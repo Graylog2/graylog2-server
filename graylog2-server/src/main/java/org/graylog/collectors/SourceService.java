@@ -16,6 +16,7 @@
  */
 package org.graylog.collectors;
 
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.MongoException;
 import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Aggregates;
@@ -44,9 +45,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static com.mongodb.client.model.Filters.eq;
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 import static org.graylog2.database.utils.MongoUtils.stream;
@@ -90,22 +91,21 @@ public class SourceService {
     }
 
     public PaginatedList<SourceDTO> findByFleet(String fleetId, SearchQuery searchQuery, int page, int perPage,
-                                                String sortField, SortOrder order,
-                                                Predicate<SourceDTO> permissionFilter) {
+                                                String sortField, SortOrder order) {
         return paginationHelper
-                .filter(Filters.and(searchQuery.toBson(), Filters.eq(SourceDTO.FIELD_FLEET_ID, fleetId)))
+                .filter(Filters.and(searchQuery.toBson(), eq(SourceDTO.FIELD_FLEET_ID, fleetId)))
                 .sort(order.toBsonSort(sortField))
                 .perPage(perPage)
-                .page(page, permissionFilter);
+                .page(page);
     }
 
+    @MustBeClosed
     public Stream<SourceDTO> streamAllByFleet(String fleetId) {
-        return stream(collection.find(Filters.eq(SourceDTO.FIELD_FLEET_ID, fleetId)));
+        return stream(collection.find(eq(SourceDTO.FIELD_FLEET_ID, fleetId)));
     }
 
     public Optional<SourceDTO> get(String fleetId, String sourceId) {
-        return Optional.ofNullable(collection.find(idEq(sourceId)).first())
-                .filter(source -> source.fleetId().equals(fleetId));
+        return Optional.ofNullable(collection.find(Filters.and(idEq(sourceId), eq(SourceDTO.FIELD_FLEET_ID, fleetId))).first());
     }
 
     public SourceDTO create(String fleetId, String name, @Nullable String description, boolean enabled, SourceConfig config) {
@@ -178,7 +178,7 @@ public class SourceService {
     }
 
     public long countByFleet(String fleetId) {
-        return collection.countDocuments(Filters.eq(SourceDTO.FIELD_FLEET_ID, fleetId));
+        return collection.countDocuments(eq(SourceDTO.FIELD_FLEET_ID, fleetId));
     }
 
     public Map<String, Long> countByFleetGrouped() {
@@ -196,7 +196,7 @@ public class SourceService {
     }
 
     public long deleteAllByFleet(String fleetId, boolean appendMarker) {
-        long deletedCount = collection.deleteMany(Filters.eq(SourceDTO.FIELD_FLEET_ID, fleetId)).getDeletedCount();
+        long deletedCount = collection.deleteMany(eq(SourceDTO.FIELD_FLEET_ID, fleetId)).getDeletedCount();
         if (deletedCount > 0 && appendMarker) {
             txnLogService.appendFleetMarker(fleetId, MarkerType.CONFIG_CHANGED);
         }

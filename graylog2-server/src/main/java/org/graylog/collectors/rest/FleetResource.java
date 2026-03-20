@@ -46,6 +46,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorsConfigService;
+import org.graylog.collectors.CollectorsPermissions;
 import org.graylog.collectors.FleetService;
 import org.graylog.collectors.SourceService;
 import org.graylog.collectors.db.FleetDTO;
@@ -113,7 +114,7 @@ public class FleetResource extends RestResource {
         }
 
         final PaginatedList<FleetDTO> result = fleetService.findPaginated(searchQuery, page, perPage, sort, order,
-                fleet -> isPermitted(FleetPermissions.FLEET_READ, fleet.id()));
+                fleet -> isPermitted(CollectorsPermissions.FLEET_READ, fleet.id()));
 
         return PageListResponse.create(
                 query,
@@ -131,7 +132,7 @@ public class FleetResource extends RestResource {
     @Timed
     @Operation(summary = "Get a single fleet")
     public FleetResponse get(@Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId) {
-        checkPermission(FleetPermissions.FLEET_READ, fleetId);
+        checkPermission(CollectorsPermissions.FLEET_READ, fleetId);
         // TODO: audit event
         return fleetService.get(fleetId)
                 .map(FleetResponse::fromDTO)
@@ -170,7 +171,7 @@ public class FleetResource extends RestResource {
     @Timed
     @Operation(summary = "Get statistics for a fleet")
     public FleetStatsResponse stats(@Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId) {
-        checkPermission(FleetPermissions.FLEET_READ, fleetId);
+        checkPermission(CollectorsPermissions.FLEET_READ, fleetId);
         if (fleetService.get(fleetId).isEmpty()) {
             throw new NotFoundException("Fleet " + fleetId + " not found");
         }
@@ -185,7 +186,7 @@ public class FleetResource extends RestResource {
     @POST
     @Timed
     @Operation(summary = "Create a new fleet")
-    @RequiresPermissions(FleetPermissions.FLEET_CREATE)
+    @RequiresPermissions(CollectorsPermissions.FLEET_CREATE)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "The newly created fleet", content = @Content(schema = @Schema(implementation = FleetResponse.class))),
     })
@@ -207,7 +208,7 @@ public class FleetResource extends RestResource {
     @NoAuditEvent("todo")
     public FleetResponse update(@Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId,
                                 @Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) UpdateFleetRequest request) {
-        checkPermission(FleetPermissions.FLEET_EDIT, fleetId);
+        checkPermission(CollectorsPermissions.FLEET_EDIT, fleetId);
         return fleetService.update(fleetId, request.name(), request.description(), request.targetVersion())
                 .map(FleetResponse::fromDTO)
                 .orElseThrow(() -> new NotFoundException("Fleet " + fleetId + " not found"));
@@ -220,7 +221,7 @@ public class FleetResource extends RestResource {
     // TODO: audit event
     @NoAuditEvent("todo")
     public void delete(@Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId) {
-        checkPermission(FleetPermissions.FLEET_DELETE, fleetId);
+        checkPermission(CollectorsPermissions.FLEET_DELETE, fleetId);
         // TODO should this fail if there are still collectors using it? should a replacement fleed be required?
         if (!fleetService.delete(fleetId)) {
             throw new NotFoundException("Fleet " + fleetId + " not found");

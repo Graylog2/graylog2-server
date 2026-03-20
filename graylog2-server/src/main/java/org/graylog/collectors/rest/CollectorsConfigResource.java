@@ -33,10 +33,12 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.collectors.CollectorInputService;
 import org.graylog.collectors.CollectorLogsDestinationService;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
+import org.graylog.collectors.CollectorsPermissions;
 import org.graylog.collectors.FleetService;
 import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.TokenSigningKey;
@@ -97,6 +99,7 @@ public class CollectorsConfigResource extends RestResource {
 
     @GET
     @Operation(summary = "Get collectors configuration")
+    @RequiresPermissions(CollectorsPermissions.CONFIGURATION_READ)
     public CollectorsConfig get(@Context ContainerRequestContext requestContext) {
         return collectorsConfigService.get().orElseGet(() -> {
             final var hostname = RestTools.buildExternalUri(requestContext.getHeaders(), httpExternalUri).getHost();
@@ -107,6 +110,7 @@ public class CollectorsConfigResource extends RestResource {
     @NoAuditEvent("TODO")
     @PUT
     @Operation(summary = "Update collectors configuration")
+    @RequiresPermissions(CollectorsPermissions.CONFIGURATION_EDIT)
     public CollectorsConfig put(@Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) CollectorsConfigRequest request) throws ValidationException {
         validateThresholds(request);
         opAmpCaService.ensureInitialized();

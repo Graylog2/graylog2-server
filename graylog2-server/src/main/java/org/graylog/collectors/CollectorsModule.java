@@ -42,7 +42,6 @@ import org.graylog.collectors.periodical.PurgeExpiredCollectorInstancesPeriodica
 import org.graylog.collectors.rest.CollectorInstancesResource;
 import org.graylog.collectors.rest.CollectorsActivityResource;
 import org.graylog.collectors.rest.CollectorsConfigResource;
-import org.graylog.collectors.rest.FleetPermissions;
 import org.graylog.collectors.rest.FleetResource;
 import org.graylog.collectors.rest.SourceResource;
 import org.graylog2.database.SequenceTopics;
@@ -110,7 +109,7 @@ public class CollectorsModule extends PluginModule {
         addMigration(V20260303120000_CollectorDEVMigrations.class);
 
         // Fleet permissions
-        addPermissions(FleetPermissions.class);
+        addPermissions(CollectorsPermissions.class);
 
         // Register entities with the title service
         addDbEntities(FleetDTO.class);

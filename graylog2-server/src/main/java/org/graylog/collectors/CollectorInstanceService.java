@@ -17,6 +17,7 @@
 package org.graylog.collectors;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Predicates;
 import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
@@ -28,29 +29,32 @@ import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.ReturnDocument;
 import com.mongodb.client.result.InsertOneResult;
 import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.graylog2.database.filtering.DbSortResolver;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.CollectorInstanceReport;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.filtering.DbSortResolver;
 import org.graylog2.database.pagination.MongoPaginationHelper;
 import org.mongojack.Id;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Date;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Updates.set;
@@ -183,14 +187,14 @@ public class CollectorInstanceService {
     }
 
     public PaginatedList<CollectorInstanceDTO> findPaginated(Bson query, DbSortResolver.ResolvedSort resolvedSort,
-                                                              int page, int perPage) {
+                                                             int page, int perPage, Predicate<CollectorInstanceDTO> selector) {
         return paginationHelper
                 .filter(query)
                 .sort(resolvedSort.sort())
                 .pipeline(resolvedSort.preSortStages())
                 .postSortPipeline(resolvedSort.postSortStages())
                 .perPage(perPage)
-                .page(page);
+                .page(page, selector);
     }
 
     public long count() {
@@ -239,13 +243,16 @@ public class CollectorInstanceService {
     }
 
     public Map<String, CollectorInstanceDTO> findByInstanceUids(Set<String> instanceUids) {
+        return findByInstanceUids(instanceUids, Predicates.alwaysTrue());
+    }
+
+    public Map<String, CollectorInstanceDTO> findByInstanceUids(Set<String> instanceUids, Predicate<CollectorInstanceDTO> predicate) {
         if (instanceUids == null || instanceUids.isEmpty()) {
             return Map.of();
         }
-        final Map<String, CollectorInstanceDTO> result = new HashMap<>();
-        collection.find(Filters.in(FIELD_INSTANCE_UID, instanceUids))
-                .forEach(dto -> result.put(dto.instanceUid(), dto));
-        return result;
+        return StreamSupport.stream(collection.find(Filters.in(FIELD_INSTANCE_UID, instanceUids)).spliterator(), false)
+                .filter(predicate)
+                .collect(Collectors.toMap(CollectorInstanceDTO::instanceUid, Function.identity()));
     }
 
     public record MinimalCollectorInstanceDTO(@Id @JsonProperty(FIELD_ID) String id,

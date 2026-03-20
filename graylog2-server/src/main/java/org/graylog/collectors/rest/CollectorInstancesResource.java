@@ -40,11 +40,11 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorsConfigService;
+import org.graylog.collectors.CollectorsPermissions;
 import org.graylog.collectors.FleetService;
 import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.SourceService;
@@ -78,6 +78,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_LAST_SEEN;
@@ -185,6 +186,9 @@ public class CollectorInstancesResource extends RestResource {
     @Timed
     @Operation(summary = "Get global collector statistics")
     public CollectorStatsResponse stats() {
+        // TODO for a permission check we would need to know which fleets are granted to the user
+        // since we haven't implemented that yet, we can't add them as filters to the count queries, as a consequence
+        // the counts would be wrong in case someone had explicit grants
         final long totalInstances = collectorInstanceService.count();
         final long onlineInstances = collectorInstanceService.countOnline(
                 Instant.now().minus(getOfflineThreshold()));
@@ -216,7 +220,12 @@ public class CollectorInstancesResource extends RestResource {
         final Instant offlineCutoff = Instant.now().minus(offlineThreshold);
         final Bson dbQuery = dbQueryCreator.createDbQuery(filters, query);
         final var resolvedSort = DbSortResolver.resolve(ATTRIBUTES, sort, order);
-        final var list = collectorInstanceService.findPaginated(dbQuery, resolvedSort, page, perPage);
+        final var list = collectorInstanceService.findPaginated(
+                dbQuery,
+                resolvedSort,
+                page,
+                perPage,
+                dto ->  isPermitted(CollectorsPermissions.FLEET_READ, dto.fleetId()));
 
         return PageListResponse.create(
                 query,
@@ -244,9 +253,14 @@ public class CollectorInstancesResource extends RestResource {
     @Timed
     @Operation(summary = "Delete a collector instance")
     @NoAuditEvent("TODO")
-    @RequiresPermissions(FleetPermissions.INSTANCE_DELETE)
     public Response deleteInstance(
             @Parameter(name = "instanceUid", required = true) @PathParam("instanceUid") String instanceUid) {
+        final Optional<CollectorInstanceDTO> collector = collectorInstanceService.findByInstanceUid(instanceUid);
+        if (collector.isEmpty()) {
+            throw new NotFoundException(f("Collector instance <%s> not found", instanceUid));
+        }
+        checkPermission(CollectorsPermissions.FLEET_INSTANCE_DELETE, collector.get().fleetId());
+
         final boolean deleted = collectorInstanceService.deleteByInstanceUid(instanceUid);
         if (!deleted) {
             throw new NotFoundException(f("Collector instance <%s> not found", instanceUid));
@@ -263,6 +277,8 @@ public class CollectorInstancesResource extends RestResource {
         final String targetFleetId = request.fleetId();
         final Set<String> instanceUids = request.instanceUids();
 
+        checkPermission(CollectorsPermissions.FLEET_READ, targetFleetId);
+        checkPermission(CollectorsPermissions.FLEET_INSTANCE_ASSIGN, targetFleetId);
         if (instanceUids == null || instanceUids.isEmpty()) {
             throw new BadRequestException("instance_uids must not be empty");
         }
@@ -275,9 +291,16 @@ public class CollectorInstancesResource extends RestResource {
             throw new NotFoundException(f("Target fleet <%s> not found", targetFleetId));
         }
 
+        final Set<String> permittedInstanceUids = collectorInstanceService.findByInstanceUids(instanceUids,
+                        instanceDTO -> isPermitted(CollectorsPermissions.FLEET_READ, instanceDTO.fleetId())
+                                && isPermitted(CollectorsPermissions.FLEET_INSTANCE_ASSIGN, instanceDTO.fleetId()))
+                .values().stream()
+                .map(CollectorInstanceDTO::instanceUid)
+                .collect(Collectors.toSet());
+
         // TODO: Show pending configuration changes per collector instance (#25341)
         txnLogService.appendCollectorMarker(
-                instanceUids,
+                permittedInstanceUids,
                 MarkerType.FLEET_REASSIGNED,
                 new Document("new_fleet_id", targetFleetId));
 

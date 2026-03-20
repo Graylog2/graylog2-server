@@ -26,15 +26,17 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.collectors.CollectorInstanceService;
+import org.graylog.collectors.CollectorsPermissions;
 import org.graylog.collectors.FleetService;
 import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.FleetDTO;
 import org.graylog.collectors.db.MarkerType;
 import org.graylog.collectors.db.TransactionMarker;
-import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 
 import java.util.ArrayList;
@@ -72,12 +74,11 @@ public class CollectorsActivityResource extends RestResource {
         this.userService = userService;
     }
 
-    // TODO: Add permission check once collector permission constants are defined
-
     @GET
     @Path("/recent")
     @Timed
     @Operation(summary = "Get recent activity across all fleets and collectors")
+    @RequiresPermissions(CollectorsPermissions.ACTIVITY_READ)
     public RecentActivityResponse recent() {
         final List<TransactionMarker> markers = transactionLogService.getRecentMarkers(RECENT_ACTIVITY_LIMIT);
         if (markers.isEmpty()) {
@@ -136,8 +137,17 @@ public class CollectorsActivityResource extends RestResource {
         for (final var targetId : marker.targetIds()) {
             final String name;
             if (TransactionMarker.TARGET_FLEET.equals(marker.target())) {
+                // skip the target if it's a fleet we have no permission to
+                if (!isPermitted(CollectorsPermissions.FLEET_READ, targetId)) {
+                    continue;
+                }
                 name = fleetNames.getOrDefault(targetId, targetId);
             } else {
+                // skip the target if the user cannot see the target's fleet
+                if (instances.containsKey(targetId)
+                        && !isPermitted(CollectorsPermissions.FLEET_READ, instances.get(targetId).fleetId())) {
+                    continue;
+                }
                 name = resolveInstanceHostname(instances, targetId);
             }
             targets.add(new RecentActivityResponse.TargetInfo(targetId, name, marker.target()));
@@ -170,7 +180,7 @@ public class CollectorsActivityResource extends RestResource {
     private Map<String, String> resolveDetails(TransactionMarker marker, Map<String, String> fleetNames) {
         if (marker.type() == MarkerType.FLEET_REASSIGNED && marker.payload() != null) {
             final String newFleetId = marker.payload().getString("new_fleet_id");
-            if (newFleetId != null) {
+            if (newFleetId != null && isPermitted(CollectorsPermissions.FLEET_READ, newFleetId)) {
                 return Map.of(
                         "new_fleet_id", newFleetId,
                         "new_fleet_name", fleetNames.getOrDefault(newFleetId, newFleetId));
@@ -184,7 +194,7 @@ public class CollectorsActivityResource extends RestResource {
         for (final var username : usernames) {
             final var fullName = Optional.ofNullable(userService.load(username))
                     .or(() -> Optional.ofNullable(userService.loadById(username)))
-                    .map(User::getFullName)
+                    .map(user -> isPermitted(RestPermissions.USERS_READ, user.getId()) ? user.getFullName() : "Unknown")
                     .orElse(username);
             result.put(username, fullName);
         }

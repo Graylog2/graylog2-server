@@ -39,7 +39,7 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.collectors.CollectorsPermissions;
 import org.graylog.collectors.SourceService;
 import org.graylog.collectors.db.SourceDTO;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -91,6 +91,7 @@ public class SourceResource extends RestResource {
             @Parameter(name = "sort") @QueryParam("sort") @DefaultValue("name") String sort,
             @Parameter(name = "order") @QueryParam("order") @DefaultValue("asc") SortOrder order) {
 
+        checkPermission(CollectorsPermissions.FLEET_READ, fleetId);
         final SearchQuery searchQuery;
         try {
             searchQuery = sourceService.parseSearchQuery(query);
@@ -98,8 +99,7 @@ public class SourceResource extends RestResource {
             throw new BadRequestException("Invalid search query: " + e.getMessage(), e);
         }
 
-        final PaginatedList<SourceDTO> result = sourceService.findByFleet(fleetId, searchQuery, page, perPage, sort, order,
-                source -> isPermitted(FleetPermissions.SOURCE_READ, source.id()));
+        final PaginatedList<SourceDTO> result = sourceService.findByFleet(fleetId, searchQuery, page, perPage, sort, order);
 
         return PageListResponse.create(
                 query,
@@ -119,7 +119,7 @@ public class SourceResource extends RestResource {
     public SourceResponse get(
             @Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId,
             @Parameter(name = "sourceId", required = true) @PathParam("sourceId") String sourceId) {
-        checkPermission(FleetPermissions.SOURCE_READ, sourceId);
+        checkPermission(CollectorsPermissions.FLEET_READ, fleetId);
         // TODO: audit event
         return sourceService.get(fleetId, sourceId)
                 .map(SourceResponse::fromDTO)
@@ -129,12 +129,12 @@ public class SourceResource extends RestResource {
     @POST
     @Timed
     @Operation(summary = "Create a new source in a fleet")
-    @RequiresPermissions(FleetPermissions.SOURCE_CREATE)
     // TODO: audit event
     @NoAuditEvent("todo")
     public Response create(
             @Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId,
             @Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) CreateSourceRequest request) {
+        checkPermission(CollectorsPermissions.SOURCE_CREATE, fleetId);
         final SourceDTO created;
         try {
             created = sourceService.create(fleetId, request.name(), request.description(), request.enabled(), request.config());
@@ -163,7 +163,7 @@ public class SourceResource extends RestResource {
             @Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId,
             @Parameter(name = "sourceId", required = true) @PathParam("sourceId") String sourceId,
             @Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) UpdateSourceRequest request) {
-        checkPermission(FleetPermissions.SOURCE_EDIT, sourceId);
+        checkPermission(CollectorsPermissions.SOURCE_EDIT, fleetId);
         // TODO: audit event
         try {
             return sourceService.update(fleetId, sourceId, request.name(), request.description(), request.enabled(), request.config())
@@ -189,7 +189,7 @@ public class SourceResource extends RestResource {
     public void delete(
             @Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId,
             @Parameter(name = "sourceId", required = true) @PathParam("sourceId") String sourceId) {
-        checkPermission(FleetPermissions.SOURCE_DELETE, sourceId);
+        checkPermission(CollectorsPermissions.SOURCE_DELETE, fleetId);
         // TODO: audit event
         if (!sourceService.delete(fleetId, sourceId)) {
             throw new NotFoundException("Source " + sourceId + " not found");
