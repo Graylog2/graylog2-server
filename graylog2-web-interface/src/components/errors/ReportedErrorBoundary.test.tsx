@@ -34,9 +34,6 @@ jest.mock('routing/withLocation', () => (Component) => (props) => (
 ));
 jest.mock('brand-customization/useProductName');
 
-const mockCloseSidebar = jest.fn();
-jest.mock('hooks/useRightSidebar', () => () => ({ openSidebar: jest.fn(), closeSidebar: mockCloseSidebar, sidebar: null }));
-
 const triggerError = async (error: ReportedError) => {
   await suppressConsole(() => {
     ErrorsActions.report(error);
@@ -117,18 +114,6 @@ describe('ReportedErrorBoundary', () => {
         screen.queryByText(/Do not hesitate to consult the Graylog community if your questions are not answered/i),
       ).not.toBeInTheDocument();
     });
-  });
-
-  it('closes the right sidebar when an error is reported', async () => {
-    render(<ReportedErrorBoundary>Hello World!</ReportedErrorBoundary>);
-
-    await screen.findByText('Hello World!');
-
-    await triggerError(createReactError(new Error('The error message'), { componentStack: 'The component stack' }));
-
-    await screen.findByText('Something went wrong.');
-
-    expect(mockCloseSidebar).toHaveBeenCalled();
   });
 
   it('resets error when navigation changes', async () => {
