@@ -23,7 +23,10 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.TooLongFrameException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.util.List;
@@ -39,6 +42,7 @@ import java.util.List;
  */
 public class JsonArrayFrameDecoder extends ByteToMessageDecoder {
 
+    private static final Logger LOG = LoggerFactory.getLogger(JsonArrayFrameDecoder.class);
     private static final JsonFactory JSON_FACTORY = new JsonFactory();
 
     /**
@@ -172,10 +176,59 @@ public class JsonArrayFrameDecoder extends ByteToMessageDecoder {
             return buffer.readRetainedSlice(objectLength);
 
         } catch (Exception e) {
-            // Incomplete or unparseable JSON — wait for more data
             buffer.readerIndex(startPos);
+
+            // Jackson failed to parse. Determine if the data is malformed (complete but
+            // invalid JSON) or merely incomplete (needs more bytes). Scan for a matching
+            // '}' using brace depth counting on raw bytes. If found, the object boundary
+            // is present but the content is invalid — skip past it and continue.
+            final int malformedEnd = findClosingBrace(buffer, startPos);
+            if (malformedEnd > 0) {
+                buffer.readerIndex(startPos + malformedEnd);
+                LOG.warn("Skipping malformed JSON object ({} bytes) at buffer position {}",
+                        malformedEnd, startPos);
+                ctx.fireExceptionCaught(new DecoderException(
+                        "Malformed JSON object at buffer position " + startPos, e));
+                return null;
+            }
+
+            // No matching '}' found — data is likely incomplete, wait for more bytes
             return null;
         }
+    }
+
+    @Override
+    protected void decodeLast(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+        super.decodeLast(ctx, in, out);
+        // Reset state so a malformed array (missing ']') on one request
+        // does not corrupt parsing of subsequent requests on the same connection.
+        insideArray = false;
+    }
+
+    /**
+     * Scan raw bytes from {@code startPos} looking for the matching '}' that closes
+     * the opening '{'. Uses simple brace depth counting — this deliberately ignores
+     * JSON string quoting because we only use it as a recovery heuristic for data
+     * that Jackson already rejected.
+     *
+     * @return the number of bytes from startPos to just past the matching '}',
+     * or -1 if no matching '}' was found.
+     */
+    private static int findClosingBrace(ByteBuf buffer, int startPos) {
+        int depth = 0;
+        final int end = buffer.writerIndex();
+        for (int i = startPos; i < end; i++) {
+            final byte b = buffer.getByte(i);
+            if (b == '{') {
+                depth++;
+            } else if (b == '}') {
+                depth--;
+                if (depth == 0) {
+                    return i - startPos + 1;
+                }
+            }
+        }
+        return -1;
     }
 
     /**

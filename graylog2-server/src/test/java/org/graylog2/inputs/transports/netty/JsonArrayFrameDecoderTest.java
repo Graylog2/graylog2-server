@@ -18,6 +18,7 @@ package org.graylog2.inputs.transports.netty;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.embedded.EmbeddedChannel;
+import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.TooLongFrameException;
 import io.netty.util.CharsetUtil;
 import org.junit.jupiter.api.Test;
@@ -445,6 +446,30 @@ public class JsonArrayFrameDecoderTest {
     }
 
     @Test
+    public void testMalformedJsonIsSkippedAndSubsequentObjectDecoded() {
+        // Malformed JSON starting with '{' should be detected via brace-scan fallback
+        // and skipped, allowing valid objects sent afterward to be decoded.
+        EmbeddedChannel ch = new EmbeddedChannel(new JsonArrayFrameDecoder(8192));
+
+        // Send malformed JSON — Jackson fails, brace-scan finds matching '}',
+        // decoder skips it and fires DecoderException
+        assertThrows(DecoderException.class, () ->
+                ch.writeInbound(copiedBuffer("{not valid json}", CharsetUtil.UTF_8)));
+        assertNull(ch.readInbound());
+
+        // Send valid JSON — should be decoded normally
+        ch.writeInbound(copiedBuffer("{\"message\":\"hello\"}", CharsetUtil.UTF_8));
+        ch.finish();
+
+        ByteBuf buf = ch.readInbound();
+        assertNotNull(buf, "Valid JSON after malformed input should still be decoded");
+        assertEquals("{\"message\":\"hello\"}", buf.toString(CharsetUtil.UTF_8));
+        buf.release();
+
+        ch.finishAndReleaseAll();
+    }
+
+    @Test
     public void testBackslashEscapedBackslash() {
         EmbeddedChannel ch = new EmbeddedChannel(new JsonArrayFrameDecoder(8192));
 
@@ -457,5 +482,72 @@ public class JsonArrayFrameDecoderTest {
         buf1.release();
 
         assertNull(ch.readInbound());
+    }
+
+    @Test
+    public void testMalformedJsonInsideArrayDoesNotBlockSubsequentObjects() {
+        // If one object in an array is malformed, valid objects after it should still be emitted.
+        // The decoder fires a DecoderException for the malformed object and continues.
+        EmbeddedChannel ch = new EmbeddedChannel(new JsonArrayFrameDecoder(8192));
+
+        assertThrows(DecoderException.class, () ->
+                ch.writeInbound(copiedBuffer("[{not json},{\"id\":1}]", CharsetUtil.UTF_8)));
+
+        ByteBuf buf = ch.readInbound();
+        assertNotNull(buf, "Valid object after malformed one in same array should be emitted");
+        assertEquals("{\"id\":1}", buf.toString(CharsetUtil.UTF_8));
+        buf.release();
+
+        ch.finishAndReleaseAll();
+    }
+
+    @Test
+    public void testMissingArrayCloseDoesNotCorruptNextRequest() {
+        // A malformed array payload missing ']' should not leave insideArray=true,
+        // which would corrupt parsing of the next HTTP request on the same connection.
+        EmbeddedChannel ch = new EmbeddedChannel(new JsonArrayFrameDecoder(8192));
+
+        // First request: malformed — opening '[' but no closing ']'
+        ch.writeInbound(copiedBuffer("[{\"id\":1}", CharsetUtil.UTF_8));
+
+        ByteBuf buf1 = ch.readInbound();
+        assertNotNull(buf1);
+        assertEquals("{\"id\":1}", buf1.toString(CharsetUtil.UTF_8));
+        buf1.release();
+
+        // Second request: a standalone object (not in an array).
+        // If insideArray leaked from the previous request, the decoder would
+        // misinterpret this payload.
+        ch.writeInbound(copiedBuffer("{\"id\":2}", CharsetUtil.UTF_8));
+        ch.finish();
+
+        ByteBuf buf2 = ch.readInbound();
+        assertNotNull(buf2, "Standalone object after unclosed array should be decoded");
+        assertEquals("{\"id\":2}", buf2.toString(CharsetUtil.UTF_8));
+        buf2.release();
+
+        ch.finishAndReleaseAll();
+    }
+
+    @Test
+    public void testPlainTextInputDoesNotStallDecoder() {
+        // Non-JSON plaintext should be skipped entirely, not block the decoder.
+        EmbeddedChannel ch = new EmbeddedChannel(new JsonArrayFrameDecoder(8192));
+
+        ch.writeInbound(copiedBuffer("just plain text", CharsetUtil.UTF_8));
+
+        // Plain text should be consumed (skipped byte by byte) without emitting frames
+        assertNull(ch.readInbound());
+
+        // A valid object sent afterward should still work
+        ch.writeInbound(copiedBuffer("{\"id\":1}", CharsetUtil.UTF_8));
+        ch.finish();
+
+        ByteBuf buf = ch.readInbound();
+        assertNotNull(buf, "Valid JSON after plain text should be decoded");
+        assertEquals("{\"id\":1}", buf.toString(CharsetUtil.UTF_8));
+        buf.release();
+
+        ch.finishAndReleaseAll();
     }
 }
