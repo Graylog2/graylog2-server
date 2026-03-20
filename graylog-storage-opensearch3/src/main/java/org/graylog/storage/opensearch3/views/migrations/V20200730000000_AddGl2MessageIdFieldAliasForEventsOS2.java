@@ -17,57 +17,56 @@
 package org.graylog.storage.opensearch3.views.migrations;
 
 import com.google.common.collect.ImmutableMap;
-import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
-import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
-import org.graylog.shaded.opensearch2.org.opensearch.action.support.master.AcknowledgedResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutMappingRequest;
-import org.graylog.storage.opensearch3.OpenSearchClient;
-import org.graylog2.indexer.ElasticsearchException;
-
 import jakarta.inject.Inject;
+import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
+import org.graylog.storage.opensearch3.OfficialOpensearchClient;
+import org.graylog2.indexer.ElasticsearchException;
+import org.opensearch.client.opensearch._types.ExpandWildcard;
+import org.opensearch.client.opensearch._types.mapping.Property;
+import org.opensearch.client.opensearch.indices.PutMappingRequest;
+import org.opensearch.client.opensearch.indices.PutMappingResponse;
 
-import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.graylog2.plugin.Message.FIELD_GL2_MESSAGE_ID;
 
 public class V20200730000000_AddGl2MessageIdFieldAliasForEventsOS2 implements V20200730000000_AddGl2MessageIdFieldAliasForEvents.ElasticsearchAdapter {
 
-    private final OpenSearchClient client;
+    private final OfficialOpensearchClient client;
 
     @Inject
-    public V20200730000000_AddGl2MessageIdFieldAliasForEventsOS2(OpenSearchClient client) {
+    public V20200730000000_AddGl2MessageIdFieldAliasForEventsOS2(OfficialOpensearchClient client) {
         this.client = client;
     }
 
     @Override
     public void addGl2MessageIdFieldAlias(Set<String> indexPrefixes) {
 
-        final String[] prefixesWithWildcard = indexPrefixes.stream().map(p -> p + "*").toArray(String[]::new);
-
-        final PutMappingRequest putMappingRequest = new PutMappingRequest(prefixesWithWildcard)
-                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN_CLOSED)
-                .source(ImmutableMap.of("properties", ImmutableMap.of(FIELD_GL2_MESSAGE_ID, aliasMapping())));
-
-        try {
-            final AcknowledgedResponse acknowledgedResponse = client.execute((c, requestOptions) -> c.indices().putMapping(putMappingRequest, requestOptions));
-            if (!acknowledgedResponse.isAcknowledged()) {
-                throw new ElasticsearchException(errorMsgFor(prefixesWithWildcard) + " Elasticsearch failed to acknowledge.");
-            }
-        } catch (ElasticsearchException e) {
-            throw new ElasticsearchException(errorMsgFor(prefixesWithWildcard), e);
+        final List<String> prefixesWithWildcard = indexPrefixes.stream().map(p -> p + "*").collect(Collectors.toList());
+        PutMappingRequest request = PutMappingRequest.builder()
+                .index(prefixesWithWildcard)
+                .allowNoIndices(true)
+                .expandWildcards(ExpandWildcard.Open, ExpandWildcard.Closed)
+                .properties(ImmutableMap.of(FIELD_GL2_MESSAGE_ID, aliasMapping()))
+                .build();
+        PutMappingResponse response = client.sync(c -> c.indices().putMapping(request), errorMsgFor(prefixesWithWildcard));
+        if (!response.acknowledged()) {
+            throw new ElasticsearchException(errorMsgFor(prefixesWithWildcard) + " Opensearch failed to acknowledge.");
         }
+
     }
 
-    private String errorMsgFor(String[] prefixesWithWildcard) {
-        return "Failed to add field alias " + FIELD_GL2_MESSAGE_ID + " for indices " + Arrays.toString(prefixesWithWildcard) + ".";
+    private String errorMsgFor(List<String> prefixesWithWildcard) {
+        return "Failed to add field alias " + FIELD_GL2_MESSAGE_ID + " for indices " + prefixesWithWildcard.toString() + ".";
     }
 
-    static LinkedHashMap<String, Object> aliasMapping() {
+    static Property aliasMapping() {
         LinkedHashMap<String, Object> aliasMapping = new LinkedHashMap<>();
-        aliasMapping.put("type", "alias");
-        aliasMapping.put("path", "id");
-        return aliasMapping;
+        return Property.builder()
+                .alias(a -> a.path("id"))
+                .build();
     }
 }
