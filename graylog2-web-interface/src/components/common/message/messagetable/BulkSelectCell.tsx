@@ -20,13 +20,14 @@ import styled from 'styled-components';
 import { BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 const StyledCell = styled.td`
-  width: ${BULK_SELECT_COLUMN_WIDTH}px;
+  &&& {
+    width: ${BULK_SELECT_COLUMN_WIDTH}px;
+    min-width: auto;
+  }
 `;
 
 const BulkSelectCell = ({ children = null }: React.PropsWithChildren) => (
-  <StyledCell data-bulk-select-cell onClick={(event) => event.stopPropagation()}>
-    {children}
-  </StyledCell>
+  <StyledCell onClick={(event) => event.stopPropagation()}>{children}</StyledCell>
 );
 
 export default BulkSelectCell;

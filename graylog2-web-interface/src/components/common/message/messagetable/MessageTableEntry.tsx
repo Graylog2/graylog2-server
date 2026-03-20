@@ -72,7 +72,7 @@ export const TableBody = styled.tbody<{ $expanded?: boolean; $highlighted?: bool
 const FieldsRow = styled.tr`
   cursor: pointer;
 
-  && td:not([data-bulk-select-cell]) {
+  && td {
     min-width: 50px;
     word-break: break-word;
     padding: 4px 5px 2px;
