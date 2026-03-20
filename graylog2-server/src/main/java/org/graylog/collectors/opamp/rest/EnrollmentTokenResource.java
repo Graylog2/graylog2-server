@@ -31,6 +31,7 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -39,16 +40,15 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog.collectors.CollectorsConfigService;
+import org.graylog.collectors.CollectorsPermissions;
 import org.graylog.collectors.FleetService;
 import org.graylog.collectors.db.EnrollmentTokenCreator;
 import org.graylog.collectors.db.EnrollmentTokenDTO;
 import org.graylog.collectors.db.FleetDTO;
 import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
-import org.graylog.plugins.sidecar.permissions.SidecarRestPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.filtering.ComputedFieldRegistry;
 import org.graylog2.database.filtering.DbQueryCreator;
@@ -64,6 +64,8 @@ import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 @Tag(name = "OpAMP Enrollment", description = "OpAMP agent enrollment management")
 @Path("/opamp/enrollment-tokens")
@@ -133,8 +135,6 @@ public class EnrollmentTokenResource extends RestResource {
     @NoAuditEvent("TODO")
     @POST
     @Operation(summary = "Create an enrollment token for OpAMP agents")
-    // TODO: Replace with proper OpAMP permissions and verify target fleet exists and caller has access
-    @RequiresPermissions(SidecarRestPermissions.SIDECARS_CREATE)
     public EnrollmentTokenResponse createToken(
             @RequestBody(description = "Enrollment token creation request")
             @Valid @NotNull CreateEnrollmentTokenRequest request) {
@@ -142,6 +142,8 @@ public class EnrollmentTokenResource extends RestResource {
                 new BadRequestException("Collectors must be configured before creating enrollment tokens. " +
                         "Configure collectors at /api/collectors/config first.")
         );
+
+        checkPermission(CollectorsPermissions.FLEET_INSTANCE_ASSIGN, request.fleetId());
 
         if (fleetService.get(request.fleetId()).isEmpty()) {
             throw new BadRequestException("Fleet not found: " + request.fleetId());
@@ -151,10 +153,8 @@ public class EnrollmentTokenResource extends RestResource {
         return enrollmentTokenService.createToken(request, creator);
     }
 
-    // TODO: Add fleet-aware authorization — filter results to fleets the caller may read
     @GET
     @Operation(summary = "List enrollment tokens")
-    @RequiresPermissions(SidecarRestPermissions.SIDECARS_CREATE)
     public PageListResponse<EnrollmentTokenDTO> list(
             @Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
             @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
@@ -171,25 +171,31 @@ public class EnrollmentTokenResource extends RestResource {
             @QueryParam("order") @DefaultValue(DEFAULT_SORT_DIRECTION) SortOrder order) {
         final Bson dbQuery = dbQueryCreator.createDbQuery(filters, query);
         final var resolvedSort = DbSortResolver.resolve(ATTRIBUTES, sort, order);
-        final var list = enrollmentTokenService.findPaginated(dbQuery, resolvedSort, page, perPage);
+        final var list = enrollmentTokenService.findPaginated(dbQuery, resolvedSort,
+                page, perPage, dto -> isPermitted(CollectorsPermissions.FLEET_INSTANCE_ASSIGN, dto.fleetId()));
 
         return PageListResponse.create(query, list.pagination(), list.pagination().total(),
                 sort, order, list.stream().toList(), ATTRIBUTES, DEFAULTS);
     }
 
     // TODO: Add @AuditEvent for security audit logging of token deletion
-    // TODO: Authorize against the token's fleet, not only a global permission
     @NoAuditEvent("TODO")
     @DELETE
     @Path("/{tokenId}")
     @Operation(summary = "Delete an enrollment token")
-    @RequiresPermissions(SidecarRestPermissions.SIDECARS_CREATE)
     public Response delete(@Parameter(name = "tokenId", required = true) @PathParam("tokenId") String tokenId) {
         if (!ObjectId.isValid(tokenId)) {
             throw new BadRequestException("Invalid token ID format");
         }
+
+        final Optional<EnrollmentTokenDTO> token = enrollmentTokenService.findOne(tokenId);
+        if (token.isEmpty()) {
+            throw new NotFoundException("Enrollment token not found");
+        }
+        checkPermission(CollectorsPermissions.FLEET_INSTANCE_ASSIGN, token.get().fleetId());
+
         if (!enrollmentTokenService.delete(tokenId)) {
-            throw new jakarta.ws.rs.NotFoundException("Enrollment token not found");
+            throw new NotFoundException("Enrollment token not found");
         }
         return Response.noContent().build();
     }
@@ -201,14 +207,19 @@ public class EnrollmentTokenResource extends RestResource {
     @POST
     @Path("/bulk_delete")
     @Operation(summary = "Bulk delete enrollment tokens")
-    @RequiresPermissions(SidecarRestPermissions.SIDECARS_CREATE)
     public BulkOperationResponse bulkDelete(
             @RequestBody(description = "Token IDs to delete")
             @NotNull final BulkOperationRequest request) {
         if (request.entityIds() == null || request.entityIds().isEmpty()) {
             throw new BadRequestException("No IDs provided in the request");
         }
-        final long deleted = enrollmentTokenService.deleteMany(request.entityIds());
-        return new BulkOperationResponse(Ints.saturatedCast(deleted), List.of());
+        try (Stream<EnrollmentTokenDTO> stream = enrollmentTokenService.findByIds(request.entityIds())) {
+            final List<String> permittedIds =
+                    stream.filter(dto -> isPermitted(CollectorsPermissions.FLEET_INSTANCE_ASSIGN, dto.fleetId()))
+                            .map(EnrollmentTokenDTO::id)
+                            .toList();
+            final long deleted = enrollmentTokenService.deleteMany(permittedIds);
+            return new BulkOperationResponse(Ints.saturatedCast(deleted), List.of());
+        }
     }
 }

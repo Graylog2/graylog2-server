@@ -16,6 +16,7 @@
  */
 package org.graylog.collectors.opamp.rest;
 
+import com.google.common.base.Predicates;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.MultivaluedHashMap;
@@ -186,7 +187,7 @@ class EnrollmentTokenResourceTest {
 
         final var paginatedList = new PaginatedList<>(List.of(token), 1, 1, 50);
 
-        when(enrollmentTokenService.findPaginated(any(), any(DbSortResolver.ResolvedSort.class), anyInt(), anyInt()))
+        when(enrollmentTokenService.findPaginated(any(), any(DbSortResolver.ResolvedSort.class), anyInt(), anyInt(), Predicates.alwaysTrue()))
                 .thenReturn(paginatedList);
 
         final var response = resource.list(1, 50, "", List.of(), "created_at",

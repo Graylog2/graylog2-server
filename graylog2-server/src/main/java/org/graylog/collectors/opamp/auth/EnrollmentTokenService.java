@@ -16,6 +16,7 @@
  */
 package org.graylog.collectors.opamp.auth;
 
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.model.IndexModel;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
@@ -27,6 +28,7 @@ import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.TokenSigningKey;
@@ -55,9 +57,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static com.mongodb.client.model.Filters.eq;
 import static org.graylog2.database.utils.MongoUtils.idEq;
+import static org.graylog2.database.utils.MongoUtils.idsIn;
+import static org.graylog2.database.utils.MongoUtils.stream;
 import static org.graylog2.database.utils.MongoUtils.stringIdsIn;
 
 /**
@@ -238,16 +244,20 @@ public class EnrollmentTokenService {
         );
     }
 
+    public Optional<EnrollmentTokenDTO> findOne(String tokenId) {
+        return Optional.ofNullable(tokenCollection.find(idEq(tokenId)).first());
+    }
+
     public PaginatedList<EnrollmentTokenDTO> findPaginated(Bson query,
                                                            DbSortResolver.ResolvedSort resolvedSort,
-                                                           int page, int perPage) {
+                                                           int page, int perPage, Predicate<EnrollmentTokenDTO> filter) {
         return paginationHelper
                 .filter(query)
                 .sort(resolvedSort.sort())
                 .pipeline(resolvedSort.preSortStages())
                 .postSortPipeline(resolvedSort.postSortStages())
                 .perPage(perPage)
-                .page(page);
+                .page(page, filter);
     }
 
     private String buildJwt(TokenSigningKey tokenSigningKey, String jti, Instant issuedAt, @Nullable Instant expiresAt) {
@@ -282,5 +292,10 @@ public class EnrollmentTokenService {
         return collectorsConfigService.get()
                 .map(CollectorsConfig::tokenSigningKey)
                 .orElseThrow(() -> new IllegalStateException("Token signing key not found"));
+    }
+
+    @MustBeClosed
+    public Stream<EnrollmentTokenDTO> findByIds(List<String> ids) {
+        return stream(tokenCollection.find(idsIn(ids.stream().map(ObjectId::new).toList())));
     }
 }
