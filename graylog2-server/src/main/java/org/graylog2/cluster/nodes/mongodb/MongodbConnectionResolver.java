@@ -20,5 +20,9 @@ import com.mongodb.MongoClient;
 
 public interface MongodbConnectionResolver {
 
+    /**
+     * This will provide a client for the requested host and port. The client may be cached and reused. Do not
+     * close the client, it will be closed automatically - it's lifecycle is managed by the resolver itself.
+     */
     MongoClient resolve(String nodeName);
 }

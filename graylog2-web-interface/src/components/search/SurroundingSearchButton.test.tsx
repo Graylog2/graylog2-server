@@ -18,9 +18,14 @@ import * as React from 'react';
 import { asElement, render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
+import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
+import { asMock } from 'helpers/mocking';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import DrilldownContext from 'views/components/contexts/DrilldownContext';
 
 import SurroundingSearchButton from './SurroundingSearchButton';
+
+jest.mock('hooks/useSearchConfiguration', () => jest.fn());
 
 const getOption = async (optionText: string) => {
   const button = await screen.findByRole('button', { name: /show surrounding messages/i });
@@ -32,15 +37,26 @@ const getOption = async (optionText: string) => {
 
 describe('SurroundingSearchButton', () => {
   const searchConfig = {
+    ...mockSearchesClusterConfig,
     surrounding_filter_fields: ['somefield', 'someotherfield'],
     surrounding_timerange_options: {
       PT1S: '1 second',
       PT1M: 'Only a minute',
     },
   };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    asMock(useSearchConfiguration).mockReturnValue({
+      config: searchConfig,
+      refresh: jest.fn(),
+      isInitialLoading: false,
+    });
+  });
+
   const TestComponent = (props: Partial<React.ComponentProps<typeof SurroundingSearchButton>>) => (
     <SurroundingSearchButton
-      searchConfig={searchConfig}
       timestamp="2020-02-28T09:45:31.123Z"
       id="foo-bar"
       messageFields={{}}

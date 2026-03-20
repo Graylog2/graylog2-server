@@ -14,19 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { useContext } from 'react';
 
-import type { ActionDefinition, ActionHandlerArguments } from 'views/components/actions/ActionHandler';
+import FieldActionsContext, { type FieldActionsContextValue } from './FieldActionsContext';
 
-// eslint-disable-next-line import/prefer-default-export
-type ExternalActionArgs = ActionHandlerArguments;
+const DEFAULT_CONTEXT_VALUE: FieldActionsContextValue = {
+  evaluateCondition: (conditionFn, handlerArgs) => conditionFn(handlerArgs),
+  additionalHandlerArgs: {},
+  valueActions: [],
+  fieldActions: [],
+};
 
-export const createSimpleExternalValueAction = (
-  overrides: Partial<ActionDefinition<ExternalActionArgs>> = {},
-): ActionDefinition<ExternalActionArgs> => ({
-  type: 'http-get',
-  title: 'Pivot to example.org',
-  isHidden: ({ field }) => !['field1'].includes(field),
-  linkTarget: () => 'the-link',
-  resetFocus: false,
-  ...overrides,
-});
+const useFieldActions = (): FieldActionsContextValue | undefined => {
+  const contextValue = useContext(FieldActionsContext);
+
+  if (!contextValue) {
+    return DEFAULT_CONTEXT_VALUE;
+  }
+
+  return contextValue;
+};
+
+export default useFieldActions;
