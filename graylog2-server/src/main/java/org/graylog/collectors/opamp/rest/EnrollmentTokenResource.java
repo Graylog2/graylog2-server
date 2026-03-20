@@ -16,6 +16,7 @@
  */
 package org.graylog.collectors.opamp.rest;
 
+import com.google.common.primitives.Ints;
 import com.mongodb.client.model.Filters;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -40,6 +41,7 @@ import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.FleetService;
 import org.graylog.collectors.db.EnrollmentTokenCreator;
@@ -51,6 +53,8 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.filtering.ComputedFieldRegistry;
 import org.graylog2.database.filtering.DbQueryCreator;
 import org.graylog2.database.filtering.DbSortResolver;
+import org.graylog2.rest.bulk.model.BulkOperationRequest;
+import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
@@ -181,12 +185,30 @@ public class EnrollmentTokenResource extends RestResource {
     @Operation(summary = "Delete an enrollment token")
     @RequiresPermissions(SidecarRestPermissions.SIDECARS_CREATE)
     public Response delete(@Parameter(name = "tokenId", required = true) @PathParam("tokenId") String tokenId) {
-        if (!org.bson.types.ObjectId.isValid(tokenId)) {
+        if (!ObjectId.isValid(tokenId)) {
             throw new BadRequestException("Invalid token ID format");
         }
         if (!enrollmentTokenService.delete(tokenId)) {
             throw new jakarta.ws.rs.NotFoundException("Enrollment token not found");
         }
         return Response.noContent().build();
+    }
+
+    // TODO: Add @AuditEvent for security audit logging of bulk token deletion
+    // TODO: Add fleet-aware authorization — check caller's access to each token's fleet before deleting.
+    //       Partition IDs into allowed/denied, delete only allowed, return denied as failures in BulkOperationResponse.
+    @NoAuditEvent("TODO")
+    @POST
+    @Path("/bulk_delete")
+    @Operation(summary = "Bulk delete enrollment tokens")
+    @RequiresPermissions(SidecarRestPermissions.SIDECARS_CREATE)
+    public BulkOperationResponse bulkDelete(
+            @RequestBody(description = "Token IDs to delete")
+            @NotNull final BulkOperationRequest request) {
+        if (request.entityIds() == null || request.entityIds().isEmpty()) {
+            throw new BadRequestException("No IDs provided in the request");
+        }
+        final long deleted = enrollmentTokenService.deleteMany(request.entityIds());
+        return new BulkOperationResponse(Ints.saturatedCast(deleted), List.of());
     }
 }

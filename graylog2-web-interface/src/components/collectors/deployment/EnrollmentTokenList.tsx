@@ -28,6 +28,7 @@ import type { Sort } from 'stores/PaginationTypes';
 
 import { fetchPaginatedEnrollmentTokens, enrollmentTokensKeyFn, useCollectorsMutations, useFleets } from '../hooks';
 import type { EnrollmentTokenMetadata } from '../types';
+import BulkActions from './BulkActions';
 
 const DEFAULT_LAYOUT = {
   entityTableId: 'enrollment-tokens',
@@ -143,6 +144,7 @@ const EnrollmentTokenList = () => {
         entityAttributesAreCamelCase={false}
         columnRenderers={renderers}
         entityActions={entityActions}
+        bulkSelection={{ actions: <BulkActions /> }}
       />
       {deletingToken && (
         <ConfirmDialog

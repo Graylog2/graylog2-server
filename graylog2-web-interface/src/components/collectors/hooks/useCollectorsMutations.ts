@@ -156,6 +156,13 @@ const useCollectorsMutations = () => {
     onSuccess: onSuccess('Enrollment token has been deleted.'),
   });
 
+  const bulkDeleteEnrollmentTokensMutation = useMutation({
+    mutationFn: (entityIds: string[]) =>
+      OpAMPEnrollment.bulkDelete({ entity_ids: entityIds }),
+    onError: onMutationError('Deleting enrollment tokens'),
+    onSuccess: onSuccess('Enrollment tokens have been deleted.'),
+  });
+
   // Instance reassignment mutation
   const reassignInstancesMutation = useMutation({
     mutationFn: (input: { instanceUids: string[]; fleetId: string }) =>
@@ -211,6 +218,8 @@ const useCollectorsMutations = () => {
     isCreatingEnrollmentToken: createEnrollmentTokenMutation.isPending,
     deleteEnrollmentToken: deleteEnrollmentTokenMutation.mutateAsync,
     isDeletingEnrollmentToken: deleteEnrollmentTokenMutation.isPending,
+    bulkDeleteEnrollmentTokens: bulkDeleteEnrollmentTokensMutation.mutateAsync,
+    isBulkDeletingEnrollmentTokens: bulkDeleteEnrollmentTokensMutation.isPending,
 
     // Instance operations
     reassignInstances: reassignInstancesMutation.mutateAsync,

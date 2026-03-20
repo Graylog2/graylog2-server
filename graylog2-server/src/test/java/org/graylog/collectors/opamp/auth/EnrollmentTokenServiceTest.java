@@ -51,6 +51,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
+import java.util.List;
 import java.util.Date;
 import java.util.Optional;
 
@@ -326,6 +327,37 @@ class EnrollmentTokenServiceTest {
         // BouncyCastle's PEM parser returns "EdDSA" as the algorithm family,
         // while the original KeyPairGenerator("Ed25519") reports "Ed25519"
         assertThat(privateKey.getAlgorithm()).isIn("Ed25519", "EdDSA");
+    }
+
+    @Test
+    void deleteManyRemovesMultipleTokens() {
+        final var request1 = new CreateEnrollmentTokenRequest(TEST_TOKEN_NAME, "fleet-1", Duration.ofDays(1));
+        final var request2 = new CreateEnrollmentTokenRequest("token-2", "fleet-1", Duration.ofDays(1));
+        final var request3 = new CreateEnrollmentTokenRequest("token-3", "fleet-2", Duration.ofDays(1));
+
+        final var response1 = enrollmentTokenService.createToken(request1, TEST_CREATOR);
+        final var response2 = enrollmentTokenService.createToken(request2, TEST_CREATOR);
+        final var response3 = enrollmentTokenService.createToken(request3, TEST_CREATOR);
+
+        final var dto1 = enrollmentTokenService.validateToken(response1.token()).orElseThrow();
+        final var dto2 = enrollmentTokenService.validateToken(response2.token()).orElseThrow();
+        final var dto3 = enrollmentTokenService.validateToken(response3.token()).orElseThrow();
+
+        // Delete tokens 1 and 2
+        final long deleted = enrollmentTokenService.deleteMany(List.of(dto1.id(), dto2.id()));
+        assertThat(deleted).isEqualTo(2);
+
+        // Token 3 should still be valid
+        assertThat(enrollmentTokenService.validateToken(response3.token())).isPresent();
+        // Tokens 1 and 2 should be gone
+        assertThat(enrollmentTokenService.validateToken(response1.token())).isEmpty();
+        assertThat(enrollmentTokenService.validateToken(response2.token())).isEmpty();
+    }
+
+    @Test
+    void deleteManyReturnsZeroForNonexistentIds() {
+        final long deleted = enrollmentTokenService.deleteMany(List.of("507f1f77bcf86cd799439011", "507f1f77bcf86cd799439012"));
+        assertThat(deleted).isEqualTo(0);
     }
 
     @Test

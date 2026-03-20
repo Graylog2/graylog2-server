@@ -58,6 +58,7 @@ import java.util.UUID;
 
 import static com.mongodb.client.model.Filters.eq;
 import static org.graylog2.database.utils.MongoUtils.idEq;
+import static org.graylog2.database.utils.MongoUtils.stringIdsIn;
 
 /**
  * Service for accessing enrollment tokens.
@@ -217,6 +218,10 @@ public class EnrollmentTokenService {
 
     public boolean delete(String id) {
         return tokenCollection.deleteOne(idEq(id)).getDeletedCount() > 0;
+    }
+
+    public long deleteMany(List<String> ids) {
+        return tokenCollection.deleteMany(stringIdsIn(ids)).getDeletedCount();
     }
 
     public void deleteAllByFleet(String fleetId) {

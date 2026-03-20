@@ -30,6 +30,7 @@ import org.graylog.collectors.db.EnrollmentTokenCreator;
 import org.graylog.collectors.db.EnrollmentTokenDTO;
 import org.graylog.collectors.db.FleetDTO;
 import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
+import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.ComputedFieldRegistry;
 import org.graylog2.database.filtering.DbSortResolver;
@@ -214,5 +215,41 @@ class EnrollmentTokenResourceTest {
         assertThatThrownBy(() -> resource.delete(validId))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("Enrollment token not found");
+    }
+
+    @Test
+    void bulkDeleteDelegatesToService() {
+        final var ids = List.of("507f1f77bcf86cd799439011", "507f1f77bcf86cd799439012");
+        when(enrollmentTokenService.deleteMany(ids)).thenReturn(2L);
+
+        final var response = resource.bulkDelete(new BulkOperationRequest(ids));
+
+        assertThat(response.successfullyPerformed()).isEqualTo(2);
+        assertThat(response.failures()).isEmpty();
+        verify(enrollmentTokenService).deleteMany(ids);
+    }
+
+    @Test
+    void bulkDeleteThrowsWhenNoIdsProvided() {
+        assertThatThrownBy(() -> resource.bulkDelete(new BulkOperationRequest(List.of())))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("No IDs provided");
+    }
+
+    @Test
+    void bulkDeleteThrowsWhenIdsNull() {
+        assertThatThrownBy(() -> resource.bulkDelete(new BulkOperationRequest(null)))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("No IDs provided");
+    }
+
+    @Test
+    void bulkDeleteReportsPartialDeletion() {
+        final var ids = List.of("507f1f77bcf86cd799439011", "507f1f77bcf86cd799439012", "507f1f77bcf86cd799439013");
+        when(enrollmentTokenService.deleteMany(ids)).thenReturn(2L);
+
+        final var response = resource.bulkDelete(new BulkOperationRequest(ids));
+
+        assertThat(response.successfullyPerformed()).isEqualTo(2);
     }
 }
