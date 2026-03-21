@@ -119,6 +119,11 @@
             <artifactId>mongojack</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.opensearch</groupId>
+            <artifactId>opensearch-core</artifactId>
+            <version>${opensearch.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.graylog.repackaged</groupId>
             <artifactId>os-platform-finder</artifactId>
         </dependency>
