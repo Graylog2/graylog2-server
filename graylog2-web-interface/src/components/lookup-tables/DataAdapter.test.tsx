@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import { createLookupTableAdapter } from 'fixtures/lookupTables';
@@ -23,11 +24,17 @@ import { asMock } from 'helpers/mocking';
 import useScopePermissions from 'hooks/useScopePermissions';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
 import { ModalProvider } from 'components/lookup-tables/contexts/ModalContext';
+import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 
 import CSVFileAdapterSummary from './adapters/CSVFileAdapterSummary';
 import DataAdapter from './DataAdapter';
 
 jest.mock('hooks/useScopePermissions');
+jest.mock('stores/lookup-tables/LookupTableDataAdaptersStore', () => ({
+  LookupTableDataAdaptersActions: {
+    lookup: jest.fn(),
+  },
+}));
 
 PluginStore.register(
   new PluginManifest(
@@ -84,5 +91,38 @@ describe('DataAdapter', () => {
     renderedDataAdapter('ILLUMINATE');
 
     expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
+  });
+
+  // Regression: PR #23432 introduced json-with-bigint which deserializes large numbers as BigInt.
+  // DataAdapter used native JSON.stringify to render lookup results, which throws
+  // "TypeError: Do not know how to serialize a BigInt" for values like AD's accountExpires.
+  // Introduced by: 5cb51acdcceb660c2cc75fc8c0ad48a17b543334 (2026-03-19)
+  it('should render lookup results containing BigInt values without crashing', async () => {
+    const lookupResultWithBigInt = {
+      single_value: 'testuser',
+      multi_value: {
+        sAMAccountName: 'testuser',
+        accountExpires: BigInt('9223372036854775807'),
+        pwdLastSet: BigInt('134185088795495957'),
+        displayName: 'Test User',
+      },
+      has_error: false,
+      ttl: 1000,
+    };
+
+    asMock(LookupTableDataAdaptersActions.lookup).mockResolvedValue(lookupResultWithBigInt);
+
+    renderedDataAdapter('DEFAULT');
+
+    const keyInput = screen.getByLabelText(/key/i);
+    const lookupButton = screen.getByRole('button', { name: /look up/i });
+
+    await userEvent.type(keyInput, 'testuser');
+    await userEvent.click(lookupButton);
+
+    await screen.findByText(/lookup result/i);
+
+    expect(screen.getByText(/9223372036854775807/)).toBeInTheDocument();
+    expect(screen.getByText(/testuser/)).toBeInTheDocument();
   });
 });

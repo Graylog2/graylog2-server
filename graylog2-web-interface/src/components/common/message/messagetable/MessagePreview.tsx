@@ -21,6 +21,7 @@ import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig'
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import type { Message } from 'views/components/messagelist/Types';
 import usePluginEntities from 'hooks/usePluginEntities';
+import BulkSelectCell from 'components/common/message/messagetable/BulkSelectCell';
 
 import MessageFieldRow from './MessageFieldRow';
 
@@ -51,6 +52,7 @@ type Props = {
   showMessageRow?: boolean;
   messageFieldType: FieldType;
   config: MessagesWidgetConfig;
+  displayBulkSelectCol: boolean;
 };
 
 const MessagePreview = ({
@@ -60,12 +62,14 @@ const MessagePreview = ({
   messageFieldType,
   showMessageRow = false,
   config,
+  displayBulkSelectCol,
 }: Props) => {
   const MessageRowOverride = usePluginEntities('views.components.widgets.messageTable.messageRowOverride')?.[0];
 
   return (
     showMessageRow && (
       <TableRow onClick={onRowClick}>
+        {displayBulkSelectCol && <BulkSelectCell />}
         <td colSpan={colSpanFixup}>
           {!!MessageRowOverride && (
             <MessageRowOverride

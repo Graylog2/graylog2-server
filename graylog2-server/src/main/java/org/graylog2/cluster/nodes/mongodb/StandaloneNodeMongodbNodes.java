@@ -61,7 +61,7 @@ public class StandaloneNodeMongodbNodes implements MongodbNodesService {
         ClusterDescription clusterDescription = mongoConnection.getClusterDescription();
         ClusterType clusterType = clusterDescription.getType();
 
-        return new MongodbNode("0", host, clusterType.name(), version, profilingResults.profilingLevel(), 0, profilingResults.slowQueryCount(), storageUsedPercent, availableConnections, currentConnections, connectionsPercent);
+        return new MongodbNode("0", host, clusterType.name(), version, profilingResults.profilingLevel(), 0L, profilingResults.slowQueryCount(), storageUsedPercent, availableConnections, currentConnections, connectionsPercent);
     }
 
     @Override

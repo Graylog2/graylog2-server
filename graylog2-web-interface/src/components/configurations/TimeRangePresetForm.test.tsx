@@ -56,6 +56,7 @@ describe('TimeRangePresetForm', () => {
     asMock(useSearchConfiguration).mockReturnValue({
       config: mockSearchesClusterConfig,
       refresh: jest.fn(),
+      isInitialLoading: false,
     });
 
     asMock(debounce as DebouncedFunc<(...args: any) => any>).mockImplementation((fn) => fn);

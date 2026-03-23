@@ -16,28 +16,32 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { useContext, useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 import type { WidgetComponentProps, MessageResult } from 'views/types';
 import { Messages } from 'views/Constants';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import type { SearchTypeOptions } from 'views/logic/search/GlobalOverride';
 import { PaginatedList } from 'components/common';
+import BulkActionsRow from 'components/common/EntityDataTable/BulkActionsRow';
 import MessageTable from 'components/common/message/messagetable/MessageTable';
 import ErrorWidget from 'views/components/widgets/ErrorWidget';
 import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import type { BackendMessage } from 'views/components/messagelist/Types';
 import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
 import { InputsActions } from 'stores/inputs/InputsStore';
-import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useCurrentSearchTypesResults from 'views/components/widgets/useCurrentSearchTypesResults';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import reexecuteSearchTypes from 'views/components/widgets/reexecuteSearchTypes';
 import useOnSearchExecution from 'views/hooks/useOnSearchExecution';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useSearchResult from 'views/hooks/useSearchResult';
+import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
+import useMessageListPluggableBulkActions from 'views/components/widgets/useMessageListPluggableBulkActions';
 
 import RenderCompletionCallback from './RenderCompletionCallback';
+import MessageTableSelectedEntitiesProvider from './MessageTableSelectedEntitiesProvider';
+import SelectableMessageTableMessagesProvider from './SelectableMessageTableMessagesProvider';
 
 const Wrapper = styled.div`
   display: flex;
@@ -50,11 +54,42 @@ const Wrapper = styled.div`
   }
 `;
 
+const StyledBulkActionsRow = styled(BulkActionsRow)`
+  padding-bottom: 10px;
+`;
+
+const BulkActions = ({ actions, actionModals }: { actions: React.ReactNode; actionModals: React.ReactNode }) => {
+  if (!actions) return null;
+
+  return (
+    <>
+      <BulkActionsDropdown bsSize="xs">{actions}</BulkActionsDropdown>
+      {actionModals}
+    </>
+  );
+};
+
 export type MessageListResult = {
   messages: Array<BackendMessage>;
   total: number;
   id: string;
   type: 'messages';
+};
+
+export type SelectableMessageTableMessage = {
+  id: string;
+  index: BackendMessage['index'];
+  timestamp: BackendMessage['message']['timestamp'];
+};
+
+export type MessageTableBulkSelection = {
+  actions?: React.ReactNode;
+  onChangeSelection?: (
+    selectedEntities: Array<BackendMessage['message']['_id']>,
+    data: Readonly<Array<SelectableMessageTableMessage>>,
+  ) => void;
+  initialSelection?: Array<BackendMessage['message']['_id']>;
+  isEntitySelectable?: (entity: BackendMessage) => boolean;
 };
 
 type Props = WidgetComponentProps<MessagesWidgetConfig, MessageListResult> & {
@@ -104,17 +139,27 @@ const MessageList = ({
   onConfigChange = () => Promise.resolve(),
   pageSize = Messages.DEFAULT_LIMIT,
   setLoadingState,
+  editing,
 }: Props) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const { pluggableBulkActions, pluggableBulkActionModals } = useMessageListPluggableBulkActions();
   const { stopAutoRefresh } = useAutoRefresh();
 
   const pageErrors = usePageErrors(searchTypeId);
-  const activeQueryId = useActiveQueryId();
   const searchTypes = useCurrentSearchTypesResults();
   const scrollContainerRef = useResetScrollPositionOnPageChange(currentPage);
   const dispatch = useViewsDispatch();
   useResetPaginationOnSearchExecution(setCurrentPage, currentPage);
   useRenderCompletionCallback();
+  const displayBulkSelectCol = !!pluggableBulkActions && !editing;
+
+  const bulkSelection = useMemo(
+    () => ({
+      actions: <BulkActions actions={pluggableBulkActions} actionModals={pluggableBulkActionModals} />,
+    }),
+    [pluggableBulkActions, pluggableBulkActionModals],
+  );
+  const isEntitySelectable = (entity: BackendMessage) => Boolean(displayBulkSelectCol && entity.message?._id);
 
   const handlePageChange = useCallback(
     (newCurrentPage: number) => {
@@ -150,32 +195,46 @@ const MessageList = ({
     [config, onConfigChange],
   );
 
+  const content = (
+    <Wrapper>
+      {displayBulkSelectCol && <StyledBulkActionsRow bulkActions={bulkSelection.actions} />}
+      <PaginatedList
+        onChange={handlePageChange}
+        activePage={Number(currentPage)}
+        showPageSizeSelect={false}
+        totalItems={totalMessages}
+        pageSize={pageSize}
+        enforcePageBounds={false}
+        useQueryParameter={false}>
+        {pageErrors.length > 0 ? (
+          <ErrorWidget errors={pageErrors} />
+        ) : (
+          <MessageTable
+
+            config={config}
+            scrollContainerRef={scrollContainerRef}
+            fields={fields}
+            onSortChange={onSortChange}
+            setLoadingState={setLoadingState}
+            messages={messages}
+            displayBulkSelectCol={displayBulkSelectCol}
+            isEntitySelectable={isEntitySelectable}
+          />
+        )}
+      </PaginatedList>
+    </Wrapper>
+  );
+
   return (
     <WindowDimensionsContextProvider>
-      <Wrapper>
-        <PaginatedList
-          onChange={handlePageChange}
-          activePage={Number(currentPage)}
-          showPageSizeSelect={false}
-          totalItems={totalMessages}
-          pageSize={pageSize}
-          enforcePageBounds={false}
-          useQueryParameter={false}>
-          {pageErrors.length > 0 ? (
-            <ErrorWidget errors={pageErrors} />
-          ) : (
-            <MessageTable
-              activeQueryId={activeQueryId}
-              config={config}
-              scrollContainerRef={scrollContainerRef}
-              fields={fields}
-              onSortChange={onSortChange}
-              setLoadingState={setLoadingState}
-              messages={messages}
-            />
-          )}
-        </PaginatedList>
-      </Wrapper>
+      <SelectableMessageTableMessagesProvider
+        messages={messages}
+        isEntitySelectable={isEntitySelectable}
+        displayBulkSelectCol={displayBulkSelectCol}>
+        <MessageTableSelectedEntitiesProvider bulkSelection={bulkSelection}>
+          {content}
+        </MessageTableSelectedEntitiesProvider>
+      </SelectableMessageTableMessagesProvider>
     </WindowDimensionsContextProvider>
   );
 };

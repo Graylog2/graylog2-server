@@ -17,28 +17,25 @@
 package org.graylog.storage.opensearch3.sniffer.impl;
 
 import jakarta.inject.Inject;
-import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Node;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
-import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.NodesSniffer;
-import org.graylog.storage.opensearch3.sniffer.SnifferBuilder;
+import org.graylog.storage.opensearch3.sniffer.DiscoveredNode;
+import org.graylog.storage.opensearch3.sniffer.NodesSniffer;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.configuration.RunsWithDataNode;
 
+import java.net.URI;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * This is an implementation of a {@link NodesSniffer} which provides hostnames of datanodes available in the
- * datanode {@link NodeService} collection. By using this sniffer, opensearch clients can recover and start using
- * opensearch inside datanode even if we heavily reconfigure the cluster topology - by stopping and starting nodes,
- * changing their hostnames(and certificates), by adding and removing nodes. Opensearch clients will always get
- * all available nodes through this sniffer. This also helps to spread the load in the cluster, as all of those
- * nodes can be used by the client, not just those initially configured.
+ * Provides hostnames of datanodes available in the datanode {@link NodeService} collection.
+ * By using this sniffer, opensearch clients can recover and start using opensearch inside
+ * datanode even if we heavily reconfigure the cluster topology.
  */
-public class DatanodesSniffer implements SnifferBuilder {
+public class DatanodesSniffer implements NodesSniffer {
 
     private final NodeService<DataNodeDto> nodeService;
     private final boolean runsWithDataNode;
@@ -55,11 +52,21 @@ public class DatanodesSniffer implements SnifferBuilder {
     }
 
     @Override
-    public NodesSniffer create(RestClient restClient) {
-        return () -> nodeService.allActive().values().stream()
+    public List<DiscoveredNode> sniff() {
+        return nodeService.allActive().values().stream()
                 .filter(n -> n.getDataNodeStatus() == DataNodeStatus.AVAILABLE)
                 .map(NodeDto::getTransportAddress)
-                .map(host -> new Node(HttpHost.create(host)))
+                .map(DatanodesSniffer::toDiscoveredNode)
                 .collect(Collectors.toList());
+    }
+
+    private static DiscoveredNode toDiscoveredNode(String address) {
+        final URI uri = URI.create(address);
+        return new DiscoveredNode(
+                uri.getScheme(),
+                uri.getHost(),
+                uri.getPort(),
+                Collections.emptyMap()
+        );
     }
 }

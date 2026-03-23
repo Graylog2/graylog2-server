@@ -14,19 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch3;
+import React from 'react';
+import styled from 'styled-components';
 
-import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
-import org.graylog.testing.elasticsearch.SearchInstance;
-import org.graylog.testing.elasticsearch.SearchServerInstance;
-import org.graylog2.indexer.indices.IndicesGetAllMessageFieldsIT;
+import { BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
-public class IndicesGetAllMessageFieldsOS2IT extends IndicesGetAllMessageFieldsIT {
-    @SearchInstance
-    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
+const StyledCell = styled.td`
+  &&& {
+    width: ${BULK_SELECT_COLUMN_WIDTH}px;
+    min-width: auto;
+  }
+`;
 
-    @Override
-    protected SearchServerInstance searchServer() {
-        return openSearchInstance;
-    }
-}
+const BulkSelectCell = ({ children = null }: React.PropsWithChildren) => (
+  <StyledCell onClick={(event) => event.stopPropagation()}>{children}</StyledCell>
+);
+
+export default BulkSelectCell;

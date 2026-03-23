@@ -14,9 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { ActionContexts } from 'views/types';
 import type { ActionHandler, ActionConditions } from 'views/components/actions/ActionHandler';
 
 export type ValuePath = Array<{ [key: string]: any }>;
 
-export type ValueActionHandler<Contexts = ActionContexts> = ActionHandler<Contexts> & ActionConditions<Contexts>;
+export type ValueActionHandler<Args extends object = {}> = ActionHandler<Args> & ActionConditions<Args>;

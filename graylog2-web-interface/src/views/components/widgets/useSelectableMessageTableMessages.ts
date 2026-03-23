@@ -14,19 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch3.sniffer;
 
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
-import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.NodesSniffer;
+import { useContext } from 'react';
 
-public interface SnifferBuilder {
-    /**
-     * @return true if the configuration of this node allows that type of sniffer
-     */
-    boolean enabled();
+import SelectableMessageTableMessagesContext from './SelectableMessageTableMessagesContext';
 
-    /**
-     * @return Always a new instance of a sniffer.
-     */
-    NodesSniffer create(RestClient restClient);
-}
+const useSelectableMessageTableMessages = () => {
+  const contextValue = useContext(SelectableMessageTableMessagesContext);
+
+  if (!contextValue) {
+    throw new Error(
+      'useSelectableMessageTableMessages needs to be used inside SelectableMessageTableMessagesContext.Provider',
+    );
+  }
+
+  return contextValue;
+};
+
+export default useSelectableMessageTableMessages;

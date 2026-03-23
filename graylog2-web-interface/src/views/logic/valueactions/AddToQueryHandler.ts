@@ -37,7 +37,7 @@ type Arguments = {
   field: string;
   value?: string | number;
   type: FieldType;
-  contexts?: ActionContexts;
+  contexts?: Partial<ActionContexts>;
 };
 
 const AddToQueryHandler =

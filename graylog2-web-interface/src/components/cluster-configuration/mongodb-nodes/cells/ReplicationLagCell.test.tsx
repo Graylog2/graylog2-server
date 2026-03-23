@@ -43,21 +43,18 @@ describe('<ReplicationLagCell />', () => {
   const warningThreshold = 1000;
   const dangerThreshold = 30000;
 
-  it.each([MongodbRole.PRIMARY, MongodbRole.STANDALONE, MongodbRole.ARBITER])(
-    'shows "-" for role %s',
-    (role) => {
-      render(
-        <ReplicationLagCell
-          replicationLag={100}
-          role={role}
-          warningThreshold={warningThreshold}
-          dangerThreshold={dangerThreshold}
-        />,
-      );
+  it.each([MongodbRole.PRIMARY, MongodbRole.STANDALONE, MongodbRole.ARBITER])('shows "-" for role %s', (role) => {
+    render(
+      <ReplicationLagCell
+        replicationLag={100}
+        role={role}
+        warningThreshold={warningThreshold}
+        dangerThreshold={dangerThreshold}
+      />,
+    );
 
-      expect(screen.getByText('-')).toBeInTheDocument();
-    },
-  );
+    expect(screen.getByText('-')).toBeInTheDocument();
+  });
 
   it('shows placeholder when lag is not available for a secondary node', () => {
     render(

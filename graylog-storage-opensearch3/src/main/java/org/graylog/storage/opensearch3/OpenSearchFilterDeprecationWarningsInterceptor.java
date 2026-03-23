@@ -17,26 +17,22 @@
 package org.graylog.storage.opensearch3;
 
 import org.apache.hc.core5.http.EntityDetails;
-import org.graylog.shaded.opensearch2.org.apache.http.Header;
-import org.graylog.shaded.opensearch2.org.apache.http.HttpException;
-import org.graylog.shaded.opensearch2.org.apache.http.HttpResponse;
-import org.graylog.shaded.opensearch2.org.apache.http.HttpResponseInterceptor;
-import org.graylog.shaded.opensearch2.org.apache.http.protocol.HttpContext;
-import org.graylog.shaded.opensearch2.org.opensearch.common.joda.JodaDeprecationPatterns;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.HttpResponseInterceptor;
+import org.apache.hc.core5.http.protocol.HttpContext;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 // TODO: check, if these messages still need filtering
-public class OpenSearchFilterDeprecationWarningsInterceptor implements HttpResponseInterceptor, org.apache.hc.core5.http.HttpResponseInterceptor {
+public class OpenSearchFilterDeprecationWarningsInterceptor implements HttpResponseInterceptor {
     private final String[] messagesToFilter = {
             "setting was deprecated in OpenSearch",
             "but in a future major version, direct access to system indices and their aliases will not be allowed",
             "but in a future major version, direct access to system indices will be prevented by default",
             "in epoch time formats is deprecated and will not be supported in the next major version of OpenSearch",
-            JodaDeprecationPatterns.USE_NEW_FORMAT_SPECIFIERS
+            "Use new java.time date format specifiers."
     };
 
     private boolean isDeprecationMessage(final String message) {
@@ -46,20 +42,9 @@ public class OpenSearchFilterDeprecationWarningsInterceptor implements HttpRespo
         return false;
     }
 
-    /**
-     * OS2 Implementation, remove with the rest of OS2 client
-     */
-    @Deprecated(forRemoval = true)
     @Override
-    public void process(HttpResponse response, HttpContext context) {
-        List<Header> warnings = Arrays.stream(response.getHeaders("Warning")).filter(header -> !this.isDeprecationMessage(header.getValue())).collect(Collectors.toList());
-        response.removeHeaders("Warning");
-        warnings.forEach(response::addHeader);
-    }
-
-    @Override
-    public void process(org.apache.hc.core5.http.HttpResponse response, EntityDetails entity, org.apache.hc.core5.http.protocol.HttpContext context) {
-        List<org.apache.hc.core5.http.Header> warnings = Arrays.stream(response.getHeaders("Warning")).filter(header -> !this.isDeprecationMessage(header.getValue())).toList();
+    public void process(HttpResponse response, EntityDetails entity, HttpContext context) {
+        List<Header> warnings = Arrays.stream(response.getHeaders("Warning")).filter(header -> !this.isDeprecationMessage(header.getValue())).toList();
         response.removeHeaders("Warning");
         warnings.forEach(response::addHeader);
     }

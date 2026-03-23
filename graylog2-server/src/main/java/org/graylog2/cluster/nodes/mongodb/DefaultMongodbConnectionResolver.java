@@ -24,6 +24,10 @@ import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.apache.http.client.utils.URIBuilder;
 import org.graylog2.configuration.MongoDbConfiguration;
+import org.graylog2.system.shutdown.GracefulShutdownHook;
+import org.graylog2.system.shutdown.GracefulShutdownService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -31,20 +35,32 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
-public class DefaultMongodbConnectionResolver implements MongodbConnectionResolver {
+public class DefaultMongodbConnectionResolver implements MongodbConnectionResolver, GracefulShutdownHook {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultMongodbConnectionResolver.class);
 
     private final MongoClientURI mongoClientURI;
+    private final Map<String, MongoClient> mongoClients = new ConcurrentHashMap<>();
+
 
     @Inject
-    public DefaultMongodbConnectionResolver(MongoDbConfiguration configuration) {
+    public DefaultMongodbConnectionResolver(MongoDbConfiguration configuration, GracefulShutdownService shutdownService) {
         this.mongoClientURI = configuration.getMongoClientURI();
+        shutdownService.register(DefaultMongodbConnectionResolver.this);
     }
 
     @Override
     public MongoClient resolve(String nodeName) {
+        return mongoClients.computeIfAbsent(nodeName, k -> createClient(nodeName));
+    }
+
+    @Nonnull
+    private MongoClient createClient(String nodeName) {
+        LOG.info("Creating mongo client for {}", nodeName);
         return new MongoClient(new MongoClientURI(buildConnectionString(nodeName)));
     }
 
@@ -69,6 +85,8 @@ public class DefaultMongodbConnectionResolver implements MongodbConnectionResolv
             final Map<String, String> configParams = new LinkedHashMap<>(configParamsFromQuery());
             configParams.put("directConnection", "true");
             configParams.forEach(builder::addParameter);
+            configParams.remove("replicaSet");
+            configParams.put("maxPoolSize", "5");
 
             return builder.build().toString();
         } catch (URISyntaxException e) {
@@ -84,5 +102,20 @@ public class DefaultMongodbConnectionResolver implements MongodbConnectionResolv
                         .withKeyValueSeparator('=')
                         .split(query))
                 .orElseGet(Collections::emptyMap);
+    }
+
+    @Override
+    public void doGracefulShutdown() throws Exception {
+        for (Map.Entry<String, MongoClient> entry : mongoClients.entrySet()) {
+            final String nodeName = entry.getKey();
+            final MongoClient client = entry.getValue();
+            LOG.info("Closing mongo client for {}", nodeName);
+            try {
+                client.close();
+            } catch (Exception e) {
+                LOG.warn("Error while closing mongo client for {}", nodeName, e);
+            }
+        }
+        mongoClients.clear();
     }
 }
