@@ -54,7 +54,9 @@ import java.util.stream.Collectors;
    on this collection if we just want to retrieve one of them. To enable this for dashboards, a view is created, matching
    only documents which have the corresponding type.
  */
-@DbEntity(collection = "dashboards", readPermission = RestPermissions.DASHBOARDS_READ)
+@DbEntity(collection = "dashboards", readPermission = RestPermissions.DASHBOARDS_READ,
+          readableFields = {"title", "summary", "description", "type", "owner",
+                  "created_at", "last_updated_at", "search_id"})
 public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, ViewLike, SourcedMongoEntity<ViewDTO, ViewDTO.Builder> {
     public static final String COLLECTION_NAME = "views";
 

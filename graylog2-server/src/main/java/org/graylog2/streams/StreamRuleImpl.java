@@ -43,7 +43,8 @@ import static org.graylog2.streams.StreamRuleImpl.FIELD_DESCRIPTION;
  */
 @DbEntity(collection = "streamrules",
           titleField = FIELD_DESCRIPTION,
-          readPermission = STREAMS_READ)
+          readPermission = STREAMS_READ,
+          readableFields = {"type", "value", "field", "inverted", "stream_id", "description"})
 public class StreamRuleImpl extends PersistedImpl implements StreamRule {
     public static final String FIELD_TYPE = "type";
     public static final String FIELD_VALUE = "value";

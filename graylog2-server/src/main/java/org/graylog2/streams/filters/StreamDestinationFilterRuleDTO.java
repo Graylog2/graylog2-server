@@ -37,7 +37,8 @@ import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 @AutoValue
 @JsonAutoDetect
 @JsonDeserialize(builder = StreamDestinationFilterRuleDTO.Builder.class)
-@DbEntity(collection = StreamDestinationFilterService.COLLECTION, readPermission = RestPermissions.STREAM_DESTINATION_FILTERS_READ)
+@DbEntity(collection = StreamDestinationFilterService.COLLECTION, readPermission = RestPermissions.STREAM_DESTINATION_FILTERS_READ,
+          readableFields = {"title", "description", "stream_id", "destination_type", "status"})
 public abstract class StreamDestinationFilterRuleDTO implements MongoEntity {
     public enum Status {
         @JsonProperty("enabled")

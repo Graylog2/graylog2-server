@@ -40,7 +40,9 @@ import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
 @AutoValue
 @JsonAutoDetect
 @JsonDeserialize(builder = StreamDTO.Builder.class)
-@DbEntity(collection = "streams", readPermission = STREAMS_READ)
+@DbEntity(collection = "streams", readPermission = STREAMS_READ,
+          readableFields = {"title", "description", "disabled", "created_at", "creator_user_id",
+                  "matching_type", "index_set_id", "is_editable", "categories", "is_default_stream"})
 // Package-private to prevent usage outside the streams package.
 abstract class StreamDTO implements ScopedEntity<StreamDTO.Builder> {
     public static final String FIELD_TITLE = "title";

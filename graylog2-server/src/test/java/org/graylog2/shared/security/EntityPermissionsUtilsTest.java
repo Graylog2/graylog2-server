@@ -27,7 +27,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -59,7 +61,7 @@ class EntityPermissionsUtilsTest {
     @Test
     void hasReadPermissionForWholeCollectionReturnsFalseWhenCatalogHasNullPermission() {
         doReturn(Optional.of(
-                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, null))
+                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, null, List.of()))
         ).when(catalog)
                 .getByCollectionName("streams");
 
@@ -70,7 +72,7 @@ class EntityPermissionsUtilsTest {
     @Test
     void hasReadPermissionForWholeCollectionReturnsTrueWhenCatalogHasAllAllowedPermission() {
         doReturn(Optional.of(
-                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, DbEntity.ALL_ALLOWED))
+                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, DbEntity.ALL_ALLOWED, List.of()))
         ).when(catalog)
                 .getByCollectionName("streams");
 
@@ -81,7 +83,7 @@ class EntityPermissionsUtilsTest {
     @Test
     void hasReadPermissionForWholeCollectionReturnsFalseWhenSubjectMissesPermission() {
         doReturn(Optional.of(
-                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read"))
+                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read", List.of()))
         ).when(catalog)
                 .getByCollectionName("streams");
 
@@ -93,13 +95,70 @@ class EntityPermissionsUtilsTest {
     @Test
     void hasReadPermissionForWholeCollectionReturnsTrueWhenSubjectHasPermission() {
         doReturn(Optional.of(
-                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read"))
+                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read", List.of()))
         ).when(catalog)
                 .getByCollectionName("streams");
 
         doReturn(true).when(subject).isPermitted("streams:read:*");
         final boolean hasReadPermissions = toTest.hasReadPermissionForWholeCollection(subject, "streams");
         assertTrue(hasReadPermissions);
+    }
+
+    @Test
+    void areFieldsReadableReturnsTrueWhenCollectionNotInCatalog() {
+        doReturn(Optional.empty()).when(catalog).getByCollectionName("unknown");
+
+        assertTrue(toTest.areFieldsReadable("unknown", Set.of("any_field")));
+    }
+
+    @Test
+    void areFieldsReadableReturnsTrueWhenAllFieldsAreReadable() {
+        doReturn(Optional.of(
+                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read",
+                        List.of("title", "description", "created_at")))
+        ).when(catalog).getByCollectionName("streams");
+
+        assertTrue(toTest.areFieldsReadable("streams", Set.of("title", "description")));
+    }
+
+    @Test
+    void areFieldsReadableReturnsFalseWhenFieldIsNotInReadableList() {
+        doReturn(Optional.of(
+                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read",
+                        List.of("title", "description")))
+        ).when(catalog).getByCollectionName("streams");
+
+        assertFalse(toTest.areFieldsReadable("streams", Set.of("title", "secret_field")));
+    }
+
+    @Test
+    void areFieldsReadableAlwaysAllowsIdField() {
+        doReturn(Optional.of(
+                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read",
+                        List.of("title")))
+        ).when(catalog).getByCollectionName("streams");
+
+        assertTrue(toTest.areFieldsReadable("streams", Set.of("_id", "title")));
+    }
+
+    @Test
+    void areFieldsReadableReturnsFalseWhenReadableFieldsIsEmpty() {
+        doReturn(Optional.of(
+                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read",
+                        List.of()))
+        ).when(catalog).getByCollectionName("streams");
+
+        assertFalse(toTest.areFieldsReadable("streams", Set.of("title")));
+    }
+
+    @Test
+    void areFieldsReadableAllowsOnlyIdFieldWhenReadableFieldsIsEmpty() {
+        doReturn(Optional.of(
+                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read",
+                        List.of()))
+        ).when(catalog).getByCollectionName("streams");
+
+        assertTrue(toTest.areFieldsReadable("streams", Set.of("_id")));
     }
 
 }

@@ -70,7 +70,9 @@ import static org.graylog2.users.UserImpl.FULL_NAME;
 
 @DbEntity(collection = COLLECTION_NAME,
           titleField = FULL_NAME,
-          readPermission = USERS_READ)
+          readPermission = USERS_READ,
+          readableFields = {"username", "email", "first_name", "last_name", "full_name",
+                  "timezone", "external_user", "roles", "account_status", "service_account"})
 public class UserImpl extends PersistedImpl implements User {
 
     public static final String FULL_NAME_FORMAT = "%s %s";

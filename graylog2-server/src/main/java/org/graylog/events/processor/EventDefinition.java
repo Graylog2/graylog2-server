@@ -30,7 +30,9 @@ import org.joda.time.DateTime;
 import javax.annotation.Nullable;
 import java.util.Set;
 
-@DbEntity(readPermission = RestPermissions.EVENT_DEFINITIONS_READ, collection = DBEventDefinitionService.COLLECTION_NAME)
+@DbEntity(readPermission = RestPermissions.EVENT_DEFINITIONS_READ,
+          collection = DBEventDefinitionService.COLLECTION_NAME,
+          readableFields = {"title", "description", "priority", "alert", "state", "updated_at", "matched_at", "remediation_steps"})
 public interface EventDefinition {
     enum State {
         ENABLED,

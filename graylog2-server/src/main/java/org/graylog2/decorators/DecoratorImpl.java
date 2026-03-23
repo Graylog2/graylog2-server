@@ -38,7 +38,8 @@ import static org.graylog2.shared.security.RestPermissions.DECORATORS_READ;
 @JsonAutoDetect
 @DbEntity(collection = "decorators",
           titleField = NO_TITLE,
-          readPermission = DECORATORS_READ)
+          readPermission = DECORATORS_READ,
+          readableFields = {"type", "stream", "order"})
 public abstract class DecoratorImpl implements Decorator, Comparable<DecoratorImpl>,
         BuildableMongoEntity<DecoratorImpl, DecoratorImpl.Builder> {
     static final String FIELD_ID = "id";

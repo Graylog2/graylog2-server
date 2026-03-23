@@ -35,6 +35,8 @@ import org.graylog2.database.utils.CompositeDisplayFormatter;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.security.EntityPermissionsUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.HashSet;
@@ -51,6 +53,8 @@ import static org.graylog2.users.UserImpl.LocalAdminUser.LOCAL_ADMIN_ID;
 import static org.graylog2.users.UserImpl.USERNAME;
 
 public class MongoEntitySuggestionService implements EntitySuggestionService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MongoEntitySuggestionService.class);
 
     private final MongoConnection mongoConnection;
     private final EntityPermissionsUtils permissionsUtils;
@@ -90,6 +94,18 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                                             final int page,
                                             final int perPage,
                                             final Subject subject) {
+        final Set<String> requestedFields = new HashSet<>();
+        requestedFields.add(targetColumn);
+        requestedFields.add(valueColumn);
+        if (displayFields != null) {
+            requestedFields.addAll(displayFields);
+        }
+        if (!permissionsUtils.areFieldsReadable(collection, requestedFields)) {
+            LOG.warn("Suggestion request for collection [{}] denied: requested fields {} contain non-readable fields",
+                    collection, requestedFields);
+            return emptyResponse(page, perPage);
+        }
+
         final MongoCollection<Document> mongoCollection = mongoConnection.getMongoDatabase().getCollection(collection);
         final boolean filterIsEmpty = Strings.isNullOrEmpty(query);
         final boolean isSpecialCollection = addAdminToSuggestions(collection, valueColumn, filterIsEmpty, query);
@@ -182,6 +198,11 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                         suggestions.size(),
                         page,
                         perPage));
+    }
+
+    private static EntitySuggestionResponse emptyResponse(final int page, final int perPage) {
+        return new EntitySuggestionResponse(List.of(),
+                PaginatedList.PaginationInfo.create(0, 0, page, perPage));
     }
 
     @MustBeClosed
