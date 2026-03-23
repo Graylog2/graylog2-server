@@ -430,7 +430,7 @@ public class V20260303120000_CollectorDEVMigrations extends Migration {
         // Index must be deleted first!
         for (final var index : collection.listIndexes()) {
             if (index.get("key", Document.class).containsKey(certificateFingerprintField)) {
-                collection.dropIndex(certificateFingerprintField);
+                collection.dropIndex(index.getString("name"));
             }
         }
 
