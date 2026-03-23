@@ -92,4 +92,13 @@ const SidebarTitle = styled.h4(
   `,
 );
 
-export { ANIMATION_DURATION, slideAnimation, fadeAnimation, SidebarContainer, SidebarRow, SidebarContentArea, SidebarHeader, SidebarTitle };
+export {
+  ANIMATION_DURATION,
+  slideAnimation,
+  fadeAnimation,
+  SidebarContainer,
+  SidebarRow,
+  SidebarContentArea,
+  SidebarHeader,
+  SidebarTitle,
+};

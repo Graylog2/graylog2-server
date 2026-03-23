@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { JSONStringify } from 'json-with-bigint';
 
 import Routes from 'routing/Routes';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -114,7 +115,7 @@ const DataAdapter = ({ dataAdapter, noEdit = false }: Props) => {
         {lookupResult && (
           <div>
             <h4>Lookup result</h4>
-            <pre>{JSON.stringify(lookupResult, null, 2)}</pre>
+            <pre>{JSONStringify(lookupResult, null, 2)}</pre>
           </div>
         )}
       </Col>

@@ -17,25 +17,25 @@
 package org.graylog.storage.opensearch3.migrations;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
-import org.graylog.storage.opensearch3.PlainJsonApi;
-import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
-
 import jakarta.inject.Inject;
+import org.graylog.storage.opensearch3.OfficialOpensearchClient;
+import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
+import org.opensearch.client.opensearch.generic.Request;
+import org.opensearch.client.opensearch.generic.Requests;
 
 import java.util.Collection;
 
-public class V20170607164210_MigrateReopenedIndicesToAliasesClusterStateOS2 implements V20170607164210_MigrateReopenedIndicesToAliases.ClusterState {
-    private final PlainJsonApi plainJsonApi;
+public class V20170607164210_MigrateReopenedIndicesToAliasesClusterStateOS implements V20170607164210_MigrateReopenedIndicesToAliases.ClusterState {
+    private final OfficialOpensearchClient client;
 
     @Inject
-    public V20170607164210_MigrateReopenedIndicesToAliasesClusterStateOS2(PlainJsonApi plainJsonApi) {
-        this.plainJsonApi = plainJsonApi;
+    public V20170607164210_MigrateReopenedIndicesToAliasesClusterStateOS(OfficialOpensearchClient client) {
+        this.client = client;
     }
 
     @Override
     public JsonNode getForIndices(Collection<String> indices) {
-        return plainJsonApi.perform(request(indices),
+        return client.performRequest(request(indices),
                 "Couldn't read cluster state for reopened indices " + indices);
     }
 
@@ -46,7 +46,9 @@ public class V20170607164210_MigrateReopenedIndicesToAliasesClusterStateOS2 impl
             apiEndpoint.append("/");
             apiEndpoint.append(joinedIndices);
         }
-
-        return new Request("GET", apiEndpoint.toString());
+        return Requests.builder()
+                .method("GET")
+                .endpoint(apiEndpoint.toString())
+                .build();
     }
 }

@@ -16,17 +16,28 @@
  */
 package org.graylog.storage.opensearch3.sniffer;
 
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
-import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.NodesSniffer;
+import org.apache.hc.core5.http.HttpHost;
 
-public interface SnifferBuilder {
-    /**
-     * @return true if the configuration of this node allows that type of sniffer
-     */
-    boolean enabled();
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Map;
 
-    /**
-     * @return Always a new instance of a sniffer.
-     */
-    NodesSniffer create(RestClient restClient);
+public record DiscoveredNode(
+        String scheme,
+        String host,
+        int port,
+        Map<String, List<String>> attributes
+) {
+    public URI toURI() {
+        try {
+            return new URI(scheme, null, host, port, null, null, null);
+        } catch (URISyntaxException e) {
+            throw new IllegalStateException("Failed to construct URI from discovered node: " + host, e);
+        }
+    }
+
+    public HttpHost toHttpHost() {
+        return new HttpHost(scheme, host, port);
+    }
 }

@@ -14,19 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch3;
+import { useContext } from 'react';
 
-import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
-import org.graylog.testing.elasticsearch.SearchInstance;
-import org.graylog.testing.elasticsearch.SearchServerInstance;
-import org.graylog2.indexer.indices.IndicesGetAllMessageFieldsIT;
+import FieldActionsContext, { type FieldActionsContextValue } from './FieldActionsContext';
 
-public class IndicesGetAllMessageFieldsOS2IT extends IndicesGetAllMessageFieldsIT {
-    @SearchInstance
-    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
+const DEFAULT_CONTEXT_VALUE: FieldActionsContextValue = {
+  evaluateCondition: (conditionFn, handlerArgs) => conditionFn(handlerArgs),
+  additionalHandlerArgs: {},
+  valueActions: [],
+  fieldActions: [],
+};
 
-    @Override
-    protected SearchServerInstance searchServer() {
-        return openSearchInstance;
-    }
-}
+const useFieldActions = (): FieldActionsContextValue | undefined => {
+  const contextValue = useContext(FieldActionsContext);
+
+  if (!contextValue) {
+    return DEFAULT_CONTEXT_VALUE;
+  }
+
+  return contextValue;
+};
+
+export default useFieldActions;

@@ -22,7 +22,7 @@ import { selectWidgets } from 'views/logic/slices/viewSelectors';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 
 const AddToAllTablesActionHandler =
-  ({ field }: ActionHandlerArguments<{}>) =>
+  ({ field }: ActionHandlerArguments) =>
   async (dispatch: ViewsDispatch, getState: GetState) => {
     const widgets = selectWidgets(getState());
     const newWidgets = widgets
