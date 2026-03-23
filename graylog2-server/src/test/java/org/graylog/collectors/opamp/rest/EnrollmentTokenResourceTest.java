@@ -16,7 +16,6 @@
  */
 package org.graylog.collectors.opamp.rest;
 
-import com.google.common.base.Predicates;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.MultivaluedHashMap;
@@ -31,11 +30,13 @@ import org.graylog.collectors.db.EnrollmentTokenCreator;
 import org.graylog.collectors.db.EnrollmentTokenDTO;
 import org.graylog.collectors.db.FleetDTO;
 import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
-import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.ComputedFieldRegistry;
 import org.graylog2.database.filtering.DbSortResolver;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.rest.bulk.model.BulkOperationRequest;
+import org.graylog2.security.WithAuthorization;
+import org.graylog2.security.WithAuthorizationExtension;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.shared.users.UserService;
@@ -64,6 +65,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(WithAuthorizationExtension.class)
+@WithAuthorization(permissions = "*")
 class EnrollmentTokenResourceTest {
 
     @Mock
@@ -180,14 +183,11 @@ class EnrollmentTokenResourceTest {
 
     @Test
     void listReturnsPaginatedTokens() {
-        final var token = new EnrollmentTokenDTO(
-                "token-id", "test-token", "jti-1", "kid-1", "fleet-1",
-                new EnrollmentTokenCreator("test-user-id", "testuser"),
-                Instant.now(), Instant.now().plusSeconds(86400), 0, null);
+        final var token = createToken("token-id");
 
         final var paginatedList = new PaginatedList<>(List.of(token), 1, 1, 50);
 
-        when(enrollmentTokenService.findPaginated(any(), any(DbSortResolver.ResolvedSort.class), anyInt(), anyInt(), Predicates.alwaysTrue()))
+        when(enrollmentTokenService.findPaginated(any(), any(DbSortResolver.ResolvedSort.class), anyInt(), anyInt(), any()))
                 .thenReturn(paginatedList);
 
         final var response = resource.list(1, 50, "", List.of(), "created_at",
@@ -200,6 +200,7 @@ class EnrollmentTokenResourceTest {
     @Test
     void deleteReturns204WhenTokenExists() {
         final String validId = "507f1f77bcf86cd799439011";
+        when(enrollmentTokenService.findOne(validId)).thenReturn(Optional.of(createToken(validId)));
         when(enrollmentTokenService.delete(validId)).thenReturn(true);
 
         final Response response = resource.delete(validId);
@@ -211,6 +212,7 @@ class EnrollmentTokenResourceTest {
     @Test
     void deleteReturns404WhenTokenNotFound() {
         final String validId = "507f1f77bcf86cd799439012";
+        when(enrollmentTokenService.findOne(validId)).thenReturn(Optional.of(createToken(validId)));
         when(enrollmentTokenService.delete(validId)).thenReturn(false);
 
         assertThatThrownBy(() -> resource.delete(validId))
@@ -221,6 +223,8 @@ class EnrollmentTokenResourceTest {
     @Test
     void bulkDeleteDelegatesToService() {
         final var ids = List.of("507f1f77bcf86cd799439011", "507f1f77bcf86cd799439012");
+
+        when(enrollmentTokenService.findByIds(ids)).thenReturn(ids.stream().map(this::createToken));
         when(enrollmentTokenService.deleteMany(ids)).thenReturn(2L);
 
         final var response = resource.bulkDelete(new BulkOperationRequest(ids));
@@ -247,10 +251,24 @@ class EnrollmentTokenResourceTest {
     @Test
     void bulkDeleteReportsPartialDeletion() {
         final var ids = List.of("507f1f77bcf86cd799439011", "507f1f77bcf86cd799439012", "507f1f77bcf86cd799439013");
+        when(enrollmentTokenService.findByIds(ids)).thenReturn(ids.stream().map(this::createToken));
         when(enrollmentTokenService.deleteMany(ids)).thenReturn(2L);
 
         final var response = resource.bulkDelete(new BulkOperationRequest(ids));
 
         assertThat(response.successfullyPerformed()).isEqualTo(2);
+    }
+
+    private EnrollmentTokenDTO createToken(String id) {
+        return EnrollmentTokenDTO.builder()
+                .id(id)
+                .name("test-token")
+                .jti("jti")
+                .kid("kid")
+                .fleetId("fleet-id")
+                .createdBy(new EnrollmentTokenCreator("test-user-id", "testuser"))
+                .createdAt(Instant.now())
+                .expiresAt(Instant.now().plusSeconds(86400))
+                .build();
     }
 }
