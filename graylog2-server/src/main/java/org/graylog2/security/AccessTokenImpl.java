@@ -29,8 +29,11 @@ import java.util.Map;
 import static org.graylog2.security.AccessTokenImpl.COLLECTION_NAME;
 import static org.graylog2.security.AccessTokenImpl.NAME;
 
-@DbEntity(collection = COLLECTION_NAME, titleField = NAME,
-          readableFields = {"username", "NAME", "created_at", "last_access", "expires_at"})
+@DbEntity(
+        collection = COLLECTION_NAME,
+        titleField = NAME,
+        readableFields = {} // Intentional, no fields are readable, the tokens should not be exposed
+        )
 public class AccessTokenImpl extends PersistedImpl implements AccessToken {
     public enum Type {
         PLAINTEXT(0), AES_SIV(1);
