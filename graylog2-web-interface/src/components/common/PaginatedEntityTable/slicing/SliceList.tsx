@@ -18,9 +18,9 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { /* Badge, */ ListGroup, ListGroupItem } from 'components/bootstrap';
-// import { formatReadableNumber } from 'util/NumberFormatting';
+import { ListGroup, ListGroupItem } from 'components/bootstrap';
 
+// import { formatReadableNumber } from 'util/NumberFormatting';
 import type { SliceRenderers, Slices } from './Slicing';
 
 const StyledListGroup = styled(ListGroup)`
@@ -34,6 +34,7 @@ const SliceInner = styled.div`
 
 const Title = styled.div`
   word-break: break-word;
+  flex: 1;
 `;
 
 /*
