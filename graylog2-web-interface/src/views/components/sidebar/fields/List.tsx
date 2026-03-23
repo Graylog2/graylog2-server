@@ -62,11 +62,7 @@ type RowProps = {
 };
 
 const RowComponent = ({ index, style, fieldList, activeQueryFields }: RowComponentProps<RowProps>) => (
-  <ListItem
-    fieldType={fieldList.get(index)}
-    activeQueryFields={activeQueryFields}
-    style={style}
-  />
+  <ListItem fieldType={fieldList.get(index)} activeQueryFields={activeQueryFields} style={style} />
 );
 
 const List = ({ filter, activeQueryFields, allFields, currentGroup }: Props) => {

@@ -269,8 +269,8 @@ const InputDiagnosisOverviewTab = ({
           {input.attributes?.bind_address && input.attributes?.port && (
             <>
               <StyledListGroupItem>
-                <StyledTitle>This Input is listening on:</StyledTitle>Bind address{' '}
-                {input.attributes?.bind_address}, Port {input.attributes?.port}.
+                <StyledTitle>This Input is listening on:</StyledTitle>Bind address {input.attributes?.bind_address},
+                Port {input.attributes?.port}.
               </StyledListGroupItem>
               {listeningProtocol && (
                 <StyledListGroupItem>
@@ -293,8 +293,8 @@ const InputDiagnosisOverviewTab = ({
         }
         headerLeftSection={<HelpPopoverButton helpText={DIAGNOSIS_HELP.INPUT_STATE} />}>
         <StyledP>
-          Number of {productName} nodes the Input is configured to run, and on how many it is running. If any are
-          not running, click to see any associated error messages.
+          Number of {productName} nodes the Input is configured to run, and on how many it is running. If any are not
+          running, click to see any associated error messages.
         </StyledP>
         <StyledListGroup>
           {inputMetrics.failedStarts15mCount !== undefined && (
@@ -320,13 +320,12 @@ const InputDiagnosisOverviewTab = ({
           </p>
           <StyledList>
             <li>
-              When an Input fails on one or more {productName} nodes, the Message field of the State panel will
-              show a short error message; a full length error message may be found in the {productName} server.log
-              file.
+              When an Input fails on one or more {productName} nodes, the Message field of the State panel will show a
+              short error message; a full length error message may be found in the {productName} server.log file.
             </li>
             <li>
-              An input configured to use a specified port will fail if that port is privileged (and {productName}{' '}
-              is not running as root), or already in use by another Input or application.
+              An input configured to use a specified port will fail if that port is privileged (and {productName} is not
+              running as root), or already in use by another Input or application.
             </li>
             <li>An input will fail if it is unable to route to the specified IP.</li>
             <li>
@@ -335,11 +334,10 @@ const InputDiagnosisOverviewTab = ({
             </li>
             <li>A TCP input will fail if it has an invalid or expired certificate.</li>
             <li>
-              Inputs that connect to an external API (for example, the Microsoft Azure Input) require
-              configuration changes at the source to enable {productName} to collect logs. The steps required will
-              be detailed on the appropriate documentation sub-page for that Input. An input that connects to an
-              external API will fail if incorrectly configured at either the {productName} side, or (as
-              applicable) the side hosting the API.
+              Inputs that connect to an external API (for example, the Microsoft Azure Input) require configuration
+              changes at the source to enable {productName} to collect logs. The steps required will be detailed on the
+              appropriate documentation sub-page for that Input. An input that connects to an external API will fail if
+              incorrectly configured at either the {productName} side, or (as applicable) the side hosting the API.
             </li>
           </StyledList>
           <br />
@@ -348,33 +346,33 @@ const InputDiagnosisOverviewTab = ({
           </p>
           <StyledList>
             <li>
-              Check the Network I/O field of the Received Traffic panel. If no traffic is showing here, that
-              suggests a connectivity problem.
+              Check the Network I/O field of the Received Traffic panel. If no traffic is showing here, that suggests a
+              connectivity problem.
               <StyledList>
                 <li>
-                  If no traffic is showing, first troubleshoot network connectivity between the {productName}{' '}
-                  server(s) and the log source. This may be achieved by running ping, telnet or tracert commands.
+                  If no traffic is showing, first troubleshoot network connectivity between the {productName} server(s)
+                  and the log source. This may be achieved by running ping, telnet or tracert commands.
                 </li>
                 <li>
-                  For Inputs that connect to an external API, check the {productName} server.log file -
-                  authentication failures (invalid logins or permissions to perform the action on the API) will be
-                  printed in full here.
+                  For Inputs that connect to an external API, check the {productName} server.log file - authentication
+                  failures (invalid logins or permissions to perform the action on the API) will be printed in full
+                  here.
                 </li>
               </StyledList>
             </li>
 
             <li>
-              If traffic is showing on the Network I/O field of the Received Traffic panel, but no messages have
-              been received, this suggests the messages are not being sent in a format appropriate to the Input.
+              If traffic is showing on the Network I/O field of the Received Traffic panel, but no messages have been
+              received, this suggests the messages are not being sent in a format appropriate to the Input.
               <StyledList>
                 <li>TCP input cannot read UDP traffic, and vice versa.</li>
                 <li>
-                  A message with no content will be discarded. This can be monitored via the Empty Messages
-                  Discarded field.
+                  A message with no content will be discarded. This can be monitored via the Empty Messages Discarded
+                  field.
                 </li>
                 <li>
-                  Listener Inputs expect messages in a limited range of formats and may be unable to read messages
-                  in foreign formats. For troubleshooting purposes, the Raw Text Input has the most permissive
+                  Listener Inputs expect messages in a limited range of formats and may be unable to read messages in
+                  foreign formats. For troubleshooting purposes, the Raw Text Input has the most permissive
                   requirements.
                 </li>
               </StyledList>
@@ -389,10 +387,10 @@ const InputDiagnosisOverviewTab = ({
           </p>
           <StyledList>
             <li>
-              On Licensed Enterprise clusters, Failure Processing can be enabled to allow storage of messages that
-              error at each stage - input, processing, and writing to the search cluster, along with details of
-              the failure - see the failure_cause and failure_details fields. Navigate to the Message Error panel
-              and click on the message count to examine individual failed messages.
+              On Licensed Enterprise clusters, Failure Processing can be enabled to allow storage of messages that error
+              at each stage - input, processing, and writing to the search cluster, along with details of the failure -
+              see the failure_cause and failure_details fields. Navigate to the Message Error panel and click on the
+              message count to examine individual failed messages.
             </li>
           </StyledList>
         </Alert>
@@ -426,25 +424,23 @@ const InputDiagnosisOverviewTab = ({
               <StyledTitle>Empty Messages discarded:</StyledTitle>
               {inputMetrics.emptyMessages}
             </StyledListGroupItem>
-            {Number.isInteger(inputMetrics.open_connections) &&
-              Number.isInteger(inputMetrics.total_connections) && (
-                <StyledListGroupItem>
-                  <StyledTitle>Active Connections:</StyledTitle>
-                  {inputMetrics.open_connections}&nbsp; ({inputMetrics.total_connections} total)
-                </StyledListGroupItem>
-              )}
-            {Number.isInteger(inputMetrics.read_bytes_1sec) &&
-              Number.isInteger(inputMetrics.read_bytes_total) && (
-                <StyledListGroupItem>
-                  <StyledTitle>Network I/O:</StyledTitle>
-                  <NetworkStats
-                    readBytes1Sec={inputMetrics.read_bytes_1sec}
-                    readBytesTotal={inputMetrics.read_bytes_total}
-                    writtenBytes1Sec={inputMetrics.write_bytes_1sec}
-                    writtenBytesTotal={inputMetrics.write_bytes_total}
-                  />
-                </StyledListGroupItem>
-              )}
+            {Number.isInteger(inputMetrics.open_connections) && Number.isInteger(inputMetrics.total_connections) && (
+              <StyledListGroupItem>
+                <StyledTitle>Active Connections:</StyledTitle>
+                {inputMetrics.open_connections}&nbsp; ({inputMetrics.total_connections} total)
+              </StyledListGroupItem>
+            )}
+            {Number.isInteger(inputMetrics.read_bytes_1sec) && Number.isInteger(inputMetrics.read_bytes_total) && (
+              <StyledListGroupItem>
+                <StyledTitle>Network I/O:</StyledTitle>
+                <NetworkStats
+                  readBytes1Sec={inputMetrics.read_bytes_1sec}
+                  readBytesTotal={inputMetrics.read_bytes_total}
+                  writtenBytes1Sec={inputMetrics.write_bytes_1sec}
+                  writtenBytesTotal={inputMetrics.write_bytes_total}
+                />
+              </StyledListGroupItem>
+            )}
           </StyledListGroup>
         )}
       </Section>
