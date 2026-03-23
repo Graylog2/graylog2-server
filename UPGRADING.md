@@ -60,18 +60,6 @@ underscores instead, e.g. `${aggregation_conditions.count}`, `${aggregation_cond
 existing notifications using the escaping of parentheses in explicit `aggregation_conditions` key names will need to
 be modified to instead use the underscore format.
 
-### Data Node in-place migration only available for OpenSearch versions above 2.0.0
-
-Due to bundling OpenSearch 3.5.0 with Data Node, in-place migrations are now only supported for OpenSearch versions
-higher than 2.0.0. If you are running a lower version, please upgrade your OpenSearch to the highest available 2.x or
-3.x version first.
-
-### Data Node role name change from `search` to `warm`
-
-Data Node now bundles OpenSearch 3.5.0. In OpenSearch 3.x the `search` role was explicitly renamed to `warm`. While Data
-Node will usually take care of this for you, please be aware that you need to adjust your roles accordingly if you
-override the default values using `node_role` in the Data Node configuration.
-
 ### OpenSearch-Based Anomaly Detection Removed
 
 Anomaly detection now runs natively within Graylog, removing the dependency on OpenSearch's Anomaly Detection plugin. 
