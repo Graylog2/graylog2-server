@@ -15,13 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { Spinner } from 'components/common';
 import { Button } from 'components/bootstrap';
 import type { InputSummary } from 'hooks/usePaginatedInputs';
-import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
-import { useStore } from 'stores/connect';
+import { useMetrics } from 'hooks/useMetrics';
 import {
   getMetricNamesForInput,
   calculateInputMetrics,
@@ -35,23 +34,15 @@ type Props = {
 };
 
 const ThroughputSection = ({ input }: Props) => {
-  const metrics = useStore(MetricsStore, (store) => store.metrics);
   const metricNames = getMetricNamesForInput(input);
+  const { data: metrics, isLoading } = useMetrics(metricNames);
   const [showDetails, setShowDetails] = useState(false);
 
   const toggleShowDetails = () => {
     setShowDetails(!showDetails);
   };
 
-  useEffect(() => {
-    metricNames.map((metricName) => MetricsActions.addGlobal(metricName));
-
-    return () => {
-      metricNames.map((metricName) => MetricsActions.removeGlobal(metricName));
-    };
-  }, [input, metricNames]);
-
-  if (!metrics) {
+  if (isLoading || Object.keys(metrics).length === 0) {
     return <Spinner />;
   }
 

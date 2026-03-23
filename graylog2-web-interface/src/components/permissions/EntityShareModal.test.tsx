@@ -54,6 +54,8 @@ jest.mock('stores/permissions/EntityShareStore', () => ({
 
 jest.setTimeout(10000);
 
+const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+
 describe('EntityShareModal', () => {
   beforeEach(() => {
     asMock(EntityShareStore.getInitialState).mockReturnValue({ state: mockEntityShareState });
@@ -91,7 +93,7 @@ describe('EntityShareModal', () => {
   it('updates entity share state on submit', async () => {
     render(<SimpleEntityShareModal />);
 
-    await userEvent.click(await screen.findByRole('button', { name: /update sharing/i }));
+    await setupUser().click(await screen.findByRole('button', { name: /update sharing/i }));
 
     await waitFor(() => expect(EntityShareActions.update).toHaveBeenCalledTimes(1));
 
@@ -108,7 +110,7 @@ describe('EntityShareModal', () => {
       name: /cancel/i,
     });
 
-    await userEvent.click(cancelButton);
+    await setupUser().click(cancelButton);
 
     await waitFor(() => {
       expect(onClose).toHaveBeenCalledTimes(1);
@@ -170,7 +172,7 @@ describe('EntityShareModal', () => {
           name: /add collaborator/i,
         });
 
-        await userEvent.click(submitButton);
+        await setupUser().click(submitButton);
 
         await waitFor(() => {
           expect(EntityShareActions.prepare).toHaveBeenCalledWith(
@@ -200,7 +202,7 @@ describe('EntityShareModal', () => {
 
       await selectEvent.chooseOption('Search for users and teams', john.title);
 
-      await userEvent.click(await screen.findByRole('button', { name: /update sharing/i }));
+      await setupUser().click(await screen.findByRole('button', { name: /update sharing/i }));
 
       await waitFor(() => {
         expect(window.confirm).toHaveBeenCalledWith(
@@ -271,7 +273,7 @@ describe('EntityShareModal', () => {
 
         const deleteButton = await screen.findByTitle(`Remove sharing for ${grantee.title}`);
 
-        await userEvent.click(deleteButton);
+        await setupUser().click(deleteButton);
 
         await waitFor(() => {
           expect(EntityShareActions.prepare).toHaveBeenCalledWith(

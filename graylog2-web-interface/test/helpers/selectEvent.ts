@@ -16,7 +16,7 @@
  */
 
 import userEvent from '@testing-library/user-event';
-import selectEvent from 'react-select-event';
+import * as selectEvent from 'react-select-event';
 import { screen, within } from 'wrappedTestingLibrary';
 
 /*
@@ -24,9 +24,19 @@ import { screen, within } from 'wrappedTestingLibrary';
  * They are useful when interacting with the `react-select` select component.
  */
 
-const clearAll = (container: HTMLElement, selectClassName: string) => {
+const setup = () => {
+  // clock property is set by @sinonjs/fake-timers when jest.useFakeTimers() is active
+  if ('clock' in setTimeout) {
+    return userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+  }
+
+  return userEvent.setup();
+};
+
+const clearAll = async (container: HTMLElement, selectClassName: string) => {
+  // eslint-disable-next-line testing-library/no-node-access
   const clearIcons = container.querySelectorAll(`.${selectClassName} svg[aria-hidden="true"]`);
-  userEvent.click(clearIcons[clearIcons.length - 1]);
+  await setup().click(clearIcons[clearIcons.length - 1]);
 };
 
 const customCreate = (element: HTMLElement, option: string) =>
@@ -38,6 +48,7 @@ const customSelect = (element: HTMLElement, optionOrOptions: string | Array<stri
 const findSelectInput = (name: string, config?: { container: HTMLElement }) => {
   const queryRoot = config?.container ? within(config.container) : screen;
 
+  // eslint-disable-next-line testing-library/prefer-screen-queries
   return queryRoot.findByRole('combobox', { name: new RegExp(name, 'i') });
 };
 const assertOptionExists = async (
@@ -61,9 +72,12 @@ const chooseOption = async (
   const input = await findSelectInput(selectName, config);
   const optionNames = Array.isArray(optionName) ? optionName : [optionName];
 
-  optionNames.forEach((name) => {
-    userEvent.type(input, `${name}{enter}`);
-  });
+  const user = setup();
+
+  for (const name of optionNames) {
+    // eslint-disable-next-line no-await-in-loop
+    await user.type(input, `${name}{enter}`);
+  }
 };
 
 export default {

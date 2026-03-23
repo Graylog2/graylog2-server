@@ -25,6 +25,7 @@ import { defaultCompare } from 'logic/DefaultCompare';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { IconButton } from 'components/common';
+import usePermissions from 'hooks/usePermissions';
 
 const SliceHeader = styled.div(
   ({ theme }) => css`
@@ -61,8 +62,9 @@ const SliceHeaderControls = ({
   columnSchemas,
   onChangeSlicing,
 }: Props) => {
+  const { isPermitted } = usePermissions();
   const sliceableColumns = columnSchemas
-    .filter((schema) => schema.sliceable)
+    .filter((schema) => schema.sliceable && isPermitted(schema.permissions))
     .sort(({ title: title1 }, { title: title2 }) => defaultCompare(title1, title2));
   const sendTelemetry = useSendTelemetry();
   const onSliceColumn = (columnId: string) => {

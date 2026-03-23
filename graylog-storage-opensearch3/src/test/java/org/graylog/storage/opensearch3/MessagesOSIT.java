@@ -16,14 +16,14 @@
  */
 package org.graylog.storage.opensearch3;
 
-import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.core.rest.RestStatus;
 import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
 import org.graylog.storage.opensearch3.testing.OpenSearchInstanceBuilder;
 import org.graylog.testing.elasticsearch.SearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.messages.MessagesIT;
+import org.opensearch.client.opensearch._types.Result;
+import org.opensearch.client.opensearch.core.IndexRequest;
+import org.opensearch.client.opensearch.core.IndexResponse;
 
 import java.util.Map;
 
@@ -40,12 +40,16 @@ public class MessagesOSIT extends MessagesIT {
 
     @Override
     protected boolean indexMessage(String index, Map<String, Object> source, String id) {
-        final IndexRequest indexRequest = new IndexRequest(index)
-                .source(source)
-                .id(id);
+        final IndexRequest indexRequest = IndexRequest.of(r -> r
+                .index(index)
+                .document(source)
+                .id(id)
+        );
 
-        final IndexResponse result = this.openSearchInstance.openSearchClient().execute((c, requestOptions) -> c.index(indexRequest, requestOptions));
+        final IndexResponse result;
+        result = this.openSearchInstance.getOfficialOpensearchClient().sync(c ->
+                c.index(indexRequest), "Error indexing document");
 
-        return result.status().equals(RestStatus.CREATED);
+        return result.result() == Result.Created;
     }
 }

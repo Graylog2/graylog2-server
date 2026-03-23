@@ -26,7 +26,6 @@ import FieldTypeIcon from './FieldTypeIcon';
 type Props = {
   activeQueryFields: List<FieldTypeMapping>;
   fieldType: FieldTypeMapping;
-  selectedQuery: string;
   style: React.CSSProperties;
 };
 
@@ -38,14 +37,14 @@ const StyledListItem = styled.li(
   `,
 );
 
-const ListItem = ({ activeQueryFields, fieldType, selectedQuery, style }: Props) => {
+const ListItem = ({ activeQueryFields, fieldType, style }: Props) => {
   const { name, type } = fieldType;
   const disabled = !activeQueryFields.find((f) => f.name === name);
 
   return (
     <StyledListItem style={style}>
       <FieldTypeIcon type={type} />{' '}
-      <Field queryId={selectedQuery} disabled={disabled} name={name} type={type}>
+      <Field disabled={disabled} name={name} type={type}>
         {name}
       </Field>
     </StyledListItem>

@@ -66,6 +66,7 @@ const defaultPages = {
   SECURITY_EVENTS: 'what_more_can_graylog_do_for_me/security_events.htm',
   SECURITY_INVESTIGATIONS: 'what_more_can_graylog_do_for_me/investigations.htm',
   SECURITY_SIGMA_RULES: 'what_more_can_graylog_do_for_me/sigma_rules.htm',
+  SECURITY_THREAT_COVERAGE: 'what_more_can_graylog_do_for_me/threat_coverage_widget.htm',
   SECURITY_VULNERABILITY_SCANNING: 'what_more_can_graylog_do_for_me/vulnerability_scanning.htm',
   STREAMS: 'making_sense_of_your_log_data/streams.html',
   STREAM_PROCESSING_RUNTIME_LIMITS: 'making_sense_of_your_log_data/stream_processing.htm#StreamProcessingRuntimeLimits',

@@ -58,7 +58,7 @@ describe('AddToAllTablesActionHandler', () => {
     const dispatch = mockDispatch({ view: { view, activeQuery: 'query-id-1' } } as RootState);
 
     await dispatch(
-      AddToAllTablesActionHandler({ queryId: 'query-id-1', field: 'author', type: FieldTypes.STRING(), contexts: {} }),
+      AddToAllTablesActionHandler({ field: 'author', type: FieldTypes.STRING(), contexts: {} }),
     );
 
     expect(updateWidgets).toHaveBeenCalledWith(expectedWidgets);

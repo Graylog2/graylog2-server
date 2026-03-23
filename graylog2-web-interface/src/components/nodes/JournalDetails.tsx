@@ -15,12 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect } from 'react';
 import numeral from 'numeral';
 import moment from 'moment';
 import 'moment-duration-format';
 import styled from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
+
+import { ClusterJournal } from '@graylog/server-api';
 
 import { Link, Spinner, RelativeTime } from 'components/common';
 import { Row, Col, Alert } from 'components/bootstrap';
@@ -28,9 +29,8 @@ import ProgressBar, { Bar } from 'components/common/ProgressBar';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 import NumberUtils from 'util/NumberUtils';
 import Routes from 'routing/Routes';
-import { JournalStore } from 'stores/journal/JournalStore';
-import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
-import { useStore } from 'stores/connect';
+import { defaultOnError } from 'util/conditional/onError';
+import { useNodeMetrics } from 'hooks/useMetrics';
 
 const JournalUsageProgressBar = styled(ProgressBar)`
   margin-bottom: 5px;
@@ -53,34 +53,24 @@ const metricNames = {
   oldestSegment: 'org.graylog2.journal.oldest-segment',
 };
 
+const metricValues = Object.values(metricNames);
+
+const fetchJournalInfo = (nodeId: string) =>
+  defaultOnError(ClusterJournal.get(nodeId), 'Could not get journal information');
+
 const JournalDetails = ({ nodeId }: Props) => {
-  const { metrics: metricsState } = useStore(MetricsStore);
   const { data: journalInformation } = useQuery({
     queryKey: ['journal', 'info', nodeId],
-    queryFn: () => JournalStore.get(nodeId),
+    queryFn: () => fetchJournalInfo(nodeId),
   });
 
-  useEffect(() => {
-    if (journalInformation?.enabled) {
-      Object.keys(metricNames).forEach((metricShortName) => MetricsActions.add(nodeId, metricNames[metricShortName]));
+  const { data: nodeMetrics, isLoading: metricsLoading } = useNodeMetrics(nodeId, metricValues);
 
-      return () => {
-        Object.keys(metricNames).forEach((metricShortName) =>
-          MetricsActions.remove(nodeId, metricNames[metricShortName]),
-        );
-      };
-    }
-
-    return () => {};
-  }, [journalInformation?.enabled, nodeId]);
-
-  const _isLoading = !(metricsState && journalInformation);
+  const _isLoading = metricsLoading || !journalInformation;
 
   if (_isLoading) {
     return <Spinner text="Loading journal metrics..." />;
   }
-
-  const nodeMetrics = metricsState[nodeId];
 
   if (!journalInformation.enabled) {
     return <Alert bsStyle="warning">The disk journal is disabled on this node.</Alert>;
