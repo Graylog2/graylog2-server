@@ -34,7 +34,8 @@ import static org.graylog2.shared.security.RestPermissions.OUTPUTS_READ;
 @AutoValue
 @JsonAutoDetect
 @DbEntity(collection = "outputs",
-          readPermission = OUTPUTS_READ)
+          readPermission = OUTPUTS_READ,
+          readableFields = {"title", "type", "creator_user_id", "created_at"})
 public abstract class OutputImpl implements Output {
     static final String FIELD_ID = "id";
     static final String FIELD_TITLE = "title";

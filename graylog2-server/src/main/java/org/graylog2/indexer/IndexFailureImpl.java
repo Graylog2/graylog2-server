@@ -31,7 +31,8 @@ import static org.graylog2.shared.security.RestPermissions.INDICES_FAILURES;
 
 @DbEntity(collection = "index_failures",
           titleField = "message",
-          readPermission = INDICES_FAILURES)
+          readPermission = INDICES_FAILURES,
+          readableFields = {"timestamp", "letter_id", "message", "index", "type"})
 public class IndexFailureImpl extends PersistedImpl implements IndexFailure {
 
     public IndexFailureImpl(Map<String, Object> fields) {

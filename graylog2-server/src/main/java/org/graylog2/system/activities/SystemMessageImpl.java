@@ -33,7 +33,8 @@ import static org.graylog2.shared.security.RestPermissions.SYSTEMMESSAGES_READ;
 
 @DbEntity(collection = "system_messages",
           titleField = "content",
-          readPermission = SYSTEMMESSAGES_READ)
+          readPermission = SYSTEMMESSAGES_READ,
+          readableFields = {"caller", "content", "timestamp", "node_id"})
 public class SystemMessageImpl extends PersistedImpl implements SystemMessage {
 
     private final String caller;

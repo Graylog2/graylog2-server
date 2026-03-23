@@ -62,7 +62,9 @@ import static org.graylog2.shared.security.RestPermissions.INDEXSETS_READ;
 
 @AutoValue
 @JsonAutoDetect
-@DbEntity(collection = MongoIndexSetService.COLLECTION_NAME, readPermission = INDEXSETS_READ)
+@DbEntity(collection = MongoIndexSetService.COLLECTION_NAME, readPermission = INDEXSETS_READ,
+          readableFields = {"title", "description", "index_prefix", "writable", "regular", "creation_date",
+                  "index_template_type", "shards", "replicas"})
 public abstract class IndexSetConfig implements
         Comparable<IndexSetConfig>,
         ExtendedIndexSetFields,

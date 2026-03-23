@@ -40,7 +40,8 @@ import java.util.Map;
 
 @AutoValue
 @JsonDeserialize(builder = InputImpl.Builder.class)
-@DbEntity(collection = InputServiceImpl.COLLECTION_NAME, readPermission = RestPermissions.INPUTS_READ)
+@DbEntity(collection = InputServiceImpl.COLLECTION_NAME, readPermission = RestPermissions.INPUTS_READ,
+          readableFields = {"title", "type", "creator_user_id", "created_at", "global", "node_id", "name"})
 public abstract class InputImpl implements Input, MongoEntity {
     private static final Logger LOG = LoggerFactory.getLogger(InputImpl.class);
 

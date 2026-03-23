@@ -48,7 +48,9 @@ import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
 @AutoValue
 @JsonAutoDetect
 @JsonDeserialize(builder = StreamImpl.Builder.class)
-@DbEntity(collection = "streams", readPermission = STREAMS_READ)
+@DbEntity(collection = "streams", readPermission = STREAMS_READ,
+          readableFields = {"title", "description", "disabled", "created_at", "creator_user_id",
+                  "matching_type", "index_set_id", "is_editable", "categories", "is_default_stream"})
 public abstract class StreamImpl implements Stream {
     public static final String FIELD_ID = "_id";
     public static final String FIELD_TITLE = "title";

@@ -23,7 +23,9 @@ import org.graylog2.plugin.lifecycles.Lifecycle;
 
 import java.util.Map;
 
-@DbEntity(collection = "nodes", titleField = "node_id")
+@DbEntity(collection = "nodes", titleField = "node_id",
+          readableFields = {"node_id", "hostname", "transport_address", "is_leader", "last_seen",
+                  "is_processing"})
 public class ServerNodeEntity extends AbstractNode<ServerNodeDto> {
 
     @JsonCreator

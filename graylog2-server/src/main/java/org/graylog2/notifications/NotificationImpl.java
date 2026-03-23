@@ -37,7 +37,8 @@ import static org.graylog2.shared.security.RestPermissions.NOTIFICATIONS_READ;
 
 @DbEntity(collection = "notifications",
           titleField = FIELD_DETAILS + ".title",
-          readPermission = NOTIFICATIONS_READ)
+          readPermission = NOTIFICATIONS_READ,
+          readableFields = {"type", "severity", "timestamp", "node_id", "key"})
 public class NotificationImpl extends PersistedImpl implements Notification {
     static final String FIELD_TYPE = "type";
     static final String FIELD_KEY = "key";
