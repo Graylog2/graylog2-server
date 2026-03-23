@@ -34,6 +34,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.ToXCo
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
@@ -275,21 +276,15 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
                 .toList();
     }
 
-    @Override
-    public List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timerange, Set<String> affectedIndices,
-                                                Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
-                                                Map<String, Set<String>> extraFilters, String slicingColumn, String type, int maxBuckets) {
+    public List<Slice> aggregateSlices(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                          Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
+                                          Map<String, Set<String>> extraFilters, Map<String, Object> meta, AggregationBuilder aggregationBuilder) {
         final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(filter)
+                .aggregation(aggregationBuilder)
                 .size(0);
-
-        searchSourceBuilder.aggregation(
-                AggregationBuilders.terms(slicesAggregationName)
-                        .field(slicingColumn)
-                        .size(maxBuckets)
-        );
 
         final Set<String> indices = affectedIndices.isEmpty() ? Collections.singleton("") : affectedIndices;
         final SearchRequest searchRequest = new SearchRequest(indices.toArray(new String[0]))
@@ -304,47 +299,37 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
         final SearchResponse searchResult = client.search(searchRequest, "Unable to perform slice aggregation query");
         final ParsedTerms termsResult = searchResult.getAggregations().get(slicesAggregationName);
 
-        return termsResult.getBuckets().stream().map(e -> new Slice(e.getKeyAsString(), null, type, Math.toIntExact(e.getDocCount()))).toList();
+        return termsResult.getBuckets().stream().map(e -> new Slice(e.getKeyAsString(), null, Math.toIntExact(e.getDocCount()), meta)).toList();
     }
+
+    @Override
+    public List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                                Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
+                                                Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, int maxBuckets) {
+        final var builder = AggregationBuilders.terms(slicesAggregationName)
+                        .field(slicingColumn)
+                        .size(maxBuckets);
+
+        return aggregateSlices(queryString, timerange, affectedIndices, eventStreams, filterString, forbiddenSourceStreams, extraFilters, meta, builder);
+     }
 
     @Override
     public List<Slice> aggregateSlicesForRangeQuery(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                                   Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
-                                                  Map<String, Set<String>> extraFilters, String slicingColumn, String type, List<NumberRange> ranges) {
-        final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
-
-        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
-                .query(filter)
-                .size(0);
-
-        final RangeAggregationBuilder rangeAgg = AggregationBuilders.range(slicesAggregationName).field(slicingColumn);
+                                                  Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, List<NumberRange> ranges) {
+        final RangeAggregationBuilder builder = AggregationBuilders.range(slicesAggregationName).field(slicingColumn);
         ranges.forEach(r -> {
             final Double from = r.from();
             final Double to = r.to();
             if (from != null && to != null) {
-                rangeAgg.addRange(from, to);
+                builder.addRange(from, to);
             } else if (to != null) {
-                rangeAgg.addUnboundedTo(to);
+                builder.addUnboundedTo(to);
             } else if (from != null) {
-                rangeAgg.addUnboundedFrom(from);
+                builder.addUnboundedFrom(from);
             }
         });
-        searchSourceBuilder.aggregation(rangeAgg);
-
-        final Set<String> indices = affectedIndices.isEmpty() ? Collections.singleton("") : affectedIndices;
-        final SearchRequest searchRequest = new SearchRequest(indices.toArray(new String[0]))
-                .source(searchSourceBuilder)
-                .indicesOptions(INDICES_OPTIONS);
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Query:\n{}", searchSourceBuilder.toString(new ToXContent.MapParams(Collections.singletonMap("pretty", "true"))));
-            LOG.debug("Execute range aggregation: {}", searchRequest);
-        }
-
-        final SearchResponse searchResult = client.search(searchRequest, "Unable to perform range slice aggregation query");
-        final ParsedRange rangeResult = searchResult.getAggregations().get(slicesAggregationName);
-
-        return rangeResult.getBuckets().stream().map(e -> new Slice(e.getKeyAsString(), null, type, Math.toIntExact(e.getDocCount()))).toList();
+        return aggregateSlices(queryString, timerange, affectedIndices, eventStreams, filterString, forbiddenSourceStreams, extraFilters, meta, builder);
     }
 
     @Override

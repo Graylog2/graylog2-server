@@ -197,53 +197,27 @@ public class MoreSearch {
     }
 
 
-    /**
-     * Executes a terms aggregation on the given {@code slicingColumn} and returns the bucket counts.
-     * This is the indexer-native equivalent of using ScriptingApiService for slice aggregations.
-     *
-     * @param queryString           the search query string
-     * @param timeRange             the time range for the search
-     * @param eventStreams          event streams to search in
-     * @param filterString          additional filter string
-     * @param forbiddenSourceStreams source streams the caller must not access
-     * @param slicingColumn         the field to aggregate on
-     * @param maxBuckets            maximum number of buckets to return
-     * @return a list of slices
-     */
     public List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timeRange, Set<String> eventStreams,
                                        String filterString, Set<String> forbiddenSourceStreams,
-                                       String slicingColumn, String type, int maxBuckets) {
+                                       String slicingColumn, Map<String, Object> meta, int maxBuckets) {
         final Set<String> affectedIndices = getAffectedIndices(eventStreams, timeRange);
         if (affectedIndices == null || affectedIndices.isEmpty()) {
             return List.of();
         }
         // TODO: add extra filters if necessary
         return moreSearchAdapter.aggregateSlicesForColumn(queryString, timeRange, affectedIndices, eventStreams,
-                filterString, forbiddenSourceStreams, Map.of(), slicingColumn, type, maxBuckets);
+                filterString, forbiddenSourceStreams, Map.of(), slicingColumn, meta, maxBuckets);
     }
 
-    /**
-     * Executes a range aggregation on the given {@code slicingColumn} and returns the bucket counts.
-     * This is the indexer-native equivalent of using ScriptingApiService for range-based slice aggregations.
-     *
-     * @param queryString           the search query string
-     * @param timeRange             the time range for the search
-     * @param eventStreams          event streams to search in
-     * @param filterString          additional filter string
-     * @param forbiddenSourceStreams source streams the caller must not access
-     * @param slicingColumn         the field to aggregate on
-     * @param ranges                the numeric ranges to bucket by
-     * @return a list of range key to document count, in bucket order
-     */
     public List<Slice> aggregateSlicesForRangeQuery(String queryString, TimeRange timeRange, Set<String> eventStreams,
                                                   String filterString, Set<String> forbiddenSourceStreams,
-                                                  String slicingColumn, String type, List<NumberRange> ranges) {
+                                                  String slicingColumn, Map<String, Object> meta, List<NumberRange> ranges) {
         final Set<String> affectedIndices = getAffectedIndices(eventStreams, timeRange);
         if (affectedIndices == null || affectedIndices.isEmpty()) {
             return List.of();
         }
         return moreSearchAdapter.aggregateSlicesForRangeQuery(queryString, timeRange, affectedIndices, eventStreams,
-                filterString, forbiddenSourceStreams, Map.of(), slicingColumn, type, ranges);
+                filterString, forbiddenSourceStreams, Map.of(), slicingColumn, meta, ranges);
     }
 
     /**

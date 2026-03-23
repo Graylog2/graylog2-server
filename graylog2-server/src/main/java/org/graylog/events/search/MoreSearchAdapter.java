@@ -56,11 +56,11 @@ public interface MoreSearchAdapter {
 
     List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                 Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
-                                Map<String, Set<String>> extraFilters, String slicingColumn, String type, int maxBuckets);
+                                Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, int maxBuckets);
 
     List<Slice> aggregateSlicesForRangeQuery(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                            Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
-                                           Map<String, Set<String>> extraFilters, String slicingColumn, String type, List<NumberRange> ranges);
+                                           Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, List<NumberRange> ranges);
 
     default ChunkCommand buildScrollCommand(String queryString, TimeRange timeRange, Set<String> affectedIndices, List<UsedSearchFilter> filters, Set<String> streams, int batchSize) {
         ChunkCommand.Builder commandBuilder = ChunkCommand.builder()
