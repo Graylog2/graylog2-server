@@ -41,6 +41,8 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbSortResolver;
 import org.graylog2.database.pagination.MongoPaginationHelper;
 import org.mongojack.Id;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -67,12 +69,14 @@ import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_INSTANCE_UID;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_LAST_PROCESSED_TXN_SEQ;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_LAST_SEEN;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_MESSAGE_SEQ_NUM;
+import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_FINGERPRINT;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_NON_IDENTIFYING_ATTRIBUTES;
 import static org.graylog2.database.MongoEntity.FIELD_ID;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 
 @Singleton
 public class CollectorInstanceService {
+    private static final Logger LOG = LoggerFactory.getLogger(CollectorInstanceService.class);
 
     private final MongoCollection<CollectorInstanceDTO> collection;
     private final MongoPaginationHelper<CollectorInstanceDTO> paginationHelper;
@@ -84,15 +88,19 @@ public class CollectorInstanceService {
         projectedCollection = mongoCollections.nonEntityCollection("collector_instances", MinimalCollectorInstanceDTO.class);
         paginationHelper = mongoCollections.paginationHelper(collection);
 
-        collection.createIndexes(List.of(
-                new IndexModel(Indexes.ascending(FIELD_INSTANCE_UID), new IndexOptions().unique(true)),
-                new IndexModel(Indexes.ascending(FIELD_IDENTIFYING_ATTRIBUTES + ".key",
-                        FIELD_IDENTIFYING_ATTRIBUTES + ".value")),
-                new IndexModel(Indexes.ascending(FIELD_NON_IDENTIFYING_ATTRIBUTES + ".key",
-                        FIELD_NON_IDENTIFYING_ATTRIBUTES + ".value")),
-                new IndexModel(Indexes.ascending(FIELD_ACTIVE_CERTIFICATE_FINGERPRINT), new IndexOptions().unique(true)),
-                new IndexModel(Indexes.ascending(FIELD_LAST_SEEN))
-        ));
+        try {
+            collection.createIndexes(List.of(
+                    new IndexModel(Indexes.ascending(FIELD_INSTANCE_UID), new IndexOptions().unique(true)),
+                    new IndexModel(Indexes.ascending(FIELD_IDENTIFYING_ATTRIBUTES + ".key",
+                            FIELD_IDENTIFYING_ATTRIBUTES + ".value")),
+                    new IndexModel(Indexes.ascending(FIELD_NON_IDENTIFYING_ATTRIBUTES + ".key",
+                            FIELD_NON_IDENTIFYING_ATTRIBUTES + ".value")),
+                    new IndexModel(Indexes.ascending(FIELD_ACTIVE_CERTIFICATE_FINGERPRINT), new IndexOptions().unique(true)),
+                    new IndexModel(Indexes.ascending(FIELD_LAST_SEEN))
+            ));
+        } catch (Exception e) {
+            LOG.error("Database index creation failed", e);
+        }
     }
 
     /**
