@@ -427,6 +427,13 @@ public class V20260303120000_CollectorDEVMigrations extends Migration {
         final var activeCertificateFingerprintField = "active_certificate_fingerprint";
         final var activeCertificateExpiresAt = "active_certificate_expires_at";
 
+        // Index must be deleted first!
+        for (final var index : collection.listIndexes()) {
+            if (index.get("key", Document.class).containsKey(certificateFingerprintField)) {
+                collection.dropIndex(certificateFingerprintField);
+            }
+        }
+
         var converted = 0L;
 
         try {
@@ -455,12 +462,6 @@ public class V20260303120000_CollectorDEVMigrations extends Migration {
 
         if (converted > 0) {
             LOG.info("Converted {} collector instance document(s) to new certificate fields.", converted);
-
-            for (final var index : collection.listIndexes()) {
-                if (index.get("key", Document.class).containsKey(certificateFingerprintField)) {
-                    collection.dropIndex(certificateFingerprintField);
-                }
-            }
         }
     }
 }
