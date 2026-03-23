@@ -25,10 +25,7 @@ import isReservedField from 'views/logic/IsReservedField';
 import useInitialSelection from 'views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection';
 import { isPermitted } from 'util/PermissionsMixin';
 
-const ChangeFieldType = ({
-  field,
-  onClose,
-}: ActionComponentProps<AdditionalViewsActionHandlerArguments>) => {
+const ChangeFieldType = ({ field, onClose }: ActionComponentProps<AdditionalViewsActionHandlerArguments>) => {
   const [show, setShow] = useState(true);
   const handleOnClose = useCallback(() => {
     setShow(false);
