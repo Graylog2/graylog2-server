@@ -33,6 +33,9 @@ const OutputsCell = ({ stream }: Props) => {
   }
 
   const outputCount = stream.outputs?.length || 0;
+  if (outputCount === 0) {
+    return null;
+  }
 
   return <CountBadge count={outputCount} ref={buttonRef} title="Stream Outputs" />;
 };

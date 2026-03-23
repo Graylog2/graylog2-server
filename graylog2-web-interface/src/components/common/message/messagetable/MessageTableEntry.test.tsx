@@ -21,6 +21,8 @@ import * as Immutable from 'immutable';
 import MockStore from 'helpers/mocking/StoreMock';
 import MockAction from 'helpers/mocking/MockAction';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
+import MessageTableSelectedEntitiesProvider from 'views/components/widgets/MessageTableSelectedEntitiesProvider';
+import SelectableMessageTableMessagesProvider from 'views/components/widgets/SelectableMessageTableMessagesProvider';
 
 import MessageTableEntry from './MessageTableEntry';
 
@@ -42,17 +44,21 @@ describe('MessageTableEntry', () => {
     };
 
     render(
-      <table>
-        <MessageTableEntry
-          expandAllRenderAsync
-          toggleDetail={() => {}}
-          fields={Immutable.List()}
-          message={message}
-          config={MessagesWidgetConfig.builder().build()}
-          selectedFields={Immutable.OrderedSet(['message', 'notexisting'])}
-          expanded={false}
-        />
-      </table>,
+      <SelectableMessageTableMessagesProvider displayBulkSelectCol={false} messages={[]}>
+        <MessageTableSelectedEntitiesProvider bulkSelection={null}>
+          <table>
+            <MessageTableEntry
+              expandAllRenderAsync
+              toggleDetail={() => {}}
+              fields={Immutable.List()}
+              message={message}
+              config={MessagesWidgetConfig.builder().build()}
+              selectedFields={Immutable.OrderedSet(['message', 'notexisting'])}
+              expanded={false}
+            />
+          </table>
+        </MessageTableSelectedEntitiesProvider>
+      </SelectableMessageTableMessagesProvider>,
     );
 
     expect(screen.getByText('Something happened!')).toBeInTheDocument();

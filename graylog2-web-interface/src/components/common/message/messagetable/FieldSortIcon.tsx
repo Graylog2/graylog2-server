@@ -25,7 +25,7 @@ import SortIcon from 'components/common/SortIcon';
 type Props = {
   config: MessagesWidgetConfig;
   fieldName: string;
-  onSortChange: (newSortConfig: SortConfig[]) => Promise<void>;
+  onSortChange?: (newSortConfig: SortConfig[]) => Promise<void>;
   setLoadingState: (loading: boolean) => void;
 };
 
@@ -83,7 +83,7 @@ const _directionStrategy = (config: MessagesWidgetConfig, fieldName: string) => 
   }
 };
 
-const FieldSortIcon = ({ fieldName, config, onSortChange, setLoadingState }: Props) => {
+const FieldSortIcon = ({ fieldName, config, onSortChange = undefined, setLoadingState }: Props) => {
   const changeSort = (nextDirection: Direction) =>
     _changeSort(nextDirection, config, fieldName, onSortChange, setLoadingState);
 
@@ -93,7 +93,7 @@ const FieldSortIcon = ({ fieldName, config, onSortChange, setLoadingState }: Pro
   return (
     <SortIcon
       activeDirection={activeDirection}
-      onChange={() => handleSortChange(changeSort)}
+      onChange={typeof onSortChange === 'function' ? () => handleSortChange(changeSort) : undefined}
       title={tooltip(fieldName)}
     />
   );

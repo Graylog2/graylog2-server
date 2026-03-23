@@ -41,6 +41,7 @@ describe('TimeRangePresetDropdown', () => {
     asMock(useSearchConfiguration).mockReturnValue({
       config: mockSearchClusterConfig,
       refresh: jest.fn(),
+      isInitialLoading: false,
     });
 
     const onSelectOption = jest.fn();
@@ -89,6 +90,7 @@ describe('TimeRangePresetDropdown', () => {
         ],
       },
       refresh: jest.fn(),
+      isInitialLoading: false,
     });
 
     const onSelectOption = jest.fn();
