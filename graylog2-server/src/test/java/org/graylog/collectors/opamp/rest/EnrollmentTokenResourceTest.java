@@ -19,7 +19,6 @@ package org.graylog.collectors.opamp.rest;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Response;
-import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
@@ -31,11 +30,9 @@ import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.ComputedFieldRegistry;
 import org.graylog2.database.filtering.DbSortResolver;
-import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.security.WithAuthorization;
 import org.graylog2.security.WithAuthorizationExtension;
-import org.graylog2.shared.users.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,7 +50,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -69,24 +65,11 @@ class EnrollmentTokenResourceTest {
     private CollectorsConfigService collectorsConfigService;
     @Mock
     private FleetService fleetService;
-    @Mock
-    private UserService userService;
 
     private EnrollmentTokenResource resource;
 
     @BeforeEach
     void setUp() throws Exception {
-        final var mockUser = mock(User.class);
-        lenient().when(mockUser.getId()).thenReturn("test-user-id");
-        lenient().when(mockUser.getName()).thenReturn("testuser");
-
-        lenient().when(userService.loadById("test-principal")).thenReturn(mockUser);
-
-        final var subject = mock(Subject.class);
-        lenient().when(subject.getPrincipal()).thenReturn("test-principal");
-        lenient().when(subject.isAuthenticated()).thenReturn(true);
-        ThreadContext.bind(subject);
-
         resource = new EnrollmentTokenResource(
                 enrollmentTokenService, collectorsConfigService, fleetService, mock(ComputedFieldRegistry.class));
     }
