@@ -105,60 +105,38 @@ class EntityPermissionsUtilsTest {
     }
 
     @Test
-    void areFieldsReadableReturnsTrueWhenCollectionNotInCatalog() {
+    void areAllFieldsReadableReturnsFalseWhenCollectionNotInCatalog() {
         doReturn(Optional.empty()).when(catalog).getByCollectionName("unknown");
-
-        assertTrue(toTest.areFieldsReadable("unknown", Set.of("any_field")));
+        assertFalse(toTest.areAllFieldsReadable("unknown", Set.of("any_field")));
     }
 
     @Test
-    void areFieldsReadableReturnsTrueWhenAllFieldsAreReadable() {
+    void areFieldsReadableReturnsTrueWhenAllFieldsAreAllReadable() {
         doReturn(Optional.of(
                 new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read",
                         List.of("title", "description", "created_at")))
         ).when(catalog).getByCollectionName("streams");
 
-        assertTrue(toTest.areFieldsReadable("streams", Set.of("title", "description")));
+        assertTrue(toTest.areAllFieldsReadable("streams", Set.of("title", "description")));
     }
 
     @Test
-    void areFieldsReadableReturnsFalseWhenFieldIsNotInReadableList() {
+    void areAllFieldsReadableReturnsFalseWhenFieldIsNotInReadableList() {
         doReturn(Optional.of(
                 new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read",
                         List.of("title", "description")))
         ).when(catalog).getByCollectionName("streams");
 
-        assertFalse(toTest.areFieldsReadable("streams", Set.of("title", "secret_field")));
+        assertFalse(toTest.areAllFieldsReadable("streams", Set.of("title", "secret_field")));
     }
 
     @Test
-    void areFieldsReadableAlwaysAllowsIdField() {
-        doReturn(Optional.of(
-                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read",
-                        List.of("title")))
-        ).when(catalog).getByCollectionName("streams");
-
-        assertTrue(toTest.areFieldsReadable("streams", Set.of("_id", "title")));
-    }
-
-    @Test
-    void areFieldsReadableReturnsFalseWhenReadableFieldsIsEmpty() {
+    void areFieldsReadableReturnsFalseWhenReadableAllFieldsIsEmpty() {
         doReturn(Optional.of(
                 new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read",
                         List.of()))
         ).when(catalog).getByCollectionName("streams");
 
-        assertFalse(toTest.areFieldsReadable("streams", Set.of("title")));
+        assertFalse(toTest.areAllFieldsReadable("streams", Set.of("title")));
     }
-
-    @Test
-    void areFieldsReadableAllowsOnlyIdFieldWhenReadableFieldsIsEmpty() {
-        doReturn(Optional.of(
-                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read",
-                        List.of()))
-        ).when(catalog).getByCollectionName("streams");
-
-        assertTrue(toTest.areFieldsReadable("streams", Set.of("_id")));
-    }
-
 }

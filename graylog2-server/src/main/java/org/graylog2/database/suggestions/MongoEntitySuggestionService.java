@@ -100,7 +100,7 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
         if (displayFields != null) {
             requestedFields.addAll(displayFields);
         }
-        if (!permissionsUtils.areFieldsReadable(collection, requestedFields)) {
+        if (!permissionsUtils.areAllFieldsReadable(collection, requestedFields)) {
             LOG.warn("Suggestion request for collection [{}] denied: requested fields {} contain non-readable fields",
                     collection, requestedFields);
             return emptyResponse(page, perPage);

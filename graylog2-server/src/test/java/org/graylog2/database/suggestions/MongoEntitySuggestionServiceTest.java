@@ -52,7 +52,7 @@ class MongoEntitySuggestionServiceTest {
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb) {
-        lenient().doReturn(true).when(entityPermissionsUtils).areFieldsReadable(anyString(), any());
+        lenient().doReturn(true).when(entityPermissionsUtils).areAllFieldsReadable(anyString(), any());
         this.toTest = new MongoEntitySuggestionService(mongodb.mongoConnection(), entityPermissionsUtils);
     }
 
@@ -253,17 +253,20 @@ class MongoEntitySuggestionServiceTest {
 
     @Test
     void returnsEmptyResponseWhenValueColumnIsNotReadable() {
-        doReturn(false).when(entityPermissionsUtils).areFieldsReadable("dashboards", Set.of("_id", "secret_field"));
+        doReturn(false).when(entityPermissionsUtils).areAllFieldsReadable("dashboards", Set.of("field_1", "field_2"));
 
-        final var result = toTest.suggest("dashboards", "_id", "secret_field", "", 1, 10, subject);
+        EntitySuggestionResponse result = toTest.suggest("dashboards", "field_1", "field_2", "", 1, 10, subject);
+        assertThat(result.suggestions()).isEmpty();
+        assertThat(result.pagination().total()).isZero();
 
+        result = toTest.suggest("dashboards", "field_1", "field_2", "", 1, 10, subject);
         assertThat(result.suggestions()).isEmpty();
         assertThat(result.pagination().total()).isZero();
     }
 
     @Test
     void returnsEmptyResponseWhenTargetColumnIsNotReadable() {
-        doReturn(false).when(entityPermissionsUtils).areFieldsReadable("dashboards", Set.of("secret_target", "title"));
+        doReturn(false).when(entityPermissionsUtils).areAllFieldsReadable("dashboards", Set.of("secret_target", "title"));
 
         final var result = toTest.suggest("dashboards", "secret_target", "title", "", 1, 10, subject);
 
@@ -275,7 +278,7 @@ class MongoEntitySuggestionServiceTest {
     @MongoDBFixtures("composite-display-fixtures.json")
     void returnsEmptyResponseWhenDisplayFieldIsNotReadable() {
         doReturn(false).when(entityPermissionsUtils)
-                .areFieldsReadable("nodes", Set.of("node_id", "hostname", "secret_field"));
+                .areAllFieldsReadable("nodes", Set.of("node_id", "hostname", "secret_field"));
 
         final var result = toTest.suggest(
                 "nodes",
