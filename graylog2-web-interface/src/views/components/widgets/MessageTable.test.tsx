@@ -25,6 +25,8 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import MessageTable from 'components/common/message/messagetable/MessageTable';
+import SelectableMessageTableMessagesProvider from 'views/components/widgets/SelectableMessageTableMessagesProvider';
+import MessageTableSelectedEntitiesProvider from 'views/components/widgets/MessageTableSelectedEntitiesProvider';
 
 import InteractiveContext from '../contexts/InteractiveContext';
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
@@ -53,15 +55,20 @@ const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full
 const config = MessagesWidgetConfig.builder().fields(['file_name']).build();
 
 const SimpleMessageTable = (props: Partial<Pick<React.ComponentProps<typeof MessageTable>, 'config' | 'fields'>>) => (
-  <MessageTable
-    config={config}
-    fields={Immutable.List(fields)}
-    messages={messages}
-    onSortChange={() => Promise.resolve()}
-    setLoadingState={() => {}}
-    scrollContainerRef={undefined}
-    {...props}
-  />
+  <SelectableMessageTableMessagesProvider displayBulkSelectCol={false} messages={messages}>
+    <MessageTableSelectedEntitiesProvider bulkSelection={null}>
+      <MessageTable
+
+        config={config}
+        fields={Immutable.List(fields)}
+        messages={messages}
+        onSortChange={() => Promise.resolve()}
+        setLoadingState={() => {}}
+        scrollContainerRef={undefined}
+        {...props}
+      />
+    </MessageTableSelectedEntitiesProvider>
+  </SelectableMessageTableMessagesProvider>
 );
 
 const highlightedStyle = 'border-left: 7px solid #45E5A8';
