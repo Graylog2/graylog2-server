@@ -30,11 +30,19 @@ const StyledListGroup = styled(ListGroup)`
 const SliceInner = styled.div`
   display: flex;
   justify-content: space-between;
+  gap: 2px;
 `;
 
 const Title = styled.div`
   word-break: break-word;
   flex: 1;
+`;
+
+const Additional = styled.div`
+  white-space: nowrap;
+  display: flex;
+  align-items: flex-start;
+  gap: 2px;
 `;
 
 /*
@@ -74,10 +82,9 @@ const SliceList = ({
         active={String(activeSlice) === String(slice.value)}>
         <SliceInner>
           <Title>{sliceRenderers?.[sliceCol]?.render?.(slice) ?? slice.title ?? String(slice.value)}</Title>
-
-          {
-            // <CountBadge title={String(slice.count)}>{formatReadableNumber(slice.count)}</CountBadge>
-          }
+          {sliceRenderers?.[sliceCol]?.renderAdditional ? (
+            <Additional>{sliceRenderers?.[sliceCol]?.renderAdditional?.(slice)}</Additional>
+          ) : null}
         </SliceInner>
       </ListGroupItem>
     ))}
