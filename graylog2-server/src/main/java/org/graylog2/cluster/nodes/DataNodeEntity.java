@@ -31,8 +31,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @DbEntity(collection = "datanodes", titleField = "node_id",
-          readableFields = {"node_id", "hostname", "transport_address", "cluster_address",
-                  "rest_api_address", "datanode_status", "datanode_version", "is_leader", "last_seen"})
+          readableFields = {})
 public class DataNodeEntity extends AbstractNode<DataNodeDto> {
 
     @JsonCreator
