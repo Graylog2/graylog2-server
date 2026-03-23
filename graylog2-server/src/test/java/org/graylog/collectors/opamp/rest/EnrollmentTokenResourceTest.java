@@ -18,9 +18,7 @@ package org.graylog.collectors.opamp.rest;
 
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.SecurityContext;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.graylog.collectors.CollectorsConfig;
@@ -37,8 +35,6 @@ import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.security.WithAuthorization;
 import org.graylog2.security.WithAuthorizationExtension;
-import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.shared.users.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,8 +43,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.VarHandle;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -95,16 +89,6 @@ class EnrollmentTokenResourceTest {
 
         resource = new EnrollmentTokenResource(
                 enrollmentTokenService, collectorsConfigService, fleetService, mock(ComputedFieldRegistry.class));
-
-        // Set userService and securityContext on RestResource using VarHandle (setAccessible is forbidden)
-        final var lookup = MethodHandles.privateLookupIn(RestResource.class, MethodHandles.lookup());
-
-        final VarHandle userServiceHandle = lookup.findVarHandle(RestResource.class, "userService", UserService.class);
-        userServiceHandle.set(resource, userService);
-
-        final var securityContext = new ShiroSecurityContext(subject, null, true, null, new MultivaluedHashMap<>());
-        final VarHandle securityContextHandle = lookup.findVarHandle(RestResource.class, "securityContext", SecurityContext.class);
-        securityContextHandle.set(resource, securityContext);
     }
 
     @AfterEach
