@@ -26,7 +26,6 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import useLocation from 'routing/useLocation';
 import HotkeysProvider from 'contexts/HotkeysProvider';
 import useNotifications from 'components/notifications/useNotifications';
-import { alice } from 'fixtures/users';
 
 jest.mock('./ScratchpadToggle', () => mockComponent('ScratchpadToggle'));
 jest.mock('hooks/useCurrentUser');
@@ -63,14 +62,17 @@ describe('Navigation', () => {
     await screen.findByRole('button', { name: /user menu for administrator/i });
   });
 
-  it('shows notification badge for users with notifications:read permission', async () => {
+  it('shows notification badge when there are notifications', async () => {
     render(<SUT />);
 
     await screen.findByTestId('notification-badge');
   });
 
-  it('does not show notification badge for users without notifications:read permission', async () => {
-    asMock(useCurrentUser).mockReturnValue(alice);
+  it('does not show notification badge when there are no notifications', async () => {
+    asMock(useNotifications).mockReturnValue({
+      data: { total: 0, notifications: [] },
+      isLoading: false,
+    });
 
     render(<SUT />);
 

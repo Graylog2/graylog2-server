@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import useLocation from 'routing/useLocation';
-import { IfPermitted, Link, LinkContainer } from 'components/common';
+import { Link, LinkContainer } from 'components/common';
 import AppConfig from 'util/AppConfig';
 import { Navbar, Nav } from 'components/bootstrap';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
@@ -79,9 +79,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
       <Navbar.Collapse>
         <MainNavbar pathname={pathname} />
 
-        <IfPermitted permissions="notifications:read">
-          <NotificationBadge />
-        </IfPermitted>
+        <NotificationBadge />
 
         <Nav pullRight className="header-meta-nav">
           {AppConfig.isFeatureEnabled(FEATURE_FLAG) ? <QuickJumpModalContainer /> : null}
