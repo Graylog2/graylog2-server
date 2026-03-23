@@ -65,14 +65,21 @@ import java.util.stream.Collectors;
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Strings.nullToEmpty;
 import static org.graylog2.shared.security.RestPermissions.USERS_READ;
+import static org.graylog2.users.UserImpl.ACCOUNT_STATUS;
 import static org.graylog2.users.UserImpl.COLLECTION_NAME;
+import static org.graylog2.users.UserImpl.EMAIL;
+import static org.graylog2.users.UserImpl.FIRST_NAME;
 import static org.graylog2.users.UserImpl.FULL_NAME;
+import static org.graylog2.users.UserImpl.LAST_NAME;
+import static org.graylog2.users.UserImpl.STARTPAGE;
+import static org.graylog2.users.UserImpl.TIMEZONE;
+import static org.graylog2.users.UserImpl.USERNAME;
 
 @DbEntity(collection = COLLECTION_NAME,
           titleField = FULL_NAME,
           readPermission = USERS_READ,
-          readableFields = {"username", "email", "first_name", "last_name", "full_name",
-                  "timezone", "external_user", "roles", "account_status", "service_account"})
+          readableFields = {USERNAME, EMAIL, FIRST_NAME, LAST_NAME, FULL_NAME,
+                  TIMEZONE, ACCOUNT_STATUS, STARTPAGE})
 public class UserImpl extends PersistedImpl implements User {
 
     public static final String FULL_NAME_FORMAT = "%s %s";
