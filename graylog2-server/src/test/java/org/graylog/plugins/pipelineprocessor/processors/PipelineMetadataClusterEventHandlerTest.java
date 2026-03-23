@@ -16,7 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.processors;
 
-import jakarta.inject.Provider;
+import com.codahale.metrics.MetricRegistry;
 import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService;
 import org.graylog.plugins.pipelineprocessor.events.PipelineConnectionsChangedEvent;
@@ -46,7 +46,7 @@ import static org.mockito.Mockito.when;
 
 class PipelineMetadataClusterEventHandlerTest {
 
-    private final PipelineInterpreterStateUpdater stateUpdater = mock(PipelineInterpreterStateUpdater.class);
+    private final PipelineInterpreterStateBuilder stateBuilder = mock(PipelineInterpreterStateBuilder.class);
     private final PipelineMetadataUpdater metadataUpdater = mock(PipelineMetadataUpdater.class);
     private final MongoDbPipelineMetadataService pipelineMetadataService = mock(MongoDbPipelineMetadataService.class);
     private final PipelineInterpreter.State state = mock(PipelineInterpreter.State.class);
@@ -57,10 +57,9 @@ class PipelineMetadataClusterEventHandlerTest {
 
     @BeforeEach
     void setUp() {
-        Provider<PipelineInterpreterStateUpdater> stateUpdaterProvider = () -> stateUpdater;
         handler = new PipelineMetadataClusterEventHandler(
-                clusterEventBus, stateUpdaterProvider, metadataUpdater, pipelineMetadataService, executor);
-        when(stateUpdater.getLatestState()).thenReturn(state);
+                clusterEventBus, stateBuilder, new MetricRegistry(), metadataUpdater, pipelineMetadataService, executor);
+        when(stateBuilder.buildState(any())).thenReturn(state);
     }
 
     @Test
@@ -132,9 +131,10 @@ class PipelineMetadataClusterEventHandlerTest {
     }
 
     @Test
-    void nullStateSkipsMetadataUpdate() {
-        when(stateUpdater.getLatestState()).thenReturn(null);
+    void buildStateExceptionDoesNotPropagate() {
+        when(stateBuilder.buildState(any())).thenThrow(new RuntimeException("build error"));
 
+        // Should not throw
         handler.handleRuleChanges(new RulesChangedEvent(Set.of(), Set.of()));
 
         verifyNoInteractions(metadataUpdater);

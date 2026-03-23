@@ -17,8 +17,6 @@
 package org.graylog.plugins.pipelineprocessor.processors;
 
 import com.codahale.metrics.MetricRegistry;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
@@ -27,16 +25,10 @@ import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
-import org.graylog.plugins.pipelineprocessor.db.PipelineService;
-import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
-import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigDto;
-import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigService;
-import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.events.PipelineConnectionsChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.RuleMetricsConfigChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
-import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.rest.resources.system.inputs.InputDeletedEvent;
 
 import java.util.concurrent.ScheduledExecutorService;
@@ -49,40 +41,21 @@ import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory
 public class PipelineInterpreterStateUpdater {
     private static final RateLimitedLog log = createDefaultRateLimitedLog(PipelineInterpreterStateUpdater.class);
 
-    private final RuleMetricsConfigService ruleMetricsConfigService;
+    private final PipelineInterpreterStateBuilder stateBuilder;
     private final ScheduledExecutorService scheduler;
-    private final PipelineInterpreter.State.Factory stateFactory;
     /**
      * non-null if the update has successfully loaded a state
      */
     private final AtomicReference<PipelineInterpreter.State> latestState = new AtomicReference<>();
-    private final PipelineResolver pipelineResolver;
     private final PipelineMetricRegistry pipelineMetricRegistry;
 
     @Inject
-    public PipelineInterpreterStateUpdater(RuleService ruleService,
-                                     PipelineService pipelineService,
-                                     PipelineStreamConnectionsService pipelineStreamConnectionsService,
-                                     PipelineRuleParser pipelineRuleParser,
-                                     PipelineResolver.Factory pipelineResolverFactory,
-                                     RuleMetricsConfigService ruleMetricsConfigService,
+    public PipelineInterpreterStateUpdater(PipelineInterpreterStateBuilder stateBuilder,
                                      MetricRegistry metricRegistry,
                                      @Named("daemonScheduler") ScheduledExecutorService scheduler,
-                                     EventBus serverEventBus,
-                                     PipelineInterpreter.State.Factory stateFactory) {
-        this.ruleMetricsConfigService = ruleMetricsConfigService;
+                                     EventBus serverEventBus) {
+        this.stateBuilder = stateBuilder;
         this.scheduler = scheduler;
-        this.stateFactory = stateFactory;
-        this.pipelineResolver = pipelineResolverFactory.create(
-                PipelineResolverConfig.of(
-                        // TODO: Implement a #streamAll method in the services to get a real database cursor instead of
-                        //       loading all entries into memory.
-                        () -> ruleService.loadAll().stream(),
-                        () -> pipelineService.loadAll().stream(),
-                        () -> pipelineStreamConnectionsService.loadAll().stream()
-                ),
-                pipelineRuleParser
-        );
         this.pipelineMetricRegistry = PipelineMetricRegistry.create(metricRegistry, Pipeline.class.getName(), Rule.class.getName());
 
         // listens to cluster wide Rule, Pipeline and pipeline stream connection changes
@@ -94,11 +67,7 @@ public class PipelineInterpreterStateUpdater {
     // only the singleton instance should mutate itself, others are welcome to reload a new state, but we don't
     // currently allow direct global state updates from external sources (if you need to, send an event on the bus instead)
     private synchronized PipelineInterpreter.State reloadAndSave() {
-        final ImmutableMap<String, Pipeline> currentPipelines = pipelineResolver.resolvePipelines(pipelineMetricRegistry);
-        final ImmutableSetMultimap<String, Pipeline> streamPipelineConnections = pipelineResolver.resolveStreamConnections(currentPipelines);
-
-        final RuleMetricsConfigDto ruleMetricsConfig = ruleMetricsConfigService.get();
-        final PipelineInterpreter.State newState = stateFactory.newState(currentPipelines, streamPipelineConnections, ruleMetricsConfig);
+        final PipelineInterpreter.State newState = stateBuilder.buildState(pipelineMetricRegistry);
         latestState.set(newState);
         log.debug("Pipeline interpreter state got updated");
         return newState;

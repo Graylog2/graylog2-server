@@ -36,8 +36,9 @@ import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineStreamCon
 import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
-import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreterStateUpdater;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
+import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreterStateBuilder;
+import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreterStateUpdater;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineResolver;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.plugin.Message;
@@ -132,17 +133,20 @@ class MessageCreationLoopPreventionTest extends BaseParserTest {
         final FunctionRegistry functionRegistry = new FunctionRegistry(functions);
         final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry);
         final MetricRegistry metricRegistry = new MetricRegistry();
-        final PipelineInterpreterStateUpdater stateUpdater = new PipelineInterpreterStateUpdater(
+        final PipelineInterpreterStateBuilder stateBuilder = new PipelineInterpreterStateBuilder(
                 ruleService,
                 pipelineService,
                 pipelineStreamConnectionsService,
                 parser,
                 (config, ruleParser) -> new PipelineResolver(ruleParser, config),
                 ruleMetricsConfigService,
+                (currentPipelines, streamPipelineConnections, ruleMetricsConfig) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, new MetricRegistry(), 1, true)
+        );
+        final PipelineInterpreterStateUpdater stateUpdater = new PipelineInterpreterStateUpdater(
+                stateBuilder,
                 metricRegistry,
                 Executors.newScheduledThreadPool(1),
-                eventBus,
-                (currentPipelines, streamPipelineConnections, ruleMetricsConfig) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, new MetricRegistry(), 1, true)
+                eventBus
         );
         this.pipelineInterpreter = new PipelineInterpreter(
                 messageQueueAcknowledger,
