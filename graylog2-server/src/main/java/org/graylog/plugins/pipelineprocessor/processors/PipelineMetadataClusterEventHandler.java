@@ -118,6 +118,14 @@ public class PipelineMetadataClusterEventHandler {
         });
     }
 
+    /**
+     * When an input is renamed, rules that previously referenced the input by name are no longer applicable; and
+     * rules that reference the new name now apply.
+     * Unfortunately, we don't have an exact mapping of rules by referenced input name. So we find all the rules
+     * that reference any inputs by name and fire an update event for those rules.
+     * Note: we also don't have an exact mapping of functions to rules, so we just trigger for all the rules included
+     * in pipelines that reference inputs in any way.
+     */
     @Subscribe
     public void handleInputRenamed(InputRenamedEvent event) {
         executor.submit(() -> {
