@@ -70,9 +70,7 @@ export const streamRulesColumnRenderers: ColumnRenderers<InputStreamRule> = {
       ),
     },
     rule: {
-      renderCell: (_rule: string, streamRule: InputStreamRule) => (
-        <StreamRuleCell streamRule={streamRule} />
-      ),
+      renderCell: (_rule: string, streamRule: InputStreamRule) => <StreamRuleCell streamRule={streamRule} />,
     },
   },
 };

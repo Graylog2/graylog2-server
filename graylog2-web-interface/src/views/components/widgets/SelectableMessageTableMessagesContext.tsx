@@ -14,30 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import styled from 'styled-components';
 
-import { Checkbox } from 'components/bootstrap';
+import * as React from 'react';
 
-const RowCheckbox = styled(Checkbox)`
-  &.checkbox {
-    margin: 0;
-    padding-top: 2px;
+import { singleton } from 'logic/singleton';
+import type { SelectableMessageTableMessage } from 'views/components/widgets/MessageList';
 
-    label {
-      display: flex;
-      align-items: center;
-      padding: 0;
-      min-height: 14px;
+export interface SelectableMessageTableMessagesState {
+  selectableMessageTableMessages: Array<SelectableMessageTableMessage>;
+}
 
-      input {
-        width: 14px;
-        height: 14px;
-        cursor: pointer;
-        margin: 0;
-        position: relative;
-      }
-    }
-  }
-`;
+const SelectableMessageTableMessagesContext = React.createContext<SelectableMessageTableMessagesState | undefined>(
+  undefined,
+);
 
-export default RowCheckbox;
+export default singleton(
+  'contexts.views.SelectableMessageTableMessagesContext',
+  () => SelectableMessageTableMessagesContext,
+);
