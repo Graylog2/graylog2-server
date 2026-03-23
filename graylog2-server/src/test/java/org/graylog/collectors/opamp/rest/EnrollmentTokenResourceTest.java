@@ -19,7 +19,6 @@ package org.graylog.collectors.opamp.rest;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Response;
-import org.apache.shiro.util.ThreadContext;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.FleetService;
@@ -33,7 +32,6 @@ import org.graylog2.database.filtering.DbSortResolver;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.security.WithAuthorization;
 import org.graylog2.security.WithAuthorizationExtension;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -72,12 +70,6 @@ class EnrollmentTokenResourceTest {
     void setUp() throws Exception {
         resource = new EnrollmentTokenResource(
                 enrollmentTokenService, collectorsConfigService, fleetService, mock(ComputedFieldRegistry.class));
-    }
-
-    @AfterEach
-    void tearDown() {
-        ThreadContext.unbindSubject();
-        ThreadContext.unbindSecurityManager();
     }
 
     @Test
