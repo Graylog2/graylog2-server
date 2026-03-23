@@ -18,10 +18,11 @@
 import * as React from 'react';
 
 import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
-import type { SelectableMessageTableMessage } from 'views/components/widgets/MessageList';
 import useSelectedMessageEntities from 'views/hooks/useSelectedMessageEntities';
+import useSelectableMessageTableMessages from 'views/components/widgets/useSelectableMessageTableMessages';
 
-const BulkSelectHead = ({ data }: { data: Array<SelectableMessageTableMessage> }) => {
+const BulkSelectHead = () => {
+  const { selectableMessageTableMessages: data } = useSelectableMessageTableMessages();
   const { toggleAllEntitySelect, isAllRowsSelected, isSomeRowsSelected } = useSelectedMessageEntities();
   const title = `${isAllRowsSelected ? 'Deselect' : 'Select'} all visible messages`;
 
