@@ -30,12 +30,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.util.Set;
+import java.util.concurrent.ScheduledExecutorService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -49,6 +51,7 @@ class PipelineMetadataClusterEventHandlerTest {
     private final MongoDbPipelineMetadataService pipelineMetadataService = mock(MongoDbPipelineMetadataService.class);
     private final PipelineInterpreter.State state = mock(PipelineInterpreter.State.class);
     private final ClusterEventBus clusterEventBus = mock(ClusterEventBus.class);
+    private final ScheduledExecutorService executor = directExecutor();
 
     private PipelineMetadataClusterEventHandler handler;
 
@@ -56,7 +59,7 @@ class PipelineMetadataClusterEventHandlerTest {
     void setUp() {
         Provider<PipelineInterpreterStateUpdater> stateUpdaterProvider = () -> stateUpdater;
         handler = new PipelineMetadataClusterEventHandler(
-                clusterEventBus, stateUpdaterProvider, metadataUpdater, pipelineMetadataService);
+                clusterEventBus, stateUpdaterProvider, metadataUpdater, pipelineMetadataService, executor);
         when(stateUpdater.getLatestState()).thenReturn(state);
     }
 
@@ -144,5 +147,14 @@ class PipelineMetadataClusterEventHandlerTest {
 
         // Should not throw
         handler.handleRuleChanges(event);
+    }
+
+    private static ScheduledExecutorService directExecutor() {
+        final ScheduledExecutorService mock = mock(ScheduledExecutorService.class);
+        doAnswer(invocation -> {
+            invocation.getArgument(0, Runnable.class).run();
+            return null;
+        }).when(mock).submit(any(Runnable.class));
+        return mock;
     }
 }
