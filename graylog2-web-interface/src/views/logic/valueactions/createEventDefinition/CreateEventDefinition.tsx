@@ -25,12 +25,7 @@ import { ActionContext } from 'views/logic/ActionContext';
 
 type SearchValueActionArgs = AdditionalViewsActionHandlerArguments;
 
-const CreateEventDefinition = ({
-  value,
-  field,
-  queryId,
-  onClose,
-}: ActionComponentProps<SearchValueActionArgs>) => {
+const CreateEventDefinition = ({ value, field, queryId, onClose }: ActionComponentProps<SearchValueActionArgs>) => {
   const contexts = useContext(ActionContext);
 
   const mappedData = useMappedData({ contexts, field, queryId, value });

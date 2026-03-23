@@ -24,8 +24,7 @@ type StateSummary = { [inputId: string]: Array<string> };
 
 const PROBLEMATIC_STATES = new Set(['FAILED', 'FAILING', 'SETUP']);
 
-const fetchStateSummary = (): Promise<StateSummary> =>
-  SystemInputStates.summary();
+const fetchStateSummary = (): Promise<StateSummary> => SystemInputStates.summary();
 
 const useInputStateSummary = (): { hasProblematicInputs: boolean; isLoading: boolean } => {
   const { data, isLoading } = useQuery<StateSummary>({

@@ -114,12 +114,7 @@ const InputDiagnosisPage = () => {
           <p>Input Diagnosis can be used to test inputs and parsing without writing any data to the search cluster.</p>
         </LeftCol>
       </Header>
-      <StyledSegmentedControl<DiagnosisTab>
-        data={TABS}
-        radius="sm"
-        value={currentTab}
-        onChange={setCurrentTab}
-      />
+      <StyledSegmentedControl<DiagnosisTab> data={TABS} radius="sm" value={currentTab} onChange={setCurrentTab} />
       {input && currentTab === 'overview' && (
         <InputDiagnosisOverviewTab
           input={input}
@@ -133,9 +128,7 @@ const InputDiagnosisPage = () => {
           hasReceivedMessage={hasReceivedMessage}
         />
       )}
-      {currentTab === 'rules' && (
-        <InputDiagnosisRulesTab inputId={inputId} />
-      )}
+      {currentTab === 'rules' && <InputDiagnosisRulesTab inputId={inputId} />}
     </>
   );
 };
