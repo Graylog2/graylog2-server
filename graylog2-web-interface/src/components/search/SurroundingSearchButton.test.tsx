@@ -56,12 +56,7 @@ describe('SurroundingSearchButton', () => {
   });
 
   const TestComponent = (props: Partial<React.ComponentProps<typeof SurroundingSearchButton>>) => (
-    <SurroundingSearchButton
-      timestamp="2020-02-28T09:45:31.123Z"
-      id="foo-bar"
-      messageFields={{}}
-      {...props}
-    />
+    <SurroundingSearchButton timestamp="2020-02-28T09:45:31.123Z" id="foo-bar" messageFields={{}} {...props} />
   );
 
   const renderButton = (props: Partial<React.ComponentProps<typeof SurroundingSearchButton>> = {}) =>
