@@ -36,7 +36,13 @@ import java.util.Map;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
+import static org.graylog2.streams.StreamRuleImpl.FIELD_CONTENT_PACK;
 import static org.graylog2.streams.StreamRuleImpl.FIELD_DESCRIPTION;
+import static org.graylog2.streams.StreamRuleImpl.FIELD_FIELD;
+import static org.graylog2.streams.StreamRuleImpl.FIELD_INVERTED;
+import static org.graylog2.streams.StreamRuleImpl.FIELD_STREAM_ID;
+import static org.graylog2.streams.StreamRuleImpl.FIELD_TYPE;
+import static org.graylog2.streams.StreamRuleImpl.FIELD_VALUE;
 
 /**
  * Representing the rules of a single stream.
@@ -44,7 +50,7 @@ import static org.graylog2.streams.StreamRuleImpl.FIELD_DESCRIPTION;
 @DbEntity(collection = "streamrules",
           titleField = FIELD_DESCRIPTION,
           readPermission = STREAMS_READ,
-          readableFields = {"type", "value", "field", "inverted", "stream_id", "description"})
+          readableFields = {FIELD_TYPE, FIELD_VALUE, FIELD_FIELD, FIELD_INVERTED, FIELD_STREAM_ID, FIELD_DESCRIPTION, FIELD_CONTENT_PACK})
 public class StreamRuleImpl extends PersistedImpl implements StreamRule {
     public static final String FIELD_TYPE = "type";
     public static final String FIELD_VALUE = "value";

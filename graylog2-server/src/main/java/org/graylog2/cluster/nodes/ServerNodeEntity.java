@@ -23,9 +23,11 @@ import org.graylog2.plugin.lifecycles.Lifecycle;
 
 import java.util.Map;
 
+import static org.graylog2.cluster.nodes.ServerNodeDto.FIELD_IS_PROCESSING;
+
 @DbEntity(collection = "nodes", titleField = "node_id",
           readableFields = {"node_id", "hostname", "transport_address", "is_leader", "last_seen",
-                  "is_processing"})
+                  FIELD_IS_PROCESSING})
 public class ServerNodeEntity extends AbstractNode<ServerNodeDto> {
 
     @JsonCreator

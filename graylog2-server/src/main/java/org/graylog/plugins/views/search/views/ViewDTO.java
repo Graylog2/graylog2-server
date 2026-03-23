@@ -48,6 +48,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.graylog.plugins.views.search.views.ViewDTO.FIELD_CREATED_AT;
+import static org.graylog.plugins.views.search.views.ViewDTO.FIELD_DESCRIPTION;
+import static org.graylog.plugins.views.search.views.ViewDTO.FIELD_LAST_UPDATED_AT;
+import static org.graylog.plugins.views.search.views.ViewDTO.FIELD_OWNER;
+import static org.graylog.plugins.views.search.views.ViewDTO.FIELD_SEARCH_ID;
+import static org.graylog.plugins.views.search.views.ViewDTO.FIELD_SUMMARY;
+import static org.graylog.plugins.views.search.views.ViewDTO.FIELD_TITLE;
+import static org.graylog.plugins.views.search.views.ViewDTO.FIELD_TYPE;
+
 @AutoValue
 @JsonDeserialize(builder = ViewDTO.Builder.class)
 /* We do store both saved searches and dashboards in a single collection. Therefore we cannot use the `@DbEntity`-annotation
@@ -55,8 +64,8 @@ import java.util.stream.Collectors;
    only documents which have the corresponding type.
  */
 @DbEntity(collection = "dashboards", readPermission = RestPermissions.DASHBOARDS_READ,
-          readableFields = {"title", "summary", "description", "type", "owner",
-                  "created_at", "last_updated_at", "search_id"})
+          readableFields = {FIELD_TITLE, FIELD_SUMMARY, FIELD_DESCRIPTION, FIELD_TYPE,
+                  FIELD_OWNER, FIELD_CREATED_AT, FIELD_LAST_UPDATED_AT, FIELD_SEARCH_ID})
 public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, ViewLike, SourcedMongoEntity<ViewDTO, ViewDTO.Builder> {
     public static final String COLLECTION_NAME = "views";
 
