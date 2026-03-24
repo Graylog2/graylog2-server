@@ -16,7 +16,6 @@
  */
 package org.graylog2.inputs.transports.netty;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -36,6 +35,10 @@ import io.netty.handler.codec.http.HttpVersion;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+// NOTE: Auth, CORS, and OPTIONS handling in this class are cross-cutting concerns that would
+// be cleaner as separate upstream pipeline handlers (e.g., HttpAuthHandler, HttpCorsHandler).
+// This was not done during the OTel HTTP input restructuring to minimize blast radius.
+// See: docs/plans/2026-03-24-otel-http-input-pipeline-restructuring-design.md
 public class HttpHandler extends SimpleChannelInboundHandler<HttpRequest> {
     private final boolean enableCors;
     private final String authorizationHeader;
@@ -75,19 +78,21 @@ public class HttpHandler extends SimpleChannelInboundHandler<HttpRequest> {
         }
 
         final boolean correctPath = path.equals(request.uri());
-        if (correctPath && request instanceof FullHttpRequest) {
-            final FullHttpRequest fullHttpRequest = (FullHttpRequest) request;
-            final ByteBuf buffer = fullHttpRequest.content();
-
-            // send on to raw message handler
-            writeResponse(channel, keepAlive, httpRequestVersion, HttpResponseStatus.ACCEPTED, origin);
-            ctx.fireChannelRead(buffer.retain());
+        if (correctPath && request instanceof FullHttpRequest fullHttpRequest) {
+            handleValidPost(ctx, fullHttpRequest, keepAlive);
         } else {
             writeResponse(channel, keepAlive, httpRequestVersion, HttpResponseStatus.NOT_FOUND, origin);
         }
     }
 
-    private void writeResponse(Channel channel,
+    protected void handleValidPost(ChannelHandlerContext ctx, FullHttpRequest request, boolean keepAlive) {
+        final String origin = request.headers().get(HttpHeaderNames.ORIGIN);
+        writeResponse(ctx.channel(), keepAlive, request.protocolVersion(),
+                HttpResponseStatus.ACCEPTED, origin);
+        ctx.fireChannelRead(request.content().retain());
+    }
+
+    protected void writeResponse(Channel channel,
                                boolean keepAlive,
                                HttpVersion httpRequestVersion,
                                HttpResponseStatus status,
