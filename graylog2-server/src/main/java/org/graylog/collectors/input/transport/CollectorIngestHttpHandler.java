@@ -18,12 +18,14 @@ package org.graylog.collectors.input.transport;
 
 import com.google.protobuf.AbstractMessageLite;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import org.graylog.collectors.input.CollectorJournalRecordFactory;
-import org.graylog.inputs.otel.transport.OTelHttpHandler;
+import org.graylog.inputs.otel.transport.OtlpHttpUtils;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.journal.RawMessage;
 import org.slf4j.Logger;
@@ -31,48 +33,81 @@ import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 /**
- * An HTTP handler for collector-managed agents that extracts the agent instance UID
- * from the Netty channel attribute (set by {@link AgentCertChannelHandler} during TLS handshake)
- * and embeds it in each journal record before writing to the Graylog journal.
+ * HTTP handler for collector-managed agents. Validates agent identity from the
+ * channel attribute set by {@link AgentCertChannelHandler} during TLS handshake.
  * <p>
- * If the agent instance UID is not present on the channel (i.e., no valid client certificate),
- * the handler rejects the request with a 401 Unauthorized response.
+ * This handler is independent of {@link org.graylog2.inputs.transports.netty.HttpHandler}
+ * — it does not need auth, CORS, OPTIONS, or forwarded-for handling since the collector
+ * input uses mTLS for authentication and is only accessed by collector agents.
+ * <p>
+ * OTLP protocol logic (parsing, response formatting) is shared via {@link OtlpHttpUtils}.
  */
-public class CollectorIngestHttpHandler extends OTelHttpHandler {
+public class CollectorIngestHttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
     private static final Logger LOG = LoggerFactory.getLogger(CollectorIngestHttpHandler.class);
+    private static final String LOGS_PATH = "/v1/logs";
+
+    private final MessageInput input;
 
     public CollectorIngestHttpHandler(MessageInput input) {
-        super(input);
+        this.input = input;
     }
 
     @Override
-    protected boolean validateRequest(ChannelHandlerContext ctx, FullHttpRequest request) {
+    protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) {
+        final boolean keepAlive = HttpUtil.isKeepAlive(request);
+
+        if (!HttpMethod.POST.equals(request.method())) {
+            OtlpHttpUtils.sendError(ctx, HttpResponseStatus.METHOD_NOT_ALLOWED, keepAlive);
+            return;
+        }
+
+        if (!LOGS_PATH.equals(request.uri())) {
+            OtlpHttpUtils.sendError(ctx, HttpResponseStatus.NOT_FOUND, keepAlive);
+            return;
+        }
+
         final String instanceUid = ctx.channel().attr(AgentCertChannelHandler.AGENT_INSTANCE_UID).get();
         if (instanceUid == null) {
             LOG.warn("Rejecting request without agent identity (no valid client certificate)");
-            sendError(ctx, HttpResponseStatus.UNAUTHORIZED, HttpUtil.isKeepAlive(request));
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    protected Stream<RawMessage> createJournalRecords(ChannelHandlerContext ctx,
-                                                      ExportLogsServiceRequest exportRequest) {
-        final String instanceUid = ctx.channel().attr(AgentCertChannelHandler.AGENT_INSTANCE_UID).get();
-
-        final Function<byte[], RawMessage> createRawMessage;
-        if (ctx.channel().remoteAddress() instanceof InetSocketAddress address) {
-            createRawMessage = bytes -> new RawMessage(bytes, address);
-        } else {
-            createRawMessage = RawMessage::new;
+            OtlpHttpUtils.sendError(ctx, HttpResponseStatus.UNAUTHORIZED, keepAlive);
+            return;
         }
 
-        return CollectorJournalRecordFactory.createFromRequest(exportRequest, instanceUid).stream()
-                .map(AbstractMessageLite::toByteArray)
-                .map(createRawMessage);
+        // Parse
+        final ExportLogsServiceRequest exportRequest;
+        try {
+            exportRequest = OtlpHttpUtils.parse(request);
+        } catch (OtlpHttpUtils.UnsupportedContentTypeException e) {
+            OtlpHttpUtils.sendError(ctx, HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE, keepAlive);
+            return;
+        } catch (Exception e) {
+            LOG.debug("Failed to parse OTLP request", e);
+            OtlpHttpUtils.sendError(ctx, HttpResponseStatus.BAD_REQUEST, keepAlive);
+            return;
+        }
+
+        // Process
+        final boolean isProtobuf = OtlpHttpUtils.isProtobuf(request);
+        try {
+            final Function<byte[], RawMessage> createRawMessage;
+            if (ctx.channel().remoteAddress() instanceof InetSocketAddress address) {
+                createRawMessage = bytes -> new RawMessage(bytes, address);
+            } else {
+                createRawMessage = RawMessage::new;
+            }
+
+            CollectorJournalRecordFactory.createFromRequest(exportRequest, instanceUid).stream()
+                    .map(AbstractMessageLite::toByteArray)
+                    .map(createRawMessage)
+                    .forEach(input::processRawMessage);
+        } catch (Exception e) {
+            LOG.error("Failed to process OTLP request", e);
+            OtlpHttpUtils.sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR, keepAlive);
+            return;
+        }
+
+        OtlpHttpUtils.sendSuccess(ctx, isProtobuf, keepAlive);
     }
 }

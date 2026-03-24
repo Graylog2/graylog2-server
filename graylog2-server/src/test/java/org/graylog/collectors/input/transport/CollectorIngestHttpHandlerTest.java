@@ -32,18 +32,19 @@ import io.opentelemetry.proto.logs.v1.LogRecord;
 import io.opentelemetry.proto.logs.v1.ResourceLogs;
 import io.opentelemetry.proto.logs.v1.ScopeLogs;
 import org.graylog.collectors.CollectorJournal;
-
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.journal.RawMessage;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.nio.charset.StandardCharsets;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -54,18 +55,26 @@ class CollectorIngestHttpHandlerTest {
     @Mock
     private MessageInput input;
 
+    @Test
+    void postWithValidIdentityReturns200() throws Exception {
+        final EmbeddedChannel channel = createChannel("test-uid");
+        final ExportLogsServiceRequest request = createTestRequest();
+
+        final FullHttpRequest httpRequest = createProtobufRequest("/v1/logs", request.toByteArray());
+        channel.writeInbound(httpRequest);
+
+        final FullHttpResponse response = channel.readOutbound();
+        assertThat(response.status()).isEqualTo(HttpResponseStatus.OK);
+        verify(input).processRawMessage(any());
+        response.release();
+    }
 
     @Test
-    void rejectsRequestWithoutAgentIdentity() {
+    void postWithoutIdentityReturns401() {
         final EmbeddedChannel channel = createChannel(null);
         final ExportLogsServiceRequest request = createTestRequest();
 
-        final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
-                HttpVersion.HTTP_1_1, HttpMethod.POST, "/v1/logs",
-                Unpooled.wrappedBuffer(request.toByteArray()));
-        httpRequest.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/x-protobuf");
-        httpRequest.headers().set(HttpHeaderNames.CONTENT_LENGTH, request.toByteArray().length);
-
+        final FullHttpRequest httpRequest = createProtobufRequest("/v1/logs", request.toByteArray());
         channel.writeInbound(httpRequest);
 
         final FullHttpResponse response = channel.readOutbound();
@@ -75,17 +84,88 @@ class CollectorIngestHttpHandlerTest {
     }
 
     @Test
+    void getRequestReturns405() {
+        final EmbeddedChannel channel = createChannel("test-uid");
+
+        final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
+                HttpVersion.HTTP_1_1, HttpMethod.GET, "/v1/logs");
+        httpRequest.headers().set(HttpHeaderNames.CONTENT_LENGTH, 0);
+
+        channel.writeInbound(httpRequest);
+
+        final FullHttpResponse response = channel.readOutbound();
+        assertThat(response.status()).isEqualTo(HttpResponseStatus.METHOD_NOT_ALLOWED);
+        verifyNoInteractions(input);
+        response.release();
+    }
+
+    @Test
+    void wrongPathReturns404() {
+        final EmbeddedChannel channel = createChannel("test-uid");
+        final ExportLogsServiceRequest request = createTestRequest();
+
+        final FullHttpRequest httpRequest = createProtobufRequest("/v1/metrics", request.toByteArray());
+        channel.writeInbound(httpRequest);
+
+        final FullHttpResponse response = channel.readOutbound();
+        assertThat(response.status()).isEqualTo(HttpResponseStatus.NOT_FOUND);
+        verifyNoInteractions(input);
+        response.release();
+    }
+
+    @Test
+    void unsupportedContentTypeReturns415() {
+        final EmbeddedChannel channel = createChannel("test-uid");
+
+        final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
+                HttpVersion.HTTP_1_1, HttpMethod.POST, "/v1/logs",
+                Unpooled.wrappedBuffer("hello".getBytes(StandardCharsets.UTF_8)));
+        httpRequest.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain");
+        httpRequest.headers().set(HttpHeaderNames.CONTENT_LENGTH, 5);
+
+        channel.writeInbound(httpRequest);
+
+        final FullHttpResponse response = channel.readOutbound();
+        assertThat(response.status()).isEqualTo(HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE);
+        verifyNoInteractions(input);
+        response.release();
+    }
+
+    @Test
+    void invalidProtobufReturns400() {
+        final EmbeddedChannel channel = createChannel("test-uid");
+
+        final FullHttpRequest httpRequest = createProtobufRequest("/v1/logs",
+                new byte[]{0x01, 0x02, (byte) 0xFF});
+        channel.writeInbound(httpRequest);
+
+        final FullHttpResponse response = channel.readOutbound();
+        assertThat(response.status()).isEqualTo(HttpResponseStatus.BAD_REQUEST);
+        verifyNoInteractions(input);
+        response.release();
+    }
+
+    @Test
+    void processingFailureReturns500() {
+        final EmbeddedChannel channel = createChannel("test-uid");
+        doThrow(new RuntimeException("journal full")).when(input).processRawMessage(any());
+
+        final ExportLogsServiceRequest request = createTestRequest();
+        final FullHttpRequest httpRequest = createProtobufRequest("/v1/logs", request.toByteArray());
+        channel.writeInbound(httpRequest);
+
+        final FullHttpResponse response = channel.readOutbound();
+        assertThat(response.status()).isEqualTo(HttpResponseStatus.INTERNAL_SERVER_ERROR);
+        response.release();
+    }
+
+    @Test
     void collectorInstanceUidIsEmbeddedInJournalRecord() throws Exception {
         final String agentUid = "agent-uid-42";
         final EmbeddedChannel channel = createChannel(agentUid);
         final ExportLogsServiceRequest request = createTestRequest();
 
-        final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
-                HttpVersion.HTTP_1_1, HttpMethod.POST, "/v1/logs",
-                Unpooled.wrappedBuffer(request.toByteArray()));
-        httpRequest.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/x-protobuf");
-        httpRequest.headers().set(HttpHeaderNames.CONTENT_LENGTH, request.toByteArray().length);
-
+        final FullHttpRequest httpRequest = createProtobufRequest("/v1/logs", request.toByteArray());
         channel.writeInbound(httpRequest);
 
         final ArgumentCaptor<RawMessage> captor = ArgumentCaptor.forClass(RawMessage.class);
@@ -115,12 +195,7 @@ class CollectorIngestHttpHandlerTest {
                                         .build())))
                 .build();
 
-        final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
-                HttpVersion.HTTP_1_1, HttpMethod.POST, "/v1/logs",
-                Unpooled.wrappedBuffer(request.toByteArray()));
-        httpRequest.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/x-protobuf");
-        httpRequest.headers().set(HttpHeaderNames.CONTENT_LENGTH, request.toByteArray().length);
-
+        final FullHttpRequest httpRequest = createProtobufRequest("/v1/logs", request.toByteArray());
         channel.writeInbound(httpRequest);
 
         final ArgumentCaptor<RawMessage> captor = ArgumentCaptor.forClass(RawMessage.class);
@@ -137,15 +212,10 @@ class CollectorIngestHttpHandlerTest {
 
     @Test
     void keepAliveRequestKeepsChannelOpen() throws Exception {
-        final String agentUid = "keep-alive-agent";
-        final EmbeddedChannel channel = createChannel(agentUid);
+        final EmbeddedChannel channel = createChannel("keep-alive-agent");
         final ExportLogsServiceRequest request = createTestRequest();
 
-        final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
-                HttpVersion.HTTP_1_1, HttpMethod.POST, "/v1/logs",
-                Unpooled.wrappedBuffer(request.toByteArray()));
-        httpRequest.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/x-protobuf");
-        httpRequest.headers().set(HttpHeaderNames.CONTENT_LENGTH, request.toByteArray().length);
+        final FullHttpRequest httpRequest = createProtobufRequest("/v1/logs", request.toByteArray());
         httpRequest.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
 
         channel.writeInbound(httpRequest);
@@ -167,6 +237,15 @@ class CollectorIngestHttpHandlerTest {
             channel.attr(AgentCertChannelHandler.AGENT_INSTANCE_UID).set(agentInstanceUid);
         }
         return channel;
+    }
+
+    private FullHttpRequest createProtobufRequest(String path, byte[] body) {
+        final FullHttpRequest request = new DefaultFullHttpRequest(
+                HttpVersion.HTTP_1_1, HttpMethod.POST, path,
+                Unpooled.wrappedBuffer(body));
+        request.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/x-protobuf");
+        request.headers().set(HttpHeaderNames.CONTENT_LENGTH, body.length);
+        return request;
     }
 
     private ExportLogsServiceRequest createTestRequest() {
