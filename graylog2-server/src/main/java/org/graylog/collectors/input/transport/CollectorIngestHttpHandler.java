@@ -129,9 +129,11 @@ public class CollectorIngestHttpHandler extends SimpleChannelInboundHandler<Full
     }
 
     private void sendError(ChannelHandlerContext ctx, HttpResponseStatus status, boolean keepAlive) {
+        final byte[] body = OtlpHttpUtils.buildErrorStatusJson(status, null);
         final DefaultFullHttpResponse response = new DefaultFullHttpResponse(
-                HttpVersion.HTTP_1_1, status);
-        response.headers().set(HttpHeaderNames.CONTENT_LENGTH, 0);
+                HttpVersion.HTTP_1_1, status, Unpooled.wrappedBuffer(body));
+        response.headers().set(HttpHeaderNames.CONTENT_TYPE, OtlpHttpUtils.JSON_CONTENT_TYPE);
+        response.headers().set(HttpHeaderNames.CONTENT_LENGTH, body.length);
         response.headers().set(HttpHeaderNames.CONNECTION,
                 keepAlive ? HttpHeaderValues.KEEP_ALIVE : HttpHeaderValues.CLOSE);
         ctx.writeAndFlush(response)

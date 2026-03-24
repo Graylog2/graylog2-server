@@ -17,9 +17,13 @@
 package org.graylog.inputs.otel.transport;
 
 import com.google.protobuf.AbstractMessageLite;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
+
+import jakarta.annotation.Nullable;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import org.graylog.inputs.otel.OTelJournalRecordFactory;
 import org.graylog2.inputs.transports.netty.HttpHandler;
@@ -59,6 +63,22 @@ public class OTelHttpHandler extends HttpHandler {
                            MessageInput input) {
         super(enableCors, authorizationHeader, authorizationHeaderValue, path);
         this.input = input;
+    }
+
+    /**
+     * Injects an OTLP-conformant Status body into error responses that would otherwise have
+     * empty bodies (e.g., 401/404/405 from the inherited HttpHandler validation).
+     * Defaults to JSON encoding since the request content-type may not be known at this point.
+     */
+    @Override
+    protected void writeResponse(Channel channel, boolean keepAlive, HttpVersion version,
+                                  HttpResponseStatus status, String origin,
+                                  @Nullable byte[] body, @Nullable String contentType) {
+        if (body == null && !HttpResponseStatus.OK.equals(status)) {
+            body = OtlpHttpUtils.buildErrorStatusJson(status, null);
+            contentType = OtlpHttpUtils.JSON_CONTENT_TYPE;
+        }
+        super.writeResponse(channel, keepAlive, version, status, origin, body, contentType);
     }
 
     @Override

@@ -17,8 +17,10 @@
 package org.graylog.inputs.otel.transport;
 
 import com.google.protobuf.util.JsonFormat;
+import io.grpc.Status;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse;
 
@@ -84,6 +86,42 @@ public final class OtlpHttpUtils {
             final ExportLogsServiceRequest.Builder builder = ExportLogsServiceRequest.newBuilder();
             JsonFormat.parser().merge(json, builder);
             return builder.build();
+        }
+    }
+
+    /**
+     * Builds a JSON-serialized {@link Status} body for OTLP error responses.
+     * Per the OTLP/HTTP spec, error responses should contain a Status message.
+     * JSON is used as the default encoding since the request encoding may not be known
+     * (e.g., for 415 Unsupported Media Type or pre-handler errors like 401/404/405).
+     */
+    public static byte[] buildErrorStatusJson(HttpResponseStatus httpStatus, String message) {
+        final int grpcCode = httpStatusToGrpcCode(httpStatus);
+        final String msg = message != null ? message : httpStatus.reasonPhrase();
+        // Build google.rpc.Status JSON manually to avoid protobuf version conflicts
+        // with the com.google.rpc.Status class (compiled against a different protobuf runtime).
+        final String json = "{\"code\":" + grpcCode + ",\"message\":\"" + escapeJson(msg) + "\"}";
+        return json.getBytes(StandardCharsets.UTF_8);
+    }
+
+    private static String escapeJson(String value) {
+        return value.replace("\\", "\\\\").replace("\"", "\\\"");
+    }
+
+    private static int httpStatusToGrpcCode(HttpResponseStatus httpStatus) {
+        final int code = httpStatus.code();
+        if (code == 400 || code == 415) {
+            return Status.INVALID_ARGUMENT.getCode().value();
+        } else if (code == 401) {
+            return Status.UNAUTHENTICATED.getCode().value();
+        } else if (code == 404 || code == 405) {
+            return Status.UNIMPLEMENTED.getCode().value();
+        } else if (code == 429) {
+            return Status.RESOURCE_EXHAUSTED.getCode().value();
+        } else if (code == 503) {
+            return Status.UNAVAILABLE.getCode().value();
+        } else {
+            return Status.INTERNAL.getCode().value();
         }
     }
 
