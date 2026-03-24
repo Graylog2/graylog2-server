@@ -100,13 +100,15 @@ class OtlpHttpUtilsTest {
     void preComputedProtobufResponseIsValid() throws Exception {
         final ExportLogsServiceResponse response = ExportLogsServiceResponse.parseFrom(
                 OtlpHttpUtils.SUCCESS_RESPONSE_PROTOBUF);
-        assertThat(response.getPartialSuccess().getRejectedLogRecords()).isEqualTo(0);
+        // Per OTLP spec, partial_success must not be set when all records are accepted
+        assertThat(response.hasPartialSuccess()).isFalse();
     }
 
     @Test
     void preComputedJsonResponseIsValid() {
         final String json = new String(OtlpHttpUtils.SUCCESS_RESPONSE_JSON, StandardCharsets.UTF_8);
-        assertThat(json).contains("partialSuccess");
+        // Empty default instance serializes to "{}" in JSON
+        assertThat(json).isNotEmpty();
     }
 
     private FullHttpRequest createRequest(String contentType, byte[] body) {

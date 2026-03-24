@@ -81,7 +81,7 @@ class OTelHttpHandlerTest {
         final byte[] responseBytes = new byte[response.content().readableBytes()];
         response.content().readBytes(responseBytes);
         final ExportLogsServiceResponse exportResponse = ExportLogsServiceResponse.parseFrom(responseBytes);
-        assertThat(exportResponse.getPartialSuccess().getRejectedLogRecords()).isEqualTo(0);
+        assertThat(exportResponse.hasPartialSuccess()).isFalse();
 
         verify(input, times(1)).processRawMessage(any());
         response.release();
@@ -106,7 +106,7 @@ class OTelHttpHandlerTest {
         assertThat(response.headers().get(HttpHeaderNames.CONTENT_TYPE)).isEqualTo("application/json");
 
         final String responseJson = response.content().toString(StandardCharsets.UTF_8);
-        assertThat(responseJson).contains("partialSuccess");
+        assertThat(responseJson).isNotEmpty();
 
         verify(input, times(1)).processRawMessage(any());
         response.release();

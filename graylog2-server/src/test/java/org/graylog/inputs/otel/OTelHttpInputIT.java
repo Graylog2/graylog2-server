@@ -128,7 +128,7 @@ class OTelHttpInputIT {
         assertThat(response.statusCode()).isEqualTo(200);
         assertThat(response.headers().firstValue("content-type")).hasValue("application/x-protobuf");
         final ExportLogsServiceResponse exportResponse = ExportLogsServiceResponse.parseFrom(response.body());
-        assertThat(exportResponse.getPartialSuccess().getRejectedLogRecords()).isEqualTo(0);
+        assertThat(exportResponse.hasPartialSuccess()).isFalse();
         verify(input).processRawMessage(any());
     }
 
@@ -147,7 +147,7 @@ class OTelHttpInputIT {
 
         assertThat(response.statusCode()).isEqualTo(200);
         assertThat(response.headers().firstValue("content-type")).hasValue("application/json");
-        assertThat(response.body()).contains("partialSuccess");
+        assertThat(response.body()).isNotEmpty();
         verify(input).processRawMessage(any());
     }
 

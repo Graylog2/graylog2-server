@@ -19,7 +19,6 @@ package org.graylog.inputs.otel.transport;
 import com.google.protobuf.util.JsonFormat;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
-import io.opentelemetry.proto.collector.logs.v1.ExportLogsPartialSuccess;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse;
 
@@ -35,25 +34,17 @@ public final class OtlpHttpUtils {
     public static final String PROTOBUF_CONTENT_TYPE = "application/x-protobuf";
     public static final String JSON_CONTENT_TYPE = "application/json";
 
-    // Pre-computed success response bodies — the OTLP response with zero rejected records is invariant.
-    public static final byte[] SUCCESS_RESPONSE_PROTOBUF = ExportLogsServiceResponse.newBuilder()
-            .setPartialSuccess(ExportLogsPartialSuccess.newBuilder()
-                    .setRejectedLogRecords(0)
-                    .build())
-            .build()
-            .toByteArray();
+    // Pre-computed success response bodies. Per OTLP spec, partial_success must not be set
+    // when all records are accepted — so the response is an empty ExportLogsServiceResponse.
+    public static final byte[] SUCCESS_RESPONSE_PROTOBUF = ExportLogsServiceResponse.getDefaultInstance().toByteArray();
     public static final byte[] SUCCESS_RESPONSE_JSON = computeJsonSuccessResponse();
 
     private OtlpHttpUtils() {}
 
     private static byte[] computeJsonSuccessResponse() {
         try {
-            final ExportLogsServiceResponse response = ExportLogsServiceResponse.newBuilder()
-                    .setPartialSuccess(ExportLogsPartialSuccess.newBuilder()
-                            .setRejectedLogRecords(0)
-                            .build())
-                    .build();
-            return JsonFormat.printer().print(response).getBytes(StandardCharsets.UTF_8);
+            return JsonFormat.printer().print(ExportLogsServiceResponse.getDefaultInstance())
+                    .getBytes(StandardCharsets.UTF_8);
         } catch (Exception e) {
             throw new RuntimeException("Failed to serialize OTLP JSON success response", e);
         }
