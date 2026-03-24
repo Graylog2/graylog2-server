@@ -222,7 +222,7 @@ public class HttpHandlerTest {
         final AtomicBoolean called = new AtomicBoolean(false);
         final HttpHandler handler = new HttpHandler(false, null, null, "/test") {
             @Override
-            protected void handleValidPost(ChannelHandlerContext ctx, FullHttpRequest request, boolean keepAlive) {
+            protected void handleValidPost(ChannelHandlerContext ctx, FullHttpRequest request, boolean keepAlive, String origin) {
                 called.set(true);
                 writeResponse(ctx.channel(), keepAlive, request.protocolVersion(), HttpResponseStatus.OK, null);
             }

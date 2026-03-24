@@ -19,7 +19,6 @@ package org.graylog.inputs.otel.transport;
 import com.google.protobuf.AbstractMessageLite;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import org.graylog.inputs.otel.OTelJournalRecordFactory;
@@ -63,9 +62,9 @@ public class OTelHttpHandler extends HttpHandler {
     }
 
     @Override
-    protected void handleValidPost(ChannelHandlerContext ctx, FullHttpRequest request, boolean keepAlive) {
+    protected void handleValidPost(ChannelHandlerContext ctx, FullHttpRequest request, boolean keepAlive,
+                                    String origin) {
         final boolean isProtobuf = OtlpHttpUtils.isProtobuf(request);
-        final String origin = request.headers().get(HttpHeaderNames.ORIGIN);
 
         // 1. Parse request
         final ExportLogsServiceRequest exportRequest;

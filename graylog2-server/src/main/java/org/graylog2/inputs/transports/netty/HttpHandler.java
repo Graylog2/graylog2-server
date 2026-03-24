@@ -83,14 +83,14 @@ public class HttpHandler extends SimpleChannelInboundHandler<HttpRequest> {
 
         final boolean correctPath = path.equals(request.uri());
         if (correctPath && request instanceof FullHttpRequest fullHttpRequest) {
-            handleValidPost(ctx, fullHttpRequest, keepAlive);
+            handleValidPost(ctx, fullHttpRequest, keepAlive, origin);
         } else {
             writeResponse(channel, keepAlive, httpRequestVersion, HttpResponseStatus.NOT_FOUND, origin);
         }
     }
 
-    protected void handleValidPost(ChannelHandlerContext ctx, FullHttpRequest request, boolean keepAlive) {
-        final String origin = request.headers().get(HttpHeaderNames.ORIGIN);
+    protected void handleValidPost(ChannelHandlerContext ctx, FullHttpRequest request, boolean keepAlive,
+                                    String origin) {
         writeResponse(ctx.channel(), keepAlive, request.protocolVersion(),
                 HttpResponseStatus.ACCEPTED, origin);
         ctx.fireChannelRead(request.content().retain());
