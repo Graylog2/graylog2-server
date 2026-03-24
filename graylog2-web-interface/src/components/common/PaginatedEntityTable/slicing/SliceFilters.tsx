@@ -31,9 +31,7 @@ export type SortMode = string;
 export type SortDirection = 'asc' | 'desc';
 export type SortOption = { value: SortMode; label: string };
 
-export const DEFAULT_SORT_OPTIONS: Array<SortOption> = [
-  { value: ALPHABETICAL_SORT, label: 'Alphabetical' },
-];
+export const DEFAULT_SORT_OPTIONS: Array<SortOption> = [{ value: ALPHABETICAL_SORT, label: 'Alphabetical' }];
 
 export const defaultSortDirectionForMode = (mode: SortMode): SortDirection =>
   mode === ALPHABETICAL_SORT ? 'asc' : 'desc';
@@ -176,7 +174,8 @@ const SliceFilters = ({
         <IconButton
           name={sortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward'}
           title={`Sort ${sortDirection === 'asc' ? 'ascending' : 'descending'}`}
-          onClick={handleSortDirectionChange} />
+          onClick={handleSortDirectionChange}
+        />
       </ControlsRow>
     </Controls>
   );
