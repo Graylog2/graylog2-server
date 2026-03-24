@@ -26,8 +26,6 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
@@ -36,18 +34,22 @@ import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import io.opentelemetry.proto.logs.v1.ResourceLogs;
 import io.opentelemetry.proto.logs.v1.ScopeLogs;
-
+import org.graylog2.inputs.transports.netty.RawMessageHandler;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.junit.jupiter.api.BeforeEach;
+import org.graylog2.plugin.journal.RawMessage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -205,8 +207,154 @@ class OTelHttpHandlerTest {
         response.release();
     }
 
+    @Test
+    void requestWithValidAuthReturns200() throws Exception {
+        final EmbeddedChannel channel = createChannel(false, "Authorization", "Bearer secret");
+        final ExportLogsServiceRequest request = createTestRequest();
+
+        final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
+                HttpVersion.HTTP_1_1, HttpMethod.POST, "/v1/logs",
+                Unpooled.wrappedBuffer(request.toByteArray()));
+        httpRequest.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/x-protobuf");
+        httpRequest.headers().set(HttpHeaderNames.CONTENT_LENGTH, request.toByteArray().length);
+        httpRequest.headers().set("Authorization", "Bearer secret");
+
+        channel.writeInbound(httpRequest);
+
+        final FullHttpResponse response = channel.readOutbound();
+        assertThat(response.status()).isEqualTo(HttpResponseStatus.OK);
+        verify(input).processRawMessage(any());
+        response.release();
+    }
+
+    @Test
+    void requestWithBadAuthReturns401() {
+        final EmbeddedChannel channel = createChannel(false, "Authorization", "Bearer secret");
+
+        final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
+                HttpVersion.HTTP_1_1, HttpMethod.POST, "/v1/logs",
+                Unpooled.wrappedBuffer(createTestRequest().toByteArray()));
+        httpRequest.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/x-protobuf");
+        httpRequest.headers().set(HttpHeaderNames.CONTENT_LENGTH, 1);
+        httpRequest.headers().set("Authorization", "Bearer wrong");
+
+        channel.writeInbound(httpRequest);
+
+        final FullHttpResponse response = channel.readOutbound();
+        assertThat(response.status()).isEqualTo(HttpResponseStatus.UNAUTHORIZED);
+        verifyNoInteractions(input);
+        response.release();
+    }
+
+    @Test
+    void requestWithMissingAuthReturns401() {
+        final EmbeddedChannel channel = createChannel(false, "Authorization", "Bearer secret");
+
+        final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
+                HttpVersion.HTTP_1_1, HttpMethod.POST, "/v1/logs",
+                Unpooled.wrappedBuffer(createTestRequest().toByteArray()));
+        httpRequest.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/x-protobuf");
+        httpRequest.headers().set(HttpHeaderNames.CONTENT_LENGTH, 1);
+
+        channel.writeInbound(httpRequest);
+
+        final FullHttpResponse response = channel.readOutbound();
+        assertThat(response.status()).isEqualTo(HttpResponseStatus.UNAUTHORIZED);
+        verifyNoInteractions(input);
+        response.release();
+    }
+
+    @Test
+    void optionsRequestReturns200() {
+        final EmbeddedChannel channel = createChannel(true, null, null);
+
+        final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
+                HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, "/v1/logs");
+        httpRequest.headers().set(HttpHeaderNames.CONTENT_LENGTH, 0);
+        httpRequest.headers().set(HttpHeaderNames.ORIGIN, "http://example.com");
+
+        channel.writeInbound(httpRequest);
+
+        final FullHttpResponse response = channel.readOutbound();
+        assertThat(response.status()).isEqualTo(HttpResponseStatus.OK);
+        assertThat(response.headers().get(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN))
+                .isEqualTo("http://example.com");
+        verifyNoInteractions(input);
+        response.release();
+    }
+
+    @Test
+    void corsHeadersOnSuccessResponse() throws Exception {
+        final EmbeddedChannel channel = createChannel(true, null, null);
+        final ExportLogsServiceRequest request = createTestRequest();
+
+        final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
+                HttpVersion.HTTP_1_1, HttpMethod.POST, "/v1/logs",
+                Unpooled.wrappedBuffer(request.toByteArray()));
+        httpRequest.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/x-protobuf");
+        httpRequest.headers().set(HttpHeaderNames.CONTENT_LENGTH, request.toByteArray().length);
+        httpRequest.headers().set(HttpHeaderNames.ORIGIN, "http://example.com");
+
+        channel.writeInbound(httpRequest);
+
+        final FullHttpResponse response = channel.readOutbound();
+        assertThat(response.status()).isEqualTo(HttpResponseStatus.OK);
+        assertThat(response.headers().get(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN))
+                .isEqualTo("http://example.com");
+        response.release();
+    }
+
+    @Test
+    void forwardedForIpUsedAsSourceAddress() throws Exception {
+        final EmbeddedChannel channel = createChannel();
+        // Simulate HttpForwardedForHandler having set the original IP
+        channel.attr(RawMessageHandler.ORIGINAL_IP_KEY).set(
+                new InetSocketAddress(InetAddress.getByName("10.0.0.1"), 0));
+
+        final ExportLogsServiceRequest request = createTestRequest();
+        final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
+                HttpVersion.HTTP_1_1, HttpMethod.POST, "/v1/logs",
+                Unpooled.wrappedBuffer(request.toByteArray()));
+        httpRequest.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/x-protobuf");
+        httpRequest.headers().set(HttpHeaderNames.CONTENT_LENGTH, request.toByteArray().length);
+
+        channel.writeInbound(httpRequest);
+
+        final FullHttpResponse response = channel.readOutbound();
+        assertThat(response.status()).isEqualTo(HttpResponseStatus.OK);
+
+        final ArgumentCaptor<RawMessage> captor = ArgumentCaptor.forClass(RawMessage.class);
+        verify(input).processRawMessage(captor.capture());
+        assertThat(captor.getValue().getRemoteAddress().getAddress().getHostAddress()).isEqualTo("10.0.0.1");
+        response.release();
+    }
+
+    @Test
+    void processingFailureReturns500() {
+        final EmbeddedChannel channel = createChannel();
+        doThrow(new RuntimeException("journal full")).when(input).processRawMessage(any());
+
+        final ExportLogsServiceRequest request = createTestRequest();
+        final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
+                HttpVersion.HTTP_1_1, HttpMethod.POST, "/v1/logs",
+                Unpooled.wrappedBuffer(request.toByteArray()));
+        httpRequest.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/x-protobuf");
+        httpRequest.headers().set(HttpHeaderNames.CONTENT_LENGTH, request.toByteArray().length);
+
+        channel.writeInbound(httpRequest);
+
+        final FullHttpResponse response = channel.readOutbound();
+        assertThat(response.status()).isEqualTo(HttpResponseStatus.INTERNAL_SERVER_ERROR);
+        response.release();
+    }
+
     private EmbeddedChannel createChannel() {
-        return new EmbeddedChannel(new OTelHttpHandler(input));
+        return createChannel(false, null, null);
+    }
+
+    private EmbeddedChannel createChannel(boolean enableCors, String authHeader, String authHeaderValue) {
+        return new EmbeddedChannel(new OTelHttpHandler(enableCors, authHeader, authHeaderValue,
+                OTelHttpHandler.LOGS_PATH, input));
     }
 
     private ExportLogsServiceRequest createTestRequest() {

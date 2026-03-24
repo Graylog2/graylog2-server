@@ -17,161 +17,123 @@
 package org.graylog.inputs.otel.transport;
 
 import com.google.protobuf.AbstractMessageLite;
-import com.google.protobuf.util.JsonFormat;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpHeaderValues;
-import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpUtil;
-import io.netty.handler.codec.http.HttpVersion;
-import io.opentelemetry.proto.collector.logs.v1.ExportLogsPartialSuccess;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
-import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse;
 import org.graylog.inputs.otel.OTelJournalRecordFactory;
+import org.graylog2.inputs.transports.netty.HttpHandler;
+import org.graylog2.inputs.transports.netty.RawMessageHandler;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.journal.RawMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public class OTelHttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
+/**
+ * OTLP HTTP handler for the generic user-facing OTel HTTP input.
+ * <p>
+ * Extends {@link HttpHandler} to inherit auth, CORS, OPTIONS, method/path validation,
+ * and keep-alive handling. Overrides {@link #handleValidPost} to parse OTLP requests
+ * and send structured OTLP responses.
+ * <p>
+ * This handler calls {@link MessageInput#processRawMessage} directly instead of firing
+ * messages downstream to {@link RawMessageHandler}. This is intentional — OTLP requires
+ * knowing whether processing succeeded before sending the response, but the Netty pipeline
+ * doesn't support firing N messages downstream, waiting for all to complete, and then
+ * deciding the response. RawMessageHandler (added unconditionally by AbstractTcpTransport)
+ * remains in the pipeline but is unreachable.
+ */
+public class OTelHttpHandler extends HttpHandler {
     private static final Logger LOG = LoggerFactory.getLogger(OTelHttpHandler.class);
 
     public static final String LOGS_PATH = "/v1/logs";
-    public static final String PROTOBUF_CONTENT_TYPE = "application/x-protobuf";
-    public static final String JSON_CONTENT_TYPE = "application/json";
 
     private final MessageInput input;
+    private final boolean enableCors;
 
-    public OTelHttpHandler(MessageInput input) {
+    public OTelHttpHandler(boolean enableCors, String authorizationHeader,
+                           String authorizationHeaderValue, String path,
+                           MessageInput input) {
+        super(enableCors, authorizationHeader, authorizationHeaderValue, path);
         this.input = input;
+        this.enableCors = enableCors;
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) {
-        final boolean keepAlive = HttpUtil.isKeepAlive(request);
+    protected void handleValidPost(ChannelHandlerContext ctx, FullHttpRequest request, boolean keepAlive) {
+        final boolean isProtobuf = OtlpHttpUtils.isProtobuf(request);
+        final String origin = request.headers().get(HttpHeaderNames.ORIGIN);
 
-        // 1. Validate method
-        if (!HttpMethod.POST.equals(request.method())) {
-            sendError(ctx, HttpResponseStatus.METHOD_NOT_ALLOWED, keepAlive);
-            return;
-        }
-
-        // 2. Validate path
-        final String uri = request.uri();
-        if (!LOGS_PATH.equals(uri) && !uri.startsWith(LOGS_PATH + "?")) {
-            sendError(ctx, HttpResponseStatus.NOT_FOUND, keepAlive);
-            return;
-        }
-
-        // 3. Determine content type
-        final String contentType = request.headers().get(HttpHeaderNames.CONTENT_TYPE);
-        final boolean isProtobuf = contentType != null && contentType.startsWith(PROTOBUF_CONTENT_TYPE);
-        final boolean isJson = contentType != null && contentType.startsWith(JSON_CONTENT_TYPE);
-        if (!isProtobuf && !isJson) {
-            sendError(ctx, HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE, keepAlive);
-            return;
-        }
-
-        // 4. Subclass validation hook
-        if (!validateRequest(ctx, request)) {
-            return;
-        }
-
+        // 1. Parse request
+        final ExportLogsServiceRequest exportRequest;
         try {
-            // 5. Parse request
-            final ExportLogsServiceRequest exportRequest;
-            if (isProtobuf) {
-                final byte[] bytes = new byte[request.content().readableBytes()];
-                request.content().readBytes(bytes);
-                exportRequest = ExportLogsServiceRequest.parseFrom(bytes);
-            } else {
-                final String json = request.content().toString(StandardCharsets.UTF_8);
-                final ExportLogsServiceRequest.Builder builder = ExportLogsServiceRequest.newBuilder();
-                JsonFormat.parser().merge(json, builder);
-                exportRequest = builder.build();
-            }
-
-            // 6. Create journal records and process
-            createJournalRecords(ctx, exportRequest).forEach(input::processRawMessage);
-
-            // 7. Send success response
-            sendSuccess(ctx, isProtobuf, keepAlive);
+            exportRequest = OtlpHttpUtils.parse(request);
+        } catch (OtlpHttpUtils.UnsupportedContentTypeException e) {
+            writeResponse(ctx.channel(), keepAlive, request.protocolVersion(),
+                    HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE, origin);
+            return;
         } catch (Exception e) {
             LOG.debug("Failed to parse OTLP request", e);
-            sendError(ctx, HttpResponseStatus.BAD_REQUEST, keepAlive);
+            OtlpHttpUtils.sendError(ctx, HttpResponseStatus.BAD_REQUEST, keepAlive);
+            return;
         }
+
+        // 2. Process
+        try {
+            createJournalRecords(ctx, exportRequest).forEach(input::processRawMessage);
+        } catch (Exception e) {
+            LOG.error("Failed to process OTLP request", e);
+            OtlpHttpUtils.sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR, keepAlive);
+            return;
+        }
+
+        // 3. Respond with CORS headers if enabled
+        final DefaultFullHttpResponse response = OtlpHttpUtils.buildSuccessResponse(isProtobuf, keepAlive);
+        if (response == null) {
+            OtlpHttpUtils.sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR, keepAlive);
+            return;
+        }
+        if (enableCors && origin != null && !origin.isEmpty()) {
+            response.headers().set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+            response.headers().set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS, true);
+            response.headers().set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS, "Authorization, Content-Type");
+        }
+        OtlpHttpUtils.writeAndFlush(ctx, response, keepAlive);
     }
 
-    protected boolean validateRequest(ChannelHandlerContext ctx, FullHttpRequest request) {
-        return true;
-    }
-
+    /**
+     * Creates journal records from the parsed OTLP request.
+     * Resolves the source IP from the forwarded-for channel attribute if available.
+     */
     protected Stream<RawMessage> createJournalRecords(ChannelHandlerContext ctx,
-                                                      ExportLogsServiceRequest exportRequest) {
-        final Function<byte[], RawMessage> createRawMessage;
-        if (ctx.channel().remoteAddress() instanceof InetSocketAddress address) {
-            createRawMessage = bytes -> new RawMessage(bytes, address);
-        } else {
-            createRawMessage = RawMessage::new;
-        }
+                                                       ExportLogsServiceRequest exportRequest) {
+        final InetSocketAddress remoteAddress = resolveRemoteAddress(ctx);
+        final Function<byte[], RawMessage> createRawMessage = remoteAddress != null
+                ? bytes -> new RawMessage(bytes, remoteAddress)
+                : RawMessage::new;
 
         return OTelJournalRecordFactory.createFromRequest(exportRequest).stream()
                 .map(AbstractMessageLite::toByteArray)
                 .map(createRawMessage);
     }
 
-    private void sendSuccess(ChannelHandlerContext ctx, boolean protobuf, boolean keepAlive) {
-        final ExportLogsServiceResponse response = ExportLogsServiceResponse.newBuilder()
-                .setPartialSuccess(ExportLogsPartialSuccess.newBuilder()
-                        .setRejectedLogRecords(0)
-                        .build())
-                .build();
-
-        final byte[] body;
-        final String responseContentType;
-        if (protobuf) {
-            body = response.toByteArray();
-            responseContentType = PROTOBUF_CONTENT_TYPE;
-        } else {
-            try {
-                body = JsonFormat.printer().print(response).getBytes(StandardCharsets.UTF_8);
-                responseContentType = JSON_CONTENT_TYPE;
-            } catch (Exception e) {
-                LOG.error("Failed to serialize OTLP JSON response", e);
-                sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR, keepAlive);
-                return;
-            }
+    /**
+     * Resolves the client IP address, preferring the forwarded-for value set by
+     * {@link org.graylog2.inputs.transports.netty.HttpForwardedForHandler}.
+     */
+    private InetSocketAddress resolveRemoteAddress(ChannelHandlerContext ctx) {
+        if (ctx.channel().hasAttr(RawMessageHandler.ORIGINAL_IP_KEY)) {
+            return ctx.channel().attr(RawMessageHandler.ORIGINAL_IP_KEY).get();
         }
-
-        final DefaultFullHttpResponse httpResponse = new DefaultFullHttpResponse(
-                HttpVersion.HTTP_1_1, HttpResponseStatus.OK,
-                Unpooled.wrappedBuffer(body));
-        httpResponse.headers().set(HttpHeaderNames.CONTENT_TYPE, responseContentType);
-        httpResponse.headers().set(HttpHeaderNames.CONTENT_LENGTH, body.length);
-        httpResponse.headers().set(HttpHeaderNames.CONNECTION,
-                keepAlive ? HttpHeaderValues.KEEP_ALIVE : HttpHeaderValues.CLOSE);
-        ctx.writeAndFlush(httpResponse)
-                .addListener(keepAlive ? ChannelFutureListener.CLOSE_ON_FAILURE : ChannelFutureListener.CLOSE);
-    }
-
-    protected void sendError(ChannelHandlerContext ctx, HttpResponseStatus status, boolean keepAlive) {
-        final DefaultFullHttpResponse response = new DefaultFullHttpResponse(
-                HttpVersion.HTTP_1_1, status);
-        response.headers().set(HttpHeaderNames.CONTENT_LENGTH, 0);
-        response.headers().set(HttpHeaderNames.CONNECTION,
-                keepAlive ? HttpHeaderValues.KEEP_ALIVE : HttpHeaderValues.CLOSE);
-        ctx.writeAndFlush(response)
-                .addListener(keepAlive ? ChannelFutureListener.CLOSE_ON_FAILURE : ChannelFutureListener.CLOSE);
+        if (ctx.channel().remoteAddress() instanceof InetSocketAddress address) {
+            return address;
+        }
+        return null;
     }
 }
