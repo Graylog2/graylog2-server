@@ -18,7 +18,7 @@ import React from 'react';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import type { PipelineType } from 'components/pipelines/types';
-import type { PipelineConnectionsType } from 'stores/pipelines/PipelineConnectionsStore';
+import type { PipelineConnectionsType } from 'hooks/usePipelineConnections';
 import type { Stream } from 'stores/streams/StreamsStore';
 
 type Props = {

@@ -22,8 +22,7 @@ import GrokPatternInput from 'components/grok-patterns/GrokPatternInput';
 import UserNotification from 'util/UserNotification';
 import { getValueFromInput } from 'util/FormsUtils';
 import ToolsStore from 'stores/tools/ToolsStore';
-import { GrokPatternsStore } from 'stores/grok-patterns/GrokPatternsStore';
-import type CancellablePromise from 'logic/rest/CancellablePromise';
+import { loadGrokPatterns } from 'hooks/useGrokPatterns';
 
 import Style from './GrokExtractorConfiguration.css';
 
@@ -58,18 +57,14 @@ class GrokExtractorConfiguration extends React.Component<
   }
 
   componentWillUnmount() {
-    if (this.loadPromise) {
-      this.loadPromise.cancel();
-    }
+    this._unmounted = true;
   }
 
-  private loadPromise: CancellablePromise<void>;
+  private _unmounted = false;
 
   loadData = () => {
-    this.loadPromise = GrokPatternsStore.loadPatterns((patterns) => {
-      if (!this.loadPromise.isCancelled()) {
-        this.loadPromise = undefined;
-
+    loadGrokPatterns((patterns) => {
+      if (!this._unmounted) {
         this.setState({
           patterns: patterns,
         });

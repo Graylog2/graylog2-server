@@ -15,16 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect } from 'react';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { IndexSetConfigurationForm, IndicesPageNavigation } from 'components/indices';
-import { useStore } from 'stores/connect';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import { updateIndexSet } from 'stores/indices/IndexSetsStore';
+import useSingleIndexSet from 'components/indices/hooks/useSingleIndexSet';
 import useParams from 'routing/useParams';
 import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
@@ -35,21 +34,17 @@ import SelectIndexSetTemplateProvider from 'components/indices/IndexSetTemplates
 import useIndicesConfiguration from 'hooks/useIndicesConfiguration';
 
 const _saveConfiguration = (history: HistoryFunction, indexSet: IndexSet) =>
-  IndexSetsActions.update(indexSet).then(() => {
+  updateIndexSet(indexSet).then(() => {
     history.push(Routes.SYSTEM.INDICES.LIST);
   });
 
 const IndexSetConfigurationPage = () => {
   const { indexSetId } = useParams();
-  const { indexSet } = useStore(IndexSetsStore);
+  const { data: indexSet } = useSingleIndexSet(indexSetId);
   const { retentionStrategies, rotationStrategies, retentionStrategiesContext } = useIndicesConfiguration();
   const history = useHistory();
   const { from } = useQuery();
   const sendTelemetry = useSendTelemetry();
-
-  useEffect(() => {
-    IndexSetsActions.get(indexSetId);
-  }, [indexSetId]);
 
   const formCancelLink = () => {
     if (from === 'details') {

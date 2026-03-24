@@ -23,6 +23,7 @@ import Reflux from 'reflux';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import AppFacade from 'routing/AppFacade';
+import ServerAvailabilityProvider from 'contexts/ServerAvailabilityProvider';
 import ViewsBindings from 'views/bindings';
 import ThreatIntelBindings from 'threatintel/bindings';
 import AwsBindings from 'aws/bindings';
@@ -81,7 +82,9 @@ const root = createRoot(appContainer);
 root.render(
   <TelemetryInit>
     <LoginQueryClientProvider>
-      <AppFacade />
+      <ServerAvailabilityProvider>
+        <AppFacade />
+      </ServerAvailabilityProvider>
     </LoginQueryClientProvider>
   </TelemetryInit>,
 );

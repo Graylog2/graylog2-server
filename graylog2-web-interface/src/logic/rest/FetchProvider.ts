@@ -21,15 +21,11 @@ import FetchError from 'logic/errors/FetchError';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import CancellablePromise from 'logic/rest/CancellablePromise';
-import { ServerAvailabilityActions } from 'stores/sessions/ServerAvailabilityStore';
+import { reportError as reportServerError, reportSuccess as reportServerSuccess } from 'api/server-availability';
 import type { Method } from 'routing/types';
 
 // eslint-disable-next-line global-require,@typescript-eslint/no-require-imports
 const importSessionStore = memoize(() => require('stores/sessions/SessionStore'));
-
-const reportServerSuccess = () => {
-  ServerAvailabilityActions.reportSuccess();
-};
 
 const defaultOnUnauthorizedError = (error: FetchError) => ErrorsActions.report(createFromFetchError(error));
 
@@ -53,7 +49,7 @@ const onServerError = async (error: Response | undefined, onUnauthorized = defau
   }
 
   if (error && !error.status) {
-    ServerAvailabilityActions.reportError(fetchError);
+    reportServerError(fetchError);
   }
 
   throw fetchError;

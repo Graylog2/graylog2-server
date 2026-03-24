@@ -14,29 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import Reflux from 'reflux';
 import type { ColorScheme } from '@graylog/sawmill';
 
 import type { PREFERENCES_THEME_MODE } from 'theme/constants';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
-import { singletonStore, singletonActions } from 'logic/singleton';
-
-type PreferencesActionsType = {
-  saveUserPreferences: (
-    userName: string,
-    preferences: PreferencesUpdateMap,
-    callback?: (preferences: PreferencesUpdateMap) => void,
-    displaySuccessNotification?: boolean,
-  ) => Promise<unknown>;
-};
-export const PreferencesActions = singletonActions('core.Preferences', () =>
-  Reflux.createActions<PreferencesActionsType>({
-    loadUserPreferences: { asyncResult: true },
-    saveUserPreferences: { asyncResult: true },
-  }),
-);
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 type BooleanString = 'true' | 'false';
 
@@ -69,42 +53,32 @@ const convertPreferences = (preferences: PreferencesUpdateMap): PreferencesMap =
     }
   });
 
-  // @ts-ignore
-  return convertedPreferences;
+  return convertedPreferences as PreferencesMap;
 };
 
-export const PreferencesStore = singletonStore('core.Preferences', () =>
-  Reflux.createStore({
-    listenables: [PreferencesActions],
-    URL: qualifyUrl('/users/'),
+export const saveUserPreferences = (
+  userName: string,
+  preferences: PreferencesUpdateMap,
+  callback: (preferences: PreferencesUpdateMap) => void = () => {},
+  displaySuccessNotification = true,
+): Promise<void> => {
+  const convertedPreferences = convertPreferences(preferences);
+  const url = `${qualifyUrl('/users/')}${encodeURIComponent(userName)}/preferences`;
 
-    saveUserPreferences(
-      userName: string,
-      preferences: PreferencesUpdateMap,
-      callback: (preferences: PreferencesUpdateMap) => void = () => {},
-      displaySuccessNotification = true,
-    ) {
-      const convertedPreferences = convertPreferences(preferences);
-      const url = `${this.URL + encodeURIComponent(userName)}/preferences`;
-      const promise = fetch('PUT', url, { preferences: convertedPreferences }).then(
-        () => {
-          if (displaySuccessNotification) {
-            UserNotification.success('User preferences successfully saved');
-          }
+  return fetch('PUT', url, { preferences: convertedPreferences }).then(
+    () => {
+      if (displaySuccessNotification) {
+        UserNotification.success('User preferences successfully saved');
+      }
 
-          callback(preferences);
-        },
-        (errorThrown) => {
-          UserNotification.error(
-            `Saving of preferences for "${userName}" failed with status: ${errorThrown}`,
-            'Could not save user preferences',
-          );
-        },
-      );
-
-      PreferencesActions.saveUserPreferences.promise(promise);
-
-      return promise;
+      callback(preferences);
+      CurrentUserStore.reload();
     },
-  }),
-);
+    (errorThrown) => {
+      UserNotification.error(
+        `Saving of preferences for "${userName}" failed with status: ${errorThrown}`,
+        'Could not save user preferences',
+      );
+    },
+  );
+};

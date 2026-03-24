@@ -17,11 +17,20 @@
 
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
-import type { Output } from 'stores/outputs/OutputsStore';
+import type { ConfigurationField } from 'components/configurationforms';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import { defaultOnError } from 'util/conditional/onError';
+
+export type Output = {
+  id: string;
+  title: string;
+  type: string;
+  configuration: {
+    [key: string]: ConfigurationField;
+  };
+};
 
 type OutputRequestResponse = {
   outputs: Array<Output>;
