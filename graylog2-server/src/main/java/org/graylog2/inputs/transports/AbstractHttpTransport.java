@@ -130,6 +130,22 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
         return maxChunkSize <= 0 ? DEFAULT_MAX_CHUNK_SIZE : maxChunkSize;
     }
 
+    protected boolean isEnableCors() {
+        return enableCors;
+    }
+
+    protected String getAuthorizationHeader() {
+        return authorizationHeader;
+    }
+
+    protected String getAuthorizationHeaderValue() {
+        return authorizationHeaderValue;
+    }
+
+    protected String getPath() {
+        return path;
+    }
+
     @Override
     protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getCustomChildChannelHandlers(
             MessageInput input) {
