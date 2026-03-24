@@ -66,7 +66,18 @@ public class OTelHttpTransport extends AbstractHttpTransport {
     protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getCustomChildChannelHandlers(MessageInput input) {
         final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlers =
                 new LinkedHashMap<>(super.getCustomChildChannelHandlers(input));
-        handlers.replace("http-handler", () -> new OTelHttpHandler(input));
+        // Replace the standard HttpHandler with OTelHttpHandler which extends it and overrides
+        // handleValidPost for OTLP protocol handling. Auth, CORS, OPTIONS, method/path validation,
+        // and keep-alive are inherited from HttpHandler.
+        //
+        // Note: rawmessage-handler, codec-aggregator, and exception-logger are added downstream
+        // by AbstractTcpTransport.getChildChannelHandlers and are unreachable because
+        // OTelHttpHandler.handleValidPost does not fire messages downstream — it calls
+        // input.processRawMessage directly. These cannot be removed without overriding
+        // getChildChannelHandlers.
+        handlers.replace("http-handler", () -> new OTelHttpHandler(
+                isEnableCors(), getAuthorizationHeader(), getAuthorizationHeaderValue(),
+                getPath(), input));
         handlers.remove("http-bulk-newline-decoder");
         return handlers;
     }
