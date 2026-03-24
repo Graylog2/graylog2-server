@@ -37,8 +37,6 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 // NOTE: Auth, CORS, and OPTIONS handling in this class are cross-cutting concerns that would
 // be cleaner as separate upstream pipeline handlers (e.g., HttpAuthHandler, HttpCorsHandler).
-// This was not done during the OTel HTTP input restructuring to minimize blast radius.
-// See: docs/plans/2026-03-24-otel-http-input-pipeline-restructuring-design.md
 public class HttpHandler extends SimpleChannelInboundHandler<HttpRequest> {
     private final boolean enableCors;
     private final String authorizationHeader;
@@ -97,10 +95,10 @@ public class HttpHandler extends SimpleChannelInboundHandler<HttpRequest> {
     }
 
     protected void writeResponse(Channel channel,
-                               boolean keepAlive,
-                               HttpVersion httpRequestVersion,
-                               HttpResponseStatus status,
-                               String origin) {
+                                 boolean keepAlive,
+                                 HttpVersion httpRequestVersion,
+                                 HttpResponseStatus status,
+                                 String origin) {
         final HttpResponse response = new DefaultFullHttpResponse(httpRequestVersion, status);
 
         response.headers().set(HttpHeaderNames.CONTENT_LENGTH, 0);

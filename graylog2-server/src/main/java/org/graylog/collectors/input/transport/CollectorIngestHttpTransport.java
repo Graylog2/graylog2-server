@@ -27,6 +27,7 @@ import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.IngestEndpointConfig;
 import org.graylog.collectors.opamp.OpAmpCaService;
+import org.graylog.inputs.otel.transport.OtlpHttpUtils;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.inputs.transports.AbstractHttpTransport;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
@@ -74,7 +75,7 @@ public class CollectorIngestHttpTransport extends AbstractHttpTransport {
                                         CollectorsConfigService collectorsConfigService) {
         super(buildTransportConfig(collectorsConfigService), eventLoopGroup, eventLoopGroupFactory,
                 nettyTransportConfiguration, throughputCounter, localMetricRegistry,
-                tlsConfiguration, trustedProxies, "/v1/logs");
+                tlsConfiguration, trustedProxies, OtlpHttpUtils.LOGS_PATH);
         this.opAmpCaService = opAmpCaService;
     }
 

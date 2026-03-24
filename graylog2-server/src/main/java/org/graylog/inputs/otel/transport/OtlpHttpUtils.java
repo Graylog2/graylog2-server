@@ -41,10 +41,33 @@ import java.nio.charset.StandardCharsets;
 public final class OtlpHttpUtils {
     private static final Logger LOG = LoggerFactory.getLogger(OtlpHttpUtils.class);
 
+    public static final String LOGS_PATH = "/v1/logs";
     public static final String PROTOBUF_CONTENT_TYPE = "application/x-protobuf";
     public static final String JSON_CONTENT_TYPE = "application/json";
 
+    // Pre-computed success response bodies — the OTLP response with zero rejected records is invariant.
+    private static final byte[] SUCCESS_RESPONSE_PROTOBUF = ExportLogsServiceResponse.newBuilder()
+            .setPartialSuccess(ExportLogsPartialSuccess.newBuilder()
+                    .setRejectedLogRecords(0)
+                    .build())
+            .build()
+            .toByteArray();
+    private static final byte[] SUCCESS_RESPONSE_JSON = computeJsonSuccessResponse();
+
     private OtlpHttpUtils() {}
+
+    private static byte[] computeJsonSuccessResponse() {
+        try {
+            final ExportLogsServiceResponse response = ExportLogsServiceResponse.newBuilder()
+                    .setPartialSuccess(ExportLogsPartialSuccess.newBuilder()
+                            .setRejectedLogRecords(0)
+                            .build())
+                    .build();
+            return JsonFormat.printer().print(response).getBytes(StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to serialize OTLP JSON success response", e);
+        }
+    }
 
     /**
      * Returns true if the request's Content-Type indicates protobuf encoding.
@@ -87,30 +110,10 @@ public final class OtlpHttpUtils {
      * Builds a successful OTLP response with zero rejected records.
      * The caller is responsible for adding any additional headers (e.g., CORS)
      * and writing/flushing the response.
-     *
-     * @return the built response, or null if JSON serialization failed (error response already sent)
      */
     public static DefaultFullHttpResponse buildSuccessResponse(boolean protobuf, boolean keepAlive) {
-        final ExportLogsServiceResponse response = ExportLogsServiceResponse.newBuilder()
-                .setPartialSuccess(ExportLogsPartialSuccess.newBuilder()
-                        .setRejectedLogRecords(0)
-                        .build())
-                .build();
-
-        final byte[] body;
-        final String responseContentType;
-        if (protobuf) {
-            body = response.toByteArray();
-            responseContentType = PROTOBUF_CONTENT_TYPE;
-        } else {
-            try {
-                body = JsonFormat.printer().print(response).getBytes(StandardCharsets.UTF_8);
-                responseContentType = JSON_CONTENT_TYPE;
-            } catch (Exception e) {
-                LOG.error("Failed to serialize OTLP JSON response", e);
-                return null;
-            }
-        }
+        final byte[] body = protobuf ? SUCCESS_RESPONSE_PROTOBUF : SUCCESS_RESPONSE_JSON;
+        final String responseContentType = protobuf ? PROTOBUF_CONTENT_TYPE : JSON_CONTENT_TYPE;
 
         final DefaultFullHttpResponse httpResponse = new DefaultFullHttpResponse(
                 HttpVersion.HTTP_1_1, HttpResponseStatus.OK,
@@ -127,12 +130,7 @@ public final class OtlpHttpUtils {
      * Convenience method for handlers that don't need to add extra headers (e.g., collector handler).
      */
     public static void sendSuccess(ChannelHandlerContext ctx, boolean protobuf, boolean keepAlive) {
-        final DefaultFullHttpResponse response = buildSuccessResponse(protobuf, keepAlive);
-        if (response == null) {
-            sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR, keepAlive);
-            return;
-        }
-        writeAndFlush(ctx, response, keepAlive);
+        writeAndFlush(ctx, buildSuccessResponse(protobuf, keepAlive), keepAlive);
     }
 
     /**

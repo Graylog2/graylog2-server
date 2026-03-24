@@ -52,7 +52,7 @@ import java.util.stream.Stream;
 public class OTelHttpHandler extends HttpHandler {
     private static final Logger LOG = LoggerFactory.getLogger(OTelHttpHandler.class);
 
-    public static final String LOGS_PATH = "/v1/logs";
+    public static final String LOGS_PATH = OtlpHttpUtils.LOGS_PATH;
 
     private final MessageInput input;
 
@@ -78,7 +78,8 @@ public class OTelHttpHandler extends HttpHandler {
             return;
         } catch (Exception e) {
             LOG.debug("Failed to parse OTLP request", e);
-            OtlpHttpUtils.sendError(ctx, HttpResponseStatus.BAD_REQUEST, keepAlive);
+            writeResponse(ctx.channel(), keepAlive, request.protocolVersion(),
+                    HttpResponseStatus.BAD_REQUEST, origin);
             return;
         }
 
@@ -87,16 +88,13 @@ public class OTelHttpHandler extends HttpHandler {
             createJournalRecords(ctx, exportRequest).forEach(input::processRawMessage);
         } catch (Exception e) {
             LOG.error("Failed to process OTLP request", e);
-            OtlpHttpUtils.sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR, keepAlive);
+            writeResponse(ctx.channel(), keepAlive, request.protocolVersion(),
+                    HttpResponseStatus.INTERNAL_SERVER_ERROR, origin);
             return;
         }
 
         // 3. Respond with CORS headers if enabled
         final DefaultFullHttpResponse response = OtlpHttpUtils.buildSuccessResponse(isProtobuf, keepAlive);
-        if (response == null) {
-            OtlpHttpUtils.sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR, keepAlive);
-            return;
-        }
         if (isEnableCors() && origin != null && !origin.isEmpty()) {
             response.headers().set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
             response.headers().set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS, true);

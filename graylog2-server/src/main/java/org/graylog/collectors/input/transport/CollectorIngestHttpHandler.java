@@ -46,7 +46,7 @@ import java.util.function.Function;
  */
 public class CollectorIngestHttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
     private static final Logger LOG = LoggerFactory.getLogger(CollectorIngestHttpHandler.class);
-    private static final String LOGS_PATH = "/v1/logs";
+    private static final String LOGS_PATH = OtlpHttpUtils.LOGS_PATH;
 
     private final MessageInput input;
 
