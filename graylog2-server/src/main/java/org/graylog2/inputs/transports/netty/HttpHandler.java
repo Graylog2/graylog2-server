@@ -21,16 +21,18 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
+
+import jakarta.annotation.Nullable;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -99,9 +101,24 @@ public class HttpHandler extends SimpleChannelInboundHandler<HttpRequest> {
                                  HttpVersion httpRequestVersion,
                                  HttpResponseStatus status,
                                  String origin) {
-        final HttpResponse response = new DefaultFullHttpResponse(httpRequestVersion, status);
+        writeResponse(channel, keepAlive, httpRequestVersion, status, origin, null, null);
+    }
 
-        response.headers().set(HttpHeaderNames.CONTENT_LENGTH, 0);
+    protected void writeResponse(Channel channel,
+                                 boolean keepAlive,
+                                 HttpVersion httpRequestVersion,
+                                 HttpResponseStatus status,
+                                 String origin,
+                                 @Nullable byte[] body,
+                                 @Nullable String contentType) {
+        final DefaultFullHttpResponse response = body != null
+                ? new DefaultFullHttpResponse(httpRequestVersion, status, Unpooled.wrappedBuffer(body))
+                : new DefaultFullHttpResponse(httpRequestVersion, status);
+
+        response.headers().set(HttpHeaderNames.CONTENT_LENGTH, body != null ? body.length : 0);
+        if (contentType != null) {
+            response.headers().set(HttpHeaderNames.CONTENT_TYPE, contentType);
+        }
         response.headers().set(HttpHeaderNames.CONNECTION, keepAlive ? HttpHeaderValues.KEEP_ALIVE : HttpHeaderValues.CLOSE);
 
         if (enableCors && origin != null && !origin.isEmpty()) {
@@ -110,8 +127,7 @@ public class HttpHandler extends SimpleChannelInboundHandler<HttpRequest> {
             response.headers().set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS, "Authorization, Content-Type");
         }
 
-        final ChannelFuture channelFuture = channel.writeAndFlush(response);
-
-        channelFuture.addListener(keepAlive ? ChannelFutureListener.CLOSE_ON_FAILURE : ChannelFutureListener.CLOSE);
+        channel.writeAndFlush(response)
+                .addListener(keepAlive ? ChannelFutureListener.CLOSE_ON_FAILURE : ChannelFutureListener.CLOSE);
     }
 }

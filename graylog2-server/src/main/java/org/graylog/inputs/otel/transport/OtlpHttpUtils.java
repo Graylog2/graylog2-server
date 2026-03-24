@@ -46,13 +46,13 @@ public final class OtlpHttpUtils {
     public static final String JSON_CONTENT_TYPE = "application/json";
 
     // Pre-computed success response bodies — the OTLP response with zero rejected records is invariant.
-    private static final byte[] SUCCESS_RESPONSE_PROTOBUF = ExportLogsServiceResponse.newBuilder()
+    public static final byte[] SUCCESS_RESPONSE_PROTOBUF = ExportLogsServiceResponse.newBuilder()
             .setPartialSuccess(ExportLogsPartialSuccess.newBuilder()
                     .setRejectedLogRecords(0)
                     .build())
             .build()
             .toByteArray();
-    private static final byte[] SUCCESS_RESPONSE_JSON = computeJsonSuccessResponse();
+    public static final byte[] SUCCESS_RESPONSE_JSON = computeJsonSuccessResponse();
 
     private OtlpHttpUtils() {}
 
@@ -107,34 +107,27 @@ public final class OtlpHttpUtils {
     }
 
     /**
-     * Builds a successful OTLP response with zero rejected records.
-     * The caller is responsible for adding any additional headers (e.g., CORS)
-     * and writing/flushing the response.
-     */
-    public static DefaultFullHttpResponse buildSuccessResponse(boolean protobuf, boolean keepAlive) {
-        final byte[] body = protobuf ? SUCCESS_RESPONSE_PROTOBUF : SUCCESS_RESPONSE_JSON;
-        final String responseContentType = protobuf ? PROTOBUF_CONTENT_TYPE : JSON_CONTENT_TYPE;
-
-        final DefaultFullHttpResponse httpResponse = new DefaultFullHttpResponse(
-                HttpVersion.HTTP_1_1, HttpResponseStatus.OK,
-                Unpooled.wrappedBuffer(body));
-        httpResponse.headers().set(HttpHeaderNames.CONTENT_TYPE, responseContentType);
-        httpResponse.headers().set(HttpHeaderNames.CONTENT_LENGTH, body.length);
-        httpResponse.headers().set(HttpHeaderNames.CONNECTION,
-                keepAlive ? HttpHeaderValues.KEEP_ALIVE : HttpHeaderValues.CLOSE);
-        return httpResponse;
-    }
-
-    /**
-     * Builds and immediately sends a successful OTLP response.
-     * Convenience method for handlers that don't need to add extra headers (e.g., collector handler).
+     * Sends a successful OTLP response with zero rejected records.
+     * Used by handlers that don't inherit from {@link org.graylog2.inputs.transports.netty.HttpHandler}
+     * (e.g., the collector ingest handler).
      */
     public static void sendSuccess(ChannelHandlerContext ctx, boolean protobuf, boolean keepAlive) {
-        writeAndFlush(ctx, buildSuccessResponse(protobuf, keepAlive), keepAlive);
+        final byte[] body = protobuf ? SUCCESS_RESPONSE_PROTOBUF : SUCCESS_RESPONSE_JSON;
+        final String contentType = protobuf ? PROTOBUF_CONTENT_TYPE : JSON_CONTENT_TYPE;
+        final DefaultFullHttpResponse response = new DefaultFullHttpResponse(
+                HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.wrappedBuffer(body));
+        response.headers().set(HttpHeaderNames.CONTENT_TYPE, contentType);
+        response.headers().set(HttpHeaderNames.CONTENT_LENGTH, body.length);
+        response.headers().set(HttpHeaderNames.CONNECTION,
+                keepAlive ? HttpHeaderValues.KEEP_ALIVE : HttpHeaderValues.CLOSE);
+        ctx.writeAndFlush(response)
+                .addListener(keepAlive ? ChannelFutureListener.CLOSE_ON_FAILURE : ChannelFutureListener.CLOSE);
     }
 
     /**
      * Sends an error response with the given HTTP status and empty body.
+     * Used by handlers that don't inherit from {@link org.graylog2.inputs.transports.netty.HttpHandler}
+     * (e.g., the collector ingest handler).
      */
     public static void sendError(ChannelHandlerContext ctx, HttpResponseStatus status, boolean keepAlive) {
         final DefaultFullHttpResponse response = new DefaultFullHttpResponse(
@@ -142,13 +135,6 @@ public final class OtlpHttpUtils {
         response.headers().set(HttpHeaderNames.CONTENT_LENGTH, 0);
         response.headers().set(HttpHeaderNames.CONNECTION,
                 keepAlive ? HttpHeaderValues.KEEP_ALIVE : HttpHeaderValues.CLOSE);
-        writeAndFlush(ctx, response, keepAlive);
-    }
-
-    /**
-     * Writes and flushes a response, attaching the appropriate keep-alive listener.
-     */
-    public static void writeAndFlush(ChannelHandlerContext ctx, DefaultFullHttpResponse response, boolean keepAlive) {
         ctx.writeAndFlush(response)
                 .addListener(keepAlive ? ChannelFutureListener.CLOSE_ON_FAILURE : ChannelFutureListener.CLOSE);
     }

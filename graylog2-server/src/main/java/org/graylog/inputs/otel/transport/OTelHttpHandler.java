@@ -18,7 +18,6 @@ package org.graylog.inputs.otel.transport;
 
 import com.google.protobuf.AbstractMessageLite;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -93,14 +92,11 @@ public class OTelHttpHandler extends HttpHandler {
             return;
         }
 
-        // 3. Respond with CORS headers if enabled
-        final DefaultFullHttpResponse response = OtlpHttpUtils.buildSuccessResponse(isProtobuf, keepAlive);
-        if (isEnableCors() && origin != null && !origin.isEmpty()) {
-            response.headers().set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
-            response.headers().set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS, true);
-            response.headers().set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS, "Authorization, Content-Type");
-        }
-        OtlpHttpUtils.writeAndFlush(ctx, response, keepAlive);
+        // 3. Respond
+        final byte[] responseBody = isProtobuf ? OtlpHttpUtils.SUCCESS_RESPONSE_PROTOBUF : OtlpHttpUtils.SUCCESS_RESPONSE_JSON;
+        final String responseContentType = isProtobuf ? OtlpHttpUtils.PROTOBUF_CONTENT_TYPE : OtlpHttpUtils.JSON_CONTENT_TYPE;
+        writeResponse(ctx.channel(), keepAlive, request.protocolVersion(),
+                HttpResponseStatus.OK, origin, responseBody, responseContentType);
     }
 
     /**
