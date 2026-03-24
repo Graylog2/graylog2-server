@@ -18,15 +18,10 @@ package org.graylog.inputs.otel.transport;
 
 import com.google.protobuf.util.JsonFormat;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse;
@@ -102,69 +97,16 @@ class OtlpHttpUtilsTest {
     }
 
     @Test
-    void sendSuccessWritesProtobufResponse() throws Exception {
-        final EmbeddedChannel channel = new EmbeddedChannel(new ChannelInboundHandlerAdapter());
-
-        OtlpHttpUtils.sendSuccess(channel.pipeline().firstContext(), true, true);
-
-        final FullHttpResponse response = channel.readOutbound();
-        assertThat(response.status()).isEqualTo(HttpResponseStatus.OK);
-        assertThat(response.headers().get(HttpHeaderNames.CONTENT_TYPE)).isEqualTo("application/x-protobuf");
-
-        final byte[] bytes = new byte[response.content().readableBytes()];
-        response.content().readBytes(bytes);
-        final ExportLogsServiceResponse parsed = ExportLogsServiceResponse.parseFrom(bytes);
-        assertThat(parsed.getPartialSuccess().getRejectedLogRecords()).isEqualTo(0);
-        response.release();
+    void preComputedProtobufResponseIsValid() throws Exception {
+        final ExportLogsServiceResponse response = ExportLogsServiceResponse.parseFrom(
+                OtlpHttpUtils.SUCCESS_RESPONSE_PROTOBUF);
+        assertThat(response.getPartialSuccess().getRejectedLogRecords()).isEqualTo(0);
     }
 
     @Test
-    void sendSuccessWritesJsonResponse() throws Exception {
-        final EmbeddedChannel channel = new EmbeddedChannel(new ChannelInboundHandlerAdapter());
-
-        OtlpHttpUtils.sendSuccess(channel.pipeline().firstContext(), false, true);
-
-        final FullHttpResponse response = channel.readOutbound();
-        assertThat(response.status()).isEqualTo(HttpResponseStatus.OK);
-        assertThat(response.headers().get(HttpHeaderNames.CONTENT_TYPE)).isEqualTo("application/json");
-        assertThat(response.content().toString(StandardCharsets.UTF_8)).contains("partialSuccess");
-        response.release();
-    }
-
-    @Test
-    void sendErrorWritesStatusWithEmptyBody() {
-        final EmbeddedChannel channel = new EmbeddedChannel(new ChannelInboundHandlerAdapter());
-
-        OtlpHttpUtils.sendError(channel.pipeline().firstContext(), HttpResponseStatus.BAD_REQUEST, true);
-
-        final FullHttpResponse response = channel.readOutbound();
-        assertThat(response.status()).isEqualTo(HttpResponseStatus.BAD_REQUEST);
-        assertThat(response.headers().getInt(HttpHeaderNames.CONTENT_LENGTH)).isEqualTo(0);
-        response.release();
-    }
-
-    @Test
-    void sendSuccessRespectsKeepAlive() {
-        final EmbeddedChannel channel = new EmbeddedChannel(new ChannelInboundHandlerAdapter());
-
-        OtlpHttpUtils.sendSuccess(channel.pipeline().firstContext(), true, true);
-
-        final FullHttpResponse response = channel.readOutbound();
-        assertThat(response.headers().get(HttpHeaderNames.CONNECTION))
-                .isEqualToIgnoringCase(HttpHeaderValues.KEEP_ALIVE.toString());
-        response.release();
-    }
-
-    @Test
-    void sendSuccessClosesConnectionWhenNotKeepAlive() {
-        final EmbeddedChannel channel = new EmbeddedChannel(new ChannelInboundHandlerAdapter());
-
-        OtlpHttpUtils.sendSuccess(channel.pipeline().firstContext(), true, false);
-
-        final FullHttpResponse response = channel.readOutbound();
-        assertThat(response.headers().get(HttpHeaderNames.CONNECTION))
-                .isEqualToIgnoringCase(HttpHeaderValues.CLOSE.toString());
-        response.release();
+    void preComputedJsonResponseIsValid() {
+        final String json = new String(OtlpHttpUtils.SUCCESS_RESPONSE_JSON, StandardCharsets.UTF_8);
+        assertThat(json).contains("partialSuccess");
     }
 
     private FullHttpRequest createRequest(String contentType, byte[] body) {

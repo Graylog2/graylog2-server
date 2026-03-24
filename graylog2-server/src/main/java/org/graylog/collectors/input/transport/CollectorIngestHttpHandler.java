@@ -17,12 +17,18 @@
 package org.graylog.collectors.input.transport;
 
 import com.google.protobuf.AbstractMessageLite;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
+import io.netty.handler.codec.http.HttpVersion;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import org.graylog.collectors.input.CollectorJournalRecordFactory;
 import org.graylog.inputs.otel.transport.OtlpHttpUtils;
@@ -42,7 +48,7 @@ import java.util.function.Function;
  * — it does not need auth, CORS, OPTIONS, or forwarded-for handling since the collector
  * input uses mTLS for authentication and is only accessed by collector agents.
  * <p>
- * OTLP protocol logic (parsing, response formatting) is shared via {@link OtlpHttpUtils}.
+ * OTLP protocol logic (parsing) is shared via {@link OtlpHttpUtils}.
  */
 public class CollectorIngestHttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
     private static final Logger LOG = LoggerFactory.getLogger(CollectorIngestHttpHandler.class);
@@ -59,36 +65,34 @@ public class CollectorIngestHttpHandler extends SimpleChannelInboundHandler<Full
         final boolean keepAlive = HttpUtil.isKeepAlive(request);
 
         if (!HttpMethod.POST.equals(request.method())) {
-            OtlpHttpUtils.sendError(ctx, HttpResponseStatus.METHOD_NOT_ALLOWED, keepAlive);
+            sendError(ctx, HttpResponseStatus.METHOD_NOT_ALLOWED, keepAlive);
             return;
         }
 
         if (!LOGS_PATH.equals(request.uri())) {
-            OtlpHttpUtils.sendError(ctx, HttpResponseStatus.NOT_FOUND, keepAlive);
+            sendError(ctx, HttpResponseStatus.NOT_FOUND, keepAlive);
             return;
         }
 
         final String instanceUid = ctx.channel().attr(AgentCertChannelHandler.AGENT_INSTANCE_UID).get();
         if (instanceUid == null) {
             LOG.warn("Rejecting request without agent identity (no valid client certificate)");
-            OtlpHttpUtils.sendError(ctx, HttpResponseStatus.UNAUTHORIZED, keepAlive);
+            sendError(ctx, HttpResponseStatus.UNAUTHORIZED, keepAlive);
             return;
         }
 
-        // Parse
         final ExportLogsServiceRequest exportRequest;
         try {
             exportRequest = OtlpHttpUtils.parse(request);
         } catch (OtlpHttpUtils.UnsupportedContentTypeException e) {
-            OtlpHttpUtils.sendError(ctx, HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE, keepAlive);
+            sendError(ctx, HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE, keepAlive);
             return;
         } catch (Exception e) {
             LOG.debug("Failed to parse OTLP request", e);
-            OtlpHttpUtils.sendError(ctx, HttpResponseStatus.BAD_REQUEST, keepAlive);
+            sendError(ctx, HttpResponseStatus.BAD_REQUEST, keepAlive);
             return;
         }
 
-        // Process
         final boolean isProtobuf = OtlpHttpUtils.isProtobuf(request);
         try {
             final Function<byte[], RawMessage> createRawMessage;
@@ -104,10 +108,33 @@ public class CollectorIngestHttpHandler extends SimpleChannelInboundHandler<Full
                     .forEach(input::processRawMessage);
         } catch (Exception e) {
             LOG.error("Failed to process OTLP request", e);
-            OtlpHttpUtils.sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR, keepAlive);
+            sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR, keepAlive);
             return;
         }
 
-        OtlpHttpUtils.sendSuccess(ctx, isProtobuf, keepAlive);
+        sendSuccess(ctx, isProtobuf, keepAlive);
+    }
+
+    private void sendSuccess(ChannelHandlerContext ctx, boolean protobuf, boolean keepAlive) {
+        final byte[] body = protobuf ? OtlpHttpUtils.SUCCESS_RESPONSE_PROTOBUF : OtlpHttpUtils.SUCCESS_RESPONSE_JSON;
+        final String contentType = protobuf ? OtlpHttpUtils.PROTOBUF_CONTENT_TYPE : OtlpHttpUtils.JSON_CONTENT_TYPE;
+        final DefaultFullHttpResponse response = new DefaultFullHttpResponse(
+                HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.wrappedBuffer(body));
+        response.headers().set(HttpHeaderNames.CONTENT_TYPE, contentType);
+        response.headers().set(HttpHeaderNames.CONTENT_LENGTH, body.length);
+        response.headers().set(HttpHeaderNames.CONNECTION,
+                keepAlive ? HttpHeaderValues.KEEP_ALIVE : HttpHeaderValues.CLOSE);
+        ctx.writeAndFlush(response)
+                .addListener(keepAlive ? ChannelFutureListener.CLOSE_ON_FAILURE : ChannelFutureListener.CLOSE);
+    }
+
+    private void sendError(ChannelHandlerContext ctx, HttpResponseStatus status, boolean keepAlive) {
+        final DefaultFullHttpResponse response = new DefaultFullHttpResponse(
+                HttpVersion.HTTP_1_1, status);
+        response.headers().set(HttpHeaderNames.CONTENT_LENGTH, 0);
+        response.headers().set(HttpHeaderNames.CONNECTION,
+                keepAlive ? HttpHeaderValues.KEEP_ALIVE : HttpHeaderValues.CLOSE);
+        ctx.writeAndFlush(response)
+                .addListener(keepAlive ? ChannelFutureListener.CLOSE_ON_FAILURE : ChannelFutureListener.CLOSE);
     }
 }
