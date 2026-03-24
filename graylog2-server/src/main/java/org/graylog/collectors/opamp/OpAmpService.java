@@ -28,7 +28,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Longs;
 import com.google.protobuf.ByteString;
-import com.google.protobuf.GeneratedMessageV3;
+import com.google.protobuf.MessageOrBuilder;
 import com.google.protobuf.util.JsonFormat;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.annotation.Nonnull;
@@ -147,7 +147,7 @@ public class OpAmpService {
      * @param message the message to convert
      * @return the JSON string or the #toString() result if the JSON converter fails
      */
-    private static String toProtoString(GeneratedMessageV3 message) {
+    private static String toProtoString(MessageOrBuilder message) {
         try {
             return PROTO_PRINTER.print(message);
         } catch (Exception e) {
