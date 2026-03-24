@@ -55,14 +55,12 @@ public class OTelHttpHandler extends HttpHandler {
     public static final String LOGS_PATH = "/v1/logs";
 
     private final MessageInput input;
-    private final boolean enableCors;
 
     public OTelHttpHandler(boolean enableCors, String authorizationHeader,
                            String authorizationHeaderValue, String path,
                            MessageInput input) {
         super(enableCors, authorizationHeader, authorizationHeaderValue, path);
         this.input = input;
-        this.enableCors = enableCors;
     }
 
     @Override
@@ -99,7 +97,7 @@ public class OTelHttpHandler extends HttpHandler {
             OtlpHttpUtils.sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR, keepAlive);
             return;
         }
-        if (enableCors && origin != null && !origin.isEmpty()) {
+        if (isEnableCors() && origin != null && !origin.isEmpty()) {
             response.headers().set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
             response.headers().set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS, true);
             response.headers().set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS, "Authorization, Content-Type");

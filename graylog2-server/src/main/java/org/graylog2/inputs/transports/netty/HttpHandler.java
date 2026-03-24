@@ -52,6 +52,10 @@ public class HttpHandler extends SimpleChannelInboundHandler<HttpRequest> {
         this.path = path;
     }
 
+    protected boolean isEnableCors() {
+        return enableCors;
+    }
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, HttpRequest request) throws Exception {
         final Channel channel = ctx.channel();
