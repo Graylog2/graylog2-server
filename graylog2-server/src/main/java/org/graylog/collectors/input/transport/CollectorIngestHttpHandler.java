@@ -118,24 +118,30 @@ public class CollectorIngestHttpHandler extends SimpleChannelInboundHandler<Full
     private void sendSuccess(ChannelHandlerContext ctx, boolean protobuf, boolean keepAlive) {
         final byte[] body = protobuf ? OtlpHttpUtils.SUCCESS_RESPONSE_PROTOBUF : OtlpHttpUtils.SUCCESS_RESPONSE_JSON;
         final String contentType = protobuf ? OtlpHttpUtils.PROTOBUF_CONTENT_TYPE : OtlpHttpUtils.JSON_CONTENT_TYPE;
+
         final DefaultFullHttpResponse response = new DefaultFullHttpResponse(
                 HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.wrappedBuffer(body));
+
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, contentType);
         response.headers().set(HttpHeaderNames.CONTENT_LENGTH, body.length);
         response.headers().set(HttpHeaderNames.CONNECTION,
                 keepAlive ? HttpHeaderValues.KEEP_ALIVE : HttpHeaderValues.CLOSE);
+
         ctx.writeAndFlush(response)
                 .addListener(keepAlive ? ChannelFutureListener.CLOSE_ON_FAILURE : ChannelFutureListener.CLOSE);
     }
 
     private void sendError(ChannelHandlerContext ctx, HttpResponseStatus status, boolean keepAlive) {
         final byte[] body = OtlpHttpUtils.buildErrorStatusJson(status, null);
+
         final DefaultFullHttpResponse response = new DefaultFullHttpResponse(
                 HttpVersion.HTTP_1_1, status, Unpooled.wrappedBuffer(body));
+
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, OtlpHttpUtils.JSON_CONTENT_TYPE);
         response.headers().set(HttpHeaderNames.CONTENT_LENGTH, body.length);
         response.headers().set(HttpHeaderNames.CONNECTION,
                 keepAlive ? HttpHeaderValues.KEEP_ALIVE : HttpHeaderValues.CLOSE);
+
         ctx.writeAndFlush(response)
                 .addListener(keepAlive ? ChannelFutureListener.CLOSE_ON_FAILURE : ChannelFutureListener.CLOSE);
     }

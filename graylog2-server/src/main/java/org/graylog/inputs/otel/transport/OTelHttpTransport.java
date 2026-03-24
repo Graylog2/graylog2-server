@@ -21,7 +21,6 @@ import com.google.inject.assistedinject.AssistedInject;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.EventLoopGroup;
 import jakarta.inject.Named;
-
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.inputs.transports.AbstractHttpTransport;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
@@ -78,7 +77,6 @@ public class OTelHttpTransport extends AbstractHttpTransport {
         handlers.replace("http-handler", () -> new OTelHttpHandler(
                 isEnableCors(), getAuthorizationHeader(), getAuthorizationHeaderValue(),
                 getPath(), input));
-        handlers.remove("http-bulk-newline-decoder");
         return handlers;
     }
 

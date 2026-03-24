@@ -22,9 +22,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
-
-import jakarta.annotation.Nullable;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
+import jakarta.annotation.Nullable;
 import org.graylog.inputs.otel.OTelJournalRecordFactory;
 import org.graylog2.inputs.transports.netty.HttpHandler;
 import org.graylog2.inputs.transports.netty.RawMessageHandler;
@@ -72,8 +71,8 @@ public class OTelHttpHandler extends HttpHandler {
      */
     @Override
     protected void writeResponse(Channel channel, boolean keepAlive, HttpVersion version,
-                                  HttpResponseStatus status, String origin,
-                                  @Nullable byte[] body, @Nullable String contentType) {
+                                 HttpResponseStatus status, String origin,
+                                 @Nullable byte[] body, @Nullable String contentType) {
         if (body == null && !HttpResponseStatus.OK.equals(status)) {
             body = OtlpHttpUtils.buildErrorStatusJson(status, null);
             contentType = OtlpHttpUtils.JSON_CONTENT_TYPE;
@@ -83,9 +82,7 @@ public class OTelHttpHandler extends HttpHandler {
 
     @Override
     protected void handleValidPost(ChannelHandlerContext ctx, FullHttpRequest request, boolean keepAlive,
-                                    String origin) {
-        final boolean isProtobuf = OtlpHttpUtils.isProtobuf(request);
-
+                                   String origin) {
         // 1. Parse request
         final ExportLogsServiceRequest exportRequest;
         try {
@@ -112,6 +109,7 @@ public class OTelHttpHandler extends HttpHandler {
         }
 
         // 3. Respond
+        final boolean isProtobuf = OtlpHttpUtils.isProtobuf(request);
         final byte[] responseBody = isProtobuf ? OtlpHttpUtils.SUCCESS_RESPONSE_PROTOBUF : OtlpHttpUtils.SUCCESS_RESPONSE_JSON;
         final String responseContentType = isProtobuf ? OtlpHttpUtils.PROTOBUF_CONTENT_TYPE : OtlpHttpUtils.JSON_CONTENT_TYPE;
         writeResponse(ctx.channel(), keepAlive, request.protocolVersion(),
@@ -123,7 +121,7 @@ public class OTelHttpHandler extends HttpHandler {
      * Resolves the source IP from the forwarded-for channel attribute if available.
      */
     protected Stream<RawMessage> createJournalRecords(ChannelHandlerContext ctx,
-                                                       ExportLogsServiceRequest exportRequest) {
+                                                      ExportLogsServiceRequest exportRequest) {
         final InetSocketAddress remoteAddress = resolveRemoteAddress(ctx);
         final Function<byte[], RawMessage> createRawMessage = remoteAddress != null
                 ? bytes -> new RawMessage(bytes, remoteAddress)

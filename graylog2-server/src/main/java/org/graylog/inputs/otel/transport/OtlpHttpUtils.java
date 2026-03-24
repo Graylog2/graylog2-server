@@ -17,7 +17,7 @@
 package org.graylog.inputs.otel.transport;
 
 import com.google.protobuf.util.JsonFormat;
-import io.grpc.Status;
+import com.google.rpc.Status;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -25,6 +25,13 @@ import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse;
 
 import java.nio.charset.StandardCharsets;
+
+import static io.grpc.Status.INTERNAL;
+import static io.grpc.Status.INVALID_ARGUMENT;
+import static io.grpc.Status.RESOURCE_EXHAUSTED;
+import static io.grpc.Status.UNAUTHENTICATED;
+import static io.grpc.Status.UNAVAILABLE;
+import static io.grpc.Status.UNIMPLEMENTED;
 
 /**
  * Stateless utility for OTLP HTTP protocol concerns: request parsing, content-type
@@ -41,7 +48,8 @@ public final class OtlpHttpUtils {
     public static final byte[] SUCCESS_RESPONSE_PROTOBUF = ExportLogsServiceResponse.getDefaultInstance().toByteArray();
     public static final byte[] SUCCESS_RESPONSE_JSON = computeJsonSuccessResponse();
 
-    private OtlpHttpUtils() {}
+    private OtlpHttpUtils() {
+    }
 
     private static byte[] computeJsonSuccessResponse() {
         try {
@@ -64,9 +72,8 @@ public final class OtlpHttpUtils {
      * Parses an OTLP ExportLogsServiceRequest from the HTTP request body.
      * Determines encoding (protobuf or JSON) from the Content-Type header.
      *
-     * @throws UnsupportedContentTypeException if Content-Type is not protobuf or JSON
+     * @throws UnsupportedContentTypeException                    if Content-Type is not protobuf or JSON
      * @throws com.google.protobuf.InvalidProtocolBufferException if the payload is malformed
-     * @throws com.google.protobuf.util.JsonFormat.ParseException if JSON parsing fails
      */
     public static ExportLogsServiceRequest parse(FullHttpRequest request) throws Exception {
         final String contentType = request.headers().get(HttpHeaderNames.CONTENT_TYPE);
@@ -96,32 +103,25 @@ public final class OtlpHttpUtils {
      * (e.g., for 415 Unsupported Media Type or pre-handler errors like 401/404/405).
      */
     public static byte[] buildErrorStatusJson(HttpResponseStatus httpStatus, String message) {
-        final int grpcCode = httpStatusToGrpcCode(httpStatus);
-        final String msg = message != null ? message : httpStatus.reasonPhrase();
-        // Build google.rpc.Status JSON manually to avoid protobuf version conflicts
-        // with the com.google.rpc.Status class (compiled against a different protobuf runtime).
-        final String json = "{\"code\":" + grpcCode + ",\"message\":\"" + escapeJson(msg) + "\"}";
-        return json.getBytes(StandardCharsets.UTF_8);
-    }
+        final var grpcStatus = switch (httpStatus.code()) {
+            case 400, 415 -> INVALID_ARGUMENT;
+            case 401 -> UNAUTHENTICATED;
+            case 404, 405 -> UNIMPLEMENTED;
+            case 429 -> RESOURCE_EXHAUSTED;
+            case 503 -> UNAVAILABLE;
+            default -> INTERNAL;
+        };
 
-    private static String escapeJson(String value) {
-        return value.replace("\\", "\\\\").replace("\"", "\\\"");
-    }
+        // Convert gRPC Status to protobuf Status message for JSON serialization
+        final var protobufStatus = Status.newBuilder()
+                .setCode(grpcStatus.getCode().value())
+                .setMessage(message == null ? httpStatus.reasonPhrase() : message)
+                .build();
 
-    private static int httpStatusToGrpcCode(HttpResponseStatus httpStatus) {
-        final int code = httpStatus.code();
-        if (code == 400 || code == 415) {
-            return Status.INVALID_ARGUMENT.getCode().value();
-        } else if (code == 401) {
-            return Status.UNAUTHENTICATED.getCode().value();
-        } else if (code == 404 || code == 405) {
-            return Status.UNIMPLEMENTED.getCode().value();
-        } else if (code == 429) {
-            return Status.RESOURCE_EXHAUSTED.getCode().value();
-        } else if (code == 503) {
-            return Status.UNAVAILABLE.getCode().value();
-        } else {
-            return Status.INTERNAL.getCode().value();
+        try {
+            return JsonFormat.printer().print(protobufStatus).getBytes(StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to serialize Status to JSON", e);
         }
     }
 
