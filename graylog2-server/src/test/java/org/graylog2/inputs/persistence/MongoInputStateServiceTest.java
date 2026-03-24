@@ -37,18 +37,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
-class InputStateServiceTest {
+class MongoInputStateServiceTest {
 
     private static final String NODE_1 = "node-1";
     private static final String NODE_2 = "node-2";
 
-    private InputStateService serviceNode1;
-    private InputStateService serviceNode2;
+    private MongoInputStateService serviceNode1;
+    private MongoInputStateService serviceNode2;
 
     @BeforeEach
     void setUp(MongoCollections mongoCollections) {
-        serviceNode1 = new InputStateService(mongoCollections, new SimpleNodeId(NODE_1));
-        serviceNode2 = new InputStateService(mongoCollections, new SimpleNodeId(NODE_2));
+        serviceNode1 = new MongoInputStateService(mongoCollections, new SimpleNodeId(NODE_1));
+        serviceNode2 = new MongoInputStateService(mongoCollections, new SimpleNodeId(NODE_2));
     }
 
     @Test

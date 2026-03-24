@@ -67,14 +67,12 @@ class EventsSearchServiceTest {
     private ObjectMapper objectMapper;
     @Mock
     private Subject subject;
-    @Mock
-    private ScriptingApiService scriptingApiService;
 
     private EventsSearchService service;
 
     @BeforeEach
     void setUp() {
-        service = new EventsSearchService(moreSearch, streamService, eventDefinitionService, scriptingApiService, objectMapper);
+        service = new EventsSearchService(moreSearch, streamService, eventDefinitionService, objectMapper);
 
         when(objectMapper.convertValue(any(Map.class), eq(EventDto.class))).thenAnswer(invocation -> {
             final Map<String, Object> fields = invocation.getArgument(0);

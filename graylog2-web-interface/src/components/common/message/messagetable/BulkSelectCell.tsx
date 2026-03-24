@@ -14,30 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import React from 'react';
 import styled from 'styled-components';
 
-import { Checkbox } from 'components/bootstrap';
+import { BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
-const RowCheckbox = styled(Checkbox)`
-  &.checkbox {
-    margin: 0;
-    padding-top: 2px;
-
-    label {
-      display: flex;
-      align-items: center;
-      padding: 0;
-      min-height: 14px;
-
-      input {
-        width: 14px;
-        height: 14px;
-        cursor: pointer;
-        margin: 0;
-        position: relative;
-      }
-    }
+const StyledCell = styled.td`
+  &&& {
+    width: ${BULK_SELECT_COLUMN_WIDTH}px;
+    min-width: auto;
   }
 `;
 
-export default RowCheckbox;
+const BulkSelectCell = ({ children = null }: React.PropsWithChildren) => (
+  <StyledCell onClick={(event) => event.stopPropagation()}>{children}</StyledCell>
+);
+
+export default BulkSelectCell;
