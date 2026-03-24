@@ -27,8 +27,8 @@ import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.IngestEndpointConfig;
 import org.graylog.collectors.opamp.OpAmpCaService;
-import org.graylog.inputs.otel.transport.OTelHttpTransport;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
+import org.graylog2.inputs.transports.AbstractHttpTransport;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
 import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.plugin.LocalMetricRegistry;
@@ -55,7 +55,7 @@ import java.util.concurrent.Callable;
  * The HTTP handler is replaced with {@link CollectorIngestHttpHandler} which enforces
  * agent identity presence and embeds the agent instance UID in journal records.
  */
-public class CollectorIngestHttpTransport extends OTelHttpTransport {
+public class CollectorIngestHttpTransport extends AbstractHttpTransport {
     public static final String NAME = "CollectorIngestHttpTransport";
     static final int DEFAULT_HTTP_PORT = 14401;
 
@@ -74,7 +74,7 @@ public class CollectorIngestHttpTransport extends OTelHttpTransport {
                                         CollectorsConfigService collectorsConfigService) {
         super(buildTransportConfig(collectorsConfigService), eventLoopGroup, eventLoopGroupFactory,
                 nettyTransportConfiguration, throughputCounter, localMetricRegistry,
-                tlsConfiguration, trustedProxies);
+                tlsConfiguration, trustedProxies, "/v1/logs");
         this.opAmpCaService = opAmpCaService;
     }
 
@@ -84,15 +84,15 @@ public class CollectorIngestHttpTransport extends OTelHttpTransport {
                 .map(IngestEndpointConfig::port)
                 .orElse(DEFAULT_HTTP_PORT);
         return new Configuration(Map.of(
-                OTelHttpTransport.CK_BIND_ADDRESS, "0.0.0.0",
-                OTelHttpTransport.CK_PORT, port,
-                OTelHttpTransport.CK_TLS_ENABLE, true,
-                OTelHttpTransport.CK_TLS_CLIENT_AUTH, OTelHttpTransport.TLS_CLIENT_AUTH_REQUIRED,
-                OTelHttpTransport.CK_MAX_CHUNK_SIZE, 4 * 1024 * 1024,
-                OTelHttpTransport.CK_RECV_BUFFER_SIZE, 1048576,
-                OTelHttpTransport.CK_NUMBER_WORKER_THREADS, 4,
-                OTelHttpTransport.CK_TCP_KEEPALIVE, true,
-                OTelHttpTransport.CK_IDLE_WRITER_TIMEOUT, 60
+                CK_BIND_ADDRESS, "0.0.0.0",
+                CK_PORT, port,
+                CK_TLS_ENABLE, true,
+                CK_TLS_CLIENT_AUTH, TLS_CLIENT_AUTH_REQUIRED,
+                CK_MAX_CHUNK_SIZE, 4 * 1024 * 1024,
+                CK_RECV_BUFFER_SIZE, 1048576,
+                CK_NUMBER_WORKER_THREADS, 4,
+                CK_TCP_KEEPALIVE, true,
+                CK_IDLE_WRITER_TIMEOUT, 60
         ));
     }
 
@@ -115,7 +115,10 @@ public class CollectorIngestHttpTransport extends OTelHttpTransport {
         // Add all parent custom handlers (HTTP decoder, decompressor, encoder, aggregator, etc.)
         handlers.putAll(super.getCustomChildChannelHandlers(input));
 
-        // Replace the http-handler with the collector ingest variant that enforces agent identity
+        // Replace the http-handler with the collector ingest variant that enforces agent identity.
+        // Note: rawmessage-handler, codec-aggregator, and exception-logger are added downstream
+        // by AbstractTcpTransport and are unreachable because CollectorIngestHttpHandler does not
+        // fire messages downstream. These cannot be removed without overriding getChildChannelHandlers.
         handlers.replace("http-handler", () -> new CollectorIngestHttpHandler(input));
 
         return handlers;
@@ -131,7 +134,7 @@ public class CollectorIngestHttpTransport extends OTelHttpTransport {
     }
 
     @ConfigClass
-    public static class Config extends OTelHttpTransport.Config {
+    public static class Config extends AbstractHttpTransport.Config {
         @Override
         public ConfigurationRequest getRequestedConfiguration() {
             return new ConfigurationRequest();
