@@ -17,7 +17,6 @@
 import MockStore from 'helpers/mocking/StoreMock';
 import MockAction from 'helpers/mocking/MockAction';
 import FieldType, { FieldTypes, Properties } from 'views/logic/fieldtypes/FieldType';
-import type { ActionDefinition } from 'views/components/actions/ActionHandler';
 import { createSearch } from 'fixtures/searches';
 import type { RootState } from 'views/types';
 
@@ -30,8 +29,11 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
   },
 }));
 
-jest.mock('stores/decorators/DecoratorsStore', () => ({
-  DecoratorsStore: MockStore(),
+jest.mock('@graylog/server-api', () => ({
+  SearchDecorators: {
+    get: jest.fn(() => Promise.resolve([])),
+    getAvailable: jest.fn(() => Promise.resolve({})),
+  },
 }));
 
 describe('Views bindings value actions', () => {
@@ -39,12 +41,12 @@ describe('Views bindings value actions', () => {
   const defaultArguments = {
     queryId: 'query1',
     contexts: {
-      message: {},
+      message: { id: 'message-id', index: 'message-index', fields: {} },
       isLocalNode: true,
     },
     type: FieldType.Unknown,
   };
-  const findAction = (type: string): ActionDefinition<{}> => valueActions.find((binding) => binding.type === type);
+  const findAction = (type: string) => valueActions.find((binding) => binding.type === type);
   const view = createSearch({ queryId: 'query1' });
   const rootState = { view: { view } } as RootState;
   const getState = jest.fn(() => rootState);

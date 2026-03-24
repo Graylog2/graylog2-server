@@ -217,6 +217,7 @@ const ApiRoutes = {
     references: (inputId: string) => ({ url: `/system/inputs/references/${inputId}` }),
   },
   InputStatesController: {
+    summary: () => ({ url: '/system/inputstates/summary' }),
     start: (inputId: string) => ({ url: `/system/inputstates/${inputId}` }),
     stop: (inputId: string) => ({ url: `/system/inputstates/${inputId}` }),
   },
@@ -306,6 +307,7 @@ const ApiRoutes = {
   },
   StreamOutputFilterRuleApiController: {
     get: (streamId: string) => ({ url: `/streams/${streamId}/destinations/filters` }),
+    countByStreams: () => ({ url: '/streams/destinations/filters/count' }),
     delete: (streamId: string, filterId: string) => ({ url: `/streams/${streamId}/destinations/filters/${filterId}` }),
     update: (streamId: string, filterId: string) => ({ url: `/streams/${streamId}/destinations/filters/${filterId}` }),
     create: (streamId: string) => ({ url: `/streams/${streamId}/destinations/filters` }),

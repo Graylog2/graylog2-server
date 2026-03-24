@@ -31,6 +31,7 @@ import useEventDefinitionConfigFromLocalStorage from 'components/event-definitio
 import { SYSTEM_EVENT_DEFINITION_TYPE as mockSYSTEM_EVENT_DEFINITION_TYPE } from 'components/event-definitions/constants';
 import type { PermissionsByScopeReturnType } from 'hooks/useScopePermissions';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
+import fetch from 'logic/rest/FetchProvider';
 
 import EventDefinitionFormContainer from './EventDefinitionFormContainer';
 
@@ -93,29 +94,32 @@ jest.mock('stores/connect', () => ({
   ),
 }));
 
-jest.mock('stores/event-definitions/AvailableEventDefinitionTypesStore', () => ({
-  AvailableEventDefinitionTypesStore: {
-    getInitialState: () => ({
-      aggregation_functions: [
-        'avg',
-        'card',
-        'count',
-        'max',
-        'min',
-        'sum',
-        'stddev',
-        'sumofsquares',
-        'variance',
-        'percentage',
-        'percentile',
-        'latest',
-      ],
-      field_provider_types: ['template-v1', 'lookup-v1'],
-      processor_types: ['aggregation-v1', mockSYSTEM_EVENT_DEFINITION_TYPE, 'correlation-v1', 'anomaly-v1', 'sigma-v1'],
-      storage_handler_types: ['persist-to-streams-v1'],
-    }),
-  },
-}));
+jest.mock('logic/rest/FetchProvider', () => {
+  const mockFetch = jest.fn(() => Promise.resolve({}));
+  const MockBuilder = () => ({ json: () => ({ build: () => Promise.resolve({}) }) });
+
+  return { __esModule: true, default: mockFetch, Builder: MockBuilder };
+});
+
+const mockEntityTypes = {
+  aggregation_functions: [
+    'avg',
+    'card',
+    'count',
+    'max',
+    'min',
+    'sum',
+    'stddev',
+    'sumofsquares',
+    'variance',
+    'percentage',
+    'percentile',
+    'latest',
+  ],
+  field_provider_types: ['template-v1', 'lookup-v1'],
+  processor_types: ['aggregation-v1', mockSYSTEM_EVENT_DEFINITION_TYPE, 'correlation-v1', 'anomaly-v1', 'sigma-v1'],
+  storage_handler_types: ['persist-to-streams-v1'],
+};
 
 const mockEventNotifications = [
   {
@@ -210,6 +214,8 @@ jest.mock('hooks/usePluginEntities');
 
 describe('EventDefinitionFormContainer', () => {
   beforeEach(() => {
+    asMock(fetch).mockResolvedValue(mockEntityTypes);
+
     asMock(useLocation).mockImplementation(() => ({
       pathname: '/event-definitions',
       search: '',
@@ -257,7 +263,7 @@ describe('EventDefinitionFormContainer', () => {
   it('should render Filters & Aggregation form enabled', async () => {
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
     const tab = await screen.findByRole('button', { name: /condition/i });
-    userEvent.click(tab);
+    await userEvent.click(tab);
     const conditionTypeSelect = await screen.findByLabelText('Condition Type');
 
     expect(conditionTypeSelect).toBeInTheDocument();
@@ -268,7 +274,7 @@ describe('EventDefinitionFormContainer', () => {
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
 
     const tab = await screen.findByRole('button', { name: /condition/i });
-    userEvent.click(tab);
+    await userEvent.click(tab);
 
     expect(screen.getByText(/cannot be edited/i)).toBeVisible();
   });
@@ -277,7 +283,7 @@ describe('EventDefinitionFormContainer', () => {
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
 
     const tab = await screen.findByRole('button', { name: /fields/i });
-    userEvent.click(tab);
+    await userEvent.click(tab);
 
     expect(screen.getByRole('button', { name: /add custom field/i })).toBeEnabled();
   });
@@ -287,7 +293,7 @@ describe('EventDefinitionFormContainer', () => {
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
 
     const tab = await screen.findByRole('button', { name: /fields/i });
-    userEvent.click(tab);
+    await userEvent.click(tab);
 
     expect(screen.getByText(/cannot be edited/i)).toBeVisible();
   });
@@ -296,7 +302,7 @@ describe('EventDefinitionFormContainer', () => {
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
 
     const tab = await screen.findByRole('button', { name: /notifications/i });
-    userEvent.click(tab);
+    await userEvent.click(tab);
 
     expect(screen.getByRole('button', { name: /add notification/i })).toBeEnabled();
   });
@@ -306,7 +312,7 @@ describe('EventDefinitionFormContainer', () => {
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
 
     const tab = await screen.findByRole('button', { name: /notification/i });
-    userEvent.click(tab);
+    await userEvent.click(tab);
 
     expect(screen.getByRole('button', { name: /add notification/i })).toBeEnabled();
   });
@@ -315,14 +321,14 @@ describe('EventDefinitionFormContainer', () => {
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
 
     const tab = await screen.findByRole('button', { name: /notification/i });
-    userEvent.click(tab);
+    await userEvent.click(tab);
     const addNotificationButton = screen.getByRole('button', { name: /add notification/i });
 
     expect(addNotificationButton).toBeEnabled();
 
-    userEvent.click(addNotificationButton);
-    userEvent.type(screen.getByText(/select notification/i), 'mock-notification-title{enter}');
-    userEvent.click(screen.getByRole('button', { name: /add notification/i }));
+    await userEvent.click(addNotificationButton);
+    await userEvent.type(screen.getByText(/select notification/i), 'mock-notification-title{enter}');
+    await userEvent.click(screen.getByRole('button', { name: /add notification/i }));
 
     expect(screen.getByText(/mock-notification-title/i)).toBeVisible();
   });
@@ -332,14 +338,14 @@ describe('EventDefinitionFormContainer', () => {
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
 
     const tab = await screen.findByRole('button', { name: /notification/i });
-    userEvent.click(tab);
+    await userEvent.click(tab);
     const addNotificationButton = screen.getByRole('button', { name: /add notification/i });
 
     expect(addNotificationButton).toBeEnabled();
 
-    userEvent.click(addNotificationButton);
-    userEvent.type(screen.getByText(/select notification/i), 'mock-notification-title{enter}');
-    userEvent.click(screen.getByRole('button', { name: /add notification/i }));
+    await userEvent.click(addNotificationButton);
+    await userEvent.type(screen.getByText(/select notification/i), 'mock-notification-title{enter}');
+    await userEvent.click(screen.getByRole('button', { name: /add notification/i }));
 
     expect(screen.getByText(/mock-notification-title/i)).toBeVisible();
   });
@@ -348,7 +354,7 @@ describe('EventDefinitionFormContainer', () => {
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
 
     const tab = await screen.findByRole('button', { name: /summary/i });
-    userEvent.click(tab);
+    await userEvent.click(tab);
 
     expect(screen.getByRole('button', { name: /update event definition/i })).toBeVisible();
   });

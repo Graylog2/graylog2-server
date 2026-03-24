@@ -26,6 +26,7 @@ import org.graylog.events.search.MoreSearch;
 import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.NumberRange;
 import org.graylog2.indexer.results.ChunkedResult;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.results.ResultChunk;
@@ -36,6 +37,7 @@ import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.rest.resources.entities.Slice;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch._types.ExpandWildcard;
 import org.opensearch.client.opensearch._types.FieldSort;
@@ -43,11 +45,13 @@ import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.SortOptions;
 import org.opensearch.client.opensearch._types.SortOrder;
 import org.opensearch.client.opensearch._types.aggregations.Aggregation;
+import org.opensearch.client.opensearch._types.aggregations.AggregationRange;
 import org.opensearch.client.opensearch._types.aggregations.DateHistogramAggregate;
 import org.opensearch.client.opensearch._types.aggregations.DateHistogramBucket;
 import org.opensearch.client.opensearch._types.aggregations.FieldDateMath;
 import org.opensearch.client.opensearch._types.aggregations.LongTermsAggregate;
 import org.opensearch.client.opensearch._types.aggregations.MultiBucketBase;
+import org.opensearch.client.opensearch._types.aggregations.RangeAggregation;
 import org.opensearch.client.opensearch._types.mapping.FieldType;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
@@ -78,6 +82,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(MoreSearchAdapterOS.class);
     private static final String TERMS_AGGREGATION_NAME = "alert_type";
     private static final String HISTOGRAM_AGGREGATION_NAME = "histogram";
+    private static final String SLICES_AGGREGATION_NAME = "slices";
 
     private final OfficialOpensearchClient opensearchClient;
     private final Boolean allowLeadingWildcard;
@@ -223,17 +228,17 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
 
             final Aggregation histogramAggregation = Aggregation.builder().dateHistogram(dh -> {
 
-                dh.interval(t -> t.time(interval.getQuantity().toString() + interval.getUnit()));
+                        dh.interval(t -> t.time(interval.getQuantity().toString() + interval.getUnit()));
 
-                dh.field(EventDto.FIELD_EVENT_TIMESTAMP)
-                        .timeZone(timeZone.getId())
-                        .minDocCount(0)
-                        .extendedBounds(bounds -> bounds
-                                .min(FieldDateMath.builder().expr(Tools.buildElasticSearchTimeFormat(timerange.from())).build())
-                                .max(FieldDateMath.builder().expr(Tools.buildElasticSearchTimeFormat(timerange.to())).build()));
+                        dh.field(EventDto.FIELD_EVENT_TIMESTAMP)
+                                .timeZone(timeZone.getId())
+                                .minDocCount(0)
+                                .extendedBounds(bounds -> bounds
+                                        .min(FieldDateMath.builder().expr(Tools.buildElasticSearchTimeFormat(timerange.from())).build())
+                                        .max(FieldDateMath.builder().expr(Tools.buildElasticSearchTimeFormat(timerange.to())).build()));
 
-                return dh;
-            })
+                        return dh;
+                    })
                     .aggregations(TERMS_AGGREGATION_NAME, Aggregation.builder().terms(terms -> terms.minDocCount(0).field(EventDto.FIELD_ALERT)).build())
                     .build();
 
@@ -325,6 +330,99 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
                 .filter(s -> s.name().equalsIgnoreCase(sorting.getUppercasedDirection()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No sorting option named " + sorting.getUppercasedDirection()));
+    }
+
+    @Override
+    public List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                             Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
+                                             Map<String, Set<String>> extraFilters, String slicingColumn, String type, int maxBuckets) {
+        final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
+
+        final org.opensearch.client.opensearch.core.SearchRequest searchRequest = org.opensearch.client.opensearch.core.SearchRequest.of(builder -> {
+            builder.query(filter);
+            builder.size(0);
+            builder.ignoreUnavailable(true);
+            builder.allowNoIndices(true);
+            builder.expandWildcards(ExpandWildcard.Open);
+
+            if (!affectedIndices.isEmpty()) {
+                builder.index(new ArrayList<>(affectedIndices));
+            }
+
+            builder.aggregations(SLICES_AGGREGATION_NAME, Aggregation.builder()
+                    .terms(terms -> terms.field(slicingColumn).size(maxBuckets))
+                    .build());
+
+            return builder;
+        });
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Query:\n{}", searchRequest.query().toJsonString());
+            LOG.debug("Execute aggregation: {}", searchRequest.toJsonString());
+        }
+
+        final SearchResponse<Map> searchResult = opensearchClient.sync(c -> c.search(searchRequest, Map.class), "Unable to perform slice aggregation query");
+        final var termsAgg = searchResult.aggregations().get(SLICES_AGGREGATION_NAME);
+
+        final List<Slice> result = new ArrayList<>();
+        if (termsAgg.isSterms()) {
+            termsAgg.sterms().buckets().array().forEach(b -> result.add(new Slice(b.key(), null, type, Math.toIntExact(b.docCount()))));
+        } else if (termsAgg.isLterms()) {
+            termsAgg.lterms().buckets().array().forEach(b -> result.add(new Slice(b.keyAsString(), null, type, Math.toIntExact(b.docCount()))));
+        } else if (termsAgg.isDterms()) {
+            termsAgg.dterms().buckets().array().forEach(b -> result.add(new Slice(b.keyAsString(), null, type, Math.toIntExact(b.docCount()))));
+        }
+        return result;
+    }
+
+    @Override
+    public List<Slice> aggregateSlicesForRangeQuery(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                            Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
+                                            Map<String, Set<String>> extraFilters, String slicingColumn, String type, List<NumberRange> ranges) {
+        final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
+
+        final RangeAggregation.Builder rangeBuilder = new RangeAggregation.Builder().field(slicingColumn);
+        ranges.forEach(r -> {
+            final AggregationRange.Builder range = new AggregationRange.Builder();
+            if (r.from() != null) {
+                range.from(JsonData.of(r.from()));
+            }
+            if (r.to() != null) {
+                range.to(JsonData.of(r.to()));
+            }
+            rangeBuilder.ranges(range.build());
+        });
+        rangeBuilder.keyed(false);
+
+        final org.opensearch.client.opensearch.core.SearchRequest searchRequest = org.opensearch.client.opensearch.core.SearchRequest.of(builder -> {
+            builder.query(filter);
+            builder.size(0);
+            builder.ignoreUnavailable(true);
+            builder.allowNoIndices(true);
+            builder.expandWildcards(ExpandWildcard.Open);
+
+            if (!affectedIndices.isEmpty()) {
+                builder.index(new ArrayList<>(affectedIndices));
+            }
+
+            builder.aggregations(SLICES_AGGREGATION_NAME, Aggregation.builder()
+                    .range(rangeBuilder.build())
+                    .build());
+
+            return builder;
+        });
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Query:\n{}", searchRequest.query().toJsonString());
+            LOG.debug("Execute range aggregation: {}", searchRequest.toJsonString());
+        }
+
+        final SearchResponse<Map> searchResult = opensearchClient.sync(c -> c.search(searchRequest, Map.class), "Unable to perform range slice aggregation query");
+        final var rangeAgg = searchResult.aggregations().get(SLICES_AGGREGATION_NAME).range();
+
+        final List<Slice> result = new ArrayList<>();
+        rangeAgg.buckets().array().forEach(b -> result.add(new Slice(b.key(), null, type, Math.toIntExact(b.docCount()))));
+        return result;
     }
 
     @Override

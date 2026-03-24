@@ -42,7 +42,7 @@ type Arguments = {
 
 const extractFieldsFromValuePath = (valuePath: ValuePath): Array<string> =>
   valuePath
-    .map((item) => Object.entries(item).map(([key, value]: [string, string]) => (key === '_exists_' ? value : key)))
+    .map((item) => Object.entries(item).map(([key, value]) => (key === '_exists_' ? String(value) : key)))
     .reduce((prev, cur) => [...prev, ...cur], [])
     .reduce((prev, cur) => (prev.includes(cur) ? prev : [...prev, cur]), []);
 
@@ -53,7 +53,7 @@ const ShowDocumentsHandler =
     const mergedObject = Object.fromEntries(valuePath.flatMap(Object.entries));
     const widgetQuery = widget && widget.query ? widget.query.query_string : '';
     const valuePathQuery = Object.entries(mergedObject)
-      .map(([k, v]) => predicate(k, escape(v)))
+      .map(([k, v]) => predicate(k, escape(String(v))))
       .reduce((prev: string, next: string) => addToQuery(prev, next), '');
     const query = addToQuery(widgetQuery, valuePathQuery);
     const valuePathFields = extractFieldsFromValuePath(valuePath);
@@ -77,6 +77,6 @@ const ShowDocumentsHandler =
   };
 
 ShowDocumentsHandler.isEnabled = ({ contexts: { valuePath, widget } }) =>
-  valuePath !== undefined && widget !== undefined;
+  valuePath !== undefined && valuePath.length > 0 && widget !== undefined;
 
 export default ShowDocumentsHandler;
