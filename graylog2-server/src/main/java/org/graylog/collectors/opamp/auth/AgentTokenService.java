@@ -16,6 +16,7 @@
  */
 package org.graylog.collectors.opamp.auth;
 
+import com.google.common.base.Throwables;
 import io.jsonwebtoken.Jwts;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -26,7 +27,9 @@ import org.graylog.security.pki.PemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.security.cert.X509Certificate;
+import java.io.IOException;
+import java.security.PublicKey;
+import java.security.cert.CertificateException;
 import java.time.Clock;
 import java.util.Date;
 import java.util.Optional;
@@ -87,16 +90,10 @@ public class AgentTokenService {
                         }
 
                         // TODO performance this loads the entire collector instance document, which seems excessive
-                        final CollectorInstanceDTO collector = collectorInstanceService.findByFingerprint(fingerprint)
+                        final CollectorInstanceDTO collector = collectorInstanceService.findByActiveOrNextFingerprint(fingerprint)
                                 .orElseThrow(() -> new SecurityException("Unknown collector fingerprint"));
                         collectorRef.set(collector);
-                        try {
-                            final X509Certificate cert = PemUtils.parseCertificate(collector.activeCertificatePem());
-                            cert.checkValidity(now);
-                            return cert.getPublicKey();
-                        } catch (Exception e) {
-                            throw new SecurityException("Failed to parse collector certificate", e);
-                        }
+                        return selectPublicKey(collector, fingerprint, now);
                     })
                     .clock(() -> now)
                     .build()
@@ -109,4 +106,35 @@ public class AgentTokenService {
         }
     }
 
+    private PublicKey selectPublicKey(CollectorInstanceDTO instance, String fingerprint, Date now) {
+        final var nextCertFp = instance.nextCertificateFingerprint().orElse(null);
+
+        try {
+            // If the instance authenticates with its new certificate, activate the new one.
+            // The renewal process was successful.
+            if (fingerprint.equals(nextCertFp) && instance.nextCertificatePem().isPresent()) {
+                final var publicKey = getPublicKey(instance.nextCertificatePem().get(), now);
+                LOG.info("Activating next certificate for instance: {}", instance.instanceUid());
+                if (!collectorInstanceService.activateNextCertificate(instance)) {
+                    LOG.warn("Failed to activate next certificate for instance: {}", instance.instanceUid());
+                }
+                return publicKey;
+            }
+        } catch (SecurityException e) {
+            LOG.warn("Token validation with next certificate failed. Falling back to active certificate: {}",
+                    Throwables.getRootCause(e).getMessage());
+            // TODO: Store error message in instance document
+        }
+        return getPublicKey(instance.activeCertificatePem(), now);
+    }
+
+    private PublicKey getPublicKey(String certPem, Date now) {
+        try {
+            final var cert = PemUtils.parseCertificate(certPem);
+            cert.checkValidity(now);
+            return cert.getPublicKey();
+        } catch (IOException | CertificateException e) {
+            throw new SecurityException("Failed to parse collector certificate", e);
+        }
+    }
 }

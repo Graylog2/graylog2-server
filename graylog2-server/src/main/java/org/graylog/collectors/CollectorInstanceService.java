@@ -55,13 +55,17 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Updates.set;
 import static com.mongodb.client.model.Updates.setOnInsert;
+import static com.mongodb.client.model.Updates.unset;
+import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_ACTIVE_CERTIFICATE_EXPIRES_AT;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_ACTIVE_CERTIFICATE_FINGERPRINT;
+import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_ACTIVE_CERTIFICATE_PEM;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_CAPABILITIES;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_FLEET_ID;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_IDENTIFYING_ATTRIBUTES;
@@ -69,7 +73,9 @@ import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_INSTANCE_UID;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_LAST_PROCESSED_TXN_SEQ;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_LAST_SEEN;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_MESSAGE_SEQ_NUM;
+import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_EXPIRES_AT;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_FINGERPRINT;
+import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_PEM;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_NON_IDENTIFYING_ATTRIBUTES;
 import static org.graylog2.database.MongoEntity.FIELD_ID;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
@@ -185,6 +191,61 @@ public class CollectorInstanceService {
         return Optional.ofNullable(
                 collection.find(Filters.eq(FIELD_ACTIVE_CERTIFICATE_FINGERPRINT, fingerprint)).first()
         );
+    }
+
+    /**
+     * Finds the collector instance that has the given value as active or next fingerprint.
+     *
+     * @param fingerprint the fingerprint to look for
+     * @return the found instance or an empty optional
+     */
+    public Optional<CollectorInstanceDTO> findByActiveOrNextFingerprint(String fingerprint) {
+        return Optional.ofNullable(
+                collection.find(Filters.or(
+                        Filters.eq(FIELD_ACTIVE_CERTIFICATE_FINGERPRINT, fingerprint),
+                        Filters.eq(FIELD_NEXT_CERTIFICATE_FINGERPRINT, fingerprint)
+                )).first()
+        );
+    }
+
+    /**
+     * Sets the next certificate as active for the given instance.
+     *
+     * @param instance the instance DTO
+     * @return true if the activation succeeded, false otherwise
+     * @throws IllegalArgumentException if no next certificate exists for the instance
+     */
+    public boolean activateNextCertificate(CollectorInstanceDTO instance) {
+        final Supplier<IllegalArgumentException> err = () -> new IllegalArgumentException("Instance missing next certificate data");
+
+        final var result = collection.updateOne(Filters.eq(FIELD_INSTANCE_UID, instance.instanceUid()), combine(
+                set(FIELD_ACTIVE_CERTIFICATE_PEM, instance.nextCertificatePem().orElseThrow(err)),
+                set(FIELD_ACTIVE_CERTIFICATE_FINGERPRINT, instance.nextCertificateFingerprint().orElseThrow(err)),
+                set(FIELD_ACTIVE_CERTIFICATE_EXPIRES_AT, Date.from(instance.nextCertificateExpiresAt().orElseThrow(err))),
+                unset(FIELD_NEXT_CERTIFICATE_PEM),
+                unset(FIELD_NEXT_CERTIFICATE_FINGERPRINT),
+                unset(FIELD_NEXT_CERTIFICATE_EXPIRES_AT)
+        ));
+
+        return result.getModifiedCount() > 0;
+    }
+
+    /**
+     * Inserts the next certificate data for the given instance UID.
+     *
+     * @param instanceUid the instance UID
+     * @param fingerprint the next certificate fingerprint
+     * @param pem         the next certificate PEM
+     * @param expiresAt   the next certificate expiration date
+     * @return true if the insert succeeded, false otherwise
+     */
+    public boolean insertNextCertificate(String instanceUid, String fingerprint, String pem, Instant expiresAt) {
+        final var result = collection.updateOne(Filters.eq(FIELD_INSTANCE_UID, instanceUid), combine(
+                set(FIELD_NEXT_CERTIFICATE_PEM, pem),
+                set(FIELD_NEXT_CERTIFICATE_FINGERPRINT, fingerprint),
+                set(FIELD_NEXT_CERTIFICATE_EXPIRES_AT, Date.from(expiresAt))
+        ));
+        return result.getModifiedCount() > 0;
     }
 
     public Optional<CollectorInstanceDTO> findByInstanceUid(String instanceUid) {

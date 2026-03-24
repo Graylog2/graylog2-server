@@ -17,6 +17,8 @@
 package org.graylog.collectors.opamp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.client.model.Filters;
+import org.bson.Document;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.grn.GRNRegistry;
@@ -39,7 +41,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.mongodb.client.model.Updates.combine;
+import static com.mongodb.client.model.Updates.set;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Tests for {@link CollectorInstanceService}.
@@ -48,6 +53,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CollectorInstanceServiceTest {
 
     private CollectorInstanceService collectorInstanceService;
+    private MongoCollections mongoCollections;
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb) {
@@ -60,7 +66,7 @@ class CollectorInstanceServiceTest {
                 InputConfigurationBeanDeserializerModifier.withoutConfig()
         ).get();
 
-        final MongoCollections mongoCollections = new MongoCollections(
+        mongoCollections = new MongoCollections(
                 new MongoJackObjectMapperProvider(objectMapper),
                 mongodb.mongoConnection()
         );
@@ -210,6 +216,119 @@ class CollectorInstanceServiceTest {
         assertThat(deleted).isEqualTo(0);
     }
 
+    @Test
+    void findByActiveOrNextFingerprintMatchesActiveFingerprint() {
+        enroll(collectorInstanceService, "uid-active", "sha256:active-fp");
+
+        final Optional<CollectorInstanceDTO> found = collectorInstanceService.findByActiveOrNextFingerprint("sha256:active-fp");
+
+        assertThat(found).isPresent();
+        assertThat(found.get().instanceUid()).isEqualTo("uid-active");
+    }
+
+    @Test
+    void findByActiveOrNextFingerprintMatchesNextFingerprint() {
+        enroll(collectorInstanceService, "uid-next", "sha256:active-fp-2");
+        setNextCertificateFields("uid-next", "sha256:next-fp", "next-cert-pem",
+                Instant.now().plus(Duration.ofDays(30)));
+
+        final Optional<CollectorInstanceDTO> found = collectorInstanceService.findByActiveOrNextFingerprint("sha256:next-fp");
+
+        assertThat(found).isPresent();
+        assertThat(found.get().instanceUid()).isEqualTo("uid-next");
+        assertThat(found.get().nextCertificateFingerprint()).hasValue("sha256:next-fp");
+    }
+
+    @Test
+    void findByActiveOrNextFingerprintReturnsEmptyForUnknown() {
+        enroll(collectorInstanceService, "uid-no-match", "sha256:some-fp");
+
+        final Optional<CollectorInstanceDTO> found = collectorInstanceService.findByActiveOrNextFingerprint("sha256:unknown-fp");
+
+        assertThat(found).isEmpty();
+    }
+
+    @Test
+    void activateNextCertificatePromotesNextToActive() {
+        enroll(collectorInstanceService, "uid-activate", "sha256:old-active-fp");
+        final var nextExpiresAt = Instant.now().plus(Duration.ofDays(30));
+        setNextCertificateFields("uid-activate", "sha256:new-fp", "new-cert-pem", nextExpiresAt);
+
+        // Read back the instance with next certificate fields set
+        final var withNext = collectorInstanceService.findByInstanceUid("uid-activate").orElseThrow();
+        assertThat(collectorInstanceService.activateNextCertificate(withNext)).isTrue();
+
+        // Verify the promoted active_certificate_expires_at is a BSON Date, not a String
+        assertFieldIsDate("uid-activate", CollectorInstanceDTO.FIELD_ACTIVE_CERTIFICATE_EXPIRES_AT);
+
+        // Verify that next certificate fields are now active
+        final var updated = collectorInstanceService.findByInstanceUid("uid-activate").orElseThrow();
+        assertThat(updated.activeCertificateFingerprint()).isEqualTo("sha256:new-fp");
+        assertThat(updated.activeCertificatePem()).isEqualTo("new-cert-pem");
+        assertThat(updated.activeCertificateExpiresAt()).isEqualTo(Date.from(nextExpiresAt).toInstant());
+
+        // Next certificate fields should be cleared
+        assertThat(updated.nextCertificateFingerprint()).isEmpty();
+        assertThat(updated.nextCertificatePem()).isEmpty();
+        assertThat(updated.nextCertificateExpiresAt()).isEmpty();
+    }
+
+    @Test
+    void activateNextCertificateThrowsWhenNextFieldsMissing() {
+        final CollectorInstanceDTO enrolled = enroll(collectorInstanceService, "uid-no-next", "sha256:fp-no-next");
+
+        assertThatThrownBy(() -> collectorInstanceService.activateNextCertificate(enrolled))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void insertNextCertificateSetsNextFields() {
+        enroll(collectorInstanceService, "uid-insert-next", "sha256:active-fp");
+        final Instant nextExpiresAt = Instant.now().plus(Duration.ofDays(30));
+
+        final boolean result = collectorInstanceService.insertNextCertificate(
+                "uid-insert-next", "sha256:next-fp", "next-cert-pem", nextExpiresAt);
+
+        // Verify BSON type is Date, not String
+        assertFieldIsDate("uid-insert-next", CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_EXPIRES_AT);
+
+        assertThat(result).isTrue();
+        final var updated = collectorInstanceService.findByInstanceUid("uid-insert-next").orElseThrow();
+        assertThat(updated.nextCertificateFingerprint()).hasValue("sha256:next-fp");
+        assertThat(updated.nextCertificatePem()).hasValue("next-cert-pem");
+        assertThat(updated.nextCertificateExpiresAt()).hasValue(Date.from(nextExpiresAt).toInstant());
+        // Active certificate should remain unchanged
+        assertThat(updated.activeCertificateFingerprint()).isEqualTo("sha256:active-fp");
+    }
+
+    @Test
+    void insertNextCertificateReturnsFalseForNonExistentInstance() {
+        final boolean result = collectorInstanceService.insertNextCertificate(
+                "non-existent-uid", "sha256:next-fp", "next-cert-pem", Instant.now().plus(Duration.ofDays(30)));
+
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    void insertNextCertificateOverwritesPreviousNextFields() {
+        enroll(collectorInstanceService, "uid-overwrite-next", "sha256:active-fp");
+        final Instant firstExpiresAt = Instant.now().plus(Duration.ofDays(10));
+        final Instant secondExpiresAt = Instant.now().plus(Duration.ofDays(20));
+
+        collectorInstanceService.insertNextCertificate(
+                "uid-overwrite-next", "sha256:first-next-fp", "first-pem", firstExpiresAt);
+        collectorInstanceService.insertNextCertificate(
+                "uid-overwrite-next", "sha256:second-next-fp", "second-pem", secondExpiresAt);
+
+        // Verify BSON type is Date, not String
+        assertFieldIsDate("uid-overwrite-next", CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_EXPIRES_AT);
+
+        final var updated = collectorInstanceService.findByInstanceUid("uid-overwrite-next").orElseThrow();
+        assertThat(updated.nextCertificateFingerprint()).hasValue("sha256:second-next-fp");
+        assertThat(updated.nextCertificatePem()).hasValue("second-pem");
+        assertThat(updated.nextCertificateExpiresAt()).hasValue(Date.from(secondExpiresAt).toInstant());
+    }
+
     private static CollectorInstanceDTO enroll(CollectorInstanceService service, String instanceUid, String fingerprint) {
         return service.enroll(
                 instanceUid,
@@ -235,6 +354,29 @@ class CollectorInstanceServiceTest {
                 "507f1f77bcf86cd799439011",
                 lastSeen,
                 "000000000000000000000000"
+        );
+    }
+
+    private Optional<Document> findRawDocument(String instanceUid) {
+        return Optional.ofNullable(mongoCollections.nonEntityCollection("collector_instances", Document.class)
+                .find(Filters.eq(CollectorInstanceDTO.FIELD_INSTANCE_UID, instanceUid))
+                .first());
+    }
+
+    private void assertFieldIsDate(String instanceUid, String fieldName) {
+        assertThat(findRawDocument(instanceUid).orElseThrow().get(fieldName))
+                .isInstanceOf(Date.class);
+    }
+
+    private void setNextCertificateFields(String instanceUid, String fingerprint, String pem, Instant expiresAt) {
+        final var collection = mongoCollections.collection("collector_instances", CollectorInstanceDTO.class);
+        collection.updateOne(
+                Filters.eq(CollectorInstanceDTO.FIELD_INSTANCE_UID, instanceUid),
+                combine(
+                        set(CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_FINGERPRINT, fingerprint),
+                        set(CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_PEM, pem),
+                        set(CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_EXPIRES_AT, expiresAt)
+                )
         );
     }
 }

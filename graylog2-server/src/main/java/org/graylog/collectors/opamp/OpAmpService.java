@@ -22,6 +22,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Longs;
@@ -221,19 +223,17 @@ public class OpAmpService {
         }
 
         // 2. Extract CSR
-        if (!message.hasConnectionSettingsRequest() || !message.getConnectionSettingsRequest().hasOpamp() || !message.getConnectionSettingsRequest().getOpamp().hasCertificateRequest()) {
+        final var csrBytes = getCsr(message);
+        if (csrBytes.isEmpty()) {
             return errorResponse(message, "Missing CSR in enrollment request");
         }
 
-        final ByteString csrBytes = message.getConnectionSettingsRequest().getOpamp().getCertificateRequest().getCsr();
-        if (csrBytes.isEmpty()) {
-            return errorResponse(message, "Empty CSR");
-        }
-
         try {
+            final var collectorConfig = collectorsConfigService.getOrDefault();
+
             // 3. Sign CSR with OpAMP CA
             final CertificateEntry issuerCert = opAmpCaService.getSigningCert();
-            final X509Certificate agentCert = certificateService.builder().signCsr(csrBytes.toByteArray(), issuerCert, instanceUid, Duration.ofDays(365));
+            final X509Certificate agentCert = certificateService.builder().signCsr(csrBytes.get().toByteArray(), issuerCert, instanceUid, collectorConfig.collectorCertLifetime());
 
             // 4. Save agent record
             final String fingerprint = PemUtils.computeFingerprint(agentCert);
@@ -244,10 +244,8 @@ public class OpAmpService {
             enrollmentTokenService.incrementUsage(auth.token().id());
 
             // 5. Return certificate and connection settings
-            final var connectionSettingsBuilder = ConnectionSettingsOffers.newBuilder()
-                    .setOpamp(OpAMPConnectionSettings.newBuilder()
-                            .setHeartbeatIntervalSeconds(30)
-                            .setCertificate(TLSCertificate.newBuilder().setCert(ByteString.copyFromUtf8(certPem))));
+            final var connectionSettingsBuilder = ConnectionSettingsOffers.newBuilder();
+            setOpampConnectionSettings(connectionSettingsBuilder, certPem, collectorConfig.collectorCertLifetime());
 
             return serverToAgentBuilder(message)
                     .setConnectionSettings(connectionSettingsBuilder)
@@ -256,6 +254,33 @@ public class OpAmpService {
             LOG.error("Enrollment failed for collector {}", instanceUid, e);
             return errorResponse(message, "Enrollment failed: " + e.getMessage());
         }
+    }
+
+    private void setOpampConnectionSettings(Opamp.ConnectionSettingsOffers.Builder connectionSettingsBuilder, String certPem, Duration heartbeatInterval) {
+        connectionSettingsBuilder.setOpamp(OpAMPConnectionSettings.newBuilder()
+                .setHeartbeatIntervalSeconds(heartbeatInterval.getSeconds())
+                .setCertificate(TLSCertificate.newBuilder().setCert(ByteString.copyFromUtf8(certPem))));
+    }
+
+    /**
+     * Get the CSR byte value from the message. Returns an empty optional if the message doesn't contain a CSR,
+     * or the CSR is empty.
+     *
+     * @param message the message
+     * @return the CSR bytes or an empty optional
+     */
+    private Optional<ByteString> getCsr(AgentToServer message) {
+        if (!message.hasConnectionSettingsRequest()
+                || !message.getConnectionSettingsRequest().hasOpamp()
+                || !message.getConnectionSettingsRequest().getOpamp().hasCertificateRequest()) {
+            return Optional.empty();
+        }
+
+        final var csrBytes = message.getConnectionSettingsRequest().getOpamp().getCertificateRequest().getCsr();
+        if (csrBytes.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(csrBytes);
     }
 
     static void buildConnectionSettings(ServerToAgent.Builder builder, @Nullable OtlpExporterConfig exporterConfig) {
@@ -368,6 +393,9 @@ public class OpAmpService {
         // determine our response
         final ServerToAgent.Builder responseBuilder = serverToAgentBuilder(message);
 
+        // Don't fetch the config, we might not need it. If we need it, only get it once.
+        final var configSupplier = Suppliers.memoize(collectorsConfigService::get);
+
         LOG.debug("[{}/{}] Previously seen state {} - consecutive: {}", instanceUid, sequenceNum, previousState, seqConsecutive);
         if (!seqConsecutive) {
             // either we haven't seen messages from this collector before (which means we've just started)
@@ -389,7 +417,7 @@ public class OpAmpService {
                     instanceUid, sequenceNum, unprocessedMarkers.size(), lastProcessedTxnSeq, coalesced);
 
             // do this first. in case there's no configured endpoint we don't have to perform the more expensive stuff
-            final Optional<OtlpExporterConfig> exporterConfig = getExporterConfig();
+            final Optional<OtlpExporterConfig> exporterConfig = getExporterConfig(configSupplier);
 
             if (coalesced.recomputeIngestConfig()) {
                 // The connection settings should only be sent when they change. Not having a config is a change, too.
@@ -476,7 +504,39 @@ public class OpAmpService {
             }
         }
 
+        // Collectors send new CSRs when they need to renew their certificate.
+        getCsr(message).ifPresent(csr -> handleRenewal(responseBuilder, instanceUid, csr, configSupplier));
+
         return responseBuilder.build();
+    }
+
+    private void handleRenewal(ServerToAgent.Builder responseBuilder,
+                               String instanceUid,
+                               ByteString csr,
+                               Supplier<Optional<CollectorsConfig>> configSupplier) {
+        LOG.info("Received CSR for certificate renewal from instance: {}", instanceUid);
+        try {
+            final var config = configSupplier.get().orElse(CollectorsConfig.createDefault("localhost"));
+            final var issuer = opAmpCaService.getSigningCert();
+            final var cert = certificateService.builder().signCsr(csr.toByteArray(), issuer, instanceUid, config.collectorCertLifetime());
+
+            final var fingerprint = PemUtils.computeFingerprint(cert);
+            final var certPem = PemUtils.toPem(cert);
+            final var expiresAt = cert.getNotAfter().toInstant();
+
+            if (!collectorInstanceService.insertNextCertificate(instanceUid, fingerprint, certPem, expiresAt)) {
+                LOG.warn("Couldn't insert next certificate for instanceUid {}", instanceUid);
+                return;
+            }
+
+            LOG.info("Sending new certificate for instance: {} (fingerprint={} expires={})", instanceUid, fingerprint, expiresAt);
+            final var connectionSettingsBuilder = ConnectionSettingsOffers.newBuilder();
+            setOpampConnectionSettings(connectionSettingsBuilder, certPem, config.collectorHeartbeatInterval());
+
+            responseBuilder.setConnectionSettings(connectionSettingsBuilder.build());
+        } catch (Exception e) {
+            LOG.error("Failed to send renewal request to agent {}: {}", instanceUid, e.getMessage());
+        }
     }
 
     @WithSpan
@@ -526,8 +586,8 @@ public class OpAmpService {
     }
 
     @Nonnull
-    private Optional<OtlpExporterConfig> getExporterConfig() {
-        final CollectorsConfig collectorsConfig = collectorsConfigService.get()
+    private Optional<OtlpExporterConfig> getExporterConfig(Supplier<Optional<CollectorsConfig>> configSupplier) {
+        final CollectorsConfig collectorsConfig = configSupplier.get()
                 .orElseThrow(() -> new IllegalStateException("Unable to determine collector input config, cannot send remote config."));
         final var httpEndpoint = collectorsConfig.http();
         if (httpEndpoint == null) {
