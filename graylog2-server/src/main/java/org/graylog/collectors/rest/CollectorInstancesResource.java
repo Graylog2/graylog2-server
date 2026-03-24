@@ -52,6 +52,9 @@ import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.FleetDTO;
 import org.graylog.collectors.db.MarkerType;
+import org.graylog2.audit.AuditActor;
+import org.graylog2.audit.AuditEventSender;
+import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.filtering.ComputedFieldRegistry;
 import org.graylog2.database.filtering.DbQueryCreator;
@@ -165,6 +168,7 @@ public class CollectorInstancesResource extends RestResource {
     private final FleetTransactionLogService txnLogService;
     private final CollectorsConfigService collectorsConfigService;
     private final DbQueryCreator dbQueryCreator;
+    private final AuditEventSender auditEventSender;
 
     @Inject
     public CollectorInstancesResource(CollectorInstanceService collectorInstanceService,
@@ -172,13 +176,15 @@ public class CollectorInstancesResource extends RestResource {
                                       SourceService sourceService,
                                       ComputedFieldRegistry computedFieldRegistry,
                                       FleetTransactionLogService txnLogService,
-                                      CollectorsConfigService collectorsConfigService) {
+                                      CollectorsConfigService collectorsConfigService,
+                                      AuditEventSender auditEventSender) {
         this.collectorInstanceService = collectorInstanceService;
         this.fleetService = fleetService;
         this.sourceService = sourceService;
         this.txnLogService = txnLogService;
         this.dbQueryCreator = new DbQueryCreator(CollectorInstanceDTO.FIELD_INSTANCE_UID, ATTRIBUTES, computedFieldRegistry);
         this.collectorsConfigService = collectorsConfigService;
+        this.auditEventSender = auditEventSender;
     }
 
     @GET
@@ -255,19 +261,24 @@ public class CollectorInstancesResource extends RestResource {
     @Path("/instances/{instanceUid}")
     @Timed
     @Operation(summary = "Delete a collector instance")
-    @NoAuditEvent("TODO")
+    @NoAuditEvent("inline")
     public Response deleteInstance(
             @Parameter(name = "instanceUid", required = true) @PathParam("instanceUid") String instanceUid) {
         final Optional<CollectorInstanceDTO> collector = collectorInstanceService.findByInstanceUid(instanceUid);
         if (collector.isEmpty()) {
             throw new NotFoundException(f("Collector instance <%s> not found", instanceUid));
         }
-        checkPermission(CollectorsPermissions.FLEET_INSTANCE_DELETE, collector.get().fleetId());
+        final CollectorInstanceDTO dto = collector.get();
+        checkPermission(CollectorsPermissions.FLEET_INSTANCE_DELETE, dto.fleetId());
 
         final boolean deleted = collectorInstanceService.deleteByInstanceUid(instanceUid);
         if (!deleted) {
             throw new NotFoundException(f("Collector instance <%s> not found", instanceUid));
         }
+        auditEventSender.success(AuditActor.user(getCurrentUser()), AuditEventTypes.COLLECTOR_INSTANCE_DELETE, Map.of(
+                "instanceUid", instanceUid,
+                "fleetId", dto.fleetId()
+        ));
         return Response.noContent().build();
     }
 
@@ -275,7 +286,7 @@ public class CollectorInstancesResource extends RestResource {
     @Path("/instances/reassign")
     @Timed
     @Operation(summary = "Reassign collector instances to a different fleet")
-    @NoAuditEvent("TODO")
+    @NoAuditEvent("inline")
     public Response reassignInstances(@Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) ReassignCollectorsRequest request) {
         final String targetFleetId = request.fleetId();
         final Set<String> instanceUids = request.instanceUids();
@@ -294,10 +305,10 @@ public class CollectorInstancesResource extends RestResource {
             throw new NotFoundException(f("Target fleet <%s> not found", targetFleetId));
         }
 
-        final Set<String> permittedInstanceUids = collectorInstanceService.findByInstanceUids(instanceUids,
-                        instanceDTO -> isPermitted(CollectorsPermissions.FLEET_READ, instanceDTO.fleetId())
-                                && isPermitted(CollectorsPermissions.FLEET_INSTANCE_ASSIGN, instanceDTO.fleetId()))
-                .values().stream()
+        final Map<String, CollectorInstanceDTO> permittedInstances = collectorInstanceService.findByInstanceUids(instanceUids,
+                instanceDTO -> isPermitted(CollectorsPermissions.FLEET_READ, instanceDTO.fleetId())
+                        && isPermitted(CollectorsPermissions.FLEET_INSTANCE_ASSIGN, instanceDTO.fleetId()));
+        final Set<String> permittedInstanceUids = permittedInstances.values().stream()
                 .map(CollectorInstanceDTO::instanceUid)
                 .collect(Collectors.toSet());
 
@@ -307,6 +318,13 @@ public class CollectorInstancesResource extends RestResource {
                 MarkerType.FLEET_REASSIGNED,
                 new Document("new_fleet_id", targetFleetId));
 
+        final AuditActor auditActor = AuditActor.user(getCurrentUser());
+        permittedInstances.values().forEach(dto ->
+                auditEventSender.success(auditActor, AuditEventTypes.COLLECTOR_INSTANCE_REASSIGN, Map.of(
+                        "instanceUid", dto.instanceUid(),
+                        "fleetId", dto.fleetId(),
+                        "targetFleetId", targetFleetId
+                )));
         return Response.noContent().build();
     }
 

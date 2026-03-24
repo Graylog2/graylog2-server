@@ -42,6 +42,10 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.collectors.CollectorsPermissions;
 import org.graylog.collectors.SourceService;
 import org.graylog.collectors.db.SourceDTO;
+import org.graylog2.audit.AuditActor;
+import org.graylog2.audit.AuditEventSender;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.SortOrder;
@@ -54,6 +58,8 @@ import org.graylog2.shared.rest.resources.RestResource;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @Tag(name = "Collectors/Sources")
 @Path("/collectors/fleets/{fleetId}/sources")
@@ -74,10 +80,12 @@ public class SourceResource extends RestResource {
             .build();
 
     private final SourceService sourceService;
+    private final AuditEventSender auditEventSender;
 
     @Inject
-    public SourceResource(SourceService sourceService) {
+    public SourceResource(SourceService sourceService, AuditEventSender auditEventSender) {
         this.sourceService = sourceService;
+        this.auditEventSender = auditEventSender;
     }
 
     @GET
@@ -120,7 +128,6 @@ public class SourceResource extends RestResource {
             @Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId,
             @Parameter(name = "sourceId", required = true) @PathParam("sourceId") String sourceId) {
         checkPermission(CollectorsPermissions.FLEET_READ, fleetId);
-        // TODO: audit event
         return sourceService.get(fleetId, sourceId)
                 .map(SourceResponse::fromDTO)
                 .orElseThrow(() -> new NotFoundException("Source " + sourceId + " not found"));
@@ -129,8 +136,7 @@ public class SourceResource extends RestResource {
     @POST
     @Timed
     @Operation(summary = "Create a new source in a fleet")
-    // TODO: audit event
-    @NoAuditEvent("todo")
+    @AuditEvent(type = AuditEventTypes.COLLECTOR_SOURCE_CREATE)
     public Response create(
             @Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId,
             @Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) CreateSourceRequest request) {
@@ -141,7 +147,7 @@ public class SourceResource extends RestResource {
         } catch (IllegalArgumentException e) {
             if (e.getMessage() != null && e.getMessage().contains("already exists")) {
                 return Response.status(Response.Status.CONFLICT)
-                        .entity(java.util.Map.of("message", e.getMessage()))
+                        .entity(Map.of("message", e.getMessage()))
                         .build();
             }
             throw new BadRequestException(e.getMessage(), e);
@@ -157,14 +163,12 @@ public class SourceResource extends RestResource {
     @Path("/{sourceId}")
     @Timed
     @Operation(summary = "Update a source")
-    // TODO: audit event
-    @NoAuditEvent("todo")
+    @AuditEvent(type = AuditEventTypes.COLLECTOR_SOURCE_UPDATE)
     public Response update(
             @Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId,
             @Parameter(name = "sourceId", required = true) @PathParam("sourceId") String sourceId,
             @Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) UpdateSourceRequest request) {
         checkPermission(CollectorsPermissions.SOURCE_EDIT, fleetId);
-        // TODO: audit event
         try {
             return sourceService.update(fleetId, sourceId, request.name(), request.description(), request.enabled(), request.config())
                     .map(SourceResponse::fromDTO)
@@ -173,7 +177,7 @@ public class SourceResource extends RestResource {
         } catch (IllegalArgumentException e) {
             if (e.getMessage() != null && e.getMessage().contains("already exists")) {
                 return Response.status(Response.Status.CONFLICT)
-                        .entity(java.util.Map.of("message", e.getMessage()))
+                        .entity(Map.of("message", e.getMessage()))
                         .build();
             }
             throw new BadRequestException(e.getMessage(), e);
@@ -184,15 +188,20 @@ public class SourceResource extends RestResource {
     @Path("/{sourceId}")
     @Timed
     @Operation(summary = "Delete a source")
-    // TODO: audit event
-    @NoAuditEvent("todo")
+    @NoAuditEvent("inline")
     public void delete(
             @Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId,
             @Parameter(name = "sourceId", required = true) @PathParam("sourceId") String sourceId) {
         checkPermission(CollectorsPermissions.SOURCE_DELETE, fleetId);
-        // TODO: audit event
+        final var source = sourceService.get(fleetId, sourceId)
+                .orElseThrow(() -> new NotFoundException("Source " + sourceId + " not found"));
         if (!sourceService.delete(fleetId, sourceId)) {
             throw new NotFoundException("Source " + sourceId + " not found");
         }
+        auditEventSender.success(AuditActor.user(getCurrentUser()), AuditEventTypes.COLLECTOR_SOURCE_DELETE, Map.of(
+                "sourceId", Objects.requireNonNull(source.id()),
+                "fleetId", fleetId,
+                "name", source.name()
+        ));
     }
 }

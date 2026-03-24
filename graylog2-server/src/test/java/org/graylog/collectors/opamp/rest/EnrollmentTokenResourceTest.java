@@ -26,10 +26,11 @@ import org.graylog.collectors.db.EnrollmentTokenCreator;
 import org.graylog.collectors.db.EnrollmentTokenDTO;
 import org.graylog.collectors.db.FleetDTO;
 import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
+import org.graylog2.audit.NullAuditEventSender;
+import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.ComputedFieldRegistry;
 import org.graylog2.database.filtering.DbSortResolver;
-import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.security.WithAuthorization;
 import org.graylog2.security.WithAuthorizationExtension;
 import org.junit.jupiter.api.BeforeEach;
@@ -68,8 +69,8 @@ class EnrollmentTokenResourceTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        resource = new EnrollmentTokenResource(
-                enrollmentTokenService, collectorsConfigService, fleetService, mock(ComputedFieldRegistry.class));
+        resource = new EnrollmentTokenResource(enrollmentTokenService, collectorsConfigService, fleetService,
+                mock(ComputedFieldRegistry.class), new NullAuditEventSender());
     }
 
     @Test

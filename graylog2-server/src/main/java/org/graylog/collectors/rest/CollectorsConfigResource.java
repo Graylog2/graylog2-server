@@ -46,7 +46,8 @@ import org.graylog.collectors.db.MarkerType;
 import org.graylog.collectors.input.CollectorIngestHttpInput;
 import org.graylog.collectors.opamp.OpAmpCaService;
 import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
-import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.validators.ValidationResult;
@@ -107,7 +108,7 @@ public class CollectorsConfigResource extends RestResource {
         });
     }
 
-    @NoAuditEvent("TODO")
+    @AuditEvent(type = AuditEventTypes.COLLECTORS_CONFIG_UPDATE)
     @PUT
     @Operation(summary = "Update collectors configuration")
     @RequiresPermissions(CollectorsPermissions.CONFIGURATION_EDIT)

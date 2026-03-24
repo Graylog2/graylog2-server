@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -49,6 +50,10 @@ import org.graylog.collectors.db.EnrollmentTokenCreator;
 import org.graylog.collectors.db.EnrollmentTokenDTO;
 import org.graylog.collectors.db.FleetDTO;
 import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
+import org.graylog2.audit.AuditActor;
+import org.graylog2.audit.AuditEventSender;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.filtering.ComputedFieldRegistry;
 import org.graylog2.database.filtering.DbQueryCreator;
@@ -63,7 +68,10 @@ import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.rest.resources.RestResource;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -119,22 +127,24 @@ public class EnrollmentTokenResource extends RestResource {
     private final CollectorsConfigService collectorsConfigService;
     private final FleetService fleetService;
     private final DbQueryCreator dbQueryCreator;
+    private final AuditEventSender auditEventSender;
 
     @Inject
     public EnrollmentTokenResource(EnrollmentTokenService enrollmentTokenService,
                                    CollectorsConfigService collectorsConfigService,
                                    FleetService fleetService,
-                                   ComputedFieldRegistry computedFieldRegistry) {
+                                   ComputedFieldRegistry computedFieldRegistry,
+                                   AuditEventSender auditEventSender) {
         this.enrollmentTokenService = enrollmentTokenService;
         this.collectorsConfigService = collectorsConfigService;
         this.fleetService = fleetService;
         this.dbQueryCreator = new DbQueryCreator(EnrollmentTokenDTO.FIELD_NAME, ATTRIBUTES, computedFieldRegistry);
+        this.auditEventSender = auditEventSender;
     }
 
-    // TODO: Add @AuditEvent for security audit logging of token creation
-    @NoAuditEvent("TODO")
     @POST
     @Operation(summary = "Create an enrollment token for OpAMP agents")
+    @AuditEvent(type = AuditEventTypes.OPAMP_ENROLLMENT_TOKEN_CREATE)
     public EnrollmentTokenResponse createToken(
             @RequestBody(description = "Enrollment token creation request")
             @Valid @NotNull CreateEnrollmentTokenRequest request) {
@@ -178,11 +188,10 @@ public class EnrollmentTokenResource extends RestResource {
                 sort, order, list.stream().toList(), ATTRIBUTES, DEFAULTS);
     }
 
-    // TODO: Add @AuditEvent for security audit logging of token deletion
-    @NoAuditEvent("TODO")
     @DELETE
     @Path("/{tokenId}")
     @Operation(summary = "Delete an enrollment token")
+    @NoAuditEvent("inline")
     public Response delete(@Parameter(name = "tokenId", required = true) @PathParam("tokenId") String tokenId) {
         if (!ObjectId.isValid(tokenId)) {
             throw new BadRequestException("Invalid token ID format");
@@ -192,21 +201,25 @@ public class EnrollmentTokenResource extends RestResource {
         if (token.isEmpty()) {
             throw new NotFoundException("Enrollment token not found");
         }
-        checkPermission(CollectorsPermissions.FLEET_INSTANCE_ASSIGN, token.get().fleetId());
+        final EnrollmentTokenDTO dto = token.get();
+        checkPermission(CollectorsPermissions.FLEET_INSTANCE_ASSIGN, dto.fleetId());
 
         if (!enrollmentTokenService.delete(tokenId)) {
             throw new NotFoundException("Enrollment token not found");
         }
+        auditEventSender.success(getAuditActor(), AuditEventTypes.OPAMP_ENROLLMENT_TOKEN_DELETE, Map.of(
+                "tokenId", Objects.requireNonNull(dto.id()),
+                "name", dto.name(),
+                "expiresAt", Objects.requireNonNull(dto.expiresAt()),
+                "fleetId", dto.fleetId()
+        ));
         return Response.noContent().build();
     }
 
-    // TODO: Add @AuditEvent for security audit logging of bulk token deletion
-    // TODO: Add fleet-aware authorization — check caller's access to each token's fleet before deleting.
-    //       Partition IDs into allowed/denied, delete only allowed, return denied as failures in BulkOperationResponse.
-    @NoAuditEvent("TODO")
     @POST
     @Path("/bulk_delete")
     @Operation(summary = "Bulk delete enrollment tokens")
+    @NoAuditEvent("inline for bulk")
     public BulkOperationResponse bulkDelete(
             @RequestBody(description = "Token IDs to delete")
             @NotNull final BulkOperationRequest request) {
@@ -214,12 +227,30 @@ public class EnrollmentTokenResource extends RestResource {
             throw new BadRequestException("No IDs provided in the request");
         }
         try (Stream<EnrollmentTokenDTO> stream = enrollmentTokenService.findByIds(request.entityIds())) {
+            // we need to create the proper audit contexts for each delete event
+            final List<Map<String, Object>> auditContexts = new ArrayList<>();
             final List<String> permittedIds =
                     stream.filter(dto -> isPermitted(CollectorsPermissions.FLEET_INSTANCE_ASSIGN, dto.fleetId()))
+                            .peek(dto -> auditContexts.add(Map.of(
+                                    "tokenId", Objects.requireNonNull(dto.id()),
+                                    "name", dto.name(),
+                                    "expiresAt", Objects.requireNonNull(dto.expiresAt()),
+                                    "fleetId", dto.fleetId()
+                                    )))
                             .map(EnrollmentTokenDTO::id)
                             .toList();
             final long deleted = enrollmentTokenService.deleteMany(permittedIds);
+
+            // after deletion worked, send audit events for each bulk item
+            final AuditActor auditActor = getAuditActor();
+            auditContexts.forEach(context -> auditEventSender.success(auditActor, AuditEventTypes.OPAMP_ENROLLMENT_TOKEN_DELETE, context));
+
             return new BulkOperationResponse(Ints.saturatedCast(deleted), List.of());
         }
+    }
+
+    @Nonnull
+    private AuditActor getAuditActor() {
+        return AuditActor.user(getCurrentUser());
     }
 }

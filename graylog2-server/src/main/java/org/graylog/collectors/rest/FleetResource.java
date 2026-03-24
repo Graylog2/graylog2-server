@@ -50,6 +50,10 @@ import org.graylog.collectors.CollectorsPermissions;
 import org.graylog.collectors.FleetService;
 import org.graylog.collectors.SourceService;
 import org.graylog.collectors.db.FleetDTO;
+import org.graylog2.audit.AuditActor;
+import org.graylog2.audit.AuditEventSender;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.SortOrder;
@@ -65,6 +69,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 @Tag(name = "Collectors/Fleets")
 @Path("/collectors/fleets")
@@ -86,14 +91,17 @@ public class FleetResource extends RestResource {
     private final CollectorInstanceService instanceService;
     private final SourceService sourceService;
     private final CollectorsConfigService collectorsConfigService;
+    private final AuditEventSender auditEventSender;
 
     @Inject
     public FleetResource(FleetService fleetService, CollectorInstanceService instanceService,
-                         SourceService sourceService, CollectorsConfigService collectorsConfigService) {
+                         SourceService sourceService, CollectorsConfigService collectorsConfigService,
+                         AuditEventSender auditEventSender) {
         this.fleetService = fleetService;
         this.instanceService = instanceService;
         this.sourceService = sourceService;
         this.collectorsConfigService = collectorsConfigService;
+        this.auditEventSender = auditEventSender;
     }
 
     @GET
@@ -133,7 +141,6 @@ public class FleetResource extends RestResource {
     @Operation(summary = "Get a single fleet")
     public FleetResponse get(@Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId) {
         checkPermission(CollectorsPermissions.FLEET_READ, fleetId);
-        // TODO: audit event
         return fleetService.get(fleetId)
                 .map(FleetResponse::fromDTO)
                 .orElseThrow(() -> new NotFoundException("Fleet " + fleetId + " not found"));
@@ -190,8 +197,7 @@ public class FleetResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "The newly created fleet", content = @Content(schema = @Schema(implementation = FleetResponse.class))),
     })
-    // TODO: audit event
-    @NoAuditEvent("todo")
+    @AuditEvent(type = AuditEventTypes.COLLECTOR_FLEET_CREATE)
     public Response create(@Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) CreateFleetRequest request) {
         final FleetDTO created = fleetService.create(request.name(), request.description(), request.targetVersion());
         final FleetResponse response = FleetResponse.fromDTO(created);
@@ -204,8 +210,7 @@ public class FleetResource extends RestResource {
     @Path("/{fleetId}")
     @Timed
     @Operation(summary = "Update a fleet")
-    // TODO: audit event
-    @NoAuditEvent("todo")
+    @AuditEvent(type = AuditEventTypes.COLLECTOR_FLEET_UPDATE)
     public FleetResponse update(@Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId,
                                 @Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) UpdateFleetRequest request) {
         checkPermission(CollectorsPermissions.FLEET_EDIT, fleetId);
@@ -218,14 +223,18 @@ public class FleetResource extends RestResource {
     @Path("/{fleetId}")
     @Timed
     @Operation(summary = "Delete a fleet")
-    // TODO: audit event
-    @NoAuditEvent("todo")
+    @NoAuditEvent("inline")
     public void delete(@Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId) {
         checkPermission(CollectorsPermissions.FLEET_DELETE, fleetId);
-        // TODO should this fail if there are still collectors using it? should a replacement fleed be required?
+        final var fleet = fleetService.get(fleetId)
+                .orElseThrow(() -> new NotFoundException("Fleet " + fleetId + " not found"));
         if (!fleetService.delete(fleetId)) {
             throw new NotFoundException("Fleet " + fleetId + " not found");
         }
+        auditEventSender.success(AuditActor.user(getCurrentUser()), AuditEventTypes.COLLECTOR_FLEET_DELETE, Map.of(
+                "fleetId", fleetId,
+                "name", fleet.name()
+        ));
     }
 
     private Duration getOfflineThreshold() {
