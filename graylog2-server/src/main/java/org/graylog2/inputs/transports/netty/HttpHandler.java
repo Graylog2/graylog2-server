@@ -63,8 +63,13 @@ public class HttpHandler extends SimpleChannelInboundHandler<HttpRequest> {
         final HttpVersion httpRequestVersion = request.protocolVersion();
         final String origin = request.headers().get(HttpHeaderNames.ORIGIN);
 
+        // Handle CORS preflight before auth — browsers send OPTIONS without credentials.
+        if (HttpMethod.OPTIONS.equals(request.method())) {
+            writeResponse(channel, keepAlive, httpRequestVersion, HttpResponseStatus.OK, origin);
+            return;
+        }
+
         if (isNotBlank(authorizationHeader)) {
-            // Authentication is required.
             final String suppliedAuthHeaderValue = request.headers().get(authorizationHeader);
             if (isBlank(suppliedAuthHeaderValue) || !suppliedAuthHeaderValue.equals(authorizationHeaderValue)) {
                 writeResponse(channel, keepAlive, httpRequestVersion, HttpResponseStatus.UNAUTHORIZED, origin);
@@ -72,11 +77,7 @@ public class HttpHandler extends SimpleChannelInboundHandler<HttpRequest> {
             }
         }
 
-        // to allow for future changes, let's be at least a little strict in what we accept here.
-        if (HttpMethod.OPTIONS.equals(request.method())) {
-            writeResponse(channel, keepAlive, httpRequestVersion, HttpResponseStatus.OK, origin);
-            return;
-        } else if (!HttpMethod.POST.equals(request.method())) {
+        if (!HttpMethod.POST.equals(request.method())) {
             writeResponse(channel, keepAlive, httpRequestVersion, HttpResponseStatus.METHOD_NOT_ALLOWED, origin);
             return;
         }

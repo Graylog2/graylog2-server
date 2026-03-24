@@ -265,6 +265,26 @@ class OTelHttpHandlerTest {
     }
 
     @Test
+    void optionsPreflightSucceedsEvenWithAuthConfigured() {
+        final EmbeddedChannel channel = createChannel(true, "Authorization", "Bearer secret");
+
+        final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
+                HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, "/v1/logs");
+        httpRequest.headers().set(HttpHeaderNames.CONTENT_LENGTH, 0);
+        httpRequest.headers().set(HttpHeaderNames.ORIGIN, "http://example.com");
+        // No Authorization header — browser preflight doesn't send credentials
+
+        channel.writeInbound(httpRequest);
+
+        final FullHttpResponse response = channel.readOutbound();
+        assertThat(response.status()).isEqualTo(HttpResponseStatus.OK);
+        assertThat(response.headers().get(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN))
+                .isEqualTo("http://example.com");
+        verifyNoInteractions(input);
+        response.release();
+    }
+
+    @Test
     void optionsRequestReturns200() {
         final EmbeddedChannel channel = createChannel(true, null, null);
 
