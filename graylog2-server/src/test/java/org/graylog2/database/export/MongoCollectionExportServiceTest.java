@@ -37,7 +37,11 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 
 
 @ExtendWith(MongoDBExtension.class)
@@ -55,6 +59,7 @@ class MongoCollectionExportServiceTest {
 
     @BeforeEach
     void setUp(MongoDBTestService mongoDBTestService) {
+        lenient().doReturn(true).when(permissionsUtils).areAllFieldsReadable(anyString(), any());
         final MongoConnection mongoConnection = mongoDBTestService.mongoConnection();
         toTest = new MongoCollectionExportService(mongoConnection, permissionsUtils);
         collection = mongoConnection.getMongoDatabase().getCollection(TEST_COLLECTION_NAME);
@@ -160,5 +165,50 @@ class MongoCollectionExportServiceTest {
         doReturn((Predicate<Document>) document -> docId.equals(document.get(EntityPermissionsUtils.ID_FIELD).toString()))
                 .when(permissionsUtils)
                 .createPermissionCheck(subject, TEST_COLLECTION_NAME);
+    }
+
+    @Test
+    void returnsEmptyListWhenExportedFieldIsNotReadable() {
+        insertTestData();
+        doReturn(false).when(permissionsUtils).areAllFieldsReadable(eq(TEST_COLLECTION_NAME), any());
+
+        final List<Document> result = toTest.export(TEST_COLLECTION_NAME,
+                List.of("name", "secret_field"),
+                10,
+                Filters.empty(),
+                List.of(),
+                subject);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void returnsResultsWhenAllFieldsAreReadableAndUserIsAdmin() {
+        insertTestData();
+        simulateAdminUser();
+
+        final List<Document> result = toTest.export(TEST_COLLECTION_NAME,
+                List.of("name"),
+                10,
+                Filters.empty(),
+                List.of(),
+                subject);
+
+        assertThat(result).isNotEmpty();
+    }
+
+    @Test
+    void returnsResultsWhenAllFieldsAreReadableAndUserIsNotAdmin() {
+        insertTestData();
+        simulateUserThatCanSeeOnlyOneDoc("0000000000000000000000c7");
+
+        final List<Document> result = toTest.export(TEST_COLLECTION_NAME,
+                List.of("name"),
+                10,
+                Filters.empty(),
+                List.of(),
+                subject);
+
+        assertThat(result).isNotEmpty();
     }
 }
