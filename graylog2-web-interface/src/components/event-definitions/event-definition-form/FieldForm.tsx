@@ -271,7 +271,14 @@ class FieldForm extends React.Component<
             </ControlLabel>
             <InputGroup>
               <InputGroup.Addon>
-                <input id="is-key" name="is-key" type="checkbox" onChange={this.toggleKey} checked={isKey} />
+                <input
+                  id="is-key"
+                  name="is-key"
+                  type="checkbox"
+                  aria-label="Use Field as Event Key"
+                  onChange={this.toggleKey}
+                  checked={isKey}
+                />
               </InputGroup.Addon>
               <FormControl
                 id="field-key"

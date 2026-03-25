@@ -29,12 +29,7 @@ jest.mock('logic/telemetry/useSendTelemetry');
 
 jest.mock('logic/telemetry/withTelemetry', () => ({
   __esModule: true,
-  default: (Component: React.FC) => (props: any) => (
-    <Component
-      {...props}
-      sendTelemetry={() => {}}
-    />
-  ),
+  default: (Component: React.FC) => (props: any) => <Component {...props} sendTelemetry={() => {}} />,
 }));
 
 describe('FieldForm', () => {
