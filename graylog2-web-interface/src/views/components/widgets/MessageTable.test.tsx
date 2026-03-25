@@ -58,7 +58,6 @@ const SimpleMessageTable = (props: Partial<Pick<React.ComponentProps<typeof Mess
   <SelectableMessageTableMessagesProvider displayBulkSelectCol={false} messages={messages}>
     <MessageTableSelectedEntitiesProvider bulkSelection={null}>
       <MessageTable
-
         config={config}
         fields={Immutable.List(fields)}
         messages={messages}
