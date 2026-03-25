@@ -14,15 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { ActionHandlerArguments } from 'views/components/actions/ActionHandler';
+import type { ResolvedActionHandlerArguments } from 'views/components/actions/ActionHandler';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
-import type { GetState } from 'views/types';
+import type { GetState, AdditionalViewsActionHandlerArguments } from 'views/types';
 import { selectWidgets } from 'views/logic/slices/viewSelectors';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import { updateWidgets } from 'views/logic/slices/widgetActions';
 
 const RemoveFromAllTablesActionHandler =
-  ({ field }: ActionHandlerArguments<{}>) =>
+  ({ field }: ResolvedActionHandlerArguments<AdditionalViewsActionHandlerArguments>) =>
   (dispatch: ViewsDispatch, getState: GetState) => {
     const widgets = selectWidgets(getState());
     const newWidgets = widgets

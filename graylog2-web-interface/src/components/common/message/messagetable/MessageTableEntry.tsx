@@ -34,10 +34,14 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { TableDataCell } from 'views/components/datatable';
 import MessageDetail from 'components/common/message/details/MessageDetail';
 import DecoratedValue from 'views/components/messagelist/decoration/DecoratedValue';
-import type { Message } from 'views/components/messagelist/Types';
+import type { BackendMessage, Message } from 'views/components/messagelist/Types';
 import CustomHighlighting from 'views/components/highlighting/CustomHighlighting';
 import TypeSpecificValue from 'views/components/TypeSpecificValue';
 import HighlightMessageContext from 'views/components/contexts/HighlightMessageContext';
+import { toSelectableMessageTableEntry } from 'views/components/widgets/MessageTableSelectedEntitiesProvider';
+import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
+import BulkSelectCell from 'components/common/message/messagetable/BulkSelectCell';
+import useSelectedMessageEntities from 'views/hooks/useSelectedMessageEntities';
 
 import MessagePreview from './MessagePreview';
 
@@ -79,6 +83,12 @@ const FieldsRow = styled.tr`
   }
 `;
 
+const ActionsCell = styled(TableDataCell)`
+  width: 1%;
+  white-space: nowrap;
+  text-align: right;
+`;
+
 const MessageDetailRow = styled.tr`
   td {
     padding-top: 5px;
@@ -101,9 +111,12 @@ type Props = {
   expanded: boolean;
   fields: FieldTypeMappingsList;
   message: Message;
+  rowActions?: React.ReactNode;
   selectedFields?: Immutable.OrderedSet<string>;
   showMessageRow?: boolean;
   toggleDetail: (messageId: string) => void;
+  displayBulkSelectCol?: boolean;
+  isEntitySelectable?: (entity: BackendMessage) => boolean;
 };
 
 const isDecoratedField = (field: string | number, decorationStats: Message['decoration_stats']) =>
@@ -118,6 +131,31 @@ const fieldType = (fieldName: string, { decoration_stats: decorationStats }: Mes
 const Strong = ({ children = undefined, strong }: React.PropsWithChildren<{ strong: boolean }>) =>
   strong ? <strong>{children}</strong> : <>{children}</>;
 
+const RowBulkCheckbox = ({
+  message,
+  isEntitySelectable = () => false,
+}: {
+  message: Message;
+  isEntitySelectable?: (entity: BackendMessage) => boolean;
+}) => {
+  const { toggleEntitySelect, isEntitySelected } = useSelectedMessageEntities();
+  const isSelected = isEntitySelected(message.index, message.id);
+  const checkboxTitle = `${isSelected ? 'Deselect' : 'Select'} message`;
+  const isSelectDisabled = !isEntitySelectable(toSelectableMessageTableEntry(message));
+
+  return (
+    <BulkSelectCell>
+      <RowCheckbox
+        onChange={() => toggleEntitySelect(message.index, message.id)}
+        title={!isSelectDisabled ? checkboxTitle : undefined}
+        checked={isSelected}
+        disabled={isSelectDisabled}
+        aria-label={checkboxTitle}
+      />
+    </BulkSelectCell>
+  );
+};
+
 const MessageTableEntry = ({
   config,
   disableSurroundingSearch = false,
@@ -125,13 +163,17 @@ const MessageTableEntry = ({
   expanded,
   fields,
   message,
+  rowActions = undefined,
   showMessageRow = false,
   selectedFields = Immutable.OrderedSet<string>(),
   toggleDetail,
+  displayBulkSelectCol = false,
+  isEntitySelectable = () => false,
 }: Props) => {
   const { inputs: inputsList = [] } = useStore(InputsStore);
   const { streams: streamsList = [] } = useStore(StreamsStore);
   const highlightMessageId = useContext(HighlightMessageContext);
+
   const sendTelemetry = useSendTelemetry();
   const additionalContextValue = useMemo(() => ({ message }), [message]);
   const allStreams = useMemo(() => Immutable.List<Stream>(streamsList), [streamsList]);
@@ -157,7 +199,7 @@ const MessageTableEntry = ({
     }
   }, [message.id, message.index, sendTelemetry, toggleDetail]);
 
-  const colSpanFixup = selectedFields.size + 1;
+  const colSpanFixup = selectedFields.size + 1 + (rowActions ? 1 : 0) + (displayBulkSelectCol ? 1 : 0);
 
   const selectedFieldsList = useMemo(
     () =>
@@ -192,7 +234,9 @@ const MessageTableEntry = ({
     <AdditionalContext.Provider value={additionalContextValue}>
       <TableBody $expanded={expanded} $highlighted={message.id === highlightMessageId}>
         <FieldsRow onClick={_toggleDetail} className="table-data-row">
+          {displayBulkSelectCol && <RowBulkCheckbox message={message} isEntitySelectable={isEntitySelectable} />}
           {selectedFieldsList}
+          {rowActions && <ActionsCell $isNumeric={false}>{rowActions}</ActionsCell>}
         </FieldsRow>
 
         <MessagePreview
@@ -202,6 +246,7 @@ const MessageTableEntry = ({
           messageFieldType={messageFieldType}
           onRowClick={_toggleDetail}
           message={message}
+          displayBulkSelectCol={displayBulkSelectCol}
         />
 
         {expanded && (

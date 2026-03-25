@@ -15,16 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect } from 'react';
 
 import AppConfig from 'util/AppConfig';
 import { Spinner } from 'components/common';
 import { IndexSetConfigurationForm } from 'components/indices';
-import { useStore } from 'stores/connect';
 import Routes from 'routing/Routes';
 import { IndexSetsActions } from 'stores/indices/IndexSetsStore';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
 import SelectIndexSetTemplateModal from 'components/indices/IndexSetTemplates/SelectIndexSetTemplateModal';
 import { adjustFormat } from 'util/DateTime';
 import useHistory from 'routing/useHistory';
@@ -32,6 +29,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted } from 'util/PermissionsMixin';
+import useIndicesConfiguration from 'hooks/useIndicesConfiguration';
 
 type Props = {
   showSelectTemplateModal: boolean;
@@ -42,14 +40,9 @@ const CreateIndexSet = ({ showSelectTemplateModal, setShowSelectTemplateModal }:
   const isCloud = AppConfig.isCloud();
   const history = useHistory();
   const sendTelemetry = useSendTelemetry();
-  const { retentionStrategies, rotationStrategies, retentionStrategiesContext } = useStore(IndicesConfigurationStore);
+  const { retentionStrategies, rotationStrategies, retentionStrategiesContext } = useIndicesConfiguration();
 
   const currentUser = useCurrentUser();
-
-  useEffect(() => {
-    IndicesConfigurationActions.loadRotationStrategies();
-    IndicesConfigurationActions.loadRetentionStrategies();
-  }, []);
 
   const _saveConfiguration = (indexSetItem: IndexSet) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDICES.INDEX_SET_CREATED, {
