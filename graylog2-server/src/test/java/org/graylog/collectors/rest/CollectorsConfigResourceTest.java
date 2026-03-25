@@ -32,6 +32,7 @@ import org.graylog.collectors.TokenSigningKey;
 import org.graylog.collectors.db.MarkerType;
 import org.graylog.collectors.input.CollectorIngestHttpInput;
 import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
+import org.graylog.security.pki.CertificateEntry;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.validators.ValidationResult;
@@ -146,7 +147,7 @@ class CollectorsConfigResourceTest {
 
         resource.put(request);
 
-        verify(collectorCaService).ensureInitialized();
+        verify(collectorCaService).initializeCa();
         verify(collectorLogsDestinationService).ensureExists();
     }
 
@@ -329,9 +330,7 @@ class CollectorsConfigResourceTest {
                 .build();
 
         when(collectorsConfigService.get()).thenReturn(Optional.of(existingConfig));
-        when(collectorCaService.getCaCertId()).thenReturn("ca-id");
-        when(collectorCaService.getSigningCertId()).thenReturn("signing-cert-id");
-        when(collectorCaService.getOtlpServerCertId()).thenReturn("otlp-id");
+        stubInitAndLoad();
 
         final var request = new CollectorsConfigRequest(
                 new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14401),
@@ -359,9 +358,20 @@ class CollectorsConfigResourceTest {
     }
 
     private void stubCaService() {
-        when(collectorsConfigService.get()).thenReturn(Optional.empty());
-        when(collectorCaService.getCaCertId()).thenReturn("ca-id");
-        when(collectorCaService.getSigningCertId()).thenReturn("signing-cert-id");
-        when(collectorCaService.getOtlpServerCertId()).thenReturn("otlp-id");
+        lenient().when(collectorsConfigService.get()).thenReturn(Optional.empty());
+        stubInitAndLoad();
+    }
+
+    private void stubInitAndLoad() {
+        final var caCert = mock(CertificateEntry.class);
+        final var signingCert = mock(CertificateEntry.class);
+        final var otlpServerCert = mock(CertificateEntry.class);
+        final var hierarchy = new CollectorCaService.CaHierarchy(caCert, signingCert, otlpServerCert);
+
+        lenient().when(caCert.id()).thenReturn("ca-id");
+        lenient().when(signingCert.id()).thenReturn("signing-cert-id");
+        lenient().when(otlpServerCert.id()).thenReturn("otlp-id");
+        lenient().when(collectorCaService.initializeCa()).thenReturn(hierarchy);
+        lenient().when(collectorCaService.loadHierarchy()).thenReturn(hierarchy);
     }
 }

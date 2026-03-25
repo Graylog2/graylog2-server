@@ -23,7 +23,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.KeyUsage;
-import org.graylog.collectors.rest.CollectorsConfigResource;
 import org.graylog.security.pki.Algorithm;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
@@ -37,7 +36,7 @@ import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.List;
 
-import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * Service for managing the Collectors CA hierarchy and providing certificate accessors.
@@ -46,13 +45,10 @@ import static java.util.Objects.nonNull;
  * <ul>
  *   <li>CA cert (Ed25519, 30 years) - self-signed trust anchor</li>
  *   <li>Signing cert (intermediate, 5 years) - signs agent CSRs and issues OTLP server certs</li>
- *   <li>Token signing cert (end-entity, 2 years) - signs enrollment JWTs</li>
  *   <li>OTLP Server cert (end-entity, 2 years) - TLS server certificate for OTLP ingest endpoint</li>
  * </ul>
  * <p>
- * The hierarchy is created on-demand when first accessed via {@link #ensureInitialized()}.
- * Certificate IDs are persisted in {@link CollectorsConfig} by the caller
- * ({@link CollectorsConfigResource}).
+ * Certificate IDs are persisted in {@link CollectorsConfig} by the caller.
  */
 @Singleton
 public class CollectorCaService {
@@ -70,8 +66,6 @@ public class CollectorCaService {
     private final ClusterIdService clusterIdService;
     private final CollectorsConfigService collectorsConfigService;
 
-    private volatile CaHierarchy cachedHierarchy;
-
     @Inject
     public CollectorCaService(CertificateService certificateService,
                               ClusterIdService clusterIdService,
@@ -81,13 +75,21 @@ public class CollectorCaService {
         this.collectorsConfigService = collectorsConfigService;
     }
 
+    private CollectorsConfig ensureConfig() {
+        return collectorsConfigService.get().orElseThrow(() -> new IllegalStateException("Collectors config not found"));
+    }
+
+    private IllegalStateException caNotInitializedError() {
+        return new IllegalStateException("CA not initialized");
+    }
+
     /**
      * Returns the CA certificate.
      *
      * @return the CA certificate entry
      */
     public CertificateEntry getCaCert() {
-        return ensureInitialized().caCert();
+        return certificateService.findById(ensureConfig().caCertId()).orElseThrow(this::caNotInitializedError);
     }
 
     /**
@@ -96,7 +98,7 @@ public class CollectorCaService {
      * @return the signing certificate entry
      */
     public CertificateEntry getSigningCert() {
-        return ensureInitialized().signingCert();
+        return certificateService.findById(ensureConfig().signingCertId()).orElseThrow(this::caNotInitializedError);
     }
 
     /**
@@ -105,19 +107,7 @@ public class CollectorCaService {
      * @return the OTLP server certificate entry
      */
     public CertificateEntry getOtlpServerCert() {
-        return ensureInitialized().otlpServerCert();
-    }
-
-    public String getCaCertId() {
-        return ensureInitialized().caCert().id();
-    }
-
-    public String getSigningCertId() {
-        return ensureInitialized().signingCert().id();
-    }
-
-    public String getOtlpServerCertId() {
-        return ensureInitialized().otlpServerCert().id();
+        return certificateService.findById(ensureConfig().otlpServerCertId()).orElseThrow(this::caNotInitializedError);
     }
 
     /**
@@ -133,9 +123,9 @@ public class CollectorCaService {
      * @return a configured SslContextBuilder ready to be built
      */
     public SslContextBuilder newServerSslContextBuilder() {
-        ensureInitialized();
-        final CertificateEntry otlpServerCert = getOtlpServerCert();
-        final CertificateEntry signingCert = getSigningCert();
+        final var hierarchy = loadHierarchy();
+        final var otlpServerCert = hierarchy.otlpServerCert();
+        final var signingCert = hierarchy.signingCert();
 
         try {
             final PrivateKey key = PemUtils.parsePrivateKey(certificateService.encryptedValueService().decrypt(otlpServerCert.privateKey()));
@@ -158,32 +148,23 @@ public class CollectorCaService {
     }
 
     /**
-     * Ensures the CA hierarchy is initialized, creating it if necessary.
-     * <p>
-     * Handles two scenarios:
-     * <ol>
-     *   <li>Full config exists in {@link CollectorsConfig} — loads from stored cert IDs</li>
-     *   <li>No config exists — creates the full hierarchy from scratch</li>
-     * </ol>
-     * <p>
-     * Results are cached in memory for the lifetime of this singleton. The caller
-     * is responsible for persisting cert IDs into {@link CollectorsConfig}.
+     * Loads the existing Collector CA hierarchy.
      *
-     * @return the loaded CA hierarchy
+     * @return the CA hierarchy
      */
-    public CaHierarchy ensureInitialized() {
-        if (cachedHierarchy != null) {
-            return cachedHierarchy;
-        }
+    public CaHierarchy loadHierarchy() {
+        return new CaHierarchy(getCaCert(), getSigningCert(), getOtlpServerCert());
+    }
 
+    /**
+     * Initialize the CA hierarchy.
+     *
+     * @return the CA init result
+     */
+    public CaHierarchy initializeCa() {
         final var maybeConfig = collectorsConfigService.get();
-        if (maybeConfig.isPresent()) {
-            final var config = maybeConfig.get();
-
-            if (nonNull(config.caCertId()) && nonNull(config.signingCertId()) && nonNull(config.otlpServerCertId())) {
-                cachedHierarchy = loadFromConfig(config);
-                return cachedHierarchy;
-            }
+        if (maybeConfig.isPresent() && isNotBlank(maybeConfig.get().caCertId())) {
+            throw new IllegalStateException("Collectors CA is already initialized");
         }
 
         LOG.info("Creating Collectors CA hierarchy");
@@ -205,21 +186,10 @@ public class CollectorCaService {
                             List.of(clusterIdService.getString())
                     ));
 
-            cachedHierarchy = new CaHierarchy(caCert, signingCert, otlpServerCert);
-            return cachedHierarchy;
+            return new CaHierarchy(caCert, signingCert, otlpServerCert);
         } catch (Exception e) {
             throw new RuntimeException("Failed to create Collectors CA hierarchy", e);
         }
-    }
-
-    private CaHierarchy loadFromConfig(CollectorsConfig config) {
-        final CertificateEntry caCert = certificateService.findById(config.caCertId())
-                .orElseThrow(() -> new IllegalStateException("CA cert not found: " + config.caCertId()));
-        final CertificateEntry signingCert = certificateService.findById(config.signingCertId())
-                .orElseThrow(() -> new IllegalStateException("Signing cert not found: " + config.signingCertId()));
-        final CertificateEntry otlpServerCert = certificateService.findById(config.otlpServerCertId())
-                .orElseThrow(() -> new IllegalStateException("OTLP server cert not found: " + config.otlpServerCertId()));
-        return new CaHierarchy(caCert, signingCert, otlpServerCert);
     }
 
     public record CaHierarchy(CertificateEntry caCert,

@@ -114,7 +114,6 @@ public class CollectorsConfigResource extends RestResource {
     @RequiresPermissions(CollectorsPermissions.CONFIGURATION_EDIT)
     public CollectorsConfig put(@Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) CollectorsConfigRequest request) throws ValidationException {
         validateThresholds(request);
-        collectorCaService.ensureInitialized();
         collectorLogsDestinationService.ensureExists();
 
         final var existing = collectorsConfigService.get();
@@ -134,9 +133,12 @@ public class CollectorsConfigResource extends RestResource {
                 ? request.collectorExpirationThreshold() : CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD;
 
         final TokenSigningKey tokenSigningKey;
+        final CollectorCaService.CaHierarchy caHierarchy;
         if (existing.isPresent()) {
             tokenSigningKey = existing.get().tokenSigningKey();
+            caHierarchy = collectorCaService.loadHierarchy();
         } else {
+            caHierarchy = collectorCaService.initializeCa();
             try {
                 tokenSigningKey = enrollmentTokenService.createTokenSigningKey();
             } catch (Exception e) {
@@ -145,10 +147,10 @@ public class CollectorsConfigResource extends RestResource {
         }
 
         final var config = CollectorsConfig.builder()
-                .caCertId(collectorCaService.getCaCertId())
-                .signingCertId(collectorCaService.getSigningCertId())
+                .caCertId(caHierarchy.caCert().id())
+                .signingCertId(caHierarchy.signingCert().id())
                 .tokenSigningKey(tokenSigningKey)
-                .otlpServerCertId(collectorCaService.getOtlpServerCertId())
+                .otlpServerCertId(caHierarchy.otlpServerCert().id())
                 .http(request.http().toConfig(httpInputId))
                 .collectorOfflineThreshold(effectiveOffline)
                 .collectorDefaultVisibilityThreshold(effectiveVisibility)

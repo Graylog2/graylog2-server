@@ -29,11 +29,13 @@ import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
 import org.graylog.security.pki.PemUtils;
 import org.graylog.testing.TestClocks;
+import org.graylog.testing.cluster.ClusterConfigServiceExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterIdService;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -46,9 +48,9 @@ import java.security.cert.X509Certificate;
 import java.time.Clock;
 import java.time.Duration;
 import java.util.Collections;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.bouncycastle.asn1.ASN1OctetString.getInstance;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -57,6 +59,7 @@ import static org.mockito.Mockito.when;
  * Tests for {@link CollectorCaService}.
  */
 @ExtendWith(MongoDBExtension.class)
+@ExtendWith(ClusterConfigServiceExtension.class)
 class CollectorCaServiceTest {
 
     private CertificateService certificateService;
@@ -66,7 +69,7 @@ class CollectorCaServiceTest {
     private Clock clock = TestClocks.fixedEpoch();
 
     @BeforeEach
-    void setUp(MongoDBTestService mongodb) {
+    void setUp(MongoDBTestService mongodb, ClusterConfigService clusterConfigService) {
         final EncryptedValueService encryptedValueService = new EncryptedValueService("1234567890abcdef");
         final ObjectMapper objectMapper = new ObjectMapperProvider(
                 ObjectMapperProvider.class.getClassLoader(),
@@ -83,19 +86,25 @@ class CollectorCaServiceTest {
         certificateService = new CertificateService(mongoCollections, encryptedValueService, CustomizationConfig.empty(), clock);
         clusterIdService = mock(ClusterIdService.class);
         when(clusterIdService.getString()).thenReturn("cluster-id");
-        collectorsConfigService = mock(CollectorsConfigService.class);
+        collectorsConfigService = new CollectorsConfigService(clusterConfigService);
         collectorCaService = new CollectorCaService(certificateService, clusterIdService, collectorsConfigService);
     }
 
-    private void mockClusterConfigStorage() {
-        when(collectorsConfigService.get()).thenReturn(Optional.empty());
+    private void initConfig() {
+        initConfig(collectorCaService.initializeCa());
+    }
+
+    private void initConfig(CollectorCaService.CaHierarchy hierarchy) {
+        collectorsConfigService.save(CollectorsConfig.createDefaultBuilder("localhost")
+                .caCertId(hierarchy.caCert().id())
+                .signingCertId(hierarchy.signingCert().id())
+                .otlpServerCertId(hierarchy.otlpServerCert().id())
+                .build());
     }
 
     @Test
-    void ensureInitialized_createsFullHierarchy() {
-        mockClusterConfigStorage();
-
-        final CollectorCaService.CaHierarchy hierarchy = collectorCaService.ensureInitialized();
+    void initializeCa() {
+        final var hierarchy = collectorCaService.initializeCa();
 
         assertThat(hierarchy.caCert()).isNotNull();
         assertThat(hierarchy.caCert().id()).isNotNull();
@@ -114,15 +123,11 @@ class CollectorCaServiceTest {
     }
 
     @Test
-    void ensureInitialized_isIdempotent() {
-        mockClusterConfigStorage();
+    void initializeCaFailsWhenConfigExists() {
+        final CollectorCaService.CaHierarchy first = collectorCaService.initializeCa();
+        initConfig(first);
 
-        final CollectorCaService.CaHierarchy first = collectorCaService.ensureInitialized();
-        final CollectorCaService.CaHierarchy second = collectorCaService.ensureInitialized();
-
-        assertThat(second.caCert().id()).isEqualTo(first.caCert().id());
-        assertThat(second.signingCert().id()).isEqualTo(first.signingCert().id());
-        assertThat(second.otlpServerCert().id()).isEqualTo(first.otlpServerCert().id());
+        assertThatThrownBy(() -> collectorCaService.initializeCa()).isInstanceOf(IllegalStateException.class);
 
         // Verify all four certs were saved only once (root CA + opAmpCa + otlpServer)
         assertThat(certificateService.findAll()).hasSize(3);
@@ -134,8 +139,7 @@ class CollectorCaServiceTest {
 
     @Test
     void checkCaCert() throws Exception {
-        mockClusterConfigStorage();
-
+        initConfig();
         final var cert = collectorCaService.getCaCert();
 
         assertThat(getCN(cert)).isEqualTo("O=Graylog,CN=Collectors CA");
@@ -144,8 +148,7 @@ class CollectorCaServiceTest {
 
     @Test
     void checkSigningCert() throws Exception {
-        mockClusterConfigStorage();
-
+        initConfig();
         final var cert = collectorCaService.getSigningCert();
 
         assertThat(getCN(cert)).isEqualTo("O=Graylog,CN=Collectors Signing");
@@ -155,8 +158,7 @@ class CollectorCaServiceTest {
 
     @Test
     void checkOTLPServerCert() throws Exception {
-        mockClusterConfigStorage();
-
+        initConfig();
         final var cert = collectorCaService.getOtlpServerCert();
 
         assertThat(getCN(cert)).isEqualTo("O=Graylog,CN=Collectors OTLP Server");
@@ -165,8 +167,7 @@ class CollectorCaServiceTest {
 
     @Test
     void otlpServerCert_hasServerAuthEku() throws Exception {
-        mockClusterConfigStorage();
-
+        initConfig();
         final CertificateEntry otlpServerCert = collectorCaService.getOtlpServerCert();
         final X509Certificate cert = PemUtils.parseCertificate(otlpServerCert.certificate());
 
@@ -185,7 +186,7 @@ class CollectorCaServiceTest {
     void otlpServerCert_hasClusterIdAsDnsSan() throws Exception {
         final String testClusterId = "2209F727-F7E1-4123-9386-94FE3B354A07";
         when(clusterIdService.getString()).thenReturn(testClusterId);
-        mockClusterConfigStorage();
+        initConfig();
 
         final CertificateEntry otlpServerCert = collectorCaService.getOtlpServerCert();
         final X509Certificate cert = PemUtils.parseCertificate(otlpServerCert.certificate());
@@ -198,8 +199,7 @@ class CollectorCaServiceTest {
 
     @Test
     void newServerSslContextBuilder_returnsConfiguredBuilder() throws Exception {
-        mockClusterConfigStorage();
-
+        initConfig();
         final SslContextBuilder builder = collectorCaService.newServerSslContextBuilder();
         assertThat(builder).isNotNull();
 
