@@ -46,6 +46,18 @@ class MoreSearchAdapterOSTest {
     }
 
     @Test
+    void testIsRangeValue() {
+        assertThat(MoreSearchAdapterOS.isRangeValue("<=100")).isTrue();
+        assertThat(MoreSearchAdapterOS.isRangeValue(">=100")).isTrue();
+        assertThat(MoreSearchAdapterOS.isRangeValue("<100")).isTrue();
+        assertThat(MoreSearchAdapterOS.isRangeValue(">100")).isTrue();
+        assertThat(MoreSearchAdapterOS.isRangeValue("sigma")).isFalse();
+        assertThat(MoreSearchAdapterOS.isRangeValue("aggregation")).isFalse();
+        assertThat(MoreSearchAdapterOS.isRangeValue("100")).isFalse();
+        assertThat(MoreSearchAdapterOS.isRangeValue("")).isFalse();
+    }
+
+    @Test
     void testBuildExtraFilter() {
         verifyFilter("<=100", Query.builder().range(range -> range.field(FIELD).lte(VALUE)).build());
         verifyFilter(">=100", Query.builder().range(range -> range.field(FIELD).gte(VALUE)).build());

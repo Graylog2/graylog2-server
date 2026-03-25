@@ -220,12 +220,21 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
                 .filter(termsQuery(EventDto.FIELD_STREAMS, eventStreams))
                 .filter(requireNonNull(TimeRangeQueryFactory.create(timerange)));
 
-        extraFilters.entrySet()
-                .stream()
-                .flatMap(extraFilter -> extraFilter.getValue()
-                        .stream()
-                        .map(value -> buildExtraFilter(extraFilter.getKey(), value)))
-                .forEach(filter::filter);
+        extraFilters.forEach((field, values) -> {
+            values.stream()
+                    .filter(MoreSearchAdapterES7::isRangeValue)
+                    .map(value -> buildExtraFilter(field, value))
+                    .forEach(q -> filter.filter(q));
+            final var termQueries = values.stream()
+                    .filter(v -> !isRangeValue(v))
+                    .map(value -> buildExtraFilter(field, value))
+                    .toList();
+            if (!termQueries.isEmpty()) {
+                final BoolQueryBuilder shouldQuery = boolQuery().minimumShouldMatch(1);
+                termQueries.forEach(shouldQuery::should);
+                filter.filter(shouldQuery);
+            }
+        });
 
         if (!isNullOrEmpty(filterString)) {
             filter.filter(queryStringQuery(filterString));
@@ -238,6 +247,10 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
         }
 
         return filter;
+    }
+
+    static boolean isRangeValue(String value) {
+        return value.startsWith("<=") || value.startsWith(">=") || value.startsWith("<") || value.startsWith(">");
     }
 
     static QueryBuilder buildExtraFilter(String field, String value) {
