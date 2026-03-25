@@ -93,14 +93,22 @@ public class OTelHttpTransport extends AbstractHttpTransport {
     public static class Config extends AbstractHttpTransport.Config {
         @Override
         public ConfigurationRequest getRequestedConfiguration() {
-            final ConfigurationRequest r = super.getRequestedConfiguration();
-            r.addField(ConfigurationRequest.Templates.portNumber(CK_PORT, 4318));
-            r.addField(new NumberField(CK_MAX_CHUNK_SIZE,
+            final var config = new ConfigurationRequest();
+
+            // Keep all inherited settings except some that we explicitly filter out here
+            super.getRequestedConfiguration().getFields().values().stream()
+                    .filter(field -> !field.getName().equals(CK_ENABLE_BULK_RECEIVING))
+                    .forEach(config::addField);
+
+            // Adjust default settings for our needs
+            config.addField(ConfigurationRequest.Templates.portNumber(CK_PORT, 4318));
+            config.addField(new NumberField(CK_MAX_CHUNK_SIZE,
                     "Max. HTTP chunk size",
                     DEFAULT_OTLP_MAX_CHUNK_SIZE,
                     "The maximum HTTP chunk size in bytes (e. g. length of HTTP request body)",
                     ConfigurationField.Optional.OPTIONAL));
-            return r;
+
+            return config;
         }
     }
 }

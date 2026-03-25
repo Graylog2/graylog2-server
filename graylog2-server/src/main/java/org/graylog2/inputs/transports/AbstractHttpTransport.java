@@ -63,7 +63,7 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
     protected static final int DEFAULT_MAX_CHUNK_SIZE = (int) Size.kilobytes(64L).toBytes();
     private static final int DEFAULT_IDLE_WRITER_TIMEOUT = 60;
 
-    static final String CK_ENABLE_BULK_RECEIVING = "enable_bulk_receiving";
+    protected static final String CK_ENABLE_BULK_RECEIVING = "enable_bulk_receiving";
     static final String CK_ENABLE_CORS = "enable_cors";
     public static final String CK_MAX_CHUNK_SIZE = "max_chunk_size";
     public static final String CK_IDLE_WRITER_TIMEOUT = "idle_writer_timeout";
