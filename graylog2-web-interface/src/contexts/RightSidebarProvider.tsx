@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import isEqual from 'lodash/isEqual';
-import React, { useReducer, useCallback, useMemo, useRef } from 'react';
+import React, { useReducer, useCallback, useMemo } from 'react';
 
 import RightSidebarContext from 'contexts/RightSidebarContext';
 import type { RightSidebarContent } from 'contexts/RightSidebarContext';
@@ -182,8 +182,6 @@ const RightSidebarProvider = ({ children }: Props) => {
   const sendTelemetry = useSendTelemetry();
 
   const content = state.currentIndex >= 0 ? state.contentHistory[state.currentIndex] : null;
-  const contentRef = useRef(content);
-  contentRef.current = content;
   const canGoBack = state.currentIndex > 0;
   const canGoForward = state.currentIndex < state.contentHistory.length - 1;
 
@@ -195,13 +193,15 @@ const RightSidebarProvider = ({ children }: Props) => {
     dispatch({ type: 'OPEN_SIDEBAR', content: newContent as RightSidebarContent<any> });
   }, [sendTelemetry]);
 
+  // `content` in the dependency array means closeSidebar's identity changes on every navigation.
+  // This is acceptable because closeSidebar is only used in click handlers, not in effects or memo deps.
   const closeSidebar = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.CLOSED, {
       app_section: 'right-sidebar',
-      event_details: { content_id: contentRef.current?.id, component_key: contentRef.current?.componentKey },
+      event_details: { content_id: content?.id, component_key: content?.componentKey },
     });
     dispatch({ type: 'CLOSE_SIDEBAR' });
-  }, [sendTelemetry]);
+  }, [sendTelemetry, content]);
 
   const collapseSidebar = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.COLLAPSED, {
