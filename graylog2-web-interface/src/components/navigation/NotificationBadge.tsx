@@ -19,11 +19,16 @@ import styled from 'styled-components';
 
 import { LinkContainer } from 'components/common';
 import { Badge, Nav } from 'components/bootstrap';
+import useCurrentUser from 'hooks/useCurrentUser';
+import useNotifications from 'components/notifications/useNotifications';
 import Routes from 'routing/Routes';
 import { NAV_ITEM_HEIGHT } from 'theme/constants';
-import useNotifications from 'components/notifications/useNotifications';
+import type * as Immutable from 'immutable';
 
 import InactiveNavItem from './InactiveNavItem';
+
+const hasNotificationPermission = (permissions: Immutable.List<string>): boolean =>
+  permissions.some((p) => p === '*' || p === 'notifications:*' || p.startsWith('notifications:read'));
 
 const StyledNav = styled(Nav)`
   > li > a {
@@ -43,9 +48,11 @@ const StyledInactiveNavItem = styled(InactiveNavItem)`
 `;
 
 const NotificationBadge = () => {
-  const { data, isLoading } = useNotifications();
+  const currentUser = useCurrentUser();
+  const enabled = hasNotificationPermission(currentUser.permissions);
+  const { data, isLoading } = useNotifications({ enabled });
 
-  return isLoading || data.total === 0 ? null : (
+  return isLoading || !data || data.total === 0 ? null : (
     <StyledNav navbar>
       <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
         <StyledInactiveNavItem>
