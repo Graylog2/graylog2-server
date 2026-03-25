@@ -135,6 +135,7 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds
   const { setSelectedEntities } = useSelectedEntities();
   const {
     data: { indexSets: indexSetsList },
+    isInitialLoading,
   } = useIndexSetsList(false);
   const indexSets = useMemo(() => {
     if (!indexSetsList) return null;
@@ -212,7 +213,7 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds
       onCancel={onCancel}
       show={show}
       bsSize="large">
-      {!indexSets ? (
+      {!indexSets || isInitialLoading ? (
         <Spinner />
       ) : (
         <IndexSetCustomFieldTypeRemoveContent
