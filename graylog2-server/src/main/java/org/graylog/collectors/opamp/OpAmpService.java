@@ -245,7 +245,7 @@ public class OpAmpService {
 
             // 5. Return certificate and connection settings
             final var connectionSettingsBuilder = ConnectionSettingsOffers.newBuilder();
-            setOpampConnectionSettings(connectionSettingsBuilder, certPem, collectorConfig.collectorCertLifetime());
+            setOpampConnectionSettings(connectionSettingsBuilder, certPem, collectorConfig.collectorHeartbeatInterval());
 
             return serverToAgentBuilder(message)
                     .setConnectionSettings(connectionSettingsBuilder)
