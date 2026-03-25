@@ -64,8 +64,7 @@ public class EntityPermissionsUtils {
 
     /**
      * Checks whether all the given field names are declared as readable for the specified collection.
-     * The {@code _id} field is always considered readable.
-     * If the collection is not registered in the catalog, all fields are considered readable (backward compatibility).
+     * If the collection is not registered in the catalog, the request is denied.
      * If the catalog entry has an empty {@code readableFields} list, no user-specified fields are allowed.
      */
     public boolean areAllFieldsReadable(final String collection, final Collection<String> fields) {

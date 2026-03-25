@@ -38,12 +38,13 @@ import static org.graylog2.notifications.NotificationImpl.FIELD_NODE_ID;
 import static org.graylog2.notifications.NotificationImpl.FIELD_SEVERITY;
 import static org.graylog2.notifications.NotificationImpl.FIELD_TIMESTAMP;
 import static org.graylog2.notifications.NotificationImpl.FIELD_TYPE;
+import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
 import static org.graylog2.shared.security.RestPermissions.NOTIFICATIONS_READ;
 
 @DbEntity(collection = "notifications",
           titleField = FIELD_DETAILS + ".title",
           readPermission = NOTIFICATIONS_READ,
-          readableFields = {FIELD_TYPE, FIELD_SEVERITY, FIELD_TIMESTAMP, FIELD_NODE_ID, FIELD_KEY})
+          readableFields = {ID_FIELD, FIELD_TYPE, FIELD_SEVERITY, FIELD_TIMESTAMP, FIELD_NODE_ID, FIELD_KEY})
 public class NotificationImpl extends PersistedImpl implements Notification {
     static final String FIELD_TYPE = "type";
     static final String FIELD_KEY = "key";

@@ -56,6 +56,7 @@ import static org.graylog.plugins.views.search.views.ViewDTO.FIELD_SEARCH_ID;
 import static org.graylog.plugins.views.search.views.ViewDTO.FIELD_SUMMARY;
 import static org.graylog.plugins.views.search.views.ViewDTO.FIELD_TITLE;
 import static org.graylog.plugins.views.search.views.ViewDTO.FIELD_TYPE;
+import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
 
 @AutoValue
 @JsonDeserialize(builder = ViewDTO.Builder.class)
@@ -64,7 +65,7 @@ import static org.graylog.plugins.views.search.views.ViewDTO.FIELD_TYPE;
    only documents which have the corresponding type.
  */
 @DbEntity(collection = "dashboards", readPermission = RestPermissions.DASHBOARDS_READ,
-          readableFields = {FIELD_TITLE, FIELD_SUMMARY, FIELD_DESCRIPTION, FIELD_TYPE,
+          readableFields = {ID_FIELD, FIELD_TITLE, FIELD_SUMMARY, FIELD_DESCRIPTION, FIELD_TYPE,
                   FIELD_OWNER, FIELD_CREATED_AT, FIELD_LAST_UPDATED_AT, FIELD_SEARCH_ID})
 public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, ViewLike, SourcedMongoEntity<ViewDTO, ViewDTO.Builder> {
     public static final String COLLECTION_NAME = "views";

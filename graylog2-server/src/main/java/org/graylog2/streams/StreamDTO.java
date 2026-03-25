@@ -35,6 +35,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
 import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
 import static org.graylog2.streams.StreamDTO.FIELD_CATEGORIES;
 import static org.graylog2.streams.StreamDTO.FIELD_CREATED_AT;
@@ -51,7 +52,7 @@ import static org.graylog2.streams.StreamDTO.FIELD_TITLE;
 @JsonAutoDetect
 @JsonDeserialize(builder = StreamDTO.Builder.class)
 @DbEntity(collection = "streams", readPermission = STREAMS_READ,
-          readableFields = {FIELD_TITLE, FIELD_DESCRIPTION, FIELD_DISABLED, FIELD_CREATED_AT,
+          readableFields = {ID_FIELD, FIELD_TITLE, FIELD_DESCRIPTION, FIELD_DISABLED, FIELD_CREATED_AT,
                   FIELD_CREATOR_USER_ID, FIELD_MATCHING_TYPE, FIELD_INDEX_SET_ID,
                   FIELD_IS_EDITABLE, FIELD_CATEGORIES, FIELD_DEFAULT_STREAM})
 // Package-private to prevent usage outside the streams package.
