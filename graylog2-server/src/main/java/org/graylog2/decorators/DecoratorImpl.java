@@ -35,6 +35,7 @@ import static org.graylog2.decorators.DecoratorImpl.FIELD_ID;
 import static org.graylog2.decorators.DecoratorImpl.FIELD_ORDER;
 import static org.graylog2.decorators.DecoratorImpl.FIELD_STREAM;
 import static org.graylog2.decorators.DecoratorImpl.FIELD_TYPE;
+import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
 import static org.graylog2.shared.security.RestPermissions.DECORATORS_READ;
 
 @AutoValue
@@ -42,7 +43,7 @@ import static org.graylog2.shared.security.RestPermissions.DECORATORS_READ;
 @DbEntity(collection = "decorators",
           titleField = NO_TITLE,
           readPermission = DECORATORS_READ,
-          readableFields = {FIELD_ID, FIELD_TYPE, FIELD_STREAM, FIELD_ORDER})
+          readableFields = {ID_FIELD, FIELD_ID, FIELD_TYPE, FIELD_STREAM, FIELD_ORDER})
 public abstract class DecoratorImpl implements Decorator, Comparable<DecoratorImpl>,
         BuildableMongoEntity<DecoratorImpl, DecoratorImpl.Builder> {
     static final String FIELD_ID = "id";

@@ -68,12 +68,13 @@ import static org.graylog2.indexer.indexset.fields.WritableField.FIELD_WRITABLE;
 import static org.graylog2.indexer.template.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
 import static org.graylog2.shared.fields.TitleAndDescriptionFields.FIELD_DESCRIPTION;
 import static org.graylog2.shared.fields.TitleField.FIELD_TITLE;
+import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
 import static org.graylog2.shared.security.RestPermissions.INDEXSETS_READ;
 
 @AutoValue
 @JsonAutoDetect
 @DbEntity(collection = MongoIndexSetService.COLLECTION_NAME, readPermission = INDEXSETS_READ,
-          readableFields = {FIELD_ID, FIELD_TITLE, FIELD_DESCRIPTION, FIELD_INDEX_PREFIX, FIELD_WRITABLE,
+          readableFields = {ID_FIELD, FIELD_ID, FIELD_TITLE, FIELD_DESCRIPTION, FIELD_INDEX_PREFIX, FIELD_WRITABLE,
                   FIELD_REGULAR, FIELD_CREATION_DATE, FIELD_INDEX_TEMPLATE_TYPE, FIELD_SHARDS, FIELD_REPLICAS})
 public abstract class IndexSetConfig implements
         Comparable<IndexSetConfig>,
