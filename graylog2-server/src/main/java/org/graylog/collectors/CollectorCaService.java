@@ -157,13 +157,32 @@ public class CollectorCaService {
     }
 
     /**
+     * Returns true if the CA is already initialized.
+     *
+     * @return true if initialized, false otherwise
+     */
+    public boolean isCaInitialized() {
+        final var maybeConfig = collectorsConfigService.get();
+        return maybeConfig.isPresent() && isNotBlank(maybeConfig.get().caCertId());
+    }
+
+    public void renewCertificates() {
+        if (!isCaInitialized()) {
+            LOG.debug("CA not initialized - skipping renewal");
+            return;
+        }
+
+        final var hierarchy = loadHierarchy();
+        // TODO: Continue
+    }
+
+    /**
      * Initialize the CA hierarchy.
      *
      * @return the CA init result
      */
     public CaHierarchy initializeCa() {
-        final var maybeConfig = collectorsConfigService.get();
-        if (maybeConfig.isPresent() && isNotBlank(maybeConfig.get().caCertId())) {
+        if (isCaInitialized()) {
             throw new IllegalStateException("Collectors CA is already initialized");
         }
 
