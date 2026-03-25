@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import type * as Immutable from 'immutable';
 
 import { LinkContainer } from 'components/common';
 import { Badge, Nav } from 'components/bootstrap';
@@ -23,7 +24,6 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import useNotifications from 'components/notifications/useNotifications';
 import Routes from 'routing/Routes';
 import { NAV_ITEM_HEIGHT } from 'theme/constants';
-import type * as Immutable from 'immutable';
 
 import InactiveNavItem from './InactiveNavItem';
 

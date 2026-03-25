@@ -56,7 +56,10 @@ describe('NotificationBadge', () => {
   });
 
   it('renders nothing when user has no notification permissions', () => {
-    const userWithoutPermissions = adminUser.toBuilder().permissions(Immutable.List(['dashboards:read'])).build();
+    const userWithoutPermissions = adminUser
+      .toBuilder()
+      .permissions(Immutable.List(['dashboards:read']))
+      .build();
     asMock(useCurrentUser).mockReturnValue(userWithoutPermissions);
     asMock(useNotifications).mockReturnValue({ data: undefined, isLoading: false });
 
