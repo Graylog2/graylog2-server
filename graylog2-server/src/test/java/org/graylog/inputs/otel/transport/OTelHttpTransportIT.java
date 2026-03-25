@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.inputs.otel;
+package org.graylog.inputs.otel.transport;
 
 import com.google.protobuf.util.JsonFormat;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -24,7 +24,6 @@ import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import io.opentelemetry.proto.logs.v1.ResourceLogs;
 import io.opentelemetry.proto.logs.v1.ScopeLogs;
-import org.graylog.inputs.otel.transport.OTelHttpTransport;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
 import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
@@ -57,7 +56,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 /**
- * Integration tests for the generic OTLP HTTP input using the real transport pipeline.
+ * Integration tests for {@link OTelHttpTransport} using the real transport pipeline.
  * <p>
  * These tests launch {@link OTelHttpTransport} which constructs the full Netty handler
  * chain (including auth, CORS, forwarded-for, HTTP codecs, and the OTel handler).
@@ -65,7 +64,7 @@ import static org.mockito.Mockito.verify;
  * were invisible to tests that manually wired the pipeline.
  */
 @ExtendWith(MockitoExtension.class)
-class OTelHttpInputIT {
+class OTelHttpTransportIT {
 
     @Mock
     private MessageInput input;
