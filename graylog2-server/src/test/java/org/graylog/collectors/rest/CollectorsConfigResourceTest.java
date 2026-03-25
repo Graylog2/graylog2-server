@@ -21,6 +21,7 @@ import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
+import org.graylog.collectors.CollectorCaService;
 import org.graylog.collectors.CollectorInputService;
 import org.graylog.collectors.CollectorLogsDestinationService;
 import org.graylog.collectors.CollectorsConfig;
@@ -30,7 +31,6 @@ import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.TokenSigningKey;
 import org.graylog.collectors.db.MarkerType;
 import org.graylog.collectors.input.CollectorIngestHttpInput;
-import org.graylog.collectors.opamp.OpAmpCaService;
 import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.database.ValidationException;
@@ -73,7 +73,7 @@ class CollectorsConfigResourceTest {
     @Mock
     private HttpConfiguration httpConfiguration;
     @Mock
-    private OpAmpCaService opAmpCaService;
+    private CollectorCaService collectorCaService;
     @Mock
     private EnrollmentTokenService enrollmentTokenService;
     @Mock
@@ -96,7 +96,7 @@ class CollectorsConfigResourceTest {
                 fleetService,
                 fleetTransactionLogService,
                 enrollmentTokenService,
-                opAmpCaService
+                collectorCaService
         );
 
         final var subject = mock(Subject.class);
@@ -146,7 +146,7 @@ class CollectorsConfigResourceTest {
 
         resource.put(request);
 
-        verify(opAmpCaService).ensureInitialized();
+        verify(collectorCaService).ensureInitialized();
         verify(collectorLogsDestinationService).ensureExists();
     }
 
@@ -329,9 +329,9 @@ class CollectorsConfigResourceTest {
                 .build();
 
         when(collectorsConfigService.get()).thenReturn(Optional.of(existingConfig));
-        when(opAmpCaService.getCaCertId()).thenReturn("ca-id");
-        when(opAmpCaService.getSigningCertId()).thenReturn("signing-cert-id");
-        when(opAmpCaService.getOtlpServerCertId()).thenReturn("otlp-id");
+        when(collectorCaService.getCaCertId()).thenReturn("ca-id");
+        when(collectorCaService.getSigningCertId()).thenReturn("signing-cert-id");
+        when(collectorCaService.getOtlpServerCertId()).thenReturn("otlp-id");
 
         final var request = new CollectorsConfigRequest(
                 new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14401),
@@ -360,8 +360,8 @@ class CollectorsConfigResourceTest {
 
     private void stubCaService() {
         when(collectorsConfigService.get()).thenReturn(Optional.empty());
-        when(opAmpCaService.getCaCertId()).thenReturn("ca-id");
-        when(opAmpCaService.getSigningCertId()).thenReturn("signing-cert-id");
-        when(opAmpCaService.getOtlpServerCertId()).thenReturn("otlp-id");
+        when(collectorCaService.getCaCertId()).thenReturn("ca-id");
+        when(collectorCaService.getSigningCertId()).thenReturn("signing-cert-id");
+        when(collectorCaService.getOtlpServerCertId()).thenReturn("otlp-id");
     }
 }

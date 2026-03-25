@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.collectors.opamp;
+package org.graylog.collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.handler.ssl.SslContext;
@@ -24,7 +24,6 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
-import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
@@ -55,15 +54,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for {@link OpAmpCaService}.
+ * Tests for {@link CollectorCaService}.
  */
 @ExtendWith(MongoDBExtension.class)
-class OpAmpCaServiceTest {
+class CollectorCaServiceTest {
 
     private CertificateService certificateService;
     private CollectorsConfigService collectorsConfigService;
     private ClusterIdService clusterIdService;
-    private OpAmpCaService opAmpCaService;
+    private CollectorCaService collectorCaService;
     private Clock clock = TestClocks.fixedEpoch();
 
     @BeforeEach
@@ -85,7 +84,7 @@ class OpAmpCaServiceTest {
         clusterIdService = mock(ClusterIdService.class);
         when(clusterIdService.getString()).thenReturn("cluster-id");
         collectorsConfigService = mock(CollectorsConfigService.class);
-        opAmpCaService = new OpAmpCaService(certificateService, clusterIdService, collectorsConfigService);
+        collectorCaService = new CollectorCaService(certificateService, clusterIdService, collectorsConfigService);
     }
 
     private void mockClusterConfigStorage() {
@@ -96,7 +95,7 @@ class OpAmpCaServiceTest {
     void ensureInitialized_createsFullHierarchy() {
         mockClusterConfigStorage();
 
-        final OpAmpCaService.CaHierarchy hierarchy = opAmpCaService.ensureInitialized();
+        final CollectorCaService.CaHierarchy hierarchy = collectorCaService.ensureInitialized();
 
         assertThat(hierarchy.caCert()).isNotNull();
         assertThat(hierarchy.caCert().id()).isNotNull();
@@ -118,8 +117,8 @@ class OpAmpCaServiceTest {
     void ensureInitialized_isIdempotent() {
         mockClusterConfigStorage();
 
-        final OpAmpCaService.CaHierarchy first = opAmpCaService.ensureInitialized();
-        final OpAmpCaService.CaHierarchy second = opAmpCaService.ensureInitialized();
+        final CollectorCaService.CaHierarchy first = collectorCaService.ensureInitialized();
+        final CollectorCaService.CaHierarchy second = collectorCaService.ensureInitialized();
 
         assertThat(second.caCert().id()).isEqualTo(first.caCert().id());
         assertThat(second.signingCert().id()).isEqualTo(first.signingCert().id());
@@ -137,7 +136,7 @@ class OpAmpCaServiceTest {
     void checkCaCert() throws Exception {
         mockClusterConfigStorage();
 
-        final var cert = opAmpCaService.getCaCert();
+        final var cert = collectorCaService.getCaCert();
 
         assertThat(getCN(cert)).isEqualTo("O=Graylog,CN=Collectors CA");
         assertThat(PemUtils.parseCertificate(cert.certificate()).getSigAlgName()).isEqualTo("Ed25519");
@@ -147,7 +146,7 @@ class OpAmpCaServiceTest {
     void checkSigningCert() throws Exception {
         mockClusterConfigStorage();
 
-        final var cert = opAmpCaService.getSigningCert();
+        final var cert = collectorCaService.getSigningCert();
 
         assertThat(getCN(cert)).isEqualTo("O=Graylog,CN=Collectors Signing");
         assertThat(PemUtils.parseCertificate(cert.certificate()).getSigAlgName()).isEqualTo("Ed25519");
@@ -158,7 +157,7 @@ class OpAmpCaServiceTest {
     void checkOTLPServerCert() throws Exception {
         mockClusterConfigStorage();
 
-        final var cert = opAmpCaService.getOtlpServerCert();
+        final var cert = collectorCaService.getOtlpServerCert();
 
         assertThat(getCN(cert)).isEqualTo("O=Graylog,CN=Collectors OTLP Server");
         assertThat(PemUtils.parseCertificate(cert.certificate()).getSigAlgName()).isEqualTo("Ed25519");
@@ -168,7 +167,7 @@ class OpAmpCaServiceTest {
     void otlpServerCert_hasServerAuthEku() throws Exception {
         mockClusterConfigStorage();
 
-        final CertificateEntry otlpServerCert = opAmpCaService.getOtlpServerCert();
+        final CertificateEntry otlpServerCert = collectorCaService.getOtlpServerCert();
         final X509Certificate cert = PemUtils.parseCertificate(otlpServerCert.certificate());
 
         // OID 1.3.6.1.5.5.7.3.1 = id-kp-serverAuth
@@ -188,7 +187,7 @@ class OpAmpCaServiceTest {
         when(clusterIdService.getString()).thenReturn(testClusterId);
         mockClusterConfigStorage();
 
-        final CertificateEntry otlpServerCert = opAmpCaService.getOtlpServerCert();
+        final CertificateEntry otlpServerCert = collectorCaService.getOtlpServerCert();
         final X509Certificate cert = PemUtils.parseCertificate(otlpServerCert.certificate());
 
         final var sans = cert.getSubjectAlternativeNames();
@@ -201,7 +200,7 @@ class OpAmpCaServiceTest {
     void newServerSslContextBuilder_returnsConfiguredBuilder() throws Exception {
         mockClusterConfigStorage();
 
-        final SslContextBuilder builder = opAmpCaService.newServerSslContextBuilder();
+        final SslContextBuilder builder = collectorCaService.newServerSslContextBuilder();
         assertThat(builder).isNotNull();
 
         // Verify the builder can actually build an SslContext

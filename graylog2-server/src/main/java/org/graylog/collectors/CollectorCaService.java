@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.collectors.opamp;
+package org.graylog.collectors;
 
 import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContextBuilder;
@@ -23,8 +23,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.KeyUsage;
-import org.graylog.collectors.CollectorsConfig;
-import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.rest.CollectorsConfigResource;
 import org.graylog.security.pki.Algorithm;
 import org.graylog.security.pki.CertificateEntry;
@@ -57,8 +55,8 @@ import static java.util.Objects.nonNull;
  * ({@link CollectorsConfigResource}).
  */
 @Singleton
-public class OpAmpCaService {
-    private static final Logger LOG = LoggerFactory.getLogger(OpAmpCaService.class);
+public class CollectorCaService {
+    private static final Logger LOG = LoggerFactory.getLogger(CollectorCaService.class);
 
     static final Duration CA_CERT_VALIDITY = Duration.ofDays(30 * 365);
     static final Duration SIGNING_CERT_VALIDITY = Duration.ofDays(5 * 365);
@@ -75,9 +73,9 @@ public class OpAmpCaService {
     private volatile CaHierarchy cachedHierarchy;
 
     @Inject
-    public OpAmpCaService(CertificateService certificateService,
-                          ClusterIdService clusterIdService,
-                          CollectorsConfigService collectorsConfigService) {
+    public CollectorCaService(CertificateService certificateService,
+                              ClusterIdService clusterIdService,
+                              CollectorsConfigService collectorsConfigService) {
         this.certificateService = certificateService;
         this.clusterIdService = clusterIdService;
         this.collectorsConfigService = collectorsConfigService;

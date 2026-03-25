@@ -16,6 +16,7 @@
  */
 package org.graylog.collectors;
 
+import com.google.inject.Scopes;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog.collectors.config.receiver.FilelogReceiverConfig;
@@ -89,6 +90,9 @@ public class CollectorsModule extends PluginModule {
 
         addSystemRestResource(CollectorsConfigResource.class);
         addSystemRestResource(CollectorInstancesResource.class);
+
+        // CA
+        bind(CollectorCaService.class).in(Scopes.SINGLETON);
 
         // Collectors config
         bind(CollectorsConfigService.class).asEagerSingleton();

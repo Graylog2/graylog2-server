@@ -16,6 +16,7 @@
  */
 package org.graylog.collectors.opamp;
 
+import org.graylog.collectors.CollectorCaService;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.FleetTransactionLogService;
@@ -60,7 +61,7 @@ class OpAmpServiceTest {
     private AgentTokenService agentTokenService;
 
     @Mock
-    private OpAmpCaService opAmpCaService;
+    private CollectorCaService collectorCaService;
 
     @Mock
     private CertificateService certificateService;
@@ -87,7 +88,7 @@ class OpAmpServiceTest {
     @BeforeEach
     void setUp() {
         lenient().when(clusterIdService.getString()).thenReturn("clusterId");
-        opAmpService = new OpAmpService(enrollmentTokenService, agentTokenService, opAmpCaService, certificateService,
+        opAmpService = new OpAmpService(enrollmentTokenService, agentTokenService, collectorCaService, certificateService,
                 collectorInstanceService, collectorsConfigService, clusterIdService, fleetTransactionLogService, sourceService);
     }
 

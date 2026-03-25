@@ -38,8 +38,7 @@ public class OpAmpModule extends PluginModule {
         bind(ExecutorService.class).annotatedWith(OpAmpExecutor.class)
                 .toInstance(Executors.newVirtualThreadPerTaskExecutor());
 
-        // Certificate and enrollment services
-        bind(OpAmpCaService.class).in(Scopes.SINGLETON);
+        // Authentication and enrollment services
         bind(AgentTokenService.class).in(Scopes.SINGLETON);
         bind(EnrollmentTokenService.class).in(Scopes.SINGLETON);
         addSystemRestResource(EnrollmentTokenResource.class);

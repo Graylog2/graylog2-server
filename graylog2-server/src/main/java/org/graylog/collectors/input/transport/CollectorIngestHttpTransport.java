@@ -23,10 +23,10 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.EventLoopGroup;
 import io.netty.handler.ssl.SslContext;
 import jakarta.inject.Named;
+import org.graylog.collectors.CollectorCaService;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.IngestEndpointConfig;
-import org.graylog.collectors.opamp.OpAmpCaService;
 import org.graylog.inputs.otel.transport.OtlpHttpUtils;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.inputs.transports.AbstractHttpTransport;
@@ -50,7 +50,7 @@ import java.util.concurrent.Callable;
 /**
  * An HTTP transport for collector-managed agents that auto-configures Ed25519 mTLS
  * using the OpAMP CA hierarchy. Overrides the TLS handler to use certificates from
- * {@link OpAmpCaService} and adds {@link AgentCertChannelHandler} to extract the
+ * {@link CollectorCaService} and adds {@link AgentCertChannelHandler} to extract the
  * agent identity from the client certificate on each connection.
  * <p>
  * The HTTP handler is replaced with {@link CollectorIngestHttpHandler} which enforces
@@ -60,7 +60,7 @@ public class CollectorIngestHttpTransport extends AbstractHttpTransport {
     public static final String NAME = "CollectorIngestHttpTransport";
     static final int DEFAULT_HTTP_PORT = 14401;
 
-    private final OpAmpCaService opAmpCaService;
+    private final CollectorCaService collectorCaService;
 
     @AssistedInject
     public CollectorIngestHttpTransport(@Assisted Configuration configuration,
@@ -71,12 +71,12 @@ public class CollectorIngestHttpTransport extends AbstractHttpTransport {
                                         LocalMetricRegistry localMetricRegistry,
                                         TLSProtocolsConfiguration tlsConfiguration,
                                         @Named("trusted_proxies") Set<IpSubnet> trustedProxies,
-                                        OpAmpCaService opAmpCaService,
+                                        CollectorCaService collectorCaService,
                                         CollectorsConfigService collectorsConfigService) {
         super(buildTransportConfig(collectorsConfigService), eventLoopGroup, eventLoopGroupFactory,
                 nettyTransportConfiguration, throughputCounter, localMetricRegistry,
                 tlsConfiguration, trustedProxies, OtlpHttpUtils.LOGS_PATH);
-        this.opAmpCaService = opAmpCaService;
+        this.collectorCaService = collectorCaService;
     }
 
     private static Configuration buildTransportConfig(CollectorsConfigService collectorsConfigService) {
@@ -100,7 +100,7 @@ public class CollectorIngestHttpTransport extends AbstractHttpTransport {
     @Override
     protected Callable<? extends ChannelHandler> createSslHandler(MessageInput input) {
         return () -> {
-            final SslContext sslContext = opAmpCaService.newServerSslContextBuilder().build();
+            final SslContext sslContext = collectorCaService.newServerSslContextBuilder().build();
             return sslContext.newHandler(PooledByteBufAllocator.DEFAULT);
         };
     }

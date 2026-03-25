@@ -24,10 +24,10 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
+import org.graylog.collectors.CollectorCaService;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.db.CollectorInstanceDTO;
-import org.graylog.collectors.opamp.OpAmpCaService;
 import org.graylog.collectors.opamp.transport.OpAmpAuthContext;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.security.pki.CertificateEntry;
@@ -69,7 +69,7 @@ class AgentTokenServiceTest {
     private static final String TEST_CLUSTER_ID = "test-cluster-id-12345";
 
     private CertificateService certificateService;
-    private OpAmpCaService opAmpCaService;
+    private CollectorCaService collectorCaService;
     private CollectorInstanceService collectorInstanceService;
     private AgentTokenService agentTokenService;
     private CollectorsConfigService collectorsConfigService;
@@ -95,7 +95,7 @@ class AgentTokenServiceTest {
         when(clusterIdService.getString()).thenReturn(TEST_CLUSTER_ID);
         collectorInstanceService = new CollectorInstanceService(mongoCollections);
         collectorsConfigService = mock(CollectorsConfigService.class);
-        opAmpCaService = new OpAmpCaService(certificateService, clusterIdService, collectorsConfigService);
+        collectorCaService = new CollectorCaService(certificateService, clusterIdService, collectorsConfigService);
         agentTokenService = new AgentTokenService(collectorInstanceService, clock);
     }
 
@@ -105,7 +105,7 @@ class AgentTokenServiceTest {
         when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
         // Create CA hierarchy
-        final CertificateEntry enrollmentCa = opAmpCaService.getSigningCert();
+        final CertificateEntry enrollmentCa = collectorCaService.getSigningCert();
 
         // Generate agent key pair and CSR (use Ed25519 to match CA)
         final KeyPair agentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
@@ -207,7 +207,7 @@ class AgentTokenServiceTest {
         when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
         // Create CA hierarchy
-        final CertificateEntry enrollmentCa = opAmpCaService.getSigningCert();
+        final CertificateEntry enrollmentCa = collectorCaService.getSigningCert();
 
         // Generate agent key pair and CSR (use Ed25519 to match CA)
         final KeyPair agentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();

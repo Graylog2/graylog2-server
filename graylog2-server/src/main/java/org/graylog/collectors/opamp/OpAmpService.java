@@ -44,6 +44,7 @@ import opamp.proto.Opamp.OpAMPConnectionSettings;
 import opamp.proto.Opamp.ServerErrorResponse;
 import opamp.proto.Opamp.ServerToAgent;
 import opamp.proto.Opamp.TLSCertificate;
+import org.graylog.collectors.CollectorCaService;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
@@ -107,7 +108,7 @@ public class OpAmpService {
 
     private final EnrollmentTokenService enrollmentTokenService;
     private final AgentTokenService agentTokenService;
-    private final OpAmpCaService opAmpCaService;
+    private final CollectorCaService collectorCaService;
     private final CertificateService certificateService;
     private final CollectorInstanceService collectorInstanceService;
     private final CollectorsConfigService collectorsConfigService;
@@ -119,7 +120,7 @@ public class OpAmpService {
     @Inject
     public OpAmpService(EnrollmentTokenService enrollmentTokenService,
                         AgentTokenService agentTokenService,
-                        OpAmpCaService opAmpCaService,
+                        CollectorCaService collectorCaService,
                         CertificateService certificateService,
                         CollectorInstanceService collectorInstanceService,
                         CollectorsConfigService collectorsConfigService,
@@ -128,7 +129,7 @@ public class OpAmpService {
                         SourceService sourceService) {
         this.enrollmentTokenService = enrollmentTokenService;
         this.agentTokenService = agentTokenService;
-        this.opAmpCaService = opAmpCaService;
+        this.collectorCaService = collectorCaService;
         this.certificateService = certificateService;
         this.collectorInstanceService = collectorInstanceService;
         this.collectorsConfigService = collectorsConfigService;
@@ -232,7 +233,7 @@ public class OpAmpService {
             final var collectorConfig = collectorsConfigService.getOrDefault();
 
             // 3. Sign CSR with OpAMP CA
-            final CertificateEntry issuerCert = opAmpCaService.getSigningCert();
+            final CertificateEntry issuerCert = collectorCaService.getSigningCert();
             final X509Certificate agentCert = certificateService.builder().signCsr(csrBytes.get().toByteArray(), issuerCert, instanceUid, collectorConfig.collectorCertLifetime());
 
             // 4. Save agent record
@@ -517,7 +518,7 @@ public class OpAmpService {
         LOG.info("Received CSR for certificate renewal from instance: {}", instanceUid);
         try {
             final var config = configSupplier.get().orElse(CollectorsConfig.createDefault("localhost"));
-            final var issuer = opAmpCaService.getSigningCert();
+            final var issuer = collectorCaService.getSigningCert();
             final var cert = certificateService.builder().signCsr(csr.toByteArray(), issuer, instanceUid, config.collectorCertLifetime());
 
             final var fingerprint = PemUtils.computeFingerprint(cert);
@@ -595,7 +596,7 @@ public class OpAmpService {
         }
 
         // We use the long-lived CA cert so intermediate cert rotation is not an issue for Collector mTLS connections.
-        final var caCert = opAmpCaService.getCaCert().certificate();
+        final var caCert = collectorCaService.getCaCert().certificate();
         final var tlsSettings = TLSConfigurationSettings.withCACert(clusterIdService.getString(), caCert);
 
         if (httpEndpoint.enabled()) {

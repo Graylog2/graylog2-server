@@ -34,6 +34,7 @@ import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.collectors.CollectorCaService;
 import org.graylog.collectors.CollectorInputService;
 import org.graylog.collectors.CollectorLogsDestinationService;
 import org.graylog.collectors.CollectorsConfig;
@@ -44,7 +45,6 @@ import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.TokenSigningKey;
 import org.graylog.collectors.db.MarkerType;
 import org.graylog.collectors.input.CollectorIngestHttpInput;
-import org.graylog.collectors.opamp.OpAmpCaService;
 import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -77,7 +77,7 @@ public class CollectorsConfigResource extends RestResource {
     private final FleetService fleetService;
     private final FleetTransactionLogService fleetTransactionLogService;
     private final EnrollmentTokenService enrollmentTokenService;
-    private final OpAmpCaService opAmpCaService;
+    private final CollectorCaService collectorCaService;
 
     @Inject
     public CollectorsConfigResource(CollectorsConfigService collectorsConfigService,
@@ -87,7 +87,7 @@ public class CollectorsConfigResource extends RestResource {
                                     FleetService fleetService,
                                     FleetTransactionLogService fleetTransactionLogService,
                                     EnrollmentTokenService enrollmentTokenService,
-                                    OpAmpCaService opAmpCaService) {
+                                    CollectorCaService collectorCaService) {
         this.collectorsConfigService = collectorsConfigService;
         this.collectorInputService = collectorInputService;
         this.collectorLogsDestinationService = collectorLogsDestinationService;
@@ -95,7 +95,7 @@ public class CollectorsConfigResource extends RestResource {
         this.fleetService = fleetService;
         this.fleetTransactionLogService = fleetTransactionLogService;
         this.enrollmentTokenService = enrollmentTokenService;
-        this.opAmpCaService = opAmpCaService;
+        this.collectorCaService = collectorCaService;
     }
 
     @GET
@@ -114,7 +114,7 @@ public class CollectorsConfigResource extends RestResource {
     @RequiresPermissions(CollectorsPermissions.CONFIGURATION_EDIT)
     public CollectorsConfig put(@Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) CollectorsConfigRequest request) throws ValidationException {
         validateThresholds(request);
-        opAmpCaService.ensureInitialized();
+        collectorCaService.ensureInitialized();
         collectorLogsDestinationService.ensureExists();
 
         final var existing = collectorsConfigService.get();
@@ -145,10 +145,10 @@ public class CollectorsConfigResource extends RestResource {
         }
 
         final var config = CollectorsConfig.builder()
-                .caCertId(opAmpCaService.getCaCertId())
-                .signingCertId(opAmpCaService.getSigningCertId())
+                .caCertId(collectorCaService.getCaCertId())
+                .signingCertId(collectorCaService.getSigningCertId())
                 .tokenSigningKey(tokenSigningKey)
-                .otlpServerCertId(opAmpCaService.getOtlpServerCertId())
+                .otlpServerCertId(collectorCaService.getOtlpServerCertId())
                 .http(request.http().toConfig(httpInputId))
                 .collectorOfflineThreshold(effectiveOffline)
                 .collectorDefaultVisibilityThreshold(effectiveVisibility)
