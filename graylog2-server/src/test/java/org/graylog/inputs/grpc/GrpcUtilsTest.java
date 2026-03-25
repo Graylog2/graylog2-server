@@ -14,23 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+package org.graylog.inputs.grpc;
 
-import { SystemNotifications } from '@graylog/server-api';
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
+import org.junit.jupiter.api.Test;
 
-import { NOTIFICATIONS_QUERY_KEY } from 'components/notifications/constants';
+import static org.assertj.core.api.Assertions.assertThat;
 
-const POLL_INTERVAL = 3000;
-
-const fetchNotifications = () => SystemNotifications.listNotifications({ requestShouldExtendSession: false });
-const useNotifications = ({ enabled = true }: { enabled?: boolean } = {}) => {
-  const { data, isLoading } = useQuery({
-    queryKey: NOTIFICATIONS_QUERY_KEY,
-    queryFn: fetchNotifications,
-    refetchInterval: POLL_INTERVAL,
-    enabled,
-  });
-
-  return { data, isLoading };
-};
-export default useNotifications;
+class GrpcUtilsTest {
+    @Test
+    void createThrottledStatusRuntimeException() {
+        final StatusRuntimeException exception = GrpcUtils.createThrottledStatusRuntimeException();
+        assertThat(exception.getStatus().getCode()).isEqualTo(Status.UNAVAILABLE.getCode());
+        assertThat(exception.getStatus().getDescription()).contains("THROTTLED mode");
+    }
+}
