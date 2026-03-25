@@ -16,12 +16,11 @@
  */
 package org.graylog2.inputs.transports.netty;
 
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -31,7 +30,6 @@ import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
-
 import jakarta.annotation.Nullable;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
@@ -50,10 +48,6 @@ public class HttpHandler extends SimpleChannelInboundHandler<HttpRequest> {
         this.authorizationHeader = authorizationHeader;
         this.authorizationHeaderValue = authorizationHeaderValue;
         this.path = path;
-    }
-
-    protected boolean isEnableCors() {
-        return enableCors;
     }
 
     @Override
@@ -91,7 +85,7 @@ public class HttpHandler extends SimpleChannelInboundHandler<HttpRequest> {
     }
 
     protected void handleValidPost(ChannelHandlerContext ctx, FullHttpRequest request, boolean keepAlive,
-                                    String origin) {
+                                   String origin) {
         writeResponse(ctx.channel(), keepAlive, request.protocolVersion(),
                 HttpResponseStatus.ACCEPTED, origin);
         ctx.fireChannelRead(request.content().retain());
