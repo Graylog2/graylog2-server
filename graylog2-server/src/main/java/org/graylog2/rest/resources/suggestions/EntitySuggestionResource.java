@@ -82,6 +82,6 @@ public class EntitySuggestionResource extends RestResource {
             displayFields = Arrays.asList(displayFieldsParam.split(","));
         }
 
-        return entitySuggestionService.suggest(collection, identifier, column, displayFields, displayTemplate, identifierType, query, page, perPage, getSubject());
+        return entitySuggestionService.suggest(collection, identifier, column, displayFields, displayTemplate, query, page, perPage, getSubject());
     }
 }
