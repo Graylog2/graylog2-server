@@ -189,7 +189,7 @@ class OTelHttpHandlerTest {
     }
 
     @Test
-    void invalidProtobufReturns400() {
+    void invalidProtobufReturns400WithProtobufContentType() {
         final EmbeddedChannel channel = createChannel();
 
         final byte[] invalidBytes = new byte[]{0x01, 0x02, 0x03, (byte) 0xFF, (byte) 0xFE};
@@ -203,6 +203,26 @@ class OTelHttpHandlerTest {
 
         final FullHttpResponse response = channel.readOutbound();
         assertThat(response.status()).isEqualTo(HttpResponseStatus.BAD_REQUEST);
+        assertThat(response.headers().get(HttpHeaderNames.CONTENT_TYPE)).isEqualTo("application/x-protobuf");
+        verifyNoInteractions(input);
+        response.release();
+    }
+
+    @Test
+    void invalidJsonReturns400WithJsonContentType() {
+        final EmbeddedChannel channel = createChannel();
+
+        final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
+                HttpVersion.HTTP_1_1, HttpMethod.POST, "/v1/logs",
+                Unpooled.wrappedBuffer("not valid json".getBytes(StandardCharsets.UTF_8)));
+        httpRequest.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json");
+        httpRequest.headers().set(HttpHeaderNames.CONTENT_LENGTH, 14);
+
+        channel.writeInbound(httpRequest);
+
+        final FullHttpResponse response = channel.readOutbound();
+        assertThat(response.status()).isEqualTo(HttpResponseStatus.BAD_REQUEST);
+        assertThat(response.headers().get(HttpHeaderNames.CONTENT_TYPE)).isEqualTo("application/json");
         verifyNoInteractions(input);
         response.release();
     }
@@ -350,7 +370,7 @@ class OTelHttpHandlerTest {
     }
 
     @Test
-    void processingFailureReturns500() {
+    void processingFailureReturns500WithMatchingContentType() {
         final EmbeddedChannel channel = createChannel();
         doThrow(new RuntimeException("journal full")).when(input).processRawMessage(any());
 
@@ -365,6 +385,7 @@ class OTelHttpHandlerTest {
 
         final FullHttpResponse response = channel.readOutbound();
         assertThat(response.status()).isEqualTo(HttpResponseStatus.INTERNAL_SERVER_ERROR);
+        assertThat(response.headers().get(HttpHeaderNames.CONTENT_TYPE)).isEqualTo("application/x-protobuf");
         response.release();
     }
 

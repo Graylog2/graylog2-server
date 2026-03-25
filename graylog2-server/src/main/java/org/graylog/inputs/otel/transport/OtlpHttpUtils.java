@@ -97,12 +97,31 @@ public final class OtlpHttpUtils {
     }
 
     /**
-     * Builds a JSON-serialized {@link Status} body for OTLP error responses.
-     * Per the OTLP/HTTP spec, error responses should contain a Status message.
-     * JSON is used as the default encoding since the request encoding may not be known
-     * (e.g., for 415 Unsupported Media Type or pre-handler errors like 401/404/405).
+     * Builds a serialized {@link Status} body for OTLP error responses, matching the request encoding.
+     * Per the OTLP/HTTP spec, error responses should contain a Status message in the same
+     * encoding as the request.
+     */
+    public static byte[] buildErrorStatus(HttpResponseStatus httpStatus, String message, boolean protobuf) {
+        final var rpcStatus = buildRpcStatus(httpStatus, message);
+        if (protobuf) {
+            return rpcStatus.toByteArray();
+        }
+        try {
+            return JsonFormat.printer().print(rpcStatus).getBytes(StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to serialize Status to JSON", e);
+        }
+    }
+
+    /**
+     * Builds a JSON-serialized {@link Status} body for OTLP error responses where the request
+     * encoding is not known (e.g., 415 Unsupported Media Type, or pre-handler errors like 401/404/405).
      */
     public static byte[] buildErrorStatusJson(HttpResponseStatus httpStatus, String message) {
+        return buildErrorStatus(httpStatus, message, false);
+    }
+
+    private static Status buildRpcStatus(HttpResponseStatus httpStatus, String message) {
         final var grpcStatus = switch (httpStatus.code()) {
             case 400, 415 -> INVALID_ARGUMENT;
             case 401 -> UNAUTHENTICATED;
@@ -112,17 +131,10 @@ public final class OtlpHttpUtils {
             default -> INTERNAL;
         };
 
-        // Convert gRPC Status to protobuf Status message for JSON serialization
-        final var protobufStatus = Status.newBuilder()
+        return Status.newBuilder()
                 .setCode(grpcStatus.getCode().value())
                 .setMessage(message == null ? httpStatus.reasonPhrase() : message)
                 .build();
-
-        try {
-            return JsonFormat.printer().print(protobufStatus).getBytes(StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to serialize Status to JSON", e);
-        }
     }
 
     /**

@@ -83,6 +83,8 @@ public class OTelHttpHandler extends HttpHandler {
     @Override
     protected void handleValidPost(ChannelHandlerContext ctx, FullHttpRequest request, boolean keepAlive,
                                    String origin) {
+        final boolean isProtobuf = OtlpHttpUtils.isProtobuf(request);
+
         // 1. Parse request
         final ExportLogsServiceRequest exportRequest;
         try {
@@ -93,8 +95,7 @@ public class OTelHttpHandler extends HttpHandler {
             return;
         } catch (Exception e) {
             LOG.debug("Failed to parse OTLP request", e);
-            writeResponse(ctx.channel(), keepAlive, request.protocolVersion(),
-                    HttpResponseStatus.BAD_REQUEST, origin);
+            sendOtlpError(ctx, request, keepAlive, origin, isProtobuf, HttpResponseStatus.BAD_REQUEST);
             return;
         }
 
@@ -103,17 +104,25 @@ public class OTelHttpHandler extends HttpHandler {
             createJournalRecords(ctx, exportRequest).forEach(input::processRawMessage);
         } catch (Exception e) {
             LOG.error("Failed to process OTLP request", e);
-            writeResponse(ctx.channel(), keepAlive, request.protocolVersion(),
-                    HttpResponseStatus.INTERNAL_SERVER_ERROR, origin);
+            sendOtlpError(ctx, request, keepAlive, origin, isProtobuf, HttpResponseStatus.INTERNAL_SERVER_ERROR);
             return;
         }
 
         // 3. Respond
-        final boolean isProtobuf = OtlpHttpUtils.isProtobuf(request);
         final byte[] responseBody = isProtobuf ? OtlpHttpUtils.SUCCESS_RESPONSE_PROTOBUF : OtlpHttpUtils.SUCCESS_RESPONSE_JSON;
         final String responseContentType = isProtobuf ? OtlpHttpUtils.PROTOBUF_CONTENT_TYPE : OtlpHttpUtils.JSON_CONTENT_TYPE;
         writeResponse(ctx.channel(), keepAlive, request.protocolVersion(),
                 HttpResponseStatus.OK, origin, responseBody, responseContentType);
+    }
+
+    /**
+     * Sends an OTLP-conformant error response in the encoding matching the request.
+     */
+    private void sendOtlpError(ChannelHandlerContext ctx, FullHttpRequest request, boolean keepAlive,
+                                String origin, boolean protobuf, HttpResponseStatus status) {
+        final byte[] body = OtlpHttpUtils.buildErrorStatus(status, null, protobuf);
+        final String contentType = protobuf ? OtlpHttpUtils.PROTOBUF_CONTENT_TYPE : OtlpHttpUtils.JSON_CONTENT_TYPE;
+        writeResponse(ctx.channel(), keepAlive, request.protocolVersion(), status, origin, body, contentType);
     }
 
     /**

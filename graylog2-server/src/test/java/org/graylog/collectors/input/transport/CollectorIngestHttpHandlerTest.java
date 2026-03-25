@@ -132,7 +132,7 @@ class CollectorIngestHttpHandlerTest {
     }
 
     @Test
-    void invalidProtobufReturns400() {
+    void invalidProtobufReturns400WithProtobufContentType() {
         final EmbeddedChannel channel = createChannel("test-uid");
 
         final FullHttpRequest httpRequest = createProtobufRequest("/v1/logs",
@@ -141,12 +141,13 @@ class CollectorIngestHttpHandlerTest {
 
         final FullHttpResponse response = channel.readOutbound();
         assertThat(response.status()).isEqualTo(HttpResponseStatus.BAD_REQUEST);
+        assertThat(response.headers().get(HttpHeaderNames.CONTENT_TYPE)).isEqualTo("application/x-protobuf");
         verifyNoInteractions(input);
         response.release();
     }
 
     @Test
-    void processingFailureReturns500() {
+    void processingFailureReturns500WithMatchingContentType() {
         final EmbeddedChannel channel = createChannel("test-uid");
         doThrow(new RuntimeException("journal full")).when(input).processRawMessage(any());
 
@@ -156,6 +157,7 @@ class CollectorIngestHttpHandlerTest {
 
         final FullHttpResponse response = channel.readOutbound();
         assertThat(response.status()).isEqualTo(HttpResponseStatus.INTERNAL_SERVER_ERROR);
+        assertThat(response.headers().get(HttpHeaderNames.CONTENT_TYPE)).isEqualTo("application/x-protobuf");
         response.release();
     }
 

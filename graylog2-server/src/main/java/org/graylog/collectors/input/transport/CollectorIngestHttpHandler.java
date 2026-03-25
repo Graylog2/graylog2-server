@@ -82,6 +82,8 @@ public class CollectorIngestHttpHandler extends SimpleChannelInboundHandler<Full
         }
 
         final ExportLogsServiceRequest exportRequest;
+        final boolean isProtobuf = OtlpHttpUtils.isProtobuf(request);
+
         try {
             exportRequest = OtlpHttpUtils.parse(request);
         } catch (OtlpHttpUtils.UnsupportedContentTypeException e) {
@@ -89,11 +91,10 @@ public class CollectorIngestHttpHandler extends SimpleChannelInboundHandler<Full
             return;
         } catch (Exception e) {
             LOG.debug("Failed to parse OTLP request", e);
-            sendError(ctx, HttpResponseStatus.BAD_REQUEST, keepAlive);
+            sendError(ctx, HttpResponseStatus.BAD_REQUEST, keepAlive, isProtobuf);
             return;
         }
 
-        final boolean isProtobuf = OtlpHttpUtils.isProtobuf(request);
         try {
             final Function<byte[], RawMessage> createRawMessage;
             if (ctx.channel().remoteAddress() instanceof InetSocketAddress address) {
@@ -108,7 +109,7 @@ public class CollectorIngestHttpHandler extends SimpleChannelInboundHandler<Full
                     .forEach(input::processRawMessage);
         } catch (Exception e) {
             LOG.error("Failed to process OTLP request", e);
-            sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR, keepAlive);
+            sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR, keepAlive, isProtobuf);
             return;
         }
 
@@ -131,18 +132,27 @@ public class CollectorIngestHttpHandler extends SimpleChannelInboundHandler<Full
                 .addListener(keepAlive ? ChannelFutureListener.CLOSE_ON_FAILURE : ChannelFutureListener.CLOSE);
     }
 
-    private void sendError(ChannelHandlerContext ctx, HttpResponseStatus status, boolean keepAlive) {
-        final byte[] body = OtlpHttpUtils.buildErrorStatusJson(status, null);
+    private void sendError(ChannelHandlerContext ctx, HttpResponseStatus status, boolean keepAlive, boolean protobuf) {
+        final byte[] body = OtlpHttpUtils.buildErrorStatus(status, null, protobuf);
+        final String contentType = protobuf ? OtlpHttpUtils.PROTOBUF_CONTENT_TYPE : OtlpHttpUtils.JSON_CONTENT_TYPE;
 
         final DefaultFullHttpResponse response = new DefaultFullHttpResponse(
                 HttpVersion.HTTP_1_1, status, Unpooled.wrappedBuffer(body));
 
-        response.headers().set(HttpHeaderNames.CONTENT_TYPE, OtlpHttpUtils.JSON_CONTENT_TYPE);
+        response.headers().set(HttpHeaderNames.CONTENT_TYPE, contentType);
         response.headers().set(HttpHeaderNames.CONTENT_LENGTH, body.length);
         response.headers().set(HttpHeaderNames.CONNECTION,
                 keepAlive ? HttpHeaderValues.KEEP_ALIVE : HttpHeaderValues.CLOSE);
 
         ctx.writeAndFlush(response)
                 .addListener(keepAlive ? ChannelFutureListener.CLOSE_ON_FAILURE : ChannelFutureListener.CLOSE);
+    }
+
+    /**
+     * Sends an error response defaulting to JSON encoding. Used for errors where the request
+     * encoding is not known (e.g., 401/404/405/415).
+     */
+    private void sendError(ChannelHandlerContext ctx, HttpResponseStatus status, boolean keepAlive) {
+        sendError(ctx, status, keepAlive, false);
     }
 }
