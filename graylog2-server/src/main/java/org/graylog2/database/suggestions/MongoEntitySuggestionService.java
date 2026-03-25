@@ -33,7 +33,6 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.utils.CompositeDisplayFormatter;
 import org.graylog2.database.utils.MongoUtils;
-import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.security.EntityPermissionsUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +75,6 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                                             final String valueColumn,
                                             @Nullable final List<String> displayFields,
                                             @Nullable final String displayTemplate,
-                                            final SearchQueryField.Type identifierType,
                                             final String query,
                                             final int page,
                                             final int perPage,
