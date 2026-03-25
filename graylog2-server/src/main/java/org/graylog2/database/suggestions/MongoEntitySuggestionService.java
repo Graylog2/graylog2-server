@@ -72,20 +72,7 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
 
     @Override
     public EntitySuggestionResponse suggest(final String collection,
-                                            final String targetColumn,
-                                            final String valueColumn,
-                                            @Nullable final List<String> displayFields,
-                                            @Nullable final String displayTemplate,
-                                            final String query,
-                                            final int page,
-                                            final int perPage,
-                                            final Subject subject) {
-        return suggest(collection, targetColumn, valueColumn, displayFields, displayTemplate, null, query, page, perPage, subject);
-    }
-
-    @Override
-    public EntitySuggestionResponse suggest(final String collection,
-                                            final String targetColumn,
+                                            final String identifier,
                                             final String valueColumn,
                                             @Nullable final List<String> displayFields,
                                             @Nullable final String displayTemplate,
@@ -95,7 +82,7 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                                             final int perPage,
                                             final Subject subject) {
         final Set<String> requestedFields = new HashSet<>();
-        requestedFields.add(targetColumn);
+        requestedFields.add(identifier);
         requestedFields.add(valueColumn);
         if (displayFields != null) {
             requestedFields.addAll(displayFields);
@@ -114,7 +101,7 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
 
         // Determine which fields to project
         final Set<String> fieldsToProject = new HashSet<>();
-        fieldsToProject.add(targetColumn);
+        fieldsToProject.add(identifier);
 
         if (displayFields != null && !displayFields.isEmpty()) {
             fieldsToProject.addAll(displayFields);
@@ -165,9 +152,9 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                             displayValue = doc.getString(valueColumn);
                         }
 
-                        // Extract targetColumn value as String
+                        // Extract identifier value as String
                         final String targetValue;
-                        final Object rawValue = doc.get(targetColumn);
+                        final Object rawValue = doc.get(identifier);
                         if (rawValue instanceof ObjectId oid) {
                             targetValue = oid.toHexString();
                         } else {
@@ -217,16 +204,4 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
     private Stream<Document> mongoPaginate(FindIterable<Document> result, int limit, int skip) {
         return MongoUtils.stream(result.limit(limit).skip(skip));
     }
-
-    @Override
-    public EntitySuggestionResponse suggest(final String collection,
-                                            final String targetColumn,
-                                            final String valueColumn,
-                                            final String query,
-                                            final int page,
-                                            final int perPage,
-                                            final Subject subject) {
-        return suggest(collection, targetColumn, valueColumn, null, null, null, query, page, perPage, subject);
-    }
-
 }

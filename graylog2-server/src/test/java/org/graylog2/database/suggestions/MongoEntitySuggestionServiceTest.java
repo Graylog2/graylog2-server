@@ -66,7 +66,7 @@ class MongoEntitySuggestionServiceTest {
                 .when(entityPermissionsUtils)
                 .createPermissionCheck(subject, "dashboards");
 
-        final var result = toTest.suggest("dashboards", "_id", "title", "", 1, 10, subject);
+        final var result = toTest.suggest("dashboards", "_id", "title", null, null, null, "", 1, 10, subject);
 
         assertThat(result.pagination().count()).isEqualTo(2);
 
@@ -89,6 +89,7 @@ class MongoEntitySuggestionServiceTest {
                 "hostname",
                 List.of("node_id", "hostname"),
                 "{node_id} ({hostname})",
+                null,
                 "",
                 1,
                 10,
@@ -130,6 +131,7 @@ class MongoEntitySuggestionServiceTest {
                 "hostname",
                 List.of("node_id", "hostname"),
                 null,
+                null,
                 "",
                 1,
                 10,
@@ -159,6 +161,7 @@ class MongoEntitySuggestionServiceTest {
                 "hostname",
                 List.of("node_id", "hostname"),
                 "{node_id} ({hostname})",
+                null,
                 "webserver1",
                 1,
                 10,
@@ -184,6 +187,7 @@ class MongoEntitySuggestionServiceTest {
                 "hostname",
                 List.of("node_id", "hostname"),
                 "{node_id} ({hostname})",
+                null,
                 "node-uuid-123",
                 1,
                 10,
@@ -208,6 +212,7 @@ class MongoEntitySuggestionServiceTest {
                 "nodes",
                 "node_id",
                 "hostname",
+                null,
                 null,
                 null,
                 "",
@@ -239,6 +244,7 @@ class MongoEntitySuggestionServiceTest {
                 "hostname",
                 List.of("node_id", "hostname"),
                 "{node_id} ({hostname})",
+                null,
                 "",
                 1,
                 10,
@@ -255,11 +261,11 @@ class MongoEntitySuggestionServiceTest {
     void returnsEmptyResponseWhenValueColumnIsNotReadable() {
         doReturn(false).when(entityPermissionsUtils).areAllFieldsReadable("dashboards", Set.of("field_1", "field_2"));
 
-        EntitySuggestionResponse result = toTest.suggest("dashboards", "field_1", "field_2", "", 1, 10, subject);
+        EntitySuggestionResponse result = toTest.suggest("dashboards", "field_1", "field_2", null, null, null, "", 1, 10, subject);
         assertThat(result.suggestions()).isEmpty();
         assertThat(result.pagination().total()).isZero();
 
-        result = toTest.suggest("dashboards", "field_1", "field_2", "", 1, 10, subject);
+        result = toTest.suggest("dashboards", "field_1", "field_2", null, null, null, "", 1, 10, subject);
         assertThat(result.suggestions()).isEmpty();
         assertThat(result.pagination().total()).isZero();
     }
@@ -268,7 +274,7 @@ class MongoEntitySuggestionServiceTest {
     void returnsEmptyResponseWhenTargetColumnIsNotReadable() {
         doReturn(false).when(entityPermissionsUtils).areAllFieldsReadable("dashboards", Set.of("secret_target", "title"));
 
-        final var result = toTest.suggest("dashboards", "secret_target", "title", "", 1, 10, subject);
+        final var result = toTest.suggest("dashboards", "secret_target", "title", null, null, null, "", 1, 10, subject);
 
         assertThat(result.suggestions()).isEmpty();
         assertThat(result.pagination().total()).isZero();
@@ -286,6 +292,7 @@ class MongoEntitySuggestionServiceTest {
                 "hostname",
                 List.of("node_id", "secret_field"),
                 "{node_id} ({secret_field})",
+                null,
                 "",
                 1,
                 10,
@@ -300,7 +307,7 @@ class MongoEntitySuggestionServiceTest {
     void returnsResultsWhenAllFieldsAreReadable() {
         doReturn(true).when(entityPermissionsUtils).hasAllPermission(subject);
 
-        final var result = toTest.suggest("dashboards", "_id", "title", "", 1, 10, subject);
+        final var result = toTest.suggest("dashboards", "_id", "title", null, null, null, "", 1, 10, subject);
 
         assertThat(result.suggestions()).isNotEmpty();
     }
