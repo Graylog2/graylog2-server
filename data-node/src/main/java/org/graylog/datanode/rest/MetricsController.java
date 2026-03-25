@@ -21,10 +21,6 @@ import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -56,8 +52,6 @@ public class MetricsController {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get all metrics",
-                  notes = "Note that this might return a huge result set.")
     public MetricRegistry metrics() {
         return metricRegistry;
     }
@@ -65,7 +59,6 @@ public class MetricsController {
     @GET
     @Timed
     @Path("/names")
-    @ApiOperation(value = "Get all metrics keys/names")
     public MetricNamesResponse metricNames() {
         return MetricNamesResponse.create(metricRegistry.getNames());
     }
@@ -73,12 +66,7 @@ public class MetricsController {
     @GET
     @Timed
     @Path("/{metricName}")
-    @ApiOperation(value = "Get a single metric")
-    @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such metric")
-    })
-    public Metric singleMetric(@ApiParam(name = "metricName", required = true)
-                               @PathParam("metricName") String metricName) {
+    public Metric singleMetric(@PathParam("metricName") String metricName) {
         final Metric metric = metricRegistry.getMetrics().get(metricName);
         if (metric == null) {
             final String msg = "I do not have a metric called [" + metricName + "].";
@@ -90,12 +78,7 @@ public class MetricsController {
     @POST
     @Timed
     @Path("/multiple")
-    @ApiOperation("Get the values of multiple metrics at once")
-    @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Malformed body")
-    })
-    public MetricsSummaryResponse multipleMetrics(@ApiParam(name = "Requested metrics", required = true)
-                                                  @Valid @NotNull MetricsReadRequest request) {
+    public MetricsSummaryResponse multipleMetrics(@Valid @NotNull MetricsReadRequest request) {
         final Map<String, Metric> metrics = metricRegistry.getMetrics();
 
         final List<Map<String, Object>> metricsList = Lists.newArrayList();

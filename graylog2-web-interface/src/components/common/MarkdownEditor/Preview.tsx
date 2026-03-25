@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import NumberUtils from 'util/NumberUtils';
@@ -136,7 +137,7 @@ function Preview({
   noBorder = false,
   noPadding = false,
 }: Props) {
-  const [fullView, setFullView] = React.useState<boolean>(false);
+  const [fullView, setFullView] = useState<boolean>(false);
 
   return (
     show && (

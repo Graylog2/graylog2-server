@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo } from 'react';
 
 import { RowContainer } from 'components/lookup-tables/layout-componets';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -23,12 +24,12 @@ import type { LookupTableCache } from 'logic/lookup-tables/types';
 
 function CacheShow({ cache }: { cache: LookupTableCache }) {
   const plugins = usePluginEntities('lookupTableCaches');
-  const cachePlugin = React.useMemo(
+  const cachePlugin = useMemo(
     () => plugins.find((p: any) => p.type === cache?.config?.type),
     [cache?.config?.type, plugins],
   );
 
-  const DocComponent = React.useMemo(() => cachePlugin?.documentationComponent, [cachePlugin]);
+  const DocComponent = useMemo(() => cachePlugin?.documentationComponent, [cachePlugin]);
 
   return (
     <RowContainer $gap="xl" $withDocs={!!DocComponent} $justify="center">

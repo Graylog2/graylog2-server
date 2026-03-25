@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import type { InputDescription } from 'src/stores/inputs/InputTypesStore';
 
 import { SystemInputsTypes } from '@graylog/server-api';
 
+import type { InputDescription } from 'stores/inputs/InputTypesStore';
 import { defaultOnError } from 'util/conditional/onError';
 
 type Options = {

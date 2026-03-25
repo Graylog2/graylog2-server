@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, waitFor, screen, act } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
@@ -84,10 +84,7 @@ describe('<UserCreate />', () => {
       const submitButton = await findSubmitButton();
       await userEvent.type(usernameInput, 'The username');
 
-      // eslint-disable-next-line testing-library/no-unnecessary-act
-      await act(async () => {
-        await userEvent.type(firstNameInput, 'The first name');
-      });
+      await userEvent.type(firstNameInput, 'The first name');
 
       await userEvent.type(lastNameInput, 'The last name');
       await userEvent.type(emailInput, 'username@example.org');
@@ -137,10 +134,7 @@ describe('<UserCreate />', () => {
       await userEvent.type(usernameInput, '   username   ');
       await userEvent.type(firstNameInput, 'The first name');
 
-      // eslint-disable-next-line testing-library/no-unnecessary-act
-      await act(async () => {
-        await userEvent.type(lastNameInput, 'The last name');
-      });
+      await userEvent.type(lastNameInput, 'The last name');
 
       await userEvent.type(emailInput, 'username@example.org');
       await userEvent.type(passwordInput, 'thepassword');

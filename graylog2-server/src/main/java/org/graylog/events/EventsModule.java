@@ -57,6 +57,7 @@ import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorParameters;
 import org.graylog.events.processor.aggregation.AggregationSearch;
 import org.graylog.events.processor.aggregation.PivotAggregationSearch;
+import org.graylog.events.processor.modifier.EventSummaryModifier;
 import org.graylog.events.processor.storage.EventStorageHandlerEngine;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
 import org.graylog.events.processor.systemnotification.SystemNotificationEventProcessor;
@@ -186,10 +187,11 @@ public class EventsModule extends PluginModule {
 
         serviceBinder().addBinding().to(NotificationSystemEventPublisher.class).in(Scopes.SINGLETON);
 
-        eventModifierBinder(); // Initialize event modifier binding to avoid errors when no modifiers are bound.
         eventQuerySearchTypeSupplierBinder(); // Initialize binder to avoid errors when no suppliers are bound.
 
         OptionalBinder.newOptionalBinder(binder(), EventProcedureProvider.class)
                 .setDefault().to(DefaultEventProcedureProvider.class);
+
+        addEventModifier(EventSummaryModifier.class);
     }
 }

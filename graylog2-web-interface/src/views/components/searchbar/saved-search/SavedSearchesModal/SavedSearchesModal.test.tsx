@@ -18,6 +18,7 @@ import React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import Immutable from 'immutable';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import asMock from 'helpers/mocking/AsMock';
 import View from 'views/logic/views/View';
@@ -56,6 +57,11 @@ const createPaginatedSearches = (count = 1) => {
       {
         id: 'description',
         title: 'Description',
+        sortable: true,
+      },
+      {
+        id: 'favorite',
+        title: 'Favorite',
         sortable: true,
       },
     ],
@@ -126,7 +132,7 @@ describe('SavedSearchesModal', () => {
 
       const cancel = getByText('Cancel');
 
-      userEvent.click(cancel);
+      await userEvent.click(cancel);
 
       expect(onToggleModal).toHaveBeenCalledTimes(1);
     });
@@ -141,7 +147,7 @@ describe('SavedSearchesModal', () => {
       await screen.findByText('search-title-0');
       const deleteBtn = screen.getByTitle('Delete search search-title-0');
 
-      userEvent.click(deleteBtn);
+      await userEvent.click(deleteBtn);
 
       expect(window.confirm).toHaveBeenCalledTimes(1);
 
@@ -163,7 +169,7 @@ describe('SavedSearchesModal', () => {
 
       const listItem = await screen.findByText('search-title-0');
 
-      userEvent.click(listItem);
+      await userEvent.click(listItem);
 
       expect(onLoad).toHaveBeenCalledTimes(1);
     });
@@ -171,7 +177,7 @@ describe('SavedSearchesModal', () => {
     it('should not display delete action for saved search when user is missing required permissions', async () => {
       const currentUser = adminUser
         .toBuilder()
-        .permissions(Immutable.List([`view:read:${defaultPaginatedSearches.list[0].id}`]))
+        .permissions(Immutable.List<Permission>([`view:read:${defaultPaginatedSearches.list[0].id}`]))
         .build();
       asMock(useCurrentUser).mockReturnValue(currentUser);
 
@@ -203,13 +209,13 @@ describe('SavedSearchesModal', () => {
         name: /configure page size/i,
       });
 
-      userEvent.click(pageSizeDropdown);
+      await userEvent.click(pageSizeDropdown);
 
       const pageSizeOption = await screen.findByRole('menuitem', {
         name: /100/i,
       });
 
-      userEvent.click(pageSizeOption);
+      await userEvent.click(pageSizeOption);
 
       expect(updateTableLayout).toHaveBeenCalledTimes(1);
       expect(updateTableLayout).toHaveBeenCalledWith({ perPage: 100 });

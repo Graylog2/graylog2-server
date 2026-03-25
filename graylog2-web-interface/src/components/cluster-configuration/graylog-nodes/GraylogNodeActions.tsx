@@ -15,17 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
-import URI from 'urijs';
 
-import { LinkContainer } from 'components/common/router';
-import { ConfirmDialog, ExternalLink, IfPermitted } from 'components/common';
-import { DropdownButton, MenuItem } from 'components/bootstrap';
+import { LinkContainer, ConfirmDialog, IfPermitted } from 'components/common';
+import { MoreActions } from 'components/common/EntityDataTable';
+import { MenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { SystemLoadBalancerStore } from 'stores/load-balancer/SystemLoadBalancerStore';
 import { SystemProcessingStore } from 'stores/system-processing/SystemProcessingStore';
 
-import type { GraylogNode } from './useClusterGraylogNodes';
+import { LOAD_BALANCER_STATUS } from './fetchClusterGraylogNodes';
+import type { ClusterGraylogNode as GraylogNode, LoadBalancerStatus } from './fetchClusterGraylogNodes';
 
 type Props = {
   node: GraylogNode;
@@ -33,11 +33,10 @@ type Props = {
 
 const GraylogNodeActions = ({ node }: Props) => {
   const [showMessageProcessingModal, setShowMessageProcessingModal] = useState<boolean>(false);
-  const [loadBalancerStatusToConfirm, setLoadBalancerStatusToConfirm] = useState<'ALIVE' | 'DEAD' | undefined>(
+  const [loadBalancerStatusToConfirm, setLoadBalancerStatusToConfirm] = useState<LoadBalancerStatus | undefined>(
     undefined,
   );
 
-  const apiBrowserURI = new URI(`${node.transport_address}/api-browser/`).normalizePathname().toString();
   const nodeName = `${node.short_node_id} / ${node.hostname}`;
 
   const toggleMessageProcessing = () => {
@@ -49,27 +48,27 @@ const GraylogNodeActions = ({ node }: Props) => {
     setShowMessageProcessingModal(false);
   };
 
-  const updateLoadBalancerStatus = (status: 'ALIVE' | 'DEAD') => {
+  const updateLoadBalancerStatus = (status: LoadBalancerStatus) => {
     SystemLoadBalancerStore.override(node.node_id, status);
     setLoadBalancerStatusToConfirm(undefined);
   };
 
   return (
     <>
-      <DropdownButton bsSize="xs" title="More" id={`more-actions-dropdown-${node.node_id}`} pullRight>
+      <MoreActions>
         <IfPermitted permissions="processing:changestate">
           <MenuItem onSelect={() => setShowMessageProcessingModal(true)}>
             {node.is_processing ? 'Pause' : 'Resume'} message processing
           </MenuItem>
         </IfPermitted>
         <IfPermitted permissions="lbstatus:change">
-          {node.lb_status === 'alive' ? (
-            <MenuItem onSelect={() => setLoadBalancerStatusToConfirm('DEAD')}>
-              Override load Balancer status to DEAD
+          {node.lb_status === LOAD_BALANCER_STATUS.ALIVE ? (
+            <MenuItem onSelect={() => setLoadBalancerStatusToConfirm(LOAD_BALANCER_STATUS.DEAD)}>
+              Override load balancer status to DEAD
             </MenuItem>
           ) : (
-            <MenuItem onSelect={() => setLoadBalancerStatusToConfirm('ALIVE')}>
-              Override load Balancer status to ALIVE
+            <MenuItem onSelect={() => setLoadBalancerStatusToConfirm(LOAD_BALANCER_STATUS.ALIVE)}>
+              Override load balancer status to ALIVE
             </MenuItem>
           )}
         </IfPermitted>
@@ -103,12 +102,7 @@ const GraylogNodeActions = ({ node }: Props) => {
             <MenuItem>Get recent system log messages</MenuItem>
           </LinkContainer>
         </IfPermitted>
-        <IfPermitted permissions="api_browser:read">
-          <MenuItem href={apiBrowserURI} target="_blank">
-            <ExternalLink>API Browser</ExternalLink>
-          </MenuItem>
-        </IfPermitted>
-      </DropdownButton>
+      </MoreActions>
       {showMessageProcessingModal && (
         <ConfirmDialog
           show

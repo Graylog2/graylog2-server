@@ -16,7 +16,9 @@
  */
 import * as Immutable from 'immutable';
 
-import { DecoratorsActions } from 'stores/decorators/DecoratorsStore';
+import { SearchDecorators } from '@graylog/server-api';
+
+import type { Decorator } from 'views/logic/widgets/MessagesWidgetConfig';
 
 import View from './View';
 import type { ViewType } from './View';
@@ -37,8 +39,6 @@ type ViewCreator = (
   streamCategory: string | string[] | undefined | null,
 ) => Promise<Result>;
 type DefaultWidgets = Record<ViewType, ViewCreator>;
-
-type Decorator = { stream: string | null; category: string | null };
 
 export const matchesDecoratorStream = (streamId: string | string[] | undefined | null) => {
   if (!streamId) {
@@ -69,7 +69,7 @@ const _defaultWidgets: DefaultWidgets = {
     streamId: string | string[] | undefined | null,
     streamCategory: string | string[] | undefined | null,
   ) => {
-    const decorators = await DecoratorsActions.list();
+    const decorators = await SearchDecorators.get();
     const byStreamId = matchesDecoratorStream(streamId);
     const byStreamCategory = matchesDecoratorStreamCategories(streamCategory);
     const streamDecorators = decorators ? decorators.filter(byStreamId) : [];

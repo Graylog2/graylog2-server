@@ -15,13 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { FixedSizeList } from 'react-window';
+import { List as VirtualList, type RowComponentProps } from 'react-window';
 import type { List as ImmutableList } from 'immutable';
 import styled from 'styled-components';
 
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import ElementDimensions from 'components/common/ElementDimensions';
-import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import isFilteredField from 'views/logic/IsFilteredField';
 
 import ListItem from './ListItem';
@@ -57,9 +56,16 @@ const _fieldsToShow = (
   }
 };
 
-const List = ({ filter, activeQueryFields, allFields, currentGroup }: Props) => {
-  const activeQuery = useActiveQueryId();
+type RowProps = {
+  fieldList: ImmutableList<FieldTypeMapping>;
+  activeQueryFields: ImmutableList<FieldTypeMapping>;
+};
 
+const RowComponent = ({ index, style, fieldList, activeQueryFields }: RowComponentProps<RowProps>) => (
+  <ListItem fieldType={fieldList.get(index)} activeQueryFields={activeQueryFields} style={style} />
+);
+
+const List = ({ filter, activeQueryFields, allFields, currentGroup }: Props) => {
   if (!activeQueryFields) {
     return <span>No field information available.</span>;
   }
@@ -68,7 +74,10 @@ const List = ({ filter, activeQueryFields, allFields, currentGroup }: Props) => 
     ? (field: { name: string }) => field.name.toLocaleUpperCase().includes(filter.toLocaleUpperCase())
     : () => true;
   const fieldsToShow = _fieldsToShow(activeQueryFields, allFields, currentGroup);
-  const fieldList = fieldsToShow.filter(fieldFilter).sortBy((field) => field.name.toLocaleUpperCase());
+  const fieldList = fieldsToShow
+    .filter(fieldFilter)
+    .sortBy((field) => field.name.toLocaleUpperCase())
+    .toList();
 
   if (fieldList.isEmpty()) {
     return <i>No fields to show. Try changing your filter term or select a different field set above.</i>;
@@ -77,16 +86,16 @@ const List = ({ filter, activeQueryFields, allFields, currentGroup }: Props) => 
   return (
     <DynamicHeight>
       {({ width, height }) => (
-        <FixedSizeList height={height || DEFAULT_HEIGHT_PX} width={width} itemCount={fieldList.size} itemSize={20}>
-          {({ index, style }) => (
-            <ListItem
-              fieldType={fieldList.get(index)}
-              selectedQuery={activeQuery}
-              activeQueryFields={activeQueryFields}
-              style={style}
-            />
-          )}
-        </FixedSizeList>
+        <VirtualList
+          style={{ height: height || DEFAULT_HEIGHT_PX, width }}
+          rowComponent={RowComponent}
+          rowCount={fieldList.size}
+          rowHeight={20}
+          rowProps={{
+            fieldList,
+            activeQueryFields,
+          }}
+        />
       )}
     </DynamicHeight>
   );

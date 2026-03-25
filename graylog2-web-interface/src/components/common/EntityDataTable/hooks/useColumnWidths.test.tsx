@@ -20,10 +20,10 @@ import useColumnWidths from './useColumnWidths';
 
 describe('useColumnWidths hook test', () => {
   const defaultProps = {
-    actionsColWidth: 0,
+    actionsColMinWidth: 0,
     bulkSelectColWidth: 0,
     columnWidthPreferences: undefined,
-    tableWidth: 600,
+    scrollContainerWidth: 600,
     headerMinWidths: { title: 100, description: 110 },
     columnSchemas: [
       { id: 'title', title: 'Title' },
@@ -86,7 +86,7 @@ describe('useColumnWidths hook test', () => {
     const { result } = renderHook(() =>
       useColumnWidths({
         ...defaultProps,
-        actionsColWidth: 110,
+        actionsColMinWidth: 110,
         bulkSelectColWidth: 20,
         columnRenderersByAttribute,
         columnIds,
@@ -101,6 +101,28 @@ describe('useColumnWidths hook test', () => {
     });
   });
 
+  it('should use actions column to fill remaining width when all columns are static', async () => {
+    const columnRenderersByAttribute = {
+      title: { staticWidth: 200 },
+      description: { staticWidth: 200 },
+    };
+    const columnIds = ['title', 'description'];
+
+    const { result } = renderHook(() =>
+      useColumnWidths({
+        ...defaultProps,
+        columnRenderersByAttribute,
+        columnIds,
+      }),
+    );
+
+    expect(result.current).toEqual({
+      actions: 200,
+      description: 200,
+      title: 200,
+    });
+  });
+
   it('should consider header min widths', async () => {
     const columnRenderersByAttribute = {
       title: { width: 1 },
@@ -112,8 +134,8 @@ describe('useColumnWidths hook test', () => {
     const { result } = renderHook(() =>
       useColumnWidths({
         ...defaultProps,
-        tableWidth: 1500,
-        actionsColWidth: 110,
+        scrollContainerWidth: 1500,
+        actionsColMinWidth: 110,
         bulkSelectColWidth: 20,
         columnRenderersByAttribute,
         columnIds,

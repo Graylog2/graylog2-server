@@ -40,7 +40,6 @@ import org.opensearch.client.opensearch.core.BulkRequest.Builder;
 import org.opensearch.client.opensearch.indices.GetIndexResponse;
 import org.opensearch.client.opensearch.indices.GetMappingResponse;
 import org.opensearch.client.opensearch.indices.IndexSettings;
-import org.opensearch.client.opensearch.indices.add_block.IndicesBlockOptions;
 import org.opensearch.client.opensearch.indices.get_mapping.IndexMappingRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +52,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -62,6 +62,12 @@ import static org.graylog2.indexer.Constants.COMPOSABLE_INDEX_TEMPLATES_FEATURE;
 
 public class ClientOS implements Client {
     private static final Logger LOG = LoggerFactory.getLogger(ClientOS.class);
+
+    private static final Set<String> PROTECTED_INDICES = Set.of(
+            ".opensearch-observability",
+            ".opendistro_security"
+    );
+
     private final OfficialOpensearchClient opensearchClient;
     private final List<String> featureFlags;
     private final ObjectMapper objectMapper;
@@ -80,9 +86,13 @@ public class ClientOS implements Client {
 
     @Override
     public void deleteIndices(String... indices) {
-        if (indices.length > 0) {
-            opensearchClient.sync(c -> c.indices().delete(r -> r.index(List.of(indices)).ignoreUnavailable(true)), "Failed to delete indices");
-        }
+        Arrays.stream(indices)
+                .filter(i -> !PROTECTED_INDICES.contains(i))
+                .forEach(this::deleteIndex);
+    }
+
+    private void deleteIndex(String index) {
+        opensearchClient.sync(c -> c.indices().delete(r -> r.index(index).ignoreUnavailable(true)), "Failed to delete index " + index);
     }
 
     public void deleteDataStreams() {
@@ -207,7 +217,7 @@ public class ClientOS implements Client {
 
     @Override
     public void setIndexBlock(String index) {
-        opensearchClient.sync(c -> c.indices().addBlock(req -> req.index(index).block(IndicesBlockOptions.ReadOnly)), "Unable to set index block for " + index);
+        opensearchClient.sync(c -> c.indices().putSettings(req -> req.index(index).settings(s -> s.customSettings("index.blocks.read_only_allow_delete", JsonData.of(true)))), "Unable to set index block for " + index);
     }
 
     @Override

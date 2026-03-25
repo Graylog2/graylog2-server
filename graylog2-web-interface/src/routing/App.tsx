@@ -28,10 +28,12 @@ import RuntimeErrorBoundary from 'components/errors/RuntimeErrorBoundary';
 import NavigationTelemetry from 'logic/telemetry/NavigationTelemetry';
 import HotkeysProvider from 'contexts/HotkeysProvider';
 import HotkeysModalContainer from 'components/hotkeys/HotkeysModalContainer';
-import PerspectivesProvider from 'components/perspectives/contexts/PerspectivesProvider';
 import PageContextProviders from 'components/page/contexts/PageContextProviders';
 import { singleton } from 'logic/singleton';
 import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
+import RightSidebarProvider from 'contexts/RightSidebarProvider';
+import RightSidebar from 'components/layout/RightSidebar';
+import RightSidebarContext from 'contexts/RightSidebarContext';
 
 const AppLayout = styled.div`
   display: flex;
@@ -39,10 +41,24 @@ const AppLayout = styled.div`
   height: 100%;
 `;
 
-const PageContent = styled.div`
-  height: 100%;
-  overflow: auto;
+const ContentRow = styled.div`
+  display: flex;
+  flex-direction: row;
   flex: 1;
+  overflow: auto;
+`;
+
+const MainContentColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+`;
+
+const PageContent = styled.div`
+  flex: 1;
+  min-height: 0;
 `;
 
 const App = () => (
@@ -54,29 +70,36 @@ const App = () => (
         }
 
         return (
-          <PerspectivesProvider>
+          <RightSidebarProvider>
             <HotkeysProvider>
               <ScratchpadProvider loginName={currentUser.username}>
                 <NavigationTelemetry />
                 <>
                   <AppLayout>
                     <Navigation />
-                    <Scratchpad />
                     <ReportedErrorBoundary>
-                      <RuntimeErrorBoundary>
-                        <PageContextProviders>
-                          <PageContent>
-                            <Outlet />
-                          </PageContent>
-                        </PageContextProviders>
-                      </RuntimeErrorBoundary>
+                      <ContentRow>
+                        <MainContentColumn>
+                          <Scratchpad />
+                          <RuntimeErrorBoundary>
+                            <PageContextProviders>
+                              <PageContent>
+                                <Outlet />
+                              </PageContent>
+                            </PageContextProviders>
+                          </RuntimeErrorBoundary>
+                        </MainContentColumn>
+                        <RightSidebarContext.Consumer>
+                          {({ isOpen }) => isOpen && <RightSidebar />}
+                        </RightSidebarContext.Consumer>
+                      </ContentRow>
                     </ReportedErrorBoundary>
                   </AppLayout>
                   <HotkeysModalContainer />
                 </>
               </ScratchpadProvider>
             </HotkeysProvider>
-          </PerspectivesProvider>
+          </RightSidebarProvider>
         );
       }}
     </CurrentUserContext.Consumer>

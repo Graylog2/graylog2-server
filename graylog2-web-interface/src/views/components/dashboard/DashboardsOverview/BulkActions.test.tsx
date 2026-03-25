@@ -41,10 +41,12 @@ describe('DashboardsOverview BulkActionsRow', () => {
     selectEntity: () => {},
     deselectEntity: () => {},
     toggleEntitySelect: () => {},
+    isSomeRowsSelected: false,
+    isAllRowsSelected: false,
   };
 
   const openActionsDropdown = async () => {
-    userEvent.click(
+    await userEvent.click(
       await screen.findByRole('button', {
         name: /bulk actions/i,
       }),
@@ -54,7 +56,7 @@ describe('DashboardsOverview BulkActionsRow', () => {
   };
 
   const deleteDashboards = async () => {
-    userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
     await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
   };
 
@@ -72,6 +74,7 @@ describe('DashboardsOverview BulkActionsRow', () => {
       ...useSelectedEntitiesResponse,
       selectedEntities: ['dashboard-id-1', 'dashboard-id-2'],
       setSelectedEntities,
+      isAllRowsSelected: true,
     });
 
     render(<BulkActions />);
@@ -104,6 +107,7 @@ describe('DashboardsOverview BulkActionsRow', () => {
       ...useSelectedEntitiesResponse,
       selectedEntities: ['dashboard-id-1', 'dashboard-id-2'],
       setSelectedEntities,
+      isAllRowsSelected: true,
     });
 
     render(<BulkActions />);

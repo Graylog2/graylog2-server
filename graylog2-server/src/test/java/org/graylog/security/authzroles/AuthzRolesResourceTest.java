@@ -18,6 +18,8 @@ package org.graylog.security.authzroles;
 
 import jakarta.ws.rs.ForbiddenException;
 import org.bson.types.ObjectId;
+import org.graylog.security.UserContext;
+import org.graylog2.audit.AuditEventSender;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.search.SearchQueryParser;
@@ -29,7 +31,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
@@ -38,6 +39,7 @@ import java.util.Set;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -54,6 +56,8 @@ class AuthzRolesResourceTest {
     private SearchQueryParser searchQueryParser;
     @Mock
     private SearchQueryParser userSearchQueryParser;
+    @Mock
+    AuditEventSender auditEventSender;
 
     @InjectMocks
     private AuthzRolesResource classUnderTest;
@@ -62,7 +66,7 @@ class AuthzRolesResourceTest {
     @WithAuthorization(permissions = "roles:read:reader")
     void testGetSingleRole() {
         ObjectId readerRoleId = new ObjectId();
-        AuthzRoleDTO readerRole = Mockito.mock(AuthzRoleDTO.class);
+        AuthzRoleDTO readerRole = mock(AuthzRoleDTO.class);
         String idHexString = readerRoleId.toHexString();
 
         when(authzolesService.get(eq(idHexString))).thenReturn(Optional.of(readerRole));
@@ -78,7 +82,7 @@ class AuthzRolesResourceTest {
     @WithAuthorization(permissions = "roles:read:random")
     void testGEtSignleRoleThrowsAccessError() {
         ObjectId readerRoleId = new ObjectId();
-        AuthzRoleDTO readerRole = Mockito.mock(AuthzRoleDTO.class);
+        AuthzRoleDTO readerRole = mock(AuthzRoleDTO.class);
         String idHexString = readerRoleId.toHexString();
 
         when(authzolesService.get(eq(idHexString))).thenReturn(Optional.of(readerRole));
@@ -90,15 +94,18 @@ class AuthzRolesResourceTest {
     @WithAuthorization(permissions = { "users:rolesedit:johnny", "roles:assign:reader" })
     void testAddingUserToRole() throws ValidationException {
         ObjectId readerRoleId = new ObjectId();
-        AuthzRoleDTO readerRole = Mockito.mock(AuthzRoleDTO.class);
+        AuthzRoleDTO readerRole = mock(AuthzRoleDTO.class);
         String idHexString = readerRoleId.toHexString();
+        UserContext userContext = mock(UserContext.class);
 
         when(authzolesService.get(eq(idHexString))).thenReturn(Optional.of(readerRole));
         when(readerRole.name()).thenReturn("reader");
-        User user = Mockito.mock(User.class);
+        User user = mock(User.class);
         when(userService.load(eq("johnny"))).thenReturn(user);
+        when(userContext.getUser()).thenReturn(user);
+        when(user.getName()).thenReturn("johnny");
 
-        classUnderTest.addUser(idHexString, Set.of("johnny"));
+        classUnderTest.addUser(idHexString, Set.of("johnny"), userContext);
 
         verify(user).setRoleIds(eq(Set.of(idHexString)));
     }
@@ -107,24 +114,24 @@ class AuthzRolesResourceTest {
     @WithAuthorization(permissions = { "roles:assign:reader" })
     void testAddingUserToRoleFailsWithoutRolesEdit() {
         ObjectId readerRoleId = new ObjectId();
-        AuthzRoleDTO readerRole = Mockito.mock(AuthzRoleDTO.class);
+        AuthzRoleDTO readerRole = mock(AuthzRoleDTO.class);
         String idHexString = readerRoleId.toHexString();
 
-        assertThrows(ForbiddenException.class, () -> classUnderTest.addUser(idHexString, Set.of("johnny")));
+        assertThrows(ForbiddenException.class, () -> classUnderTest.addUser(idHexString, Set.of("johnny"), mock(UserContext.class)));
     }
 
     @Test
     @WithAuthorization(permissions = { "users:rolesedit:johnny", "roles:assign:wrong" })
     void testAddingUserToRoleFailsWithWrongAssignRole() {
         ObjectId readerRoleId = new ObjectId();
-        AuthzRoleDTO readerRole = Mockito.mock(AuthzRoleDTO.class);
+        AuthzRoleDTO readerRole = mock(AuthzRoleDTO.class);
         String idHexString = readerRoleId.toHexString();
 
         when(authzolesService.get(eq(idHexString))).thenReturn(Optional.of(readerRole));
         when(readerRole.name()).thenReturn("reader");
-        User user = Mockito.mock(User.class);
+        User user = mock(User.class);
         when(userService.load(eq("johnny"))).thenReturn(user);
 
-        assertThrows(ForbiddenException.class, () -> classUnderTest.addUser(idHexString, Set.of("johnny")));
+        assertThrows(ForbiddenException.class, () -> classUnderTest.addUser(idHexString, Set.of("johnny"), mock(UserContext.class)));
     }
 }

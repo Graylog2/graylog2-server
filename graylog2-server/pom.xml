@@ -64,6 +64,10 @@
         <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
         <!-- to work around filtering bug, which makes maven.build.timestamp inaccessible -->
         <build.timestamp>${maven.build.timestamp}</build.timestamp>
+
+        <!-- OpenAPI generation parameters (for generate-openapi profile) - can be overridden via -D flags -->
+        <openapi.server.output.file>${project.build.directory}/openapi.yaml</openapi.server.output.file>
+        <openapi.server.config.file>${project.basedir}/../misc/graylog.conf</openapi.server.config.file>
     </properties>
 
     <dependencies>
@@ -380,8 +384,12 @@
             <artifactId>gelfclient</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-annotations</artifactId>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-jaxrs2-jakarta</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger.parser.v3</groupId>
+            <artifactId>swagger-parser</artifactId>
         </dependency>
         <dependency>
             <groupId>org.hibernate.validator</groupId>
@@ -413,6 +421,10 @@
         <dependency>
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud-storage</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-storage-blob</artifactId>
         </dependency>
 
         <!-- Logging dependencies -->
@@ -765,19 +777,10 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
-        <!-- used for sanity -->
-        <dependency>
-            <groupId>net.jcip</groupId>
-            <artifactId>jcip-annotations</artifactId>
-        </dependency>
         <dependency>
             <groupId>com.google.auto.value</groupId>
             <artifactId>auto-value-annotations</artifactId>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>info.leadinglight</groupId>
-            <artifactId>jdot</artifactId>
         </dependency>
         <dependency>
             <groupId>one.util</groupId>
@@ -834,6 +837,11 @@
             <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-reporting</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.mockito</groupId>
@@ -877,6 +885,14 @@
             <groupId>org.skyscreamer</groupId>
             <artifactId>jsonassert</artifactId>
             <version>1.5.3</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Source: https://mvnrepository.com/artifact/org.testcontainers/testcontainers-mongodb -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers-mongodb</artifactId>
+            <version>2.0.3</version>
             <scope>test</scope>
         </dependency>
 
@@ -992,7 +1008,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>buildnumber-maven-plugin</artifactId>
-                    <version>3.2.1</version>
+                    <version>3.3.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -1124,7 +1140,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>generate-api-defs</id>
+                        <id>generate-swagger-api-definition</id>
                         <phase>compile</phase>
                         <goals>
                             <goal>java</goal>
@@ -1219,6 +1235,44 @@
         </plugins>
     </build>
     <profiles>
+        <profile>
+            <!-- Generate OpenAPI description using exec:exec (forked JVM) instead of exec:java
+                 to avoid BouncyCastle classloader conflicts in multi-module builds -->
+            <id>generate-openapi</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>generate-openapi-description</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>java</executable>
+                                    <arguments>
+                                        <argument>-classpath</argument>
+                                        <classpath/>
+                                        <argument>-Dgraylog.password_secret=dummypasswordsecretformavenbuildonlydummypasswordsecretformavenbuildonlydummypasswordsecretformavenbuildonlydummy</argument>
+                                        <argument>-Dgraylog.data_dir=${java.io.tmpdir}/${project.artifactId}-openapi-description-generation-data-${maven.build.timestamp}</argument>
+                                        <argument>-Dgraylog.node_id_file=${java.io.tmpdir}/${project.artifactId}-openapi-description-generation-node-id-${maven.build.timestamp}</argument>
+                                        <argument>org.graylog2.bootstrap.Main</argument>
+                                        <argument>openapi-description</argument>
+                                        <argument>-np</argument>
+                                        <argument>-f</argument>
+                                        <argument>${openapi.server.config.file}</argument>
+                                        <argument>${openapi.server.output.file}</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>release</id>
             <build>

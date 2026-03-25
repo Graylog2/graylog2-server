@@ -86,8 +86,8 @@ const EventProcedureRenderer = ({ eventProcedureId, eventId }: { eventProcedureI
 
   return (
     <>
-      {pluggableEventProcedureSummary.map(({ component: PluggableEventProcedureSummary }) => (
-        <PluggableEventProcedureSummary eventProcedureId={eventProcedureId} eventId={eventId} />
+      {pluggableEventProcedureSummary.map(({ component: PluggableEventProcedureSummary, key }) => (
+        <PluggableEventProcedureSummary eventProcedureId={eventProcedureId} eventId={eventId} key={key} />
       ))}
     </>
   );
@@ -128,6 +128,11 @@ const ValidSecurityLicense = () => {
   return validSecurityLicense;
 };
 
+export const eventTypeAttribute = {
+  renderCell: (alert: boolean) => <EventTypeLabel isAlert={alert} />,
+  staticWidth: 100,
+};
+
 export const getGeneralEventAttributeRenderers = <T extends EntityBase, M = unknown>(): ColumnRenderersByAttribute<
   T,
   M
@@ -147,10 +152,7 @@ export const getGeneralEventAttributeRenderers = <T extends EntityBase, M = unkn
   id: {
     staticWidth: 300,
   },
-  alert: {
-    renderCell: (alert: boolean) => <EventTypeLabel isAlert={alert} />,
-    staticWidth: 100,
-  },
+  alert: eventTypeAttribute,
   priority: {
     renderCell: (priority: number) => <PriorityName priority={priority} />,
     staticWidth: 'matchHeader',
@@ -164,7 +166,8 @@ export const getGeneralEventAttributeRenderers = <T extends EntityBase, M = unkn
     staticWidth: 400,
   },
 });
-const customColumnRenderers = (): ColumnRenderers<Event> => ({
+
+const CustomColumnRenderers: ColumnRenderers<Event> = {
   attributes: {
     ...getGeneralEventAttributeRenderers<Event>(),
     event_definition_id: {
@@ -194,8 +197,6 @@ const customColumnRenderers = (): ColumnRenderers<Event> => ({
       staticWidth: 320,
     },
   },
-});
+};
 
-const useColumnRenderers = () => useMemo<ColumnRenderers<Event>>(customColumnRenderers, []);
-
-export default useColumnRenderers;
+export default CustomColumnRenderers;

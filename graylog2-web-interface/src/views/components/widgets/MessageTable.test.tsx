@@ -24,8 +24,9 @@ import MockAction from 'helpers/mocking/MockAction';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-
-import MessageTable from './MessageTable';
+import MessageTable from 'components/common/message/messagetable/MessageTable';
+import SelectableMessageTableMessagesProvider from 'views/components/widgets/SelectableMessageTableMessagesProvider';
+import MessageTableSelectedEntitiesProvider from 'views/components/widgets/MessageTableSelectedEntitiesProvider';
 
 import InteractiveContext from '../contexts/InteractiveContext';
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
@@ -52,19 +53,21 @@ const messages = [
 ];
 const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];
 const config = MessagesWidgetConfig.builder().fields(['file_name']).build();
-const activeQueryId = 'some-query-id';
 
 const SimpleMessageTable = (props: Partial<Pick<React.ComponentProps<typeof MessageTable>, 'config' | 'fields'>>) => (
-  <MessageTable
-    activeQueryId={activeQueryId}
-    config={config}
-    fields={Immutable.List(fields)}
-    messages={messages}
-    onSortChange={() => Promise.resolve()}
-    setLoadingState={() => {}}
-    scrollContainerRef={undefined}
-    {...props}
-  />
+  <SelectableMessageTableMessagesProvider displayBulkSelectCol={false} messages={messages}>
+    <MessageTableSelectedEntitiesProvider bulkSelection={null}>
+      <MessageTable
+        config={config}
+        fields={Immutable.List(fields)}
+        messages={messages}
+        onSortChange={() => Promise.resolve()}
+        setLoadingState={() => {}}
+        scrollContainerRef={undefined}
+        {...props}
+      />
+    </MessageTableSelectedEntitiesProvider>
+  </SelectableMessageTableMessagesProvider>
 );
 
 const highlightedStyle = 'border-left: 7px solid #45E5A8';
@@ -133,6 +136,7 @@ describe('MessageTable', () => {
 
     const message = await screen.findByText('frank.txt');
 
+    // eslint-disable-next-line testing-library/no-node-access
     expect(message.closest('tbody')).toHaveStyle(highlightedStyle);
   });
 
@@ -145,6 +149,7 @@ describe('MessageTable', () => {
 
     const message = await screen.findByText('frank.txt');
 
+    // eslint-disable-next-line testing-library/no-node-access
     expect(message.closest('tbody')).not.toHaveStyle(highlightedStyle);
   });
 
@@ -153,7 +158,7 @@ describe('MessageTable', () => {
 
     await screen.findByText(/frank.txt/i);
 
-    expect(screen.getByText('sort')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /sort file_name/i })).toBeInTheDocument();
   });
 
   it('does not show sort icons in non-interactive context', async () => {
@@ -165,6 +170,6 @@ describe('MessageTable', () => {
 
     await screen.findByText(/frank.txt/i);
 
-    expect(screen.queryByText('sort')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /sort file_name/i })).not.toBeInTheDocument();
   });
 });

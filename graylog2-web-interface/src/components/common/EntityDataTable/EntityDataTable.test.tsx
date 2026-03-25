@@ -29,6 +29,13 @@ import { ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
 import EntityDataTable from './EntityDataTable';
 
 jest.mock('hooks/useCurrentUser');
+jest.mock('logic/telemetry/useSendTelemetry', () => () => jest.fn());
+
+declare module 'graylog-web-plugin/plugin' {
+  interface EntityActions {
+    status: 'read';
+  }
+}
 
 describe('<EntityDataTable />', () => {
   beforeEach(() => {
@@ -37,7 +44,7 @@ describe('<EntityDataTable />', () => {
 
   const columnSchemas: Array<ColumnSchema> = [
     { id: 'title', title: 'Title', type: 'STRING', sortable: true },
-    { id: 'description', title: 'Description', type: 'STRING', sortable: true },
+    { id: 'description', title: 'Description', type: 'STRING', sortable: true, sliceable: true },
     { id: 'stream', title: 'Stream', type: 'STRING', sortable: true },
     {
       id: 'status',
@@ -71,12 +78,14 @@ describe('<EntityDataTable />', () => {
     defaultDisplayedColumns,
     defaultColumnOrder: defaultDisplayedColumns,
     layoutPreferences: { attributes: columnPreferences },
+    enableSlicing: true,
     entities: data,
     onLayoutPreferencesChange: () => Promise.resolve(),
     onSortChange: () => {},
     entityAttributesAreCamelCase: true,
     columnSchemas,
     onResetLayoutPreferences: () => Promise.resolve(),
+    onChangeSlicing: () => {},
   };
 
   it('should render selected columns and table headers', async () => {
@@ -155,6 +164,16 @@ describe('<EntityDataTable />', () => {
     await screen.findByText('Custom actions for Entity title');
   });
 
+  it('keeps the trailing actions column even without row actions', async () => {
+    render(<EntityDataTable {...defaultProps} />);
+
+    const headers = await screen.findAllByRole('columnheader');
+
+    const visibleAttributeHeaders = 3; // title, description, status
+
+    expect(headers).toHaveLength(visibleAttributeHeaders + 1);
+  });
+
   it('should not render column if user does not have required permissions', () => {
     asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
 
@@ -183,11 +202,41 @@ describe('<EntityDataTable />', () => {
 
     render(<EntityDataTable {...defaultProps} onSortChange={onSortChange} />);
 
-    userEvent.click(await screen.findByTitle(/sort description ascending/i));
+    await userEvent.click(await screen.findByRole('button', { name: /toggle description actions/i }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /sort ascending/i }));
 
     await waitFor(() => expect(onSortChange).toHaveBeenCalledTimes(1));
 
     expect(onSortChange).toHaveBeenCalledWith({ attributeId: 'description', direction: 'asc' });
+  });
+
+  it('should slice by column using header action', async () => {
+    const onChangeSlicing = jest.fn(() => {});
+
+    render(<EntityDataTable {...defaultProps} columnSchemas={columnSchemas} onChangeSlicing={onChangeSlicing} />);
+
+    await userEvent.click(await screen.findByRole('button', { name: /toggle description actions/i }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /slice by values/i }));
+
+    expect(onChangeSlicing).toHaveBeenCalledWith('description');
+  });
+
+  it('should remove slicing using header action', async () => {
+    const onChangeSlicing = jest.fn(() => {});
+
+    render(
+      <EntityDataTable
+        {...defaultProps}
+        columnSchemas={columnSchemas}
+        onChangeSlicing={onChangeSlicing}
+        activeSliceCol="description"
+      />,
+    );
+
+    await userEvent.click(await screen.findByRole('button', { name: /toggle description actions/i }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /no slicing/i }));
+
+    expect(onChangeSlicing).toHaveBeenCalledWith(undefined, undefined);
   });
 
   it('bulk actions should update selected items', async () => {
@@ -208,12 +257,12 @@ describe('<EntityDataTable />', () => {
     render(<EntityDataTable {...defaultProps} bulkSelection={{ actions: <BulkActions /> }} />);
 
     const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select entity/i });
-    userEvent.click(rowCheckboxes[0]);
+    await userEvent.click(rowCheckboxes[0]);
 
     await screen.findByText(selectedItemInfo);
     const customBulkAction = await screen.findByRole('button', { name: /reset selection/i });
 
-    userEvent.click(customBulkAction);
+    await userEvent.click(customBulkAction);
 
     expect(screen.queryByText(selectedItemInfo)).not.toBeInTheDocument();
     expect(rowCheckboxes[0]).not.toBeChecked();
@@ -229,13 +278,13 @@ describe('<EntityDataTable />', () => {
     expect(rowCheckboxes[0]).not.toBeChecked();
 
     const selectAllCheckbox = await screen.findByRole('checkbox', { name: /select all visible entities/i });
-    userEvent.click(selectAllCheckbox);
+    await userEvent.click(selectAllCheckbox);
 
     expect(rowCheckboxes[0]).toBeChecked();
 
     await screen.findByText('1 item selected');
 
-    userEvent.click(selectAllCheckbox);
+    await userEvent.click(selectAllCheckbox);
 
     expect(rowCheckboxes[0]).not.toBeChecked();
   });
@@ -257,8 +306,8 @@ describe('<EntityDataTable />', () => {
     await screen.findByRole('columnheader', { name: /status/i });
     await screen.findByRole('columnheader', { name: /description/i });
 
-    userEvent.click(await screen.findByRole('button', { name: /configure visible columns/i }));
-    userEvent.click(await screen.findByRole('menuitem', { name: /hide title/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /configure visible columns/i }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /hide title/i }));
 
     expect(onLayoutPreferencesChange).toHaveBeenCalledWith({
       attributes: {
@@ -287,7 +336,7 @@ describe('<EntityDataTable />', () => {
       />,
     );
 
-    userEvent.click(await screen.findByRole('button', { name: /configure visible columns/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /configure visible columns/i }));
     await screen.findByRole('menuitem', { name: /show title/i });
 
     expect(
@@ -319,8 +368,8 @@ describe('<EntityDataTable />', () => {
       />,
     );
 
-    userEvent.click(await screen.findByRole('button', { name: /configure visible columns/i }));
-    userEvent.click(await screen.findByRole('menuitem', { name: /reset all columns/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /configure visible columns/i }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /reset all columns/i }));
 
     await waitFor(() => expect(onResetLayoutPreferences).toHaveBeenCalledTimes(1));
   });

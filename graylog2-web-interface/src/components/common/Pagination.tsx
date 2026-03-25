@@ -20,6 +20,8 @@ import { Pagination as BootstrapPagination } from 'react-bootstrap';
 import { createUltimatePagination, ITEM_TYPES } from 'react-ultimate-pagination';
 import styled, { css } from 'styled-components';
 
+import { MoreActionsIcon } from 'components/common/MoreActions';
+
 import Icon from './Icon';
 
 type Props = {
@@ -113,7 +115,7 @@ const UltimatePagination = createUltimatePagination({
           title={title}
           aria-label={title}
           className="pagination-control">
-          <Icon name="more_horiz" />
+          <MoreActionsIcon />
         </BootstrapPagination.Ellipsis>
       );
     },

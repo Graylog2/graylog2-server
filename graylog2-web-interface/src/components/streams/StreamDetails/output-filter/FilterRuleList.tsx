@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import { DEFAULT_PAGE_SIZES } from 'hooks/usePaginationQueryParameter';
 import SectionComponent from 'components/common/Section/SectionComponent';
@@ -75,11 +76,11 @@ type Props = {
   destinationType: string;
   paginatedFilters: PaginatedListType<StreamOutputFilterRule>;
   onPaginationChange: (newPage: number, newPerPage: number) => void;
-  requiredPermissions: Array<string>;
+  requiredPermissions: Array<Permission>;
 };
 const _headerCellFormatter = (header: string) => <th>{header}</th>;
 const buildFilterItem =
-  (destinationType: string, requiredPermissions: Array<string>) => (filter: StreamOutputFilterRule) => (
+  (destinationType: string, requiredPermissions: Array<Permission>) => (filter: StreamOutputFilterRule) => (
     <tr key={filter.id}>
       <td>
         {filter.title}

@@ -22,6 +22,7 @@ import com.github.joschi.jadconfig.Validator;
 import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.StringSetConverter;
 import com.github.joschi.jadconfig.converters.TrimmedStringSetConverter;
+import com.github.joschi.jadconfig.documentation.Documentation;
 import com.github.joschi.jadconfig.documentation.DocumentationSection;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
@@ -38,9 +39,9 @@ import org.graylog2.cluster.leader.AutomaticLeaderElectionService;
 import org.graylog2.cluster.leader.LeaderElectionMode;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.cluster.lock.MongoLockService;
-import com.github.joschi.jadconfig.documentation.Documentation;
 import org.graylog2.configuration.DocumentationConstants;
 import org.graylog2.configuration.converters.JavaDurationConverter;
+import org.graylog2.configuration.validators.PositiveJavaDurationValidator;
 import org.graylog2.notifications.Notification;
 import org.graylog2.outputs.BatchSizeConfig;
 import org.graylog2.plugin.Tools;
@@ -513,8 +514,9 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Parameter(value = "global_inputs_only")
     private boolean globalInputsOnly = false;
 
-    @Parameter(value = "max_event_age", converter = JavaDurationConverter.class)
-    private java.time.Duration maxEventAge = java.time.Duration.ofDays(1L);
+    @Documentation("Maximum age of cluster events before cleanup. The cleanup runs at this interval, so effective event age is between max_event_age and 2*max_event_age. Minimum effective interval is 1 hour. Default: 12h")
+    @Parameter(value = "max_event_age", converter = JavaDurationConverter.class, validators = PositiveJavaDurationValidator.class)
+    private java.time.Duration maxEventAge = java.time.Duration.ofHours(12L);
 
     public boolean maintainsStreamAwareFieldTypes() {
         return streamAwareFieldTypes;

@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { render, screen, act } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
-import type { InputTypeDescriptionsResponse } from 'src/hooks/useInputTypesDescriptions';
 
+import type { InputTypeDescriptionsResponse } from 'hooks/useInputTypesDescriptions';
 import mockComponent from 'helpers/mocking/MockComponent';
 import useInputsStates from 'hooks/useInputsStates';
 import { mockInputStates } from 'fixtures/inputs';
@@ -27,10 +27,12 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { asMock } from 'helpers/mocking';
 import useFeature from 'hooks/useFeature';
 import useInputMutations from 'hooks/useInputMutations';
+import usePermissions from 'hooks/usePermissions';
 
 import InputsActions from './InputsActions';
 
 jest.useFakeTimers();
+const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
 
 jest.mock('hooks/useInputsStates', () => ({
   __esModule: true,
@@ -46,6 +48,7 @@ jest.mock('routing/useLocation', () => ({
 }));
 jest.mock('hooks/useFeature');
 jest.mock('hooks/useInputMutations');
+jest.mock('hooks/usePermissions');
 jest.mock('stores/inputs/InputStatesStore', () => ({
   __esModule: true,
   default: {
@@ -123,7 +126,7 @@ const renderSUT = (input = baseInput, extraProps = {}) =>
     />,
   );
 
-const openMoreActions = async () => userEvent.click(await screen.findByRole('button', { name: /more/i }));
+const openMoreActions = async () => setupUser().click(await screen.findByRole('button', { name: /more/i }));
 
 describe('InputsActions', () => {
   const updateInputMock = jest.fn(() => Promise.resolve());
@@ -149,6 +152,7 @@ describe('InputsActions', () => {
       updateInput: updateInputMock,
       deleteInput: deleteInputMock,
     } as any);
+    asMock(usePermissions).mockReturnValue({ isPermitted: () => true });
   });
 
   it('renders Received messages button with correct query for standard input', () => {
@@ -174,9 +178,41 @@ describe('InputsActions', () => {
 
     const setupButton = await screen.findByRole('button', { name: /set up input/i });
 
-    userEvent.click(setupButton);
+    await setupUser().click(setupButton);
 
     expect(await screen.findByText(/InputSetupWizard/i)).toBeInTheDocument();
+  });
+
+  it('renders input state controls when user has changestate permission', async () => {
+    const input = {
+      ...baseInput,
+      id: 'input-changestate',
+      title: 'Input with changestate only',
+      type: 'org.graylog2.inputs.gelf.udp.GELFUDPInput',
+    };
+    const isPermitted = jest.fn((permission) => permission === `inputs:changestate:${input.id}`);
+
+    asMock(usePermissions).mockReturnValue({ isPermitted });
+
+    renderSUT(input);
+
+    expect(await screen.findByRole('button', { name: /set up input/i })).toBeInTheDocument();
+    expect(isPermitted).toHaveBeenCalledWith(`inputs:changestate:${input.id}`);
+  });
+
+  it('does not render input state controls without changestate permission', () => {
+    const input = {
+      ...baseInput,
+      id: 'input-no-changestate',
+      title: 'Input without changestate',
+      type: 'org.graylog2.inputs.gelf.udp.GELFUDPInput',
+    };
+
+    asMock(usePermissions).mockReturnValue({ isPermitted: () => false });
+
+    renderSUT(input);
+
+    expect(screen.queryByRole('button', { name: /set up input/i })).not.toBeInTheDocument();
   });
 
   it('opens Static Field form when Add static field is selected', async () => {
@@ -188,12 +224,12 @@ describe('InputsActions', () => {
     };
     renderSUT(input);
     await openMoreActions();
-    userEvent.click(screen.getByText('Add static field'));
+    await setupUser().click(screen.getByText('Add static field'));
 
     expect(await screen.findByText('StaticFieldForm')).toBeInTheDocument();
   });
 
-  it('uses forwarder query field for ForwarderServiceInput', () => {
+  it('uses forwarder query field for ForwarderServiceInput', async () => {
     const input = {
       ...baseInput,
       id: 'forwarder-id',
@@ -203,7 +239,7 @@ describe('InputsActions', () => {
     renderSUT(input);
     const btn = screen.getByText('Received messages');
     expect(btn).toBeInTheDocument();
-    userEvent.click(btn);
+    await setupUser().click(btn);
     expect(telemetryMock).toHaveBeenCalledWith(
       'Inputs Show Received Messages Clicked',
       expect.objectContaining({
@@ -224,7 +260,7 @@ describe('InputsActions', () => {
 
     renderSUT(setupInput);
     const setupButton = await screen.findByRole('button', { name: /set up input/i });
-    userEvent.click(setupButton);
+    await setupUser().click(setupButton);
     expect(await screen.findByText(/InputSetupWizard/i)).toBeInTheDocument();
   });
 
@@ -241,7 +277,7 @@ describe('InputsActions', () => {
     renderSUT(setupInput);
     await openMoreActions();
 
-    userEvent.click(screen.getByText('Edit input'));
+    await setupUser().click(screen.getByText('Edit input'));
 
     act(() => {
       jest.advanceTimersByTime(200);
@@ -249,7 +285,7 @@ describe('InputsActions', () => {
 
     expect(screen.getByText(/Editing Input Input 3/)).toBeInTheDocument();
 
-    await userEvent.click(screen.getByText('Update input'));
+    await setupUser().click(screen.getByText('Update input'));
     expect(updateInputMock).toHaveBeenCalledWith({
       input: expect.objectContaining({ title: 'Input 3' }),
       inputId: 'input3',
@@ -313,11 +349,11 @@ describe('InputsActions', () => {
     renderSUT(setupInput);
     await openMoreActions();
 
-    userEvent.click(screen.getByText('Delete input'));
+    await setupUser().click(screen.getByText('Delete input'));
 
     expect(screen.getByText('Do you really want to delete input Input 3?')).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+    await setupUser().click(screen.getByRole('button', { name: 'Confirm' }));
 
     expect(deleteInputMock).toHaveBeenCalledWith({ inputId: 'input3' });
   });
@@ -343,7 +379,7 @@ describe('InputsActions', () => {
       const enterItem = screen.getByText('Enter Setup mode');
       expect(enterItem).toBeInTheDocument();
 
-      userEvent.click(enterItem);
+      await setupUser().click(enterItem);
 
       const InputStatesStore = jest.requireMock('stores/inputs/InputStatesStore').default;
       expect(InputStatesStore.setup).toHaveBeenCalledWith(input);
@@ -367,7 +403,7 @@ describe('InputsActions', () => {
       const exitItem = screen.getByText('Exit Setup mode');
       expect(exitItem).toBeInTheDocument();
 
-      userEvent.click(exitItem);
+      await setupUser().click(exitItem);
 
       const InputStatesStore = jest.requireMock('stores/inputs/InputStatesStore').default;
       expect(InputStatesStore.stop).toHaveBeenCalledWith(input);

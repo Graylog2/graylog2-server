@@ -69,7 +69,7 @@ describe('<BooleanField>', () => {
     expect(input).toBeInTheDocument();
     expect(input).not.toBeChecked();
 
-    userEvent.click(input);
+    await userEvent.click(input);
 
     await waitFor(() => expect(changeFunction).toHaveBeenCalledWith('example_boolean_field', true));
 
@@ -77,7 +77,7 @@ describe('<BooleanField>', () => {
 
     expect(input).toBeChecked();
 
-    userEvent.click(input);
+    await userEvent.click(input);
 
     await waitFor(() => expect(changeFunction).toHaveBeenCalledWith('example_boolean_field', false));
   });

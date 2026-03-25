@@ -18,8 +18,8 @@ import React from 'react';
 
 import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted } from 'util/PermissionsMixin';
-import { Link } from 'components/common/router';
-import Routes from 'routing/Routes';
+import SidebarNavigationLink from 'components/layout/RightSidebar/SidebarNavigationLink';
+import SidebarEventDefinitionDetails from 'components/event-definitions/SidebarEventDefinitionDetails';
 
 const EventDefinitionLink = ({ title, id }: { title: string | undefined; id: string }) => {
   const { permissions } = useCurrentUser();
@@ -28,8 +28,8 @@ const EventDefinitionLink = ({ title, id }: { title: string | undefined; id: str
     return <em>{id}</em>;
   }
 
-  if (isPermitted(permissions, `eventdefinitions:edit:${id}`)) {
-    return <Link to={Routes.ALERTS.DEFINITIONS.edit(id)}>{title}</Link>;
+  if (isPermitted(permissions, `eventdefinitions:read:${id}`)) {
+    return <SidebarNavigationLink content={SidebarEventDefinitionDetails(id)}>{title}</SidebarNavigationLink>;
   }
 
   return <>{title}</>;

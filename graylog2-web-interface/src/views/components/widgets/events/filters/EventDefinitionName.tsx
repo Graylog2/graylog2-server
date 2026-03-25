@@ -16,8 +16,7 @@
  */
 import * as React from 'react';
 
-import { Spinner } from 'components/common';
-import { Link } from 'components/common/router';
+import { Spinner, Link } from 'components/common';
 import Routes from 'routing/Routes';
 import useEventDefinition from 'components/events/events/hooks/useEventDefinition';
 import { isPermitted } from 'util/PermissionsMixin';

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
 
@@ -79,10 +79,18 @@ const DataAdapterForm = ({ type, title, saved, onCancel, create = false, dataAda
   const { updateAdapter, updatingAdapter } = useUpdateAdapter();
 
   const adapterPlugins = usePluginEntities('lookupTableAdapters');
-  const plugin = React.useMemo(() => adapterPlugins.find((p) => p.type === type), [adapterPlugins, type]);
+  const plugin = adapterPlugins.find((p) => p.type === type);
 
-  const DocComponent = React.useMemo(() => plugin?.documentationComponent, [plugin]);
-  const pluginDisplayName = React.useMemo(() => plugin?.displayName || type, [plugin, type]);
+  const DocComponent = plugin?.documentationComponent;
+  const pluginDisplayName = plugin?.displayName || type;
+
+  const initialValues = useMemo(() => {
+    if (plugin?.prepareConfig && dataAdapter?.config) {
+      return { ...dataAdapter, config: plugin.prepareConfig(dataAdapter.config) };
+    }
+
+    return dataAdapter;
+  }, [dataAdapter, plugin]);
 
   const handleSubmit = async (values: LookupTableAdapter) => {
     const promise = create ? createAdapter(values) : updateAdapter(values);
@@ -100,16 +108,13 @@ const DataAdapterForm = ({ type, title, saved, onCancel, create = false, dataAda
     });
   };
 
-  const canModify = React.useMemo(
-    () => create || (!loadingScopePermissions && scopePermissions?.is_mutable),
-    [create, loadingScopePermissions, scopePermissions?.is_mutable],
-  );
+  const canModify = create || (!loadingScopePermissions && scopePermissions?.is_mutable);
 
   return (
     <RowContainer style={{ flexGrow: 1 }} $withDocs={!!DocComponent}>
       <Col style={{ flexGrow: 1, height: '100%' }}>
         <Title title={title} typeName={pluginDisplayName} create={create} />
-        <Formik initialValues={dataAdapter} onSubmit={handleSubmit} validateOnBlur={false} enableReinitialize>
+        <Formik initialValues={initialValues} onSubmit={handleSubmit} validateOnBlur={false} enableReinitialize>
           {({ isSubmitting, isValid }) => (
             <FlexForm className="form form-horizontal">
               <Row $gap="xl" style={{ flexGrow: 1 }}>

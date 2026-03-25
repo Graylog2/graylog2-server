@@ -27,7 +27,6 @@ import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/h
 import { profile1, attributes, profile2 } from 'fixtures/indexSetFieldTypeProfiles';
 import ProfilesList from 'components/indices/IndexSetFieldTypeProfiles/ProfilesList';
 import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 const getData = (list = [profile1]) => ({
   list,
@@ -39,12 +38,9 @@ const getData = (list = [profile1]) => ({
 
 const renderIndexSetFieldTypeProfilesList = () =>
   render(
-    <DefaultQueryParamProvider>
-      <TestStoreProvider>
-        <ProfilesList />
-      </TestStoreProvider>
-      ,
-    </DefaultQueryParamProvider>,
+    <TestStoreProvider>
+      <ProfilesList />
+    </TestStoreProvider>,
   );
 
 jest.mock('routing/useParams', () => jest.fn());

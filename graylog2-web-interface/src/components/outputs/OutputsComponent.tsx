@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import type * as Immutable from 'immutable';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import { Row, Col } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
@@ -34,7 +35,7 @@ import AssignOutputDropdown from './AssignOutputDropdown';
 
 type Props = {
   streamId?: string;
-  permissions: Immutable.List<string>;
+  permissions: Immutable.List<Permission>;
 };
 
 const OutputsComponent = ({ streamId = undefined, permissions }: Props) => {

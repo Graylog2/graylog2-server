@@ -20,12 +20,12 @@ import React, { useCallback } from 'react';
 
 import Icon from 'components/common/Icon';
 
-const StyledSortIcon = styled.button(
-  ({ theme }) => css`
+const StyledSortIcon = styled.button<{ $disabled: boolean }>(
+  ({ theme, $disabled }) => css`
     border: 0;
     background: transparent;
     padding: 5px;
-    cursor: pointer;
+    cursor: ${$disabled ? 'default' : 'pointer'};
     position: relative;
     color: ${theme.colors.gray[70]};
     display: inline-flex;
@@ -53,7 +53,7 @@ type Props<AscDirection extends string, DescDirection extends string> = {
   activeDirection: AscDirection | DescDirection | null;
   ascId?: string;
   descId?: string;
-  onChange: (activeDirection: AscDirection | DescDirection | null) => void;
+  onChange?: (activeDirection: AscDirection | DescDirection | null) => void;
   title?: string;
   order?: number;
   className?: string;
@@ -61,7 +61,7 @@ type Props<AscDirection extends string, DescDirection extends string> = {
 
 const SortIcon = <AscDirection extends string, DescDirection extends string>({
   activeDirection,
-  onChange,
+  onChange = undefined,
   title = 'Sort',
   order = undefined,
   ascId = 'Ascending',
@@ -72,6 +72,11 @@ const SortIcon = <AscDirection extends string, DescDirection extends string>({
   const isAscSort = activeDirection === ascId && activeDirection !== descId;
 
   const sortActive = !!activeDirection;
+  const disabled = typeof onChange !== 'function';
+
+  if (disabled && !sortActive) {
+    return null;
+  }
 
   return (
     <StyledSortIcon
@@ -79,11 +84,11 @@ const SortIcon = <AscDirection extends string, DescDirection extends string>({
       title={title}
       type="button"
       aria-label={title}
-      onClick={handleSortChange}>
+      onClick={handleSortChange}
+      $disabled={disabled}>
       <Icon
-        name="sort"
+        name={isAscSort ? 'arrow_upward' : 'arrow_downward'}
         data-testid="sort-icon-svg"
-        flip={isAscSort ? 'horizontal' : undefined}
         className={`sort-icon-${isAscSort ? 'asc' : 'desc'}`}
       />
       {order && <Bulb>{order}</Bulb>}

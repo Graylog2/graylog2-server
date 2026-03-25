@@ -25,7 +25,6 @@ import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indexset.MongoIndexSet;
-import org.graylog2.indexer.indexset.MongoIndexSetService;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.rest.bulk.model.BulkOperationFailure;
@@ -35,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -51,18 +51,15 @@ public class FieldTypeMappingsService {
 
     private final IndexSetService indexSetService;
     private final MongoIndexSet.Factory mongoIndexSetFactory;
-    private final MongoIndexSetService mongoIndexSetService;
 
     private final IndexFieldTypeProfileService profileService;
 
     @Inject
     public FieldTypeMappingsService(final IndexSetService indexSetService,
                                     final MongoIndexSet.Factory mongoIndexSetFactory,
-                                    final MongoIndexSetService mongoIndexSetService,
                                     final IndexFieldTypeProfileService profileService) {
         this.indexSetService = indexSetService;
         this.mongoIndexSetFactory = mongoIndexSetFactory;
-        this.mongoIndexSetService = mongoIndexSetService;
         this.profileService = profileService;
     }
 
@@ -73,18 +70,34 @@ public class FieldTypeMappingsService {
         checkType(customMapping);
         checkAllIndicesSupportFieldTypeChange(customMapping.fieldName(), indexSetsIds);
 
+        final Set<String> indexSetIdsWithError = new HashSet<>();
+
         for (String indexSetId : indexSetsIds) {
-            try {
                 indexSetService.get(indexSetId).ifPresent(indexSetConfig -> {
-                    var updatedIndexSetConfig = storeMapping(customMapping, indexSetConfig);
-                    if (rotateImmediately) {
-                        updatedIndexSetConfig.ifPresent(this::cycleIndexSet);
+                    final var rollbackMappings = new CustomFieldMappings(indexSetConfig.customFieldMappings());
+                    try {
+                        var updatedIndexSetConfig = storeMapping(customMapping, indexSetConfig);
+                        if (rotateImmediately) {
+                            updatedIndexSetConfig.ifPresent(this::cycleIndexSet);
+                        }
+                    } catch (Exception ex) {
+                        LOG.error("Failed to update field type in index set: " + indexSetId, ex);
+                        indexSetIdsWithError.add(indexSetId);
+                        try {
+                            // rolling back changes in MongoDB
+                            indexSetService.save(
+                                    indexSetConfig.toBuilder()
+                                            .customFieldMappings(rollbackMappings)
+                                            .build()
+                            );
+                        } catch (Exception e) {
+                            LOG.error("Failed to roll back field types for index set: " + indexSetId, e);
+                        }
                     }
                 });
-            } catch (Exception ex) {
-                LOG.error("Failed to update field type in index set : " + indexSetId, ex);
-                throw ex;
-            }
+        }
+        if(!indexSetIdsWithError.isEmpty()) {
+            throw new RuntimeException("Failed to update field types in index set(s): " + String.join(",", indexSetIdsWithError) + ". Please check logs for details.");
         }
     }
 
@@ -158,7 +171,7 @@ public class FieldTypeMappingsService {
                 .collect(Collectors.toCollection(ArrayList::new));
         final List<String> errors = new LinkedList<>();
         if (removedSmth) {
-            var updatedIndexSetConfig = Optional.of(mongoIndexSetService.save(
+            var updatedIndexSetConfig = Optional.of(indexSetService.save(
                     indexSetConfig.toBuilder()
                             .customFieldMappings(previousCustomFieldMappings)
                             .build()
@@ -185,7 +198,7 @@ public class FieldTypeMappingsService {
         if (previousCustomFieldMappings.contains(customMapping)) {
             return Optional.empty();
         }
-        return Optional.of(mongoIndexSetService.save(
+        return Optional.of(indexSetService.save(
                 indexSetConfig.toBuilder()
                         .customFieldMappings(previousCustomFieldMappings.mergeWith(customMapping))
                         .build()
@@ -197,7 +210,7 @@ public class FieldTypeMappingsService {
         if (Objects.equals(indexSetConfig.fieldTypeProfile(), profileId)) {
             return Optional.empty();
         }
-        return Optional.of(mongoIndexSetService.save(
+        return Optional.of(indexSetService.save(
                 indexSetConfig.toBuilder()
                         .fieldTypeProfile(profileId)
                         .build()
@@ -208,14 +221,14 @@ public class FieldTypeMappingsService {
         if (indexSetConfig.fieldTypeProfile() == null) {
             return Optional.empty();
         }
-        return Optional.of(mongoIndexSetService.save(
+        return Optional.of(indexSetService.save(
                 indexSetConfig.toBuilder()
                         .fieldTypeProfile(null)
                         .build()
         ));
     }
 
-    private void cycleIndexSet(final IndexSetConfig indexSetConfig) {
+    void cycleIndexSet(final IndexSetConfig indexSetConfig) {
         final IndexSet mongoIndexSet = mongoIndexSetFactory.create(indexSetConfig);
         mongoIndexSet.cycle();
     }

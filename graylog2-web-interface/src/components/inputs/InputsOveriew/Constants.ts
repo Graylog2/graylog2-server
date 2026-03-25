@@ -19,7 +19,7 @@ import type { Sort } from 'stores/PaginationTypes';
 const getInputsTableElements = () => {
   const tableLayout = {
     entityTableId: 'inputs',
-    defaultPageSize: 20,
+    defaultPageSize: 50,
     defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
     defaultDisplayedAttributes: [
       'title',
@@ -27,14 +27,27 @@ const getInputsTableElements = () => {
       'direction',
       'desired_state',
       'traffic',
+      'input_failures',
       'node_id',
       'address',
       'port',
     ],
-    defaultColumnOrder: ['title', 'type', 'direction', 'desired_state', 'traffic', 'node_id', 'address', 'port'],
+    defaultColumnOrder: [
+      'title',
+      'type',
+      'direction',
+      'desired_state',
+      'traffic',
+      'input_failures',
+      'node_id',
+      'address',
+      'port',
+    ],
   };
+
   const additionalAttributes = [
-    { id: 'traffic', title: 'Traffic' },
+    { id: 'traffic', title: 'Traffic Last Minute' },
+    { id: 'input_failures', title: 'Input Failures' },
     { id: 'address', title: 'Address' },
     { id: 'port', title: 'Port' },
   ];

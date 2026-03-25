@@ -23,9 +23,10 @@ import { TIME_UNITS } from 'components/event-definitions/event-definition-types/
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import { Timestamp, HoverForHelp } from 'components/common';
-import { Link } from 'components/common/router';
-import Routes from 'routing/Routes';
 import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
+import useFeature from 'hooks/useFeature';
+import SidebarNavigationLink from 'components/layout/RightSidebar/SidebarNavigationLink';
+import SidebarEventDefinitionDetails from 'components/event-definitions/SidebarEventDefinitionDetails';
 
 import useAlertAndEventDefinitionData from './useAlertAndEventDefinitionData';
 
@@ -41,6 +42,7 @@ const AlertTimestamp = styled(Timestamp)(
 const useAttributeComponents = () => {
   const { alertId, definitionId, type } = useReplaySearchContext();
   const { eventData, eventDefinition } = useAlertAndEventDefinitionData(alertId, definitionId);
+  const isRightSidebarEnabled = useFeature('replay_search_right_sidebar');
 
   return useMemo(() => {
     const isEventDefinition = type === 'event_definition';
@@ -54,8 +56,12 @@ const useAttributeComponents = () => {
     const isEDUpdatedAfterEvent =
       !isEventDefinition && moment(eventDefinition.updated_at).diff(eventData?.timestamp) > 0;
 
-    return [
-      { title: 'Timestamp', content: <Timestamp dateTime={eventData?.timestamp} />, show: !isEventDefinition },
+    const components: Array<{
+      title: string;
+      content: React.ReactNode;
+      show?: boolean;
+      inRows?: boolean;
+    }> = [
       {
         title: 'Event definition updated at',
         content: (
@@ -72,9 +78,9 @@ const useAttributeComponents = () => {
       {
         title: 'Event definition',
         content: (
-          <Link target="_blank" to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>
+          <SidebarNavigationLink content={SidebarEventDefinitionDetails(eventDefinition.id)}>
             {eventDefinition.title}
-          </Link>
+          </SidebarNavigationLink>
         ),
         show: !isEventDefinition,
       },
@@ -92,17 +98,22 @@ const useAttributeComponents = () => {
         content:
           searchWithin?.duration && searchWithin?.unit && `${searchWithin.duration} ${searchWithin.unit.toLowerCase()}`,
       },
-      { title: 'Description', content: eventDefinition.description },
       {
         title: 'Notifications',
         content: <Notifications />,
       },
-      {
+      { title: 'Description', content: eventDefinition.description, inRows: true },
+    ];
+    if (!isRightSidebarEnabled) {
+      components.push({
         title: 'Aggregation conditions',
         content: <AggregationConditions />,
-      },
-    ];
-  }, [eventData?.timestamp, eventDefinition, type]);
+        inRows: true,
+      });
+    }
+
+    return components;
+  }, [eventData?.timestamp, eventDefinition, isRightSidebarEnabled, type]);
 };
 
 export default useAttributeComponents;

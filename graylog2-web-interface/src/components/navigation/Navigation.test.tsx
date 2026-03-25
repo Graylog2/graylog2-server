@@ -23,32 +23,50 @@ import mockComponent from 'helpers/mocking/MockComponent';
 import { asMock } from 'helpers/mocking';
 import Navigation from 'components/navigation/Navigation';
 import useCurrentUser from 'hooks/useCurrentUser';
-import PerspectivesBindings from 'components/perspectives/bindings';
-import PerspectivesProvider from 'components/perspectives/contexts/PerspectivesProvider';
 import useLocation from 'routing/useLocation';
 import HotkeysProvider from 'contexts/HotkeysProvider';
-import { usePluginExports } from 'views/test/testPlugins';
+import useNotifications from 'components/notifications/useNotifications';
 
 jest.mock('./ScratchpadToggle', () => mockComponent('ScratchpadToggle'));
 jest.mock('hooks/useCurrentUser');
-jest.mock('./DevelopmentHeaderBadge', () => () => <span />);
-jest.mock('routing/withLocation', () => (x) => x);
 jest.mock('routing/useLocation', () => jest.fn(() => ({ pathname: '' })));
+jest.mock('@graylog/server-api', () => ({
+  SystemNotifications: {
+    listNotifications: jest.fn(async () => ({ total: 0 })),
+  },
+}));
+jest.mock('components/notifications/useNotifications');
 
 describe('Navigation', () => {
   const SUT = () => (
     <HotkeysProvider>
-      <PerspectivesProvider>
-        <Navigation />
-      </PerspectivesProvider>
+      <Navigation />
     </HotkeysProvider>
   );
-
-  usePluginExports(PerspectivesBindings);
 
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
     asMock(useLocation).mockReturnValue({ pathname: '/' } as Location);
+
+    asMock(useNotifications).mockReturnValue({
+      data: {
+        total: 1,
+        notifications: [
+          {
+            id: 'deadbeef',
+            details: {},
+            validations: {},
+            fields: {},
+            severity: 'urgent',
+            type: 'no_input_running',
+            key: 'test',
+            timestamp: '2022-12-12T10:55:55.014Z',
+            node_id: '3fcc3889-18a3-4a0d-821c-0fd560d152e7',
+          },
+        ],
+      },
+      isLoading: false,
+    });
   });
 
   it('has common elements', async () => {
@@ -57,5 +75,24 @@ describe('Navigation', () => {
     await screen.findByRole('link', { name: /throughput/i });
     await screen.findByRole('button', { name: /help/i });
     await screen.findByRole('button', { name: /user menu for administrator/i });
+  });
+
+  it('shows notification badge when there are notifications', async () => {
+    render(<SUT />);
+
+    await screen.findByTestId('notification-badge');
+  });
+
+  it('does not show notification badge when there are no notifications', async () => {
+    asMock(useNotifications).mockReturnValue({
+      data: { total: 0, notifications: [] },
+      isLoading: false,
+    });
+
+    render(<SUT />);
+
+    await screen.findByRole('button', { name: /help/i });
+
+    expect(screen.queryByTestId('notification-badge')).not.toBeInTheDocument();
   });
 });

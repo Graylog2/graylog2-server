@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import styled, { css } from 'styled-components';
 
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { isInputRunning, isInputInSetupMode } from 'components/inputs/helpers/inputState';
@@ -35,11 +36,18 @@ type Props = {
   openWizard: () => void;
 };
 
+const StateActionButton = styled(Button)(
+  () => css`
+    min-width: 95px;
+  `,
+);
+
 const InputStateControl = ({ input, openWizard, inputStates }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
+
   const startInput = () => {
     setIsLoading(true);
 
@@ -77,24 +85,24 @@ const InputStateControl = ({ input, openWizard, inputStates }: Props) => {
 
   if (inputSetupFeatureFlagIsEnabled && isInputInSetupMode(inputStates, input.id)) {
     return (
-      <Button bsStyle="warning" bsSize="xsmall" onClick={setupInput}>
+      <StateActionButton bsStyle="warning" bsSize="xsmall" onClick={setupInput}>
         Set-up Input
-      </Button>
+      </StateActionButton>
     );
   }
 
   if (isInputRunning(inputStates, input.id)) {
     return (
-      <Button bsStyle="danger" bsSize="xsmall" onClick={stopInput} disabled={isLoading}>
+      <StateActionButton bsSize="xsmall" onClick={stopInput} disabled={isLoading}>
         {isLoading ? 'Stopping...' : 'Stop input'}
-      </Button>
+      </StateActionButton>
     );
   }
 
   return (
-    <Button bsStyle="primary" bsSize="xsmall" onClick={startInput} disabled={isLoading}>
+    <StateActionButton bsStyle="primary" bsSize="xsmall" onClick={startInput} disabled={isLoading}>
       {isLoading ? 'Starting...' : 'Start input'}
-    </Button>
+    </StateActionButton>
   );
 };
 

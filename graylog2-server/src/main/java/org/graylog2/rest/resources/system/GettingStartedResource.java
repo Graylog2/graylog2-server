@@ -17,8 +17,8 @@
 package org.graylog2.rest.resources.system;
 
 import com.google.common.collect.Sets;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -37,7 +37,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 import java.util.Locale;
 
 @RequiresAuthentication
-@Api(value = "System/GettingStartedGuides", description = "Getting Started guide")
+@Tag(name = "System/GettingStartedGuides", description = "Getting Started guide")
 @Path("/system/gettingstarted")
 @Produces(MediaType.APPLICATION_JSON)
 public class GettingStartedResource extends RestResource {
@@ -50,7 +50,7 @@ public class GettingStartedResource extends RestResource {
     }
 
     @GET
-    @ApiOperation("Check whether to display the Getting started guide for this version")
+    @Operation(summary = "Check whether to display the Getting started guide for this version")
     public DisplayGettingStarted displayGettingStarted() {
         final GettingStartedState gettingStartedState = clusterConfigService.get(GettingStartedState.class);
         if (gettingStartedState == null) {
@@ -62,7 +62,7 @@ public class GettingStartedResource extends RestResource {
 
     @POST
     @Path("dismiss")
-    @ApiOperation("Dismiss auto-showing getting started guide for this version")
+    @Operation(summary = "Dismiss auto-showing getting started guide for this version")
     @AuditEvent(type = AuditEventTypes.GETTING_STARTED_GUIDE_OPT_OUT_CREATE)
     public void dismissGettingStarted() {
         final GettingStartedState gettingStartedState = clusterConfigService.getOrDefault(GettingStartedState.class,

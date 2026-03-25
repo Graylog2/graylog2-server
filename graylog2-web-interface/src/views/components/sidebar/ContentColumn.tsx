@@ -20,21 +20,26 @@ import styled, { css } from 'styled-components';
 import type { SearchPreferencesLayout } from 'views/components/contexts/SearchPagePreferencesContext';
 import { IconButton } from 'components/common';
 import zIndices from 'theme/z-indices';
+import type {
+  LayoutSidebarTitle,
+  LayoutSidebarTitleComponent,
+} from 'views/components/contexts/SearchPageLayoutContext';
 
 type Props = {
   children: React.ReactNode;
   closeSidebar: () => void;
   enableSidebarPinning: boolean;
   forceSideBarPinned: boolean;
-  searchPageLayout: SearchPreferencesLayout | undefined | null;
+  searchPreferencesLayout: SearchPreferencesLayout | undefined | null;
   sectionTitle: string;
-  title: string;
+  title: LayoutSidebarTitle;
+  width?: number;
 };
 
-export const Container = styled.div<{ $sidebarIsPinned: boolean }>(
-  ({ theme, $sidebarIsPinned }) => css`
+export const Container = styled.div<{ $sidebarIsPinned: boolean; $width: number }>(
+  ({ theme, $sidebarIsPinned, $width }) => css`
     position: ${$sidebarIsPinned ? 'relative' : 'fixed'};
-    width: 270px;
+    width: ${$width}px;
     height: ${$sidebarIsPinned ? '100%' : 'calc(100% - 50px)'}; /* subtract the nav height */
     top: ${$sidebarIsPinned ? 0 : '50px'};
     left: ${$sidebarIsPinned ? 0 : '50px'};
@@ -146,30 +151,37 @@ const toggleSidebarPinning = (searchPageLayout: SearchPreferencesLayout) => {
   togglePinning();
 };
 
+const DefaultTitle: LayoutSidebarTitleComponent = ({ onClose, children = null }) => (
+  <Title onClick={onClose}>{children}</Title>
+);
+
 const ContentColumn = ({
   children,
   title,
   sectionTitle,
   closeSidebar,
-  searchPageLayout,
+  searchPreferencesLayout,
   forceSideBarPinned,
   enableSidebarPinning,
+  width = 275,
 }: Props) => {
-  const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned || forceSideBarPinned;
+  const sidebarIsPinned = searchPreferencesLayout?.config.sidebar.isPinned || forceSideBarPinned;
+  const titleAttr = typeof title === 'string' ? title : undefined;
+  const TitleComponent = typeof title === 'string' ? DefaultTitle : title;
 
   return (
-    <Container $sidebarIsPinned={sidebarIsPinned}>
+    <Container $sidebarIsPinned={sidebarIsPinned} $width={width}>
       <ContentGrid>
         <Header>
-          <TitleSection title={title}>
+          <TitleSection title={titleAttr}>
             <CenterVertical>
-              <Title onClick={closeSidebar}>{title}</Title>
+              <TitleComponent onClose={closeSidebar}>{typeof title === 'string' ? title : null}</TitleComponent>
             </CenterVertical>
             {!forceSideBarPinned && enableSidebarPinning && (
               <CenterVertical>
                 <OverlayToggle $sidebarIsPinned={sidebarIsPinned}>
                   <IconButton
-                    onClick={() => toggleSidebarPinning(searchPageLayout)}
+                    onClick={() => toggleSidebarPinning(searchPreferencesLayout)}
                     title={`Display sidebar ${sidebarIsPinned ? 'as overlay' : 'inline'}`}
                     name="keep"
                   />

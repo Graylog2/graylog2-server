@@ -22,10 +22,10 @@ import java.time.Duration;
 
 public record TimeStampConfig(@JsonProperty("grace_period") Duration gracePeriod) {
     public static final TimeStampConfig THRESHOLD_2DAYS = new TimeStampConfig(Duration.ofDays(2));
-    private static final TimeStampConfig THRESHOLD_DISTANT_FUTURE = new TimeStampConfig(Duration.ofSeconds(1000000000000L));
+    private static final TimeStampConfig DISABLED_CONFIG = new TimeStampConfig(null);
 
     public static TimeStampConfig getDefault() {
         // Off by default
-        return THRESHOLD_DISTANT_FUTURE;
+        return DISABLED_CONFIG;
     }
 }

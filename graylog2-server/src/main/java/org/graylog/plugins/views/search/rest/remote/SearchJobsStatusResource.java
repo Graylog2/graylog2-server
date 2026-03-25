@@ -16,9 +16,9 @@
  */
 package org.graylog.plugins.views.search.rest.remote;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.Consumes;
@@ -43,15 +43,16 @@ import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.RestTools;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 
 import static org.graylog.plugins.views.search.rest.SearchResource.SEARCH_FORMAT_V1;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "SearchJobs", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "SearchJobs")
 @Path("/views/searchjobs")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes({MediaType.APPLICATION_JSON})
@@ -67,13 +68,13 @@ public class SearchJobsStatusResource extends ProxiedResource implements PluginR
     }
 
     @GET
-    @ApiOperation(value = "Retrieve the status of an executed query")
+    @Operation(summary = "Retrieve the status of an executed query")
     @Path("{nodeId}/{jobId}/status")
     @Produces({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
-    public void asyncSearchJobStatus(@ApiParam(name = "jobId", required = true) @NotBlank @PathParam("jobId") String jobId,
-                                     @ApiParam(name = "nodeId", required = true) @NotBlank @PathParam("nodeId") String nodeId,
-                                     @ApiParam(name = "page") @QueryParam("page") @DefaultValue("0") int page,
-                                     @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("0") int perPage,
+    public void asyncSearchJobStatus(@Parameter(name = "jobId", required = true) @NotBlank @PathParam("jobId") String jobId,
+                                     @Parameter(name = "nodeId", required = true) @NotBlank @PathParam("nodeId") String nodeId,
+                                     @Parameter(name = "page") @QueryParam("page") @DefaultValue("0") int page,
+                                     @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("0") int perPage,
                                      @Context SearchUser searchUser,
                                      @Suspended AsyncResponse asyncResponse) {
         processAsync(asyncResponse,
@@ -89,12 +90,12 @@ public class SearchJobsStatusResource extends ProxiedResource implements PluginR
     }
 
     @DELETE
-    @ApiOperation(value = "Cancels search job")
+    @Operation(summary = "Cancels search job")
     @Path("{nodeId}/{jobId}/cancel")
     @Produces({MediaType.APPLICATION_JSON})
     @NoAuditEvent("this is a proxy resource, the event will be triggered on the individual nodes")
-    public void cancelAsyncSearchJob(@ApiParam(name = "jobId", required = true) @NotBlank @PathParam("jobId") String jobId,
-                                     @ApiParam(name = "nodeId", required = true) @NotBlank @PathParam("nodeId") String nodeId,
+    public void cancelAsyncSearchJob(@Parameter(name = "jobId", required = true) @NotBlank @PathParam("jobId") String jobId,
+                                     @Parameter(name = "nodeId", required = true) @NotBlank @PathParam("nodeId") String nodeId,
                                      @Context SearchUser searchUser,
                                      @Suspended AsyncResponse asyncResponse) {
         processAsync(asyncResponse,

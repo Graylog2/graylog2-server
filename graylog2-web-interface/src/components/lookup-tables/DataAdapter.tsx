@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { JSONStringify } from 'json-with-bigint';
 
 import Routes from 'routing/Routes';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -34,15 +36,15 @@ type Props = {
 };
 
 const DataAdapter = ({ dataAdapter, noEdit = false }: Props) => {
-  const [lookupKey, setLookupKey] = React.useState('');
-  const [lookupResult, setLookupResult] = React.useState(null);
+  const [lookupKey, setLookupKey] = useState('');
+  const [lookupResult, setLookupResult] = useState(null);
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(dataAdapter);
   const navigate = useNavigate();
 
   const canEdit = !noEdit && !loadingScopePermissions && scopePermissions?.is_mutable;
 
-  const _onChange = (event: React.SyntheticEvent) => {
-    setLookupKey(getValueFromInput(event.target));
+  const _onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setLookupKey(String(getValueFromInput(event.target)));
   };
 
   const _lookupKey = (event: React.SyntheticEvent) => {
@@ -113,7 +115,7 @@ const DataAdapter = ({ dataAdapter, noEdit = false }: Props) => {
         {lookupResult && (
           <div>
             <h4>Lookup result</h4>
-            <pre>{JSON.stringify(lookupResult, null, 2)}</pre>
+            <pre>{JSONStringify(lookupResult, null, 2)}</pre>
           </div>
         )}
       </Col>
