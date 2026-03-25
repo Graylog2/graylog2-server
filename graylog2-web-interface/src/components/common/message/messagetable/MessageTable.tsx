@@ -29,7 +29,6 @@ import Field from 'views/components/Field';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import { TableHeaderCell, TableHead } from 'views/components/datatable';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
-import useSelectableMessageTableMessages from 'views/components/widgets/useSelectableMessageTableMessages';
 import BulkSelectCell from 'components/common/message/messagetable/BulkSelectCell';
 
 import FieldSortIcon from './FieldSortIcon';
@@ -145,7 +144,6 @@ const MessageTable = ({
   isEntitySelectable = () => false,
 }: Props) => {
   const { stopAutoRefresh } = useAutoRefresh();
-  const { selectableMessageTableMessages } = useSelectableMessageTableMessages();
   const [expandedMessages, setExpandedMessages] = useState(Immutable.Set<string>());
   const formattedMessages = useMemo(() => _getFormattedMessages(messages), [messages]);
   const selectedFields = useMemo(() => Immutable.OrderedSet<string>(config?.fields ?? []), [config?.fields]);
@@ -166,7 +164,7 @@ const MessageTable = ({
             <tr>
               {displayBulkSelectCol && (
                 <BulkSelectCell>
-                  <BulkSelectHead data={selectableMessageTableMessages} />
+                  <BulkSelectHead />
                 </BulkSelectCell>
               )}
               {selectedFields

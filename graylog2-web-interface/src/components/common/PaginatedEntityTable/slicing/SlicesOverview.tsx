@@ -24,7 +24,13 @@ import { PaginatedList, Spinner } from 'components/common';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
-import SliceFilters, { type SortMode } from './SliceFilters';
+import SliceFilters, {
+  ALPHABETICAL_SORT,
+  defaultSortDirectionForMode,
+  type SortMode,
+  type SortDirection,
+  type SortOption,
+} from './SliceFilters';
 import SliceList from './SliceList';
 import useSlices from './useSlices';
 import type { SliceRenderers, Slices } from './Slicing';
@@ -54,6 +60,7 @@ const SlicesLists = styled.div`
 `;
 
 const SLICES_PAGE_SIZE = 10;
+const SHOW_EMPTY_SLICES_SECTION = false;
 
 const paginatedSlices = (slices: Slices, page: number, pageSize: number) => {
   const from = (page - 1) * pageSize;
@@ -69,8 +76,7 @@ type Props = {
   onChangeSlicing: (sliceCol: string | undefined, slice?: string | undefined) => void;
   sliceRenderers?: SliceRenderers;
   fetchSlices: FetchSlices;
-  sortMode: SortMode;
-  onSortModeChange: (mode: SortMode) => void;
+  sortOptions: Array<SortOption>;
 };
 
 type UseAutoExpandEmptySlicesArgs = {
@@ -122,19 +128,21 @@ const SlicesOverview = ({
   onChangeSlicing,
   sliceRenderers = undefined,
   fetchSlices,
-  sortMode,
-  onSortModeChange,
+  sortOptions,
 }: Props) => {
   const [showEmptySlices, setShowEmptySlices] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [nonEmptyPage, setNonEmptyPage] = useState(1);
   const [emptyPage, setEmptyPage] = useState(1);
+  const [sortMode, setSortMode] = useState<SortMode>(ALPHABETICAL_SORT);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(defaultSortDirectionForMode(ALPHABETICAL_SORT));
   const sendTelemetry = useSendTelemetry();
   const { isLoading, refetchSlices, hasEmptySlices, emptySliceCount, visibleNonEmptySlices, visibleEmptySlices } =
     useSlices({
       fetchSlices,
       activeSlice,
       searchQuery,
+      sortDirection,
       sortMode,
       sliceRenderers,
     });
@@ -150,7 +158,13 @@ const SlicesOverview = ({
     setEmptyPage(1);
   };
   const onSortModeUpdate = (mode: SortMode) => {
-    onSortModeChange(mode);
+    setSortMode(mode);
+    setSortDirection(defaultSortDirectionForMode(mode));
+    setNonEmptyPage(1);
+    setEmptyPage(1);
+  };
+  const onSortDirectionUpdate = (direction: SortDirection) => {
+    setSortDirection(direction);
     setNonEmptyPage(1);
     setEmptyPage(1);
   };
@@ -196,8 +210,11 @@ const SlicesOverview = ({
         searchQuery={searchQuery}
         onSearchQueryChange={onSearchQueryChange}
         onSearchReset={() => onSearchQueryChange('')}
+        sortOptions={sortOptions}
         sortMode={sortMode}
         onSortModeChange={onSortModeUpdate}
+        sortDirection={sortDirection}
+        onSortDirectionChange={onSortDirectionUpdate}
       />
       <SlicesLists>
         <PaginatedList
@@ -220,41 +237,45 @@ const SlicesOverview = ({
             listTestId="slices-list"
           />
         </PaginatedList>
-        <EmptySlicesHeader>
-          {hasEmptySlices ? (
-            <Button
-              bsStyle="link"
-              bsSize="sm"
-              onClick={onToggleEmptySlices}
-              title={showEmptySlices ? 'Hide empty slices' : 'Show empty slices'}>
-              {showEmptySlices ? 'Hide empty slices' : 'Show empty slices'} ({emptySliceCount})
-            </Button>
-          ) : (
-            <EmptySlicesLabel>Empty slices (0)</EmptySlicesLabel>
-          )}
-        </EmptySlicesHeader>
-        {showEmptySlices && visibleEmptySlices.length > 0 && (
-          <PaginatedList
-            activePage={emptyPage}
-            hideFirstAndLastPageLinks
-            pageSize={SLICES_PAGE_SIZE}
-            totalItems={visibleEmptySlices.length}
-            showPageSizeSelect={false}
-            useQueryParameter={false}
-            onChange={(newPage, pageSize) => {
-              void pageSize;
-              setEmptyPage(newPage);
-            }}>
-            <SliceList
-              slices={currentEmptySlices}
-              activeSlice={activeSlice}
-              sliceCol={sliceCol}
-              onChangeSlicing={onSliceSelection}
-              sliceRenderers={sliceRenderers}
-              keyPrefix="empty-"
-              listTestId="empty-slices-list"
-            />
-          </PaginatedList>
+        {SHOW_EMPTY_SLICES_SECTION && (
+          <>
+            <EmptySlicesHeader>
+              {hasEmptySlices ? (
+                <Button
+                  bsStyle="link"
+                  bsSize="sm"
+                  onClick={onToggleEmptySlices}
+                  title={showEmptySlices ? 'Hide empty slices' : 'Show empty slices'}>
+                  {showEmptySlices ? 'Hide empty slices' : 'Show empty slices'} ({emptySliceCount})
+                </Button>
+              ) : (
+                <EmptySlicesLabel>Empty slices (0)</EmptySlicesLabel>
+              )}
+            </EmptySlicesHeader>
+            {showEmptySlices && visibleEmptySlices.length > 0 && (
+              <PaginatedList
+                activePage={emptyPage}
+                hideFirstAndLastPageLinks
+                pageSize={SLICES_PAGE_SIZE}
+                totalItems={visibleEmptySlices.length}
+                showPageSizeSelect={false}
+                useQueryParameter={false}
+                onChange={(newPage, pageSize) => {
+                  void pageSize;
+                  setEmptyPage(newPage);
+                }}>
+                <SliceList
+                  slices={currentEmptySlices}
+                  activeSlice={activeSlice}
+                  sliceCol={sliceCol}
+                  onChangeSlicing={onSliceSelection}
+                  sliceRenderers={sliceRenderers}
+                  keyPrefix="empty-"
+                  listTestId="empty-slices-list"
+                />
+              </PaginatedList>
+            )}
+          </>
         )}
       </SlicesLists>
     </>
