@@ -15,15 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import Immutable from 'immutable';
 import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
 
 import { asMock } from 'helpers/mocking';
+import { adminUser } from 'fixtures/users';
+import useCurrentUser from 'hooks/useCurrentUser';
 import useNotifications from 'components/notifications/useNotifications';
 
 import NotificationBadge from './NotificationBadge';
 
 const BADGE_ID = 'notification-badge';
 
+jest.mock('hooks/useCurrentUser');
 jest.mock('components/notifications/useNotifications');
 
 const notificationFixture = {
@@ -47,6 +51,21 @@ const setNotificationCount = (count: number) =>
   });
 
 describe('NotificationBadge', () => {
+  beforeEach(() => {
+    asMock(useCurrentUser).mockReturnValue(adminUser);
+  });
+
+  it('renders nothing when user has no notification permissions', () => {
+    const userWithoutPermissions = adminUser.toBuilder().permissions(Immutable.List(['dashboards:read'])).build();
+    asMock(useCurrentUser).mockReturnValue(userWithoutPermissions);
+    asMock(useNotifications).mockReturnValue({ data: undefined, isLoading: false });
+
+    render(<NotificationBadge />);
+
+    expect(useNotifications).toHaveBeenCalledWith({ enabled: false });
+    expect(screen.queryByTestId(BADGE_ID)).not.toBeInTheDocument();
+  });
+
   it('renders nothing when there are no notifications', () => {
     setNotificationCount(0);
 
