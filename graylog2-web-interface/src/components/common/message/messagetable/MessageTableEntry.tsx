@@ -131,6 +131,31 @@ const fieldType = (fieldName: string, { decoration_stats: decorationStats }: Mes
 const Strong = ({ children = undefined, strong }: React.PropsWithChildren<{ strong: boolean }>) =>
   strong ? <strong>{children}</strong> : <>{children}</>;
 
+const RowBulkCheckbox = ({
+  message,
+  isEntitySelectable = () => false,
+}: {
+  message: Message;
+  isEntitySelectable?: (entity: BackendMessage) => boolean;
+}) => {
+  const { toggleEntitySelect, isEntitySelected } = useSelectedMessageEntities();
+  const isSelected = isEntitySelected(message.index, message.id);
+  const checkboxTitle = `${isSelected ? 'Deselect' : 'Select'} message`;
+  const isSelectDisabled = !isEntitySelectable(toSelectableMessageTableEntry(message));
+
+  return (
+    <BulkSelectCell>
+      <RowCheckbox
+        onChange={() => toggleEntitySelect(message.index, message.id)}
+        title={!isSelectDisabled ? checkboxTitle : undefined}
+        checked={isSelected}
+        disabled={isSelectDisabled}
+        aria-label={checkboxTitle}
+      />
+    </BulkSelectCell>
+  );
+};
+
 const MessageTableEntry = ({
   config,
   disableSurroundingSearch = false,
@@ -148,7 +173,7 @@ const MessageTableEntry = ({
   const { inputs: inputsList = [] } = useStore(InputsStore);
   const { streams: streamsList = [] } = useStore(StreamsStore);
   const highlightMessageId = useContext(HighlightMessageContext);
-  const { toggleEntitySelect, isEntitySelected } = useSelectedMessageEntities();
+
   const sendTelemetry = useSendTelemetry();
   const additionalContextValue = useMemo(() => ({ message }), [message]);
   const allStreams = useMemo(() => Immutable.List<Stream>(streamsList), [streamsList]);
@@ -174,9 +199,6 @@ const MessageTableEntry = ({
     }
   }, [message.id, message.index, sendTelemetry, toggleDetail]);
 
-  const isSelected = isEntitySelected(message.index, message.id);
-  const checkboxTitle = `${isSelected ? 'Deselect' : 'Select'} message`;
-  const isSelectDisabled = !displayBulkSelectCol || !isEntitySelectable(toSelectableMessageTableEntry(message));
   const colSpanFixup = selectedFields.size + 1 + (rowActions ? 1 : 0) + (displayBulkSelectCol ? 1 : 0);
 
   const selectedFieldsList = useMemo(
@@ -212,17 +234,7 @@ const MessageTableEntry = ({
     <AdditionalContext.Provider value={additionalContextValue}>
       <TableBody $expanded={expanded} $highlighted={message.id === highlightMessageId}>
         <FieldsRow onClick={_toggleDetail} className="table-data-row">
-          {displayBulkSelectCol && (
-            <BulkSelectCell>
-              <RowCheckbox
-                onChange={() => toggleEntitySelect(message.index, message.id)}
-                title={!isSelectDisabled ? checkboxTitle : undefined}
-                checked={isSelected}
-                disabled={isSelectDisabled}
-                aria-label={checkboxTitle}
-              />
-            </BulkSelectCell>
-          )}
+          {displayBulkSelectCol && <RowBulkCheckbox message={message} isEntitySelectable={isEntitySelectable} />}
           {selectedFieldsList}
           {rowActions && <ActionsCell $isNumeric={false}>{rowActions}</ActionsCell>}
         </FieldsRow>

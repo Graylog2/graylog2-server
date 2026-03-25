@@ -45,7 +45,9 @@ import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.ranges.MongoIndexRangeService;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.InputServiceImpl;
+import org.graylog2.inputs.persistence.InputStateService;
 import org.graylog2.inputs.persistence.InputStatusService;
+import org.graylog2.inputs.persistence.MongoInputStateService;
 import org.graylog2.inputs.persistence.MongoInputStatusService;
 import org.graylog2.notifications.DeletedStreamNotificationListener;
 import org.graylog2.notifications.NotificationService;
@@ -96,6 +98,7 @@ public class PersistenceServicesBindings extends AbstractModule {
         bind(TokenUsageService.class).to(TokenUsageServiceImpl.class).asEagerSingleton();
         bind(SessionService.class).to(MongoDbSessionService.class).asEagerSingleton();
         bind(InputStatusService.class).to(MongoInputStatusService.class).asEagerSingleton();
+        bind(InputStateService.class).to(MongoInputStateService.class).asEagerSingleton();
         bind(EntityListPreferencesService.class).to(EntityListPreferencesServiceImpl.class);
         bind(EntitySuggestionService.class).to(MongoEntitySuggestionService.class);
         bind(EntityTitleService.class).to(EntityTitleServiceImpl.class);

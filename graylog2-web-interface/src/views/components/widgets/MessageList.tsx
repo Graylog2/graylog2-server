@@ -210,7 +210,6 @@ const MessageList = ({
           <ErrorWidget errors={pageErrors} />
         ) : (
           <MessageTable
-
             config={config}
             scrollContainerRef={scrollContainerRef}
             fields={fields}
