@@ -243,11 +243,12 @@ class FieldForm extends React.Component<
   render() {
     const { fieldName: prevFieldName } = this.props;
     const { fieldName, isKey, keyPosition, config, validation } = this.state;
+    const isEditingField = !!prevFieldName;
 
     return (
       <Row>
         <Col md={7} lg={6}>
-          <h2 className={commonStyles.title}>{prevFieldName ? `Custom Field "${fieldName}"` : 'New Custom Field'}</h2>
+          <h2 className={commonStyles.title}>{isEditingField ? `Custom Field "${fieldName}"` : 'New Custom Field'}</h2>
 
           <Input
             id="field-name"
@@ -315,7 +316,7 @@ class FieldForm extends React.Component<
         <Col md={12}>
           <ButtonToolbar>
             <Button bsStyle="primary" onClick={this.handleSubmit}>
-              Add custom field
+              {isEditingField ? 'Update custom field' : 'Add custom field'}
             </Button>
             <Button onClick={this.handleCancel}>Cancel</Button>
           </ButtonToolbar>
