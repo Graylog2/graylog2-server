@@ -16,12 +16,10 @@
  */
 package org.graylog.plugins.pipelineprocessor.processors;
 
-import com.codahale.metrics.MetricRegistry;
-import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
-import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService;
 import org.graylog.plugins.pipelineprocessor.events.PipelineConnectionsChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
+import org.graylog.scheduler.system.SystemJobManager;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.rest.resources.system.inputs.InputDeletedEvent;
 import org.graylog2.rest.resources.system.inputs.InputRenamedEvent;
@@ -30,131 +28,103 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.util.Set;
-import java.util.concurrent.ScheduledExecutorService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.doAnswer;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 
 class PipelineMetadataClusterEventHandlerTest {
 
-    private final PipelineInterpreterStateBuilder stateBuilder = mock(PipelineInterpreterStateBuilder.class);
-    private final PipelineMetadataUpdater metadataUpdater = mock(PipelineMetadataUpdater.class);
-    private final MongoDbPipelineMetadataService pipelineMetadataService = mock(MongoDbPipelineMetadataService.class);
-    private final PipelineInterpreter.State state = mock(PipelineInterpreter.State.class);
+    private final SystemJobManager systemJobManager = mock(SystemJobManager.class);
     private final ClusterEventBus clusterEventBus = mock(ClusterEventBus.class);
-    private final ScheduledExecutorService executor = directExecutor();
 
     private PipelineMetadataClusterEventHandler handler;
 
     @BeforeEach
     void setUp() {
-        handler = new PipelineMetadataClusterEventHandler(
-                clusterEventBus, stateBuilder, new MetricRegistry(), metadataUpdater, pipelineMetadataService, executor);
-        when(stateBuilder.buildState(any())).thenReturn(state);
+        handler = new PipelineMetadataClusterEventHandler(clusterEventBus, systemJobManager);
     }
 
     @Test
-    void handleRuleChangesDelegatesToMetadataUpdater() {
+    void handleRuleChangesSubmitsJob() {
         RulesChangedEvent event = new RulesChangedEvent(
                 Set.of(new RulesChangedEvent.Reference("rule1", "Rule 1")),
                 Set.of());
 
         handler.handleRuleChanges(event);
 
-        verify(metadataUpdater).handleRuleChanges(event, state);
+        ArgumentCaptor<PipelineMetadataUpdateJob.Config> captor = ArgumentCaptor.forClass(PipelineMetadataUpdateJob.Config.class);
+        verify(systemJobManager).submit(captor.capture());
+        PipelineMetadataUpdateJob.Config config = captor.getValue();
+        assertEquals(PipelineMetadataUpdateJob.EventType.RULES_CHANGED, config.eventType());
+        assertNotNull(config.rulesEvent());
+        assertEquals(event, config.rulesEvent());
     }
 
     @Test
-    void handlePipelineChangesDelegatesToMetadataUpdater() {
+    void handlePipelineChangesSubmitsJob() {
         PipelinesChangedEvent event = PipelinesChangedEvent.create(Set.of(), Set.of("p1"));
 
         handler.handlePipelineChanges(event);
 
-        verify(metadataUpdater).handlePipelineChanges(event, state);
+        ArgumentCaptor<PipelineMetadataUpdateJob.Config> captor = ArgumentCaptor.forClass(PipelineMetadataUpdateJob.Config.class);
+        verify(systemJobManager).submit(captor.capture());
+        PipelineMetadataUpdateJob.Config config = captor.getValue();
+        assertEquals(PipelineMetadataUpdateJob.EventType.PIPELINES_CHANGED, config.eventType());
+        assertEquals(event, config.pipelinesEvent());
     }
 
     @Test
-    void handlePipelineConnectionChangesDelegatesToMetadataUpdater() {
+    void handlePipelineConnectionChangesSubmitsJob() {
         PipelineConnectionsChangedEvent event = PipelineConnectionsChangedEvent.create("stream1", Set.of("p1"));
 
         handler.handlePipelineConnectionChanges(event);
 
-        verify(metadataUpdater).handleConnectionChanges(event, state);
+        ArgumentCaptor<PipelineMetadataUpdateJob.Config> captor = ArgumentCaptor.forClass(PipelineMetadataUpdateJob.Config.class);
+        verify(systemJobManager).submit(captor.capture());
+        PipelineMetadataUpdateJob.Config config = captor.getValue();
+        assertEquals(PipelineMetadataUpdateJob.EventType.PIPELINE_CONNECTIONS_CHANGED, config.eventType());
+        assertEquals(event, config.connectionsEvent());
     }
 
     @Test
-    void handleInputDeletedDelegatesToMetadataUpdater() {
+    void handleInputDeletedSubmitsJob() {
         InputDeletedEvent event = new InputDeletedEvent("input1", "Input 1");
 
         handler.handleInputDeleted(event);
 
-        verify(metadataUpdater).handleInputDeleted(event, state);
+        ArgumentCaptor<PipelineMetadataUpdateJob.Config> captor = ArgumentCaptor.forClass(PipelineMetadataUpdateJob.Config.class);
+        verify(systemJobManager).submit(captor.capture());
+        PipelineMetadataUpdateJob.Config config = captor.getValue();
+        assertEquals(PipelineMetadataUpdateJob.EventType.INPUT_DELETED, config.eventType());
+        assertEquals(event, config.inputDeletedEvent());
     }
 
     @Test
-    void handleInputRenamedDiscoversAffectedRulesAndDelegates() {
+    void handleInputRenamedSubmitsJob() {
         InputRenamedEvent event = new InputRenamedEvent("input1", "Old Name", "New Name");
-
-        PipelineRulesMetadataDao dao = PipelineRulesMetadataDao.builder()
-                .pipelineId("p1")
-                .rules(Set.of("rule1", "rule2"))
-                .hasInputReferences(true)
-                .build();
-        when(pipelineMetadataService.getReferencingPipelines()).thenReturn(Set.of(dao));
 
         handler.handleInputRenamed(event);
 
-        ArgumentCaptor<RulesChangedEvent> captor = ArgumentCaptor.forClass(RulesChangedEvent.class);
-        verify(metadataUpdater).handleRuleChanges(captor.capture(), eq(state));
-        RulesChangedEvent syntheticEvent = captor.getValue();
-        assertEquals(2, syntheticEvent.updatedRules().size());
-        assertTrue(syntheticEvent.deletedRules().isEmpty());
+        ArgumentCaptor<PipelineMetadataUpdateJob.Config> captor = ArgumentCaptor.forClass(PipelineMetadataUpdateJob.Config.class);
+        verify(systemJobManager).submit(captor.capture());
+        PipelineMetadataUpdateJob.Config config = captor.getValue();
+        assertEquals(PipelineMetadataUpdateJob.EventType.INPUT_RENAMED, config.eventType());
+        assertEquals(event, config.inputRenamedEvent());
     }
 
     @Test
-    void handleInputRenamedSkipsWhenNoReferencingPipelines() {
-        InputRenamedEvent event = new InputRenamedEvent("input1", "Old Name", "New Name");
-        when(pipelineMetadataService.getReferencingPipelines()).thenReturn(Set.of());
+    void configFactoryMethodsSetCorrectEventTypeAndNullOthers() {
+        RulesChangedEvent rulesEvent = new RulesChangedEvent(Set.of(), Set.of());
+        PipelineMetadataUpdateJob.Config config = PipelineMetadataUpdateJob.forRulesChanged(rulesEvent);
 
-        handler.handleInputRenamed(event);
-
-        verify(metadataUpdater, never()).handleRuleChanges(any(), any());
-    }
-
-    @Test
-    void buildStateExceptionDoesNotPropagate() {
-        when(stateBuilder.buildState(any())).thenThrow(new RuntimeException("build error"));
-
-        // Should not throw
-        handler.handleRuleChanges(new RulesChangedEvent(Set.of(), Set.of()));
-
-        verifyNoInteractions(metadataUpdater);
-    }
-
-    @Test
-    void exceptionFromMetadataUpdaterDoesNotPropagate() {
-        RulesChangedEvent event = new RulesChangedEvent(Set.of(), Set.of());
-        doThrow(new RuntimeException("test error")).when(metadataUpdater).handleRuleChanges(any(), any());
-
-        // Should not throw
-        handler.handleRuleChanges(event);
-    }
-
-    private static ScheduledExecutorService directExecutor() {
-        final ScheduledExecutorService mock = mock(ScheduledExecutorService.class);
-        doAnswer(invocation -> {
-            invocation.getArgument(0, Runnable.class).run();
-            return null;
-        }).when(mock).submit(any(Runnable.class));
-        return mock;
+        assertEquals(PipelineMetadataUpdateJob.EventType.RULES_CHANGED, config.eventType());
+        assertNotNull(config.rulesEvent());
+        assertNull(config.pipelinesEvent());
+        assertNull(config.connectionsEvent());
+        assertNull(config.inputDeletedEvent());
+        assertNull(config.inputRenamedEvent());
     }
 }
