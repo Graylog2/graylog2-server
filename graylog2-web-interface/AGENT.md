@@ -29,7 +29,7 @@ disable_plugins=true yarn start
 # Build (without plugins)
 yarn build
 
-# Run all tests
+# Run all tests (DO NOT use `yarn jest`)
 yarn test
 
 # Run a specific test
@@ -98,3 +98,12 @@ yarn tsc && yarn lint:changes && yarn test
 - Register: `PluginStore.register(new PluginManifest({}, { key: [data] }));`
 - Consume: `usePluginEntities('key')`
 - No central documentation of plugin store keys — search the codebase for usage.
+
+## Finishing work
+
+Before finishing current work, please make sure that:
+
+  - Type-checking passes
+  - Tests are passing
+  - Generated code is adhering our frontend style guide (as laid out on `CONTRIBUTING.md`)
+
