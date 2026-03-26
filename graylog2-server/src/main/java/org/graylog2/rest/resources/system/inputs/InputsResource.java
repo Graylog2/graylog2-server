@@ -29,6 +29,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
@@ -66,6 +67,7 @@ import org.graylog2.inputs.InputImpl;
 import org.graylog2.inputs.InputRuntimeStatusProvider;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.diagnosis.InputDiagnosticService;
+import org.graylog2.inputs.diagnosis.InputRoutingRulesService;
 import org.graylog2.inputs.encryption.EncryptedInputConfigs;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.database.ValidationException;
@@ -82,6 +84,8 @@ import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.rest.resources.entities.FilterOption;
 import org.graylog2.rest.resources.entities.Sorting;
+import org.graylog2.rest.resources.streams.responses.StreamPipelineRulesResponse;
+import org.graylog2.rest.resources.system.inputs.responses.InputStreamRulesResponse;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
@@ -146,6 +150,7 @@ public class InputsResource extends AbstractInputsResource {
 
     private final InputService inputService;
     private final InputDiagnosticService inputDiagnosticService;
+    private final InputRoutingRulesService routingRulesService;
     private final DbQueryCreator dbQueryCreator;
     private final StreamService streamService;
     private final StreamRuleService streamRuleService;
@@ -158,6 +163,7 @@ public class InputsResource extends AbstractInputsResource {
     @Inject
     public InputsResource(InputService inputService,
                           InputDiagnosticService inputDiagnosticService,
+                          InputRoutingRulesService routingRulesService,
                           StreamService streamService,
                           StreamRuleService streamRuleService,
                           PipelineService pipelineService,
@@ -169,6 +175,7 @@ public class InputsResource extends AbstractInputsResource {
         super(messageInputFactory.getAvailableInputs());
         this.inputService = inputService;
         this.inputDiagnosticService = inputDiagnosticService;
+        this.routingRulesService = routingRulesService;
         this.dbQueryCreator = new DbQueryCreator(MessageInput.FIELD_TITLE, ATTRIBUTES, computedFieldRegistry);
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
@@ -287,6 +294,59 @@ public class InputsResource extends AbstractInputsResource {
                 pipelineService.loadBySourcePattern(inputId).stream()
                         .map(pipelineDao -> new InputReference(pipelineDao.id(), pipelineDao.title()))
                         .toList());
+    }
+
+    @GET
+    @Timed
+    @Path("/routing_rules/pipeline/{inputId}")
+    @Operation(summary = "Get a paginated list of pipeline rules that reference the specified input")
+    @Produces(MediaType.APPLICATION_JSON)
+    public PageListResponse<StreamPipelineRulesResponse> getPipelineRulesPage(
+            @Parameter(name = "inputId", required = true) @PathParam("inputId") @NotBlank String inputId,
+            @Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+            @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+            @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+            @Parameter(name = "sort",
+                       description = "The field to sort the result on",
+                       required = true,
+                       schema = @Schema(allowableValues = {"rule", "pipeline", "connected_streams"}))
+            @DefaultValue("rule") @QueryParam("sort") String sort,
+            @Parameter(name = "order", description = "The sort direction",
+                       schema = @Schema(allowableValues = {"asc", "desc"}))
+            @DefaultValue("asc") @QueryParam("order") SortOrder order) {
+
+        checkPermission(RestPermissions.INPUTS_READ, inputId);
+
+        return routingRulesService.getPipelineRulesPage(inputId,
+                pipelineId -> isPermitted(PipelineRestPermissions.PIPELINE_READ, pipelineId),
+                streamId -> isPermitted(RestPermissions.STREAMS_READ, streamId),
+                page, perPage, query, sort, order);
+    }
+
+    @GET
+    @Timed
+    @Path("/routing_rules/streams/{inputId}")
+    @Operation(summary = "Get a paginated list of stream rules that reference the specified input")
+    @Produces(MediaType.APPLICATION_JSON)
+    public PageListResponse<InputStreamRulesResponse> getStreamRulesPage(
+            @Parameter(name = "inputId", required = true) @PathParam("inputId") @NotBlank String inputId,
+            @Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+            @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+            @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+            @Parameter(name = "sort",
+                       description = "The field to sort the result on",
+                       required = true,
+                       schema = @Schema(allowableValues = {"stream", "rule_field", "rule_type", "rule_value"}))
+            @DefaultValue("stream") @QueryParam("sort") String sort,
+            @Parameter(name = "order", description = "The sort direction",
+                       schema = @Schema(allowableValues = {"asc", "desc"}))
+            @DefaultValue("asc") @QueryParam("order") SortOrder order) {
+
+        checkPermission(RestPermissions.INPUTS_READ, inputId);
+
+        return routingRulesService.getStreamRulesPage(inputId,
+                streamId -> isPermitted(RestPermissions.STREAMS_READ, streamId),
+                page, perPage, query, sort, order);
     }
 
     @GET

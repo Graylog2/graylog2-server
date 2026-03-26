@@ -19,6 +19,8 @@ import { useEffect, useMemo, useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import groupBy from 'lodash/groupBy';
 
+import { SystemCatalog } from '@graylog/server-api';
+
 import { LinkContainer, DocumentTitle, PageHeader } from 'components/common';
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
@@ -26,18 +28,19 @@ import UserNotification from 'util/UserNotification';
 import ValueReferenceData from 'util/ValueReferenceData';
 import ContentPackEdit from 'components/content-packs/ContentPackEdit';
 import Entity from 'logic/content-packs/Entity';
-import { CatalogActions, CatalogStore } from 'stores/content-packs/CatalogStore';
+import EntityIndex from 'logic/content-packs/EntityIndex';
 import { ContentPacksActions, ContentPacksStore } from 'stores/content-packs/ContentPacksStore';
 import useParams from 'routing/useParams';
 import useHistory from 'routing/useHistory';
 import { useStore } from 'stores/connect';
 import useProductName from 'brand-customization/useProductName';
 import MarketplaceLink from 'components/support/MarketplaceLink';
+import useEntityIndex from 'components/content-packs/hooks/useEntityIndex';
 
 const EditContentPackPage = () => {
   useStore(ContentPacksStore);
   const productName = useProductName();
-  const { entityIndex } = useStore(CatalogStore);
+  const { entityIndex } = useEntityIndex();
   const { contentPackId, contentPackRev } = useParams<{ contentPackId: string; contentPackRev: string }>();
   const history = useHistory();
   const [selectedEntities, setSelectedEntities] = useState({});
@@ -53,8 +56,6 @@ const EditContentPackPage = () => {
 
       setContentPack(newContentPack);
       setContentPackEntities(cloneDeep(newContentPack.entities));
-
-      CatalogActions.showEntityIndex();
     });
   }, [contentPackId, contentPackRev]);
 
@@ -152,7 +153,12 @@ const EditContentPackPage = () => {
   };
 
   const _getEntities = (newSelectedEntities) => {
-    CatalogActions.getSelectedEntities(newSelectedEntities).then((result: any) => {
+    const payload = Object.keys(newSelectedEntities)
+      .reduce((acc, entityType) => acc.concat(newSelectedEntities[entityType]), [])
+      .filter((e) => e instanceof EntityIndex)
+      .map((entity) => entity.toJSON());
+
+    SystemCatalog.resolveEntities({ entities: payload as any }).then((result: any) => {
       const selectedContentPackEntities = Object.keys(newSelectedEntities)
         .reduce((acc, entityType) => acc.concat(newSelectedEntities[entityType]), [])
         .filter((e) => e instanceof Entity);

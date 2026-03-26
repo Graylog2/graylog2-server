@@ -124,7 +124,11 @@ describe('SearchBar pluggable controls', () => {
   usePlugin(testPlugin);
 
   beforeEach(() => {
-    asMock(useSearchConfiguration).mockReturnValue({ config: mockSearchesClusterConfig, refresh: () => {} });
+    asMock(useSearchConfiguration).mockReturnValue({
+      config: mockSearchesClusterConfig,
+      refresh: () => {},
+      isInitialLoading: false,
+    });
   });
 
   it('should render and have initial values', async () => {

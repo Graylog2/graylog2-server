@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 
+import { HoverForHelp } from 'components/common';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -25,6 +26,23 @@ import useLocation from 'routing/useLocation';
 import useMinimumRefreshInterval from 'views/hooks/useMinimumRefreshInterval';
 import RefreshControls from 'components/common/RefreshControls';
 import useDefaultInterval from 'views/hooks/useDefaultIntervalForRefresh';
+import useAutoRefresh from 'views/hooks/useAutoRefresh';
+
+import useTableFetchContext from '../../common/PaginatedEntityTable/useTableFetchContext';
+
+const useDisableRefreshWhileSlicing = () => {
+  const tableFetchContext = useTableFetchContext();
+  const { refreshConfig, stopAutoRefresh } = useAutoRefresh();
+  const isSlicingEnabled = Boolean(tableFetchContext?.searchParams.sliceCol);
+
+  useEffect(() => {
+    if (isSlicingEnabled && refreshConfig?.enabled) {
+      stopAutoRefresh();
+    }
+  }, [isSlicingEnabled, refreshConfig?.enabled, stopAutoRefresh]);
+
+  return isSlicingEnabled;
+};
 
 const EventsRefreshControls = () => {
   const location = useLocation();
@@ -32,6 +50,7 @@ const EventsRefreshControls = () => {
   const { config } = useSearchConfiguration();
   const autoRefreshTimerangeOptions = config?.auto_refresh_timerange_options;
   const { data: minimumRefreshInterval, isInitialLoading: isLoadingMinimumInterval } = useMinimumRefreshInterval();
+  const isSlicingEnabled = useDisableRefreshWhileSlicing();
 
   const onSelectInterval = useCallback(
     (interval: string) => {
@@ -67,15 +86,20 @@ const EventsRefreshControls = () => {
 
   return (
     <RefreshControls
-      disable={false}
+      disable={isSlicingEnabled}
       intervalOptions={intervalOptions}
       isLoadingMinimumInterval={isLoadingMinimumInterval}
       minimumRefreshInterval={minimumRefreshInterval}
       defaultInterval={defaultInterval}
       humanName="Events"
       onToggle={onToggle}
-      onSelectInterval={onSelectInterval}
-    />
+      onSelectInterval={onSelectInterval}>
+      {isSlicingEnabled && (
+        <HoverForHelp title="Auto refresh unavailable" placement="left" pullRight={false} iconSize="sm">
+          Auto refresh is turned off during slicing to avoid performance issues.
+        </HoverForHelp>
+      )}
+    </RefreshControls>
   );
 };
 

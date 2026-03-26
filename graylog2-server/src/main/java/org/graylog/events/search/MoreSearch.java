@@ -23,6 +23,7 @@ import org.graylog.plugins.views.search.IndexRangeContainsOneOfStreams;
 import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.NumberRange;
 import org.graylog.plugins.views.search.errors.EmptyParameterError;
 import org.graylog.plugins.views.search.errors.SearchException;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
@@ -33,6 +34,7 @@ import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.rest.resources.entities.Slice;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -193,6 +196,55 @@ public class MoreSearch {
         return queryDecorators.decorate(queryString, ParameterProvider.of(queryParameters));
     }
 
+
+    /**
+     * Executes a terms aggregation on the given {@code slicingColumn} and returns the bucket counts.
+     * This is the indexer-native equivalent of using ScriptingApiService for slice aggregations.
+     *
+     * @param queryString           the search query string
+     * @param timeRange             the time range for the search
+     * @param eventStreams          event streams to search in
+     * @param filterString          additional filter string
+     * @param forbiddenSourceStreams source streams the caller must not access
+     * @param slicingColumn         the field to aggregate on
+     * @param maxBuckets            maximum number of buckets to return
+     * @return a list of slices
+     */
+    public List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timeRange, Set<String> eventStreams,
+                                       String filterString, Set<String> forbiddenSourceStreams,
+                                       String slicingColumn, String type, int maxBuckets) {
+        final Set<String> affectedIndices = getAffectedIndices(eventStreams, timeRange);
+        if (affectedIndices == null || affectedIndices.isEmpty()) {
+            return List.of();
+        }
+        // TODO: add extra filters if necessary
+        return moreSearchAdapter.aggregateSlicesForColumn(queryString, timeRange, affectedIndices, eventStreams,
+                filterString, forbiddenSourceStreams, Map.of(), slicingColumn, type, maxBuckets);
+    }
+
+    /**
+     * Executes a range aggregation on the given {@code slicingColumn} and returns the bucket counts.
+     * This is the indexer-native equivalent of using ScriptingApiService for range-based slice aggregations.
+     *
+     * @param queryString           the search query string
+     * @param timeRange             the time range for the search
+     * @param eventStreams          event streams to search in
+     * @param filterString          additional filter string
+     * @param forbiddenSourceStreams source streams the caller must not access
+     * @param slicingColumn         the field to aggregate on
+     * @param ranges                the numeric ranges to bucket by
+     * @return a list of range key to document count, in bucket order
+     */
+    public List<Slice> aggregateSlicesForRangeQuery(String queryString, TimeRange timeRange, Set<String> eventStreams,
+                                                  String filterString, Set<String> forbiddenSourceStreams,
+                                                  String slicingColumn, String type, List<NumberRange> ranges) {
+        final Set<String> affectedIndices = getAffectedIndices(eventStreams, timeRange);
+        if (affectedIndices == null || affectedIndices.isEmpty()) {
+            return List.of();
+        }
+        return moreSearchAdapter.aggregateSlicesForRangeQuery(queryString, timeRange, affectedIndices, eventStreams,
+                filterString, forbiddenSourceStreams, Map.of(), slicingColumn, type, ranges);
+    }
 
     /**
      * Helper to perform basic Lucene escaping of query string values
