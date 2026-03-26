@@ -36,6 +36,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.ParsedMultiBucketAggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.DateHistogramInterval;
@@ -297,7 +298,7 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
         }
 
         final SearchResponse searchResult = client.search(searchRequest, "Unable to perform range slice aggregation query");
-        final ParsedRange rangeResult = searchResult.getAggregations().get(slicesAggregationName);
+        final ParsedMultiBucketAggregation<MultiBucketsAggregation.Bucket> rangeResult = searchResult.getAggregations().get(slicesAggregationName);
 
         return rangeResult.getBuckets().stream().map(e -> new Slice(e.getKeyAsString(), null, Math.toIntExact(e.getDocCount()), meta)).toList();
     }

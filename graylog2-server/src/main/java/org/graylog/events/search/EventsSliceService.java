@@ -43,6 +43,8 @@ import static org.graylog.events.event.EventDto.FIELD_ALERT;
 import static org.graylog.events.event.EventDto.FIELD_PRIORITY;
 
 public class EventsSliceService extends AbstractEventsSearchService {
+    public final static String TYPE = "type";
+
     private final ScriptingApiService scriptingApiService;
 
     @Inject
@@ -64,7 +66,7 @@ public class EventsSliceService extends AbstractEventsSearchService {
         final var filter = buildFilter(EventsSearchParameters.builder().query(query).timerange(timeRange).filter(request.filter()).build());
 
         final String column = request.sliceColumn();
-        final Map<String, Object> meta = getTypeBySliceColumn(column) != null ? Map.of("type", getTypeBySliceColumn(column)) : Map.of();
+        final Map<String, Object> meta = getTypeBySliceColumn(column) != null ? Map.of(TYPE, getTypeBySliceColumn(column)) : Map.of();
 
         final var queryString = filter.isEmpty() ? query : query.isEmpty() ? filter : query + " AND " + filter;
 

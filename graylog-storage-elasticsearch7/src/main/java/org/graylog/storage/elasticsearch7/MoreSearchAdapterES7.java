@@ -36,6 +36,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuil
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.ParsedMultiBucketAggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
@@ -297,9 +298,9 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
         }
 
         final SearchResponse searchResult = client.search(searchRequest, "Unable to perform slice aggregation query");
-        final ParsedTerms termsResult = searchResult.getAggregations().get(slicesAggregationName);
+        final ParsedMultiBucketAggregation<ParsedMultiBucketAggregation.ParsedBucket> result = searchResult.getAggregations().get(slicesAggregationName);
 
-        return termsResult.getBuckets().stream().map(e -> new Slice(e.getKeyAsString(), null, Math.toIntExact(e.getDocCount()), meta)).toList();
+        return result.getBuckets().stream().map(e -> new Slice(e.getKeyAsString(), null, Math.toIntExact(e.getDocCount()), meta)).toList();
     }
 
     @Override
