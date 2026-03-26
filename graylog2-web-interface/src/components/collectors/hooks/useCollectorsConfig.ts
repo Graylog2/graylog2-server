@@ -24,7 +24,7 @@ import type { CollectorsConfig } from '../types';
 
 export const CONFIG_KEY_PREFIX = ['collectors', 'config'];
 
-export const useCollectorsConfig = () =>
+export const useCollectorsConfig = (): { data: CollectorsConfig | undefined; isLoading: boolean } =>
   useQuery<CollectorsConfig>({
     queryKey: CONFIG_KEY_PREFIX,
     queryFn: () =>

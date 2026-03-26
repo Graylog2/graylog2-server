@@ -24,6 +24,7 @@ import EnrollmentTokenList from './EnrollmentTokenList';
 
 import { fetchPaginatedEnrollmentTokens, useFleets, useCollectorsMutations } from '../hooks';
 import type { EnrollmentTokenMetadata, Fleet } from '../types';
+import { mockCollectorsMutations } from '../testing/mockMutations';
 
 jest.mock('../hooks/useFleetQueries');
 jest.mock('../hooks/useCollectorsMutations');
@@ -90,11 +91,11 @@ describe('EnrollmentTokenList', () => {
     asMock(useFleets).mockReturnValue({
       data: mockFleets,
       isLoading: false,
-    } as unknown as ReturnType<typeof useFleets>);
+    });
 
-    asMock(useCollectorsMutations).mockReturnValue({
+    asMock(useCollectorsMutations).mockReturnValue(mockCollectorsMutations({
       deleteEnrollmentToken: deleteEnrollmentTokenMock,
-    } as unknown as ReturnType<typeof useCollectorsMutations>);
+    }));
 
     asMock(fetchPaginatedEnrollmentTokens).mockResolvedValue(mockPaginatedResponse([mockToken()]));
   });

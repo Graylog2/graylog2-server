@@ -27,7 +27,7 @@ import type { BulkFleetStatsResponse, Fleet } from '../types';
 export const FLEETS_KEY_PREFIX = ['collectors', 'fleets'];
 export const fleetsKeyFn = (searchParams: SearchParams) => [...FLEETS_KEY_PREFIX, 'paginated', searchParams];
 
-export const useFleets = () =>
+export const useFleets = (): { data: Fleet[] | undefined; isLoading: boolean } =>
   useQuery<Fleet[]>({
     queryKey: [...FLEETS_KEY_PREFIX],
     queryFn: () =>

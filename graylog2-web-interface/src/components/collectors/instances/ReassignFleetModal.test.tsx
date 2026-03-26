@@ -24,6 +24,7 @@ import ReassignFleetModal from './ReassignFleetModal';
 
 import { useFleets, useCollectorsMutations } from '../hooks';
 import type { Fleet } from '../types';
+import { mockCollectorsMutations } from '../testing/mockMutations';
 
 jest.mock('../hooks/useFleetQueries');
 jest.mock('../hooks/useCollectorsMutations');
@@ -61,12 +62,12 @@ describe('ReassignFleetModal', () => {
     asMock(useFleets).mockReturnValue({
       data: mockFleets,
       isLoading: false,
-    } as unknown as ReturnType<typeof useFleets>);
+    });
 
-    asMock(useCollectorsMutations).mockReturnValue({
+    asMock(useCollectorsMutations).mockReturnValue(mockCollectorsMutations({
       reassignInstances: reassignInstancesMock,
       isReassigningInstances: false,
-    } as unknown as ReturnType<typeof useCollectorsMutations>);
+    }));
   });
 
   it('renders modal title with instance count', async () => {
@@ -147,7 +148,7 @@ describe('ReassignFleetModal', () => {
     asMock(useFleets).mockReturnValue({
       data: undefined,
       isLoading: true,
-    } as unknown as ReturnType<typeof useFleets>);
+    });
 
     render(<ReassignFleetModal instanceUids={['uid-1']} onClose={jest.fn()} />);
 

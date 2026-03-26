@@ -20,6 +20,7 @@ import asMock from 'helpers/mocking/AsMock';
 
 import useDefaultInstanceFilters from './useDefaultInstanceFilters';
 import { useCollectorsConfig } from './useCollectorsConfig';
+import type { CollectorsConfig } from '../types';
 
 jest.mock('./useCollectorsConfig');
 
@@ -32,7 +33,7 @@ describe('useDefaultInstanceFilters', () => {
     asMock(useCollectorsConfig).mockReturnValue({
       data: undefined,
       isLoading: true,
-    } as unknown as ReturnType<typeof useCollectorsConfig>);
+    });
 
     const { result } = renderHook(() => useDefaultInstanceFilters());
 
@@ -41,9 +42,9 @@ describe('useDefaultInstanceFilters', () => {
 
   it('returns undefined when threshold is not set', () => {
     asMock(useCollectorsConfig).mockReturnValue({
-      data: {},
+      data: {} as CollectorsConfig,
       isLoading: false,
-    } as unknown as ReturnType<typeof useCollectorsConfig>);
+    });
 
     const { result } = renderHook(() => useDefaultInstanceFilters());
 
@@ -52,9 +53,9 @@ describe('useDefaultInstanceFilters', () => {
 
   it('returns filter with last_seen cutoff when threshold is configured', () => {
     asMock(useCollectorsConfig).mockReturnValue({
-      data: { collector_default_visibility_threshold: 'PT24H' },
+      data: { collector_default_visibility_threshold: 'PT24H' } as CollectorsConfig,
       isLoading: false,
-    } as unknown as ReturnType<typeof useCollectorsConfig>);
+    });
 
     const { result } = renderHook(() => useDefaultInstanceFilters());
 

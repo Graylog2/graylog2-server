@@ -24,6 +24,7 @@ import InstanceActions from './InstanceActions';
 
 import { useCollectorsMutations } from '../hooks';
 import type { CollectorInstanceView } from '../types';
+import { mockCollectorsMutations } from '../testing/mockMutations';
 
 jest.mock('../hooks/useCollectorsMutations');
 jest.mock('./ReassignFleetModal', () => (props: { onClose: () => void }) => (
@@ -59,10 +60,10 @@ describe('InstanceActions', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    asMock(useCollectorsMutations).mockReturnValue({
+    asMock(useCollectorsMutations).mockReturnValue(mockCollectorsMutations({
       deleteInstance: deleteInstanceMock,
       isDeletingInstance: false,
-    } as unknown as ReturnType<typeof useCollectorsMutations>);
+    }));
   });
 
   it('renders View Logs and Details buttons', async () => {

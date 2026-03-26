@@ -25,6 +25,8 @@ import useInputsStates from 'hooks/useInputsStates';
 import CollectorsSettings from './CollectorsSettings';
 
 import { useCollectorsConfig, useCollectorsMutations } from '../hooks';
+import type { CollectorsConfig } from '../types';
+import { mockCollectorsMutations } from '../testing/mockMutations';
 
 jest.mock('../hooks');
 jest.mock('hooks/useInput');
@@ -33,10 +35,15 @@ jest.mock('components/inputs/InputStateBadge', () => () => <span>Running</span>)
 
 const updateConfig = jest.fn();
 
-const config = {
+const config: CollectorsConfig = {
   ca_cert_id: 'ca-id',
   signing_cert_id: 'signing-id',
-  token_signing_key: { is_set: true },
+  token_signing_key: {
+    public_key: 'pub-key',
+    private_key: 'priv-key',
+    fingerprint: 'fp',
+    created_at: '2026-01-01T00:00:00Z',
+  },
   otlp_server_cert_id: 'otlp-id',
   http: {
     enabled: true,
@@ -56,11 +63,11 @@ describe('CollectorsSettings', () => {
     asMock(useCollectorsConfig).mockReturnValue({
       data: config,
       isLoading: false,
-    } as unknown as ReturnType<typeof useCollectorsConfig>);
-    asMock(useCollectorsMutations).mockReturnValue({
+    });
+    asMock(useCollectorsMutations).mockReturnValue(mockCollectorsMutations({
       updateConfig,
       isUpdatingConfig: false,
-    } as unknown as ReturnType<typeof useCollectorsMutations>);
+    }));
     asMock(useInput).mockReturnValue({
       data: { id: 'input-1' },
     } as unknown as ReturnType<typeof useInput>);
