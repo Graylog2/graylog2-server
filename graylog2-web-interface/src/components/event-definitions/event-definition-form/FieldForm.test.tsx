@@ -22,15 +22,9 @@ import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { asMock } from 'helpers/mocking';
 
-import FieldForm from './FieldForm';
-
-jest.mock('routing/useLocation');
-jest.mock('logic/telemetry/useSendTelemetry');
-
-jest.mock('logic/telemetry/withTelemetry', () => ({
-  __esModule: true,
-  default: (Component: React.FC) => (props: any) => <Component {...props} sendTelemetry={() => {}} />,
-}));
+jest.mock('logic/telemetry/withTelemetry', () => <T,>(Component: React.FC<T>) => (props: T) => (
+  <Component {...props} sendTelemetry={() => {}} />
+));
 
 describe('FieldForm', () => {
   beforeEach(() => {
