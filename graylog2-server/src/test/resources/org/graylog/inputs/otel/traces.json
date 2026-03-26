@@ -1,0 +1,105 @@
+{
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "my.service"
+            }
+          }
+        ]
+      },
+      "schemaUrl": "https://opentelemetry.io/schemas/1.0.0",
+      "scopeSpans": [
+        {
+          "scope": {
+            "name": "my.library",
+            "version": "1.0.0",
+            "attributes": [
+              {
+                "key": "my.scope.attribute",
+                "value": {
+                  "stringValue": "some scope attribute"
+                }
+              }
+            ]
+          },
+          "schemaUrl": "https://opentelemetry.io/schemas/1.0.0",
+          "spans": [
+            {
+              "traceId": "W47/95gDgQPSabYzgT/GDA==",
+              "spanId": "7uGbfsPBsXQ=",
+              "parentSpanId": "AQEBAQEBAQE=",
+              "traceState": "vendor1=value1",
+              "name": "Example span",
+              "kind": 2,
+              "startTimeUnixNano": "1544712660300000000",
+              "endTimeUnixNano": "1544712660400000000",
+              "attributes": [
+                {
+                  "key": "string.attribute",
+                  "value": {
+                    "stringValue": "some string"
+                  }
+                },
+                {
+                  "key": "boolean.attribute",
+                  "value": {
+                    "boolValue": true
+                  }
+                },
+                {
+                  "key": "int.attribute",
+                  "value": {
+                    "intValue": "10"
+                  }
+                },
+                {
+                  "key": "double.attribute",
+                  "value": {
+                    "doubleValue": 637.704
+                  }
+                }
+              ],
+              "status": {
+                "code": 1,
+                "message": "OK"
+              },
+              "events": [
+                {
+                  "timeUnixNano": "1544712660350000000",
+                  "name": "exception",
+                  "attributes": [
+                    {
+                      "key": "exception.type",
+                      "value": {
+                        "stringValue": "RuntimeException"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "links": [
+                {
+                  "traceId": "W47/95gDgQPSabYzgT/GDA==",
+                  "spanId": "7uGbfsPBsXQ=",
+                  "traceState": "vendor2=value2",
+                  "attributes": [
+                    {
+                      "key": "link.attribute",
+                      "value": {
+                        "stringValue": "link value"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

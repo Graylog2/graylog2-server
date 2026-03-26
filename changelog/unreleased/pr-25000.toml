@@ -1,0 +1,4 @@
+type = "a"
+message = "Add support for OpenTelemetry traces (OTLP) to the OTel input."
+
+pulls = ["25000"]

@@ -1,0 +1,17 @@
+{
+  "resourceSpans": [
+    {
+      "scopeSpans": [
+        {
+          "spans": [
+            {
+              "traceId": "W47/95gDgQPSabYzgT/GDA==",
+              "spanId": "7uGbfsPBsXQ=",
+              "name": "minimal"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
