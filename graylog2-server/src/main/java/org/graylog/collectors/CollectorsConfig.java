@@ -34,6 +34,7 @@ public record CollectorsConfig(
         @JsonProperty("collector_default_visibility_threshold") Duration collectorDefaultVisibilityThreshold,
         @JsonProperty("collector_expiration_threshold") Duration collectorExpirationThreshold,
         // TODO: Make certificate lifetime configurable in the UI - https://github.com/Graylog2/graylog2-server/issues/25407
+        // TODO: Collector cert lifetime can't be higher than the signing cert's lifetime. Validate!
         @JsonProperty("collector_cert_lifetime") Duration collectorCertLifetime,
         // TODO: Make heartbeat interval configurable in the UI - https://github.com/Graylog2/graylog2-server/issues/25408
         @JsonProperty("collector_heartbeat_interval") Duration collectorHeartbeatInterval
