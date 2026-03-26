@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import moment from 'moment';
 
-import { Button, Input, Alert, Row, Col } from 'components/bootstrap';
+import { Input, Alert, Row, Col } from 'components/bootstrap';
 import { Link, Spinner } from 'components/common';
 import TimeUnitInput, { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import Routes from 'routing/Routes';
@@ -28,6 +28,7 @@ import useInputsStates from 'hooks/useInputsStates';
 
 import { useCollectorsConfig, useCollectorsMutations } from '../hooks';
 import type { CollectorsConfigRequest } from '../types';
+import FormSubmit from 'components/common/FormSubmit';
 
 type EndpointFormState = {
   enabled: boolean;
@@ -146,18 +147,13 @@ const CollectorsSettings = () => {
 
   return (
     <>
-      {!isConfigured && (
-        <Row className="content">
-          <Col md={12}>
+      <Row className="content">
+        <Col md={6}>
+          {!isConfigured && (
             <Alert bsStyle="warning">
               Collectors have not been set up yet. Configure the ingest endpoints below and save to get started.
             </Alert>
-          </Col>
-        </Row>
-      )}
-
-      <Row className="content">
-        <Col md={6}>
+          )}
           <h2>Ingest Endpoints</h2>
 
           <h3>HTTP</h3>
@@ -238,10 +234,14 @@ const CollectorsSettings = () => {
               )
             }
           />
-
-          <Button bsStyle="primary" onClick={handleSave} disabled={isUpdatingConfig}>
-            {isUpdatingConfig ? 'Saving...' : 'Save'}
-          </Button>
+          <FormSubmit
+            isAsyncSubmit
+            submitButtonText="Update settings"
+            submitLoadingText="Updating..."
+            onSubmit={handleSave}
+            isSubmitting={isUpdatingConfig}
+            displayCancel={false}
+          />
         </Col>
       </Row>
 

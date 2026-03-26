@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 
-import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import { CollectorsPageNavigation } from 'components/collectors/common';
 import CollectorsSettings from 'components/collectors/settings/CollectorsSettings';
@@ -27,11 +26,7 @@ const CollectorsSettingsPage = () => (
     <PageHeader title="Collectors Settings">
       <span>Configure ingest endpoints for managed collectors.</span>
     </PageHeader>
-    <Row className="content">
-      <Col md={12}>
-        <CollectorsSettings />
-      </Col>
-    </Row>
+    <CollectorsSettings />
   </DocumentTitle>
 );
 
