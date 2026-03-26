@@ -72,13 +72,6 @@ const MutedText = styled.span(
   `,
 );
 
-const EmptyState = styled.p(
-  ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
-    font-style: italic;
-  `,
-);
-
 const ICON_MAP: Record<ActivityEntry['type'], IconName> = {
   CONFIG_CHANGED: 'settings',
   INGEST_CONFIG_CHANGED: 'settings',
