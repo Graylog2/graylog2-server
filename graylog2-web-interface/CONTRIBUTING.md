@@ -30,7 +30,8 @@ Please read and understand the [Code of Conduct](https://github.com/Graylog2/gra
 
 ### Class vs Functional
 
-Small components should be functional. For complex components, either class or functional with hooks is acceptable — when in doubt, prefer functional.
+- Small components should be functional. For complex components, either class or functional with hooks is acceptable — when in doubt, prefer functional.
+- When touching existing components, migrate them to functional, typed components. Exception: trivial bugfixes where migration effort exceeds the fix or risks unforeseen consequences.
 
 ### Size and Simplicity
 
@@ -47,9 +48,10 @@ Small components should be functional. For complex components, either class or f
 - Use **TypeScript** for all new React components with static types for props.
 - **No PropTypes** — support was dropped with React 19.
 - Use **default parameters** instead of `defaultProps` in functional components. See the [React 19 upgrade guide](https://react.dev/blog/2024/04/25/react-19-upgrade-guide).
-- When touching existing components, migrate them to functional, typed components. Exception: trivial bugfixes where migration effort exceeds the fix or risks unforeseen consequences.
 - Prefix unused parameters with an underscore and a meaningful name (e.g., `_eventType`), not just `_`. See [this discussion](https://github.com/Graylog2/graylog2-server/pull/12176#pullrequestreview-940555887).
 - `types.d.ts` can hide errors like missing imports. Temporarily rename to `types.ts` to detect them.
+- Do not leave out types for function arguments (therefore being implicitly `any`), use proper types.
+- Do not use `as unknown as <...>` to opt out of type-checking
 
 ## Imports
 
@@ -132,7 +134,7 @@ test({ value1: undefined, value2: null }); // 12, null
 
 ## Session Timeouts
 
-To prevent session expiry during user interaction, every API request using `fetch` from `FetchProvider` extends the session. Periodic requests must use `fetchPeriodically` instead to avoid extending the session when the user is idle.
+To prevent session expiry during user interaction, every API request using `fetch` from `FetchProvider` extends the session. Periodic requests must use `fetchPeriodically` instead to avoid extending the session when the user is idle. When using the generated stubs, pass the optional last options argument with `{ requestShouldExtendSession: false }`.
 
 ## Plugin System
 
@@ -212,8 +214,3 @@ Avoid `link` style buttons — use actual anchors for navigation.
 - Form modals should not close on outside click (to prevent data loss).
 - Form modals should autofocus the first input.
 
-## Common Problems
-
-### Yarn Cache
-
-The yarn cache can grow very large (200GB+). Run `yarn cache clean` periodically.
