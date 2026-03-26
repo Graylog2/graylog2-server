@@ -164,7 +164,7 @@ const DeploymentForm = () => {
         <Label>Platform</Label>
         <SegmentedControl
           value={platform}
-          onChange={(v) => setPlatform(v as Platform)}
+          onChange={(v) => setPlatform(v)}
           data={[
             { value: 'linux', label: 'Linux' },
             { value: 'windows', label: 'Windows' },
@@ -201,7 +201,7 @@ const DeploymentForm = () => {
         <Label>Token Expiry</Label>
         <SegmentedControl
           value={expiry}
-          onChange={(v) => setExpiry(v as TokenExpiry)}
+          onChange={(v) => setExpiry(v)}
           data={[
             { value: 'PT24H', label: '24 hours' },
             { value: 'P7D', label: '7 days' },
