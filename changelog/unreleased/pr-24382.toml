@@ -1,4 +1,4 @@
-type = "f"
+type = "c"
 message = "Improving write amplification in current cluster event bus implementation."
 
 pulls = ["24382"]

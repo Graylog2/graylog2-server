@@ -133,22 +133,22 @@ public class ClusterEventService extends AbstractExecutionThreadService {
 
     @VisibleForTesting
     void iterateEvents(MongoCursor<ClusterEvent> cursor) {
-            LOG.debug("Opened MongoDB cursor on \"{}\"", COLLECTION_NAME);
-            while (cursor.hasNext()) {
-                final var clusterEvent = cursor.tryNext();
-                if (clusterEvent != null) {
-                    LOG.trace("Processing cluster event: {}", clusterEvent);
-                    Object payload = extractPayload(clusterEvent.payload(), clusterEvent.eventClass());
-                    if (payload != null) {
-                        serverEventBus.post(payload);
-                    } else {
-                        LOG.warn("Couldn't extract payload of cluster event with ID <{}>", clusterEvent.id());
-                        LOG.debug("Invalid payload in cluster event: {}", clusterEvent);
-                    }
-
-                    this.offset = new Offset(clusterEvent.timestamp(), clusterEvent.id());
+        LOG.debug("Opened MongoDB cursor on \"{}\"", COLLECTION_NAME);
+        while (cursor.hasNext()) {
+            final var clusterEvent = cursor.tryNext();
+            if (clusterEvent != null) {
+                LOG.trace("Processing cluster event: {}", clusterEvent);
+                Object payload = extractPayload(clusterEvent.payload(), clusterEvent.eventClass());
+                if (payload != null) {
+                    serverEventBus.post(payload);
+                } else {
+                    LOG.warn("Couldn't extract payload of cluster event with ID <{}>", clusterEvent.id());
+                    LOG.debug("Invalid payload in cluster event: {}", clusterEvent);
                 }
+
+                this.offset = new Offset(clusterEvent.timestamp(), clusterEvent.id());
             }
+        }
     }
 
     @Subscribe
@@ -192,7 +192,7 @@ public class ClusterEventService extends AbstractExecutionThreadService {
                 ? Filters.gte(ClusterEvent.FIELD_TIMESTAMP, offset.lastSeen())
                 : Filters.or(Filters.gt(ClusterEvent.FIELD_TIMESTAMP, offset.lastSeen()),
                 Filters.and(Filters.eq(ClusterEvent.FIELD_TIMESTAMP, offset.lastSeen()), Filters.ne(ClusterEvent.FIELD_ID, offset.lastId())));
-        final var query = Filters.and(Filters.ne(ClusterEvent.FIELD_PRODUCER, nodeId.toString()), timestampQuery);
+        final var query = Filters.and(Filters.ne(ClusterEvent.FIELD_PRODUCER, nodeId.getNodeId()), timestampQuery);
         return collection.find(query);
     }
 
