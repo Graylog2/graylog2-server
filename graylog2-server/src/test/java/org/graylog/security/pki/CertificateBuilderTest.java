@@ -105,6 +105,15 @@ class CertificateBuilderTest {
     }
 
     @Test
+    void createRootCaCertificateHasSkiButNoAki() throws Exception {
+        final var entry = builder.createRootCa("SKI Test", Algorithm.ED25519, Duration.ofDays(365));
+        final var cert = PemUtils.parseCertificate(entry.certificate());
+
+        assertThat(PemUtils.extractSubjectKeyIdentifier(cert)).isPresent();
+        assertThat(PemUtils.extractAuthorityKeyIdentifier(cert)).isEmpty();
+    }
+
+    @Test
     void createRootCaCertificateValidityMatchesDuration() throws Exception {
         final CertificateEntry entry = builder.createRootCa("Validity Test", Algorithm.ED25519, Duration.ofDays(365));
 
@@ -181,6 +190,19 @@ class CertificateBuilderTest {
     }
 
     @Test
+    void createIntermediateCaHasSkiAndAkiMatchingIssuerSki() throws Exception {
+        final var rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(3650));
+        final var intermediateCa = builder.createIntermediateCa("Intermediate CA", rootCa, Duration.ofDays(365));
+
+        final var rootCert = PemUtils.parseCertificate(rootCa.certificate());
+        final var intermediateCert = PemUtils.parseCertificate(intermediateCa.certificate());
+
+        assertThat(PemUtils.extractSubjectKeyIdentifier(intermediateCert)).isPresent();
+        assertThat(PemUtils.extractAuthorityKeyIdentifier(intermediateCert))
+                .isEqualTo(PemUtils.extractSubjectKeyIdentifier(rootCert));
+    }
+
+    @Test
     void createIntermediateCaInheritsAlgorithmFromIssuer() throws Exception {
         final CertificateEntry rsaRootCa = builder.createRootCa("RSA Root CA", Algorithm.RSA_4096, Duration.ofDays(3650));
 
@@ -243,6 +265,21 @@ class CertificateBuilderTest {
         assertThat(endEntityCert.issuerChain()).hasSize(2);
         assertThat(endEntityCert.issuerChain().get(0)).isEqualTo(intermediateCa.certificate());
         assertThat(endEntityCert.issuerChain().get(1)).isEqualTo(rootCa.certificate());
+    }
+
+    @Test
+    void createEndEntityCertHasSkiAndAkiMatchingIssuerSki() throws Exception {
+        final var rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(3650));
+        final var intermediateCa = builder.createIntermediateCa("Intermediate CA", rootCa, Duration.ofDays(1825));
+        final var endEntity = builder.createEndEntityCert(
+                "Agent", intermediateCa, KeyUsage.digitalSignature, Duration.ofDays(365));
+
+        final var intermediateCert = PemUtils.parseCertificate(intermediateCa.certificate());
+        final var endEntityCert = PemUtils.parseCertificate(endEntity.certificate());
+
+        assertThat(PemUtils.extractSubjectKeyIdentifier(endEntityCert)).isPresent();
+        assertThat(PemUtils.extractAuthorityKeyIdentifier(endEntityCert))
+                .isEqualTo(PemUtils.extractSubjectKeyIdentifier(intermediateCert));
     }
 
     @Test

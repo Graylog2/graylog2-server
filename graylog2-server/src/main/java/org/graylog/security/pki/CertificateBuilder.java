@@ -26,8 +26,11 @@ import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.KeyUsage;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
@@ -140,6 +143,8 @@ public class CertificateBuilder {
                 new KeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign)
         );
 
+        addSubjectKeyIdentifier(certBuilder, keyPair.getPublic());
+
         final X509Certificate certificate = signCertificate(certBuilder, keyPair.getPrivate(), algorithm);
 
         return buildEntry(certificate, keyPair.getPrivate(), List.of());
@@ -212,6 +217,9 @@ public class CertificateBuilder {
                 true,
                 new KeyUsage(KeyUsage.keyCertSign)
         );
+
+        addSubjectKeyIdentifier(certBuilder, keyPair.getPublic());
+        addAuthorityKeyIdentifier(certBuilder, issuerCert);
 
         final X509Certificate certificate = signCertificate(certBuilder, issuerPrivateKey, algorithm);
 
@@ -358,6 +366,9 @@ public class CertificateBuilder {
             );
         }
 
+        addSubjectKeyIdentifier(certBuilder, keyPair.getPublic());
+        addAuthorityKeyIdentifier(certBuilder, issuerCert);
+
         // Add Subject Alternative Names if specified (non-critical)
         if (dnsNames != null && !dnsNames.isEmpty()) {
             final GeneralName[] names = dnsNames.stream()
@@ -374,6 +385,39 @@ public class CertificateBuilder {
         issuerChain.addAll(issuer.issuerChain());
 
         return buildEntry(certificate, keyPair.getPrivate(), issuerChain);
+    }
+
+    /**
+     * Add the Subject Key Identifier to the cert builder. It's best practice to add the SKI to each certificate.
+     *
+     * @param certBuilder the cert builder
+     * @param publicKey   the cert public key
+     * @throws Exception when adding the extension fails
+     */
+    private void addSubjectKeyIdentifier(X509v3CertificateBuilder certBuilder, PublicKey publicKey) throws Exception {
+        final var spki = SubjectPublicKeyInfo.getInstance(publicKey.getEncoded());
+
+        certBuilder.addExtension(
+                Extension.subjectKeyIdentifier,
+                false,
+                new JcaX509ExtensionUtils().createSubjectKeyIdentifier(spki)
+        );
+    }
+
+    /**
+     * Add the Authority Key Identifier to the cert builder. The AKI should be added to all certificates but the root
+     * certificate.
+     *
+     * @param certBuilder the cert builder
+     * @param issuerCert  the cert public key
+     * @throws Exception when adding the extension fails
+     */
+    private void addAuthorityKeyIdentifier(X509v3CertificateBuilder certBuilder, X509Certificate issuerCert) throws Exception {
+        certBuilder.addExtension(
+                Extension.authorityKeyIdentifier,
+                false,
+                new JcaX509ExtensionUtils().createAuthorityKeyIdentifier(issuerCert)
+        );
     }
 
     private X509Certificate signCertificate(JcaX509v3CertificateBuilder certBuilder, PrivateKey signingKey, Algorithm algorithm)
