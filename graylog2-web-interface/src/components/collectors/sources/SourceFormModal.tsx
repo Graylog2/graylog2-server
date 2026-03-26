@@ -17,8 +17,9 @@
 import * as React from 'react';
 import { useState } from 'react';
 
-import { Input, SegmentedControl } from 'components/bootstrap';
+import { Input } from 'components/bootstrap';
 import Modal from 'components/bootstrap/Modal';
+import ModalSubmit from 'components/common/ModalSubmit';
 
 import { SOURCE_TYPE_LABELS } from './Constants';
 
@@ -27,10 +28,9 @@ import type {
   SourceType,
   FileSourceConfig,
   JournaldSourceConfig,
-  WindowsEventLogSourceConfig,
   JournaldPriority,
+  WindowsEventLogSourceConfig,
 } from '../types';
-import ModalSubmit from 'components/common/ModalSubmit';
 
 type Props = {
   fleetId: string;
@@ -97,17 +97,15 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
           onChange={(e) => updateFileConfig({ paths: [e.target.value] })}
           required
         />
-        <div>
-          <label htmlFor="file-read-mode">Read Mode</label>
-          <SegmentedControl
-            value={fileConfig.read_mode}
-            onChange={(v) => updateFileConfig({ read_mode: v as 'beginning' | 'end' })}
-            data={[
-              { value: 'end', label: 'From end (tail)' },
-              { value: 'beginning', label: 'From beginning' },
-            ]}
-          />
-        </div>
+        <Input
+          id="file-read-mode"
+          type="select"
+          label="Read Mode"
+          value={fileConfig.read_mode}
+          onChange={(e) => updateFileConfig({ read_mode: e.target.value as 'beginning' | 'end' })}>
+          <option value="end">From end (tail)</option>
+          <option value="beginning">From beginning</option>
+        </Input>
       </>
     );
   };
@@ -117,34 +115,30 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
 
     return (
       <>
-        <div>
-          <label htmlFor="file-read-mode">Read Mode</label>
-          <SegmentedControl
-            value={journaldConfig.read_mode}
-            onChange={(v) => updateJournaldConfig({ read_mode: v as 'beginning' | 'end' })}
-            data={[
-              { value: 'end', label: 'From end (tail)' },
-              { value: 'beginning', label: 'From beginning' },
-            ]}
-          />
-        </div>
-        <div>
-          <label htmlFor="journald-priority">Priority</label>
-          <SegmentedControl
-            value={journaldConfig.priority}
-            onChange={(v) => updateJournaldConfig({ priority: v as JournaldPriority })}
-            data={[
-              { value: 'emerg', label: 'EMERG' },
-              { value: 'alert', label: 'ALERT' },
-              { value: 'crit', label: 'CRIT' },
-              { value: 'err', label: 'ERR' },
-              { value: 'warning', label: 'WARNING' },
-              { value: 'notice', label: 'NOTICE' },
-              { value: 'info', label: 'INFO' },
-              { value: 'debug', label: 'DEBUG' },
-            ]}
-          />
-        </div>
+        <Input
+          id="journald-read-mode"
+          type="select"
+          label="Read Mode"
+          value={journaldConfig.read_mode}
+          onChange={(e) => updateJournaldConfig({ read_mode: e.target.value as 'beginning' | 'end' })}>
+          <option value="end">From end (tail)</option>
+          <option value="beginning">From beginning</option>
+        </Input>
+        <Input
+          id="journald-priority"
+          type="select"
+          label="Priority"
+          value={journaldConfig.priority}
+          onChange={(e) => updateJournaldConfig({ priority: e.target.value as JournaldPriority })}>
+          <option value="emerg">Emergency</option>
+          <option value="alert">Alert</option>
+          <option value="crit">Critical</option>
+          <option value="err">Error</option>
+          <option value="warning">Warning</option>
+          <option value="notice">Notice</option>
+          <option value="info">Info</option>
+          <option value="debug">Debug</option>
+        </Input>
         <Input
           id="journald-match-pattern"
           type="text"
@@ -187,17 +181,15 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
             updateWindowsEventLogConfig({ include_default_channels: e.target.checked })
           }
         />
-        <div>
-          <label htmlFor="win-read-mode">Read Mode</label>
-          <SegmentedControl
-            value={winConfig.read_mode}
-            onChange={(v) => updateWindowsEventLogConfig({ read_mode: v as 'beginning' | 'end' })}
-            data={[
-              { value: 'end', label: 'From end (tail)' },
-              { value: 'beginning', label: 'From beginning' },
-            ]}
-          />
-        </div>
+        <Input
+          id="win-read-mode"
+          type="select"
+          label="Read Mode"
+          value={winConfig.read_mode}
+          onChange={(e) => updateWindowsEventLogConfig({ read_mode: e.target.value as 'beginning' | 'end' })}>
+          <option value="end">From end (tail)</option>
+          <option value="beginning">From beginning</option>
+        </Input>
       </>
     );
   };
@@ -221,15 +213,17 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
         <Modal.Title>{isEdit ? 'Edit Source' : 'New Source'}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <div>
-          <label htmlFor="source-type">Source Type</label>
-          <SegmentedControl
-            value={sourceType}
-            onChange={handleTypeChange}
-            data={Object.entries(SOURCE_TYPE_LABELS).map(([value, label]) => ({ value, label }))}
-            disabled={isEdit}
-          />
-        </div>
+        <Input
+          id="source-type"
+          type="select"
+          label="Source Type"
+          value={sourceType}
+          onChange={(e) => handleTypeChange(e.target.value)}
+          disabled={isEdit}>
+          {Object.entries(SOURCE_TYPE_LABELS).map(([value, label]) => (
+            <option key={value} value={value}>{label}</option>
+          ))}
+        </Input>
         <Input
           id="source-name"
           type="text"
