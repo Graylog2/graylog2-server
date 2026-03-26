@@ -68,6 +68,9 @@ public class EntityPermissionsUtils {
      * If the catalog entry has an empty {@code readableFields} list, no user-specified fields are allowed.
      */
     public boolean areAllFieldsReadable(final String collection, final Collection<String> fields) {
+        if (fields == null || fields.isEmpty()) {
+            return false;
+        }
         final Optional<DbEntityCatalogEntry> entry = catalog.getByCollectionName(collection);
         return entry.map(dbEntityCatalogEntry -> dbEntityCatalogEntry.readableFields().containsAll(fields))
                 .orElse(false);
