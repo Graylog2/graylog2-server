@@ -16,6 +16,7 @@
  */
 package org.graylog.security.pki;
 
+import org.bouncycastle.asn1.x509.KeyUsage;
 import org.graylog.testing.TestClocks;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.junit.jupiter.api.BeforeEach;
@@ -224,6 +225,53 @@ class PemUtilsTest {
         assertThat(fingerprint1).isNotEqualTo(fingerprint2);
     }
 
+    // extractSubjectKeyIdentifier tests
+
+    @Test
+    void extractSubjectKeyIdentifierReturnsHexString() throws Exception {
+        final var cert = PemUtils.parseCertificate(
+                builder.createRootCa("Test", Algorithm.ED25519, Duration.ofDays(365)).certificate());
+
+        final var ski = PemUtils.extractSubjectKeyIdentifier(cert);
+
+        assertThat(ski).isPresent();
+        assertThat(ski.get()).matches("[0-9a-f]{40}"); // SHA-1 = 20 bytes = 40 hex chars
+    }
+
+    @Test
+    void extractSubjectKeyIdentifierDiffersForDifferentKeys() throws Exception {
+        final var cert1 = PemUtils.parseCertificate(
+                builder.createRootCa("CA 1", Algorithm.ED25519, Duration.ofDays(365)).certificate());
+        final var cert2 = PemUtils.parseCertificate(
+                builder.createRootCa("CA 2", Algorithm.ED25519, Duration.ofDays(365)).certificate());
+
+        assertThat(PemUtils.extractSubjectKeyIdentifier(cert1))
+                .isNotEqualTo(PemUtils.extractSubjectKeyIdentifier(cert2));
+    }
+
+    // extractAuthorityKeyIdentifier tests
+
+    @Test
+    void extractAuthorityKeyIdentifierReturnsEmptyWhenAbsent() throws Exception {
+        // Root CA has no AKI
+        final var cert = PemUtils.parseCertificate(
+                builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(365)).certificate());
+
+        assertThat(PemUtils.extractAuthorityKeyIdentifier(cert)).isEmpty();
+    }
+
+    @Test
+    void extractAuthorityKeyIdentifierMatchesIssuerSki() throws Exception {
+        final var issuer = builder.createRootCa("Issuer", Algorithm.ED25519, Duration.ofDays(365));
+        final var child = builder.createIntermediateCa("Child", issuer, Duration.ofDays(365));
+
+        final var issuerSki = PemUtils.extractSubjectKeyIdentifier(PemUtils.parseCertificate(issuer.certificate()));
+        final var childAki = PemUtils.extractAuthorityKeyIdentifier(PemUtils.parseCertificate(child.certificate()));
+
+        assertThat(childAki).isEqualTo(issuerSki);
+    }
+
+
     // detectAlgorithm tests
 
     @Test
@@ -291,7 +339,7 @@ class PemUtilsTest {
         final CertificateEntry rootCa = builder.createRootCa("Root", Algorithm.ED25519, Duration.ofDays(1));
         final CertificateEntry agentCert = builder.createEndEntityCert(
                 "my-agent-uid", rootCa,
-                org.bouncycastle.asn1.x509.KeyUsage.digitalSignature,
+                KeyUsage.digitalSignature,
                 Duration.ofDays(1));
         final X509Certificate x509 = PemUtils.parseCertificate(agentCert.certificate());
 

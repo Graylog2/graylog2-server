@@ -16,8 +16,12 @@
  */
 package org.graylog.security.pki;
 
+import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
+import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.openssl.PEMKeyPair;
@@ -38,6 +42,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.HexFormat;
+import java.util.Optional;
 
 /**
  * Utility class for PEM encoding, decoding, and certificate operations.
@@ -178,6 +183,43 @@ public final class PemUtils {
         final MessageDigest digest = MessageDigest.getInstance("SHA-256");
         final byte[] hash = digest.digest(certificate.getEncoded());
         return "sha256:" + HexFormat.of().formatHex(hash);
+    }
+
+    /**
+     * Extracts the Subject Key Identifier (SKI) from an X.509 certificate.
+     * <p>
+     * The SKI is a hash of the certificate's public key, as defined by RFC 5280.
+     * It identifies the key itself, not the certificate — matching the AKI in certificates
+     * issued by this key.
+     *
+     * @param certificate the certificate to extract the SKI from
+     * @return the SKI as a lowercase hex string, or empty if the extension is absent
+     */
+    public static Optional<String> extractSubjectKeyIdentifier(X509Certificate certificate) {
+        final var extensionValue = certificate.getExtensionValue(Extension.subjectKeyIdentifier.getId());
+        if (extensionValue == null) {
+            return Optional.empty();
+        }
+        final var ski = SubjectKeyIdentifier.getInstance(ASN1OctetString.getInstance(extensionValue).getOctets());
+        return Optional.of(HexFormat.of().formatHex(ski.getKeyIdentifier()));
+    }
+
+    /**
+     * Extracts the Authority Key Identifier (AKI) from an X.509 certificate.
+     * <p>
+     * The AKI identifies the key that signed this certificate. It matches the Subject Key
+     * Identifier (SKI) of the issuing certificate, enabling efficient lookup of the issuer.
+     *
+     * @param certificate the certificate to extract the AKI from
+     * @return the AKI as a lowercase hex string, or empty if the extension is absent
+     */
+    public static Optional<String> extractAuthorityKeyIdentifier(X509Certificate certificate) {
+        final var extensionValue = certificate.getExtensionValue(Extension.authorityKeyIdentifier.getId());
+        if (extensionValue == null) {
+            return Optional.empty();
+        }
+        final var aki = AuthorityKeyIdentifier.getInstance(ASN1OctetString.getInstance(extensionValue).getOctets());
+        return Optional.of(HexFormat.of().formatHex(aki.getKeyIdentifierOctets()));
     }
 
     /**
