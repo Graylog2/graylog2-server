@@ -20,10 +20,9 @@ import styled, { css } from 'styled-components';
 
 import { ARCHIVE_RETENTION_STRATEGY } from 'stores/indices/IndicesStore';
 import { Icon, Section, Spinner, LinkContainer } from 'components/common';
-import { IndexSetsStore } from 'stores/indices/IndexSetsStore';
 import { Table, Button, Alert } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import { useStore } from 'stores/connect';
+import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 import type { Stream } from 'stores/streams/StreamsStore';
 import NumberUtils from 'util/NumberUtils';
 import useStreamOutputFilters from 'components/streams/hooks/useStreamOutputFilters';
@@ -57,7 +56,9 @@ const DestinationIndexSetSection = ({ stream }: Props) => {
   const archivingEnabled =
     indexSet?.retention_strategy_class === ARCHIVE_RETENTION_STRATEGY ||
     indexSet?.data_tiering?.archive_before_deletion;
-  const { indexSets } = useStore(IndexSetsStore);
+  const {
+    data: { indexSets },
+  } = useIndexSetsList(false);
   const { data: streamOutputFilters, isLoading: isLoadingStreamOutputFilters } = useStreamOutputFilters(
     stream.id,
     'indexer',

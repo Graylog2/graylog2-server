@@ -15,16 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 import UserNotification from 'util/UserNotification';
 import { BootstrapModalForm, Input, Button } from 'components/bootstrap';
-import { ContentPacksActions } from 'stores/content-packs/ContentPacksStore';
+import { createContentPack } from 'hooks/useContentPackMutations';
 import useProductName from 'brand-customization/useProductName';
 
 import style from './ContentPackUploadControls.css';
 
 const ContentPackUploadControls = () => {
   const productName = useProductName();
+  const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
   const uploadInputRef = useRef(null);
 
@@ -44,10 +46,10 @@ const ContentPackUploadControls = () => {
     reader.onload = (evt) => {
       const request = evt.target.result;
 
-      ContentPacksActions.create.triggerPromise(request as string).then(
+      createContentPack(request as string).then(
         () => {
           UserNotification.success('Content pack imported successfully', 'Success!');
-          ContentPacksActions.list();
+          queryClient.invalidateQueries({ queryKey: ['content-packs'] });
         },
         (response) => {
           const message = `Error importing content pack, please ensure it is a valid JSON file. Check your ${productName} server logs for more information.`;
