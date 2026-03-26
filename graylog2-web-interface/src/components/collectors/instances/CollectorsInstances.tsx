@@ -36,7 +36,7 @@ const CollectorsInstances = () => {
   const defaultFilters = useDefaultInstanceFilters();
 
   const fleetNames = useMemo(
-    () => (fleets ?? []).reduce((acc, fleet) => ({ ...acc, [fleet.id]: fleet.name }), {} as Record<string, string>),
+    () => Object.fromEntries((fleets ?? []).map(fleet => [fleet.id, fleet.name])),
     [fleets],
   );
 
