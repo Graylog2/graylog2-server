@@ -154,6 +154,7 @@ const CollectorsSettings = () => {
               Collectors have not been set up yet. Configure the ingest endpoints below and save to get started.
             </Alert>
           )}
+          <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
           <h2>Ingest Endpoints</h2>
 
           <h3>HTTP</h3>
@@ -238,10 +239,10 @@ const CollectorsSettings = () => {
             isAsyncSubmit
             submitButtonText="Update settings"
             submitLoadingText="Updating..."
-            onSubmit={handleSave}
             isSubmitting={isUpdatingConfig}
             displayCancel={false}
           />
+          </form>
         </Col>
       </Row>
 
