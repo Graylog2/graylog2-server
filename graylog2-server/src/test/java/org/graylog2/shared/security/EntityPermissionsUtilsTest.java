@@ -111,7 +111,7 @@ class EntityPermissionsUtilsTest {
     }
 
     @Test
-    void areFieldsReadableReturnsTrueWhenAllFieldsAreAllReadable() {
+    void areAllFieldsReadableReturnsTrueWhenAllFieldsAreReadable() {
         doReturn(Optional.of(
                 new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read",
                         List.of("title", "description", "created_at")))
@@ -131,12 +131,18 @@ class EntityPermissionsUtilsTest {
     }
 
     @Test
-    void areFieldsReadableReturnsFalseWhenReadableAllFieldsIsEmpty() {
+    void areAllFieldsReadableReturnsFalseWhenReadableFieldsIsEmpty() {
         doReturn(Optional.of(
                 new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read",
                         List.of()))
         ).when(catalog).getByCollectionName("streams");
 
         assertFalse(toTest.areAllFieldsReadable("streams", Set.of("title")));
+    }
+
+    @Test
+    void areAllFieldsReadableReturnsFalseWhenUsedWithEmptyOrNullList() {
+        assertFalse(toTest.areAllFieldsReadable("streams", Set.of()));
+        assertFalse(toTest.areAllFieldsReadable("streams", null));
     }
 }
