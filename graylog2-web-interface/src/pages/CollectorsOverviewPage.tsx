@@ -29,7 +29,7 @@ const CollectorsOverviewPage = () => {
 
   if (isLoading) {
     return (<DocumentTitle title="Collectors Overview">
-        <Spinner />;
+        <Spinner />
       </DocumentTitle>
     );
   }
