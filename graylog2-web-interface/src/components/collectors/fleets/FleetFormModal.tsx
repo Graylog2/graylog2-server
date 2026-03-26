@@ -17,8 +17,9 @@
 import * as React from 'react';
 import { useState } from 'react';
 
-import { Button, Input } from 'components/bootstrap';
+import { Input } from 'components/bootstrap';
 import Modal from 'components/bootstrap/Modal';
+import ModalSubmit from 'components/common/ModalSubmit';
 
 import type { Fleet } from '../types';
 
@@ -77,12 +78,15 @@ const FleetFormModal = ({ fleet = undefined, onClose, onSave, isLoading = false 
         />
       </Modal.Body>
       <Modal.Footer>
-        <Button bsStyle="default" onClick={onClose}>
-          Cancel
-        </Button>{' '}
-        <Button bsStyle="primary" onClick={handleSave} disabled={!name || isLoading}>
-          {isEdit ? 'Save Changes' : 'Create Fleet'}
-        </Button>
+        <ModalSubmit
+          isAsyncSubmit
+          submitButtonText={`${isEdit ? 'Update' : 'Create'} ${name}`}
+          submitLoadingText={`${isEdit ? 'Updating...' : 'Creating...'}`}
+          onCancel={onClose}
+          onSubmit={handleSave}
+          disabledSubmit={!name || isLoading}
+          isSubmitting={isLoading}
+        />
       </Modal.Footer>
     </Modal>
   );

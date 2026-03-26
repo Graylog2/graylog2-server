@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 
-import { Button, Input, SegmentedControl } from 'components/bootstrap';
+import { Input, SegmentedControl } from 'components/bootstrap';
 import Modal from 'components/bootstrap/Modal';
 
 import { SOURCE_TYPE_LABELS } from './Constants';
@@ -30,6 +30,7 @@ import type {
   WindowsEventLogSourceConfig,
   JournaldPriority,
 } from '../types';
+import ModalSubmit from 'components/common/ModalSubmit';
 
 type Props = {
   fleetId: string;
@@ -254,12 +255,15 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
         {renderConfigSection()}
       </Modal.Body>
       <Modal.Footer>
-        <Button bsStyle="default" onClick={onClose}>
-          Cancel
-        </Button>{' '}
-        <Button bsStyle="primary" onClick={handleSave} disabled={!name || isLoading}>
-          Save Source
-        </Button>
+        <ModalSubmit
+          isAsyncSubmit
+          submitButtonText={`${isEdit ? 'Update' : 'Create'} ${name}`}
+          submitLoadingText={`${isEdit ? 'Updating...' : 'Creating...'}`}
+          onCancel={onClose}
+          onSubmit={handleSave}
+          disabledSubmit={!name || isLoading}
+          isSubmitting={isLoading}
+        />
       </Modal.Footer>
     </Modal>
   );
