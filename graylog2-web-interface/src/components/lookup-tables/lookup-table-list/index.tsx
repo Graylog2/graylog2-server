@@ -21,7 +21,7 @@ import { Row, Col } from 'components/bootstrap';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import QueryHelper from 'components/common/QueryHelper';
 import { ErrorsProvider } from 'components/lookup-tables/contexts/ErrorsContext';
-import { useFetchLookupTables } from 'components/lookup-tables/hooks/useLookupTablesAPI';
+import { fetchPaginatedLookupTables, lookupTablesKeyFn } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import type { SearchParams, Attribute } from 'stores/PaginationTypes';
 import type { LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
 import type { LookupTableEntity } from 'components/lookup-tables/types';
@@ -54,7 +54,6 @@ function LookupTableList() {
     cacheNames?: Array<string>;
     adapterNames?: Array<string>;
   }>({ lutNames: undefined, cacheNames: undefined, adapterNames: undefined });
-  const { fetchPaginatedLookupTables, lookupTablesKeyFn } = useFetchLookupTables();
   const { renderActions } = useActions();
 
   const handleFetchTables = useCallback(
@@ -105,7 +104,7 @@ function LookupTableList() {
 
       return Promise.resolve(patchedResponse);
     },
-    [fetchPaginatedLookupTables],
+    [],
   );
 
   return (

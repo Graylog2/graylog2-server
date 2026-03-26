@@ -22,8 +22,8 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { InputsActions } from 'stores/inputs/InputsStore';
-import type { InputDescription } from 'stores/inputs/InputTypesStore';
-import { InputTypesActions } from 'stores/inputs/InputTypesStore';
+import type { InputDescription } from 'hooks/useInputType';
+import { fetchInputType } from 'hooks/useInputType';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -111,9 +111,7 @@ const CreateInputControl = () => {
       event_details: { value: selected },
     });
 
-    InputTypesActions.get(selected).then((inputDefinition: InputDescription) =>
-      setSelectedInputDefinition(inputDefinition),
-    );
+    fetchInputType(selected).then((inputDefinition: InputDescription) => setSelectedInputDefinition(inputDefinition));
   };
 
   const onCustomInputClose = () => {
