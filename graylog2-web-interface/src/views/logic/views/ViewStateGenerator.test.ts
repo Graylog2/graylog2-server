@@ -19,11 +19,11 @@ import ViewStateGenerator from './ViewStateGenerator';
 
 import MessagesWidget from '../widgets/MessagesWidget';
 
-const mockList = jest.fn(() => Promise.resolve([]));
+const mockGet = jest.fn(() => Promise.resolve([]));
 
-jest.mock('stores/decorators/DecoratorsStore', () => ({
-  DecoratorsActions: {
-    list: () => mockList(),
+jest.mock('@graylog/server-api', () => ({
+  SearchDecorators: {
+    get: () => mockGet(),
   },
 }));
 
@@ -40,7 +40,7 @@ describe('ViewStateGenerator', () => {
   });
 
   it('adds decorators for current stream to message table', async () => {
-    mockList.mockReturnValue(
+    mockGet.mockReturnValue(
       Promise.resolve([
         { id: 'decorator1', stream: 'foobar', order: 0, type: 'something' },
         { id: 'decorator2', stream: 'different', order: 0, type: 'something' },
@@ -49,7 +49,7 @@ describe('ViewStateGenerator', () => {
 
     const result = await ViewStateGenerator(View.Type.Search, 'foobar');
 
-    expect(mockList).toHaveBeenCalledWith();
+    expect(mockGet).toHaveBeenCalledWith();
 
     const messageTableWidget = result.widgets.find((widget) => widget.type === MessagesWidget.type);
 
@@ -63,7 +63,7 @@ describe('ViewStateGenerator', () => {
   });
 
   it('adds decorators for default search to message table if stream id is `null`', async () => {
-    mockList.mockReturnValue(
+    mockGet.mockReturnValue(
       Promise.resolve([
         { id: 'decorator1', stream: 'foobar', order: 0, type: 'something' },
         { id: 'decorator2', stream: null, order: 0, type: 'something' },
@@ -72,7 +72,7 @@ describe('ViewStateGenerator', () => {
 
     const result = await ViewStateGenerator(View.Type.Search, null);
 
-    expect(mockList).toHaveBeenCalledWith();
+    expect(mockGet).toHaveBeenCalledWith();
 
     const messageTableWidget = result.widgets.find((widget) => widget.type === MessagesWidget.type);
 
@@ -86,7 +86,7 @@ describe('ViewStateGenerator', () => {
   });
 
   it('does not add decorators for current stream to message table if none exist for this stream', async () => {
-    mockList.mockReturnValue(
+    mockGet.mockReturnValue(
       Promise.resolve([
         { id: 'decorator1', stream: 'foobar', order: 0, type: 'something' },
         { id: 'decorator2', stream: null, order: 0, type: 'something' },
@@ -95,7 +95,7 @@ describe('ViewStateGenerator', () => {
 
     const result = await ViewStateGenerator(View.Type.Search, 'otherstream');
 
-    expect(mockList).toHaveBeenCalledWith();
+    expect(mockGet).toHaveBeenCalledWith();
 
     const messageTableWidget = result.widgets.find((widget) => widget.type === MessagesWidget.type);
 
@@ -109,7 +109,7 @@ describe('ViewStateGenerator', () => {
   it('does not add decorators for current stream to message table if none exist at all', async () => {
     const result = await ViewStateGenerator(View.Type.Search, 'otherstream');
 
-    expect(mockList).toHaveBeenCalledWith();
+    expect(mockGet).toHaveBeenCalledWith();
 
     const messageTableWidget = result.widgets.find((widget) => widget.type === MessagesWidget.type);
 
@@ -123,7 +123,7 @@ describe('ViewStateGenerator', () => {
   it('does not add decorators for default search to message table if none exist at all', async () => {
     const result = await ViewStateGenerator(View.Type.Search, null);
 
-    expect(mockList).toHaveBeenCalledWith();
+    expect(mockGet).toHaveBeenCalledWith();
 
     const messageTableWidget = result.widgets.find((widget) => widget.type === MessagesWidget.type);
 

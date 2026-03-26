@@ -16,8 +16,9 @@
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
+import { StreamRules } from '@graylog/server-api';
+
 import type { StreamRuleType } from 'stores/streams/StreamsStore';
-import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import { defaultOnError } from 'util/conditional/onError';
 
 const useStreamRuleTypes = (): { data: Array<StreamRuleType> | undefined } => {
@@ -26,7 +27,7 @@ const useStreamRuleTypes = (): { data: Array<StreamRuleType> | undefined } => {
 
     queryFn: () =>
       defaultOnError<Array<StreamRuleType>>(
-        StreamRulesStore.types(),
+        StreamRules.types('null') as unknown as Promise<Array<StreamRuleType>>,
         'Loading stream rule types failed with status',
         'Could not load stream rule types',
       ),

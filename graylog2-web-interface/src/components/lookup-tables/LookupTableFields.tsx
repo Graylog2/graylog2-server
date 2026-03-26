@@ -15,19 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect } from 'react';
 import memoize from 'lodash/memoize';
 import type { Permission } from 'graylog-web-plugin/plugin';
+import { useQuery } from '@tanstack/react-query';
 
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
 import { Select, Spinner } from 'components/common';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
-import { useStore } from 'stores/connect';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { ALL_MESSAGES_TIMERANGE } from 'views/Constants';
-import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
+import { fetchAllLookupTables } from 'components/lookup-tables/hooks/api/lookupTablesAPI';
 
 const LOOKUP_PERMISSIONS: Permission[] = ['lookuptables:read'] as const;
 
@@ -55,18 +54,16 @@ const LookupTableFields = ({
   customKeyField = null,
 }: Props) => {
   const { data: allFieldTypes } = useFieldTypes([], ALL_MESSAGES_TIMERANGE);
-  const lookupTables = useStore(LookupTablesStore);
   const currentUser = useCurrentUser();
+  const hasPermission = isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS);
 
-  useEffect(() => {
-    if (!isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS)) {
-      return;
-    }
+  const { data: tables } = useQuery({
+    queryKey: ['lookup-tables', 'all'],
+    queryFn: () => fetchAllLookupTables(),
+    enabled: hasPermission,
+  });
 
-    LookupTablesActions.searchPaginated(1, 0, undefined, false);
-  }, [currentUser.permissions]);
-
-  if (!isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS)) {
+  if (!hasPermission) {
     return (
       <Row>
         <Col md={6} lg={5}>
@@ -87,12 +84,12 @@ const LookupTableFields = ({
     (fieldTypes) => fieldTypes.map((ft) => ft.name).join('-'),
   );
 
-  const formatLookupTables = (tables) =>
-    tables
+  const formatLookupTables = (items) =>
+    items
       .sort((lt1, lt2) => naturalSortIgnoreCase(lt1.title, lt2.title))
       .map((table) => ({ label: table.title, value: table.name }));
 
-  const isLoading = !allFieldTypes || !lookupTables.tables;
+  const isLoading = !allFieldTypes || !tables;
 
   if (isLoading) {
     return <Spinner text="Loading Field Provider information..." />;
@@ -107,7 +104,7 @@ const LookupTableFields = ({
             name="event-field-table-name"
             placeholder="Select Lookup Table"
             onChange={onTableNameChange}
-            options={formatLookupTables(lookupTables.tables)}
+            options={formatLookupTables(tables)}
             value={selectedTableName}
             required
           />

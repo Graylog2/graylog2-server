@@ -40,7 +40,6 @@ const TeamsNotificationDetails = ({ notification }: TeamsNotificationSummaryV2Ty
       value={<NewExampleWell bsSize="small">{notification.config.adaptive_card}</NewExampleWell>}
     />
     <ReadOnlyFormGroup label="Message Backlog Limit" value={notification.config.backlog_size} />
-    <ReadOnlyFormGroup label="Time Zone" value={notification.config.time_zone} />
   </>
 );
 

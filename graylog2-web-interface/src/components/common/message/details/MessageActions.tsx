@@ -16,12 +16,12 @@
  */
 import * as React from 'react';
 import type * as Immutable from 'immutable';
+import { JSONStringify } from 'json-with-bigint';
 
 import { LinkContainer, ClipboardButton } from 'components/common';
 import Routes from 'routing/Routes';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 import SurroundingSearchButton from 'components/search/SurroundingSearchButton';
-import type { SearchesConfig } from 'components/search/SearchConfig';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -92,7 +92,6 @@ type Props = {
   showOriginal: boolean;
   toggleShowOriginal: () => void;
   streams: Immutable.List<any>;
-  searchConfig: SearchesConfig;
 };
 
 const MessageActions = ({
@@ -106,7 +105,6 @@ const MessageActions = ({
   showOriginal,
   toggleShowOriginal,
   streams,
-  searchConfig,
 }: Props) => {
   const pluggableActions = usePluggableMessageActions(id, index);
   const isFavoriteFieldsEnabled = useFeature('message_table_favorite_fields');
@@ -118,12 +116,7 @@ const MessageActions = ({
   const { timestamp, ...remainingFields } = fields;
 
   const surroundingSearchButton = disableSurroundingSearch || (
-    <SurroundingSearchButton
-      id={id}
-      timestamp={timestamp as string}
-      searchConfig={searchConfig}
-      messageFields={remainingFields}
-    />
+    <SurroundingSearchButton id={id} timestamp={String(timestamp)} messageFields={remainingFields} />
   );
 
   const showChanges = decorationStats && (
@@ -139,7 +132,7 @@ const MessageActions = ({
       {pluggableActions}
 
       <ClipboardButton title="Copy ID" text={id} bsSize="small" />
-      <ClipboardButton title="Copy message" bsSize="small" text={JSON.stringify(fields, null, 2)} />
+      <ClipboardButton title="Copy message" bsSize="small" text={JSONStringify(fields, null, 2)} />
       {surroundingSearchButton}
       {disableTestAgainstStream ? null : <TestAgainstStreamButton streams={streams} id={id} index={index} />}
       {isFavoriteFieldsEnabled && <MessageEditFieldConfigurationAction />}

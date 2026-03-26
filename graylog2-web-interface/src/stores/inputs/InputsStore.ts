@@ -20,7 +20,6 @@ import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import { singletonStore, singletonActions } from 'logic/singleton';
-import { InputStaticFieldsStore } from 'stores/inputs/InputStaticFieldsStore';
 import type { Input, ConfiguredInput } from 'components/messageloaders/Types';
 
 type InputsActionsType = {
@@ -56,7 +55,6 @@ export const InputsStore = singletonStore('core.Inputs', () =>
 
     init() {
       this.trigger(this._state());
-      this.listenTo(InputStaticFieldsStore, this.list);
     },
 
     getInitialState() {

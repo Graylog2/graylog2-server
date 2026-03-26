@@ -43,12 +43,12 @@ describe('<Spinner />', () => {
   });
 
   it('should be visible after when delay is completed', async () => {
-    const { container } = render(<Spinner />);
+    render(<Spinner />);
 
     act(() => {
       jest.advanceTimersByTime(200);
     });
 
-    expect(container.firstChild).toHaveStyle('visibility: visible');
+    expect(screen.getByText('Loading...')).toBeVisible();
   });
 });

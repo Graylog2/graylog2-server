@@ -18,7 +18,6 @@ package org.graylog.plugins.pipelineprocessor.processors;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
@@ -33,7 +32,6 @@ import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.rest.resources.system.inputs.InputDeletedEvent;
-import org.graylog2.rest.resources.system.inputs.InputRenamedEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -186,23 +184,5 @@ public class PipelineMetadataUpdater {
      */
     private void deletePipelineEntries(PipelinesChangedEvent event) {
         pipelineMetadataService.delete(event.deletedPipelineIds());
-    }
-
-    /**
-     * When an input is renamed, rules that previously referenced the input by name are no longer applicable; and
-     * rules that reference the new name now apply.
-     * Unfortunately, we don't have an exact mapping of rules by referenced input name. So we find all the rules
-     * that reference any inputs by name and fire an update event for those rules.
-     * Note: we also don't have an exact mapping of functions to rules, so we just trigger for all the rules included
-     * in pipelines that reference inputs in any way.
-     */
-    @Subscribe
-    public void handleInputRename(InputRenamedEvent event) {
-        Set<RulesChangedEvent.Reference> updated = pipelineMetadataService.getReferencingPipelines().stream()
-                .flatMap(dao -> dao.rules().stream())
-                .filter(Objects::nonNull)
-                .map(ruleId -> new RulesChangedEvent.Reference(ruleId, ruleId))
-                .collect(Collectors.toSet());
-        eventBus.post(new RulesChangedEvent(updated, Set.of()));
     }
 }

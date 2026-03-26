@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, waitFor, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import selectEvent from 'helpers/selectEvent';
@@ -97,13 +97,9 @@ describe('EditWidgetFrame', () => {
     it("changes the widget's streams when using stream filter", async () => {
       renderSUT();
       const streamFilter = await screen.findByTestId('streams-filter');
-      const reactSelect = streamFilter.querySelector('div');
+      const reactSelect = within(streamFilter).getByRole('combobox');
 
-      expect(reactSelect).not.toBeNull();
-
-      if (reactSelect) {
-        await selectEvent.select(reactSelect, 'PFLog');
-      }
+      await selectEvent.select(reactSelect, 'PFLog');
 
       const searchButton = screen.getByRole('button', {
         name: /perform search \(changes were made after last search execution\)/i,

@@ -17,7 +17,6 @@
 
 import React, { useState, useEffect } from 'react';
 import styled, { css } from 'styled-components';
-import { useQueryClient } from '@tanstack/react-query';
 
 import UserNotification from 'util/UserNotification';
 import { isPermitted } from 'util/PermissionsMixin';
@@ -27,7 +26,7 @@ import { ConfirmDialog, Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
 import StreamRuleModal from 'components/streamrules/StreamRuleModal';
 import { StreamRulesInputsActions, StreamRulesInputsStore } from 'stores/inputs/StreamRulesInputsStore';
-import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
+import useStreamRuleMutations from 'hooks/useStreamRuleMutations';
 import type { StreamRule as StreamRuleTypeDefinition, Stream, StreamRule } from 'stores/streams/StreamsStore';
 
 import useCurrentUser from '../../hooks/useCurrentUser';
@@ -57,36 +56,23 @@ const DetailsStreamRule = ({ stream, streamRule, onSubmit = () => {}, onDelete =
   const [showStreamRuleForm, setShowStreamRuleForm] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const { inputs } = useStore(StreamRulesInputsStore);
-  const queryClient = useQueryClient();
-  const STREAM_QUERY_KEY = ['stream', stream.id];
+  const { removeStreamRule, updateStreamRule } = useStreamRuleMutations();
 
   useEffect(() => {
     StreamRulesInputsActions.list();
   }, []);
 
   const onConfirmDelete = () => {
-    StreamRulesStore.remove(stream.id, streamRule.id, () => {
-      if (onDelete) {
-        onDelete(streamRule.id);
-      }
-
-      queryClient.invalidateQueries({
-        queryKey: STREAM_QUERY_KEY,
-      });
+    removeStreamRule({ streamId: stream.id, streamRuleId: streamRule.id }).then(() => {
+      onDelete(streamRule.id);
       setShowConfirmDelete(false);
       UserNotification.success('Stream rule has been successfully deleted.', 'Success');
     });
   };
 
   const _onSubmit = (streamRuleId: string, data: StreamRule) =>
-    StreamRulesStore.update(stream.id, streamRuleId, data, () => {
-      if (onSubmit) {
-        onSubmit(streamRuleId, data);
-      }
-
-      queryClient.invalidateQueries({
-        queryKey: STREAM_QUERY_KEY,
-      });
+    updateStreamRule({ streamId: stream.id, streamRuleId, data }).then(() => {
+      onSubmit(streamRuleId, data);
       UserNotification.success('Stream rule has been successfully updated.', 'Success');
     });
 

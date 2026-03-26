@@ -19,7 +19,6 @@ import { render, screen, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import { useQueryParam } from 'routing/QueryParams';
-import { MockStore } from 'helpers/mocking';
 import useParams from 'routing/useParams';
 import asMock from 'helpers/mocking/AsMock';
 import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
@@ -56,20 +55,20 @@ const renderIndexSetFieldTypesList = () =>
     </TestStoreProvider>,
   );
 
-jest.mock('stores/indices/IndexSetsStore', () => ({
-  IndexSetsActions: {
-    list: jest.fn(),
-  },
-  IndexSetsStore: MockStore([
-    'getInitialState',
-    () => ({
-      indexSets: [{ id: '111', title: 'index set title' }],
-      indexSet: { id: '111', title: 'index set title', field_type_profile: 'profile-id-111' },
-    }),
-  ]),
-}));
+jest.mock('components/indices/hooks/useSingleIndexSet', () => jest.fn(() => ({
+  data: { id: '111', title: 'index set title', field_type_profile: 'profile-id-111' },
+  refetch: jest.fn(),
+  isSuccess: true,
+  isInitialLoading: false,
+})));
 
 jest.mock('routing/useParams', () => jest.fn());
+jest.mock('components/indices/hooks/useIndexSetsList', () => jest.fn(() => ({
+  data: { indexSets: [{ id: '111', title: 'index set title' }], indexSetsCount: 1, indexSetStats: null },
+  refetch: jest.fn(),
+  isSuccess: true,
+  isInitialLoading: false,
+})));
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings');
 jest.mock('components/common/PaginatedEntityTable/useFetchEntities');
 
@@ -163,7 +162,7 @@ describe('IndexSetFieldTypesList', () => {
       await within(tableRow).findByText('Boolean');
       await within(tableRow).findByText('Index');
 
-      const editButton = await within(tableRow).findByRole('button', { name: /edit/i });
+      const editButton = await within(tableRow).findByRole('button', { name: 'Edit field type for field' });
 
       expect(editButton).not.toBeDisabled();
     });
@@ -181,7 +180,7 @@ describe('IndexSetFieldTypesList', () => {
       await within(tableRow).findByText('field-1');
       await within(tableRow).findByText('Boolean');
       await within(tableRow).findByText(/overridden index/i);
-      const editButton = await within(tableRow).findByRole('button', { name: /edit/i });
+      const editButton = await within(tableRow).findByRole('button', { name: 'Edit field type for field-1' });
 
       expect(editButton).not.toBeDisabled();
     });
@@ -199,7 +198,7 @@ describe('IndexSetFieldTypesList', () => {
       await within(tableRow).findByText('field-2');
       await within(tableRow).findByText('Boolean');
       await within(tableRow).findByText(/overridden profile/i);
-      const editButton = await within(tableRow).findByRole('button', { name: /edit/i });
+      const editButton = await within(tableRow).findByRole('button', { name: 'Edit field type for field-2' });
 
       expect(editButton).not.toBeDisabled();
     });
@@ -217,7 +216,7 @@ describe('IndexSetFieldTypesList', () => {
       await within(tableRow).findByText('field-3');
       await within(tableRow).findByText('String type');
       await within(tableRow).findByText(/profile/i);
-      const editButton = await within(tableRow).findByRole('button', { name: /edit/i });
+      const editButton = await within(tableRow).findByRole('button', { name: 'Edit field type for field-3' });
 
       expect(editButton).not.toBeDisabled();
     });
@@ -246,7 +245,7 @@ describe('IndexSetFieldTypesList', () => {
       const tableRow = await screen.findByTestId('table-row-field-4');
 
       await within(tableRow).findByTitle('Field has reserved field type');
-      const editButton = await within(tableRow).findByRole('button', { name: /edit/i });
+      const editButton = await within(tableRow).findByRole('button', { name: 'Edit field type for field-4' });
 
       expect(editButton).toBeDisabled();
     });
