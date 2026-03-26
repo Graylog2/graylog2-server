@@ -34,7 +34,6 @@ import QueryHelper from 'components/common/QueryHelper';
 import EventsWidgets from 'components/events/EventsWidgets';
 import EventsRefreshProvider from 'components/events/EventsRefreshProvider';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
-import { EXCLUDE_INFO_FILTER } from 'logic/alerts/EventDefinitionPriorityEnum';
 import { adjustFormat, toDateObject } from 'util/DateTime';
 import { DATE_SEPARATOR } from 'components/common/EntityFilters/helpers/timeRange';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
@@ -47,7 +46,7 @@ const defaultFrom = adjustFormat(toDateObject(new Date(), undefined, 'UTC').subt
 const nonInfoPriorities = Object.keys(EventDefinitionPriorityEnum.properties)
   .reverse()
   .filter((key) => key !== String(EventDefinitionPriorityEnum.INFO));
-const defaultFilters = OrderedMap({ priority: nonInfoPriorities, timestamp:  defaultFrom });
+const defaultFilters = OrderedMap({ priority: nonInfoPriorities, timestamp: [`${defaultFrom}${DATE_SEPARATOR}`] });
 
 const EventsEntityTable = () => {
   const { stream_id: streamId } = useQuery();
