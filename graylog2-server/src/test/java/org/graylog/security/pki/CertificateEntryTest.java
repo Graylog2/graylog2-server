@@ -99,6 +99,7 @@ class CertificateEntryTest {
         final CertificateEntry entry = new CertificateEntry(
                 "test-id",
                 "SHA256:abc123",
+                "ski",
                 privateKey,
                 "-----BEGIN CERTIFICATE-----\nTEST\n-----END CERTIFICATE-----",
                 issuerChain,
@@ -131,6 +132,7 @@ class CertificateEntryTest {
         final CertificateEntry original = new CertificateEntry(
                 null,
                 "SHA256:abc123",
+                "ski",
                 privateKey,
                 "-----BEGIN CERTIFICATE-----\nTEST\n-----END CERTIFICATE-----",
                 List.of(),
@@ -165,6 +167,7 @@ class CertificateEntryTest {
         final CertificateEntry entry = new CertificateEntry(
                 "test-id",
                 "SHA256:abc123",
+                "ski",
                 privateKey,
                 "-----BEGIN CERTIFICATE-----\nTEST\n-----END CERTIFICATE-----",
                 List.of("-----BEGIN CERTIFICATE-----\nISSUER\n-----END CERTIFICATE-----"),
@@ -200,6 +203,7 @@ class CertificateEntryTest {
         final CertificateEntry entry = new CertificateEntry(
                 null,
                 "SHA256:abc123",
+                "ski",
                 privateKey,
                 "-----BEGIN CERTIFICATE-----\nTEST\n-----END CERTIFICATE-----",
                 List.of("-----BEGIN CERTIFICATE-----\nISSUER\n-----END CERTIFICATE-----"),

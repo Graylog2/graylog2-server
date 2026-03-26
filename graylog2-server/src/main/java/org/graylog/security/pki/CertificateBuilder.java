@@ -441,6 +441,7 @@ public class CertificateBuilder {
         return new CertificateEntry(
                 null, // ID assigned on save
                 fingerprint,
+                PemUtils.extractSubjectKeyIdentifier(certificate).orElseThrow(() -> new IllegalArgumentException("Certificate has no SKI")),
                 encryptedValueService.encrypt(privateKeyPem),
                 certificatePem,
                 issuerChain,

@@ -40,6 +40,11 @@ public record CertificateEntry(
         @JsonProperty(FIELD_FINGERPRINT)
         String fingerprint,
 
+        // TODO: subjectKeyIdentifier MUST not be Nullable!
+        @Nullable
+        @JsonProperty(FIELD_SUBJECT_KEY_IDENTIFIER)
+        String subjectKeyIdentifier,
+
         @JsonProperty(FIELD_PRIVATE_KEY)
         EncryptedValue privateKey,
 
@@ -69,6 +74,7 @@ public record CertificateEntry(
 
     public static final String FIELD_ID = "id";
     public static final String FIELD_FINGERPRINT = "fingerprint";
+    public static final String FIELD_SUBJECT_KEY_IDENTIFIER = "subject_key_identifier";
     public static final String FIELD_PRIVATE_KEY = "private_key";
     public static final String FIELD_CERTIFICATE = "certificate";
     public static final String FIELD_ISSUER_CHAIN = "issuer_chain";
@@ -88,6 +94,7 @@ public record CertificateEntry(
         return new CertificateEntry(
                 newId,
                 fingerprint,
+                subjectKeyIdentifier,
                 privateKey,
                 certificate,
                 issuerChain,

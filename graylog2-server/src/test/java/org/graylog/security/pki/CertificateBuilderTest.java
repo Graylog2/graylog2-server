@@ -63,6 +63,7 @@ class CertificateBuilderTest {
         assertThat(entry).isNotNull();
         assertThat(entry.id()).isNull(); // Not saved yet
         assertThat(entry.fingerprint()).startsWith("sha256:");
+        assertThat(entry.subjectKeyIdentifier()).matches("[0-9a-f]{40}");
         assertThat(entry.certificate()).startsWith("-----BEGIN CERTIFICATE-----");
         assertThat(entry.issuerChain()).isEmpty();
     }
@@ -144,6 +145,7 @@ class CertificateBuilderTest {
         assertThat(intermediateCa).isNotNull();
         assertThat(intermediateCa.id()).isNull(); // Not saved yet
         assertThat(intermediateCa.fingerprint()).startsWith("sha256:");
+        assertThat(intermediateCa.subjectKeyIdentifier()).matches("[0-9a-f]{40}");
     }
 
     @Test
@@ -225,6 +227,7 @@ class CertificateBuilderTest {
         assertThat(endEntityCert).isNotNull();
         assertThat(endEntityCert.id()).isNull(); // Not saved yet
         assertThat(endEntityCert.fingerprint()).startsWith("sha256:");
+        assertThat(endEntityCert.subjectKeyIdentifier()).matches("[0-9a-f]{40}");
     }
 
     @Test

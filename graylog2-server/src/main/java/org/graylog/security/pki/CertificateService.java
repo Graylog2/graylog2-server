@@ -132,6 +132,7 @@ public class CertificateService {
             return new CertificateEntry(
                     entry.id(),
                     entry.fingerprint(),
+                    entry.subjectKeyIdentifier(),
                     entry.privateKey(),
                     entry.certificate(),
                     entry.issuerChain(),

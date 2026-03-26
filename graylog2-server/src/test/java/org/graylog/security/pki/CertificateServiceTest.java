@@ -99,6 +99,7 @@ class CertificateServiceTest {
         final CertificateEntry updated = new CertificateEntry(
                 savedId,
                 "SHA256:updated",
+                "ski",
                 createEncryptedValue(),
                 "-----BEGIN CERTIFICATE-----\nUPDATED\n-----END CERTIFICATE-----",
                 List.of(),
@@ -214,6 +215,7 @@ class CertificateServiceTest {
         return new CertificateEntry(
                 id,
                 fingerprint,
+                "ski",
                 createEncryptedValue(),
                 "-----BEGIN CERTIFICATE-----\nTEST\n-----END CERTIFICATE-----",
                 List.of("-----BEGIN CERTIFICATE-----\nISSUER\n-----END CERTIFICATE-----"),
