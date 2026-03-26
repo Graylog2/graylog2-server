@@ -28,7 +28,10 @@ const CollectorsOverviewPage = () => {
   const { data: config, isLoading } = useCollectorsConfig();
 
   if (isLoading) {
-    return <Spinner />;
+    return (<DocumentTitle title="Collectors Overview">
+        <Spinner />;
+      </DocumentTitle>
+    );
   }
 
   if (!config?.signing_cert_id) {
