@@ -15,79 +15,99 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useCallback } from 'react';
+import { Formik, Form } from 'formik';
 
-import { Input } from 'components/bootstrap';
-import Modal from 'components/bootstrap/Modal';
+import { Modal } from 'components/bootstrap';
+import { FormikInput } from 'components/common';
 import ModalSubmit from 'components/common/ModalSubmit';
 
 import type { Fleet } from '../types';
 
+type FormValues = {
+  name: string;
+  description: string;
+  target_version: string;
+};
+
 type Props = {
   fleet?: Fleet;
   onClose: () => void;
-  onSave: (fleet: Omit<Fleet, 'id' | 'created_at' | 'updated_at'>) => void;
-  isLoading?: boolean;
+  onSave: (fleet: Omit<Fleet, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
 };
 
-const FleetFormModal = ({ fleet = undefined, onClose, onSave, isLoading = false }: Props) => {
-  const isEdit = !!fleet;
-  const [name, setName] = useState(fleet?.name || '');
-  const [description, setDescription] = useState(fleet?.description || '');
-  const [targetVersion, setTargetVersion] = useState(fleet?.target_version || '');
+const validate = (values: FormValues) => {
+  const errors: Partial<Record<keyof FormValues, string>> = {};
 
-  const handleSave = () => {
-    onSave({
-      name,
-      description,
-      target_version: targetVersion || null,
-    });
+  if (!values.name) {
+    errors.name = 'Name is required';
+  }
+
+  return errors;
+};
+
+const FleetFormModal = ({ fleet = undefined, onClose, onSave }: Props) => {
+  const isEdit = !!fleet;
+
+  const initialValues: FormValues = {
+    name: fleet?.name || '',
+    description: fleet?.description || '',
+    target_version: fleet?.target_version || '',
   };
+
+  const handleSubmit = useCallback(
+    (values: FormValues) =>
+      onSave({
+        name: values.name,
+        description: values.description,
+        target_version: values.target_version || null,
+      }).then(() => onClose()),
+    [onSave, onClose],
+  );
 
   return (
     <Modal show onHide={onClose}>
-      <Modal.Header>
-        <Modal.Title>{isEdit ? 'Edit Fleet' : 'New Fleet'}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Input
-          id="fleet-name"
-          type="text"
-          label="Name"
-          help="A unique name for this fleet"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-        <Input
-          id="fleet-description"
-          type="textarea"
-          label="Description"
-          help="Optional description of this fleet's purpose"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        <Input
-          id="fleet-target-version"
-          type="text"
-          label="Target Version"
-          help="Optional collector version for this fleet"
-          placeholder="e.g., 1.2.0"
-          value={targetVersion}
-          onChange={(e) => setTargetVersion(e.target.value)}
-        />
-      </Modal.Body>
-      <Modal.Footer>
-        <ModalSubmit
-          isAsyncSubmit
-          submitButtonText={`${isEdit ? 'Update' : 'Create'} ${name}`}
-          submitLoadingText={`${isEdit ? 'Updating...' : 'Creating...'}`}
-          onCancel={onClose}
-          onSubmit={handleSave}
-          disabledSubmit={!name || isLoading}
-          isSubmitting={isLoading}
-        />
-      </Modal.Footer>
+      <Formik<FormValues> initialValues={initialValues} onSubmit={handleSubmit} validate={validate}>
+        {({ isSubmitting, isValidating }) => (
+          <Form>
+            <Modal.Header>
+              <Modal.Title>{isEdit ? 'Edit Fleet' : 'New Fleet'}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <FormikInput
+                id="fleet-name"
+                label="Name"
+                name="name"
+                help="A unique name for this fleet"
+                required
+              />
+              <FormikInput
+                id="fleet-description"
+                label="Description"
+                name="description"
+                type="textarea"
+                help="Optional description of this fleet's purpose"
+              />
+              <FormikInput
+                id="fleet-target-version"
+                label="Target Version"
+                name="target_version"
+                help="Optional collector version for this fleet"
+                placeholder="e.g., 1.2.0"
+              />
+            </Modal.Body>
+            <Modal.Footer>
+              <ModalSubmit
+                submitButtonText={isEdit ? 'Update fleet' : 'Create fleet'}
+                submitLoadingText={isEdit ? 'Updating...' : 'Creating...'}
+                onCancel={onClose}
+                disabledSubmit={isValidating}
+                isSubmitting={isSubmitting}
+              />
+            </Modal.Footer>
+          </Form>
+        )}
+      </Formik>
     </Modal>
   );
 };

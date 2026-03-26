@@ -32,7 +32,7 @@ import type { Fleet } from '../types';
 
 const CollectorsFleets = () => {
   const [showFleetModal, setShowFleetModal] = useState(false);
-  const { createFleet, isCreatingFleet } = useCollectorsMutations();
+  const { createFleet } = useCollectorsMutations();
   const { pathname } = useLocation();
   const history = useHistory();
 
@@ -50,7 +50,6 @@ const CollectorsFleets = () => {
 
   const handleSaveFleet = async (fleet: Omit<Fleet, 'id' | 'created_at' | 'updated_at'>) => {
     await createFleet(fleet);
-    closeCreateModal();
   };
 
   return (
@@ -66,7 +65,7 @@ const CollectorsFleets = () => {
       />
 
       {showFleetModal && (
-        <FleetFormModal onClose={closeCreateModal} onSave={handleSaveFleet} isLoading={isCreatingFleet} />
+        <FleetFormModal onClose={closeCreateModal} onSave={handleSaveFleet} />
       )}
     </>
   );
