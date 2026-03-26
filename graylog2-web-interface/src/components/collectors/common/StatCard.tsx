@@ -38,6 +38,9 @@ const StyledCard = styled.div<{ $variant: Variant; $clickable: boolean }>(
     background-color: ${theme.colors.cards.background};
     border: 1px solid ${theme.colors.cards.border};
     border-radius: 8px;
+    font: inherit;
+    color: inherit;
+    width: auto;
 
     ${$clickable &&
     css`
@@ -48,19 +51,9 @@ const StyledCard = styled.div<{ $variant: Variant; $clickable: boolean }>(
       }
     `}
 
-    ${$variant === 'success' &&
+    ${$variant !== 'default' &&
     css`
-      border-left: 3px solid ${theme.colors.variant.success};
-    `}
-
-    ${$variant === 'warning' &&
-    css`
-      border-left: 3px solid ${theme.colors.variant.warning};
-    `}
-
-    ${$variant === 'danger' &&
-    css`
-      border-left: 3px solid ${theme.colors.variant.danger};
+      border-left: 3px solid ${theme.colors.variant[$variant]};
     `}
   `,
 );
@@ -81,7 +74,12 @@ const Label = styled.div(
 );
 
 const StatCard = ({ value, label, variant = 'default', onClick = undefined }: Props) => (
-  <StyledCard $variant={variant} $clickable={!!onClick} onClick={onClick} data-testid="stat-card">
+  <StyledCard as={onClick ? 'button' : 'div'}
+              $variant={variant}
+              $clickable={!!onClick}
+              onClick={onClick}
+              type={onClick ? 'button' : undefined}
+  >
     <Value>{value}</Value>
     <Label>{label}</Label>
   </StyledCard>
