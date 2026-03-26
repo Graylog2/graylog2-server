@@ -246,7 +246,7 @@ const FleetDetail = ({ fleetId }: Props) => {
       {activeTab === 'sources' && (
         <>
           <ActionsRow>
-            <Button bsStyle="success" onClick={() => setShowSourceModal(true)}>
+            <Button bsStyle="primary" onClick={() => setShowSourceModal(true)}>
               Add Source
             </Button>
           </ActionsRow>
