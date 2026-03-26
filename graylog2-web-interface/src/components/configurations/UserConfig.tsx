@@ -189,7 +189,7 @@ const UserConfig = () => {
                               duration={values.default_ttl_for_new_tokens}
                               update={(value) => setFieldValue('default_ttl_for_new_tokens', value)}
                               label="Default TTL for new tokens (as ISO8601 Duration)"
-                              help="Tokens will be automatically invalidated after this amount of time. Example, for 24 hours: PT24H, for 30 days: PT30D"
+                              help="Tokens will be automatically invalidated after this amount of time. Example, for 24 hours: PT24H, for 30 days: P30D"
                               validator={defaultTokenTtlValidator}
                               errorText="invalid (min: 1 day)"
                               disabled={!values.default_ttl_for_new_tokens}
