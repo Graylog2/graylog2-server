@@ -16,6 +16,4 @@
  */
 export { default as FleetDetail } from './FleetDetail';
 export { default as FleetFormModal } from './FleetFormModal';
-export { default as FleetSettings } from './FleetSettings';
 export { default as customColumnRenderers } from './ColumnRenderers';
-export * from './Constants';

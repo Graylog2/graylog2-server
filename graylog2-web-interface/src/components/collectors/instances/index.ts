@@ -18,4 +18,3 @@ export { default as InstanceDetailDrawer } from './InstanceDetailDrawer';
 export { default as InstanceActions } from './InstanceActions';
 export { default as BulkActions } from './BulkActions';
 export { default as customColumnRenderers } from './ColumnRenderers';
-export * from './Constants';
