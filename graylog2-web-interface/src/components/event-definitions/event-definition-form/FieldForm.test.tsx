@@ -23,6 +23,8 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { asMock } from 'helpers/mocking';
 import FieldForm from 'components/event-definitions/event-definition-form/FieldForm';
 
+jest.mock('routing/useLocation');
+jest.mock('logic/telemetry/useSendTelemetry');
 jest.mock('logic/telemetry/withTelemetry', () => <T,>(Component: React.FC<T>) => (props: T) => (
   <Component {...props} sendTelemetry={() => {}} />
 ));
