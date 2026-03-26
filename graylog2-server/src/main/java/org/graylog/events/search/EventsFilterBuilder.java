@@ -23,9 +23,11 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.Set;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import static org.graylog.events.search.EventsSearchFilter.NULL_VALUE;
 import static org.graylog2.plugin.Tools.ES_DATE_FORMAT_FORMATTER;
 
 public class EventsFilterBuilder {
@@ -76,6 +78,20 @@ public class EventsFilterBuilder {
             filterBuilder.add(parameters.filter().id().stream()
                     .map(idFilter -> EventDto.FIELD_ID + ":" + quote(idFilter))
                     .collect(joiningQueriesWithOR));
+        }
+
+        // add filtering for associated assets in Indexer
+        if(parameters.filter().extraFilters().containsKey(EventDto.FIELD_ASSOCIATED_ASSETS) && !parameters.filter().extraFilters().get(EventDto.FIELD_ASSOCIATED_ASSETS).isEmpty()) {
+            final Set<String> assets = parameters.filter().extraFilters().get(EventDto.FIELD_ASSOCIATED_ASSETS);
+            if(assets.contains(NULL_VALUE)) {
+                filterBuilder.add("NOT _exists_:" + EventDto.FIELD_ASSOCIATED_ASSETS);
+                // possible alternative
+                // filterBuilder.add("-" + EventDto.FIELD_ASSOCIATED_ASSETS + ":*");
+            } else {
+                filterBuilder.add(assets.stream()
+                        .map(assetFilter -> EventDto.FIELD_ASSOCIATED_ASSETS + ":" + quote(assetFilter))
+                        .collect(joiningQueriesWithOR));
+            }
         }
 
         switch (parameters.filter().alerts()) {

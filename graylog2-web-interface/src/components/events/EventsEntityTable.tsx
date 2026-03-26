@@ -37,16 +37,17 @@ import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import { EXCLUDE_INFO_FILTER } from 'logic/alerts/EventDefinitionPriorityEnum';
 import { adjustFormat, toDateObject } from 'util/DateTime';
 import { DATE_SEPARATOR } from 'components/common/EntityFilters/helpers/timeRange';
+import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 
 const additionalSearchFields = {
   key: 'The key of the event',
 };
 
 const defaultFrom = adjustFormat(toDateObject(new Date(), undefined, 'UTC').subtract(1, 'month'), 'internal');
-const defaultFilters = OrderedMap({
-  priority: [EXCLUDE_INFO_FILTER],
-  timestamp: [`${defaultFrom}${DATE_SEPARATOR}`],
-});
+const nonInfoPriorities = Object.keys(EventDefinitionPriorityEnum.properties)
+  .reverse()
+  .filter((key) => key !== String(EventDefinitionPriorityEnum.INFO));
+const defaultFilters = OrderedMap({ priority: nonInfoPriorities, timestamp:  defaultFrom });
 
 const EventsEntityTable = () => {
   const { stream_id: streamId } = useQuery();
@@ -59,7 +60,7 @@ const EventsEntityTable = () => {
     const { filter, timerange } = parseFilters(filters);
 
     return Events.slices({
-      include_all: false,
+      include_all: true,
       slice_column: column,
       query: getConcatenatedQuery(query, streamId as string),
       filter,

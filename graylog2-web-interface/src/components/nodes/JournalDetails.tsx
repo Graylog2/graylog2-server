@@ -21,13 +21,15 @@ import 'moment-duration-format';
 import styled from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
 
+import { ClusterJournal } from '@graylog/server-api';
+
 import { Link, Spinner, RelativeTime } from 'components/common';
 import { Row, Col, Alert } from 'components/bootstrap';
 import ProgressBar, { Bar } from 'components/common/ProgressBar';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 import NumberUtils from 'util/NumberUtils';
 import Routes from 'routing/Routes';
-import { JournalStore } from 'stores/journal/JournalStore';
+import { defaultOnError } from 'util/conditional/onError';
 import { useNodeMetrics } from 'hooks/useMetrics';
 
 const JournalUsageProgressBar = styled(ProgressBar)`
@@ -53,10 +55,13 @@ const metricNames = {
 
 const metricValues = Object.values(metricNames);
 
+const fetchJournalInfo = (nodeId: string) =>
+  defaultOnError(ClusterJournal.get(nodeId), 'Could not get journal information');
+
 const JournalDetails = ({ nodeId }: Props) => {
   const { data: journalInformation } = useQuery({
     queryKey: ['journal', 'info', nodeId],
-    queryFn: () => JournalStore.get(nodeId),
+    queryFn: () => fetchJournalInfo(nodeId),
   });
 
   const { data: nodeMetrics, isLoading: metricsLoading } = useNodeMetrics(nodeId, metricValues);

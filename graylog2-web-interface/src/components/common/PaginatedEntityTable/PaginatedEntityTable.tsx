@@ -30,7 +30,6 @@ import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import TableFetchContextProvider from 'components/common/PaginatedEntityTable/TableFetchContextProvider';
 import type { PaginatedResponse, FetchOptions } from 'components/common/PaginatedEntityTable/useFetchEntities';
 import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
-import useOnRefresh from 'components/common/PaginatedEntityTable/useOnRefresh';
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
 import Slicing, { type SliceRenderers } from 'components/common/PaginatedEntityTable/slicing';
 import type { FetchSlices } from 'components/common/PaginatedEntityTable/slicing/useFetchSlices';
@@ -137,8 +136,6 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
     humanName,
     fetchOptions: reactQueryOptions,
   });
-
-  useOnRefresh(refetch);
 
   useEffect(() => {
     if (!onDataLoaded || isLoadingEntities) {
@@ -328,6 +325,7 @@ export type PaginatedEntityTableProps<T, M> = {
   additionalAttributes?: Array<Attribute>;
   bulkSelection?: EntityDataTableProps['bulkSelection'];
   columnRenderers: EntityDataTableProps['columnRenderers'];
+  // eslint-disable-next-line react/no-unused-prop-types
   defaultFilters?: UrlQueryFilters;
   entityActions?: EntityDataTableProps['entityActions'];
   entityAttributesAreCamelCase: boolean;

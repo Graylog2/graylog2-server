@@ -17,26 +17,43 @@
 import * as React from 'react';
 import { screen, render, waitFor, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import { defaultUser } from 'defaultMockValues';
 
+import { asMock } from 'helpers/mocking';
 import type { SearchParams } from 'stores/PaginationTypes';
 import TableFetchContext, { type ContextValue } from 'components/common/PaginatedEntityTable/TableFetchContext';
+import type { ColumnSchema } from 'components/common/EntityDataTable/types';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import Slicing from './index';
 
 jest.mock('logic/telemetry/useSendTelemetry', () => () => jest.fn());
+jest.mock('hooks/useCurrentUser');
 
 describe('Slicing', () => {
-  const columnSchemas = [
+  const columnSchemas: Array<ColumnSchema> = [
     { id: 'title', title: 'Title', type: 'STRING' as const, sliceable: true },
-    { id: 'status', title: 'Status', type: 'STRING' as const, sliceable: true },
+    {
+      id: 'status',
+      title: 'Status',
+      type: 'STRING' as const,
+      sliceable: true,
+      permissions: ['streams:read'],
+      slice_sort_options: [{ value: 'risk_score', title: 'Risk Score' }],
+    },
+    { id: 'owner', title: 'Owner', type: 'STRING' as const, sliceable: true, permissions: ['roles:read'] },
     { id: 'description', title: 'Description', type: 'STRING' as const, sliceable: false },
   ];
 
+  beforeEach(() => {
+    asMock(useCurrentUser).mockReturnValue(defaultUser);
+  });
+
   const renderSUT = (
     props: Partial<React.ComponentProps<typeof Slicing>> = {},
-    contextOverrides: Partial<ContextValue> & { searchParams?: Partial<SearchParams> } = {},
+    contextOverrides: { searchParams?: Partial<SearchParams> } = {},
   ) => {
-    const searchParams = {
+    const searchParams: SearchParams = {
       page: 1,
       pageSize: 10,
       query: '',
@@ -51,7 +68,6 @@ describe('Slicing', () => {
       refetch: jest.fn(),
       attributes: [],
       entityTableId: 'test-entity-table',
-      ...contextOverrides,
     };
 
     return render(
@@ -74,8 +90,22 @@ describe('Slicing', () => {
     await userEvent.click(button);
 
     await screen.findByRole('menuitem', { name: /title/i });
+    await screen.findByRole('menuitem', { name: /owner/i });
     await screen.findByRole('menuitem', { name: /status/i });
     expect(screen.queryByRole('menuitem', { name: /description/i })).not.toBeInTheDocument();
+  });
+
+  it('hides slice options for columns without the required permissions', async () => {
+    asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(['streams:read']).build());
+
+    renderSUT();
+
+    const button = await screen.findByRole('button', { name: /status/i });
+    await userEvent.click(button);
+
+    await screen.findByRole('menuitem', { name: /title/i });
+    await screen.findByRole('menuitem', { name: /status/i });
+    expect(screen.queryByRole('menuitem', { name: /owner/i })).not.toBeInTheDocument();
   });
 
   it('selects a slice', async () => {
@@ -114,19 +144,59 @@ describe('Slicing', () => {
 
     await screen.findByText('Alpha');
 
-    await userEvent.type(screen.getByPlaceholderText(/filter status/i), 'alp');
+    await userEvent.type(screen.getByPlaceholderText(/filter/i), 'alp');
 
     expect(screen.getByText('Alpha')).toBeInTheDocument();
     expect(screen.queryByText('Beta')).not.toBeInTheDocument();
   });
 
-  it('sorts slices by count', async () => {
+  it('does not display count as a slice sort option', async () => {
+    renderSUT();
+
+    await userEvent.click(await screen.findByRole('button', { name: /alphabetical/i }));
+
+    expect(screen.queryByRole('menuitem', { name: /count/i })).not.toBeInTheDocument();
+  });
+
+  it('displays additional slice sort options from the active column schema', async () => {
+    renderSUT();
+
+    await userEvent.click(await screen.findByRole('button', { name: /alphabetical/i }));
+
+    await screen.findByRole('menuitem', { name: /risk score/i });
+  });
+
+  it('sorts slices by additional slice sort metadata', async () => {
+    renderSUT({
+      fetchSlices: () =>
+        Promise.resolve({
+          slices: [
+            { value: 'Alpha', count: 1, meta: { risk_score: 2 } },
+            { value: 'Beta', count: 1, meta: { risk_score: 10 } },
+          ],
+        }),
+    });
+
+    await screen.findByText('Alpha');
+
+    const getItems = () => within(screen.getByTestId('slices-list')).getAllByRole('button');
+
+    await userEvent.click(screen.getByRole('button', { name: /alphabetical/i }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /risk score/i }));
+
+    await waitFor(() => {
+      expect(getItems()[0]).toHaveTextContent('Beta');
+      expect(getItems()[1]).toHaveTextContent('Alpha');
+    });
+  });
+
+  it('toggles the slice sort direction', async () => {
     renderSUT({
       fetchSlices: () =>
         Promise.resolve({
           slices: [
             { value: 'Alpha', count: 1 },
-            { value: 'Beta', count: 3 },
+            { value: 'Beta', count: 1 },
           ],
         }),
     });
@@ -138,8 +208,7 @@ describe('Slicing', () => {
     expect(getItems()[0]).toHaveTextContent('Alpha');
     expect(getItems()[1]).toHaveTextContent('Beta');
 
-    await userEvent.click(screen.getByRole('button', { name: /a-z/i }));
-    await userEvent.click(await screen.findByRole('menuitem', { name: /count/i }));
+    await userEvent.click(screen.getByRole('button', { name: /sort ascending/i }));
 
     await waitFor(() => {
       expect(getItems()[0]).toHaveTextContent('Beta');
@@ -147,23 +216,102 @@ describe('Slicing', () => {
     });
   });
 
-  it('shows empty slices when toggled', async () => {
+  it('keeps null-value slices at the top regardless of slice sort', async () => {
     renderSUT({
       fetchSlices: () =>
         Promise.resolve({
           slices: [
-            { value: 'Alpha', count: 1 },
-            { value: 'Gamma', count: 0 },
+            { value: 'Alpha', count: 2, meta: { risk_score: 1 } },
+            { value: null, title: '(Empty Value)', count: 1, meta: { risk_score: 100 } },
+            { value: 'Beta', count: 3, meta: { risk_score: 10 } },
           ],
         }),
     });
 
+    await screen.findByText('(Empty Value)');
+
+    const getItems = () => within(screen.getByTestId('slices-list')).getAllByRole('button');
+
+    expect(getItems()[0]).toHaveTextContent('(Empty Value)');
+
+    await userEvent.click(screen.getByRole('button', { name: /alphabetical/i }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /risk score/i }));
+
+    await waitFor(() => {
+      expect(getItems()[0]).toHaveTextContent('(Empty Value)');
+      expect(getItems()[1]).toHaveTextContent('Beta');
+      expect(getItems()[2]).toHaveTextContent('Alpha');
+    });
+
+    await userEvent.click(screen.getByRole('button', { name: /sort descending/i }));
+
+    await waitFor(() => {
+      expect(getItems()[0]).toHaveTextContent('(Empty Value)');
+      expect(getItems()[1]).toHaveTextContent('Alpha');
+      expect(getItems()[2]).toHaveTextContent('Beta');
+    });
+  });
+
+  it('paginates non-empty slices', async () => {
+    renderSUT({
+      fetchSlices: () =>
+        Promise.resolve({
+          slices: Array.from({ length: 11 }, (_, index) => ({
+            value: `Slice-${String(index + 1).padStart(2, '0')}`,
+            count: 1,
+          })),
+        }),
+    });
+
+    await screen.findByText('Slice-01');
+
+    expect(within(screen.getByTestId('slices-list')).getByText('Slice-01')).toBeInTheDocument();
+    expect(within(screen.getByTestId('slices-list')).queryByText('Slice-11')).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: /open page 2/i }));
+
+    await waitFor(() => expect(within(screen.getByTestId('slices-list')).getByText('Slice-11')).toBeInTheDocument());
+    expect(within(screen.getByTestId('slices-list')).queryByText('Slice-01')).not.toBeInTheDocument();
+  });
+
+  it('hides the empty slices section for now', async () => {
+    renderSUT(
+      {
+        fetchSlices: () =>
+          Promise.resolve({
+            slices: [
+              { value: 'Alpha', count: 1 },
+              { value: 'Gamma', count: 0 },
+            ],
+          }),
+      },
+      { searchParams: { slice: 'Gamma' } },
+    );
+
     await screen.findByText('Alpha');
 
+    expect(screen.queryByRole('button', { name: /show empty slices/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /hide empty slices/i })).not.toBeInTheDocument();
+    expect(screen.queryByTestId('empty-slices-list')).not.toBeInTheDocument();
     expect(screen.queryByText('Gamma')).not.toBeInTheDocument();
+  });
 
-    await userEvent.click(screen.getByRole('button', { name: /show empty slices/i }));
+  it('refetches slices when selecting a slice', async () => {
+    const fetchSlices = jest.fn(() =>
+      Promise.resolve({
+        slices: [
+          { value: 'Alpha', count: 2 },
+          { value: 'Beta', count: 1 },
+        ],
+      }),
+    );
+    renderSUT({ fetchSlices });
 
-    expect(await screen.findByText('Gamma')).toBeInTheDocument();
+    await screen.findByText('Alpha');
+    expect(fetchSlices).toHaveBeenCalledTimes(1);
+
+    await userEvent.click(within(screen.getByTestId('slices-list')).getByRole('button', { name: /beta/i }));
+
+    await waitFor(() => expect(fetchSlices.mock.calls.length).toBeGreaterThanOrEqual(2));
   });
 });
