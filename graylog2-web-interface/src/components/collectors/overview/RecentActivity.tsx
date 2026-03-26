@@ -17,7 +17,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Icon, Link, RelativeTime, Spinner } from 'components/common';
+import { Icon, Link, RelativeTime, Spinner, NoEntitiesExist } from 'components/common';
 import type { IconName } from 'components/common/Icon/types';
 import Routes from 'routing/Routes';
 
@@ -154,7 +154,7 @@ const RecentActivity = () => {
 
       {isLoading && <Spinner />}
 
-      {!isLoading && (!data?.activities || data.activities.length === 0) && <EmptyState>No recent activity</EmptyState>}
+      {!isLoading && (!data?.activities || data.activities.length === 0) && <NoEntitiesExist>No recent activity.</NoEntitiesExist>}
 
       {!isLoading && data?.activities && data.activities.length > 0 && (
         <ActivityList>
