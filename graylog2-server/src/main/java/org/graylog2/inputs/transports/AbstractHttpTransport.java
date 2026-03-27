@@ -63,10 +63,10 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
     protected static final int DEFAULT_MAX_CHUNK_SIZE = (int) Size.kilobytes(64L).toBytes();
     private static final int DEFAULT_IDLE_WRITER_TIMEOUT = 60;
 
-    static final String CK_ENABLE_BULK_RECEIVING = "enable_bulk_receiving";
+    protected static final String CK_ENABLE_BULK_RECEIVING = "enable_bulk_receiving";
     static final String CK_ENABLE_CORS = "enable_cors";
-    static final String CK_MAX_CHUNK_SIZE = "max_chunk_size";
-    static final String CK_IDLE_WRITER_TIMEOUT = "idle_writer_timeout";
+    public static final String CK_MAX_CHUNK_SIZE = "max_chunk_size";
+    public static final String CK_IDLE_WRITER_TIMEOUT = "idle_writer_timeout";
     static final String CK_AUTHORIZATION_HEADER_NAME = "authorization_header_name";
     static final String CK_AUTHORIZATION_HEADER_VALUE = "authorization_header_value";
     private static final String AUTHORIZATION_HEADER_NAME_LABEL = "Authorization Header Name";
@@ -128,6 +128,22 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
     protected static int parseMaxChunkSize(Configuration configuration) {
         int maxChunkSize = configuration.getInt(CK_MAX_CHUNK_SIZE, DEFAULT_MAX_CHUNK_SIZE);
         return maxChunkSize <= 0 ? DEFAULT_MAX_CHUNK_SIZE : maxChunkSize;
+    }
+
+    protected boolean isEnableCors() {
+        return enableCors;
+    }
+
+    protected String getAuthorizationHeader() {
+        return authorizationHeader;
+    }
+
+    protected String getAuthorizationHeaderValue() {
+        return authorizationHeaderValue;
+    }
+
+    protected String getPath() {
+        return path;
     }
 
     @Override
