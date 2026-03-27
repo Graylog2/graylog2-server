@@ -18,14 +18,27 @@ package org.graylog.security.pki;
 
 import org.graylog.security.pki.jwks.JwksResource;
 import org.graylog.security.pki.jwks.JwksService;
+import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.PluginModule;
+
+import static org.graylog.collectors.CollectorsModule.COLLECTORS_FLAG;
 
 /**
  * Guice module for certificate storage and JWKS services.
  */
 public class PkiModule extends PluginModule {
+    private final boolean collectorsEnabled;
+
+    public PkiModule(FeatureFlags featureFlags) {
+        this.collectorsEnabled = featureFlags.isOn(COLLECTORS_FLAG);
+    }
+
     @Override
     protected void configure() {
+        if (!collectorsEnabled) {
+            return;
+        }
+
         bind(CertificateService.class).asEagerSingleton();
         bind(JwksService.class).asEagerSingleton();
         addSystemRestResource(JwksResource.class);

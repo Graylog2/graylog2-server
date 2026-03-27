@@ -224,7 +224,7 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
                 new DataTieringModule(),
                 new DatanodeMigrationBindings(),
                 new CaModule(),
-                new PkiModule(),
+                new PkiModule(featureFlags),
                 new TelemetryModule(),
                 new DataNodeModule(),
                 new McpServerModule(),

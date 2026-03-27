@@ -54,7 +54,7 @@ import org.graylog2.plugin.PluginModule;
 
 public class CollectorsModule extends PluginModule {
     private static final String OTLP_DUMP_FLAG = "collector_otlp_traffic_dump";
-    private static final String COLLECTORS_FLAG = "collectors";
+    public static final String COLLECTORS_FLAG = "collectors";
 
     private final boolean collectorsEnabled;
     private final boolean otlpDumpEnabled;
