@@ -164,6 +164,11 @@ test({ value1: undefined, value2: null }); // 12, null
 
 `Array.reduce` is slow for building objects from large arrays. Use `Object.fromEntries` instead. See [this PR](https://github.com/Graylog2/graylog2-server/pull/12162) for details.
 
+### Date and Time
+
+- Avoid using `moment` directly in application code when shared date/time abstractions already cover the use case. Prefer `util/DateTime` and user-facing helpers such as `useUserDateTime`.
+- If the required date/time logic is missing from the shared abstraction, extend `util/DateTime` instead of introducing new direct `moment` usage. This keeps future migration away from `moment` easier.
+
 ## Session Timeouts
 
 To prevent session expiry during user interaction, every API request using `fetch` from `FetchProvider` extends the session. Periodic requests must use `fetchPeriodically` instead to avoid extending the session when the user is idle. When using the generated stubs, pass the optional last options argument with `{ requestShouldExtendSession: false }`.
