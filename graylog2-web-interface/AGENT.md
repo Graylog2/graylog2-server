@@ -104,6 +104,6 @@ yarn tsc && yarn lint:changes && yarn test
 Before finishing current work, please make sure that:
 
   - Type-checking passes
-  - Tests are passing
+  - Tests are passing (use `yarn test`, never `yarn jest`)
   - Generated code is adhering our frontend style guide (as laid out on `CONTRIBUTING.md`)
 
