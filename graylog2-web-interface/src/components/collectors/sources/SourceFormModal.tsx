@@ -15,10 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useCallback } from 'react';
+import { Formik, Form } from 'formik';
 
 import { Input } from 'components/bootstrap';
 import Modal from 'components/bootstrap/Modal';
+import { FormikInput } from 'components/common';
 import ModalSubmit from 'components/common/ModalSubmit';
 
 import { SOURCE_TYPE_LABELS } from './Constants';
@@ -36,8 +38,7 @@ type Props = {
   fleetId: string;
   source?: Source;
   onClose: () => void;
-  onSave: (source: Omit<Source, 'id'>) => void;
-  isLoading?: boolean;
+  onSave: (source: Omit<Source, 'id'>) => Promise<void>;
 };
 
 const defaultConfigs: Record<SourceType, FileSourceConfig | JournaldSourceConfig | WindowsEventLogSourceConfig> = {
@@ -46,219 +47,210 @@ const defaultConfigs: Record<SourceType, FileSourceConfig | JournaldSourceConfig
   windows_event_log: { channels: [], include_default_channels: true, read_mode: 'end' },
 };
 
-const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoading = false }: Props) => {
+type FormValues = {
+  source_type: SourceType;
+  name: string;
+  description: string;
+  enabled: boolean;
+  config: FileSourceConfig | JournaldSourceConfig | WindowsEventLogSourceConfig;
+};
+
+const validate = (values: FormValues) => {
+  const errors: Partial<Record<keyof FormValues, string>> = {};
+
+  if (!values.name) {
+    errors.name = 'Name is required';
+  }
+
+  return errors;
+};
+
+const FileConfigFields = ({ config, setFieldValue }: { config: FileSourceConfig; setFieldValue: (field: string, value: unknown) => void }) => (
+  <>
+    <Input
+      id="file-paths"
+      type="text"
+      label="File Path(s)"
+      help="Glob pattern supported (e.g., /var/log/*.log)"
+      value={config.paths[0] || ''}
+      onChange={(e) => setFieldValue('config', { ...config, paths: [e.target.value] })}
+      required
+    />
+    <Input
+      id="file-read-mode"
+      type="select"
+      label="Read Mode"
+      value={config.read_mode}
+      onChange={(e) => setFieldValue('config', { ...config, read_mode: e.target.value as 'beginning' | 'end' })}>
+      <option value="end">From end (tail)</option>
+      <option value="beginning">From beginning</option>
+    </Input>
+  </>
+);
+
+const JournaldConfigFields = ({ config, setFieldValue }: { config: JournaldSourceConfig; setFieldValue: (field: string, value: unknown) => void }) => (
+  <>
+    <Input
+      id="journald-read-mode"
+      type="select"
+      label="Read Mode"
+      value={config.read_mode}
+      onChange={(e) => setFieldValue('config', { ...config, read_mode: e.target.value as 'beginning' | 'end' })}>
+      <option value="end">From end (tail)</option>
+      <option value="beginning">From beginning</option>
+    </Input>
+    <Input
+      id="journald-priority"
+      type="select"
+      label="Priority"
+      value={config.priority}
+      onChange={(e) => setFieldValue('config', { ...config, priority: e.target.value as JournaldPriority })}>
+      <option value="emerg">Emergency</option>
+      <option value="alert">Alert</option>
+      <option value="crit">Critical</option>
+      <option value="err">Error</option>
+      <option value="warning">Warning</option>
+      <option value="notice">Notice</option>
+      <option value="info">Info</option>
+      <option value="debug">Debug</option>
+    </Input>
+    <Input
+      id="journald-match-pattern"
+      type="text"
+      label="Match Pattern"
+      help="Optional journald match expression to filter entries"
+      value={config.match_pattern || ''}
+      onChange={(e) => setFieldValue('config', { ...config, match_pattern: e.target.value || undefined })}
+    />
+  </>
+);
+
+const WindowsEventLogConfigFields = ({ config, setFieldValue }: { config: WindowsEventLogSourceConfig; setFieldValue: (field: string, value: unknown) => void }) => (
+  <>
+    <Input
+      id="win-channels"
+      type="text"
+      label="Channels"
+      help="Comma-separated channel names (e.g., Application, Security, System)"
+      value={config.channels.join(', ')}
+      onChange={(e) =>
+        setFieldValue('config', {
+          ...config,
+          channels: e.target.value.split(',').map((c) => c.trim()).filter(Boolean),
+        })
+      }
+      required
+    />
+    <Input
+      id="win-include-default-channels"
+      type="checkbox"
+      label="Include default channels"
+      checked={config.include_default_channels}
+      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+        setFieldValue('config', { ...config, include_default_channels: e.target.checked })
+      }
+    />
+    <Input
+      id="win-read-mode"
+      type="select"
+      label="Read Mode"
+      value={config.read_mode}
+      onChange={(e) => setFieldValue('config', { ...config, read_mode: e.target.value as 'beginning' | 'end' })}>
+      <option value="end">From end (tail)</option>
+      <option value="beginning">From beginning</option>
+    </Input>
+  </>
+);
+
+const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props) => {
   const isEdit = !!source;
-  const [sourceType, setSourceType] = useState<SourceType>(source?.type || 'file');
-  const [name, setName] = useState(source?.name || '');
-  const [description, setDescription] = useState(source?.description || '');
-  const [enabled, setEnabled] = useState(source?.enabled ?? true);
-  const [config, setConfig] = useState<(typeof defaultConfigs)[SourceType]>(
-    source?.config || defaultConfigs[sourceType],
+
+  const initialValues: FormValues = {
+    source_type: source?.type || 'file',
+    name: source?.name || '',
+    description: source?.description || '',
+    enabled: source?.enabled ?? true,
+    config: source?.config || defaultConfigs[source?.type || 'file'],
+  };
+
+  const handleSubmit = useCallback(
+    (values: FormValues) =>
+      onSave({
+        fleet_id: fleetId,
+        name: values.name,
+        description: values.description,
+        enabled: values.enabled,
+        type: values.source_type,
+        config: values.config,
+      } as Omit<Source, 'id'>).then(() => onClose()),
+    [fleetId, onSave, onClose],
   );
-
-  const handleTypeChange = (type: string) => {
-    setSourceType(type as SourceType);
-    setConfig(defaultConfigs[type as SourceType]);
-  };
-
-  const handleSave = () => {
-    onSave({
-      fleet_id: fleetId,
-      name,
-      description,
-      enabled,
-      type: sourceType,
-      config,
-    } as Omit<Source, 'id'>);
-  };
-
-  const updateFileConfig = (updates: Partial<FileSourceConfig>) => {
-    setConfig((prev) => ({ ...prev, ...updates }));
-  };
-
-  const updateJournaldConfig = (updates: Partial<JournaldSourceConfig>) => {
-    setConfig((prev) => ({ ...prev, ...updates }));
-  };
-  const updateWindowsEventLogConfig = (updates: Partial<WindowsEventLogSourceConfig>) => {
-    setConfig((prev) => ({ ...prev, ...updates }));
-  };
-
-  const renderFileConfig = () => {
-    const fileConfig = config as FileSourceConfig;
-
-    return (
-      <>
-        <Input
-          id="file-paths"
-          type="text"
-          label="File Path(s)"
-          help="Glob pattern supported (e.g., /var/log/*.log)"
-          value={fileConfig.paths[0] || ''}
-          onChange={(e) => updateFileConfig({ paths: [e.target.value] })}
-          required
-        />
-        <Input
-          id="file-read-mode"
-          type="select"
-          label="Read Mode"
-          value={fileConfig.read_mode}
-          onChange={(e) => updateFileConfig({ read_mode: e.target.value as 'beginning' | 'end' })}>
-          <option value="end">From end (tail)</option>
-          <option value="beginning">From beginning</option>
-        </Input>
-      </>
-    );
-  };
-
-  const renderJournaldConfig = () => {
-    const journaldConfig = config as JournaldSourceConfig;
-
-    return (
-      <>
-        <Input
-          id="journald-read-mode"
-          type="select"
-          label="Read Mode"
-          value={journaldConfig.read_mode}
-          onChange={(e) => updateJournaldConfig({ read_mode: e.target.value as 'beginning' | 'end' })}>
-          <option value="end">From end (tail)</option>
-          <option value="beginning">From beginning</option>
-        </Input>
-        <Input
-          id="journald-priority"
-          type="select"
-          label="Priority"
-          value={journaldConfig.priority}
-          onChange={(e) => updateJournaldConfig({ priority: e.target.value as JournaldPriority })}>
-          <option value="emerg">Emergency</option>
-          <option value="alert">Alert</option>
-          <option value="crit">Critical</option>
-          <option value="err">Error</option>
-          <option value="warning">Warning</option>
-          <option value="notice">Notice</option>
-          <option value="info">Info</option>
-          <option value="debug">Debug</option>
-        </Input>
-        <Input
-          id="journald-match-pattern"
-          type="text"
-          label="Match Pattern"
-          help="Optional journald match expression to filter entries"
-          value={journaldConfig.match_pattern || ''}
-          onChange={(e) => updateJournaldConfig({ match_pattern: e.target.value || undefined })}
-        />
-      </>
-    );
-  };
-
-  const renderWindowsEventLogConfig = () => {
-    const winConfig = config as WindowsEventLogSourceConfig;
-
-    return (
-      <>
-        <Input
-          id="win-channels"
-          type="text"
-          label="Channels"
-          help="Comma-separated channel names (e.g., Application, Security, System)"
-          value={winConfig.channels.join(', ')}
-          onChange={(e) =>
-            updateWindowsEventLogConfig({
-              channels: e.target.value
-                .split(',')
-                .map((c) => c.trim())
-                .filter(Boolean),
-            })
-          }
-          required
-        />
-        <Input
-          id="win-include-default-channels"
-          type="checkbox"
-          label="Include default channels"
-          checked={winConfig.include_default_channels}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            updateWindowsEventLogConfig({ include_default_channels: e.target.checked })
-          }
-        />
-        <Input
-          id="win-read-mode"
-          type="select"
-          label="Read Mode"
-          value={winConfig.read_mode}
-          onChange={(e) => updateWindowsEventLogConfig({ read_mode: e.target.value as 'beginning' | 'end' })}>
-          <option value="end">From end (tail)</option>
-          <option value="beginning">From beginning</option>
-        </Input>
-      </>
-    );
-  };
-
-  const renderConfigSection = () => {
-    switch (sourceType) {
-      case 'file':
-        return renderFileConfig();
-      case 'journald':
-        return renderJournaldConfig();
-      case 'windows_event_log':
-        return renderWindowsEventLogConfig();
-      default:
-        return null;
-    }
-  };
 
   return (
     <Modal show onHide={onClose} bsSize="lg">
-      <Modal.Header>
-        <Modal.Title>{isEdit ? 'Edit Source' : 'New Source'}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Input
-          id="source-type"
-          type="select"
-          label="Source Type"
-          value={sourceType}
-          onChange={(e) => handleTypeChange(e.target.value)}
-          disabled={isEdit}>
-          {Object.entries(SOURCE_TYPE_LABELS).map(([value, label]) => (
-            <option key={value} value={value}>{label}</option>
-          ))}
-        </Input>
-        <Input
-          id="source-name"
-          type="text"
-          label="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-        <Input
-          id="source-description"
-          type="textarea"
-          label="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        <Input
-          id="source-enabled"
-          type="checkbox"
-          label="Enabled"
-          checked={enabled}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEnabled(e.target.checked)}
-        />
-        {renderConfigSection()}
-      </Modal.Body>
-      <Modal.Footer>
-        <ModalSubmit
-          isAsyncSubmit
-          submitButtonText={`${isEdit ? 'Update' : 'Create'} ${name}`}
-          submitLoadingText={`${isEdit ? 'Updating...' : 'Creating...'}`}
-          onCancel={onClose}
-          onSubmit={handleSave}
-          disabledSubmit={!name || isLoading}
-          isSubmitting={isLoading}
-        />
-      </Modal.Footer>
+      <Formik<FormValues> initialValues={initialValues} onSubmit={handleSubmit} validate={validate}>
+        {({ isSubmitting, isValidating, values, setFieldValue }) => (
+          <Form>
+            <Modal.Header>
+              <Modal.Title>{isEdit ? 'Edit Source' : 'New Source'}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Input
+                id="source-type"
+                type="select"
+                label="Source Type"
+                value={values.source_type}
+                onChange={(e) => {
+                  const newType = e.target.value as SourceType;
+
+                  setFieldValue('source_type', newType);
+                  setFieldValue('config', defaultConfigs[newType]);
+                }}
+                disabled={isEdit}>
+                {Object.entries(SOURCE_TYPE_LABELS).map(([value, label]) => (
+                  <option key={value} value={value}>{label}</option>
+                ))}
+              </Input>
+              <FormikInput
+                id="source-name"
+                label="Name"
+                name="name"
+                required
+              />
+              <FormikInput
+                id="source-description"
+                label="Description"
+                name="description"
+                type="textarea"
+              />
+              <FormikInput
+                id="source-enabled"
+                label="Enabled"
+                name="enabled"
+                type="checkbox"
+              />
+              {values.source_type === 'file' && (
+                <FileConfigFields config={values.config as FileSourceConfig} setFieldValue={setFieldValue} />
+              )}
+              {values.source_type === 'journald' && (
+                <JournaldConfigFields config={values.config as JournaldSourceConfig} setFieldValue={setFieldValue} />
+              )}
+              {values.source_type === 'windows_event_log' && (
+                <WindowsEventLogConfigFields config={values.config as WindowsEventLogSourceConfig} setFieldValue={setFieldValue} />
+              )}
+            </Modal.Body>
+            <Modal.Footer>
+              <ModalSubmit
+                submitButtonText={isEdit ? 'Update source' : 'Create source'}
+                submitLoadingText={isEdit ? 'Updating...' : 'Creating...'}
+                onCancel={onClose}
+                disabledSubmit={isValidating}
+                isSubmitting={isSubmitting}
+              />
+            </Modal.Footer>
+          </Form>
+        )}
+      </Formik>
     </Modal>
   );
 };

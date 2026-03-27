@@ -17,9 +17,11 @@
 import * as React from 'react';
 import { useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { Formik, Form } from 'formik';
 
-import { Button, Input } from 'components/bootstrap';
-import { Card, ConfirmDialog, RelativeTime } from 'components/common';
+import { Button } from 'components/bootstrap';
+import { Card, ConfirmDialog, FormikInput, RelativeTime } from 'components/common';
+import FormSubmit from 'components/common/FormSubmit';
 
 import type { Fleet } from '../types';
 
@@ -27,7 +29,12 @@ type Props = {
   fleet: Fleet;
   onSave: (updates: Partial<Fleet>) => Promise<void>;
   onDelete?: () => Promise<void>;
-  isLoading?: boolean;
+};
+
+type FormValues = {
+  name: string;
+  description: string;
+  target_version: string;
 };
 
 const Section = styled(Card)`
@@ -51,13 +58,6 @@ const InfoValue = styled.span`
   font-family: ${({ theme }) => theme.fonts.family.monospace};
 `;
 
-const ButtonGroup = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: ${({ theme }) => theme.spacings.sm};
-  margin-top: ${({ theme }) => theme.spacings.md};
-`;
-
 const WarningText = styled.p`
   font-size: ${({ theme }) => theme.fonts.size.small};
   color: ${({ theme }) => theme.colors.gray[60]};
@@ -72,73 +72,79 @@ const SectionTitle = styled.h4(
   `,
 );
 
-const FleetSettings = ({ fleet, onSave, onDelete = undefined, isLoading = false }: Props) => {
-  const [name, setName] = useState(fleet.name);
-  const [description, setDescription] = useState(fleet.description);
-  const [targetVersion, setTargetVersion] = useState(fleet.target_version ?? '');
-  const [isDirty, setIsDirty] = useState(false);
+const validate = (values: FormValues) => {
+  const errors: Partial<Record<keyof FormValues, string>> = {};
+
+  if (!values.name) {
+    errors.name = 'Name is required';
+  }
+
+  return errors;
+};
+
+const FleetSettings = ({ fleet, onSave, onDelete = undefined }: Props) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const handleChange = <T,>(setter: React.Dispatch<React.SetStateAction<T>>, value: T) => {
-    setter(value);
-    setIsDirty(true);
+  const initialValues: FormValues = {
+    name: fleet.name,
+    description: fleet.description || '',
+    target_version: fleet.target_version ?? '',
   };
 
-  const handleSave = useCallback(async () => {
-    await onSave({
-      name,
-      description,
-      target_version: targetVersion || null,
-    });
-    setIsDirty(false);
-  }, [name, description, targetVersion, onSave]);
+  const handleSubmit = useCallback(
+    async (values: FormValues) => {
+      await onSave({
+        name: values.name,
+        description: values.description,
+        target_version: values.target_version || null,
+      });
+    },
+    [onSave],
+  );
 
   const handleConfirmDelete = useCallback(async () => {
     await onDelete?.();
   }, [onDelete]);
 
-  const handleReset = () => {
-    setName(fleet.name);
-    setDescription(fleet.description);
-    setTargetVersion(fleet.target_version ?? '');
-    setIsDirty(false);
-  };
-
   return (
     <div>
-      <Section>
-        <SectionTitle>General Settings</SectionTitle>
-        <Input
-          id="fleet-name"
-          label="Fleet Name"
-          value={name}
-          onChange={(e) => handleChange(setName, e.target.value)}
-          required
-        />
-        <Input
-          id="fleet-description"
-          type="textarea"
-          label="Description"
-          value={description}
-          onChange={(e) => handleChange(setDescription, e.target.value)}
-        />
-        <Input
-          id="fleet-target-version"
-          label="Target Version"
-          help="Collector version to deploy to this fleet"
-          placeholder="e.g., 1.2.0"
-          value={targetVersion}
-          onChange={(e) => handleChange(setTargetVersion, e.target.value)}
-        />
-        <ButtonGroup>
-          <Button bsStyle="default" onClick={handleReset} disabled={!isDirty || isLoading}>
-            Reset
-          </Button>
-          <Button bsStyle="primary" onClick={handleSave} disabled={!isDirty || !name || isLoading}>
-            Save Changes
-          </Button>
-        </ButtonGroup>
-      </Section>
+      <Formik<FormValues> initialValues={initialValues} onSubmit={handleSubmit} validate={validate} enableReinitialize>
+        {({ isSubmitting, isValidating, dirty, resetForm }) => (
+          <Section>
+            <SectionTitle>General Settings</SectionTitle>
+            <Form>
+              <FormikInput
+                id="fleet-name"
+                label="Fleet Name"
+                name="name"
+                required
+              />
+              <FormikInput
+                id="fleet-description"
+                type="textarea"
+                label="Description"
+                name="description"
+              />
+              <FormikInput
+                id="fleet-target-version"
+                label="Target Version"
+                name="target_version"
+                help="Collector version to deploy to this fleet"
+                placeholder="e.g., 1.2.0"
+              />
+              <FormSubmit
+                isAsyncSubmit
+                submitButtonText="Save changes"
+                submitLoadingText="Saving..."
+                isSubmitting={isSubmitting}
+                disabledSubmit={!dirty || isValidating}
+                onCancel={resetForm}
+                disabledCancel={!dirty || isSubmitting}
+              />
+            </Form>
+          </Section>
+        )}
+      </Formik>
 
       <Section>
         <SectionTitle>Fleet Information</SectionTitle>

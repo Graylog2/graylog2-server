@@ -100,14 +100,10 @@ const FleetDetail = ({ fleetId }: Props) => {
   const { data: sources } = useSources(fleetId);
   const {
     createSource,
-    isCreatingSource,
     updateSource,
-    isUpdatingSource,
     deleteSource,
     updateFleet,
-    isUpdatingFleet,
     deleteFleet,
-    isDeletingFleet,
   } = useCollectorsMutations();
   const [showSourceModal, setShowSourceModal] = useState(false);
   const [editingSource, setEditingSource] = useState<Source | null>(null);
@@ -210,10 +206,8 @@ const FleetDetail = ({ fleetId }: Props) => {
   const handleSaveSource = async (source: Omit<Source, 'id'>) => {
     if (editingSource) {
       await updateSource({ fleetId, sourceId: editingSource.id, updates: source as Omit<Source, 'id' | 'fleet_id'> });
-      setEditingSource(null);
     } else {
       await createSource({ fleetId, source: source as Omit<Source, 'id' | 'fleet_id'> });
-      setShowSourceModal(false);
     }
   };
 
@@ -289,7 +283,6 @@ const FleetDetail = ({ fleetId }: Props) => {
             // Fleet-specific queries were already removed by the mutation's onSuccess.
             queryClient.invalidateQueries({ queryKey: ['collectors'] });
           }}
-          isLoading={isUpdatingFleet || isDeletingFleet}
         />
       )}
 
@@ -298,7 +291,6 @@ const FleetDetail = ({ fleetId }: Props) => {
           fleetId={fleetId}
           onClose={() => setShowSourceModal(false)}
           onSave={handleSaveSource}
-          isLoading={isCreatingSource}
         />
       )}
 
@@ -308,7 +300,6 @@ const FleetDetail = ({ fleetId }: Props) => {
           source={editingSource}
           onClose={() => setEditingSource(null)}
           onSave={handleSaveSource}
-          isLoading={isUpdatingSource}
         />
       )}
 

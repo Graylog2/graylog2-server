@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
+import { Formik, Form } from 'formik';
 
 import { Modal } from 'components/bootstrap';
 import { Select, Spinner } from 'components/common';
@@ -31,10 +32,23 @@ type Props = {
   onSuccess?: () => void;
 };
 
+type FormValues = {
+  fleetId: string;
+};
+
+const validate = (values: FormValues) => {
+  const errors: Partial<Record<keyof FormValues, string>> = {};
+
+  if (!values.fleetId) {
+    errors.fleetId = 'Fleet is required';
+  }
+
+  return errors;
+};
+
 const ReassignFleetModal = ({ instanceUids, currentFleetId, onClose, onSuccess }: Props) => {
   const { data: fleets, isLoading: fleetsLoading } = useFleets();
-  const { reassignInstances, isReassigningInstances } = useCollectorsMutations();
-  const [selectedFleetId, setSelectedFleetId] = useState<string | undefined>(undefined);
+  const { reassignInstances } = useCollectorsMutations();
 
   const availableFleets = (fleets || []).filter((fleet: Fleet) => fleet.id !== currentFleetId);
 
@@ -43,48 +57,53 @@ const ReassignFleetModal = ({ instanceUids, currentFleetId, onClose, onSuccess }
     value: fleet.id,
   }));
 
-  const handleSubmit = useCallback(async () => {
-    if (!selectedFleetId) return;
-
-    await reassignInstances({ instanceUids, fleetId: selectedFleetId });
-    onSuccess?.();
-    onClose();
-  }, [selectedFleetId, instanceUids, reassignInstances, onSuccess, onClose]);
+  const handleSubmit = useCallback(
+    async (values: FormValues) => {
+      await reassignInstances({ instanceUids, fleetId: values.fleetId });
+      onSuccess?.();
+      onClose();
+    },
+    [instanceUids, reassignInstances, onSuccess, onClose],
+  );
 
   const instanceCount = instanceUids.length;
   const descriptor = instanceCount === 1 ? 'instance' : 'instances';
 
   return (
     <Modal onHide={onClose} show>
-      <Modal.Header showCloseButton>
-        <Modal.Title>
-          Reassign {instanceCount} {descriptor} to fleet
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        {fleetsLoading ? (
-          <Spinner />
-        ) : (
-          <Select
-            placeholder="Select a fleet..."
-            options={fleetOptions}
-            value={selectedFleetId}
-            onChange={(value: string) => setSelectedFleetId(value)}
-            clearable={false}
-          />
+      <Formik<FormValues> initialValues={{ fleetId: '' }} onSubmit={handleSubmit} validate={validate}>
+        {({ isSubmitting, isValidating, values, setFieldValue }) => (
+          <Form>
+            <Modal.Header showCloseButton>
+              <Modal.Title>
+                Reassign {instanceCount} {descriptor} to fleet
+              </Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              {fleetsLoading ? (
+                <Spinner />
+              ) : (
+                <Select
+                  placeholder="Select a fleet..."
+                  options={fleetOptions}
+                  value={values.fleetId}
+                  onChange={(value: string) => setFieldValue('fleetId', value)}
+                  clearable={false}
+                />
+              )}
+            </Modal.Body>
+            <Modal.Footer>
+              <ModalSubmit
+                submitButtonText={`Reassign ${descriptor}`}
+                submitLoadingText="Reassigning..."
+                onCancel={onClose}
+                disabledSubmit={!values.fleetId || isValidating}
+                isSubmitting={isSubmitting}
+              />
+            </Modal.Footer>
+          </Form>
         )}
-      </Modal.Body>
-      <Modal.Footer>
-        <ModalSubmit
-          isAsyncSubmit
-          submitButtonText={`Reassign ${descriptor}`}
-          submitLoadingText="Reassigning..."
-          onCancel={onClose}
-          onSubmit={handleSubmit}
-          disabledSubmit={!selectedFleetId}
-          isSubmitting={isReassigningInstances}
-        />
-      </Modal.Footer>
+      </Formik>
     </Modal>
   );
 };

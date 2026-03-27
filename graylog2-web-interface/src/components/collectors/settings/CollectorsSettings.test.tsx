@@ -70,12 +70,12 @@ describe('CollectorsSettings', () => {
     }));
     asMock(useInput).mockReturnValue({
       data: { id: 'input-1' },
-    } as unknown as ReturnType<typeof useInput>);
+    } as ReturnType<typeof useInput>);
     asMock(useInputsStates).mockReturnValue({
       data: {},
       refetch: jest.fn(),
       isLoading: false,
-    } as unknown as ReturnType<typeof useInputsStates>);
+    });
     updateConfig.mockResolvedValue(undefined);
   });
 
