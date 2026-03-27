@@ -15,12 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import isEqual from 'lodash/isEqual';
-import React, { useReducer, useCallback, useMemo } from 'react';
+import React, { useReducer, useCallback, useMemo, useRef } from 'react';
 
 import RightSidebarContext from 'contexts/RightSidebarContext';
 import type { RightSidebarContent } from 'contexts/RightSidebarContext';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import type {TelemetryEventType} from 'logic/telemetry/TelemetryContext';
 
 type Props = {
   children: React.ReactNode;
@@ -184,32 +185,30 @@ const RightSidebarProvider = ({ children }: Props) => {
   const content = state.currentIndex >= 0 ? state.contentHistory[state.currentIndex] : null;
   const canGoBack = state.currentIndex > 0;
   const canGoForward = state.currentIndex < state.contentHistory.length - 1;
+  const stateRef = useRef(state);
+  // eslint-disable-next-line react-hooks/refs -- idempotent write; keeps callbacks stable while reading latest state for telemetry
+  stateRef.current = state;
 
   const sendSidebarTelemetry = useCallback(
-    (eventType: string, eventDetails?: Record<string, unknown>) => {
+    (eventType: TelemetryEventType, component?: any) => {
+      const customComponent = component ? component : stateRef.current.contentHistory[stateRef.current.currentIndex];
       sendTelemetry(eventType, {
         app_section: 'right-sidebar',
-        ...(eventDetails ? { event_details: eventDetails } : {}),
+        event_details: { content_id: customComponent?.id, component_key: customComponent?.componentKey }
       });
     },
     [sendTelemetry],
   );
 
   const openSidebar = useCallback(<T = Record<string, unknown>,>(newContent: RightSidebarContent<T>) => {
-    sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.OPENED, {
-      content_id: newContent.id, component_key: newContent.componentKey,
-    });
+    sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.OPENED, newContent);
     dispatch({ type: 'OPEN_SIDEBAR', content: newContent as RightSidebarContent<any> });
   }, [sendSidebarTelemetry]);
 
-  // `content` in the dependency array means closeSidebar's identity changes on every navigation.
-  // This is acceptable because closeSidebar is only used in click handlers, not in effects or memo deps.
   const closeSidebar = useCallback(() => {
-    sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.CLOSED, {
-      content_id: content?.id, component_key: content?.componentKey,
-    });
+    sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.CLOSED);
     dispatch({ type: 'CLOSE_SIDEBAR' });
-  }, [sendSidebarTelemetry, content]);
+  }, [sendSidebarTelemetry]);
 
   const collapseSidebar = useCallback(() => {
     sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.COLLAPSED);
@@ -230,12 +229,14 @@ const RightSidebarProvider = ({ children }: Props) => {
   }, []);
 
   const goBack = useCallback(() => {
-    sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.NAVIGATED_BACK);
+    const target = stateRef.current.contentHistory[stateRef.current.currentIndex - 1];
+    sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.NAVIGATED_BACK, target);
     dispatch({ type: 'GO_BACK' });
   }, [sendSidebarTelemetry]);
 
   const goForward = useCallback(() => {
-    sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.NAVIGATED_FORWARD);
+    const target = stateRef.current.contentHistory[stateRef.current.currentIndex + 1];
+    sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.NAVIGATED_FORWARD, target);
     dispatch({ type: 'GO_FORWARD' });
   }, [sendSidebarTelemetry]);
 

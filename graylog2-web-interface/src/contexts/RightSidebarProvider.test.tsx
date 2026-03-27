@@ -585,11 +585,14 @@ describe('RightSidebarProvider', () => {
 
       expect(mockSendTelemetry).toHaveBeenCalledWith(
         TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.COLLAPSED,
-        expect.objectContaining({ app_section: 'right-sidebar' }),
+        expect.objectContaining({
+          app_section: 'right-sidebar',
+          event_details: { content_id: 'test-sidebar', component_key: undefined },
+        }),
       );
     });
 
-    it('sends EXPANDED event when expanding sidebar', async () => {
+    it('sends EXPANDED event with content_id when expanding sidebar', async () => {
       render(
         <RightSidebarProvider>
           <TestConsumer />
@@ -604,11 +607,14 @@ describe('RightSidebarProvider', () => {
 
       expect(mockSendTelemetry).toHaveBeenCalledWith(
         TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.EXPANDED,
-        expect.objectContaining({ app_section: 'right-sidebar' }),
+        expect.objectContaining({
+          app_section: 'right-sidebar',
+          event_details: { content_id: 'test-sidebar', component_key: undefined },
+        }),
       );
     });
 
-    it('sends NAVIGATED_BACK event when going back', async () => {
+    it('sends NAVIGATED_BACK event with target content_id when going back', async () => {
       render(
         <RightSidebarProvider>
           <TestConsumer />
@@ -623,11 +629,14 @@ describe('RightSidebarProvider', () => {
 
       expect(mockSendTelemetry).toHaveBeenCalledWith(
         TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.NAVIGATED_BACK,
-        expect.objectContaining({ app_section: 'right-sidebar' }),
+        expect.objectContaining({
+          app_section: 'right-sidebar',
+          event_details: { content_id: 'test-sidebar', component_key: undefined },
+        }),
       );
     });
 
-    it('sends NAVIGATED_FORWARD event when going forward', async () => {
+    it('sends NAVIGATED_FORWARD event with target content_id when going forward', async () => {
       render(
         <RightSidebarProvider>
           <TestConsumer />
@@ -643,7 +652,10 @@ describe('RightSidebarProvider', () => {
 
       expect(mockSendTelemetry).toHaveBeenCalledWith(
         TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.NAVIGATED_FORWARD,
-        expect.objectContaining({ app_section: 'right-sidebar' }),
+        expect.objectContaining({
+          app_section: 'right-sidebar',
+          event_details: { content_id: 'test-sidebar-2', component_key: undefined },
+        }),
       );
     });
   });
