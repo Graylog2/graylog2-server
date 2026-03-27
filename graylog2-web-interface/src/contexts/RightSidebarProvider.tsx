@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import isEqual from 'lodash/isEqual';
-import React, { useReducer, useCallback, useMemo, useRef } from 'react';
+import React, { useReducer, useCallback, useMemo } from 'react';
 
 import RightSidebarContext from 'contexts/RightSidebarContext';
 import type { RightSidebarContent } from 'contexts/RightSidebarContext';
@@ -185,23 +185,21 @@ const RightSidebarProvider = ({ children }: Props) => {
   const content = state.currentIndex >= 0 ? state.contentHistory[state.currentIndex] : null;
   const canGoBack = state.currentIndex > 0;
   const canGoForward = state.currentIndex < state.contentHistory.length - 1;
-  const stateRef = useRef(state);
-  // eslint-disable-next-line react-hooks/refs -- idempotent write; keeps callbacks stable while reading latest state for telemetry
-  stateRef.current = state;
 
   const sendSidebarTelemetry = useCallback(
-    (eventType: TelemetryEventType, component?: any) => {
-      const customComponent = component ? component : stateRef.current.contentHistory[stateRef.current.currentIndex];
+    (eventType: TelemetryEventType, eventDetails?: Record<string, unknown>) => {
       sendTelemetry(eventType, {
         app_section: 'right-sidebar',
-        event_details: { content_id: customComponent?.id, component_key: customComponent?.componentKey }
+        ...(eventDetails ? { event_details: eventDetails } : {}),
       });
     },
     [sendTelemetry],
   );
 
   const openSidebar = useCallback(<T = Record<string, unknown>,>(newContent: RightSidebarContent<T>) => {
-    sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.OPENED, newContent);
+    sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.OPENED, {
+      content_id: newContent.id, component_key: newContent.componentKey,
+    });
     dispatch({ type: 'OPEN_SIDEBAR', content: newContent as RightSidebarContent<any> });
   }, [sendSidebarTelemetry]);
 
@@ -229,14 +227,12 @@ const RightSidebarProvider = ({ children }: Props) => {
   }, []);
 
   const goBack = useCallback(() => {
-    const target = stateRef.current.contentHistory[stateRef.current.currentIndex - 1];
-    sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.NAVIGATED_BACK, target);
+    sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.NAVIGATED_BACK);
     dispatch({ type: 'GO_BACK' });
   }, [sendSidebarTelemetry]);
 
   const goForward = useCallback(() => {
-    const target = stateRef.current.contentHistory[stateRef.current.currentIndex + 1];
-    sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.NAVIGATED_FORWARD, target);
+    sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.NAVIGATED_FORWARD);
     dispatch({ type: 'GO_FORWARD' });
   }, [sendSidebarTelemetry]);
 
