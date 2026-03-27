@@ -82,6 +82,7 @@ Please read and understand the [Code of Conduct](https://github.com/Graylog2/gra
 - Use the default wrappers provided by `wrappedTestingLibrary` and `wrappedTestingLibrary/hooks`. Do not manually add providers that are already included there, such as `DefaultQueryClientProvider`, unless the test needs a specific override or custom setup.
 - Write unit tests for every use case of new functionality.
 - Test from the user's perspective — do not rely on internal implementation details.
+- Prefer `await screen.findBy...` directly over wrapping it in `expect(...).toBeInTheDocument()`. `findBy` already fails if the element is not present.
 - **No snapshot tests** for component state. Use Testing Library queries (`getByText`, etc.) instead. Snapshot tests are acceptable for verifying complex function return values.
 - When mocking API communication in tests, do not mock `@tanstack/react-query` directly. Mock the abstraction on top of it instead, which is usually a dedicated hook.
 - If a `react-query` hook currently lives inside a component and the test needs to mock it, move that hook into a separate file so it can be mocked cleanly.
