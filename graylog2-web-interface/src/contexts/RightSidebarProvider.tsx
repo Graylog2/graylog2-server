@@ -19,6 +19,9 @@ import React, { useReducer, useCallback, useMemo } from 'react';
 
 import RightSidebarContext from 'contexts/RightSidebarContext';
 import type { RightSidebarContent } from 'contexts/RightSidebarContext';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import type {TelemetryEventType} from 'logic/telemetry/TelemetryContext';
 
 type Props = {
   children: React.ReactNode;
@@ -177,26 +180,43 @@ const historyReducer = (state: HistoryState, action: HistoryAction): HistoryStat
 
 const RightSidebarProvider = ({ children }: Props) => {
   const [state, dispatch] = useReducer(historyReducer, initialState);
+  const sendTelemetry = useSendTelemetry();
 
   const content = state.currentIndex >= 0 ? state.contentHistory[state.currentIndex] : null;
   const canGoBack = state.currentIndex > 0;
   const canGoForward = state.currentIndex < state.contentHistory.length - 1;
 
+  const sendSidebarTelemetry = useCallback(
+    (eventType: TelemetryEventType, eventDetails?: Record<string, unknown>) => {
+      sendTelemetry(eventType, {
+        app_section: 'right-sidebar',
+        ...(eventDetails ? { event_details: eventDetails } : {}),
+      });
+    },
+    [sendTelemetry],
+  );
+
   const openSidebar = useCallback(<T = Record<string, unknown>,>(newContent: RightSidebarContent<T>) => {
+    sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.OPENED, {
+      content_id: newContent.id, component_key: newContent.componentKey,
+    });
     dispatch({ type: 'OPEN_SIDEBAR', content: newContent as RightSidebarContent<any> });
-  }, []);
+  }, [sendSidebarTelemetry]);
 
   const closeSidebar = useCallback(() => {
+    sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.CLOSED);
     dispatch({ type: 'CLOSE_SIDEBAR' });
-  }, []);
+  }, [sendSidebarTelemetry]);
 
   const collapseSidebar = useCallback(() => {
+    sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.COLLAPSED);
     dispatch({ type: 'COLLAPSE_SIDEBAR' });
-  }, []);
+  }, [sendSidebarTelemetry]);
 
   const expandSidebar = useCallback(() => {
+    sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.EXPANDED);
     dispatch({ type: 'EXPAND_SIDEBAR' });
-  }, []);
+  }, [sendSidebarTelemetry]);
 
   const updateContent = useCallback(<T = Record<string, unknown>,>(newContent: RightSidebarContent<T>) => {
     dispatch({ type: 'UPDATE_CONTENT', content: newContent as RightSidebarContent<any> });
@@ -207,12 +227,14 @@ const RightSidebarProvider = ({ children }: Props) => {
   }, []);
 
   const goBack = useCallback(() => {
+    sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.NAVIGATED_BACK);
     dispatch({ type: 'GO_BACK' });
-  }, []);
+  }, [sendSidebarTelemetry]);
 
   const goForward = useCallback(() => {
+    sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.NAVIGATED_FORWARD);
     dispatch({ type: 'GO_FORWARD' });
-  }, []);
+  }, [sendSidebarTelemetry]);
 
   const contextValue = useMemo(
     () => ({
