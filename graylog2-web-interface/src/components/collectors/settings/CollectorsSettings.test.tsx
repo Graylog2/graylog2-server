@@ -100,7 +100,7 @@ describe('CollectorsSettings', () => {
     await user.type(hostnameInput, 'ingest.example.com');
     await user.clear(portInput);
     await user.type(portInput, '14411');
-    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await user.click(screen.getByRole('button', { name: /Update settings/i }));
 
     await waitFor(() =>
       expect(updateConfig).toHaveBeenCalledWith({
