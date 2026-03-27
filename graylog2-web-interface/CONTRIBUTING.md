@@ -41,6 +41,7 @@ Please read and understand the [Code of Conduct](https://github.com/Graylog2/gra
 ### Reusing Components
 
 - We wrap react-bootstrap components in our own wrappers, importable from `components/graylog`. Always use these wrappers instead of importing react-bootstrap directly.
+- For common UI patterns, prefer existing shared UI components from `components/graylog` and `components/common` before introducing native HTML elements.
 - Check the [frontend documentation](https://graylog2.github.io/frontend-documentation) for available common components before creating new ones.
 
 ## Type Definitions
@@ -87,6 +88,12 @@ Please read and understand the [Code of Conduct](https://github.com/Graylog2/gra
 
 - Prefer replacing with `react-query` (API caching) or `useState`/`useContext` (state).
 - If migration isn't possible yet, access via `useStore`.
+
+## Common Libraries
+
+- For server state and API communication, use `@tanstack/react-query`, preferably behind dedicated hooks instead of calling `useQuery` or `useMutation` directly in many components.
+- For forms, use `formik` and prefer existing Formik-based helpers and components when they fit.
+- For component styling, use `styled-components` and prefer theme tokens over hard-coded values.
 
 ## Testing
 
