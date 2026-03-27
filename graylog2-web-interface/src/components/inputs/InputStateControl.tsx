@@ -18,8 +18,8 @@ import * as React from 'react';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { isInputRunning, isInputInSetupMode } from 'components/inputs/helpers/inputState';
+import useInputStateMutations from 'hooks/useInputsStateMutations';
 import useFeature from 'hooks/useFeature';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
@@ -47,6 +47,7 @@ const InputStateControl = ({ input, openWizard, inputStates }: Props) => {
   const { pathname } = useLocation();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
+  const { startInput: startInputMutation, stopInput: stopInputMutation } = useInputStateMutations(input as any);
 
   const startInput = () => {
     setIsLoading(true);
@@ -56,7 +57,7 @@ const InputStateControl = ({ input, openWizard, inputStates }: Props) => {
       app_action_value: 'start-input',
     });
 
-    InputStatesStore.start(input).finally(() => {
+    startInputMutation({ inputId: input.id }).finally(() => {
       setIsLoading(false);
     });
   };
@@ -69,7 +70,7 @@ const InputStateControl = ({ input, openWizard, inputStates }: Props) => {
       app_action_value: 'stop-input',
     });
 
-    InputStatesStore.stop(input).finally(() => {
+    stopInputMutation({ inputId: input.id }).finally(() => {
       setIsLoading(false);
     });
   };
