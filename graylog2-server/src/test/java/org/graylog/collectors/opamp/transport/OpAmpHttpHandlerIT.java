@@ -16,7 +16,6 @@
  */
 package org.graylog.collectors.opamp.transport;
 
-import com.github.joschi.jadconfig.util.Size;
 import com.google.protobuf.ByteString;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -29,6 +28,8 @@ import opamp.proto.Opamp.ServerErrorResponse;
 import opamp.proto.Opamp.ServerErrorResponseType;
 import opamp.proto.Opamp.ServerToAgent;
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.graylog.collectors.CollectorsConfig;
+import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.db.EnrollmentTokenCreator;
 import org.graylog.collectors.db.EnrollmentTokenDTO;
 import org.graylog.collectors.opamp.OpAmpConstants;
@@ -47,6 +48,7 @@ import java.util.concurrent.Executors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -54,6 +56,9 @@ class OpAmpHttpHandlerIT {
 
     private static final MediaType PROTOBUF = MediaType.parse("application/x-protobuf");
     private static final int TEST_MAX_MESSAGE_SIZE = 1024; // 1 KB for tests
+    public static final CollectorsConfig TEST_COLLECTORS_CONFIG = CollectorsConfig.createDefaultBuilder("localhost")
+            .opampMaxRequestBodySizeBytes(TEST_MAX_MESSAGE_SIZE)
+            .build();
     private static final EnrollmentTokenDTO TEST_TOKEN_DTO = new EnrollmentTokenDTO(
             "token-id", "test-token", "jti-1", "kid-1", "test-fleet",
             new EnrollmentTokenCreator("user-id", "admin"), Instant.now(), null, 0, null);
@@ -69,14 +74,15 @@ class OpAmpHttpHandlerIT {
         httpServer = HttpServer.createSimpleServer(null, port);
 
         opAmpService = mock(OpAmpService.class);
+        final var collectorsConfigService = mock(CollectorsConfigService.class);
+        lenient().when(collectorsConfigService.getOpampMaxRequestBodySizeBytes()).thenReturn(TEST_COLLECTORS_CONFIG.opampMaxRequestBodySizeBytes());
         final var executor = Executors.newVirtualThreadPerTaskExecutor();
 
         // Register auth filter via addon (handles auth for HTTP requests too)
         final var listener = httpServer.getListener("grizzly");
         listener.registerAddOn(new OpAmpAddOn(new OpAmpWebSocketAuthFilter(opAmpService, executor)));
 
-        final OpAmpHttpHandler handler = new OpAmpHttpHandler(opAmpService, executor,
-                Size.bytes(TEST_MAX_MESSAGE_SIZE));
+        final OpAmpHttpHandler handler = new OpAmpHttpHandler(opAmpService, collectorsConfigService, executor);
         httpServer.getServerConfiguration().addHttpHandler(handler, OpAmpConstants.PATH);
 
         httpServer.start();

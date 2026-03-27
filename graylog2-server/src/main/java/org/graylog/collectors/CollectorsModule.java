@@ -39,6 +39,7 @@ import org.graylog.collectors.input.processor.LogRecordProcessor;
 import org.graylog.collectors.input.processor.WindowsEventLogRecordProcessor;
 import org.graylog.collectors.input.transport.CollectorIngestHttpTransport;
 import org.graylog.collectors.migrations.V20260303120000_CollectorDEVMigrations;
+import org.graylog.collectors.opamp.OpAmpModule;
 import org.graylog.collectors.periodical.CollectorCaRenewalPeriodical;
 import org.graylog.collectors.periodical.PurgeExpiredCollectorInstancesPeriodical;
 import org.graylog.collectors.rest.CollectorInstancesResource;
@@ -62,6 +63,8 @@ public class CollectorsModule extends PluginModule {
 
     @Override
     protected void configure() {
+        install(new OpAmpModule());
+
         // Fleet transaction log
         Multibinder.newSetBinder(binder(), String.class, SequenceTopics.class)
                 .addBinding().toInstance("fleet_txn_log");

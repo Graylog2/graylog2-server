@@ -16,10 +16,8 @@
  */
 package org.graylog.collectors.opamp.transport;
 
-import com.github.joschi.jadconfig.util.Size;
 import com.google.protobuf.InvalidProtocolBufferException;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import opamp.proto.Opamp.AgentToServer;
 import opamp.proto.Opamp.ServerErrorResponse;
@@ -30,6 +28,7 @@ import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.util.HttpStatus;
+import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.opamp.OpAmpExecutor;
 import org.graylog.collectors.opamp.OpAmpService;
 import org.slf4j.Logger;
@@ -38,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
+import java.util.function.Supplier;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -48,14 +48,14 @@ public class OpAmpHttpHandler extends HttpHandler {
 
     private final OpAmpService opAmpService;
     private final ExecutorService executor;
-    private final int maxMessageSize;
+    private final Supplier<Integer> maxMessageSizeSupplier;
 
     @Inject
     public OpAmpHttpHandler(OpAmpService opAmpService,
-                            @OpAmpExecutor ExecutorService executor,
-                            @Named("opamp_max_request_body_size") Size maxRequestBodySize) {
+                            CollectorsConfigService collectorsConfigService,
+                            @OpAmpExecutor ExecutorService executor) {
         this.opAmpService = opAmpService;
-        this.maxMessageSize = (int) maxRequestBodySize.toBytes();
+        this.maxMessageSizeSupplier = collectorsConfigService::getOpampMaxRequestBodySizeBytes;
         this.executor = executor;
     }
 
@@ -86,6 +86,7 @@ public class OpAmpHttpHandler extends HttpHandler {
             return;
         }
 
+        final int maxMessageSize = maxMessageSizeSupplier.get();
         final int contentLength = request.getContentLength();
         if (contentLength > maxMessageSize) {
             LOG.warn("OpAMP request Content-Length {} exceeds maximum {}", contentLength, maxMessageSize);
