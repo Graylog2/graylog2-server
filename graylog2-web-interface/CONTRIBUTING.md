@@ -79,6 +79,7 @@ Please read and understand the [Code of Conduct](https://github.com/Graylog2/gra
 - **Framework**: Jest + [Testing Library](https://testing-library.com/).
 - Follow Testing Library's [Guiding Principles](https://testing-library.com/docs/guiding-principles) and their guide for [picking a good query](https://testing-library.com/docs/queries/about#priority).
 - Import `render` from `wrappedTestingLibrary`, not directly from `@testing-library/react`.
+- Use the default wrappers provided by `wrappedTestingLibrary` and `wrappedTestingLibrary/hooks`. Do not manually add providers that are already included there, such as `DefaultQueryClientProvider`, unless the test needs a specific override or custom setup.
 - Write unit tests for every use case of new functionality.
 - Test from the user's perspective — do not rely on internal implementation details.
 - **No snapshot tests** for component state. Use Testing Library queries (`getByText`, etc.) instead. Snapshot tests are acceptable for verifying complex function return values.
