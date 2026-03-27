@@ -18,6 +18,8 @@ package org.graylog.plugins.pipelineprocessor;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
+import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
+import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbRuleService;
 import org.graylog.plugins.pipelineprocessor.functions.ProcessorFunctionsModule;
@@ -66,6 +68,8 @@ public class PipelineProcessorModule extends PluginModule {
                 PipelineMetadataUpdateJob.Config.class);
 
         addAuditEventTypes(PipelineProcessorAuditEventTypes.class);
+
+        addDbEntities(RuleDao.class, PipelineDao.class);
 
         addQuickJumpProvider(QuickJumpProvider.create("pipeline", MongoDbPipelineService.COLLECTION,
                 (id, user) -> user.isPermitted(PipelineRestPermissions.PIPELINE_READ, id)));
