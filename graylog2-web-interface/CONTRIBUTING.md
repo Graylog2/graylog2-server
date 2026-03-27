@@ -55,6 +55,10 @@ Please read and understand the [Code of Conduct](https://github.com/Graylog2/gra
 
 ### Type Safety
 
+- Prefer TypeScript's type inference over unnecessary explicit type annotations. Add explicit types when they improve clarity or are required, not by default.
+- Avoid redundant function type annotations when the expected type is already inferred from usage, such as callbacks passed to typed component props.
+- Avoid explicit function return types when TypeScript can infer them clearly.
+- Exception: for exported hooks that wrap `react-query`, prefer explicitly typing the hook's public return shape to the fields our code actually uses instead of exposing the full `useQuery` result type. This makes the contract clearer and keeps tests easier to mock.
 - Prefix unused parameters with an underscore and a meaningful name (e.g., `_eventType`), not just `_`. See [this discussion](https://github.com/Graylog2/graylog2-server/pull/12176#pullrequestreview-940555887).
 - `types.d.ts` can hide errors like missing imports. Temporarily rename to `types.ts` to detect them.
 - Do not leave out types for function arguments (therefore being implicitly `any`), use proper types.
