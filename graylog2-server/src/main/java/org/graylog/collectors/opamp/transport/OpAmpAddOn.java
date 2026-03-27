@@ -26,7 +26,7 @@ import java.util.Objects;
 
 /**
  * Custom AddOn that enables WebSocket support and positions the auth filter in the
- * filter chain. The auth filter handles authentication for both HTTP and WebSocket
+ * filter chain. The auth filter handles authentication for WebSocket
  * requests to the OpAMP endpoint.
  */
 public class OpAmpAddOn implements AddOn {
