@@ -94,6 +94,30 @@ public class StageIteratorTest {
         assertEquals(10, Iterables.getOnlyElement(stages[1]).stage(), "last set of stages are on stage 1");
     }
 
+    @Test
+    public void iteratorVisitsOnlyExistingStageNumbers() {
+        final ImmutableSet<Pipeline> pipelines = ImmutableSet.of(
+                Pipeline.builder()
+                        .name("disparate")
+                        .stages(of(Stage.builder()
+                                        .stage(0)
+                                        .match(Stage.Match.ALL)
+                                        .ruleReferences(Collections.emptyList())
+                                        .build(),
+                                Stage.builder()
+                                        .stage(Integer.MAX_VALUE)
+                                        .match(Stage.Match.ALL)
+                                        .ruleReferences(Collections.emptyList())
+                                        .build()))
+                        .build());
+
+        final StageIterator iterator = new StageIterator(pipelines);
+        final List<List<Stage>> slices = Lists.newArrayList(iterator);
+
+        assertEquals(2, slices.size(), "Iterator should only visit actual stage numbers");
+        assertEquals(0, Iterables.getOnlyElement(slices.get(0)).stage());
+        assertEquals(Integer.MAX_VALUE, Iterables.getOnlyElement(slices.get(1)).stage());
+    }
 
     @Test
     public void multiplePipelines() {
@@ -158,5 +182,63 @@ public class StageIteratorTest {
         assertArrayEquals(new int[] {-1, 0, 4, 10, 11},
                           stageSets.stream().flatMap(Collection::stream).mapToInt(Stage::stage).distinct().toArray(),
                           "Stages must be sorted numerically");
+    }
+
+    @Test
+    public void configurationOnlyProducesActualStagesToIterate() {
+        final Stage stageMinusOne = Stage.builder()
+                .stage(-1)
+                .match(Stage.Match.ALL)
+                .ruleReferences(Collections.emptyList())
+                .build();
+        final Stage stageZeroA = Stage.builder()
+                .stage(0)
+                .match(Stage.Match.ALL)
+                .ruleReferences(Collections.emptyList())
+                .build();
+        final Stage stageZeroB = Stage.builder()
+                .stage(0)
+                .match(Stage.Match.ALL)
+                .ruleReferences(Collections.emptyList())
+                .build();
+        final Stage stageFive = Stage.builder()
+                .stage(5)
+                .match(Stage.Match.ALL)
+                .ruleReferences(Collections.emptyList())
+                .build();
+
+        final ImmutableSet<Pipeline> pipelines = ImmutableSet.of(
+                Pipeline.builder().name("p1").stages(of(stageMinusOne, stageZeroA)).build(),
+                Pipeline.builder().name("p2").stages(of(stageZeroB, stageFive)).build()
+        );
+
+        final StageIterator.Configuration configuration = new StageIterator.Configuration(pipelines);
+        final List<List<Stage>> slices = Lists.newArrayList(configuration.stageSlicesIterator());
+
+        assertEquals(3, slices.size());
+        assertEquals(Lists.newArrayList(stageMinusOne), slices.get(0));
+        assertEquals(Lists.newArrayList(stageZeroA, stageZeroB), slices.get(1));
+        assertEquals(Lists.newArrayList(stageFive), slices.get(2));
+    }
+
+    @Test
+    public void configurationIteratorSkipsEmptyPipelines() {
+        final ImmutableSet<Pipeline> pipelines = ImmutableSet.of(
+                Pipeline.empty("empty"),
+                Pipeline.builder()
+                        .name("nonempty")
+                        .stages(of(Stage.builder()
+                                .stage(3)
+                                .match(Stage.Match.ALL)
+                                .ruleReferences(Collections.emptyList())
+                                .build()))
+                        .build()
+        );
+
+        final StageIterator.Configuration configuration = new StageIterator.Configuration(pipelines);
+        final List<List<Stage>> slices = Lists.newArrayList(configuration.stageSlicesIterator());
+
+        assertEquals(1, slices.size());
+        assertEquals(3, Iterables.getOnlyElement(slices.get(0)).stage());
     }
 }
