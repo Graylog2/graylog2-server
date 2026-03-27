@@ -160,11 +160,11 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
 
         extraFilters.forEach((field, values) -> {
             values.stream()
-                    .filter(MoreSearchAdapterOS::isRangeValue)
+                    .filter(MoreSearchAdapter::isRangeValue)
                     .map(value -> buildExtraFilter(field, value))
                     .forEach(boolQuery::filter);
             final var termQueries = values.stream()
-                    .filter(v -> !isRangeValue(v))
+                    .filter(v -> !MoreSearchAdapter.isRangeValue(v))
                     .map(value -> buildExtraFilter(field, value))
                     .toList();
             if (!termQueries.isEmpty()) {
@@ -280,10 +280,6 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
         });
 
         return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(events, alerts));
-    }
-
-    static boolean isRangeValue(String value) {
-        return value.startsWith("<=") || value.startsWith(">=") || value.startsWith("<") || value.startsWith(">");
     }
 
     static Query buildExtraFilter(String field, String value) {

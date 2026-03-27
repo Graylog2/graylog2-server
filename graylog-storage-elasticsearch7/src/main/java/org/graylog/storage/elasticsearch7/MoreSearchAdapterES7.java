@@ -52,7 +52,6 @@ import org.graylog2.indexer.results.ResultChunk;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.indexer.searches.Sorting;
-import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -222,11 +221,11 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
 
         extraFilters.forEach((field, values) -> {
             values.stream()
-                    .filter(MoreSearchAdapterES7::isRangeValue)
+                    .filter(MoreSearchAdapter::isRangeValue)
                     .map(value -> buildExtraFilter(field, value))
-                    .forEach(q -> filter.filter(q));
+                    .forEach(filter::filter);
             final var termQueries = values.stream()
-                    .filter(v -> !isRangeValue(v))
+                    .filter(v -> !MoreSearchAdapter.isRangeValue(v))
                     .map(value -> buildExtraFilter(field, value))
                     .toList();
             if (!termQueries.isEmpty()) {
@@ -247,10 +246,6 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
         }
 
         return filter;
-    }
-
-    static boolean isRangeValue(String value) {
-        return value.startsWith("<=") || value.startsWith(">=") || value.startsWith("<") || value.startsWith(">");
     }
 
     static QueryBuilder buildExtraFilter(String field, String value) {

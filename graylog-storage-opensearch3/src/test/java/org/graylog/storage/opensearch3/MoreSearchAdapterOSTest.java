@@ -18,6 +18,7 @@ package org.graylog.storage.opensearch3;
 
 import org.assertj.core.api.Assertions;
 import org.graylog.events.event.EventDto;
+import org.graylog.events.search.MoreSearchAdapter;
  import org.graylog2.indexer.searches.Sorting;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,14 +48,14 @@ class MoreSearchAdapterOSTest {
 
     @Test
     void testIsRangeValue() {
-        assertThat(MoreSearchAdapterOS.isRangeValue("<=100")).isTrue();
-        assertThat(MoreSearchAdapterOS.isRangeValue(">=100")).isTrue();
-        assertThat(MoreSearchAdapterOS.isRangeValue("<100")).isTrue();
-        assertThat(MoreSearchAdapterOS.isRangeValue(">100")).isTrue();
-        assertThat(MoreSearchAdapterOS.isRangeValue("sigma")).isFalse();
-        assertThat(MoreSearchAdapterOS.isRangeValue("aggregation")).isFalse();
-        assertThat(MoreSearchAdapterOS.isRangeValue("100")).isFalse();
-        assertThat(MoreSearchAdapterOS.isRangeValue("")).isFalse();
+        assertThat(MoreSearchAdapter.isRangeValue("<=100")).isTrue();
+        assertThat(MoreSearchAdapter.isRangeValue(">=100")).isTrue();
+        assertThat(MoreSearchAdapter.isRangeValue("<100")).isTrue();
+        assertThat(MoreSearchAdapter.isRangeValue(">100")).isTrue();
+        assertThat(MoreSearchAdapter.isRangeValue("sigma")).isFalse();
+        assertThat(MoreSearchAdapter.isRangeValue("aggregation")).isFalse();
+        assertThat(MoreSearchAdapter.isRangeValue("100")).isFalse();
+        assertThat(MoreSearchAdapter.isRangeValue("")).isFalse();
     }
 
     @Test

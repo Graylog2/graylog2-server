@@ -23,25 +23,11 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.RangeQuer
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MoreSearchAdapterES7Test {
     private static final String FIELD = "field";
     private static final String VALUE = "100";
-
-    @Test
-    void testIsRangeValue() {
-        assertTrue(MoreSearchAdapterES7.isRangeValue("<=100"));
-        assertTrue(MoreSearchAdapterES7.isRangeValue(">=100"));
-        assertTrue(MoreSearchAdapterES7.isRangeValue("<100"));
-        assertTrue(MoreSearchAdapterES7.isRangeValue(">100"));
-        assertFalse(MoreSearchAdapterES7.isRangeValue("sigma"));
-        assertFalse(MoreSearchAdapterES7.isRangeValue("aggregation"));
-        assertFalse(MoreSearchAdapterES7.isRangeValue("100"));
-        assertFalse(MoreSearchAdapterES7.isRangeValue(""));
-    }
 
     @Test
     void testBuildExtraFilter() {

@@ -23,25 +23,11 @@ import org.graylog.shaded.opensearch2.org.opensearch.index.query.RangeQueryBuild
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MoreSearchAdapterOS2Test {
     private static final String FIELD = "field";
     private static final String VALUE = "100";
-
-    @Test
-    void testIsRangeValue() {
-        assertTrue(MoreSearchAdapterOS2.isRangeValue("<=100"));
-        assertTrue(MoreSearchAdapterOS2.isRangeValue(">=100"));
-        assertTrue(MoreSearchAdapterOS2.isRangeValue("<100"));
-        assertTrue(MoreSearchAdapterOS2.isRangeValue(">100"));
-        assertFalse(MoreSearchAdapterOS2.isRangeValue("sigma"));
-        assertFalse(MoreSearchAdapterOS2.isRangeValue("aggregation"));
-        assertFalse(MoreSearchAdapterOS2.isRangeValue("100"));
-        assertFalse(MoreSearchAdapterOS2.isRangeValue(""));
-    }
 
     @Test
     void testBuildExtraFilter() {
