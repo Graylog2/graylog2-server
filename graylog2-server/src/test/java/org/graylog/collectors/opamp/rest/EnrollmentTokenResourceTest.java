@@ -89,6 +89,7 @@ class EnrollmentTokenResourceTest {
                 Duration.ofDays(1)
         );
         final var expectedResponse = new EnrollmentTokenResponse(
+                "1",
                 "test-token",
                 Instant.now().plusSeconds(86400)
         );
