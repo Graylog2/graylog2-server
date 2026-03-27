@@ -434,5 +434,13 @@ export const TELEMETRY_EVENT_TYPE = {
     FLEET_NEW_OPENED: 'Fleet Create Opened',
     FLEET_NEW_CANCELLED: 'Fleet Create Cancelled',
     FLEET_CREATED: 'Fleet Created',
-  }
+  },
+  RIGHT_SIDEBAR: {
+    OPENED: 'Right Sidebar Opened',
+    CLOSED: 'Right Sidebar Closed',
+    COLLAPSED: 'Right Sidebar Collapsed',
+    EXPANDED: 'Right Sidebar Expanded',
+    NAVIGATED_BACK: 'Right Sidebar Navigated Back',
+    NAVIGATED_FORWARD: 'Right Sidebar Navigated Forward',
+  },
 } as const;
