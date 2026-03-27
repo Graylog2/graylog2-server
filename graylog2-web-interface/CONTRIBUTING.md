@@ -91,6 +91,7 @@ Please read and understand the [Code of Conduct](https://github.com/Graylog2/gra
 ### Assertions and Queries
 
 - Follow Testing Library's [Guiding Principles](https://testing-library.com/docs/guiding-principles) and their guide for [picking a good query](https://testing-library.com/docs/queries/about#priority).
+- Prefer `findBy` over `getBy` for UI that may update asynchronously. It matches async UI behavior and avoids brittle manual waiting.
 - Prefer `await screen.findBy...` directly over wrapping it in `expect(...).toBeInTheDocument()`. `findBy` already fails if the element is not present.
 
 ### Mocking
