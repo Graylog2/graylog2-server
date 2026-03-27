@@ -82,6 +82,8 @@ Please read and understand the [Code of Conduct](https://github.com/Graylog2/gra
 - Write unit tests for every use case of new functionality.
 - Test from the user's perspective — do not rely on internal implementation details.
 - **No snapshot tests** for component state. Use Testing Library queries (`getByText`, etc.) instead. Snapshot tests are acceptable for verifying complex function return values.
+- When mocking API communication in tests, do not mock `@tanstack/react-query` directly. Mock the abstraction on top of it instead, which is usually a dedicated hook.
+- If a `react-query` hook currently lives inside a component and the test needs to mock it, move that hook into a separate file so it can be mocked cleanly.
 
 ### Test File Placement
 
@@ -214,4 +216,3 @@ Avoid `link` style buttons — use actual anchors for navigation.
 - ESC key must close modals.
 - Form modals should not close on outside click (to prevent data loss).
 - Form modals should autofocus the first input.
-

@@ -80,13 +80,7 @@ yarn tsc && yarn lint:changes && yarn test
 
 ## Testing Guidelines
 
-- Import `render` from `wrappedTestingLibrary`, not directly from `@testing-library/react`.
-- Place test files next to source files: `Component.tsx` / `Component.test.tsx`.
-- If fixtures are needed, use a `__tests__/` directory alongside the component.
-- Test from the user's perspective — avoid testing internal implementation details.
-- Write tests for every use case of new functionality.
-- When mocking API communication in tests, do not mock `@tanstack/react-query` directly. Mock the abstraction on top of it instead, which is usually a dedicated hook.
-- If the `react-query` hook currently lives inside a component and the test needs to mock it, move that hook into a separate file so it can be mocked cleanly.
+- Follow `CONTRIBUTING.md` for testing conventions, test placement, and mocking guidelines.
 
 ## File Naming and Placement
 
@@ -108,4 +102,3 @@ Before finishing current work, please make sure that:
   - Type-checking passes
   - Tests are passing (use `yarn test`, never `yarn jest`)
   - Generated code is adhering our frontend style guide (as laid out on `CONTRIBUTING.md`)
-
