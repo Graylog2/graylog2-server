@@ -17,6 +17,7 @@
 package org.graylog2.contentpacks.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -30,7 +31,6 @@ import javax.annotation.Nullable;
 @JsonDeserialize(builder = ContentPackUninstallation.Builder.class)
 public abstract class ContentPackUninstallation {
     private static final String FIELD_ENTITIES = "entities";
-    private static final String FIELD_ENTITY_OBJECTS = "entity_objects";
     private static final String FIELD_FAILED_ENTITIES = "failed_entities";
     private static final String FIELD_SKIPPED_ENTITIES = "skipped_entities";
 
@@ -38,7 +38,7 @@ public abstract class ContentPackUninstallation {
     public abstract ImmutableSet<NativeEntityDescriptor> entities();
 
     @Nullable
-    @JsonProperty(FIELD_ENTITY_OBJECTS)
+    @JsonIgnore
     public abstract ImmutableMap<ModelId, Object> entityObjects();
 
     @JsonProperty(FIELD_FAILED_ENTITIES)
@@ -63,7 +63,6 @@ public abstract class ContentPackUninstallation {
         @JsonProperty(FIELD_ENTITIES)
         public abstract Builder entities(ImmutableSet<NativeEntityDescriptor> entities);
 
-        @JsonProperty(FIELD_ENTITY_OBJECTS)
         public abstract Builder entityObjects(ImmutableMap<ModelId, Object> entityObjects);
 
         @JsonProperty(FIELD_FAILED_ENTITIES)
