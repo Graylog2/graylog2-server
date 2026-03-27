@@ -106,7 +106,7 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(
     &.disabled,
     &.disabled:hover,
     &.disabled:focus {
-      color: ${theme.colors.variant.default};
+      color: ${theme.colors.text.disabled};
       background-color: ${theme.colors.variant.lightest.default};
 
       .list-group-item-heading {
