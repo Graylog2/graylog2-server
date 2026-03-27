@@ -75,6 +75,7 @@ yarn tsc && yarn lint:changes && yarn test
 - **ES6 modules** — use `import`/`export`, not `require`.
 - **Nullish coalescing (`??`)** over logical OR (`||`) for default values.
 - **`Object.fromEntries`** over `Array.reduce` for constructing objects from arrays (performance).
+- Treat ESLint and Stylelint rules as authoritative for code style and patterns in this repo.
 - Wrapper components from `components/graylog` instead of direct react-bootstrap imports.
 - Check the [frontend documentation](https://graylog2.github.io/frontend-documentation) for available common components before creating new ones.
 
