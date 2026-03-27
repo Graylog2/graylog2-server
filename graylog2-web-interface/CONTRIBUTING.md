@@ -48,6 +48,7 @@ Please read and understand the [Code of Conduct](https://github.com/Graylog2/gra
 - Use **TypeScript** for all new React components with static types for props.
 - **No PropTypes** — support was dropped with React 19.
 - Use **default parameters** instead of `defaultProps` in functional components. See the [React 19 upgrade guide](https://react.dev/blog/2024/04/25/react-19-upgrade-guide).
+- For the main exported component in a file, name the component props type `Props` and place it directly above the component.
 - When typing components with children, prefer `React.PropsWithChildren` over adding a `children` field to the props type directly.
 - Prefix unused parameters with an underscore and a meaningful name (e.g., `_eventType`), not just `_`. See [this discussion](https://github.com/Graylog2/graylog2-server/pull/12176#pullrequestreview-940555887).
 - `types.d.ts` can hide errors like missing imports. Temporarily rename to `types.ts` to detect them.
