@@ -125,7 +125,7 @@ import {
   SidecarFailureTrackingPage,
   IndexSetFieldTypesPage,
   ClusterConfigurationPage,
-  ClusterCertificateManagementPage,
+  ClusterCertificateManagementPage
 } from 'pages';
 import AppConfig from 'util/AppConfig';
 import { appPrefixed } from 'util/URLUtils';
@@ -182,6 +182,7 @@ const AppRouter = () => {
   }
 
   const enableDataNodeMigration = AppConfig.isFeatureEnabled('data_node_migration');
+  const enableCollectors = AppConfig.isFeatureEnabled('collectors');
 
   const router = createBrowserRouter([
     ...pluginRoutesWithNullParent,
@@ -383,13 +384,17 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.SIDECARS.NEW_COLLECTOR, element: <SidecarNewCollectorPage /> },
             { path: RoutePaths.SYSTEM.SIDECARS.EDIT_COLLECTOR(':collectorId'), element: <SidecarEditCollectorPage /> },
 
-            { path: RoutePaths.SYSTEM.COLLECTORS.OVERVIEW, element: <CollectorsOverviewPage /> },
-            { path: RoutePaths.SYSTEM.COLLECTORS.FLEETS, element: <CollectorsFleetsPage /> },
-            { path: `${RoutePaths.SYSTEM.COLLECTORS.FLEETS}/new`, element: <CollectorsFleetsPage /> },
-            { path: `${RoutePaths.SYSTEM.COLLECTORS.FLEETS}/:fleetId`, element: <CollectorsFleetDetailPage /> },
-            { path: RoutePaths.SYSTEM.COLLECTORS.INSTANCES, element: <CollectorsInstancesPage /> },
-            { path: RoutePaths.SYSTEM.COLLECTORS.DEPLOYMENT, element: <CollectorsDeploymentPage /> },
-            { path: RoutePaths.SYSTEM.COLLECTORS.SETTINGS, element: <CollectorsSettingsPage /> },
+            ...(enableCollectors
+              ? [
+                  { path: RoutePaths.SYSTEM.COLLECTORS.OVERVIEW, element: <CollectorsOverviewPage /> },
+                  { path: RoutePaths.SYSTEM.COLLECTORS.FLEETS, element: <CollectorsFleetsPage /> },
+                  { path: `${RoutePaths.SYSTEM.COLLECTORS.FLEETS}/new`, element: <CollectorsFleetsPage /> },
+                  { path: `${RoutePaths.SYSTEM.COLLECTORS.FLEETS}/:fleetId`, element: <CollectorsFleetDetailPage /> },
+                  { path: RoutePaths.SYSTEM.COLLECTORS.INSTANCES, element: <CollectorsInstancesPage /> },
+                  { path: RoutePaths.SYSTEM.COLLECTORS.DEPLOYMENT, element: <CollectorsDeploymentPage /> },
+                  { path: RoutePaths.SYSTEM.COLLECTORS.SETTINGS, element: <CollectorsSettingsPage /> },
+                ]
+              : []),
 
             { path: RoutePaths.KEYBOARD_SHORTCUTS, element: <KeyboardShortcutsPage /> },
             {

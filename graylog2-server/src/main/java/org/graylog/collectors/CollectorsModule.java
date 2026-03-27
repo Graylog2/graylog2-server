@@ -54,15 +54,22 @@ import org.graylog2.plugin.PluginModule;
 
 public class CollectorsModule extends PluginModule {
     private static final String OTLP_DUMP_FLAG = "collector_otlp_traffic_dump";
+    private static final String COLLECTORS_FLAG = "collectors";
 
+    private final boolean collectorsEnabled;
     private final boolean otlpDumpEnabled;
 
     public CollectorsModule(FeatureFlags featureFlags) {
+        this.collectorsEnabled = featureFlags.isOn(COLLECTORS_FLAG);
         this.otlpDumpEnabled = featureFlags.isOn(OTLP_DUMP_FLAG);
     }
 
     @Override
     protected void configure() {
+        if (!collectorsEnabled) {
+            return;
+        }
+
         install(new OpAmpModule());
 
         // Fleet transaction log
