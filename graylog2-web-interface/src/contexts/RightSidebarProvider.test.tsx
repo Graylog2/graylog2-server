@@ -18,6 +18,7 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
+import asMock from 'helpers/mocking/AsMock';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
@@ -30,7 +31,7 @@ const mockSendTelemetry = jest.fn();
 
 beforeEach(() => {
   jest.clearAllMocks();
-  (useSendTelemetry as jest.Mock).mockReturnValue(mockSendTelemetry);
+  asMock(useSendTelemetry).mockReturnValue(mockSendTelemetry);
 });
 
 const TestComponent = () => <div>Test Content</div>;
@@ -153,12 +154,16 @@ const TestConsumer = () => {
   );
 };
 
+const SUT = () => (
+  <RightSidebarProvider>
+    <TestConsumer />
+  </RightSidebarProvider>
+);
+
 describe('RightSidebarProvider', () => {
   it('should provide default context values', () => {
     render(
-      <RightSidebarProvider>
-        <TestConsumer />
-      </RightSidebarProvider>,
+      <SUT />,
     );
 
     expect(screen.getByTestId('is-open')).toHaveTextContent('false');
@@ -171,9 +176,7 @@ describe('RightSidebarProvider', () => {
 
   it('should open sidebar with content', async () => {
     render(
-      <RightSidebarProvider>
-        <TestConsumer />
-      </RightSidebarProvider>,
+      <SUT />,
     );
 
     await userEvent.click(screen.getByText('Open Sidebar'));
@@ -184,9 +187,7 @@ describe('RightSidebarProvider', () => {
 
   it('should close sidebar', async () => {
     render(
-      <RightSidebarProvider>
-        <TestConsumer />
-      </RightSidebarProvider>,
+      <SUT />,
     );
 
     await userEvent.click(screen.getByText('Open Sidebar'));
@@ -198,9 +199,7 @@ describe('RightSidebarProvider', () => {
 
   it('should update sidebar width', async () => {
     render(
-      <RightSidebarProvider>
-        <TestConsumer />
-      </RightSidebarProvider>,
+      <SUT />,
     );
 
     expect(screen.getByTestId('width')).toHaveTextContent('400');

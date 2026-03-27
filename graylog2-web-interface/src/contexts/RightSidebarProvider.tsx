@@ -185,37 +185,41 @@ const RightSidebarProvider = ({ children }: Props) => {
   const canGoBack = state.currentIndex > 0;
   const canGoForward = state.currentIndex < state.contentHistory.length - 1;
 
+  const sendSidebarTelemetry = useCallback(
+    (eventType: string, eventDetails?: Record<string, unknown>) => {
+      sendTelemetry(eventType, {
+        app_section: 'right-sidebar',
+        ...(eventDetails ? { event_details: eventDetails } : {}),
+      });
+    },
+    [sendTelemetry],
+  );
+
   const openSidebar = useCallback(<T = Record<string, unknown>,>(newContent: RightSidebarContent<T>) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.OPENED, {
-      app_section: 'right-sidebar',
-      event_details: { content_id: newContent.id, component_key: newContent.componentKey },
+    sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.OPENED, {
+      content_id: newContent.id, component_key: newContent.componentKey,
     });
     dispatch({ type: 'OPEN_SIDEBAR', content: newContent as RightSidebarContent<any> });
-  }, [sendTelemetry]);
+  }, [sendSidebarTelemetry]);
 
   // `content` in the dependency array means closeSidebar's identity changes on every navigation.
   // This is acceptable because closeSidebar is only used in click handlers, not in effects or memo deps.
   const closeSidebar = useCallback(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.CLOSED, {
-      app_section: 'right-sidebar',
-      event_details: { content_id: content?.id, component_key: content?.componentKey },
+    sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.CLOSED, {
+      content_id: content?.id, component_key: content?.componentKey,
     });
     dispatch({ type: 'CLOSE_SIDEBAR' });
-  }, [sendTelemetry, content]);
+  }, [sendSidebarTelemetry, content]);
 
   const collapseSidebar = useCallback(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.COLLAPSED, {
-      app_section: 'right-sidebar',
-    });
+    sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.COLLAPSED);
     dispatch({ type: 'COLLAPSE_SIDEBAR' });
-  }, [sendTelemetry]);
+  }, [sendSidebarTelemetry]);
 
   const expandSidebar = useCallback(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.EXPANDED, {
-      app_section: 'right-sidebar',
-    });
+    sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.EXPANDED);
     dispatch({ type: 'EXPAND_SIDEBAR' });
-  }, [sendTelemetry]);
+  }, [sendSidebarTelemetry]);
 
   const updateContent = useCallback(<T = Record<string, unknown>,>(newContent: RightSidebarContent<T>) => {
     dispatch({ type: 'UPDATE_CONTENT', content: newContent as RightSidebarContent<any> });
@@ -226,18 +230,14 @@ const RightSidebarProvider = ({ children }: Props) => {
   }, []);
 
   const goBack = useCallback(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.NAVIGATED_BACK, {
-      app_section: 'right-sidebar',
-    });
+    sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.NAVIGATED_BACK);
     dispatch({ type: 'GO_BACK' });
-  }, [sendTelemetry]);
+  }, [sendSidebarTelemetry]);
 
   const goForward = useCallback(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.NAVIGATED_FORWARD, {
-      app_section: 'right-sidebar',
-    });
+    sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.NAVIGATED_FORWARD);
     dispatch({ type: 'GO_FORWARD' });
-  }, [sendTelemetry]);
+  }, [sendSidebarTelemetry]);
 
   const contextValue = useMemo(
     () => ({
