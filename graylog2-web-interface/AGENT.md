@@ -29,7 +29,7 @@ disable_plugins=true yarn start
 # Build (without plugins)
 yarn build
 
-# Run all tests
+# Run all tests (DO NOT use `yarn jest`)
 yarn test
 
 # Run a specific test
@@ -75,16 +75,17 @@ yarn tsc && yarn lint:changes && yarn test
 - **ES6 modules** — use `import`/`export`, not `require`.
 - **Nullish coalescing (`??`)** over logical OR (`||`) for default values.
 - **`Object.fromEntries`** over `Array.reduce` for constructing objects from arrays (performance).
+- Treat ESLint and Stylelint rules as authoritative for code style and patterns in this repo.
 - Wrapper components from `components/graylog` instead of direct react-bootstrap imports.
 - Check the [frontend documentation](https://graylog2.github.io/frontend-documentation) for available common components before creating new ones.
 
 ## Testing Guidelines
 
-- Import `render` from `wrappedTestingLibrary`, not directly from `@testing-library/react`.
-- Place test files next to source files: `Component.tsx` / `Component.test.tsx`.
-- If fixtures are needed, use a `__tests__/` directory alongside the component.
-- Test from the user's perspective — avoid testing internal implementation details.
-- Write tests for every use case of new functionality.
+- Follow `CONTRIBUTING.md` for testing conventions, test placement, and mocking guidelines.
+
+## Browser Compatibility
+
+- Follow the supported browser targets defined in `supportedBrowsers.js`. When making browser-sensitive changes, consider the browsers we currently build assets for and do not add compatibility workarounds for older unsupported browsers.
 
 ## File Naming and Placement
 
@@ -98,3 +99,11 @@ yarn tsc && yarn lint:changes && yarn test
 - Register: `PluginStore.register(new PluginManifest({}, { key: [data] }));`
 - Consume: `usePluginEntities('key')`
 - No central documentation of plugin store keys — search the codebase for usage.
+
+## Finishing work
+
+Before finishing current work, please make sure that:
+
+  - Type-checking passes
+  - Tests are passing (use `yarn test`, never `yarn jest`)
+  - Generated code is adhering our frontend style guide (as laid out on `CONTRIBUTING.md`)
