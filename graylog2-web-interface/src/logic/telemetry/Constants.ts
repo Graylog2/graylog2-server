@@ -430,6 +430,11 @@ export const TELEMETRY_EVENT_TYPE = {
     SLICE_SORT_CHANGED: 'Entity Data Table Slice Sort Changed',
     SLICE_EMPTY_VALUES_TOGGLED: 'Entity Data Table Slice Empty Values Toggled',
   },
+  COLLECTORS: {
+    FLEET_NEW_OPENED: 'Fleet Create Opened',
+    FLEET_NEW_CANCELLED: 'Fleet Create Cancelled',
+    FLEET_CREATED: 'Fleet Created',
+  },
   RIGHT_SIDEBAR: {
     OPENED: 'Right Sidebar Opened',
     CLOSED: 'Right Sidebar Closed',
