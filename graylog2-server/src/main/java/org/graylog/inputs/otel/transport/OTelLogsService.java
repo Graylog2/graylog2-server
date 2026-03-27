@@ -25,12 +25,14 @@ import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse;
 import io.opentelemetry.proto.collector.logs.v1.LogsServiceGrpc;
 import jakarta.inject.Inject;
+import org.graylog.inputs.otel.OTelJournal;
 import org.graylog.inputs.otel.OTelJournalRecordFactory;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
 import org.graylog2.plugin.journal.RawMessage;
 
 import java.net.InetSocketAddress;
+import java.util.List;
 import java.util.function.Function;
 
 import static org.graylog.inputs.grpc.GrpcUtils.createThrottledStatusRuntimeException;
@@ -74,9 +76,14 @@ public class OTelLogsService extends LogsServiceGrpc.LogsServiceImplBase {
             createRawMessage = RawMessage::new;
         }
 
-        journalRecordFactory.createFromRequest(request).stream()
+        final List<OTelJournal.Record> journalRecords = journalRecordFactory.createFromRequest(request);
+        final int recordCount = journalRecords.size();
+        final int perMessageSize = recordCount > 0 ? request.getSerializedSize() / recordCount : 0;
+
+        journalRecords.stream()
                 .map(AbstractMessageLite::toByteArray)
                 .map(createRawMessage)
+                .peek(raw -> raw.setInputMessageSize(perMessageSize))
                 .forEach(input::processRawMessage);
 
         responseObserver.onNext(ExportLogsServiceResponse.newBuilder().build());

@@ -30,6 +30,7 @@ import static org.graylog.schema.NetworkFields.NETWORK_DATA_BYTES;
 import static org.graylog.schema.NetworkFields.NETWORK_HEADER_BYTES;
 import static org.graylog.schema.SourceFields.SOURCE_BYTES_SENT;
 import static org.graylog2.plugin.Message.FIELD_GL2_ACCOUNTED_MESSAGE_SIZE;
+import static org.graylog2.plugin.Message.FIELD_GL2_INPUT_MESSAGE_SIZE;
 import static org.graylog2.plugin.Message.FIELD_GL2_PROCESSING_DURATION_MS;
 
 public class HardcodedFieldUnitObtainingMethod implements FieldUnitObtainingMethod {
@@ -47,6 +48,7 @@ public class HardcodedFieldUnitObtainingMethod implements FieldUnitObtainingMeth
         return switch (fieldName) {
             case FIELD_GL2_PROCESSING_DURATION_MS -> supportedUnits.getUnit(new UnitId("time", "ms"));
             case FIELD_GL2_ACCOUNTED_MESSAGE_SIZE,
+                    FIELD_GL2_INPUT_MESSAGE_SIZE,
                     HTTP_BYTES,
                     HTTP_RESPONSE_BYTES,
                     NETWORK_BYTES,
