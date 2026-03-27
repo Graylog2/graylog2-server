@@ -99,6 +99,11 @@ Please read and understand the [Code of Conduct](https://github.com/Graylog2/gra
 - When mocking API communication in tests, do not mock `@tanstack/react-query` directly. Mock the abstraction on top of it instead, which is usually a dedicated hook.
 - If a `react-query` hook currently lives inside a component and the test needs to mock it, move that hook into a separate file so it can be mocked cleanly.
 
+### Fixtures
+
+- Prefer existing fixtures over creating large inline entity mocks inside a test. Search for reusable fixtures nearby and in shared test fixture locations before creating a new one.
+- If no suitable fixture exists, extract the mock data into a fixture file instead of keeping a complex object inline in the test. Follow the local pattern when one exists; otherwise place the fixture near the test, typically in a nearby `__tests__` directory.
+
 ### Test File Placement
 
 Test files go next to their source files:
