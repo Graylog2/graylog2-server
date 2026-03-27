@@ -19,6 +19,7 @@ package org.graylog.collectors.opamp;
 import com.google.inject.Scopes;
 import org.graylog.collectors.opamp.auth.AgentTokenService;
 import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
+import org.graylog.collectors.opamp.http.OpAmpHttpServerExtension;
 import org.graylog.collectors.opamp.rest.EnrollmentTokenResource;
 import org.graylog.collectors.opamp.transport.OpAmpHttpHandler;
 import org.graylog2.plugin.PluginModule;
@@ -38,5 +39,6 @@ public class OpAmpModule extends PluginModule {
         bind(AgentTokenService.class).in(Scopes.SINGLETON);
         bind(EnrollmentTokenService.class).in(Scopes.SINGLETON);
         addSystemRestResource(EnrollmentTokenResource.class);
+        addHttpServerExtension(OpAmpHttpServerExtension.TYPE, OpAmpHttpServerExtension.class);
     }
 }

@@ -44,13 +44,12 @@ import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.model.Resource;
-import org.graylog.collectors.opamp.OpAmpConstants;
-import org.graylog.collectors.opamp.transport.OpAmpHttpHandler;
 import org.graylog.security.UserContextBinder;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.jersey.AuditEventModelProcessor;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
+import org.graylog2.jersey.HttpServerExtension;
 import org.graylog2.jersey.PrefixAddingModelProcessor;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -123,7 +122,7 @@ public class JerseyService extends AbstractIdleService {
     private final ErrorPageGenerator errorPageGenerator;
     private final TLSProtocolsConfiguration tlsConfiguration;
     private final int shutdownTimeoutMs;
-    private final OpAmpHttpHandler opAmpHttpHandler;
+    private final Map<String, HttpServerExtension> httpServerExtensions;
 
     private HttpServer httpServer = null;
 
@@ -141,7 +140,7 @@ public class JerseyService extends AbstractIdleService {
                          ErrorPageGenerator errorPageGenerator,
                          TLSProtocolsConfiguration tlsConfiguration,
                          @Named("shutdown_timeout") int shutdownTimeoutMs,
-                         OpAmpHttpHandler opAmpHttpHandler) {
+                         Map<String, HttpServerExtension> httpServerExtensions) {
         this.configuration = requireNonNull(configuration, "configuration");
         this.dynamicFeatures = requireNonNull(dynamicFeatures, "dynamicFeatures");
         this.containerResponseFilters = requireNonNull(containerResponseFilters, "containerResponseFilters");
@@ -155,7 +154,7 @@ public class JerseyService extends AbstractIdleService {
         this.errorPageGenerator = requireNonNull(errorPageGenerator, "errorPageGenerator");
         this.tlsConfiguration = requireNonNull(tlsConfiguration);
         this.shutdownTimeoutMs = shutdownTimeoutMs;
-        this.opAmpHttpHandler = requireNonNull(opAmpHttpHandler, "opAmpHttpHandler");
+        this.httpServerExtensions = requireNonNull(httpServerExtensions, "httpServerExtensions");
     }
 
     @Override
@@ -224,20 +223,17 @@ public class JerseyService extends AbstractIdleService {
                 configuration.isHttpEnableCors(),
                 pluginResources);
 
-        configureOpAmp(httpServer);
+        for (final var entry : httpServerExtensions.entrySet()) {
+            final var type = entry.getKey();
+            final var extension = entry.getValue();
+
+            LOG.debug("Configure HTTP server with <{}> extension", type);
+            extension.configure(httpServer);
+        }
 
         httpServer.start();
 
         LOG.info("Started REST API at <{}>", configuration.getHttpBindAddress());
-    }
-
-    /**
-     * Configure OpAMP endpoint at /v1/opamp for HTTP transport.
-     */
-    private void configureOpAmp(HttpServer httpServer) {
-        httpServer.getServerConfiguration().addHttpHandler(opAmpHttpHandler, OpAmpConstants.PATH);
-
-        LOG.info("OpAMP endpoint enabled at {}", OpAmpConstants.PATH);
     }
 
     private Set<Resource> prefixPluginResources(String pluginPrefix, Map<String, Set<Class<? extends PluginRestResource>>> pluginResourceMap) {
