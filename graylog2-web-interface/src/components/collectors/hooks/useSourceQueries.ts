@@ -24,6 +24,11 @@ import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/u
 
 import type { Source } from '../types';
 
+// The generated API type (SourceResponse) has a generic config: { type: string },
+// while our domain Source type uses a discriminated union with specific config types.
+// This assertion is safe because the server always returns fully-typed configs.
+const toSources = (elements: readonly { id: string; name: string }[]): Source[] => elements as Source[];
+
 export const SOURCES_KEY_PREFIX = ['collectors', 'sources'];
 export const sourcesKeyFn = (searchParams: SearchParams) => [...SOURCES_KEY_PREFIX, 'paginated', searchParams];
 
@@ -40,7 +45,7 @@ export const fetchPaginatedSources = async (
       searchParams.sort?.attributeId,
       searchParams.sort?.direction,
     ).then((response) => ({
-      list: response.elements as unknown as Source[],
+      list: toSources(response.elements),
       pagination: response.pagination,
       attributes: response.attributes,
     })),
@@ -55,7 +60,7 @@ export const useSources = (fleetId?: string) =>
       if (!fleetId) return [];
 
       return defaultOnError(
-        CollectorsSources.list(fleetId, 1, 0).then((response) => response.elements as unknown as Source[]),
+        CollectorsSources.list(fleetId, 1, 0).then((response) => toSources(response.elements)),
         'Loading sources failed with status',
         'Could not load sources',
       );
