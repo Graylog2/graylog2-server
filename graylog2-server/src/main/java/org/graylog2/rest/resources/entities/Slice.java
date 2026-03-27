@@ -32,4 +32,12 @@ public record Slice(@JsonProperty(FIELD_ID) String value,
     public Slice(String value, String title, Integer count) {
         this(value, title, count, Map.of());
     }
+    public Slice(String value, Integer count, Map<String, Object> meta) {
+        this(value, null, count, meta);
+    }
+
+    // used to make sure, that we have a minimal count of 1 to prevent hiding with current FE logic. Will change in the future
+    public static Slice minimalCount1(Slice slice) {
+        return new Slice(slice.value(), slice.title(), slice.count() > 0 ? slice.count() : 1, slice.meta());
+    }
 }
