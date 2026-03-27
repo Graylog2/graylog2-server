@@ -83,6 +83,10 @@ yarn tsc && yarn lint:changes && yarn test
 
 - Follow `CONTRIBUTING.md` for testing conventions, test placement, and mocking guidelines.
 
+## Browser Compatibility
+
+- Follow the supported browser targets defined in `supportedBrowsers.js`. When making browser-sensitive changes, consider the browsers we currently build assets for and do not add compatibility workarounds for older unsupported browsers.
+
 ## File Naming and Placement
 
 - React components: PascalCase (`MyComponent.tsx`)
