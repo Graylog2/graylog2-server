@@ -219,6 +219,11 @@ Test layout changes in Chrome, Firefox, and Safari. Larger layout changes should
 
 ## UI Styling
 
+### Styled Components
+
+- In styled components, prefer theme tokens over hard-coded style values when possible. This includes spacing via `theme.spacings`, colors via `theme.colors`, and typography values such as `theme.fonts.family` and `theme.fonts.size`.
+- To style a component, prefer wrapping that component with `styled(...)` instead of targeting it through selectors from a parent component.
+
 ### Forms
 
 - Use vertically aligned labels and inputs (no horizontal forms without good reason).
