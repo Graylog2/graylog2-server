@@ -19,6 +19,7 @@ import { Navigate } from 'react-router-dom';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
+import BetaBadge from 'components/common/BetaBadge';
 import { CollectorsPageNavigation } from 'components/collectors/common';
 import CollectorsInstances from 'components/collectors/instances/CollectorsInstances';
 import { useCollectorsConfig } from 'components/collectors/hooks';
@@ -38,7 +39,7 @@ const CollectorsInstancesPage = () => {
   return (
     <DocumentTitle title="Collector Instances">
       <CollectorsPageNavigation />
-      <PageHeader title="Instances">
+      <PageHeader title={<>Instances <BetaBadge /></>}>
         <span>View all collector instances across fleets.</span>
       </PageHeader>
 

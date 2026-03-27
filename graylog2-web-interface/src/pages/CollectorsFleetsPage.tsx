@@ -19,6 +19,7 @@ import { Navigate } from 'react-router-dom';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
+import BetaBadge from 'components/common/BetaBadge';
 import { CollectorsPageNavigation } from 'components/collectors/common';
 import CollectorsFleets from 'components/collectors/fleets/CollectorsFleets';
 import { useCollectorsConfig } from 'components/collectors/hooks';
@@ -39,7 +40,7 @@ const CollectorsFleetsPage = () => {
   return (
     <DocumentTitle title="Collector Fleets">
       <CollectorsPageNavigation />
-      <PageHeader title="Fleets" actions={<CreateButton entityKey={'Fleet'} />}>
+      <PageHeader title={<>Fleets <BetaBadge /></>} actions={<CreateButton entityKey={'Fleet'} />}>
         <span>Manage collector fleets and their configurations.</span>
       </PageHeader>
 

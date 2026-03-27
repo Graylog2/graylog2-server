@@ -17,13 +17,14 @@
 import * as React from 'react';
 
 import { DocumentTitle, PageHeader } from 'components/common';
+import BetaBadge from 'components/common/BetaBadge';
 import { CollectorsPageNavigation } from 'components/collectors/common';
 import CollectorsSettings from 'components/collectors/settings/CollectorsSettings';
 
 const CollectorsSettingsPage = () => (
   <DocumentTitle title="Collectors Settings">
     <CollectorsPageNavigation />
-    <PageHeader title="Collectors Settings">
+    <PageHeader title={<>Collectors Settings <BetaBadge /></>}>
       <span>Configure ingest endpoints for managed collectors.</span>
     </PageHeader>
     <CollectorsSettings />

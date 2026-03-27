@@ -19,6 +19,7 @@ import { Navigate } from 'react-router-dom';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
+import BetaBadge from 'components/common/BetaBadge';
 import { CollectorsOverview } from 'components/collectors/overview';
 import { CollectorsPageNavigation } from 'components/collectors/common';
 import { useCollectorsConfig } from 'components/collectors/hooks';
@@ -41,7 +42,7 @@ const CollectorsOverviewPage = () => {
   return (
     <DocumentTitle title="Collectors Overview">
       <CollectorsPageNavigation />
-      <PageHeader title="Collectors Overview">
+      <PageHeader title={<>Collectors Overview <BetaBadge /></>}>
         <span>Overview of all collectors and sources across your infrastructure.</span>
       </PageHeader>
       <Row className="content">
