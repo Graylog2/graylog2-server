@@ -67,8 +67,8 @@ const FleetFormModal = ({ fleet = undefined, onClose, onSave }: Props) => {
 
   return (
     <Modal show onHide={onClose}>
-      <Formik<FormValues> initialValues={initialValues} onSubmit={handleSubmit} validate={validate}>
-        {({ isSubmitting, isValidating }) => (
+      <Formik<FormValues> initialValues={initialValues} onSubmit={handleSubmit} validate={validate} validateOnMount>
+        {({ isSubmitting, isValid, isValidating }) => (
           <Form>
             <Modal.Header>
               <Modal.Title>{isEdit ? 'Edit Fleet' : 'New Fleet'}</Modal.Title>
@@ -101,7 +101,7 @@ const FleetFormModal = ({ fleet = undefined, onClose, onSave }: Props) => {
                 submitButtonText={isEdit ? 'Update fleet' : 'Create fleet'}
                 submitLoadingText={isEdit ? 'Updating...' : 'Creating...'}
                 onCancel={onClose}
-                disabledSubmit={isValidating}
+                disabledSubmit={isValidating || !isValid}
                 isSubmitting={isSubmitting}
               />
             </Modal.Footer>
