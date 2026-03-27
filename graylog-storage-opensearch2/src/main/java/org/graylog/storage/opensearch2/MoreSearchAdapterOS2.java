@@ -52,7 +52,6 @@ import org.graylog2.indexer.results.ResultChunk;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.indexer.searches.Sorting;
-import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -220,12 +219,21 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
                 .filter(termsQuery(EventDto.FIELD_STREAMS, eventStreams))
                 .filter(requireNonNull(TimeRangeQueryFactory.create(timerange)));
 
-        extraFilters.entrySet()
-                .stream()
-                .flatMap(extraFilter -> extraFilter.getValue()
-                        .stream()
-                        .map(value -> buildExtraFilter(extraFilter.getKey(), value)))
-                .forEach(filter::filter);
+        extraFilters.forEach((field, values) -> {
+            values.stream()
+                    .filter(MoreSearchAdapter::isRangeValue)
+                    .map(value -> buildExtraFilter(field, value))
+                    .forEach(filter::filter);
+            final var termQueries = values.stream()
+                    .filter(v -> !MoreSearchAdapter.isRangeValue(v))
+                    .map(value -> buildExtraFilter(field, value))
+                    .toList();
+            if (!termQueries.isEmpty()) {
+                final BoolQueryBuilder shouldQuery = boolQuery().minimumShouldMatch(1);
+                termQueries.forEach(shouldQuery::should);
+                filter.filter(shouldQuery);
+            }
+        });
 
         if (!isNullOrEmpty(filterString)) {
             filter.filter(queryStringQuery(filterString));
