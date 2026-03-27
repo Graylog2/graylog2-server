@@ -53,7 +53,6 @@ import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventTypes;
-import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.filtering.ComputedFieldRegistry;
 import org.graylog2.database.filtering.DbQueryCreator;
@@ -144,7 +143,7 @@ public class EnrollmentTokenResource extends RestResource {
 
     @POST
     @Operation(summary = "Create an enrollment token for OpAMP agents")
-    @AuditEvent(type = AuditEventTypes.OPAMP_ENROLLMENT_TOKEN_CREATE)
+    @NoAuditEvent("inline for ID")
     public EnrollmentTokenResponse createToken(
             @RequestBody(description = "Enrollment token creation request")
             @Valid @NotNull CreateEnrollmentTokenRequest request) {
@@ -160,7 +159,15 @@ public class EnrollmentTokenResource extends RestResource {
         }
         final var user = getCurrentUser();
         final var creator = new EnrollmentTokenCreator(user.getId(), user.getName());
-        return enrollmentTokenService.createToken(request, creator);
+        final EnrollmentTokenResponse token = enrollmentTokenService.createToken(request, creator);
+
+        auditEventSender.success(getAuditActor(), AuditEventTypes.OPAMP_ENROLLMENT_TOKEN_CREATE, Map.of(
+                "tokenId", Objects.requireNonNull(token.id()),
+                "name", request.name(),
+                "expiresAt", Objects.requireNonNullElse(token.expiresAt(), "never"),
+                "fleetId", request.fleetId()
+        ));
+        return token;
     }
 
     @GET
@@ -210,7 +217,7 @@ public class EnrollmentTokenResource extends RestResource {
         auditEventSender.success(getAuditActor(), AuditEventTypes.OPAMP_ENROLLMENT_TOKEN_DELETE, Map.of(
                 "tokenId", Objects.requireNonNull(dto.id()),
                 "name", dto.name(),
-                "expiresAt", Objects.requireNonNull(dto.expiresAt()),
+                "expiresAt", Objects.requireNonNullElse(dto.expiresAt(), "never"),
                 "fleetId", dto.fleetId()
         ));
         return Response.noContent().build();
@@ -234,7 +241,7 @@ public class EnrollmentTokenResource extends RestResource {
                             .peek(dto -> auditContexts.add(Map.of(
                                     "tokenId", Objects.requireNonNull(dto.id()),
                                     "name", dto.name(),
-                                    "expiresAt", Objects.requireNonNull(dto.expiresAt()),
+                                    "expiresAt", Objects.requireNonNullElse(dto.expiresAt(), "never"),
                                     "fleetId", dto.fleetId()
                                     )))
                             .map(EnrollmentTokenDTO::id)

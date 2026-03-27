@@ -21,6 +21,7 @@ import com.mongodb.client.model.IndexModel;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.InsertOneResult;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -43,6 +44,7 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbSortResolver;
 import org.graylog2.database.pagination.MongoPaginationHelper;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.cluster.ClusterIdService;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.slf4j.Logger;
@@ -149,7 +151,7 @@ public class EnrollmentTokenService {
         final String jti = UUID.randomUUID().toString();
         final String token = buildJwt(tokenSigningKey, jti, now, expiresAt);
 
-        tokenCollection.insertOne(EnrollmentTokenDTO.builder()
+        final InsertOneResult insertOneResult = tokenCollection.insertOne(EnrollmentTokenDTO.builder()
                 .name(request.name())
                 .jti(jti)
                 .kid(tokenSigningKey.fingerprint())
@@ -159,7 +161,7 @@ public class EnrollmentTokenService {
                 .expiresAt(expiresAt)
                 .build());
 
-        return new EnrollmentTokenResponse(token, expiresAt);
+        return new EnrollmentTokenResponse(MongoUtils.insertedIdAsString(insertOneResult), token, expiresAt);
     }
 
     /**

@@ -197,8 +197,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String MCP_TOOL_LIST = MCP_PREFIX + "tool:list";
     public static final String MCP_TOOL_CALL = MCP_PREFIX + "tool:call";
 
-    public static final String OPAMP_ENROLLMENT_TOKEN_CREATE = PREFIX + "opamp_enrollment_token:create";
-    public static final String OPAMP_ENROLLMENT_TOKEN_DELETE = PREFIX + "opamp_enrollment_token:delete";
+    public static final String OPAMP_ENROLLMENT_TOKEN_CREATE = PREFIX + "collector_enrollment_token:create";
+    public static final String OPAMP_ENROLLMENT_TOKEN_DELETE = PREFIX + "collector_enrollment_token:delete";
     public static final String COLLECTOR_FLEET_CREATE = PREFIX + "collector_fleet:create";
     public static final String COLLECTOR_FLEET_DELETE = PREFIX + "collector_fleet:delete";
     public static final String COLLECTOR_FLEET_UPDATE = PREFIX + "collector_fleet:update";

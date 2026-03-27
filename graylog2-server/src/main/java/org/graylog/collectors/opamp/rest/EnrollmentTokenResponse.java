@@ -16,12 +16,14 @@
  */
 package org.graylog.collectors.opamp.rest;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nullable;
 
 import java.time.Instant;
 
 public record EnrollmentTokenResponse(
+        @JsonIgnore @JsonProperty("id") String id,
         @JsonProperty("token") String token,
         @Nullable @JsonProperty("expires_at") Instant expiresAt
 ) {}
