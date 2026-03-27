@@ -49,6 +49,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ClusterEventService extends AbstractExecutionThreadService {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterEventService.class);
@@ -61,6 +63,7 @@ public class ClusterEventService extends AbstractExecutionThreadService {
     private final ObjectMapper objectMapper;
     private final EventBus serverEventBus;
     private final RestrictedChainingClassLoader chainingClassLoader;
+    private final AtomicReference<MongoCursor<ClusterEvent>> eventsCursor = new AtomicReference<>();
     private Offset offset;
 
     @Inject
@@ -116,11 +119,12 @@ public class ClusterEventService extends AbstractExecutionThreadService {
 
     @Override
     protected void run() {
-        while (!Thread.currentThread().isInterrupted()) {
+        while (!Thread.currentThread().isInterrupted() && isRunning()) {
             final var events = eventsIterable(this.offset)
                     .cursorType(CursorType.TailableAwait)
                     .noCursorTimeout(true);
             try (final var cursor = events.iterator()) {
+                this.eventsCursor.set(cursor);
                 iterateEvents(cursor);
                 Thread.sleep(1000);
             } catch (Exception e) {
@@ -208,5 +212,14 @@ public class ClusterEventService extends AbstractExecutionThreadService {
             LOG.warn("Couldn't load class <{}>.", eventClass, e);
         }
         return null;
+    }
+
+    @Override
+    protected void triggerShutdown() {
+        final var cursor = this.eventsCursor.get();
+        if (cursor != null) {
+            cursor.close();
+        }
+        Thread.currentThread().interrupt();
     }
 }

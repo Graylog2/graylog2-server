@@ -89,10 +89,12 @@ class ClusterEventServicePerformanceTest {
         }
     }
 
-    private ClusterEventService createClusterEventPeriodical(NodeId nodeId, EventBus serverEventBus, ClusterEventBus clusterEventBus) {
-        return new ClusterEventService(objectMapperProvider, mongodb.mongoConnection(),
+    private ClusterEventService createClusterEventService(NodeId nodeId, EventBus serverEventBus, ClusterEventBus clusterEventBus) {
+        final var service = new ClusterEventService(objectMapperProvider, mongodb.mongoConnection(),
                 nodeId, new RestrictedChainingClassLoader(new ChainingClassLoader(this.getClass().getClassLoader()),
                 SafeClasses.allGraylogInternal()), serverEventBus, clusterEventBus, offset, Size.megabytes(100));
+        service.startAsync().awaitRunning();
+        return service;
     }
 
     @Test
@@ -108,7 +110,7 @@ class ClusterEventServicePerformanceTest {
         for (int i = 0; i < CONSUMER_COUNT; i++) {
             final var serverEventBus = new EventBus();
             final var clusterEventBus = new ClusterEventBus();
-            final var periodical = createClusterEventPeriodical(new SimpleNodeId("consumer-" + i), serverEventBus, clusterEventBus);
+            final var periodical = createClusterEventService(new SimpleNodeId("consumer-" + i), serverEventBus, clusterEventBus);
             threadPool.submit(periodical::run);
 
             serverEventBus.register(new EventSubscriber(consumerCountdown::countDown));
@@ -118,7 +120,7 @@ class ClusterEventServicePerformanceTest {
             final var serverEventBus = new EventBus();
             final var clusterEventBus = new ClusterEventBus();
             final var nodeId = new SimpleNodeId("producer-" + i);
-            final var periodical = createClusterEventPeriodical(nodeId, serverEventBus, clusterEventBus);
+            final var periodical = createClusterEventService(nodeId, serverEventBus, clusterEventBus);
 
             threadPool.submit(periodical::run);
 
