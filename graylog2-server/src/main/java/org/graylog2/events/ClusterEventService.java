@@ -119,7 +119,7 @@ public class ClusterEventService extends AbstractExecutionThreadService {
 
     @Override
     protected void run() {
-        while (!Thread.currentThread().isInterrupted() && isRunning()) {
+        while (isRunning()) {
             final var events = eventsIterable(this.offset)
                     .cursorType(CursorType.TailableAwait)
                     .noCursorTimeout(true);
@@ -220,6 +220,5 @@ public class ClusterEventService extends AbstractExecutionThreadService {
         if (cursor != null) {
             cursor.close();
         }
-        Thread.currentThread().interrupt();
     }
 }
