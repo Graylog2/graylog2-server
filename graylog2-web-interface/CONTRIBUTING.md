@@ -52,6 +52,7 @@ Please read and understand the [Code of Conduct](https://github.com/Graylog2/gra
 - `types.d.ts` can hide errors like missing imports. Temporarily rename to `types.ts` to detect them.
 - Do not leave out types for function arguments (therefore being implicitly `any`), use proper types.
 - Do not use `as unknown as <...>` to opt out of type-checking
+- In tests, never cast to `jest.Mock` (`foo as jest.Mock`), use the `asMock` helper function
 
 ## Imports
 
