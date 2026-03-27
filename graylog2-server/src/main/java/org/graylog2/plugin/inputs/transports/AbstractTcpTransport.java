@@ -99,15 +99,15 @@ public abstract class AbstractTcpTransport extends NettyTransport {
 
     private static final String CK_TLS_CERT_FILE = "tls_cert_file";
     private static final String CK_TLS_KEY_FILE = "tls_key_file";
-    private static final String CK_TLS_ENABLE = "tls_enable";
+    public static final String CK_TLS_ENABLE = "tls_enable";
     private static final String CK_TLS_KEY_PASSWORD = "tls_key_password";
-    private static final String CK_TLS_CLIENT_AUTH = "tls_client_auth";
+    public static final String CK_TLS_CLIENT_AUTH = "tls_client_auth";
     private static final String CK_TLS_CLIENT_AUTH_TRUSTED_CERT_FILE = "tls_client_auth_cert_file";
-    private static final String CK_TCP_KEEPALIVE = "tcp_keepalive";
+    public static final String CK_TCP_KEEPALIVE = "tcp_keepalive";
 
     private static final String TLS_CLIENT_AUTH_DISABLED = "disabled";
     private static final String TLS_CLIENT_AUTH_OPTIONAL = "optional";
-    private static final String TLS_CLIENT_AUTH_REQUIRED = "required";
+    public static final String TLS_CLIENT_AUTH_REQUIRED = "required";
     private static final ImmutableMap<String, String> TLS_CLIENT_AUTH_OPTIONS = ImmutableMap.of(
             TLS_CLIENT_AUTH_DISABLED, TLS_CLIENT_AUTH_DISABLED,
             TLS_CLIENT_AUTH_OPTIONAL, TLS_CLIENT_AUTH_OPTIONAL,
@@ -146,8 +146,8 @@ public abstract class AbstractTcpTransport extends NettyTransport {
             EventLoopGroupFactory eventLoopGroupFactory,
             NettyTransportConfiguration nettyTransportConfiguration,
             org.graylog2.Configuration graylogConfiguration) {
-            this(configuration, throughputCounter, localRegistry, parentEventLoopGroup, eventLoopGroupFactory,
-                    nettyTransportConfiguration, new TLSProtocolsConfiguration(graylogConfiguration.getEnabledTlsProtocols()));
+        this(configuration, throughputCounter, localRegistry, parentEventLoopGroup, eventLoopGroupFactory,
+                nettyTransportConfiguration, new TLSProtocolsConfiguration(graylogConfiguration.getEnabledTlsProtocols()));
     }
 
     public AbstractTcpTransport(
@@ -263,7 +263,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
         handlers.put("connection-counter", () -> connectionCounter);
         if (tlsEnable) {
             LOG.info("Enabled TLS for input {}. key-file=\"{}\" cert-file=\"{}\"", input.toIdentifier(), tlsKeyFile, tlsCertFile);
-            handlers.put("tls", getSslHandlerCallable(input));
+            handlers.put("tls", createSslHandler(input));
         }
         handlers.putAll(getCustomChildChannelHandlers(input));
         if (aggregator != null) {
@@ -274,6 +274,10 @@ public abstract class AbstractTcpTransport extends NettyTransport {
         handlers.put("exception-logger", () -> new ExceptionLoggingChannelHandler(input, LOG, this.tcpKeepalive));
 
         return handlers;
+    }
+
+    protected Callable<? extends ChannelHandler> createSslHandler(MessageInput input) {
+        return getSslHandlerCallable(input);
     }
 
     private Callable<ChannelHandler> getSslHandlerCallable(MessageInput input) {
@@ -299,8 +303,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                 if (!Strings.isNullOrEmpty(tlsKeyPassword)) {
                     keyFile = KeyUtil.generatePKCS8FromPrivateKey(tmpPath, tlsKeyPassword.toCharArray(), ssc.key());
                     ssc.privateKey().delete();
-                }
-                else {
+                } else {
                     keyFile = ssc.privateKey();
                 }
             } catch (GeneralSecurityException e) {
