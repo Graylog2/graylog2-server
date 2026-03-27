@@ -16,6 +16,7 @@
  */
 package org.graylog2.database;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -75,7 +76,7 @@ public class MongoSequenceService {
         return doc == null ? 0L : doc.getLong(FIELD_VALUE);
     }
 
-    // Package-private for test access
+    @VisibleForTesting
     MongoCollection<Document> getCollection() {
         return collection;
     }
