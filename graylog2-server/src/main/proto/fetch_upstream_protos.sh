@@ -9,7 +9,7 @@
 set -eo pipefail
 
 # OpenTelemetry Proto - https://github.com/open-telemetry/opentelemetry-proto/releases
-OTEL_VERSION="v1.5.0"
+OTEL_VERSION="v1.7.0"
 
 # OpAMP Proto - https://github.com/open-telemetry/opamp-spec/releases
 OPAMP_VERSION="v0.14.0"
