@@ -24,11 +24,11 @@ import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import type { CollectorInstanceView } from '../types';
 
 const OsIcon = ({ os }: { os: string | null }) => {
-  if (os === 'linux') return <span title="Linux">🐧</span>;
-  if (os === 'windows') return <span title="Windows">🪟</span>;
-  if (os === 'darwin') return <span title="macOS">🍎</span>;
+  if (os === 'linux') return <span title="Linux">Linux</span>;
+  if (os === 'windows') return <span title="Windows">Windows</span>;
+  if (os === 'darwin') return <span title="macOS">macOS</span>;
 
-  return <span title="Unknown">❓</span>;
+  return <span title="Unknown"><i>Unknown</i></span>;
 };
 
 type Props = {
