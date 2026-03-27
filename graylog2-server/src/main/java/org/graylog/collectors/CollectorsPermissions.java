@@ -25,22 +25,22 @@ import java.util.Set;
 import static org.graylog2.plugin.security.Permission.create;
 
 public class CollectorsPermissions implements PluginPermissions {
-    public static final String FLEET_CREATE = "collectors_fleets:create";
-    public static final String FLEET_READ = "collectors_fleets:read";
-    public static final String FLEET_EDIT = "collectors_fleets:edit";
-    public static final String FLEET_DELETE = "collectors_fleets:delete";
-    public static final String FLEET_INSTANCE_ASSIGN = "collectors_fleets:assign_instance";
-    public static final String FLEET_INSTANCE_DELETE = "collectors_fleets:delete_instance";
+    public static final String FLEET_CREATE = "collector_fleets:create";
+    public static final String FLEET_READ = "collector_fleets:read";
+    public static final String FLEET_EDIT = "collector_fleets:edit";
+    public static final String FLEET_DELETE = "collector_fleets:delete";
+    public static final String FLEET_INSTANCE_ASSIGN = "collector_fleets:assign_instance";
+    public static final String FLEET_INSTANCE_DELETE = "collector_fleets:delete_instance";
 
     // these are scoped to fleets, not individual sources!
-    public static final String SOURCE_CREATE = "collectors_fleets:source_create";
-    public static final String SOURCE_EDIT = "collectors_fleets:source_edit";
-    public static final String SOURCE_DELETE = "collectors_fleets:source_delete";
+    public static final String SOURCE_CREATE = "collector_fleets:source_create";
+    public static final String SOURCE_EDIT = "collector_fleets:source_edit";
+    public static final String SOURCE_DELETE = "collector_fleets:source_delete";
 
     public static final String CONFIGURATION_READ = "collectors_config:read";
     public static final String CONFIGURATION_EDIT = "collectors_config:edit";
 
-    public static final String ACTIVITY_READ = "collectors_activity:read";
+    public static final String ACTIVITIES_READ = "collector_activities:read";
 
     private static final ImmutableSet<Permission> PERMISSIONS = ImmutableSet.of(
             create(FLEET_CREATE, "Create a new fleet"),
@@ -54,7 +54,7 @@ public class CollectorsPermissions implements PluginPermissions {
             create(SOURCE_DELETE, "Delete a source in a fleet"),
             create(CONFIGURATION_READ, "Read the configuration for collectors"),
             create(CONFIGURATION_EDIT, "Edit the configuration for collectors"),
-            create(ACTIVITY_READ, "Read the recent activity feed")
+            create(ACTIVITIES_READ, "Read the recent activity feed")
     );
 
     @Override

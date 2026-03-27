@@ -78,7 +78,7 @@ public class CollectorsActivityResource extends RestResource {
     @Path("/recent")
     @Timed
     @Operation(summary = "Get recent activity across all fleets and collectors")
-    @RequiresPermissions(CollectorsPermissions.ACTIVITY_READ)
+    @RequiresPermissions(CollectorsPermissions.ACTIVITIES_READ)
     public RecentActivityResponse recent() {
         final List<TransactionMarker> markers = transactionLogService.getRecentMarkers(RECENT_ACTIVITY_LIMIT);
         if (markers.isEmpty()) {

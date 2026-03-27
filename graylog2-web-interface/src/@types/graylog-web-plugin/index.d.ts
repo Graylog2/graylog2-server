@@ -228,8 +228,8 @@ declare module 'graylog-web-plugin/plugin' {
     clusterconfig: 'read';
     clusterconfigentry: 'read' | 'edit';
     clusterconfiguration: 'read';
+    collector_fleets: 'read';
     collectors_config: 'read';
-    collectors_fleets: 'read';
     contentpack: 'read';
     dashboards: 'create' | 'edit' | 'read';
     datanode: 'start';

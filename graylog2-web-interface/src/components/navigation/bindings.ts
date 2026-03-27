@@ -95,7 +95,7 @@ const navigationBindings: PluginExports = {
             {
               path: Routes.SYSTEM.COLLECTORS.OVERVIEW,
               description: 'Collectors',
-              permissions: ['collectors_fleets:read', 'collectors_config:read'],
+              permissions: ['collector_fleets:read', 'collectors_config:read'],
               requiredFeatureFlag: 'collectors',
             },
           ],
