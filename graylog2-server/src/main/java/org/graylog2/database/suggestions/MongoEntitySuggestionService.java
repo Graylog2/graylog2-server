@@ -33,8 +33,9 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.utils.CompositeDisplayFormatter;
 import org.graylog2.database.utils.MongoUtils;
-import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.security.EntityPermissionsUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.HashSet;
@@ -52,6 +53,8 @@ import static org.graylog2.users.UserImpl.USERNAME;
 
 public class MongoEntitySuggestionService implements EntitySuggestionService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(MongoEntitySuggestionService.class);
+
     private final MongoConnection mongoConnection;
     private final EntityPermissionsUtils permissionsUtils;
 
@@ -68,7 +71,7 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
 
     @Override
     public EntitySuggestionResponse suggest(final String collection,
-                                            final String targetColumn,
+                                            final String identifier,
                                             final String valueColumn,
                                             @Nullable final List<String> displayFields,
                                             @Nullable final String displayTemplate,
@@ -76,20 +79,18 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                                             final int page,
                                             final int perPage,
                                             final Subject subject) {
-        return suggest(collection, targetColumn, valueColumn, displayFields, displayTemplate, null, query, page, perPage, subject);
-    }
+        final Set<String> requestedFields = new HashSet<>();
+        requestedFields.add(identifier);
+        requestedFields.add(valueColumn);
+        if (displayFields != null) {
+            requestedFields.addAll(displayFields);
+        }
+        if (!permissionsUtils.areAllFieldsReadable(collection, requestedFields)) {
+            LOG.warn("Suggestion request for collection [{}] denied: requested fields {} contain non-readable fields",
+                    collection, requestedFields);
+            return emptyResponse(page, perPage);
+        }
 
-    @Override
-    public EntitySuggestionResponse suggest(final String collection,
-                                            final String targetColumn,
-                                            final String valueColumn,
-                                            @Nullable final List<String> displayFields,
-                                            @Nullable final String displayTemplate,
-                                            final SearchQueryField.Type identifierType,
-                                            final String query,
-                                            final int page,
-                                            final int perPage,
-                                            final Subject subject) {
         final MongoCollection<Document> mongoCollection = mongoConnection.getMongoDatabase().getCollection(collection);
         final boolean filterIsEmpty = Strings.isNullOrEmpty(query);
         final boolean isSpecialCollection = addAdminToSuggestions(collection, valueColumn, filterIsEmpty, query);
@@ -98,7 +99,7 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
 
         // Determine which fields to project
         final Set<String> fieldsToProject = new HashSet<>();
-        fieldsToProject.add(targetColumn);
+        fieldsToProject.add(identifier);
 
         if (displayFields != null && !displayFields.isEmpty()) {
             fieldsToProject.addAll(displayFields);
@@ -149,9 +150,9 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                             displayValue = doc.getString(valueColumn);
                         }
 
-                        // Extract targetColumn value as String
+                        // Extract identifier value as String
                         final String targetValue;
-                        final Object rawValue = doc.get(targetColumn);
+                        final Object rawValue = doc.get(identifier);
                         if (rawValue instanceof ObjectId oid) {
                             targetValue = oid.toHexString();
                         } else {
@@ -184,6 +185,11 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                         perPage));
     }
 
+    private static EntitySuggestionResponse emptyResponse(final int page, final int perPage) {
+        return new EntitySuggestionResponse(List.of(),
+                PaginatedList.PaginationInfo.create(0, 0, page, perPage));
+    }
+
     @MustBeClosed
     private Stream<Document> paginateWithPermissionCheck(FindIterable<Document> result, int limit, int skip, Predicate<Document> checkPermission) {
         return MongoUtils.stream(result)
@@ -196,16 +202,4 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
     private Stream<Document> mongoPaginate(FindIterable<Document> result, int limit, int skip) {
         return MongoUtils.stream(result.limit(limit).skip(skip));
     }
-
-    @Override
-    public EntitySuggestionResponse suggest(final String collection,
-                                            final String targetColumn,
-                                            final String valueColumn,
-                                            final String query,
-                                            final int page,
-                                            final int perPage,
-                                            final Subject subject) {
-        return suggest(collection, targetColumn, valueColumn, null, null, null, query, page, perPage, subject);
-    }
-
 }
