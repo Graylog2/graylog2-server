@@ -139,17 +139,22 @@ const useExecutePreview = (config: EventDefinition['config']) => {
   const queryId = useMemo(() => generateId(), []);
   const searchTypeId = useMemo(() => generateId(), []);
   const [results, setResults] = useState<SearchExecutionResult>();
+  const [isFetching, setIsFetching] = useState(false);
   const { startJob, executeJobResult } = useSearchExecutors();
   const executeSearch = useMemo(
     () =>
-      debounce(
-        (search: Search) =>
-          createSearch(search)
-            .then((createdSearch) => startJob(createdSearch, [searchTypeId], SearchExecutionState.empty()))
-            .then((jobIds) => executeJobResult({ jobIds }))
-            .then((result) => setResults(result)),
-        250,
-      ),
+      debounce((search: Search) => {
+        setIsFetching(true);
+
+        createSearch(search)
+          .then((createdSearch) => startJob(createdSearch, [searchTypeId], SearchExecutionState.empty()))
+          .then((jobIds) => executeJobResult({ jobIds }))
+          .then((result) => {
+            setResults(result);
+            setIsFetching(false);
+          })
+          .catch(() => setIsFetching(false));
+      }, 250),
     [executeJobResult, searchTypeId, startJob],
   );
 
@@ -161,6 +166,7 @@ const useExecutePreview = (config: EventDefinition['config']) => {
   }, [config, currentUser, executeSearch, queryId, searchTypeId]);
 
   return {
+    isFetching,
     errors: results?.result?.errors,
     result: results?.result?.forId(queryId)?.searchTypes?.[searchTypeId],
   };
@@ -169,9 +175,8 @@ const useExecutePreview = (config: EventDefinition['config']) => {
 const FilterPreview = ({ config }: FilterPreviewProps) => {
   const currentUser = useCurrentUser();
   const displayPreview = isPermittedToSeePreview(currentUser, config);
-  const results = useExecutePreview(config);
-  const { result: searchResult = {}, errors = [] } = results ?? {};
-  const isFetchingData = !results?.result;
+  const { isFetching, result: searchResult = {}, errors = [] } = useExecutePreview(config);
+  const isFetchingData = isFetching || !searchResult;
   const hasError = errors?.length > 0;
 
   return (
