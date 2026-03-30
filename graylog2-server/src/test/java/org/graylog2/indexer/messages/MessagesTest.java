@@ -99,6 +99,7 @@ public class MessagesTest {
 
         verify(trafficAccounting, times(1)).addOutputTraffic(82);
         verify(trafficAccounting, never()).addSystemTraffic(anyLong());
+        verify(trafficAccounting, times(1)).addIndexedInputTraffic(82);
     }
 
     @Test
@@ -114,6 +115,21 @@ public class MessagesTest {
 
         verify(trafficAccounting, never()).addOutputTraffic(anyLong());
         verify(trafficAccounting, times(1)).addSystemTraffic(82);
+        verify(trafficAccounting, times(1)).addIndexedInputTraffic(82);
+    }
+
+    @Test
+    public void bulkIndexingShouldAccountIndexedInputTraffic() throws IOException {
+        final List<MessageWithIndex> messageList = List.of(
+                new MessageWithIndex(wrap(messageWithInputSize(17, 100)), ""),
+                new MessageWithIndex(wrap(messageWithInputSize(23, 200)), ""),
+                new MessageWithIndex(wrap(messageWithInputSize(42, 300)), "")
+        );
+        when(messagesAdapter.bulkIndex(any())).thenReturn(IndexingResults.create(createSuccessFromMessages(messageList), List.of()));
+
+        messages.bulkIndex(messageList);
+
+        verify(trafficAccounting, times(1)).addIndexedInputTraffic(600);
     }
 
     @Test
@@ -207,6 +223,13 @@ public class MessagesTest {
         final Message message = mock(Message.class);
         when(message.getSize()).thenReturn(size);
 
+        return message;
+    }
+
+    private Message messageWithInputSize(long size, long inputSize) {
+        final Message message = mock(Message.class);
+        when(message.getSize()).thenReturn(size);
+        when(message.getField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE)).thenReturn(inputSize);
         return message;
     }
 }
