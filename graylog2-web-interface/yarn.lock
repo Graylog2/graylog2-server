@@ -7914,7 +7914,7 @@ escodegen@^2.1.0:
     eslint-config-prettier "10.1.5"
     eslint-import-resolver-webpack "0.13.10"
     eslint-plugin-compat "7.0.1"
-    eslint-plugin-graylog "file:../../../../../../Library/Caches/Yarn/v6/npm-eslint-config-graylog-1.3.0-fdb16306-adb1-4ef6-9bd5-414c323b5efe-1774851349038/node_modules/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
     eslint-plugin-import "2.32.0"
     eslint-plugin-jest "29.15.0"
     eslint-plugin-jest-dom "5.5.0"
@@ -7922,7 +7922,7 @@ escodegen@^2.1.0:
     eslint-plugin-jsx-a11y "6.10.2"
     eslint-plugin-react "7.37.5"
     eslint-plugin-react-hooks "7.0.1"
-    eslint-plugin-testing-library "7.16.1"
+    eslint-plugin-testing-library "7.16.0"
     typescript-eslint "^8.44.1"
 
 eslint-config-prettier@10.1.5:
@@ -8079,10 +8079,10 @@ eslint-plugin-react@7.37.5:
     string.prototype.matchall "^4.0.12"
     string.prototype.repeat "^1.0.0"
 
-eslint-plugin-testing-library@7.16.1:
-  version "7.16.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-testing-library/-/eslint-plugin-testing-library-7.16.1.tgz#9378976d98aeaa6a7dd724a46d4e54f7cbbc90b0"
-  integrity sha512-/pCFzJuro/wOq6FCp43DwS3fpCr0hM2gByJAxi8bPdL7DXKdmH3p3BEpVKQkneUxT6T2XbUXG4J+c5GSAm12lA==
+eslint-plugin-testing-library@7.16.0:
+  version "7.16.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-testing-library/-/eslint-plugin-testing-library-7.16.0.tgz#ac8dd5e4069e9264d997079b4cb5f45e79d2b8a7"
+  integrity sha512-lHZI6/Olb2oZqxd1+s1nOLCtL2PXKrc1ERz6oDbUKS0xZAMFH3Fy6wJo75z3pXTop3BV6+loPi2MSjIYt3vpAg==
   dependencies:
     "@typescript-eslint/scope-manager" "^8.56.0"
     "@typescript-eslint/utils" "^8.56.0"
@@ -9527,14 +9527,14 @@ graphemer@^1.4.0:
     "@reduxjs/toolkit" "^2.5.1"
     "@tanstack/react-query" "5.90.21"
     "@types/react" "18.3.13"
-    babel-preset-graylog "file:../../../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-7.1.0-SNAPSHOT-20dfc5a3-d59d-4e92-95fe-efbf71479dca-1774851348961/node_modules/babel-preset-graylog"
-    eslint-config-graylog "file:../../../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-7.1.0-SNAPSHOT-20dfc5a3-d59d-4e92-95fe-efbf71479dca-1774851348961/node_modules/eslint-config-graylog"
+    babel-preset-graylog "file:packages/babel-preset-graylog"
+    eslint-config-graylog "file:packages/eslint-config-graylog"
     formik "2.4.9"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-7.1.0-SNAPSHOT-20dfc5a3-d59d-4e92-95fe-efbf71479dca-1774851348961/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:packages/jest-preset-graylog"
     moment "2.30.1"
-    moment-timezone "0.6.1"
+    moment-timezone "0.6.0"
     react "18.3.1"
     react-dom "18.2.0"
     react-redux "^9.2.0"
@@ -12152,10 +12152,10 @@ moment-precise-range-plugin@^1.3.0:
   resolved "https://registry.yarnpkg.com/moment-precise-range-plugin/-/moment-precise-range-plugin-1.3.0.tgz#60ac075fdfd14689f6d102af751d171a80b4ab60"
   integrity sha1-YKwHX9/RRon20QKvdR0XGoC0q2A=
 
-moment-timezone@0.6.1:
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.6.1.tgz#c324a71a8285583eb679ced4ba3dcfa53fdce500"
-  integrity sha512-1B9lmAhB9D9/sHaPC1N7wLFEVUoFldxOpOO96lOD1PvJ43vCd0ozDPbu0FEL3++VvawOlDkq8YD373tJmP5JHw==
+moment-timezone@0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.6.0.tgz#c5a6519171f31a64739ea75d33f5c136c08ff608"
+  integrity sha512-ldA5lRNm3iJCWZcBCab4pnNL3HSZYXVb/3TYr75/1WCTWYuTqYUb5f/S384pncYjJ88lbO8Z4uPDvmoluHJc8Q==
   dependencies:
     moment "^2.29.4"
 
