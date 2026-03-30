@@ -15,3 +15,4 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 export { default } from './RightSidebar';
+export { SidebarContainer, SidebarRow, SidebarContentArea, SidebarHeader, SidebarTitle } from './SidebarStyles';

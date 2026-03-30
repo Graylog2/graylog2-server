@@ -1,0 +1,4 @@
+type = "c"
+message = "Migrated the storage module from the deprecated OpenSearch Rest High-Level Client to the OpenSearch Java Client. This ensures compatibility with newer OpenSearch versions and removes reliance on deprecated APIs."
+
+pulls = ["25390"]

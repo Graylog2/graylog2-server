@@ -26,7 +26,7 @@ import { isPermitted } from 'util/PermissionsMixin';
 import StreamRuleModal from 'components/streamrules/StreamRuleModal';
 import UserNotification from 'util/UserNotification';
 import { StreamRulesInputsActions, StreamRulesInputsStore } from 'stores/inputs/StreamRulesInputsStore';
-import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
+import useStreamRuleMutations from 'hooks/useStreamRuleMutations';
 import type { StreamRule as StreamRuleTypeDefinition, Stream } from 'stores/streams/StreamsStore';
 
 import useCurrentUser from '../../hooks/useCurrentUser';
@@ -50,6 +50,7 @@ const StreamRule = ({ matchData = undefined, stream, streamRule, onSubmit = () =
   const { permissions } = useCurrentUser();
   const [showStreamRuleForm, setShowStreamRuleForm] = useState(false);
   const { inputs } = useStore(StreamRulesInputsStore);
+  const { removeStreamRule, updateStreamRule } = useStreamRuleMutations();
 
   useEffect(() => {
     StreamRulesInputsActions.list();
@@ -66,7 +67,7 @@ const StreamRule = ({ matchData = undefined, stream, streamRule, onSubmit = () =
     /* TODO: Replace with custom confirmation dialog */
     // eslint-disable-next-line no-alert
     if (window.confirm('Do you really want to delete this stream rule?')) {
-      StreamRulesStore.remove(stream.id, streamRule.id, () => {
+      removeStreamRule({ streamId: stream.id, streamRuleId: streamRule.id }).then(() => {
         if (onDelete) {
           onDelete(streamRule.id);
         }
@@ -77,7 +78,7 @@ const StreamRule = ({ matchData = undefined, stream, streamRule, onSubmit = () =
   };
 
   const _onSubmit = (streamRuleId: string, data: StreamRuleTypeDefinition) =>
-    StreamRulesStore.update(stream.id, streamRuleId, data, () => {
+    updateStreamRule({ streamId: stream.id, streamRuleId, data }).then(() => {
       if (onSubmit) {
         onSubmit(streamRuleId, data);
       }

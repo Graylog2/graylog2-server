@@ -287,6 +287,10 @@ export interface ActionContexts {
   favoriteFields?: Array<string>;
 }
 
+export type AdditionalViewsActionHandlerArguments = {
+  queryId: QueryId;
+};
+
 export type SearchTypeResult = SearchTypeResultTypes[keyof SearchTypeResultTypes];
 export type SearchTypeResults = { [id: string]: SearchTypeResult };
 
@@ -432,6 +436,14 @@ export type EventActionComponentProps<T = unknown> = {
 type MessageActionComponentProps = {
   index: string;
   id: string;
+};
+
+export type MessageBulkActionsComponentProps<T = unknown> = {
+  modalRef: () => T;
+};
+
+export type MessageBulkActionsModalProps<T = unknown> = {
+  ref: React.LegacyRef<T>;
 };
 
 type SearchActionComponentProps = {
@@ -636,7 +648,7 @@ declare module 'graylog-web-plugin/plugin' {
     creators?: Array<Creator>;
     enterpriseWidgets?: Array<WidgetExport>;
     useExternalActions?: Array<() => ExternalActionsHookData>;
-    fieldActions?: Array<ActionDefinition>;
+    fieldActions?: Array<ActionDefinition<AdditionalViewsActionHandlerArguments>>;
     fieldTypeValueRenderer?: Array<{
       type: string;
       render: (value: unknown, field: string, render: React.ComponentType<ValueRendererProps>) => React.ReactNode;
@@ -645,7 +657,7 @@ declare module 'graylog-web-plugin/plugin' {
     searchTypes?: Array<SearchType<any, any>>;
     coreSystemConfigurations?: Array<CoreSystemConfiguration>;
     systemConfigurations?: Array<SystemConfiguration>;
-    valueActions?: Array<ActionDefinition>;
+    valueActions?: Array<ActionDefinition<AdditionalViewsActionHandlerArguments>>;
     'views.completers'?: Array<Completer>;
     'views.components.assetInformationActions'?: Array<AssetInformation>;
     'views.components.eventProcedureForm'?: Array<EventProcedureForm>;
@@ -662,6 +674,12 @@ declare module 'graylog-web-plugin/plugin' {
     'views.components.widgets.messageTable.contextProviders'?: Array<React.ComponentType<React.PropsWithChildren<{}>>>;
     'views.components.widgets.messageTable.messageActions'?: Array<{
       component: React.ComponentType<MessageActionComponentProps>;
+      key: string;
+      useCondition: () => boolean;
+    }>;
+    'views.components.widgets.messageTable.messageBulkActions'?: Array<{
+      component: React.ComponentType<MessageBulkActionsComponentProps<unknown>>;
+      modal?: React.ComponentType<MessageBulkActionsModalProps<unknown>>;
       key: string;
       useCondition: () => boolean;
     }>;

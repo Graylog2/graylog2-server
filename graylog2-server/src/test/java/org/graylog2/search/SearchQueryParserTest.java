@@ -32,6 +32,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 
@@ -226,27 +227,29 @@ public class SearchQueryParserTest {
                 "date", SearchQueryField.create("created_at", SearchQueryField.Type.DATE));
         final SearchQueryParser parser = new SearchQueryParser("defaultfield", fields);
 
-        final SearchQueryParser.FieldValue v1 = parser.createFieldValue(fields.get("id").getFieldType(), "abc", false);
+        final SearchQueryField id = Objects.requireNonNull(fields.get("id"));
+        final SearchQueryParser.FieldValue v1 = parser.createFieldValue(id, "abc", false);
         assertThat(v1.getOperator()).isEqualTo(SearchQueryParser.DEFAULT_STRING_OPERATOR);
         assertThat(v1.getValue()).isEqualTo("abc");
         assertThat(v1.isNegate()).isFalse();
 
-        final SearchQueryParser.FieldValue v2 = parser.createFieldValue(fields.get("id").getFieldType(), "=abc", true);
+        final SearchQueryParser.FieldValue v2 = parser.createFieldValue(id, "=abc", true);
         assertThat(v2.getOperator()).isEqualTo(SearchQueryOperators.EQUALS);
         assertThat(v2.getValue()).isEqualTo("abc");
         assertThat(v2.isNegate()).isTrue();
 
-        final SearchQueryParser.FieldValue v3 = parser.createFieldValue(fields.get("date").getFieldType(), ">=2017-03-01", false);
+        final SearchQueryField date = Objects.requireNonNull(fields.get("date"));
+        final SearchQueryParser.FieldValue v3 = parser.createFieldValue(date, ">=2017-03-01", false);
         assertThat(v3.getOperator()).isEqualTo(SearchQueryOperators.GREATER_EQUALS);
         assertThat(v3.getValue()).isEqualTo(new DateTime(2017, 3, 1, 0, 0, DateTimeZone.UTC));
         assertThat(v3.isNegate()).isFalse();
 
-        final SearchQueryParser.FieldValue v4 = parser.createFieldValue(fields.get("date").getFieldType(), ">=2017-03-01 12:12:12", false);
+        final SearchQueryParser.FieldValue v4 = parser.createFieldValue(date, ">=2017-03-01 12:12:12", false);
         assertThat(v4.getOperator()).isEqualTo(SearchQueryOperators.GREATER_EQUALS);
         assertThat(v4.getValue()).isEqualTo(new DateTime(2017, 3, 1, 12, 12, 12, DateTimeZone.UTC));
         assertThat(v4.isNegate()).isFalse();
 
-        final SearchQueryParser.FieldValue v5 = parser.createFieldValue(fields.get("date").getFieldType(), "\">=2017-03-01 12:12:12\"", false);
+        final SearchQueryParser.FieldValue v5 = parser.createFieldValue(date, "\">=2017-03-01 12:12:12\"", false);
         assertThat(v5.getOperator()).isEqualTo(SearchQueryOperators.GREATER_EQUALS);
         assertThat(v5.getValue()).isEqualTo(new DateTime(2017, 3, 1, 12, 12, 12, DateTimeZone.UTC));
         assertThat(v5.isNegate()).isFalse();

@@ -22,6 +22,7 @@ import Badge from 'components/bootstrap/Badge';
 const StyledBadge = styled(Badge)(
   ({ theme }) => css`
     background-color: ${theme.colors.variant.light.danger};
+    vertical-align: middle;
   `,
 );
 

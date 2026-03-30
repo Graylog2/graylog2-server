@@ -28,6 +28,7 @@ import { asMock } from 'helpers/mocking';
 import useFeature from 'hooks/useFeature';
 import useInputMutations from 'hooks/useInputMutations';
 import usePermissions from 'hooks/usePermissions';
+import useInputStateMutations from 'hooks/useInputsStateMutations';
 
 import InputsActions from './InputsActions';
 
@@ -49,13 +50,7 @@ jest.mock('routing/useLocation', () => ({
 jest.mock('hooks/useFeature');
 jest.mock('hooks/useInputMutations');
 jest.mock('hooks/usePermissions');
-jest.mock('stores/inputs/InputStatesStore', () => ({
-  __esModule: true,
-  default: {
-    setup: jest.fn(),
-    stop: jest.fn(),
-  },
-}));
+jest.mock('hooks/useInputsStateMutations');
 
 jest.mock('components/inputs', () => ({
   __esModule: true,
@@ -153,6 +148,11 @@ describe('InputsActions', () => {
       deleteInput: deleteInputMock,
     } as any);
     asMock(usePermissions).mockReturnValue({ isPermitted: () => true });
+    asMock(useInputStateMutations).mockReturnValue({
+      startInput: jest.fn(() => Promise.resolve()),
+      stopInput: jest.fn(() => Promise.resolve()),
+      setupInput: jest.fn(() => Promise.resolve()),
+    } as any);
   });
 
   it('renders Received messages button with correct query for standard input', () => {
@@ -360,6 +360,16 @@ describe('InputsActions', () => {
 
   describe('Setup mode actions', () => {
     const { isInputInSetupMode, isInputRunning } = jest.requireMock('components/inputs/helpers/inputState');
+    const setupInputMock = jest.fn(() => Promise.resolve());
+    const stopInputMock = jest.fn(() => Promise.resolve());
+
+    beforeEach(() => {
+      asMock(useInputStateMutations).mockReturnValue({
+        startInput: jest.fn(() => Promise.resolve()),
+        stopInput: stopInputMock,
+        setupInput: setupInputMock,
+      } as any);
+    });
 
     it('shows Enter Setup mode when not running and not in setup mode', async () => {
       asMock(isInputInSetupMode).mockReturnValue(false);
@@ -381,8 +391,7 @@ describe('InputsActions', () => {
 
       await setupUser().click(enterItem);
 
-      const InputStatesStore = jest.requireMock('stores/inputs/InputStatesStore').default;
-      expect(InputStatesStore.setup).toHaveBeenCalledWith(input);
+      expect(setupInputMock).toHaveBeenCalledWith({ inputId: 'input4' });
     });
 
     it('shows Exit Setup mode when in setup mode', async () => {
@@ -405,8 +414,7 @@ describe('InputsActions', () => {
 
       await setupUser().click(exitItem);
 
-      const InputStatesStore = jest.requireMock('stores/inputs/InputStatesStore').default;
-      expect(InputStatesStore.stop).toHaveBeenCalledWith(input);
+      expect(stopInputMock).toHaveBeenCalledWith({ inputId: 'input3' });
     });
 
     it('does not show Enter Setup mode when input is running', async () => {

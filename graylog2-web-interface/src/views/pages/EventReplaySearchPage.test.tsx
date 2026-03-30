@@ -39,6 +39,8 @@ import useParams from 'routing/useParams';
 import type { Stream } from 'logic/streams/types';
 import RightSidebarProvider from 'contexts/RightSidebarProvider';
 
+jest.mock('logic/telemetry/useSendTelemetry');
+
 const mockView = createSearch();
 
 jest.mock('views/components/Search');

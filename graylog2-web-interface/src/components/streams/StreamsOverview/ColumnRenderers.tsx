@@ -19,7 +19,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import type Immutable from 'immutable';
 
 import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
-import type { Output } from 'stores/outputs/OutputsStore';
+import type { Output } from 'hooks/useOutputs';
 import type { Stream, StreamRule } from 'stores/streams/StreamsStore';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import IndexSetCell from 'components/streams/StreamsOverview/cells/IndexSetCell';

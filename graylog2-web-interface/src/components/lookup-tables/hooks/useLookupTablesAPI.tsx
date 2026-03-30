@@ -48,10 +48,8 @@ import {
   validateDataAdapter,
 } from './api/lookupTablesAPI';
 
+export { fetchPaginatedLookupTables };
 export const lookupTablesKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
-export function useFetchLookupTables() {
-  return { fetchPaginatedLookupTables, lookupTablesKeyFn };
-}
 
 export function useFetchLookupTable(idOrName: string) {
   const { data, isLoading } = useQuery({

@@ -26,7 +26,6 @@ type Props = {
 };
 
 const ReplaySearchSidebar = ({ alertId, definitionId = undefined }: Props) => {
-
   const sideBarDetailsPlugin = usePluginEntities('views.components.eventReplay.sideBarDetails');
 
   const EventSideBarDetails = useMemo<React.ComponentType<EventReplaySideBarDetailsProps>>(() => {
