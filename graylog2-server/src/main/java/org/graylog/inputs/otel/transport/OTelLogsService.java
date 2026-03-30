@@ -27,7 +27,6 @@ import io.opentelemetry.proto.collector.logs.v1.LogsServiceGrpc;
 import jakarta.inject.Inject;
 import org.graylog.inputs.otel.OTelJournal;
 import org.graylog.inputs.otel.OTelJournalRecordFactory;
-
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
 import org.graylog2.plugin.journal.RawMessage;
@@ -74,7 +73,7 @@ public class OTelLogsService extends LogsServiceGrpc.LogsServiceImplBase {
             createRawMessage = RawMessage::new;
         }
 
-        final List<OTelJournal.Record> journalRecords = journalRecordFactory.createFromRequest(request);
+        final List<OTelJournal.Record> journalRecords = OTelJournalRecordFactory.createFromRequest(request);
         final int recordCount = journalRecords.size();
         final int perMessageSize = recordCount > 0 ? request.getSerializedSize() / recordCount : 0;
 
