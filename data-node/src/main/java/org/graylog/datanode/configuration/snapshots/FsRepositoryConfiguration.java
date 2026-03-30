@@ -36,7 +36,7 @@ public class FsRepositoryConfiguration implements RepositoryConfiguration {
      * <a href="https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/snapshot-restore/#shared-file-system">See snapshot documentation</a>
      */
     @Documentation("Filesystem path where searchable snapshots should be stored")
-    @Parameter(value = "path_repo", converter = PathListConverter.class, validators = DirectoriesWritableValidator.class)
+    @Parameter(value = "path_repo", fallbackPropertyName = "path.repo", converter = PathListConverter.class, validators = DirectoriesWritableValidator.class)
     private List<Path> pathRepo;
 
     @Override
