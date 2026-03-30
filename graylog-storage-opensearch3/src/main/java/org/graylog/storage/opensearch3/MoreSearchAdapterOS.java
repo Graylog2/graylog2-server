@@ -158,12 +158,19 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
         boolQuery.filter(timerangeQuery(timerange));
 
 
-        extraFilters.entrySet()
-                .stream()
-                .flatMap(extraFilter -> extraFilter.getValue()
-                        .stream()
-                        .map(value -> buildExtraFilter(extraFilter.getKey(), value)))
-                .forEach(boolQuery::filter);
+        extraFilters.forEach((field, values) -> {
+            values.stream()
+                    .filter(MoreSearchAdapter::isRangeValue)
+                    .map(value -> buildExtraFilter(field, value))
+                    .forEach(boolQuery::filter);
+            final var termQueries = values.stream()
+                    .filter(v -> !MoreSearchAdapter.isRangeValue(v))
+                    .map(value -> buildExtraFilter(field, value))
+                    .toList();
+            if (!termQueries.isEmpty()) {
+                boolQuery.filter(Query.of(b -> b.bool(inner -> inner.should(termQueries).minimumShouldMatch("1"))));
+            }
+        });
 
         if (!isNullOrEmpty(filterString)) {
             boolQuery.filter(Query.builder().queryString(qs -> qs.query(filterString)).build());
