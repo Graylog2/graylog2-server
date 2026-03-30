@@ -27,7 +27,6 @@ import StreamRuleModal from 'components/streamrules/StreamRuleModal';
 import Spinner from 'components/common/Spinner';
 import type { MatchData } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
-import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import useCreateStreamRule from 'components/streamrules/hooks/useCreateStreamRule';
 import StartStreamAfterRuleCreateDialog from 'components/streamrules/StartStreamAfterRuleCreateDialog';
 
@@ -70,13 +69,11 @@ const StreamRulesEditor = ({ streamId, messageId = '', index = '' }: Props) => {
     });
 
   useEffect(() => {
-    const refetchStrems = () => refetch();
-    StreamsStore.onChange(refetchStrems);
-    StreamRulesStore.onChange(refetchStrems);
+    const refetchStreams = () => refetch();
+    StreamsStore.onChange(refetchStreams);
 
     return () => {
-      StreamsStore.unregister(refetchStrems);
-      StreamRulesStore.unregister(refetchStrems);
+      StreamsStore.unregister(refetchStreams);
     };
   }, [refetch]);
 

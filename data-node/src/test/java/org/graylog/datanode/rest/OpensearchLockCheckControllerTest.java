@@ -33,22 +33,29 @@ class OpensearchLockCheckControllerTest {
     @Test
     void testNotLockedDir(@TempDir Path tempDir) throws IOException {
         final OpensearchLockCheckController controller = new OpensearchLockCheckController(tempDir);
-        createLockFile(tempDir);
-        final OpensearchLockCheckResult result = controller.checkLockFiles();
-        Assertions.assertThat(result.locks())
-                .hasSize(1)
-                .allSatisfy(l -> Assertions.assertThat(l.locked()).isFalse());
+        final Path lockFile = createLockFile(tempDir);
+        try {
+            final OpensearchLockCheckResult result = controller.checkLockFiles();
+            Assertions.assertThat(result.locks())
+                    .hasSize(1)
+                    .allSatisfy(l -> Assertions.assertThat(l.locked()).isFalse());
+        } finally {
+            Files.deleteIfExists(lockFile);
+        }
     }
 
     @Test
     void testLockedDir(@TempDir Path tempDir) throws IOException {
         final OpensearchLockCheckController controller = new OpensearchLockCheckController(tempDir);
         final Path lockFile = createLockFile(tempDir);
-        lock(lockFile);
-        final OpensearchLockCheckResult result = controller.checkLockFiles();
-        Assertions.assertThat(result.locks())
-                .hasSize(1)
-                .allSatisfy(l -> Assertions.assertThat(l.locked()).isTrue());
+        try (final FileLock lock = lock(lockFile)) {
+            final OpensearchLockCheckResult result = controller.checkLockFiles();
+            Assertions.assertThat(result.locks())
+                    .hasSize(1)
+                    .allSatisfy(l -> Assertions.assertThat(l.locked()).isTrue());
+        } finally {
+            Files.deleteIfExists(lockFile);
+        }
     }
 
     @Test

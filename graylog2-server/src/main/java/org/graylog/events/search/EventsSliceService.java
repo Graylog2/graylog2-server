@@ -34,6 +34,7 @@ import org.graylog2.streams.StreamService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -42,6 +43,8 @@ import static org.graylog.events.event.EventDto.FIELD_ALERT;
 import static org.graylog.events.event.EventDto.FIELD_PRIORITY;
 
 public class EventsSliceService extends AbstractEventsSearchService {
+    public final static String TYPE = "type";
+
     private final ScriptingApiService scriptingApiService;
 
     @Inject
@@ -62,25 +65,28 @@ public class EventsSliceService extends AbstractEventsSearchService {
         final var timeRange = request.timerange();
         final var filter = buildFilter(EventsSearchParameters.builder().query(query).timerange(timeRange).filter(request.filter()).build());
 
+        final String column = request.sliceColumn();
+        final Map<String, Object> meta = getTypeBySliceColumn(column) != null ? Map.of(TYPE, getTypeBySliceColumn(column)) : Map.of();
+
         final var queryString = filter.isEmpty() ? query : query.isEmpty() ? filter : query + " AND " + filter;
 
-        final var allSlicesInTimeRange = this.slices("", timeRange, subject, searchUser, request.sliceColumn());
-        final var filteredSlices = this.slices(queryString, timeRange, subject, searchUser, request.sliceColumn());
-        final var slices = filteredSlicesWithMergedInEmptySlicesFrom(filteredSlices, allSlicesInTimeRange, getTypeBySliceColumn(request.sliceColumn()));
+        final var allSlicesInTimeRange = this.slices("", timeRange, subject, searchUser, column, meta);
+        final var filteredSlices = this.slices(queryString, timeRange, subject, searchUser, column, meta);
+        final var slices = filteredSlicesWithMergedInEmptySlicesFrom(filteredSlices, allSlicesInTimeRange, meta);
 
         return new Slices(addMissingOptions(slices, request.sliceColumn()));
     }
 
-    protected static List<Slice> filteredSlicesWithMergedInEmptySlicesFrom(final List<Slice> filteredSlices, final List<Slice> allSlicesInTimeRange, final String type) {
+    protected static List<Slice> filteredSlicesWithMergedInEmptySlicesFrom(final List<Slice> filteredSlices, final List<Slice> allSlicesInTimeRange, final Map<String, Object> meta) {
         final var existingSlices = filteredSlices.stream().map(Slice::value).collect(Collectors.toSet());
-        final var emptySlices = allSlicesInTimeRange.stream().filter(slice -> !existingSlices.contains(slice.value())).map(s -> new Slice(s.value(), s.title(), type, 0));
+        final var emptySlices = allSlicesInTimeRange.stream().filter(slice -> !existingSlices.contains(slice.value())).map(s -> new Slice(s.value(), s.title(), 0, meta));
         return Streams.concat(filteredSlices.stream(), emptySlices).toList();
     }
 
     /**
      * Used inside this service for the core Events/Alerts table but also is a provided method, re-used from the enterprise/security part of Graylog
      */
-    protected List<Slice> slices(String query, TimeRange timeRange, Subject subject, SearchUser searchUser, final String slicingColumn) {
+    protected List<Slice> slices(String query, TimeRange timeRange, Subject subject, SearchUser searchUser, final String slicingColumn, final Map<String, Object> meta) {
         try {
             return scriptingApiService.executeAggregation(
                             new AggregationRequestSpec(query, allowedEventStreams(subject), Set.of(), timeRange, List.of(new Grouping(slicingColumn, Integer.MAX_VALUE)), List.of(new Metric("count", slicingColumn))),
@@ -88,7 +94,7 @@ public class EventsSliceService extends AbstractEventsSearchService {
                     )
                     .datarows()
                     .stream()
-                    .map(r -> mapAggregationResultsToSlice(slicingColumn, r))
+                    .map(r -> mapAggregationResultsToSlice(meta, r))
                     .toList();
         } catch (QueryFailedException e) {
             throw new RuntimeException(e);
@@ -98,7 +104,7 @@ public class EventsSliceService extends AbstractEventsSearchService {
     /**
      * finding the overall count for one column for MongoDB based queries so we can calculate the "empty" case
      */
-    public Optional<Slice> count(String query, TimeRange timeRange, Subject subject, SearchUser searchUser, final String type) {
+    public Optional<Slice> count(String query, TimeRange timeRange, Subject subject, SearchUser searchUser, final Map<String, Object> meta) {
         try {
             return scriptingApiService.executeAggregation(
                             new AggregationRequestSpec(query, allowedEventStreams(subject), Set.of(), timeRange, List.of(), List.of(new Metric("count", null))),
@@ -106,7 +112,7 @@ public class EventsSliceService extends AbstractEventsSearchService {
                     )
                     .datarows()
                     .stream()
-                    .map(r -> new Slice(r.getFirst().toString(), r.getFirst().toString(), type, Integer.valueOf(r.getLast().toString())))
+                    .map(r -> new Slice(r.getFirst().toString(), r.getFirst().toString(), Integer.valueOf(r.getLast().toString()), meta))
                     .findFirst();
         } catch (QueryFailedException e) {
             throw new RuntimeException(e);
@@ -125,20 +131,20 @@ public class EventsSliceService extends AbstractEventsSearchService {
      * In the Open Source part, we only map priority and type, both of which are augmented in the FE regarding the title.
      * So we only need a simple mapping function here.
      */
-    protected Slice mapAggregationResultsToSlice(final String slicingColumn, final List<Object> result) {
-        return new Slice(result.getFirst().toString(), null, getTypeBySliceColumn(slicingColumn), Integer.valueOf(result.getLast().toString()));
+    protected Slice mapAggregationResultsToSlice(final Map<String, Object> meta, final List<Object> result) {
+        return new Slice(result.getFirst().toString(), null, Integer.valueOf(result.getLast().toString()), meta);
     }
 
     // the alert can either be true or false
     List<Slice> handleAlertColumn(final List<Slice> slices) {
-        final var type = getTypeBySliceColumn(FIELD_ALERT);
+        final Map<String, Object> meta = getTypeBySliceColumn(FIELD_ALERT) != null ? Map.of("type", getTypeBySliceColumn(FIELD_ALERT)) : Map.of();
 
         if (slices.size() == 2) {
             return slices;
         }
 
-        final var TRUE = new Slice("true", null, type, 0);
-        final var FALSE = new Slice("false", null, type, 0);
+        final var TRUE = new Slice("true", null, 0, meta);
+        final var FALSE = new Slice("false", null, 0, meta);
 
         if (slices.isEmpty()) {
             return List.of(TRUE, FALSE);
@@ -153,17 +159,17 @@ public class EventsSliceService extends AbstractEventsSearchService {
 
     // priority can be 0 (info) to 4 (critical), see EventDefinitionPriorityEnum.ts
     List<Slice> handlePriorityColumn(final List<Slice> slices) {
-        final var type = getTypeBySliceColumn(FIELD_PRIORITY);
+        final Map<String, Object> meta = getTypeBySliceColumn(FIELD_PRIORITY) != null ? Map.of("type", getTypeBySliceColumn(FIELD_PRIORITY)) : Map.of();
 
         if (slices.size() == 5) {
             return slices;
         }
 
-        final var INFO = new Slice("0", null, type, 0);
-        final var LOW = new Slice("1", null, type, 0);
-        final var MEDIUM = new Slice("2", null, type, 0);
-        final var HIGH = new Slice("3", null, type, 0);
-        final var CRITICAL = new Slice("4", null, type, 0);
+        final var INFO = new Slice("0", null, 0, meta);
+        final var LOW = new Slice("1", null, 0, meta);
+        final var MEDIUM = new Slice("2", null, 0, meta);
+        final var HIGH = new Slice("3", null, 0, meta);
+        final var CRITICAL = new Slice("4", null, 0, meta);
 
         if (slices.isEmpty()) {
             return List.of(INFO, LOW, MEDIUM, HIGH, CRITICAL);

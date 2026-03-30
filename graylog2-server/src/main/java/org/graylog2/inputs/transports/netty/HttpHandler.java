@@ -16,9 +16,8 @@
  */
 package org.graylog2.inputs.transports.netty;
 
-import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -28,14 +27,16 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
+import jakarta.annotation.Nullable;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+// NOTE: Auth, CORS, and OPTIONS handling in this class are cross-cutting concerns that would
+// be cleaner as separate upstream pipeline handlers (e.g., HttpAuthHandler, HttpCorsHandler).
 public class HttpHandler extends SimpleChannelInboundHandler<HttpRequest> {
     private final boolean enableCors;
     private final String authorizationHeader;
@@ -56,8 +57,13 @@ public class HttpHandler extends SimpleChannelInboundHandler<HttpRequest> {
         final HttpVersion httpRequestVersion = request.protocolVersion();
         final String origin = request.headers().get(HttpHeaderNames.ORIGIN);
 
+        // Handle CORS preflight before auth — browsers send OPTIONS without credentials.
+        if (HttpMethod.OPTIONS.equals(request.method())) {
+            writeResponse(channel, keepAlive, httpRequestVersion, HttpResponseStatus.OK, origin);
+            return;
+        }
+
         if (isNotBlank(authorizationHeader)) {
-            // Authentication is required.
             final String suppliedAuthHeaderValue = request.headers().get(authorizationHeader);
             if (isBlank(suppliedAuthHeaderValue) || !suppliedAuthHeaderValue.equals(authorizationHeaderValue)) {
                 writeResponse(channel, keepAlive, httpRequestVersion, HttpResponseStatus.UNAUTHORIZED, origin);
@@ -65,36 +71,49 @@ public class HttpHandler extends SimpleChannelInboundHandler<HttpRequest> {
             }
         }
 
-        // to allow for future changes, let's be at least a little strict in what we accept here.
-        if (HttpMethod.OPTIONS.equals(request.method())) {
-            writeResponse(channel, keepAlive, httpRequestVersion, HttpResponseStatus.OK, origin);
-            return;
-        } else if (!HttpMethod.POST.equals(request.method())) {
+        if (!HttpMethod.POST.equals(request.method())) {
             writeResponse(channel, keepAlive, httpRequestVersion, HttpResponseStatus.METHOD_NOT_ALLOWED, origin);
             return;
         }
 
         final boolean correctPath = path.equals(request.uri());
-        if (correctPath && request instanceof FullHttpRequest) {
-            final FullHttpRequest fullHttpRequest = (FullHttpRequest) request;
-            final ByteBuf buffer = fullHttpRequest.content();
-
-            // send on to raw message handler
-            writeResponse(channel, keepAlive, httpRequestVersion, HttpResponseStatus.ACCEPTED, origin);
-            ctx.fireChannelRead(buffer.retain());
+        if (correctPath && request instanceof FullHttpRequest fullHttpRequest) {
+            handleValidPost(ctx, fullHttpRequest, keepAlive, origin);
         } else {
             writeResponse(channel, keepAlive, httpRequestVersion, HttpResponseStatus.NOT_FOUND, origin);
         }
     }
 
-    private void writeResponse(Channel channel,
-                               boolean keepAlive,
-                               HttpVersion httpRequestVersion,
-                               HttpResponseStatus status,
-                               String origin) {
-        final HttpResponse response = new DefaultFullHttpResponse(httpRequestVersion, status);
+    protected void handleValidPost(ChannelHandlerContext ctx, FullHttpRequest request, boolean keepAlive,
+                                   String origin) {
+        writeResponse(ctx.channel(), keepAlive, request.protocolVersion(),
+                HttpResponseStatus.ACCEPTED, origin);
+        ctx.fireChannelRead(request.content().retain());
+    }
 
-        response.headers().set(HttpHeaderNames.CONTENT_LENGTH, 0);
+    protected void writeResponse(Channel channel,
+                                 boolean keepAlive,
+                                 HttpVersion httpRequestVersion,
+                                 HttpResponseStatus status,
+                                 String origin) {
+        writeResponse(channel, keepAlive, httpRequestVersion, status, origin, null, null);
+    }
+
+    protected void writeResponse(Channel channel,
+                                 boolean keepAlive,
+                                 HttpVersion httpRequestVersion,
+                                 HttpResponseStatus status,
+                                 String origin,
+                                 @Nullable byte[] body,
+                                 @Nullable String contentType) {
+        final DefaultFullHttpResponse response = body != null
+                ? new DefaultFullHttpResponse(httpRequestVersion, status, Unpooled.wrappedBuffer(body))
+                : new DefaultFullHttpResponse(httpRequestVersion, status);
+
+        response.headers().set(HttpHeaderNames.CONTENT_LENGTH, body != null ? body.length : 0);
+        if (contentType != null) {
+            response.headers().set(HttpHeaderNames.CONTENT_TYPE, contentType);
+        }
         response.headers().set(HttpHeaderNames.CONNECTION, keepAlive ? HttpHeaderValues.KEEP_ALIVE : HttpHeaderValues.CLOSE);
 
         if (enableCors && origin != null && !origin.isEmpty()) {
@@ -103,8 +122,7 @@ public class HttpHandler extends SimpleChannelInboundHandler<HttpRequest> {
             response.headers().set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS, "Authorization, Content-Type");
         }
 
-        final ChannelFuture channelFuture = channel.writeAndFlush(response);
-
-        channelFuture.addListener(keepAlive ? ChannelFutureListener.CLOSE_ON_FAILURE : ChannelFutureListener.CLOSE);
+        channel.writeAndFlush(response)
+                .addListener(keepAlive ? ChannelFutureListener.CLOSE_ON_FAILURE : ChannelFutureListener.CLOSE);
     }
 }

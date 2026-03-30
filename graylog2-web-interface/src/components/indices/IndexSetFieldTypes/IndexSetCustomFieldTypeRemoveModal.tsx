@@ -17,9 +17,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
-import { useStore } from 'stores/connect';
-import type { IndexSet, IndexSetsStoreState } from 'stores/indices/IndexSetsStore';
-import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import type { IndexSet } from 'stores/indices/IndexSetsStore';
+import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -51,12 +50,6 @@ type ContentProps = {
   fields: Array<string>;
   setRotated: React.Dispatch<React.SetStateAction<boolean>>;
   rotated: boolean;
-};
-
-const indexSetsStoreMapper = ({ indexSets }: IndexSetsStoreState): Record<string, IndexSet> => {
-  if (!indexSets) return null;
-
-  return Object.fromEntries(indexSets.map((indexSet) => [indexSet.id, indexSet]));
 };
 
 const OverriddenProfilesFieldsWithTypeList = ({
@@ -140,7 +133,16 @@ const IndexSetCustomFieldTypeRemoveContent = ({
 
 const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds }: Props) => {
   const { setSelectedEntities } = useSelectedEntities();
-  const indexSets = useStore(IndexSetsStore, indexSetsStoreMapper);
+  const {
+    data: { indexSets: indexSetsList },
+    isInitialLoading,
+  } = useIndexSetsList(false);
+  const indexSets = useMemo(() => {
+    if (!indexSetsList) return null;
+
+    return Object.fromEntries(indexSetsList.map((indexSet) => [indexSet.id, indexSet]));
+  }, [indexSetsList]);
+
   const [removalResponse, setRemovalResponse] = useState<RemovalResponse>(null);
   const [rotated, setRotated] = useState(true);
   const removeSucceededFieldsFromSelected = useCallback(
@@ -197,7 +199,6 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds
   }, [onClose, sendTelemetry, telemetryPathName]);
 
   useEffect(() => {
-    IndexSetsActions.list(false);
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.REMOVE_CUSTOM_FIELD_TYPE_OPENED, {
       app_pathname: telemetryPathName,
       app_action_value: 'removed-custom-field-type-opened',
@@ -212,7 +213,7 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds
       onCancel={onCancel}
       show={show}
       bsSize="large">
-      {!indexSets ? (
+      {!indexSets || isInitialLoading ? (
         <Spinner />
       ) : (
         <IndexSetCustomFieldTypeRemoveContent

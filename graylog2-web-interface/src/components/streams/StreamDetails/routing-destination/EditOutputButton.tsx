@@ -20,7 +20,7 @@ import { useState, useRef } from 'react';
 
 import type { ConfigurationFormData } from 'components/configurationforms';
 import { ConfigurationForm } from 'components/configurationforms';
-import type { Output } from 'stores/outputs/OutputsStore';
+import type { Output } from 'hooks/useOutputs';
 import { Button } from 'components/bootstrap';
 import { Icon, IfPermitted } from 'components/common';
 import type { AvailableOutputRequestedConfiguration } from 'components/streams/useAvailableOutputTypes';
