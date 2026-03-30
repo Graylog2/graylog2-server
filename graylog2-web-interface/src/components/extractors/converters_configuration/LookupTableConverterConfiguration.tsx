@@ -16,12 +16,11 @@
  */
 import React from 'react';
 
-import { Link } from 'components/common/router';
-import { Select, Spinner } from 'components/common';
+import { Link, Select, Spinner } from 'components/common';
 import { Row, Col, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import { getValueFromInput } from 'util/FormsUtils';
-import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
+import { fetchAllLookupTables } from 'components/lookup-tables/hooks/api/lookupTablesAPI';
 
 type Props = {
   type: string;
@@ -30,8 +29,6 @@ type Props = {
 };
 
 class LookupTableConverterConfiguration extends React.Component<Props, { lookupTables: any }> {
-  private converterEnabled: Input;
-
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -43,10 +40,12 @@ class LookupTableConverterConfiguration extends React.Component<Props, { lookupT
     this.props.onChange(this.props.type, this._getConverterObject());
 
     // TODO the 10k items is bad. we need a searchable/scrollable long list select box
-    LookupTablesActions.searchPaginated(1, 10000, null).then((result) => {
-      this.setState({ lookupTables: result.lookup_tables });
+    fetchAllLookupTables().then((result) => {
+      this.setState({ lookupTables: result });
     });
   }
+
+  private converterEnabled: Input;
 
   _getConverterObject = (configuration?) => ({
     type: this.props.type,

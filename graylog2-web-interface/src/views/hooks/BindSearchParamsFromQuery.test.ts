@@ -73,6 +73,27 @@ describe('BindSearchParamsFromQuery should', () => {
     const [newView] = await bindSearchParamsFromQuery(input);
 
     expect(findMockQuery(newView).query.query_string).toBe('gl2_source_input:source-input-id');
+    expect(newView.search.id).not.toBe(view.search.id);
+  });
+
+  it('apply URL query override without mutating the original saved query', async () => {
+    const savedQuery = Query.builder()
+      .id(MOCK_VIEW_QUERY_ID)
+      .query(createElasticsearchQueryString('persisted:query'))
+      .build();
+    const savedSearch = Search.create().toBuilder().queries([savedQuery]).build();
+    const savedView = view.toBuilder().search(savedSearch).build();
+    const input = {
+      ...defaultInput,
+      view: savedView,
+      query: { q: 'override:query' },
+    };
+
+    const [newView] = await bindSearchParamsFromQuery(input);
+
+    expect(findMockQuery(newView).query.query_string).toBe('override:query');
+    expect(findMockQuery(savedView).query.query_string).toBe('persisted:query');
+    expect(newView.search.id).not.toBe(savedView.search.id);
   });
 
   it('not update query string when no query param is provided', async () => {

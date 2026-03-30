@@ -158,6 +158,7 @@ const useAttributeColumnDefinitions = <Entity extends EntityBase, Meta>({
   columnSchemas,
   columnWidths,
   entityAttributesAreCamelCase,
+  enableSlicing,
   meta,
   onChangeSlicing,
   onHeaderSectionResize,
@@ -168,6 +169,7 @@ const useAttributeColumnDefinitions = <Entity extends EntityBase, Meta>({
   columnSchemas: Array<ColumnSchema>;
   columnWidths: { [attributeId: string]: number };
   entityAttributesAreCamelCase: boolean;
+  enableSlicing: boolean;
   meta: Meta;
   onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void;
   onHeaderSectionResize: (colId: string, part: 'left' | 'right', width: number) => void;
@@ -214,7 +216,7 @@ const useAttributeColumnDefinitions = <Entity extends EntityBase, Meta>({
           enableResizing: !columnRenderersByAttribute[col.id].staticWidth,
           meta: {
             label: col.title,
-            enableSlicing: col.sliceable,
+            enableSlicing: enableSlicing && col.sliceable,
             columnRenderer: columnRenderersByAttribute[col.id],
             enableColumnOrdering: true,
           },
@@ -231,7 +233,16 @@ const useAttributeColumnDefinitions = <Entity extends EntityBase, Meta>({
           ...baseColDef,
         });
       }),
-    [columnSchemas, cell, header, columnWidths, columnRenderersByAttribute, entityAttributesAreCamelCase, columnHelper],
+    [
+      columnSchemas,
+      cell,
+      header,
+      columnWidths,
+      columnRenderersByAttribute,
+      enableSlicing,
+      entityAttributesAreCamelCase,
+      columnHelper,
+    ],
   );
 };
 

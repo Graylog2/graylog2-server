@@ -43,6 +43,7 @@ const getEvent = (id: string): Event => ({
   replay_info: undefined,
   alert: undefined,
   message: '',
+  timestamp_processing: null,
 });
 
 const mockedSelectedEntitiesData = {
@@ -69,7 +70,7 @@ const mockedEventActions: Array<EventAction> = [
 const renderBulkAction = () => render(<BulkActions selectedEntitiesData={mockedSelectedEntitiesData} />);
 
 const openActionsDropdown = async () =>
-  userEvent.click(
+  await userEvent.click(
     await screen.findByRole('button', {
       name: /bulk actions/i,
     }),

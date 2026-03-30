@@ -18,9 +18,8 @@ import React from 'react';
 import numeral from 'numeral';
 
 import HideOnCloud from 'util/conditional/HideOnCloud';
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, DocumentTitle, PageHeader, Spinner, Icon } from 'components/common';
 import { Alert, Row, Col, Panel, Button, ButtonToolbar } from 'components/bootstrap';
-import { DocumentTitle, PageHeader, Spinner, Icon } from 'components/common';
 import useProductName from 'brand-customization/useProductName';
 import {
   IndicesConfigurationDropdown,
@@ -35,10 +34,10 @@ import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
 import connect from 'stores/connect';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
+import { fetchIndexSet } from 'stores/indices/IndexSetsStore';
 import type { IndexerOverview } from 'stores/indexers/IndexerOverviewStore';
 import type { Indices } from 'stores/indices/IndicesStore';
 import { IndexerOverviewActions, IndexerOverviewStore } from 'stores/indexers/IndexerOverviewStore';
-import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
 import { IndicesActions, IndicesStore } from 'stores/indices/IndicesStore';
 
 const REFRESH_INTERVAL = 2000;
@@ -76,7 +75,6 @@ type Props = {
   params: {
     indexSetId?: string;
   };
-  indexSet?: IndexSet;
   indexerOverview?: IndexerOverview;
   indexerOverviewError?: string;
   indexDetails: {
@@ -87,13 +85,13 @@ type Props = {
 
 type State = {
   timerId?: NodeJS.Timeout;
+  indexSet?: IndexSet;
 };
 
 class IndexSetPage extends React.Component<Props, State> {
   static defaultProps = {
     indexerOverview: undefined,
     indexerOverviewError: undefined,
-    indexSet: undefined,
   };
 
   constructor(props) {
@@ -101,6 +99,7 @@ class IndexSetPage extends React.Component<Props, State> {
 
     this.state = {
       timerId: undefined,
+      indexSet: undefined,
     };
   }
 
@@ -108,7 +107,7 @@ class IndexSetPage extends React.Component<Props, State> {
     const {
       params: { indexSetId },
     } = this.props;
-    IndexSetsActions.get(indexSetId);
+    fetchIndexSet(indexSetId).then((response) => this.setState({ indexSet: response }));
     IndicesActions.list(indexSetId);
 
     const timerId = setInterval(() => {
@@ -135,7 +134,7 @@ class IndexSetPage extends React.Component<Props, State> {
   };
 
   _isLoading = () => {
-    const { indexSet } = this.props;
+    const { indexSet } = this.state;
 
     return !indexSet;
   };
@@ -146,12 +145,12 @@ class IndexSetPage extends React.Component<Props, State> {
     }
 
     const {
-      indexSet,
       indexerOverview,
       indexerOverviewError,
       params: { indexSetId },
       indexDetails: { indices: indexDetailsIndices, closedIndices: indexDetailsClosedIndices },
     } = this.props;
+    const { indexSet } = this.state;
 
     const pageHeader = indexSet && (
       <PageHeader
@@ -237,13 +236,10 @@ class IndexSetPage extends React.Component<Props, State> {
 export default connect(
   withParams(IndexSetPage),
   {
-    indexSets: IndexSetsStore,
     indexerOverview: IndexerOverviewStore,
     indices: IndicesStore,
   },
-  ({ indexSets, indexerOverview, indices }) => ({
-    // @ts-ignore
-    indexSet: indexSets ? indexSets.indexSet : undefined,
+  ({ indexerOverview, indices }) => ({
     // @ts-ignore
     indexerOverview: indexerOverview && indexerOverview.indexerOverview,
     // @ts-ignore

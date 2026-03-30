@@ -294,13 +294,6 @@
             </dependency>
 
             <dependency>
-                <groupId>net.jcip</groupId>
-                <artifactId>jcip-annotations</artifactId>
-                <version>${jcip-annotations.version}</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
                 <groupId>org.graylog2</groupId>
                 <artifactId>gelfclient</artifactId>
                 <version>${gelfclient.version}</version>
@@ -392,11 +385,6 @@
                 <version>${streamex.version}</version>
             </dependency>
             <dependency>
-                <groupId>info.leadinglight</groupId>
-                <artifactId>jdot</artifactId>
-                <version>${jdot.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.unboundid</groupId>
                 <artifactId>unboundid-ldapsdk</artifactId>
                 <version>${unboundid-ldap.version}</version>
@@ -405,6 +393,11 @@
                 <groupId>com.github.stateless4j</groupId>
                 <artifactId>stateless4j</artifactId>
                 <version>${stateless4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.grizzly</groupId>
+                <artifactId>grizzly-websockets</artifactId>
+                <version>${grizzly-websockets.version}</version>
             </dependency>
 
             <!-- Tracing dependencies -->
@@ -420,6 +413,7 @@
                 <artifactId>opentelemetry-instrumentation-annotations</artifactId>
                 <version>${opentelemetry-instrumentation.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>software.amazon.msk</groupId>
                 <artifactId>aws-msk-iam-auth</artifactId>

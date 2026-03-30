@@ -14,12 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { Row, Col } from 'components/bootstrap';
-import { InputStatesStore } from 'stores/inputs/InputStatesStore';
-import { Link } from 'components/common/router';
-import { DocumentTitle, PageHeader, Spinner } from 'components/common';
+import { Link, DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
 import { NodesStore } from 'stores/nodes/NodesStore';
@@ -38,14 +36,6 @@ const NodeInputsPage = () => {
 
   const { nodes } = useStore(NodesStore);
   const node = nodes?.[nodeId];
-
-  useEffect(() => {
-    const interval = setInterval(InputStatesStore.list, 2000);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
 
   if (!node || isLoadingInputTypes || isLoadingInputTypesDescriptions) {
     return <Spinner />;

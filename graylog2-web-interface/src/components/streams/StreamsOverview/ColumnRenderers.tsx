@@ -19,7 +19,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import type Immutable from 'immutable';
 
 import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
-import type { Output } from 'stores/outputs/OutputsStore';
+import type { Output } from 'hooks/useOutputs';
 import type { Stream, StreamRule } from 'stores/streams/StreamsStore';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import IndexSetCell from 'components/streams/StreamsOverview/cells/IndexSetCell';
@@ -32,6 +32,7 @@ import StreamRulesCell from './cells/StreamRulesCell';
 import PipelinesCell from './cells/PipelinesCell';
 import OutputsCell from './cells/OutputsCell';
 import ArchivingsCell from './cells/ArchivingsCell';
+import DestinationFilterRulesCell from './cells/DestinationFilterRulesCell';
 
 const getStreamDataLakeTableElements = PluginStore.exports('dataLake')?.[0]?.getStreamDataLakeTableElements;
 const pipelineRenderer = {
@@ -70,6 +71,10 @@ const customColumnRenderers = (
     ...(isPipelineColumnPermitted ? pipelineRenderer : {}),
     outputs: {
       renderCell: (_outputs: Output[], stream) => <OutputsCell stream={stream} />,
+      staticWidth: 'matchHeader' as const,
+    },
+    destination_filters: {
+      renderCell: (_destinationFilters: string, stream) => <DestinationFilterRulesCell stream={stream} />,
       staticWidth: 'matchHeader' as const,
     },
     archiving: {

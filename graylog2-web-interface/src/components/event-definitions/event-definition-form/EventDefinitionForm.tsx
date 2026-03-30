@@ -45,14 +45,24 @@ import ShareForm from './ShareForm';
 const WizardContainer = styled.div`
   margin-bottom: 10px;
 `;
-export const getStepKeys = (isNew: boolean) => [
-  'event-details',
-  'condition',
-  'fields',
-  'notifications',
-  ...(isNew ? ['Share'] : []),
-  'summary',
+const STEP_KEYS = {
+  EVENT_DETAILS: 'event-details',
+  CONDITION: 'condition',
+  FIELDS: 'fields',
+  NOTIFICATIONS: 'notifications',
+  SHARE: 'Share',
+  SUMMARY: 'summary',
+};
+
+export const getStepKeys = (isNew: boolean, hideFieldsStep = false) => [
+  STEP_KEYS.EVENT_DETAILS,
+  STEP_KEYS.CONDITION,
+  ...(hideFieldsStep ? [] : [STEP_KEYS.FIELDS]),
+  STEP_KEYS.NOTIFICATIONS,
+  ...(isNew ? [STEP_KEYS.SHARE] : []),
+  STEP_KEYS.SUMMARY,
 ];
+
 const STEP_TELEMETRY_KEYS = [
   TELEMETRY_EVENT_TYPE.EVENTDEFINITION_DETAILS.STEP_CLICKED,
   TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.STEP_CLICKED,
@@ -91,6 +101,7 @@ type Props = {
   onSubmit: () => void;
   canEdit: boolean;
   formControls?: React.ComponentType<EventDefinitionFormControlsProps>;
+  hideFieldsStep?: boolean;
 };
 
 const EventDefinitionForm = ({
@@ -108,6 +119,7 @@ const EventDefinitionForm = ({
   onChangeStep,
   onSubmit,
   validation,
+  hideFieldsStep = false,
 }: Props) => {
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
@@ -139,42 +151,37 @@ const EventDefinitionForm = ({
 
   const eventDefinitionType = getConditionPlugin(eventDefinition.config.type);
   const isNew = action === 'create';
-  const currentStepKeys = getStepKeys(isNew);
-  const activeStepIndex = currentStepKeys.indexOf(activeStep);
-  const steps = [
+
+  const allSteps = [
     {
-      key: currentStepKeys[0],
+      key: STEP_KEYS.EVENT_DETAILS,
       title: 'Event Details',
       component: (
         <EventDetailsForm {...defaultStepProps} eventDefinitionEventProcedure={eventProcedureId} canEdit={canEdit} />
       ),
     },
     {
-      key: currentStepKeys[1],
+      key: STEP_KEYS.CONDITION,
       title: eventDefinitionType?.displayName ?? 'Condition',
       component: <EventConditionForm {...defaultStepProps} canEdit={canEditCondition} />,
     },
     {
-      key: currentStepKeys[2],
+      key: STEP_KEYS.FIELDS,
       title: 'Fields',
       component: <FieldsForm {...defaultStepProps} canEdit={canEdit} />,
     },
     {
-      key: currentStepKeys[3],
+      key: STEP_KEYS.NOTIFICATIONS,
       title: 'Notifications',
       component: <NotificationsForm {...defaultStepProps} notifications={notifications} defaults={defaults} />,
     },
-    ...(isNew
-      ? [
-          {
-            key: currentStepKeys[4],
-            title: 'Share',
-            component: <ShareForm {...defaultStepProps} />,
-          },
-        ]
-      : []),
     {
-      key: currentStepKeys[currentStepKeys.length - 1],
+      key: STEP_KEYS.SHARE,
+      title: 'Share',
+      component: <ShareForm {...defaultStepProps} />,
+    },
+    {
+      key: STEP_KEYS.SUMMARY,
       title: 'Summary',
       component: (
         <EventDefinitionSummary
@@ -186,6 +193,16 @@ const EventDefinitionForm = ({
       ),
     },
   ];
+
+  const steps = allSteps.filter((step) => {
+    if (step.key === STEP_KEYS.FIELDS && hideFieldsStep) return false;
+    if (step.key === STEP_KEYS.SHARE && !isNew) return false;
+
+    return true;
+  });
+
+  const currentStepKeys = steps.map((step) => step.key);
+  const activeStepIndex = currentStepKeys.indexOf(activeStep);
 
   const handleStepChange = (nextStep: string) => {
     sendTelemetry(STEP_TELEMETRY_KEYS[currentStepKeys.indexOf(nextStep)], {

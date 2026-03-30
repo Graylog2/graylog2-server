@@ -16,13 +16,12 @@
  */
 import React from 'react';
 
-import { Link } from 'components/common/router';
-import { Select, Spinner, Icon } from 'components/common';
+import { Link, Select, Spinner, Icon } from 'components/common';
 import { Row, Col, Button, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';
 import ToolsStore from 'stores/tools/ToolsStore';
-import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
+import { fetchAllLookupTables } from 'components/lookup-tables/hooks/api/lookupTablesAPI';
 
 type Props = {
   configuration: any;
@@ -52,8 +51,8 @@ class LookupTableExtractorConfiguration extends React.Component<
 
   componentDidMount() {
     // TODO the 10k items is bad. we need a searchable/scrollable long list select box
-    LookupTablesActions.searchPaginated(1, 10000, null).then((result) => {
-      this.setState({ lookupTables: result.lookup_tables });
+    fetchAllLookupTables().then((result) => {
+      this.setState({ lookupTables: result });
     });
   }
 

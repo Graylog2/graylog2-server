@@ -71,7 +71,7 @@ class OTelLogsCodecTest {
 
     @BeforeEach
     void setUp() {
-        codec = new OTelLogsCodec(messageFactory, new ObjectMapperProvider().get());
+        codec = new OTelLogsCodec(messageFactory, new OTelTypeConverter(new ObjectMapperProvider().get()));
     }
 
     // Uses a modified official example that was copied from
@@ -227,7 +227,7 @@ class OTelLogsCodecTest {
                 Resources.toString(Resources.getResource(
                         OTelGrpcInput.class, filename), StandardCharsets.UTF_8),
                 requestBuilder);
-        return new OTelJournalRecordFactory().createFromRequest(requestBuilder.build()).stream()
+        return OTelJournalRecordFactory.createFromRequest(requestBuilder.build()).stream()
                 .map(OTelJournal.Record::getLog).findFirst().orElseThrow();
     }
 }

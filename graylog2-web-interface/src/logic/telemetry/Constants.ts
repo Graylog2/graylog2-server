@@ -409,20 +409,6 @@ export const TELEMETRY_EVENT_TYPE = {
       'Datanode Migration Inplace Journal Size Downtime Warning Next Clicked',
     INPLACE_STOP_MESSAGE_PROCESSING_NEXT_CLICKED: 'Datanode Migration Inplace Stop Message Processing Next Clicked',
     INPLACE_RESTART_GRAYLOG_NEXT_CLICKED: 'Datanode Migration Inplace Restart Graylog Next Clicked',
-    REMOTEREINDEX_WELCOME_NEXT_CLICKED: 'Datanode Migration RemoteReindex Welcome Next Clicked',
-    REMOTEREINDEX_MIGRATE_EXISTING_DATA_QUESTION_NEXT_CLICKED:
-      'Datanode Migration RemoteReindex Migrate Existing Data Question Next Clicked',
-    REMOTEREINDEX_MIGRATE_EXISTING_DATA_QUESTION_SKIP_CLICKED:
-      'Datanode Migration RemoteReindex Migrate Existing Data Question Skip Clicked',
-    REMOTEREINDEX_MIGRATE_EXISTING_DATA_CHECK_CONNECTION_CLICKED:
-      'Datanode Migration RemoteReindex Migrate Existing Data Check Connection Clicked',
-    REMOTEREINDEX_MIGRATE_EXISTING_DATA_START_CLICKED:
-      'Datanode Migration RemoteReindex Migrate Existing Data Start Clicked',
-    REMOTEREINDEX_RUNNING_LOGVIEW_CLICKED: 'Datanode Migration RemoteReindex Running Logview Clicked',
-    REMOTEREINDEX_RUNNING_RETRY_CLICKED: 'Datanode Migration RemoteReindex Running Retry Clicked',
-    REMOTEREINDEX_RUNNING_RETRY_CONFIRM_CLICKED: 'Datanode Migration RemoteReindex Running Retry Confirm Clicked',
-    REMOTEREINDEX_SHUTDOWN_OLD_CLUSTER_NEXT_CLICKED:
-      'Datanode Migration RemoteReindex Shutdown Old Cluster Next Clicked',
   },
   ALERTS_AND_EVENTS: {
     ACTION_RAN: 'Alerts And Events Action Ran',
@@ -440,5 +426,21 @@ export const TELEMETRY_EVENT_TYPE = {
     SLICE_COLUMN_SELECTED_SECTION: 'Entity Data Table Slice Column Selected (Section)',
     SLICE_REMOVED: 'Entity Data Table Slice Removed',
     SLICE_VALUE_SELECTED: 'Entity Data Table Slice Value Selected',
+    SLICE_SEARCH_CHANGED: 'Entity Data Table Slice Search Changed',
+    SLICE_SORT_CHANGED: 'Entity Data Table Slice Sort Changed',
+    SLICE_EMPTY_VALUES_TOGGLED: 'Entity Data Table Slice Empty Values Toggled',
+  },
+  COLLECTORS: {
+    FLEET_NEW_OPENED: 'Fleet Create Opened',
+    FLEET_NEW_CANCELLED: 'Fleet Create Cancelled',
+    FLEET_CREATED: 'Fleet Created',
+  },
+  RIGHT_SIDEBAR: {
+    OPENED: 'Right Sidebar Opened',
+    CLOSED: 'Right Sidebar Closed',
+    COLLAPSED: 'Right Sidebar Collapsed',
+    EXPANDED: 'Right Sidebar Expanded',
+    NAVIGATED_BACK: 'Right Sidebar Navigated Back',
+    NAVIGATED_FORWARD: 'Right Sidebar Navigated Forward',
   },
 } as const;

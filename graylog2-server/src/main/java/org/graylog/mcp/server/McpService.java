@@ -197,10 +197,11 @@ public class McpService {
                                         });
                                 auditEventSender.success(auditActor, AuditEventType.create(MCP_TOOL_CALL),
                                         auditContext);
-                                return Optional.of(new McpSchema.CallToolResult(
-                                        List.of(new McpSchema.TextContent(objectMapper.writeValueAsString(result))),
-                                        false,
-                                        structuredContent));
+                                return Optional.of(McpSchema.CallToolResult.builder()
+                                        .content(List.of(new McpSchema.TextContent(objectMapper.writeValueAsString(result))))
+                                        .isError(false)
+                                        .structuredContent(structuredContent)
+                                        .build());
                             } catch (JsonProcessingException e) {
                                 auditEventSender.failure(auditActor, AuditEventType.create(MCP_TOOL_CALL),
                                         auditContext);
@@ -209,15 +210,24 @@ public class McpService {
                         } else {
                             // no schema, just return the string representation directly
                             auditEventSender.success(auditActor, AuditEventType.create(MCP_TOOL_CALL), auditContext);
-                            return Optional.of(new McpSchema.CallToolResult(result.toString(), false));
+                            return Optional.of(McpSchema.CallToolResult.builder()
+                                    .content(List.of(new McpSchema.TextContent(result.toString())))
+                                    .isError(false)
+                                    .build());
                         }
                     } catch (Exception e) {
                         auditEventSender.failure(auditActor, AuditEventType.create(MCP_TOOL_CALL), auditContext);
-                        return Optional.of(new McpSchema.CallToolResult(f("Tool call failed: %s", e.getMessage()), true));
+                        return Optional.of(McpSchema.CallToolResult.builder()
+                                .content(List.of(new McpSchema.TextContent(f("Tool call failed: %s", e.getMessage()))))
+                                .isError(true)
+                                .build());
                     }
                 } else {
                     auditEventSender.failure(auditActor, AuditEventType.create(MCP_TOOL_CALL), auditContext);
-                    return Optional.of(new McpSchema.CallToolResult("Unknown tool named: " + callToolRequest.name(), true));
+                    return Optional.of(McpSchema.CallToolResult.builder()
+                            .content(List.of(new McpSchema.TextContent("Unknown tool named: " + callToolRequest.name())))
+                            .isError(true)
+                            .build());
                 }
             }
             case McpSchema.METHOD_PROMPT_LIST -> {

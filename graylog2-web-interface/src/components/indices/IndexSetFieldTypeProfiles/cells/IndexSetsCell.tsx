@@ -17,7 +17,7 @@
 import React from 'react';
 import { styled } from 'styled-components';
 
-import { Link } from 'components/common/router';
+import { Link } from 'components/common';
 import Routes from 'routing/Routes';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted } from 'util/PermissionsMixin';

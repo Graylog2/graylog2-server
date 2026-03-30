@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useState, useRef } from 'react';
 
-import { IconButton, ModalSubmit } from 'components/common';
+import { IconButton, LinkContainer, ModalSubmit } from 'components/common';
 import { ButtonToolbar, Modal, Menu, MenuItem } from 'components/bootstrap';
 import usePluginEntities from 'hooks/usePluginEntities';
 import Routes from 'routing/Routes';
@@ -29,9 +29,7 @@ import EventDetails from './EventDetails';
 const usePluggableDashboardActions = (eventId: string) => {
   const modalRefs = useRef({});
   const pluggableActions = usePluginEntities('views.components.widgets.events.actions');
-  const availableActions = pluggableActions.filter((perspective) =>
-    perspective.useCondition ? !!perspective.useCondition() : true,
-  );
+  const availableActions = pluggableActions.filter((action) => (action.useCondition ? !!action.useCondition() : true));
   const actions = availableActions.map(({ component: PluggableDashboardAction, key }) => (
     <PluggableDashboardAction key={`event-action-${key}`} eventId={eventId} modalRef={() => modalRefs.current[key]} />
   ));
@@ -65,9 +63,9 @@ const RowActions = ({ eventId, hasReplayInfo, eventDefinitionId }: Props) => {
 
   const moreActions = [
     hasReplayInfo && isPermitted(user.permissions, `eventdefinitions:read:${eventDefinitionId}`) ? (
-      <MenuItem href={Routes.ALERTS.replay_search(eventId)} target="_blank" key="replay-search">
-        Replay search
-      </MenuItem>
+      <LinkContainer to={Routes.ALERTS.replay_search(eventId)} key="replay-search">
+        <MenuItem>Replay search</MenuItem>
+      </LinkContainer>
     ) : null,
     pluggableActions.length ? pluggableActions : null,
   ].filter(Boolean);

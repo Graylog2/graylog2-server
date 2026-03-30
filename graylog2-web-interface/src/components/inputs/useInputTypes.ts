@@ -14,13 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useStore } from 'stores/connect';
-import { InputTypesStore } from 'stores/inputs/InputTypesStore';
+import useInputTypesHook from 'hooks/useInputTypes';
 
 const useInputTypes = () => {
-  const { inputTypes } = useStore(InputTypesStore);
+  const { data } = useInputTypesHook();
 
-  return inputTypes;
+  return data?.types;
 };
 
 export default useInputTypes;

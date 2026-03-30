@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState, useMemo } from 'react';
 import styled from 'styled-components';
+import { JSONStringify } from 'json-with-bigint';
 
 import useProductName from 'brand-customization/useProductName';
 import { useErrorsContext } from 'components/lookup-tables/contexts/ErrorsContext';
@@ -68,7 +69,7 @@ function TestLookup({ table }: Props) {
   const dataPreview = useMemo(() => {
     if (total === 0) return 'No results to show';
 
-    return JSON.stringify(results, null, 2);
+    return JSONStringify(results, null, 2);
   }, [results, total]);
 
   const onChange = (event: React.BaseSyntheticEvent) => {
@@ -94,7 +95,7 @@ function TestLookup({ table }: Props) {
 
     if (lookupKey.valid) {
       testLookupTableKey({ tableName: table.name, key: lookupKey.value }).then((resp: any) => {
-        setLookupResult(JSON.stringify(resp, null, 2));
+        setLookupResult(JSONStringify(resp, null, 2));
         setLookupKey({ value: '', valid: false });
       });
     }

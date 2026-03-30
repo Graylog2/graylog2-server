@@ -31,13 +31,13 @@ import connect from 'stores/connect';
 import type { Message } from 'views/components/messagelist/Types';
 import useForwarderMessageLoaders from 'components/messageloaders/useForwarderMessageLoaders';
 import AppConfig from 'util/AppConfig';
-import { CodecTypesStore, CodecTypesActions } from 'stores/codecs/CodecTypesStore';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 import useHistory from 'routing/useHistory';
 import MessageFormatter from 'logic/message/MessageFormatter';
 import UserNotification from 'util/UserNotification';
 
-import type { Input as InputType, CodecTypes } from './Types';
+import type { Input as InputType } from './Types';
+import useCodecTypes from './useCodecTypes';
 
 const DEFAULT_REMOTE_ADDRESS = '127.0.0.1';
 
@@ -160,7 +160,6 @@ type OptionsType = {
 
 type Props = {
   inputs?: Immutable.Map<string, InputType>;
-  codecTypes?: CodecTypes;
   onMessageLoaded: (message: Message | undefined, option: OptionsType) => void;
   inputIdSelector?: boolean;
 };
@@ -180,7 +179,7 @@ const parseRawMessage = (
 
   return Messages.parse(payload).then(
     (response) => MessageFormatter.formatResultMessage(response),
-    (error) => {
+    (error): undefined => {
       if (error.additional && error.additional.status === 400) {
         UserNotification.error(
           'Please ensure the selected codec and its configuration are right. ' +
@@ -188,21 +187,19 @@ const parseRawMessage = (
           'Could not load raw message',
         );
 
-        return;
+        return undefined;
       }
 
       UserNotification.error(`Loading raw message failed with status: ${error}`, 'Could not load raw message');
+
+      return undefined;
     },
   );
 };
 
-const RawMessageLoader = ({
-  onMessageLoaded,
-  inputIdSelector = false,
-  codecTypes = undefined,
-  inputs = undefined,
-}: Props) => {
+const RawMessageLoader = ({ onMessageLoaded, inputIdSelector = false, inputs = undefined }: Props) => {
   const productName = useProductName();
+  const { data: codecTypes } = useCodecTypes();
   const [loading, setLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
   const [remoteAddress, setRemoteAddress] = useState<string>(DEFAULT_REMOTE_ADDRESS);
@@ -210,10 +207,6 @@ const RawMessageLoader = ({
   const [codecConfiguration, setCodecConfiguration] = useState({});
   const [inputId, setInputId] = useState<string | typeof undefined>();
   const history = useHistory();
-
-  useEffect(() => {
-    CodecTypesActions.list();
-  }, []);
 
   useEffect(() => {
     if (inputIdSelector) {
@@ -271,11 +264,11 @@ const RawMessageLoader = ({
   };
 
   const _onMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setMessage(getValueFromInput(event.target));
+    setMessage(String(getValueFromInput(event.target)));
   };
 
   const _onRemoteAddressChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRemoteAddress(getValueFromInput(event.target));
+    setRemoteAddress(String(getValueFromInput(event.target)));
   };
 
   const _onCodecConfigurationChange = (field: string, value: ConfigurationFieldValue) => {
@@ -421,10 +414,9 @@ const RawMessageLoader = ({
 export default connect(
   // @ts-ignore
   RawMessageLoader,
-  { inputs: InputsStore, codecTypes: CodecTypesStore },
+  { inputs: InputsStore },
   // @ts-ignore
-  ({ inputs: { inputs }, codecTypes: { codecTypes } }) => ({
+  ({ inputs: { inputs } }) => ({
     inputs: inputs ? Immutable.Map(InputsStore.inputsAsMap(inputs)) : undefined,
-    codecTypes,
   }),
 );

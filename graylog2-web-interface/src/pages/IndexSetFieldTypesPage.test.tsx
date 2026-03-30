@@ -19,7 +19,6 @@ import { render, screen, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import { useQueryParam } from 'routing/QueryParams';
-import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
@@ -29,7 +28,6 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import IndexSetFieldTypesPage from 'pages/IndexSetFieldTypesPage';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import { overriddenIndexField, defaultField, attributes } from 'fixtures/indexSetFieldTypes';
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 const getData = (list = [defaultField]) => ({
   list,
@@ -41,38 +39,29 @@ const getData = (list = [defaultField]) => ({
 
 const renderIndexSetFieldTypesPage = () =>
   render(
-    <DefaultQueryParamProvider>
-      <TestStoreProvider>
-        <IndexSetFieldTypesPage />
-      </TestStoreProvider>
-      ,
-    </DefaultQueryParamProvider>,
+    <TestStoreProvider>
+      <IndexSetFieldTypesPage />
+    </TestStoreProvider>,
   );
 
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
 jest.mock('components/common/PaginatedEntityTable/useFetchEntities', () => jest.fn());
 
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
-jest.mock('components/perspectives/hooks/useActivePerspective');
 
 jest.mock('routing/QueryParams', () => ({
   ...jest.requireActual('routing/QueryParams'),
   useQueryParam: jest.fn(),
 }));
 
-jest.mock('stores/indices/IndexSetsStore', () => ({
-  IndexSetsActions: {
-    list: jest.fn(() => Promise.resolve()),
-    get: jest.fn(() => Promise.resolve()),
-  },
-  IndexSetsStore: MockStore([
-    'getInitialState',
-    () => ({
-      indexSets: [{ id: '111', title: 'index set title', field_type_profile: null }],
-      indexSet: { id: '111', title: 'index set title', field_type_profile: null },
-    }),
-  ]),
-}));
+jest.mock('components/indices/hooks/useSingleIndexSet', () =>
+  jest.fn(() => ({
+    data: { id: '111', title: 'index set title', field_type_profile: null },
+    refetch: jest.fn(),
+    isSuccess: true,
+    isInitialLoading: false,
+  })),
+);
 
 describe('IndexSetFieldTypesPage', () => {
   useViewsPlugin();

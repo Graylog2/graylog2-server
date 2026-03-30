@@ -27,7 +27,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.graylog.storage.opensearch3.blocks.BlockSettingsParser;
 import org.graylog.storage.opensearch3.cluster.ClusterStateApi;
-import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.graylog.storage.opensearch3.stats.ClusterStatsApi;
 import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
 import org.graylog.storage.opensearch3.stats.StatsApi;
@@ -126,8 +125,6 @@ public class IndicesAdapterOS implements IndicesAdapter {
     private final org.opensearch.client.opensearch.OpenSearchClient openSearchClient;
     private final OpenSearchIndicesClient indicesClient;
     private final OpenSearchCatClient catClient;
-    private final PlainJsonApi jsonApi;
-    private final OSSerializationUtils osSerializationUtils;
 
     // this is the maximum amount of bytes that the index list is supposed to fill in a request,
     // it assumes that these don't need url encoding. If we exceed the maximum, we request settings for all indices
@@ -141,9 +138,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
                             ClusterStateApi clusterStateApi,
                             IndexTemplateAdapter indexTemplateAdapter,
                             IndexStatisticsBuilder indexStatisticsBuilder,
-                            ObjectMapper objectMapper,
-                            PlainJsonApi jsonApi,
-                            final OSSerializationUtils osSerializationUtils) {
+                            ObjectMapper objectMapper) {
         this.c = c;
         this.statsApi = statsApi;
         this.clusterStatsApi = clusterStatsApi;
@@ -152,10 +147,8 @@ public class IndicesAdapterOS implements IndicesAdapter {
         this.indexStatisticsBuilder = indexStatisticsBuilder;
         this.objectMapper = objectMapper;
         this.openSearchClient = c.sync();
-        this.jsonApi = jsonApi;
         this.indicesClient = openSearchClient.indices();
         this.catClient = openSearchClient.cat();
-        this.osSerializationUtils = osSerializationUtils;
     }
 
     @Override
@@ -214,7 +207,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
                 .settings(createIndexSettings(indexSettings));
         if (mapping != null) {
             try {
-                builder.mappings(osSerializationUtils.fromMap(mapping, TypeMapping._DESERIALIZER));
+                builder.mappings(OSSerializationUtils.fromMap(mapping, TypeMapping._DESERIALIZER));
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
@@ -250,7 +243,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
                     .method("PUT")
                     .body(Body.from(objectMapper.writeValueAsBytes(mapping), "application/json"))
                     .build();
-            jsonApi.performRequest(request, "Unable to update index mapping " + indexName);
+            c.performRequest(request, "Unable to update index mapping " + indexName);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to update index mapping " + indexName, e);
         }
@@ -264,7 +257,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
                     .ignoreUnavailable(true)
                     .expandWildcards(ExpandWildcard.All));
             IndexMappingRecord indexMappingRecord = response.get(index);
-            return osSerializationUtils.toMap(indexMappingRecord.mappings());
+            return OSSerializationUtils.toMap(indexMappingRecord.mappings());
         }, "Couldn't read mapping of index " + index);
     }
 
@@ -274,7 +267,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
                 .method("GET")
                 .endpoint("/" + index + "/_settings")
                 .build();
-        JsonNode jsonNode = jsonApi.performRequest(request, "Unable to retrieve index settings " + index);
+        JsonNode jsonNode = c.performRequest(request, "Unable to retrieve index settings " + index);
         return Optional.ofNullable(jsonNode.get(index))
                 .map(node -> node.get("settings"))
                 .map(node -> objectMapper.convertValue(node, new TypeReference<Map<String, Object>>() {}))

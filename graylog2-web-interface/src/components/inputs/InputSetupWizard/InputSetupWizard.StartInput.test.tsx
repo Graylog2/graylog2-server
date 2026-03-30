@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import { PipelinesPipelines, Streams, PipelinesConnections } from '@graylog/server-api';
+import { PipelinesPipelines, Streams, PipelinesConnections, SystemInputStates } from '@graylog/server-api';
 
 import selectEvent from 'helpers/selectEvent';
 import { asMock, StoreMock as MockStore } from 'helpers/mocking';
@@ -26,7 +26,6 @@ import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
 import useFilteredStreams from 'components/inputs/InputSetupWizard/hooks/useFilteredStreams';
 import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 import { streams } from 'fixtures/streams';
-import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 
 import InputSetupWizardProvider from './contexts/InputSetupWizardProvider';
 import InputSetupWizard from './Wizard';
@@ -47,6 +46,10 @@ jest.mock('@graylog/server-api', () => ({
   PipelinesConnections: {
     connectStreams: jest.fn(),
   },
+  SystemInputStates: {
+    start: jest.fn(() => Promise.resolve()),
+    stop: jest.fn(() => Promise.resolve()),
+  },
 }));
 
 jest.mock('components/inputs/InputSetupWizard/hooks/useFilteredStreams');
@@ -55,10 +58,6 @@ jest.mock('components/indices/hooks/useIndexSetsList');
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 jest.mock('views/stores/StreamsStore', () => ({ StreamsStore: MockStore() }));
 jest.mock('stores/system/SystemStore', () => ({ SystemStore: MockStore() }));
-
-jest.mock('stores/inputs/InputStatesStore', () => ({
-  InputStatesStore: MockStore(['start', jest.fn(() => Promise.resolve())], ['stop', jest.fn(() => Promise.resolve())]),
-}));
 
 jest.mock('stores/nodes/NodesStore', () => ({
   NodesStore: MockStore(),
@@ -217,8 +216,10 @@ const createStream = async (newPipeline = false, removeFromDefault = true) => {
     name: 'Next',
   });
 
-  fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
-  fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
+  await userEvent.clear(titleInput);
+  await userEvent.type(titleInput, 'Wingardium');
+  await userEvent.clear(descriptionInput);
+  await userEvent.type(descriptionInput, 'Wingardium new stream');
 
   if (!removeFromDefault) {
     await userEvent.click(removeFromDefaultCheckbox);
@@ -254,7 +255,7 @@ describe('InputSetupWizard Start Input', () => {
       await goToStartInputStep();
       await startInput();
 
-      await waitFor(() => expect(InputStatesStore.start).toHaveBeenCalledWith(input));
+      await waitFor(() => expect(SystemInputStates.start).toHaveBeenCalledWith(input.id));
 
       expect(await screen.findByRole('heading', { name: /Setting up Input.../i })).toBeInTheDocument();
       expect(await screen.findByText(/Input started successfully!/i)).toBeInTheDocument();
@@ -274,7 +275,7 @@ describe('InputSetupWizard Start Input', () => {
       await goToStartInputStep();
       await startInput();
 
-      await waitFor(() => expect(InputStatesStore.start).toHaveBeenCalledWith(input));
+      await waitFor(() => expect(SystemInputStates.start).toHaveBeenCalledWith(input.id));
 
       await waitFor(() =>
         expect(PipelinesPipelines.routing).toHaveBeenCalledWith({
@@ -308,7 +309,7 @@ describe('InputSetupWizard Start Input', () => {
       await goToStartInputStep();
       await startInput();
 
-      await waitFor(() => expect(InputStatesStore.start).toHaveBeenCalledWith(input));
+      await waitFor(() => expect(SystemInputStates.start).toHaveBeenCalledWith(input.id));
 
       await waitFor(() =>
         expect(PipelinesPipelines.routing).toHaveBeenCalledWith({
@@ -331,7 +332,7 @@ describe('InputSetupWizard Start Input', () => {
 
     it('should show the progress for all steps', async () => {
       renderWizard();
-      await waitFor(() => createStream());
+      await createStream();
       await goToStartInputStep();
       await startInput();
 
@@ -343,16 +344,16 @@ describe('InputSetupWizard Start Input', () => {
 
     it('should start the input', async () => {
       renderWizard();
-      await waitFor(() => createStream());
+      await createStream();
       await goToStartInputStep();
       await startInput();
 
-      await waitFor(() => expect(InputStatesStore.start).toHaveBeenCalledWith(input));
+      await waitFor(() => expect(SystemInputStates.start).toHaveBeenCalledWith(input.id));
     });
 
     it('should create the new stream', async () => {
       renderWizard();
-      await waitFor(() => createStream());
+      await createStream();
       await goToStartInputStep();
       await startInput();
 
@@ -366,7 +367,7 @@ describe('InputSetupWizard Start Input', () => {
 
     it('should start the new stream', async () => {
       renderWizard();
-      await waitFor(() => createStream());
+      await createStream();
       await goToStartInputStep();
       await startInput();
 
@@ -375,7 +376,7 @@ describe('InputSetupWizard Start Input', () => {
 
     it('create routing for the new stream', async () => {
       renderWizard();
-      await waitFor(() => createStream(true));
+      await createStream(true);
       await goToStartInputStep();
       await startInput();
 
@@ -408,7 +409,7 @@ describe('InputSetupWizard Start Input', () => {
 
       it('should create the new pipeline', async () => {
         renderWizard();
-        await waitFor(() => createStream(true));
+        await createStream(true);
         await goToStartInputStep();
         await startInput();
 
@@ -421,7 +422,7 @@ describe('InputSetupWizard Start Input', () => {
 
       it('should connect the new pipeline to the stream', async () => {
         renderWizard();
-        await waitFor(() => createStream(true));
+        await createStream(true);
         await goToStartInputStep();
         await startInput();
 

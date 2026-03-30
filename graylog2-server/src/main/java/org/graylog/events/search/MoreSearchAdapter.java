@@ -18,12 +18,17 @@ package org.graylog.events.search;
 
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.NumberRange;
 import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.indexer.searches.Sorting;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.rest.resources.entities.Slice;
 
 import java.time.ZoneId;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,4 +53,30 @@ public interface MoreSearchAdapter {
 
     void scrollEvents(String queryString, TimeRange timeRange, Set<String> affectedIndices, Set<String> streams,
                       List<UsedSearchFilter> filters, int batchSize, ScrollEventsCallback resultCallback) throws EventProcessorException;
+
+    List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
+                                Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, int maxBuckets);
+
+    List<Slice> aggregateSlicesForRangeQuery(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                           Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
+                                           Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, List<NumberRange> ranges);
+
+    default ChunkCommand buildScrollCommand(String queryString, TimeRange timeRange, Set<String> affectedIndices, List<UsedSearchFilter> filters, Set<String> streams, int batchSize) {
+        ChunkCommand.Builder commandBuilder = ChunkCommand.builder()
+                .query(queryString)
+                .range(timeRange)
+                .indices(affectedIndices)
+                .filters(filters == null ? Collections.emptyList() : filters)
+                .batchSize(batchSize)
+                // For correlation need the oldest messages to come in first
+                .sorting(new Sorting(Message.FIELD_TIMESTAMP, Sorting.Direction.ASC));
+
+        if (!streams.isEmpty()) {
+            commandBuilder = commandBuilder.streams(streams);
+        }
+
+        return commandBuilder
+                .build();
+    }
 }

@@ -26,18 +26,10 @@ type Props = {
   disabled?: boolean;
   name: string;
   menuContainer?: HTMLElement;
-  queryId?: string;
   type: FieldType;
 };
 
-const Field = ({
-  children = null,
-  disabled = false,
-  menuContainer = document.body,
-  name,
-  queryId = undefined,
-  type,
-}: Props) => (
+const Field = ({ children = null, disabled = false, menuContainer = document.body, name, type }: Props) => (
   <InteractiveContext.Consumer>
     {(interactive) =>
       interactive ? (
@@ -46,8 +38,7 @@ const Field = ({
           disabled={!interactive || disabled}
           menuContainer={menuContainer}
           name={name}
-          type={type}
-          queryId={queryId}>
+          type={type}>
           {name} = {type.type}
         </FieldActions>
       ) : (

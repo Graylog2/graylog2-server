@@ -1,0 +1,5 @@
+type = "f"
+message = "Skip system notifications polling for users without notifications:read permission"
+
+issues = ["graylog-plugin-enterprise#10902"]
+pulls = ["25387"]

@@ -18,7 +18,7 @@ package org.graylog2.shared.inputs;
 
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -26,70 +26,55 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Stream;
 
 @Singleton
 public class InputRegistry {
     private static final Logger LOG = LoggerFactory.getLogger(InputRegistry.class);
 
-    private final Set<IOState<MessageInput>> inputStates = Sets.newConcurrentHashSet();
+    private final ConcurrentMap<String, IOState<MessageInput>> inputStates = new ConcurrentHashMap<>();
+
+    @Inject
+    public InputRegistry() {
+    }
 
     public Set<IOState<MessageInput>> getInputStates() {
-        return ImmutableSet.copyOf(inputStates);
+        return ImmutableSet.copyOf(inputStates.values());
     }
 
     public IOState<MessageInput> getInputState(String inputId) {
-        for (IOState<MessageInput> inputState : inputStates) {
-            if (inputState.getStoppable().getPersistId().equals(inputId)) {
-                return inputState;
-            }
-        }
-
-        return null;
+        return inputStates.get(inputId);
     }
 
     public Set<IOState<MessageInput>> getRunningInputs() {
-        ImmutableSet.Builder<IOState<MessageInput>> runningInputs = ImmutableSet.builder();
-        for (IOState<MessageInput> inputState : inputStates) {
-            if (inputState.getState() == IOState.Type.RUNNING) {
-                runningInputs.add(inputState);
+        ImmutableSet.Builder<IOState<MessageInput>> builder = ImmutableSet.builder();
+        for (IOState<MessageInput> state : inputStates.values()) {
+            if (state.getState() == IOState.Type.RUNNING) {
+                builder.add(state);
             }
         }
-        return runningInputs.build();
+        return builder.build();
     }
 
     public boolean hasTypeRunning(Class klazz) {
-        for (IOState<MessageInput> inputState : inputStates) {
+        for (IOState<MessageInput> inputState : inputStates.values()) {
             if (inputState.getStoppable().getClass().equals(klazz)) {
                 return true;
             }
         }
-
         return false;
     }
 
     public int runningCount() {
-        return getRunningInputs().size();
-    }
-
-    public MessageInput getRunningInput(String inputId) {
-        for (IOState<MessageInput> inputState : inputStates) {
-            if (inputState.getStoppable().getId().equals(inputId)) {
-                return inputState.getStoppable();
+        int count = 0;
+        for (IOState<MessageInput> state : inputStates.values()) {
+            if (state.getState() == IOState.Type.RUNNING) {
+                count++;
             }
         }
-
-        return null;
-    }
-
-    public IOState<MessageInput> getRunningInputState(String inputStateId) {
-        for (IOState<MessageInput> inputState : inputStates) {
-            if (inputState.getStoppable().getId().equals(inputStateId)) {
-                return inputState;
-            }
-        }
-
-        return null;
+        return count;
     }
 
     public boolean remove(MessageInput input) {
@@ -97,9 +82,9 @@ public class InputRegistry {
         input.terminate();
         if (inputState != null) {
             inputState.setState(IOState.Type.TERMINATED);
+            inputStates.remove(input.getId());
         }
-
-        return inputStates.remove(inputState);
+        return inputState != null;
     }
 
     public boolean remove(IOState<MessageInput> inputState) {
@@ -108,7 +93,7 @@ public class InputRegistry {
     }
 
     public IOState<MessageInput> stop(MessageInput input) {
-        IOState<MessageInput> inputState = getRunningInputState(input.getId());
+        IOState<MessageInput> inputState = inputStates.get(input.getId());
 
         if (inputState != null) {
             inputState.setState(IOState.Type.STOPPING);
@@ -126,14 +111,16 @@ public class InputRegistry {
     public void setup(IOState<MessageInput> inputState) {
         remove(inputState);
         inputState.setState(IOState.Type.SETUP);
-        inputStates.add(inputState);
+        add(inputState);
     }
 
     public boolean add(IOState<MessageInput> messageInputIOState) {
-        return inputStates.add(messageInputIOState);
+        final String inputId = messageInputIOState.getStoppable().getId();
+        return inputStates.putIfAbsent(inputId, messageInputIOState) == null;
     }
 
     public Stream<IOState<MessageInput>> stream() {
-        return inputStates.stream();
+        return inputStates.values().stream();
     }
+
 }

@@ -22,15 +22,14 @@ import CustomColumnRenderers from 'components/events/events/ColumnRenderers';
 type Props<M = EventsAdditionalData> = { event: Event; meta: M; eventDefinitionEventProcedureId: string };
 
 const RemediationSteps = ({ event, meta, eventDefinitionEventProcedureId }: Props) => (
-  <>
-    <h2>Event Procedure Summary</h2>
+  <div>
     {CustomColumnRenderers.attributes.remediation_steps.renderCell(
       undefined,
       event,
       meta,
       eventDefinitionEventProcedureId,
     )}
-  </>
+  </div>
 );
 
 export default RemediationSteps;

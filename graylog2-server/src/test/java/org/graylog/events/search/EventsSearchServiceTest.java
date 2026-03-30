@@ -21,6 +21,7 @@ import org.apache.shiro.subject.Subject;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
+import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiService;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;

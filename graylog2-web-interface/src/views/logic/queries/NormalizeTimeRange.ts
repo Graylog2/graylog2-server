@@ -16,7 +16,7 @@
  */
 import isAllMessagesRange from 'views/logic/queries/IsAllMessagesRange';
 import { NO_TIMERANGE_OVERRIDE, RELATIVE_ALL_TIME } from 'views/Constants';
-import { normalizeIfClassifiedRelativeTimeRange } from 'views/components/searchbar/time-range-filter/time-range-picker/RelativeTimeRangeClassifiedHelper';
+import { normalizeIfClassifiedRelativeTimeRange } from 'views/components/time-range-picker/RelativeTimeRangeClassifiedHelper';
 import {
   isTypeKeyword,
   isTypeRelativeWithEnd,
@@ -24,7 +24,7 @@ import {
   isTimeRange,
 } from 'views/typeGuards/timeRange';
 import { adjustFormat, toUTCFromTz } from 'util/DateTime';
-import type { TimeRangePickerTimeRange } from 'views/components/searchbar/time-range-filter/time-range-picker/TimeRangePicker';
+import type { TimeRangePickerTimeRange } from 'views/components/time-range-picker/TimeRangePicker';
 
 import type { TimeRange, NoTimeRangeOverride } from './Query';
 

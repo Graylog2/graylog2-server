@@ -26,13 +26,13 @@ import moment from 'moment';
 import { OrderedMap } from 'immutable';
 import type * as Immutable from 'immutable';
 import type { Permission } from 'graylog-web-plugin/plugin';
+import { useQuery } from '@tanstack/react-query';
 
 import { describeExpression } from 'util/CronUtils';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { isPermitted } from 'util/PermissionsMixin';
 import * as FormsUtils from 'util/FormsUtils';
 import FormWarningsContext from 'contexts/FormWarningsContext';
-import { useStore } from 'stores/connect';
 import Store from 'logic/local-storage/Store';
 import { MultiSelect, TimeUnitInput, SearchFiltersFormControls, TimezoneSelect } from 'components/common';
 import Query from 'views/logic/queries/Query';
@@ -43,7 +43,7 @@ import { Alert, ButtonToolbar, ControlLabel, FormGroup, HelpBlock, Input } from 
 import RelativeTime from 'components/common/RelativeTime';
 import type { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
-import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
+import { fetchAllLookupTables } from 'components/lookup-tables/hooks/api/lookupTablesAPI';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import generateId from 'logic/generateId';
 import parseSearch from 'views/logic/slices/parseSearch';
@@ -139,7 +139,11 @@ type QueryParametersProps = {
   validation: Props['validation'];
 };
 const QueryParameters = ({ eventDefinition, onChange, userCanViewLookupTables, validation }: QueryParametersProps) => {
-  const { tables = {} } = useStore(LookupTablesStore);
+  const { data: tables = [] } = useQuery({
+    queryKey: ['lookup-tables', 'all'],
+    queryFn: () => fetchAllLookupTables(),
+    enabled: userCanViewLookupTables,
+  });
   const queryParameters = eventDefinition?.config?.query_parameters ?? [];
 
   const onChangeQueryParameters = useCallback(
@@ -161,7 +165,7 @@ const QueryParameters = ({ eventDefinition, onChange, userCanViewLookupTables, v
       queryParameter={LookupTableParameter.fromJSON(queryParam)}
       embryonic={!!(queryParam as LookupTableParameterJsonEmbryonic).embryonic}
       queryParameters={queryParameters}
-      lookupTables={Object.values(tables)}
+      lookupTables={tables}
       onChange={onChangeQueryParameters}
     />
   ));
@@ -252,12 +256,6 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
     },
     [setFieldWarning],
   );
-
-  useEffect(() => {
-    if (userCanViewLookupTables) {
-      LookupTablesActions.searchPaginated(1, 0, undefined, false);
-    }
-  }, [userCanViewLookupTables]);
 
   useEffect(() => {
     validateQueryString(
@@ -390,7 +388,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
       const value = FormsUtils.getValueFromInput(event.target);
       const newConfig = getUpdatedConfig(name as EventDefinitionConfigKeys, value);
       handleConfigChange(name, newConfig);
-      debouncedParseQuery(value, newConfig);
+      debouncedParseQuery(value as string, newConfig);
     },
     [debouncedParseQuery, getUpdatedConfig, handleConfigChange],
   );
