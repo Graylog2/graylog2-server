@@ -97,6 +97,16 @@ public interface MongoPaginationHelper<T extends MongoEntity> {
     MongoPaginationHelper<T> pipeline(List<Bson> pipeline);
 
     /**
+     * Sets pipeline stages to be added after {@code $sort} in the aggregation pipeline.
+     * Useful for cleaning up temporary fields created by pre-sort pipeline stages
+     * (e.g., {@code $unset} to remove fields added by {@code $set}).
+     *
+     * @param postSortPipeline the pipeline stages to add after sort. Must be non-null and not empty.
+     * @return A new pagination helper with the setting applied
+     */
+    MongoPaginationHelper<T> postSortPipeline(List<Bson> postSortPipeline);
+
+    /**
      * Specifies whether to include the entity source metadata in the result. For this to work properly when set to
      * true, T must implement {@link org.graylog2.database.entities.SourcedMongoEntity}. Otherwise, there will never
      * be any source metadata included in the result.

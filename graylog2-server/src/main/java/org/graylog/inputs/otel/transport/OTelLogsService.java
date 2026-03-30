@@ -27,6 +27,7 @@ import io.opentelemetry.proto.collector.logs.v1.LogsServiceGrpc;
 import jakarta.inject.Inject;
 import org.graylog.inputs.otel.OTelJournal;
 import org.graylog.inputs.otel.OTelJournalRecordFactory;
+
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
 import org.graylog2.plugin.journal.RawMessage;
@@ -39,16 +40,13 @@ import static org.graylog.inputs.grpc.GrpcUtils.createThrottledStatusRuntimeExce
 import static org.graylog.inputs.grpc.RemoteAddressProviderInterceptor.REMOTE_ADDRESS;
 
 public class OTelLogsService extends LogsServiceGrpc.LogsServiceImplBase {
-    private final OTelJournalRecordFactory journalRecordFactory;
     private final ThrottleableTransport2 transport;
     private final MessageInput input;
 
     @Inject
-    public OTelLogsService(@Assisted ThrottleableTransport2 transport, @Assisted MessageInput input,
-                           OTelJournalRecordFactory journalRecordFactory) {
+    public OTelLogsService(@Assisted ThrottleableTransport2 transport, @Assisted MessageInput input) {
         this.transport = transport;
         this.input = input;
-        this.journalRecordFactory = journalRecordFactory;
     }
 
     public interface Factory {

@@ -17,12 +17,14 @@
 package org.graylog2.inputs.transports.netty;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.DefaultHttpRequest;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
@@ -35,6 +37,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS;
 import static io.netty.handler.codec.http.HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS;
@@ -212,6 +215,31 @@ public class HttpHandlerTest {
         assertThat(headers.get(ACCESS_CONTROL_ALLOW_ORIGIN)).isEqualTo("http://example.com");
         assertThat(headers.get(ACCESS_CONTROL_ALLOW_CREDENTIALS)).isEqualTo("true");
         assertThat(headers.get(ACCESS_CONTROL_ALLOW_HEADERS)).isEqualTo("Authorization, Content-Type");
+    }
+
+    @Test
+    void handleValidPostIsCalledForValidRequest() {
+        final AtomicBoolean called = new AtomicBoolean(false);
+        final HttpHandler handler = new HttpHandler(false, null, null, "/test") {
+            @Override
+            protected void handleValidPost(ChannelHandlerContext ctx, FullHttpRequest request, boolean keepAlive, String origin) {
+                called.set(true);
+                writeResponse(ctx.channel(), keepAlive, request.protocolVersion(), HttpResponseStatus.OK, null);
+            }
+        };
+        final EmbeddedChannel channel = new EmbeddedChannel(handler);
+
+        final FullHttpRequest request = new DefaultFullHttpRequest(
+                HttpVersion.HTTP_1_1, HttpMethod.POST, "/test",
+                Unpooled.wrappedBuffer("body".getBytes(StandardCharsets.UTF_8)));
+        request.headers().set(CONTENT_LENGTH, 4);
+
+        channel.writeInbound(request);
+
+        assertThat(called.get()).isTrue();
+        final FullHttpResponse response = channel.readOutbound();
+        assertThat(response.status()).isEqualTo(HttpResponseStatus.OK);
+        response.release();
     }
 
     @Test

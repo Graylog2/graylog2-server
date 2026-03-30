@@ -31,7 +31,7 @@ import io.opentelemetry.proto.logs.v1.ScopeLogs;
 import io.opentelemetry.proto.resource.v1.Resource;
 import org.graylog.inputs.otel.OTelGrpcInput;
 import org.graylog.inputs.otel.OTelJournal;
-import org.graylog.inputs.otel.OTelJournalRecordFactory;
+
 import org.graylog.inputs.otel.transport.OTelLogsService;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
@@ -67,7 +67,7 @@ class OTelLogsServiceTest {
 
     @BeforeEach
     void setUp() {
-        logsService = new OTelLogsService(transport, input, new OTelJournalRecordFactory());
+        logsService = new OTelLogsService(transport, input);
     }
 
     // Test processing a request using the official example from

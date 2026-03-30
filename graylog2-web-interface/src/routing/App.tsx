@@ -53,10 +53,12 @@ const MainContentColumn = styled.div`
   flex-direction: column;
   flex: 1;
   min-width: 0;
+  min-height: 0;
 `;
 
 const PageContent = styled.div`
   flex: 1;
+  min-height: 0;
 `;
 
 const App = () => (
@@ -75,10 +77,10 @@ const App = () => (
                 <>
                   <AppLayout>
                     <Navigation />
-                    <ContentRow>
-                      <MainContentColumn>
-                        <Scratchpad />
-                        <ReportedErrorBoundary>
+                    <ReportedErrorBoundary>
+                      <ContentRow>
+                        <MainContentColumn>
+                          <Scratchpad />
                           <RuntimeErrorBoundary>
                             <PageContextProviders>
                               <PageContent>
@@ -86,12 +88,12 @@ const App = () => (
                               </PageContent>
                             </PageContextProviders>
                           </RuntimeErrorBoundary>
-                        </ReportedErrorBoundary>
-                      </MainContentColumn>
-                      <RightSidebarContext.Consumer>
-                        {({ isOpen }) => isOpen && <RightSidebar />}
-                      </RightSidebarContext.Consumer>
-                    </ContentRow>
+                        </MainContentColumn>
+                        <RightSidebarContext.Consumer>
+                          {({ isOpen }) => isOpen && <RightSidebar />}
+                        </RightSidebarContext.Consumer>
+                      </ContentRow>
+                    </ReportedErrorBoundary>
                   </AppLayout>
                   <HotkeysModalContainer />
                 </>

@@ -1,0 +1,79 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import * as React from 'react';
+import { useContext } from 'react';
+
+import usePluginEntities from 'hooks/usePluginEntities';
+import type { AdditionalViewsActionHandlerArguments } from 'views/types';
+import FieldActionsContext, { type FieldActionsContextValue } from 'views/components/actions/FieldActionsContext';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import type {
+  ActionHandlerCondition,
+  ExecuteThunkAction,
+  ResolvedActionHandlerArguments,
+} from 'views/components/actions/ActionHandler';
+import { Button } from 'components/bootstrap';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
+import AddToQueryHandler from 'views/logic/valueactions/AddToQueryHandler';
+
+const AssetDetailsActions = ({ assetId }: { assetId: string }) => {
+  const { all } = useContext(FieldTypesContext);
+  const fieldType = all.find((f) => f.name === 'associated_assets')?.type;
+  const queryId = useActiveQueryId();
+  const dispatch = useViewsDispatch();
+  const handleAddToQuery = () =>
+    dispatch(AddToQueryHandler({ queryId, field: 'associated_assets', value: assetId, type: fieldType }));
+
+  return (
+    <Button bsSize="xs" bsStyle="primary" onClick={() => handleAddToQuery()}>
+      Add to query
+    </Button>
+  );
+};
+
+const ViewsFieldActionsProvider = ({ children }: React.PropsWithChildren) => {
+  const dispatch = useViewsDispatch();
+  const queryId = useActiveQueryId();
+  const valueActions = usePluginEntities('valueActions');
+  const fieldActions = usePluginEntities('fieldActions');
+  const additionalHandlerArgs = { queryId };
+  const evaluateCondition = (
+    condition: ActionHandlerCondition<AdditionalViewsActionHandlerArguments>,
+    args: ResolvedActionHandlerArguments<AdditionalViewsActionHandlerArguments>,
+    fallbackValue: boolean,
+  ) => {
+    if (!condition) {
+      return fallbackValue;
+    }
+
+    return dispatch((_dispatch, stateGetter) => condition(args, stateGetter));
+  };
+  const executeThunkAction: ExecuteThunkAction = (thunk, args) => Promise.resolve(dispatch(thunk(args)));
+  const actionConfig: FieldActionsContextValue<AdditionalViewsActionHandlerArguments> = {
+    evaluateCondition,
+    executeThunkAction,
+    additionalHandlerArgs,
+    valueActions,
+    fieldActions,
+    assetDetailsActions: AssetDetailsActions,
+  };
+
+  return <FieldActionsContext.Provider value={actionConfig}>{children}</FieldActionsContext.Provider>;
+};
+
+export default ViewsFieldActionsProvider;
