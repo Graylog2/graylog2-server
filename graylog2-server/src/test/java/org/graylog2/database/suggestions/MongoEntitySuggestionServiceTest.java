@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -252,35 +253,28 @@ class MongoEntitySuggestionServiceTest {
     }
 
     @Test
-    void returnsEmptyResponseWhenValueColumnIsNotReadable() {
+    void throwsExceptionWhenValueColumnIsNotReadable() {
         doReturn(false).when(entityPermissionsUtils).areAllFieldsReadable("dashboards", Set.of("field_1", "field_2"));
 
-        EntitySuggestionResponse result = toTest.suggest("dashboards", "field_1", "field_2", null, null, "", 1, 10, subject);
-        assertThat(result.suggestions()).isEmpty();
-        assertThat(result.pagination().total()).isZero();
-
-        result = toTest.suggest("dashboards", "field_1", "field_2", null, null, "", 1, 10, subject);
-        assertThat(result.suggestions()).isEmpty();
-        assertThat(result.pagination().total()).isZero();
+        assertThatThrownBy(() -> toTest.suggest("dashboards", "field_1", "field_2", null, null, "", 1, 10, subject))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    void returnsEmptyResponseWhenTargetColumnIsNotReadable() {
+    void throwsExceptionWhenTargetColumnIsNotReadable() {
         doReturn(false).when(entityPermissionsUtils).areAllFieldsReadable("dashboards", Set.of("secret_target", "title"));
 
-        final var result = toTest.suggest("dashboards", "secret_target", "title", null, null, "", 1, 10, subject);
-
-        assertThat(result.suggestions()).isEmpty();
-        assertThat(result.pagination().total()).isZero();
+        assertThatThrownBy(() -> toTest.suggest("dashboards", "secret_target", "title", null, null, "", 1, 10, subject))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     @MongoDBFixtures("composite-display-fixtures.json")
-    void returnsEmptyResponseWhenDisplayFieldIsNotReadable() {
+    void throwsExceptionWhenDisplayFieldIsNotReadable() {
         doReturn(false).when(entityPermissionsUtils)
                 .areAllFieldsReadable("nodes", Set.of("node_id", "hostname", "secret_field"));
 
-        final var result = toTest.suggest(
+        assertThatThrownBy(() -> toTest.suggest(
                 "nodes",
                 "node_id",
                 "hostname",
@@ -290,10 +284,7 @@ class MongoEntitySuggestionServiceTest {
                 1,
                 10,
                 subject
-        );
-
-        assertThat(result.suggestions()).isEmpty();
-        assertThat(result.pagination().total()).isZero();
+        )).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test

@@ -47,6 +47,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
+import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.graylog2.users.UserImpl.COLLECTION_NAME;
 import static org.graylog2.users.UserImpl.LocalAdminUser.LOCAL_ADMIN_ID;
 import static org.graylog2.users.UserImpl.USERNAME;
@@ -86,9 +87,7 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
             requestedFields.addAll(displayFields);
         }
         if (!permissionsUtils.areAllFieldsReadable(collection, requestedFields)) {
-            LOG.warn("Suggestion request for collection [{}] denied: requested fields {} contain non-readable fields",
-                    collection, requestedFields);
-            return emptyResponse(page, perPage);
+            throw new IllegalArgumentException(f("Improper list of fields for collection %s : %s", collection, requestedFields));
         }
 
         final MongoCollection<Document> mongoCollection = mongoConnection.getMongoDatabase().getCollection(collection);
@@ -183,11 +182,6 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                         suggestions.size(),
                         page,
                         perPage));
-    }
-
-    private static EntitySuggestionResponse emptyResponse(final int page, final int perPage) {
-        return new EntitySuggestionResponse(List.of(),
-                PaginatedList.PaginationInfo.create(0, 0, page, perPage));
     }
 
     @MustBeClosed

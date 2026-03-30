@@ -21,6 +21,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -82,6 +83,10 @@ public class EntitySuggestionResource extends RestResource {
             displayFields = Arrays.asList(displayFieldsParam.split(","));
         }
 
-        return entitySuggestionService.suggest(collection, identifier, column, displayFields, displayTemplate, query, page, perPage, getSubject());
+        try {
+            return entitySuggestionService.suggest(collection, identifier, column, displayFields, displayTemplate, query, page, perPage, getSubject());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e);
+        }
     }
 }

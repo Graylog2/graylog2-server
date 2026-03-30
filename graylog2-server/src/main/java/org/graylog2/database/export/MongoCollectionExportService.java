@@ -39,6 +39,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 /**
  * A general service for exporting limited list of Documents (with a selection of fields) from a collection in MongoDB.
  * Meant to be used when users have permissions to read the whole entity collection.
@@ -66,9 +68,7 @@ public class MongoCollectionExportService {
                                  final List<Sort> sorts,
                                  final Subject subject) {
         if (!permissionsUtils.areAllFieldsReadable(collectionName, exportedFieldNames)) {
-            LOG.warn("Export request for collection [{}] denied: requested fields {} contain non-readable fields",
-                    collectionName, exportedFieldNames);
-            return List.of();
+            throw new IllegalArgumentException(f("Improper list of fields for collection %s : %s", collectionName, exportedFieldNames));
         }
 
         final MongoCollection<Document> collection = mongoConnection.getMongoDatabase().getCollection(collectionName);

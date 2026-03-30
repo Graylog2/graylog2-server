@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -168,18 +169,17 @@ class MongoCollectionExportServiceTest {
     }
 
     @Test
-    void returnsEmptyListWhenExportedFieldIsNotReadable() {
+    void throwsExceptionWhenExportedFieldIsNotReadable() {
         insertTestData();
         doReturn(false).when(permissionsUtils).areAllFieldsReadable(eq(TEST_COLLECTION_NAME), any());
 
-        final List<Document> result = toTest.export(TEST_COLLECTION_NAME,
+        assertThatThrownBy(() -> toTest.export(TEST_COLLECTION_NAME,
                 List.of("name", "secret_field"),
                 10,
                 Filters.empty(),
                 List.of(),
-                subject);
-
-        assertThat(result).isEmpty();
+                subject))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
