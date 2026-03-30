@@ -39,16 +39,13 @@ import static org.graylog.inputs.grpc.GrpcUtils.createThrottledStatusRuntimeExce
 import static org.graylog.inputs.grpc.RemoteAddressProviderInterceptor.REMOTE_ADDRESS;
 
 public class OTelLogsService extends LogsServiceGrpc.LogsServiceImplBase {
-    private final OTelJournalRecordFactory journalRecordFactory;
     private final ThrottleableTransport2 transport;
     private final MessageInput input;
 
     @Inject
-    public OTelLogsService(@Assisted ThrottleableTransport2 transport, @Assisted MessageInput input,
-                           OTelJournalRecordFactory journalRecordFactory) {
+    public OTelLogsService(@Assisted ThrottleableTransport2 transport, @Assisted MessageInput input) {
         this.transport = transport;
         this.input = input;
-        this.journalRecordFactory = journalRecordFactory;
     }
 
     public interface Factory {
@@ -76,7 +73,7 @@ public class OTelLogsService extends LogsServiceGrpc.LogsServiceImplBase {
             createRawMessage = RawMessage::new;
         }
 
-        final List<OTelJournal.Record> journalRecords = journalRecordFactory.createFromRequest(request);
+        final List<OTelJournal.Record> journalRecords = OTelJournalRecordFactory.createFromRequest(request);
         final int recordCount = journalRecords.size();
         final int perMessageSize = recordCount > 0 ? request.getSerializedSize() / recordCount : 0;
 
