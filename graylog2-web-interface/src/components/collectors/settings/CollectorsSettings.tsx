@@ -33,12 +33,6 @@ import { useCollectorsConfig, useCollectorInputIds, useCollectorsMutations } fro
 import type { CollectorsConfigRequest } from '../types';
 
 
-const Section = styled.div(
-  ({ theme }) => css`
-    margin-bottom: ${theme.spacings.lg};
-  `,
-);
-
 const SectionTitle = styled.h3(
   ({ theme }) => css`
     margin-bottom: ${theme.spacings.sm};
