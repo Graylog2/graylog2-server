@@ -33,6 +33,10 @@ import java.util.stream.Collectors;
 
 public class FsRepositoryConfiguration implements RepositoryConfiguration {
     /**
+     * By default, this property is called path_dir. But the name is almost the same as opensearch property path.dir,
+     * so people tent to use the dot instead of underscore here. Let's add the doc version as fallback, catching
+     * possible misconfiguration, using it and providing a warning automatically if such situation occurs.
+     *
      * <a href="https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/snapshot-restore/#shared-file-system">See snapshot documentation</a>
      */
     @Documentation("Filesystem path where searchable snapshots should be stored")
