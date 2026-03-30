@@ -14,11 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.collectors;
+package org.graylog.collectors.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record IngestEndpointConfig(
-        @JsonProperty("hostname") String hostname,
-        @JsonProperty("port") int port
+import java.util.List;
+
+public record CollectorInputIdsResponse(
+        @JsonProperty("collector_input_ids") List<String> collectorInputIds
 ) {}

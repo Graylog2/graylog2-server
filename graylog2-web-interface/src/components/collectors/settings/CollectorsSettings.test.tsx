@@ -19,17 +19,15 @@ import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import { asMock } from 'helpers/mocking';
-import useInput from 'hooks/useInput';
 import useInputsStates from 'hooks/useInputsStates';
 
 import CollectorsSettings from './CollectorsSettings';
 
-import { useCollectorsConfig, useCollectorsMutations } from '../hooks';
+import { useCollectorsConfig, useCollectorInputIds, useCollectorsMutations } from '../hooks';
 import type { CollectorsConfig } from '../types';
 import { mockCollectorsMutations } from '../testing/mockMutations';
 
 jest.mock('../hooks');
-jest.mock('hooks/useInput');
 jest.mock('hooks/useInputsStates');
 jest.mock('components/inputs/InputStateBadge', () => () => <span>Running</span>);
 
@@ -46,10 +44,8 @@ const config: CollectorsConfig = {
   },
   otlp_server_cert_id: 'otlp-id',
   http: {
-    enabled: true,
     hostname: 'otlp.example.com',
     port: 14401,
-    input_id: 'input-1',
   },
   collector_offline_threshold: 'PT5M',
   collector_default_visibility_threshold: 'P1D',
@@ -64,18 +60,19 @@ describe('CollectorsSettings', () => {
       data: config,
       isLoading: false,
     });
+    asMock(useCollectorInputIds).mockReturnValue({
+      data: [],
+      isLoading: false,
+    });
     asMock(useCollectorsMutations).mockReturnValue(mockCollectorsMutations({
       updateConfig,
       isUpdatingConfig: false,
     }));
-    asMock(useInput).mockReturnValue({
-      data: { id: 'input-1' },
-    } as ReturnType<typeof useInput>);
     asMock(useInputsStates).mockReturnValue({
       data: {},
       refetch: jest.fn(),
       isLoading: false,
-    });
+    } as unknown as ReturnType<typeof useInputsStates>);
     updateConfig.mockResolvedValue(undefined);
   });
 
@@ -84,8 +81,6 @@ describe('CollectorsSettings', () => {
 
     expect(await screen.findByRole('heading', { name: 'HTTP' })).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'gRPC' })).not.toBeInTheDocument();
-    expect(screen.getByText('HTTP:')).toBeInTheDocument();
-    expect(screen.queryByText('gRPC:')).not.toBeInTheDocument();
   });
 
   it('saves a request payload without grpc settings', async () => {
@@ -105,10 +100,10 @@ describe('CollectorsSettings', () => {
     await waitFor(() =>
       expect(updateConfig).toHaveBeenCalledWith({
         http: {
-          enabled: true,
           hostname: 'ingest.example.com',
           port: 14411,
         },
+        create_input: true,
         collector_offline_threshold: 'PT5M',
         collector_default_visibility_threshold: 'P1D',
         collector_expiration_threshold: 'P7D',
@@ -116,5 +111,21 @@ describe('CollectorsSettings', () => {
     );
 
     expect(updateConfig).not.toHaveBeenCalledWith(expect.objectContaining({ grpc: expect.anything() }));
+  });
+
+  it('shows info banner when no collector inputs exist', async () => {
+    render(<CollectorsSettings />);
+
+    expect(
+      await screen.findByText(/No collector ingest input exists/),
+    ).toBeInTheDocument();
+  });
+
+  it('does not show enabled checkbox', async () => {
+    render(<CollectorsSettings />);
+
+    await screen.findByLabelText('Hostname');
+
+    expect(screen.queryByLabelText('Enabled')).not.toBeInTheDocument();
   });
 });
