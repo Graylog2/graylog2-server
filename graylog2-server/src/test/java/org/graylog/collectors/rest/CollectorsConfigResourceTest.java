@@ -20,7 +20,6 @@ import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.util.ThreadContext;
 import org.graylog.collectors.CollectorCaService;
 import org.graylog.collectors.CollectorIngestInputService;
 import org.graylog.collectors.CollectorLogsDestinationService;
@@ -36,10 +35,10 @@ import org.graylog.security.pki.CertificateEntry;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.validators.ValidationResult;
-import org.graylog2.security.SecurityTestUtils;
+import org.graylog2.security.WithAuthorization;
+import org.graylog2.security.WithAuthorizationExtension;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.shared.security.RestPermissions;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -64,6 +63,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(WithAuthorizationExtension.class)
+@WithAuthorization(username = "admin", permissions = "*")
 class CollectorsConfigResourceTest {
 
     @Mock
@@ -100,15 +101,6 @@ class CollectorsConfigResourceTest {
                 enrollmentTokenService,
                 collectorCaService
         );
-
-        final var subject = mock(Subject.class);
-        lenient().when(subject.getPrincipal()).thenReturn("admin");
-        ThreadContext.bind(subject);
-    }
-
-    @AfterEach
-    void tearDown() {
-        SecurityTestUtils.clearSecurityContext();
     }
 
     @Test
@@ -343,7 +335,6 @@ class CollectorsConfigResourceTest {
     @Test
     void putWithCreateInputDelegatesToService() throws Exception {
         stubCaService();
-        setupSecurityContext();
 
         final var request = new CollectorsConfigRequest(
                 new CollectorsConfigRequest.IngestEndpointRequest("host", 14401),
@@ -369,15 +360,6 @@ class CollectorsConfigResourceTest {
 
         verify(collectorIngestInputService, never()).createInput(any(), any(), any(int.class));
         verify(collectorsConfigService).save(any(CollectorsConfig.class));
-    }
-
-    private void setupSecurityContext() {
-        SecurityTestUtils.setupSecurityContext("admin", "admin-role", Set.of(
-                CollectorsPermissions.CONFIGURATION_EDIT,
-                RestPermissions.INPUTS_CREATE,
-                RestPermissions.INPUT_TYPES_CREATE + ":*"
-        ));
-        resource = SecurityTestUtils.injectSecurityManager(resource, CollectorsConfigResource.class);
     }
 
     private void stubCaService() {
