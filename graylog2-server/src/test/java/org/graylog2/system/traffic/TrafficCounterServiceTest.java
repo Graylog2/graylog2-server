@@ -62,12 +62,12 @@ class TrafficCounterServiceTest {
 
             // Record traffic for each hour of the current day - 9 hours (it's 08:20, so we are in the 9th hour of the day)
             IntStream.rangeClosed(0, now.hourOfDay().get()).forEach(hour ->
-                    service.updateTraffic(today.plusHours(hour), nodeId, 1, 1, 1));
+                    service.updateTraffic(today.plusHours(hour), nodeId, 1, 1, 1, 1));
 
             // Record traffic for all previous days - 30 x 24 hours
             IntStream.rangeClosed(1, 30).forEach(day ->
                     IntStream.rangeClosed(0, 23).forEach(hour ->
-                            service.updateTraffic(today.minusDays(day).plusHours(hour), nodeId, 1, 1, 1)));
+                            service.updateTraffic(today.minusDays(day).plusHours(hour), nodeId, 1, 1, 1, 1)));
 
             // Verify that today is included from the histogram.
             final TrafficCounterService.TrafficHistogram trafficHistogramIncludesToday =
@@ -77,6 +77,7 @@ class TrafficCounterServiceTest {
             assertThat(trafficHistogramIncludesToday.input()).hasSize(31);
             assertThat(trafficHistogramIncludesToday.decoded()).hasSize(31);
             assertThat(trafficHistogramIncludesToday.output()).hasSize(31);
+            assertThat(trafficHistogramIncludesToday.inputIndexed()).hasSize(31);
             verifyDayTrafficVolume(trafficHistogramIncludesToday);
 
             // Verify that today is omitted from the histogram.
@@ -89,6 +90,7 @@ class TrafficCounterServiceTest {
             assertThat(trafficHistogramExcludesToday.input()).hasSize(30);
             assertThat(trafficHistogramExcludesToday.decoded()).hasSize(30);
             assertThat(trafficHistogramExcludesToday.output()).hasSize(30);
+            assertThat(trafficHistogramExcludesToday.inputIndexed()).hasSize(30);
             verifyDayTrafficVolume(trafficHistogramIncludesToday);
         } finally {
             DateTimeUtils.setCurrentMillisSystem();
@@ -97,7 +99,7 @@ class TrafficCounterServiceTest {
 
     private static void verifyDayTrafficVolume(TrafficCounterService.TrafficHistogram trafficHistogram) {
         // For each type of traffic, check that we got the correct values
-        ImmutableList.of(trafficHistogram.input(), trafficHistogram.decoded(), trafficHistogram.output()).forEach(histogram -> {
+        ImmutableList.of(trafficHistogram.input(), trafficHistogram.decoded(), trafficHistogram.output(), trafficHistogram.inputIndexed()).forEach(histogram -> {
             final ImmutableList<Long> outputValues = ImmutableList.copyOf(histogram.values());
 
             // Check that we got the expected count for each of the previous days. We should get the full counter
@@ -129,12 +131,12 @@ class TrafficCounterServiceTest {
 
             // Record traffic for each hour of the current day (now)
             IntStream.rangeClosed(0, now.hourOfDay().get()).forEach(hour ->
-                    service.updateTraffic(today.plusHours(hour), nodeId, 1, 1, 1));
+                    service.updateTraffic(today.plusHours(hour), nodeId, 1, 1, 1, 1));
 
             // Record traffic for all previous days
             IntStream.rangeClosed(1, 30).forEach(day ->
                     IntStream.rangeClosed(0, 23).forEach(hour ->
-                            service.updateTraffic(today.minusDays(day).plusHours(hour), nodeId, 1, 1, 1)));
+                            service.updateTraffic(today.minusDays(day).plusHours(hour), nodeId, 1, 1, 1, 1)));
 
             final TrafficCounterService.TrafficHistogram histogramIncludesToday =
                     service.clusterTrafficOfLastDays(Duration.standardDays(30), TrafficCounterService.Interval.HOURLY, true);
@@ -145,6 +147,7 @@ class TrafficCounterServiceTest {
             assertThat(histogramIncludesToday.input()).hasSize(729);
             assertThat(histogramIncludesToday.decoded()).hasSize(729);
             assertThat(histogramIncludesToday.output()).hasSize(729);
+            assertThat(histogramIncludesToday.inputIndexed()).hasSize(729);
             verifyHourTraffic(histogramIncludesToday, 729);
 
             final TrafficCounterService.TrafficHistogram histogramExcludesToday =
@@ -156,6 +159,7 @@ class TrafficCounterServiceTest {
             assertThat(histogramExcludesToday.input()).hasSize(720);
             assertThat(histogramExcludesToday.decoded()).hasSize(720);
             assertThat(histogramExcludesToday.output()).hasSize(720);
+            assertThat(histogramExcludesToday.inputIndexed()).hasSize(720);
             verifyHourTraffic(histogramExcludesToday, 720);
         } finally {
             DateTimeUtils.setCurrentMillisSystem();
@@ -164,7 +168,7 @@ class TrafficCounterServiceTest {
 
     private static void verifyHourTraffic(TrafficCounterService.TrafficHistogram trafficHistogram, int bucketCount) {
         // For each type of traffic, check that we got the correct values
-        ImmutableList.of(trafficHistogram.input(), trafficHistogram.decoded(), trafficHistogram.output()).forEach(histogram -> {
+        ImmutableList.of(trafficHistogram.input(), trafficHistogram.decoded(), trafficHistogram.output(), trafficHistogram.inputIndexed()).forEach(histogram -> {
             final ImmutableList<Long> outputValues = ImmutableList.copyOf(histogram.values());
 
             // Check that we got the expected count for each of the previous days. We should get one value per hour. (1)
