@@ -42,15 +42,6 @@ public interface Indexable {
 
     long getSize();
 
-    /**
-     * Returns the input message size in bytes. This is the raw payload size at the transport
-     * layer, as recorded in {@link org.graylog2.plugin.Message#FIELD_GL2_INPUT_MESSAGE_SIZE}.
-     * Falls back to {@link #getSize()} if no input message size was recorded.
-     */
-    default long getInputMessageSize() {
-        return getSize();
-    }
-
     DateTime getReceiveTime();
 
     Map<String, Object> toElasticSearchObject(ObjectMapper objectMapper, @Nonnull final Meter invalidTimestampMeter);
