@@ -33,9 +33,9 @@ import java.util.stream.Collectors;
 
 public class FsRepositoryConfiguration implements RepositoryConfiguration {
     /**
-     * By default, this Graylog setting is called {@code path_repo}. The name is very similar to the OpenSearch
-     * repository path setting {@code path.repo}, so people tend to use the OpenSearch-style name with a dot here.
-     * To catch such possible misconfigurations, {@code path.repo} is also accepted as a fallback property name.
+     * By default, this property is called path_repo. But the name is almost the same as opensearch property path.repo,
+     * so people tend to use the dot instead of underscore here. Let's add the doc version as fallback, catching
+     * possible misconfiguration, using it and providing a warning automatically if such situation occurs.
      *
      * <a href="https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/snapshot-restore/#shared-file-system">See snapshot documentation</a>
      */
