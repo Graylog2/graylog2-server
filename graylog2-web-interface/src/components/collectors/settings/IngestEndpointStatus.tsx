@@ -29,7 +29,6 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import useInputMutations from 'hooks/useInputMutations';
 import { isPermitted } from 'util/PermissionsMixin';
 import useInputsStates from 'hooks/useInputsStates';
-import { defaultOnError } from 'util/conditional/onError';
 
 import { useCollectorInputIds } from '../hooks';
 import { COLLECTOR_INPUT_IDS_KEY_PREFIX } from '../hooks/useCollectorInputIds';
@@ -65,7 +64,7 @@ const IngestEndpointStatus = ({ defaultPort, isInitialSetup }: Props) => {
   const inputQueries = useQueries({
     queries: readableInputIds.map((id) => ({
       queryKey: ['inputs', id],
-      queryFn: () => defaultOnError(SystemInputs.get(id), 'Loading input failed with status', 'Could not load input'),
+      queryFn: () => SystemInputs.get(id),
       retry: false,
     })),
   });
