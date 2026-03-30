@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixed error message when content packs are successfully uninstalled."
+
+pulls = ["25448"]
+issues = ["22059"]
