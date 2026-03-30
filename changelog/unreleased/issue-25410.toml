@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix mongodb connection in mongodb metrics supplier"
+
+pulls = ["25424"]
+issues = ["25410"]
