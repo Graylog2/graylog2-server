@@ -20,6 +20,7 @@ import { useQueries, useQueryClient } from '@tanstack/react-query';
 import styled, { css } from 'styled-components';
 
 import { SystemInputs } from '@graylog/server-api';
+
 import { Button, Alert, Row, Col, Table } from 'components/bootstrap';
 import { Link } from 'components/common';
 import Routes from 'routing/Routes';
@@ -110,8 +111,8 @@ const IngestEndpointStatus = ({ defaultPort, isInitialSetup }: Props) => {
 
   return (
     <Row className="content">
-      <Col md={6}>
-        <SectionTitle>Ingest Endpoint Status</SectionTitle>
+      <Col md={12}>
+        <SectionTitle>Ingest Inputs</SectionTitle>
         {!isInitialSetup && allQueriesSettled && !hasInputs && (
           <Alert bsStyle="info">
             No collector ingest input exists. Collectors will not be able to send data until an input is created.

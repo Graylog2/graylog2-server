@@ -109,7 +109,6 @@ class CollectorsConfigResourceTest {
     @AfterEach
     void tearDown() {
         SecurityTestUtils.clearSecurityContext();
-        ThreadContext.unbindSubject();
     }
 
     @Test
