@@ -335,7 +335,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
     @Override
     public List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                              Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
-                                             Map<String, Set<String>> extraFilters, String slicingColumn, String type, int maxBuckets) {
+                                             Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, int maxBuckets) {
         final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
 
         final org.opensearch.client.opensearch.core.SearchRequest searchRequest = org.opensearch.client.opensearch.core.SearchRequest.of(builder -> {
@@ -366,11 +366,11 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
 
         final List<Slice> result = new ArrayList<>();
         if (termsAgg.isSterms()) {
-            termsAgg.sterms().buckets().array().forEach(b -> result.add(new Slice(b.key(), null, type, Math.toIntExact(b.docCount()))));
+            termsAgg.sterms().buckets().array().forEach(b -> result.add(new Slice(b.key(), null, Math.toIntExact(b.docCount()), meta)));
         } else if (termsAgg.isLterms()) {
-            termsAgg.lterms().buckets().array().forEach(b -> result.add(new Slice(b.keyAsString(), null, type, Math.toIntExact(b.docCount()))));
+            termsAgg.lterms().buckets().array().forEach(b -> result.add(new Slice(b.keyAsString(), null, Math.toIntExact(b.docCount()), meta)));
         } else if (termsAgg.isDterms()) {
-            termsAgg.dterms().buckets().array().forEach(b -> result.add(new Slice(b.keyAsString(), null, type, Math.toIntExact(b.docCount()))));
+            termsAgg.dterms().buckets().array().forEach(b -> result.add(new Slice(b.keyAsString(), null, Math.toIntExact(b.docCount()), meta)));
         }
         return result;
     }
@@ -378,7 +378,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
     @Override
     public List<Slice> aggregateSlicesForRangeQuery(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                             Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
-                                            Map<String, Set<String>> extraFilters, String slicingColumn, String type, List<NumberRange> ranges) {
+                                            Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, List<NumberRange> ranges) {
         final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
 
         final RangeAggregation.Builder rangeBuilder = new RangeAggregation.Builder().field(slicingColumn);
@@ -421,7 +421,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
         final var rangeAgg = searchResult.aggregations().get(SLICES_AGGREGATION_NAME).range();
 
         final List<Slice> result = new ArrayList<>();
-        rangeAgg.buckets().array().forEach(b -> result.add(new Slice(b.key(), null, type, Math.toIntExact(b.docCount()))));
+        rangeAgg.buckets().array().forEach(b -> result.add(new Slice(b.key(), null, Math.toIntExact(b.docCount()), meta)));
         return result;
     }
 
