@@ -16,11 +16,10 @@
  */
 package org.graylog2.telemetry.suppliers;
 
-import com.github.zafarkhaja.semver.Version;
 import org.assertj.core.api.Assertions;
+import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
-import org.graylog.testing.mongodb.MongoDBVersion;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -35,11 +34,9 @@ public class MongoDBMetricsSupplierTest {
         Assertions.assertThat(supplier.get())
                 .isPresent()
                 .hasValueSatisfying(event -> {
-                    final MongoDBVersion expectedVersion = testService.version();
                     final String actualVersion = (String) event.metrics().get("version");
-                    final Version parsedActual = Version.parse(actualVersion);
-                    Assertions.assertThat(parsedActual.satisfies(expectedVersion.version()))
-                            .isTrue();
+                    Assertions.assertThat(actualVersion)
+                            .startsWith(MongodbServer.DEFAULT_VERSION.getVersion());
                 });
     }
 }
