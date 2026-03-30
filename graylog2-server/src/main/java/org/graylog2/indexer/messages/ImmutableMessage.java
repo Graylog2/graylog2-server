@@ -54,4 +54,6 @@ public interface ImmutableMessage extends Indexable, Acknowledgeable {
     String getSource();
 
     ImmutableSet<String> getStreamIds();
+
+    long getInputSize();
 }

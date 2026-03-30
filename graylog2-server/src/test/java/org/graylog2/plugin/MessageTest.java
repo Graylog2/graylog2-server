@@ -486,6 +486,15 @@ public class MessageTest {
     }
 
     @Test
+    public void getInputSizeReturnsFieldValue() {
+        final Message message = new Message("message", "source", Tools.nowUTC());
+        assertThat(message.getInputSize()).isEqualTo(0L);
+
+        message.addField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, 12345L);
+        assertThat(message.getInputSize()).isEqualTo(12345L);
+    }
+
+    @Test
     public void messageSizes() {
         final Message message = new Message("1234567890", "12345", Tools.nowUTC());
         assertThat(message.getSize()).isEqualTo(45);

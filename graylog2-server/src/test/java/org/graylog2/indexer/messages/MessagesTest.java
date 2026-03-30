@@ -89,30 +89,32 @@ public class MessagesTest {
     public void bulkIndexingShouldAccountMessageSizes() throws IOException {
         when(messagesAdapter.bulkIndex(any())).thenReturn(IndexingResults.empty());
         final List<MessageWithIndex> messageList = List.of(
-                new MessageWithIndex(wrap(messageWithSize(17)), ""),
-                new MessageWithIndex(wrap(messageWithSize(23)), ""),
-                new MessageWithIndex(wrap(messageWithSize(42)), "")
+                new MessageWithIndex(wrap(messageWithSize(17, 100)), ""),
+                new MessageWithIndex(wrap(messageWithSize(23, 200)), ""),
+                new MessageWithIndex(wrap(messageWithSize(42, 300)), "")
         );
         when(messagesAdapter.bulkIndex(any())).thenReturn(IndexingResults.create(createSuccessFromMessages(messageList), List.of()));
 
         messages.bulkIndex(messageList);
 
         verify(trafficAccounting, times(1)).addOutputTraffic(82);
+        verify(trafficAccounting, times(1)).addInputTraffic(600);
         verify(trafficAccounting, never()).addSystemTraffic(anyLong());
     }
 
     @Test
     public void bulkIndexingShouldAccountMessageSizesForSystemTrafficSeparately() throws IOException {
         final List<MessageWithIndex> messageList = List.of(
-                new MessageWithIndex(wrap(messageWithSize(17)), ""),
-                new MessageWithIndex(wrap(messageWithSize(23)), ""),
-                new MessageWithIndex(wrap(messageWithSize(42)), "")
+                new MessageWithIndex(wrap(messageWithSize(17, 100)), ""),
+                new MessageWithIndex(wrap(messageWithSize(23, 200)), ""),
+                new MessageWithIndex(wrap(messageWithSize(42, 300)), "")
         );
         when(messagesAdapter.bulkIndex(any())).thenReturn(IndexingResults.create(createSuccessFromMessages(messageList), List.of()));
 
         messages.bulkIndex(messageList, true);
 
         verify(trafficAccounting, never()).addOutputTraffic(anyLong());
+        verify(trafficAccounting, never()).addInputTraffic(anyLong());
         verify(trafficAccounting, times(1)).addSystemTraffic(82);
     }
 
@@ -203,9 +205,10 @@ public class MessagesTest {
         return mock;
     }
 
-    private Message messageWithSize(long size) {
+    private Message messageWithSize(long size, long inputSize) {
         final Message message = mock(Message.class);
         when(message.getSize()).thenReturn(size);
+        when(message.getInputSize()).thenReturn(inputSize);
 
         return message;
     }

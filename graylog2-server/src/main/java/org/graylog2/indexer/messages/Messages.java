@@ -232,15 +232,22 @@ public class Messages {
     }
 
     private void accountTotalMessageSizes(List<IndexingSuccess> requests, boolean isSystemTraffic) {
-        final long totalSizeOfIndexedMessages = requests.stream()
-                .map(IndexingSuccess::message)
-                .mapToLong(Indexable::getSize)
-                .sum();
+        long totalOutputSize = 0;
+        long totalInputSize = 0;
+
+        for (final IndexingSuccess request : requests) {
+            final Indexable message = request.message();
+            totalOutputSize += message.getSize();
+            if (message instanceof ImmutableMessage immutable) {
+                totalInputSize += immutable.getInputSize();
+            }
+        }
 
         if (isSystemTraffic) {
-            trafficAccounting.addSystemTraffic(totalSizeOfIndexedMessages);
+            trafficAccounting.addSystemTraffic(totalOutputSize);
         } else {
-            trafficAccounting.addOutputTraffic(totalSizeOfIndexedMessages);
+            trafficAccounting.addOutputTraffic(totalOutputSize);
+            trafficAccounting.addInputTraffic(totalInputSize);
         }
     }
 

@@ -700,6 +700,11 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         return sizeCounter.getCount();
     }
 
+    public long getInputSize() {
+        final Object v = getField(FIELD_GL2_INPUT_MESSAGE_SIZE);
+        return v instanceof Number n ? n.longValue() : 0L;
+    }
+
     public static boolean validKey(final String key) {
         return VALID_KEY_CHAR_MATCHER.matchesAllOf(key);
     }

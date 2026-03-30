@@ -23,13 +23,19 @@ import org.graylog2.plugin.GlobalMetricNames;
 import jakarta.inject.Inject;
 
 public class TrafficAccounting {
+    private final Counter inputByteCounter;
     private final Counter outputByteCounter;
     private final Counter systemTrafficCounter;
 
     @Inject
     public TrafficAccounting(MetricRegistry metricRegistry) {
+        inputByteCounter = metricRegistry.counter(GlobalMetricNames.INPUT_TRAFFIC);
         outputByteCounter = metricRegistry.counter(GlobalMetricNames.OUTPUT_TRAFFIC);
         systemTrafficCounter = metricRegistry.counter(GlobalMetricNames.SYSTEM_OUTPUT_TRAFFIC);
+    }
+
+    public void addInputTraffic(long size) {
+        this.inputByteCounter.inc(size);
     }
 
     public void addOutputTraffic(long size) {

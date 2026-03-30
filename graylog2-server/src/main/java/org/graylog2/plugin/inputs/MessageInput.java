@@ -85,7 +85,6 @@ public abstract class MessageInput implements Stoppable {
     private final Configuration codecConfig;
     private final Counter globalIncomingMessages;
     private final Counter emptyMessages;
-    private final Counter globalRawSize;
 
     protected String title;
     protected String creatorUserId;
@@ -119,7 +118,6 @@ public abstract class MessageInput implements Stoppable {
         this.serverStatus = serverStatus;
         this.requestedConfiguration = config.combinedRequestedConfiguration();
         this.codecConfig = config.codecConfig.getRequestedConfiguration().filter(codec.getConfiguration());
-        globalRawSize = metricRegistry.counter(GlobalMetricNames.INPUT_TRAFFIC);
         rawSize = localRegistry.meter("rawSize");
         incomingMessages = localRegistry.meter("incomingMessages");
         globalIncomingMessages = metricRegistry.counter(GlobalMetricNames.INPUT_THROUGHPUT);
@@ -402,7 +400,6 @@ public abstract class MessageInput implements Stoppable {
         incomingMessages.mark();
         globalIncomingMessages.inc();
         rawSize.mark(payloadLength);
-        globalRawSize.inc(payloadLength);
     }
 
     public String getType() {
