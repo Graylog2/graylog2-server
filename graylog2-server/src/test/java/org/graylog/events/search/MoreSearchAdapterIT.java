@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -199,6 +200,30 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
                 getCountingAndCollectingScrollEventsCallback(count, allResults));
         assertThat(allResults).isEmpty();
     }
+
+    @Test
+    public void eventSearchWithExtraFiltersSingleTermValue() {
+        // Baseline: a single term value filters to the matching subset
+        final Map<String, Set<String>> extraFilters = Map.of("message", Set.of("Hi"));
+        final MoreSearch.Result result = toTest.eventSearch("*",
+                RelativeRange.allTime(),
+                Set.of(INDEX_NAME),
+                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", Set.of(), extraFilters);
+
+        assertThat(result.results()).hasSize(4); // messages 1-4 have "Hi"
+    }
+
+    @Test
+    public void eventSearchWithMultipleTermExtraFiltersOrsValuesForSameField() {
+        final Map<String, Set<String>> extraFilters = Map.of("message", Set.of("Hi", "Ahoj"));
+        final MoreSearch.Result result = toTest.eventSearch("*",
+                RelativeRange.allTime(),
+                Set.of(INDEX_NAME),
+                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", Set.of(), extraFilters);
+
+        assertThat(result.results()).hasSize(7);
+    }
+
 
     @Nonnull
     private MoreSearchAdapter.ScrollEventsCallback getCountingAndCollectingScrollEventsCallback(AtomicInteger count,
