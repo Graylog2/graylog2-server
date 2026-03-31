@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 public class CIDRPatriciaTrieTest {
 
@@ -71,6 +72,23 @@ public class CIDRPatriciaTrieTest {
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> trie.insertCIDR("127.a.3.21/12", "Bad Range 1"));
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> trie.insertCIDR("not.an.ip.address/12", "Bad Range 2"));
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> trie.insertCIDR("127.0.0.0", "Bad Range 3"));
+    }
+
+    @Test
+    public void testSingleIPTypeAdaptersDontThrowException() {
+        final CIDRPatriciaTrie ipv4Trie = buildIPv4Trie();
+
+        String nullResult = assertDoesNotThrow(() -> ipv4Trie.longestPrefixRangeLookup("77f:8b7a:3e82:6fb3:ba15:9b68:7fe0:a695"));
+        assertThat(nullResult).isNull();
+        nullResult = assertDoesNotThrow(() -> ipv4Trie.longestPrefixRangeLookup("2001:db8:abcd::1"));
+        assertThat(nullResult).isNull();
+
+        final CIDRPatriciaTrie ipv6Trie = buildIPv6Trie();
+
+        nullResult = assertDoesNotThrow(() -> ipv6Trie.longestPrefixRangeLookup("35.139.253.123"));
+        assertThat(nullResult).isNull();
+        nullResult = assertDoesNotThrow(() -> ipv6Trie.longestPrefixRangeLookup("192.168.1.100"));
+        assertThat(nullResult).isNull();
     }
 
     @Test
@@ -167,6 +185,29 @@ public class CIDRPatriciaTrieTest {
         trie.insertCIDR("77f::/16", "IPv6 Range 4");
         trie.insertCIDR("17c5:b180::/35", "IPv6 Range 5");
         trie.insertCIDR("2001:db7::/128","Single IPv6");
+        return trie;
+    }
+
+    private static CIDRPatriciaTrie buildIPv4Trie() {
+        final CIDRPatriciaTrie trie = new CIDRPatriciaTrie();
+        trie.insertCIDR("192.168.1.0/24", "IPv4 Range 1");
+        trie.insertCIDR("10.0.0.0/8", "IPv4 Range 2");
+        trie.insertCIDR("35.138.0.0/15", "IPv4 Range 3");
+        trie.insertCIDR("192.168.102.0/24", "HR");
+        trie.insertCIDR("192.168.102.0/28", "HR Subnet 1");
+        trie.insertCIDR("192.168.102.16/28", "HR Subnet 2");
+        trie.insertCIDR("192.168.102.32/28", "HR Subnet 3");
+        return trie;
+    }
+
+    private static CIDRPatriciaTrie buildIPv6Trie() {
+        final CIDRPatriciaTrie trie = new CIDRPatriciaTrie();
+        trie.insertCIDR("2001:db8::/32", "IPv6 Range 1");
+        trie.insertCIDR("2404:6800:4001::/48", "IPv6 Range 2");
+        trie.insertCIDR("8dbf:8000::/19", "IPv6 Range 3");
+        trie.insertCIDR("77f::/16", "IPv6 Range 4");
+        trie.insertCIDR("17c5:b180::/35", "IPv6 Range 5");
+        trie.insertCIDR("2001:db7::/128", "Single IPv6");
         return trie;
     }
 }
