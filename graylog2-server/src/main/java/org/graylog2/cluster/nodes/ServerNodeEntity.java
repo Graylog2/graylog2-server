@@ -51,6 +51,13 @@ public class ServerNodeEntity extends AbstractNode<ServerNodeDto> {
         }
     }
 
+    public String getVersion() {
+        if (!fields.containsKey(ServerNodeDto.FIELD_VERSION)) {
+            return null;
+        }
+        return (String) fields.get(ServerNodeDto.FIELD_VERSION);
+    }
+
     @Override
     public ServerNodeDto toDto() {
         return ServerNodeDto.Builder.builder()
@@ -62,6 +69,7 @@ public class ServerNodeEntity extends AbstractNode<ServerNodeDto> {
                 .setLeader(this.isLeader())
                 .setProcessing(this.isProcessing())
                 .setLifecycle(this.getLifecycle())
+                .setVersion(this.getVersion())
                 .build();
     }
 
