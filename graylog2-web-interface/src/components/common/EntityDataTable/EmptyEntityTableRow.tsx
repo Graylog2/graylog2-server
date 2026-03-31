@@ -21,13 +21,13 @@ const Row = styled.tr`
   cursor: default;
 `;
 
-const NoticeCell = styled.td`
+const TD = styled.td`
   min-width: 50px;
   word-break: break-word;
   padding: 4px 5px 2px;
 `;
 
-const NoticeContent = styled.div`
+const Content = styled.div`
   display: flex;
   align-items: flex-start;
 `;
@@ -40,9 +40,9 @@ type Props = {
 
 const EmptyEntityTableRow = ({ visibleCellCount, notice, actionCell = undefined }: Props) => (
   <Row>
-    <NoticeCell colSpan={Math.max(visibleCellCount - (actionCell ? 1 : 0), 1)}>
-      <NoticeContent>{notice}</NoticeContent>
-    </NoticeCell>
+    <TD colSpan={Math.max(visibleCellCount - (actionCell ? 1 : 0), 1)}>
+      <Content>{notice}</Content>
+    </TD>
     {actionCell}
   </Row>
 );
