@@ -76,7 +76,12 @@ public class GrokExtractor extends Extractor {
         final Grok grok = grokPatternRegistry.cachedGrokForPattern(this.pattern, this.namedCapturesOnly);
 
         // the extractor instance is rebuilt every second anyway
-        final Match match = grok.match(value);
+        final Match match;
+        try {
+            match = grok.match(value);
+        } catch (StackOverflowError e) {
+            throw new RuntimeException("Pattern caused a stack overflow during matching. Simplify the pattern to avoid deeply nested or repeated groups.");
+        }
         final Map<String, Object> matches = match.captureFlattened();
         final List<Result> results = new ArrayList<>(matches.size());
 
