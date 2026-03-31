@@ -29,10 +29,12 @@ import Field from 'views/components/Field';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import { TableHeaderCell, TableHead } from 'views/components/datatable';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import BulkSelectCell from 'components/common/message/messagetable/BulkSelectCell';
 
 import FieldSortIcon from './FieldSortIcon';
 import MessageTableEntry from './MessageTableEntry';
 import MessageTableProviders from './MessageTableProviders';
+import BulkSelectHead from './BulkSelectHead';
 
 const Table = styled.table(
   ({ theme }) => css`
@@ -88,13 +90,15 @@ const TableWrapper = styled.div(
 );
 
 type Props = {
-  activeQueryId: string;
   config: MessagesWidgetConfig;
   fields: Immutable.List<FieldTypeMapping>;
   messages: Array<BackendMessage>;
-  onSortChange: (newSortConfig: SortConfig[]) => Promise<void>;
+  onSortChange?: (newSortConfig: SortConfig[]) => Promise<void>;
+  renderRowActions?: (message: Message) => React.ReactNode;
   scrollContainerRef: React.MutableRefObject<HTMLDivElement>;
   setLoadingState: (loading: boolean) => void;
+  displayBulkSelectCol?: boolean;
+  isEntitySelectable?: (entity: BackendMessage) => boolean;
 };
 
 const _fieldTypeFor = (fieldName: string, fields: Immutable.List<FieldTypeMapping>) =>
@@ -130,12 +134,14 @@ const _toggleMessageDetail = (
 
 const MessageTable = ({
   fields,
-  activeQueryId,
   messages,
   config,
-  onSortChange,
+  onSortChange = undefined,
+  renderRowActions = undefined,
   setLoadingState,
   scrollContainerRef,
+  displayBulkSelectCol = false,
+  isEntitySelectable = () => false,
 }: Props) => {
   const { stopAutoRefresh } = useAutoRefresh();
   const [expandedMessages, setExpandedMessages] = useState(Immutable.Set<string>());
@@ -156,6 +162,11 @@ const MessageTable = ({
         <Table className="table table-condensed">
           <TableHead>
             <tr>
+              {displayBulkSelectCol && (
+                <BulkSelectCell>
+                  <BulkSelectHead />
+                </BulkSelectCell>
+              )}
               {selectedFields
                 .toSeq()
                 .map((selectedFieldName) => {
@@ -164,7 +175,7 @@ const MessageTable = ({
 
                   return (
                     <TableHeaderCell key={selectedFieldName} $isNumeric={type.isNumeric()}>
-                      <Field type={type} name={selectedFieldName} queryId={activeQueryId}>
+                      <Field type={type} name={selectedFieldName}>
                         {selectedFieldName}
                       </Field>
                       {interactive && !isCompound && (
@@ -179,6 +190,7 @@ const MessageTable = ({
                   );
                 })
                 .toArray()}
+              {renderRowActions && <TableHeaderCell />}
             </tr>
           </TableHead>
           {formattedMessages.map((message) => {
@@ -192,9 +204,12 @@ const MessageTable = ({
                 config={config}
                 showMessageRow={config?.showMessageRow}
                 selectedFields={selectedFields}
+                rowActions={renderRowActions?.(message)}
                 expanded={expandedMessages.contains(messageKey)}
                 toggleDetail={toggleDetail}
                 expandAllRenderAsync={false}
+                displayBulkSelectCol={displayBulkSelectCol}
+                isEntitySelectable={isEntitySelectable}
               />
             );
           })}

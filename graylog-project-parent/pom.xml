@@ -394,6 +394,11 @@
                 <artifactId>stateless4j</artifactId>
                 <version>${stateless4j.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.glassfish.grizzly</groupId>
+                <artifactId>grizzly-websockets</artifactId>
+                <version>${grizzly-websockets.version}</version>
+            </dependency>
 
             <!-- Tracing dependencies -->
             <dependency>
@@ -408,6 +413,7 @@
                 <artifactId>opentelemetry-instrumentation-annotations</artifactId>
                 <version>${opentelemetry-instrumentation.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>software.amazon.msk</groupId>
                 <artifactId>aws-msk-iam-auth</artifactId>

@@ -42,6 +42,7 @@ import TeamsNotificationSummary from './event-notifications/event-notification-t
 import GreyNoiseAdapterFieldSet from './dataadapters/GreyNoiseAdapterFieldSet';
 import GreyNoiseAdapterSummary from './dataadapters/GreyNoiseAdapterSummary';
 import GreyNoiseAdapterDocumentation from './dataadapters/GreyNoiseAdapterDocumentation';
+import { prepareGreyNoiseConfig } from './dataadapters/prepareGreyNoiseConfig';
 import TeamsNotificationV2Form, {
   defaultConfig as TeamsV2DefaultConfig,
 } from './event-notifications/event-notification-types/TeamsNotificationV2Form';
@@ -106,6 +107,7 @@ const bindings = {
       formComponent: GreyNoiseAdapterFieldSet,
       summaryComponent: GreyNoiseAdapterSummary,
       documentationComponent: GreyNoiseAdapterDocumentation,
+      prepareConfig: prepareGreyNoiseConfig,
     },
   ],
 };

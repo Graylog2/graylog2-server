@@ -37,6 +37,9 @@ import {
 } from 'helpers/mocking/EventAndEventDefinitions_mock';
 import useParams from 'routing/useParams';
 import type { Stream } from 'logic/streams/types';
+import RightSidebarProvider from 'contexts/RightSidebarProvider';
+
+jest.mock('logic/telemetry/useSendTelemetry');
 
 const mockView = createSearch();
 
@@ -72,9 +75,11 @@ jest.mock('views/logic/Widgets', () => ({
 
 describe('EventReplaySearchPage', () => {
   const SimpleReplaySearchPage = () => (
-    <StreamsContext.Provider value={[{ id: 'deadbeef', title: 'Teststream' } as Stream]}>
-      <EventReplaySearchPage />
-    </StreamsContext.Provider>
+    <RightSidebarProvider>
+      <StreamsContext.Provider value={[{ id: 'deadbeef', title: 'Teststream' } as Stream]}>
+        <EventReplaySearchPage />
+      </StreamsContext.Provider>
+    </RightSidebarProvider>
   );
 
   useViewsPlugin();

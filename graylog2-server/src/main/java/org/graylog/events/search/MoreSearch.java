@@ -23,6 +23,7 @@ import org.graylog.plugins.views.search.IndexRangeContainsOneOfStreams;
 import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.NumberRange;
 import org.graylog.plugins.views.search.errors.EmptyParameterError;
 import org.graylog.plugins.views.search.errors.SearchException;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
@@ -33,6 +34,7 @@ import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.rest.resources.entities.Slice;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -193,6 +196,29 @@ public class MoreSearch {
         return queryDecorators.decorate(queryString, ParameterProvider.of(queryParameters));
     }
 
+
+    public List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timeRange, Set<String> eventStreams,
+                                       String filterString, Set<String> forbiddenSourceStreams,
+                                       String slicingColumn, Map<String, Object> meta, int maxBuckets) {
+        final Set<String> affectedIndices = getAffectedIndices(eventStreams, timeRange);
+        if (affectedIndices == null || affectedIndices.isEmpty()) {
+            return List.of();
+        }
+        // TODO: add extra filters if necessary
+        return moreSearchAdapter.aggregateSlicesForColumn(queryString, timeRange, affectedIndices, eventStreams,
+                filterString, forbiddenSourceStreams, Map.of(), slicingColumn, meta, maxBuckets);
+    }
+
+    public List<Slice> aggregateSlicesForRangeQuery(String queryString, TimeRange timeRange, Set<String> eventStreams,
+                                                  String filterString, Set<String> forbiddenSourceStreams,
+                                                  String slicingColumn, Map<String, Object> meta, List<NumberRange> ranges) {
+        final Set<String> affectedIndices = getAffectedIndices(eventStreams, timeRange);
+        if (affectedIndices == null || affectedIndices.isEmpty()) {
+            return List.of();
+        }
+        return moreSearchAdapter.aggregateSlicesForRangeQuery(queryString, timeRange, affectedIndices, eventStreams,
+                filterString, forbiddenSourceStreams, Map.of(), slicingColumn, meta, ranges);
+    }
 
     /**
      * Helper to perform basic Lucene escaping of query string values

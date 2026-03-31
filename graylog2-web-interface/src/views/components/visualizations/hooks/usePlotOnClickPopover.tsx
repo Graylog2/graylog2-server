@@ -63,15 +63,12 @@ const listSubplotOrder = (gd: HTMLElement): string[] => {
 
 const createBarElementGetter = (gd: PlotlyHTMLElement & { _fullData: Array<any> }) => {
   const fullData = gd._fullData;
-  const curveNumberGroupedBySubPlot = fullData.reduce(
-    (acc, { xaxis, yaxis }, curveNumber) => {
-      const subplot = `${xaxis ?? 'x'}${yaxis ?? 'y'}`;
-      (acc[subplot] ||= []).push(curveNumber);
+  const curveNumberGroupedBySubPlot: Record<string, number[]> = {};
 
-      return acc;
-    },
-    {} as Record<string, number[]>,
-  );
+  fullData.forEach(({ xaxis, yaxis }, curveNumber) => {
+    const subplot = `${xaxis ?? 'x'}${yaxis ?? 'y'}`;
+    (curveNumberGroupedBySubPlot[subplot] ||= []).push(curveNumber);
+  });
   const subPlotDOMOrder = listSubplotOrder(gd);
 
   const curveNumberRenderIndexArray = subPlotDOMOrder.flatMap((subPlotId) => curveNumberGroupedBySubPlot[subPlotId]);

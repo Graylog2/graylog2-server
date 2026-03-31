@@ -23,6 +23,8 @@ import { createHandlerFor } from './ActionHandler';
 import type { ActionComponentProps, ActionComponents, ActionDefinition } from './ActionHandler';
 
 describe('ActionHandler', () => {
+  const executeThunkAction = jest.fn(() => Promise.resolve(undefined));
+
   it('returns the handler for a function-based definition', () => {
     const actionDefinition: ActionDefinition = {
       type: 'dummy-action',
@@ -31,7 +33,7 @@ describe('ActionHandler', () => {
       resetFocus: false,
     };
 
-    const result = createHandlerFor(jest.fn(), actionDefinition, jest.fn());
+    const result = createHandlerFor(executeThunkAction, actionDefinition, jest.fn());
 
     expect(result).toEqual(actionDefinition.handler);
   });
@@ -39,45 +41,73 @@ describe('ActionHandler', () => {
   it('generates a handler from a component-based definition', () => {
     const setState = jest.fn();
     const setActionComponents = jest.fn((fn) => setState(fn({})));
-    const actionDefinition: ActionDefinition<{}> = {
+    const actionDefinition: ActionDefinition = {
       type: 'dummy-action',
       title: 'A Dummy Action',
       component: () => <div>Hello world!</div>,
       resetFocus: false,
     };
-    const handler = createHandlerFor(jest.fn(), actionDefinition, setActionComponents);
+    const handler = createHandlerFor(executeThunkAction, actionDefinition, setActionComponents);
 
     expect(handler).toBeDefined();
 
-    return handler({ queryId: 'foo', field: 'bar', value: 42, type: FieldType.Unknown, contexts: {} }).then(
-      async () => {
-        expect(setActionComponents).toHaveBeenCalled();
-        expect(setState).toHaveBeenCalled();
+    return handler({ field: 'bar', value: 42, type: FieldType.Unknown, contexts: {} }).then(async () => {
+      expect(setActionComponents).toHaveBeenCalled();
+      expect(setState).toHaveBeenCalled();
 
-        const state = setState.mock.calls[0][0];
+      const state = setState.mock.calls[0][0];
 
-        expect(Object.entries(state)).toHaveLength(1);
+      expect(Object.entries(state)).toHaveLength(1);
 
-        const Component = state[Object.keys(state)[0]];
-        render(Component);
+      const Component = state[Object.keys(state)[0]];
+      render(Component);
 
-        await screen.findByText(/hello world/i);
-      },
+      await screen.findByText(/hello world/i);
+    });
+  });
+
+  it('generates a handler from a thunk-based definition', async () => {
+    const thunk = jest.fn(() => () => Promise.resolve('done'));
+    const actionDefinition: ActionDefinition = {
+      type: 'dummy-action',
+      title: 'A Dummy Action',
+      thunk,
+      resetFocus: false,
+    };
+    const localExecuteThunkAction = jest.fn(() => Promise.resolve('done'));
+    const handler = createHandlerFor(localExecuteThunkAction, actionDefinition, jest.fn());
+    const args = { field: 'bar', value: 42, type: FieldType.Unknown, contexts: {} };
+
+    await handler(args);
+
+    expect(localExecuteThunkAction).toHaveBeenCalledWith(thunk, args);
+  });
+
+  it('throws for thunk-based definitions when no executeThunkAction is provided', () => {
+    const actionDefinition: ActionDefinition = {
+      type: 'dummy-action',
+      title: 'A Dummy Action',
+      thunk: jest.fn(() => () => Promise.resolve('done')),
+      resetFocus: false,
+    };
+
+    expect(() => createHandlerFor(undefined, actionDefinition, jest.fn())).toThrow(
+      "Invalid binding for action: A Dummy Action - thunk actions require 'executeThunkAction'.",
     );
   });
 
   it('supplied onClose removes component from state', () => {
     const setState = jest.fn();
     const setActionComponents = jest.fn((fn) => setState(fn({})));
-    const actionDefinition: ActionDefinition<{}> = {
+    const actionDefinition: ActionDefinition = {
       type: 'dummy-action',
       title: 'A Dummy Action',
       component: () => <div>Hello world!</div>,
       resetFocus: false,
     };
-    const handler = createHandlerFor(jest.fn(), actionDefinition, setActionComponents);
+    const handler = createHandlerFor(executeThunkAction, actionDefinition, setActionComponents);
 
-    return handler({ queryId: 'foo', field: 'bar', value: 42, type: FieldType.Unknown, contexts: {} }).then(() => {
+    return handler({ field: 'bar', value: 42, type: FieldType.Unknown, contexts: {} }).then(() => {
       const state: ActionComponents = setState.mock.calls[0][0];
       const component: { props: ActionComponentProps } = Object.values(state)[0];
       const { onClose } = component.props;
