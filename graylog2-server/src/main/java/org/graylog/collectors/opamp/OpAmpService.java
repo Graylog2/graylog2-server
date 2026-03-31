@@ -580,6 +580,7 @@ public class OpAmpService {
         final CollectorsConfig collectorsConfig = configSupplier.get();
         final var httpEndpoint = collectorsConfig.http();
 
+        // We use the long-lived CA cert so intermediate cert rotation is not an issue for Collector mTLS connections.
         final var caCert = collectorCaService.getCaCert().certificate();
         final var tlsSettings = TLSConfigurationSettings.withCACert(clusterIdService.getString(), caCert);
 
