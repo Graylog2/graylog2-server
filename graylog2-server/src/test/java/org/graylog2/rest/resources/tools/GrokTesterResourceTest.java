@@ -102,9 +102,6 @@ public class GrokTesterResourceTest {
         assertThat(response.errorMessage()).isNullOrEmpty();
     }
 
-    // See: https://github.com/Graylog2/graylog-plugin-enterprise/issues/13717
-    // A repeated group like (.|\r|\n)* causes deep recursion in Java's regex engine on long
-    // input, resulting in a StackOverflowError. Verify it is caught and returned as an error.
     @Test
     public void testGrokWithNestedQuantifierReturnsErrorInsteadOfCrashing() {
         final String longInput = "a]".repeat(5000);
@@ -113,8 +110,6 @@ public class GrokTesterResourceTest {
         assertThat(response.errorMessage()).contains("stack overflow");
     }
 
-    // See: https://github.com/Graylog2/graylog-plugin-enterprise/issues/13717
-    // A character class like [\s\S]* matches the same characters but without deep recursion.
     @Test
     public void testGrokWithCharacterClassDoesNotOverflow() {
         final String longInput = "a]".repeat(5000);
