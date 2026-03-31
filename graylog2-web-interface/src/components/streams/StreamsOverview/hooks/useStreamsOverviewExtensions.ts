@@ -16,14 +16,14 @@
  */
 import { useMemo } from 'react';
 
+import usePluginEntities from 'hooks/usePluginEntities';
 import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
 import type { Stream } from 'stores/streams/StreamsStore';
 import type { Attribute } from 'stores/PaginationTypes';
 import type { ColumnRenderersByAttribute, ExpandedSectionRenderer } from 'components/common/EntityDataTable/types';
 
-import usePluggableStreamsOverviewTableElements from './usePluggableStreamsOverviewTableElements';
-
 const entityName = 'stream';
+const streamOverviewTableElementsExport = 'components.streams.overview.tableElements';
 
 const useStreamsOverviewExtensions = (): {
   columnRenderers: ColumnRenderersByAttribute<Stream>;
@@ -38,32 +38,29 @@ const useStreamsOverviewExtensions = (): {
     pluggableAttributes,
     pluggableExpandedSections,
   } = usePluggableEntityTableElements<Stream>(null, entityName);
-  const {
-    pluggableColumnRenderers: streamOverviewColumnRenderers,
-    pluggableAttributes: streamOverviewAttributes,
-  } = usePluggableStreamsOverviewTableElements();
+  const pluginTableElements = usePluginEntities(streamOverviewTableElementsExport);
 
   return useMemo(
     () => ({
       // Stream overview extensions are stream-specific and should be applied
       // before generic entity table extensions so generic plugins can still override them.
       columnRenderers: {
-        ...streamOverviewColumnRenderers,
+        ...pluginTableElements.reduce((acc, curr) => ({ ...acc, ...curr.columnRenderers }), {}),
         ...pluggableColumnRenderers,
       },
       attributes: {
         attributeNames: [
-          ...(streamOverviewAttributes.attributeNames || []),
-          ...(pluggableAttributes.attributeNames || []),
+          ...pluginTableElements.map(({ attributeName }) => attributeName),
+          ...pluggableAttributes.attributeNames,
         ],
         attributes: [
-          ...(streamOverviewAttributes.attributes || []),
-          ...(pluggableAttributes.attributes || []),
+          ...pluginTableElements.flatMap(({ attributes }) => attributes),
+          ...pluggableAttributes.attributes,
         ],
       },
       expandedSections: pluggableExpandedSections,
     }),
-    [pluggableAttributes, pluggableColumnRenderers, pluggableExpandedSections, streamOverviewAttributes, streamOverviewColumnRenderers],
+    [pluginTableElements, pluggableAttributes, pluggableColumnRenderers, pluggableExpandedSections],
   );
 };
 
