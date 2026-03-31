@@ -77,7 +77,7 @@ describe('CollectorsSettings', () => {
       data: {},
       refetch: jest.fn(),
       isLoading: false,
-    } as unknown as ReturnType<typeof useInputsStates>);
+    });
     updateConfig.mockResolvedValue(undefined);
   });
 
