@@ -27,6 +27,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 
 import jakarta.inject.Inject;
 
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -63,6 +64,10 @@ public class EntitySuggestionResource extends RestResource {
                                             @ApiParam(name = "query")
                                             @QueryParam("query") @DefaultValue("") String query) {
 
-        return entitySuggestionService.suggest(collection, column, query, page, perPage, getSubject());
+        try {
+            return entitySuggestionService.suggest(collection, column, query, page, perPage, getSubject());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e);
+        }
     }
 }

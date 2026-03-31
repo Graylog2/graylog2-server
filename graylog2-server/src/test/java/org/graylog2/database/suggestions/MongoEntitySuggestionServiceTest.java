@@ -30,10 +30,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -48,6 +53,7 @@ class MongoEntitySuggestionServiceTest {
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb) {
+        lenient().doReturn(true).when(entityPermissionsUtils).areAllFieldsReadable(anyString(), any());
         this.toTest = new MongoEntitySuggestionService(mongodb.mongoConnection(), entityPermissionsUtils);
     }
 
@@ -71,5 +77,22 @@ class MongoEntitySuggestionServiceTest {
                 .containsExactlyInAnyOrder("5a82f5974b900a7a97caa1e5", "5a82f5974b900a7a97caa1e7");
         assertThat(suggestions.stream().map(EntitySuggestion::value).toList())
                 .containsExactlyInAnyOrder("Test", "Test 3");
+    }
+
+    @Test
+    void throwsExceptionWhenValueColumnIsNotReadable() {
+        doReturn(false).when(entityPermissionsUtils).areAllFieldsReadable("dashboards", Set.of("secret_field"));
+
+        assertThatThrownBy(() -> toTest.suggest("dashboards", "secret_field", "", 1, 10, subject))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void returnsResultsWhenAllFieldsAreReadable() {
+        doReturn(true).when(entityPermissionsUtils).hasAllPermission(subject);
+
+        final var result = toTest.suggest("dashboards", "title", "", 1, 10, subject);
+
+        assertThat(result.suggestions()).isNotEmpty();
     }
 }
