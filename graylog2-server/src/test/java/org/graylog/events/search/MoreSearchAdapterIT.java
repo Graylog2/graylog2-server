@@ -377,6 +377,42 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
     }
 
     @Test
+    public void eventSearchWithExtraFiltersSingleTermValue() {
+        // Baseline: a single term value filters to the matching subset
+        final Map<String, Set<String>> extraFilters = Map.of("message", Set.of("Hi"));
+        final MoreSearch.Result result = toTest.eventSearch("*",
+                RelativeRange.allTime(),
+                Set.of(INDEX_NAME),
+                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", Set.of(), extraFilters);
+
+        assertThat(result.results()).hasSize(4); // messages 1-4 have "Hi"
+    }
+
+    @Test
+    public void eventSearchWithMultipleTermExtraFiltersOrsValuesForSameField() {
+        final Map<String, Set<String>> extraFilters = Map.of("message", Set.of("Hi", "Ahoj"));
+        final MoreSearch.Result result = toTest.eventSearch("*",
+                RelativeRange.allTime(),
+                Set.of(INDEX_NAME),
+                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", Set.of(), extraFilters);
+
+        assertThat(result.results()).hasSize(7);
+    }
+
+    @Test
+    public void eventHistogramWithMultipleTermExtraFiltersOrsValuesForSameField() {
+        final Map<String, Set<String>> extraFilters = Map.of("message", Set.of("Hi", "Ahoj"));
+        final MoreSearch.Histogram result = toTest.eventHistogram("*",
+                AbsoluteRange.create("2015-01-01 01:00:00.000", "2022-01-01 01:00:00.000"),
+                Set.of(INDEX_NAME),
+                ALL_STREAMS, "", Set.of(), ZoneId.of("Europe/Vienna"), extraFilters);
+
+        final long totalCount = result.buckets().alerts().stream().mapToLong(MoreSearch.Histogram.Bucket::count).sum()
+                + result.buckets().events().stream().mapToLong(MoreSearch.Histogram.Bucket::count).sum();
+        assertThat(totalCount).isEqualTo(7);
+    }
+
+    @Test
     public void eventSearchReturnsEmptyForPageBeyondResults() {
         final MoreSearch.Result result = toTest.eventSearch("*",
                 RelativeRange.allTime(),
