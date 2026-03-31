@@ -106,6 +106,10 @@ public class CollectorsConfigResource extends RestResource {
         });
     }
 
+    // Separate endpoint so the UI can check input existence without needing read permission on each input.
+    // Currently, all users with Reader role have wildcard inputs:read, so per-input filtering is not needed in
+    // practice. If more fine-grained read permissions become common, the UI can use these IDs to determine the
+    // presence of collector inputs, regardless of the user's read permissions.
     @GET
     @Path("/inputs")
     @Operation(summary = "Get collector ingest input IDs")

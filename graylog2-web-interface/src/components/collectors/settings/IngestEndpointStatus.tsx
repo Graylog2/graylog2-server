@@ -56,6 +56,9 @@ const IngestEndpointStatus = ({ defaultPort, isInitialSetup }: Props) => {
     'input_types:create:org.graylog.collectors.input.CollectorIngestHttpInput',
   ]);
 
+  // Per-input read permission filtering. Currently, all users with Reader role have wildcard
+  // inputs:read, so this filter is a no-op in practice. Kept for correctness if more
+  // fine-grained read permissions are introduced.
   const readableInputIds = useMemo(
     () => collectorInputIds.filter((id) => isPermitted(currentUser?.permissions, `inputs:read:${id}`)),
     [collectorInputIds, currentUser?.permissions],
