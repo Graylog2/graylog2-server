@@ -131,6 +131,10 @@ public class CIDRPatriciaTrie {
         final boolean lookupIsIPv6 = ip.contains(":");
 
         final int shortestPrefixForType = lookupIsIPv6 ? shortestV6Prefix : shortestV4Prefix;
+        if (shortestPrefixForType == -1) {
+            // No entry exists matching this IP type
+            return null;
+        }
         for (int i = binaryIP.length(); i >= shortestPrefixForType; i--) {
             final String lookupPrefix = binaryIP.substring(0, i);
             final Map<String, Node> prefixTrie = trie.prefixMap(lookupPrefix);
