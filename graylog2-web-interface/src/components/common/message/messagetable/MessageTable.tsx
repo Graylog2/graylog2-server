@@ -99,6 +99,7 @@ type Props = {
   setLoadingState: (loading: boolean) => void;
   displayBulkSelectCol?: boolean;
   isEntitySelectable?: (entity: BackendMessage) => boolean;
+  isEmptyMessage?: (message: Message) => boolean;
 };
 
 const _fieldTypeFor = (fieldName: string, fields: Immutable.List<FieldTypeMapping>) =>
@@ -142,6 +143,7 @@ const MessageTable = ({
   scrollContainerRef,
   displayBulkSelectCol = false,
   isEntitySelectable = () => false,
+  isEmptyMessage = () => false,
 }: Props) => {
   const { stopAutoRefresh } = useAutoRefresh();
   const [expandedMessages, setExpandedMessages] = useState(Immutable.Set<string>());
@@ -210,6 +212,7 @@ const MessageTable = ({
                 expandAllRenderAsync={false}
                 displayBulkSelectCol={displayBulkSelectCol}
                 isEntitySelectable={isEntitySelectable}
+                isEmptyMessage={isEmptyMessage(message)}
               />
             );
           })}

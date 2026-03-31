@@ -43,6 +43,7 @@ import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
 import BulkSelectCell from 'components/common/message/messagetable/BulkSelectCell';
 import useSelectedMessageEntities from 'views/hooks/useSelectedMessageEntities';
 
+import EmptyMessageTableRow from './EmptyMessageTableRow';
 import MessagePreview from './MessagePreview';
 
 export const TableBody = styled.tbody<{ $expanded?: boolean; $highlighted?: boolean }>(
@@ -69,8 +70,8 @@ export const TableBody = styled.tbody<{ $expanded?: boolean; $highlighted?: bool
 `,
 );
 
-const FieldsRow = styled.tr`
-  cursor: pointer;
+const FieldsRow = styled.tr<{ $clickable: boolean }>`
+  cursor: ${({ $clickable }) => ($clickable ? 'pointer' : 'default')};
 
   && td {
     min-width: 50px;
@@ -117,6 +118,7 @@ type Props = {
   toggleDetail: (messageId: string) => void;
   displayBulkSelectCol?: boolean;
   isEntitySelectable?: (entity: BackendMessage) => boolean;
+  isEmptyMessage?: boolean;
 };
 
 const isDecoratedField = (field: string | number, decorationStats: Message['decoration_stats']) =>
@@ -169,6 +171,7 @@ const MessageTableEntry = ({
   toggleDetail,
   displayBulkSelectCol = false,
   isEntitySelectable = () => false,
+  isEmptyMessage = false,
 }: Props) => {
   const { inputs: inputsList = [] } = useStore(InputsStore);
   const { streams: streamsList = [] } = useStore(StreamsStore);
@@ -187,6 +190,10 @@ const MessageTableEntry = ({
   );
 
   const _toggleDetail = useCallback(() => {
+    if (isEmptyMessage) {
+      return;
+    }
+
     const isSelectingText = !!window.getSelection()?.toString();
 
     if (!isSelectingText) {
@@ -197,7 +204,7 @@ const MessageTableEntry = ({
 
       toggleDetail(`${message.index}-${message.id}`);
     }
-  }, [message.id, message.index, sendTelemetry, toggleDetail]);
+  }, [isEmptyMessage, message.id, message.index, sendTelemetry, toggleDetail]);
 
   const colSpanFixup = selectedFields.size + 1 + (rowActions ? 1 : 0) + (displayBulkSelectCol ? 1 : 0);
 
@@ -233,23 +240,29 @@ const MessageTableEntry = ({
   return (
     <AdditionalContext.Provider value={additionalContextValue}>
       <TableBody $expanded={expanded} $highlighted={message.id === highlightMessageId}>
-        <FieldsRow onClick={_toggleDetail} className="table-data-row">
-          {displayBulkSelectCol && <RowBulkCheckbox message={message} isEntitySelectable={isEntitySelectable} />}
-          {selectedFieldsList}
-          {rowActions && <ActionsCell $isNumeric={false}>{rowActions}</ActionsCell>}
-        </FieldsRow>
+        {isEmptyMessage ? (
+          <EmptyMessageTableRow colSpan={colSpanFixup} messageId={message.id} rowActions={rowActions} />
+        ) : (
+          <FieldsRow onClick={_toggleDetail} className="table-data-row" $clickable>
+            {displayBulkSelectCol && <RowBulkCheckbox message={message} isEntitySelectable={isEntitySelectable} />}
+            {selectedFieldsList}
+            {rowActions && <ActionsCell $isNumeric={false}>{rowActions}</ActionsCell>}
+          </FieldsRow>
+        )}
 
-        <MessagePreview
-          showMessageRow={showMessageRow}
-          config={config}
-          colSpanFixup={colSpanFixup}
-          messageFieldType={messageFieldType}
-          onRowClick={_toggleDetail}
-          message={message}
-          displayBulkSelectCol={displayBulkSelectCol}
-        />
+        {!isEmptyMessage && (
+          <MessagePreview
+            showMessageRow={showMessageRow}
+            config={config}
+            colSpanFixup={colSpanFixup}
+            messageFieldType={messageFieldType}
+            onRowClick={_toggleDetail}
+            message={message}
+            displayBulkSelectCol={displayBulkSelectCol}
+          />
+        )}
 
-        {expanded && (
+        {expanded && !isEmptyMessage && (
           <MessageDetailRow>
             <td colSpan={colSpanFixup}>
               <MessageDetail
