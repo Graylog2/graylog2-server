@@ -62,9 +62,15 @@ type Props = {
   traffic: Traffic;
   trafficLimit?: number;
   title?: string;
+  trafficType?: 'input-indexed' | 'output';
 };
 
-const TrafficGraphWithDaySelect = ({ traffic, trafficLimit = undefined, title = undefined }: Props) => {
+const TrafficGraphWithDaySelect = ({
+  traffic,
+  trafficLimit = undefined,
+  title = undefined,
+  trafficType = 'output',
+}: Props) => {
   const { graphDays, setGraphDays } = useGraphDays();
   const { graphWidth, graphContainerRef } = useGraphWidth();
   const { pathname } = useLocation();
@@ -77,9 +83,11 @@ const TrafficGraphWithDaySelect = ({ traffic, trafficLimit = undefined, title = 
 
     setGraphDays(newDays);
 
+    const appSection = trafficType === 'input-indexed' ? 'incoming-traffic' : 'outgoing-traffic';
+
     sendTelemetry(TELEMETRY_EVENT_TYPE.TRAFFIC_GRAPH_DAYS_CHANGED, {
       app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'outgoing-traffic',
+      app_section: appSection,
       app_action_value: 'trafficgraph-days-button',
       event_details: { value: newDays },
     });
@@ -114,7 +122,7 @@ const TrafficGraphWithDaySelect = ({ traffic, trafficLimit = undefined, title = 
       </Wrapper>
 
       <StyledH3 ref={graphContainerRef}>
-        {title ?? 'Outgoing traffic'}{' '}
+        {title ?? (trafficType === 'input-indexed' ? 'Incoming traffic' : 'Outgoing traffic')}{' '}
         {bytesOut && (
           <small>
             Last {graphDays} days: {formattedTotalTraffic}
