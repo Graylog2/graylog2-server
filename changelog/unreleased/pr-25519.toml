@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixed error on CIDR lookups in a data adapter with only one type of address."
+
+issues = ["Graylog2/graylog-plugin-enterprise#13729"]
+pulls = ["25519"]
