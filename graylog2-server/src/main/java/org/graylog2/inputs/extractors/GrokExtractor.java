@@ -80,7 +80,7 @@ public class GrokExtractor extends Extractor {
         try {
             match = grok.match(value);
         } catch (StackOverflowError e) {
-            throw new RuntimeException("Pattern caused a stack overflow during matching. Simplify the pattern to avoid deeply nested or repeated groups.");
+            throw new ExtractorException("Pattern caused a stack overflow during matching. Simplify the pattern to avoid deeply nested or repeated groups.");
         }
         final Map<String, Object> matches = match.captureFlattened();
         final List<Result> results = new ArrayList<>(matches.size());
