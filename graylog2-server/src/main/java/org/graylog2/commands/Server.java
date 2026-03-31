@@ -106,6 +106,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.quickjump.QuickJumpModule;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.resources.system.ClusterConfigValidatorModule;
+import org.graylog2.shared.ServerVersion;
 import org.graylog2.shared.UI;
 import org.graylog2.shared.bindings.MessageInputBindings;
 import org.graylog2.shared.bindings.RestApiBindings;
@@ -276,6 +277,7 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
                         .setHostname(Tools.getLocalCanonicalHostname())
                         .setProcessing(serverStatus.isProcessing())
                         .setLifecycle(serverStatus.getLifecycle())
+                        .setVersion(ServerVersion.VERSION.toString())
                         .build());
         serverStatus.setLocalMode(isLocal());
         if (leaderElectionService.isLeader() && !nodeService.isOnlyLeader(serverStatus.getNodeId())) {
