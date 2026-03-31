@@ -17,7 +17,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
-import useCurrentUser from 'hooks/useCurrentUser';
 import QueryHelper from 'components/common/QueryHelper';
 import type { Stream } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
@@ -27,13 +26,13 @@ import getStreamTableElements from 'components/streams/StreamsOverview/Constants
 import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
 import useTableElements from 'components/streams/StreamsOverview/hooks/useTableComponents';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
-import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
 
 import CustomColumnRenderers from './ColumnRenderers';
 import usePipelineColumn from './hooks/usePipelineColumn';
+import useStreamsOverviewExtensions from './hooks/useStreamsOverviewExtensions';
 
 const useRefetchStreamsOnStoreChange = (refetchStreams: () => void) => {
   useEffect(() => {
@@ -48,26 +47,23 @@ const useRefetchStreamsOnStoreChange = (refetchStreams: () => void) => {
 type Props = {
   indexSets: Array<IndexSet>;
 };
-const entityName = 'stream';
 
 const StreamsOverview = ({ indexSets }: Props) => {
   const queryClient = useQueryClient();
   const { isPipelineColumnPermitted } = usePipelineColumn();
-  const currentUser = useCurrentUser();
-  const { pluggableColumnRenderers, pluggableAttributes, pluggableExpandedSections } =
-    usePluggableEntityTableElements<Stream>(null, entityName);
+  const { columnRenderers: extensionColumnRenderers, attributes: extensionAttributes, expandedSections: pluggableExpandedSections } =
+    useStreamsOverviewExtensions();
 
   const { entityActions, expandedSections, bulkActions } = useTableElements({ indexSets, pluggableExpandedSections });
   useRefetchStreamsOnStoreChange(() => queryClient.invalidateQueries({ queryKey: KEY_PREFIX }));
 
   const columnRenderers = useMemo(
-    () =>
-      CustomColumnRenderers(indexSets, isPipelineColumnPermitted, currentUser.permissions, pluggableColumnRenderers),
-    [indexSets, isPipelineColumnPermitted, currentUser.permissions, pluggableColumnRenderers],
+    () => CustomColumnRenderers(indexSets, isPipelineColumnPermitted, extensionColumnRenderers),
+    [extensionColumnRenderers, indexSets, isPipelineColumnPermitted],
   );
   const { additionalAttributes, defaultLayout } = useMemo(
-    () => getStreamTableElements(currentUser.permissions, isPipelineColumnPermitted, pluggableAttributes),
-    [currentUser.permissions, isPipelineColumnPermitted, pluggableAttributes],
+    () => getStreamTableElements(isPipelineColumnPermitted, extensionAttributes),
+    [extensionAttributes, isPipelineColumnPermitted],
   );
 
   const fetchEntities = (options: SearchParams): Promise<PaginatedResponse<Stream>> => {

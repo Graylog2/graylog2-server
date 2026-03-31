@@ -14,25 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
-import { PluginStore } from 'graylog-web-plugin/plugin';
-import type Immutable from 'immutable';
-import type { Permission } from 'graylog-web-plugin/plugin';
-
 import type { Attribute, Sort } from 'stores/PaginationTypes';
 
-const getStreamDataLakeTableElements = PluginStore.exports('dataLake')?.[0]?.getStreamDataLakeTableElements;
-
 const getStreamTableElements = (
-  permissions: Immutable.List<Permission>,
   isPipelineColumnPermitted: boolean,
-  pluggableAttributes?: {
+  extensionAttributes?: {
     attributeNames?: Array<string>;
     attributes?: Array<Attribute>;
   },
 ) => {
-  const streamDataLakeTableElements = getStreamDataLakeTableElements?.(permissions);
-
   const defaultLayout = {
     entityTableId: 'streams',
     defaultPageSize: 20,
@@ -44,9 +34,8 @@ const getStreamTableElements = (
       ...(isPipelineColumnPermitted ? ['pipelines'] : []),
       'outputs',
       'archiving',
-      ...(streamDataLakeTableElements?.attributeName ? [streamDataLakeTableElements.attributeName] : []),
+      ...(extensionAttributes?.attributeNames || []),
       'destination_filters',
-      ...(pluggableAttributes?.attributeNames || []),
       'disabled',
       'throughput',
     ],
@@ -57,9 +46,8 @@ const getStreamTableElements = (
       ...(isPipelineColumnPermitted ? ['pipelines'] : []),
       'outputs',
       'archiving',
-      ...(streamDataLakeTableElements?.attributeName ? [streamDataLakeTableElements.attributeName] : []),
+      ...(extensionAttributes?.attributeNames || []),
       'destination_filters',
-      ...(pluggableAttributes?.attributeNames || []),
       'disabled',
       'throughput',
       'created_at',
@@ -72,10 +60,9 @@ const getStreamTableElements = (
     { id: 'rules', title: 'Stream Rules' },
     ...(isPipelineColumnPermitted ? [{ id: 'pipelines', title: 'Pipelines' }] : []),
     { id: 'outputs', title: 'Outputs' },
-    { id: 'destination_filters', title: 'Filter Rules' },
     { id: 'archiving', title: 'Archiving' },
-    ...(streamDataLakeTableElements?.attributes || []),
-    ...(pluggableAttributes?.attributes || []),
+    ...(extensionAttributes?.attributes || []),
+    { id: 'destination_filters', title: 'Filter Rules' },
   ];
 
   return {
