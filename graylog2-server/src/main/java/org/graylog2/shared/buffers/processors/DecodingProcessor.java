@@ -281,7 +281,10 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
 
         metricRegistry.meter(name(baseMetricName, "processedMessages")).mark();
         decodedTrafficCounter.inc(message.getSize());
-        message.addField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, inputSize);
+        // Preserve the size if it was already set by the forwarder.
+        if (message.getField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE) == null) {
+            message.addField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, inputSize);
+        }
         return message;
     }
 
