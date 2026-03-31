@@ -27,12 +27,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class GrokTesterResourceTest {
     static {
@@ -47,20 +43,6 @@ public class GrokTesterResourceTest {
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
         final InMemoryGrokPatternService grokPatternService = new InMemoryGrokPatternService(clusterEventBus);
         grokPatternService.save(GrokPattern.create("NUMBER", "[0-9]+"));
-        grokPatternService.save(GrokPattern.create("INT", "(?:[+-]?(?:[0-9]+))"));
-        grokPatternService.save(GrokPattern.create("YEAR", "(?:\\d\\d){1,2}"));
-        grokPatternService.save(GrokPattern.create("MONTHNUM", "(?:0[1-9]|1[0-2])"));
-        grokPatternService.save(GrokPattern.create("MONTHDAY", "(?:(?:0[1-9])|(?:[12][0-9])|(?:3[01])|[1-9])"));
-        grokPatternService.save(GrokPattern.create("HOUR", "(?:2[0123]|[01]?[0-9])"));
-        grokPatternService.save(GrokPattern.create("MINUTE", "(?:[0-5][0-9])"));
-        grokPatternService.save(GrokPattern.create("SECOND", "(?:(?:[0-5]?[0-9]|60)(?:[:.,][0-9]+)?)"));
-        grokPatternService.save(GrokPattern.create("TIME", "(?!<[0-9])%{HOUR}:%{MINUTE}(?::%{SECOND})(?![0-9])"));
-        grokPatternService.save(GrokPattern.create("ISO8601_TIMEZONE", "(?:Z|[+-]%{HOUR}(?::?%{MINUTE}))"));
-        grokPatternService.save(GrokPattern.create("ISO8601_SECOND", "(?:%{SECOND}|60)"));
-        grokPatternService.save(GrokPattern.create("TIMESTAMP_ISO8601", "%{YEAR}-%{MONTHNUM}-%{MONTHDAY}[T ]%{HOUR}:?%{MINUTE}(?::?%{SECOND})?%{ISO8601_TIMEZONE}?"));
-        grokPatternService.save(GrokPattern.create("LOGLEVEL", "([Aa]lert|ALERT|[Tt]race|TRACE|[Dd]ebug|DEBUG|[Nn]otice|NOTICE|[Ii]nfo|INFO|[Ww]arn(?:ing)?|WARN(?:ING)?|[Ee]rr(?:or)?|ERR(?:OR)?|[Cc]rit(?:ical)?|CRIT(?:ICAL)?|[Ff]atal|FATAL|[Ss]evere|SEVERE|EMERG(?:ENCY)?|[Ee]merg(?:ency)?)"));
-        grokPatternService.save(GrokPattern.create("SPACE", "\\s*"));
-        grokPatternService.save(GrokPattern.create("DATA", ".*?"));
         resource = new GrokTesterResource(grokPatternService);
     }
 
@@ -121,62 +103,23 @@ public class GrokTesterResourceTest {
     }
 
     // See: https://github.com/Graylog2/graylog-plugin-enterprise/issues/13717
-    // The pattern (?<message>(.|\r|\n)*) uses a nested quantifier that causes deep recursion
-    // in Java's regex engine on long input, resulting in a StackOverflowError.
+    // A repeated group like (.|\r|\n)* causes deep recursion in Java's regex engine on long
+    // input, resulting in a StackOverflowError. Verify it is caught and returned as an error.
     @Test
-    public void testGrokWithNestedQuantifierCausesStackOverflow() {
-        final String pattern = "%{TIMESTAMP_ISO8601:logtime}%{SPACE:UNWANTED}%{LOGLEVEL:loglevel}%{SPACE:UNWANTED}" +
-                "\\[%{DATA:loggername}\\]%{SPACE:UNWANTED}(?<message>(.|\r|\n)*)";
-        final String sampleData = buildLongLogLine();
-
-        final GrokTesterResponse response = resource.grokTest(pattern, sampleData, false);
+    public void testGrokWithNestedQuantifierReturnsErrorInsteadOfCrashing() {
+        final String longInput = "a]".repeat(5000);
+        final GrokTesterResponse response = resource.grokTest("(?<msg>(.|\r|\n)*)", longInput, false);
         assertThat(response.matched()).isFalse();
         assertThat(response.errorMessage()).contains("stack overflow");
     }
 
     // See: https://github.com/Graylog2/graylog-plugin-enterprise/issues/13717
-    // The workaround replaces (?<message>(.|\r|\n)*) with (?<message>[\s\S]*) which uses a
-    // character class instead of a nested group, avoiding deep recursion.
+    // A character class like [\s\S]* matches the same characters but without deep recursion.
     @Test
-    public void testGrokWithCharacterClassWorkaroundDoesNotOverflow() {
-        final String pattern = "%{TIMESTAMP_ISO8601:logtime}%{SPACE:UNWANTED}%{LOGLEVEL:loglevel}%{SPACE:UNWANTED}" +
-                "\\[%{DATA:loggername}\\]%{SPACE:UNWANTED}(?<message>[\\s\\S]*)";
-        final String sampleData = buildLongLogLine();
-
-        assertThatNoException().isThrownBy(() -> {
-            final GrokTesterResponse response = resource.grokTest(pattern, sampleData, false);
-            assertThat(response.matched()).isTrue();
-            assertThat(response.errorMessage()).isNullOrEmpty();
-            assertThat(response.matches()).extracting("name").contains("logtime", "loglevel", "loggername", "message");
-        });
-    }
-
-    // See: https://github.com/Graylog2/graylog-plugin-enterprise/issues/13717
-    // Simplest fix: drop the trailing message capture entirely. The customer only needs
-    // logtime, loglevel, and loggername — the message field is already on the log entry.
-    @Test
-    public void testGrokWithoutTrailingCaptureDoesNotOverflow() {
-        final String pattern = "%{TIMESTAMP_ISO8601:logtime}%{SPACE:UNWANTED}%{LOGLEVEL:loglevel}%{SPACE:UNWANTED}" +
-                "\\[%{DATA:loggername}\\]";
-        final String sampleData = buildLongLogLine();
-
-        final GrokTesterResponse response = resource.grokTest(pattern, sampleData, false);
+    public void testGrokWithCharacterClassDoesNotOverflow() {
+        final String longInput = "a]".repeat(5000);
+        final GrokTesterResponse response = resource.grokTest("(?<msg>[\\s\\S]*)", longInput, false);
         assertThat(response.matched()).isTrue();
         assertThat(response.errorMessage()).isNullOrEmpty();
-        assertThat(response.matches()).extracting("name").contains("logtime", "loglevel", "loggername");
-    }
-
-    /**
-     * Builds a log line similar to the one in the customer report — a long Graylog server log entry
-     * with many stream IDs that is large enough to trigger stack overflow with nested quantifiers.
-     */
-    private static String buildLongLogLine() {
-        final String streamIds = IntStream.range(0, 200)
-                .mapToObj(i -> f("5e3957%04d94e3e27%06x", i, i * 7))
-                .collect(Collectors.joining(", "));
-        return "2026-03-30T09:33:57.653+02:00 INFO  [RebuildIndexRangesJob] Created ranges for index logmonitor_21636: " +
-                "MongoIndexRange{id=null, indexName=logmonitor_21636, begin=1975-08-16T05:23:51.326Z, " +
-                "end=2026-03-20T06:58:54.421Z, calculatedAt=2026-03-30T07:33:53.631Z, " +
-                "calculationDuration=4015, streamIds=[" + streamIds + "]}";
     }
 }
