@@ -79,6 +79,12 @@ public class ClusterEventPeriodical extends Periodical {
                 .collection(COLLECTION_NAME, ClusterEvent.class)
                 .withWriteConcern(WriteConcern.JOURNALED);
 
+        try {
+            collection.dropIndex(Indexes.ascending("timestamp", "producer", "consumers"));
+        } catch (MongoException ignored) {
+            // Old index may not exist
+        }
+
         collection.createIndex(Indexes.ascending(
                 "consumers",
                 "timestamp"));
