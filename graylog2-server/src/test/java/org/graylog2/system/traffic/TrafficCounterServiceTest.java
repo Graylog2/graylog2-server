@@ -78,7 +78,7 @@ class TrafficCounterServiceTest {
             assertThat(trafficHistogramIncludesToday.decoded()).hasSize(31);
             assertThat(trafficHistogramIncludesToday.output()).hasSize(31);
             assertThat(trafficHistogramIncludesToday.inputIndexed()).hasSize(31);
-            verifyDayTrafficVolume(trafficHistogramIncludesToday);
+            verifyDayTrafficVolume(trafficHistogramIncludesToday, true);
 
             // Verify that today is omitted from the histogram.
             final TrafficCounterService.TrafficHistogram trafficHistogramExcludesToday =
@@ -91,13 +91,14 @@ class TrafficCounterServiceTest {
             assertThat(trafficHistogramExcludesToday.decoded()).hasSize(30);
             assertThat(trafficHistogramExcludesToday.output()).hasSize(30);
             assertThat(trafficHistogramExcludesToday.inputIndexed()).hasSize(30);
-            verifyDayTrafficVolume(trafficHistogramIncludesToday);
+            verifyDayTrafficVolume(trafficHistogramExcludesToday, false);
         } finally {
             DateTimeUtils.setCurrentMillisSystem();
         }
     }
 
-    private static void verifyDayTrafficVolume(TrafficCounterService.TrafficHistogram trafficHistogram) {
+    private static void verifyDayTrafficVolume(TrafficCounterService.TrafficHistogram trafficHistogram,
+                                               boolean includesToday) {
         // For each type of traffic, check that we got the correct values
         ImmutableList.of(trafficHistogram.input(), trafficHistogram.decoded(), trafficHistogram.output(), trafficHistogram.inputIndexed()).forEach(histogram -> {
             final ImmutableList<Long> outputValues = ImmutableList.copyOf(histogram.values());
@@ -111,12 +112,14 @@ class TrafficCounterServiceTest {
                         .isEqualTo(24);
             }
 
-            // Check that we got the correct count for the current day. The current day is only in its 9th hour,
-            // so we should only get a value of 9.
-            assertThat(outputValues.get(30))
-                    .withFailMessage("Value <%s> is not the expected value - expected=%s but got=%s",
-                            30, 9, outputValues.get(30))
-                    .isEqualTo(9);
+            if (includesToday) {
+                // Check that we got the correct count for the current day. The current day is only in its 9th hour,
+                // so we should only get a value of 9.
+                assertThat(outputValues.get(30))
+                        .withFailMessage("Value <%s> is not the expected value - expected=%s but got=%s",
+                                30, 9, outputValues.get(30))
+                        .isEqualTo(9);
+            }
         });
     }
 
