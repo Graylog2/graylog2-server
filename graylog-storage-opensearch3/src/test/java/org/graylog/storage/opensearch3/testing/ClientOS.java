@@ -198,19 +198,19 @@ public class ClientOS implements Client {
             opensearchClient.syncWithoutErrorMapping().cluster().health(req -> req.waitForStatus(HealthStatus.Green));
         } catch (IOException e) {
             try {
-                final IndicesResponse catIndices = opensearchClient.syncWithoutErrorMapping().cat().indices();
-                final String table = catIndices.valueBody().stream()
-                        .map(r -> f("%-10s %-10s %-40s %-25s %-5s %-5s",
-                                r.health(), r.status(), r.index(), r.uuid(), r.pri(), r.rep()))
+                final var catShards = opensearchClient.syncWithoutErrorMapping().cat().shards();
+                final String table = catShards.valueBody().stream()
+                        .filter(r -> "UNASSIGNED".equalsIgnoreCase(r.state()))
+                        .map(r -> f("%-40s %-8s %-12s %-12s %-20s %s",
+                                r.index(), r.shard(), r.prirep(), r.state(), r.unassignedReason(), r.unassignedDetails()))
                         .collect(Collectors.joining("\n",
-                                f("%-10s %-10s %-40s %-25s %-5s %-5s\n",
-                                        "health", "status", "index", "uuid", "pri", "rep"),
+                                f("%-40s %-8s %-12s %-12s %-20s %s\n",
+                                        "index", "shard", "prirep", "state", "reason", "details"),
                                 ""));
-                LOG.error("OpenSearch test server clean up failed. Current indices:\n{}", table);
+                fail("Unassigned shards after clean up of OpenSearch:\n" + table);
             } catch (Exception catException) {
-                LOG.error("OpenSearch test server clean up failed and could not retrieve _cat/indices", catException);
+                LOG.error("OpenSearch test server clean up failed and could not retrieve _cat/shards", catException);
             }
-            fail(e.getMessage());
         }
     }
 
