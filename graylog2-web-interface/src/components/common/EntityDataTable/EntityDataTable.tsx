@@ -47,7 +47,14 @@ import useIntersectionObserver from 'hooks/useIntersectionObserver';
 import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
 import ActiveSliceColContext from 'components/common/EntityDataTable/contexts/ActiveSliceColContext';
 
-import type { ColumnRenderers, ColumnSchema, EntityBase, ColumnPreferences, ExpandedSectionRenderers } from './types';
+import type {
+  ColumnRenderers,
+  ColumnSchema,
+  EntityBase,
+  ColumnPreferences,
+  ExpandedSectionRenderers,
+  EmptyRowRenderer,
+} from './types';
 import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
 import BulkActionsRow from './BulkActionsRow';
 
@@ -150,6 +157,8 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   enableSlicing?: boolean;
   /** Allows you to extend a row with additional information * */
   expandedSectionRenderers?: ExpandedSectionRenderers<Entity>;
+  isEmptyRow?: (entity: Entity) => boolean;
+  renderEmptyRow?: EmptyRowRenderer<Entity>;
   /** User layout preferences */
   layoutPreferences: {
     attributes?: ColumnPreferences;
@@ -197,6 +206,8 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   entityAttributesAreCamelCase,
   enableSlicing = false,
   expandedSectionRenderers = undefined,
+  isEmptyRow = () => false,
+  renderEmptyRow = undefined,
   layoutPreferences,
   meta = undefined,
   onChangeSlicing,
@@ -339,6 +350,8 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                       <Table<Entity>
                         expandedSectionRenderers={expandedSectionRenderers}
                         headerGroups={headerGroups}
+                        isEmptyRow={isEmptyRow}
+                        renderEmptyRow={renderEmptyRow}
                         rows={table.getRowModel().rows}
                       />
                       <ScrollRightIndicator ref={scrolledToRightIndicator} />

@@ -20,9 +20,15 @@ import { flexRender } from '@tanstack/react-table';
 import styled, { css } from 'styled-components';
 
 import { Table as BaseTable } from 'components/bootstrap';
+import EmptyEntityTableRow from 'components/common/EntityDataTable/EmptyEntityTableRow';
 import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
-import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
-import type { EntityBase, ExpandedSectionRenderers, ColumnMetaContext } from 'components/common/EntityDataTable/types';
+import { ACTIONS_COL_ID, CELL_PADDING } from 'components/common/EntityDataTable/Constants';
+import type {
+  EntityBase,
+  ExpandedSectionRenderers,
+  ColumnMetaContext,
+  EmptyRowRenderer,
+} from 'components/common/EntityDataTable/types';
 import {
   columnOpacityVar,
   columnTransformVar,
@@ -89,37 +95,61 @@ const Td = styled.td<{
 
 type Props<Entity extends EntityBase> = {
   expandedSectionRenderers: ExpandedSectionRenderers<Entity> | undefined;
+  isEmptyRow?: (entity: Entity) => boolean;
+  renderEmptyRow?: EmptyRowRenderer<Entity>;
   headerGroups: Array<HeaderGroup<Entity>>;
   rows: Array<Row<Entity>>;
 };
 
-const Table = <Entity extends EntityBase>({ expandedSectionRenderers, headerGroups, rows }: Props<Entity>) => (
+const Table = <Entity extends EntityBase>({
+  expandedSectionRenderers,
+  isEmptyRow = () => false,
+  renderEmptyRow = undefined,
+  headerGroups,
+  rows,
+}: Props<Entity>) => (
   <StyledTable striped condensed hover>
     <TableHead headerGroups={headerGroups} />
-    {rows.map((row) => (
-      <tbody key={`table-row-${row.id}`} data-testid={`table-row-${row.id}`}>
-        <tr>
-          {row.getVisibleCells().map((cell) => {
-            const columnMeta = cell.column.columnDef.meta as ColumnMetaContext<Entity>;
+    {rows.map((row) => {
+      const visibleCells = row.getVisibleCells();
+      const visibleCellCount = visibleCells.length;
+      const renderCell = (cell) => {
+        const columnMeta = cell.column.columnDef.meta as ColumnMetaContext<Entity>;
 
-            return (
-              <Td
-                key={cell.id}
-                $colId={cell.column.id}
-                $pinningPosition={cell.column.getIsPinned()}
-                $hidePadding={columnMeta?.hideCellPadding}>
-                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-              </Td>
-            );
-          })}
-        </tr>
-        <ExpandedSections
-          key={`expanded-sections-${row.id}`}
-          expandedSectionRenderers={expandedSectionRenderers}
-          entity={row.original}
-        />
-      </tbody>
-    ))}
+        return (
+          <Td
+            key={cell.id}
+            $colId={cell.column.id}
+            $pinningPosition={cell.column.getIsPinned()}
+            $hidePadding={columnMeta?.hideCellPadding}>
+            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+          </Td>
+        );
+      };
+      const actionCellIndex = visibleCells.findIndex((cell) => cell.column.id === ACTIONS_COL_ID);
+      const defaultRowActionCell = actionCellIndex >= 0 ? renderCell(visibleCells[actionCellIndex]) : undefined;
+
+      return (
+        <tbody key={`table-row-${row.id}`} data-testid={`table-row-${row.id}`}>
+          {isEmptyRow(row.original) && renderEmptyRow ? (
+            <EmptyEntityTableRow
+              visibleCellCount={visibleCellCount}
+              notice={renderEmptyRow({ row })}
+              actionCell={defaultRowActionCell}
+            />
+          ) : (
+            <>
+              <tr>{visibleCells.map(renderCell)}</tr>
+              <ExpandedSections
+                key={`expanded-sections-${row.id}`}
+                expandedSectionRenderers={expandedSectionRenderers}
+                entity={row.original}
+              />
+            </>
+          )}
+        </tbody>
+      );
+    })}
   </StyledTable>
 );
 
