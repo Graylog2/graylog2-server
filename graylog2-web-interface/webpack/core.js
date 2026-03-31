@@ -124,7 +124,12 @@ const rules = (target, supportedBrowsers) => [
 const config = (target, appPath, rootPath, webInterfaceRoot, supportedBrowsers) => {
   const MANIFESTS_PATH = path.resolve(webInterfaceRoot, 'manifests');
   const VENDOR_MANIFEST_PATH = path.resolve(MANIFESTS_PATH, 'vendor-manifest.json');
+  const COMMONS_MANIFEST_PATH = path.resolve(MANIFESTS_PATH, 'commons-manifest.json');
   const BUILD_PATH = path.resolve(rootPath, 'target/web/build');
+
+  const commonsDllPlugins = target.startsWith('build')
+    ? [new webpack.DllReferencePlugin({ manifest: COMMONS_MANIFEST_PATH, context: webInterfaceRoot })]
+    : [];
 
   const baseConfig = {
     output: {
@@ -154,6 +159,7 @@ const config = (target, appPath, rootPath, webInterfaceRoot, supportedBrowsers) 
         hashDigestLength: 8,
       }),
       new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST_PATH, context: webInterfaceRoot }),
+      ...commonsDllPlugins,
       new webpack.DefinePlugin({
         FEATURES: JSON.stringify(process.env.FEATURES),
       }),

@@ -40,11 +40,13 @@ public class PluginAssets {
     private static final String pluginPathPrefix = "plugin/";
     private static final String manifestFilename = "module.json";
     private static final String vendorManifestFilename = "vendor-module.json";
+    private static final String commonsManifestFilename = "commons-module.json";
 
     private final ObjectMapper objectMapper;
     private final List<String> jsFiles;
     private final List<String> cssFiles;
     private final List<String> vendorJsFiles;
+    private final List<String> commonsJsFiles;
 
     @Inject
     public PluginAssets(Set<Plugin> plugins,
@@ -66,6 +68,22 @@ public class PluginAssets {
             cssFiles.addAll(vendorManifest.files().cssFiles());
         } else {
             throw new IllegalStateException("Unable to find vendor assets. Maybe the web interface was not built into server?");
+        }
+
+        final InputStream commonsManifestStream = this.getClass().getResourceAsStream("/" + pathPrefix + "/" + commonsManifestFilename);
+        if (commonsManifestStream != null) {
+            final ModuleManifest commonsManifest;
+            try {
+                commonsManifest = objectMapper.readValue(commonsManifestStream, ModuleManifest.class);
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to read commons manifest: ", e);
+            }
+            this.commonsJsFiles = commonsManifest.files().jsFiles();
+            jsFiles.addAll(commonsManifest.files().jsFiles());
+            cssFiles.addAll(commonsManifest.files().cssFiles());
+        } else {
+            this.commonsJsFiles = List.of();
+            LOG.debug("No commons assets found, skipping.");
         }
 
         plugins.forEach(plugin -> {
@@ -107,7 +125,14 @@ public class PluginAssets {
                     if (vendorJsFiles.contains(file2)) {
                         return 1;
                     }
-                    // Polyfill JS script goes second
+                    // Commons JS scripts go second
+                    if (commonsJsFiles.contains(file1)) {
+                        return -1;
+                    }
+                    if (commonsJsFiles.contains(file2)) {
+                        return 1;
+                    }
+                    // Polyfill JS script goes third
                     if (file1.startsWith("polyfill")) {
                         return -1;
                     }
@@ -115,7 +140,7 @@ public class PluginAssets {
                     if (file2.startsWith("polyfill")) {
                         return 1;
                     }
-                    // Builtins JS script goes third
+                    // Builtins JS script goes fourth
                     if (file1.startsWith("builtins")) {
                         return -1;
                     }

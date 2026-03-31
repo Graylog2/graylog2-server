@@ -7,6 +7,9 @@
     <% for (var vendorChunk in vendorModule().files.js) { %>
     <script defer src="/<%= vendorModule().files.js[vendorChunk] %>"></script>
     <% } %>
+    <% for (var commonsChunk in commonsModule().files.js) { %>
+    <script defer src="/<%= commonsModule().files.js[commonsChunk] %>"></script>
+    <% } %>
     <% for (var idx in pluginNames()) { %>
     <script defer src="/<%= pluginNames()[idx] %>.js"></script>
     <% } %>
