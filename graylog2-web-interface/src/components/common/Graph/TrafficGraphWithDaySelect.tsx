@@ -102,6 +102,8 @@ const TrafficGraphWithDaySelect = ({
     return formatValueWithUnitLabel(prettified?.value, prettified.unit.abbrev);
   }, [bytesOut]);
 
+  const graphTitle = title ?? (trafficType === 'input' ? 'Incoming traffic' : 'Outgoing traffic');
+
   return (
     <>
       <Wrapper className="form-inline graph-days pull-right">
