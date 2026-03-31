@@ -1,0 +1,7 @@
+type = "s"
+message = "The suggestions endpoint could allow admin users to retrieve information about MongoDB collections not exposed in the UI. Additionally, users with certain roles, while working with MongoDB collections they are allowed to see, could use this endpoint to access additional field values beyond those intended to be visible. These security vulnerabilities have been fixed."
+
+issues = [""]
+pulls = ["25404", "Graylog2/graylog-plugin-enterprise#13618"]
+
+
