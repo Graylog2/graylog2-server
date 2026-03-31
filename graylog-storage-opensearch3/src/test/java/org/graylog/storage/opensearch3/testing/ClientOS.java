@@ -59,6 +59,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.graylog2.indexer.Constants.COMPOSABLE_INDEX_TEMPLATES_FEATURE;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class ClientOS implements Client {
     private static final Logger LOG = LoggerFactory.getLogger(ClientOS.class);
@@ -192,6 +193,24 @@ public class ClientOS implements Client {
         deleteIndices(existingIndices());
         deleteAllTemplates();
         refreshNode();
+        try {
+            opensearchClient.syncWithoutErrorMapping().cluster().health(req -> req.waitForStatus(HealthStatus.Green));
+        } catch (IOException e) {
+            try {
+                final IndicesResponse catIndices = opensearchClient.syncWithoutErrorMapping().cat().indices();
+                final String table = catIndices.valueBody().stream()
+                        .map(r -> String.format("%-10s %-10s %-40s %-25s %-5s %-5s",
+                                r.health(), r.status(), r.index(), r.uuid(), r.pri(), r.rep()))
+                        .collect(Collectors.joining("\n",
+                                String.format("%-10s %-10s %-40s %-25s %-5s %-5s\n",
+                                        "health", "status", "index", "uuid", "pri", "rep"),
+                                ""));
+                LOG.error("OpenSearch test server clean up failed. Current indices:\n{}", table);
+            } catch (Exception catException) {
+                LOG.error("OpenSearch test server clean up failed and could not retrieve _cat/indices", catException);
+            }
+            fail(e.getMessage());
+        }
     }
 
     private String[] existingIndices() {
