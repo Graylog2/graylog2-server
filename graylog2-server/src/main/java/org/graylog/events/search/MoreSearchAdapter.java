@@ -48,4 +48,8 @@ public interface MoreSearchAdapter {
 
     void scrollEvents(String queryString, TimeRange timeRange, Set<String> affectedIndices, Set<String> streams,
                       List<UsedSearchFilter> filters, int batchSize, ScrollEventsCallback resultCallback) throws EventProcessorException;
+
+    static boolean isRangeValue(String value) {
+        return value.startsWith("<=") || value.startsWith(">=") || value.startsWith("<") || value.startsWith(">");
+    }
 }
