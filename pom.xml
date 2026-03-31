@@ -782,7 +782,7 @@
                         <dependency>
                             <groupId>org.openrewrite</groupId>
                             <artifactId>rewrite-java</artifactId>
-                            <version>8.75.11</version>
+                            <version>8.76.4</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
