@@ -89,7 +89,7 @@ describe('TrafficGraphWithDaySelect', () => {
 
   it('supports both input and output traffic with correct titles and telemetry', async () => {
     const { getByLabelText, rerender } = render(
-      <TrafficGraphWithDaySelect traffic={mockTrafficData} trafficType="input" />,
+      <TrafficGraphWithDaySelect traffic={mockTrafficData} trafficType="input-indexed" />,
     ) as any;
 
     await screen.findByText('Incoming traffic');
@@ -112,11 +112,7 @@ describe('TrafficGraphWithDaySelect', () => {
 
   it('allows custom title to override default', async () => {
     render(
-      <TrafficGraphWithDaySelect
-        traffic={mockTrafficData}
-        trafficType="input"
-        title="Remaining Volume"
-      />,
+      <TrafficGraphWithDaySelect traffic={mockTrafficData} trafficType="input-indexed" title="Remaining Volume" />,
     );
 
     await screen.findByText('Remaining Volume');
@@ -130,12 +126,7 @@ describe('TrafficGraphWithDaySelect', () => {
   });
 
   it('passes trafficLimit to graph component', async () => {
-    const { container } = render(
-      <TrafficGraphWithDaySelect
-        traffic={mockTrafficData}
-        trafficLimit={1073741824}
-      />,
-    );
+    const { container } = render(<TrafficGraphWithDaySelect traffic={mockTrafficData} trafficLimit={1073741824} />);
 
     expect(container).toBeInTheDocument();
   });
