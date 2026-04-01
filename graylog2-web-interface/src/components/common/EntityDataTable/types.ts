@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type * as React from 'react';
+
 import type { Attribute, Sort } from 'stores/PaginationTypes';
 import type { ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
 
