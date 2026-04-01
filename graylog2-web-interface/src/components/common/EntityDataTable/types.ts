@@ -15,8 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type * as React from 'react';
-import type { Row } from '@tanstack/react-table';
-
 import type { Attribute, Sort } from 'stores/PaginationTypes';
 import type { ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
 
@@ -90,11 +88,7 @@ export type ExpandedSectionRenderers<Entity> = {
   [sectionName: string]: ExpandedSectionRenderer<Entity>;
 };
 
-export type RowOverrideArgs<Entity extends EntityBase> = {
-  row: Row<Entity>;
-};
-
-export type RowOverride<Entity extends EntityBase> = (args: RowOverrideArgs<Entity>) => React.ReactNode;
+export type RowOverride<Entity extends EntityBase> = (entity: Entity) => React.ReactNode;
 
 export type DefaultLayout = {
   entityTableId: string;

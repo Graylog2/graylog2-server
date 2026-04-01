@@ -190,7 +190,7 @@ const MessageTableEntry = ({
   );
 
   const _toggleDetail = useCallback(() => {
-    if (overrideContent != null) {
+    if (overrideContent !== undefined) {
       return;
     }
 
@@ -240,7 +240,7 @@ const MessageTableEntry = ({
   return (
     <AdditionalContext.Provider value={additionalContextValue}>
       <TableBody $expanded={expanded} $highlighted={message.id === highlightMessageId}>
-        {overrideContent != null ? (
+        {overrideContent !== undefined ? (
           <MessageTableOverrideRow colSpan={colSpanFixup} notice={overrideContent} rowActions={rowActions} />
         ) : (
           <FieldsRow onClick={_toggleDetail} className="table-data-row" $clickable>
@@ -250,7 +250,7 @@ const MessageTableEntry = ({
           </FieldsRow>
         )}
 
-        {overrideContent == null && (
+        {overrideContent === undefined && (
           <MessagePreview
             showMessageRow={showMessageRow}
             config={config}
@@ -262,7 +262,7 @@ const MessageTableEntry = ({
           />
         )}
 
-        {expanded && overrideContent == null && (
+        {expanded && overrideContent === undefined && (
           <MessageDetailRow>
             <td colSpan={colSpanFixup}>
               <MessageDetail

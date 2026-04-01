@@ -169,7 +169,7 @@ describe('<EntityDataTable />', () => {
       <EntityDataTable<{ id: string; title: string }>
         {...defaultProps}
         entityActions={(entity) => `Custom actions for ${entity.title}`}
-        rowOverride={({ row }) => `Override for ${row.original.title}`}
+        rowOverride={(entity) => `Override for ${entity.title}`}
       />,
     );
 

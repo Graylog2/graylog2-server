@@ -126,11 +126,11 @@ const Table = <Entity extends EntityBase>({
       };
       const actionCellIndex = visibleCells.findIndex((cell) => cell.column.id === ACTIONS_COL_ID);
       const defaultRowActionCell = actionCellIndex >= 0 ? renderCell(visibleCells[actionCellIndex]) : undefined;
-      const overrideNotice = rowOverride?.({ row });
+      const overrideNotice = rowOverride?.(row.original);
 
       return (
         <tbody key={`table-row-${row.id}`} data-testid={`table-row-${row.id}`}>
-          {overrideNotice != null ? (
+          {overrideNotice !== undefined ? (
             <EntityTableOverrideRow
               visibleCellCount={visibleCellCount}
               notice={overrideNotice}
