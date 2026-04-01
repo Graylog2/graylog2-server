@@ -60,7 +60,9 @@ const EmptyMessageTableRow = ({ colSpan, messageId, rowActions = undefined }: Pr
   <Row className="table-data-row">
     <NoticeCell colSpan={colSpan}>
       <NoticeContent>
-        <NoticeAlert compact>You don&apos;t have access to the message with ID {messageId}.</NoticeAlert>
+        <NoticeAlert compact>
+          This log message with ID {messageId} is no longer available. It could not be found in its source index.
+        </NoticeAlert>
         {rowActions && <NoticeActions>{rowActions}</NoticeActions>}
       </NoticeContent>
     </NoticeCell>
