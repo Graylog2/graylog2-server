@@ -79,4 +79,8 @@ public interface MoreSearchAdapter {
         return commandBuilder
                 .build();
     }
+
+    static boolean isRangeValue(String value) {
+        return value.startsWith("<=") || value.startsWith(">=") || value.startsWith("<") || value.startsWith(">");
+    }
 }
