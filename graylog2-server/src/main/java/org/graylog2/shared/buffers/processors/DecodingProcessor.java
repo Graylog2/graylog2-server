@@ -49,6 +49,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static com.codahale.metrics.MetricRegistry.name;
+import static org.graylog2.shared.utilities.InputMessageSizeDistributor.distribute;
 
 public class DecodingProcessor implements EventHandler<MessageEvent> {
     private static final Logger LOG = LoggerFactory.getLogger(DecodingProcessor.class);
@@ -196,33 +197,16 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         return processedMessages;
     }
 
-    /**
-     * Distributes the raw payload size proportionally across messages based on their decoded sizes.
-     * The last message receives the remainder to avoid rounding errors.
-     */
     private void distributePayloadSize(List<Message> messages, long payloadLength) {
         if (messages.isEmpty()) {
             return;
         }
-        final long totalDecodedSize = messages.stream()
-                .mapToLong(Message::getSize)
-                .sum();
+        final List<Long> sizes = distribute(payloadLength, messages.stream()
+                .map(Message::getSize)
+                .toList());
 
-        long assignedSize = 0L;
         for (int i = 0; i < messages.size(); i++) {
-            final Message msg = messages.get(i);
-            final long inputSize;
-            if (i == messages.size() - 1) {
-                // Last message gets the remainder to avoid rounding errors.
-                inputSize = payloadLength - assignedSize;
-            } else if (totalDecodedSize > 0) {
-                inputSize = payloadLength * msg.getSize() / totalDecodedSize;
-            } else {
-                // All messages have zero decoded size — distribute evenly.
-                inputSize = payloadLength / messages.size();
-            }
-            assignedSize += inputSize;
-            msg.addField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, inputSize);
+            messages.get(i).addField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, sizes.get(i));
         }
     }
 

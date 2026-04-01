@@ -25,7 +25,7 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import org.graylog.integrations.aws.AWSMessageType;
-import org.graylog.integrations.aws.cloudwatch.KinesisLogEntry;
+import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -46,10 +46,12 @@ import software.amazon.kinesis.retrieval.KinesisClientRecord;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import static java.util.Objects.requireNonNull;
+import static org.graylog2.shared.utilities.InputMessageSizeDistributor.distribute;
 
 /**
  * Runtime Kinesis consumer processor.
@@ -62,12 +64,12 @@ public class KinesisShardProcessorFactory implements ShardRecordProcessorFactory
     private final String kinesisStreamName;
     private final ObjectMapper objectMapper;
     private final KinesisTransport transport;
-    private final Consumer<byte[]> handleMessageCallback;
+    private final Consumer<RawMessage> handleMessageCallback;
     private final KinesisPayloadDecoder kinesisPayloadDecoder;
 
     KinesisShardProcessorFactory(ObjectMapper objectMapper,
                                  KinesisTransport transport,
-                                 Consumer<byte[]> handleMessageCallback,
+                                 Consumer<RawMessage> handleMessageCallback,
                                  String kinesisStreamName,
                                  AWSMessageType awsMessageType) {
         this.objectMapper = objectMapper;
@@ -111,11 +113,17 @@ public class KinesisShardProcessorFactory implements ShardRecordProcessorFactory
                     final byte[] dataBytes = new byte[dataBuffer.remaining()];
                     dataBuffer.get(dataBytes);
 
-                    List<KinesisLogEntry> kinesisLogEntries =
+                    final var result =
                             kinesisPayloadDecoder.processMessages(dataBytes, record.approximateArrivalTimestamp());
 
-                    for (KinesisLogEntry kinesisLogEntry : kinesisLogEntries) {
-                        handleMessageCallback.accept(objectMapper.writeValueAsBytes(kinesisLogEntry));
+                    final List<Long> sizes = distribute(result.decompressedSize(), result.entries().stream()
+                            .map(e -> (long) e.message().length())
+                            .toList());
+
+                    for (int i = 0; i < result.entries().size(); i++) {
+                        final RawMessage raw = new RawMessage(objectMapper.writeValueAsBytes(result.entries().get(i)));
+                        raw.setInputMessageSize(sizes.get(i).intValue());
+                        handleMessageCallback.accept(raw);
                     }
                 } catch (Exception e) {
                     LOG.error("Could not read Kinesis record from stream [{}]", kinesisStreamName, e);

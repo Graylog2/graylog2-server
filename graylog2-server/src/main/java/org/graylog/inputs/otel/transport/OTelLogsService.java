@@ -17,7 +17,6 @@
 package org.graylog.inputs.otel.transport;
 
 import com.google.inject.assistedinject.Assisted;
-import com.google.protobuf.AbstractMessageLite;
 import io.grpc.Context;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
@@ -37,6 +36,7 @@ import java.util.function.Function;
 
 import static org.graylog.inputs.grpc.GrpcUtils.createThrottledStatusRuntimeException;
 import static org.graylog.inputs.grpc.RemoteAddressProviderInterceptor.REMOTE_ADDRESS;
+import static org.graylog2.shared.utilities.InputMessageSizeDistributor.distribute;
 
 public class OTelLogsService extends LogsServiceGrpc.LogsServiceImplBase {
     private final ThrottleableTransport2 transport;
@@ -74,14 +74,16 @@ public class OTelLogsService extends LogsServiceGrpc.LogsServiceImplBase {
         }
 
         final List<OTelJournal.Record> journalRecords = OTelJournalRecordFactory.createFromRequest(request);
-        final int recordCount = journalRecords.size();
-        final int perMessageSize = recordCount > 0 ? request.getSerializedSize() / recordCount : 0;
+        final List<Long> weights = journalRecords.stream()
+                .map(r -> (long) r.getLog().getLogRecord().getSerializedSize())
+                .toList();
+        final List<Long> sizes = distribute(request.getSerializedSize(), weights);
 
-        journalRecords.stream()
-                .map(AbstractMessageLite::toByteArray)
-                .map(createRawMessage)
-                .peek(raw -> raw.setInputMessageSize(perMessageSize))
-                .forEach(input::processRawMessage);
+        for (int i = 0; i < journalRecords.size(); i++) {
+            final RawMessage raw = createRawMessage.apply(journalRecords.get(i).toByteArray());
+            raw.setInputMessageSize(sizes.get(i).intValue());
+            input.processRawMessage(raw);
+        }
 
         responseObserver.onNext(ExportLogsServiceResponse.newBuilder().build());
         responseObserver.onCompleted();

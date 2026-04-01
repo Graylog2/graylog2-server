@@ -24,6 +24,7 @@ import org.graylog.integrations.aws.AWSClientBuilderUtil;
 import org.graylog.integrations.aws.AWSMessageType;
 import org.graylog.integrations.aws.resources.requests.AWSRequest;
 import org.graylog2.plugin.InputFailureRecorder;
+import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +73,7 @@ public class KinesisConsumer implements Runnable {
     private final Integer recordBatchSize;
     private final ObjectMapper objectMapper;
     private final AWSMessageType awsMessageType;
-    private final Consumer<byte[]> handleMessageCallback;
+    private final Consumer<RawMessage> handleMessageCallback;
     private final AWSRequest request;
     private final AWSClientBuilderUtil awsClientBuilderUtil;
     private final InputFailureRecorder inputFailureRecorder;
@@ -81,7 +82,7 @@ public class KinesisConsumer implements Runnable {
     KinesisConsumer(NodeId nodeId,
                     KinesisTransport transport,
                     ObjectMapper objectMapper,
-                    Consumer<byte[]> handleMessageCallback,
+                    Consumer<RawMessage> handleMessageCallback,
                     String kinesisStreamName,
                     AWSMessageType awsMessageType,
                     int recordBatchSize, AWSRequest request,
