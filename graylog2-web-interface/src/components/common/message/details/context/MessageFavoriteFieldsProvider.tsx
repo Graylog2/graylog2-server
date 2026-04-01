@@ -28,9 +28,8 @@ import { StreamsStore } from 'views/stores/StreamsStore';
 import type { Stream } from 'logic/streams/types';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
-
-import { DEFAULT_FIELDS } from '../fields/hooks/useMessageFavoriteFieldsForEditing';
-import useMessageFavoriteFieldsMutation from '../fields/hooks/useMessageFavoriteFieldsMutation';
+import { getStreamFavoriteFields } from 'components/common/message/helpers';
+import useMessageFavoriteFieldsMutation from 'components/common/message/details/fields/hooks/useMessageFavoriteFieldsMutation';
 
 type OriginalProps = React.PropsWithChildren<{
   message: Message;
@@ -52,7 +51,7 @@ const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messa
   }, [message?.fields?.streams, permissions, streamsList]);
 
   const initialFavoriteFields = useMemo(
-    () => uniq(flattenDeep(zip(streams.map((stream) => stream?.favorite_fields ?? DEFAULT_FIELDS)))),
+    () => uniq(flattenDeep(zip(streams.map((stream) => getStreamFavoriteFields(stream))))),
     [streams],
   );
 

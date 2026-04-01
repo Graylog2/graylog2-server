@@ -25,8 +25,9 @@ import { StreamsStore } from 'views/stores/StreamsStore';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 import StringUtils from 'util/StringUtils';
 import { ModalSubmit } from 'components/common';
+import { DEFAULT_FIELDS } from 'components/common/message/helpers';
 
-import useMessageFavoriteFieldsForEditing, { DEFAULT_FIELDS } from './hooks/useMessageFavoriteFieldsForEditing';
+import useMessageFavoriteFieldsForEditing from './hooks/useMessageFavoriteFieldsForEditing';
 import MessageFieldsEditModeLists from './MessageFieldsEditModeLists';
 import useSendFavoriteFieldTelemetry from './hooks/useSendFavoriteFieldTelemetry';
 

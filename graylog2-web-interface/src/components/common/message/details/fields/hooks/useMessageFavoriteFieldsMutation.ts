@@ -22,8 +22,8 @@ import { FavoriteFields } from '@graylog/server-api';
 import { StreamsActions } from 'views/stores/StreamsStore';
 import UserNotification from 'util/UserNotification';
 import type { Stream } from 'logic/streams/types';
-
-import useSendFavoriteFieldTelemetry from './useSendFavoriteFieldTelemetry';
+import { getStreamFavoriteFields } from 'components/common/message/helpers';
+import useSendFavoriteFieldTelemetry from 'components/common/message/details/fields/hooks/useSendFavoriteFieldTelemetry';
 
 interface FavoriteFieldRequest {
   readonly field: string;
@@ -94,7 +94,7 @@ const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavorit
         streams.map((stream) => [
           stream.id,
           favoritesToSave.filter((f) => {
-            const streamFavoriteFields = stream?.favorite_fields ?? [];
+            const streamFavoriteFields = getStreamFavoriteFields(stream);
 
             return streamFavoriteFields.includes(f) || newAddedFields.includes(f);
           }),
