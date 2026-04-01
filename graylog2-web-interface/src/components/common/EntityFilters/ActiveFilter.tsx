@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Button } from 'components/bootstrap';
 import type { Attribute } from 'stores/PaginationTypes';
@@ -34,7 +34,9 @@ const CenteredButton = styled(Button)`
 `;
 
 const FilterValueButton = styled(CenteredButton)<{ $isConflicting: boolean }>`
-  text-decoration: ${({ $isConflicting }) => ($isConflicting ? 'line-through' : 'none')};
+  &&& {
+    text-decoration: ${({ $isConflicting }) => ($isConflicting ? 'line-through' : 'none')};
+  }
 `;
 
 type FilterValueDropdownProps = {
@@ -75,7 +77,11 @@ const FilterValueDropdown = ({
       show={show}
       closeOnSelect={false}
       toggleChild={
-        <FilterValueButton bsSize="xsmall" title="Change filter value" $isConflicting={isConflicting}>
+        <FilterValueButton
+          bsSize="xsmall"
+          title="Change filter value"
+          $isConflicting={isConflicting}
+          disabled={isConflicting}>
           {filterValueRenderer ? filterValueRenderer(value, title) : title}
         </FilterValueButton>
       }
@@ -127,9 +133,10 @@ const ActiveFilter = ({
       {attribute.type === 'BOOLEAN' && (
         <FilterValueButton
           bsSize="xsmall"
-          onClick={onChangeBooleanValue}
+          onClick={isConflicting ? undefined : onChangeBooleanValue}
           title="Change filter value"
-          $isConflicting={isConflicting}>
+          $isConflicting={isConflicting}
+          disabled={isConflicting}>
           {filterValueRenderer ? filterValueRenderer(value, title) : title}
         </FilterValueButton>
       )}
