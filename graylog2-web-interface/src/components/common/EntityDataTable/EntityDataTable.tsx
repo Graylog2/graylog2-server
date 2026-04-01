@@ -179,6 +179,10 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   entityActions?: (entity: Entity) => React.ReactNode;
   /** Meta data. */
   meta?: Meta;
+  /** Disable column reordering */
+  noColumnReordering?: boolean;
+  /** Disable page size select */
+  noPageSizeSelect?: boolean;
 };
 
 /**
@@ -207,6 +211,8 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   pageSize = undefined,
   parentBgColor = undefined,
   appSection = undefined,
+  noColumnReordering = false,
+  noPageSizeSelect = false,
 }: Props<Entity, Meta>) => {
   const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection ?? []);
   const hasRowActions = typeof entityActions === 'function';
@@ -313,15 +319,22 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
           <ExpandedSectionsProvider>
             <ActionsRow>
               <div>{displayBulkAction && <BulkActionsRow bulkActions={actions} />}</div>
-              <LayoutConfigRow>
-                Show
-                <ButtonGroup>
-                  {displayPageSizeSelect && (
-                    <PageSizeSelect pageSize={pageSize} showLabel={false} onChange={onPageSizeChange} />
-                  )}
-                  <ColumnsVisibilitySelect<Entity> table={table} onResetLayoutPreferences={resetLayoutPreferences} />
-                </ButtonGroup>
-              </LayoutConfigRow>
+              {noColumnReordering && noPageSizeSelect ? null : (
+                <LayoutConfigRow>
+                  Show
+                  <ButtonGroup>
+                    {displayPageSizeSelect && !noPageSizeSelect && (
+                      <PageSizeSelect pageSize={pageSize} showLabel={false} onChange={onPageSizeChange} />
+                    )}
+                    {!noColumnReordering && (
+                      <ColumnsVisibilitySelect<Entity>
+                        table={table}
+                        onResetLayoutPreferences={resetLayoutPreferences}
+                      />
+                    )}
+                  </ButtonGroup>
+                </LayoutConfigRow>
+              )}
             </ActionsRow>
             <TableDndProvider table={table}>
               <DndStylesContext.Consumer>
