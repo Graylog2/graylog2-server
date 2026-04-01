@@ -99,6 +99,7 @@ type Props = {
   setLoadingState: (loading: boolean) => void;
   displayBulkSelectCol?: boolean;
   isEntitySelectable?: (entity: BackendMessage) => boolean;
+  rowOverride?: (message: Message) => React.ReactNode;
 };
 
 const _fieldTypeFor = (fieldName: string, fields: Immutable.List<FieldTypeMapping>) =>
@@ -142,6 +143,7 @@ const MessageTable = ({
   scrollContainerRef,
   displayBulkSelectCol = false,
   isEntitySelectable = () => false,
+  rowOverride = undefined,
 }: Props) => {
   const { stopAutoRefresh } = useAutoRefresh();
   const [expandedMessages, setExpandedMessages] = useState(Immutable.Set<string>());
@@ -195,6 +197,7 @@ const MessageTable = ({
           </TableHead>
           {formattedMessages.map((message) => {
             const messageKey = `${message.index}-${message.id}`;
+            const overrideContent = rowOverride?.(message);
 
             return (
               <MessageTableEntry
@@ -210,6 +213,7 @@ const MessageTable = ({
                 expandAllRenderAsync={false}
                 displayBulkSelectCol={displayBulkSelectCol}
                 isEntitySelectable={isEntitySelectable}
+                overrideContent={overrideContent}
               />
             );
           })}
