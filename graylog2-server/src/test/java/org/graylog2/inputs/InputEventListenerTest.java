@@ -27,6 +27,7 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
+import org.graylog2.rest.models.system.inputs.responses.InputStopped;
 import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
 import org.graylog2.shared.inputs.InputLauncher;
 import org.graylog2.shared.inputs.InputRegistry;
@@ -278,5 +279,23 @@ public class InputEventListenerTest {
         listener.inputDeleted(InputDeleted.create(INPUT_ID));
 
         verify(inputRegistry, never()).remove(any(MessageInput.class));
+    }
+
+    @Test
+    public void inputStoppedRemovesInputFromRegistry() {
+        when(inputRegistry.getInputState(INPUT_ID)).thenReturn(inputState);
+
+        listener.inputStopped(InputStopped.create(INPUT_ID));
+
+        verify(inputRegistry, times(1)).remove(inputState);
+    }
+
+    @Test
+    public void inputStoppedDoesNothingIfInputIsNotInRegistry() {
+        when(inputRegistry.getInputState(INPUT_ID)).thenReturn(null);
+
+        listener.inputStopped(InputStopped.create(INPUT_ID));
+
+        verify(inputRegistry, never()).remove(Mockito.<IOState<MessageInput>>any());
     }
 }
