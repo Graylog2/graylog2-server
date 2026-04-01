@@ -108,7 +108,8 @@ class EntityTitleServiceTest {
                                 "streams",
                                 DbEntity.NO_TITLE,
                                 StreamImpl.class,
-                                DbEntity.ALL_ALLOWED)
+                                DbEntity.ALL_ALLOWED,
+                                List.of())
                 )
         ).when(entitiesCatalog).getByCollectionName("streams");
 
