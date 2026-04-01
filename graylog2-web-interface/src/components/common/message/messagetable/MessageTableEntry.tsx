@@ -43,7 +43,7 @@ import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
 import BulkSelectCell from 'components/common/message/messagetable/BulkSelectCell';
 import useSelectedMessageEntities from 'views/hooks/useSelectedMessageEntities';
 
-import EmptyMessageTableRow from './EmptyMessageTableRow';
+import MessageTableOverrideRow from './MessageTableOverrideRow';
 import MessagePreview from './MessagePreview';
 
 export const TableBody = styled.tbody<{ $expanded?: boolean; $highlighted?: boolean }>(
@@ -118,7 +118,7 @@ type Props = {
   toggleDetail: (messageId: string) => void;
   displayBulkSelectCol?: boolean;
   isEntitySelectable?: (entity: BackendMessage) => boolean;
-  isEmptyMessage?: boolean;
+  overrideContent?: React.ReactNode;
 };
 
 const isDecoratedField = (field: string | number, decorationStats: Message['decoration_stats']) =>
@@ -171,7 +171,7 @@ const MessageTableEntry = ({
   toggleDetail,
   displayBulkSelectCol = false,
   isEntitySelectable = () => false,
-  isEmptyMessage = false,
+  overrideContent = undefined,
 }: Props) => {
   const { inputs: inputsList = [] } = useStore(InputsStore);
   const { streams: streamsList = [] } = useStore(StreamsStore);
@@ -190,7 +190,7 @@ const MessageTableEntry = ({
   );
 
   const _toggleDetail = useCallback(() => {
-    if (isEmptyMessage) {
+    if (overrideContent != null) {
       return;
     }
 
@@ -204,7 +204,7 @@ const MessageTableEntry = ({
 
       toggleDetail(`${message.index}-${message.id}`);
     }
-  }, [isEmptyMessage, message.id, message.index, sendTelemetry, toggleDetail]);
+  }, [overrideContent, message.id, message.index, sendTelemetry, toggleDetail]);
 
   const colSpanFixup = selectedFields.size + 1 + (rowActions ? 1 : 0) + (displayBulkSelectCol ? 1 : 0);
 
@@ -240,8 +240,8 @@ const MessageTableEntry = ({
   return (
     <AdditionalContext.Provider value={additionalContextValue}>
       <TableBody $expanded={expanded} $highlighted={message.id === highlightMessageId}>
-        {isEmptyMessage ? (
-          <EmptyMessageTableRow colSpan={colSpanFixup} messageId={message.id} rowActions={rowActions} />
+        {overrideContent != null ? (
+          <MessageTableOverrideRow colSpan={colSpanFixup} notice={overrideContent} rowActions={rowActions} />
         ) : (
           <FieldsRow onClick={_toggleDetail} className="table-data-row" $clickable>
             {displayBulkSelectCol && <RowBulkCheckbox message={message} isEntitySelectable={isEntitySelectable} />}
@@ -250,7 +250,7 @@ const MessageTableEntry = ({
           </FieldsRow>
         )}
 
-        {!isEmptyMessage && (
+        {overrideContent == null && (
           <MessagePreview
             showMessageRow={showMessageRow}
             config={config}
@@ -262,7 +262,7 @@ const MessageTableEntry = ({
           />
         )}
 
-        {expanded && !isEmptyMessage && (
+        {expanded && overrideContent == null && (
           <MessageDetailRow>
             <td colSpan={colSpanFixup}>
               <MessageDetail

@@ -53,7 +53,7 @@ import type {
   EntityBase,
   ColumnPreferences,
   ExpandedSectionRenderers,
-  EmptyRowRenderer,
+  RowOverride,
 } from './types';
 import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
 import BulkActionsRow from './BulkActionsRow';
@@ -157,8 +157,7 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   enableSlicing?: boolean;
   /** Allows you to extend a row with additional information * */
   expandedSectionRenderers?: ExpandedSectionRenderers<Entity>;
-  isEmptyRow?: (entity: Entity) => boolean;
-  renderEmptyRow?: EmptyRowRenderer<Entity>;
+  rowOverride?: RowOverride<Entity>;
   /** User layout preferences */
   layoutPreferences: {
     attributes?: ColumnPreferences;
@@ -206,8 +205,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   entityAttributesAreCamelCase,
   enableSlicing = false,
   expandedSectionRenderers = undefined,
-  isEmptyRow = () => false,
-  renderEmptyRow = undefined,
+  rowOverride = undefined,
   layoutPreferences,
   meta = undefined,
   onChangeSlicing,
@@ -350,8 +348,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                       <Table<Entity>
                         expandedSectionRenderers={expandedSectionRenderers}
                         headerGroups={headerGroups}
-                        isEmptyRow={isEmptyRow}
-                        renderEmptyRow={renderEmptyRow}
+                        rowOverride={rowOverride}
                         rows={table.getRowModel().rows}
                       />
                       <ScrollRightIndicator ref={scrolledToRightIndicator} />

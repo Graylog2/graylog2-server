@@ -90,11 +90,11 @@ export type ExpandedSectionRenderers<Entity> = {
   [sectionName: string]: ExpandedSectionRenderer<Entity>;
 };
 
-export type EmptyRowRendererArgs<Entity extends EntityBase> = {
+export type RowOverrideArgs<Entity extends EntityBase> = {
   row: Row<Entity>;
 };
 
-export type EmptyRowRenderer<Entity extends EntityBase> = (args: EmptyRowRendererArgs<Entity>) => React.ReactNode;
+export type RowOverride<Entity extends EntityBase> = (args: RowOverrideArgs<Entity>) => React.ReactNode;
 
 export type DefaultLayout = {
   entityTableId: string;

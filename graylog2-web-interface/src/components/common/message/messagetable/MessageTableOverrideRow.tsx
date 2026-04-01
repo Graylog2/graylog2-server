@@ -52,21 +52,19 @@ const NoticeActions = styled.div`
 
 type Props = {
   colSpan: number;
-  messageId: string;
+  notice: React.ReactNode;
   rowActions?: React.ReactNode;
 };
 
-const EmptyMessageTableRow = ({ colSpan, messageId, rowActions = undefined }: Props) => (
+const MessageTableOverrideRow = ({ colSpan, notice, rowActions = undefined }: Props) => (
   <Row className="table-data-row">
     <NoticeCell colSpan={colSpan}>
       <NoticeContent>
-        <NoticeAlert compact>
-          This log message with ID {messageId} is no longer available. It could not be found in its source index.
-        </NoticeAlert>
+        <NoticeAlert compact>{notice}</NoticeAlert>
         {rowActions && <NoticeActions>{rowActions}</NoticeActions>}
       </NoticeContent>
     </NoticeCell>
   </Row>
 );
 
-export default EmptyMessageTableRow;
+export default MessageTableOverrideRow;

@@ -38,7 +38,7 @@ type Props = {
   actionCell?: React.ReactNode;
 };
 
-const EmptyEntityTableRow = ({ visibleCellCount, notice, actionCell = undefined }: Props) => (
+const EntityTableOverrideRow = ({ visibleCellCount, notice, actionCell = undefined }: Props) => (
   <Row>
     <TD colSpan={Math.max(visibleCellCount - (actionCell ? 1 : 0), 1)}>
       <Content>{notice}</Content>
@@ -47,4 +47,4 @@ const EmptyEntityTableRow = ({ visibleCellCount, notice, actionCell = undefined 
   </Row>
 );
 
-export default EmptyEntityTableRow;
+export default EntityTableOverrideRow;

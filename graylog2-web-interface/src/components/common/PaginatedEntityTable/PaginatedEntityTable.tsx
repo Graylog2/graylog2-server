@@ -28,7 +28,7 @@ import type {
   EntityBase,
   DefaultLayout,
   ExpandedSectionRenderers,
-  EmptyRowRenderer,
+  RowOverride,
 } from 'components/common/EntityDataTable/types';
 import EntityFilters from 'components/common/EntityFilters';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
@@ -103,8 +103,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   entityActions = undefined,
   entityAttributesAreCamelCase,
   expandedSectionRenderers = undefined,
-  isEmptyRow = () => false,
-  renderEmptyRow = undefined,
+  rowOverride = undefined,
   externalSearch = undefined,
   fetchEntities,
   fetchOptions,
@@ -257,8 +256,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
                 onLayoutPreferencesChange={onLayoutPreferencesChange}
                 onChangeSlicing={onChangeSlicing}
                 expandedSectionRenderers={expandedSectionRenderers}
-                isEmptyRow={isEmptyRow}
-                renderEmptyRow={renderEmptyRow}
+                rowOverride={rowOverride}
                 enableSlicing={typeof fetchSlices === 'function'}
                 bulkSelection={bulkSelection}
                 onSortChange={onSortChange}
@@ -341,8 +339,7 @@ export type PaginatedEntityTableProps<T extends EntityBase, M> = {
   entityActions?: EntityDataTableProps['entityActions'];
   entityAttributesAreCamelCase: boolean;
   expandedSectionRenderers?: ExpandedSectionRenderers<T>;
-  isEmptyRow?: (entity: T) => boolean;
-  renderEmptyRow?: EmptyRowRenderer<T>;
+  rowOverride?: RowOverride<T>;
   externalSearch?: ExternalSearch;
   fetchEntities: (options: SearchParams) => Promise<PaginatedResponse<T, M>>;
   fetchOptions?: FetchOptions;

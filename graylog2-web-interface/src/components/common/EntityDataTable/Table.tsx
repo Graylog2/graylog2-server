@@ -20,14 +20,14 @@ import { flexRender } from '@tanstack/react-table';
 import styled, { css } from 'styled-components';
 
 import { Table as BaseTable } from 'components/bootstrap';
-import EmptyEntityTableRow from 'components/common/EntityDataTable/EmptyEntityTableRow';
+import EntityTableOverrideRow from 'components/common/EntityDataTable/EntityTableOverrideRow';
 import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
 import { ACTIONS_COL_ID, CELL_PADDING } from 'components/common/EntityDataTable/Constants';
 import type {
   EntityBase,
   ExpandedSectionRenderers,
   ColumnMetaContext,
-  EmptyRowRenderer,
+  RowOverride,
 } from 'components/common/EntityDataTable/types';
 import {
   columnOpacityVar,
@@ -95,16 +95,14 @@ const Td = styled.td<{
 
 type Props<Entity extends EntityBase> = {
   expandedSectionRenderers: ExpandedSectionRenderers<Entity> | undefined;
-  isEmptyRow?: (entity: Entity) => boolean;
-  renderEmptyRow?: EmptyRowRenderer<Entity>;
+  rowOverride?: RowOverride<Entity>;
   headerGroups: Array<HeaderGroup<Entity>>;
   rows: Array<Row<Entity>>;
 };
 
 const Table = <Entity extends EntityBase>({
   expandedSectionRenderers,
-  isEmptyRow = () => false,
-  renderEmptyRow = undefined,
+  rowOverride = undefined,
   headerGroups,
   rows,
 }: Props<Entity>) => (
@@ -128,13 +126,14 @@ const Table = <Entity extends EntityBase>({
       };
       const actionCellIndex = visibleCells.findIndex((cell) => cell.column.id === ACTIONS_COL_ID);
       const defaultRowActionCell = actionCellIndex >= 0 ? renderCell(visibleCells[actionCellIndex]) : undefined;
+      const overrideNotice = rowOverride?.({ row });
 
       return (
         <tbody key={`table-row-${row.id}`} data-testid={`table-row-${row.id}`}>
-          {isEmptyRow(row.original) && renderEmptyRow ? (
-            <EmptyEntityTableRow
+          {overrideNotice != null ? (
+            <EntityTableOverrideRow
               visibleCellCount={visibleCellCount}
-              notice={renderEmptyRow({ row })}
+              notice={overrideNotice}
               actionCell={defaultRowActionCell}
             />
           ) : (
