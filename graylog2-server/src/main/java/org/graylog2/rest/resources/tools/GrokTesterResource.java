@@ -94,7 +94,13 @@ public class GrokTesterResource extends RestResource {
             return GrokTesterResponse.createError(pattern, string, e.getMessage());
         }
 
-        final Match match = grok.match(string);
+        final Match match;
+        try {
+            match = grok.match(string);
+        } catch (StackOverflowError e) {
+            return GrokTesterResponse.createError(pattern, string,
+                    "Pattern caused a stack overflow during matching. Simplify the pattern to avoid deeply nested or repeated groups.");
+        }
         final Map<String, Object> matches = match.captureFlattened();
 
         final GrokTesterResponse response;
