@@ -7922,7 +7922,7 @@ escodegen@^2.1.0:
     eslint-plugin-jsx-a11y "6.10.2"
     eslint-plugin-react "7.37.5"
     eslint-plugin-react-hooks "7.0.1"
-    eslint-plugin-testing-library "7.16.0"
+    eslint-plugin-testing-library "7.16.1"
     typescript-eslint "^8.44.1"
 
 eslint-config-prettier@10.1.5:
@@ -8079,10 +8079,10 @@ eslint-plugin-react@7.37.5:
     string.prototype.matchall "^4.0.12"
     string.prototype.repeat "^1.0.0"
 
-eslint-plugin-testing-library@7.16.0:
-  version "7.16.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-testing-library/-/eslint-plugin-testing-library-7.16.0.tgz#ac8dd5e4069e9264d997079b4cb5f45e79d2b8a7"
-  integrity sha512-lHZI6/Olb2oZqxd1+s1nOLCtL2PXKrc1ERz6oDbUKS0xZAMFH3Fy6wJo75z3pXTop3BV6+loPi2MSjIYt3vpAg==
+eslint-plugin-testing-library@7.16.1:
+  version "7.16.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-testing-library/-/eslint-plugin-testing-library-7.16.1.tgz#9378976d98aeaa6a7dd724a46d4e54f7cbbc90b0"
+  integrity sha512-/pCFzJuro/wOq6FCp43DwS3fpCr0hM2gByJAxi8bPdL7DXKdmH3p3BEpVKQkneUxT6T2XbUXG4J+c5GSAm12lA==
   dependencies:
     "@typescript-eslint/scope-manager" "^8.56.0"
     "@typescript-eslint/utils" "^8.56.0"
@@ -9534,7 +9534,7 @@ graphemer@^1.4.0:
     html-webpack-plugin "^5.5.0"
     jest-preset-graylog "file:packages/jest-preset-graylog"
     moment "2.30.1"
-    moment-timezone "0.6.0"
+    moment-timezone "0.6.1"
     react "18.3.1"
     react-dom "18.2.0"
     react-redux "^9.2.0"
@@ -11727,9 +11727,9 @@ lodash.truncate@^4.4.2:
   integrity sha1-WjUNoLERO4N+z//VgSy+WNbq4ZM=
 
 lodash@^4.0.1, lodash@^4.17.15, lodash@^4.17.20, lodash@^4.17.21, lodash@^4.17.4:
-  version "4.17.23"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.23.tgz#f113b0378386103be4f6893388c73d0bde7f2c5a"
-  integrity sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w==
+  version "4.18.1"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.18.1.tgz#ff2b66c1f6326d59513de2407bf881439812771c"
+  integrity sha512-dMInicTPVE8d1e5otfwmmjlxkZoUpiVLwyeTdUsi/Caj/gfzzblBcCE5sRHV/AsjuCmxWrte2TNGSYuCeCq+0Q==
 
 loose-envify@^1.0.0, loose-envify@^1.1.0, loose-envify@^1.4.0:
   version "1.4.0"
@@ -12152,10 +12152,10 @@ moment-precise-range-plugin@^1.3.0:
   resolved "https://registry.yarnpkg.com/moment-precise-range-plugin/-/moment-precise-range-plugin-1.3.0.tgz#60ac075fdfd14689f6d102af751d171a80b4ab60"
   integrity sha1-YKwHX9/RRon20QKvdR0XGoC0q2A=
 
-moment-timezone@0.6.0:
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.6.0.tgz#c5a6519171f31a64739ea75d33f5c136c08ff608"
-  integrity sha512-ldA5lRNm3iJCWZcBCab4pnNL3HSZYXVb/3TYr75/1WCTWYuTqYUb5f/S384pncYjJ88lbO8Z4uPDvmoluHJc8Q==
+moment-timezone@0.6.1:
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.6.1.tgz#c324a71a8285583eb679ced4ba3dcfa53fdce500"
+  integrity sha512-1B9lmAhB9D9/sHaPC1N7wLFEVUoFldxOpOO96lOD1PvJ43vCd0ozDPbu0FEL3++VvawOlDkq8YD373tJmP5JHw==
   dependencies:
     moment "^2.29.4"
 
