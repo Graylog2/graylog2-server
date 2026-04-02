@@ -23,13 +23,20 @@ import io.grpc.stub.StreamObserver;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse;
 import io.opentelemetry.proto.common.v1.AnyValue;
+import io.opentelemetry.proto.common.v1.InstrumentationScope;
 import io.opentelemetry.proto.common.v1.KeyValue;
+import io.opentelemetry.proto.logs.v1.LogRecord;
+import io.opentelemetry.proto.logs.v1.ResourceLogs;
+import io.opentelemetry.proto.logs.v1.ScopeLogs;
+import io.opentelemetry.proto.resource.v1.Resource;
 import org.graylog.inputs.otel.OTelGrpcInput;
 import org.graylog.inputs.otel.OTelJournal;
 
 import org.graylog.inputs.otel.transport.OTelLogsService;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
+import org.graylog2.plugin.journal.RawMessage;
+import org.mockito.ArgumentCaptor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,10 +45,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -88,6 +97,68 @@ class OTelLogsServiceTest {
 
         verify(responseObserver).onNext(eq(ExportLogsServiceResponse.newBuilder().build()));
         verify(responseObserver).onCompleted();
+    }
+
+    @Test
+    void exportDistributesRequestSizeAcrossRecords() {
+        final ExportLogsServiceRequest request = ExportLogsServiceRequest.newBuilder()
+                .addResourceLogs(ResourceLogs.newBuilder()
+                        .setResource(Resource.newBuilder()
+                                .addAttributes(KeyValue.newBuilder()
+                                        .setKey("service.name")
+                                        .setValue(AnyValue.newBuilder().setStringValue("test-service"))))
+                        .addScopeLogs(ScopeLogs.newBuilder()
+                                .setScope(InstrumentationScope.newBuilder().setName("test-scope"))
+                                .addLogRecords(LogRecord.newBuilder()
+                                        .setBody(AnyValue.newBuilder().setStringValue("log message 1")))
+                                .addLogRecords(LogRecord.newBuilder()
+                                        .setBody(AnyValue.newBuilder().setStringValue("log message 2")))
+                                .addLogRecords(LogRecord.newBuilder()
+                                        .setBody(AnyValue.newBuilder().setStringValue("log message 3")))))
+                .build();
+
+        logsService.export(request, responseObserver);
+
+        final ArgumentCaptor<RawMessage> captor = ArgumentCaptor.forClass(RawMessage.class);
+        verify(input, times(3)).processRawMessage(captor.capture());
+
+        final List<RawMessage> captured = captor.getAllValues();
+        final int expectedPerMessageSize = request.getSerializedSize() / 3;
+
+        for (final RawMessage raw : captured) {
+            assertThat(raw.getInputMessageSize())
+                    .as("Each RawMessage should carry the proportional request size")
+                    .isEqualTo(expectedPerMessageSize);
+        }
+
+        final long totalAssigned = captured.stream()
+                .mapToLong(RawMessage::getInputMessageSize)
+                .sum();
+        assertThat(totalAssigned).isLessThanOrEqualTo(request.getSerializedSize());
+    }
+
+    @Test
+    void exportWithSingleLogRecordAssignsFullRequestSize() {
+        final ExportLogsServiceRequest request = ExportLogsServiceRequest.newBuilder()
+                .addResourceLogs(ResourceLogs.newBuilder()
+                        .setResource(Resource.newBuilder()
+                                .addAttributes(KeyValue.newBuilder()
+                                        .setKey("service.name")
+                                        .setValue(AnyValue.newBuilder().setStringValue("test-service"))))
+                        .addScopeLogs(ScopeLogs.newBuilder()
+                                .setScope(InstrumentationScope.newBuilder().setName("test-scope"))
+                                .addLogRecords(LogRecord.newBuilder()
+                                        .setBody(AnyValue.newBuilder().setStringValue("single log message")))))
+                .build();
+
+        logsService.export(request, responseObserver);
+
+        final ArgumentCaptor<RawMessage> captor = ArgumentCaptor.forClass(RawMessage.class);
+        verify(input).processRawMessage(captor.capture());
+
+        assertThat(captor.getValue().getInputMessageSize())
+                .as("Single log record should get the full request serialized size")
+                .isEqualTo(request.getSerializedSize());
     }
 
     private OTelJournal.Record parseJournalRecord(byte[] payload) {

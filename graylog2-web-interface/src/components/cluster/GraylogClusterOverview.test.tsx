@@ -107,7 +107,7 @@ describe('GraylogClusterOverview', () => {
   it('renders GraylogClusterOverview', async () => {
     render(<GraylogClusterOverview />);
 
-    expect(screen.getByText(/Outgoing traffic/)).toBeInTheDocument();
+    expect(screen.getByText(/Incoming traffic/)).toBeInTheDocument();
 
     await waitFor(() => expect(SystemClusterTraffic.get).toHaveBeenCalledWith(30, false));
 
