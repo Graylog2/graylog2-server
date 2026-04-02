@@ -168,6 +168,12 @@ public class SerializationMemoizingMessage implements ImmutableMessage {
     }
 
     @Override
+    public long getInputMessageSize() {
+        final Object value = delegate.getField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE);
+        return value instanceof Number n ? n.longValue() : getSize();
+    }
+
+    @Override
     public DateTime getReceiveTime() {
         return delegate.getReceiveTime();
     }

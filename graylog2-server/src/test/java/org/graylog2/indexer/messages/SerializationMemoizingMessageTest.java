@@ -42,6 +42,42 @@ import static org.mockito.Mockito.verify;
 class SerializationMemoizingMessageTest {
 
     @Test
+    void getInputMessageSizeReturnsFieldValue(MessageFactory messageFactory) {
+        final Message message = messageFactory.createMessage("test", "source", DateTime.now(DateTimeZone.UTC));
+        message.addField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, 500L);
+        final SerializationMemoizingMessage msg = new SerializationMemoizingMessage(message);
+
+        assertThat(msg.getInputMessageSize()).isEqualTo(500L);
+    }
+
+    @Test
+    void getInputMessageSizeFallsBackToGetSizeWhenFieldAbsent(MessageFactory messageFactory) {
+        final Message message = messageFactory.createMessage("test", "source", DateTime.now(DateTimeZone.UTC));
+        final SerializationMemoizingMessage msg = new SerializationMemoizingMessage(message);
+
+        assertThat(msg.getInputMessageSize()).isEqualTo(message.getSize());
+    }
+
+    @Test
+    void getInputMessageSizeFallsBackToGetSizeWhenFieldIsNotANumber(MessageFactory messageFactory) {
+        final Message message = messageFactory.createMessage("test", "source", DateTime.now(DateTimeZone.UTC));
+        message.addField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, "not-a-number");
+        final SerializationMemoizingMessage msg = new SerializationMemoizingMessage(message);
+
+        assertThat(msg.getInputMessageSize()).isEqualTo(message.getSize());
+    }
+
+    @Test
+    void getInputMessageSizeHandlesIntegerFieldValue(MessageFactory messageFactory) {
+        final Message message = messageFactory.createMessage("test", "source", DateTime.now(DateTimeZone.UTC));
+        // Some codecs might set this as an Integer rather than Long
+        message.addField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, 42);
+        final SerializationMemoizingMessage msg = new SerializationMemoizingMessage(message);
+
+        assertThat(msg.getInputMessageSize()).isEqualTo(42L);
+    }
+
+    @Test
     void serializeTwice(MessageFactory messageFactory) throws IOException {
         final Message wrappedMsg = spy(messageFactory.createMessage("test message", "test source",
                 DateTime.now(DateTimeZone.UTC)));

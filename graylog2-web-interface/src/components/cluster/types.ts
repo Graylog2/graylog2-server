@@ -20,5 +20,6 @@ export type Traffic = {
   to: string;
   output: Record<string, number>;
   input: Record<string, number>;
+  input_indexed?: Record<string, number>;
   decoded: Record<string, number>;
 };

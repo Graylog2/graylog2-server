@@ -252,7 +252,8 @@ public class Message implements Messages, Indexable, Acknowledgeable {
             FIELD_GL2_SOURCE_INPUT,
             FIELD_GL2_SOURCE_NODE,
             FIELD_GL2_SOURCE_RADIO,
-            FIELD_GL2_SOURCE_RADIO_INPUT
+            FIELD_GL2_SOURCE_RADIO_INPUT,
+            FIELD_GL2_FORWARDER_INPUT
     );
 
     // Graylog Illuminate Fields
