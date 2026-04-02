@@ -16,13 +16,12 @@
  */
 import { useCallback } from 'react';
 import { useMutation } from '@tanstack/react-query';
+import mapValues from 'lodash/mapValues';
 
 import { FavoriteFields } from '@graylog/server-api';
 
 import { StreamsActions } from 'views/stores/StreamsStore';
 import UserNotification from 'util/UserNotification';
-import type { Stream } from 'logic/streams/types';
-import { getStreamFavoriteFields } from 'components/common/message/helpers';
 import useSendFavoriteFieldTelemetry from 'components/common/message/details/fields/hooks/useSendFavoriteFieldTelemetry';
 
 interface FavoriteFieldRequest {
@@ -36,7 +35,10 @@ interface SetFavoriteFieldsRequest {
   };
 }
 
-const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavoriteFields: Array<string>) => {
+const useMessageFavoriteFieldsMutation = (
+  initialFavoriteFieldsByStream: Record<string, Array<string>>,
+  initialFavoriteFields: Array<string>,
+) => {
   const sendFavoriteFieldTelemetry = useSendFavoriteFieldTelemetry();
   const { isPending: setFieldsIsPending, mutate: setFavoriteFields } = useMutation({
     mutationFn: (props: SetFavoriteFieldsRequest) => FavoriteFields.set(props),
@@ -90,26 +92,19 @@ const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavorit
     (favoritesToSave: Array<string>) => {
       const newAddedFields = favoritesToSave.filter((f) => !initialFavoriteFields.includes(f));
 
-      const newFavoriteFieldsByStream = Object.fromEntries(
-        streams.map((stream) => [
-          stream.id,
-          favoritesToSave.filter((f) => {
-            const streamFavoriteFields = getStreamFavoriteFields(stream);
-
-            return streamFavoriteFields.includes(f) || newAddedFields.includes(f);
-          }),
-        ]),
+      const newFavoriteFieldsByStream = mapValues(initialFavoriteFieldsByStream, (streamFavoriteFields) =>
+        favoritesToSave.filter((f) => streamFavoriteFields.includes(f) || newAddedFields.includes(f)),
       );
 
       setFavoriteFields({ fields: newFavoriteFieldsByStream });
     },
-    [initialFavoriteFields, setFavoriteFields, streams],
+    [initialFavoriteFields, initialFavoriteFieldsByStream, setFavoriteFields],
   );
 
   const toggleField = useCallback(
     (field: string) => {
       const isFavorite = initialFavoriteFields?.includes(field);
-      const streamIds = streams.map((stream) => stream.id);
+      const streamIds = Object.keys(initialFavoriteFieldsByStream);
 
       if (isFavorite) {
         removeFavoriteField({ field, stream_ids: streamIds });
@@ -117,7 +112,7 @@ const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavorit
         addFavoriteField({ field, stream_ids: streamIds });
       }
     },
-    [addFavoriteField, initialFavoriteFields, removeFavoriteField, streams],
+    [addFavoriteField, initialFavoriteFields, initialFavoriteFieldsByStream, removeFavoriteField],
   );
 
   return {

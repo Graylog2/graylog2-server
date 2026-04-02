@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { Stream } from 'logic/streams/types';
+import type { Message } from 'views/components/messagelist/Types';
 
 export const DEFAULT_FIELDS = ['source', 'destination_ip', 'usernames'];
 
-export const getStreamFavoriteFields = (stream: Stream) => stream?.favorite_fields ?? DEFAULT_FIELDS;
+export const getStreamFavoriteFields = (stream: Stream, fields: Message['fields'] = {}) =>
+  stream?.favorite_fields ?? DEFAULT_FIELDS.filter((field) => Object.hasOwn(fields, field));

@@ -50,18 +50,28 @@ const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messa
     return messageStreamIds.map((id) => streamsById?.[id]).filter((s) => !!s);
   }, [message?.fields?.streams, permissions, streamsList]);
 
+  const initialFavoriteFieldsByStream = useMemo(
+    () => Object.fromEntries(streams.map((stream) => [stream.id, getStreamFavoriteFields(stream, message?.fields)])),
+    [message?.fields, streams],
+  );
+
   const initialFavoriteFields = useMemo(
-    () => uniq(flattenDeep(zip(streams.map((stream) => getStreamFavoriteFields(stream))))),
-    [streams],
+    () => uniq(flattenDeep(zip(Object.values(initialFavoriteFieldsByStream)))),
+    [initialFavoriteFieldsByStream],
   );
 
   const editableStreams = useMemo(
-    () => streams.filter((stream: Stream) => isPermitted(permissions, `streams:edit:${stream.id}`)),
+    () => streams.filter((stream) => isPermitted(permissions, `streams:edit:${stream.id}`)),
     [permissions, streams],
   );
 
+  const editableStreamsInitialFavoriteFields = useMemo(
+    () => Object.fromEntries(editableStreams.map(({ id }) => [id, initialFavoriteFieldsByStream[id]])),
+    [editableStreams, initialFavoriteFieldsByStream],
+  );
+
   const { saveFavoriteField, toggleField, setFieldsIsPending } = useMessageFavoriteFieldsMutation(
-    editableStreams,
+    editableStreamsInitialFavoriteFields,
     initialFavoriteFields,
   );
 
@@ -74,6 +84,7 @@ const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messa
       toggleField,
       editableStreams,
       setFieldsIsPending,
+      initialFavoriteFieldsByStream,
     }),
     [
       initialFavoriteFields,
@@ -81,8 +92,9 @@ const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messa
       messageFields,
       message,
       toggleField,
-      editableStreams,
       setFieldsIsPending,
+      initialFavoriteFieldsByStream,
+      editableStreams,
     ],
   );
 
