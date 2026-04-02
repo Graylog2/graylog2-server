@@ -42,7 +42,7 @@
         <mainClass>org.graylog.datanode.bootstrap.Main</mainClass>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <opensearch.version>2.19.4</opensearch.version>
+        <opensearch.version>2.19.5</opensearch.version>
         <opensearch.mac.jdk.version>21.0.7</opensearch.mac.jdk.version>
         <opensearch.mac.jdk.build>6</opensearch.mac.jdk.build>
 
