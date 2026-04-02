@@ -104,6 +104,8 @@ public class CollectorsModule extends PluginModule {
 
         // CA
         bind(CollectorCaService.class).in(Scopes.SINGLETON);
+        bind(CollectorCaKeyManager.class).in(Scopes.SINGLETON);
+        addInitializer(CollectorCaKeyManager.class);
 
         // Collectors config
         bind(CollectorsConfigService.class).asEagerSingleton();
