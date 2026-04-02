@@ -26,9 +26,11 @@ import io.opentelemetry.proto.collector.logs.v1.LogsServiceGrpc;
 import jakarta.inject.Inject;
 import org.graylog.inputs.otel.OTelJournalRecordFactory;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.shared.utilities.RecordSizeDistributingProcessor;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
 import org.graylog2.plugin.journal.RawMessage;
+import org.graylog2.shared.utilities.RecordSizeDistributingProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.util.function.Function;
@@ -37,6 +39,8 @@ import static org.graylog.inputs.grpc.GrpcUtils.createThrottledStatusRuntimeExce
 import static org.graylog.inputs.grpc.RemoteAddressProviderInterceptor.REMOTE_ADDRESS;
 
 public class OTelLogsService extends LogsServiceGrpc.LogsServiceImplBase {
+    private static final Logger LOG = LoggerFactory.getLogger(OTelLogsService.class);
+
     private final ThrottleableTransport2 transport;
     private final MessageInput input;
 
@@ -76,7 +80,8 @@ public class OTelLogsService extends LogsServiceGrpc.LogsServiceImplBase {
                 request.getSerializedSize(),
                 r -> r.getLog().getLogRecord().getSerializedSize(),
                 createRawMessage,
-                input);
+                input,
+                LOG);
 
         responseObserver.onNext(ExportLogsServiceResponse.newBuilder().build());
         responseObserver.onCompleted();

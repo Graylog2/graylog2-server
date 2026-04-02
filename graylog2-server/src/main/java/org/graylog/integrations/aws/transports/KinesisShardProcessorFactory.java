@@ -120,6 +120,11 @@ public class KinesisShardProcessorFactory implements ShardRecordProcessorFactory
                             .map(e -> (long) e.message().length())
                             .toList());
 
+                    if (LOG.isTraceEnabled()) {
+                        LOG.trace("Distributing total input size {} across {} records: {}",
+                                result.decompressedSize(), result.entries().size(), sizes);
+                    }
+
                     for (int i = 0; i < result.entries().size(); i++) {
                         final RawMessage raw = new RawMessage(objectMapper.writeValueAsBytes(result.entries().get(i)));
                         raw.setInputMessageSize(sizes.get(i));

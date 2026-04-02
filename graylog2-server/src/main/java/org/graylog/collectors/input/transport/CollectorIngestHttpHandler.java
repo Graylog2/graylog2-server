@@ -108,7 +108,8 @@ public class CollectorIngestHttpHandler extends SimpleChannelInboundHandler<Full
                     exportRequest.getSerializedSize(),
                     r -> r.getOtelRecord().getLog().getLogRecord().getSerializedSize(),
                     createRawMessage,
-                    input);
+                    input,
+                    LOG);
         } catch (Exception e) {
             LOG.error("Failed to process OTLP request", e);
             sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR, keepAlive, isProtobuf);

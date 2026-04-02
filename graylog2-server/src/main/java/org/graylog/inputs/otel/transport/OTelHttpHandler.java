@@ -140,7 +140,8 @@ public class OTelHttpHandler extends HttpHandler {
                 exportRequest.getSerializedSize(),
                 r -> r.getLog().getLogRecord().getSerializedSize(),
                 createRawMessage,
-                input);
+                input,
+                LOG);
     }
 
     /**

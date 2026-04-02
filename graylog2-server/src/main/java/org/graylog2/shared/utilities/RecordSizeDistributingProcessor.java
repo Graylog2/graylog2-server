@@ -19,6 +19,7 @@ package org.graylog2.shared.utilities;
 import com.google.protobuf.MessageLite;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.journal.RawMessage;
+import org.slf4j.Logger;
 
 import java.util.List;
 import java.util.function.Function;
@@ -41,16 +42,22 @@ public final class RecordSizeDistributingProcessor {
      * @param weightExtractor  extracts the weight (e.g. LogRecord serialized size) from each record
      * @param createRawMessage factory to create a RawMessage from serialized bytes
      * @param input            the message input to submit messages to
+     * @param log              logger from the calling class for trace-level size distribution logging
      */
     public static <T extends MessageLite> void processRecords(List<T> records,
                                                                long totalRequestSize,
                                                                ToLongFunction<T> weightExtractor,
                                                                Function<byte[], RawMessage> createRawMessage,
-                                                               MessageInput input) {
+                                                               MessageInput input,
+                                                               Logger log) {
         final List<Long> weights = records.stream()
                 .map(weightExtractor::applyAsLong)
                 .toList();
         final List<Long> sizes = distribute(totalRequestSize, weights);
+
+        if (log.isTraceEnabled()) {
+            log.trace("Distributing total input size {} across {} records: {}", totalRequestSize, records.size(), sizes);
+        }
 
         for (int i = 0; i < records.size(); i++) {
             final RawMessage raw = createRawMessage.apply(records.get(i).toByteArray());
