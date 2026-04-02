@@ -26,6 +26,7 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.periodical.Periodical;
+import org.graylog2.shared.ServerVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +66,7 @@ public class NodePingThread extends Periodical {
                 .setHostname(Tools.getLocalCanonicalHostname())
                 .setProcessing(isProcessing)
                 .setLifecycle(lifecycle)
+                .setVersion(ServerVersion.VERSION.toString())
                 .build();
         nodeService.ping(dto);
     }

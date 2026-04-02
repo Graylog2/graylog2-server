@@ -26,6 +26,7 @@ import org.graylog.events.search.MoreSearch;
 import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.NumberRange;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
@@ -33,12 +34,16 @@ import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.ToXContent;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.ParsedMultiBucketAggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.LongBounds;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.ParsedDateHistogram;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.range.ParsedRange;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.range.RangeAggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.ParsedTerms;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.sort.FieldSortBuilder;
@@ -49,10 +54,10 @@ import org.graylog2.indexer.results.ResultChunk;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.indexer.searches.Sorting;
-import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.rest.resources.entities.Slice;
 import org.graylog2.search.QueryStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,6 +88,7 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
     public static final IndicesOptions INDICES_OPTIONS = IndicesOptions.LENIENT_EXPAND_OPEN;
     private static final String termsAggregationName = "alert_type";
     private static final String histogramAggregationName = "histogram";
+    private static final String slicesAggregationName = "slices";
 
     private final OpenSearchClient client;
     private final Boolean allowLeadingWildcard;
@@ -215,12 +221,21 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
                 .filter(termsQuery(EventDto.FIELD_STREAMS, eventStreams))
                 .filter(requireNonNull(TimeRangeQueryFactory.create(timerange)));
 
-        extraFilters.entrySet()
-                .stream()
-                .flatMap(extraFilter -> extraFilter.getValue()
-                        .stream()
-                        .map(value -> buildExtraFilter(extraFilter.getKey(), value)))
-                .forEach(filter::filter);
+        extraFilters.forEach((field, values) -> {
+            values.stream()
+                    .filter(MoreSearchAdapter::isRangeValue)
+                    .map(value -> buildExtraFilter(field, value))
+                    .forEach(filter::filter);
+            final var termQueries = values.stream()
+                    .filter(v -> !MoreSearchAdapter.isRangeValue(v))
+                    .map(value -> buildExtraFilter(field, value))
+                    .toList();
+            if (!termQueries.isEmpty()) {
+                final BoolQueryBuilder shouldQuery = boolQuery().minimumShouldMatch(1);
+                termQueries.forEach(shouldQuery::should);
+                filter.filter(shouldQuery);
+            }
+        });
 
         if (!isNullOrEmpty(filterString)) {
             filter.filter(queryStringQuery(filterString));
@@ -267,6 +282,65 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
                     return sortBuilder.order(order);
                 })
                 .toList();
+    }
+
+    private List<Slice> aggregateSlices(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                        Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
+                                        Map<String, Set<String>> extraFilters, Map<String, Object> meta, AggregationBuilder aggregation) {
+
+        final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
+
+        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
+                .query(filter)
+                .aggregation(aggregation)
+                .size(0);
+
+        final Set<String> indices = affectedIndices.isEmpty() ? Collections.singleton("") : affectedIndices;
+        final SearchRequest searchRequest = new SearchRequest(indices.toArray(new String[0]))
+                .source(searchSourceBuilder)
+                .indicesOptions(INDICES_OPTIONS);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Query:\n{}", searchSourceBuilder.toString(new ToXContent.MapParams(Collections.singletonMap("pretty", "true"))));
+            LOG.debug("Execute range aggregation: {}", searchRequest);
+        }
+
+        final SearchResponse searchResult = client.search(searchRequest, "Unable to perform range slice aggregation query");
+        final ParsedMultiBucketAggregation<MultiBucketsAggregation.Bucket> rangeResult = searchResult.getAggregations().get(slicesAggregationName);
+
+        return rangeResult.getBuckets().stream().map(e -> new Slice(e.getKeyAsString(), null, Math.toIntExact(e.getDocCount()), meta)).toList();
+    }
+
+    @Override
+    public List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                             Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
+                                             Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, int maxBuckets) {
+        AggregationBuilder builder = AggregationBuilders.terms(slicesAggregationName)
+                        .field(slicingColumn)
+                        .size(maxBuckets);
+
+        return aggregateSlices(queryString, timerange, affectedIndices, eventStreams, filterString, forbiddenSourceStreams, extraFilters, meta, builder);
+    }
+
+    @Override
+    public List<Slice> aggregateSlicesForRangeQuery(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                            Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
+                                            Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, List<NumberRange> ranges) {
+
+        final RangeAggregationBuilder builder = AggregationBuilders.range(slicesAggregationName).field(slicingColumn);
+        ranges.forEach(r -> {
+            final Double from = r.from();
+            final Double to = r.to();
+            if (from != null && to != null) {
+                builder.addRange(from, to);
+            } else if (to != null) {
+                builder.addUnboundedTo(to);
+            } else if (from != null) {
+                builder.addUnboundedFrom(from);
+            }
+        });
+
+        return aggregateSlices(queryString, timerange, affectedIndices, eventStreams, filterString, forbiddenSourceStreams, extraFilters, meta, builder);
     }
 
     @Override

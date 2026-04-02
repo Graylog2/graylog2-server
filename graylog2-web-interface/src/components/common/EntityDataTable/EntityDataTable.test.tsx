@@ -164,6 +164,19 @@ describe('<EntityDataTable />', () => {
     await screen.findByText('Custom actions for Entity title');
   });
 
+  it('should render row override content and keep row actions', async () => {
+    render(
+      <EntityDataTable<{ id: string; title: string }>
+        {...defaultProps}
+        entityActions={(entity) => `Custom actions for ${entity.title}`}
+        rowOverride={(entity) => `Override for ${entity.title}`}
+      />,
+    );
+
+    await screen.findByText('Override for Entity title');
+    await screen.findByText('Custom actions for Entity title');
+  });
+
   it('keeps the trailing actions column even without row actions', async () => {
     render(<EntityDataTable {...defaultProps} />);
 

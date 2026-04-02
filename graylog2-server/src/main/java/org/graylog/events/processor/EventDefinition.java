@@ -30,7 +30,21 @@ import org.joda.time.DateTime;
 import javax.annotation.Nullable;
 import java.util.Set;
 
-@DbEntity(readPermission = RestPermissions.EVENT_DEFINITIONS_READ, collection = DBEventDefinitionService.COLLECTION_NAME)
+import static org.graylog.events.processor.EventDefinitionDto.FIELD_ALERT;
+import static org.graylog.events.processor.EventDefinitionDto.FIELD_DESCRIPTION;
+import static org.graylog.events.processor.EventDefinitionDto.FIELD_MATCHED_AT;
+import static org.graylog.events.processor.EventDefinitionDto.FIELD_PRIORITY;
+import static org.graylog.events.processor.EventDefinitionDto.FIELD_STATE;
+import static org.graylog.events.processor.EventDefinitionDto.FIELD_TITLE;
+import static org.graylog.events.processor.EventDefinitionDto.FIELD_UPDATED_AT;
+import static org.graylog2.database.MongoEntity.FIELD_ID;
+import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
+
+@DbEntity(readPermission = RestPermissions.EVENT_DEFINITIONS_READ,
+          collection = DBEventDefinitionService.COLLECTION_NAME,
+          readableFields = {ID_FIELD, FIELD_ID, FIELD_TITLE, FIELD_DESCRIPTION, FIELD_UPDATED_AT, FIELD_MATCHED_AT,
+                  FIELD_PRIORITY, FIELD_ALERT, FIELD_STATE
+          })
 public interface EventDefinition {
     enum State {
         ENABLED,

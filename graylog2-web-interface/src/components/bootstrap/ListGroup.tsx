@@ -22,11 +22,12 @@ type Props = React.PropsWithChildren<{
   className?: string;
   componentClass?: React.ElementType | undefined;
   bsClass?: React.ComponentProps<typeof BootstrapListGroup>['bsClass'];
+  role?: 'list';
   style?: React.ComponentProps<typeof BootstrapListGroup>['style'];
 }>;
 
-const ListGroup = ({ className = undefined, children = undefined, ...props }: Props) => (
-  <BootstrapListGroup bsClass={className} {...props}>
+const ListGroup = ({ className = undefined, children = undefined, role = undefined, ...props }: Props) => (
+  <BootstrapListGroup bsClass={className} role={role} {...props}>
     {children}
   </BootstrapListGroup>
 );

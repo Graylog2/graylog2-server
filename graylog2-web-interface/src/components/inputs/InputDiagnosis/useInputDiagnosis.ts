@@ -18,10 +18,10 @@ import { useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { useStore } from 'stores/connect';
-import InputStatesStore from 'stores/inputs/InputStatesStore';
 import { InputsStore, InputsActions } from 'stores/inputs/InputsStore';
 import { useMetrics } from 'hooks/useMetrics';
-import type { InputStateByNode, InputStates, InputState } from 'stores/inputs/InputStatesStore';
+import useInputsStates from 'hooks/useInputsStates';
+import type { InputStateByNode, InputState } from 'hooks/useInputsStates';
 import type { Input } from 'components/messageloaders/Types';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -117,7 +117,7 @@ const useInputDiagnosis = (
     refetchInterval: 5000,
   });
 
-  const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
+  const { data: inputStates } = useInputsStates();
   const inputStateByNode = inputStates ? inputStates[inputId] || {} : ({} as InputStateByNode);
   const inputNodeStates = { total: Object.keys(inputStateByNode).length, states: {} };
 
