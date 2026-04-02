@@ -122,7 +122,7 @@ public class KinesisShardProcessorFactory implements ShardRecordProcessorFactory
 
                     for (int i = 0; i < result.entries().size(); i++) {
                         final RawMessage raw = new RawMessage(objectMapper.writeValueAsBytes(result.entries().get(i)));
-                        raw.setInputMessageSize(sizes.get(i).intValue());
+                        raw.setInputMessageSize(sizes.get(i));
                         handleMessageCallback.accept(raw);
                     }
                 } catch (Exception e) {

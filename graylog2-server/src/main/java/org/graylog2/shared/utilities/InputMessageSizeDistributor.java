@@ -52,6 +52,7 @@ public final class InputMessageSizeDistributor {
             if (i == count - 1) {
                 size = totalSize - assignedSize;
             } else if (totalWeight > 0) {
+                // Can overflow if totalSize * weight exceeds Long.MAX_VALUE (~9.2 EB), not a real-world concern
                 size = totalSize * weights.get(i) / totalWeight;
             } else {
                 size = totalSize / count;

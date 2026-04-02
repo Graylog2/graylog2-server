@@ -24,19 +24,17 @@ import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse;
 import io.opentelemetry.proto.collector.logs.v1.LogsServiceGrpc;
 import jakarta.inject.Inject;
-import org.graylog.inputs.otel.OTelJournal;
 import org.graylog.inputs.otel.OTelJournalRecordFactory;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.shared.utilities.RecordSizeDistributingProcessor;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
 import org.graylog2.plugin.journal.RawMessage;
 
 import java.net.InetSocketAddress;
-import java.util.List;
 import java.util.function.Function;
 
 import static org.graylog.inputs.grpc.GrpcUtils.createThrottledStatusRuntimeException;
 import static org.graylog.inputs.grpc.RemoteAddressProviderInterceptor.REMOTE_ADDRESS;
-import static org.graylog2.shared.utilities.InputMessageSizeDistributor.distribute;
 
 public class OTelLogsService extends LogsServiceGrpc.LogsServiceImplBase {
     private final ThrottleableTransport2 transport;
@@ -73,17 +71,12 @@ public class OTelLogsService extends LogsServiceGrpc.LogsServiceImplBase {
             createRawMessage = RawMessage::new;
         }
 
-        final List<OTelJournal.Record> journalRecords = OTelJournalRecordFactory.createFromRequest(request);
-        final List<Long> weights = journalRecords.stream()
-                .map(r -> (long) r.getLog().getLogRecord().getSerializedSize())
-                .toList();
-        final List<Long> sizes = distribute(request.getSerializedSize(), weights);
-
-        for (int i = 0; i < journalRecords.size(); i++) {
-            final RawMessage raw = createRawMessage.apply(journalRecords.get(i).toByteArray());
-            raw.setInputMessageSize(sizes.get(i).intValue());
-            input.processRawMessage(raw);
-        }
+        RecordSizeDistributingProcessor.processRecords(
+                OTelJournalRecordFactory.createFromRequest(request),
+                request.getSerializedSize(),
+                r -> r.getLog().getLogRecord().getSerializedSize(),
+                createRawMessage,
+                input);
 
         responseObserver.onNext(ExportLogsServiceResponse.newBuilder().build());
         responseObserver.onCompleted();

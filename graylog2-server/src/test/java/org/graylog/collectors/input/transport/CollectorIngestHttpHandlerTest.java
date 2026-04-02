@@ -232,6 +232,34 @@ class CollectorIngestHttpHandlerTest {
         response.release();
     }
 
+    @Test
+    void inputMessageSizeIsDistributedProportionally() {
+        final EmbeddedChannel channel = createChannel("test-uid");
+        final ExportLogsServiceRequest request = ExportLogsServiceRequest.newBuilder()
+                .addResourceLogs(ResourceLogs.newBuilder()
+                        .addScopeLogs(ScopeLogs.newBuilder()
+                                .addLogRecords(LogRecord.newBuilder()
+                                        .setBody(AnyValue.newBuilder().setStringValue("log message one")))
+                                .addLogRecords(LogRecord.newBuilder()
+                                        .setBody(AnyValue.newBuilder().setStringValue("log message two")))))
+                .build();
+
+        final FullHttpRequest httpRequest = createProtobufRequest("/v1/logs", request.toByteArray());
+        channel.writeInbound(httpRequest);
+
+        final ArgumentCaptor<RawMessage> captor = ArgumentCaptor.forClass(RawMessage.class);
+        verify(input, times(2)).processRawMessage(captor.capture());
+
+        // Equal log record sizes → each gets half the request size
+        final int expectedPerMessage = request.getSerializedSize() / 2;
+        assertThat(captor.getAllValues().get(0).getInputMessageSize()).isEqualTo(expectedPerMessage);
+        assertThat(captor.getAllValues().get(1).getInputMessageSize())
+                .isEqualTo(request.getSerializedSize() - expectedPerMessage);
+
+        final FullHttpResponse response = channel.readOutbound();
+        response.release();
+    }
+
     private EmbeddedChannel createChannel(String agentInstanceUid) {
         final EmbeddedChannel channel = new EmbeddedChannel(
                 new CollectorIngestHttpHandler(input));
