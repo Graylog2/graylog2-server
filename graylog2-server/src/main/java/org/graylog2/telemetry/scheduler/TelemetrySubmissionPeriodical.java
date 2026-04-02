@@ -25,9 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import java.util.AbstractMap;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class TelemetrySubmissionPeriodical extends Periodical {
 
@@ -48,23 +47,24 @@ public class TelemetrySubmissionPeriodical extends Periodical {
 
     @Override
     public void doRun() {
-        final var telemetryMetrics = metricsProviders.entrySet()
-                .stream()
-                .map(entry -> entry(entry.getKey(), entry.getValue().get()))
-                .flatMap(entry -> entry.getValue().map(metrics -> entry(entry.getKey(), metrics)).stream())
-                .filter(e -> !e.getValue().metrics().isEmpty())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        final Map<String, TelemetryEvent> telemetryMetrics = new HashMap<>();
+        for (final var entry : metricsProviders.entrySet()) {
+            try {
+                entry.getValue().get()
+                        .filter(event -> !event.metrics().isEmpty())
+                        .ifPresent(event -> telemetryMetrics.put(entry.getKey(), event));
+            } catch (Exception e) {
+                LOG.debug("Error collecting telemetry metrics from [{}], skipping.", entry.getKey(), e);
+            }
+        }
         try {
             if (!telemetryMetrics.isEmpty()) {
                 telemetryClient.capture(telemetryMetrics);
+                LOG.info("Telemetry submitted, {}", telemetryMetrics);
             }
         } catch (Exception e) {
             LOG.warn("Error while submitting telemetry: ", e);
         }
-    }
-
-    private <K, V> Map.Entry<K, V> entry(K key, V value) {
-        return new AbstractMap.SimpleEntry<>(key, value);
     }
 
     @Override
@@ -89,12 +89,14 @@ public class TelemetrySubmissionPeriodical extends Periodical {
 
     @Override
     public int getInitialDelaySeconds() {
-        return Math.toIntExact(runPeriod.toSeconds());
+        return 30;
+//        return Math.toIntExact(runPeriod.toSeconds());
     }
 
     @Override
     public int getPeriodSeconds() {
-        return Math.toIntExact(runPeriod.toSeconds());
+        return 60;
+//        return Math.toIntExact(runPeriod.toSeconds());
     }
 
     @Nonnull

@@ -139,5 +139,7 @@ public class CollectorsModule extends PluginModule {
                 IndexTemplateProvider.class);
         indexTemplateProviderBinder.addBinding(CollectorLogsIndexTemplateProvider.COLLECTOR_LOGS_TEMPLATE_TYPE)
                 .to(CollectorLogsIndexTemplateProvider.class);
+
+        addTelemetryMetricProvider("Collector Metrics", CollectorMetricsSupplier.class);
     }
 }
