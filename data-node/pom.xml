@@ -554,7 +554,7 @@
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-x64.tar.gz
                             </url>
                             <sha512>
-                                360f865a9e5f71f425e315c4d5e0a0b32a94debe461472210648edd7fb153211c89322597eb91e202fa360e1d79f5ef38ce35dc2c839f92654003d357a26afb4
+                                5594746235bc1321e8bfdccb23375c6b7f10b4cd5145bca6ff275abef4cc2a954b4381955f8dca66c0804446bbf58eaf812b2ac16e123d79f0bd6f4a976edfa6
                             </sha512>
                             <outputFileName>opensearch-${opensearch.version}-linux-x64.tar.gz</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
@@ -578,7 +578,7 @@
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-arm64.tar.gz
                             </url>
                             <sha512>
-                                8b000d75befa6eac73da6bccbd3b5f5f14448caf8a66585d8d5bf2b49f46b268e6388be12ae21b75372e23afe60bd5160366704f646c530cdf783bce7d697c40
+                                1b8263e3c1a3a6d49305e1cce3dc1f4841135c299efddb192eabc839a7943cc584d2241cc85390644572d5481cf938e8ba0602224e8367f0b28aabc9c43bef26
                             </sha512>
                             <outputFileName>opensearch-${opensearch.version}-linux-aarch64.tar.gz</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
@@ -604,7 +604,7 @@
                             <outputFileName>repository-s3-${opensearch.version}.zip</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
                             <sha512>
-                                012f350310101913cb0358495e05e506b0ddef4b43d7f8c149d7c1643142ac2b9baa612b0e31e82f2bdd98379ffa14df8039ba894e5443faa278c1a7df00dcc8
+                                8b41bc034043bde9e0b9b606c67d6bbf12f5d227f78ad8d8ff05328305ca63907c9c480df888fc5d619f8f7e203a8be9d42e2ce019a0c81bf445f5c454f01902
                             </sha512>
                         </configuration>
                     </execution>
@@ -621,7 +621,7 @@
                             <outputFileName>repository-gcs-${opensearch.version}.zip</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
                             <sha512>
-                                658c5726d5f8ef23d814db5f5fe101b87a1ebfbf10f869599ad2d350dc2bb91afa5e6002300032f671d4b6827a7e7ffb58b43f004e8953f74db70cde7be610d7
+                                22647de144d64b6b9118c4abd92face19523729fdbe83c9299a771c6346e11752b80795e40722d6cdd5c91c3c22e3c84fcd927dbb83f9fcbd707b2c6444c83b2
                             </sha512>
                         </configuration>
                     </execution>
@@ -638,7 +638,7 @@
                             <outputFileName>repository-hdfs-${opensearch.version}.zip</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
                             <sha512>
-                                3550e9d2477cc9222dd834e4671636d76a50b8f54664a10f54e0be93b7a923d2b47564eb78c58e0291fb7653e1806afb62300918c7fd6cd29f4655ce0f2a2164
+                                078ad5529ba6f49651b1ccf314878694ea9c95daac534cce5b11bdc32f1ace6b952347e27da73f11458c80e2583528338bdb1467102b4456a832e33aff564d15
                             </sha512>
                         </configuration>
                     </execution>
@@ -655,7 +655,7 @@
                             <outputFileName>repository-azure-${opensearch.version}.zip</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
                             <sha512>
-                                2b1661e061bc892aee54748a857d1c1d3a3269eb11a8ac789f3913ea067a70ea9cd9d24cd48f9dc344850dcac807775f66709104c1edf4804713d18d6e49f6d0
+                                6ebdcbff6c8abef43730f6f5d60c1e0c2b7e3afa09b6832c30ce60e0da4502786132eed9b3207430d951e65abd226cb9cb9bbe49f434f8e3aa118fe58f601c43
                             </sha512>
                         </configuration>
                     </execution>
