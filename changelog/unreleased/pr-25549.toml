@@ -1,0 +1,4 @@
+type = "c"
+message = "Upgrade data node's bundled OpenSearch to 2.19.5."
+
+pulls = ["25549"]
