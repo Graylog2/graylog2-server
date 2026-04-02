@@ -99,6 +99,7 @@ public class ClusterResource extends RestResource {
             EntityAttribute.builder().id("hostname").title("Node").searchable(true).sortable(true).build(),
             EntityAttribute.builder().id("node_id").title("Node ID").searchable(true).sortable(true).type(SearchQueryField.Type.STRING).build(),
             EntityAttribute.builder().id("short_node_id").title("Short node ID").sortable(true).build(),
+            EntityAttribute.builder().id(ServerNodeDto.FIELD_VERSION).title("Version").sortable(true).type(SearchQueryField.Type.STRING).build(),
             EntityAttribute.builder().id(ServerNodeDto.FIELD_LOAD_BALANCER_STATUS).title("Load balancer").sortable(true).filterable(true).filterOptions(loadBalancerOptions()).build(),
             EntityAttribute.builder().id(ServerNodeDto.FIELD_LIFECYCLE).title("Status").sortable(true).filterable(true).filterOptions(lifecycleOptions()).build(),
             EntityAttribute.builder().id(ServerNodeDto.FIELD_IS_PROCESSING).title("Processing").sortable(true).filterable(true).build()
@@ -155,7 +156,7 @@ public class ClusterResource extends RestResource {
                                                  @Parameter(name = "sort",
                                                            description = "The field to sort the result on",
                                                            required = true,
-                                                           schema = @Schema(allowableValues = {"hostname", "node_id", "short_node_id", "transport_address"}))
+                                                           schema = @Schema(allowableValues = {"hostname", "node_id", "short_node_id", "transport_address", "version"}))
                                                  @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
                                                  @Parameter(name = "order", description = "The sort direction",
                                                            schema = @Schema(allowableValues = {"asc", "desc"}))
