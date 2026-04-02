@@ -34,6 +34,7 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.models.SortOrder;
+import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -94,7 +95,29 @@ class ClusterResourceIT {
                 .containsExactly("my-hostname");
     }
 
-    private static NodeDto node(String hostname, boolean leader, String nodeID) {
+    @Test
+    void testPaginatedNodesIncludesVersionAttribute() {
+        Assertions.assertThat(clusterResource.nodes(1, 10, "", "hostname", SortOrder.ASCENDING).attributes())
+                .extracting(EntityAttribute::id)
+                .contains(ServerNodeDto.FIELD_VERSION);
+    }
+
+    @Test
+    void testPaginatedNodesWithVersionSorting() {
+        Assertions.assertThat(clusterResource.nodes(1, 10, "", ServerNodeDto.FIELD_VERSION, SortOrder.DESCENDING).elements())
+                .hasSize(3)
+                .extracting(ServerNodeDto::getVersion)
+                .containsExactly("6.3.0", "6.2.0", "6.1.0");
+    }
+
+    private static ServerNodeDto node(String hostname, boolean leader, String nodeID) {
+        final String version = switch (hostname) {
+            case "aaa-hostname" -> "6.1.0";
+            case "my-hostname" -> "6.2.0";
+            case "zzz-hostname" -> "6.3.0";
+            default -> "6.0.0";
+        };
+
         return ServerNodeDto.Builder.builder()
                 .setHostname(hostname)
                 .setId(nodeID)
@@ -102,6 +125,7 @@ class ClusterResourceIT {
                 .setTransportAddress("http://" + hostname + ":8999")
                 .setProcessing(true)
                 .setLifecycle(Lifecycle.RUNNING)
+                .setVersion(version)
                 .build();
     }
 

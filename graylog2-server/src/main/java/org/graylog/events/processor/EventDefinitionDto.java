@@ -71,8 +71,8 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
     public static final String FIELD_UPDATED_AT = "updated_at";
     public static final String FIELD_MATCHED_AT = "matched_at";
     public static final String FIELD_EVENT_SUMMARY_TEMPLATE = "event_summary_template";
-    private static final String FIELD_PRIORITY = "priority";
-    private static final String FIELD_ALERT = "alert";
+    public static final String FIELD_PRIORITY = "priority";
+    public static final String FIELD_ALERT = "alert";
     public static final String FIELD_CONFIG = "config";
     private static final String FIELD_FIELD_SPEC = "field_spec";
     private static final String FIELD_KEY_SPEC = "key_spec";

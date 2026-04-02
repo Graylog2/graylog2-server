@@ -106,7 +106,7 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(
     &.disabled,
     &.disabled:hover,
     &.disabled:focus {
-      color: ${theme.colors.variant.default};
+      color: ${theme.colors.text.disabled};
       background-color: ${theme.colors.variant.lightest.default};
 
       .list-group-item-heading {
@@ -152,10 +152,14 @@ type Props = React.PropsWithChildren<{
   href?: string;
   onClick?: () => void;
   onKeyDown?: React.ComponentProps<typeof StyledListGroupItem>['onKeyDown'];
+  role?: 'listitem';
 }>;
 
-const ListGroupItem = ({ containerProps = {}, ...rest }: Props, ref: React.ForwardedRef<HTMLElement>) => (
-  <RefContainer ref={ref} {...containerProps}>
+const ListGroupItem = (
+  { containerProps = {}, role = undefined, ...rest }: Props,
+  ref: React.ForwardedRef<HTMLElement>,
+) => (
+  <RefContainer ref={ref} role={role} {...containerProps}>
     <StyledListGroupItem {...rest} />
   </RefContainer>
 );
