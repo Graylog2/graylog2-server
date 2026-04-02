@@ -125,7 +125,6 @@ public class FleetService {
                     .updatedAt(Instant.now())
                     .build();
             collection.replaceOne(idEq(fleetId), updated);
-            txnLogService.appendFleetMarker(fleetId, MarkerType.CONFIG_CHANGED);
             return updated;
         });
     }
