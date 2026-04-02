@@ -20,24 +20,25 @@ import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.util.ThreadContext;
 import org.graylog.collectors.CollectorCaService;
-import org.graylog.collectors.CollectorInputService;
+import org.graylog.collectors.CollectorIngestInputService;
 import org.graylog.collectors.CollectorLogsDestinationService;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
+import org.graylog.collectors.CollectorsPermissions;
 import org.graylog.collectors.FleetService;
 import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.TokenSigningKey;
 import org.graylog.collectors.db.MarkerType;
-import org.graylog.collectors.input.CollectorIngestHttpInput;
 import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.validators.ValidationResult;
+import org.graylog2.security.WithAuthorization;
+import org.graylog2.security.WithAuthorizationExtension;
 import org.graylog2.security.encryption.EncryptedValue;
-import org.junit.jupiter.api.AfterEach;
+import org.graylog2.shared.security.RestPermissions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,21 +55,22 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(WithAuthorizationExtension.class)
+@WithAuthorization(username = "admin", permissions = "*")
 class CollectorsConfigResourceTest {
 
     @Mock
     private CollectorsConfigService collectorsConfigService;
     @Mock
-    private CollectorInputService collectorInputService;
+    private CollectorIngestInputService collectorIngestInputService;
     @Mock
     private CollectorLogsDestinationService collectorLogsDestinationService;
     @Mock
@@ -91,7 +93,7 @@ class CollectorsConfigResourceTest {
         when(httpConfiguration.getHttpExternalUri()).thenReturn(URI.create("https://graylog.example.com:443/"));
         resource = new CollectorsConfigResource(
                 collectorsConfigService,
-                collectorInputService,
+                collectorIngestInputService,
                 collectorLogsDestinationService,
                 httpConfiguration,
                 fleetService,
@@ -99,15 +101,6 @@ class CollectorsConfigResourceTest {
                 enrollmentTokenService,
                 collectorCaService
         );
-
-        final var subject = mock(Subject.class);
-        lenient().when(subject.getPrincipal()).thenReturn("admin");
-        ThreadContext.bind(subject);
-    }
-
-    @AfterEach
-    void tearDown() {
-        ThreadContext.unbindSubject();
     }
 
     @Test
@@ -127,10 +120,8 @@ class CollectorsConfigResourceTest {
 
         final var result = resource.get(requestContext);
 
-        assertThat(result.http().enabled()).isTrue();
         assertThat(result.http().hostname()).isEqualTo("graylog.example.com");
         assertThat(result.http().port()).isEqualTo(14401);
-        assertThat(result.http().inputId()).isNull();
         assertThat(result.collectorOfflineThreshold()).isEqualTo(CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD);
         assertThat(result.collectorDefaultVisibilityThreshold()).isEqualTo(CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD);
         assertThat(result.collectorExpirationThreshold()).isEqualTo(CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD);
@@ -141,8 +132,8 @@ class CollectorsConfigResourceTest {
         stubCaService();
 
         final var request = new CollectorsConfigRequest(
-                new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14401),
-                null, null, null
+                new CollectorsConfigRequest.IngestEndpointRequest("host", 14401),
+                null, null, null, null
         );
 
         resource.put(request);
@@ -152,28 +143,12 @@ class CollectorsConfigResourceTest {
     }
 
     @Test
-    void putDelegatesInputReconciliation() throws ValidationException {
-        stubCaService();
-        when(collectorInputService.reconcile(any(), isNull(), eq(CollectorIngestHttpInput.class.getCanonicalName()),
-                eq(CollectorIngestHttpInput.NAME), anyString())).thenReturn("new-input-id");
-
-        final var request = new CollectorsConfigRequest(
-                new CollectorsConfigRequest.IngestEndpointRequest(true, "host", 14401),
-                null, null, null
-        );
-
-        final var result = resource.put(request);
-
-        assertThat(result.http().inputId()).isEqualTo("new-input-id");
-    }
-
-    @Test
     void putPersistsConfig() throws ValidationException {
         stubCaService();
 
         final var request = new CollectorsConfigRequest(
-                new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14401),
-                null, null, null
+                new CollectorsConfigRequest.IngestEndpointRequest("host", 14401),
+                null, null, null, null
         );
 
         final var fleetIds = Set.of("fleet-1", "fleet-2");
@@ -188,8 +163,8 @@ class CollectorsConfigResourceTest {
     @Test
     void putRejectsZeroVisibilityThreshold() {
         final var request = new CollectorsConfigRequest(
-                new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14401),
-                null, Duration.ZERO, null
+                new CollectorsConfigRequest.IngestEndpointRequest("host", 14401),
+                null, Duration.ZERO, null, null
         );
 
         assertThatThrownBy(() -> resource.put(request))
@@ -205,8 +180,8 @@ class CollectorsConfigResourceTest {
     @Test
     void putRejectsVisibilityThresholdBelowOfflineThreshold() {
         final var request = new CollectorsConfigRequest(
-                new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14401),
-                null, Duration.ofMinutes(3), null
+                new CollectorsConfigRequest.IngestEndpointRequest("host", 14401),
+                null, Duration.ofMinutes(3), null, null
         );
 
         assertThatThrownBy(() -> resource.put(request))
@@ -222,8 +197,8 @@ class CollectorsConfigResourceTest {
     @Test
     void putRejectsExpirationNotGreaterThanVisibility() {
         final var request = new CollectorsConfigRequest(
-                new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14401),
-                null, Duration.ofDays(2), Duration.ofDays(1)
+                new CollectorsConfigRequest.IngestEndpointRequest("host", 14401),
+                null, Duration.ofDays(2), Duration.ofDays(1), null
         );
 
         assertThatThrownBy(() -> resource.put(request))
@@ -239,8 +214,8 @@ class CollectorsConfigResourceTest {
     @Test
     void putRejectsMultipleInvalidThresholds() {
         final var request = new CollectorsConfigRequest(
-                new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14401),
-                null, Duration.ofMinutes(-5), Duration.ofMinutes(-10)
+                new CollectorsConfigRequest.IngestEndpointRequest("host", 14401),
+                null, Duration.ofMinutes(-5), Duration.ofMinutes(-10), null
         );
 
         assertThatThrownBy(() -> resource.put(request))
@@ -257,8 +232,8 @@ class CollectorsConfigResourceTest {
         stubCaService();
 
         final var request = new CollectorsConfigRequest(
-                new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14401),
-                Duration.ofMinutes(10), Duration.ofHours(12), Duration.ofDays(3)
+                new CollectorsConfigRequest.IngestEndpointRequest("host", 14401),
+                Duration.ofMinutes(10), Duration.ofHours(12), Duration.ofDays(3), null
         );
 
         final var result = resource.put(request);
@@ -273,8 +248,8 @@ class CollectorsConfigResourceTest {
         stubCaService();
 
         final var request = new CollectorsConfigRequest(
-                new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14401),
-                null, null, null
+                new CollectorsConfigRequest.IngestEndpointRequest("host", 14401),
+                null, null, null, null
         );
 
         final var result = resource.put(request);
@@ -287,8 +262,8 @@ class CollectorsConfigResourceTest {
     @Test
     void putRejectsOfflineThresholdBelowOneMinute() {
         final var request = new CollectorsConfigRequest(
-                new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14401),
-                Duration.ofSeconds(30), null, null
+                new CollectorsConfigRequest.IngestEndpointRequest("host", 14401),
+                Duration.ofSeconds(30), null, null, null
         );
 
         assertThatThrownBy(() -> resource.put(request))
@@ -306,8 +281,8 @@ class CollectorsConfigResourceTest {
         stubCaService();
 
         final var request = new CollectorsConfigRequest(
-                new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14401),
-                null, null, null
+                new CollectorsConfigRequest.IngestEndpointRequest("host", 14401),
+                null, null, null, null
         );
 
         final var result = resource.put(request);
@@ -323,7 +298,7 @@ class CollectorsConfigResourceTest {
                 .caCertId("ca-id")
                 .otlpServerCertId("otlp-id")
                 .tokenSigningKey(existingKey)
-                .http(new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14401).toConfig(null))
+                .http(new CollectorsConfigRequest.IngestEndpointRequest("host", 14401).toConfig())
                 .collectorOfflineThreshold(CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD)
                 .collectorDefaultVisibilityThreshold(CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD)
                 .collectorExpirationThreshold(CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD)
@@ -333,8 +308,8 @@ class CollectorsConfigResourceTest {
         stubInitAndLoad();
 
         final var request = new CollectorsConfigRequest(
-                new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14401),
-                null, null, null
+                new CollectorsConfigRequest.IngestEndpointRequest("host", 14401),
+                null, null, null, null
         );
 
         final var result = resource.put(request);
@@ -348,13 +323,43 @@ class CollectorsConfigResourceTest {
         when(enrollmentTokenService.createTokenSigningKey()).thenThrow(new NoSuchAlgorithmException("test error"));
 
         final var request = new CollectorsConfigRequest(
-                new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14401),
-                null, null, null
+                new CollectorsConfigRequest.IngestEndpointRequest("host", 14401),
+                null, null, null, null
         );
 
         assertThatThrownBy(() -> resource.put(request))
                 .isInstanceOf(InternalServerErrorException.class)
                 .hasMessageContaining("Could not create token signing key");
+    }
+
+    @Test
+    void putWithCreateInputDelegatesToService() throws Exception {
+        stubCaService();
+
+        final var request = new CollectorsConfigRequest(
+                new CollectorsConfigRequest.IngestEndpointRequest("host", 14401),
+                null, null, null, true
+        );
+
+        resource.put(request);
+
+        verify(collectorIngestInputService).createInput(any(Subject.class), eq("admin"), eq(14401));
+        verify(collectorsConfigService).save(any(CollectorsConfig.class));
+    }
+
+    @Test
+    void putWithCreateInputNullDoesNotCallService() throws Exception {
+        stubCaService();
+
+        final var request = new CollectorsConfigRequest(
+                new CollectorsConfigRequest.IngestEndpointRequest("host", 14401),
+                null, null, null, null
+        );
+
+        resource.put(request);
+
+        verify(collectorIngestInputService, never()).createInput(any(), any(), any(int.class));
+        verify(collectorsConfigService).save(any(CollectorsConfig.class));
     }
 
     private void stubCaService() {

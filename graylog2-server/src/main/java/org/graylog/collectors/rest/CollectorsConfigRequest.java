@@ -18,23 +18,30 @@ package org.graylog.collectors.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
 import org.graylog.collectors.IngestEndpointConfig;
 
 import java.time.Duration;
 
+import static java.util.Objects.requireNonNull;
+
 public record CollectorsConfigRequest(
-        @JsonProperty("http") IngestEndpointRequest http,
+        @JsonProperty("http") @NotNull IngestEndpointRequest http,
         @JsonProperty("collector_offline_threshold") @Nullable Duration collectorOfflineThreshold,
         @JsonProperty("collector_default_visibility_threshold") @Nullable Duration collectorDefaultVisibilityThreshold,
-        @JsonProperty("collector_expiration_threshold") @Nullable Duration collectorExpirationThreshold
+        @JsonProperty("collector_expiration_threshold") @Nullable Duration collectorExpirationThreshold,
+        @JsonProperty("create_input") @Nullable Boolean createInput
 ) {
+    public CollectorsConfigRequest {
+        requireNonNull(http, "http must not be null");
+    }
+
     public record IngestEndpointRequest(
-            @JsonProperty("enabled") boolean enabled,
             @JsonProperty("hostname") String hostname,
             @JsonProperty("port") int port
     ) {
-        public IngestEndpointConfig toConfig(String inputId) {
-            return new IngestEndpointConfig(enabled(), hostname(), port(), inputId);
+        public IngestEndpointConfig toConfig() {
+            return new IngestEndpointConfig(hostname(), port());
         }
     }
 }
