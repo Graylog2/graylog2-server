@@ -18,6 +18,7 @@ package org.graylog.collectors;
 
 import org.graylog.collectors.db.FileSourceConfig;
 import org.graylog.collectors.db.FleetDTO;
+import org.graylog.collectors.db.JournaldSourceConfig;
 import org.graylog.collectors.db.MarkerType;
 import org.graylog.collectors.db.SourceConfig;
 import org.graylog.collectors.db.SourceDTO;
@@ -69,6 +70,10 @@ class SourceServiceTest {
 
     private SourceConfig validFileConfig() {
         return FileSourceConfig.builder().paths(List.of("/var/log/syslog")).readMode("tail").build();
+    }
+
+    private SourceConfig validJournaldConfig() {
+        return JournaldSourceConfig.builder().readMode("tail").priority("info").build();
     }
 
     @Test
@@ -244,6 +249,21 @@ class SourceServiceTest {
         assertThat(grouped).containsEntry(fleetA.id(), 3L);
         assertThat(grouped).containsEntry(fleetB.id(), 1L);
         assertThat(grouped).hasSize(2);
+    }
+
+    @Test
+    void countByTypeReturnsPerTypeSourceCounts() {
+        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet", null);
+
+        sourceService.create(fleet.id(), "file-1", "File source 1", true, validFileConfig());
+        sourceService.create(fleet.id(), "file-2", "File source 2", true, validFileConfig());
+        sourceService.create(fleet.id(), "journald-1", "Journald source", true, validJournaldConfig());
+
+        Map<String, Long> byType = sourceService.countByType();
+
+        assertThat(byType).containsEntry("file", 2L);
+        assertThat(byType).containsEntry("journald", 1L);
+        assertThat(byType).hasSize(2);
     }
 
     @Test
