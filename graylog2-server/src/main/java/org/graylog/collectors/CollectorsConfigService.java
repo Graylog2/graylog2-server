@@ -18,8 +18,11 @@ package org.graylog.collectors;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.graylog.collectors.events.CollectorCaConfigUpdated;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -30,10 +33,12 @@ public class CollectorsConfigService {
     private static final CollectorsConfig DEFAULT_CONFIG = CollectorsConfig.createDefault("localhost");
 
     private final ClusterConfigService clusterConfigService;
+    private final ClusterEventBus clusterEventBus;
 
     @Inject
-    public CollectorsConfigService(ClusterConfigService clusterConfigService) {
+    public CollectorsConfigService(ClusterConfigService clusterConfigService, ClusterEventBus clusterEventBus) {
         this.clusterConfigService = clusterConfigService;
+        this.clusterEventBus = clusterEventBus;
     }
 
     /**
@@ -70,6 +75,17 @@ public class CollectorsConfigService {
      * @param config the config object
      */
     public void save(CollectorsConfig config) {
+        final var existing = get();
+
         clusterConfigService.write(config);
+
+
+        existing.ifPresent(c -> {
+            if (!Objects.equals(c.caCertId(), config.caCertId())
+                    || !Objects.equals(c.signingCertId(), config.signingCertId())
+                    || !Objects.equals(c.otlpServerCertId(), config.otlpServerCertId())) {
+                clusterEventBus.post(new CollectorCaConfigUpdated());
+            }
+        });
     }
 }

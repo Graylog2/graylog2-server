@@ -16,9 +16,6 @@
  */
 package org.graylog.collectors;
 
-import io.netty.handler.ssl.ClientAuth;
-import io.netty.handler.ssl.SslContextBuilder;
-import io.netty.handler.ssl.SslProvider;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
@@ -26,13 +23,10 @@ import org.bouncycastle.asn1.x509.KeyUsage;
 import org.graylog.security.pki.Algorithm;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
-import org.graylog.security.pki.PemUtils;
 import org.graylog2.plugin.cluster.ClusterIdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.List;
 
@@ -108,43 +102,6 @@ public class CollectorCaService {
      */
     public CertificateEntry getOtlpServerCert() {
         return certificateService.findById(ensureConfig().otlpServerCertId()).orElseThrow(this::caNotInitializedError);
-    }
-
-    /**
-     * Creates a new {@link SslContextBuilder} configured for the OTLP server endpoint.
-     * <p>
-     * The builder is configured with:
-     * <ul>
-     *   <li>The OTLP server certificate and private key for server identity</li>
-     *   <li>Client authentication required (mTLS)</li>
-     *   <li>The signing cert as the trust anchor for validating client certificates</li>
-     * </ul>
-     *
-     * @return a configured SslContextBuilder ready to be built
-     */
-    public SslContextBuilder newServerSslContextBuilder() {
-        final var hierarchy = loadHierarchy();
-        final var otlpServerCert = hierarchy.otlpServerCert();
-        final var signingCert = hierarchy.signingCert();
-
-        try {
-            final PrivateKey key = PemUtils.parsePrivateKey(certificateService.encryptedValueService().decrypt(otlpServerCert.privateKey()));
-
-            final X509Certificate signingCertPem = PemUtils.parseCertificate(signingCert.certificate());
-            final X509Certificate serverCertPem = PemUtils.parseCertificate(otlpServerCert.certificate());
-            final X509Certificate trustedCert = PemUtils.parseCertificate(signingCert.certificate());
-
-            // The Collector only has access to the CA cert, so we need to have the intermediate signing cert
-            // in the key cert chain.
-            return SslContextBuilder.forServer(key, serverCertPem, signingCertPem)
-                    // JDK provider required: BoringSSL (OPENSSL) can load Ed25519 keys but cannot
-                    // complete TLS handshakes — its cipher suite negotiation doesn't recognize Ed25519.
-                    .sslProvider(SslProvider.JDK)
-                    .clientAuth(ClientAuth.REQUIRE)
-                    .trustManager(trustedCert);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to create OTLP server SSL context", e);
-        }
     }
 
     /**
