@@ -105,13 +105,13 @@ import java.util.zip.ZipOutputStream;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class SupportBundleService {
-    public static final int LOGFILE_ENUMERATION_RANGE = 5; // how many rotated logs should we look for
+    private static final int LOGFILE_ENUMERATION_RANGE = 5; // how many rotated logs should we look for
     private static final Logger LOG = LoggerFactory.getLogger(SupportBundleService.class);
-    public static final String SUPPORT_BUNDLE_DIR_NAME = "support-bundle";
-    public static final Duration CALL_TIMEOUT = Duration.ofSeconds(10);
-    public static final String BUNDLE_NAME_PREFIX = "graylog-support-bundle";
-    public static final String IN_MEMORY_LOGFILE_ID = "memory";
-    public static final long LOG_COLLECTION_SIZE_LIMIT = 60 * 1024 * 1024; // Limits how many on-disk logs we collect per node
+    private static final String SUPPORT_BUNDLE_DIR_NAME = "support-bundle";
+    private static final Duration CALL_TIMEOUT = Duration.ofSeconds(10);
+    private static final String BUNDLE_NAME_PREFIX = "graylog-support-bundle";
+    private static final String IN_MEMORY_LOGFILE_ID = "memory";
+    private static final long LOG_COLLECTION_SIZE_LIMIT = 60 * 1024 * 1024; // Limits how many on-disk logs we collect per node
     private static final DateTimeFormatter TIMESTAMP_FORMAT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmmss", Locale.US).withZone(ZoneOffset.UTC);
 
