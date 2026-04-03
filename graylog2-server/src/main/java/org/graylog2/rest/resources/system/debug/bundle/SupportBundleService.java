@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.ws.rs.NotFoundException;
@@ -94,7 +94,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -224,29 +223,23 @@ public class SupportBundleService {
     }
 
     private Map<String, Object> getClusterInfo() {
-        ExecutorService executorService =
-                Executors.newFixedThreadPool(3,
-                        new ThreadFactoryBuilder().setNameFormat("support-bundle-cluster-info-collector-%d").build());
-
         final Map<String, Object> clusterInfo = new ConcurrentHashMap<>();
         final Map<String, Object> searchDb = new ConcurrentHashMap<>();
 
         final CompletableFuture<?> clusterStats = timeLimitedOrErrorString(clusterStatsService::clusterStats,
-                executorService).thenAccept(stats -> clusterInfo.put("cluster_stats", stats));
+                executor).thenAccept(stats -> clusterInfo.put("cluster_stats", stats));
 
         final CompletableFuture<?> searchDbVersion =
                 timeLimitedOrErrorString(() -> versionProbeFactory.createDefault().probe(elasticsearchHosts)
-                        .map(SearchVersion::toString).orElse("Unknown"), executorService)
+                        .map(SearchVersion::toString).orElse("Unknown"), executor)
                         .thenAccept(version -> searchDb.put("version", version));
         final CompletableFuture<?> searchDbStats = timeLimitedOrErrorString(searchDbClusterAdapter::rawClusterStats,
-                executorService).thenAccept(stats -> searchDb.put("stats", stats));
+                executor).thenAccept(stats -> searchDb.put("stats", stats));
 
         try {
             CompletableFuture.allOf(clusterStats, searchDbVersion, searchDbStats).get();
         } catch (Exception e) {
             throw new RuntimeException("Failed collecting cluster info", e);
-        } finally {
-            executorService.shutdownNow();
         }
 
         clusterInfo.put("search_db", searchDb);
