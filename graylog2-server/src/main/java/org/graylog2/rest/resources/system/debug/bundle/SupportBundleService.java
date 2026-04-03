@@ -93,6 +93,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -190,66 +191,78 @@ public class SupportBundleService {
     }
 
     private void fetchClusterInfos(ProxiedResourceHelper proxiedResourceHelper, Map<String, SupportBundleNodeManifest> nodeManifests, Path tmpDir) throws IOException {
-        // All tasks submitted from the calling thread as peers — no task blocks on siblings from the same pool
-        final CompletableFuture<Map<String, CallResult<SystemOverviewResponse>>> systemOverviewFuture =
-                CompletableFuture.supplyAsync(() -> proxiedResourceHelper.requestOnAllNodes(
-                        RemoteSystemResource.class, RemoteSystemResource::system, CALL_TIMEOUT), executor);
-
-        final CompletableFuture<Map<String, CallResult<SystemJVMResponse>>> jvmFuture =
-                CompletableFuture.supplyAsync(() -> proxiedResourceHelper.requestOnAllNodes(
-                        RemoteSystemResource.class, RemoteSystemResource::jvm, CALL_TIMEOUT), executor);
-
-        final CompletableFuture<Map<String, CallResult<SystemProcessBufferDumpResponse>>> processBufferFuture =
-                CompletableFuture.supplyAsync(() -> proxiedResourceHelper.requestOnAllNodes(
-                        RemoteSystemResource.class, RemoteSystemResource::processBufferDump, CALL_TIMEOUT), executor);
-
-        final CompletableFuture<Map<String, CallResult<PluginList>>> installedPluginsFuture =
-                CompletableFuture.supplyAsync(() -> proxiedResourceHelper.requestOnAllNodes(
-                        RemoteSystemPluginResource.class, RemoteSystemPluginResource::list, CALL_TIMEOUT), executor);
-
-        final CompletableFuture<Object> clusterStatsFuture =
-                timeLimitedOrErrorString(clusterStatsService::clusterStats, executor);
-
-        final CompletableFuture<Object> searchDbVersionFuture =
-                timeLimitedOrErrorString(() -> versionProbeFactory.createDefault().probe(elasticsearchHosts)
-                        .map(SearchVersion::toString).orElse("Unknown"), executor);
-
-        final CompletableFuture<Object> searchDbStatsFuture =
-                timeLimitedOrErrorString(searchDbClusterAdapter::rawClusterStats, executor);
-
-        final CompletableFuture<Map<String, Object>> datanodeInfoFuture =
-                CompletableFuture.supplyAsync(this::getDatanodeInfo, executor);
-
+        // requestOnAllNodes submits per-node tasks to `executor` then blocks on Future#get.
+        // A separate short-lived orchestration executor runs these blocking fan-outs so they
+        // never occupy `executor` slots, keeping `executor` free for the per-node HTTP work.
+        // The executor is created here (not as a field) because builds are infrequent and
+        // there is no value in holding idle threads between them.
+        final ExecutorService orchestrationExecutor = Executors.newFixedThreadPool(4,
+                Thread.ofPlatform().daemon().name("support-bundle-orchestration-", 0).factory());
         try {
-            CompletableFuture.allOf(systemOverviewFuture, jvmFuture, processBufferFuture, installedPluginsFuture,
-                    clusterStatsFuture, searchDbVersionFuture, searchDbStatsFuture, datanodeInfoFuture).get();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed collecting cluster infos", e);
-        }
+            final CompletableFuture<Map<String, CallResult<SystemOverviewResponse>>> systemOverviewFuture =
+                    CompletableFuture.supplyAsync(() -> proxiedResourceHelper.requestOnAllNodes(
+                            RemoteSystemResource.class, RemoteSystemResource::system, CALL_TIMEOUT), orchestrationExecutor);
 
-        final Map<String, Object> searchDb = Map.of(
-                "version", searchDbVersionFuture.join(),
-                "stats", searchDbStatsFuture.join()
-        );
-        final Map<String, Object> clusterInfo = Map.of(
-                "cluster_stats", clusterStatsFuture.join(),
-                "search_db", searchDb
-        );
+            final CompletableFuture<Map<String, CallResult<SystemJVMResponse>>> jvmFuture =
+                    CompletableFuture.supplyAsync(() -> proxiedResourceHelper.requestOnAllNodes(
+                            RemoteSystemResource.class, RemoteSystemResource::jvm, CALL_TIMEOUT), orchestrationExecutor);
 
-        try (FileOutputStream clusterJson = new FileOutputStream(tmpDir.resolve("cluster.json").toFile())) {
-            final Map<String, Object> result = new HashMap<>(
-                    Map.of(
-                            "manifest", nodeManifests,
-                            "cluster_system_overview", stripCallResult(systemOverviewFuture.join()),
-                            "jvm", stripCallResult(jvmFuture.join()),
-                            "process_buffer_dump", stripCallResult(processBufferFuture.join()),
-                            "installed_plugins", stripCallResult(installedPluginsFuture.join())
-                    )
+            final CompletableFuture<Map<String, CallResult<SystemProcessBufferDumpResponse>>> processBufferFuture =
+                    CompletableFuture.supplyAsync(() -> proxiedResourceHelper.requestOnAllNodes(
+                            RemoteSystemResource.class, RemoteSystemResource::processBufferDump, CALL_TIMEOUT), orchestrationExecutor);
+
+            final CompletableFuture<Map<String, CallResult<PluginList>>> installedPluginsFuture =
+                    CompletableFuture.supplyAsync(() -> proxiedResourceHelper.requestOnAllNodes(
+                            RemoteSystemPluginResource.class, RemoteSystemPluginResource::list, CALL_TIMEOUT), orchestrationExecutor);
+
+            // These submit leaf tasks to `executor` without blocking on sub-tasks — no nesting risk.
+            final CompletableFuture<Object> clusterStatsFuture =
+                    timeLimitedOrErrorString(clusterStatsService::clusterStats, executor);
+
+            final CompletableFuture<Object> searchDbVersionFuture =
+                    timeLimitedOrErrorString(() -> versionProbeFactory.createDefault().probe(elasticsearchHosts)
+                            .map(SearchVersion::toString).orElse("Unknown"), executor);
+
+            final CompletableFuture<Object> searchDbStatsFuture =
+                    timeLimitedOrErrorString(searchDbClusterAdapter::rawClusterStats, executor);
+
+            final CompletableFuture<Map<String, Object>> datanodeInfoFuture =
+                    CompletableFuture.supplyAsync(this::getDatanodeInfo, executor);
+
+            try {
+                CompletableFuture.allOf(systemOverviewFuture, jvmFuture, processBufferFuture, installedPluginsFuture,
+                        clusterStatsFuture, searchDbVersionFuture, searchDbStatsFuture, datanodeInfoFuture).get();
+            } catch (Exception e) {
+                throw new RuntimeException("Failed collecting cluster infos", e);
+            }
+
+            final Map<String, Object> searchDb = Map.of(
+                    "version", searchDbVersionFuture.join(),
+                    "stats", searchDbStatsFuture.join()
             );
-            result.putAll(clusterInfo);
-            result.putAll(datanodeInfoFuture.join());
+            final Map<String, Object> clusterInfo = Map.of(
+                    "cluster_stats", clusterStatsFuture.join(),
+                    "search_db", searchDb
+            );
 
-            objectMapper.writerWithDefaultPrettyPrinter().writeValue(clusterJson, result);
+            try (FileOutputStream clusterJson = new FileOutputStream(tmpDir.resolve("cluster.json").toFile())) {
+                final Map<String, Object> result = new HashMap<>(
+                        Map.of(
+                                "manifest", nodeManifests,
+                                "cluster_system_overview", stripCallResult(systemOverviewFuture.join()),
+                                "jvm", stripCallResult(jvmFuture.join()),
+                                "process_buffer_dump", stripCallResult(processBufferFuture.join()),
+                                "installed_plugins", stripCallResult(installedPluginsFuture.join())
+                        )
+                );
+                result.putAll(clusterInfo);
+                result.putAll(datanodeInfoFuture.join());
+
+                objectMapper.writerWithDefaultPrettyPrinter().writeValue(clusterJson, result);
+            }
+        } finally {
+            // All futures are complete at this point — shutdownNow has nothing left to interrupt.
+            orchestrationExecutor.shutdownNow();
         }
     }
 

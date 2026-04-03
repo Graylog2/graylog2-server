@@ -182,7 +182,7 @@ public class SupportBundleResourceIT {
     }
 
     @FullBackendTest
-    void buildBundleRequiresAuthentication() {
+    void buildBundleRequiresPermissions() {
         given()
                 .spec(api.forUser(unprivilegedUser).requestSpecification())
                 .when()
