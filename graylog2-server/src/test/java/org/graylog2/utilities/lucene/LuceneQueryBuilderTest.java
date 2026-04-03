@@ -24,6 +24,7 @@ import org.apache.lucene.search.PointRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.RegexpQuery;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TermRangeQuery;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
@@ -73,10 +74,10 @@ class LuceneQueryBuilderTest {
         assertThat(booleanQuery.clauses()).hasSize(1);
 
         BooleanClause clause = booleanQuery.clauses().getFirst();
-        assertThat(clause.occur()).isEqualTo(BooleanClause.Occur.SHOULD);
-        assertThat(clause.query()).isInstanceOf(RegexpQuery.class);
+        assertThat(clause.getOccur()).isEqualTo(BooleanClause.Occur.SHOULD);
+        assertThat(clause.getQuery()).isInstanceOf(RegexpQuery.class);
 
-        RegexpQuery regexpQuery = (RegexpQuery) clause.query();
+        RegexpQuery regexpQuery = (RegexpQuery) clause.getQuery();
         assertThat(regexpQuery.getRegexp().field()).isEqualTo("name");
         assertThat(regexpQuery.getRegexp().text()).isEqualTo(".*john.*");
     }
@@ -91,10 +92,10 @@ class LuceneQueryBuilderTest {
         assertThat(booleanQuery.clauses()).hasSize(1);
 
         BooleanClause clause = booleanQuery.clauses().getFirst();
-        assertThat(clause.occur()).isEqualTo(BooleanClause.Occur.SHOULD);
-        assertThat(clause.query()).isInstanceOf(TermQuery.class);
+        assertThat(clause.getOccur()).isEqualTo(BooleanClause.Occur.SHOULD);
+        assertThat(clause.getQuery()).isInstanceOf(TermQuery.class);
 
-        TermQuery termQuery = (TermQuery) clause.query();
+        TermQuery termQuery = (TermQuery) clause.getQuery();
         assertThat(termQuery.getTerm().field()).isEqualTo("name");
         assertThat(termQuery.getTerm().text()).isEqualTo("john");
     }
@@ -109,9 +110,9 @@ class LuceneQueryBuilderTest {
         assertThat(booleanQuery.clauses()).hasSize(1);
 
         BooleanClause clause = booleanQuery.clauses().getFirst();
-        assertThat(clause.query()).isInstanceOf(RegexpQuery.class);
+        assertThat(clause.getQuery()).isInstanceOf(RegexpQuery.class);
 
-        RegexpQuery regexpQuery = (RegexpQuery) clause.query();
+        RegexpQuery regexpQuery = (RegexpQuery) clause.getQuery();
         assertThat(regexpQuery.getRegexp().field()).isEqualTo("name");
         // When user provides wildcards, just convert them without adding substring matching
         assertThat(regexpQuery.getRegexp().text()).isEqualTo("jo.*n");
@@ -125,9 +126,9 @@ class LuceneQueryBuilderTest {
         assertThat(query).isInstanceOf(BooleanQuery.class);
         BooleanQuery booleanQuery = (BooleanQuery) query;
         BooleanClause clause = booleanQuery.clauses().getFirst();
-        assertThat(clause.query()).isInstanceOf(RegexpQuery.class);
+        assertThat(clause.getQuery()).isInstanceOf(RegexpQuery.class);
 
-        RegexpQuery regexpQuery = (RegexpQuery) clause.query();
+        RegexpQuery regexpQuery = (RegexpQuery) clause.getQuery();
         // Wildcards in input are converted: ? -> . (no additional .* wrapping when wildcards present)
         assertThat(regexpQuery.getRegexp().text()).isEqualTo("jo.n");
     }
@@ -140,9 +141,9 @@ class LuceneQueryBuilderTest {
         assertThat(query).isInstanceOf(BooleanQuery.class);
         BooleanQuery booleanQuery = (BooleanQuery) query;
         BooleanClause clause = booleanQuery.clauses().getFirst();
-        assertThat(clause.query()).isInstanceOf(RegexpQuery.class);
+        assertThat(clause.getQuery()).isInstanceOf(RegexpQuery.class);
 
-        RegexpQuery regexpQuery = (RegexpQuery) clause.query();
+        RegexpQuery regexpQuery = (RegexpQuery) clause.getQuery();
         // User provided wildcard, so no additional wrapping
         assertThat(regexpQuery.getRegexp().text()).isEqualTo(".*john");
     }
@@ -155,9 +156,9 @@ class LuceneQueryBuilderTest {
         assertThat(query).isInstanceOf(BooleanQuery.class);
         BooleanQuery booleanQuery = (BooleanQuery) query;
         BooleanClause clause = booleanQuery.clauses().getFirst();
-        assertThat(clause.query()).isInstanceOf(RegexpQuery.class);
+        assertThat(clause.getQuery()).isInstanceOf(RegexpQuery.class);
 
-        RegexpQuery regexpQuery = (RegexpQuery) clause.query();
+        RegexpQuery regexpQuery = (RegexpQuery) clause.getQuery();
         // User provided wildcard, so no additional wrapping
         assertThat(regexpQuery.getRegexp().text()).isEqualTo("john.*");
     }
@@ -171,9 +172,9 @@ class LuceneQueryBuilderTest {
         assertThat(query).isInstanceOf(BooleanQuery.class);
         BooleanQuery booleanQuery = (BooleanQuery) query;
         BooleanClause clause = booleanQuery.clauses().getFirst();
-        assertThat(clause.query()).isInstanceOf(RegexpQuery.class);
+        assertThat(clause.getQuery()).isInstanceOf(RegexpQuery.class);
 
-        RegexpQuery regexpQuery = (RegexpQuery) clause.query();
+        RegexpQuery regexpQuery = (RegexpQuery) clause.getQuery();
         // Should be wrapped with .* for substring matching: "local" matches "localhost"
         assertThat(regexpQuery.getRegexp().text()).isEqualTo(".*local.*");
     }
@@ -186,9 +187,9 @@ class LuceneQueryBuilderTest {
         assertThat(query).isInstanceOf(BooleanQuery.class);
         BooleanQuery booleanQuery = (BooleanQuery) query;
         BooleanClause clause = booleanQuery.clauses().getFirst();
-        assertThat(clause.query()).isInstanceOf(PointRangeQuery.class);
+        assertThat(clause.getQuery()).isInstanceOf(PointRangeQuery.class);
 
-        PointRangeQuery rangeQuery = (PointRangeQuery) clause.query();
+        PointRangeQuery rangeQuery = (PointRangeQuery) clause.getQuery();
         assertThat(rangeQuery.getField()).isEqualTo("age");
         // For age:>30, the range should be [31, MAX_VALUE] (exclusive converted to inclusive by adding 1)
         assertThat(rangeQuery.toString()).contains("age:[31 TO 2147483647]");
@@ -202,9 +203,9 @@ class LuceneQueryBuilderTest {
         assertThat(query).isInstanceOf(BooleanQuery.class);
         BooleanQuery booleanQuery = (BooleanQuery) query;
         BooleanClause clause = booleanQuery.clauses().getFirst();
-        assertThat(clause.query()).isInstanceOf(PointRangeQuery.class);
+        assertThat(clause.getQuery()).isInstanceOf(PointRangeQuery.class);
 
-        PointRangeQuery rangeQuery = (PointRangeQuery) clause.query();
+        PointRangeQuery rangeQuery = (PointRangeQuery) clause.getQuery();
         assertThat(rangeQuery.getField()).isEqualTo("age");
         // For age:>=30, the range should be [30, MAX_VALUE]
         assertThat(rangeQuery.toString()).contains("age:[30 TO 2147483647]");
@@ -218,9 +219,9 @@ class LuceneQueryBuilderTest {
         assertThat(query).isInstanceOf(BooleanQuery.class);
         BooleanQuery booleanQuery = (BooleanQuery) query;
         BooleanClause clause = booleanQuery.clauses().getFirst();
-        assertThat(clause.query()).isInstanceOf(PointRangeQuery.class);
+        assertThat(clause.getQuery()).isInstanceOf(PointRangeQuery.class);
 
-        PointRangeQuery rangeQuery = (PointRangeQuery) clause.query();
+        PointRangeQuery rangeQuery = (PointRangeQuery) clause.getQuery();
         assertThat(rangeQuery.getField()).isEqualTo("age");
         // For age:<30, the range should be [MIN_VALUE, 29] (exclusive converted to inclusive by subtracting 1)
         assertThat(rangeQuery.toString()).contains("age:[-2147483648 TO 29]");
@@ -234,9 +235,9 @@ class LuceneQueryBuilderTest {
         assertThat(query).isInstanceOf(BooleanQuery.class);
         BooleanQuery booleanQuery = (BooleanQuery) query;
         BooleanClause clause = booleanQuery.clauses().getFirst();
-        assertThat(clause.query()).isInstanceOf(PointRangeQuery.class);
+        assertThat(clause.getQuery()).isInstanceOf(PointRangeQuery.class);
 
-        PointRangeQuery rangeQuery = (PointRangeQuery) clause.query();
+        PointRangeQuery rangeQuery = (PointRangeQuery) clause.getQuery();
         assertThat(rangeQuery.getField()).isEqualTo("age");
         // For age:<=30, the range should be [MIN_VALUE, 30]
         assertThat(rangeQuery.toString()).contains("age:[-2147483648 TO 30]");
@@ -252,7 +253,7 @@ class LuceneQueryBuilderTest {
         assertThat(booleanQuery.clauses()).hasSize(1);
 
         BooleanClause clause = booleanQuery.clauses().get(0);
-        assertThat(clause.occur()).isEqualTo(BooleanClause.Occur.MUST_NOT);
+        assertThat(clause.getOccur()).isEqualTo(BooleanClause.Occur.MUST_NOT);
     }
 
     @Test
@@ -264,13 +265,13 @@ class LuceneQueryBuilderTest {
         BooleanQuery booleanQuery = (BooleanQuery) query;
         assertThat(booleanQuery.clauses()).hasSize(2);
 
-        assertThat(booleanQuery.clauses().get(0).occur()).isEqualTo(BooleanClause.Occur.SHOULD);
-        assertThat(booleanQuery.clauses().get(1).occur()).isEqualTo(BooleanClause.Occur.SHOULD);
+        assertThat(booleanQuery.clauses().get(0).getOccur()).isEqualTo(BooleanClause.Occur.SHOULD);
+        assertThat(booleanQuery.clauses().get(1).getOccur()).isEqualTo(BooleanClause.Occur.SHOULD);
 
         // First clause should be RegexpQuery for name
-        assertThat(booleanQuery.clauses().get(0).query()).isInstanceOf(RegexpQuery.class);
+        assertThat(booleanQuery.clauses().get(0).getQuery()).isInstanceOf(RegexpQuery.class);
         // Second clause should be PointRangeQuery for age (numeric field)
-        assertThat(booleanQuery.clauses().get(1).query()).isInstanceOf(PointRangeQuery.class);
+        assertThat(booleanQuery.clauses().get(1).getQuery()).isInstanceOf(PointRangeQuery.class);
     }
 
     @Test
@@ -283,8 +284,8 @@ class LuceneQueryBuilderTest {
         assertThat(booleanQuery.clauses()).hasSize(2);
 
         // Default operator is REGEXP, so both should be RegexpQuery with substring matching
-        assertThat(booleanQuery.clauses().get(0).query()).isInstanceOf(RegexpQuery.class);
-        assertThat(booleanQuery.clauses().get(1).query()).isInstanceOf(RegexpQuery.class);
+        assertThat(booleanQuery.clauses().get(0).getQuery()).isInstanceOf(RegexpQuery.class);
+        assertThat(booleanQuery.clauses().get(1).getQuery()).isInstanceOf(RegexpQuery.class);
     }
 
     @Test
@@ -296,12 +297,12 @@ class LuceneQueryBuilderTest {
         BooleanQuery booleanQuery = (BooleanQuery) query;
         assertThat(booleanQuery.clauses()).hasSize(2);
 
-        assertThat(booleanQuery.clauses().get(0).occur()).isEqualTo(BooleanClause.Occur.SHOULD);
-        assertThat(booleanQuery.clauses().get(1).occur()).isEqualTo(BooleanClause.Occur.MUST_NOT);
+        assertThat(booleanQuery.clauses().get(0).getOccur()).isEqualTo(BooleanClause.Occur.SHOULD);
+        assertThat(booleanQuery.clauses().get(1).getOccur()).isEqualTo(BooleanClause.Occur.MUST_NOT);
 
         // Both should be RegexpQuery (default operator)
-        assertThat(booleanQuery.clauses().get(0).query()).isInstanceOf(RegexpQuery.class);
-        assertThat(booleanQuery.clauses().get(1).query()).isInstanceOf(RegexpQuery.class);
+        assertThat(booleanQuery.clauses().get(0).getQuery()).isInstanceOf(RegexpQuery.class);
+        assertThat(booleanQuery.clauses().get(1).getQuery()).isInstanceOf(RegexpQuery.class);
     }
 
     @Test
@@ -315,9 +316,9 @@ class LuceneQueryBuilderTest {
 
         BooleanClause clause = booleanQuery.clauses().get(0);
         // Default operator is REGEXP, so it should use RegexpQuery with substring matching
-        assertThat(clause.query()).isInstanceOf(RegexpQuery.class);
+        assertThat(clause.getQuery()).isInstanceOf(RegexpQuery.class);
 
-        RegexpQuery regexpQuery = (RegexpQuery) clause.query();
+        RegexpQuery regexpQuery = (RegexpQuery) clause.getQuery();
         assertThat(regexpQuery.getRegexp().field()).isEqualTo("defaultfield");
         assertThat(regexpQuery.getRegexp().text()).isEqualTo(".*john.*");
     }
@@ -333,9 +334,9 @@ class LuceneQueryBuilderTest {
         assertThat(booleanQuery.clauses()).hasSize(1);
 
         BooleanClause clause = booleanQuery.clauses().getFirst();
-        assertThat(clause.query()).isInstanceOf(RegexpQuery.class);
+        assertThat(clause.getQuery()).isInstanceOf(RegexpQuery.class);
 
-        RegexpQuery regexpQuery = (RegexpQuery) clause.query();
+        RegexpQuery regexpQuery = (RegexpQuery) clause.getQuery();
         assertThat(regexpQuery.getRegexp().field()).isEqualTo("name");
         // Input "John" should be lowercased to "john" for case-insensitive matching
         assertThat(regexpQuery.getRegexp().text()).isEqualTo(".*john.*");
@@ -352,9 +353,9 @@ class LuceneQueryBuilderTest {
         assertThat(booleanQuery.clauses()).hasSize(1);
 
         BooleanClause clause = booleanQuery.clauses().getFirst();
-        assertThat(clause.query()).isInstanceOf(TermQuery.class);
+        assertThat(clause.getQuery()).isInstanceOf(TermQuery.class);
 
-        TermQuery termQuery = (TermQuery) clause.query();
+        TermQuery termQuery = (TermQuery) clause.getQuery();
         assertThat(termQuery.getTerm().field()).isEqualTo("name");
         // Input "JOHN" should be lowercased to "john" for case-insensitive matching
         assertThat(termQuery.getTerm().text()).isEqualTo("john");
@@ -371,9 +372,9 @@ class LuceneQueryBuilderTest {
         assertThat(booleanQuery.clauses()).hasSize(1);
 
         BooleanClause clause = booleanQuery.clauses().getFirst();
-        assertThat(clause.query()).isInstanceOf(RegexpQuery.class);
+        assertThat(clause.getQuery()).isInstanceOf(RegexpQuery.class);
 
-        RegexpQuery regexpQuery = (RegexpQuery) clause.query();
+        RegexpQuery regexpQuery = (RegexpQuery) clause.getQuery();
         assertThat(regexpQuery.getRegexp().field()).isEqualTo("name");
         // Input "Jo*N" should be lowercased and wildcards converted: "jo.*n"
         assertThat(regexpQuery.getRegexp().text()).isEqualTo("jo.*n");

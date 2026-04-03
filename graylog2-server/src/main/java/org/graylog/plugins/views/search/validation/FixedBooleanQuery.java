@@ -22,6 +22,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryVisitor;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
@@ -75,8 +76,8 @@ public class FixedBooleanQuery extends Query implements Iterable<BooleanClause> 
     @Override
     public void visit(QueryVisitor visitor) {
         delegate.clauses().forEach(c -> {
-            final QueryVisitor sub = visitor.getSubVisitor(c.occur(), delegate);
-            c.query().visit(sub);
+            final QueryVisitor sub = visitor.getSubVisitor(c.getOccur(), delegate);
+            c.getQuery().visit(sub);
         });
     }
 }

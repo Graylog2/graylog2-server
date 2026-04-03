@@ -27,7 +27,7 @@ import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.filesystem.index.IndicesDirectoryParser;
 import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
 import org.graylog.datanode.filesystem.index.dto.NodeInformation;
-import org.opensearch.Version;
+import org.graylog.shaded.opensearch2.org.opensearch.Version;
 
 import java.util.ArrayList;
 import java.util.Collections;
