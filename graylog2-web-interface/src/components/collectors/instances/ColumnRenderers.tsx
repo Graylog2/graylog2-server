@@ -28,7 +28,11 @@ const OsIcon = ({ os }: { os: string | null }) => {
   if (os === 'windows') return <span title="Windows">Windows</span>;
   if (os === 'darwin') return <span title="macOS">macOS</span>;
 
-  return <span title="Unknown"><i>Unknown</i></span>;
+  return (
+    <span title="Unknown">
+      <i>Unknown</i>
+    </span>
+  );
 };
 
 type Props = {

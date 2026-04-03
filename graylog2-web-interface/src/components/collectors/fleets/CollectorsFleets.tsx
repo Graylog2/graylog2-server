@@ -64,9 +64,7 @@ const CollectorsFleets = () => {
         entityActions={() => null}
       />
 
-      {showFleetModal && (
-        <FleetFormModal onClose={closeCreateModal} onSave={handleSaveFleet} />
-      )}
+      {showFleetModal && <FleetFormModal onClose={closeCreateModal} onSave={handleSaveFleet} />}
     </>
   );
 };

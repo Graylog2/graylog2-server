@@ -26,15 +26,24 @@ import Routes from 'routing/Routes';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import type { Sort } from 'stores/PaginationTypes';
 
+import BulkActions from './BulkActions';
+
 import { fetchPaginatedEnrollmentTokens, enrollmentTokensKeyFn, useCollectorsMutations, useFleets } from '../hooks';
 import type { EnrollmentTokenMetadata } from '../types';
-import BulkActions from './BulkActions';
 
 const DEFAULT_LAYOUT = {
   entityTableId: 'enrollment-tokens',
   defaultPageSize: 20,
   defaultSort: { attributeId: 'created_at', direction: 'desc' } as Sort,
-  defaultDisplayedAttributes: ['name', 'fleet_id', 'created_by', 'created_at', 'expires_at', 'usage_count', 'last_used_at'],
+  defaultDisplayedAttributes: [
+    'name',
+    'fleet_id',
+    'created_by',
+    'created_at',
+    'expires_at',
+    'usage_count',
+    'last_used_at',
+  ],
   defaultColumnOrder: ['name', 'fleet_id', 'created_by', 'created_at', 'expires_at', 'usage_count', 'last_used_at'],
 };
 

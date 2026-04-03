@@ -30,7 +30,9 @@ jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
 jest.mock('../hooks/useCollectorsMutations');
 
 const setSelectedEntitiesMock = jest.fn();
-const bulkDeleteEnrollmentTokensMock = jest.fn(() => Promise.resolve({ successfully_performed: 0, failures: [], errors: [] }));
+const bulkDeleteEnrollmentTokensMock = jest.fn(() =>
+  Promise.resolve({ successfully_performed: 0, failures: [], errors: [] }),
+);
 
 const useSelectedEntitiesResponse = {
   selectedEntities: [],
@@ -50,9 +52,11 @@ describe('BulkActions', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     asMock(useSelectedEntities).mockReturnValue(useSelectedEntitiesResponse);
-    asMock(useCollectorsMutations).mockReturnValue(mockCollectorsMutations({
-      bulkDeleteEnrollmentTokens: bulkDeleteEnrollmentTokensMock,
-    }));
+    asMock(useCollectorsMutations).mockReturnValue(
+      mockCollectorsMutations({
+        bulkDeleteEnrollmentTokens: bulkDeleteEnrollmentTokensMock,
+      }),
+    );
   });
 
   it('renders bulk actions dropdown', async () => {

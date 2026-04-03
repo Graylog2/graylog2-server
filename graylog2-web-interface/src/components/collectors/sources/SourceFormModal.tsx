@@ -65,7 +65,13 @@ const validate = (values: FormValues) => {
   return errors;
 };
 
-const FileConfigFields = ({ config, setFieldValue }: { config: FileSourceConfig; setFieldValue: (field: string, value: unknown) => void }) => (
+const FileConfigFields = ({
+  config,
+  setFieldValue,
+}: {
+  config: FileSourceConfig;
+  setFieldValue: (field: string, value: unknown) => void;
+}) => (
   <>
     <Input
       id="file-paths"
@@ -88,7 +94,13 @@ const FileConfigFields = ({ config, setFieldValue }: { config: FileSourceConfig;
   </>
 );
 
-const JournaldConfigFields = ({ config, setFieldValue }: { config: JournaldSourceConfig; setFieldValue: (field: string, value: unknown) => void }) => (
+const JournaldConfigFields = ({
+  config,
+  setFieldValue,
+}: {
+  config: JournaldSourceConfig;
+  setFieldValue: (field: string, value: unknown) => void;
+}) => (
   <>
     <Input
       id="journald-read-mode"
@@ -125,7 +137,13 @@ const JournaldConfigFields = ({ config, setFieldValue }: { config: JournaldSourc
   </>
 );
 
-const WindowsEventLogConfigFields = ({ config, setFieldValue }: { config: WindowsEventLogSourceConfig; setFieldValue: (field: string, value: unknown) => void }) => (
+const WindowsEventLogConfigFields = ({
+  config,
+  setFieldValue,
+}: {
+  config: WindowsEventLogSourceConfig;
+  setFieldValue: (field: string, value: unknown) => void;
+}) => (
   <>
     <Input
       id="win-channels"
@@ -136,7 +154,10 @@ const WindowsEventLogConfigFields = ({ config, setFieldValue }: { config: Window
       onChange={(e) =>
         setFieldValue('config', {
           ...config,
-          channels: e.target.value.split(',').map((c) => c.trim()).filter(Boolean),
+          channels: e.target.value
+            .split(',')
+            .map((c) => c.trim())
+            .filter(Boolean),
         })
       }
       required
@@ -208,27 +229,14 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props
                 }}
                 disabled={isEdit}>
                 {Object.entries(SOURCE_TYPE_LABELS).map(([value, label]) => (
-                  <option key={value} value={value}>{label}</option>
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
                 ))}
               </Input>
-              <FormikInput
-                id="source-name"
-                label="Name"
-                name="name"
-                required
-              />
-              <FormikInput
-                id="source-description"
-                label="Description"
-                name="description"
-                type="textarea"
-              />
-              <FormikInput
-                id="source-enabled"
-                label="Enabled"
-                name="enabled"
-                type="checkbox"
-              />
+              <FormikInput id="source-name" label="Name" name="name" required />
+              <FormikInput id="source-description" label="Description" name="description" type="textarea" />
+              <FormikInput id="source-enabled" label="Enabled" name="enabled" type="checkbox" />
               {values.source_type === 'file' && (
                 <FileConfigFields config={values.config as FileSourceConfig} setFieldValue={setFieldValue} />
               )}
@@ -236,7 +244,10 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props
                 <JournaldConfigFields config={values.config as JournaldSourceConfig} setFieldValue={setFieldValue} />
               )}
               {values.source_type === 'windows_event_log' && (
-                <WindowsEventLogConfigFields config={values.config as WindowsEventLogSourceConfig} setFieldValue={setFieldValue} />
+                <WindowsEventLogConfigFields
+                  config={values.config as WindowsEventLogSourceConfig}
+                  setFieldValue={setFieldValue}
+                />
               )}
             </Modal.Body>
             <Modal.Footer>

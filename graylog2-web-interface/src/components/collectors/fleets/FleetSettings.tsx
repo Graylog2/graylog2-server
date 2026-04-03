@@ -113,18 +113,8 @@ const FleetSettings = ({ fleet, onSave, onDelete = undefined }: Props) => {
           <Section>
             <SectionTitle>General Settings</SectionTitle>
             <Form>
-              <FormikInput
-                id="fleet-name"
-                label="Fleet Name"
-                name="name"
-                required
-              />
-              <FormikInput
-                id="fleet-description"
-                type="textarea"
-                label="Description"
-                name="description"
-              />
+              <FormikInput id="fleet-name" label="Fleet Name" name="name" required />
+              <FormikInput id="fleet-description" type="textarea" label="Description" name="description" />
               <FormikInput
                 id="fleet-target-version"
                 label="Target Version"

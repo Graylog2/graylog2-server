@@ -141,12 +141,7 @@ const CollectorsSettings = () => {
                 <h2>Ingest Endpoints</h2>
 
                 <h3>HTTP</h3>
-                <FormikInput
-                  id="http-enabled"
-                  type="checkbox"
-                  label="Enabled"
-                  name="http_enabled"
-                />
+                <FormikInput id="http-enabled" type="checkbox" label="Enabled" name="http_enabled" />
                 <FormikInput
                   id="http-hostname"
                   type="text"
