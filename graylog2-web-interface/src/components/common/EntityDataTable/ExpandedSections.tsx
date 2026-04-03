@@ -75,8 +75,6 @@ const ExpandedSections = <Entity extends EntityBase>({
   const { expandedSections, toggleSection } = useContext(ExpandedEntitiesSectionsContext);
   const expandedEntitySections = expandedSections?.[entity.id];
 
-  console.log('ExpandedSections', expandedSections);
-
   if (!expandedEntitySections?.length) {
     return null;
   }
