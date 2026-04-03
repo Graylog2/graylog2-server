@@ -21,13 +21,14 @@ import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Users;
+import org.graylog.testing.completebackend.conditions.EnabledIfSearchServer;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
-import java.util.Set;
 import java.util.zip.ZipInputStream;
 
 import static io.restassured.RestAssured.given;
@@ -40,6 +41,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 
 @GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
+@EnabledIfSearchServer(distribution = SearchVersion.Distribution.DATANODE)
 public class SupportBundleResourceIT {
     private static final String MANIFEST_URL = "/system/debug/support/manifest";
     private static final String LOGFILE_URL = "/system/debug/support/logfile/{id}";
@@ -403,10 +405,13 @@ public class SupportBundleResourceIT {
         assertThat(entryNames).isNotEmpty();
         // The bundle must always contain a cluster.json summary
         assertThat(entryNames).anyMatch(name -> name.equals("cluster.json"));
-        // Each node's directory should contain a thread dump and metrics
+        // Each Graylog node's directory should contain a thread dump and metrics
         assertThat(entryNames).anyMatch(name -> name.endsWith("thread-dump.txt"));
         assertThat(entryNames).anyMatch(name -> name.endsWith("metrics.json"));
         // At least one log file should be present (the in-memory log)
         assertThat(entryNames).anyMatch(name -> name.endsWith("server.mem.log"));
+        // Datanode-specific entries: each datanode's log and certificates
+        assertThat(entryNames).anyMatch(name -> name.startsWith("datanodes/") && name.endsWith("datanode.log"));
+        assertThat(entryNames).anyMatch(name -> name.startsWith("datanodes/") && name.endsWith("certificates.json"));
     }
 }

@@ -92,7 +92,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -196,6 +195,7 @@ public class SupportBundleService {
     }
 
     private void fetchClusterInfos(ProxiedResourceHelper proxiedResourceHelper, Map<String, SupportBundleNodeManifest> nodeManifests, Path tmpDir) throws IOException {
+        // All tasks submitted from the calling thread as peers — no task blocks on siblings from the same pool
         final CompletableFuture<Map<String, CallResult<SystemOverviewResponse>>> systemOverviewFuture =
                 CompletableFuture.supplyAsync(() -> proxiedResourceHelper.requestOnAllNodes(
                         RemoteSystemResource.class, RemoteSystemResource::system, CALL_TIMEOUT), executor);
@@ -212,18 +212,34 @@ public class SupportBundleService {
                 CompletableFuture.supplyAsync(() -> proxiedResourceHelper.requestOnAllNodes(
                         RemoteSystemPluginResource.class, RemoteSystemPluginResource::list, CALL_TIMEOUT), executor);
 
-        final CompletableFuture<Map<String, Object>> clusterInfoFuture =
-                CompletableFuture.supplyAsync(this::getClusterInfo, executor);
+        final CompletableFuture<Object> clusterStatsFuture =
+                timeLimitedOrErrorString(clusterStatsService::clusterStats, executor);
+
+        final CompletableFuture<Object> searchDbVersionFuture =
+                timeLimitedOrErrorString(() -> versionProbeFactory.createDefault().probe(elasticsearchHosts)
+                        .map(SearchVersion::toString).orElse("Unknown"), executor);
+
+        final CompletableFuture<Object> searchDbStatsFuture =
+                timeLimitedOrErrorString(searchDbClusterAdapter::rawClusterStats, executor);
 
         final CompletableFuture<Map<String, Object>> datanodeInfoFuture =
                 CompletableFuture.supplyAsync(this::getDatanodeInfo, executor);
 
         try {
-            CompletableFuture.allOf(systemOverviewFuture, jvmFuture, processBufferFuture,
-                    installedPluginsFuture, clusterInfoFuture, datanodeInfoFuture).get();
+            CompletableFuture.allOf(systemOverviewFuture, jvmFuture, processBufferFuture, installedPluginsFuture,
+                    clusterStatsFuture, searchDbVersionFuture, searchDbStatsFuture, datanodeInfoFuture).get();
         } catch (Exception e) {
             throw new RuntimeException("Failed collecting cluster infos", e);
         }
+
+        final Map<String, Object> searchDb = Map.of(
+                "version", searchDbVersionFuture.join(),
+                "stats", searchDbStatsFuture.join()
+        );
+        final Map<String, Object> clusterInfo = Map.of(
+                "cluster_stats", clusterStatsFuture.join(),
+                "search_db", searchDb
+        );
 
         try (FileOutputStream clusterJson = new FileOutputStream(tmpDir.resolve("cluster.json").toFile())) {
             final Map<String, Object> result = new HashMap<>(
@@ -235,35 +251,11 @@ public class SupportBundleService {
                             "installed_plugins", stripCallResult(installedPluginsFuture.join())
                     )
             );
-            result.putAll(clusterInfoFuture.join());
+            result.putAll(clusterInfo);
             result.putAll(datanodeInfoFuture.join());
 
             objectMapper.writerWithDefaultPrettyPrinter().writeValue(clusterJson, result);
         }
-    }
-
-    private Map<String, Object> getClusterInfo() {
-        final Map<String, Object> clusterInfo = new ConcurrentHashMap<>();
-        final Map<String, Object> searchDb = new ConcurrentHashMap<>();
-
-        final CompletableFuture<?> clusterStats = timeLimitedOrErrorString(clusterStatsService::clusterStats,
-                executor).thenAccept(stats -> clusterInfo.put("cluster_stats", stats));
-
-        final CompletableFuture<?> searchDbVersion =
-                timeLimitedOrErrorString(() -> versionProbeFactory.createDefault().probe(elasticsearchHosts)
-                        .map(SearchVersion::toString).orElse("Unknown"), executor)
-                        .thenAccept(version -> searchDb.put("version", version));
-        final CompletableFuture<?> searchDbStats = timeLimitedOrErrorString(searchDbClusterAdapter::rawClusterStats,
-                executor).thenAccept(stats -> searchDb.put("stats", stats));
-
-        try {
-            CompletableFuture.allOf(clusterStats, searchDbVersion, searchDbStats).get();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed collecting cluster info", e);
-        }
-
-        clusterInfo.put("search_db", searchDb);
-        return clusterInfo;
     }
 
     private Map<String, Object> getDatanodeInfo() {
