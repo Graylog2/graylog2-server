@@ -142,7 +142,7 @@
         <HdrHistogram.version>2.2.2</HdrHistogram.version>
         <hamcrest.version>3.0</hamcrest.version>
         <hibernate-validator.version>9.1.0.Final</hibernate-validator.version>
-        <hk2.version>3.1.1</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
+        <hk2.version>4.0.0</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
         <jackson.version>2.21.2</jackson.version>
         <jadconfig.version>1.1.0</jadconfig.version>
         <java-semver.version>0.10.2</java-semver.version>
