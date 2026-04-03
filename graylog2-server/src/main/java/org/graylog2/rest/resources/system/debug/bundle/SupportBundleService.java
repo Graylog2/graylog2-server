@@ -193,30 +193,47 @@ public class SupportBundleService {
     }
 
     private void fetchClusterInfos(ProxiedResourceHelper proxiedResourceHelper, Map<String, SupportBundleNodeManifest> nodeManifests, Path tmpDir) throws IOException {
+        final CompletableFuture<Map<String, CallResult<SystemOverviewResponse>>> systemOverviewFuture =
+                CompletableFuture.supplyAsync(() -> proxiedResourceHelper.requestOnAllNodes(
+                        RemoteSystemResource.class, RemoteSystemResource::system, CALL_TIMEOUT), executor);
+
+        final CompletableFuture<Map<String, CallResult<SystemJVMResponse>>> jvmFuture =
+                CompletableFuture.supplyAsync(() -> proxiedResourceHelper.requestOnAllNodes(
+                        RemoteSystemResource.class, RemoteSystemResource::jvm, CALL_TIMEOUT), executor);
+
+        final CompletableFuture<Map<String, CallResult<SystemProcessBufferDumpResponse>>> processBufferFuture =
+                CompletableFuture.supplyAsync(() -> proxiedResourceHelper.requestOnAllNodes(
+                        RemoteSystemResource.class, RemoteSystemResource::processBufferDump, CALL_TIMEOUT), executor);
+
+        final CompletableFuture<Map<String, CallResult<PluginList>>> installedPluginsFuture =
+                CompletableFuture.supplyAsync(() -> proxiedResourceHelper.requestOnAllNodes(
+                        RemoteSystemPluginResource.class, RemoteSystemPluginResource::list, CALL_TIMEOUT), executor);
+
+        final CompletableFuture<Map<String, Object>> clusterInfoFuture =
+                CompletableFuture.supplyAsync(this::getClusterInfo, executor);
+
+        final CompletableFuture<Map<String, Object>> datanodeInfoFuture =
+                CompletableFuture.supplyAsync(this::getDatanodeInfo, executor);
+
+        try {
+            CompletableFuture.allOf(systemOverviewFuture, jvmFuture, processBufferFuture,
+                    installedPluginsFuture, clusterInfoFuture, datanodeInfoFuture).get();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed collecting cluster infos", e);
+        }
+
         try (FileOutputStream clusterJson = new FileOutputStream(tmpDir.resolve("cluster.json").toFile())) {
-            final Map<String, CallResult<SystemOverviewResponse>> systemOverview =
-                    proxiedResourceHelper.requestOnAllNodes(RemoteSystemResource.class, RemoteSystemResource::system, CALL_TIMEOUT);
-
-            final Map<String, CallResult<SystemJVMResponse>> jvm = proxiedResourceHelper.requestOnAllNodes(
-                    RemoteSystemResource.class, RemoteSystemResource::jvm, CALL_TIMEOUT);
-
-            final Map<String, CallResult<SystemProcessBufferDumpResponse>> processBuffer = proxiedResourceHelper.requestOnAllNodes(
-                    RemoteSystemResource.class, RemoteSystemResource::processBufferDump, CALL_TIMEOUT);
-
-            final Map<String, CallResult<PluginList>> installedPlugins = proxiedResourceHelper.requestOnAllNodes(
-                    RemoteSystemPluginResource.class, RemoteSystemPluginResource::list, CALL_TIMEOUT);
-
             final Map<String, Object> result = new HashMap<>(
                     Map.of(
                             "manifest", nodeManifests,
-                            "cluster_system_overview", stripCallResult(systemOverview),
-                            "jvm", stripCallResult(jvm),
-                            "process_buffer_dump", stripCallResult(processBuffer),
-                            "installed_plugins", stripCallResult(installedPlugins)
+                            "cluster_system_overview", stripCallResult(systemOverviewFuture.join()),
+                            "jvm", stripCallResult(jvmFuture.join()),
+                            "process_buffer_dump", stripCallResult(processBufferFuture.join()),
+                            "installed_plugins", stripCallResult(installedPluginsFuture.join())
                     )
             );
-            result.putAll(getClusterInfo());
-            result.putAll(getDatanodeInfo());
+            result.putAll(clusterInfoFuture.join());
+            result.putAll(datanodeInfoFuture.join());
 
             objectMapper.writerWithDefaultPrettyPrinter().writeValue(clusterJson, result);
         }
