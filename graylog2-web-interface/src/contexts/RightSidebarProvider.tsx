@@ -21,7 +21,7 @@ import RightSidebarContext from 'contexts/RightSidebarContext';
 import type { RightSidebarContent } from 'contexts/RightSidebarContext';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import type {TelemetryEventType} from 'logic/telemetry/TelemetryContext';
+import type { TelemetryEventType } from 'logic/telemetry/TelemetryContext';
 
 type Props = {
   children: React.ReactNode;
@@ -196,12 +196,16 @@ const RightSidebarProvider = ({ children }: Props) => {
     [sendTelemetry],
   );
 
-  const openSidebar = useCallback(<T = Record<string, unknown>,>(newContent: RightSidebarContent<T>) => {
-    sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.OPENED, {
-      content_id: newContent.id, component_key: newContent.componentKey,
-    });
-    dispatch({ type: 'OPEN_SIDEBAR', content: newContent as RightSidebarContent<any> });
-  }, [sendSidebarTelemetry]);
+  const openSidebar = useCallback(
+    <T = Record<string, unknown>,>(newContent: RightSidebarContent<T>) => {
+      sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.OPENED, {
+        content_id: newContent.id,
+        component_key: newContent.componentKey,
+      });
+      dispatch({ type: 'OPEN_SIDEBAR', content: newContent as RightSidebarContent<any> });
+    },
+    [sendSidebarTelemetry],
+  );
 
   const closeSidebar = useCallback(() => {
     sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.CLOSED);

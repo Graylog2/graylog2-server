@@ -60,10 +60,12 @@ describe('InstanceActions', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    asMock(useCollectorsMutations).mockReturnValue(mockCollectorsMutations({
-      deleteInstance: deleteInstanceMock,
-      isDeletingInstance: false,
-    }));
+    asMock(useCollectorsMutations).mockReturnValue(
+      mockCollectorsMutations({
+        deleteInstance: deleteInstanceMock,
+        isDeletingInstance: false,
+      }),
+    );
   });
 
   it('renders View Logs and Details buttons', async () => {

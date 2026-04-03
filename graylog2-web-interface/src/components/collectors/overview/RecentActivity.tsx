@@ -147,7 +147,9 @@ const RecentActivity = () => {
 
       {isLoading && <Spinner />}
 
-      {!isLoading && (!data?.activities || data.activities.length === 0) && <NoEntitiesExist>No recent activity.</NoEntitiesExist>}
+      {!isLoading && (!data?.activities || data.activities.length === 0) && (
+        <NoEntitiesExist>No recent activity.</NoEntitiesExist>
+      )}
 
       {!isLoading && data?.activities && data.activities.length > 0 && (
         <ActivityList>

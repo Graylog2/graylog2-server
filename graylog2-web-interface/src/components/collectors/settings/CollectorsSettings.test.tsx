@@ -64,10 +64,12 @@ describe('CollectorsSettings', () => {
       data: config,
       isLoading: false,
     });
-    asMock(useCollectorsMutations).mockReturnValue(mockCollectorsMutations({
-      updateConfig,
-      isUpdatingConfig: false,
-    }));
+    asMock(useCollectorsMutations).mockReturnValue(
+      mockCollectorsMutations({
+        updateConfig,
+        isUpdatingConfig: false,
+      }),
+    );
     asMock(useInput).mockReturnValue({
       data: { id: 'input-1' },
     } as ReturnType<typeof useInput>);

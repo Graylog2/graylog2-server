@@ -27,7 +27,6 @@ import collectorLogsUrl from '../common/collectorLogsUrl';
 import { useCollectorsMutations } from '../hooks';
 import type { CollectorInstanceView } from '../types';
 
-
 type Props = {
   instance: CollectorInstanceView;
   onDetailsClick: (instance: CollectorInstanceView) => void;

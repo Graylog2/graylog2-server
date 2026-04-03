@@ -28,7 +28,16 @@ describe('StatCard', () => {
   });
 
   it('applies variant styling for warning', async () => {
-    render(<StatCard value={5} label="Offline" variant="warning" onClick={() => { /* force this to be a button */ }} />);
+    render(
+      <StatCard
+        value={5}
+        label="Offline"
+        variant="warning"
+        onClick={() => {
+          /* force this to be a button */
+        }}
+      />,
+    );
 
     const card = screen.getByRole('button');
     expect(card).toBeInTheDocument();

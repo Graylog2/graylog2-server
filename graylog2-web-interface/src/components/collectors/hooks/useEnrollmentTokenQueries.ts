@@ -21,7 +21,6 @@ import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQue
 import { defaultOnError } from 'util/conditional/onError';
 import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
 
-
 import type { EnrollmentTokenMetadata } from '../types';
 
 export const ENROLLMENT_TOKENS_KEY_PREFIX = ['collectors', 'enrollment-tokens'];

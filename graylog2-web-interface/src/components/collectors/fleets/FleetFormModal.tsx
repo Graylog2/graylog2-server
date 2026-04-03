@@ -74,13 +74,7 @@ const FleetFormModal = ({ fleet = undefined, onClose, onSave }: Props) => {
               <Modal.Title>{isEdit ? 'Edit Fleet' : 'New Fleet'}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <FormikInput
-                id="fleet-name"
-                label="Name"
-                name="name"
-                help="A unique name for this fleet"
-                required
-              />
+              <FormikInput id="fleet-name" label="Name" name="name" help="A unique name for this fleet" required />
               <FormikInput
                 id="fleet-description"
                 label="Description"

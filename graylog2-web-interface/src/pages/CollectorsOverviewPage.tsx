@@ -29,7 +29,8 @@ const CollectorsOverviewPage = () => {
   const { data: config, isLoading } = useCollectorsConfig();
 
   if (isLoading) {
-    return (<DocumentTitle title="Collectors Overview">
+    return (
+      <DocumentTitle title="Collectors Overview">
         <Spinner />
       </DocumentTitle>
     );
@@ -42,7 +43,12 @@ const CollectorsOverviewPage = () => {
   return (
     <DocumentTitle title="Collectors Overview">
       <CollectorsPageNavigation />
-      <PageHeader title={<>Collectors Overview <BetaBadge /></>}>
+      <PageHeader
+        title={
+          <>
+            Collectors Overview <BetaBadge />
+          </>
+        }>
         <span>Overview of all collectors and sources across your infrastructure.</span>
       </PageHeader>
       <Row className="content">

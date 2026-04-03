@@ -480,11 +480,7 @@ describe('<EntityFilters />', () => {
       });
 
       render(
-        <EntityFilters
-          urlQueryFilters={OrderedMap({ type: ['string'] })}
-          activeSliceCol="type"
-          activeSlice="string"
-        />,
+        <EntityFilters urlQueryFilters={OrderedMap({ type: ['string'] })} activeSliceCol="type" activeSlice="string" />,
       );
 
       const activeFilter = await screen.findByTestId('type-filter-string');
