@@ -83,6 +83,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -154,40 +155,59 @@ public class SupportBundleService {
     }
 
     public void buildBundle(HttpHeaders httpHeaders, Subject currentSubject) {
-        final ProxiedResourceHelper proxiedResourceHelper = new ProxiedResourceHelper(httpHeaders, currentSubject, nodeService, remoteInterfaceProvider, executor);
+        final ProxiedResourceHelper proxiedResourceHelper = new ProxiedResourceHelper(
+                httpHeaders, currentSubject, nodeService, remoteInterfaceProvider, executor);
 
-        final var manifestsResponse = proxiedResourceHelper.requestOnAllNodes(
-                RemoteSupportBundleInterface.class,
-                RemoteSupportBundleInterface::getNodeManifest, CALL_TIMEOUT);
-        final Map<String, SupportBundleNodeManifest> nodeManifests = extractManifests(manifestsResponse);
+        final Map<String, SupportBundleNodeManifest> nodeManifests = extractManifests(
+                proxiedResourceHelper.requestOnAllNodes(
+                        RemoteSupportBundleInterface.class,
+                        RemoteSupportBundleInterface::getNodeManifest, CALL_TIMEOUT));
 
-        Path bundleSpoolDir = null;
         try {
-            bundleSpoolDir = prepareBundleSpoolDir();
-            final Path finalSpoolDir = bundleSpoolDir; // needed for the lambda
-            final Path dataNodeDir = bundleSpoolDir.resolve("datanodes");
-
-            // Fetch from all nodes in parallel, with per-node sub-tasks also running as peers
-            final List<CompletableFuture<Void>> futures = Stream.concat(
-                    nodeManifests.entrySet().stream().flatMap(entry ->
-                            fetchNodeInfosAsync(proxiedResourceHelper, entry.getKey(), entry.getValue(), finalSpoolDir).stream()),
-                    datanodeService.allActive().values().stream().map(datanode ->
-                            CompletableFuture.runAsync(() -> fetchDataNodeInfos(datanode, dataNodeDir), executor))
-            ).toList();
-            CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).get();
-            fetchClusterInfos(proxiedResourceHelper, nodeManifests, bundleSpoolDir);
-            writeZipFile(bundleSpoolDir);
+            final Path spoolDir = prepareBundleSpoolDir();
+            try {
+                collectBundleData(proxiedResourceHelper, nodeManifests, spoolDir);
+                writeZipFile(spoolDir);
+            } finally {
+                FileUtils.deleteDirectory(spoolDir.toFile());
+            }
         } catch (Exception e) {
             LOG.warn("Exception while trying to build support bundle", e);
             throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR, e);
-        } finally {
-            try {
-                if (bundleSpoolDir != null) {
-                    FileUtils.deleteDirectory(bundleSpoolDir.toFile());
-                }
-            } catch (IOException e) {
-                LOG.error("Failed to cleanup temp directory <{}>", bundleSpoolDir);
-            }
+        }
+    }
+
+    private void collectBundleData(ProxiedResourceHelper proxiedResourceHelper,
+                                   Map<String, SupportBundleNodeManifest> nodeManifests,
+                                   Path spoolDir) throws Exception {
+        final Path dataNodeDir = spoolDir.resolve("datanodes");
+
+        // fetchClusterInfos runs concurrently with per-node collection — they are independent.
+        // Its requestOnAllNodes wrappers run on their own orchestrationExecutor (created inside
+        // the method), so only 4 simple leaf tasks land on `executor` — no starvation risk.
+        final List<CompletableFuture<Void>> futures = new ArrayList<>();
+
+        nodeManifests.entrySet().stream()
+                .flatMap(e -> fetchNodeInfosAsync(proxiedResourceHelper, e.getKey(), e.getValue(), spoolDir).stream())
+                .forEach(futures::add);
+
+        datanodeService.allActive().values().stream()
+                .map(dn -> CompletableFuture.runAsync(() -> fetchDataNodeInfos(dn, dataNodeDir), executor))
+                .forEach(futures::add);
+
+        futures.add(CompletableFuture.runAsync(
+                () -> fetchClusterInfosUnchecked(proxiedResourceHelper, nodeManifests, spoolDir), executor));
+
+        CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).get();
+    }
+
+    private void fetchClusterInfosUnchecked(ProxiedResourceHelper proxiedResourceHelper,
+                                            Map<String, SupportBundleNodeManifest> nodeManifests,
+                                            Path spoolDir) {
+        try {
+            fetchClusterInfos(proxiedResourceHelper, nodeManifests, spoolDir);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
