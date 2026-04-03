@@ -471,6 +471,40 @@ describe('<EntityFilters />', () => {
 
       expect(screen.getByRole('menuitem', { name: /string/i })).toBeDisabled();
     });
+
+    it('should strike through and disable conflicting active filter while keeping delete available', async () => {
+      asMock(useFiltersWithTitle).mockReturnValue({
+        data: OrderedMap({ type: [{ title: 'String', value: 'string' }] }),
+        onChange: onChangeFiltersWithTitle,
+        isInitialLoading: false,
+      });
+
+      render(
+        <EntityFilters
+          urlQueryFilters={OrderedMap({ type: ['string'] })}
+          activeSliceCol="type"
+          activeSlice="string"
+        />,
+      );
+
+      const activeFilter = await screen.findByTestId('type-filter-string');
+      const changeFilterButton = within(activeFilter).getByRole('button', { name: /change filter value/i });
+      const deleteFilterButton = within(activeFilter).getByRole('button', { name: /delete filter/i });
+
+      expect(changeFilterButton).toBeDisabled();
+      expect(changeFilterButton).toHaveStyle('text-decoration: line-through');
+      expect(deleteFilterButton).not.toBeDisabled();
+
+      await setupUser().click(changeFilterButton);
+
+      expect(screen.queryByRole('menuitem', { name: /number/i })).not.toBeInTheDocument();
+
+      await setupUser().click(deleteFilterButton);
+
+      await waitFor(() => {
+        expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap());
+      });
+    });
   });
 
   describe('generic attribute', () => {
