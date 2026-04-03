@@ -168,10 +168,10 @@ public class SupportBundleService {
             final Path finalSpoolDir = bundleSpoolDir; // needed for the lambda
             final Path dataNodeDir = bundleSpoolDir.resolve("datanodes");
 
-            // Fetch from all nodes in parallel
+            // Fetch from all nodes in parallel, with per-node sub-tasks also running as peers
             final List<CompletableFuture<Void>> futures = Stream.concat(
-                    nodeManifests.entrySet().stream().map(entry ->
-                            CompletableFuture.runAsync(() -> fetchNodeInfos(proxiedResourceHelper, entry.getKey(), entry.getValue(), finalSpoolDir), executor)),
+                    nodeManifests.entrySet().stream().flatMap(entry ->
+                            fetchNodeInfosAsync(proxiedResourceHelper, entry.getKey(), entry.getValue(), finalSpoolDir).stream()),
                     datanodeService.allActive().values().stream().map(datanode ->
                             CompletableFuture.runAsync(() -> fetchDataNodeInfos(datanode, dataNodeDir), executor))
             ).toList();
@@ -334,53 +334,59 @@ public class SupportBundleService {
         }).collect(Collectors.toMap(Map.Entry::getKey, res -> Objects.requireNonNull(res.getValue().response()).entity().get()));
     }
 
-    private void fetchNodeInfos(ProxiedResourceHelper proxiedResourceHelper, String nodeId, SupportBundleNodeManifest manifest, Path tmpDir) {
+    private List<CompletableFuture<Void>> fetchNodeInfosAsync(ProxiedResourceHelper proxiedResourceHelper, String nodeId, SupportBundleNodeManifest manifest, Path tmpDir) {
         final Path nodeDir = tmpDir.resolve(new SimpleNodeId(nodeId).getShortNodeId());
         var ignored = nodeDir.toFile().mkdirs();
 
-        fetchLogs(proxiedResourceHelper, nodeId, manifest.entries().logfiles(), nodeDir);
-        fetchNodeInfo(proxiedResourceHelper, nodeId, nodeDir);
+        return List.of(
+                CompletableFuture.runAsync(() -> fetchLogs(proxiedResourceHelper, nodeId, manifest.entries().logfiles(), nodeDir), executor),
+                CompletableFuture.runAsync(() -> fetchThreadDump(proxiedResourceHelper, nodeId, nodeDir), executor),
+                CompletableFuture.runAsync(() -> fetchMetrics(proxiedResourceHelper, nodeId, nodeDir), executor),
+                CompletableFuture.runAsync(() -> fetchSystemStats(proxiedResourceHelper, nodeId, nodeDir), executor),
+                CompletableFuture.runAsync(() -> fetchNodeCertificates(proxiedResourceHelper, nodeId, nodeDir), executor)
+        );
     }
 
-    private void fetchNodeInfo(ProxiedResourceHelper proxiedResourceHelper, String nodeId, Path nodeDir) {
+    private void fetchThreadDump(ProxiedResourceHelper proxiedResourceHelper, String nodeId, Path nodeDir) {
         try (var threadDumpFile = new FileOutputStream(nodeDir.resolve("thread-dump.txt").toFile())) {
-
             final ProxiedResource.NodeResponse<SystemThreadDumpResponse> dump = proxiedResourceHelper.doNodeApiCall(nodeId,
-                    RemoteSystemResource.class, RemoteSystemResource::threadDump, Function.identity(), CALL_TIMEOUT
-            );
+                    RemoteSystemResource.class, RemoteSystemResource::threadDump, Function.identity(), CALL_TIMEOUT);
             if (dump.entity().isPresent()) {
                 threadDumpFile.write(dump.entity().get().threadDump().getBytes(StandardCharsets.UTF_8));
             }
         } catch (Exception e) {
             LOG.warn("Failed to get threadDump from node <{}>", nodeId, e);
         }
+    }
 
+    private void fetchMetrics(ProxiedResourceHelper proxiedResourceHelper, String nodeId, Path nodeDir) {
         try (var nodeMetricsFile = new FileOutputStream(nodeDir.resolve("metrics.json").toFile())) {
             final ProxiedResource.NodeResponse<MetricsSummaryResponse> metrics = proxiedResourceHelper.doNodeApiCall(nodeId,
-                    RemoteMetricsResource.class, c -> c.byNamespace("org"), Function.identity(), CALL_TIMEOUT
-            );
+                    RemoteMetricsResource.class, c -> c.byNamespace("org"), Function.identity(), CALL_TIMEOUT);
             if (metrics.entity().isPresent()) {
                 objectMapper.writerWithDefaultPrettyPrinter().writeValue(nodeMetricsFile, metrics.entity().get());
             }
         } catch (Exception e) {
             LOG.warn("Failed to get metrics from node <{}>", nodeId, e);
         }
+    }
 
+    private void fetchSystemStats(ProxiedResourceHelper proxiedResourceHelper, String nodeId, Path nodeDir) {
         try (var systemStatsFile = new FileOutputStream(nodeDir.resolve("system-stats.json").toFile())) {
             final ProxiedResource.NodeResponse<SystemStats> statsResponse = proxiedResourceHelper.doNodeApiCall(nodeId,
-                    RemoteSystemStatsResource.class, RemoteSystemStatsResource::systemStats, Function.identity(), CALL_TIMEOUT
-            );
+                    RemoteSystemStatsResource.class, RemoteSystemStatsResource::systemStats, Function.identity(), CALL_TIMEOUT);
             if (statsResponse.entity().isPresent()) {
                 objectMapper.writerWithDefaultPrettyPrinter().writeValue(systemStatsFile, statsResponse.entity().get());
             }
         } catch (Exception e) {
             LOG.warn("Failed to get system stats from node <{}>", nodeId, e);
         }
+    }
 
+    private void fetchNodeCertificates(ProxiedResourceHelper proxiedResourceHelper, String nodeId, Path nodeDir) {
         try (var certificatesFile = new FileOutputStream(nodeDir.resolve("certificates.json").toFile())) {
             final ProxiedResource.NodeResponse<Map<String, KeyStoreDto>> certificatesResponse = proxiedResourceHelper.doNodeApiCall(nodeId,
-                    RemoteCertificatesResource.class, RemoteCertificatesResource::certificates, Function.identity(), CALL_TIMEOUT
-            );
+                    RemoteCertificatesResource.class, RemoteCertificatesResource::certificates, Function.identity(), CALL_TIMEOUT);
             if (certificatesResponse.entity().isPresent()) {
                 objectMapper.writerWithDefaultPrettyPrinter().writeValue(certificatesFile, certificatesResponse.entity().get());
             }
