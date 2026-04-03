@@ -75,7 +75,7 @@ public class OTelHttpTransport extends AbstractHttpTransport {
         // input.processRawMessage directly. These cannot be removed without overriding
         // getChildChannelHandlers.
         handlers.replace("http-handler", () -> new OTelHttpHandler(
-                isEnableCors(), getAuthorizationHeader(), getAuthorizationHeaderValue(),
+                isEnableCors(), getAuthorizationHeader(), getAuthorizationHeaderValues(),
                 getPath(), input));
         return handlers;
     }
