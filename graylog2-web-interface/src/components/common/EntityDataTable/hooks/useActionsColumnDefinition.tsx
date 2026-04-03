@@ -34,8 +34,8 @@ const AlignRight = styled.div`
 `;
 
 const BackgroundFoundation = styled.div<{ $parentBgColor: string }>(
-  ({ theme, $parentBgColor }) => css`
-    background-color: ${$parentBgColor ?? theme.colors.global.contentBackground};
+  ({ $parentBgColor }) => css`
+    background-color: ${$parentBgColor ?? 'transparent'};
     height: 100%;
     width: var(${actionsHeaderWidthVar});
   `,
