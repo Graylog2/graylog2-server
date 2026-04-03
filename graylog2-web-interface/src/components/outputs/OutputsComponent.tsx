@@ -27,6 +27,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { isPermitted } from 'util/PermissionsMixin';
 import useAvailableOutputTypes from 'components/streams/useAvailableOutputTypes';
+import { getOutputTypeDefinition } from 'components/streams/useAvailableOutputTypes';
 import useOutputs from 'hooks/useOutputs';
 import useStreamOutputs from 'hooks/useStreamOutputs';
 import useOutputMutations from 'hooks/useOutputMutations';
@@ -72,8 +73,10 @@ const OutputsComponent = ({ streamId = undefined, permissions }: Props) => {
 
   const getTypeDefinition = useCallback(
     (typeName: string, callback: (def: any) => void) => {
-      if (types?.[typeName]) {
-        callback(types[typeName]);
+      const typeDefinition = getOutputTypeDefinition(types, typeName);
+
+      if (typeDefinition) {
+        callback(typeDefinition);
       }
     },
     [types],

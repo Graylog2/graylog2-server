@@ -30,13 +30,17 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useStreamOutputMutation from 'hooks/useStreamOutputMutations';
 import type {
   AvailableOutputRequestedConfiguration,
+  AvailableOutputSummary,
   AvailableOutputTypes,
 } from 'components/streams/useAvailableOutputTypes';
 import { Icon } from 'components/common';
 
 type Props = {
   stream: Stream;
-  getTypeDefinition: (type: string) => AvailableOutputRequestedConfiguration;
+  getTypeDefinition: (
+    type: string,
+    callback?: (available: AvailableOutputSummary) => void,
+  ) => AvailableOutputRequestedConfiguration | undefined;
   availableOutputTypes: AvailableOutputTypes;
   assignableOutputs: Array<Output>;
 };
