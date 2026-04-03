@@ -301,15 +301,13 @@ public class SupportBundleService {
                     var zipEntry = new ZipEntry(tmpDir.relativize(p).toString());
                     try {
                         zipStream.putNextEntry(zipEntry);
-                        Files.copy(p, zipStream);
+                        try {
+                            Files.copy(p, zipStream);
+                        } finally {
+                            zipStream.closeEntry();
+                        }
                     } catch (IOException e) {
                         LOG.warn("Failure while creating ZipEntry <{}>", zipEntry, e);
-                    } finally {
-                        try {
-                            zipStream.closeEntry();
-                        } catch (IOException e) {
-                            LOG.warn("Failed to close zip entry", e);
-                        }
                     }
                 });
             }
