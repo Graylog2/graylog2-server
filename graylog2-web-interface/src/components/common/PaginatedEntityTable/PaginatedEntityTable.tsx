@@ -127,6 +127,8 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   tableLayout,
   topRightCol = undefined,
   withoutURLParams = false,
+  noPageSizeSelect = false,
+  noColumnReordering = false,
 }: PaginatedEntityTableProps<T, M> & InnerProps) => {
   const { mutateAsync: updateTableLayout } = useUpdateUserLayoutPreferences(tableLayout.entityTableId);
   const fetchKey = useMemo(() => keyFn(fetchOptions), [fetchOptions, keyFn]);
@@ -270,6 +272,8 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
                 columnSchemas={columnSchemas}
                 entityAttributesAreCamelCase={entityAttributesAreCamelCase}
                 meta={meta}
+                noPageSizeSelect={noPageSizeSelect}
+                noColumnReordering={noColumnReordering}
               />
             )}
           </PaginatedList>
@@ -356,6 +360,8 @@ export type PaginatedEntityTableProps<T extends EntityBase, M> = {
   tableLayout: DefaultLayout;
   topRightCol?: React.ReactNode;
   withoutURLParams?: boolean;
+  noPageSizeSelect?: boolean;
+  noColumnReordering?: boolean;
 };
 
 /*

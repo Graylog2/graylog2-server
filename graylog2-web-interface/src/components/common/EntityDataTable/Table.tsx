@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import React, { useContext } from 'react';
 import type { Row, HeaderGroup, ColumnPinningPosition } from '@tanstack/react-table';
 import { flexRender } from '@tanstack/react-table';
 import styled, { css } from 'styled-components';
@@ -37,6 +37,7 @@ import {
 } from 'components/common/EntityDataTable/CSSVariables';
 import ScrollShadow from 'theme/box-shadows/ScrollShadow';
 
+import ExpandedEntitiesSectionsContext from './contexts/ExpandedSectionsContext';
 import TableHead from './TableHead';
 
 const StyledTable = styled(BaseTable)(
@@ -57,6 +58,13 @@ const StyledTable = styled(BaseTable)(
 
       > tbody:nth-of-type(odd) > tr {
         background-color: ${theme.colors.table.row.background};
+      }
+      > tbody > tr.active {
+        background-color: ${theme.colors.table.row.backgroundHover} !important;
+
+        & td {
+          background-color: transparent !important;
+        }
       }
     }
   `,
@@ -105,51 +113,57 @@ const Table = <Entity extends EntityBase>({
   rowOverride = undefined,
   headerGroups,
   rows,
-}: Props<Entity>) => (
-  <StyledTable striped condensed hover>
-    <TableHead headerGroups={headerGroups} />
-    {rows.map((row) => {
-      const visibleCells = row.getVisibleCells();
-      const visibleCellCount = visibleCells.length;
-      const renderCell = (cell) => {
-        const columnMeta = cell.column.columnDef.meta as ColumnMetaContext<Entity>;
+}: Props<Entity>) => {
+  const { expandedSections } = useContext(ExpandedEntitiesSectionsContext);
+
+  const isRowExpanded = (rowId: string) => !!expandedSections?.[rowId];
+
+  return (
+    <StyledTable striped condensed hover>
+      <TableHead headerGroups={headerGroups} />
+      {rows.map((row) => {
+        const visibleCells = row.getVisibleCells();
+        const visibleCellCount = visibleCells.length;
+        const renderCell = (cell) => {
+          const columnMeta = cell.column.columnDef.meta as ColumnMetaContext<Entity>;
+
+          return (
+            <Td
+              key={cell.id}
+              $colId={cell.column.id}
+              $pinningPosition={cell.column.getIsPinned()}
+              $hidePadding={columnMeta?.hideCellPadding}>
+              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+            </Td>
+          );
+        };
+        const actionCellIndex = visibleCells.findIndex((cell) => cell.column.id === ACTIONS_COL_ID);
+        const defaultRowActionCell = actionCellIndex >= 0 ? renderCell(visibleCells[actionCellIndex]) : undefined;
+        const overrideNotice = rowOverride?.(row.original);
 
         return (
-          <Td
-            key={cell.id}
-            $colId={cell.column.id}
-            $pinningPosition={cell.column.getIsPinned()}
-            $hidePadding={columnMeta?.hideCellPadding}>
-            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-          </Td>
-        );
-      };
-      const actionCellIndex = visibleCells.findIndex((cell) => cell.column.id === ACTIONS_COL_ID);
-      const defaultRowActionCell = actionCellIndex >= 0 ? renderCell(visibleCells[actionCellIndex]) : undefined;
-      const overrideNotice = rowOverride?.(row.original);
-
-      return (
-        <tbody key={`table-row-${row.id}`} data-testid={`table-row-${row.id}`}>
-          {overrideNotice !== undefined ? (
-            <EntityTableOverrideRow
-              visibleCellCount={visibleCellCount}
-              notice={overrideNotice}
-              actionCell={defaultRowActionCell}
-            />
-          ) : (
-            <>
-              <tr>{visibleCells.map(renderCell)}</tr>
-              <ExpandedSections
-                key={`expanded-sections-${row.id}`}
-                expandedSectionRenderers={expandedSectionRenderers}
-                entity={row.original}
+          <tbody key={`table-row-${row.id}`} data-testid={`table-row-${row.id}`}>
+            {overrideNotice !== undefined ? (
+              <EntityTableOverrideRow
+                visibleCellCount={visibleCellCount}
+                notice={overrideNotice}
+                actionCell={defaultRowActionCell}
               />
-            </>
-          )}
-        </tbody>
-      );
-    })}
-  </StyledTable>
-);
+            ) : (
+              <>
+                <tr className={isRowExpanded(row.id) ? 'active' : null}>{visibleCells.map(renderCell)}</tr>
+                <ExpandedSections
+                  key={`expanded-sections-${row.id}`}
+                  expandedSectionRenderers={expandedSectionRenderers}
+                  entity={row.original}
+                />
+              </>
+            )}
+          </tbody>
+        );
+      })}
+    </StyledTable>
+  );
+};
 
 export default React.memo(Table) as typeof Table;
