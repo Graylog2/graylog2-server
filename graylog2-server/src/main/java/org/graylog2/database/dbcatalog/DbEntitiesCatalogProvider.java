@@ -23,6 +23,7 @@ import jakarta.inject.Singleton;
 import org.graylog2.database.DbEntity;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import static org.graylog2.plugin.inject.Graylog2Module.DB_ENTITIES;
@@ -47,7 +48,7 @@ public class DbEntitiesCatalogProvider implements Provider<DbEntitiesCatalog> {
                         Arrays.stream(clazz.getAnnotationsByType(DbEntity.class))
                                 .map(a ->
                                         new DbEntityCatalogEntry(a.collection(), a.titleField(), clazz,
-                                                a.readPermission()))
+                                                a.readPermission(), List.of(a.readableFields())))
                 )
                 .toList();
         return new DbEntitiesCatalog(catalogEntries);

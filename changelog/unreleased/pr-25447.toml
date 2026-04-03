@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixed event search extra filters being incorrectly applied as ANDed together."
+
+issues = ["Graylog2/graylog-plugin-enterprise#13434"]
+pulls = ["25447"]
