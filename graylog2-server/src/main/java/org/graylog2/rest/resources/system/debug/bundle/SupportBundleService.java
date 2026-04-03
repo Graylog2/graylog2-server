@@ -78,9 +78,10 @@ import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -89,7 +90,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TimeZone;
+
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
@@ -115,6 +116,8 @@ public class SupportBundleService {
     public static final String BUNDLE_NAME_PREFIX = "graylog-support-bundle";
     public static final String IN_MEMORY_LOGFILE_ID = "memory";
     public static final long LOG_COLLECTION_SIZE_LIMIT = 60 * 1024 * 1024; // Limits how many on-disk logs we collect per node
+    private static final DateTimeFormatter TIMESTAMP_FORMAT =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmmss", Locale.US).withZone(ZoneOffset.UTC);
 
     private final ExecutorService executor;
     private final NodeService nodeService;
@@ -283,9 +286,7 @@ public class SupportBundleService {
     }
 
     private String nowTimestamp() {
-        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-HHmmss", Locale.US);
-        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return simpleDateFormat.format(Instant.now().toEpochMilli());
+        return TIMESTAMP_FORMAT.format(Instant.now());
     }
 
     private void writeZipFile(Path tmpDir) throws IOException {
