@@ -66,6 +66,7 @@ import org.slf4j.LoggerFactory;
 import retrofit2.Call;
 import retrofit2.http.GET;
 
+import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -295,7 +296,7 @@ public class SupportBundleService {
                 PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-------"))
         );
 
-        try (ZipOutputStream zipStream = new ZipOutputStream(new FileOutputStream(zipFile.toFile()))) {
+        try (ZipOutputStream zipStream = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(zipFile.toFile())))) {
             try (final Stream<Path> walk = Files.walk(tmpDir)) {
                 walk.filter(p -> !Files.isDirectory(p)).forEach(p -> {
                     var zipEntry = new ZipEntry(tmpDir.relativize(p).toString());
