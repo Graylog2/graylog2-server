@@ -422,7 +422,9 @@ public class SupportBundleService {
         try (var opensearchLog = new FileOutputStream(nodeDir.resolve(logfile).toFile())) {
             Map<String, ResponseBody> opensearchOut = datanodeProxy.remoteInterface(datanode.getHostname(), RemoteDataNodeStatusResource.class, function);
             if (opensearchOut.containsKey(datanode.getHostname())) {
-                opensearchLog.write(opensearchOut.get(datanode.getHostname()).bytes());
+                try (final var logStream = opensearchOut.get(datanode.getHostname()).byteStream()) {
+                    logStream.transferTo(opensearchLog);
+                }
             }
         } catch (Exception e) {
             LOG.warn("Failed to get logs from data node <{}>", datanode.getHostname(), e);
