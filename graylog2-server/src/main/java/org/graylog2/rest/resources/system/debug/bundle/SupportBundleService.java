@@ -226,7 +226,7 @@ public class SupportBundleService {
     private Map<String, Object> getClusterInfo() {
         ExecutorService executorService =
                 Executors.newFixedThreadPool(3,
-                        new ThreadFactoryBuilder().setNameFormat("support-bundle-cluster-info-collector").build());
+                        new ThreadFactoryBuilder().setNameFormat("support-bundle-cluster-info-collector-%d").build());
 
         final Map<String, Object> clusterInfo = new ConcurrentHashMap<>();
         final Map<String, Object> searchDb = new ConcurrentHashMap<>();
@@ -291,9 +291,14 @@ public class SupportBundleService {
                     try {
                         zipStream.putNextEntry(zipEntry);
                         Files.copy(p, zipStream);
-                        zipStream.closeEntry();
                     } catch (IOException e) {
                         LOG.warn("Failure while creating ZipEntry <{}>", zipEntry, e);
+                    } finally {
+                        try {
+                            zipStream.closeEntry();
+                        } catch (IOException e) {
+                            LOG.warn("Failed to close zip entry", e);
+                        }
                     }
                 });
             }
@@ -577,8 +582,6 @@ public class SupportBundleService {
             Files.copy(filePath, outputStream);
         } catch (NoSuchFileException e) {
             throw new NotFoundException(e);
-        } catch (Exception e) {
-            outputStream.close();
         }
     }
 
