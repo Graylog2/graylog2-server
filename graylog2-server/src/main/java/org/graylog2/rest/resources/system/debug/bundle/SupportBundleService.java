@@ -563,9 +563,8 @@ public class SupportBundleService {
     }
 
     public List<BundleFile> listBundles() {
-        try (var files = Files.walk(bundleDir)) {
+        try (var files = Files.list(bundleDir)) {
             return files
-                    .filter(p -> !Files.isDirectory(p))
                     .filter(p -> p.getFileName().toString().startsWith(BUNDLE_NAME_PREFIX))
                     .map(f -> {
                         try {
