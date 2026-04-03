@@ -90,13 +90,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -175,9 +172,7 @@ public class SupportBundleService {
                     datanodeService.allActive().values().stream().map(datanode ->
                             CompletableFuture.runAsync(() -> fetchDataNodeInfos(datanode, dataNodeDir), executor))
             ).toList();
-            for (CompletableFuture<Void> f : futures) {
-                f.get();
-            }
+            CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).get();
             fetchClusterInfos(proxiedResourceHelper, nodeManifests, bundleSpoolDir);
             writeZipFile(bundleSpoolDir);
         } catch (Exception e) {
@@ -322,7 +317,6 @@ public class SupportBundleService {
     }
 
     private Map<String, SupportBundleNodeManifest> extractManifests(Map<String, CallResult<SupportBundleNodeManifest>> manifestResponse) {
-        //noinspection OptionalGetWithoutIsPresent
         return manifestResponse.entrySet().stream().filter(result -> {
             var node = result.getKey();
             var response = result.getValue().response();
@@ -331,7 +325,7 @@ public class SupportBundleService {
                 return false;
             }
             return true;
-        }).collect(Collectors.toMap(Map.Entry::getKey, res -> Objects.requireNonNull(res.getValue().response()).entity().get()));
+        }).collect(Collectors.toMap(Map.Entry::getKey, res -> Objects.requireNonNull(res.getValue().response()).entity().orElseThrow()));
     }
 
     private List<CompletableFuture<Void>> fetchNodeInfosAsync(ProxiedResourceHelper proxiedResourceHelper, String nodeId, SupportBundleNodeManifest manifest, Path tmpDir) {
@@ -400,9 +394,8 @@ public class SupportBundleService {
         final Path nodeDir = dataNodeDir.resolve(Objects.requireNonNull(datanode.getHostname()));
         var ignored = nodeDir.toFile().mkdirs();
 
-        fetchDataNodeLogs(datanode, nodeDir);
+        getProxiedLog(datanode, nodeDir, "datanode.log", RemoteDataNodeStatusResource::datanodeInternalLogs);
         try (var certificatesFile = new FileOutputStream(nodeDir.resolve("certificates.json").toFile())) {
-
             Map<String, Map<String, KeyStoreDto>> certificates = datanodeProxy.remoteInterface(datanode.getHostname(), RemoteCertificatesResource.class, RemoteCertificatesResource::certificates);
             if (certificates.containsKey(datanode.getHostname())) {
                 objectMapper.writerWithDefaultPrettyPrinter().writeValue(certificatesFile, certificates.get(datanode.getHostname()));
@@ -410,10 +403,6 @@ public class SupportBundleService {
         } catch (Exception e) {
             LOG.warn("Failed to get certificates from data node <{}>", datanode.getHostname(), e);
         }
-    }
-
-    private void fetchDataNodeLogs(DataNodeDto datanode, Path nodeDir) {
-        getProxiedLog(datanode, nodeDir, "datanode.log", RemoteDataNodeStatusResource::datanodeInternalLogs);
     }
 
     private void getProxiedLog(DataNodeDto datanode, Path nodeDir, String logfile, Function<RemoteDataNodeStatusResource, Call<ResponseBody>> function) {
@@ -433,19 +422,19 @@ public class SupportBundleService {
     List<LogFile> applyBundleSizeLogFileLimit(List<LogFile> allLogs) {
         final ImmutableList.Builder<LogFile> truncatedLogFileList = ImmutableList.builder();
 
-        // Always collect the in-memory log and the newest on-disk log file
-        // Keep collecting until we pass LOG_COLLECTION_SIZE_LIMIT
-        final AtomicBoolean oneFileAdded = new AtomicBoolean(false);
-        final AtomicLong collectedSize = new AtomicLong();
-        allLogs.stream().sorted(Comparator.comparing(LogFile::lastModified).reversed()).forEach(logFile -> {
+        // Always collect the in-memory log and the newest on-disk log file.
+        // Keep collecting until we pass LOG_COLLECTION_SIZE_LIMIT.
+        boolean oneFileAdded = false;
+        long collectedSize = 0;
+        for (final LogFile logFile : allLogs.stream().sorted(Comparator.comparing(LogFile::lastModified).reversed()).toList()) {
             if (logFile.id().equals(IN_MEMORY_LOGFILE_ID)) {
                 truncatedLogFileList.add(logFile);
-            } else if (!oneFileAdded.get() || collectedSize.get() < LOG_COLLECTION_SIZE_LIMIT) {
+            } else if (!oneFileAdded || collectedSize < LOG_COLLECTION_SIZE_LIMIT) {
                 truncatedLogFileList.add(logFile);
-                oneFileAdded.set(true);
-                collectedSize.addAndGet(logFile.size());
+                oneFileAdded = true;
+                collectedSize += logFile.size();
             }
-        });
+        }
         return truncatedLogFileList.build();
     }
 
@@ -621,6 +610,9 @@ public class SupportBundleService {
         protected Subject getSubject() {
             return currentSubject;
         }
+
+        // The following overrides exist solely to widen visibility from protected to
+        // package-private so that SupportBundleService can call them directly.
 
         @Override
         protected <RemoteInterfaceType, RemoteCallResponseType, FinalResponseType> NodeResponse<FinalResponseType> doNodeApiCall(
