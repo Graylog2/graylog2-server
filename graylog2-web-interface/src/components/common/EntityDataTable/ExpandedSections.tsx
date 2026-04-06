@@ -37,7 +37,7 @@ const Container = styled.tr(
 const ContentCell = styled.td`
   && {
     padding: 0;
-    border-top-color: ${({ theme }) => theme.colors.table.row.backgroundHover} !important;
+    border-top-color: ${({ theme }) => theme.colors.table.row.backgroundStriped} !important;
   }
 `;
 
@@ -47,7 +47,7 @@ const Content = styled.div`
   width: 100%;
   max-width: var(${scrollContainerWidthVar}, 100%);
   padding: ${CELL_PADDING}px;
-  background-color: ${({ theme }) => theme.colors.table.row.backgroundHover};
+  background-color: ${({ theme }) => theme.colors.table.row.backgroundStriped};
 `;
 
 const Header = styled.div`

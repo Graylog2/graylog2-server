@@ -60,7 +60,7 @@ const StyledTable = styled(BaseTable)(
         background-color: ${theme.colors.table.row.background};
       }
       > tbody > tr.active {
-        background-color: ${theme.colors.table.row.backgroundHover} !important;
+        background-color: ${theme.colors.table.row.backgroundStriped} !important;
 
         & td {
           background-color: transparent !important;
