@@ -19,7 +19,6 @@ import { useState, useMemo, useCallback } from 'react';
 
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 
-
 import customColumnRenderers from './ColumnRenderers';
 import InstanceActions from './InstanceActions';
 import BulkActions from './BulkActions';
@@ -35,10 +34,7 @@ const CollectorsInstances = () => {
   const { data: sources } = useSources(selectedInstance?.fleet_id);
   const defaultFilters = useDefaultInstanceFilters();
 
-  const fleetNames = useMemo(
-    () => Object.fromEntries((fleets ?? []).map(fleet => [fleet.id, fleet.name])),
-    [fleets],
-  );
+  const fleetNames = useMemo(() => Object.fromEntries((fleets ?? []).map((fleet) => [fleet.id, fleet.name])), [fleets]);
 
   const columnRenderers = useMemo(() => customColumnRenderers({ fleetNames }), [fleetNames]);
 
