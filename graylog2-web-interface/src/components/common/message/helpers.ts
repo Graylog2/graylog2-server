@@ -14,12 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.opensearch.configuration.beans.impl;
+import type { Stream } from 'logic/streams/types';
+import type { Message } from 'views/components/messagelist/Types';
 
-public interface OpensearchNodeRole {
-    String CLUSTER_MANAGER = "cluster_manager";
-    String DATA = "data";
-    String INGEST = "ingest";
-    String REMOTE_CLUSTER_CLIENT = "remote_cluster_client";
-    String SEARCH = "search";
-}
+export const DEFAULT_FIELDS = ['source', 'destination_ip', 'usernames'];
+
+export const getStreamFavoriteFields = (stream: Stream, fields: Message['fields'] = {}) =>
+  stream?.favorite_fields ?? DEFAULT_FIELDS.filter((field) => Object.hasOwn(fields, field));

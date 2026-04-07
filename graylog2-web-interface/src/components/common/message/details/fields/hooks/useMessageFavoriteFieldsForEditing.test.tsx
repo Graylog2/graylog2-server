@@ -47,6 +47,9 @@ const createWrapper =
         message: undefined,
         editableStreams: [],
         setFieldsIsPending: false,
+        initialFavoriteFieldsByStream: {
+          streamId: initialFavorites,
+        },
       }}>
       {children}
     </MessageFavoriteFieldsContext.Provider>
