@@ -27,6 +27,7 @@ import FormWrap from 'integrations/aws/common/FormWrap';
 import { ApiRoutes } from 'integrations/aws/common/Routes';
 import { DEFAULT_KINESIS_LOG_TYPE, KINESIS_LOG_TYPES } from 'integrations/aws/common/constants';
 import { toAWSRequest } from 'integrations/aws/common/formDataAdapter';
+import Store from 'logic/local-storage/Store';
 
 const Container = styled.div`
   border: 1px solid #a6afbd;
@@ -125,7 +126,11 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
 
   const [fetchSubmitStatus, setSubmitFetch] = useFetch(
     null,
-    () => {
+    (result) => {
+      if (result?.id) {
+        Store.sessionSet('setup_wizard_input_id', result.id);
+      }
+
       onSubmit();
     },
     'POST',
