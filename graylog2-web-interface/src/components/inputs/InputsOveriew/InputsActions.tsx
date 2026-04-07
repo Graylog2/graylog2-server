@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import styled from 'styled-components';
 
 import { Button, ButtonToolbar, DeleteMenuItem, MenuItem } from 'components/bootstrap';
 import { ConfirmDialog, IfPermitted, LinkContainer } from 'components/common';
@@ -55,6 +56,14 @@ type Props = {
     };
   };
 };
+
+const StyledButtonToolbar = styled(ButtonToolbar)`
+  align-items: center;
+
+  .dropdown.btn-group {
+    display: flex;
+  }
+`;
 
 const FORWARDER_SERVICE_INPUT = 'org.graylog.plugins.forwarder.input.ForwarderServiceInput';
 const GL2_FORWARDER_INPUT = 'gl2_forwarder_input';
@@ -137,7 +146,7 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
   const queryField = input.type === FORWARDER_SERVICE_INPUT ? GL2_FORWARDER_INPUT : GL2_SOURCE_INPUT;
 
   return (
-    <ButtonToolbar>
+    <StyledButtonToolbar>
       <IfPermitted permissions={['searches:relative']}>
         <LinkContainer
           key={`received-messages-${input.id}`}
@@ -284,7 +293,7 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
           values={input.attributes}
         />
       )}
-    </ButtonToolbar>
+    </StyledButtonToolbar>
   );
 };
 
