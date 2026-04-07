@@ -89,14 +89,12 @@ public class TelemetrySubmissionPeriodical extends Periodical {
 
     @Override
     public int getInitialDelaySeconds() {
-        return 30;
-//        return Math.toIntExact(runPeriod.toSeconds());
+        return Math.toIntExact(runPeriod.toSeconds());
     }
 
     @Override
     public int getPeriodSeconds() {
-        return 60;
-//        return Math.toIntExact(runPeriod.toSeconds());
+        return Math.toIntExact(runPeriod.toSeconds());
     }
 
     @Nonnull
