@@ -39,7 +39,12 @@ const CollectorsDeploymentPage = () => {
   return (
     <DocumentTitle title="Deploy Collectors">
       <CollectorsPageNavigation />
-      <PageHeader title={<>Deploy Collectors <BetaBadge /></>}>
+      <PageHeader
+        title={
+          <>
+            Deploy Collectors <BetaBadge />
+          </>
+        }>
         <span>Generate enrollment tokens and installation scripts.</span>
       </PageHeader>
       <Row className="content">

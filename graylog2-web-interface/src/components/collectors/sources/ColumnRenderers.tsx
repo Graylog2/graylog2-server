@@ -23,7 +23,6 @@ import { SOURCE_TYPE_LABELS } from './Constants';
 
 import type { Source } from '../types';
 
-
 const customColumnRenderers = (): ColumnRenderers<Source> => ({
   attributes: {
     name: {
