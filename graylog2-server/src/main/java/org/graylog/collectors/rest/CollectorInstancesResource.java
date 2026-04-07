@@ -182,7 +182,7 @@ public class CollectorInstancesResource extends RestResource {
         this.fleetService = fleetService;
         this.sourceService = sourceService;
         this.txnLogService = txnLogService;
-        this.dbQueryCreator = new DbQueryCreator(CollectorInstanceDTO.FIELD_INSTANCE_UID, ATTRIBUTES, computedFieldRegistry);
+        this.dbQueryCreator = new DbQueryCreator("hostname", ATTRIBUTES, computedFieldRegistry);
         this.collectorsConfigService = collectorsConfigService;
         this.auditEventSender = auditEventSender;
     }
