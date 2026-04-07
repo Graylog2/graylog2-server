@@ -29,6 +29,10 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.Date;
 
+/**
+ * Custom trust manager that looks up the trust chain via authority key identifiers. This allows efficient certificate
+ * lookup with multiple active signing certs. (e.g., cert renewal)
+ */
 @Singleton
 public class CollectorCaTrustManager implements X509TrustManager {
     private static final Logger LOG = LoggerFactory.getLogger(CollectorCaTrustManager.class);
@@ -55,7 +59,7 @@ public class CollectorCaTrustManager implements X509TrustManager {
                 .orElseThrow(() -> new CertificateException("Client certificate has no Authority Key Identifier"));
 
         final var issuerEntry = caCache.getBySubjectKeyIdentifier(aki)
-                .orElseThrow(() -> new CertificateException("No known issuer for AKI: " + aki));
+                .orElseThrow(() -> new CertificateException("No known issuer for Authority Key Identifier: " + aki));
 
         try {
             clientCert.verify(issuerEntry.cert().getPublicKey());

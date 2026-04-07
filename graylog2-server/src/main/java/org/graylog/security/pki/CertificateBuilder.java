@@ -443,6 +443,7 @@ public class CertificateBuilder {
                 null, // ID assigned on save
                 fingerprint,
                 PemUtils.extractSubjectKeyIdentifier(certificate).orElseThrow(() -> new IllegalArgumentException("Certificate has no SKI")),
+                PemUtils.extractAuthorityKeyIdentifier(certificate),
                 encryptedValueService.encrypt(privateKeyPem),
                 certificatePem,
                 issuerChain,

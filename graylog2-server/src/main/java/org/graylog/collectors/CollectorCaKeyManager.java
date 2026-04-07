@@ -27,6 +27,10 @@ import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
+/**
+ * Custom key manager that dynamically retrieves the server and signing certificates. This behavior is required
+ * for certificate renewal.
+ */
 @Singleton
 public class CollectorCaKeyManager implements X509KeyManager {
     private static final Logger LOG = LoggerFactory.getLogger(CollectorCaKeyManager.class);

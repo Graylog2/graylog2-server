@@ -37,7 +37,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -114,7 +113,7 @@ class CollectorCaTrustManagerTest {
         // The AKI of the untrusted cert won't match any known issuer SKI
         assertThatThrownBy(() -> trustManager.checkClientTrusted(new X509Certificate[]{untrustedCert}, "Ed25519"))
                 .isInstanceOf(CertificateException.class)
-                .hasMessageContaining("No known issuer for AKI");
+                .hasMessageContaining("No known issuer for Authority Key Identifier");
     }
 
     @Test

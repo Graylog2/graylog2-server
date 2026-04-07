@@ -133,6 +133,7 @@ public class CertificateService {
                     entry.id(),
                     entry.fingerprint(),
                     entry.subjectKeyIdentifier(),
+                    entry.authorityKeyIdentifier(),
                     entry.privateKey(),
                     entry.certificate(),
                     entry.issuerChain(),
