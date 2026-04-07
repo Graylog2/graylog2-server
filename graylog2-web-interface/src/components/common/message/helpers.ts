@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.schema;
+import type { Stream } from 'logic/streams/types';
+import type { Message } from 'views/components/messagelist/Types';
 
-public class SecurityFields {
-    public static final String FIELD_ASSOCIATED_ASSETS = "associated_assets";
-    public static final String FIELD_ASSET_CATEGORIES = "associated_asset_categories";
-    public static final String FIELD_ASSET_PRIORITIES = "associated_asset_priorities";
-}
+export const DEFAULT_FIELDS = ['source', 'destination_ip', 'usernames'];
+
+export const getStreamFavoriteFields = (stream: Stream, fields: Message['fields'] = {}) =>
+  stream?.favorite_fields ?? DEFAULT_FIELDS.filter((field) => Object.hasOwn(fields, field));
