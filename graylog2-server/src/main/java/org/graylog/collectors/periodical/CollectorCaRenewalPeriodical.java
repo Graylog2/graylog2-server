@@ -54,6 +54,11 @@ public class CollectorCaRenewalPeriodical extends Periodical {
     }
 
     @Override
+    public boolean leaderOnly() {
+        return true;
+    }
+
+    @Override
     public boolean isDaemon() {
         return true;
     }
