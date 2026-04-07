@@ -21,8 +21,7 @@ import { IfPermitted, Section, Spinner } from 'components/common';
 import type { Stream } from 'stores/streams/StreamsStore';
 import useStreamOutputs from 'hooks/useStreamOutputs';
 import type { AvailableOutputSummary } from 'components/streams/useAvailableOutputTypes';
-import useAvailableOutputTypes from 'components/streams/useAvailableOutputTypes';
-import {
+import useAvailableOutputTypes, {
   getOutputTypeDefinition,
   getRequestedOutputConfiguration,
 } from 'components/streams/useAvailableOutputTypes';

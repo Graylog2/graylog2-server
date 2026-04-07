@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
-import type { ConfigurationField } from 'components/configurationforms';
 
+import type { ConfigurationField } from 'components/configurationforms';
 import { asMock } from 'helpers/mocking';
 import useOutputs from 'hooks/useOutputs';
 import useStreamOutputs from 'hooks/useStreamOutputs';
