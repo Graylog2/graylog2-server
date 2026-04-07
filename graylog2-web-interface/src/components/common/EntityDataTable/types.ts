@@ -89,6 +89,8 @@ export type ExpandedSectionRenderers<Entity> = {
   [sectionName: string]: ExpandedSectionRenderer<Entity>;
 };
 
+export type RowOverride<Entity extends EntityBase> = (entity: Entity) => React.ReactNode;
+
 export type DefaultLayout = {
   entityTableId: string;
   defaultSort: Sort;

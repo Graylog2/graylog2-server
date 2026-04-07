@@ -38,9 +38,20 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.graylog2.inputs.InputImpl.FIELD_CREATED_AT;
+import static org.graylog2.inputs.InputImpl.FIELD_CREATOR_USER_ID;
+import static org.graylog2.inputs.InputImpl.FIELD_GLOBAL;
+import static org.graylog2.inputs.InputImpl.FIELD_NAME;
+import static org.graylog2.inputs.InputImpl.FIELD_NODE_ID;
+import static org.graylog2.inputs.InputImpl.FIELD_TITLE;
+import static org.graylog2.inputs.InputImpl.FIELD_TYPE;
+import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
+
 @AutoValue
 @JsonDeserialize(builder = InputImpl.Builder.class)
-@DbEntity(collection = InputServiceImpl.COLLECTION_NAME, readPermission = RestPermissions.INPUTS_READ)
+@DbEntity(collection = InputServiceImpl.COLLECTION_NAME, readPermission = RestPermissions.INPUTS_READ,
+          readableFields = {ID_FIELD, FIELD_TITLE, FIELD_TYPE, FIELD_CREATOR_USER_ID, FIELD_CREATED_AT,
+                  FIELD_GLOBAL, FIELD_NODE_ID, FIELD_NAME})
 public abstract class InputImpl implements Input, MongoEntity {
     private static final Logger LOG = LoggerFactory.getLogger(InputImpl.class);
 
