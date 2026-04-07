@@ -64,10 +64,12 @@ describe('ReassignFleetModal', () => {
       isLoading: false,
     });
 
-    asMock(useCollectorsMutations).mockReturnValue(mockCollectorsMutations({
-      reassignInstances: reassignInstancesMock,
-      isReassigningInstances: false,
-    }));
+    asMock(useCollectorsMutations).mockReturnValue(
+      mockCollectorsMutations({
+        reassignInstances: reassignInstancesMock,
+        isReassigningInstances: false,
+      }),
+    );
   });
 
   it('renders modal title with instance count', async () => {
