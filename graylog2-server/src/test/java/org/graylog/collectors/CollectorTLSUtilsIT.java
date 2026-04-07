@@ -95,7 +95,7 @@ import static org.mockito.Mockito.when;
  */
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(ClusterConfigServiceExtension.class)
-class CollectorTLTUtilsIT {
+class CollectorTLSUtilsIT {
 
     private static final String AGENT_INSTANCE_UID = "test-agent-42";
     private static final Duration CERT_VALIDITY = Duration.ofDays(1);

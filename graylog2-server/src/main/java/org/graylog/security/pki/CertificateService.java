@@ -73,6 +73,7 @@ public class CertificateService {
                 Indexes.ascending(CertificateEntry.FIELD_FINGERPRINT),
                 new IndexOptions().unique(true)
         );
+        collection.createIndex(Indexes.ascending(CertificateEntry.FIELD_SUBJECT_KEY_IDENTIFIER));
     }
 
     /**

@@ -18,6 +18,7 @@ package org.graylog.collectors;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.graylog.security.pki.PemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,17 +62,43 @@ public class CollectorCaTrustManager implements X509TrustManager {
         final var issuerEntry = caCache.getBySubjectKeyIdentifier(aki)
                 .orElseThrow(() -> new CertificateException("No known issuer for Authority Key Identifier: " + aki));
 
+        verifySignatureAndValidity(clientCert, issuerEntry.cert());
+        verifyEndEntityCert(clientCert);
+        verifyClientAuthEku(clientCert);
+
+        LOG.debug("Client certificate trusted: subject=<{}>, issuer=<{}>",
+                clientCert.getSubjectX500Principal(), clientCert.getIssuerX500Principal());
+    }
+
+    private void verifySignatureAndValidity(X509Certificate clientCert, X509Certificate issuerCert) throws CertificateException {
         try {
-            clientCert.verify(issuerEntry.cert().getPublicKey());
+            clientCert.verify(issuerCert.getPublicKey());
             clientCert.checkValidity(Date.from(Instant.now(clock)));
         } catch (CertificateException e) {
             throw e;
         } catch (Exception e) {
             throw new CertificateException("Client certificate verification failed", e);
         }
+    }
 
-        LOG.debug("Client certificate trusted: subject=<{}>, issuer=<{}>",
-                clientCert.getSubjectX500Principal(), clientCert.getIssuerX500Principal());
+    private void verifyEndEntityCert(X509Certificate clientCert) throws CertificateException {
+        final var basicConstraints = clientCert.getBasicConstraints();
+        if (basicConstraints >= 0) {
+            throw new CertificateException("Client certificate must be an end-entity certificate, not a CA");
+        }
+    }
+
+    private void verifyClientAuthEku(X509Certificate clientCert) throws CertificateException {
+        try {
+            final var eku = clientCert.getExtendedKeyUsage();
+            if (eku == null || !eku.contains(KeyPurposeId.id_kp_clientAuth.getId())) {
+                throw new CertificateException("Client certificate does not have the clientAuth extended key usage");
+            }
+        } catch (CertificateException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new CertificateException("Failed to check extended key usage", e);
+        }
     }
 
     @Override

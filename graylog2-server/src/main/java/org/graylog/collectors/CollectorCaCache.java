@@ -16,9 +16,9 @@
  */
 package org.graylog.collectors;
 
+import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Expiry;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -50,15 +50,15 @@ import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 public class CollectorCaCache extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(CollectorCaCache.class);
 
+    private static final String SERVER_KEY = "server";
+    private static final String SIGNING_KEY = "signing";
+    private static final String CA_KEY = "ca";
+
     private final CollectorCaService caService;
     private final CertificateService certificateService;
     private final EncryptedValueService encryptedValueService;
     private final EventBus eventBus;
-    private final LoadingCache<CacheKey, CacheEntry> cache;
-
-    private enum CacheKey {
-        SERVER, SIGNING, CA
-    }
+    private final Cache<String, CacheEntry> cache;
 
     /**
      * The cache entry.
@@ -81,12 +81,10 @@ public class CollectorCaCache extends AbstractIdleService {
         this.encryptedValueService = encryptedValueService;
         this.eventBus = eventBus;
         this.cache = Caffeine.newBuilder()
-                .expireAfter(Expiry.<CacheKey, CacheEntry>creating((key, value) -> Duration.between(
-                        Instant.now(clock),
-                        value.cert().getNotAfter().toInstant()
-                ).minusDays(1)))
+                .expireAfter(Expiry.<String, CacheEntry>creating((key, value) ->
+                        Duration.between(Instant.now(clock), value.cert().getNotAfter().toInstant())))
                 .initialCapacity(3)
-                .build(this::loadCacheKey);
+                .build();
     }
 
     /**
@@ -96,8 +94,11 @@ public class CollectorCaCache extends AbstractIdleService {
      * @return the cache entry or an empty optional
      */
     public Optional<CacheEntry> getBySubjectKeyIdentifier(String ski) {
-        return certificateService.findBySubjectKeyIdentifier(requireNonBlank(ski, "Subject Key Identifier can't be blank"))
-                .map(entry -> getCacheEntry(() -> entry));
+        requireNonBlank(ski, "Subject Key Identifier can't be blank");
+
+        return Optional.ofNullable(cache.get(ski, key -> getCacheEntry(
+                () -> certificateService.findBySubjectKeyIdentifier(ski).orElse(null)
+        ).orElse(null)));
     }
 
     /**
@@ -106,7 +107,7 @@ public class CollectorCaCache extends AbstractIdleService {
      * @return the server entry
      */
     public CacheEntry getServer() {
-        return cache.get(CacheKey.SERVER);
+        return cache.get(SERVER_KEY, key -> getCacheEntry(caService::getOtlpServerCert).orElseThrow(() -> new IllegalStateException("Server certificate not found")));
     }
 
     /**
@@ -115,7 +116,7 @@ public class CollectorCaCache extends AbstractIdleService {
      * @return the signing entry
      */
     public CacheEntry getSigning() {
-        return cache.get(CacheKey.SIGNING);
+        return cache.get(SIGNING_KEY, key -> getCacheEntry(caService::getSigningCert).orElseThrow(() -> new IllegalStateException("Signing certificate not found")));
     }
 
     /**
@@ -124,24 +125,19 @@ public class CollectorCaCache extends AbstractIdleService {
      * @return the CA entry
      */
     public CacheEntry getCa() {
-        return cache.get(CacheKey.CA);
+        return cache.get(CA_KEY, key -> getCacheEntry(caService::getCaCert).orElseThrow(() -> new IllegalStateException("CA certificate not found")));
     }
 
-    private CacheEntry loadCacheKey(CacheKey key) {
-        return switch (key) {
-            case SERVER -> getCacheEntry(caService::getOtlpServerCert);
-            case SIGNING -> getCacheEntry(caService::getSigningCert);
-            case CA -> getCacheEntry(caService::getCaCert);
-        };
-    }
-
-    private CacheEntry getCacheEntry(Supplier<CertificateEntry> certSupplier) {
+    private Optional<CacheEntry> getCacheEntry(Supplier<CertificateEntry> certSupplier) {
         try {
             final var certEntry = certSupplier.get();
+            if (certEntry == null) {
+                return Optional.empty();
+            }
             final var cert = PemUtils.parseCertificate(certEntry.certificate());
             final var privateKey = PemUtils.parsePrivateKey(encryptedValueService.decrypt(certEntry.privateKey()));
             LOG.debug("Loaded cert <{}>", certEntry.fingerprint());
-            return new CacheEntry(privateKey, cert, certEntry.fingerprint());
+            return Optional.of(new CacheEntry(privateKey, cert, certEntry.fingerprint()));
         } catch (Exception e) {
             LOG.error("Couldn't load certificate", e);
             throw new RuntimeException(e);

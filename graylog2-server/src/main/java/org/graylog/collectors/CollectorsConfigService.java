@@ -79,6 +79,7 @@ public class CollectorsConfigService {
 
         clusterConfigService.write(config);
 
+        // On first-time save (no existing config), there's nothing cached to invalidate, so we skip the event.
         existing.ifPresent(c -> {
             if (!Objects.equals(c.caCertId(), config.caCertId())
                     || !Objects.equals(c.signingCertId(), config.signingCertId())

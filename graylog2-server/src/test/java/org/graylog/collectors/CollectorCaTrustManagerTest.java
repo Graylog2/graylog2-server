@@ -152,6 +152,36 @@ class CollectorCaTrustManagerTest {
     }
 
     @Test
+    void checkClientTrusted_rejectsCertWithoutClientAuthEku() throws Exception {
+        final var serverCertEntry = certBuilder.createEndEntityCert(
+                "server-only", signingCertEntry, KeyUsage.digitalSignature,
+                KeyPurposeId.id_kp_serverAuth, Duration.ofDays(30));
+        final var serverCert = PemUtils.parseCertificate(serverCertEntry.certificate());
+
+        final var serverCertAki = PemUtils.extractAuthorityKeyIdentifier(serverCert).orElseThrow();
+        when(caCache.getBySubjectKeyIdentifier(serverCertAki)).thenReturn(Optional.of(cacheEntry(signingCertEntry)));
+
+        assertThatThrownBy(() -> trustManager.checkClientTrusted(new X509Certificate[]{serverCert}, "Ed25519"))
+                .isInstanceOf(CertificateException.class)
+                .hasMessageContaining("clientAuth extended key usage");
+    }
+
+    @Test
+    void checkClientTrusted_rejectsCaCertUsedAsClientCert() throws Exception {
+        // An intermediate CA cert has basicConstraints isCA=true and should be rejected even
+        // when signature verification passes. The signing cert's AKI points to the root CA,
+        // so we mock that lookup to return the root CA entry.
+        final var signingCert = PemUtils.parseCertificate(signingCertEntry.certificate());
+        final var signingCertAki = PemUtils.extractAuthorityKeyIdentifier(signingCert).orElseThrow();
+        final var caCacheEntry = caCache.getCa();
+        when(caCache.getBySubjectKeyIdentifier(signingCertAki)).thenReturn(Optional.of(caCacheEntry));
+
+        assertThatThrownBy(() -> trustManager.checkClientTrusted(new X509Certificate[]{signingCert}, "Ed25519"))
+                .isInstanceOf(CertificateException.class)
+                .hasMessageContaining("end-entity certificate, not a CA");
+    }
+
+    @Test
     void checkClientTrusted_rejectsSelfSignedCert() throws Exception {
         // A self-signed root CA cert has no AKI, so it should be rejected
         final var selfSignedCa = certBuilder.createRootCa("Self Signed", Algorithm.ED25519, Duration.ofDays(365));
