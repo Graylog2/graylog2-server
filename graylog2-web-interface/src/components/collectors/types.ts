@@ -162,7 +162,7 @@ export type ActorInfo = {
 };
 
 export type TargetInfo = {
-  id: string;
+  id: string | null;
   name: string;
   type: 'fleet' | 'collector';
 };

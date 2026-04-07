@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Show event definition ID instead of throwing errors in the Events Overview widget when the event definition has been deleted"
+
+pulls = ["25548"]
+issues = ["graylog-plugin-enterprise#13756"]
