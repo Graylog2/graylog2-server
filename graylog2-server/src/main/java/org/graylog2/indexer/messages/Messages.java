@@ -248,8 +248,8 @@ public class Messages {
             trafficAccounting.addSystemTraffic(totalSizeOfIndexedMessages);
         } else {
             trafficAccounting.addOutputTraffic(totalSizeOfIndexedMessages);
+            trafficAccounting.addIndexedInputTraffic(totalInputSizeOfIndexedMessages);
         }
-        trafficAccounting.addIndexedInputTraffic(totalInputSizeOfIndexedMessages);
     }
 
     private void recordTimestamp(List<IndexingSuccess> messageList) {
