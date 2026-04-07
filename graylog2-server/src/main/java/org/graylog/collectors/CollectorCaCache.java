@@ -60,13 +60,6 @@ public class CollectorCaCache extends AbstractIdleService {
     private final EventBus eventBus;
     private final Cache<String, CacheEntry> cache;
 
-    /**
-     * The cache entry.
-     *
-     * @param privateKey  the private key
-     * @param cert        the certificate
-     * @param fingerprint the certificate fingerprint
-     */
     public record CacheEntry(PrivateKey privateKey, X509Certificate cert, String fingerprint) {
     }
 
