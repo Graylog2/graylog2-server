@@ -16,6 +16,8 @@
  */
 package org.graylog2.rest.resources.system.debug.bundle;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.testing.completebackend.FullBackendTest;
 import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.completebackend.Lifecycle;
@@ -28,7 +30,12 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import static io.restassured.RestAssured.given;
@@ -365,6 +372,61 @@ public class SupportBundleResourceIT {
 
     @FullBackendTest
     void downloadedBundleIsValidZipWithExpectedEntries() throws Exception {
+        final Map<String, byte[]> entries = buildAndDownloadBundleEntries();
+
+        assertThat(entries).isNotEmpty();
+        assertThat(entries).containsKey("cluster.json");
+        assertThat(entries.keySet()).anyMatch(name -> name.endsWith("thread-dump.txt"));
+        assertThat(entries.keySet()).anyMatch(name -> name.endsWith("metrics.json"));
+        assertThat(entries.keySet()).anyMatch(name -> name.endsWith("server.mem.log"));
+        assertThat(entries.keySet()).anyMatch(name -> name.startsWith("datanodes/") && name.endsWith("datanode.log"));
+        assertThat(entries.keySet()).anyMatch(name -> name.startsWith("datanodes/") && name.endsWith("certificates.json"));
+    }
+
+    @FullBackendTest
+    void downloadedBundleFileContentsAreValid() throws Exception {
+        final Map<String, byte[]> entries = buildAndDownloadBundleEntries();
+        final ObjectMapper objectMapper = new ObjectMapper();
+
+        // cluster.json must be valid JSON with all expected top-level keys
+        final JsonNode clusterJson = objectMapper.readTree(entries.get("cluster.json"));
+        assertThat(clusterJson.has("manifest")).isTrue();
+        assertThat(clusterJson.has("cluster_system_overview")).isTrue();
+        assertThat(clusterJson.has("jvm")).isTrue();
+        assertThat(clusterJson.has("process_buffer_dump")).isTrue();
+        assertThat(clusterJson.has("installed_plugins")).isTrue();
+        assertThat(clusterJson.has("cluster_stats")).isTrue();
+        assertThat(clusterJson.has("search_db")).isTrue();
+        assertThat(clusterJson.has("datanodes")).isTrue();
+
+        assertThat(utf8Content(entries, "thread-dump.txt"))
+                .as("thread-dump.txt must be non-empty text")
+                .isNotBlank();
+
+        final String metricsJson = utf8Content(entries, "metrics.json");
+        assertThat(metricsJson)
+                .as("metrics.json must be valid non-empty JSON")
+                .isNotBlank();
+        assertThat(objectMapper.readTree(metricsJson).isObject()).isTrue();
+
+        assertThat(utf8Content(entries, "server.mem.log"))
+                .as("in-memory server log must be non-empty")
+                .isNotBlank();
+
+        assertThat(utf8Content(entries, "datanode.log"))
+                .as("datanode log must be non-empty")
+                .isNotBlank();
+
+        final String datanodeCerts = utf8Content(entries, "certificates.json");
+        assertThat(datanodeCerts)
+                .as("certificates.json must be valid non-empty JSON")
+                .isNotBlank();
+        assertThat(objectMapper.readTree(datanodeCerts).isObject()).isTrue();
+    }
+
+    // --- Helpers ---
+
+    private Map<String, byte[]> buildAndDownloadBundleEntries() throws IOException {
         given()
                 .spec(api.requestSpecification())
                 .when()
@@ -390,28 +452,23 @@ public class SupportBundleResourceIT {
                 .statusCode(200)
                 .extract().asByteArray();
 
-        final List<String> entryNames;
+        final Map<String, byte[]> entries = new HashMap<>();
         try (final ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(zipBytes))) {
-            final var entries = new java.util.ArrayList<String>();
-            java.util.zip.ZipEntry entry;
+            ZipEntry entry;
             while ((entry = zip.getNextEntry()) != null) {
-                entries.add(entry.getName());
+                entries.put(entry.getName(), zip.readAllBytes());
                 zip.closeEntry();
             }
-            entryNames = entries;
         }
+        return entries;
+    }
 
-        assertThat(zipBytes).isNotEmpty();
-        assertThat(entryNames).isNotEmpty();
-        // The bundle must always contain a cluster.json summary
-        assertThat(entryNames).anyMatch(name -> name.equals("cluster.json"));
-        // Each Graylog node's directory should contain a thread dump and metrics
-        assertThat(entryNames).anyMatch(name -> name.endsWith("thread-dump.txt"));
-        assertThat(entryNames).anyMatch(name -> name.endsWith("metrics.json"));
-        // At least one log file should be present (the in-memory log)
-        assertThat(entryNames).anyMatch(name -> name.endsWith("server.mem.log"));
-        // Datanode-specific entries: each datanode's log and certificates
-        assertThat(entryNames).anyMatch(name -> name.startsWith("datanodes/") && name.endsWith("datanode.log"));
-        assertThat(entryNames).anyMatch(name -> name.startsWith("datanodes/") && name.endsWith("certificates.json"));
+    /** Returns the UTF-8 content of the first zip entry whose name ends with {@code suffix}. */
+    private static String utf8Content(Map<String, byte[]> entries, String suffix) {
+        return entries.entrySet().stream()
+                .filter(e -> e.getKey().endsWith(suffix))
+                .map(e -> new String(e.getValue(), StandardCharsets.UTF_8))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("No zip entry ending with: " + suffix));
     }
 }
