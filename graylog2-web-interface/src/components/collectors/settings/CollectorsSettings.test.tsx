@@ -65,14 +65,16 @@ describe('CollectorsSettings', () => {
       data: config,
       isLoading: false,
     });
+    asMock(useCollectorsMutations).mockReturnValue(
+      mockCollectorsMutations({
+        updateConfig,
+        isUpdatingConfig: false,
+      }),
+    );
     asMock(useCollectorInputIds).mockReturnValue({
       data: [],
       isLoading: false,
     });
-    asMock(useCollectorsMutations).mockReturnValue(mockCollectorsMutations({
-      updateConfig,
-      isUpdatingConfig: false,
-    }));
     asMock(useInputsStates).mockReturnValue({
       data: {},
       refetch: jest.fn(),

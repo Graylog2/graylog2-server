@@ -20,6 +20,7 @@ import asMock from 'helpers/mocking/AsMock';
 
 import useDefaultInstanceFilters from './useDefaultInstanceFilters';
 import { useCollectorsConfig } from './useCollectorsConfig';
+
 import type { CollectorsConfig } from '../types';
 
 jest.mock('./useCollectorsConfig');

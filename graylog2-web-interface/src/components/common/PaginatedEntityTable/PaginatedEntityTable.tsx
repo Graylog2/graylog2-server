@@ -24,7 +24,12 @@ import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/ho
 import { useTableEventHandlers } from 'components/common/EntityDataTable';
 import { Spinner, PaginatedList, SearchForm, NoSearchResult, EntityDataTable } from 'components/common';
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
-import type { EntityBase, DefaultLayout, ExpandedSectionRenderers } from 'components/common/EntityDataTable/types';
+import type {
+  EntityBase,
+  DefaultLayout,
+  ExpandedSectionRenderers,
+  RowOverride,
+} from 'components/common/EntityDataTable/types';
 import EntityFilters from 'components/common/EntityFilters';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import TableFetchContextProvider from 'components/common/PaginatedEntityTable/TableFetchContextProvider';
@@ -98,6 +103,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   entityActions = undefined,
   entityAttributesAreCamelCase,
   expandedSectionRenderers = undefined,
+  rowOverride = undefined,
   externalSearch = undefined,
   fetchEntities,
   fetchOptions,
@@ -250,6 +256,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
                 onLayoutPreferencesChange={onLayoutPreferencesChange}
                 onChangeSlicing={onChangeSlicing}
                 expandedSectionRenderers={expandedSectionRenderers}
+                rowOverride={rowOverride}
                 enableSlicing={typeof fetchSlices === 'function'}
                 bulkSelection={bulkSelection}
                 onSortChange={onSortChange}
@@ -272,7 +279,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   );
 };
 
-type WrapperProps<T, M> = PaginatedEntityTableProps<T, M> & {
+type WrapperProps<T extends EntityBase, M> = PaginatedEntityTableProps<T, M> & {
   isLoadingLayoutPreferences: boolean;
   layoutConfig: LayoutConfig;
   reactQueryOptions: FetchOptions;
@@ -323,7 +330,7 @@ const TableWithURLParams = <T extends EntityBase, M = unknown>({ ...props }: Wra
   );
 };
 
-export type PaginatedEntityTableProps<T, M> = {
+export type PaginatedEntityTableProps<T extends EntityBase, M> = {
   additionalAttributes?: Array<Attribute>;
   bulkSelection?: EntityDataTableProps['bulkSelection'];
   columnRenderers: EntityDataTableProps['columnRenderers'];
@@ -332,6 +339,7 @@ export type PaginatedEntityTableProps<T, M> = {
   entityActions?: EntityDataTableProps['entityActions'];
   entityAttributesAreCamelCase: boolean;
   expandedSectionRenderers?: ExpandedSectionRenderers<T>;
+  rowOverride?: RowOverride<T>;
   externalSearch?: ExternalSearch;
   fetchEntities: (options: SearchParams) => Promise<PaginatedResponse<T, M>>;
   fetchOptions?: FetchOptions;

@@ -4,7 +4,7 @@ Thank you for contributing to the Graylog web interface. This guide covers conve
 
 For general contribution instructions, visit [graylog.org/get-involved](https://www.graylog.org/get-involved/).
 
-> **AI agents**: Also read [AGENT.md](./AGENT.md) for agent-specific instructions, commands, and project structure details.
+> **AI agents**: Also read [AGENTS.md](./AGENTS.md) for agent-specific instructions, commands, and project structure details.
 
 ## Code of Conduct
 
