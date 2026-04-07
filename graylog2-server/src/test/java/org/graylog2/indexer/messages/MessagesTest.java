@@ -114,8 +114,8 @@ public class MessagesTest {
         messages.bulkIndex(messageList, true);
 
         verify(trafficAccounting, never()).addOutputTraffic(anyLong());
+        verify(trafficAccounting, never()).addIndexedInputTraffic(anyLong());
         verify(trafficAccounting, times(1)).addSystemTraffic(82);
-        verify(trafficAccounting, times(1)).addIndexedInputTraffic(82);
     }
 
     @Test
