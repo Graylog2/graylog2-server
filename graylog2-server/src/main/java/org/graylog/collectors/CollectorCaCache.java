@@ -27,6 +27,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.collectors.events.CollectorCaConfigUpdated;
 import org.graylog.security.pki.CertificateEntry;
+import org.graylog.security.pki.CertificateService;
 import org.graylog.security.pki.PemUtils;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.slf4j.Logger;
@@ -37,7 +38,10 @@ import java.security.cert.X509Certificate;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.function.Supplier;
+
+import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 
 /**
  * Provides a CA cache that caches {@link CertificateEntry} instances based on their expiration date.
@@ -47,6 +51,7 @@ public class CollectorCaCache extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(CollectorCaCache.class);
 
     private final CollectorCaService caService;
+    private final CertificateService certificateService;
     private final EncryptedValueService encryptedValueService;
     private final EventBus eventBus;
     private final LoadingCache<CacheKey, CacheEntry> cache;
@@ -67,10 +72,12 @@ public class CollectorCaCache extends AbstractIdleService {
 
     @Inject
     public CollectorCaCache(CollectorCaService caService,
+                            CertificateService certificateService,
                             EncryptedValueService encryptedValueService,
                             EventBus eventBus,
                             Clock clock) {
         this.caService = caService;
+        this.certificateService = certificateService;
         this.encryptedValueService = encryptedValueService;
         this.eventBus = eventBus;
         this.cache = Caffeine.newBuilder()
@@ -80,6 +87,17 @@ public class CollectorCaCache extends AbstractIdleService {
                 ).minusDays(1)))
                 .initialCapacity(3)
                 .build(this::loadCacheKey);
+    }
+
+    /**
+     * Get entry by certificate Subject Key Identifier.
+     *
+     * @param ski the cert Subject Key Identifier value
+     * @return the cache entry or an empty optional
+     */
+    public Optional<CacheEntry> getBySubjectKeyIdentifier(String ski) {
+        return certificateService.findBySubjectKeyIdentifier(requireNonBlank(ski, "Subject Key Identifier can't be blank"))
+                .map(entry -> getCacheEntry(() -> entry));
     }
 
     /**

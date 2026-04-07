@@ -23,12 +23,15 @@ import org.graylog.collectors.events.CollectorCaConfigUpdated;
 import org.graylog.security.pki.Algorithm;
 import org.graylog.security.pki.CertificateBuilder;
 import org.graylog.security.pki.CertificateEntry;
+import org.graylog.security.pki.CertificateService;
+import org.graylog.security.pki.PemUtils;
 import org.graylog.testing.TestClocks;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -43,6 +46,7 @@ class CollectorCaCacheTest {
     private final EventBus eventBus = new EventBus();
 
     private CollectorCaService caService;
+    private CertificateService certService;
     private CollectorCaCache cache;
 
     private CertificateEntry caCert;
@@ -52,6 +56,7 @@ class CollectorCaCacheTest {
     @BeforeEach
     void setUp() throws Exception {
         caService = mock(CollectorCaService.class);
+        certService = mock(CertificateService.class);
 
         final var certBuilder = new CertificateBuilder(encryptedValueService, "Test", TestClocks.fixedEpoch());
 
@@ -67,7 +72,7 @@ class CollectorCaCacheTest {
         when(caService.getSigningCert()).thenReturn(signingCert);
         when(caService.getOtlpServerCert()).thenReturn(serverCert);
 
-        cache = new CollectorCaCache(caService, encryptedValueService, eventBus, TestClocks.fixedEpoch());
+        cache = new CollectorCaCache(caService, certService, encryptedValueService, eventBus, TestClocks.fixedEpoch());
     }
 
     @Test
@@ -168,6 +173,36 @@ class CollectorCaCacheTest {
 
         final var entry = cache.getServer();
         assertThat(entry.fingerprint()).isEqualTo(newServerCert.fingerprint());
+    }
+
+    @Test
+    void getByFingerprint_returnsCacheEntryForKnownSubjectKeyIdentifier() throws Exception {
+        when(certService.findBySubjectKeyIdentifier(serverCert.subjectKeyIdentifier())).thenReturn(Optional.of(serverCert));
+
+        final var result = cache.getBySubjectKeyIdentifier(serverCert.subjectKeyIdentifier());
+
+        assertThat(result).isPresent();
+        assertThat(result.get().cert().getSerialNumber()).isEqualTo(PemUtils.parseCertificate(serverCert.certificate()).getSerialNumber());
+        assertThat(result.get().privateKey()).isNotNull();
+    }
+
+    @Test
+    void getByFingerprint_returnsEmptyForUnknownSubjectKeyIdentifier() {
+        when(certService.findBySubjectKeyIdentifier("unknown")).thenReturn(Optional.empty());
+
+        assertThat(cache.getBySubjectKeyIdentifier("sha256:unknown")).isEmpty();
+    }
+
+    @Test
+    void getByFingerprint_rejectsBlankSubjectKeyIdentifier() {
+        assertThatThrownBy(() -> cache.getBySubjectKeyIdentifier(""))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void getByFingerprint_rejectsNullSubjectKeyIdentifier() {
+        assertThatThrownBy(() -> cache.getBySubjectKeyIdentifier(null))
+                .isInstanceOf(Exception.class);
     }
 
     @Test

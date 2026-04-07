@@ -171,6 +171,18 @@ public class CertificateService {
     }
 
     /**
+     * Finds a certificate entry by its Subject Key Identifier value.
+     *
+     * @param ski the Subject Key Identifier value
+     * @return an Optional containing the certificate entry if found, or empty if not found
+     */
+    public Optional<CertificateEntry> findBySubjectKeyIdentifier(String ski) {
+        return Optional.ofNullable(
+                collection.find(Filters.eq(CertificateEntry.FIELD_SUBJECT_KEY_IDENTIFIER, ski)).first()
+        );
+    }
+
+    /**
      * Returns all certificate entries in the collection.
      *
      * @return a list of all certificate entries
