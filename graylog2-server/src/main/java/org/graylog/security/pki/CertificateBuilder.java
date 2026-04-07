@@ -43,6 +43,8 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCSException;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.graylog2.security.encryption.EncryptedValueService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -76,6 +78,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  *       for OpAMP enrollment. A unified certificate builder could serve both use cases.
  */
 public class CertificateBuilder {
+    private static final Logger LOG = LoggerFactory.getLogger(CertificateBuilder.class);
 
     static {
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
@@ -564,7 +567,38 @@ public class CertificateBuilder {
         final X500Name issuerDn = X500Name.getInstance(issuerCert.getSubjectX500Principal().getEncoded());
 
         final Instant now = Instant.now(clock);
-        final Instant notAfter = now.plus(validity);
+        final Instant issuerNotAfter = issuerCert.getNotAfter().toInstant();
+        final Duration issuerRemaining = Duration.between(now, issuerNotAfter);
+
+        if (issuerRemaining.isNegative() || issuerRemaining.isZero()) {
+            throw new IllegalStateException("Issuer certificate has expired");
+        }
+
+        // Cap the certificate lifetime to the issuer's remaining lifetime.
+        //
+        // A signed certificate must never outlive its issuer. When the requested lifetime
+        // exceeds the issuer's remaining validity, we shorten it. This handles:
+        //
+        //   - Collector cert lifetime configured longer than the signing cert's total lifetime
+        //     (e.g., 10-year collector cert with a 5-year signing cert)
+        //   - Enrollment during the last portion of the signing cert's lifetime, when less
+        //     than one full collector cert lifetime remains
+        //
+        // The shortened cert is transparent to collectors: they renew at a configurable
+        // fraction of their cert's lifetime (default 75% elapsed) via OpAMP. After the
+        // signing cert is renewed by the periodic renewal check (at 20% remaining lifetime),
+        // the next collector renewal gets a full-lifetime cert signed by the new signing cert.
+        // Old collector certs remain trusted because the trust manager resolves issuers via
+        // AKI/SKI lookup, which finds both old and new signing certs in the database.
+        final Duration effectiveValidity;
+        if (issuerRemaining.compareTo(validity) < 0) {
+            effectiveValidity = issuerRemaining;
+            LOG.debug("Capping certificate lifetime from {} to {} days (issuer expires {})",
+                    validity.toDays(), issuerRemaining.toDays(), issuerNotAfter);
+        } else {
+            effectiveValidity = validity;
+        }
+        final Instant notAfter = now.plus(effectiveValidity);
         final BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
 
         final JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
