@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix API Browser to pre-fetch OpenAPI spec instead of letting the component fetch it directly."
+
+issues = ["25561"]
+pulls = ["25562"]
