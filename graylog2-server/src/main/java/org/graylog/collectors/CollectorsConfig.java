@@ -103,6 +103,8 @@ public abstract class CollectorsConfig {
         return createDefaultBuilder(hostname).build();
     }
 
+    public abstract Builder toBuilder();
+
     public static Builder builder() {
         return Builder.create();
     }

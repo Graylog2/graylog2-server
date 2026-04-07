@@ -100,7 +100,7 @@ class AgentTokenServiceTest {
         when(clusterIdService.getString()).thenReturn(TEST_CLUSTER_ID);
         collectorInstanceService = new CollectorInstanceService(mongoCollections);
         collectorsConfigService = new CollectorsConfigService(clusterConfigService, mock(ClusterEventBus.class));
-        collectorCaService = new CollectorCaService(certificateService, clusterIdService, collectorsConfigService);
+        collectorCaService = new CollectorCaService(certificateService, clusterIdService, collectorsConfigService, clock);
         agentTokenService = new AgentTokenService(collectorInstanceService, clock);
     }
 

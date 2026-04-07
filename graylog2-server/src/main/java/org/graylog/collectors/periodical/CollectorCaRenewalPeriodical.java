@@ -65,7 +65,7 @@ public class CollectorCaRenewalPeriodical extends Periodical {
 
     @Override
     public int getPeriodSeconds() {
-        return 60 * 60;
+        return 15 * 60;
     }
 
     @Override

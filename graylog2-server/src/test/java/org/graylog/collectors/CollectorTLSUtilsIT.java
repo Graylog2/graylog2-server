@@ -119,7 +119,7 @@ class CollectorTLSUtilsIT {
         final var certService = new CertificateService(mongoCollections, encryptedValueService, CustomizationConfig.empty(), Clock.systemUTC());
         final var clusterIdService = mock(ClusterIdService.class);
         final var collectorsConfigService = new CollectorsConfigService(clusterConfigService, new ClusterEventBus());
-        final var caService = new CollectorCaService(certService, clusterIdService, collectorsConfigService);
+        final var caService = new CollectorCaService(certService, clusterIdService, collectorsConfigService, Clock.systemUTC());
 
         when(clusterIdService.getString()).thenReturn(UUID.randomUUID().toString());
 

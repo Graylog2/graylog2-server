@@ -49,6 +49,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import java.security.cert.X509Certificate;
 import java.time.Clock;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -90,7 +92,7 @@ class CollectorCaServiceTest {
         clusterIdService = mock(ClusterIdService.class);
         when(clusterIdService.getString()).thenReturn("cluster-id");
         collectorsConfigService = new CollectorsConfigService(clusterConfigService, mock(ClusterEventBus.class));
-        collectorCaService = new CollectorCaService(certificateService, clusterIdService, collectorsConfigService);
+        collectorCaService = new CollectorCaService(certificateService, clusterIdService, collectorsConfigService, clock);
     }
 
     private void initConfig() {
@@ -198,6 +200,114 @@ class CollectorCaServiceTest {
         assertThat(sans).isNotNull();
         // GeneralName type 2 = dNSName
         assertThat(sans).anyMatch(entry -> (int) entry.get(0) == 2 && testClusterId.equals(entry.get(1)));
+    }
+
+    @Test
+    void needsRenewal_returnsFalseWhenCertIsNew() {
+        initConfig();
+        final var signingCert = collectorCaService.getSigningCert();
+
+        // At epoch (cert creation time), the full lifetime remains
+        assertThat(collectorCaService.needsRenewal(signingCert, Instant.EPOCH)).isFalse();
+    }
+
+    @Test
+    void needsRenewal_returnsTrueWhenBelowThreshold() {
+        initConfig();
+        final var signingCert = collectorCaService.getSigningCert();
+
+        // Advance to 85% of signing cert lifetime (5 years) — only 15% remains, below 20% threshold
+        final var signingLifetimeDays = 5 * 365;
+        final var at85Percent = Instant.EPOCH.plus(Duration.ofDays((long) (signingLifetimeDays * 0.85)));
+        assertThat(collectorCaService.needsRenewal(signingCert, at85Percent)).isTrue();
+    }
+
+    @Test
+    void needsRenewal_returnsFalseWhenAboveThreshold() {
+        initConfig();
+        final var signingCert = collectorCaService.getSigningCert();
+
+        // Advance to 50% of signing cert lifetime — 50% remains, above 20% threshold
+        final var signingLifetimeDays = 5 * 365;
+        final var atHalfway = Instant.EPOCH.plus(Duration.ofDays((long) (signingLifetimeDays * 0.5)));
+        assertThat(collectorCaService.needsRenewal(signingCert, atHalfway)).isFalse();
+    }
+
+    @Test
+    void renewCertificates_doesNothingWhenCertsAreNew() {
+        initConfig();
+        final var configBefore = collectorsConfigService.get().orElseThrow();
+
+        collectorCaService.renewCertificates();
+
+        final var configAfter = collectorsConfigService.get().orElseThrow();
+        assertThat(configAfter.signingCertId()).isEqualTo(configBefore.signingCertId());
+        assertThat(configAfter.otlpServerCertId()).isEqualTo(configBefore.otlpServerCertId());
+    }
+
+    @Test
+    void renewCertificates_renewsSigningCertAndCascadesToServerCert() {
+        initConfig();
+        final var configBefore = collectorsConfigService.get().orElseThrow();
+
+        // Create a service with a clock past the signing cert's renewal threshold
+        final var signingLifetimeDays = 5 * 365;
+        final var futureClock = Clock.fixed(
+                Instant.EPOCH.plus(Duration.ofDays((long) (signingLifetimeDays * 0.85))),
+                ZoneOffset.UTC);
+        final var futureService = new CollectorCaService(certificateService, clusterIdService, collectorsConfigService, futureClock);
+
+        futureService.renewCertificates();
+
+        final var configAfter = collectorsConfigService.get().orElseThrow();
+        // Both signing and server cert should have changed
+        assertThat(configAfter.signingCertId()).isNotEqualTo(configBefore.signingCertId());
+        assertThat(configAfter.otlpServerCertId()).isNotEqualTo(configBefore.otlpServerCertId());
+        // CA cert should remain unchanged
+        assertThat(configAfter.caCertId()).isEqualTo(configBefore.caCertId());
+
+        // Verify the new signing cert is signed by the CA
+        final var newSigningCert = certificateService.findById(configAfter.signingCertId()).orElseThrow();
+        final var caCert = certificateService.findById(configAfter.caCertId()).orElseThrow();
+        assertThat(newSigningCert.authorityKeyIdentifier()).hasValue(caCert.subjectKeyIdentifier());
+
+        // Verify the new server cert is signed by the new signing cert
+        final var newServerCert = certificateService.findById(configAfter.otlpServerCertId()).orElseThrow();
+        assertThat(newServerCert.authorityKeyIdentifier()).hasValue(newSigningCert.subjectKeyIdentifier());
+    }
+
+    @Test
+    void renewCertificates_renewsOnlyServerCertWhenSigningCertIsFresh() {
+        initConfig();
+        final var configBefore = collectorsConfigService.get().orElseThrow();
+
+        // Advance past the OTLP server cert threshold (2 years) but not the signing cert threshold (5 years)
+        final var serverLifetimeDays = 2 * 365;
+        final var futureClock = Clock.fixed(
+                Instant.EPOCH.plus(Duration.ofDays((long) (serverLifetimeDays * 0.85))),
+                ZoneOffset.UTC);
+        final var futureService = new CollectorCaService(certificateService, clusterIdService, collectorsConfigService, futureClock);
+
+        futureService.renewCertificates();
+
+        final var configAfter = collectorsConfigService.get().orElseThrow();
+        // Only server cert should have changed
+        assertThat(configAfter.caCertId()).isEqualTo(configBefore.caCertId());
+        assertThat(configAfter.signingCertId()).isEqualTo(configBefore.signingCertId());
+        assertThat(configAfter.otlpServerCertId()).isNotEqualTo(configBefore.otlpServerCertId());
+
+        // Verify the new server cert is signed by the existing signing cert
+        final var newServerCert = certificateService.findById(configAfter.otlpServerCertId()).orElseThrow();
+        final var signingCert = certificateService.findById(configAfter.signingCertId()).orElseThrow();
+        assertThat(newServerCert.authorityKeyIdentifier()).hasValue(signingCert.subjectKeyIdentifier());
+    }
+
+    @Test
+    void renewCertificates_skipsWhenCaNotInitialized() {
+        // No initConfig() call — CA is not initialized
+        collectorCaService.renewCertificates();
+        // Should return silently without errors
+        assertThat(collectorsConfigService.get()).isEmpty();
     }
 
     @Test
