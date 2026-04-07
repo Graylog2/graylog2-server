@@ -17,6 +17,7 @@
 package org.graylog.collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.eventbus.EventBus;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import org.bouncycastle.asn1.ASN1OctetString;
@@ -34,6 +35,7 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterIdService;
@@ -67,10 +69,11 @@ class CollectorCaServiceTest {
     private ClusterIdService clusterIdService;
     private CollectorCaService collectorCaService;
     private Clock clock = TestClocks.fixedEpoch();
+    private EncryptedValueService encryptedValueService;
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb, ClusterConfigService clusterConfigService) {
-        final EncryptedValueService encryptedValueService = new EncryptedValueService("1234567890abcdef");
+        encryptedValueService = new EncryptedValueService("1234567890abcdef");
         final ObjectMapper objectMapper = new ObjectMapperProvider(
                 ObjectMapperProvider.class.getClassLoader(),
                 Collections.emptySet(),
@@ -86,7 +89,7 @@ class CollectorCaServiceTest {
         certificateService = new CertificateService(mongoCollections, encryptedValueService, CustomizationConfig.empty(), clock);
         clusterIdService = mock(ClusterIdService.class);
         when(clusterIdService.getString()).thenReturn("cluster-id");
-        collectorsConfigService = new CollectorsConfigService(clusterConfigService);
+        collectorsConfigService = new CollectorsConfigService(clusterConfigService, mock(ClusterEventBus.class));
         collectorCaService = new CollectorCaService(certificateService, clusterIdService, collectorsConfigService);
     }
 
@@ -200,7 +203,9 @@ class CollectorCaServiceTest {
     @Test
     void newServerSslContextBuilder_returnsConfiguredBuilder() throws Exception {
         initConfig();
-        final SslContextBuilder builder = collectorCaService.newServerSslContextBuilder();
+        final var cache = new CollectorCaCache(collectorCaService, certificateService, encryptedValueService, new EventBus(), TestClocks.fixedEpoch());
+        final var tlsUtils = new CollectorTLSUtils(new CollectorCaKeyManager(cache), new CollectorCaTrustManager(cache, clock));
+        final SslContextBuilder builder = tlsUtils.newServerSslContextBuilder();
         assertThat(builder).isNotNull();
 
         // Verify the builder can actually build an SslContext

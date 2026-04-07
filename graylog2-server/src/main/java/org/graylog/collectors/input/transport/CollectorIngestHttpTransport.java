@@ -24,6 +24,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.handler.ssl.SslContext;
 import jakarta.inject.Named;
 import org.graylog.collectors.CollectorCaService;
+import org.graylog.collectors.CollectorTLSUtils;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.IngestEndpointConfig;
@@ -60,7 +61,7 @@ public class CollectorIngestHttpTransport extends AbstractHttpTransport {
     public static final String NAME = "CollectorIngestHttpTransport";
     static final int DEFAULT_HTTP_PORT = 14401;
 
-    private final CollectorCaService collectorCaService;
+    private final CollectorTLSUtils tlsUtils;
 
     @AssistedInject
     public CollectorIngestHttpTransport(@Assisted Configuration configuration,
@@ -71,12 +72,12 @@ public class CollectorIngestHttpTransport extends AbstractHttpTransport {
                                         LocalMetricRegistry localMetricRegistry,
                                         TLSProtocolsConfiguration tlsConfiguration,
                                         @Named("trusted_proxies") Set<IpSubnet> trustedProxies,
-                                        CollectorCaService collectorCaService,
+                                        CollectorTLSUtils tlsUtils,
                                         CollectorsConfigService collectorsConfigService) {
         super(buildTransportConfig(collectorsConfigService), eventLoopGroup, eventLoopGroupFactory,
                 nettyTransportConfiguration, throughputCounter, localMetricRegistry,
                 tlsConfiguration, trustedProxies, OtlpHttpUtils.LOGS_PATH);
-        this.collectorCaService = collectorCaService;
+        this.tlsUtils = tlsUtils;
     }
 
     private static Configuration buildTransportConfig(CollectorsConfigService collectorsConfigService) {
@@ -100,7 +101,7 @@ public class CollectorIngestHttpTransport extends AbstractHttpTransport {
     @Override
     protected Callable<? extends ChannelHandler> createSslHandler(MessageInput input) {
         return () -> {
-            final SslContext sslContext = collectorCaService.newServerSslContextBuilder().build();
+            final SslContext sslContext = tlsUtils.newServerSslContextBuilder().build();
             return sslContext.newHandler(PooledByteBufAllocator.DEFAULT);
         };
     }
