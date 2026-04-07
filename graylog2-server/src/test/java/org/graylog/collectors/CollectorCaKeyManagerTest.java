@@ -102,6 +102,16 @@ class CollectorCaKeyManagerTest {
     }
 
     @Test
+    void chooseEngineServerAlias_returnsAliasForEdDSA() {
+        assertThat(keyManager.chooseEngineServerAlias("EdDSA", null, null)).isEqualTo("server");
+    }
+
+    @Test
+    void chooseEngineServerAlias_returnsNullForRSA() {
+        assertThat(keyManager.chooseEngineServerAlias("RSA", null, null)).isNull();
+    }
+
+    @Test
     void getClientAliases_returnsNull() {
         assertThat(keyManager.getClientAliases("EdDSA", null)).isNull();
     }

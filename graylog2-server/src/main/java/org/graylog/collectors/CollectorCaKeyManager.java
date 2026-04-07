@@ -21,7 +21,8 @@ import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.X509KeyManager;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.X509ExtendedKeyManager;
 import java.net.Socket;
 import java.security.Principal;
 import java.security.PrivateKey;
@@ -32,7 +33,7 @@ import java.security.cert.X509Certificate;
  * for certificate renewal.
  */
 @Singleton
-public class CollectorCaKeyManager implements X509KeyManager {
+public class CollectorCaKeyManager extends X509ExtendedKeyManager {
     private static final Logger LOG = LoggerFactory.getLogger(CollectorCaKeyManager.class);
     private static final String ALIAS = "server";
 
@@ -75,6 +76,11 @@ public class CollectorCaKeyManager implements X509KeyManager {
         }
         LOG.debug("Returning null private key for alias <{}>", alias);
         return null;
+    }
+
+    @Override
+    public String chooseEngineServerAlias(String keyType, Principal[] issuers, SSLEngine engine) {
+        return chooseServerAlias(keyType, issuers, null);
     }
 
     @Override
