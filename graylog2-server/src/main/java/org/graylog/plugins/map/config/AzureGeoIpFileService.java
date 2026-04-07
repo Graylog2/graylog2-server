@@ -19,19 +19,17 @@ package org.graylog.plugins.map.config;
 import com.azure.core.http.policy.ExponentialBackoffOptions;
 import com.azure.core.http.policy.RetryOptions;
 import com.azure.storage.blob.BlobClient;
-import com.azure.storage.blob.BlobServiceClient;
-import com.azure.storage.blob.BlobServiceClientBuilder;
-import com.azure.storage.common.StorageSharedKeyCredential;
+import com.azure.storage.blob.BlobContainerClient;
+import com.azure.storage.blob.models.ListBlobsOptions;
 import org.apache.commons.lang3.StringUtils;
+import org.graylog.integrations.azure.BlobServiceClientBuilderFactory;
 import org.graylog2.plugin.validate.ConfigValidationException;
-import org.graylog2.security.encryption.EncryptedValueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Locale;
 import java.util.Optional;
 
 /**
@@ -39,14 +37,14 @@ import java.util.Optional;
  */
 public class AzureGeoIpFileService extends GeoIpFileService {
     private static final Logger LOG = LoggerFactory.getLogger(AzureGeoIpFileService.class);
-    private static final String NULL_AZURE_CLIENT_MESSAGE = "Unable to create Azure Blob Service Client. Geo Location Processor Azure file refresh is disabled.";
 
-    private final EncryptedValueService encryptedValueService;
-    private BlobServiceClient blobServiceClient;
+    private final BlobServiceClientBuilderFactory blobServiceClientBuilderFactory;
+    private BlobContainerClient blobContainerClient;
 
-    public AzureGeoIpFileService(GeoIpProcessorConfig config, EncryptedValueService encryptedValueService) {
+    public AzureGeoIpFileService(GeoIpProcessorConfig config,
+                                 BlobServiceClientBuilderFactory blobServiceClientBuilderFactory) {
         super(config);
-        this.encryptedValueService = encryptedValueService;
+        this.blobServiceClientBuilderFactory = blobServiceClientBuilderFactory;
     }
 
     @Override
@@ -67,12 +65,10 @@ public class AzureGeoIpFileService extends GeoIpFileService {
     @Override
     public void validateConfiguration(GeoIpResolverConfig config) throws ConfigValidationException {
         final boolean hasAccountName = StringUtils.isNotBlank(config.azureAccountName());
-        final boolean hasAccountKey = config.azureAccountKey() != null && config.azureAccountKey().isSet();
         final boolean hasContainerName = StringUtils.isNotBlank(config.azureContainerName());
 
-
-        if (!hasAccountName || !hasAccountKey || !hasContainerName) {
-            throw new ConfigValidationException("Azure authentication is required. Provide account name, account key, and container name.");
+        if (!hasAccountName || !hasContainerName) {
+            throw new ConfigValidationException("Azure authentication is required. Provide account name and container name.");
         }
     }
 
@@ -92,16 +88,14 @@ public class AzureGeoIpFileService extends GeoIpFileService {
     }
 
     private Optional<Instant> downloadFile(GeoIpResolverConfig config, String blobPath, Path tempPath) {
-        final String container = config.azureContainerName();
         try {
-            final BlobClient blobClient = getBlobServiceClient(config)
-                    .getBlobContainerClient(container)
-                    .getBlobClient(blobPath);
-
+            final BlobClient blobClient = getBlobContainerClient(config).getBlobClient(blobPath);
             blobClient.downloadToFile(tempPath.toString(), true);
             return Optional.of(blobClient.getProperties().getLastModified().toInstant());
+        } catch (AzureCloudDownloadException e) {
+            throw e;
         } catch (Exception e) {
-            throw new AzureCloudDownloadException("Failed to download blob %s: %s".formatted(blobPath, e.getMessage()));
+            throw new AzureCloudDownloadException("Failed to download blob %s".formatted(blobPath), e);
         }
     }
 
@@ -116,17 +110,16 @@ public class AzureGeoIpFileService extends GeoIpFileService {
     }
 
     private Optional<Instant> getFileServerTimestamp(GeoIpResolverConfig config, String blobPath) {
-        final String container = config.azureContainerName();
         try {
-            final BlobClient blobClient = getBlobServiceClient(config)
-                    .getBlobContainerClient(container)
-                    .getBlobClient(blobPath);
+            final BlobClient blobClient = getBlobContainerClient(config).getBlobClient(blobPath);
 
             if (Boolean.TRUE.equals(blobClient.exists())) {
                 return Optional.of(blobClient.getProperties().getLastModified().toInstant());
             }
+        } catch (AzureCloudDownloadException e) {
+            throw e;
         } catch (Exception e) {
-            LOG.warn("Failed to get last modified time for blob {}: {}", blobPath, e.getMessage());
+            throw new AzureCloudDownloadException("Failed to get last modified time for blob %s.".formatted(blobPath), e);
         }
         return Optional.empty();
     }
@@ -137,41 +130,41 @@ public class AzureGeoIpFileService extends GeoIpFileService {
         return true;
     }
 
-    private BlobServiceClient getBlobServiceClient(GeoIpResolverConfig config) {
-        if (blobServiceClient == null) {
-            try {
-                blobServiceClient = createBlobServiceClient(config);
-            } catch (Exception e) {
-                LOG.warn(NULL_AZURE_CLIENT_MESSAGE);
-                throw new IllegalStateException("Unable to connect to Azure Blob Storage.", e);
+    private BlobContainerClient getBlobContainerClient(GeoIpResolverConfig config) {
+        if (blobContainerClient == null) {
+            blobContainerClient = createBlobServiceClient(config);
+            if (!blobContainerClient.exists()) {
+                throw new AzureCloudDownloadException("Container <%s> does not exist!".formatted(config.azureContainerName()));
+            } else {
+                // additional check to verify that provided credentials have access to the container
+                blobContainerClient.listBlobs(new ListBlobsOptions().setPrefix(""), null);
             }
         }
-        return blobServiceClient;
+        return blobContainerClient;
     }
 
-    private BlobServiceClient createBlobServiceClient(GeoIpResolverConfig config) {
+    private BlobContainerClient createBlobServiceClient(GeoIpResolverConfig config) {
         final ExponentialBackoffOptions exponentialOptions = new ExponentialBackoffOptions()
                 .setMaxRetries(3)
                 .setBaseDelay(Duration.ofSeconds(1))
                 .setMaxDelay(Duration.ofSeconds(1));
 
-        final RetryOptions retryOptions = new RetryOptions(exponentialOptions);
-
-        final String accountKey = encryptedValueService.decrypt(config.azureAccountKey());
-        final BlobServiceClientBuilder builder = new BlobServiceClientBuilder()
-                .retryOptions(retryOptions)
-                .credential(new StorageSharedKeyCredential(config.azureAccountName(), accountKey));
-
-        config.azureEndpoint().ifPresentOrElse(builder::endpoint, () ->
-                builder.endpoint(String.format(Locale.ROOT, "https://%s.blob.core.windows.net", config.azureAccountName()))
-        );
-
-        return builder.buildClient();
+        return blobServiceClientBuilderFactory.create(
+                        config.azureAccountName(),
+                        config.azureAccountKey(),
+                        config.azureEndpoint().orElse(null))
+                .retryOptions(new RetryOptions(exponentialOptions))
+                .buildClient()
+                .getBlobContainerClient(config.azureContainerName());
     }
 
     static class AzureCloudDownloadException extends RuntimeException {
         public AzureCloudDownloadException(String message) {
             super(message);
+        }
+
+        public AzureCloudDownloadException(String message, Throwable cause) {
+            super(message, cause);
         }
     }
 }

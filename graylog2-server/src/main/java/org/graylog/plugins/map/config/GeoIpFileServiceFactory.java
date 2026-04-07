@@ -17,17 +17,17 @@
 package org.graylog.plugins.map.config;
 
 import jakarta.inject.Inject;
-import org.graylog2.security.encryption.EncryptedValueService;
+import org.graylog.integrations.azure.BlobServiceClientBuilderFactory;
 
 public class GeoIpFileServiceFactory {
     private final GeoIpProcessorConfig processorConfig;
-    private final EncryptedValueService encryptedValueService;
+    private final BlobServiceClientBuilderFactory blobServiceClientBuilderFactory;
 
     @Inject
     public GeoIpFileServiceFactory(GeoIpProcessorConfig processorConfig,
-                                   EncryptedValueService encryptedValueService) {
+                                   BlobServiceClientBuilderFactory blobServiceClientBuilderFactory) {
         this.processorConfig = processorConfig;
-        this.encryptedValueService = encryptedValueService;
+        this.blobServiceClientBuilderFactory = blobServiceClientBuilderFactory;
     }
 
     /**
@@ -46,7 +46,7 @@ public class GeoIpFileServiceFactory {
         } else if (config.isGcsCloud()) {
             return new GcsGeoIpFileService(processorConfig);
         } else if (config.isAzureCloud()) {
-            return new AzureGeoIpFileService(processorConfig, encryptedValueService);
+            return new AzureGeoIpFileService(processorConfig, blobServiceClientBuilderFactory);
         } else {
             return new LocalGeoIpFileService(processorConfig);
         }
