@@ -44,9 +44,8 @@ import software.amazon.kinesis.processor.ShardRecordProcessorFactory;
 import software.amazon.kinesis.retrieval.KinesisClientRecord;
 
 import java.nio.ByteBuffer;
-import java.util.List;
+import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
-
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -116,18 +115,19 @@ public class KinesisShardProcessorFactory implements ShardRecordProcessorFactory
                     final var result =
                             kinesisPayloadDecoder.processMessages(dataBytes, record.approximateArrivalTimestamp());
 
-                    final List<Long> sizes = distribute(result.decompressedSize(), result.entries().stream()
-                            .map(e -> (long) e.message().length())
-                            .toList());
+                    final long[] weights = result.entries().stream()
+                            .mapToLong(e -> e.message().length())
+                            .toArray();
+                    final long[] sizes = distribute(result.decompressedSize(), weights);
 
                     if (LOG.isTraceEnabled()) {
                         LOG.trace("Distributing total input size {} across {} records: {}",
-                                result.decompressedSize(), result.entries().size(), sizes);
+                                result.decompressedSize(), result.entries().size(), Arrays.toString(sizes));
                     }
 
                     for (int i = 0; i < result.entries().size(); i++) {
                         final RawMessage raw = new RawMessage(objectMapper.writeValueAsBytes(result.entries().get(i)));
-                        raw.setInputMessageSize(sizes.get(i));
+                        raw.setInputMessageSize(sizes[i]);
                         handleMessageCallback.accept(raw);
                     }
                 } catch (Exception e) {

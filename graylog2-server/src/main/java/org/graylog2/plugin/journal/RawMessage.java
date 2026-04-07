@@ -209,10 +209,6 @@ public class RawMessage implements Serializable {
         return msgBuilder.getPayload().size();
     }
 
-    public void setInputMessageSize(int inputMessageSize) {
-        msgBuilder.setInputMessageSize(inputMessageSize);
-    }
-
     public void setInputMessageSize(long inputMessageSize) {
         msgBuilder.setInputMessageSize(Ints.saturatedCast(inputMessageSize));
     }

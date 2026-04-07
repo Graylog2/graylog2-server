@@ -201,12 +201,13 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         if (messages.isEmpty()) {
             return;
         }
-        final List<Long> sizes = distribute(payloadLength, messages.stream()
-                .map(Message::getSize)
-                .toList());
+        final long[] weights = messages.stream()
+                .mapToLong(Message::getSize)
+                .toArray();
+        final long[] sizes = distribute(payloadLength, weights);
 
         for (int i = 0; i < messages.size(); i++) {
-            messages.get(i).addField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, sizes.get(i));
+            messages.get(i).addField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, sizes[i]);
         }
     }
 

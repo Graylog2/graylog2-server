@@ -21,6 +21,7 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.journal.RawMessage;
 import org.slf4j.Logger;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.ToLongFunction;
@@ -50,18 +51,18 @@ public final class RecordSizeDistributingProcessor {
                                                                Function<byte[], RawMessage> createRawMessage,
                                                                MessageInput input,
                                                                Logger log) {
-        final List<Long> weights = records.stream()
-                .map(weightExtractor::applyAsLong)
-                .toList();
-        final List<Long> sizes = distribute(totalRequestSize, weights);
+        final long[] weights = records.stream()
+                .mapToLong(weightExtractor)
+                .toArray();
+        final long[] sizes = distribute(totalRequestSize, weights);
 
         if (log.isTraceEnabled()) {
-            log.trace("Distributing total input size {} across {} records: {}", totalRequestSize, records.size(), sizes);
+            log.trace("Distributing total input size {} across {} records: {}", totalRequestSize, records.size(), Arrays.toString(sizes));
         }
 
         for (int i = 0; i < records.size(); i++) {
             final RawMessage raw = createRawMessage.apply(records.get(i).toByteArray());
-            raw.setInputMessageSize(sizes.get(i));
+            raw.setInputMessageSize(sizes[i]);
             input.processRawMessage(raw);
         }
     }

@@ -16,10 +16,6 @@
  */
 package org.graylog2.shared.utilities;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 /**
  * Distributes a total size proportionally across items based on individual weights.
  * The last item receives the remainder to ensure the total is preserved exactly.
@@ -34,31 +30,30 @@ public final class InputMessageSizeDistributor {
      *
      * @param totalSize the total size to distribute
      * @param weights   the weight of each item (e.g. serialized size of each record)
-     * @return a list of distributed sizes, same length as {@code weights}
+     * @return an array of distributed sizes, same length as {@code weights}
      */
-    public static List<Long> distribute(final long totalSize, final List<Long> weights) {
-        final int count = weights.size();
+    public static long[] distribute(final long totalSize, final long[] weights) {
+        final int count = weights.length;
+        final long[] result = new long[count];
 
         if (count == 0) {
-            return Collections.emptyList();
+            return result;
         }
 
-        final long totalWeight = weights.stream().mapToLong(Long::longValue).sum();
+        long totalWeight = 0L;
+        for (final long weight : weights) {
+            totalWeight += weight;
+        }
 
-        final List<Long> result = new ArrayList<>(count);
         long assignedSize = 0L;
         for (int i = 0; i < count; i++) {
-            final long size;
             if (i == count - 1) {
-                size = totalSize - assignedSize;
+                result[i] = totalSize - assignedSize;
             } else if (totalWeight > 0) {
                 // Can overflow if totalSize * weight exceeds Long.MAX_VALUE (~9.2 EB), not a real-world concern
-                size = totalSize * weights.get(i) / totalWeight;
-            } else {
-                size = totalSize / count;
+                result[i] = totalSize * weights[i] / totalWeight;
             }
-            assignedSize += size;
-            result.add(size);
+            assignedSize += result[i];
         }
 
         return result;
