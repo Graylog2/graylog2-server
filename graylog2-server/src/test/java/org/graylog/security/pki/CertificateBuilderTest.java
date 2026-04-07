@@ -24,6 +24,8 @@ import org.graylog2.security.encryption.EncryptedValueService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.cert.CertPathValidator;
 import java.security.cert.CertPathValidatorException;
 import java.security.cert.CertificateFactory;
@@ -423,6 +425,24 @@ class CertificateBuilderTest {
 
         // Should NOT have Subject Alternative Names
         assertThat(cert.getSubjectAlternativeNames()).isNull();
+    }
+
+    // CSR signing tests
+
+    @Test
+    void signCsrCertHasSkiAndAkiMatchingIssuerSki() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(3650));
+        final CertificateEntry intermediateCa = builder.createIntermediateCa("Signing CA", rootCa, Duration.ofDays(1825));
+
+        final KeyPair agentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+        final byte[] csrPem = builder.createCsr(agentKeyPair, "test-agent");
+        final X509Certificate signedCert = builder.signCsr(csrPem, intermediateCa, "test-agent", Duration.ofDays(365));
+
+        final X509Certificate intermediateCert = PemUtils.parseCertificate(intermediateCa.certificate());
+
+        assertThat(PemUtils.extractSubjectKeyIdentifier(signedCert)).isPresent();
+        assertThat(PemUtils.extractAuthorityKeyIdentifier(signedCert))
+                .isEqualTo(PemUtils.extractSubjectKeyIdentifier(intermediateCert));
     }
 
     // PKIX trust chain validation tests

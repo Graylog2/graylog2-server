@@ -61,6 +61,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -472,7 +473,7 @@ public class CertificateBuilder {
 
         // Detect algorithm from key pair
         final String keyAlgorithm = keyPair.getPublic().getAlgorithm();
-        final String signatureAlgorithm = "Ed25519".equals(keyAlgorithm) ? "Ed25519" : "SHA256withRSA";
+        final String signatureAlgorithm = Set.of("Ed25519", "EdDSA").contains(keyAlgorithm) ? "Ed25519" : "SHA256withRSA";
 
         final ContentSigner signer = new JcaContentSignerBuilder(signatureAlgorithm)
                 .setProvider("BC")
@@ -590,6 +591,9 @@ public class CertificateBuilder {
                 false,
                 new ExtendedKeyUsage(KeyPurposeId.id_kp_clientAuth)
         );
+
+        addSubjectKeyIdentifier(certBuilder, publicKey);
+        addAuthorityKeyIdentifier(certBuilder, issuerCert);
 
         // Detect algorithm from issuer certificate
         final Algorithm algorithm = PemUtils.detectAlgorithm(issuerCert);
