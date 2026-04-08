@@ -52,6 +52,7 @@ import java.io.StringWriter;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
+import java.security.SecureRandom;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Security;
@@ -84,6 +85,8 @@ public class CertificateBuilder {
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
     }
 
+    private static final SecureRandom SERIAL_RNG = new SecureRandom();
+
     private final EncryptedValueService encryptedValueService;
     private final String productName;
     private final Clock clock;
@@ -98,6 +101,12 @@ public class CertificateBuilder {
         this.encryptedValueService = encryptedValueService;
         this.productName = productName;
         this.clock = clock;
+    }
+
+    private static BigInteger generateSerialNumber() {
+        final byte[] bytes = new byte[16];
+        SERIAL_RNG.nextBytes(bytes);
+        return new BigInteger(1, bytes); // signum=1 ensures positive
     }
 
     /**
@@ -148,7 +157,7 @@ public class CertificateBuilder {
 
         final Instant now = Instant.now(clock);
         final Instant notAfter = now.plus(validity);
-        final BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
+        final BigInteger serialNumber = generateSerialNumber();
 
         final JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
                 subject,
@@ -222,7 +231,7 @@ public class CertificateBuilder {
 
         final Instant now = Instant.now(clock);
         final Instant notAfter = capNotAfter(now, validity, issuerCert);
-        final BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
+        final BigInteger serialNumber = generateSerialNumber();
 
         final JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
                 issuerDn,
@@ -362,7 +371,7 @@ public class CertificateBuilder {
 
         final Instant now = Instant.now(clock);
         final Instant notAfter = capNotAfter(now, validity, issuerCert);
-        final BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
+        final BigInteger serialNumber = generateSerialNumber();
 
         final JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
                 issuerDn,
@@ -590,7 +599,7 @@ public class CertificateBuilder {
 
         final Instant now = Instant.now(clock);
         final Instant notAfter = capNotAfter(now, validity, issuerCert);
-        final BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
+        final BigInteger serialNumber = generateSerialNumber();
 
         final JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
                 issuerDn,
