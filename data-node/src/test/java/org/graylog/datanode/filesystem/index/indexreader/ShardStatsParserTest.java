@@ -45,8 +45,9 @@ class ShardStatsParserTest {
     @Test
     void testElasticsearch7() throws URISyntaxException, IncompatibleIndexVersionException {
         final URI shard = getClass().getResource("/indices/elasticsearch7/nodes/0/indices/JwZYQzvUQG6JxLBgMsFfTA/0").toURI();
-        Assertions.assertThatThrownBy(() -> shardStatsParser.read(Path.of(shard)))
-                .isInstanceOf(IncompatibleIndexVersionException.class);
+        final ShardStats stats = shardStatsParser.read(Path.of(shard));
+        Assertions.assertThat(stats.documentsCount()).isEqualTo(1);
+        Assertions.assertThat(stats.minSegmentLuceneVersion().toString()).isEqualTo("8.7.0");
     }
     @Test
     void testElasticsearch6() throws URISyntaxException  {

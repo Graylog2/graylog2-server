@@ -99,13 +99,7 @@ const FleetDetail = ({ fleetId }: Props) => {
   const { data: stats, isLoading: statsLoading } = useFleetStats(fleetId);
   const defaultInstanceFilters = useDefaultInstanceFilters();
   const { data: sources } = useSources(fleetId);
-  const {
-    createSource,
-    updateSource,
-    deleteSource,
-    updateFleet,
-    deleteFleet,
-  } = useCollectorsMutations();
+  const { createSource, updateSource, deleteSource, updateFleet, deleteFleet } = useCollectorsMutations();
   const [showSourceModal, setShowSourceModal] = useState(false);
   const [editingSource, setEditingSource] = useState<Source | null>(null);
   const [deletingSource, setDeletingSource] = useState<Source | null>(null);
@@ -215,7 +209,9 @@ const FleetDetail = ({ fleetId }: Props) => {
   return (
     <div>
       <Header>
-        <h2>{fleet.name} <BetaBadge /></h2>
+        <h2>
+          {fleet.name} <BetaBadge />
+        </h2>
         {fleet.target_version && <Label bsStyle="info">v{fleet.target_version}</Label>}
       </Header>
 
@@ -288,11 +284,7 @@ const FleetDetail = ({ fleetId }: Props) => {
       )}
 
       {showSourceModal && (
-        <SourceFormModal
-          fleetId={fleetId}
-          onClose={() => setShowSourceModal(false)}
-          onSave={handleSaveSource}
-        />
+        <SourceFormModal fleetId={fleetId} onClose={() => setShowSourceModal(false)} onSave={handleSaveSource} />
       )}
 
       {editingSource && (
