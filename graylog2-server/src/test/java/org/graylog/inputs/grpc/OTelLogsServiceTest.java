@@ -123,18 +123,19 @@ class OTelLogsServiceTest {
         verify(input, times(3)).processRawMessage(captor.capture());
 
         final List<RawMessage> captured = captor.getAllValues();
-        final int expectedPerMessageSize = request.getSerializedSize() / 3;
 
         for (final RawMessage raw : captured) {
             assertThat(raw.getInputMessageSize())
-                    .as("Each RawMessage should carry the proportional request size")
-                    .isEqualTo(expectedPerMessageSize);
+                    .as("Each RawMessage should carry a non-zero proportional request size")
+                    .isGreaterThan(0);
         }
 
         final long totalAssigned = captured.stream()
                 .mapToLong(RawMessage::getInputMessageSize)
                 .sum();
-        assertThat(totalAssigned).isLessThanOrEqualTo(request.getSerializedSize());
+        assertThat(totalAssigned)
+                .as("Total distributed size should equal the original request size")
+                .isEqualTo(request.getSerializedSize());
     }
 
     @Test

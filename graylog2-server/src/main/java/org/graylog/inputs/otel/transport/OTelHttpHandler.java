@@ -16,7 +16,6 @@
  */
 package org.graylog.inputs.otel.transport;
 
-import com.google.protobuf.AbstractMessageLite;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -28,13 +27,13 @@ import org.graylog.inputs.otel.OTelJournalRecordFactory;
 import org.graylog2.inputs.transports.netty.HttpHandler;
 import org.graylog2.inputs.transports.netty.RawMessageHandler;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.shared.utilities.RecordSizeDistributingProcessor;
 import org.graylog2.plugin.journal.RawMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 /**
  * OTLP HTTP handler for the generic user-facing OTel HTTP input.
@@ -101,7 +100,7 @@ public class OTelHttpHandler extends HttpHandler {
 
         // 2. Process
         try {
-            createJournalRecords(ctx, exportRequest).forEach(input::processRawMessage);
+            processJournalRecords(ctx, exportRequest);
         } catch (Exception e) {
             LOG.error("Failed to process OTLP request", e);
             sendOtlpError(ctx, request, keepAlive, origin, isProtobuf, HttpResponseStatus.INTERNAL_SERVER_ERROR);
@@ -126,19 +125,23 @@ public class OTelHttpHandler extends HttpHandler {
     }
 
     /**
-     * Creates journal records from the parsed OTLP request.
-     * Resolves the source IP from the forwarded-for channel attribute if available.
+     * Creates journal records from the parsed OTLP request, distributes the original request
+     * size proportionally across records, and submits them for processing.
      */
-    protected Stream<RawMessage> createJournalRecords(ChannelHandlerContext ctx,
-                                                      ExportLogsServiceRequest exportRequest) {
+    protected void processJournalRecords(ChannelHandlerContext ctx,
+                                         ExportLogsServiceRequest exportRequest) {
         final InetSocketAddress remoteAddress = resolveRemoteAddress(ctx);
         final Function<byte[], RawMessage> createRawMessage = remoteAddress != null
                 ? bytes -> new RawMessage(bytes, remoteAddress)
                 : RawMessage::new;
 
-        return OTelJournalRecordFactory.createFromRequest(exportRequest).stream()
-                .map(AbstractMessageLite::toByteArray)
-                .map(createRawMessage);
+        RecordSizeDistributingProcessor.processRecords(
+                OTelJournalRecordFactory.createFromRequest(exportRequest),
+                exportRequest.getSerializedSize(),
+                r -> r.getLog().getLogRecord().getSerializedSize(),
+                createRawMessage,
+                input,
+                LOG);
     }
 
     /**
