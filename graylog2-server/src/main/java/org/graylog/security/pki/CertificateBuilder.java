@@ -101,6 +101,28 @@ public class CertificateBuilder {
     }
 
     /**
+     * Computes the effective notAfter for a certificate, capping to the issuer's remaining lifetime.
+     * <p>
+     * A signed certificate must never outlive its issuer. When the requested lifetime exceeds the
+     * issuer's remaining validity, we shorten it.
+     */
+    private Instant capNotAfter(Instant now, Duration validity, X509Certificate issuerCert) {
+        final var issuerNotAfter = issuerCert.getNotAfter().toInstant();
+        final var issuerRemaining = Duration.between(now, issuerNotAfter);
+
+        if (issuerRemaining.isNegative() || issuerRemaining.isZero()) {
+            throw new IllegalStateException("Issuer certificate has expired");
+        }
+
+        if (issuerRemaining.compareTo(validity) < 0) {
+            LOG.debug("Capping certificate lifetime from {} to {} days (issuer expires {})",
+                    validity.toDays(), issuerRemaining.toDays(), issuerNotAfter);
+            return now.plus(issuerRemaining);
+        }
+        return now.plus(validity);
+    }
+
+    /**
      * Creates a self-signed root CA certificate.
      * The certificate includes:
      * <ul>
@@ -199,7 +221,7 @@ public class CertificateBuilder {
         final X500Name issuerDn = X500Name.getInstance(issuerCert.getSubjectX500Principal().getEncoded());
 
         final Instant now = Instant.now(clock);
-        final Instant notAfter = now.plus(validity);
+        final Instant notAfter = capNotAfter(now, validity, issuerCert);
         final BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
 
         final JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
@@ -339,7 +361,7 @@ public class CertificateBuilder {
         final X500Name issuerDn = X500Name.getInstance(issuerCert.getSubjectX500Principal().getEncoded());
 
         final Instant now = Instant.now(clock);
-        final Instant notAfter = now.plus(validity);
+        final Instant notAfter = capNotAfter(now, validity, issuerCert);
         final BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
 
         final JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
@@ -567,38 +589,7 @@ public class CertificateBuilder {
         final X500Name issuerDn = X500Name.getInstance(issuerCert.getSubjectX500Principal().getEncoded());
 
         final Instant now = Instant.now(clock);
-        final Instant issuerNotAfter = issuerCert.getNotAfter().toInstant();
-        final Duration issuerRemaining = Duration.between(now, issuerNotAfter);
-
-        if (issuerRemaining.isNegative() || issuerRemaining.isZero()) {
-            throw new IllegalStateException("Issuer certificate has expired");
-        }
-
-        // Cap the certificate lifetime to the issuer's remaining lifetime.
-        //
-        // A signed certificate must never outlive its issuer. When the requested lifetime
-        // exceeds the issuer's remaining validity, we shorten it. This handles:
-        //
-        //   - Collector cert lifetime configured longer than the signing cert's total lifetime
-        //     (e.g., 10-year collector cert with a 5-year signing cert)
-        //   - Enrollment during the last portion of the signing cert's lifetime, when less
-        //     than one full collector cert lifetime remains
-        //
-        // The shortened cert is transparent to collectors: they renew at a configurable
-        // fraction of their cert's lifetime (default 75% elapsed) via OpAMP. After the
-        // signing cert is renewed by the periodic renewal check (at 20% remaining lifetime),
-        // the next collector renewal gets a full-lifetime cert signed by the new signing cert.
-        // Old collector certs remain trusted because the trust manager resolves issuers via
-        // AKI/SKI lookup, which finds both old and new signing certs in the database.
-        final Duration effectiveValidity;
-        if (issuerRemaining.compareTo(validity) < 0) {
-            effectiveValidity = issuerRemaining;
-            LOG.debug("Capping certificate lifetime from {} to {} days (issuer expires {})",
-                    validity.toDays(), issuerRemaining.toDays(), issuerNotAfter);
-        } else {
-            effectiveValidity = validity;
-        }
-        final Instant notAfter = now.plus(effectiveValidity);
+        final Instant notAfter = capNotAfter(now, validity, issuerCert);
         final BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
 
         final JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(

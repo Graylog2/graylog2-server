@@ -37,6 +37,8 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -247,32 +249,23 @@ class CollectorCaTrustManagerTest {
 
     @Test
     void checkClientTrusted_rejectsExpiredIssuer() throws Exception {
-        // Create a signing cert that expires before the client cert. In production this
-        // shouldn't happen (signCsr caps lifetime), but we need to test that the issuer
-        // validity check catches it independently.
-        final var shortCa = certBuilder.createRootCa("Short CA", Algorithm.ED25519, Duration.ofDays(365));
-        final var shortSigning = certBuilder.createIntermediateCa("Short Signing", shortCa, Duration.ofDays(2));
-        // Client cert outlives the signing cert (5 days > 2 days)
+        // Create a valid client cert signed by the real signing cert
         final var clientCertEntry = certBuilder.createEndEntityCert(
-                "test-agent", shortSigning, KeyUsage.digitalSignature,
-                KeyPurposeId.id_kp_clientAuth, Duration.ofDays(5));
+                "test-agent", signingCertEntry, KeyUsage.digitalSignature,
+                KeyPurposeId.id_kp_clientAuth, Duration.ofDays(30));
         final var clientCert = PemUtils.parseCertificate(clientCertEntry.certificate());
 
-        // Mock SKI lookup to return the short-lived signing cert, and root CA for chain check
+        // Mock an expired issuer: a CA with keyCertSign, but checkValidity throws
+        final var expiredIssuer = mock(X509Certificate.class);
+        when(expiredIssuer.getBasicConstraints()).thenReturn(0);
+        when(expiredIssuer.getKeyUsage()).thenReturn(new boolean[]{false, false, false, false, false, true, false, false, false});
+        doThrow(new java.security.cert.CertificateExpiredException("expired")).when(expiredIssuer).checkValidity(any());
+
         final var clientAki = PemUtils.extractAuthorityKeyIdentifier(clientCert).orElseThrow();
-        when(caCache.getBySubjectKeyIdentifier(clientAki)).thenReturn(Optional.of(cacheEntry(shortSigning)));
-        when(caCache.getCa()).thenReturn(cacheEntry(shortCa));
+        final var fakeEntry = new CollectorCaCache.CacheEntry(null, expiredIssuer, "expired-issuer");
+        when(caCache.getBySubjectKeyIdentifier(clientAki)).thenReturn(Optional.of(fakeEntry));
 
-        // Clock at day 3: signing cert expired (2-day), client cert still valid (5-day)
-        final var futureClock = Clock.fixed(Instant.EPOCH.plus(Duration.ofDays(3)), ZoneOffset.UTC);
-        final var futureTrustManager = new CollectorCaTrustManager(caCache, futureClock);
-
-        // Sanity: the signing cert should be expired, the client cert should be valid
-        final var day3 = Instant.now(futureClock);
-        assertThat(shortSigning.notAfter()).isBefore(day3);
-        assertThat(clientCertEntry.notAfter()).isAfter(day3);
-
-        assertThatThrownBy(() -> futureTrustManager.checkClientTrusted(new X509Certificate[]{clientCert}, "Ed25519"))
+        assertThatThrownBy(() -> trustManager.checkClientTrusted(new X509Certificate[]{clientCert}, "Ed25519"))
                 .isInstanceOf(CertificateException.class);
     }
 
