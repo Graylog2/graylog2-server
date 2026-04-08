@@ -62,12 +62,39 @@ public class CollectorCaTrustManager implements X509TrustManager {
         final var issuerEntry = caCache.getBySubjectKeyIdentifier(aki)
                 .orElseThrow(() -> new CertificateException("No known issuer for Authority Key Identifier: " + aki));
 
+        verifyIssuerIsCa(issuerEntry.cert());
         verifySignatureAndValidity(clientCert, issuerEntry.cert());
         verifyEndEntityCert(clientCert);
         verifyClientAuthEku(clientCert);
 
         LOG.debug("Client certificate trusted: subject=<{}>, issuer=<{}>",
                 clientCert.getSubjectX500Principal(), clientCert.getIssuerX500Principal());
+    }
+
+    private void verifyIssuerIsCa(X509Certificate issuerCert) throws CertificateException {
+        if (issuerCert.getBasicConstraints() < 0) {
+            throw new CertificateException("Issuer certificate is not a CA");
+        }
+
+        final boolean[] keyUsage = issuerCert.getKeyUsage();
+        // keyUsage[5] is keyCertSign
+        if (keyUsage == null || !keyUsage[5]) {
+            throw new CertificateException("Issuer certificate does not have keyCertSign key usage");
+        }
+
+        // Collector certs are capped to the signing cert's remaining lifetime in CertificateBuilder#signCsr,
+        // so an expired issuer means the collector cert should also have expired.
+        issuerCert.checkValidity(Date.from(Instant.now(clock)));
+
+        // Verify the issuer chains back to the collectors root CA
+        try {
+            final var rootCa = caCache.getCa();
+            issuerCert.verify(rootCa.cert().getPublicKey());
+        } catch (CertificateException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new CertificateException("Issuer certificate is not signed by the collectors root CA", e);
+        }
     }
 
     private void verifySignatureAndValidity(X509Certificate clientCert, X509Certificate issuerCert) throws CertificateException {

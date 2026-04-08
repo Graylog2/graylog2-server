@@ -182,6 +182,101 @@ class CollectorCaTrustManagerTest {
     }
 
     @Test
+    void checkClientTrusted_rejectsIssuerWithoutCaBasicConstraints() throws Exception {
+        // Create an end-entity cert and use it as the "issuer" in the SKI lookup.
+        // Even if the signature would verify, the issuer must be a CA.
+        final var endEntityEntry = certBuilder.createEndEntityCert(
+                "not-a-ca", signingCertEntry, KeyUsage.digitalSignature,
+                KeyPurposeId.id_kp_serverAuth, Duration.ofDays(30));
+
+        // Create a client cert signed by the real signing cert
+        final var clientCertEntry = certBuilder.createEndEntityCert(
+                "test-agent", signingCertEntry, KeyUsage.digitalSignature,
+                KeyPurposeId.id_kp_clientAuth, Duration.ofDays(30));
+        final var clientCert = PemUtils.parseCertificate(clientCertEntry.certificate());
+
+        // Make the AKI lookup return the end-entity cert instead of the real signing cert
+        final var clientAki = PemUtils.extractAuthorityKeyIdentifier(clientCert).orElseThrow();
+        when(caCache.getBySubjectKeyIdentifier(clientAki)).thenReturn(Optional.of(cacheEntry(endEntityEntry)));
+
+        assertThatThrownBy(() -> trustManager.checkClientTrusted(new X509Certificate[]{clientCert}, "Ed25519"))
+                .isInstanceOf(CertificateException.class)
+                .hasMessageContaining("Issuer certificate is not a CA");
+    }
+
+    @Test
+    void checkClientTrusted_rejectsIssuerWithoutKeyCertSign() throws Exception {
+        // Create a valid client cert signed by the real signing cert
+        final var clientCertEntry = certBuilder.createEndEntityCert(
+                "test-agent", signingCertEntry, KeyUsage.digitalSignature,
+                KeyPurposeId.id_kp_clientAuth, Duration.ofDays(30));
+        final var clientCert = PemUtils.parseCertificate(clientCertEntry.certificate());
+
+        // Create a mock issuer cert that is a CA but lacks keyCertSign
+        final var fakeIssuer = mock(X509Certificate.class);
+        when(fakeIssuer.getBasicConstraints()).thenReturn(0); // CA:TRUE
+        when(fakeIssuer.getKeyUsage()).thenReturn(new boolean[]{true, false, false, false, false, false, false, false, false});
+
+        final var clientAki = PemUtils.extractAuthorityKeyIdentifier(clientCert).orElseThrow();
+        final var fakeEntry = new CollectorCaCache.CacheEntry(null, fakeIssuer, "fake");
+        when(caCache.getBySubjectKeyIdentifier(clientAki)).thenReturn(Optional.of(fakeEntry));
+
+        assertThatThrownBy(() -> trustManager.checkClientTrusted(new X509Certificate[]{clientCert}, "Ed25519"))
+                .isInstanceOf(CertificateException.class)
+                .hasMessageContaining("keyCertSign");
+    }
+
+    @Test
+    void checkClientTrusted_rejectsIssuerNotSignedByRootCa() throws Exception {
+        // Create a separate CA hierarchy not rooted in our trust anchor
+        final var rogueRoot = certBuilder.createRootCa("Rogue Root", Algorithm.ED25519, Duration.ofDays(365));
+        final var rogueSigning = certBuilder.createIntermediateCa("Rogue Signing", rogueRoot, Duration.ofDays(365));
+        final var clientCertEntry = certBuilder.createEndEntityCert(
+                "rogue-agent", rogueSigning, KeyUsage.digitalSignature,
+                KeyPurposeId.id_kp_clientAuth, Duration.ofDays(30));
+        final var clientCert = PemUtils.parseCertificate(clientCertEntry.certificate());
+
+        // Mock SKI lookup to return the rogue signing cert (valid CA, but wrong root)
+        final var clientAki = PemUtils.extractAuthorityKeyIdentifier(clientCert).orElseThrow();
+        when(caCache.getBySubjectKeyIdentifier(clientAki)).thenReturn(Optional.of(cacheEntry(rogueSigning)));
+
+        assertThatThrownBy(() -> trustManager.checkClientTrusted(new X509Certificate[]{clientCert}, "Ed25519"))
+                .isInstanceOf(CertificateException.class)
+                .hasMessageContaining("not signed by the collectors root CA");
+    }
+
+    @Test
+    void checkClientTrusted_rejectsExpiredIssuer() throws Exception {
+        // Create a signing cert that expires before the client cert. In production this
+        // shouldn't happen (signCsr caps lifetime), but we need to test that the issuer
+        // validity check catches it independently.
+        final var shortCa = certBuilder.createRootCa("Short CA", Algorithm.ED25519, Duration.ofDays(365));
+        final var shortSigning = certBuilder.createIntermediateCa("Short Signing", shortCa, Duration.ofDays(2));
+        // Client cert outlives the signing cert (5 days > 2 days)
+        final var clientCertEntry = certBuilder.createEndEntityCert(
+                "test-agent", shortSigning, KeyUsage.digitalSignature,
+                KeyPurposeId.id_kp_clientAuth, Duration.ofDays(5));
+        final var clientCert = PemUtils.parseCertificate(clientCertEntry.certificate());
+
+        // Mock SKI lookup to return the short-lived signing cert, and root CA for chain check
+        final var clientAki = PemUtils.extractAuthorityKeyIdentifier(clientCert).orElseThrow();
+        when(caCache.getBySubjectKeyIdentifier(clientAki)).thenReturn(Optional.of(cacheEntry(shortSigning)));
+        when(caCache.getCa()).thenReturn(cacheEntry(shortCa));
+
+        // Clock at day 3: signing cert expired (2-day), client cert still valid (5-day)
+        final var futureClock = Clock.fixed(Instant.EPOCH.plus(Duration.ofDays(3)), ZoneOffset.UTC);
+        final var futureTrustManager = new CollectorCaTrustManager(caCache, futureClock);
+
+        // Sanity: the signing cert should be expired, the client cert should be valid
+        final var day3 = Instant.now(futureClock);
+        assertThat(shortSigning.notAfter()).isBefore(day3);
+        assertThat(clientCertEntry.notAfter()).isAfter(day3);
+
+        assertThatThrownBy(() -> futureTrustManager.checkClientTrusted(new X509Certificate[]{clientCert}, "Ed25519"))
+                .isInstanceOf(CertificateException.class);
+    }
+
+    @Test
     void checkClientTrusted_rejectsSelfSignedCert() throws Exception {
         // A self-signed root CA cert has no AKI, so it should be rejected
         final var selfSignedCa = certBuilder.createRootCa("Self Signed", Algorithm.ED25519, Duration.ofDays(365));
