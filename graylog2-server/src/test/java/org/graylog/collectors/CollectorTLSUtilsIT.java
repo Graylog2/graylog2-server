@@ -114,7 +114,7 @@ class CollectorTLSUtilsIT {
 
     @BeforeEach
     void setUp(MongoCollections mongoCollections, ClusterConfigService clusterConfigService) throws Exception {
-        final var certBuilder = new CertificateBuilder(encryptedValueService, "Test", TestClocks.fixedEpoch());
+        final var certBuilder = new CertificateBuilder(encryptedValueService, "Test", Clock.systemUTC());
 
         final var certService = new CertificateService(mongoCollections, encryptedValueService, CustomizationConfig.empty(), Clock.systemUTC());
         final var clusterIdService = mock(ClusterIdService.class);
@@ -143,10 +143,10 @@ class CollectorTLSUtilsIT {
         agentKey = PemUtils.parsePrivateKey(encryptedValueService.decrypt(agentCertEntry.privateKey()));
         agentCert = PemUtils.parseCertificate(agentCertEntry.certificate());
 
-        caCache = new CollectorCaCache(caService, certService, encryptedValueService, new EventBus(), TestClocks.fixedEpoch());
+        caCache = new CollectorCaCache(caService, certService, encryptedValueService, new EventBus(), Clock.systemUTC());
         caCache.startAsync().awaitRunning();
         final var keyManager = new CollectorCaKeyManager(caCache);
-        final var trustManager = new CollectorCaTrustManager(caCache, TestClocks.fixedEpoch());
+        final var trustManager = new CollectorCaTrustManager(caCache, Clock.systemUTC());
         tlsUtils = new CollectorTLSUtils(keyManager, trustManager);
 
         bossGroup = new MultiThreadIoEventLoopGroup(1, NioIoHandler.newFactory());
