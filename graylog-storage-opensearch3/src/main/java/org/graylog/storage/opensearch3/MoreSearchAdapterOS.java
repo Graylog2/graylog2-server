@@ -74,6 +74,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -145,7 +146,31 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
                 .build();
     }
 
-    private Query createQuery(String queryString, TimeRange timerange, Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams, Map<String, Set<String>> extraFilters) {
+    private Query createQuery(String queryString,
+                              TimeRange timerange,
+                              Set<String> eventStreams,
+                              String filterString,
+                              Set<String> forbiddenSourceStreams,
+                              Map<String, Set<String>> extraFilters) {
+        return createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters, false);
+    }
+
+    private Query createRangeQueryIncludeDefaultForMissingField(String queryString,
+                              TimeRange timerange,
+                              Set<String> eventStreams,
+                              String filterString,
+                              Set<String> forbiddenSourceStreams,
+                              Map<String, Set<String>> extraFilters) {
+        return createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters, true);
+    }
+
+    private Query createQuery(String queryString,
+                              TimeRange timerange,
+                              Set<String> eventStreams,
+                              String filterString,
+                              Set<String> forbiddenSourceStreams,
+                              Map<String, Set<String>> extraFilters,
+                              final boolean isRangeQueryIncludeDefaultForMissingField) {
 
         final BoolQuery.Builder boolQuery = BoolQuery.builder();
 
@@ -157,6 +182,9 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
         boolQuery.filter(termsQuery(EventDto.FIELD_STREAMS, eventStreams));
         boolQuery.filter(timerangeQuery(timerange));
 
+        if(isRangeQueryIncludeDefaultForMissingField) {
+            boolQuery.minimumShouldMatch("0");
+        }
 
         extraFilters.forEach((field, values) -> {
             values.stream()
@@ -386,13 +414,15 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
     public List<Slice> aggregateSlicesForRangeQuery(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                             Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
                                             Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, List<NumberRange> ranges) {
-        final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
+        final AtomicReference<Query> filter = new AtomicReference<>(createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters));
 
         final RangeAggregation.Builder rangeBuilder = new RangeAggregation.Builder().field(slicingColumn);
         ranges.forEach(r -> {
             final AggregationRange.Builder range = new AggregationRange.Builder();
             if (r.from() != null) {
                 range.from(JsonData.of(r.from()));
+            } else {
+                filter.set(createRangeQueryIncludeDefaultForMissingField(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters));
             }
             if (r.to() != null) {
                 range.to(JsonData.of(r.to()));
@@ -402,7 +432,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
         rangeBuilder.keyed(false);
 
         final org.opensearch.client.opensearch.core.SearchRequest searchRequest = org.opensearch.client.opensearch.core.SearchRequest.of(builder -> {
-            builder.query(filter);
+            builder.query(filter.get());
             builder.size(0);
             builder.ignoreUnavailable(true);
             builder.allowNoIndices(true);
