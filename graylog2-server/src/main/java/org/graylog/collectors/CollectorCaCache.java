@@ -50,9 +50,9 @@ import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 public class CollectorCaCache extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(CollectorCaCache.class);
 
-    private static final String SERVER_KEY = "server";
-    private static final String SIGNING_KEY = "signing";
-    private static final String CA_KEY = "ca";
+    private static final String SERVER_KEY = "_static_:server";
+    private static final String SIGNING_KEY = "_static_:signing";
+    private static final String CA_KEY = "_static_:ca";
 
     private final CollectorCaService caService;
     private final CertificateService certificateService;
