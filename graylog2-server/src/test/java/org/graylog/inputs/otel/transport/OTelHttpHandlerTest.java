@@ -46,6 +46,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -229,7 +232,7 @@ class OTelHttpHandlerTest {
 
     @Test
     void requestWithValidAuthReturns200() throws Exception {
-        final EmbeddedChannel channel = createChannel(false, "Authorization", "Bearer secret");
+        final EmbeddedChannel channel = createChannel(false, "Authorization", "Bearer secret", null);
         final ExportLogsServiceRequest request = createTestRequest();
 
         final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
@@ -248,8 +251,28 @@ class OTelHttpHandlerTest {
     }
 
     @Test
+    void requestWithValidSecondaryAuthReturns200() throws Exception {
+        final EmbeddedChannel channel = createChannel(false, "Authorization", "Bearer primary", "Bearer secondary");
+        final ExportLogsServiceRequest request = createTestRequest();
+
+        final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
+                HttpVersion.HTTP_1_1, HttpMethod.POST, "/v1/logs",
+                Unpooled.wrappedBuffer(request.toByteArray()));
+        httpRequest.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/x-protobuf");
+        httpRequest.headers().set(HttpHeaderNames.CONTENT_LENGTH, request.toByteArray().length);
+        httpRequest.headers().set("Authorization", "Bearer secondary");
+
+        channel.writeInbound(httpRequest);
+
+        final FullHttpResponse response = channel.readOutbound();
+        assertThat(response.status()).isEqualTo(HttpResponseStatus.OK);
+        verify(input).processRawMessage(any());
+        response.release();
+    }
+
+    @Test
     void requestWithBadAuthReturns401() {
-        final EmbeddedChannel channel = createChannel(false, "Authorization", "Bearer secret");
+        final EmbeddedChannel channel = createChannel(false, "Authorization", "Bearer secret", null);
 
         final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
                 HttpVersion.HTTP_1_1, HttpMethod.POST, "/v1/logs",
@@ -268,7 +291,7 @@ class OTelHttpHandlerTest {
 
     @Test
     void requestWithMissingAuthReturns401() {
-        final EmbeddedChannel channel = createChannel(false, "Authorization", "Bearer secret");
+        final EmbeddedChannel channel = createChannel(false, "Authorization", "Bearer secret", null);
 
         final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
                 HttpVersion.HTTP_1_1, HttpMethod.POST, "/v1/logs",
@@ -286,7 +309,7 @@ class OTelHttpHandlerTest {
 
     @Test
     void optionsPreflightSucceedsEvenWithAuthConfigured() {
-        final EmbeddedChannel channel = createChannel(true, "Authorization", "Bearer secret");
+        final EmbeddedChannel channel = createChannel(true, "Authorization", "Bearer secret", null);
 
         final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
                 HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, "/v1/logs");
@@ -306,7 +329,7 @@ class OTelHttpHandlerTest {
 
     @Test
     void optionsRequestReturns200() {
-        final EmbeddedChannel channel = createChannel(true, null, null);
+        final EmbeddedChannel channel = createChannel(true, null, null, null);
 
         final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
                 HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, "/v1/logs");
@@ -325,7 +348,7 @@ class OTelHttpHandlerTest {
 
     @Test
     void corsHeadersOnSuccessResponse() throws Exception {
-        final EmbeddedChannel channel = createChannel(true, null, null);
+        final EmbeddedChannel channel = createChannel(true, null, null, null);
         final ExportLogsServiceRequest request = createTestRequest();
 
         final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
@@ -390,12 +413,16 @@ class OTelHttpHandlerTest {
     }
 
     private EmbeddedChannel createChannel() {
-        return createChannel(false, null, null);
+        return createChannel(false, null, null, null);
     }
 
-    private EmbeddedChannel createChannel(boolean enableCors, String authHeader, String authHeaderValue) {
-        return new EmbeddedChannel(new OTelHttpHandler(enableCors, authHeader, authHeaderValue,
-                OTelHttpHandler.LOGS_PATH, input));
+    private EmbeddedChannel createChannel(boolean enableCors, String authHeader,
+                                          String primaryValue, String secondaryValue) {
+        final Set<String> authorizationHeaderValues = Stream.of(primaryValue, secondaryValue)
+                .filter(v -> v != null && !v.isBlank())
+                .collect(Collectors.toUnmodifiableSet());
+        return new EmbeddedChannel(new OTelHttpHandler(enableCors, authHeader,
+                authorizationHeaderValues, OTelHttpHandler.LOGS_PATH, input));
     }
 
     private ExportLogsServiceRequest createTestRequest() {

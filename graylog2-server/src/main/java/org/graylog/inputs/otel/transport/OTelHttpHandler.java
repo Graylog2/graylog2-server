@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -58,9 +59,9 @@ public class OTelHttpHandler extends HttpHandler {
     private final MessageInput input;
 
     public OTelHttpHandler(boolean enableCors, String authorizationHeader,
-                           String authorizationHeaderValue, String path,
+                           Set<String> authorizationHeaderValues, String path,
                            MessageInput input) {
-        super(enableCors, authorizationHeader, authorizationHeaderValue, path);
+        super(enableCors, authorizationHeader, authorizationHeaderValues, path);
         this.input = input;
     }
 
@@ -119,7 +120,7 @@ public class OTelHttpHandler extends HttpHandler {
      * Sends an OTLP-conformant error response in the encoding matching the request.
      */
     private void sendOtlpError(ChannelHandlerContext ctx, FullHttpRequest request, boolean keepAlive,
-                                String origin, boolean protobuf, HttpResponseStatus status) {
+                               String origin, boolean protobuf, HttpResponseStatus status) {
         final byte[] body = OtlpHttpUtils.buildErrorStatus(status, null, protobuf);
         final String contentType = protobuf ? OtlpHttpUtils.PROTOBUF_CONTENT_TYPE : OtlpHttpUtils.JSON_CONTENT_TYPE;
         writeResponse(ctx.channel(), keepAlive, request.protocolVersion(), status, origin, body, contentType);
