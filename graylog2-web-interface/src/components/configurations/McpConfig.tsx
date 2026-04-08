@@ -28,7 +28,7 @@ import Spinner from 'components/common/Spinner';
 import 'moment-duration-format';
 import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
-import BetaBadge from 'components/common/BetaBadge';
+
 
 type McpConfigState = {
   enable_remote_access: boolean;
@@ -78,9 +78,7 @@ const McpConfig = () => {
 
   return (
     <div>
-      <h2>
-        MCP Server Configuration <BetaBadge />
-      </h2>
+      <h2>MCP Server Configuration</h2>
       <br />
       <p>Activate MCP (Model Context Protocol) to enable LLM-powered communication and automation with your cluster.</p>
       <p>
