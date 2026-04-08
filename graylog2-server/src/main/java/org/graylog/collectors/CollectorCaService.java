@@ -147,7 +147,6 @@ public class CollectorCaService {
             return;
         }
 
-        final var config = ensureConfig();
         final var hierarchy = loadHierarchy();
         final var now = Instant.now(clock);
 
@@ -164,7 +163,7 @@ public class CollectorCaService {
                 LOG.info("Re-issuing OTLP server certificate (signing cert renewed)");
                 final var newServerCert = certificateService.save(createServerCert(builder, newSigningCert));
 
-                collectorsConfigService.save(config.toBuilder()
+                collectorsConfigService.save(ensureConfig().toBuilder()
                         .signingCertId(newSigningCert.id())
                         .otlpServerCertId(newServerCert.id())
                         .build());
@@ -175,7 +174,7 @@ public class CollectorCaService {
                 if (needsRenewal(curServerCert, now)) {
                     LOG.info("Renewing OTLP server certificate <{}> (expires {})", curServerCert.fingerprint(), curServerCert.notAfter());
                     final var newServerCert = certificateService.save(createServerCert(builder, signingCert));
-                    collectorsConfigService.save(config.toBuilder()
+                    collectorsConfigService.save(ensureConfig().toBuilder()
                             .otlpServerCertId(newServerCert.id())
                             .build());
                 }
