@@ -23,6 +23,7 @@ import fetch from 'logic/rest/FetchProvider';
 import { DocumentTitle } from 'components/common';
 import { createLinkAndDownload } from 'util/FileDownloadUtils';
 import { qualifyUrl } from 'util/URLUtils';
+import PageErrorOverview from 'components/common/PageErrorOverview';
 
 const StyledExplorerContainer = styled.div(
   ({ theme }) => css`
@@ -93,7 +94,8 @@ const DownloadSpecSelect = () => (
           createLinkAndDownload(qualifyUrl(path), `openapi${path.substring(path.lastIndexOf('.'))}`);
         }
 
-        e.stopPropagation();
+        // eslint-disable-next-line no-param-reassign
+        e.target.value = '';
       }}>
       <option value="">Select format</option>
       <option value="/openapi.json">JSON</option>
@@ -110,7 +112,12 @@ const addRequestedByHeader = (event: CustomEvent) => {
 const ApiBrowserPage = () => {
   const explorerRef = useRef<HTMLElement & { loadSpec: (spec: object) => void }>(null);
   const [loaded, setLoaded] = useState(false);
-  const { data: spec, isInitialLoading: loadingSpec } = useQuery({
+  const {
+    data: spec,
+    isInitialLoading: loadingSpec,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ['api-browser', 'spec'],
     queryFn: fetchSpec,
   });
@@ -136,17 +143,21 @@ const ApiBrowserPage = () => {
   }, [loaded]);
 
   useEffect(() => {
-    if (loaded && !loadingSpec) {
+    if (loaded && !loadingSpec && !isError) {
       explorerRef.current.loadSpec(spec);
     }
-  }, [loaded, loadingSpec, spec]);
+  }, [isError, loaded, loadingSpec, spec]);
 
   if (!loaded || loadingSpec) {
     return (
-      <DocumentTitle title="API Browser">
-        <span>Loading...</span>
+      <DocumentTitle title="API Browser - Loading API Spec">
+        <span>Loading API spec ...</span>
       </DocumentTitle>
     );
+  }
+
+  if (error) {
+    return <PageErrorOverview title="Fetching API spec failed!" error={error} />;
   }
 
   return (
