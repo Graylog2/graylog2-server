@@ -1,5 +1,5 @@
 type = "a"
-message = "Add secondary authorization token support to Raw HTTP Input."
+message = "Add secondary authorization token support to HTTP-based inputs."
 
 issues = ["Graylog2/graylog-plugin-enterprise#13702"]
 pulls = ["25544"]
