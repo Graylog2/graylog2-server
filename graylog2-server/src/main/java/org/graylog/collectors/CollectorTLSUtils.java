@@ -20,7 +20,9 @@ import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslProvider;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
+@Singleton
 public class CollectorTLSUtils {
     private final CollectorCaKeyManager keyManager;
     private final CollectorCaTrustManager trustManager;

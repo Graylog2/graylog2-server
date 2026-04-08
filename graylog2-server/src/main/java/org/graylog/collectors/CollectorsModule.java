@@ -107,6 +107,7 @@ public class CollectorsModule extends PluginModule {
         bind(CollectorCaCache.class).in(Scopes.SINGLETON);
         bind(CollectorCaKeyManager.class).in(Scopes.SINGLETON);
         bind(CollectorCaTrustManager.class).in(Scopes.SINGLETON);
+        bind(CollectorTLSUtils.class).in(Scopes.SINGLETON);
         addInitializer(CollectorCaCache.class);
 
         // Collectors config
