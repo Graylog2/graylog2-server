@@ -561,6 +561,22 @@ class CertificateBuilderTest {
     }
 
     @Test
+    void signCsrAcceptsEdDSAKeyAlgorithmName() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(3650));
+        final CertificateEntry issuer = builder.createIntermediateCa("Signing CA", rootCa, Duration.ofDays(1825));
+
+        // The JDK reports "EdDSA" (not "Ed25519") when using the "EdDSA" generator name
+        final KeyPair edDsaKeyPair = KeyPairGenerator.getInstance("EdDSA").generateKeyPair();
+        assertThat(edDsaKeyPair.getPublic().getAlgorithm()).isEqualTo("EdDSA");
+
+        final byte[] csrPem = builder.createCsr(edDsaKeyPair, "eddsa-agent");
+        final X509Certificate cert = builder.signCsr(csrPem, issuer, "eddsa-agent", Duration.ofDays(365));
+
+        assertThat(cert).isNotNull();
+        assertThat(cert.getSubjectX500Principal().getName()).contains("CN=eddsa-agent");
+    }
+
+    @Test
     void signCsrRejectsRsaKey() throws Exception {
         final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(3650));
         final CertificateEntry issuer = builder.createIntermediateCa("Signing CA", rootCa, Duration.ofDays(1825));

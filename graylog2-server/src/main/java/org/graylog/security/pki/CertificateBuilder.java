@@ -106,7 +106,8 @@ public class CertificateBuilder {
     private static BigInteger generateSerialNumber() {
         final byte[] bytes = new byte[16];
         SERIAL_RNG.nextBytes(bytes);
-        return new BigInteger(1, bytes); // signum=1 ensures positive
+        bytes[0] |= 0x01; // Guarantee non-zero for RFC 5280 compliance
+        return new BigInteger(1, bytes);
     }
 
     /**
@@ -574,7 +575,7 @@ public class CertificateBuilder {
                 .setProvider("BC")
                 .getPublicKey(csr.getSubjectPublicKeyInfo());
 
-        if (!"Ed25519".equals(publicKey.getAlgorithm())) {
+        if (!Set.of("Ed25519", "EdDSA").contains(publicKey.getAlgorithm())) {
             throw new IllegalArgumentException(
                     f("CSR public key must be Ed25519, but was %s", publicKey.getAlgorithm())
             );
