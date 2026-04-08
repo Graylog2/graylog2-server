@@ -389,6 +389,39 @@ class OTelHttpHandlerTest {
         response.release();
     }
 
+    @Test
+    void inputMessageSizeIsDistributedProportionally() {
+        final EmbeddedChannel channel = createChannel();
+        final ExportLogsServiceRequest request = ExportLogsServiceRequest.newBuilder()
+                .addResourceLogs(ResourceLogs.newBuilder()
+                        .addScopeLogs(ScopeLogs.newBuilder()
+                                .addLogRecords(LogRecord.newBuilder()
+                                        .setBody(AnyValue.newBuilder().setStringValue("log message one")))
+                                .addLogRecords(LogRecord.newBuilder()
+                                        .setBody(AnyValue.newBuilder().setStringValue("log message two")))))
+                .build();
+
+        final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
+                HttpVersion.HTTP_1_1, HttpMethod.POST, "/v1/logs",
+                Unpooled.wrappedBuffer(request.toByteArray()));
+        httpRequest.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/x-protobuf");
+        httpRequest.headers().set(HttpHeaderNames.CONTENT_LENGTH, request.toByteArray().length);
+
+        channel.writeInbound(httpRequest);
+
+        final ArgumentCaptor<RawMessage> captor = ArgumentCaptor.forClass(RawMessage.class);
+        verify(input, times(2)).processRawMessage(captor.capture());
+
+        // Equal log record sizes → each gets half the request size
+        final int expectedPerMessage = request.getSerializedSize() / 2;
+        assertThat(captor.getAllValues().get(0).getInputMessageSize()).isEqualTo(expectedPerMessage);
+        assertThat(captor.getAllValues().get(1).getInputMessageSize())
+                .isEqualTo(request.getSerializedSize() - expectedPerMessage);
+
+        final FullHttpResponse response = channel.readOutbound();
+        response.release();
+    }
+
     private EmbeddedChannel createChannel() {
         return createChannel(false, null, null);
     }

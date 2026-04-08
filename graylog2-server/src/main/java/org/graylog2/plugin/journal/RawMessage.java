@@ -19,6 +19,7 @@ package org.graylog2.plugin.journal;
 import com.eaio.uuid.UUID;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Iterables;
+import com.google.common.primitives.Ints;
 import com.google.common.collect.Lists;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.UninitializedMessageException;
@@ -208,8 +209,8 @@ public class RawMessage implements Serializable {
         return msgBuilder.getPayload().size();
     }
 
-    public void setInputMessageSize(int inputMessageSize) {
-        msgBuilder.setInputMessageSize(inputMessageSize);
+    public void setInputMessageSize(long inputMessageSize) {
+        msgBuilder.setInputMessageSize(Ints.saturatedCast(inputMessageSize));
     }
 
     public UUID getId() {
