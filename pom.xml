@@ -782,17 +782,17 @@
                         <dependency>
                             <groupId>org.openrewrite</groupId>
                             <artifactId>rewrite-java</artifactId>
-                            <version>8.77.0</version>
+                            <version>8.78.0</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-testing-frameworks</artifactId>
-                            <version>3.31.0</version>
+                            <version>3.33.0</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-migrate-java</artifactId>
-                            <version>3.31.0</version>
+                            <version>3.31.3</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
