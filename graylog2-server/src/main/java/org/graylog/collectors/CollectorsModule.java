@@ -135,6 +135,7 @@ public class CollectorsModule extends PluginModule {
         registerJacksonSubtype(JournaldSourceConfig.class);
         registerJacksonSubtype(WindowsEventLogSourceConfig.class);
 
+
         final var indexTemplateProviderBinder = MapBinder.newMapBinder(binder(), String.class,
                 IndexTemplateProvider.class);
         indexTemplateProviderBinder.addBinding(CollectorLogsIndexTemplateProvider.COLLECTOR_LOGS_TEMPLATE_TYPE)
