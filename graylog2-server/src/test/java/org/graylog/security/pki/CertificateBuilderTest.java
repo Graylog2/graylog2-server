@@ -428,6 +428,54 @@ class CertificateBuilderTest {
         assertThat(cert.getSubjectAlternativeNames()).isNull();
     }
 
+    // End-entity certificate lifetime cap tests
+
+    @Test
+    void createEndEntityCertCapsLifetimeToIssuerRemainingLifetime() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(3650));
+        final CertificateEntry shortIssuer = builder.createIntermediateCa("Short CA", rootCa, Duration.ofDays(30));
+
+        final CertificateEntry endEntityCert = builder.createEndEntityCert(
+                "Server", shortIssuer, KeyUsage.digitalSignature | KeyUsage.keyEncipherment,
+                KeyPurposeId.id_kp_serverAuth, Duration.ofDays(365));
+
+        final X509Certificate cert = PemUtils.parseCertificate(endEntityCert.certificate());
+        final Duration actualValidity = Duration.between(
+                cert.getNotBefore().toInstant(), cert.getNotAfter().toInstant());
+        assertThat(actualValidity.toDays()).isEqualTo(30);
+    }
+
+    @Test
+    void createEndEntityCertUsesRequestedLifetimeWhenIssuerHasEnoughRemaining() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(3650));
+        final CertificateEntry issuer = builder.createIntermediateCa("Signing CA", rootCa, Duration.ofDays(1825));
+
+        final CertificateEntry endEntityCert = builder.createEndEntityCert(
+                "Server", issuer, KeyUsage.digitalSignature | KeyUsage.keyEncipherment,
+                KeyPurposeId.id_kp_serverAuth, Duration.ofDays(365));
+
+        final X509Certificate cert = PemUtils.parseCertificate(endEntityCert.certificate());
+        final Duration actualValidity = Duration.between(
+                cert.getNotBefore().toInstant(), cert.getNotAfter().toInstant());
+        assertThat(actualValidity.toDays()).isEqualTo(365);
+    }
+
+    @Test
+    void createEndEntityCertRejectsExpiredIssuer() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(3650));
+        final CertificateEntry shortIssuer = builder.createIntermediateCa("Expired CA", rootCa, Duration.ofDays(1));
+
+        final var futureBuilder = new CertificateBuilder(
+                new EncryptedValueService("1234567890abcdef"), "Graylog",
+                Clock.offset(clock, Duration.ofDays(2)));
+
+        assertThatThrownBy(() -> futureBuilder.createEndEntityCert(
+                "Server", shortIssuer, KeyUsage.digitalSignature,
+                KeyPurposeId.id_kp_serverAuth, Duration.ofDays(365)))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("expired");
+    }
+
     // CSR signing tests
 
     @Test
