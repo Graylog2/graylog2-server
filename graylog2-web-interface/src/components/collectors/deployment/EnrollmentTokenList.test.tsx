@@ -93,9 +93,11 @@ describe('EnrollmentTokenList', () => {
       isLoading: false,
     });
 
-    asMock(useCollectorsMutations).mockReturnValue(mockCollectorsMutations({
-      deleteEnrollmentToken: deleteEnrollmentTokenMock,
-    }));
+    asMock(useCollectorsMutations).mockReturnValue(
+      mockCollectorsMutations({
+        deleteEnrollmentToken: deleteEnrollmentTokenMock,
+      }),
+    );
 
     asMock(fetchPaginatedEnrollmentTokens).mockResolvedValue(mockPaginatedResponse([mockToken()]));
   });

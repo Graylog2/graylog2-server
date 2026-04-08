@@ -81,6 +81,10 @@ const ICON_MAP: Record<ActivityEntry['type'], IconName> = {
 };
 
 const targetLink = (target: TargetInfo) => {
+  if (!target.id) {
+    return <MutedText>[deleted]</MutedText>;
+  }
+
   if (target.type === 'fleet') {
     return <Link to={Routes.SYSTEM.COLLECTORS.FLEET(target.id)}>{target.name}</Link>;
   }
@@ -127,7 +131,9 @@ const renderDescription = (entry: ActivityEntry) => {
       return (
         <span>
           Collector {targetLink(target)} reassigned to fleet{' '}
-          {newFleetId ? <Link to={Routes.SYSTEM.COLLECTORS.FLEET(newFleetId)}>{newFleetName}</Link> : 'unknown'}
+          {newFleetId
+            ? <Link to={Routes.SYSTEM.COLLECTORS.FLEET(newFleetId)}>{newFleetName}</Link>
+            : <MutedText>[deleted]</MutedText>}
         </span>
       );
     }
@@ -147,7 +153,9 @@ const RecentActivity = () => {
 
       {isLoading && <Spinner />}
 
-      {!isLoading && (!data?.activities || data.activities.length === 0) && <NoEntitiesExist>No recent activity.</NoEntitiesExist>}
+      {!isLoading && (!data?.activities || data.activities.length === 0) && (
+        <NoEntitiesExist>No recent activity.</NoEntitiesExist>
+      )}
 
       {!isLoading && data?.activities && data.activities.length > 0 && (
         <ActivityList>

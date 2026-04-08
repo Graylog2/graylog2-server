@@ -41,7 +41,7 @@ public record RecentActivityResponse(@JsonProperty("activities") List<ActivityEn
     }
 
     public record TargetInfo(
-            @JsonProperty("id") String id,
+            @JsonProperty("id") @Nullable String id,
             @JsonProperty("name") String name,
             @JsonProperty("type") String type) {
     }

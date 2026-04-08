@@ -74,12 +74,12 @@ const Label = styled.div(
 );
 
 const StatCard = ({ value, label, variant = 'default', onClick = undefined }: Props) => (
-  <StyledCard as={onClick ? 'button' : 'div'}
-              $variant={variant}
-              $clickable={!!onClick}
-              onClick={onClick}
-              type={onClick ? 'button' : undefined}
-  >
+  <StyledCard
+    as={onClick ? 'button' : 'div'}
+    $variant={variant}
+    $clickable={!!onClick}
+    onClick={onClick}
+    type={onClick ? 'button' : undefined}>
     <Value>{value}</Value>
     <Label>{label}</Label>
   </StyledCard>

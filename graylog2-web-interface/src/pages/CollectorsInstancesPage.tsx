@@ -39,7 +39,12 @@ const CollectorsInstancesPage = () => {
   return (
     <DocumentTitle title="Collector Instances">
       <CollectorsPageNavigation />
-      <PageHeader title={<>Instances <BetaBadge /></>}>
+      <PageHeader
+        title={
+          <>
+            Instances <BetaBadge />
+          </>
+        }>
         <span>View all collector instances across fleets.</span>
       </PageHeader>
 
