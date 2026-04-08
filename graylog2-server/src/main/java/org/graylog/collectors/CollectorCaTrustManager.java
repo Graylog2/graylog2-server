@@ -23,7 +23,9 @@ import org.graylog.security.pki.PemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.X509ExtendedTrustManager;
+import java.net.Socket;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Clock;
@@ -33,9 +35,13 @@ import java.util.Date;
 /**
  * Custom trust manager that looks up the trust chain via authority key identifiers. This allows efficient certificate
  * lookup with multiple active signing certs. (e.g., cert renewal)
+ * <p>
+ * Extends {@link X509ExtendedTrustManager} rather than implementing {@link javax.net.ssl.X509TrustManager} because
+ * Netty uses {@link javax.net.ssl.SSLEngine}-based handshakes. The JDK wraps a plain {@code X509TrustManager} in
+ * an adapter that adds endpoint identification checks; extending the "Extended" variant avoids that wrapper.
  */
 @Singleton
-public class CollectorCaTrustManager implements X509TrustManager {
+public class CollectorCaTrustManager extends X509ExtendedTrustManager {
     private static final Logger LOG = LoggerFactory.getLogger(CollectorCaTrustManager.class);
 
     private final CollectorCaCache caCache;
@@ -129,7 +135,27 @@ public class CollectorCaTrustManager implements X509TrustManager {
     }
 
     @Override
+    public void checkClientTrusted(X509Certificate[] certs, String authType, Socket socket) throws CertificateException {
+        checkClientTrusted(certs, authType);
+    }
+
+    @Override
+    public void checkClientTrusted(X509Certificate[] certs, String authType, SSLEngine engine) throws CertificateException {
+        checkClientTrusted(certs, authType);
+    }
+
+    @Override
     public void checkServerTrusted(X509Certificate[] certs, String authType) throws CertificateException {
+        throw new UnsupportedOperationException("#checkServerTrusted() not implemented");
+    }
+
+    @Override
+    public void checkServerTrusted(X509Certificate[] certs, String authType, Socket socket) throws CertificateException {
+        throw new UnsupportedOperationException("#checkServerTrusted() not implemented");
+    }
+
+    @Override
+    public void checkServerTrusted(X509Certificate[] certs, String authType, SSLEngine engine) throws CertificateException {
         throw new UnsupportedOperationException("#checkServerTrusted() not implemented");
     }
 

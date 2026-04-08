@@ -31,6 +31,10 @@ import java.security.cert.X509Certificate;
 /**
  * Custom key manager that dynamically retrieves the server and signing certificates. This behavior is required
  * for certificate renewal.
+ * <p>
+ * Extends {@link X509ExtendedKeyManager} rather than implementing {@link javax.net.ssl.X509KeyManager} because
+ * Netty uses {@link javax.net.ssl.SSLEngine}-based handshakes. The JDK wraps a plain {@code X509KeyManager} in
+ * an adapter that adds endpoint identification checks; extending the "Extended" variant avoids that wrapper.
  */
 @Singleton
 public class CollectorCaKeyManager extends X509ExtendedKeyManager {
