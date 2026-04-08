@@ -361,10 +361,12 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
             if (from != null && to != null) {
                 builder.addRange(from, to);
             } else if (to != null) {
-                filter.set(createRangeQueryIncludeDefaultForMissingField(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters));
                 builder.addUnboundedTo(to);
             } else if (from != null) {
                 builder.addUnboundedFrom(from);
+            }
+            if(from == null || from == 0d) {
+                filter.set(createRangeQueryIncludeDefaultForMissingField(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters));
             }
         });
 

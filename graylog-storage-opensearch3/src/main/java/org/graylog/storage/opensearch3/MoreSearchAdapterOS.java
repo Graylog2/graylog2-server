@@ -421,11 +421,12 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
             final AggregationRange.Builder range = new AggregationRange.Builder();
             if (r.from() != null) {
                 range.from(JsonData.of(r.from()));
-            } else {
-                filter.set(createRangeQueryIncludeDefaultForMissingField(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters));
             }
             if (r.to() != null) {
                 range.to(JsonData.of(r.to()));
+            }
+            if(r.from() == null || r.from() == 0d) {
+                filter.set(createRangeQueryIncludeDefaultForMissingField(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters));
             }
             rangeBuilder.ranges(range.build());
         });
