@@ -45,7 +45,6 @@ import org.graylog.security.pki.CertificateBuilder;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
 import org.graylog.security.pki.PemUtils;
-import org.graylog.testing.TestClocks;
 import org.graylog.testing.cluster.ClusterConfigServiceExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.database.MongoCollections;
