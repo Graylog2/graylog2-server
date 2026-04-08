@@ -176,7 +176,7 @@ class CollectorCaCacheTest {
     }
 
     @Test
-    void getByFingerprint_returnsCacheEntryForKnownSubjectKeyIdentifier() throws Exception {
+    void getBySubjectKeyIdentifier_returnsCacheEntryForKnownSubjectKeyIdentifier() throws Exception {
         when(certService.findBySubjectKeyIdentifier(serverCert.subjectKeyIdentifier())).thenReturn(Optional.of(serverCert));
 
         final var result = cache.getBySubjectKeyIdentifier(serverCert.subjectKeyIdentifier());
@@ -187,20 +187,20 @@ class CollectorCaCacheTest {
     }
 
     @Test
-    void getByFingerprint_returnsEmptyForUnknownSubjectKeyIdentifier() {
+    void getBySubjectKeyIdentifier_returnsEmptyForUnknownSubjectKeyIdentifier() {
         when(certService.findBySubjectKeyIdentifier("unknown")).thenReturn(Optional.empty());
 
         assertThat(cache.getBySubjectKeyIdentifier("sha256:unknown")).isEmpty();
     }
 
     @Test
-    void getByFingerprint_rejectsBlankSubjectKeyIdentifier() {
+    void getBySubjectKeyIdentifier_rejectsBlankSubjectKeyIdentifier() {
         assertThatThrownBy(() -> cache.getBySubjectKeyIdentifier(""))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    void getByFingerprint_rejectsNullSubjectKeyIdentifier() {
+    void getBySubjectKeyIdentifier_rejectsNullSubjectKeyIdentifier() {
         assertThatThrownBy(() -> cache.getBySubjectKeyIdentifier(null))
                 .isInstanceOf(Exception.class);
     }
