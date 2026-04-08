@@ -188,9 +188,9 @@ class CollectorCaCacheTest {
 
     @Test
     void getBySubjectKeyIdentifier_returnsEmptyForUnknownSubjectKeyIdentifier() {
-        when(certService.findBySubjectKeyIdentifier("unknown")).thenReturn(Optional.empty());
+        when(certService.findBySubjectKeyIdentifier("unknown-ski")).thenReturn(Optional.empty());
 
-        assertThat(cache.getBySubjectKeyIdentifier("sha256:unknown")).isEmpty();
+        assertThat(cache.getBySubjectKeyIdentifier("unknown-ski")).isEmpty();
     }
 
     @Test
