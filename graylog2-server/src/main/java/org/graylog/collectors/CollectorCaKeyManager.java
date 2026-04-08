@@ -21,6 +21,8 @@ import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Set;
+
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.X509ExtendedKeyManager;
 import java.net.Socket;
@@ -40,6 +42,7 @@ import java.security.cert.X509Certificate;
 public class CollectorCaKeyManager extends X509ExtendedKeyManager {
     private static final Logger LOG = LoggerFactory.getLogger(CollectorCaKeyManager.class);
     private static final String ALIAS = "server";
+    private static final Set<String> ED25519_KEY_TYPES = Set.of("EdDSA", "Ed25519");
 
     private final CollectorCaCache caCache;
 
@@ -50,7 +53,7 @@ public class CollectorCaKeyManager extends X509ExtendedKeyManager {
 
     @Override
     public String chooseServerAlias(String keyType, Principal[] issuers, Socket socket) {
-        if ("EdDSA".equals(keyType)) {
+        if (ED25519_KEY_TYPES.contains(keyType)) {
             LOG.debug("Returning <{}> as the server alias for key type <{}>", ALIAS, keyType);
             return ALIAS;
         }

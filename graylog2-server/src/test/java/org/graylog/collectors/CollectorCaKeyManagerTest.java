@@ -68,6 +68,11 @@ class CollectorCaKeyManagerTest {
     }
 
     @Test
+    void chooseServerAlias_returnsAliasForEd25519() {
+        assertThat(keyManager.chooseServerAlias("Ed25519", null, null)).isEqualTo("server");
+    }
+
+    @Test
     void chooseServerAlias_returnsNullForRSA() {
         assertThat(keyManager.chooseServerAlias("RSA", null, null)).isNull();
     }
@@ -104,6 +109,11 @@ class CollectorCaKeyManagerTest {
     @Test
     void chooseEngineServerAlias_returnsAliasForEdDSA() {
         assertThat(keyManager.chooseEngineServerAlias("EdDSA", null, null)).isEqualTo("server");
+    }
+
+    @Test
+    void chooseEngineServerAlias_returnsAliasForEd25519() {
+        assertThat(keyManager.chooseEngineServerAlias("Ed25519", null, null)).isEqualTo("server");
     }
 
     @Test
