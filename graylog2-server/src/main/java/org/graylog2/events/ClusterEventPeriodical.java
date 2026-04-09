@@ -18,6 +18,7 @@ package org.graylog2.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -157,6 +158,7 @@ public class ClusterEventPeriodical extends Periodical {
     }
 
     @Subscribe
+    @AllowConcurrentEvents
     public void publishClusterEvent(Object event) {
         if (event instanceof DeadEvent) {
             LOG.debug("Skipping DeadEvent on cluster event bus");

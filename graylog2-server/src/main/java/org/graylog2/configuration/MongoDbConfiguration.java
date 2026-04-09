@@ -74,7 +74,8 @@ public class MongoDbConfiguration {
 
     public MongoClientURI getMongoClientURI() {
         final MongoClientOptions.Builder mongoClientOptionsBuilder = MongoClientOptions.builder()
-                .connectionsPerHost(getMaxConnections());
+                .connectionsPerHost(getMaxConnections())
+                .socketTimeout(60000);
 
         return new MongoClientURI(uri, mongoClientOptionsBuilder);
     }

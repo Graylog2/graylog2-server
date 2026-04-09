@@ -47,6 +47,14 @@ public class MongoDbConfigurationTest {
     }
 
     @Test
+    public void defaultSocketTimeoutIs60Seconds() throws RepositoryException, ValidationException {
+        MongoDbConfiguration configuration = new MongoDbConfiguration();
+        new JadConfig(new InMemoryRepository(), configuration).process();
+
+        assertEquals(60000, configuration.getMongoClientURI().getOptions().getSocketTimeout());
+    }
+
+    @Test
     public void validateSucceedsIfUriIsMissing() throws RepositoryException, ValidationException {
         MongoDbConfiguration configuration = new MongoDbConfiguration();
         new JadConfig(new InMemoryRepository(Collections.emptyMap()), configuration).process();
