@@ -15,11 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
-import { useQueries, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import styled, { css } from 'styled-components';
-
-import { SystemInputs } from '@graylog/server-api';
 
 import { Button, Alert, Row, Col, Table } from 'components/bootstrap';
 import { Link } from 'components/common';
@@ -30,7 +27,7 @@ import useInputMutations from 'hooks/useInputMutations';
 import { isPermitted } from 'util/PermissionsMixin';
 import useInputsStates from 'hooks/useInputsStates';
 
-import { useCollectorInputIds } from '../hooks';
+import { useCollectorInputDetails } from '../hooks';
 import { COLLECTOR_INPUT_IDS_KEY_PREFIX } from '../hooks/useCollectorInputIds';
 
 const SectionTitle = styled.h3(
@@ -48,7 +45,7 @@ const IngestEndpointStatus = ({ defaultPort, isInitialSetup }: Props) => {
   const queryClient = useQueryClient();
   const currentUser = useCurrentUser();
   const { createInput } = useInputMutations();
-  const { data: collectorInputIds = [], isLoading } = useCollectorInputIds();
+  const { collectorInputIds, loadedInputs, unreadableCount, isLoading } = useCollectorInputDetails();
   const { data: inputStates, isLoading: isLoadingInputStates } = useInputsStates({ enabled: collectorInputIds.length > 0 });
 
   const canCreateInputs = isPermitted(currentUser?.permissions, [
@@ -56,29 +53,6 @@ const IngestEndpointStatus = ({ defaultPort, isInitialSetup }: Props) => {
     'input_types:create:org.graylog.collectors.input.CollectorIngestHttpInput',
   ]);
 
-  // Per-input read permission filtering. Currently, all users with Reader role have wildcard
-  // inputs:read, so this filter is a no-op in practice. Kept for correctness if more
-  // fine-grained read permissions are introduced.
-  const readableInputIds = useMemo(
-    () => collectorInputIds.filter((id) => isPermitted(currentUser?.permissions, `inputs:read:${id}`)),
-    [collectorInputIds, currentUser?.permissions],
-  );
-
-  const inputQueries = useQueries({
-    queries: readableInputIds.map((id) => ({
-      queryKey: ['inputs', id],
-      queryFn: () => SystemInputs.get(id),
-      retry: false,
-    })),
-  });
-
-  const allQueriesSettled = inputQueries.every((q) => !q.isLoading);
-
-  const loadedInputs = inputQueries
-    .filter((q) => q.isSuccess && q.data)
-    .map((q) => q.data);
-
-  const unreadableCount = collectorInputIds.length - readableInputIds.length;
   const hasInputs = loadedInputs.length > 0 || unreadableCount > 0;
 
   const hasRunningInput = loadedInputs.some((input) => {
@@ -103,7 +77,7 @@ const IngestEndpointStatus = ({ defaultPort, isInitialSetup }: Props) => {
     await queryClient.invalidateQueries({ queryKey: COLLECTOR_INPUT_IDS_KEY_PREFIX });
   };
 
-  if (isLoading || !allQueriesSettled) {
+  if (isLoading) {
     return null;
   }
 
@@ -115,7 +89,7 @@ const IngestEndpointStatus = ({ defaultPort, isInitialSetup }: Props) => {
     <Row className="content">
       <Col md={12}>
         <SectionTitle>Ingest Inputs</SectionTitle>
-        {!isInitialSetup && allQueriesSettled && !hasInputs && (
+        {!isInitialSetup && !hasInputs && (
           <Alert bsStyle="info">
             No collector ingest input exists. Collectors will not be able to send data until an input is created.
             {canCreateInputs && (

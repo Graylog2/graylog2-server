@@ -23,7 +23,7 @@ import useInputsStates from 'hooks/useInputsStates';
 
 import CollectorsSettings from './CollectorsSettings';
 
-import { useCollectorsConfig, useCollectorInputIds, useCollectorsMutations } from '../hooks';
+import { useCollectorsConfig, useCollectorInputIds, useCollectorsMutations, useCollectorInputDetails } from '../hooks';
 import type { CollectorsConfig } from '../types';
 import { mockCollectorsMutations } from '../testing/mockMutations';
 
@@ -78,6 +78,13 @@ describe('CollectorsSettings', () => {
     asMock(useInputsStates).mockReturnValue({
       data: {},
       refetch: jest.fn(),
+      isLoading: false,
+    });
+    asMock(useCollectorInputDetails).mockReturnValue({
+      collectorInputIds: [],
+      readableInputIds: [],
+      loadedInputs: [],
+      unreadableCount: 0,
       isLoading: false,
     });
     updateConfig.mockResolvedValue(undefined);
