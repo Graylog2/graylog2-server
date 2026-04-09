@@ -94,6 +94,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -196,18 +197,18 @@ public class SupportBundleService {
                 .forEach(futures::add);
 
         futures.add(CompletableFuture.runAsync(
-                () -> fetchClusterInfosUnchecked(proxiedResourceHelper, nodeManifests, spoolDir), executor));
+                () -> tryFetchClusterInfos(proxiedResourceHelper, nodeManifests, spoolDir), executor));
 
         CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).get();
     }
 
-    private void fetchClusterInfosUnchecked(ProxiedResourceHelper proxiedResourceHelper,
+    private void tryFetchClusterInfos(ProxiedResourceHelper proxiedResourceHelper,
                                             Map<String, SupportBundleNodeManifest> nodeManifests,
                                             Path spoolDir) {
         try {
             fetchClusterInfos(proxiedResourceHelper, nodeManifests, spoolDir);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            LOG.warn("Failed to collect cluster infos for support bundle, skipping", e);
         }
     }
 
@@ -248,13 +249,20 @@ public class SupportBundleService {
                     timeLimitedOrErrorString(searchDbClusterAdapter::rawClusterStats, executor);
 
             final CompletableFuture<Map<String, Object>> datanodeInfoFuture =
-                    CompletableFuture.supplyAsync(this::getDatanodeInfo, executor);
+                    CompletableFuture.supplyAsync(this::getDatanodeInfo, executor)
+                            .exceptionally(e -> {
+                                LOG.warn("Failed to collect datanode info for support bundle", e);
+                                return Map.of();
+                            });
 
             try {
                 CompletableFuture.allOf(systemOverviewFuture, jvmFuture, processBufferFuture, installedPluginsFuture,
                         clusterStatsFuture, searchDbVersionFuture, searchDbStatsFuture, datanodeInfoFuture).get();
-            } catch (Exception e) {
-                throw new RuntimeException("Failed collecting cluster infos", e);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                LOG.warn("Interrupted while collecting cluster infos for support bundle");
+            } catch (ExecutionException e) {
+                LOG.warn("Failed collecting cluster infos for support bundle", e);
             }
 
             final Map<String, Object> searchDb = Map.of(
