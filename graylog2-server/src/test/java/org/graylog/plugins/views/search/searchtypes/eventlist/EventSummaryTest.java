@@ -33,30 +33,25 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class EventSummaryTest {
-
-    private EventDto buildTestEvent(DateTime timestamp, String key) {
-        return EventDto.builder()
+    @Test
+    public void testParseRawEvent() {
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final var streams = Set.of("stream-id-1", "stream-id-2");
+        final var rawEvent = EventDto.builder()
                 .id("dead-beef")
                 .message("message")
-                .sourceStreams(Set.of("stream-id-1", "stream-id-2"))
-                .eventTimestamp(timestamp)
+                .sourceStreams(streams)
+                .eventTimestamp(now)
                 .alert(false)
                 .eventDefinitionId("deadbeef")
                 .priority(2)
-                .key(key)
-                .keyTuple(key != null ? List.of(key) : List.of())
+                .keyTuple(List.of())
                 .eventDefinitionType("aggregation-v1")
-                .processingTimestamp(timestamp)
+                .processingTimestamp(now)
                 .streams(Set.of())
                 .source("localhost")
                 .fields(Map.of())
                 .build();
-    }
-
-    @Test
-    public void testParseRawEvent() {
-        final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final var rawEvent = buildTestEvent(now, null);
 
         EventSummary eventSummary = EventSummary.parse(rawEvent);
         assertThat(eventSummary.id()).isEqualTo("dead-beef");
@@ -70,7 +65,22 @@ public class EventSummaryTest {
     @Test
     public void parseShouldPreserveEventKey() {
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final var rawEvent = buildTestEvent(now, "testkey_1");
+        final var rawEvent = EventDto.builder()
+                .id("dead-beef")
+                .message("message")
+                .sourceStreams(Set.of("stream-id-1"))
+                .eventTimestamp(now)
+                .alert(false)
+                .eventDefinitionId("deadbeef")
+                .priority(2)
+                .key("testkey_1")
+                .keyTuple(List.of("testkey_1"))
+                .eventDefinitionType("aggregation-v1")
+                .processingTimestamp(now)
+                .streams(Set.of())
+                .source("localhost")
+                .fields(Map.of())
+                .build();
 
         EventSummary eventSummary = EventSummary.parse(rawEvent);
         assertThat(eventSummary.key()).isEqualTo("testkey_1");
@@ -79,7 +89,21 @@ public class EventSummaryTest {
     @Test
     public void parseShouldHandleNullEventKey() {
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final var rawEvent = buildTestEvent(now, null);
+        final var rawEvent = EventDto.builder()
+                .id("dead-beef")
+                .message("message")
+                .sourceStreams(Set.of("stream-id-1"))
+                .eventTimestamp(now)
+                .alert(false)
+                .eventDefinitionId("deadbeef")
+                .priority(2)
+                .keyTuple(List.of())
+                .eventDefinitionType("aggregation-v1")
+                .processingTimestamp(now)
+                .streams(Set.of())
+                .source("localhost")
+                .fields(Map.of())
+                .build();
 
         EventSummary eventSummary = EventSummary.parse(rawEvent);
         assertThat(eventSummary.key()).isNull();
@@ -89,7 +113,22 @@ public class EventSummaryTest {
     public void serializedJsonShouldContainKeyField() throws Exception {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final var rawEvent = buildTestEvent(now, "testkey_1");
+        final var rawEvent = EventDto.builder()
+                .id("dead-beef")
+                .message("message")
+                .sourceStreams(Set.of("stream-id-1"))
+                .eventTimestamp(now)
+                .alert(false)
+                .eventDefinitionId("deadbeef")
+                .priority(2)
+                .key("testkey_1")
+                .keyTuple(List.of("testkey_1"))
+                .eventDefinitionType("aggregation-v1")
+                .processingTimestamp(now)
+                .streams(Set.of())
+                .source("localhost")
+                .fields(Map.of())
+                .build();
 
         EventSummary eventSummary = EventSummary.parse(rawEvent);
         final String json = objectMapper.writeValueAsString(eventSummary);
