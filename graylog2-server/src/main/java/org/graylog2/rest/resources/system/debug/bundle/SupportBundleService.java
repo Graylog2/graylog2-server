@@ -241,19 +241,39 @@ public class SupportBundleService {
         try {
             final CompletableFuture<Map<String, CallResult<SystemOverviewResponse>>> systemOverviewFuture =
                     CompletableFuture.supplyAsync(() -> proxiedResourceHelper.requestOnAllNodes(
-                            RemoteSystemResource.class, RemoteSystemResource::system, CALL_TIMEOUT), orchestrationExecutor);
+                            RemoteSystemResource.class, RemoteSystemResource::system, CALL_TIMEOUT), orchestrationExecutor)
+                            .exceptionally(e -> {
+                                LOG.warn("Failed to collect system overview for support bundle", e);
+                                errors.add(BundleError.of("cluster/system-overview", e));
+                                return Map.of();
+                            });
 
             final CompletableFuture<Map<String, CallResult<SystemJVMResponse>>> jvmFuture =
                     CompletableFuture.supplyAsync(() -> proxiedResourceHelper.requestOnAllNodes(
-                            RemoteSystemResource.class, RemoteSystemResource::jvm, CALL_TIMEOUT), orchestrationExecutor);
+                            RemoteSystemResource.class, RemoteSystemResource::jvm, CALL_TIMEOUT), orchestrationExecutor)
+                            .exceptionally(e -> {
+                                LOG.warn("Failed to collect JVM info for support bundle", e);
+                                errors.add(BundleError.of("cluster/jvm", e));
+                                return Map.of();
+                            });
 
             final CompletableFuture<Map<String, CallResult<SystemProcessBufferDumpResponse>>> processBufferFuture =
                     CompletableFuture.supplyAsync(() -> proxiedResourceHelper.requestOnAllNodes(
-                            RemoteSystemResource.class, RemoteSystemResource::processBufferDump, CALL_TIMEOUT), orchestrationExecutor);
+                            RemoteSystemResource.class, RemoteSystemResource::processBufferDump, CALL_TIMEOUT), orchestrationExecutor)
+                            .exceptionally(e -> {
+                                LOG.warn("Failed to collect process buffer dump for support bundle", e);
+                                errors.add(BundleError.of("cluster/process-buffer-dump", e));
+                                return Map.of();
+                            });
 
             final CompletableFuture<Map<String, CallResult<PluginList>>> installedPluginsFuture =
                     CompletableFuture.supplyAsync(() -> proxiedResourceHelper.requestOnAllNodes(
-                            RemoteSystemPluginResource.class, RemoteSystemPluginResource::list, CALL_TIMEOUT), orchestrationExecutor);
+                            RemoteSystemPluginResource.class, RemoteSystemPluginResource::list, CALL_TIMEOUT), orchestrationExecutor)
+                            .exceptionally(e -> {
+                                LOG.warn("Failed to collect installed plugins for support bundle", e);
+                                errors.add(BundleError.of("cluster/installed-plugins", e));
+                                return Map.of();
+                            });
 
             // These submit leaf tasks to `executor` without blocking on sub-tasks — no nesting risk.
             final CompletableFuture<Object> clusterStatsFuture =
@@ -282,7 +302,8 @@ public class SupportBundleService {
                 LOG.warn("Interrupted while collecting cluster infos for support bundle");
                 errors.add(BundleError.of("cluster/infos", e));
             } catch (ExecutionException e) {
-                LOG.warn("Failed collecting cluster infos for support bundle", e);
+                // Should not happen — all futures have .exceptionally() handlers.
+                LOG.warn("Unexpected failure while collecting cluster infos for support bundle", e);
                 errors.add(BundleError.of("cluster/infos", e));
             }
 
@@ -299,10 +320,10 @@ public class SupportBundleService {
                 final Map<String, Object> result = new HashMap<>(
                         Map.of(
                                 "manifest", nodeManifests,
-                                "cluster_system_overview", stripCallResult(systemOverviewFuture.join()),
-                                "jvm", stripCallResult(jvmFuture.join()),
-                                "process_buffer_dump", stripCallResult(processBufferFuture.join()),
-                                "installed_plugins", stripCallResult(installedPluginsFuture.join())
+                                "cluster_system_overview", stripCallResult(systemOverviewFuture.join(), errors, "system-overview"),
+                                "jvm", stripCallResult(jvmFuture.join(), errors, "jvm"),
+                                "process_buffer_dump", stripCallResult(processBufferFuture.join(), errors, "process-buffer-dump"),
+                                "installed_plugins", stripCallResult(installedPluginsFuture.join(), errors, "installed-plugins")
                         )
                 );
                 result.putAll(clusterInfo);
@@ -329,10 +350,23 @@ public class SupportBundleService {
                 .completeOnTimeout("Timeout after " + CALL_TIMEOUT + "!", CALL_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS);
     }
 
-    private <T> Map<String, T> stripCallResult(Map<String, CallResult<T>> input) {
-        return input.entrySet().stream()
-                .filter(e -> e.getValue().response() != null && e.getValue().response().entity().isPresent())
-                .collect(Collectors.toMap(Map.Entry::getKey, v -> v.getValue().response().entity().get()));
+    private <T> Map<String, T> stripCallResult(Map<String, CallResult<T>> input, List<BundleError> errors, String component) {
+        final Map<String, T> results = new HashMap<>();
+        input.forEach((nodeId, callResult) -> {
+            if (callResult.response() != null && callResult.response().entity().isPresent()) {
+                results.put(nodeId, callResult.response().entity().get());
+            } else {
+                errors.add(new BundleError(f("node/%s/%s", nodeId, component), describeCallFailure(callResult), null));
+            }
+        });
+        return results;
+    }
+
+    private static String describeCallFailure(CallResult<?> callResult) {
+        if (callResult.response() == null) {
+            return Optional.ofNullable(callResult.serverErrorMessage()).orElse("Call not executed");
+        }
+        return "No entity in response";
     }
 
     private String nowTimestamp() {

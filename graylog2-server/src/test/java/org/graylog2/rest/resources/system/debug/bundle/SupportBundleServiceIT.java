@@ -16,11 +16,14 @@
  */
 package org.graylog2.rest.resources.system.debug.bundle;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.ws.rs.core.HttpHeaders;
 import org.apache.shiro.subject.Subject;
+import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.TestNodeService;
 import org.graylog2.indexer.cluster.ClusterAdapter;
+import org.graylog2.system.stats.ClusterStats;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.resources.datanodes.DatanodeRestApiProxy;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -43,6 +46,7 @@ import java.util.zip.ZipFile;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -112,6 +116,50 @@ class SupportBundleServiceIT {
             assertThat(content)
                     .contains("cluster/datanode-info")
                     .contains("Simulated datanode service failure");
+        }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void buildBundleRecordsPerNodeFailuresFromStripCallResultInErrorsJson() throws Exception {
+        // A node is registered but the remoteInterfaceProvider mock returns null,
+        // so every API call to it throws an NPE inside requestOnAllNodes, producing
+        // CallResult.error(...). stripCallResult should record each of those as a BundleError.
+        // Stub these so fetchClusterInfos can build cluster.json without NPE-ing on
+        // Map.of() null-value checks, allowing execution to reach stripCallResult.
+        when(clusterStatsService.clusterStats()).thenReturn(mock(ClusterStats.class));
+        when(searchDbClusterAdapter.rawClusterStats()).thenReturn(mock(JsonNode.class));
+
+        final String failingNodeId = "failing-node-001";
+        final NodeService nodeServiceWithNode = mock(NodeService.class);
+        when(nodeServiceWithNode.allActive()).thenReturn(Map.of(failingNodeId, mock(Node.class)));
+        when(datanodeService.allActive()).thenReturn(Map.of());
+
+        final SupportBundleService service = new SupportBundleService(
+                executor, nodeServiceWithNode, datanodeService, remoteInterfaceProvider,
+                tempDir, objectMapperProvider, clusterStatsService, versionProbeFactory,
+                List.of(), searchDbClusterAdapter, datanodeProxy);
+
+        assertThatNoException().isThrownBy(
+                () -> service.buildBundle(mock(HttpHeaders.class), mock(Subject.class)));
+
+        final Path bundleDir = tempDir.resolve("support-bundle");
+        final Optional<Path> zipFile = Files.list(bundleDir)
+                .filter(p -> p.getFileName().toString().endsWith(".zip"))
+                .findFirst();
+        assertThat(zipFile).as("bundle zip file").isPresent();
+
+        try (final ZipFile zip = new ZipFile(zipFile.get().toFile())) {
+            final var errorsEntry = zip.getEntry("errors.json");
+            assertThat(errorsEntry).as("errors.json entry in bundle zip").isNotNull();
+
+            final String content = new String(
+                    zip.getInputStream(errorsEntry).readAllBytes(), StandardCharsets.UTF_8);
+            assertThat(content)
+                    .contains(f("node/%s/system-overview", failingNodeId))
+                    .contains(f("node/%s/jvm", failingNodeId))
+                    .contains(f("node/%s/process-buffer-dump", failingNodeId))
+                    .contains(f("node/%s/installed-plugins", failingNodeId));
         }
     }
 
