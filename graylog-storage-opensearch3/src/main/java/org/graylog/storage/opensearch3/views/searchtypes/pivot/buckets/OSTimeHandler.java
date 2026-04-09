@@ -90,9 +90,12 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
 
                 DateHistogramAggregation.Builder aggBuilder = DateHistogramAggregation.builder()
                         .field(timeField)
-                        .order(mapOrders(ordering.orders()))
                         .format(DATE_TIME_FORMAT)
                         .timeZone(timeZone);
+                final HistogramOrder histogramOrder = mapOrders(ordering.orders());
+                if (histogramOrder != null) {
+                    aggBuilder.order(histogramOrder);
+                }
                 setInterval(aggBuilder, dateHistogramInterval);
 
                 DateHistogramAggregation aggregation = aggBuilder.build();
@@ -116,14 +119,20 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
 
     private HistogramOrder mapOrders(List<BucketOrder> orders) {
         HistogramOrder.Builder builder = HistogramOrder.builder();
-        orders.forEach(order -> {
+        boolean hasOrders = false;
+        for (BucketOrder order : orders) {
             if (order.type() == BucketOrder.Type.KEY) {
                 builder.key(order.order());
+                hasOrders = true;
             } else if (order.type() == BucketOrder.Type.COUNT) {
                 builder.count(order.order());
+                hasOrders = true;
             }
-        });
-        return builder.build();
+            // Note: AGGREGATION type ordering is not supported by HistogramOrder in the opensearch-java client.
+            // When only AGGREGATION orders are present, we return null to avoid sending an empty "order": {}
+            // which OpenSearch 3.x rejects with: [date_histogram] failed to parse field [order]
+        }
+        return hasOrders ? builder.build() : null;
     }
 
     private boolean isAllMessages(final TimeRange timerange) {
