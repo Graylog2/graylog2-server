@@ -133,7 +133,7 @@ class CollectorsConfigResourceTest {
 
         final var request = new CollectorsConfigRequest(
                 new CollectorsConfigRequest.IngestEndpointRequest("host", 14401),
-                null, null, null, null
+                null, null, null, false
         );
 
         resource.put(request);
@@ -148,7 +148,7 @@ class CollectorsConfigResourceTest {
 
         final var request = new CollectorsConfigRequest(
                 new CollectorsConfigRequest.IngestEndpointRequest("host", 14401),
-                null, null, null, null
+                null, null, null, false
         );
 
         final var fleetIds = Set.of("fleet-1", "fleet-2");
@@ -164,7 +164,7 @@ class CollectorsConfigResourceTest {
     void putRejectsZeroVisibilityThreshold() {
         final var request = new CollectorsConfigRequest(
                 new CollectorsConfigRequest.IngestEndpointRequest("host", 14401),
-                null, Duration.ZERO, null, null
+                null, Duration.ZERO, null, false
         );
 
         assertThatThrownBy(() -> resource.put(request))
@@ -181,7 +181,7 @@ class CollectorsConfigResourceTest {
     void putRejectsVisibilityThresholdBelowOfflineThreshold() {
         final var request = new CollectorsConfigRequest(
                 new CollectorsConfigRequest.IngestEndpointRequest("host", 14401),
-                null, Duration.ofMinutes(3), null, null
+                null, Duration.ofMinutes(3), null, false
         );
 
         assertThatThrownBy(() -> resource.put(request))
@@ -198,7 +198,7 @@ class CollectorsConfigResourceTest {
     void putRejectsExpirationNotGreaterThanVisibility() {
         final var request = new CollectorsConfigRequest(
                 new CollectorsConfigRequest.IngestEndpointRequest("host", 14401),
-                null, Duration.ofDays(2), Duration.ofDays(1), null
+                null, Duration.ofDays(2), Duration.ofDays(1), false
         );
 
         assertThatThrownBy(() -> resource.put(request))
@@ -215,7 +215,7 @@ class CollectorsConfigResourceTest {
     void putRejectsMultipleInvalidThresholds() {
         final var request = new CollectorsConfigRequest(
                 new CollectorsConfigRequest.IngestEndpointRequest("host", 14401),
-                null, Duration.ofMinutes(-5), Duration.ofMinutes(-10), null
+                null, Duration.ofMinutes(-5), Duration.ofMinutes(-10), false
         );
 
         assertThatThrownBy(() -> resource.put(request))
@@ -233,7 +233,7 @@ class CollectorsConfigResourceTest {
 
         final var request = new CollectorsConfigRequest(
                 new CollectorsConfigRequest.IngestEndpointRequest("host", 14401),
-                Duration.ofMinutes(10), Duration.ofHours(12), Duration.ofDays(3), null
+                Duration.ofMinutes(10), Duration.ofHours(12), Duration.ofDays(3), false
         );
 
         final var result = resource.put(request);
@@ -249,7 +249,7 @@ class CollectorsConfigResourceTest {
 
         final var request = new CollectorsConfigRequest(
                 new CollectorsConfigRequest.IngestEndpointRequest("host", 14401),
-                null, null, null, null
+                null, null, null, false
         );
 
         final var result = resource.put(request);
@@ -263,7 +263,7 @@ class CollectorsConfigResourceTest {
     void putRejectsOfflineThresholdBelowOneMinute() {
         final var request = new CollectorsConfigRequest(
                 new CollectorsConfigRequest.IngestEndpointRequest("host", 14401),
-                Duration.ofSeconds(30), null, null, null
+                Duration.ofSeconds(30), null, null, false
         );
 
         assertThatThrownBy(() -> resource.put(request))
@@ -282,7 +282,7 @@ class CollectorsConfigResourceTest {
 
         final var request = new CollectorsConfigRequest(
                 new CollectorsConfigRequest.IngestEndpointRequest("host", 14401),
-                null, null, null, null
+                null, null, null, false
         );
 
         final var result = resource.put(request);
@@ -309,7 +309,7 @@ class CollectorsConfigResourceTest {
 
         final var request = new CollectorsConfigRequest(
                 new CollectorsConfigRequest.IngestEndpointRequest("host", 14401),
-                null, null, null, null
+                null, null, null, false
         );
 
         final var result = resource.put(request);
@@ -324,7 +324,7 @@ class CollectorsConfigResourceTest {
 
         final var request = new CollectorsConfigRequest(
                 new CollectorsConfigRequest.IngestEndpointRequest("host", 14401),
-                null, null, null, null
+                null, null, null, false
         );
 
         assertThatThrownBy(() -> resource.put(request))
@@ -348,12 +348,12 @@ class CollectorsConfigResourceTest {
     }
 
     @Test
-    void putWithCreateInputNullDoesNotCallService() throws Exception {
+    void putWithCreateInputFalseDoesNotCallService() throws Exception {
         stubCaService();
 
         final var request = new CollectorsConfigRequest(
                 new CollectorsConfigRequest.IngestEndpointRequest("host", 14401),
-                null, null, null, null
+                null, null, null, false
         );
 
         resource.put(request);

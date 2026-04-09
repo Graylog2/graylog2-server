@@ -30,7 +30,7 @@ public record CollectorsConfigRequest(
         @JsonProperty("collector_offline_threshold") @Nullable Duration collectorOfflineThreshold,
         @JsonProperty("collector_default_visibility_threshold") @Nullable Duration collectorDefaultVisibilityThreshold,
         @JsonProperty("collector_expiration_threshold") @Nullable Duration collectorExpirationThreshold,
-        @JsonProperty("create_input") @Nullable Boolean createInput
+        @JsonProperty("create_input") boolean createInput
 ) {
     public CollectorsConfigRequest {
         requireNonNull(http, "http must not be null");

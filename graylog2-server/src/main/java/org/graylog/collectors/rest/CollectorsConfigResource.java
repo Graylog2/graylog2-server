@@ -160,7 +160,7 @@ public class CollectorsConfigResource extends RestResource {
                 .collectorExpirationThreshold(effectiveExpiration)
                 .build();
 
-        if (Boolean.TRUE.equals(request.createInput())) {
+        if (request.createInput()) {
             collectorIngestInputService.createInput(getSubject(), getCurrentUser().getName(), request.http().port());
         }
 
