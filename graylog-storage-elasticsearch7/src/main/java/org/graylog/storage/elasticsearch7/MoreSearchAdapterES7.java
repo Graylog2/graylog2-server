@@ -66,6 +66,7 @@ import java.io.UncheckedIOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -245,7 +246,7 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
                 .filter(termsQuery(EventDto.FIELD_STREAMS, eventStreams))
                 .filter(requireNonNull(TimeRangeQueryFactory.create(timerange)));
 
-        if(isRangeQueryIncludeDefaultForMissingField) {
+        if(isRangeQueryIncludeDefaultForMissingField || extraFilters.values().stream().flatMap(Collection::stream).anyMatch(MoreSearchAdapter::isRangeValueLowerBoundsIs0)) {
             filter.minimumShouldMatch("0");
         }
 

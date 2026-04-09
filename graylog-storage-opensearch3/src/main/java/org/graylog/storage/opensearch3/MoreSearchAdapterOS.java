@@ -67,6 +67,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -182,7 +183,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
         boolQuery.filter(termsQuery(EventDto.FIELD_STREAMS, eventStreams));
         boolQuery.filter(timerangeQuery(timerange));
 
-        if(isRangeQueryIncludeDefaultForMissingField) {
+        if(isRangeQueryIncludeDefaultForMissingField || extraFilters.values().stream().flatMap(Collection::stream).anyMatch(MoreSearchAdapter::isRangeValueLowerBoundsIs0)) {
             boolQuery.minimumShouldMatch("0");
         }
 
