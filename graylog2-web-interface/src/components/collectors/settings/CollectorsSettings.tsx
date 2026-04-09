@@ -173,7 +173,8 @@ const CollectorsSettings = () => {
               <Col md={6}>
                 <SectionTitle>Ingest Endpoint</SectionTitle>
                 <HelpText>
-                  The hostname and port that managed collectors use to send their data.
+                  The external address that is pushed to managed collectors as their data destination.
+                  It must route to a running collector ingest input.
                   This is typically the address of a load balancer or the server itself.
                 </HelpText>
 
