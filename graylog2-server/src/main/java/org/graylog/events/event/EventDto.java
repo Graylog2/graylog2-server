@@ -51,6 +51,8 @@ public abstract class EventDto {
     public static final String FIELD_KEY = "key";
     public static final String FIELD_PRIORITY = "priority";
     public static final String FIELD_SCORES = "scores";
+    // needed for search queries
+    public static final String NORMALIZED_RISK_PATH = "scores.normalized_risk";
     public static final String FIELD_ASSOCIATED_ASSETS = "associated_assets";
     public static final String FIELD_FIELDS = "fields";
     public static final String FIELD_GROUP_BY_FIELDS = "group_by_fields";

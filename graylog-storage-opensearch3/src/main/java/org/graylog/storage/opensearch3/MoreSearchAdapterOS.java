@@ -183,10 +183,6 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
         boolQuery.filter(termsQuery(EventDto.FIELD_STREAMS, eventStreams));
         boolQuery.filter(timerangeQuery(timerange));
 
-        if(isRangeQueryIncludeDefaultForMissingField || extraFilters.values().stream().flatMap(Collection::stream).anyMatch(MoreSearchAdapter::isRangeValueLowerBoundsIs0)) {
-            boolQuery.minimumShouldMatch("0");
-        }
-
         extraFilters.forEach((field, values) -> {
             values.stream()
                     .filter(MoreSearchAdapter::isRangeValue)
@@ -210,7 +206,13 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
             // the event must not be in the search result.
             boolQuery.filter(forbiddenStreamsQuery(forbiddenSourceStreams));
         }
-        return Query.of(b -> b.bool(boolQuery.build()));
+
+        if(isRangeQueryIncludeDefaultForMissingField || extraFilters.values().stream().flatMap(Collection::stream).anyMatch(MoreSearchAdapter::isRangeValueLowerBoundsIs0)) {
+            return Query.of(a -> a.bool(b -> b.should(Query.of(c -> c.bool(boolQuery.build())),
+                    Query.of(d -> d.bool(inner -> inner.mustNot(mn -> mn.exists(e -> e.field(EventDto.NORMALIZED_RISK_PATH)))))).minimumShouldMatch("0")));
+        } else {
+            return Query.of(b -> b.bool(boolQuery.build()));
+        }
     }
 
     @Nonnull
