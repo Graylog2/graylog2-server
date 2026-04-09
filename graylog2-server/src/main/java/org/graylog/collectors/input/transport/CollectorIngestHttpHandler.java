@@ -16,7 +16,6 @@
  */
 package org.graylog.collectors.input.transport;
 
-import com.google.protobuf.AbstractMessageLite;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -31,6 +30,7 @@ import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import org.graylog.collectors.input.CollectorJournalRecordFactory;
+import org.graylog2.shared.utilities.RecordSizeDistributingProcessor;
 import org.graylog.inputs.otel.transport.OtlpHttpUtils;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.journal.RawMessage;
@@ -103,10 +103,13 @@ public class CollectorIngestHttpHandler extends SimpleChannelInboundHandler<Full
                 createRawMessage = RawMessage::new;
             }
 
-            CollectorJournalRecordFactory.createFromRequest(exportRequest, instanceUid).stream()
-                    .map(AbstractMessageLite::toByteArray)
-                    .map(createRawMessage)
-                    .forEach(input::processRawMessage);
+            RecordSizeDistributingProcessor.processRecords(
+                    CollectorJournalRecordFactory.createFromRequest(exportRequest, instanceUid),
+                    exportRequest.getSerializedSize(),
+                    r -> r.getOtelRecord().getLog().getLogRecord().getSerializedSize(),
+                    createRawMessage,
+                    input,
+                    LOG);
         } catch (Exception e) {
             LOG.error("Failed to process OTLP request", e);
             sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR, keepAlive, isProtobuf);

@@ -62,7 +62,7 @@ describe('<EntityDataTable />', () => {
     status: { status: ATTRIBUTE_STATUS.show },
   } as const;
 
-  const defaultDisplayedColumns = ['title', 'description', 'summary', 'status'];
+  const defaultDisplayedColumns = ['title', 'description', 'status', 'summary'];
 
   const data = [
     {
