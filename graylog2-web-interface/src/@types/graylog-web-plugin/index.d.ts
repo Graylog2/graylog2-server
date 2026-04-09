@@ -147,8 +147,8 @@ type InputSetupWizard = {
 };
 
 type License = {
-  EnterpriseTrafficGraph: React.ComponentType;
-  LicenseGraphWithMetrics: React.ComponentType;
+  TrafficGraph: React.ComponentType;
+  TrafficGraphWithLicenseMetrics: React.ComponentType;
   EnterpriseProductLink: React.ComponentType<{
     children: React.ReactNode;
     href: string;
