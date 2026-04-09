@@ -80,6 +80,7 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders.existsQuery;
 import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders.termsQuery;
@@ -246,10 +247,6 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
                 .filter(termsQuery(EventDto.FIELD_STREAMS, eventStreams))
                 .filter(requireNonNull(TimeRangeQueryFactory.create(timerange)));
 
-        if(isRangeQueryIncludeDefaultForMissingField || extraFilters.values().stream().flatMap(Collection::stream).anyMatch(MoreSearchAdapter::isRangeValueLowerBoundsIs0)) {
-            filter.minimumShouldMatch("0");
-        }
-
         extraFilters.forEach((field, values) -> {
             values.stream()
                     .filter(MoreSearchAdapter::isRangeValue)
@@ -276,7 +273,11 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
             filter.filter(boolQuery().mustNot(termsQuery(EventDto.FIELD_SOURCE_STREAMS, forbiddenSourceStreams)));
         }
 
-        return filter;
+        if(isRangeQueryIncludeDefaultForMissingField || extraFilters.values().stream().flatMap(Collection::stream).anyMatch(MoreSearchAdapter::isRangeValueLowerBoundsIs0)) {
+            return boolQuery().should(filter).should(boolQuery().mustNot(existsQuery(EventDto.NORMALIZED_RISK_PATH))).minimumShouldMatch("0");
+        } else {
+            return filter;
+        }
     }
 
     static QueryBuilder buildExtraFilter(String field, String value) {

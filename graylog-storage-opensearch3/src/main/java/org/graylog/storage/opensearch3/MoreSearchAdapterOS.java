@@ -209,7 +209,8 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
 
         if(isRangeQueryIncludeDefaultForMissingField || extraFilters.values().stream().flatMap(Collection::stream).anyMatch(MoreSearchAdapter::isRangeValueLowerBoundsIs0)) {
             return Query.of(a -> a.bool(b -> b.should(Query.of(c -> c.bool(boolQuery.build())),
-                    Query.of(d -> d.bool(inner -> inner.mustNot(mn -> mn.exists(e -> e.field(EventDto.NORMALIZED_RISK_PATH)))))).minimumShouldMatch("0")));
+                    Query.of(d -> d.bool(inner -> inner.mustNot(mn -> mn.exists(e -> e.field(EventDto.NORMALIZED_RISK_PATH))))))
+                    .minimumShouldMatch("0")));
         } else {
             return Query.of(b -> b.bool(boolQuery.build()));
         }
