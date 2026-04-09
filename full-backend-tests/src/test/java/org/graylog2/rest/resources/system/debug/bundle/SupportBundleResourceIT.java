@@ -26,6 +26,7 @@ import org.graylog.testing.completebackend.apis.Users;
 import org.graylog.testing.completebackend.conditions.EnabledIfSearchServer;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.storage.SearchVersion;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -334,7 +335,7 @@ public class SupportBundleResourceIT {
                 .get(LIST_URL)
                 .then()
                 .statusCode(200)
-                .body("collect { it.file_name }", not(org.hamcrest.Matchers.hasItem(filename)));
+                .body("collect { it.file_name }", not(Matchers.hasItem(filename)));
     }
 
     @FullBackendTest
