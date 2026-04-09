@@ -194,7 +194,7 @@ public class OutputResource extends RestResource {
             @ApiResponse(responseCode = "404", description = "No such output on this node.")
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_OUTPUT_UPDATE)
-    public Output update(@Parameter(name = "outputId", description = "The id of the output that should be deleted", required = true)
+    public Output update(@Parameter(name = "outputId", description = "The id of the output that should be updated", required = true)
                          @PathParam("outputId") String outputId,
                          @RequestBody(required = true) Map<String, Object> deltas) throws ValidationException, NotFoundException {
         checkPermission(RestPermissions.OUTPUTS_EDIT, outputId);
