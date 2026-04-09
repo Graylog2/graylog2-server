@@ -78,7 +78,7 @@ import StreamCategoryFilter from 'views/components/searchbar/StreamCategoryFilte
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
-import useCurrentQuerySearchResulErrors from 'views/hooks/useCurrentQuerySearchResulErrors';
+import useSearchResultTimeRangeErrorCheck from 'views/hooks/useSearchResultTimeRangeErrorCheck';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -213,8 +213,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
   const handlerContext = useHandlerContext();
   const isLoadingExecution = useIsLoading();
 
-  const searchResulErrors = useCurrentQuerySearchResulErrors();
-  const timeRangeHasErrorInResults = searchResulErrors.some(({ type }) => type === QUERY_TIME_RANGE_LIMIT_ERROR_TYPE);
+  const searchResultTimeRangeErrorCheck = useSearchResultTimeRangeErrorCheck(QUERY_TIME_RANGE_LIMIT_ERROR_TYPE);
 
   if (!currentQuery || !config) {
     return <Spinner />;
@@ -245,7 +244,9 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
               setFieldValue,
               validateForm,
             }) => {
-              const disableSearchSubmit = isSubmitting || isValidating || !isValid || isLoadingExecution;
+              const showTimeRangeErrorFromResults = searchResultTimeRangeErrorCheck(values?.timerange);
+              const disableSearchSubmit =
+                isSubmitting || isValidating || !isValid || isLoadingExecution || showTimeRangeErrorFromResults;
 
               return (
                 <>
@@ -261,7 +262,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
                         limitDuration={limitDuration}
                         onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                         value={values?.timerange}
-                        hasErrorOnMount={!!errors.timerange || timeRangeHasErrorInResults}
+                        hasErrorOnMount={!!errors.timerange || showTimeRangeErrorFromResults}
                         moveRangeProps={{
                           effectiveTimerange: results?.effectiveTimerange,
                           initialTimerange: currentQuery.timerange,

@@ -64,7 +64,7 @@ import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import { defaultCompare } from 'logic/DefaultCompare';
 import StreamCategoryFilter from 'views/components/searchbar/StreamCategoryFilter';
 import { executeActiveQuery } from 'views/logic/slices/viewSlice';
-import useCurrentQuerySearchResulErrors from 'views/hooks/useCurrentQuerySearchResulErrors';
+import useSearchResultTimeRangeErrorCheck from 'views/hooks/useSearchResultTimeRangeErrorCheck';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeFilter from './searchbar/time-range-filter';
@@ -239,8 +239,7 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
 
   useBindApplySearchControlsChanges(formRef);
 
-  const searchResulErrors = useCurrentQuerySearchResulErrors();
-  const timeRangeHasErrorInResults = searchResulErrors.some(({ type }) => type === SEARCH_TYPE_RANGE_LIMIT_ERROR_TYPE);
+  const searchResultTimeRangeErrorCheck = useSearchResultTimeRangeErrorCheck(SEARCH_TYPE_RANGE_LIMIT_ERROR_TYPE);
 
   return (
     <FormWarningsProvider>
@@ -251,7 +250,8 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
         onSubmit={_onSubmit}
         validateQueryString={validate}>
         {({ dirty, errors, isValid, isSubmitting, handleSubmit, values, setFieldValue, validateForm }) => {
-          const disableSearchSubmit = isSubmitting || isValidatingQuery || !isValid;
+          const showTimeRangeErrorFromResults = searchResultTimeRangeErrorCheck(values?.timerange);
+          const disableSearchSubmit = isSubmitting || isValidatingQuery || !isValid || showTimeRangeErrorFromResults;
 
           return (
             <Container>
@@ -267,7 +267,7 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                     limitDuration={limitDuration}
                     onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                     value={values?.timerange}
-                    hasErrorOnMount={!!errors.timerange || timeRangeHasErrorInResults}
+                    hasErrorOnMount={!!errors.timerange || showTimeRangeErrorFromResults}
                   />
                 )}
                 {hasTimeRangeOverride && (
