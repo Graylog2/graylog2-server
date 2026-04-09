@@ -209,7 +209,10 @@ public class OutputResource extends RestResource {
         if (deltas.containsKey("configuration")) {
             @SuppressWarnings("unchecked")
             final Map<String, Object> configuration = (Map<String, Object>) deltas.get("configuration");
-            deltas.put("configuration", ConfigurationMapConverter.convertValues(configuration, outputSummary.requestedConfiguration()));
+            // Merge with existing configuration to avoid losing fields not included in the update.
+            final Map<String, Object> mergedConfiguration = new HashMap<>(oldOutput.getConfiguration());
+            mergedConfiguration.putAll(ConfigurationMapConverter.convertValues(configuration, outputSummary.requestedConfiguration()));
+            deltas.put("configuration", mergedConfiguration);
         }
 
         return this.outputService.update(outputId, deltas);
