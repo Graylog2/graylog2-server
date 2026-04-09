@@ -29,7 +29,7 @@ import connect from 'stores/connect';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import type Widget from 'views/logic/widgets/Widget';
 import type { SearchBarFormValues } from 'views/Constants';
-import { DEFAULT_TIMERANGE } from 'views/Constants';
+import { SEARCH_TYPE_RANGE_LIMIT_ERROR_TYPE, DEFAULT_TIMERANGE } from 'views/Constants';
 import type GlobalOverride from 'views/logic/search/GlobalOverride';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import { PropagateDisableSubmissionState } from 'views/components/aggregationwizard';
@@ -64,6 +64,7 @@ import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import { defaultCompare } from 'logic/DefaultCompare';
 import StreamCategoryFilter from 'views/components/searchbar/StreamCategoryFilter';
 import { executeActiveQuery } from 'views/logic/slices/viewSlice';
+import useCurrentQuerySearchResulErrors from 'views/hooks/useCurrentQuerySearchResulErrors';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeFilter from './searchbar/time-range-filter';
@@ -238,6 +239,9 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
 
   useBindApplySearchControlsChanges(formRef);
 
+  const searchResulErrors = useCurrentQuerySearchResulErrors();
+  const timeRangeHasErrorInResults = searchResulErrors.some(({ type }) => type === SEARCH_TYPE_RANGE_LIMIT_ERROR_TYPE);
+
   return (
     <FormWarningsProvider>
       <SearchBarForm
@@ -263,7 +267,7 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                     limitDuration={limitDuration}
                     onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                     value={values?.timerange}
-                    hasErrorOnMount={!!errors.timerange}
+                    hasErrorOnMount={!!errors.timerange || timeRangeHasErrorInResults}
                   />
                 )}
                 {hasTimeRangeOverride && (
