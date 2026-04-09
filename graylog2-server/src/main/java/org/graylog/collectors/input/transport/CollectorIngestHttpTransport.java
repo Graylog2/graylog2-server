@@ -22,8 +22,10 @@ import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.EventLoopGroup;
 import io.netty.handler.ssl.SslContext;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog.collectors.CollectorCaService;
+import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.inputs.otel.transport.OtlpHttpUtils;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.inputs.transports.AbstractHttpTransport;
@@ -136,6 +138,13 @@ public class CollectorIngestHttpTransport extends AbstractHttpTransport {
                 CK_TCP_KEEPALIVE
         );
 
+        private final CollectorsConfigService collectorsConfigService;
+
+        @Inject
+        public Config(CollectorsConfigService collectorsConfigService) {
+            this.collectorsConfigService = collectorsConfigService;
+        }
+
         @Override
         public ConfigurationRequest getRequestedConfiguration() {
             final var config = new ConfigurationRequest();
@@ -144,7 +153,12 @@ public class CollectorIngestHttpTransport extends AbstractHttpTransport {
                     .filter(field -> ALLOWED_FIELDS.contains(field.getName()))
                     .forEach(config::addField);
 
-            config.addField(ConfigurationRequest.Templates.portNumber(CK_PORT, DEFAULT_HTTP_PORT));
+            config.addField(new NumberField(
+                    CK_PORT,
+                    "Port",
+                    DEFAULT_HTTP_PORT,
+                    portDescription(),
+                    NumberField.Attribute.IS_PORT_NUMBER));
             config.addField(new NumberField(
                     CK_MAX_CHUNK_SIZE,
                     "Max. HTTP chunk size",
@@ -153,6 +167,15 @@ public class CollectorIngestHttpTransport extends AbstractHttpTransport {
                     ConfigurationField.Optional.OPTIONAL));
 
             return config;
+        }
+
+        private String portDescription() {
+            return collectorsConfigService.get()
+                    .map(c -> "Port to listen on. The collectors settings currently direct collectors to port "
+                            + c.http().port() + ". If you use a different port, ensure the external port "
+                            + "is routed correctly to this port.")
+                    .orElse("Port to listen on. If this port differs from the port configured in the "
+                            + "collectors settings, ensure the external port is routed correctly to this port.");
         }
     }
 }
