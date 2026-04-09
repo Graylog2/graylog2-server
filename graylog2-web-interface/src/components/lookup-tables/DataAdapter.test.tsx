@@ -24,16 +24,15 @@ import { asMock } from 'helpers/mocking';
 import useScopePermissions from 'hooks/useScopePermissions';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
 import { ModalProvider } from 'components/lookup-tables/contexts/ModalContext';
-import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
+import { lookupDataAdapter } from 'components/lookup-tables/hooks/api/lookupTablesAPI';
 
 import CSVFileAdapterSummary from './adapters/CSVFileAdapterSummary';
 import DataAdapter from './DataAdapter';
 
 jest.mock('hooks/useScopePermissions');
-jest.mock('stores/lookup-tables/LookupTableDataAdaptersStore', () => ({
-  LookupTableDataAdaptersActions: {
-    lookup: jest.fn(),
-  },
+jest.mock('components/lookup-tables/hooks/api/lookupTablesAPI', () => ({
+  ...jest.requireActual('components/lookup-tables/hooks/api/lookupTablesAPI'),
+  lookupDataAdapter: jest.fn(),
 }));
 
 PluginStore.register(
@@ -110,7 +109,7 @@ describe('DataAdapter', () => {
       ttl: 1000,
     };
 
-    asMock(LookupTableDataAdaptersActions.lookup).mockResolvedValue(lookupResultWithBigInt);
+    asMock(lookupDataAdapter).mockResolvedValue(lookupResultWithBigInt);
 
     renderedDataAdapter('DEFAULT');
 

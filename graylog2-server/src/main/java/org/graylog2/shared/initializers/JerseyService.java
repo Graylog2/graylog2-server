@@ -49,6 +49,7 @@ import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.jersey.AuditEventModelProcessor;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
+import org.graylog2.jersey.HttpServerExtension;
 import org.graylog2.jersey.PrefixAddingModelProcessor;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -121,8 +122,9 @@ public class JerseyService extends AbstractIdleService {
     private final ErrorPageGenerator errorPageGenerator;
     private final TLSProtocolsConfiguration tlsConfiguration;
     private final int shutdownTimeoutMs;
+    private final Map<String, HttpServerExtension> httpServerExtensions;
 
-    private HttpServer apiHttpServer = null;
+    private HttpServer httpServer = null;
 
     @Inject
     public JerseyService(final HttpConfiguration configuration,
@@ -137,7 +139,8 @@ public class JerseyService extends AbstractIdleService {
                          MetricRegistry metricRegistry,
                          ErrorPageGenerator errorPageGenerator,
                          TLSProtocolsConfiguration tlsConfiguration,
-                         @Named("shutdown_timeout") int shutdownTimeoutMs) {
+                         @Named("shutdown_timeout") int shutdownTimeoutMs,
+                         Map<String, HttpServerExtension> httpServerExtensions) {
         this.configuration = requireNonNull(configuration, "configuration");
         this.dynamicFeatures = requireNonNull(dynamicFeatures, "dynamicFeatures");
         this.containerResponseFilters = requireNonNull(containerResponseFilters, "containerResponseFilters");
@@ -151,6 +154,7 @@ public class JerseyService extends AbstractIdleService {
         this.errorPageGenerator = requireNonNull(errorPageGenerator, "errorPageGenerator");
         this.tlsConfiguration = requireNonNull(tlsConfiguration);
         this.shutdownTimeoutMs = shutdownTimeoutMs;
+        this.httpServerExtensions = requireNonNull(httpServerExtensions, "httpServerExtensions");
     }
 
     @Override
@@ -163,7 +167,7 @@ public class JerseyService extends AbstractIdleService {
 
     @Override
     protected void shutDown() throws Exception {
-        shutdownHttpServer(apiHttpServer, configuration.getHttpBindAddress());
+        shutdownHttpServer(httpServer, configuration.getHttpBindAddress());
     }
 
     private void shutdownHttpServer(HttpServer httpServer, HostAndPort bindAddress) {
@@ -209,7 +213,7 @@ public class JerseyService extends AbstractIdleService {
                 null
         );
 
-        apiHttpServer = setUp(
+        httpServer = setUp(
                 listenUri,
                 sslEngineConfigurator,
                 configuration.getHttpThreadPoolSize(),
@@ -219,7 +223,15 @@ public class JerseyService extends AbstractIdleService {
                 configuration.isHttpEnableCors(),
                 pluginResources);
 
-        apiHttpServer.start();
+        for (final var entry : httpServerExtensions.entrySet()) {
+            final var type = entry.getKey();
+            final var extension = entry.getValue();
+
+            LOG.debug("Configure HTTP server with <{}> extension", type);
+            extension.configure(httpServer);
+        }
+
+        httpServer.start();
 
         LOG.info("Started REST API at <{}>", configuration.getHttpBindAddress());
     }
@@ -335,6 +347,10 @@ public class JerseyService extends AbstractIdleService {
 
         final NetworkListener listener = httpServer.getListener("grizzly");
         listener.setMaxHttpHeaderSize(maxHeaderSize);
+        // Graylog Collector has a default poll interval of 30 seconds. The default Grizzly idle timeout is
+        // also 30 seconds. We increase the default timeout to avoid race conditions where the Collector tries to
+        // execute a poll request at the same time Grizzly will close the connection.
+        listener.getKeepAlive().setIdleTimeoutInSeconds(90);
 
         final ExecutorService workerThreadPoolExecutor = instrumentedExecutor(
                 "http-worker-executor",

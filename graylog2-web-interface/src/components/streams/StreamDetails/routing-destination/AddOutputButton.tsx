@@ -23,19 +23,24 @@ import { Modal, BootstrapModalWrapper, Button, SegmentedControl } from 'componen
 import type { Stream } from 'stores/streams/StreamsStore';
 import CreateOutputDropdown from 'components/outputs/CreateOutputDropdown';
 import AssignOutputDropdown from 'components/outputs/AssignOutputDropdown';
-import { OutputsStore, type Output } from 'stores/outputs/OutputsStore';
+import type { Output } from 'hooks/useOutputs';
+import useOutputMutations from 'hooks/useOutputMutations';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useStreamOutputMutation from 'hooks/useStreamOutputMutations';
 import type {
   AvailableOutputRequestedConfiguration,
+  AvailableOutputSummary,
   AvailableOutputTypes,
 } from 'components/streams/useAvailableOutputTypes';
 import { Icon } from 'components/common';
 
 type Props = {
   stream: Stream;
-  getTypeDefinition: (type: string) => AvailableOutputRequestedConfiguration;
+  getTypeDefinition: (
+    type: string,
+    callback?: (available: AvailableOutputSummary) => void,
+  ) => AvailableOutputRequestedConfiguration | undefined;
   availableOutputTypes: AvailableOutputTypes;
   assignableOutputs: Array<Output>;
 };
@@ -52,6 +57,7 @@ const AddOutputButton = ({ stream, getTypeDefinition, assignableOutputs, availab
   const [showAddOutput, setShowAddOutput] = useState(false);
   const sendTelemetry = useSendTelemetry();
   const { addStreamOutput } = useStreamOutputMutation();
+  const { saveOutput } = useOutputMutations();
   const queryClient = useQueryClient();
   const CREATE_SEGMENT = 'create';
   const ASSIGN_SEGMENT = 'assign';
@@ -77,7 +83,7 @@ const AddOutputButton = ({ stream, getTypeDefinition, assignableOutputs, availab
       app_pathname: 'stream',
     });
 
-    OutputsStore.save(data, (result: Output) => {
+    saveOutput(data).then((result: any) => {
       addStreamOutput({ streamId: stream.id, outputs: { outputs: [result.id] } }).then(() => {
         queryClient.invalidateQueries({
           queryKey: ['outputs', 'overview'],
@@ -85,8 +91,6 @@ const AddOutputButton = ({ stream, getTypeDefinition, assignableOutputs, availab
 
         onCancel();
       });
-
-      return result;
     });
   };
 

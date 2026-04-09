@@ -1,0 +1,4 @@
+type = "a"
+message = "Add Graylog Collector management system."
+
+pulls = ["24815"]

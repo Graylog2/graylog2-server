@@ -21,7 +21,6 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import QueryHelper from 'components/common/QueryHelper';
 import type { Stream } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
-import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { keyFn, fetchStreams, KEY_PREFIX } from 'components/streams/hooks/useStreams';
 import getStreamTableElements from 'components/streams/StreamsOverview/Constants';
@@ -39,11 +38,9 @@ import usePipelineColumn from './hooks/usePipelineColumn';
 const useRefetchStreamsOnStoreChange = (refetchStreams: () => void) => {
   useEffect(() => {
     StreamsStore.onChange(() => refetchStreams());
-    StreamRulesStore.onChange(() => refetchStreams());
 
     return () => {
       StreamsStore.unregister(() => refetchStreams());
-      StreamRulesStore.unregister(() => refetchStreams());
     };
   }, [refetchStreams]);
 };

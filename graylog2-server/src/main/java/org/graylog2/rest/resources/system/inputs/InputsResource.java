@@ -125,7 +125,13 @@ public class InputsResource extends AbstractInputsResource {
                     .relatedIdentifier("node_id").relatedDisplayFields(List.of("node_id", "hostname"))
                     .relatedDisplayTemplate("{node_id} ({hostname})").type(SearchQueryField.Type.STRING)
                     .filterable(true).build(),
-            EntityAttribute.builder().id(MessageInput.FIELD_GLOBAL).title("Global").type(SearchQueryField.Type.BOOLEAN).filterable(true).build(),
+            EntityAttribute.builder().id(MessageInput.FIELD_GLOBAL).title("Global").type(SearchQueryField.Type.BOOLEAN)
+                    .filterable(true)
+                    .filterOptions(Set.of(
+                            FilterOption.create("true", "Global"),
+                            FilterOption.create("false", "Local")
+                    ))
+                    .build(),
             EntityAttribute.builder().id(MessageInput.FIELD_CREATED_AT).title("Created").type(SearchQueryField.Type.DATE).filterable(true).build(),
             EntityAttribute.builder().id(MessageInput.FIELD_DESIRED_STATE).title("State").type(SearchQueryField.Type.STRING).filterable(false).build(),
             EntityAttribute.builder()

@@ -29,16 +29,15 @@ import ValueReferenceData from 'util/ValueReferenceData';
 import ContentPackEdit from 'components/content-packs/ContentPackEdit';
 import Entity from 'logic/content-packs/Entity';
 import EntityIndex from 'logic/content-packs/EntityIndex';
-import { ContentPacksActions, ContentPacksStore } from 'stores/content-packs/ContentPacksStore';
+import { createContentPack } from 'hooks/useContentPackMutations';
 import useParams from 'routing/useParams';
 import useHistory from 'routing/useHistory';
-import { useStore } from 'stores/connect';
 import useProductName from 'brand-customization/useProductName';
+import useContentPackRevisions from 'components/content-packs/hooks/useContentPackRevisions';
 import MarketplaceLink from 'components/support/MarketplaceLink';
 import useEntityIndex from 'components/content-packs/hooks/useEntityIndex';
 
 const EditContentPackPage = () => {
-  useStore(ContentPacksStore);
   const productName = useProductName();
   const { entityIndex } = useEntityIndex();
   const { contentPackId, contentPackRev } = useParams<{ contentPackId: string; contentPackRev: string }>();
@@ -48,16 +47,18 @@ const EditContentPackPage = () => {
   const [contentPack, setContentPack] = useState(undefined);
   const [contentPackEntities, setContentPackEntities] = useState(undefined);
   const [fetchedEntities, setFetchedEntities] = useState(undefined);
+  const { data: revisionData } = useContentPackRevisions(contentPackId);
 
   useEffect(() => {
-    ContentPacksActions.get(contentPackId).then((result) => {
-      const { contentPackRevisions } = result;
-      const newContentPack = contentPackRevisions.createNewVersionFromRev(contentPackRev);
+    if (!revisionData) return;
 
-      setContentPack(newContentPack);
-      setContentPackEntities(cloneDeep(newContentPack.entities));
-    });
-  }, [contentPackId, contentPackRev]);
+    const { contentPackRevisions } = revisionData;
+    const newContentPack = contentPackRevisions.createNewVersionFromRev(contentPackRev);
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setContentPack(newContentPack);
+    setContentPackEntities(cloneDeep(newContentPack.entities));
+  }, [revisionData, contentPackRev]);
 
   const entityCatalog = useMemo(() => {
     if (!contentPack || !entityIndex) {
@@ -131,7 +132,7 @@ const EditContentPackPage = () => {
   };
 
   const _onSave = () => {
-    ContentPacksActions.create(contentPack.toJSON()).then(
+    createContentPack(contentPack.toJSON()).then(
       () => {
         UserNotification.success('Content pack imported successfully', 'Success!');
         history.push(Routes.SYSTEM.CONTENTPACKS.LIST);

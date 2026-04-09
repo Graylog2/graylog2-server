@@ -19,7 +19,7 @@ package org.graylog.datanode.filesystem.index.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog.datanode.filesystem.index.statefile.StateFile;
-import org.opensearch.Version;
+import org.graylog.shaded.opensearch2.org.opensearch.Version;
 
 import javax.annotation.Nullable;
 import java.nio.file.Path;

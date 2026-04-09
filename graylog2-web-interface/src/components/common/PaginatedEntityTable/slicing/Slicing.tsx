@@ -27,16 +27,18 @@ import { DEFAULT_SORT_OPTIONS } from './SliceFilters';
 import SlicesOverview from './SlicesOverview';
 import type { FetchSlices } from './useFetchSlices';
 
-export type Slice = {
+export type Slice<T extends { [attribute: string]: unknown } = {}> = {
   value: string | number | null;
   count: number;
   title?: string;
   type?: unknown;
-  meta?: unknown;
+  meta?: T;
 };
 export type SliceRenderer = {
   extendSlices?: (slices: Array<Slice>) => Array<Slice>;
   render?: (slice: Slice) => React.ReactNode;
+  // render additional slice information on right side of list item
+  renderAdditional?: (slice: Slice) => React.ReactNode;
 };
 export type SliceRenderers = { [col: string]: SliceRenderer };
 export type Slices = Array<Slice>;

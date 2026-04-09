@@ -19,7 +19,6 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import selectEvent from 'helpers/selectEvent';
-import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import useFieldTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
 import { fetchFieldTypeUsages } from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
@@ -121,20 +120,7 @@ jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
 jest.mock('components/indices/hooks/useIndexSetsList');
 
-jest.mock('stores/indices/IndexSetsStore', () => ({
-  IndexSetsActions: {
-    list: jest.fn(),
-  },
-  IndexSetsStore: MockStore([
-    'getInitialState',
-    () => ({
-      indexSets: [
-        { id: 'id-1', title: 'Index Title 1' },
-        { id: 'id-2', title: 'Index Title 2' },
-      ],
-    }),
-  ]),
-}));
+// IndexSetsStore mock removed - components now use useIndexSetsList hook
 
 describe('ChangeFieldTypeModal', () => {
   const putFieldTypeMutationMock = jest.fn(() => Promise.resolve());

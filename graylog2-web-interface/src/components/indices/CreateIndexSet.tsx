@@ -20,7 +20,7 @@ import AppConfig from 'util/AppConfig';
 import { Spinner } from 'components/common';
 import { IndexSetConfigurationForm } from 'components/indices';
 import Routes from 'routing/Routes';
-import { IndexSetsActions } from 'stores/indices/IndexSetsStore';
+import { createIndexSet } from 'stores/indices/IndexSetsStore';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import SelectIndexSetTemplateModal from 'components/indices/IndexSetTemplates/SelectIndexSetTemplateModal';
 import { adjustFormat } from 'util/DateTime';
@@ -53,7 +53,7 @@ const CreateIndexSet = ({ showSelectTemplateModal, setShowSelectTemplateModal }:
 
     copy.creation_date = adjustFormat(new Date(), 'internal');
 
-    return IndexSetsActions.create(copy).then(() => {
+    return createIndexSet(copy).then(() => {
       history.push(Routes.SYSTEM.INDICES.LIST);
     });
   };

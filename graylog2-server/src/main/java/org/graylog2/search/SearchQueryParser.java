@@ -167,7 +167,7 @@ public class SearchQueryParser {
             final String entry = matcher.group();
 
             if (!entry.contains(":")) {
-                builder.put(withPrefixIfNeeded(defaultField), createFieldValue(defaultFieldKey.getFieldType(), entry, false));
+                builder.put(withPrefixIfNeeded(defaultField), createFieldValue(defaultFieldKey, entry, false));
                 continue;
             }
 
@@ -190,9 +190,9 @@ public class SearchQueryParser {
                 }
                 final SearchQueryField translatedKey = dbFieldMapping.get(cleanKey);
                 if (translatedKey != null) {
-                    builder.put(withPrefixIfNeeded(translatedKey.getDbField()), createFieldValue(translatedKey.getFieldType(), v, negate));
+                    builder.put(withPrefixIfNeeded(translatedKey.getDbField()), createFieldValue(translatedKey, v, negate));
                 } else {
-                    builder.put(withPrefixIfNeeded(defaultField), createFieldValue(defaultFieldKey.getFieldType(), v, negate));
+                    builder.put(withPrefixIfNeeded(defaultField), createFieldValue(defaultFieldKey, v, negate));
                 }
             });
 
@@ -252,26 +252,34 @@ public class SearchQueryParser {
      * We try to convert the value types according to the data type of the query field.
      */
     @VisibleForTesting
-    FieldValue createFieldValue(SearchQueryField.Type fieldType, String quotedStringValue, boolean negate) {
+    FieldValue createFieldValue(SearchQueryField fieldKey, String quotedStringValue, boolean negate) {
         // Make sure there are no quotes in the value (e.g. `"foo"' --> `foo')
         final String value = quotedStringValue.replaceAll(QUOTE_REPLACE_REGEX, "");
+        final var fieldType = fieldKey.getFieldType();
         final Pair<String, SearchQueryOperator> pair = extractOperator(value, fieldType == STRING ? DEFAULT_STRING_OPERATOR : DEFAULT_OPERATOR);
-        return new FieldValue(fieldType.getMongoValueConverter().apply(pair.getLeft()), pair.getRight(), negate);
+        return new FieldValue(fieldType.getMongoValueConverter().apply(pair.getLeft()), pair.getRight(), negate, fieldKey);
     }
 
     public static class FieldValue {
         private final Object value;
         private final SearchQueryOperator operator;
         private final boolean negate;
+        private final SearchQueryField field;
 
         public FieldValue(final Object value, final boolean negate) {
-            this(value, DEFAULT_STRING_OPERATOR, negate);
+            this(value, DEFAULT_STRING_OPERATOR, negate, null);
         }
 
         public FieldValue(final Object value, final SearchQueryOperator operator, final boolean negate) {
+            this(value, operator, negate, null);
+        }
+
+        public FieldValue(final Object value, final SearchQueryOperator operator, final boolean negate,
+                          final SearchQueryField field) {
             this.value = requireNonNull(value);
             this.operator = operator;
             this.negate = negate;
+            this.field = field;
         }
 
         public Object getValue() {
@@ -284,6 +292,10 @@ public class SearchQueryParser {
 
         public boolean isNegate() {
             return negate;
+        }
+
+        public SearchQueryField getField() {
+            return field;
         }
 
         @Override

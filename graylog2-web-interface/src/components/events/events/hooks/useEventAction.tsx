@@ -28,7 +28,7 @@ const useEventAction = (event: Event) => {
   const sendEventActionTelemetry = useSendEventActionTelemetry();
   const hasReplayInfo = !!event.replay_info;
   const permissions = usePermissions();
-  const isPermitted = permissions.isPermitted(`eventdefinitions:edit:${event.event_definition_id}`);
+  const isPermitted = permissions.isPermitted(`eventdefinitions:read:${event.event_definition_id}`);
 
   const moreActions = useMemo(
     () =>

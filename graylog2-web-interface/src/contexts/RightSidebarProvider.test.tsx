@@ -18,9 +18,21 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
+import asMock from 'helpers/mocking/AsMock';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+
 import RightSidebarProvider from './RightSidebarProvider';
 
 import useRightSidebar from '../hooks/useRightSidebar';
+
+jest.mock('logic/telemetry/useSendTelemetry');
+const mockSendTelemetry = jest.fn();
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  asMock(useSendTelemetry).mockReturnValue(mockSendTelemetry);
+});
 
 const TestComponent = () => <div>Test Content</div>;
 const TestComponent2 = () => <div>Test Content 2</div>;
@@ -142,13 +154,15 @@ const TestConsumer = () => {
   );
 };
 
+const SUT = () => (
+  <RightSidebarProvider>
+    <TestConsumer />
+  </RightSidebarProvider>
+);
+
 describe('RightSidebarProvider', () => {
   it('should provide default context values', () => {
-    render(
-      <RightSidebarProvider>
-        <TestConsumer />
-      </RightSidebarProvider>,
-    );
+    render(<SUT />);
 
     expect(screen.getByTestId('is-open')).toHaveTextContent('false');
     expect(screen.getByTestId('is-collapsed')).toHaveTextContent('false');
@@ -159,11 +173,7 @@ describe('RightSidebarProvider', () => {
   });
 
   it('should open sidebar with content', async () => {
-    render(
-      <RightSidebarProvider>
-        <TestConsumer />
-      </RightSidebarProvider>,
-    );
+    render(<SUT />);
 
     await userEvent.click(screen.getByText('Open Sidebar'));
 
@@ -172,11 +182,7 @@ describe('RightSidebarProvider', () => {
   });
 
   it('should close sidebar', async () => {
-    render(
-      <RightSidebarProvider>
-        <TestConsumer />
-      </RightSidebarProvider>,
-    );
+    render(<SUT />);
 
     await userEvent.click(screen.getByText('Open Sidebar'));
     expect(screen.getByTestId('is-open')).toHaveTextContent('true');
@@ -186,11 +192,7 @@ describe('RightSidebarProvider', () => {
   });
 
   it('should update sidebar width', async () => {
-    render(
-      <RightSidebarProvider>
-        <TestConsumer />
-      </RightSidebarProvider>,
-    );
+    render(<SUT />);
 
     expect(screen.getByTestId('width')).toHaveTextContent('400');
 
@@ -518,6 +520,120 @@ describe('RightSidebarProvider', () => {
       await userEvent.click(screen.getByText('Close Sidebar'));
       expect(screen.getByTestId('is-collapsed')).toHaveTextContent('false');
       expect(screen.getByTestId('is-open')).toHaveTextContent('false');
+    });
+  });
+
+  describe('Telemetry', () => {
+    it('sends OPENED event with content_id when opening sidebar', async () => {
+      render(
+        <RightSidebarProvider>
+          <TestConsumer />
+        </RightSidebarProvider>,
+      );
+
+      await userEvent.click(screen.getByText('Open Sidebar'));
+
+      expect(mockSendTelemetry).toHaveBeenCalledWith(
+        TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.OPENED,
+        expect.objectContaining({
+          app_section: 'right-sidebar',
+          event_details: { content_id: 'test-sidebar', component_key: undefined },
+        }),
+      );
+    });
+
+    it('sends CLOSED event when closing sidebar', async () => {
+      render(
+        <RightSidebarProvider>
+          <TestConsumer />
+        </RightSidebarProvider>,
+      );
+
+      await userEvent.click(screen.getByText('Open Sidebar'));
+      mockSendTelemetry.mockClear();
+
+      await userEvent.click(screen.getByText('Close Sidebar'));
+
+      expect(mockSendTelemetry).toHaveBeenCalledWith(
+        TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.CLOSED,
+        expect.objectContaining({ app_section: 'right-sidebar' }),
+      );
+    });
+
+    it('sends COLLAPSED event when collapsing sidebar', async () => {
+      render(
+        <RightSidebarProvider>
+          <TestConsumer />
+        </RightSidebarProvider>,
+      );
+
+      await userEvent.click(screen.getByText('Open Sidebar'));
+      mockSendTelemetry.mockClear();
+
+      await userEvent.click(screen.getByText('Collapse Sidebar'));
+
+      expect(mockSendTelemetry).toHaveBeenCalledWith(
+        TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.COLLAPSED,
+        expect.objectContaining({ app_section: 'right-sidebar' }),
+      );
+    });
+
+    it('sends EXPANDED event when expanding sidebar', async () => {
+      render(
+        <RightSidebarProvider>
+          <TestConsumer />
+        </RightSidebarProvider>,
+      );
+
+      await userEvent.click(screen.getByText('Open Sidebar'));
+      await userEvent.click(screen.getByText('Collapse Sidebar'));
+      mockSendTelemetry.mockClear();
+
+      await userEvent.click(screen.getByText('Expand Sidebar'));
+
+      expect(mockSendTelemetry).toHaveBeenCalledWith(
+        TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.EXPANDED,
+        expect.objectContaining({ app_section: 'right-sidebar' }),
+      );
+    });
+
+    it('sends NAVIGATED_BACK event when going back', async () => {
+      render(
+        <RightSidebarProvider>
+          <TestConsumer />
+        </RightSidebarProvider>,
+      );
+
+      await userEvent.click(screen.getByText('Open Sidebar'));
+      await userEvent.click(screen.getByText('Open Sidebar 2'));
+      mockSendTelemetry.mockClear();
+
+      await userEvent.click(screen.getByText('Go Back'));
+
+      expect(mockSendTelemetry).toHaveBeenCalledWith(
+        TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.NAVIGATED_BACK,
+        expect.objectContaining({ app_section: 'right-sidebar' }),
+      );
+    });
+
+    it('sends NAVIGATED_FORWARD event when going forward', async () => {
+      render(
+        <RightSidebarProvider>
+          <TestConsumer />
+        </RightSidebarProvider>,
+      );
+
+      await userEvent.click(screen.getByText('Open Sidebar'));
+      await userEvent.click(screen.getByText('Open Sidebar 2'));
+      await userEvent.click(screen.getByText('Go Back'));
+      mockSendTelemetry.mockClear();
+
+      await userEvent.click(screen.getByText('Go Forward'));
+
+      expect(mockSendTelemetry).toHaveBeenCalledWith(
+        TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.NAVIGATED_FORWARD,
+        expect.objectContaining({ app_section: 'right-sidebar' }),
+      );
     });
   });
 });

@@ -23,8 +23,15 @@ import type { ColumnRenderersByAttribute, EntityBase } from 'components/common/E
 import DefaultColumnRenderers from 'components/common/EntityDataTable/DefaultColumnRenderers';
 import type { Attribute } from 'stores/PaginationTypes';
 
-const TD = styled.td`
+const LabelTD = styled.td`
   white-space: nowrap;
+`;
+
+const ValueTD = styled.td`
+  overflow-wrap: break-word;
+  word-break: break-word;
+  max-width: 0;
+  width: 100%;
 `;
 
 type Props<T extends EntityBase, M = EventsAdditionalData> = {
@@ -53,11 +60,11 @@ const EventDetailsTable = <E extends EntityBase = Event>({
         return (
           <tr key={attribute.id}>
             {attribute.title && (
-              <TD>
+              <LabelTD>
                 <b>{attribute.title}</b>
-              </TD>
+              </LabelTD>
             )}
-            <td>{renderCell ? renderCell(value, event, meta, eventProcedureId) : value}</td>
+            <ValueTD>{renderCell ? renderCell(value, event, meta, eventProcedureId) : value}</ValueTD>
           </tr>
         );
       })}

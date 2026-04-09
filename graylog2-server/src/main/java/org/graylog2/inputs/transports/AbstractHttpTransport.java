@@ -52,6 +52,8 @@ import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -63,14 +65,16 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
     protected static final int DEFAULT_MAX_CHUNK_SIZE = (int) Size.kilobytes(64L).toBytes();
     private static final int DEFAULT_IDLE_WRITER_TIMEOUT = 60;
 
-    static final String CK_ENABLE_BULK_RECEIVING = "enable_bulk_receiving";
+    protected static final String CK_ENABLE_BULK_RECEIVING = "enable_bulk_receiving";
     static final String CK_ENABLE_CORS = "enable_cors";
-    static final String CK_MAX_CHUNK_SIZE = "max_chunk_size";
-    static final String CK_IDLE_WRITER_TIMEOUT = "idle_writer_timeout";
+    public static final String CK_MAX_CHUNK_SIZE = "max_chunk_size";
+    public static final String CK_IDLE_WRITER_TIMEOUT = "idle_writer_timeout";
     static final String CK_AUTHORIZATION_HEADER_NAME = "authorization_header_name";
     static final String CK_AUTHORIZATION_HEADER_VALUE = "authorization_header_value";
     private static final String AUTHORIZATION_HEADER_NAME_LABEL = "Authorization Header Name";
     private static final String AUTHORIZATION_HEADER_VALUE_LABEL = "Authorization Header Value";
+    private static final String AUTHORIZATION_HEADER_VALUE_SECONDARY_LABEL = "Authorization Header Value (secondary)";
+    private static final String CK_AUTHORIZATION_HEADER_VALUE_SECONDARY = "authorization_header_value_secondary";
     static final String CK_REAL_IP_HEADER_NAME = "real_ip_header_name";
     static final String CK_ENABLE_FORWARDED_FOR = "enable_forwarded_for";
     static final String CK_REQUIRE_TRUSTED_PROXIES = "require_trusted_proxies";
@@ -81,7 +85,7 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
     protected final int maxChunkSize;
     private final int idleWriterTimeout;
     private final String authorizationHeader;
-    private final String authorizationHeaderValue;
+    private final Set<String> authorizationHeaderValues;
     private final Set<IpSubnet> trustedProxies;
     private final String path;
     private final boolean enableForwardedFor;
@@ -112,7 +116,11 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
                 ? configuration.getInt(CK_IDLE_WRITER_TIMEOUT, DEFAULT_IDLE_WRITER_TIMEOUT)
                 : DEFAULT_IDLE_WRITER_TIMEOUT;
         this.authorizationHeader = configuration.getString(CK_AUTHORIZATION_HEADER_NAME);
-        this.authorizationHeaderValue = configuration.getString(CK_AUTHORIZATION_HEADER_VALUE);
+        this.authorizationHeaderValues = Stream.of(
+                        configuration.getString(CK_AUTHORIZATION_HEADER_VALUE),
+                        configuration.getString(CK_AUTHORIZATION_HEADER_VALUE_SECONDARY)
+                ).filter(v -> v != null && !v.isBlank())
+                .collect(Collectors.toUnmodifiableSet());
         this.enableForwardedFor = configuration.getBoolean(CK_ENABLE_FORWARDED_FOR);
         this.requireTrustedProxies = configuration.getBoolean(CK_REQUIRE_TRUSTED_PROXIES);
         this.enableRealIpHeader = configuration.getBoolean(CK_ENABLE_REAL_IP_HEADER);
@@ -128,6 +136,22 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
     protected static int parseMaxChunkSize(Configuration configuration) {
         int maxChunkSize = configuration.getInt(CK_MAX_CHUNK_SIZE, DEFAULT_MAX_CHUNK_SIZE);
         return maxChunkSize <= 0 ? DEFAULT_MAX_CHUNK_SIZE : maxChunkSize;
+    }
+
+    protected boolean isEnableCors() {
+        return enableCors;
+    }
+
+    protected String getAuthorizationHeader() {
+        return authorizationHeader;
+    }
+
+    protected Set<String> getAuthorizationHeaderValues() {
+        return authorizationHeaderValues;
+    }
+
+    protected String getPath() {
+        return path;
     }
 
     @Override
@@ -152,7 +176,7 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
         handlers.put("http-forwarded-for-handler", () -> new HttpForwardedForHandler(enableForwardedFor,
                 enableRealIpHeader, realIpHeaders, requireTrustedProxies, trustedProxies));
         handlers.put("http-handler",
-                () -> new HttpHandler(enableCors, authorizationHeader, authorizationHeaderValue, path));
+                () -> new HttpHandler(enableCors, authorizationHeader, authorizationHeaderValues, path));
         if (enableBulkReceiving) {
             handlers.put("http-bulk-newline-decoder",
                     () -> new LenientDelimiterBasedFrameDecoder(maxChunkSize,
@@ -167,11 +191,13 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
     @Override
     public void launch(MessageInput input, @Nullable InputFailureRecorder inputFailureRecorder)
             throws MisfireException {
-        if (isNotBlank(authorizationHeader) && isBlank(authorizationHeaderValue)) {
-            checkForConfigFieldDependencies(AUTHORIZATION_HEADER_NAME_LABEL,
+        if (isNotBlank(authorizationHeader) && authorizationHeaderValues.isEmpty()) {
+            checkForConfigFieldDependencies(
+                    AUTHORIZATION_HEADER_NAME_LABEL,
                     AUTHORIZATION_HEADER_VALUE_LABEL);
-        } else if (isNotBlank(authorizationHeaderValue) && isBlank(authorizationHeader)) {
-            checkForConfigFieldDependencies(AUTHORIZATION_HEADER_VALUE_LABEL,
+        } else if (!authorizationHeaderValues.isEmpty() && isBlank(authorizationHeader)) {
+            checkForConfigFieldDependencies(
+                    AUTHORIZATION_HEADER_VALUE_LABEL,
                     AUTHORIZATION_HEADER_NAME_LABEL);
         }
         super.launch(input, inputFailureRecorder);
@@ -218,6 +244,13 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
                     AUTHORIZATION_HEADER_VALUE_LABEL,
                     "",
                     "The secret authorization header value which all request must have in order to authenticate successfully. e.g. Bearer: <api-token>N",
+                    ConfigurationField.Optional.OPTIONAL,
+                    TextField.Attribute.IS_PASSWORD));
+            r.addField(new TextField(
+                    CK_AUTHORIZATION_HEADER_VALUE_SECONDARY,
+                    AUTHORIZATION_HEADER_VALUE_SECONDARY_LABEL,
+                    "",
+                    "Optional secondary authorization header value to accept during token rotation. Remove once all clients have migrated to the new token.",
                     ConfigurationField.Optional.OPTIONAL,
                     TextField.Attribute.IS_PASSWORD));
             r.addField(new BooleanField(

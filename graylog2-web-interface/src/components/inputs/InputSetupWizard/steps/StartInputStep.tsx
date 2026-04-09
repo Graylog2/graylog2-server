@@ -19,6 +19,8 @@ import { useEffect, useState, useMemo } from 'react';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
+import { SystemInputStates } from '@graylog/server-api';
+
 import usePluginEntities from 'hooks/usePluginEntities';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
@@ -26,7 +28,6 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import Routes from 'routing/Routes';
 import useSetupInputMutations from 'components/inputs/InputSetupWizard/hooks/useSetupInputMutations';
-import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { Button, Row, Col } from 'components/bootstrap';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
 import useInputSetupWizardSteps from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizardSteps';
@@ -136,7 +137,7 @@ const StartInputStep = () => {
 
     if (!input) return;
 
-    InputStatesStore.start(input).finally(() => {
+    SystemInputStates.start(input.id).finally(() => {
       setStartInputStatus('SUCCESS');
     });
   };
@@ -146,7 +147,7 @@ const StartInputStep = () => {
 
     if (!input) return;
 
-    InputStatesStore.stop(input);
+    SystemInputStates.stop(input.id);
   };
 
   const setupInput = async () => {
