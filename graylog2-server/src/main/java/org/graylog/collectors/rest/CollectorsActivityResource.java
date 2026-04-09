@@ -135,22 +135,34 @@ public class CollectorsActivityResource extends RestResource {
         // Resolve targets
         final List<RecentActivityResponse.TargetInfo> targets = new ArrayList<>();
         for (final var targetId : marker.targetIds()) {
+            final String id;
             final String name;
             if (TransactionMarker.TARGET_FLEET.equals(marker.target())) {
-                // skip the target if it's a fleet we have no permission to
-                if (!isPermitted(CollectorsPermissions.FLEET_READ, targetId)) {
-                    continue;
+                if (fleetNames.containsKey(targetId)) {
+                    // skip the target if it's a fleet we have no permission to
+                    if (!isPermitted(CollectorsPermissions.FLEET_READ, targetId)) {
+                        continue;
+                    }
+                    id = targetId;
+                    name = fleetNames.get(targetId);
+                } else {
+                    id = null;
+                    name = "[deleted]";
                 }
-                name = fleetNames.getOrDefault(targetId, targetId);
             } else {
-                // skip the target if the user cannot see the target's fleet
-                if (instances.containsKey(targetId)
-                        && !isPermitted(CollectorsPermissions.FLEET_READ, instances.get(targetId).fleetId())) {
-                    continue;
+                if (instances.containsKey(targetId)) {
+                    // skip the target if the user cannot see the target's fleet
+                    if (!isPermitted(CollectorsPermissions.FLEET_READ, instances.get(targetId).fleetId())) {
+                        continue;
+                    }
+                    id = targetId;
+                    name = resolveInstanceHostname(instances, targetId);
+                } else {
+                    id = null;
+                    name = "[deleted]";
                 }
-                name = resolveInstanceHostname(instances, targetId);
             }
-            targets.add(new RecentActivityResponse.TargetInfo(targetId, name, marker.target()));
+            targets.add(new RecentActivityResponse.TargetInfo(id, name, marker.target()));
         }
 
         // Resolve details
@@ -180,10 +192,16 @@ public class CollectorsActivityResource extends RestResource {
     private Map<String, String> resolveDetails(TransactionMarker marker, Map<String, String> fleetNames) {
         if (marker.type() == MarkerType.FLEET_REASSIGNED && marker.payload() != null) {
             final String newFleetId = marker.payload().getString("new_fleet_id");
-            if (newFleetId != null && isPermitted(CollectorsPermissions.FLEET_READ, newFleetId)) {
-                return Map.of(
-                        "new_fleet_id", newFleetId,
-                        "new_fleet_name", fleetNames.getOrDefault(newFleetId, newFleetId));
+            if (newFleetId != null) {
+                if (fleetNames.containsKey(newFleetId)) {
+                    if (isPermitted(CollectorsPermissions.FLEET_READ, newFleetId)) {
+                        return Map.of(
+                                "new_fleet_id", newFleetId,
+                                "new_fleet_name", fleetNames.get(newFleetId));
+                    }
+                    return Map.of();
+                }
+                return Map.of("new_fleet_name", "[deleted]");
             }
         }
         return Map.of();

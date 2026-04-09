@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix issue when default favorite fields disappear after adding favorite field."
+
+pulls = ["25530"]
+issues = ["25517"]

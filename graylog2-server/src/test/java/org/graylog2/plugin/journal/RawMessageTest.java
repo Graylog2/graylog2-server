@@ -16,6 +16,7 @@
  */
 package org.graylog2.plugin.journal;
 
+import jakarta.annotation.Nonnull;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.jupiter.api.Test;
@@ -26,13 +27,10 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class RawMessageTest {
+class RawMessageTest {
     @Test
-    public void minimalEncodeDecode() {
-        final RawMessage rawMessage = new RawMessage("testmessage".getBytes(StandardCharsets.UTF_8));
-        rawMessage.addSourceNode("inputid", new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"));
-        rawMessage.setCodecName("raw");
-        rawMessage.setCodecConfig(Configuration.EMPTY_CONFIGURATION);
+    void minimalEncodeDecode() {
+        final RawMessage rawMessage = createRawMessage("testmessage".getBytes(StandardCharsets.UTF_8));
 
         final byte[] encoded = rawMessage.encode();
         final RawMessage decodedMsg = RawMessage.decode(encoded, 1);
@@ -43,5 +41,39 @@ public class RawMessageTest {
         assertEquals(1, decodedMsg.getSourceNodes().size());
         assertEquals("inputid", decodedMsg.getSourceNodes().get(0).inputId);
         assertEquals("5ca1ab1e-0000-4000-a000-000000000000", decodedMsg.getSourceNodes().get(0).nodeId);
+    }
+
+    @Test
+    void inputMessageSizeSurvivesJournalRoundTrip() {
+        final RawMessage rawMessage = createRawMessage("testmessage".getBytes(StandardCharsets.UTF_8));
+        rawMessage.setInputMessageSize(12345);
+
+        final byte[] encoded = rawMessage.encode();
+        final RawMessage decodedMsg = RawMessage.decode(encoded, 1);
+
+        assertNotNull(decodedMsg);
+        assertEquals(12345, decodedMsg.getInputMessageSize());
+    }
+
+    @Test
+    void getInputMessageSizeFallsBackToPayloadSize() {
+        final byte[] payload = "testmessage".getBytes(StandardCharsets.UTF_8);
+        final RawMessage rawMessage = createRawMessage(payload);
+
+        final byte[] encoded = rawMessage.encode();
+        final RawMessage decodedMsg = RawMessage.decode(encoded, 1);
+
+        assertNotNull(decodedMsg);
+        assertEquals(payload.length, decodedMsg.getInputMessageSize());
+        assertEquals(payload.length, decodedMsg.getPayloadSize());
+    }
+
+    @Nonnull
+    private RawMessage createRawMessage(byte[] payload) {
+        final RawMessage rawMessage = new RawMessage(payload);
+        rawMessage.addSourceNode("inputid", new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"));
+        rawMessage.setCodecName("raw");
+        rawMessage.setCodecConfig(Configuration.EMPTY_CONFIGURATION);
+        return rawMessage;
     }
 }
