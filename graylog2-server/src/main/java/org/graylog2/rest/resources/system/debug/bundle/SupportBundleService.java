@@ -70,6 +70,8 @@ import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -84,6 +86,7 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -182,6 +185,7 @@ public class SupportBundleService {
                                    Map<String, SupportBundleNodeManifest> nodeManifests,
                                    Path spoolDir) throws Exception {
         final Path dataNodeDir = spoolDir.resolve("datanodes");
+        final List<BundleError> errors = Collections.synchronizedList(new ArrayList<>());
 
         // fetchClusterInfos runs concurrently with per-node collection — they are independent.
         // Its requestOnAllNodes wrappers run on their own orchestrationExecutor (created inside
@@ -189,30 +193,44 @@ public class SupportBundleService {
         final List<CompletableFuture<Void>> futures = new ArrayList<>();
 
         nodeManifests.entrySet().stream()
-                .flatMap(e -> fetchNodeInfosAsync(proxiedResourceHelper, e.getKey(), e.getValue(), spoolDir).stream())
+                .flatMap(e -> fetchNodeInfosAsync(proxiedResourceHelper, e.getKey(), e.getValue(), spoolDir, errors).stream())
                 .forEach(futures::add);
 
         datanodeService.allActive().values().stream()
-                .map(dn -> CompletableFuture.runAsync(() -> fetchDataNodeInfos(dn, dataNodeDir), executor))
+                .map(dn -> CompletableFuture.runAsync(() -> fetchDataNodeInfos(dn, dataNodeDir, errors), executor))
                 .forEach(futures::add);
 
         futures.add(CompletableFuture.runAsync(
-                () -> tryFetchClusterInfos(proxiedResourceHelper, nodeManifests, spoolDir), executor));
+                () -> tryFetchClusterInfos(proxiedResourceHelper, nodeManifests, spoolDir, errors), executor));
 
         CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).get();
+
+        writeErrors(errors, spoolDir);
+    }
+
+    private void writeErrors(List<BundleError> errors, Path spoolDir) {
+        if (errors.isEmpty()) {
+            return;
+        }
+        try (var errorsFile = new FileOutputStream(spoolDir.resolve("errors.json").toFile())) {
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(errorsFile, errors);
+        } catch (IOException e) {
+            LOG.warn("Failed to write errors.json to support bundle", e);
+        }
     }
 
     private void tryFetchClusterInfos(ProxiedResourceHelper proxiedResourceHelper,
                                             Map<String, SupportBundleNodeManifest> nodeManifests,
-                                            Path spoolDir) {
+                                            Path spoolDir, List<BundleError> errors) {
         try {
-            fetchClusterInfos(proxiedResourceHelper, nodeManifests, spoolDir);
+            fetchClusterInfos(proxiedResourceHelper, nodeManifests, spoolDir, errors);
         } catch (Exception e) {
             LOG.warn("Failed to collect cluster infos for support bundle, skipping", e);
+            errors.add(BundleError.of("cluster/infos", e));
         }
     }
 
-    private void fetchClusterInfos(ProxiedResourceHelper proxiedResourceHelper, Map<String, SupportBundleNodeManifest> nodeManifests, Path tmpDir) throws IOException {
+    private void fetchClusterInfos(ProxiedResourceHelper proxiedResourceHelper, Map<String, SupportBundleNodeManifest> nodeManifests, Path tmpDir, List<BundleError> errors) throws IOException {
         // requestOnAllNodes submits per-node tasks to `executor` then blocks on Future#get.
         // A separate short-lived orchestration executor runs these blocking fan-outs so they
         // never occupy `executor` slots, keeping `executor` free for the per-node HTTP work.
@@ -252,6 +270,7 @@ public class SupportBundleService {
                     CompletableFuture.supplyAsync(this::getDatanodeInfo, executor)
                             .exceptionally(e -> {
                                 LOG.warn("Failed to collect datanode info for support bundle", e);
+                                errors.add(BundleError.of("cluster/datanode-info", e));
                                 return Map.of();
                             });
 
@@ -261,8 +280,10 @@ public class SupportBundleService {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 LOG.warn("Interrupted while collecting cluster infos for support bundle");
+                errors.add(BundleError.of("cluster/infos", e));
             } catch (ExecutionException e) {
                 LOG.warn("Failed collecting cluster infos for support bundle", e);
+                errors.add(BundleError.of("cluster/infos", e));
             }
 
             final Map<String, Object> searchDb = Map.of(
@@ -368,20 +389,20 @@ public class SupportBundleService {
         }).collect(Collectors.toMap(Map.Entry::getKey, res -> Objects.requireNonNull(res.getValue().response()).entity().orElseThrow()));
     }
 
-    private List<CompletableFuture<Void>> fetchNodeInfosAsync(ProxiedResourceHelper proxiedResourceHelper, String nodeId, SupportBundleNodeManifest manifest, Path tmpDir) {
+    private List<CompletableFuture<Void>> fetchNodeInfosAsync(ProxiedResourceHelper proxiedResourceHelper, String nodeId, SupportBundleNodeManifest manifest, Path tmpDir, List<BundleError> errors) {
         final Path nodeDir = tmpDir.resolve(new SimpleNodeId(nodeId).getShortNodeId());
         var ignored = nodeDir.toFile().mkdirs();
 
         return List.of(
-                CompletableFuture.runAsync(() -> fetchLogs(proxiedResourceHelper, nodeId, manifest.entries().logfiles(), nodeDir), executor),
-                CompletableFuture.runAsync(() -> fetchThreadDump(proxiedResourceHelper, nodeId, nodeDir), executor),
-                CompletableFuture.runAsync(() -> fetchMetrics(proxiedResourceHelper, nodeId, nodeDir), executor),
-                CompletableFuture.runAsync(() -> fetchSystemStats(proxiedResourceHelper, nodeId, nodeDir), executor),
-                CompletableFuture.runAsync(() -> fetchNodeCertificates(proxiedResourceHelper, nodeId, nodeDir), executor)
+                CompletableFuture.runAsync(() -> fetchLogs(proxiedResourceHelper, nodeId, manifest.entries().logfiles(), nodeDir, errors), executor),
+                CompletableFuture.runAsync(() -> fetchThreadDump(proxiedResourceHelper, nodeId, nodeDir, errors), executor),
+                CompletableFuture.runAsync(() -> fetchMetrics(proxiedResourceHelper, nodeId, nodeDir, errors), executor),
+                CompletableFuture.runAsync(() -> fetchSystemStats(proxiedResourceHelper, nodeId, nodeDir, errors), executor),
+                CompletableFuture.runAsync(() -> fetchNodeCertificates(proxiedResourceHelper, nodeId, nodeDir, errors), executor)
         );
     }
 
-    private void fetchThreadDump(ProxiedResourceHelper proxiedResourceHelper, String nodeId, Path nodeDir) {
+    private void fetchThreadDump(ProxiedResourceHelper proxiedResourceHelper, String nodeId, Path nodeDir, List<BundleError> errors) {
         try (var threadDumpFile = new FileOutputStream(nodeDir.resolve("thread-dump.txt").toFile())) {
             final ProxiedResource.NodeResponse<SystemThreadDumpResponse> dump = proxiedResourceHelper.doNodeApiCall(nodeId,
                     RemoteSystemResource.class, RemoteSystemResource::threadDump, Function.identity(), CALL_TIMEOUT);
@@ -390,10 +411,11 @@ public class SupportBundleService {
             }
         } catch (Exception e) {
             LOG.warn("Failed to get threadDump from node <{}>", nodeId, e);
+            errors.add(BundleError.of(f("node/%s/thread-dump", nodeId), e));
         }
     }
 
-    private void fetchMetrics(ProxiedResourceHelper proxiedResourceHelper, String nodeId, Path nodeDir) {
+    private void fetchMetrics(ProxiedResourceHelper proxiedResourceHelper, String nodeId, Path nodeDir, List<BundleError> errors) {
         try (var nodeMetricsFile = new FileOutputStream(nodeDir.resolve("metrics.json").toFile())) {
             final ProxiedResource.NodeResponse<MetricsSummaryResponse> metrics = proxiedResourceHelper.doNodeApiCall(nodeId,
                     RemoteMetricsResource.class, c -> c.byNamespace("org"), Function.identity(), CALL_TIMEOUT);
@@ -402,10 +424,11 @@ public class SupportBundleService {
             }
         } catch (Exception e) {
             LOG.warn("Failed to get metrics from node <{}>", nodeId, e);
+            errors.add(BundleError.of(f("node/%s/metrics", nodeId), e));
         }
     }
 
-    private void fetchSystemStats(ProxiedResourceHelper proxiedResourceHelper, String nodeId, Path nodeDir) {
+    private void fetchSystemStats(ProxiedResourceHelper proxiedResourceHelper, String nodeId, Path nodeDir, List<BundleError> errors) {
         try (var systemStatsFile = new FileOutputStream(nodeDir.resolve("system-stats.json").toFile())) {
             final ProxiedResource.NodeResponse<SystemStats> statsResponse = proxiedResourceHelper.doNodeApiCall(nodeId,
                     RemoteSystemStatsResource.class, RemoteSystemStatsResource::systemStats, Function.identity(), CALL_TIMEOUT);
@@ -414,10 +437,11 @@ public class SupportBundleService {
             }
         } catch (Exception e) {
             LOG.warn("Failed to get system stats from node <{}>", nodeId, e);
+            errors.add(BundleError.of(f("node/%s/system-stats", nodeId), e));
         }
     }
 
-    private void fetchNodeCertificates(ProxiedResourceHelper proxiedResourceHelper, String nodeId, Path nodeDir) {
+    private void fetchNodeCertificates(ProxiedResourceHelper proxiedResourceHelper, String nodeId, Path nodeDir, List<BundleError> errors) {
         try (var certificatesFile = new FileOutputStream(nodeDir.resolve("certificates.json").toFile())) {
             final ProxiedResource.NodeResponse<Map<String, KeyStoreDto>> certificatesResponse = proxiedResourceHelper.doNodeApiCall(nodeId,
                     RemoteCertificatesResource.class, RemoteCertificatesResource::certificates, Function.identity(), CALL_TIMEOUT);
@@ -426,15 +450,16 @@ public class SupportBundleService {
             }
         } catch (Exception e) {
             LOG.warn("Failed to get certificates from node <{}>", nodeId, e);
+            errors.add(BundleError.of(f("node/%s/certificates", nodeId), e));
         }
     }
 
 
-    private void fetchDataNodeInfos(DataNodeDto datanode, Path dataNodeDir) {
+    private void fetchDataNodeInfos(DataNodeDto datanode, Path dataNodeDir, List<BundleError> errors) {
         final Path nodeDir = dataNodeDir.resolve(Objects.requireNonNull(datanode.getHostname()));
         var ignored = nodeDir.toFile().mkdirs();
 
-        getProxiedLog(datanode, nodeDir, "datanode.log", RemoteDataNodeStatusResource::datanodeInternalLogs);
+        getProxiedLog(datanode, nodeDir, "datanode.log", RemoteDataNodeStatusResource::datanodeInternalLogs, errors);
         try (var certificatesFile = new FileOutputStream(nodeDir.resolve("certificates.json").toFile())) {
             Map<String, Map<String, KeyStoreDto>> certificates = datanodeProxy.remoteInterface(datanode.getHostname(), RemoteCertificatesResource.class, RemoteCertificatesResource::certificates);
             if (certificates.containsKey(datanode.getHostname())) {
@@ -442,10 +467,11 @@ public class SupportBundleService {
             }
         } catch (Exception e) {
             LOG.warn("Failed to get certificates from data node <{}>", datanode.getHostname(), e);
+            errors.add(BundleError.of(f("datanode/%s/certificates", datanode.getHostname()), e));
         }
     }
 
-    private void getProxiedLog(DataNodeDto datanode, Path nodeDir, String logfile, Function<RemoteDataNodeStatusResource, Call<ResponseBody>> function) {
+    private void getProxiedLog(DataNodeDto datanode, Path nodeDir, String logfile, Function<RemoteDataNodeStatusResource, Call<ResponseBody>> function, List<BundleError> errors) {
         try (var opensearchLog = new FileOutputStream(nodeDir.resolve(logfile).toFile())) {
             Map<String, ResponseBody> opensearchOut = datanodeProxy.remoteInterface(datanode.getHostname(), RemoteDataNodeStatusResource.class, function);
             if (opensearchOut.containsKey(datanode.getHostname())) {
@@ -455,6 +481,7 @@ public class SupportBundleService {
             }
         } catch (Exception e) {
             LOG.warn("Failed to get logs from data node <{}>", datanode.getHostname(), e);
+            errors.add(BundleError.of(f("datanode/%s/logs/%s", datanode.getHostname(), logfile), e));
         }
     }
 
@@ -478,7 +505,7 @@ public class SupportBundleService {
         return truncatedLogFileList.build();
     }
 
-    private void fetchLogs(ProxiedResourceHelper proxiedResourceHelper, String nodeId, List<LogFile> logFiles, Path nodeDir) {
+    private void fetchLogs(ProxiedResourceHelper proxiedResourceHelper, String nodeId, List<LogFile> logFiles, Path nodeDir, List<BundleError> errors) {
         final Path logDir = nodeDir.resolve("logs");
         var ignored = logDir.toFile().mkdirs();
 
@@ -496,9 +523,11 @@ public class SupportBundleService {
                     }
                 } else {
                     LOG.warn("Failed to fetch logfile <{}> from node <{}>: Empty response", logFile.name(), nodeId);
+                    errors.add(new BundleError(f("node/%s/logs/%s", nodeId, logFile.name()), "Empty response", null));
                 }
             } catch (IOException e) {
                 LOG.warn("Failed to fetch logfile <{}> from node <{}>", logFile.name(), nodeId, e);
+                errors.add(BundleError.of(f("node/%s/logs/%s", nodeId, logFile.name()), e));
             }
         });
     }
@@ -635,6 +664,14 @@ public class SupportBundleService {
         ensureFileWithinBundleDir(bundleDir, filename);
         final Path filePath = bundleDir.resolve(filename);
         Files.delete(filePath);
+    }
+
+    record BundleError(String component, String error, String stacktrace) {
+        static BundleError of(String component, Throwable e) {
+            final StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            return new BundleError(component, e.toString(), sw.toString());
+        }
     }
 
     static class ProxiedResourceHelper extends ProxiedResource {
