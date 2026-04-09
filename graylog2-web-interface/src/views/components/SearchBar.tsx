@@ -42,6 +42,7 @@ import {
   newFiltersForQuery,
 } from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
+import { QUERY_TIME_RANGE_LIMIT_ERROR_TYPE, SEARCH_TYPE_RANGE_LIMIT_ERROR_TYPE } from 'views/Constants';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
@@ -77,6 +78,7 @@ import StreamCategoryFilter from 'views/components/searchbar/StreamCategoryFilte
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
+import useSearchResult from 'views/hooks/useSearchResult';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -199,6 +201,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
   const currentQuery = useCurrentQuery();
   const queryFilters = useQueryFilters();
   const results = useViewsSelector(selectCurrentQueryResults);
+  const searchResult = useSearchResult();
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const initialValues = useInitialFormValues({ queryFilters, currentQuery });
   const dispatch = useViewsDispatch();
@@ -217,6 +220,11 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
 
   const { query } = currentQuery;
   const limitDuration = moment.duration(config.query_time_range_limit).asSeconds() ?? 0;
+
+  const searchResulErrors = searchResult?.result?.errors?.filter((error) => error.queryId === currentQuery?.id) ?? [];
+  const timeRangeHasErrorInResults = searchResulErrors.some(
+    ({ type }) => type === QUERY_TIME_RANGE_LIMIT_ERROR_TYPE || type === SEARCH_TYPE_RANGE_LIMIT_ERROR_TYPE,
+  );
 
   return (
     <WidgetFocusContext.Consumer>
@@ -256,7 +264,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
                         limitDuration={limitDuration}
                         onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                         value={values?.timerange}
-                        hasErrorOnMount={!!errors.timerange}
+                        hasErrorOnMount={!!errors.timerange || timeRangeHasErrorInResults}
                         moveRangeProps={{
                           effectiveTimerange: results?.effectiveTimerange,
                           initialTimerange: currentQuery.timerange,
