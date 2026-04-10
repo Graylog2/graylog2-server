@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.system.debug.bundle;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.ws.rs.core.HttpHeaders;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.cluster.Node;
@@ -68,7 +69,7 @@ class SupportBundleServiceIT {
 
     @BeforeEach
     void setUp() {
-        executor = Executors.newFixedThreadPool(8);
+        executor = Executors.newFixedThreadPool(8, new ThreadFactoryBuilder().setNameFormat("support-bundle-executor-%d").build());
         nodeService = new TestNodeService();
         datanodeService = mock(org.graylog2.cluster.nodes.NodeService.class);
         remoteInterfaceProvider = mock(RemoteInterfaceProvider.class);
