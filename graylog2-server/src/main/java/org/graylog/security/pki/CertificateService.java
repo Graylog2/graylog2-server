@@ -31,7 +31,6 @@ import org.graylog2.web.customization.CustomizationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.security.cert.X509Certificate;
 import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
@@ -110,42 +109,16 @@ public class CertificateService {
      * @return the saved certificate entry with its ID
      */
     public CertificateEntry save(CertificateEntry entry) {
-        final CertificateEntry enriched = enrichWithDn(entry);
-        if (enriched.id() == null) {
-            final String insertedId = insertedIdAsString(collection.insertOne(enriched));
-            return enriched.withId(insertedId);
+        // TODO: Switch CertificateEntry to BuildableMongoEntity and use MongoUtils#save
+        if (entry.id() == null) {
+            final String insertedId = insertedIdAsString(collection.insertOne(entry));
+            return entry.withId(insertedId);
         } else {
             collection.replaceOne(
-                    Filters.eq("_id", new ObjectId(enriched.id())),
-                    enriched,
+                    Filters.eq("_id", new ObjectId(entry.id())),
+                    entry,
                     new ReplaceOptions().upsert(false)
             );
-            return enriched;
-        }
-    }
-
-    private CertificateEntry enrichWithDn(CertificateEntry entry) {
-        if (entry.subjectDn() != null && entry.issuerDn() != null) {
-            return entry;
-        }
-        try {
-            final X509Certificate cert = PemUtils.parseCertificate(entry.certificate());
-            return new CertificateEntry(
-                    entry.id(),
-                    entry.fingerprint(),
-                    entry.subjectKeyIdentifier(),
-                    entry.authorityKeyIdentifier(),
-                    entry.privateKey(),
-                    entry.certificate(),
-                    entry.issuerChain(),
-                    cert.getSubjectX500Principal().getName(),
-                    cert.getIssuerX500Principal().getName(),
-                    entry.notBefore(),
-                    entry.notAfter(),
-                    entry.createdAt()
-            );
-        } catch (Exception e) {
-            LOG.warn("Failed to extract DN from certificate: {}", e.getMessage());
             return entry;
         }
     }

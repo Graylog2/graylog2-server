@@ -17,6 +17,7 @@
 package org.graylog.security.pki;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.MongoWriteException;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.testing.TestClocks;
 import org.graylog.testing.mongodb.MongoDBExtension;
@@ -39,6 +40,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Tests for {@link CertificateService} CRUD operations.
@@ -81,18 +83,18 @@ class CertificateServiceTest {
     }
 
     @Test
-    void saveInsertsCertificateEntryWithNullId() {
-        final CertificateEntry entry = createCertificateEntry(null, "SHA256:fingerprint1");
+    void saveInsertsCertificateEntryWithNullId() throws Exception {
+        final CertificateEntry entry = createCertificateEntry();
 
         final CertificateEntry saved = certificateService.save(entry);
 
         assertThat(saved.id()).isNotNull();
-        assertThat(saved.fingerprint()).isEqualTo("SHA256:fingerprint1");
+        assertThat(saved.fingerprint()).isEqualTo(entry.fingerprint());
     }
 
     @Test
-    void saveReplacesCertificateEntryWithExistingId() {
-        final CertificateEntry original = createCertificateEntry(null, "SHA256:original");
+    void saveReplacesCertificateEntryWithExistingId() throws Exception {
+        final CertificateEntry original = createCertificateEntry();
         final CertificateEntry saved = certificateService.save(original);
         final String savedId = saved.id();
 
@@ -104,8 +106,8 @@ class CertificateServiceTest {
                 createEncryptedValue(),
                 "-----BEGIN CERTIFICATE-----\nUPDATED\n-----END CERTIFICATE-----",
                 List.of(),
-                null,
-                null,
+                "subject-dn",
+                "issuer-dn",
                 Instant.parse("2024-01-01T00:00:00Z"),
                 Instant.parse("2025-01-01T00:00:00Z"),
                 Instant.parse("2024-01-01T00:00:00Z")
@@ -125,15 +127,15 @@ class CertificateServiceTest {
     }
 
     @Test
-    void findByIdReturnsSavedCertificateEntry() {
-        final CertificateEntry entry = createCertificateEntry(null, "SHA256:findbyid");
+    void findByIdReturnsSavedCertificateEntry() throws Exception {
+        final CertificateEntry entry = createCertificateEntry();
         final CertificateEntry saved = certificateService.save(entry);
 
         final Optional<CertificateEntry> result = certificateService.findById(saved.id());
 
         assertThat(result).isPresent();
         assertThat(result.get().id()).isEqualTo(saved.id());
-        assertThat(result.get().fingerprint()).isEqualTo("SHA256:findbyid");
+        assertThat(result.get().fingerprint()).isEqualTo(entry.fingerprint());
     }
 
     @Test
@@ -143,45 +145,21 @@ class CertificateServiceTest {
     }
 
     @Test
-    void findByFingerprintReturnsSavedCertificateEntry() {
-        final CertificateEntry entry = createCertificateEntry(null, "SHA256:byfingerprint");
+    void findByFingerprintReturnsSavedCertificateEntry() throws Exception {
+        final CertificateEntry entry = certificateService.save(createCertificateEntry());
+
+        final Optional<CertificateEntry> result = certificateService.findByFingerprint(entry.fingerprint());
+
+        assertThat(result).get().satisfies(found -> assertThat(found.id()).isEqualTo(entry.id()));
+    }
+
+    @Test
+    void fingerprintIsUnique() throws Exception {
+        final CertificateEntry entry = createCertificateEntry();
         certificateService.save(entry);
 
-        final Optional<CertificateEntry> result = certificateService.findByFingerprint("SHA256:byfingerprint");
-
-        assertThat(result).isPresent();
-        assertThat(result.get().fingerprint()).isEqualTo("SHA256:byfingerprint");
-    }
-
-    @Test
-    void fingerprintIsUnique() {
-        final CertificateEntry entry1 = createCertificateEntry(null, "SHA256:unique");
-        certificateService.save(entry1);
-
-        final CertificateEntry entry2 = createCertificateEntry(null, "SHA256:unique");
-
-        org.junit.jupiter.api.Assertions.assertThrows(
-                com.mongodb.MongoWriteException.class,
-                () -> certificateService.save(entry2)
-        );
-    }
-
-    @Test
-    void saveExtractsSubjectAndIssuerDn() throws Exception {
-        final CertificateEntry rootCa = certificateService.builder()
-                .createRootCa("Test Root CA", Algorithm.ED25519, Duration.ofDays(365));
-
-        assertThat(rootCa.subjectDn()).isNull();
-        assertThat(rootCa.issuerDn()).isNull();
-
-        final CertificateEntry saved = certificateService.save(rootCa);
-
-        assertThat(saved.subjectDn()).contains("Test Root CA");
-        assertThat(saved.issuerDn()).contains("Test Root CA"); // self-signed
-
-        final CertificateEntry loaded = certificateService.findById(saved.id()).orElseThrow();
-        assertThat(loaded.subjectDn()).isEqualTo(saved.subjectDn());
-        assertThat(loaded.issuerDn()).isEqualTo(saved.issuerDn());
+        assertThatThrownBy(() -> certificateService.save(entry.withId(null)))
+                .isInstanceOf(MongoWriteException.class);
     }
 
     @Test
@@ -229,21 +207,12 @@ class CertificateServiceTest {
         assertThat(retrieved.get().fingerprint()).isEqualTo(rootCa.fingerprint());
     }
 
-    private CertificateEntry createCertificateEntry(String id, String fingerprint) {
-        return new CertificateEntry(
-                id,
-                fingerprint,
-                "ski",
-                Optional.of("aki"),
-                createEncryptedValue(),
-                "-----BEGIN CERTIFICATE-----\nTEST\n-----END CERTIFICATE-----",
-                List.of("-----BEGIN CERTIFICATE-----\nISSUER\n-----END CERTIFICATE-----"),
-                null,
-                null,
-                Instant.parse("2024-01-01T00:00:00Z"),
-                Instant.parse("2025-01-01T00:00:00Z"),
-                Instant.parse("2024-01-01T00:00:00Z")
-        );
+    private CertificateEntry createCertificateEntry() throws Exception {
+        return createCertificateEntry(null, "common-name");
+    }
+
+    private CertificateEntry createCertificateEntry(String id, String commonName) throws Exception {
+        return certificateService.builder().createRootCa(commonName, Algorithm.ED25519, Duration.ofDays(1)).withId(id);
     }
 
     private EncryptedValue createEncryptedValue() {
