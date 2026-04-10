@@ -100,6 +100,7 @@ class CertificateServiceTest {
                 savedId,
                 "SHA256:updated",
                 "ski",
+                Optional.of("aki"),
                 createEncryptedValue(),
                 "-----BEGIN CERTIFICATE-----\nUPDATED\n-----END CERTIFICATE-----",
                 List.of(),
@@ -197,6 +198,23 @@ class CertificateServiceTest {
     }
 
     @Test
+    void findBySubjectKeyIdentifierReturnsEmptyForNonExistentSki() {
+        assertThat(certificateService.findBySubjectKeyIdentifier("nonexistent")).isEmpty();
+    }
+
+    @Test
+    void findBySubjectKeyIdentifierReturnsSavedCertificateEntry() throws Exception {
+        final CertificateEntry saved = certificateService.save(
+                certificateService.builder().createRootCa("SKI Test CA", Algorithm.ED25519, Duration.ofDays(365)));
+
+        final var result = certificateService.findBySubjectKeyIdentifier(saved.subjectKeyIdentifier());
+
+        assertThat(result).isPresent();
+        assertThat(result.get().id()).isEqualTo(saved.id());
+        assertThat(result.get().fingerprint()).isEqualTo(saved.fingerprint());
+    }
+
+    @Test
     void integrationTestWithBuilder() throws Exception {
         // Test the full workflow: create cert with builder, save, retrieve
         final CertificateEntry rootCa = certificateService.save(
@@ -216,6 +234,7 @@ class CertificateServiceTest {
                 id,
                 fingerprint,
                 "ski",
+                Optional.of("aki"),
                 createEncryptedValue(),
                 "-----BEGIN CERTIFICATE-----\nTEST\n-----END CERTIFICATE-----",
                 List.of("-----BEGIN CERTIFICATE-----\nISSUER\n-----END CERTIFICATE-----"),

@@ -18,10 +18,13 @@ package org.graylog.collectors;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.graylog.collectors.events.CollectorCaConfigUpdated;
 import org.graylog2.configuration.HttpConfiguration;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 
 import java.net.URI;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -32,12 +35,15 @@ public class CollectorsConfigService {
     private static final CollectorsConfig DEFAULT_CONFIG = CollectorsConfig.createDefault("localhost");
 
     private final ClusterConfigService clusterConfigService;
+    private final ClusterEventBus clusterEventBus;
     private final URI httpExternalUri;
 
     @Inject
     public CollectorsConfigService(ClusterConfigService clusterConfigService,
-                                    HttpConfiguration httpConfiguration) {
+                                   ClusterEventBus clusterEventBus,
+                                   HttpConfiguration httpConfiguration) {
         this.clusterConfigService = clusterConfigService;
+        this.clusterEventBus = clusterEventBus;
         this.httpExternalUri = httpConfiguration.getHttpExternalUri();
     }
 
@@ -75,6 +81,17 @@ public class CollectorsConfigService {
      * @param config the config object
      */
     public void save(CollectorsConfig config) {
+        final var existing = get();
+
         clusterConfigService.write(config);
+
+        // On first-time save (no existing config), there's nothing cached to invalidate, so we skip the event.
+        existing.ifPresent(c -> {
+            if (!Objects.equals(c.caCertId(), config.caCertId())
+                    || !Objects.equals(c.signingCertId(), config.signingCertId())
+                    || !Objects.equals(c.otlpServerCertId(), config.otlpServerCertId())) {
+                clusterEventBus.post(new CollectorCaConfigUpdated());
+            }
+        });
     }
 }

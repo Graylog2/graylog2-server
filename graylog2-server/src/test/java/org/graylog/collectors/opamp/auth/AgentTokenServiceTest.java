@@ -41,6 +41,7 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterIdService;
@@ -101,8 +102,8 @@ class AgentTokenServiceTest {
         collectorInstanceService = new CollectorInstanceService(mongoCollections);
         final var httpConfiguration = mock(HttpConfiguration.class);
         when(httpConfiguration.getHttpExternalUri()).thenReturn(java.net.URI.create("https://localhost:443/"));
-        collectorsConfigService = new CollectorsConfigService(clusterConfigService, httpConfiguration);
-        collectorCaService = new CollectorCaService(certificateService, clusterIdService, collectorsConfigService);
+        collectorsConfigService = new CollectorsConfigService(clusterConfigService, mock(ClusterEventBus.class), httpConfiguration);
+        collectorCaService = new CollectorCaService(certificateService, clusterIdService, collectorsConfigService, clock);
         agentTokenService = new AgentTokenService(collectorInstanceService, clock);
     }
 
