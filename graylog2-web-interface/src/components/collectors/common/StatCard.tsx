@@ -21,17 +21,21 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
+import { HoverForHelp } from 'components/common';
+
 type Variant = 'default' | 'success' | 'warning' | 'danger';
 
 type Props = {
   value: number;
   label: string;
+  helpText?: React.ReactNode;
   variant?: Variant;
   onClick?: () => void;
 };
 
 const StyledCard = styled.div<{ $variant: Variant; $clickable: boolean }>(
   ({ theme, $variant, $clickable }) => css`
+    position: relative;
     text-align: center;
     min-width: 100px;
     padding: ${theme.spacings.md};
@@ -58,6 +62,16 @@ const StyledCard = styled.div<{ $variant: Variant; $clickable: boolean }>(
   `,
 );
 
+const HelpCorner = styled.div(
+  ({ theme }) => css`
+    position: absolute;
+    top: ${theme.spacings.xs};
+    right: ${theme.spacings.xs};
+    color: ${theme.colors.gray[70]};
+    font-size: 0.7em;
+  `,
+);
+
 const Value = styled.div(
   ({ theme }) => css`
     font-size: ${theme.fonts.size.huge};
@@ -73,13 +87,20 @@ const Label = styled.div(
   `,
 );
 
-const StatCard = ({ value, label, variant = 'default', onClick = undefined }: Props) => (
+const StatCard = ({ value, label, helpText = undefined, variant = 'default', onClick = undefined }: Props) => (
   <StyledCard
     as={onClick ? 'button' : 'div'}
     $variant={variant}
     $clickable={!!onClick}
     onClick={onClick}
     type={onClick ? 'button' : undefined}>
+    {helpText && (
+      <HelpCorner>
+        <HoverForHelp title={label} placement="right" pullRight={false}>
+          {helpText}
+        </HoverForHelp>
+      </HelpCorner>
+    )}
     <Value>{value}</Value>
     <Label>{label}</Label>
   </StyledCard>

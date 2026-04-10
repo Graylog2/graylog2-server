@@ -71,26 +71,34 @@ const CollectorsOverview = () => {
           <StatCard
             value={stats?.total_instances ?? 0}
             label="Instances"
+            helpText="Running collector processes across all fleets."
             onClick={() => history.push(Routes.SYSTEM.COLLECTORS.INSTANCES)}
           />
           <StatCard
             value={stats?.online_instances ?? 0}
             label="Online"
+            helpText="Instances that reported a heartbeat within the offline threshold."
             variant="success"
             onClick={() => history.push(`${Routes.SYSTEM.COLLECTORS.INSTANCES}?filters=status%3Donline`)}
           />
           <StatCard
             value={stats?.offline_instances ?? 0}
             label="Offline"
+            helpText="Instances that missed their heartbeat. Check host connectivity or collector process status."
             variant="warning"
             onClick={() => history.push(`${Routes.SYSTEM.COLLECTORS.INSTANCES}?filters=status%3Doffline`)}
           />
           <StatCard
             value={stats?.total_fleets ?? 0}
             label="Fleets"
+            helpText="Logical groups of collectors that share the same source configuration."
             onClick={() => history.push(Routes.SYSTEM.COLLECTORS.FLEETS)}
           />
-          <StatCard value={stats?.total_sources ?? 0} label="Sources" />
+          <StatCard
+            value={stats?.total_sources ?? 0}
+            label="Sources"
+            helpText="Data collection configurations (file paths, journald, Windows Event Logs) across all fleets."
+          />
         </StatsRow>
       )}
 

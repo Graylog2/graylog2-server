@@ -131,14 +131,23 @@ const CollectorsSettings = () => {
       <Row className="content">
         <Col md={6}>
           {!isConfigured && (
-            <Alert bsStyle="warning">
-              Collectors have not been set up yet. Configure the ingest endpoints below and save to get started.
+            <Alert bsStyle="info">
+              <strong>Getting started with Collectors</strong>
+              <p>
+                Collectors need ingest endpoints to receive collected data. Configure the HTTP endpoint below
+                and save to initialize the collector infrastructure. After setup, you can create fleets,
+                add sources, and deploy collectors to your hosts.
+              </p>
             </Alert>
           )}
           <Formik<FormValues> initialValues={initialValues} onSubmit={handleSubmit} enableReinitialize>
             {({ isSubmitting, setFieldValue, values }) => (
               <Form>
                 <h2>Ingest Endpoints</h2>
+                <p>
+                  Ingest endpoints receive log data from collectors via OpenTelemetry (OTLP).
+                  The hostname must be reachable from collector hosts, not just from this server.
+                </p>
 
                 <h3>HTTP</h3>
                 <FormikInput id="http-enabled" type="checkbox" label="Enabled" name="http_enabled" />
@@ -148,6 +157,7 @@ const CollectorsSettings = () => {
                   label="Hostname"
                   name="http_hostname"
                   placeholder="e.g. otlp.example.com"
+                  help="The hostname or IP address that collectors will use to connect. Must be reachable from collector hosts."
                   disabled={!values.http_enabled}
                 />
                 <FormikInput
@@ -218,13 +228,14 @@ const CollectorsSettings = () => {
         <Row className="content">
           <Col md={12}>
             <h2>Ingest Endpoint Status</h2>
+            <p>Shows whether ingest endpoints are actively listening for collector data.</p>
             {httpInput && (
               <p>
                 <strong>HTTP:</strong> <InputStateBadge input={httpInput} inputStates={inputStates} />{' '}
                 <Link to={Routes.SYSTEM.INPUT_DIAGNOSIS(httpInput.id)}>View Diagnostics</Link>
               </p>
             )}
-            {!httpInput && <p>No ingest endpoints are running.</p>}
+            {!httpInput && <p>No ingest endpoints are running. Enable and configure an HTTP endpoint above, then save.</p>}
           </Col>
         </Row>
       )}

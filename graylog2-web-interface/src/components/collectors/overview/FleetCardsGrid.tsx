@@ -18,7 +18,8 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
-import { Button } from 'components/bootstrap';
+import { Alert, Button } from 'components/bootstrap';
+import { Link } from 'components/common';
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 
@@ -60,7 +61,15 @@ const FleetCardsGrid = ({ fleets, filter }: Props) => {
   if (fleets.length === 0) {
     return (
       <EmptyState>
-        <p>No fleets yet</p>
+        <Alert bsStyle="info">
+          <strong>No fleets yet</strong>
+          <p>
+            Fleets let you manage groups of collectors with shared configuration.
+            Create your first fleet, then add sources to define what data its collectors should collect.
+            Once configured, <Link to={Routes.SYSTEM.COLLECTORS.DEPLOYMENT}>deploy collectors</Link> using
+            an enrollment token.
+          </p>
+        </Alert>
         <Button bsStyle="success" onClick={() => history.push(Routes.SYSTEM.COLLECTORS.FLEETS)}>
           Create Fleet
         </Button>
