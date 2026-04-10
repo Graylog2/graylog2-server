@@ -29,6 +29,7 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
+import useSearchResultTimeRangeErrorCheck from 'views/hooks/useSearchResultTimeRangeErrorCheck';
 
 import OriginalSearchBar from './SearchBar';
 
@@ -58,6 +59,7 @@ jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 jest.mock('views/logic/queries/useCurrentQuery');
 jest.mock('views/stores/useViewsDispatch');
 jest.mock('views/hooks/useAutoRefresh');
+jest.mock('views/hooks/useSearchResultTimeRangeErrorCheck');
 
 const query = MockQuery.builder()
   .timerange({ type: 'relative', from: 300 })
@@ -81,6 +83,7 @@ describe('SearchBar', () => {
       isInitialLoading: false,
     });
     asMock(useCurrentQuery).mockReturnValue(query);
+    asMock(useSearchResultTimeRangeErrorCheck).mockReturnValue(() => false);
   });
 
   it('should render the SearchBar', async () => {
@@ -173,5 +176,25 @@ describe('SearchBar', () => {
     render(<SearchBar />);
 
     await waitFor(() => expect(validateQuery).toHaveBeenCalled());
+  });
+
+  it('shows warning icon on timerange button when search result timerange check returns true', async () => {
+    asMock(useSearchResultTimeRangeErrorCheck).mockReturnValue(() => true);
+
+    render(<SearchBar />);
+
+    const timeRangePickerButton = await screen.findByLabelText('Open Time Range Selector');
+
+    await waitFor(() => expect(within(timeRangePickerButton).getByText('warning')).toBeInTheDocument());
+  });
+
+  it('does not show warning icon on timerange button when search result timerange check returns false', async () => {
+    asMock(useSearchResultTimeRangeErrorCheck).mockReturnValue(() => false);
+
+    render(<SearchBar />);
+
+    const timeRangePickerButton = await screen.findByLabelText('Open Time Range Selector');
+
+    expect(within(timeRangePickerButton).queryByText('warning')).not.toBeInTheDocument();
   });
 });
