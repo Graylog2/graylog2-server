@@ -188,6 +188,16 @@ describe('SearchBar', () => {
     await waitFor(() => expect(within(timeRangePickerButton).getByText('warning')).toBeInTheDocument());
   });
 
+  it('disables the search button when search result timerange check returns true', async () => {
+    asMock(useSearchResultTimeRangeErrorCheck).mockReturnValue(() => true);
+
+    render(<SearchBar />);
+
+    const searchButton = await screen.findByRole('button', { name: /perform search/i });
+
+    await waitFor(() => expect(searchButton.classList).toContain('disabled'));
+  });
+
   it('does not show warning icon on timerange button when search result timerange check returns false', async () => {
     asMock(useSearchResultTimeRangeErrorCheck).mockReturnValue(() => false);
 
@@ -196,5 +206,15 @@ describe('SearchBar', () => {
     const timeRangePickerButton = await screen.findByLabelText('Open Time Range Selector');
 
     expect(within(timeRangePickerButton).queryByText('warning')).not.toBeInTheDocument();
+  });
+
+  it('does not disable the search button when search result timerange check returns false', async () => {
+    asMock(useSearchResultTimeRangeErrorCheck).mockReturnValue(() => false);
+
+    render(<SearchBar />);
+
+    const searchButton = await screen.findByRole('button', { name: /perform search/i });
+
+    await waitFor(() => expect(searchButton.classList).not.toContain('disabled'));
   });
 });
