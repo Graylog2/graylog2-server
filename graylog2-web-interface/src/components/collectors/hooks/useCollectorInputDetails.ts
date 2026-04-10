@@ -21,7 +21,9 @@ import { SystemInputs } from '@graylog/server-api';
 
 import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted } from 'util/PermissionsMixin';
-import { defaultOnError } from 'util/conditional/onError';
+import { onError } from 'util/conditional/onError';
+import FetchError from 'logic/errors/FetchError';
+import UserNotification from 'util/UserNotification';
 
 import { useCollectorInputIds } from './useCollectorInputIds';
 
@@ -37,10 +39,16 @@ export const useCollectorInputDetails = () => {
   const inputQueries = useQueries({
     queries: readableInputIds.map((id) => ({
       queryKey: ['inputs', id],
-      queryFn: () => defaultOnError(
+      queryFn: () => onError(
         SystemInputs.get(id),
-        'Loading collector input details failed with status',
-        'Could not load collector input details.',
+        (error) => {
+          if (error instanceof FetchError && error.status === 404) return;
+
+          UserNotification.error(
+            `Loading collector input details failed with status: ${error}`,
+            'Could not load collector input details.',
+          );
+        },
       ),
       retry: false,
       refetchOnWindowFocus: true, // override global false — refresh input data when user returns to this tab
