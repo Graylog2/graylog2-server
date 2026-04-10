@@ -17,8 +17,6 @@
 package org.graylog.collectors.db;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.annotation.Nullable;
 import org.mongojack.Id;
 
@@ -42,8 +40,6 @@ public record TransactionMarker(
         @JsonProperty(FIELD_TARGET) String target,
         @JsonProperty(FIELD_TARGET_ID) Set<String> targetIds,
         @JsonProperty(FIELD_TYPE) MarkerType type,
-        @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = FIELD_TYPE, defaultImpl = Void.class)
-        @JsonSubTypes(@JsonSubTypes.Type(FleetReassignedPayload.class))
         @JsonProperty(FIELD_PAYLOAD) @Nullable MarkerPayload payload,
         @JsonProperty(FIELD_CREATED_AT) @Nullable Instant createdAt,
         @JsonProperty(FIELD_CREATED_BY) @Nullable String createdBy,

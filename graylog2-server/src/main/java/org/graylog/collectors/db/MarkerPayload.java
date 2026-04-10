@@ -16,5 +16,12 @@
  */
 package org.graylog.collectors.db;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+import static org.graylog.collectors.db.TransactionMarker.FIELD_TYPE;
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = FIELD_TYPE, defaultImpl = Void.class)
+@JsonSubTypes(@JsonSubTypes.Type(FleetReassignedPayload.class))
 public sealed interface MarkerPayload permits FleetReassignedPayload {
 }
