@@ -20,6 +20,7 @@ import { useQueries } from '@tanstack/react-query';
 import { SystemInputs } from '@graylog/server-api';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted } from 'util/PermissionsMixin';
+import { defaultOnError } from 'util/conditional/onError';
 
 import { useCollectorInputIds } from './useCollectorInputIds';
 
@@ -35,7 +36,11 @@ export const useCollectorInputDetails = () => {
   const inputQueries = useQueries({
     queries: readableInputIds.map((id) => ({
       queryKey: ['inputs', id],
-      queryFn: () => SystemInputs.get(id),
+      queryFn: () => defaultOnError(
+        SystemInputs.get(id),
+        'Loading collector input details failed with status',
+        'Could not load collector input details.',
+      ),
       retry: false,
       refetchOnWindowFocus: true, // override global false — refresh input data when user returns to this tab
     })),

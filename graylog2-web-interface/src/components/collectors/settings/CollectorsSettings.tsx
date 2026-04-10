@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo, useState, useEffect } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Formik, Form } from 'formik';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
@@ -28,6 +28,7 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted } from 'util/PermissionsMixin';
 
 import IngestEndpointStatus from './IngestEndpointStatus';
+import PortMismatchAlert from './PortMismatchAlert';
 
 import { useCollectorsConfig, useCollectorInputIds, useCollectorsMutations, useCollectorInputDetails } from '../hooks';
 import type { CollectorsConfigRequest } from '../types';
@@ -62,45 +63,6 @@ type FormValues = {
 };
 
 const THRESHOLD_UNITS = ['DAYS', 'HOURS', 'MINUTES'];
-const DEBOUNCE_MS = 500;
-
-type PortMismatchAlertProps = {
-  formPort: number;
-  collectorInputs: Array<{ attributes?: { port?: number } }>;
-  isLoading: boolean;
-};
-
-const PortMismatchAlert = ({ formPort, collectorInputs, isLoading }: PortMismatchAlertProps) => {
-  const [debouncedPort, setDebouncedPort] = useState(formPort);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedPort(formPort), DEBOUNCE_MS);
-    return () => clearTimeout(timer);
-  }, [formPort]);
-
-  if (isLoading || collectorInputs.length === 0) {
-    return null;
-  }
-
-  const mismatchedPorts = [
-    ...new Set(
-      collectorInputs
-        .map((input) => input.attributes?.port)
-        .filter((port): port is number => port !== undefined && port !== debouncedPort),
-    ),
-  ].sort((a, b) => a - b);
-
-  if (mismatchedPorts.length === 0) {
-    return null;
-  }
-
-  return (
-    <Alert bsStyle="info">
-      Collector ingest inputs exist on different {mismatchedPorts.length === 1 ? 'port' : 'ports'}: {mismatchedPorts.join(', ')}.
-      If the external port differs from an input port, ensure your network routes traffic correctly.
-    </Alert>
-  );
-};
 
 const CollectorsSettings = () => {
   const { data: config, isLoading: isLoadingConfig } = useCollectorsConfig();

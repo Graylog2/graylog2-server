@@ -53,7 +53,7 @@ const IngestEndpointStatus = ({ defaultPort, isInitialSetup }: Props) => {
     'input_types:create:org.graylog.collectors.input.CollectorIngestHttpInput',
   ]);
 
-  const hasInputs = loadedInputs.length > 0 || unreadableCount > 0;
+  const hasInputs = collectorInputIds.length > 0;
 
   const hasRunningInput = loadedInputs.some((input) => {
     const nodeStates = inputStates?.[input.id];
