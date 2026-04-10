@@ -225,7 +225,7 @@ class CollectorLogsDestinationServiceTest {
     private void stubIndexSetExists() {
         final var existingConfig = IndexSetConfig.builder()
                 .id("existing-index-set-id")
-                .title("Collector Logs")
+                .title("Collector System Logs")
                 .indexPrefix("gl-collector-system-logs")
                 .indexTemplateName("gl-collector-system-logs-template")
                 .indexTemplateType(CollectorLogsIndexTemplateProvider.COLLECTOR_LOGS_TEMPLATE_TYPE)

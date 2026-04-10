@@ -93,6 +93,11 @@ public class V20260303120000_CollectorDEVMigrations extends Migration {
             return;
         }
 
+        if ("Collector System Logs".equals(stream.getTitle())) {
+            LOG.debug("Stream already migrated, nothing to do");
+            return;
+        }
+
         LOG.info("Removing legacy Collector Logs stream and index-set");
 
         final var indexSet = stream.getIndexSet();
