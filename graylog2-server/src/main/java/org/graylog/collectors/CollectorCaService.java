@@ -177,7 +177,7 @@ public class CollectorCaService {
 
                 if (needsRenewal(curServerCert, now)) {
                     LOG.info("Renewing OTLP server certificate <{}> (expires {})", curServerCert.fingerprint(), curServerCert.notAfter());
-                    final var newServerCert = certificateService.save(createServerCert(builder, signingCert));
+                    final var newServerCert = certificateService.insert(createServerCert(builder, signingCert));
                     collectorsConfigService.save(ensureConfig().toBuilder()
                             .otlpServerCertId(newServerCert.id())
                             .build());

@@ -34,7 +34,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -83,41 +82,21 @@ class CertificateServiceTest {
     }
 
     @Test
-    void saveInsertsCertificateEntryWithNullId() throws Exception {
+    void insertInsertsCertificateEntryWithNullId() throws Exception {
         final CertificateEntry entry = createCertificateEntry();
 
-        final CertificateEntry saved = certificateService.save(entry);
+        final CertificateEntry saved = certificateService.insert(entry);
 
         assertThat(saved.id()).isNotNull();
         assertThat(saved.fingerprint()).isEqualTo(entry.fingerprint());
     }
 
     @Test
-    void saveReplacesCertificateEntryWithExistingId() throws Exception {
+    void insertCertificateWithExistingIdFails() throws Exception {
         final CertificateEntry original = createCertificateEntry();
-        final CertificateEntry saved = certificateService.save(original);
-        final String savedId = saved.id();
+        final CertificateEntry saved = certificateService.insert(original);
 
-        final CertificateEntry updated = new CertificateEntry(
-                savedId,
-                "SHA256:updated",
-                "ski",
-                Optional.of("aki"),
-                createEncryptedValue(),
-                "-----BEGIN CERTIFICATE-----\nUPDATED\n-----END CERTIFICATE-----",
-                List.of(),
-                "subject-dn",
-                "issuer-dn",
-                Instant.parse("2024-01-01T00:00:00Z"),
-                Instant.parse("2025-01-01T00:00:00Z"),
-                Instant.parse("2024-01-01T00:00:00Z")
-        );
-
-        final CertificateEntry result = certificateService.save(updated);
-
-        assertThat(result.id()).isEqualTo(savedId);
-        assertThat(result.fingerprint()).isEqualTo("SHA256:updated");
-        assertThat(result.certificate()).isEqualTo("-----BEGIN CERTIFICATE-----\nUPDATED\n-----END CERTIFICATE-----");
+        assertThatThrownBy(() -> certificateService.insert(saved)).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -129,7 +108,7 @@ class CertificateServiceTest {
     @Test
     void findByIdReturnsSavedCertificateEntry() throws Exception {
         final CertificateEntry entry = createCertificateEntry();
-        final CertificateEntry saved = certificateService.save(entry);
+        final CertificateEntry saved = certificateService.insert(entry);
 
         final Optional<CertificateEntry> result = certificateService.findById(saved.id());
 
@@ -146,7 +125,7 @@ class CertificateServiceTest {
 
     @Test
     void findByFingerprintReturnsSavedCertificateEntry() throws Exception {
-        final CertificateEntry entry = certificateService.save(createCertificateEntry());
+        final CertificateEntry entry = certificateService.insert(createCertificateEntry());
 
         final Optional<CertificateEntry> result = certificateService.findByFingerprint(entry.fingerprint());
 
@@ -156,20 +135,20 @@ class CertificateServiceTest {
     @Test
     void fingerprintIsUnique() throws Exception {
         final CertificateEntry entry = createCertificateEntry();
-        certificateService.save(entry);
+        certificateService.insert(entry);
 
-        assertThatThrownBy(() -> certificateService.save(entry.withId(null)))
+        assertThatThrownBy(() -> certificateService.insert(entry.withId(null)))
                 .isInstanceOf(MongoWriteException.class);
     }
 
     @Test
     void saveExtractsDnForIntermediateCa() throws Exception {
-        final CertificateEntry rootCa = certificateService.save(
+        final CertificateEntry rootCa = certificateService.insert(
                 certificateService.builder().createRootCa("Root", Algorithm.ED25519, Duration.ofDays(365)));
 
         final CertificateEntry intermediate = certificateService.builder()
                 .createIntermediateCa("Intermediate", rootCa, Duration.ofDays(180));
-        final CertificateEntry saved = certificateService.save(intermediate);
+        final CertificateEntry saved = certificateService.insert(intermediate);
 
         assertThat(saved.subjectDn()).contains("Intermediate");
         assertThat(saved.issuerDn()).contains("Root");
@@ -182,7 +161,7 @@ class CertificateServiceTest {
 
     @Test
     void findBySubjectKeyIdentifierReturnsSavedCertificateEntry() throws Exception {
-        final CertificateEntry saved = certificateService.save(
+        final CertificateEntry saved = certificateService.insert(
                 certificateService.builder().createRootCa("SKI Test CA", Algorithm.ED25519, Duration.ofDays(365)));
 
         final var result = certificateService.findBySubjectKeyIdentifier(saved.subjectKeyIdentifier());
@@ -231,7 +210,7 @@ class CertificateServiceTest {
     @Test
     void integrationTestWithBuilder() throws Exception {
         // Test the full workflow: create cert with builder, save, retrieve
-        final CertificateEntry rootCa = certificateService.save(
+        final CertificateEntry rootCa = certificateService.insert(
                 certificateService.builder().createRootCa("Test CA", Algorithm.ED25519, Duration.ofDays(365))
         );
 

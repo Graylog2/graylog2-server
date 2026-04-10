@@ -19,10 +19,8 @@ package org.graylog.security.pki;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
-import com.mongodb.client.model.ReplaceOptions;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.bson.types.ObjectId;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
@@ -103,25 +101,18 @@ public class CertificateService {
     }
 
     /**
-     * Saves a certificate entry to the database.
-     * If the entry has a null ID, it will be inserted as a new document.
-     * If the entry has an existing ID, it will replace the existing document.
+     * Inserts a new certificate entry into the database. If the given entity has a non-null ID, the method throws
+     * and exception.
      *
      * @param entry the certificate entry to save
      * @return the saved certificate entry with its ID
+     * @throws IllegalArgumentException when the given entry has a non-null ID
      */
-    public CertificateEntry save(CertificateEntry entry) {
-        // TODO: Switch CertificateEntry to BuildableMongoEntity and use MongoUtils#save
+    public CertificateEntry insert(CertificateEntry entry) {
         if (entry.id() == null) {
-            final String insertedId = insertedIdAsString(collection.insertOne(entry));
-            return entry.withId(insertedId);
+            return entry.withId(insertedIdAsString(collection.insertOne(entry)));
         } else {
-            collection.replaceOne(
-                    Filters.eq("_id", new ObjectId(entry.id())),
-                    entry,
-                    new ReplaceOptions().upsert(false)
-            );
-            return entry;
+            throw new IllegalArgumentException("new certificate entry should not have an ID");
         }
     }
 
