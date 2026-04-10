@@ -88,7 +88,7 @@ const PortMismatchAlert = ({ formPort, collectorInputs, isLoading }: PortMismatc
         .map((input) => input.attributes?.port)
         .filter((port): port is number => port !== undefined && port !== debouncedPort),
     ),
-  ];
+  ].sort((a, b) => a - b);
 
   if (mismatchedPorts.length === 0) {
     return null;

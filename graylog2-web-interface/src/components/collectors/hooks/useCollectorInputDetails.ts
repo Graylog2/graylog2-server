@@ -37,6 +37,7 @@ export const useCollectorInputDetails = () => {
       queryKey: ['inputs', id],
       queryFn: () => SystemInputs.get(id),
       retry: false,
+      refetchOnWindowFocus: true, // override global false — refresh input data when user returns to this tab
     })),
   });
 

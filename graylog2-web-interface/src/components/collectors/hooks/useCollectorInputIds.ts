@@ -33,6 +33,7 @@ export const useCollectorInputIds = (): { data: string[] | undefined; isLoading:
         'Loading collector input IDs failed with status',
         'Could not load collector input IDs.',
       ),
+    refetchOnWindowFocus: true, // override global false — refresh input data when user returns to this tab
   });
 
   return { data: data?.collector_input_ids, isLoading };
