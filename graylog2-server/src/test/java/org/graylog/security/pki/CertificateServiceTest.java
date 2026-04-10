@@ -193,6 +193,42 @@ class CertificateServiceTest {
     }
 
     @Test
+    void insertReturnsInsertedEntries() throws Exception {
+        final List<CertificateEntry> entries = List.of(
+                createCertificateEntry(null, "1"),
+                createCertificateEntry(null, "2"),
+                createCertificateEntry(null, "3")
+        );
+
+        final var insertedEntries = certificateService.insert(entries);
+
+        assertThat(insertedEntries).hasSize(3);
+
+        assertThat(certificateService.findAll()).satisfiesExactly(
+                entry1 -> assertThat(entry1.subjectDn()).isEqualTo("O=Graylog,CN=1"),
+                entry2 -> assertThat(entry2.subjectDn()).isEqualTo("O=Graylog,CN=2"),
+                entry3 -> assertThat(entry3.subjectDn()).isEqualTo("O=Graylog,CN=3")
+        ).containsAll(insertedEntries);
+    }
+
+    @Test
+    void insertRejectsEntriesWithId() throws Exception {
+        final List<CertificateEntry> entries = List.of(
+                createCertificateEntry(null, "1"),
+                createCertificateEntry("64a7f8b9c0d1e2f3a4b5c6d7", "2")
+        );
+
+        assertThatThrownBy(() -> certificateService.insert(entries)).isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(certificateService.findAll()).isEmpty();
+    }
+
+    @Test
+    void insertEmptyCollectionReturnsZero() {
+        assertThat(certificateService.insert(List.of())).isEmpty();
+    }
+
+    @Test
     void integrationTestWithBuilder() throws Exception {
         // Test the full workflow: create cert with builder, save, retrieve
         final CertificateEntry rootCa = certificateService.save(

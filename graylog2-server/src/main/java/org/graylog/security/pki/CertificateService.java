@@ -33,10 +33,12 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Clock;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
+import static org.graylog2.database.utils.MongoUtils.insertedIds;
 
 /**
  * Service for managing certificate entries in MongoDB.
@@ -121,6 +123,28 @@ public class CertificateService {
             );
             return entry;
         }
+    }
+
+    /**
+     * Insert the given new certificate entries into the database. If any of the given entries has a non-null ID, the
+     * method throws an exception.
+     *
+     * @param entries the new entries to insert
+     * @return the inserted entries
+     * @throws IllegalArgumentException when any of the given entries has a non-null ID
+     */
+    public List<CertificateEntry> insert(Collection<CertificateEntry> entries) {
+        if (entries.isEmpty()) {
+            return List.of();
+        }
+        if (entries.stream().anyMatch(entry -> entry.id() != null)) {
+            throw new IllegalArgumentException("no entry should have an ID");
+        }
+
+        final var ids = insertedIds(collection.insertMany(List.copyOf(entries)));
+
+        // Just fetching the new entries is less error-prone than mapping the inserted IDs to the given entries.
+        return collection.find(Filters.in("_id", ids)).into(new ArrayList<>(ids.size()));
     }
 
     /**
