@@ -29,6 +29,20 @@ import { mockCollectorsMutations } from '../testing/mockMutations';
 
 jest.mock('../hooks');
 jest.mock('hooks/useInputsStates');
+
+const mockInput = (port: number) => ({
+  id: 'input-1',
+  creator_user_id: 'admin',
+  node: 'node-1',
+  name: 'CollectorIngestHttpInput',
+  created_at: '2026-01-01T00:00:00Z',
+  global: true,
+  attributes: { port, bind_address: '0.0.0.0' },
+  title: 'Collector Ingest (HTTP)',
+  type: 'org.graylog.collectors.input.CollectorIngestHttpInput',
+  content_pack: '',
+  static_fields: {},
+});
 jest.mock('hooks/useInputMutations', () => () => ({
   createInput: jest.fn(),
   updateInput: jest.fn(),
@@ -103,8 +117,8 @@ describe('CollectorsSettings', () => {
 
     render(<CollectorsSettings />);
 
-    const hostnameInput = await screen.findByLabelText('Hostname');
-    const portInput = screen.getByLabelText('Port');
+    const hostnameInput = await screen.findByLabelText('External hostname');
+    const portInput = screen.getByLabelText('External port');
 
     await user.clear(hostnameInput);
     await user.type(hostnameInput, 'ingest.example.com');
@@ -129,7 +143,7 @@ describe('CollectorsSettings', () => {
   it('does not show enabled checkbox', async () => {
     render(<CollectorsSettings />);
 
-    await screen.findByLabelText('Hostname');
+    await screen.findByLabelText('External hostname');
 
     expect(screen.queryByLabelText('Enabled')).not.toBeInTheDocument();
   });
@@ -138,7 +152,7 @@ describe('CollectorsSettings', () => {
     asMock(useCollectorInputDetails).mockReturnValue({
       collectorInputIds: ['input-1'],
       readableInputIds: ['input-1'],
-      loadedInputs: [{ id: 'input-1', title: 'Test', attributes: { port: 14402, bind_address: '0.0.0.0' } }],
+      loadedInputs: [mockInput(14402)],
       unreadableCount: 0,
       isLoading: false,
     });
@@ -146,21 +160,21 @@ describe('CollectorsSettings', () => {
     render(<CollectorsSettings />);
 
     await screen.findByText(/different port/i);
-    expect(screen.getByText(/14402/)).toBeInTheDocument();
+    expect(screen.getAllByText(/14402/).length).toBeGreaterThanOrEqual(1);
   });
 
   it('does not show port mismatch info when ports match', async () => {
     asMock(useCollectorInputDetails).mockReturnValue({
       collectorInputIds: ['input-1'],
       readableInputIds: ['input-1'],
-      loadedInputs: [{ id: 'input-1', title: 'Test', attributes: { port: 14401, bind_address: '0.0.0.0' } }],
+      loadedInputs: [mockInput(14401)],
       unreadableCount: 0,
       isLoading: false,
     });
 
     render(<CollectorsSettings />);
 
-    await screen.findByLabelText('Hostname');
+    await screen.findByLabelText('External hostname');
     expect(screen.queryByText(/different port/i)).not.toBeInTheDocument();
   });
 
@@ -175,7 +189,7 @@ describe('CollectorsSettings', () => {
 
     render(<CollectorsSettings />);
 
-    await screen.findByLabelText('Hostname');
+    await screen.findByLabelText('External hostname');
     expect(screen.queryByText(/different port/i)).not.toBeInTheDocument();
   });
 });
