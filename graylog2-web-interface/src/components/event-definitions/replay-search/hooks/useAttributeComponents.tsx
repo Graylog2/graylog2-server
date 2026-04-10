@@ -27,6 +27,8 @@ import useReplaySearchContext from 'components/event-definitions/replay-search/h
 import useFeature from 'hooks/useFeature';
 import SidebarNavigationLink from 'components/layout/RightSidebar/SidebarNavigationLink';
 import SidebarEventDefinitionDetails from 'components/event-definitions/SidebarEventDefinitionDetails';
+import Routes from 'routing/Routes';
+import Link from 'components/common/Link';
 
 import useAlertAndEventDefinitionData from './useAlertAndEventDefinitionData';
 
@@ -38,6 +40,19 @@ const AlertTimestamp = styled(Timestamp)(
     color: ${theme.colors.variant.darker.warning};
   `,
 );
+
+const EventDefinitionTitle = () => {
+  const { alertId, definitionId } = useReplaySearchContext();
+  const { eventDefinition } = useAlertAndEventDefinitionData(alertId, definitionId);
+
+  return alertId ? (
+    <SidebarNavigationLink content={SidebarEventDefinitionDetails(definitionId)}>
+      {eventDefinition.title}
+    </SidebarNavigationLink>
+  ) : (
+    <Link to={Routes.ALERTS.DEFINITIONS.show(definitionId)}>{eventDefinition.title}</Link>
+  );
+};
 
 const useAttributeComponents = () => {
   const { alertId, definitionId, type } = useReplaySearchContext();
@@ -77,11 +92,7 @@ const useAttributeComponents = () => {
       },
       {
         title: 'Event definition',
-        content: (
-          <SidebarNavigationLink content={SidebarEventDefinitionDetails(eventDefinition.id)}>
-            {eventDefinition.title}
-          </SidebarNavigationLink>
-        ),
+        content: <EventDefinitionTitle />,
         show: !isEventDefinition,
       },
       {
