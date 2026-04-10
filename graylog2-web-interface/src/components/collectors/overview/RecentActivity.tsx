@@ -20,10 +20,10 @@ import styled, { css } from 'styled-components';
 import { Icon, Link, RelativeTime, Spinner, NoEntitiesExist } from 'components/common';
 import type { IconName } from 'components/common/Icon/types';
 import Routes from 'routing/Routes';
+import { naturalSortIgnoreCase } from 'util/SortUtils';
 
 import { useRecentActivity } from '../hooks';
 import type { ActivityEntry, TargetInfo } from '../types';
-import {naturalSortIgnoreCase} from 'util/SortUtils';
 
 const SectionTitle = styled.h3(
   ({ theme }) => css`
@@ -95,11 +95,12 @@ const targetLink = (target: TargetInfo) => {
 
 const additionalTargetText = (targets: TargetInfo[]) => {
   if (targets.length <= 1) {
-    return <></>;
+    return null;
   }
   if (targets.length === 2) {
     return <span> and 1 other {targets[0].type}</span>;
   }
+
   return <span> and {targets.length - 1} other {targets[0].type}s</span>;
 }
 
