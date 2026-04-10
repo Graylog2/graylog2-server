@@ -31,12 +31,12 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Clock;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
-import static org.graylog2.database.utils.MongoUtils.insertedIds;
+import static org.graylog2.database.utils.MongoUtils.insertedIdsAsString;
 
 /**
  * Service for managing certificate entries in MongoDB.
@@ -91,7 +91,7 @@ public class CertificateService {
      * <pre>{@code
      * CertificateEntry rootCa = certificateService.builder()
      *     .createRootCa("My Root CA", Algorithm.ED25519, Duration.ofDays(3650));
-     * rootCa = certificateService.save(rootCa);
+     * rootCa = certificateService.insert(rootCa);
      * }</pre>
      *
      * @return a new CertificateBuilder instance
@@ -102,7 +102,7 @@ public class CertificateService {
 
     /**
      * Inserts a new certificate entry into the database. If the given entity has a non-null ID, the method throws
-     * and exception.
+     * an exception.
      *
      * @param entry the certificate entry to save
      * @return the saved certificate entry with its ID
@@ -124,7 +124,7 @@ public class CertificateService {
      * @return the inserted entries
      * @throws IllegalArgumentException when any of the given entries has a non-null ID
      */
-    public List<CertificateEntry> insert(Collection<CertificateEntry> entries) {
+    public List<CertificateEntry> insert(List<CertificateEntry> entries) {
         if (entries.isEmpty()) {
             return List.of();
         }
@@ -132,10 +132,12 @@ public class CertificateService {
             throw new IllegalArgumentException("no entry should have an ID");
         }
 
-        final var ids = insertedIds(collection.insertMany(List.copyOf(entries)));
+        final var ids = insertedIdsAsString(collection.insertMany(List.copyOf(entries)));
 
-        // Just fetching the new entries is less error-prone than mapping the inserted IDs to the given entries.
-        return collection.find(Filters.in("_id", ids)).into(new ArrayList<>(ids.size()));
+        // Map the returned IDs to the given entries in order.
+        return IntStream.range(0, entries.size())
+                .mapToObj(idx -> entries.get(idx).withId(ids.get(idx)))
+                .toList();
     }
 
     /**

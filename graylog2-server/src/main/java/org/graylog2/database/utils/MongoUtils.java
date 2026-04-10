@@ -94,14 +94,13 @@ public class MongoUtils<T extends MongoEntity> {
      * @return a list of the inserted object IDs. Fails if the IDs are not stored as {@link ObjectId}.
      */
     public static List<ObjectId> insertedIds(@Nonnull InsertManyResult result) {
-        final var ids = result.getInsertedIds().values();
-        if (ids.stream().anyMatch(Objects::isNull)) {
+        final var entries = result.getInsertedIds().entrySet();
+        if (entries.stream().map(Map.Entry::getValue).anyMatch(Objects::isNull)) {
             // This should only happen when inserting RawBsonDocuments
             throw new IllegalArgumentException("One of the inserted IDs is null. Make sure that you are inserting documents of " +
                     "type <? extends MongoEntity>.");
         }
-        return result.getInsertedIds().entrySet()
-                .stream()
+        return entries.stream()
                 .sorted(Comparator.comparingInt(Map.Entry::getKey))
                 .map(Map.Entry::getValue)
                 .map(value -> value.asObjectId().getValue())

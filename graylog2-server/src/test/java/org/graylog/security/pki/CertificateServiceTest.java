@@ -173,21 +173,22 @@ class CertificateServiceTest {
 
     @Test
     void insertReturnsInsertedEntries() throws Exception {
-        final List<CertificateEntry> entries = List.of(
-                createCertificateEntry(null, "1"),
-                createCertificateEntry(null, "2"),
-                createCertificateEntry(null, "3")
-        );
+        final var newEntry1 = createCertificateEntry(null, "1");
+        final var newEntry2 = createCertificateEntry(null, "2");
+        final var newEntry3 = createCertificateEntry(null, "3");
+        final List<CertificateEntry> entries = List.of(newEntry1, newEntry2, newEntry3);
 
         final var insertedEntries = certificateService.insert(entries);
 
         assertThat(insertedEntries).hasSize(3);
 
-        assertThat(certificateService.findAll()).satisfiesExactly(
+        assertThat(insertedEntries).satisfiesExactly(
                 entry1 -> assertThat(entry1.subjectDn()).isEqualTo("O=Graylog,CN=1"),
                 entry2 -> assertThat(entry2.subjectDn()).isEqualTo("O=Graylog,CN=2"),
                 entry3 -> assertThat(entry3.subjectDn()).isEqualTo("O=Graylog,CN=3")
-        ).containsAll(insertedEntries);
+        );
+
+        assertThat(certificateService.findAll()).containsAll(insertedEntries);
     }
 
     @Test

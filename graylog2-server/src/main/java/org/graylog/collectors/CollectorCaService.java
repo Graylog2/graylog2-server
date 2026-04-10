@@ -235,7 +235,7 @@ public class CollectorCaService {
         return entries.stream()
                 .filter(entry -> needle.fingerprint().equals(entry.fingerprint()))
                 .findFirst()
-                .orElseThrow();
+                .orElseThrow(() -> new IllegalArgumentException("No entry found with fingerprint: " + needle.fingerprint()));
     }
 
     private CertificateEntry createRootCert(CertificateBuilder builder) throws Exception {
