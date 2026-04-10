@@ -14,29 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo } from 'react';
-
 import useEventDefinition from 'hooks/useEventDefinition';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 
 const useEventsAdditionalData = ({ eventData, definitionId = null }: { eventData: Event; definitionId?: string }) => {
-  const { data, isLoading: isLoadingEventDefinition } = useEventDefinition(
-    definitionId ?? eventData?.event_definition_id,
-  );
+  const eventDefinitionId = definitionId ?? eventData?.event_definition_id;
+  const { data, isLoading: isLoadingEventDefinition } = useEventDefinition(eventDefinitionId);
 
-  const meta = useMemo<EventsAdditionalData>(
-    () =>
-      eventData
-        ? {
-            context: {
-              event_definitions: {
-                [eventData.event_definition_id]: data.eventDefinition,
-              },
-            },
-          }
-        : null,
-    [eventData, data.eventDefinition],
-  );
+  const meta: EventsAdditionalData = isLoadingEventDefinition
+    ? {
+        context: {
+          event_definitions: {
+            [eventDefinitionId]: data.eventDefinition,
+          },
+        },
+      }
+    : null;
 
   const eventDefinitionEventProcedureId: string = data?.eventDefinition?.event_procedure ?? '';
 
