@@ -183,14 +183,14 @@ const CollectorsSettings = () => {
                 <FormikInput
                   id="http-hostname"
                   type="text"
-                  label="Hostname"
+                  label="External hostname"
                   name="http_hostname"
                   placeholder="e.g. otlp.example.com"
                 />
                 <FormikInput
                   id="http-port"
                   type="number"
-                  label="Port"
+                  label="External port"
                   name="http_port"
                 />
 
