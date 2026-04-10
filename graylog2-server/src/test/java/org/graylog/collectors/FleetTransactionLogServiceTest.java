@@ -16,6 +16,7 @@
  */
 package org.graylog.collectors;
 
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.graylog.collectors.db.FleetReassignedPayload;
@@ -44,7 +45,7 @@ class FleetTransactionLogServiceTest {
     private static final NodeId NODE_ID = new SimpleNodeId("test-node-1");
 
     private FleetTransactionLogService service;
-    private com.mongodb.client.MongoCollection<Document> rawCollection;
+    private MongoCollection<Document> rawCollection;
 
     @BeforeEach
     void setUp(MongoCollections mongoCollections) {
