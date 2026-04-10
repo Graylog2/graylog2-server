@@ -133,4 +133,49 @@ describe('CollectorsSettings', () => {
 
     expect(screen.queryByLabelText('Enabled')).not.toBeInTheDocument();
   });
+
+  it('shows port mismatch info when input port differs from config port', async () => {
+    asMock(useCollectorInputDetails).mockReturnValue({
+      collectorInputIds: ['input-1'],
+      readableInputIds: ['input-1'],
+      loadedInputs: [{ id: 'input-1', title: 'Test', attributes: { port: 14402, bind_address: '0.0.0.0' } }],
+      unreadableCount: 0,
+      isLoading: false,
+    });
+
+    render(<CollectorsSettings />);
+
+    await screen.findByText(/different port/i);
+    expect(screen.getByText(/14402/)).toBeInTheDocument();
+  });
+
+  it('does not show port mismatch info when ports match', async () => {
+    asMock(useCollectorInputDetails).mockReturnValue({
+      collectorInputIds: ['input-1'],
+      readableInputIds: ['input-1'],
+      loadedInputs: [{ id: 'input-1', title: 'Test', attributes: { port: 14401, bind_address: '0.0.0.0' } }],
+      unreadableCount: 0,
+      isLoading: false,
+    });
+
+    render(<CollectorsSettings />);
+
+    await screen.findByLabelText('Hostname');
+    expect(screen.queryByText(/different port/i)).not.toBeInTheDocument();
+  });
+
+  it('does not show port mismatch info while loading', async () => {
+    asMock(useCollectorInputDetails).mockReturnValue({
+      collectorInputIds: [],
+      readableInputIds: [],
+      loadedInputs: [],
+      unreadableCount: 0,
+      isLoading: true,
+    });
+
+    render(<CollectorsSettings />);
+
+    await screen.findByLabelText('Hostname');
+    expect(screen.queryByText(/different port/i)).not.toBeInTheDocument();
+  });
 });
