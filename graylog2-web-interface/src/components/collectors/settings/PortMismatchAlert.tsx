@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 import { useState, useEffect } from 'react';
 
 import { Alert } from 'components/bootstrap';
@@ -31,6 +32,7 @@ const PortMismatchAlert = ({ formPort, collectorInputs, isLoading }: Props) => {
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedPort(formPort), DEBOUNCE_MS);
+
     return () => clearTimeout(timer);
   }, [formPort]);
 

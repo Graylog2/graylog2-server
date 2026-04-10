@@ -18,6 +18,7 @@ import { useMemo } from 'react';
 import { useQueries } from '@tanstack/react-query';
 
 import { SystemInputs } from '@graylog/server-api';
+
 import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted } from 'util/PermissionsMixin';
 import { defaultOnError } from 'util/conditional/onError';
