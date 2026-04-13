@@ -25,6 +25,7 @@ import org.mongojack.ObjectId;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * MongoDB entity for storing certificates with their private keys and metadata.
@@ -40,10 +41,11 @@ public record CertificateEntry(
         @JsonProperty(FIELD_FINGERPRINT)
         String fingerprint,
 
-        // TODO: subjectKeyIdentifier MUST not be Nullable!
-        @Nullable
         @JsonProperty(FIELD_SUBJECT_KEY_IDENTIFIER)
         String subjectKeyIdentifier,
+
+        @JsonProperty(FIELD_AUTHORITY_KEY_IDENTIFIER)
+        Optional<String> authorityKeyIdentifier, // CA certs don't have an Authority Key Identifier
 
         @JsonProperty(FIELD_PRIVATE_KEY)
         EncryptedValue privateKey,
@@ -54,11 +56,9 @@ public record CertificateEntry(
         @JsonProperty(FIELD_ISSUER_CHAIN)
         List<String> issuerChain,
 
-        @Nullable
         @JsonProperty(FIELD_SUBJECT_DN)
         String subjectDn,
 
-        @Nullable
         @JsonProperty(FIELD_ISSUER_DN)
         String issuerDn,
 
@@ -75,6 +75,7 @@ public record CertificateEntry(
     public static final String FIELD_ID = "id";
     public static final String FIELD_FINGERPRINT = "fingerprint";
     public static final String FIELD_SUBJECT_KEY_IDENTIFIER = "subject_key_identifier";
+    public static final String FIELD_AUTHORITY_KEY_IDENTIFIER = "authority_key_identifier";
     public static final String FIELD_PRIVATE_KEY = "private_key";
     public static final String FIELD_CERTIFICATE = "certificate";
     public static final String FIELD_ISSUER_CHAIN = "issuer_chain";
@@ -95,6 +96,7 @@ public record CertificateEntry(
                 newId,
                 fingerprint,
                 subjectKeyIdentifier,
+                authorityKeyIdentifier,
                 privateKey,
                 certificate,
                 issuerChain,

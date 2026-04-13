@@ -22,7 +22,6 @@ import jakarta.annotation.Nullable;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 
 public record RecentActivityResponse(@JsonProperty("activities") List<ActivityEntry> activities) {
 
@@ -32,7 +31,7 @@ public record RecentActivityResponse(@JsonProperty("activities") List<ActivityEn
             @JsonProperty("type") String type,
             @JsonProperty("actor") @Nullable ActorInfo actor,
             @JsonProperty("targets") List<TargetInfo> targets,
-            @JsonProperty("details") @JsonInclude(JsonInclude.Include.ALWAYS) Map<String, String> details) {
+            @JsonProperty("details") @JsonInclude(JsonInclude.Include.ALWAYS) @Nullable ActivityDetails details) {
     }
 
     public record ActorInfo(
@@ -44,5 +43,13 @@ public record RecentActivityResponse(@JsonProperty("activities") List<ActivityEn
             @JsonProperty("id") @Nullable String id,
             @JsonProperty("name") String name,
             @JsonProperty("type") String type) {
+    }
+
+    public sealed interface ActivityDetails permits FleetReassignedDetails {
+    }
+
+    public record FleetReassignedDetails(
+            @JsonProperty("destination_fleet") TargetInfo destinationFleet
+    ) implements ActivityDetails {
     }
 }

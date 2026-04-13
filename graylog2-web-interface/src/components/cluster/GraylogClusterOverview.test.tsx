@@ -47,6 +47,22 @@ const trafficResponse = {
     '2022-09-27T08:00:00.000Z': 2145529,
     '2022-09-27T09:00:00.000Z': 1053461,
   },
+  input_indexed: {
+    '2022-09-16T13:00:00.000Z': 0,
+    '2022-09-20T18:00:00.000Z': 0,
+    '2022-09-20T19:00:00.000Z': 0,
+    '2022-09-21T08:00:00.000Z': 20218553,
+    '2022-09-21T09:00:00.000Z': 7867447,
+    '2022-09-26T10:00:00.000Z': 7942929,
+    '2022-09-26T11:00:00.000Z': 27529017,
+    '2022-09-26T12:00:00.000Z': 29165527,
+    '2022-09-26T13:00:00.000Z': 29188019,
+    '2022-09-26T14:00:00.000Z': 29161963,
+    '2022-09-26T15:00:00.000Z': 29262878,
+    '2022-09-26T16:00:00.000Z': 9254935,
+    '2022-09-27T08:00:00.000Z': 2145529,
+    '2022-09-27T09:00:00.000Z': 1053461,
+  },
   output: {
     '2022-09-16T13:00:00.000Z': 0,
     '2022-09-20T18:00:00.000Z': 0,
@@ -107,7 +123,7 @@ describe('GraylogClusterOverview', () => {
   it('renders GraylogClusterOverview', async () => {
     render(<GraylogClusterOverview />);
 
-    expect(screen.getByText(/Outgoing traffic/)).toBeInTheDocument();
+    expect(screen.getByText(/Incoming traffic/)).toBeInTheDocument();
 
     await waitFor(() => expect(SystemClusterTraffic.get).toHaveBeenCalledWith(30, false));
 
