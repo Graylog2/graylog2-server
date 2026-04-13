@@ -16,34 +16,43 @@
  */
 package org.graylog.collectors.db;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nullable;
-import org.bson.Document;
+import org.mongojack.Id;
 
 import java.time.Instant;
 import java.util.Set;
 
 /**
- * A raw marker entry from the fleet transaction log.
+ * A marker entry from the fleet transaction log.
  *
- *  This is persisted in a non-entity collection, thus it has no Jackson mapping.
- *
- * @param seq       sequence number (the _id in MongoDB)
- * @param target    "fleet" or "collector"
- * @param targetIds fleet IDs or collector instance UIDs (always a set, even for single targets)
- * @param type      parsed marker type
- * @param rawType   original string from MongoDB (for logging unknown types)
- * @param payload   optional type-specific data (e.g., new_fleet_id for FLEET_REASSIGNED)
- * @param createdAt      timestamp when the marker was created
- * @param createdByUser  username of the actor, or null for system-initiated actions
+ * @param seq           sequence number (the _id in MongoDB)
+ * @param target        "fleet" or "collector"
+ * @param targetIds     fleet IDs or collector instance UIDs (always a set, even for single targets)
+ * @param type          parsed marker type
+ * @param payload       optional type-specific data (e.g., new_fleet_id for FLEET_REASSIGNED)
+ * @param createdAt     timestamp when the marker was created
+ * @param createdBy     node ID of the server that created the marker
+ * @param createdByUser username of the actor, or null for system-initiated actions
  */
-public record TransactionMarker(long seq,
-                                String target,
-                                Set<String> targetIds,
-                                MarkerType type,
-                                String rawType,
-                                @Nullable Document payload,
-                                @Nullable Instant createdAt,
-                                @Nullable String createdByUser) {
+public record TransactionMarker(
+        @Id @JsonProperty(FIELD_ID) long seq,
+        @JsonProperty(FIELD_TARGET) String target,
+        @JsonProperty(FIELD_TARGET_ID) Set<String> targetIds,
+        @JsonProperty(FIELD_TYPE) MarkerType type,
+        @JsonProperty(FIELD_PAYLOAD) @Nullable MarkerPayload payload,
+        @JsonProperty(FIELD_CREATED_AT) @Nullable Instant createdAt,
+        @JsonProperty(FIELD_CREATED_BY) @Nullable String createdBy,
+        @JsonProperty(FIELD_CREATED_BY_USER) @Nullable String createdByUser) {
+
+    public static final String FIELD_ID = "_id";
+    public static final String FIELD_TARGET = "target";
+    public static final String FIELD_TARGET_ID = "target_id";
+    public static final String FIELD_TYPE = "type";
+    public static final String FIELD_PAYLOAD = "payload";
+    public static final String FIELD_CREATED_AT = "created_at";
+    public static final String FIELD_CREATED_BY = "created_by";
+    public static final String FIELD_CREATED_BY_USER = "created_by_user";
 
     public static final String TARGET_FLEET = "fleet";
     public static final String TARGET_COLLECTOR = "collector";

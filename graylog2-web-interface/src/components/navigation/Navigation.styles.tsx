@@ -17,7 +17,7 @@
 import styled, { css } from 'styled-components';
 
 import { Navbar } from 'components/bootstrap';
-import { NAV_ITEM_HEIGHT } from 'theme/constants';
+import { NAV_ITEM_HEIGHT, NAV_ITEM_LINE_HEIGHT } from 'theme/constants';
 import { hoverIndicatorStyles, activeIndicatorStyles } from 'components/common/NavItemStateIndicator';
 
 const StyledNavbar = styled(Navbar)(
@@ -32,6 +32,7 @@ const StyledNavbar = styled(Navbar)(
         height: ${NAV_ITEM_HEIGHT};
         display: inline-flex;
         align-items: center;
+        line-height: ${NAV_ITEM_LINE_HEIGHT};
       }
 
       .navbar-nav > li,
