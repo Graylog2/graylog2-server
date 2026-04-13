@@ -43,6 +43,8 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCSException;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.graylog2.security.encryption.EncryptedValueService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -50,6 +52,7 @@ import java.io.StringWriter;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
+import java.security.SecureRandom;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Security;
@@ -61,6 +64,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -75,10 +79,13 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  *       for OpAMP enrollment. A unified certificate builder could serve both use cases.
  */
 public class CertificateBuilder {
+    private static final Logger LOG = LoggerFactory.getLogger(CertificateBuilder.class);
 
     static {
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
     }
+
+    private static final SecureRandom SERIAL_RNG = new SecureRandom();
 
     private final EncryptedValueService encryptedValueService;
     private final String productName;
@@ -94,6 +101,35 @@ public class CertificateBuilder {
         this.encryptedValueService = encryptedValueService;
         this.productName = productName;
         this.clock = clock;
+    }
+
+    private static BigInteger generateSerialNumber() {
+        final byte[] bytes = new byte[16];
+        SERIAL_RNG.nextBytes(bytes);
+        bytes[0] |= 0x01; // Guarantee non-zero for RFC 5280 compliance
+        return new BigInteger(1, bytes);
+    }
+
+    /**
+     * Computes the effective notAfter for a certificate, capping to the issuer's remaining lifetime.
+     * <p>
+     * A signed certificate must never outlive its issuer. When the requested lifetime exceeds the
+     * issuer's remaining validity, we shorten it.
+     */
+    private Instant capNotAfter(Instant now, Duration validity, X509Certificate issuerCert) {
+        final var issuerNotAfter = issuerCert.getNotAfter().toInstant();
+        final var issuerRemaining = Duration.between(now, issuerNotAfter);
+
+        if (issuerRemaining.isNegative() || issuerRemaining.isZero()) {
+            throw new IllegalStateException("Issuer certificate has expired");
+        }
+
+        if (issuerRemaining.compareTo(validity) < 0) {
+            LOG.debug("Capping certificate lifetime from {} to {} days (issuer expires {})",
+                    validity.toDays(), issuerRemaining.toDays(), issuerNotAfter);
+            return now.plus(issuerRemaining);
+        }
+        return now.plus(validity);
     }
 
     /**
@@ -122,7 +158,7 @@ public class CertificateBuilder {
 
         final Instant now = Instant.now(clock);
         final Instant notAfter = now.plus(validity);
-        final BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
+        final BigInteger serialNumber = generateSerialNumber();
 
         final JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
                 subject,
@@ -195,8 +231,8 @@ public class CertificateBuilder {
         final X500Name issuerDn = X500Name.getInstance(issuerCert.getSubjectX500Principal().getEncoded());
 
         final Instant now = Instant.now(clock);
-        final Instant notAfter = now.plus(validity);
-        final BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
+        final Instant notAfter = capNotAfter(now, validity, issuerCert);
+        final BigInteger serialNumber = generateSerialNumber();
 
         final JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
                 issuerDn,
@@ -335,8 +371,8 @@ public class CertificateBuilder {
         final X500Name issuerDn = X500Name.getInstance(issuerCert.getSubjectX500Principal().getEncoded());
 
         final Instant now = Instant.now(clock);
-        final Instant notAfter = now.plus(validity);
-        final BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
+        final Instant notAfter = capNotAfter(now, validity, issuerCert);
+        final BigInteger serialNumber = generateSerialNumber();
 
         final JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
                 issuerDn,
@@ -442,6 +478,7 @@ public class CertificateBuilder {
                 null, // ID assigned on save
                 fingerprint,
                 PemUtils.extractSubjectKeyIdentifier(certificate).orElseThrow(() -> new IllegalArgumentException("Certificate has no SKI")),
+                PemUtils.extractAuthorityKeyIdentifier(certificate),
                 encryptedValueService.encrypt(privateKeyPem),
                 certificatePem,
                 issuerChain,
@@ -472,7 +509,7 @@ public class CertificateBuilder {
 
         // Detect algorithm from key pair
         final String keyAlgorithm = keyPair.getPublic().getAlgorithm();
-        final String signatureAlgorithm = "Ed25519".equals(keyAlgorithm) ? "Ed25519" : "SHA256withRSA";
+        final String signatureAlgorithm = Set.of("Ed25519", "EdDSA").contains(keyAlgorithm) ? "Ed25519" : "SHA256withRSA";
 
         final ContentSigner signer = new JcaContentSignerBuilder(signatureAlgorithm)
                 .setProvider("BC")
@@ -538,7 +575,7 @@ public class CertificateBuilder {
                 .setProvider("BC")
                 .getPublicKey(csr.getSubjectPublicKeyInfo());
 
-        if (!"Ed25519".equals(publicKey.getAlgorithm())) {
+        if (!Set.of("Ed25519", "EdDSA").contains(publicKey.getAlgorithm())) {
             throw new IllegalArgumentException(
                     f("CSR public key must be Ed25519, but was %s", publicKey.getAlgorithm())
             );
@@ -562,8 +599,8 @@ public class CertificateBuilder {
         final X500Name issuerDn = X500Name.getInstance(issuerCert.getSubjectX500Principal().getEncoded());
 
         final Instant now = Instant.now(clock);
-        final Instant notAfter = now.plus(validity);
-        final BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
+        final Instant notAfter = capNotAfter(now, validity, issuerCert);
+        final BigInteger serialNumber = generateSerialNumber();
 
         final JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
                 issuerDn,
@@ -590,6 +627,9 @@ public class CertificateBuilder {
                 false,
                 new ExtendedKeyUsage(KeyPurposeId.id_kp_clientAuth)
         );
+
+        addSubjectKeyIdentifier(certBuilder, publicKey);
+        addAuthorityKeyIdentifier(certBuilder, issuerCert);
 
         // Detect algorithm from issuer certificate
         final Algorithm algorithm = PemUtils.detectAlgorithm(issuerCert);
