@@ -137,12 +137,15 @@ describe('DeploymentForm telemetry', () => {
         expect(sendTelemetry).toHaveBeenCalledWith(
           'Collector Enrollment Token Generated',
           expect.objectContaining({
-            token_id: 'token-value-xyz',
             fleet_id: 'fleet-1',
             platform: 'linux',
             expires_in: 'P7D',
             app_action_value: 'deployment-generate',
           }),
+        );
+        expect(sendTelemetry).not.toHaveBeenCalledWith(
+          'Collector Enrollment Token Generated',
+          expect.objectContaining({ token_id: expect.anything() }),
         );
       },
       { timeout: 5000 },
@@ -178,9 +181,12 @@ describe('DeploymentForm telemetry', () => {
         expect(sendTelemetry).toHaveBeenCalledWith(
           'Collector Enrollment Token Copied',
           expect.objectContaining({
-            token_id: 'token-value-xyz',
             app_action_value: 'deployment-copy-token',
           }),
+        );
+        expect(sendTelemetry).not.toHaveBeenCalledWith(
+          'Collector Enrollment Token Copied',
+          expect.objectContaining({ token_id: expect.anything() }),
         );
       },
       { timeout: 5000 },
@@ -216,10 +222,13 @@ describe('DeploymentForm telemetry', () => {
         expect(sendTelemetry).toHaveBeenCalledWith(
           'Collector Deployment Script Copied',
           expect.objectContaining({
-            token_id: 'token-value-xyz',
             platform: 'linux',
             app_action_value: 'deployment-copy-script',
           }),
+        );
+        expect(sendTelemetry).not.toHaveBeenCalledWith(
+          'Collector Deployment Script Copied',
+          expect.objectContaining({ token_id: expect.anything() }),
         );
       },
       { timeout: 5000 },

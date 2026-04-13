@@ -199,9 +199,12 @@ describe('EnrollmentTokenList', () => {
         expect(sendTelemetry).toHaveBeenCalledWith(
           'Collector Enrollment Token Deleted',
           expect.objectContaining({
-            token_id: 'token-1',
             app_action_value: 'token-delete',
           }),
+        );
+        expect(sendTelemetry).not.toHaveBeenCalledWith(
+          'Collector Enrollment Token Deleted',
+          expect.objectContaining({ token_id: expect.anything() }),
         );
       });
     });

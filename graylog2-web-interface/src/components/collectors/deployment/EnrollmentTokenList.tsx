@@ -134,7 +134,6 @@ const EnrollmentTokenList = () => {
     await deleteEnrollmentToken(deletingToken.id);
     sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.DELETED, {
       app_action_value: 'token-delete',
-      token_id: deletingToken.id,
     });
     setDeletingToken(null);
   }, [deletingToken, deleteEnrollmentToken, sendTelemetry]);

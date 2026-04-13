@@ -151,7 +151,6 @@ const DeploymentForm = () => {
 
         sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.GENERATED, {
           app_action_value: 'deployment-generate',
-          token_id: response.token,
           fleet_id: values.fleetId,
           platform: values.platform,
           expires_in: values.expiry,
@@ -290,7 +289,6 @@ const DeploymentForm = () => {
                       onSuccess={() =>
                         sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.TOKEN_COPIED, {
                           app_action_value: 'deployment-copy-token',
-                          token_id: tokenResponse.token,
                         })
                       }
                     />
@@ -315,7 +313,6 @@ const DeploymentForm = () => {
                         sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.SCRIPT_COPIED, {
                           app_action_value: 'deployment-copy-script',
                           platform: values.platform,
-                          token_id: tokenResponse.token,
                         })
                       }
                     />
