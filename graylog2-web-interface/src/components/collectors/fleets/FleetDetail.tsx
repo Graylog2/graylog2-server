@@ -29,6 +29,7 @@ import useHistory from 'routing/useHistory';
 import useQuery from 'routing/useQuery';
 import Routes from 'routing/Routes';
 import type { SearchParams } from 'stores/PaginationTypes';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import FleetSettings from './FleetSettings';
 
@@ -43,6 +44,7 @@ import {
   useCollectorsMutations,
   useDefaultInstanceFilters,
 } from '../hooks';
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import StatCard from '../common/StatCard';
 import { InstanceDetailDrawer } from '../instances';
 import BulkActions from '../instances/BulkActions';
@@ -110,6 +112,8 @@ const FleetDetail = ({ fleetId }: Props) => {
   const initialTab: FleetTab = VALID_TABS.includes(tabParam as FleetTab) ? (tabParam as FleetTab) : DEFAULT_TAB;
   const [activeTab, setActiveTab] = useState<FleetTab>(initialTab);
 
+  const sendTelemetry = useSendCollectorsTelemetry();
+
   const navigateToTab = useCallback(
     (nextTab: FleetTab, filters?: Array<string>) => {
       setActiveTab(nextTab);
@@ -135,9 +139,14 @@ const FleetDetail = ({ fleetId }: Props) => {
 
   const onTabChange = useCallback(
     (nextTab: FleetTab) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.FLEET.TAB_SELECTED, {
+        app_action_value: `tab-${nextTab}`,
+        fleet_id: fleetId,
+        tab: nextTab,
+      });
       navigateToTab(nextTab);
     },
-    [navigateToTab],
+    [fleetId, navigateToTab, sendTelemetry],
   );
 
   const fleetNames = useMemo(() => (fleet ? { [fleet.id]: fleet.name } : {}), [fleet]);
@@ -216,20 +225,84 @@ const FleetDetail = ({ fleetId }: Props) => {
       </Header>
 
       <StatsRow>
-        <StatCard value={stats?.total_instances ?? 0} label="Instances" onClick={() => navigateToTab('instances')} />
+        <StatCard
+          value={stats?.total_instances ?? 0}
+          label="Instances"
+          onClick={() => {
+            sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.OVERVIEW.STAT_CARD_CLICKED, {
+              app_action_value: 'stat-card-instances',
+              card: 'instances',
+              value: stats?.total_instances ?? 0,
+              variant: 'default',
+              navigates_to: 'instances',
+              total_instances: stats?.total_instances ?? 0,
+              online_instances: stats?.online_instances ?? 0,
+              offline_instances: stats?.offline_instances ?? 0,
+              total_fleets: 0,
+              total_sources: stats?.total_sources ?? 0,
+            });
+            navigateToTab('instances');
+          }}
+        />
         <StatCard
           value={stats?.online_instances ?? 0}
           label="Online"
           variant="success"
-          onClick={() => navigateToTab('instances', ['status=online'])}
+          onClick={() => {
+            sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.OVERVIEW.STAT_CARD_CLICKED, {
+              app_action_value: 'stat-card-online',
+              card: 'online',
+              value: stats?.online_instances ?? 0,
+              variant: 'success',
+              navigates_to: 'instances-online',
+              total_instances: stats?.total_instances ?? 0,
+              online_instances: stats?.online_instances ?? 0,
+              offline_instances: stats?.offline_instances ?? 0,
+              total_fleets: 0,
+              total_sources: stats?.total_sources ?? 0,
+            });
+            navigateToTab('instances', ['status=online']);
+          }}
         />
         <StatCard
           value={stats?.offline_instances ?? 0}
           label="Offline"
           variant="warning"
-          onClick={() => navigateToTab('instances', ['status=offline'])}
+          onClick={() => {
+            sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.OVERVIEW.STAT_CARD_CLICKED, {
+              app_action_value: 'stat-card-offline',
+              card: 'offline',
+              value: stats?.offline_instances ?? 0,
+              variant: 'warning',
+              navigates_to: 'instances-offline',
+              total_instances: stats?.total_instances ?? 0,
+              online_instances: stats?.online_instances ?? 0,
+              offline_instances: stats?.offline_instances ?? 0,
+              total_fleets: 0,
+              total_sources: stats?.total_sources ?? 0,
+            });
+            navigateToTab('instances', ['status=offline']);
+          }}
         />
-        <StatCard value={stats?.total_sources ?? 0} label="Sources" onClick={() => navigateToTab('sources')} />
+        <StatCard
+          value={stats?.total_sources ?? 0}
+          label="Sources"
+          onClick={() => {
+            sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.OVERVIEW.STAT_CARD_CLICKED, {
+              app_action_value: 'stat-card-sources',
+              card: 'sources',
+              value: stats?.total_sources ?? 0,
+              variant: 'default',
+              navigates_to: 'sources',
+              total_instances: stats?.total_instances ?? 0,
+              online_instances: stats?.online_instances ?? 0,
+              offline_instances: stats?.offline_instances ?? 0,
+              total_fleets: 0,
+              total_sources: stats?.total_sources ?? 0,
+            });
+            navigateToTab('sources');
+          }}
+        />
       </StatsRow>
 
       <SegmentedControl<FleetTab> data={SEGMENTS} value={activeTab} onChange={onTabChange} />
