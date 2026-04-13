@@ -179,8 +179,14 @@ const FleetDetail = ({ fleetId }: Props) => {
     if (!deletingSource) return;
 
     await deleteSource({ fleetId, sourceId: deletingSource.id });
+    sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SOURCE.DELETED, {
+      app_action_value: 'source-delete',
+      fleet_id: fleetId,
+      source_id: deletingSource.id,
+      source_type: deletingSource.type,
+    });
     setDeletingSource(null);
-  }, [deletingSource, deleteSource, fleetId]);
+  }, [deletingSource, deleteSource, fleetId, sendTelemetry]);
 
   const sourceActions = useCallback(
     (source: Source) => (

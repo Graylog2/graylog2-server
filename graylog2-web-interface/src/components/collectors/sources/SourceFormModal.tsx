@@ -15,16 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { Formik, Form } from 'formik';
+import isEqual from 'lodash/isEqual';
 
 import { Input } from 'components/bootstrap';
 import Modal from 'components/bootstrap/Modal';
 import { FormikInput } from 'components/common';
 import ModalSubmit from 'components/common/ModalSubmit';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import { SOURCE_TYPE_LABELS } from './Constants';
 
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import type {
   Source,
   SourceType,
@@ -38,7 +41,7 @@ type Props = {
   fleetId: string;
   source?: Source;
   onClose: () => void;
-  onSave: (source: Omit<Source, 'id'>) => Promise<void>;
+  onSave: (source: Omit<Source, 'id'>) => Promise<{ id?: string } | void>;
 };
 
 const defaultConfigs: Record<SourceType, FileSourceConfig | JournaldSourceConfig | WindowsEventLogSourceConfig> = {
@@ -185,14 +188,39 @@ const WindowsEventLogConfigFields = ({
 
 const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props) => {
   const isEdit = !!source;
+  const sendTelemetry = useSendCollectorsTelemetry();
 
-  const initialValues: FormValues = {
-    source_type: source?.type || 'file',
-    name: source?.name || '',
-    description: source?.description || '',
-    enabled: source?.enabled ?? true,
-    config: source?.config || defaultConfigs[source?.type || 'file'],
-  };
+  const initialValues: FormValues = useMemo(
+    () => ({
+      source_type: source?.type || 'file',
+      name: source?.name || '',
+      description: source?.description || '',
+      enabled: source?.enabled ?? true,
+      config: source?.config || defaultConfigs[source?.type || 'file'],
+    }),
+    [source],
+  );
+
+  useEffect(() => {
+    if (!isEdit) {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SOURCE.CREATE_OPENED, {
+        app_action_value: 'source-create-open',
+        fleet_id: fleetId,
+      });
+    }
+    // fire only once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleClose = useCallback(() => {
+    if (!isEdit) {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SOURCE.CREATE_CANCELLED, {
+        app_action_value: 'source-create-cancel',
+        fleet_id: fleetId,
+      });
+    }
+    onClose();
+  }, [fleetId, isEdit, onClose, sendTelemetry]);
 
   const handleSubmit = useCallback(
     (values: FormValues) =>
@@ -203,12 +231,35 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props
         enabled: values.enabled,
         type: values.source_type,
         config: values.config,
-      } as Omit<Source, 'id'>).then(() => onClose()),
-    [fleetId, onSave, onClose],
+      } as Omit<Source, 'id'>).then((saved) => {
+        if (isEdit) {
+          sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SOURCE.UPDATED, {
+            app_action_value: 'source-edit-submit',
+            fleet_id: fleetId,
+            source_id: source!.id,
+            source_type: values.source_type,
+            enabled: values.enabled,
+            enabled_changed: initialValues.enabled !== values.enabled,
+            config_changed: !isEqual(initialValues.config, values.config),
+          });
+        } else {
+          const savedId = (saved as { id?: string } | undefined)?.id ?? '';
+          sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SOURCE.CREATED, {
+            app_action_value: 'source-create-submit',
+            fleet_id: fleetId,
+            source_id: savedId,
+            source_type: values.source_type,
+            enabled: values.enabled,
+          });
+        }
+
+        onClose();
+      }),
+    [fleetId, isEdit, onSave, onClose, sendTelemetry, source, initialValues],
   );
 
   return (
-    <Modal show onHide={onClose} bsSize="lg">
+    <Modal show onHide={handleClose} bsSize="lg">
       <Formik<FormValues> initialValues={initialValues} onSubmit={handleSubmit} validate={validate}>
         {({ isSubmitting, isValidating, values, setFieldValue }) => (
           <Form>
@@ -254,7 +305,7 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props
               <ModalSubmit
                 submitButtonText={isEdit ? 'Update source' : 'Create source'}
                 submitLoadingText={isEdit ? 'Updating...' : 'Creating...'}
-                onCancel={onClose}
+                onCancel={handleClose}
                 disabledSubmit={isValidating}
                 isSubmitting={isSubmitting}
               />
