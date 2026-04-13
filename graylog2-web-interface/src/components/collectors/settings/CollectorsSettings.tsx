@@ -27,9 +27,17 @@ import InputStateBadge from 'components/inputs/InputStateBadge';
 import useInput from 'hooks/useInput';
 import useInputsStates from 'hooks/useInputsStates';
 import FormSubmit from 'components/common/FormSubmit';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import { useCollectorsConfig, useCollectorsMutations } from '../hooks';
 import type { CollectorsConfigRequest } from '../types';
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
+import {
+  classifyHostname,
+  classifyInputBind,
+  comparePort,
+  classifyInputState,
+} from '../hooks/telemetry-helpers';
 
 type FormValues = {
   http_enabled: boolean;
@@ -51,6 +59,7 @@ const CollectorsSettings = () => {
   const isConfigured = !!config?.signing_cert_id;
   const { data: inputStates } = useInputsStates({ enabled: isConfigured });
   const { data: httpInput } = useInput(config?.http?.input_id);
+  const sendTelemetry = useSendCollectorsTelemetry();
 
   const initialValues: FormValues = useMemo(() => {
     if (!config) {
@@ -84,6 +93,19 @@ const CollectorsSettings = () => {
     };
   }, [config]);
 
+  // Convert InputStates dict to array format for telemetry helpers
+  const inputStatesArray = useMemo(() => {
+    if (!inputStates) return undefined;
+    // Get the first node's states as an array
+    const firstNodeStates = Object.values(inputStates)[0];
+    if (!firstNodeStates) return undefined;
+
+    return Object.values(firstNodeStates).map((state) => ({
+      id: state.id,
+      state: state.state,
+    }));
+  }, [inputStates]);
+
   const handleSubmit = useCallback(
     async (values: FormValues, { setErrors }: { setErrors: (errors: Record<string, string>) => void }) => {
       const request: CollectorsConfigRequest = {
@@ -101,6 +123,33 @@ const CollectorsSettings = () => {
 
       try {
         await updateConfig(request);
+
+        const offlineDuration = moment.duration(values.offline_value, values.offline_unit as moment.unitOfTime.DurationConstructor);
+        const visibilityDuration = moment.duration(values.visibility_value, values.visibility_unit as moment.unitOfTime.DurationConstructor);
+        const expirationDuration = moment.duration(values.expiration_value, values.expiration_unit as moment.unitOfTime.DurationConstructor);
+
+        const oldHttp = config?.http;
+
+        sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SETTINGS.UPDATED, {
+          app_action_value: 'settings-save',
+          http_enabled: values.http_enabled,
+          http_hostname_kind: classifyHostname(values.http_hostname ?? ''),
+          http_port: values.http_port,
+          offline_threshold_seconds: Math.round(offlineDuration.asSeconds()),
+          visibility_threshold_seconds: Math.round(visibilityDuration.asSeconds()),
+          expiration_threshold_seconds: Math.round(expirationDuration.asSeconds()),
+          http_enabled_changed: (oldHttp?.enabled ?? false) !== values.http_enabled,
+          http_hostname_changed: (oldHttp?.hostname ?? '') !== values.http_hostname,
+          http_port_changed: (oldHttp?.port ?? null) !== values.http_port,
+          offline_threshold_changed: (config?.collector_offline_threshold ?? null) !== request.collector_offline_threshold,
+          visibility_threshold_changed: (config?.collector_default_visibility_threshold ?? null) !== request.collector_default_visibility_threshold,
+          expiration_threshold_changed: (config?.collector_expiration_threshold ?? null) !== request.collector_expiration_threshold,
+          port_matches_input: comparePort(values.http_port, httpInput as never),
+          input_bind_type: classifyInputBind(
+            (httpInput as { attributes?: { bind_address?: string } })?.attributes?.bind_address,
+          ),
+          input_state: classifyInputState(httpInput as never, inputStatesArray as never),
+        });
       } catch (error: unknown) {
         const validationErrors = (
           error as { additional?: { body?: { validation_errors?: Record<string, Array<{ error: string }>> } } }
@@ -119,7 +168,7 @@ const CollectorsSettings = () => {
         }
       }
     },
-    [updateConfig],
+    [updateConfig, config, sendTelemetry, httpInput, inputStatesArray],
   );
 
   if (isLoadingConfig) {
@@ -221,7 +270,25 @@ const CollectorsSettings = () => {
             {httpInput && (
               <p>
                 <strong>HTTP:</strong> <InputStateBadge input={httpInput} inputStates={inputStates} />{' '}
-                <Link to={Routes.SYSTEM.INPUT_DIAGNOSIS(httpInput.id)}>View Diagnostics</Link>
+                <Link
+                  to={Routes.SYSTEM.INPUT_DIAGNOSIS(httpInput.id)}
+                  onClick={() =>
+                    sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SETTINGS.DIAGNOSTICS_OPENED, {
+                      app_action_value: 'view-diagnostics-link',
+                      input_id: httpInput.id,
+                      http_hostname_kind: classifyHostname(config?.http?.hostname ?? ''),
+                      port_matches_input: comparePort(
+                        config?.http?.port ?? NaN,
+                        httpInput as never,
+                      ),
+                      input_bind_type: classifyInputBind(
+                        (httpInput as { attributes?: { bind_address?: string } })?.attributes?.bind_address,
+                      ),
+                      input_state: classifyInputState(httpInput as never, inputStatesArray as never),
+                    })
+                  }>
+                  View Diagnostics
+                </Link>
               </p>
             )}
             {!httpInput && <p>No ingest endpoints are running.</p>}
