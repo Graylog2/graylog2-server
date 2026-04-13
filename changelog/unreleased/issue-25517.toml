@@ -1,5 +1,5 @@
 type = "f"
-message = "Fix issue when default favorite fields disappear after adding favorite field."
+message = "Fix stream rule update request payload"
 
-pulls = ["25530"]
-issues = ["25517"]
+pulls = ["25618"]
+issues = ["25609"]
