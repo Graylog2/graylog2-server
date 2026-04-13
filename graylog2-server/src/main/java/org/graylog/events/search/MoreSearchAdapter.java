@@ -85,6 +85,6 @@ public interface MoreSearchAdapter {
     }
 
     static boolean isRangeValueLowerBoundsIs0(String value) {
-        return value.startsWith(">=0");
+        return !value.isEmpty() && (value.trim().equals(">=0") || value.trim().equals(">=0.0"));
     }
 }
