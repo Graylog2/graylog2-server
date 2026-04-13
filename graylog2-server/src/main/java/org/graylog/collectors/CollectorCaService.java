@@ -32,8 +32,10 @@ import org.slf4j.LoggerFactory;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 
+import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
@@ -157,15 +159,17 @@ public class CollectorCaService {
                 final var curSigningCert = hierarchy.signingCert();
 
                 LOG.info("Renewing signing certificate <{}> (expires {})", curSigningCert.fingerprint(), curSigningCert.notAfter());
-                final var newSigningCert = certificateService.save(createSigningCert(builder, hierarchy.caCert()));
+                final var newSigningCert = createSigningCert(builder, hierarchy.caCert());
 
                 // Cascading renewal: re-issue OTLP server cert with the new signing cert
                 LOG.info("Re-issuing OTLP server certificate (signing cert renewed)");
-                final var newServerCert = certificateService.save(createServerCert(builder, newSigningCert));
+                final var newServerCert = createServerCert(builder, newSigningCert);
+
+                final var result = certificateService.insert(List.of(newSigningCert, newServerCert));
 
                 collectorsConfigService.save(ensureConfig().toBuilder()
-                        .signingCertId(newSigningCert.id())
-                        .otlpServerCertId(newServerCert.id())
+                        .signingCertId(selectByFingerprint(result, newSigningCert).id())
+                        .otlpServerCertId(selectByFingerprint(result, newServerCert).id())
                         .build());
             } else {
                 final var signingCert = hierarchy.signingCert();
@@ -173,7 +177,7 @@ public class CollectorCaService {
 
                 if (needsRenewal(curServerCert, now)) {
                     LOG.info("Renewing OTLP server certificate <{}> (expires {})", curServerCert.fingerprint(), curServerCert.notAfter());
-                    final var newServerCert = certificateService.save(createServerCert(builder, signingCert));
+                    final var newServerCert = certificateService.insert(createServerCert(builder, signingCert));
                     collectorsConfigService.save(ensureConfig().toBuilder()
                             .otlpServerCertId(newServerCert.id())
                             .build());
@@ -209,16 +213,30 @@ public class CollectorCaService {
         try {
             final var builder = certificateService.builder();
 
-            final CertificateEntry caCert = certificateService.save(createRootCert(builder));
-            final CertificateEntry signingCert = certificateService.save(createSigningCert(builder, caCert));
-            final CertificateEntry serverCert = certificateService.save(createServerCert(builder, signingCert));
+            final var caCert = createRootCert(builder);
+            final var signingCert = createSigningCert(builder, caCert);
+            final var serverCert = createServerCert(builder, signingCert);
 
-            return new CaHierarchy(caCert, signingCert, serverCert);
+            final var result = certificateService.insert(List.of(caCert, signingCert, serverCert));
+
+            return new CaHierarchy(
+                    selectByFingerprint(result, caCert),
+                    selectByFingerprint(result, signingCert),
+                    selectByFingerprint(result, serverCert)
+            );
         } catch (Exception e) {
             throw new RuntimeException("Failed to create Collectors CA hierarchy", e);
         }
     }
 
+    private static CertificateEntry selectByFingerprint(Collection<CertificateEntry> entries, CertificateEntry needle) {
+        requireNonNull(needle, "needle can't be null");
+
+        return entries.stream()
+                .filter(entry -> needle.fingerprint().equals(entry.fingerprint()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No entry found with fingerprint: " + needle.fingerprint()));
+    }
 
     private CertificateEntry createRootCert(CertificateBuilder builder) throws Exception {
         return builder.createRootCa(CA_CERT_CN, Algorithm.ED25519, CA_CERT_VALIDITY);
