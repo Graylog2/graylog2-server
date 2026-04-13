@@ -26,8 +26,6 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.web.customization.CustomizationConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.Clock;
 import java.util.ArrayList;
@@ -48,7 +46,6 @@ import static org.graylog2.database.utils.MongoUtils.insertedIdsAsString;
 @Singleton
 public class CertificateService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CertificateService.class);
     private static final String COLLECTION_NAME = "pki_certificates";
 
     private final MongoCollection<CertificateEntry> collection;
@@ -132,7 +129,7 @@ public class CertificateService {
             throw new IllegalArgumentException("no entry should have an ID");
         }
 
-        final var ids = insertedIdsAsString(collection.insertMany(List.copyOf(entries)));
+        final var ids = insertedIdsAsString(collection.insertMany(entries));
 
         // Map the returned IDs to the given entries in order.
         return IntStream.range(0, entries.size())

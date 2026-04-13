@@ -25,7 +25,6 @@ import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
-import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.web.customization.CustomizationConfig;
@@ -229,14 +228,5 @@ class CertificateServiceTest {
 
     private CertificateEntry createCertificateEntry(String id, String commonName) throws Exception {
         return certificateService.builder().createRootCa(commonName, Algorithm.ED25519, Duration.ofDays(1)).withId(id);
-    }
-
-    private EncryptedValue createEncryptedValue() {
-        return EncryptedValue.builder()
-                .value("2d043f9a7d5a5a7537d3e93c93c5dc40")
-                .salt("c93c0263bfc3713d")
-                .isKeepValue(false)
-                .isDeleteValue(false)
-                .build();
     }
 }
