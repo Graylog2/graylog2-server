@@ -22,11 +22,13 @@ import { Alert, Input } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import FleetCardsGrid from './FleetCardsGrid';
 import RecentActivity from './RecentActivity';
 
 import { useCollectorStats, useFleetsBulkStats } from '../hooks';
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import StatCard from '../common/StatCard';
 
 const StatsRow = styled.div(
@@ -59,6 +61,31 @@ const CollectorsOverview = () => {
   const { data: bulkStats, isLoading: bulkLoading, isError: bulkError } = useFleetsBulkStats();
   const [filter, setFilter] = useState('');
   const history = useHistory();
+  const sendTelemetry = useSendCollectorsTelemetry();
+
+  const snapshot = {
+    total_instances: stats?.total_instances ?? 0,
+    online_instances: stats?.online_instances ?? 0,
+    offline_instances: stats?.offline_instances ?? 0,
+    total_fleets: stats?.total_fleets ?? 0,
+    total_sources: stats?.total_sources ?? 0,
+  };
+
+  const emitStatCard = (
+    card: 'instances' | 'online' | 'offline' | 'fleets',
+    value: number,
+    variant: 'default' | 'success' | 'warning' | 'danger',
+    navigates_to: 'instances' | 'instances-online' | 'instances-offline' | 'fleets',
+  ) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.OVERVIEW.STAT_CARD_CLICKED, {
+      app_action_value: `stat-card-${card}`,
+      card,
+      value,
+      variant,
+      navigates_to,
+      ...snapshot,
+    });
+  };
 
   return (
     <div>
@@ -71,24 +98,36 @@ const CollectorsOverview = () => {
           <StatCard
             value={stats?.total_instances ?? 0}
             label="Instances"
-            onClick={() => history.push(Routes.SYSTEM.COLLECTORS.INSTANCES)}
+            onClick={() => {
+              emitStatCard('instances', stats?.total_instances ?? 0, 'default', 'instances');
+              history.push(Routes.SYSTEM.COLLECTORS.INSTANCES);
+            }}
           />
           <StatCard
             value={stats?.online_instances ?? 0}
             label="Online"
             variant="success"
-            onClick={() => history.push(`${Routes.SYSTEM.COLLECTORS.INSTANCES}?filters=status%3Donline`)}
+            onClick={() => {
+              emitStatCard('online', stats?.online_instances ?? 0, 'success', 'instances-online');
+              history.push(`${Routes.SYSTEM.COLLECTORS.INSTANCES}?filters=status%3Donline`);
+            }}
           />
           <StatCard
             value={stats?.offline_instances ?? 0}
             label="Offline"
             variant="warning"
-            onClick={() => history.push(`${Routes.SYSTEM.COLLECTORS.INSTANCES}?filters=status%3Doffline`)}
+            onClick={() => {
+              emitStatCard('offline', stats?.offline_instances ?? 0, 'warning', 'instances-offline');
+              history.push(`${Routes.SYSTEM.COLLECTORS.INSTANCES}?filters=status%3Doffline`);
+            }}
           />
           <StatCard
             value={stats?.total_fleets ?? 0}
             label="Fleets"
-            onClick={() => history.push(Routes.SYSTEM.COLLECTORS.FLEETS)}
+            onClick={() => {
+              emitStatCard('fleets', stats?.total_fleets ?? 0, 'default', 'fleets');
+              history.push(Routes.SYSTEM.COLLECTORS.FLEETS);
+            }}
           />
           <StatCard value={stats?.total_sources ?? 0} label="Sources" />
         </StatsRow>
