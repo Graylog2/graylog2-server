@@ -32,7 +32,7 @@ const DropdownTrigger = styled.button(
     display: inline-flex;
     align-items: center;
     gap: ${theme.spacings.xxs};
-    line-height: normal;
+    line-height: inherit;
 
     &:focus-visible {
       outline-offset: 2px;

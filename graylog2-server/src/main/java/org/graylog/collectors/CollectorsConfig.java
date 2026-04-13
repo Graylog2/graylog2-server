@@ -81,7 +81,6 @@ public abstract class CollectorsConfig {
     public abstract Duration collectorExpirationThreshold();
 
     // TODO: Make certificate lifetime configurable in the UI - https://github.com/Graylog2/graylog2-server/issues/25407
-    // TODO: Collector cert lifetime can't be higher than the signing cert's lifetime. Validate!
     @JsonProperty(FIELD_COLLECTOR_CERT_LIFETIME)
     public abstract Duration collectorCertLifetime();
 
@@ -102,6 +101,8 @@ public abstract class CollectorsConfig {
     public static CollectorsConfig createDefault(String hostname) {
         return createDefaultBuilder(hostname).build();
     }
+
+    public abstract Builder toBuilder();
 
     public static Builder builder() {
         return Builder.create();

@@ -40,6 +40,7 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterIdService;
@@ -98,8 +99,8 @@ class AgentTokenServiceTest {
         final var clusterIdService = mock(ClusterIdService.class);
         when(clusterIdService.getString()).thenReturn(TEST_CLUSTER_ID);
         collectorInstanceService = new CollectorInstanceService(mongoCollections);
-        collectorsConfigService = new CollectorsConfigService(clusterConfigService);
-        collectorCaService = new CollectorCaService(certificateService, clusterIdService, collectorsConfigService);
+        collectorsConfigService = new CollectorsConfigService(clusterConfigService, mock(ClusterEventBus.class));
+        collectorCaService = new CollectorCaService(certificateService, clusterIdService, collectorsConfigService, clock);
         agentTokenService = new AgentTokenService(collectorInstanceService, clock);
     }
 

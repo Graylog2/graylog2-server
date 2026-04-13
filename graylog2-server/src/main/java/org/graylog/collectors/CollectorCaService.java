@@ -16,24 +16,22 @@
  */
 package org.graylog.collectors;
 
-import io.netty.handler.ssl.ClientAuth;
-import io.netty.handler.ssl.SslContextBuilder;
-import io.netty.handler.ssl.SslProvider;
+import com.google.common.annotations.VisibleForTesting;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.graylog.security.pki.Algorithm;
+import org.graylog.security.pki.CertificateBuilder;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
-import org.graylog.security.pki.PemUtils;
 import org.graylog2.plugin.cluster.ClusterIdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
+import java.time.Clock;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -58,6 +56,9 @@ public class CollectorCaService {
     static final Duration SIGNING_CERT_VALIDITY = Duration.ofDays(5 * 365);
     static final Duration OTLP_SERVER_CERT_VALIDITY = Duration.ofDays(2 * 365);
 
+    // Renew when less than 20% of the certificate's lifetime remains
+    static final double RENEWAL_THRESHOLD_RATIO = 0.2;
+
     static final String CA_CERT_CN = "Collectors CA";
     static final String SIGNING_CERT_CN = "Collectors Signing";
     static final String OTLP_SERVER_CERT_CN = "Collectors OTLP Server";
@@ -65,14 +66,17 @@ public class CollectorCaService {
     private final CertificateService certificateService;
     private final ClusterIdService clusterIdService;
     private final CollectorsConfigService collectorsConfigService;
+    private final Clock clock;
 
     @Inject
     public CollectorCaService(CertificateService certificateService,
                               ClusterIdService clusterIdService,
-                              CollectorsConfigService collectorsConfigService) {
+                              CollectorsConfigService collectorsConfigService,
+                              Clock clock) {
         this.certificateService = certificateService;
         this.clusterIdService = clusterIdService;
         this.collectorsConfigService = collectorsConfigService;
+        this.clock = clock;
     }
 
     private CollectorsConfig ensureConfig() {
@@ -111,43 +115,6 @@ public class CollectorCaService {
     }
 
     /**
-     * Creates a new {@link SslContextBuilder} configured for the OTLP server endpoint.
-     * <p>
-     * The builder is configured with:
-     * <ul>
-     *   <li>The OTLP server certificate and private key for server identity</li>
-     *   <li>Client authentication required (mTLS)</li>
-     *   <li>The signing cert as the trust anchor for validating client certificates</li>
-     * </ul>
-     *
-     * @return a configured SslContextBuilder ready to be built
-     */
-    public SslContextBuilder newServerSslContextBuilder() {
-        final var hierarchy = loadHierarchy();
-        final var otlpServerCert = hierarchy.otlpServerCert();
-        final var signingCert = hierarchy.signingCert();
-
-        try {
-            final PrivateKey key = PemUtils.parsePrivateKey(certificateService.encryptedValueService().decrypt(otlpServerCert.privateKey()));
-
-            final X509Certificate signingCertPem = PemUtils.parseCertificate(signingCert.certificate());
-            final X509Certificate serverCertPem = PemUtils.parseCertificate(otlpServerCert.certificate());
-            final X509Certificate trustedCert = PemUtils.parseCertificate(signingCert.certificate());
-
-            // The Collector only has access to the CA cert, so we need to have the intermediate signing cert
-            // in the key cert chain.
-            return SslContextBuilder.forServer(key, serverCertPem, signingCertPem)
-                    // JDK provider required: BoringSSL (OPENSSL) can load Ed25519 keys but cannot
-                    // complete TLS handshakes — its cipher suite negotiation doesn't recognize Ed25519.
-                    .sslProvider(SslProvider.JDK)
-                    .clientAuth(ClientAuth.REQUIRE)
-                    .trustManager(trustedCert);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to create OTLP server SSL context", e);
-        }
-    }
-
-    /**
      * Loads the existing Collector CA hierarchy.
      *
      * @return the CA hierarchy
@@ -166,6 +133,14 @@ public class CollectorCaService {
         return maybeConfig.isPresent() && isNotBlank(maybeConfig.get().caCertId());
     }
 
+    /**
+     * Checks if the signing and OTLP server certificates need renewal and renews them if necessary.
+     * <p>
+     * The signing cert is renewed when less than {@link #RENEWAL_THRESHOLD_RATIO} of its lifetime remains.
+     * When the signing cert is renewed, the OTLP server cert is always re-issued (cascading renewal)
+     * because it is signed by the signing cert. The OTLP server cert is also independently checked
+     * and renewed if it approaches expiry on its own.
+     */
     public void renewCertificates() {
         if (!isCaInitialized()) {
             LOG.debug("CA not initialized - skipping renewal");
@@ -173,7 +148,50 @@ public class CollectorCaService {
         }
 
         final var hierarchy = loadHierarchy();
-        // TODO: Continue
+        final var now = Instant.now(clock);
+
+        try {
+            final var builder = certificateService.builder();
+
+            if (needsRenewal(hierarchy.signingCert(), now)) {
+                final var curSigningCert = hierarchy.signingCert();
+
+                LOG.info("Renewing signing certificate <{}> (expires {})", curSigningCert.fingerprint(), curSigningCert.notAfter());
+                final var newSigningCert = certificateService.save(createSigningCert(builder, hierarchy.caCert()));
+
+                // Cascading renewal: re-issue OTLP server cert with the new signing cert
+                LOG.info("Re-issuing OTLP server certificate (signing cert renewed)");
+                final var newServerCert = certificateService.save(createServerCert(builder, newSigningCert));
+
+                collectorsConfigService.save(ensureConfig().toBuilder()
+                        .signingCertId(newSigningCert.id())
+                        .otlpServerCertId(newServerCert.id())
+                        .build());
+            } else {
+                final var signingCert = hierarchy.signingCert();
+                final var curServerCert = hierarchy.otlpServerCert();
+
+                if (needsRenewal(curServerCert, now)) {
+                    LOG.info("Renewing OTLP server certificate <{}> (expires {})", curServerCert.fingerprint(), curServerCert.notAfter());
+                    final var newServerCert = certificateService.save(createServerCert(builder, signingCert));
+                    collectorsConfigService.save(ensureConfig().toBuilder()
+                            .otlpServerCertId(newServerCert.id())
+                            .build());
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to renew certificates", e);
+        }
+    }
+
+    /**
+     * Returns true if the certificate needs renewal based on its remaining lifetime.
+     */
+    @VisibleForTesting
+    boolean needsRenewal(CertificateEntry cert, Instant now) {
+        final var totalLifetime = Duration.between(cert.notBefore(), cert.notAfter());
+        final var remaining = Duration.between(now, cert.notAfter());
+        return remaining.toMillis() < (long) (totalLifetime.toMillis() * RENEWAL_THRESHOLD_RATIO);
     }
 
     /**
@@ -191,24 +209,34 @@ public class CollectorCaService {
         try {
             final var builder = certificateService.builder();
 
-            final CertificateEntry caCert = certificateService.save(
-                    builder.createRootCa(CA_CERT_CN, Algorithm.ED25519, CA_CERT_VALIDITY));
-            final CertificateEntry signingCert = certificateService.save(
-                    builder.createIntermediateCa(SIGNING_CERT_CN, caCert, SIGNING_CERT_VALIDITY));
-            final CertificateEntry otlpServerCert = certificateService.save(
-                    builder.createEndEntityCert(
-                            OTLP_SERVER_CERT_CN,
-                            signingCert,
-                            KeyUsage.digitalSignature | KeyUsage.keyEncipherment,
-                            KeyPurposeId.id_kp_serverAuth,
-                            OTLP_SERVER_CERT_VALIDITY,
-                            List.of(clusterIdService.getString())
-                    ));
+            final CertificateEntry caCert = certificateService.save(createRootCert(builder));
+            final CertificateEntry signingCert = certificateService.save(createSigningCert(builder, caCert));
+            final CertificateEntry serverCert = certificateService.save(createServerCert(builder, signingCert));
 
-            return new CaHierarchy(caCert, signingCert, otlpServerCert);
+            return new CaHierarchy(caCert, signingCert, serverCert);
         } catch (Exception e) {
             throw new RuntimeException("Failed to create Collectors CA hierarchy", e);
         }
+    }
+
+
+    private CertificateEntry createRootCert(CertificateBuilder builder) throws Exception {
+        return builder.createRootCa(CA_CERT_CN, Algorithm.ED25519, CA_CERT_VALIDITY);
+    }
+
+    private CertificateEntry createSigningCert(CertificateBuilder builder, CertificateEntry issuerCert) throws Exception {
+        return builder.createIntermediateCa(SIGNING_CERT_CN, issuerCert, SIGNING_CERT_VALIDITY);
+    }
+
+    private CertificateEntry createServerCert(CertificateBuilder builder, CertificateEntry issuerCert) throws Exception {
+        return builder.createEndEntityCert(
+                OTLP_SERVER_CERT_CN,
+                issuerCert,
+                KeyUsage.digitalSignature | KeyUsage.keyEncipherment,
+                KeyPurposeId.id_kp_serverAuth,
+                OTLP_SERVER_CERT_VALIDITY,
+                List.of(clusterIdService.getString())
+        );
     }
 
     public record CaHierarchy(CertificateEntry caCert,
