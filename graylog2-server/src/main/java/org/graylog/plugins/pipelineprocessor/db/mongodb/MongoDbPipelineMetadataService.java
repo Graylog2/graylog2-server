@@ -67,6 +67,7 @@ public class MongoDbPipelineMetadataService {
         this.routingRulesCollection = mongoCollections.collection(ROUTING_RULES_COLLECTION_NAME, RoutingRuleDao.class);
         routingRulesCollection.createIndex(Indexes.ascending(FIELD_ROUTED_STREAM_IDS));
         routingRulesCollection.createIndex(Indexes.ascending(RoutingRuleDao.FIELD_PIPELINE_ID));
+        routingRulesCollection.createIndex(Indexes.ascending(RoutingRuleDao.FIELD_RULE_ID));
     }
 
     public PipelineRulesMetadataDao get(final String pipelineId) throws NotFoundException {

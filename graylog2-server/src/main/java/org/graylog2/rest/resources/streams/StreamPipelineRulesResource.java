@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.streams;
 
     import com.codahale.metrics.annotation.Timed;
+    import com.mongodb.client.model.Filters;
     import io.swagger.v3.oas.annotations.Operation;
     import io.swagger.v3.oas.annotations.Parameter;
     import io.swagger.v3.oas.annotations.media.Schema;
@@ -59,6 +60,8 @@ public class StreamPipelineRulesResource extends RestResource {
             EntityAttribute.builder().id("id").title("id").type(SearchQueryField.Type.OBJECT_ID).hidden(true).searchable(false).build(),
             EntityAttribute.builder().id(RoutingRuleDao.FIELD_RULE_ID).title("Pipeline Rule")
                     .hidden(true).filterable(true)
+                    .type(SearchQueryField.Type.OBJECT_ID)
+                    .bsonFilterCreator((name, value) -> Filters.eq(name, value.getValue().toString()))
                     .relatedCollection("pipeline_processor_rules").relatedProperty("title")
                     .build(),
             EntityAttribute.builder().id(RoutingRuleDao.FIELD_RULE_TITLE).title("Pipeline Rule")
@@ -66,6 +69,8 @@ public class StreamPipelineRulesResource extends RestResource {
                     .build(),
             EntityAttribute.builder().id(RoutingRuleDao.FIELD_PIPELINE_ID).title("Source pipeline")
                     .hidden(true).filterable(true)
+                    .type(SearchQueryField.Type.OBJECT_ID)
+                    .bsonFilterCreator((name, value) -> Filters.eq(name, value.getValue().toString()))
                     .relatedCollection("pipeline_processor_pipelines").relatedProperty("title")
                     .build(),
             EntityAttribute.builder().id(RoutingRuleDao.FIELD_PIPELINE_TITLE).title("Source pipeline")

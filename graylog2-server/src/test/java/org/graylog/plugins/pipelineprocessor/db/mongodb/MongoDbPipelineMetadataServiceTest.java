@@ -491,5 +491,11 @@ class MongoDbPipelineMetadataServiceTest {
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().rule()).isEqualTo("New Rule");
         assertThat(result.getFirst().pipeline()).isEqualTo("Test Pipeline Updated");
+
+        // Delete should remove both pipeline metadata and routing rules
+        service.delete(Set.of("pipeline1"));
+        assertThat(service.getRoutingRulesPaginated("s2", null, FIELD_RULE_TITLE, SortOrder.ASCENDING, 1, 10))
+                .isEmpty();
+        assertThat(service.getPipelinesByRule("rule2")).isEmpty();
     }
 }
