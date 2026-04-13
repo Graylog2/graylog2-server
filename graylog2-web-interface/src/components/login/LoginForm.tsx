@@ -31,7 +31,7 @@ const LoginForm = ({ onErrorChange }: Props) => {
     event.preventDefault();
     onErrorChange();
     const formData = new FormData(event.currentTarget);
-    const username = formData.get('username') as string;
+    const username = ((formData.get('username') as string) ?? '').trim();
     const password = formData.get('password') as string;
     const location = document.location.host;
 
