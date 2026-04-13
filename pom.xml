@@ -109,9 +109,9 @@
         <asm.version>9.9.1</asm.version>
         <auto-service.version>1.1.1</auto-service.version>
         <auto-value.version>1.11.1</auto-value.version>
-        <aws-java-sdk-1.version>1.12.675</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.42.1</aws-java-sdk-2.version>
-        <aws-kinesis-client.version>3.4.1</aws-kinesis-client.version>
+        <aws-java-sdk-1.version>1.12.797</aws-java-sdk-1.version>
+        <aws-java-sdk-2.version>2.42.32</aws-java-sdk-2.version>
+        <aws-kinesis-client.version>3.4.2</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.3.5</aws-msk-iam-auth.version>
         <!-- When bumping bouncycastle.version, check if the explicit management for bcutil-jdk18on can/must be removed. -->
         <bouncycastle.version>1.83</bouncycastle.version>
@@ -130,7 +130,7 @@
         <error-prone.version>2.48.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
         <gcs.version>2.64.1</gcs.version>
-        <azure-blob-storage.version>12.33.2</azure-blob-storage.version>
+        <azure-blob-storage.version>12.33.3</azure-blob-storage.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>5.0.2</geoip2.version>
         <grizzly-websockets.version>4.0.2</grizzly-websockets.version> <!-- Should match the version used by Jersey -->
@@ -163,10 +163,10 @@
         <kafka.version>4.2.0</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <log4j.version>2.25.4</log4j.version>
-        <lucene.version>10.3.2</lucene.version>
+        <lucene.version>9.12.3</lucene.version>
         <lz4.version>1.10.4</lz4.version>
         <metrics.version>4.2.38</metrics.version>
-        <mongodb-driver.version>5.6.4</mongodb-driver.version>
+        <mongodb-driver.version>5.6.5</mongodb-driver.version>
         <mongojack.version>5.1.0</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.2.12.Final</netty.version>
@@ -189,7 +189,7 @@
         <siv-mode.version>1.6.1</siv-mode.version>
         <slf4j.version>2.0.17</slf4j.version>
         <streamex.version>0.8.4</streamex.version>
-        <swagger.version>2.2.45</swagger.version>
+        <swagger.version>2.2.46</swagger.version>
         <swagger-parser.version>2.1.39</swagger-parser.version>
         <syslog4j.version>0.9.61</syslog4j.version>
         <threeten-extra.version>1.8.0</threeten-extra.version>
@@ -203,7 +203,7 @@
         <jjwt.version>0.13.0</jjwt.version>
         <stateless4j.version>2.6.0</stateless4j.version>
         <poi.version>5.5.1</poi.version>
-        <mcp-bom.version>1.1.0</mcp-bom.version>
+        <mcp-bom.version>1.1.1</mcp-bom.version>
         <json-schema-generator.version>4.38.0</json-schema-generator.version>
 
         <!-- Test dependencies -->
@@ -720,7 +720,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.9.8.2</version>
+                    <version>4.9.8.3</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>
@@ -782,17 +782,17 @@
                         <dependency>
                             <groupId>org.openrewrite</groupId>
                             <artifactId>rewrite-java</artifactId>
-                            <version>8.77.0</version>
+                            <version>8.78.3</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-testing-frameworks</artifactId>
-                            <version>3.31.0</version>
+                            <version>3.33.0</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-migrate-java</artifactId>
-                            <version>3.31.0</version>
+                            <version>3.31.3</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>

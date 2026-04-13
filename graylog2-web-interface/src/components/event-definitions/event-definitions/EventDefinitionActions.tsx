@@ -283,7 +283,6 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
               {isEnabled ? 'Disable' : 'Enable'}
             </MenuItem>
           </IfPermitted>
-          {moreActions}
           {showActions() && (
             <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
               <MenuItem divider />
@@ -310,10 +309,11 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
                 <MenuItem divider />
               </IfPermitted>
               <LinkContainer to={Routes.ALERTS.DEFINITIONS.replay_search(eventDefinition.id)}>
-                <MenuItem>Replay search</MenuItem>
+                <MenuItem>Replay Search</MenuItem>
               </LinkContainer>
             </>
           )}
+          {moreActions}
         </MoreActions>
       </ButtonToolbar>
       {showDialog && (

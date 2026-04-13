@@ -34,9 +34,11 @@ public class OpenTrafficCounterCalculator implements TrafficCounterCalculator {
     private volatile long previousInputBytes = 0L;
     private volatile long previousOutputBytes = 0L;
     private volatile long previousDecodedBytes = 0L;
+    private volatile long previousInputIndexedBytes = 0L;
     private final Counter inputCounter;
     private final Counter outputCounter;
     private final Counter decodedCounter;
+    private final Counter inputIndexedCounter;
 
     @Inject
     public OpenTrafficCounterCalculator(NodeId nodeId, TrafficUpdater trafficUpdater, MetricRegistry metricRegistry) {
@@ -45,6 +47,7 @@ public class OpenTrafficCounterCalculator implements TrafficCounterCalculator {
         inputCounter = metricRegistry.counter(GlobalMetricNames.INPUT_TRAFFIC);
         outputCounter = metricRegistry.counter(GlobalMetricNames.OUTPUT_TRAFFIC);
         decodedCounter = metricRegistry.counter(GlobalMetricNames.DECODED_TRAFFIC);
+        inputIndexedCounter = metricRegistry.counter(GlobalMetricNames.INDEXED_INPUT_TRAFFIC);
     }
 
 
@@ -55,6 +58,7 @@ public class OpenTrafficCounterCalculator implements TrafficCounterCalculator {
         final long currentInputBytes = inputCounter.getCount();
         final long currentOutputBytes = outputCounter.getCount();
         final long currentDecodedBytes = decodedCounter.getCount();
+        final long currentInputIndexedBytes = inputIndexedCounter.getCount();
 
         final long inputLastMinute = currentInputBytes - previousInputBytes;
         previousInputBytes = currentInputBytes;
@@ -62,6 +66,8 @@ public class OpenTrafficCounterCalculator implements TrafficCounterCalculator {
         previousOutputBytes = currentOutputBytes;
         final long decodedBytesLastMinute = currentDecodedBytes - previousDecodedBytes;
         previousDecodedBytes = currentDecodedBytes;
+        final long inputIndexedBytesLastMinute = currentInputIndexedBytes - previousInputIndexedBytes;
+        previousInputIndexedBytes = currentInputIndexedBytes;
 
         if (LOG.isDebugEnabled()) {
             final Size in = Size.bytes(inputLastMinute);
@@ -74,6 +80,7 @@ public class OpenTrafficCounterCalculator implements TrafficCounterCalculator {
                 nodeId,
                 inputLastMinute,
                 outputBytesLastMinute,
-                decodedBytesLastMinute);
+                decodedBytesLastMinute,
+                inputIndexedBytesLastMinute);
     }
 }
