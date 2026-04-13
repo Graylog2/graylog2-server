@@ -167,14 +167,27 @@ export type TargetInfo = {
   type: 'fleet' | 'collector';
 };
 
-export type ActivityEntry = {
+export type FleetReassignedDetails = {
+  destination_fleet: TargetInfo;
+};
+
+export type ActivityEntryBase = {
   seq: number;
   timestamp: string | null;
-  type: 'CONFIG_CHANGED' | 'INGEST_CONFIG_CHANGED' | 'RESTART' | 'DISCOVERY_RUN' | 'FLEET_REASSIGNED';
   actor: ActorInfo | null;
   targets: TargetInfo[];
-  details: Record<string, string>;
 };
+
+export type SimpleActivityEntry = ActivityEntryBase & {
+  type: 'CONFIG_CHANGED' | 'INGEST_CONFIG_CHANGED' | 'RESTART' | 'DISCOVERY_RUN';
+};
+
+export type FleetReassignedActivityEntry = ActivityEntryBase & {
+  type: 'FLEET_REASSIGNED';
+  details: FleetReassignedDetails | null;
+};
+
+export type ActivityEntry = SimpleActivityEntry | FleetReassignedActivityEntry;
 
 export type RecentActivityResponse = {
   activities: ActivityEntry[];
