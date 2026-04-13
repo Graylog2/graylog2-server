@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
+import org.graylog.collectors.config.extension.FileStorageExtensionConfig;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -71,7 +72,7 @@ public abstract class ExporterSendingQueue {
                 .blockOnOverflow(false)
                 .sizer(Sizer.REQUESTS)
                 .queueSize(1000)
-                .storage(null)
+                .storage(FileStorageExtensionConfig.defaultInstance().name())
                 .batch(null);
     }
 
