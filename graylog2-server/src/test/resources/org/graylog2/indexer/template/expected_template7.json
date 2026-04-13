@@ -38,6 +38,9 @@
       "gl2_accounted_message_size" : {
         "type" : "long"
       },
+      "gl2_input_message_size" : {
+        "type" : "long"
+      },
       "gl2_receive_timestamp" : {
         "type" : "date",
         "format" : "uuuu-MM-dd HH:mm:ss.SSS"

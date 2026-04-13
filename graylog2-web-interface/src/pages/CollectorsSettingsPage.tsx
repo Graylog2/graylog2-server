@@ -30,7 +30,7 @@ const CollectorsSettingsPage = () => (
           Collectors Settings <BetaBadge />
         </>
       }>
-      <span>Configure ingest endpoints for managed collectors.</span>
+      <span>Configure settings for managed collectors.</span>
     </PageHeader>
     <CollectorsSettings />
   </DocumentTitle>
