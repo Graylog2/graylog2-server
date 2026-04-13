@@ -21,7 +21,9 @@ import { Formik, Form } from 'formik';
 import { Modal } from 'components/bootstrap';
 import { FormikInput } from 'components/common';
 import ModalSubmit from 'components/common/ModalSubmit';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import type { Fleet } from '../types';
 
 type FormValues = {
@@ -33,7 +35,7 @@ type FormValues = {
 type Props = {
   fleet?: Fleet;
   onClose: () => void;
-  onSave: (fleet: Omit<Fleet, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
+  onSave: (fleet: Omit<Fleet, 'id' | 'created_at' | 'updated_at'>) => Promise<{ id?: string } | void>;
 };
 
 const validate = (values: FormValues) => {
@@ -48,6 +50,7 @@ const validate = (values: FormValues) => {
 
 const FleetFormModal = ({ fleet = undefined, onClose, onSave }: Props) => {
   const isEdit = !!fleet;
+  const sendTelemetry = useSendCollectorsTelemetry();
 
   const initialValues: FormValues = {
     name: fleet?.name || '',
@@ -55,18 +58,36 @@ const FleetFormModal = ({ fleet = undefined, onClose, onSave }: Props) => {
     target_version: fleet?.target_version || '',
   };
 
+  const handleClose = useCallback(() => {
+    if (!isEdit) {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.FLEET.CREATE_CANCELLED, {
+        app_action_value: 'fleet-create-cancel',
+      });
+    }
+    onClose();
+  }, [isEdit, onClose, sendTelemetry]);
+
   const handleSubmit = useCallback(
     (values: FormValues) =>
       onSave({
         name: values.name,
         description: values.description,
         target_version: values.target_version || null,
-      }).then(() => onClose()),
-    [onSave, onClose],
+      }).then((saved) => {
+        if (!isEdit) {
+          const createdId = (saved && 'id' in saved) ? saved.id ?? '' : '';
+          sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.FLEET.CREATED, {
+            app_action_value: 'fleet-create-submit',
+            fleet_id: createdId,
+          });
+        }
+        onClose();
+      }),
+    [isEdit, onSave, onClose, sendTelemetry],
   );
 
   return (
-    <Modal show onHide={onClose}>
+    <Modal show onHide={handleClose}>
       <Formik<FormValues> initialValues={initialValues} onSubmit={handleSubmit} validate={validate} validateOnMount>
         {({ isSubmitting, isValid, isValidating }) => (
           <Form>
@@ -94,9 +115,10 @@ const FleetFormModal = ({ fleet = undefined, onClose, onSave }: Props) => {
               <ModalSubmit
                 submitButtonText={isEdit ? 'Update fleet' : 'Create fleet'}
                 submitLoadingText={isEdit ? 'Updating...' : 'Creating...'}
-                onCancel={onClose}
+                onCancel={handleClose}
                 disabledSubmit={isValidating || !isValid}
                 isSubmitting={isSubmitting}
+                isAsyncSubmit
               />
             </Modal.Footer>
           </Form>

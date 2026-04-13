@@ -49,7 +49,9 @@ const CollectorsFleets = () => {
   }, [history]);
 
   const handleSaveFleet = async (fleet: Omit<Fleet, 'id' | 'created_at' | 'updated_at'>) => {
-    await createFleet(fleet);
+    const saved = await createFleet(fleet);
+
+    return saved;
   };
 
   return (
