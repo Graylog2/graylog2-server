@@ -24,13 +24,20 @@ import org.graylog2.Configuration;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.configuration.ConfigurationException;
+import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.BooleanField;
+import org.graylog2.plugin.configuration.fields.NumberField;
+import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
+import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.security.RestPermissions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -41,6 +48,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
@@ -64,6 +72,17 @@ class CollectorIngestInputServiceTest {
     @BeforeEach
     void setUp() {
         service = new CollectorIngestInputService(inputService, messageInputFactory, configuration);
+    }
+
+    private void stubInputDescription() {
+        final var configRequest = new ConfigurationRequest();
+        configRequest.addField(new TextField(NettyTransport.CK_BIND_ADDRESS, "Bind address", "0.0.0.0", "Address to listen on."));
+        configRequest.addField(new NumberField(NettyTransport.CK_PORT, "Port", 14401, "Port to listen on."));
+        configRequest.addField(new BooleanField("tcp_keepalive", "TCP keepalive", true, "Enable TCP keepalive"));
+        final var inputDescription = mock(InputDescription.class);
+        when(inputDescription.getConfigurationRequest()).thenReturn(configRequest);
+        when(messageInputFactory.getAvailableInputs())
+                .thenReturn(Map.of(CollectorIngestHttpInput.class.getCanonicalName(), inputDescription));
     }
 
     @Test
@@ -118,6 +137,7 @@ class CollectorIngestInputServiceTest {
         when(subject.isPermitted(RestPermissions.INPUTS_CREATE)).thenReturn(true);
         when(subject.isPermitted(RestPermissions.INPUT_TYPES_CREATE + ":" + CollectorIngestHttpInput.class.getCanonicalName()))
                 .thenReturn(true);
+        stubInputDescription();
 
         final var messageInput = mock(MessageInput.class);
         when(messageInput.asMap()).thenReturn(Map.of());
@@ -133,10 +153,38 @@ class CollectorIngestInputServiceTest {
     }
 
     @Test
+    void createInputAppliesDescriptionDefaultsAndOverridesPort() throws Exception {
+        when(subject.isPermitted(RestPermissions.INPUTS_CREATE)).thenReturn(true);
+        when(subject.isPermitted(RestPermissions.INPUT_TYPES_CREATE + ":" + CollectorIngestHttpInput.class.getCanonicalName()))
+                .thenReturn(true);
+        stubInputDescription();
+
+        final var messageInput = mock(MessageInput.class);
+        when(messageInput.asMap()).thenReturn(Map.of());
+        when(messageInputFactory.create(any(InputCreateRequest.class), anyString(), isNull(), anyBoolean()))
+                .thenReturn(messageInput);
+        when(inputService.create(anyMap())).thenReturn(mock(Input.class));
+
+        service.createInput(subject, "admin", 12345);
+
+        final var requestCaptor = ArgumentCaptor.forClass(InputCreateRequest.class);
+        verify(messageInputFactory).create(requestCaptor.capture(), anyString(), isNull(), anyBoolean());
+        final var request = requestCaptor.getValue();
+        assertThat(request.title()).isEqualTo(CollectorIngestHttpInput.NAME);
+        assertThat(request.type()).isEqualTo(CollectorIngestHttpInput.class.getCanonicalName());
+        assertThat(request.global()).isTrue();
+        assertThat(request.configuration())
+                .containsEntry(NettyTransport.CK_BIND_ADDRESS, "0.0.0.0")
+                .containsEntry(NettyTransport.CK_PORT, 12345)
+                .containsEntry("tcp_keepalive", true);
+    }
+
+    @Test
     void createInputMapsConfigurationExceptionToBadRequest() throws Exception {
         when(subject.isPermitted(RestPermissions.INPUTS_CREATE)).thenReturn(true);
         when(subject.isPermitted(RestPermissions.INPUT_TYPES_CREATE + ":" + CollectorIngestHttpInput.class.getCanonicalName()))
                 .thenReturn(true);
+        stubInputDescription();
 
         final var messageInput = mock(MessageInput.class);
         when(messageInputFactory.create(any(InputCreateRequest.class), anyString(), isNull(), anyBoolean()))

@@ -27,13 +27,16 @@ import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.shared.security.RestPermissions;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -70,15 +73,29 @@ public class CollectorIngestInputService {
             throw new ForbiddenException(f("Not permitted to create input type %s", CollectorIngestHttpInput.class.getCanonicalName()));
         }
 
+        final var inputType = CollectorIngestHttpInput.class.getCanonicalName();
+        final var inputDescription = messageInputFactory.getAvailableInputs().get(inputType);
+        if (inputDescription == null) {
+            throw new NotFoundException(f("No input of type %s registered", inputType));
+        }
+
+        // Start with the default configuration values for the input type and then only override the port
+        final var inputConfig = inputDescription.getConfigurationRequest().getFields().entrySet().stream()
+                .filter(entry -> entry.getValue().getDefaultValue() != null)
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> entry.getValue().getDefaultValue(),
+                        (a, b) -> b,
+                        HashMap::new
+                ));
+        inputConfig.put(NettyTransport.CK_PORT, port);
+
         try {
             final var inputCreateRequest = InputCreateRequest.create(
                     CollectorIngestHttpInput.NAME,
                     CollectorIngestHttpInput.class.getCanonicalName(),
                     true,
-                    Map.of(
-                            "bind_address", "0.0.0.0",
-                            "port", port
-                    ),
+                    inputConfig,
                     null
             );
             final var messageInput = messageInputFactory.create(
