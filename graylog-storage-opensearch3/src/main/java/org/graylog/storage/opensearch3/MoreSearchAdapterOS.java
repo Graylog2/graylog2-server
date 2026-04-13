@@ -353,7 +353,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
     }
 
     private FieldValue missingValue(Sorting sorting) {
-        final boolean first = sorting.getUppercasedDirection().equals(SortOrder.Asc.name());
+        final boolean first = SortOrder.Asc.name().equalsIgnoreCase(sorting.getUppercasedDirection());
         return FieldValue.of(first ? "_first" : "_last");
     }
 
