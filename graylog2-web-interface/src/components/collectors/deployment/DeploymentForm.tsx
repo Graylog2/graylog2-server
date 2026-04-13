@@ -20,11 +20,13 @@ import styled, { css } from 'styled-components';
 import { Formik, Form } from 'formik';
 
 import { SegmentedControl } from 'components/bootstrap';
+import FormSubmit from 'components/common/FormSubmit';
 import { ClipboardButton, FormikInput, Select } from 'components/common';
 import SectionGrid from 'components/common/Section/SectionGrid';
-import FormSubmit from 'components/common/FormSubmit';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import { useFleets, useCollectorsMutations } from '../hooks';
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 
 type Platform = 'linux' | 'windows' | 'macos' | 'container';
 type TokenExpiry = 'PT24H' | 'P7D' | 'P30D' | 'never';
@@ -133,6 +135,7 @@ const validate = (values: FormValues) => {
 const DeploymentForm = () => {
   const { data: fleets } = useFleets();
   const { createEnrollmentToken } = useCollectorsMutations();
+  const sendTelemetry = useSendCollectorsTelemetry();
   const [tokenResponse, setTokenResponse] = useState<TokenResponse | null>(null);
 
   const fleetOptions = (fleets || []).map((f) => ({ value: f.id, label: f.name }));
@@ -146,6 +149,14 @@ const DeploymentForm = () => {
           expiresIn: values.expiry === 'never' ? null : values.expiry,
         });
 
+        sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.GENERATED, {
+          app_action_value: 'deployment-generate',
+          token_id: response.token,
+          fleet_id: values.fleetId,
+          platform: values.platform,
+          expires_in: values.expiry,
+        });
+
         setTokenResponse({
           token: response.token,
           expiresAt: response.expires_at,
@@ -154,7 +165,7 @@ const DeploymentForm = () => {
         // Error notification handled by useCollectorsMutations onError callback
       }
     },
-    [createEnrollmentToken],
+    [createEnrollmentToken, sendTelemetry],
   );
 
   const getInstallScript = (platform: Platform) => {
@@ -193,7 +204,13 @@ const DeploymentForm = () => {
             <Label>Platform</Label>
             <SegmentedControl
               value={values.platform}
-              onChange={(v) => setFieldValue('platform', v)}
+              onChange={(v) => {
+                sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.PLATFORM_SELECTED, {
+                  app_action_value: 'deployment-platform',
+                  platform: v,
+                });
+                setFieldValue('platform', v);
+              }}
               data={[
                 { value: 'linux', label: 'Linux' },
                 { value: 'windows', label: 'Windows' },
@@ -209,7 +226,14 @@ const DeploymentForm = () => {
               placeholder="Select a fleet"
               options={fleetOptions}
               value={values.fleetId}
-              onChange={(selected) => setFieldValue('fleetId', selected as string)}
+              onChange={(selected) => {
+                const newFleetId = selected as string;
+                sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.FLEET_SELECTED, {
+                  app_action_value: 'deployment-fleet',
+                  fleet_id: newFleetId,
+                });
+                setFieldValue('fleetId', newFleetId);
+              }}
               clearable={false}
             />
           </Section>
@@ -229,7 +253,13 @@ const DeploymentForm = () => {
             <Label>Token Expiry</Label>
             <SegmentedControl
               value={values.expiry}
-              onChange={(v) => setFieldValue('expiry', v)}
+              onChange={(v) => {
+                sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.EXPIRY_SELECTED, {
+                  app_action_value: 'deployment-expiry',
+                  expires_in: v,
+                });
+                setFieldValue('expiry', v);
+              }}
               data={[
                 { value: 'PT24H', label: '24 hours' },
                 { value: 'P7D', label: '7 days' },
@@ -253,7 +283,17 @@ const DeploymentForm = () => {
                 <ResultSection>
                   <h4>
                     Enrollment Token
-                    <ClipboardButton text={tokenResponse.token} title="Copy Token" bsSize="xs" />
+                    <ClipboardButton
+                      text={tokenResponse.token}
+                      title="Copy Token"
+                      bsSize="xs"
+                      onSuccess={() =>
+                        sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.TOKEN_COPIED, {
+                          app_action_value: 'deployment-copy-token',
+                          token_id: tokenResponse.token,
+                        })
+                      }
+                    />
                   </h4>
                   <TokenRow>
                     <CodeInline>{tokenResponse.token.slice(0, 50)}...</CodeInline>
@@ -267,7 +307,18 @@ const DeploymentForm = () => {
                 <ResultSection>
                   <h4>
                     Installation Script
-                    <ClipboardButton text={getInstallScript(values.platform)} title="Copy Script" bsSize="xs" />
+                    <ClipboardButton
+                      text={getInstallScript(values.platform)}
+                      title="Copy Script"
+                      bsSize="xs"
+                      onSuccess={() =>
+                        sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.SCRIPT_COPIED, {
+                          app_action_value: 'deployment-copy-script',
+                          platform: values.platform,
+                          token_id: tokenResponse.token,
+                        })
+                      }
+                    />
                   </h4>
                   <ScriptBlock>{getInstallScript(values.platform)}</ScriptBlock>
                 </ResultSection>
