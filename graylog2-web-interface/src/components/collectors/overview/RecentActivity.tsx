@@ -81,6 +81,10 @@ const ICON_MAP: Record<ActivityEntry['type'], IconName> = {
 };
 
 const targetLink = (target: TargetInfo) => {
+  if (!target.id) {
+    return <MutedText>[deleted]</MutedText>;
+  }
+
   if (target.type === 'fleet') {
     return <Link to={Routes.SYSTEM.COLLECTORS.FLEET(target.id)}>{target.name}</Link>;
   }
@@ -121,18 +125,13 @@ const renderDescription = (entry: ActivityEntry) => {
         </span>
       );
     case 'FLEET_REASSIGNED': {
-      const newFleetId = entry.details?.new_fleet_id;
-      const newFleetName = entry.details?.new_fleet_name ?? newFleetId;
-
       return (
         <span>
-          Collector {targetLink(target)} reassigned to fleet{' '}
-          {newFleetId ? <Link to={Routes.SYSTEM.COLLECTORS.FLEET(newFleetId)}>{newFleetName}</Link> : 'unknown'}
+          Collector {targetLink(target)} reassigned
+          {entry.details && <> to fleet {targetLink(entry.details.destination_fleet)}</>}
         </span>
       );
     }
-    default:
-      return <span>{entry.type}</span>;
   }
 };
 

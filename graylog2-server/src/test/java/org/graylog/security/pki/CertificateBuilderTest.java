@@ -24,6 +24,9 @@ import org.graylog2.security.encryption.EncryptedValueService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.cert.CertPathValidator;
 import java.security.cert.CertPathValidatorException;
 import java.security.cert.CertificateFactory;
@@ -423,6 +426,236 @@ class CertificateBuilderTest {
 
         // Should NOT have Subject Alternative Names
         assertThat(cert.getSubjectAlternativeNames()).isNull();
+    }
+
+    // End-entity certificate lifetime cap tests
+
+    @Test
+    void createEndEntityCertCapsLifetimeToIssuerRemainingLifetime() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(3650));
+        final CertificateEntry shortIssuer = builder.createIntermediateCa("Short CA", rootCa, Duration.ofDays(30));
+
+        final CertificateEntry endEntityCert = builder.createEndEntityCert(
+                "Server", shortIssuer, KeyUsage.digitalSignature | KeyUsage.keyEncipherment,
+                KeyPurposeId.id_kp_serverAuth, Duration.ofDays(365));
+
+        final X509Certificate cert = PemUtils.parseCertificate(endEntityCert.certificate());
+        final Duration actualValidity = Duration.between(
+                cert.getNotBefore().toInstant(), cert.getNotAfter().toInstant());
+        assertThat(actualValidity.toDays()).isEqualTo(30);
+    }
+
+    @Test
+    void createEndEntityCertUsesRequestedLifetimeWhenIssuerHasEnoughRemaining() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(3650));
+        final CertificateEntry issuer = builder.createIntermediateCa("Signing CA", rootCa, Duration.ofDays(1825));
+
+        final CertificateEntry endEntityCert = builder.createEndEntityCert(
+                "Server", issuer, KeyUsage.digitalSignature | KeyUsage.keyEncipherment,
+                KeyPurposeId.id_kp_serverAuth, Duration.ofDays(365));
+
+        final X509Certificate cert = PemUtils.parseCertificate(endEntityCert.certificate());
+        final Duration actualValidity = Duration.between(
+                cert.getNotBefore().toInstant(), cert.getNotAfter().toInstant());
+        assertThat(actualValidity.toDays()).isEqualTo(365);
+    }
+
+    @Test
+    void createEndEntityCertRejectsExpiredIssuer() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(3650));
+        final CertificateEntry shortIssuer = builder.createIntermediateCa("Expired CA", rootCa, Duration.ofDays(1));
+
+        final var futureBuilder = new CertificateBuilder(
+                new EncryptedValueService("1234567890abcdef"), "Graylog",
+                Clock.offset(clock, Duration.ofDays(2)));
+
+        assertThatThrownBy(() -> futureBuilder.createEndEntityCert(
+                "Server", shortIssuer, KeyUsage.digitalSignature,
+                KeyPurposeId.id_kp_serverAuth, Duration.ofDays(365)))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("expired");
+    }
+
+    // CSR signing tests
+
+    @Test
+    void signCsrCertHasSkiAndAkiMatchingIssuerSki() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(3650));
+        final CertificateEntry intermediateCa = builder.createIntermediateCa("Signing CA", rootCa, Duration.ofDays(1825));
+
+        final KeyPair agentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+        final byte[] csrPem = builder.createCsr(agentKeyPair, "test-agent");
+        final X509Certificate signedCert = builder.signCsr(csrPem, intermediateCa, "test-agent", Duration.ofDays(365));
+
+        final X509Certificate intermediateCert = PemUtils.parseCertificate(intermediateCa.certificate());
+
+        assertThat(PemUtils.extractSubjectKeyIdentifier(signedCert)).isPresent();
+        assertThat(PemUtils.extractAuthorityKeyIdentifier(signedCert))
+                .isEqualTo(PemUtils.extractSubjectKeyIdentifier(intermediateCert));
+    }
+
+    @Test
+    void signCsrSetsSubjectCnAndIssuerDn() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(3650));
+        final CertificateEntry issuer = builder.createIntermediateCa("Signing CA", rootCa, Duration.ofDays(1825));
+
+        final KeyPair agentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+        final byte[] csrPem = builder.createCsr(agentKeyPair, "test-agent");
+        final X509Certificate cert = builder.signCsr(csrPem, issuer, "my-agent-uid", Duration.ofDays(365));
+
+        assertThat(cert.getSubjectX500Principal().getName()).contains("CN=my-agent-uid");
+        assertThat(cert.getSubjectX500Principal().getName()).contains("O=Graylog");
+        assertThat(cert.getIssuerX500Principal().getName()).contains("CN=Signing CA");
+    }
+
+    @Test
+    void signCsrCertIsVerifiableByIssuer() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(3650));
+        final CertificateEntry issuer = builder.createIntermediateCa("Signing CA", rootCa, Duration.ofDays(1825));
+
+        final KeyPair agentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+        final byte[] csrPem = builder.createCsr(agentKeyPair, "test-agent");
+        final X509Certificate cert = builder.signCsr(csrPem, issuer, "test-agent", Duration.ofDays(365));
+
+        final X509Certificate issuerCert = PemUtils.parseCertificate(issuer.certificate());
+        assertThatCode(() -> cert.verify(issuerCert.getPublicKey())).doesNotThrowAnyException();
+    }
+
+    @Test
+    void signCsrCertHasBasicConstraintsCaFalse() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(3650));
+        final CertificateEntry issuer = builder.createIntermediateCa("Signing CA", rootCa, Duration.ofDays(1825));
+
+        final KeyPair agentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+        final byte[] csrPem = builder.createCsr(agentKeyPair, "test-agent");
+        final X509Certificate cert = builder.signCsr(csrPem, issuer, "test-agent", Duration.ofDays(365));
+
+        assertThat(cert.getBasicConstraints()).isEqualTo(-1);
+    }
+
+    @Test
+    void signCsrCertHasDigitalSignatureKeyUsage() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(3650));
+        final CertificateEntry issuer = builder.createIntermediateCa("Signing CA", rootCa, Duration.ofDays(1825));
+
+        final KeyPair agentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+        final byte[] csrPem = builder.createCsr(agentKeyPair, "test-agent");
+        final X509Certificate cert = builder.signCsr(csrPem, issuer, "test-agent", Duration.ofDays(365));
+
+        final boolean[] keyUsage = cert.getKeyUsage();
+        assertThat(keyUsage).isNotNull();
+        assertThat(keyUsage[0]).isTrue(); // digitalSignature
+        assertThat(keyUsage[5]).isFalse(); // keyCertSign must NOT be set
+    }
+
+    @Test
+    void signCsrCertHasClientAuthEku() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(3650));
+        final CertificateEntry issuer = builder.createIntermediateCa("Signing CA", rootCa, Duration.ofDays(1825));
+
+        final KeyPair agentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+        final byte[] csrPem = builder.createCsr(agentKeyPair, "test-agent");
+        final X509Certificate cert = builder.signCsr(csrPem, issuer, "test-agent", Duration.ofDays(365));
+
+        assertThat(cert.getExtendedKeyUsage()).contains(KeyPurposeId.id_kp_clientAuth.getId());
+    }
+
+    @Test
+    void signCsrAcceptsEdDSAKeyAlgorithmName() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(3650));
+        final CertificateEntry issuer = builder.createIntermediateCa("Signing CA", rootCa, Duration.ofDays(1825));
+
+        // The JDK reports "EdDSA" (not "Ed25519") when using the "EdDSA" generator name
+        final KeyPair edDsaKeyPair = KeyPairGenerator.getInstance("EdDSA").generateKeyPair();
+        assertThat(edDsaKeyPair.getPublic().getAlgorithm()).isEqualTo("EdDSA");
+
+        final byte[] csrPem = builder.createCsr(edDsaKeyPair, "eddsa-agent");
+        final X509Certificate cert = builder.signCsr(csrPem, issuer, "eddsa-agent", Duration.ofDays(365));
+
+        assertThat(cert).isNotNull();
+        assertThat(cert.getSubjectX500Principal().getName()).contains("CN=eddsa-agent");
+    }
+
+    @Test
+    void signCsrRejectsRsaKey() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(3650));
+        final CertificateEntry issuer = builder.createIntermediateCa("Signing CA", rootCa, Duration.ofDays(1825));
+
+        final KeyPair rsaKeyPair = KeyPairGenerator.getInstance("RSA").generateKeyPair();
+        final byte[] csrPem = builder.createCsr(rsaKeyPair, "rsa-agent");
+
+        assertThatThrownBy(() -> builder.signCsr(csrPem, issuer, "rsa-agent", Duration.ofDays(365)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Ed25519");
+    }
+
+    @Test
+    void signCsrRejectsInvalidCsrSignature() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(3650));
+        final CertificateEntry issuer = builder.createIntermediateCa("Signing CA", rootCa, Duration.ofDays(1825));
+
+        // Create a CSR with one key pair, then tamper by creating another CSR and mixing PEM
+        // Simplest: pass garbage PEM
+        final byte[] invalidCsr = "-----BEGIN CERTIFICATE REQUEST-----\ngarbage\n-----END CERTIFICATE REQUEST-----".getBytes(StandardCharsets.UTF_8);
+
+        assertThatThrownBy(() -> builder.signCsr(invalidCsr, issuer, "bad-agent", Duration.ofDays(365)))
+                .isInstanceOf(Exception.class);
+    }
+
+    // CSR signing lifetime cap tests
+
+    @Test
+    void signCsrCapsLifetimeToIssuerRemainingLifetime() throws Exception {
+        // Create an issuer with only 30 days of validity
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(3650));
+        final CertificateEntry shortLivedIssuer = builder.createIntermediateCa("Short Signing CA", rootCa, Duration.ofDays(30));
+
+        final KeyPair agentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+        final byte[] csrPem = builder.createCsr(agentKeyPair, "test-agent");
+
+        // Request 365 days, but issuer only has 30 days left
+        final X509Certificate signedCert = builder.signCsr(csrPem, shortLivedIssuer, "test-agent", Duration.ofDays(365));
+
+        final Duration actualValidity = Duration.between(
+                signedCert.getNotBefore().toInstant(),
+                signedCert.getNotAfter().toInstant()
+        );
+        assertThat(actualValidity.toDays()).isEqualTo(30);
+    }
+
+    @Test
+    void signCsrUsesRequestedLifetimeWhenIssuerHasEnoughRemaining() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(3650));
+        final CertificateEntry issuer = builder.createIntermediateCa("Signing CA", rootCa, Duration.ofDays(1825));
+
+        final KeyPair agentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+        final byte[] csrPem = builder.createCsr(agentKeyPair, "test-agent");
+
+        final X509Certificate signedCert = builder.signCsr(csrPem, issuer, "test-agent", Duration.ofDays(365));
+
+        final Duration actualValidity = Duration.between(
+                signedCert.getNotBefore().toInstant(),
+                signedCert.getNotAfter().toInstant()
+        );
+        assertThat(actualValidity.toDays()).isEqualTo(365);
+    }
+
+    @Test
+    void signCsrRejectsExpiredIssuer() throws Exception {
+        // Create an issuer with 1 day validity, then use a clock past that
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(3650));
+        final CertificateEntry shortLivedIssuer = builder.createIntermediateCa("Expired CA", rootCa, Duration.ofDays(1));
+
+        final var futureBuilder = new CertificateBuilder(
+                new EncryptedValueService("1234567890abcdef"), "Graylog",
+                Clock.offset(clock, Duration.ofDays(2)));
+
+        final KeyPair agentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+        final byte[] csrPem = futureBuilder.createCsr(agentKeyPair, "test-agent");
+
+        assertThatThrownBy(() -> futureBuilder.signCsr(csrPem, shortLivedIssuer, "test-agent", Duration.ofDays(365)))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("expired");
     }
 
     // PKIX trust chain validation tests

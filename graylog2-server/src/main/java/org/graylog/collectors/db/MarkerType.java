@@ -16,12 +16,12 @@
  */
 package org.graylog.collectors.db;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 /**
  * Types of markers in the fleet transaction log. Stored as strings in MongoDB.
  * Unknown values (from newer server versions) are parsed as {@link #UNKNOWN} to ensure
  * forward compatibility across cluster upgrades.
- *
- * This is persisted in a non-entity collection, thus it has no Jackson mapping.
  */
 public enum MarkerType {
     CONFIG_CHANGED,
@@ -35,6 +35,7 @@ public enum MarkerType {
      * Parse a marker type from its string representation, returning {@link #UNKNOWN}
      * for unrecognized values instead of throwing.
      */
+    @JsonCreator
     public static MarkerType fromString(String value) {
         try {
             return valueOf(value);
