@@ -95,7 +95,7 @@ public abstract class CollectorsConfig {
         requireNonBlank(hostname, "hostname can't be blank");
 
         return CollectorsConfig.builder()
-                .http(new IngestEndpointConfig(true, hostname, DEFAULT_HTTP_PORT, null));
+                .http(new IngestEndpointConfig(hostname, DEFAULT_HTTP_PORT));
     }
 
     public static CollectorsConfig createDefault(String hostname) {

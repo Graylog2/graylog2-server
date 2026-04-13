@@ -14,11 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.collectors;
+package org.graylog.collectors.db;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
-public record IngestEndpointConfig(
-        @JsonProperty("hostname") String hostname,
-        @JsonProperty("port") int port
-) {}
+@JsonTypeName("FLEET_REASSIGNED")
+public record FleetReassignedPayload(
+        @JsonProperty("new_fleet_id") String newFleetId
+) implements MarkerPayload {
+}

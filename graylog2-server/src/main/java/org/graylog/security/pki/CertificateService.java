@@ -19,25 +19,22 @@ package org.graylog.security.pki;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
-import com.mongodb.client.model.ReplaceOptions;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.bson.types.ObjectId;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.web.customization.CustomizationConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.security.cert.X509Certificate;
 import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
+import static org.graylog2.database.utils.MongoUtils.insertedIdsAsString;
 
 /**
  * Service for managing certificate entries in MongoDB.
@@ -49,7 +46,6 @@ import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 @Singleton
 public class CertificateService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CertificateService.class);
     private static final String COLLECTION_NAME = "pki_certificates";
 
     private final MongoCollection<CertificateEntry> collection;
@@ -92,7 +88,7 @@ public class CertificateService {
      * <pre>{@code
      * CertificateEntry rootCa = certificateService.builder()
      *     .createRootCa("My Root CA", Algorithm.ED25519, Duration.ofDays(3650));
-     * rootCa = certificateService.save(rootCa);
+     * rootCa = certificateService.insert(rootCa);
      * }</pre>
      *
      * @return a new CertificateBuilder instance
@@ -102,52 +98,43 @@ public class CertificateService {
     }
 
     /**
-     * Saves a certificate entry to the database.
-     * If the entry has a null ID, it will be inserted as a new document.
-     * If the entry has an existing ID, it will replace the existing document.
+     * Inserts a new certificate entry into the database. If the given entity has a non-null ID, the method throws
+     * an exception.
      *
      * @param entry the certificate entry to save
      * @return the saved certificate entry with its ID
+     * @throws IllegalArgumentException when the given entry has a non-null ID
      */
-    public CertificateEntry save(CertificateEntry entry) {
-        final CertificateEntry enriched = enrichWithDn(entry);
-        if (enriched.id() == null) {
-            final String insertedId = insertedIdAsString(collection.insertOne(enriched));
-            return enriched.withId(insertedId);
+    public CertificateEntry insert(CertificateEntry entry) {
+        if (entry.id() == null) {
+            return entry.withId(insertedIdAsString(collection.insertOne(entry)));
         } else {
-            collection.replaceOne(
-                    Filters.eq("_id", new ObjectId(enriched.id())),
-                    enriched,
-                    new ReplaceOptions().upsert(false)
-            );
-            return enriched;
+            throw new IllegalArgumentException("new certificate entry should not have an ID");
         }
     }
 
-    private CertificateEntry enrichWithDn(CertificateEntry entry) {
-        if (entry.subjectDn() != null && entry.issuerDn() != null) {
-            return entry;
+    /**
+     * Insert the given new certificate entries into the database. If any of the given entries has a non-null ID, the
+     * method throws an exception.
+     *
+     * @param entries the new entries to insert
+     * @return the inserted entries
+     * @throws IllegalArgumentException when any of the given entries has a non-null ID
+     */
+    public List<CertificateEntry> insert(List<CertificateEntry> entries) {
+        if (entries.isEmpty()) {
+            return List.of();
         }
-        try {
-            final X509Certificate cert = PemUtils.parseCertificate(entry.certificate());
-            return new CertificateEntry(
-                    entry.id(),
-                    entry.fingerprint(),
-                    entry.subjectKeyIdentifier(),
-                    entry.authorityKeyIdentifier(),
-                    entry.privateKey(),
-                    entry.certificate(),
-                    entry.issuerChain(),
-                    cert.getSubjectX500Principal().getName(),
-                    cert.getIssuerX500Principal().getName(),
-                    entry.notBefore(),
-                    entry.notAfter(),
-                    entry.createdAt()
-            );
-        } catch (Exception e) {
-            LOG.warn("Failed to extract DN from certificate: {}", e.getMessage());
-            return entry;
+        if (entries.stream().anyMatch(entry -> entry.id() != null)) {
+            throw new IllegalArgumentException("no entry should have an ID");
         }
+
+        final var ids = insertedIdsAsString(collection.insertMany(entries));
+
+        // Map the returned IDs to the given entries in order.
+        return IntStream.range(0, entries.size())
+                .mapToObj(idx -> entries.get(idx).withId(ids.get(idx)))
+                .toList();
     }
 
     /**

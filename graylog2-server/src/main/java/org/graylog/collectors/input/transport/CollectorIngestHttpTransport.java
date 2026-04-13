@@ -22,12 +22,11 @@ import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.EventLoopGroup;
 import io.netty.handler.ssl.SslContext;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog.collectors.CollectorCaService;
 import org.graylog.collectors.CollectorTLSUtils;
-import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
-import org.graylog.collectors.IngestEndpointConfig;
 import org.graylog.inputs.otel.transport.OtlpHttpUtils;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.inputs.transports.AbstractHttpTransport;
@@ -36,6 +35,8 @@ import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.ConfigurationField;
+import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
@@ -43,8 +44,9 @@ import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.graylog2.utilities.IpSubnet;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
@@ -72,30 +74,18 @@ public class CollectorIngestHttpTransport extends AbstractHttpTransport {
                                         LocalMetricRegistry localMetricRegistry,
                                         TLSProtocolsConfiguration tlsConfiguration,
                                         @Named("trusted_proxies") Set<IpSubnet> trustedProxies,
-                                        CollectorTLSUtils tlsUtils,
-                                        CollectorsConfigService collectorsConfigService) {
-        super(buildTransportConfig(collectorsConfigService), eventLoopGroup, eventLoopGroupFactory,
+                                        CollectorTLSUtils tlsUtils) {
+        super(withTlsDefaults(configuration), eventLoopGroup, eventLoopGroupFactory,
                 nettyTransportConfiguration, throughputCounter, localMetricRegistry,
                 tlsConfiguration, trustedProxies, OtlpHttpUtils.LOGS_PATH);
         this.tlsUtils = tlsUtils;
     }
 
-    private static Configuration buildTransportConfig(CollectorsConfigService collectorsConfigService) {
-        final var port = collectorsConfigService.get()
-                .map(CollectorsConfig::http)
-                .map(IngestEndpointConfig::port)
-                .orElse(DEFAULT_HTTP_PORT);
-        return new Configuration(Map.of(
-                CK_BIND_ADDRESS, "0.0.0.0",
-                CK_PORT, port,
-                CK_TLS_ENABLE, true,
-                CK_TLS_CLIENT_AUTH, TLS_CLIENT_AUTH_REQUIRED,
-                CK_MAX_CHUNK_SIZE, 4 * 1024 * 1024,
-                CK_RECV_BUFFER_SIZE, 1048576,
-                CK_NUMBER_WORKER_THREADS, 4,
-                CK_TCP_KEEPALIVE, true,
-                CK_IDLE_WRITER_TIMEOUT, 60
-        ));
+    private static Configuration withTlsDefaults(Configuration userConfig) {
+        final var merged = Optional.ofNullable(userConfig.getSource()).map(HashMap::new).orElse(new HashMap<>());
+        merged.put(CK_TLS_ENABLE, true);
+        merged.put(CK_TLS_CLIENT_AUTH, TLS_CLIENT_AUTH_REQUIRED);
+        return new Configuration(merged);
     }
 
     @Override
@@ -137,9 +127,56 @@ public class CollectorIngestHttpTransport extends AbstractHttpTransport {
 
     @ConfigClass
     public static class Config extends AbstractHttpTransport.Config {
+        private static final int DEFAULT_MAX_CHUNK_SIZE = 4 * 1024 * 1024;
+
+        private static final Set<String> ALLOWED_FIELDS = Set.of(
+                CK_BIND_ADDRESS,
+                CK_PORT,
+                CK_RECV_BUFFER_SIZE,
+                CK_NUMBER_WORKER_THREADS,
+                CK_MAX_CHUNK_SIZE,
+                CK_IDLE_WRITER_TIMEOUT,
+                CK_TCP_KEEPALIVE
+        );
+
+        private final CollectorsConfigService collectorsConfigService;
+
+        @Inject
+        public Config(CollectorsConfigService collectorsConfigService) {
+            this.collectorsConfigService = collectorsConfigService;
+        }
+
         @Override
         public ConfigurationRequest getRequestedConfiguration() {
-            return new ConfigurationRequest();
+            final var config = new ConfigurationRequest();
+
+            super.getRequestedConfiguration().getFields().values().stream()
+                    .filter(field -> ALLOWED_FIELDS.contains(field.getName()))
+                    .forEach(config::addField);
+
+            config.addField(new NumberField(
+                    CK_PORT,
+                    "Port",
+                    DEFAULT_HTTP_PORT,
+                    portDescription(),
+                    NumberField.Attribute.IS_PORT_NUMBER));
+            config.addField(new NumberField(
+                    CK_MAX_CHUNK_SIZE,
+                    "Max. HTTP chunk size",
+                    DEFAULT_MAX_CHUNK_SIZE,
+                    "The maximum HTTP chunk size in bytes (e.g. length of HTTP request body)",
+                    ConfigurationField.Optional.OPTIONAL));
+
+            return config;
+        }
+
+        private String portDescription() {
+            return collectorsConfigService.get()
+                    .map(c -> "Port to listen on. The collectors settings currently direct collectors to port "
+                            + c.http().port() + ". If you use a different port, ensure the external port "
+                            + "is routed correctly to this port.")
+                    .orElse("Port to listen on. If this port differs from the port configured in the "
+                            + "collectors settings, ensure the external port is routed correctly to this port.");
         }
     }
 }

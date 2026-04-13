@@ -56,11 +56,9 @@ public record CertificateEntry(
         @JsonProperty(FIELD_ISSUER_CHAIN)
         List<String> issuerChain,
 
-        @Nullable
         @JsonProperty(FIELD_SUBJECT_DN)
         String subjectDn,
 
-        @Nullable
         @JsonProperty(FIELD_ISSUER_DN)
         String issuerDn,
 
