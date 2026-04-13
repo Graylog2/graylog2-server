@@ -21,6 +21,7 @@ import jakarta.ws.rs.ForbiddenException;
 import org.apache.shiro.subject.Subject;
 import org.graylog.collectors.input.CollectorIngestHttpInput;
 import org.graylog2.Configuration;
+import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -49,10 +50,14 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class CollectorIngestInputServiceTest {
 
-    @Mock private InputService inputService;
-    @Mock private MessageInputFactory messageInputFactory;
-    @Mock private Configuration configuration;
-    @Mock private Subject subject;
+    @Mock
+    private InputService inputService;
+    @Mock
+    private MessageInputFactory messageInputFactory;
+    @Mock
+    private Configuration configuration;
+    @Mock
+    private Subject subject;
 
     private CollectorIngestInputService service;
 
@@ -63,8 +68,8 @@ class CollectorIngestInputServiceTest {
 
     @Test
     void getInputIdsReturnsIdsForMatchingInputs() {
-        final var input1 = mock(org.graylog2.inputs.Input.class);
-        final var input2 = mock(org.graylog2.inputs.Input.class);
+        final var input1 = mock(Input.class);
+        final var input2 = mock(Input.class);
         when(input1.getId()).thenReturn("id-1");
         when(input2.getId()).thenReturn("id-2");
         when(inputService.allByType(CollectorIngestHttpInput.class.getCanonicalName()))
@@ -118,7 +123,7 @@ class CollectorIngestInputServiceTest {
         when(messageInput.asMap()).thenReturn(Map.of());
         when(messageInputFactory.create(any(InputCreateRequest.class), anyString(), isNull(), anyBoolean()))
                 .thenReturn(messageInput);
-        final var input = mock(org.graylog2.inputs.Input.class);
+        final var input = mock(Input.class);
         when(inputService.create(any(Map.class))).thenReturn(input);
 
         service.createInput(subject, "admin", 14401);

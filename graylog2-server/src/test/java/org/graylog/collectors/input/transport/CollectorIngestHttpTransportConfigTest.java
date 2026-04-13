@@ -18,6 +18,7 @@ package org.graylog.collectors.input.transport;
 
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
+import org.graylog.collectors.IngestEndpointConfig;
 import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,7 +39,7 @@ class CollectorIngestHttpTransportConfigTest {
     @Test
     void portDescriptionIncludesConfiguredPort() {
         final var config = CollectorsConfig.builder()
-                .http(new org.graylog.collectors.IngestEndpointConfig("host", 14401))
+                .http(new IngestEndpointConfig("host", 14401))
                 .build();
         when(collectorsConfigService.get()).thenReturn(Optional.of(config));
 
