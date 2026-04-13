@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { Formik, Form } from 'formik';
+import type { FormikTouched } from 'formik';
 
 import { Modal } from 'components/bootstrap';
 import { FormikInput } from 'components/common';
@@ -58,10 +59,22 @@ const FleetFormModal = ({ fleet = undefined, onClose, onSave }: Props) => {
     target_version: fleet?.target_version || '',
   };
 
+  // Ref kept up-to-date from the Formik render prop so handleClose (which lives
+  // outside Formik) can report abandonment context on cancel.
+  const formStateRef = useRef<{ dirty: boolean; touched: FormikTouched<FormValues> }>({
+    dirty: false,
+    touched: {},
+  });
+
   const handleClose = useCallback(() => {
     if (!isEdit) {
+      const { dirty, touched } = formStateRef.current;
+      const fields_touched = Object.keys(touched).filter((k) => Boolean((touched as Record<string, unknown>)[k]));
+
       sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.FLEET.CREATE_CANCELLED, {
         app_action_value: 'fleet-create-cancel',
+        dirty,
+        fields_touched,
       });
     }
     onClose();
@@ -89,7 +102,10 @@ const FleetFormModal = ({ fleet = undefined, onClose, onSave }: Props) => {
   return (
     <Modal show onHide={handleClose}>
       <Formik<FormValues> initialValues={initialValues} onSubmit={handleSubmit} validate={validate} validateOnMount>
-        {({ isSubmitting, isValid, isValidating }) => (
+        {({ isSubmitting, isValid, isValidating, dirty, touched }) => {
+          formStateRef.current = { dirty, touched };
+
+          return (
           <Form>
             <Modal.Header>
               <Modal.Title>{isEdit ? 'Edit Fleet' : 'New Fleet'}</Modal.Title>
@@ -122,7 +138,8 @@ const FleetFormModal = ({ fleet = undefined, onClose, onSave }: Props) => {
               />
             </Modal.Footer>
           </Form>
-        )}
+          );
+        }}
       </Formik>
     </Modal>
   );

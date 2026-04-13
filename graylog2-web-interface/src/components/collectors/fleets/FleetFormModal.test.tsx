@@ -34,7 +34,7 @@ describe('FleetFormModal telemetry (create path)', () => {
     sendTelemetry.mockClear();
   });
 
-  it('emits FLEET.CREATE_CANCELLED when user clicks Cancel on create path', async () => {
+  it('emits FLEET.CREATE_CANCELLED with dirty=false when user cancels without touching anything', async () => {
     const onClose = jest.fn();
     render(<FleetFormModal onClose={onClose} onSave={jest.fn()} />);
     const cancelButton = screen.getByRole('button', { name: /Cancel/i });
@@ -42,9 +42,31 @@ describe('FleetFormModal telemetry (create path)', () => {
 
     expect(sendTelemetry).toHaveBeenCalledWith(
       'Fleet Create Cancelled',
-      expect.objectContaining({ app_action_value: 'fleet-create-cancel' }),
+      expect.objectContaining({
+        app_action_value: 'fleet-create-cancel',
+        dirty: false,
+        fields_touched: [],
+      }),
     );
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it('emits FLEET.CREATE_CANCELLED with dirty=true and fields_touched after typing and blurring', async () => {
+    render(<FleetFormModal onClose={jest.fn()} onSave={jest.fn()} />);
+
+    const nameInput = screen.getByLabelText(/Name/i);
+    await userEvent.type(nameInput, 'web');
+    fireEvent.blur(nameInput);
+
+    await userEvent.click(screen.getByRole('button', { name: /Cancel/i }));
+
+    expect(sendTelemetry).toHaveBeenCalledWith(
+      'Fleet Create Cancelled',
+      expect.objectContaining({
+        dirty: true,
+        fields_touched: expect.arrayContaining(['name']),
+      }),
+    );
   });
 
   it('emits FLEET.CREATED after successful save on create path', async () => {

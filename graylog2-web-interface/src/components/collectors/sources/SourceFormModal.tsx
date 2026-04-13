@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Formik, Form } from 'formik';
+import type { FormikTouched } from 'formik';
 import isEqual from 'lodash/isEqual';
 
 import { Input } from 'components/bootstrap';
@@ -212,11 +213,30 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Ref kept up-to-date from the Formik render prop so handleClose (which lives
+  // outside Formik) can report abandonment context on cancel.
+  const formStateRef = useRef<{
+    dirty: boolean;
+    touched: FormikTouched<FormValues>;
+    values: FormValues;
+  }>({ dirty: false, touched: {}, values: initialValues });
+
   const handleClose = useCallback(() => {
     if (!isEdit) {
+      const { dirty, touched, values } = formStateRef.current;
+      const fields_touched = Object.keys(touched).filter(
+        (k) => Boolean((touched as Record<string, unknown>)[k]),
+      );
+
       sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SOURCE.CREATE_CANCELLED, {
         app_action_value: 'source-create-cancel',
         fleet_id: fleetId,
+        dirty,
+        fields_touched,
+        source_type: values.source_type,
+        source_type_changed_from_default: values.source_type !== 'file',
+        enabled: values.enabled,
+        enabled_toggled: values.enabled !== true,
       });
     }
     onClose();
@@ -261,7 +281,10 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props
   return (
     <Modal show onHide={handleClose} bsSize="lg">
       <Formik<FormValues> initialValues={initialValues} onSubmit={handleSubmit} validate={validate}>
-        {({ isSubmitting, isValidating, values, setFieldValue }) => (
+        {({ isSubmitting, isValidating, values, setFieldValue, dirty, touched }) => {
+          formStateRef.current = { dirty, touched, values };
+
+          return (
           <Form>
             <Modal.Header>
               <Modal.Title>{isEdit ? 'Edit Source' : 'New Source'}</Modal.Title>
@@ -311,7 +334,8 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props
               />
             </Modal.Footer>
           </Form>
-        )}
+          );
+        }}
       </Formik>
     </Modal>
   );

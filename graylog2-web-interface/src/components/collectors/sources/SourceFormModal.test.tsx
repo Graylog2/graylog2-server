@@ -88,13 +88,57 @@ describe('SourceFormModal telemetry', () => {
     expect(sendTelemetryInstance).not.toHaveBeenCalledWith('Collector Source Create Opened', expect.anything());
   });
 
-  it('emits CREATE_CANCELLED on cancel (create path)', async () => {
+  it('emits CREATE_CANCELLED with dirty=false when user cancels without touching anything', async () => {
     render(<SourceFormModal fleetId="f-1" onClose={jest.fn()} onSave={jest.fn()} />);
     await userEvent.click(screen.getByRole('button', { name: /Cancel/i }));
 
     expect(sendTelemetryInstance).toHaveBeenCalledWith(
       'Collector Source Create Cancelled',
-      expect.objectContaining({ fleet_id: 'f-1' }),
+      expect.objectContaining({
+        fleet_id: 'f-1',
+        dirty: false,
+        fields_touched: [],
+        source_type: 'file',
+        source_type_changed_from_default: false,
+        enabled: true,
+        enabled_toggled: false,
+      }),
+    );
+  });
+
+  it('emits CREATE_CANCELLED with dirty=true and fields_touched after interaction', async () => {
+    render(<SourceFormModal fleetId="f-1" onClose={jest.fn()} onSave={jest.fn()} />);
+
+    const nameInput = screen.getByLabelText(/Name/i);
+    await userEvent.type(nameInput, 'my-src');
+    fireEvent.blur(nameInput);
+
+    await userEvent.click(screen.getByRole('button', { name: /Cancel/i }));
+
+    expect(sendTelemetryInstance).toHaveBeenCalledWith(
+      'Collector Source Create Cancelled',
+      expect.objectContaining({
+        dirty: true,
+        fields_touched: expect.arrayContaining(['name']),
+      }),
+    );
+  });
+
+  it('emits CREATE_CANCELLED with source_type and source_type_changed_from_default after type change', async () => {
+    render(<SourceFormModal fleetId="f-1" onClose={jest.fn()} onSave={jest.fn()} />);
+
+    const typeSelect = screen.getByLabelText(/Source Type/i);
+    await userEvent.selectOptions(typeSelect, 'journald');
+
+    await userEvent.click(screen.getByRole('button', { name: /Cancel/i }));
+
+    expect(sendTelemetryInstance).toHaveBeenCalledWith(
+      'Collector Source Create Cancelled',
+      expect.objectContaining({
+        source_type: 'journald',
+        source_type_changed_from_default: true,
+        dirty: true,
+      }),
     );
   });
 
