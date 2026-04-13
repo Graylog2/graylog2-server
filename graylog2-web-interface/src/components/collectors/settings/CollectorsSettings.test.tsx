@@ -19,18 +19,35 @@ import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import { asMock } from 'helpers/mocking';
-import useInput from 'hooks/useInput';
 import useInputsStates from 'hooks/useInputsStates';
 
 import CollectorsSettings from './CollectorsSettings';
 
-import { useCollectorsConfig, useCollectorsMutations } from '../hooks';
+import { useCollectorsConfig, useCollectorInputIds, useCollectorsMutations, useCollectorInputDetails } from '../hooks';
 import type { CollectorsConfig } from '../types';
 import { mockCollectorsMutations } from '../testing/mockMutations';
 
 jest.mock('../hooks');
-jest.mock('hooks/useInput');
 jest.mock('hooks/useInputsStates');
+
+const mockInput = (port: number) => ({
+  id: 'input-1',
+  creator_user_id: 'admin',
+  node: 'node-1',
+  name: 'CollectorIngestHttpInput',
+  created_at: '2026-01-01T00:00:00Z',
+  global: true,
+  attributes: { port, bind_address: '0.0.0.0' },
+  title: 'Collector Ingest (HTTP)',
+  type: 'org.graylog.collectors.input.CollectorIngestHttpInput',
+  content_pack: '',
+  static_fields: {},
+});
+jest.mock('hooks/useInputMutations', () => () => ({
+  createInput: jest.fn(),
+  updateInput: jest.fn(),
+  deleteInput: jest.fn(),
+}));
 jest.mock('components/inputs/InputStateBadge', () => () => <span>Running</span>);
 
 const updateConfig = jest.fn();
@@ -46,10 +63,8 @@ const config: CollectorsConfig = {
   },
   otlp_server_cert_id: 'otlp-id',
   http: {
-    enabled: true,
     hostname: 'otlp.example.com',
     port: 14401,
-    input_id: 'input-1',
   },
   collector_offline_threshold: 'PT5M',
   collector_default_visibility_threshold: 'P1D',
@@ -70,33 +85,40 @@ describe('CollectorsSettings', () => {
         isUpdatingConfig: false,
       }),
     );
-    asMock(useInput).mockReturnValue({
-      data: { id: 'input-1' },
-    } as ReturnType<typeof useInput>);
+    asMock(useCollectorInputIds).mockReturnValue({
+      data: [],
+      isLoading: false,
+    });
     asMock(useInputsStates).mockReturnValue({
       data: {},
       refetch: jest.fn(),
       isLoading: false,
     });
+    asMock(useCollectorInputDetails).mockReturnValue({
+      collectorInputIds: [],
+      readableInputIds: [],
+      loadedInputs: [],
+      unreadableCount: 0,
+      isLoading: false,
+    });
     updateConfig.mockResolvedValue(undefined);
   });
 
-  it('renders only the HTTP ingest endpoint', async () => {
+  it('renders the ingest endpoint section', async () => {
     render(<CollectorsSettings />);
 
-    expect(await screen.findByRole('heading', { name: 'HTTP' })).toBeInTheDocument();
+    await screen.findByRole('heading', { name: 'Ingest Endpoint' });
+
     expect(screen.queryByRole('heading', { name: 'gRPC' })).not.toBeInTheDocument();
-    expect(screen.getByText('HTTP:')).toBeInTheDocument();
-    expect(screen.queryByText('gRPC:')).not.toBeInTheDocument();
   });
 
-  it('saves a request payload without grpc settings', async () => {
+  it('saves config with create_input false when already configured', async () => {
     const user = userEvent.setup();
 
     render(<CollectorsSettings />);
 
-    const hostnameInput = await screen.findByLabelText('Hostname');
-    const portInput = screen.getByLabelText('Port');
+    const hostnameInput = await screen.findByLabelText('External hostname');
+    const portInput = screen.getByLabelText('External port');
 
     await user.clear(hostnameInput);
     await user.type(hostnameInput, 'ingest.example.com');
@@ -107,16 +129,67 @@ describe('CollectorsSettings', () => {
     await waitFor(() =>
       expect(updateConfig).toHaveBeenCalledWith({
         http: {
-          enabled: true,
           hostname: 'ingest.example.com',
           port: 14411,
         },
+        create_input: false,
         collector_offline_threshold: 'PT5M',
         collector_default_visibility_threshold: 'P1D',
         collector_expiration_threshold: 'P7D',
       }),
     );
+  });
 
-    expect(updateConfig).not.toHaveBeenCalledWith(expect.objectContaining({ grpc: expect.anything() }));
+  it('does not show enabled checkbox', async () => {
+    render(<CollectorsSettings />);
+
+    await screen.findByLabelText('External hostname');
+
+    expect(screen.queryByLabelText('Enabled')).not.toBeInTheDocument();
+  });
+
+  it('shows port mismatch info when input port differs from config port', async () => {
+    asMock(useCollectorInputDetails).mockReturnValue({
+      collectorInputIds: ['input-1'],
+      readableInputIds: ['input-1'],
+      loadedInputs: [mockInput(14402)],
+      unreadableCount: 0,
+      isLoading: false,
+    });
+
+    render(<CollectorsSettings />);
+
+    await screen.findByText(/different port/i);
+    expect(screen.getAllByText(/14402/).length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('does not show port mismatch info when ports match', async () => {
+    asMock(useCollectorInputDetails).mockReturnValue({
+      collectorInputIds: ['input-1'],
+      readableInputIds: ['input-1'],
+      loadedInputs: [mockInput(14401)],
+      unreadableCount: 0,
+      isLoading: false,
+    });
+
+    render(<CollectorsSettings />);
+
+    await screen.findByLabelText('External hostname');
+    expect(screen.queryByText(/different port/i)).not.toBeInTheDocument();
+  });
+
+  it('does not show port mismatch info while loading', async () => {
+    asMock(useCollectorInputDetails).mockReturnValue({
+      collectorInputIds: [],
+      readableInputIds: [],
+      loadedInputs: [],
+      unreadableCount: 0,
+      isLoading: true,
+    });
+
+    render(<CollectorsSettings />);
+
+    await screen.findByLabelText('External hostname');
+    expect(screen.queryByText(/different port/i)).not.toBeInTheDocument();
   });
 });
