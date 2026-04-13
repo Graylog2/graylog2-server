@@ -29,7 +29,7 @@ import RecentActivity from './RecentActivity';
 
 import { useCollectorStats, useFleetsBulkStats } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
-import StatCard from '../common/StatCard';
+import StatCard, { type Variant as StatCardVariant } from '../common/StatCard';
 
 const StatsRow = styled.div(
   ({ theme }) => css`
@@ -74,7 +74,7 @@ const CollectorsOverview = () => {
   const emitStatCard = (
     card: 'instances' | 'online' | 'offline' | 'fleets',
     value: number,
-    variant: 'default' | 'success' | 'warning' | 'danger',
+    variant: StatCardVariant,
     navigates_to: 'instances' | 'instances-online' | 'instances-offline' | 'fleets',
   ) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.OVERVIEW.STAT_CARD_CLICKED, {

@@ -21,7 +21,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-type Variant = 'default' | 'success' | 'warning' | 'danger';
+export type Variant = 'default' | 'success' | 'warning' | 'danger';
 
 type Props = {
   value: number;
