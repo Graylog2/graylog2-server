@@ -40,7 +40,7 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.bson.Document;
+import org.graylog.collectors.db.FleetReassignedPayload;
 import org.bson.conversions.Bson;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorsConfigService;
@@ -316,7 +316,7 @@ public class CollectorInstancesResource extends RestResource {
         txnLogService.appendCollectorMarker(
                 permittedInstanceUids,
                 MarkerType.FLEET_REASSIGNED,
-                new Document("new_fleet_id", targetFleetId));
+                new FleetReassignedPayload(targetFleetId));
 
         final AuditActor auditActor = AuditActor.user(getCurrentUser());
         permittedInstances.values().forEach(dto ->

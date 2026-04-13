@@ -20,15 +20,17 @@ import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.Sorts;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
-import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog.collectors.db.CoalescedActions;
+import org.graylog.collectors.db.FleetReassignedPayload;
+import org.graylog.collectors.db.MarkerPayload;
 import org.graylog.collectors.db.MarkerType;
 import org.graylog.collectors.db.TransactionMarker;
 import org.graylog2.database.MongoCollections;
@@ -39,24 +41,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static org.graylog.collectors.db.TransactionMarker.FIELD_CREATED_AT;
+import static org.graylog.collectors.db.TransactionMarker.FIELD_CREATED_BY;
+import static org.graylog.collectors.db.TransactionMarker.FIELD_CREATED_BY_USER;
+import static org.graylog.collectors.db.TransactionMarker.FIELD_ID;
+import static org.graylog.collectors.db.TransactionMarker.FIELD_PAYLOAD;
+import static org.graylog.collectors.db.TransactionMarker.FIELD_TARGET;
+import static org.graylog.collectors.db.TransactionMarker.FIELD_TARGET_ID;
+import static org.graylog.collectors.db.TransactionMarker.FIELD_TYPE;
+import static org.graylog.collectors.db.TransactionMarker.TARGET_COLLECTOR;
+import static org.graylog.collectors.db.TransactionMarker.TARGET_FLEET;
+
 @Singleton
 public class FleetTransactionLogService {
 
     static final String COLLECTION_NAME = "collector_fleet_transaction_log";
     static final String SEQUENCE_TOPIC = "fleet_txn_log";
-    static final String FIELD_TARGET = "target";
-    static final String FIELD_TARGET_ID = "target_id";
-    static final String FIELD_TYPE = "type";
-    static final String FIELD_PAYLOAD = "payload";
-    static final String FIELD_CREATED_AT = "created_at";
-    static final String FIELD_CREATED_BY = "created_by";
-    static final String FIELD_CREATED_BY_USER = "created_by_user";
+
     /**
      * The maximum number of bulk action targets we allow for a transaction log entry.
      */
     public static final int MAX_BULK_TARGET_SIZE = 100;
 
-    private final MongoCollection<Document> collection;
+    private final MongoCollection<TransactionMarker> collection;
     private final MongoSequenceService sequenceService;
     private final NodeId nodeId;
 
@@ -64,7 +71,7 @@ public class FleetTransactionLogService {
     public FleetTransactionLogService(MongoCollections mongoCollections,
                                       MongoSequenceService sequenceService,
                                       NodeId nodeId) {
-        this.collection = mongoCollections.nonEntityCollection(COLLECTION_NAME, Document.class)
+        this.collection = mongoCollections.nonEntityCollection(COLLECTION_NAME, TransactionMarker.class)
                 .withWriteConcern(WriteConcern.JOURNALED);
         this.sequenceService = sequenceService;
         this.nodeId = nodeId;
@@ -73,7 +80,7 @@ public class FleetTransactionLogService {
         collection.createIndex(
                 Indexes.compoundIndex(
                         Indexes.ascending(FIELD_TARGET, FIELD_TARGET_ID),
-                        Indexes.ascending("_id")
+                        Indexes.ascending(FIELD_ID)
                 )
         );
     }
@@ -84,27 +91,27 @@ public class FleetTransactionLogService {
     }
 
     public long appendFleetMarker(Set<String> fleetIds, MarkerType type) {
-        return appendMarker(TransactionMarker.TARGET_FLEET, fleetIds, type, null);
+        return appendMarker(TARGET_FLEET, fleetIds, type, null);
     }
 
-    public long appendCollectorMarker(Set<String> instanceUids, MarkerType type, @Nullable Document payload) {
+    public long appendCollectorMarker(Set<String> instanceUids, MarkerType type, @Nullable MarkerPayload payload) {
         if (instanceUids == null || instanceUids.isEmpty()) {
             throw new IllegalArgumentException("instanceUids must not be empty");
         }
         if (instanceUids.size() > MAX_BULK_TARGET_SIZE) {
             throw new IllegalArgumentException("instanceUids must not exceed " + MAX_BULK_TARGET_SIZE + " elements, got " + instanceUids.size());
         }
-        return appendMarker(TransactionMarker.TARGET_COLLECTOR, instanceUids, type, payload);
+        return appendMarker(TARGET_COLLECTOR, instanceUids, type, payload);
     }
 
-    private long appendMarker(String target, Set<String> targetIds, MarkerType type, @Nullable Document payload) {
+    private long appendMarker(String target, Set<String> targetIds, MarkerType type, @Nullable MarkerPayload payload) {
         if (targetIds == null || targetIds.isEmpty() || targetIds.stream().noneMatch(StringUtils::isNotBlank)) {
             throw new IllegalArgumentException("targetIds must not be empty");
         }
 
         final long seq = sequenceService.incrementAndGet(SEQUENCE_TOPIC);
         collection.updateOne(
-                Filters.eq("_id", seq),
+                Filters.eq(FIELD_ID, seq),
                 Updates.combine(
                         Updates.set(FIELD_TARGET, target),
                         Updates.set(FIELD_TARGET_ID, targetIds),
@@ -126,49 +133,33 @@ public class FleetTransactionLogService {
             throw new IllegalArgumentException("At least one of fleetId or instanceUid must be non-null");
         }
 
-        final Bson seqFilter = Filters.gt("_id", lastProcessedSeq);
+        final Bson seqFilter = Filters.gt(FIELD_ID, lastProcessedSeq);
         final Bson filter;
 
         if (fleetId != null && instanceUid != null) {
             filter = Filters.and(seqFilter, Filters.or(
                     Filters.and(
-                            Filters.eq(FIELD_TARGET, TransactionMarker.TARGET_FLEET),
+                            Filters.eq(FIELD_TARGET, TARGET_FLEET),
                             Filters.eq(FIELD_TARGET_ID, fleetId)
                     ),
                     Filters.and(
-                            Filters.eq(FIELD_TARGET, TransactionMarker.TARGET_COLLECTOR),
+                            Filters.eq(FIELD_TARGET, TARGET_COLLECTOR),
                             Filters.eq(FIELD_TARGET_ID, instanceUid)
                     )
             ));
         } else if (fleetId != null) {
             filter = Filters.and(seqFilter,
-                    Filters.eq(FIELD_TARGET, TransactionMarker.TARGET_FLEET),
+                    Filters.eq(FIELD_TARGET, TARGET_FLEET),
                     Filters.eq(FIELD_TARGET_ID, fleetId));
         } else {
             filter = Filters.and(seqFilter,
-                    Filters.eq(FIELD_TARGET, TransactionMarker.TARGET_COLLECTOR),
+                    Filters.eq(FIELD_TARGET, TARGET_COLLECTOR),
                     Filters.eq(FIELD_TARGET_ID, instanceUid));
         }
 
         return collection.find(filter)
-                .sort(new Document("_id", 1))
-                .map(this::documentToMarker)
+                .sort(Sorts.ascending(FIELD_ID))
                 .into(new ArrayList<>());
-    }
-
-    private TransactionMarker documentToMarker(Document doc) {
-        final String rawType = doc.getString(FIELD_TYPE);
-        final var createdAt = doc.getDate(FIELD_CREATED_AT);
-        return new TransactionMarker(
-                doc.getLong("_id"),
-                doc.getString(FIELD_TARGET),
-                Set.copyOf(doc.getList(FIELD_TARGET_ID, String.class)),
-                MarkerType.fromString(rawType),
-                rawType,
-                doc.get(FIELD_PAYLOAD, Document.class),
-                createdAt != null ? createdAt.toInstant() : null,
-                doc.getString(FIELD_CREATED_BY_USER)
-        );
     }
 
     @Nullable
@@ -194,9 +185,8 @@ public class FleetTransactionLogService {
                 MarkerType.FLEET_REASSIGNED.name());
 
         return collection.find(filter)
-                .sort(new Document("_id", -1))
+                .sort(Sorts.descending(FIELD_ID))
                 .limit(limit)
-                .map(this::documentToMarker)
                 .into(new ArrayList<>());
     }
 
@@ -233,13 +223,13 @@ public class FleetTransactionLogService {
         if (latestReassignment != null) {
             // Fleet reassignment: recompute config from new fleet, discard fleet-level markers
             recomputeConfig = true;
-            newFleetId = latestReassignment.payload() != null
-                    ? latestReassignment.payload().getString("new_fleet_id")
+            newFleetId = latestReassignment.payload() instanceof FleetReassignedPayload(String fleetId)
+                    ? fleetId
                     : null;
 
             // Only process collector-level commands (fleet-level ones are from old fleet)
             for (var marker : markers) {
-                if (TransactionMarker.TARGET_COLLECTOR.equals(marker.target())) {
+                if (TARGET_COLLECTOR.equals(marker.target())) {
                     switch (marker.type()) {
                         case RESTART -> restart = true;
                         case DISCOVERY_RUN -> runDiscovery = true;
@@ -267,7 +257,7 @@ public class FleetTransactionLogService {
     }
 
     // Package-private for test access
-    MongoCollection<Document> getCollection() {
+    MongoCollection<TransactionMarker> getCollection() {
         return collection;
     }
 }

@@ -30,6 +30,8 @@ export { useSources, fetchPaginatedSources, sourcesKeyFn, SOURCES_KEY_PREFIX } f
 
 export { useCollectorStats } from './useCollectorStats';
 export { useCollectorsConfig } from './useCollectorsConfig';
+export { useCollectorInputIds } from './useCollectorInputIds';
+export { useCollectorInputDetails } from './useCollectorInputDetails';
 
 export {
   fetchPaginatedEnrollmentTokens,
