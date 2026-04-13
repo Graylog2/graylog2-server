@@ -19,6 +19,7 @@ package org.graylog.collectors.rest;
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -33,8 +34,12 @@ import org.graylog.collectors.FleetService;
 import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.FleetDTO;
+import org.graylog.collectors.db.FleetReassignedPayload;
 import org.graylog.collectors.db.MarkerType;
 import org.graylog.collectors.db.TransactionMarker;
+import org.graylog.collectors.rest.RecentActivityResponse.ActivityDetails;
+import org.graylog.collectors.rest.RecentActivityResponse.FleetReassignedDetails;
+import org.graylog.collectors.rest.RecentActivityResponse.TargetInfo;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
@@ -133,7 +138,7 @@ public class CollectorsActivityResource extends RestResource {
         }
 
         // Resolve targets
-        final List<RecentActivityResponse.TargetInfo> targets = new ArrayList<>();
+        final List<TargetInfo> targets = new ArrayList<>();
         for (final var targetId : marker.targetIds()) {
             final String id;
             final String name;
@@ -162,11 +167,8 @@ public class CollectorsActivityResource extends RestResource {
                     name = "[deleted]";
                 }
             }
-            targets.add(new RecentActivityResponse.TargetInfo(id, name, marker.target()));
+            targets.add(new TargetInfo(id, name, marker.target()));
         }
-
-        // Resolve details
-        final Map<String, String> details = resolveDetails(marker, fleetNames);
 
         return new RecentActivityResponse.ActivityEntry(
                 marker.seq(),
@@ -174,7 +176,7 @@ public class CollectorsActivityResource extends RestResource {
                 marker.type().name(),
                 actor,
                 targets,
-                details);
+                resolveDetails(marker, fleetNames));
     }
 
     private String resolveInstanceHostname(Map<String, CollectorInstanceDTO> instances, String instanceUid) {
@@ -189,22 +191,21 @@ public class CollectorsActivityResource extends RestResource {
         return instanceUid;
     }
 
-    private Map<String, String> resolveDetails(TransactionMarker marker, Map<String, String> fleetNames) {
-        if (marker.type() == MarkerType.FLEET_REASSIGNED && marker.payload() != null) {
-            final String newFleetId = marker.payload().getString("new_fleet_id");
-            if (newFleetId != null) {
-                if (fleetNames.containsKey(newFleetId)) {
-                    if (isPermitted(CollectorsPermissions.FLEET_READ, newFleetId)) {
-                        return Map.of(
-                                "new_fleet_id", newFleetId,
-                                "new_fleet_name", fleetNames.get(newFleetId));
-                    }
-                    return Map.of();
+    @Nullable
+    private ActivityDetails resolveDetails(TransactionMarker marker, Map<String, String> fleetNames) {
+        if (marker.type() == MarkerType.FLEET_REASSIGNED
+                && marker.payload() instanceof FleetReassignedPayload(String newFleetId)) {
+            if (fleetNames.containsKey(newFleetId)) {
+                if (isPermitted(CollectorsPermissions.FLEET_READ, newFleetId)) {
+                    return new FleetReassignedDetails(
+                            new TargetInfo(newFleetId, fleetNames.get(newFleetId), TransactionMarker.TARGET_FLEET));
                 }
-                return Map.of("new_fleet_name", "[deleted]");
+                return null;
             }
+            return new FleetReassignedDetails(
+                    new TargetInfo(null, "[deleted]", TransactionMarker.TARGET_FLEET));
         }
-        return Map.of();
+        return null;
     }
 
     private Map<String, String> resolveUserDisplayNames(Set<String> usernames) {

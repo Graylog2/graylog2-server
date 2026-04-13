@@ -32,7 +32,6 @@ import com.google.protobuf.MessageOrBuilder;
 import com.google.protobuf.util.JsonFormat;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import okhttp3.HttpUrl;
@@ -284,14 +283,7 @@ public class OpAmpService {
         return Optional.of(csrBytes);
     }
 
-    static void buildConnectionSettings(ServerToAgent.Builder builder, @Nullable OtlpExporterConfig exporterConfig) {
-        if (exporterConfig == null) {
-            builder.setConnectionSettings(Opamp.ConnectionSettingsOffers.newBuilder()
-                    .setOwnLogs(Opamp.TelemetryConnectionSettings.newBuilder()
-                            .setDestinationEndpoint(""))); // Empty signals: don't send logs
-            return;
-        }
-
+    static void buildConnectionSettings(ServerToAgent.Builder builder, OtlpExporterConfig exporterConfig) {
         final var caCert = exporterConfig.tls().caPem().orElseThrow();
         final var minVersion = exporterConfig.tls().minVersion();
         final var maxVersion = exporterConfig.tls().maxVersion().orElse("");
@@ -395,7 +387,7 @@ public class OpAmpService {
         final ServerToAgent.Builder responseBuilder = serverToAgentBuilder(message);
 
         // Don't fetch the config, we might not need it. If we need it, only get it once.
-        final var configSupplier = Suppliers.memoize(collectorsConfigService::get);
+        final Supplier<CollectorsConfig> configSupplier = Suppliers.memoize(collectorsConfigService::getOrDefault);
 
         LOG.debug("[{}/{}] Previously seen state {} - consecutive: {}", instanceUid, sequenceNum, previousState, seqConsecutive);
         if (!seqConsecutive) {
@@ -417,20 +409,18 @@ public class OpAmpService {
             LOG.debug("[{}/{}] {} unprocessed markers for this collector (last processed tnx id {}) coalesced to {}",
                     instanceUid, sequenceNum, unprocessedMarkers.size(), lastProcessedTxnSeq, coalesced);
 
-            // do this first. in case there's no configured endpoint we don't have to perform the more expensive stuff
-            final Optional<OtlpExporterConfig> exporterConfig = getExporterConfig(configSupplier);
+            final OtlpExporterConfig exporterConfig = getExporterConfig(configSupplier);
 
             if (coalesced.recomputeIngestConfig()) {
                 // The connection settings should only be sent when they change. Not having a config is a change, too.
                 if (agentCapabilities.contains(Opamp.AgentCapabilities.AgentCapabilities_ReportsOwnLogs)) {
                     // The "own_logs" are always transmitted via HTTP according to OpAMP.
-                    buildConnectionSettings(responseBuilder, exporterConfig.orElse(null));
+                    buildConnectionSettings(responseBuilder, exporterConfig);
                 }
             }
 
             final var configBuilder = CollectorConfig.builder();
             if (coalesced.recomputeConfig() || coalesced.recomputeIngestConfig()) {
-                final var effectiveEndpoint = exporterConfig.orElseThrow();
                 final var effectiveFleetId = (coalesced.newFleetId() == null) ? fleetId : coalesced.newFleetId();
                 LOG.debug("[{}/{}] Computing new collector config for fleet id {}", instanceUid, sequenceNum, effectiveFleetId);
 
@@ -451,7 +441,7 @@ public class OpAmpService {
                         .collect(Collectors.groupingBy(CollectorReceiverConfig::type));
 
                 configBuilder.receivers(receiverConfigs);
-                configBuilder.exporters(Map.of(effectiveEndpoint.getName(), effectiveEndpoint));
+                configBuilder.exporters(Map.of(exporterConfig.getName(), exporterConfig));
 
                 final Map<String, CollectorProcessorConfig> receiverProcessors = receiverGroups.keySet().stream()
                         .map(component -> ResourceProcessorConfig.builder(component)
@@ -464,7 +454,7 @@ public class OpAmpService {
                 final var pipelines = receiverGroups.entrySet().stream()
                         .collect(Collectors.toMap(e -> f("logs/%s", e.getKey()), e -> CollectorPipelineConfig.builder()
                                 .receivers(e.getValue().stream().map(CollectorReceiverConfig::name).collect(Collectors.toSet()))
-                                .exporters(Set.of(effectiveEndpoint.getName()))
+                                .exporters(Set.of(exporterConfig.getName()))
                                 .processors(receiverProcessors.values().stream()
                                         .filter(config -> e.getKey().equals(config.id()))
                                         .map(CollectorProcessorConfig::name)
@@ -514,10 +504,10 @@ public class OpAmpService {
     private void handleRenewal(ServerToAgent.Builder responseBuilder,
                                String instanceUid,
                                ByteString csr,
-                               Supplier<Optional<CollectorsConfig>> configSupplier) {
+                               Supplier<CollectorsConfig> configSupplier) {
         LOG.info("Received CSR for certificate renewal from instance: {}", instanceUid);
         try {
-            final var config = configSupplier.get().orElse(CollectorsConfig.createDefault("localhost"));
+            final var config = configSupplier.get();
             final var issuer = collectorCaService.getSigningCert();
             final var cert = certificateService.builder().signCsr(csr.toByteArray(), issuer, instanceUid, config.collectorCertLifetime());
 
@@ -586,27 +576,18 @@ public class OpAmpService {
         return OptionalLong.empty();
     }
 
-    @Nonnull
-    private Optional<OtlpExporterConfig> getExporterConfig(Supplier<Optional<CollectorsConfig>> configSupplier) {
-        final CollectorsConfig collectorsConfig = configSupplier.get()
-                .orElseThrow(() -> new IllegalStateException("Unable to determine collector input config, cannot send remote config."));
+    private OtlpExporterConfig getExporterConfig(Supplier<CollectorsConfig> configSupplier) {
+        final CollectorsConfig collectorsConfig = configSupplier.get();
         final var httpEndpoint = collectorsConfig.http();
-        if (httpEndpoint == null) {
-            throw new IllegalStateException("No collector input configured, cannot send remote config.");
-        }
 
         // We use the long-lived CA cert so intermediate cert rotation is not an issue for Collector mTLS connections.
         final var caCert = collectorCaService.getCaCert().certificate();
         final var tlsSettings = TLSConfigurationSettings.withCACert(clusterIdService.getString(), caCert);
 
-        if (httpEndpoint.enabled()) {
-            return Optional.of(OtlpHttpExporterConfig.builder()
-                    .endpoint(f("https://%s:%s", httpEndpoint.hostname(), httpEndpoint.port()))
-                    .tls(tlsSettings)
-                    .build());
-        }
-
-        return Optional.empty();
+        return OtlpHttpExporterConfig.builder()
+                .endpoint(f("https://%s:%s", httpEndpoint.hostname(), httpEndpoint.port()))
+                .tls(tlsSettings)
+                .build();
     }
 
     @Nonnull

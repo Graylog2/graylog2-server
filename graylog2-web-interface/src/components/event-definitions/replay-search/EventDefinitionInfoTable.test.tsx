@@ -137,7 +137,7 @@ describe('<EventDefinitionInfoTable />', () => {
   it('Shows event definition link for event', async () => {
     render(<EventInfoComponent type="event" />);
 
-    const eventDefinition = await screen.findByRole('button', { name: /event definition/i });
+    const eventDefinition = await screen.findByRole('link', { name: /event definition/i });
 
     expect(eventDefinition).toHaveTextContent('Event Definition Title');
   });

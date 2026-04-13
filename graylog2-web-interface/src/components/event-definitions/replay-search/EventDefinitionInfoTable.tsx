@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React from 'react';
+import * as React from 'react';
 import styled from 'styled-components';
 
 import { Table } from 'components/bootstrap';
