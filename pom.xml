@@ -109,9 +109,9 @@
         <asm.version>9.9.1</asm.version>
         <auto-service.version>1.1.1</auto-service.version>
         <auto-value.version>1.11.1</auto-value.version>
-        <aws-java-sdk-1.version>1.12.675</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.42.1</aws-java-sdk-2.version>
-        <aws-kinesis-client.version>3.4.1</aws-kinesis-client.version>
+        <aws-java-sdk-1.version>1.12.797</aws-java-sdk-1.version>
+        <aws-java-sdk-2.version>2.42.32</aws-java-sdk-2.version>
+        <aws-kinesis-client.version>3.4.2</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.3.5</aws-msk-iam-auth.version>
         <!-- When bumping bouncycastle.version, check if the explicit management for bcutil-jdk18on can/must be removed. -->
         <bouncycastle.version>1.83</bouncycastle.version>
@@ -166,7 +166,7 @@
         <lucene.version>9.12.3</lucene.version>
         <lz4.version>1.10.4</lz4.version>
         <metrics.version>4.2.38</metrics.version>
-        <mongodb-driver.version>5.6.4</mongodb-driver.version>
+        <mongodb-driver.version>5.6.5</mongodb-driver.version>
         <mongojack.version>5.1.0</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.2.12.Final</netty.version>
@@ -765,7 +765,7 @@
                 <plugin>
                     <groupId>org.openrewrite.maven</groupId>
                     <artifactId>rewrite-maven-plugin</artifactId>
-                    <version>6.35.0</version>
+                    <version>6.35.1</version>
                     <configuration>
                         <!-- do not set <configLocation> here, otherwise it cannot be overridden by a system property later -->
                         <exclusions>
@@ -782,7 +782,7 @@
                         <dependency>
                             <groupId>org.openrewrite</groupId>
                             <artifactId>rewrite-java</artifactId>
-                            <version>8.78.0</version>
+                            <version>8.78.5</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
