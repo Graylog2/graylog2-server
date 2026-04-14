@@ -542,7 +542,7 @@ class CollectorInstanceServiceTest {
     }
 
     private CollectorInstanceDTO enroll(String instanceUid) throws Exception {
-        final var cert = certBuilder.createRootCa(instanceUid, Algorithm.ED25519, Duration.ofDays(1));
+        final var cert = certBuilder.createEndEntityCert(instanceUid, issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
 
         return collectorInstanceService.enroll(
                 instanceUid,
@@ -559,7 +559,7 @@ class CollectorInstanceServiceTest {
     private void enrollWithFleetAndLastSeen(String instanceUid,
                                             String fleetId,
                                             Instant lastSeen) throws Exception {
-        final var cert = certBuilder.createRootCa(instanceUid, Algorithm.ED25519, Duration.ofDays(1));
+        final var cert = certBuilder.createEndEntityCert(instanceUid, issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
 
         collectorInstanceService.enroll(
                 instanceUid,
