@@ -111,7 +111,7 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
     public MoreSearch.Result eventSearch(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                          Sorting sorting, int page, int perPage, Set<String> eventStreams,
                                          String filterString, Set<String> forbiddenSourceStreams, Map<String, Set<String>> extraFilters) {
-        final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
+        final var filter = checkAndAddRangeFilterFixWhenFieldIsMissing(createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters), extraFilters);
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(filter)
@@ -153,7 +153,7 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
     public MoreSearch.Histogram eventHistogram(String queryString, AbsoluteRange timerange, Set<String> affectedIndices,
                                                Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams, ZoneId timeZone,
                                                Map<String, Set<String>> extraFilters) {
-        final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
+        final var filter = checkAndAddRangeFilterFixWhenFieldIsMissing(createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters), extraFilters);
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(filter)
@@ -212,31 +212,24 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
         return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(events, alerts));
     }
 
+    private QueryBuilder addFieldIsMissing(QueryBuilder filter) {
+        return boolQuery().should(filter).should(boolQuery().mustNot(existsQuery(EventDto.FIELD_SCORES_NORMALIZED_RISK))).minimumShouldMatch("0");
+    }
+
+    private QueryBuilder checkAndAddRangeFilterFixWhenFieldIsMissing(QueryBuilder filter, Map<String, Set<String>> extraFilters) {
+        if(extraFilters.values().stream().flatMap(Collection::stream).anyMatch(MoreSearchAdapter::isLowerBoundZeroRangeFilter)) {
+            return addFieldIsMissing(filter);
+        } else {
+            return filter;
+        }
+    }
+
     private QueryBuilder createQuery(String queryString,
                                      TimeRange timerange,
                                      Set<String> eventStreams,
                                      String filterString,
                                      Set<String> forbiddenSourceStreams,
                                      Map<String, Set<String>> extraFilters) {
-        return createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters, false);
-    }
-
-    private QueryBuilder createRangeQueryIncludeDefaultForMissingField(String queryString,
-                                                                       TimeRange timerange,
-                                                                       Set<String> eventStreams,
-                                                                       String filterString,
-                                                                       Set<String> forbiddenSourceStreams,
-                                                                       Map<String, Set<String>> extraFilters) {
-        return createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters, true);
-    }
-
-    private QueryBuilder createQuery(String queryString,
-                                     TimeRange timerange,
-                                     Set<String> eventStreams,
-                                     String filterString,
-                                     Set<String> forbiddenSourceStreams,
-                                     Map<String, Set<String>> extraFilters,
-                                     final boolean isRangeQueryIncludeDefaultForMissingField) {
 
         final QueryBuilder query = QueryStringUtils.isEmptyOrMatchAllQueryString(queryString)
                 ? matchAllQuery()
@@ -273,11 +266,7 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
             filter.filter(boolQuery().mustNot(termsQuery(EventDto.FIELD_SOURCE_STREAMS, forbiddenSourceStreams)));
         }
 
-        if(isRangeQueryIncludeDefaultForMissingField || extraFilters.values().stream().flatMap(Collection::stream).anyMatch(MoreSearchAdapter::isLowerBoundZeroRangeFilter)) {
-            return boolQuery().should(filter).should(boolQuery().mustNot(existsQuery(EventDto.FIELD_SCORES_NORMALIZED_RISK))).minimumShouldMatch("0");
-        } else {
-            return filter;
-        }
+        return filter;
     }
 
     static QueryBuilder buildExtraFilter(String field, String value) {
@@ -341,7 +330,7 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
     public List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                                 Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
                                                 Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, int maxBuckets) {
-        final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
+        final var filter = checkAndAddRangeFilterFixWhenFieldIsMissing(createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters), extraFilters);
 
         final var builder = AggregationBuilders.terms(slicesAggregationName)
                         .field(slicingColumn)
@@ -354,7 +343,7 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
     public List<Slice> aggregateSlicesForRangeQuery(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                                   Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
                                                   Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, List<NumberRange> ranges) {
-        final AtomicReference<QueryBuilder> filter = new AtomicReference<>(createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters));
+        QueryBuilder filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
 
         final RangeAggregationBuilder builder = AggregationBuilders.range(slicesAggregationName).field(slicingColumn);
         ranges.forEach(r -> {
@@ -367,11 +356,10 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
             } else if (from != null) {
                 builder.addUnboundedFrom(from);
             }
-            if(from == null || from == 0d) {
-                filter.set(createRangeQueryIncludeDefaultForMissingField(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters));
-            }
         });
-        return aggregateSlices(filter.get(), affectedIndices, meta, builder);
+
+        filter = ranges.stream().anyMatch(r -> r.from() == null || r.from() == 0d) ? addFieldIsMissing(filter) : filter;
+        return aggregateSlices(filter, affectedIndices, meta, builder);
     }
 
     @Override
