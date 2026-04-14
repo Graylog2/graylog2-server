@@ -15,11 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import styled, { css } from 'styled-components';
 
+import fetch from 'logic/rest/FetchProvider';
 import { DocumentTitle } from 'components/common';
+import { createLinkAndDownload } from 'util/FileDownloadUtils';
 import { qualifyUrl } from 'util/URLUtils';
+import PageErrorOverview from 'components/common/PageErrorOverview';
 
 const StyledExplorerContainer = styled.div(
   ({ theme }) => css`
@@ -71,83 +75,97 @@ const StyledExplorerContainer = styled.div(
   `,
 );
 
-// noinspection JSUnusedGlobalSymbols
+const DownloadSpecSelect = () => (
+  <div
+    slot="overview-header"
+    style={{
+      padding: '16px 16px 0',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'flex-end',
+      gap: '8px',
+    }}>
+    <span>Download OpenAPI specification:</span>
+    <select
+      onChange={(e) => {
+        const path = e.target.value;
+
+        if (path) {
+          createLinkAndDownload(qualifyUrl(path), `openapi${path.substring(path.lastIndexOf('.'))}`);
+        }
+
+        // eslint-disable-next-line no-param-reassign
+        e.target.value = '';
+      }}>
+      <option value="">Select format</option>
+      <option value="/openapi.json">JSON</option>
+      <option value="/openapi.yaml">YAML</option>
+    </select>
+  </div>
+);
+
+const fetchSpec = () => fetch('GET', qualifyUrl('/openapi.json'));
+const addRequestedByHeader = (event: CustomEvent) => {
+  event.detail.request.headers.append('X-Requested-By', 'API Browser');
+};
+
 const ApiBrowserPage = () => {
-  const explorerRef = useRef<HTMLElement>(null);
+  const explorerRef = useRef<HTMLElement & { loadSpec: (spec: object) => void }>(null);
   const [loaded, setLoaded] = useState(false);
+  const {
+    data: spec,
+    isInitialLoading: loadingSpec,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ['api-browser', 'spec'],
+    queryFn: fetchSpec,
+  });
 
   useEffect(() => {
-    import(/* webpackChunkName: "openapi-explorer" */ 'openapi-explorer').then(() => setLoaded(true));
-  }, []);
-
-  const handleRequest = useCallback((event: CustomEvent) => {
-    event.detail.request.headers.append('X-Requested-By', 'API Browser');
+    import(/* webpackChunkName: "openapi-explorer" */ 'openapi-explorer').then(() => {
+      setLoaded(true);
+    });
   }, []);
 
   useEffect(() => {
     const el = explorerRef.current;
 
     if (el) {
-      el.addEventListener('request', handleRequest as EventListener);
+      el.addEventListener('request', addRequestedByHeader);
     }
 
     return () => {
       if (el) {
-        el.removeEventListener('request', handleRequest as EventListener);
+        el.removeEventListener('request', addRequestedByHeader);
       }
     };
-  }, [handleRequest, loaded]);
+  }, [loaded]);
 
-  if (!loaded) {
+  useEffect(() => {
+    if (loaded && !loadingSpec && !isError) {
+      explorerRef.current.loadSpec(spec);
+    }
+  }, [isError, loaded, loadingSpec, spec]);
+
+  if (!loaded || loadingSpec) {
     return (
-      <DocumentTitle title="API Browser">
-        <span>Loading...</span>
+      <DocumentTitle title="API Browser - Loading API Spec">
+        <span>Loading API spec ...</span>
       </DocumentTitle>
     );
   }
 
-  // @ts-ignore
-  // @ts-ignore
+  if (error) {
+    return <PageErrorOverview title="Fetching API spec failed!" error={error} />;
+  }
+
   return (
     <DocumentTitle title="API Browser">
       <StyledExplorerContainer>
         {/* @ts-ignore - openapi-explorer is a web component */}
-        <openapi-explorer
-          ref={explorerRef}
-          spec-url={qualifyUrl('/openapi.yaml')}
-          server-url="api/"
-          hide-authentication
-          hide-server-selection>
-          <div
-            slot="overview-header"
-            style={{
-              padding: '16px 16px 0',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-end',
-              gap: '8px',
-            }}>
-            <span>Download OpenAPI specification:</span>
-            {}
-            <select
-              onChange={(e) => {
-                const path = e.target.value;
-
-                if (path) {
-                  const link = document.createElement('a');
-                  link.href = qualifyUrl(path);
-                  link.download = `openapi${path.substring(path.lastIndexOf('.'))}`;
-                  link.click();
-                }
-
-                // eslint-disable-next-line no-param-reassign
-                e.target.value = '';
-              }}>
-              <option value="">Select format</option>
-              <option value="/openapi.json">JSON</option>
-              <option value="/openapi.yaml">YAML</option>
-            </select>
-          </div>
+        <openapi-explorer ref={explorerRef} server-url="api/" hide-authentication hide-server-selection>
+          <DownloadSpecSelect />
           {/* @ts-ignore - openapi-explorer is a web component */}
         </openapi-explorer>
       </StyledExplorerContainer>

@@ -46,7 +46,6 @@ import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
 import org.graylog2.plugin.inputs.transports.Transport;
-import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.slf4j.Logger;
@@ -58,7 +57,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
 
 import static org.graylog.integrations.aws.inputs.AWSInput.getKinesisStreamARNDefinition;
 
@@ -149,7 +147,7 @@ public class KinesisTransport extends ThrottleableTransport2 {
         final String streamName = configuration.getString(CK_KINESIS_STREAM_NAME);
         final AWSMessageType awsMessageType = AWSMessageType.valueOf(configuration.getString(AWSCodec.CK_AWS_MESSAGE_TYPE));
 
-        this.kinesisConsumer = new KinesisConsumer(nodeId, this, objectMapper, kinesisCallback(input),
+        this.kinesisConsumer = new KinesisConsumer(nodeId, this, objectMapper, input::processRawMessage,
                 streamName, awsMessageType, batchSize, awsRequest, awsClientBuilderUtil, inputFailureRecorder);
 
         LOG.debug("Starting Kinesis reader thread for input {}", input.toIdentifier());
@@ -173,10 +171,6 @@ public class KinesisTransport extends ThrottleableTransport2 {
                         endpointName, endpoint), e);
             }
         }
-    }
-
-    private Consumer<byte[]> kinesisCallback(final MessageInput input) {
-        return (data) -> input.processRawMessage(new RawMessage(data));
     }
 
     @Override

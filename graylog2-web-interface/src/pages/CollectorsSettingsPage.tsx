@@ -24,8 +24,13 @@ import CollectorsSettings from 'components/collectors/settings/CollectorsSetting
 const CollectorsSettingsPage = () => (
   <DocumentTitle title="Collectors Settings">
     <CollectorsPageNavigation />
-    <PageHeader title={<>Collectors Settings <BetaBadge /></>}>
-      <span>Configure ingest endpoints for managed collectors.</span>
+    <PageHeader
+      title={
+        <>
+          Collectors Settings <BetaBadge />
+        </>
+      }>
+      <span>Configure settings for managed collectors.</span>
     </PageHeader>
     <CollectorsSettings />
   </DocumentTitle>
