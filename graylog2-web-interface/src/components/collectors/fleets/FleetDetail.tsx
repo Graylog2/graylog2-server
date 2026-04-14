@@ -21,7 +21,7 @@ import styled, { css } from 'styled-components';
 import URI from 'urijs';
 
 import { Button, ButtonToolbar, DeleteMenuItem, Label, SegmentedControl } from 'components/bootstrap';
-import { ConfirmDialog, Spinner } from 'components/common';
+import { ConfirmDialog, Link, Spinner } from 'components/common';
 import BetaBadge from 'components/common/BetaBadge';
 import { MoreActions } from 'components/common/EntityDataTable';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
@@ -216,26 +216,41 @@ const FleetDetail = ({ fleetId }: Props) => {
       </Header>
 
       <StatsRow>
-        <StatCard value={stats?.total_instances ?? 0} label="Instances" onClick={() => navigateToTab('instances')} />
+        <StatCard
+          value={stats?.total_instances ?? 0}
+          label="Instances"
+          helpText="Collector processes enrolled in this fleet."
+          onClick={() => navigateToTab('instances')}
+        />
         <StatCard
           value={stats?.online_instances ?? 0}
           label="Online"
+          helpText="Instances that reported a heartbeat within the offline threshold."
           variant="success"
           onClick={() => navigateToTab('instances', ['status=online'])}
         />
         <StatCard
           value={stats?.offline_instances ?? 0}
           label="Offline"
+          helpText="Instances that missed their heartbeat. Check host connectivity or collector process status."
           variant="warning"
           onClick={() => navigateToTab('instances', ['status=offline'])}
         />
-        <StatCard value={stats?.total_sources ?? 0} label="Sources" onClick={() => navigateToTab('sources')} />
+        <StatCard
+          value={stats?.total_sources ?? 0}
+          label="Sources"
+          helpText="Data collection configurations assigned to this fleet."
+          onClick={() => navigateToTab('sources')}
+        />
       </StatsRow>
 
       <SegmentedControl<FleetTab> data={SEGMENTS} value={activeTab} onChange={onTabChange} />
 
       {activeTab === 'sources' && (
         <>
+          <p>
+            Sources are automatically pushed to all collectors in this fleet. Changes take effect within seconds.
+          </p>
           <ActionsRow>
             <Button bsStyle="primary" onClick={() => setShowSourceModal(true)}>
               Add Source
@@ -254,6 +269,12 @@ const FleetDetail = ({ fleetId }: Props) => {
       )}
 
       {activeTab === 'instances' && (
+        <>
+        <p>
+          Collector instances enrolled in this fleet. Each instance runs all enabled sources.
+          To add more instances, <Link to={Routes.SYSTEM.COLLECTORS.DEPLOYMENT}>deploy collectors</Link> using
+          an enrollment token for this fleet.
+        </p>
         <PaginatedEntityTable<CollectorInstanceView>
           humanName="instances"
           entityActions={instanceActions}
@@ -265,6 +286,7 @@ const FleetDetail = ({ fleetId }: Props) => {
           defaultFilters={defaultInstanceFilters}
           bulkSelection={{ actions: <BulkActions /> }}
         />
+        </>
       )}
 
       {activeTab === 'settings' && (
@@ -311,7 +333,8 @@ const FleetDetail = ({ fleetId }: Props) => {
           show
           onConfirm={handleConfirmDeleteSource}
           onCancel={() => setDeletingSource(null)}>
-          Are you sure you want to delete source <strong>{deletingSource.name}</strong>?
+          Are you sure you want to delete source <strong>{deletingSource.name}</strong>? Collectors in this fleet
+          will stop collecting data from this source within seconds.
         </ConfirmDialog>
       )}
     </div>

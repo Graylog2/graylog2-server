@@ -168,7 +168,7 @@ describe('EnrollmentTokenList', () => {
       await userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
 
       await screen.findByText(/are you sure you want to delete this enrollment token/i);
-      await screen.findByText(/re-enroll/i);
+      await screen.findByText(/continue to operate normally/i);
     });
 
     it('calls deleteEnrollmentToken when confirmed', async () => {
