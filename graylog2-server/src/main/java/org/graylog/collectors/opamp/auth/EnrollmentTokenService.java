@@ -30,7 +30,6 @@ import io.jsonwebtoken.Jwts;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.bson.BsonNull;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -306,7 +305,7 @@ public class EnrollmentTokenService {
     public EnrollmentTokenStats getStats() {
         final var expiredCond = new Document("$cond", List.of(
                 new Document("$and", List.of(
-                        new Document("$ne", List.of("$" + EnrollmentTokenDTO.FIELD_EXPIRES_AT, BsonNull.VALUE)),
+                        new Document("$eq", List.of(new Document("$type", "$" + EnrollmentTokenDTO.FIELD_EXPIRES_AT), "date")),
                         new Document("$lt", List.of("$" + EnrollmentTokenDTO.FIELD_EXPIRES_AT, Date.from(Instant.now(clock))))
                 )),
                 1L,
