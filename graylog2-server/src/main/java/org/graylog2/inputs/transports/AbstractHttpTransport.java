@@ -43,7 +43,6 @@ import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
-import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.transports.AbstractTcpTransport;
@@ -120,8 +119,8 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
                 : DEFAULT_IDLE_WRITER_TIMEOUT;
         this.authorizationHeader = configuration.getString(CK_AUTHORIZATION_HEADER_NAME);
         this.authorizationHeaderValues = Stream.of(
-                        decryptConfigValue(configuration, CK_AUTHORIZATION_HEADER_VALUE, encryptedValueService),
-                        decryptConfigValue(configuration, CK_AUTHORIZATION_HEADER_VALUE_SECONDARY, encryptedValueService)
+                        encryptedValueService.decrypt(configuration.getEncryptedValue(CK_AUTHORIZATION_HEADER_VALUE)),
+                        encryptedValueService.decrypt(configuration.getEncryptedValue(CK_AUTHORIZATION_HEADER_VALUE_SECONDARY))
                 ).filter(v -> v != null && !v.isBlank())
                 .collect(Collectors.toUnmodifiableSet());
         this.enableForwardedFor = configuration.getBoolean(CK_ENABLE_FORWARDED_FOR);
@@ -130,15 +129,6 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
         this.realIpHeaders = configuration.getString(CK_REAL_IP_HEADER_NAME);
         this.trustedProxies = trustedProxies;
         this.path = path;
-    }
-
-    @Nullable
-    private static String decryptConfigValue(Configuration configuration, String key, EncryptedValueService encryptedValueService) {
-        final EncryptedValue encrypted = configuration.getEncryptedValue(key);
-        if (encrypted.isSet()) {
-            return encryptedValueService.decrypt(encrypted);
-        }
-        return configuration.getString(key);
     }
 
     /**
