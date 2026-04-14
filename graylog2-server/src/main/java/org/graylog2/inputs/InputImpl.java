@@ -41,10 +41,19 @@ import java.util.Collections;
 import java.util.Map;
 
 import static com.google.common.base.Strings.emptyToNull;
+import static org.graylog2.plugin.inputs.MessageInput.FIELD_CREATED_AT;
+import static org.graylog2.plugin.inputs.MessageInput.FIELD_CREATOR_USER_ID;
+import static org.graylog2.plugin.inputs.MessageInput.FIELD_GLOBAL;
+import static org.graylog2.plugin.inputs.MessageInput.FIELD_NAME;
+import static org.graylog2.plugin.inputs.MessageInput.FIELD_NODE_ID;
+import static org.graylog2.plugin.inputs.MessageInput.FIELD_TITLE;
+import static org.graylog2.plugin.inputs.MessageInput.FIELD_TYPE;
+import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
 import static org.graylog2.shared.security.RestPermissions.INPUTS_READ;
 
-@DbEntity(collection = "inputs",
-          readPermission = INPUTS_READ)
+@DbEntity(collection = "inputs", readPermission = INPUTS_READ,
+          readableFields = {ID_FIELD, FIELD_TITLE, FIELD_TYPE, FIELD_CREATOR_USER_ID, FIELD_CREATED_AT,
+                  FIELD_GLOBAL, FIELD_NODE_ID, FIELD_NAME})
 public class InputImpl extends PersistedImpl implements Input {
     private static final Logger LOG = LoggerFactory.getLogger(InputImpl.class);
 
