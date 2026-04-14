@@ -40,7 +40,6 @@ const activityResponse = (targets: TargetInfo[]): { data: RecentActivityResponse
       type: 'CONFIG_CHANGED',
       actor: null,
       targets,
-      details: {},
     }],
   },
 });
