@@ -20,9 +20,12 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.UpdateResult;
 import jakarta.inject.Inject;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.graylog.collectors.FleetService;
+import org.graylog.collectors.db.FleetDTO;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
 import org.slf4j.Logger;
@@ -65,6 +68,8 @@ public class V20260303120000_CollectorDEVMigrations extends Migration {
         final var db = mongoConnection.getMongoDatabase();
 
         migrateCollectorIngestConfig(db);
+
+        removeTargetVersion(db);
     }
 
     /**
@@ -137,5 +142,11 @@ public class V20260303120000_CollectorDEVMigrations extends Migration {
                 LOG.info("Backfilled bind_address/port on collector ingest input <{}>.", doc.getObjectId("_id"));
             }
         }
+    }
+
+    private void removeTargetVersion(MongoDatabase db) {
+        final MongoCollection<Document> fleetCollection = db.getCollection(FleetService.COLLECTION_NAME);
+        final UpdateResult updateResult = fleetCollection.updateMany(Filters.empty(), Updates.unset("target_version"));
+        LOG.info("Removed deprecated field `target_version` from {} fleets", updateResult.getModifiedCount());
     }
 }

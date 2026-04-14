@@ -40,14 +40,12 @@ const mockFleets: Fleet[] = [
     name: 'Production',
     created_at: '2026-01-01T00:00:00Z',
     updated_at: '2026-01-01T00:00:00Z',
-    target_version: '',
   },
   {
     id: 'fleet-2',
     name: 'Staging',
     created_at: '2026-01-01T00:00:00Z',
     updated_at: '2026-01-01T00:00:00Z',
-    target_version: '',
   },
 ];
 

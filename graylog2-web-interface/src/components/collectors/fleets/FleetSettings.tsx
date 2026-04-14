@@ -34,7 +34,6 @@ type Props = {
 type FormValues = {
   name: string;
   description: string;
-  target_version: string;
 };
 
 const Section = styled(Card)`
@@ -88,7 +87,6 @@ const FleetSettings = ({ fleet, onSave, onDelete = undefined }: Props) => {
   const initialValues: FormValues = {
     name: fleet.name,
     description: fleet.description || '',
-    target_version: fleet.target_version ?? '',
   };
 
   const handleSubmit = useCallback(
@@ -96,7 +94,6 @@ const FleetSettings = ({ fleet, onSave, onDelete = undefined }: Props) => {
       await onSave({
         name: values.name,
         description: values.description,
-        target_version: values.target_version || null,
       });
     },
     [onSave],
@@ -115,13 +112,6 @@ const FleetSettings = ({ fleet, onSave, onDelete = undefined }: Props) => {
             <Form>
               <FormikInput id="fleet-name" label="Fleet Name" name="name" required />
               <FormikInput id="fleet-description" type="textarea" label="Description" name="description" />
-              <FormikInput
-                id="fleet-target-version"
-                label="Target Version"
-                name="target_version"
-                help="Collector version to deploy to this fleet"
-                placeholder="e.g., 1.2.0"
-              />
               <FormSubmit
                 isAsyncSubmit
                 submitButtonText="Save changes"
