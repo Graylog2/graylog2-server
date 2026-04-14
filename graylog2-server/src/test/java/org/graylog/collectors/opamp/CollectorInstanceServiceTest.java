@@ -56,25 +56,22 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class CollectorInstanceServiceTest {
     private static final EncryptedValueService encryptedValueService = new EncryptedValueService("abcdef1234567890");
     private static CertificateBuilder certBuilder;
-    private static CertificateEntry caCert;
     private static CertificateEntry issuerCert;
 
     private CollectorInstanceService collectorInstanceService;
     private MongoCollections mongoCollections;
-    private CertificateEntry collectorCert;
 
     @BeforeAll
     static void beforeAll() throws Exception {
         certBuilder = new CertificateBuilder(encryptedValueService, "Graylog", TestClocks.fixedEpoch());
-        caCert = certBuilder.createRootCa("Test CA", Algorithm.ED25519, Duration.ofDays(7)).withId("100000000000000000000000");
+        final CertificateEntry caCert = certBuilder.createRootCa("Test CA", Algorithm.ED25519, Duration.ofDays(7)).withId("100000000000000000000000");
         issuerCert = certBuilder.createIntermediateCa("Test Issuer", caCert, Duration.ofDays(5)).withId("200000000000000000000000");
     }
 
     @BeforeEach
-    void setUp(MongoCollections coll) throws Exception {
+    void setUp(MongoCollections coll) {
         mongoCollections = coll;
         collectorInstanceService = new CollectorInstanceService(coll);
-        collectorCert = certBuilder.createRootCa("test", Algorithm.ED25519, Duration.ofDays(1));
     }
 
     @Test
@@ -380,7 +377,7 @@ class CollectorInstanceServiceTest {
         assertThat(previousState.messageSeqNum()).isEqualTo(1L);
         assertThat(previousState.lastProcessTxnSeq()).isEqualTo(0L);
         assertThat(previousState.fleetId()).isEqualTo(fleetId);
-        assertThat(previousState.osType()).isEmpty();
+        assertThat(previousState.osType()).isEqualTo(CollectorOSType.UNKNOWN);
     }
 
     @Test
@@ -397,7 +394,7 @@ class CollectorInstanceServiceTest {
                 .build();
         final var prevState1 = collectorInstanceService.updateFromReport(firstReport);
 
-        assertThat(prevState1.osType()).isEmpty();
+        assertThat(prevState1.osType()).isEqualTo(CollectorOSType.UNKNOWN);
 
         assertThat(collectorInstanceService.findByInstanceUid(uid)).hasValueSatisfying(instance -> {
             assertThat(instance.messageSeqNum()).isEqualTo(1L);
@@ -421,7 +418,7 @@ class CollectorInstanceServiceTest {
                 .build();
         final var prevState2 = collectorInstanceService.updateFromReport(secondReport);
 
-        assertThat(prevState2.osType()).hasValue(CollectorOSType.LINUX);
+        assertThat(prevState2.osType()).isEqualTo(CollectorOSType.LINUX);
 
         assertThat(collectorInstanceService.findByInstanceUid(uid)).hasValueSatisfying(instance -> {
             assertThat(instance.messageSeqNum()).isEqualTo(2L);
@@ -464,12 +461,10 @@ class CollectorInstanceServiceTest {
         assertThat(collectorInstanceService.findByInstanceUid(uid)).hasValueSatisfying(instance -> {
             assertThat(instance.messageSeqNum()).isEqualTo(2L);
             assertThat(instance.capabilities()).isEqualTo(200L);
-            assertThat(instance.identifyingAttributes()).hasValueSatisfying(attrs -> {
-                assertThat(attrs).containsExactly(Attribute.of("service.name", "supervisor"));
-            });
-            assertThat(instance.nonIdentifyingAttributes()).hasValueSatisfying(attrs -> {
-                assertThat(attrs).contains(Attribute.of("os.type", "linux"));
-            });
+            assertThat(instance.identifyingAttributes())
+                    .hasValueSatisfying(attrs -> assertThat(attrs).containsExactly(Attribute.of("service.name", "supervisor")));
+            assertThat(instance.nonIdentifyingAttributes())
+                    .hasValueSatisfying(attrs -> assertThat(attrs).contains(Attribute.of("os.type", "linux")));
             assertThat(instance.lastSeen()).isEqualTo(Instant.ofEpochSecond(1));
             // lastProcessedTxnSeq should remain from the first report since the second didn't set it
             assertThat(instance.lastProcessedTxnSeq()).isEqualTo(5L);
@@ -492,6 +487,60 @@ class CollectorInstanceServiceTest {
         assertFieldIsDate("date-uid", CollectorInstanceDTO.FIELD_LAST_SEEN);
     }
 
+    @Test
+    void extractOsTypeFromReportReturnsCorrectOs() {
+        final var report = reportWithAttributes(List.of(
+                Attribute.of("host.name", "h1"),
+                Attribute.of("os.type", "linux")
+        ));
+
+        assertThat(CollectorInstanceService.extractOsTypeFromReport(report)).isEqualTo(CollectorOSType.LINUX);
+    }
+
+    @Test
+    void extractOsTypeFromReportReturnsUnknownForUnrecognizedOsType() {
+        final var report = reportWithAttributes(List.of(Attribute.of("os.type", "freebsd")));
+
+        assertThat(CollectorInstanceService.extractOsTypeFromReport(report)).isEqualTo(CollectorOSType.UNKNOWN);
+    }
+
+    @Test
+    void extractOsTypeFromReportReturnsUnknownWhenOsTypeAttributeMissing() {
+        final var report = reportWithAttributes(List.of(
+                Attribute.of("host.name", "h1"),
+                Attribute.of("host.arch", "amd64")
+        ));
+
+        assertThat(CollectorInstanceService.extractOsTypeFromReport(report)).isEqualTo(CollectorOSType.UNKNOWN);
+    }
+
+    @Test
+    void extractOsTypeFromReportReturnsUnknownWhenAttributesAbsent() {
+        final var report = CollectorInstanceReport.builder()
+                .instanceUid("uid-1")
+                .messageSeqNum(1L)
+                .capabilities(0L)
+                .build();
+
+        assertThat(CollectorInstanceService.extractOsTypeFromReport(report)).isEqualTo(CollectorOSType.UNKNOWN);
+    }
+
+    @Test
+    void extractOsTypeFromReportReturnsUnknownWhenAttributesEmpty() {
+        final var report = reportWithAttributes(List.of());
+
+        assertThat(CollectorInstanceService.extractOsTypeFromReport(report)).isEqualTo(CollectorOSType.UNKNOWN);
+    }
+
+    private static CollectorInstanceReport reportWithAttributes(List<Attribute> attributes) {
+        return CollectorInstanceReport.builder()
+                .instanceUid("uid-1")
+                .messageSeqNum(1L)
+                .capabilities(0L)
+                .nonIdentifyingAttributes(attributes)
+                .build();
+    }
+
     private CollectorInstanceDTO enroll(String instanceUid) throws Exception {
         final var cert = certBuilder.createRootCa(instanceUid, Algorithm.ED25519, Duration.ofDays(1));
 
@@ -507,12 +556,12 @@ class CollectorInstanceServiceTest {
         );
     }
 
-    private CollectorInstanceDTO enrollWithFleetAndLastSeen(String instanceUid,
-                                                            String fleetId,
-                                                            Instant lastSeen) throws Exception {
+    private void enrollWithFleetAndLastSeen(String instanceUid,
+                                            String fleetId,
+                                            Instant lastSeen) throws Exception {
         final var cert = certBuilder.createRootCa(instanceUid, Algorithm.ED25519, Duration.ofDays(1));
 
-        return collectorInstanceService.enroll(
+        collectorInstanceService.enroll(
                 instanceUid,
                 fleetId,
                 cert.fingerprint(),

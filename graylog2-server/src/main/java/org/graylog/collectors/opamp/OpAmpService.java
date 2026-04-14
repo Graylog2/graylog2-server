@@ -45,7 +45,6 @@ import opamp.proto.Opamp.ServerToAgent;
 import opamp.proto.Opamp.TLSCertificate;
 import org.graylog.collectors.CollectorCaService;
 import org.graylog.collectors.CollectorInstanceService;
-import org.graylog.collectors.CollectorOSType;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.FleetTransactionLogService;
@@ -257,7 +256,7 @@ public class OpAmpService {
         }
     }
 
-    private void setOpampConnectionSettings(Opamp.ConnectionSettingsOffers.Builder connectionSettingsBuilder, String certPem, Duration heartbeatInterval) {
+    private void setOpampConnectionSettings(ConnectionSettingsOffers.Builder connectionSettingsBuilder, String certPem, Duration heartbeatInterval) {
         connectionSettingsBuilder.setOpamp(OpAMPConnectionSettings.newBuilder()
                 .setHeartbeatIntervalSeconds(heartbeatInterval.getSeconds())
                 .setCertificate(TLSCertificate.newBuilder().setCert(ByteString.copyFromUtf8(certPem))));
@@ -298,7 +297,7 @@ public class OpAmpService {
                 .build()
                 .toString();
 
-        builder.setConnectionSettings(Opamp.ConnectionSettingsOffers.newBuilder()
+        builder.setConnectionSettings(ConnectionSettingsOffers.newBuilder()
                 .setOwnLogs(Opamp.TelemetryConnectionSettings.newBuilder()
                         .setDestinationEndpoint(endpoint)
                         .setTls(Opamp.TLSConnectionSettings.newBuilder()
@@ -329,6 +328,14 @@ public class OpAmpService {
     @WithSpan
     private ServerToAgent handleIdentifiedMessage(AgentToServer message, OpAmpAuthContext.Identified auth) {
         final String instanceUid = bytesToUuidString(message.getInstanceUid().toByteArray());
+
+        if (LOG.isTraceEnabled()) {
+            try {
+                LOG.trace("Message from enrolled instance <{}>:\n{}", instanceUid, JsonFormat.printer().print(message));
+            } catch (Exception e) {
+                LOG.error("Couldn't serialize identified message", e);
+            }
+        }
 
         // payload and authentication context uids must match
         if (!Objects.equals(instanceUid, auth.instanceUid())) {
@@ -379,9 +386,16 @@ public class OpAmpService {
 
         // let's save the report and load the previously known values for the important properties
         // previousState is not the entire document, but the minimal version to avoid high deserialization cost
-        final var previousState = collectorInstanceService.updateFromReport(updateBuilder.build());
-        final var osType = previousState.osType().orElse(CollectorOSType.UNKNOWN);
+        final var instanceReport = updateBuilder.build();
+        final var previousState = collectorInstanceService.updateFromReport(instanceReport);
         final boolean seqConsecutive = (previousState.messageSeqNum() + 1) == sequenceNum;
+
+        final var osType = switch (previousState.osType()) {
+            // On the first report the "os.type" non-identifying attribute might not be present in the previous state.
+            // We will always run into this case when a Collector from an unsupported operating system connects.
+            case UNKNOWN -> CollectorInstanceService.extractOsTypeFromReport(instanceReport);
+            case LINUX, MACOS, WINDOWS -> previousState.osType();
+        };
 
         // determine our response
         final ServerToAgent.Builder responseBuilder = serverToAgentBuilder(message);

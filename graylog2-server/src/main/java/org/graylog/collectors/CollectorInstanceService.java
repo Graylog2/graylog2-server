@@ -156,6 +156,23 @@ public class CollectorInstanceService {
     }
 
     /**
+     * Extracts the {@link CollectorOSType} from the given report.
+     *
+     * @param report the report
+     * @return the operating system type or UNKNOWN when the attribute doesn't exist
+     */
+    public static CollectorOSType extractOsTypeFromReport(CollectorInstanceReport report) {
+        return report.nonIdentifyingAttributes().orElse(List.of())
+                .stream()
+                .filter(a -> OS_TYPE_KEY.equals(a.key()))
+                .map(Attribute::value)
+                .map(String::valueOf)
+                .map(CollectorOSType::of)
+                .findFirst()
+                .orElse(CollectorOSType.UNKNOWN);
+    }
+
+    /**
      * Updates an existing collector instance to a new fleet id.
      *
      * @param instanceUid the instance to update
@@ -346,15 +363,16 @@ public class CollectorInstanceService {
                                               @JsonProperty(FIELD_MESSAGE_SEQ_NUM) long messageSeqNum,
                                               @JsonProperty(FIELD_LAST_PROCESSED_TXN_SEQ) long lastProcessTxnSeq,
                                               @JsonProperty(FIELD_NON_IDENTIFYING_ATTRIBUTES) List<Attribute> nonIdentifyingAttributes) {
-        public Optional<CollectorOSType> osType() {
+        public CollectorOSType osType() {
             if (nonIdentifyingAttributes == null) {
-                return Optional.empty();
+                return CollectorOSType.UNKNOWN;
             }
             return nonIdentifyingAttributes.stream()
                     .filter(a -> OS_TYPE_KEY.equals(a.key()))
                     .map(a -> String.valueOf(a.value()))
                     .map(CollectorOSType::of)
-                    .findFirst();
+                    .findFirst()
+                    .orElse(CollectorOSType.UNKNOWN);
         }
     }
 }

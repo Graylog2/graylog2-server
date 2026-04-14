@@ -35,12 +35,18 @@ public enum CollectorOSType {
         this.osName = osName;
     }
 
+    /**
+     * Returns the operating system type for the given name. Returns UNKNOWN when the given name doesn't match any type.
+     *
+     * @param osName the operating system name
+     * @return the operating system type for the given string or UNKNOWN
+     */
     public static CollectorOSType of(String osName) {
         requireNonBlank(osName, "osName can't be blank");
 
         return Arrays.stream(CollectorOSType.values())
                 .filter(type -> type.osName.equals(osName))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No such collector OS type: " + osName));
+                .orElse(UNKNOWN);
     }
 }

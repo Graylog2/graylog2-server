@@ -39,10 +39,8 @@ class CollectorOSTypeTest {
     }
 
     @Test
-    void ofThrowsForUnknownOSName() {
-        assertThatThrownBy(() -> CollectorOSType.of("freebsd"))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("freebsd");
+    void ofReturnsUNKNOWNForUnknownOSName() {
+        assertThat(CollectorOSType.of("freebsd")).isEqualTo(CollectorOSType.UNKNOWN);
     }
 
     @ParameterizedTest
@@ -55,7 +53,6 @@ class CollectorOSTypeTest {
 
     @Test
     void ofIsCaseSensitive() {
-        assertThatThrownBy(() -> CollectorOSType.of("Linux"))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThat(CollectorOSType.of("Linux")).isEqualTo(CollectorOSType.UNKNOWN);
     }
 }
