@@ -63,6 +63,7 @@ export { default as FlatContentRow } from './FlatContentRow';
 export { default as FormikFormGroup } from './FormikFormGroup';
 export { default as FormikInput } from './FormikInput';
 export { default as FormSubmit } from './FormSubmit';
+export { default as GrowableInput } from './GrowableInput';
 export { default as HasOwnership } from './HasOwnership';
 export { default as HoverForHelp } from './HoverForHelp';
 export { default as ISODurationInput } from './ISODurationInput';
