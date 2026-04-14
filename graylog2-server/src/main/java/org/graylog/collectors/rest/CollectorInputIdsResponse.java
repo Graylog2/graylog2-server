@@ -14,23 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+package org.graylog.collectors.rest;
 
-type InputWrapperProps = {
-  className?: string;
-  children: React.ReactNode;
-  wrapperAttributes?: React.HTMLAttributes<HTMLElement> & {
-    'data-input-value'?: string | undefined;
-  };
-};
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-const InputWrapper = ({ children, className = undefined, wrapperAttributes = undefined }: InputWrapperProps) =>
-  className ? (
-    <div {...wrapperAttributes} className={className}>
-      {children}
-    </div>
-  ) : (
-    <span {...wrapperAttributes}>{children}</span>
-  );
+import java.util.List;
 
-export default InputWrapper;
+public record CollectorInputIdsResponse(
+        @JsonProperty("collector_input_ids") List<String> collectorInputIds
+) {}

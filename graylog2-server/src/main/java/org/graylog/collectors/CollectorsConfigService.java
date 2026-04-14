@@ -19,9 +19,11 @@ package org.graylog.collectors;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.collectors.events.CollectorCaConfigUpdated;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 
+import java.net.URI;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -34,11 +36,15 @@ public class CollectorsConfigService {
 
     private final ClusterConfigService clusterConfigService;
     private final ClusterEventBus clusterEventBus;
+    private final URI httpExternalUri;
 
     @Inject
-    public CollectorsConfigService(ClusterConfigService clusterConfigService, ClusterEventBus clusterEventBus) {
+    public CollectorsConfigService(ClusterConfigService clusterConfigService,
+                                   ClusterEventBus clusterEventBus,
+                                   HttpConfiguration httpConfiguration) {
         this.clusterConfigService = clusterConfigService;
         this.clusterEventBus = clusterEventBus;
+        this.httpExternalUri = httpConfiguration.getHttpExternalUri();
     }
 
     /**
@@ -56,7 +62,7 @@ public class CollectorsConfigService {
      * @return the current config or a default config
      */
     public CollectorsConfig getOrDefault() {
-        return get().orElse(CollectorsConfig.createDefault("localhost"));
+        return get().orElse(CollectorsConfig.createDefault(httpExternalUri.getHost()));
     }
 
     /**
