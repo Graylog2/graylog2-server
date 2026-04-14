@@ -16,42 +16,27 @@
  */
 package org.graylog2.telemetry.suppliers;
 
-import com.github.zafarkhaja.semver.Version;
-import com.mongodb.MongoClient;
-import org.graylog2.database.MongoDBVersionCheck;
-import org.graylog2.telemetry.scheduler.TelemetryEvent;
+import org.assertj.core.api.Assertions;
+import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog.testing.mongodb.MongoDBExtension;
+import org.graylog.testing.mongodb.MongoDBTestService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockedStatic;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mockStatic;
-
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 public class MongoDBMetricsSupplierTest {
-    @Mock
-    private MongoClient mongoClient;
-
-    @InjectMocks
-    private MongoDBMetricsSupplier mongoDBMetricsSupplier;
 
     @Test
-    public void shouldReturnMongoDBMetrics() {
-        Version version = Version.of(7, 0, 24);
+    public void shouldReturnMongoDBMetrics(MongoDBTestService testService) {
 
-        try (MockedStatic<MongoDBVersionCheck> mongoDBVersionCheck = mockStatic(MongoDBVersionCheck.class)) {
-            mongoDBVersionCheck.when(() -> MongoDBVersionCheck.getVersion(mongoClient)).thenReturn(version);
+        final MongoDBMetricsSupplier supplier = new MongoDBMetricsSupplier(testService.mongoConnection());
 
-            Optional<TelemetryEvent> event = mongoDBMetricsSupplier.get();
-
-            assertTrue(event.isPresent());
-            assertEquals(version.toString(), event.get().metrics().get("version"));
-        }
+        Assertions.assertThat(supplier.get())
+                .isPresent()
+                .hasValueSatisfying(event -> {
+                    final String actualVersion = (String) event.metrics().get("version");
+                    Assertions.assertThat(actualVersion)
+                            .startsWith(MongodbServer.DEFAULT_VERSION.getVersion());
+                });
     }
 }

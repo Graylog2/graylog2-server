@@ -63,28 +63,16 @@ function AdapterTypeSelect({ adapterConfigType, onAdapterChange }: Props) {
     return [];
   }, [types, fetchingDataAdapterTypes, adapterPlugins]);
 
-  const _getCorrectUserpasswd = (config: LookupTableAdapter['config']) => {
-    if (config.user_passwd.is_set) return { is_set: true, keep_value: true };
-
-    return { set_value: '' };
-  };
-
   const handleTypeSelect = React.useCallback(
     (adapterType: string) => {
       const defaultConfig = { ...types[adapterType].default_config };
-      const isLDAP = defaultConfig.type === 'LDAP';
-
-      const configWithPassword = {
-        ...defaultConfig,
-        ...(isLDAP ? { user_passwd: _getCorrectUserpasswd(defaultConfig) } : {}),
-      };
 
       onAdapterChange({
         id: null,
         title: '',
         name: '',
         description: '',
-        config: configWithPassword,
+        config: defaultConfig,
       });
     },
     [onAdapterChange, types],

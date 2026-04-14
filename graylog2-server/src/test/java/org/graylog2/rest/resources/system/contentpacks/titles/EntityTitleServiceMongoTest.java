@@ -48,8 +48,8 @@ public class EntityTitleServiceMongoTest {
     public void setUp() {
         DbEntitiesCatalog entitiesCatalog = new DbEntitiesCatalog(
                 List.of(
-                        new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read"),
-                        new DbEntityCatalogEntry("nodes", "node_id", StreamImpl.class, "nodes:read")
+                        new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read", List.of()),
+                        new DbEntityCatalogEntry("nodes", "node_id", StreamImpl.class, "nodes:read", List.of())
                 )
         );
         mongodb.start();

@@ -31,18 +31,24 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.shared.security.EntityPermissionsUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
+import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.graylog2.users.UserImpl.COLLECTION_NAME;
 import static org.graylog2.users.UserImpl.LocalAdminUser.LOCAL_ADMIN_ID;
 import static org.graylog2.users.UserImpl.USERNAME;
 
 public class MongoEntitySuggestionService implements EntitySuggestionService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MongoEntitySuggestionService.class);
 
     private final MongoConnection mongoConnection;
     private final EntityPermissionsUtils permissionsUtils;
@@ -65,6 +71,9 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                                             final int page,
                                             final int perPage,
                                             final Subject subject) {
+        if (!permissionsUtils.areAllFieldsReadable(collection, Set.of(valueColumn))) {
+            throw new IllegalArgumentException(f("Improper list of fields for collection %s : %s", collection, Set.of(valueColumn)));
+        }
         final MongoCollection<Document> mongoCollection = mongoConnection.getMongoDatabase().getCollection(collection);
         final boolean filterIsEmpty = Strings.isNullOrEmpty(query);
         final boolean isSpecialCollection = addAdminToSuggestions(collection, valueColumn, filterIsEmpty, query);
