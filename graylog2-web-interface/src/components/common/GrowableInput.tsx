@@ -53,7 +53,7 @@ const Wrapper = styled.div(
     }
 
     .growable-input-wrapper::after {
-      content: attr(data-replicated-value) ' ';
+      content: attr(data-input-value) ' ';
       white-space: pre-wrap;
       overflow-wrap: break-word;
       visibility: hidden;
@@ -122,7 +122,7 @@ const GrowableInput = ({
         title={title}
         type="textarea"
         value={value}
-        wrapperAttributes={{ 'data-replicated-value': value }}
+        wrapperAttributes={{ 'data-input-value': value }}
         wrapperClassName="growable-input-wrapper"
       />
     </Wrapper>
