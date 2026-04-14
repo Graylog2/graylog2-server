@@ -378,10 +378,8 @@ public class OpAmpService {
 
         // let's save the report and load the previously known values for the important properties
         // previousState is not the entire document, but the minimal version to avoid high deserialization cost
-        final Optional<CollectorInstanceService.MinimalCollectorInstanceDTO> previousState = collectorInstanceService.createOrUpdateFromReport(updateBuilder.build());
-        final boolean seqConsecutive = previousState
-                .filter(prevState -> (prevState.messageSeqNum() + 1) == sequenceNum)
-                .isPresent();
+        final var previousState = collectorInstanceService.updateFromReport(updateBuilder.build());
+        final boolean seqConsecutive = (previousState.messageSeqNum() + 1) == sequenceNum;
 
         // determine our response
         final ServerToAgent.Builder responseBuilder = serverToAgentBuilder(message);
@@ -400,9 +398,9 @@ public class OpAmpService {
             // If we would only look at the applied transaction sequence from the previousState, we would reply
             // with a config update for a remote config status APPLIED request.
             final var lastProcessedTxnSeq = requireNonNull(appliedTxnSeq, "appliedTxnSeq is null")
-                    .orElse(previousState.map(CollectorInstanceService.MinimalCollectorInstanceDTO::lastProcessTxnSeq).orElse(0L));
+                    .orElse(previousState.lastProcessTxnSeq());
 
-            final String fleetId = previousState.map(CollectorInstanceService.MinimalCollectorInstanceDTO::fleetId).orElse(null);
+            final String fleetId = previousState.fleetId();
 
             final List<TransactionMarker> unprocessedMarkers = txnLogService.getUnprocessedMarkers(fleetId, instanceUid, lastProcessedTxnSeq);
             final CoalescedActions coalesced = txnLogService.coalesce(unprocessedMarkers);
