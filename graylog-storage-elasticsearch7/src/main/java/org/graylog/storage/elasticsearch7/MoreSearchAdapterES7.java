@@ -273,8 +273,8 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
             filter.filter(boolQuery().mustNot(termsQuery(EventDto.FIELD_SOURCE_STREAMS, forbiddenSourceStreams)));
         }
 
-        if(isRangeQueryIncludeDefaultForMissingField || extraFilters.values().stream().flatMap(Collection::stream).anyMatch(MoreSearchAdapter::isRangeValueLowerBoundsIs0)) {
-            return boolQuery().should(filter).should(boolQuery().mustNot(existsQuery(EventDto.NORMALIZED_RISK_PATH))).minimumShouldMatch("0");
+        if(isRangeQueryIncludeDefaultForMissingField || extraFilters.values().stream().flatMap(Collection::stream).anyMatch(MoreSearchAdapter::isLowerBoundZeroRangeFilter)) {
+            return boolQuery().should(filter).should(boolQuery().mustNot(existsQuery(EventDto.FIELD_SCORES_NORMALIZED_RISK))).minimumShouldMatch("0");
         } else {
             return filter;
         }

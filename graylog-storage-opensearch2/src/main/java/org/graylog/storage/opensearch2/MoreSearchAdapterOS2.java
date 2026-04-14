@@ -42,7 +42,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.LongBounds;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.ParsedDateHistogram;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.range.ParsedRange;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.range.RangeAggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.ParsedTerms;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
@@ -275,8 +274,8 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
             filter.filter(boolQuery().mustNot(termsQuery(EventDto.FIELD_SOURCE_STREAMS, forbiddenSourceStreams)));
         }
 
-        if(isRangeQueryIncludeDefaultForMissingField || extraFilters.values().stream().flatMap(Collection::stream).anyMatch(MoreSearchAdapter::isRangeValueLowerBoundsIs0)) {
-            return boolQuery().should(filter).should(boolQuery().mustNot(existsQuery(EventDto.NORMALIZED_RISK_PATH))).minimumShouldMatch("0");
+        if(isRangeQueryIncludeDefaultForMissingField || extraFilters.values().stream().flatMap(Collection::stream).anyMatch(MoreSearchAdapter::isLowerBoundZeroRangeFilter)) {
+            return boolQuery().should(filter).should(boolQuery().mustNot(existsQuery(EventDto.FIELD_SCORES_NORMALIZED_RISK))).minimumShouldMatch("0");
         } else {
             return filter;
         }

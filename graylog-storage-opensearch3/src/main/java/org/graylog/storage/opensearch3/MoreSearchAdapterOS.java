@@ -207,9 +207,9 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
             boolQuery.filter(forbiddenStreamsQuery(forbiddenSourceStreams));
         }
 
-        if(isRangeQueryIncludeDefaultForMissingField || extraFilters.values().stream().flatMap(Collection::stream).anyMatch(MoreSearchAdapter::isRangeValueLowerBoundsIs0)) {
+        if(isRangeQueryIncludeDefaultForMissingField || extraFilters.values().stream().flatMap(Collection::stream).anyMatch(MoreSearchAdapter::isLowerBoundZeroRangeFilter)) {
             return Query.of(a -> a.bool(b -> b.should(Query.of(c -> c.bool(boolQuery.build())),
-                    Query.of(d -> d.bool(inner -> inner.mustNot(mn -> mn.exists(e -> e.field(EventDto.NORMALIZED_RISK_PATH))))))
+                    Query.of(d -> d.bool(inner -> inner.mustNot(mn -> mn.exists(e -> e.field(EventDto.FIELD_SCORES_NORMALIZED_RISK))))))
                     .minimumShouldMatch("0")));
         } else {
             return Query.of(b -> b.bool(boolQuery.build()));
