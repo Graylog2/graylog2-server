@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix switching event definitions between aggregation and filter conditions so stale aggregation settings are cleared and previous aggregation conditions can be restored when switching back."
+
+pulls = ["25643"]
+issues = ["22866", "22115"]
