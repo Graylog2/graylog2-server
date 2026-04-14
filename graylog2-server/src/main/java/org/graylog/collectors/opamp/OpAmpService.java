@@ -45,6 +45,7 @@ import opamp.proto.Opamp.ServerToAgent;
 import opamp.proto.Opamp.TLSCertificate;
 import org.graylog.collectors.CollectorCaService;
 import org.graylog.collectors.CollectorInstanceService;
+import org.graylog.collectors.CollectorOSType;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.FleetTransactionLogService;
@@ -379,6 +380,7 @@ public class OpAmpService {
         // let's save the report and load the previously known values for the important properties
         // previousState is not the entire document, but the minimal version to avoid high deserialization cost
         final var previousState = collectorInstanceService.updateFromReport(updateBuilder.build());
+        final var osType = previousState.osType().orElse(CollectorOSType.UNKNOWN);
         final boolean seqConsecutive = (previousState.messageSeqNum() + 1) == sequenceNum;
 
         // determine our response
@@ -426,6 +428,7 @@ public class OpAmpService {
                 try (final var sources = sourceService.streamAllByFleet(effectiveFleetId)) {
                     sources.map(SourceDTO::toReceiverConfig)
                             .flatMap(Optional::stream)
+                            .filter(config -> config.osSupport().contains(osType))
                             .forEach(receiverConfig -> receiverConfigs.put(receiverConfig.name(), receiverConfig));
                 }
 

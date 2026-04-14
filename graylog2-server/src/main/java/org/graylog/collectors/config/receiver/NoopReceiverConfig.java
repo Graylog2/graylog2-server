@@ -18,6 +18,9 @@ package org.graylog.collectors.config.receiver;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.auto.value.AutoValue;
+import org.graylog.collectors.CollectorOSType;
+
+import java.util.EnumSet;
 
 /**
  * No-op receiver that we use to ensure the presence of at least one receiver in the Collector config.
@@ -27,6 +30,11 @@ import com.google.auto.value.AutoValue;
 public abstract class NoopReceiverConfig implements CollectorReceiverConfig {
     public String type() {
         return "nop";
+    }
+
+    @Override
+    public EnumSet<CollectorOSType> osSupport() {
+        return EnumSet.of(CollectorOSType.LINUX, CollectorOSType.MACOS, CollectorOSType.UNKNOWN, CollectorOSType.WINDOWS);
     }
 
     public static NoopReceiverConfig instance() {

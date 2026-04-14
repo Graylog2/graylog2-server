@@ -21,9 +21,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.collectors.CollectorOSType;
 import org.graylog.collectors.config.GoDurationSerializer;
 
 import java.time.Duration;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 
@@ -59,6 +61,11 @@ public abstract class WindowsEventLogReceiverConfig implements CollectorReceiver
 
     public String type() {
         return RECEIVER_TYPE;
+    }
+
+    @Override
+    public EnumSet<CollectorOSType> osSupport() {
+        return EnumSet.of(CollectorOSType.WINDOWS);
     }
 
     @JsonIgnore
