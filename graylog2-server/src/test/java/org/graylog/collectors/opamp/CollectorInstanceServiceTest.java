@@ -379,6 +379,7 @@ class CollectorInstanceServiceTest {
         assertThat(previousState.messageSeqNum()).isEqualTo(1L);
         assertThat(previousState.lastProcessTxnSeq()).isEqualTo(0L);
         assertThat(previousState.fleetId()).isEqualTo(fleetId);
+        assertThat(previousState.osType()).isEmpty();
     }
 
     @Test
@@ -393,7 +394,9 @@ class CollectorInstanceServiceTest {
                 .nonIdentifyingAttributes(List.of(Attribute.of("os.type", "linux")))
                 .lastSeen(Instant.ofEpochSecond(0))
                 .build();
-        collectorInstanceService.updateFromReport(firstReport);
+        final var prevState1 = collectorInstanceService.updateFromReport(firstReport);
+
+        assertThat(prevState1.osType()).isEmpty();
 
         assertThat(collectorInstanceService.findByInstanceUid(uid)).hasValueSatisfying(instance -> {
             assertThat(instance.messageSeqNum()).isEqualTo(1L);
@@ -415,7 +418,9 @@ class CollectorInstanceServiceTest {
                 ))
                 .lastSeen(Instant.ofEpochSecond(100))
                 .build();
-        collectorInstanceService.updateFromReport(secondReport);
+        final var prevState2 = collectorInstanceService.updateFromReport(secondReport);
+
+        assertThat(prevState2.osType()).hasValue("linux");
 
         assertThat(collectorInstanceService.findByInstanceUid(uid)).hasValueSatisfying(instance -> {
             assertThat(instance.messageSeqNum()).isEqualTo(2L);

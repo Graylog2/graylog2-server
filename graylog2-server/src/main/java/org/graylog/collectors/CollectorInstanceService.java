@@ -33,6 +33,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.CollectorInstanceReport;
 import org.graylog2.database.MongoCollection;
@@ -82,6 +83,7 @@ import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 @Singleton
 public class CollectorInstanceService {
     private static final Logger LOG = LoggerFactory.getLogger(CollectorInstanceService.class);
+    private static final String OS_TYPE_KEY = "os.type";
 
     private final MongoCollection<CollectorInstanceDTO> collection;
     private final MongoPaginationHelper<CollectorInstanceDTO> paginationHelper;
@@ -140,7 +142,10 @@ public class CollectorInstanceService {
                 combine(updateOps),
                 new FindOneAndUpdateOptions()
                         .returnDocument(ReturnDocument.BEFORE)
-                        .projection(Projections.include(FIELD_MESSAGE_SEQ_NUM, FIELD_LAST_PROCESSED_TXN_SEQ, FIELD_FLEET_ID)));
+                        .projection(Projections.fields(
+                                Projections.include(FIELD_MESSAGE_SEQ_NUM, FIELD_LAST_PROCESSED_TXN_SEQ, FIELD_FLEET_ID),
+                                Projections.elemMatch(FIELD_NON_IDENTIFYING_ATTRIBUTES, Filters.eq(Attribute.FIELD_KEY, OS_TYPE_KEY))
+                        )));
 
         if (previousInstanceDto == null) {
             // If there was no existing document, the instance was not enrolled.
@@ -339,5 +344,16 @@ public class CollectorInstanceService {
     public record MinimalCollectorInstanceDTO(@Id @JsonProperty(FIELD_ID) String id,
                                               @JsonProperty(FIELD_FLEET_ID) String fleetId,
                                               @JsonProperty(FIELD_MESSAGE_SEQ_NUM) long messageSeqNum,
-                                              @JsonProperty(FIELD_LAST_PROCESSED_TXN_SEQ) long lastProcessTxnSeq) {}
+                                              @JsonProperty(FIELD_LAST_PROCESSED_TXN_SEQ) long lastProcessTxnSeq,
+                                              @JsonProperty(FIELD_NON_IDENTIFYING_ATTRIBUTES) List<Attribute> nonIdentifyingAttributes) {
+        public Optional<String> osType() {
+            if (nonIdentifyingAttributes == null) {
+                return Optional.empty();
+            }
+            return nonIdentifyingAttributes.stream()
+                    .filter(a -> OS_TYPE_KEY.equals(a.key()))
+                    .map(a -> String.valueOf(a.value()))
+                    .findFirst();
+        }
+    }
 }
