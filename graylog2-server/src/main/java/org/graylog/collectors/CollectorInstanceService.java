@@ -346,13 +346,14 @@ public class CollectorInstanceService {
                                               @JsonProperty(FIELD_MESSAGE_SEQ_NUM) long messageSeqNum,
                                               @JsonProperty(FIELD_LAST_PROCESSED_TXN_SEQ) long lastProcessTxnSeq,
                                               @JsonProperty(FIELD_NON_IDENTIFYING_ATTRIBUTES) List<Attribute> nonIdentifyingAttributes) {
-        public Optional<String> osType() {
+        public Optional<CollectorOSType> osType() {
             if (nonIdentifyingAttributes == null) {
                 return Optional.empty();
             }
             return nonIdentifyingAttributes.stream()
                     .filter(a -> OS_TYPE_KEY.equals(a.key()))
                     .map(a -> String.valueOf(a.value()))
+                    .map(CollectorOSType::of)
                     .findFirst();
         }
     }

@@ -20,6 +20,7 @@ import com.mongodb.client.model.Filters;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bson.Document;
 import org.graylog.collectors.CollectorInstanceService;
+import org.graylog.collectors.CollectorOSType;
 import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.CollectorInstanceReport;
@@ -420,7 +421,7 @@ class CollectorInstanceServiceTest {
                 .build();
         final var prevState2 = collectorInstanceService.updateFromReport(secondReport);
 
-        assertThat(prevState2.osType()).hasValue("linux");
+        assertThat(prevState2.osType()).hasValue(CollectorOSType.LINUX);
 
         assertThat(collectorInstanceService.findByInstanceUid(uid)).hasValueSatisfying(instance -> {
             assertThat(instance.messageSeqNum()).isEqualTo(2L);
