@@ -29,7 +29,7 @@ class CollectorsConfigTest {
 
     @Test
     void serializesAndDeserializes() throws Exception {
-        final var http = new IngestEndpointConfig(true, "graylog.example.com", 14401, "input-1");
+        final var http = new IngestEndpointConfig("graylog.example.com", 14401);
         final var config = CollectorsConfig.builder()
                 .caCertId("ca-cert-id")
                 .signingCertId("signing-cert-id")
@@ -45,18 +45,6 @@ class CollectorsConfigTest {
         assertThat(json).contains("\"signing_cert_id\"");
         assertThat(json).contains("\"token_signing_key\"");
         assertThat(json).contains("\"otlp_server_cert_id\"");
-    }
-
-    @Test
-    void ingestEndpointConfigWithNullInputId() throws Exception {
-        final var endpoint = new IngestEndpointConfig(true, "host.example.com", 14401, null);
-        final var json = objectMapper.writeValueAsString(endpoint);
-        final var deserialized = objectMapper.readValue(json, IngestEndpointConfig.class);
-
-        assertThat(deserialized.inputId()).isNull();
-        assertThat(deserialized.enabled()).isTrue();
-        assertThat(deserialized.hostname()).isEqualTo("host.example.com");
-        assertThat(deserialized.port()).isEqualTo(14401);
     }
 
     @Test

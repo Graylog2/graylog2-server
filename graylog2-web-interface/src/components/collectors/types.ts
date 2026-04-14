@@ -108,10 +108,8 @@ export type CollectorStats = {
 };
 
 export type IngestEndpointConfig = {
-  enabled: boolean;
   hostname: string;
   port: number;
-  input_id: string | null;
 };
 
 export type TokenSigningKey = {
@@ -132,15 +130,19 @@ export type CollectorsConfig = {
   collector_expiration_threshold: string;
 };
 
+export type CollectorInputIdsResponse = {
+  collector_input_ids: string[];
+};
+
 export type CollectorsConfigRequest = {
   http: {
-    enabled: boolean;
     hostname: string;
     port: number;
   };
   collector_offline_threshold: string;
   collector_default_visibility_threshold: string;
   collector_expiration_threshold: string;
+  create_input: boolean;
 };
 
 export type FleetStatsSummary = {

@@ -52,9 +52,9 @@ import java.io.StringWriter;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
-import java.security.SecureRandom;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.Security;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -482,8 +482,8 @@ public class CertificateBuilder {
                 encryptedValueService.encrypt(privateKeyPem),
                 certificatePem,
                 issuerChain,
-                null, // subjectDn - extracted on save
-                null, // issuerDn - extracted on save
+                certificate.getSubjectX500Principal().getName(),
+                certificate.getIssuerX500Principal().getName(),
                 certificate.getNotBefore().toInstant(),
                 certificate.getNotAfter().toInstant(),
                 Instant.now(clock)

@@ -47,6 +47,7 @@ import org.graylog.security.pki.CertificateService;
 import org.graylog.security.pki.PemUtils;
 import org.graylog.testing.cluster.ClusterConfigServiceExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -117,7 +118,9 @@ class CollectorTLSUtilsIT {
 
         final var certService = new CertificateService(mongoCollections, encryptedValueService, CustomizationConfig.empty(), Clock.systemUTC());
         final var clusterIdService = mock(ClusterIdService.class);
-        final var collectorsConfigService = new CollectorsConfigService(clusterConfigService, new ClusterEventBus());
+        final var httpConfiguration = mock(HttpConfiguration.class);
+        when(httpConfiguration.getHttpExternalUri()).thenReturn(java.net.URI.create("https://localhost:443/"));
+        final var collectorsConfigService = new CollectorsConfigService(clusterConfigService, new ClusterEventBus(), httpConfiguration);
         final var caService = new CollectorCaService(certService, clusterIdService, collectorsConfigService, Clock.systemUTC());
 
         when(clusterIdService.getString()).thenReturn(UUID.randomUUID().toString());
