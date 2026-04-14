@@ -48,7 +48,7 @@ const validate = (values: FormValues) => {
   return errors;
 };
 
-const ReassignFleetModal = ({ instanceUids, currentFleetId, onClose, onSuccess }: Props) => {
+const ReassignFleetModal = ({ instanceUids, currentFleetId = undefined, onClose, onSuccess = () => {} }: Props) => {
   const { data: fleets, isLoading: fleetsLoading } = useFleets();
   const { reassignInstances } = useCollectorsMutations();
   const sendTelemetry = useSendCollectorsTelemetry();
@@ -79,7 +79,7 @@ const ReassignFleetModal = ({ instanceUids, currentFleetId, onClose, onSuccess }
         });
       }
 
-      onSuccess?.();
+      onSuccess();
       onClose();
     },
     [instanceUids, reassignInstances, onSuccess, onClose, currentFleetId, sendTelemetry],
