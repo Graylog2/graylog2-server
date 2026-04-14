@@ -58,6 +58,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static com.mongodb.client.model.Updates.combine;
@@ -153,23 +154,6 @@ public class CollectorInstanceService {
         }
 
         return previousInstanceDto;
-    }
-
-    /**
-     * Extracts the {@link CollectorOSType} from the given report.
-     *
-     * @param report the report
-     * @return the operating system type or UNKNOWN when the attribute doesn't exist
-     */
-    public static CollectorOSType extractOsTypeFromReport(CollectorInstanceReport report) {
-        return report.nonIdentifyingAttributes().orElse(List.of())
-                .stream()
-                .filter(a -> OS_TYPE_KEY.equals(a.key()))
-                .map(Attribute::value)
-                .map(String::valueOf)
-                .map(CollectorOSType::of)
-                .findFirst()
-                .orElse(CollectorOSType.UNKNOWN);
     }
 
     /**
@@ -358,6 +342,25 @@ public class CollectorInstanceService {
                 .collect(Collectors.toMap(CollectorInstanceDTO::instanceUid, Function.identity()));
     }
 
+    /**
+     * Extracts the {@link CollectorOSType} from the given report.
+     *
+     * @param report the report
+     * @return the operating system type or UNKNOWN when the attribute doesn't exist
+     */
+    public static CollectorOSType extractOsTypeFromReport(CollectorInstanceReport report) {
+        return extractOSType(report.nonIdentifyingAttributes().orElse(List.of()).stream());
+    }
+
+    private static CollectorOSType extractOSType(Stream<Attribute> attributes) {
+        return attributes.filter(a -> OS_TYPE_KEY.equals(a.key()))
+                .map(Attribute::value)
+                .map(String::valueOf)
+                .map(CollectorOSType::of)
+                .findFirst()
+                .orElse(CollectorOSType.UNKNOWN);
+    }
+
     public record MinimalCollectorInstanceDTO(@Id @JsonProperty(FIELD_ID) String id,
                                               @JsonProperty(FIELD_FLEET_ID) String fleetId,
                                               @JsonProperty(FIELD_MESSAGE_SEQ_NUM) long messageSeqNum,
@@ -367,12 +370,7 @@ public class CollectorInstanceService {
             if (nonIdentifyingAttributes == null) {
                 return CollectorOSType.UNKNOWN;
             }
-            return nonIdentifyingAttributes.stream()
-                    .filter(a -> OS_TYPE_KEY.equals(a.key()))
-                    .map(a -> String.valueOf(a.value()))
-                    .map(CollectorOSType::of)
-                    .findFirst()
-                    .orElse(CollectorOSType.UNKNOWN);
+            return extractOSType(nonIdentifyingAttributes.stream());
         }
     }
 }
