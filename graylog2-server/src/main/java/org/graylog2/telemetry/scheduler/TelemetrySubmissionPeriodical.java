@@ -60,7 +60,6 @@ public class TelemetrySubmissionPeriodical extends Periodical {
         try {
             if (!telemetryMetrics.isEmpty()) {
                 telemetryClient.capture(telemetryMetrics);
-                LOG.info("Telemetry submitted, {}", telemetryMetrics);
             }
         } catch (Exception e) {
             LOG.warn("Error while submitting telemetry: ", e);
