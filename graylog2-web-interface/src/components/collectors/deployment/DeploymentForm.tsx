@@ -19,7 +19,7 @@ import { useState, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 import { Formik, Form } from 'formik';
 
-import { SegmentedControl } from 'components/bootstrap';
+import { Alert, SegmentedControl } from 'components/bootstrap';
 import { ClipboardButton, FormikInput, Select } from 'components/common';
 import SectionGrid from 'components/common/Section/SectionGrid';
 import FormSubmit from 'components/common/FormSubmit';
@@ -189,6 +189,11 @@ const DeploymentForm = () => {
     <Formik<FormValues> initialValues={initialValues} onSubmit={handleSubmit} validate={validate}>
       {({ isSubmitting, values, setFieldValue }) => (
         <Form>
+          <Alert bsStyle="info">
+            <strong>How deployment works:</strong> Select a target platform and fleet, then generate an enrollment token.
+            Run the installation script on your target host &mdash; the collector will enroll, receive its fleet&apos;s
+            configuration, and start collecting data automatically.
+          </Alert>
           <Section>
             <Label>Platform</Label>
             <SegmentedControl
@@ -227,6 +232,10 @@ const DeploymentForm = () => {
 
           <Section>
             <Label>Token Expiry</Label>
+            <InfoText>
+              How long this token remains valid for new enrollments. Already-enrolled collectors are not
+              affected when a token expires.
+            </InfoText>
             <SegmentedControl
               value={values.expiry}
               onChange={(v) => setFieldValue('expiry', v)}
@@ -269,6 +278,9 @@ const DeploymentForm = () => {
                     Installation Script
                     <ClipboardButton text={getInstallScript(values.platform)} title="Copy Script" bsSize="xs" />
                   </h4>
+                  <InfoText>
+                    Run this script on the target host. The collector will download, install, and enroll automatically.
+                  </InfoText>
                   <ScriptBlock>{getInstallScript(values.platform)}</ScriptBlock>
                 </ResultSection>
               </SectionGrid>

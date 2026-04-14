@@ -30,7 +30,10 @@ const CollectorsSettingsPage = () => (
           Collectors Settings <BetaBadge />
         </>
       }>
-      <span>Configure settings for managed collectors.</span>
+      <span>
+        Configure the endpoints and lifecycle settings for managed collectors. Collectors connect to these
+        endpoints to receive configuration updates and send collected log data.
+      </span>
     </PageHeader>
     <CollectorsSettings />
   </DocumentTitle>

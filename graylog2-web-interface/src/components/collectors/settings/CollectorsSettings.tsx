@@ -164,8 +164,13 @@ const CollectorsSettings = () => {
       <Row className="content">
         {!isConfigured && (
           <Col md={12}>
-            <Alert bsStyle="warning">
-              Collectors have not been set up yet. Configure the ingest endpoint and basic settings below to get started.
+            <Alert bsStyle="info">
+              <strong>Getting started with Collectors</strong>
+              <p>
+                Collectors need ingest endpoints to receive collected data. Configure the HTTP endpoint below
+                and save to initialize the collector infrastructure. After setup, you can create fleets,
+                add sources, and deploy collectors to your hosts.
+              </p>
             </Alert>
           </Col>
         )}
@@ -175,6 +180,7 @@ const CollectorsSettings = () => {
               <Col md={6}>
                 <SectionTitle>Ingest Endpoint</SectionTitle>
                 <HelpText>
+                  Ingest endpoints receive log data from collectors via OpenTelemetry (OTLP).
                   The external address that is pushed to managed collectors as their data destination.
                   It must route to a running collector ingest input.
                   This is typically the address of a load balancer or the server itself.
@@ -186,6 +192,7 @@ const CollectorsSettings = () => {
                   label="External hostname"
                   name="http_hostname"
                   placeholder="e.g. otlp.example.com"
+                  help="The hostname or IP address that collectors will use to connect. Must be reachable from collector hosts."
                 />
                 <FormikInput
                   id="http-port"

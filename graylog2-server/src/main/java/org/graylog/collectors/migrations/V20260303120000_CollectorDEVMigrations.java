@@ -21,10 +21,20 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.graylog.collectors.CollectorLogsDestinationService;
+import org.graylog.security.UserContext;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.database.NotFoundException;
+import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
 import org.graylog2.migrations.Migration;
+import org.graylog2.plugin.streams.Stream;
+import org.graylog2.shared.users.UserService;
+import org.graylog2.streams.StreamGuardException;
+import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,10 +57,25 @@ public class V20260303120000_CollectorDEVMigrations extends Migration {
     private static final String INPUT_TYPE = "org.graylog.collectors.input.CollectorIngestHttpInput";
 
     private final MongoConnection mongoConnection;
+    private final Provider<StreamService> streamServiceProvider;
+    private final Provider<IndexSetService> indexSetServiceProvider;
+    private final Provider<IndexSetCleanupJob.Factory> indexSetCleanupJobFactoryProvider;
+    private final Provider<UserService> userServiceProvider;
+    private final Provider<CollectorLogsDestinationService> logsDestinationServiceProvider;
 
     @Inject
-    public V20260303120000_CollectorDEVMigrations(MongoConnection mongoConnection) {
+    public V20260303120000_CollectorDEVMigrations(MongoConnection mongoConnection,
+                                                  Provider<StreamService> streamServiceProvider,
+                                                  Provider<IndexSetService> indexSetServiceProvider,
+                                                  Provider<IndexSetCleanupJob.Factory> indexSetCleanupJobFactoryProvider,
+                                                  Provider<UserService> userServiceProvider,
+                                                  Provider<CollectorLogsDestinationService> logsDestinationServiceProvider) {
         this.mongoConnection = mongoConnection;
+        this.streamServiceProvider = streamServiceProvider;
+        this.indexSetServiceProvider = indexSetServiceProvider;
+        this.indexSetCleanupJobFactoryProvider = indexSetCleanupJobFactoryProvider;
+        this.userServiceProvider = userServiceProvider;
+        this.logsDestinationServiceProvider = logsDestinationServiceProvider;
     }
 
     @Override
@@ -65,6 +90,12 @@ public class V20260303120000_CollectorDEVMigrations extends Migration {
         final var db = mongoConnection.getMongoDatabase();
 
         migrateCollectorIngestConfig(db);
+        removeLegacyCollectorLogsStream();
+
+        UserContext.<Void>runAs("admin", userServiceProvider.get(), () -> {
+            logsDestinationServiceProvider.get().ensureExists();
+            return null;
+        });
     }
 
     /**
@@ -138,4 +169,36 @@ public class V20260303120000_CollectorDEVMigrations extends Migration {
             }
         }
     }
+
+    private void removeLegacyCollectorLogsStream() {
+        final var streamService = streamServiceProvider.get();
+
+        final Stream stream;
+        try {
+            stream = streamService.load(Stream.COLLECTOR_SYSTEM_LOGS_STREAM_ID);
+        } catch (NotFoundException e) {
+            LOG.debug("Stream not found, nothing to do");
+            return;
+        }
+
+        if ("Collector System Logs".equals(stream.getTitle())) {
+            LOG.debug("Stream already migrated, nothing to do");
+            return;
+        }
+
+        LOG.info("Removing legacy Collector Logs stream and index-set");
+
+        final var indexSet = stream.getIndexSet();
+
+        try {
+            streamService.destroy(stream);
+        } catch (NotFoundException | StreamGuardException e) {
+            throw new RuntimeException("Couldn't destroy stream", e);
+        }
+
+        if (indexSetServiceProvider.get().delete(indexSet.getConfig().id()) > 0) {
+            indexSetCleanupJobFactoryProvider.get().create(indexSet).execute();
+        }
+    }
+
 }

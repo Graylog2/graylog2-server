@@ -18,15 +18,25 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { StreamRules } from '@graylog/server-api';
 
+import type { StreamRule } from 'stores/streams/StreamsStore';
 import UserNotification from 'util/UserNotification';
 
-type StreamRuleData = {
-  field: string;
-  type: number;
-  value: string;
-  inverted: boolean;
-  description: string;
-};
+type StreamRuleData = Pick<StreamRule, 'field' | 'type' | 'value' | 'inverted' | 'description'>;
+type StreamRuleMutationData = StreamRuleData & Partial<StreamRule>;
+
+const toStreamRuleData = ({
+  field,
+  type,
+  value,
+  inverted,
+  description,
+}: StreamRuleMutationData): StreamRuleData => ({
+  field,
+  type,
+  value,
+  inverted,
+  description,
+});
 
 const useStreamRuleMutations = () => {
   const queryClient = useQueryClient();
@@ -37,7 +47,8 @@ const useStreamRuleMutations = () => {
   };
 
   const createRule = useMutation({
-    mutationFn: ({ streamId, data }: { streamId: string; data: StreamRuleData }) => StreamRules.create(streamId, data),
+    mutationFn: ({ streamId, data }: { streamId: string; data: StreamRuleMutationData }) =>
+      StreamRules.create(streamId, toStreamRuleData(data)),
     onSuccess: () => invalidateStreamQueries(),
     onError: (error: Error) => {
       UserNotification.error(`Creating Stream Rule failed with status: ${error}`, 'Could not create Stream Rule');
@@ -45,8 +56,15 @@ const useStreamRuleMutations = () => {
   });
 
   const updateRule = useMutation({
-    mutationFn: ({ streamId, streamRuleId, data }: { streamId: string; streamRuleId: string; data: StreamRuleData }) =>
-      StreamRules.update(streamId, streamRuleId, data),
+    mutationFn: ({
+      streamId,
+      streamRuleId,
+      data,
+    }: {
+      streamId: string;
+      streamRuleId: string;
+      data: StreamRuleMutationData;
+    }) => StreamRules.update(streamId, streamRuleId, toStreamRuleData(data)),
     onSuccess: () => invalidateStreamQueries(),
     onError: (error: Error) => {
       UserNotification.error(`Updating Stream Rule failed with status: ${error}`, 'Could not update Stream Rule');
