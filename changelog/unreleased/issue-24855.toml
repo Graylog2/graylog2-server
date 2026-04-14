@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix source stream permission filtering for events."
+
+issues = ["24855"]
+pulls = ["25647", "graylog-plugin-enterprise#13891"]
