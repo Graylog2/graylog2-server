@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useCallback, useState } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import cloneDeep from 'lodash/cloneDeep';
+import pick from 'lodash/pick';
 
 import { Col, ControlLabel, FormGroup, Input, Radio, Row } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
@@ -48,10 +49,10 @@ const initialFilterConfig = {
   use_cron_scheduling: false,
 };
 
-const initialAggregationConfig = {
+const initialAggregationConfig: Partial<EventDefinition['config']> = {
   group_by: [],
   series: [],
-  conditions: {},
+  conditions: { expression: null },
 };
 
 type Props = {
@@ -71,7 +72,9 @@ const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validati
   const [conditionType, setConditionType] = useState(
     isEmpty(group_by) && isEmpty(series) && isEmpty(expression) ? conditionTypes.FILTER : conditionTypes.AGGREGATION,
   );
-  const [existingAggregationConfig, setExistingAggregationConfig] = useState<EventDefinition['config'] | undefined>();
+  const [existingAggregationConfig, setExistingAggregationConfig] = useState<
+    Partial<EventDefinition['config']> | undefined
+  >();
 
   const propagateConfigChange = useCallback(
     (config: EventDefinition['config']) => {
@@ -94,26 +97,18 @@ const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validati
       const nextConditionType = Number(FormsUtils.getValueFromInput(event.target as HTMLInputElement));
 
       setConditionType(nextConditionType);
-      let newExistingAggregationConfig;
 
-      if (nextConditionType === conditionTypes.FILTER) {
-        // Store existing data temporarily in state, to restore it in case the type change was accidental
-        Object.keys(initialAggregationConfig).forEach((key) => {
-          newExistingAggregationConfig[key] = eventDefinition.config[key];
-        });
+      const switchingToFilter = nextConditionType === conditionTypes.FILTER;
+      if (!switchingToFilter && !existingAggregationConfig) return;
 
-        const nextConfig = { ...eventDefinition.config, ...initialAggregationConfig };
+      const updatedAggregationConfig = switchingToFilter ? initialAggregationConfig : existingAggregationConfig;
+      const nextConfig: EventDefinition['config'] = { ...eventDefinition.config, ...updatedAggregationConfig };
+      propagateConfigChange(nextConfig);
 
-        propagateConfigChange(nextConfig as EventDefinition['config']);
-      } else if (existingAggregationConfig) {
-        // Reset aggregation data from state if it exists
-        const nextConfig = { ...eventDefinition.config, ...existingAggregationConfig };
-
-        propagateConfigChange(nextConfig);
-        newExistingAggregationConfig = undefined;
-      }
-
-      setExistingAggregationConfig(newExistingAggregationConfig);
+      const newSnapshot = switchingToFilter
+        ? pick(eventDefinition.config, Object.keys(initialAggregationConfig))
+        : undefined;
+      setExistingAggregationConfig(newSnapshot);
     },
     [eventDefinition.config, existingAggregationConfig, propagateConfigChange],
   );
