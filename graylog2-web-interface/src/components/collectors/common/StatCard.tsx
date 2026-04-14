@@ -95,7 +95,7 @@ const StatCard = ({ value, label, helpText = undefined, variant = 'default', onC
     type={onClick ? 'button' : undefined}>
     {helpText && (
       <HelpCorner>
-        <HoverForHelp title={label} placement="right" pullRight={false}>
+        <HoverForHelp title={label} triggerTitle="More info" placement="right" pullRight={false}>
           {helpText}
         </HoverForHelp>
       </HelpCorner>
