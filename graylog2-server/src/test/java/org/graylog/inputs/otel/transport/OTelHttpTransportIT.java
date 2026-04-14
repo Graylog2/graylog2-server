@@ -30,6 +30,7 @@ import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.graylog2.plugin.journal.RawMessage;
 import org.junit.jupiter.api.AfterEach;
@@ -94,7 +95,8 @@ class OTelHttpTransportIT {
 
         transport = new OTelHttpTransport(configuration, eventLoopGroup, eventLoopGroupFactory,
                 new NettyTransportConfiguration("nio", "jdk", 2),
-                throughputCounter, localRegistry, tlsConfiguration, Collections.emptySet());
+                throughputCounter, localRegistry, tlsConfiguration,
+                new EncryptedValueService("test-encryption-key"), Collections.emptySet());
         transport.launch(input);
 
         await().atMost(5, TimeUnit.SECONDS).until(() -> transport.getLocalAddress() != null);
