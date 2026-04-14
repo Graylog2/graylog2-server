@@ -21,6 +21,9 @@ import jakarta.ws.rs.ForbiddenException;
 import org.apache.shiro.subject.Subject;
 import org.graylog.collectors.input.CollectorIngestHttpInput;
 import org.graylog2.Configuration;
+import org.graylog2.audit.AuditActor;
+import org.graylog2.audit.AuditEventSender;
+import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.configuration.ConfigurationException;
@@ -50,6 +53,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -65,13 +69,15 @@ class CollectorIngestInputServiceTest {
     @Mock
     private Configuration configuration;
     @Mock
+    private AuditEventSender auditEventSender;
+    @Mock
     private Subject subject;
 
     private CollectorIngestInputService service;
 
     @BeforeEach
     void setUp() {
-        service = new CollectorIngestInputService(inputService, messageInputFactory, configuration);
+        service = new CollectorIngestInputService(inputService, messageInputFactory, configuration, auditEventSender);
     }
 
     private void stubInputDescription() {
@@ -177,6 +183,36 @@ class CollectorIngestInputServiceTest {
                 .containsEntry(NettyTransport.CK_BIND_ADDRESS, "0.0.0.0")
                 .containsEntry(NettyTransport.CK_PORT, 12345)
                 .containsEntry("tcp_keepalive", true);
+    }
+
+    @Test
+    void createInputEmitsMessageInputCreateAuditEvent() throws Exception {
+        when(subject.isPermitted(RestPermissions.INPUTS_CREATE)).thenReturn(true);
+        when(subject.isPermitted(RestPermissions.INPUT_TYPES_CREATE + ":" + CollectorIngestHttpInput.class.getCanonicalName()))
+                .thenReturn(true);
+        stubInputDescription();
+
+        final var messageInput = mock(MessageInput.class);
+        when(messageInput.asMap()).thenReturn(Map.of());
+        when(messageInputFactory.create(any(InputCreateRequest.class), anyString(), isNull(), anyBoolean()))
+                .thenReturn(messageInput);
+        final var input = mock(Input.class);
+        when(inputService.create(any(Map.class))).thenReturn(input);
+
+        service.createInput(subject, "admin", 14401);
+
+        final ArgumentCaptor<Map<String, Object>> contextCaptor = ArgumentCaptor.captor();
+        verify(auditEventSender).success(
+                eq(AuditActor.user("admin")),
+                eq(AuditEventTypes.MESSAGE_INPUT_CREATE),
+                contextCaptor.capture()
+        );
+        final var context = contextCaptor.getValue();
+        assertThat(context).containsOnlyKeys("request_entity");
+        final var requestEntity = (InputCreateRequest) context.get("request_entity");
+        assertThat(requestEntity.title()).isEqualTo(CollectorIngestHttpInput.NAME);
+        assertThat(requestEntity.type()).isEqualTo(CollectorIngestHttpInput.class.getCanonicalName());
+        assertThat(requestEntity.global()).isTrue();
     }
 
     @Test

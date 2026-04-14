@@ -23,6 +23,9 @@ import jakarta.ws.rs.NotFoundException;
 import org.apache.shiro.subject.Subject;
 import org.graylog.collectors.input.CollectorIngestHttpInput;
 import org.graylog2.Configuration;
+import org.graylog2.audit.AuditActor;
+import org.graylog2.audit.AuditEventSender;
+import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.configuration.ConfigurationException;
@@ -44,14 +47,17 @@ public class CollectorIngestInputService {
     private final InputService inputService;
     private final MessageInputFactory messageInputFactory;
     private final Configuration configuration;
+    private final AuditEventSender auditEventSender;
 
     @Inject
     public CollectorIngestInputService(InputService inputService,
                                        MessageInputFactory messageInputFactory,
-                                       Configuration configuration) {
+                                       Configuration configuration,
+                                       AuditEventSender auditEventSender) {
         this.inputService = inputService;
         this.messageInputFactory = messageInputFactory;
         this.configuration = configuration;
+        this.auditEventSender = auditEventSender;
     }
 
     public List<String> getInputIds() {
@@ -103,6 +109,11 @@ public class CollectorIngestInputService {
             messageInput.checkConfiguration();
             final var input = inputService.create(messageInput.asMap());
             inputService.save(input);
+            auditEventSender.success(
+                    AuditActor.user(userName),
+                    AuditEventTypes.MESSAGE_INPUT_CREATE,
+                    Map.of("request_entity", inputCreateRequest)
+            );
         } catch (NoSuchInputTypeException e) {
             throw new NotFoundException("No such input type registered", e);
         } catch (ConfigurationException e) {
