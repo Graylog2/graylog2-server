@@ -47,7 +47,10 @@ const CollectorsFleetsPage = () => {
           </>
         }
         actions={<CreateButton entityKey={'Fleet'} />}>
-        <span>Manage collector fleets and their configurations.</span>
+        <span>
+          A fleet is a group of collectors that share the same configuration. All collectors in a fleet
+          collect data from the same sources. Use fleets to organize collectors by environment, team, or purpose.
+        </span>
       </PageHeader>
 
       <Row className="content">
