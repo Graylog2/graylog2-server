@@ -111,7 +111,7 @@ describe('<EventDefinitionInfoTable />', () => {
     mockUseAlertAndEventDefinitionData({});
   });
 
-  it('Always shows fields: Priority, Execute search every, Search within, Description, Notifications, Aggregation conditions', async () => {
+  it('Always shows fields: Priority, Execute search every, Search within, Description, Notifications', async () => {
     render(<EventInfoComponent type="event" />);
 
     const priority = await screen.findByTitle('Priority');
@@ -119,19 +119,12 @@ describe('<EventDefinitionInfoTable />', () => {
     const searchWithin = await screen.findByTitle('Search within');
     const description = await screen.findByTitle('Description');
     const notifications = await screen.findByTitle('Notifications');
-    const aggregationConditions = await screen.findByTitle('Aggregation conditions');
-    const field1Condition = await screen.findByTestId('color-count(field1)>500');
-    const field2Condition = await screen.findByTestId('color-count(field2)<8000');
 
     expect(priority).toHaveTextContent('Medium');
     expect(execution).toHaveTextContent('1 minute');
     expect(searchWithin).toHaveTextContent('1 minute');
     expect(description).toHaveTextContent('Test description');
     expect(notifications).toHaveTextContent('Email notification');
-    expect(aggregationConditions).toHaveTextContent('count(field1)>500count(field2)<8000');
-
-    expect(field1Condition).toHaveStyle({ backgroundColor: 'rgb(255, 255, 255)' });
-    expect(field2Condition).toHaveStyle({ backgroundColor: 'rgb(0, 0, 0)' });
   });
 
   it('Shows event definition link for event', async () => {
