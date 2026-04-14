@@ -40,6 +40,7 @@ export {
 } from './useEnrollmentTokenQueries';
 
 export { default as useCollectorsMutations } from './useCollectorsMutations';
+export { default as useCollectorInputMutations } from './useCollectorInputMutations';
 export { default as useDefaultInstanceFilters } from './useDefaultInstanceFilters';
 
 export { useRecentActivity, ACTIVITY_KEY } from './useActivityQueries';
