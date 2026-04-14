@@ -46,6 +46,9 @@ type InputProps = Omit<
   error?: React.ReactElement | string;
   help?: React.ReactElement | string;
   wrapperClassName?: string;
+  wrapperAttributes?: React.HTMLAttributes<HTMLElement> & {
+    'data-input-value'?: string | undefined;
+  };
   addonAfter?: React.ReactElement | string;
   buttonAfter?: React.ReactElement | string;
   children?: any[] | React.ReactElement;
@@ -79,6 +82,7 @@ class Input extends React.Component<
     error: undefined,
     help: undefined,
     wrapperClassName: undefined,
+    wrapperAttributes: undefined,
     addonAfter: null,
     buttonAfter: null,
     children: null,
@@ -125,6 +129,7 @@ class Input extends React.Component<
       bsStyle,
       formGroupClassName,
       wrapperClassName,
+      wrapperAttributes,
       inputDescClassName,
       label,
       labelClassName,
@@ -151,7 +156,7 @@ class Input extends React.Component<
     return (
       <FormGroup controlId={id} validationState={error ? 'error' : bsStyle} bsClass={formGroupClassName}>
         {label && <ControlLabel className={labelClassName}>{label}</ControlLabel>}
-        <InputWrapper className={wrapperClassName}>
+        <InputWrapper className={wrapperClassName} wrapperAttributes={wrapperAttributes}>
           {input}
           <InputDescription error={error} help={help} className={inputDescClassName} />
         </InputWrapper>
@@ -160,12 +165,22 @@ class Input extends React.Component<
   };
 
   _renderCheckboxGroup = (controlProps) => {
-    const { id, buttonAfter, bsStyle, formGroupClassName, inputDescClassName, wrapperClassName, label, error, help } =
-      this.props;
+    const {
+      id,
+      buttonAfter,
+      bsStyle,
+      formGroupClassName,
+      inputDescClassName,
+      wrapperClassName,
+      wrapperAttributes,
+      label,
+      error,
+      help,
+    } = this.props;
 
     return (
       <FormGroup controlId={id} validationState={error ? 'error' : bsStyle} bsClass={formGroupClassName}>
-        <InputWrapper className={wrapperClassName}>
+        <InputWrapper className={wrapperClassName} wrapperAttributes={wrapperAttributes}>
           {buttonAfter ? (
             <InputGroup>
               <Checkbox ref={this.input} {...controlProps}>
@@ -185,11 +200,21 @@ class Input extends React.Component<
   };
 
   _renderRadioGroup = (controlProps) => {
-    const { id, bsStyle, formGroupClassName, inputDescClassName, wrapperClassName, label, error, help } = this.props;
+    const {
+      id,
+      bsStyle,
+      formGroupClassName,
+      inputDescClassName,
+      wrapperClassName,
+      wrapperAttributes,
+      label,
+      error,
+      help,
+    } = this.props;
 
     return (
       <FormGroup controlId={id} validationState={error ? 'error' : bsStyle} bsClass={formGroupClassName}>
-        <InputWrapper className={wrapperClassName}>
+        <InputWrapper className={wrapperClassName} wrapperAttributes={wrapperAttributes}>
           <Radio
             inputRef={(ref) => {
               this.input = ref;
@@ -215,6 +240,7 @@ class Input extends React.Component<
       bsStyle: _bsStyle,
       formGroupClassName: _formGroupClassName,
       wrapperClassName: _wrapperClassName,
+      wrapperAttributes: _wrapperAttributes,
       labelClassName: _labelClassName,
       inputDescClassName: _inputDescClassName,
       error: _error,

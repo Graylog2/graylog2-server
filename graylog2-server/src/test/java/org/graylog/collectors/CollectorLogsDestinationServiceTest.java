@@ -133,13 +133,13 @@ class CollectorLogsDestinationServiceTest {
         final var saved = captor.getValue();
 
         assertThat(saved.isRegular()).hasValue(false);
-        assertThat(saved.indexPrefix()).isEqualTo("gl-collector-logs");
-        assertThat(saved.indexTemplateName()).isEqualTo("gl-collector-logs-template");
+        assertThat(saved.indexPrefix()).isEqualTo("gl-collector-system-logs");
+        assertThat(saved.indexTemplateName()).isEqualTo("gl-collector-system-logs-template");
         assertThat(saved.indexTemplateType()).hasValue(CollectorLogsIndexTemplateProvider.COLLECTOR_LOGS_TEMPLATE_TYPE);
         assertThat(saved.dataTieringConfig()).isNull();
         assertThat(saved.isWritable()).isTrue();
-        assertThat(saved.title()).isEqualTo("Collector Logs");
-        assertThat(saved.description()).isEqualTo("Index set for collector self-log messages");
+        assertThat(saved.title()).isEqualTo("Collector System Logs");
+        assertThat(saved.description()).isEqualTo("Index set for collector system log messages");
         assertThat(saved.rotationStrategyClass())
                 .isEqualTo(TimeBasedSizeOptimizingStrategy.class.getCanonicalName());
         assertThat(saved.rotationStrategyConfig()).isInstanceOf(TimeBasedSizeOptimizingStrategyConfig.class);
@@ -164,8 +164,8 @@ class CollectorLogsDestinationServiceTest {
         verify(streamService).save(captor.capture());
         final var saved = captor.getValue();
 
-        assertThat(saved.getId()).isEqualTo(Stream.COLLECTOR_LOGS_STREAM_ID);
-        assertThat(saved.getTitle()).isEqualTo("Collector Logs");
+        assertThat(saved.getId()).isEqualTo(Stream.COLLECTOR_SYSTEM_LOGS_STREAM_ID);
+        assertThat(saved.getTitle()).isEqualTo("Collector System Logs");
         assertThat(saved.removeMatchesFromDefaultStream()).isTrue();
         assertThat(saved.getScope()).isEqualTo(ImmutableSystemScope.NAME);
         assertThat(saved.getDisabled()).isFalse();
@@ -187,7 +187,7 @@ class CollectorLogsDestinationServiceTest {
         verify(streamRuleService).create(mapCaptor.capture());
         final var ruleData = (java.util.Map<String, Object>) mapCaptor.getValue();
 
-        assertThat(ruleData.get("stream_id")).hasToString(Stream.COLLECTOR_LOGS_STREAM_ID);
+        assertThat(ruleData.get("stream_id")).hasToString(Stream.COLLECTOR_SYSTEM_LOGS_STREAM_ID);
         assertThat(ruleData.get("field")).isEqualTo(CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_TYPE);
         assertThat(ruleData.get("type")).isEqualTo(StreamRuleType.EXACT.toInteger());
         assertThat(ruleData.get("value")).isEqualTo(CollectorLogRecordProcessor.RECEIVER_TYPE);
@@ -225,9 +225,9 @@ class CollectorLogsDestinationServiceTest {
     private void stubIndexSetExists() {
         final var existingConfig = IndexSetConfig.builder()
                 .id("existing-index-set-id")
-                .title("Collector Logs")
-                .indexPrefix("gl-collector-logs")
-                .indexTemplateName("gl-collector-logs-template")
+                .title("Collector System Logs")
+                .indexPrefix("gl-collector-system-logs")
+                .indexTemplateName("gl-collector-system-logs-template")
                 .indexTemplateType(CollectorLogsIndexTemplateProvider.COLLECTOR_LOGS_TEMPLATE_TYPE)
                 .creationDate(ZonedDateTime.now(ZoneOffset.UTC))
                 .indexAnalyzer("standard")
@@ -248,14 +248,14 @@ class CollectorLogsDestinationServiceTest {
     }
 
     private void stubStreamDoesNotExist() throws NotFoundException {
-        when(streamService.load(Stream.COLLECTOR_LOGS_STREAM_ID)).thenThrow(new NotFoundException("not found"));
+        when(streamService.load(Stream.COLLECTOR_SYSTEM_LOGS_STREAM_ID)).thenThrow(new NotFoundException("not found"));
     }
 
     private void stubStreamExists() throws NotFoundException {
-        when(streamService.load(Stream.COLLECTOR_LOGS_STREAM_ID)).thenReturn(mock(StreamImpl.class));
+        when(streamService.load(Stream.COLLECTOR_SYSTEM_LOGS_STREAM_ID)).thenReturn(mock(StreamImpl.class));
     }
 
     private void stubStreamRuleCount(long count) {
-        when(streamRuleService.streamRuleCount(Stream.COLLECTOR_LOGS_STREAM_ID)).thenReturn(count);
+        when(streamRuleService.streamRuleCount(Stream.COLLECTOR_SYSTEM_LOGS_STREAM_ID)).thenReturn(count);
     }
 }

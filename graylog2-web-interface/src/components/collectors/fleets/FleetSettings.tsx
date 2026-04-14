@@ -147,7 +147,8 @@ const FleetSettings = ({ fleet, onSave, onDelete = undefined }: Props) => {
       <Section>
         <SectionTitle>Danger Zone</SectionTitle>
         <WarningText>
-          Deleting a fleet will remove all configuration. Instances will need to be re-enrolled.
+          Deleting a fleet removes all source configurations and unenrolls all collector instances.
+          Instances will stop collecting data and must be re-enrolled into a new fleet.
         </WarningText>
         <Button bsStyle="danger" onClick={() => setShowDeleteConfirm(true)} disabled={!onDelete}>
           Delete Fleet
@@ -160,8 +161,8 @@ const FleetSettings = ({ fleet, onSave, onDelete = undefined }: Props) => {
           show
           onConfirm={handleConfirmDelete}
           onCancel={() => setShowDeleteConfirm(false)}>
-          Are you sure you want to delete fleet <strong>{fleet.name}</strong>? All configuration will be removed and
-          instances will need to be re-enrolled.
+          Are you sure you want to delete fleet <strong>{fleet.name}</strong>? All source configurations will be
+          removed and collector instances will stop collecting data. Instances must be re-enrolled into a new fleet.
         </ConfirmDialog>
       )}
     </div>
