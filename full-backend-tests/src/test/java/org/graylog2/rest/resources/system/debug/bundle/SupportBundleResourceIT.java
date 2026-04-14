@@ -48,8 +48,13 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 
-@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 @EnabledIfSearchServer(distribution = SearchVersion.Distribution.DATANODE)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS,
+                             env = {
+                                     @GraylogBackendConfiguration.Env(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"),
+                                     @GraylogBackendConfiguration.Env(key = "GRAYLOG_SELFSIGNED_STARTUP", value = "true"),
+                                     @GraylogBackendConfiguration.Env(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = ""),
+                             })
 public class SupportBundleResourceIT {
     private static final String MANIFEST_URL = "/system/debug/support/manifest";
     private static final String LOGFILE_URL = "/system/debug/support/logfile/{id}";

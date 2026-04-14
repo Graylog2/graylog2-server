@@ -30,6 +30,7 @@ import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.graylog.datanode.opensearch.OpensearchProcess;
+import org.graylog.datanode.rest.config.OnlyInSecuredNode;
 import org.graylog2.log4j.MemoryAppender;
 
 import java.util.List;
@@ -61,6 +62,7 @@ public class LogsController {
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
+    @OnlyInSecuredNode
     @Path("/internal")
     public Response getOpensearchInternal() {
         final Appender appender = getAppender(MEMORY_APPENDER_NAME);
