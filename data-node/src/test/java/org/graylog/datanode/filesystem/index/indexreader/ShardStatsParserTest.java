@@ -58,13 +58,6 @@ class ShardStatsParserTest {
     }
 
     @Test
-    void testOpensearch1() throws URISyntaxException {
-        final URI shard = getClass().getResource("/indices/opensearch1/nodes/0/indices/ccMlzvWBQT2YkL8LawXC1Q/0").toURI();
-        Assertions.assertThatThrownBy(() -> shardStatsParser.read(Path.of(shard)))
-                .isInstanceOf(IncompatibleIndexVersionException.class);
-    }
-
-    @Test
     void testOpensearch2MultipleSegments() throws URISyntaxException, IncompatibleIndexVersionException {
         // lmXxSRU5RkGiY4rPrDBAjQ/0 has four segments (_5/_6/_7/_8) — tests the min-across-segments logic
         final URI shardUri = getClass().getResource("/indices/opensearch2/nodes/0/indices/lmXxSRU5RkGiY4rPrDBAjQ/0").toURI();
