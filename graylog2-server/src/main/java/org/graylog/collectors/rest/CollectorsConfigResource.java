@@ -124,7 +124,6 @@ public class CollectorsConfigResource extends RestResource {
     @POST
     @Path("/inputs")
     @Operation(summary = "Create the default collector ingest input")
-    @RequiresPermissions(CollectorsPermissions.CONFIGURATION_EDIT)
     @NoAuditEvent("Audit event is emitted by CollectorIngestInputService")
     public CollectorInputIdsResponse createInput() throws ValidationException {
         final var config = collectorsConfigService.get()
