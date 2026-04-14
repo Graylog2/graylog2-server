@@ -19,7 +19,7 @@ import { useEffect, useState, useMemo } from 'react';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
-import { SystemInputStates } from '@graylog/server-api';
+import { ClusterInputState } from '@graylog/server-api';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -137,7 +137,7 @@ const StartInputStep = () => {
 
     if (!input) return;
 
-    SystemInputStates.start(input.id).finally(() => {
+    ClusterInputState.start(input.id).finally(() => {
       setStartInputStatus('SUCCESS');
     });
   };
@@ -147,7 +147,7 @@ const StartInputStep = () => {
 
     if (!input) return;
 
-    SystemInputStates.stop(input.id);
+    ClusterInputState.stop(input.id);
   };
 
   const setupInput = async () => {
