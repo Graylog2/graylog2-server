@@ -130,10 +130,13 @@ public class OpAmpHttpHandler extends HttpHandler {
             reply = opAmpService.handleMessage(message, authContext.get());
         } catch (RuntimeException e) {
             LOG.error("Error processing OpAMP message: {}", message, e);
+            final var type = e instanceof IllegalArgumentException
+                    ? ServerErrorResponseType.ServerErrorResponseType_BadRequest
+                    : ServerErrorResponseType.ServerErrorResponseType_Unknown;
             reply = ServerToAgent.newBuilder()
                     .setInstanceUid(message.getInstanceUid())
                     .setErrorResponse(ServerErrorResponse.newBuilder()
-                            .setType(ServerErrorResponseType.ServerErrorResponseType_Unknown)
+                            .setType(type)
                             .setErrorMessage(e.getMessage())
                             .build())
                     .build();

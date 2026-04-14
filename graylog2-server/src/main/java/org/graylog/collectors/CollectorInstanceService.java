@@ -31,6 +31,7 @@ import com.mongodb.client.result.InsertOneResult;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog.collectors.db.Attribute;
@@ -356,6 +357,7 @@ public class CollectorInstanceService {
         return attributes.filter(a -> OS_TYPE_KEY.equals(a.key()))
                 .map(Attribute::value)
                 .map(String::valueOf)
+                .filter(StringUtils::isNotBlank)
                 .map(CollectorOSType::of)
                 .findFirst()
                 .orElse(CollectorOSType.UNKNOWN);

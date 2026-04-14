@@ -333,7 +333,7 @@ public class OpAmpService {
             try {
                 LOG.trace("Message from enrolled instance <{}>:\n{}", instanceUid, JsonFormat.printer().print(message));
             } catch (Exception e) {
-                LOG.error("Couldn't serialize identified message", e);
+                LOG.trace("Couldn't serialize message from instance <{}>", instanceUid, e);
             }
         }
 

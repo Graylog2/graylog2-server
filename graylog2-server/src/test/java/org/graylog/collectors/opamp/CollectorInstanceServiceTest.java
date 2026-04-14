@@ -331,7 +331,7 @@ class CollectorInstanceServiceTest {
     }
 
     @Test
-    void updateFromReportReturnsEmptyForNonExistentInstance() {
+    void updateFromReportThrowsForNonExistentInstance() {
         final var report = CollectorInstanceReport.builder()
                 .instanceUid("new-uid")
                 .messageSeqNum(1L)

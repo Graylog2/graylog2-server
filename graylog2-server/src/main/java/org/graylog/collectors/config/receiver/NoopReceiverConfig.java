@@ -34,6 +34,7 @@ public abstract class NoopReceiverConfig implements CollectorReceiverConfig {
 
     @Override
     public EnumSet<CollectorOSType> osSupport() {
+        // We include all operating system types (also UNKNOWN) so we can use this receiver on all platforms.
         return EnumSet.allOf(CollectorOSType.class);
     }
 
