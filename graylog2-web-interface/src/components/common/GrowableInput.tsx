@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useLayoutEffect, useRef } from 'react';
-import styled from 'styled-components';
+import React from 'react';
+import styled, { css } from 'styled-components';
 
 import { Input } from 'components/bootstrap';
 
@@ -35,10 +35,44 @@ type Props = {
   value?: string;
 };
 
-const StyledInput = styled(Input)`
-  overflow: hidden;
-  resize: none;
-`;
+const Wrapper = styled.div(
+  ({ theme }) => css`
+    width: 100%;
+
+    .growable-input-wrapper {
+      display: grid;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .growable-input-wrapper::after,
+    .growable-input-wrapper > textarea {
+      grid-area: 1 / 1 / 2 / 2;
+    }
+
+    .growable-input-wrapper::after {
+      content: attr(data-replicated-value) ' ';
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+      visibility: hidden;
+      box-sizing: border-box;
+      border: 1px solid transparent;
+      padding: 6px 12px;
+      font-size: ${theme.fonts.size.body};
+      line-height: inherit;
+    }
+
+    .growable-input-wrapper > textarea {
+      resize: none;
+      overflow: hidden;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+    }
+  `,
+);
 
 // Behaves and looks like an input, but it grows with its content.
 const GrowableInput = ({
@@ -56,24 +90,6 @@ const GrowableInput = ({
   value = '',
   restrictLineBreaks = true,
 }: Props) => {
-  const inputRef = useRef<Input | null>(null);
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const resizeTextarea = () => {
-    const element = inputRef.current?.getInputDOMNode();
-
-    if (!(element instanceof HTMLTextAreaElement)) {
-      return;
-    }
-
-    element.style.height = 'auto';
-    element.style.height = `${element.scrollHeight}px`;
-  };
-
-  useLayoutEffect(() => {
-    resizeTextarea();
-  }, [resizeTextarea, value]);
-
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const sanitizedValue = restrictLineBreaks ? event.target.value.replace(/[\r\n]+/g, ' ') : event.target.value;
 
@@ -89,24 +105,27 @@ const GrowableInput = ({
   };
 
   return (
-    <StyledInput
-      bsStyle={bsStyle}
-      className={className}
-      error={error}
-      id={id}
-      label={label}
-      name={name}
-      onBlur={onBlur}
-      onChange={handleChange}
-      onKeyDown={handleKeyDown}
-      ref={inputRef}
-      readOnly={readOnly}
-      required={required}
-      rows={1}
-      title={title}
-      type="textarea"
-      value={value}
-    />
+    <Wrapper>
+      <Input
+        bsStyle={bsStyle}
+        className={className}
+        error={error}
+        id={id}
+        label={label}
+        name={name}
+        onBlur={onBlur}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+        readOnly={readOnly}
+        required={required}
+        rows={1}
+        title={title}
+        type="textarea"
+        value={value}
+        wrapperAttributes={{ 'data-replicated-value': value }}
+        wrapperClassName="growable-input-wrapper"
+      />
+    </Wrapper>
   );
 };
 
