@@ -18,31 +18,46 @@ import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 import { Formik, Form } from 'formik';
 import moment from 'moment';
+import styled, { css } from 'styled-components';
 
 import { Alert, Row, Col } from 'components/bootstrap';
-import { FormikInput, Link, Spinner } from 'components/common';
+import { FormikInput, Spinner } from 'components/common';
 import TimeUnitInput, { extractDurationAndUnit } from 'components/common/TimeUnitInput';
-import Routes from 'routing/Routes';
-import InputStateBadge from 'components/inputs/InputStateBadge';
-import useInput from 'hooks/useInput';
-import useInputsStates from 'hooks/useInputsStates';
 import FormSubmit from 'components/common/FormSubmit';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useCurrentUser from 'hooks/useCurrentUser';
+import useInputsStates from 'hooks/useInputsStates';
+import { isPermitted } from 'util/PermissionsMixin';
 
-import { useCollectorsConfig, useCollectorsMutations } from '../hooks';
+import IngestEndpointStatus from './IngestEndpointStatus';
+import PortMismatchAlert from './PortMismatchAlert';
+
+import { useCollectorsConfig, useCollectorInputIds, useCollectorsMutations, useCollectorInputDetails } from '../hooks';
 import type { CollectorsConfigRequest } from '../types';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
-import {
-  classifyHostname,
-  classifyInputBind,
-  comparePort,
-  classifyInputState,
-} from '../hooks/telemetry-helpers';
+import { classifyHostname, classifyInputBind } from '../hooks/telemetry-helpers';
+
+
+const SectionTitle = styled.h3(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.sm};
+    border-bottom: 1px solid ${theme.colors.gray[80]};
+    padding-bottom: ${theme.spacings.xs};
+  `,
+);
+
+const HelpText = styled.p(
+  ({ theme }) => css`
+    font-size: ${theme.fonts.size.small};
+    color: ${theme.colors.gray[60]};
+    margin-bottom: ${theme.spacings.md};
+  `,
+);
 
 type FormValues = {
-  http_enabled: boolean;
   http_hostname: string;
   http_port: number;
+  create_input: boolean;
   offline_value: number;
   offline_unit: string;
   visibility_value: number;
@@ -56,17 +71,26 @@ const THRESHOLD_UNITS = ['DAYS', 'HOURS', 'MINUTES'];
 const CollectorsSettings = () => {
   const { data: config, isLoading: isLoadingConfig } = useCollectorsConfig();
   const { updateConfig } = useCollectorsMutations();
+  const currentUser = useCurrentUser();
   const isConfigured = !!config?.signing_cert_id;
-  const { data: inputStates } = useInputsStates({ enabled: isConfigured });
-  const { data: httpInput } = useInput(config?.http?.input_id);
+  const { data: collectorInputIds = [], isLoading: isLoadingInputIds } = useCollectorInputIds();
+  const { loadedInputs: collectorInputs, isLoading: isLoadingInputDetails } = useCollectorInputDetails();
+  const { data: inputStates } = useInputsStates({ enabled: collectorInputIds.length > 0 });
+
+  const canCreateInputs = isPermitted(currentUser?.permissions, [
+    'inputs:create',
+    'input_types:create:org.graylog.collectors.input.CollectorIngestHttpInput',
+  ]);
+
+  const showCreateInputCheckbox = !isConfigured && !isLoadingInputIds && collectorInputIds.length === 0 && canCreateInputs;
   const sendTelemetry = useSendCollectorsTelemetry();
 
   const initialValues: FormValues = useMemo(() => {
     if (!config) {
       return {
-        http_enabled: false,
         http_hostname: '',
         http_port: 14401,
+        create_input: true,
         offline_value: 5,
         offline_unit: 'MINUTES',
         visibility_value: 1,
@@ -81,9 +105,9 @@ const CollectorsSettings = () => {
     const expiration = extractDurationAndUnit(config.collector_expiration_threshold, THRESHOLD_UNITS);
 
     return {
-      http_enabled: config.http.enabled,
       http_hostname: config.http.hostname,
       http_port: config.http.port,
+      create_input: true,
       offline_value: offline.duration,
       offline_unit: offline.unit,
       visibility_value: visibility.duration,
@@ -93,23 +117,37 @@ const CollectorsSettings = () => {
     };
   }, [config]);
 
-  // Convert InputStates dict to array format for telemetry helpers
-  const inputStatesArray = useMemo(() => {
-    if (!inputStates) return undefined;
-    // Get the first node's states as an array
-    const firstNodeStates = Object.values(inputStates)[0];
-    if (!firstNodeStates) return undefined;
+  const portMatchesAnyInput = useMemo(() => {
+    if (collectorInputs.length === 0) return null;
 
-    return Object.values(firstNodeStates).map((state) => ({
-      id: state.id,
-      state: state.state,
-    }));
-  }, [inputStates]);
+    return collectorInputs.some((input) => input?.attributes?.port === config?.http?.port);
+  }, [collectorInputs, config?.http?.port]);
+
+  const inputBindTypes = useMemo((): 'all_wildcard' | 'all_specific' | 'mixed' | 'none' => {
+    if (collectorInputs.length === 0) return 'none';
+    const kinds = collectorInputs.map((input) => classifyInputBind(String(input?.attributes?.bind_address ?? '')));
+
+    if (kinds.every((k) => k === 'wildcard')) return 'all_wildcard';
+    if (kinds.every((k) => k === 'specific')) return 'all_specific';
+
+    return 'mixed';
+  }, [collectorInputs]);
+
+  const hasRunningInput = useMemo(() => {
+    if (!inputStates || collectorInputs.length === 0) return false;
+
+    return collectorInputs.some((input) => {
+      const nodeStates = inputStates?.[input.id];
+      if (!nodeStates) return false;
+
+      return Object.values(nodeStates).some((entry) => entry.state === 'RUNNING');
+    });
+  }, [inputStates, collectorInputs]);
 
   const handleSubmit = useCallback(
     async (values: FormValues, { setErrors }: { setErrors: (errors: Record<string, string>) => void }) => {
       const request: CollectorsConfigRequest = {
-        http: { enabled: values.http_enabled, hostname: values.http_hostname, port: values.http_port },
+        http: { hostname: values.http_hostname, port: values.http_port },
         collector_offline_threshold: moment
           .duration(values.offline_value, values.offline_unit as moment.unitOfTime.DurationConstructor)
           .toISOString(),
@@ -119,36 +157,38 @@ const CollectorsSettings = () => {
         collector_expiration_threshold: moment
           .duration(values.expiration_value, values.expiration_unit as moment.unitOfTime.DurationConstructor)
           .toISOString(),
+        create_input: showCreateInputCheckbox && values.create_input,
       };
 
       try {
         await updateConfig(request);
 
-        const offlineDuration = moment.duration(values.offline_value, values.offline_unit as moment.unitOfTime.DurationConstructor);
-        const visibilityDuration = moment.duration(values.visibility_value, values.visibility_unit as moment.unitOfTime.DurationConstructor);
-        const expirationDuration = moment.duration(values.expiration_value, values.expiration_unit as moment.unitOfTime.DurationConstructor);
-
-        const oldHttp = config?.http;
+        const offlineSec = Math.round(
+          moment.duration(values.offline_value, values.offline_unit as moment.unitOfTime.DurationConstructor).asSeconds(),
+        );
+        const visibilitySec = Math.round(
+          moment.duration(values.visibility_value, values.visibility_unit as moment.unitOfTime.DurationConstructor).asSeconds(),
+        );
+        const expirationSec = Math.round(
+          moment.duration(values.expiration_value, values.expiration_unit as moment.unitOfTime.DurationConstructor).asSeconds(),
+        );
 
         sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SETTINGS.UPDATED, {
           app_action_value: 'settings-save',
-          http_enabled: values.http_enabled,
           http_hostname_kind: classifyHostname(values.http_hostname ?? ''),
           http_port: values.http_port,
-          offline_threshold_seconds: Math.round(offlineDuration.asSeconds()),
-          visibility_threshold_seconds: Math.round(visibilityDuration.asSeconds()),
-          expiration_threshold_seconds: Math.round(expirationDuration.asSeconds()),
-          http_enabled_changed: (oldHttp?.enabled ?? false) !== values.http_enabled,
-          http_hostname_changed: (oldHttp?.hostname ?? '') !== values.http_hostname,
-          http_port_changed: (oldHttp?.port ?? null) !== values.http_port,
-          offline_threshold_changed: (config?.collector_offline_threshold ?? null) !== request.collector_offline_threshold,
-          visibility_threshold_changed: (config?.collector_default_visibility_threshold ?? null) !== request.collector_default_visibility_threshold,
-          expiration_threshold_changed: (config?.collector_expiration_threshold ?? null) !== request.collector_expiration_threshold,
-          port_matches_input: comparePort(values.http_port, httpInput as never),
-          input_bind_type: classifyInputBind(
-            (httpInput as { attributes?: { bind_address?: string } })?.attributes?.bind_address,
-          ),
-          input_state: classifyInputState(httpInput as never, inputStatesArray as never),
+          offline_threshold_seconds: offlineSec,
+          visibility_threshold_seconds: visibilitySec,
+          expiration_threshold_seconds: expirationSec,
+          http_hostname_changed: (config?.http?.hostname ?? '') !== values.http_hostname,
+          http_port_changed: (config?.http?.port ?? null) !== values.http_port,
+          offline_threshold_changed: config?.collector_offline_threshold !== request.collector_offline_threshold,
+          visibility_threshold_changed: config?.collector_default_visibility_threshold !== request.collector_default_visibility_threshold,
+          expiration_threshold_changed: config?.collector_expiration_threshold !== request.collector_expiration_threshold,
+          port_matches_any_input: portMatchesAnyInput,
+          input_bind_types: inputBindTypes,
+          has_running_input: hasRunningInput,
+          input_count: collectorInputIds.length,
         });
       } catch (error: unknown) {
         const validationErrors = (
@@ -156,19 +196,24 @@ const CollectorsSettings = () => {
         )?.additional?.body?.validation_errors;
 
         if (validationErrors) {
-          const extracted: Record<string, string> = {};
+          const fieldMapping: Record<string, string> = {
+            collector_offline_threshold: 'offline_value',
+            collector_default_visibility_threshold: 'visibility_value',
+            collector_expiration_threshold: 'expiration_value',
+          };
+          const mapped: Record<string, string> = {};
 
           Object.entries(validationErrors).forEach(([field, errors]) => {
             if (errors?.[0]?.error) {
-              extracted[field] = errors[0].error;
+              mapped[fieldMapping[field] ?? field] = errors[0].error;
             }
           });
 
-          setErrors(extracted);
+          setErrors(mapped);
         }
       }
     },
-    [updateConfig, config, sendTelemetry, httpInput, inputStatesArray],
+    [updateConfig, showCreateInputCheckbox, config, sendTelemetry, portMatchesAnyInput, inputBindTypes, hasRunningInput, collectorInputIds.length],
   );
 
   if (isLoadingConfig) {
@@ -178,36 +223,56 @@ const CollectorsSettings = () => {
   return (
     <>
       <Row className="content">
-        <Col md={6}>
-          {!isConfigured && (
+        {!isConfigured && (
+          <Col md={12}>
             <Alert bsStyle="warning">
-              Collectors have not been set up yet. Configure the ingest endpoints below and save to get started.
+              Collectors have not been set up yet. Configure the ingest endpoint and basic settings below to get started.
             </Alert>
-          )}
-          <Formik<FormValues> initialValues={initialValues} onSubmit={handleSubmit} enableReinitialize>
-            {({ isSubmitting, setFieldValue, values }) => (
-              <Form>
-                <h2>Ingest Endpoints</h2>
+          </Col>
+        )}
+        <Formik<FormValues> initialValues={initialValues} onSubmit={handleSubmit} enableReinitialize>
+          {({ isSubmitting, setFieldValue, values, errors }) => (
+            <Form>
+              <Col md={6}>
+                <SectionTitle>Ingest Endpoint</SectionTitle>
+                <HelpText>
+                  The external address that is pushed to managed collectors as their data destination.
+                  It must route to a running collector ingest input.
+                  This is typically the address of a load balancer or the server itself.
+                </HelpText>
 
-                <h3>HTTP</h3>
-                <FormikInput id="http-enabled" type="checkbox" label="Enabled" name="http_enabled" />
                 <FormikInput
                   id="http-hostname"
                   type="text"
-                  label="Hostname"
+                  label="External hostname"
                   name="http_hostname"
                   placeholder="e.g. otlp.example.com"
-                  disabled={!values.http_enabled}
                 />
                 <FormikInput
                   id="http-port"
                   type="number"
-                  label="Port"
+                  label="External port"
                   name="http_port"
-                  disabled={!values.http_enabled}
                 />
 
-                <h2>Collector Lifecycle</h2>
+                <PortMismatchAlert
+                  formPort={values.http_port}
+                  collectorInputs={collectorInputs}
+                  isLoading={isLoadingInputDetails}
+                />
+
+                {showCreateInputCheckbox && (
+                  <FormikInput
+                    id="create-input"
+                    type="checkbox"
+                    label="Create ingest input"
+                    name="create_input"
+                  />
+                )}
+              </Col>
+
+              <Col md={6}>
+                <SectionTitle>Collector Lifecycle</SectionTitle>
 
                 <TimeUnitInput
                   label="Offline threshold"
@@ -220,7 +285,9 @@ const CollectorsSettings = () => {
                   units={THRESHOLD_UNITS}
                   required
                   hideCheckbox
-                  help="Collectors that haven't reported within this time are shown as offline."
+                  help={errors.offline_value
+                    ? <span className="text-danger">{errors.offline_value}</span>
+                    : "Collectors that haven't reported within this time are shown as offline."}
                 />
 
                 <TimeUnitInput
@@ -234,7 +301,9 @@ const CollectorsSettings = () => {
                   units={THRESHOLD_UNITS}
                   required
                   hideCheckbox
-                  help="Collectors that haven't reported within this time are hidden from the default view. Users can adjust or remove this filter in the instances table."
+                  help={errors.visibility_value
+                    ? <span className="text-danger">{errors.visibility_value}</span>
+                    : "Collectors that haven't reported within this time are hidden from the default view. Users can adjust or remove this filter in the instances table."}
                 />
 
                 <TimeUnitInput
@@ -248,8 +317,13 @@ const CollectorsSettings = () => {
                   units={THRESHOLD_UNITS}
                   required
                   hideCheckbox
-                  help="Collectors that haven't reported within this time are permanently removed."
+                  help={errors.expiration_value
+                    ? <span className="text-danger">{errors.expiration_value}</span>
+                    : "Collectors that haven't reported within this time are permanently removed."}
                 />
+              </Col>
+
+              <Col md={12}>
                 <FormSubmit
                   isAsyncSubmit
                   submitButtonText="Update settings"
@@ -257,44 +331,13 @@ const CollectorsSettings = () => {
                   isSubmitting={isSubmitting}
                   displayCancel={false}
                 />
-              </Form>
-            )}
-          </Formik>
-        </Col>
+              </Col>
+            </Form>
+          )}
+        </Formik>
       </Row>
 
-      {isConfigured && (
-        <Row className="content">
-          <Col md={12}>
-            <h2>Ingest Endpoint Status</h2>
-            {httpInput && (
-              <p>
-                <strong>HTTP:</strong> <InputStateBadge input={httpInput} inputStates={inputStates} />{' '}
-                <Link
-                  to={Routes.SYSTEM.INPUT_DIAGNOSIS(httpInput.id)}
-                  onClick={() =>
-                    sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SETTINGS.DIAGNOSTICS_OPENED, {
-                      app_action_value: 'view-diagnostics-link',
-                      input_id: httpInput.id,
-                      http_hostname_kind: classifyHostname(config?.http?.hostname ?? ''),
-                      port_matches_input: comparePort(
-                        config?.http?.port ?? NaN,
-                        httpInput as never,
-                      ),
-                      input_bind_type: classifyInputBind(
-                        (httpInput as { attributes?: { bind_address?: string } })?.attributes?.bind_address,
-                      ),
-                      input_state: classifyInputState(httpInput as never, inputStatesArray as never),
-                    })
-                  }>
-                  View Diagnostics
-                </Link>
-              </p>
-            )}
-            {!httpInput && <p>No ingest endpoints are running.</p>}
-          </Col>
-        </Row>
-      )}
+      <IngestEndpointStatus defaultPort={config?.http?.port ?? 14401} isInitialSetup={!isConfigured} />
     </>
   );
 };
