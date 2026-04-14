@@ -20,6 +20,7 @@ import styled, { css } from 'styled-components';
 
 import { Button } from 'components/bootstrap';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { EmptyEntity, Link } from 'components/common';
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 
@@ -62,12 +63,17 @@ const FleetCardsGrid = ({ fleets, filter }: Props) => {
 
   if (fleets.length === 0) {
     return (
-      <EmptyState>
-        <p>No fleets yet</p>
+      <EmptyEntity title="No fleets yet">
+        <p>
+          Fleets let you manage groups of collectors with shared configuration.
+          Create your first fleet, then add sources to define what data its collectors should collect.
+          Once configured, <Link to={Routes.SYSTEM.COLLECTORS.DEPLOYMENT}>deploy collectors</Link> using
+          an enrollment token.
+        </p>
         <Button bsStyle="success" onClick={() => history.push(Routes.SYSTEM.COLLECTORS.FLEETS)}>
           Create Fleet
         </Button>
-      </EmptyState>
+      </EmptyEntity>
     );
   }
 
