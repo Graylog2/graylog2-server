@@ -55,6 +55,7 @@ const EventDefinitionTitle = () => {
 const useAttributeComponents = () => {
   const { alertId, definitionId, type } = useReplaySearchContext();
   const { eventData, eventDefinition } = useAlertAndEventDefinitionData(alertId, definitionId);
+
   return useMemo(() => {
     const isEventDefinition = type === 'event_definition';
 
