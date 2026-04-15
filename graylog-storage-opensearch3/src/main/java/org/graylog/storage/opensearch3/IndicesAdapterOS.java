@@ -780,7 +780,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
     }
 
     @Override
-    public List<String> getOutdatedIndices(int currentMajorVersion) {
+    public Set<String> getOutdatedIndices(int currentMajorVersion) {
         return c.execute(() -> {
             GetIndicesSettingsResponse result = indicesClient.getSettings(b -> b
                     .ignoreUnavailable(true)
@@ -801,7 +801,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
                                         LOG.error("Could not resolve version from settings for index " + index);
                                         return true;
                                     })
-                    ).toList();
+                    ).collect(Collectors.toSet());
         }, "Couldn't read settings for indices");
     }
 }

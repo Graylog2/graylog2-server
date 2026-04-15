@@ -670,7 +670,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     }
 
     @Override
-    public List<String> getOutdatedIndices(int currentMajorVersion) {
+    public Set<String> getOutdatedIndices(int currentMajorVersion) {
         throw new UnsupportedOperationException("Not supported in deprecated client.");
     }
 }

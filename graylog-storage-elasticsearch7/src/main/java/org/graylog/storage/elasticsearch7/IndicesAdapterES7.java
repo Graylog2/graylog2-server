@@ -655,7 +655,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     }
 
     @Override
-    public List<String> getOutdatedIndices(int currentMajorVersion) {
+    public Set<String> getOutdatedIndices(int currentMajorVersion) {
         throw new UnsupportedOperationException("Outdated indices check only supported in OpenSearch versions > 2.x.");
     }
 }
