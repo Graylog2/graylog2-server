@@ -34,6 +34,7 @@ import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.StreamGuardException;
+import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +59,7 @@ public class V20260303120000_CollectorDEVMigrations extends Migration {
 
     private final MongoConnection mongoConnection;
     private final Provider<StreamService> streamServiceProvider;
+    private final Provider<StreamRuleService> streamRuleServiceProvider;
     private final Provider<IndexSetService> indexSetServiceProvider;
     private final Provider<IndexSetCleanupJob.Factory> indexSetCleanupJobFactoryProvider;
     private final Provider<UserService> userServiceProvider;
@@ -66,12 +68,14 @@ public class V20260303120000_CollectorDEVMigrations extends Migration {
     @Inject
     public V20260303120000_CollectorDEVMigrations(MongoConnection mongoConnection,
                                                   Provider<StreamService> streamServiceProvider,
+                                                  Provider<StreamRuleService> streamRuleServiceProvider,
                                                   Provider<IndexSetService> indexSetServiceProvider,
                                                   Provider<IndexSetCleanupJob.Factory> indexSetCleanupJobFactoryProvider,
                                                   Provider<UserService> userServiceProvider,
                                                   Provider<CollectorLogsDestinationService> logsDestinationServiceProvider) {
         this.mongoConnection = mongoConnection;
         this.streamServiceProvider = streamServiceProvider;
+        this.streamRuleServiceProvider = streamRuleServiceProvider;
         this.indexSetServiceProvider = indexSetServiceProvider;
         this.indexSetCleanupJobFactoryProvider = indexSetCleanupJobFactoryProvider;
         this.userServiceProvider = userServiceProvider;
@@ -91,6 +95,7 @@ public class V20260303120000_CollectorDEVMigrations extends Migration {
 
         migrateCollectorIngestConfig(db);
         removeLegacyCollectorLogsStream();
+        removeLegacyCollectorSourceTypeStreamRule();
 
         UserContext.<Void>runAs("admin", userServiceProvider.get(), () -> {
             logsDestinationServiceProvider.get().ensureExists();
@@ -168,6 +173,21 @@ public class V20260303120000_CollectorDEVMigrations extends Migration {
                 LOG.info("Backfilled bind_address/port on collector ingest input <{}>.", doc.getObjectId("_id"));
             }
         }
+    }
+
+    /**
+     * Removes any stream rule on the Collector System Logs stream that still uses the legacy
+     * {@code collector_source_type} field.
+     */
+    private void removeLegacyCollectorSourceTypeStreamRule() {
+        final var streamRuleService = streamRuleServiceProvider.get();
+
+        streamRuleService.loadForStreamId(Stream.COLLECTOR_SYSTEM_LOGS_STREAM_ID).stream()
+                .filter(rule -> "collector_source_type".equals(rule.getField()))
+                .forEach(rule -> {
+                    streamRuleService.destroy(rule);
+                    LOG.info("Removed legacy collector_source_type stream rule <{}> on Collector System Logs stream.", rule.getId());
+                });
     }
 
     private void removeLegacyCollectorLogsStream() {
