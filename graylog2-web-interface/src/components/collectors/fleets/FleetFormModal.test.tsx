@@ -26,6 +26,42 @@ import FleetFormModal from './FleetFormModal';
 
 jest.mock('components/collectors/hooks/useSendCollectorsTelemetry');
 
+beforeEach(() => {
+  asMock(useSendCollectorsTelemetry).mockReturnValue(jest.fn());
+});
+
+describe('FleetFormModal (form behavior)', () => {
+  it('renders name input field', async () => {
+    render(<FleetFormModal onClose={jest.fn()} onSave={jest.fn()} />);
+
+    await screen.findByLabelText(/name/i);
+  });
+
+  it('renders description input field', async () => {
+    render(<FleetFormModal onClose={jest.fn()} onSave={jest.fn()} />);
+
+    await screen.findByLabelText(/description/i);
+  });
+
+  it('calls onClose when cancel clicked', async () => {
+    const onClose = jest.fn();
+    render(<FleetFormModal onClose={onClose} onSave={jest.fn()} />);
+
+    const cancelButton = await screen.findByRole('button', { name: /cancel/i });
+    await userEvent.click(cancelButton);
+
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('disables save button when name is empty', async () => {
+    render(<FleetFormModal onClose={jest.fn()} onSave={jest.fn()} />);
+
+    const saveButton = await screen.findByRole('button', { name: /create fleet/i });
+
+    expect(saveButton).toBeDisabled();
+  });
+});
+
 describe('FleetFormModal telemetry (create path)', () => {
   const sendTelemetry = jest.fn();
 
