@@ -132,6 +132,16 @@ class InputStartupErrorsTest {
     }
 
     @Test
+    void unknownHostExceptionWithNullMessage() {
+        final var input = mockInputWithAddress("0.0.0.0", 514);
+        final var exception = new MisfireException(new UnknownHostException());
+
+        final String result = InputStartupErrors.describeFailure(input, exception);
+
+        assertThat(result).isEqualTo("Unknown host.");
+    }
+
+    @Test
     void nullExceptionMessage() {
         final var input = mockInputWithAddress("0.0.0.0", 4317);
         final var exception = new RuntimeException((String) null);

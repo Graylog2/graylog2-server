@@ -60,7 +60,8 @@ public class InputStartupErrors {
         }
 
         if (root instanceof UnknownHostException) {
-            return f("Unknown host '%s'.", root.getMessage());
+            final String host = root.getMessage();
+            return host != null ? f("Unknown host '%s'.", host) : "Unknown host.";
         }
 
         if (root instanceof SSLException && hasAddress) {

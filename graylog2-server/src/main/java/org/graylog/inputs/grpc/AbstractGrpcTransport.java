@@ -154,7 +154,7 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
             }
             return contextBuilder.build();
         } catch (SSLException e) {
-            throw new RuntimeException(f("Failed setting up TLS for gRPC server: {}.", e.getLocalizedMessage()), e);
+            throw new RuntimeException(f("Failed setting up TLS for gRPC server: %s.", e.getLocalizedMessage()), e);
         }
     }
 
