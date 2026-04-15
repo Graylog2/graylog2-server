@@ -30,9 +30,7 @@ export type CollectorsSection =
 
 const sectionForPathname = (pathname: string): CollectorsSection => {
   if (pathname.includes('/system/collectors/fleets/')) return 'collectors-fleet-detail';
-  if (pathname.endsWith('/system/collectors/fleets') || pathname.includes('/system/collectors/fleets?')) {
-    return 'collectors-fleets';
-  }
+  if (pathname.endsWith('/system/collectors/fleets')) return 'collectors-fleets';
   if (pathname.includes('/system/collectors/instances')) return 'collectors-instances';
   if (pathname.includes('/system/collectors/deployment')) return 'collectors-deployment';
   if (pathname.includes('/system/collectors/settings')) return 'collectors-settings';
