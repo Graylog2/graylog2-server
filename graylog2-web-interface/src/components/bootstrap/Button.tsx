@@ -148,6 +148,7 @@ const linkStyles = css`
   }
 
   .mantine-Button-label {
+    word-break: break-word;
     white-space: normal;
     text-align: left;
   }
