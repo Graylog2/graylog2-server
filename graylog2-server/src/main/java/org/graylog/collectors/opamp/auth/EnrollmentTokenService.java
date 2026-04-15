@@ -324,9 +324,9 @@ public class EnrollmentTokenService {
             return new EnrollmentTokenStats(0, 0, 0);
         }
         return new EnrollmentTokenStats(
-                ((Number) result.get("count")).longValue(),
-                ((Number) result.get("total_usage")).longValue(),
-                ((Number) result.get("expired")).longValue()
+                result.getLong("count"),
+                result.getLong("total_usage"),
+                result.getLong("expired")
         );
     }
 
