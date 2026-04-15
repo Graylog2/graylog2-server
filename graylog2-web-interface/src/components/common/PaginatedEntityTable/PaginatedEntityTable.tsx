@@ -200,7 +200,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
     list,
     meta,
     pagination: { total },
-    attributes,
+    attributes = [],
   } = paginatedEntities;
 
   return (
