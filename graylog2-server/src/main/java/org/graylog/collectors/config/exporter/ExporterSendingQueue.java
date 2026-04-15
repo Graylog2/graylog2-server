@@ -82,10 +82,6 @@ public abstract class ExporterSendingQueue {
         return builder().build();
     }
 
-    public static ExporterSendingQueue createDefaultWithStorage(String storage) {
-        return builder().storage(storage).build();
-    }
-
     @AutoValue.Builder
     public abstract static class Builder {
         public abstract Builder enabled(boolean enabled);

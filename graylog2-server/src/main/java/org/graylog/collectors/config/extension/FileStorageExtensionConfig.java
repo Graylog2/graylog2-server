@@ -24,12 +24,10 @@ import org.graylog.collectors.config.GoDurationSerializer;
 
 import java.time.Duration;
 
-import static org.graylog2.shared.utilities.StringUtils.f;
-
 /**
  * Configuration for the file_storage OpenTelemetry Collector extension.
  *
- * @see <a href=" * @see <a href="https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/processor/resourceprocessor/README.md">Processor Documentation</a>">Extension Documentation</a>
+ * @see <a href=" * @see <a href="https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/extension/storage/filestorage/README.md">Extension Documentation</a>
  */
 @AutoValue
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
@@ -37,7 +35,7 @@ public abstract class FileStorageExtensionConfig implements CollectorExtensionCo
     private static final String ENV_GLC_INTERNAL_STORAGE_PATH = "${env:GLC_INTERNAL_STORAGE_PATH}";
     private static final FileStorageExtensionConfig INSTANCE = new AutoValue_FileStorageExtensionConfig.Builder()
             .id("default")
-            .name(f("file_storage/%s", "default"))
+            .name("file_storage/default")
             .timeout(Duration.ofSeconds(1))
             .recreate(true)
             .fsync(true)
