@@ -204,7 +204,7 @@ public class SourceService {
         collection.aggregate(pipeline, Document.class).forEach(doc -> {
             final String type = doc.getString("_id");
             if (type != null) {
-                result.put(type, doc.getLong("count"));
+                result.put(type, ((Number) doc.get("count")).longValue());
             }
         });
         return result;
