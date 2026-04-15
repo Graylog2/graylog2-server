@@ -56,42 +56,59 @@ type Props = VisualizationComponentProps & {
   striped?: boolean;
 };
 
-const getStylesForPinnedColumns = (
-  tag: 'th' | 'td',
-  stickyLeftMarginsByColumnIndex: Array<{ index: number; column: string; leftMargin: number }>,
-) =>
-  stickyLeftMarginsByColumnIndex
-    .map(
-      ({ index, leftMargin }) => `
-    ${tag}:nth-child(${index + 1}) {
-        position: sticky!important;
-        left: ${leftMargin}px;
-        z-index: 1;
-    }
-  `,
-    )
-    .concat(' ; ');
+type StickyColumn = {
+  index: number;
+  column: string;
+  leftMargin: number;
+};
+
+const getPinnedColumnStyles =
+  (tag: 'th' | 'td', stickyLeftMarginsByColumnIndex: Array<StickyColumn>, odd: boolean = false) =>
+  ({ theme }) => css`
+    ${stickyLeftMarginsByColumnIndex.map(
+      ({ index, leftMargin }) => css`
+        & ${tag}:nth-child(${index + 1}) {
+          position: sticky !important;
+          left: ${leftMargin}px;
+          z-index: 1;
+          background-color: ${odd
+            ? theme.utils.flattenMixColor(
+                theme.colors.table.row.backgroundStriped,
+                theme.colors.global.contentBackground,
+              )
+            : theme.colors.global.contentBackground};
+        }
+      `,
+    )}
+  `;
 
 const THead = styled(TableHead)<{
-  $stickyLeftMarginsByColumnIndex: Array<{ index: number; column: string; leftMargin: number }>;
+  $stickyLeftMarginsByColumnIndex: Array<StickyColumn>;
 }>(
-  ({ $stickyLeftMarginsByColumnIndex, theme }) => css`
-  background-color: ${theme.colors.global.contentBackground};
-
-  & tr.pivot-header-row {
-    & ${getStylesForPinnedColumns('th', $stickyLeftMarginsByColumnIndex)}
-  }
-`,
+  ({ $stickyLeftMarginsByColumnIndex }) => css`
+    & tr.pivot-header-row {
+      ${getPinnedColumnStyles('th', $stickyLeftMarginsByColumnIndex)}
+    }
+  `,
 );
 
 const TBody = styled.tbody<{
-  $stickyLeftMarginsByColumnIndex: Array<{ index: number; column: string; leftMargin: number }>;
+  $stickyLeftMarginsByColumnIndex: Array<StickyColumn>;
+  $striped: boolean;
 }>(
-  ({ $stickyLeftMarginsByColumnIndex }) => css`
-  & tr {
-    & ${getStylesForPinnedColumns('td', $stickyLeftMarginsByColumnIndex)}
-  }
-`,
+  ({ $stickyLeftMarginsByColumnIndex, $striped }) => css`
+    & tr {
+      ${getPinnedColumnStyles('td', $stickyLeftMarginsByColumnIndex)}
+    }
+
+    ${$striped
+      ? css`
+          & tr:nth-of-type(odd) {
+            ${getPinnedColumnStyles('td', $stickyLeftMarginsByColumnIndex, true)}
+          }
+        `
+      : css``}
+  `,
 );
 
 const _compareArray = (ary1, ary2) => {
@@ -315,7 +332,9 @@ const DataTable = ({
               showRowNumbers={showRowNumbers}
             />
           </THead>
-          <TBody $stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>{formattedRows}</TBody>
+          <TBody $striped={striped} $stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>
+            {formattedRows}
+          </TBody>
         </MessagesTable>
       </div>
     </div>
