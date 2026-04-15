@@ -54,45 +54,67 @@ const SectionTitle = styled.h3(
   `,
 );
 
-const CollectorsOverview = () => {
-  const { data: stats, isLoading: statsLoading, isError: statsError } = useCollectorStats();
-  const { data: bulkStats, isLoading: bulkLoading, isError: bulkError } = useFleetsBulkStats();
-  const [filter, setFilter] = useState('');
+const StatsSection = () => {
+  const { data: stats, isLoading, isError } = useCollectorStats();
   const history = useHistory();
+
+  if (isLoading) return <Spinner />;
+
+  if (isError) return <Alert bsStyle="danger">Could not load collector stats.</Alert>;
+
+  return (
+    <StatsRow>
+      <StatCard
+        value={stats?.total_instances ?? 0}
+        label="Instances"
+        helpText="Running collector processes across all fleets."
+        onClick={() => history.push(Routes.SYSTEM.COLLECTORS.INSTANCES)}
+      />
+      <StatCard
+        value={stats?.online_instances ?? 0}
+        label="Online"
+        helpText="Instances that reported a heartbeat within the offline threshold."
+        variant="success"
+        onClick={() => history.push(`${Routes.SYSTEM.COLLECTORS.INSTANCES}?filters=status%3Donline`)}
+      />
+      <StatCard
+        value={stats?.offline_instances ?? 0}
+        label="Offline"
+        helpText="Instances that missed their heartbeat. Check host connectivity or collector process status."
+        variant="warning"
+        onClick={() => history.push(`${Routes.SYSTEM.COLLECTORS.INSTANCES}?filters=status%3Doffline`)}
+      />
+      <StatCard
+        value={stats?.total_fleets ?? 0}
+        label="Fleets"
+        helpText="Logical groups of collectors that share the same source configuration."
+        onClick={() => history.push(Routes.SYSTEM.COLLECTORS.FLEETS)}
+      />
+      <StatCard
+        value={stats?.total_sources ?? 0}
+        label="Sources"
+        helpText="Data collection configurations (file paths, journald, Windows Event Logs) across all fleets."
+      />
+    </StatsRow>
+  );
+};
+
+const FleetsSection = ({ filter }: { filter: string }) => {
+  const { data: bulkStats, isLoading, isError } = useFleetsBulkStats();
+
+  if (isLoading) return <Spinner />;
+
+  if (isError) return <Alert bsStyle="danger">Could not load fleet stats.</Alert>;
+
+  return <FleetCardsGrid fleets={bulkStats?.fleets || []} filter={filter} />;
+};
+
+const CollectorsOverview = () => {
+  const [filter, setFilter] = useState('');
 
   return (
     <div>
-      {statsLoading ? (
-        <Spinner />
-      ) : statsError ? (
-        <Alert bsStyle="danger">Could not load collector stats.</Alert>
-      ) : (
-        <StatsRow>
-          <StatCard
-            value={stats?.total_instances ?? 0}
-            label="Instances"
-            onClick={() => history.push(Routes.SYSTEM.COLLECTORS.INSTANCES)}
-          />
-          <StatCard
-            value={stats?.online_instances ?? 0}
-            label="Online"
-            variant="success"
-            onClick={() => history.push(`${Routes.SYSTEM.COLLECTORS.INSTANCES}?filters=status%3Donline`)}
-          />
-          <StatCard
-            value={stats?.offline_instances ?? 0}
-            label="Offline"
-            variant="warning"
-            onClick={() => history.push(`${Routes.SYSTEM.COLLECTORS.INSTANCES}?filters=status%3Doffline`)}
-          />
-          <StatCard
-            value={stats?.total_fleets ?? 0}
-            label="Fleets"
-            onClick={() => history.push(Routes.SYSTEM.COLLECTORS.FLEETS)}
-          />
-          <StatCard value={stats?.total_sources ?? 0} label="Sources" />
-        </StatsRow>
-      )}
+      <StatsSection />
 
       <SectionHeader>
         <SectionTitle>Fleets</SectionTitle>
@@ -105,13 +127,7 @@ const CollectorsOverview = () => {
         />
       </SectionHeader>
 
-      {bulkLoading ? (
-        <Spinner />
-      ) : bulkError ? (
-        <Alert bsStyle="danger">Could not load fleet stats.</Alert>
-      ) : (
-        <FleetCardsGrid fleets={bulkStats?.fleets || []} filter={filter} />
-      )}
+      <FleetsSection filter={filter} />
 
       <RecentActivity />
     </div>

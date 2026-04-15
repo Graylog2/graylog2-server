@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
+import org.graylog.collectors.config.extension.FileStorageExtensionConfig;
 
 import java.util.List;
 
@@ -76,10 +77,14 @@ public abstract class JournaldReceiverConfig implements CollectorReceiverConfig,
     @JsonProperty("start_at")
     public abstract StartAt startAt();
 
+    @JsonProperty("storage")
+    public abstract String storage();
+
     public static Builder builder(String id) {
         return new AutoValue_JournaldReceiverConfig.Builder()
                 .name(f("journald/%s", id))
                 .startAt(StartAt.END)
+                .storage(FileStorageExtensionConfig.defaultInstance().name())
                 .priority(Priority.INFO);
     }
 
@@ -92,6 +97,8 @@ public abstract class JournaldReceiverConfig implements CollectorReceiverConfig,
         public abstract Builder matches(@Nullable List<String> matches);
 
         public abstract Builder startAt(StartAt startAt);
+
+        public abstract Builder storage(String storage);
 
         public abstract JournaldReceiverConfig build();
     }

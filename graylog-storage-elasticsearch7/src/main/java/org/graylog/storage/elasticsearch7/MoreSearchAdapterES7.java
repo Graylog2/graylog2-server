@@ -264,7 +264,7 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
         return QueryBuilders.multiMatchQuery(value, field);
     }
 
-    private List<FieldSortBuilder> createSorting(Sorting sorting) {
+    List<FieldSortBuilder> createSorting(Sorting sorting) {
         final SortOrder order = SortOrder.valueOf(sorting.getUppercasedDirection());
         final List<FieldSortBuilder> sortBuilders;
         if (EventDto.FIELD_TIMERANGE_START.equals(sorting.getField())) {
