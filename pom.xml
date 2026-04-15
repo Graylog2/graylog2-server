@@ -127,7 +127,7 @@
         <commons-validator.version>1.10.1</commons-validator.version>
         <commons-io.version>2.21.0</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
-        <error-prone.version>2.48.0</error-prone.version>
+        <error-prone.version>2.49.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
         <gcs.version>2.64.1</gcs.version>
         <azure-blob-storage.version>12.33.3</azure-blob-storage.version>
@@ -1149,6 +1149,8 @@
                     <showDeprecation>true</showDeprecation>
                     <forceJavacCompilerUse>true</forceJavacCompilerUse>
                     <compilerArgs>
+                        <!-- Necessary only if building with JDK21: https://github.com/google/error-prone/issues/5426 -->
+                        <arg>-XDaddTypeAnnotationsToSymbol=true</arg>
                         <arg>-XDcompilePolicy=simple</arg>
                         <arg>--should-stop=ifError=FLOW</arg>
                         <!--
@@ -1157,7 +1159,6 @@
                           See available bug patterns: https://errorprone.info/bugpatterns
                         -->
                         <arg>
-                            -XDaddTypeAnnotationsToSymbol=true
                             -Xplugin:ErrorProne
                             -Xep:DoNotMock:WARN
                             -XepDisableWarningsInGeneratedCode
@@ -1205,6 +1206,7 @@
                             -Xep:WildcardImport:ERROR
                             -Xep:JavaDurationGetSecondsToToSeconds:ERROR
                             -Xep:StreamResourceLeak:ERROR
+                            -Xep:RecordAccessorInCompactConstructor:ERROR
                         </arg>
                     </compilerArgs>
                     <annotationProcessorPaths>
