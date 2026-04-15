@@ -52,7 +52,7 @@ const NodeInputsPage = () => {
       <div>
         <PageHeader title={title}>
           <span>
-            {productName} nodes accept data via inputs. On this page you can see which inputs are running on this
+            {productName} nodesy accept data via inputs. On this page you can see which inputs are running on this
             specific node.
             <br />
             You can launch and terminate inputs on your cluster <Link to={Routes.SYSTEM.INPUTS}>here</Link>.
@@ -60,7 +60,14 @@ const NodeInputsPage = () => {
         </PageHeader>
         <Row className="content">
           <Col md={12}>
-            <InputsOverview node={node} inputTypes={inputTypes} inputTypeDescriptions={inputTypeDescriptions} />
+            <h2>Local Inputs</h2>
+            <InputsOverview node={node} inputTypes={inputTypes} inputTypeDescriptions={inputTypeDescriptions} entityTableId="node-inputs" />
+          </Col>
+        </Row>
+        <Row className="content">
+          <Col md={12}>
+            <h2>Global Inputs</h2>
+            <InputsOverview global={true} inputTypes={inputTypes} inputTypeDescriptions={inputTypeDescriptions} entityTableId="global-inputs" withoutURLParams />
           </Col>
         </Row>
       </div>
