@@ -15,20 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import {useEffect, useState, useMemo, useCallback} from 'react';
 
 import useLocation from 'routing/useLocation';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
-import type { SearchParams } from 'stores/PaginationTypes';
+import type {SearchParams} from 'stores/PaginationTypes';
 import Routes from 'routing/Routes';
 import useHistory from 'routing/useHistory';
 
-import { FleetFormModal } from './index';
+import {FleetFormModal} from './index';
 import customColumnRenderers from './ColumnRenderers';
-import { DEFAULT_LAYOUT } from './Constants';
+import {DEFAULT_LAYOUT} from './Constants';
 
-import { fetchPaginatedFleets, fleetsKeyFn, useCollectorsMutations } from '../hooks';
-import type { Fleet } from '../types';
+import {fetchPaginatedFleets, fleetsKeyFn, useCollectorsMutations} from '../hooks';
+import type {Fleet} from '../types';
 
 const CollectorsFleets = () => {
   const [showFleetModal, setShowFleetModal] = useState(false);

@@ -14,11 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import asMock from 'helpers/mocking/AsMock';
+import { asMock } from 'helpers/mocking';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import EnrollmentTokenList from './EnrollmentTokenList';
 
@@ -26,6 +27,7 @@ import { fetchPaginatedEnrollmentTokens, useFleets, useCollectorsMutations } fro
 import type { EnrollmentTokenMetadata, Fleet } from '../types';
 import { mockCollectorsMutations } from '../testing/mockMutations';
 
+jest.mock('logic/telemetry/useSendTelemetry');
 jest.mock('../hooks/useFleetQueries');
 jest.mock('../hooks/useCollectorsMutations');
 jest.mock('../hooks/useEnrollmentTokenQueries', () => ({
@@ -83,9 +85,12 @@ const mockPaginatedResponse = (tokens: EnrollmentTokenMetadata[]) => ({
 });
 
 describe('EnrollmentTokenList', () => {
+  const sendTelemetry = jest.fn();
+
   beforeEach(() => {
     jest.clearAllMocks();
 
+    asMock(useSendTelemetry).mockReturnValue(sendTelemetry);
     asMock(useFleets).mockReturnValue({
       data: mockFleets,
       isLoading: false,
@@ -178,6 +183,75 @@ describe('EnrollmentTokenList', () => {
 
       await waitFor(() => {
         expect(deleteEnrollmentTokenMock).toHaveBeenCalledWith('token-1');
+      });
+    });
+
+    it('emits DELETED telemetry when token is deleted', async () => {
+      render(<EnrollmentTokenList />);
+
+      await openMoreActions();
+      await userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
+      await userEvent.click(await screen.findByRole('button', { name: /confirm/i }));
+
+      await waitFor(() => {
+        expect(sendTelemetry).toHaveBeenCalledWith(
+          'Collector Enrollment Token Deleted',
+          expect.objectContaining({
+            app_action_value: 'token-delete',
+          }),
+        );
+        expect(sendTelemetry).not.toHaveBeenCalledWith(
+          'Collector Enrollment Token Deleted',
+          expect.objectContaining({ token_id: expect.anything() }),
+        );
+      });
+    });
+  });
+
+  describe('bulk delete action', () => {
+    it('emits BULK_DELETED telemetry with count on multi-select delete', async () => {
+      const bulkDeleteMock = jest.fn(() => Promise.resolve());
+      asMock(useCollectorsMutations).mockReturnValue(
+        mockCollectorsMutations({
+          deleteEnrollmentToken: deleteEnrollmentTokenMock,
+          bulkDeleteEnrollmentTokens: bulkDeleteMock as any,
+        }),
+      );
+
+      asMock(fetchPaginatedEnrollmentTokens).mockResolvedValue(
+        mockPaginatedResponse([
+          mockToken({ id: 'token-1', name: 'Token 1' }),
+          mockToken({ id: 'token-2', name: 'Token 2' }),
+        ]),
+      );
+
+      render(<EnrollmentTokenList />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Token 1')).toBeInTheDocument();
+        expect(screen.getByText('Token 2')).toBeInTheDocument();
+      });
+
+      // Select multiple tokens via checkboxes
+      const checkboxes = await screen.findAllByRole('checkbox');
+      // Skip header checkbox (index 0)
+      await userEvent.click(checkboxes[1]);
+      await userEvent.click(checkboxes[2]);
+
+      // Open bulk actions and delete
+      const bulkActionButton = await screen.findByRole('button', { name: /bulk actions/i });
+      await userEvent.click(bulkActionButton);
+      await userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
+      await userEvent.click(await screen.findByRole('button', { name: /confirm/i }));
+
+      await waitFor(() => {
+        expect(sendTelemetry).toHaveBeenCalledWith(
+          'Collector Enrollment Tokens Bulk Deleted',
+          expect.objectContaining({
+            count: 2,
+            app_action_value: 'token-bulk-delete',
+          }),
+        );
       });
     });
   });
