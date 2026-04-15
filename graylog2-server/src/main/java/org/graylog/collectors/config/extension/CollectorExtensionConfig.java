@@ -14,25 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.collectors.config.receiver;
+package org.graylog.collectors.config.extension;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.graylog.collectors.CollectorOSType;
 
-import java.util.EnumSet;
+public interface CollectorExtensionConfig {
+    @JsonIgnore
+    String id();
 
-public interface CollectorReceiverConfig {
     @JsonIgnore
     String name();
-
-    @JsonIgnore
-    String type();
-
-    /**
-     * The operating systems the receiver supports.
-     *
-     * @return an enum set of supported operating system types
-     */
-    @JsonIgnore
-    EnumSet<CollectorOSType> osSupport();
 }

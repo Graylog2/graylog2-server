@@ -24,11 +24,13 @@ import com.google.auto.value.AutoValue;
 @AutoValue
 @JsonDeserialize(builder = Attribute.Builder.class)
 public abstract class Attribute {
+    public static final String FIELD_KEY = "key";
+    private static final String FIELD_VALUE = "value";
 
-    @JsonProperty("key")
+    @JsonProperty(FIELD_KEY)
     public abstract String key();
 
-    @JsonProperty("value")
+    @JsonProperty(FIELD_VALUE)
     public abstract Object value();
 
     public static Builder builder() {
@@ -47,10 +49,10 @@ public abstract class Attribute {
             return new AutoValue_Attribute.Builder();
         }
 
-        @JsonProperty("key")
+        @JsonProperty(FIELD_KEY)
         public abstract Builder key(String key);
 
-        @JsonProperty("value")
+        @JsonProperty(FIELD_VALUE)
         public abstract Builder value(Object value);
 
         public abstract Attribute build();
