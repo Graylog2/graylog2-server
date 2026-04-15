@@ -394,7 +394,7 @@ public class RestPermissions implements PluginPermissions {
                     RestPermissions.USERS_READ, RestPermissions.USERS_LIST
             )),
             BuiltinRole.create("Cluster Configuration Reader", "Allows viewing the Cluster Configuration page", ImmutableSet.of(
-                    RestPermissions.CLUSTER_CONFIGURATION_READ
+                    RestPermissions.CLUSTER_CONFIGURATION_READ, RestPermissions.DATANODE_REST_PROXY
             )),
             BuiltinRole.create("API Browser Reader", "Allows viewing the API browser page", ImmutableSet.of(
                     RestPermissions.API_BROWSER_READ
