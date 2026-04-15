@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 
 import { Link, Icon, StatusIcon } from 'components/common';
@@ -99,7 +99,6 @@ type StepReviewProps = {
 };
 
 const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: StepReviewProps) => {
-  const [formError, setFormError] = useState(null);
   const { formData } = useContext(FormDataContext);
   const { logData } = useContext(ApiContext);
   const {
@@ -147,14 +146,12 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
     }),
   );
 
-  useEffect(() => {
-    if (fetchSubmitStatus.error) {
-      setFormError({
+  const formError = fetchSubmitStatus.error
+    ? {
         full_message: fetchSubmitStatus.error,
         nice_message: <span>We were unable to save your Input, please try again in a few moments.</span>,
-      });
-    }
-  }, [fetchSubmitStatus.error]);
+      }
+    : null;
 
   const handleSubmit = () => {
     if (externalInputSubmit) {
