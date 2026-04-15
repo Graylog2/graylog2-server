@@ -45,7 +45,7 @@ class CollectorOSTypeTest {
 
     @ParameterizedTest
     @NullAndEmptySource
-    @ValueSource(strings = {"", "  ", "\t", "\n"})
+    @ValueSource(strings = {"  ", "\t", "\n"})
     void ofThrowsForBlankOrNullOSName(String osName) {
         assertThatThrownBy(() -> CollectorOSType.of(osName))
                 .isInstanceOf(IllegalArgumentException.class);
