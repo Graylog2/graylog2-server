@@ -16,13 +16,6 @@
  */
 export type HostnameKind = 'ip' | 'hostname';
 export type InputBindType = 'wildcard' | 'specific' | 'unknown';
-export type InputStateClassification = 'running' | 'stopped' | 'failed' | 'not_configured' | 'unknown';
-
-// Structural types — avoid importing concrete Input / InputState types to keep
-// this module decoupled from whatever shape those stores currently expose.
-type InputLike = { attributes?: { port?: number; bind_address?: string } };
-type InputIdLike = { id?: string };
-type InputStateLike = { id: string; state: string };
 
 const IPV4_PATTERN = /^(\d{1,3}\.){3}\d{1,3}$/;
 const IPV6_PATTERN = /^[0-9a-fA-F:]+$/;
@@ -45,35 +38,4 @@ export const classifyInputBind = (bindAddress: string | undefined | null): Input
   }
 
   return 'specific';
-};
-
-// Literal port equality; null when input or port cannot be read.
-export const comparePort = (settingsPort: number, input: InputLike | undefined): boolean | null => {
-  const inputPort = input?.attributes?.port;
-
-  if (inputPort === undefined || inputPort === null) return null;
-
-  return inputPort === settingsPort;
-};
-
-// Returns runtime state of the backing Input. 'not_configured' means no input is set at all.
-// 'unknown' means we know there's an input but couldn't look up its state.
-export const classifyInputState = (
-  input: InputIdLike | undefined,
-  inputStates: Array<InputStateLike> | undefined,
-): InputStateClassification => {
-  if (!input) return 'not_configured';
-  if (!inputStates) return 'unknown';
-
-  const match = inputStates.find((s) => s.id === input.id);
-
-  if (!match) return 'unknown';
-
-  const normalised = String(match.state).toLowerCase();
-
-  if (normalised === 'running') return 'running';
-  if (normalised === 'failed') return 'failed';
-  if (normalised === 'stopped') return 'stopped';
-
-  return 'unknown';
 };
