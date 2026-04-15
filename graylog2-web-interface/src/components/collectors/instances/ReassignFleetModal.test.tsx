@@ -23,11 +23,13 @@ import asMock from 'helpers/mocking/AsMock';
 import ReassignFleetModal from './ReassignFleetModal';
 
 import { useFleets, useCollectorsMutations } from '../hooks';
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import type { Fleet } from '../types';
 import { mockCollectorsMutations } from '../testing/mockMutations';
 
 jest.mock('../hooks/useFleetQueries');
 jest.mock('../hooks/useCollectorsMutations');
+jest.mock('../hooks/useSendCollectorsTelemetry');
 
 const mockFleets: Fleet[] = [
   {
@@ -51,11 +53,13 @@ const mockFleets: Fleet[] = [
 ];
 
 const reassignInstancesMock = jest.fn(() => Promise.resolve());
+const sendTelemetryMock = jest.fn();
 
 describe('ReassignFleetModal', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
+    asMock(useSendCollectorsTelemetry).mockReturnValue(sendTelemetryMock);
     asMock(useFleets).mockReturnValue({
       data: mockFleets,
       isLoading: false,
@@ -152,5 +156,54 @@ describe('ReassignFleetModal', () => {
     render(<ReassignFleetModal instanceUids={['uid-1']} onClose={jest.fn()} />);
 
     await screen.findByText(/loading/i);
+  });
+
+  describe('telemetry', () => {
+    it('emits REASSIGNED telemetry on single-instance reassignment success', async () => {
+      render(
+        <ReassignFleetModal instanceUids={['uid-1']} currentFleetId="fleet-1" onClose={jest.fn()} />,
+      );
+
+      // Select a fleet
+      await userEvent.click(await screen.findByText(/select a fleet/i));
+      await userEvent.click(await screen.findByText('Staging'));
+
+      // Submit
+      await userEvent.click(await screen.findByRole('button', { name: /reassign instance/i }));
+
+      await waitFor(() => {
+        expect(sendTelemetryMock).toHaveBeenCalledWith(
+          'Collector Instance Reassigned',
+          expect.objectContaining({
+            instance_id: 'uid-1',
+            from_fleet_id: 'fleet-1',
+            to_fleet_id: 'fleet-2',
+          }),
+        );
+      });
+    });
+
+    it('emits BULK_REASSIGNED telemetry on multi-instance reassignment success', async () => {
+      render(
+        <ReassignFleetModal instanceUids={['uid-1', 'uid-2', 'uid-3']} onClose={jest.fn()} />,
+      );
+
+      // Select a fleet
+      await userEvent.click(await screen.findByText(/select a fleet/i));
+      await userEvent.click(await screen.findByText('Staging'));
+
+      // Submit
+      await userEvent.click(await screen.findByRole('button', { name: /reassign instances/i }));
+
+      await waitFor(() => {
+        expect(sendTelemetryMock).toHaveBeenCalledWith(
+          'Collector Instances Bulk Reassigned',
+          expect.objectContaining({
+            count: 3,
+            to_fleet_id: 'fleet-2',
+          }),
+        );
+      });
+    });
   });
 });

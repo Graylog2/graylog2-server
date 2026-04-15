@@ -22,7 +22,9 @@ import { Formik, Form } from 'formik';
 import { Button } from 'components/bootstrap';
 import { Card, ConfirmDialog, FormikInput, RelativeTime } from 'components/common';
 import FormSubmit from 'components/common/FormSubmit';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import type { Fleet } from '../types';
 
 type Props = {
@@ -83,6 +85,7 @@ const validate = (values: FormValues) => {
 
 const FleetSettings = ({ fleet, onSave, onDelete = undefined }: Props) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const sendTelemetry = useSendCollectorsTelemetry();
 
   const initialValues: FormValues = {
     name: fleet.name,
@@ -95,13 +98,21 @@ const FleetSettings = ({ fleet, onSave, onDelete = undefined }: Props) => {
         name: values.name,
         description: values.description,
       });
+      sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.FLEET.UPDATED, {
+        app_action_value: 'fleet-settings-save',
+        fleet_id: fleet.id,
+      });
     },
-    [onSave],
+    [fleet.id, onSave, sendTelemetry],
   );
 
   const handleConfirmDelete = useCallback(async () => {
     await onDelete?.();
-  }, [onDelete]);
+    sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.FLEET.DELETED, {
+      app_action_value: 'fleet-delete',
+      fleet_id: fleet.id,
+    });
+  }, [fleet.id, onDelete, sendTelemetry]);
 
   return (
     <div>
