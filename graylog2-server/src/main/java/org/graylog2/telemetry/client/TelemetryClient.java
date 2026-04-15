@@ -60,6 +60,8 @@ public class TelemetryClient {
                     .stream()
                     .map(entry -> {
                         final HashMap<String, Object> properties = new HashMap<>(entry.getValue().metrics());
+                        // setting this prevents posthog from creating a person profile for the ID
+                        // this event is not tied to a person so it's useless to create that (and pay for it)
                         properties.put("$process_person_profile", false);
                         return PosthogAPI.Event.create(clusterId, entry.getKey(), properties);
                     })
