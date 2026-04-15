@@ -18,9 +18,9 @@ import Routes from 'routing/Routes';
 
 const COLLECTOR_SYSTEM_LOGS_STREAM_ID = '000000000000000000000005';
 
-const collectorLogsUrl = (instanceUid: string): string =>
+const collectorSystemLogsUrl = (instanceUid: string): string =>
   Routes.search_with_query(`collector_instance_uid:"${instanceUid}"`, 'relative', { relative: 3600 }, [
     COLLECTOR_SYSTEM_LOGS_STREAM_ID,
   ]);
 
-export default collectorLogsUrl;
+export default collectorSystemLogsUrl;

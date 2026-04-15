@@ -72,10 +72,10 @@ describe('InstanceActions', () => {
     );
   });
 
-  it('renders View Logs and Details buttons', async () => {
+  it('renders View System Logs and Details buttons', async () => {
     render(<InstanceActions instance={mockInstance} onDetailsClick={jest.fn()} />);
 
-    await screen.findByText(/view logs/i);
+    await screen.findByText(/view system logs/i);
     await screen.findByRole('button', { name: /details/i });
   });
 
