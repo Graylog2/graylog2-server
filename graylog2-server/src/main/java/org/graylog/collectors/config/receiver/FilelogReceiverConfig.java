@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
 import org.graylog.collectors.CollectorOSType;
+import org.graylog.collectors.config.extension.FileStorageExtensionConfig;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -87,6 +88,9 @@ public abstract class FilelogReceiverConfig implements CollectorReceiverConfig, 
     @JsonProperty("multiline")
     public abstract CollectorReceiverMultilineConfig multiline();
 
+    @JsonProperty("storage")
+    public abstract String storage();
+
     public static Builder builder(String id) {
         return new AutoValue_FilelogReceiverConfig.Builder()
                 .name(f("filelog/%s", id))
@@ -97,7 +101,8 @@ public abstract class FilelogReceiverConfig implements CollectorReceiverConfig, 
                 .includeFileOwnerName(true)
                 .includeFileOwnerGroupName(true)
                 .includeFileRecordNumber(true)
-                .includeFileRecordOffset(true);
+                .includeFileRecordOffset(true)
+                .storage(FileStorageExtensionConfig.defaultInstance().name());
     }
 
     @AutoValue.Builder
@@ -128,6 +133,8 @@ public abstract class FilelogReceiverConfig implements CollectorReceiverConfig, 
         public abstract Builder startAt(@Nullable String startAt);
 
         public abstract Builder multiline(@Nullable CollectorReceiverMultilineConfig multiline);
+
+        public abstract Builder storage(String storage);
 
         public abstract FilelogReceiverConfig build();
     }
