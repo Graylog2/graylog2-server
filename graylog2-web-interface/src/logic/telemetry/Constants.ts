@@ -458,12 +458,10 @@ export const TELEMETRY_EVENT_TYPE = {
       BULK_REASSIGNED: 'Collector Instances Bulk Reassigned',
     },
     ENROLLMENT_TOKEN: {
-      PLATFORM_SELECTED: 'Collector Deployment Platform Selected',
       FLEET_SELECTED: 'Collector Deployment Fleet Selected',
       EXPIRY_SELECTED: 'Collector Enrollment Token Expiry Selected',
       GENERATED: 'Collector Enrollment Token Generated',
       TOKEN_COPIED: 'Collector Enrollment Token Copied',
-      SCRIPT_COPIED: 'Collector Deployment Script Copied',
       DELETED: 'Collector Enrollment Token Deleted',
       BULK_DELETED: 'Collector Enrollment Tokens Bulk Deleted',
     },

@@ -65,21 +65,6 @@ describe('DeploymentForm telemetry', () => {
     });
   });
 
-  it('emits PLATFORM_SELECTED when platform changes', async () => {
-    const user = userEvent.setup();
-    render(<DeploymentForm />);
-
-    await user.click(screen.getByRole('radio', { name: /windows/i }));
-
-    expect(sendTelemetry).toHaveBeenCalledWith(
-      'Collector Deployment Platform Selected',
-      expect.objectContaining({
-        platform: 'windows',
-        app_action_value: 'deployment-platform',
-      }),
-    );
-  });
-
   it('emits FLEET_SELECTED when fleet is selected', async () => {
     const user = userEvent.setup();
     render(<DeploymentForm />);
@@ -193,45 +178,4 @@ describe('DeploymentForm telemetry', () => {
     );
   });
 
-  it('emits SCRIPT_COPIED when script clipboard button is clicked', async () => {
-    const user = userEvent.setup();
-    render(<DeploymentForm />);
-
-    // Generate token first
-    const fleetSelect = screen.getByRole('combobox', { name: /fleet/i });
-    await user.click(fleetSelect);
-    await user.click(screen.getByRole('option', { name: /my fleet/i }));
-    const nameInput = screen.getByPlaceholderText(/e\.g\. Initial Fleet Enrollment/i);
-    await user.type(nameInput, 'my-token');
-    await user.click(screen.getByRole('button', { name: /generate enrollment token/i }));
-
-    // Wait for the mutation
-    await waitFor(
-      () => {
-        expect(createEnrollmentToken).toHaveBeenCalled();
-      },
-      { timeout: 5000 },
-    );
-
-    // Click copy script button
-    const copyScriptButtons = screen.getAllByRole('button', { name: /copy script/i });
-    await user.click(copyScriptButtons[0]);
-
-    await waitFor(
-      () => {
-        expect(sendTelemetry).toHaveBeenCalledWith(
-          'Collector Deployment Script Copied',
-          expect.objectContaining({
-            platform: 'linux',
-            app_action_value: 'deployment-copy-script',
-          }),
-        );
-        expect(sendTelemetry).not.toHaveBeenCalledWith(
-          'Collector Deployment Script Copied',
-          expect.objectContaining({ token_id: expect.anything() }),
-        );
-      },
-      { timeout: 5000 },
-    );
-  });
 });

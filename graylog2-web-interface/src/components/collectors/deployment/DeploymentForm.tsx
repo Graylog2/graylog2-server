@@ -208,13 +208,7 @@ const DeploymentForm = () => {
             <Label>Platform</Label>
             <SegmentedControl
               value={values.platform}
-              onChange={(v) => {
-                sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.PLATFORM_SELECTED, {
-                  app_action_value: 'deployment-platform',
-                  platform: v,
-                });
-                setFieldValue('platform', v);
-              }}
+              onChange={(v) => setFieldValue('platform', v)}
               data={[
                 { value: 'linux', label: 'Linux' },
                 { value: 'windows', label: 'Windows' },
@@ -318,12 +312,6 @@ const DeploymentForm = () => {
                       text={getInstallScript(values.platform)}
                       title="Copy Script"
                       bsSize="xs"
-                      onSuccess={() =>
-                        sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.SCRIPT_COPIED, {
-                          app_action_value: 'deployment-copy-script',
-                          platform: values.platform,
-                        })
-                      }
                     />
                   </h4>
                   <InfoText>
