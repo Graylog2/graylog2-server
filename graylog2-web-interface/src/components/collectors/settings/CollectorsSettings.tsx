@@ -24,7 +24,9 @@ import { Alert, Row, Col } from 'components/bootstrap';
 import { FormikInput, Spinner } from 'components/common';
 import TimeUnitInput, { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import FormSubmit from 'components/common/FormSubmit';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useCurrentUser from 'hooks/useCurrentUser';
+import useInputsStates from 'hooks/useInputsStates';
 import { isPermitted } from 'util/PermissionsMixin';
 
 import IngestEndpointStatus from './IngestEndpointStatus';
@@ -32,6 +34,8 @@ import PortMismatchAlert from './PortMismatchAlert';
 
 import { useCollectorsConfig, useCollectorInputIds, useCollectorsMutations, useCollectorInputDetails } from '../hooks';
 import type { CollectorsConfigRequest } from '../types';
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
+import { classifyHostname, classifyInputBind } from '../hooks/telemetry-helpers';
 
 
 const SectionTitle = styled.h3(
@@ -71,6 +75,7 @@ const CollectorsSettings = () => {
   const isConfigured = !!config?.signing_cert_id;
   const { data: collectorInputIds = [], isLoading: isLoadingInputIds } = useCollectorInputIds();
   const { loadedInputs: collectorInputs, isLoading: isLoadingInputDetails } = useCollectorInputDetails();
+  const { data: inputStates } = useInputsStates({ enabled: collectorInputIds.length > 0 });
 
   const canCreateInputs = isPermitted(currentUser?.permissions, [
     'inputs:create',
@@ -78,6 +83,7 @@ const CollectorsSettings = () => {
   ]);
 
   const showCreateInputCheckbox = !isConfigured && !isLoadingInputIds && collectorInputIds.length === 0 && canCreateInputs;
+  const sendTelemetry = useSendCollectorsTelemetry();
 
   const initialValues: FormValues = useMemo(() => {
     if (!config) {
@@ -111,6 +117,33 @@ const CollectorsSettings = () => {
     };
   }, [config]);
 
+  const portMatchesAnyInput = useMemo(() => {
+    if (collectorInputs.length === 0) return null;
+
+    return collectorInputs.some((input) => input?.attributes?.port === config?.http?.port);
+  }, [collectorInputs, config?.http?.port]);
+
+  const inputBindTypes = useMemo((): 'all_wildcard' | 'all_specific' | 'mixed' | 'none' => {
+    if (collectorInputs.length === 0) return 'none';
+    const kinds = collectorInputs.map((input) => classifyInputBind(String(input?.attributes?.bind_address ?? '')));
+
+    if (kinds.every((k) => k === 'wildcard')) return 'all_wildcard';
+    if (kinds.every((k) => k === 'specific')) return 'all_specific';
+
+    return 'mixed';
+  }, [collectorInputs]);
+
+  const hasRunningInput = useMemo(() => {
+    if (!inputStates || collectorInputs.length === 0) return false;
+
+    return collectorInputs.some((input) => {
+      const nodeStates = inputStates?.[input.id];
+      if (!nodeStates) return false;
+
+      return Object.values(nodeStates).some((entry) => entry.state === 'RUNNING');
+    });
+  }, [inputStates, collectorInputs]);
+
   const handleSubmit = useCallback(
     async (values: FormValues, { setErrors }: { setErrors: (errors: Record<string, string>) => void }) => {
       const request: CollectorsConfigRequest = {
@@ -129,6 +162,34 @@ const CollectorsSettings = () => {
 
       try {
         await updateConfig(request);
+
+        const offlineSec = Math.round(
+          moment.duration(values.offline_value, values.offline_unit as moment.unitOfTime.DurationConstructor).asSeconds(),
+        );
+        const visibilitySec = Math.round(
+          moment.duration(values.visibility_value, values.visibility_unit as moment.unitOfTime.DurationConstructor).asSeconds(),
+        );
+        const expirationSec = Math.round(
+          moment.duration(values.expiration_value, values.expiration_unit as moment.unitOfTime.DurationConstructor).asSeconds(),
+        );
+
+        sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SETTINGS.UPDATED, {
+          app_action_value: 'settings-save',
+          http_hostname_kind: classifyHostname(values.http_hostname ?? ''),
+          http_port: values.http_port,
+          offline_threshold_seconds: offlineSec,
+          visibility_threshold_seconds: visibilitySec,
+          expiration_threshold_seconds: expirationSec,
+          http_hostname_changed: (config?.http?.hostname ?? '') !== values.http_hostname,
+          http_port_changed: (config?.http?.port ?? null) !== values.http_port,
+          offline_threshold_changed: config?.collector_offline_threshold !== request.collector_offline_threshold,
+          visibility_threshold_changed: config?.collector_default_visibility_threshold !== request.collector_default_visibility_threshold,
+          expiration_threshold_changed: config?.collector_expiration_threshold !== request.collector_expiration_threshold,
+          port_matches_any_input: portMatchesAnyInput,
+          input_bind_types: inputBindTypes,
+          has_running_input: hasRunningInput,
+          input_count: collectorInputIds.length,
+        });
       } catch (error: unknown) {
         const validationErrors = (
           error as { additional?: { body?: { validation_errors?: Record<string, Array<{ error: string }>> } } }
@@ -152,7 +213,7 @@ const CollectorsSettings = () => {
         }
       }
     },
-    [updateConfig, showCreateInputCheckbox],
+    [updateConfig, showCreateInputCheckbox, config, sendTelemetry, portMatchesAnyInput, inputBindTypes, hasRunningInput, collectorInputIds.length],
   );
 
   if (isLoadingConfig) {

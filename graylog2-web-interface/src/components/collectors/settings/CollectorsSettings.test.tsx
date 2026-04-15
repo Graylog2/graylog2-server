@@ -20,6 +20,7 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import { asMock } from 'helpers/mocking';
 import useInputsStates from 'hooks/useInputsStates';
+import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendCollectorsTelemetry';
 
 import CollectorsSettings from './CollectorsSettings';
 
@@ -29,6 +30,7 @@ import { mockCollectorsMutations } from '../testing/mockMutations';
 
 jest.mock('../hooks');
 jest.mock('hooks/useInputsStates');
+jest.mock('components/collectors/hooks/useSendCollectorsTelemetry');
 
 const mockInput = (port: number) => ({
   id: 'input-1',
@@ -191,5 +193,84 @@ describe('CollectorsSettings', () => {
 
     await screen.findByLabelText('External hostname');
     expect(screen.queryByText(/different port/i)).not.toBeInTheDocument();
+  });
+});
+
+describe('CollectorsSettings telemetry', () => {
+  const sendTelemetry = jest.fn();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    asMock(useSendCollectorsTelemetry).mockReturnValue(sendTelemetry);
+    asMock(useCollectorsConfig).mockReturnValue({
+      data: config,
+      isLoading: false,
+    });
+    asMock(useCollectorsMutations).mockReturnValue(
+      mockCollectorsMutations({
+        updateConfig: jest.fn().mockResolvedValue(undefined),
+        isUpdatingConfig: false,
+      }),
+    );
+    asMock(useCollectorInputIds).mockReturnValue({
+      data: ['input-1'],
+      isLoading: false,
+    });
+    asMock(useInputsStates).mockReturnValue({
+      data: {
+        'input-1': {
+          'node-1': {
+            state: 'RUNNING',
+            id: 'input-1',
+            detailed_message: null,
+            message_input: {} as never,
+          },
+        },
+      },
+      refetch: jest.fn(),
+      isLoading: false,
+    } as never);
+    asMock(useCollectorInputDetails).mockReturnValue({
+      collectorInputIds: ['input-1'],
+      readableInputIds: ['input-1'],
+      loadedInputs: [mockInput(14401)],
+      unreadableCount: 0,
+      isLoading: false,
+    });
+  });
+
+  it('emits SETTINGS.UPDATED on submit with resulting state and diff flags', async () => {
+    const user = userEvent.setup();
+    const mockUpdateConfig = jest.fn().mockResolvedValue(undefined);
+    asMock(useCollectorsMutations).mockReturnValue(
+      mockCollectorsMutations({
+        updateConfig: mockUpdateConfig,
+        isUpdatingConfig: false,
+      }),
+    );
+
+    render(<CollectorsSettings />);
+    const hostnameInput = await screen.findByLabelText('External hostname');
+
+    await user.clear(hostnameInput);
+    await user.type(hostnameInput, 'newhost.example.com');
+
+    await user.click(screen.getByRole('button', { name: /Update settings/i }));
+
+    await waitFor(() => {
+      expect(sendTelemetry).toHaveBeenCalledWith(
+        'Collector Settings Updated',
+        expect.objectContaining({
+          http_hostname_kind: 'hostname',
+          http_port: 14401,
+          http_hostname_changed: true,
+          http_port_changed: false,
+          port_matches_any_input: true,
+          input_bind_types: 'all_wildcard',
+          has_running_input: true,
+          input_count: 1,
+        }),
+      );
+    });
   });
 });
