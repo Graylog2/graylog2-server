@@ -257,7 +257,7 @@ public class OpAmpService {
         }
     }
 
-    private void setOpampConnectionSettings(Opamp.ConnectionSettingsOffers.Builder connectionSettingsBuilder, String certPem, Duration heartbeatInterval) {
+    private void setOpampConnectionSettings(ConnectionSettingsOffers.Builder connectionSettingsBuilder, String certPem, Duration heartbeatInterval) {
         connectionSettingsBuilder.setOpamp(OpAMPConnectionSettings.newBuilder()
                 .setHeartbeatIntervalSeconds(heartbeatInterval.toSeconds())
                 .setCertificate(TLSCertificate.newBuilder().setCert(ByteString.copyFromUtf8(certPem))));
@@ -298,7 +298,7 @@ public class OpAmpService {
                 .build()
                 .toString();
 
-        builder.setConnectionSettings(Opamp.ConnectionSettingsOffers.newBuilder()
+        builder.setConnectionSettings(ConnectionSettingsOffers.newBuilder()
                 .setOwnLogs(Opamp.TelemetryConnectionSettings.newBuilder()
                         .setDestinationEndpoint(endpoint)
                         .setTls(Opamp.TLSConnectionSettings.newBuilder()
@@ -329,6 +329,14 @@ public class OpAmpService {
     @WithSpan
     private ServerToAgent handleIdentifiedMessage(AgentToServer message, OpAmpAuthContext.Identified auth) {
         final String instanceUid = bytesToUuidString(message.getInstanceUid().toByteArray());
+
+        if (LOG.isTraceEnabled()) {
+            try {
+                LOG.trace("Message from enrolled instance <{}>:\n{}", instanceUid, JsonFormat.printer().print(message));
+            } catch (Exception e) {
+                LOG.trace("Couldn't serialize message from instance <{}>", instanceUid, e);
+            }
+        }
 
         // payload and authentication context uids must match
         if (!Objects.equals(instanceUid, auth.instanceUid())) {
@@ -379,10 +387,16 @@ public class OpAmpService {
 
         // let's save the report and load the previously known values for the important properties
         // previousState is not the entire document, but the minimal version to avoid high deserialization cost
-        final Optional<CollectorInstanceService.MinimalCollectorInstanceDTO> previousState = collectorInstanceService.createOrUpdateFromReport(updateBuilder.build());
-        final boolean seqConsecutive = previousState
-                .filter(prevState -> (prevState.messageSeqNum() + 1) == sequenceNum)
-                .isPresent();
+        final var instanceReport = updateBuilder.build();
+        final var previousState = collectorInstanceService.updateFromReport(instanceReport);
+        final boolean seqConsecutive = (previousState.messageSeqNum() + 1) == sequenceNum;
+
+        final var osType = switch (previousState.osType()) {
+            // On the first report the "os.type" non-identifying attribute might not be present in the previous state.
+            // We will always run into this case when a Collector from an unsupported operating system connects.
+            case UNKNOWN -> CollectorInstanceService.extractOsTypeFromReport(instanceReport);
+            case LINUX, MACOS, WINDOWS -> previousState.osType();
+        };
 
         // determine our response
         final ServerToAgent.Builder responseBuilder = serverToAgentBuilder(message);
@@ -401,9 +415,9 @@ public class OpAmpService {
             // If we would only look at the applied transaction sequence from the previousState, we would reply
             // with a config update for a remote config status APPLIED request.
             final var lastProcessedTxnSeq = requireNonNull(appliedTxnSeq, "appliedTxnSeq is null")
-                    .orElse(previousState.map(CollectorInstanceService.MinimalCollectorInstanceDTO::lastProcessTxnSeq).orElse(0L));
+                    .orElse(previousState.lastProcessTxnSeq());
 
-            final String fleetId = previousState.map(CollectorInstanceService.MinimalCollectorInstanceDTO::fleetId).orElse(null);
+            final String fleetId = previousState.fleetId();
 
             final List<TransactionMarker> unprocessedMarkers = txnLogService.getUnprocessedMarkers(fleetId, instanceUid, lastProcessedTxnSeq);
             final CoalescedActions coalesced = txnLogService.coalesce(unprocessedMarkers);
@@ -429,6 +443,7 @@ public class OpAmpService {
                 try (final var sources = sourceService.streamAllByFleet(effectiveFleetId)) {
                     sources.map(SourceDTO::toReceiverConfig)
                             .flatMap(Optional::stream)
+                            .filter(config -> config.osSupport().contains(osType))
                             .forEach(receiverConfig -> receiverConfigs.put(receiverConfig.name(), receiverConfig));
                 }
 
