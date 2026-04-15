@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import useRightSidebar from 'hooks/useRightSidebar';
 import type { RightSidebarContent } from 'contexts/RightSidebarContext';
