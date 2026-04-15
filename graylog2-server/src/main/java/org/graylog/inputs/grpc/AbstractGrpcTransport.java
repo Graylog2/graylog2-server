@@ -109,11 +109,10 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
             serverBuilder.intercept(new BearerTokenAuthInterceptor(token));
         }
 
-        if (!insecure) {
-            serverBuilder.sslContext(getSslContext());
-        }
-
         try {
+            if (!insecure) {
+                serverBuilder.sslContext(getSslContext());
+            }
             this.server = serverBuilder.build().start();
         } catch (Exception e) {
             throw new MisfireException("Failed to start gRPC server", e);
