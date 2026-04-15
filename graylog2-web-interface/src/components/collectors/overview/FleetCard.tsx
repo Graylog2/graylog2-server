@@ -21,9 +21,9 @@ import { HoverForHelp } from 'components/common';
 
 import type { FleetStatsSummary } from '../types';
 
-type HealthStatus = 'healthy' | 'degraded' | 'down' | 'empty';
+export type HealthStatus = 'healthy' | 'degraded' | 'down' | 'empty';
 
-const getHealthStatus = (stats: FleetStatsSummary): HealthStatus => {
+export const getHealthStatus = (stats: FleetStatsSummary): HealthStatus => {
   if (stats.total_instances === 0) return 'empty';
   if (stats.online_instances === stats.total_instances) return 'healthy';
   if (stats.online_instances === 0) return 'down';
