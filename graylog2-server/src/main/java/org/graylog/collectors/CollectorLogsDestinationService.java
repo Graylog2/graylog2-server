@@ -58,7 +58,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 public class CollectorLogsDestinationService {
     private static final Logger LOG = LoggerFactory.getLogger(CollectorLogsDestinationService.class);
 
-    static final String COLLECTOR_LOGS_INDEX_PREFIX = "gl-collector-logs";
+    static final String COLLECTOR_LOGS_INDEX_PREFIX = "gl-collector-system-logs";
 
     private final IndexSetService indexSetService;
     private final IndexSetConfigFactory indexSetConfigFactory;
@@ -97,8 +97,8 @@ public class CollectorLogsDestinationService {
         }
 
         final IndexSetConfig indexSetConfig = indexSetConfigFactory.createDefault()
-                .title("Collector Logs")
-                .description("Index set for collector self-log messages")
+                .title("Collector System Logs")
+                .description("Index set for collector system log messages")
                 .indexTemplateType(CollectorLogsIndexTemplateProvider.COLLECTOR_LOGS_TEMPLATE_TYPE)
                 .isWritable(true)
                 .isRegular(false)
@@ -121,13 +121,13 @@ public class CollectorLogsDestinationService {
         }
 
         final IndexSetConfig saved = indexSetService.save(indexSetConfig);
-        LOG.info("Created collector logs index set <{}/{}>", saved.id(), saved.title());
+        LOG.info("Created collector system logs index set <{}/{}>", saved.id(), saved.title());
         return requireNonNull(saved.id(), "index set ID cannot be null");
     }
 
     private void ensureStream(String indexSetId) {
         try {
-            streamService.load(Stream.COLLECTOR_LOGS_STREAM_ID);
+            streamService.load(Stream.COLLECTOR_SYSTEM_LOGS_STREAM_ID);
             return;
         } catch (NotFoundException ignored) {
             // Stream does not exist, create it
@@ -135,9 +135,9 @@ public class CollectorLogsDestinationService {
 
         final String creatorUserId = SecurityUtils.getSubject().getPrincipal().toString();
         final var stream = StreamImpl.builder()
-                .id(Stream.COLLECTOR_LOGS_STREAM_ID)
-                .title("Collector Logs")
-                .description("Stream containing collector self-logs from managed collectors")
+                .id(Stream.COLLECTOR_SYSTEM_LOGS_STREAM_ID)
+                .title("Collector System Logs")
+                .description("Stream containing system logs from managed collectors")
                 .disabled(false)
                 .createdAt(DateTime.now(DateTimeZone.UTC))
                 .creatorUserId(creatorUserId)
@@ -150,31 +150,31 @@ public class CollectorLogsDestinationService {
 
         try {
             streamService.save(stream);
-            LOG.info("Created collector logs stream <{}/{}>", stream.getId(), stream.getTitle());
+            LOG.info("Created collector system logs stream <{}/{}>", stream.getId(), stream.getTitle());
         } catch (ValidationException e) {
-            throw new InternalServerErrorException("Failed to create collector logs stream", e);
+            throw new InternalServerErrorException("Failed to create collector system logs stream", e);
         }
     }
 
     private void ensureStreamRule() {
-        if (streamRuleService.streamRuleCount(Stream.COLLECTOR_LOGS_STREAM_ID) > 0) {
+        if (streamRuleService.streamRuleCount(Stream.COLLECTOR_SYSTEM_LOGS_STREAM_ID) > 0) {
             return;
         }
 
         final var rule = streamRuleService.create(Map.of(
-                StreamRuleImpl.FIELD_STREAM_ID, new ObjectId(Stream.COLLECTOR_LOGS_STREAM_ID),
+                StreamRuleImpl.FIELD_STREAM_ID, new ObjectId(Stream.COLLECTOR_SYSTEM_LOGS_STREAM_ID),
                 StreamRuleImpl.FIELD_FIELD, CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_TYPE,
                 StreamRuleImpl.FIELD_TYPE, StreamRuleType.EXACT.toInteger(),
                 StreamRuleImpl.FIELD_VALUE, CollectorLogRecordProcessor.RECEIVER_TYPE,
                 StreamRuleImpl.FIELD_INVERTED, false,
-                StreamRuleImpl.FIELD_DESCRIPTION, "Route collector self-logs to dedicated stream"
+                StreamRuleImpl.FIELD_DESCRIPTION, "Route collector system logs to dedicated stream"
         ));
 
         try {
             streamRuleService.save(rule);
-            LOG.info("Created collector logs stream rule for stream <{}>", Stream.COLLECTOR_LOGS_STREAM_ID);
+            LOG.info("Created collector system logs stream rule for stream <{}>", Stream.COLLECTOR_SYSTEM_LOGS_STREAM_ID);
         } catch (ValidationException e) {
-            throw new InternalServerErrorException("Failed to create collector logs stream rule", e);
+            throw new InternalServerErrorException("Failed to create collector system logs stream rule", e);
         }
     }
 }
