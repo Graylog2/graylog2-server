@@ -36,7 +36,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 @AutoValue
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class FilelogReceiverConfig implements CollectorReceiverConfig, CollectorStanzaReceiver {
-    public static final String RECEIVER_TYPE = "filelog";
+    public static final String RECEIVER_TYPE = "file_log";
 
     public String type() {
         return RECEIVER_TYPE;
