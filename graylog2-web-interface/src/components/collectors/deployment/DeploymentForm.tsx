@@ -19,12 +19,14 @@ import { useState, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 import { Formik, Form } from 'formik';
 
-import { SegmentedControl } from 'components/bootstrap';
+import { Alert, SegmentedControl } from 'components/bootstrap';
+import FormSubmit from 'components/common/FormSubmit';
 import { ClipboardButton, FormikInput, Select } from 'components/common';
 import SectionGrid from 'components/common/Section/SectionGrid';
-import FormSubmit from 'components/common/FormSubmit';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import { useFleets, useCollectorsMutations } from '../hooks';
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 
 type Platform = 'linux' | 'windows' | 'macos' | 'container';
 type TokenExpiry = 'PT24H' | 'P7D' | 'P30D' | 'never';
@@ -133,6 +135,7 @@ const validate = (values: FormValues) => {
 const DeploymentForm = () => {
   const { data: fleets } = useFleets();
   const { createEnrollmentToken } = useCollectorsMutations();
+  const sendTelemetry = useSendCollectorsTelemetry();
   const [tokenResponse, setTokenResponse] = useState<TokenResponse | null>(null);
 
   const fleetOptions = (fleets || []).map((f) => ({ value: f.id, label: f.name }));
@@ -146,6 +149,13 @@ const DeploymentForm = () => {
           expiresIn: values.expiry === 'never' ? null : values.expiry,
         });
 
+        sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.GENERATED, {
+          app_action_value: 'deployment-generate',
+          fleet_id: values.fleetId,
+          platform: values.platform,
+          expires_in: values.expiry,
+        });
+
         setTokenResponse({
           token: response.token,
           expiresAt: response.expires_at,
@@ -154,7 +164,7 @@ const DeploymentForm = () => {
         // Error notification handled by useCollectorsMutations onError callback
       }
     },
-    [createEnrollmentToken],
+    [createEnrollmentToken, sendTelemetry],
   );
 
   const getInstallScript = (platform: Platform) => {
@@ -189,6 +199,11 @@ const DeploymentForm = () => {
     <Formik<FormValues> initialValues={initialValues} onSubmit={handleSubmit} validate={validate}>
       {({ isSubmitting, values, setFieldValue }) => (
         <Form>
+          <Alert bsStyle="info">
+            <strong>How deployment works:</strong> Select a target platform and fleet, then generate an enrollment token.
+            Run the installation script on your target host &mdash; the collector will enroll, receive its fleet&apos;s
+            configuration, and start collecting data automatically.
+          </Alert>
           <Section>
             <Label>Platform</Label>
             <SegmentedControl
@@ -209,7 +224,14 @@ const DeploymentForm = () => {
               placeholder="Select a fleet"
               options={fleetOptions}
               value={values.fleetId}
-              onChange={(selected) => setFieldValue('fleetId', selected as string)}
+              onChange={(selected) => {
+                const newFleetId = selected as string;
+                sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.FLEET_SELECTED, {
+                  app_action_value: 'deployment-fleet',
+                  fleet_id: newFleetId,
+                });
+                setFieldValue('fleetId', newFleetId);
+              }}
               clearable={false}
             />
           </Section>
@@ -227,9 +249,19 @@ const DeploymentForm = () => {
 
           <Section>
             <Label>Token Expiry</Label>
+            <InfoText>
+              How long this token remains valid for new enrollments. Already-enrolled collectors are not
+              affected when a token expires.
+            </InfoText>
             <SegmentedControl
               value={values.expiry}
-              onChange={(v) => setFieldValue('expiry', v)}
+              onChange={(v) => {
+                sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.EXPIRY_SELECTED, {
+                  app_action_value: 'deployment-expiry',
+                  expires_in: v,
+                });
+                setFieldValue('expiry', v);
+              }}
               data={[
                 { value: 'PT24H', label: '24 hours' },
                 { value: 'P7D', label: '7 days' },
@@ -253,7 +285,16 @@ const DeploymentForm = () => {
                 <ResultSection>
                   <h4>
                     Enrollment Token
-                    <ClipboardButton text={tokenResponse.token} title="Copy Token" bsSize="xs" />
+                    <ClipboardButton
+                      text={tokenResponse.token}
+                      title="Copy Token"
+                      bsSize="xs"
+                      onSuccess={() =>
+                        sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.TOKEN_COPIED, {
+                          app_action_value: 'deployment-copy-token',
+                        })
+                      }
+                    />
                   </h4>
                   <TokenRow>
                     <CodeInline>{tokenResponse.token.slice(0, 50)}...</CodeInline>
@@ -267,8 +308,15 @@ const DeploymentForm = () => {
                 <ResultSection>
                   <h4>
                     Installation Script
-                    <ClipboardButton text={getInstallScript(values.platform)} title="Copy Script" bsSize="xs" />
+                    <ClipboardButton
+                      text={getInstallScript(values.platform)}
+                      title="Copy Script"
+                      bsSize="xs"
+                    />
                   </h4>
+                  <InfoText>
+                    Run this script on the target host. The collector will download, install, and enroll automatically.
+                  </InfoText>
                   <ScriptBlock>{getInstallScript(values.platform)}</ScriptBlock>
                 </ResultSection>
               </SectionGrid>

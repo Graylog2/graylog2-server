@@ -15,16 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Formik, Form } from 'formik';
+import type { FormikTouched } from 'formik';
+import isEqual from 'lodash/isEqual';
 
-import { Input } from 'components/bootstrap';
+import { HelpBlock, Input } from 'components/bootstrap';
 import Modal from 'components/bootstrap/Modal';
 import { FormikInput } from 'components/common';
 import ModalSubmit from 'components/common/ModalSubmit';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import { SOURCE_TYPE_LABELS } from './Constants';
 
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import type {
   Source,
   SourceType,
@@ -38,7 +42,7 @@ type Props = {
   fleetId: string;
   source?: Source;
   onClose: () => void;
-  onSave: (source: Omit<Source, 'id'>) => Promise<void>;
+  onSave: (source: Omit<Source, 'id'>) => Promise<{ id?: string } | void>;
 };
 
 const defaultConfigs: Record<SourceType, FileSourceConfig | JournaldSourceConfig | WindowsEventLogSourceConfig> = {
@@ -77,7 +81,7 @@ const FileConfigFields = ({
       id="file-paths"
       type="text"
       label="File Path(s)"
-      help="Glob pattern supported (e.g., /var/log/*.log)"
+      help="Glob patterns supported (e.g., /var/log/*.log, /var/log/**/*.log). The collector watches matched files for new lines."
       value={config.paths[0] || ''}
       onChange={(e) => setFieldValue('config', { ...config, paths: [e.target.value] })}
       required
@@ -86,6 +90,7 @@ const FileConfigFields = ({
       id="file-read-mode"
       type="select"
       label="Read Mode"
+      help="From end: only collect new lines after the collector starts. From beginning: collect all existing lines first, then continue tailing."
       value={config.read_mode}
       onChange={(e) => setFieldValue('config', { ...config, read_mode: e.target.value as 'beginning' | 'end' })}>
       <option value="end">From end (tail)</option>
@@ -106,6 +111,7 @@ const JournaldConfigFields = ({
       id="journald-read-mode"
       type="select"
       label="Read Mode"
+      help="From end: only collect new entries after the collector starts. From beginning: collect all existing entries first, then continue tailing."
       value={config.read_mode}
       onChange={(e) => setFieldValue('config', { ...config, read_mode: e.target.value as 'beginning' | 'end' })}>
       <option value="end">From end (tail)</option>
@@ -115,6 +121,7 @@ const JournaldConfigFields = ({
       id="journald-priority"
       type="select"
       label="Priority"
+      help="Minimum severity level to collect. For example, selecting Error also collects Critical, Alert, and Emergency entries."
       value={config.priority}
       onChange={(e) => setFieldValue('config', { ...config, priority: e.target.value as JournaldPriority })}>
       <option value="emerg">Emergency</option>
@@ -130,7 +137,7 @@ const JournaldConfigFields = ({
       id="journald-match-pattern"
       type="text"
       label="Match Pattern"
-      help="Optional journald match expression to filter entries"
+      help="Optional journald match expression to filter entries by unit, process, etc. Example: _SYSTEMD_UNIT=nginx.service"
       value={config.match_pattern || ''}
       onChange={(e) => setFieldValue('config', { ...config, match_pattern: e.target.value || undefined })}
     />
@@ -185,14 +192,58 @@ const WindowsEventLogConfigFields = ({
 
 const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props) => {
   const isEdit = !!source;
+  const sendTelemetry = useSendCollectorsTelemetry();
 
-  const initialValues: FormValues = {
-    source_type: source?.type || 'file',
-    name: source?.name || '',
-    description: source?.description || '',
-    enabled: source?.enabled ?? true,
-    config: source?.config || defaultConfigs[source?.type || 'file'],
-  };
+  const initialValues: FormValues = useMemo(
+    () => ({
+      source_type: source?.type || 'file',
+      name: source?.name || '',
+      description: source?.description || '',
+      enabled: source?.enabled ?? true,
+      config: source?.config || defaultConfigs[source?.type || 'file'],
+    }),
+    [source],
+  );
+
+  useEffect(() => {
+    if (!isEdit) {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SOURCE.CREATE_OPENED, {
+        app_action_value: 'source-create-open',
+        fleet_id: fleetId,
+      });
+    }
+    // fire only once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Ref kept up-to-date from the Formik render prop so handleClose (which lives
+  // outside Formik) can report abandonment context on cancel.
+  const formStateRef = useRef<{
+    dirty: boolean;
+    touched: FormikTouched<FormValues>;
+    values: FormValues;
+  }>({ dirty: false, touched: {}, values: initialValues });
+
+  const handleClose = useCallback(() => {
+    if (!isEdit) {
+      const { dirty, touched, values } = formStateRef.current;
+      const fields_touched = Object.keys(touched).filter(
+        (k) => Boolean((touched as Record<string, unknown>)[k]),
+      );
+
+      sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SOURCE.CREATE_CANCELLED, {
+        app_action_value: 'source-create-cancel',
+        fleet_id: fleetId,
+        dirty,
+        fields_touched,
+        source_type: values.source_type,
+        source_type_changed_from_default: values.source_type !== 'file',
+        enabled: values.enabled,
+        enabled_toggled: values.enabled !== true,
+      });
+    }
+    onClose();
+  }, [fleetId, isEdit, onClose, sendTelemetry]);
 
   const handleSubmit = useCallback(
     (values: FormValues) =>
@@ -203,19 +254,49 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props
         enabled: values.enabled,
         type: values.source_type,
         config: values.config,
-      } as Omit<Source, 'id'>).then(() => onClose()),
-    [fleetId, onSave, onClose],
+      } as Omit<Source, 'id'>).then((saved) => {
+        if (isEdit) {
+          sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SOURCE.UPDATED, {
+            app_action_value: 'source-edit-submit',
+            fleet_id: fleetId,
+            source_id: source!.id,
+            source_type: values.source_type,
+            enabled: values.enabled,
+            enabled_changed: initialValues.enabled !== values.enabled,
+            config_changed: !isEqual(initialValues.config, values.config),
+          });
+        } else {
+          const savedId = (saved as { id?: string } | undefined)?.id ?? '';
+          sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SOURCE.CREATED, {
+            app_action_value: 'source-create-submit',
+            fleet_id: fleetId,
+            source_id: savedId,
+            source_type: values.source_type,
+            enabled: values.enabled,
+          });
+        }
+
+        onClose();
+      }),
+    [fleetId, isEdit, onSave, onClose, sendTelemetry, source, initialValues],
   );
 
   return (
-    <Modal show onHide={onClose} bsSize="lg">
+    <Modal show onHide={handleClose} bsSize="lg">
       <Formik<FormValues> initialValues={initialValues} onSubmit={handleSubmit} validate={validate}>
-        {({ isSubmitting, isValidating, values, setFieldValue }) => (
+        {({ isSubmitting, isValidating, values, setFieldValue, dirty, touched }) => {
+          formStateRef.current = { dirty, touched, values };
+
+          return (
           <Form>
             <Modal.Header>
               <Modal.Title>{isEdit ? 'Edit Source' : 'New Source'}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
+              <p>
+                A source defines what data collectors in this fleet should collect.
+                Each source type corresponds to a different collection method.
+              </p>
               <Input
                 id="source-type"
                 type="select"
@@ -234,9 +315,24 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props
                   </option>
                 ))}
               </Input>
+              {values.source_type === 'file' && (
+                <HelpBlock>Collect log lines from files on the host. Supports glob patterns for matching multiple files.</HelpBlock>
+              )}
+              {values.source_type === 'journald' && (
+                <HelpBlock>Collect entries from the systemd journal (Linux only).</HelpBlock>
+              )}
+              {values.source_type === 'windows_event_log' && (
+                <HelpBlock>Collect events from Windows Event Viewer channels.</HelpBlock>
+              )}
               <FormikInput id="source-name" label="Name" name="name" required />
               <FormikInput id="source-description" label="Description" name="description" type="textarea" />
-              <FormikInput id="source-enabled" label="Enabled" name="enabled" type="checkbox" />
+              <FormikInput
+                id="source-enabled"
+                label="Enabled"
+                name="enabled"
+                type="checkbox"
+                help="Disabled sources are not sent to collectors. Use this to temporarily stop collection without removing the source."
+              />
               {values.source_type === 'file' && (
                 <FileConfigFields config={values.config as FileSourceConfig} setFieldValue={setFieldValue} />
               )}
@@ -254,13 +350,14 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props
               <ModalSubmit
                 submitButtonText={isEdit ? 'Update source' : 'Create source'}
                 submitLoadingText={isEdit ? 'Updating...' : 'Creating...'}
-                onCancel={onClose}
+                onCancel={handleClose}
                 disabledSubmit={isValidating}
                 isSubmitting={isSubmitting}
               />
             </Modal.Footer>
           </Form>
-        )}
+          );
+        }}
       </Formik>
     </Modal>
   );

@@ -302,27 +302,26 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
         if (EventDto.FIELD_TIMERANGE_START.equals(sorting.getField())) {
             // When sorting by timerange start, add two separate sort clauses
             return List.of(
-                    SortOptions.of(builder -> builder.field(sort -> withUnmapped(sort.field(EventDto.FIELD_TIMERANGE_START).order(order), sorting))),
-                    SortOptions.of(builder -> builder.field(sort -> withUnmapped(sort.field(EventDto.FIELD_TIMERANGE_END).order(order), sorting)))
+                    SortOptions.of(builder -> builder.field(sort -> withUnmapped(sort.field(EventDto.FIELD_TIMERANGE_START).order(order), sorting, order))),
+                    SortOptions.of(builder -> builder.field(sort -> withUnmapped(sort.field(EventDto.FIELD_TIMERANGE_END).order(order), sorting, order)))
             );
         } else {
             return List.of(
-                    SortOptions.of(builder -> builder.field(sort -> withUnmapped(sort.field(sorting.getField()).order(order), sorting)))
+                    SortOptions.of(builder -> builder.field(sort -> withUnmapped(sort.field(sorting.getField()).order(order), sorting, order)))
             );
         }
     }
 
-    private FieldSort.Builder withUnmapped(FieldSort.Builder builder, Sorting sorting) {
+    private FieldSort.Builder withUnmapped(FieldSort.Builder builder, Sorting sorting, org.opensearch.client.opensearch._types.SortOrder order) {
         return sorting.getUnmappedType()
                 .map(unmappedType -> builder
                         .unmappedType(fieldType(unmappedType))
-                        .missing(missingValue(sorting)))
+                        .missing(missingValue(order)))
                 .orElse(builder);
     }
 
-    private FieldValue missingValue(Sorting sorting) {
-        final boolean first = sorting.getUppercasedDirection().equals(SortOrder.Asc.name());
-        return FieldValue.of(first ? "_first" : "_last");
+    private FieldValue missingValue(org.opensearch.client.opensearch._types.SortOrder order) {
+        return FieldValue.of(order.equals(SortOrder.Asc) ? "_first" : "_last");
     }
 
     private FieldType fieldType(String typeName) {

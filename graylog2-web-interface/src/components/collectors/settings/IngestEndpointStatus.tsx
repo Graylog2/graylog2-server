@@ -24,8 +24,11 @@ import InputStateBadge from 'components/inputs/InputStateBadge';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted } from 'util/PermissionsMixin';
 import useInputsStates from 'hooks/useInputsStates';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import { useCollectorInputDetails, useCollectorInputMutations } from '../hooks';
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
+import { classifyInputBind } from '../hooks/telemetry-helpers';
 
 const SectionTitle = styled.h3(
   ({ theme }) => css`
@@ -42,6 +45,7 @@ const IngestEndpointStatus = ({ isInitialSetup }: Props) => {
   const { createCollectorInput } = useCollectorInputMutations();
   const { collectorInputIds, loadedInputs, unreadableCount, isLoading } = useCollectorInputDetails();
   const { data: inputStates, isLoading: isLoadingInputStates } = useInputsStates({ enabled: collectorInputIds.length > 0 });
+  const sendTelemetry = useSendCollectorsTelemetry();
 
   const canCreateInputs = isPermitted(currentUser?.permissions, [
     'inputs:create',
@@ -113,7 +117,26 @@ const IngestEndpointStatus = ({ isInitialSetup }: Props) => {
                   <td><InputStateBadge input={input} inputStates={inputStates} /></td>
                   <td>{String(input.attributes?.bind_address ?? '')}</td>
                   <td>{String(input.attributes?.port ?? '')}</td>
-                  <td><Link to={`${Routes.SYSTEM.INPUTS}?query=id%3A${input.id}`}>Manage</Link></td>
+                  <td>
+                    <Link
+                      to={`${Routes.SYSTEM.INPUTS}?query=id%3A${input.id}`}
+                      onClick={() => {
+                        const nodeStates = inputStates?.[input.id];
+                        const isRunning = nodeStates
+                          ? Object.values(nodeStates).some((entry) => entry.state === 'RUNNING')
+                          : false;
+
+                        sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SETTINGS.DIAGNOSTICS_OPENED, {
+                          app_action_value: 'manage-input-link',
+                          input_id: input.id,
+                          input_bind_type: classifyInputBind(String(input.attributes?.bind_address ?? '')),
+                          input_port: input.attributes?.port,
+                          input_running: isRunning,
+                        });
+                      }}>
+                      Manage
+                    </Link>
+                  </td>
                 </tr>
               ))}
             </tbody>

@@ -133,7 +133,7 @@
     "@types/urijs": "^1.19.26",
     "assets-webpack-plugin": "^7.1.1",
     "babel-plugin-react-compiler": "^1.0.0",
-    "copy-webpack-plugin": "^13.0.1",
+    "copy-webpack-plugin": "^14.0.0",
     "cors": "^2.8.5",
     "cross-env": "^10.1.0",
     "css-loader": "^6.5.1",

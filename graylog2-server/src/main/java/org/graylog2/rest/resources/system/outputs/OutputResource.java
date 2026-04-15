@@ -194,7 +194,7 @@ public class OutputResource extends RestResource {
             @ApiResponse(responseCode = "404", description = "No such output on this node.")
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_OUTPUT_UPDATE)
-    public Output update(@Parameter(name = "outputId", description = "The id of the output that should be deleted", required = true)
+    public Output update(@Parameter(name = "outputId", description = "The id of the output that should be updated", required = true)
                          @PathParam("outputId") String outputId,
                          @RequestBody(required = true) Map<String, Object> deltas) throws ValidationException, NotFoundException {
         checkPermission(RestPermissions.OUTPUTS_EDIT, outputId);
@@ -209,7 +209,10 @@ public class OutputResource extends RestResource {
         if (deltas.containsKey("configuration")) {
             @SuppressWarnings("unchecked")
             final Map<String, Object> configuration = (Map<String, Object>) deltas.get("configuration");
-            deltas.put("configuration", ConfigurationMapConverter.convertValues(configuration, outputSummary.requestedConfiguration()));
+            // Merge with existing configuration to avoid losing fields not included in the update.
+            final Map<String, Object> mergedConfiguration = new HashMap<>(oldOutput.getConfiguration());
+            mergedConfiguration.putAll(ConfigurationMapConverter.convertValues(configuration, outputSummary.requestedConfiguration()));
+            deltas.put("configuration", mergedConfiguration);
         }
 
         return this.outputService.update(outputId, deltas);
