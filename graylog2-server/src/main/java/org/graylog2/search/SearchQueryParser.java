@@ -139,6 +139,13 @@ public class SearchQueryParser {
         this.dbFieldMapping = allowedFieldsWithMapping;
     }
 
+    /**
+     * Constructs a new parser with a list of attribute declarations.
+     * This form supports more complex mappings for attribute declarations than some of the other constructors.
+     *
+     * @param defaultField the name of the default field (already mapped)
+     * @param attributes   the list of full entity attributes to use.
+     */
     public SearchQueryParser(@Nonnull String defaultField,
                              @Nonnull final List<EntityAttribute> attributes) {
 
