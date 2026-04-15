@@ -63,6 +63,9 @@ public abstract class WindowsEventLogSourceConfig implements SourceConfig {
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("WindowsEventLogSourceConfig: " + e.getMessage());
         }
+        if (!includeDefaultChannels() && channels().isEmpty()) {
+            throw new IllegalArgumentException("At least one channel needs to be set when include_default_channels is false");
+        }
     }
 
     @Override
