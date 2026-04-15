@@ -366,7 +366,7 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
 
     @Documentation("Opensearch memory lock ensures the process locks its memory into RAM so it cannot be swapped to disk.")
     @Parameter(value = "opensearch_bootstrap_memory_lock")
-    private boolean opensearchBootstrapMemoryLock = true;
+    private boolean opensearchBootstrapMemoryLock = false;
 
     public String getOpensearchAuditLog() {
         return opensearchAuditLog;

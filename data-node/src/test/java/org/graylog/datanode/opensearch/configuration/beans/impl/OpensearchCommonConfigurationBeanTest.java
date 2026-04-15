@@ -34,7 +34,7 @@ import java.util.Map;
 class OpensearchCommonConfigurationBeanTest {
 
     @Test
-    void testBootstrapMemoryLockEnabledByDefault(@TempDir Path tempDir) throws ValidationException, RepositoryException {
+    void testBootstrapMemoryLockDisabledByDefault(@TempDir Path tempDir) throws ValidationException, RepositoryException {
         final DatanodeConfiguration datanodeConfiguration = mockDatanodeConfiguration(tempDir);
 
         final OpensearchCommonConfigurationBean bean = new OpensearchCommonConfigurationBean(
@@ -45,7 +45,7 @@ class OpensearchCommonConfigurationBeanTest {
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(new OpensearchConfigurationParams(tempDir));
 
         Assertions.assertThat(configurationPart.properties())
-                .containsEntry("bootstrap.memory_lock", "true");
+                .containsEntry("bootstrap.memory_lock", "false");
     }
 
     @Test
