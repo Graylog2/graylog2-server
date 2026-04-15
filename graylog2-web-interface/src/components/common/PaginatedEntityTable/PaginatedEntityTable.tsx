@@ -22,8 +22,14 @@ import type { LayoutConfig } from 'components/common/EntityDataTable/hooks/useTa
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import { useTableEventHandlers } from 'components/common/EntityDataTable';
-import { Alert } from 'components/bootstrap';
-import { Spinner, PaginatedList, SearchForm, NoSearchResult, EntityDataTable } from 'components/common';
+import {
+  Spinner,
+  PaginatedList,
+  SearchForm,
+  NoSearchResult,
+  EntityDataTable,
+  FetchErrorAlert,
+} from 'components/common';
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
 import type {
   EntityBase,
@@ -243,9 +249,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
           {MiddleSection ? <MiddleSection searchParams={fetchOptions} setFilters={onChangeFilters} /> : null}
 
           {isError ? (
-            <Alert bsStyle="danger">
-              Fetching {humanName} failed: {(error as Error)?.message ?? 'Unknown error'}
-            </Alert>
+            <FetchErrorAlert message={`Fetching ${humanName} failed`} error={error} />
           ) : (
             <PaginatedList
               pageSize={layoutConfig.pageSize}
