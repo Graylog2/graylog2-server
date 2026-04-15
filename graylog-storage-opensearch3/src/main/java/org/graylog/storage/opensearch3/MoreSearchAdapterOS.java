@@ -67,6 +67,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -74,6 +75,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -104,9 +106,10 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
     public MoreSearch.Result eventSearch(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                          Sorting sorting, int page, int perPage, Set<String> eventStreams,
                                          String filterString, Set<String> forbiddenSourceStreams, Map<String, Set<String>> extraFilters) {
+        final var filter = checkAndAddRangeFilterFixWhenFieldIsMissing(createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters), extraFilters);
 
         final org.opensearch.client.opensearch.core.SearchRequest newSearchRequest = org.opensearch.client.opensearch.core.SearchRequest.of(builder -> {
-            builder.query(createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters));
+            builder.query(filter);
             builder.from((page - 1) * perPage);
             builder.size(perPage);
             builder.trackTotalHits(th -> th.enabled(true));
@@ -145,7 +148,26 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
                 .build();
     }
 
-    private Query createQuery(String queryString, TimeRange timerange, Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams, Map<String, Set<String>> extraFilters) {
+    private Query addFieldIsMissing(BoolQuery.Builder boolQuery) {
+        return Query.of(a -> a.bool(b -> b.should(Query.of(c -> c.bool(boolQuery.build())),
+                        Query.of(d -> d.bool(inner -> inner.mustNot(mn -> mn.exists(e -> e.field(EventDto.FIELD_SCORES_NORMALIZED_RISK))))))
+                .minimumShouldMatch("0")));
+    }
+
+    private Query checkAndAddRangeFilterFixWhenFieldIsMissing(BoolQuery.Builder boolQuery, Map<String, Set<String>> extraFilters) {
+        if(extraFilters.values().stream().flatMap(Collection::stream).anyMatch(MoreSearchAdapter::isLowerBoundZeroRangeFilter)) {
+            return addFieldIsMissing(boolQuery);
+        } else {
+            return Query.of(b -> b.bool(boolQuery.build()));
+        }
+    }
+
+    private BoolQuery.Builder createQuery(String queryString,
+                              TimeRange timerange,
+                              Set<String> eventStreams,
+                              String filterString,
+                              Set<String> forbiddenSourceStreams,
+                              Map<String, Set<String>> extraFilters) {
 
         final BoolQuery.Builder boolQuery = BoolQuery.builder();
 
@@ -156,7 +178,6 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
         boolQuery.filter(query);
         boolQuery.filter(termsQuery(EventDto.FIELD_STREAMS, eventStreams));
         boolQuery.filter(timerangeQuery(timerange));
-
 
         extraFilters.forEach((field, values) -> {
             values.stream()
@@ -181,7 +202,8 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
             // the event must not be in the search result.
             boolQuery.filter(forbiddenStreamsQuery(forbiddenSourceStreams));
         }
-        return Query.of(b -> b.bool(boolQuery.build()));
+
+        return boolQuery;
     }
 
     @Nonnull
@@ -215,7 +237,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
     public MoreSearch.Histogram eventHistogram(String queryString, AbsoluteRange timerange, Set<String> affectedIndices,
                                                Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
                                                ZoneId timeZone, Map<String, Set<String>> extraFilters) {
-        final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
+        final var filter = checkAndAddRangeFilterFixWhenFieldIsMissing(createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters), extraFilters);
 
         final org.opensearch.client.opensearch.core.SearchRequest newSearchRequest = org.opensearch.client.opensearch.core.SearchRequest.of(builder -> {
             builder.query(filter);
@@ -321,7 +343,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
     }
 
     private FieldValue missingValue(Sorting sorting) {
-        final boolean first = sorting.getUppercasedDirection().equals(SortOrder.Asc.name());
+        final boolean first = SortOrder.Asc.name().equalsIgnoreCase(sorting.getUppercasedDirection());
         return FieldValue.of(first ? "_first" : "_last");
     }
 
@@ -343,7 +365,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
     public List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                              Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
                                              Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, int maxBuckets) {
-        final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
+        final var filter = checkAndAddRangeFilterFixWhenFieldIsMissing(createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters), extraFilters);
 
         final org.opensearch.client.opensearch.core.SearchRequest searchRequest = org.opensearch.client.opensearch.core.SearchRequest.of(builder -> {
             builder.query(filter);
@@ -386,7 +408,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
     public List<Slice> aggregateSlicesForRangeQuery(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                             Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
                                             Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, List<NumberRange> ranges) {
-        final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
+        var boolQuery = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
 
         final RangeAggregation.Builder rangeBuilder = new RangeAggregation.Builder().field(slicingColumn);
         ranges.forEach(r -> {
@@ -400,6 +422,8 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
             rangeBuilder.ranges(range.build());
         });
         rangeBuilder.keyed(false);
+
+        final var filter = ranges.stream().anyMatch(r -> r.from() == null || r.from() == 0d) ? addFieldIsMissing(boolQuery) : Query.of(b -> b.bool(boolQuery.build()));;
 
         final org.opensearch.client.opensearch.core.SearchRequest searchRequest = org.opensearch.client.opensearch.core.SearchRequest.of(builder -> {
             builder.query(filter);

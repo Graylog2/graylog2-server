@@ -56,6 +56,8 @@ public abstract class EventDto {
     public static final String FIELD_GROUP_BY_FIELDS = "group_by_fields";
     public static final String FIELD_AGGREGATION_CONDITIONS = "aggregation_conditions";
     public static final String FIELD_REPLAY_INFO = "replay_info";
+    // needed for search queries
+    public static final String FIELD_SCORES_NORMALIZED_RISK = "scores.normalized_risk";
 
     @JsonProperty(FIELD_ID)
     public abstract String id();

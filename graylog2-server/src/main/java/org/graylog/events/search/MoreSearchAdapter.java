@@ -83,4 +83,8 @@ public interface MoreSearchAdapter {
     static boolean isRangeValue(String value) {
         return value.startsWith("<=") || value.startsWith(">=") || value.startsWith("<") || value.startsWith(">");
     }
+
+    static boolean isLowerBoundZeroRangeFilter(String value) {
+        return !value.isEmpty() && (value.trim().equals(">=0") || value.trim().equals(">=0.0"));
+    }
 }
