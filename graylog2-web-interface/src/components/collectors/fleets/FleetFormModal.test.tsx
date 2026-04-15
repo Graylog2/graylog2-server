@@ -15,9 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor, fireEvent } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
-import { fireEvent } from '@testing-library/react';
 
 import { asMock } from 'helpers/mocking';
 import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendCollectorsTelemetry';
@@ -109,16 +108,19 @@ describe('FleetFormModal telemetry (create path)', () => {
     const onSave = jest.fn().mockResolvedValue({ id: 'new-fleet-id' });
     const onClose = jest.fn();
     render(<FleetFormModal onClose={onClose} onSave={onSave} />);
-    
+
     const nameInput = screen.getByLabelText(/Name/i) as HTMLInputElement;
     await userEvent.type(nameInput, 'web');
-    
+
     const submitButton = await screen.findByRole('button', { name: /Create fleet/i });
     await waitFor(() => {
       expect(submitButton).not.toBeDisabled();
     });
 
-    // Try fireEvent instead of userEvent
+    // userEvent.click on this submit button does not reliably fire Formik's onSubmit
+    // under jsdom (Mantine Modal portal + pointer-events interaction). fireEvent.click
+    // dispatches the click directly and triggers form submission as intended.
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.click(submitButton);
 
     await waitFor(() => {
@@ -135,15 +137,17 @@ describe('FleetFormModal telemetry (create path)', () => {
     const onSave = jest.fn().mockResolvedValue(undefined);
     const onClose = jest.fn();
     render(<FleetFormModal onClose={onClose} onSave={onSave} />);
-    
+
     const nameInput = screen.getByLabelText(/Name/i) as HTMLInputElement;
     await userEvent.type(nameInput, 'web');
-    
+
     const submitButton = await screen.findByRole('button', { name: /Create fleet/i });
     await waitFor(() => {
       expect(submitButton).not.toBeDisabled();
     });
 
+    // See note above: fireEvent.click needed for Formik submit under Mantine Modal.
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.click(submitButton);
 
     await waitFor(() => {
