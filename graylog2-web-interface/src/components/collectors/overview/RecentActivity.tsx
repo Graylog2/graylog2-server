@@ -20,6 +20,7 @@ import styled, { css } from 'styled-components';
 import { Icon, Link, RelativeTime, Spinner, NoEntitiesExist } from 'components/common';
 import type { IconName } from 'components/common/Icon/types';
 import Routes from 'routing/Routes';
+import { naturalSortIgnoreCase } from 'util/SortUtils';
 
 import { useRecentActivity } from '../hooks';
 import type { ActivityEntry, TargetInfo } from '../types';
@@ -92,8 +93,20 @@ const targetLink = (target: TargetInfo) => {
   return <Link to={Routes.SYSTEM.COLLECTORS.INSTANCES}>{target.name}</Link>;
 };
 
+const additionalTargetText = (targets: TargetInfo[]) => {
+  if (targets.length <= 1) {
+    return null;
+  }
+  if (targets.length === 2) {
+    return <span> and 1 other {targets[0].type}</span>;
+  }
+
+  return <span> and {targets.length - 1} other {targets[0].type}s</span>;
+}
+
 const renderDescription = (entry: ActivityEntry) => {
-  const target = entry.targets[0];
+  const sortedTargets = entry.targets.toSorted((a, b) => naturalSortIgnoreCase(a.name, b.name));
+  const target = sortedTargets[0];
 
   if (!target) {
     return <span>{entry.type}</span>;
@@ -103,25 +116,25 @@ const renderDescription = (entry: ActivityEntry) => {
     case 'CONFIG_CHANGED':
       return (
         <span>
-          Configuration updated for {target.type} {targetLink(target)}
+          Configuration updated for {target.type} {targetLink(target)}{additionalTargetText(sortedTargets)}
         </span>
       );
     case 'INGEST_CONFIG_CHANGED':
       return (
         <span>
-          Ingest configuration updated for {target.type} {targetLink(target)}
+          Ingest configuration updated for {target.type} {targetLink(target)}{additionalTargetText(sortedTargets)}
         </span>
       );
     case 'RESTART':
       return (
         <span>
-          Restart requested for {target.type} {targetLink(target)}
+          Restart requested for {target.type} {targetLink(target)}{additionalTargetText(sortedTargets)}
         </span>
       );
     case 'DISCOVERY_RUN':
       return (
         <span>
-          Discovery run triggered for {target.type} {targetLink(target)}
+          Discovery run triggered for {target.type} {targetLink(target)}{additionalTargetText(sortedTargets)}
         </span>
       );
     case 'FLEET_REASSIGNED': {

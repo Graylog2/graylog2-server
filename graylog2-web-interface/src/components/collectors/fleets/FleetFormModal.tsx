@@ -27,7 +27,6 @@ import type { Fleet } from '../types';
 type FormValues = {
   name: string;
   description: string;
-  target_version: string;
 };
 
 type Props = {
@@ -52,7 +51,6 @@ const FleetFormModal = ({ fleet = undefined, onClose, onSave }: Props) => {
   const initialValues: FormValues = {
     name: fleet?.name || '',
     description: fleet?.description || '',
-    target_version: fleet?.target_version || '',
   };
 
   const handleSubmit = useCallback(
@@ -60,7 +58,6 @@ const FleetFormModal = ({ fleet = undefined, onClose, onSave }: Props) => {
       onSave({
         name: values.name,
         description: values.description,
-        target_version: values.target_version || null,
       }).then(() => onClose()),
     [onSave, onClose],
   );
@@ -81,13 +78,6 @@ const FleetFormModal = ({ fleet = undefined, onClose, onSave }: Props) => {
                 name="description"
                 type="textarea"
                 help="Optional description of this fleet's purpose"
-              />
-              <FormikInput
-                id="fleet-target-version"
-                label="Target Version"
-                name="target_version"
-                help="Optional collector version for this fleet"
-                placeholder="e.g., 1.2.0"
               />
             </Modal.Body>
             <Modal.Footer>

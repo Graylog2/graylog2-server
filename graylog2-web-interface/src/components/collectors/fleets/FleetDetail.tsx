@@ -20,7 +20,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import styled, { css } from 'styled-components';
 import URI from 'urijs';
 
-import { Button, ButtonToolbar, DeleteMenuItem, Label, SegmentedControl } from 'components/bootstrap';
+import { Button, ButtonToolbar, DeleteMenuItem, SegmentedControl } from 'components/bootstrap';
 import { ConfirmDialog, Link, Spinner } from 'components/common';
 import BetaBadge from 'components/common/BetaBadge';
 import { MoreActions } from 'components/common/EntityDataTable';
@@ -212,7 +212,6 @@ const FleetDetail = ({ fleetId }: Props) => {
         <h2>
           {fleet.name} <BetaBadge />
         </h2>
-        {fleet.target_version && <Label bsStyle="info">v{fleet.target_version}</Label>}
       </Header>
 
       <StatsRow>
