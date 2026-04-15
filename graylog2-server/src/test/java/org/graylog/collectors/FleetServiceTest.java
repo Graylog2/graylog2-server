@@ -72,19 +72,18 @@ class FleetServiceTest {
 
     @Test
     void createFleet() {
-        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet", "1.0.0");
+        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet");
 
         assertThat(fleet.id()).isNotNull();
         assertThat(fleet.name()).isEqualTo("test-fleet");
         assertThat(fleet.description()).isEqualTo("A test fleet");
-        assertThat(fleet.targetVersion()).isEqualTo("1.0.0");
         assertThat(fleet.createdAt()).isNotNull();
         assertThat(fleet.updatedAt()).isNotNull();
     }
 
     @Test
     void createFleetAppendsConfigChangedMarker() {
-        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet", null);
+        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet");
 
         List<TransactionMarker> markers = txnLogService.getUnprocessedMarkers(fleet.id(), null, 0L);
         assertThat(markers).hasSize(2);
@@ -96,14 +95,13 @@ class FleetServiceTest {
 
     @Test
     void getFleet() {
-        FleetDTO created = fleetService.create("test-fleet", "A test fleet", "2.0.0");
+        FleetDTO created = fleetService.create("test-fleet", "A test fleet");
 
         Optional<FleetDTO> result = fleetService.get(created.id());
 
         assertThat(result).isPresent();
         assertThat(result.get().name()).isEqualTo("test-fleet");
         assertThat(result.get().description()).isEqualTo("A test fleet");
-        assertThat(result.get().targetVersion()).isEqualTo("2.0.0");
     }
 
     @Test
@@ -115,20 +113,19 @@ class FleetServiceTest {
 
     @Test
     void updateFleet() {
-        FleetDTO created = fleetService.create("test-fleet", "Original desc", "1.0.0");
+        FleetDTO created = fleetService.create("test-fleet", "Original desc");
 
-        Optional<FleetDTO> updated = fleetService.update(created.id(), "updated-fleet", "Updated desc", "2.0.0");
+        Optional<FleetDTO> updated = fleetService.update(created.id(), "updated-fleet", "Updated desc");
 
         assertThat(updated).isPresent();
         assertThat(updated.get().name()).isEqualTo("updated-fleet");
         assertThat(updated.get().description()).isEqualTo("Updated desc");
-        assertThat(updated.get().targetVersion()).isEqualTo("2.0.0");
         assertThat(updated.get().updatedAt()).isAfterOrEqualTo(created.updatedAt());
     }
 
     @Test
     void deleteFleet() {
-        FleetDTO created = fleetService.create("test-fleet", "A test fleet", null);
+        FleetDTO created = fleetService.create("test-fleet", "A test fleet");
 
         boolean deleted = fleetService.delete(created.id());
 
@@ -145,8 +142,8 @@ class FleetServiceTest {
 
     @Test
     void duplicateNameAllowed() {
-        FleetDTO first = fleetService.create("test-fleet", "First fleet", null);
-        FleetDTO second = fleetService.create("test-fleet", "Second fleet", null);
+        FleetDTO first = fleetService.create("test-fleet", "First fleet");
+        FleetDTO second = fleetService.create("test-fleet", "Second fleet");
 
         assertThat(first.id()).isNotEqualTo(second.id());
         assertThat(first.name()).isEqualTo(second.name());
@@ -154,9 +151,9 @@ class FleetServiceTest {
 
     @Test
     void findPaginated() {
-        fleetService.create("fleet-a", "First", null);
-        fleetService.create("fleet-b", "Second", null);
-        fleetService.create("fleet-c", "Third", null);
+        fleetService.create("fleet-a", "First");
+        fleetService.create("fleet-b", "Second");
+        fleetService.create("fleet-c", "Third");
 
         SearchQuery query = fleetService.parseSearchQuery("");
         PaginatedList<FleetDTO> result = fleetService.findPaginated(query, 1, 2,
@@ -168,8 +165,8 @@ class FleetServiceTest {
 
     @Test
     void findPaginatedWithSearch() {
-        fleetService.create("alpha-fleet", "First fleet", null);
-        fleetService.create("beta-fleet", "Second fleet", null);
+        fleetService.create("alpha-fleet", "First fleet");
+        fleetService.create("beta-fleet", "Second fleet");
 
         SearchQuery query = fleetService.parseSearchQuery("alpha");
         PaginatedList<FleetDTO> result = fleetService.findPaginated(query, 1, 10,
@@ -182,7 +179,7 @@ class FleetServiceTest {
 
     @Test
     void assembleConfigReturnsFleetWithSources() {
-        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet", "1.0.0");
+        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet");
         sourceService.create(fleet.id(), "source-1", "First source", true, validFileConfig());
         sourceService.create(fleet.id(), "source-2", "Second source", true, validFileConfig());
 
@@ -202,7 +199,7 @@ class FleetServiceTest {
 
     @Test
     void deleteFleetCascadesSourceDeletion() {
-        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet", null);
+        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet");
         sourceService.create(fleet.id(), "source-1", "First source", true, validFileConfig());
         sourceService.create(fleet.id(), "source-2", "Second source", true, validFileConfig());
 
@@ -218,12 +215,12 @@ class FleetServiceTest {
     void getAllFleetIds() {
         assertThat(fleetService.getAllFleetIds()).isEmpty();
 
-        fleetService.create("fleet-a", "First", null);
+        fleetService.create("fleet-a", "First");
 
         assertThat(fleetService.getAllFleetIds()).hasSize(1);
 
-        fleetService.create("fleet-b", "Second", null);
-        fleetService.create("fleet-c", "Third", null);
+        fleetService.create("fleet-b", "Second");
+        fleetService.create("fleet-c", "Third");
 
         assertThat(fleetService.getAllFleetIds()).hasSize(3);
 

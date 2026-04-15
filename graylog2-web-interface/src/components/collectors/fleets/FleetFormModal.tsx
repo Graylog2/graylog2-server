@@ -30,7 +30,6 @@ import type { Fleet } from '../types';
 type FormValues = {
   name: string;
   description: string;
-  target_version: string;
 };
 
 type Props = {
@@ -56,7 +55,6 @@ const FleetFormModal = ({ fleet = undefined, onClose, onSave }: Props) => {
   const initialValues: FormValues = {
     name: fleet?.name || '',
     description: fleet?.description || '',
-    target_version: fleet?.target_version || '',
   };
 
   // Ref kept up-to-date from the Formik render prop so handleClose (which lives
@@ -85,7 +83,6 @@ const FleetFormModal = ({ fleet = undefined, onClose, onSave }: Props) => {
       onSave({
         name: values.name,
         description: values.description,
-        target_version: values.target_version || null,
       }).then((saved) => {
         if (!isEdit) {
           const createdId = (saved && 'id' in saved) ? saved.id ?? '' : '';
@@ -118,13 +115,6 @@ const FleetFormModal = ({ fleet = undefined, onClose, onSave }: Props) => {
                 name="description"
                 type="textarea"
                 help="Optional description of this fleet's purpose"
-              />
-              <FormikInput
-                id="fleet-target-version"
-                label="Target Version"
-                name="target_version"
-                help="Optional collector version for this fleet"
-                placeholder="e.g., 1.2.0"
               />
             </Modal.Body>
             <Modal.Footer>

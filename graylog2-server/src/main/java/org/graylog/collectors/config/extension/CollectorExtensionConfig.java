@@ -14,13 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.collectors.rest;
+package org.graylog.collectors.config.extension;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotBlank;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public record CreateFleetRequest(
-        @NotBlank @JsonProperty("name") String name,
-        @Nullable @JsonProperty("description") String description) {
+public interface CollectorExtensionConfig {
+    @JsonIgnore
+    String id();
+
+    @JsonIgnore
+    String name();
 }

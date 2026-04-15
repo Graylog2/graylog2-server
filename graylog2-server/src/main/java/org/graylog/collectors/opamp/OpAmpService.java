@@ -55,6 +55,7 @@ import org.graylog.collectors.config.CollectorServiceConfig;
 import org.graylog.collectors.config.TLSConfigurationSettings;
 import org.graylog.collectors.config.exporter.OtlpExporterConfig;
 import org.graylog.collectors.config.exporter.OtlpHttpExporterConfig;
+import org.graylog.collectors.config.extension.FileStorageExtensionConfig;
 import org.graylog.collectors.config.processor.CollectorProcessorConfig;
 import org.graylog.collectors.config.processor.ResourceProcessorConfig;
 import org.graylog.collectors.config.receiver.CollectorReceiverConfig;
@@ -431,6 +432,9 @@ public class OpAmpService {
                             .forEach(receiverConfig -> receiverConfigs.put(receiverConfig.name(), receiverConfig));
                 }
 
+                final var storageExtensionConfig = FileStorageExtensionConfig.defaultInstance();
+                configBuilder.extensions(Map.of(storageExtensionConfig.name(), storageExtensionConfig));
+
                 // The Collector must at least have one receiver to avoid a startup error.
                 if (receiverConfigs.isEmpty()) {
                     final var noop = NoopReceiverConfig.instance();
@@ -462,6 +466,7 @@ public class OpAmpService {
                                 .build()));
 
                 configBuilder.service(CollectorServiceConfig.builder()
+                        .extensions(Set.of(storageExtensionConfig.name()))
                         .pipelines(pipelines)
                         .build());
                 try {

@@ -80,7 +80,7 @@ class SourceServiceTest {
 
     @Test
     void createSource() {
-        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet", null);
+        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet");
 
         SourceDTO source = sourceService.create(fleet.id(), "my-source", "A source", true, validFileConfig());
 
@@ -94,7 +94,7 @@ class SourceServiceTest {
 
     @Test
     void createSourceAppendsConfigChangedMarker() {
-        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet", null);
+        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet");
 
         // Fleet creation already appends a marker; get markers after fleet creation
         List<TransactionMarker> markersAfterFleet = txnLogService.getUnprocessedMarkers(fleet.id(), null, 0L);
@@ -109,7 +109,7 @@ class SourceServiceTest {
 
     @Test
     void getSource() {
-        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet", null);
+        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet");
         SourceDTO created = sourceService.create(fleet.id(), "my-source", "A source", true, validFileConfig());
 
         Optional<SourceDTO> result = sourceService.get(fleet.id(), created.id());
@@ -120,8 +120,8 @@ class SourceServiceTest {
 
     @Test
     void getSourceWrongFleet() {
-        FleetDTO fleetA = fleetService.create("fleet-a", "Fleet A", null);
-        FleetDTO fleetB = fleetService.create("fleet-b", "Fleet B", null);
+        FleetDTO fleetA = fleetService.create("fleet-a", "Fleet A");
+        FleetDTO fleetB = fleetService.create("fleet-b", "Fleet B");
         SourceDTO source = sourceService.create(fleetA.id(), "my-source", "A source", true, validFileConfig());
 
         Optional<SourceDTO> result = sourceService.get(fleetB.id(), source.id());
@@ -131,7 +131,7 @@ class SourceServiceTest {
 
     @Test
     void updateSource() {
-        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet", null);
+        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet");
         SourceDTO created = sourceService.create(fleet.id(), "my-source", "Original desc", true, validFileConfig());
 
         SourceConfig newConfig = FileSourceConfig.builder().paths(List.of("/var/log/auth.log")).readMode(JournaldReceiverConfig.StartAt.END.toString()).build();
@@ -147,7 +147,7 @@ class SourceServiceTest {
 
     @Test
     void deleteSource() {
-        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet", null);
+        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet");
         SourceDTO created = sourceService.create(fleet.id(), "my-source", "A source", true, validFileConfig());
 
         boolean deleted = sourceService.delete(fleet.id(), created.id());
@@ -158,8 +158,8 @@ class SourceServiceTest {
 
     @Test
     void deleteSourceWrongFleet() {
-        FleetDTO fleetA = fleetService.create("fleet-a", "Fleet A", null);
-        FleetDTO fleetB = fleetService.create("fleet-b", "Fleet B", null);
+        FleetDTO fleetA = fleetService.create("fleet-a", "Fleet A");
+        FleetDTO fleetB = fleetService.create("fleet-b", "Fleet B");
         SourceDTO source = sourceService.create(fleetA.id(), "my-source", "A source", true, validFileConfig());
 
         boolean deleted = sourceService.delete(fleetB.id(), source.id());
@@ -171,8 +171,8 @@ class SourceServiceTest {
 
     @Test
     void findByFleet() {
-        FleetDTO fleetA = fleetService.create("fleet-a", "Fleet A", null);
-        FleetDTO fleetB = fleetService.create("fleet-b", "Fleet B", null);
+        FleetDTO fleetA = fleetService.create("fleet-a", "Fleet A");
+        FleetDTO fleetB = fleetService.create("fleet-b", "Fleet B");
         sourceService.create(fleetA.id(), "source-a1", "Source A1", true, validFileConfig());
         sourceService.create(fleetA.id(), "source-a2", "Source A2", true, validFileConfig());
         sourceService.create(fleetB.id(), "source-b1", "Source B1", true, validFileConfig());
@@ -189,7 +189,7 @@ class SourceServiceTest {
 
     @Test
     void streamAllByFleet() {
-        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet", null);
+        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet");
         sourceService.create(fleet.id(), "source-1", "Source 1", true, validFileConfig());
         sourceService.create(fleet.id(), "source-2", "Source 2", true, validFileConfig());
 
@@ -200,7 +200,7 @@ class SourceServiceTest {
 
     @Test
     void deleteAllByFleet() {
-        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet", null);
+        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet");
         sourceService.create(fleet.id(), "source-1", "Source 1", true, validFileConfig());
         sourceService.create(fleet.id(), "source-2", "Source 2", true, validFileConfig());
 
@@ -214,7 +214,7 @@ class SourceServiceTest {
 
     @Test
     void duplicateNameWithinFleetThrows() {
-        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet", null);
+        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet");
         sourceService.create(fleet.id(), "my-source", "First source", true, validFileConfig());
 
         assertThatThrownBy(() -> sourceService.create(fleet.id(), "my-source", "Second source", true, validFileConfig()))
@@ -223,8 +223,8 @@ class SourceServiceTest {
 
     @Test
     void sameNameDifferentFleetsAllowed() {
-        FleetDTO fleetA = fleetService.create("fleet-a", "Fleet A", null);
-        FleetDTO fleetB = fleetService.create("fleet-b", "Fleet B", null);
+        FleetDTO fleetA = fleetService.create("fleet-a", "Fleet A");
+        FleetDTO fleetB = fleetService.create("fleet-b", "Fleet B");
 
         SourceDTO sourceA = sourceService.create(fleetA.id(), "my-source", "Source in A", true, validFileConfig());
         SourceDTO sourceB = sourceService.create(fleetB.id(), "my-source", "Source in B", true, validFileConfig());
@@ -235,8 +235,8 @@ class SourceServiceTest {
 
     @Test
     void countByFleetGroupedReturnsPerFleetSourceCounts() {
-        FleetDTO fleetA = fleetService.create("fleet-a", "Fleet A", null);
-        FleetDTO fleetB = fleetService.create("fleet-b", "Fleet B", null);
+        FleetDTO fleetA = fleetService.create("fleet-a", "Fleet A");
+        FleetDTO fleetB = fleetService.create("fleet-b", "Fleet B");
 
         // fleet-a: 3 sources
         sourceService.create(fleetA.id(), "source-a1", "Source A1", true, validFileConfig());
@@ -255,7 +255,7 @@ class SourceServiceTest {
 
     @Test
     void countByTypeReturnsPerTypeSourceCounts() {
-        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet", null);
+        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet");
 
         sourceService.create(fleet.id(), "file-1", "File source 1", true, validFileConfig());
         sourceService.create(fleet.id(), "file-2", "File source 2", true, validFileConfig());
@@ -270,7 +270,7 @@ class SourceServiceTest {
 
     @Test
     void createSourceWithInvalidConfigThrows() {
-        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet", null);
+        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet");
         SourceConfig invalidConfig = FileSourceConfig.builder().paths(List.of()).readMode(JournaldReceiverConfig.StartAt.END.toString()).build();
 
         assertThatThrownBy(() -> sourceService.create(fleet.id(), "my-source", "A source", true, invalidConfig))
