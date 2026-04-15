@@ -209,7 +209,9 @@ class FleetServiceTest {
         fleetService.delete(fleet.id());
 
         assertThat(fleetService.get(fleet.id())).isEmpty();
-        assertThat(sourceService.streamAllByFleet(fleet.id())).isEmpty();
+        try (var stream = sourceService.streamAllByFleet(fleet.id())) {
+            assertThat(stream).isEmpty();
+        }
     }
 
     @Test

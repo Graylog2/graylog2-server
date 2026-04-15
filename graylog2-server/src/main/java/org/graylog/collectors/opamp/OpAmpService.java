@@ -258,7 +258,7 @@ public class OpAmpService {
 
     private void setOpampConnectionSettings(Opamp.ConnectionSettingsOffers.Builder connectionSettingsBuilder, String certPem, Duration heartbeatInterval) {
         connectionSettingsBuilder.setOpamp(OpAMPConnectionSettings.newBuilder()
-                .setHeartbeatIntervalSeconds(heartbeatInterval.getSeconds())
+                .setHeartbeatIntervalSeconds(heartbeatInterval.toSeconds())
                 .setCertificate(TLSCertificate.newBuilder().setCert(ByteString.copyFromUtf8(certPem))));
     }
 
