@@ -151,8 +151,9 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
 
       <Section>
         <SectionTitle>Active Sources ({sources.length})</SectionTitle>
+        <EmptyText>Sources are inherited from this instance&apos;s fleet configuration.</EmptyText>
         {sources.length === 0 ? (
-          <EmptyText>No sources configured for this fleet.</EmptyText>
+          <EmptyText>No sources configured for this fleet. Add sources in the fleet detail page to start collecting data.</EmptyText>
         ) : (
           <SourceList>
             {sources.map((source) => (

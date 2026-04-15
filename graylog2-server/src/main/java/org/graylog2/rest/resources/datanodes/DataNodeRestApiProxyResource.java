@@ -54,12 +54,16 @@ import static org.graylog2.audit.AuditEventTypes.DATANODE_API_REQUEST;
 @RequiresPermissions(RestPermissions.DATANODE_REST_PROXY)
 public class DataNodeRestApiProxyResource extends RestResource {
     private static final List<Predicate<ProxyRequestAdapter.ProxyRequest>> allowList = List.of(
-            request -> request.path().startsWith("indices-directory") && "GET".equals(request.method()),
-            request -> request.path().startsWith("logs") && "GET".equals(request.method()),
-            request -> request.path().startsWith("metrics") && "GET".equals(request.method()),
-            request -> request.path().startsWith("metrics") && "POST".equals(request.method()),
-            request -> request.path().startsWith("connection-check") && "POST".equals(request.method())
+            request -> isAllowed(request, "indices-directory", "GET", RestPermissions.DATANODE_MIGRATION),
+            request -> isAllowed(request, "logs", "GET", RestPermissions.CLUSTER_CONFIGURATION_READ),
+            request -> isAllowed(request, "metrics", "GET", RestPermissions.CLUSTER_CONFIGURATION_READ),
+            request -> isAllowed(request, "metrics", "POST", RestPermissions.CLUSTER_CONFIGURATION_READ),
+            request -> isAllowed(request, "connection-check", "POST", RestPermissions.CLUSTER_CONFIGURATION_READ)
     );
+
+    private static boolean isAllowed(ProxyRequestAdapter.ProxyRequest request, String path, String method, String permission) {
+        return request.path().startsWith(path) && method.equals(request.method()) && (request.subject() != null && request.subject().isPermitted(permission));
+    }
 
     private final DatanodeRestApiProxy proxyRequestAdapter;
     private final boolean enableAllowlist;
@@ -117,7 +121,7 @@ public class DataNodeRestApiProxyResource extends RestResource {
     }
 
     private Response request(ContainerRequestContext context, String path, String hostname) throws IOException {
-        final var request = new ProxyRequestAdapter.ProxyRequest(context.getMethod(), path, context.getEntityStream(), hostname, context.getUriInfo().getQueryParameters());
+        final var request = new ProxyRequestAdapter.ProxyRequest(context.getMethod(), path, context.getEntityStream(), hostname, context.getUriInfo().getQueryParameters(), getSubject());
         if (enableAllowlist && allowList.stream().noneMatch(condition -> condition.test(request))) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("This request is not allowed.")

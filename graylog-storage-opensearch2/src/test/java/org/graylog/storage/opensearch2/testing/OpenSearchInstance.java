@@ -137,7 +137,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
         if (version().satisfies(SearchVersion.Distribution.OPENSEARCH, "2.9.0")) {
             fixNumberOfReplicaForMlPlugin();
         }
-        if (version().satisfies(SearchVersion.Distribution.OPENSEARCH, "2.19.3")) {
+        if (version().satisfies(SearchVersion.Distribution.OPENSEARCH, "~2.19")) {
             fixDefaultNumberOfReplicasForIsmConfigs();
         }
     }
