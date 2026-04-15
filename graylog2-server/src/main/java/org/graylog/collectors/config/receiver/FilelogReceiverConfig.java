@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
+import org.graylog.collectors.CollectorReadMode;
 import org.graylog.collectors.config.extension.FileStorageExtensionConfig;
 
 import java.util.List;
@@ -73,9 +74,8 @@ public abstract class FilelogReceiverConfig implements CollectorReceiverConfig, 
 
     // TODO: Configure offset storage - otherwise, offsets will only be tracked in memory!
 
-    @Nullable
     @JsonProperty("start_at")
-    public abstract String startAt();
+    public abstract CollectorReadMode startAt();
 
     @Nullable
     @JsonProperty("multiline")
@@ -95,7 +95,8 @@ public abstract class FilelogReceiverConfig implements CollectorReceiverConfig, 
                 .includeFileOwnerGroupName(true)
                 .includeFileRecordNumber(true)
                 .includeFileRecordOffset(true)
-                .storage(FileStorageExtensionConfig.defaultInstance().name());
+                .storage(FileStorageExtensionConfig.defaultInstance().name())
+                .startAt(CollectorReadMode.END);
     }
 
     @AutoValue.Builder
@@ -123,7 +124,7 @@ public abstract class FilelogReceiverConfig implements CollectorReceiverConfig, 
 
         public abstract Builder includeFileRecordOffset(boolean includeFileRecordOffset);
 
-        public abstract Builder startAt(@Nullable String startAt);
+        public abstract Builder startAt(CollectorReadMode startAt);
 
         public abstract Builder multiline(@Nullable CollectorReceiverMultilineConfig multiline);
 
