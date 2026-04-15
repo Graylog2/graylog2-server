@@ -20,9 +20,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
+import org.graylog.collectors.CollectorOSType;
 import org.graylog.collectors.CollectorReadMode;
 import org.graylog.collectors.config.extension.FileStorageExtensionConfig;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -58,6 +60,11 @@ public abstract class JournaldReceiverConfig implements CollectorReceiverConfig,
 
     public String type() {
         return RECEIVER_TYPE;
+    }
+
+    @Override
+    public EnumSet<CollectorOSType> osSupport() {
+        return EnumSet.of(CollectorOSType.LINUX);
     }
 
     @JsonProperty("priority")
