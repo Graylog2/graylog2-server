@@ -22,6 +22,7 @@ import type { LayoutConfig } from 'components/common/EntityDataTable/hooks/useTa
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import { useTableEventHandlers } from 'components/common/EntityDataTable';
+import { Alert } from 'components/bootstrap';
 import { Spinner, PaginatedList, SearchForm, NoSearchResult, EntityDataTable } from 'components/common';
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
 import type {
@@ -137,6 +138,8 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
     data: paginatedEntities = INITIAL_DATA,
     isInitialLoading: isLoadingEntities,
     refetch,
+    isError,
+    error,
   } = useFetchEntities<T, M>({
     fetchKey,
     searchParams: fetchOptions,
@@ -220,63 +223,71 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
                 query={fetchOptions.query}
                 placeholder={searchPlaceholder ?? `Search for ${humanName}`}
                 queryHelpComponent={queryHelpComponent}>
-                <div style={{ marginBottom: 5 }}>
-                  <EntityFilters
-                    attributes={attributes}
-                    urlQueryFilters={fetchOptions.filters}
-                    setUrlQueryFilters={onChangeFilters}
-                    filterValueRenderers={filterValueRenderers}
-                    appSection={appSection}
-                    activeSliceCol={fetchOptions.sliceCol}
-                    activeSlice={fetchOptions.slice}
-                  />
-                </div>
+                {attributes.length > 0 && (
+                  <div style={{ marginBottom: 5 }}>
+                    <EntityFilters
+                      attributes={attributes}
+                      urlQueryFilters={fetchOptions.filters}
+                      setUrlQueryFilters={onChangeFilters}
+                      filterValueRenderers={filterValueRenderers}
+                      appSection={appSection}
+                      activeSliceCol={fetchOptions.sliceCol}
+                      activeSlice={fetchOptions.slice}
+                    />
+                  </div>
+                )}
               </SearchForm>
               {topRightCol}
             </SearchRow>
           )}
           {MiddleSection ? <MiddleSection searchParams={fetchOptions} setFilters={onChangeFilters} /> : null}
 
-          <PaginatedList
-            pageSize={layoutConfig.pageSize}
-            showPageSizeSelect={false}
-            totalItems={total}
-            useQueryParameter={!withoutURLParams}
-            onChange={onPaginationChange}>
-            {list?.length === 0 ? (
-              <NoSearchResult>No {humanName} have been found.</NoSearchResult>
-            ) : (
-              <EntityDataTable<T, M>
-                entities={list}
-                defaultDisplayedColumns={tableLayout.defaultDisplayedAttributes}
-                layoutPreferences={{
-                  attributes: layoutConfig.attributes,
-                  order: layoutConfig.order,
-                }}
-                defaultColumnOrder={tableLayout.defaultColumnOrder}
-                onResetLayoutPreferences={onResetLayoutPreferences}
-                onLayoutPreferencesChange={onLayoutPreferencesChange}
-                onChangeSlicing={onChangeSlicing}
-                expandedSectionRenderers={expandedSectionRenderers}
-                rowOverride={rowOverride}
-                enableSlicing={typeof fetchSlices === 'function'}
-                bulkSelection={bulkSelection}
-                onSortChange={onSortChange}
-                onPageSizeChange={onPageSizeChange}
-                pageSize={layoutConfig.pageSize}
-                activeSort={layoutConfig.sort}
-                activeSliceCol={fetchOptions.sliceCol}
-                appSection={appSection}
-                entityActions={entityActions}
-                columnRenderers={columnRenderers}
-                columnSchemas={columnSchemas}
-                entityAttributesAreCamelCase={entityAttributesAreCamelCase}
-                meta={meta}
-                noPageSizeSelect={noPageSizeSelect}
-                noColumnReordering={noColumnReordering}
-              />
-            )}
-          </PaginatedList>
+          {isError ? (
+            <Alert bsStyle="danger">
+              Fetching {humanName} failed: {(error as Error)?.message ?? 'Unknown error'}
+            </Alert>
+          ) : (
+            <PaginatedList
+              pageSize={layoutConfig.pageSize}
+              showPageSizeSelect={false}
+              totalItems={total}
+              useQueryParameter={!withoutURLParams}
+              onChange={onPaginationChange}>
+              {list?.length === 0 ? (
+                <NoSearchResult>No {humanName} have been found.</NoSearchResult>
+              ) : (
+                <EntityDataTable<T, M>
+                  entities={list}
+                  defaultDisplayedColumns={tableLayout.defaultDisplayedAttributes}
+                  layoutPreferences={{
+                    attributes: layoutConfig.attributes,
+                    order: layoutConfig.order,
+                  }}
+                  defaultColumnOrder={tableLayout.defaultColumnOrder}
+                  onResetLayoutPreferences={onResetLayoutPreferences}
+                  onLayoutPreferencesChange={onLayoutPreferencesChange}
+                  onChangeSlicing={onChangeSlicing}
+                  expandedSectionRenderers={expandedSectionRenderers}
+                  rowOverride={rowOverride}
+                  enableSlicing={typeof fetchSlices === 'function'}
+                  bulkSelection={bulkSelection}
+                  onSortChange={onSortChange}
+                  onPageSizeChange={onPageSizeChange}
+                  pageSize={layoutConfig.pageSize}
+                  activeSort={layoutConfig.sort}
+                  activeSliceCol={fetchOptions.sliceCol}
+                  appSection={appSection}
+                  entityActions={entityActions}
+                  columnRenderers={columnRenderers}
+                  columnSchemas={columnSchemas}
+                  entityAttributesAreCamelCase={entityAttributesAreCamelCase}
+                  meta={meta}
+                  noPageSizeSelect={noPageSizeSelect}
+                  noColumnReordering={noColumnReordering}
+                />
+              )}
+            </PaginatedList>
+          )}
         </TableWrapper>
       </Container>
     </TableFetchContextProvider>
