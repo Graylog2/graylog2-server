@@ -16,7 +16,6 @@
  */
 package org.graylog2.inputs;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.graylog2.plugin.IOState;
 import org.joda.time.DateTime;
 
@@ -51,6 +50,5 @@ public interface Input {
         return "[" + getType() + "/" + getTitle() + "/" + getId() + "]";
     }
 
-    @JsonIgnore
     Map<String, Object> getFields();
 }
