@@ -63,15 +63,6 @@ const TokenRow = styled.div(
   `,
 );
 
-const InfoText = styled.span(
-  ({ theme }) => css`
-    font-size: ${theme.fonts.size.small};
-    color: ${theme.colors.gray[60]};
-    margin-top: ${theme.spacings.xs};
-    display: block;
-  `,
-);
-
 const ResultsContainer = styled.div(
   ({ theme }) => css`
     margin-top: ${theme.spacings.lg};
