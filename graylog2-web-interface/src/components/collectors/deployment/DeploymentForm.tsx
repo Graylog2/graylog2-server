@@ -19,9 +19,9 @@ import { useState, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 import { Formik, Form } from 'formik';
 
-import { Alert, SegmentedControl } from 'components/bootstrap';
+import { Alert, SegmentedControl, HelpBlock } from 'components/bootstrap';
 import FormSubmit from 'components/common/FormSubmit';
-import { ClipboardButton, FormikInput, Select } from 'components/common';
+import { ClipboardButton, FormikInput, Select, Timestamp } from 'components/common';
 import SectionGrid from 'components/common/Section/SectionGrid';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
@@ -121,7 +121,7 @@ const CollectorsDocsLink = () => (
     href="https://go2docs.graylog.org/current/getting_in_log_data/collectors.htm"
     target="_blank"
     rel="noopener noreferrer">
-    collector installation instructions
+    Collector installation instructions
   </a>
 );
 
@@ -171,12 +171,14 @@ const DeploymentForm = () => {
         <Form>
           <Alert bsStyle="info">
             <strong>How deployment works:</strong> Select a fleet and generate an enrollment token. Then follow the{' '}
-            <CollectorsDocsLink /> to install the collector on your target host &mdash; it will enroll, receive its
+            <CollectorsDocsLink /> to install the Collector on your target host &mdash; it will enroll, receive its
             fleet&apos;s configuration, and start collecting data automatically.
           </Alert>
 
           <Section>
-            <Label>Fleet *</Label>
+            <Label>
+              <strong>Fleet *</strong>
+            </Label>
             <Select
               placeholder="Select a fleet"
               options={fleetOptions}
@@ -191,6 +193,7 @@ const DeploymentForm = () => {
               }}
               clearable={false}
             />
+            <HelpBlock>Collectors enrolled with this token will be assigned to the selected fleet.</HelpBlock>
           </Section>
 
           <Section>
@@ -200,16 +203,15 @@ const DeploymentForm = () => {
               label="Name *"
               name="name"
               placeholder="e.g. Initial Fleet Enrollment"
+              help="A descriptive token name to simplify token management."
               required
             />
           </Section>
 
           <Section>
-            <Label>Token Expiry</Label>
-            <InfoText>
-              How long this token remains valid for new enrollments. Already-enrolled collectors are not affected when a
-              token expires.
-            </InfoText>
+            <Label>
+              <strong>Token Expiry *</strong>
+            </Label>
             <SegmentedControl
               value={values.expiry}
               onChange={(v) => {
@@ -226,6 +228,10 @@ const DeploymentForm = () => {
                 { value: 'never', label: 'No expiry' },
               ]}
             />
+            <HelpBlock>
+              How long this token remains valid for new enrollments. Already-enrolled Collectors are not affected when a
+              token expires.
+            </HelpBlock>
           </Section>
 
           <FormSubmit
@@ -256,17 +262,24 @@ const DeploymentForm = () => {
                   <TokenRow>
                     <CodeInline>{tokenResponse.token.slice(0, 50)}...</CodeInline>
                   </TokenRow>
-                  <InfoText>
-                    Fleet: {fleets?.find((f) => f.id === values.fleetId)?.name} | Expires:{' '}
-                    {tokenResponse.expiresAt ? new Date(tokenResponse.expiresAt).toLocaleString() : 'Never'}
-                  </InfoText>
+                  <HelpBlock>
+                    <ul style={{ paddingLeft: 0 }}>
+                      <li>
+                        <strong>Fleet:</strong> {fleets?.find((f) => f.id === values.fleetId)?.name}
+                      </li>
+                      <li>
+                        <strong>Expires:</strong>{' '}
+                        {tokenResponse.expiresAt ? <Timestamp dateTime={tokenResponse.expiresAt} /> : 'Never'}
+                      </li>
+                    </ul>
+                  </HelpBlock>
                 </ResultSection>
 
                 <ResultSection>
                   <h4>Installation</h4>
                   <p>
                     Copy the enrollment token above, then follow the <CollectorsDocsLink /> to install and enroll the
-                    collector on your target host(s).
+                    Collector on your target host(s).
                   </p>
                 </ResultSection>
               </SectionGrid>
