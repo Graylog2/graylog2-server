@@ -316,6 +316,9 @@ public class IndicesResource extends RestResource {
 
     @GET
     @Path("/outdated")
+    @Operation(summary = "Get a list of indices that were created in a OpenSearch version prior to the recent one")
+    @RequiresPermissions(RestPermissions.INDICES_READ)
+    @Produces(MediaType.APPLICATION_JSON)
     public Set<String> getOutdatedIndices() {
         int currentMajorVersion = Optional.ofNullable(cluster.elasticsearchStats().clusterVersion())
                 .map(version -> StringUtils.substringBefore(version, "."))
