@@ -46,10 +46,16 @@ import java.util.Map;
 /**
  * Processes Windows Event Log receiver messages into GIM format.
  *
- * Field semantics are based on Windows Event Log schema and Microsoft security-auditing event documentation:
- * - System fields: SystemPropertiesType (Provider, EventID, Version, Level, Task, Opcode, Keywords,
- * TimeCreated/SystemTime, EventRecordID, Correlation/ActivityID, Execution, Channel, Computer, Security/UserID)
- * - Security event field references used here: 4624, 4634, 4648, 4672, 4688, 4717, 4718, 4740, 4776, 4798
+ * <p>Handles all Windows Event Log channels (Security, System, Application, etc.).
+ * System-level fields (event_code, host, channel, provider, etc.) are extracted for all events.
+ * Security-relevant EventData fields (Subject/Target user, process, network info) are mapped
+ * to GIM fields. All EventData/UserData entries are additionally serialized into
+ * {@code vendor_event_data}/{@code vendor_user_data} JSON blob fields to preserve the
+ * complete original structure for downstream processing.
+ *
+ * <p>Field naming aligns with Graylog Illuminate conventions. Subject (acting user) maps to
+ * {@code source_user_*}, Target (affected user) maps to {@code user_*}. This mapping is
+ * event-ID-agnostic; Illuminate pipelines refine this per event type.
  *
  * @see <a href="https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/windowseventlogreceiver">windowseventlog receiver</a>
  * @see <a href="https://learn.microsoft.com/en-us/windows/win32/wes/eventschema-systempropertiestype-complextype">SystemPropertiesType</a>
