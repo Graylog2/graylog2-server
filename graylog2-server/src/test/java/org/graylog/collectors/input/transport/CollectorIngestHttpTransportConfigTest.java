@@ -19,6 +19,7 @@ package org.graylog.collectors.input.transport;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.IngestEndpointConfig;
+import org.graylog2.plugin.inputs.transports.AbstractTcpTransport;
 import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -69,5 +70,16 @@ class CollectorIngestHttpTransportConfigTest {
         final var portField = transportConfig.getRequestedConfiguration().getField(NettyTransport.CK_PORT);
 
         assertThat(portField.getAttributes()).contains("is_port_number");
+    }
+
+    @Test
+    void keepAliveIsEnabledByDefault() {
+        when(collectorsConfigService.get()).thenReturn(Optional.empty());
+
+        final var transportConfig = new CollectorIngestHttpTransport.Config(collectorsConfigService);
+        final var keepAliveField = transportConfig.getRequestedConfiguration()
+                .getField(AbstractTcpTransport.CK_TCP_KEEPALIVE);
+
+        assertThat(keepAliveField.getDefaultValue()).isEqualTo(true);
     }
 }

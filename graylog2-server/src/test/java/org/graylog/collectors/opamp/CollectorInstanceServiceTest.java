@@ -16,27 +16,30 @@
  */
 package org.graylog.collectors.opamp;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.model.Filters;
+import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bson.Document;
 import org.graylog.collectors.CollectorInstanceService;
+import org.graylog.collectors.CollectorOSType;
+import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceDTO;
-import org.graylog.grn.GRNRegistry;
+import org.graylog.collectors.db.CollectorInstanceReport;
+import org.graylog.security.pki.Algorithm;
+import org.graylog.security.pki.CertificateBuilder;
+import org.graylog.security.pki.CertificateEntry;
+import org.graylog.testing.TestClocks;
 import org.graylog.testing.mongodb.MongoDBExtension;
-import org.graylog.testing.mongodb.MongoDBTestService;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
-import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 import org.graylog2.security.encryption.EncryptedValueService;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -51,48 +54,44 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 @ExtendWith(MongoDBExtension.class)
 class CollectorInstanceServiceTest {
+    private static final EncryptedValueService encryptedValueService = new EncryptedValueService("abcdef1234567890");
+    private static CertificateBuilder certBuilder;
+    private static CertificateEntry issuerCert;
 
     private CollectorInstanceService collectorInstanceService;
     private MongoCollections mongoCollections;
 
-    @BeforeEach
-    void setUp(MongoDBTestService mongodb) {
-        final EncryptedValueService encryptedValueService = new EncryptedValueService("1234567890abcdef");
-        final ObjectMapper objectMapper = new ObjectMapperProvider(
-                ObjectMapperProvider.class.getClassLoader(),
-                Collections.emptySet(),
-                encryptedValueService,
-                GRNRegistry.createWithBuiltinTypes(),
-                InputConfigurationBeanDeserializerModifier.withoutConfig()
-        ).get();
+    @BeforeAll
+    static void beforeAll() throws Exception {
+        certBuilder = new CertificateBuilder(encryptedValueService, "Graylog", TestClocks.fixedEpoch());
+        final CertificateEntry caCert = certBuilder.createRootCa("Test CA", Algorithm.ED25519, Duration.ofDays(7)).withId("100000000000000000000000");
+        issuerCert = certBuilder.createIntermediateCa("Test Issuer", caCert, Duration.ofDays(5)).withId("200000000000000000000000");
+    }
 
-        mongoCollections = new MongoCollections(
-                new MongoJackObjectMapperProvider(objectMapper),
-                mongodb.mongoConnection()
-        );
-        collectorInstanceService = new CollectorInstanceService(mongoCollections);
+    @BeforeEach
+    void setUp(MongoCollections coll) {
+        mongoCollections = coll;
+        collectorInstanceService = new CollectorInstanceService(coll);
     }
 
     @Test
-    void enrollAssignsIdToNewCollector() {
-        final CollectorInstanceDTO collector = enroll(collectorInstanceService, "instance-uid-1", "sha256:fingerprint1");
+    void enrollAssignsIdToNewCollector() throws Exception {
+        final var collector = enroll("instance-uid-1");
 
         assertThat(collector.id()).isNotNull();
         assertThat(collector.instanceUid()).isEqualTo("instance-uid-1");
-        assertThat(collector.activeCertificateFingerprint()).isEqualTo("sha256:fingerprint1");
-        assertThat(collector.activeCertificateExpiresAt()).isEqualTo(Instant.ofEpochMilli(0).plus(Duration.ofDays(7)));
+        assertThat(collector.activeCertificateFingerprint()).matches("sha256:[a-f0-9]{64}");
+        assertThat(collector.activeCertificateExpiresAt()).isEqualTo(Instant.ofEpochMilli(0).plus(Duration.ofDays(1)));
     }
 
     @Test
-    void findByInstanceUidReturnsCollector() {
-        enroll(collectorInstanceService, "instance-uid-2", "sha256:fingerprint2");
+    void findByInstanceUidReturnsCollector() throws Exception {
+        final var instance = enroll("instance-uid-1");
 
-        final Optional<CollectorInstanceDTO> found = collectorInstanceService.findByInstanceUid("instance-uid-2");
-
-        assertThat(found).isPresent();
-        assertThat(found.get().instanceUid()).isEqualTo("instance-uid-2");
-        assertThat(found.get().activeCertificateFingerprint()).isEqualTo("sha256:fingerprint2");
-        assertThat(found.get().activeCertificateExpiresAt()).isEqualTo(Instant.ofEpochMilli(0).plus(Duration.ofDays(7)));
+        assertThat(collectorInstanceService.findByInstanceUid("instance-uid-1")).hasValueSatisfying(found -> {
+            assertThat(found.instanceUid()).isEqualTo("instance-uid-1");
+            assertThat(found.activeCertificateFingerprint()).isEqualTo(instance.activeCertificateFingerprint());
+        });
     }
 
     @Test
@@ -103,10 +102,10 @@ class CollectorInstanceServiceTest {
     }
 
     @Test
-    void existsByInstanceUidReturnsTrueForExisting() {
-        enroll(collectorInstanceService, "instance-uid-4", "sha256:fingerprint4");
+    void existsByInstanceUidReturnsTrueForExisting() throws Exception {
+        enroll("instance-uid-1");
 
-        final boolean exists = collectorInstanceService.existsByInstanceUid("instance-uid-4");
+        final boolean exists = collectorInstanceService.existsByInstanceUid("instance-uid-1");
 
         assertThat(exists).isTrue();
     }
@@ -119,7 +118,7 @@ class CollectorInstanceServiceTest {
     }
 
     @Test
-    void countByFleetGroupedReturnsPerFleetCounts() {
+    void countByFleetGroupedReturnsPerFleetCounts() throws Exception {
         final Instant now = Instant.now();
         final Instant recentlySeen = now.minusSeconds(30);
         final Instant longAgo = now.minusSeconds(600);
@@ -129,12 +128,12 @@ class CollectorInstanceServiceTest {
         final String fleetB = "507f1f77bcf86cd799439013";
 
         // fleet-a: 3 instances (2 online, 1 offline based on threshold)
-        enrollWithFleetAndLastSeen(collectorInstanceService, "uid-a1", "sha256:fp-a1", fleetA, recentlySeen);
-        enrollWithFleetAndLastSeen(collectorInstanceService, "uid-a2", "sha256:fp-a2", fleetA, recentlySeen);
-        enrollWithFleetAndLastSeen(collectorInstanceService, "uid-a3", "sha256:fp-a3", fleetA, longAgo);
+        enrollWithFleetAndLastSeen("uid-a1", fleetA, recentlySeen);
+        enrollWithFleetAndLastSeen("uid-a2", fleetA, recentlySeen);
+        enrollWithFleetAndLastSeen("uid-a3", fleetA, longAgo);
 
         // fleet-b: 1 instance (1 online)
-        enrollWithFleetAndLastSeen(collectorInstanceService, "uid-b1", "sha256:fp-b1", fleetB, recentlySeen);
+        enrollWithFleetAndLastSeen("uid-b1", fleetB, recentlySeen);
 
         final Map<String, long[]> grouped = collectorInstanceService.countByFleetGrouped(onlineThreshold);
 
@@ -151,10 +150,10 @@ class CollectorInstanceServiceTest {
     }
 
     @Test
-    void findByInstanceUidsReturnsMappedResults() {
-        enroll(collectorInstanceService, "uid-1", "sha256:fp-1");
-        enroll(collectorInstanceService, "uid-2", "sha256:fp-2");
-        enroll(collectorInstanceService, "uid-3", "sha256:fp-3");
+    void findByInstanceUidsReturnsMappedResults() throws Exception {
+        enroll("uid-1");
+        enroll("uid-2");
+        enroll("uid-3");
 
         Map<String, CollectorInstanceDTO> result = collectorInstanceService.findByInstanceUids(Set.of("uid-1", "uid-3"));
 
@@ -171,8 +170,8 @@ class CollectorInstanceServiceTest {
     }
 
     @Test
-    void deleteByInstanceUidDeletesExistingInstance() {
-        enroll(collectorInstanceService, "uid-to-delete", "sha256:fp-delete");
+    void deleteByInstanceUidDeletesExistingInstance() throws Exception {
+        enroll("uid-to-delete");
 
         final boolean deleted = collectorInstanceService.deleteByInstanceUid("uid-to-delete");
 
@@ -188,16 +187,14 @@ class CollectorInstanceServiceTest {
     }
 
     @Test
-    void deleteExpiredRemovesOldInstances() {
+    void deleteExpiredRemovesOldInstances() throws Exception {
         final Instant now = Instant.now();
         final Duration threshold = Duration.ofDays(7);
 
         // Expired: last seen 8 days ago
-        enrollWithFleetAndLastSeen(collectorInstanceService, "uid-expired",
-                "sha256:fp-expired", "507f1f77bcf86cd799439012", now.minus(Duration.ofDays(8)));
+        enrollWithFleetAndLastSeen("uid-expired", "507f1f77bcf86cd799439012", now.minus(Duration.ofDays(8)));
         // Not expired: last seen 3 days ago
-        enrollWithFleetAndLastSeen(collectorInstanceService, "uid-recent",
-                "sha256:fp-recent", "507f1f77bcf86cd799439012", now.minus(Duration.ofDays(3)));
+        enrollWithFleetAndLastSeen("uid-recent", "507f1f77bcf86cd799439012", now.minus(Duration.ofDays(3)));
 
         final long deleted = collectorInstanceService.deleteExpired(threshold);
 
@@ -207,9 +204,9 @@ class CollectorInstanceServiceTest {
     }
 
     @Test
-    void deleteExpiredReturnsZeroWhenNothingToDelete() {
-        enrollWithFleetAndLastSeen(collectorInstanceService, "uid-fresh",
-                "sha256:fp-fresh", "507f1f77bcf86cd799439012", Instant.now());
+    void deleteExpiredReturnsZeroWhenNothingToDelete() throws Exception {
+        enrollWithFleetAndLastSeen("uid-fresh",
+                "507f1f77bcf86cd799439012", Instant.now());
 
         final long deleted = collectorInstanceService.deleteExpired(Duration.ofDays(7));
 
@@ -217,22 +214,22 @@ class CollectorInstanceServiceTest {
     }
 
     @Test
-    void findByActiveOrNextFingerprintMatchesActiveFingerprint() {
-        enroll(collectorInstanceService, "uid-active", "sha256:active-fp");
+    void findByActiveOrNextFingerprintMatchesActiveFingerprint() throws Exception {
+        final var instance = enroll("uid-active");
 
-        final Optional<CollectorInstanceDTO> found = collectorInstanceService.findByActiveOrNextFingerprint("sha256:active-fp");
+        final var found = collectorInstanceService.findByActiveOrNextFingerprint(instance.activeCertificateFingerprint());
 
         assertThat(found).isPresent();
         assertThat(found.get().instanceUid()).isEqualTo("uid-active");
     }
 
     @Test
-    void findByActiveOrNextFingerprintMatchesNextFingerprint() {
-        enroll(collectorInstanceService, "uid-next", "sha256:active-fp-2");
+    void findByActiveOrNextFingerprintMatchesNextFingerprint() throws Exception {
+        enroll("uid-next");
         setNextCertificateFields("uid-next", "sha256:next-fp", "next-cert-pem",
                 Instant.now().plus(Duration.ofDays(30)));
 
-        final Optional<CollectorInstanceDTO> found = collectorInstanceService.findByActiveOrNextFingerprint("sha256:next-fp");
+        final var found = collectorInstanceService.findByActiveOrNextFingerprint("sha256:next-fp");
 
         assertThat(found).isPresent();
         assertThat(found.get().instanceUid()).isEqualTo("uid-next");
@@ -240,8 +237,8 @@ class CollectorInstanceServiceTest {
     }
 
     @Test
-    void findByActiveOrNextFingerprintReturnsEmptyForUnknown() {
-        enroll(collectorInstanceService, "uid-no-match", "sha256:some-fp");
+    void findByActiveOrNextFingerprintReturnsEmptyForUnknown() throws Exception {
+        enroll("uid-no-match");
 
         final Optional<CollectorInstanceDTO> found = collectorInstanceService.findByActiveOrNextFingerprint("sha256:unknown-fp");
 
@@ -249,8 +246,8 @@ class CollectorInstanceServiceTest {
     }
 
     @Test
-    void activateNextCertificatePromotesNextToActive() {
-        enroll(collectorInstanceService, "uid-activate", "sha256:old-active-fp");
+    void activateNextCertificatePromotesNextToActive() throws Exception {
+        enroll("uid-activate");
         final var nextExpiresAt = Instant.now().plus(Duration.ofDays(30));
         setNextCertificateFields("uid-activate", "sha256:new-fp", "new-cert-pem", nextExpiresAt);
 
@@ -274,31 +271,35 @@ class CollectorInstanceServiceTest {
     }
 
     @Test
-    void activateNextCertificateThrowsWhenNextFieldsMissing() {
-        final CollectorInstanceDTO enrolled = enroll(collectorInstanceService, "uid-no-next", "sha256:fp-no-next");
+    void activateNextCertificateThrowsWhenNextFieldsMissing() throws Exception {
+        final CollectorInstanceDTO enrolled = enroll("uid-no-next");
 
         assertThatThrownBy(() -> collectorInstanceService.activateNextCertificate(enrolled))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    void insertNextCertificateSetsNextFields() {
-        enroll(collectorInstanceService, "uid-insert-next", "sha256:active-fp");
-        final Instant nextExpiresAt = Instant.now().plus(Duration.ofDays(30));
+    void insertNextCertificateSetsNextFields() throws Exception {
+        final var instance = enroll("uid-insert-next");
+        final var nextDuration = Duration.ofDays(30);
+        final var nextExpiresAt = Instant.now().plus(nextDuration);
 
-        final boolean result = collectorInstanceService.insertNextCertificate(
-                "uid-insert-next", "sha256:next-fp", "next-cert-pem", nextExpiresAt);
+        final var nextCert = certBuilder.createEndEntityCert("uid-insert-next", issuerCert,
+                KeyUsage.digitalSignature, nextDuration);
+
+        final var result = collectorInstanceService.insertNextCertificate(
+                "uid-insert-next", nextCert.fingerprint(), nextCert.certificate(), nextExpiresAt);
 
         // Verify BSON type is Date, not String
         assertFieldIsDate("uid-insert-next", CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_EXPIRES_AT);
 
         assertThat(result).isTrue();
         final var updated = collectorInstanceService.findByInstanceUid("uid-insert-next").orElseThrow();
-        assertThat(updated.nextCertificateFingerprint()).hasValue("sha256:next-fp");
-        assertThat(updated.nextCertificatePem()).hasValue("next-cert-pem");
+        assertThat(updated.nextCertificateFingerprint()).hasValue(nextCert.fingerprint());
+        assertThat(updated.nextCertificatePem()).hasValue(nextCert.certificate());
         assertThat(updated.nextCertificateExpiresAt()).hasValue(Date.from(nextExpiresAt).toInstant());
         // Active certificate should remain unchanged
-        assertThat(updated.activeCertificateFingerprint()).isEqualTo("sha256:active-fp");
+        assertThat(updated.activeCertificateFingerprint()).isEqualTo(instance.activeCertificateFingerprint());
     }
 
     @Test
@@ -310,8 +311,8 @@ class CollectorInstanceServiceTest {
     }
 
     @Test
-    void insertNextCertificateOverwritesPreviousNextFields() {
-        enroll(collectorInstanceService, "uid-overwrite-next", "sha256:active-fp");
+    void insertNextCertificateOverwritesPreviousNextFields() throws Exception {
+        enroll("uid-overwrite-next");
         final Instant firstExpiresAt = Instant.now().plus(Duration.ofDays(10));
         final Instant secondExpiresAt = Instant.now().plus(Duration.ofDays(20));
 
@@ -329,29 +330,244 @@ class CollectorInstanceServiceTest {
         assertThat(updated.nextCertificateExpiresAt()).hasValue(Date.from(secondExpiresAt).toInstant());
     }
 
-    private static CollectorInstanceDTO enroll(CollectorInstanceService service, String instanceUid, String fingerprint) {
-        return service.enroll(
+    @Test
+    void updateFromReportThrowsForNonExistentInstance() {
+        final var report = CollectorInstanceReport.builder()
+                .instanceUid("new-uid")
+                .messageSeqNum(1L)
+                .capabilities(100L)
+                .build();
+
+        assertThatThrownBy(() -> collectorInstanceService.updateFromReport(report))
+                .hasMessageContaining("enrolled")
+                .isInstanceOf(IllegalArgumentException.class);
+
+        // Does NOT create a new instance document
+        assertThat(collectorInstanceService.findByInstanceUid("new-uid")).isEmpty();
+    }
+
+    @Test
+    void updateFromReportReturnsPreviousState() throws Exception {
+        final var uid = "returning-uid";
+        final var fleetId = "000000000000000000000000";
+
+        // Enroll first so the document exists with a fleet_id
+        enroll(uid);
+
+        // First report — document already exists from enroll, so we get its state back
+        final var firstReport = CollectorInstanceReport.builder()
+                .instanceUid(uid)
+                .messageSeqNum(1L)
+                .capabilities(100L)
+                .lastProcessedTxnSeq(0L)
+                .build();
+        collectorInstanceService.updateFromReport(firstReport);
+
+        // Second report — should return the state written by the first report
+        final var secondReport = CollectorInstanceReport.builder()
+                .instanceUid(uid)
+                .messageSeqNum(2L)
+                .capabilities(200L)
+                .lastProcessedTxnSeq(1L)
+                .build();
+
+        final var previousState = collectorInstanceService.updateFromReport(secondReport);
+
+        assertThat(previousState).isNotNull();
+        assertThat(previousState.messageSeqNum()).isEqualTo(1L);
+        assertThat(previousState.lastProcessTxnSeq()).isEqualTo(0L);
+        assertThat(previousState.fleetId()).isEqualTo(fleetId);
+        assertThat(previousState.osType()).isEqualTo(CollectorOSType.UNKNOWN);
+    }
+
+    @Test
+    void updateFromReportUpdatesExistingDocument() throws Exception {
+        final var uid = "update-uid";
+        enroll(uid);
+
+        final var firstReport = CollectorInstanceReport.builder()
+                .instanceUid(uid)
+                .messageSeqNum(1L)
+                .capabilities(100L)
+                .nonIdentifyingAttributes(List.of(Attribute.of("os.type", "linux")))
+                .lastSeen(Instant.ofEpochSecond(0))
+                .build();
+        final var prevState1 = collectorInstanceService.updateFromReport(firstReport);
+
+        assertThat(prevState1.osType()).isEqualTo(CollectorOSType.UNKNOWN);
+
+        assertThat(collectorInstanceService.findByInstanceUid(uid)).hasValueSatisfying(instance -> {
+            assertThat(instance.messageSeqNum()).isEqualTo(1L);
+            assertThat(instance.capabilities()).isEqualTo(100L);
+            assertThat(instance.nonIdentifyingAttributes()).hasValueSatisfying(attrs -> {
+                assertThat(attrs).extracting(Attribute::key).containsExactly("os.type");
+                assertThat(attrs).extracting(a -> String.valueOf(a.value())).containsExactly("linux");
+            });
+            assertThat(instance.lastSeen()).isEqualTo(Instant.ofEpochSecond(0));
+        });
+
+        final var secondReport = CollectorInstanceReport.builder()
+                .instanceUid(uid)
+                .messageSeqNum(2L)
+                .capabilities(300L)
+                .nonIdentifyingAttributes(List.of(
+                        Attribute.of("os.type", "windows"),
+                        Attribute.of("host.arch", "amd64")
+                ))
+                .lastSeen(Instant.ofEpochSecond(100))
+                .build();
+        final var prevState2 = collectorInstanceService.updateFromReport(secondReport);
+
+        assertThat(prevState2.osType()).isEqualTo(CollectorOSType.LINUX);
+
+        assertThat(collectorInstanceService.findByInstanceUid(uid)).hasValueSatisfying(instance -> {
+            assertThat(instance.messageSeqNum()).isEqualTo(2L);
+            assertThat(instance.capabilities()).isEqualTo(300L);
+            assertThat(instance.nonIdentifyingAttributes()).hasValueSatisfying(attrs -> {
+                assertThat(attrs).extracting(Attribute::key).containsExactly("os.type", "host.arch");
+                assertThat(attrs).extracting(a -> (String) a.value()).containsExactly("windows", "amd64");
+            });
+            assertThat(instance.lastSeen()).isEqualTo(Instant.ofEpochSecond(100));
+        });
+    }
+
+    @Test
+    void updateFromReportDoesNotOverwriteOptionalFieldsWhenAbsent() throws Exception {
+        final var uid = "optional-uid";
+        enroll(uid);
+
+        // First report sets attributes
+        final var firstReport = CollectorInstanceReport.builder()
+                .instanceUid(uid)
+                .lastSeen(Instant.ofEpochSecond(0))
+                .messageSeqNum(1L)
+                .capabilities(100L)
+                .lastProcessedTxnSeq(5L)
+                .identifyingAttributes(List.of(Attribute.of("service.name", "supervisor")))
+                .nonIdentifyingAttributes(List.of(Attribute.of("os.type", "linux")))
+                .build();
+        collectorInstanceService.updateFromReport(firstReport);
+
+        // Second report omits optional fields
+        final var secondReport = CollectorInstanceReport.builder()
+                .instanceUid(uid)
+                .lastSeen(Instant.ofEpochSecond(1))
+                .messageSeqNum(2L)
+                .capabilities(200L)
+                .build();
+        collectorInstanceService.updateFromReport(secondReport);
+
+        // The optional fields from the first report should still be present
+        assertThat(collectorInstanceService.findByInstanceUid(uid)).hasValueSatisfying(instance -> {
+            assertThat(instance.messageSeqNum()).isEqualTo(2L);
+            assertThat(instance.capabilities()).isEqualTo(200L);
+            assertThat(instance.identifyingAttributes())
+                    .hasValueSatisfying(attrs -> assertThat(attrs).containsExactly(Attribute.of("service.name", "supervisor")));
+            assertThat(instance.nonIdentifyingAttributes())
+                    .hasValueSatisfying(attrs -> assertThat(attrs).contains(Attribute.of("os.type", "linux")));
+            assertThat(instance.lastSeen()).isEqualTo(Instant.ofEpochSecond(1));
+            // lastProcessedTxnSeq should remain from the first report since the second didn't set it
+            assertThat(instance.lastProcessedTxnSeq()).isEqualTo(5L);
+        });
+    }
+
+    @Test
+    void updateFromReportStoresLastSeenAsDate() throws Exception {
+        final var uid = "date-uid";
+        enroll(uid);
+
+        final var report = CollectorInstanceReport.builder()
+                .instanceUid("date-uid")
+                .messageSeqNum(1L)
+                .capabilities(100L)
+                .build();
+
+        collectorInstanceService.updateFromReport(report);
+
+        assertFieldIsDate("date-uid", CollectorInstanceDTO.FIELD_LAST_SEEN);
+    }
+
+    @Test
+    void extractOsTypeFromReportReturnsCorrectOs() {
+        final var report = reportWithAttributes(List.of(
+                Attribute.of("host.name", "h1"),
+                Attribute.of("os.type", "linux")
+        ));
+
+        assertThat(CollectorInstanceService.extractOsTypeFromReport(report)).isEqualTo(CollectorOSType.LINUX);
+    }
+
+    @Test
+    void extractOsTypeFromReportReturnsUnknownForUnrecognizedOsType() {
+        final var report = reportWithAttributes(List.of(Attribute.of("os.type", "freebsd")));
+
+        assertThat(CollectorInstanceService.extractOsTypeFromReport(report)).isEqualTo(CollectorOSType.UNKNOWN);
+    }
+
+    @Test
+    void extractOsTypeFromReportReturnsUnknownWhenOsTypeAttributeMissing() {
+        final var report = reportWithAttributes(List.of(
+                Attribute.of("host.name", "h1"),
+                Attribute.of("host.arch", "amd64")
+        ));
+
+        assertThat(CollectorInstanceService.extractOsTypeFromReport(report)).isEqualTo(CollectorOSType.UNKNOWN);
+    }
+
+    @Test
+    void extractOsTypeFromReportReturnsUnknownWhenAttributesAbsent() {
+        final var report = CollectorInstanceReport.builder()
+                .instanceUid("uid-1")
+                .messageSeqNum(1L)
+                .capabilities(0L)
+                .build();
+
+        assertThat(CollectorInstanceService.extractOsTypeFromReport(report)).isEqualTo(CollectorOSType.UNKNOWN);
+    }
+
+    @Test
+    void extractOsTypeFromReportReturnsUnknownWhenAttributesEmpty() {
+        final var report = reportWithAttributes(List.of());
+
+        assertThat(CollectorInstanceService.extractOsTypeFromReport(report)).isEqualTo(CollectorOSType.UNKNOWN);
+    }
+
+    private static CollectorInstanceReport reportWithAttributes(List<Attribute> attributes) {
+        return CollectorInstanceReport.builder()
+                .instanceUid("uid-1")
+                .messageSeqNum(1L)
+                .capabilities(0L)
+                .nonIdentifyingAttributes(attributes)
+                .build();
+    }
+
+    private CollectorInstanceDTO enroll(String instanceUid) throws Exception {
+        final var cert = certBuilder.createEndEntityCert(instanceUid, issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
+
+        return collectorInstanceService.enroll(
                 instanceUid,
-                "507f1f77bcf86cd799439012", // Valid 24-char hex ObjectId
-                fingerprint,
-                "-----BEGIN CERTIFICATE-----\ntest\n-----END CERTIFICATE-----",
-                Date.from(Instant.ofEpochMilli(0).plus(Duration.ofDays(7))),
-                "507f1f77bcf86cd799439011", // Valid 24-char hex ObjectId
+                "000000000000000000000000",
+                cert.fingerprint(),
+                cert.certificate(),
+                Date.from(cert.notAfter()),
+                issuerCert.id(),
                 Instant.now(),
                 "000000000000000000000000"
         );
     }
 
-    private static CollectorInstanceDTO enrollWithFleetAndLastSeen(CollectorInstanceService service,
-                                                                   String instanceUid, String fingerprint,
-                                                                   String fleetId, Instant lastSeen) {
-        return service.enroll(
+    private void enrollWithFleetAndLastSeen(String instanceUid,
+                                            String fleetId,
+                                            Instant lastSeen) throws Exception {
+        final var cert = certBuilder.createEndEntityCert(instanceUid, issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
+
+        collectorInstanceService.enroll(
                 instanceUid,
                 fleetId,
-                fingerprint,
-                "-----BEGIN CERTIFICATE-----\ntest\n-----END CERTIFICATE-----",
-                Date.from(Instant.ofEpochMilli(0).plus(Duration.ofDays(7))),
-                "507f1f77bcf86cd799439011",
+                cert.fingerprint(),
+                cert.certificate(),
+                Date.from(cert.notAfter()),
+                issuerCert.id(),
                 lastSeen,
                 "000000000000000000000000"
         );
