@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Stream;
 import java.util.zip.ZipFile;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -102,22 +103,23 @@ class SupportBundleServiceIT {
 
         // A zip file must have been written to the bundle dir.
         final Path bundleDir = tempDir.resolve("support-bundle");
-        final Optional<Path> zipFile = Files.list(bundleDir)
-                .filter(p -> p.getFileName().toString().endsWith(".zip"))
-                .findFirst();
-        assertThat(zipFile).as("bundle zip file").isPresent();
+        try (final Stream<Path> files = Files.list(bundleDir)) {
+            final Optional<Path> zipFile = files.filter(p -> p.getFileName().toString().endsWith(".zip")).findFirst();
+            assertThat(zipFile).as("bundle zip file").isPresent();
 
-        // The zip must contain errors.json with the collected error.
-        try (final ZipFile zip = new ZipFile(zipFile.get().toFile())) {
-            final var errorsEntry = zip.getEntry("errors.json");
-            assertThat(errorsEntry).as("errors.json entry in bundle zip").isNotNull();
+            // The zip must contain errors.json with the collected error.
+            try (final ZipFile zip = new ZipFile(zipFile.get().toFile())) {
+                final var errorsEntry = zip.getEntry("errors.json");
+                assertThat(errorsEntry).as("errors.json entry in bundle zip").isNotNull();
 
-            final String content = new String(
-                    zip.getInputStream(errorsEntry).readAllBytes(), StandardCharsets.UTF_8);
-            assertThat(content)
-                    .contains("cluster/datanode-info")
-                    .contains("Simulated datanode service failure");
+                final String content = new String(
+                        zip.getInputStream(errorsEntry).readAllBytes(), StandardCharsets.UTF_8);
+                assertThat(content)
+                        .contains("cluster/datanode-info")
+                        .contains("Simulated datanode service failure");
+            }
         }
+
     }
 
     @Test
