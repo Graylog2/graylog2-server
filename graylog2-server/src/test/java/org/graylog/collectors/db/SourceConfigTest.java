@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class SourceConfigTest {
@@ -89,6 +90,15 @@ class SourceConfigTest {
     void fileSourceValidation() {
         final var config = FileSourceConfig.builder().paths(List.of()).readMode(CollectorReadMode.END).build();
         assertThatThrownBy(config::validate).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void windowsEventLogValidation() {
+        final var configInvalid = WindowsEventLogSourceConfig.builder().includeDefaultChannels(false).channels(List.of()).build();
+        assertThatThrownBy(configInvalid::validate).isInstanceOf(IllegalArgumentException.class);
+
+        final WindowsEventLogSourceConfig defaultsEmptyChannels = WindowsEventLogSourceConfig.builder().includeDefaultChannels(true).channels(List.of()).build();
+        assertThatNoException().isThrownBy(defaultsEmptyChannels::validate);
     }
 
 
