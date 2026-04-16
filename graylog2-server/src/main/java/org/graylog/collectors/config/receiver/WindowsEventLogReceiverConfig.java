@@ -21,9 +21,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.collectors.CollectorOSType;
 import org.graylog.collectors.config.GoDurationSerializer;
+import org.graylog.collectors.config.extension.FileStorageExtensionConfig;
 
 import java.time.Duration;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 
@@ -61,6 +64,11 @@ public abstract class WindowsEventLogReceiverConfig implements CollectorReceiver
         return RECEIVER_TYPE;
     }
 
+    @Override
+    public EnumSet<CollectorOSType> osSupport() {
+        return EnumSet.of(CollectorOSType.WINDOWS);
+    }
+
     @JsonIgnore
     public abstract List<String> channels();
 
@@ -95,6 +103,9 @@ public abstract class WindowsEventLogReceiverConfig implements CollectorReceiver
     @JsonProperty("include_log_record_original")
     public abstract boolean includeLogRecordOriginal();
 
+    @JsonProperty("storage")
+    public abstract String storage();
+
     public static Builder builder(String id) {
         return new AutoValue_WindowsEventLogReceiverConfig.Builder()
                 .name(f("windowseventlog/%s", id))
@@ -105,7 +116,8 @@ public abstract class WindowsEventLogReceiverConfig implements CollectorReceiver
                 .pollInterval(Duration.ofSeconds(1))
                 .maxEventsPerPoll(0)
                 .raw(false)
-                .includeLogRecordOriginal(false);
+                .includeLogRecordOriginal(false)
+                .storage(FileStorageExtensionConfig.defaultInstance().name());
     }
 
     @AutoValue.Builder
@@ -127,6 +139,8 @@ public abstract class WindowsEventLogReceiverConfig implements CollectorReceiver
         public abstract Builder raw(boolean raw);
 
         public abstract Builder includeLogRecordOriginal(boolean includeLogRecordOriginal);
+
+        public abstract Builder storage(String storage);
 
         public abstract WindowsEventLogReceiverConfig build();
     }

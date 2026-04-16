@@ -31,8 +31,10 @@ import com.mongodb.client.result.InsertOneResult;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.CollectorInstanceReport;
 import org.graylog2.database.MongoCollection;
@@ -57,11 +59,11 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Updates.set;
-import static com.mongodb.client.model.Updates.setOnInsert;
 import static com.mongodb.client.model.Updates.unset;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_ACTIVE_CERTIFICATE_EXPIRES_AT;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_ACTIVE_CERTIFICATE_FINGERPRINT;
@@ -83,6 +85,7 @@ import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 @Singleton
 public class CollectorInstanceService {
     private static final Logger LOG = LoggerFactory.getLogger(CollectorInstanceService.class);
+    private static final String OS_TYPE_KEY = "os.type";
 
     private final MongoCollection<CollectorInstanceDTO> collection;
     private final MongoPaginationHelper<CollectorInstanceDTO> paginationHelper;
@@ -110,15 +113,16 @@ public class CollectorInstanceService {
     }
 
     /**
-     * Saves an incoming collector instance report and returns the previously saved state if available.
+     * Saves an incoming collector instance report and returns the previously saved state. Throws an exception when
+     * the instance is not enrolled.
      *
-     * @param update the report to save
-     * @return optionally the previous version of the report
+     * @param update the instance report to save
+     * @return the previous saved state
+     * @throws IllegalArgumentException when the instance is not enrolled
      */
-    public Optional<MinimalCollectorInstanceDTO> createOrUpdateFromReport(CollectorInstanceReport update) {
+    public MinimalCollectorInstanceDTO updateFromReport(CollectorInstanceReport update) {
         final List<Bson> updateOps = new ArrayList<>();
 
-        updateOps.add(setOnInsert(FIELD_INSTANCE_UID, update.instanceUid()));
         updateOps.add(set(FIELD_LAST_SEEN, Date.from(update.lastSeen())));
         updateOps.add(set(FIELD_MESSAGE_SEQ_NUM, update.messageSeqNum()));
         updateOps.add(set(FIELD_CAPABILITIES, update.capabilities()));
@@ -136,14 +140,21 @@ public class CollectorInstanceService {
         // to retrieve the previous `message_seq_num`, which we need to determine what to do next.
         // the result is not the full CollectorInstanceDTO as we have it, but the minimal set of fields necessary to
         // determine next steps
-        final MinimalCollectorInstanceDTO previousInstanceDto = projectedCollection.findOneAndUpdate(Filters.eq(FIELD_INSTANCE_UID, update.instanceUid()),
+        final var previousInstanceDto = projectedCollection.findOneAndUpdate(Filters.eq(FIELD_INSTANCE_UID, update.instanceUid()),
                 combine(updateOps),
                 new FindOneAndUpdateOptions()
                         .returnDocument(ReturnDocument.BEFORE)
-                        .projection(Projections.include(FIELD_MESSAGE_SEQ_NUM, FIELD_LAST_PROCESSED_TXN_SEQ, FIELD_FLEET_ID))
-                        .upsert(true));
+                        .projection(Projections.fields(
+                                Projections.include(FIELD_MESSAGE_SEQ_NUM, FIELD_LAST_PROCESSED_TXN_SEQ, FIELD_FLEET_ID),
+                                Projections.elemMatch(FIELD_NON_IDENTIFYING_ATTRIBUTES, Filters.eq(Attribute.FIELD_KEY, OS_TYPE_KEY))
+                        )));
 
-        return Optional.ofNullable(previousInstanceDto);
+        if (previousInstanceDto == null) {
+            // If there was no existing document, the instance was not enrolled.
+            throw new IllegalArgumentException("Instance not enrolled: " + update.instanceUid());
+        }
+
+        return previousInstanceDto;
     }
 
     /**
@@ -332,8 +343,36 @@ public class CollectorInstanceService {
                 .collect(Collectors.toMap(CollectorInstanceDTO::instanceUid, Function.identity()));
     }
 
+    /**
+     * Extracts the {@link CollectorOSType} from the given report.
+     *
+     * @param report the report
+     * @return the operating system type or UNKNOWN when the attribute doesn't exist
+     */
+    public static CollectorOSType extractOsTypeFromReport(CollectorInstanceReport report) {
+        return extractOSType(report.nonIdentifyingAttributes().orElse(List.of()).stream());
+    }
+
+    private static CollectorOSType extractOSType(Stream<Attribute> attributes) {
+        return attributes.filter(a -> OS_TYPE_KEY.equals(a.key()))
+                .map(Attribute::value)
+                .map(String::valueOf)
+                .filter(StringUtils::isNotBlank)
+                .map(CollectorOSType::of)
+                .findFirst()
+                .orElse(CollectorOSType.UNKNOWN);
+    }
+
     public record MinimalCollectorInstanceDTO(@Id @JsonProperty(FIELD_ID) String id,
                                               @JsonProperty(FIELD_FLEET_ID) String fleetId,
                                               @JsonProperty(FIELD_MESSAGE_SEQ_NUM) long messageSeqNum,
-                                              @JsonProperty(FIELD_LAST_PROCESSED_TXN_SEQ) long lastProcessTxnSeq) {}
+                                              @JsonProperty(FIELD_LAST_PROCESSED_TXN_SEQ) long lastProcessTxnSeq,
+                                              @JsonProperty(FIELD_NON_IDENTIFYING_ATTRIBUTES) List<Attribute> nonIdentifyingAttributes) {
+        public CollectorOSType osType() {
+            if (nonIdentifyingAttributes == null) {
+                return CollectorOSType.UNKNOWN;
+            }
+            return extractOSType(nonIdentifyingAttributes.stream());
+        }
+    }
 }
