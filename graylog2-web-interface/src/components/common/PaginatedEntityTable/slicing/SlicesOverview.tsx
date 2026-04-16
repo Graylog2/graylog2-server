@@ -26,8 +26,8 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import SliceFilters, {
   ALPHABETICAL_SORT,
-  defaultSortDirectionForMode,
-  type SortMode,
+  defaultSortDirectionForAttribute,
+  type SortAttribute,
   type SortDirection,
   type SortOption,
 } from './SliceFilters';
@@ -77,7 +77,7 @@ type Props = {
   sliceRenderers?: SliceRenderers;
   fetchSlices: FetchSlices;
   sortOptions: Array<SortOption>;
-  defaultSliceSort?: { mode: string; direction: SortDirection };
+  defaultSliceSort?: { attribute: string; direction: SortDirection };
 };
 
 type UseAutoExpandEmptySlicesArgs = {
@@ -136,9 +136,9 @@ const SlicesOverview = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [nonEmptyPage, setNonEmptyPage] = useState(1);
   const [emptyPage, setEmptyPage] = useState(1);
-  const [sortMode, setSortMode] = useState<SortMode>(defaultSliceSort?.mode ?? ALPHABETICAL_SORT);
+  const [sortAttribute, setSortAttribute] = useState<SortAttribute>(defaultSliceSort?.attribute ?? ALPHABETICAL_SORT);
   const [sortDirection, setSortDirection] = useState<SortDirection>(
-    defaultSliceSort?.direction ?? defaultSortDirectionForMode(defaultSliceSort?.mode ?? ALPHABETICAL_SORT),
+    defaultSliceSort?.direction ?? defaultSortDirectionForAttribute(defaultSliceSort?.attribute ?? ALPHABETICAL_SORT),
   );
   const sendTelemetry = useSendTelemetry();
   const { isLoading, refetchSlices, hasEmptySlices, emptySliceCount, visibleNonEmptySlices, visibleEmptySlices } =
@@ -147,7 +147,7 @@ const SlicesOverview = ({
       activeSlice,
       searchQuery,
       sortDirection,
-      sortMode,
+      sortAttribute,
       sliceRenderers,
     });
 
@@ -161,9 +161,9 @@ const SlicesOverview = ({
     setNonEmptyPage(1);
     setEmptyPage(1);
   };
-  const onSortModeUpdate = (mode: SortMode) => {
-    setSortMode(mode);
-    setSortDirection(defaultSortDirectionForMode(mode));
+  const onSortAttributeUpdate = (attribute: SortAttribute) => {
+    setSortAttribute(attribute);
+    setSortDirection(defaultSortDirectionForAttribute(attribute));
     setNonEmptyPage(1);
     setEmptyPage(1);
   };
@@ -215,8 +215,8 @@ const SlicesOverview = ({
         onSearchQueryChange={onSearchQueryChange}
         onSearchReset={() => onSearchQueryChange('')}
         sortOptions={sortOptions}
-        sortMode={sortMode}
-        onSortModeChange={onSortModeUpdate}
+        sortAttribute={sortAttribute}
+        onSortAttributeChange={onSortAttributeUpdate}
         sortDirection={sortDirection}
         onSortDirectionChange={onSortDirectionUpdate}
       />

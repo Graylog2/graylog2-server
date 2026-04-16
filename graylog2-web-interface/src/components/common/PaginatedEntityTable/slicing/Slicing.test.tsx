@@ -296,6 +296,72 @@ describe('Slicing', () => {
     expect(screen.queryByText('Gamma')).not.toBeInTheDocument();
   });
 
+  describe('slice_sort_default', () => {
+    it('applies the configured sort mode and direction on initial render', async () => {
+      const columnSchemasWithDefault: Array<ColumnSchema> = [
+        {
+          id: 'status',
+          title: 'Status',
+          type: 'STRING' as const,
+          sliceable: true,
+          slice_sort_options: [{ value: 'risk_score', title: 'Risk Score' }],
+          slice_sort_default: { attribute: 'risk_score', direction: 'desc' },
+        },
+      ];
+
+      renderSUT({
+        columnSchemas: columnSchemasWithDefault,
+        fetchSlices: () =>
+          Promise.resolve({
+            slices: [
+              { value: 'Alpha', count: 1, meta: { risk_score: 2 } },
+              { value: 'Beta', count: 1, meta: { risk_score: 10 } },
+            ],
+          }),
+      });
+
+      await screen.findByText('Alpha');
+
+      // sort dropdown should display the default sort mode without user interaction
+      expect(screen.getByRole('button', { name: /risk score/i })).toBeInTheDocument();
+
+      // slices should be ordered by risk_score descending: Beta (10) before Alpha (2)
+      const getItems = () => within(screen.getByTestId('slices-list')).getAllByRole('button');
+      expect(getItems()[0]).toHaveTextContent('Beta');
+      expect(getItems()[1]).toHaveTextContent('Alpha');
+    });
+
+    it('applies the configured direction for alphabetical sort on initial render', async () => {
+      const columnSchemasWithDefault: Array<ColumnSchema> = [
+        {
+          id: 'status',
+          title: 'Status',
+          type: 'STRING' as const,
+          sliceable: true,
+          slice_sort_default: { attribute: 'alphabetical', direction: 'desc' },
+        },
+      ];
+
+      renderSUT({
+        columnSchemas: columnSchemasWithDefault,
+        fetchSlices: () =>
+          Promise.resolve({
+            slices: [
+              { value: 'Alpha', count: 1 },
+              { value: 'Beta', count: 1 },
+            ],
+          }),
+      });
+
+      await screen.findByText('Alpha');
+
+      // slices should be sorted alphabetically descending: Beta before Alpha
+      const getItems = () => within(screen.getByTestId('slices-list')).getAllByRole('button');
+      expect(getItems()[0]).toHaveTextContent('Beta');
+      expect(getItems()[1]).toHaveTextContent('Alpha');
+    });
+  });
+
   it('refetches slices when selecting a slice', async () => {
     const fetchSlices = jest.fn(() =>
       Promise.resolve({
