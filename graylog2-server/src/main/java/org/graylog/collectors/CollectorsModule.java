@@ -104,6 +104,11 @@ public class CollectorsModule extends PluginModule {
 
         // CA
         bind(CollectorCaService.class).in(Scopes.SINGLETON);
+        bind(CollectorCaCache.class).in(Scopes.SINGLETON);
+        bind(CollectorCaKeyManager.class).in(Scopes.SINGLETON);
+        bind(CollectorCaTrustManager.class).in(Scopes.SINGLETON);
+        bind(CollectorTLSUtils.class).in(Scopes.SINGLETON);
+        addInitializer(CollectorCaCache.class);
 
         // Collectors config
         bind(CollectorsConfigService.class).asEagerSingleton();
@@ -139,5 +144,7 @@ public class CollectorsModule extends PluginModule {
                 IndexTemplateProvider.class);
         indexTemplateProviderBinder.addBinding(CollectorLogsIndexTemplateProvider.COLLECTOR_LOGS_TEMPLATE_TYPE)
                 .to(CollectorLogsIndexTemplateProvider.class);
+
+        addTelemetryMetricProvider("Collector Metrics", CollectorMetricsSupplier.class);
     }
 }

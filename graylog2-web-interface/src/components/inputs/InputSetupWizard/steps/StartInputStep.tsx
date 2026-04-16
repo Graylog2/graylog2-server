@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
-import { SystemInputStates } from '@graylog/server-api';
+import { ClusterInputState } from '@graylog/server-api';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -106,22 +106,16 @@ const StartInputStep = () => {
     }),
     [deleteStreamMutation, deletePipelineMutation, deleteRoutingRuleMutation],
   );
+  const mutationsArray = Object.values(stepMutations);
+  const hasError = mutationsArray.some((mutation) => mutation?.isError);
+  const haveAllSucceeded = mutationsArray.every((mutation) => mutation && !mutation.isPending && mutation.isSuccess);
+  let currentStartInputStatus = startInputStatus;
 
-  useEffect(() => {
-    if (!isRollback) {
-      const mutationsArray = Object.entries(stepMutations);
-
-      const hasError = !!mutationsArray.find(([_, mutation]) => mutation.isError);
-
-      const haveAllSucceeded = mutationsArray.every(([_, mutation]) => !mutation.isPending && mutation.isSuccess);
-
-      if (hasError) {
-        setStartInputStatus('FAILED');
-      } else if (haveAllSucceeded) {
-        setStartInputStatus('SUCCESS');
-      }
-    }
-  }, [stepMutations, isRollback]);
+  if (!isRollback && hasError) {
+    currentStartInputStatus = 'FAILED';
+  } else if (!isRollback && haveAllSucceeded) {
+    currentStartInputStatus = 'SUCCESS';
+  }
 
   const createPipeline = async (stream: StreamConfiguration) => {
     const pipeline = {
@@ -137,7 +131,7 @@ const StartInputStep = () => {
 
     if (!input) return;
 
-    SystemInputStates.start(input.id).finally(() => {
+    ClusterInputState.start(input.id).finally(() => {
       setStartInputStatus('SUCCESS');
     });
   };
@@ -147,7 +141,7 @@ const StartInputStep = () => {
 
     if (!input) return;
 
-    SystemInputStates.stop(input.id);
+    ClusterInputState.stop(input.id);
   };
 
   const setupInput = async () => {
@@ -348,7 +342,7 @@ const StartInputStep = () => {
     });
 
   const renderNextButton = () => {
-    if (startInputStatus === 'NOT_STARTED' || startInputStatus === 'ROLLED_BACK') {
+    if (currentStartInputStatus === 'NOT_STARTED' || currentStartInputStatus === 'ROLLED_BACK') {
       return (
         <Button onClick={handleStart} disabled={!isInputStartable()} bsStyle="primary">
           Start Input
@@ -356,9 +350,9 @@ const StartInputStep = () => {
       );
     }
 
-    if (startInputStatus === 'FAILED' || startInputStatus === 'ROLLING_BACK') {
+    if (currentStartInputStatus === 'FAILED' || currentStartInputStatus === 'ROLLING_BACK') {
       return (
-        <Button disabled={startInputStatus === 'ROLLING_BACK'} onClick={handleRollback} bsStyle="primary">
+        <Button disabled={currentStartInputStatus === 'ROLLING_BACK'} onClick={handleRollback} bsStyle="primary">
           Rollback Input
         </Button>
       );
@@ -366,7 +360,7 @@ const StartInputStep = () => {
 
     if (hasNextStep) {
       return (
-        <Button disabled={startInputStatus === 'RUNNING'} onClick={goToInputDiagnosis} bsStyle="primary">
+        <Button disabled={currentStartInputStatus === 'RUNNING'} onClick={goToInputDiagnosis} bsStyle="primary">
           Launch Input Diagnosis
         </Button>
       );
@@ -394,15 +388,15 @@ const StartInputStep = () => {
               <>
                 <StyledHeading>Setting up Input...</StyledHeading>
                 {renderProgressMessages(stepMutations)}
-                {startInputStatus && (
+                {currentStartInputStatus && (
                   <ProgressMessage
                     stepName="result"
                     isLoading={false}
-                    isSuccess={startInputStatus === 'SUCCESS'}
-                    isError={startInputStatus === 'FAILED'}
+                    isSuccess={currentStartInputStatus === 'SUCCESS'}
+                    isError={currentStartInputStatus === 'FAILED'}
                   />
                 )}
-                {isIlluminateFlow && startInputStatus === 'SUCCESS' && <ExtraSetupWizardStep />}
+                {isIlluminateFlow && currentStartInputStatus === 'SUCCESS' && <ExtraSetupWizardStep />}
               </>
             ))}
 

@@ -237,10 +237,18 @@ public class Messages {
                 .mapToLong(Indexable::getSize)
                 .sum();
 
+        final long totalInputSizeOfIndexedMessages = requests.stream()
+                .map(IndexingSuccess::message)
+                .filter(ImmutableMessage.class::isInstance)
+                .map(ImmutableMessage.class::cast)
+                .mapToLong(ImmutableMessage::getInputMessageSize)
+                .sum();
+
         if (isSystemTraffic) {
             trafficAccounting.addSystemTraffic(totalSizeOfIndexedMessages);
         } else {
             trafficAccounting.addOutputTraffic(totalSizeOfIndexedMessages);
+            trafficAccounting.addIndexedInputTraffic(totalInputSizeOfIndexedMessages);
         }
     }
 

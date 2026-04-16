@@ -20,11 +20,13 @@ import { useCallback, useState } from 'react';
 import { Button, ButtonToolbar, DeleteMenuItem, MenuItem } from 'components/bootstrap';
 import { ConfirmDialog, LinkContainer } from 'components/common';
 import { MoreActions } from 'components/common/EntityDataTable';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import ReassignFleetModal from './ReassignFleetModal';
 
 import collectorLogsUrl from '../common/collectorLogsUrl';
 import { useCollectorsMutations } from '../hooks';
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import type { CollectorInstanceView } from '../types';
 
 type Props = {
@@ -36,19 +38,46 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
   const [showReassignModal, setShowReassignModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const { deleteInstance } = useCollectorsMutations();
+  const sendTelemetry = useSendCollectorsTelemetry();
 
   const handleConfirmDelete = useCallback(async () => {
     await deleteInstance(instance.instance_uid);
+    sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.DELETED, {
+      app_action_value: 'instance-delete',
+      instance_id: instance.instance_uid,
+      fleet_id: instance.fleet_id,
+      status: instance.status,
+    });
     setShowDeleteConfirm(false);
-  }, [instance.instance_uid, deleteInstance]);
+  }, [instance, deleteInstance, sendTelemetry]);
 
   return (
     <>
       <ButtonToolbar>
         <LinkContainer to={collectorLogsUrl(instance.instance_uid)}>
-          <Button bsSize="xsmall">View Logs</Button>
+          <Button
+            bsSize="xsmall"
+            onClick={() =>
+              sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.VIEW_LOGS_CLICKED, {
+                app_action_value: 'instance-view-logs',
+                instance_id: instance.instance_uid,
+                fleet_id: instance.fleet_id,
+              })
+            }>
+            View Logs
+          </Button>
         </LinkContainer>
-        <Button bsSize="xsmall" onClick={() => onDetailsClick(instance)}>
+        <Button
+          bsSize="xsmall"
+          onClick={() => {
+            sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.DETAILS_OPENED, {
+              app_action_value: 'instance-details',
+              instance_id: instance.instance_uid,
+              fleet_id: instance.fleet_id,
+              status: instance.status,
+            });
+            onDetailsClick(instance);
+          }}>
           Details
         </Button>
         <MoreActions>

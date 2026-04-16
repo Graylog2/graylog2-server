@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
+import org.graylog.collectors.CollectorReadMode;
 import org.graylog.collectors.config.receiver.CollectorReceiverConfig;
 import org.graylog.collectors.config.receiver.JournaldReceiverConfig;
 
@@ -40,7 +41,7 @@ public abstract class JournaldSourceConfig implements SourceConfig {
     public abstract String type();
 
     @JsonProperty("read_mode")
-    public abstract String readMode();
+    public abstract CollectorReadMode readMode();
 
     @JsonProperty("priority")
     public abstract String priority();
@@ -56,7 +57,6 @@ public abstract class JournaldSourceConfig implements SourceConfig {
     public void validate() {
         try {
             JournaldReceiverConfig.Priority.valueOf(priority().toUpperCase(Locale.ROOT));
-            JournaldReceiverConfig.StartAt.valueOf(readMode().toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("JournaldSourceConfig: " + e.getMessage());
         }
@@ -65,7 +65,7 @@ public abstract class JournaldSourceConfig implements SourceConfig {
     @Override
     public Optional<CollectorReceiverConfig> toReceiverConfig(String id) {
         return Optional.of(JournaldReceiverConfig.builder(id)
-                .startAt(JournaldReceiverConfig.StartAt.valueOf(readMode().toUpperCase(Locale.ROOT)))
+                .startAt(readMode())
                 .priority(JournaldReceiverConfig.Priority.valueOf(priority().toUpperCase(Locale.ROOT)))
                 .matches(matchPattern().map(List::of).orElse(null))
                 .build());
@@ -78,14 +78,14 @@ public abstract class JournaldSourceConfig implements SourceConfig {
             return new AutoValue_JournaldSourceConfig.Builder()
                     .type(TYPE_NAME)
                     .priority("INFO")
-                    .readMode("end");
+                    .readMode(CollectorReadMode.END);
         }
 
         @JsonProperty(TYPE_FIELD)
         public abstract Builder type(String type);
 
         @JsonProperty("read_mode")
-        public abstract Builder readMode(String readMode);
+        public abstract Builder readMode(CollectorReadMode readMode);
 
         @JsonProperty("priority")
         public abstract Builder priority(String priority);
