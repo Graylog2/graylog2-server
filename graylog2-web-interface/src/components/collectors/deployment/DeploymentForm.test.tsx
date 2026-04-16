@@ -122,7 +122,6 @@ describe('DeploymentForm telemetry', () => {
           'Collector Enrollment Token Generated',
           expect.objectContaining({
             fleet_id: 'fleet-1',
-            platform: 'linux',
             expires_in: 'P7D',
             app_action_value: 'deployment-generate',
           }),

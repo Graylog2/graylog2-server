@@ -28,7 +28,6 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { useFleets, useCollectorsMutations } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 
-type Platform = 'linux' | 'windows' | 'macos' | 'container';
 type TokenExpiry = 'PT24H' | 'P7D' | 'P30D' | 'never';
 
 const Section = styled.div(
@@ -42,20 +41,6 @@ const Label = styled.label(
     display: block;
     font-weight: 500;
     margin-bottom: ${theme.spacings.xs};
-  `,
-);
-
-const ScriptBlock = styled.pre(
-  ({ theme }) => css`
-    display: block;
-    padding: ${theme.spacings.md};
-    background: ${theme.colors.global.contentBackground};
-    border: 1px solid ${theme.colors.gray[80]};
-    border-radius: 4px;
-    white-space: pre-wrap;
-    word-break: break-all;
-    font-family: ${theme.fonts.family.monospace};
-    font-size: ${theme.fonts.size.small};
   `,
 );
 
@@ -112,7 +97,6 @@ type TokenResponse = {
 };
 
 type FormValues = {
-  platform: Platform;
   fleetId: string;
   name: string;
   expiry: TokenExpiry;
@@ -131,6 +115,15 @@ const validate = (values: FormValues) => {
 
   return errors;
 };
+
+const CollectorsDocsLink = () => (
+  <a
+    href="https://go2docs.graylog.org/current/getting_in_log_data/collectors.htm"
+    target="_blank"
+    rel="noopener noreferrer">
+    collector installation instructions
+  </a>
+);
 
 const DeploymentForm = () => {
   const { data: fleets } = useFleets();
@@ -152,7 +145,6 @@ const DeploymentForm = () => {
         sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.GENERATED, {
           app_action_value: 'deployment-generate',
           fleet_id: values.fleetId,
-          platform: values.platform,
           expires_in: values.expiry,
         });
 
@@ -167,29 +159,7 @@ const DeploymentForm = () => {
     [createEnrollmentToken, sendTelemetry],
   );
 
-  const getInstallScript = (platform: Platform) => {
-    if (!tokenResponse) return '';
-
-    const { token } = tokenResponse;
-    const scripts: Record<Platform, string> = {
-      linux: `curl -sL https://graylog.example.com/collector/install.sh \\
-  | sudo bash -s -- \\
-  --token "${token}"`,
-      windows: `Invoke-WebRequest -Uri https://graylog.example.com/collector/install.ps1 -OutFile install.ps1
-.\\install.ps1 -Token "${token}"`,
-      macos: `curl -sL https://graylog.example.com/collector/install.sh \\
-  | sudo bash -s -- \\
-  --token "${token}"`,
-      container: `docker run -d \\
-  -e GRAYLOG_TOKEN="${token}" \\
-  graylog/collector:latest`,
-    };
-
-    return scripts[platform];
-  };
-
   const initialValues: FormValues = {
-    platform: 'linux',
     fleetId: '',
     name: '',
     expiry: 'P7D',
@@ -200,23 +170,10 @@ const DeploymentForm = () => {
       {({ isSubmitting, values, setFieldValue }) => (
         <Form>
           <Alert bsStyle="info">
-            <strong>How deployment works:</strong> Select a target platform and fleet, then generate an enrollment
-            token. Run the installation script on your target host &mdash; the collector will enroll, receive its
+            <strong>How deployment works:</strong> Select a fleet and generate an enrollment token. Then follow the{' '}
+            <CollectorsDocsLink /> to install the collector on your target host &mdash; it will enroll, receive its
             fleet&apos;s configuration, and start collecting data automatically.
           </Alert>
-          <Section>
-            <Label>Platform</Label>
-            <SegmentedControl
-              value={values.platform}
-              onChange={(v) => setFieldValue('platform', v)}
-              data={[
-                { value: 'linux', label: 'Linux' },
-                { value: 'windows', label: 'Windows' },
-                { value: 'macos', label: 'macOS' },
-                { value: 'container', label: 'Container' },
-              ]}
-            />
-          </Section>
 
           <Section>
             <Label>Fleet *</Label>
@@ -306,14 +263,11 @@ const DeploymentForm = () => {
                 </ResultSection>
 
                 <ResultSection>
-                  <h4>
-                    Installation Script
-                    <ClipboardButton text={getInstallScript(values.platform)} title="Copy Script" bsSize="xs" />
-                  </h4>
-                  <InfoText>
-                    Run this script on the target host. The collector will download, install, and enroll automatically.
-                  </InfoText>
-                  <ScriptBlock>{getInstallScript(values.platform)}</ScriptBlock>
+                  <h4>Installation</h4>
+                  <p>
+                    Copy the enrollment token above, then follow the <CollectorsDocsLink /> to install and enroll the
+                    collector on your target host(s).
+                  </p>
                 </ResultSection>
               </SectionGrid>
             </ResultsContainer>
