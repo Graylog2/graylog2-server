@@ -34,7 +34,6 @@ class FleetDTOTest {
                 .id("fleet-id-1")
                 .name("My Fleet")
                 .description("A test fleet")
-                .targetVersion("1.2.3")
                 .createdAt(now)
                 .updatedAt(now)
                 .build();
@@ -45,21 +44,7 @@ class FleetDTOTest {
         assertThat(deserialized).isEqualTo(fleet);
         assertThat(deserialized.name()).isEqualTo("My Fleet");
         assertThat(deserialized.description()).isEqualTo("A test fleet");
-        assertThat(deserialized.targetVersion()).isEqualTo("1.2.3");
         assertThat(deserialized.createdAt()).isEqualTo(now);
         assertThat(deserialized.updatedAt()).isEqualTo(now);
-    }
-
-    @Test
-    void nullableTargetVersion() {
-        final var now = Instant.now();
-        final var fleet = FleetDTO.builder()
-                .name("My Fleet")
-                .description("No version set")
-                .createdAt(now)
-                .updatedAt(now)
-                .build();
-
-        assertThat(fleet.targetVersion()).isNull();
     }
 }

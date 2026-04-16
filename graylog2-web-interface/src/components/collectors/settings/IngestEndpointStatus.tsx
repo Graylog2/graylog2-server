@@ -26,9 +26,12 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import useInputMutations from 'hooks/useInputMutations';
 import { isPermitted } from 'util/PermissionsMixin';
 import useInputsStates from 'hooks/useInputsStates';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import { useCollectorInputDetails } from '../hooks';
 import { COLLECTOR_INPUT_IDS_KEY_PREFIX } from '../hooks/useCollectorInputIds';
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
+import { classifyInputBind } from '../hooks/telemetry-helpers';
 
 const SectionTitle = styled.h3(
   ({ theme }) => css`
@@ -46,7 +49,10 @@ const IngestEndpointStatus = ({ defaultPort, isInitialSetup }: Props) => {
   const currentUser = useCurrentUser();
   const { createInput } = useInputMutations();
   const { collectorInputIds, loadedInputs, unreadableCount, isLoading } = useCollectorInputDetails();
-  const { data: inputStates, isLoading: isLoadingInputStates } = useInputsStates({ enabled: collectorInputIds.length > 0 });
+  const { data: inputStates, isLoading: isLoadingInputStates } = useInputsStates({
+    enabled: collectorInputIds.length > 0,
+  });
+  const sendTelemetry = useSendCollectorsTelemetry();
 
   const canCreateInputs = isPermitted(currentUser?.permissions, [
     'inputs:create',
@@ -104,8 +110,8 @@ const IngestEndpointStatus = ({ defaultPort, isInitialSetup }: Props) => {
         )}
         {loadedInputs.length === 0 && unreadableCount > 0 && (
           <p>
-            {unreadableCount} collector ingest {unreadableCount === 1 ? 'input exists' : 'inputs exist'} but you do
-            not have permission to view {unreadableCount === 1 ? 'it' : 'them'}.
+            {unreadableCount} collector ingest {unreadableCount === 1 ? 'input exists' : 'inputs exist'} but you do not
+            have permission to view {unreadableCount === 1 ? 'it' : 'them'}.
           </p>
         )}
         {!isLoadingInputStates && !hasRunningInput && loadedInputs.length > 0 && (
@@ -128,10 +134,31 @@ const IngestEndpointStatus = ({ defaultPort, isInitialSetup }: Props) => {
               {loadedInputs.map((input) => (
                 <tr key={input.id}>
                   <td>{input.title}</td>
-                  <td><InputStateBadge input={input} inputStates={inputStates} /></td>
+                  <td>
+                    <InputStateBadge input={input} inputStates={inputStates} />
+                  </td>
                   <td>{String(input.attributes?.bind_address ?? '')}</td>
                   <td>{String(input.attributes?.port ?? '')}</td>
-                  <td><Link to={`${Routes.SYSTEM.INPUTS}?query=id%3A${input.id}`}>Manage</Link></td>
+                  <td>
+                    <Link
+                      to={`${Routes.SYSTEM.INPUTS}?query=id%3A${input.id}`}
+                      onClick={() => {
+                        const nodeStates = inputStates?.[input.id];
+                        const isRunning = nodeStates
+                          ? Object.values(nodeStates).some((entry) => entry.state === 'RUNNING')
+                          : false;
+
+                        sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SETTINGS.DIAGNOSTICS_OPENED, {
+                          app_action_value: 'manage-input-link',
+                          input_id: input.id,
+                          input_bind_type: classifyInputBind(String(input.attributes?.bind_address ?? '')),
+                          input_port: input.attributes?.port,
+                          input_running: isRunning,
+                        });
+                      }}>
+                      Manage
+                    </Link>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -139,8 +166,7 @@ const IngestEndpointStatus = ({ defaultPort, isInitialSetup }: Props) => {
         )}
         {unreadableCount > 0 && loadedInputs.length > 0 && (
           <p>
-            {unreadableCount} additional {unreadableCount === 1 ? 'input' : 'inputs'} not visible due to
-            permissions.
+            {unreadableCount} additional {unreadableCount === 1 ? 'input' : 'inputs'} not visible due to permissions.
           </p>
         )}
       </Col>

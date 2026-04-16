@@ -37,6 +37,7 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoSequenceService;
 import org.graylog2.plugin.system.NodeId;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -83,6 +84,7 @@ public class FleetTransactionLogService {
                         Indexes.ascending(FIELD_ID)
                 )
         );
+        collection.createIndex(Indexes.ascending(FIELD_CREATED_AT));
     }
 
     public long appendFleetMarker(String fleetId, MarkerType type) {
@@ -254,6 +256,10 @@ public class FleetTransactionLogService {
         }
 
         return new CoalescedActions(recomputeConfig, recomputeIngestConfig, newFleetId, restart, runDiscovery, maxSeq);
+    }
+
+    public long countMarkersSince(Instant since) {
+        return collection.countDocuments(Filters.gte(FIELD_CREATED_AT, since));
     }
 
     // Package-private for test access
