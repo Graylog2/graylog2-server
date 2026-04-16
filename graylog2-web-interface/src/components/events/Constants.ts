@@ -34,6 +34,7 @@ export const commonEventAttributes: Array<Attribute> = [
     sortable: true,
     title: 'Priority',
     type: 'STRING',
+    slice_sort_default: { mode: 'alphabetical', direction: 'desc' },
   },
   {
     id: 'timestamp',
