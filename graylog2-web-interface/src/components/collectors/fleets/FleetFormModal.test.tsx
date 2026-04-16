@@ -154,10 +154,7 @@ describe('FleetFormModal telemetry (create path)', () => {
       expect(onSave).toHaveBeenCalled();
     });
 
-    expect(sendTelemetry).toHaveBeenCalledWith(
-      'Fleet Created',
-      expect.objectContaining({ fleet_id: '' }),
-    );
+    expect(sendTelemetry).toHaveBeenCalledWith('Fleet Created', expect.objectContaining({ fleet_id: '' }));
   });
 
   it('does NOT emit create telemetry in edit mode', async () => {

@@ -101,8 +101,13 @@ const additionalTargetText = (targets: TargetInfo[]) => {
     return <span> and 1 other {targets[0].type}</span>;
   }
 
-  return <span> and {targets.length - 1} other {targets[0].type}s</span>;
-}
+  return (
+    <span>
+      {' '}
+      and {targets.length - 1} other {targets[0].type}s
+    </span>
+  );
+};
 
 const renderDescription = (entry: ActivityEntry) => {
   const sortedTargets = entry.targets.toSorted((a, b) => naturalSortIgnoreCase(a.name, b.name));
@@ -116,25 +121,29 @@ const renderDescription = (entry: ActivityEntry) => {
     case 'CONFIG_CHANGED':
       return (
         <span>
-          Configuration updated for {target.type} {targetLink(target)}{additionalTargetText(sortedTargets)}
+          Configuration updated for {target.type} {targetLink(target)}
+          {additionalTargetText(sortedTargets)}
         </span>
       );
     case 'INGEST_CONFIG_CHANGED':
       return (
         <span>
-          Ingest configuration updated for {target.type} {targetLink(target)}{additionalTargetText(sortedTargets)}
+          Ingest configuration updated for {target.type} {targetLink(target)}
+          {additionalTargetText(sortedTargets)}
         </span>
       );
     case 'RESTART':
       return (
         <span>
-          Restart requested for {target.type} {targetLink(target)}{additionalTargetText(sortedTargets)}
+          Restart requested for {target.type} {targetLink(target)}
+          {additionalTargetText(sortedTargets)}
         </span>
       );
     case 'DISCOVERY_RUN':
       return (
         <span>
-          Discovery run triggered for {target.type} {targetLink(target)}{additionalTargetText(sortedTargets)}
+          Discovery run triggered for {target.type} {targetLink(target)}
+          {additionalTargetText(sortedTargets)}
         </span>
       );
     case 'FLEET_REASSIGNED': {

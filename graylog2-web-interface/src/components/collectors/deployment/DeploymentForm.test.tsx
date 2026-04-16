@@ -176,5 +176,4 @@ describe('DeploymentForm telemetry', () => {
       { timeout: 5000 },
     );
   });
-
 });

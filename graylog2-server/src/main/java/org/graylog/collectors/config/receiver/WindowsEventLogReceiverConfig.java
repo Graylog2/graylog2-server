@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.collectors.CollectorOSType;
+import org.graylog.collectors.CollectorReadMode;
 import org.graylog.collectors.config.GoDurationSerializer;
 import org.graylog.collectors.config.extension.FileStorageExtensionConfig;
 
@@ -53,13 +54,6 @@ public abstract class WindowsEventLogReceiverConfig implements CollectorReceiver
             "Microsoft-Windows-PowerShell/Operational",
             "Windows PowerShell"
     );
-
-    public enum StartAt {
-        @JsonProperty("beginning")
-        BEGINNING,
-        @JsonProperty("end")
-        END
-    }
 
     public String type() {
         return RECEIVER_TYPE;
@@ -96,7 +90,7 @@ public abstract class WindowsEventLogReceiverConfig implements CollectorReceiver
     public abstract int maxEventsPerPoll();
 
     @JsonProperty("start_at")
-    public abstract StartAt startAt();
+    public abstract CollectorReadMode startAt();
 
     @JsonProperty("raw")
     public abstract boolean raw();
@@ -112,7 +106,7 @@ public abstract class WindowsEventLogReceiverConfig implements CollectorReceiver
                 .name(f("windowseventlog/%s", id))
                 .channels(List.of())
                 .includeDefaultChannels(true)
-                .startAt(StartAt.END)
+                .startAt(CollectorReadMode.END)
                 .maxReads(100)
                 .pollInterval(Duration.ofSeconds(1))
                 .maxEventsPerPoll(0)
@@ -129,7 +123,7 @@ public abstract class WindowsEventLogReceiverConfig implements CollectorReceiver
 
         public abstract Builder includeDefaultChannels(boolean includeDefaultChannels);
 
-        public abstract Builder startAt(StartAt startAt);
+        public abstract Builder startAt(CollectorReadMode startAt);
 
         public abstract Builder maxReads(int maxReads);
 

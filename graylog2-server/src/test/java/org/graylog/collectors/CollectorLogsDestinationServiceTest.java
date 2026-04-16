@@ -19,7 +19,6 @@ package org.graylog.collectors;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.graylog.collectors.indexer.CollectorLogsIndexTemplateProvider;
-import org.graylog.collectors.input.CollectorIngestCodec;
 import org.graylog.collectors.input.processor.CollectorLogRecordProcessor;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.entities.ImmutableSystemScope;
@@ -188,7 +187,7 @@ class CollectorLogsDestinationServiceTest {
         final var ruleData = (java.util.Map<String, Object>) mapCaptor.getValue();
 
         assertThat(ruleData.get("stream_id")).hasToString(Stream.COLLECTOR_SYSTEM_LOGS_STREAM_ID);
-        assertThat(ruleData.get("field")).isEqualTo(CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_TYPE);
+        assertThat(ruleData.get("field")).isEqualTo("collector_receiver_type");
         assertThat(ruleData.get("type")).isEqualTo(StreamRuleType.EXACT.toInteger());
         assertThat(ruleData.get("value")).isEqualTo(CollectorLogRecordProcessor.RECEIVER_TYPE);
         assertThat(ruleData.get("inverted")).isEqualTo(false);

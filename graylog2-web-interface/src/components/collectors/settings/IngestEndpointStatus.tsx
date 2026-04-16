@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import styled, { css } from 'styled-components';
 
 import { Button, Alert, Row, Col, Table } from 'components/bootstrap';
@@ -23,13 +22,11 @@ import { Link } from 'components/common';
 import Routes from 'routing/Routes';
 import InputStateBadge from 'components/inputs/InputStateBadge';
 import useCurrentUser from 'hooks/useCurrentUser';
-import useInputMutations from 'hooks/useInputMutations';
 import { isPermitted } from 'util/PermissionsMixin';
 import useInputsStates from 'hooks/useInputsStates';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-import { useCollectorInputDetails } from '../hooks';
-import { COLLECTOR_INPUT_IDS_KEY_PREFIX } from '../hooks/useCollectorInputIds';
+import { useCollectorInputDetails, useCollectorInputMutations } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import { classifyInputBind } from '../hooks/telemetry-helpers';
 
@@ -40,16 +37,16 @@ const SectionTitle = styled.h3(
 );
 
 type Props = {
-  defaultPort: number;
   isInitialSetup: boolean;
 };
 
-const IngestEndpointStatus = ({ defaultPort, isInitialSetup }: Props) => {
-  const queryClient = useQueryClient();
+const IngestEndpointStatus = ({ isInitialSetup }: Props) => {
   const currentUser = useCurrentUser();
-  const { createInput } = useInputMutations();
+  const { createCollectorInput } = useCollectorInputMutations();
   const { collectorInputIds, loadedInputs, unreadableCount, isLoading } = useCollectorInputDetails();
-  const { data: inputStates, isLoading: isLoadingInputStates } = useInputsStates({ enabled: collectorInputIds.length > 0 });
+  const { data: inputStates, isLoading: isLoadingInputStates } = useInputsStates({
+    enabled: collectorInputIds.length > 0,
+  });
   const sendTelemetry = useSendCollectorsTelemetry();
 
   const canCreateInputs = isPermitted(currentUser?.permissions, [
@@ -66,20 +63,7 @@ const IngestEndpointStatus = ({ defaultPort, isInitialSetup }: Props) => {
     return Object.values(nodeStates).some((entry) => entry.state === 'RUNNING');
   });
 
-  const handleCreateInput = async () => {
-    await createInput({
-      input: {
-        title: 'Collector Ingest (HTTP)',
-        type: 'org.graylog.collectors.input.CollectorIngestHttpInput',
-        global: true,
-        configuration: {
-          bind_address: '0.0.0.0',
-          port: defaultPort,
-        },
-      },
-    });
-    await queryClient.invalidateQueries({ queryKey: COLLECTOR_INPUT_IDS_KEY_PREFIX });
-  };
+  const handleCreateInput = () => createCollectorInput();
 
   if (isLoading) {
     return null;
@@ -108,8 +92,8 @@ const IngestEndpointStatus = ({ defaultPort, isInitialSetup }: Props) => {
         )}
         {loadedInputs.length === 0 && unreadableCount > 0 && (
           <p>
-            {unreadableCount} collector ingest {unreadableCount === 1 ? 'input exists' : 'inputs exist'} but you do
-            not have permission to view {unreadableCount === 1 ? 'it' : 'them'}.
+            {unreadableCount} collector ingest {unreadableCount === 1 ? 'input exists' : 'inputs exist'} but you do not
+            have permission to view {unreadableCount === 1 ? 'it' : 'them'}.
           </p>
         )}
         {!isLoadingInputStates && !hasRunningInput && loadedInputs.length > 0 && (
@@ -132,7 +116,9 @@ const IngestEndpointStatus = ({ defaultPort, isInitialSetup }: Props) => {
               {loadedInputs.map((input) => (
                 <tr key={input.id}>
                   <td>{input.title}</td>
-                  <td><InputStateBadge input={input} inputStates={inputStates} /></td>
+                  <td>
+                    <InputStateBadge input={input} inputStates={inputStates} />
+                  </td>
                   <td>{String(input.attributes?.bind_address ?? '')}</td>
                   <td>{String(input.attributes?.port ?? '')}</td>
                   <td>
@@ -162,8 +148,7 @@ const IngestEndpointStatus = ({ defaultPort, isInitialSetup }: Props) => {
         )}
         {unreadableCount > 0 && loadedInputs.length > 0 && (
           <p>
-            {unreadableCount} additional {unreadableCount === 1 ? 'input' : 'inputs'} not visible due to
-            permissions.
+            {unreadableCount} additional {unreadableCount === 1 ? 'input' : 'inputs'} not visible due to permissions.
           </p>
         )}
       </Col>

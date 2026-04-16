@@ -29,7 +29,6 @@ import 'moment-duration-format';
 import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 
-
 type McpConfigState = {
   enable_remote_access: boolean;
   enable_output_schema: boolean;
