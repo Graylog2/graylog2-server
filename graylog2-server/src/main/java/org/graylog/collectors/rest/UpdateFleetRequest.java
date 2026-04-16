@@ -22,6 +22,5 @@ import jakarta.validation.constraints.NotBlank;
 
 public record UpdateFleetRequest(
         @NotBlank @JsonProperty("name") String name,
-        @Nullable @JsonProperty("description") String description,
-        @Nullable @JsonProperty("target_version") String targetVersion) {
+        @Nullable @JsonProperty("description") String description) {
 }

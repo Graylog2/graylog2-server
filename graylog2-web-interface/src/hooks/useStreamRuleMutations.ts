@@ -24,13 +24,7 @@ import UserNotification from 'util/UserNotification';
 type StreamRuleData = Pick<StreamRule, 'field' | 'type' | 'value' | 'inverted' | 'description'>;
 type StreamRuleMutationData = StreamRuleData & Partial<StreamRule>;
 
-const toStreamRuleData = ({
-  field,
-  type,
-  value,
-  inverted,
-  description,
-}: StreamRuleMutationData): StreamRuleData => ({
+const toStreamRuleData = ({ field, type, value, inverted, description }: StreamRuleMutationData): StreamRuleData => ({
   field,
   type,
   value,

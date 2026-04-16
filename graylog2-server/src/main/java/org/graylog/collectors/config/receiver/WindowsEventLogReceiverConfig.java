@@ -21,9 +21,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.collectors.CollectorOSType;
+import org.graylog.collectors.CollectorReadMode;
 import org.graylog.collectors.config.GoDurationSerializer;
+import org.graylog.collectors.config.extension.FileStorageExtensionConfig;
 
 import java.time.Duration;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 
@@ -50,15 +54,13 @@ public abstract class WindowsEventLogReceiverConfig implements CollectorReceiver
             "Windows PowerShell"
     );
 
-    public enum StartAt {
-        @JsonProperty("beginning")
-        BEGINNING,
-        @JsonProperty("end")
-        END
-    }
-
     public String type() {
         return RECEIVER_TYPE;
+    }
+
+    @Override
+    public EnumSet<CollectorOSType> osSupport() {
+        return EnumSet.of(CollectorOSType.WINDOWS);
     }
 
     @JsonIgnore
@@ -87,7 +89,7 @@ public abstract class WindowsEventLogReceiverConfig implements CollectorReceiver
     public abstract int maxEventsPerPoll();
 
     @JsonProperty("start_at")
-    public abstract StartAt startAt();
+    public abstract CollectorReadMode startAt();
 
     @JsonProperty("raw")
     public abstract boolean raw();
@@ -95,17 +97,21 @@ public abstract class WindowsEventLogReceiverConfig implements CollectorReceiver
     @JsonProperty("include_log_record_original")
     public abstract boolean includeLogRecordOriginal();
 
+    @JsonProperty("storage")
+    public abstract String storage();
+
     public static Builder builder(String id) {
         return new AutoValue_WindowsEventLogReceiverConfig.Builder()
                 .name(f("windowseventlog/%s", id))
                 .channels(List.of())
                 .includeDefaultChannels(true)
-                .startAt(StartAt.END)
+                .startAt(CollectorReadMode.END)
                 .maxReads(100)
                 .pollInterval(Duration.ofSeconds(1))
                 .maxEventsPerPoll(0)
                 .raw(false)
-                .includeLogRecordOriginal(false);
+                .includeLogRecordOriginal(false)
+                .storage(FileStorageExtensionConfig.defaultInstance().name());
     }
 
     @AutoValue.Builder
@@ -116,7 +122,7 @@ public abstract class WindowsEventLogReceiverConfig implements CollectorReceiver
 
         public abstract Builder includeDefaultChannels(boolean includeDefaultChannels);
 
-        public abstract Builder startAt(StartAt startAt);
+        public abstract Builder startAt(CollectorReadMode startAt);
 
         public abstract Builder maxReads(int maxReads);
 
@@ -127,6 +133,8 @@ public abstract class WindowsEventLogReceiverConfig implements CollectorReceiver
         public abstract Builder raw(boolean raw);
 
         public abstract Builder includeLogRecordOriginal(boolean includeLogRecordOriginal);
+
+        public abstract Builder storage(String storage);
 
         public abstract WindowsEventLogReceiverConfig build();
     }

@@ -140,10 +140,17 @@ const activeStyles = (themeColors: DefaultTheme['colors'], bsStyle: StyleProps) 
 // Other link styles are defined in e.g. the size specific function
 const linkStyles = css`
   vertical-align: baseline;
+  user-select: text;
 
   &:hover {
     background: transparent;
     text-decoration: underline;
+  }
+
+  .mantine-Button-label {
+    word-break: break-word;
+    white-space: normal;
+    text-align: left;
   }
 `;
 

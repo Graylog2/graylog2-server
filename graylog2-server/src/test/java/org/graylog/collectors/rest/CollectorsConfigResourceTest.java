@@ -16,6 +16,7 @@
  */
 package org.graylog.collectors.rest;
 
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.MultivaluedHashMap;
@@ -49,6 +50,7 @@ import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -360,6 +362,36 @@ class CollectorsConfigResourceTest {
 
         verify(collectorIngestInputService, never()).createInput(any(), any(), any(int.class));
         verify(collectorsConfigService).save(any(CollectorsConfig.class));
+    }
+
+    @Test
+    void createInputDelegatesToServiceUsingSavedConfigPort() throws Exception {
+        final var existingConfig = CollectorsConfig.builder()
+                .caCertId("ca-id")
+                .signingCertId("signing-id")
+                .otlpServerCertId("otlp-id")
+                .tokenSigningKey(new TokenSigningKey(EncryptedValue.createUnset(), "pub", "fp", Instant.now()))
+                .http(new CollectorsConfigRequest.IngestEndpointRequest("host", 14445).toConfig())
+                .collectorOfflineThreshold(CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD)
+                .collectorDefaultVisibilityThreshold(CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD)
+                .collectorExpirationThreshold(CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD)
+                .build();
+        when(collectorsConfigService.get()).thenReturn(Optional.of(existingConfig));
+        when(collectorIngestInputService.getInputIds()).thenReturn(List.of("input-new"));
+
+        final var result = resource.createInput();
+
+        verify(collectorIngestInputService).createInput(any(Subject.class), eq("admin"), eq(14445));
+        assertThat(result.collectorInputIds()).containsExactly("input-new");
+    }
+
+    @Test
+    void createInputFailsWhenNoConfigExists() {
+        when(collectorsConfigService.get()).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> resource.createInput())
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("not been initialized");
     }
 
     private void stubCaService() {
