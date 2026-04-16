@@ -248,20 +248,23 @@ describe('StreamsOverview', () => {
   });
 
   it('should render stream overview table elements from plugins', async () => {
-    const plugin = new PluginManifest({}, {
-      'components.streams.overview.tableElements': [
-        {
-          attributeName: 'data_lake',
-          attributes: [{ id: 'data_lake', title: 'Data Lake' }],
-          columnRenderers: {
-            data_lake: {
-              renderCell: () => 'Preview logs',
-              staticWidth: 'matchHeader',
+    const plugin = new PluginManifest(
+      {},
+      {
+        'components.streams.overview.tableElements': [
+          {
+            attributeName: 'data_lake',
+            attributes: [{ id: 'data_lake', title: 'Data Lake' }],
+            columnRenderers: {
+              data_lake: {
+                renderCell: () => 'Preview logs',
+                staticWidth: 'matchHeader',
+              },
             },
           },
-        },
-      ],
-    });
+        ],
+      },
+    );
 
     PluginStore.register(plugin);
     asMock(useFetchEntities).mockReturnValue(paginatedStreams());

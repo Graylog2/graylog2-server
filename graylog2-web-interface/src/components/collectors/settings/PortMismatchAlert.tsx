@@ -54,8 +54,9 @@ const PortMismatchAlert = ({ formPort, collectorInputs, isLoading }: Props) => {
 
   return (
     <Alert bsStyle="info">
-      Collector ingest inputs exist on different {mismatchedPorts.length === 1 ? 'port' : 'ports'}: {mismatchedPorts.join(', ')}.
-      If the external port differs from an input port, ensure your network routes traffic correctly.
+      Collector ingest inputs exist on different {mismatchedPorts.length === 1 ? 'port' : 'ports'}:{' '}
+      {mismatchedPorts.join(', ')}. If the external port differs from an input port, ensure your network routes traffic
+      correctly.
     </Alert>
   );
 };

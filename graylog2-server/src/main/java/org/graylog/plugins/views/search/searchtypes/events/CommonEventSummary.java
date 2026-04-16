@@ -35,6 +35,7 @@ public interface CommonEventSummary {
     String FIELD_ALERT = "alert";
     String FIELD_EVENT_DEFINITION_ID = "event_definition_id";
 
+    String FIELD_KEY = "key";
     String FIELD_PRIORITY = "priority";
     String FIELD_EVENT_KEYS = "event_keys";
     String FIELD_REPLAY_INFO = "replay_info";
@@ -56,6 +57,10 @@ public interface CommonEventSummary {
 
     @JsonProperty(FIELD_EVENT_DEFINITION_ID)
     String eventDefinitionId();
+
+    @Nullable
+    @JsonProperty(FIELD_KEY)
+    String key();
 
     @JsonProperty(FIELD_PRIORITY)
     Long priority();
