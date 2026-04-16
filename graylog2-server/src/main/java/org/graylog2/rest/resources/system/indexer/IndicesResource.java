@@ -321,9 +321,13 @@ public class IndicesResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Set<String> getOutdatedIndices() {
         int currentMajorVersion = Optional.ofNullable(cluster.elasticsearchStats().clusterVersion())
-                .map(version -> StringUtils.substringBefore(version, "."))
-                .map(Integer::parseInt)
-                .orElseThrow(() -> new ForbiddenException("Cluster version is required"));
+                .map(version -> {
+                    try {
+                        return Integer.parseInt(StringUtils.substringBefore(version, "."));
+                    } catch (NumberFormatException e) {
+                        throw new IllegalStateException("Cluster version cannot be determined: " + version);
+                    }
+                }).orElseThrow(() -> new IllegalStateException("Cluster version cannot be determined: null"));
         return indices.getOutdatedIndices(currentMajorVersion);
     }
 
