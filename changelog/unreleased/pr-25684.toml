@@ -1,0 +1,4 @@
+type = "c"
+message = "Updated Bouncy Castle dependencies to `1.84`."
+
+pulls = ["25684"]
