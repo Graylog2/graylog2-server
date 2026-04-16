@@ -29,20 +29,20 @@ class ResourceProcessorConfigTest {
 
     @Test
     void builderCreatesResourceProcessorName() {
-        final var config = ResourceProcessorConfig.builder("filelog")
+        final var config = ResourceProcessorConfig.builder("file_log")
                 .attributes(List.of(ResourceProcessorConfig.Attribute.upsert("a", "b")))
                 .build();
 
-        assertThat(config.name()).isEqualTo("resource/filelog");
+        assertThat(config.name()).isEqualTo("resource/file_log");
     }
 
     @Test
     void collectorComponentAttributeUsesDefaultKeyAndUpsertAction() {
-        final var attribute = ResourceProcessorConfig.collectorComponentAttribute("filelog");
+        final var attribute = ResourceProcessorConfig.collectorComponentAttribute("file_log");
 
         assertThat(attribute.key()).isEqualTo(CollectorAttributes.COLLECTOR_RECEIVER_TYPE);
         assertThat(attribute.value().isTextual()).isTrue();
-        assertThat(attribute.value().textValue()).isEqualTo("filelog");
+        assertThat(attribute.value().textValue()).isEqualTo("file_log");
         assertThat(attribute.action()).isEqualTo(ResourceProcessorConfig.Action.UPSERT);
     }
 
