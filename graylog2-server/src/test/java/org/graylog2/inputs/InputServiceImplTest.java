@@ -358,6 +358,20 @@ public class InputServiceImplTest {
     }
 
     @Test
+    @MongoDBFixtures("InputServiceImplTest.json")
+    void testAddStaticFieldWithDuplicateKeyReplacesValue() throws Exception {
+        final String inputId = "54e3deadbeefdeadbeef0003";
+        final Input input = inputService.find(inputId);
+
+        // Add a static field with the same key but different value
+        inputService.addStaticField(input, "static_field", "bar");
+
+        // Should have exactly one entry with the new value, not a duplicate
+        final List<Map.Entry<String, String>> fields = inputService.getStaticFields(inputId);
+        assertThat(fields).hasSize(1).isEqualTo(List.of(Map.entry("static_field", "bar")));
+    }
+
+    @Test
     public void findIdsByDesiredState() throws Exception {
         InputImpl stoppedInput = InputImpl.builder()
                 .setTitle("stopped input")
