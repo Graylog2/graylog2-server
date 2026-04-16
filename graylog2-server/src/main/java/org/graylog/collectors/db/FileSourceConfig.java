@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
+import org.graylog.collectors.CollectorReadMode;
 import org.graylog.collectors.config.receiver.CollectorReceiverConfig;
 import org.graylog.collectors.config.receiver.FilelogReceiverConfig;
 
@@ -42,7 +43,7 @@ public abstract class FileSourceConfig implements SourceConfig {
     public abstract List<String> paths();
 
     @JsonProperty("read_mode")
-    public abstract String readMode();
+    public abstract CollectorReadMode readMode();
 
     @Nullable
     @JsonProperty("multiline")
@@ -56,9 +57,6 @@ public abstract class FileSourceConfig implements SourceConfig {
     public void validate() {
         if (paths() == null || paths().isEmpty()) {
             throw new IllegalArgumentException("FileSourceConfig requires at least one path");
-        }
-        if (readMode() == null || readMode().isBlank()) {
-            throw new IllegalArgumentException("FileSourceConfig requires a non-blank read_mode");
         }
     }
 
@@ -75,7 +73,9 @@ public abstract class FileSourceConfig implements SourceConfig {
     public abstract static class Builder {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_FileSourceConfig.Builder().type(TYPE_NAME);
+            return new AutoValue_FileSourceConfig.Builder()
+                    .type(TYPE_NAME)
+                    .readMode(CollectorReadMode.END);
         }
 
         @JsonProperty(TYPE_FIELD)
@@ -85,7 +85,7 @@ public abstract class FileSourceConfig implements SourceConfig {
         public abstract Builder paths(List<String> paths);
 
         @JsonProperty("read_mode")
-        public abstract Builder readMode(String readMode);
+        public abstract Builder readMode(CollectorReadMode readMode);
 
         @JsonProperty("multiline")
         public abstract Builder multiline(@Nullable MultilineConfig multiline);

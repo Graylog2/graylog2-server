@@ -33,11 +33,8 @@ const useStreamsOverviewExtensions = (): {
   };
   expandedSections: { [sectionName: string]: ExpandedSectionRenderer<Stream> };
 } => {
-  const {
-    pluggableColumnRenderers,
-    pluggableAttributes,
-    pluggableExpandedSections,
-  } = usePluggableEntityTableElements<Stream>(null, entityName);
+  const { pluggableColumnRenderers, pluggableAttributes, pluggableExpandedSections } =
+    usePluggableEntityTableElements<Stream>(null, entityName);
   const pluginTableElements = usePluginEntities(streamOverviewTableElementsExport);
 
   return useMemo(
@@ -53,10 +50,7 @@ const useStreamsOverviewExtensions = (): {
           ...pluginTableElements.map(({ attributeName }) => attributeName),
           ...pluggableAttributes.attributeNames,
         ],
-        attributes: [
-          ...pluginTableElements.flatMap(({ attributes }) => attributes),
-          ...pluggableAttributes.attributes,
-        ],
+        attributes: [...pluginTableElements.flatMap(({ attributes }) => attributes), ...pluggableAttributes.attributes],
       },
       expandedSections: pluggableExpandedSections,
     }),

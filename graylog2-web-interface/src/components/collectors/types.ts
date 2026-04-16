@@ -21,7 +21,6 @@ export type Fleet = {
   id: string;
   name: string;
   description?: string;
-  target_version: string | null;
   created_at: string;
   updated_at: string;
 };

@@ -39,17 +39,15 @@ export const useCollectorInputDetails = () => {
   const inputQueries = useQueries({
     queries: readableInputIds.map((id) => ({
       queryKey: ['inputs', id],
-      queryFn: () => onError(
-        SystemInputs.get(id),
-        (error) => {
+      queryFn: () =>
+        onError(SystemInputs.get(id), (error) => {
           if (error instanceof FetchError && error.status === 404) return;
 
           UserNotification.error(
             `Loading collector input details failed with status: ${error}`,
             'Could not load collector input details.',
           );
-        },
-      ),
+        }),
       retry: false,
       refetchOnWindowFocus: true, // override global false — refresh input data when user returns to this tab
     })),
@@ -57,9 +55,7 @@ export const useCollectorInputDetails = () => {
 
   const allQueriesSettled = inputQueries.every((q) => !q.isLoading);
 
-  const loadedInputs = inputQueries
-    .filter((q) => q.isSuccess && q.data)
-    .map((q) => q.data);
+  const loadedInputs = inputQueries.filter((q) => q.isSuccess && q.data).map((q) => q.data);
 
   const unreadableCount = collectorInputIds.length - readableInputIds.length;
 
