@@ -22,7 +22,6 @@ import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import org.graylog.inputs.otel.OTelJournal;
-import org.graylog.schema.AssociatedFields;
 import org.graylog.schema.DestinationFields;
 import org.graylog.schema.EventFields;
 import org.graylog.schema.HostFields;
@@ -75,9 +74,10 @@ class WindowsEventLogRecordProcessorTest {
                 .containsEntry(UserFields.USER_NAME, "TestAdmin")
                 .containsEntry(UserFields.USER_DOMAIN, "WINHOST01")
                 .containsEntry(UserFields.USER_SESSION_ID, "0x25501f9")
-                .containsEntry(AssociatedFields.ASSOCIATED_USER_ID, "S-1-5-18")
-                .containsEntry(AssociatedFields.ASSOCIATED_USER_NAME, "WINHOST01$")
-                .containsEntry(AssociatedFields.ASSOCIATED_SESSION_ID, "0x3e7");
+                .containsEntry(SourceFields.SOURCE_USER_ID, "S-1-5-18")
+                .containsEntry(SourceFields.SOURCE_USER_NAME, "WINHOST01$")
+                .containsEntry(SourceFields.SOURCE_USER_DOMAIN, "TESTWG")
+                .containsEntry(SourceFields.SOURCE_USER_SESSION_ID, "0x3e7");
 
         assertThat(result).doesNotContainKeys(
                 SourceFields.SOURCE_IP,
@@ -104,9 +104,10 @@ class WindowsEventLogRecordProcessorTest {
                 .containsEntry(DestinationFields.DESTINATION_HOSTNAME, "localhost")
                 .containsEntry(UserFields.USER_NAME, "TestAdmin")
                 .containsEntry(UserFields.USER_DOMAIN, "WINHOST01")
-                .containsEntry(AssociatedFields.ASSOCIATED_USER_ID, "S-1-5-18")
-                .containsEntry(AssociatedFields.ASSOCIATED_USER_NAME, "WINHOST01$")
-                .containsEntry(AssociatedFields.ASSOCIATED_SESSION_ID, "0x3e7");
+                .containsEntry(SourceFields.SOURCE_USER_ID, "S-1-5-18")
+                .containsEntry(SourceFields.SOURCE_USER_NAME, "WINHOST01$")
+                .containsEntry(SourceFields.SOURCE_USER_DOMAIN, "TESTWG")
+                .containsEntry(SourceFields.SOURCE_USER_SESSION_ID, "0x3e7");
 
         assertThat(result).doesNotContainKeys(
                 UserFields.USER_ID,
@@ -136,9 +137,10 @@ class WindowsEventLogRecordProcessorTest {
                         "SeImpersonatePrivilege",
                         "SeDelegateSessionUserImpersonatePrivilege"
                 ))
-                .containsEntry(AssociatedFields.ASSOCIATED_USER_ID, "S-1-5-21-1000000000-1000000000-1000000000-500")
-                .containsEntry(AssociatedFields.ASSOCIATED_USER_NAME, "TestAdmin")
-                .containsEntry(AssociatedFields.ASSOCIATED_SESSION_ID, "0x25501f9");
+                .containsEntry(SourceFields.SOURCE_USER_ID, "S-1-5-21-1000000000-1000000000-1000000000-500")
+                .containsEntry(SourceFields.SOURCE_USER_NAME, "TestAdmin")
+                .containsEntry(SourceFields.SOURCE_USER_DOMAIN, "WINHOST01")
+                .containsEntry(SourceFields.SOURCE_USER_SESSION_ID, "0x25501f9");
     }
 
     @Test
@@ -207,9 +209,10 @@ class WindowsEventLogRecordProcessorTest {
                 .containsEntry(UserFields.USER_NAME, "SYSTEM")
                 .containsEntry(UserFields.USER_DOMAIN, "NT AUTHORITY")
                 .containsEntry(UserFields.USER_SESSION_ID, "0x3e7")
-                .containsEntry(AssociatedFields.ASSOCIATED_USER_ID, "S-1-5-18")
-                .containsEntry(AssociatedFields.ASSOCIATED_USER_NAME, "WINSERVER01$")
-                .containsEntry(AssociatedFields.ASSOCIATED_SESSION_ID, "0x3e7");
+                .containsEntry(SourceFields.SOURCE_USER_ID, "S-1-5-18")
+                .containsEntry(SourceFields.SOURCE_USER_NAME, "WINSERVER01$")
+                .containsEntry(SourceFields.SOURCE_USER_DOMAIN, "WORKGROUP")
+                .containsEntry(SourceFields.SOURCE_USER_SESSION_ID, "0x3e7");
 
         assertThat(result).doesNotContainKeys(
                 SourceFields.SOURCE_IP,
@@ -241,9 +244,10 @@ class WindowsEventLogRecordProcessorTest {
                         "SeImpersonatePrivilege",
                         "SeDelegateSessionUserImpersonatePrivilege"
                 ))
-                .containsEntry(AssociatedFields.ASSOCIATED_USER_ID, "S-1-5-18")
-                .containsEntry(AssociatedFields.ASSOCIATED_USER_NAME, "SYSTEM")
-                .containsEntry(AssociatedFields.ASSOCIATED_SESSION_ID, "0x3e7");
+                .containsEntry(SourceFields.SOURCE_USER_ID, "S-1-5-18")
+                .containsEntry(SourceFields.SOURCE_USER_NAME, "SYSTEM")
+                .containsEntry(SourceFields.SOURCE_USER_DOMAIN, "NT AUTHORITY")
+                .containsEntry(SourceFields.SOURCE_USER_SESSION_ID, "0x3e7");
     }
 
     @Test
@@ -302,8 +306,9 @@ class WindowsEventLogRecordProcessorTest {
                 .containsEntry(EventFields.EVENT_CODE, 16977L)
                 .containsEntry(EVENT_ID, "16977")
                 .containsEntry(VendorFields.VENDOR_SUBTYPE, "Microsoft-Windows-Directory-Services-SAM")
-                .containsEntry(AssociatedFields.ASSOCIATED_USER_ID, "S-1-5-18")
-                .containsEntry(AssociatedFields.ASSOCIATED_USER_NAME, "SYSTEM");
+                .containsEntry(SourceFields.SOURCE_USER_ID, "S-1-5-18")
+                .containsEntry(SourceFields.SOURCE_USER_NAME, "SYSTEM")
+                .containsEntry(SourceFields.SOURCE_USER_DOMAIN, "NT AUTHORITY");
     }
 
     @Test
@@ -318,8 +323,9 @@ class WindowsEventLogRecordProcessorTest {
                 .containsEntry(EventFields.EVENT_CODE, 104L)
                 .containsEntry(EVENT_ID, "104")
                 .containsEntry(VendorFields.VENDOR_SUBTYPE, "Microsoft-Windows-Eventlog")
-                .containsEntry(AssociatedFields.ASSOCIATED_USER_ID, "S-1-5-21-1000000000-2000000000-3000000000-500")
-                .containsEntry(AssociatedFields.ASSOCIATED_USER_NAME, "Administrator");
+                .containsEntry(SourceFields.SOURCE_USER_ID, "S-1-5-21-1000000000-2000000000-3000000000-500")
+                .containsEntry(SourceFields.SOURCE_USER_NAME, "Administrator")
+                .containsEntry(SourceFields.SOURCE_USER_DOMAIN, "winserver03");
     }
 
     @Test
@@ -340,9 +346,10 @@ class WindowsEventLogRecordProcessorTest {
                 .containsEntry(ProcessFields.PROCESS_NAME, "cmd.exe")
                 .containsEntry(ProcessFields.PROCESS_PARENT_PATH, "C:\\Windows\\System32\\services.exe")
                 .containsEntry(ProcessFields.PROCESS_PARENT_NAME, "services.exe")
-                .containsEntry(AssociatedFields.ASSOCIATED_USER_ID, "S-1-5-18")
-                .containsEntry(AssociatedFields.ASSOCIATED_USER_NAME, "TESTHOST01$")
-                .containsEntry(AssociatedFields.ASSOCIATED_SESSION_ID, "0x3e7");
+                .containsEntry(SourceFields.SOURCE_USER_ID, "S-1-5-18")
+                .containsEntry(SourceFields.SOURCE_USER_NAME, "TESTHOST01$")
+                .containsEntry(SourceFields.SOURCE_USER_DOMAIN, "WORKGROUP")
+                .containsEntry(SourceFields.SOURCE_USER_SESSION_ID, "0x3e7");
     }
 
     private static OTelJournal.Log wrapLogRecord(LogRecord logRecord) {

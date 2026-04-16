@@ -19,7 +19,6 @@ package org.graylog.collectors.input.processor;
 import com.google.common.net.InetAddresses;
 import io.opentelemetry.proto.common.v1.AnyValue;
 import org.graylog.inputs.otel.OTelJournal;
-import org.graylog.schema.AssociatedFields;
 import org.graylog.schema.DestinationFields;
 import org.graylog.schema.EventFields;
 import org.graylog.schema.HostFields;
@@ -146,10 +145,10 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
         putByPrecedence(result, UserFields.USER_DOMAIN, fields.targetDomainName);
         putByPrecedence(result, UserFields.USER_SESSION_ID, fields.targetLogonId);
 
-        putByPrecedence(result, AssociatedFields.ASSOCIATED_USER_ID, fields.subjectUserSid, fields.securityUserId);
-        putByPrecedence(result, AssociatedFields.ASSOCIATED_USER_NAME, fields.subjectUserName, fields.securityUserName);
-        // Unmapped: associated_user_domain (not in GIM) - sources: subjectDomainName, securityDomain
-        putByPrecedence(result, AssociatedFields.ASSOCIATED_SESSION_ID, fields.subjectLogonId);
+        putByPrecedence(result, SourceFields.SOURCE_USER_ID, fields.subjectUserSid, fields.securityUserId);
+        putByPrecedence(result, SourceFields.SOURCE_USER_NAME, fields.subjectUserName, fields.securityUserName);
+        putByPrecedence(result, SourceFields.SOURCE_USER_DOMAIN, fields.subjectDomainName, fields.securityDomain);
+        putByPrecedence(result, SourceFields.SOURCE_USER_SESSION_ID, fields.subjectLogonId);
 
         putByPrecedence(result, SourceFields.SOURCE_HOSTNAME, fields.workstationName, fields.workstation);
         putIfPresent(result, SourceFields.SOURCE_IP, validIp(fields.ipAddress));
