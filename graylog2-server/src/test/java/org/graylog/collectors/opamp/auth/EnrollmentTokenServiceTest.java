@@ -361,6 +361,65 @@ class EnrollmentTokenServiceTest {
     }
 
     @Test
+    void getStatsReturnsZerosForEmptyCollection() {
+        final var stats = enrollmentTokenService.getStats();
+
+        assertThat(stats.count()).isEqualTo(0);
+        assertThat(stats.totalUsage()).isEqualTo(0);
+        assertThat(stats.expired()).isEqualTo(0);
+    }
+
+    @Test
+    void getStatsReturnsCorrectCountsAndUsage() {
+        // Create 3 tokens, increment usage on two of them
+        final var t1 = enrollmentTokenService.createToken(
+                new CreateEnrollmentTokenRequest("token-1", "fleet-1", Duration.ofDays(1)), TEST_CREATOR);
+        final var t2 = enrollmentTokenService.createToken(
+                new CreateEnrollmentTokenRequest("token-2", "fleet-1", Duration.ofDays(1)), TEST_CREATOR);
+        enrollmentTokenService.createToken(
+                new CreateEnrollmentTokenRequest("token-3", "fleet-2", null), TEST_CREATOR);
+
+        enrollmentTokenService.incrementUsage(t1.id());
+        enrollmentTokenService.incrementUsage(t1.id());
+        enrollmentTokenService.incrementUsage(t2.id());
+
+        final var stats = enrollmentTokenService.getStats();
+
+        assertThat(stats.count()).isEqualTo(3);
+        assertThat(stats.totalUsage()).isEqualTo(3);
+        assertThat(stats.expired()).isEqualTo(0);
+    }
+
+    @Test
+    void getStatsCountsExpiredTokens() {
+        // Token that expires in 1 hour
+        enrollmentTokenService.createToken(
+                new CreateEnrollmentTokenRequest("expires-soon", "fleet-1", Duration.ofHours(1)), TEST_CREATOR);
+        // Token that expires in 2 days
+        enrollmentTokenService.createToken(
+                new CreateEnrollmentTokenRequest("expires-later", "fleet-1", Duration.ofDays(2)), TEST_CREATOR);
+        // Token that never expires
+        enrollmentTokenService.createToken(
+                new CreateEnrollmentTokenRequest("no-expiry", "fleet-1", null), TEST_CREATOR);
+
+        // Advance clock by 2 hours — first token should be expired
+        mutableClock.add(Duration.ofHours(2));
+
+        final var stats = enrollmentTokenService.getStats();
+
+        assertThat(stats.count()).isEqualTo(3);
+        assertThat(stats.expired()).isEqualTo(1);
+
+        // Advance clock by 2 more days — second token also expired now
+        mutableClock.add(Duration.ofDays(2));
+
+        final var stats2 = enrollmentTokenService.getStats();
+
+        assertThat(stats2.count()).isEqualTo(3);
+        assertThat(stats2.expired()).isEqualTo(2);
+    }
+
+    @Test
     void incrementUsageUpdatesCountAndLastUsed() {
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
                 TEST_TOKEN_NAME,
