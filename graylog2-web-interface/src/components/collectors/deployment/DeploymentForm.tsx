@@ -134,7 +134,7 @@ const DeploymentForm = () => {
   const fleetOptions = (fleets || []).map((f) => ({ value: f.id, label: f.name }));
 
   const handleSubmit = useCallback(
-    async (values: FormValues) => {
+    async (values: FormValues, { resetForm }) => {
       try {
         const response = await createEnrollmentToken({
           name: values.name,
@@ -152,6 +152,8 @@ const DeploymentForm = () => {
           token: response.token,
           expiresAt: response.expires_at,
         });
+
+        resetForm();
       } catch {
         // Error notification handled by useCollectorsMutations onError callback
       }
