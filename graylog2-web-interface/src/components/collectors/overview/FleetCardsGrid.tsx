@@ -65,10 +65,9 @@ const FleetCardsGrid = ({ fleets, filter }: Props) => {
     return (
       <EmptyEntity title="No fleets yet">
         <p>
-          Fleets let you manage groups of collectors with shared configuration.
-          Create your first fleet, then add sources to define what data its collectors should collect.
-          Once configured, <Link to={Routes.SYSTEM.COLLECTORS.DEPLOYMENT}>deploy collectors</Link> using
-          an enrollment token.
+          Fleets let you manage groups of collectors with shared configuration. Create your first fleet, then add
+          sources to define what data its collectors should collect. Once configured,{' '}
+          <Link to={Routes.SYSTEM.COLLECTORS.DEPLOYMENT}>deploy collectors</Link> using an enrollment token.
         </p>
         <Button bsStyle="success" onClick={() => history.push(Routes.SYSTEM.COLLECTORS.FLEETS)}>
           Create Fleet

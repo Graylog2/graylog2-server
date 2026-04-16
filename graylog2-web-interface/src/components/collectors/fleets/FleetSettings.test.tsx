@@ -45,11 +45,11 @@ describe('FleetSettings telemetry', () => {
   it('emits FLEET.UPDATED on successful save', async () => {
     const onSave = jest.fn().mockResolvedValue(undefined);
     render(<FleetSettings fleet={fleet as never} onSave={onSave} />);
-    
+
     const nameInput = screen.getByLabelText(/Fleet Name/i) as HTMLInputElement;
     await userEvent.clear(nameInput);
     await userEvent.type(nameInput, 'web-v2');
-    
+
     const saveButton = screen.getByRole('button', { name: /Save changes/i });
     fireEvent.click(saveButton);
 
@@ -66,10 +66,10 @@ describe('FleetSettings telemetry', () => {
   it('emits FLEET.DELETED on confirmed delete', async () => {
     const onDelete = jest.fn().mockResolvedValue(undefined);
     render(<FleetSettings fleet={fleet as never} onSave={jest.fn()} onDelete={onDelete} />);
-    
+
     const deleteButton = screen.getByRole('button', { name: /Delete Fleet/i });
     await userEvent.click(deleteButton);
-    
+
     const confirmButton = screen.getByRole('button', { name: /Confirm/i });
     fireEvent.click(confirmButton);
 

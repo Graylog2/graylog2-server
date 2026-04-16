@@ -73,8 +73,7 @@ const EnterpriseGraphComponent = () => {
   const currentUser = useCurrentUser();
 
   return React.createElement(
-    (isPermitted(currentUser.permissions, ['licenses:read']) && licensePlugin[0]?.TrafficGraph) ||
-      ClusterTrafficGraph,
+    (isPermitted(currentUser.permissions, ['licenses:read']) && licensePlugin[0]?.TrafficGraph) || ClusterTrafficGraph,
   );
 };
 
@@ -85,7 +84,6 @@ type Props = {
 };
 
 const GraylogClusterOverview = ({ layout = 'default', children = null, showLicenseGraph = false }: Props) => {
-
   if (layout === 'compact') {
     return (
       <GraphDaysContextProvider>

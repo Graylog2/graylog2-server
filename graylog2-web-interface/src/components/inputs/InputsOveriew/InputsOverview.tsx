@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import * as Immutable from 'immutable';
 
 import type { NodeInfo } from 'stores/nodes/NodesStore';
-import { keyFn, fetchInputs } from 'hooks/usePaginatedInputs';
+import { KEY_PREFIX, fetchInputs } from 'hooks/usePaginatedInputs';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import QueryHelper from 'components/common/QueryHelper';
 import CreateInputControl from 'components/inputs/CreateInputControl';
@@ -44,15 +44,30 @@ type Input = {
 
 type Props = {
   node?: NodeInfo;
+  global?: boolean;
   inputTypes: InputTypesSummary;
   inputTypeDescriptions: InputTypeDescriptionsResponse;
+  entityTableId?: string;
+  withoutURLParams?: boolean;
 };
 
 const entityName = 'input';
 
-const InputsOverview = ({ node = undefined, inputTypeDescriptions, inputTypes }: Props) => {
+const InputsOverview = ({
+  node = undefined,
+  global = undefined,
+  inputTypeDescriptions,
+  inputTypes,
+  entityTableId = undefined,
+  withoutURLParams = false,
+}: Props) => {
   const { data: inputStates } = useInputsStates();
   const { tableLayout, additionalAttributes } = getInputsTableElements();
+  const resolvedTableLayout = entityTableId ? { ...tableLayout, entityTableId } : tableLayout;
+  const resolvedKeyFn = useCallback(
+    (searchParams: SearchParams) => [...KEY_PREFIX, entityTableId ?? tableLayout.entityTableId, searchParams],
+    [entityTableId, tableLayout.entityTableId],
+  );
   const { entityActions, expandedSections } = useTableElements({
     inputTypes,
     inputTypeDescriptions,
@@ -63,6 +78,8 @@ const InputsOverview = ({ node = undefined, inputTypeDescriptions, inputTypes }:
 
     if (node) {
       optionsCopy.filters = Immutable.OrderedMap(options.filters).set('node_id', [node.node_id]);
+    } else if (global) {
+      optionsCopy.filters = Immutable.OrderedMap(options.filters).set('global', ['true']);
     }
 
     return fetchInputs(optionsCopy);
@@ -70,7 +87,7 @@ const InputsOverview = ({ node = undefined, inputTypeDescriptions, inputTypes }:
 
   return (
     <div>
-      {!node && (
+      {!node && !global && (
         <IfPermitted permissions="inputs:create">
           <CreateInputControl />
         </IfPermitted>
@@ -80,11 +97,12 @@ const InputsOverview = ({ node = undefined, inputTypeDescriptions, inputTypes }:
         additionalAttributes={additionalAttributes}
         queryHelpComponent={<QueryHelper entityName={entityName} />}
         entityActions={entityActions}
-        tableLayout={tableLayout}
+        tableLayout={resolvedTableLayout}
         fetchEntities={fetchEntities}
         expandedSectionRenderers={expandedSections}
-        keyFn={keyFn}
+        keyFn={resolvedKeyFn}
         bulkSelection={undefined}
+        withoutURLParams={withoutURLParams}
         entityAttributesAreCamelCase={false}
         filterValueRenderers={{}}
         columnRenderers={columnRenderers}

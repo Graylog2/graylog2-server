@@ -85,7 +85,7 @@ const FleetFormModal = ({ fleet = undefined, onClose, onSave }: Props) => {
         description: values.description,
       }).then((saved) => {
         if (!isEdit) {
-          const createdId = (saved && 'id' in saved) ? saved.id ?? '' : '';
+          const createdId = saved && 'id' in saved ? (saved.id ?? '') : '';
           sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.FLEET.CREATED, {
             app_action_value: 'fleet-create-submit',
             fleet_id: createdId,
@@ -103,31 +103,31 @@ const FleetFormModal = ({ fleet = undefined, onClose, onSave }: Props) => {
           formStateRef.current = { dirty, touched };
 
           return (
-          <Form>
-            <Modal.Header>
-              <Modal.Title>{isEdit ? 'Edit Fleet' : 'New Fleet'}</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <FormikInput id="fleet-name" label="Name" name="name" help="A unique name for this fleet" required />
-              <FormikInput
-                id="fleet-description"
-                label="Description"
-                name="description"
-                type="textarea"
-                help="Optional description of this fleet's purpose"
-              />
-            </Modal.Body>
-            <Modal.Footer>
-              <ModalSubmit
-                submitButtonText={isEdit ? 'Update fleet' : 'Create fleet'}
-                submitLoadingText={isEdit ? 'Updating...' : 'Creating...'}
-                onCancel={handleClose}
-                disabledSubmit={isValidating || !isValid}
-                isSubmitting={isSubmitting}
-                isAsyncSubmit
-              />
-            </Modal.Footer>
-          </Form>
+            <Form>
+              <Modal.Header>
+                <Modal.Title>{isEdit ? 'Edit Fleet' : 'New Fleet'}</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <FormikInput id="fleet-name" label="Name" name="name" help="A unique name for this fleet" required />
+                <FormikInput
+                  id="fleet-description"
+                  label="Description"
+                  name="description"
+                  type="textarea"
+                  help="Optional description of this fleet's purpose"
+                />
+              </Modal.Body>
+              <Modal.Footer>
+                <ModalSubmit
+                  submitButtonText={isEdit ? 'Update fleet' : 'Create fleet'}
+                  submitLoadingText={isEdit ? 'Updating...' : 'Creating...'}
+                  onCancel={handleClose}
+                  disabledSubmit={isValidating || !isValid}
+                  isSubmitting={isSubmitting}
+                  isAsyncSubmit
+                />
+              </Modal.Footer>
+            </Form>
           );
         }}
       </Formik>

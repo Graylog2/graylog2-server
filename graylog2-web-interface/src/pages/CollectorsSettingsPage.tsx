@@ -31,8 +31,8 @@ const CollectorsSettingsPage = () => (
         </>
       }>
       <span>
-        Configure the endpoints and lifecycle settings for managed collectors. Collectors connect to these
-        endpoints to receive configuration updates and send collected log data.
+        Configure the endpoints and lifecycle settings for managed collectors. Collectors connect to these endpoints to
+        receive configuration updates and send collected log data.
       </span>
     </PageHeader>
     <CollectorsSettings />
