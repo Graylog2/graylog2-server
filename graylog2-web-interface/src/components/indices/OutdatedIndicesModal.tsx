@@ -41,9 +41,9 @@ const OutdatedIndicesModal = ({ show, onClose }: Props) => {
             {outdatedIndices.length > 0 ? (
               <>
                 <Alert bsStyle="info">
-                  Found <strong>{outdatedIndices.length}</strong> {outdatedIndices.length === 1 ? 'index' : 'indices'} that were
-                  created with a previous version of OpenSearch. These indices may need to be re-indexed for compatibility
-                  with future OpenSearch versions.
+                  Found <strong>{outdatedIndices.length}</strong> {outdatedIndices.length === 1 ? 'index' : 'indices'}{' '}
+                  that were created with a previous major version of OpenSearch. These indices may need to be re-indexed
+                  for compatibility with future OpenSearch major versions.
                 </Alert>
                 <ul>
                   {outdatedIndices.map((index) => (
@@ -53,7 +53,7 @@ const OutdatedIndicesModal = ({ show, onClose }: Props) => {
               </>
             ) : (
               <Alert bsStyle="success">
-                All indices are up to date. No indices created with previous versions of OpenSearch were found.
+                All indices are up to date. No indices created with previous major versions of OpenSearch were found.
               </Alert>
             )}
           </>
