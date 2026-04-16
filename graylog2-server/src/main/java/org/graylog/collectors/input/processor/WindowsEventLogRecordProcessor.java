@@ -50,8 +50,8 @@ import java.util.Map;
  * System-level fields (event_code, host, channel, provider, etc.) are extracted for all events.
  * Security-relevant EventData fields (Subject/Target user, process, network info) are mapped
  * to GIM fields. All EventData/UserData entries are additionally serialized into
- * {@code vendor_event_data}/{@code vendor_user_data} JSON blob fields to preserve the
- * complete original structure for downstream processing.
+ * {@code vendor_event_data} as a JSON blob field to preserve the complete original
+ * structure for downstream processing.
  *
  * <p>Field naming aligns with Graylog Illuminate conventions. Subject (acting user) maps to
  * {@code source_user_*}, Target (affected user) maps to {@code user_*}. This mapping is
@@ -73,7 +73,6 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
     private static final String VENDOR_EVENT_SUBSTATUS = "vendor_event_substatus";
     private static final String USER_SESSION_UID = "user_session_uid";
     private static final String VENDOR_EVENT_DATA = "vendor_event_data";
-    private static final String VENDOR_USER_DATA = "vendor_user_data";
 
     @Override
     public Map<String, Object> process(OTelJournal.Log log) {
@@ -195,7 +194,6 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
         putIfPresent(result, USER_SESSION_UID, fields.logonGuid);
 
         putIfPresent(result, VENDOR_EVENT_DATA, fields.vendorEventDataJson);
-        putIfPresent(result, VENDOR_USER_DATA, fields.vendorUserDataJson);
 
         return result;
     }
@@ -377,8 +375,8 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
             return;
         }
 
-        // Serialize ALL user_data to JSON blob (preserves full original structure)
-        fields.vendorUserDataJson = serializeKvListToJson(value.getKvlistValue().getValuesList());
+        // Serialize user_data to vendor_event_data (same field as event_data; they're mutually exclusive)
+        fields.vendorEventDataJson = serializeKvListToJson(value.getKvlistValue().getValuesList());
 
         for (final var kv : value.getKvlistValue().getValuesList()) {
             switch (kv.getKey()) {
@@ -675,6 +673,5 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
         private String logonGuid;
 
         private String vendorEventDataJson;
-        private String vendorUserDataJson;
     }
 }

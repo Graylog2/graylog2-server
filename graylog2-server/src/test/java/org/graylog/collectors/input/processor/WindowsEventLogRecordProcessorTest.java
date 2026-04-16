@@ -51,7 +51,7 @@ class WindowsEventLogRecordProcessorTest {
     private static final String VENDOR_EVENT_SUBSTATUS = "vendor_event_substatus";
     private static final String USER_SESSION_UID = "user_session_uid";
     private static final String VENDOR_EVENT_DATA = "vendor_event_data";
-    private static final String VENDOR_USER_DATA = "vendor_user_data";
+
 
     private final WindowsEventLogRecordProcessor processor = new WindowsEventLogRecordProcessor();
 
@@ -491,15 +491,15 @@ class WindowsEventLogRecordProcessorTest {
     }
 
     @Test
-    void serializesUserDataToJsonBlob() throws IOException {
-        // Event 104 EventLog-cleared: has user_data with SubjectUserName, SubjectDomainName, Channel, etc.
+    void serializesUserDataToVendorEventData() throws IOException {
+        // Event 104 EventLog-cleared: has user_data (not event_data). Serialized into vendor_event_data.
         final var logRecord = fixtureRecordByRecordId("windows-2025-eventlog-3.ndjson", 16518L);
         final var result = processor.process(wrapLogRecord(logRecord));
 
-        assertThat(result).containsKey(VENDOR_USER_DATA);
+        assertThat(result).containsKey(VENDOR_EVENT_DATA);
 
-        final var vendorUserData = (String) result.get(VENDOR_USER_DATA);
-        assertThat(vendorUserData)
+        final var vendorEventData = (String) result.get(VENDOR_EVENT_DATA);
+        assertThat(vendorEventData)
                 .contains("\"SubjectUserName\"")
                 .contains("\"Administrator\"")
                 .contains("\"SubjectDomainName\"")
