@@ -52,8 +52,8 @@ const CollectorsOverviewPage = () => {
           </>
         }>
         <span>
-          Collectors are lightweight services deployed across your infrastructure to collect logs and forward them
-          to {productName}. They are organized into fleets and configured with sources that define what data to collect.
+          Collectors are lightweight services deployed across your infrastructure to collect logs and forward them to{' '}
+          {productName}. They are organized into fleets and configured with sources that define what data to collect.
         </span>
       </PageHeader>
       <Row className="content">

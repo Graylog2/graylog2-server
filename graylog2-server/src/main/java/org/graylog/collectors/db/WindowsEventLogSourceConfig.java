@@ -21,14 +21,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.collectors.CollectorReadMode;
 import org.graylog.collectors.config.receiver.CollectorReceiverConfig;
 import org.graylog.collectors.config.receiver.WindowsEventLogReceiverConfig;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
-
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @AutoValue
 @JsonTypeName(WindowsEventLogSourceConfig.TYPE_NAME)
@@ -47,7 +45,7 @@ public abstract class WindowsEventLogSourceConfig implements SourceConfig {
     public abstract boolean includeDefaultChannels();
 
     @JsonProperty("read_mode")
-    public abstract String readMode();
+    public abstract CollectorReadMode readMode();
 
     public static Builder builder() {
         return Builder.create();
@@ -55,14 +53,6 @@ public abstract class WindowsEventLogSourceConfig implements SourceConfig {
 
     @Override
     public void validate() {
-        if (isBlank(readMode())) {
-            throw new IllegalArgumentException("WindowsEventLogSourceConfig requires a non-blank read_mode");
-        }
-        try {
-            WindowsEventLogReceiverConfig.StartAt.valueOf(readMode().toUpperCase(Locale.ROOT));
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("WindowsEventLogSourceConfig: " + e.getMessage());
-        }
     }
 
     @Override
@@ -70,7 +60,7 @@ public abstract class WindowsEventLogSourceConfig implements SourceConfig {
         return Optional.of(WindowsEventLogReceiverConfig.builder(id)
                 .channels(channels())
                 .includeDefaultChannels(includeDefaultChannels())
-                .startAt(WindowsEventLogReceiverConfig.StartAt.valueOf(readMode().toUpperCase(Locale.ROOT)))
+                .startAt(readMode())
                 .build());
     }
 
@@ -82,7 +72,7 @@ public abstract class WindowsEventLogSourceConfig implements SourceConfig {
                     .type(TYPE_NAME)
                     .channels(List.of())
                     .includeDefaultChannels(true)
-                    .readMode("end");
+                    .readMode(CollectorReadMode.END);
         }
 
         @JsonProperty(TYPE_FIELD)
@@ -95,7 +85,7 @@ public abstract class WindowsEventLogSourceConfig implements SourceConfig {
         public abstract Builder includeDefaultChannels(boolean includeDefaultChannels);
 
         @JsonProperty("read_mode")
-        public abstract Builder readMode(String readMode);
+        public abstract Builder readMode(CollectorReadMode readMode);
 
         public abstract WindowsEventLogSourceConfig build();
     }
