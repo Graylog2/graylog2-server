@@ -16,8 +16,11 @@
  */
 package org.graylog.collectors.input.processor;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.InetAddresses;
 import io.opentelemetry.proto.common.v1.AnyValue;
+import io.opentelemetry.proto.common.v1.KeyValue;
 import org.graylog.inputs.otel.OTelJournal;
 import org.graylog.schema.DestinationFields;
 import org.graylog.schema.EventFields;
@@ -36,6 +39,7 @@ import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,6 +55,7 @@ import java.util.Map;
  * @see <a href="https://learn.microsoft.com/en-us/windows/win32/wes/eventschema-systempropertiestype-complextype">SystemPropertiesType</a>
  */
 public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String EVENT_ID = "event_id";
     private static final String VENDOR_EVENT_CATEGORY = "vendor_event_category";
     private static final String VENDOR_EVENT_TIMESTAMP = "vendor_event_timestamp";
@@ -61,6 +66,8 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
     private static final String WINDOWS_AUTH_LM_PACKAGE_NAME = "windows_authentication_lmpackage_name";
     private static final String VENDOR_EVENT_SUBSTATUS = "vendor_event_substatus";
     private static final String USER_SESSION_UID = "user_session_uid";
+    private static final String VENDOR_EVENT_DATA = "vendor_event_data";
+    private static final String VENDOR_USER_DATA = "vendor_user_data";
 
     @Override
     public Map<String, Object> process(OTelJournal.Log log) {
@@ -181,6 +188,9 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
         putIfPresent(result, ProcessFields.PROCESS_COMMAND_LINE, fields.commandLine);
         putIfPresent(result, USER_SESSION_UID, fields.logonGuid);
 
+        putIfPresent(result, VENDOR_EVENT_DATA, fields.vendorEventDataJson);
+        putIfPresent(result, VENDOR_USER_DATA, fields.vendorUserDataJson);
+
         return result;
     }
 
@@ -258,6 +268,9 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
         if (value.getValueCase() != AnyValue.ValueCase.KVLIST_VALUE) {
             return;
         }
+
+        // Serialize ALL event_data to JSON blob (preserves full original structure)
+        fields.vendorEventDataJson = serializeKvListToJson(value.getKvlistValue().getValuesList());
 
         for (final var kv : value.getKvlistValue().getValuesList()) {
             switch (kv.getKey()) {
@@ -357,6 +370,9 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
         if (value.getValueCase() != AnyValue.ValueCase.KVLIST_VALUE) {
             return;
         }
+
+        // Serialize ALL user_data to JSON blob (preserves full original structure)
+        fields.vendorUserDataJson = serializeKvListToJson(value.getKvlistValue().getValuesList());
 
         for (final var kv : value.getKvlistValue().getValuesList()) {
             switch (kv.getKey()) {
@@ -534,6 +550,47 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
         return values;
     }
 
+    private static String serializeKvListToJson(List<KeyValue> kvList) {
+        if (kvList.isEmpty()) {
+            return null;
+        }
+
+        final Map<String, Object> map = new LinkedHashMap<>();
+        for (final var kv : kvList) {
+            map.put(kv.getKey(), anyValueToObject(kv.getValue()));
+        }
+
+        try {
+            return OBJECT_MAPPER.writeValueAsString(map);
+        } catch (JsonProcessingException e) {
+            return null;
+        }
+    }
+
+    private static Object anyValueToObject(AnyValue value) {
+        return switch (value.getValueCase()) {
+            case STRING_VALUE -> value.getStringValue();
+            case INT_VALUE -> value.getIntValue();
+            case DOUBLE_VALUE -> value.getDoubleValue();
+            case BOOL_VALUE -> value.getBoolValue();
+            case ARRAY_VALUE -> {
+                final List<Object> list = new ArrayList<>();
+                for (final var item : value.getArrayValue().getValuesList()) {
+                    list.add(anyValueToObject(item));
+                }
+                yield list;
+            }
+            case KVLIST_VALUE -> {
+                final Map<String, Object> nested = new LinkedHashMap<>();
+                for (final var kv : value.getKvlistValue().getValuesList()) {
+                    nested.put(kv.getKey(), anyValueToObject(kv.getValue()));
+                }
+                yield nested;
+            }
+            default -> null;
+        };
+    }
+
     private static void putIfPresent(Map<String, Object> target, String fieldName, String value) {
         if (value != null && !value.isEmpty()) {
             target.put(fieldName, value);
@@ -610,5 +667,8 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
         private String failureReason;
         private String commandLine;
         private String logonGuid;
+
+        private String vendorEventDataJson;
+        private String vendorUserDataJson;
     }
 }

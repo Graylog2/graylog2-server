@@ -50,6 +50,8 @@ class WindowsEventLogRecordProcessorTest {
     private static final String WINDOWS_AUTH_LM_PACKAGE_NAME = "windows_authentication_lmpackage_name";
     private static final String VENDOR_EVENT_SUBSTATUS = "vendor_event_substatus";
     private static final String USER_SESSION_UID = "user_session_uid";
+    private static final String VENDOR_EVENT_DATA = "vendor_event_data";
+    private static final String VENDOR_USER_DATA = "vendor_user_data";
 
     private final WindowsEventLogRecordProcessor processor = new WindowsEventLogRecordProcessor();
 
@@ -417,6 +419,93 @@ class WindowsEventLogRecordProcessorTest {
                 .containsEntry(UserFields.USER_NAME, "Administrator")
                 .containsEntry(UserFields.USER_DOMAIN, "GLCWIN2022")
                 .containsEntry(UserFields.USER_SESSION_ID, "0x297a8f1a");
+    }
+
+    @Test
+    void serializesEventDataToJsonBlob() throws IOException {
+        // 4717 from OTLP dump: has AccessGranted and TargetSid which are NOT extracted as GIM fields
+        final var logRecord = fixtureRecordByRecordId("windows-2025-eventlog-4.ndjson", 695175L);
+        final var result = processor.process(wrapLogRecord(logRecord));
+
+        assertThat(result)
+                .containsEntry(EventFields.EVENT_CODE, 4717L)
+                .containsEntry(EventFields.EVENT_OUTCOME, "success")
+                .containsEntry(SourceFields.SOURCE_USER_ID, "S-1-5-18")
+                .containsEntry(SourceFields.SOURCE_USER_NAME, "GLCWIN2025$")
+                .containsEntry(SourceFields.SOURCE_USER_DOMAIN, "WORKGROUP")
+                .containsEntry(SourceFields.SOURCE_USER_SESSION_ID, "0x3e7")
+                .containsKey(VENDOR_EVENT_DATA);
+
+        // The JSON blob must contain ALL event_data keys (including ones extracted as GIM fields)
+        final var vendorEventData = (String) result.get(VENDOR_EVENT_DATA);
+        assertThat(vendorEventData)
+                .contains("\"AccessGranted\"")
+                .contains("\"SeServiceLogonRight\"")
+                .contains("\"TargetSid\"")
+                .contains("\"S-1-5-111-3847866527-469524349-687026318-516638107-1125189541-212\"")
+                // Also contains extracted fields — blob preserves the full original structure
+                .contains("\"SubjectUserSid\"")
+                .contains("\"SubjectUserName\"");
+    }
+
+    @Test
+    void serializesDefenderEventDataToJsonBlob() throws IOException {
+        // Defender 1150: EventData with space-named keys
+        final var logRecord = fixtureRecordByRecordId("windows-2025-eventlog-4.ndjson", 3661L);
+        final var result = processor.process(wrapLogRecord(logRecord));
+
+        assertThat(result).containsKey(VENDOR_EVENT_DATA);
+
+        final var vendorEventData = (String) result.get(VENDOR_EVENT_DATA);
+        // Keys with spaces are preserved in JSON
+        assertThat(vendorEventData)
+                .contains("\"Engine version\"")
+                .contains("\"Product Name\"")
+                .contains("\"Microsoft Defender Antivirus\"");
+    }
+
+    @Test
+    void serializesSystemEventDataToJsonBlob() throws IOException {
+        // System 7036: param1/param2/Binary
+        final var logRecord = fixtureRecordByRecordId("windows-2025-eventlog-2.ndjson", 187435L);
+        final var result = processor.process(wrapLogRecord(logRecord));
+
+        assertThat(result).containsKey(VENDOR_EVENT_DATA);
+
+        final var vendorEventData = (String) result.get(VENDOR_EVENT_DATA);
+        assertThat(vendorEventData)
+                .contains("\"param1\"")
+                .contains("\"Windows Update Medic Service\"")
+                .contains("\"param2\"")
+                .contains("\"running\"");
+    }
+
+    @Test
+    void omitsVendorEventDataWhenNoEventData() throws IOException {
+        // PowerShell event (record_id=8526) has event_data with unnamed keys — verify blob is present
+        final var logRecord = fixtureRecordByRecordId(8526L);
+        final var result = processor.process(wrapLogRecord(logRecord));
+
+        // This event has event_data, so blob should be present
+        assertThat(result).containsKey(VENDOR_EVENT_DATA);
+    }
+
+    @Test
+    void serializesUserDataToJsonBlob() throws IOException {
+        // Event 104 EventLog-cleared: has user_data with SubjectUserName, SubjectDomainName, Channel, etc.
+        final var logRecord = fixtureRecordByRecordId("windows-2025-eventlog-3.ndjson", 16518L);
+        final var result = processor.process(wrapLogRecord(logRecord));
+
+        assertThat(result).containsKey(VENDOR_USER_DATA);
+
+        final var vendorUserData = (String) result.get(VENDOR_USER_DATA);
+        assertThat(vendorUserData)
+                .contains("\"SubjectUserName\"")
+                .contains("\"Administrator\"")
+                .contains("\"SubjectDomainName\"")
+                .contains("\"winserver03\"")
+                .contains("\"Channel\"")
+                .contains("\"System\"");
     }
 
     private static OTelJournal.Log wrapLogRecord(LogRecord logRecord) {
