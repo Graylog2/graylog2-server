@@ -105,7 +105,7 @@ function EventSummaryTemplateHelp() {
       title="Event Summary Template"
       width={500}
       overlay={<Overlay />}>
-      <QueryHelpButton bsStyle="link" title="Summary Template Help">
+      <QueryHelpButton bsStyle="link" title="Summary Template Help" aria-label="Show event summary template help">
         <Icon name="help" />
       </QueryHelpButton>
     </OverlayTrigger>
