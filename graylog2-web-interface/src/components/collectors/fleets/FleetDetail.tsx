@@ -318,9 +318,7 @@ const FleetDetail = ({ fleetId }: Props) => {
 
       {activeTab === 'sources' && (
         <>
-          <p>
-            Sources are automatically pushed to all collectors in this fleet. Changes take effect within seconds.
-          </p>
+          <p>Sources are automatically pushed to all collectors in this fleet. Changes take effect within seconds.</p>
           <ActionsRow>
             <Button bsStyle="primary" onClick={() => setShowSourceModal(true)}>
               Add Source
@@ -340,22 +338,22 @@ const FleetDetail = ({ fleetId }: Props) => {
 
       {activeTab === 'instances' && (
         <>
-        <p>
-          Collector instances enrolled in this fleet. Each instance runs all enabled sources.
-          To add more instances, <Link to={Routes.SYSTEM.COLLECTORS.DEPLOYMENT}>deploy collectors</Link> using
-          an enrollment token for this fleet.
-        </p>
-        <PaginatedEntityTable<CollectorInstanceView>
-          humanName="instances"
-          entityActions={instanceActions}
-          tableLayout={INSTANCES_LAYOUT}
-          fetchEntities={fetchInstances}
-          keyFn={(params) => [...instancesKeyFn(params), fleetId]}
-          entityAttributesAreCamelCase={false}
-          columnRenderers={instanceRenderers}
-          defaultFilters={defaultInstanceFilters}
-          bulkSelection={{ actions: <BulkActions /> }}
-        />
+          <p>
+            Collector instances enrolled in this fleet. Each instance runs all enabled sources. To add more instances,{' '}
+            <Link to={Routes.SYSTEM.COLLECTORS.DEPLOYMENT}>deploy collectors</Link> using an enrollment token for this
+            fleet.
+          </p>
+          <PaginatedEntityTable<CollectorInstanceView>
+            humanName="instances"
+            entityActions={instanceActions}
+            tableLayout={INSTANCES_LAYOUT}
+            fetchEntities={fetchInstances}
+            keyFn={(params) => [...instancesKeyFn(params), fleetId]}
+            entityAttributesAreCamelCase={false}
+            columnRenderers={instanceRenderers}
+            defaultFilters={defaultInstanceFilters}
+            bulkSelection={{ actions: <BulkActions /> }}
+          />
         </>
       )}
 
@@ -403,8 +401,8 @@ const FleetDetail = ({ fleetId }: Props) => {
           show
           onConfirm={handleConfirmDeleteSource}
           onCancel={() => setDeletingSource(null)}>
-          Are you sure you want to delete source <strong>{deletingSource.name}</strong>? Collectors in this fleet
-          will stop collecting data from this source within seconds.
+          Are you sure you want to delete source <strong>{deletingSource.name}</strong>? Collectors in this fleet will
+          stop collecting data from this source within seconds.
         </ConfirmDialog>
       )}
     </div>

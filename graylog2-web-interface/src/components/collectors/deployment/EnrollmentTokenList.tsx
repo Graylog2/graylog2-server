@@ -167,8 +167,8 @@ const EnrollmentTokenList = () => {
           show
           onConfirm={handleConfirmDelete}
           onCancel={() => setDeletingToken(null)}>
-          Are you sure you want to delete this enrollment token? New collectors will not be able to enroll
-          using this token. Already-enrolled collectors will continue to operate normally.
+          Are you sure you want to delete this enrollment token? New collectors will not be able to enroll using this
+          token. Already-enrolled collectors will continue to operate normally.
         </ConfirmDialog>
       )}
     </>

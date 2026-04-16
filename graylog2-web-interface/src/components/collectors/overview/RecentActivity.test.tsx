@@ -34,13 +34,15 @@ const fleetTarget = (id: string, name: string): TargetInfo => ({ id, name, type:
 const activityResponse = (targets: TargetInfo[]): { data: RecentActivityResponse; isLoading: boolean } => ({
   isLoading: false,
   data: {
-    activities: [{
-      seq: 1,
-      timestamp: '2026-04-10T08:00:00Z',
-      type: 'CONFIG_CHANGED',
-      actor: null,
-      targets,
-    }],
+    activities: [
+      {
+        seq: 1,
+        timestamp: '2026-04-10T08:00:00Z',
+        type: 'CONFIG_CHANGED',
+        actor: null,
+        targets,
+      },
+    ],
   },
 });
 
@@ -50,9 +52,7 @@ describe('RecentActivity', () => {
   });
 
   it('shows single fleet target without additional text', async () => {
-    asMock(useRecentActivity).mockReturnValue(
-      activityResponse([fleetTarget('f1', 'Alpha Fleet')]),
-    );
+    asMock(useRecentActivity).mockReturnValue(activityResponse([fleetTarget('f1', 'Alpha Fleet')]));
 
     render(<RecentActivity />);
 
@@ -89,10 +89,7 @@ describe('RecentActivity', () => {
 
   it('sorts targets alphabetically and displays the first', async () => {
     asMock(useRecentActivity).mockReturnValue(
-      activityResponse([
-        fleetTarget('f2', 'Zulu Fleet'),
-        fleetTarget('f1', 'Alpha Fleet'),
-      ]),
+      activityResponse([fleetTarget('f2', 'Zulu Fleet'), fleetTarget('f1', 'Alpha Fleet')]),
     );
 
     render(<RecentActivity />);
@@ -103,10 +100,7 @@ describe('RecentActivity', () => {
   });
 
   it('does not mutate the original targets array', () => {
-    const targets: TargetInfo[] = [
-      fleetTarget('f2', 'Zulu Fleet'),
-      fleetTarget('f1', 'Alpha Fleet'),
-    ];
+    const targets: TargetInfo[] = [fleetTarget('f2', 'Zulu Fleet'), fleetTarget('f1', 'Alpha Fleet')];
     const originalOrder = [...targets];
 
     asMock(useRecentActivity).mockReturnValue(activityResponse(targets));
