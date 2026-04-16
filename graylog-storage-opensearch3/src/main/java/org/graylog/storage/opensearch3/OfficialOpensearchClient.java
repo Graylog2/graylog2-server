@@ -214,6 +214,14 @@ public final class OfficialOpensearchClient {
                 .orElse(false);
     }
 
+    private static boolean hasCausedByReason(OpenSearchException openSearchException, Predicate<String> predicate) {
+        return Optional.ofNullable(openSearchException.error())
+                .map(ErrorCause::causedBy)
+                .map(ErrorCause::reason)
+                .map(predicate::test)
+                .orElse(false);
+    }
+
     private static boolean hasType(OpenSearchException openSearchException, String type) {
         return openSearchException.error().type().contains(type);
     }
@@ -243,7 +251,7 @@ public final class OfficialOpensearchClient {
     }
 
     private static boolean isBatchSizeTooLargeException(OpenSearchException openSearchException) {
-        return isSearchPhaseExecutionException(openSearchException) && hasReason(openSearchException, r -> r.contains("Batch size is too large"));
+        return isSearchPhaseExecutionException(openSearchException) && hasCausedByReason(openSearchException, r -> r.contains("Batch size is too large"));
     }
 
     private static boolean isParentCircuitBreakingException(OpenSearchException openSearchException) {
@@ -251,7 +259,7 @@ public final class OfficialOpensearchClient {
     }
 
     private static boolean isResultWindowLimitException(OpenSearchException openSearchException) {
-        return isSearchPhaseExecutionException(openSearchException) && hasReason(openSearchException, r -> r.contains("Result window is too large"));
+        return isSearchPhaseExecutionException(openSearchException) && hasCausedByReason(openSearchException, r -> r.contains("Result window is too large"));
     }
 
     @Deprecated
