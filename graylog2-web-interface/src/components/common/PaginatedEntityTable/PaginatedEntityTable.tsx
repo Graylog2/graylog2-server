@@ -180,6 +180,8 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
     [additionalAttributes, paginatedEntities?.attributes],
   );
 
+  const attributes = useAuthorizedAttributes(paginatedEntities?.attributes ?? []);
+
   const onPaginationChange = withoutURLParams
     ? (currentPage: number, pageSize: number) => paginationState.setPagination({ page: currentPage, pageSize })
     : undefined;
@@ -192,10 +194,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
     list,
     meta,
     pagination: { total },
-    attributes: allAttributes,
   } = paginatedEntities;
-
-  const attributes = useAuthorizedAttributes(allAttributes);
 
   return (
     <TableFetchContextProvider
