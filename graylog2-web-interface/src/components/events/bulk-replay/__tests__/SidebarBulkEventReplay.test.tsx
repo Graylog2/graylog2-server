@@ -75,8 +75,6 @@ const removeEvent = async (eventId: string) => {
 const eventByIndex = (index: number) => events[initialEventIds[index]].event;
 const eventMessage = (index: number) => eventByIndex(index).message;
 
-const onClose = jest.fn();
-
 const markEventAsReviewedFromHeader = async (eventId: string) => {
   const dropdownButton = await findDropdownButton();
 
@@ -89,7 +87,7 @@ const markEventAsReviewedFromHeader = async (eventId: string) => {
 
 const SUT = () => (
   <EventReplaySelectedProvider initialEventIds={initialEventIds} eventsData={events}>
-    <SidebarBulkEventReplay onClose={onClose} />
+    <SidebarBulkEventReplay />
   </EventReplaySelectedProvider>
 );
 
