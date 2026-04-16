@@ -72,10 +72,10 @@ const getPinnedColumnStyles =
           left: ${leftMargin}px;
           z-index: 1;
           background-color: ${odd
-            ? theme.utils.flattenMixColor(
-                theme.colors.table.row.backgroundStriped,
+            ? theme.utils.flattenColorStack([
                 theme.colors.global.contentBackground,
-              )
+                theme.colors.table.row.backgroundStriped,
+              ])
             : theme.colors.global.contentBackground};
         }
       `,
@@ -254,7 +254,7 @@ const DataTable = ({
   );
 
   const actualColumnPivotFields = _extractColumnPivotValues(rows);
-  const pinnedColumns = useMemo(
+  const pinnedColumns: Immutable.Set<string> = useMemo(
     () => widget?.config?.visualizationConfig?.pinnedColumns ?? Immutable.Set(),
     [widget?.config?.visualizationConfig?.pinnedColumns],
   );
@@ -284,6 +284,7 @@ const DataTable = ({
 
     return res;
   }, [widget?.config?.visualizationConfig?.showRowNumbers, rowPivots, series, pinnedColumns, rowPivotColumnsWidth]);
+
   const formattedRows = deduplicateValues(expandedRows, rowFieldNames).map((reducedItem, idx) => {
     const valuePath = rowFieldNames.map((pivotField) => ({ [pivotField]: expandedRows[idx][pivotField] }));
     const key = `datatableentry-${idx}`;
@@ -301,6 +302,7 @@ const DataTable = ({
         series={series}
         showRowNumbers={showRowNumbers}
         units={widgetUnits}
+        pinnedColumns={pinnedColumns}
       />
     );
   });
