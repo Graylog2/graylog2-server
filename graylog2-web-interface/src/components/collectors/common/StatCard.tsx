@@ -22,8 +22,7 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import { HoverForHelp } from 'components/common';
-
-type Variant = 'default' | 'success' | 'warning' | 'danger';
+export type Variant = 'default' | 'success' | 'warning' | 'danger';
 
 type Props = {
   value: number;
@@ -96,7 +95,7 @@ const StatCard = ({ value, label, helpText = undefined, variant = 'default', onC
     type={onClick ? 'button' : undefined}>
     {helpText && (
       <HelpCorner>
-        <HoverForHelp title={label} placement="right" pullRight={false}>
+        <HoverForHelp title={label} triggerTitle="More info" placement="right" pullRight={false}>
           {helpText}
         </HoverForHelp>
       </HelpCorner>

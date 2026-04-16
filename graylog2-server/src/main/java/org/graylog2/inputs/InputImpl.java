@@ -17,6 +17,7 @@
 package org.graylog2.inputs;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -204,6 +205,7 @@ public abstract class InputImpl implements Input, MongoEntity {
         return toBuilder().setPersistedDesiredState(desiredState).build();
     }
 
+    @JsonIgnore
     @Override
     public Map<String, Object> getFields() {
         final Map<String, Object> doc = new java.util.LinkedHashMap<>();

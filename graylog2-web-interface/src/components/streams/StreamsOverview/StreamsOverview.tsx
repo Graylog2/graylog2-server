@@ -51,8 +51,11 @@ type Props = {
 const StreamsOverview = ({ indexSets }: Props) => {
   const queryClient = useQueryClient();
   const { isPipelineColumnPermitted } = usePipelineColumn();
-  const { columnRenderers: extensionColumnRenderers, attributes: extensionAttributes, expandedSections: pluggableExpandedSections } =
-    useStreamsOverviewExtensions();
+  const {
+    columnRenderers: extensionColumnRenderers,
+    attributes: extensionAttributes,
+    expandedSections: pluggableExpandedSections,
+  } = useStreamsOverviewExtensions();
 
   const { entityActions, expandedSections, bulkActions } = useTableElements({ indexSets, pluggableExpandedSections });
   useRefetchStreamsOnStoreChange(() => queryClient.invalidateQueries({ queryKey: KEY_PREFIX }));

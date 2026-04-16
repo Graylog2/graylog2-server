@@ -18,6 +18,7 @@ package org.graylog.collectors.db;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
+import org.graylog.collectors.CollectorReadMode;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,7 +47,7 @@ class SourceConfigTest {
                 {
                     "type": "file",
                     "paths": ["/var/log/syslog", "/var/log/auth.log"],
-                    "read_mode": "tail",
+                    "read_mode": "end",
                     "multiline": {
                         "pattern": "^\\\\d{4}-",
                         "negate": true
@@ -60,7 +61,7 @@ class SourceConfigTest {
         final var fileConfig = (FileSourceConfig) config;
         assertThat(fileConfig.type()).isEqualTo("file");
         assertThat(fileConfig.paths()).containsExactly("/var/log/syslog", "/var/log/auth.log");
-        assertThat(fileConfig.readMode()).isEqualTo("tail");
+        assertThat(fileConfig.readMode()).isEqualTo(CollectorReadMode.END);
         assertThat(fileConfig.multiline()).isNotNull();
         assertThat(fileConfig.multiline().pattern()).isEqualTo("^\\d{4}-");
         assertThat(fileConfig.multiline().negate()).isTrue();
@@ -86,7 +87,7 @@ class SourceConfigTest {
 
     @Test
     void fileSourceValidation() {
-        final var config = FileSourceConfig.builder().paths(List.of()).readMode("tail").build();
+        final var config = FileSourceConfig.builder().paths(List.of()).readMode(CollectorReadMode.END).build();
         assertThatThrownBy(config::validate).isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -95,7 +96,7 @@ class SourceConfigTest {
     void jsonRoundTrip() throws Exception {
         final var original = FileSourceConfig.builder()
                 .paths(List.of("/var/log/syslog"))
-                .readMode("tail")
+                .readMode(CollectorReadMode.END)
                 .multiline(new MultilineConfig("^\\d{4}-", true))
                 .build();
 
@@ -109,7 +110,7 @@ class SourceConfigTest {
     void serializationIncludesTypeField() throws Exception {
         final var config = FileSourceConfig.builder()
                 .paths(List.of("/var/log/syslog"))
-                .readMode("tail")
+                .readMode(CollectorReadMode.END)
                 .build();
 
         final var json = objectMapper.writeValueAsString(config);

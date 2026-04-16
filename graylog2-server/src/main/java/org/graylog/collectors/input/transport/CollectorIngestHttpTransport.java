@@ -35,6 +35,7 @@ import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -166,6 +167,12 @@ public class CollectorIngestHttpTransport extends AbstractHttpTransport {
                     DEFAULT_MAX_CHUNK_SIZE,
                     "The maximum HTTP chunk size in bytes (e.g. length of HTTP request body)",
                     ConfigurationField.Optional.OPTIONAL));
+            config.addField(new BooleanField(
+                    CK_TCP_KEEPALIVE,
+                    "TCP keepalive",
+                    true,
+                    "Enable TCP keepalive packets"
+            ));
 
             return config;
         }

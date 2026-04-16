@@ -48,7 +48,8 @@ export const getOutputTypeDefinition = (
 export const getRequestedOutputConfiguration = (
   outputTypes: AvailableOutputTypes | undefined,
   outputType: string,
-): AvailableOutputRequestedConfiguration | undefined => getOutputTypeDefinition(outputTypes, outputType)?.requested_configuration;
+): AvailableOutputRequestedConfiguration | undefined =>
+  getOutputTypeDefinition(outputTypes, outputType)?.requested_configuration;
 
 export const fetchOutputsTypes = () => {
   const url = qualifyUrl(ApiRoutes.OutputsApiController.availableTypes().url);
