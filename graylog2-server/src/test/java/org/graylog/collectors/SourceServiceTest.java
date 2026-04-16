@@ -16,7 +16,6 @@
  */
 package org.graylog.collectors;
 
-import org.graylog.collectors.config.receiver.JournaldReceiverConfig;
 import org.graylog.collectors.db.FileSourceConfig;
 import org.graylog.collectors.db.FleetDTO;
 import org.graylog.collectors.db.JournaldSourceConfig;
@@ -39,7 +38,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -71,11 +69,11 @@ class SourceServiceTest {
     }
 
     private SourceConfig validFileConfig() {
-        return FileSourceConfig.builder().paths(List.of("/var/log/syslog")).readMode(JournaldReceiverConfig.StartAt.END.toString()).build();
+        return FileSourceConfig.builder().paths(List.of("/var/log/syslog")).readMode(CollectorReadMode.END).build();
     }
 
     private SourceConfig validJournaldConfig() {
-        return JournaldSourceConfig.builder().readMode(JournaldReceiverConfig.StartAt.END.toString()).priority("info").build();
+        return JournaldSourceConfig.builder().readMode(CollectorReadMode.END).priority("info").build();
     }
 
     @Test
@@ -134,7 +132,7 @@ class SourceServiceTest {
         FleetDTO fleet = fleetService.create("test-fleet", "A test fleet");
         SourceDTO created = sourceService.create(fleet.id(), "my-source", "Original desc", true, validFileConfig());
 
-        SourceConfig newConfig = FileSourceConfig.builder().paths(List.of("/var/log/auth.log")).readMode(JournaldReceiverConfig.StartAt.END.toString()).build();
+        SourceConfig newConfig = FileSourceConfig.builder().paths(List.of("/var/log/auth.log")).readMode(CollectorReadMode.END).build();
         Optional<SourceDTO> updated = sourceService.update(fleet.id(), created.id(), "updated-source", "Updated desc", false, newConfig);
 
         assertThat(updated).isPresent();
@@ -271,7 +269,7 @@ class SourceServiceTest {
     @Test
     void createSourceWithInvalidConfigThrows() {
         FleetDTO fleet = fleetService.create("test-fleet", "A test fleet");
-        SourceConfig invalidConfig = FileSourceConfig.builder().paths(List.of()).readMode(JournaldReceiverConfig.StartAt.END.toString()).build();
+        SourceConfig invalidConfig = FileSourceConfig.builder().paths(List.of()).readMode(CollectorReadMode.END).build();
 
         assertThatThrownBy(() -> sourceService.create(fleet.id(), "my-source", "A source", true, invalidConfig))
                 .isInstanceOf(IllegalArgumentException.class);

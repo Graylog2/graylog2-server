@@ -37,7 +37,7 @@ class CollectorJournalRecordFactoryTest {
                         .setResource(Resource.newBuilder()
                                 .addAttributes(KeyValue.newBuilder()
                                         .setKey(CollectorAttributes.COLLECTOR_RECEIVER_TYPE)
-                                        .setValue(AnyValue.newBuilder().setStringValue("filelog"))))
+                                        .setValue(AnyValue.newBuilder().setStringValue("file_log"))))
                         .addScopeLogs(ScopeLogs.newBuilder()
                                 .addLogRecords(LogRecord.newBuilder()
                                         .setBody(AnyValue.newBuilder().setStringValue("hello")))))
@@ -48,7 +48,7 @@ class CollectorJournalRecordFactoryTest {
         assertThat(records).hasSize(1);
         final var record = records.get(0);
         assertThat(record.getCollectorInstanceUid()).isEqualTo("agent-42");
-        assertThat(record.getCollectorReceiverType()).isEqualTo("filelog");
+        assertThat(record.getCollectorReceiverType()).isEqualTo("file_log");
         assertThat(record.getOtelRecord().getLog().getLogRecord().getBody().getStringValue()).isEqualTo("hello");
     }
 
@@ -74,7 +74,7 @@ class CollectorJournalRecordFactoryTest {
                         .setResource(Resource.newBuilder()
                                 .addAttributes(KeyValue.newBuilder()
                                         .setKey(CollectorAttributes.COLLECTOR_RECEIVER_TYPE)
-                                        .setValue(AnyValue.newBuilder().setStringValue("filelog"))))
+                                        .setValue(AnyValue.newBuilder().setStringValue("file_log"))))
                         .addScopeLogs(ScopeLogs.newBuilder()
                                 .addLogRecords(LogRecord.newBuilder()
                                         .setBody(AnyValue.newBuilder().setStringValue("file log")))))
@@ -91,7 +91,7 @@ class CollectorJournalRecordFactoryTest {
         final var records = CollectorJournalRecordFactory.createFromRequest(request, "agent-1");
 
         assertThat(records).hasSize(2);
-        assertThat(records.get(0).getCollectorReceiverType()).isEqualTo("filelog");
+        assertThat(records.get(0).getCollectorReceiverType()).isEqualTo("file_log");
         assertThat(records.get(1).getCollectorReceiverType()).isEqualTo("journald");
     }
 }

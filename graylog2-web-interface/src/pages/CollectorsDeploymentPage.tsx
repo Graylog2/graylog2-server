@@ -46,8 +46,8 @@ const CollectorsDeploymentPage = () => {
           </>
         }>
         <span>
-          Deploy collectors to your infrastructure using enrollment tokens. An enrollment token authorizes
-          a collector to join a specific fleet and establishes a secure connection using mutual TLS.
+          Deploy collectors to your infrastructure using enrollment tokens. An enrollment token authorizes a collector
+          to join a specific fleet and establishes a secure connection using mutual TLS.
         </span>
       </PageHeader>
       <Row className="content">
@@ -59,8 +59,8 @@ const CollectorsDeploymentPage = () => {
         <Col md={12}>
           <h2>Enrollment Tokens</h2>
           <p>
-            Tokens authorize new collectors to enroll into a fleet. Deleting a token does not affect
-            already-enrolled collectors.
+            Tokens authorize new collectors to enroll into a fleet. Deleting a token does not affect already-enrolled
+            collectors.
           </p>
           <EnrollmentTokenList />
         </Col>

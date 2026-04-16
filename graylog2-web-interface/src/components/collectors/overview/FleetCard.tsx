@@ -38,29 +38,27 @@ const HEALTH_VARIANT: Record<HealthStatus, string> = {
   empty: '',
 };
 
-const Card = styled.div<{ $status: HealthStatus }>(
-  ({ theme, $status }) => {
-    const bandColor = HEALTH_VARIANT[$status]
-      ? theme.colors.variant[HEALTH_VARIANT[$status] as keyof typeof theme.colors.variant]
-      : theme.colors.gray[60];
+const Card = styled.div<{ $status: HealthStatus }>(({ theme, $status }) => {
+  const bandColor = HEALTH_VARIANT[$status]
+    ? theme.colors.variant[HEALTH_VARIANT[$status] as keyof typeof theme.colors.variant]
+    : theme.colors.gray[60];
 
-    return css`
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      border: 1px solid ${theme.colors.gray[80]};
-      border-radius: 8px;
-      padding: ${theme.spacings.md};
-      background: ${theme.colors.global.contentBackground};
-      cursor: pointer;
-      border-left: 3px solid ${bandColor};
+  return css`
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid ${theme.colors.gray[80]};
+    border-radius: 8px;
+    padding: ${theme.spacings.md};
+    background: ${theme.colors.global.contentBackground};
+    cursor: pointer;
+    border-left: 3px solid ${bandColor};
 
-      &:hover {
-        outline: 1px solid ${theme.colors.variant.info};
-      }
-    `;
-  },
-);
+    &:hover {
+      outline: 1px solid ${theme.colors.variant.info};
+    }
+  `;
+});
 
 const HelpCorner = styled.div(
   ({ theme }) => css`
