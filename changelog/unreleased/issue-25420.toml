@@ -2,4 +2,4 @@ type = "a"
 message = "Add in the Event Details form helper text and examples on how to use Event Summary Templates."
 
 issues = ["25420"]
-pulls = []
+pulls = ["25696"]
