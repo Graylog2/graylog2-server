@@ -49,7 +49,7 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 class CollectorIngestCodecTest {
 
-    private static final String TEST_RECEIVER_TYPE = "filelog";
+    private static final String TEST_RECEIVER_TYPE = "file_log";
     private static final String TEST_INSTANCE_UID = "test-agent";
 
     private final MessageFactory messageFactory = new TestMessageFactory();
@@ -366,7 +366,7 @@ class CollectorIngestCodecTest {
     void setsReceiverTypeField() {
         final var codecWithProcessor = new CollectorIngestCodec(
                 Configuration.EMPTY_CONFIGURATION, messageFactory, dumpWriter, typeConverter,
-                Map.of("filelog", log -> Map.of(EventFields.EVENT_LOG_NAME, "test.log")));
+                Map.of("file_log", log -> Map.of(EventFields.EVENT_LOG_NAME, "test.log")));
 
         final var logRecord = LogRecord.newBuilder()
                 .setBody(AnyValue.newBuilder().setStringValue("test"))
@@ -381,7 +381,7 @@ class CollectorIngestCodecTest {
                 .build();
         final var collectorRecord = CollectorJournal.Record.newBuilder()
                 .setOtelRecord(otelRecord)
-                .setCollectorReceiverType("filelog")
+                .setCollectorReceiverType("file_log")
                 .setCollectorInstanceUid(TEST_INSTANCE_UID)
                 .build();
 
@@ -389,7 +389,7 @@ class CollectorIngestCodecTest {
         final var decoded = codecWithProcessor.decodeSafe(rawMessage);
 
         assertThat(decoded).isPresent();
-        assertThat(decoded.get().getField("collector_receiver_type")).isEqualTo("filelog");
+        assertThat(decoded.get().getField("collector_receiver_type")).isEqualTo("file_log");
         assertThat(decoded.get().getField(EventFields.EVENT_LOG_NAME)).isEqualTo("test.log");
     }
 
