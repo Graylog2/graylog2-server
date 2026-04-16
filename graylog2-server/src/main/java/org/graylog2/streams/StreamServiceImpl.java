@@ -550,6 +550,7 @@ public class StreamServiceImpl implements StreamService {
 
         final Stream updatedStream = streamBuilder.build();
         save(updatedStream);
+        streamTitleCache.invalidate(streamId);
         if (streamRenamedEvent != null) {
             clusterEventBus.post(streamRenamedEvent);
         }
