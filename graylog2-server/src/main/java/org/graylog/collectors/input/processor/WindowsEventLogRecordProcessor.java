@@ -39,7 +39,6 @@ import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -559,7 +558,7 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
             return null;
         }
 
-        final Map<String, Object> map = new LinkedHashMap<>();
+        final Map<String, Object> map = new HashMap<>();
         for (final var kv : kvList) {
             map.put(kv.getKey(), anyValueToObject(kv.getValue()));
         }
@@ -585,7 +584,7 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
                 yield list;
             }
             case KVLIST_VALUE -> {
-                final Map<String, Object> nested = new LinkedHashMap<>();
+                final Map<String, Object> nested = new HashMap<>();
                 for (final var kv : value.getKvlistValue().getValuesList()) {
                     nested.put(kv.getKey(), anyValueToObject(kv.getValue()));
                 }
