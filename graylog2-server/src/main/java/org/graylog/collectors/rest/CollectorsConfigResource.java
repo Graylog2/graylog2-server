@@ -22,9 +22,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -46,6 +48,7 @@ import org.graylog.collectors.db.MarkerType;
 import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.validators.ValidationResult;
@@ -115,6 +118,20 @@ public class CollectorsConfigResource extends RestResource {
     @Operation(summary = "Get collector ingest input IDs")
     @RequiresPermissions(CollectorsPermissions.CONFIGURATION_READ)
     public CollectorInputIdsResponse getInputIds() {
+        return new CollectorInputIdsResponse(collectorIngestInputService.getInputIds());
+    }
+
+    @POST
+    @Path("/inputs")
+    @Operation(summary = "Create the default collector ingest input")
+    @NoAuditEvent("Audit event is emitted by CollectorIngestInputService")
+    // Input permissions are checked inline in CollectorIngestInputService#createInput. Collectors config is not
+    // altered, only read in this process.
+    @RequiresPermissions(CollectorsPermissions.CONFIGURATION_READ)
+    public CollectorInputIdsResponse createInput() throws ValidationException {
+        final var config = collectorsConfigService.get()
+                .orElseThrow(() -> new BadRequestException("Collectors config has not been initialized yet"));
+        collectorIngestInputService.createInput(getSubject(), getCurrentUser().getName(), config.http().port());
         return new CollectorInputIdsResponse(collectorIngestInputService.getInputIds());
     }
 
