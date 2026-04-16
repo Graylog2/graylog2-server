@@ -46,8 +46,8 @@ public abstract class ResourceProcessorConfig implements CollectorProcessorConfi
                 .name(f("resource/%s", id));
     }
 
-    public static Attribute collectorComponentAttribute(String compoenent) {
-        return Attribute.upsert(CollectorAttributes.COLLECTOR_RECEIVER_TYPE, compoenent);
+    public static Attribute collectorComponentAttribute(String component) {
+        return Attribute.upsert(CollectorAttributes.COLLECTOR_RECEIVER_TYPE, component);
     }
 
     @AutoValue.Builder
