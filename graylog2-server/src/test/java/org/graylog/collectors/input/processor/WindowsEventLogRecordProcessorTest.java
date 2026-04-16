@@ -44,6 +44,12 @@ class WindowsEventLogRecordProcessorTest {
     private static final String VENDOR_EVENT_CATEGORY = "vendor_event_category";
     private static final String VENDOR_EVENT_TIMESTAMP = "vendor_event_timestamp";
     private static final String PRIVILEGE_ASSIGNED_NAME = "privilege_assigned_name";
+    private static final String WINDOWS_LOGON_TYPE = "windows_logon_type";
+    private static final String WINDOWS_AUTH_PACKAGE_NAME = "windows_authentication_package_name";
+    private static final String WINDOWS_AUTH_PROCESS_NAME = "windows_authentication_process_name";
+    private static final String WINDOWS_AUTH_LM_PACKAGE_NAME = "windows_authentication_lmpackage_name";
+    private static final String VENDOR_EVENT_SUBSTATUS = "vendor_event_substatus";
+    private static final String USER_SESSION_UID = "user_session_uid";
 
     private final WindowsEventLogRecordProcessor processor = new WindowsEventLogRecordProcessor();
 
@@ -350,6 +356,50 @@ class WindowsEventLogRecordProcessorTest {
                 .containsEntry(SourceFields.SOURCE_USER_NAME, "TESTHOST01$")
                 .containsEntry(SourceFields.SOURCE_USER_DOMAIN, "WORKGROUP")
                 .containsEntry(SourceFields.SOURCE_USER_SESSION_ID, "0x3e7");
+    }
+
+    @Test
+    void maps4625WithFailureFields() throws IOException {
+        // 4625 from OTLP dump: record_id=1081233, Status=0xc000006d, SubStatus=0xc0000064
+        final var logRecord = fixtureRecordByRecordId("windows-2025-eventlog-4.ndjson", 1081233L);
+        final var result = processor.process(wrapLogRecord(logRecord));
+
+        assertThat(result)
+                .containsEntry(EventFields.EVENT_CODE, 4625L)
+                .containsEntry(EventFields.EVENT_OUTCOME, "failure")
+                .containsEntry(WINDOWS_LOGON_TYPE, "3")
+                .containsEntry(WINDOWS_AUTH_PACKAGE_NAME, "NTLM")
+                .containsEntry(EventFields.EVENT_ERROR_CODE, "0xc000006d")
+                .containsEntry(VENDOR_EVENT_SUBSTATUS, "0xc0000064")
+                .containsEntry(EventFields.EVENT_ERROR_DESCRIPTION, "Unknown user name or bad password.")
+                .containsEntry(SourceFields.SOURCE_IP, "108.221.24.75")
+                .containsEntry(SourceFields.SOURCE_PORT, 0)
+                .containsEntry(UserFields.USER_ID, "S-1-0-0")
+                .containsEntry(UserFields.USER_NAME, "REMOTE")
+                .containsEntry(SourceFields.SOURCE_USER_ID, "S-1-0-0")
+                .containsEntry(SourceFields.SOURCE_USER_SESSION_ID, "0x0");
+    }
+
+    @Test
+    void maps4624WithNetworkAndAuthFields() throws IOException {
+        // 4624 from OTLP dump: record_id=834375, real IP, NTLM V2, LogonType=3
+        final var logRecord = fixtureRecordByRecordId("windows-2025-eventlog-4.ndjson", 834375L);
+        final var result = processor.process(wrapLogRecord(logRecord));
+
+        assertThat(result)
+                .containsEntry(EventFields.EVENT_CODE, 4624L)
+                .containsEntry(EventFields.EVENT_OUTCOME, "success")
+                .containsEntry(WINDOWS_LOGON_TYPE, "3")
+                .containsEntry(WINDOWS_AUTH_PACKAGE_NAME, "NTLM")
+                .containsEntry(WINDOWS_AUTH_LM_PACKAGE_NAME, "NTLM V2")
+                .containsEntry(USER_SESSION_UID, "{00000000-0000-0000-0000-000000000000}")
+                .containsEntry(SourceFields.SOURCE_IP, "31.150.102.150")
+                .containsEntry(SourceFields.SOURCE_PORT, 0)
+                .containsEntry(SourceFields.SOURCE_HOSTNAME, "h2")
+                .containsEntry(UserFields.USER_ID, "S-1-5-21-2637047489-2197293977-9275664-500")
+                .containsEntry(UserFields.USER_NAME, "Administrator")
+                .containsEntry(UserFields.USER_DOMAIN, "GLCWIN2022")
+                .containsEntry(UserFields.USER_SESSION_ID, "0x297a8f1a");
     }
 
     private static OTelJournal.Log wrapLogRecord(LogRecord logRecord) {

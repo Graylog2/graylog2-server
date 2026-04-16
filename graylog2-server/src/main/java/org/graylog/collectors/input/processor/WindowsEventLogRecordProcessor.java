@@ -55,6 +55,12 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
     private static final String VENDOR_EVENT_CATEGORY = "vendor_event_category";
     private static final String VENDOR_EVENT_TIMESTAMP = "vendor_event_timestamp";
     private static final String PRIVILEGE_ASSIGNED_NAME = "privilege_assigned_name";
+    private static final String WINDOWS_LOGON_TYPE = "windows_logon_type";
+    private static final String WINDOWS_AUTH_PACKAGE_NAME = "windows_authentication_package_name";
+    private static final String WINDOWS_AUTH_PROCESS_NAME = "windows_authentication_process_name";
+    private static final String WINDOWS_AUTH_LM_PACKAGE_NAME = "windows_authentication_lmpackage_name";
+    private static final String VENDOR_EVENT_SUBSTATUS = "vendor_event_substatus";
+    private static final String USER_SESSION_UID = "user_session_uid";
 
     @Override
     public Map<String, Object> process(OTelJournal.Log log) {
@@ -162,6 +168,16 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
         if (!privilegeValues.isEmpty()) {
             result.put(PRIVILEGE_ASSIGNED_NAME, privilegeValues);
         }
+
+        putIfPresent(result, WINDOWS_LOGON_TYPE, fields.logonType);
+        putIfPresent(result, WINDOWS_AUTH_PACKAGE_NAME, fields.authPackageName);
+        putIfPresent(result, WINDOWS_AUTH_PROCESS_NAME, fields.authProcessName);
+        putIfPresent(result, WINDOWS_AUTH_LM_PACKAGE_NAME, fields.authLmPackageName);
+        putIfPresent(result, EventFields.EVENT_ERROR_CODE, fields.status);
+        putIfPresent(result, VENDOR_EVENT_SUBSTATUS, fields.subStatus);
+        putIfPresent(result, EventFields.EVENT_ERROR_DESCRIPTION, fields.failureReason);
+        putIfPresent(result, ProcessFields.PROCESS_COMMAND_LINE, fields.commandLine);
+        putIfPresent(result, USER_SESSION_UID, fields.logonGuid);
 
         return result;
     }
@@ -292,14 +308,27 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
                         fields.targetUserName = extractString(kv.getValue());
                     }
                 }
+                // 4624/4634 logon type code.
+                case "LogonType" -> fields.logonType = extractString(kv.getValue());
+                // 4624 authentication package name.
+                case "AuthenticationPackageName" -> fields.authPackageName = extractString(kv.getValue());
+                // 4624 trusted logon process name.
+                case "LogonProcessName" -> fields.authProcessName = extractString(kv.getValue());
+                // 4624 NTLM package subtype.
+                case "LmPackageName" -> fields.authLmPackageName = extractString(kv.getValue());
+                // 4625/4776 validation status/error code.
+                case "Status" -> fields.status = extractString(kv.getValue());
+                // 4625 NTSTATUS sub-code for failure detail.
+                case "SubStatus" -> fields.subStatus = extractString(kv.getValue());
+                // 4625 human-readable failure description.
+                case "FailureReason" -> fields.failureReason = extractString(kv.getValue());
+                // 4688 command line (when audit policy enabled).
+                case "CommandLine" -> fields.commandLine = extractString(kv.getValue());
+                // 4624/4648 logon GUID correlation value.
+                case "LogonGuid" -> fields.logonGuid = extractString(kv.getValue());
                 // Unmapped but documented:
                 // case "process" -> OpenSSH EventData process marker.
                 // case "payload" -> OpenSSH EventData payload detail text.
-                // case "LogonType" -> 4624/4634 logon type code.
-                // case "LogonGuid" -> 4624/4648 logon GUID correlation value.
-                // case "AuthenticationPackageName" -> 4624 auth package.
-                // case "LogonProcessName" -> 4624 trusted logon process name.
-                // case "LmPackageName" -> 4624 NTLM package subtype.
                 // case "TransmittedServices" -> 4624 Kerberos transited services.
                 // case "KeyLength" -> 4624 key length.
                 // case "ImpersonationLevel" -> 4624 impersonation level.
@@ -314,14 +343,10 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
                 // case "TargetLogonGuid" -> 4648 target logon GUID.
                 // case "TargetSid" -> 4717/4718/4798 target SID.
                 // case "PackageName" -> 4776 authentication package.
-                // case "Status" -> 4776 validation status/error code.
                 // case "AccessGranted" -> 4717 granted logon right.
                 // case "AccessRemoved" -> 4718 removed logon right.
                 // case "MandatoryLabel" -> 4688 mandatory integrity label SID.
                 // case "TokenElevationType" -> 4688 token elevation type code.
-                // case "CommandLine" -> 4688 command line (when audit policy enabled).
-                // case "FailureReason" -> 4625 human-readable failure description.
-                // case "SubStatus" -> 4625 NTSTATUS sub-code for failure detail.
                 // case "" -> unnamed positional EventData entries (common in PowerShell events).
             }
         }
@@ -573,5 +598,15 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
         private String workstation;
         private String targetServerName;
         private String privilegeList;
+
+        private String logonType;
+        private String authPackageName;
+        private String authProcessName;
+        private String authLmPackageName;
+        private String status;
+        private String subStatus;
+        private String failureReason;
+        private String commandLine;
+        private String logonGuid;
     }
 }
