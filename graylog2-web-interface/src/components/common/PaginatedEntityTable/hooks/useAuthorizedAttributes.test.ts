@@ -27,6 +27,12 @@ import useAuthorizedAttributes from './useAuthorizedAttributes';
 
 jest.mock('hooks/useCurrentUser');
 
+declare module 'graylog-web-plugin/plugin' {
+  interface EntityActions {
+    restricted: 'read';
+  }
+}
+
 describe('useAuthorizedAttributes', () => {
   const attributes: Array<Attribute> = [
     { id: 'title', title: 'Title', type: 'STRING' },
