@@ -116,8 +116,9 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
                 case "outcome" -> putIfPresent(result, EventFields.EVENT_OUTCOME, extractString(bodyFieldValue));
                 // UserData payload fields (provider-specific, alternative to EventData for some providers).
                 case "user_data" -> extractUserData(bodyFieldValue, fields);
+                // System/Level: rendered severity text (Information/Warning/Error/Critical/Verbose).
+                case "level" -> putIfPresent(result, VendorFields.VENDOR_EVENT_SEVERITY, extractString(bodyFieldValue));
                 // Unmapped but documented:
-                // case "level" -> rendered level text (Information/Warning/Error).
                 // case "keywords" -> System/Keywords rendered keywords bitmask/tags.
             }
         }
@@ -155,6 +156,7 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
         putByPrecedence(result, SourceFields.SOURCE_USER_NAME, fields.subjectUserName, fields.securityUserName);
         putByPrecedence(result, SourceFields.SOURCE_USER_DOMAIN, fields.subjectDomainName, fields.securityDomain);
         putByPrecedence(result, SourceFields.SOURCE_USER_SESSION_ID, fields.subjectLogonId);
+        putIfPresent(result, SourceFields.SOURCE_USER_TYPE, fields.securityUserType);
 
         putByPrecedence(result, SourceFields.SOURCE_HOSTNAME, fields.workstationName, fields.workstation);
         putIfPresent(result, SourceFields.SOURCE_IP, validIp(fields.ipAddress));
@@ -247,8 +249,7 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
                 case "user_id" -> fields.securityUserId = extractString(kv.getValue());
                 case "user_name" -> fields.securityUserName = extractString(kv.getValue());
                 case "domain" -> fields.securityDomain = extractString(kv.getValue());
-                // Unmapped but documented:
-                // case "user_type" -> System/Security user type descriptor.
+                case "user_type" -> fields.securityUserType = extractString(kv.getValue());
             }
         }
     }
@@ -573,6 +574,7 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
         private String securityUserId;
         private String securityUserName;
         private String securityDomain;
+        private String securityUserType;
 
         private Long processId;
         private String processPath;

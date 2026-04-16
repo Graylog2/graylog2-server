@@ -293,11 +293,28 @@ class WindowsEventLogRecordProcessorTest {
                 .containsEntry(EventFields.EVENT_LOG_NAME, "System")
                 .containsEntry(EventFields.EVENT_CODE, 7036L)
                 .containsEntry(EVENT_ID, "7036")
-                .containsEntry(VendorFields.VENDOR_SUBTYPE, "Service Control Manager");
+                .containsEntry(VendorFields.VENDOR_SUBTYPE, "Service Control Manager")
+                .containsEntry(VendorFields.VENDOR_EVENT_SEVERITY, "Information");
 
         assertThat(result).doesNotContainKeys(
                 EventFields.EVENT_OUTCOME
         );
+    }
+
+    @Test
+    void mapsDefenderEventWithSecurityUserType() throws IOException {
+        final var logRecord = fixtureRecordByRecordId("windows-2025-eventlog-4.ndjson", 3661L);
+        final var result = processor.process(wrapLogRecord(logRecord));
+
+        assertThat(result)
+                .containsEntry(HostFields.HOST_HOSTNAME, "glcwin2025")
+                .containsEntry(EventFields.EVENT_LOG_NAME, "Microsoft-Windows-Windows Defender/Operational")
+                .containsEntry(EventFields.EVENT_CODE, 1150L)
+                .containsEntry(VendorFields.VENDOR_EVENT_SEVERITY, "Information")
+                .containsEntry(SourceFields.SOURCE_USER_ID, "S-1-5-18")
+                .containsEntry(SourceFields.SOURCE_USER_NAME, "SYSTEM")
+                .containsEntry(SourceFields.SOURCE_USER_DOMAIN, "NT AUTHORITY")
+                .containsEntry(SourceFields.SOURCE_USER_TYPE, "WellKnownGroup");
     }
 
     @Test
