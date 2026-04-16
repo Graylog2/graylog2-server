@@ -389,7 +389,8 @@ class CollectorIngestCodecTest {
         final var decoded = codecWithProcessor.decodeSafe(rawMessage);
 
         assertThat(decoded).isPresent();
-        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_TYPE)).isEqualTo("file_log");
+        assertThat(decoded.get().getField("collector_receiver_type")).isEqualTo("file_log");
+        assertThat(decoded.get().getField("collector_receiver_type")).isEqualTo("filelog");
         assertThat(decoded.get().getField(EventFields.EVENT_LOG_NAME)).isEqualTo("test.log");
     }
 

@@ -160,9 +160,7 @@ describe('ReassignFleetModal', () => {
 
   describe('telemetry', () => {
     it('emits REASSIGNED telemetry on single-instance reassignment success', async () => {
-      render(
-        <ReassignFleetModal instanceUids={['uid-1']} currentFleetId="fleet-1" onClose={jest.fn()} />,
-      );
+      render(<ReassignFleetModal instanceUids={['uid-1']} currentFleetId="fleet-1" onClose={jest.fn()} />);
 
       // Select a fleet
       await userEvent.click(await screen.findByText(/select a fleet/i));
@@ -184,9 +182,7 @@ describe('ReassignFleetModal', () => {
     });
 
     it('emits BULK_REASSIGNED telemetry on multi-instance reassignment success', async () => {
-      render(
-        <ReassignFleetModal instanceUids={['uid-1', 'uid-2', 'uid-3']} onClose={jest.fn()} />,
-      );
+      render(<ReassignFleetModal instanceUids={['uid-1', 'uid-2', 'uid-3']} onClose={jest.fn()} />);
 
       // Select a fleet
       await userEvent.click(await screen.findByText(/select a fleet/i));

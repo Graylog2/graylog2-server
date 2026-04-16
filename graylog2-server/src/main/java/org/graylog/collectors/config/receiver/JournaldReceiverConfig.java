@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
 import org.graylog.collectors.CollectorOSType;
+import org.graylog.collectors.CollectorReadMode;
 import org.graylog.collectors.config.extension.FileStorageExtensionConfig;
 
 import java.util.EnumSet;
@@ -37,13 +38,6 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class JournaldReceiverConfig implements CollectorReceiverConfig, CollectorStanzaReceiver {
     public static final String RECEIVER_TYPE = "journald";
-
-    public enum StartAt {
-        @JsonProperty("beginning")
-        BEGINNING,
-        @JsonProperty("end")
-        END
-    }
 
     public enum Priority {
         @JsonProperty("emerg")
@@ -82,7 +76,7 @@ public abstract class JournaldReceiverConfig implements CollectorReceiverConfig,
 
     // Available options: "beginning", "end"
     @JsonProperty("start_at")
-    public abstract StartAt startAt();
+    public abstract CollectorReadMode startAt();
 
     @JsonProperty("storage")
     public abstract String storage();
@@ -90,7 +84,7 @@ public abstract class JournaldReceiverConfig implements CollectorReceiverConfig,
     public static Builder builder(String id) {
         return new AutoValue_JournaldReceiverConfig.Builder()
                 .name(f("journald/%s", id))
-                .startAt(StartAt.END)
+                .startAt(CollectorReadMode.END)
                 .storage(FileStorageExtensionConfig.defaultInstance().name())
                 .priority(Priority.INFO);
     }
@@ -103,7 +97,7 @@ public abstract class JournaldReceiverConfig implements CollectorReceiverConfig,
 
         public abstract Builder matches(@Nullable List<String> matches);
 
-        public abstract Builder startAt(StartAt startAt);
+        public abstract Builder startAt(CollectorReadMode startAt);
 
         public abstract Builder storage(String storage);
 

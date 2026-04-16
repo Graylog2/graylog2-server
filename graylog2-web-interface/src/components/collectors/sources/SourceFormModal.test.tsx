@@ -82,7 +82,15 @@ describe('SourceFormModal telemetry', () => {
   });
 
   it('does NOT emit CREATE_OPENED on mount in edit mode', () => {
-    const source = { id: 's-1', fleet_id: 'f-1', name: 's', description: '', enabled: true, type: 'file' as const, config: { paths: ['/var/log/x'], read_mode: 'end' as const } };
+    const source = {
+      id: 's-1',
+      fleet_id: 'f-1',
+      name: 's',
+      description: '',
+      enabled: true,
+      type: 'file' as const,
+      config: { paths: ['/var/log/x'], read_mode: 'end' as const },
+    };
     render(<SourceFormModal fleetId="f-1" source={source} onClose={jest.fn()} onSave={jest.fn()} />);
 
     expect(sendTelemetryInstance).not.toHaveBeenCalledWith('Collector Source Create Opened', expect.anything());

@@ -49,7 +49,9 @@ const IngestEndpointStatus = ({ defaultPort, isInitialSetup }: Props) => {
   const currentUser = useCurrentUser();
   const { createInput } = useInputMutations();
   const { collectorInputIds, loadedInputs, unreadableCount, isLoading } = useCollectorInputDetails();
-  const { data: inputStates, isLoading: isLoadingInputStates } = useInputsStates({ enabled: collectorInputIds.length > 0 });
+  const { data: inputStates, isLoading: isLoadingInputStates } = useInputsStates({
+    enabled: collectorInputIds.length > 0,
+  });
   const sendTelemetry = useSendCollectorsTelemetry();
 
   const canCreateInputs = isPermitted(currentUser?.permissions, [
@@ -108,8 +110,8 @@ const IngestEndpointStatus = ({ defaultPort, isInitialSetup }: Props) => {
         )}
         {loadedInputs.length === 0 && unreadableCount > 0 && (
           <p>
-            {unreadableCount} collector ingest {unreadableCount === 1 ? 'input exists' : 'inputs exist'} but you do
-            not have permission to view {unreadableCount === 1 ? 'it' : 'them'}.
+            {unreadableCount} collector ingest {unreadableCount === 1 ? 'input exists' : 'inputs exist'} but you do not
+            have permission to view {unreadableCount === 1 ? 'it' : 'them'}.
           </p>
         )}
         {!isLoadingInputStates && !hasRunningInput && loadedInputs.length > 0 && (
@@ -132,7 +134,9 @@ const IngestEndpointStatus = ({ defaultPort, isInitialSetup }: Props) => {
               {loadedInputs.map((input) => (
                 <tr key={input.id}>
                   <td>{input.title}</td>
-                  <td><InputStateBadge input={input} inputStates={inputStates} /></td>
+                  <td>
+                    <InputStateBadge input={input} inputStates={inputStates} />
+                  </td>
                   <td>{String(input.attributes?.bind_address ?? '')}</td>
                   <td>{String(input.attributes?.port ?? '')}</td>
                   <td>
@@ -162,8 +166,7 @@ const IngestEndpointStatus = ({ defaultPort, isInitialSetup }: Props) => {
         )}
         {unreadableCount > 0 && loadedInputs.length > 0 && (
           <p>
-            {unreadableCount} additional {unreadableCount === 1 ? 'input' : 'inputs'} not visible due to
-            permissions.
+            {unreadableCount} additional {unreadableCount === 1 ? 'input' : 'inputs'} not visible due to permissions.
           </p>
         )}
       </Col>

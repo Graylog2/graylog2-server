@@ -57,7 +57,7 @@ const useCollectorsMutations = () => {
 
   // Fleet mutations
   const createFleetMutation = useMutation({
-    mutationFn: (input: { name: string; description?: string; }) =>
+    mutationFn: (input: { name: string; description?: string }) =>
       CollectorsFleets.create({
         name: input.name,
         description: input.description,

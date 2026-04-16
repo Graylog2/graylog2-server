@@ -227,9 +227,7 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props
   const handleClose = useCallback(() => {
     if (!isEdit) {
       const { dirty, touched, values } = formStateRef.current;
-      const fields_touched = Object.keys(touched).filter(
-        (k) => Boolean((touched as Record<string, unknown>)[k]),
-      );
+      const fields_touched = Object.keys(touched).filter((k) => Boolean((touched as Record<string, unknown>)[k]));
 
       sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SOURCE.CREATE_CANCELLED, {
         app_action_value: 'source-create-cancel',
@@ -288,74 +286,76 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props
           formStateRef.current = { dirty, touched, values };
 
           return (
-          <Form>
-            <Modal.Header>
-              <Modal.Title>{isEdit ? 'Edit Source' : 'New Source'}</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>
-                A source defines what data collectors in this fleet should collect.
-                Each source type corresponds to a different collection method.
-              </p>
-              <Input
-                id="source-type"
-                type="select"
-                label="Source Type"
-                value={values.source_type}
-                onChange={(e) => {
-                  const newType = e.target.value as SourceType;
+            <Form>
+              <Modal.Header>
+                <Modal.Title>{isEdit ? 'Edit Source' : 'New Source'}</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <p>
+                  A source defines what data collectors in this fleet should collect. Each source type corresponds to a
+                  different collection method.
+                </p>
+                <Input
+                  id="source-type"
+                  type="select"
+                  label="Source Type"
+                  value={values.source_type}
+                  onChange={(e) => {
+                    const newType = e.target.value as SourceType;
 
-                  setFieldValue('source_type', newType);
-                  setFieldValue('config', defaultConfigs[newType]);
-                }}
-                disabled={isEdit}>
-                {Object.entries(SOURCE_TYPE_LABELS).map(([value, label]) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </Input>
-              {values.source_type === 'file' && (
-                <HelpBlock>Collect log lines from files on the host. Supports glob patterns for matching multiple files.</HelpBlock>
-              )}
-              {values.source_type === 'journald' && (
-                <HelpBlock>Collect entries from the systemd journal (Linux only).</HelpBlock>
-              )}
-              {values.source_type === 'windows_event_log' && (
-                <HelpBlock>Collect events from Windows Event Viewer channels.</HelpBlock>
-              )}
-              <FormikInput id="source-name" label="Name" name="name" required />
-              <FormikInput id="source-description" label="Description" name="description" type="textarea" />
-              <FormikInput
-                id="source-enabled"
-                label="Enabled"
-                name="enabled"
-                type="checkbox"
-                help="Disabled sources are not sent to collectors. Use this to temporarily stop collection without removing the source."
-              />
-              {values.source_type === 'file' && (
-                <FileConfigFields config={values.config as FileSourceConfig} setFieldValue={setFieldValue} />
-              )}
-              {values.source_type === 'journald' && (
-                <JournaldConfigFields config={values.config as JournaldSourceConfig} setFieldValue={setFieldValue} />
-              )}
-              {values.source_type === 'windows_event_log' && (
-                <WindowsEventLogConfigFields
-                  config={values.config as WindowsEventLogSourceConfig}
-                  setFieldValue={setFieldValue}
+                    setFieldValue('source_type', newType);
+                    setFieldValue('config', defaultConfigs[newType]);
+                  }}
+                  disabled={isEdit}>
+                  {Object.entries(SOURCE_TYPE_LABELS).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </Input>
+                {values.source_type === 'file' && (
+                  <HelpBlock>
+                    Collect log lines from files on the host. Supports glob patterns for matching multiple files.
+                  </HelpBlock>
+                )}
+                {values.source_type === 'journald' && (
+                  <HelpBlock>Collect entries from the systemd journal (Linux only).</HelpBlock>
+                )}
+                {values.source_type === 'windows_event_log' && (
+                  <HelpBlock>Collect events from Windows Event Viewer channels.</HelpBlock>
+                )}
+                <FormikInput id="source-name" label="Name" name="name" required />
+                <FormikInput id="source-description" label="Description" name="description" type="textarea" />
+                <FormikInput
+                  id="source-enabled"
+                  label="Enabled"
+                  name="enabled"
+                  type="checkbox"
+                  help="Disabled sources are not sent to collectors. Use this to temporarily stop collection without removing the source."
                 />
-              )}
-            </Modal.Body>
-            <Modal.Footer>
-              <ModalSubmit
-                submitButtonText={isEdit ? 'Update source' : 'Create source'}
-                submitLoadingText={isEdit ? 'Updating...' : 'Creating...'}
-                onCancel={handleClose}
-                disabledSubmit={isValidating}
-                isSubmitting={isSubmitting}
-              />
-            </Modal.Footer>
-          </Form>
+                {values.source_type === 'file' && (
+                  <FileConfigFields config={values.config as FileSourceConfig} setFieldValue={setFieldValue} />
+                )}
+                {values.source_type === 'journald' && (
+                  <JournaldConfigFields config={values.config as JournaldSourceConfig} setFieldValue={setFieldValue} />
+                )}
+                {values.source_type === 'windows_event_log' && (
+                  <WindowsEventLogConfigFields
+                    config={values.config as WindowsEventLogSourceConfig}
+                    setFieldValue={setFieldValue}
+                  />
+                )}
+              </Modal.Body>
+              <Modal.Footer>
+                <ModalSubmit
+                  submitButtonText={isEdit ? 'Update source' : 'Create source'}
+                  submitLoadingText={isEdit ? 'Updating...' : 'Creating...'}
+                  onCancel={handleClose}
+                  disabledSubmit={isValidating}
+                  isSubmitting={isSubmitting}
+                />
+              </Modal.Footer>
+            </Form>
           );
         }}
       </Formik>
