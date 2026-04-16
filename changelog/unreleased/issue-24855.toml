@@ -1,4 +1,4 @@
-type = "f"
+type = "s"
 message = "Fix source stream permission filtering for events."
 
 issues = ["24855"]
