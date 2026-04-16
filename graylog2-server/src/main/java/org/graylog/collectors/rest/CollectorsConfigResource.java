@@ -125,6 +125,9 @@ public class CollectorsConfigResource extends RestResource {
     @Path("/inputs")
     @Operation(summary = "Create the default collector ingest input")
     @NoAuditEvent("Audit event is emitted by CollectorIngestInputService")
+    // Input permissions are checked inline in CollectorIngestInputService#createInput. Collectors config is not
+    // altered, only read in this process.
+    @RequiresPermissions(CollectorsPermissions.CONFIGURATION_READ)
     public CollectorInputIdsResponse createInput() throws ValidationException {
         final var config = collectorsConfigService.get()
                 .orElseThrow(() -> new BadRequestException("Collectors config has not been initialized yet"));
