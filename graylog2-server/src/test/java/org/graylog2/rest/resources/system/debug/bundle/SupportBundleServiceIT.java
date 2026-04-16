@@ -147,22 +147,24 @@ class SupportBundleServiceIT {
                 () -> service.buildBundle(mock(HttpHeaders.class), mock(Subject.class)));
 
         final Path bundleDir = tempDir.resolve("support-bundle");
-        final Optional<Path> zipFile = Files.list(bundleDir)
-                .filter(p -> p.getFileName().toString().endsWith(".zip"))
-                .findFirst();
-        assertThat(zipFile).as("bundle zip file").isPresent();
+        try (final Stream<Path> files = Files.list(bundleDir)) {
+            final Optional<Path> zipFile = files
+                    .filter(p -> p.getFileName().toString().endsWith(".zip"))
+                    .findFirst();
+            assertThat(zipFile).as("bundle zip file").isPresent();
 
-        try (final ZipFile zip = new ZipFile(zipFile.get().toFile())) {
-            final var errorsEntry = zip.getEntry("errors.json");
-            assertThat(errorsEntry).as("errors.json entry in bundle zip").isNotNull();
+            try (final ZipFile zip = new ZipFile(zipFile.get().toFile())) {
+                final var errorsEntry = zip.getEntry("errors.json");
+                assertThat(errorsEntry).as("errors.json entry in bundle zip").isNotNull();
 
-            final String content = new String(
-                    zip.getInputStream(errorsEntry).readAllBytes(), StandardCharsets.UTF_8);
-            assertThat(content)
-                    .contains(f("node/%s/system-overview", failingNodeId))
-                    .contains(f("node/%s/jvm", failingNodeId))
-                    .contains(f("node/%s/process-buffer-dump", failingNodeId))
-                    .contains(f("node/%s/installed-plugins", failingNodeId));
+                final String content = new String(
+                        zip.getInputStream(errorsEntry).readAllBytes(), StandardCharsets.UTF_8);
+                assertThat(content)
+                        .contains(f("node/%s/system-overview", failingNodeId))
+                        .contains(f("node/%s/jvm", failingNodeId))
+                        .contains(f("node/%s/process-buffer-dump", failingNodeId))
+                        .contains(f("node/%s/installed-plugins", failingNodeId));
+            }
         }
     }
 
