@@ -26,15 +26,23 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 export const ALPHABETICAL_SORT = 'alphabetical';
-
-export type SortAttribute = string;
-export type SortDirection = 'asc' | 'desc';
-export type SortOption = { value: SortAttribute; label: string };
-
 export const DEFAULT_SORT_OPTIONS: Array<SortOption> = [{ value: ALPHABETICAL_SORT, label: 'Alphabetical' }];
+const DEFAULT_SORT_DIRECTION = 'asc';
 
-export const defaultSortDirectionForAttribute = (attribute: SortAttribute): SortDirection =>
-  attribute === ALPHABETICAL_SORT ? 'asc' : 'desc';
+export type SortMode = string;
+export type SortDirection = 'asc' | 'desc';
+export type SortOption = { value: SortMode; label: string };
+
+export const defaultSortDirectionForMode = (
+  mode: SortMode,
+  sliceSortDefault?: { mode: SortMode; direction: SortDirection },
+): SortDirection => {
+  if (sliceSortDefault?.mode === mode) {
+    return sliceSortDefault.direction;
+  }
+
+  return DEFAULT_SORT_DIRECTION;
+};
 
 const Controls = styled.div(
   ({ theme }) => css`
@@ -74,8 +82,8 @@ type Props = {
   onSearchQueryChange: (value: string) => void;
   onSearchReset: () => void;
   sortOptions: Array<SortOption>;
-  sortAttribute: SortAttribute;
-  onSortAttributeChange: (attribute: SortAttribute) => void;
+  sortMode: SortMode;
+  onSortModeChange: (mode: SortMode) => void;
   sortDirection: SortDirection;
   onSortDirectionChange: (direction: SortDirection) => void;
 };
@@ -88,13 +96,13 @@ const SliceFilters = ({
   onSearchQueryChange,
   onSearchReset,
   sortOptions,
-  sortAttribute,
-  onSortAttributeChange,
+  sortMode,
+  onSortModeChange,
   sortDirection,
   onSortDirectionChange,
 }: Props) => {
   const sendTelemetry = useSendTelemetry();
-  const selectedSortOption = sortOptions.find((option) => option.value === sortAttribute) ?? DEFAULT_SORT_OPTIONS[0];
+  const selectedSortOption = sortOptions.find((option) => option.value === sortMode) ?? DEFAULT_SORT_OPTIONS[0];
 
   const handleSearchChange = (value: string) => {
     onSearchQueryChange(value);
@@ -116,18 +124,17 @@ const SliceFilters = ({
       },
     });
   };
-  const handleSortAttributeChange = (attribute: SortAttribute) => {
-    if (attribute === sortAttribute) {
+  const handleSortModeChange = (mode: SortMode) => {
+    if (mode === sortMode) {
       return;
     }
 
-    onSortAttributeChange(attribute);
+    onSortModeChange(mode);
     sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_SORT_CHANGED, {
       app_section: appSection,
       event_details: {
         attribute_id: sliceCol,
-        sort_attribute: attribute,
-        sort_direction: defaultSortDirectionForAttribute(attribute),
+        sort_mode: mode,
       },
     });
   };
@@ -139,7 +146,7 @@ const SliceFilters = ({
       app_section: appSection,
       event_details: {
         attribute_id: sliceCol,
-        sort_attribute: sortAttribute,
+        sort_mode: sortMode,
         sort_direction: nextDirection,
       },
     });
@@ -152,7 +159,10 @@ const SliceFilters = ({
       title={selectedSortOption.label}
       buttonTitle={`Sort by ${selectedSortOption.label}`}>
       {sortOptions.map((option) => (
-        <MenuItem key={option.value} onClick={() => handleSortAttributeChange(option.value)} active={sortAttribute === option.value}>
+        <MenuItem
+          key={option.value}
+          onClick={() => handleSortModeChange(option.value)}
+          active={sortMode === option.value}>
           {option.label}
         </MenuItem>
       ))}
@@ -173,7 +183,7 @@ const SliceFilters = ({
         {sortControl}
         <IconButton
           name={sortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward'}
-          title={`Sort ${sortDirection === 'asc' ? 'ascending' : 'descending'}`}
+          title={`Sort ${sortDirection === 'asc' ? 'descending' : 'ascending'}`}
           onClick={handleSortDirectionChange}
         />
       </ControlsRow>

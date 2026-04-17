@@ -25,6 +25,7 @@ import TableFetchContext, { type ContextValue } from 'components/common/Paginate
 import type { ColumnSchema } from 'components/common/EntityDataTable/types';
 import useCurrentUser from 'hooks/useCurrentUser';
 
+import { ALPHABETICAL_SORT } from './SliceFilters';
 import Slicing from './index';
 
 jest.mock('logic/telemetry/useSendTelemetry', () => () => jest.fn());
@@ -185,6 +186,13 @@ describe('Slicing', () => {
     await userEvent.click(await screen.findByRole('menuitem', { name: /risk score/i }));
 
     await waitFor(() => {
+      expect(getItems()[0]).toHaveTextContent('Alpha');
+      expect(getItems()[1]).toHaveTextContent('Beta');
+    });
+
+    await userEvent.click(screen.getByRole('button', { name: /sort descending/i }));
+
+    await waitFor(() => {
       expect(getItems()[0]).toHaveTextContent('Beta');
       expect(getItems()[1]).toHaveTextContent('Alpha');
     });
@@ -208,7 +216,7 @@ describe('Slicing', () => {
     expect(getItems()[0]).toHaveTextContent('Alpha');
     expect(getItems()[1]).toHaveTextContent('Beta');
 
-    await userEvent.click(screen.getByRole('button', { name: /sort ascending/i }));
+    await userEvent.click(screen.getByRole('button', { name: /sort descending/i }));
 
     await waitFor(() => {
       expect(getItems()[0]).toHaveTextContent('Beta');
@@ -239,11 +247,19 @@ describe('Slicing', () => {
 
     await waitFor(() => {
       expect(getItems()[0]).toHaveTextContent('(Empty Value)');
+      expect(getItems()[1]).toHaveTextContent('Alpha');
+      expect(getItems()[2]).toHaveTextContent('Beta');
+    });
+
+    await userEvent.click(screen.getByRole('button', { name: /sort descending/i }));
+
+    await waitFor(() => {
+      expect(getItems()[0]).toHaveTextContent('(Empty Value)');
       expect(getItems()[1]).toHaveTextContent('Beta');
       expect(getItems()[2]).toHaveTextContent('Alpha');
     });
 
-    await userEvent.click(screen.getByRole('button', { name: /sort descending/i }));
+    await userEvent.click(screen.getByRole('button', { name: /sort ascending/i }));
 
     await waitFor(() => {
       expect(getItems()[0]).toHaveTextContent('(Empty Value)');
@@ -305,7 +321,7 @@ describe('Slicing', () => {
           type: 'STRING' as const,
           sliceable: true,
           slice_sort_options: [{ value: 'risk_score', title: 'Risk Score' }],
-          slice_sort_default: { attribute: 'risk_score', direction: 'desc' },
+          slice_sort_default: { mode: 'risk_score', direction: 'desc' },
         },
       ];
 
@@ -338,7 +354,7 @@ describe('Slicing', () => {
           title: 'Status',
           type: 'STRING' as const,
           sliceable: true,
-          slice_sort_default: { attribute: 'alphabetical', direction: 'desc' },
+          slice_sort_default: { mode: ALPHABETICAL_SORT, direction: 'desc' },
         },
       ];
 

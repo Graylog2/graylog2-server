@@ -18,7 +18,7 @@
 import { defaultCompare } from 'logic/DefaultCompare';
 import type { Slices, SliceRenderers } from 'components/common/PaginatedEntityTable/slicing/Slicing';
 
-import { ALPHABETICAL_SORT, type SortDirection, type SortAttribute } from './SliceFilters';
+import { ALPHABETICAL_SORT, type SortDirection, type SortMode } from './SliceFilters';
 import useFetchSlices, { type FetchSlices } from './useFetchSlices';
 
 type Slice = Slices[number];
@@ -60,7 +60,7 @@ const compareNullableValues = (
 
 const sortSlices = (
   items: Slices,
-  sortAttribute: SortAttribute,
+  sortMode: SortAttribute,
   sortDirection: SortDirection,
   getSliceLabel: (slice: Slice) => string,
 ) =>
@@ -73,10 +73,10 @@ const sortSlices = (
 
     let comparison = 0;
 
-    if (sortAttribute === ALPHABETICAL_SORT) {
+    if (sortMode === ALPHABETICAL_SORT) {
       comparison = defaultCompare(getSliceLabel(left), getSliceLabel(right));
     } else {
-      comparison = compareNullableValues(left.meta?.[sortAttribute], right.meta?.[sortAttribute]);
+      comparison = compareNullableValues(left.meta?.[sortMode], right.meta?.[sortMode]);
     }
 
     if (comparison !== 0) {
@@ -102,7 +102,7 @@ type Props = {
   fetchSlices: FetchSlices;
   activeSlice: string | undefined;
   searchQuery: string;
-  sortAttribute: SortAttribute;
+  sortMode: SortAttribute;
   sortDirection: SortDirection;
   sliceRenderers?: SliceRenderers;
 };
@@ -128,7 +128,7 @@ const useSlices = ({
   fetchSlices,
   activeSlice,
   searchQuery,
-  sortAttribute,
+  sortMode,
   sortDirection,
   sliceRenderers = undefined,
 }: Props) => {
@@ -143,8 +143,8 @@ const useSlices = ({
     refetchSlices,
     hasEmptySlices: emptySlices.length > 0,
     emptySliceCount: emptySlices.length,
-    visibleNonEmptySlices: sortSlices(nonEmptySlices, sortAttribute, sortDirection, getSliceLabel),
-    visibleEmptySlices: sortSlices(emptySlices, sortAttribute, sortDirection, getSliceLabel),
+    visibleNonEmptySlices: sortSlices(nonEmptySlices, sortMode, sortDirection, getSliceLabel),
+    visibleEmptySlices: sortSlices(emptySlices, sortMode, sortDirection, getSliceLabel),
   };
 };
 
