@@ -41,7 +41,6 @@ const EventsListSidebar = styled.div(
     display: flex;
     flex-direction: column;
     gap: ${theme.spacings.xs};
-    width: 320px;
   `,
 );
 
@@ -55,7 +54,7 @@ const StyledList = styled.ul(
 );
 
 const ActionsBar = styled(ButtonToolbar)`
-  align-self: flex-end;
+  align-self: flex-start;
   display: flex;
   justify-content: flex-end;
   align-items: end;

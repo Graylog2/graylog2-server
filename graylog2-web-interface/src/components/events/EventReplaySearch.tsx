@@ -50,7 +50,6 @@ const defaultSearchPageLayout: Partial<LayoutState> = {
     initialSectionCollapsed: true,
     title: 'Replayed Search',
     sections: [...sidebarSections],
-    contentColumnWidth: 350,
   },
 };
 
