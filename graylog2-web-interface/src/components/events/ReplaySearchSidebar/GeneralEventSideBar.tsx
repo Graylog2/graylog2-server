@@ -24,7 +24,7 @@ import useEventsAdditionalData from 'components/events/ReplaySearchSidebar/hooks
 import useEventById from 'hooks/useEventById';
 import { Spinner } from 'components/common';
 import ExpandableSection from 'components/events/ReplaySearchSidebar/ExpandableSection';
-import EventDefinitionInfoTable from 'components/event-definitions/replay-search/EventDefinitionInfoTable';
+import EventDefinitionInfoList from 'components/event-definitions/replay-search/EventDefinitionInfoList';
 import ReplaySearchContext from 'components/event-definitions/replay-search/ReplaySearchContext';
 import type { ReplaySearchContextType } from 'components/event-definitions/replay-search/ReplaySearchContext';
 
@@ -90,7 +90,7 @@ const GeneralEventSideBar = ({ alertId, definitionId }: EventReplaySideBarDetail
       {resolvedDefinitionId && (
         <ReplaySearchContext.Provider value={replaySearchContext}>
           <ExpandableSection title="Event Definition Details">
-            <EventDefinitionInfoTable />
+            <EventDefinitionInfoList />
           </ExpandableSection>
         </ReplaySearchContext.Provider>
       )}
