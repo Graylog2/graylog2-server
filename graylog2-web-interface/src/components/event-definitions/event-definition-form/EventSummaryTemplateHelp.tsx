@@ -18,7 +18,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { Button } from 'components/bootstrap';
-import { OverlayTrigger, Icon } from 'components/common';
+import { OverlayTrigger, Icon, ExternalLink } from 'components/common';
 
 const QueryHelpButton = styled(Button)`
   padding: 6px 6px;
@@ -49,7 +49,13 @@ function Overlay() {
       </p>
       <p>
         You can insert values from the event, event definition, or custom fields. This uses the same template syntax as
-        Graylog email notifications.
+        Graylog email notifications{' '}
+        {
+          <ExternalLink href="https://www.tinymediamanager.org/docs/jmte" target="_blank">
+            (JMTE)
+          </ExternalLink>
+        }
+        .
       </p>
       <strong>Basic example</strong>
       <ExampleWrapper>
