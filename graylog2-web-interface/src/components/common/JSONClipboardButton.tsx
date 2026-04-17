@@ -14,17 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 
-import ExpandableSection from 'components/events/ReplaySearchSidebar/ExpandableSection';
-import EventDefinitionInfoList from 'components/event-definitions/replay-search/EventDefinitionInfoList';
+import * as JSON from 'util/json';
 
-const EventDefinitionSideBar = () => (
-  <div>
-    <ExpandableSection title="Event Definition Details">
-      <EventDefinitionInfoList />
-    </ExpandableSection>
-  </div>
+import ClipboardButton from './ClipboardButton';
+
+/**
+ * Component that renders a button to copy the JSON value of an object into the clipboard when pressed.
+ * The content to be copied can be given in the `content` prop, it can be any value that is serializable using `JSON.stringify`.
+ */
+
+type Props = Omit<React.ComponentProps<typeof ClipboardButton>, 'text'> & {
+  content: any;
+};
+
+const JSONClipboardButton = ({ content, ...rest }: Props) => (
+  <ClipboardButton text={JSON.stringify(content, null, 2)} {...rest} />
 );
-
-export default EventDefinitionSideBar;
+export default JSONClipboardButton;

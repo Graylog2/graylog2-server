@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import org.apache.hc.core5.http.ContentTooLongException;
+import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
 import org.graylog.storage.exceptions.ParsedOpenSearchException;
 import org.graylog2.indexer.BatchSizeTooLargeException;
 import org.graylog2.indexer.IndexNotFoundException;
@@ -28,6 +29,7 @@ import org.graylog2.indexer.InvalidWriteTargetException;
 import org.graylog2.indexer.MapperParsingException;
 import org.graylog2.indexer.MasterNotDiscoveredException;
 import org.graylog2.indexer.ParentCircuitBreakingException;
+import org.graylog2.indexer.exceptions.ResultWindowLimitExceededException;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch.OpenSearchAsyncClient;
 import org.opensearch.client.opensearch.OpenSearchClient;
@@ -45,6 +47,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -184,6 +187,16 @@ public final class OfficialOpensearchClient {
             if (isParentCircuitBreakingException(openSearchException)) {
                 return new ParentCircuitBreakingException(openSearchException.getMessage());
             }
+            if (isResultWindowLimitException(openSearchException)) {
+                final var resultWindowLimitFromError = Optional.ofNullable(openSearchException.error())
+                        .map(ErrorCause::causedBy)
+                        .map(ErrorCause::reason)
+                        .map(SearchTypeErrorParser::parseResultLimit)
+                        .map(ResultWindowLimitExceededException::new);
+                if (resultWindowLimitFromError.isPresent()) {
+                    return resultWindowLimitFromError.get();
+                }
+            }
         } else if (t instanceof ResponseException responseException) {
             if (responseException.status() == 429) {
                 return new BatchSizeTooLargeException(t.getMessage());
@@ -194,61 +207,59 @@ public final class OfficialOpensearchClient {
         return new RuntimeException(message, t);
     }
 
+    private static boolean hasReason(OpenSearchException openSearchException, Predicate<String> predicate) {
+        return Optional.ofNullable(openSearchException.error())
+                .map(ErrorCause::reason)
+                .map(predicate::test)
+                .orElse(false);
+    }
+
+    private static boolean hasCausedByReason(OpenSearchException openSearchException, Predicate<String> predicate) {
+        return Optional.ofNullable(openSearchException.error())
+                .map(ErrorCause::causedBy)
+                .map(ErrorCause::reason)
+                .map(predicate::test)
+                .orElse(false);
+    }
+
+    private static boolean hasType(OpenSearchException openSearchException, String type) {
+        return openSearchException.error().type().contains(type);
+    }
+
     private static boolean isInvalidWriteTargetException(OpenSearchException openSearchException) {
-        try {
-            final ParsedOpenSearchException parsedException = ParsedOpenSearchException.from(openSearchException.getMessage());
-            return parsedException.reason().startsWith("no write index is defined for alias");
-        } catch (Exception e) {
-            return false;
-        }
+        return hasReason(openSearchException, r -> r.startsWith("no write index is defined for alias"));
     }
 
     private static boolean isMasterNotDiscoveredException(OpenSearchException openSearchException) {
-        try {
-            final ParsedOpenSearchException parsedException = ParsedOpenSearchException.from(openSearchException.getMessage());
-            return parsedException.type().equals("master_not_discovered_exception")
-                    || (parsedException.type().equals("cluster_block_exception") && parsedException.reason().contains("no master"));
-        } catch (Exception e) {
-            return false;
-        }
+        return hasType(openSearchException, "master_not_discovered_exception")
+                || (hasType(openSearchException, "cluster_block_exception") && hasReason(openSearchException, r -> r.contains("no master")));
     }
 
     private static boolean isIndexNotFoundException(OpenSearchException openSearchException) {
-        return openSearchException.getMessage().contains("index_not_found_exception");
+        return hasType(openSearchException, "index_not_found_exception");
     }
 
     private static boolean isIndexClosedException(OpenSearchException openSearchException) {
-        return openSearchException.getMessage().contains("index_closed_exception");
+        return hasType(openSearchException, "index_closed_exception");
     }
 
     private static boolean isMapperParsingExceptionException(OpenSearchException openSearchException) {
-        return openSearchException.getMessage().contains("mapper_parsing_exception");
+        return hasType(openSearchException, "mapper_parsing_exception");
+    }
+    private static boolean isSearchPhaseExecutionException(OpenSearchException openSearchException) {
+        return hasType(openSearchException, "search_phase_execution_exception");
     }
 
     private static boolean isBatchSizeTooLargeException(OpenSearchException openSearchException) {
-        try {
-            final ParsedOpenSearchException parsedException = ParsedOpenSearchException.from(openSearchException.getMessage());
-            if (parsedException.type().equals("search_phase_execution_exception")) {
-                ParsedOpenSearchException parsedCause = ParsedOpenSearchException.from(openSearchException.getCause().getMessage());
-                return parsedCause.reason().contains("Batch size is too large");
-            }
-        } catch (Exception e) {
-            return false;
-        }
-        return false;
+        return isSearchPhaseExecutionException(openSearchException) && hasCausedByReason(openSearchException, r -> r.contains("Batch size is too large"));
     }
 
     private static boolean isParentCircuitBreakingException(OpenSearchException openSearchException) {
-        try {
-            final ParsedOpenSearchException parsedException = ParsedOpenSearchException.from(openSearchException.getMessage());
-            if (parsedException.type().equals("circuit_breaking_exception")) {
-                ParsedOpenSearchException parsedCause = ParsedOpenSearchException.from(openSearchException.getCause().getMessage());
-                return parsedCause.reason().contains("[parent] Data too large");
-            }
-        } catch (Exception e) {
-            return false;
-        }
-        return false;
+        return hasType(openSearchException, "circuit_breaking_exception") && hasReason(openSearchException, r -> r.contains("[parent] Data too large"));
+    }
+
+    private static boolean isResultWindowLimitException(OpenSearchException openSearchException) {
+        return isSearchPhaseExecutionException(openSearchException) && hasCausedByReason(openSearchException, r -> r.contains("Result window is too large"));
     }
 
     @Deprecated
