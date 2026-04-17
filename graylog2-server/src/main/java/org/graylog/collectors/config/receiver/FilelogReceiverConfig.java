@@ -30,14 +30,14 @@ import java.util.List;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
- * Otel collector filelog receiver configuration.
+ * OTel collector file_log receiver configuration.
  *
- * @see <a href="https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/filelogreceiver">filelog receiver</a>
+ * @see <a href="https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/filelogreceiver">file_log receiver</a>
  */
 @AutoValue
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class FilelogReceiverConfig implements CollectorReceiverConfig, CollectorStanzaReceiver {
-    public static final String RECEIVER_TYPE = "filelog";
+    public static final String RECEIVER_TYPE = "file_log";
 
     public String type() {
         return RECEIVER_TYPE;
@@ -93,7 +93,7 @@ public abstract class FilelogReceiverConfig implements CollectorReceiverConfig, 
 
     public static Builder builder(String id) {
         return new AutoValue_FilelogReceiverConfig.Builder()
-                .name(f("filelog/%s", id))
+                .name(f("file_log/%s", id))
                 .includeFileName(true)
                 .includeFilePath(true)
                 .includeFileNameResolved(true)

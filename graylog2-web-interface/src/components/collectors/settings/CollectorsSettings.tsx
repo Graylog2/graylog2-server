@@ -362,7 +362,7 @@ const CollectorsSettings = () => {
         </Formik>
       </Row>
 
-      <IngestEndpointStatus defaultPort={config?.http?.port ?? 14401} isInitialSetup={!isConfigured} />
+      <IngestEndpointStatus isInitialSetup={!isConfigured} />
     </>
   );
 };

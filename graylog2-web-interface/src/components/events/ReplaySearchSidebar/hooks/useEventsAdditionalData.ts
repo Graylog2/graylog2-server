@@ -21,7 +21,7 @@ const useEventsAdditionalData = ({ eventData, definitionId = null }: { eventData
   const eventDefinitionId = definitionId ?? eventData?.event_definition_id;
   const { data, isLoading: isLoadingEventDefinition } = useEventDefinition(eventDefinitionId);
 
-  const meta: EventsAdditionalData = isLoadingEventDefinition
+  const meta: EventsAdditionalData = !isLoadingEventDefinition
     ? {
         context: {
           event_definitions: {

@@ -17,7 +17,7 @@
 import React from 'react';
 
 import type { IndexSummary } from 'stores/indexers/IndexerOverviewStore';
-import { IndexSection } from 'components/indices';
+import IndexSection from 'components/indices/IndexSection';
 import type { IndexInfo } from 'stores/indices/IndicesStore';
 
 type Props = {
