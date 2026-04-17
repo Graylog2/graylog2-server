@@ -50,7 +50,6 @@ public abstract class WindowsEventLogReceiverConfig implements CollectorReceiver
             "Security",
             "Setup",
             "Microsoft-Windows-Windows Defender/Operational",
-            "Microsoft-Windows-TerminalServices-LocalSessionManager/Operational",
             "Microsoft-Windows-PowerShell/Operational",
             "Windows PowerShell"
     );
