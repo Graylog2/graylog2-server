@@ -74,6 +74,8 @@ export { default as InputDescription } from './InputDescription';
 export { default as InputOptionalInfo } from './InputOptionalInfo';
 export { default as InputList } from './InputList';
 export { default as InteractableModal } from './InteractableModal';
+export { default as JSONClipboardButton } from './JSONClipboardButton';
+export { default as JSONClipboardIconButton } from './JSONClipboardIconButton';
 export { default as JSONValueInput } from './JSONValueInput';
 export { default as KeyCapture } from './KeyCapture';
 export { default as KeyValueTable } from './KeyValueTable';
