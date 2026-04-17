@@ -44,59 +44,69 @@ function Overlay() {
   return (
     <div>
       <p>
-        Use a template to customize the Event Summary shown when an event is created. Templates use Graylog variables
-        wrapped in {getStringVariable('...')}.
-      </p>
-      <p>
-        You can insert values from the event, event definition, or custom fields. This uses the same template syntax as
-        Graylog email notifications{' '}
+        Use a template to customize the description shown on the Alerts & Events page when an event is created.
+        Templates use{' '}
         {
           <ExternalLink href="https://www.tinymediamanager.org/docs/jmte" target="_blank">
-            (JMTE)
+            JMTE
           </ExternalLink>
-        }
-        .
+        }{' '}
+        substitution - variables wrapped in {getStringVariable('...')}.
       </p>
-      <strong>Basic example</strong>
+      <strong>Event Definition Variables</strong>
       <ExampleWrapper>
-        Failed login detected on {getStringVariable('event.source')}
+        {getStringVariable('event_definition_id')}
         <br />
-        User: {getStringVariable('event.fields.username')}
+        {getStringVariable('event_definition_title')}
         <br />
-        Count: {getStringVariable('event.fields.count')}
+        {getStringVariable('event_definition_type')}
+        <br />
+        {getStringVariable('event_definition_description')}
       </ExampleWrapper>
-      <strong>Common Variables</strong>
+      <strong>Custom Fields</strong>
+      <p>
+        Custom fields defined on the event definition are available under <code>fields</code>.
+      </p>
+      <ExampleWrapper>{getStringVariable('fields.my_custom_field')}</ExampleWrapper>
+      <strong>Source Context</strong>
+      <p>
+        The <code>source</code> variable contains context from the triggering data. Its contents depend on the event
+        definition type:
+      </p>
+      <p>
+        <em>Filter events</em> — original log message fields:
+      </p>
       <ExampleWrapper>
-        Event message: {getStringVariable('event.message')}
+        {getStringVariable('source.source')} (hostname)
         <br />
-        Source host: {getStringVariable('event.source')}
+        {getStringVariable('source.message')}
         <br />
-        Event time: {getStringVariable('event.timestamp')}
+        {getStringVariable('source.timestamp')}
         <br />
-        Grouping key: {getStringVariable('event.key')}
-        <br />
-        Priority: {getStringVariable('event.priority')}
-        <br />
-        Custom event field: {getStringVariable('event.fields.my_custom_field')}
+        {getStringVariable('source.some_extracted_field')}
       </ExampleWrapper>
-      <strong>Conditional Example</strong>
+      <p>
+        <em>Aggregation events</em> — group-by values and aggregation results:
+      </p>
       <ExampleWrapper>
-        {getStringVariable('if event.priority == 3')}
+        {getStringVariable('source.username')} (group-by field)
         <br />
-        critical event on {getStringVariable('event.source')}
+        {getStringVariable('source.aggregation_value_count_source_bytes_sent')}
         <br />
-        {getStringVariable('else')}
-        <br />
-        event on {getStringVariable('event.source')}
-        <br />
-        {getStringVariable('end')}
+        {getStringVariable('source.aggregation_key')}
       </ExampleWrapper>
-      <strong>Loop Example (Backlog Messages)</strong>
+      <strong>Examples</strong>
+      <p>
+        <em>Filter</em> — alert on a specific log message:
+      </p>
       <ExampleWrapper>
-        {getStringVariable('foreach backlog message')}
-        <br />- {getStringVariable('message.source')}: {getStringVariable('message.message')}
-        <br />
-        {getStringVariable('end')}
+        Error on {getStringVariable('source.source')}: {getStringVariable('source.message')}
+      </ExampleWrapper>
+      <p>
+        <em>Aggregation</em> — failed login count per user:
+      </p>
+      <ExampleWrapper>
+        {getStringVariable('fields.user')} failed to login {getStringVariable('source.aggregation_value_count')} times
       </ExampleWrapper>
     </div>
   );
