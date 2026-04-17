@@ -22,6 +22,7 @@ import org.graylog.storage.opensearch3.cluster.ClusterStateApi;
 import org.graylog.storage.opensearch3.stats.ClusterStatsApi;
 import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
 import org.graylog.storage.opensearch3.stats.StatsApi;
+import org.graylog.storage.opensearch3.testing.client.mock.ServerlessOpenSearchClient;
 import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -30,14 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.opensearch.client.json.JsonData;
-import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.FlushStats;
-import org.opensearch.client.opensearch.cat.OpenSearchCatClient;
-import org.opensearch.client.opensearch.indices.GetIndicesSettingsResponse;
-import org.opensearch.client.opensearch.indices.IndexSettings;
-import org.opensearch.client.opensearch.indices.IndexState;
-import org.opensearch.client.opensearch.indices.OpenSearchIndicesClient;
 import org.opensearch.client.opensearch.indices.stats.IndexStats;
 import org.opensearch.client.opensearch.indices.stats.IndicesStats;
 
@@ -46,23 +40,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class IndicesAdapterOSTest {
 
     private IndicesAdapterOS toTest;
 
-    @Mock
-    private OfficialOpensearchClient opensearchClient;
     @Mock
     private StatsApi statsApi;
     @Mock
@@ -74,25 +63,9 @@ class IndicesAdapterOSTest {
     @Mock
     private IndexStatisticsBuilder indexStatisticsBuilder;
 
-    private OpenSearchIndicesClient indicesClient;
-
     @BeforeEach
     void setUp() {
-        OpenSearchClient client = mock(OpenSearchClient.class);
-        when(opensearchClient.sync()).thenReturn(client);
-        indicesClient = mock(OpenSearchIndicesClient.class);
-        when(client.indices()).thenReturn(indicesClient);
-        when(client.cat()).thenReturn(mock(OpenSearchCatClient.class));
-        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-        toTest = new IndicesAdapterOS(
-                opensearchClient,
-                statsApi,
-                clusterStatsApi,
-                clusterStateApi,
-                indexTemplateAdapter,
-                indexStatisticsBuilder,
-                objectMapper
-        );
+        toTest = buildAdapter(ServerlessOpenSearchClient.builder().build());
     }
 
     @Test
@@ -194,68 +167,52 @@ class IndicesAdapterOSTest {
 
 
     @Test
-    void testGetOutdatedIndicesFiltersOlderVersion() throws Exception {
-        setupExecutePassthrough();
+    void testGetOutdatedIndicesFiltersOlderVersion() {
+        final IndicesAdapterOS adapter = buildAdapterWithSettingsResponse("""
+                {
+                  "current_index": {"settings": {"index.version.created_string": "2.5.0"}},
+                  "old_index":     {"settings": {"index.version.created_string": "1.3.0"}}
+                }
+                """);
 
-        GetIndicesSettingsResponse response = GetIndicesSettingsResponse.of(b -> b
-                .result(Map.of(
-                        "current_index", indexStateWithVersion("2.5.0"),
-                        "old_index", indexStateWithVersion("1.3.0")
-                ))
-        );
-        doReturn(response).when(indicesClient).getSettings(any(Function.class));
-
-        assertThat(toTest.getOutdatedIndices(2)).containsExactly("old_index");
+        assertThat(adapter.getOutdatedIndices(2)).containsExactly("old_index");
     }
 
     @Test
-    void testGetOutdatedIndicesAllCurrentMajorVersion() throws Exception {
-        setupExecutePassthrough();
+    void testGetOutdatedIndicesAllCurrentMajorVersion() {
+        final IndicesAdapterOS adapter = buildAdapterWithSettingsResponse("""
+                {
+                  "index_a": {"settings": {"index.version.created_string": "2.5.0"}},
+                  "index_b": {"settings": {"index.version.created_string": "2.11.0"}}
+                }
+                """);
 
-        GetIndicesSettingsResponse response = GetIndicesSettingsResponse.of(b -> b
-                .result(Map.of(
-                        "index_a", indexStateWithVersion("2.5.0"),
-                        "index_b", indexStateWithVersion("2.11.0")
-                ))
-        );
-        doReturn(response).when(indicesClient).getSettings(any(Function.class));
-
-        assertThat(toTest.getOutdatedIndices(2)).isEmpty();
+        assertThat(adapter.getOutdatedIndices(2)).isEmpty();
     }
 
     @Test
-    void testGetOutdatedIndicesMissingVersionTreatedAsOutdated() throws Exception {
-        setupExecutePassthrough();
+    void testGetOutdatedIndicesMissingVersionTreatedAsOutdated() {
+        final IndicesAdapterOS adapter = buildAdapterWithSettingsResponse("""
+                {
+                  "no_settings": {},
+                  "no_version":  {"settings": {"some.other.setting": "value"}},
+                  "current":     {"settings": {"index.version.created_string": "2.5.0"}}
+                }
+                """);
 
-        GetIndicesSettingsResponse response = GetIndicesSettingsResponse.of(b -> b
-                .result(Map.of(
-                        "no_settings", IndexState.of(is -> is),
-                        "no_version", IndexState.of(is -> is
-                                .settings(IndexSettings.of(s -> s
-                                        .customSettings(Map.of("some.other.setting", JsonData.of("value")))
-                                ))
-                        ),
-                        "current", indexStateWithVersion("2.5.0")
-                ))
-        );
-        doReturn(response).when(indicesClient).getSettings(any(Function.class));
-
-        assertThat(toTest.getOutdatedIndices(2)).containsExactlyInAnyOrder("no_settings", "no_version");
+        assertThat(adapter.getOutdatedIndices(2)).containsExactlyInAnyOrder("no_settings", "no_version");
     }
 
-    private void setupExecutePassthrough() {
-        when(opensearchClient.execute(any(), any())).thenAnswer(invocation -> {
-            OfficialOpensearchClient.ThrowingSupplier<?> supplier = invocation.getArgument(0);
-            return supplier.get();
-        });
+    private IndicesAdapterOS buildAdapterWithSettingsResponse(String settingsJson) {
+        final OfficialOpensearchClient client = ServerlessOpenSearchClient.builder()
+                .stubResponse("GET", "/_settings", settingsJson)
+                .build();
+        return buildAdapter(client);
     }
 
-    private IndexState indexStateWithVersion(String version) {
-        return IndexState.of(is -> is.settings(
-                IndexSettings.of(s -> s
-                        .customSettings(Map.of("version.created_string", JsonData.of(version)))
-                )
-        ));
+    private IndicesAdapterOS buildAdapter(OfficialOpensearchClient client) {
+        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+        return new IndicesAdapterOS(client, statsApi, clusterStatsApi, clusterStateApi, indexTemplateAdapter, indexStatisticsBuilder, objectMapper);
     }
 
     private IndicesStats buildIndicesStats(final String uuid, final long count, final FlushStats.Builder flushStatsBuilder) {
@@ -268,6 +225,4 @@ class IndicesAdapterOSTest {
                 .total(IndexStats.builder().build())
                 .build();
     }
-
-
 }
