@@ -73,9 +73,7 @@ function Overlay() {
         The <code>source</code> variable contains context from the triggering data. Its contents depend on the event
         definition type:
       </p>
-      <p>
-        <em>Filter events</em> — original log message fields:
-      </p>
+      <p>Filter events: original log message fields.</p>
       <ExampleWrapper>
         {getStringVariable('source.source')} (hostname)
         <br />
@@ -85,9 +83,7 @@ function Overlay() {
         <br />
         {getStringVariable('source.some_extracted_field')}
       </ExampleWrapper>
-      <p>
-        <em>Aggregation events</em> — group-by values and aggregation results:
-      </p>
+      <p>Aggregation events: group-by values and aggregation results.</p>
       <ExampleWrapper>
         {getStringVariable('source.username')} (group-by field)
         <br />
@@ -96,15 +92,11 @@ function Overlay() {
         {getStringVariable('source.aggregation_key')}
       </ExampleWrapper>
       <strong>Examples</strong>
-      <p>
-        <em>Filter</em> — alert on a specific log message:
-      </p>
+      <p>Filter on a specific log message:</p>
       <ExampleWrapper>
         Error on {getStringVariable('source.source')}: {getStringVariable('source.message')}
       </ExampleWrapper>
-      <p>
-        <em>Aggregation</em> — failed login count per user:
-      </p>
+      <p>Aggregation of failed login count per user:</p>
       <ExampleWrapper>
         {getStringVariable('fields.user')} failed to login {getStringVariable('source.aggregation_value_count')} times
       </ExampleWrapper>
