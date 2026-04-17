@@ -778,4 +778,30 @@ public class IndicesAdapterOS implements IndicesAdapter {
 
         return new WarmIndexInfo(index, initialIndexName, repository, snapshotName);
     }
+
+    @Override
+    public Set<String> getOutdatedIndices(int currentMajorVersion) {
+        return c.execute(() -> {
+            GetIndicesSettingsResponse result = indicesClient.getSettings(b -> b
+                    .ignoreUnavailable(true)
+                    .allowNoIndices(true)
+                    .expandWildcards(ExpandWildcard.All)
+                    .flatSettings(true)
+                    .human(true)
+            );
+            return result.result().keySet().stream()
+                    .filter(index ->
+                            Optional.ofNullable(toIndexSettings(result, index))
+                                    .map(settings -> settings.get("index.version.created_string"))
+                                    .map(Object::toString)
+                                    // checking for version mismatch is enough as a higher version index won't work anyway
+                                    // or would be expected if created with e.g. Elastic 7.x
+                                    .map(version -> !version.startsWith(currentMajorVersion + "."))
+                                    .orElseGet(() -> {
+                                        LOG.error("Could not resolve version from settings for index " + index);
+                                        return true;
+                                    })
+                    ).collect(Collectors.toSet());
+        }, "Couldn't read settings for indices");
+    }
 }
