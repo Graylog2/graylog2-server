@@ -107,12 +107,12 @@ class OpAmpServiceBuildCollectorConfigTest {
 
         final var config = OpAmpService.buildCollectorConfig(FLEET_ID, List.of(source), CollectorOSType.LINUX, exporterConfig());
 
-        assertThat(config.receivers()).containsOnlyKeys("filelog/abc123");
+        assertThat(config.receivers()).containsOnlyKeys("file_log/abc123");
         assertThat(config.processors()).containsOnlyKeys("resource/abc123");
         assertThat(config.service().pipelines()).containsOnlyKeys("logs/abc123");
 
         final var pipeline = config.service().pipelines().get("logs/abc123");
-        assertThat(pipeline.receivers()).containsExactly("filelog/abc123");
+        assertThat(pipeline.receivers()).containsExactly("file_log/abc123");
         assertThat(pipeline.processors()).containsExactly("resource/abc123");
         assertThat(pipeline.exporters()).containsExactly(exporterConfig().getName());
     }
@@ -130,7 +130,7 @@ class OpAmpServiceBuildCollectorConfigTest {
 
         assertThat(processor.attributes()).anySatisfy(attr -> {
             assertThat(attr.key()).isEqualTo(CollectorAttributes.COLLECTOR_RECEIVER_TYPE);
-            assertThat(attr.value().textValue()).isEqualTo("filelog");
+            assertThat(attr.value().textValue()).isEqualTo("file_log");
         });
         assertThat(processor.attributes()).anySatisfy(attr -> {
             assertThat(attr.key()).isEqualTo(CollectorAttributes.COLLECTOR_SOURCE_ID);
@@ -172,14 +172,14 @@ class OpAmpServiceBuildCollectorConfigTest {
 
         final var config = OpAmpService.buildCollectorConfig(FLEET_ID, sources, CollectorOSType.LINUX, exporterConfig());
 
-        assertThat(config.receivers()).containsOnlyKeys("filelog/a", "filelog/b", "journald/c");
+        assertThat(config.receivers()).containsOnlyKeys("file_log/a", "file_log/b", "journald/c");
         assertThat(config.processors()).containsOnlyKeys("resource/a", "resource/b", "resource/c");
         assertThat(config.service().pipelines()).containsOnlyKeys("logs/a", "logs/b", "logs/c");
 
         // Each pipeline wires its single receiver to its single processor — no cross-wiring.
-        assertThat(config.service().pipelines().get("logs/a").receivers()).containsExactly("filelog/a");
+        assertThat(config.service().pipelines().get("logs/a").receivers()).containsExactly("file_log/a");
         assertThat(config.service().pipelines().get("logs/a").processors()).containsExactly("resource/a");
-        assertThat(config.service().pipelines().get("logs/b").receivers()).containsExactly("filelog/b");
+        assertThat(config.service().pipelines().get("logs/b").receivers()).containsExactly("file_log/b");
         assertThat(config.service().pipelines().get("logs/b").processors()).containsExactly("resource/b");
         assertThat(config.service().pipelines().get("logs/c").receivers()).containsExactly("journald/c");
         assertThat(config.service().pipelines().get("logs/c").processors()).containsExactly("resource/c");
@@ -190,10 +190,10 @@ class OpAmpServiceBuildCollectorConfigTest {
         final var config = OpAmpService.buildCollectorConfig(
                 FLEET_ID, List.of(fileSource("abc123")), CollectorOSType.LINUX, exporterConfig());
 
-        // Pipelines are keyed by source id, not by receiver type (e.g. not "logs/filelog").
+        // Pipelines are keyed by source id, not by receiver type (e.g. not "logs/file_log").
         assertThat(config.service().pipelines()).containsOnlyKeys("logs/abc123");
-        assertThat(config.service().pipelines()).doesNotContainKey("logs/filelog");
-        assertThat(config.service().pipelines()).doesNotContainKey("logs/filelog/abc123");
+        assertThat(config.service().pipelines()).doesNotContainKey("logs/file_log");
+        assertThat(config.service().pipelines()).doesNotContainKey("logs/file_log/abc123");
     }
 
     @Test
@@ -205,8 +205,8 @@ class OpAmpServiceBuildCollectorConfigTest {
         final var config = OpAmpService.buildCollectorConfig(
                 FLEET_ID, List.of(enabled, disabled, wrongOs), CollectorOSType.WINDOWS, exporterConfig());
 
-        // Only the enabled filelog source survives on Windows (journald is Linux-only; disabled is skipped).
-        assertThat(config.receivers()).containsOnlyKeys("filelog/enabled");
+        // Only the enabled file_log source survives on Windows (journald is Linux-only; disabled is skipped).
+        assertThat(config.receivers()).containsOnlyKeys("file_log/enabled");
         assertThat(config.processors()).containsOnlyKeys("resource/enabled");
         assertThat(config.service().pipelines()).containsOnlyKeys("logs/enabled");
     }
