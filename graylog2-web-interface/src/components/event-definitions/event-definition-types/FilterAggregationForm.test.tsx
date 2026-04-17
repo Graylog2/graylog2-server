@@ -50,11 +50,12 @@ describe('FilterAggregationForm', () => {
     },
   };
 
-  const renderForm = (props = {}) => render(
-    <FormWarningsProvider>
-      <FilterAggregationForm {...defaultProps} {...props} />
-    </FormWarningsProvider>,
-  );
+  const renderForm = (props = {}) =>
+    render(
+      <FormWarningsProvider>
+        <FilterAggregationForm {...defaultProps} {...props} />
+      </FormWarningsProvider>,
+    );
 
   it('should clear aggregation config when switching from aggregation to filter mode', async () => {
     const onChange = jest.fn();
@@ -65,11 +66,14 @@ describe('FilterAggregationForm', () => {
 
     await userEvent.click(filterRadio);
 
-    expect(onChange).toHaveBeenCalledWith('config', expect.objectContaining({
-      group_by: [],
-      series: [],
-      conditions: {},
-    }));
+    expect(onChange).toHaveBeenCalledWith(
+      'config',
+      expect.objectContaining({
+        group_by: [],
+        series: [],
+        conditions: {},
+      }),
+    );
   });
 
   it('should restore aggregation config when switching back from filter to aggregation mode', async () => {
@@ -85,11 +89,14 @@ describe('FilterAggregationForm', () => {
 
     await userEvent.click(filterRadio);
 
-    expect(onChange).toHaveBeenCalledWith('config', expect.objectContaining({
-      group_by: [],
-      series: [],
-      conditions: {},
-    }));
+    expect(onChange).toHaveBeenCalledWith(
+      'config',
+      expect.objectContaining({
+        group_by: [],
+        series: [],
+        conditions: {},
+      }),
+    );
 
     // Simulate parent updating eventDefinition with the cleared config
     const clearedConfig = onChange.mock.calls[0][1];
@@ -100,11 +107,7 @@ describe('FilterAggregationForm', () => {
 
     rerender(
       <FormWarningsProvider>
-        <FilterAggregationForm
-          {...defaultProps}
-          eventDefinition={clearedEventDefinition}
-          onChange={onChange}
-        />
+        <FilterAggregationForm {...defaultProps} eventDefinition={clearedEventDefinition} onChange={onChange} />
       </FormWarningsProvider>,
     );
 
@@ -113,12 +116,15 @@ describe('FilterAggregationForm', () => {
 
     await userEvent.click(aggregationRadio);
 
-    expect(onChange).toHaveBeenLastCalledWith('config', expect.objectContaining({
-      group_by: ['source'],
-      series: [{ id: 'series-1', function: 'count', field: 'timestamp' }],
-      conditions: expect.objectContaining({
-        expression: expect.objectContaining({ expr: '<' }),
+    expect(onChange).toHaveBeenLastCalledWith(
+      'config',
+      expect.objectContaining({
+        group_by: ['source'],
+        series: [{ id: 'series-1', function: 'count', field: 'timestamp' }],
+        conditions: expect.objectContaining({
+          expression: expect.objectContaining({ expr: '<' }),
+        }),
       }),
-    }));
+    );
   });
 });

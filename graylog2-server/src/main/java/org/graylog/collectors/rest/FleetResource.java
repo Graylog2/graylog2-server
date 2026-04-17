@@ -199,7 +199,7 @@ public class FleetResource extends RestResource {
     })
     @AuditEvent(type = AuditEventTypes.COLLECTOR_FLEET_CREATE)
     public Response create(@Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) CreateFleetRequest request) {
-        final FleetDTO created = fleetService.create(request.name(), request.description(), request.targetVersion());
+        final FleetDTO created = fleetService.create(request.name(), request.description());
         final FleetResponse response = FleetResponse.fromDTO(created);
         final URI uri = getUriBuilderToSelf().path(FleetResource.class, "get")
                 .build(created.id());
@@ -214,7 +214,7 @@ public class FleetResource extends RestResource {
     public FleetResponse update(@Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId,
                                 @Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) UpdateFleetRequest request) {
         checkPermission(CollectorsPermissions.FLEET_EDIT, fleetId);
-        return fleetService.update(fleetId, request.name(), request.description(), request.targetVersion())
+        return fleetService.update(fleetId, request.name(), request.description())
                 .map(FleetResponse::fromDTO)
                 .orElseThrow(() -> new NotFoundException("Fleet " + fleetId + " not found"));
     }
