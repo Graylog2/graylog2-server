@@ -34,7 +34,7 @@ export type FetchOptions = {
   refetchInterval?: number;
 };
 
-const slicesToFilters = (searchParams: SearchParams) => {
+export const slicesToFilters = (searchParams: SearchParams) => {
   const newSearchParams = { ...searchParams };
 
   delete newSearchParams.slice;

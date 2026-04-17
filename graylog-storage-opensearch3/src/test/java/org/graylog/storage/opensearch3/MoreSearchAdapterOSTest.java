@@ -109,6 +109,45 @@ class MoreSearchAdapterOSTest {
         assertThat(sortOptionsDesc.get(0).field().order().jsonValue()).isEqualTo("desc");
     }
 
+    @Test
+    void testSortingWithUnmappedTypeAscShouldUseMissingFirst() {
+        // Given
+        final Sorting sorting = new Sorting("some_field", Sorting.Direction.ASC, "date");
+
+        // When
+        final List<SortOptions> sortOptions = adapter.newCreateSorting(sorting);
+
+        // Then
+        assertThat(sortOptions).hasSize(1);
+        assertThat(sortOptions.get(0).field().missing().stringValue()).isEqualTo("_first");
+    }
+
+    @Test
+    void testSortingWithUnmappedTypeDescShouldUseMissingLast() {
+        // Given
+        final Sorting sorting = new Sorting("some_field", Sorting.Direction.DESC, "date");
+
+        // When
+        final List<SortOptions> sortOptions = adapter.newCreateSorting(sorting);
+
+        // Then
+        assertThat(sortOptions).hasSize(1);
+        assertThat(sortOptions.get(0).field().missing().stringValue()).isEqualTo("_last");
+    }
+
+    @Test
+    void testSortingWithoutUnmappedTypeShouldHaveNoMissingValue() {
+        // Given
+        final Sorting sorting = new Sorting("some_field", Sorting.Direction.ASC);
+
+        // When
+        final List<SortOptions> sortOptions = adapter.newCreateSorting(sorting);
+
+        // Then
+        assertThat(sortOptions).hasSize(1);
+        assertThat(sortOptions.get(0).field().missing()).isNull();
+    }
+
     private static void verifyFilter(String value, Query expected) {
         Query generatedQuery = MoreSearchAdapterOS.buildExtraFilter(FIELD, value);
         Assertions.assertThat(generatedQuery)

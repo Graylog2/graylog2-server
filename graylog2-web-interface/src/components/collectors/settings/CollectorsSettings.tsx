@@ -24,7 +24,9 @@ import { Alert, Row, Col } from 'components/bootstrap';
 import { FormikInput, Spinner } from 'components/common';
 import TimeUnitInput, { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import FormSubmit from 'components/common/FormSubmit';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useCurrentUser from 'hooks/useCurrentUser';
+import useInputsStates from 'hooks/useInputsStates';
 import { isPermitted } from 'util/PermissionsMixin';
 
 import IngestEndpointStatus from './IngestEndpointStatus';
@@ -32,7 +34,8 @@ import PortMismatchAlert from './PortMismatchAlert';
 
 import { useCollectorsConfig, useCollectorInputIds, useCollectorsMutations, useCollectorInputDetails } from '../hooks';
 import type { CollectorsConfigRequest } from '../types';
-
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
+import { classifyHostname, classifyInputBind } from '../hooks/telemetry-helpers';
 
 const SectionTitle = styled.h3(
   ({ theme }) => css`
@@ -71,13 +74,16 @@ const CollectorsSettings = () => {
   const isConfigured = !!config?.signing_cert_id;
   const { data: collectorInputIds = [], isLoading: isLoadingInputIds } = useCollectorInputIds();
   const { loadedInputs: collectorInputs, isLoading: isLoadingInputDetails } = useCollectorInputDetails();
+  const { data: inputStates } = useInputsStates({ enabled: collectorInputIds.length > 0 });
 
   const canCreateInputs = isPermitted(currentUser?.permissions, [
     'inputs:create',
     'input_types:create:org.graylog.collectors.input.CollectorIngestHttpInput',
   ]);
 
-  const showCreateInputCheckbox = !isConfigured && !isLoadingInputIds && collectorInputIds.length === 0 && canCreateInputs;
+  const showCreateInputCheckbox =
+    !isConfigured && !isLoadingInputIds && collectorInputIds.length === 0 && canCreateInputs;
+  const sendTelemetry = useSendCollectorsTelemetry();
 
   const initialValues: FormValues = useMemo(() => {
     if (!config) {
@@ -111,6 +117,33 @@ const CollectorsSettings = () => {
     };
   }, [config]);
 
+  const portMatchesAnyInput = useMemo(() => {
+    if (collectorInputs.length === 0) return null;
+
+    return collectorInputs.some((input) => input?.attributes?.port === config?.http?.port);
+  }, [collectorInputs, config?.http?.port]);
+
+  const inputBindTypes = useMemo((): 'all_wildcard' | 'all_specific' | 'mixed' | 'none' => {
+    if (collectorInputs.length === 0) return 'none';
+    const kinds = collectorInputs.map((input) => classifyInputBind(String(input?.attributes?.bind_address ?? '')));
+
+    if (kinds.every((k) => k === 'wildcard')) return 'all_wildcard';
+    if (kinds.every((k) => k === 'specific')) return 'all_specific';
+
+    return 'mixed';
+  }, [collectorInputs]);
+
+  const hasRunningInput = useMemo(() => {
+    if (!inputStates || collectorInputs.length === 0) return false;
+
+    return collectorInputs.some((input) => {
+      const nodeStates = inputStates?.[input.id];
+      if (!nodeStates) return false;
+
+      return Object.values(nodeStates).some((entry) => entry.state === 'RUNNING');
+    });
+  }, [inputStates, collectorInputs]);
+
   const handleSubmit = useCallback(
     async (values: FormValues, { setErrors }: { setErrors: (errors: Record<string, string>) => void }) => {
       const request: CollectorsConfigRequest = {
@@ -129,6 +162,42 @@ const CollectorsSettings = () => {
 
       try {
         await updateConfig(request);
+
+        const offlineSec = Math.round(
+          moment
+            .duration(values.offline_value, values.offline_unit as moment.unitOfTime.DurationConstructor)
+            .asSeconds(),
+        );
+        const visibilitySec = Math.round(
+          moment
+            .duration(values.visibility_value, values.visibility_unit as moment.unitOfTime.DurationConstructor)
+            .asSeconds(),
+        );
+        const expirationSec = Math.round(
+          moment
+            .duration(values.expiration_value, values.expiration_unit as moment.unitOfTime.DurationConstructor)
+            .asSeconds(),
+        );
+
+        sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SETTINGS.UPDATED, {
+          app_action_value: 'settings-save',
+          http_hostname_kind: classifyHostname(values.http_hostname ?? ''),
+          http_port: values.http_port,
+          offline_threshold_seconds: offlineSec,
+          visibility_threshold_seconds: visibilitySec,
+          expiration_threshold_seconds: expirationSec,
+          http_hostname_changed: (config?.http?.hostname ?? '') !== values.http_hostname,
+          http_port_changed: (config?.http?.port ?? null) !== values.http_port,
+          offline_threshold_changed: config?.collector_offline_threshold !== request.collector_offline_threshold,
+          visibility_threshold_changed:
+            config?.collector_default_visibility_threshold !== request.collector_default_visibility_threshold,
+          expiration_threshold_changed:
+            config?.collector_expiration_threshold !== request.collector_expiration_threshold,
+          port_matches_any_input: portMatchesAnyInput,
+          input_bind_types: inputBindTypes,
+          has_running_input: hasRunningInput,
+          input_count: collectorInputIds.length,
+        });
       } catch (error: unknown) {
         const validationErrors = (
           error as { additional?: { body?: { validation_errors?: Record<string, Array<{ error: string }>> } } }
@@ -152,7 +221,16 @@ const CollectorsSettings = () => {
         }
       }
     },
-    [updateConfig, showCreateInputCheckbox],
+    [
+      updateConfig,
+      showCreateInputCheckbox,
+      config,
+      sendTelemetry,
+      portMatchesAnyInput,
+      inputBindTypes,
+      hasRunningInput,
+      collectorInputIds.length,
+    ],
   );
 
   if (isLoadingConfig) {
@@ -164,8 +242,13 @@ const CollectorsSettings = () => {
       <Row className="content">
         {!isConfigured && (
           <Col md={12}>
-            <Alert bsStyle="warning">
-              Collectors have not been set up yet. Configure the ingest endpoint and basic settings below to get started.
+            <Alert bsStyle="info">
+              <strong>Getting started with Collectors</strong>
+              <p>
+                Collectors need ingest endpoints to receive collected data. Configure the HTTP endpoint below and save
+                to initialize the collector infrastructure. After setup, you can create fleets, add sources, and deploy
+                collectors to your hosts.
+              </p>
             </Alert>
           </Col>
         )}
@@ -175,9 +258,9 @@ const CollectorsSettings = () => {
               <Col md={6}>
                 <SectionTitle>Ingest Endpoint</SectionTitle>
                 <HelpText>
-                  The external address that is pushed to managed collectors as their data destination.
-                  It must route to a running collector ingest input.
-                  This is typically the address of a load balancer or the server itself.
+                  Ingest endpoints receive log data from collectors via OpenTelemetry (OTLP). The external address that
+                  is pushed to managed collectors as their data destination. It must route to a running collector ingest
+                  input. This is typically the address of a load balancer or the server itself.
                 </HelpText>
 
                 <FormikInput
@@ -186,13 +269,9 @@ const CollectorsSettings = () => {
                   label="External hostname"
                   name="http_hostname"
                   placeholder="e.g. otlp.example.com"
+                  help="The hostname or IP address that collectors will use to connect. Must be reachable from collector hosts."
                 />
-                <FormikInput
-                  id="http-port"
-                  type="number"
-                  label="External port"
-                  name="http_port"
-                />
+                <FormikInput id="http-port" type="number" label="External port" name="http_port" />
 
                 <PortMismatchAlert
                   formPort={values.http_port}
@@ -201,12 +280,7 @@ const CollectorsSettings = () => {
                 />
 
                 {showCreateInputCheckbox && (
-                  <FormikInput
-                    id="create-input"
-                    type="checkbox"
-                    label="Create ingest input"
-                    name="create_input"
-                  />
+                  <FormikInput id="create-input" type="checkbox" label="Create ingest input" name="create_input" />
                 )}
               </Col>
 
@@ -224,9 +298,13 @@ const CollectorsSettings = () => {
                   units={THRESHOLD_UNITS}
                   required
                   hideCheckbox
-                  help={errors.offline_value
-                    ? <span className="text-danger">{errors.offline_value}</span>
-                    : "Collectors that haven't reported within this time are shown as offline."}
+                  help={
+                    errors.offline_value ? (
+                      <span className="text-danger">{errors.offline_value}</span>
+                    ) : (
+                      "Collectors that haven't reported within this time are shown as offline."
+                    )
+                  }
                 />
 
                 <TimeUnitInput
@@ -240,9 +318,13 @@ const CollectorsSettings = () => {
                   units={THRESHOLD_UNITS}
                   required
                   hideCheckbox
-                  help={errors.visibility_value
-                    ? <span className="text-danger">{errors.visibility_value}</span>
-                    : "Collectors that haven't reported within this time are hidden from the default view. Users can adjust or remove this filter in the instances table."}
+                  help={
+                    errors.visibility_value ? (
+                      <span className="text-danger">{errors.visibility_value}</span>
+                    ) : (
+                      "Collectors that haven't reported within this time are hidden from the default view. Users can adjust or remove this filter in the instances table."
+                    )
+                  }
                 />
 
                 <TimeUnitInput
@@ -256,9 +338,13 @@ const CollectorsSettings = () => {
                   units={THRESHOLD_UNITS}
                   required
                   hideCheckbox
-                  help={errors.expiration_value
-                    ? <span className="text-danger">{errors.expiration_value}</span>
-                    : "Collectors that haven't reported within this time are permanently removed."}
+                  help={
+                    errors.expiration_value ? (
+                      <span className="text-danger">{errors.expiration_value}</span>
+                    ) : (
+                      "Collectors that haven't reported within this time are permanently removed."
+                    )
+                  }
                 />
               </Col>
 
@@ -276,7 +362,7 @@ const CollectorsSettings = () => {
         </Formik>
       </Row>
 
-      <IngestEndpointStatus defaultPort={config?.http?.port ?? 14401} isInitialSetup={!isConfigured} />
+      <IngestEndpointStatus isInitialSetup={!isConfigured} />
     </>
   );
 };

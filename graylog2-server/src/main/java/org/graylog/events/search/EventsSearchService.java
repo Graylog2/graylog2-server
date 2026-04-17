@@ -24,15 +24,12 @@ import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 
 import java.time.ZoneId;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.graylog.events.search.EventsSearchFilter.NULL_VALUE;
@@ -60,7 +57,7 @@ public class EventsSearchService extends AbstractEventsSearchService {
         final var filter = buildFilter(parameters);
         final var cleanedParameters = hasAssociatedAssetsForNullFilter(parameters) ? removeAssociatedAssetsForNullFilter(parameters) : parameters;
 
-        final MoreSearch.Result result = moreSearch.eventSearch(cleanedParameters, filter, eventStreams, forbiddenSourceStreams(subject));
+        final MoreSearch.Result result = moreSearch.eventSearch(cleanedParameters, filter, eventStreams, allowedSourceStreams(subject));
 
         return buildResultForSubject(parameters, result, subject);
     }
@@ -92,7 +89,7 @@ public class EventsSearchService extends AbstractEventsSearchService {
         }
 
         final var filter = buildFilter(parameters);
-        final var result = moreSearch.histogram(parameters, filter, eventStreams, forbiddenSourceStreams(subject), timeZone);
+        final var result = moreSearch.histogram(parameters, filter, eventStreams, allowedSourceStreams(subject), timeZone);
 
         return EventsHistogramResult.fromResult(result);
     }
@@ -117,19 +114,8 @@ public class EventsSearchService extends AbstractEventsSearchService {
     // TODO: Loading all streams for a user is not very efficient. Not sure if we can find an alternative that is
     //       more efficient. Doing a separate ES query to get all source streams that would be in the result is
     //       most probably not more efficient.
-    private Set<String> forbiddenSourceStreams(Subject subject) {
-        // Users with the generic streams:read permission can read all streams so we don't need to check every single
-        // stream here and can take a short cut.
-        if (subject.isPermitted(RestPermissions.STREAMS_READ)) {
-            return Collections.emptySet();
-        }
-
-        try (var stream = streamService.streamAllIds()) {
-            return stream
-                    // Select all streams the user is NOT permitted to access
-                    .filter(streamId -> !subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId)))
-                    .collect(Collectors.toSet());
-        }
+    private SourceStreamFilter allowedSourceStreams(Subject subject) {
+        return SourceStreamFilter.forSubject(subject, streamService);
     }
 
     private EventsSearchResult buildResultForSubject(EventsSearchParameters parameters,
