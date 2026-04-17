@@ -2,7 +2,7 @@
 
 ## Frontend
 
-The web interface lives in `graylog2-web-interface/` and has its own conventions. Before modifying frontend code, you must read `graylog2-web-interface/AGENTS.md` and follow its conventions.
+The web interface lives in `graylog2-web-interface/` and has its own conventions. Before modifying frontend code (including tests and linting), you must read `graylog2-web-interface/AGENTS.md` and follow its conventions. Run any `yarn` commands from the `graylog2-web-interface/` directory.
 
 ## Build Commands
 
