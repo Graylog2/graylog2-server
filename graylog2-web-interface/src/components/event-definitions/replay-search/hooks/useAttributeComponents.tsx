@@ -75,7 +75,6 @@ const useAttributeComponents = () => {
       title: string;
       content: React.ReactNode;
       show?: boolean;
-      inRows?: boolean;
     }> = [
       {
         title: 'Event definition updated at',

@@ -46,7 +46,7 @@ const EventDetailsDefinitionList = <E extends EntityBase = Event>({
 
       return (
         <React.Fragment key={attribute.id}>
-          {attribute.title && <dt>{attribute.title}</dt>}
+          <dt>{attribute.title}</dt>
           <dd>{renderCell ? renderCell(value, event, meta, eventProcedureId) : value}</dd>
         </React.Fragment>
       );
