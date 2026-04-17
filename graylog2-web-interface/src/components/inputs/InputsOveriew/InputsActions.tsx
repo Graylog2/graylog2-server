@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import styled from 'styled-components';
 
 import { Button, ButtonToolbar, DeleteMenuItem, MenuItem } from 'components/bootstrap';
 import { ConfirmDialog, IfPermitted, LinkContainer } from 'components/common';
@@ -29,7 +30,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import useFeature from 'hooks/useFeature';
 import type { ConfiguredInput, Input } from 'components/messageloaders/Types';
-import InputStatesStore from 'stores/inputs/InputStatesStore';
+import useInputStateMutations from 'hooks/useInputsStateMutations';
 import { MoreActions } from 'components/common/EntityDataTable';
 import type { InputTypesSummary } from 'hooks/useInputTypes';
 import type { InputTypeDescriptionsResponse } from 'hooks/useInputTypesDescriptions';
@@ -56,6 +57,14 @@ type Props = {
   };
 };
 
+const StyledButtonToolbar = styled(ButtonToolbar)`
+  align-items: center;
+
+  .dropdown.btn-group {
+    display: flex;
+  }
+`;
+
 const FORWARDER_SERVICE_INPUT = 'org.graylog.plugins.forwarder.input.ForwarderServiceInput';
 const GL2_FORWARDER_INPUT = 'gl2_forwarder_input';
 const GL2_SOURCE_INPUT = 'gl2_source_input';
@@ -68,6 +77,7 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
   const { data: inputStates, isLoading: isLoadingInputStates } = useInputsStates();
 
   const { updateInput, deleteInput } = useInputMutations();
+  const { setupInput, stopInput: stopInputMutation } = useInputStateMutations(input as any);
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
@@ -108,7 +118,7 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
       app_action_value: 'input-enter-setup',
     });
 
-    InputStatesStore.setup(input);
+    setupInput({ inputId: input.id });
   };
 
   const exitInputSetupMode = () => {
@@ -117,7 +127,7 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
       app_action_value: 'input-exit-setup',
     });
 
-    InputStatesStore.stop(input);
+    stopInputMutation({ inputId: input.id });
   };
 
   const handleConfirmDelete = async () => {
@@ -136,7 +146,7 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
   const queryField = input.type === FORWARDER_SERVICE_INPUT ? GL2_FORWARDER_INPUT : GL2_SOURCE_INPUT;
 
   return (
-    <ButtonToolbar>
+    <StyledButtonToolbar>
       <IfPermitted permissions={['searches:relative']}>
         <LinkContainer
           key={`received-messages-${input.id}`}
@@ -283,7 +293,7 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
           values={input.attributes}
         />
       )}
-    </ButtonToolbar>
+    </StyledButtonToolbar>
   );
 };
 

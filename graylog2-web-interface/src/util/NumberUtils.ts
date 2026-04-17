@@ -21,6 +21,8 @@ type NumberInput = number | string;
 const NumberUtils = {
   JAVA_INTEGER_MIN_VALUE: 2 ** 31 * -1,
   JAVA_INTEGER_MAX_VALUE: 2 ** 31 - 1,
+  BYTES_PER_GB: 1_000_000_000 as const,
+  BYTES_PER_GIB: 1_073_741_824 as const,
   normalizeNumber(number: NumberInput): number {
     switch (number) {
       case 'NaN':
@@ -71,6 +73,33 @@ const NumberUtils = {
     numeral.zeroFormat(null);
 
     return formattedNumber;
+  },
+  formatDecimalBytes(number: NumberInput): string {
+    numeral.zeroFormat('0B');
+
+    let formattedNumber: string;
+
+    try {
+      formattedNumber = numeral(this.normalizeNumber(number)).format('0.0b');
+    } catch (_e) {
+      formattedNumber = String(number);
+    }
+
+    numeral.zeroFormat(null);
+
+    return formattedNumber;
+  },
+  bytesToGb(bytes: number): number {
+    return parseFloat((bytes / this.BYTES_PER_GB).toFixed(2));
+  },
+  gbToBytes(gb: number): number {
+    return Math.round(gb * this.BYTES_PER_GB);
+  },
+  bytesToGiB(bytes: number): number {
+    return parseFloat((bytes / this.BYTES_PER_GIB).toFixed(2));
+  },
+  giBToBytes(giB: number): number {
+    return Math.round(giB * this.BYTES_PER_GIB);
   },
   isNumber(possibleNumber: unknown): boolean {
     return possibleNumber !== '' && !Number.isNaN(Number(possibleNumber));

@@ -52,28 +52,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.graylog.shaded</groupId>
-            <artifactId>opensearch2-rest-high-level-client</artifactId>
-            <version>${opensearch.shaded.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.graylog.shaded</groupId>
-            <artifactId>opensearch2-rest-client-sniffer</artifactId>
-            <version>${opensearch.shaded.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>org.opensearch.client</groupId>
             <artifactId>opensearch-java</artifactId>
             <version>${opensearch.client.version}</version>

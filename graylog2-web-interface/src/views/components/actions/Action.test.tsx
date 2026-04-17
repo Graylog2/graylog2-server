@@ -17,36 +17,28 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
-import noop from 'lodash/noop';
 
 import { createSimpleExternalValueAction } from 'fixtures/externalValueActions';
-import type { ActionContexts, RootState } from 'views/types';
+import type { ActionContexts } from 'views/types';
 import asMock from 'helpers/mocking/AsMock';
-import usePluginEntities from 'hooks/usePluginEntities';
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import useViewsDispatch from 'views/stores/useViewsDispatch';
-import mockDispatch from 'views/test/mockDispatch';
-import { createSearch } from 'fixtures/searches';
 import useExternalValueActions from 'views/hooks/useExternalValueActions';
+import useFieldActions from 'views/components/actions/useFieldActions';
 
 import Action from './Action';
 
-jest.mock('hooks/usePluginEntities', () => jest.fn(() => []));
-jest.mock('views/stores/useViewsDispatch');
-
 jest.mock('views/hooks/useExternalValueActions');
+jest.mock('views/components/actions/useFieldActions');
 
 describe('Action', () => {
   beforeEach(() => {
-    const view = createSearch();
-    const dispatch = mockDispatch({ view: { view, activeQuery: 'query-id-1' } } as RootState);
-    asMock(useViewsDispatch).mockReturnValue(dispatch);
-
     asMock(useExternalValueActions).mockReturnValue({
       isLoading: false,
       externalValueActions: [],
       isError: false,
     });
+
+    asMock(useFieldActions).mockReturnValue(actionConfig);
   });
 
   afterEach(() => {
@@ -54,11 +46,24 @@ describe('Action', () => {
   });
 
   const exampleHandlerArgs = {
-    queryId: 'query-id',
     field: 'field1',
     value: 'field-value',
     type: new FieldType('string', [], []),
     contexts: {} as ActionContexts,
+  };
+
+  const actionConfig = {
+    evaluateCondition: (condition, args, fallbackValue) => {
+      if (!condition) {
+        return fallbackValue;
+      }
+
+      return condition(args);
+    },
+    executeThunkAction: () => Promise.resolve(),
+    additionalHandlerArgs: {},
+    valueActions: [],
+    fieldActions: [],
   };
 
   type Props = Partial<React.ComponentProps<typeof Action>>;
@@ -101,7 +106,7 @@ describe('Action', () => {
       },
     ];
 
-    asMock(usePluginEntities).mockImplementation((entityKey) => ({ fieldActions })[entityKey]);
+    asMock(useFieldActions).mockReturnValue({ ...actionConfig, fieldActions });
 
     render(<SimpleAction type="field" />);
 
@@ -113,9 +118,7 @@ describe('Action', () => {
     expect(mockActionHandler).toHaveBeenCalledTimes(1);
   });
 
-  it('does not fail when plugin is not present for external actions', async () => {
-    asMock(usePluginEntities).mockImplementation((entityKey) => ({ wrongKey: noop })[entityKey]);
-
+  it('does not fail when no internal actions are configured', async () => {
     render(<SimpleAction>The dropdown header</SimpleAction>);
     await openDropdown('The dropdown header');
 

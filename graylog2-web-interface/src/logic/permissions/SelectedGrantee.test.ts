@@ -37,5 +37,7 @@ describe('SelectedGrantee', () => {
     ${alice} | ${owner}   | ${'unchanged'}
     ${alice} | ${manager} | ${'changed'}
     ${bob}   | ${manager} | ${'new'}
-  `('should return current state of $expectedReturn grantee', ({ grantee, capability, expectedReturn }) => expectCurrentState({ grantee, capability, expectedReturn }));
+  `('should return current state of $expectedReturn grantee', ({ grantee, capability, expectedReturn }) =>
+    expectCurrentState({ grantee, capability, expectedReturn }),
+  );
 });

@@ -15,19 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useMemo } from 'react';
+import { useContext } from 'react';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import type { QueryId } from 'views/logic/queries/Query';
 import Action from 'views/components/actions/Action';
 import { ActionContext } from 'views/logic/ActionContext';
+import useFieldActions from 'views/components/actions/useFieldActions';
 
 type Props = {
   children: React.ReactNode;
   element: React.ReactNode;
   field: string;
   menuContainer?: HTMLElement | undefined | null;
-  queryId: QueryId;
   type?: FieldType;
   value: React.ReactNode;
 };
@@ -37,15 +36,18 @@ const ValueActions = ({
   element,
   field,
   menuContainer = document.body,
-  queryId,
   type = FieldType.Unknown,
   value,
 }: Props) => {
   const actionContext = useContext(ActionContext);
-  const handlerArgs = useMemo(
-    () => ({ queryId, field, type, value, contexts: actionContext }),
-    [actionContext, field, queryId, type, value],
-  );
+  const { additionalHandlerArgs } = useFieldActions();
+  const handlerArgs = {
+    field,
+    type,
+    value,
+    contexts: actionContext,
+    ...additionalHandlerArgs,
+  };
   const elementWithStatus = (() => element) as React.ComponentType<{ active: boolean }>;
 
   return (

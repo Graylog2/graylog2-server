@@ -66,8 +66,6 @@ class IndicesAdapterOSTest {
     private IndexTemplateAdapter indexTemplateAdapter;
     @Mock
     private IndexStatisticsBuilder indexStatisticsBuilder;
-    @Mock
-    private PlainJsonApi jsonApi;
 
     @BeforeEach
     void setUp() {
@@ -83,8 +81,7 @@ class IndicesAdapterOSTest {
                 clusterStateApi,
                 indexTemplateAdapter,
                 indexStatisticsBuilder,
-                objectMapper,
-                jsonApi
+                objectMapper
         );
     }
 

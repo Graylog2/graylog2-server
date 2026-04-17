@@ -16,6 +16,7 @@
  */
 import memoize from 'lodash/memoize';
 
+import * as JSON from 'util/json';
 import FetchError from 'logic/errors/FetchError';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
@@ -73,7 +74,7 @@ const defaultResponseHandler = (resp: Response) => {
 
     reportServerSuccess();
 
-    return noContent ? null : resp.json();
+    return noContent ? null : resp.text().then(JSON.parse);
   }
 
   throw resp;
@@ -121,6 +122,15 @@ export class Builder {
     this.options = {
       ...this.options,
       [header]: value,
+    };
+
+    return this;
+  }
+
+  setHeaders(headers: { [key: string]: string | number | boolean | string[] }) {
+    this.options = {
+      ...this.options,
+      ...headers,
     };
 
     return this;

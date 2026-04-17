@@ -20,14 +20,31 @@ import org.graylog.shaded.opensearch2.org.opensearch.index.query.MultiMatchQuery
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.RangeQueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.sort.FieldSortBuilder;
+import org.graylog2.indexer.searches.Sorting;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 class MoreSearchAdapterOS2Test {
     private static final String FIELD = "field";
     private static final String VALUE = "100";
+    private MoreSearchAdapterOS2 adapter;
+
+    @BeforeEach
+    void setUp() {
+        adapter = new MoreSearchAdapterOS2(
+                null,  // opensearchClient - not needed for sorting tests
+                true,  // allowLeadingWildcard
+                null,  // multiChunkResultRetriever - not needed for sorting tests
+                null
+        );
+    }
 
     @Test
     void testBuildExtraFilter() {
@@ -36,6 +53,45 @@ class MoreSearchAdapterOS2Test {
         verifyFilter("<100", QueryBuilders.rangeQuery(FIELD).lt(VALUE), RangeQueryBuilder.class);
         verifyFilter(">100", QueryBuilders.rangeQuery(FIELD).gt(VALUE), RangeQueryBuilder.class);
         verifyFilter(VALUE, QueryBuilders.multiMatchQuery(VALUE, FIELD), MultiMatchQueryBuilder.class);
+    }
+
+    @Test
+    void testSortingWithUnmappedTypeAscShouldUseMissingFirst() {
+        // Given
+        final Sorting sorting = new Sorting("some_field", Sorting.Direction.ASC, "date");
+
+        // When
+        final List<FieldSortBuilder> sortOptions = adapter.createSorting(sorting);
+
+        // Then
+        assertThat(sortOptions).hasSize(1);
+        assertThat(sortOptions.get(0).missing()).isEqualTo("_first");
+    }
+
+    @Test
+    void testSortingWithUnmappedTypeDescShouldUseMissingLast() {
+        // Given
+        final Sorting sorting = new Sorting("some_field", Sorting.Direction.DESC, "date");
+
+        // When
+        final List<FieldSortBuilder> sortOptions = adapter.createSorting(sorting);
+
+        // Then
+        assertThat(sortOptions).hasSize(1);
+        assertThat(sortOptions.get(0).missing()).isEqualTo("_last");
+    }
+
+    @Test
+    void testSortingWithoutUnmappedTypeShouldHaveNoMissingValue() {
+        // Given
+        final Sorting sorting = new Sorting("some_field", Sorting.Direction.ASC);
+
+        // When
+        final List<FieldSortBuilder> sortOptions = adapter.createSorting(sorting);
+
+        // Then
+        assertThat(sortOptions).hasSize(1);
+        assertThat(sortOptions.get(0).missing()).isNull();
     }
 
     private static void verifyFilter(String value, QueryBuilder expectedFilter, Class<? extends QueryBuilder> expectedFilterClass) {

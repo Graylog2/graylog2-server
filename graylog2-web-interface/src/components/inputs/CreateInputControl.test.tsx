@@ -22,7 +22,7 @@ import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
 
 import selectEvent from 'helpers/selectEvent';
 import asMock from 'helpers/mocking/AsMock';
-import { InputTypesActions } from 'stores/inputs/InputTypesStore';
+import { fetchInputType } from 'hooks/useInputType';
 import { InputsActions } from 'stores/inputs/InputsStore';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
@@ -32,7 +32,7 @@ import useInputTypes from './useInputTypes';
 import CreateInputControl from './CreateInputControl';
 
 jest.mock('./useInputTypes');
-jest.mock('stores/inputs/InputTypesStore');
+jest.mock('hooks/useInputType');
 jest.mock('stores/inputs/InputsStore');
 jest.mock('logic/telemetry/useSendTelemetry');
 jest.mock('routing/useLocation');
@@ -51,10 +51,10 @@ describe('CreateInputControl', () => {
       'input-type-2': 'Input Type 2',
     });
 
-    asMock(InputTypesActions.get).mockResolvedValue({
-      requested_configuration: [],
+    asMock(fetchInputType).mockResolvedValue({
+      requested_configuration: {},
       description: 'Test input type',
-    });
+    } as any);
 
     asMock(InputsActions.create).mockResolvedValue({ id: 'input-id-1' });
 

@@ -81,12 +81,12 @@ public class PipelineInterpreter implements MessageProcessor {
     private final Meter filteredOutMessages;
     private final Timer executionTime;
     private final MetricRegistry metricRegistry;
-    private final ConfigurationStateUpdater stateUpdater;
+    private final PipelineInterpreterStateUpdater stateUpdater;
 
     @Inject
     public PipelineInterpreter(MessageQueueAcknowledger messageQueueAcknowledger,
                                MetricRegistry metricRegistry,
-                               ConfigurationStateUpdater stateUpdater) {
+                               PipelineInterpreterStateUpdater stateUpdater) {
 
         this.messageQueueAcknowledger = messageQueueAcknowledger;
         this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));

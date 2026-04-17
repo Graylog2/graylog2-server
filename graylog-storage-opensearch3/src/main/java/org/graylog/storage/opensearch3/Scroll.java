@@ -17,13 +17,11 @@
 package org.graylog.storage.opensearch3;
 
 import jakarta.inject.Inject;
-import org.graylog.storage.search.SearchCommand;
 import org.graylog2.indexer.results.ChunkedResult;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.searches.ChunkCommand;
 import org.opensearch.client.opensearch._types.ExpandWildcard;
 import org.opensearch.client.opensearch._types.Time;
-import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.SearchRequest;
 import org.opensearch.client.opensearch.core.SearchResponse;
 
@@ -49,8 +47,8 @@ public class Scroll implements MultiChunkResultRetriever {
 
     @Override
     public ChunkedResult retrieveChunkedResult(ChunkCommand chunkCommand) {
-        final Query query = createQuery(chunkCommand);
-        final SearchRequest request = buildScrollRequest(query, chunkCommand);
+        final SearchRequest.Builder builder = searchRequestFactory.create(chunkCommand);
+        final SearchRequest request = buildScrollRequest(builder, chunkCommand);
         final SearchResponse<Map> result = opensearchClient.sync(
                 c -> c.search(request, Map.class),
                 "Unable to perform scroll search"
@@ -58,49 +56,17 @@ public class Scroll implements MultiChunkResultRetriever {
         return scrollResultFactory.create(result, request.toString(), DEFAULT_SCROLLTIME, chunkCommand.fields(), chunkCommand.limit().orElse(-1));
     }
 
-    Query createQuery(final ChunkCommand chunkCommand) {
-        final SearchCommand searchCommand = SearchCommand.from(chunkCommand);
-        return searchRequestFactory.createQuery(searchCommand);
-    }
-
-    SearchRequest buildScrollRequest(Query query, ChunkCommand chunkCommand) {
+    SearchRequest buildScrollRequest(SearchRequest.Builder builder, ChunkCommand chunkCommand) {
         final Set<String> indices = chunkCommand.indices();
 
         final Time scrollTime = new Time.Builder().time(DEFAULT_SCROLLTIME).build();
 
-        return SearchRequest.of(builder -> {
-            builder.index(new LinkedList<>(indices));
-            builder.query(query);
-            builder.scroll(scrollTime);
-            builder.ignoreUnavailable(true);
-            builder.allowNoIndices(true);
-            builder.expandWildcards(ExpandWildcard.Open);
-            builder.trackTotalHits(th -> th.enabled(true));
+        builder.index(new LinkedList<>(indices));
+        builder.ignoreUnavailable(true);
+        builder.allowNoIndices(true);
+        builder.expandWildcards(ExpandWildcard.Open);
+        builder.scroll(scrollTime);
 
-            // Set source fields
-            if (!chunkCommand.fields().isEmpty()) {
-                builder.source(s -> s.filter(sf -> sf.includes(new LinkedList<>(chunkCommand.fields()))));
-            }
-
-            // Set slice parameters
-            chunkCommand.sliceParams().ifPresent(sliceParams ->
-                    builder.slice(slice -> slice.id(sliceParams.id()).max(sliceParams.max()))
-            );
-
-            // Set pagination parameters
-            // IMPORTANT: Don't use 'from' (offset) with slice parameters - they're incompatible in OpenSearch/Elasticsearch
-            if (chunkCommand.sliceParams().isEmpty()) {
-                chunkCommand.offset().ifPresent(offset -> builder.from(offset));
-            }
-
-            // Set batch size, or use limit as fallback if batchSize is absent
-            if (chunkCommand.batchSize().isPresent()) {
-                builder.size(Math.toIntExact(chunkCommand.batchSize().getAsLong()));
-            } else {
-                chunkCommand.limit().ifPresent(builder::size);
-            }
-
-            return builder;
-        });
+        return builder.build();
     }
 }

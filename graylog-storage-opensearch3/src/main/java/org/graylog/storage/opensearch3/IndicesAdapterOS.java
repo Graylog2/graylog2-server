@@ -125,7 +125,6 @@ public class IndicesAdapterOS implements IndicesAdapter {
     private final org.opensearch.client.opensearch.OpenSearchClient openSearchClient;
     private final OpenSearchIndicesClient indicesClient;
     private final OpenSearchCatClient catClient;
-    private final PlainJsonApi jsonApi;
 
     // this is the maximum amount of bytes that the index list is supposed to fill in a request,
     // it assumes that these don't need url encoding. If we exceed the maximum, we request settings for all indices
@@ -139,8 +138,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
                             ClusterStateApi clusterStateApi,
                             IndexTemplateAdapter indexTemplateAdapter,
                             IndexStatisticsBuilder indexStatisticsBuilder,
-                            ObjectMapper objectMapper,
-                            PlainJsonApi jsonApi) {
+                            ObjectMapper objectMapper) {
         this.c = c;
         this.statsApi = statsApi;
         this.clusterStatsApi = clusterStatsApi;
@@ -149,7 +147,6 @@ public class IndicesAdapterOS implements IndicesAdapter {
         this.indexStatisticsBuilder = indexStatisticsBuilder;
         this.objectMapper = objectMapper;
         this.openSearchClient = c.sync();
-        this.jsonApi = jsonApi;
         this.indicesClient = openSearchClient.indices();
         this.catClient = openSearchClient.cat();
     }
@@ -246,7 +243,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
                     .method("PUT")
                     .body(Body.from(objectMapper.writeValueAsBytes(mapping), "application/json"))
                     .build();
-            jsonApi.performRequest(request, "Unable to update index mapping " + indexName);
+            c.performRequest(request, "Unable to update index mapping " + indexName);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to update index mapping " + indexName, e);
         }
@@ -270,7 +267,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
                 .method("GET")
                 .endpoint("/" + index + "/_settings")
                 .build();
-        JsonNode jsonNode = jsonApi.performRequest(request, "Unable to retrieve index settings " + index);
+        JsonNode jsonNode = c.performRequest(request, "Unable to retrieve index settings " + index);
         return Optional.ofNullable(jsonNode.get(index))
                 .map(node -> node.get("settings"))
                 .map(node -> objectMapper.convertValue(node, new TypeReference<Map<String, Object>>() {}))

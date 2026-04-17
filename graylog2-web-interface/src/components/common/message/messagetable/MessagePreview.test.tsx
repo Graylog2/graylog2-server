@@ -51,6 +51,7 @@ describe('MessagePreview', () => {
           showMessageRow
           config={MessagesWidgetConfig.builder().build()}
           messageFieldType={new FieldType('string', [], [])}
+          displayBulkSelectCol={false}
           {...rest}
         />
       </tbody>

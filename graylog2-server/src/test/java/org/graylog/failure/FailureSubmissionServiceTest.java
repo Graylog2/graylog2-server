@@ -19,6 +19,7 @@ package org.graylog.failure;
 import org.graylog2.indexer.messages.IndexingError;
 import org.graylog2.inputs.diagnosis.InputDiagnosisMetrics;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -34,6 +35,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog.failure.InputFailureCause.INPUT_PARSE;
 import static org.graylog2.indexer.messages.IndexingError.Type.MappingError;
 import static org.graylog2.indexer.messages.IndexingError.Type.Unknown;
 import static org.mockito.Mockito.lenient;
@@ -415,5 +417,39 @@ class FailureSubmissionServiceTest {
         assertThat(failureBatchCaptor.getValue()).satisfies(fb ->
                 assertThat(fb.getFailures().get(0)).satisfies(indexingFailure ->
                         assertThat(indexingFailure.failureDetails()).isEqualTo("IllegalArgumentException: rootCauseMessage")));
+    }
+
+    @Test
+    void submitInputFailure() throws Exception {
+        final String failureMessage = "failure-message";
+        final String failureDetails = "failure-details";
+
+        InputFailure inputFailure = new InputFailure(
+                INPUT_PARSE,
+                failureMessage,
+                failureDetails,
+                Tools.nowUTC(),
+                new RawMessage(new byte[]{1, 2, 3}),
+                "original-payload"
+        );
+
+        underTest.submitInputFailure(inputFailure);
+
+        verify(failureSubmissionQueue, times(1)).submitBlocking(failureBatchCaptor.capture());
+        assertThat(failureBatchCaptor.getValue()).satisfies(batch -> {
+            assertThat(batch.containsInputFailures()).isTrue();
+            assertThat(batch.size()).isEqualTo(1);
+
+            assertThat(batch.getFailures().getFirst())
+                    .isSameAs(inputFailure)
+                    .satisfies(failure -> {
+                        assertThat(failure.failureType()).isEqualTo(FailureType.INPUT);
+                        assertThat(failure.failureCause().label()).isEqualTo(INPUT_PARSE.label());
+                        assertThat(failure.message()).isEqualTo(failureMessage);
+                        assertThat(failure.failureDetails()).isEqualTo(failureDetails);
+                        assertThat(failure.failureTimestamp()).isNotNull();
+                        assertThat(failure.requiresAcknowledgement()).isFalse();
+                    });
+        });
     }
 }

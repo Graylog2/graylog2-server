@@ -217,6 +217,7 @@ const ApiRoutes = {
     references: (inputId: string) => ({ url: `/system/inputs/references/${inputId}` }),
   },
   InputStatesController: {
+    summary: () => ({ url: '/system/inputstates/summary' }),
     start: (inputId: string) => ({ url: `/system/inputstates/${inputId}` }),
     stop: (inputId: string) => ({ url: `/system/inputstates/${inputId}` }),
   },

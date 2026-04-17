@@ -167,6 +167,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String SUPPORT_BUNDLE_DOWNLOAD = PREFIX + "support_bundle:download";
     public static final String SYSTEM_JOB_START = PREFIX + "system_job:start";
     public static final String SYSTEM_JOB_STOP = PREFIX + "system_job:stop";
+    public static final String MONGODB_CHANGE_PROFILING = PREFIX + "mongodb:changeprofiling";
 
     public static final String SYSTEM_JOB_ACKNOWLEDGE = PREFIX + "system_job:acknowledge";
     public static final String SYSTEM_NOTIFICATION_CREATE = PREFIX + "system_notification:create";
@@ -195,6 +196,18 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String MCP_PROMPT_GET = MCP_PREFIX + "prompt:get";
     public static final String MCP_TOOL_LIST = MCP_PREFIX + "tool:list";
     public static final String MCP_TOOL_CALL = MCP_PREFIX + "tool:call";
+
+    public static final String OPAMP_ENROLLMENT_TOKEN_CREATE = PREFIX + "collector_enrollment_token:create";
+    public static final String OPAMP_ENROLLMENT_TOKEN_DELETE = PREFIX + "collector_enrollment_token:delete";
+    public static final String COLLECTOR_FLEET_CREATE = PREFIX + "collector_fleet:create";
+    public static final String COLLECTOR_FLEET_DELETE = PREFIX + "collector_fleet:delete";
+    public static final String COLLECTOR_FLEET_UPDATE = PREFIX + "collector_fleet:update";
+    public static final String COLLECTOR_INSTANCE_DELETE = PREFIX + "collector_instance:delete";
+    public static final String COLLECTOR_INSTANCE_REASSIGN = PREFIX + "collector_instance:reassign";
+    public static final String COLLECTOR_SOURCE_CREATE = PREFIX + "collector_source:create";
+    public static final String COLLECTOR_SOURCE_DELETE = PREFIX + "collector_source:delete";
+    public static final String COLLECTOR_SOURCE_UPDATE = PREFIX + "collector_source:update";
+    public static final String COLLECTORS_CONFIG_UPDATE = PREFIX + "collectors_config:update";
 
     private static final ImmutableSet<String> EVENT_TYPES = ImmutableSet.<String>builder()
             .add(ALARM_CALLBACK_CREATE)
@@ -364,6 +377,18 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(MCP_TOOL_CALL)
             .add(MCP_PROMPT_LIST)
             .add(MCP_PROMPT_GET)
+            .add(MONGODB_CHANGE_PROFILING)
+            .add(OPAMP_ENROLLMENT_TOKEN_CREATE)
+            .add(OPAMP_ENROLLMENT_TOKEN_DELETE)
+            .add(COLLECTOR_FLEET_CREATE)
+            .add(COLLECTOR_FLEET_DELETE)
+            .add(COLLECTOR_FLEET_UPDATE)
+            .add(COLLECTOR_INSTANCE_DELETE)
+            .add(COLLECTOR_INSTANCE_REASSIGN)
+            .add(COLLECTOR_SOURCE_CREATE)
+            .add(COLLECTOR_SOURCE_DELETE)
+            .add(COLLECTOR_SOURCE_UPDATE)
+            .add(COLLECTORS_CONFIG_UPDATE)
             .build();
 
     @Override

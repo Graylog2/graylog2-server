@@ -48,6 +48,7 @@ const listResponse = {
       pipeline: 'Pipeline 1',
       rule_id: 'rule-id-1',
       rule: 'Rule 1',
+      stage: 1,
       connected_streams: [
         {
           id: 'stream-id-1',

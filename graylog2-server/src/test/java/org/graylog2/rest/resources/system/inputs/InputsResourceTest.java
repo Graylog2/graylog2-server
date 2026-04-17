@@ -29,6 +29,7 @@ import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.diagnosis.InputDiagnosticService;
+import org.graylog2.inputs.diagnosis.InputRoutingRulesService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
@@ -207,7 +208,8 @@ class InputsResourceTest {
                                   PipelineService pipelineService,
                                   MessageInputFactory messageInputFactory,
                                   Configuration config) {
-            super(inputService, mock(InputDiagnosticService.class), streamService, streamRuleService,
+            super(inputService, mock(InputDiagnosticService.class), mock(InputRoutingRulesService.class),
+                    streamService, streamRuleService,
                     pipelineService, messageInputFactory, config, mock(MongoDbInputsMetadataService.class),
                     mock(ClusterEventBus.class), new ComputedFieldRegistry(Set.of()));
             configuration = mock(HttpConfiguration.class);

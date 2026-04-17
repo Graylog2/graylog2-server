@@ -94,26 +94,23 @@ const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validati
       const nextConditionType = Number(FormsUtils.getValueFromInput(event.target as HTMLInputElement));
 
       setConditionType(nextConditionType);
-      let newExistingAggregationConfig;
-
       if (nextConditionType === conditionTypes.FILTER) {
         // Store existing data temporarily in state, to restore it in case the type change was accidental
-        Object.keys(initialAggregationConfig).forEach((key) => {
-          newExistingAggregationConfig[key] = eventDefinition.config[key];
-        });
+        const savedAggregationConfig = Object.fromEntries(
+          Object.keys(initialAggregationConfig).map((key) => [key, eventDefinition.config[key]]),
+        ) as EventDefinition['config'];
 
         const nextConfig = { ...eventDefinition.config, ...initialAggregationConfig };
 
         propagateConfigChange(nextConfig as EventDefinition['config']);
+        setExistingAggregationConfig(savedAggregationConfig);
       } else if (existingAggregationConfig) {
         // Reset aggregation data from state if it exists
         const nextConfig = { ...eventDefinition.config, ...existingAggregationConfig };
 
         propagateConfigChange(nextConfig);
-        newExistingAggregationConfig = undefined;
+        setExistingAggregationConfig(undefined);
       }
-
-      setExistingAggregationConfig(newExistingAggregationConfig);
     },
     [eventDefinition.config, existingAggregationConfig, propagateConfigChange],
   );

@@ -98,6 +98,7 @@ export type Attribute = {
   related_display_fields?: Array<string>;
   related_display_template?: string;
   sliceable?: boolean;
+  slice_sort_options?: Array<{ value: string; title: string }>;
   permissions?: Array<Permission>;
 };
 

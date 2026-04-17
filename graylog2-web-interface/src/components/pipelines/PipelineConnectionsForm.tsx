@@ -22,7 +22,7 @@ import { ControlLabel, FormGroup, HelpBlock, Button, BootstrapModalForm } from '
 import Routes from 'routing/Routes';
 import type { PipelineType } from 'components/pipelines/types';
 import type { Stream } from 'stores/streams/StreamsStore';
-import type { PipelineConnectionsType } from 'stores/pipelines/PipelineConnectionsStore';
+import type { PipelineConnectionsType } from 'hooks/usePipelineConnections';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 

@@ -24,11 +24,16 @@ import { Button, Col, DropdownButton, Label, MenuItem, Row, DeleteMenuItem } fro
 import Routes from 'routing/Routes';
 import StringUtils from 'util/StringUtils';
 import NumberUtils from 'util/NumberUtils';
-import { useStore } from 'stores/connect';
 import { IndexSetDeletionForm, IndexSetDetails } from 'components/indices';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
-import type { IndexSetsStoreState, IndexSet, IndexSetStats } from 'stores/indices/IndexSetsStore';
-import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import {
+  searchIndexSetsPaginated,
+  fetchIndexSetsPaginated,
+  fetchIndexSetsStats,
+  setDefaultIndexSet,
+  deleteIndexSet as deleteIndexSetApi,
+} from 'stores/indices/IndexSetsStore';
+import type { IndexSet, IndexSetStats, IndexSetsStats } from 'stores/indices/IndexSetsStore';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
@@ -74,8 +79,10 @@ const DEFAULT_PAGE_SIZE = 10;
 const SEARCH_MIN_TERM_LENGTH = 3;
 
 const IndexSetsComponent = () => {
-  const { indexSetsCount, indexSets, indexSetStats, globalIndexSetStats } =
-    useStore<IndexSetsStoreState>(IndexSetsStore);
+  const [indexSetsCount, setIndexSetsCount] = useState<number>(undefined);
+  const [indexSets, setIndexSets] = useState<Array<IndexSet>>(undefined);
+  const [indexSetStats, setIndexSetStats] = useState<IndexSetsStats>({});
+  const [globalIndexSetStats, setGlobalIndexSetStats] = useState<IndexSetStats>(undefined);
   const { page, resetPage }: PaginationQueryParameterResult = usePaginationQueryParameter();
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
@@ -87,11 +94,15 @@ const IndexSetsComponent = () => {
 
   const loadData = useCallback(
     (pageNumber: number = DEFAULT_PAGE_NUMBER, limit: number = DEFAULT_PAGE_SIZE) => {
-      if (searchTerm) {
-        IndexSetsActions.searchPaginated(searchTerm, (pageNumber - 1) * limit, limit, statsEnabled);
-      } else {
-        IndexSetsActions.listPaginated((pageNumber - 1) * limit, limit, statsEnabled);
-      }
+      const fetchFn = searchTerm
+        ? searchIndexSetsPaginated(searchTerm, (pageNumber - 1) * limit, limit, statsEnabled)
+        : fetchIndexSetsPaginated((pageNumber - 1) * limit, limit, statsEnabled);
+
+      fetchFn.then((response) => {
+        setIndexSetsCount(response.total);
+        setIndexSets(response.index_sets);
+        setIndexSetStats(response.stats);
+      });
     },
     [statsEnabled, searchTerm],
   );
@@ -102,7 +113,7 @@ const IndexSetsComponent = () => {
 
   useEffect(() => {
     if (statsEnabled) {
-      IndexSetsActions.stats();
+      fetchIndexSetsStats().then(setGlobalIndexSetStats);
     }
   }, [statsEnabled]);
 
@@ -132,21 +143,21 @@ const IndexSetsComponent = () => {
       app_action_value: 'set-default-index-set',
     });
 
-    IndexSetsActions.setDefault(indexSet).then(() => loadData());
+    setDefaultIndexSet(indexSet).then(() => loadData());
   };
 
   const onDelete = (indexSet: IndexSet) => () => {
     formsRef.current[`index-set-deletion-form-${indexSet.id}`].open();
   };
 
-  const deleteIndexSet = (indexSet: IndexSet, deleteIndices: boolean) => {
+  const onDeleteIndexSet = (indexSet: IndexSet, deleteIndices: boolean) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDICES.INDEX_SET_DELETED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'index-sets',
       app_action_value: 'delete-index-set',
     });
 
-    IndexSetsActions.delete(indexSet, deleteIndices).then(() => {
+    deleteIndexSetApi(indexSet, deleteIndices).then(() => {
       resetPage();
       loadData(page);
     });
@@ -179,7 +190,7 @@ const IndexSetsComponent = () => {
             formsRef.current = { ...formsRef.current, [`index-set-deletion-form-${indexSet.id}`]: elem };
           }}
           indexSet={indexSet}
-          onDelete={deleteIndexSet}
+          onDelete={onDeleteIndexSet}
         />
       </Col>
     );

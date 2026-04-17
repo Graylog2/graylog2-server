@@ -22,9 +22,6 @@ import com.mongodb.DBObject;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +30,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+import java.time.Clock;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,40 +42,56 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class ClusterEventCleanupPeriodicalTest {
-    private static final DateTime TIME = new DateTime(2015, 4, 1, 0, 0, DateTimeZone.UTC);
+    private static final Instant TIME = Instant.parse("2015-04-01T00:00:00Z");
     private static final Duration maxEventAge = Duration.ofDays(1);
+    private static final Clock FIXED_CLOCK = Clock.fixed(TIME, ZoneOffset.UTC);
 
     private MongoConnection mongoConnection;
     private ClusterEventCleanupPeriodical clusterEventCleanupPeriodical;
 
     @BeforeEach
-    public void setUpService(MongoCollections mongoCollections) throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TIME.getMillis());
-
+    public void setUpService(MongoCollections mongoCollections) {
         this.mongoConnection = mongoCollections.mongoConnection();
-
-        this.clusterEventCleanupPeriodical = new ClusterEventCleanupPeriodical(mongoCollections, maxEventAge);
+        this.clusterEventCleanupPeriodical = new ClusterEventCleanupPeriodical(mongoCollections, maxEventAge, FIXED_CLOCK);
     }
 
     @AfterEach
     public void tearDown() {
-        DateTimeUtils.setCurrentMillisSystem();
         mongoConnection.getMongoDatabase().drop();
     }
 
     @Test
-    public void testDoRun() throws Exception {
-        final var maxEventAgeMillis = maxEventAge.toMillis();
+    public void testDoRun() {
+        final long maxEventAgeMillis = maxEventAge.toMillis();
+        final long timeMillis = TIME.toEpochMilli();
         final DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
         assertThat(insertEvent(collection, 0L)).isTrue();
-        assertThat(insertEvent(collection, TIME.getMillis())).isTrue();
-        assertThat(insertEvent(collection, TIME.minus(maxEventAgeMillis).getMillis())).isTrue();
-        assertThat(insertEvent(collection, TIME.minus(2 * maxEventAgeMillis).getMillis())).isTrue();
+        assertThat(insertEvent(collection, timeMillis)).isTrue();
+        assertThat(insertEvent(collection, timeMillis - maxEventAgeMillis)).isTrue();
+        assertThat(insertEvent(collection, timeMillis - 2 * maxEventAgeMillis)).isTrue();
         assertThat(collection.count()).isEqualTo(4L);
 
         clusterEventCleanupPeriodical.run();
 
         assertThat(collection.count()).isEqualTo(2L);
+    }
+
+    @Test
+    void getPeriodSeconds_defaultAge_returns43200(MongoCollections mongoCollections) {
+        final var periodical = new ClusterEventCleanupPeriodical(mongoCollections, Duration.ofHours(12));
+        assertThat(periodical.getPeriodSeconds()).isEqualTo(43200);
+    }
+
+    @Test
+    void getPeriodSeconds_shortAge_clampsToMinimum(MongoCollections mongoCollections) {
+        final var periodical = new ClusterEventCleanupPeriodical(mongoCollections, Duration.ofSeconds(10));
+        assertThat(periodical.getPeriodSeconds()).isEqualTo(3600);
+    }
+
+    @Test
+    void getPeriodSeconds_customAge_matchesMaxEventAge(MongoCollections mongoCollections) {
+        final var periodical = new ClusterEventCleanupPeriodical(mongoCollections, Duration.ofHours(2));
+        assertThat(periodical.getPeriodSeconds()).isEqualTo(7200);
     }
 
     private boolean insertEvent(DBCollection collection, long timestamp) {

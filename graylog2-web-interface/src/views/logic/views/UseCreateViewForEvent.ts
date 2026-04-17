@@ -17,6 +17,8 @@
 import { useMemo } from 'react';
 import * as Immutable from 'immutable';
 
+import { SearchDecorators } from '@graylog/server-api';
+
 import View from 'views/logic/views/View';
 import type { AbsoluteTimeRange, RelativeTimeRangeStartOnly, TimeRange } from 'views/logic/queries/Query';
 import type { Event } from 'components/events/events/types';
@@ -29,7 +31,6 @@ import ViewState from 'views/logic/views/ViewState';
 import { allMessagesTable, resultHistogram } from 'views/logic/Widgets';
 import type Widget from 'views/logic/widgets/Widget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import { DecoratorsActions } from 'stores/decorators/DecoratorsStore';
 import generateId from 'logic/generateId';
 import pivotForField from 'views/logic/searchtypes/aggregation/PivotGenerator';
 import FieldType from 'views/logic/fieldtypes/FieldType';
@@ -91,7 +92,13 @@ const createViewWidget = ({ groupBy, fnSeries, expr }: { groupBy: Array<string>;
   return getAggregationWidget({ rowPivots, fnSeries: [fnSeriesForFunc], sort });
 };
 
-const getSummaryAggregation = ({ aggregations, groupBy }: { aggregations: Array<EventDefinitionAggregation>; groupBy: Array<string> }) => {
+const getSummaryAggregation = ({
+  aggregations,
+  groupBy,
+}: {
+  aggregations: Array<EventDefinitionAggregation>;
+  groupBy: Array<string>;
+}) => {
   const { summaryFnSeries, summaryTitle } = aggregations.reduce<{ summaryFnSeries: string[]; summaryTitle: string }>(
     (res, { value, expr, fnSeries }) => {
       const concatTitle = `${fnSeries} ${expr} ${value}`;
@@ -119,13 +126,18 @@ const getSummaryAggregation = ({ aggregations, groupBy }: { aggregations: Array<
   };
 };
 
-export const WidgetsGenerator = async ({ streams, streamCategories, aggregations, groupBy }: {
+export const WidgetsGenerator = async ({
+  streams,
+  streamCategories,
+  aggregations,
+  groupBy,
+}: {
   streams: string | string[] | undefined;
   streamCategories: string | string[] | undefined;
   aggregations: Array<EventDefinitionAggregation>;
   groupBy: Array<string>;
 }) => {
-  const decorators = await DecoratorsActions.list();
+  const decorators = await SearchDecorators.get();
   const byStreamId = matchesDecoratorStream(streams);
   const byStreamCategory = matchesDecoratorStreamCategories(streamCategories);
   const streamDecorators = decorators?.length ? decorators.filter(byStreamId) : [];

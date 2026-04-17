@@ -4,7 +4,7 @@ Thank you for contributing to the Graylog web interface. This guide covers conve
 
 For general contribution instructions, visit [graylog.org/get-involved](https://www.graylog.org/get-involved/).
 
-> **AI agents**: Also read [AGENT.md](./AGENT.md) for agent-specific instructions, commands, and project structure details.
+> **AI agents**: Also read [AGENTS.md](./AGENTS.md) for agent-specific instructions, commands, and project structure details.
 
 ## Code of Conduct
 
@@ -30,7 +30,8 @@ Please read and understand the [Code of Conduct](https://github.com/Graylog2/gra
 
 ### Class vs Functional
 
-Small components should be functional. For complex components, either class or functional with hooks is acceptable — when in doubt, prefer functional.
+- Small components should be functional. For complex components, either class or functional with hooks is acceptable — when in doubt, prefer functional.
+- When touching existing components, migrate them to functional, typed components. Exception: trivial bugfixes where migration effort exceeds the fix or risks unforeseen consequences.
 
 ### Size and Simplicity
 
@@ -40,16 +41,33 @@ Small components should be functional. For complex components, either class or f
 ### Reusing Components
 
 - We wrap react-bootstrap components in our own wrappers, importable from `components/graylog`. Always use these wrappers instead of importing react-bootstrap directly.
+- For common UI patterns, prefer existing shared UI components from `components/graylog` and `components/common` before introducing native HTML elements.
 - Check the [frontend documentation](https://graylog2.github.io/frontend-documentation) for available common components before creating new ones.
 
 ## Type Definitions
 
+### Component Props
+
 - Use **TypeScript** for all new React components with static types for props.
 - **No PropTypes** — support was dropped with React 19.
 - Use **default parameters** instead of `defaultProps` in functional components. See the [React 19 upgrade guide](https://react.dev/blog/2024/04/25/react-19-upgrade-guide).
-- When touching existing components, migrate them to functional, typed components. Exception: trivial bugfixes where migration effort exceeds the fix or risks unforeseen consequences.
+- For the main exported component in a file, name the component props type `Props` and place it directly above the component.
+- When typing components with children, prefer `React.PropsWithChildren` over adding a `children` field to the props type directly.
+
+### Type Safety
+
+- Prefer TypeScript's type inference over unnecessary explicit type annotations. Add explicit types when they improve clarity or are required, not by default.
+- Avoid redundant function type annotations when the expected type is already inferred from usage, such as callbacks passed to typed component props.
+- Avoid explicit function return types when TypeScript can infer them clearly.
+- Exception: for exported hooks that wrap `react-query`, prefer explicitly typing the hook's public return shape to the fields our code actually uses instead of exposing the full `useQuery` result type. This makes the contract clearer and keeps tests easier to mock.
 - Prefix unused parameters with an underscore and a meaningful name (e.g., `_eventType`), not just `_`. See [this discussion](https://github.com/Graylog2/graylog2-server/pull/12176#pullrequestreview-940555887).
 - `types.d.ts` can hide errors like missing imports. Temporarily rename to `types.ts` to detect them.
+- Do not leave out types for function arguments (therefore being implicitly `any`), use proper types.
+- Do not use `as unknown as <...>` to opt out of type-checking
+
+### Test Typing
+
+- In tests, never cast to `jest.Mock` (`foo as jest.Mock`), use the `asMock` helper function
 
 ## Imports
 
@@ -71,14 +89,41 @@ Small components should be functional. For complex components, either class or f
 - Prefer replacing with `react-query` (API caching) or `useState`/`useContext` (state).
 - If migration isn't possible yet, access via `useStore`.
 
+## Common Libraries
+
+- For server state and API communication, use `@tanstack/react-query`, preferably behind dedicated hooks instead of calling `useQuery` or `useMutation` directly in many components.
+- For forms, use `formik` and prefer existing Formik-based helpers and components when they fit.
+- For component styling, use `styled-components` and prefer theme tokens over hard-coded values.
+
 ## Testing
 
+### General
+
 - **Framework**: Jest + [Testing Library](https://testing-library.com/).
-- Follow Testing Library's [Guiding Principles](https://testing-library.com/docs/guiding-principles) and their guide for [picking a good query](https://testing-library.com/docs/queries/about#priority).
-- Import `render` from `wrappedTestingLibrary`, not directly from `@testing-library/react`.
 - Write unit tests for every use case of new functionality.
 - Test from the user's perspective — do not rely on internal implementation details.
 - **No snapshot tests** for component state. Use Testing Library queries (`getByText`, etc.) instead. Snapshot tests are acceptable for verifying complex function return values.
+
+### Render and Wrappers
+
+- Import `render` from `wrappedTestingLibrary`, not directly from `@testing-library/react`.
+- Use the default wrappers provided by `wrappedTestingLibrary` and `wrappedTestingLibrary/hooks`. Do not manually add providers that are already included there, such as `DefaultQueryClientProvider`, unless the test needs a specific override or custom setup.
+
+### Assertions and Queries
+
+- Follow Testing Library's [Guiding Principles](https://testing-library.com/docs/guiding-principles) and their guide for [picking a good query](https://testing-library.com/docs/queries/about#priority).
+- Prefer `findBy` over `getBy` for UI that may update asynchronously. It matches async UI behavior and avoids brittle manual waiting.
+- Prefer `await screen.findBy...` directly over wrapping it in `expect(...).toBeInTheDocument()`. `findBy` already fails if the element is not present.
+
+### Mocking
+
+- When mocking API communication in tests, do not mock `@tanstack/react-query` directly. Mock the abstraction on top of it instead, which is usually a dedicated hook.
+- If a `react-query` hook currently lives inside a component and the test needs to mock it, move that hook into a separate file so it can be mocked cleanly.
+
+### Fixtures
+
+- Prefer existing fixtures over creating large inline entity mocks inside a test. Search for reusable fixtures nearby and in shared test fixture locations before creating a new one.
+- If no suitable fixture exists, extract the mock data into a fixture file instead of keeping a complex object inline in the test. Follow the local pattern when one exists; otherwise place the fixture near the test, typically in a nearby `__tests__` directory.
 
 ### Test File Placement
 
@@ -130,9 +175,14 @@ test({ value1: undefined, value2: null }); // 12, null
 
 `Array.reduce` is slow for building objects from large arrays. Use `Object.fromEntries` instead. See [this PR](https://github.com/Graylog2/graylog2-server/pull/12162) for details.
 
+### Date and Time
+
+- Avoid using `moment` directly in application code when shared date/time abstractions already cover the use case. Prefer `util/DateTime` and user-facing helpers such as `useUserDateTime`.
+- If the required date/time logic is missing from the shared abstraction, extend `util/DateTime` instead of introducing new direct `moment` usage. This keeps future migration away from `moment` easier.
+
 ## Session Timeouts
 
-To prevent session expiry during user interaction, every API request using `fetch` from `FetchProvider` extends the session. Periodic requests must use `fetchPeriodically` instead to avoid extending the session when the user is idle.
+To prevent session expiry during user interaction, every API request using `fetch` from `FetchProvider` extends the session. Periodic requests must use `fetchPeriodically` instead to avoid extending the session when the user is idle. When using the generated stubs, pass the optional last options argument with `{ requestShouldExtendSession: false }`.
 
 ## Plugin System
 
@@ -176,6 +226,11 @@ Test layout changes in Chrome, Firefox, and Safari. Larger layout changes should
 
 ## UI Styling
 
+### Styled Components
+
+- In styled components, prefer theme tokens over hard-coded style values when possible. This includes spacing via `theme.spacings`, colors via `theme.colors`, and typography values such as `theme.fonts.family` and `theme.fonts.size`.
+- To style a component, prefer wrapping that component with `styled(...)` instead of targeting it through selectors from a parent component.
+
 ### Forms
 
 - Use vertically aligned labels and inputs (no horizontal forms without good reason).
@@ -211,9 +266,3 @@ Avoid `link` style buttons — use actual anchors for navigation.
 - ESC key must close modals.
 - Form modals should not close on outside click (to prevent data loss).
 - Form modals should autofocus the first input.
-
-## Common Problems
-
-### Yarn Cache
-
-The yarn cache can grow very large (200GB+). Run `yarn cache clean` periodically.

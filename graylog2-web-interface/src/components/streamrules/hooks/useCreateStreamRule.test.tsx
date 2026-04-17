@@ -29,10 +29,10 @@ const mockSendTelemetry = jest.fn();
 const mockInvalidateQueries = jest.fn();
 const mockUserNotificationSuccess = jest.fn();
 
-jest.mock('stores/streams/StreamRulesStore', () => ({
-  StreamRulesStore: {
-    create: (...args) => mockCreateStreamRule(...args),
-  },
+jest.mock('hooks/useStreamRuleMutations', () => () => ({
+  createStreamRule: (...args) => mockCreateStreamRule(...args),
+  updateStreamRule: jest.fn(),
+  removeStreamRule: jest.fn(),
 }));
 
 jest.mock('stores/streams/StreamsStore', () => ({
@@ -106,7 +106,7 @@ const TestComponent = ({ streamIsPaused }: TestComponentProps) => {
 
 describe('useCreateStreamRule', () => {
   beforeEach(() => {
-    mockCreateStreamRule.mockImplementation((_streamId, _rule, callback) => Promise.resolve().then(() => callback()));
+    mockCreateStreamRule.mockImplementation(() => Promise.resolve());
     mockResumeStream.mockImplementation((_streamId, callback) => Promise.resolve().then(() => callback()));
   });
 

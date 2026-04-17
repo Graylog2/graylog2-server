@@ -39,7 +39,6 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.system.debug.DebugEvent;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -65,7 +64,7 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
-public class ClusterEventPeriodicalTest {
+class ClusterEventPeriodicalTest {
     private static final DateTime TIME = new DateTime(2015, 4, 1, 0, 0, DateTimeZone.UTC);
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
@@ -80,9 +79,7 @@ public class ClusterEventPeriodicalTest {
     private MongoJackObjectMapperProvider objectMapperProvider;
 
     @BeforeEach
-    public void setUpService(MongoCollections mongoCollections) throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TIME.getMillis());
-
+    void setUpService(MongoCollections mongoCollections) {
         this.mongoConnection = mongoCollections.connection();
         this.objectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
 
@@ -99,18 +96,17 @@ public class ClusterEventPeriodicalTest {
     }
 
     @AfterEach
-    public void tearDown() {
-        DateTimeUtils.setCurrentMillisSystem();
+    void tearDown() {
         mongoConnection.getMongoDatabase().drop();
     }
 
     @Test
-    public void clusterEventServiceRegistersItselfWithClusterEventBus() throws Exception {
+    void clusterEventServiceRegistersItselfWithClusterEventBus() {
         verify(clusterEventBus, times(1)).registerClusterEventSubscriber(clusterEventPeriodical);
     }
 
     @Test
-    public void runHandlesInvalidPayloadsGracefully() throws Exception {
+    void runHandlesInvalidPayloadsGracefully() {
         DBObject event = new BasicDBObjectBuilder()
                 .add("timestamp", TIME.getMillis())
                 .add("producer", "TEST-PRODUCER")
@@ -137,7 +133,7 @@ public class ClusterEventPeriodicalTest {
     }
 
     @Test
-    public void serverEventBusDispatchesTypedEvents() throws Exception {
+    void serverEventBusDispatchesTypedEvents() {
         final SimpleEventHandler handler = new SimpleEventHandler();
         serverEventBus.register(handler);
 
@@ -169,7 +165,7 @@ public class ClusterEventPeriodicalTest {
     }
 
     @Test
-    public void runHandlesAutoValueCorrectly() throws Exception {
+    void runHandlesAutoValueCorrectly() {
         final DebugEvent event = DebugEvent.create("Node ID", TIME, "test");
         DBObject dbObject = new BasicDBObjectBuilder()
                 .add("timestamp", TIME.getMillis())
@@ -197,7 +193,7 @@ public class ClusterEventPeriodicalTest {
     }
 
     @Test
-    public void testRun() throws Exception {
+    void testRun() {
         DBObject event = new BasicDBObjectBuilder()
                 .add("timestamp", TIME.getMillis())
                 .add("producer", "TEST-PRODUCER")
@@ -224,7 +220,7 @@ public class ClusterEventPeriodicalTest {
     }
 
     @Test
-    public void testPublishClusterEvent() throws Exception {
+    void testPublishClusterEvent() {
         @SuppressWarnings("deprecation")
         DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
         SimpleEvent event = new SimpleEvent("test");
@@ -247,7 +243,7 @@ public class ClusterEventPeriodicalTest {
     }
 
     @Test
-    public void publishClusterEventHandlesAutoValueCorrectly() throws Exception {
+    void publishClusterEventHandlesAutoValueCorrectly() {
         @SuppressWarnings("deprecation")
         DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
         DebugEvent event = DebugEvent.create("Node ID", "Test");
@@ -266,7 +262,7 @@ public class ClusterEventPeriodicalTest {
     }
 
     @Test
-    public void publishClusterEventSkipsDeadEvent() throws Exception {
+    void publishClusterEventSkipsDeadEvent() {
         @SuppressWarnings("deprecation")
         DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
         DeadEvent event = new DeadEvent(clusterEventBus, new SimpleEvent("test"));
@@ -280,7 +276,7 @@ public class ClusterEventPeriodicalTest {
     }
 
     @Test
-    public void prepareCollectionCreatesIndexesOnExistingCollection() throws Exception {
+    void prepareCollectionCreatesIndexesOnExistingCollection() {
         @SuppressWarnings("deprecation")
         DBCollection original = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
         original.dropIndexes();
@@ -294,7 +290,7 @@ public class ClusterEventPeriodicalTest {
     }
 
     @Test
-    public void prepareCollectionCreatesCollectionIfItDoesNotExist() throws Exception {
+    void prepareCollectionCreatesCollectionIfItDoesNotExist() {
         @SuppressWarnings("deprecation")
         final DB database = mongoConnection.getDatabase();
         database.getCollection(ClusterEventPeriodical.COLLECTION_NAME).drop();
@@ -307,7 +303,7 @@ public class ClusterEventPeriodicalTest {
     }
 
     @Test
-    public void localNodeIsMarkedAsHavingConsumedEvent() {
+    void localNodeIsMarkedAsHavingConsumedEvent() {
         @SuppressWarnings("deprecation")
         DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
         SimpleEvent event = new SimpleEvent("test");
@@ -320,7 +316,7 @@ public class ClusterEventPeriodicalTest {
     }
 
     @Test
-    public void localEventIsPostedToServerBusImmediately() {
+    void localEventIsPostedToServerBusImmediately() {
         SimpleEvent event = new SimpleEvent("test");
 
         clusterEventPeriodical.publishClusterEvent(event);
@@ -329,7 +325,7 @@ public class ClusterEventPeriodicalTest {
     }
 
     @Test
-    public void localEventIsNotProcessedFromDB() {
+    void localEventIsNotProcessedFromDB() {
         DBObject event = new BasicDBObjectBuilder()
                 .add("timestamp", TIME.getMillis())
                 .add("producer", "TEST-PRODUCER")
@@ -364,7 +360,7 @@ public class ClusterEventPeriodicalTest {
     }
 
     @Test
-    public void testInstantiatesSafeEventClass() {
+    void testInstantiatesSafeEventClass() {
         DBObject event = new BasicDBObjectBuilder()
                 .add("timestamp", TIME.getMillis())
                 .add("producer", "TEST-PRODUCER")
@@ -383,7 +379,7 @@ public class ClusterEventPeriodicalTest {
     }
 
     @Test
-    public void testIgnoresUnsafeEventClass() {
+    void testIgnoresUnsafeEventClass() {
         DBObject event = new BasicDBObjectBuilder()
                 .add("timestamp", TIME.getMillis())
                 .add("producer", "TEST-PRODUCER")

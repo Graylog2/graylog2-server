@@ -14,14 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import Reflux from 'reflux';
 import isArray from 'lodash/isArray';
 
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
-import { singletonStore, singletonActions } from 'logic/singleton';
 import type { RetentionStrategyConfig, RotationStrategyConfig } from 'components/indices/Types';
 import type { DataTieringConfig, DataTieringFormValues, DataTieringStatus } from 'components/indices/data-tiering';
 
@@ -88,279 +86,114 @@ export type IndexSetsStoreState = {
   globalIndexSetStats: IndexSetStats;
 };
 
-type IndexSetsActionsType = {
-  list: (stats: boolean) => Promise<unknown>;
-  listPaginated: (skip: number, limit: number, stats: boolean) => Promise<unknown>;
-  get: (indexSetId: string) => Promise<unknown>;
-  update: (indexSet: IndexSet) => Promise<unknown>;
-  create: (indexSet: IndexSet) => Promise<unknown>;
-  delete: (indexSet: IndexSet, deleteIndices: boolean) => Promise<unknown>;
-  searchPaginated: (searchTerm: string, skip: number, limit: number, stats: boolean) => Promise<unknown>;
-  setDefault: (indexSet: IndexSet) => Promise<unknown>;
-  stats: () => Promise<unknown>;
+const _errorMessage = (error) => {
+  try {
+    if (isArray(error.additional.body)) {
+      return error.additional.body.map(({ message, path }) => `${path ?? ''} ${message}.`).join(' ');
+    }
+
+    return error.additional.body.message;
+  } catch (_e) {
+    return error.message;
+  }
 };
 
-export const IndexSetsActions = singletonActions('core.IndexSets', () =>
-  Reflux.createActions<IndexSetsActionsType>({
-    list: { asyncResult: true },
-    listPaginated: { asyncResult: true },
-    get: { asyncResult: true },
-    update: { asyncResult: true },
-    create: { asyncResult: true },
-    delete: { asyncResult: true },
-    searchPaginated: { asyncResult: true },
-    setDefault: { asyncResult: true },
-    stats: { asyncResult: true },
-  }),
-);
+export const fetchIndexSets = (stats: boolean, only_open: boolean = false): Promise<IndexSetsResponseType> =>
+  fetch('GET', qualifyUrl(ApiRoutes.IndexSetsApiController.list(stats, only_open).url));
 
-export const IndexSetsStore = singletonStore('core.IndexSets', () =>
-  Reflux.createStore<IndexSetsStoreState>({
-    listenables: [IndexSetsActions],
-    indexSetsCount: undefined,
-    indexSets: undefined,
-    indexSetStats: undefined,
-    indexSet: undefined,
-    globalIndexSetStats: undefined,
+export const fetchIndexSetsPaginated = (skip: number, limit: number, stats: boolean): Promise<IndexSetsResponseType> =>
+  fetch('GET', qualifyUrl(ApiRoutes.IndexSetsApiController.listPaginated(skip, limit, stats).url));
 
-    getInitialState() {
-      return this.getState();
+export const searchIndexSetsPaginated = (
+  searchTerm: string,
+  skip: number,
+  limit: number,
+  stats: boolean,
+): Promise<IndexSetsResponseType> =>
+  fetch('GET', qualifyUrl(ApiRoutes.IndexSetsApiController.searchPaginated(searchTerm, skip, limit, stats).url));
+
+export const fetchIndexSet = (indexSetId: string): Promise<IndexSet> =>
+  fetch('GET', qualifyUrl(ApiRoutes.IndexSetsApiController.get(indexSetId).url));
+
+export const createIndexSet = (indexSet: IndexSet): Promise<IndexSet> => {
+  const url = qualifyUrl(ApiRoutes.IndexSetsApiController.create().url);
+
+  return fetch('POST', url, indexSet).then(
+    (response: IndexSet) => {
+      UserNotification.success(`Successfully created index set '${indexSet.title}'`, 'Success');
+
+      return response;
     },
-
-    getState() {
-      return {
-        indexSetsCount: this.indexSetsCount,
-        indexSets: this.indexSets,
-        indexSetStats: this.indexSetStats,
-        indexSet: this.indexSet,
-        globalIndexSetStats: this.globalIndexSetStats,
-      };
-    },
-
-    propagateChanges() {
-      this.trigger(this.getState());
-    },
-
-    list(stats: boolean) {
-      const url = qualifyUrl(ApiRoutes.IndexSetsApiController.list(stats).url);
-      const promise = fetch('GET', url);
-
-      promise.then(
-        (response: IndexSetsResponseType) => {
-          this.indexSetsCount = response.total;
-          this.indexSets = response.index_sets;
-          this.indexSetStats = response.stats;
-
-          this.propagateChanges();
-
-          return response;
-        },
-        (error) => {
-          UserNotification.error(`Fetching index sets list failed: ${error.message}`, 'Could not retrieve index sets.');
-        },
+    (error) => {
+      UserNotification.error(
+        `Creating index set '${indexSet.title}' failed with status: ${_errorMessage(error)}`,
+        'Could not create index set.',
       );
 
-      IndexSetsActions.list.promise(promise);
+      throw error;
     },
+  );
+};
 
-    listPaginated(skip: number, limit: number, stats: boolean) {
-      const url = qualifyUrl(ApiRoutes.IndexSetsApiController.listPaginated(skip, limit, stats).url);
-      const promise = fetch('GET', url);
+export const updateIndexSet = (indexSet: IndexSet): Promise<IndexSet> => {
+  const url = qualifyUrl(ApiRoutes.IndexSetsApiController.get(indexSet.id).url);
 
-      promise.then(
-        (response: IndexSetsResponseType) => {
-          this.indexSetsCount = response.total;
-          this.indexSets = response.index_sets;
-          this.indexSetStats = response.stats;
+  return fetch('PUT', url, indexSet).then(
+    (response: IndexSet) => {
+      UserNotification.success(`Successfully updated index set '${indexSet.title}'`, 'Success');
 
-          this.propagateChanges();
-
-          return response;
-        },
-        (error) => {
-          UserNotification.error(
-            `Fetching index sets list failed: ${this._errorMessage(error)}`,
-            'Could not retrieve index sets.',
-          );
-        },
+      return response;
+    },
+    (error) => {
+      UserNotification.error(
+        `Updating index set '${indexSet.title}' failed with status: ${_errorMessage(error)}`,
+        'Could not update index set.',
       );
 
-      IndexSetsActions.listPaginated.promise(promise);
+      throw error;
     },
+  );
+};
 
-    searchPaginated(searchTerm: string, skip: number, limit: number, stats: boolean) {
-      const url = qualifyUrl(ApiRoutes.IndexSetsApiController.searchPaginated(searchTerm, skip, limit, stats).url);
-      const promise = fetch('GET', url);
+export const deleteIndexSet = (indexSet: IndexSet, deleteIndices: boolean): Promise<void> => {
+  const url = qualifyUrl(ApiRoutes.IndexSetsApiController.delete(indexSet.id, deleteIndices).url);
 
-      promise.then(
-        (response: IndexSetsResponseType) => {
-          this.indexSetsCount = response.total;
-          this.indexSets = response.index_sets;
-          this.indexSetStats = response.stats;
-
-          this.propagateChanges();
-
-          return response;
-        },
-        (error) => {
-          UserNotification.error(
-            `Fetching index sets list failed: ${this._errorMessage(error)}`,
-            'Could not retrieve index sets.',
-          );
-        },
+  return fetch('DELETE', url).then(
+    () => {
+      UserNotification.success(`Successfully deleted index set '${indexSet.title}'`, 'Success');
+    },
+    (error) => {
+      UserNotification.error(
+        `Deleting index set '${indexSet.title}' failed with status: ${_errorMessage(error)}`,
+        'Could not delete index set.',
       );
 
-      IndexSetsActions.searchPaginated.promise(promise);
+      throw error;
     },
+  );
+};
 
-    get(indexSetId: string) {
-      const url = qualifyUrl(ApiRoutes.IndexSetsApiController.get(indexSetId).url);
-      const promise = fetch('GET', url);
+export const setDefaultIndexSet = (indexSet: IndexSet): Promise<void> => {
+  const url = qualifyUrl(ApiRoutes.IndexSetsApiController.setDefault(indexSet.id).url);
 
-      promise.then(
-        (response: IndexSet) => {
-          this.indexSet = response;
-
-          this.propagateChanges();
-
-          return response;
-        },
-        (error) => {
-          UserNotification.error(
-            `Fetching index set '${indexSetId}' failed with status: ${this._errorMessage(error)}`,
-            'Could not retrieve index set.',
-          );
-        },
+  return fetch('PUT', url).then(
+    () => {
+      UserNotification.success(`Successfully set index set '${indexSet.title}' as default`, 'Success');
+    },
+    (error) => {
+      UserNotification.error(
+        `Setting index set '${indexSet.title}' as default failed with status: ${_errorMessage(error)}`,
+        'Could not set default index set.',
       );
 
-      IndexSetsActions.get.promise(promise);
+      throw error;
     },
+  );
+};
 
-    update(indexSet: IndexSet) {
-      const url = qualifyUrl(ApiRoutes.IndexSetsApiController.get(indexSet.id).url);
-      const promise = fetch('PUT', url, indexSet);
-
-      promise.then(
-        (response: IndexSet) => {
-          UserNotification.success(`Successfully updated index set '${indexSet.title}'`, 'Success');
-
-          this.indexSet = response;
-
-          this.propagateChanges();
-
-          return response;
-        },
-        (error) => {
-          UserNotification.error(
-            `Updating index set '${indexSet.title}' failed with status: ${this._errorMessage(error)}`,
-            'Could not update index set.',
-          );
-        },
-      );
-
-      IndexSetsActions.update.promise(promise);
-    },
-
-    create(indexSet: IndexSet) {
-      const url = qualifyUrl(ApiRoutes.IndexSetsApiController.create().url);
-      const promise = fetch('POST', url, indexSet);
-
-      promise.then(
-        (response: IndexSet) => {
-          UserNotification.success(`Successfully created index set '${indexSet.title}'`, 'Success');
-
-          this.indexSet = response;
-
-          this.propagateChanges();
-
-          return response;
-        },
-        (error) => {
-          UserNotification.error(
-            `Creating index set '${indexSet.title}' failed with status: ${this._errorMessage(error)}`,
-            'Could not create index set.',
-          );
-        },
-      );
-
-      IndexSetsActions.create.promise(promise);
-    },
-
-    delete(indexSet: IndexSet, deleteIndices: boolean) {
-      const url = qualifyUrl(ApiRoutes.IndexSetsApiController.delete(indexSet.id, deleteIndices).url);
-      const promise = fetch('DELETE', url);
-
-      promise.then(
-        () => {
-          UserNotification.success(`Successfully deleted index set '${indexSet.title}'`, 'Success');
-        },
-        (error) => {
-          UserNotification.error(
-            `Deleting index set '${indexSet.title}' failed with status: ${this._errorMessage(error)}`,
-            'Could not delete index set.',
-          );
-        },
-      );
-
-      IndexSetsActions.delete.promise(promise);
-    },
-
-    setDefault(indexSet: IndexSet) {
-      const url = qualifyUrl(ApiRoutes.IndexSetsApiController.setDefault(indexSet.id).url);
-      const promise = fetch('PUT', url);
-
-      promise.then(
-        () => {
-          UserNotification.success(`Successfully set index set '${indexSet.title}' as default`, 'Success');
-        },
-        (error) => {
-          UserNotification.error(
-            `Setting index set '${indexSet.title}' as default failed with status: ${this._errorMessage(error)}`,
-            'Could not set default index set.',
-          );
-        },
-      );
-
-      IndexSetsActions.setDefault.promise(promise);
-    },
-
-    stats() {
-      const url = qualifyUrl(ApiRoutes.IndexSetsApiController.stats().url);
-      const promise = fetch('GET', url);
-
-      promise.then(
-        (response) => {
-          this.globalIndexSetStats = {
-            indices: response.indices,
-            documents: response.documents,
-            size: response.size,
-          };
-
-          this.propagateChanges();
-
-          return response;
-        },
-        (error) => {
-          UserNotification.error(
-            `Fetching global index stats failed: ${error.message}`,
-            'Could not retrieve global index stats.',
-          );
-        },
-      );
-
-      IndexSetsActions.stats.promise(promise);
-    },
-
-    _errorMessage(error) {
-      try {
-        if (isArray(error.additional.body)) {
-          return error.additional.body.map(({ message, path }) => `${path ?? ''} ${message}.`).join(' ');
-        }
-
-        return error.additional.body.message;
-      } catch (_e) {
-        return error.message;
-      }
-    },
-  }),
-);
+export const fetchIndexSetsStats = (): Promise<IndexSetStats> =>
+  fetch('GET', qualifyUrl(ApiRoutes.IndexSetsApiController.stats().url)).then((response) => ({
+    indices: response.indices,
+    documents: response.documents,
+    size: response.size,
+  }));

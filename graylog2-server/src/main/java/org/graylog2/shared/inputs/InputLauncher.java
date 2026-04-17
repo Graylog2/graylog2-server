@@ -84,12 +84,11 @@ public class InputLauncher {
 
         final IOState<MessageInput> inputState;
         if (inputRegistry.getInputState(input.getId()) == null) {
-            if (featureFlags.isOn("SETUP_MODE") && input.getDesiredState() == IOState.Type.SETUP) {
-                inputState = inputStateFactory.create(input, IOState.Type.SETUP);
-            } else {
-                inputState = inputStateFactory.create(input);
-            }
+            inputState = inputStateFactory.create(input);
             inputRegistry.add(inputState);
+            if (featureFlags.isOn("SETUP_MODE") && input.getDesiredState() == IOState.Type.SETUP) {
+                inputState.setState(IOState.Type.SETUP);
+            }
         } else {
             inputState = inputRegistry.getInputState(input.getId());
             switch (inputState.getState()) {

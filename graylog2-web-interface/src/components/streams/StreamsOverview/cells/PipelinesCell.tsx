@@ -35,6 +35,9 @@ const PipelinesCell = ({ stream }: Props) => {
   }
 
   const pipelinesCount = data?.length || 0;
+  if (pipelinesCount === 0) {
+    return null;
+  }
 
   return <CountBadge count={pipelinesCount} ref={buttonRef} title="Connected pipelines" />;
 };

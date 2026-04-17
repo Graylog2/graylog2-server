@@ -16,14 +16,16 @@
  */
 import React, { useMemo } from 'react';
 
-import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
 import usePluginEntities from 'hooks/usePluginEntities';
 import GeneralEventSideBar from 'components/events/ReplaySearchSidebar/GeneralEventSideBar';
 import type { EventReplaySideBarDetailsProps } from 'views/types';
 
-const ReplaySearchSidebar = () => {
-  const { alertId } = useReplaySearchContext();
+type Props = {
+  alertId: string;
+  definitionId?: string;
+};
 
+const ReplaySearchSidebar = ({ alertId, definitionId = undefined }: Props) => {
   const sideBarDetailsPlugin = usePluginEntities('views.components.eventReplay.sideBarDetails');
 
   const EventSideBarDetails = useMemo<React.ComponentType<EventReplaySideBarDetailsProps>>(() => {
@@ -36,7 +38,7 @@ const ReplaySearchSidebar = () => {
     return GeneralEventSideBar;
   }, [sideBarDetailsPlugin]);
 
-  return <EventSideBarDetails alertId={alertId} />;
+  return <EventSideBarDetails alertId={alertId} definitionId={definitionId} />;
 };
 
 export default ReplaySearchSidebar;

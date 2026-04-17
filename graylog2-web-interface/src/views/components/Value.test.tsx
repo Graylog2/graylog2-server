@@ -158,7 +158,7 @@ describe('Value', () => {
         </InteractiveContext.Provider>
       );
 
-      render(<Component field="foo" queryId="someQueryId" value={value} type={type} />);
+      render(<Component field="foo" value={value} type={type} />);
 
       await screen.findByText(result);
     },

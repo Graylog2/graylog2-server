@@ -17,7 +17,6 @@
 package org.graylog2.streams.filters;
 
 import com.google.common.collect.ImmutableMultimap;
-import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.mongodb.client.model.Sorts;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
@@ -49,12 +48,12 @@ class StreamDestinationFilterServiceTest {
     @Mock
     private DestinationFilterCreationValidator mockedFilterLicenseCheck;
     private StreamDestinationFilterService service;
-    private EventBus eventBus;
+    private ClusterEventBus clusterEventBus;
 
     @BeforeEach
     void setUp(MongoCollections mongoCollections) {
-        this.eventBus = new EventBus("stream-destination-filter-service");
-        this.service = new StreamDestinationFilterService(mongoCollections, new ClusterEventBus(MoreExecutors.directExecutor()), eventBus, Optional.of(mockedFilterLicenseCheck));
+        this.clusterEventBus = new ClusterEventBus(MoreExecutors.directExecutor());
+        this.service = new StreamDestinationFilterService(mongoCollections, clusterEventBus, Optional.of(mockedFilterLicenseCheck));
     }
 
     @Test
@@ -314,7 +313,7 @@ class StreamDestinationFilterServiceTest {
         optionalDto = service.findByIdForStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0002");
         assertThat(optionalDto).isPresent();
 
-        eventBus.post(new StreamDeletedEvent("54e3deadbeefdeadbeef1000", "Test Stream 1"));
+        clusterEventBus.post(new StreamDeletedEvent("54e3deadbeefdeadbeef1000", "Test Stream 1"));
 
         var afterDeletionEvent = service.findByIdForStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0000");
         assertThat(afterDeletionEvent).isNotPresent();

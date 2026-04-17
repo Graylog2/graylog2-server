@@ -17,19 +17,49 @@
 import React from 'react';
 
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
-import CustomColumnRenderers from 'components/events/events/ColumnRenderers';
+import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
+import usePluginEntities from 'hooks/usePluginEntities';
+import { MarkdownPreview } from 'components/common/MarkdownEditor';
 
 type Props<M = EventsAdditionalData> = { event: Event; meta: M; eventDefinitionEventProcedureId: string };
+const RemediationStepRenderer = ({
+  eventDefinitionId,
+  meta,
+}: {
+  eventDefinitionId: string;
+  meta: EventsAdditionalData;
+}) => {
+  const { context: eventsContext } = meta;
+  const eventDefinitionContext = eventsContext?.event_definitions?.[eventDefinitionId];
 
-const RemediationSteps = ({ event, meta, eventDefinitionEventProcedureId }: Props) => (
-  <div>
-    {CustomColumnRenderers.attributes.remediation_steps.renderCell(
-      undefined,
-      event,
-      meta,
-      eventDefinitionEventProcedureId,
-    )}
-  </div>
-);
+  return eventDefinitionContext?.remediation_steps ? (
+    <MarkdownPreview show withFullView noBorder noBackground value={eventDefinitionContext.remediation_steps} />
+  ) : (
+    <em>No remediation steps</em>
+  );
+};
 
+const EventProcedureRenderer = ({ eventProcedureId, eventId }: { eventProcedureId: string; eventId: string }) => {
+  const pluggableEventProcedureSummary = usePluginEntities('views.components.eventProcedureSummary');
+
+  return (
+    <>
+      {pluggableEventProcedureSummary.map(({ component: PluggableEventProcedureSummary, key }) => (
+        <PluggableEventProcedureSummary eventProcedureId={eventProcedureId} eventId={eventId} key={key} />
+      ))}
+    </>
+  );
+};
+
+const RemediationSteps = ({ event, meta, eventDefinitionEventProcedureId }: Props) => {
+  const {
+    data: { valid: validSecurityLicense },
+  } = usePluggableLicenseCheck('/license/security');
+
+  return validSecurityLicense ? (
+    <EventProcedureRenderer eventProcedureId={eventDefinitionEventProcedureId} eventId={event?.id} />
+  ) : (
+    <RemediationStepRenderer meta={meta} eventDefinitionId={event.event_definition_id} />
+  );
+};
 export default RemediationSteps;

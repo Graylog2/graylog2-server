@@ -18,34 +18,16 @@ import * as React from 'react';
 import { useMemo } from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
-import useActiveQueryId from 'views/hooks/useActiveQueryId';
-import type FieldType from 'views/logic/fieldtypes/FieldType';
-import AddToQueryHandler from 'views/logic/valueactions/AddToQueryHandler';
-import useViewsDispatch from 'views/stores/useViewsDispatch';
-import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 
-const handleAddToQuery = (dispatch: ViewsDispatch, queryId: string, id: string, fieldType: FieldType) => {
-  const field: string = 'associated_assets';
-
-  return dispatch(AddToQueryHandler({ queryId, field, value: id, type: fieldType }));
-};
-
-const FormatAssetList = ({ associated_assets, fieldType }: { associated_assets: string[]; fieldType: FieldType }) => {
+const FormatAssetList = ({ associated_assets }: { associated_assets: string[] }) => {
   const pluggableAssetListComponent = usePluginEntities('views.components.assetInformationActions');
-  const queryId = useActiveQueryId();
-  const dispatch = useViewsDispatch();
 
   const assetsList = useMemo(
     () =>
       pluggableAssetListComponent.map(({ component: PluggableAssetListItem }) => (
-        <PluggableAssetListItem
-          key={associated_assets[0]}
-          assetIds={associated_assets}
-          direction="col"
-          addToQuery={(id) => handleAddToQuery(dispatch, queryId, id, fieldType)}
-        />
+        <PluggableAssetListItem key={associated_assets[0]} assetIds={associated_assets} direction="col" />
       )),
-    [pluggableAssetListComponent, associated_assets, dispatch, queryId, fieldType],
+    [pluggableAssetListComponent, associated_assets],
   );
 
   if (associated_assets.length === 0) {
