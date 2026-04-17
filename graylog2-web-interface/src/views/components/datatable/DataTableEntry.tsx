@@ -54,9 +54,16 @@ type Props = {
   types: FieldTypeMappingsList;
   valuePath: ValuePath;
   units: UnitsConfig;
+  pinnedColumns: Immutable.Set<string>;
 };
 
-const _c = (field: string, value: any, path: ValuePath, source: string) => ({ field, value, path, source });
+const _c = (field: string, value: any, path: ValuePath, source: string, prefix: string) => ({
+  field,
+  value,
+  path,
+  source,
+  prefix,
+});
 
 type ColumnProps = {
   field: string;
@@ -65,6 +72,7 @@ type ColumnProps = {
   valuePath: ValuePath;
   source: string | undefined | null;
   unit: FieldUnit;
+  isPinned: boolean;
 };
 
 const flattenValuePath = (valuePath: ValuePath) =>
@@ -73,11 +81,14 @@ const flattenValuePath = (valuePath: ValuePath) =>
     .map(([key, value]) => `${key}:${value}`)
     .join('-');
 
-const Column = ({ field, value, type, valuePath, source, unit }: ColumnProps) => {
+const Column = ({ field, value, type, valuePath, source, unit, isPinned }: ColumnProps) => {
   const additionalContextValue = useMemo(() => ({ valuePath }), [valuePath]);
 
   return (
-    <TableDataCell $isNumeric={type.isNumeric()} data-testid={`value-cell-${flattenValuePath(valuePath)}-${field}`}>
+    <TableDataCell
+      className={isPinned ? 'pinned-column' : undefined}
+      $isNumeric={type.isNumeric()}
+      data-testid={`value-cell-${flattenValuePath(valuePath)}-${field}`}>
       <AdditionalContext.Provider value={additionalContextValue}>
         <CustomHighlighting field={source ?? field} value={value}>
           {value !== null && value !== undefined ? (
@@ -125,6 +136,7 @@ const DataTableEntry = ({
   showRowNumbers,
   types,
   units,
+  pinnedColumns,
 }: Props) => {
   const classes = 'message-group';
   const activeQuery = useActiveQueryId();
@@ -146,8 +158,9 @@ const DataTableEntry = ({
     return series.map(({ effectiveName, function: fn }) => {
       const fullPath = [].concat(translatedPath, [effectiveName]);
       const value = get(item, fullPath);
+      const prefix = columnPivotValueKeys.join('-');
 
-      return _c(effectiveName, value, fullValuePathForField(fn, parentValuePath), fn);
+      return _c(effectiveName, value, fullValuePathForField(fn, parentValuePath), fn, prefix);
     });
   });
 
@@ -156,15 +169,24 @@ const DataTableEntry = ({
   return (
     <tr className={`fields-row ${classes}`}>
       {showRowNumbers && <LineNumber>{index}</LineNumber>}
-      {columns.map(({ field, value, path, source }, idx) => {
+      {columns.map(({ field, value, path, source, prefix = '' }, idx) => {
         const key = `${activeQuery}-${field}=${value}-${idx}`;
         const nameForField = columnNameToField(field, series);
         const fieldNameForUnit = parseSeries(nameForField)?.field ?? nameForField;
         const unit = units.getFieldUnit(fieldNameForUnit);
+        const isPinned = pinnedColumns.has(`${prefix}${field}`);
+        console.log({
+          pinnedColumns,
+          isPinned,
+          prefix,
+          field,
+          key: `${prefix}${field}`,
+        });
 
         return (
           <Column
             key={key}
+            isPinned={isPinned}
             field={field}
             value={value}
             type={fieldTypeFor(nameForField, types)}
