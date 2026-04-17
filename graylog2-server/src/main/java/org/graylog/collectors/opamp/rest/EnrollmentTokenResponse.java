@@ -25,5 +25,6 @@ import java.time.Instant;
 public record EnrollmentTokenResponse(
         @JsonIgnore @JsonProperty("id") String id,
         @JsonProperty("token") String token,
+        @JsonProperty("fleet_id") String fleetId,
         @Nullable @JsonProperty("expires_at") Instant expiresAt
 ) {}

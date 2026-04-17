@@ -164,7 +164,7 @@ public class EnrollmentTokenService {
                 .expiresAt(expiresAt)
                 .build());
 
-        return new EnrollmentTokenResponse(MongoUtils.insertedIdAsString(insertOneResult), token, expiresAt);
+        return new EnrollmentTokenResponse(MongoUtils.insertedIdAsString(insertOneResult), token, request.fleetId(), expiresAt);
     }
 
     /**

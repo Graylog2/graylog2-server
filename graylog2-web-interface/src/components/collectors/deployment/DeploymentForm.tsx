@@ -84,6 +84,7 @@ const ResultSection = styled.div(
 
 type TokenResponse = {
   token: string;
+  fleetId: string;
   expiresAt: string | null;
 };
 
@@ -141,6 +142,7 @@ const DeploymentForm = () => {
 
         setTokenResponse({
           token: response.token,
+          fleetId: response.fleet_id,
           expiresAt: response.expires_at,
         });
 
@@ -258,7 +260,7 @@ const DeploymentForm = () => {
                   <HelpBlock>
                     <ul style={{ paddingLeft: 0 }}>
                       <li>
-                        <strong>Fleet:</strong> {fleets?.find((f) => f.id === values.fleetId)?.name}
+                        <strong>Fleet:</strong> {fleets?.find((f) => f.id === tokenResponse.fleetId)?.name}
                       </li>
                       <li>
                         <strong>Expires:</strong>{' '}
