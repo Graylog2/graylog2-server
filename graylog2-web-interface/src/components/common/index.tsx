@@ -40,6 +40,7 @@ export { default as CopyToClipboardCapture } from './CopyToClipboardCapture';
 export { default as CountBadge } from './CountBadge';
 export { default as DataTable } from './DataTable';
 export { default as DatePicker } from './DatePicker';
+export { default as DefinitionList } from './DefinitionList';
 export { default as Dropzone } from './Dropzone';
 export { default as DocumentTitle } from './DocumentTitle';
 export { default as Drawer } from './Drawer';
