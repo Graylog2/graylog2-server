@@ -240,9 +240,6 @@ const FleetDetail = ({ fleetId }: Props) => {
         <h2>
           {fleet.name} <BetaBadge />
         </h2>
-        <LinkContainer to={collectorReceivedMessagesUrl('collector_fleet_id', fleet.id)}>
-          <Button bsSize="xsmall">Received messages</Button>
-        </LinkContainer>
       </Header>
 
       <StatsRow>
@@ -336,6 +333,9 @@ const FleetDetail = ({ fleetId }: Props) => {
         <>
           <p>Sources are automatically pushed to all collectors in this fleet. Changes take effect within seconds.</p>
           <ActionsRow>
+            <LinkContainer to={collectorReceivedMessagesUrl('collector_fleet_id', fleet.id)}>
+              <Button>Received messages</Button>
+            </LinkContainer>
             <Button bsStyle="primary" onClick={() => setShowSourceModal(true)}>
               Add Source
             </Button>
