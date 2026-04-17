@@ -188,13 +188,29 @@ describe('InstanceActions', () => {
   });
 
   describe('View System Logs button telemetry', () => {
-    it('emits VIEW_LOGS_CLICKED when View System Logs is clicked', async () => {
+    it('emits VIEW_SYSTEM_LOGS_CLICKED when View System Logs is clicked', async () => {
       render(<InstanceActions instance={mockInstance} onDetailsClick={jest.fn()} />);
 
       await userEvent.click(await screen.findByText(/view system logs/i));
 
       expect(sendTelemetryMock).toHaveBeenCalledWith(
-        'Collector Instance View Logs Clicked',
+        'Collector Instance View System Logs Clicked',
+        expect.objectContaining({
+          instance_id: 'uid-1',
+          fleet_id: 'fleet-1',
+        }),
+      );
+    });
+  });
+
+  describe('Received messages button telemetry', () => {
+    it('emits SHOW_RECEIVED_MESSAGES_CLICKED when Received messages is clicked', async () => {
+      render(<InstanceActions instance={mockInstance} onDetailsClick={jest.fn()} />);
+
+      await userEvent.click(await screen.findByRole('link', { name: /received messages/i }));
+
+      expect(sendTelemetryMock).toHaveBeenCalledWith(
+        'Collector Instance Show Received Messages Clicked',
         expect.objectContaining({
           instance_id: 'uid-1',
           fleet_id: 'fleet-1',

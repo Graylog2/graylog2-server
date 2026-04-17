@@ -24,6 +24,7 @@ import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import type { SearchParams } from 'stores/PaginationTypes';
 import Routes from 'routing/Routes';
 import useHistory from 'routing/useHistory';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import { FleetFormModal } from './index';
 import customColumnRenderers from './ColumnRenderers';
@@ -31,6 +32,7 @@ import { DEFAULT_LAYOUT } from './Constants';
 
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
 import { fetchPaginatedFleets, fleetsKeyFn, useCollectorsMutations } from '../hooks';
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import type { Fleet } from '../types';
 
 const CollectorsFleets = () => {
@@ -38,6 +40,7 @@ const CollectorsFleets = () => {
   const { createFleet } = useCollectorsMutations();
   const { pathname } = useLocation();
   const history = useHistory();
+  const sendTelemetry = useSendCollectorsTelemetry();
 
   useEffect(() => {
     setShowFleetModal(pathname === Routes.SYSTEM.COLLECTORS.FLEETS_NEW);
@@ -51,11 +54,20 @@ const CollectorsFleets = () => {
     (fleet: Fleet) => (
       <ButtonToolbar>
         <LinkContainer to={collectorReceivedMessagesUrl('collector_fleet_id', fleet.id)}>
-          <Button bsSize="xsmall">Received messages</Button>
+          <Button
+            bsSize="xsmall"
+            onClick={() =>
+              sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.FLEET.SHOW_RECEIVED_MESSAGES_CLICKED, {
+                app_action_value: 'fleet-show-received-messages',
+                fleet_id: fleet.id,
+              })
+            }>
+            Received messages
+          </Button>
         </LinkContainer>
       </ButtonToolbar>
     ),
-    [],
+    [sendTelemetry],
   );
 
   const closeCreateModal = useCallback(() => {
