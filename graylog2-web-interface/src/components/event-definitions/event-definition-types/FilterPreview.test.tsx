@@ -29,7 +29,10 @@ const mockExecuteJobResult = jest.fn();
 const mockStartJob = jest.fn(() => Promise.resolve({ jobIds: ['job-1'] }));
 
 jest.mock('hooks/useCurrentUser');
-jest.mock('lodash/debounce', () => (fn: (...args: unknown[]) => unknown) => fn);
+jest.mock('hooks/useDebouncedValue', () => ({
+  __esModule: true,
+  default: <T,>(value: T) => [value],
+}));
 jest.mock('logic/generateId', () => () => 'mock-id');
 
 jest.mock('views/logic/slices/createSearch', () => ({
@@ -78,11 +81,6 @@ const mockSearchResult = {
   },
 };
 
-// The search execution chain (createSearch → startJob → executeJobResult) uses multiple .then() calls.
-// Each .then() schedules a microtask, so we need to yield to the event loop to let the chain reach
-// the executeJobResult mock before we can resolve it with test data.
-const flushPromises = () => new Promise((resolve) => { setTimeout(resolve, 0); });
-
 describe('FilterPreview', () => {
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(mockDefaultUser);
@@ -102,21 +100,26 @@ describe('FilterPreview', () => {
   });
 
   it('should show results after query completes', async () => {
-    render(<FilterPreview config={config} />);
+    mockExecuteJobResult.mockResolvedValueOnce(mockSearchResult);
 
-    await flushPromises();
-    resolveSearch(mockSearchResult);
+    render(<FilterPreview config={config} />);
 
     await screen.findByText('Test message');
   });
 
   it('should show loading spinner again when config changes trigger a re-fetch', async () => {
+    mockExecuteJobResult.mockResolvedValueOnce(mockSearchResult);
+
     const { rerender } = render(<FilterPreview config={config} />);
 
-    await flushPromises();
-    resolveSearch(mockSearchResult);
-
     await screen.findByText('Test message');
+
+    mockExecuteJobResult.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveSearch = resolve;
+        }),
+    );
 
     rerender(<FilterPreview config={{ ...config, query: 'new_query' }} />);
 
