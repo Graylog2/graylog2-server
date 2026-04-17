@@ -190,16 +190,16 @@ class EncryptedValueDeserializerTest {
         assertThatThrownBy(() -> objectMapper
                 .readValue("{\"salt\":\"\"}", EncryptedValue.class)
         ).isInstanceOf(JsonMappingException.class)
-                .hasMessageContaining("encrypted_value and salt");
+                .hasMessageContaining("encrypted_value and salt must be strings");
 
         assertThatThrownBy(() -> objectMapper
                 .readValue("{\"encrypted_value\":\"\"}", EncryptedValue.class)
         ).isInstanceOf(JsonMappingException.class)
-                .hasMessageContaining("encrypted_value and salt");
+                .hasMessageContaining("encrypted_value and salt must be strings");
 
         assertThatThrownBy(() -> objectMapper
                 .readValue("{}", EncryptedValue.class)
         ).isInstanceOf(JsonMappingException.class)
-                .hasMessageContaining("encrypted_value and salt");
+                .hasMessageContaining("encrypted_value and salt must be strings");
     }
 }
