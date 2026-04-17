@@ -15,8 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useMemo } from 'react';
-
 import type { Attribute } from 'stores/PaginationTypes';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted } from 'util/PermissionsMixin';
@@ -24,11 +22,8 @@ import { isPermitted } from 'util/PermissionsMixin';
 const useAuthorizedAttributes = (attributes: Array<Attribute>) => {
   const currentUser = useCurrentUser();
 
-  return useMemo(
-    () => attributes.filter(({ permissions }) =>
-      !permissions?.length || isPermitted(currentUser.permissions, permissions)),
-    [attributes, currentUser.permissions],
-  );
+  return attributes.filter(({ permissions }) =>
+    !permissions?.length || isPermitted(currentUser.permissions, permissions));
 };
 
 export default useAuthorizedAttributes;
