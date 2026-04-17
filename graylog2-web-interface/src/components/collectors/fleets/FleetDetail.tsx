@@ -96,6 +96,27 @@ const SEGMENTS = [
   { value: 'settings' as const, label: 'Settings' },
 ];
 
+type SourceActionsHandlers = {
+  onEdit: (source: Source) => void;
+  onDelete: (source: Source) => void;
+};
+
+export const sourceActionsFactory =
+  ({ onEdit, onDelete }: SourceActionsHandlers) =>
+  (source: Source) => (
+    <ButtonToolbar>
+      <LinkContainer to={collectorReceivedMessagesUrl('collector_source_id', source.id)}>
+        <Button bsSize="xsmall">Received messages</Button>
+      </LinkContainer>
+      <Button bsSize="xsmall" onClick={() => onEdit(source)}>
+        Edit
+      </Button>
+      <MoreActions>
+        <DeleteMenuItem onSelect={() => onDelete(source)} />
+      </MoreActions>
+    </ButtonToolbar>
+  );
+
 const FleetDetail = ({ fleetId }: Props) => {
   const queryClient = useQueryClient();
   const { data: fleet, isLoading: fleetLoading } = useFleet(fleetId);
@@ -189,17 +210,8 @@ const FleetDetail = ({ fleetId }: Props) => {
     setDeletingSource(null);
   }, [deletingSource, deleteSource, fleetId, sendTelemetry]);
 
-  const sourceActions = useCallback(
-    (source: Source) => (
-      <ButtonToolbar>
-        <Button bsSize="xsmall" onClick={() => setEditingSource(source)}>
-          Edit
-        </Button>
-        <MoreActions>
-          <DeleteMenuItem onSelect={() => setDeletingSource(source)} />
-        </MoreActions>
-      </ButtonToolbar>
-    ),
+  const sourceActions = useMemo(
+    () => sourceActionsFactory({ onEdit: setEditingSource, onDelete: setDeletingSource }),
     [],
   );
 
