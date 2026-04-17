@@ -60,7 +60,7 @@ const compareNullableValues = (
 
 const sortSlices = (
   items: Slices,
-  sortMode: SortAttribute,
+  sortMode: SortMode,
   sortDirection: SortDirection,
   getSliceLabel: (slice: Slice) => string,
 ) =>
@@ -102,7 +102,7 @@ type Props = {
   fetchSlices: FetchSlices;
   activeSlice: string | undefined;
   searchQuery: string;
-  sortMode: SortAttribute;
+  sortMode: SortMode;
   sortDirection: SortDirection;
   sliceRenderers?: SliceRenderers;
 };
