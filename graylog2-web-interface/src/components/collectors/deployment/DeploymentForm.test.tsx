@@ -60,6 +60,7 @@ describe('DeploymentForm telemetry', () => {
     );
     createEnrollmentToken.mockResolvedValue({
       token: 'token-value-xyz',
+      fleet_id: 'fleet-1',
       expires_at: '2026-05-13T12:00:00Z',
     });
   });
