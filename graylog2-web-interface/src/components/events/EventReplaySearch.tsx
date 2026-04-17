@@ -23,41 +23,15 @@ import type { ReplaySearchContextType } from 'components/event-definitions/repla
 import ReplaySearchContext from 'components/event-definitions/replay-search/ReplaySearchContext';
 import type { Event } from 'components/events/events/types';
 import useRightSidebar from 'hooks/useRightSidebar';
-import ReplaySearchSidebar from 'components/events/ReplaySearchSidebar/ReplaySearchSidebar';
-import useFeature from 'hooks/useFeature';
 import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
-import sidebarSections, { type SidebarSection } from 'views/components/sidebar/sidebarSections';
-import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
+import sidebarSections from 'views/components/sidebar/sidebarSections';
 import SidebarEventDetails from 'components/events/SidebarEventDetails';
-
-const ReplaySearchSidebarSection = () => {
-  const { alertId, definitionId } = useReplaySearchContext();
-
-  return <ReplaySearchSidebar alertId={alertId} definitionId={definitionId} />;
-};
-
-const replaySection: SidebarSection = {
-  key: 'eventDescription',
-  hoverTitle: 'Replay Details',
-  title: null,
-  icon: 'play_arrow',
-  content: ReplaySearchSidebarSection,
-};
 
 const defaultSearchPageLayout: Partial<LayoutState> = {
   sidebar: {
     isShown: true,
     title: 'Replayed Search',
     sections: [...sidebarSections],
-    contentColumnWidth: 350,
-  },
-};
-
-const legacySearchPageLayout: Partial<LayoutState> = {
-  sidebar: {
-    isShown: true,
-    title: 'Replayed Search',
-    sections: [replaySection, ...sidebarSections],
     contentColumnWidth: 350,
   },
 };
@@ -71,9 +45,7 @@ type Props = {
 const EventReplaySearch = ({ eventDefinitionMappedData, eventData, searchPageLayout = undefined }: Props) => {
   const { eventDefinition, aggregations } = eventDefinitionMappedData;
   const { openSidebar } = useRightSidebar();
-  const isRightSidebarEnabled = useFeature('replay_search_right_sidebar');
-  const effectiveLayout =
-    searchPageLayout ?? (isRightSidebarEnabled ? defaultSearchPageLayout : legacySearchPageLayout);
+  const effectiveLayout = searchPageLayout ?? defaultSearchPageLayout;
 
   const view = useCreateViewForEvent({
     eventData,
@@ -91,10 +63,8 @@ const EventReplaySearch = ({ eventDefinitionMappedData, eventData, searchPageLay
   );
 
   useEffect(() => {
-    if (isRightSidebarEnabled) {
-      openSidebar(SidebarEventDetails(eventData?.id, eventDefinition?.id));
-    }
-  }, [isRightSidebarEnabled, openSidebar, eventData?.id, eventDefinition?.id]);
+    openSidebar(SidebarEventDetails(eventData?.id, eventDefinition?.id));
+  }, [openSidebar, eventData?.id, eventDefinition?.id]);
 
   return (
     <ReplaySearchContext.Provider value={replaySearchContext}>
