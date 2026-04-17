@@ -191,7 +191,7 @@ describe('InstanceActions', () => {
     it('emits VIEW_LOGS_CLICKED when View Logs is clicked', async () => {
       render(<InstanceActions instance={mockInstance} onDetailsClick={jest.fn()} />);
 
-      await userEvent.click(await screen.findByText(/view logs/i));
+      await userEvent.click(await screen.findByText(/view system logs/i));
 
       expect(sendTelemetryMock).toHaveBeenCalledWith(
         'Collector Instance View Logs Clicked',
