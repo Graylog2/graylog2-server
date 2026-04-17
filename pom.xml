@@ -113,8 +113,7 @@
         <aws-java-sdk-2.version>2.42.32</aws-java-sdk-2.version>
         <aws-kinesis-client.version>3.4.2</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.3.5</aws-msk-iam-auth.version>
-        <!-- When bumping bouncycastle.version, check if the explicit management for bcutil-jdk18on can/must be removed. -->
-        <bouncycastle.version>1.83</bouncycastle.version>
+        <bouncycastle.version>1.84</bouncycastle.version>
         <caffeine.version>3.2.3</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.184</classgraph.version>
@@ -536,14 +535,6 @@
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcpkix-jdk18on</artifactId>
-                <version>${bouncycastle.version}</version>
-            </dependency>
-            <!-- Manage bcutil-jdk18on, because bcpkix-jdk18on version 1.80 declares it as a dependency with a dynamic
-            version of [1.80,1.81). We enforce deterministic versions with the enforcer plugin, though. When updating
-            bouncycastle versions, check if this management can or must be removed again. -->
-            <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcutil-jdk18on</artifactId>
                 <version>${bouncycastle.version}</version>
             </dependency>
             <dependency>
