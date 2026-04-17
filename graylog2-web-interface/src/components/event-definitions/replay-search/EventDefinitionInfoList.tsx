@@ -14,35 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
 import * as React from 'react';
-import styled from 'styled-components';
 
-import { Table } from 'components/bootstrap';
+import { DefinitionList } from 'components/common';
 import useAttributeComponents from 'components/event-definitions/replay-search/hooks/useAttributeComponents';
-import EventAttribute from 'components/event-definitions/replay-search/EventAttribute';
+import NoAttributeProvided from 'components/event-definitions/replay-search/NoAttributeProvided';
 
-const StyledTable = styled(Table)`
-  margin-bottom: 0;
-`;
-
-const EventDefinitionInfoTable = () => {
+const EventDefinitionInfoList = () => {
   const infoAttributes = useAttributeComponents();
 
   return (
-    <StyledTable condensed striped>
-      <tbody data-testid="info-container">
-        {infoAttributes.map(
-          ({ title, content, show, inRows }) =>
-            show !== false && (
-              <EventAttribute key={title} title={title} inRows={inRows}>
-                {content}
-              </EventAttribute>
-            ),
-        )}
-      </tbody>
-    </StyledTable>
+    <DefinitionList>
+      {infoAttributes.map(
+        ({ title, content, show }) =>
+          show !== false && (
+            <React.Fragment key={title}>
+              <dt>{title}</dt>
+              <dd title={title}>{content || <NoAttributeProvided />}</dd>
+            </React.Fragment>
+          ),
+      )}
+    </DefinitionList>
   );
 };
 
-export default EventDefinitionInfoTable;
+export default EventDefinitionInfoList;
