@@ -14,10 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.collectors.config;
+import Routes from 'routing/Routes';
 
-public class CollectorAttributes {
-    public static final String COLLECTOR_RECEIVER_TYPE = "collector.receiver.type";
-    public static final String COLLECTOR_SOURCE_ID = "collector.source.id";
-    public static final String COLLECTOR_FLEET_ID = "collector.fleet.id";
-}
+const COLLECTOR_SYSTEM_LOGS_STREAM_ID = '000000000000000000000005';
+
+const collectorSystemLogsUrl = (instanceUid: string): string =>
+  Routes.search_with_query(`collector_instance_uid:"${instanceUid}"`, 'relative', { relative: 3600 }, [
+    COLLECTOR_SYSTEM_LOGS_STREAM_ID,
+  ]);
+
+export default collectorSystemLogsUrl;
