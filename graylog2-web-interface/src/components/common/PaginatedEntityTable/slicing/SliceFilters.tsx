@@ -25,24 +25,15 @@ import SearchForm from 'components/common/SearchForm';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
-export const ALPHABETICAL_SORT = 'alphabetical';
-export const DEFAULT_SORT_OPTIONS: Array<SortOption> = [{ value: ALPHABETICAL_SORT, label: 'Alphabetical' }];
-const DEFAULT_SORT_DIRECTION = 'asc';
+export type { SortMode, SortDirection } from './slicingConstants';
+export { ALPHABETICAL_SORT, defaultSortDirectionForMode } from './slicingConstants';
 
-export type SortMode = string;
-export type SortDirection = 'asc' | 'desc';
+import { ALPHABETICAL_SORT } from './slicingConstants';
+import type { SortMode, SortDirection } from './slicingConstants';
+
 export type SortOption = { value: SortMode; label: string };
 
-export const defaultSortDirectionForMode = (
-  mode: SortMode,
-  sliceSortDefault?: { mode: SortMode; direction: SortDirection },
-): SortDirection => {
-  if (sliceSortDefault?.mode === mode) {
-    return sliceSortDefault.direction;
-  }
-
-  return DEFAULT_SORT_DIRECTION;
-};
+export const DEFAULT_SORT_OPTIONS: Array<SortOption> = [{ value: ALPHABETICAL_SORT, label: 'Alphabetical' }];
 
 const Controls = styled.div(
   ({ theme }) => css`
