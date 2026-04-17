@@ -187,8 +187,8 @@ describe('InstanceActions', () => {
     });
   });
 
-  describe('View Logs button telemetry', () => {
-    it('emits VIEW_LOGS_CLICKED when View Logs is clicked', async () => {
+  describe('View System Logs button telemetry', () => {
+    it('emits VIEW_LOGS_CLICKED when View System Logs is clicked', async () => {
       render(<InstanceActions instance={mockInstance} onDetailsClick={jest.fn()} />);
 
       await userEvent.click(await screen.findByText(/view system logs/i));
