@@ -81,7 +81,7 @@ const FileConfigFields = ({
       id="file-paths"
       type="text"
       label="File Path(s)"
-      help="Glob patterns supported (e.g., /var/log/*.log, /var/log/**/*.log). The collector watches matched files for new lines."
+      help="Glob patterns supported (e.g., /var/log/*.log, /var/log/**/*.log). The Collector watches matched files for new lines."
       value={config.paths[0] || ''}
       onChange={(e) => setFieldValue('config', { ...config, paths: [e.target.value] })}
       required
@@ -90,7 +90,7 @@ const FileConfigFields = ({
       id="file-read-mode"
       type="select"
       label="Read Mode"
-      help="From end: only collect new lines after the collector starts. From beginning: collect all existing lines first, then continue tailing."
+      help="From end: only collect new lines after the Collector starts. From beginning: collect all existing lines first, then continue tailing."
       value={config.read_mode}
       onChange={(e) => setFieldValue('config', { ...config, read_mode: e.target.value as 'beginning' | 'end' })}>
       <option value="end">From end (tail)</option>
@@ -111,7 +111,7 @@ const JournaldConfigFields = ({
       id="journald-read-mode"
       type="select"
       label="Read Mode"
-      help="From end: only collect new entries after the collector starts. From beginning: collect all existing entries first, then continue tailing."
+      help="From end: only collect new entries after the Collector starts. From beginning: collect all existing entries first, then continue tailing."
       value={config.read_mode}
       onChange={(e) => setFieldValue('config', { ...config, read_mode: e.target.value as 'beginning' | 'end' })}>
       <option value="end">From end (tail)</option>
@@ -294,7 +294,7 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props
               </Modal.Header>
               <Modal.Body>
                 <p>
-                  A source defines what data collectors in this fleet should collect. Each source type corresponds to a
+                  A source defines what data Collectors in this fleet should collect. Each source type corresponds to a
                   different collection method.
                 </p>
                 <Input
@@ -333,7 +333,7 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props
                   label="Enabled"
                   name="enabled"
                   type="checkbox"
-                  help="Disabled sources are not sent to collectors. Use this to temporarily stop collection without removing the source."
+                  help="Disabled sources are not sent to Collectors. Use this to temporarily stop collection without removing the source."
                 />
                 {values.source_type === 'file' && (
                   <FileConfigFields config={values.config as FileSourceConfig} setFieldValue={setFieldValue} />

@@ -99,12 +99,12 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
       )}
       {showDeleteConfirm && (
         <ConfirmDialog
-          title="Delete collector instance"
+          title="Delete Collector instance"
           show
           onConfirm={handleConfirmDelete}
           onCancel={() => setShowDeleteConfirm(false)}>
           Are you sure you want to delete instance <strong>{instance.hostname || instance.instance_uid}</strong>?<br />
-          The collector will need to be re-enrolled to appear again.
+          The Collector will need to be re-enrolled to appear again.
         </ConfirmDialog>
       )}
     </>
