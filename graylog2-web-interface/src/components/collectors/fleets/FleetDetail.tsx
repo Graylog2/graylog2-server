@@ -287,7 +287,7 @@ const FleetDetail = ({ fleetId }: Props) => {
         <StatCard
           value={stats?.offline_instances ?? 0}
           label="Offline"
-          helpText="Instances that missed their heartbeat. Check host connectivity or collector process status."
+          helpText="Instances that missed their heartbeat. Check host connectivity or Collector process status."
           variant="warning"
           onClick={() => {
             sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.OVERVIEW.STAT_CARD_CLICKED, {
@@ -331,7 +331,7 @@ const FleetDetail = ({ fleetId }: Props) => {
 
       {activeTab === 'sources' && (
         <>
-          <p>Sources are automatically pushed to all collectors in this fleet. Changes take effect within seconds.</p>
+          <p>Sources are automatically pushed to all Collectors in this fleet. Changes take effect within seconds.</p>
           <ActionsRow>
             <LinkContainer to={collectorReceivedMessagesUrl('collector_fleet_id', fleet.id)}>
               <Button>Received messages</Button>
@@ -356,7 +356,7 @@ const FleetDetail = ({ fleetId }: Props) => {
         <>
           <p>
             Collector instances enrolled in this fleet. Each instance runs all enabled sources. To add more instances,{' '}
-            <Link to={Routes.SYSTEM.COLLECTORS.DEPLOYMENT}>deploy collectors</Link> using an enrollment token for this
+            <Link to={Routes.SYSTEM.COLLECTORS.DEPLOYMENT}>deploy Collectors</Link> using an enrollment token for this
             fleet.
           </p>
           <PaginatedEntityTable<CollectorInstanceView>

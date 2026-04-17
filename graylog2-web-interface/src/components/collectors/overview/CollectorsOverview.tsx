@@ -87,14 +87,14 @@ const StatsSection = () => {
 
   if (isLoading) return <Spinner />;
 
-  if (isError) return <Alert bsStyle="danger">Could not load collector stats.</Alert>;
+  if (isError) return <Alert bsStyle="danger">Could not load Collector stats.</Alert>;
 
   return (
     <StatsRow>
       <StatCard
         value={stats?.total_instances ?? 0}
         label="Instances"
-        helpText="Running collector processes across all fleets."
+        helpText="Running Collector processes across all fleets."
         onClick={() => {
           emitStatCard('instances', stats?.total_instances ?? 0, 'default', 'instances');
           history.push(Routes.SYSTEM.COLLECTORS.INSTANCES);
@@ -113,7 +113,7 @@ const StatsSection = () => {
       <StatCard
         value={stats?.offline_instances ?? 0}
         label="Offline"
-        helpText="Instances that missed their heartbeat. Check host connectivity or collector process status."
+        helpText="Instances that missed their heartbeat. Check host connectivity or Collector process status."
         variant="warning"
         onClick={() => {
           emitStatCard('offline', stats?.offline_instances ?? 0, 'warning', 'instances-offline');
@@ -123,7 +123,7 @@ const StatsSection = () => {
       <StatCard
         value={stats?.total_fleets ?? 0}
         label="Fleets"
-        helpText="Logical groups of collectors that share the same source configuration."
+        helpText="Logical groups of Collectors that share the same source configuration."
         onClick={() => {
           emitStatCard('fleets', stats?.total_fleets ?? 0, 'default', 'fleets');
           history.push(Routes.SYSTEM.COLLECTORS.FLEETS);
