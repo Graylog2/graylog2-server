@@ -46,8 +46,8 @@ const CollectorsInstancesPage = () => {
           </>
         }>
         <span>
-          A collector instance represents a running collector process on a remote host. Instances enroll into a fleet using
-          an enrollment token and automatically receive their fleet&apos;s source configuration.
+          A collector instance represents a running collector process on a remote host. Instances enroll into a fleet
+          using an enrollment token and automatically receive their fleet&apos;s source configuration.
         </span>
       </PageHeader>
 

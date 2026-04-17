@@ -7022,9 +7022,9 @@ domhandler@^4.0.0, domhandler@^4.2.0:
     domelementtype "^2.2.0"
 
 dompurify@^3.0.0:
-  version "3.3.2"
-  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.3.2.tgz#58c515d0f8508b8749452a028aa589ad80b36325"
-  integrity sha512-6obghkliLdmKa56xdbLOpUZ43pAR6xFy1uOrxBaIDjT+yaRuuybLjGS9eVBoSR/UPU5fq3OXClEHLJNGvbxKpQ==
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.4.0.tgz#b1fc33ebdadb373241621e0a30e4ad81573dfd0b"
+  integrity sha512-nolgK9JcaUXMSmW+j1yaSvaEaoXYHwWyGJlkoCTghc97KgGDDSnpoU/PlEnw63Ah+TGKFOyY+X5LnxaWbCSfXg==
   optionalDependencies:
     "@types/trusted-types" "^2.0.7"
 
@@ -7914,7 +7914,7 @@ escodegen@^2.1.0:
     eslint-config-prettier "10.1.5"
     eslint-import-resolver-webpack "0.13.11"
     eslint-plugin-compat "7.0.1"
-    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-cd404f20-8d81-469d-930f-6f78165b245b-1776147318433/node_modules/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
     eslint-plugin-import "2.32.0"
     eslint-plugin-jest "29.15.1"
     eslint-plugin-jest-dom "5.5.0"
@@ -9527,12 +9527,12 @@ graphemer@^1.4.0:
     "@reduxjs/toolkit" "^2.5.1"
     "@tanstack/react-query" "5.90.21"
     "@types/react" "18.3.13"
-    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-7.1.0-SNAPSHOT-d9ca01ce-763f-480f-879c-bed124905fa1-1776147318399/node_modules/babel-preset-graylog"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-7.1.0-SNAPSHOT-d9ca01ce-763f-480f-879c-bed124905fa1-1776147318399/node_modules/eslint-config-graylog"
+    babel-preset-graylog "file:packages/babel-preset-graylog"
+    eslint-config-graylog "file:packages/eslint-config-graylog"
     formik "2.4.9"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-7.1.0-SNAPSHOT-d9ca01ce-763f-480f-879c-bed124905fa1-1776147318399/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:packages/jest-preset-graylog"
     moment "2.30.1"
     moment-timezone "0.6.1"
     react "18.3.1"
@@ -11727,11 +11727,6 @@ lodash.truncate@^4.4.2:
   integrity sha1-WjUNoLERO4N+z//VgSy+WNbq4ZM=
 
 lodash@^4.0.1, lodash@^4.17.15, lodash@^4.17.20, lodash@^4.17.21, lodash@^4.17.4, lodash@^4.18.1:
-  version "4.18.1"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.18.1.tgz#ff2b66c1f6326d59513de2407bf881439812771c"
-  integrity sha512-dMInicTPVE8d1e5otfwmmjlxkZoUpiVLwyeTdUsi/Caj/gfzzblBcCE5sRHV/AsjuCmxWrte2TNGSYuCeCq+0Q==
-
-lodash@^4.18.1:
   version "4.18.1"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.18.1.tgz#ff2b66c1f6326d59513de2407bf881439812771c"
   integrity sha512-dMInicTPVE8d1e5otfwmmjlxkZoUpiVLwyeTdUsi/Caj/gfzzblBcCE5sRHV/AsjuCmxWrte2TNGSYuCeCq+0Q==

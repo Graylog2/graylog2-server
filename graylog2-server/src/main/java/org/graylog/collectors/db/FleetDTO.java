@@ -34,7 +34,6 @@ import java.time.Instant;
 public abstract class FleetDTO implements BuildableMongoEntity<FleetDTO, FleetDTO.Builder> {
     public static final String FIELD_NAME = "name";
     public static final String FIELD_DESCRIPTION = "description";
-    public static final String FIELD_TARGET_VERSION = "target_version";
     public static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_UPDATED_AT = "updated_at";
 
@@ -44,10 +43,6 @@ public abstract class FleetDTO implements BuildableMongoEntity<FleetDTO, FleetDT
     @Nullable
     @JsonProperty(FIELD_DESCRIPTION)
     public abstract String description();
-
-    @Nullable
-    @JsonProperty(FIELD_TARGET_VERSION)
-    public abstract String targetVersion();
 
     @JsonProperty(FIELD_CREATED_AT)
     public abstract Instant createdAt();
@@ -72,9 +67,6 @@ public abstract class FleetDTO implements BuildableMongoEntity<FleetDTO, FleetDT
 
         @JsonProperty(FIELD_DESCRIPTION)
         public abstract Builder description(@Nullable String description);
-
-        @JsonProperty(FIELD_TARGET_VERSION)
-        public abstract Builder targetVersion(@Nullable String targetVersion);
 
         @JsonProperty(FIELD_CREATED_AT)
         public abstract Builder createdAt(Instant createdAt);
