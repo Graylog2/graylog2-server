@@ -53,6 +53,9 @@ public abstract class WindowsEventLogSourceConfig implements SourceConfig {
 
     @Override
     public void validate() {
+        if (!includeDefaultChannels() && channels().isEmpty()) {
+            throw new IllegalArgumentException("WindowsEventLogSourceConfig requires at least one channel to be set when include_default_channels is false");
+        }
     }
 
     @Override

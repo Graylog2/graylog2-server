@@ -28,11 +28,11 @@ class ResourceProcessorConfigTest {
 
     @Test
     void builderCreatesResourceProcessorName() {
-        final var config = ResourceProcessorConfig.builder("filelog")
+        final var config = ResourceProcessorConfig.builder("file_log")
                 .attributes(List.of(ResourceProcessorConfig.Attribute.upsert("a", "b")))
                 .build();
 
-        assertThat(config.name()).isEqualTo("resource/filelog");
+        assertThat(config.name()).isEqualTo("resource/file_log");
     }
 
     @Test
