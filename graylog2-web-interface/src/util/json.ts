@@ -14,11 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const SidebarEventDefinitionDetails = (id: string) =>
-  ({
-    id: 'event-definition-details',
-    title: 'Definition Details',
-    componentKey: 'replay-search-sidebar',
-    props: { alertId: undefined, definitionId: id },
-  }) as const;
-export default SidebarEventDefinitionDetails;
+import { JSONParse, JSONStringify } from 'json-with-bigint';
+
+export { JSONParse as parse, JSONStringify as stringify };
