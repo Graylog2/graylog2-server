@@ -14,17 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import { JSONParse, JSONStringify } from 'json-with-bigint';
 
-import ExpandableSection from 'components/events/ReplaySearchSidebar/ExpandableSection';
-import EventDefinitionInfoList from 'components/event-definitions/replay-search/EventDefinitionInfoList';
-
-const EventDefinitionSideBar = () => (
-  <div>
-    <ExpandableSection title="Event Definition Details">
-      <EventDefinitionInfoList />
-    </ExpandableSection>
-  </div>
-);
-
-export default EventDefinitionSideBar;
+export { JSONParse as parse, JSONStringify as stringify };
