@@ -41,8 +41,8 @@ class ExporterSendingQueueTest {
         assertThat(config.numConsumers()).isEqualTo(10);
         assertThat(config.waitForResult()).isFalse();
         assertThat(config.blockOnOverflow()).isFalse();
-        assertThat(config.sizer()).isEqualTo(ExporterSendingQueue.Sizer.REQUESTS);
-        assertThat(config.queueSize()).isEqualTo(1000);
+        assertThat(config.sizer()).isEqualTo(ExporterSendingQueue.Sizer.BYTES);
+        assertThat(config.queueSize()).isEqualTo(67108864);
         assertThat(config.storage()).contains("file_storage/default");
         assertThat(config.batch()).contains(ExporterSendingQueue.Batch.createDefault());
     }

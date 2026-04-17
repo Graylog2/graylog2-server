@@ -72,8 +72,8 @@ public abstract class ExporterSendingQueue {
                 .numConsumers(10)
                 .waitForResult(false)
                 .blockOnOverflow(false)
-                .sizer(Sizer.REQUESTS)
-                .queueSize(1000)
+                .sizer(Sizer.BYTES)
+                .queueSize(64 * 1024 * 1024)
                 .storage(FileStorageExtensionConfig.defaultInstance().name())
                 .batch(Batch.createDefault());
     }
@@ -127,9 +127,10 @@ public abstract class ExporterSendingQueue {
 
         public static Builder builder() {
             return new AutoValue_ExporterSendingQueue_Batch.Builder()
+                    // TODO: Make the sending queue batch settings configurable
                     .flushTimeout(Duration.ofMillis(200))
-                    .minSize(1048576)
-                    .maxSize(1048576 * 3)
+                    .minSize(1024 * 1024)
+                    .maxSize(3 * 1024 * 1024) // Default for CollectorIngestHttpInput is 4 MB
                     .sizer(Sizer.BYTES);
         }
 
