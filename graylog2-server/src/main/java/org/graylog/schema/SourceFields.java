@@ -65,6 +65,10 @@ public class SourceFields {
     public static final String SOURCE_USER = SOURCE_PREFIX + UserFields.USER;
     public static final String SOURCE_USER_EMAIL = SOURCE_PREFIX + UserFields.USER_EMAIL;
     public static final String SOURCE_USER_NAME = SOURCE_PREFIX + UserFields.USER_NAME;
+    public static final String SOURCE_USER_ID = SOURCE_PREFIX + UserFields.USER_ID;
+    public static final String SOURCE_USER_DOMAIN = SOURCE_PREFIX + UserFields.USER_DOMAIN;
+    public static final String SOURCE_USER_SESSION_ID = SOURCE_PREFIX + UserFields.USER_SESSION_ID;
+    public static final String SOURCE_USER_TYPE = SOURCE_PREFIX + UserFields.USER_TYPE;
 
     // To be removed
     @Deprecated

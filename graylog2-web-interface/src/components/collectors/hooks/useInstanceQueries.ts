@@ -81,8 +81,8 @@ export const useInstances = (fleetId?: string) =>
 
       return defaultOnError(
         Collectors.findInstances(1, 0, undefined, filters).then((response) => response.elements.map(toView)),
-        'Loading collector instances failed with status',
-        'Could not load collector instances',
+        'Loading Collector instances failed with status',
+        'Could not load Collector instances',
       );
     },
   });

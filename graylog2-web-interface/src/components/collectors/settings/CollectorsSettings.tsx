@@ -269,7 +269,7 @@ const CollectorsSettings = () => {
                   label="External hostname"
                   name="http_hostname"
                   placeholder="e.g. otlp.example.com"
-                  help="The hostname or IP address that collectors will use to connect. Must be reachable from collector hosts."
+                  help="The hostname or IP address that Collectors will use to connect. Must be reachable from Collector hosts."
                 />
                 <FormikInput id="http-port" type="number" label="External port" name="http_port" />
 

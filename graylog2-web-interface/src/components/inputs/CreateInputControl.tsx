@@ -16,7 +16,7 @@
  */
 
 import * as React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import { useQueryClient } from '@tanstack/react-query';
@@ -25,6 +25,7 @@ import { InputsActions } from 'stores/inputs/InputsStore';
 import type { InputDescription } from 'hooks/useInputType';
 import { fetchInputType } from 'hooks/useInputType';
 import { getPathnameWithoutId } from 'util/URLUtils';
+import Store from 'logic/local-storage/Store';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
@@ -35,6 +36,7 @@ import type { ConfiguredInput, Input } from 'components/messageloaders/Types';
 import useInputTypes from 'components/inputs/useInputTypes';
 import { KEY_PREFIX } from 'hooks/usePaginatedInputs';
 import useFeature from 'hooks/useFeature';
+import useInput from 'hooks/useInput';
 import { INPUT_SETUP_MODE_FEATURE_FLAG, InputSetupWizard } from 'components/inputs/InputSetupWizard';
 
 const StyledForm = styled.form`
@@ -49,6 +51,8 @@ const FormGroup = styled.div`
   vertical-align: middle;
 `;
 
+export const SETUP_WIZARD_INPUT_ID_KEY = 'setup_wizard_input_id';
+
 const CreateInputControl = () => {
   const [showConfigurationForm, setShowConfigurationForm] = useState<boolean>(false);
   const [selectedInput, setSelectedInput] = useState<string | undefined>(undefined);
@@ -57,11 +61,25 @@ const CreateInputControl = () => {
   const [showWizard, setShowWizard] = useState<boolean>(false);
   const [createdInputId, setCreatedInputId] = useState<string | null>(null);
   const [createdInputData, setCreatedInputData] = useState<ConfiguredInput | null>(null);
+  const [pendingWizardInputId, setPendingWizardInputId] = useState<string | null>(() => Store.sessionGet<string>(SETUP_WIZARD_INPUT_ID_KEY) ?? null);
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const inputTypes = useInputTypes();
   const queryClient = useQueryClient();
   const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
+  const { data: pendingWizardInputData } = useInput(pendingWizardInputId);
+
+  const hasPendingStorageWizard = inputSetupFeatureFlagIsEnabled && !!pendingWizardInputId;
+  const showWizardFromStorage = hasPendingStorageWizard && !!pendingWizardInputData && !showWizard;
+  const wizardInputFromStorage = pendingWizardInputData
+    ? (pendingWizardInputData as unknown as Input)
+    : null;
+
+  useEffect(() => {
+    if (showWizardFromStorage) {
+      Store.sessionDelete(SETUP_WIZARD_INPUT_ID_KEY);
+    }
+  }, [showWizardFromStorage]);
 
   const openWizard = (inputId: string, inputData: ConfiguredInput) => {
     setCreatedInputId(inputId);
@@ -69,10 +87,25 @@ const CreateInputControl = () => {
     setShowWizard(true);
   };
 
-  const closeWizard = () => {
+  const closeLocalWizard = () => {
     setShowWizard(false);
     setCreatedInputId(null);
     setCreatedInputData(null);
+  };
+
+  const closeStorageWizard = () => {
+    Store.sessionDelete(SETUP_WIZARD_INPUT_ID_KEY);
+    setPendingWizardInputId(null);
+  };
+
+  const closeWizard = () => {
+    if (showWizard) {
+      closeLocalWizard();
+
+      return;
+    }
+
+    closeStorageWizard();
   };
 
   const resetFields = () => {
@@ -120,6 +153,10 @@ const CreateInputControl = () => {
 
   const handleInputTypeSubmit = (event) => {
     event.preventDefault();
+
+    if (hasPendingStorageWizard) {
+      return;
+    }
 
     const customConfiguration = PluginStore.exports('inputConfiguration').find(
       (inputConfig) => inputConfig.type === selectedInput,
@@ -175,7 +212,7 @@ const CreateInputControl = () => {
             />
           </FormGroup>
           &nbsp;
-          <Button bsStyle="primary" type="submit" disabled={!selectedInput}>
+          <Button bsStyle="primary" type="submit" disabled={!selectedInput || hasPendingStorageWizard}>
             Launch new input
           </Button>
         </StyledForm>
@@ -200,8 +237,11 @@ const CreateInputControl = () => {
               />
             )
           ))}
-        {inputSetupFeatureFlagIsEnabled && showWizard && createdInputId && (
-          <InputSetupWizard input={createInputForWizard()} show={showWizard} onClose={closeWizard} />
+        {inputSetupFeatureFlagIsEnabled && (showWizard || showWizardFromStorage) && (
+          <InputSetupWizard
+            input={showWizard ? createInputForWizard() : wizardInputFromStorage}
+            show
+            onClose={closeWizard} />
         )}
       </Col>
     </Row>
