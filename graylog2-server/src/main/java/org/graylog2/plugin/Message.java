@@ -75,6 +75,10 @@ import static com.google.common.base.CharMatcher.anyOf;
 import static com.google.common.base.CharMatcher.inRange;
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.base.Predicates.not;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_COLLECTOR_FLEET_ID;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_COLLECTOR_INSTANCE_UID;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_COLLECTOR_RECEIVER_TYPE;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_ID;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_CATEGORY;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_SUBCATEGORY;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_TYPE;
@@ -270,6 +274,13 @@ public class Message implements Messages, Indexable, Acknowledgeable {
             FIELD_ILLUMINATE_GIM_TAGS,
             FIELD_ILLUMINATE_GIM_VERSION,
             FIELD_ASSOCIATED_ASSETS
+    );
+
+    private static final Set<String> COLLECTOR_FIELDS = ImmutableSet.of(
+            FIELD_COLLECTOR_RECEIVER_TYPE,
+            FIELD_COLLECTOR_SOURCE_ID,
+            FIELD_COLLECTOR_FLEET_ID,
+            FIELD_COLLECTOR_INSTANCE_UID
     );
 
     private static final ImmutableSet<String> CORE_MESSAGE_FIELDS = ImmutableSet.of(
@@ -657,7 +668,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
     private void updateSize(String fieldName, Object newValue, Object previousValue) {
         // don't count internal fields
-        if (GRAYLOG_FIELDS.contains(fieldName) || ILLUMINATE_FIELDS.contains(fieldName)) {
+        if (GRAYLOG_FIELDS.contains(fieldName) || ILLUMINATE_FIELDS.contains(fieldName) || COLLECTOR_FIELDS.contains(fieldName)) {
             return;
         }
         long newValueSize = 0;
