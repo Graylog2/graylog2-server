@@ -21,7 +21,7 @@ import styled, { css } from 'styled-components';
 import URI from 'urijs';
 
 import { Button, ButtonToolbar, DeleteMenuItem, SegmentedControl } from 'components/bootstrap';
-import { ConfirmDialog, Link, Spinner } from 'components/common';
+import { ConfirmDialog, Link, LinkContainer, Spinner } from 'components/common';
 import BetaBadge from 'components/common/BetaBadge';
 import { MoreActions } from 'components/common/EntityDataTable';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
@@ -45,6 +45,7 @@ import {
   useDefaultInstanceFilters,
 } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
+import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
 import StatCard from '../common/StatCard';
 import { InstanceDetailDrawer } from '../instances';
 import BulkActions from '../instances/BulkActions';
@@ -227,6 +228,9 @@ const FleetDetail = ({ fleetId }: Props) => {
         <h2>
           {fleet.name} <BetaBadge />
         </h2>
+        <LinkContainer to={collectorReceivedMessagesUrl('collector_fleet_id', fleet.id)}>
+          <Button bsSize="xsmall">Received messages</Button>
+        </LinkContainer>
       </Header>
 
       <StatsRow>

@@ -101,3 +101,31 @@ describe('FleetDetail telemetry', () => {
     );
   });
 });
+
+describe('FleetDetail received messages', () => {
+  const fleet = { id: 'f-1', name: 'web', description: '', target_version: null, created_at: '', updated_at: '' };
+  const stats = { total_instances: 0, online_instances: 0, offline_instances: 0, total_sources: 0 };
+
+  beforeEach(() => {
+    asMock(useSendCollectorsTelemetry).mockReturnValue(jest.fn());
+    asMock(useFleet).mockReturnValue({ data: fleet, isLoading: false } as never);
+    asMock(useFleetStats).mockReturnValue({ data: stats, isLoading: false } as never);
+    asMock(useSources).mockReturnValue({ data: [] } as never);
+    asMock(useCollectorsMutations).mockReturnValue({
+      createSource: jest.fn(),
+      updateSource: jest.fn(),
+      deleteSource: jest.fn(),
+      updateFleet: jest.fn(),
+      deleteFleet: jest.fn(),
+    } as never);
+    asMock(useDefaultInstanceFilters).mockReturnValue([] as never);
+  });
+
+  it('renders a fleet-level Received messages link pointing to collector_fleet_id filter', async () => {
+    render(<FleetDetail fleetId="f-1" />);
+
+    const link = await screen.findByRole('link', { name: /received messages/i });
+    expect(link).toHaveAttribute('href', expect.stringContaining('collector_fleet_id'));
+    expect(link).toHaveAttribute('href', expect.stringContaining('f-1'));
+  });
+});
