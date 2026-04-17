@@ -36,15 +36,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public interface MoreSearchAdapter {
     default MoreSearch.Result eventSearch(String queryString, TimeRange timerange, Set<String> affectedIndices, Sorting sorting,
-                                          int page, int perPage, Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams) {
-        return eventSearch(queryString, timerange, affectedIndices, sorting, page, perPage, eventStreams, filterString, forbiddenSourceStreams, Map.of());
+                                          int page, int perPage, Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter) {
+        return eventSearch(queryString, timerange, affectedIndices, sorting, page, perPage, eventStreams, filterString, sourceStreamFilter, Map.of());
     }
     MoreSearch.Result eventSearch(String queryString, TimeRange timerange, Set<String> affectedIndices, Sorting sorting,
-                                  int page, int perPage, Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
+                                  int page, int perPage, Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
                                   Map<String, Set<String>> extraFilters);
 
     MoreSearch.Histogram eventHistogram(String queryString, AbsoluteRange timerange, Set<String> affectedIndices,
-                                        Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
+                                        Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
                                         ZoneId timeZone, Map<String, Set<String>> extraFilters);
 
     interface ScrollEventsCallback {
@@ -55,11 +55,11 @@ public interface MoreSearchAdapter {
                       List<UsedSearchFilter> filters, int batchSize, ScrollEventsCallback resultCallback) throws EventProcessorException;
 
     List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timerange, Set<String> affectedIndices,
-                                Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
+                                Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
                                 Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, int maxBuckets);
 
     List<Slice> aggregateSlicesForRangeQuery(String queryString, TimeRange timerange, Set<String> affectedIndices,
-                                           Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
+                                           Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
                                            Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, List<NumberRange> ranges);
 
     default ChunkCommand buildScrollCommand(String queryString, TimeRange timeRange, Set<String> affectedIndices, List<UsedSearchFilter> filters, Set<String> streams, int batchSize) {

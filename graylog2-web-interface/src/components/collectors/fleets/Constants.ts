@@ -22,6 +22,6 @@ export const DEFAULT_LAYOUT = {
   entityTableId: ENTITY_TABLE_ID,
   defaultPageSize: 20,
   defaultSort: { attributeId: 'name', direction: 'asc' } as Sort,
-  defaultDisplayedAttributes: ['name', 'description', 'target_version', 'created_at'],
-  defaultColumnOrder: ['name', 'description', 'target_version', 'created_at'],
+  defaultDisplayedAttributes: ['name', 'description', 'created_at'],
+  defaultColumnOrder: ['name', 'description', 'created_at'],
 };
