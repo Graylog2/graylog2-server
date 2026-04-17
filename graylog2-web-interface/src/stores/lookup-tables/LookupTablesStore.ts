@@ -130,7 +130,7 @@ export const LookupTablesStore = singletonStore('core.LookupTables', () =>
     table: null,
     cache: null,
     dataAdapter: null,
-    tables: null,
+    tables: undefined,
     caches: null,
     dataAdapters: null,
     lookupResult: null,
