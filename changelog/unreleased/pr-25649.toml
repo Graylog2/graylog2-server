@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Encrypt authorization header values for HTTP-based inputs."
+
+pulls = ["25649"]
