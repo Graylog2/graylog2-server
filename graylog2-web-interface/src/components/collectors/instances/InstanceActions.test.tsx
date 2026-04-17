@@ -79,6 +79,14 @@ describe('InstanceActions', () => {
     await screen.findByRole('button', { name: /details/i });
   });
 
+  it('renders Received messages link pointing to collector_instance_uid filter', async () => {
+    render(<InstanceActions instance={mockInstance} onDetailsClick={jest.fn()} />);
+
+    const link = await screen.findByRole('link', { name: /received messages/i });
+    expect(link).toHaveAttribute('href', expect.stringContaining('collector_instance_uid'));
+    expect(link).toHaveAttribute('href', expect.stringContaining('uid-1'));
+  });
+
   it('calls onDetailsClick when Details is clicked', async () => {
     const onDetailsClick = jest.fn();
     render(<InstanceActions instance={mockInstance} onDetailsClick={onDetailsClick} />);
