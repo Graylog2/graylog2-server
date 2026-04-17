@@ -21,7 +21,7 @@ import styled, { css } from 'styled-components';
 import URI from 'urijs';
 
 import { Button, ButtonToolbar, DeleteMenuItem, SegmentedControl } from 'components/bootstrap';
-import { ConfirmDialog, Link, Spinner } from 'components/common';
+import { ConfirmDialog, Link, LinkContainer, Spinner } from 'components/common';
 import BetaBadge from 'components/common/BetaBadge';
 import { MoreActions } from 'components/common/EntityDataTable';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
@@ -45,6 +45,7 @@ import {
   useDefaultInstanceFilters,
 } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
+import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
 import StatCard from '../common/StatCard';
 import { InstanceDetailDrawer } from '../instances';
 import BulkActions from '../instances/BulkActions';
@@ -94,6 +95,27 @@ const SEGMENTS = [
   { value: 'instances' as const, label: 'Instances' },
   { value: 'settings' as const, label: 'Settings' },
 ];
+
+type SourceActionsHandlers = {
+  onEdit: (source: Source) => void;
+  onDelete: (source: Source) => void;
+};
+
+export const sourceActionsFactory =
+  ({ onEdit, onDelete }: SourceActionsHandlers) =>
+  (source: Source) => (
+    <ButtonToolbar>
+      <LinkContainer to={collectorReceivedMessagesUrl('collector_source_id', source.id)}>
+        <Button bsSize="xsmall">Received messages</Button>
+      </LinkContainer>
+      <Button bsSize="xsmall" onClick={() => onEdit(source)}>
+        Edit
+      </Button>
+      <MoreActions>
+        <DeleteMenuItem onSelect={() => onDelete(source)} />
+      </MoreActions>
+    </ButtonToolbar>
+  );
 
 const FleetDetail = ({ fleetId }: Props) => {
   const queryClient = useQueryClient();
@@ -188,17 +210,8 @@ const FleetDetail = ({ fleetId }: Props) => {
     setDeletingSource(null);
   }, [deletingSource, deleteSource, fleetId, sendTelemetry]);
 
-  const sourceActions = useCallback(
-    (source: Source) => (
-      <ButtonToolbar>
-        <Button bsSize="xsmall" onClick={() => setEditingSource(source)}>
-          Edit
-        </Button>
-        <MoreActions>
-          <DeleteMenuItem onSelect={() => setDeletingSource(source)} />
-        </MoreActions>
-      </ButtonToolbar>
-    ),
+  const sourceActions = useMemo(
+    () => sourceActionsFactory({ onEdit: setEditingSource, onDelete: setDeletingSource }),
     [],
   );
 
@@ -320,6 +333,9 @@ const FleetDetail = ({ fleetId }: Props) => {
         <>
           <p>Sources are automatically pushed to all collectors in this fleet. Changes take effect within seconds.</p>
           <ActionsRow>
+            <LinkContainer to={collectorReceivedMessagesUrl('collector_fleet_id', fleet.id)}>
+              <Button>Received messages</Button>
+            </LinkContainer>
             <Button bsStyle="primary" onClick={() => setShowSourceModal(true)}>
               Add Source
             </Button>

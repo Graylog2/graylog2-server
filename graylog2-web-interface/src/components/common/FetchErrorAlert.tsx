@@ -14,10 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.collectors.config;
+import * as React from 'react';
 
-public class CollectorAttributes {
-    public static final String COLLECTOR_RECEIVER_TYPE = "collector.receiver.type";
-    public static final String COLLECTOR_SOURCE_ID = "collector.source.id";
-    public static final String COLLECTOR_FLEET_ID = "collector.fleet.id";
-}
+import { Alert } from 'components/bootstrap';
+
+type Props = {
+  message: string;
+  error?: Error | null;
+};
+
+/**
+ * Renders a danger `Alert` summarizing a failed fetch.
+ * Use for user-facing error states where a data fetch rejected and there is no
+ * way to recover automatically — e.g. in place of a table body or a chart.
+ */
+const FetchErrorAlert = ({ message, error = null }: Props) => (
+  <Alert bsStyle="danger">
+    {message}: {error?.message ?? 'Unknown error'}
+  </Alert>
+);
+
+export default FetchErrorAlert;
