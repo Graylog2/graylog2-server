@@ -25,18 +25,23 @@ const OUTDATED_INDICES_URL = qualifyUrl('/system/indexer/indices/outdated');
 const fetchOutdatedIndices = (): Promise<Array<string>> =>
   fetch('GET', OUTDATED_INDICES_URL);
 
+const sortOutdatedIndices = (indices: Array<string>) => Array.from(indices).sort();
+
 const useOutdatedIndices = () => {
-  const { data, isLoading } = useQuery({
+  const { data = [], isError, isLoading } = useQuery({
     queryKey: ['outdatedIndices'],
     queryFn: () => defaultOnError(
       fetchOutdatedIndices(),
       'Loading outdated indices failed',
       'Could not load outdated indices',
     ),
+    retry: false,
+    select: sortOutdatedIndices,
   });
 
   return {
-    data: [...(data ?? [])].sort(),
+    data,
+    isError,
     isLoading,
   };
 };
