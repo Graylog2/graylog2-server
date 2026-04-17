@@ -14,17 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 
-import ExpandableSection from 'components/events/ReplaySearchSidebar/ExpandableSection';
-import EventDefinitionInfoList from 'components/event-definitions/replay-search/EventDefinitionInfoList';
+import { Alert } from 'components/bootstrap';
 
-const EventDefinitionSideBar = () => (
-  <div>
-    <ExpandableSection title="Event Definition Details">
-      <EventDefinitionInfoList />
-    </ExpandableSection>
-  </div>
+type Props = {
+  message: string;
+  error?: Error | null;
+};
+
+/**
+ * Renders a danger `Alert` summarizing a failed fetch.
+ * Use for user-facing error states where a data fetch rejected and there is no
+ * way to recover automatically — e.g. in place of a table body or a chart.
+ */
+const FetchErrorAlert = ({ message, error = null }: Props) => (
+  <Alert bsStyle="danger">
+    {message}: {error?.message ?? 'Unknown error'}
+  </Alert>
 );
 
-export default EventDefinitionSideBar;
+export default FetchErrorAlert;
