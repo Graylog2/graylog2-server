@@ -28,7 +28,6 @@ import org.graylog.schema.HostFields;
 import org.graylog.schema.ProcessFields;
 import org.graylog.schema.SourceFields;
 import org.graylog.schema.TraceFields;
-import org.graylog.schema.UserFields;
 import org.graylog.schema.VendorFields;
 import org.junit.jupiter.api.Test;
 
@@ -40,16 +39,13 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class WindowsEventLogRecordProcessorTest {
-    private static final String EVENT_ID = "event_id";
     private static final String VENDOR_EVENT_CATEGORY = "vendor_event_category";
-    private static final String VENDOR_EVENT_TIMESTAMP = "vendor_event_timestamp";
+    private static final String VENDOR_OPCODE = "vendor_opcode";
     private static final String PRIVILEGE_ASSIGNED_NAME = "privilege_assigned_name";
     private static final String WINDOWS_LOGON_TYPE = "windows_logon_type";
     private static final String WINDOWS_AUTH_PACKAGE_NAME = "windows_authentication_package_name";
     private static final String WINDOWS_AUTH_PROCESS_NAME = "windows_authentication_process_name";
     private static final String WINDOWS_AUTH_LM_PACKAGE_NAME = "windows_authentication_lmpackage_name";
-    private static final String VENDOR_EVENT_SUBSTATUS = "vendor_event_substatus";
-    private static final String USER_SESSION_UID = "user_session_uid";
     private static final String VENDOR_EVENT_DATA = "vendor_event_data";
 
 
@@ -68,24 +64,23 @@ class WindowsEventLogRecordProcessorTest {
                 .containsEntry(EventFields.EVENT_LOG_NAME, "Security")
                 .containsEntry(EventFields.EVENT_UID, "140716")
                 .containsEntry(EventFields.EVENT_CODE, 4624L)
-                .containsEntry(EVENT_ID, "4624")
                 .containsEntry(VendorFields.VENDOR_SUBTYPE, "Microsoft-Windows-Security-Auditing")
                 .containsEntry(VENDOR_EVENT_CATEGORY, "Logoff")
-                .containsEntry(VendorFields.VENDOR_EVENT_ACTION, "Info")
+                .containsEntry(VENDOR_OPCODE, "Info")
                 .containsEntry(VendorFields.VENDOR_VERSION, "3")
                 .containsEntry(TraceFields.TRACE_ID, "{11111111-2222-3333-4444-555555555555}")
-                .containsEntry(VENDOR_EVENT_TIMESTAMP, "2026-02-28 09:16:32.772")
+                .containsEntry(VendorFields.VENDOR_EVENT_TIMESTAMP,"2026-02-28 09:16:32.772")
                 .containsEntry(ProcessFields.PROCESS_ID, "5860")
                 .containsEntry(ProcessFields.PROCESS_PATH, "C:\\Windows\\System32\\OpenSSH\\sshd.exe")
                 .containsEntry(ProcessFields.PROCESS_NAME, "sshd.exe")
-                .containsEntry(UserFields.USER_ID, "S-1-5-21-1000000000-1000000000-1000000000-500")
-                .containsEntry(UserFields.USER_NAME, "TestAdmin")
-                .containsEntry(UserFields.USER_DOMAIN, "WINHOST01")
-                .containsEntry(UserFields.USER_SESSION_ID, "0x25501f9")
-                .containsEntry(SourceFields.SOURCE_USER_ID, "S-1-5-18")
-                .containsEntry(SourceFields.SOURCE_USER_NAME, "WINHOST01$")
-                .containsEntry(SourceFields.SOURCE_USER_DOMAIN, "TESTWG")
-                .containsEntry(SourceFields.SOURCE_USER_SESSION_ID, "0x3e7");
+                .containsEntry("TargetUserSid", "S-1-5-21-1000000000-1000000000-1000000000-500")
+                .containsEntry("TargetUserName", "TestAdmin")
+                .containsEntry("TargetDomainName", "WINHOST01")
+                .containsEntry("TargetLogonId", "0x25501f9")
+                .containsEntry("SubjectUserSid", "S-1-5-18")
+                .containsEntry("SubjectUserName", "WINHOST01$")
+                .containsEntry("SubjectDomainName", "TESTWG")
+                .containsEntry("SubjectLogonId", "0x3e7");
 
         assertThat(result).doesNotContainKeys(
                 SourceFields.SOURCE_IP,
@@ -104,22 +99,21 @@ class WindowsEventLogRecordProcessorTest {
         assertThat(result)
                 .containsEntry("message", "A logon was attempted using explicit credentials.")
                 .containsEntry(EventFields.EVENT_CODE, 4648L)
-                .containsEntry(EVENT_ID, "4648")
                 .containsEntry(EventFields.EVENT_UID, "140715")
                 .containsEntry(VendorFields.VENDOR_SUBTYPE, "Microsoft-Windows-Security-Auditing")
                 .containsEntry(ProcessFields.PROCESS_ID, "5860")
                 .containsEntry(ProcessFields.PROCESS_PATH, "C:\\Windows\\System32\\OpenSSH\\sshd.exe")
                 .containsEntry(DestinationFields.DESTINATION_HOSTNAME, "localhost")
-                .containsEntry(UserFields.USER_NAME, "TestAdmin")
-                .containsEntry(UserFields.USER_DOMAIN, "WINHOST01")
-                .containsEntry(SourceFields.SOURCE_USER_ID, "S-1-5-18")
-                .containsEntry(SourceFields.SOURCE_USER_NAME, "WINHOST01$")
-                .containsEntry(SourceFields.SOURCE_USER_DOMAIN, "TESTWG")
-                .containsEntry(SourceFields.SOURCE_USER_SESSION_ID, "0x3e7");
+                .containsEntry("TargetUserName", "TestAdmin")
+                .containsEntry("TargetDomainName", "WINHOST01")
+                .containsEntry("SubjectUserSid", "S-1-5-18")
+                .containsEntry("SubjectUserName", "WINHOST01$")
+                .containsEntry("SubjectDomainName", "TESTWG")
+                .containsEntry("SubjectLogonId", "0x3e7");
 
         assertThat(result).doesNotContainKeys(
-                UserFields.USER_ID,
-                UserFields.USER_SESSION_ID,
+                "TargetUserSid",
+                "TargetLogonId",
                 SourceFields.SOURCE_IP
         );
     }
@@ -133,7 +127,6 @@ class WindowsEventLogRecordProcessorTest {
         assertThat(result)
                 .containsEntry("message", "Special privileges assigned to new logon.")
                 .containsEntry(EventFields.EVENT_CODE, 4672L)
-                .containsEntry(EVENT_ID, "4672")
                 .containsEntry(PRIVILEGE_ASSIGNED_NAME, List.of(
                         "SeSecurityPrivilege",
                         "SeTakeOwnershipPrivilege",
@@ -145,10 +138,10 @@ class WindowsEventLogRecordProcessorTest {
                         "SeImpersonatePrivilege",
                         "SeDelegateSessionUserImpersonatePrivilege"
                 ))
-                .containsEntry(SourceFields.SOURCE_USER_ID, "S-1-5-21-1000000000-1000000000-1000000000-500")
-                .containsEntry(SourceFields.SOURCE_USER_NAME, "TestAdmin")
-                .containsEntry(SourceFields.SOURCE_USER_DOMAIN, "WINHOST01")
-                .containsEntry(SourceFields.SOURCE_USER_SESSION_ID, "0x25501f9");
+                .containsEntry("SubjectUserSid", "S-1-5-21-1000000000-1000000000-1000000000-500")
+                .containsEntry("SubjectUserName", "TestAdmin")
+                .containsEntry("SubjectDomainName", "WINHOST01")
+                .containsEntry("SubjectLogonId", "0x25501f9");
     }
 
     @Test
@@ -164,7 +157,6 @@ class WindowsEventLogRecordProcessorTest {
                 .containsEntry(EventFields.EVENT_LOG_NAME, "OpenSSH/Operational")
                 .containsEntry(EventFields.EVENT_UID, "2743")
                 .containsEntry(EventFields.EVENT_CODE, 4L)
-                .containsEntry(EVENT_ID, "4")
                 .containsEntry(VendorFields.VENDOR_SUBTYPE, "OpenSSH")
                 .containsEntry(ProcessFields.PROCESS_ID, "4160");
 
@@ -187,10 +179,9 @@ class WindowsEventLogRecordProcessorTest {
                 .containsEntry(EventFields.EVENT_LOG_NAME, "Windows PowerShell")
                 .containsEntry(EventFields.EVENT_UID, "8526")
                 .containsEntry(EventFields.EVENT_CODE, 600L)
-                .containsEntry(EVENT_ID, "600")
                 .containsEntry(VendorFields.VENDOR_SUBTYPE, "PowerShell")
                 .containsEntry(VENDOR_EVENT_CATEGORY, "Engine Lifecycle")
-                .containsEntry(VendorFields.VENDOR_EVENT_ACTION, "Info");
+                .containsEntry(VENDOR_OPCODE, "Info");
     }
 
     @Test
@@ -205,7 +196,6 @@ class WindowsEventLogRecordProcessorTest {
                 .containsEntry(EventFields.EVENT_LOG_NAME, "Security")
                 .containsEntry(EventFields.EVENT_UID, "227239")
                 .containsEntry(EventFields.EVENT_CODE, 4624L)
-                .containsEntry(EVENT_ID, "4624")
                 .containsEntry(EventFields.EVENT_OUTCOME, "success")
                 .containsEntry(VendorFields.VENDOR_SUBTYPE, "Microsoft-Windows-Security-Auditing")
                 .containsEntry(VENDOR_EVENT_CATEGORY, "Logon")
@@ -213,14 +203,14 @@ class WindowsEventLogRecordProcessorTest {
                 .containsEntry(ProcessFields.PROCESS_ID, "592")
                 .containsEntry(ProcessFields.PROCESS_PATH, "C:\\Windows\\System32\\services.exe")
                 .containsEntry(ProcessFields.PROCESS_NAME, "services.exe")
-                .containsEntry(UserFields.USER_ID, "S-1-5-18")
-                .containsEntry(UserFields.USER_NAME, "SYSTEM")
-                .containsEntry(UserFields.USER_DOMAIN, "NT AUTHORITY")
-                .containsEntry(UserFields.USER_SESSION_ID, "0x3e7")
-                .containsEntry(SourceFields.SOURCE_USER_ID, "S-1-5-18")
-                .containsEntry(SourceFields.SOURCE_USER_NAME, "WINSERVER01$")
-                .containsEntry(SourceFields.SOURCE_USER_DOMAIN, "WORKGROUP")
-                .containsEntry(SourceFields.SOURCE_USER_SESSION_ID, "0x3e7");
+                .containsEntry("TargetUserSid", "S-1-5-18")
+                .containsEntry("TargetUserName", "SYSTEM")
+                .containsEntry("TargetDomainName", "NT AUTHORITY")
+                .containsEntry("TargetLogonId", "0x3e7")
+                .containsEntry("SubjectUserSid", "S-1-5-18")
+                .containsEntry("SubjectUserName", "WINSERVER01$")
+                .containsEntry("SubjectDomainName", "WORKGROUP")
+                .containsEntry("SubjectLogonId", "0x3e7");
 
         assertThat(result).doesNotContainKeys(
                 SourceFields.SOURCE_IP,
@@ -236,7 +226,6 @@ class WindowsEventLogRecordProcessorTest {
 
         assertThat(result)
                 .containsEntry(EventFields.EVENT_CODE, 4672L)
-                .containsEntry(EVENT_ID, "4672")
                 .containsEntry(EventFields.EVENT_OUTCOME, "success")
                 .containsEntry(PRIVILEGE_ASSIGNED_NAME, List.of(
                         "SeAssignPrimaryTokenPrivilege",
@@ -252,10 +241,10 @@ class WindowsEventLogRecordProcessorTest {
                         "SeImpersonatePrivilege",
                         "SeDelegateSessionUserImpersonatePrivilege"
                 ))
-                .containsEntry(SourceFields.SOURCE_USER_ID, "S-1-5-18")
-                .containsEntry(SourceFields.SOURCE_USER_NAME, "SYSTEM")
-                .containsEntry(SourceFields.SOURCE_USER_DOMAIN, "NT AUTHORITY")
-                .containsEntry(SourceFields.SOURCE_USER_SESSION_ID, "0x3e7");
+                .containsEntry("SubjectUserSid", "S-1-5-18")
+                .containsEntry("SubjectUserName", "SYSTEM")
+                .containsEntry("SubjectDomainName", "NT AUTHORITY")
+                .containsEntry("SubjectLogonId", "0x3e7");
     }
 
     @Test
@@ -269,18 +258,17 @@ class WindowsEventLogRecordProcessorTest {
                 .containsEntry(EventFields.EVENT_SOURCE, "winserver02")
                 .containsEntry(EventFields.EVENT_LOG_NAME, "Security")
                 .containsEntry(EventFields.EVENT_CODE, 4625L)
-                .containsEntry(EVENT_ID, "4625")
                 .containsEntry(EventFields.EVENT_OUTCOME, "failure")
                 .containsEntry(VendorFields.VENDOR_SUBTYPE, "Microsoft-Windows-Security-Auditing")
-                .containsEntry(UserFields.USER_ID, "S-1-0-0")
-                .containsEntry(UserFields.USER_NAME, "USER")
+                .containsEntry("TargetUserSid", "S-1-0-0")
+                .containsEntry("TargetUserName", "USER")
                 .containsEntry(SourceFields.SOURCE_IP, "198.51.100.42")
                 .containsEntry(SourceFields.SOURCE_PORT, 0);
 
         assertThat(result).doesNotContainKeys(
                 SourceFields.SOURCE_HOSTNAME,
-                UserFields.USER_DOMAIN,
-                UserFields.USER_SESSION_ID
+                "TargetDomainName",
+                "TargetLogonId"
         );
     }
 
@@ -294,7 +282,6 @@ class WindowsEventLogRecordProcessorTest {
                 .containsEntry(HostFields.HOST_HOSTNAME, "winserver01")
                 .containsEntry(EventFields.EVENT_LOG_NAME, "System")
                 .containsEntry(EventFields.EVENT_CODE, 7036L)
-                .containsEntry(EVENT_ID, "7036")
                 .containsEntry(VendorFields.VENDOR_SUBTYPE, "Service Control Manager")
                 .containsEntry(VendorFields.VENDOR_EVENT_SEVERITY, "Information");
 
@@ -313,14 +300,19 @@ class WindowsEventLogRecordProcessorTest {
                 .containsEntry(EventFields.EVENT_LOG_NAME, "Microsoft-Windows-Windows Defender/Operational")
                 .containsEntry(EventFields.EVENT_CODE, 1150L)
                 .containsEntry(VendorFields.VENDOR_EVENT_SEVERITY, "Information")
-                .containsEntry(SourceFields.SOURCE_USER_ID, "S-1-5-18")
-                .containsEntry(SourceFields.SOURCE_USER_NAME, "SYSTEM")
-                .containsEntry(SourceFields.SOURCE_USER_DOMAIN, "NT AUTHORITY")
-                .containsEntry(SourceFields.SOURCE_USER_TYPE, "WellKnownGroup");
+                .containsEntry(VendorFields.VENDOR_USER_TYPE, "WellKnownGroup");
+
+        // System/Security user_id/user_name/domain are not promoted to flat fields
+        // (no clear GIM target); only user_type is preserved via vendor_user_type.
+        assertThat(result).doesNotContainKeys(
+                "SubjectUserSid", "SubjectUserName", "SubjectDomainName"
+        );
     }
 
     @Test
-    void mapsSecurityUserNameAndDomain() throws IOException {
+    void mapsSystemOnlyEventWithoutSubjectFlatFields() throws IOException {
+        // 16977 has user context only in System/Security (no EventData Subject fields).
+        // System/Security user_id/user_name/domain are not promoted to flat fields.
         final var logRecord = fixtureRecordByRecordId("windows-2025-eventlog-3.ndjson", 16521L);
 
         final var result = processor.process(wrapLogRecord(logRecord));
@@ -329,15 +321,17 @@ class WindowsEventLogRecordProcessorTest {
                 .containsEntry(HostFields.HOST_HOSTNAME, "winserver03")
                 .containsEntry(EventFields.EVENT_LOG_NAME, "System")
                 .containsEntry(EventFields.EVENT_CODE, 16977L)
-                .containsEntry(EVENT_ID, "16977")
                 .containsEntry(VendorFields.VENDOR_SUBTYPE, "Microsoft-Windows-Directory-Services-SAM")
-                .containsEntry(SourceFields.SOURCE_USER_ID, "S-1-5-18")
-                .containsEntry(SourceFields.SOURCE_USER_NAME, "SYSTEM")
-                .containsEntry(SourceFields.SOURCE_USER_DOMAIN, "NT AUTHORITY");
+                .containsEntry(VendorFields.VENDOR_USER_TYPE, "WellKnownGroup");
+
+        assertThat(result).doesNotContainKeys(
+                "SubjectUserSid", "SubjectUserName", "SubjectDomainName"
+        );
     }
 
     @Test
     void mapsUserDataSubjectFields() throws IOException {
+        // Event 104 carries Subject identity in UserData (no EventData). Raw fields flow through.
         final var logRecord = fixtureRecordByRecordId("windows-2025-eventlog-3.ndjson", 16518L);
 
         final var result = processor.process(wrapLogRecord(logRecord));
@@ -346,11 +340,9 @@ class WindowsEventLogRecordProcessorTest {
                 .containsEntry(HostFields.HOST_HOSTNAME, "winserver03")
                 .containsEntry(EventFields.EVENT_LOG_NAME, "System")
                 .containsEntry(EventFields.EVENT_CODE, 104L)
-                .containsEntry(EVENT_ID, "104")
                 .containsEntry(VendorFields.VENDOR_SUBTYPE, "Microsoft-Windows-Eventlog")
-                .containsEntry(SourceFields.SOURCE_USER_ID, "S-1-5-21-1000000000-2000000000-3000000000-500")
-                .containsEntry(SourceFields.SOURCE_USER_NAME, "Administrator")
-                .containsEntry(SourceFields.SOURCE_USER_DOMAIN, "winserver03");
+                .containsEntry("SubjectUserName", "Administrator")
+                .containsEntry("SubjectDomainName", "winserver03");
     }
 
     @Test
@@ -363,7 +355,6 @@ class WindowsEventLogRecordProcessorTest {
                 .containsEntry(HostFields.HOST_HOSTNAME, "testhost01")
                 .containsEntry(EventFields.EVENT_LOG_NAME, "Security")
                 .containsEntry(EventFields.EVENT_CODE, 4688L)
-                .containsEntry(EVENT_ID, "4688")
                 .containsEntry(EventFields.EVENT_OUTCOME, "success")
                 .containsEntry(VendorFields.VENDOR_SUBTYPE, "Microsoft-Windows-Security-Auditing")
                 .containsEntry(ProcessFields.PROCESS_ID, "6700")
@@ -371,10 +362,10 @@ class WindowsEventLogRecordProcessorTest {
                 .containsEntry(ProcessFields.PROCESS_NAME, "cmd.exe")
                 .containsEntry(ProcessFields.PROCESS_PARENT_PATH, "C:\\Windows\\System32\\services.exe")
                 .containsEntry(ProcessFields.PROCESS_PARENT_NAME, "services.exe")
-                .containsEntry(SourceFields.SOURCE_USER_ID, "S-1-5-18")
-                .containsEntry(SourceFields.SOURCE_USER_NAME, "TESTHOST01$")
-                .containsEntry(SourceFields.SOURCE_USER_DOMAIN, "WORKGROUP")
-                .containsEntry(SourceFields.SOURCE_USER_SESSION_ID, "0x3e7");
+                .containsEntry("SubjectUserSid", "S-1-5-18")
+                .containsEntry("SubjectUserName", "TESTHOST01$")
+                .containsEntry("SubjectDomainName", "WORKGROUP")
+                .containsEntry("SubjectLogonId", "0x3e7");
     }
 
     @Test
@@ -389,14 +380,14 @@ class WindowsEventLogRecordProcessorTest {
                 .containsEntry(WINDOWS_LOGON_TYPE, "3")
                 .containsEntry(WINDOWS_AUTH_PACKAGE_NAME, "NTLM")
                 .containsEntry(EventFields.EVENT_ERROR_CODE, "0xc000006d")
-                .containsEntry(VENDOR_EVENT_SUBSTATUS, "0xc0000064")
+                .containsEntry("SubStatus", "0xc0000064")
                 .containsEntry(EventFields.EVENT_ERROR_DESCRIPTION, "Unknown user name or bad password.")
                 .containsEntry(SourceFields.SOURCE_IP, "108.221.24.75")
                 .containsEntry(SourceFields.SOURCE_PORT, 0)
-                .containsEntry(UserFields.USER_ID, "S-1-0-0")
-                .containsEntry(UserFields.USER_NAME, "REMOTE")
-                .containsEntry(SourceFields.SOURCE_USER_ID, "S-1-0-0")
-                .containsEntry(SourceFields.SOURCE_USER_SESSION_ID, "0x0");
+                .containsEntry("TargetUserSid", "S-1-0-0")
+                .containsEntry("TargetUserName", "REMOTE")
+                .containsEntry("SubjectUserSid", "S-1-0-0")
+                .containsEntry("SubjectLogonId", "0x0");
     }
 
     @Test
@@ -411,14 +402,14 @@ class WindowsEventLogRecordProcessorTest {
                 .containsEntry(WINDOWS_LOGON_TYPE, "3")
                 .containsEntry(WINDOWS_AUTH_PACKAGE_NAME, "NTLM")
                 .containsEntry(WINDOWS_AUTH_LM_PACKAGE_NAME, "NTLM V2")
-                .containsEntry(USER_SESSION_UID, "{00000000-0000-0000-0000-000000000000}")
+                .containsEntry("LogonGuid", "{00000000-0000-0000-0000-000000000000}")
                 .containsEntry(SourceFields.SOURCE_IP, "31.150.102.150")
                 .containsEntry(SourceFields.SOURCE_PORT, 0)
                 .containsEntry(SourceFields.SOURCE_HOSTNAME, "h2")
-                .containsEntry(UserFields.USER_ID, "S-1-5-21-2637047489-2197293977-9275664-500")
-                .containsEntry(UserFields.USER_NAME, "Administrator")
-                .containsEntry(UserFields.USER_DOMAIN, "GLCWIN2022")
-                .containsEntry(UserFields.USER_SESSION_ID, "0x297a8f1a");
+                .containsEntry("TargetUserSid", "S-1-5-21-2637047489-2197293977-9275664-500")
+                .containsEntry("TargetUserName", "Administrator")
+                .containsEntry("TargetDomainName", "GLCWIN2022")
+                .containsEntry("TargetLogonId", "0x297a8f1a");
     }
 
     @Test
@@ -430,10 +421,10 @@ class WindowsEventLogRecordProcessorTest {
         assertThat(result)
                 .containsEntry(EventFields.EVENT_CODE, 4717L)
                 .containsEntry(EventFields.EVENT_OUTCOME, "success")
-                .containsEntry(SourceFields.SOURCE_USER_ID, "S-1-5-18")
-                .containsEntry(SourceFields.SOURCE_USER_NAME, "GLCWIN2025$")
-                .containsEntry(SourceFields.SOURCE_USER_DOMAIN, "WORKGROUP")
-                .containsEntry(SourceFields.SOURCE_USER_SESSION_ID, "0x3e7")
+                .containsEntry("SubjectUserSid", "S-1-5-18")
+                .containsEntry("SubjectUserName", "GLCWIN2025$")
+                .containsEntry("SubjectDomainName", "WORKGROUP")
+                .containsEntry("SubjectLogonId", "0x3e7")
                 .containsKey(VENDOR_EVENT_DATA);
 
         // The JSON blob must contain ALL event_data keys (including ones extracted as GIM fields)
