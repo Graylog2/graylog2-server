@@ -49,6 +49,7 @@ import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.SourceService;
+import org.graylog.collectors.config.CollectorAttributes;
 import org.graylog.collectors.config.CollectorConfig;
 import org.graylog.collectors.config.CollectorPipelineConfig;
 import org.graylog.collectors.config.CollectorServiceConfig;
@@ -91,12 +92,11 @@ import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toCollection;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.graylog.collectors.config.processor.ResourceProcessorConfig.Attribute.upsert;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 @Singleton
@@ -440,50 +440,60 @@ public class OpAmpService {
                 LOG.debug("[{}/{}] Computing new collector config for fleet id {}", instanceUid, sequenceNum, effectiveFleetId);
 
                 final Map<String, CollectorReceiverConfig> receiverConfigs = Maps.newHashMap();
+                final Map<String, CollectorProcessorConfig> processorConfigs = Maps.newHashMap();
+                final Map<String, CollectorPipelineConfig> pipelines = Maps.newHashMap();
+
                 try (final var sources = sourceService.streamAllByFleet(effectiveFleetId)) {
-                    sources.map(SourceDTO::toReceiverConfig)
-                            .flatMap(Optional::stream)
-                            .filter(config -> config.osSupport().contains(osType))
-                            .forEach(receiverConfig -> receiverConfigs.put(receiverConfig.name(), receiverConfig));
+                    sources.filter(SourceDTO::enabled).forEach(source -> {
+                        final var receiverConfig = source.toReceiverConfig()
+                                .filter(config -> config.osSupport().contains(osType))
+                                .orElse(null);
+
+                        if (receiverConfig == null) {
+                            return;
+                        }
+
+                        receiverConfigs.put(receiverConfig.name(), receiverConfig);
+                        final var processorConfig = ResourceProcessorConfig.builder(source.id())
+                                .attributes(List.of(
+                                        upsert(CollectorAttributes.COLLECTOR_RECEIVER_TYPE, receiverConfig.type()),
+                                        upsert(CollectorAttributes.COLLECTOR_SOURCE_ID, source.id()),
+                                        upsert(CollectorAttributes.COLLECTOR_FLEET_ID, effectiveFleetId)))
+                                .build();
+                        processorConfigs.put(processorConfig.name(), processorConfig);
+
+                        final var pipeline = CollectorPipelineConfig.builder()
+                                .receivers(Set.of(receiverConfig.name()))
+                                .exporters(Set.of(exporterConfig.getName()))
+                                .processors(Set.of(processorConfig.name()))
+                                .build();
+
+                        pipelines.put(f("logs/%s", source.id()), pipeline);
+                    });
+                }
+
+                // The Collector must at least have one receiver wired into one pipeline to avoid a startup error.
+                if (pipelines.isEmpty()) {
+                    final var noop = NoopReceiverConfig.instance();
+                    receiverConfigs.put(noop.name(), noop);
+                    pipelines.put(f("logs/%s", noop.name()), CollectorPipelineConfig.builder()
+                            .receivers(Set.of(noop.name()))
+                            .exporters(Set.of(exporterConfig.getName()))
+                            .build());
                 }
 
                 final var storageExtensionConfig = FileStorageExtensionConfig.defaultInstance();
+
                 configBuilder.extensions(Map.of(storageExtensionConfig.name(), storageExtensionConfig));
-
-                // The Collector must at least have one receiver to avoid a startup error.
-                if (receiverConfigs.isEmpty()) {
-                    final var noop = NoopReceiverConfig.instance();
-                    receiverConfigs.put(noop.name(), noop);
-                }
-
-                final var receiverGroups = receiverConfigs.values().stream()
-                        .collect(Collectors.groupingBy(CollectorReceiverConfig::type));
-
                 configBuilder.receivers(receiverConfigs);
                 configBuilder.exporters(Map.of(exporterConfig.getName(), exporterConfig));
-
-                final Map<String, CollectorProcessorConfig> receiverProcessors = receiverGroups.keySet().stream()
-                        .map(component -> ResourceProcessorConfig.builder(component)
-                                .attributes(List.of(ResourceProcessorConfig.collectorComponentAttribute(component)))
-                                .build())
-                        .collect(Collectors.toMap(CollectorProcessorConfig::name, Function.identity()));
-
-                configBuilder.processors(receiverProcessors);
-
-                final var pipelines = receiverGroups.entrySet().stream()
-                        .collect(Collectors.toMap(e -> f("logs/%s", e.getKey()), e -> CollectorPipelineConfig.builder()
-                                .receivers(e.getValue().stream().map(CollectorReceiverConfig::name).collect(Collectors.toSet()))
-                                .exporters(Set.of(exporterConfig.getName()))
-                                .processors(receiverProcessors.values().stream()
-                                        .filter(config -> e.getKey().equals(config.id()))
-                                        .map(CollectorProcessorConfig::name)
-                                        .collect(Collectors.toSet()))
-                                .build()));
+                configBuilder.processors(processorConfigs);
 
                 configBuilder.service(CollectorServiceConfig.builder()
                         .extensions(Set.of(storageExtensionConfig.name()))
                         .pipelines(pipelines)
                         .build());
+
                 try {
                     final String configYaml = yamlObjectMapper.writeValueAsString(configBuilder.build());
 
