@@ -17,7 +17,7 @@
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
-import EventDetailsTable from 'components/events/events/EventDetailsTable';
+import EventDetailsDefinitionList from 'components/events/events/EventDetailsDefinitionList';
 import { eventTypeAttribute } from 'components/events/events/ColumnRenderers';
 import type { EventReplaySideBarDetailsProps } from 'views/types';
 import useEventsAdditionalData from 'components/events/ReplaySearchSidebar/hooks/useEventsAdditionalData';
@@ -79,7 +79,7 @@ const GeneralEventSideBar = ({ alertId, definitionId }: EventReplaySideBarDetail
     <div>
       {alertId && (
         <ExpandableSection title="Event Details">
-          <EventDetailsTable
+          <EventDetailsDefinitionList
             event={eventData}
             meta={meta}
             attributesList={attributesList}
