@@ -14,9 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import styled from 'styled-components';
+import * as React from 'react';
+import styled, { css } from 'styled-components';
 
-const DefinitionList = styled.dl`
+import ElementDimensions from 'components/common/ElementDimensions';
+
+const HORIZONTAL_LAYOUT_BREAKPOINT = 500;
+
+const Container = styled(ElementDimensions)`
+  width: 100%;
+`;
+
+const StyledDl = styled.dl<{ $horizontalLayout: boolean }>`
   width: 100%;
   margin: 0;
 
@@ -40,6 +49,28 @@ const DefinitionList = styled.dl`
   dd:nth-of-type(odd) {
     background-color: ${({ theme }) => theme.colors.table.row.backgroundStriped};
   }
+
+  ${({ $horizontalLayout, theme }) =>
+    $horizontalLayout &&
+    css`
+      display: grid;
+      grid-template-columns: auto 1fr;
+
+      dt {
+        padding: ${theme.spacings.xxs};
+        border-bottom: 1px solid ${theme.colors.table.row.divider};
+      }
+
+      dd {
+        padding: ${theme.spacings.xxs};
+      }
+    `}
 `;
+
+const DefinitionList = ({ children }: React.PropsWithChildren) => (
+  <Container>
+    {({ width }) => <StyledDl $horizontalLayout={width > HORIZONTAL_LAYOUT_BREAKPOINT}>{children}</StyledDl>}
+  </Container>
+);
 
 export default DefinitionList;
