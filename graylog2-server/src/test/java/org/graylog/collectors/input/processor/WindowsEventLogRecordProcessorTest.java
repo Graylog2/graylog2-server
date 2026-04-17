@@ -22,6 +22,7 @@ import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import org.graylog.inputs.otel.OTelJournal;
+import org.graylog.inputs.otel.codec.OTelTypeConverter;
 import org.graylog.schema.DestinationFields;
 import org.graylog.schema.EventFields;
 import org.graylog.schema.HostFields;
@@ -29,6 +30,7 @@ import org.graylog.schema.ProcessFields;
 import org.graylog.schema.SourceFields;
 import org.graylog.schema.TraceFields;
 import org.graylog.schema.VendorFields;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -49,7 +51,7 @@ class WindowsEventLogRecordProcessorTest {
     private static final String VENDOR_EVENT_DATA = "vendor_event_data";
 
 
-    private final WindowsEventLogRecordProcessor processor = new WindowsEventLogRecordProcessor();
+    private final WindowsEventLogRecordProcessor processor = new WindowsEventLogRecordProcessor(new OTelTypeConverter(new ObjectMapperProvider().get()));
 
     @Test
     void maps4624FromFixture() throws IOException {

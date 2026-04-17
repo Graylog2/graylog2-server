@@ -16,12 +16,11 @@
  */
 package org.graylog.collectors.input.processor;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.InetAddresses;
 import io.opentelemetry.proto.common.v1.AnyValue;
-import io.opentelemetry.proto.common.v1.KeyValue;
+import jakarta.inject.Inject;
 import org.graylog.inputs.otel.OTelJournal;
+import org.graylog.inputs.otel.codec.OTelTypeConverter;
 import org.graylog.schema.DestinationFields;
 import org.graylog.schema.EventFields;
 import org.graylog.schema.HostFields;
@@ -65,7 +64,6 @@ import java.util.Map;
  * @see <a href="https://learn.microsoft.com/en-us/windows/win32/wes/eventschema-systempropertiestype-complextype">SystemPropertiesType</a>
  */
 public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String VENDOR_EVENT_CATEGORY = "vendor_event_category";
     private static final String VENDOR_OPCODE = "vendor_opcode";
     private static final String PRIVILEGE_ASSIGNED_NAME = "privilege_assigned_name";
@@ -74,6 +72,12 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
     private static final String WINDOWS_AUTH_PROCESS_NAME = "windows_authentication_process_name";
     private static final String WINDOWS_AUTH_LM_PACKAGE_NAME = "windows_authentication_lmpackage_name";
     private static final String VENDOR_EVENT_DATA = "vendor_event_data";
+    private final OTelTypeConverter typeConverter;
+
+    @Inject
+    public WindowsEventLogRecordProcessor(OTelTypeConverter typeConverter) {
+        this.typeConverter = typeConverter;
+    }
 
     @Override
     public Map<String, Object> process(OTelJournal.Log log) {
@@ -121,8 +125,6 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
                 case "execution" -> extractExecution(bodyFieldValue, fields);
                 // EventData payload fields (provider-specific, often security auditing data names).
                 case "event_data" -> extractEventData(bodyFieldValue, result, fields);
-                // Rendered Details section(s) produced by the receiver from message templates.
-                case "details" -> extractDetails(bodyFieldValue);
                 // System/Security: user context recorded in System section (SID, name, domain, type).
                 case "security" -> extractSecurity(bodyFieldValue, result);
                 // System/Keywords outcome: rendered audit outcome (e.g. "success", "failure").
@@ -193,8 +195,6 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
         for (final var kv : value.getKvlistValue().getValuesList()) {
             switch (kv.getKey()) {
                 case "id" -> fields.eventCode = extractNumber(kv.getValue());
-                // Unmapped but documented:
-                // case "qualifiers" -> EventID/Qualifiers high-order bits for classic providers.
             }
         }
     }
@@ -207,9 +207,6 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
         for (final var kv : value.getKvlistValue().getValuesList()) {
             switch (kv.getKey()) {
                 case "name" -> fields.providerName = extractString(kv.getValue());
-                // Unmapped but documented:
-                // case "guid" -> System/Provider@Guid.
-                // case "event_source" -> System/Provider@EventSourceName.
             }
         }
     }
@@ -234,8 +231,6 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
         for (final var kv : value.getKvlistValue().getValuesList()) {
             switch (kv.getKey()) {
                 case "process_id" -> fields.executionProcessId = extractFlexibleNumber(kv.getValue());
-                // Unmapped but documented:
-                // case "thread_id" -> System/Execution@ThreadID.
             }
         }
     }
@@ -249,21 +244,17 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
             switch (kv.getKey()) {
                 // System/Security UserType: rendered account type (e.g. WellKnownGroup, User).
                 case "user_type" -> putIfPresent(result, VendorFields.VENDOR_USER_TYPE, extractString(kv.getValue()));
-                // Unmapped but documented:
-                // case "user_id" -> System/Security UserID (SID). No clear GIM target.
-                // case "user_name" -> System/Security user name. No clear GIM target.
-                // case "domain" -> System/Security domain. No clear GIM target.
             }
         }
     }
 
-    private static void extractEventData(AnyValue value, Map<String, Object> result, ExtractedFields fields) {
+    private void extractEventData(AnyValue value, Map<String, Object> result, ExtractedFields fields) {
         if (value.getValueCase() != AnyValue.ValueCase.KVLIST_VALUE) {
             return;
         }
 
         // Serialize ALL event_data to JSON blob (preserves full original structure)
-        fields.vendorEventDataJson = serializeKvListToJson(value.getKvlistValue().getValuesList());
+        fields.vendorEventDataJson = typeConverter.toJson(typeConverter.toJavaMap(value.getKvlistValue()), "event_data").orElse("");
 
         for (final var kv : value.getKvlistValue().getValuesList()) {
             switch (kv.getKey()) {
@@ -319,88 +310,22 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
                 case "FailureReason" -> fields.failureReason = extractString(kv.getValue());
                 // 4688 command line (when audit policy enabled).
                 case "CommandLine" -> fields.commandLine = extractString(kv.getValue());
-                // Unmapped but documented:
-                // case "process" -> OpenSSH EventData process marker.
-                // case "payload" -> OpenSSH EventData payload detail text.
-                // case "TransmittedServices" -> 4624 Kerberos transited services.
-                // case "KeyLength" -> 4624 key length.
-                // case "ImpersonationLevel" -> 4624 impersonation level.
-                // case "RestrictedAdminMode" -> 4624 v2 restricted admin flag.
-                // case "RemoteCredentialGuard" -> 4624 v2 remote credential guard flag.
-                // case "TargetOutboundUserName" -> 4624 v2 outbound username.
-                // case "TargetOutboundDomainName" -> 4624 v2 outbound domain.
-                // case "VirtualAccount" -> 4624 v2 virtual account flag.
-                // case "TargetLinkedLogonId" -> 4624 v2 linked logon ID.
-                // case "ElevatedToken" -> 4624 v2 elevated token flag.
-                // case "TargetInfo" -> 4648 target server additional info.
-                // case "TargetLogonGuid" -> 4648 target logon GUID.
-                // case "TargetSid" -> 4717/4718/4798 target SID.
-                // case "PackageName" -> 4776 authentication package.
-                // case "AccessGranted" -> 4717 granted logon right.
-                // case "AccessRemoved" -> 4718 removed logon right.
-                // case "MandatoryLabel" -> 4688 mandatory integrity label SID.
-                // case "TokenElevationType" -> 4688 token elevation type code.
-                // case "" -> unnamed positional EventData entries (common in PowerShell events).
             }
         }
     }
 
-    private static void extractUserData(AnyValue value, Map<String, Object> result, ExtractedFields fields) {
+    private void extractUserData(AnyValue value, Map<String, Object> result, ExtractedFields fields) {
         if (value.getValueCase() != AnyValue.ValueCase.KVLIST_VALUE) {
             return;
         }
 
         // Serialize user_data to vendor_event_data (same field as event_data; they're mutually exclusive)
-        fields.vendorEventDataJson = serializeKvListToJson(value.getKvlistValue().getValuesList());
+        fields.vendorEventDataJson = typeConverter.toJson(typeConverter.toJavaMap(value.getKvlistValue()), "user_data").orElse("");
 
         for (final var kv : value.getKvlistValue().getValuesList()) {
             switch (kv.getKey()) {
-                // 104 EventLog-cleared: subject user context. Pass through raw;
-                // event_data values (if any) take precedence.
                 case "SubjectUserName", "SubjectDomainName", "SubjectUserSid", "SubjectLogonId" ->
                         putIfAbsent(result, kv.getKey(), extractString(kv.getValue()));
-                // Unmapped but documented:
-                // case "Channel" -> 104 cleared channel name.
-                // case "ClientProcessId" -> 104 client process ID that cleared the log.
-                // case "ClientProcessStartKey" -> 104 client process start key.
-                // case "xml_name" -> UserData XML element name.
-                // case "param1"/"param2" -> 1000/1001 positional application error parameters.
-                // case "binaryDataSize" -> 1000/1001 binary data size.
-                // case "binaryData" -> 1000/1001 binary crash data.
-                // case "RmSessionId" -> 10000/10001 restart manager session ID.
-                // case "UTCStartTime" -> 10000/10001 restart manager UTC start time.
-            }
-        }
-    }
-
-    private static void extractDetails(AnyValue value) {
-        if (value.getValueCase() != AnyValue.ValueCase.KVLIST_VALUE) {
-            return;
-        }
-
-        for (final var kv : value.getKvlistValue().getValuesList()) {
-            switch (kv.getKey()) {
-                // Unmapped but documented:
-                // case "Subject" -> rendered Subject account details section.
-                // case "Additional Context" -> rendered explanatory/context section.
-                // case "Logon Type" -> rendered logon type summary section.
-                // case "Process Information" -> rendered process info section.
-                // case "Network Information" -> rendered network source section.
-                // case "Detailed Authentication Information" -> rendered auth details section.
-                // case "New Logon" -> rendered new logon identity/session section.
-                // case "Impersonation Level" -> rendered impersonation level section.
-                // case "Logon Information" -> rendered logon flags section.
-                // case "Account Whose Credentials Were Used" -> 4648 rendered target account section.
-                // case "Target Server" -> 4648 rendered target server section.
-                // case "Privileges" -> 4672 rendered privilege list section.
-                // case "User" -> 4798 rendered user section.
-                // case "Authentication Package" -> 4776 rendered authentication package section.
-                // case "Error Code" -> 4776 rendered error/status section.
-                // case "Logon Account" -> 4776 rendered logon account section.
-                // case "Source Workstation" -> 4776 rendered source workstation section.
-                // case "Account Modified" -> 4717/4718 rendered modified account section.
-                // case "Access Granted" -> 4717 rendered granted right section.
-                // case "Access Removed" -> 4718 rendered removed right section.
             }
         }
     }
@@ -519,47 +444,6 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
         }
 
         return values;
-    }
-
-    private static String serializeKvListToJson(List<KeyValue> kvList) {
-        if (kvList.isEmpty()) {
-            return null;
-        }
-
-        final Map<String, Object> map = new HashMap<>();
-        for (final var kv : kvList) {
-            map.put(kv.getKey(), anyValueToObject(kv.getValue()));
-        }
-
-        try {
-            return OBJECT_MAPPER.writeValueAsString(map);
-        } catch (JsonProcessingException e) {
-            return null;
-        }
-    }
-
-    private static Object anyValueToObject(AnyValue value) {
-        return switch (value.getValueCase()) {
-            case STRING_VALUE -> value.getStringValue();
-            case INT_VALUE -> value.getIntValue();
-            case DOUBLE_VALUE -> value.getDoubleValue();
-            case BOOL_VALUE -> value.getBoolValue();
-            case ARRAY_VALUE -> {
-                final List<Object> list = new ArrayList<>();
-                for (final var item : value.getArrayValue().getValuesList()) {
-                    list.add(anyValueToObject(item));
-                }
-                yield list;
-            }
-            case KVLIST_VALUE -> {
-                final Map<String, Object> nested = new HashMap<>();
-                for (final var kv : value.getKvlistValue().getValuesList()) {
-                    nested.put(kv.getKey(), anyValueToObject(kv.getValue()));
-                }
-                yield nested;
-            }
-            default -> null;
-        };
     }
 
     private static void putIfPresent(Map<String, Object> target, String fieldName, String value) {
