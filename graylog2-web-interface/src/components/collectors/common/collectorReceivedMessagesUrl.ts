@@ -16,11 +16,13 @@
  */
 import Routes from 'routing/Routes';
 
-const COLLECTOR_SYSTEM_LOGS_STREAM_ID = '000000000000000000000005';
+/**
+ * Builds a Graylog search URL filtered on a collector message field
+ * (e.g. `collector_instance_uid`, `collector_fleet_id`, `collector_source_id`).
+ * Uses a 1h relative time range and no stream scoping — the Collector System
+ * Logs stream is system-scoped and is not included in unscoped searches.
+ */
+const collectorReceivedMessagesUrl = (field: string, value: string): string =>
+  Routes.search_with_query(`${field}:"${value}"`, 'relative', { relative: 3600 });
 
-const collectorLogsUrl = (instanceUid: string): string =>
-  Routes.search_with_query(`collector_instance_uid:"${instanceUid}"`, 'relative', { relative: 3600 }, [
-    COLLECTOR_SYSTEM_LOGS_STREAM_ID,
-  ]);
-
-export default collectorLogsUrl;
+export default collectorReceivedMessagesUrl;

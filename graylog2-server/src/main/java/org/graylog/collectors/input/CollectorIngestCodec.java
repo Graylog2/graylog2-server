@@ -60,6 +60,8 @@ public class CollectorIngestCodec implements Codec {
     private static final Logger LOG = LoggerFactory.getLogger(CollectorIngestCodec.class);
     public static final String NAME = "CollectorIngest";
     public static final String FIELD_COLLECTOR_RECEIVER_TYPE = "collector_receiver_type";
+    public static final String FIELD_COLLECTOR_SOURCE_ID = "collector_source_id";
+    public static final String FIELD_COLLECTOR_FLEET_ID = "collector_fleet_id";
     public static final String FIELD_COLLECTOR_INSTANCE_UID = "collector_instance_uid";
 
     private final Configuration configuration;
@@ -126,6 +128,8 @@ public class CollectorIngestCodec implements Codec {
         final var log = collectorRecord.getOtelRecord().getLog();
         final var logRecord = log.getLogRecord();
         final var receiverType = collectorRecord.getCollectorReceiverType();
+        final var sourceId = collectorRecord.getCollectorSourceId();
+        final var fleetId = collectorRecord.getCollectorFleetId();
         final var instanceUid = collectorRecord.getCollectorInstanceUid();
 
         if (isBlank(receiverType)) {
@@ -149,6 +153,12 @@ public class CollectorIngestCodec implements Codec {
 
         if (!instanceUid.isEmpty()) {
             message.addField(FIELD_COLLECTOR_INSTANCE_UID, instanceUid);
+        }
+        if (!sourceId.isEmpty()) {
+            message.addField(FIELD_COLLECTOR_SOURCE_ID, sourceId);
+        }
+        if (!fleetId.isEmpty()) {
+            message.addField(FIELD_COLLECTOR_FLEET_ID, fleetId);
         }
 
         if (!logRecord.getSeverityText().isEmpty()) {
