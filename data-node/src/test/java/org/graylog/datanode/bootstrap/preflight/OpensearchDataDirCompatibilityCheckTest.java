@@ -67,14 +67,32 @@ class OpensearchDataDirCompatibilityCheckTest {
     }
 
     @Test
-    void testCompatibilityCheckRerunsForNewVersion(@TempDir Path dataDir) throws IOException {
+    void testCompatibilityCheckSkipsOnMinorVersionChange(@TempDir Path dataDir) throws IOException {
         writeCheckFile(dataDir, "2.18.0");
 
+        final IndicesDirectoryParser parser = new IndicesDirectoryParser(null, null) {
+            @Override
+            public IndexerDirectoryInformation parse(Path path) {
+                throw new AssertionError("Should not be called on minor version change");
+            }
+        };
+
         final OpensearchDataDirCompatibilityCheck check =
-                new OpensearchDataDirCompatibilityCheck(configFor(dataDir, OPENSEARCH_VERSION), realParser());
+                new OpensearchDataDirCompatibilityCheck(configFor(dataDir, OPENSEARCH_VERSION), parser);
 
         Assertions.assertThatCode(check::runCheck).doesNotThrowAnyException();
-        Assertions.assertThat(readCheckFile(dataDir)).isEqualTo(OPENSEARCH_VERSION);
+    }
+
+    @Test
+    void testCompatibilityCheckRerunsForMajorVersionChange(@TempDir Path dataDir) throws IOException {
+        writeCheckFile(dataDir, "2.19.0");
+        final String nextMajorVersion = "3.0.0";
+
+        final OpensearchDataDirCompatibilityCheck check =
+                new OpensearchDataDirCompatibilityCheck(configFor(dataDir, nextMajorVersion), realParser());
+
+        Assertions.assertThatCode(check::runCheck).doesNotThrowAnyException();
+        Assertions.assertThat(readCheckFile(dataDir)).isEqualTo(nextMajorVersion);
     }
 
     @Test

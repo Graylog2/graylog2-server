@@ -62,11 +62,11 @@ public class OpensearchDataDirCompatibilityCheck implements PreflightCheck {
         final Path opensearchDataDir = datanodeConfiguration.datanodeDirectories().getDataTargetDir();
         final String opensearchVersion = datanodeConfiguration.opensearchDistributionProvider().get().version();
 
-        // We want to run the compatibility check only once for this specific data dir and opensearch version. Let's memorize
-        // the run and these two parameters and skip every time we are starting in the same configuration.
-        // Change in the dir or in opensearch version will re-run the full check again.
+        // We want to run the compatibility check only once per major opensearch version for this data dir. Let's memorize
+        // the run and skip every time we are starting with the same major version in the same data dir.
+        // A change in the major version will re-run the full check; minor/patch upgrades are skipped.
         if (isCompatibilityAlreadyVerified(opensearchDataDir, opensearchVersion)) {
-            LOG.info("Opensearch data directory compatibility already successfully verified for data directory {} and opensearch version {}, skipping check", opensearchDataDir, opensearchVersion);
+            LOG.info("Opensearch data directory compatibility already successfully verified for data directory {} and opensearch major version {}, skipping check", opensearchDataDir, Version.fromString(opensearchVersion).major);
             return;
         }
 
@@ -92,7 +92,9 @@ public class OpensearchDataDirCompatibilityCheck implements PreflightCheck {
         }
         try {
             final String storedVersion = Files.readString(checkFile, StandardCharsets.UTF_8).trim();
-            return opensearchVersion.equals(storedVersion);
+            final int storedMajor = Version.fromString(storedVersion).major;
+            final int currentMajor = Version.fromString(opensearchVersion).major;
+            return storedMajor == currentMajor;
         } catch (IOException e) {
             LOG.warn("Failed to read compatibility check file, re-running check", e);
             return false;
