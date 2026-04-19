@@ -60,6 +60,7 @@ describe('DeploymentForm telemetry', () => {
     );
     createEnrollmentToken.mockResolvedValue({
       token: 'token-value-xyz',
+      fleet_id: 'fleet-1',
       expires_at: '2026-05-13T12:00:00Z',
     });
   });
@@ -122,7 +123,6 @@ describe('DeploymentForm telemetry', () => {
           'Collector Enrollment Token Generated',
           expect.objectContaining({
             fleet_id: 'fleet-1',
-            platform: 'linux',
             expires_in: 'P7D',
             app_action_value: 'deployment-generate',
           }),

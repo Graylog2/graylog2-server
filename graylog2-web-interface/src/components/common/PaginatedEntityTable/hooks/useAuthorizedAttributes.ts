@@ -14,23 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
 
-import { Collectors } from '@graylog/server-api';
+import type { Attribute } from 'stores/PaginationTypes';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { isPermitted } from 'util/PermissionsMixin';
 
-import { defaultOnError } from 'util/conditional/onError';
+const useAuthorizedAttributes = (attributes: Array<Attribute>) => {
+  const currentUser = useCurrentUser();
 
-import type { CollectorStats } from '../types';
+  return attributes.filter(({ permissions }) =>
+    !permissions?.length || isPermitted(currentUser.permissions, permissions));
+};
 
-export const STATS_KEY_PREFIX = ['collectors', 'stats'];
-
-export const useCollectorStats = () =>
-  useQuery<CollectorStats>({
-    queryKey: STATS_KEY_PREFIX,
-    queryFn: () =>
-      defaultOnError(
-        Collectors.stats(),
-        'Loading Collector stats failed with status',
-        'Could not load Collector stats.',
-      ),
-  });
+export default useAuthorizedAttributes;

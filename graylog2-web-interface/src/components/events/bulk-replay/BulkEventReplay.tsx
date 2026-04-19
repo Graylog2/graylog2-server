@@ -55,8 +55,19 @@ const AlertWrapper = styled(Alert)(
 
 const ReplaySearchSidebarSection = () => {
   const { alertId, definitionId } = useReplaySearchContext();
+  const isRightSidebarEnabled = useFeature('replay_search_right_sidebar');
 
-  return <ReplaySearchSidebar alertId={alertId} definitionId={definitionId} />;
+  if (!isRightSidebarEnabled) {
+    return (
+      <div>
+        <SidebarBulkEventReplay/>
+        <hr/>
+        <ReplaySearchSidebar alertId={alertId} definitionId={definitionId} />
+      </div>
+    );
+  }
+
+  return <SidebarBulkEventReplay/>;
 };
 
 const replaySection: SidebarSection = {
@@ -70,18 +81,8 @@ const replaySection: SidebarSection = {
 const searchPageLayout: Partial<LayoutState> = {
   sidebar: {
     isShown: true,
-    title: SidebarBulkEventReplay,
-    sections: [...sidebarSections],
-    contentColumnWidth: 350,
-  },
-};
-
-const legacySearchPageLayout: Partial<LayoutState> = {
-  sidebar: {
-    isShown: true,
-    title: SidebarBulkEventReplay,
+    title: "Replay Search",
     sections: [replaySection, ...sidebarSections],
-    contentColumnWidth: 350,
   },
 };
 
@@ -93,7 +94,6 @@ const ReplayedSearch = ({
   const { eventIds, selectedId, eventsData } = useSelectedEvents();
   const selectedEvent = eventsData?.[selectedId];
   const { data: eventDefinitionMappedData } = useEventDefinition(selectedEvent?.event?.event_definition_id);
-  const isRightSidebarEnabled = useFeature('replay_search_right_sidebar');
   const total = eventIds.length;
 
   if (total === 0) {
@@ -111,7 +111,7 @@ const ReplayedSearch = ({
     <EventReplaySearch
       eventData={selectedEvent.event}
       eventDefinitionMappedData={eventDefinitionMappedData}
-      searchPageLayout={isRightSidebarEnabled ? searchPageLayout : legacySearchPageLayout}
+      searchPageLayout={searchPageLayout}
     />
   );
 };
