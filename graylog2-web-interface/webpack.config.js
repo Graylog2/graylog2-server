@@ -28,6 +28,7 @@ const ROOT_PATH = path.resolve(__dirname);
 const APP_PATH = path.resolve(ROOT_PATH, 'src');
 const BUILD_PATH = path.resolve(ROOT_PATH, 'target/web/build');
 const TARGET = process.env.npm_lifecycle_event || 'build';
+const isProd = TARGET.startsWith('build');
 process.env.BABEL_ENV = TARGET;
 
 const BOOTSTRAPVARS = require(path.resolve(ROOT_PATH, 'public', 'stylesheets', 'bootstrap-config.json')).vars;
@@ -35,7 +36,7 @@ const coreConfig = core.config(TARGET, APP_PATH, ROOT_PATH, ROOT_PATH, supported
 
 const webpackConfig = merge(coreConfig, {
   name: 'app',
-  dependencies: ['vendor'],
+  dependencies: isProd ? ['vendor', 'commons'] : ['vendor'],
   entry: {
     app: APP_PATH,
     preload: [path.resolve(APP_PATH, 'preload.ts')],
@@ -98,6 +99,13 @@ const webpackConfig = merge(coreConfig, {
       template: path.resolve(ROOT_PATH, 'templates/index.html.template'),
       templateParameters: {
         vendorModule: () => JSON.parse(fs.readFileSync(path.resolve(BUILD_PATH, 'vendor-module.json'), 'utf8')),
+        commonsModule: () => {
+          if (isProd) {
+            return JSON.parse(fs.readFileSync(path.resolve(BUILD_PATH, 'commons-module.json'), 'utf8'));
+          }
+
+          return { files: { js: [], css: [] } };
+        },
         pluginNames: () => global.pluginNames,
       },
       chunksSortMode: core.sortChunks,

@@ -126,11 +126,16 @@ function collectMounts(pluginModuleNames) {
 function collectAssets(pluginModules) {
   const vendorModule = JSON.parse(fs.readFileSync(`${buildDir}/${VENDORMODULE}`));
   const buildModule = JSON.parse(fs.readFileSync(`${buildDir}/${BUILDMODULE}`));
+  const commonsModulePath = `${buildDir}/commons-module.json`;
+  const commonsAssets = fs.existsSync(commonsModulePath)
+    ? JSON.parse(fs.readFileSync(commonsModulePath)).files.js
+    : [];
   const pluginAssets = pluginModules.flatMap((pluginModule) => pluginModule.files.js);
 
   return [
     'config.js',
     ...vendorModule.files.js,
+    ...commonsAssets,
     ...buildModule.files.js,
     ...pluginAssets,
   ].map((asset) => `/assets/${asset}`);
