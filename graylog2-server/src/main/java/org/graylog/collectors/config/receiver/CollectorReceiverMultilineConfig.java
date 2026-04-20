@@ -22,7 +22,7 @@ import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
 
 /**
- * Multiline configuration for otel collector receivers (filelog, tcplog, udplog).
+ * Multiline configuration for OTel collector receivers (file_log, tcp_log, udp_log).
  */
 @AutoValue
 @JsonInclude(JsonInclude.Include.NON_NULL)

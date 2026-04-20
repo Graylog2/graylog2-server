@@ -43,13 +43,13 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 public abstract class WindowsEventLogReceiverConfig implements CollectorReceiverConfig, CollectorStanzaReceiver {
     public static final String RECEIVER_TYPE = "windowseventlog";
 
+    // if you change this, also update SourceFormModal.tsx!
     private static final List<String> DEFAULT_CHANNELS = List.of(
             "Application",
             "System",
             "Security",
             "Setup",
             "Microsoft-Windows-Windows Defender/Operational",
-            "Microsoft-Windows-TerminalServices-LocalSessionManager/Operational",
             "Microsoft-Windows-PowerShell/Operational",
             "Windows PowerShell"
     );

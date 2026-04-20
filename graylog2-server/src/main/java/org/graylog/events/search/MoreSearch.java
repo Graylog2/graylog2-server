@@ -75,18 +75,18 @@ public class MoreSearch {
     /**
      * Executes an events search for the given parameters.
      *
-     * @param parameters             event search parameters
-     * @param filterString           filter string
-     * @param eventStreams           event streams to search in
-     * @param forbiddenSourceStreams forbidden source streams
+     * @param parameters         event search parameters
+     * @param filterString       filter string
+     * @param eventStreams       event streams to search in
+     * @param sourceStreamFilter controls source stream filtering based on user permissions
      * @return the result
      */
     // TODO: We cannot use Searches#search() at the moment because that method cannot handle multiple streams. (because of Searches#extractStreamId())
     //       We also cannot use the new search code at the moment because it doesn't do pagination.
-    Result eventSearch(EventsSearchParameters parameters, String filterString, Set<String> eventStreams, Set<String> forbiddenSourceStreams) {
+    Result eventSearch(EventsSearchParameters parameters, String filterString, Set<String> eventStreams, SourceStreamFilter sourceStreamFilter) {
         checkArgument(parameters != null, "parameters cannot be null");
         checkArgument(!eventStreams.isEmpty(), "eventStreams cannot be empty");
-        checkArgument(forbiddenSourceStreams != null, "forbiddenSourceStreams cannot be null");
+        checkArgument(sourceStreamFilter != null, "sourceStreamFilter cannot be null");
 
         final Sorting.Direction sortDirection = parameters.sortDirection() == EventsSearchParameters.SortDirection.ASC ? Sorting.Direction.ASC : Sorting.Direction.DESC;
         final Sorting sorting = parameters.sortUnmappedType()
@@ -105,24 +105,24 @@ public class MoreSearch {
                     .build();
         }
         return moreSearchAdapter.eventSearch(queryString, parameters.timerange(), affectedIndices, sorting, parameters.page(),
-                parameters.perPage(), eventStreams, filterString, forbiddenSourceStreams, parameters.filter().extraFilters());
+                parameters.perPage(), eventStreams, filterString, sourceStreamFilter, parameters.filter().extraFilters());
     }
 
     /**
      * Creates a histogram over events for the given parameters.
      *
-     * @param parameters             event search parameters
-     * @param filterString           filter string
-     * @param eventStreams           event streams to search in
-     * @param forbiddenSourceStreams forbidden source streams
+     * @param parameters         event search parameters
+     * @param filterString       filter string
+     * @param eventStreams       event streams to search in
+     * @param sourceStreamFilter controls source stream filtering based on user permissions
      * @return the result
      */
     // TODO: We cannot use Searches#search() at the moment because that method cannot handle multiple streams. (because of Searches#extractStreamId())
     //       We also cannot use the new search code at the moment because it doesn't do pagination.
-    Histogram histogram(EventsSearchParameters parameters, String filterString, Set<String> eventStreams, Set<String> forbiddenSourceStreams, ZoneId timeZone) {
+    Histogram histogram(EventsSearchParameters parameters, String filterString, Set<String> eventStreams, SourceStreamFilter sourceStreamFilter, ZoneId timeZone) {
         checkArgument(parameters != null, "parameters cannot be null");
         checkArgument(!eventStreams.isEmpty(), "eventStreams cannot be empty");
-        checkArgument(forbiddenSourceStreams != null, "forbiddenSourceStreams cannot be null");
+        checkArgument(sourceStreamFilter != null, "sourceStreamFilter cannot be null");
 
         final String queryString = parameters.query().trim();
         final Set<String> affectedIndices = getAffectedIndices(eventStreams, parameters.timerange());
@@ -132,7 +132,7 @@ public class MoreSearch {
             return Histogram.empty();
         }
         return moreSearchAdapter.eventHistogram(queryString, effectiveTimeRange, affectedIndices, eventStreams,
-                filterString, forbiddenSourceStreams, timeZone, parameters.filter().extraFilters());
+                filterString, sourceStreamFilter, timeZone, parameters.filter().extraFilters());
     }
 
     private Set<String> getAffectedIndices(Set<String> streamIds, TimeRange timeRange) {
@@ -198,7 +198,7 @@ public class MoreSearch {
 
 
     public List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timeRange, Set<String> eventStreams,
-                                       String filterString, Set<String> forbiddenSourceStreams,
+                                       String filterString, SourceStreamFilter sourceStreamFilter,
                                        String slicingColumn, Map<String, Object> meta, int maxBuckets) {
         final Set<String> affectedIndices = getAffectedIndices(eventStreams, timeRange);
         if (affectedIndices == null || affectedIndices.isEmpty()) {
@@ -206,18 +206,18 @@ public class MoreSearch {
         }
         // TODO: add extra filters if necessary
         return moreSearchAdapter.aggregateSlicesForColumn(queryString, timeRange, affectedIndices, eventStreams,
-                filterString, forbiddenSourceStreams, Map.of(), slicingColumn, meta, maxBuckets);
+                filterString, sourceStreamFilter, Map.of(), slicingColumn, meta, maxBuckets);
     }
 
     public List<Slice> aggregateSlicesForRangeQuery(String queryString, TimeRange timeRange, Set<String> eventStreams,
-                                                  String filterString, Set<String> forbiddenSourceStreams,
+                                                  String filterString, SourceStreamFilter sourceStreamFilter,
                                                   String slicingColumn, Map<String, Object> meta, List<NumberRange> ranges) {
         final Set<String> affectedIndices = getAffectedIndices(eventStreams, timeRange);
         if (affectedIndices == null || affectedIndices.isEmpty()) {
             return List.of();
         }
         return moreSearchAdapter.aggregateSlicesForRangeQuery(queryString, timeRange, affectedIndices, eventStreams,
-                filterString, forbiddenSourceStreams, Map.of(), slicingColumn, meta, ranges);
+                filterString, sourceStreamFilter, Map.of(), slicingColumn, meta, ranges);
     }
 
     /**

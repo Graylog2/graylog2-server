@@ -29,7 +29,7 @@ export type ColumnSchema = {
   isDerived?: boolean;
 } & Pick<
   Attribute,
-  'id' | 'title' | 'type' | 'sortable' | 'hidden' | 'permissions' | 'sliceable' | 'slice_sort_options'
+  'id' | 'title' | 'type' | 'sortable' | 'hidden' | 'permissions' | 'sliceable' | 'slice_sort_options' | 'slice_sort_default'
 >;
 
 // A column render should have either a `width` and optionally a `minWidth` or only a `staticWidth`.
