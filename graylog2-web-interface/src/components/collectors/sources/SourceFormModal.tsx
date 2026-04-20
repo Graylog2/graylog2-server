@@ -190,7 +190,7 @@ const WindowsEventLogConfigFields = ({
       type="checkbox"
       label="Include default channels"
       // if you update this, also update WindowsEventLogReceiverConfig.java
-      help="Defaults are: Application, System, Security, Setup, Microsoft-Windows-Windows Defender/Operational, Microsoft-Windows-TerminalServices-LocalSessionManager/Operational, Microsoft-Windows-PowerShell/Operational, Windows PowerShell"
+      help="Defaults are: Application, System, Security, Setup, Microsoft-Windows-Windows Defender/Operational, Microsoft-Windows-PowerShell/Operational, Windows PowerShell"
       checked={config.include_default_channels}
       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
         setFieldValue('config', { ...config, include_default_channels: e.target.checked })
