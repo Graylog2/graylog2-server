@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nullable;
 import org.graylog.datanode.filesystem.index.statefile.StateFile;
-import org.opensearch.Version;
+import org.graylog.shaded.opensearch2.org.opensearch.Version;
 
 import java.nio.file.Path;
 import java.time.Instant;

@@ -668,4 +668,9 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
 
         return new WarmIndexInfo(index, initialIndexName, repository, snapshotName);
     }
+
+    @Override
+    public Set<String> getOutdatedIndices(int currentMajorVersion) {
+        throw new UnsupportedOperationException("Not supported in deprecated client.");
+    }
 }

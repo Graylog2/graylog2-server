@@ -16,8 +16,10 @@
  */
 package org.graylog.collectors;
 
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
+import org.graylog.collectors.db.FleetReassignedPayload;
 import org.graylog.collectors.db.MarkerType;
 import org.graylog.collectors.db.TransactionMarker;
 import org.graylog.testing.mongodb.MongoDBExtension;
@@ -43,6 +45,7 @@ class FleetTransactionLogServiceTest {
     private static final NodeId NODE_ID = new SimpleNodeId("test-node-1");
 
     private FleetTransactionLogService service;
+    private MongoCollection<Document> rawCollection;
 
     @BeforeEach
     void setUp(MongoCollections mongoCollections) {
@@ -52,6 +55,7 @@ class FleetTransactionLogServiceTest {
                 Set.of(FleetTransactionLogService.SEQUENCE_TOPIC)
         );
         service = new FleetTransactionLogService(mongoCollections, sequenceService, NODE_ID);
+        rawCollection = mongoCollections.nonEntityCollection(FleetTransactionLogService.COLLECTION_NAME, Document.class);
     }
 
     // --- Write path tests ---
@@ -62,15 +66,14 @@ class FleetTransactionLogServiceTest {
 
         assertThat(seq).isEqualTo(1L);
 
-        var doc = service.getCollection().find(Filters.eq("_id", 1L)).first();
-        assertThat(doc).isNotNull();
-        assertThat(doc.getString(FleetTransactionLogService.FIELD_TARGET)).isEqualTo("fleet");
-        assertThat(doc.getList(FleetTransactionLogService.FIELD_TARGET_ID, String.class)).containsExactly("fleet-1");
-        assertThat(doc.getString(FleetTransactionLogService.FIELD_TYPE)).isEqualTo("CONFIG_CHANGED");
-        assertThat(doc.get(FleetTransactionLogService.FIELD_PAYLOAD)).isNull();
-        assertThat(doc.get(FleetTransactionLogService.FIELD_CREATED_AT)).isNotNull();
-        assertThat(doc.getString(FleetTransactionLogService.FIELD_CREATED_BY)).isEqualTo("test-node-1");
-        assertThat(doc.getString("created_by_user")).isNull();
+        var marker = service.getCollection().find(Filters.eq("_id", 1L)).first();
+        assertThat(marker).isNotNull();
+        assertThat(marker.target()).isEqualTo("fleet");
+        assertThat(marker.targetIds()).containsExactly("fleet-1");
+        assertThat(marker.type()).isEqualTo(MarkerType.CONFIG_CHANGED);
+        assertThat(marker.payload()).isNull();
+        assertThat(marker.createdAt()).isNotNull();
+        assertThat(marker.createdByUser()).isNull();
     }
 
     @Test
@@ -87,18 +90,18 @@ class FleetTransactionLogServiceTest {
 
     @Test
     void appendCollectorMarkerWithPayloadStoresPayload() {
-        var payload = new Document("new_fleet_id", "fleet-B");
+        var payload = new FleetReassignedPayload("fleet-B");
         long seq = service.appendCollectorMarker(Set.of("inst-1"), MarkerType.FLEET_REASSIGNED, payload);
 
         assertThat(seq).isEqualTo(1L);
 
-        var doc = service.getCollection().find(Filters.eq("_id", 1L)).first();
-        assertThat(doc).isNotNull();
-        assertThat(doc.getString(FleetTransactionLogService.FIELD_TARGET)).isEqualTo("collector");
-        assertThat(doc.getList(FleetTransactionLogService.FIELD_TARGET_ID, String.class)).containsExactly("inst-1");
-        assertThat(doc.getString(FleetTransactionLogService.FIELD_TYPE)).isEqualTo("FLEET_REASSIGNED");
-        assertThat(doc.get(FleetTransactionLogService.FIELD_PAYLOAD, Document.class).getString("new_fleet_id"))
-                .isEqualTo("fleet-B");
+        var marker = service.getCollection().find(Filters.eq("_id", 1L)).first();
+        assertThat(marker).isNotNull();
+        assertThat(marker.target()).isEqualTo("collector");
+        assertThat(marker.targetIds()).containsExactly("inst-1");
+        assertThat(marker.type()).isEqualTo(MarkerType.FLEET_REASSIGNED);
+        assertThat(marker.payload()).isInstanceOf(FleetReassignedPayload.class);
+        assertThat(((FleetReassignedPayload) marker.payload()).newFleetId()).isEqualTo("fleet-B");
     }
 
     @Test
@@ -177,18 +180,17 @@ class FleetTransactionLogServiceTest {
 
     @Test
     void getUnprocessedMarkersDeserializesUnknownTypesAsUnknown() {
-        // Insert a marker with an unknown type directly into the collection
-        service.getCollection().insertOne(new Document("_id", 999L)
-                .append(FleetTransactionLogService.FIELD_TARGET, "fleet")
-                .append(FleetTransactionLogService.FIELD_TARGET_ID, List.of("fleet-1"))
-                .append(FleetTransactionLogService.FIELD_TYPE, "FUTURE_MARKER_TYPE")
-                .append(FleetTransactionLogService.FIELD_CREATED_BY, "test"));
+        // Insert a marker with an unknown type directly into the raw collection
+        rawCollection.insertOne(new Document("_id", 999L)
+                .append("target", "fleet")
+                .append("target_id", List.of("fleet-1"))
+                .append("type", "FUTURE_MARKER_TYPE")
+                .append("created_by", "test"));
 
         List<TransactionMarker> markers = service.getUnprocessedMarkers("fleet-1", null, 0L);
 
         assertThat(markers).hasSize(1);
         assertThat(markers.getFirst().type()).isEqualTo(MarkerType.UNKNOWN);
-        assertThat(markers.getFirst().rawType()).isEqualTo("FUTURE_MARKER_TYPE");
     }
 
     // --- Recent markers tests ---
@@ -210,12 +212,12 @@ class FleetTransactionLogServiceTest {
     void getRecentMarkersExcludesUnknownType() {
         service.appendFleetMarker("fleet-1", MarkerType.CONFIG_CHANGED); // seq 1
 
-        // Insert an UNKNOWN marker directly
-        service.getCollection().insertOne(new Document("_id", 999L)
-                .append(FleetTransactionLogService.FIELD_TARGET, "fleet")
-                .append(FleetTransactionLogService.FIELD_TARGET_ID, List.of("fleet-1"))
-                .append(FleetTransactionLogService.FIELD_TYPE, "FUTURE_MARKER_TYPE")
-                .append(FleetTransactionLogService.FIELD_CREATED_BY, "test"));
+        // Insert an UNKNOWN marker directly via raw collection
+        rawCollection.insertOne(new Document("_id", 999L)
+                .append("target", "fleet")
+                .append("target_id", List.of("fleet-1"))
+                .append("type", "FUTURE_MARKER_TYPE")
+                .append("created_by", "test"));
 
         List<TransactionMarker> markers = service.getRecentMarkers(10);
 

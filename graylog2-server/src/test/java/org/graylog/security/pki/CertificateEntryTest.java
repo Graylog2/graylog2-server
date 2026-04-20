@@ -100,6 +100,7 @@ class CertificateEntryTest {
                 "test-id",
                 "SHA256:abc123",
                 "ski",
+                Optional.of("aki"),
                 privateKey,
                 "-----BEGIN CERTIFICATE-----\nTEST\n-----END CERTIFICATE-----",
                 issuerChain,
@@ -112,6 +113,8 @@ class CertificateEntryTest {
 
         assertThat(entry.id()).isEqualTo("test-id");
         assertThat(entry.fingerprint()).isEqualTo("SHA256:abc123");
+        assertThat(entry.subjectKeyIdentifier()).isEqualTo("ski");
+        assertThat(entry.authorityKeyIdentifier()).hasValue("aki");
         assertThat(entry.privateKey()).isEqualTo(privateKey);
         assertThat(entry.certificate()).isEqualTo("-----BEGIN CERTIFICATE-----\nTEST\n-----END CERTIFICATE-----");
         assertThat(entry.issuerChain()).isEqualTo(issuerChain);
@@ -133,6 +136,7 @@ class CertificateEntryTest {
                 null,
                 "SHA256:abc123",
                 "ski",
+                Optional.empty(),
                 privateKey,
                 "-----BEGIN CERTIFICATE-----\nTEST\n-----END CERTIFICATE-----",
                 List.of(),
@@ -168,6 +172,7 @@ class CertificateEntryTest {
                 "test-id",
                 "SHA256:abc123",
                 "ski",
+                Optional.empty(),
                 privateKey,
                 "-----BEGIN CERTIFICATE-----\nTEST\n-----END CERTIFICATE-----",
                 List.of("-----BEGIN CERTIFICATE-----\nISSUER\n-----END CERTIFICATE-----"),
@@ -204,6 +209,7 @@ class CertificateEntryTest {
                 null,
                 "SHA256:abc123",
                 "ski",
+                Optional.of("aki"),
                 privateKey,
                 "-----BEGIN CERTIFICATE-----\nTEST\n-----END CERTIFICATE-----",
                 List.of("-----BEGIN CERTIFICATE-----\nISSUER\n-----END CERTIFICATE-----"),
@@ -220,6 +226,8 @@ class CertificateEntryTest {
         assertThat(retrieved).isPresent();
         assertThat(retrieved.get().id()).isEqualTo(savedId);
         assertThat(retrieved.get().fingerprint()).isEqualTo("SHA256:abc123");
+        assertThat(retrieved.get().subjectKeyIdentifier()).isEqualTo("ski");
+        assertThat(retrieved.get().authorityKeyIdentifier()).hasValue("aki");
         assertThat(retrieved.get().privateKey()).isEqualTo(privateKey);
         assertThat(retrieved.get().certificate()).isEqualTo("-----BEGIN CERTIFICATE-----\nTEST\n-----END CERTIFICATE-----");
         assertThat(retrieved.get().issuerChain()).containsExactly("-----BEGIN CERTIFICATE-----\nISSUER\n-----END CERTIFICATE-----");

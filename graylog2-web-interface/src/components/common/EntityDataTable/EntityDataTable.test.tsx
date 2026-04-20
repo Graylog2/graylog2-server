@@ -62,7 +62,7 @@ describe('<EntityDataTable />', () => {
     status: { status: ATTRIBUTE_STATUS.show },
   } as const;
 
-  const defaultDisplayedColumns = ['title', 'description', 'summary', 'status'];
+  const defaultDisplayedColumns = ['title', 'description', 'status', 'summary'];
 
   const data = [
     {
@@ -161,6 +161,19 @@ describe('<EntityDataTable />', () => {
       />,
     );
 
+    await screen.findByText('Custom actions for Entity title');
+  });
+
+  it('should render row override content and keep row actions', async () => {
+    render(
+      <EntityDataTable<{ id: string; title: string }>
+        {...defaultProps}
+        entityActions={(entity) => `Custom actions for ${entity.title}`}
+        rowOverride={(entity) => `Override for ${entity.title}`}
+      />,
+    );
+
+    await screen.findByText('Override for Entity title');
     await screen.findByText('Custom actions for Entity title');
   });
 
