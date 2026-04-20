@@ -24,7 +24,7 @@ import useResizeObserver from '@react-hook/resize-observer';
 
 import { ButtonToolbar } from 'components/bootstrap';
 import type { EntityBase } from 'components/common/EntityDataTable/types';
-import { ACTIONS_COL_ID, CELL_PADDING } from 'components/common/EntityDataTable/Constants';
+import { ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
 import { actionsHeaderWidthVar } from 'components/common/EntityDataTable/CSSVariables';
 
 const AlignRight = styled.div`
@@ -33,14 +33,10 @@ const AlignRight = styled.div`
   height: 100%;
 `;
 
-const Actions = styled.div<{ $isOddRow?: boolean; $parentBgColor?: string }>(
-  ({ $isOddRow = false, $parentBgColor = undefined, theme }) => css`
+const Actions = styled.div(
+  () => css`
     display: flex;
     justify-content: flex-end;
-    padding: ${CELL_PADDING}px;
-    background-color: ${$isOddRow
-      ? theme.utils.flattenColorStack([theme.colors.global.contentBackground, theme.colors.table.row.backgroundStriped])
-      : ($parentBgColor ?? theme.colors.global.contentBackground)};
     height: 100%;
     align-items: flex-start;
     width: var(${actionsHeaderWidthVar});
@@ -51,12 +47,10 @@ const ActionCell = <Entity extends EntityBase>({
   row,
   entityActions,
   onWidthChange,
-  parentBgColor,
 }: {
   row: Row<Entity>;
   entityActions: (entity: Entity) => React.ReactNode | undefined;
   onWidthChange: (rowId: string, width: number) => void;
-  parentBgColor: string | undefined;
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -70,49 +64,39 @@ const ActionCell = <Entity extends EntityBase>({
 
   return (
     <AlignRight>
-      <Actions $isOddRow={row.index % 2 !== 0} $parentBgColor={parentBgColor}>
+      <Actions>
         <ButtonToolbar ref={ref}>{entityActions(row.original)}</ButtonToolbar>
       </Actions>
     </AlignRight>
   );
 };
 
+const Header = () => (
+  <AlignRight>
+    <Actions />
+  </AlignRight>
+);
+
 const useActionsColumnDefinition = <Entity extends EntityBase>({
   colWidth,
   entityActions,
   hasRowActions,
   onWidthChange,
-  parentBgColor,
 }: {
   colWidth: number;
   entityActions: (entity: Entity) => React.ReactNode | undefined;
   hasRowActions: boolean;
   minWidth: number;
   onWidthChange: (colId: string, width: number) => void;
-  parentBgColor: string | undefined;
 }) => {
   const columnHelper = createColumnHelper<Entity>();
 
   const cell = useCallback(
     ({ row }: { row: Row<Entity> }) =>
       entityActions ? (
-        <ActionCell<Entity>
-          row={row}
-          entityActions={entityActions}
-          onWidthChange={onWidthChange}
-          parentBgColor={parentBgColor}
-        />
+        <ActionCell<Entity> row={row} entityActions={entityActions} onWidthChange={onWidthChange} />
       ) : null,
-    [entityActions, onWidthChange, parentBgColor],
-  );
-
-  const header = useCallback(
-    () => (
-      <AlignRight>
-        <Actions $parentBgColor={parentBgColor} />
-      </AlignRight>
-    ),
-    [parentBgColor],
+    [entityActions, onWidthChange],
   );
 
   return useMemo(
@@ -124,13 +108,10 @@ const useActionsColumnDefinition = <Entity extends EntityBase>({
         enablePinning: true,
         enableResizing: false,
         // The actions/tail column is always present. We only hide its content when there are no row actions.
-        header: hasRowActions ? header : undefined,
+        header: hasRowActions ? Header : undefined,
         cell: hasRowActions ? cell : undefined,
-        meta: {
-          hideCellPadding: true,
-        },
       }),
-    [colWidth, cell, columnHelper, hasRowActions, header],
+    [colWidth, cell, columnHelper, hasRowActions],
   );
 };
 export default useActionsColumnDefinition;

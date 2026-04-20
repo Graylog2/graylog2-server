@@ -74,8 +74,10 @@ const Td = styled.td<{
   $colId: string;
   $hidePadding: boolean;
   $pinningPosition: ColumnPinningPosition;
+  $isOddRow: boolean;
+  $parentBgColor?: string;
 }>(
-  ({ $colId, $hidePadding, $pinningPosition }) => css`
+  ({ $colId, $hidePadding, $pinningPosition, $parentBgColor = undefined, $isOddRow, theme }) => css`
     word-break: break-word;
     opacity: var(${columnOpacityVar($colId)}, 1);
     transform: var(${columnTransformVar($colId)}, none);
@@ -85,6 +87,12 @@ const Td = styled.td<{
       ? css`
           position: sticky;
           ${$pinningPosition === 'left' ? 'left' : 'right'}: 0;
+          background-color: ${$isOddRow
+            ? theme.utils.flattenColorStack([
+                $parentBgColor ?? theme.colors.global.contentBackground,
+                theme.colors.table.row.backgroundStriped,
+              ])
+            : ($parentBgColor ?? theme.colors.global.contentBackground)};
           ${ScrollShadow('left')}
           &::before {
             display: var(${displayScrollRightIndicatorVar}, none);
@@ -106,6 +114,7 @@ type Props<Entity extends EntityBase> = {
   rowOverride?: RowOverride<Entity>;
   headerGroups: Array<HeaderGroup<Entity>>;
   rows: Array<Row<Entity>>;
+  parentBgColor?: string;
 };
 
 const Table = <Entity extends EntityBase>({
@@ -113,6 +122,7 @@ const Table = <Entity extends EntityBase>({
   rowOverride = undefined,
   headerGroups,
   rows,
+  parentBgColor = undefined,
 }: Props<Entity>) => {
   const { expandedSections } = useContext(ExpandedEntitiesSectionsContext);
 
@@ -120,19 +130,22 @@ const Table = <Entity extends EntityBase>({
 
   return (
     <StyledTable striped condensed hover>
-      <TableHead headerGroups={headerGroups} />
+      <TableHead headerGroups={headerGroups} parentBgColor={parentBgColor} />
       {rows.map((row) => {
         const visibleCells = row.getVisibleCells();
         const visibleCellCount = visibleCells.length;
         const renderCell = (cell) => {
           const columnMeta = cell.column.columnDef.meta as ColumnMetaContext<Entity>;
+          const isOddRow = row.index % 2 !== 0;
 
           return (
             <Td
               key={cell.id}
+              $isOddRow={isOddRow}
               $colId={cell.column.id}
               $pinningPosition={cell.column.getIsPinned()}
-              $hidePadding={columnMeta?.hideCellPadding}>
+              $hidePadding={columnMeta?.hideCellPadding}
+              $parentBgColor={parentBgColor}>
               {flexRender(cell.column.columnDef.cell, cell.getContext())}
             </Td>
           );

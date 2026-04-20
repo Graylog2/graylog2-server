@@ -282,7 +282,6 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     onActionsWidthChange: handleActionsWidthChange,
     onChangeSlicing,
     onHeaderSectionResize: handleHeaderSectionResize,
-    parentBgColor,
     appSection,
   });
 
@@ -363,6 +362,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                         headerGroups={headerGroups}
                         rowOverride={rowOverride}
                         rows={table.getRowModel().rows}
+                        parentBgColor={parentBgColor}
                       />
                       <ScrollRightIndicator ref={scrolledToRightIndicator} />
                     </InnerContainer>
