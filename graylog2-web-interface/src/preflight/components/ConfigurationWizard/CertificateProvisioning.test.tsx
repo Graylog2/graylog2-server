@@ -51,7 +51,7 @@ describe('CertificateProvisioning', () => {
   it('should provision certificates', async () => {
     renderPreflight(<CertificateProvisioning onSkipProvisioning={() => {}} />);
 
-    userEvent.click(await screen.findByRole('button', { name: /provision certificate and continue/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /provision certificate and continue/i }));
 
     await waitFor(() =>
       expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/generate'), undefined, false),
@@ -71,7 +71,7 @@ describe('CertificateProvisioning', () => {
       </DefaultQueryClientProvider>,
     );
 
-    userEvent.click(await screen.findByRole('button', { name: /provision certificate and continue/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /provision certificate and continue/i }));
 
     await waitFor(() =>
       expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/generate'), undefined, false),
@@ -111,7 +111,7 @@ describe('CertificateProvisioning', () => {
 
     renderPreflight(<CertificateProvisioning onSkipProvisioning={onSkipProvisioning} />);
 
-    userEvent.click(await screen.findByRole('button', { name: /skip provisioning/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /skip provisioning/i }));
 
     expect(onSkipProvisioning).toHaveBeenCalledTimes(1);
   });

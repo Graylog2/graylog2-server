@@ -48,6 +48,21 @@ public class SearchTypeErrorParser {
         return new SearchTypeError(query, searchTypeId, ex);
     }
 
+    public static Integer getResultWindowLimitFromError(final Throwable ex) {
+        Throwable possibleResultWindowException = ex;
+        int attempt = 0;
+        while (possibleResultWindowException != null && attempt < MAX_DEPTH_OF_EXCEPTION_CAUSE_ANALYSIS) {
+            final Integer resultWindowLimit = parseResultLimit(possibleResultWindowException);
+            if (resultWindowLimit != null) {
+                return resultWindowLimit;
+            }
+            possibleResultWindowException = possibleResultWindowException.getCause();
+            attempt++;
+        }
+
+        return null;
+    }
+
     private static boolean isSearchTypeAbortedError(ElasticsearchException ex) {
         return ex != null &&
                 (
@@ -61,7 +76,7 @@ public class SearchTypeErrorParser {
         return parseResultLimit(throwable.getMessage());
     }
 
-    private static Integer parseResultLimit(String description) {
+    public static Integer parseResultLimit(String description) {
         if (description.toLowerCase(Locale.US).contains("result window is too large")) {
             final Matcher matcher = Pattern.compile("[0-9]+").matcher(description);
             if (matcher.find()) {

@@ -64,6 +64,7 @@ public class V202406260800_MigrateCertificateAuthority extends Migration {
         }
         readExistingKeystore().ifPresent(keystore -> clusterConfigService.write(new EncryptedCaKeystore(keystore)));
         mongoConnection.getMongoDatabase().getCollection(LEGACY_COLLECTION_NAME).drop();
+        clusterConfigService.write(new V202406260800_MigrateCertificateAuthority.MigrationCompleted());
     }
 
     public Optional<EncryptedValue> readExistingKeystore() {

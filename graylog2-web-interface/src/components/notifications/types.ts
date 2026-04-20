@@ -16,7 +16,6 @@
  */
 import type { SystemNotifications } from '@graylog/server-api';
 
-type Depromise<T> = T extends Promise<infer R> ? R : never;
-export type NotificationType = Depromise<
+export type NotificationType = Awaited<
   ReturnType<(typeof SystemNotifications)['listNotifications']>
 >['notifications'][number];

@@ -16,70 +16,82 @@
  */
 package org.graylog2.events;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
-import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class ClusterEventCleanupPeriodicalTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-    private static final DateTime TIME = new DateTime(2015, 4, 1, 0, 0, DateTimeZone.UTC);
+    private static final Instant TIME = Instant.parse("2015-04-01T00:00:00Z");
+    private static final Duration maxEventAge = Duration.ofDays(1);
+    private static final Clock FIXED_CLOCK = Clock.fixed(TIME, ZoneOffset.UTC);
 
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-
-    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     private MongoConnection mongoConnection;
     private ClusterEventCleanupPeriodical clusterEventCleanupPeriodical;
 
-    @Before
-    public void setUpService() throws Exception {
-        DateTimeUtils.setCurrentMillisFixed(TIME.getMillis());
-
-        this.mongoConnection = mongodb.mongoConnection();
-
-        this.clusterEventCleanupPeriodical = new ClusterEventCleanupPeriodical(new MongoCollections(
-                new MongoJackObjectMapperProvider(objectMapper),
-                mongodb.mongoConnection()));
+    @BeforeEach
+    public void setUpService(MongoCollections mongoCollections) {
+        this.mongoConnection = mongoCollections.mongoConnection();
+        this.clusterEventCleanupPeriodical = new ClusterEventCleanupPeriodical(mongoCollections, maxEventAge, FIXED_CLOCK);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
-        DateTimeUtils.setCurrentMillisSystem();
         mongoConnection.getMongoDatabase().drop();
     }
 
     @Test
-    public void testDoRun() throws Exception {
+    public void testDoRun() {
+        final long maxEventAgeMillis = maxEventAge.toMillis();
+        final long timeMillis = TIME.toEpochMilli();
         final DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
         assertThat(insertEvent(collection, 0L)).isTrue();
-        assertThat(insertEvent(collection, TIME.getMillis())).isTrue();
-        assertThat(insertEvent(collection, TIME.minus(ClusterEventCleanupPeriodical.DEFAULT_MAX_EVENT_AGE).getMillis())).isTrue();
-        assertThat(insertEvent(collection, TIME.minus(2 * ClusterEventCleanupPeriodical.DEFAULT_MAX_EVENT_AGE).getMillis())).isTrue();
+        assertThat(insertEvent(collection, timeMillis)).isTrue();
+        assertThat(insertEvent(collection, timeMillis - maxEventAgeMillis)).isTrue();
+        assertThat(insertEvent(collection, timeMillis - 2 * maxEventAgeMillis)).isTrue();
         assertThat(collection.count()).isEqualTo(4L);
 
         clusterEventCleanupPeriodical.run();
 
         assertThat(collection.count()).isEqualTo(2L);
+    }
+
+    @Test
+    void getPeriodSeconds_defaultAge_returns43200(MongoCollections mongoCollections) {
+        final var periodical = new ClusterEventCleanupPeriodical(mongoCollections, Duration.ofHours(12));
+        assertThat(periodical.getPeriodSeconds()).isEqualTo(43200);
+    }
+
+    @Test
+    void getPeriodSeconds_shortAge_clampsToMinimum(MongoCollections mongoCollections) {
+        final var periodical = new ClusterEventCleanupPeriodical(mongoCollections, Duration.ofSeconds(10));
+        assertThat(periodical.getPeriodSeconds()).isEqualTo(3600);
+    }
+
+    @Test
+    void getPeriodSeconds_customAge_matchesMaxEventAge(MongoCollections mongoCollections) {
+        final var periodical = new ClusterEventCleanupPeriodical(mongoCollections, Duration.ofHours(2));
+        assertThat(periodical.getPeriodSeconds()).isEqualTo(7200);
     }
 
     private boolean insertEvent(DBCollection collection, long timestamp) {

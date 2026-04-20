@@ -68,11 +68,8 @@ const bindSearchParamsFromQuery: ViewHook = async ({ query, view, executionState
     return [view, executionState];
   }
 
-  const newSearch = view.search.toBuilder().newId().queries([newQuery]).build();
-
-  const savedSearch = await createSearch(newSearch);
-
-  const newView = view.toBuilder().search(savedSearch).build();
+  const newSearch = await createSearch(view.search.toBuilder().newId().queries([newQuery]).build());
+  const newView = view.toBuilder().search(newSearch).build();
 
   return [newView, executionState];
 };

@@ -40,6 +40,8 @@ import java.security.cert.X509Certificate;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
@@ -58,6 +60,9 @@ public class CsrSigner {
             new GeneralName(iPAddress, "127.0.0.1"),
             new GeneralName(iPAddress, "0:0:0:0:0:0:0:1")
     );
+    public static final Instant Y10K = LocalDate.of(9999, 1, 1) // Let's not try 31.12, who wants to deal with timezones and DST in year 9999?!
+            .atStartOfDay(ZoneOffset.UTC)
+            .toInstant();
 
     private final Clock clock;
 
@@ -83,7 +88,7 @@ public class CsrSigner {
     public X509Certificate sign(PrivateKey caPrivateKey, X509Certificate caCertificate, PKCS10CertificationRequest csr, @NotNull Duration certificateLifetime) throws Exception {
 
         final boolean keysMatching = KeystoreUtils.matchingKeys(caPrivateKey, caCertificate.getPublicKey());
-        if(!keysMatching) {
+        if (!keysMatching) {
             throw new IllegalArgumentException("Provided CA private key doesn't correspond to provided CA certificate!");
         }
 
@@ -109,7 +114,7 @@ public class CsrSigner {
         var builder = new X509v3CertificateBuilder(
                 issuerName,
                 serialNumber,
-                Date.from(validFrom), Date.from(validUntil),
+                Date.from(validFrom), fixY10kProblem(validUntil),
                 csr.getSubject(), csr.getSubjectPublicKeyInfo());
 
         var altNames = Optional.ofNullable(csr.getAttributes(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest))
@@ -131,6 +136,13 @@ public class CsrSigner {
         ContentSigner signer = new JcaContentSignerBuilder(SIGNING_ALGORITHM).build(caPrivateKey);
         X509CertificateHolder certHolder = builder.build(signer);
         return new JcaX509CertificateConverter().getCertificate(certHolder);
+    }
+
+    private Date fixY10kProblem(Instant validUntil) {
+        if (validUntil.isAfter(Y10K)) {
+            return Date.from(Y10K);
+        }
+        return Date.from(validUntil);
     }
 
     private Stream<? extends GeneralName> resolveDNSName(GeneralName name) {

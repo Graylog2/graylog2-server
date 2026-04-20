@@ -47,8 +47,7 @@ public class DatanodeSearchableSnapshotsIT {
     @BeforeEach
     void setUp() {
         network = Network.newNetwork();
-        mongoDB = MongoDBTestService.create(network);
-        mongoDB.start();
+        mongoDB = MongoDBTestService.createStarted(network);
         s3Container = new S3MinioContainer(network);
         s3Container.start();
 

@@ -31,6 +31,17 @@ public interface JobDefinitionConfig {
     @JsonProperty(TYPE_FIELD)
     String type();
 
+    /**
+     * Returns the job factory type for this job definition config. The return value is used to look up the correct
+     * job factory. This is usually the same as the config type, only for special job definition configs this might
+     * differ. (e.g., system jobs)
+     *
+     * @return the job factory type
+     */
+    default String jobFactoryType() {
+        return type();
+    }
+
     interface Builder<SELF> {
         @JsonProperty(TYPE_FIELD)
         SELF type(String type);

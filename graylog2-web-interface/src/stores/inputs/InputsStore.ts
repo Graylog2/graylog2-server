@@ -20,14 +20,13 @@ import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import { singletonStore, singletonActions } from 'logic/singleton';
-import { InputStaticFieldsStore } from 'stores/inputs/InputStaticFieldsStore';
 import type { Input, ConfiguredInput } from 'components/messageloaders/Types';
 
 type InputsActionsType = {
   list: () => Promise<{ inputs: Array<Input>; total: number }>;
   get: (id: string) => Promise<Input>;
   getOptional: (id: string, showError: boolean) => Promise<Input>;
-  create: (input: ConfiguredInput) => Promise<void>;
+  create: (input: ConfiguredInput) => Promise<{ id: string }>;
   delete: (input: Input) => Promise<void>;
   update: (id: string, input: ConfiguredInput) => Promise<void>;
 };
@@ -56,7 +55,6 @@ export const InputsStore = singletonStore('core.Inputs', () =>
 
     init() {
       this.trigger(this._state());
-      this.listenTo(InputStaticFieldsStore, this.list);
     },
 
     getInitialState() {
@@ -136,7 +134,6 @@ export const InputsStore = singletonStore('core.Inputs', () =>
     delete(input) {
       const inputId = input.id;
       const inputTitle = input.title;
-
       const promise = fetch('DELETE', URLUtils.qualifyUrl(`${this.sourceUrl}/${inputId}`));
 
       promise.then(

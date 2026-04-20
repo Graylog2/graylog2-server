@@ -21,7 +21,6 @@ import styled, { css } from 'styled-components';
 import { Icon } from 'components/common';
 import useIsDirty from 'views/hooks/useIsDirty';
 import { Button } from 'components/bootstrap';
-
 const StyledIcon = styled(Icon)<{ $isDirty: boolean }>(
   ({ theme, $isDirty }) => css`
     color: ${$isDirty ? theme.colors.variant.dark.warning : 'default'};

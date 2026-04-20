@@ -58,9 +58,17 @@ const OverlayDropdownButton = ({
     setShowDropdown((cur) => !cur);
   };
 
+  const onClose = () => {
+    if (typeof onToggleProp === 'function') {
+      onToggleProp(!show);
+    }
+    setShowDropdown(false);
+  };
+
   return (
     <OverlayDropdown
       show={show}
+      onClose={onClose}
       closeOnSelect={closeOnSelect}
       dropdownZIndex={dropdownZIndex}
       alwaysShowCaret={alwaysShowCaret}

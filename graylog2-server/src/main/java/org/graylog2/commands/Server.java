@@ -16,6 +16,7 @@
  */
 package org.graylog2.commands;
 
+import com.github.joschi.jadconfig.documentation.DocumentedBeansService;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.google.common.collect.ImmutableList;
@@ -28,6 +29,7 @@ import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
+import org.graylog.collectors.CollectorsModule;
 import org.graylog.enterprise.EnterpriseModule;
 import org.graylog.events.EventsModule;
 import org.graylog.events.processor.EventDefinitionConfiguration;
@@ -52,6 +54,7 @@ import org.graylog.scheduler.JobSchedulerConfiguration;
 import org.graylog.scheduler.JobSchedulerModule;
 import org.graylog.security.SecurityModule;
 import org.graylog.security.certutil.CaModule;
+import org.graylog.security.pki.PkiModule;
 import org.graylog.tracing.TracingModule;
 import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertConditionBindings;
@@ -82,6 +85,7 @@ import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.configuration.VersionCheckConfiguration;
 import org.graylog2.contentpacks.ContentPacksModule;
+import org.graylog2.database.MongoSequenceModule;
 import org.graylog2.database.entities.ScopedEntitiesModule;
 import org.graylog2.datatiering.DataTieringModule;
 import org.graylog2.decorators.DecoratorBindings;
@@ -102,6 +106,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.quickjump.QuickJumpModule;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.resources.system.ClusterConfigValidatorModule;
+import org.graylog2.shared.ServerVersion;
 import org.graylog2.shared.UI;
 import org.graylog2.shared.bindings.MessageInputBindings;
 import org.graylog2.shared.bindings.RestApiBindings;
@@ -130,7 +135,7 @@ import static org.graylog2.plugin.ServerStatus.Capability.MASTER;
 import static org.graylog2.plugin.ServerStatus.Capability.SERVER;
 
 @Command(name = "server", description = "Start the Graylog server")
-public class Server extends ServerBootstrap {
+public class Server extends ServerBootstrap implements DocumentedBeansService {
     protected static final Configuration configuration = new Configuration();
     private static final Logger LOG = LoggerFactory.getLogger(Server.class);
     private final HttpConfiguration httpConfiguration = new HttpConfiguration();
@@ -165,6 +170,11 @@ public class Server extends ServerBootstrap {
 
     public boolean isLocal() {
         return local;
+    }
+
+    @Override
+    public List<Object> getDocumentedConfigurationBeans() {
+        return getCommandConfigurationBeans();
     }
 
     @Override
@@ -215,10 +225,13 @@ public class Server extends ServerBootstrap {
                 new DataTieringModule(),
                 new DatanodeMigrationBindings(),
                 new CaModule(),
+                new PkiModule(featureFlags),
                 new TelemetryModule(),
                 new DataNodeModule(),
                 new McpServerModule(),
-                new QuickJumpModule(featureFlags)
+                new QuickJumpModule(featureFlags),
+                new MongoSequenceModule(),
+                new CollectorsModule(featureFlags)
         );
 
         modules.add(new FieldTypeManagementModule());
@@ -262,6 +275,9 @@ public class Server extends ServerBootstrap {
                         .setLeader(leaderElectionService.isLeader())
                         .setTransportAddress(httpConfiguration.getHttpPublishUri().toString())
                         .setHostname(Tools.getLocalCanonicalHostname())
+                        .setProcessing(serverStatus.isProcessing())
+                        .setLifecycle(serverStatus.getLifecycle())
+                        .setVersion(ServerVersion.VERSION.toString())
                         .build());
         serverStatus.setLocalMode(isLocal());
         if (leaderElectionService.isLeader() && !nodeService.isOnlyLeader(serverStatus.getNodeId())) {

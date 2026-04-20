@@ -57,6 +57,7 @@ public abstract class EventReplayInfo {
 
     public static Builder builder() {
         return new AutoValue_EventReplayInfo.Builder()
+                .streams(Collections.emptySet())
                 .filters(Collections.emptyList());
     }
 

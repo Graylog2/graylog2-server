@@ -15,19 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
 
+import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
 import { DataAdaptersOverview } from 'components/lookup-tables';
 import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
-import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
-import LUTModals from 'components/lookup-tables/LUTModals';
 
 function LUTDataAdaptersPage() {
-  const { setModal } = useModalContext();
-
-  const showCreateModal = () => {
-    setModal('DATA-ADAPTER-CREATE');
-  };
+  const navigate = useNavigate();
 
   return (
     <LUTPageLayout
@@ -35,12 +31,11 @@ function LUTDataAdaptersPage() {
       pageTitle="Data Adapters for Lookup Tables"
       pageDescription="Data adapters provide the actual values for lookup tables."
       actions={
-        <Button bsStyle="primary" onClick={showCreateModal}>
+        <Button bsStyle="primary" onClick={() => navigate(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE)}>
           Create data adapter
         </Button>
       }>
       <DataAdaptersOverview />
-      <LUTModals />
     </LUTPageLayout>
   );
 }

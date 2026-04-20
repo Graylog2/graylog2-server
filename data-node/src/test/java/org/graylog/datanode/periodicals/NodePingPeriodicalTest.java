@@ -32,6 +32,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @ExtendWith(MongoDBExtension.class)
 class NodePingPeriodicalTest {
@@ -58,7 +59,7 @@ class NodePingPeriodicalTest {
                 nodeService,
                 nodeID,
                 new Configuration(),
-                () -> uri,
+                () -> Optional.of(uri),
                 () -> cluster,
                 () -> datanodeRestApi,
                 () -> OpensearchState.AVAILABLE,

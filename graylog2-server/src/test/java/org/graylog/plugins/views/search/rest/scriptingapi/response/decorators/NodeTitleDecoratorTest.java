@@ -22,6 +22,7 @@ import org.graylog.plugins.views.search.rest.scriptingapi.request.RequestedField
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.TestNodeService;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +35,7 @@ class NodeTitleDecoratorTest {
     @BeforeEach
     void setUp() {
         final NodeService nodeService = new TestNodeService();
-        nodeService.registerServer("5ca1ab1e-0000-4000-a000-000000000000", false, URI.create("http://my-host.example.com"), "my-host.example.com");
+        nodeService.registerServer("5ca1ab1e-0000-4000-a000-000000000000", false, URI.create("http://my-host.example.com"), "my-host.example.com", true, Lifecycle.RUNNING);
 
         decorator = new NodeTitleDecorator(nodeService);
     }

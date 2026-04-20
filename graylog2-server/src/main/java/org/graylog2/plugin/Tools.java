@@ -75,10 +75,12 @@ public final class Tools {
 
     private static final String ES_DATE_FORMAT_JODA = "yyyy-MM-dd HH:mm:ss.SSS";
     private static final String ES_DATE_FORMAT_NO_MS = "yyyy-MM-dd HH:mm:ss";
+    private static final String ISO_DATE_FORMAT_NO_MS = "yyyy-MM-dd'T'HH:mm:ssZZ";
 
     public static final DateTimeFormatter ES_DATE_FORMAT_FORMATTER = DateTimeFormat.forPattern(Tools.ES_DATE_FORMAT_JODA).withZoneUTC();
     public static final DateTimeFormatter ES_DATE_FORMAT_NO_MS_FORMATTER = DateTimeFormat.forPattern(Tools.ES_DATE_FORMAT_NO_MS).withZoneUTC();
     public static final DateTimeFormatter ISO_DATE_FORMAT_FORMATTER = ISODateTimeFormat.dateTime().withZoneUTC();
+    public static final DateTimeFormatter ISO_DATE_FORMAT_NO_MS_FORMATTER = DateTimeFormat.forPattern(ISO_DATE_FORMAT_NO_MS).withZoneUTC();
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final int AVAILABLE_PROCESSORS = Runtime.getRuntime().availableProcessors();
 
@@ -382,6 +384,9 @@ public final class Tools {
         return ISODateTimeFormat.dateTime().print(time);
     }
 
+    public static String getISO8601StringWithoutMillis(DateTime time) {
+        return ISO_DATE_FORMAT_NO_MS_FORMATTER.print(time);
+    }
 
     public static ZonedDateTime jodaToJavaUTC(DateTime dateTime) {
         return ZonedDateTime.ofInstant(Instant.ofEpochMilli(dateTime.getMillis()), ZoneId.of("UTC"));
@@ -673,5 +678,43 @@ public final class Tools {
 
     public static int availableProcessors() {
         return AVAILABLE_PROCESSORS;
+    }
+
+    /**
+     * Calculate percentage from total and value, returning a double for precision.
+     *
+     * @param total The total number of items
+     * @param value The value to calculate percentage for
+     * @return A double between 0.0 and 100.0 representing the percentage.
+     * Returns 0.0 if total is 0 or negative, or if value is 0 or negative.
+     * Returns 100.0 if value is greater than or equal to total.
+     */
+    public static double percentageOf(long total, long value) {
+        // Handle invalid inputs
+        if (total <= 0 || value <= 0) {
+            return 0.0;
+        }
+
+        // Cap at 100% if value exceeds total
+        if (value >= total) {
+            return 100.0;
+        }
+
+        // Calculate percentage with full precision
+        return (double) value * 100.0 / (double) total;
+    }
+
+    /**
+     * Calculate percentage from total and value, returning rounded integer.
+     * Uses Math.round() for banker's rounding instead of floor.
+     *
+     * @param total The total number of items
+     * @param value The value to calculate percentage for
+     * @return An integer between 0 and 100 representing the percentage.
+     * Returns 0 if total is 0 or negative, or if value is 0 or negative.
+     * Returns 100 if value is greater than or equal to total.
+     */
+    public static int percentageOfRounded(long total, long value) {
+        return Math.toIntExact(Math.round(percentageOf(total, value)));
     }
 }

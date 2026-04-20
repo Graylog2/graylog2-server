@@ -18,9 +18,9 @@ package org.graylog2.rest.resources.cluster;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.bson.types.ObjectId;
 import org.graylog.scheduler.rest.JobResourceHandlerService;
@@ -63,7 +63,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
 @RequiresAuthentication
-@Api(value = "Cluster/Jobs", description = "Cluster-wide System Jobs")
+@Tag(name = "Cluster/Jobs", description = "Cluster-wide System Jobs")
 @Path("/cluster/jobs")
 public class ClusterSystemJobResource extends ProxiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterSystemJobResource.class);
@@ -85,7 +85,7 @@ public class ClusterSystemJobResource extends ProxiedResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "List currently running jobs")
+    @Operation(summary = "List currently running jobs")
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Optional<Map<String, List<SystemJobSummary>>>> list(@Context UserContext userContext) throws IOException, NodeNotFoundException {
         final Map<String, Optional<Map<String, List<SystemJobSummary>>>> forAllNodes = stripCallResult(requestOnAllNodes(RemoteSystemJobResource.class, RemoteSystemJobResource::list));
@@ -104,10 +104,10 @@ public class ClusterSystemJobResource extends ProxiedResource {
     @GET
     @Path("{jobId}")
     @Timed
-    @ApiOperation(value = "Get job with the given ID")
+    @Operation(summary = "Get job with the given ID")
     @Produces(MediaType.APPLICATION_JSON)
     public SystemJobSummary getJob(@Context UserContext userContext,
-                                   @ApiParam(name = "jobId", required = true) @PathParam("jobId") String jobId) throws IOException {
+                                   @Parameter(name = "jobId", required = true) @PathParam("jobId") String jobId) throws IOException {
         for (Map.Entry<String, Node> entry : nodeService.allActive().entrySet()) {
             final RemoteSystemJobResource remoteSystemJobResource = remoteInterfaceProvider.get(entry.getValue(), getAuthenticationToken(), RemoteSystemJobResource.class);
             try {
@@ -134,11 +134,11 @@ public class ClusterSystemJobResource extends ProxiedResource {
     @DELETE
     @Path("{jobId}")
     @Timed
-    @ApiOperation(value = "Cancel job with the given ID")
+    @Operation(summary = "Cancel job with the given ID")
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.SYSTEM_JOB_STOP)
     public SystemJobSummary cancelJob(@Context UserContext userContext,
-                                      @ApiParam(name = "jobId", required = true) @PathParam("jobId") @NotEmpty String jobId) throws IOException {
+                                      @Parameter(name = "jobId", required = true) @PathParam("jobId") @NotEmpty String jobId) throws IOException {
         final Optional<Response<SystemJobSummary>> summaryResponse = nodeService.allActive().entrySet().stream()
                 .map(entry -> {
                     final RemoteSystemJobResource resource = remoteInterfaceProvider.get(entry.getValue(),

@@ -34,7 +34,9 @@ import org.graylog2.periodical.IndexRetentionThread;
 import org.graylog2.periodical.IndexRotationThread;
 import org.graylog2.periodical.IndexerClusterCheckerThread;
 import org.graylog2.periodical.LeaderPresenceCheckPeriodical;
+import org.graylog2.periodical.NodeMetricPeriodical;
 import org.graylog2.periodical.NodePingThread;
+import org.graylog2.periodical.StaleInputRuntimeStateCleanup;
 import org.graylog2.periodical.OrphanedTokenCleaner;
 import org.graylog2.periodical.SearchVersionCheckPeriodical;
 import org.graylog2.periodical.ThrottleStateUpdaterThread;
@@ -72,5 +74,7 @@ public class PeriodicalBindings extends AbstractModule {
         periodicalBinder.addBinding().to(InputDiagnosisMetricsPeriodical.class);
         periodicalBinder.addBinding().to(ExpiredTokenCleaner.class);
         periodicalBinder.addBinding().to(OrphanedTokenCleaner.class);
+        periodicalBinder.addBinding().to(NodeMetricPeriodical.class);
+        periodicalBinder.addBinding().to(StaleInputRuntimeStateCleanup.class);
     }
 }

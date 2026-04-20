@@ -44,15 +44,6 @@ type State = {
 };
 
 class JSONExtractorConfiguration extends React.Component<Props, State> {
-  private DEFAULT_CONFIGURATION = {
-    list_separator: ', ',
-    key_separator: '_',
-    kv_separator: '=',
-    key_prefix: '',
-    replace_key_whitespace: false,
-    key_whitespace_replacement: '_',
-  };
-
   static defaultProps = {
     exampleMessage: undefined,
   };
@@ -74,6 +65,15 @@ class JSONExtractorConfiguration extends React.Component<Props, State> {
     this.setState({ configuration: this._getEffectiveConfiguration(nextProps.configuration) });
   }
 
+  private DEFAULT_CONFIGURATION = {
+    list_separator: ', ',
+    key_separator: '_',
+    kv_separator: '=',
+    key_prefix: '',
+    replace_key_whitespace: false,
+    key_whitespace_replacement: '_',
+  };
+
   _onTryClick = () => {
     this.setState({ trying: true });
 
@@ -93,7 +93,7 @@ class JSONExtractorConfiguration extends React.Component<Props, State> {
       const matches = [];
 
       for (const match in result.matches) {
-        if (result.matches.hasOwnProperty(match)) {
+        if (match in result.matches) {
           matches.push(<dt key={`${match}-name`}>{match}</dt>);
           matches.push(
             <dd key={`${match}-value`}>
@@ -112,7 +112,7 @@ class JSONExtractorConfiguration extends React.Component<Props, State> {
   };
 
   _getEffectiveConfiguration(configuration) {
-    return ExtractorUtils.getEffectiveConfiguration(this.DEFAULT_CONFIGURATION, configuration);
+    return ExtractorUtils.getEffectiveConfiguration(this.DEFAULT_CONFIGURATION, configuration) as Configuration;
   }
 
   _onChange(key) {

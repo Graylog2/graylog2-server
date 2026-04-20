@@ -17,8 +17,6 @@
 import React from 'react';
 import camelCase from 'lodash/camelCase';
 import cloneDeep from 'lodash/cloneDeep';
-import defaultTo from 'lodash/defaultTo';
-import max from 'lodash/max';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
 
@@ -54,7 +52,7 @@ class NotificationSettingsForm extends React.Component<
 
     const gracePeriod = extractDurationAndUnit(gracePeriodMs, TIME_UNITS);
     const defaultBacklogSize = props.defaults.default_backlog_size;
-    const effectiveBacklogSize = defaultTo(backlogSize, defaultBacklogSize);
+    const effectiveBacklogSize = backlogSize ?? defaultBacklogSize;
 
     this.state = {
       gracePeriodDuration: gracePeriod.duration,
@@ -73,7 +71,7 @@ class NotificationSettingsForm extends React.Component<
   };
 
   handleGracePeriodChange = (nextValue, nextUnit, enabled) => {
-    const durationInMs = enabled ? moment.duration(max([nextValue, 0]), nextUnit).asMilliseconds() : 0;
+    const durationInMs = enabled ? moment.duration(Math.max(nextValue, 0), nextUnit).asMilliseconds() : 0;
 
     this.propagateChanges('grace_period_ms', durationInMs);
     this.setState({ gracePeriodDuration: nextValue, gracePeriodUnit: nextUnit });
@@ -84,7 +82,7 @@ class NotificationSettingsForm extends React.Component<
     const value = event.target.value === '' ? '' : FormsUtils.getValueFromInput(event.target);
 
     this.setState({ [camelCase(name)]: value });
-    this.propagateChanges(name, max([Number(value), 0]));
+    this.propagateChanges(name, Math.max(Number(value), 0));
   };
 
   toggleBacklogSize = () => {
@@ -128,6 +126,7 @@ class NotificationSettingsForm extends React.Component<
               <input
                 id="toggle_backlog_size"
                 type="checkbox"
+                aria-label="Toggle message backlog"
                 checked={isBacklogSizeEnabled}
                 onChange={this.toggleBacklogSize}
               />

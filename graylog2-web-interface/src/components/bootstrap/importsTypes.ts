@@ -15,5 +15,5 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-// eslint-disable-next-line no-restricted-imports,import/prefer-default-export
+// eslint-disable-next-line no-restricted-imports
 export type { ButtonProps } from 'react-bootstrap';

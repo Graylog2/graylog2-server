@@ -58,18 +58,11 @@ public class Sorting {
         return this.direction;
     }
 
+    public String getUppercasedDirection() {
+        return this.direction.toString().toUpperCase(Locale.ENGLISH);
+    }
+
     public Optional<String> getUnmappedType() {
         return Optional.ofNullable(this.unmappedType);
     }
-
-    public static Sorting fromApiParam(String param) {
-        if (param == null || !param.contains(":")) {
-            throw new IllegalArgumentException("Invalid sorting parameter: " + param);
-        }
-
-        String[] parts = param.split(":");
-
-        return new Sorting(parts[0], Direction.valueOf(parts[1].toUpperCase(Locale.ENGLISH)));
-    }
-
 }

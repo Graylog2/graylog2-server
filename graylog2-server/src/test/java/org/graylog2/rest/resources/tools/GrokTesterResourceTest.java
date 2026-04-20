@@ -22,8 +22,8 @@ import org.graylog2.grok.InMemoryGrokPatternService;
 import org.graylog2.rest.resources.tools.responses.GrokTesterResponse;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.concurrent.Executors;
@@ -37,7 +37,7 @@ public class GrokTesterResourceTest {
 
     private GrokTesterResource resource;
 
-    @Before
+    @BeforeEach
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() throws Exception {
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
@@ -99,6 +99,22 @@ public class GrokTesterResourceTest {
         assertThat(response.matched()).isFalse();
         assertThat(response.pattern()).isEqualTo("%{NUMBER}");
         assertThat(response.string()).isEqualTo("");
+        assertThat(response.errorMessage()).isNullOrEmpty();
+    }
+
+    @Test
+    public void testGrokWithNestedQuantifierReturnsErrorInsteadOfCrashing() {
+        final String longInput = "a]".repeat(5000);
+        final GrokTesterResponse response = resource.grokTest("(?<msg>(.|\r|\n)*)", longInput, false);
+        assertThat(response.matched()).isFalse();
+        assertThat(response.errorMessage()).contains("stack overflow");
+    }
+
+    @Test
+    public void testGrokWithCharacterClassDoesNotOverflow() {
+        final String longInput = "a]".repeat(5000);
+        final GrokTesterResponse response = resource.grokTest("(?<msg>[\\s\\S]*)", longInput, false);
+        assertThat(response.matched()).isTrue();
         assertThat(response.errorMessage()).isNullOrEmpty();
     }
 }

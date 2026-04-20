@@ -1,0 +1,4 @@
+type = "changed"
+message = "Change internal storage format for sessions."
+
+pulls = ["21857"]

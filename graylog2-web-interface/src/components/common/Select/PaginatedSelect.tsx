@@ -58,14 +58,10 @@ const PaginatedSelect = ({ onLoadOptions, ...rest }: Props) => {
 
   const handleSearch = debounce((newValue, actionMeta) => {
     if (actionMeta.action === 'input-change') {
-      return loadOptions({ ...DEFAULT_PAGINATION, query: newValue });
+      loadOptions({ ...DEFAULT_PAGINATION, query: newValue });
+    } else if (actionMeta.action === 'menu-close') {
+      loadOptions(DEFAULT_PAGINATION);
     }
-
-    if (actionMeta.action === 'menu-close') {
-      return loadOptions(DEFAULT_PAGINATION);
-    }
-
-    return Promise.resolve();
   }, 400);
 
   const handleLoadMore = debounce(() => {

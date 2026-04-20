@@ -30,8 +30,7 @@ import OriginFilterValueRenderer from 'components/indices/IndexSetFieldTypes/Ori
 import useCustomColumnRenderers from 'components/indices/IndexSetFieldTypes/hooks/useCustomColumnRenderers';
 import IndexSetProfile from 'components/indices/IndexSetFieldTypes/IndexSetProfile';
 import type { FieldTypePutResponse } from 'views/logic/fieldactions/ChangeFieldType/types';
-import { useStore } from 'stores/connect';
-import { IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import useSingleIndexSet from 'components/indices/hooks/useSingleIndexSet';
 import isIndexFieldTypeChangeAllowed from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
 
 import BulkActions from './BulkActions';
@@ -41,9 +40,8 @@ export const DEFAULT_LAYOUT = {
   defaultPageSize: 20,
   defaultSort: { attributeId: 'field_name', direction: 'asc' } as Sort,
   defaultDisplayedAttributes: ['field_name', 'type', 'origin', 'is_reserved'],
+  defaultColumnOrder: ['field_name', 'type', 'origin', 'is_reserved'],
 };
-
-const COLUMNS_ORDER = ['field_name', 'type', 'origin', 'is_reserved'];
 
 const StyledStatusIcon = styled(StatusIcon)`
   margin-right: 5px;
@@ -61,7 +59,7 @@ const FilterValueRenderers = {
 
 const IndexSetFieldTypesList = () => {
   const { indexSetId } = useParams();
-  const { indexSet } = useStore(IndexSetsStore);
+  const { data: indexSet } = useSingleIndexSet(indexSetId);
   const [selectedEntitiesData, setSelectedEntitiesData] = useState<Record<string, IndexSetFieldType>>({});
   const customColumnRenderers = useCustomColumnRenderers();
 
@@ -106,14 +104,13 @@ const IndexSetFieldTypesList = () => {
   return (
     <PaginatedEntityTable<IndexSetFieldType>
       humanName="index set field types"
-      columnsOrder={COLUMNS_ORDER}
       entityActions={indexFieldTypeChangeAllowed && renderActions}
       tableLayout={DEFAULT_LAYOUT}
       topRightCol={indexFieldTypeChangeAllowed && <IndexSetProfile />}
       fetchEntities={(searchParams) => fetchIndexSetFieldTypes(indexSetId, searchParams)}
       keyFn={keyFn}
       bulkSelection={bulkSelection}
-      expandedSectionsRenderer={expandedSections}
+      expandedSectionRenderers={expandedSections}
       entityAttributesAreCamelCase
       filterValueRenderers={FilterValueRenderers}
       columnRenderers={customColumnRenderers}

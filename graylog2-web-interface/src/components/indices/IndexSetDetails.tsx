@@ -21,7 +21,7 @@ import { Col } from 'components/bootstrap';
 import { IndicesConfiguration } from 'components/indices';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import useProfile from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfile';
-import { Link } from 'components/common/router';
+import { Link } from 'components/common';
 import Routes from 'routing/Routes';
 
 import StyledIndexSetDetailsRow from './StyledIndexSetDetailsRow';

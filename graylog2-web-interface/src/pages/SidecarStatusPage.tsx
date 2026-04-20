@@ -37,8 +37,6 @@ class SidecarStatusPage extends React.Component<
     [key: string]: any;
   }
 > {
-  private interval: NodeJS.Timeout;
-
   constructor(props) {
     super(props);
 
@@ -59,6 +57,8 @@ class SidecarStatusPage extends React.Component<
       clearInterval(this.interval);
     }
   }
+
+  private interval: NodeJS.Timeout;
 
   reloadSidecar = (history) => {
     SidecarsActions.getSidecar(this.props.params.sidecarId).then(

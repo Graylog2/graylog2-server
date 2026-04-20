@@ -44,7 +44,7 @@ describe('SuggestReloadIfVersionChanged', () => {
 
     const reloadButton = await screen.findByRole('button', { name: 'Reload now' });
 
-    userEvent.click(reloadButton);
+    await userEvent.click(reloadButton);
 
     expect(reload).toHaveBeenCalled();
   });

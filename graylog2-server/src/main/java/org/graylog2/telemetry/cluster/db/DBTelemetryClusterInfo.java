@@ -16,68 +16,95 @@
  */
 package org.graylog2.telemetry.cluster.db;
 
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Updates;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.graylog2.database.MongoConnection;
+import org.graylog2.database.MongoCollection;
+import org.graylog2.database.MongoCollections;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 import java.time.Duration;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.currentDate;
 import static org.graylog2.configuration.TelemetryConfiguration.TELEMETRY_CLUSTER_INFO_TTL;
 import static org.graylog2.database.indices.MongoDbIndexTools.ensureTTLIndex;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_CLUSTER_ID;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_CODENAME;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_CPU_CORES;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_FACILITY;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_HOSTNAME;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_IS_LEADER;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_IS_PROCESSING;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_LB_STATUS;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_LIFECYCLE;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_JVM_HEAP_COMMITTED;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_JVM_HEAP_MAX;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_JVM_HEAP_USED;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_MEMORY_TOTAL;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_NODE_ID;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_OPERATING_SYSTEM;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_STARTED_AT;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_TIMEZONE;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_UPDATED_AT;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_VERSION;
 
 public class DBTelemetryClusterInfo {
-
-    public static final String FIELD_NODE_ID = "node_id";
-    public static final String FIELD_IS_LEADER = "is_leader";
-    public static final String FIELD_VERSION = "version";
-    private static final String FIELD_ID = "_id";
-    private static final String FIELD_UPDATED_AT = "updated_at";
     private static final String COLLECTION_NAME = "telemetry_cluster_infos";
-    private final MongoCollection<Document> collection;
-
+    private final MongoCollection<TelemetryClusterInfoDto> collection;
 
     @Inject
     public DBTelemetryClusterInfo(@Named(TELEMETRY_CLUSTER_INFO_TTL) Duration telemetryClusterInfoTtl,
-                                  MongoConnection mongoConnection) {
+                                  MongoCollections mongoCollections) {
 
-        collection = mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME);
+        collection = mongoCollections.collection(COLLECTION_NAME, TelemetryClusterInfoDto.class);
         collection.createIndex(Indexes.ascending(FIELD_NODE_ID), new IndexOptions().unique(true));
 
-        ensureTTLIndex(collection, telemetryClusterInfoTtl, FIELD_UPDATED_AT);
+        com.mongodb.client.MongoCollection<Document> nonEntityCollection = mongoCollections.nonEntityCollection(
+                COLLECTION_NAME,
+                Document.class
+        );
+        ensureTTLIndex(nonEntityCollection, telemetryClusterInfoTtl, FIELD_UPDATED_AT);
     }
 
-    public void update(Map<String, Object> nodeInfo, String nodeId) {
-        List<Bson> updateValues = nodeInfo.entrySet().stream().map(entry -> Updates.set(entry.getKey(), entry.getValue())).collect(Collectors.toList());
-        updateValues.add(currentDate(FIELD_UPDATED_AT));
+    public void update(TelemetryClusterInfoDto nodeInfo) {
+        List<Bson> updates = new ArrayList<>();
+        updates.add(Updates.set(FIELD_NODE_ID, nodeInfo.nodeId()));
+        updates.add(Updates.set(FIELD_CLUSTER_ID, nodeInfo.clusterId()));
+        updates.add(Updates.set(FIELD_CODENAME, nodeInfo.codename()));
+        updates.add(Updates.set(FIELD_FACILITY, nodeInfo.facility()));
+        updates.add(Updates.set(FIELD_HOSTNAME, nodeInfo.hostname()));
+        updates.add(Updates.set(FIELD_LB_STATUS, nodeInfo.lbStatus()));
+        updates.add(Updates.set(FIELD_LIFECYCLE, nodeInfo.lifecycle()));
+        updates.add(Updates.set(FIELD_OPERATING_SYSTEM, nodeInfo.operatingSystem()));
+        updates.add(Updates.set(FIELD_STARTED_AT, nodeInfo.startedAt()));
+        updates.add(Updates.set(FIELD_TIMEZONE, nodeInfo.timezone()));
+        updates.add(Updates.set(FIELD_IS_LEADER, nodeInfo.isLeader()));
+        updates.add(Updates.set(FIELD_IS_PROCESSING, nodeInfo.isProcessing()));
+        updates.add(Updates.set(FIELD_VERSION, nodeInfo.version()));
+        updates.add(Updates.set(FIELD_JVM_HEAP_USED, nodeInfo.jvmHeapUsed()));
+        updates.add(Updates.set(FIELD_JVM_HEAP_COMMITTED, nodeInfo.jvmHeapCommitted()));
+        updates.add(Updates.set(FIELD_JVM_HEAP_MAX, nodeInfo.jvmHeapMax()));
+        updates.add(Updates.set(FIELD_MEMORY_TOTAL, nodeInfo.memoryTotal()));
+        updates.add(Updates.set(FIELD_CPU_CORES, nodeInfo.cpuCores()));
+        updates.add(Updates.set(FIELD_VERSION, nodeInfo.version()));
+        updates.add(currentDate(FIELD_UPDATED_AT));
+
         collection.findOneAndUpdate(
-                eq(FIELD_NODE_ID, nodeId),
-                Updates.combine(updateValues),
+                eq(FIELD_NODE_ID, nodeInfo.nodeId()),
+                Updates.combine(updates),
                 new FindOneAndUpdateOptions().upsert(true)
         );
     }
 
-    public Map<String, Map<String, Object>> findAll() {
-        Map<String, Map<String, Object>> nodes = new LinkedHashMap<>();
-        for (Document document : collection.find()) {
-            nodes.put(document.getString(FIELD_NODE_ID), document.entrySet().stream()
-                    .filter(entry -> !FIELD_UPDATED_AT.equals(entry.getKey()))
-                    .filter(entry -> !FIELD_ID.equals(entry.getKey()))
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
-        }
-        return nodes;
+    public List<TelemetryClusterInfoDto> findAll() {
+        return collection.find().into(new ArrayList<>());
     }
 }

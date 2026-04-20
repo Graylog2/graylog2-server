@@ -14,13 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect } from 'react';
+import React from 'react';
 import numeral from 'numeral';
 
 import { Pluralize, Spinner } from 'components/common';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
-import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
-import { useStore } from 'stores/connect';
+import { useNodeMetrics } from 'hooks/useMetrics';
 
 type Props = {
   nodeId: string;
@@ -32,21 +31,11 @@ const metricNames = {
   entriesUncommitted: 'org.graylog2.journal.entries-uncommitted',
 };
 
+const metricValues = Object.values(metricNames);
+
 const JournalState = ({ nodeId }: Props) => {
-  const { metrics } = useStore(MetricsStore);
-
-  useEffect(() => {
-    Object.keys(metricNames).forEach((metricShortName) => MetricsActions.add(nodeId, metricNames[metricShortName]));
-
-    return () => {
-      Object.keys(metricNames).forEach((metricShortName) =>
-        MetricsActions.remove(nodeId, metricNames[metricShortName]),
-      );
-    };
-  }, [nodeId]);
-
-  const nodeMetrics = metrics?.[nodeId];
-  const _isLoading = !nodeMetrics;
+  const { data: nodeMetrics, isLoading } = useNodeMetrics(nodeId, metricValues);
+  const _isLoading = isLoading || !nodeMetrics;
 
   if (_isLoading) {
     return <Spinner text="Loading journal metrics..." />;

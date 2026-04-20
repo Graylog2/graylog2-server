@@ -16,22 +16,18 @@
  */
 package org.graylog2.inputs.persistence;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
-import org.graylog2.database.NotFoundException;
-import org.graylog2.inputs.InputService;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Optional;
 
@@ -39,31 +35,22 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.when;
 
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class MongoInputStatusServiceTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     // Code Under Test
     private MongoInputStatusService cut;
 
     @Mock
     EventBus mockEventBus;
-    @Mock
-    private InputService inputService;
 
-    @Before
-    public void setUp() {
-        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-        final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-
-        cut = new MongoInputStatusService(
-                new MongoCollections(mapperProvider, mongodb.mongoConnection()), inputService, mockEventBus);
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) {
+        cut = new MongoInputStatusService(mongoCollections, mockEventBus);
     }
 
     @Test
@@ -181,24 +168,10 @@ public class MongoInputStatusServiceTest {
 
     @Test
     @MongoDBFixtures("input-status.json")
-    public void handleDeleteEvent_WhenStoppingInputDoesNothing() throws Exception {
+    public void handleDeleteEvent_RemovesState() {
         final String deletedInput = "54e3deadbeefdeadbeef0001";
-        final InputDeleted inputDeletedEvent = new InputDeleted() {
-            @Override
-            public String id() {
-                return deletedInput;
-            }
-        };
-
-        cut.handleInputDeleted(inputDeletedEvent);
-        // The record should not be removed from the DB
         assertThat(cut.get(deletedInput).isPresent(), is(true));
-    }
 
-    @Test
-    @MongoDBFixtures("input-status.json")
-    public void handleDeleteEvent_WhenDeletingInputRemovesState() throws Exception {
-        final String deletedInput = "54e3deadbeefdeadbeef0001";
         final InputDeleted inputDeletedEvent = new InputDeleted() {
             @Override
             public String id() {
@@ -206,12 +179,7 @@ public class MongoInputStatusServiceTest {
             }
         };
 
-        // Simulate that the input has actually been deleted
-        // TODO: This will change once we fix https://github.com/Graylog2/graylog2-server/issues/7812
-        when(inputService.find(deletedInput)).thenThrow(new NotFoundException());
-
         cut.handleInputDeleted(inputDeletedEvent);
-        // The record should be removed from the DB
         assertThat(cut.get(deletedInput).isPresent(), is(false));
     }
 }

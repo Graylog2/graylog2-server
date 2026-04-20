@@ -46,11 +46,12 @@ type GeneratedLayout = {
   tickvals: Array<number>;
   ticktext: Array<string>;
 };
+
+const getMaxDailyValue = (arr: Array<number>) => arr.reduce((a, b) => Math.max(a, b), 0);
+
 const TrafficGraph = ({ width, traffic, trafficLimit = undefined }: Props) => {
   const theme = useTheme();
   const isCloud = AppConfig.isCloud();
-
-  const getMaxDailyValue = (arr: Array<number>) => arr.reduce((a, b) => Math.max(a, b));
 
   const yValues = useMemo(() => Object.values(traffic), [traffic]);
 
@@ -62,7 +63,7 @@ const TrafficGraph = ({ width, traffic, trafficLimit = undefined }: Props) => {
         y: yValues,
         ...getHoverTemplateSettings({
           convertedValues: yValues,
-          unit: FieldUnit.fromJSON({ abbrev: 'b', unit_type: 'size' }),
+          unit: FieldUnit.fromJSON({ abbrev: 'b', unit_type: 'binary_size' }),
         }),
       },
     ],
@@ -121,14 +122,14 @@ const TrafficGraph = ({ width, traffic, trafficLimit = undefined }: Props) => {
   const notZoomedLayout = useMemo<GeneratedLayout>(
     () => ({
       rangemode: 'tozero',
-      ...(getFormatSettingsByData('size', valuesToGetFormatSettings) as GeneratedLayout),
+      ...(getFormatSettingsByData('binary_size', valuesToGetFormatSettings) as GeneratedLayout),
     }),
     [valuesToGetFormatSettings],
   );
   const zoomedLayout = useMemo(
     () => ({
       rangemode: 'tozero',
-      ...(getFormatSettingsByData('size', yValues) as GeneratedLayout),
+      ...(getFormatSettingsByData('binary_size', yValues) as GeneratedLayout),
     }),
     [yValues],
   );
@@ -141,8 +142,10 @@ const TrafficGraph = ({ width, traffic, trafficLimit = undefined }: Props) => {
       },
       xaxis: {
         type: 'date',
+        tickformat: '%b %d',
+        hoverformat: '%b %d, %Y',
         title: {
-          text: 'Time',
+          text: 'Date (UTC)',
         },
       },
       hovermode: 'x',

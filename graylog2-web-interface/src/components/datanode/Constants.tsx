@@ -93,30 +93,6 @@ export const MIGRATION_STATE = {
       </>
     ),
   },
-  REMOTE_REINDEX_WELCOME_PAGE: {
-    key: 'REMOTE_REINDEX_WELCOME_PAGE',
-    description: 'Remote reindexing migration',
-  },
-  PROVISION_DATANODE_CERTIFICATES_PAGE: {
-    key: 'PROVISION_DATANODE_CERTIFICATES_PAGE',
-    description: 'Provision Data Node with certificates',
-  },
-  PROVISION_DATANODE_CERTIFICATES_RUNNING: {
-    key: 'PROVISION_DATANODE_CERTIFICATES_RUNNING',
-    description: "Provision the Data Node's certificate.",
-  },
-  EXISTING_DATA_MIGRATION_QUESTION_PAGE: {
-    key: 'EXISTING_DATA_MIGRATION_QUESTION_PAGE',
-    description: 'Migrate existing data question',
-  },
-  MIGRATE_EXISTING_DATA: {
-    key: 'MIGRATE_EXISTING_DATA',
-    description: 'Migrate existing data',
-  },
-  REMOTE_REINDEX_RUNNING: {
-    key: 'REMOTE_REINDEX_RUNNING',
-    description: 'Remote reindexing migration running',
-  },
   DIRECTORY_COMPATIBILITY_CHECK_PAGE: {
     key: 'DIRECTORY_COMPATIBILITY_CHECK_PAGE',
     description: 'Directory compatibility check',
@@ -151,14 +127,6 @@ export const IN_PLACE_MIGRATION_STEPS = [
   MIGRATION_STATE.MESSAGE_PROCESSING_STOP.key,
   MIGRATION_STATE.RESTART_GRAYLOG.key,
 ];
-export const REMOTE_REINDEXING_MIGRATION_STEPS = [
-  MIGRATION_STATE.REMOTE_REINDEX_WELCOME_PAGE.key,
-  MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_RUNNING.key,
-  MIGRATION_STATE.EXISTING_DATA_MIGRATION_QUESTION_PAGE.key,
-  MIGRATION_STATE.MIGRATE_EXISTING_DATA.key,
-  MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key,
-  MIGRATION_STATE.ASK_TO_SHUTDOWN_OLD_CLUSTER.key,
-];
 
 export const MIGRATION_WIZARD_STEPS = [
   MIGRATION_STATE.NEW.key,
@@ -185,22 +153,6 @@ export const MIGRATION_ACTIONS = {
   PROVISION_DATANODE_CERTIFICATES: {
     key: 'PROVISION_DATANODE_CERTIFICATES',
     label: 'Provision Data Nodes with certificates',
-  },
-  SKIP_EXISTING_DATA_MIGRATION: {
-    key: 'SKIP_EXISTING_DATA_MIGRATION',
-    label: 'Skip existing data migration',
-  },
-  RETRY_MIGRATE_EXISTING_DATA: {
-    key: 'RETRY_MIGRATE_EXISTING_DATA',
-    label: 'Retry migrate existing data',
-  },
-  CHECK_REMOTE_INDEXER_CONNECTION: {
-    key: 'CHECK_REMOTE_INDEXER_CONNECTION',
-    label: 'Check connection',
-  },
-  START_REMOTE_REINDEX_MIGRATION: {
-    key: 'START_REMOTE_REINDEX_MIGRATION',
-    label: 'Start migration',
   },
 };
 export default MIGRATION_STEP;

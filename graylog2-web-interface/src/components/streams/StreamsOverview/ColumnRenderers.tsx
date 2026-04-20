@@ -15,11 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { PluginStore } from 'graylog-web-plugin/plugin';
-import type Immutable from 'immutable';
-import type { ColumnRenderersByAttribute } from 'src/components/common/EntityDataTable/types';
 
-import type { Output } from 'stores/outputs/OutputsStore';
+import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
+import type { Output } from 'hooks/useOutputs';
 import type { Stream, StreamRule } from 'stores/streams/StreamsStore';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import IndexSetCell from 'components/streams/StreamsOverview/cells/IndexSetCell';
@@ -32,19 +30,18 @@ import StreamRulesCell from './cells/StreamRulesCell';
 import PipelinesCell from './cells/PipelinesCell';
 import OutputsCell from './cells/OutputsCell';
 import ArchivingsCell from './cells/ArchivingsCell';
+import DestinationFilterRulesCell from './cells/DestinationFilterRulesCell';
 
-const getStreamDataLakeTableElements = PluginStore.exports('dataLake')?.[0]?.getStreamDataLakeTableElements;
 const pipelineRenderer = {
   pipelines: {
     renderCell: (_pipeline: any[], stream) => <PipelinesCell stream={stream} />,
-    staticWidth: 100,
+    staticWidth: 'matchHeader' as const,
   },
 };
 const customColumnRenderers = (
   indexSets: Array<IndexSet>,
   isPipelineColumnPermitted: boolean,
-  permissions: Immutable.List<string>,
-  pluggableColumnRenderers?: ColumnRenderersByAttribute<Stream>,
+  extensionColumnRenderers?: ColumnRenderersByAttribute<Stream>,
 ): ColumnRenderers<Stream> => ({
   attributes: {
     title: {
@@ -57,27 +54,30 @@ const customColumnRenderers = (
     },
     throughput: {
       renderCell: (_throughput: string, stream) => <ThroughputCell stream={stream} />,
-      staticWidth: 130,
+      staticWidth: 'matchHeader' as const,
     },
     disabled: {
       renderCell: (_disabled: string, stream) => <StatusCell stream={stream} />,
-      staticWidth: 130,
+      staticWidth: 'matchHeader' as const,
     },
     rules: {
       renderCell: (_rules: StreamRule[], stream) => <StreamRulesCell stream={stream} />,
-      staticWidth: 100,
+      staticWidth: 'matchHeader' as const,
     },
     ...(isPipelineColumnPermitted ? pipelineRenderer : {}),
     outputs: {
       renderCell: (_outputs: Output[], stream) => <OutputsCell stream={stream} />,
-      staticWidth: 100,
+      staticWidth: 'matchHeader' as const,
+    },
+    destination_filters: {
+      renderCell: (_destinationFilters: string, stream) => <DestinationFilterRulesCell stream={stream} />,
+      staticWidth: 'matchHeader' as const,
     },
     archiving: {
       renderCell: (_archiving: boolean, stream) => <ArchivingsCell stream={stream} indexSets={indexSets} />,
-      staticWidth: 100,
+      staticWidth: 'matchHeader' as const,
     },
-    ...(getStreamDataLakeTableElements?.(permissions)?.columnRenderer || {}),
-    ...(pluggableColumnRenderers || {}),
+    ...(extensionColumnRenderers || {}),
   },
 });
 

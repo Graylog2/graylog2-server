@@ -17,6 +17,7 @@
 package org.graylog2.cluster.nodes;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.types.ObjectId;
 import org.graylog2.database.DbEntity;
 import org.graylog2.datanode.DataNodeLifecycleTrigger;
@@ -29,7 +30,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-@DbEntity(collection = "datanodes", titleField = "node_id")
+@DbEntity(collection = "datanodes", titleField = "node_id",
+          readableFields = {})
 public class DataNodeEntity extends AbstractNode<DataNodeDto> {
 
     @JsonCreator
@@ -42,11 +44,11 @@ public class DataNodeEntity extends AbstractNode<DataNodeDto> {
     }
 
     public String getClusterAddress() {
-        return (String) fields.get("cluster_address");
+        return (String) fields.get(DataNodeDto.FIELD_CLUSTER_ADDRESS);
     }
 
     public String getRestApiAddress() {
-        return (String) fields.get("rest_api_address");
+        return (String) fields.get(DataNodeDto.FIELD_REST_API_ADDRESS);
     }
 
     public Date getCertValidTill() {
@@ -55,17 +57,18 @@ public class DataNodeEntity extends AbstractNode<DataNodeDto> {
     }
 
     public DataNodeLifecycleTrigger getActionQueue() {
-        if (!fields.containsKey("action_queue") || Objects.isNull(fields.get("action_queue"))) {
+        if (!fields.containsKey(DataNodeDto.FIELD_ACTION_QUEUE) || Objects.isNull(fields.get(DataNodeDto.FIELD_ACTION_QUEUE))) {
             return null;
         }
-        return DataNodeLifecycleTrigger.valueOf(fields.get("action_queue").toString());
+        return DataNodeLifecycleTrigger.valueOf(fields.get(DataNodeDto.FIELD_ACTION_QUEUE).toString());
     }
 
+    @JsonProperty(DataNodeDto.FIELD_DATANODE_STATUS)
     public DataNodeStatus getDataNodeStatus() {
-        if (!fields.containsKey("datanode_status")) {
+        if (!fields.containsKey(DataNodeDto.FIELD_DATANODE_STATUS)) {
             return null;
         }
-        return DataNodeStatus.valueOf(fields.get("datanode_status").toString());
+        return DataNodeStatus.valueOf(fields.get(DataNodeDto.FIELD_DATANODE_STATUS).toString());
     }
 
 

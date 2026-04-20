@@ -17,8 +17,9 @@
 package org.graylog2.system.urlallowlist;
 
 import com.google.common.collect.ImmutableList;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 
@@ -27,12 +28,13 @@ import java.util.Collections;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class UrlAllowlistServiceTest {
+    private AutoCloseable mocks;
     @InjectMocks
     UrlAllowlistService urlAllowlistService;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        mocks = MockitoAnnotations.openMocks(this);
     }
 
     @Test
@@ -62,5 +64,10 @@ public class UrlAllowlistServiceTest {
         assertThat(urlAllowlistService.removeEntry(allowlist, "b")).isEqualTo(allowlist);
         assertThat(urlAllowlistService.removeEntry(allowlist, "a")).isEqualTo(
                 UrlAllowlist.createEnabled(Collections.emptyList()));
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        mocks.close();
     }
 }

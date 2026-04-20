@@ -63,6 +63,11 @@ export interface Notification {
 }
 type NotificationId = string;
 export type Notifications = { [id: string]: Notification };
+type EmailTemplateConfig = {
+  override_defaults: boolean;
+  text_body: string | null;
+  html_body: string | null;
+};
 
 export interface PublicNotificationsHooks {
   usePublicNotifications: () => {
@@ -72,13 +77,25 @@ export interface PublicNotificationsHooks {
   };
 }
 
+export interface EmailTemplateHooks {
+  useEmailTemplate: () => {
+    templateConfig: EmailTemplateConfig;
+    onUpdateEmailTemplates: (config: EmailTemplateConfig) => Promise<void>;
+  };
+}
+
 interface PublicNotificationsType {
   hooks?: PublicNotificationsHooks;
+}
+
+interface EmailTemplateType {
+  hooks?: EmailTemplateHooks;
 }
 
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     'customization.theme.customizer'?: Array<CustomizationType>;
     'customization.publicNotifications'?: Array<PublicNotificationsType>;
+    'customization.emailTemplates'?: Array<EmailTemplateType>;
   }
 }

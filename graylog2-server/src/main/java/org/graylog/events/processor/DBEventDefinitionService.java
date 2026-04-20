@@ -21,6 +21,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.conversions.Bson;
 import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFiltersReFetcher;
@@ -29,6 +30,7 @@ import org.graylog.security.entities.EntityRegistrar;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.NonDeletableSystemScope;
 import org.graylog2.database.entities.ScopedEntity;
@@ -45,6 +47,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -64,6 +67,8 @@ public class DBEventDefinitionService {
     public static final String COLLECTION_NAME = "event_definitions";
     public static final String SYSTEM_NOTIFICATION_EVENT_DEFINITION = "System notification events";
 
+    private static final String ILLUMINATE_SCOPE_NAME = "ILLUMINATE";
+
     private final MongoCollection<EventDefinitionDto> collection;
     private final MongoUtils<EventDefinitionDto> mongoUtils;
     private final ScopedEntityMongoUtils<EventDefinitionDto> scopedEntityMongoUtils;
@@ -75,7 +80,9 @@ public class DBEventDefinitionService {
     @Inject
     public DBEventDefinitionService(MongoCollections mongoCollections,
                                     DBEventProcessorStateService stateService,
-                                    EntityRegistrar entityRegistrar, EntityScopeService entityScopeService, SearchFiltersReFetcher searchFiltersRefetcher) {
+                                    EntityRegistrar entityRegistrar,
+                                    EntityScopeService entityScopeService,
+                                    SearchFiltersReFetcher searchFiltersRefetcher) {
         this.collection = mongoCollections.collection(COLLECTION_NAME, EventDefinitionDto.class);
         this.mongoUtils = mongoCollections.utils(collection);
         this.scopedEntityMongoUtils = mongoCollections.scopedEntityUtils(collection, entityScopeService);
@@ -111,6 +118,7 @@ public class DBEventDefinitionService {
         EventDefinitionDto enrichedWithUpdateDate = entity
                 .toBuilder()
                 .updatedAt(DateTime.now(DateTimeZone.UTC))
+                .eventSummaryTemplate(StringUtils.trimToNull(entity.eventSummaryTemplate()))
                 .build();
         if (enrichedWithUpdateDate.id() == null) {
             final String id = scopedEntityMongoUtils.create(enrichedWithUpdateDate);
@@ -254,5 +262,22 @@ public class DBEventDefinitionService {
         collection.updateMany(
                 Filters.eq(EventDefinitionDto.FIELD_EVENT_PROCEDURE, procedureId),
                 Updates.unset(EventDefinitionDto.FIELD_EVENT_PROCEDURE));
+    }
+
+    /**
+     * @return a map with counts of event definitions grouped by source (Illuminate vs user-created).
+     */
+    public Map<String, Long> countBySource() {
+        long illuminateEventCount = collection.countDocuments(
+                Filters.eq(ScopedEntity.FIELD_SCOPE, ILLUMINATE_SCOPE_NAME)
+        );
+        long userEventCount = collection.countDocuments(
+                Filters.eq(ScopedEntity.FIELD_SCOPE, DefaultEntityScope.NAME)
+        );
+
+        return Map.of(
+                "illuminate_event_definitions", illuminateEventCount,
+                "user_event_definitions", userEventCount
+        );
     }
 }

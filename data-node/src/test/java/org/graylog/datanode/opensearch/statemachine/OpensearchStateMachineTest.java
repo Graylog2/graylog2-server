@@ -27,6 +27,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Set;
 
+import static org.mockito.Mockito.verify;
+
 @ExtendWith(MockitoExtension.class)
 class OpensearchStateMachineTest {
 
@@ -166,6 +168,29 @@ class OpensearchStateMachineTest {
         machine.fire(OpensearchEvent.HEALTH_CHECK_FAILED);
         Assertions.assertEquals(OpensearchState.FAILED, machine.getState());
 
+    }
+
+    @Test
+    void testRemoveConfigurationFromTerminated() {
+        final StateMachine<OpensearchState, OpensearchEvent> machine = OpensearchStateMachine.createNew(opensearchProcess, tracer);
+        Assertions.assertEquals(machine.getState(), OpensearchState.WAITING_FOR_CONFIGURATION);
+
+        machine.fire(OpensearchEvent.PROCESS_PREPARED);
+        Assertions.assertEquals(OpensearchState.PREPARED, machine.getState());
+
+        machine.fire(OpensearchEvent.PROCESS_STARTED);
+        Assertions.assertEquals(OpensearchState.STARTING, machine.getState());
+
+        machine.fire(OpensearchEvent.HEALTH_CHECK_OK);
+        Assertions.assertEquals(OpensearchState.AVAILABLE, machine.getState());
+
+        machine.fire(OpensearchEvent.PROCESS_TERMINATED);
+        Assertions.assertEquals(OpensearchState.TERMINATED, machine.getState());
+
+        machine.fire(OpensearchEvent.PROCESS_CONFIGURATION_REMOVED);
+        Assertions.assertEquals(OpensearchState.WAITING_FOR_CONFIGURATION, machine.getState());
+
+        verify(opensearchProcess).removeConfiguration();
     }
 
 }

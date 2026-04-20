@@ -34,10 +34,11 @@ import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.datanode.ProxyRequestAdapter;
-import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.datastream.DataStreamAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
+import org.graylog2.indexer.indices.IndexTemplateAdapter;
+import org.graylog2.indexer.indices.IndexTemplateAdapterProvider;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
@@ -58,7 +59,6 @@ import org.graylog2.storage.providers.MoreSearchAdapterProvider;
 import org.graylog2.storage.providers.MultiChunkResultRetrieverProvider;
 import org.graylog2.storage.providers.NodeAdapterProvider;
 import org.graylog2.storage.providers.ProxyRequestAdapterProvider;
-import org.graylog2.storage.providers.RemoteReindexingMigrationAdapterProvider;
 import org.graylog2.storage.providers.SearchesAdapterProvider;
 import org.graylog2.storage.providers.SecurityAdapterProvider;
 import org.graylog2.storage.providers.StreamsForFieldRetrieverProvider;
@@ -89,12 +89,12 @@ public class VersionAwareStorageModule extends AbstractModule {
         bind(NodeAdapter.class).toProvider(NodeAdapterProvider.class);
         bind(IndexFieldTypePollerAdapter.class).toProvider(IndexFieldTypePollerAdapterProvider.class);
         bind(IndexToolsAdapter.class).toProvider(IndexToolsAdapterProvider.class);
+        bind(IndexTemplateAdapter.class).toProvider(IndexTemplateAdapterProvider.class);
         bind(V20170607164210_MigrateReopenedIndicesToAliases.ClusterState.class)
                 .toProvider(V20170607164210_MigrateReopenedIndicesToAliasesClusterStateAdapterProvider.class);
         bind(V20200730000000_AddGl2MessageIdFieldAliasForEvents.ElasticsearchAdapter.class)
                 .toProvider(V20200730000000_AddGl2MessageIdFieldAliasForEventsElasticsearchAdapterProvider.class);
         bind(ProxyRequestAdapter.class).toProvider(ProxyRequestAdapterProvider.class);
-        bind(RemoteReindexingMigrationAdapter.class).toProvider(RemoteReindexingMigrationAdapterProvider.class);
         bind(DatanodeUpgradeServiceAdapter.class).toProvider(DatanodeUpgradeAdapterProvider.class);
 
         bind(IndexerHostsAdapter.class).toProvider(IndexerHostsAdapterProvider.class);

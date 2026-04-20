@@ -26,7 +26,7 @@ const PREM_ONLY_NAV_ITEMS = [
     description: 'Index Set Templates',
     path: Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW,
     exactPathMatch: false,
-    permissions: 'indexset_templates:read',
+    permissions: 'indexset_templates:read' as const,
   },
 ];
 
@@ -36,7 +36,7 @@ const NAV_ITEMS = [
     description: 'Field Type Profiles',
     path: Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW,
     exactPathMatch: false,
-    permissions: 'mappingprofiles:read',
+    permissions: 'mappingprofiles:read' as const,
   },
 ];
 

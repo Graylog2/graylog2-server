@@ -19,19 +19,34 @@ import type { ModalRootProps } from '@mantine/core';
 import { Modal as MantineModal } from '@mantine/core';
 import styled, { css } from 'styled-components';
 
-import type { BsSize } from 'components/bootstrap/types';
 import zIndices from 'theme/z-indices';
 
-export type ModalSize = 'lg' | 'large' | 'sm' | 'small';
+export type ModalSize = 'lg' | 'large' | 'sm' | 'small' | 'xl' | 'xlarge';
 
-const ModalOverlay = styled(MantineModal.Overlay)`
-  z-index: ${zIndices.modalOverlay};
-`;
+const XLARGE_MODAL_WIDTH_PX = 1200;
 
-const ModalContent = styled(MantineModal.Content)`
-  z-index: ${zIndices.modalBody};
-  border-radius: 10px;
-`;
+const ModalOverlay = styled(MantineModal.Overlay)<{ $isConfirmDialog: boolean }>(
+  ({ $isConfirmDialog }) => css`
+    z-index: ${$isConfirmDialog ? zIndices.confirmModalOverlay : zIndices.modalOverlay};
+  `,
+);
+
+const ModalContent = styled(MantineModal.Content)<{ $isConfirmDialog: boolean }>(
+  ({ $isConfirmDialog }) => css`
+    z-index: ${$isConfirmDialog ? zIndices.confirmModalBody : zIndices.modalBody};
+    border-radius: 10px;
+  `,
+);
+
+const StyledModalFooter = styled(MantineModal.Body)(
+  ({ theme }) => css`
+    position: sticky;
+    bottom: 0;
+    background-color: ${theme.colors.global.contentBackground};
+    padding: ${theme.spacings.md};
+    z-index: ${zIndices.modalBody};
+  `,
+);
 
 const StyledModalRoot = styled(MantineModal.Root)<{ $scrollInContent: boolean }>(
   ({ theme, $scrollInContent }) => css`
@@ -53,7 +68,7 @@ const StyledModalRoot = styled(MantineModal.Root)<{ $scrollInContent: boolean }>
   `,
 );
 
-const sizeForMantine = (size: BsSize) => {
+const sizeForMantine = (size?: ModalSize) => {
   switch (size) {
     case 'sm':
     case 'small':
@@ -61,6 +76,9 @@ const sizeForMantine = (size: BsSize) => {
     case 'lg':
     case 'large':
       return 'xl';
+    case 'xl':
+    case 'xlarge':
+      return XLARGE_MODAL_WIDTH_PX;
     default:
       return 'lg';
   }
@@ -75,6 +93,8 @@ type Props = {
   closable?: boolean;
   fullScreen?: boolean;
   scrollInContent?: boolean;
+  className?: string;
+  isConfirmDialog?: boolean;
   rootProps?: Partial<Omit<ModalRootProps, 'opened' | 'onClose'>>;
 };
 
@@ -87,6 +107,8 @@ const Modal = ({
   closable = true,
   fullScreen = false,
   scrollInContent = false,
+  className = undefined,
+  isConfirmDialog = false,
   rootProps = {},
 }: Props) => (
   <StyledModalRoot
@@ -97,9 +119,10 @@ const Modal = ({
     trapFocus
     closeOnEscape={closable}
     fullScreen={fullScreen}
+    className={className}
     {...(rootProps || {})}>
-    {backdrop && <ModalOverlay />}
-    <ModalContent>{children}</ModalContent>
+    {backdrop && <ModalOverlay $isConfirmDialog={isConfirmDialog} />}
+    <ModalContent $isConfirmDialog={isConfirmDialog}>{children}</ModalContent>
   </StyledModalRoot>
 );
 
@@ -115,6 +138,6 @@ Modal.Title = styled(MantineModal.Title)`
 `;
 
 Modal.Body = MantineModal.Body;
-Modal.Footer = MantineModal.Body;
+Modal.Footer = StyledModalFooter;
 
 export default Modal;

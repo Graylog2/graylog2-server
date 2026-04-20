@@ -63,8 +63,7 @@ const scoreResults = (items: Array<SearchResultItem>, query: string, weight = 1.
     return [{ ...item, score: score * weight }];
   });
 
-type Unpromise<T> = T extends Promise<infer U> ? U : never;
-type ItemResultType = Unpromise<ReturnType<typeof QuickJump.search>>['results'][number];
+type ItemResultType = Awaited<ReturnType<typeof QuickJump.search>>['results'][number];
 
 const useEntityResultMapper = () => {
   const pluginEntityRoutesResolver = usePluginEntities('entityRoutes');

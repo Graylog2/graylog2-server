@@ -21,6 +21,14 @@ import ApiRoutes from 'routing/ApiRoutes';
 import { fetchPeriodically } from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
+export type IndexRange = {
+  index_name?: string;
+  begin: string;
+  end: string;
+  calculated_at: string;
+  took_ms: number;
+};
+
 type IndexerOverviewActionsType = {
   list: (indexSetId: string) => Promise<unknown>;
 };
@@ -30,25 +38,21 @@ export const IndexerOverviewActions = singletonActions('core.IndexerOverview', (
   }),
 );
 
+export type IndexTier = 'WARM' | 'HOT';
+
 export type IndexSummary = {
-  index_name: string;
+  index_name?: string;
   size: {
     events: number;
     deleted: number;
     bytes: number;
   };
-  range: {
-    index_name: string;
-    begin: string;
-    end: string;
-    calculated_at: string;
-    took_ms: number;
-  } | null;
+  range: IndexRange;
   is_deflector: boolean;
   is_closed: boolean;
   is_reopened: boolean;
   shard_count: number;
-  tier: 'WARM' | 'HOT';
+  tier: IndexTier;
 };
 
 export type IndexerOverview = {
@@ -59,7 +63,7 @@ export type IndexerOverview = {
   indexer_cluster: {
     health: {
       status: string;
-      name: string;
+      name?: string;
       shards: {
         active: number;
         initializing: number;
@@ -69,7 +73,7 @@ export type IndexerOverview = {
     };
   };
   counts: {
-    [key: string]: number;
+    events: number;
   };
   indices: Array<IndexSummary>;
 };

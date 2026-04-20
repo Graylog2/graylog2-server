@@ -17,11 +17,11 @@
 package org.graylog2.telemetry.rest;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -37,15 +37,16 @@ import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.Map;
 
 import static org.graylog2.audit.AuditEventTypes.TELEMETRY_USER_SETTINGS_UPDATE;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "Telemetry", description = "Message inputs", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Telemetry", description = "Message inputs")
 @Path("/telemetry")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -62,16 +63,17 @@ public class TelemetryResource extends RestResource {
     }
 
     @GET
-    @ApiOperation(value = "Get telemetry information.")
+    @Operation(summary = "Get telemetry information.")
     public ObjectNode get() {
         return telemetryService.getTelemetryResponse(getCurrentUserOrThrow());
     }
 
     @GET
     @Path("user/settings")
-    @ApiOperation("Retrieve a user's telemetry settings.")
+    @Operation(summary = "Retrieve a user's telemetry settings.")
     @ApiResponses({
-            @ApiResponse(code = 404, message = "Current user not found.")
+            @ApiResponse(responseCode = "200", description = "Returns user settings", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "Current user not found.")
     })
     public TelemetryUserSettings getTelemetryUserSettings() {
         return telemetryService.getTelemetryUserSettings(getCurrentUserOrThrow());
@@ -79,10 +81,13 @@ public class TelemetryResource extends RestResource {
 
     @PUT
     @Path("user/settings")
-    @ApiOperation("Update a user's telemetry settings.")
-    @ApiResponses({@ApiResponse(code = 404, message = "Current user not found.")})
+    @Operation(summary = "Update a user's telemetry settings.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Success"),
+            @ApiResponse(responseCode = "404", description = "Current user not found.")
+    })
     @NoAuditEvent("Audit event is sent manually.")
-    public void saveTelemetryUserSettings(@ApiParam(name = "JSON body", value = "The telemetry settings to assign to the user.", required = true)
+    public void saveTelemetryUserSettings(@RequestBody(description = "The telemetry settings to assign to the user.", required = true)
                                           @Valid @NotNull TelemetryUserSettings telemetryUserSettings) {
 
         User currentUser = getCurrentUserOrThrow();

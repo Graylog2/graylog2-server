@@ -43,12 +43,13 @@ public record CsrFileStorage(String csrFilename) implements CsrStorage {
 
     @Override
     public PKCS10CertificationRequest readCsr() throws IOException {
-        Reader pemReader = new BufferedReader(new FileReader(csrFilename, Charset.defaultCharset()));
-        PEMParser pemParser = new PEMParser(pemReader);
-        Object parsedObj = pemParser.readObject();
-        if (parsedObj instanceof PKCS10CertificationRequest) {
-            return (PKCS10CertificationRequest) parsedObj;
+        try (PEMParser pemParser = new PEMParser(
+                new BufferedReader(new FileReader(csrFilename, Charset.defaultCharset())))) {
+            Object parsedObj = pemParser.readObject();
+            if (parsedObj instanceof PKCS10CertificationRequest) {
+                return (PKCS10CertificationRequest) parsedObj;
+            }
+            return null;
         }
-        return null;
     }
 }

@@ -17,9 +17,9 @@
 package org.graylog.plugins.pipelineprocessor.rest;
 
 import com.google.common.base.Strings;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
@@ -29,7 +29,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog.plugins.pipelineprocessor.processors.ConfigurationStateUpdater;
+import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreterStateUpdater;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
 import org.graylog.plugins.pipelineprocessor.simulator.PipelineInterpreterTracer;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -40,6 +40,7 @@ import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.messages.responses.DecorationStats;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
@@ -49,22 +50,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
-
-@Api(value = "Pipelines/Simulator", description = "Simulate pipeline message processor", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Pipelines/Simulator", description = "Simulate pipeline message processor")
 @Path("/system/pipelines/simulate")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class SimulatorResource extends RestResource implements PluginRestResource {
-    private final ConfigurationStateUpdater pipelineStateUpdater;
+    private final PipelineInterpreterStateUpdater pipelineStateUpdater;
     private final StreamService streamService;
     private final MessageFactory messageFactory;
     private final PipelineInterpreter pipelineInterpreter;
 
     @Inject
     public SimulatorResource(PipelineInterpreter pipelineInterpreter,
-                             ConfigurationStateUpdater pipelineStateUpdater,
+                             PipelineInterpreterStateUpdater pipelineStateUpdater,
                              StreamService streamService,
                              MessageFactory messageFactory) {
         this.pipelineInterpreter = pipelineInterpreter;
@@ -73,11 +73,11 @@ public class SimulatorResource extends RestResource implements PluginRestResourc
         this.messageFactory = messageFactory;
     }
 
-    @ApiOperation(value = "Simulate the execution of the pipeline message processor")
+    @Operation(summary = "Simulate the execution of the pipeline message processor")
     @POST
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_RULE_READ)
     @NoAuditEvent("only used to test pipelines, no changes made in the system")
-    public SimulationResponse simulate(@ApiParam(name = "simulation", required = true) @NotNull SimulationRequest request) throws NotFoundException {
+    public SimulationResponse simulate(@Parameter(name = "simulation", required = true) @NotNull SimulationRequest request) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, request.streamId());
 
         final Message message = messageFactory.createMessage(request.message());

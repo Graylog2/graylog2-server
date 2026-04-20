@@ -17,11 +17,11 @@
 package org.graylog2.shared.security.tls;
 
 import com.google.common.io.Resources;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.security.KeyException;
@@ -29,10 +29,11 @@ import java.security.cert.CertificateException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PemReaderTest {
-    @Rule
-    public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    public File temporaryFolder;
 
     @Test
     public void readCertificatesHandlesSingleCertificate() throws Exception {
@@ -48,16 +49,20 @@ public class PemReaderTest {
         assertThat(certificates).hasSize(2);
     }
 
-    @Test(expected = CertificateException.class)
+    @Test
     public void readCertificatesFailsOnInvalidFile() throws Exception {
-        final File file = temporaryFolder.newFile();
-        PemReader.readCertificates(file.toPath());
+        assertThrows(CertificateException.class, () -> {
+            final File file = File.createTempFile("junit", null, temporaryFolder);
+            PemReader.readCertificates(file.toPath());
+        });
     }
 
-    @Test(expected = CertificateException.class)
+    @Test
     public void readCertificatesFailsOnDirectory() throws Exception {
-        final File folder = temporaryFolder.newFolder();
-        PemReader.readCertificates(folder.toPath());
+        assertThrows(CertificateException.class, () -> {
+            final File folder = newFolder(temporaryFolder, "junit");
+            PemReader.readCertificates(folder.toPath());
+        });
     }
 
     @Test
@@ -74,15 +79,28 @@ public class PemReaderTest {
         assertThat(privateKey).isNotEmpty();
     }
 
-    @Test(expected = KeyException.class)
+    @Test
     public void readPrivateKeyFailsOnInvalidFile() throws Exception {
-        final File file = temporaryFolder.newFile();
-        PemReader.readPrivateKey(file.toPath());
+        assertThrows(KeyException.class, () -> {
+            final File file = File.createTempFile("junit", null, temporaryFolder);
+            PemReader.readPrivateKey(file.toPath());
+        });
     }
 
-    @Test(expected = KeyException.class)
+    @Test
     public void readPrivateKeyFailsOnDirectory() throws Exception {
-        final File folder = temporaryFolder.newFolder();
-        PemReader.readPrivateKey(folder.toPath());
+        assertThrows(KeyException.class, () -> {
+            final File folder = newFolder(temporaryFolder, "junit");
+            PemReader.readPrivateKey(folder.toPath());
+        });
+    }
+
+    private static File newFolder(File root, String... subDirs) throws IOException {
+        String subFolder = String.join("/", subDirs);
+        File result = new File(root, subFolder);
+        if (!result.mkdirs()) {
+            throw new IOException("Couldn't create folders " + root);
+        }
+        return result;
     }
 }

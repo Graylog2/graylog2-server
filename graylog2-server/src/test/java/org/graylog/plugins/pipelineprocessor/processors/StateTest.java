@@ -17,9 +17,9 @@
 package org.graylog.plugins.pipelineprocessor.processors;
 
 import org.graylog2.plugin.LocalMetricRegistry;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class StateTest {
 

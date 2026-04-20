@@ -222,11 +222,6 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
     <WidgetFocusContext.Consumer>
       {({ focusedWidget: { editing } = { editing: false } }) => (
         <FormWarningsProvider>
-          <ScrollToHint
-            scrollContainer={scrollContainer}
-            ifValueChanges={query.query_string}
-            title="Scroll to search bar"
-          />
           <SearchBarForm
             initialValues={initialValues}
             limitDuration={limitDuration}
@@ -250,6 +245,11 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
               return (
                 <>
                   <ValidateOnParameterChange parameters={parameters} />
+                  <ScrollToHint
+                    scrollContainer={scrollContainer}
+                    ifValueChanges={query.query_string}
+                    title="Scroll to search bar"
+                  />
                   <SearchBarContainer>
                     <TimeRangeRow>
                       <TimeRangeFilter

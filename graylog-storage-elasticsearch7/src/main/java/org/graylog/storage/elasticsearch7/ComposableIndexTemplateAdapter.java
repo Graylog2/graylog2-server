@@ -26,6 +26,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.Comp
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.compress.CompressedXContent;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.settings.Settings;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.XContentType;
+import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.Template;
 
 import jakarta.inject.Inject;

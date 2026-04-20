@@ -26,16 +26,16 @@ import jakarta.ws.rs.ext.ExceptionMapper;
 import org.graylog2.plugin.rest.RequestError;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.rest.exceptionmappers.JsonProcessingExceptionMapper;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class JsonProcessingExceptionMapperTest {
-    @BeforeClass
+    @BeforeAll
     public static void setUpInjector() {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
     }

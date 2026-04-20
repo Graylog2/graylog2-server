@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { render, screen, waitFor, fireEvent } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
+import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import type { Optional } from 'utility-types';
 
 import OriginalTokenList from 'components/users/TokenList';
@@ -57,6 +57,8 @@ jest.mock('components/users/UsersTokenManagement/hooks/useDeleteTokenMutation', 
   default: jest.fn(() => ({ deleteToken: jest.fn(() => Promise.resolve()) })),
 }));
 
+const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+
 describe('<TokenList />', () => {
   beforeAll(() => {
     jest.useFakeTimers();
@@ -96,13 +98,14 @@ describe('<TokenList />', () => {
     render(<TokenList tokens={tokens} onCreate={createFn} user={alice} />);
 
     const nameInput = await screen.findByPlaceholderText('What is this token for?');
-    await userEvent.type(nameInput, 'hans');
+    await setupUser().type(nameInput, 'hans');
 
     const ttlInput = await screen.findByLabelText('Token TTL');
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.change(ttlInput, { target: { value: 'PT72H' } });
 
     const createToken = await screen.findByRole('button', { name: 'Create Token' });
-    await userEvent.click(createToken);
+    await setupUser().click(createToken);
 
     await screen.findByText('beef2003');
 
@@ -128,10 +131,10 @@ describe('<TokenList />', () => {
     render(<TokenList tokens={tokens} onCreate={createFn} user={serviceUser} />);
 
     const nameInput = await screen.findByPlaceholderText('What is this token for?');
-    await userEvent.type(nameInput, 'hans');
+    await setupUser().type(nameInput, 'hans');
 
     const createToken = await screen.findByRole('button', { name: 'Create Token' });
-    await userEvent.click(createToken);
+    await setupUser().click(createToken);
 
     await screen.findByText('beef2003');
 
@@ -145,12 +148,12 @@ describe('<TokenList />', () => {
     render(<TokenList tokens={tokens} user={alice} onDelete={onDeleteFn} />);
 
     const deleteButtons = await screen.findAllByRole('button', { name: 'Delete' });
-    await userEvent.click(deleteButtons[0]);
+    await setupUser().click(deleteButtons[0]);
     await screen.findByRole('heading', {
       name: /deleting token/i,
     });
 
-    await userEvent.click(await screen.findByRole('button', { name: /Confirm/i }));
+    await setupUser().click(await screen.findByRole('button', { name: /Confirm/i }));
 
     await waitFor(() => {
       expect(deleteToken).toHaveBeenCalled();

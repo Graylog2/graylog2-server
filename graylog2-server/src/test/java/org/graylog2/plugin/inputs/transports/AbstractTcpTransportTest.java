@@ -24,6 +24,7 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LoggingHandler;
+import org.graylog.testing.RestoreSystemProperties;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
 import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
@@ -31,17 +32,16 @@ import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.RestoreSystemProperties;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,23 +49,21 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.awaitility.Awaitility.await;
-import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeTrue;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.mock;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(RestoreSystemProperties.class)
 public class AbstractTcpTransportTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    @Rule
-    public final TemporaryFolder temporaryFolder = new TemporaryFolder();
-
-    @Rule
-    public final RestoreSystemProperties restoreSystemProperties = new RestoreSystemProperties();
-
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
+    @TempDir
+    public File temporaryFolder;
 
     @Mock
     private MessageInput input;
@@ -79,7 +77,7 @@ public class AbstractTcpTransportTest {
     private EventLoopGroupFactory eventLoopGroupFactory;
     private final NettyTransportConfiguration nettyTransportConfiguration = new NettyTransportConfiguration("nio", "jdk", 2);
 
-    @Before
+    @BeforeEach
     public void setUp() {
         eventLoopGroup = new NioEventLoopGroup();
         eventLoopGroupFactory = new EventLoopGroupFactory(nettyTransportConfiguration);
@@ -87,13 +85,13 @@ public class AbstractTcpTransportTest {
         localRegistry = new LocalMetricRegistry();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         eventLoopGroup.shutdownGracefully();
     }
 
     @Test
-    public void getChildChannelHandlersGeneratesSelfSignedCertificates() {
+    public void getChildChannelHandlersGeneratesSelfSignedCertificates() throws Exception {
         final Configuration configuration = new Configuration(ImmutableMap.of(
             "bind_address", "localhost",
             "port", 12345,
@@ -108,8 +106,8 @@ public class AbstractTcpTransportTest {
     }
 
     @Test
-    public void getChildChannelHandlersFailsIfTempDirDoesNotExist() throws IOException {
-        final File tmpDir = temporaryFolder.newFolder();
+    public void getChildChannelHandlersFailsIfTempDirDoesNotExist() throws Exception {
+        final File tmpDir = newFolder(temporaryFolder, "junit");
         assumeTrue(tmpDir.delete());
         System.setProperty("java.io.tmpdir", tmpDir.getAbsolutePath());
 
@@ -122,15 +120,14 @@ public class AbstractTcpTransportTest {
         final AbstractTcpTransport transport = new AbstractTcpTransport(
             configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration, tlsConfiguration) {};
 
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("Couldn't write to temporary directory: " + tmpDir.getAbsolutePath());
-
-        transport.getChildChannelHandlers(input);
+        assertThatThrownBy(() -> transport.getChildChannelHandlers(input))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Couldn't write to temporary directory: " + tmpDir.getAbsolutePath());
     }
 
     @Test
-    public void getChildChannelHandlersFailsIfTempDirIsNotWritable() throws IOException {
-        final File tmpDir = temporaryFolder.newFolder();
+    public void getChildChannelHandlersFailsIfTempDirIsNotWritable() throws Exception {
+        final File tmpDir = newFolder(temporaryFolder, "junit");
         assumeTrue(tmpDir.setWritable(false));
         assumeFalse(tmpDir.canWrite());
         System.setProperty("java.io.tmpdir", tmpDir.getAbsolutePath());
@@ -144,15 +141,15 @@ public class AbstractTcpTransportTest {
         final AbstractTcpTransport transport = new AbstractTcpTransport(
             configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration, tlsConfiguration) {};
 
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("Couldn't write to temporary directory: " + tmpDir.getAbsolutePath());
+        Throwable exception = assertThrows(IllegalStateException.class, () ->
 
-        transport.getChildChannelHandlers(input);
+            transport.getChildChannelHandlers(input));
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Couldn't write to temporary directory: " + tmpDir.getAbsolutePath()));
     }
 
     @Test
-    public void getChildChannelHandlersFailsIfTempDirIsNoDirectory() throws IOException {
-        final File file = temporaryFolder.newFile();
+    public void getChildChannelHandlersFailsIfTempDirIsNoDirectory() throws Exception {
+        final File file = File.createTempFile("junit", null, temporaryFolder);
         assumeTrue(file.isFile());
         System.setProperty("java.io.tmpdir", file.getAbsolutePath());
 
@@ -165,14 +162,14 @@ public class AbstractTcpTransportTest {
         final AbstractTcpTransport transport = new AbstractTcpTransport(
             configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration, tlsConfiguration) {};
 
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("Couldn't write to temporary directory: " + file.getAbsolutePath());
+        Throwable exception = assertThrows(IllegalStateException.class, () ->
 
-        transport.getChildChannelHandlers(input);
+            transport.getChildChannelHandlers(input));
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Couldn't write to temporary directory: " + file.getAbsolutePath()));
     }
 
     @Test
-    @Ignore("Disabled test due to being unreliable. For details see https://github.com/Graylog2/graylog2-server/issues/4702.")
+    @Disabled("Disabled test due to being unreliable. For details see https://github.com/Graylog2/graylog2-server/issues/4702.")
     public void testTrafficCounter() throws Exception {
         final Configuration configuration = new Configuration(ImmutableMap.of(
                 "bind_address", "127.0.0.1",
@@ -204,7 +201,7 @@ public class AbstractTcpTransportTest {
     }
 
     @Test
-    @Ignore("Disabled test due to being unreliable. For details see https://github.com/Graylog2/graylog2-server/issues/4791.")
+    @Disabled("Disabled test due to being unreliable. For details see https://github.com/Graylog2/graylog2-server/issues/4791.")
     public void testConnectionCounter() throws Exception {
         final Configuration configuration = new Configuration(ImmutableMap.of(
                 "bind_address", "127.0.0.1",
@@ -252,5 +249,14 @@ public class AbstractTcpTransportTest {
                 .handler(new LoggingHandler())
                 .connect(hostname, port)
                 .syncUninterruptibly();
+    }
+
+    private static File newFolder(File root, String... subDirs) throws IOException {
+        String subFolder = String.join("/", subDirs);
+        File result = new File(root, subFolder);
+        if (!result.mkdirs()) {
+            throw new IOException("Couldn't create folders " + root);
+        }
+        return result;
     }
 }

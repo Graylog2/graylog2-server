@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import * as React from 'react';
-import { render, fireEvent, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
@@ -69,7 +70,7 @@ describe('CopyToDashboardForm', () => {
 
   const submitModal = async () => {
     const submitButton = await screen.findByRole('button', { name: /submit/i });
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
   };
 
   it('should render the modal minimal', async () => {
@@ -111,7 +112,7 @@ describe('CopyToDashboardForm', () => {
     const { getByText } = render(<SUT onCancel={onCancel} />);
     const cancelButton = getByText('Cancel');
 
-    fireEvent.click(cancelButton);
+    await userEvent.click(cancelButton);
 
     await waitFor(() => {
       expect(onCancel).toHaveBeenCalledTimes(1);
@@ -137,7 +138,7 @@ describe('CopyToDashboardForm', () => {
     const { getByText } = render(<SUT onCopyToDashboard={onSubmit} />);
     const firstView = getByText('view 1');
 
-    fireEvent.click(firstView);
+    await userEvent.click(firstView);
     await submitModal();
 
     await screen.findByRole('button', { name: /submit/i });
@@ -152,7 +153,7 @@ describe('CopyToDashboardForm', () => {
 
     const checkBox = await findByLabelText(/create a new dashboard/i);
 
-    fireEvent.click(checkBox);
+    await userEvent.click(checkBox);
     await submitModal();
 
     await screen.findByRole('button', { name: /submit/i });
@@ -168,7 +169,7 @@ describe('CopyToDashboardForm', () => {
 
     const searchInput = screen.getByPlaceholderText('Enter search query...');
 
-    fireEvent.change(searchInput, { target: { value: 'view 1' } });
+    await userEvent.type(searchInput, 'view 1');
 
     await waitFor(() =>
       expect(useDashboards).toHaveBeenCalledWith({

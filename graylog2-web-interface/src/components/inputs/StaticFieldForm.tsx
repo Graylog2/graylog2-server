@@ -16,10 +16,14 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+
+import { StaticFields } from '@graylog/server-api';
 
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 import type { Input as InputType } from 'components/messageloaders/Types';
-import { InputStaticFieldsStore } from 'stores/inputs/InputStaticFieldsStore';
+import UserNotification from 'util/UserNotification';
+import { KEY_PREFIX } from 'hooks/usePaginatedInputs';
 
 type Props = {
   input: InputType;
@@ -29,9 +33,22 @@ type Props = {
 const StaticFieldForm = ({ input, setShowModal }: Props) => {
   const [fieldName, setFieldName] = useState<string>('');
   const [fieldValue, setFieldValue] = useState<string>('');
+  const queryClient = useQueryClient();
 
   const addStaticField = () => {
-    InputStaticFieldsStore.create(input, fieldName, fieldValue).then(() => setShowModal(false));
+    StaticFields.create(input.id, { key: fieldName, value: fieldValue }).then(
+      () => {
+        UserNotification.success(`Static field '${fieldName}' added to '${input.title}' successfully`);
+        setShowModal(false);
+        queryClient.invalidateQueries({ queryKey: KEY_PREFIX });
+      },
+      (error) => {
+        UserNotification.error(
+          `Adding static field to input failed with: ${error}`,
+          `Could not add static field to input '${input.title}'`,
+        );
+      },
+    );
   };
 
   const handleFieldChange = (name: string, event: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,7 +88,6 @@ const StaticFieldForm = ({ input, setShowModal }: Props) => {
         required
         pattern="[A-Za-z0-9_]*"
         title="Should consist only of alphanumeric characters and underscores."
-        autoFocus
       />
       <Input
         value={fieldValue}

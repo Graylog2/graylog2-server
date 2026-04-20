@@ -47,19 +47,6 @@ public class FiltersIT {
     }
 
     @FullBackendTest
-    void cspDocumentationBrowser() {
-        String expected = cspResources.cspString(CSP.SWAGGER);
-        given()
-                .spec(api.requestSpecification())
-                .when()
-                .get("/api-browser")
-                .then()
-                .statusCode(200)
-                .assertThat().header(CSPResponseFilter.CSP_HEADER,
-                        Matchers.containsString(expected));
-    }
-
-    @FullBackendTest
     void cspWebInterfaceAssets() {
         given()
                 .spec(api.requestSpecification())

@@ -55,6 +55,7 @@ import org.joda.time.Period;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -99,6 +100,10 @@ public class SidecarService {
 
     public long count() {
         return collection.countDocuments();
+    }
+
+    public Map<String, Long> countByVersion() {
+        return mongoUtils.countByField(Sidecar.FIELD_SIDECAR_VERSION);
     }
 
     public Sidecar save(Sidecar sidecar) {

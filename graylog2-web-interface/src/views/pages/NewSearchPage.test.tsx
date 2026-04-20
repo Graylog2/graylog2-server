@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
@@ -139,7 +140,7 @@ describe('NewSearchPage', () => {
 
       const { findByText } = render(<SimpleNewSearchPage />);
       const viewLoadButton = await findByText('Load view');
-      fireEvent.click(viewLoadButton);
+      await userEvent.click(viewLoadButton);
 
       await waitFor(() => expect(loadView).toHaveBeenCalled());
 
@@ -163,7 +164,7 @@ describe('NewSearchPage', () => {
     it('should be supported', async () => {
       const { findByText } = render(<SimpleNewSearchPage />);
       const viewCreateButton = await findByText('Load new view');
-      fireEvent.click(viewCreateButton);
+      await userEvent.click(viewCreateButton);
 
       await waitFor(() => expect(loadNewView).toHaveBeenCalled());
     });
@@ -171,7 +172,7 @@ describe('NewSearchPage', () => {
     it('should process hooks with query', async () => {
       const { findByText } = render(<SimpleNewSearchPage />);
       const viewCreateButton = await findByText('Load new view');
-      fireEvent.click(viewCreateButton);
+      await userEvent.click(viewCreateButton);
 
       await waitFor(() => expect(useProcessHooksForView).toHaveBeenCalled());
 

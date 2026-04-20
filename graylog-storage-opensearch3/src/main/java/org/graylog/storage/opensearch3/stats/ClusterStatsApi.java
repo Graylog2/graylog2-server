@@ -17,27 +17,32 @@
 package org.graylog.storage.opensearch3.stats;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
-import org.graylog.storage.opensearch3.PlainJsonApi;
+import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
+import org.opensearch.client.opensearch.generic.Request;
+import org.opensearch.client.opensearch.generic.Requests;
+
+import java.util.Map;
 
 public class ClusterStatsApi {
-    private final ObjectMapper objectMapper;
-    private final PlainJsonApi jsonApi;
+    private final OfficialOpensearchClient officialOpensearchClient;
 
     @Inject
-    public ClusterStatsApi(ObjectMapper objectMapper,
-                           PlainJsonApi jsonApi) {
-        this.objectMapper = objectMapper;
-        this.jsonApi = jsonApi;
+    public ClusterStatsApi(OfficialOpensearchClient officialOpensearchClient) {
+        this.officialOpensearchClient = officialOpensearchClient;
     }
 
     public IndexSetStats clusterStats() {
-        final Request request = new Request("GET", "/_cluster/stats");
-        request.addParameter("filter_path", "indices.count,indices.docs.count,indices.store.size_in_bytes");
-        final JsonNode stats = jsonApi.perform(request, "Couldn't read Elasticsearch cluster stats");
+        // the new filter-by-request-path of ClusterStatsRequest is only available in OS >= 2.18.
+        // so we have to resort to using the undocumented, but working (as of 3.5.0) filter_path request parameter
+        // with a generic api request.
+        final Request request = Requests.builder()
+                .method("GET")
+                .endpoint("/_cluster/stats")
+                .query(Map.of("filter_path", "indices.count,indices.docs.count,indices.store.size_in_bytes"))
+                .build();
+        JsonNode stats = officialOpensearchClient.performRequest(request, "Couldn't read OpensSearch cluster stats");
 
         final long indicesCount = stats.path("indices").path("count").asLong();
         final long docsCount = stats.path("indices").path("docs").path("count").asLong();

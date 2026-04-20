@@ -24,64 +24,71 @@ import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class RegexReplaceExtractorTest extends AbstractExtractorTest {
     private final MessageFactory messageFactory = new TestMessageFactory();
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void testConstructorWithMissingRegex() throws Exception {
-        new RegexReplaceExtractor(
-                metricRegistry,
-                "id",
-                "title",
-                0L,
-                Extractor.CursorStrategy.COPY,
-                "message",
-                "message",
-                ImmutableMap.<String, Object>of(),
-                "user",
-                Collections.<Converter>emptyList(),
-                Extractor.ConditionType.NONE,
-                null);
+        assertThrows(ConfigurationException.class, () -> {
+            new RegexReplaceExtractor(
+                    metricRegistry,
+                    "id",
+                    "title",
+                    0L,
+                    Extractor.CursorStrategy.COPY,
+                    "message",
+                    "message",
+                    ImmutableMap.<String, Object>of(),
+                    "user",
+                    Collections.<Converter>emptyList(),
+                    Extractor.ConditionType.NONE,
+                    null);
+        });
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void testConstructorWithNonStringRegex() throws Exception {
-        new RegexReplaceExtractor(
-                metricRegistry,
-                "id",
-                "title",
-                0L,
-                Extractor.CursorStrategy.COPY,
-                "message",
-                "message",
-                ImmutableMap.<String, Object>of("regex", 0L),
-                "user",
-                Collections.<Converter>emptyList(),
-                Extractor.ConditionType.NONE,
-                null);
+        assertThrows(ConfigurationException.class, () -> {
+            new RegexReplaceExtractor(
+                    metricRegistry,
+                    "id",
+                    "title",
+                    0L,
+                    Extractor.CursorStrategy.COPY,
+                    "message",
+                    "message",
+                    ImmutableMap.<String, Object>of("regex", 0L),
+                    "user",
+                    Collections.<Converter>emptyList(),
+                    Extractor.ConditionType.NONE,
+                    null);
+        });
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void testConstructorWithNonStringReplacement() throws Exception {
-        new RegexReplaceExtractor(
-                metricRegistry,
-                "id",
-                "title",
-                0L,
-                Extractor.CursorStrategy.COPY,
-                "message",
-                "message",
-                ImmutableMap.<String, Object>of("regex", "NO-MATCH", "replacement", 0L),
-                "user",
-                Collections.<Converter>emptyList(),
-                Extractor.ConditionType.NONE,
-                null);
+        assertThrows(ConfigurationException.class, () -> {
+            new RegexReplaceExtractor(
+                    metricRegistry,
+                    "id",
+                    "title",
+                    0L,
+                    Extractor.CursorStrategy.COPY,
+                    "message",
+                    "message",
+                    ImmutableMap.<String, Object>of("regex", "NO-MATCH", "replacement", 0L),
+                    "user",
+                    Collections.<Converter>emptyList(),
+                    Extractor.ConditionType.NONE,
+                    null);
+        });
     }
 
     @Test
@@ -126,23 +133,25 @@ public class RegexReplaceExtractorTest extends AbstractExtractorTest {
         assertThat(message.getMessage()).isEqualTo("Foobar");
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testReplacementWithTooManyPlaceholders() throws Exception {
-        final Message message = messageFactory.createMessage("Foobar 123", "source", Tools.nowUTC());
-        final RegexReplaceExtractor extractor = new RegexReplaceExtractor(
-                metricRegistry,
-                "id",
-                "title",
-                0L,
-                Extractor.CursorStrategy.COPY,
-                "message",
-                "message",
-                ImmutableMap.<String, Object>of("regex", "Foobar (\\d+)", "replacement", "$1 $2"),
-                "user",
-                Collections.<Converter>emptyList(),
-                Extractor.ConditionType.NONE,
-                null);
-        extractor.runExtractor(message);
+        assertThrows(RuntimeException.class, () -> {
+            final Message message = messageFactory.createMessage("Foobar 123", "source", Tools.nowUTC());
+            final RegexReplaceExtractor extractor = new RegexReplaceExtractor(
+                    metricRegistry,
+                    "id",
+                    "title",
+                    0L,
+                    Extractor.CursorStrategy.COPY,
+                    "message",
+                    "message",
+                    ImmutableMap.<String, Object>of("regex", "Foobar (\\d+)", "replacement", "$1 $2"),
+                    "user",
+                    Collections.<Converter>emptyList(),
+                    Extractor.ConditionType.NONE,
+                    null);
+            extractor.runExtractor(message);
+        });
     }
 
     @Test

@@ -31,11 +31,11 @@ class SplitAndCountConverterConfiguration extends React.Component<
     [key: string]: any;
   }
 > {
-  private converterEnabled: Input;
-
   componentDidMount() {
     this.props.onChange(this.props.type, this._getConverterObject());
   }
+
+  private converterEnabled: Input;
 
   _getConverterObject = (configuration?) => ({
     type: this.props.type,

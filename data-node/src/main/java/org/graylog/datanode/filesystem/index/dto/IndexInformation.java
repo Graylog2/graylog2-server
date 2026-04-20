@@ -18,40 +18,60 @@ package org.graylog.datanode.filesystem.index.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nullable;
 import org.graylog.datanode.filesystem.index.statefile.StateFile;
 import org.graylog.shaded.opensearch2.org.opensearch.Version;
 
 import java.nio.file.Path;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-public record IndexInformation(@JsonIgnore Path path, String indexID, @JsonIgnore StateFile stateFile,
+public record IndexInformation(@JsonIgnore Path path, String indexID, @Nullable @JsonIgnore StateFile stateFile,
                                List<ShardInformation> shards) {
 
     @JsonProperty
     public String indexName() {
-        return stateFile.document().keySet().stream().findFirst().orElseThrow(() -> new RuntimeException("Failed to read index name"));
+        return Optional.ofNullable(stateFile)
+                .map(StateFile::document)
+                .map(Map::keySet)
+                .flatMap(keyset -> keyset.stream().findFirst())
+                .orElse(indexID);
     }
 
+    @Nullable
     @JsonProperty
     public String indexVersionCreated() {
-        final int versionValue = Integer.parseInt(indexSetting("index.version.created"));
-        return Version.fromId(versionValue).toString();
+        return indexSetting("index.version.created")
+                .map(Integer::parseInt)
+                .map(Version::fromId)
+                .map(Version::toString)
+                .orElse(null);
     }
 
+    @Nullable
     @JsonProperty
     public String creationDate() {
-
-        final long timestamp = Long.parseLong(indexSetting("index.creation_date"));
-        return Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDateTime().toString();
+        return indexSetting("index.creation_date")
+                .map(Long::parseLong)
+                .map(Instant::ofEpochMilli)
+                .map(instant -> instant.atZone(ZoneId.systemDefault()))
+                .map(ZonedDateTime::toLocalDate)
+                .map(LocalDate::toString)
+                .orElse(null);
     }
 
-    private String indexSetting(String setting) {
-        final Map<String, Object> index = (Map<String, Object>) stateFile.document().get(indexName());
-        Map<String, Object> settings = (Map<String, Object>) index.get("settings");
-        return (String) settings.get(setting);
+    private Optional<String> indexSetting(String setting) {
+        return Optional.ofNullable(stateFile).map(sf -> {
+            final Map<String, Object> index = (Map<String, Object>) sf.document().get(indexName());
+            Map<String, Object> settings = (Map<String, Object>) index.get("settings");
+            return (String) settings.get(setting);
+        });
+
     }
 
     @Override

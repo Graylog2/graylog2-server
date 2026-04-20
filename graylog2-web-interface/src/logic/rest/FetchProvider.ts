@@ -16,13 +16,15 @@
  */
 import memoize from 'lodash/memoize';
 
+import * as JSON from 'util/json';
 import FetchError from 'logic/errors/FetchError';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import CancellablePromise from 'logic/rest/CancellablePromise';
 import { ServerAvailabilityActions } from 'stores/sessions/ServerAvailabilityStore';
+import type { Method } from 'routing/types';
 
-// eslint-disable-next-line global-require
+// eslint-disable-next-line global-require,@typescript-eslint/no-require-imports
 const importSessionStore = memoize(() => require('stores/sessions/SessionStore'));
 
 const reportServerSuccess = () => {
@@ -72,7 +74,7 @@ const defaultResponseHandler = (resp: Response) => {
 
     reportServerSuccess();
 
-    return noContent ? null : resp.json();
+    return noContent ? null : resp.text().then(JSON.parse);
   }
 
   throw resp;
@@ -120,6 +122,15 @@ export class Builder {
     this.options = {
       ...this.options,
       [header]: value,
+    };
+
+    return this;
+  }
+
+  setHeaders(headers: { [key: string]: string | number | boolean | string[] }) {
+    this.options = {
+      ...this.options,
+      ...headers,
     };
 
     return this;
@@ -207,7 +218,7 @@ export class Builder {
   }
 
   ignoreUnauthorized() {
-    this.errorHandler = (error: Response) => onServerError(error, () => {});
+    this.errorHandler = (error: Response) => onServerError(error, () => Promise.resolve());
 
     return this;
   }
@@ -257,8 +268,6 @@ function queuePromiseIfNotLoggedin<T>(promise: () => Promise<T>): () => Promise<
 
   return promise;
 }
-
-type Method = 'GET' | 'PUT' | 'POST' | 'DELETE';
 
 export default function fetch<T = any>(
   method: Method,

@@ -14,10 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import moment from 'moment';
 import { Formik, Form, Field } from 'formik';
 import styled, { css } from 'styled-components';
+import deburr from 'lodash/deburr';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import useIndexSetTemplateDefaults from 'components/indices/IndexSetTemplates/hooks/useIndexSetTemplateDefaults';
@@ -28,7 +29,7 @@ import { Alert, Col, Row } from 'components/bootstrap';
 import 'components/indices/rotation';
 import 'components/indices/retention';
 import { prepareDataTieringConfig, prepareDataTieringInitialValues } from 'components/indices/data-tiering';
-import type { IndexSet, IndexSetFormValues, IndexSetFieldRestriction } from 'stores/indices/IndexSetsStore';
+import type { IndexSet, IndexSetFormValues } from 'stores/indices/IndexSetsStore';
 import type {
   RotationStrategyConfig,
   RetentionStrategyConfig,
@@ -47,6 +48,7 @@ import IndexSetReadOnlyConfiguration from 'components/indices/IndexSetConfigurat
 import IndexSetRotationRetentionConfigurationSection from 'components/indices/IndexSetConfigurationForm/IndexSetRotationRetentionConfigurationSection';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted } from 'util/PermissionsMixin';
+import { parseFieldRestrictions } from 'components/indices/helpers/fieldRestrictions';
 
 type Props = {
   cancelLink: string;
@@ -77,6 +79,18 @@ const SubmitWrapper = styled.div`
   justify-content: flex-end;
 `;
 
+export const transformTitleToPrefix = (title: string): string => {
+  if (!title) return '';
+
+  return deburr(title) // Replace extended letters with basic Latin letters
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_+-]+/g, '-') // Replace invalid chars with hyphen
+    .replace(/^[_+-]+/, '') // Remove leading invalid chars
+    .replace(/-+$/, '') // Remove trailing hyphens
+    .replace(/-{2,}/g, '-'); // Collapse multiple hyphens
+};
+
 const IndexSetConfigurationForm = ({
   indexSet: initialIndexSet = undefined,
   rotationStrategies,
@@ -95,9 +109,12 @@ const IndexSetConfigurationForm = ({
   const [fieldTypeRefreshIntervalUnit, setFieldTypeRefreshIntervalUnit] = useState<Unit>('seconds');
   const { loadingIndexSetTemplateDefaults, indexSetTemplateDefaults } = useIndexSetTemplateDefaults();
   const [indexSet] = useIndexSet(initialIndexSet);
+  const [autoFillPrefix, setAutoFillPrefix] = useState<boolean>(true);
 
-  const [immutableFields, setImmutableFields] = useState<string[]>([]);
-  const [hiddenFields, setHiddenFields] = useState<string[]>([]);
+  const getFieldRestrictions = useCallback(() => parseFieldRestrictions(indexSet?.field_restrictions), [indexSet]);
+
+  const immutableFields = getFieldRestrictions().immutableFields;
+  const hiddenFields = getFieldRestrictions().hiddenFields;
 
   const isCloud = AppConfig.isCloud();
   const enableDataTieringCloud = useFeature('data_tiering_cloud');
@@ -113,35 +130,8 @@ const IndexSetConfigurationForm = ({
 
   const [selectedRetentionSegment, setSelectedRetentionSegment] = useState<RetentionConfigSegment>(initialSegment());
 
-  const parseFieldRestrictions = (field_restrictions: IndexSetFieldRestriction[]) => {
-    const getHidden = () =>
-      Object.keys(field_restrictions).filter(
-        (field) => field_restrictions[field].filter((restriction) => restriction.type === 'hidden').length > 0,
-      );
-
-    const getImmutable = () =>
-      Object.keys(field_restrictions).filter(
-        (field) => field_restrictions[field].filter((restriction) => restriction.type === 'immutable').length > 0,
-      );
-
-    if (field_restrictions) return [getImmutable(), getHidden()];
-
-    return [[], []];
-  };
-
-  useEffect(() => {
-    if (indexSet?.use_legacy_rotation) {
-      setSelectedRetentionSegment('legacy');
-    } else {
-      setSelectedRetentionSegment('data_tiering');
-    }
-  }, [indexSet]);
-
-  useEffect(() => {
-    const [tmpImmutable, tmpHidden] = parseFieldRestrictions(indexSet?.field_restrictions);
-    setImmutableFields(tmpImmutable);
-    setHiddenFields(tmpHidden);
-  }, [indexSet]);
+  const isDataTieringImmutable = useMemo(() => immutableFields.includes('data_tiering'), [immutableFields]);
+  const isDataTieringLocked = isDataTieringImmutable && !ignoreFieldRestrictions;
 
   const prepareRetentionConfigBeforeSubmit = useCallback(
     (values: IndexSetFormValues): IndexSet => {
@@ -171,7 +161,7 @@ const IndexSetConfigurationForm = ({
 
       const configWithDataTiering = {
         ...indexSetValues,
-        data_tiering: prepareDataTieringConfig(values.data_tiering, PluginStore),
+        data_tiering: prepareDataTieringConfig(values.data_tiering, PluginStore, isDataTieringLocked),
       };
 
       if (loadingIndexSetTemplateDefaults || !indexSetTemplateDefaults)
@@ -193,6 +183,7 @@ const IndexSetConfigurationForm = ({
       selectedRetentionSegment,
       enableDataTieringCloud,
       isCloud,
+      isDataTieringLocked,
     ],
   );
 
@@ -209,6 +200,20 @@ const IndexSetConfigurationForm = ({
     setFieldValue(name, moment.duration(intervalValue, unit).asMilliseconds());
     setFieldTypeRefreshIntervalUnit(unit);
   };
+
+  const handleTitleChange = useCallback(
+    (event: React.BaseSyntheticEvent, setFieldValue: (field: string, value: any) => void) => {
+      if (!create || !autoFillPrefix) return;
+
+      const transformedPrefix = transformTitleToPrefix(event.target.value);
+      setFieldValue('index_prefix', transformedPrefix);
+    },
+    [create, autoFillPrefix],
+  );
+
+  const handlePrefixChange = useCallback(() => {
+    setAutoFillPrefix(false);
+  }, []);
 
   const detailsSectionRenderable = (): boolean => {
     if (create) return true;
@@ -232,7 +237,10 @@ const IndexSetConfigurationForm = ({
 
   const prepareInitialValues = () => {
     if (indexSet.data_tiering) {
-      return { ...indexSet, data_tiering: prepareDataTieringInitialValues(indexSet.data_tiering, PluginStore) };
+      return {
+        ...indexSet,
+        data_tiering: prepareDataTieringInitialValues(indexSet.data_tiering, PluginStore, isDataTieringLocked),
+      };
     }
 
     return indexSet as unknown as IndexSetFormValues;
@@ -253,6 +261,7 @@ const IndexSetConfigurationForm = ({
                       id="title"
                       name="title"
                       help="Descriptive name of the index set."
+                      onChange={(event) => handleTitleChange(event, setFieldValue)}
                       required
                     />
                     <FormikInput
@@ -271,6 +280,7 @@ const IndexSetConfigurationForm = ({
                           hiddenFields={hiddenFields}
                           immutableFields={immutableFields}
                           ignoreFieldRestrictions={ignoreFieldRestrictions}
+                          onPrefixChange={handlePrefixChange}
                         />
                       )}
                       <HideOnCloud>

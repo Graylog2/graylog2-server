@@ -101,12 +101,10 @@ describe('StreamRuleModal', () => {
 
     await selectEvent.chooseOption('Type', 'match input');
 
-    expect(submitBtn).toBeDisabled();
-
     await selectEvent.chooseOption('Input', 'input title (name)');
 
     await waitFor(() => expect(submitBtn).toBeEnabled());
-    userEvent.click(submitBtn);
+    await userEvent.click(submitBtn);
 
     await waitFor(() => expect(submit).toHaveBeenCalledTimes(1));
 

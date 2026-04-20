@@ -18,7 +18,7 @@ package org.graylog.events.processor.aggregation;
 
 import com.github.rholder.retry.RetryException;
 import org.graylog.testing.completebackend.Lifecycle;
-import org.graylog.testing.completebackend.WebhookServerInstance;
+import org.graylog.testing.completebackend.WebhookServerContainer;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.FullBackendTest;
 import org.graylog.testing.completebackend.GraylogBackendConfiguration;
@@ -29,7 +29,7 @@ import java.util.concurrent.ExecutionException;
 @GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class EventNotificationsResourceIT {
     private static GraylogApis apis;
-    private static WebhookServerInstance webhookServerInstance;
+    private static WebhookServerContainer webhookServerInstance;
 
 
     @BeforeAll

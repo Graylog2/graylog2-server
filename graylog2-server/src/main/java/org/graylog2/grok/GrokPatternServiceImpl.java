@@ -41,7 +41,11 @@ abstract class GrokPatternServiceImpl implements GrokPatternService {
         }
         grokCompiler.register(pattern.name(), pattern.pattern());
         Grok grok = grokCompiler.compile("%{" + pattern.name() + "}");
-        return grok.match(sampleData).captureFlattened();
+        try {
+            return grok.match(sampleData).captureFlattened();
+        } catch (StackOverflowError e) {
+            throw new IllegalArgumentException("Pattern caused a stack overflow during matching. Simplify the pattern to avoid deeply nested or repeated groups.");
+        }
     }
 
     @Override

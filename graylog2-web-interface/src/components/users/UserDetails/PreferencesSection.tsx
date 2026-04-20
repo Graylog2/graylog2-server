@@ -38,9 +38,9 @@ const PreferencesSection = ({ user: { preferences: databasePreferences, readOnly
 
   if (readOnly) {
     const localStoragePreferences = {
-      searchSidebarIsPinned: Store.get('searchSidebarIsPinned'),
-      dashboardSidebarIsPinned: Store.get('dashboardSidebarIsPinned'),
-      [PREFERENCES_THEME_MODE]: Store.get(PREFERENCES_THEME_MODE),
+      searchSidebarIsPinned: Store.get<boolean>('searchSidebarIsPinned'),
+      dashboardSidebarIsPinned: Store.get<boolean>('dashboardSidebarIsPinned'),
+      [PREFERENCES_THEME_MODE]: Store.get<string>(PREFERENCES_THEME_MODE),
     };
     preferences = { ...preferences, ...localStoragePreferences };
   }

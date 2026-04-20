@@ -16,8 +16,8 @@
  */
 package org.graylog.security.rest;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -34,7 +34,7 @@ import org.graylog2.datanode.DatanodeStartType;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.security.RestPermissions;
 
-@Api(value = "Certificate Renewal")
+@Tag(name = "Certificate Renewal")
 @Path("/certrenewal")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
@@ -51,7 +51,7 @@ public class CertificateRenewalResource implements PluginRestResource {
     @AuditEvent(type = AuditEventTypes.CERTIFICATE_RENEWAL_MANUALLY_INITIATED)
     // reusing permissions to be the same as for editing the renewal policy, which is below cluster configuration
     @RequiresPermissions({RestPermissions.CLUSTER_CONFIG_ENTRY_CREATE, RestPermissions.CLUSTER_CONFIG_ENTRY_EDIT})
-    public void initiateCertRenewalForNode(@ApiParam(name = "nodeID") @PathParam("nodeID") String nodeID) throws NodeNotFoundException {
+    public void initiateCertRenewalForNode(@Parameter(name = "nodeID") @PathParam("nodeID") String nodeID) throws NodeNotFoundException {
         dataNodeCommandService.triggerCertificateSigningRequest(nodeID, DatanodeStartType.AUTOMATICALLY);
     }
 }

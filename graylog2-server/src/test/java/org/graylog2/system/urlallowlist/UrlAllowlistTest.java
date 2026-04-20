@@ -19,13 +19,14 @@ package org.graylog2.system.urlallowlist;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.collect.ImmutableList;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class UrlAllowlistTest {
 
@@ -62,14 +63,16 @@ public class UrlAllowlistTest {
         assertThat(read).isEqualTo(orig);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void duplicateIds() {
-        UrlAllowlist.createEnabled(ImmutableList.of(LiteralAllowlistEntry.create("a", "a", "a"),
-                RegexAllowlistEntry.create("a", "b", "b")));
+        assertThrows(IllegalArgumentException.class, () ->
+            UrlAllowlist.createEnabled(ImmutableList.of(LiteralAllowlistEntry.create("a", "a", "a"),
+                    RegexAllowlistEntry.create("a", "b", "b"))));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void invalidRegex() {
-        UrlAllowlist.createEnabled(ImmutableList.of(RegexAllowlistEntry.create("a", "b", "${")));
+        assertThrows(IllegalArgumentException.class, () ->
+            UrlAllowlist.createEnabled(ImmutableList.of(RegexAllowlistEntry.create("a", "b", "${"))));
     }
 }

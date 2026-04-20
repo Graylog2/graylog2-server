@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { OrderedMap } from 'immutable';
 
 import { useQueryParam, StringParam } from 'routing/QueryParams';
@@ -22,97 +22,126 @@ import usePaginationQueryParameter, { DEFAULT_PAGE } from 'hooks/usePaginationQu
 import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
-import type { DefaultLayout } from 'components/common/EntityDataTable/types';
+import type { LayoutConfig } from 'components/common/EntityDataTable/hooks/useTableLayout';
 
-type LayoutConfig = { pageSize: number; sort: DefaultLayout['defaultSort'] };
-
-function useWithURLParams(layoutConfig: LayoutConfig) {
+export const useWithURLParams = (layoutConfig: LayoutConfig, defaultFilters?: UrlQueryFilters) => {
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setUrlQuery] = useQueryParam('query', StringParam);
+  const [sliceCol, setSliceCol] = useQueryParam('sliceCol', StringParam);
+  const [slice, setSlice] = useQueryParam('slice', StringParam);
   const urlPagination = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
+  const [hasUserModifiedFilters, setHasUserModifiedFilters] = useState(false);
 
-  const fetchOptions: SearchParams = React.useMemo(
+  const effectiveFilters = useMemo(() => {
+    if (!hasUserModifiedFilters && urlQueryFilters.isEmpty() && defaultFilters && !defaultFilters.isEmpty()) {
+      return defaultFilters;
+    }
+
+    return urlQueryFilters;
+  }, [hasUserModifiedFilters, urlQueryFilters, defaultFilters]);
+
+  const fetchOptions: SearchParams = useMemo(
     () => ({
       query,
+      slice,
+      sliceCol,
       page: urlPagination.page,
       pageSize: layoutConfig.pageSize,
       sort: layoutConfig.sort,
-      filters: urlQueryFilters,
+      filters: effectiveFilters,
     }),
-    [layoutConfig.pageSize, layoutConfig.sort, urlPagination.page, query, urlQueryFilters],
+    [query, slice, sliceCol, urlPagination.page, layoutConfig.pageSize, layoutConfig.sort, effectiveFilters],
   );
 
-  const onChangeFilters = React.useCallback(
+  const onChangeFilters = useCallback(
     (newUrlQueryFilters: UrlQueryFilters) => {
+      setHasUserModifiedFilters(true);
       urlPagination.resetPage();
       setUrlQueryFilters(newUrlQueryFilters);
     },
     [urlPagination, setUrlQueryFilters],
   );
 
+  const onChangeSlicing = (newSliceCol: string | undefined, newSlice?: string) => {
+    urlPagination.resetPage();
+    setSliceCol(newSliceCol);
+    setSlice(newSlice);
+  };
+
   return {
     fetchOptions,
     setQuery: setUrlQuery,
     onChangeFilters,
+    onChangeSlicing,
     paginationState: urlPagination,
   };
-}
+};
 
-function useWithLocalState(layoutConfig: LayoutConfig) {
-  const [fetchOptions, setFetchOptions] = React.useState<SearchParams>({
+export const useWithLocalState = (layoutConfig: LayoutConfig, defaultFilters?: UrlQueryFilters) => {
+  const [transientFetchOptions, setTransientFetchOptions] = useState<any>({
     query: '',
     page: DEFAULT_PAGE,
-    pageSize: layoutConfig.pageSize,
-    sort: layoutConfig.sort,
-    filters: OrderedMap<string, Array<string>>(),
+    filters: defaultFilters ?? OrderedMap<string, Array<string>>(),
+    slice: undefined,
+    sliceCol: undefined,
   });
 
-  const setPagination = React.useCallback(
-    ({ page, pageSize }: { page?: number; pageSize?: number }) => {
-      setFetchOptions({
-        ...fetchOptions,
-        page,
-        pageSize,
-      });
-    },
-    [fetchOptions],
-  );
+  const setPagination = useCallback(({ page, pageSize }: { page?: number; pageSize?: number }) => {
+    setTransientFetchOptions((cur) => ({
+      ...cur,
+      page,
+      pageSize,
+    }));
+  }, []);
 
-  const resetPage = React.useCallback(() => {
-    setFetchOptions({
-      ...fetchOptions,
+  const resetPage = useCallback(() => {
+    setTransientFetchOptions((cur) => ({
+      ...cur,
       page: DEFAULT_PAGE,
       sort: layoutConfig.sort,
-    });
-  }, [fetchOptions, layoutConfig.sort]);
+    }));
+  }, [layoutConfig.sort]);
 
-  const onChangeFilters = React.useCallback(
-    (newFilters: UrlQueryFilters) => {
-      setFetchOptions({
-        ...fetchOptions,
-        page: DEFAULT_PAGE,
-        filters: newFilters,
-      });
-    },
-    [fetchOptions],
+  const onChangeFilters = useCallback((newFilters: UrlQueryFilters) => {
+    setTransientFetchOptions((cur) => ({
+      ...cur,
+      page: DEFAULT_PAGE,
+      filters: newFilters,
+    }));
+  }, []);
+
+  const onChangeSlicing = useCallback((sliceCol: string | undefined, slice?: string | undefined) => {
+    setTransientFetchOptions((cur) => ({
+      ...cur,
+      page: DEFAULT_PAGE,
+      sliceCol,
+      slice,
+    }));
+  }, []);
+
+  const setQuery = useCallback((newQuery: string) => {
+    setTransientFetchOptions((cur) => ({
+      ...cur,
+      query: newQuery,
+      page: DEFAULT_PAGE,
+    }));
+  }, []);
+
+  const fetchOptions: SearchParams = useMemo(
+    () => ({
+      ...transientFetchOptions,
+      pageSize: layoutConfig.pageSize,
+      sort: layoutConfig.sort,
+    }),
+    [transientFetchOptions, layoutConfig.pageSize, layoutConfig.sort],
   );
 
-  const setQuery = React.useCallback(
-    (newQuery: string) => {
-      setFetchOptions({
-        ...fetchOptions,
-        query: newQuery,
-        page: DEFAULT_PAGE,
-      });
-    },
-    [fetchOptions],
-  );
-
-  const localPagination = React.useMemo(
+  return useMemo(
     () => ({
       fetchOptions,
       setQuery,
       onChangeFilters,
+      onChangeSlicing,
       paginationState: {
         page: fetchOptions.page,
         pageSize: fetchOptions.pageSize,
@@ -120,23 +149,6 @@ function useWithLocalState(layoutConfig: LayoutConfig) {
         setPagination,
       },
     }),
-    [fetchOptions, onChangeFilters, resetPage, setPagination, setQuery],
+    [fetchOptions, onChangeFilters, onChangeSlicing, resetPage, setPagination, setQuery],
   );
-
-  return localPagination;
-}
-
-function useFiltersAndPagination({
-  layoutConfig,
-  withoutURLParams = false,
-}: {
-  layoutConfig: LayoutConfig;
-  withoutURLParams?: boolean;
-}) {
-  const urlPaginationState = useWithURLParams(layoutConfig);
-  const localPaginationState = useWithLocalState(layoutConfig);
-
-  return withoutURLParams ? localPaginationState : urlPaginationState;
-}
-
-export default useFiltersAndPagination;
+};

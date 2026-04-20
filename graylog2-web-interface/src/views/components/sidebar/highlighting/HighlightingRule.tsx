@@ -22,7 +22,7 @@ import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 import type { Condition, Value, Color } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import type HighlightingRuleClass from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { ConditionLabelMap } from 'views/logic/views/formatting/highlighting/HighlightingRule';
-import { ColorPickerPopover, Icon, IconButton } from 'components/common';
+import { ColorPickerPopover, IconButton } from 'components/common';
 import HighlightForm from 'views/components/sidebar/highlighting/HighlightForm';
 import type HighlightingColor from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
@@ -30,7 +30,6 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
-import type { DraggableProps, DragHandleProps } from 'components/common/SortableList';
 
 import ColorPreview from './ColorPreview';
 
@@ -59,14 +58,6 @@ const ButtonContainer = styled.div`
 export const RuleContainer = styled.div`
   padding-top: 2px;
   display: inline-block;
-`;
-
-const DragHandle = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 25px;
-  width: 25px;
 `;
 
 type RuleColorPreviewProps = {
@@ -104,8 +95,7 @@ const RuleColorPreview = ({ color, onChange }: RuleColorPreviewProps) => {
 type Props = {
   rule: HighlightingRuleClass;
   className?: string;
-  draggableProps?: DraggableProps;
-  dragHandleProps?: DragHandleProps;
+  dragHandle?: React.ReactNode;
   onUpdate: (
     existingRule: HighlightingRuleClass,
     field: string,
@@ -117,7 +107,7 @@ type Props = {
 };
 
 const HighlightingRule = (
-  { rule, className = undefined, draggableProps = undefined, dragHandleProps = undefined, onUpdate, onDelete }: Props,
+  { rule, className = undefined, dragHandle = undefined, onUpdate, onDelete }: Props,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) => {
   const { field, value, color, condition } = rule;
@@ -152,7 +142,7 @@ const HighlightingRule = (
   }, [location.pathname, onDelete, rule, sendTelemetry]);
 
   return (
-    <Container className={className} ref={ref} {...(draggableProps ?? {})}>
+    <Container className={className} ref={ref}>
       <RuleColorPreview color={color} onChange={_onChange} />
       <RightCol>
         <RuleContainer data-testid="highlighting-rule">
@@ -161,11 +151,7 @@ const HighlightingRule = (
         <ButtonContainer>
           <IconButton title="Edit this Highlighting Rule" name="edit_square" onClick={() => setShowForm(true)} />
           <IconButton title="Remove this Highlighting Rule" name="delete" onClick={_onDelete} />
-          {dragHandleProps && (
-            <DragHandle {...dragHandleProps}>
-              <Icon name="drag_indicator" />
-            </DragHandle>
-          )}
+          {dragHandle}
         </ButtonContainer>
       </RightCol>
       {showForm && (

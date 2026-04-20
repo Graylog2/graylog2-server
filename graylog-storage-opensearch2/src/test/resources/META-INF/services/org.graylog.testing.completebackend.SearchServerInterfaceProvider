@@ -1,2 +1,1 @@
-org.graylog.storage.opensearch2.testing.DatanodeInstanceProvider
 org.graylog.storage.opensearch2.testing.OpenSearchInstanceProvider

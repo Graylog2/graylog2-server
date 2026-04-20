@@ -1,0 +1,58 @@
+[
+  {
+    "alias": "gl-failures_deflector",
+    "index": "gl-failures_0",
+    "filter": "-",
+    "routing.index": "-",
+    "routing.search": "-",
+    "is_write_index": "-"
+  },
+  {
+    "alias": ".opendistro-ism-managed-index-history-write",
+    "index": ".opendistro-ism-managed-index-history-2026.02.03-1",
+    "filter": "-",
+    "routing.index": "-",
+    "routing.search": "-",
+    "is_write_index": "-"
+  },
+  {
+    "alias": "gl-events_deflector",
+    "index": "gl-events_0",
+    "filter": "-",
+    "routing.index": "-",
+    "routing.search": "-",
+    "is_write_index": "-"
+  },
+  {
+    "alias": "investigation_event_index_deflector",
+    "index": "investigation_event_index_0",
+    "filter": "-",
+    "routing.index": "-",
+    "routing.search": "-",
+    "is_write_index": "-"
+  },
+  {
+    "alias": "investigation_message_index_deflector",
+    "index": "investigation_message_index_0",
+    "filter": "-",
+    "routing.index": "-",
+    "routing.search": "-",
+    "is_write_index": "-"
+  },
+  {
+    "alias": "graylog_deflector",
+    "index": "graylog_0",
+    "filter": "-",
+    "routing.index": "-",
+    "routing.search": "-",
+    "is_write_index": "-"
+  },
+  {
+    "alias": "gl-system-events_deflector",
+    "index": "gl-system-events_0",
+    "filter": "-",
+    "routing.index": "-",
+    "routing.search": "-",
+    "is_write_index": "-"
+  }
+]

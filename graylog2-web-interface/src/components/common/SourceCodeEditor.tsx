@@ -128,10 +128,6 @@ class SourceCodeEditor extends React.Component<Props, State> {
     wrapEnabled: false,
   };
 
-  private reactAce: AceEditor;
-
-  private readonly overlayContainerRef: React.RefObject<any>;
-
   constructor(props) {
     super(props);
 
@@ -170,6 +166,10 @@ class SourceCodeEditor extends React.Component<Props, State> {
       this.reloadEditor();
     }
   }
+
+  private reactAce: AceEditor;
+
+  private readonly overlayContainerRef: React.RefObject<any>;
 
   handleResize = (_event: React.ChangeEvent<unknown>, { size }) => {
     const { height, width } = size;

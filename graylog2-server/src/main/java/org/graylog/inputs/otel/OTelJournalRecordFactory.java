@@ -17,32 +17,30 @@
 package org.graylog.inputs.otel;
 
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
-import io.opentelemetry.proto.logs.v1.LogRecord;
-import io.opentelemetry.proto.logs.v1.ResourceLogs;
-import io.opentelemetry.proto.logs.v1.ScopeLogs;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class OTelJournalRecordFactory {
 
-    public List<OTelJournal.Record> createFromRequest(ExportLogsServiceRequest request) {
-        final List<OTelJournal.Record> journalRecords = new ArrayList<>();
-        for (ResourceLogs resourceLogs : request.getResourceLogsList()) {
-            for (ScopeLogs scopeLogs : resourceLogs.getScopeLogsList()) {
-                for (LogRecord logRecord : scopeLogs.getLogRecordsList()) {
-                    final var journalRecord = OTelJournal.Record.newBuilder()
+    private OTelJournalRecordFactory() {}
+
+    public static List<OTelJournal.Record> createFromRequest(ExportLogsServiceRequest request) {
+        final List<OTelJournal.Record> records = new ArrayList<>();
+        for (final var resourceLogs : request.getResourceLogsList()) {
+            for (final var scopeLogs : resourceLogs.getScopeLogsList()) {
+                for (final var logRecord : scopeLogs.getLogRecordsList()) {
+                    records.add(OTelJournal.Record.newBuilder()
                             .setLog(OTelJournal.Log.newBuilder()
                                     .setResource(resourceLogs.getResource())
                                     .setResourceSchemaUrl(resourceLogs.getSchemaUrl())
                                     .setScope(scopeLogs.getScope())
                                     .setLogRecord(logRecord)
-                                    .setLogRecordSchemaUrl(scopeLogs.getSchemaUrl())
-                            ).build();
-                    journalRecords.add(journalRecord);
+                                    .setLogRecordSchemaUrl(scopeLogs.getSchemaUrl()))
+                            .build());
                 }
             }
         }
-        return journalRecords;
+        return records;
     }
 }

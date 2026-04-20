@@ -16,7 +16,7 @@
  */
 
 import * as React from 'react';
-import { useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
@@ -73,9 +73,7 @@ const ContentPackSelectionList = ({
   updateSelectionGroup: (group: unknown) => void;
   updateSelectionEntity: (entity: unknown) => void;
 }) => {
-  const [expandedSections, setExpandedSections] = React.useState<Array<string>>(
-    isFiltered ? Object.keys(entities) : [],
-  );
+  const [expandedSections, setExpandedSections] = useState<Array<string>>(isFiltered ? Object.keys(entities) : []);
 
   useEffect(() => {
     setExpandedSections(isFiltered ? Object.keys(entities) : []);

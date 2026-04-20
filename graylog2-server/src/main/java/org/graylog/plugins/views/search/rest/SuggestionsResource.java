@@ -17,9 +17,9 @@
 package org.graylog.plugins.views.search.rest;
 
 import com.google.common.collect.ImmutableSet;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -55,11 +55,12 @@ import org.graylog2.rest.resources.system.contentpacks.titles.EntityTitleService
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityIdentifier;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleRequest;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleResponse;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -67,10 +68,10 @@ import java.util.stream.Collectors;
 import static org.graylog.plugins.views.search.engine.suggestions.FieldValueSuggestionMode.OFF;
 import static org.graylog.plugins.views.search.engine.suggestions.FieldValueSuggestionMode.TEXTUAL_ONLY;
 import static org.graylog.plugins.views.search.querystrings.LastUsedQueryStringsService.DEFAULT_LIMIT;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "Search/Suggestions", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Search/Suggestions")
 @Path("/search/suggest")
 @Produces(MediaType.APPLICATION_JSON)
 public class SuggestionsResource extends RestResource implements PluginRestResource {
@@ -105,16 +106,16 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
 
     @GET
     @Path("/query_strings")
-    @ApiOperation("Suggest last used query strings")
+    @Operation(summary = "Suggest last used query strings")
     public List<QueryString> suggestQueryStrings(@Context SearchUser searchUser,
-                                                 @ApiParam("limit") @QueryParam("limit") Integer limit) {
+                                                 @Parameter(name = "limit") @QueryParam("limit") Integer limit) {
         return lastUsedQueryStringsService.get(searchUser.getUser(), Optional.ofNullable(limit).orElse(DEFAULT_LIMIT));
     }
 
     @POST
-    @ApiOperation("Suggest field value")
+    @Operation(summary = "Suggest field value")
     @NoAuditEvent("Only suggesting field value for query, not changing any data")
-    public SuggestionsDTO suggestFieldValue(@ApiParam(name = "validationRequest") SuggestionsRequestDTO suggestionsRequest,
+    public SuggestionsDTO suggestFieldValue(@Parameter(name = "validationRequest") SuggestionsRequestDTO suggestionsRequest,
                                             @Context SearchUser searchUser) {
         if (fieldValueSuggestionMode == OFF) {
             return getNoSuggestionResponse(suggestionsRequest.field(), suggestionsRequest.input());
@@ -122,17 +123,17 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
         final Set<String> streams = adaptStreams(suggestionsRequest.streams(), searchUser);
         final TimeRange timerange = Optional.ofNullable(suggestionsRequest.timerange()).orElse(defaultTimeRange());
         final String fieldName = suggestionsRequest.field();
-        final SuggestionFieldType suggestionFieldType = getFieldType(streams, timerange, fieldName);
+        final var fieldType = mappedFieldTypesService.singleFieldTypeByStreamIds(streams, timerange, suggestionsRequest.field())
+                .stream()
+                .findFirst()
+                .map(MappedFieldTypeDTO::type)
+                .orElse(FieldTypes.Type.createType("unknown", Collections.emptySet()));
+
+        final var suggestionFieldType = SuggestionFieldType.fromFieldType(fieldType);
 
         if (fieldValueSuggestionMode == TEXTUAL_ONLY && suggestionFieldType != SuggestionFieldType.TEXTUAL) {
             return getNoSuggestionResponse(suggestionsRequest.field(), suggestionsRequest.input());
         }
-
-        final Set<MappedFieldTypeDTO> fieldTypes = mappedFieldTypesService.fieldTypesByStreamIds(streams, timerange);
-        var fieldType = fieldTypes.stream().filter(f -> f.name().equals(fieldName))
-                .findFirst()
-                .map(MappedFieldTypeDTO::type)
-                .orElse(FieldTypes.Type.createType("unknown", Collections.emptySet()));
 
         final SuggestionRequest req = SuggestionRequest.builder()
                 .field(fieldName)
@@ -143,7 +144,7 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
                 .timerange(timerange)
                 .build();
 
-        SuggestionResponse res = querySuggestionsService.suggest(req);
+        SuggestionResponse res = querySuggestionsService.suggest(req, Duration.ofSeconds(10));
         final List<SuggestionEntryDTO> suggestions = augmentSuggestions(res.suggestions().stream()
                 .map(s -> SuggestionEntryDTO.create(s.getValue(), s.getOccurrence()))
                 .toList(), fieldType, searchUser);
@@ -216,15 +217,6 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
 
     private ImmutableSet<String> loadAllAllowedStreamsForUser(SearchUser searchUser) {
         return permittedStreams.loadAllMessageStreams(searchUser);
-    }
-
-    private SuggestionFieldType getFieldType(Set<String> streams, TimeRange timerange, final String fieldName) {
-        final Set<MappedFieldTypeDTO> fieldTypes = mappedFieldTypesService.fieldTypesByStreamIds(streams, timerange);
-        return fieldTypes.stream().filter(f -> f.name().equals(fieldName))
-                .findFirst()
-                .map(MappedFieldTypeDTO::type)
-                .map(SuggestionFieldType::fromFieldType)
-                .orElse(SuggestionFieldType.OTHER);
     }
 
     private SuggestionsDTO getNoSuggestionResponse(final String fieldName,

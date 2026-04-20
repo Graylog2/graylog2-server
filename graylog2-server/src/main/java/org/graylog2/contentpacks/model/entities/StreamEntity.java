@@ -20,10 +20,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog2.contentpacks.model.entities.references.ValueReference;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -69,6 +68,10 @@ public abstract class StreamEntity {
     @JsonProperty("remove_matches")
     public abstract ValueReference removeMatches();
 
+    @JsonProperty("favorite_fields")
+    @Nullable
+    public abstract List<String> favoriteFields();
+
     @JsonCreator
     public static StreamEntity create(
             @JsonProperty("title") @NotBlank ValueReference title,
@@ -80,7 +83,8 @@ public abstract class StreamEntity {
             @JsonProperty("alarm_callbacks") @NotNull List<StreamAlarmCallbackEntity> streamAlarmCallbacks,
             @JsonProperty("outputs") @NotNull Set<ValueReference> outputs,
             @JsonProperty("default_stream") ValueReference defaultStream,
-            @JsonProperty("remove_matches") ValueReference removeMatches) {
+            @JsonProperty("remove_matches") ValueReference removeMatches,
+            @JsonProperty("favorite_fields") @Nullable List<String> favoriteFields) {
         return new AutoValue_StreamEntity(
                 title,
                 description,
@@ -91,6 +95,7 @@ public abstract class StreamEntity {
                 streamAlarmCallbacks,
                 outputs,
                 defaultStream,
-                removeMatches);
+                removeMatches,
+                favoriteFields);
     }
 }

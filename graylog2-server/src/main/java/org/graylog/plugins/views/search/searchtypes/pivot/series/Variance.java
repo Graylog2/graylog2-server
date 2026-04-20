@@ -48,7 +48,7 @@ public abstract class Variance implements SeriesSpec, HasField {
     }
 
     @Override
-    public Optional<String> statsSubfieldName() {
+    public Optional<String> multiValueAggSubfieldName() {
         return Optional.of(NAME);
     }
 

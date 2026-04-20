@@ -37,11 +37,11 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.StreamReferenceEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.streams.FavoriteFieldsService;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
@@ -51,7 +51,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class StreamReferenceFacade extends StreamFacade {
     private static final Logger LOG = LoggerFactory.getLogger(StreamReferenceFacade.class);
@@ -62,8 +61,9 @@ public class StreamReferenceFacade extends StreamFacade {
     private final StreamService streamService;
 
     @Inject
-    public StreamReferenceFacade(ObjectMapper objectMapper, StreamService streamService, StreamRuleService streamRuleService, IndexSetService indexSetService, UserService userService) {
-        super(objectMapper, streamService, streamRuleService, indexSetService, userService);
+    public StreamReferenceFacade(ObjectMapper objectMapper, StreamService streamService, StreamRuleService streamRuleService,
+                                 IndexSetService indexSetService, UserService userService, FavoriteFieldsService favoriteFieldsService) {
+        super(objectMapper, streamService, streamRuleService, indexSetService, userService, favoriteFieldsService);
         this.objectMapper = objectMapper;
         this.streamService = streamService;
     }
@@ -87,7 +87,7 @@ public class StreamReferenceFacade extends StreamFacade {
         try {
             final Stream stream = streamService.load(modelId.id());
             return Optional.of(exportNativeEntity(stream, entityDescriptorIds));
-        } catch (NotFoundException e) {
+        } catch (Exception e) {
             LOG.debug("Couldn't find stream {}", entityDescriptor, e);
             return Optional.empty();
         }
@@ -156,19 +156,8 @@ public class StreamReferenceFacade extends StreamFacade {
     }
 
     @Override
-    public EntityExcerpt createExcerpt(Stream stream) {
-        return EntityExcerpt.builder()
-                .id(ModelId.of(stream.getTitle()))
-                .type(ModelTypes.STREAM_REF_V1)
-                .title(stream.getTitle())
-                .build();
-    }
-
-    @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
-        return streamService.loadAll().stream()
-                .map(this::createExcerpt)
-                .collect(Collectors.toSet());
+        return Set.of();
     }
 
     public static Entity resolveStreamEntity(String id, Map<EntityDescriptor, Entity> entities) {

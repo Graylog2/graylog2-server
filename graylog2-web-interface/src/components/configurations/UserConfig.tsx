@@ -18,8 +18,8 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import { Form, Formik } from 'formik';
-import type { UserConfigType } from 'src/stores/configurations/ConfigurationsStore';
 
+import type { UserConfigType } from 'stores/configurations/ConfigurationsStore';
 import { useStore } from 'stores/connect';
 import type { Store } from 'stores/StoreTypes';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
@@ -189,7 +189,7 @@ const UserConfig = () => {
                               duration={values.default_ttl_for_new_tokens}
                               update={(value) => setFieldValue('default_ttl_for_new_tokens', value)}
                               label="Default TTL for new tokens (as ISO8601 Duration)"
-                              help="Tokens will be automatically invalidated after this amount of time. Example, for 24 hours: PT24H, for 30 days: PT30D"
+                              help="Tokens will be automatically invalidated after this amount of time. Example, for 24 hours: PT24H, for 30 days: P30D"
                               validator={defaultTokenTtlValidator}
                               errorText="invalid (min: 1 day)"
                               disabled={!values.default_ttl_for_new_tokens}

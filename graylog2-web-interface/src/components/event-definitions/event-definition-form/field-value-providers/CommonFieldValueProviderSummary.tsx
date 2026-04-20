@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Table, Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
@@ -29,7 +29,7 @@ type Props = {
 };
 
 const CommonFieldValueProviderSummary = ({ fieldName, config, keys, children }: Props) => {
-  const [displayDetails, setDisplayDetails] = React.useState(false);
+  const [displayDetails, setDisplayDetails] = useState(false);
 
   const toggleDisplayDetails = () => {
     setDisplayDetails((prev) => !prev);

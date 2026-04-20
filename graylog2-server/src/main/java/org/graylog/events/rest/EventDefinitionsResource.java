@@ -22,9 +22,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -72,6 +77,7 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.NonDeletableSystemScope;
 import org.graylog2.database.entities.source.DBEntitySourceService;
 import org.graylog2.database.utils.SourcedMongoEntityUtils;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -91,6 +97,7 @@ import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
@@ -104,10 +111,10 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
-@Api(value = "Events/Definitions", description = "Event definition management", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Events/Definitions", description = "Event definition management")
 @Path("/events/definitions")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -181,18 +188,19 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @GET
     @Timed
     @Path("/paginated")
-    @ApiOperation(value = "Get a paginated list of event definitions")
+    @Operation(summary = "Get a paginated list of event definitions")
     @Produces(MediaType.APPLICATION_JSON)
-    public PageListResponse<EventDefinitionDto> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                        @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                        @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-                                                        @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
-                                                        @ApiParam(name = "sort",
-                                                                  value = "The field to sort the result on",
+    public PageListResponse<EventDefinitionDto> getPage(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                        @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                        @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                        @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
+                                                        @Parameter(name = "sort",
+                                                                  description = "The field to sort the result on",
                                                                   required = true,
-                                                                  allowableValues = "title,description,priority,status")
+                                                                  schema = @Schema(allowableValues = {"title", "description", "priority", "status"}))
                                                         @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
-                                                        @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                                        @Parameter(name = "order", description = "The sort direction",
+                                                                   schema = @Schema(allowableValues = {"asc", "desc"}))
                                                         @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order) {
 
         SearchQuery searchQuery;
@@ -237,11 +245,11 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     }
 
     @GET
-    @ApiOperation("List event definitions")
+    @Operation(summary = "List event definitions")
     @Deprecated
-    public PaginatedResponse<EventDefinitionDto> list(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                      @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                      @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query) {
+    public PaginatedResponse<EventDefinitionDto> list(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                      @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                      @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query) {
         SearchQuery searchQuery;
         try {
             searchQuery = searchQueryParser.parse(query);
@@ -260,8 +268,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
 
     @GET
     @Path("{definitionId}")
-    @ApiOperation("Get an event definition")
-    public EventDefinitionDto get(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
+    @Operation(summary = "Get an event definition")
+    public EventDefinitionDto get(@Parameter(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_READ, definitionId);
         return dbService.get(definitionId)
                 .orElseThrow(() -> new NotFoundException("Event definition <" + definitionId + "> doesn't exist"));
@@ -273,8 +281,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
 
     @GET
     @Path("{definitionId}/with-context")
-    @ApiOperation("Get an event definition")
-    public EventDefinitionWithContext getWithContext(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
+    @Operation(summary = "Get an event definition")
+    public EventDefinitionWithContext getWithContext(@Parameter(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_READ, definitionId);
         return dbService.get(definitionId)
                 .map(eventDefinition -> new EventDefinitionWithContext(eventDefinition, contextService.contextFor(eventDefinition), dbService.isMutable(eventDefinition)))
@@ -285,9 +293,9 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
 
     @POST
     @Path("byIds")
-    @ApiOperation("Get multiple event definitions by id")
+    @Operation(summary = "Get multiple event definitions by id")
     @NoAuditEvent("Bulk retrieval, no data is changed.")
-    public List<EventDefinitionDto> getById(@ApiParam(name = "JSON body") @Valid GetByIdRequest request) {
+    public List<EventDefinitionDto> getById(@Parameter(name = "JSON body") @Valid GetByIdRequest request) {
         final Set<String> permittedIds = request.eventDefinitionIds().stream()
                 .filter(id -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, id))
                 .collect(Collectors.toSet());
@@ -297,11 +305,15 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Create new event definition", response = EventDefinitionDto.class)
+    @Operation(summary = "Create new event definition")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Event definition created successfully",
+                    content = @Content(schema = @Schema(implementation = EventDefinitionDto.class)))
+    })
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_CREATE)
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
-    public Response create(@ApiParam("schedule") @QueryParam("schedule") @DefaultValue("true") boolean schedule,
-                           @ApiParam(name = "JSON Body") CreateEntityRequest<EventDefinitionDto> createEntityRequest, @Context UserContext userContext) {
+    public Response create(@Parameter(name = "schedule") @QueryParam("schedule") @DefaultValue("true") boolean schedule,
+                           @Parameter(name = "JSON Body") CreateEntityRequest<EventDefinitionDto> createEntityRequest, @Context UserContext userContext) {
         final EventDefinitionDto dto = createEntityRequest.entity();
         checkEventDefinitionPermissions(dto, "create");
 
@@ -322,11 +334,15 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
 
     @PUT
     @Path("{definitionId}")
-    @ApiOperation(value = "Update existing event definition", response = EventDefinitionDto.class)
+    @Operation(summary = "Update existing event definition")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Event definition updated successfully",
+                    content = @Content(schema = @Schema(implementation = EventDefinitionDto.class)))
+    })
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_UPDATE)
-    public Response update(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
-                           @ApiParam("schedule") @QueryParam("schedule") @DefaultValue("true") boolean schedule,
-                           @ApiParam(name = "JSON Body") EventDefinitionDto dto,
+    public Response update(@Parameter(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
+                           @Parameter(name = "schedule") @QueryParam("schedule") @DefaultValue("true") boolean schedule,
+                           @Parameter(name = "JSON Body") EventDefinitionDto dto,
                            @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
         checkEventDefinitionPermissions(dto, "update");
@@ -342,17 +358,23 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         if (result.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
         }
-
-        dto = dto.toBuilder().state(schedule ? EventDefinition.State.ENABLED : EventDefinition.State.DISABLED).build();
+        if (NonDeletableSystemScope.NAME.equals(dto.scope())) {
+            //never change the state of system definitions, as the state cannot be later on changed in the UI
+            dto = dto.toBuilder().build();
+        } else {
+            dto = dto.toBuilder()
+                    .state(schedule ? EventDefinition.State.ENABLED : EventDefinition.State.DISABLED)
+                    .build();
+        }
         recentActivityService.update(definitionId, GRNTypes.EVENT_DEFINITION, userContext.getUser());
         return Response.ok().entity(eventDefinitionHandler.update(dto, schedule)).build();
     }
 
     @DELETE
     @Path("{definitionId}")
-    @ApiOperation("Delete event definition")
+    @Operation(summary = "Delete event definition")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_DELETE)
-    public EventDefinitionDto delete(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
+    public EventDefinitionDto delete(@Parameter(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
                                      @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_DELETE, definitionId);
 
@@ -381,9 +403,13 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Path("/bulk_delete")
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
-    @ApiOperation(value = "Delete multiple event definitions", response = BulkOperationResponse.class)
+    @Operation(summary = "Delete multiple event definitions")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Bulk deletion completed",
+                    content = @Content(schema = @Schema(implementation = BulkOperationResponse.class)))
+    })
     @NoAuditEvent("Audit events triggered manually")
-    public BulkOperationResponse bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
+    public BulkOperationResponse bulkDelete(@Parameter(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
                                             @Context UserContext userContext) {
         return bulkDeletionExecutor.executeBulkOperation(bulkOperationRequest,
                 userContext,
@@ -394,9 +420,9 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @PUT
     @Path("{definitionId}/schedule")
     @Consumes(MediaType.WILDCARD)
-    @ApiOperation("Enable event definition")
+    @Operation(summary = "Enable event definition")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_UPDATE)
-    public EventDefinitionDto schedule(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
+    public EventDefinitionDto schedule(@Parameter(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
                                        @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
         final EventDefinitionDto eventDefinitionDto = dbService.get(definitionId).orElseThrow(() ->
@@ -409,9 +435,13 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Path("/bulk_schedule")
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
-    @ApiOperation(value = "Enable multiple event definitions", response = BulkOperationResponse.class)
+    @Operation(summary = "Enable multiple event definitions")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Bulk enable completed",
+                    content = @Content(schema = @Schema(implementation = BulkOperationResponse.class)))
+    })
     @NoAuditEvent("Audit events triggered manually")
-    public BulkOperationResponse bulkSchedule(@ApiParam(name = "Event definitions to enable", required = true) final BulkOperationRequest bulkOperationRequest,
+    public BulkOperationResponse bulkSchedule(@Parameter(name = "Event definitions to enable", required = true) final BulkOperationRequest bulkOperationRequest,
                                               @Context UserContext userContext) {
         return bulkScheduleExecutor.executeBulkOperation(bulkOperationRequest,
                 userContext,
@@ -421,9 +451,9 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @PUT
     @Path("{definitionId}/unschedule")
     @Consumes(MediaType.WILDCARD)
-    @ApiOperation("Disable event definition")
+    @Operation(summary = "Disable event definition")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_UPDATE)
-    public EventDefinitionDto unschedule(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
+    public EventDefinitionDto unschedule(@Parameter(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
                                          @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
         final EventDefinitionDto eventDefinitionDto = dbService.get(definitionId).orElseThrow(() ->
@@ -436,9 +466,13 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Path("/bulk_unschedule")
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
-    @ApiOperation(value = "Disable multiple event definitions", response = BulkOperationResponse.class)
+    @Operation(summary = "Disable multiple event definitions")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Disable multiple event definitions retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = BulkOperationResponse.class)))
+    })
     @NoAuditEvent("Audit events triggered manually")
-    public BulkOperationResponse bulkUnschedule(@ApiParam(name = "Event definitions to disable", required = true) final BulkOperationRequest bulkOperationRequest,
+    public BulkOperationResponse bulkUnschedule(@Parameter(name = "Event definitions to disable", required = true) final BulkOperationRequest bulkOperationRequest,
                                                 @Context UserContext userContext) {
         return bulkUnscheduleExecutor.executeBulkOperation(bulkOperationRequest,
                 userContext,
@@ -448,19 +482,19 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @PUT
     @Path("{definitionId}/clear-notification-queue")
     @Consumes(MediaType.WILDCARD)
-    @ApiOperation("Clear queued notifications for event")
+    @Operation(summary = "Clear queued notifications for event")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_CLEAR_NOTIFICATION_QUEUE)
-    public void clearNotificationQueue(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
+    public void clearNotificationQueue(@Parameter(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
         eventDefinitionHandler.deleteNotificationJobTriggers(definitionId);
     }
 
     @POST
-    @ApiOperation("Execute event definition")
+    @Operation(summary = "Execute event definition")
     @Path("{definitionId}/execute")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_EXECUTE)
-    public void execute(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
-                        @ApiParam(name = "parameters", required = true) @NotNull EventProcessorParameters parameters) {
+    public void execute(@Parameter(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
+                        @Parameter(name = "parameters", required = true) @NotNull EventProcessorParameters parameters) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EXECUTE, definitionId);
         if (parameters instanceof EventProcessorParametersWithTimerange.FallbackParameters) {
             throw new BadRequestException("Unknown parameters type");
@@ -474,12 +508,12 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     }
 
     @POST
-    @ApiOperation("Duplicate an event definition")
+    @Operation(summary = "Duplicate an event definition")
     @Path("{definitionId}/duplicate")
     @Consumes(MediaType.WILDCARD)
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_CREATE)
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
-    public EventDefinitionDto duplicate(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId, @Context UserContext userContext) {
+    public EventDefinitionDto duplicate(@Parameter(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId, @Context UserContext userContext) {
         final EventDefinitionDto eventDefinitionDto = dbService.get(definitionId).orElseThrow(() ->
                 new BadRequestException(f("Unable to find event definition '%s' to duplicate", definitionId)));
         checkEventDefinitionPermissions(eventDefinitionDto, "create");
@@ -490,23 +524,23 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @POST
     @Path("/validate")
     @NoAuditEvent("Validation only")
-    @ApiOperation(value = "Validate an event definition")
+    @Operation(summary = "Validate an event definition")
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
-    public ValidationResult validate(@ApiParam(name = "JSON body", required = true)
+    public ValidationResult validate(@RequestBody(required = true)
                                          @Valid @NotNull EventDefinitionDto toValidate,
                                      @Context UserContext userContext) {
         EventProcessorConfig oldConfig = dbService.get(toValidate.id()).map(EventDefinition::config).orElse(null);
         ValidationResult validationResult = toValidate.config().validate(userContext);
-        validationResult.addAll(toValidate.config().validate(oldConfig, eventDefinitionConfiguration));
+        validationResult.addAll(toValidate.config().validate(userContext, oldConfig, eventDefinitionConfiguration));
         return validationResult;
     }
 
     @POST
     @Path("/validate/cron_expression")
     @NoAuditEvent("Validation only")
-    @ApiOperation(value = "Validate a cron expression")
+    @Operation(summary = "Validate a cron expression")
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_READ)
-    public CronValidationResponse validate(@ApiParam(name = "JSON body", required = true)
+    public CronValidationResponse validate(@RequestBody(required = true)
                                            @Valid @NotNull CronValidationRequest toValidate) {
         try {
             CronUtils.validateExpression(toValidate.expression());

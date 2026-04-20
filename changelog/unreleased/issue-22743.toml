@@ -1,0 +1,5 @@
+type = "f"
+message = "Avoid exceeding buffer size when fetching index fields."
+
+issues = ["22743"]
+pulls = [""]

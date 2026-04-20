@@ -18,6 +18,7 @@ package org.graylog.storage.opensearch3.stats;
 
 import jakarta.inject.Inject;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
+import org.graylog2.indexer.indices.util.IndexNameBatching;
 import org.opensearch.client.opensearch._types.Level;
 import org.opensearch.client.opensearch._types.StoreStats;
 import org.opensearch.client.opensearch.indices.IndicesStatsRequest;
@@ -29,6 +30,7 @@ import org.opensearch.client.opensearch.indices.stats.IndicesStatsMetric;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -47,13 +49,11 @@ public class StatsApi {
     }
 
     public Map<String, IndicesStats> indicesStatsWithShardLevel(Collection<String> indices) {
-        final IndicesStatsResponse stats = stats(indices, List.of(), true);
-        return stats.indices();
+        return batchedStats(indices, List.of(), true);
     }
 
     public Map<String, IndicesStats> indicesStatsWithDocsAndStore(Collection<String> indices) {
-        final IndicesStatsResponse stats = stats(indices, List.of(IndicesStatsMetric.Store, IndicesStatsMetric.Docs), false);
-        return stats.indices();
+        return batchedStats(indices, List.of(IndicesStatsMetric.Store, IndicesStatsMetric.Docs), false);
     }
 
     public Optional<Long> storeSizes(String index) {
@@ -66,6 +66,21 @@ public class StatsApi {
                 .map(StoreStats::sizeInBytes);
     }
 
+    private Map<String, IndicesStats> batchedStats(Collection<String> indices,
+                                                   List<IndicesStatsMetric> metrics,
+                                                   boolean withShardLevel) {
+        final List<List<String>> batches = IndexNameBatching.partitionByJoinedLength(indices);
+        if (batches.size() <= 1) {
+            return stats(indices, metrics, withShardLevel).indices();
+        }
+
+        final Map<String, IndicesStats> merged = new HashMap<>(batches.size());
+        for (final List<String> batch : batches) {
+            merged.putAll(stats(batch, metrics, withShardLevel).indices());
+        }
+        return merged;
+    }
+
     private IndicesStatsResponse stats(Collection<String> indices,
                                        List<IndicesStatsMetric> metrics,
                                        boolean withShardLevel) {
@@ -74,7 +89,7 @@ public class StatsApi {
                 .metric(metrics);
         if (withShardLevel) {
 //            request.addParameter("ignore_unavailable", "true"); //TODO "ignore_unavailable" has no equivalent?
-            builder = builder.level(Level.Shards);
+            builder.level(Level.Shards);
         }
         final IndicesStatsRequest indicesStatsRequest = builder.build();
         final OpenSearchIndicesClient indicesClient = client.sync().indices();

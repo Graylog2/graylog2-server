@@ -17,7 +17,7 @@
 package org.graylog2.shared.security;
 
 import com.google.common.collect.ImmutableMap;
-import org.apache.commons.lang3.StringUtils;
+import jakarta.inject.Inject;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.mgt.DefaultSecurityManager;
@@ -26,21 +26,12 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.database.users.User;
-import org.graylog2.security.headerauth.HTTPHeaderAuthConfig;
-import org.graylog2.security.realm.HTTPHeaderAuthenticationRealm;
+import org.graylog2.rest.models.system.sessions.SessionUtils;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.UserConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -51,44 +42,37 @@ public class SessionCreator {
 
     private final UserService userService;
     private final AuditEventSender auditEventSender;
-    private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public SessionCreator(UserService userService, AuditEventSender auditEventSender, ClusterConfigService clusterConfigService) {
+    public SessionCreator(UserService userService, AuditEventSender auditEventSender) {
         this.userService = userService;
         this.auditEventSender = auditEventSender;
-        this.clusterConfigService = clusterConfigService;
     }
 
     /**
-     * Attempts to log the user in with the given authentication token and returns a new or renewed session upon
+     * Attempts to log the user in with the given authentication token and returns a new session upon
      * success.
      * <p>
      * Side effect: the user will be registered with the current security context.
      *
-     * @param currentSessionId A session id, if one exists currently.
-     * @param host             Host the request to create a session originates from.
-     * @param authToken        Authentication token to log the user in.
+     * @param host      Host the request to create a session originates from.
+     * @param authToken Authentication token to log the user in.
      * @return A session for the authenticated user wrapped in an {@link Optional}, or an empty {@link Optional} if
      * authentication failed.
      * @throws AuthenticationServiceUnavailableException If authenticating the user fails not due to an issue with the
      *                                                   credentials but because of an external resource being
      *                                                   unavailable
      */
-    public Optional<Session> login(@Nullable String currentSessionId, String host,
-                                   ActorAwareAuthenticationToken authToken) throws AuthenticationServiceUnavailableException {
+    public Optional<Session> login(String host, ActorAwareAuthenticationToken authToken)
+            throws AuthenticationServiceUnavailableException {
 
-        final String previousSessionId = StringUtils.defaultIfBlank(currentSessionId, null);
-        final Subject subject = new Subject.Builder().sessionId(previousSessionId).host(host).buildSubject();
+        final Subject subject = new Subject.Builder().host(host).buildSubject();
 
         ThreadContext.bind(subject);
 
         try {
-            final Session session = subject.getSession();
-
             subject.login(authToken);
-
-            return createSession(subject, session, host);
+            return Optional.of(createForSubject(subject));
         } catch (AuthenticationServiceUnavailableException e) {
             log.info("Session creation failed due to authentication service being unavailable. Actor: \"{}\"",
                     authToken.getActor().urn());
@@ -109,75 +93,37 @@ public class SessionCreator {
     }
 
     /**
-     * Attempts to create a new or renewed session.
-     * <p>
-     * Side effect: the user will be registered with the current security context.
+     * Creates a session for the given user.
      *
-     * @param subject The subject that should be associated with the session
-     * @param host    Host the request to create a session originates from.
-     * @return A session for the authenticated user wrapped in an {@link Optional}, or an empty {@link Optional} if
-     * authentication failed.
+     * @param subject The subject that should be associated with the session.
+     * @return A session for the given subject. Depending on the subject's authentication state,
+     * the session state may be unauthenticated.
      */
-    public Optional<Session> create(Subject subject, String host) {
-        ThreadContext.bind(subject);
+    public Session createForSubject(Subject subject) {
+        final var session = subject.getSession();
 
-        final Session session = subject.getSession();
-
-        final HTTPHeaderAuthConfig httpHeaderConfig = loadHTTPHeaderConfig();
-        final Optional<String> usernameHeader = ShiroRequestHeadersBinder.getHeaderFromThreadContext(httpHeaderConfig.usernameHeader());
-        if (httpHeaderConfig.enabled() && usernameHeader.isPresent()) {
-            session.setAttribute(HTTPHeaderAuthenticationRealm.SESSION_AUTH_HEADER, usernameHeader.get());
-        }
-
-        return createSession(subject, session, host);
-    }
-
-    private Optional<Session> createSession(Subject subject, Session session, String host) {
-        String userId = subject.getPrincipal().toString();
-        final User user = userService.loadById(userId);
+        final var userId = subject.getPrincipal().toString();
+        final var user = userService.loadById(userId);
 
         if (user != null) {
             long timeoutInMillis = user.getSessionTimeoutMs();
             session.setTimeout(timeoutInMillis);
-            session.setAttribute("username", user.getName());
-            getSessionAttributes(subject).forEach(session::setAttribute);
+            session.setAttribute(SessionUtils.USERNAME_SESSION_KEY, user.getName());
         } else {
-            // set a sane default. really we should be able to load the user from above.
             session.setTimeout(UserConfiguration.DEFAULT_VALUES.globalSessionTimeoutInterval().toMillis());
         }
         session.touch();
 
-        // save subject in session, otherwise we can't get the username back in subsequent requests.
+        // Save subject state in session. This will save the principal (i.e. user id) as well as the authentication
+        // state of the subject in the session.
         ((DefaultSecurityManager) SecurityUtils.getSecurityManager()).getSubjectDAO().save(subject);
 
         final Map<String, Object> auditEventContext = ImmutableMap.of(
                 "session_id", session.getId(),
-                "remote_address", host
+                "remote_address", Optional.ofNullable(session.getHost()).orElse("n/a")
         );
         auditEventSender.success(AuditActor.user(user.getName()), SESSION_CREATE, auditEventContext);
 
-        return Optional.of(session);
-    }
-
-    /**
-     * Extract additional session attributes out of a subject's principal collection. We assume that if there is a
-     * second principal, that this would be a map of session attributes.
-     */
-    private Map<?, ?> getSessionAttributes(Subject subject) {
-        final List<?> principals = subject.getPrincipals().asList();
-        if (principals.size() < 2) {
-            return Collections.emptyMap();
-        }
-        Object sessionAttributes = principals.get(1);
-        if (sessionAttributes instanceof Map) {
-            return (Map<?, ?>) sessionAttributes;
-        }
-        log.error("Unable to extract session attributes from subject. Expected <Map.class> but got <{}>.",
-                sessionAttributes.getClass().getSimpleName());
-        return Collections.emptyMap();
-    }
-
-    private HTTPHeaderAuthConfig loadHTTPHeaderConfig() {
-        return clusterConfigService.getOrDefault(HTTPHeaderAuthConfig.class, HTTPHeaderAuthConfig.createDisabled());
+        return session;
     }
 }

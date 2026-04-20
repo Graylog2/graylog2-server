@@ -56,7 +56,9 @@ public class InputCreationIT {
                         "aws_s3_region", "us-east-1",
                         "aws_sqs_queue_name", "invalid-queue-no-messages-read",
                         "aws_access_key", "invalid-access-key",
-                        "aws_secret_key", "invalid-secret-key"));
+                        "aws_secret_key", "invalid-secret-key",
+                        "polling_interval", 1,
+                        "sqs_message_batch_size", 10));
         apis.inputs().getInput(inputId)
                 .assertThat().body("attributes.aws_access_key", equalTo("invalid-access-key"));
         apis.waitFor(() ->

@@ -91,7 +91,6 @@ const FieldComponent = ({ groupingIndex }: Props) => {
         selectedFields={grouping.fields}
         createSelectPlaceholder={createSelectPlaceholder}
         isFieldQualified={isFieldQualified}
-        testPrefix={`grouping-${groupingIndex}`}
         showUnit={showFieldUnit}
       />
     </Input>

@@ -20,20 +20,18 @@ import org.graylog2.rest.models.tools.requests.RegexTestRequest;
 import org.graylog2.rest.models.tools.responses.RegexTesterResponse;
 import org.graylog2.rest.models.tools.responses.RegexValidationResponse;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import jakarta.ws.rs.BadRequestException;
 
 import java.util.Collections;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class RegexTesterResourceTest {
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
 
     private RegexTesterResource resource;
 
@@ -41,16 +39,16 @@ public class RegexTesterResourceTest {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         resource = new RegexTesterResource();
     }
 
     @Test
-    public void regexTesterReturns400WithInvalidRegularExpression() throws Exception {
-        expectedException.expect(BadRequestException.class);
-        expectedException.expectMessage("Invalid regular expression: Dangling meta character '?' near index 0");
-        resource.regexTester("?*foo", "test");
+    public void regexTesterReturns400WithInvalidRegularExpression() {
+        Throwable exception = assertThrows(BadRequestException.class, () ->
+            resource.regexTester("?*foo", "test"));
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Invalid regular expression: Dangling meta character '?' near index 0"));
     }
 
     @Test
@@ -72,10 +70,10 @@ public class RegexTesterResourceTest {
     }
 
     @Test
-    public void testRegexReturns400WithInvalidRegularExpression() throws Exception {
-        expectedException.expect(BadRequestException.class);
-        expectedException.expectMessage("Invalid regular expression: Dangling meta character '?' near index 0");
-        resource.testRegex(RegexTestRequest.create("test", "?*foo"));
+    public void testRegexReturns400WithInvalidRegularExpression() {
+        Throwable exception = assertThrows(BadRequestException.class, () ->
+            resource.testRegex(RegexTestRequest.create("test", "?*foo")));
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Invalid regular expression: Dangling meta character '?' near index 0"));
     }
 
     @Test

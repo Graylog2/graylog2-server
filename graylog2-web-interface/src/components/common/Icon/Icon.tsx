@@ -120,6 +120,7 @@ const Icon = (
   ref: React.ForwardedRef<HTMLSpanElement>,
 ) => (
   <StyledSpan
+    aria-hidden={true}
     className={`material-symbols-rounded ${className ?? ''}`}
     data-testid={testId}
     onClick={onClick}

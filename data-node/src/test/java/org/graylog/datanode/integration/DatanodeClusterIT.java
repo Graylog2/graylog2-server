@@ -30,7 +30,6 @@ import org.graylog.testing.restoperations.RestOperationParameters;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
@@ -49,7 +48,6 @@ import java.util.stream.Stream;
 import static org.graylog.datanode.testinfra.DatanodeContainerizedBackend.IMAGE_WORKING_DIR;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Disabled("see https://github.com/Graylog2/graylog2-server/issues/23270")
 public class DatanodeClusterIT {
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeClusterIT.class);
 
@@ -77,8 +75,7 @@ public class DatanodeClusterIT {
         final FilesystemKeystoreInformation httpNodeA = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeA);
 
         this.network = Network.newNetwork();
-        this.mongoDBTestService = MongoDBTestService.create(network);
-        this.mongoDBTestService.start();
+        this.mongoDBTestService = MongoDBTestService.createStarted(network);
 
         nodeA = createDatanodeContainer(
                 network,

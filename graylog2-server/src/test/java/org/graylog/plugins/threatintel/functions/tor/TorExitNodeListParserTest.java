@@ -18,8 +18,8 @@ package org.graylog.plugins.threatintel.functions.tor;
 
 import com.google.common.collect.Lists;
 import org.graylog.plugins.threatintel.adapters.tor.TorExitNodeListParser;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -35,7 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TorExitNodeListParserTest {
     private TorExitNodeListParser parser;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.parser = new TorExitNodeListParser();
     }

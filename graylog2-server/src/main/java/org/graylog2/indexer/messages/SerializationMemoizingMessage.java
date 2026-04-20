@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import jakarta.annotation.Nonnull;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory;
 import org.joda.time.DateTime;
@@ -165,6 +165,12 @@ public class SerializationMemoizingMessage implements ImmutableMessage {
     @Override
     public long getSize() {
         return delegate.getSize();
+    }
+
+    @Override
+    public long getInputMessageSize() {
+        final Object value = delegate.getField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE);
+        return value instanceof Number n ? n.longValue() : getSize();
     }
 
     @Override

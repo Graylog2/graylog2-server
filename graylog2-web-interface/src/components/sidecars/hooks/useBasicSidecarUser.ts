@@ -39,7 +39,11 @@ const getSidecarUser = async (): Promise<BasicSidecarUser> =>
     username: userResponse.username,
   }));
 
-const useBasicSidecarUser = (): {
+type UseBasicSidecarUserOptions = {
+  enabled?: boolean;
+};
+
+const useBasicSidecarUser = ({ enabled = true }: UseBasicSidecarUserOptions = {}): {
   data: BasicSidecarUser;
   isLoading: boolean;
   refetch: () => void;
@@ -48,6 +52,7 @@ const useBasicSidecarUser = (): {
     queryKey: [BASIC_FORWARDER_USER_QUERY_KEY],
     queryFn: () =>
       defaultOnError(getSidecarUser(), `Loading Sidecar User failed with status`, `Could not load Sidecar User`),
+    enabled,
   });
 
   return {

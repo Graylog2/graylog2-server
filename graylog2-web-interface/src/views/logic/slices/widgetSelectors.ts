@@ -18,5 +18,4 @@ import { createSelector } from '@reduxjs/toolkit';
 
 import { selectActiveViewState } from 'views/logic/slices/viewSelectors';
 
-// eslint-disable-next-line import/prefer-default-export
 export const selectWidgetPositions = createSelector(selectActiveViewState, (viewState) => viewState.widgetPositions);

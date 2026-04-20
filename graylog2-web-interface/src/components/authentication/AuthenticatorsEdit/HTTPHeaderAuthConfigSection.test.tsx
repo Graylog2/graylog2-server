@@ -15,29 +15,31 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen, act, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
+import { render, screen, act, waitFor } from 'wrappedTestingLibrary';
 
-import { HTTPHeaderAuthConfigActions } from 'stores/authentication/HTTPHeaderAuthConfigStore';
 import HTTPHeaderAuthConfig from 'logic/authentication/HTTPHeaderAuthConfig';
 import asMock from 'helpers/mocking/AsMock';
+import HTTPHeaderAuthConfigDomain from 'domainActions/authentication/HTTPHeaderAuthConfigDomain';
 
 import HTTPHeaderAuthConfigSection from './HTTPHeaderAuthConfigSection';
 
 const mockHTTPHeaderAuthConfig = HTTPHeaderAuthConfig.builder().usernameHeader('Remote-User').enabled(true).build();
 
-jest.mock('stores/authentication/HTTPHeaderAuthConfigStore', () => ({
-  HTTPHeaderAuthConfigActions: {
-    load: jest.fn(() => Promise.resolve(mockHTTPHeaderAuthConfig)),
-    update: jest.fn(() => Promise.resolve()),
-  },
+jest.mock('domainActions/authentication/HTTPHeaderAuthConfigDomain', () => ({
+  load: jest.fn(() => Promise.resolve(mockHTTPHeaderAuthConfig)),
+  update: jest.fn(() => Promise.resolve()),
 }));
 
 describe('<HTTPHeaderAuthConfigSection />', () => {
-  afterEach(() => jest.useRealTimers());
+  afterEach(() => {
+    jest.useRealTimers();
+    jest.clearAllMocks();
+  });
 
   it('should display loading indicator while loading', async () => {
     jest.useFakeTimers();
-    asMock(HTTPHeaderAuthConfigActions.load).mockImplementationOnce(() => new Promise(() => {}));
+    asMock(HTTPHeaderAuthConfigDomain.load).mockImplementationOnce(() => new Promise(() => {}));
 
     render(<HTTPHeaderAuthConfigSection />);
 
@@ -52,11 +54,11 @@ describe('<HTTPHeaderAuthConfigSection />', () => {
     render(<HTTPHeaderAuthConfigSection />);
 
     const submitButton = await screen.findByText('Update Config');
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
-    await waitFor(() => expect(HTTPHeaderAuthConfigActions.update).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(HTTPHeaderAuthConfigDomain.update).toHaveBeenCalledTimes(1));
 
-    expect(HTTPHeaderAuthConfigActions.update).toHaveBeenCalledWith({ username_header: 'Remote-User', enabled: true });
+    expect(HTTPHeaderAuthConfigDomain.update).toHaveBeenCalledWith({ username_header: 'Remote-User', enabled: true });
   });
 
   it('should update config', async () => {
@@ -66,12 +68,13 @@ describe('<HTTPHeaderAuthConfigSection />', () => {
     const enabledHeaderCheckbox = screen.getByLabelText('Enable single sign-on via HTTP header');
     const usernameHeaderInput = screen.getByLabelText('Username header');
 
-    fireEvent.click(enabledHeaderCheckbox);
-    fireEvent.change(usernameHeaderInput, { target: { value: 'New-Header' } });
-    fireEvent.click(submitButton);
+    await userEvent.click(enabledHeaderCheckbox);
+    await userEvent.clear(usernameHeaderInput);
+    await userEvent.type(usernameHeaderInput, 'New-Header');
+    await userEvent.click(submitButton);
 
-    await waitFor(() => expect(HTTPHeaderAuthConfigActions.update).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(HTTPHeaderAuthConfigDomain.update).toHaveBeenCalledTimes(1));
 
-    expect(HTTPHeaderAuthConfigActions.update).toHaveBeenCalledWith({ username_header: 'New-Header', enabled: false });
+    expect(HTTPHeaderAuthConfigDomain.update).toHaveBeenCalledWith({ username_header: 'New-Header', enabled: false });
   });
 });

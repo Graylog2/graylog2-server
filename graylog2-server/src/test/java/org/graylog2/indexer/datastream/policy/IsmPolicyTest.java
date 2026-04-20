@@ -23,7 +23,7 @@ import org.graylog2.indexer.datastream.policy.actions.Action;
 import org.graylog2.indexer.datastream.policy.actions.DeleteAction;
 import org.graylog2.indexer.datastream.policy.actions.Retry;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.List;

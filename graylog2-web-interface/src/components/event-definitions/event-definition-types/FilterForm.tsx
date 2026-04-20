@@ -25,13 +25,14 @@ import merge from 'lodash/merge';
 import moment from 'moment';
 import { OrderedMap } from 'immutable';
 import type * as Immutable from 'immutable';
+import type { Permission } from 'graylog-web-plugin/plugin';
+import { useQuery } from '@tanstack/react-query';
 
 import { describeExpression } from 'util/CronUtils';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { isPermitted } from 'util/PermissionsMixin';
 import * as FormsUtils from 'util/FormsUtils';
 import FormWarningsContext from 'contexts/FormWarningsContext';
-import { useStore } from 'stores/connect';
 import Store from 'logic/local-storage/Store';
 import { MultiSelect, TimeUnitInput, SearchFiltersFormControls, TimezoneSelect } from 'components/common';
 import Query from 'views/logic/queries/Query';
@@ -42,7 +43,7 @@ import { Alert, ButtonToolbar, ControlLabel, FormGroup, HelpBlock, Input } from 
 import RelativeTime from 'components/common/RelativeTime';
 import type { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
-import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
+import { fetchAllLookupTables } from 'components/lookup-tables/hooks/api/lookupTablesAPI';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import generateId from 'logic/generateId';
 import parseSearch from 'views/logic/slices/parseSearch';
@@ -68,8 +69,8 @@ export const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
 export type LookupTableParameterJsonEmbryonic = Partial<LookupTableParameterJson> & {
   embryonic?: boolean;
 };
-const LOOKUP_PERMISSIONS = ['lookuptables:read'];
-const STREAM_PERMISSIONS = ['streams:read'];
+const LOOKUP_PERMISSIONS: Permission[] = ['lookuptables:read'];
+const STREAM_PERMISSIONS: Permission[] = ['streams:read'];
 
 const buildNewParameter = (name: string): LookupTableParameterJsonEmbryonic => ({
   name: name,
@@ -138,7 +139,11 @@ type QueryParametersProps = {
   validation: Props['validation'];
 };
 const QueryParameters = ({ eventDefinition, onChange, userCanViewLookupTables, validation }: QueryParametersProps) => {
-  const { tables = {} } = useStore(LookupTablesStore);
+  const { data: tables = [] } = useQuery({
+    queryKey: ['lookup-tables', 'all'],
+    queryFn: () => fetchAllLookupTables(),
+    enabled: userCanViewLookupTables,
+  });
   const queryParameters = eventDefinition?.config?.query_parameters ?? [];
 
   const onChangeQueryParameters = useCallback(
@@ -160,7 +165,7 @@ const QueryParameters = ({ eventDefinition, onChange, userCanViewLookupTables, v
       queryParameter={LookupTableParameter.fromJSON(queryParam)}
       embryonic={!!(queryParam as LookupTableParameterJsonEmbryonic).embryonic}
       queryParameters={queryParameters}
-      lookupTables={Object.values(tables)}
+      lookupTables={tables}
       onChange={onChangeQueryParameters}
     />
   ));
@@ -251,12 +256,6 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
     },
     [setFieldWarning],
   );
-
-  useEffect(() => {
-    if (userCanViewLookupTables) {
-      LookupTablesActions.searchPaginated(1, 0, undefined, false);
-    }
-  }, [userCanViewLookupTables]);
 
   useEffect(() => {
     validateQueryString(
@@ -389,7 +388,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
       const value = FormsUtils.getValueFromInput(event.target);
       const newConfig = getUpdatedConfig(name as EventDefinitionConfigKeys, value);
       handleConfigChange(name, newConfig);
-      debouncedParseQuery(value, newConfig);
+      debouncedParseQuery(value as string, newConfig);
     },
     [debouncedParseQuery, getUpdatedConfig, handleConfigChange],
   );
@@ -513,17 +512,13 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
   const onlyFilters = eventDefinition._scope === 'ILLUMINATE';
 
   // Ensure deleted streams are still displayed in select
-  const formattedStreams = useMemo(
-    () =>
-      [...streams.map((s) => s.id), ...(eventDefinition?.config?.streams ?? [])]
-        .map((streamId) => {
-          const stream = streams.find((s) => s.id === streamId);
+  const formattedStreams = [...streams.map((s) => s.id), ...(eventDefinition?.config?.streams ?? [])]
+    .map((streamId) => {
+      const stream = streams.find((s) => s.id === streamId);
 
-          return { label: stream?.title ?? streamId, value: streamId };
-        })
-        .sort((s1, s2) => defaultCompare(s1.label, s2.label)),
-    [eventDefinition?.config?.streams, streams],
-  );
+      return { label: stream?.title ?? streamId, value: streamId };
+    })
+    .sort((s1, s2) => defaultCompare(s1.label, s2.label));
 
   return (
     <fieldset>

@@ -27,7 +27,7 @@ describe('MapVisualization', () => {
       <MapVisualization id="somemap" onChange={() => {}} data={[]} height={1600} width={900} />,
     );
 
-    // eslint-disable-next-line testing-library/no-container
+    // eslint-disable-next-line testing-library/no-container, testing-library/no-node-access -- leaflet map has no accessible role
     expect(container.querySelector('div.map#visualization-somemap')).toBeInTheDocument();
   });
 
@@ -36,9 +36,9 @@ describe('MapVisualization', () => {
       <MapVisualization id="somemap" onChange={() => {}} data={fixtures.invalidData} height={1600} width={900} />,
     );
 
-    /* eslint-disable testing-library/no-container */
+    /* eslint-disable testing-library/no-container, testing-library/no-node-access -- leaflet map has no accessible role */
     expect(container.querySelector('div.map#visualization-somemap')).toBeInTheDocument();
     expect(container.querySelector('CircleMarker')).not.toBeInTheDocument();
-    /* eslint-enable testing-library/no-container */
+    /* eslint-enable testing-library/no-container, testing-library/no-node-access */
   });
 });

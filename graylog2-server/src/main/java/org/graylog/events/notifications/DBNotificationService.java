@@ -28,6 +28,7 @@ import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.search.SearchQuery;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -90,5 +91,9 @@ public class DBNotificationService {
     @MustBeClosed
     public Stream<NotificationDto> streamAll() {
         return stream(collection.find());
+    }
+
+    public Map<String, Long> countByType() {
+        return mongoUtils.countByField("config.type");
     }
 }

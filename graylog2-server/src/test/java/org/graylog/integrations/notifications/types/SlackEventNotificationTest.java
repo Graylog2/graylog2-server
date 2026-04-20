@@ -46,12 +46,14 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.web.customization.CustomizationConfig;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -59,6 +61,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -66,7 +69,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class SlackEventNotificationTest {
     //code under test
     SlackEventNotification slackEventNotification;
@@ -96,7 +100,7 @@ public class SlackEventNotificationTest {
     private final String expectedIconUrl = "emoji.com/smile.png";
     private final String expectedUsername = "graylog_user1";
 
-    @Before
+    @BeforeEach
     public void setUp() {
         getDummySlackNotificationConfig();
         eventNotificationContext = NotificationTestData.getDummyContext(getHttpNotification(), "ayirp").toBuilder().notificationConfig(slackEventNotificationConfig).build();
@@ -155,7 +159,7 @@ public class SlackEventNotificationTest {
         assertThat(attachment.text()).isEqualTo(expectedAttachmentText);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         slackEventNotification = null;
         slackEventNotificationConfig = null;
@@ -188,21 +192,25 @@ public class SlackEventNotificationTest {
         ));
     }
 
-    @Test(expected = EventNotificationException.class)
-    public void executeWithInvalidWebhookUrl() throws EventNotificationException, JsonProcessingException {
-        givenGoodNotificationService();
-        givenSlackClientThrowsPermException();
-        //when execute is called with a invalid webhook URL, we expect a event notification exception
-        slackEventNotification.execute(eventNotificationContext);
+    @Test
+    public void executeWithInvalidWebhookUrl() throws JsonProcessingException {
+        assertThrows(EventNotificationException.class, () -> {
+            givenGoodNotificationService();
+            givenSlackClientThrowsPermException();
+            //when execute is called with a invalid webhook URL, we expect a event notification exception
+            slackEventNotification.execute(eventNotificationContext);
+        });
     }
 
-    @Test(expected = EventNotificationException.class)
-    public void executeWithNullEventTimerange() throws EventNotificationException {
-        EventNotificationContext yetAnotherContext = getEventNotificationContextToSimulateNullPointerException();
-        assertThat(yetAnotherContext.event().timerangeStart().isPresent()).isFalse();
-        assertThat(yetAnotherContext.event().timerangeEnd().isPresent()).isFalse();
-        assertThat(yetAnotherContext.notificationConfig().type()).isEqualTo(SlackEventNotificationConfig.TYPE_NAME);
-        slackEventNotification.execute(yetAnotherContext);
+    @Test
+    public void executeWithNullEventTimerange() {
+        assertThrows(EventNotificationException.class, () -> {
+            EventNotificationContext yetAnotherContext = getEventNotificationContextToSimulateNullPointerException();
+            assertThat(yetAnotherContext.event().timerangeStart().isPresent()).isFalse();
+            assertThat(yetAnotherContext.event().timerangeEnd().isPresent()).isFalse();
+            assertThat(yetAnotherContext.notificationConfig().type()).isEqualTo(SlackEventNotificationConfig.TYPE_NAME);
+            slackEventNotification.execute(yetAnotherContext);
+        });
     }
 
     private EventNotificationContext getEventNotificationContextToSimulateNullPointerException() {
@@ -258,10 +266,12 @@ public class SlackEventNotificationTest {
 
     }
 
-    @Test(expected = PermanentEventNotificationException.class)
+    @Test
     public void buildCustomMessageWithInvalidTemplate() throws EventNotificationException {
-        slackEventNotificationConfig = buildInvalidTemplate();
-        slackEventNotification.buildCustomMessage(eventNotificationContext, slackEventNotificationConfig, "Title:       ${does't exist}");
+        assertThrows(PermanentEventNotificationException.class, () -> {
+            slackEventNotificationConfig = buildInvalidTemplate();
+            slackEventNotification.buildCustomMessage(eventNotificationContext, slackEventNotificationConfig, "Title:       ${does't exist}");
+        });
     }
 
     @Test

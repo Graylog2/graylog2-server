@@ -17,11 +17,13 @@
 package org.graylog.storage.opensearch3;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.graylog.storage.opensearch3.cat.CatApi;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.storage.opensearch3.cluster.ClusterStateApi;
 import org.graylog.storage.opensearch3.stats.ClusterStatsApi;
 import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
 import org.graylog.storage.opensearch3.stats.StatsApi;
+import org.graylog.storage.opensearch3.testing.client.mock.ServerlessOpenSearchClient;
+import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,6 +41,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
@@ -50,13 +53,9 @@ class IndicesAdapterOSTest {
     private IndicesAdapterOS toTest;
 
     @Mock
-    private OpenSearchClient client;
-    @Mock
     private StatsApi statsApi;
     @Mock
     private ClusterStatsApi clusterStatsApi;
-    @Mock
-    private CatApi catApi;
     @Mock
     private ClusterStateApi clusterStateApi;
     @Mock
@@ -66,16 +65,7 @@ class IndicesAdapterOSTest {
 
     @BeforeEach
     void setUp() {
-        toTest = new IndicesAdapterOS(
-                client,
-                statsApi,
-                clusterStatsApi,
-                catApi,
-                clusterStateApi,
-                indexTemplateAdapter,
-                indexStatisticsBuilder,
-                new ObjectMapperProvider().get()
-        );
+        toTest = buildAdapter(ServerlessOpenSearchClient.builder().build());
     }
 
     @Test
@@ -176,6 +166,55 @@ class IndicesAdapterOSTest {
     }
 
 
+    @Test
+    void testGetOutdatedIndicesFiltersOlderVersion() {
+        final IndicesAdapterOS adapter = buildAdapterWithSettingsResponse("""
+                {
+                  "current_index": {"settings": {"index.version.created_string": "2.5.0"}},
+                  "old_index":     {"settings": {"index.version.created_string": "1.3.0"}}
+                }
+                """);
+
+        assertThat(adapter.getOutdatedIndices(2)).containsExactly("old_index");
+    }
+
+    @Test
+    void testGetOutdatedIndicesAllCurrentMajorVersion() {
+        final IndicesAdapterOS adapter = buildAdapterWithSettingsResponse("""
+                {
+                  "index_a": {"settings": {"index.version.created_string": "2.5.0"}},
+                  "index_b": {"settings": {"index.version.created_string": "2.11.0"}}
+                }
+                """);
+
+        assertThat(adapter.getOutdatedIndices(2)).isEmpty();
+    }
+
+    @Test
+    void testGetOutdatedIndicesMissingVersionTreatedAsOutdated() {
+        final IndicesAdapterOS adapter = buildAdapterWithSettingsResponse("""
+                {
+                  "no_settings": {},
+                  "no_version":  {"settings": {"some.other.setting": "value"}},
+                  "current":     {"settings": {"index.version.created_string": "2.5.0"}}
+                }
+                """);
+
+        assertThat(adapter.getOutdatedIndices(2)).containsExactlyInAnyOrder("no_settings", "no_version");
+    }
+
+    private IndicesAdapterOS buildAdapterWithSettingsResponse(String settingsJson) {
+        final OfficialOpensearchClient client = ServerlessOpenSearchClient.builder()
+                .stubResponse("GET", "/_settings", settingsJson)
+                .build();
+        return buildAdapter(client);
+    }
+
+    private IndicesAdapterOS buildAdapter(OfficialOpensearchClient client) {
+        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+        return new IndicesAdapterOS(client, statsApi, clusterStatsApi, clusterStateApi, indexTemplateAdapter, indexStatisticsBuilder, objectMapper);
+    }
+
     private IndicesStats buildIndicesStats(final String uuid, final long count, final FlushStats.Builder flushStatsBuilder) {
         return IndicesStats.builder()
                 .uuid(uuid)
@@ -186,6 +225,4 @@ class IndicesAdapterOSTest {
                 .total(IndexStats.builder().build())
                 .build();
     }
-
-
 }

@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useCallback } from 'react';
 import upperFirst from 'lodash/upperFirst';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer } from 'components/common';
 import { ButtonToolbar, MenuItem, Button, DeleteMenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import OperatingSystemIcon from 'components/sidecars/common/OperatingSystemIcon';

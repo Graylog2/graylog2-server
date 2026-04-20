@@ -18,7 +18,6 @@ package org.graylog.storage.elasticsearch7.views.searchtypes.pivots;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
@@ -33,21 +32,21 @@ import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivot;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.EffectiveTimeRangeExtractor;
-import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.buckets.ESTimeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.Date;
@@ -56,32 +55,27 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class ESPivotTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-    @Mock
-    private SearchJob job;
     @Mock
     private Query query;
     @Mock
     private Pivot pivot;
-
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private SearchResponse queryResult;
-    @Mock
-    private Aggregations aggregations;
     @Mock
     private ESGeneratedQueryContext queryContext;
 
     private ESSearchTypeHandler<Pivot> esPivot;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.esPivot = new ESPivot(Collections.emptyMap(), Collections.emptyMap(), new EffectiveTimeRangeExtractor());
         when(pivot.id()).thenReturn("dummypivot");
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         // Some tests modify the time so we make sure to reset it after each test even if assertions fail
         DateTimeUtils.setCurrentMillisSystem();
@@ -112,7 +106,7 @@ public class ESPivotTest {
         when(queryResult.getAggregations()).thenReturn(mockMetricAggregation);
         when(query.effectiveTimeRange(pivot)).thenReturn(RelativeRange.create(300));
 
-        final SearchType.Result result = this.esPivot.doExtractResult(job, query, pivot, queryResult, aggregations, queryContext);
+        final SearchType.Result result = this.esPivot.doExtractResult(query, pivot, queryResult, queryContext);
 
         final PivotResult pivotResult = (PivotResult)result;
 
@@ -133,7 +127,7 @@ public class ESPivotTest {
         when(queryResult.getAggregations()).thenReturn(mockMetricAggregation);
         when(query.effectiveTimeRange(pivot)).thenReturn(RelativeRange.create(300));
 
-        final SearchType.Result result = esPivot.doExtractResult(null, query, pivot, queryResult, null, null);
+        final SearchType.Result result = esPivot.doExtractResult(query, pivot, queryResult, null);
 
         assertThat(result.name()).contains("customPivot");
     }
@@ -147,7 +141,7 @@ public class ESPivotTest {
         when(queryResult.getAggregations()).thenReturn(mockMetricAggregation);
         when(query.effectiveTimeRange(pivot)).thenReturn(RelativeRange.create(300));
 
-        final SearchType.Result result = this.esPivot.doExtractResult(job, query, pivot, queryResult, aggregations, queryContext);
+        final SearchType.Result result = this.esPivot.doExtractResult(query, pivot, queryResult, queryContext);
 
         final PivotResult pivotResult = (PivotResult) result;
 
@@ -169,7 +163,7 @@ public class ESPivotTest {
         when(queryResult.getAggregations()).thenReturn(mockMetricAggregation);
         when(query.effectiveTimeRange(pivot)).thenReturn(RelativeRange.create(0));
 
-        final SearchType.Result result = this.esPivot.doExtractResult(job, query, pivot, queryResult, aggregations, queryContext);
+        final SearchType.Result result = this.esPivot.doExtractResult(query, pivot, queryResult, queryContext);
 
         final PivotResult pivotResult = (PivotResult) result;
 
@@ -185,7 +179,7 @@ public class ESPivotTest {
         returnDocumentCount(queryResult, 0);
         final TimeRange pivotRange = AbsoluteRange.create(DateTime.parse("1970-01-01T00:00:00.000Z"), DateTime.parse("2020-01-09T15:44:25.408Z"));
         when(query.effectiveTimeRange(pivot)).thenReturn(pivotRange);
-        final SearchType.Result result = this.esPivot.doExtractResult(job, query, pivot, queryResult, aggregations, queryContext);
+        final SearchType.Result result = this.esPivot.doExtractResult(query, pivot, queryResult, queryContext);
         final PivotResult pivotResult = (PivotResult) result;
         assertThat(pivotResult.effectiveTimerange()).isEqualTo(AbsoluteRange.create(
                 DateTime.parse("1970-01-01T00:00:00.000Z"),

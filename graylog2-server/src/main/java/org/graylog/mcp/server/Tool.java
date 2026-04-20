@@ -21,7 +21,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.victools.jsonschema.generator.SchemaGenerator;
 import io.modelcontextprotocol.spec.McpSchema;
+import jakarta.inject.Inject;
+import org.graylog.mcp.config.McpConfiguration;
 import org.graylog.mcp.tools.PermissionHelper;
+import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.web.customization.CustomizationConfig;
 
 import java.util.Map;
 import java.util.Optional;
@@ -33,8 +37,9 @@ import java.util.Optional;
  * @param <O> Output type
  */
 public abstract class Tool<P, O> {
-
     private final ObjectMapper objectMapper;
+    private final ClusterConfigService clusterConfigService;
+
     private final TypeReference<P> parameterType;
     private final String name;
     private final String title;
@@ -42,6 +47,7 @@ public abstract class Tool<P, O> {
     private final McpSchema.JsonSchema inputSchema;
     private final Map<String, Object> outputSchema;
 
+    @Deprecated
     protected Tool(
             ObjectMapper objectMapper,
             SchemaGeneratorProvider schemaGeneratorProvider,
@@ -49,12 +55,37 @@ public abstract class Tool<P, O> {
             TypeReference<O> outputType,
             String name,
             String title,
-            String description) {
-        this.objectMapper = objectMapper;
+            String description
+    ) {
+        this(
+                parameterType,
+                outputType,
+                name,
+                title,
+                description,
+                objectMapper,
+                null,
+                schemaGeneratorProvider
+        );
+    }
+
+    protected Tool(
+            TypeReference<P> parameterType,
+            TypeReference<O> outputType,
+            String name,
+            String title,
+            String description,
+            ObjectMapper objectMapper,
+            ClusterConfigService clusterConfigService,
+            SchemaGeneratorProvider schemaGeneratorProvider
+    ) {
         this.parameterType = parameterType;
         this.name = name;
         this.title = title;
         this.description = description;
+
+        this.objectMapper = objectMapper;
+        this.clusterConfigService = clusterConfigService;
 
         // Get the schema generator with all contributed modules
         SchemaGenerator generator = schemaGeneratorProvider.get();
@@ -72,6 +103,11 @@ public abstract class Tool<P, O> {
         } else {
             this.outputSchema = objectMapper.convertValue(generator.generateSchema(outputType.getType()), new TypeReference<Map<String, Object>>() {});
         }
+    }
+
+    protected boolean isOutputSchemaEnabled() {
+        return clusterConfigService != null && clusterConfigService.getOrDefault(McpConfiguration.class, McpConfiguration.DEFAULT_VALUES)
+                .enableOutputSchema();
     }
 
     protected ObjectMapper getObjectMapper() {

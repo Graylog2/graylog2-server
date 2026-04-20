@@ -18,12 +18,11 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import { asMock } from 'helpers/mocking';
-import type { InputStateSummary } from 'hooks/useInputsStates';
-import useInputsStates from 'hooks/useInputsStates';
+import useInputStateSummary from 'hooks/useInputStateSummary';
 
 import InputsDotBadge from './InputsDotBadge';
 
-jest.mock('hooks/useInputsStates');
+jest.mock('hooks/useInputStateSummary');
 
 const TEXT = 'Inputs';
 
@@ -32,55 +31,65 @@ describe('<InputsDotBadge />', () => {
     jest.clearAllMocks();
   });
 
-  it('returns null while loading', () => {
-    asMock(useInputsStates).mockReturnValue({
-      refetch: jest.fn(),
+  it('renders text while loading', () => {
+    asMock(useInputStateSummary).mockReturnValue({
+      hasProblematicInputs: false,
       isLoading: true,
-      data: undefined,
     });
 
     render(<InputsDotBadge text={TEXT} />);
 
-    expect(screen.queryByText(TEXT)).not.toBeInTheDocument();
+    expect(screen.getByText(TEXT)).toBeInTheDocument();
   });
 
-  it('renders plain text when there are no failed/failing/setup inputs', () => {
-    asMock(useInputsStates).mockReturnValue({
-      refetch: jest.fn(),
+  it('renders plain text when there are no problematic inputs', () => {
+    asMock(useInputStateSummary).mockReturnValue({
+      hasProblematicInputs: false,
       isLoading: false,
-      data: {
-        states: [
-          { id: '1', state: 'RUNNING' } as InputStateSummary,
-          { id: '2', state: 'STARTING' } as InputStateSummary,
-        ],
-      },
     });
 
     render(<InputsDotBadge text={TEXT} />);
 
     const textEl = screen.getByText(TEXT);
     expect(textEl).toBeInTheDocument();
-    expect(textEl).not.toHaveAttribute('title', 'Some inputs are in failed state or in setup mode.');
+    expect(textEl).not.toHaveAttribute('title');
   });
 
-  describe.each(['FAILED', 'FAILING', 'SETUP'])('renders badge when an input state is %s', (problemState) => {
-    it(`shows badge (dot) with tooltip for state ${problemState}`, () => {
-      asMock(useInputsStates).mockReturnValue({
-        refetch: jest.fn(),
-        isLoading: false,
-        data: {
-          states: [
-            { id: '1', state: 'RUNNING' } as InputStateSummary,
-            { id: '2', state: problemState } as InputStateSummary,
-          ],
-        },
-      });
-
-      render(<InputsDotBadge text={TEXT} />);
-
-      const badge = screen.getByTitle(/Some inputs are in failed state or in setup mode\./i);
-      expect(badge).toBeInTheDocument();
-      expect(badge).toHaveTextContent(TEXT);
+  it('shows badge when there are problematic inputs', () => {
+    asMock(useInputStateSummary).mockReturnValue({
+      hasProblematicInputs: true,
+      isLoading: false,
     });
+
+    render(<InputsDotBadge text={TEXT} />);
+
+    const badge = screen.getByTitle(/Some inputs are in failed state or in setup mode\./i);
+    expect(badge).toBeInTheDocument();
+    expect(badge).toHaveTextContent(TEXT);
+  });
+
+  it('shows badge when hasExternalIssues is true and no problematic inputs', () => {
+    asMock(useInputStateSummary).mockReturnValue({
+      hasProblematicInputs: false,
+      isLoading: false,
+    });
+
+    render(<InputsDotBadge text={TEXT} hasExternalIssues externalIssuesTitle="Forwarder inputs have issues." />);
+
+    const badge = screen.getByTitle(/Forwarder inputs have issues\./i);
+    expect(badge).toBeInTheDocument();
+    expect(badge).toHaveTextContent(TEXT);
+  });
+
+  it('shows failed inputs title when both problematic inputs and external issues exist', () => {
+    asMock(useInputStateSummary).mockReturnValue({
+      hasProblematicInputs: true,
+      isLoading: false,
+    });
+
+    render(<InputsDotBadge text={TEXT} hasExternalIssues externalIssuesTitle="Forwarder inputs have issues." />);
+
+    const badge = screen.getByTitle(/Some inputs are in failed state or in setup mode\./i);
+    expect(badge).toBeInTheDocument();
   });
 });

@@ -22,8 +22,6 @@ import { prefixUrl } from 'routing/Routes';
 
 import RulesPage from './RulesPage';
 
-jest.mock('components/perspectives/hooks/useActivePerspective');
-
 const rulesPlugin = {
   entityCreators: [
     {
@@ -35,10 +33,12 @@ const rulesPlugin = {
   ],
 };
 describe('RulesPage', () => {
+  const renderSUT = () => render(<RulesPage />);
+
   usePluginExports(rulesPlugin);
 
   it('should show create rule button', async () => {
-    render(<RulesPage />);
+    renderSUT();
 
     await screen.findByRole('link', { name: /Create Rule/i });
   });

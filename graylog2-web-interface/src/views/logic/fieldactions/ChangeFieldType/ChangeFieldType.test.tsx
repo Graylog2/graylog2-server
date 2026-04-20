@@ -18,29 +18,31 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
+import type { ActionContexts } from 'views/types';
 import ChangeFieldType from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldType';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import useInitialSelection from 'views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection';
 import asMock from 'helpers/mocking/AsMock';
-import useFieldTypeUsages from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
+import { fetchFieldTypeUsages } from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
 
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages', () => jest.fn());
+
+jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages', () => ({
+  ...jest.requireActual('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages'),
+  fetchFieldTypeUsages: jest.fn(),
+}));
+
 const paginatedFieldUsage = {
-  data: {
-    list: [],
-    pagination: {
-      total: 0,
-      page: 1,
-      perPage: 1,
-      count: 1,
-    },
-    attributes: [],
+  list: [],
+  pagination: {
+    total: 0,
+    page: 1,
+    perPage: 1,
+    count: 1,
   },
-  refetch: () => {},
-  isInitialLoading: false,
-  isLoading: false,
+  attributes: [],
 };
 const onClose = jest.fn();
 const renderChangeTypeAction = ({
@@ -51,7 +53,14 @@ const renderChangeTypeAction = ({
 }) =>
   render(
     <TestStoreProvider>
-      <ChangeFieldType onClose={onClose} queryId={queryId} field={field} type={type} value={value} />
+      <ChangeFieldType
+        onClose={onClose}
+        queryId={queryId}
+        field={field}
+        type={type}
+        value={value}
+        contexts={{} as ActionContexts}
+      />
     </TestStoreProvider>,
   );
 
@@ -60,7 +69,7 @@ describe('ChangeFieldType', () => {
 
   beforeAll(() => {
     asMock(useInitialSelection).mockReturnValue({ list: ['id-1', 'id-2'], isLoading: false });
-    asMock(useFieldTypeUsages).mockReturnValue(paginatedFieldUsage);
+    asMock(fetchFieldTypeUsages).mockResolvedValue(paginatedFieldUsage);
   });
 
   it('Shows modal', async () => {

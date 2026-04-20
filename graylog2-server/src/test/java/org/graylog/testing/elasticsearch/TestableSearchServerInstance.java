@@ -19,7 +19,6 @@ package org.graylog.testing.elasticsearch;
 import com.google.common.io.Resources;
 import org.graylog2.shared.utilities.StringUtils;
 import org.graylog2.storage.SearchVersion;
-import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
@@ -36,7 +35,7 @@ import java.util.stream.Collectors;
 /**
  * This rule starts a SearchServer instance and provides a configured {@link Client}.
  */
-public abstract class TestableSearchServerInstance extends ExternalResource implements SearchServerInstance {
+public abstract class TestableSearchServerInstance implements SearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(TestableSearchServerInstance.class);
 
     private static final Map<ContainerCacheKey, GenericContainer<?>> containersByVersion = new ConcurrentHashMap<>();
@@ -53,6 +52,7 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
 
     protected static volatile boolean isFirstContainerStart = true;
     private boolean closed = false;
+    protected ContainerCacheKey cacheKey;
 
     @Override
     public abstract Client client();
@@ -85,7 +85,7 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
         if (!cachedInstance) {
             return doBuildContainer(image);
         }
-        final ContainerCacheKey cacheKey = new ContainerCacheKey(version, heapSize, env);
+        cacheKey = new ContainerCacheKey(version, heapSize, env);
         if (!containersByVersion.containsKey(cacheKey)) {
             containersByVersion.put(cacheKey, doBuildContainer(image));
         } else {
@@ -97,17 +97,13 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
 
     private GenericContainer<?> doBuildContainer(String image) {
         LOG.debug("Creating instance {} (cached: {})", image, cachedInstance);
+        isFirstContainerStart = true;
         final GenericContainer<?> container = buildContainer(image, network);
         container.start();
         if (LOG.isDebugEnabled()) {
             container.followOutput(new Slf4jLogConsumer(LOG).withPrefix(image));
         }
         return container;
-    }
-
-    @Override
-    protected void after() {
-        cleanUp();
     }
 
     @Override

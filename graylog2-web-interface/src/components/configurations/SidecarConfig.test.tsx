@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import MockStore from 'helpers/mocking/StoreMock';
 
@@ -58,15 +59,15 @@ describe('SidecarConfig', () => {
 
     const editButton = await screen.findByRole('button', { name: /edit configuration/i });
 
-    fireEvent.click(editButton);
+    await userEvent.click(editButton);
 
-    fireEvent.click(
+    await userEvent.click(
       await screen.findByRole('checkbox', {
         name: /override sidecar configuration/i,
       }),
     );
 
-    fireEvent.click(
+    await userEvent.click(
       await screen.findByRole('button', {
         name: /update configuration/i,
       }),

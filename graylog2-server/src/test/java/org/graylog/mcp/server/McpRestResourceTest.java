@@ -36,7 +36,7 @@ public class McpRestResourceTest {
                                        null,
                                        null,
                                        null);
-        clusterConfigService.write(McpConfiguration.create(false));
+        clusterConfigService.write(McpConfiguration.create(false, false));
     }
 
     @Test

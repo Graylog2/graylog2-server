@@ -39,10 +39,6 @@ import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.MatchAllQueryBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryStringQueryBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.OSMessageList;
 import org.graylog.storage.opensearch3.views.searchtypes.OSSearchTypeHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.EffectiveTimeRangeExtractor;
@@ -57,12 +53,14 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import org.opensearch.client.opensearch._types.query_dsl.QueryStringQuery;
 
 import java.util.Collections;
 import java.util.List;
@@ -72,22 +70,21 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.plugin.Tools.nowUTC;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class OpenSearchBackendTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-
     private OpenSearchBackend backend;
     private UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper;
 
     @Mock
     private IndexLookup indexLookup;
 
-    @Before
+    @BeforeEach
     public void setup() {
         Map<String, Provider<OSSearchTypeHandler<? extends SearchType>>> handlers = Maps.newHashMap();
         handlers.put(MessageList.NAME, () -> new OSMessageList(new LegacyDecoratorProcessor.Fake(),
@@ -103,7 +100,8 @@ public class OpenSearchBackendTest {
                 usedSearchFiltersToQueryStringsMapper,
                 new NoOpStatsCollector<>(),
                 mock(StreamService.class),
-                false);
+                false,
+                1, 1);
     }
 
     @Test
@@ -152,29 +150,29 @@ public class OpenSearchBackendTest {
                 .build();
 
         final OSGeneratedQueryContext queryContext = backend.generate(query, Collections.emptySet(), DateTimeZone.UTC);
-        final QueryBuilder esQuery = queryContext.searchSourceBuilder(new SearchType.Fallback()).query();
+        org.opensearch.client.opensearch._types.query_dsl.Query esQuery = queryContext.searchSourceBuilder(new SearchType.Fallback()).build().query();
         assertThat(esQuery)
                 .isNotNull()
-                .isInstanceOf(BoolQueryBuilder.class);
+                .matches(org.opensearch.client.opensearch._types.query_dsl.Query::isBool);
 
-        final List<QueryBuilder> filters = ((BoolQueryBuilder) esQuery).filter();
+        final List<org.opensearch.client.opensearch._types.query_dsl.Query> filters = esQuery.bool().filter();
 
         //filter for empty ES query
         assertThat(filters)
-                .anyMatch(queryBuilder -> queryBuilder instanceof MatchAllQueryBuilder);
+                .anyMatch(org.opensearch.client.opensearch._types.query_dsl.Query::isMatchAll);
 
         //2 filters from search filters
         assertThat(filters)
-                .filteredOn(queryBuilder -> queryBuilder instanceof QueryStringQueryBuilder)
-                .extracting(queryBuilder -> (QueryStringQueryBuilder) queryBuilder)
-                .extracting(QueryStringQueryBuilder::queryString)
+                .filteredOn(org.opensearch.client.opensearch._types.query_dsl.Query::isQueryString)
+                .extracting(org.opensearch.client.opensearch._types.query_dsl.Query::queryString)
+                .extracting(QueryStringQuery::query)
                 .contains("method:POST")
                 .contains("method:GET");
     }
 
     @Test
     public void testExplain() {
-        when(indexLookup.indexRangesForStreamsInTimeRange(anySet(), any())).thenAnswer(a -> {
+        when(indexLookup.indexRangesForStreamsInTimeRange(anyCollection(), any())).thenAnswer(a -> {
             if (a.getArgument(1, TimeRange.class).getFrom().getYear() < 2024) {
                 return Set.of(
                         MongoIndexRange.create("graylog_0", nowUTC(), nowUTC(), nowUTC(), 0),

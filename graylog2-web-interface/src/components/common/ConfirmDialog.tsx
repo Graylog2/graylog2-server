@@ -15,14 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled from 'styled-components';
 
 import { Modal } from 'components/bootstrap';
 import ModalSubmit from 'components/common/ModalSubmit';
-
-const StyledModal = styled(Modal)`
-  z-index: 1070;
-`;
 
 type Props = {
   btnConfirmDisabled?: boolean;
@@ -81,7 +76,7 @@ const ConfirmDialog = ({
   );
 
   return (
-    <StyledModal show={show} onHide={onHide}>
+    <Modal show={show} onHide={onHide} isConfirmDialog>
       <Modal.Header>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
@@ -89,7 +84,7 @@ const ConfirmDialog = ({
       <Modal.Body>{children}</Modal.Body>
 
       <Modal.Footer>{submit}</Modal.Footer>
-    </StyledModal>
+    </Modal>
   );
 };
 

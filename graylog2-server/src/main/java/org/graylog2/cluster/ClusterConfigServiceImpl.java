@@ -155,8 +155,12 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
 
     @Override
     public <T> int remove(Class<T> type) {
-        final String canonicalName = type.getCanonicalName();
-        return Ints.saturatedCast(collection.deleteMany(Filters.eq("type", canonicalName)).getDeletedCount());
+        return remove(type.getCanonicalName());
+    }
+
+    @Override
+    public int remove(String key) {
+        return Ints.saturatedCast(collection.deleteMany(Filters.eq("type", key)).getDeletedCount());
     }
 
     @Override

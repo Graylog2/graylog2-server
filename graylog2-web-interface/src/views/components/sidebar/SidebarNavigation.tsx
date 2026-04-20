@@ -112,8 +112,9 @@ const SidebarNavigation = ({ sections, activeSection, selectSidebarSection, side
         </>
       )}
       <Section>
-        {sections.map(({ key, icon, title }) => {
+        {sections.map(({ key, icon, title: sectionTitle, hoverTitle }) => {
           const isSelected = activeSectionKey === key;
+          const title = hoverTitle ?? sectionTitle;
 
           return (
             <NavItem

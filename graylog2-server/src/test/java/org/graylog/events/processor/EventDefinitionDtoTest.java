@@ -26,24 +26,29 @@ import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog.security.UserContext;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class EventDefinitionDtoTest {
     private EventDefinitionDto testSubject;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         final AggregationEventProcessorConfig configMock = mock(AggregationEventProcessorConfig.class);
         when(configMock.validate(any(UserContext.class))).thenReturn(new ValidationResult());
-        when(configMock.validate(any(), any())).thenReturn(new ValidationResult());
+        when(configMock.validate(nullable(EventProcessorConfig.class), any(EventDefinitionConfiguration.class)))
+                .thenReturn(new ValidationResult());
+        when(configMock.validate(any(UserContext.class), nullable(EventProcessorConfig.class), any(EventDefinitionConfiguration.class)))
+                .thenReturn(new ValidationResult());
 
         testSubject = EventDefinitionDto.builder()
             .title("foo")
@@ -82,7 +87,10 @@ public class EventDefinitionDtoTest {
         final ValidationResult mockedValidationResult = new ValidationResult();
         mockedValidationResult.addError("foo", "bar");
         when(configMock.validate(any(UserContext.class))).thenReturn(mockedValidationResult);
-        when(configMock.validate(any(), any())).thenReturn(mockedValidationResult);
+        when(configMock.validate(nullable(EventProcessorConfig.class), any(EventDefinitionConfiguration.class)))
+                .thenReturn(new ValidationResult());
+        when(configMock.validate(any(UserContext.class), nullable(EventProcessorConfig.class), any(EventDefinitionConfiguration.class)))
+                .thenReturn(new ValidationResult());
 
         final EventDefinitionDto invalidEventDefinition = testSubject.toBuilder()
             .config(configMock)
@@ -159,6 +167,28 @@ public class EventDefinitionDtoTest {
         assertThat(testSubjectJson).contains("## Heading");
         // HTML should be removed.
         assertThat(testSubjectJson).doesNotContain("form");
+    }
+
+    @Test
+    public void testValidateCallsAllConfigValidateMethods() {
+        final AggregationEventProcessorConfig configMock = mock(AggregationEventProcessorConfig.class);
+        when(configMock.validate(any(UserContext.class))).thenReturn(new ValidationResult());
+        when(configMock.validate(nullable(EventProcessorConfig.class), any(EventDefinitionConfiguration.class)))
+                .thenReturn(new ValidationResult());
+        when(configMock.validate(any(UserContext.class), nullable(EventProcessorConfig.class), any(EventDefinitionConfiguration.class)))
+                .thenCallRealMethod();
+
+        final EventDefinitionDto dto = testSubject.toBuilder()
+                .config(configMock)
+                .build();
+
+        final UserContext mockUserContext = mock(UserContext.class);
+        final EventDefinitionConfiguration edConfig = new EventDefinitionConfiguration();
+        dto.validate(null, edConfig, mockUserContext);
+
+        verify(configMock).validate(mockUserContext);
+        verify(configMock).validate(mockUserContext, null, edConfig);
+        verify(configMock).validate(null, edConfig);
     }
 
     private static ValidationResult validate(EventDefinitionDto eventDefinitionDto) {

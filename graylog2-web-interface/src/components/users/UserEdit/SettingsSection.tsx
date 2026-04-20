@@ -20,7 +20,7 @@ import styled from 'styled-components';
 
 import Routes from 'routing/Routes';
 import { Button, Row, Col } from 'components/bootstrap';
-import { IfPermitted, NoSearchResult, ReadOnlyFormGroup } from 'components/common';
+import { IfPermitted, Link, NoSearchResult, ReadOnlyFormGroup } from 'components/common';
 import type User from 'logic/users/User';
 import type { StartPage } from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
@@ -30,7 +30,6 @@ import TimeoutFormGroup from '../UserCreate/TimeoutFormGroup';
 import ServiceAccountFormGroup from '../UserCreate/ServiceAccountFormGroup';
 import StartpageFormGroup from '../StartpageFormGroup';
 import useIsGlobalTimeoutEnabled from '../../../hooks/useIsGlobalTimeoutEnabled';
-import { Link } from '../../common/router';
 
 export type SettingsFormValues = {
   timezone: string;
@@ -97,7 +96,7 @@ const SettingsSection = ({
               )}
             </IfPermitted>
             <TimezoneFormGroup />
-            <IfPermitted permissions="user:edit">
+            <IfPermitted permissions="users:edit">
               <ServiceAccountFormGroup />
             </IfPermitted>
             <StartpageFormGroup userId={id} permissions={permissions} />

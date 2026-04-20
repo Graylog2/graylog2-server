@@ -19,6 +19,7 @@ package org.graylog2.configuration;
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.ValidatorMethod;
+import com.github.joschi.jadconfig.documentation.Documentation;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import com.mongodb.MongoClientOptions;
@@ -32,7 +33,23 @@ public class MongoDbConfiguration {
     @Parameter(value = "mongodb_max_connections", validator = PositiveIntegerValidator.class)
     private int maxConnections = 1000;
 
-    @Documentation("MongoDB connection string. See https://docs.mongodb.com/manual/reference/connection-string/ for details")
+    @Documentation("""
+            MongoDB connection string.
+
+            See https://docs.mongodb.com/manual/reference/connection-string/ for details
+
+            Advanced examples:
+
+            Authenticate against the MongoDB server
+            '+'-signs in the username or password need to be replaced by '%2B'
+            #mongodb_uri = mongodb://grayloguser:secret@localhost:27017/graylog
+
+            Use a replica set instead of a single host
+            #mongodb_uri = mongodb://grayloguser:secret@localhost:27017,localhost:27018,localhost:27019/graylog?replicaSet=rs01
+
+            DNS Seedlist https://docs.mongodb.com/manual/reference/connection-string/#dns-seedlist-connection-format
+            #mongodb_uri = mongodb+srv://server.example.org/graylog
+            """)
     @Parameter(value = "mongodb_uri", required = true, validator = StringNotBlankValidator.class)
     private String uri = "mongodb://localhost/graylog";
 

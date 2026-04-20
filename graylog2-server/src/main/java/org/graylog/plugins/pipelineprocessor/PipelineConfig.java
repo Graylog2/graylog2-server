@@ -17,10 +17,14 @@
 package org.graylog.plugins.pipelineprocessor;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.documentation.Documentation;
+import com.github.joschi.jadconfig.documentation.DocumentationSection;
 import org.graylog2.plugin.PluginConfigBean;
 
+@DocumentationSection(heading = "Pipeline configuration", description = "")
 public class PipelineConfig implements PluginConfigBean {
 
+    @Documentation(value = "tbd")
     @Parameter("cached_stageiterators")
     private boolean cachedStageIterators = true;
 }

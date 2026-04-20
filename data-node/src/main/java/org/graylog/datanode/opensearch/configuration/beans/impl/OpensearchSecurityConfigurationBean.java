@@ -105,9 +105,7 @@ public class OpensearchSecurityConfigurationBean implements DatanodeConfiguratio
 
         final String truststorePassword = RandomStringUtils.secure().nextAlphabetic(256);
 
-        final TruststoreCreator truststoreCreator = TruststoreCreator.newDefaultJvm()
-                .addCertificates(opensearchConfigurationParams.trustedCertificates());
-
+        final TruststoreCreator truststoreCreator = TruststoreCreator.newDefaultJvm();
 
         opensearchCertificates.filter(OpensearchCertificates::hasCertificates).ifPresent(c -> {
             try {

@@ -17,21 +17,28 @@
 package org.graylog.plugins.sidecar.migrations;
 
 import com.google.common.collect.ImmutableSet;
+import org.graylog.plugins.sidecar.common.SidecarPluginConfiguration;
 import org.graylog.plugins.sidecar.permissions.SidecarRestPermissions;
 import org.graylog2.migrations.Migration;
 import org.graylog2.migrations.MigrationHelpers;
 
 import jakarta.inject.Inject;
+import org.graylog2.shared.security.RestPermissions;
 
 import java.time.ZonedDateTime;
 
 public class V20230502164900_AddSidecarManagerAndReaderRole extends Migration {
 
     private final MigrationHelpers helpers;
+    private final String sidecarUser;
 
     @Inject
-    public V20230502164900_AddSidecarManagerAndReaderRole(MigrationHelpers migrationHelpers) {
+    public V20230502164900_AddSidecarManagerAndReaderRole(
+            MigrationHelpers migrationHelpers,
+            SidecarPluginConfiguration sidecarPluginConfiguration
+    ) {
         this.helpers = migrationHelpers;
+        sidecarUser = sidecarPluginConfiguration.getUser();
     }
 
     @Override
@@ -45,6 +52,11 @@ public class V20230502164900_AddSidecarManagerAndReaderRole extends Migration {
                 "Sidecar Manager",
                 "Grants access to read, register and pull configurations for Sidecars (built-in)",
                 ImmutableSet.of(
+                        permissionForUser(RestPermissions.USERS_READ, sidecarUser),
+                        permissionForUser(RestPermissions.USERS_EDIT, sidecarUser),
+                        permissionForUser(RestPermissions.USERS_TOKENCREATE, sidecarUser),
+                        permissionForUser(RestPermissions.USERS_TOKENLIST, sidecarUser),
+                        permissionForUser(RestPermissions.USERS_TOKENREMOVE, sidecarUser),
                         SidecarRestPermissions.COLLECTORS_READ,
                         SidecarRestPermissions.COLLECTORS_CREATE,
                         SidecarRestPermissions.COLLECTORS_UPDATE,
@@ -65,5 +77,9 @@ public class V20230502164900_AddSidecarManagerAndReaderRole extends Migration {
                         SidecarRestPermissions.CONFIGURATIONS_READ,
                         SidecarRestPermissions.SIDECARS_READ));
 
+    }
+
+    private String permissionForUser(String permission, String user) {
+        return permission + ":" + user;
     }
 }

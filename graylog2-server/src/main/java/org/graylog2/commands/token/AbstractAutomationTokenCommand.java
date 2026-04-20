@@ -17,6 +17,7 @@
 package org.graylog2.commands.token;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.documentation.Documentation;
 import com.google.inject.Module;
 import jakarta.annotation.Nonnull;
 import java.util.List;
@@ -47,6 +48,7 @@ public abstract class AbstractAutomationTokenCommand extends AbstractNodeCommand
     }
 
     private static class TokenCommandConfiguration extends Configuration {
+        @Documentation(visible = false)
         @Parameter("password_secret")
         String passwordSecret;
 

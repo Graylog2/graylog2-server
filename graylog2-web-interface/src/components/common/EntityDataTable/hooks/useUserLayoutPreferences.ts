@@ -24,15 +24,17 @@ import { defaultOnError } from 'util/conditional/onError';
 const INITIAL_DATA = {};
 
 const preferencesFromJSON = ({
-  displayed_attributes,
+  attributes,
   sort,
   per_page,
   custom_preferences,
+  order,
 }: TableLayoutPreferencesJSON): TableLayoutPreferences => ({
-  displayedAttributes: displayed_attributes,
+  attributes,
   sort: sort ? { attributeId: sort.field, direction: sort.order } : undefined,
   perPage: per_page,
   customPreferences: custom_preferences,
+  order,
 });
 const fetchUserLayoutPreferences = (entityId: string) =>
   fetch('GET', qualifyUrl(`/entitylists/preferences/${entityId}`)).then((res) => preferencesFromJSON(res ?? {}));
@@ -42,15 +44,12 @@ const useUserLayoutPreferences = <T>(
 ): { data: TableLayoutPreferences<T>; isInitialLoading: boolean; refetch: () => void } => {
   const { data, isInitialLoading, refetch } = useQuery({
     queryKey: ['table-layout', entityId],
-
     queryFn: () =>
       defaultOnError(
         fetchUserLayoutPreferences(entityId),
         `Loading layout preferences for "${entityId}" overview failed with`,
       ),
-
     placeholderData: keepPreviousData,
-
     // 1 hour
     staleTime: 60 * (60 * 1000),
   });

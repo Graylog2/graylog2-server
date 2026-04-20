@@ -1,0 +1,5 @@
+type = "a"
+message = "Added metrics-provider for output-type frequency."
+
+pulls = ["23940"]
+issues = ["Graylog2/graylog-plugin-enterprise#12203"]

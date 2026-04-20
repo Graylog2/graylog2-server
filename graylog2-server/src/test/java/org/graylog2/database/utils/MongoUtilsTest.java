@@ -29,7 +29,6 @@ import com.mongodb.MongoWriteException;
 import com.mongodb.ServerAddress;
 import com.mongodb.WriteConcernResult;
 import com.mongodb.WriteError;
-import org.graylog2.database.MongoCollection;
 import org.bson.BsonDocument;
 import org.bson.BsonString;
 import org.bson.RawBsonDocument;
@@ -37,8 +36,8 @@ import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.BuildableMongoEntity;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoEntity;
 import org.graylog2.shared.SuppressForbidden;
@@ -57,11 +56,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.insertedId;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
+import static org.graylog2.database.utils.MongoUtils.insertedIds;
+import static org.graylog2.database.utils.MongoUtils.insertedIdsAsString;
 import static org.graylog2.database.utils.MongoUtils.stringIdsIn;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
 class MongoUtilsTest {
+
 
     private record DTO(@Id @org.mongojack.ObjectId String id, String name) implements MongoEntity {}
 
@@ -74,8 +76,8 @@ class MongoUtilsTest {
     private MongoUtils<DTO> utils;
 
     @BeforeEach
-    void setUp(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider objectMapperProvider) {
-        mongoCollections = new MongoCollections(objectMapperProvider, mongoDBTestService.mongoConnection());
+    void setUp(MongoCollections mongoCollections) {
+        this.mongoCollections = mongoCollections;
         collection = mongoCollections.collection("test", DTO.class);
         collectionRef = mongoCollections.collection("test1", DTORef.class);
         utils = mongoCollections.utils(collection);
@@ -104,6 +106,58 @@ class MongoUtilsTest {
         final var rawCollection = mongoCollections.nonEntityCollection("raw_bson_test", RawBsonDocument.class);
         final RawBsonDocument doc = RawBsonDocument.parse("{\"name\":\"a\"}");
         assertThatThrownBy(() -> insertedId(rawCollection.insertOne(doc)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("MongoEntity");
+    }
+
+    @Test
+    void testInsertedIds() {
+        final var idZero = new ObjectId("000000000000000000000000");
+        final var id1 = new ObjectId("000000000000000000000001");
+        final var id2 = new ObjectId("000000000000000000000002");
+
+        final var dto1 = new DTO(id1.toHexString(), "a");
+        final var dto2 = new DTO(id2.toHexString(), "b");
+        final var nullIdDto1 = new DTO(null, "a");
+        final var nullIdDto2 = new DTO(null, "b");
+
+        assertThat(insertedIds(collection.insertMany(List.of(dto1, dto2)))).isEqualTo(List.of(id1, id2));
+
+        assertThat(insertedIds(collection.insertMany(List.of(nullIdDto1, nullIdDto2))))
+                .satisfiesExactly(
+                        insertedId1 -> assertThat(insertedId1).isGreaterThan(idZero),
+                        insertedId2 -> assertThat(insertedId2).isGreaterThan(idZero)
+                );
+    }
+
+    @Test
+    void testInsertedIdsAsString() {
+        final var idZero = new ObjectId("000000000000000000000000");
+        final var id1 = new ObjectId("000000000000000000000001");
+        final var id2 = new ObjectId("000000000000000000000002");
+
+        final var dto1 = new DTO(id1.toHexString(), "a");
+        final var dto2 = new DTO(id2.toHexString(), "b");
+        final var nullIdDto1 = new DTO(null, "a");
+        final var nullIdDto2 = new DTO(null, "b");
+
+        assertThat(insertedIdsAsString(collection.insertMany(List.of(dto1, dto2))))
+                .isEqualTo(List.of(id1.toHexString(), id2.toHexString()));
+
+        assertThat(insertedIdsAsString(collection.insertMany(List.of(nullIdDto1, nullIdDto2))))
+                .satisfiesExactly(
+                        insertedId1 -> assertThat(insertedId1).isGreaterThan(idZero.toHexString()),
+                        insertedId2 -> assertThat(insertedId2).isGreaterThan(idZero.toHexString())
+                );
+    }
+
+    @Test
+    void testNullInsertedIds() {
+        final var rawCollection = mongoCollections.nonEntityCollection("raw_bson_test", RawBsonDocument.class);
+        final var doc1 = RawBsonDocument.parse("{\"name\":\"a\"}");
+        final var doc2 = RawBsonDocument.parse("{\"name\":\"b\"}");
+
+        assertThatThrownBy(() -> insertedIds(rawCollection.insertMany(List.of(doc1, doc2))))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("MongoEntity");
     }
@@ -276,5 +330,23 @@ class MongoUtilsTest {
         assertThat(saved)
                 .isEqualTo(orig)
                 .isEqualTo(util.getById(orig.id()).orElse(null));
+    }
+
+    @Test
+    void testCountByField() {
+        collection.insertMany(List.of(
+                new DTO(null, "name-1"),
+                new DTO(null, "name-2"),
+                new DTO(null, "name-2"),
+                new DTO(null, null)
+        ));
+
+        Map<String, Long> counts = utils.countByField("name");
+
+        assertThat(counts)
+                .containsEntry("name-1", 1L)
+                .containsEntry("name-2", 2L)
+                .hasSize(2)
+                .doesNotContainKey(null);
     }
 }

@@ -20,8 +20,6 @@ import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.graylog2.plugin.PluginModule;
-import org.graylog2.rest.models.system.sessions.responses.DefaultSessionResponseFactory;
-import org.graylog2.rest.models.system.sessions.responses.SessionResponseFactory;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.graylog2.security.DefaultX509TrustManager;
 import org.graylog2.security.TrustManagerProvider;
@@ -45,7 +43,5 @@ public class SecurityBindings extends PluginModule {
 
         OptionalBinder.newOptionalBinder(binder(), ActorAwareAuthenticationTokenFactory.class)
                 .setDefault().to(ActorAwareUsernamePasswordTokenFactory.class);
-        OptionalBinder.newOptionalBinder(binder(), SessionResponseFactory.class)
-                .setDefault().to(DefaultSessionResponseFactory.class);
     }
 }

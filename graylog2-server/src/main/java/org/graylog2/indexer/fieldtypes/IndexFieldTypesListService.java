@@ -18,22 +18,22 @@ package org.graylog2.indexer.fieldtypes;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.inmemory.InMemoryFilterExpressionParser;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.fieldtypes.utils.FieldTypeDTOsMerger;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indexset.MongoIndexSet;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType;
-import jakarta.annotation.Nonnull;
 
 import java.util.Collection;
 import java.util.List;
@@ -155,7 +155,7 @@ public class IndexFieldTypesListService {
     private Map<String, List<IndexSetFieldType>> getFilteredList(Set<String> indexSetIds, Collection<String> fieldNames) {
         final var indexSetConfigs = indexSetService.findByIds(indexSetIds);
         final var mongoIndexSets = indexSetConfigs.stream().collect(Collectors.toMap(IndexSetConfig::id, indexSetFactory::create));
-        final var activeWriteIndices = mongoIndexSets.values().stream().map(MongoIndexSet::getActiveWriteIndex).collect(Collectors.toSet());
+        final var activeWriteIndices = mongoIndexSets.values().stream().map(IndexSet::getActiveWriteIndex).collect(Collectors.toSet());
         final var previousActiveIndexSets = mongoIndexSets.values().stream().map(this::getPreviousActiveIndexSet).collect(Collectors.toSet());
 
         final var indexFieldTypes = indexFieldTypesService.findByIndexNames(Sets.union(activeWriteIndices, previousActiveIndexSets))

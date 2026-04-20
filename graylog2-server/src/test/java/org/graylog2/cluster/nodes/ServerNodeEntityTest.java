@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -42,25 +43,28 @@ class ServerNodeEntityTest {
         final String nodeId = "2d4cff7a-b9c4-440c-9c62-89ba1fb06211";
         final String transportAddress = "http://127.0.0.1:9000/api/";
         final String hostname = "graylog.local";
+        final String version = "6.3.0-SNAPSHOT";
         final Map<String, Object> fields = Maps.newHashMap();
         fields.put("last_seen", (int) lastSeen.toEpochSecond());
         fields.put("node_id", nodeId);
         fields.put("is_leader", true);
         fields.put("transport_address", transportAddress);
         fields.put("hostname", hostname);
+        fields.put(ServerNodeDto.FIELD_IS_PROCESSING, true);
+        fields.put(ServerNodeDto.FIELD_LIFECYCLE, Lifecycle.RUNNING.name());
+        fields.put(ServerNodeDto.FIELD_VERSION, version);
 
         final String id = "61b9c2861448530c3e061283";
         final ServerNodeEntity node = new ServerNodeEntity(new ObjectId(id), fields);
 
         final JsonNode jsonNode = mapper.readTree(mapper.writeValueAsString(node));
 
-        assertThat(jsonNode.size()).isEqualTo(8);
-
         assertThat(ZonedDateTime.parse(jsonNode.path("last_seen").asText())).isEqualTo(lastSeen);
         assertThat(jsonNode.path("node_id").asText()).isEqualTo(nodeId);
         assertThat(jsonNode.path("is_leader").asBoolean()).isEqualTo(true);
         assertThat(jsonNode.path("transport_address").asText()).isEqualTo(transportAddress);
         assertThat(jsonNode.path("hostname").asText()).isEqualTo(hostname);
+        assertThat(jsonNode.path("version").asText()).isEqualTo(version);
 
         assertThat(jsonNode.path("id").asText()).isEqualTo(id);
         assertThat(jsonNode.path("is_master").asBoolean()).isEqualTo(true);
@@ -73,6 +77,9 @@ class ServerNodeEntityTest {
                 .setTransportAddress(transportAddress)
                 .setHostname(hostname)
                 .setObjectId(id)
+                .setLifecycle(Lifecycle.RUNNING)
+                .setProcessing(true)
+                .setVersion(version)
                 .build());
     }
 }

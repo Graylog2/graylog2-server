@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
@@ -57,14 +57,14 @@ describe('<RedoNavItem />', () => {
   it('Call redo action on call', async () => {
     render(<RedoNavItemComponent />);
     const redoButton = await screen.findByLabelText('Redo');
-    fireEvent.click(redoButton);
+    await userEvent.click(redoButton);
 
     await waitFor(() => expect(redo).toHaveBeenCalled());
   });
 
   it('Call redo action when pressing related keyboard shortcut', async () => {
     render(<RedoNavItemComponent />);
-    userEvent.keyboard('{Meta>}{Shift>}y{/Shift}{/Meta}');
+    await userEvent.keyboard('{Meta>}{Shift>}y{/Shift}{/Meta}');
     await waitFor(() => expect(redo).toHaveBeenCalledTimes(1));
   });
 });

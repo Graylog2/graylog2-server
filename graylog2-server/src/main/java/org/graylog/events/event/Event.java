@@ -99,6 +99,10 @@ public interface Event extends Indexable {
 
     void setGroupByFields(Map<String, String> fields);
 
+    Map<String, Double> getAggregationConditions();
+
+    void setAggregationConditions(Map<String, Double> fields);
+
     void setReplayInfo(EventReplayInfo replayInfo);
 
     EventReplayInfo getReplayInfo();
@@ -119,6 +123,7 @@ public interface Event extends Indexable {
         from.sourceStreams().forEach(event::addSourceStream);
         event.setFields(from.fields());
         event.setGroupByFields(from.groupByFields());
+        event.setAggregationConditions(from.aggregationConditions());
         event.setPriority(from.priority());
         from.scores().forEach(event::setScore);
 

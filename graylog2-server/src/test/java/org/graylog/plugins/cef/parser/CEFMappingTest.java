@@ -16,11 +16,11 @@
  */
 package org.graylog.plugins.cef.parser;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CEFMappingTest {
     private static final CEFMapping[] BIG_INT_FIELDS = new CEFMapping[]{

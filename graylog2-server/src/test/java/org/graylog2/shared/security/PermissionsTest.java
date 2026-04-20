@@ -19,14 +19,15 @@ package org.graylog2.shared.security;
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.plugin.security.Permission;
 import org.graylog2.plugin.security.PluginPermissions;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PermissionsTest {
 
@@ -52,7 +53,7 @@ public class PermissionsTest {
     }
 
 
-    @Before
+    @BeforeEach
     public void setUp() {
         restPermissions = new RestPermissions();
         permissions = new Permissions(ImmutableSet.of(restPermissions));
@@ -74,14 +75,16 @@ public class PermissionsTest {
                 .containsOnly("world");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testPluginPermissionsWithDuplicatePermission() {
-        final ImmutableSet<Permission> pluginPermissions = ImmutableSet.of(
-                Permission.create("users:edit", "User edit")
-        );
-        final PermissionsPluginPermissions plugin = new PermissionsPluginPermissions(pluginPermissions);
+        assertThrows(IllegalArgumentException.class, () -> {
+            final ImmutableSet<Permission> pluginPermissions = ImmutableSet.of(
+                    Permission.create("users:edit", "User edit")
+            );
+            final PermissionsPluginPermissions plugin = new PermissionsPluginPermissions(pluginPermissions);
 
-        new Permissions(ImmutableSet.of(restPermissions, plugin));
+            new Permissions(ImmutableSet.of(restPermissions, plugin));
+        });
     }
 
     @Test

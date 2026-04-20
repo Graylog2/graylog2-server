@@ -15,19 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
 
+import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
 import { LookupTablesOverview } from 'components/lookup-tables';
 import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
-import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
-import LUTModals from 'components/lookup-tables/LUTModals';
 
 function LUTTablesPage() {
-  const { setModal } = useModalContext();
-
-  const showCreateModal = () => {
-    setModal('LUT-CREATE');
-  };
+  const navigate = useNavigate();
 
   return (
     <LUTPageLayout
@@ -35,12 +31,11 @@ function LUTTablesPage() {
       pageTitle="Lookup Tables"
       pageDescription="Lookup tables can be used in extractors, converters and processing pipelines to translate message fields or to enrich messages."
       actions={
-        <Button bsStyle="primary" onClick={showCreateModal}>
+        <Button bsStyle="primary" onClick={() => navigate(Routes.SYSTEM.LOOKUPTABLES.CREATE)}>
           Create lookup table
         </Button>
       }>
       <LookupTablesOverview />
-      <LUTModals />
     </LUTPageLayout>
   );
 }

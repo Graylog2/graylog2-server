@@ -26,14 +26,14 @@ type Props = {
 };
 
 class RuntimeErrorBoundary extends React.Component<Props> {
-  static contextType = TelemetryContext;
-
-  context: React.ContextType<typeof TelemetryContext>;
-
   componentDidCatch(error: Error, info: ErrorInfo) {
     ErrorsActions.report(createReactError(error, { componentStack: info?.componentStack }));
     this.context.sendErrorReport(error);
   }
+
+  static contextType = TelemetryContext;
+
+  context: React.ContextType<typeof TelemetryContext>;
 
   render() {
     const { children } = this.props;

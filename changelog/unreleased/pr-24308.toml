@@ -1,0 +1,5 @@
+type = "added" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Add option in MCP config for disabling schema output in responses."
+
+issues = ["23980"]
+pulls = ["24308"]

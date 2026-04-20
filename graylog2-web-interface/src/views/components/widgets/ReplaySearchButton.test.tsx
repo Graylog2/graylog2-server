@@ -43,13 +43,6 @@ describe('ReplaySearchButton', () => {
       return asElement(await screen.findByRole('link', { name: /replay search/i }), HTMLAnchorElement);
     };
 
-    it('opening in a new page', async () => {
-      const button = await renderWithContext();
-
-      expect(button.target).toEqual('_blank');
-      expect(button.rel).toEqual('noopener noreferrer');
-    });
-
     it('including query string', async () => {
       const button = await renderWithContext({ query: createElasticsearchQueryString('_exists_:nf_version') });
 

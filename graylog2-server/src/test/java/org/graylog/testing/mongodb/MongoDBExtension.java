@@ -18,11 +18,13 @@ package org.graylog.testing.mongodb;
 
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.database.MongoConnection;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtensionConfigurationException;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.InvocationInterceptor;
 import org.junit.jupiter.api.extension.ParameterContext;
@@ -87,14 +89,14 @@ public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, Be
         this.version = version;
     }
 
-    private MongoDBTestService constructInstance(ExtensionContext context, Lifecycle lifecycle) {
+    private void constructInstance(ExtensionContext context, Lifecycle lifecycle) {
         if (context.getStore(NAMESPACE).get(Lifecycle.class) == null) {
             context.getStore(NAMESPACE).put(Lifecycle.class, lifecycle);
         }
-        return (MongoDBTestService) context.getStore(NAMESPACE).getOrComputeIfAbsent(MongoDBTestService.class, c -> {
+        context.getStore(NAMESPACE).computeIfAbsent(MongoDBTestService.class, c -> {
             LOG.debug("Starting a new MongoDB service instance with lifecycle {}", lifecycle);
             this.network = Network.newNetwork();
-            return MongoDBTestService.create(version, this.network);
+            return MongoDBTestService.createStarted(version, this.network);
         });
     }
 
@@ -108,16 +110,27 @@ public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, Be
         getInstance(context).dropDatabase();
     }
 
-    private MongoDBTestService getInstance(ExtensionContext context) {
-        return requireNonNull((MongoDBTestService) context.getStore(NAMESPACE).get(MongoDBTestService.class),
-                "MongoDBTestService hasn't been initialized yet");
+    /**
+     * Gets an initialized {@link MongoDBTestService} from the context store. Should only be used from other
+     * JUnit extensions.
+     *
+     * @param context the extension context
+     * @return the MongoDB instance
+     * @throws ExtensionConfigurationException when the extension is not initialized
+     */
+    public static MongoDBTestService getInstance(ExtensionContext context) {
+        final var service = (MongoDBTestService) context.getStore(NAMESPACE).get(MongoDBTestService.class);
+        if (service == null) {
+            throw new ExtensionConfigurationException("MongoDBExtension hasn't been initialized. Make sure to add the MongoDBExtension to your test class!");
+        }
+        return service;
     }
 
     @Override
     public void beforeAll(ExtensionContext context) {
         // When extension is used with @ExtendWith on a class or @RegisterExtension on a static field, we start a
         // single MongoDB instance for all tests in the test class
-        constructInstance(context, Lifecycle.ALL_TESTS).start();
+        constructInstance(context, Lifecycle.ALL_TESTS);
     }
 
     @Override
@@ -125,12 +138,17 @@ public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, Be
         // If there isn't an instance already, the extension has been used with @RegisterExtension on a non-static
         // field (beforeAll doesn't get called in that case), so we want to start a new MongoDB instance for each test
         // in the test class
-        constructInstance(context, Lifecycle.SINGLE_TEST).start();
+        constructInstance(context, Lifecycle.SINGLE_TEST);
     }
 
     @Override
     public void afterAll(ExtensionContext context) {
-        closeInstance(context);
+        // Only run for root test class context. If this runs for @Nested tests, then we close the instance too early.
+        if (context.getParent()
+                .flatMap(ExtensionContext::getTestClass)
+                .isEmpty()) {
+            closeInstance(context);
+        }
     }
 
     @Override
@@ -145,7 +163,8 @@ public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, Be
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext context) throws ParameterResolutionException {
         return MongoDBTestService.class.equals(parameterContext.getParameter().getType()) ||
-                MongoCollections.class.equals(parameterContext.getParameter().getType());
+                MongoCollections.class.equals(parameterContext.getParameter().getType()) ||
+                MongoConnection.class.equals(parameterContext.getParameter().getType());
     }
 
     @Override
@@ -158,6 +177,9 @@ public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, Be
                     new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()),
                     getInstance(context).mongoConnection()
             );
+        }
+        if (MongoConnection.class.equals(parameterContext.getParameter().getType())) {
+            return getInstance(context).mongoConnection();
         }
         throw new ParameterResolutionException("Unsupported parameter type: " + parameterContext.getParameter().getName());
     }

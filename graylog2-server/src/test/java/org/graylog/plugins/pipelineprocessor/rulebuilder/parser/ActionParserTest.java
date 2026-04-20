@@ -25,9 +25,9 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragmentService;
 import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,7 +50,7 @@ public class ActionParserTest {
     private static final String FUNCTION2_NAME = "function2";
     private static final String FUNCTION3_NAME = "function3";
 
-    @BeforeClass
+    @BeforeAll
     public static void registerFunctions() {
         final HashMap<String, Function<?>> functions = Maps.newHashMap();
         functions.put(FUNCTION1_NAME, FunctionUtil.testFunction(
@@ -81,7 +81,7 @@ public class ActionParserTest {
                 ruleFragmentService, secureFreemarkerConfigProvider, new EventBus());
     }
 
-    @Before
+    @BeforeEach
     public void initialize() {
         final SecureFreemarkerConfigProvider secureFreemarkerConfigProvider = new SecureFreemarkerConfigProvider();
         secureFreemarkerConfigProvider.get().setLogTemplateExceptions(false);

@@ -16,8 +16,8 @@
  */
 package org.graylog2.notifications;
 
-import com.google.common.eventbus.EventBus;
 import org.assertj.core.api.Assertions;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.streams.events.StreamDeletedEvent;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -31,11 +31,11 @@ class DeletedStreamNotificationListenerTest {
 
     @Test
     void testNotificationDeletion() {
-        EventBus eventBus = new EventBus();
+        final ClusterEventBus clusterEventBus = new ClusterEventBus();
         final NotificationService notificationService = mockNotificationService("123", "456");
-        new DeletedStreamNotificationListener(eventBus, notificationService);
+        new DeletedStreamNotificationListener(clusterEventBus, notificationService);
 
-        eventBus.post(new StreamDeletedEvent("123", "stream title"));
+        clusterEventBus.post(new StreamDeletedEvent("123", "stream title"));
 
         final ArgumentCaptor<Notification> argumentCaptor = ArgumentCaptor.forClass(Notification.class);
         Mockito.verify(notificationService, Mockito.times(1)).destroy(argumentCaptor.capture());
