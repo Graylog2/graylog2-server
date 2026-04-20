@@ -14,13 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import Routes from 'routing/Routes';
 
-const COLLECTOR_SYSTEM_LOGS_STREAM_ID = '000000000000000000000005';
+import type { Attribute } from 'stores/PaginationTypes';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { isPermitted } from 'util/PermissionsMixin';
 
-const collectorLogsUrl = (instanceUid: string): string =>
-  Routes.search_with_query(`collector_instance_uid:"${instanceUid}"`, 'relative', { relative: 3600 }, [
-    COLLECTOR_SYSTEM_LOGS_STREAM_ID,
-  ]);
+const useAuthorizedAttributes = (attributes: Array<Attribute>) => {
+  const currentUser = useCurrentUser();
 
-export default collectorLogsUrl;
+  return attributes.filter(({ permissions }) =>
+    !permissions?.length || isPermitted(currentUser.permissions, permissions));
+};
+
+export default useAuthorizedAttributes;

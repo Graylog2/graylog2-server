@@ -24,7 +24,8 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import ReassignFleetModal from './ReassignFleetModal';
 
-import collectorLogsUrl from '../common/collectorLogsUrl';
+import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
+import collectorSystemLogsUrl from '../common/collectorSystemLogsUrl';
 import { useCollectorsMutations } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import type { CollectorInstanceView } from '../types';
@@ -54,7 +55,10 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
   return (
     <>
       <ButtonToolbar>
-        <LinkContainer to={collectorLogsUrl(instance.instance_uid)}>
+        <LinkContainer to={collectorReceivedMessagesUrl('collector_instance_uid', instance.instance_uid)}>
+          <Button bsSize="xsmall">Received messages</Button>
+        </LinkContainer>
+        <LinkContainer to={collectorSystemLogsUrl(instance.instance_uid)}>
           <Button
             bsSize="xsmall"
             onClick={() =>
@@ -64,7 +68,7 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
                 fleet_id: instance.fleet_id,
               })
             }>
-            View Logs
+            View System Logs
           </Button>
         </LinkContainer>
         <Button
@@ -95,12 +99,12 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
       )}
       {showDeleteConfirm && (
         <ConfirmDialog
-          title="Delete collector instance"
+          title="Delete Collector instance"
           show
           onConfirm={handleConfirmDelete}
           onCancel={() => setShowDeleteConfirm(false)}>
           Are you sure you want to delete instance <strong>{instance.hostname || instance.instance_uid}</strong>?<br />
-          The collector will need to be re-enrolled to appear again.
+          The Collector will need to be re-enrolled to appear again.
         </ConfirmDialog>
       )}
     </>

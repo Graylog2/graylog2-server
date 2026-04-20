@@ -79,7 +79,7 @@ const IngestEndpointStatus = ({ isInitialSetup }: Props) => {
         <SectionTitle>Ingest Inputs</SectionTitle>
         {!isInitialSetup && !hasInputs && (
           <Alert bsStyle="info">
-            No collector ingest input exists. Collectors will not be able to send data until an input is created.
+            No Collector ingest input exists. Collectors will not be able to send data until an input is created.
             {canCreateInputs && (
               <>
                 {' '}

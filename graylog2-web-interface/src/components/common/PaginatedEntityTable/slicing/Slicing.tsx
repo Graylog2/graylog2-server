@@ -92,6 +92,7 @@ const Slicing = ({ appSection, columnSchemas, onChangeSlicing, sliceRenderers = 
         sliceRenderers={sliceRenderers}
         fetchSlices={fetchSlices}
         sortOptions={sortOptions}
+        defaultSliceSort={activeColumn?.slice_sort_default}
       />
     </Container>
   );

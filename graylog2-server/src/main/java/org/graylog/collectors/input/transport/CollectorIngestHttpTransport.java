@@ -34,6 +34,7 @@ import org.graylog2.inputs.transports.NettyTransportConfiguration;
 import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
@@ -75,10 +76,11 @@ public class CollectorIngestHttpTransport extends AbstractHttpTransport {
                                         LocalMetricRegistry localMetricRegistry,
                                         TLSProtocolsConfiguration tlsConfiguration,
                                         @Named("trusted_proxies") Set<IpSubnet> trustedProxies,
-                                        CollectorTLSUtils tlsUtils) {
+                                        CollectorTLSUtils tlsUtils,
+                                        EncryptedValueService encryptedValueService) {
         super(withTlsDefaults(configuration), eventLoopGroup, eventLoopGroupFactory,
                 nettyTransportConfiguration, throughputCounter, localMetricRegistry,
-                tlsConfiguration, trustedProxies, OtlpHttpUtils.LOGS_PATH);
+                tlsConfiguration, encryptedValueService, trustedProxies, OtlpHttpUtils.LOGS_PATH);
         this.tlsUtils = tlsUtils;
     }
 
