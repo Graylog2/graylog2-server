@@ -27,6 +27,7 @@ import org.graylog2.inputs.transports.NettyTransportConfiguration;
 import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.NumberField;
@@ -56,9 +57,10 @@ public class OTelHttpTransport extends AbstractHttpTransport {
                              ThroughputCounter throughputCounter,
                              LocalMetricRegistry localMetricRegistry,
                              TLSProtocolsConfiguration tlsConfiguration,
+                             EncryptedValueService encryptedValueService,
                              @Named("trusted_proxies") Set<IpSubnet> trustedProxies) {
         super(configuration, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration,
-                throughputCounter, localMetricRegistry, tlsConfiguration, trustedProxies, OTelHttpHandler.LOGS_PATH);
+                throughputCounter, localMetricRegistry, tlsConfiguration, encryptedValueService, trustedProxies, OTelHttpHandler.LOGS_PATH);
     }
 
     @Override

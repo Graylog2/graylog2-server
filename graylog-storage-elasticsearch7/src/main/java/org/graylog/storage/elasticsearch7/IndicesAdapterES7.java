@@ -653,4 +653,9 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     public Optional<WarmIndexInfo> getWarmIndexInfo(String index) {
         return Optional.empty();
     }
+
+    @Override
+    public Set<String> getOutdatedIndices(int currentMajorVersion) {
+        throw new UnsupportedOperationException("Outdated indices check only supported in OpenSearch versions > 2.x.");
+    }
 }

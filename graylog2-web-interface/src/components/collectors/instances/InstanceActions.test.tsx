@@ -23,10 +23,12 @@ import asMock from 'helpers/mocking/AsMock';
 import InstanceActions from './InstanceActions';
 
 import { useCollectorsMutations } from '../hooks';
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import type { CollectorInstanceView } from '../types';
 import { mockCollectorsMutations } from '../testing/mockMutations';
 
 jest.mock('../hooks/useCollectorsMutations');
+jest.mock('../hooks/useSendCollectorsTelemetry');
 jest.mock('./ReassignFleetModal', () => (props: { onClose: () => void }) => (
   <div data-testid="reassign-modal">
     <button type="button" onClick={props.onClose}>
@@ -55,11 +57,13 @@ const mockInstance: CollectorInstanceView = {
 };
 
 const deleteInstanceMock = jest.fn(() => Promise.resolve());
+const sendTelemetryMock = jest.fn();
 
 describe('InstanceActions', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
+    asMock(useSendCollectorsTelemetry).mockReturnValue(sendTelemetryMock);
     asMock(useCollectorsMutations).mockReturnValue(
       mockCollectorsMutations({
         deleteInstance: deleteInstanceMock,
@@ -68,11 +72,19 @@ describe('InstanceActions', () => {
     );
   });
 
-  it('renders View Logs and Details buttons', async () => {
+  it('renders View System Logs and Details buttons', async () => {
     render(<InstanceActions instance={mockInstance} onDetailsClick={jest.fn()} />);
 
-    await screen.findByText(/view logs/i);
+    await screen.findByText(/view system logs/i);
     await screen.findByRole('button', { name: /details/i });
+  });
+
+  it('renders Received messages link pointing to collector_instance_uid filter', async () => {
+    render(<InstanceActions instance={mockInstance} onDetailsClick={jest.fn()} />);
+
+    const link = await screen.findByRole('link', { name: /received messages/i });
+    expect(link).toHaveAttribute('href', expect.stringContaining('collector_instance_uid'));
+    expect(link).toHaveAttribute('href', expect.stringContaining('uid-1'));
   });
 
   it('calls onDetailsClick when Details is clicked', async () => {
@@ -153,6 +165,60 @@ describe('InstanceActions', () => {
       await userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
 
       await screen.findByText('uid-1');
+    });
+
+    it('emits DELETED telemetry on confirmed delete', async () => {
+      render(<InstanceActions instance={mockInstance} onDetailsClick={jest.fn()} />);
+
+      await openMoreActions();
+      await userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
+      await userEvent.click(await screen.findByRole('button', { name: /confirm/i }));
+
+      await waitFor(() => {
+        expect(sendTelemetryMock).toHaveBeenCalledWith(
+          'Collector Instance Deleted',
+          expect.objectContaining({
+            instance_id: 'uid-1',
+            fleet_id: 'fleet-1',
+            status: 'online',
+          }),
+        );
+      });
+    });
+  });
+
+  describe('View Logs button telemetry', () => {
+    it('emits VIEW_LOGS_CLICKED when View Logs is clicked', async () => {
+      render(<InstanceActions instance={mockInstance} onDetailsClick={jest.fn()} />);
+
+      await userEvent.click(await screen.findByText(/view system logs/i));
+
+      expect(sendTelemetryMock).toHaveBeenCalledWith(
+        'Collector Instance View Logs Clicked',
+        expect.objectContaining({
+          instance_id: 'uid-1',
+          fleet_id: 'fleet-1',
+        }),
+      );
+    });
+  });
+
+  describe('Details button telemetry', () => {
+    it('emits DETAILS_OPENED with status when Details is clicked', async () => {
+      const onDetailsClick = jest.fn();
+      render(<InstanceActions instance={mockInstance} onDetailsClick={onDetailsClick} />);
+
+      await userEvent.click(await screen.findByRole('button', { name: /details/i }));
+
+      expect(sendTelemetryMock).toHaveBeenCalledWith(
+        'Collector Instance Details Opened',
+        expect.objectContaining({
+          instance_id: 'uid-1',
+          fleet_id: 'fleet-1',
+          status: 'online',
+        }),
+      );
+      expect(onDetailsClick).toHaveBeenCalledWith(mockInstance);
     });
   });
 });

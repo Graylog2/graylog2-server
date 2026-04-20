@@ -27,7 +27,7 @@ export const ACTIVITY_KEY = ['collectors', 'activity', 'recent'];
 const fetchRecentActivity = (): Promise<RecentActivityResponse> =>
   CollectorsActivity.recent() as Promise<RecentActivityResponse>;
 
-export const useRecentActivity = () =>
+export const useRecentActivity = (): { data: RecentActivityResponse | undefined; isLoading: boolean } =>
   useQuery<RecentActivityResponse>({
     queryKey: ACTIVITY_KEY,
     queryFn: () =>

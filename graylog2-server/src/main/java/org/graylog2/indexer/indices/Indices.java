@@ -352,6 +352,10 @@ public class Indices {
         return indicesAdapter.indices(indexWildcard, status, indexSet.getConfig().id());
     }
 
+    public Set<String> getOutdatedIndices(int currentMajorVersion) {
+        return indicesAdapter.getOutdatedIndices(currentMajorVersion);
+    }
+
     public boolean isOpen(final String indexName) {
         return indicesAdapter.isOpen(indexName);
     }

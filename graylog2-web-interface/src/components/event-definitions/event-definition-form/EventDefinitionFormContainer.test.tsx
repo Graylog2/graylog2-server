@@ -353,7 +353,7 @@ describe('EventDefinitionFormContainer', () => {
   it('should show summary with update action on edit', async () => {
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
 
-    const tab = await screen.findByRole('button', { name: /summary/i });
+    const tab = await screen.findByRole('button', { name: /^summary$/i });
     await userEvent.click(tab);
 
     expect(screen.getByRole('button', { name: /update event definition/i })).toBeVisible();
