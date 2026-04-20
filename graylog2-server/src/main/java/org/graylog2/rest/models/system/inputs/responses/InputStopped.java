@@ -14,17 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog2.rest.models.system.inputs.responses;
 
-import type { Attribute } from 'stores/PaginationTypes';
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
-const useAuthorizedAttributes = (attributes: Array<Attribute>) => {
-  const currentUser = useCurrentUser();
+@AutoValue
+@JsonAutoDetect
+public abstract class InputStopped {
 
-  return attributes.filter(
-    ({ permissions }) => !permissions?.length || isPermitted(currentUser.permissions, permissions),
-  );
-};
+    @JsonProperty("id")
+    public abstract String id();
 
-export default useAuthorizedAttributes;
+    @JsonCreator
+    public static InputStopped create(@JsonProperty("id") String id) {
+        return new AutoValue_InputStopped(id);
+    }
+}

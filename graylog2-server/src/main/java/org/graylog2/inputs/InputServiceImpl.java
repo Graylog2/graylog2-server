@@ -393,6 +393,12 @@ public class InputServiceImpl implements InputService {
                 .append(InputImpl.FIELD_STATIC_FIELD_KEY, key)
                 .append(InputImpl.FIELD_STATIC_FIELD_VALUE, value);
 
+        // Remove any existing static field with the same key to prevent duplicates
+        collection.updateOne(
+                MongoUtils.idEq(input.getId()),
+                MongoUtils.removeEmbedded(InputImpl.EMBEDDED_STATIC_FIELDS, InputImpl.FIELD_STATIC_FIELD_KEY, key)
+        );
+
         final UpdateResult updateResult = collection.updateOne(
                 MongoUtils.idEq(input.getId()),
                 Updates.push(InputImpl.EMBEDDED_STATIC_FIELDS, staticFieldDoc)

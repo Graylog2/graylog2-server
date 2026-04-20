@@ -32,7 +32,9 @@ import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.rest.models.streams.requests.UpdateStreamRequest;
 import org.graylog2.streams.events.StreamsChangedEvent;
+import com.google.common.eventbus.EventBus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -76,7 +78,7 @@ public class StreamServiceImplTest {
     @BeforeEach
     public void setUp(MongoCollections mongoCollections) throws Exception {
         this.streamService = new StreamServiceImpl(mongoCollections, streamRuleService,
-                outputService, indexSetService, factory, entityRegistrar, eventBus, Set.of(), new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())));
+                outputService, indexSetService, factory, entityRegistrar, eventBus, Set.of(), new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())), new EventBus());
     }
 
     @Test
@@ -112,6 +114,23 @@ public class StreamServiceImplTest {
     public void streamTitleFromCache() {
         assertThat(streamService.streamTitleFromCache("565f02223b0c25a537197af2")).isEqualTo("Logins");
         assertThat(streamService.streamTitleFromCache("5628f4503b00deadbeef0002")).isNull();
+    }
+
+    @Test
+    @MongoDBFixtures("someStreamsWithAlertConditions.json")
+    public void streamTitleFromCacheIsInvalidatedOnUpdate() throws Exception {
+        final String streamId = "565f02223b0c25a537197af2";
+
+        // Populate the cache with the current title
+        assertThat(streamService.streamTitleFromCache(streamId)).isEqualTo("Logins");
+
+        // Rename the stream
+        final UpdateStreamRequest updateRequest = UpdateStreamRequest.create(
+                "Renamed Stream", null, null, null, null, null);
+        streamService.update(streamId, updateRequest);
+
+        // The cache should immediately reflect the new title
+        assertThat(streamService.streamTitleFromCache(streamId)).isEqualTo("Renamed Stream");
     }
 
     @Test
