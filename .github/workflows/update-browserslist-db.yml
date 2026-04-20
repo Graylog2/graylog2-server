@@ -71,5 +71,5 @@ jobs:
             -H 'Content-Type: application/json' \
             -d "$(jq -n \
               --arg workflow "${{ github.workflow }}" \
-              --arg error "$RUN_URL" \
-              '{workflow: $workflow, error: $error}')"
+              --arg run_url "$RUN_URL" \
+              '{workflow: $workflow, run_url: $run_url}')"
