@@ -36,11 +36,7 @@ const OutdatedIndicesModal = ({ show, onClose }: Props) => {
       <Modal.Body>
         {isLoading && <Spinner />}
 
-        {!isLoading && isError && (
-          <Alert bsStyle="danger">
-            Could not load outdated indices.
-          </Alert>
-        )}
+        {!isLoading && isError && <Alert bsStyle="danger">Could not load outdated indices.</Alert>}
 
         {!isLoading && !isError && outdatedIndices.length > 0 && (
           <>

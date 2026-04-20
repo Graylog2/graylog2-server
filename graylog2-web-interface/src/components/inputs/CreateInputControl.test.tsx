@@ -42,12 +42,14 @@ jest.mock('hooks/useFeature');
 jest.mock('hooks/useInput');
 jest.mock('components/inputs/InputSetupWizard', () => ({
   __esModule: true,
-  InputSetupWizard: ({ input, onClose }: { input: { id: string, title: string }, onClose: () => void }) => (
+  InputSetupWizard: ({ input, onClose }: { input: { id: string; title: string }; onClose: () => void }) => (
     <div data-testid="input-setup-wizard">
       <span>InputSetupWizard</span>
       <span>{input.title}</span>
       <span>{input.id}</span>
-      <button type="button" onClick={onClose}>Close wizard</button>
+      <button type="button" onClick={onClose}>
+        Close wizard
+      </button>
     </div>
   ),
   INPUT_SETUP_MODE_FEATURE_FLAG: 'setup_mode',
