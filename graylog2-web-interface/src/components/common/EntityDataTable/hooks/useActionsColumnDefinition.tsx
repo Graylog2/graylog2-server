@@ -33,22 +33,17 @@ const AlignRight = styled.div`
   height: 100%;
 `;
 
-const BackgroundFoundation = styled.div<{ $parentBgColor: string }>(
-  ({ theme, $parentBgColor }) => css`
-    background-color: ${$parentBgColor ?? theme.colors.global.contentBackground};
-    height: 100%;
-    width: var(${actionsHeaderWidthVar});
-  `,
-);
-
-const Actions = styled.div<{ $isEvenRow: boolean }>(
-  ({ $isEvenRow, theme }) => css`
+const Actions = styled.div<{ $isOddRow?: boolean; $parentBgColor?: string }>(
+  ({ $isOddRow = false, $parentBgColor = undefined, theme }) => css`
     display: flex;
     justify-content: flex-end;
     padding: ${CELL_PADDING}px;
-    background: ${$isEvenRow ? theme.colors.table.row.background : theme.colors.table.row.backgroundStriped};
+    background-color: ${$isOddRow
+      ? theme.utils.flattenColorStack([theme.colors.global.contentBackground, theme.colors.table.row.backgroundStriped])
+      : ($parentBgColor ?? theme.colors.global.contentBackground)};
     height: 100%;
     align-items: flex-start;
+    width: var(${actionsHeaderWidthVar});
   `,
 );
 
@@ -75,11 +70,9 @@ const ActionCell = <Entity extends EntityBase>({
 
   return (
     <AlignRight>
-      <BackgroundFoundation $parentBgColor={parentBgColor}>
-        <Actions $isEvenRow={row.index % 2 === 0}>
-          <ButtonToolbar ref={ref}>{entityActions(row.original)}</ButtonToolbar>
-        </Actions>
-      </BackgroundFoundation>
+      <Actions $isOddRow={row.index % 2 !== 0} $parentBgColor={parentBgColor}>
+        <ButtonToolbar ref={ref}>{entityActions(row.original)}</ButtonToolbar>
+      </Actions>
     </AlignRight>
   );
 };
@@ -116,7 +109,7 @@ const useActionsColumnDefinition = <Entity extends EntityBase>({
   const header = useCallback(
     () => (
       <AlignRight>
-        <BackgroundFoundation $parentBgColor={parentBgColor} />
+        <Actions $parentBgColor={parentBgColor} />
       </AlignRight>
     ),
     [parentBgColor],
