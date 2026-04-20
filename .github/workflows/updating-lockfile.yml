@@ -57,3 +57,23 @@ jobs:
           -f initial_actor="Dr. Lint-a-lot"
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GRAYLOG_PROJECT_INTERNAL_WORKFLOW_RW }}
+
+      - name: Notify Slack on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SLACK_WEBHOOK: ${{ secrets.WORKFLOW_FAILURE_SLACK_WEBHOOK }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          ERROR=$(gh run view ${{ github.run_id }} --log-failed 2>/dev/null | tail -c 2500 || true)
+          if [ -z "$ERROR" ]; then
+            ERROR="Workflow failed. See: $RUN_URL"
+          else
+            ERROR="$ERROR"$'\n\nFull log: '"$RUN_URL"
+          fi
+          curl -X POST "$SLACK_WEBHOOK" \
+            -H 'Content-Type: application/json' \
+            -d "$(jq -n \
+              --arg workflow "${{ github.workflow }}" \
+              --arg error "$ERROR" \
+              '{workflow: $workflow, error: $error}')"
