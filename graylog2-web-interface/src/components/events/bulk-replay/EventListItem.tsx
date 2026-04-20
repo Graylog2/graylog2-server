@@ -60,6 +60,7 @@ const Summary = styled.span<SummaryProps>(
   ({ theme, $done }) => css`
     color: ${$done ? theme.colors.text.secondary : theme.colors.text.primary};
     flex-grow: 1;
+    overflow-wrap: anywhere;
   `,
 );
 
