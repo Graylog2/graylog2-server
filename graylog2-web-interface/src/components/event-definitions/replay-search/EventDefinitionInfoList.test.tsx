@@ -19,7 +19,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import MockStore from 'helpers/mocking/StoreMock';
 import asMock from 'helpers/mocking/AsMock';
-import EventDefinitionInfoTable from 'components/event-definitions/replay-search/EventDefinitionInfoTable';
+import EventDefinitionInfoList from 'components/event-definitions/replay-search/EventDefinitionInfoList';
 import {
   mockedMappedAggregation,
   mockEventData,
@@ -82,7 +82,7 @@ jest.mock('views/logic/slices/highlightSelectors', () => ({
   selectHighlightingRules: jest.fn(),
 }));
 
-describe('<EventDefinitionInfoTable />', () => {
+describe('<EventDefinitionInfoList />', () => {
   const EventInfoComponent = ({ type }: { type: AlertType }) => (
     <TestStoreProvider>
       <RightSidebarProvider>
@@ -92,7 +92,7 @@ describe('<EventDefinitionInfoTable />', () => {
             definitionId: '',
             alertId: '',
           }}>
-          <EventDefinitionInfoTable />
+          <EventDefinitionInfoList />
         </ReplaySearchContext.Provider>
       </RightSidebarProvider>
     </TestStoreProvider>

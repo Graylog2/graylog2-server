@@ -38,6 +38,7 @@ import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useSearchResult from 'views/hooks/useSearchResult';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import useMessageListPluggableBulkActions from 'views/components/widgets/useMessageListPluggableBulkActions';
+import InteractiveContext from 'views/components/contexts/InteractiveContext';
 
 import RenderCompletionCallback from './RenderCompletionCallback';
 import MessageTableSelectedEntitiesProvider from './MessageTableSelectedEntitiesProvider';
@@ -96,7 +97,7 @@ type Props = WidgetComponentProps<MessagesWidgetConfig, MessageListResult> & {
   pageSize?: number;
 };
 
-const useResetPaginationOnSearchExecution = (setCurrentPage: (pageNr: number) => void, currentPage) => {
+const useResetPaginationOnSearchExecution = (setCurrentPage: (pageNr: number) => void, currentPage: number) => {
   const resetPagination = useCallback(() => {
     if (currentPage !== 1) {
       setCurrentPage(1);
@@ -142,6 +143,7 @@ const MessageList = ({
   editing,
 }: Props) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const interactive = useContext(InteractiveContext);
   const { pluggableBulkActions, pluggableBulkActionModals } = useMessageListPluggableBulkActions();
   const { stopAutoRefresh } = useAutoRefresh();
 
@@ -151,7 +153,7 @@ const MessageList = ({
   const dispatch = useViewsDispatch();
   useResetPaginationOnSearchExecution(setCurrentPage, currentPage);
   useRenderCompletionCallback();
-  const displayBulkSelectCol = !!pluggableBulkActions && !editing;
+  const displayBulkSelectCol = !!pluggableBulkActions && !editing && interactive;
 
   const bulkSelection = useMemo(
     () => ({

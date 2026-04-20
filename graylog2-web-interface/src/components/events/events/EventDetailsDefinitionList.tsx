@@ -15,24 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { styled } from 'styled-components';
 
-import { Table } from 'components/bootstrap';
+import { DefinitionList } from 'components/common';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import type { ColumnRenderersByAttribute, EntityBase } from 'components/common/EntityDataTable/types';
 import DefaultColumnRenderers from 'components/common/EntityDataTable/DefaultColumnRenderers';
 import type { Attribute } from 'stores/PaginationTypes';
-
-const LabelTD = styled.td`
-  white-space: nowrap;
-`;
-
-const ValueTD = styled.td`
-  overflow-wrap: break-word;
-  word-break: break-word;
-  max-width: 0;
-  width: 100%;
-`;
 
 type Props<T extends EntityBase, M = EventsAdditionalData> = {
   attributesList: Array<{ id: string; title: string }>;
@@ -42,34 +30,28 @@ type Props<T extends EntityBase, M = EventsAdditionalData> = {
   attributesRenderers: ColumnRenderersByAttribute<T, M>;
 };
 
-const EventDetailsTable = <E extends EntityBase = Event>({
+const EventDetailsDefinitionList = <E extends EntityBase = Event>({
   event,
   attributesList,
   meta = {},
   eventProcedureId = '',
   attributesRenderers,
 }: Props<E>) => (
-  <Table condensed striped>
-    <tbody>
-      {attributesList.map((attribute: Attribute) => {
-        const defaultTypeRenderer = DefaultColumnRenderers.types?.[attribute?.type]?.renderCell;
-        const typeRenderer = attributesRenderers?.types?.[attribute?.type]?.renderCell;
-        const renderCell = attributesRenderers[attribute.id]?.renderCell ?? typeRenderer ?? defaultTypeRenderer;
-        const value = event[attribute.id];
+  <DefinitionList>
+    {attributesList.map((attribute: Attribute) => {
+      const defaultTypeRenderer = DefaultColumnRenderers.types?.[attribute?.type]?.renderCell;
+      const typeRenderer = attributesRenderers?.types?.[attribute?.type]?.renderCell;
+      const renderCell = attributesRenderers[attribute.id]?.renderCell ?? typeRenderer ?? defaultTypeRenderer;
+      const value = event[attribute.id];
 
-        return (
-          <tr key={attribute.id}>
-            {attribute.title && (
-              <LabelTD>
-                <b>{attribute.title}</b>
-              </LabelTD>
-            )}
-            <ValueTD colSpan={attribute.title ? undefined : 2}>{renderCell ? renderCell(value, event, meta, eventProcedureId) : value}</ValueTD>
-          </tr>
-        );
-      })}
-    </tbody>
-  </Table>
+      return (
+        <React.Fragment key={attribute.id}>
+          <dt>{attribute.title}</dt>
+          <dd>{renderCell ? renderCell(value, event, meta, eventProcedureId) : value}</dd>
+        </React.Fragment>
+      );
+    })}
+  </DefinitionList>
 );
 
-export default EventDetailsTable;
+export default EventDetailsDefinitionList;

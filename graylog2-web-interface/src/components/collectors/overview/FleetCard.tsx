@@ -135,7 +135,7 @@ const healthTooltips: Record<HealthStatus, string> = {
   healthy: 'All instances in this fleet are online',
   degraded: 'Some instances in this fleet are offline',
   down: 'All instances in this fleet are offline',
-  empty: 'No collector instances have enrolled in this fleet yet',
+  empty: 'No Collector instances have enrolled in this fleet yet',
 };
 
 const FleetCard = ({ stats, onClick }: Props) => {
