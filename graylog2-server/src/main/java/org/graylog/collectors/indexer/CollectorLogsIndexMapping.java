@@ -76,6 +76,8 @@ public class CollectorLogsIndexMapping extends AbstractMapping {
                 // Collector identification fields
                 .put(CollectorIngestCodec.FIELD_COLLECTOR_RECEIVER_TYPE, map().put("type", "keyword").build())
                 .put(CollectorIngestCodec.FIELD_COLLECTOR_INSTANCE_UID, map().put("type", "keyword").build())
+                .put(CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_ID, map().put("type", "keyword").build())
+                .put(CollectorIngestCodec.FIELD_COLLECTOR_FLEET_ID, map().put("type", "keyword").build())
                 .put("gl2_source_collector", map().put("type", "keyword").build())
                 // Severity fields
                 .put("vendor_event_severity", map().put("type", "keyword").build())

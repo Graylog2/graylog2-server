@@ -53,7 +53,7 @@ const BulkActions = () => {
           show
           onConfirm={handleConfirm}
           onCancel={() => setShowConfirm(false)}>
-          Are you sure you want to delete {selectedEntities.length} enrollment tokens? New collectors will not be able
+          Are you sure you want to delete {selectedEntities.length} enrollment tokens? New Collectors will not be able
           to enroll using the deleted tokens.
         </ConfirmDialog>
       )}

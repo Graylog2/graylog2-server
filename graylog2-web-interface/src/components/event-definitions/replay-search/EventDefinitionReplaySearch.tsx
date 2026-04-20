@@ -50,6 +50,13 @@ const legacySearchPageLayout: Partial<LayoutState> = {
   },
 };
 
+const searchPageLayout: Partial<LayoutState> = {
+  sidebar: {
+    isShown: true,
+    initialSectionCollapsed: true
+  }
+};
+
 const EventDefinitionReplaySearch = ({ eventDefinitionMappedData }: Props) => {
   const { eventDefinition, aggregations } = eventDefinitionMappedData;
   const { openSidebar } = useRightSidebar();
@@ -78,7 +85,7 @@ const EventDefinitionReplaySearch = ({ eventDefinitionMappedData }: Props) => {
 
   return (
     <ReplaySearchContext.Provider value={replaySearchContext}>
-      <ReplaySearch view={view} searchPageLayout={isRightSidebarEnabled ? undefined : legacySearchPageLayout} />
+      <ReplaySearch view={view} searchPageLayout={isRightSidebarEnabled ? searchPageLayout : legacySearchPageLayout} />
     </ReplaySearchContext.Provider>
   );
 };

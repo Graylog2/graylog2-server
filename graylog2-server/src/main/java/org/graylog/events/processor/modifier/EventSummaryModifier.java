@@ -24,6 +24,7 @@ import org.graylog.events.event.Event;
 import org.graylog.events.event.EventWithContext;
 import org.graylog.events.processor.EventDefinition;
 
+import java.util.Map;
 import java.util.Objects;
 
 import static org.graylog.events.event.EventDto.FIELD_EVENT_DEFINITION_ID;
@@ -48,16 +49,21 @@ public class EventSummaryModifier implements EventModifier {
             dataModelBuilder.put(FIELD_EVENT_DEFINITION_TITLE, eventDefinition.title());
             dataModelBuilder.put(FIELD_EVENT_DEFINITION_TYPE, eventDefinition.config().type());
             dataModelBuilder.put(FIELD_EVENT_DEFINITION_DESCRIPTION, eventDefinition.description());
-            
+
             if (eventWithContext.messageContext().isPresent()) {
                 dataModelBuilder.put("source", eventWithContext.messageContext().get().getFields());
             } else if (eventWithContext.eventContext().isPresent()) {
                 dataModelBuilder.put("source", eventWithContext.eventContext().get().toDto().fields());
             }
 
+            final Event event = eventWithContext.event();
+            final Map<String, String> customFields = event.toDto().fields();
+            if (!customFields.isEmpty()) {
+                dataModelBuilder.put("fields", customFields);
+            }
+
             final ImmutableMap<String, Object> dataModel = dataModelBuilder.build();
 
-            final Event event = eventWithContext.event();
             event.setMessage(templateEngine.transform(eventDefinition.eventSummaryTemplate(), dataModel));
         }
     }

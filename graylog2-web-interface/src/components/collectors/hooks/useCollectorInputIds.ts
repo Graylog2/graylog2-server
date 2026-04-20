@@ -30,8 +30,8 @@ export const useCollectorInputIds = (): { data: string[] | undefined; isLoading:
     queryFn: () =>
       defaultOnError(
         CollectorsConfigApi.getInputIds(),
-        'Loading collector input IDs failed with status',
-        'Could not load collector input IDs.',
+        'Loading Collector input IDs failed with status',
+        'Could not load Collector input IDs.',
       ),
     refetchOnWindowFocus: true, // override global false — refresh input data when user returns to this tab
   });
