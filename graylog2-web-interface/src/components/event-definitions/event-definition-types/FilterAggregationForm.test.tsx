@@ -18,6 +18,8 @@ import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
+jest.mock('jquery', () => jest.fn());
+
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import { simpleEventDefinition } from 'fixtures/eventDefinition';
 import { adminUser } from 'fixtures/users';
