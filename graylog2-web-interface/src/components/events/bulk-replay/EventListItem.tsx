@@ -40,7 +40,7 @@ const StyledItem = styled.div<StyledItemProps>(
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 30px;
+    padding: ${theme.spacings.xs} 0;
     background-color: ${$selected ? theme.colors.background.secondaryNav : 'transparent'};
     cursor: pointer;
     position: relative;
@@ -59,9 +59,6 @@ type SummaryProps = {
 const Summary = styled.span<SummaryProps>(
   ({ theme, $done }) => css`
     color: ${$done ? theme.colors.text.secondary : theme.colors.text.primary};
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
     flex-grow: 1;
   `,
 );

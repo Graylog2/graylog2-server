@@ -72,11 +72,19 @@ describe('InstanceActions', () => {
     );
   });
 
-  it('renders View Logs and Details buttons', async () => {
+  it('renders View System Logs and Details buttons', async () => {
     render(<InstanceActions instance={mockInstance} onDetailsClick={jest.fn()} />);
 
-    await screen.findByText(/view logs/i);
+    await screen.findByText(/view system logs/i);
     await screen.findByRole('button', { name: /details/i });
+  });
+
+  it('renders Received messages link pointing to collector_instance_uid filter', async () => {
+    render(<InstanceActions instance={mockInstance} onDetailsClick={jest.fn()} />);
+
+    const link = await screen.findByRole('link', { name: /received messages/i });
+    expect(link).toHaveAttribute('href', expect.stringContaining('collector_instance_uid'));
+    expect(link).toHaveAttribute('href', expect.stringContaining('uid-1'));
   });
 
   it('calls onDetailsClick when Details is clicked', async () => {
@@ -183,7 +191,7 @@ describe('InstanceActions', () => {
     it('emits VIEW_LOGS_CLICKED when View Logs is clicked', async () => {
       render(<InstanceActions instance={mockInstance} onDetailsClick={jest.fn()} />);
 
-      await userEvent.click(await screen.findByText(/view logs/i));
+      await userEvent.click(await screen.findByText(/view system logs/i));
 
       expect(sendTelemetryMock).toHaveBeenCalledWith(
         'Collector Instance View Logs Clicked',

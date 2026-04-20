@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { Formik, Form } from 'formik';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { FormikTouched } from 'formik';
+import { Formik, Form } from 'formik';
 import isEqual from 'lodash/isEqual';
 
 import { HelpBlock, Input } from 'components/bootstrap';
@@ -35,7 +35,7 @@ import type {
   FileSourceConfig,
   JournaldSourceConfig,
   JournaldPriority,
-  WindowsEventLogSourceConfig,
+  WindowsEventLogSourceConfig
 } from '../types';
 
 type Props = {
@@ -69,35 +69,50 @@ const validate = (values: FormValues) => {
   return errors;
 };
 
+export const splitToList = (value: string | undefined): Array<string> => (value || '')
+    .split(',')
+    .map((c) => c.trim())
+    .filter(Boolean);
+
 const FileConfigFields = ({
   config,
   setFieldValue,
 }: {
   config: FileSourceConfig;
   setFieldValue: (field: string, value: unknown) => void;
-}) => (
-  <>
-    <Input
-      id="file-paths"
-      type="text"
-      label="File Path(s)"
-      help="Glob patterns supported (e.g., /var/log/*.log, /var/log/**/*.log). The collector watches matched files for new lines."
-      value={config.paths[0] || ''}
-      onChange={(e) => setFieldValue('config', { ...config, paths: [e.target.value] })}
-      required
-    />
-    <Input
-      id="file-read-mode"
-      type="select"
-      label="Read Mode"
-      help="From end: only collect new lines after the collector starts. From beginning: collect all existing lines first, then continue tailing."
-      value={config.read_mode}
-      onChange={(e) => setFieldValue('config', { ...config, read_mode: e.target.value as 'beginning' | 'end' })}>
-      <option value="end">From end (tail)</option>
-      <option value="beginning">From beginning</option>
-    </Input>
-  </>
-);
+}) => {
+  // Keep a raw input buffer so the user can freely type commas and spaces.
+  // splitToList would strip a trailing comma on every keystroke otherwise,
+  // making it impossible to enter multiple comma-separated values.
+  const [pathsInput, setPathsInput] = useState(() => config.paths?.join(', ') ?? '');
+
+  return (
+    <>
+      <Input
+        id="file-paths"
+        type="text"
+        label="File Path(s)"
+        help="Glob patterns supported (e.g., /var/log/*.log, /var/log/**/*.log). The Collector watches matched files for new lines."
+        value={pathsInput}
+        onChange={(e) => {
+          setPathsInput(e.target.value);
+          setFieldValue('config', { ...config, paths: splitToList(e.target.value) });
+        }}
+        required
+      />
+      <Input
+        id="file-read-mode"
+        type="select"
+        label="Read Mode"
+        help="From end: only collect new lines after the Collector starts. From beginning: collect all existing lines first, then continue tailing."
+        value={config.read_mode}
+        onChange={(e) => setFieldValue('config', { ...config, read_mode: e.target.value as 'beginning' | 'end' })}>
+        <option value="end">From end (tail)</option>
+        <option value="beginning">From beginning</option>
+      </Input>
+    </>
+  );
+};
 
 const JournaldConfigFields = ({
   config,
@@ -111,7 +126,7 @@ const JournaldConfigFields = ({
       id="journald-read-mode"
       type="select"
       label="Read Mode"
-      help="From end: only collect new entries after the collector starts. From beginning: collect all existing entries first, then continue tailing."
+      help="From end: only collect new entries after the Collector starts. From beginning: collect all existing entries first, then continue tailing."
       value={config.read_mode}
       onChange={(e) => setFieldValue('config', { ...config, read_mode: e.target.value as 'beginning' | 'end' })}>
       <option value="end">From end (tail)</option>
@@ -150,23 +165,24 @@ const WindowsEventLogConfigFields = ({
 }: {
   config: WindowsEventLogSourceConfig;
   setFieldValue: (field: string, value: unknown) => void;
-}) => (
+}) => {
+  const [channelsInput, setChannelsInput] = useState(() => config.channels.join(', '));
+
+  return (
   <>
     <Input
       id="win-channels"
       type="text"
       label="Channels"
       help="Comma-separated channel names (e.g., Application, Security, System)"
-      value={config.channels.join(', ')}
-      onChange={(e) =>
+      value={channelsInput}
+      onChange={(e) => {
+        setChannelsInput(e.target.value);
         setFieldValue('config', {
           ...config,
-          channels: e.target.value
-            .split(',')
-            .map((c) => c.trim())
-            .filter(Boolean),
-        })
-      }
+          channels: splitToList(e.target.value),
+        });
+      }}
       required={!config.include_default_channels}
     />
     <Input
@@ -174,7 +190,7 @@ const WindowsEventLogConfigFields = ({
       type="checkbox"
       label="Include default channels"
       // if you update this, also update WindowsEventLogReceiverConfig.java
-      help="Defaults are: Application, System, Security, Setup, Microsoft-Windows-Windows Defender/Operational, Microsoft-Windows-TerminalServices-LocalSessionManager/Operational, Microsoft-Windows-PowerShell/Operational, Windows PowerShell"
+      help="Defaults are: Application, System, Security, Setup, Microsoft-Windows-Windows Defender/Operational, Microsoft-Windows-PowerShell/Operational, Windows PowerShell"
       checked={config.include_default_channels}
       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
         setFieldValue('config', { ...config, include_default_channels: e.target.checked })
@@ -190,7 +206,8 @@ const WindowsEventLogConfigFields = ({
       <option value="beginning">From beginning</option>
     </Input>
   </>
-);
+  );
+};
 
 const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props) => {
   const isEdit = !!source;
@@ -294,7 +311,7 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props
               </Modal.Header>
               <Modal.Body>
                 <p>
-                  A source defines what data collectors in this fleet should collect. Each source type corresponds to a
+                  A source defines what data Collectors in this fleet should collect. Each source type corresponds to a
                   different collection method.
                 </p>
                 <Input
@@ -333,7 +350,7 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props
                   label="Enabled"
                   name="enabled"
                   type="checkbox"
-                  help="Disabled sources are not sent to collectors. Use this to temporarily stop collection without removing the source."
+                  help="Disabled sources are not sent to Collectors. Use this to temporarily stop collection without removing the source."
                 />
                 {values.source_type === 'file' && (
                   <FileConfigFields config={values.config as FileSourceConfig} setFieldValue={setFieldValue} />

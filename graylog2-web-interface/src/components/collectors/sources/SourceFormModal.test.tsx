@@ -17,12 +17,12 @@
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
-import { fireEvent } from '@testing-library/react';
+import { act, fireEvent } from '@testing-library/react';
 
 import { asMock } from 'helpers/mocking';
 import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendCollectorsTelemetry';
 
-import SourceFormModal from './SourceFormModal';
+import SourceFormModal, { splitToList } from './SourceFormModal';
 
 jest.mock('components/collectors/hooks/useSendCollectorsTelemetry');
 
@@ -61,6 +61,90 @@ describe('SourceFormModal', () => {
     render(<SourceFormModal fleetId="fleet-1" onClose={jest.fn()} onSave={jest.fn()} />);
 
     await screen.findByLabelText(/file path/i);
+  });
+});
+
+describe('splitToList', () => {
+  it.each([
+    { name: 'single value', input: 'foo', expected: ['foo'] },
+    { name: 'simple comma separation', input: 'a,b,c', expected: ['a', 'b', 'c'] },
+    { name: 'trims whitespace around values', input: ' a , b , c ', expected: ['a', 'b', 'c'] },
+    { name: 'trims whitespace with comma+space separator', input: 'a, b, c', expected: ['a', 'b', 'c'] },
+    { name: 'filters empty segments from leading/trailing commas', input: ',a,b,', expected: ['a', 'b'] },
+    { name: 'filters empty segments from consecutive commas', input: 'a,,b', expected: ['a', 'b'] },
+    { name: 'filters whitespace-only segments', input: 'a ,   , b', expected: ['a', 'b'] },
+    { name: 'returns empty list for empty string', input: '', expected: [] },
+    { name: 'returns empty list for undefined', input: undefined, expected: [] },
+    { name: 'returns empty list for whitespace-only input', input: '   ', expected: [] },
+    { name: 'returns empty list for commas and whitespace only', input: ' , , , ', expected: [] },
+    {
+      name: 'preserves file path characters',
+      input: '/var/log/a.log, /var/log/**/b.log',
+      expected: ['/var/log/a.log', '/var/log/**/b.log'],
+    },
+  ])('$name', ({ input, expected }) => {
+    expect(splitToList(input)).toEqual(expected);
+  });
+});
+
+describe('SourceFormModal value splitting (field wiring)', () => {
+  beforeEach(() => {
+    asMock(useSendCollectorsTelemetry).mockReturnValue(jest.fn());
+  });
+
+  it('preserves the raw file paths input as the user typed it (including trailing commas)', async () => {
+    render(<SourceFormModal fleetId="f-1" onClose={jest.fn()} onSave={jest.fn()} />);
+
+    const pathInput = screen.getByLabelText(/File Path/i) as HTMLInputElement;
+    await act(async () => {
+      fireEvent.change(pathInput, { target: { value: '/var/log/a.log,' } });
+    });
+
+    // Regression: splitToList used to strip the trailing comma on every keystroke,
+    // making comma-separated entry impossible.
+    expect(pathInput.value).toBe('/var/log/a.log,');
+  });
+
+  it('pre-fills file paths from existing source by joining with comma-space', () => {
+    const source = {
+      id: 's-1',
+      fleet_id: 'f-1',
+      name: 'src',
+      description: '',
+      enabled: true,
+      type: 'file' as const,
+      config: { paths: ['/var/log/a.log', '/var/log/b.log'], read_mode: 'end' as const },
+    };
+    render(<SourceFormModal fleetId="f-1" source={source} onClose={jest.fn()} onSave={jest.fn()} />);
+
+    expect((screen.getByLabelText(/File Path/i) as HTMLInputElement).value).toBe('/var/log/a.log, /var/log/b.log');
+  });
+
+  it('preserves the raw windows event log channels input as the user typed it', async () => {
+    render(<SourceFormModal fleetId="f-1" onClose={jest.fn()} onSave={jest.fn()} />);
+    await userEvent.selectOptions(screen.getByLabelText(/Source Type/i), 'windows_event_log');
+
+    const channelsInput = screen.getByLabelText(/^Channels/i) as HTMLInputElement;
+    await act(async () => {
+      fireEvent.change(channelsInput, { target: { value: 'Application,' } });
+    });
+
+    expect(channelsInput.value).toBe('Application,');
+  });
+
+  it('pre-fills windows event log channels from existing source', () => {
+    const source = {
+      id: 's-1',
+      fleet_id: 'f-1',
+      name: 'src',
+      description: '',
+      enabled: true,
+      type: 'windows_event_log' as const,
+      config: { channels: ['Application', 'Security'], include_default_channels: false, read_mode: 'end' as const },
+    };
+    render(<SourceFormModal fleetId="f-1" source={source} onClose={jest.fn()} onSave={jest.fn()} />);
+
+    expect((screen.getByLabelText(/^Channels/i) as HTMLInputElement).value).toBe('Application, Security');
   });
 });
 
