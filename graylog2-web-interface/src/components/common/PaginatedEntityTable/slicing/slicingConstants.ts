@@ -14,23 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
 
-import { Collectors } from '@graylog/server-api';
+export type SortMode = string;
+export type SortDirection = 'asc' | 'desc';
 
-import { defaultOnError } from 'util/conditional/onError';
+export const ALPHABETICAL_SORT = 'alphabetical';
+const DEFAULT_SORT_DIRECTION: SortDirection = 'asc';
 
-import type { CollectorStats } from '../types';
+export const defaultSortDirectionForMode = (
+  mode: SortMode,
+  sliceSortDefault?: { mode: SortMode; direction: SortDirection },
+): SortDirection => {
+  if (sliceSortDefault?.mode === mode) {
+    return sliceSortDefault.direction;
+  }
 
-export const STATS_KEY_PREFIX = ['collectors', 'stats'];
-
-export const useCollectorStats = () =>
-  useQuery<CollectorStats>({
-    queryKey: STATS_KEY_PREFIX,
-    queryFn: () =>
-      defaultOnError(
-        Collectors.stats(),
-        'Loading Collector stats failed with status',
-        'Could not load Collector stats.',
-      ),
-  });
+  return DEFAULT_SORT_DIRECTION;
+};

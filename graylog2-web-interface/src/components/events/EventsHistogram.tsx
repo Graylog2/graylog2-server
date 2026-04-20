@@ -20,6 +20,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
 import moment from 'moment';
 
+import { Alert } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot, { DateType } from 'views/logic/aggregationbuilder/Pivot';
@@ -170,7 +171,7 @@ type Props = MiddleSectionProps & {
 };
 const EventsHistogram = ({ searchParams, setFilters, eventsHistogramFetcher = fetchEventsHistogram }: Props) => {
   const { userTimezone, formatTime } = useUserDateTime();
-  const { data, isInitialLoading, refetch } = useQuery({
+  const { data, isInitialLoading, refetch, isError, error } = useQuery({
     queryKey: ['events', 'histogram', searchParams],
     queryFn: () => eventsHistogramFetcher(searchParams),
     placeholderData: keepPreviousData,
@@ -188,7 +189,15 @@ const EventsHistogram = ({ searchParams, setFilters, eventsHistogramFetcher = fe
     [formatTime, searchParams.filters, setFilters, userTimezone],
   );
 
-  return isInitialLoading ? <Spinner /> : <EventsGraph data={data} alerts={alerts} onZoom={onZoom} />;
+  if (isInitialLoading) {
+    return <Spinner />;
+  }
+
+  if (isError || !data) {
+    return <Alert bsStyle="danger">Loading events histogram failed: {error?.message ?? 'Unknown error'}</Alert>;
+  }
+
+  return <EventsGraph data={data} alerts={alerts} onZoom={onZoom} />;
 };
 
 export default EventsHistogram;
