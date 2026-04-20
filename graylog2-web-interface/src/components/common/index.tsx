@@ -40,6 +40,7 @@ export { default as CopyToClipboardCapture } from './CopyToClipboardCapture';
 export { default as CountBadge } from './CountBadge';
 export { default as DataTable } from './DataTable';
 export { default as DatePicker } from './DatePicker';
+export { default as DefinitionList } from './DefinitionList';
 export { default as Dropzone } from './Dropzone';
 export { default as DocumentTitle } from './DocumentTitle';
 export { default as Drawer } from './Drawer';
@@ -54,6 +55,7 @@ export { default as EnterprisePluginNotFound } from './EnterprisePluginNotFound'
 export { default as EntityList } from './EntityList';
 export { default as EntityListItem } from './EntityListItem';
 export { default as ErrorAlert } from './ErrorAlert';
+export { default as FetchErrorAlert } from './FetchErrorAlert';
 export { default as ExpandableList } from './ExpandableList';
 export { default as ExpandableListItem } from './ExpandableListItem';
 export { default as ExpandableCheckboxListItem } from './ExpandableCheckboxListItem';

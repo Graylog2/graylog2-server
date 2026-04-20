@@ -77,6 +77,7 @@ type Props = {
   sliceRenderers?: SliceRenderers;
   fetchSlices: FetchSlices;
   sortOptions: Array<SortOption>;
+  defaultSliceSort?: { mode: string; direction: SortDirection };
 };
 
 type UseAutoExpandEmptySlicesArgs = {
@@ -129,13 +130,16 @@ const SlicesOverview = ({
   sliceRenderers = undefined,
   fetchSlices,
   sortOptions,
+  defaultSliceSort = undefined,
 }: Props) => {
   const [showEmptySlices, setShowEmptySlices] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [nonEmptyPage, setNonEmptyPage] = useState(1);
   const [emptyPage, setEmptyPage] = useState(1);
-  const [sortMode, setSortMode] = useState<SortMode>(ALPHABETICAL_SORT);
-  const [sortDirection, setSortDirection] = useState<SortDirection>(defaultSortDirectionForMode(ALPHABETICAL_SORT));
+  const [sortMode, setSortMode] = useState<SortMode>(defaultSliceSort?.mode ?? ALPHABETICAL_SORT);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(
+    defaultSortDirectionForMode(sortMode, defaultSliceSort),
+  );
   const sendTelemetry = useSendTelemetry();
   const { isLoading, refetchSlices, hasEmptySlices, emptySliceCount, visibleNonEmptySlices, visibleEmptySlices } =
     useSlices({
@@ -159,7 +163,7 @@ const SlicesOverview = ({
   };
   const onSortModeUpdate = (mode: SortMode) => {
     setSortMode(mode);
-    setSortDirection(defaultSortDirectionForMode(mode));
+    setSortDirection(defaultSortDirectionForMode(mode, defaultSliceSort));
     setNonEmptyPage(1);
     setEmptyPage(1);
   };

@@ -28,7 +28,7 @@ import {
   useDefaultInstanceFilters,
 } from 'components/collectors/hooks';
 
-import FleetDetail from './FleetDetail';
+import FleetDetail, { sourceActionsFactory } from './FleetDetail';
 
 jest.mock('components/collectors/hooks/useSendCollectorsTelemetry');
 jest.mock('components/collectors/hooks', () => ({
@@ -99,5 +99,26 @@ describe('FleetDetail telemetry', () => {
       'Fleet Tab Selected',
       expect.objectContaining({ fleet_id: 'f-1', tab: 'instances' }),
     );
+  });
+});
+
+describe('sourceActionsFactory', () => {
+  it('renders a Received messages link per source pointing to collector_source_id filter', async () => {
+    const source = {
+      id: 'src-1',
+      fleet_id: 'f-1',
+      name: 'app-logs',
+      description: '',
+      enabled: true,
+      type: 'file' as const,
+      config: { paths: ['/var/log/app.log'], read_mode: 'end' as const },
+    };
+
+    const actions = sourceActionsFactory({ onEdit: jest.fn(), onDelete: jest.fn() });
+    render(<>{actions(source)}</>);
+
+    const link = await screen.findByRole('link', { name: /received messages/i });
+    expect(link).toHaveAttribute('href', expect.stringContaining('collector_source_id'));
+    expect(link).toHaveAttribute('href', expect.stringContaining('src-1'));
   });
 });

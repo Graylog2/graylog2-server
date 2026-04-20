@@ -38,7 +38,6 @@ import org.graylog.collectors.input.processor.JournaldRecordProcessor;
 import org.graylog.collectors.input.processor.LogRecordProcessor;
 import org.graylog.collectors.input.processor.WindowsEventLogRecordProcessor;
 import org.graylog.collectors.input.transport.CollectorIngestHttpTransport;
-import org.graylog.collectors.migrations.V20260303120000_CollectorDEVMigrations;
 import org.graylog.collectors.opamp.OpAmpModule;
 import org.graylog.collectors.periodical.CollectorCaRenewalPeriodical;
 import org.graylog.collectors.periodical.PurgeExpiredCollectorInstancesPeriodical;
@@ -125,9 +124,6 @@ public class CollectorsModule extends PluginModule {
         // Periodicals
         addPeriodical(PurgeExpiredCollectorInstancesPeriodical.class);
         addPeriodical(CollectorCaRenewalPeriodical.class);
-
-        // Migrations
-        addMigration(V20260303120000_CollectorDEVMigrations.class);
 
         // Fleet permissions
         addPermissions(CollectorsPermissions.class);
