@@ -34,6 +34,7 @@ import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.streams.requests.UpdateStreamRequest;
 import org.graylog2.streams.events.StreamsChangedEvent;
+import com.google.common.eventbus.EventBus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -77,7 +78,7 @@ public class StreamServiceImplTest {
     @BeforeEach
     public void setUp(MongoCollections mongoCollections) throws Exception {
         this.streamService = new StreamServiceImpl(mongoCollections, streamRuleService,
-                outputService, indexSetService, factory, entityRegistrar, eventBus, Set.of(), new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())));
+                outputService, indexSetService, factory, entityRegistrar, eventBus, Set.of(), new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())), new EventBus());
     }
 
     @Test
