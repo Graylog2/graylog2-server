@@ -95,7 +95,7 @@ public class OpensearchDataDirCompatibilityCheck implements PreflightCheck {
             final int storedMajor = Version.fromString(storedVersion).major;
             final int currentMajor = Version.fromString(opensearchVersion).major;
             return storedMajor == currentMajor;
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOG.warn("Failed to read compatibility check file, re-running check", e);
             return false;
         }
