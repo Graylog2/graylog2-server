@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ValueNode;
 import com.google.auto.value.AutoValue;
-import org.graylog.collectors.config.CollectorAttributes;
 
 import java.util.List;
 
@@ -44,10 +43,6 @@ public abstract class ResourceProcessorConfig implements CollectorProcessorConfi
         return new AutoValue_ResourceProcessorConfig.Builder()
                 .id(id)
                 .name(f("resource/%s", id));
-    }
-
-    public static Attribute collectorComponentAttribute(String compoenent) {
-        return Attribute.upsert(CollectorAttributes.COLLECTOR_RECEIVER_TYPE, compoenent);
     }
 
     @AutoValue.Builder
