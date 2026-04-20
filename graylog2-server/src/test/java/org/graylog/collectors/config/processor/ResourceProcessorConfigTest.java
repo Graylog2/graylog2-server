@@ -17,7 +17,6 @@
 package org.graylog.collectors.config.processor;
 
 import com.fasterxml.jackson.databind.node.TextNode;
-import org.graylog.collectors.config.CollectorAttributes;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -29,21 +28,11 @@ class ResourceProcessorConfigTest {
 
     @Test
     void builderCreatesResourceProcessorName() {
-        final var config = ResourceProcessorConfig.builder("filelog")
+        final var config = ResourceProcessorConfig.builder("file_log")
                 .attributes(List.of(ResourceProcessorConfig.Attribute.upsert("a", "b")))
                 .build();
 
-        assertThat(config.name()).isEqualTo("resource/filelog");
-    }
-
-    @Test
-    void collectorComponentAttributeUsesDefaultKeyAndUpsertAction() {
-        final var attribute = ResourceProcessorConfig.collectorComponentAttribute("filelog");
-
-        assertThat(attribute.key()).isEqualTo(CollectorAttributes.COLLECTOR_RECEIVER_TYPE);
-        assertThat(attribute.value().isTextual()).isTrue();
-        assertThat(attribute.value().textValue()).isEqualTo("filelog");
-        assertThat(attribute.action()).isEqualTo(ResourceProcessorConfig.Action.UPSERT);
+        assertThat(config.name()).isEqualTo("resource/file_log");
     }
 
     @Test

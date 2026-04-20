@@ -18,7 +18,7 @@ import * as React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import { PipelinesPipelines, Streams, PipelinesConnections, SystemInputStates } from '@graylog/server-api';
+import { PipelinesPipelines, Streams, PipelinesConnections, ClusterInputState } from '@graylog/server-api';
 
 import selectEvent from 'helpers/selectEvent';
 import { asMock, StoreMock as MockStore } from 'helpers/mocking';
@@ -46,7 +46,7 @@ jest.mock('@graylog/server-api', () => ({
   PipelinesConnections: {
     connectStreams: jest.fn(),
   },
-  SystemInputStates: {
+  ClusterInputState: {
     start: jest.fn(() => Promise.resolve()),
     stop: jest.fn(() => Promise.resolve()),
   },
@@ -255,7 +255,7 @@ describe('InputSetupWizard Start Input', () => {
       await goToStartInputStep();
       await startInput();
 
-      await waitFor(() => expect(SystemInputStates.start).toHaveBeenCalledWith(input.id));
+      await waitFor(() => expect(ClusterInputState.start).toHaveBeenCalledWith(input.id));
 
       expect(await screen.findByRole('heading', { name: /Setting up Input.../i })).toBeInTheDocument();
       expect(await screen.findByText(/Input started successfully!/i)).toBeInTheDocument();
@@ -275,7 +275,7 @@ describe('InputSetupWizard Start Input', () => {
       await goToStartInputStep();
       await startInput();
 
-      await waitFor(() => expect(SystemInputStates.start).toHaveBeenCalledWith(input.id));
+      await waitFor(() => expect(ClusterInputState.start).toHaveBeenCalledWith(input.id));
 
       await waitFor(() =>
         expect(PipelinesPipelines.routing).toHaveBeenCalledWith({
@@ -309,7 +309,7 @@ describe('InputSetupWizard Start Input', () => {
       await goToStartInputStep();
       await startInput();
 
-      await waitFor(() => expect(SystemInputStates.start).toHaveBeenCalledWith(input.id));
+      await waitFor(() => expect(ClusterInputState.start).toHaveBeenCalledWith(input.id));
 
       await waitFor(() =>
         expect(PipelinesPipelines.routing).toHaveBeenCalledWith({
@@ -348,7 +348,7 @@ describe('InputSetupWizard Start Input', () => {
       await goToStartInputStep();
       await startInput();
 
-      await waitFor(() => expect(SystemInputStates.start).toHaveBeenCalledWith(input.id));
+      await waitFor(() => expect(ClusterInputState.start).toHaveBeenCalledWith(input.id));
     });
 
     it('should create the new stream', async () => {
