@@ -51,6 +51,8 @@ class CollectorIngestCodecTest {
 
     private static final String TEST_RECEIVER_TYPE = "file_log";
     private static final String TEST_INSTANCE_UID = "test-agent";
+    private static final String TEST_SOURCE_ID = "source-abc";
+    private static final String TEST_FLEET_ID = "fleet-xyz";
 
     private final MessageFactory messageFactory = new TestMessageFactory();
 
@@ -268,6 +270,116 @@ class CollectorIngestCodecTest {
 
         assertThat(decoded).isPresent();
         assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_COLLECTOR_INSTANCE_UID)).isNull();
+    }
+
+    @Test
+    void doesMapCollectorSourceIdToMessageField() {
+        final var logRecord = LogRecord.newBuilder()
+                .setBody(AnyValue.newBuilder().setStringValue("source id log"))
+                .setTimeUnixNano(1700000000000000000L)
+                .build();
+
+        final var log = OTelJournal.Log.newBuilder()
+                .setLogRecord(logRecord)
+                .build();
+
+        final var otelRecord = OTelJournal.Record.newBuilder()
+                .setLog(log)
+                .build();
+
+        final var collectorRecord = CollectorJournal.Record.newBuilder()
+                .setOtelRecord(otelRecord)
+                .setCollectorReceiverType(TEST_RECEIVER_TYPE)
+                .setCollectorSourceId(TEST_SOURCE_ID)
+                .build();
+
+        final var rawMessage = new RawMessage(collectorRecord.toByteArray());
+        final var decoded = codec.decodeSafe(rawMessage);
+
+        assertThat(decoded).isPresent();
+        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_ID)).isEqualTo(TEST_SOURCE_ID);
+    }
+
+    @Test
+    void handlesMissingCollectorSourceIdGracefully() {
+        final var logRecord = LogRecord.newBuilder()
+                .setBody(AnyValue.newBuilder().setStringValue("no source id"))
+                .setTimeUnixNano(1700000000000000000L)
+                .build();
+
+        final var log = OTelJournal.Log.newBuilder()
+                .setLogRecord(logRecord)
+                .build();
+
+        final var otelRecord = OTelJournal.Record.newBuilder()
+                .setLog(log)
+                .build();
+
+        final var collectorRecord = CollectorJournal.Record.newBuilder()
+                .setOtelRecord(otelRecord)
+                .setCollectorReceiverType(TEST_RECEIVER_TYPE)
+                .build();
+
+        final var rawMessage = new RawMessage(collectorRecord.toByteArray());
+        final var decoded = codec.decodeSafe(rawMessage);
+
+        assertThat(decoded).isPresent();
+        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_ID)).isNull();
+    }
+
+    @Test
+    void doesMapCollectorFleetIdToMessageField() {
+        final var logRecord = LogRecord.newBuilder()
+                .setBody(AnyValue.newBuilder().setStringValue("fleet id log"))
+                .setTimeUnixNano(1700000000000000000L)
+                .build();
+
+        final var log = OTelJournal.Log.newBuilder()
+                .setLogRecord(logRecord)
+                .build();
+
+        final var otelRecord = OTelJournal.Record.newBuilder()
+                .setLog(log)
+                .build();
+
+        final var collectorRecord = CollectorJournal.Record.newBuilder()
+                .setOtelRecord(otelRecord)
+                .setCollectorReceiverType(TEST_RECEIVER_TYPE)
+                .setCollectorFleetId(TEST_FLEET_ID)
+                .build();
+
+        final var rawMessage = new RawMessage(collectorRecord.toByteArray());
+        final var decoded = codec.decodeSafe(rawMessage);
+
+        assertThat(decoded).isPresent();
+        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_COLLECTOR_FLEET_ID)).isEqualTo(TEST_FLEET_ID);
+    }
+
+    @Test
+    void handlesMissingCollectorFleetIdGracefully() {
+        final var logRecord = LogRecord.newBuilder()
+                .setBody(AnyValue.newBuilder().setStringValue("no fleet id"))
+                .setTimeUnixNano(1700000000000000000L)
+                .build();
+
+        final var log = OTelJournal.Log.newBuilder()
+                .setLogRecord(logRecord)
+                .build();
+
+        final var otelRecord = OTelJournal.Record.newBuilder()
+                .setLog(log)
+                .build();
+
+        final var collectorRecord = CollectorJournal.Record.newBuilder()
+                .setOtelRecord(otelRecord)
+                .setCollectorReceiverType(TEST_RECEIVER_TYPE)
+                .build();
+
+        final var rawMessage = new RawMessage(collectorRecord.toByteArray());
+        final var decoded = codec.decodeSafe(rawMessage);
+
+        assertThat(decoded).isPresent();
+        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_COLLECTOR_FLEET_ID)).isNull();
     }
 
     @Test

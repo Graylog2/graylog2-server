@@ -44,8 +44,8 @@ export const useCollectorInputDetails = () => {
           if (error instanceof FetchError && error.status === 404) return;
 
           UserNotification.error(
-            `Loading collector input details failed with status: ${error}`,
-            'Could not load collector input details.',
+            `Loading Collector input details failed with status: ${error}`,
+            'Could not load Collector input details.',
           );
         }),
       retry: false,

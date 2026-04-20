@@ -105,6 +105,7 @@ const ConnectedSidebar = (props: Omit<React.ComponentProps<typeof Sidebar>, 'res
       title={title}
       sections={searchPageLayout?.sidebar?.sections}
       contentColumnWidth={searchPageLayout?.sidebar?.contentColumnWidth}
+      initialSectionCollapsed={searchPageLayout?.sidebar?.initialSectionCollapsed}
       {...props}
     />
   );

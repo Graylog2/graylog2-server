@@ -79,8 +79,6 @@ public abstract class FilelogReceiverConfig implements CollectorReceiverConfig, 
     @JsonProperty("include_file_record_offset")
     public abstract boolean includeFileRecordOffset();
 
-    // TODO: Configure offset storage - otherwise, offsets will only be tracked in memory!
-
     @JsonProperty("start_at")
     public abstract CollectorReadMode startAt();
 
