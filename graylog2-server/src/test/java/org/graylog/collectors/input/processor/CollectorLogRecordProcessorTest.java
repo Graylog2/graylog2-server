@@ -130,7 +130,7 @@ class CollectorLogRecordProcessorTest {
     void extractsReceiverLifecycleAttributes() {
         final var log = OTelJournal.Log.newBuilder()
                 .setLogRecord(LogRecord.newBuilder()
-                        .addAttributes(kv("otelcol.component.id", "filelog/699c94e23f694890ac6bd6c9"))
+                        .addAttributes(kv("otelcol.component.id", "file_log/699c94e23f694890ac6bd6c9"))
                         .addAttributes(kv("otelcol.component.kind", "receiver"))
                         .addAttributes(kv("otelcol.signal", "logs"))
                         .addAttributes(kv("component", "fileconsumer"))
@@ -139,7 +139,7 @@ class CollectorLogRecordProcessorTest {
                 .build();
         final var result = processor.process(log);
         assertThat(result)
-                .containsEntry("collector_component_id", "filelog/699c94e23f694890ac6bd6c9")
+                .containsEntry("collector_component_id", "file_log/699c94e23f694890ac6bd6c9")
                 .containsEntry("collector_component_kind", "receiver")
                 .containsEntry("collector_signal", "logs")
                 .containsEntry("collector_component", "fileconsumer")

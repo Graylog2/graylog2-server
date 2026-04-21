@@ -138,4 +138,6 @@ public interface IndicesAdapter {
     void refresh(String... indices);
 
     Optional<WarmIndexInfo> getWarmIndexInfo(String indexOrAlias);
+
+    Set<String> getOutdatedIndices(int currentMajorVersion);
 }

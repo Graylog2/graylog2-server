@@ -44,6 +44,7 @@ public abstract class EventSummary implements CommonEventSummary {
                 .timestamp(event.eventTimestamp())
                 .eventDefinitionId(event.eventDefinitionId())
                 .priority(event.priority())
+                .key(event.key())
                 .eventKeys(event.keyTuple())
                 .replayInfo(event.replayInfo())
                 .rawEvent(event)
@@ -81,6 +82,9 @@ public abstract class EventSummary implements CommonEventSummary {
 
         @JsonProperty(FIELD_EVENT_DEFINITION_ID)
         public abstract Builder eventDefinitionId(String eventDefinitionId);
+
+        @JsonProperty(FIELD_KEY)
+        public abstract Builder key(@Nullable String key);
 
         @JsonProperty(FIELD_PRIORITY)
         public abstract Builder priority(Long priority);

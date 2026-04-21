@@ -22,20 +22,21 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.collectors.CollectorCaService;
-import org.graylog.collectors.CollectorInputService;
+import org.graylog.collectors.CollectorIngestInputService;
 import org.graylog.collectors.CollectorLogsDestinationService;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
@@ -44,10 +45,10 @@ import org.graylog.collectors.FleetService;
 import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.TokenSigningKey;
 import org.graylog.collectors.db.MarkerType;
-import org.graylog.collectors.input.CollectorIngestHttpInput;
 import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.validators.ValidationResult;
@@ -71,7 +72,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 @RequiresAuthentication
 public class CollectorsConfigResource extends RestResource {
     private final CollectorsConfigService collectorsConfigService;
-    private final CollectorInputService collectorInputService;
+    private final CollectorIngestInputService collectorIngestInputService;
     private final CollectorLogsDestinationService collectorLogsDestinationService;
     private final URI httpExternalUri;
     private final FleetService fleetService;
@@ -81,7 +82,7 @@ public class CollectorsConfigResource extends RestResource {
 
     @Inject
     public CollectorsConfigResource(CollectorsConfigService collectorsConfigService,
-                                    CollectorInputService collectorInputService,
+                                    CollectorIngestInputService collectorIngestInputService,
                                     CollectorLogsDestinationService collectorLogsDestinationService,
                                     HttpConfiguration httpConfiguration,
                                     FleetService fleetService,
@@ -89,7 +90,7 @@ public class CollectorsConfigResource extends RestResource {
                                     EnrollmentTokenService enrollmentTokenService,
                                     CollectorCaService collectorCaService) {
         this.collectorsConfigService = collectorsConfigService;
-        this.collectorInputService = collectorInputService;
+        this.collectorIngestInputService = collectorIngestInputService;
         this.collectorLogsDestinationService = collectorLogsDestinationService;
         this.httpExternalUri = httpConfiguration.getHttpExternalUri();
         this.fleetService = fleetService;
@@ -108,6 +109,32 @@ public class CollectorsConfigResource extends RestResource {
         });
     }
 
+    // Separate endpoint so the UI can check input existence without needing read permission on each input.
+    // Currently, all users with Reader role have wildcard inputs:read, so per-input filtering is not needed in
+    // practice. If more fine-grained read permissions become common, the UI can use these IDs to determine the
+    // presence of collector inputs, regardless of the user's read permissions.
+    @GET
+    @Path("/inputs")
+    @Operation(summary = "Get collector ingest input IDs")
+    @RequiresPermissions(CollectorsPermissions.CONFIGURATION_READ)
+    public CollectorInputIdsResponse getInputIds() {
+        return new CollectorInputIdsResponse(collectorIngestInputService.getInputIds());
+    }
+
+    @POST
+    @Path("/inputs")
+    @Operation(summary = "Create the default collector ingest input")
+    @NoAuditEvent("Audit event is emitted by CollectorIngestInputService")
+    // Input permissions are checked inline in CollectorIngestInputService#createInput. Collectors config is not
+    // altered, only read in this process.
+    @RequiresPermissions(CollectorsPermissions.CONFIGURATION_READ)
+    public CollectorInputIdsResponse createInput() throws ValidationException {
+        final var config = collectorsConfigService.get()
+                .orElseThrow(() -> new BadRequestException("Collectors config has not been initialized yet"));
+        collectorIngestInputService.createInput(getSubject(), getCurrentUser().getName(), config.http().port());
+        return new CollectorInputIdsResponse(collectorIngestInputService.getInputIds());
+    }
+
     @AuditEvent(type = AuditEventTypes.COLLECTORS_CONFIG_UPDATE)
     @PUT
     @Operation(summary = "Update collectors configuration")
@@ -117,14 +144,7 @@ public class CollectorsConfigResource extends RestResource {
         collectorLogsDestinationService.ensureExists();
 
         final var existing = collectorsConfigService.get();
-        final String creatorUserId = SecurityUtils.getSubject().getPrincipal().toString();
 
-        final String httpInputId = collectorInputService.reconcile(
-                request.http(),
-                existing.map(CollectorsConfig::http).orElse(null),
-                CollectorIngestHttpInput.class.getCanonicalName(),
-                CollectorIngestHttpInput.NAME,
-                creatorUserId);
         final Duration effectiveOffline = request.collectorOfflineThreshold() != null
                 ? request.collectorOfflineThreshold() : CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD;
         final Duration effectiveVisibility = request.collectorDefaultVisibilityThreshold() != null
@@ -151,11 +171,15 @@ public class CollectorsConfigResource extends RestResource {
                 .signingCertId(caHierarchy.signingCert().id())
                 .tokenSigningKey(tokenSigningKey)
                 .otlpServerCertId(caHierarchy.otlpServerCert().id())
-                .http(request.http().toConfig(httpInputId))
+                .http(request.http().toConfig())
                 .collectorOfflineThreshold(effectiveOffline)
                 .collectorDefaultVisibilityThreshold(effectiveVisibility)
                 .collectorExpirationThreshold(effectiveExpiration)
                 .build();
+
+        if (request.createInput()) {
+            collectorIngestInputService.createInput(getSubject(), getCurrentUser().getName(), request.http().port());
+        }
 
         collectorsConfigService.save(config);
 

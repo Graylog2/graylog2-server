@@ -19,6 +19,7 @@ import { Navigate } from 'react-router-dom';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
+import useProductName from 'brand-customization/useProductName';
 import BetaBadge from 'components/common/BetaBadge';
 import { CollectorsOverview } from 'components/collectors/overview';
 import { CollectorsPageNavigation } from 'components/collectors/common';
@@ -26,10 +27,12 @@ import { useCollectorsConfig } from 'components/collectors/hooks';
 import Routes from 'routing/Routes';
 
 const CollectorsOverviewPage = () => {
+  const productName = useProductName();
   const { data: config, isLoading } = useCollectorsConfig();
 
   if (isLoading) {
-    return (<DocumentTitle title="Collectors Overview">
+    return (
+      <DocumentTitle title="Collectors Overview">
         <Spinner />
       </DocumentTitle>
     );
@@ -42,8 +45,16 @@ const CollectorsOverviewPage = () => {
   return (
     <DocumentTitle title="Collectors Overview">
       <CollectorsPageNavigation />
-      <PageHeader title={<>Collectors Overview <BetaBadge /></>}>
-        <span>Overview of all collectors and sources across your infrastructure.</span>
+      <PageHeader
+        title={
+          <>
+            Collectors Overview <BetaBadge />
+          </>
+        }>
+        <span>
+          Collectors are lightweight services deployed across your infrastructure to collect logs and forward them to{' '}
+          {productName}. They are organized into fleets and configured with sources that define what data to collect.
+        </span>
       </PageHeader>
       <Row className="content">
         <Col md={12}>

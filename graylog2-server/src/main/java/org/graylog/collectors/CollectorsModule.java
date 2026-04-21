@@ -38,7 +38,6 @@ import org.graylog.collectors.input.processor.JournaldRecordProcessor;
 import org.graylog.collectors.input.processor.LogRecordProcessor;
 import org.graylog.collectors.input.processor.WindowsEventLogRecordProcessor;
 import org.graylog.collectors.input.transport.CollectorIngestHttpTransport;
-import org.graylog.collectors.migrations.V20260303120000_CollectorDEVMigrations;
 import org.graylog.collectors.opamp.OpAmpModule;
 import org.graylog.collectors.periodical.CollectorCaRenewalPeriodical;
 import org.graylog.collectors.periodical.PurgeExpiredCollectorInstancesPeriodical;
@@ -104,6 +103,11 @@ public class CollectorsModule extends PluginModule {
 
         // CA
         bind(CollectorCaService.class).in(Scopes.SINGLETON);
+        bind(CollectorCaCache.class).in(Scopes.SINGLETON);
+        bind(CollectorCaKeyManager.class).in(Scopes.SINGLETON);
+        bind(CollectorCaTrustManager.class).in(Scopes.SINGLETON);
+        bind(CollectorTLSUtils.class).in(Scopes.SINGLETON);
+        addInitializer(CollectorCaCache.class);
 
         // Collectors config
         bind(CollectorsConfigService.class).asEagerSingleton();
@@ -121,9 +125,6 @@ public class CollectorsModule extends PluginModule {
         addPeriodical(PurgeExpiredCollectorInstancesPeriodical.class);
         addPeriodical(CollectorCaRenewalPeriodical.class);
 
-        // Migrations
-        addMigration(V20260303120000_CollectorDEVMigrations.class);
-
         // Fleet permissions
         addPermissions(CollectorsPermissions.class);
 
@@ -139,5 +140,7 @@ public class CollectorsModule extends PluginModule {
                 IndexTemplateProvider.class);
         indexTemplateProviderBinder.addBinding(CollectorLogsIndexTemplateProvider.COLLECTOR_LOGS_TEMPLATE_TYPE)
                 .to(CollectorLogsIndexTemplateProvider.class);
+
+        addTelemetryMetricProvider("Collector Metrics", CollectorMetricsSupplier.class);
     }
 }

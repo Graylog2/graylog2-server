@@ -21,7 +21,6 @@ export type Fleet = {
   id: string;
   name: string;
   description?: string;
-  target_version: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -108,10 +107,8 @@ export type CollectorStats = {
 };
 
 export type IngestEndpointConfig = {
-  enabled: boolean;
   hostname: string;
   port: number;
-  input_id: string | null;
 };
 
 export type TokenSigningKey = {
@@ -132,15 +129,19 @@ export type CollectorsConfig = {
   collector_expiration_threshold: string;
 };
 
+export type CollectorInputIdsResponse = {
+  collector_input_ids: string[];
+};
+
 export type CollectorsConfigRequest = {
   http: {
-    enabled: boolean;
     hostname: string;
     port: number;
   };
   collector_offline_threshold: string;
   collector_default_visibility_threshold: string;
   collector_expiration_threshold: string;
+  create_input: boolean;
 };
 
 export type FleetStatsSummary = {
@@ -162,19 +163,32 @@ export type ActorInfo = {
 };
 
 export type TargetInfo = {
-  id: string;
+  id: string | null;
   name: string;
   type: 'fleet' | 'collector';
 };
 
-export type ActivityEntry = {
+export type FleetReassignedDetails = {
+  destination_fleet: TargetInfo;
+};
+
+export type ActivityEntryBase = {
   seq: number;
   timestamp: string | null;
-  type: 'CONFIG_CHANGED' | 'INGEST_CONFIG_CHANGED' | 'RESTART' | 'DISCOVERY_RUN' | 'FLEET_REASSIGNED';
   actor: ActorInfo | null;
   targets: TargetInfo[];
-  details: Record<string, string>;
 };
+
+export type SimpleActivityEntry = ActivityEntryBase & {
+  type: 'CONFIG_CHANGED' | 'INGEST_CONFIG_CHANGED' | 'RESTART' | 'DISCOVERY_RUN';
+};
+
+export type FleetReassignedActivityEntry = ActivityEntryBase & {
+  type: 'FLEET_REASSIGNED';
+  details: FleetReassignedDetails | null;
+};
+
+export type ActivityEntry = SimpleActivityEntry | FleetReassignedActivityEntry;
 
 export type RecentActivityResponse = {
   activities: ActivityEntry[];
