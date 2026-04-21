@@ -186,7 +186,7 @@ public class MongoDbPipelineMetadataService {
     private static StreamPipelineRulesResponse toStreamPipelineRulesResponse(RoutingRuleDao dao,
                                                                              Predicate<StreamReference> connectedStreamFilter) {
         return new StreamPipelineRulesResponse(
-                dao.ruleId(),
+                dao.id(),
                 dao.pipelineId(),
                 dao.pipelineTitle(),
                 dao.ruleId(),
