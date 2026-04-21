@@ -301,7 +301,7 @@ public class SupportBundleResourceIT {
                 .spec(api.requestSpecification())
                 .accept("application/octet-stream")
                 .when()
-                .pathParam("filename", "../some/file")
+                .pathParam("filename", "..")
                 .get(DOWNLOAD_URL)
                 .then()
                 .statusCode(404);
@@ -370,7 +370,7 @@ public class SupportBundleResourceIT {
         given()
                 .spec(api.requestSpecification())
                 .when()
-                .pathParam("filename", "../some/file")
+                .pathParam("filename", "..")
                 .delete(DELETE_URL)
                 .then()
                 .statusCode(404);
