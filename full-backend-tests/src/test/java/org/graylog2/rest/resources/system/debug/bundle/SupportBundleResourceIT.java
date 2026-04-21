@@ -19,6 +19,8 @@ package org.graylog2.rest.resources.system.debug.bundle;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.testing.completebackend.FullBackendTest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
@@ -56,6 +58,7 @@ import static org.hamcrest.Matchers.notNullValue;
                                      @GraylogBackendConfiguration.Env(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = ""),
                              })
 public class SupportBundleResourceIT {
+    private static final Logger LOG = LoggerFactory.getLogger(SupportBundleResourceIT.class);
     private static final String MANIFEST_URL = "/system/debug/support/manifest";
     private static final String LOGFILE_URL = "/system/debug/support/logfile/{id}";
     private static final String BUILD_URL = "/system/debug/support/bundle/build";
@@ -297,14 +300,21 @@ public class SupportBundleResourceIT {
 
     @FullBackendTest
     void downloadBundleWithPathTraversalReturns404() {
-        given()
+        final var response = given()
                 .spec(api.requestSpecification())
                 .accept("application/octet-stream")
                 .when()
                 .pathParam("filename", "../etc/passwd")
                 .get(DOWNLOAD_URL)
                 .then()
-                .statusCode(404);
+                .extract().response();
+
+        LOG.info("=== downloadBundleWithPathTraversalReturns404 ===");
+        LOG.info("Status: {}", response.statusCode());
+        LOG.info("Headers: {}", response.headers());
+        LOG.info("Body: {}", response.body().asString());
+
+        response.then().statusCode(404);
     }
 
     @FullBackendTest
