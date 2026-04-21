@@ -69,6 +69,7 @@ import retrofit2.http.GET;
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -676,12 +677,10 @@ public class SupportBundleService {
         }
     }
 
-    public void downloadBundle(String filename, OutputStream outputStream) throws IOException {
+    public InputStream openBundleStream(String filename) throws IOException {
         ensureFileWithinBundleDir(bundleDir, filename);
-
         try {
-            final Path filePath = bundleDir.resolve(filename);
-            Files.copy(filePath, outputStream);
+            return Files.newInputStream(bundleDir.resolve(filename));
         } catch (NoSuchFileException e) {
             throw new NotFoundException(e);
         }
