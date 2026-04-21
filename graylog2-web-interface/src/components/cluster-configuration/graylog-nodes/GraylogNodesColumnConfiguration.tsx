@@ -68,9 +68,7 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
     },
     is_leader: {
       renderCell: (isLeader: boolean) => (
-        <SecondaryText>
-          {isLeader ? <StyledLabel bsSize="xs">Leader</StyledLabel> : <span>-</span>}
-        </SecondaryText>
+        <SecondaryText>{isLeader ? <StyledLabel bsSize="xs">Leader</StyledLabel> : <span>-</span>}</SecondaryText>
       ),
       staticWidth: 'matchHeader',
     },

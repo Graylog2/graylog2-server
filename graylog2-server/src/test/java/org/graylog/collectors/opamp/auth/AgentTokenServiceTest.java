@@ -28,6 +28,7 @@ import org.graylog.collectors.CollectorCaService;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.opamp.transport.OpAmpAuthContext;
 import org.graylog.grn.GRNRegistry;
@@ -99,7 +100,9 @@ class AgentTokenServiceTest {
         final var clusterIdService = mock(ClusterIdService.class);
         when(clusterIdService.getString()).thenReturn(TEST_CLUSTER_ID);
         collectorInstanceService = new CollectorInstanceService(mongoCollections);
-        collectorsConfigService = new CollectorsConfigService(clusterConfigService, mock(ClusterEventBus.class));
+        final var httpConfiguration = mock(HttpConfiguration.class);
+        when(httpConfiguration.getHttpExternalUri()).thenReturn(java.net.URI.create("https://localhost:443/"));
+        collectorsConfigService = new CollectorsConfigService(clusterConfigService, mock(ClusterEventBus.class), httpConfiguration);
         collectorCaService = new CollectorCaService(certificateService, clusterIdService, collectorsConfigService, clock);
         agentTokenService = new AgentTokenService(collectorInstanceService, clock);
     }

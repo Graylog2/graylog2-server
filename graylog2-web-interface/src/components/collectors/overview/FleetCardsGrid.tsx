@@ -19,11 +19,14 @@ import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Button } from 'components/bootstrap';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { EmptyEntity, Link } from 'components/common';
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 
-import FleetCard from './FleetCard';
+import FleetCard, { getHealthStatus } from './FleetCard';
 
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import type { FleetStatsSummary } from '../types';
 
 const Grid = styled.div(
@@ -49,6 +52,7 @@ type Props = {
 
 const FleetCardsGrid = ({ fleets, filter }: Props) => {
   const history = useHistory();
+  const sendTelemetry = useSendCollectorsTelemetry();
 
   const filtered = useMemo(() => {
     if (!filter) return fleets;
@@ -59,12 +63,16 @@ const FleetCardsGrid = ({ fleets, filter }: Props) => {
 
   if (fleets.length === 0) {
     return (
-      <EmptyState>
-        <p>No fleets yet</p>
+      <EmptyEntity title="No fleets yet">
+        <p>
+          Fleets let you manage groups of Collectors with shared configuration. Create your first fleet, then add
+          sources to define what data its Collectors should collect. Once configured,{' '}
+          <Link to={Routes.SYSTEM.COLLECTORS.DEPLOYMENT}>deploy Collectors</Link> using an enrollment token.
+        </p>
         <Button bsStyle="success" onClick={() => history.push(Routes.SYSTEM.COLLECTORS.FLEETS)}>
           Create Fleet
         </Button>
-      </EmptyState>
+      </EmptyEntity>
     );
   }
 
@@ -78,7 +86,16 @@ const FleetCardsGrid = ({ fleets, filter }: Props) => {
         <FleetCard
           key={fleet.fleet_id}
           stats={fleet}
-          onClick={() => history.push(Routes.SYSTEM.COLLECTORS.FLEET(fleet.fleet_id))}
+          onClick={() => {
+            sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.OVERVIEW.FLEET_CARD_CLICKED, {
+              app_action_value: 'fleet-card',
+              fleet_id: fleet.fleet_id,
+              health: getHealthStatus(fleet),
+              online_instances: fleet.online_instances,
+              offline_instances: fleet.offline_instances,
+            });
+            history.push(Routes.SYSTEM.COLLECTORS.FLEET(fleet.fleet_id));
+          }}
         />
       ))}
     </Grid>

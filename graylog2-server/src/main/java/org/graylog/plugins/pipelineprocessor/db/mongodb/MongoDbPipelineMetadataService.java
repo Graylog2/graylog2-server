@@ -32,6 +32,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.resources.streams.responses.StreamPipelineRulesResponse;
+import org.graylog2.rest.resources.streams.responses.StreamReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +42,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -153,33 +155,42 @@ public class MongoDbPipelineMetadataService {
     }
 
     public PaginatedList<StreamPipelineRulesResponse> getRoutingRulesPaginated(
-            String streamId, Bson additionalFilter, String sortField, SortOrder order, int page, int perPage) {
+            String streamId, Bson additionalFilter,
+            Predicate<RoutingRuleDao> entityFilter, Predicate<StreamReference> connectedStreamFilter,
+            String sortField, SortOrder order, int page, int perPage) {
 
         final Bson streamFilter = eq(FIELD_ROUTED_STREAM_IDS, streamId);
         final Bson filter = additionalFilter != null
                 ? Filters.and(streamFilter, additionalFilter)
                 : streamFilter;
 
-        final int total = (int) routingRulesCollection.countDocuments(filter);
+        final List<RoutingRuleDao> filtered = routingRulesCollection.find(filter)
+                .sort(order.toBsonSort(sortField))
+                .into(new ArrayList<>())
+                .stream()
+                .filter(entityFilter)
+                .toList();
+
+        final int total = filtered.size();
         final int skip = Math.max(0, page - 1) * perPage;
 
-        final List<StreamPipelineRulesResponse> results = routingRulesCollection.find(filter)
-                .sort(order.toBsonSort(sortField))
+        final List<StreamPipelineRulesResponse> results = filtered.stream()
                 .skip(skip)
                 .limit(perPage)
-                .map(MongoDbPipelineMetadataService::toStreamPipelineRulesResponse)
-                .into(new ArrayList<>());
+                .map(dao -> toStreamPipelineRulesResponse(dao, connectedStreamFilter))
+                .toList();
 
         return new PaginatedList<>(results, total, page, perPage);
     }
 
-    private static StreamPipelineRulesResponse toStreamPipelineRulesResponse(RoutingRuleDao dao) {
+    private static StreamPipelineRulesResponse toStreamPipelineRulesResponse(RoutingRuleDao dao,
+                                                                             Predicate<StreamReference> connectedStreamFilter) {
         return new StreamPipelineRulesResponse(
                 dao.ruleId(),
                 dao.pipelineId(),
                 dao.pipelineTitle(),
                 dao.ruleId(),
                 dao.ruleTitle(),
-                dao.connectedStreams());
+                dao.connectedStreams().stream().filter(connectedStreamFilter).toList());
     }
 }

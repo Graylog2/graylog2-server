@@ -103,13 +103,13 @@ class MongoDbPipelineMetadataServiceTest {
 
         // Page 1 with perPage=2: should return 2 results, total=3
         final PaginatedList<StreamPipelineRulesResponse> page1 = service.getRoutingRulesPaginated(
-                "s1", null, FIELD_RULE_TITLE, SortOrder.ASCENDING, 1, 2);
+                "s1", null, dao -> true, ref -> true, FIELD_RULE_TITLE, SortOrder.ASCENDING, 1, 2);
         assertThat(page1).hasSize(2);
         assertThat(page1.pagination().total()).isEqualTo(3);
 
         // Page 2 with perPage=2: should return 1 result, total=3
         final PaginatedList<StreamPipelineRulesResponse> page2 = service.getRoutingRulesPaginated(
-                "s1", null, FIELD_RULE_TITLE, SortOrder.ASCENDING, 2, 2);
+                "s1", null, dao -> true, ref -> true, FIELD_RULE_TITLE, SortOrder.ASCENDING, 2, 2);
         assertThat(page2).hasSize(1);
         assertThat(page2.pagination().total()).isEqualTo(3);
     }
@@ -147,7 +147,7 @@ class MongoDbPipelineMetadataServiceTest {
         service.save(List.of(pipeline), routingRules, false);
 
         final PaginatedList<StreamPipelineRulesResponse> result = service.getRoutingRulesPaginated(
-                "s1", null, FIELD_RULE_TITLE, SortOrder.ASCENDING, 1, 10);
+                "s1", null, dao -> true, ref -> true, FIELD_RULE_TITLE, SortOrder.ASCENDING, 1, 10);
 
         assertThat(result).hasSize(3);
         assertThat(result.get(0).rule()).isEqualTo("Alpha Rule");
@@ -199,7 +199,7 @@ class MongoDbPipelineMetadataServiceTest {
         service.save(List.of(pipeline1, pipeline2), routingRules, false);
 
         final PaginatedList<StreamPipelineRulesResponse> result = service.getRoutingRulesPaginated(
-                "s1", null, FIELD_PIPELINE_TITLE, SortOrder.ASCENDING, 1, 10);
+                "s1", null, dao -> true, ref -> true, FIELD_PIPELINE_TITLE, SortOrder.ASCENDING, 1, 10);
 
         assertThat(result).hasSize(2);
         assertThat(result.get(0).pipeline()).isEqualTo("Alpha Pipeline");
@@ -252,7 +252,7 @@ class MongoDbPipelineMetadataServiceTest {
         // Filter by pipeline_id should return only that pipeline's rules
         final Bson pipelineFilter = Filters.eq(RoutingRuleDao.FIELD_PIPELINE_ID, "pipeline1");
         final PaginatedList<StreamPipelineRulesResponse> filtered = service.getRoutingRulesPaginated(
-                "s1", pipelineFilter, FIELD_RULE_TITLE, SortOrder.ASCENDING, 1, 10);
+                "s1", pipelineFilter, dao -> true, ref -> true, FIELD_RULE_TITLE, SortOrder.ASCENDING, 1, 10);
         assertThat(filtered).hasSize(1);
         assertThat(filtered.getFirst().rule()).isEqualTo("Firewall Block");
         assertThat(filtered.pagination().total()).isEqualTo(1);
@@ -260,13 +260,13 @@ class MongoDbPipelineMetadataServiceTest {
         // Filter by rule_id should return only that specific rule
         final Bson ruleFilter = Filters.eq(RoutingRuleDao.FIELD_RULE_ID, "rule2");
         final PaginatedList<StreamPipelineRulesResponse> ruleFiltered = service.getRoutingRulesPaginated(
-                "s1", ruleFilter, FIELD_RULE_TITLE, SortOrder.ASCENDING, 1, 10);
+                "s1", ruleFilter, dao -> true, ref -> true, FIELD_RULE_TITLE, SortOrder.ASCENDING, 1, 10);
         assertThat(ruleFiltered).hasSize(1);
         assertThat(ruleFiltered.getFirst().rule()).isEqualTo("Log Rotation");
 
         // No filter should return all rules for the stream
         final PaginatedList<StreamPipelineRulesResponse> unfiltered = service.getRoutingRulesPaginated(
-                "s1", null, FIELD_RULE_TITLE, SortOrder.ASCENDING, 1, 10);
+                "s1", null, dao -> true, ref -> true, FIELD_RULE_TITLE, SortOrder.ASCENDING, 1, 10);
         assertThat(unfiltered).hasSize(2);
     }
 
@@ -296,7 +296,7 @@ class MongoDbPipelineMetadataServiceTest {
         service.save(List.of(pipeline), routingRules, false);
 
         final PaginatedList<StreamPipelineRulesResponse> result = service.getRoutingRulesPaginated(
-                "nonexistent", null, FIELD_RULE_TITLE, SortOrder.ASCENDING, 1, 10);
+                "nonexistent", null, dao -> true, ref -> true, FIELD_RULE_TITLE, SortOrder.ASCENDING, 1, 10);
 
         assertThat(result).isEmpty();
         assertThat(result.pagination().total()).isEqualTo(0);
@@ -332,7 +332,7 @@ class MongoDbPipelineMetadataServiceTest {
         service.save(List.of(pipeline), routingRules, false);
 
         final PaginatedList<StreamPipelineRulesResponse> result = service.getRoutingRulesPaginated(
-                "s1", null, FIELD_RULE_TITLE, SortOrder.ASCENDING, 1, 10);
+                "s1", null, dao -> true, ref -> true, FIELD_RULE_TITLE, SortOrder.ASCENDING, 1, 10);
 
         assertThat(result).hasSize(1);
         final StreamPipelineRulesResponse response = result.getFirst();
@@ -374,7 +374,7 @@ class MongoDbPipelineMetadataServiceTest {
         // Querying for each target stream should return the rule
         for (final String streamId : List.of("s1", "s2", "s3")) {
             final PaginatedList<StreamPipelineRulesResponse> result = service.getRoutingRulesPaginated(
-                    streamId, null, FIELD_RULE_TITLE, SortOrder.ASCENDING, 1, 10);
+                    streamId, null, dao -> true, ref -> true, FIELD_RULE_TITLE, SortOrder.ASCENDING, 1, 10);
             assertThat(result)
                     .as("Query for stream '%s'", streamId)
                     .hasSize(1);
@@ -385,7 +385,7 @@ class MongoDbPipelineMetadataServiceTest {
 
         // Querying for a stream NOT in the set should return nothing
         final PaginatedList<StreamPipelineRulesResponse> noResult = service.getRoutingRulesPaginated(
-                "s4", null, FIELD_RULE_TITLE, SortOrder.ASCENDING, 1, 10);
+                "s4", null, dao -> true, ref -> true, FIELD_RULE_TITLE, SortOrder.ASCENDING, 1, 10);
         assertThat(noResult).isEmpty();
     }
 
@@ -454,7 +454,7 @@ class MongoDbPipelineMetadataServiceTest {
         service.save(List.of(pipeline), initialRouting, false);
 
         // Verify initial state
-        assertThat(service.getRoutingRulesPaginated("s1", null, FIELD_RULE_TITLE, SortOrder.ASCENDING, 1, 10))
+        assertThat(service.getRoutingRulesPaginated("s1", null, dao -> true, ref -> true, FIELD_RULE_TITLE, SortOrder.ASCENDING, 1, 10))
                 .hasSize(1);
 
         // Upsert with different routing rules (rule1 removed, rule2 added)
@@ -482,19 +482,19 @@ class MongoDbPipelineMetadataServiceTest {
         service.save(List.of(updatedPipeline), updatedRouting, true);
 
         // Old routing rule should be gone
-        assertThat(service.getRoutingRulesPaginated("s1", null, FIELD_RULE_TITLE, SortOrder.ASCENDING, 1, 10))
+        assertThat(service.getRoutingRulesPaginated("s1", null, dao -> true, ref -> true, FIELD_RULE_TITLE, SortOrder.ASCENDING, 1, 10))
                 .isEmpty();
 
         // New routing rule should exist
         final PaginatedList<StreamPipelineRulesResponse> result =
-                service.getRoutingRulesPaginated("s2", null, FIELD_RULE_TITLE, SortOrder.ASCENDING, 1, 10);
+                service.getRoutingRulesPaginated("s2", null, dao -> true, ref -> true, FIELD_RULE_TITLE, SortOrder.ASCENDING, 1, 10);
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().rule()).isEqualTo("New Rule");
         assertThat(result.getFirst().pipeline()).isEqualTo("Test Pipeline Updated");
 
         // Delete should remove both pipeline metadata and routing rules
         service.delete(Set.of("pipeline1"));
-        assertThat(service.getRoutingRulesPaginated("s2", null, FIELD_RULE_TITLE, SortOrder.ASCENDING, 1, 10))
+        assertThat(service.getRoutingRulesPaginated("s2", null, dao -> true, ref -> true, FIELD_RULE_TITLE, SortOrder.ASCENDING, 1, 10))
                 .isEmpty();
         assertThat(service.getPipelinesByRule("rule2")).isEmpty();
     }

@@ -22,7 +22,9 @@ import { Formik, Form } from 'formik';
 import { Button } from 'components/bootstrap';
 import { Card, ConfirmDialog, FormikInput, RelativeTime } from 'components/common';
 import FormSubmit from 'components/common/FormSubmit';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import type { Fleet } from '../types';
 
 type Props = {
@@ -34,7 +36,6 @@ type Props = {
 type FormValues = {
   name: string;
   description: string;
-  target_version: string;
 };
 
 const Section = styled(Card)`
@@ -84,11 +85,11 @@ const validate = (values: FormValues) => {
 
 const FleetSettings = ({ fleet, onSave, onDelete = undefined }: Props) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const sendTelemetry = useSendCollectorsTelemetry();
 
   const initialValues: FormValues = {
     name: fleet.name,
     description: fleet.description || '',
-    target_version: fleet.target_version ?? '',
   };
 
   const handleSubmit = useCallback(
@@ -96,15 +97,22 @@ const FleetSettings = ({ fleet, onSave, onDelete = undefined }: Props) => {
       await onSave({
         name: values.name,
         description: values.description,
-        target_version: values.target_version || null,
+      });
+      sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.FLEET.UPDATED, {
+        app_action_value: 'fleet-settings-save',
+        fleet_id: fleet.id,
       });
     },
-    [onSave],
+    [fleet.id, onSave, sendTelemetry],
   );
 
   const handleConfirmDelete = useCallback(async () => {
     await onDelete?.();
-  }, [onDelete]);
+    sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.FLEET.DELETED, {
+      app_action_value: 'fleet-delete',
+      fleet_id: fleet.id,
+    });
+  }, [fleet.id, onDelete, sendTelemetry]);
 
   return (
     <div>
@@ -115,13 +123,6 @@ const FleetSettings = ({ fleet, onSave, onDelete = undefined }: Props) => {
             <Form>
               <FormikInput id="fleet-name" label="Fleet Name" name="name" required />
               <FormikInput id="fleet-description" type="textarea" label="Description" name="description" />
-              <FormikInput
-                id="fleet-target-version"
-                label="Target Version"
-                name="target_version"
-                help="Collector version to deploy to this fleet"
-                placeholder="e.g., 1.2.0"
-              />
               <FormSubmit
                 isAsyncSubmit
                 submitButtonText="Save changes"
@@ -157,7 +158,8 @@ const FleetSettings = ({ fleet, onSave, onDelete = undefined }: Props) => {
       <Section>
         <SectionTitle>Danger Zone</SectionTitle>
         <WarningText>
-          Deleting a fleet will remove all configuration. Instances will need to be re-enrolled.
+          Deleting a fleet removes all source configurations and unenrolls all Collector instances. Instances will stop
+          collecting data and must be re-enrolled into a new fleet.
         </WarningText>
         <Button bsStyle="danger" onClick={() => setShowDeleteConfirm(true)} disabled={!onDelete}>
           Delete Fleet
@@ -170,8 +172,8 @@ const FleetSettings = ({ fleet, onSave, onDelete = undefined }: Props) => {
           show
           onConfirm={handleConfirmDelete}
           onCancel={() => setShowDeleteConfirm(false)}>
-          Are you sure you want to delete fleet <strong>{fleet.name}</strong>? All configuration will be removed and
-          instances will need to be re-enrolled.
+          Are you sure you want to delete fleet <strong>{fleet.name}</strong>? All source configurations will be removed
+          and Collector instances will stop collecting data. Instances must be re-enrolled into a new fleet.
         </ConfirmDialog>
       )}
     </div>

@@ -18,4 +18,6 @@ package org.graylog.collectors.config;
 
 public class CollectorAttributes {
     public static final String COLLECTOR_RECEIVER_TYPE = "collector.receiver.type";
+    public static final String COLLECTOR_SOURCE_ID = "collector.source.id";
+    public static final String COLLECTOR_FLEET_ID = "collector.fleet.id";
 }

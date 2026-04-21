@@ -1,4 +1,4 @@
-    /*
+/*
  * Copyright (C) 2020 Graylog, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,6 +34,7 @@ package org.graylog2.rest.resources.streams;
     import org.apache.shiro.authz.annotation.RequiresAuthentication;
     import org.graylog.plugins.pipelineprocessor.db.RoutingRuleDao;
     import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService;
+    import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
     import org.graylog2.database.PaginatedList;
     import org.graylog2.database.filtering.DbQueryCreator;
     import org.graylog2.rest.models.SortOrder;
@@ -42,12 +43,15 @@ package org.graylog2.rest.resources.streams;
     import org.graylog2.rest.resources.entities.EntityDefaults;
     import org.graylog2.rest.resources.entities.Sorting;
     import org.graylog2.rest.resources.streams.responses.StreamPipelineRulesResponse;
+    import org.graylog2.rest.resources.streams.responses.StreamReference;
     import org.graylog2.search.SearchQueryField;
     import org.graylog2.shared.rest.PublicCloudAPI;
     import org.graylog2.shared.rest.resources.RestResource;
+    import org.graylog2.shared.security.RestPermissions;
 
     import java.util.List;
     import java.util.Locale;
+    import java.util.function.Predicate;
 
 @RequiresAuthentication
 @PublicCloudAPI
@@ -110,10 +114,17 @@ public class StreamPipelineRulesResource extends RestResource {
                        schema = @Schema(allowableValues = {"asc", "desc"}))
             @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order) {
 
+        checkPermission(RestPermissions.STREAMS_READ, streamId);
+
         final var dbQuery = dbQueryCreator.createDbQuery(filters, query);
+        final Predicate<RoutingRuleDao> pipelineFilter =
+                dao -> isPermitted(PipelineRestPermissions.PIPELINE_READ, dao.pipelineId());
+        final Predicate<StreamReference> streamFilter =
+                ref -> isPermitted(RestPermissions.STREAMS_READ, ref.id());
+
         final PaginatedList<StreamPipelineRulesResponse> result =
                 mongoDbPipelineMetadataService.getRoutingRulesPaginated(
-                        streamId, dbQuery, sort, order, page, perPage);
+                        streamId, dbQuery, pipelineFilter, streamFilter, sort, order, page, perPage);
 
         return PageListResponse.create(
                 query, result.pagination(),

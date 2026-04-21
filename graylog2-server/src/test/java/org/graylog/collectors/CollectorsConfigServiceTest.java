@@ -17,6 +17,7 @@
 package org.graylog.collectors;
 
 import org.graylog.collectors.events.CollectorCaConfigUpdated;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,7 +39,9 @@ class CollectorsConfigServiceTest {
     void setUp() {
         clusterConfigService = mock(ClusterConfigService.class);
         clusterEventBus = mock(ClusterEventBus.class);
-        service = new CollectorsConfigService(clusterConfigService, clusterEventBus);
+        final var httpConfiguration = mock(HttpConfiguration.class);
+        when(httpConfiguration.getHttpExternalUri()).thenReturn(java.net.URI.create("https://localhost:443/"));
+        service = new CollectorsConfigService(clusterConfigService, clusterEventBus, httpConfiguration);
     }
 
     private CollectorsConfig configWithCerts(String caCertId, String signingCertId, String serverCertId) {
@@ -96,7 +99,7 @@ class CollectorsConfigServiceTest {
 
         // Change only the HTTP port, not cert IDs
         final var updated = existing.toBuilder()
-                .http(new IngestEndpointConfig(true, "localhost", 9999, null))
+                .http(new IngestEndpointConfig("localhost", 9999))
                 .build();
         service.save(updated);
 

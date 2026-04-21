@@ -25,9 +25,11 @@ import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import Routes from 'routing/Routes';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import type { Sort } from 'stores/PaginationTypes';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import BulkActions from './BulkActions';
 
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import { fetchPaginatedEnrollmentTokens, enrollmentTokensKeyFn, useCollectorsMutations, useFleets } from '../hooks';
 import type { EnrollmentTokenMetadata } from '../types';
 
@@ -113,6 +115,7 @@ const customColumnRenderers = (fleetNames: Record<string, string>): ColumnRender
 const EnrollmentTokenList = () => {
   const { deleteEnrollmentToken } = useCollectorsMutations();
   const { data: fleets } = useFleets();
+  const sendTelemetry = useSendCollectorsTelemetry();
   const [deletingToken, setDeletingToken] = useState<EnrollmentTokenMetadata | null>(null);
 
   const fleetNames = useMemo(() => {
@@ -129,8 +132,11 @@ const EnrollmentTokenList = () => {
     if (!deletingToken) return;
 
     await deleteEnrollmentToken(deletingToken.id);
+    sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.DELETED, {
+      app_action_value: 'token-delete',
+    });
     setDeletingToken(null);
-  }, [deletingToken, deleteEnrollmentToken]);
+  }, [deletingToken, deleteEnrollmentToken, sendTelemetry]);
 
   const entityActions = useCallback(
     (token: EnrollmentTokenMetadata) => (
@@ -161,8 +167,8 @@ const EnrollmentTokenList = () => {
           show
           onConfirm={handleConfirmDelete}
           onCancel={() => setDeletingToken(null)}>
-          Are you sure you want to delete this enrollment token? Collectors using this token will not be able to
-          re-enroll.
+          Are you sure you want to delete this enrollment token? New Collectors will not be able to enroll using this
+          token. Already-enrolled Collectors will continue to operate normally.
         </ConfirmDialog>
       )}
     </>

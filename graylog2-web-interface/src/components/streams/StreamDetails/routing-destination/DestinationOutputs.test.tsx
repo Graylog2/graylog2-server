@@ -39,8 +39,12 @@ jest.mock('components/streams/useAvailableOutputTypes', () => {
     default: jest.fn(),
   };
 });
-jest.mock('components/streams/StreamDetails/routing-destination/AddOutputButton', () => jest.fn(() => <div>add output button</div>));
-jest.mock('components/streams/StreamDetails/routing-destination/OutputsList', () => jest.fn(() => <div>outputs list</div>));
+jest.mock('components/streams/StreamDetails/routing-destination/AddOutputButton', () =>
+  jest.fn(() => <div>add output button</div>),
+);
+jest.mock('components/streams/StreamDetails/routing-destination/OutputsList', () =>
+  jest.fn(() => <div>outputs list</div>),
+);
 
 describe('DestinationOutputs', () => {
   const streamOutput = { id: 'output-id', title: 'Existing output', type: 'enterprise-output', configuration: {} };
