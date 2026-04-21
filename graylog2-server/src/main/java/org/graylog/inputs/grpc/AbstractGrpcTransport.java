@@ -30,6 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
@@ -120,9 +121,12 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
         }
     }
 
-    private SslContext getSslContext() {
-        final var fields = new Config().getRequestedConfiguration();
+    public static void checkTlsConfiguration(Configuration configuration) throws ConfigurationException {
+        if (configuration.getBoolean(CK_INSECURE, false)) {
+            return;
+        }
 
+        final var fields = new Config().getRequestedConfiguration();
         final List<String> missingFieldNames = new ArrayList<>();
         if (configuration.getString(CK_TLS_CERT, "").isBlank()) {
             missingFieldNames.add(fields.getField(CK_TLS_CERT).getHumanName());
@@ -132,9 +136,17 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
         }
 
         if (!missingFieldNames.isEmpty()) {
-            throw new RuntimeException(f("Secure mode is enabled, but required configuration for %s is missing.",
+            throw new ConfigurationException(f("Secure mode is enabled, but required configuration for %s is missing.",
                     missingFieldNames.stream().map(s -> StringUtils.wrap(s, '"'))
                             .collect(Collectors.joining(", "))));
+        }
+    }
+
+    private SslContext getSslContext() {
+        try {
+            checkTlsConfiguration(configuration);
+        } catch (ConfigurationException e) {
+            throw new RuntimeException(e.getMessage(), e);
         }
 
         final Base64.Decoder base64Decoder = Base64.getDecoder();
