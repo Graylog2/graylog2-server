@@ -34,7 +34,7 @@ import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import type { MiddleSectionProps } from 'components/common/PaginatedEntityTable/PaginatedEntityTable';
 import useUserDateTime from 'hooks/useUserDateTime';
 import { toUTCFromTz } from 'util/DateTime';
-import type { DateTime, DateTimeFormats } from 'util/DateTime';
+import type { UserDateTimeContextType } from 'contexts/UserDateTimeContext';
 import type { TimeRange } from 'views/logic/queries/Query';
 import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 import useOnRefresh from 'components/common/PaginatedEntityTable/useOnRefresh';
@@ -57,7 +57,7 @@ const GraphContainer = styled.div`
 
 type ResultPromise = ReturnType<typeof fetchEventsHistogram>;
 
-type FormatTime = (time: DateTime, format?: DateTimeFormats) => string;
+type FormatTime = UserDateTimeContextType['formatTime'];
 
 const generateChart = (
   type: 'Alerts' | 'Events',
