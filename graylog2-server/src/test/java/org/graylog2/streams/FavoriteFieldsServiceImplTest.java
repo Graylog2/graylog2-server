@@ -25,6 +25,7 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.ImmutableSystemScope;
+import com.google.common.eventbus.EventBus;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetService;
@@ -49,7 +50,7 @@ class FavoriteFieldsServiceImplTest {
         final MongoCollections mongoCollections = new MongoCollections(new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()), mongodb.mongoConnection());
         final var streamService = new StreamServiceImpl(mongoCollections, mock(StreamRuleService.class),
                 mock(OutputService.class), mock(IndexSetService.class), mock(MongoIndexSet.Factory.class),
-                mock(EntityRegistrar.class), mock(ClusterEventBus.class), Set.of(), new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())));
+                mock(EntityRegistrar.class), mock(ClusterEventBus.class), Set.of(), new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())), new EventBus());
         this.favoriteFieldsService = new FavoriteFieldsServiceImpl(mongoCollections, streamService);
     }
 

@@ -35,7 +35,7 @@ import type {
   FileSourceConfig,
   JournaldSourceConfig,
   JournaldPriority,
-  WindowsEventLogSourceConfig
+  WindowsEventLogSourceConfig,
 } from '../types';
 
 type Props = {
@@ -69,7 +69,8 @@ const validate = (values: FormValues) => {
   return errors;
 };
 
-export const splitToList = (value: string | undefined): Array<string> => (value || '')
+export const splitToList = (value: string | undefined): Array<string> =>
+  (value || '')
     .split(',')
     .map((c) => c.trim())
     .filter(Boolean);
@@ -169,43 +170,43 @@ const WindowsEventLogConfigFields = ({
   const [channelsInput, setChannelsInput] = useState(() => config.channels.join(', '));
 
   return (
-  <>
-    <Input
-      id="win-channels"
-      type="text"
-      label="Channels"
-      help="Comma-separated channel names (e.g., Application, Security, System)"
-      value={channelsInput}
-      onChange={(e) => {
-        setChannelsInput(e.target.value);
-        setFieldValue('config', {
-          ...config,
-          channels: splitToList(e.target.value),
-        });
-      }}
-      required={!config.include_default_channels}
-    />
-    <Input
-      id="win-include-default-channels"
-      type="checkbox"
-      label="Include default channels"
-      // if you update this, also update WindowsEventLogReceiverConfig.java
-      help="Defaults are: Application, System, Security, Setup, Microsoft-Windows-Windows Defender/Operational, Microsoft-Windows-PowerShell/Operational, Windows PowerShell"
-      checked={config.include_default_channels}
-      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-        setFieldValue('config', { ...config, include_default_channels: e.target.checked })
-      }
-    />
-    <Input
-      id="win-read-mode"
-      type="select"
-      label="Read Mode"
-      value={config.read_mode}
-      onChange={(e) => setFieldValue('config', { ...config, read_mode: e.target.value as 'beginning' | 'end' })}>
-      <option value="end">From end (tail)</option>
-      <option value="beginning">From beginning</option>
-    </Input>
-  </>
+    <>
+      <Input
+        id="win-channels"
+        type="text"
+        label="Channels"
+        help="Comma-separated channel names (e.g., Application, Security, System)"
+        value={channelsInput}
+        onChange={(e) => {
+          setChannelsInput(e.target.value);
+          setFieldValue('config', {
+            ...config,
+            channels: splitToList(e.target.value),
+          });
+        }}
+        required={!config.include_default_channels}
+      />
+      <Input
+        id="win-include-default-channels"
+        type="checkbox"
+        label="Include default channels"
+        // if you update this, also update WindowsEventLogReceiverConfig.java
+        help="Defaults are: Application, System, Security, Setup, Microsoft-Windows-Windows Defender/Operational, Microsoft-Windows-PowerShell/Operational, Windows PowerShell"
+        checked={config.include_default_channels}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          setFieldValue('config', { ...config, include_default_channels: e.target.checked })
+        }
+      />
+      <Input
+        id="win-read-mode"
+        type="select"
+        label="Read Mode"
+        value={config.read_mode}
+        onChange={(e) => setFieldValue('config', { ...config, read_mode: e.target.value as 'beginning' | 'end' })}>
+        <option value="end">From end (tail)</option>
+        <option value="beginning">From beginning</option>
+      </Input>
+    </>
   );
 };
 

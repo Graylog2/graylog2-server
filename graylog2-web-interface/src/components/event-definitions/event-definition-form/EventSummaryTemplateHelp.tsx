@@ -21,7 +21,7 @@ import { Button } from 'components/bootstrap';
 import { OverlayTrigger, Icon, ExternalLink } from 'components/common';
 
 const QueryHelpButton = styled(Button)`
-  padding: 6px 6px;
+  padding: 6px;
 `;
 
 const ExampleWrapper = styled.div`
