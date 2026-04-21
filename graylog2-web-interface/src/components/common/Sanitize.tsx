@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
 import DOMPurify from 'dompurify';
 
 type Props = {
@@ -24,7 +23,7 @@ type Props = {
 } & Omit<React.HTMLAttributes<HTMLSpanElement>, 'dangerouslySetInnerHTML' | 'children'>;
 
 const Sanitize = ({ html, config = undefined, ...rest }: Props) => {
-  const sanitized = useMemo(() => DOMPurify.sanitize(html ?? '', config ?? {}), [html, config]);
+  const sanitized = DOMPurify.sanitize(html ?? '', config ?? {});
 
   // eslint-disable-next-line react/no-danger
   return <span {...rest} dangerouslySetInnerHTML={{ __html: sanitized }} />;
