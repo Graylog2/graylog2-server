@@ -210,7 +210,7 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
             request.addField(new BooleanField(
                     CK_INSECURE,
                     "Allow Insecure Connections",
-                    false,
+                    true,
                     "Disable TLS encryption to allow insecure connections to the server"
             ));
 
