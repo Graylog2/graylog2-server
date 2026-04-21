@@ -30,7 +30,7 @@ type Props = {
   disabled?: boolean;
   hasErrorOnMount?: boolean;
   onPresetSelectOpen: () => void;
-  setCurrentTimeRange: (timeRange: TimeRange | NoTimeRangeOverride) => void;
+  setCurrentTimeRange: (timeRange: TimeRange | NoTimeRangeOverride) => Promise<void>;
   toggleShow: () => void;
   showPresetDropdown?: boolean;
   submitOnPresetChange?: boolean;
@@ -57,7 +57,7 @@ const TimeRangeFilterButtons = ({
   limitDuration,
   submitOnPresetChange = true,
 }: Props) => {
-  const { submitForm, isValid } = useFormikContext();
+  const { submitForm } = useFormikContext();
 
   const _onClick = (e: React.MouseEvent<HTMLElement>) => {
     e.currentTarget.blur();
@@ -65,10 +65,11 @@ const TimeRangeFilterButtons = ({
   };
 
   const selectRelativeTimeRangePreset = (timerange: TimeRange | {}) => {
-    setCurrentTimeRange(normalizeIfAllMessagesRange(timerange));
-    if (isValid && submitOnPresetChange) {
-      submitForm();
-    }
+    setCurrentTimeRange(normalizeIfAllMessagesRange(timerange)).then(() => {
+      if (submitOnPresetChange) {
+        submitForm();
+      }
+    });
   };
 
   const _onPresetSelectToggle = (open: boolean) => {
