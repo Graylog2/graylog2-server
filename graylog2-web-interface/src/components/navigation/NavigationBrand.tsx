@@ -17,7 +17,7 @@
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
 
-import { Sanitize } from 'components/common';
+import Sanitize from 'components/common/Sanitize';
 import { NAV_LOGO_HEIGHT, MAX_NAV_LOGO_WIDTH } from 'theme/constants';
 import useCustomLogo from 'brand-customization/useCustomLogo';
 
