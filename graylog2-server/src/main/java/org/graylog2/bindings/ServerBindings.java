@@ -46,6 +46,8 @@ import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.cluster.leader.FakeLeaderElectionModule;
 import org.graylog2.cluster.leader.LeaderElectionModule;
 import org.graylog2.cluster.lock.LockServiceModule;
+import org.graylog2.database.filtering.ComputedFieldProvider;
+import org.graylog2.database.filtering.ComputedFieldRegistry;
 import org.graylog2.grok.GrokModule;
 import org.graylog2.grok.GrokPatternRegistry;
 import org.graylog2.indexer.fieldtypes.FieldTypesModule;
@@ -53,11 +55,13 @@ import org.graylog2.indexer.healing.FixDeflectorByDeleteJob;
 import org.graylog2.indexer.healing.FixDeflectorByMoveJob;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
 import org.graylog2.inputs.InputEventListener;
+import org.graylog2.inputs.InputRuntimeStatusProvider;
 import org.graylog2.inputs.InputStateListener;
 import org.graylog2.inputs.PersistedInputsImpl;
 import org.graylog2.lookup.LookupModule;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterIdFactory;
+import org.graylog2.plugin.cluster.ClusterIdService;
 import org.graylog2.plugin.cluster.RandomUUIDClusterIdFactory;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.rest.ValidationFailureExceptionMapper;
@@ -189,6 +193,7 @@ public class ServerBindings extends Graylog2Module {
         bind(GracefulShutdown.class).in(Scopes.SINGLETON);
         bind(ClusterStatsModule.class).asEagerSingleton();
         bind(ClusterConfigService.class).to(ClusterConfigServiceImpl.class).asEagerSingleton();
+        bind(ClusterIdService.class).asEagerSingleton();
         bind(GrokPatternRegistry.class).in(Scopes.SINGLETON);
         bind(Engine.class).toProvider(DefaultJmteEngineProvider.class).asEagerSingleton();
         bind(Engine.class).annotatedWith(Names.named("HtmlSafe")).toProvider(HtmlSafeJmteEngineProvider.class).asEagerSingleton();
@@ -218,6 +223,10 @@ public class ServerBindings extends Graylog2Module {
         OptionalBinder.newOptionalBinder(binder(), TrafficUpdater.class).setDefault().to(TrafficCounterService.class).asEagerSingleton();
 
         Multibinder.newSetBinder(binder(), PluggableEntityHandler.class);
+
+        bind(ComputedFieldRegistry.class).in(Scopes.SINGLETON);
+        final Multibinder<ComputedFieldProvider> computedFieldProviders = Multibinder.newSetBinder(binder(), ComputedFieldProvider.class);
+        computedFieldProviders.addBinding().to(InputRuntimeStatusProvider.class);
     }
 
     private void bindDynamicFeatures() {

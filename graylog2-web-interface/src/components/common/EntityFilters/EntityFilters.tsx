@@ -48,6 +48,8 @@ type Props = {
   setUrlQueryFilters: (urlQueryFilters: UrlQueryFilters) => void;
   filterValueRenderers?: { [attributeId: string]: (value: Filter['value'], title: string) => React.ReactNode };
   appSection: string;
+  activeSliceCol?: string;
+  activeSlice?: string;
 };
 
 const EntityFilters = ({
@@ -56,6 +58,8 @@ const EntityFilters = ({
   urlQueryFilters,
   setUrlQueryFilters,
   appSection,
+  activeSliceCol = undefined,
+  activeSlice = undefined,
 }: Props) => {
   const sendTelemetry = useSendTelemetry();
 
@@ -158,6 +162,8 @@ const EntityFilters = ({
           onChangeFilter={onChangeFilter}
           onDeleteFilter={onDeleteFilter}
           filterValueRenderers={filterValueRenderers}
+          activeSliceCol={activeSliceCol}
+          activeSlice={activeSlice}
         />
       )}
     </>

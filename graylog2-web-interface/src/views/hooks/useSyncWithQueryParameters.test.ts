@@ -87,6 +87,14 @@ describe('SyncWithQueryParameters', () => {
       );
     });
 
+    it('preserves a saved-search URL query override and appends missing timerange params', () => {
+      asMock(useCurrentQuery).mockReturnValue(createQuery(lastFiveMinutes, [], 'new-query'));
+      renderHook(() => useSyncWithQueryParameters('/search/example-search-id?q=new-query'));
+
+      expect(history.replace).toHaveBeenCalledWith('/search/example-search-id?q=new-query&rangetype=relative&from=300');
+      expect(history.push).not.toHaveBeenCalled();
+    });
+
     it('if time range is relative with from and to', () => {
       asMock(useCurrentQuery).mockReturnValue(createQuery({ ...lastFiveMinutes, to: 240 }));
       renderHook(() => useSyncWithQueryParameters('/search'));

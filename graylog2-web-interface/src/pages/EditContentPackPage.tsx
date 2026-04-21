@@ -19,26 +19,27 @@ import { useEffect, useMemo, useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import groupBy from 'lodash/groupBy';
 
-import { LinkContainer } from 'components/common/router';
+import { SystemCatalog } from '@graylog/server-api';
+
+import { LinkContainer, DocumentTitle, PageHeader } from 'components/common';
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
-import { DocumentTitle, PageHeader } from 'components/common';
 import ValueReferenceData from 'util/ValueReferenceData';
 import ContentPackEdit from 'components/content-packs/ContentPackEdit';
 import Entity from 'logic/content-packs/Entity';
-import { CatalogActions, CatalogStore } from 'stores/content-packs/CatalogStore';
-import { ContentPacksActions, ContentPacksStore } from 'stores/content-packs/ContentPacksStore';
+import EntityIndex from 'logic/content-packs/EntityIndex';
+import { createContentPack } from 'hooks/useContentPackMutations';
 import useParams from 'routing/useParams';
 import useHistory from 'routing/useHistory';
-import { useStore } from 'stores/connect';
 import useProductName from 'brand-customization/useProductName';
+import useContentPackRevisions from 'components/content-packs/hooks/useContentPackRevisions';
 import MarketplaceLink from 'components/support/MarketplaceLink';
+import useEntityIndex from 'components/content-packs/hooks/useEntityIndex';
 
 const EditContentPackPage = () => {
-  useStore(ContentPacksStore);
   const productName = useProductName();
-  const { entityIndex } = useStore(CatalogStore);
+  const { entityIndex } = useEntityIndex();
   const { contentPackId, contentPackRev } = useParams<{ contentPackId: string; contentPackRev: string }>();
   const history = useHistory();
   const [selectedEntities, setSelectedEntities] = useState({});
@@ -46,18 +47,18 @@ const EditContentPackPage = () => {
   const [contentPack, setContentPack] = useState(undefined);
   const [contentPackEntities, setContentPackEntities] = useState(undefined);
   const [fetchedEntities, setFetchedEntities] = useState(undefined);
+  const { data: revisionData } = useContentPackRevisions(contentPackId);
 
   useEffect(() => {
-    ContentPacksActions.get(contentPackId).then((result) => {
-      const { contentPackRevisions } = result;
-      const newContentPack = contentPackRevisions.createNewVersionFromRev(contentPackRev);
+    if (!revisionData) return;
 
-      setContentPack(newContentPack);
-      setContentPackEntities(cloneDeep(newContentPack.entities));
+    const { contentPackRevisions } = revisionData;
+    const newContentPack = contentPackRevisions.createNewVersionFromRev(contentPackRev);
 
-      CatalogActions.showEntityIndex();
-    });
-  }, [contentPackId, contentPackRev]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setContentPack(newContentPack);
+    setContentPackEntities(cloneDeep(newContentPack.entities));
+  }, [revisionData, contentPackRev]);
 
   const entityCatalog = useMemo(() => {
     if (!contentPack || !entityIndex) {
@@ -95,6 +96,7 @@ const EditContentPackPage = () => {
       return result;
     }, {});
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedEntities(newSelectedEntities);
   }, [contentPack, entityCatalog, entityIndex]);
 
@@ -119,6 +121,7 @@ const EditContentPackPage = () => {
       return newResult;
     }, {});
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setAppliedParameter(newAppliedParameter);
   }, [contentPack]);
 
@@ -129,7 +132,7 @@ const EditContentPackPage = () => {
   };
 
   const _onSave = () => {
-    ContentPacksActions.create(contentPack.toJSON()).then(
+    createContentPack(contentPack.toJSON()).then(
       () => {
         UserNotification.success('Content pack imported successfully', 'Success!');
         history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
@@ -151,7 +154,12 @@ const EditContentPackPage = () => {
   };
 
   const _getEntities = (newSelectedEntities) => {
-    CatalogActions.getSelectedEntities(newSelectedEntities).then((result) => {
+    const payload = Object.keys(newSelectedEntities)
+      .reduce((acc, entityType) => acc.concat(newSelectedEntities[entityType]), [])
+      .filter((e) => e instanceof EntityIndex)
+      .map((entity) => entity.toJSON());
+
+    SystemCatalog.resolveEntities({ entities: payload as any }).then((result: any) => {
       const selectedContentPackEntities = Object.keys(newSelectedEntities)
         .reduce((acc, entityType) => acc.concat(newSelectedEntities[entityType]), [])
         .filter((e) => e instanceof Entity);

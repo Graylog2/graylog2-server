@@ -38,7 +38,13 @@ public class DbQueryCreator {
 
     public DbQueryCreator(final String defaultField,
                           final List<EntityAttribute> attributes) {
-        this.dbFilterParser = new DbFilterExpressionParser();
+        this(defaultField, attributes, null);
+    }
+
+    public DbQueryCreator(final String defaultField,
+                          final List<EntityAttribute> attributes,
+                          final ComputedFieldRegistry computedFieldRegistry) {
+        this.dbFilterParser = new DbFilterExpressionParser(computedFieldRegistry);
         this.attributes = attributes;
         this.searchQueryParser = new SearchQueryParser(defaultField, attributes);
     }
@@ -52,9 +58,13 @@ public class DbQueryCreator {
     }
 
     public Bson createDbQuery(final List<String> filters, final String query) {
+        return createDbQuery(filters, query, null);
+    }
+
+    public Bson createDbQuery(final List<String> filters, final String query, final String authToken) {
         try {
             final var searchQuery = searchQueryParser.parse(query);
-            final var filterExpressionFilters = dbFilterParser.parse(filters, attributes);
+            final var filterExpressionFilters = dbFilterParser.parse(filters, attributes, authToken);
             return buildDbQuery(searchQuery, filterExpressionFilters);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());

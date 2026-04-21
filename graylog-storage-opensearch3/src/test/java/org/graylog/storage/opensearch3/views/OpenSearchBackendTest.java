@@ -39,7 +39,6 @@ import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
-import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.graylog.storage.opensearch3.views.searchtypes.OSMessageList;
 import org.graylog.storage.opensearch3.views.searchtypes.OSSearchTypeHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.EffectiveTimeRangeExtractor;
@@ -79,7 +78,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class OpenSearchBackendTest {
-    private final OSSerializationUtils serializationUtils = new OSSerializationUtils();
     private OpenSearchBackend backend;
     private UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper;
 
@@ -90,7 +88,7 @@ public class OpenSearchBackendTest {
     public void setup() {
         Map<String, Provider<OSSearchTypeHandler<? extends SearchType>>> handlers = Maps.newHashMap();
         handlers.put(MessageList.NAME, () -> new OSMessageList(new LegacyDecoratorProcessor.Fake(),
-                new TestResultMessageFactory(), false, serializationUtils));
+                new TestResultMessageFactory(), false));
         handlers.put(Pivot.NAME, () -> new OSPivot(Map.of(Time.NAME, new OSTimeHandler()), Map.of(), new EffectiveTimeRangeExtractor()));
 
         usedSearchFiltersToQueryStringsMapper = mock(UsedSearchFiltersToQueryStringsMapper.class);
@@ -103,7 +101,7 @@ public class OpenSearchBackendTest {
                 new NoOpStatsCollector<>(),
                 mock(StreamService.class),
                 false,
-                1, 1, serializationUtils);
+                1, 1);
     }
 
     @Test

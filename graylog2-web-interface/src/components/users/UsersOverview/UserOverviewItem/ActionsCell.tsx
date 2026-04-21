@@ -18,12 +18,11 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import useCurrentUser from 'hooks/useCurrentUser';
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, OverlayTrigger, IfPermitted } from 'components/common';
 import type UserOverview from 'logic/users/UserOverview';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import Routes from 'routing/Routes';
 import { Button, MenuItem, ButtonToolbar, DeleteMenuItem } from 'components/bootstrap';
-import { OverlayTrigger, IfPermitted } from 'components/common';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { MoreActions } from 'components/common/EntityDataTable';

@@ -133,12 +133,12 @@ public class CloudTrailTransportTest {
         given(mockExecutorService.scheduleWithFixedDelay(any(Runnable.class), anyLong(), anyLong(), any(TimeUnit.class)))
                 .willReturn(mockRunningTask);
 
-        given(clientUtils.createCredentialsProvider(any()))
+        given(clientUtils.createCredentialsProviderWithStsProxy(any()))
                 .willReturn(mock(AwsCredentialsProvider.class));
     }
 
     private void thenAwsClientBuilderUtilsCalled() {
-        verify(clientUtils, times(1)).createCredentialsProvider(any());
+        verify(clientUtils, times(1)).createCredentialsProviderWithStsProxy(any());
     }
 
     // WHENs

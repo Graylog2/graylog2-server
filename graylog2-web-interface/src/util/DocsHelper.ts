@@ -66,6 +66,7 @@ const defaultPages = {
   SECURITY_EVENTS: 'what_more_can_graylog_do_for_me/security_events.htm',
   SECURITY_INVESTIGATIONS: 'what_more_can_graylog_do_for_me/investigations.htm',
   SECURITY_SIGMA_RULES: 'what_more_can_graylog_do_for_me/sigma_rules.htm',
+  SECURITY_THREAT_COVERAGE: 'what_more_can_graylog_do_for_me/threat_coverage_widget.htm',
   SECURITY_VULNERABILITY_SCANNING: 'what_more_can_graylog_do_for_me/vulnerability_scanning.htm',
   STREAMS: 'making_sense_of_your_log_data/streams.html',
   STREAM_PROCESSING_RUNTIME_LIMITS: 'making_sense_of_your_log_data/stream_processing.htm#StreamProcessingRuntimeLimits',
@@ -78,7 +79,7 @@ const defaultPages = {
   DATA_TIERING: 'setting_up_graylog/data_tiering.htm',
   DATA_TIERING_WARM_TIER_SETUP: 'setting_up_graylog/data_tiering.htm#PrepareYourEnvironmentforaWarmTier',
   SERVER_UNAVAILABLE: 'https://www.graylog.org/community-support',
-  MCP_SERVER: 'setting_up_graylog/graylog_mcp.htm',
+  MCP_SERVER: 'setting_up_graylog/model_context_protocol__mcp__tools.htm',
 } as const;
 
 type Pages = Record<keyof typeof defaultPages, string>;

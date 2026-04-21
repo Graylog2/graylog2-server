@@ -37,7 +37,7 @@ import static org.graylog2.plugin.streams.Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID
 
 abstract class AbstractEventsSearchService {
     private final DBEventDefinitionService eventDefinitionService;
-    private final StreamService streamService;
+    protected final StreamService streamService;
     private final ObjectMapper objectMapper;
 
     protected AbstractEventsSearchService(DBEventDefinitionService eventDefinitionService,
@@ -120,5 +120,20 @@ abstract class AbstractEventsSearchService {
 
     protected Set<String> defaultEventStreams() {
         return Set.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID);
+    }
+
+    protected String buildFilter(EventsSearchParameters parameters) {
+        return new EventsFilterBuilder(parameters).build();
+    }
+
+    protected Set<String> allowedEventStreams(Subject subject) {
+        final var eventStreams = defaultEventStreams();
+        if (subject.isPermitted(RestPermissions.STREAMS_READ)) {
+            return eventStreams;
+        }
+
+        return eventStreams.stream()
+                .filter(streamId -> subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId)) || streamId.equals(DEFAULT_EVENTS_STREAM_ID))
+                .collect(Collectors.toSet());
     }
 }

@@ -16,11 +16,13 @@
  */
 package org.graylog2.search;
 
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog2.utilities.date.MultiFormatDateParser;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 public class SearchQueryField {
@@ -49,20 +51,31 @@ public class SearchQueryField {
         }
     }
 
+    @FunctionalInterface
+    public interface BsonFilterCreator {
+        Bson createFilter(String fieldName, SearchQueryParser.FieldValue value);
+    }
+
     private final String dbField;
     private final Type fieldType;
+    private final BsonFilterCreator bsonFilterCreator;
 
     public static SearchQueryField create(String dbField) {
-        return new SearchQueryField(dbField, Type.STRING);
+        return new SearchQueryField(dbField, Type.STRING, null);
     }
 
     public static SearchQueryField create(String dbField, Type fieldType) {
-        return new SearchQueryField(dbField, fieldType != null ? fieldType : Type.STRING);
+        return new SearchQueryField(dbField, fieldType != null ? fieldType : Type.STRING, null);
     }
 
-    SearchQueryField(String dbField, Type fieldType) {
+    public static SearchQueryField create(String dbField, Type fieldType, BsonFilterCreator bsonFilterCreator) {
+        return new SearchQueryField(dbField, fieldType != null ? fieldType : Type.STRING, bsonFilterCreator);
+    }
+
+    SearchQueryField(String dbField, Type fieldType, BsonFilterCreator bsonFilterCreator) {
         this.dbField = dbField;
         this.fieldType = fieldType;
+        this.bsonFilterCreator = bsonFilterCreator;
     }
 
     public String getDbField() {
@@ -71,5 +84,9 @@ public class SearchQueryField {
 
     public Type getFieldType() {
         return fieldType;
+    }
+
+    public Optional<BsonFilterCreator> getBsonFilterCreator() {
+        return Optional.ofNullable(bsonFilterCreator);
     }
 }

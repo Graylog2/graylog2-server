@@ -16,9 +16,8 @@
  */
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
-import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Latest;
-import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
+import org.graylog.storage.opensearch3.OSSerializationUtils;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
 import org.opensearch.client.opensearch._types.SortOrder;
@@ -34,13 +33,6 @@ import java.util.Optional;
 
 public class OSLatestHandler extends OSBasicSeriesSpecHandler<Latest> {
     private static final String AGG_NAME = "latest_aggregation";
-
-    private final OSSerializationUtils serializationUtils;
-
-    @Inject
-    public OSLatestHandler(OSSerializationUtils serializationUtils) {
-        this.serializationUtils = serializationUtils;
-    }
 
     @Override
     protected SeriesAggregationBuilder createAggregationBuilder(final String name, final Latest latestSpec) {
@@ -72,7 +64,7 @@ public class OSLatestHandler extends OSBasicSeriesSpecHandler<Latest> {
                 .filter(hits -> !hits.isEmpty())
                 .stream().findFirst()
                 .map(List::getFirst)
-                .map(hit -> serializationUtils.toMap(hit.source()))
+                .map(hit -> OSSerializationUtils.toMap(hit.source()))
                 .map(source -> source.get(seriesSpec.field()))
                 .orElse(null);
     }

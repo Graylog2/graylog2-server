@@ -17,9 +17,8 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import { LinkContainer, Link } from 'components/common/router';
+import { LinkContainer, Link, RelativeTime, OverlayTrigger, CountBadge, Spinner } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
-import { RelativeTime, OverlayTrigger, CountBadge, Spinner } from 'components/common';
 import { Button, ButtonToolbar, Label } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import type { RuleType, PipelineSummary } from 'stores/rules/RulesStore';

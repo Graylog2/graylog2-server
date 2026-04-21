@@ -24,8 +24,7 @@ import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldT
 import { fetchIndexSetFieldTypeProfiles, keyFn } from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfiles';
 import useCustomColumnRenderers from 'components/indices/IndexSetFieldTypeProfiles/helpers/useCustomColumnRenderers';
 import profileActions from 'components/indices/IndexSetFieldTypeProfiles/helpers/profileActions';
-import { useStore } from 'stores/connect';
-import { IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 import ExpandedCustomFieldTypes from 'components/indices/IndexSetFieldTypeProfiles/ExpandedCustomFieldTypes';
 
 export const DEFAULT_LAYOUT = {
@@ -46,7 +45,9 @@ const expandedSections = {
 };
 
 const ProfilesList = () => {
-  const { indexSets } = useStore(IndexSetsStore);
+  const {
+    data: { indexSets },
+  } = useIndexSetsList(false);
   const normalizedIndexSetsTitles = useMemo(() => mapValues(keyBy(indexSets, 'id'), 'title'), [indexSets]);
   const customColumnRenderers = useCustomColumnRenderers(normalizedIndexSetsTitles);
 

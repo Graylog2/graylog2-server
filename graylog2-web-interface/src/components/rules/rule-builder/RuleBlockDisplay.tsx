@@ -142,7 +142,7 @@ const RuleBlockDisplay = ({
 
     const partsWithHighlight = parts.map((part) => {
       if (part === `'$${termToHighlight}'`) {
-        return <Highlighted>{part}</Highlighted>;
+        return <Highlighted key={part}>{part}</Highlighted>;
       }
 
       return part;

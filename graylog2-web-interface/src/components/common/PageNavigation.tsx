@@ -33,6 +33,7 @@ type PageNavItem = {
   exactPathMatch?: boolean;
   useCondition?: () => boolean;
   position?: PluginNavigation['position'];
+  BadgeComponent?: React.ComponentType<{ text: string }>;
 };
 
 const usePageNavigationItems = (page: string, items: Array<PageNavItem>) => {

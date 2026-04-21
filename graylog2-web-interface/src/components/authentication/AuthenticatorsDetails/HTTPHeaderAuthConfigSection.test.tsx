@@ -18,24 +18,22 @@ import React from 'react';
 import { render, screen, act } from 'wrappedTestingLibrary';
 
 import HTTPHeaderAuthConfig from 'logic/authentication/HTTPHeaderAuthConfig';
-import { HTTPHeaderAuthConfigActions } from 'stores/authentication/HTTPHeaderAuthConfigStore';
 import asMock from 'helpers/mocking/AsMock';
+import HTTPHeaderAuthConfigDomain from 'domainActions/authentication/HTTPHeaderAuthConfigDomain';
 
 import HTTPHeaderAuthConfigSection from './HTTPHeaderAuthConfigSection';
 
 const mockHTTPHeaderAuthConfig = HTTPHeaderAuthConfig.builder().usernameHeader('Remote-User').enabled(true).build();
 
-jest.mock('stores/authentication/HTTPHeaderAuthConfigStore', () => ({
-  HTTPHeaderAuthConfigActions: {
-    load: jest.fn(),
-  },
+jest.mock('domainActions/authentication/HTTPHeaderAuthConfigDomain', () => ({
+  load: jest.fn(),
 }));
 
 describe('<HTTPHeaderAuthConfigSection />', () => {
   afterEach(() => jest.useRealTimers());
 
   it('should display loading indicator while loading', async () => {
-    asMock(HTTPHeaderAuthConfigActions.load).mockImplementation(() => new Promise(() => {}));
+    asMock(HTTPHeaderAuthConfigDomain.load).mockImplementation(() => new Promise(() => {}));
     jest.useFakeTimers();
     render(<HTTPHeaderAuthConfigSection />);
 
@@ -47,7 +45,7 @@ describe('<HTTPHeaderAuthConfigSection />', () => {
   });
 
   it('should load and display HTTP header auth config details', async () => {
-    asMock(HTTPHeaderAuthConfigActions.load).mockResolvedValue(mockHTTPHeaderAuthConfig);
+    asMock(HTTPHeaderAuthConfigDomain.load).mockResolvedValue(mockHTTPHeaderAuthConfig);
 
     render(<HTTPHeaderAuthConfigSection />);
 

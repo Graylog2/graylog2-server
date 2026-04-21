@@ -298,7 +298,7 @@ describe('IndexSetConfigurationForm', () => {
       const titleInput = await screen.findByRole('textbox', { name: /title/i });
       const prefixInput = await screen.findByRole('textbox', { name: /index prefix/i });
 
-      userEvent.type(titleInput, 'My Index');
+      await userEvent.type(titleInput, 'My Index');
 
       await waitFor(() => {
         expect(prefixInput).toHaveValue('my-index');
@@ -311,17 +311,17 @@ describe('IndexSetConfigurationForm', () => {
       const titleInput = await screen.findByRole('textbox', { name: /title/i });
       const prefixInput = await screen.findByRole('textbox', { name: /index prefix/i });
 
-      userEvent.type(titleInput, 'My Index');
+      await userEvent.type(titleInput, 'My Index');
 
       await waitFor(() => {
         expect(prefixInput).toHaveValue('my-index');
       });
 
-      userEvent.clear(prefixInput);
-      userEvent.type(prefixInput, 'custom-prefix');
+      await userEvent.clear(prefixInput);
+      await userEvent.type(prefixInput, 'custom-prefix');
 
       // Change the title again - autofill should be disabled now
-      userEvent.type(titleInput, ' Updated');
+      await userEvent.type(titleInput, ' Updated');
 
       // Prefix should remain as the manually modified value
       await waitFor(() => {
@@ -336,21 +336,21 @@ describe('IndexSetConfigurationForm', () => {
       const prefixInput = await screen.findByRole('textbox', { name: /index prefix/i });
 
       // Type title which autofills the prefix
-      userEvent.type(titleInput, 'My Index');
+      await userEvent.type(titleInput, 'My Index');
 
       await waitFor(() => {
         expect(prefixInput).toHaveValue('my-index');
       });
 
       // Now append to the autofilled prefix without clearing
-      userEvent.type(prefixInput, '-suffix');
+      await userEvent.type(prefixInput, '-suffix');
 
       await waitFor(() => {
         expect(prefixInput).toHaveValue('my-index-suffix');
       });
 
       // Change the title again - autofill should be disabled now
-      userEvent.type(titleInput, ' Updated');
+      await userEvent.type(titleInput, ' Updated');
 
       // Prefix should remain as the manually modified value
       await waitFor(() => {
@@ -364,8 +364,8 @@ describe('IndexSetConfigurationForm', () => {
       const titleInput = await screen.findByRole('textbox', { name: /title/i });
 
       // Clear existing title and type new one
-      userEvent.clear(titleInput);
-      userEvent.type(titleInput, 'New Title');
+      await userEvent.clear(titleInput);
+      await userEvent.type(titleInput, 'New Title');
 
       // Prefix field should not exist in edit mode (it's read-only after creation)
       await waitFor(() => {

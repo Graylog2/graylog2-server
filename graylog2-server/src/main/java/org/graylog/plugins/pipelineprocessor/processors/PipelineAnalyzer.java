@@ -88,13 +88,11 @@ public class PipelineAnalyzer {
             PipelineResolver resolver,
             List<PipelineRulesMetadataDao> ruleRecords) {
         final ImmutableMap<String, Pipeline> pipelines = resolver.resolvePipelines(pipelineMetricRegistry);
-        final ImmutableMap<String, Pipeline> functions = resolver.resolveFunctions(pipelines.values(), pipelineMetricRegistry);
-        return analyzePipelines(pipelines, functions, ruleRecords);
+        return analyzePipelines(pipelines, ruleRecords);
     }
 
     public Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> analyzePipelines(
             ImmutableMap<String, Pipeline> pipelines,
-            ImmutableMap<String, Pipeline> functions,
             List<PipelineRulesMetadataDao> ruleRecords) {
         final Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions = new HashMap<>();
 
@@ -112,7 +110,7 @@ public class PipelineAnalyzer {
                     .map(PipelineConnections::streamId)
                     .collect(Collectors.toSet());
 
-            Set<Stage> stages = functions.get(pipeline.id()).stages();
+            Set<Stage> stages = pipeline.stages();
             if (stages != null) {
                 for (Stage stage : stages) {
                     List<Rule> stageRules = stage.getRules();

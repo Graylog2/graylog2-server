@@ -20,7 +20,6 @@ import { render, screen, within } from 'wrappedTestingLibrary';
 import { StreamRoutingRules } from '@graylog/server-api';
 
 import type { Attribute } from 'stores/PaginationTypes';
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 import { createStreamFixture } from 'components/streams/fixtures';
 import { asMock } from 'helpers/mocking';
 import StreamConnectedPipelines from 'components/streams/StreamDetails/StreamDataRoutingIntake/StreamConnectedPipelines';
@@ -49,6 +48,7 @@ const listResponse = {
       pipeline: 'Pipeline 1',
       rule_id: 'rule-id-1',
       rule: 'Rule 1',
+      stage: 1,
       connected_streams: [
         {
           id: 'stream-id-1',
@@ -71,6 +71,9 @@ const listResponse = {
       hidden: true,
       related_property: '',
       related_collection: '',
+      related_identifier: '',
+      related_display_fields: [],
+      related_display_template: '',
       filterable: false,
       filter_options: [],
     },
@@ -82,6 +85,9 @@ const listResponse = {
       searchable: false,
       related_property: '',
       related_collection: '',
+      related_identifier: '',
+      related_display_fields: [],
+      related_display_template: '',
       filterable: false,
       filter_options: [],
       hidden: false,
@@ -94,6 +100,9 @@ const listResponse = {
       searchable: false,
       related_property: '',
       related_collection: '',
+      related_identifier: '',
+      related_display_fields: [],
+      related_display_template: '',
       filterable: false,
       filter_options: [],
       hidden: false,
@@ -107,6 +116,9 @@ const listResponse = {
       hidden: true,
       related_property: '',
       related_collection: '',
+      related_identifier: '',
+      related_display_fields: [],
+      related_display_template: '',
       filterable: false,
       filter_options: [],
     },
@@ -118,6 +130,9 @@ const listResponse = {
       searchable: false,
       related_property: '',
       related_collection: '',
+      related_identifier: '',
+      related_display_fields: [],
+      related_display_template: '',
       filterable: false,
       filter_options: [],
       hidden: false,
@@ -130,6 +145,9 @@ const listResponse = {
       searchable: false,
       related_property: '',
       related_collection: '',
+      related_identifier: '',
+      related_display_fields: [],
+      related_display_template: '',
       filterable: false,
       filter_options: [],
       hidden: false,
@@ -143,12 +161,7 @@ const listResponse = {
   },
 };
 
-const renderList = () =>
-  render(
-    <DefaultQueryParamProvider>
-      <StreamConnectedPipelines stream={createStreamFixture('1')} />
-    </DefaultQueryParamProvider>,
-  );
+const renderList = () => render(<StreamConnectedPipelines stream={createStreamFixture('1')} />);
 
 describe('<StreamConnectedPipelines />', () => {
   beforeEach(() => {

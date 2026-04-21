@@ -20,7 +20,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import type View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
-import { Link } from 'components/common/router';
+import { Link } from 'components/common';
 import Routes from 'routing/Routes';
 import FavoriteIcon from 'views/components/FavoriteIcon';
 import { createGRN } from 'logic/permissions/GRN';

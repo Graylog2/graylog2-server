@@ -1,0 +1,4 @@
+type = "a"
+message = "Changing delimiter char for decorators in ScriptingApi from '.' to '#' to avoid parsing problems when querying a nested field."
+
+pulls = ["25155"]

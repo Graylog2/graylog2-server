@@ -19,7 +19,7 @@ import * as React from 'react';
 
 import { Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer } from 'components/common';
 
 const CreateProfileButton = () => (
   <LinkContainer to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.CREATE}>

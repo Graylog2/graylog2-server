@@ -22,10 +22,39 @@ import org.graylog2.plugin.database.Persisted;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
+import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 public interface Notification extends Persisted {
+
+    /**
+     * Notification types that are not actionable by cloud users and should be
+     * suppressed from the UI listing in cloud installations ({@code is_cloud=true}).
+     * These notifications will still be persisted and will still generate system events.
+     */
+    Set<Type> CLOUD_SUPPRESSED_TYPES = Set.copyOf(EnumSet.of(
+            Type.DATA_NODE_NEEDS_PROVISIONING,
+            Type.DEFLECTOR_EXISTS_AS_INDEX,
+            Type.ES_OPEN_FILES,
+            Type.ES_CLUSTER_RED,
+            Type.ES_UNAVAILABLE,
+            Type.CHECK_SERVER_CLOCKS,
+            Type.EMAIL_TRANSPORT_FAILED,
+            Type.INDEX_RANGES_RECALCULATION,
+            Type.ES_INDEX_BLOCKED,
+            Type.ES_NODE_DISK_WATERMARK_LOW,
+            Type.ES_NODE_DISK_WATERMARK_HIGH,
+            Type.ES_NODE_DISK_WATERMARK_FLOOD_STAGE,
+            Type.ES_SHARD_ALLOCATION_MAXIMUM,
+            Type.ES_VERSION_MISMATCH,
+            Type.MULTI_LEADER,
+            Type.NO_LEADER,
+            Type.DATA_NODE_VERSION_MISMATCH,
+            Type.DATA_NODE_HEAP_WARNING
+    ));
+
     Notification addType(Type type);
 
     Notification addKey(String key);

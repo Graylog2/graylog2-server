@@ -19,7 +19,7 @@ import styled from 'styled-components';
 
 import PageHeader from 'components/common/PageHeader';
 import SectionComponent from 'components/common/Section/SectionComponent';
-import { Link } from 'components/common/router';
+import { Link } from 'components/common';
 import Routes from 'routing/Routes';
 import type { StartPage } from 'logic/users/User';
 import ContentStreamContainer from 'components/content-stream/ContentStreamContainer';

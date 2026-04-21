@@ -15,15 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
 import ProgressBar from 'components/common/ProgressBar';
 import { Spinner } from 'components/common';
 import NumberUtils from 'util/NumberUtils';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
-import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
-import { useStore } from 'stores/connect';
+import { useNodeMetrics } from 'hooks/useMetrics';
 
 const NodeHeap = styled.div`
   margin-top: 10px;
@@ -72,22 +71,14 @@ const metricNames = {
   maxMemory: 'jvm.memory.heap.max',
 };
 
+const metricValues = Object.values(metricNames);
+
 const JvmHeapUsage = ({ nodeId }: Props) => {
-  const { metrics } = useStore(MetricsStore);
-
-  useEffect(() => {
-    Object.keys(metricNames).forEach((metricShortName) => MetricsActions.add(nodeId, metricNames[metricShortName]));
-
-    return () => {
-      Object.keys(metricNames).forEach((metricShortName) =>
-        MetricsActions.remove(nodeId, metricNames[metricShortName]),
-      );
-    };
-  }, [nodeId]);
+  const { data: nodeMetrics } = useNodeMetrics(nodeId, metricValues);
 
   const extractedMetrics = useMemo(() => {
-    if (metrics?.[nodeId]) {
-      const extractedMetric = MetricsExtractor.getValuesForNode(metrics[nodeId], metricNames);
+    if (nodeMetrics) {
+      const extractedMetric = MetricsExtractor.getValuesForNode(nodeMetrics, metricNames);
       const { maxMemory, usedMemory, committedMemory } = extractedMetric;
 
       if (maxMemory) {
@@ -104,7 +95,7 @@ const JvmHeapUsage = ({ nodeId }: Props) => {
     }
 
     return {};
-  }, [metrics, nodeId]);
+  }, [nodeMetrics]);
 
   const { usedPercentage, committedPercentage, usedMemory, committedMemory, maxMemory } = extractedMetrics;
   let progressBarConfig: Array<{ value: number; bsStyle?: 'primary' | 'warning' }> = [{ value: 0 }];

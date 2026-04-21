@@ -41,9 +41,9 @@ import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
+import org.graylog.storage.opensearch3.OSSerializationUtils;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog.storage.opensearch3.TimeRangeQueryFactory;
-import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.graylog.storage.opensearch3.views.searchtypes.OSSearchTypeHandler;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
@@ -56,6 +56,7 @@ import org.graylog2.streams.StreamService;
 import org.joda.time.DateTimeZone;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch._types.ErrorCause;
+import org.opensearch.client.opensearch._types.ErrorResponse;
 import org.opensearch.client.opensearch._types.ExpandWildcard;
 import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.OpenSearchException;
@@ -105,7 +106,6 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
     private final StreamService streamService;
     private final Optional<Integer> indexerMaxConcurrentSearches;
     private final Optional<Integer> indexerMaxConcurrentShardRequests;
-    private final OSSerializationUtils osSerializationUtils;
 
     @Inject
     public OpenSearchBackend(Map<String, Provider<OSSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
@@ -117,8 +117,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                              StreamService streamService,
                              @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard,
                              @Named("indexer_max_concurrent_searches") @Nullable Integer indexerMaxConcurrentSearches,
-                             @Named("indexer_max_concurrent_shard_requests") @Nullable Integer indexerMaxConcurrentShardRequests,
-                             OSSerializationUtils osSerializationUtils) {
+                             @Named("indexer_max_concurrent_shard_requests") @Nullable Integer indexerMaxConcurrentShardRequests) {
         this.openSearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
         this.client = client;
         this.indexLookup = indexLookup;
@@ -128,7 +127,6 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
         this.executionStatsCollector = executionStatsCollector;
         this.streamService = streamService;
         this.allowLeadingWildcard = allowLeadingWildcard;
-        this.osSerializationUtils = osSerializationUtils;
         this.indexerMaxConcurrentSearches = Optional.ofNullable(indexerMaxConcurrentSearches);
         this.indexerMaxConcurrentShardRequests = Optional.ofNullable(indexerMaxConcurrentShardRequests);
     }
@@ -341,7 +339,14 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
             final int searchTypeIndex = searchTypeIds.indexOf(searchTypeId);
             final MultiSearchResponseItem<JsonData> multiSearchResponse = results.get(searchTypeIndex);
             if (multiSearchResponse.isFailure()) {
-                ElasticsearchException e = new ElasticsearchException("Search type returned error: " + multiSearchResponse.failure().error().reason());
+                String errorResponse = multiSearchResponse.failure().toJsonString();
+                OpenSearchException failure = new OpenSearchException(OSSerializationUtils.fromJson(errorResponse, ErrorResponse._DESERIALIZER));
+                String msg = Optional.ofNullable(failure.error())
+                        .map(ErrorCause::rootCause)
+                        .map(List::getFirst)
+                        .map(rootCause -> f("%s - %s", rootCause.type(), rootCause.reason()))
+                        .orElse(failure.getMessage());
+                ElasticsearchException e = new ElasticsearchException("Search type returned error: " + msg);
                 queryContext.addError(SearchTypeErrorParser.parse(query, searchTypeId, e));
             } else {
                 Optional<ElasticsearchException> failedShards = checkForFailedShards(multiSearchResponse);
@@ -379,7 +384,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                                 builder.maxConcurrentShardRequests(maxShardRequests.longValue()));
                         return builder.build();
                     })
-                    .map(osSerializationUtils::toMsearch)
+                    .map(OSSerializationUtils::toMsearch)
                     .toList();
 
             MsearchRequest.Builder request = new MsearchRequest.Builder();

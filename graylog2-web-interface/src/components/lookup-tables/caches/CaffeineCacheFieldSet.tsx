@@ -32,6 +32,7 @@ const CaffeineCacheFieldSet = ({ config }: Props, ref: any) => {
     useFormikContext();
   const [stateConfig, setStateConfig] = useState<LookupTableCacheConfig>({ ...config });
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setStateConfig({ ...config }), [config]);
 
   const validateConfig = () => {
@@ -50,7 +51,7 @@ const CaffeineCacheFieldSet = ({ config }: Props, ref: any) => {
   const handleIgnoreNullChange = (event) => {
     const ignoreValue = getValueFromInput(event.target);
 
-    const valConfig = { ...values.config, ignore_null: ignoreValue };
+    const valConfig = { ...values.config, ignore_null: ignoreValue as boolean };
     setStateConfig(valConfig);
     setValues({ ...values, config: valConfig });
   };

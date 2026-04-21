@@ -56,3 +56,19 @@ type TrendOptions = {
 };
 export const formatTrend = (num: number, options: TrendOptions = {}) =>
   (options.percentage === true ? formatPercentage : formatNumber)(num, { signDisplay: 'exceptZero' });
+
+const defaultReadableNumberOptions = {
+  compactDisplay: 'short',
+  maximumFractionDigits: desiredFractionDigits,
+  notation: 'compact',
+} as const;
+
+export const formatReadableNumber = (num: number) => {
+  if (Math.abs(num) < 1000) {
+    return new Intl.NumberFormat('en', {
+      maximumFractionDigits: fractionDigitsFor(num, desiredFractionDigits),
+    }).format(num);
+  }
+
+  return new Intl.NumberFormat('en', defaultReadableNumberOptions).format(num).toLowerCase();
+};

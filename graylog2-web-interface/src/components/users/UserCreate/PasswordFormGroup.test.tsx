@@ -16,8 +16,8 @@
  */
 import React from 'react';
 import { Formik, Form } from 'formik';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
-import { render, screen, waitFor, act } from 'wrappedTestingLibrary';
 
 import type { PasswordComplexityConfigType } from 'stores/configurations/ConfigurationsStore';
 import { PASSWORD_SPECIAL_CHARACTERS } from 'logic/users/passwordComplexity';
@@ -60,10 +60,7 @@ describe('<PasswordFormGroup />', () => {
 
     const passwordInput = screen.getByPlaceholderText('Password');
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      await userEvent.type(passwordInput, 'Abcdef1!');
-    });
+    await userEvent.type(passwordInput, 'Abcdef1!');
 
     await waitFor(() => {
       expect(
@@ -76,11 +73,9 @@ describe('<PasswordFormGroup />', () => {
     renderPasswordFormGroup();
 
     const passwordInput = screen.getByPlaceholderText('Password');
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      await userEvent.type(passwordInput, 'abc');
-      await userEvent.tab();
-    });
+
+    await userEvent.type(passwordInput, 'abc');
+    await userEvent.tab();
 
     expect(screen.getByText('Password must be at least 8 characters long.', { exact: false })).toBeInTheDocument();
     expect(

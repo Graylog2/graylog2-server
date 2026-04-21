@@ -16,7 +16,7 @@
  */
 package org.graylog.storage.opensearch3.indextemplates;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.graylog.storage.opensearch3.OSSerializationUtils;
 import org.junit.jupiter.api.Test;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;
@@ -100,16 +100,9 @@ class OSSerializationUtilsTest {
             Map.of("enabled", true));
 
 
-    private OSSerializationUtils toTest;
-
-    @BeforeEach
-    void setUp() {
-        toTest = new OSSerializationUtils();
-    }
-
     @Test
     void testFromMapOnTypeMappingClass() throws Exception {
-        final TypeMapping result = toTest.fromMap(
+        final TypeMapping result = OSSerializationUtils.fromMap(
                 TEST_TYPE_MAPPING_IN_MAP_FORMAT,
                 TypeMapping._DESERIALIZER);
         assertEquals(TEST_TYPE_MAPPING, result);
@@ -117,13 +110,13 @@ class OSSerializationUtilsTest {
 
     @Test
     void testToMapOnTypeMappingClass() throws Exception {
-        final Map<String, Object> result = toTest.toMap(TEST_TYPE_MAPPING);
+        final Map<String, Object> result = OSSerializationUtils.toMap(TEST_TYPE_MAPPING);
         assertEquals(TEST_TYPE_MAPPING_IN_MAP_FORMAT, result);
     }
 
     @Test
     void testToMapOnJsonData() throws Exception {
-        final Map<String, Object> result = toTest.toMap(JsonData.of(TEST_TYPE_MAPPING, new JacksonJsonpMapper()));
+        final Map<String, Object> result = OSSerializationUtils.toMap(JsonData.of(TEST_TYPE_MAPPING, new JacksonJsonpMapper()));
         assertEquals(TEST_TYPE_MAPPING_IN_MAP_FORMAT, result);
     }
 
@@ -139,7 +132,7 @@ class OSSerializationUtilsTest {
                         .build())
                 .build();
         final String json = expected.toJsonString();
-        final ErrorResponse errorResponse = toTest.fromJson(json, ErrorResponse._DESERIALIZER);
+        final ErrorResponse errorResponse = OSSerializationUtils.fromJson(json, ErrorResponse._DESERIALIZER);
         assertEquals(expected.status(), errorResponse.status());
         assertEquals(expected.error().type(), errorResponse.error().type());
         assertEquals(expected.error().reason(), errorResponse.error().reason());
@@ -148,8 +141,8 @@ class OSSerializationUtilsTest {
 
     @Test
     void testToJsonMap() {
-        assertEquals(Map.of(), toTest.toJsonDataMap(Map.of()));
-        final Map<String, JsonData> converted = toTest.toJsonDataMap(Map.of("the_number", 42));
+        assertEquals(Map.of(), OSSerializationUtils.toJsonDataMap(Map.of()));
+        final Map<String, JsonData> converted = OSSerializationUtils.toJsonDataMap(Map.of("the_number", 42));
 
         //JsonDataImpl does not implement equals(), so verification is slightly awkward
         assertEquals(1, converted.size());

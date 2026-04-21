@@ -18,8 +18,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import type { ColumnRenderers, ColumnSchema } from 'components/common/EntityDataTable';
-import { Icon } from 'components/common';
-import { Link } from 'components/common/router';
+import { Icon, Link } from 'components/common';
 import DataNodeStatusCell from 'components/datanode/DataNodeList/DataNodeStatusCell';
 import type { DataNode } from 'components/datanode/Types';
 import Routes from 'routing/Routes';

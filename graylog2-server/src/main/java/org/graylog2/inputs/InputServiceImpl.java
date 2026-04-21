@@ -393,6 +393,12 @@ public class InputServiceImpl implements InputService {
                 .append(InputImpl.FIELD_STATIC_FIELD_KEY, key)
                 .append(InputImpl.FIELD_STATIC_FIELD_VALUE, value);
 
+        // Remove any existing static field with the same key to prevent duplicates
+        collection.updateOne(
+                MongoUtils.idEq(input.getId()),
+                MongoUtils.removeEmbedded(InputImpl.EMBEDDED_STATIC_FIELDS, InputImpl.FIELD_STATIC_FIELD_KEY, key)
+        );
+
         final UpdateResult updateResult = collection.updateOne(
                 MongoUtils.idEq(input.getId()),
                 Updates.push(InputImpl.EMBEDDED_STATIC_FIELDS, staticFieldDoc)
@@ -729,5 +735,14 @@ public class InputServiceImpl implements InputService {
     public void persistDesiredState(Input input, IOState.Type desiredState) throws ValidationException {
         final Input updatedInput = input.withDesiredState(desiredState);
         saveWithoutEvents(updatedInput);
+    }
+
+    @Override
+    public Set<String> findIdsByDesiredState(IOState.Type desiredState) {
+        final Set<String> result = new HashSet<>();
+        documentCollection.find(eq(InputImpl.FIELD_DESIRED_STATE, desiredState.toString()))
+                .projection(Projections.include("_id"))
+                .forEach(doc -> result.add(doc.getObjectId("_id").toHexString()));
+        return result;
     }
 }

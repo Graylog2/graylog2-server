@@ -57,6 +57,7 @@ export interface EventDefinitionType {
     entityScope?: string;
   }>;
   useCondition: () => boolean;
+  hideFieldsStep?: boolean;
 }
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {

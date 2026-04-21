@@ -85,9 +85,19 @@ public class ActionTest {
     public void testExecuteNotificationGetLink() {
         when(event.id()).thenReturn(ID);
 
-        String actionText = executeNotificationConfig().getLink(event).toString();
+        final String actionText = executeNotificationConfig().getLink(event).toString();
 
-        assertThat(actionText).contains("/security/security-events/alerts?query=id%3A" + ID);
+        assertThat(actionText).contains("/alerts?query=id%3A" + ID);
+    }
+
+    @Test
+    public void testExecuteNotificationGetLinkUsesAlertsRoute() {
+        when(event.id()).thenReturn(ID);
+
+        final String link = executeNotificationConfig().getLink(event).toString();
+
+        assertThat(link).doesNotContain("security-events");
+        assertThat(link).startsWith("/alerts");
     }
 
     private ExecuteNotification.Config executeNotificationConfig() {

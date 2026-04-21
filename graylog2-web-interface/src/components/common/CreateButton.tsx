@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 
 import IfPermitted from 'components/common/IfPermitted';
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer } from 'components/common';
 import Button from 'components/bootstrap/Button';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';

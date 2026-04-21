@@ -18,7 +18,7 @@ import * as React from 'react';
 import type * as Immutable from 'immutable';
 import styled from 'styled-components';
 
-import { LinkContainer, Link } from 'components/common/router';
+import { LinkContainer, Link } from 'components/common';
 import type Role from 'logic/roles/Role';
 import Routes from 'routing/Routes';
 import type UserOverview from 'logic/users/UserOverview';

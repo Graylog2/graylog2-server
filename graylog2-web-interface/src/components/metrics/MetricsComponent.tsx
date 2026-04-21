@@ -21,7 +21,7 @@ import { Alert, Col, Row } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import { MetricsList } from 'components/metrics';
 import SearchForm from 'components/common/SearchForm';
-import type { Metric } from 'stores/metrics/MetricsStore';
+import type { Metric } from 'types/metrics';
 
 const StyledWarningDiv = styled.div(
   ({ theme }) => `

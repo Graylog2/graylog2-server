@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import useLocation from 'routing/useLocation';
-import { Link, LinkContainer } from 'components/common/router';
+import { Link, LinkContainer } from 'components/common';
 import AppConfig from 'util/AppConfig';
 import { Navbar, Nav } from 'components/bootstrap';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';

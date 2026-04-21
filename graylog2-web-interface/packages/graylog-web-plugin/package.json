@@ -1,6 +1,6 @@
 {
   "name": "graylog-web-plugin",
-  "version": "7.1.0-SNAPSHOT",
+  "version": "7.2.0-SNAPSHOT",
   "description": "Helper code for streamlining Graylog web interface plugin development",
   "main": "index.js",
   "packageManager": "yarn@1.22.22",
@@ -41,7 +41,7 @@
     "html-webpack-plugin": "^5.5.0",
     "jest-preset-graylog": "file:../jest-preset-graylog",
     "moment": "2.30.1",
-    "moment-timezone": "0.6.0",
+    "moment-timezone": "0.6.1",
     "react": "18.3.1",
     "react-dom": "18.2.0",
     "react-redux": "^9.2.0",
@@ -50,10 +50,10 @@
     "redux": "^5.0.1",
     "reflux": "0.2.13",
     "styled-components": "6.1.1",
-    "typescript": "5.9.3",
+    "typescript": "6.0.2",
     "use-query-params": "^2.2.0",
-    "webpack": "5.105.2",
-    "webpack-cli": "6.0.1",
+    "webpack": "5.106.1",
+    "webpack-cli": "7.0.2",
     "webpack-merge": "^6.0.1"
   }
 }

@@ -18,8 +18,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import { Link } from 'components/common/router';
-import { Icon } from 'components/common';
+import { Link, Icon } from 'components/common';
 import { Row } from 'components/bootstrap';
 import ViewPropertiesModal from 'views/components/dashboard/DashboardPropertiesModal';
 import onSaveView from 'views/logic/views/OnSaveViewAction';

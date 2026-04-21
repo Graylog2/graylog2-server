@@ -64,9 +64,34 @@ const renderSUT = (inputStates: InputStates, featureEnabled = true) => {
   return render(<InputStateControl input={baseInput} inputStates={inputStates} openWizard={jest.fn()} />);
 };
 
+const messageInput = {
+  title: baseInput.title,
+  global: baseInput.global,
+  name: baseInput.name,
+  content_pack: '',
+  id: baseInput.id,
+  created_at: baseInput.created_at,
+  type: baseInput.type,
+  creator_user_id: baseInput.creator_user_id,
+  attributes: baseInput.attributes,
+  static_fields: baseInput.static_fields,
+  node: baseInput.node,
+};
+
 describe('InputStateControl', () => {
-  it('shows setup state when feature is enabled and input state is not loaded yet', async () => {
-    renderSUT({});
+  it('shows setup when feature is enabled and input is in setup mode', async () => {
+    const setupStates: InputStates = {
+      [baseInput.id]: {
+        node1: {
+          id: baseInput.id,
+          state: 'SETUP',
+          detailed_message: null,
+          message_input: messageInput,
+        },
+      },
+    };
+
+    renderSUT(setupStates);
 
     expect(await screen.findByRole('button', { name: /set-up input/i })).toBeInTheDocument();
   });
@@ -84,19 +109,7 @@ describe('InputStateControl', () => {
           id: baseInput.id,
           state: 'RUNNING',
           detailed_message: null,
-          message_input: {
-            title: baseInput.title,
-            global: baseInput.global,
-            name: baseInput.name,
-            content_pack: '',
-            id: baseInput.id,
-            created_at: baseInput.created_at,
-            type: baseInput.type,
-            creator_user_id: baseInput.creator_user_id,
-            attributes: baseInput.attributes,
-            static_fields: baseInput.static_fields,
-            node: baseInput.node,
-          },
+          message_input: messageInput,
         },
       },
     };
@@ -106,35 +119,8 @@ describe('InputStateControl', () => {
     expect(await screen.findByRole('button', { name: /stop input/i })).toBeInTheDocument();
   });
 
-  it('shows start after stopping an input instead of setup', async () => {
-    const runningStates: InputStates = {
-      [baseInput.id]: {
-        node1: {
-          id: baseInput.id,
-          state: 'RUNNING',
-          detailed_message: null,
-          message_input: {
-            title: baseInput.title,
-            global: baseInput.global,
-            name: baseInput.name,
-            content_pack: '',
-            id: baseInput.id,
-            created_at: baseInput.created_at,
-            type: baseInput.type,
-            creator_user_id: baseInput.creator_user_id,
-            attributes: baseInput.attributes,
-            static_fields: baseInput.static_fields,
-            node: baseInput.node,
-          },
-        },
-      },
-    };
-
-    const { rerender } = renderSUT(runningStates);
-
-    expect(await screen.findByRole('button', { name: /stop input/i })).toBeInTheDocument();
-
-    rerender(<InputStateControl input={baseInput} inputStates={{}} openWizard={jest.fn()} />);
+  it('shows start instead of setup when input has no state after page reload', async () => {
+    renderSUT({});
 
     expect(await screen.findByRole('button', { name: /start input/i })).toBeInTheDocument();
   });

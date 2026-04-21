@@ -28,7 +28,8 @@ public interface TrafficUpdater {
                        NodeId nodeId,
                        long inLastMinute,
                        long outLastMinute,
-                       long decodedLastMinute);
+                       long decodedLastMinute,
+                       long inputIndexedLastMinute);
 
     static DateTime getDayBucketStart(DateTime observationTime) {
         return observationTime.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
@@ -42,6 +43,6 @@ public interface TrafficUpdater {
         return histogram.entrySet().stream()
                 .collect(Collectors.groupingBy(entry -> entry.getKey().withTimeAtStartOfDay(),
                         TreeMap::new,
-                        Collectors.mapping(Map.Entry::getValue, Collectors.summingLong(Long::valueOf))));
+                        Collectors.summingLong(Map.Entry::getValue)));
     }
 }

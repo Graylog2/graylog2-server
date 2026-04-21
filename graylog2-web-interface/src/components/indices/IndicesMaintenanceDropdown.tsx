@@ -18,11 +18,12 @@ import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import { ClusterDeflector, SystemDeflector, SystemIndexRanges } from '@graylog/server-api';
+
 import { DATA_TIERING_TYPE } from 'components/indices/data-tiering';
 import { ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
-import { DeflectorActions } from 'stores/indices/DeflectorStore';
-import { IndexRangesActions } from 'stores/indices/IndexRangesStore';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
+import { defaultOnError } from 'util/conditional/onError';
 
 const _onRecalculateIndexRange = (indexSetId: string) => {
   if (
@@ -31,7 +32,11 @@ const _onRecalculateIndexRange = (indexSetId: string) => {
       'This will recalculate index ranges for this index set using a background system job. Do you want to proceed?',
     )
   ) {
-    IndexRangesActions.recalculate(indexSetId);
+    defaultOnError(
+      SystemIndexRanges.rebuildIndexSet(indexSetId),
+      'Could not create a job to start index ranges recalculation',
+      'Error starting index ranges recalculation',
+    );
   }
 };
 
@@ -40,9 +45,10 @@ const _onCycleDeflector = (indexSetId: string) => {
     // eslint-disable-next-line no-alert
     window.confirm('This will manually cycle the current active write index on this index set. Do you want to proceed?')
   ) {
-    DeflectorActions.cycle(indexSetId).then(() => {
-      DeflectorActions.list(indexSetId);
-    });
+    defaultOnError(
+      ClusterDeflector.cycleByindexSetId(indexSetId).then(() => SystemDeflector.deflector(indexSetId)),
+      'Cycling deflector failed',
+    );
   }
 };
 

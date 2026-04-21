@@ -16,3 +16,4 @@
  */
 
 export { default } from './Slicing';
+export type { SliceRenderer, SliceRenderers } from './Slicing';

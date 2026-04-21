@@ -17,7 +17,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer } from 'components/common';
 import { NavDropdown, MenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import useCurrentUser from 'hooks/useCurrentUser';

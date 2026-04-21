@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix creating output from Data Routing page for Stream results in empty output configuration."
+
+issues = ["23793"]
+pulls = ["25552"]

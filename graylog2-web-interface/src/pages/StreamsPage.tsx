@@ -24,8 +24,7 @@ import { DocumentTitle, Spinner } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
 import type { Stream } from 'stores/streams/StreamsStore';
-import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
-import { useStore } from 'stores/connect';
+import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import type { EntityShare } from 'actions/permissions/EntityShareActions';
@@ -39,7 +38,10 @@ import StreamModal from 'components/streams/StreamModal';
 import useHistory from 'routing/useHistory';
 
 const StreamsPage = () => {
-  const { indexSets } = useStore(IndexSetsStore);
+  const {
+    data: { indexSets },
+    isInitialLoading: isLoadingIndexSets,
+  } = useIndexSetsList(false);
   const sendTelemetry = useSendTelemetry();
   const { createStream } = useStreamMutations();
   const queryClient = useQueryClient();
@@ -63,11 +65,7 @@ const StreamsPage = () => {
     });
   };
 
-  useEffect(() => {
-    IndexSetsActions.list(false);
-  }, []);
-
-  const isLoading = !indexSets;
+  const isLoading = isLoadingIndexSets;
 
   if (isLoading) {
     return <Spinner />;

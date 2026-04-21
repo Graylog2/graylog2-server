@@ -30,7 +30,6 @@ import org.graylog.plugins.views.search.engine.monitoring.collection.NoOpStatsCo
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
-import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.graylog.storage.opensearch3.testing.TestMsearchResponse;
 import org.graylog.storage.opensearch3.views.searchtypes.OSMessageList;
 import org.graylog.storage.opensearch3.views.searchtypes.OSSearchTypeHandler;
@@ -70,10 +69,9 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class OpenSearchBackendUsingCorrectIndicesTest extends OfficialOpensearchMockedClientTestBase {
-    private static final OSSerializationUtils serializationUtils = new OSSerializationUtils();
     private static Map<String, Provider<OSSearchTypeHandler<? extends SearchType>>> handlers = ImmutableMap.of(
             MessageList.NAME, () -> new OSMessageList(new LegacyDecoratorProcessor.Fake(),
-                    new TestResultMessageFactory(), false, serializationUtils)
+                    new TestResultMessageFactory(), false)
     );
 
     @Mock
@@ -101,8 +99,8 @@ public class OpenSearchBackendUsingCorrectIndicesTest extends OfficialOpensearch
                 mock(StreamService.class),
                 false,
                 0,
-                0,
-                serializationUtils)
+                        0
+                )
         );
     }
 

@@ -169,8 +169,10 @@ const StreamsStore = singletonStore('Streams', () =>
 
       const promise = fetch('GET', qualifyUrl(url))
         .then((result: StreamSummaryResponse) => result.streams)
-        .catch((errorThrown) => {
+        .catch((errorThrown): never => {
           UserNotification.error(`Loading streams failed with status: ${errorThrown}`, 'Could not load streams');
+
+          throw errorThrown;
         });
 
       StreamsActions.listStreams.promise(promise);
