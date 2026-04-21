@@ -55,7 +55,7 @@ describe('EventDetails', () => {
     );
 
     asMock(useCurrentUser).mockReturnValue(adminUser);
-    asMock(useEventDefinition).mockReturnValue({ data: undefined, isFetching: false, isInitialLoading: false });
+    asMock(useEventDefinition).mockReturnValue({ data: undefined, isFetching: false, isInitialLoading: false, isError: false });
 
     asMock(useEventById).mockImplementation(() => ({
       data: mockEventData.event,
@@ -90,6 +90,7 @@ describe('EventDetails', () => {
       data: mockEventDefinitionTwoAggregations,
       isFetching: false,
       isInitialLoading: false,
+      isError: false,
     });
 
     renderEventDetails();
