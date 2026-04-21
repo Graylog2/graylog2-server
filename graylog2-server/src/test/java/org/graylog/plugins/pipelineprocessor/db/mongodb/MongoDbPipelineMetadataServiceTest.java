@@ -346,6 +346,50 @@ class MongoDbPipelineMetadataServiceTest {
     }
 
     @Test
+    void testEntityFilterExcludesRowsAndStreamFilterTrimsConnectedStreams() {
+        final List<RoutingRuleDao> routingRules = List.of(
+                RoutingRuleDao.builder()
+                        .pipelineId("pipeline1").pipelineTitle("Allowed Pipeline")
+                        .ruleId("rule1").ruleTitle("Rule A")
+                        .routedStreamIds(List.of("s1"))
+                        .connectedStreams(List.of(
+                                new StreamReference("visible_stream", "Visible"),
+                                new StreamReference("hidden_stream", "Hidden")))
+                        .build(),
+                RoutingRuleDao.builder()
+                        .pipelineId("pipeline2").pipelineTitle("Denied Pipeline")
+                        .ruleId("rule2").ruleTitle("Rule B")
+                        .routedStreamIds(List.of("s1"))
+                        .connectedStreams(List.of(new StreamReference("visible_stream", "Visible")))
+                        .build()
+        );
+
+        final PipelineRulesMetadataDao p1 = PipelineRulesMetadataDao.builder()
+                .pipelineId("pipeline1").pipelineTitle("Allowed Pipeline")
+                .rules(Set.of("rule1")).streams(Set.of()).functions(Set.of()).deprecatedFunctions(Set.of())
+                .ruleTitlesById(Map.of()).connectedStreamTitlesById(Map.of()).hasInputReferences(false).build();
+        final PipelineRulesMetadataDao p2 = PipelineRulesMetadataDao.builder()
+                .pipelineId("pipeline2").pipelineTitle("Denied Pipeline")
+                .rules(Set.of("rule2")).streams(Set.of()).functions(Set.of()).deprecatedFunctions(Set.of())
+                .ruleTitlesById(Map.of()).connectedStreamTitlesById(Map.of()).hasInputReferences(false).build();
+        service.save(List.of(p1, p2), routingRules, false);
+
+        // Entity filter: exclude pipeline2; Stream filter: exclude hidden_stream
+        final PaginatedList<StreamPipelineRulesResponse> result = service.getRoutingRulesPaginated(
+                "s1", null,
+                dao -> dao.pipelineId().equals("pipeline1"),
+                ref -> ref.id().equals("visible_stream"),
+                FIELD_RULE_TITLE, SortOrder.ASCENDING, 1, 10);
+
+        // Only pipeline1's rule should remain, and only visible_stream in connected_streams
+        assertThat(result).hasSize(1);
+        assertThat(result.pagination().total()).isEqualTo(1);
+        assertThat(result.getFirst().pipelineId()).isEqualTo("pipeline1");
+        assertThat(result.getFirst().connectedStreams()).hasSize(1);
+        assertThat(result.getFirst().connectedStreams().getFirst().id()).isEqualTo("visible_stream");
+    }
+
+    @Test
     void testRuleRoutingToMultipleStreams() {
         // A single rule routes to s1, s2, and s3
         final PipelineRulesMetadataDao pipeline = PipelineRulesMetadataDao.builder()
