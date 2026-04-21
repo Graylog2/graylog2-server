@@ -25,17 +25,14 @@ const ToggleDropdown = styled.span<{ $alwaysShowCaret: boolean }>(
   ({ $alwaysShowCaret }) => css`
     cursor: pointer;
 
-    ${$alwaysShowCaret
-      ? ''
-      : css`
-          .caret {
-            visibility: hidden;
-          }
+    .caret {
+      visibility: ${$alwaysShowCaret ? 'visible' : 'hidden'};
+    }
 
-          &:hover .caret {
-            visibility: visible;
-          }
-        `}
+    /* stylelint-disable-next-line nesting-selector-no-missing-scoping-root -- & refers to the styled.span root */
+    &:hover .caret {
+      visibility: visible;
+    }
   `,
 );
 
