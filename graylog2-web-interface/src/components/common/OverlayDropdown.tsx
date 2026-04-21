@@ -42,6 +42,7 @@ const ToggleDropdown = styled.span<{ $alwaysShowCaret: boolean }>(
 type Props = {
   alwaysShowCaret?: boolean;
   children: React.ReactNode;
+  className?: string;
   closeOnSelect?: boolean;
   dropdownZIndex?: number;
   menuContainer?: HTMLElement;
@@ -55,6 +56,7 @@ type Props = {
 const OverlayDropdown = ({
   alwaysShowCaret = false,
   children,
+  className = undefined,
   closeOnSelect = true,
   dropdownZIndex = undefined,
   menuContainer = document.body,
@@ -76,7 +78,12 @@ const OverlayDropdown = ({
       portalProps={{ target: menuContainer }}
       zIndex={dropdownZIndex}>
       <Menu.Target>
-        <ToggleDropdown $alwaysShowCaret={alwaysShowCaret} onClick={onToggle} ref={toggleTarget} role="presentation">
+        <ToggleDropdown
+          $alwaysShowCaret={alwaysShowCaret}
+          className={className}
+          onClick={onToggle}
+          ref={toggleTarget}
+          role="presentation">
           {toggleChild}
         </ToggleDropdown>
       </Menu.Target>
