@@ -196,10 +196,6 @@ class DefaultEntityDependencyResolverTest {
         dependencyGraph.putEdge(eventDefDescriptor, streamDescriptor);
         when(contentPackEntityResolver.resolveEntityDependencyGraph(any())).thenReturn(dependencyGraph);
         when(contentPackEntityResolver.listAllEntityExcerpts()).thenReturn(ImmutableSet.of());
-        when(grnDescriptorService.getDescriptor(any(GRN.class))).thenAnswer(a -> {
-            GRN grnArg = a.getArgument(0);
-            return GRNDescriptor.builder().grn(grnArg).title("dummy").build();
-        });
 
         final GRN eventDefGrn = grnRegistry.newGRN("event_definition", "54e3deadbeefdeadbeefafff");
         final ImmutableSet<org.graylog.security.entities.EntityDescriptor> dependencies = entityDependencyResolver.resolve(eventDefGrn);
