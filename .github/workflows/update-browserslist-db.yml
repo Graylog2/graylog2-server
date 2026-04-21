@@ -14,7 +14,13 @@ jobs:
         working-directory: graylog2-web-interface
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install yarn
+        run: npm install -g yarn
       - name: Install dependencies
         run: yarn install
       - name: Updating browserslist db
@@ -54,3 +60,16 @@ jobs:
           -f initial_actor="Dr. Lint-a-lot"
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GRAYLOG_PROJECT_INTERNAL_WORKFLOW_RW }}
+
+      - name: Notify Slack on failure
+        if: failure()
+        env:
+          SLACK_WEBHOOK: ${{ secrets.WORKFLOW_FAILURE_SLACK_WEBHOOK }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          curl -X POST "$SLACK_WEBHOOK" \
+            -H 'Content-Type: application/json' \
+            -d "$(jq -n \
+              --arg workflow "${{ github.workflow }}" \
+              --arg run_url "$RUN_URL" \
+              '{workflow: $workflow, run_url: $run_url}')"
