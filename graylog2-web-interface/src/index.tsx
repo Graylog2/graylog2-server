@@ -82,11 +82,11 @@ const appContainer = document.querySelector('div#app-root');
 const root = createRoot(appContainer);
 
 root.render(
-  <TelemetryInit>
-    <LoginQueryClientProvider>
+  <LoginQueryClientProvider>
+    <TelemetryInit>
       <ServerAvailabilityProvider>
         <AppFacade />
       </ServerAvailabilityProvider>
-    </LoginQueryClientProvider>
-  </TelemetryInit>,
+    </TelemetryInit>
+  </LoginQueryClientProvider>,
 );
