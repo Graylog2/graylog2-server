@@ -14,10 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo } from 'react';
+import * as React from 'react';
+import DOMPurify from 'dompurify';
 
-import AppConfig from 'util/AppConfig';
+type Props = {
+  html: string | null | undefined;
+  config?: DOMPurify.Config;
+} & Omit<React.HTMLAttributes<HTMLSpanElement>, 'dangerouslySetInnerHTML' | 'children'>;
 
-const useCustomLogo = (theme: 'dark' | 'light') => useMemo(() => AppConfig?.branding?.()?.logo?.[theme], [theme]);
+const Sanitize = ({ html, config = undefined, ...rest }: Props) => {
+  const sanitized = DOMPurify.sanitize(html ?? '', config ?? {});
 
-export default useCustomLogo;
+  // eslint-disable-next-line react/no-danger
+  return <span {...rest} dangerouslySetInnerHTML={{ __html: sanitized }} />;
+};
+
+export default Sanitize;
