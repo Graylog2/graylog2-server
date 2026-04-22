@@ -7,11 +7,6 @@
   resolved "https://registry.yarnpkg.com/@aashutoshrathi/word-wrap/-/word-wrap-1.2.6.tgz#bd9154aec9983f77b3a034ecaa015c2e4201f6cf"
   integrity sha512-1Yjs2SvM8TflER/OD3cOjhWWOZb58A2t7wpE2S9XfBYTiIl+XFhQG2bjy4Pu1I+EAlCNUzRDYDdFwFYUKvXcIA==
 
-"@adobe/css-tools@^4.0.1":
-  version "4.3.2"
-  resolved "https://registry.yarnpkg.com/@adobe/css-tools/-/css-tools-4.3.2.tgz#a6abc715fb6884851fca9dad37fc34739a04fd11"
-  integrity sha512-DA5a1C0gD/pLOvhv33YMrbf2FK3oUzwNl9oOJqE4XVjuEtt6XIakRcsd7eLiOSPkp1kTRQGICTA8cKra/vFbjw==
-
 "@adobe/css-tools@^4.4.0":
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/@adobe/css-tools/-/css-tools-4.4.0.tgz#728c484f4e10df03d5a3acd0d8adcbbebff8ad63"
@@ -3843,6 +3838,13 @@
   version "13.7.4"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-13.7.4.tgz#76c3cb3a12909510f52e5dc04a6298cdf9504ffd"
   integrity sha512-oVeL12C6gQS/GAExndigSaLxTrKpQPxewx9bOcwfvJiJge4rr7wNaph4J+ns5hrmIV2as5qxqN8YKthn9qh0jw==
+
+"@types/node@^25.5.2":
+  version "25.6.0"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-25.6.0.tgz#4e09bad9b469871f2d0f68140198cbd714f4edca"
+  integrity sha512-+qIYRKdNYJwY3vRCZMdJbPLJAtGjQBudzZzdzwQYkEPQd+PJGixUL5QfvCLDaULoLv+RhT3LDkwEfKaAkgSmNQ==
+  dependencies:
+    undici-types "~7.19.0"
 
 "@types/numeral@^2.0.1":
   version "2.0.5"
@@ -7916,7 +7918,7 @@ escodegen@^2.1.0:
     eslint-plugin-compat "7.0.1"
     eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
     eslint-plugin-import "2.32.0"
-    eslint-plugin-jest "29.15.1"
+    eslint-plugin-jest "29.15.2"
     eslint-plugin-jest-dom "5.5.0"
     eslint-plugin-jest-formatting "3.1.0"
     eslint-plugin-jsx-a11y "6.10.2"
@@ -8016,10 +8018,10 @@ eslint-plugin-jest-formatting@3.1.0:
   resolved "https://registry.yarnpkg.com/eslint-plugin-jest-formatting/-/eslint-plugin-jest-formatting-3.1.0.tgz#b26dd5a40f432b642dcc880021a771bb1c93dcd2"
   integrity sha512-XyysraZ1JSgGbLSDxjj5HzKKh0glgWf+7CkqxbTqb7zEhW7X2WHo5SBQ8cGhnszKN+2Lj3/oevBlHNbHezoc/A==
 
-eslint-plugin-jest@29.15.1:
-  version "29.15.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-29.15.1.tgz#f663f9f7903a7181efddea5a92d1d31e66362596"
-  integrity sha512-6BjyErCQauz3zfJvzLw/kAez2lf4LEpbHLvWBfEcG4EI0ZiRSwjoH2uZulMouU8kRkBH+S0rhqn11IhTvxKgKw==
+eslint-plugin-jest@29.15.2:
+  version "29.15.2"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-29.15.2.tgz#e4ecd1c88dfb8a62b4a0857724792c2aab7e9b6d"
+  integrity sha512-kEN4r9RZl1xcsb4arGq89LrcVdOUFII/JSCwtTPJyv16mDwmPrcuEQwpxqZHeINvcsd7oK5O/rhdGlxFRaZwvQ==
   dependencies:
     "@typescript-eslint/utils" "^8.0.0"
 
@@ -9521,7 +9523,7 @@ graphemer@^1.4.0:
   integrity sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==
 
 "graylog-web-plugin@file:packages/graylog-web-plugin":
-  version "7.1.0-SNAPSHOT"
+  version "7.2.0-SNAPSHOT"
   dependencies:
     "@graylog/sawmill" "4.0.0"
     "@reduxjs/toolkit" "^2.5.1"
@@ -9543,9 +9545,9 @@ graphemer@^1.4.0:
     redux "^5.0.1"
     reflux "0.2.13"
     styled-components "6.1.1"
-    typescript "5.9.3"
+    typescript "6.0.2"
     use-query-params "^2.2.0"
-    webpack "5.105.4"
+    webpack "5.106.1"
     webpack-cli "7.0.2"
     webpack-merge "^6.0.1"
 
@@ -11117,7 +11119,7 @@ jest-pnp-resolver@^1.2.3:
     jest "30.3.0"
     jest-canvas-mock "^2.3.1"
     jest-environment-jsdom "30.3.0"
-    jest-styled-components "7.2.0"
+    jest-styled-components "7.4.0"
     react-select-event "5.5.1"
     resize-observer-polyfill "^1.5.1"
 
@@ -11231,12 +11233,12 @@ jest-snapshot@30.3.0:
     semver "^7.7.2"
     synckit "^0.11.8"
 
-jest-styled-components@7.2.0:
-  version "7.2.0"
-  resolved "https://registry.yarnpkg.com/jest-styled-components/-/jest-styled-components-7.2.0.tgz#67e768b98d3d58513341a62baca76f3e253a4deb"
-  integrity sha512-gwyyveNjvuRA0pyhbQoydXZllLZESs2VuL5fXCabzh0buHPAOUfANtW7n5YMPmdC0sH3VB7h2eUGZ23+tjvaBA==
+jest-styled-components@7.4.0:
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/jest-styled-components/-/jest-styled-components-7.4.0.tgz#d9f7c67ca30a077005c398329c01f6964340bda5"
+  integrity sha512-VUkStCEG3ewwBTADMT9VyrZ5Pi5oPAzufcafyK6zREFeMv0fcU2LdYFpM5RZm78IrU+Fi6DhD+NVeiurVe3LKQ==
   dependencies:
-    "@adobe/css-tools" "^4.0.1"
+    "@adobe/css-tools" "^4.4.0"
 
 jest-util@30.0.5:
   version "30.0.5"
@@ -11677,9 +11679,9 @@ locate-path@^6.0.0:
     p-locate "^5.0.0"
 
 lodash-es@^4.17.15, lodash-es@^4.17.21:
-  version "4.17.23"
-  resolved "https://registry.yarnpkg.com/lodash-es/-/lodash-es-4.17.23.tgz#58c4360fd1b5d33afc6c0bbd3d1149349b1138e0"
-  integrity sha512-kVI48u3PZr38HdYz98UmfPnXl2DXrpdctLrFLCd3kOx1xUkOmpFPx7gCWWM5MPkL/fD8zb+Ph0QzjGFs4+hHWg==
+  version "4.18.1"
+  resolved "https://registry.yarnpkg.com/lodash-es/-/lodash-es-4.18.1.tgz#b962eeb80d9d983a900bf342961fb7418ca10b1d"
+  integrity sha512-J8xewKD/Gk22OZbhpOVSwcs60zhd95ESDwezOFuA3/099925PdHJ7OFHNTGtajL3AlZkykD32HykiMo+BIBI8A==
 
 lodash.clonedeep@^4.5, lodash.clonedeep@^4.5.0:
   version "4.5.0"
@@ -16348,10 +16350,10 @@ typescript-eslint@^8.44.1:
     "@typescript-eslint/typescript-estree" "8.44.1"
     "@typescript-eslint/utils" "8.44.1"
 
-typescript@5.9.3:
-  version "5.9.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.9.3.tgz#5b4f59e15310ab17a216f5d6cf53ee476ede670f"
-  integrity sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==
+typescript@6.0.2:
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-6.0.2.tgz#0b1bfb15f68c64b97032f3d78abbf98bdbba501f"
+  integrity sha512-bGdAIrZ0wiGDo5l8c++HWtbaNCWTS4UTv7RaTH/ThVIgjkveJt83m74bBHMJkuCbslY8ixgLBVZJIOiQlQTjfQ==
 
 typescript@^5.7.3:
   version "5.8.2"
@@ -16414,6 +16416,11 @@ uncontrollable@^7.0.2:
     "@types/react" "^16.9.11"
     invariant "^2.2.4"
     react-lifecycles-compat "^3.0.4"
+
+undici-types@~7.19.0:
+  version "7.19.2"
+  resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-7.19.2.tgz#1b67fc26d0f157a0cba3a58a5b5c1e2276b8ba2a"
+  integrity sha512-qYVnV5OEm2AW8cJMCpdV20CDyaN3g0AjDlOGf1OW4iaDEx8MwdtChUp4zu4H0VP3nDRF/8RKWH+IPp9uW0YGZg==
 
 unicode-canonical-property-names-ecmascript@^2.0.0:
   version "2.0.0"
@@ -16878,10 +16885,10 @@ webpack-sources@^3.3.4:
   resolved "https://registry.yarnpkg.com/webpack-sources/-/webpack-sources-3.3.4.tgz#a338b95eb484ecc75fbb196cbe8a2890618b4891"
   integrity sha512-7tP1PdV4vF+lYPnkMR0jMY5/la2ub5Fc/8VQrrU+lXkiM6C4TjVfGw7iKfyhnTQOsD+6Q/iKw0eFciziRgD58Q==
 
-webpack@5.105.4:
-  version "5.105.4"
-  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.105.4.tgz#1b77fcd55a985ac7ca9de80a746caffa38220169"
-  integrity sha512-jTywjboN9aHxFlToqb0K0Zs9SbBoW4zRUlGzI2tYNxVYcEi/IPpn+Xi4ye5jTLvX2YeLuic/IvxNot+Q1jMoOw==
+webpack@5.106.1:
+  version "5.106.1"
+  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.106.1.tgz#0a3eeb43a50e4f67fbecd206e1e6fc2c89fc2b6f"
+  integrity sha512-EW8af29ak8Oaf4T8k8YsajjrDBDYgnKZ5er6ljWFJsXABfTNowQfvHLftwcepVgdz+IoLSdEAbBiM9DFXoll9w==
   dependencies:
     "@types/eslint-scope" "^3.7.7"
     "@types/estree" "^1.0.8"
