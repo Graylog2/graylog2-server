@@ -29,8 +29,8 @@ const useCollectorInputMutations = () => {
     mutationFn: () => CollectorsConfigApi.createInput(),
     onError: (errorThrown: unknown) => {
       UserNotification.error(
-        `Creating collector ingest input failed: ${errorThrown}`,
-        'Could not create collector ingest input',
+        `Creating Collector ingest input failed: ${errorThrown}`,
+        'Could not create Collector ingest input',
       );
     },
     onSuccess: () => {

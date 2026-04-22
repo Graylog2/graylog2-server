@@ -16,6 +16,8 @@
  */
 package org.graylog.datanode.configuration;
 
+import jakarta.inject.Provider;
+import org.graylog.datanode.OpensearchDistribution;
 import org.graylog2.security.jwt.IndexerJwtAuthToken;
 
 /**
@@ -23,7 +25,7 @@ import org.graylog2.security.jwt.IndexerJwtAuthToken;
  * config file or from the ENV properties.
  */
 public record DatanodeConfiguration(
-        OpensearchDistributionProvider opensearchDistributionProvider,
+        Provider<OpensearchDistribution> opensearchDistributionProvider,
         DatanodeDirectories datanodeDirectories,
         int processLogsBufferSize,
         IndexerJwtAuthToken indexerJwtAuthToken

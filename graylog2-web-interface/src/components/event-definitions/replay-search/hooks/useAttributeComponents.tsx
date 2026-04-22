@@ -75,7 +75,6 @@ const useAttributeComponents = () => {
       title: string;
       content: React.ReactNode;
       show?: boolean;
-      inRows?: boolean;
     }> = [
       {
         title: 'Event definition updated at',
@@ -113,13 +112,12 @@ const useAttributeComponents = () => {
         title: 'Notifications',
         content: <Notifications />,
       },
-      { title: 'Description', content: eventDefinition.description, inRows: true },
+      { title: 'Description', content: eventDefinition.description },
     ];
     if (!isRightSidebarEnabled) {
       components.push({
         title: 'Aggregation conditions',
         content: <AggregationConditions />,
-        inRows: true,
       });
     }
 

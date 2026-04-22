@@ -22,7 +22,8 @@ import Drawer from 'components/common/Drawer';
 import { Link, RelativeTime } from 'components/common';
 import Routes from 'routing/Routes';
 
-import collectorLogsUrl from '../common/collectorLogsUrl';
+import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
+import collectorSystemLogsUrl from '../common/collectorSystemLogsUrl';
 import type { CollectorInstanceView, Source } from '../types';
 
 type Props = {
@@ -125,7 +126,14 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
 
         <DetailRow>
           <Title>Logs:</Title>
-          <Link to={collectorLogsUrl(instance.instance_uid)}>View Logs</Link>
+          <Link to={collectorSystemLogsUrl(instance.instance_uid)}>View System Logs</Link>
+        </DetailRow>
+
+        <DetailRow>
+          <Title>Messages:</Title>
+          <Link to={collectorReceivedMessagesUrl('collector_instance_uid', instance.instance_uid)}>
+            Received messages
+          </Link>
         </DetailRow>
       </Section>
 
