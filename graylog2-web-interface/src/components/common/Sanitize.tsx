@@ -14,20 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration;
+import * as React from 'react';
+import DOMPurify from 'dompurify';
 
-import jakarta.inject.Provider;
-import org.graylog.datanode.OpensearchDistribution;
-import org.graylog2.security.jwt.IndexerJwtAuthToken;
+type Props = {
+  html: string | null | undefined;
+  config?: DOMPurify.Config;
+} & Omit<React.HTMLAttributes<HTMLSpanElement>, 'dangerouslySetInnerHTML' | 'children'>;
 
-/**
- * DatanodeConfiguration holds the static configuration as parsed during the datanode startup, either from the
- * config file or from the ENV properties.
- */
-public record DatanodeConfiguration(
-        Provider<OpensearchDistribution> opensearchDistributionProvider,
-        DatanodeDirectories datanodeDirectories,
-        int processLogsBufferSize,
-        IndexerJwtAuthToken indexerJwtAuthToken
-) {
-}
+const Sanitize = ({ html, config = undefined, ...rest }: Props) => {
+  const sanitized = DOMPurify.sanitize(html ?? '', config ?? {});
+
+  // eslint-disable-next-line react/no-danger
+  return <span {...rest} dangerouslySetInnerHTML={{ __html: sanitized }} />;
+};
+
+export default Sanitize;

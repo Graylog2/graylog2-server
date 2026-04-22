@@ -33,7 +33,8 @@ import GenericPlot, { type PlotLayout, type ChartConfig } from 'views/components
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import type { MiddleSectionProps } from 'components/common/PaginatedEntityTable/PaginatedEntityTable';
 import useUserDateTime from 'hooks/useUserDateTime';
-import { toUTCFromTz, adjustFormat } from 'util/DateTime';
+import { toUTCFromTz } from 'util/DateTime';
+import type { UserDateTimeContextType } from 'contexts/UserDateTimeContext';
 import type { TimeRange } from 'views/logic/queries/Query';
 import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 import useOnRefresh from 'components/common/PaginatedEntityTable/useOnRefresh';
@@ -56,11 +57,14 @@ const GraphContainer = styled.div`
 
 type ResultPromise = ReturnType<typeof fetchEventsHistogram>;
 
+type FormatTime = UserDateTimeContextType['formatTime'];
+
 const generateChart = (
   type: 'Alerts' | 'Events',
   buckets: Awaited<ResultPromise>['results']['buckets']['alerts' | 'events'],
+  formatTime: FormatTime,
 ) => {
-  const x = buckets.map((b) => b.start_date);
+  const x = buckets.map((b) => formatTime(b.start_date, 'internal'));
   const y = buckets.map((b) => b.count);
 
   return {
@@ -108,32 +112,34 @@ const layout: Partial<PlotLayout> = {
   legend: { y: yLegendPosition(height) },
 };
 
-const prepareTimeRangeForGraph = (timerange: TimeRange) => {
+const prepareTimeRangeForGraph = (timerange: TimeRange, formatTime: FormatTime) => {
   if (isTypeRelativeWithStartOnly(timerange)) {
-    const from = moment().utc().subtract(timerange.range, 'seconds');
+    const from = moment().subtract(timerange.range, 'seconds');
     const to = moment();
 
-    return [adjustFormat(from, 'internal'), adjustFormat(to, 'internal')];
+    return [formatTime(from, 'internal'), formatTime(to, 'internal')];
   }
 
-  return [timerange.from, timerange.to];
+  return [formatTime(timerange.from, 'internal'), formatTime(timerange.to, 'internal')];
 };
 
 const EventsGraph = ({
   data: { results, timerange },
   alerts,
   onZoom,
+  formatTime,
 }: {
   data: Awaited<ResultPromise>;
   alerts: 'include' | 'exclude' | 'only';
   onZoom: (from: string, to: string) => void;
+  formatTime: FormatTime;
 }) => {
   const chartData = useMemo(
     () => [
-      ...(['include', 'exclude'].includes(alerts) ? [generateChart('Events', results.buckets.events)] : []),
-      ...(['include', 'only'].includes(alerts) ? [generateChart('Alerts', results.buckets.alerts)] : []),
+      ...(['include', 'exclude'].includes(alerts) ? [generateChart('Events', results.buckets.events, formatTime)] : []),
+      ...(['include', 'only'].includes(alerts) ? [generateChart('Alerts', results.buckets.alerts, formatTime)] : []),
     ],
-    [alerts, results.buckets.alerts, results.buckets.events],
+    [alerts, results.buckets.alerts, results.buckets.events, formatTime],
   );
 
   const _layout = useMemo(
@@ -141,10 +147,10 @@ const EventsGraph = ({
       ...layout,
       xaxis: {
         ...layout.xaxis,
-        range: prepareTimeRangeForGraph(timerange),
+        range: prepareTimeRangeForGraph(timerange, formatTime),
       },
     }),
-    [timerange],
+    [timerange, formatTime],
   );
 
   return (
@@ -197,7 +203,7 @@ const EventsHistogram = ({ searchParams, setFilters, eventsHistogramFetcher = fe
     return <Alert bsStyle="danger">Loading events histogram failed: {error?.message ?? 'Unknown error'}</Alert>;
   }
 
-  return <EventsGraph data={data} alerts={alerts} onZoom={onZoom} />;
+  return <EventsGraph data={data} alerts={alerts} onZoom={onZoom} formatTime={formatTime} />;
 };
 
 export default EventsHistogram;
