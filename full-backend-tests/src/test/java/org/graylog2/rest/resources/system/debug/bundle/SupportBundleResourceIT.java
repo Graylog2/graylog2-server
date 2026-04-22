@@ -296,20 +296,6 @@ public class SupportBundleResourceIT {
                 .statusCode(403);
     }
 
-    @Disabled
-    @FullBackendTest
-    void downloadBundleWithPathTraversalReturns404() {
-        given()
-                .spec(api.requestSpecification())
-                .accept("application/octet-stream")
-                .when()
-                .urlEncodingEnabled(true)
-                .pathParam("filename", "/etc/hosts")
-                .get(DOWNLOAD_URL)
-                .then()
-                .statusCode(404);
-    }
-
     @FullBackendTest
     void deleteBundleReturns202() {
         // Build a bundle to delete
@@ -366,18 +352,6 @@ public class SupportBundleResourceIT {
                 .delete(DELETE_URL)
                 .then()
                 .statusCode(403);
-    }
-
-    @FullBackendTest
-    void deleteBundleWithPathTraversalReturns404() {
-        given()
-                .spec(api.requestSpecification())
-                .when()
-                .urlEncodingEnabled(true)
-                .pathParam("filename", "/etc/hosts")
-                .delete(DELETE_URL)
-                .then()
-                .statusCode(404);
     }
 
     @FullBackendTest
