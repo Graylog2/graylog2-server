@@ -63,9 +63,9 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
     private static final String CK_BIND_ADDRESS = "bind_address";
     private static final String CK_PORT = "port";
     private static final String CK_BEARER_TOKEN = "bearer_token";
-    private static final String CK_INSECURE = "insecure";
-    private static final String CK_TLS_CERT = "tls_cert";
-    private static final String CK_TLS_KEY = "tls_key";
+    public static final String CK_INSECURE = "insecure";
+    public static final String CK_TLS_CERT = "tls_cert";
+    public static final String CK_TLS_KEY = "tls_key";
     private static final String CK_TLS_CLIENT_CA = "tls_client_ca";
     private static final String CK_MAX_INBOUND_MSG_SIZE = "max_inbound_msg_size";
 
