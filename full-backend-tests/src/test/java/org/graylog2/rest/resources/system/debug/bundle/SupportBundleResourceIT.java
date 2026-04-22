@@ -373,8 +373,8 @@ public class SupportBundleResourceIT {
         given()
                 .spec(api.requestSpecification())
                 .when()
-                .pathParam("filename", "/etc/hosts")
                 .urlEncodingEnabled(true)
+                .pathParam("filename", "/etc/hosts")
                 .delete(DELETE_URL)
                 .then()
                 .statusCode(404);
