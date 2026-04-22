@@ -53,6 +53,11 @@ const AppFacade = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // The pre-boot theme overrides colors via !important to avoid blips, so we have to remove it when we mount the facade.
+  useEffect(() => {
+    document.getElementById('preboot-theme')?.remove();
+  }, []);
+
   const ThemeProvider = useMemo(
     () => (server.up && username && currentUser ? React.Fragment : LoggedOutThemeProvider),
     [currentUser, server.up, username],
