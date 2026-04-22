@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix MCP(ListStreamsTool): NPE when a stream has 'null' description."
+
+issues = ["25214"]
+pulls = ["25767"]
