@@ -17,6 +17,7 @@
 package org.graylog.collectors.opamp.transport;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.util.JsonFormat;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import opamp.proto.Opamp.AgentToServer;
@@ -33,6 +34,7 @@ import org.graylog.collectors.opamp.OpAmpExecutor;
 import org.graylog.collectors.opamp.OpAmpService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -129,11 +131,25 @@ public class OpAmpHttpHandler extends HttpHandler {
         try {
             reply = opAmpService.handleMessage(message, authContext.get());
         } catch (RuntimeException e) {
-            LOG.error("Error processing OpAMP message: {}", message, e);
+            final var isBadRequest = e instanceof IllegalArgumentException;
+            LOG.atLevel(isBadRequest ? Level.WARN : Level.ERROR)
+                    .setCause(e)
+                    .setMessage("Error processing OpAMP message: {}")
+                    .addArgument(() -> {
+                        try {
+                            return JsonFormat.printer().print(message);
+                        } catch (Exception ex) {
+                            return message.toString();
+                        }
+                    })
+                    .log();
+            final var type = isBadRequest
+                    ? ServerErrorResponseType.ServerErrorResponseType_BadRequest
+                    : ServerErrorResponseType.ServerErrorResponseType_Unknown;
             reply = ServerToAgent.newBuilder()
                     .setInstanceUid(message.getInstanceUid())
                     .setErrorResponse(ServerErrorResponse.newBuilder()
-                            .setType(ServerErrorResponseType.ServerErrorResponseType_Unknown)
+                            .setType(type)
                             .setErrorMessage(e.getMessage())
                             .build())
                     .build();

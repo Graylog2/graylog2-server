@@ -17,6 +17,7 @@
 import type { Sort, Attribute } from 'stores/PaginationTypes';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import type { MiddleSectionProps } from 'components/common/PaginatedEntityTable/PaginatedEntityTable';
+import { ALPHABETICAL_SORT } from 'components/common/PaginatedEntityTable/slicing/slicingConstants';
 
 export const EVENTS_ENTITY_TABLE_ID = 'events';
 
@@ -34,6 +35,7 @@ export const commonEventAttributes: Array<Attribute> = [
     sortable: true,
     title: 'Priority',
     type: 'STRING',
+    slice_sort_default: { mode: ALPHABETICAL_SORT, direction: 'desc' },
   },
   {
     id: 'timestamp',

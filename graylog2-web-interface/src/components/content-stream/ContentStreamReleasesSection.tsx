@@ -18,10 +18,9 @@ import React from 'react';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 import isEmpty from 'lodash/isEmpty';
-import DOMPurify from 'dompurify';
 
 import { ListGroup, ListGroupItem, Label, Alert } from 'components/bootstrap';
-import { RelativeTime, Spinner, ExternalLink } from 'components/common';
+import { RelativeTime, Sanitize, Spinner, ExternalLink } from 'components/common';
 import type { FeedItem } from 'components/content-stream/hook/useContentStream';
 import useContentStream from 'components/content-stream/hook/useContentStream';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -44,8 +43,6 @@ export const StyledLabel = styled(Label)`
   width: 110px;
   display: block;
 `;
-
-const _sanitizeText = (text = '') => DOMPurify.sanitize(text);
 
 const ContentStreamReleasesSection = () => {
   const path = 'release-info';
@@ -83,8 +80,7 @@ const ContentStreamReleasesSection = () => {
       {feedList.map((feed) => (
         <StyledListGroupItem key={feed?.guid['#text'] || feed?.title}>
           <a href={feed?.link} onClick={() => handleSendTelemetry(feed)} target="_blank" rel="noreferrer">
-            {/* eslint-disable-next-line react/no-danger */}
-            <span dangerouslySetInnerHTML={{ __html: _sanitizeText(feed?.title) }} />
+            <Sanitize html={feed?.title} />
           </a>
           {feed?.pubDate ? (
             <LastOpenedTime>

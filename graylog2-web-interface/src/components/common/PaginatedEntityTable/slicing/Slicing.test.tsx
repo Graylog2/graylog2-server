@@ -25,6 +25,7 @@ import TableFetchContext, { type ContextValue } from 'components/common/Paginate
 import type { ColumnSchema } from 'components/common/EntityDataTable/types';
 import useCurrentUser from 'hooks/useCurrentUser';
 
+import { ALPHABETICAL_SORT } from './SliceFilters';
 import Slicing from './index';
 
 jest.mock('logic/telemetry/useSendTelemetry', () => () => jest.fn());
@@ -185,6 +186,13 @@ describe('Slicing', () => {
     await userEvent.click(await screen.findByRole('menuitem', { name: /risk score/i }));
 
     await waitFor(() => {
+      expect(getItems()[0]).toHaveTextContent('Alpha');
+      expect(getItems()[1]).toHaveTextContent('Beta');
+    });
+
+    await userEvent.click(screen.getByRole('button', { name: /sort descending/i }));
+
+    await waitFor(() => {
       expect(getItems()[0]).toHaveTextContent('Beta');
       expect(getItems()[1]).toHaveTextContent('Alpha');
     });
@@ -208,7 +216,7 @@ describe('Slicing', () => {
     expect(getItems()[0]).toHaveTextContent('Alpha');
     expect(getItems()[1]).toHaveTextContent('Beta');
 
-    await userEvent.click(screen.getByRole('button', { name: /sort ascending/i }));
+    await userEvent.click(screen.getByRole('button', { name: /sort descending/i }));
 
     await waitFor(() => {
       expect(getItems()[0]).toHaveTextContent('Beta');
@@ -239,11 +247,19 @@ describe('Slicing', () => {
 
     await waitFor(() => {
       expect(getItems()[0]).toHaveTextContent('(Empty Value)');
+      expect(getItems()[1]).toHaveTextContent('Alpha');
+      expect(getItems()[2]).toHaveTextContent('Beta');
+    });
+
+    await userEvent.click(screen.getByRole('button', { name: /sort descending/i }));
+
+    await waitFor(() => {
+      expect(getItems()[0]).toHaveTextContent('(Empty Value)');
       expect(getItems()[1]).toHaveTextContent('Beta');
       expect(getItems()[2]).toHaveTextContent('Alpha');
     });
 
-    await userEvent.click(screen.getByRole('button', { name: /sort descending/i }));
+    await userEvent.click(screen.getByRole('button', { name: /sort ascending/i }));
 
     await waitFor(() => {
       expect(getItems()[0]).toHaveTextContent('(Empty Value)');
@@ -294,6 +310,72 @@ describe('Slicing', () => {
     expect(screen.queryByRole('button', { name: /hide empty slices/i })).not.toBeInTheDocument();
     expect(screen.queryByTestId('empty-slices-list')).not.toBeInTheDocument();
     expect(screen.queryByText('Gamma')).not.toBeInTheDocument();
+  });
+
+  describe('slice_sort_default', () => {
+    it('applies the configured sort mode and direction on initial render', async () => {
+      const columnSchemasWithDefault: Array<ColumnSchema> = [
+        {
+          id: 'status',
+          title: 'Status',
+          type: 'STRING' as const,
+          sliceable: true,
+          slice_sort_options: [{ value: 'risk_score', title: 'Risk Score' }],
+          slice_sort_default: { mode: 'risk_score', direction: 'desc' },
+        },
+      ];
+
+      renderSUT({
+        columnSchemas: columnSchemasWithDefault,
+        fetchSlices: () =>
+          Promise.resolve({
+            slices: [
+              { value: 'Alpha', count: 1, meta: { risk_score: 2 } },
+              { value: 'Beta', count: 1, meta: { risk_score: 10 } },
+            ],
+          }),
+      });
+
+      await screen.findByText('Alpha');
+
+      // sort dropdown should display the default sort mode without user interaction
+      expect(screen.getByRole('button', { name: /risk score/i })).toBeInTheDocument();
+
+      // slices should be ordered by risk_score descending: Beta (10) before Alpha (2)
+      const getItems = () => within(screen.getByTestId('slices-list')).getAllByRole('button');
+      expect(getItems()[0]).toHaveTextContent('Beta');
+      expect(getItems()[1]).toHaveTextContent('Alpha');
+    });
+
+    it('applies the configured direction for alphabetical sort on initial render', async () => {
+      const columnSchemasWithDefault: Array<ColumnSchema> = [
+        {
+          id: 'status',
+          title: 'Status',
+          type: 'STRING' as const,
+          sliceable: true,
+          slice_sort_default: { mode: ALPHABETICAL_SORT, direction: 'desc' },
+        },
+      ];
+
+      renderSUT({
+        columnSchemas: columnSchemasWithDefault,
+        fetchSlices: () =>
+          Promise.resolve({
+            slices: [
+              { value: 'Alpha', count: 1 },
+              { value: 'Beta', count: 1 },
+            ],
+          }),
+      });
+
+      await screen.findByText('Alpha');
+
+      // slices should be sorted alphabetically descending: Beta before Alpha
+      const getItems = () => within(screen.getByTestId('slices-list')).getAllByRole('button');
+      expect(getItems()[0]).toHaveTextContent('Beta');
+      expect(getItems()[1]).toHaveTextContent('Alpha');
+    });
   });
 
   it('refetches slices when selecting a slice', async () => {

@@ -30,6 +30,8 @@ export { useSources, fetchPaginatedSources, sourcesKeyFn, SOURCES_KEY_PREFIX } f
 
 export { useCollectorStats } from './useCollectorStats';
 export { useCollectorsConfig } from './useCollectorsConfig';
+export { useCollectorInputIds } from './useCollectorInputIds';
+export { useCollectorInputDetails } from './useCollectorInputDetails';
 
 export {
   fetchPaginatedEnrollmentTokens,
@@ -38,6 +40,7 @@ export {
 } from './useEnrollmentTokenQueries';
 
 export { default as useCollectorsMutations } from './useCollectorsMutations';
+export { default as useCollectorInputMutations } from './useCollectorInputMutations';
 export { default as useDefaultInstanceFilters } from './useDefaultInstanceFilters';
 
 export { useRecentActivity, ACTIVITY_KEY } from './useActivityQueries';

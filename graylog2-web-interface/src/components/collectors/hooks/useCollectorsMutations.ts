@@ -57,11 +57,10 @@ const useCollectorsMutations = () => {
 
   // Fleet mutations
   const createFleetMutation = useMutation({
-    mutationFn: (input: { name: string; description?: string; target_version?: string | null }) =>
+    mutationFn: (input: { name: string; description?: string }) =>
       CollectorsFleets.create({
         name: input.name,
         description: input.description,
-        target_version: input.target_version ?? null,
       }),
     onError: onMutationError('Creating fleet'),
     onSuccess: (fleet) => {
@@ -76,7 +75,6 @@ const useCollectorsMutations = () => {
       CollectorsFleets.update(fleetId, {
         name: updates.name,
         description: updates.description,
-        target_version: updates.target_version ?? null,
       }),
     onError: onMutationError('Updating fleet'),
     onSuccess: (fleet) => {
@@ -140,7 +138,7 @@ const useCollectorsMutations = () => {
 
   // Enrollment token mutations
   const createEnrollmentTokenMutation = useMutation({
-    mutationFn: (input: { name: string, fleetId: string; expiresIn: string | null }) =>
+    mutationFn: (input: { name: string; fleetId: string; expiresIn: string | null }) =>
       OpAMPEnrollment.createToken({
         name: input.name,
         fleet_id: input.fleetId,
@@ -157,8 +155,7 @@ const useCollectorsMutations = () => {
   });
 
   const bulkDeleteEnrollmentTokensMutation = useMutation({
-    mutationFn: (entityIds: string[]) =>
-      OpAMPEnrollment.bulkDelete({ entity_ids: entityIds }),
+    mutationFn: (entityIds: string[]) => OpAMPEnrollment.bulkDelete({ entity_ids: entityIds }),
     onError: onMutationError('Deleting enrollment tokens'),
     onSuccess: onSuccess('Enrollment tokens have been deleted.'),
   });

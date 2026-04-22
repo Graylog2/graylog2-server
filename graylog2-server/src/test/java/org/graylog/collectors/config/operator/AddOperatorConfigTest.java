@@ -24,12 +24,12 @@ class AddOperatorConfigTest {
 
     @Test
     void createsStringAttributeOperator() {
-        final var operator = AddOperatorConfig.forAttribute("glc.receiver.type", "filelog");
+        final var operator = AddOperatorConfig.forAttribute("glc.receiver.type", "file_log");
 
         assertThat(operator.type()).isEqualTo("add");
         assertThat(operator.field()).isEqualTo("attributes[\"glc.receiver.type\"]");
         assertThat(operator.value().isTextual()).isTrue();
-        assertThat(operator.value().textValue()).isEqualTo("filelog");
+        assertThat(operator.value().textValue()).isEqualTo("file_log");
     }
 
     @Test

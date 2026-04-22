@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 
 import { Link, Icon, StatusIcon } from 'components/common';
@@ -27,6 +27,7 @@ import FormWrap from 'integrations/aws/common/FormWrap';
 import { ApiRoutes } from 'integrations/aws/common/Routes';
 import { DEFAULT_KINESIS_LOG_TYPE, KINESIS_LOG_TYPES } from 'integrations/aws/common/constants';
 import { toAWSRequest } from 'integrations/aws/common/formDataAdapter';
+import Store from 'logic/local-storage/Store';
 
 const Container = styled.div`
   border: 1px solid #a6afbd;
@@ -98,7 +99,6 @@ type StepReviewProps = {
 };
 
 const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: StepReviewProps) => {
-  const [formError, setFormError] = useState(null);
   const { formData } = useContext(FormDataContext);
   const { logData } = useContext(ApiContext);
   const {
@@ -125,7 +125,11 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
 
   const [fetchSubmitStatus, setSubmitFetch] = useFetch(
     null,
-    () => {
+    (result) => {
+      if (result?.id) {
+        Store.sessionSet('setup_wizard_input_id', result.id);
+      }
+
       onSubmit();
     },
     'POST',
@@ -142,14 +146,12 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
     }),
   );
 
-  useEffect(() => {
-    if (fetchSubmitStatus.error) {
-      setFormError({
+  const formError = fetchSubmitStatus.error
+    ? {
         full_message: fetchSubmitStatus.error,
         nice_message: <span>We were unable to save your Input, please try again in a few moments.</span>,
-      });
-    }
-  }, [fetchSubmitStatus.error]);
+      }
+    : null;
 
   const handleSubmit = () => {
     if (externalInputSubmit) {

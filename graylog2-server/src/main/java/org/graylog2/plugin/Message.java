@@ -75,6 +75,10 @@ import static com.google.common.base.CharMatcher.anyOf;
 import static com.google.common.base.CharMatcher.inRange;
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.base.Predicates.not;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_COLLECTOR_FLEET_ID;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_COLLECTOR_INSTANCE_UID;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_COLLECTOR_RECEIVER_TYPE;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_ID;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_CATEGORY;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_SUBCATEGORY;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_TYPE;
@@ -122,6 +126,11 @@ public class Message implements Messages, Indexable, Acknowledgeable {
      * Will be set to the accounted message size in bytes.
      */
     public static final String FIELD_GL2_ACCOUNTED_MESSAGE_SIZE = "gl2_accounted_message_size";
+
+    /**
+     * Will be set to the raw input message size in bytes (payload size at the transport layer).
+     */
+    public static final String FIELD_GL2_INPUT_MESSAGE_SIZE = "gl2_input_message_size";
 
     /**
      * This is the message ID. It will be set to a {@link de.huxhorn.sulky.ulid.ULID} during processing.
@@ -234,6 +243,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
     private static final ImmutableSet<String> GRAYLOG_FIELDS = ImmutableSet.of(
             FIELD_GL2_ACCOUNTED_MESSAGE_SIZE,
+            FIELD_GL2_INPUT_MESSAGE_SIZE,
             FIELD_GL2_PROCESSING_ERROR,
             FIELD_GL2_PROCESSING_DURATION_MS,
             FIELD_GL2_PROCESSING_TIMESTAMP,
@@ -246,7 +256,8 @@ public class Message implements Messages, Indexable, Acknowledgeable {
             FIELD_GL2_SOURCE_INPUT,
             FIELD_GL2_SOURCE_NODE,
             FIELD_GL2_SOURCE_RADIO,
-            FIELD_GL2_SOURCE_RADIO_INPUT
+            FIELD_GL2_SOURCE_RADIO_INPUT,
+            FIELD_GL2_FORWARDER_INPUT
     );
 
     // Graylog Illuminate Fields
@@ -263,6 +274,13 @@ public class Message implements Messages, Indexable, Acknowledgeable {
             FIELD_ILLUMINATE_GIM_TAGS,
             FIELD_ILLUMINATE_GIM_VERSION,
             FIELD_ASSOCIATED_ASSETS
+    );
+
+    private static final Set<String> COLLECTOR_FIELDS = ImmutableSet.of(
+            FIELD_COLLECTOR_RECEIVER_TYPE,
+            FIELD_COLLECTOR_SOURCE_ID,
+            FIELD_COLLECTOR_FLEET_ID,
+            FIELD_COLLECTOR_INSTANCE_UID
     );
 
     private static final ImmutableSet<String> CORE_MESSAGE_FIELDS = ImmutableSet.of(
@@ -650,7 +668,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
     private void updateSize(String fieldName, Object newValue, Object previousValue) {
         // don't count internal fields
-        if (GRAYLOG_FIELDS.contains(fieldName) || ILLUMINATE_FIELDS.contains(fieldName)) {
+        if (GRAYLOG_FIELDS.contains(fieldName) || ILLUMINATE_FIELDS.contains(fieldName) || COLLECTOR_FIELDS.contains(fieldName)) {
             return;
         }
         long newValueSize = 0;

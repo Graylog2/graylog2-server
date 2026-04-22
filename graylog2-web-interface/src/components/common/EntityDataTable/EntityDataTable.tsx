@@ -47,7 +47,14 @@ import useIntersectionObserver from 'hooks/useIntersectionObserver';
 import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
 import ActiveSliceColContext from 'components/common/EntityDataTable/contexts/ActiveSliceColContext';
 
-import type { ColumnRenderers, ColumnSchema, EntityBase, ColumnPreferences, ExpandedSectionRenderers } from './types';
+import type {
+  ColumnRenderers,
+  ColumnSchema,
+  EntityBase,
+  ColumnPreferences,
+  ExpandedSectionRenderers,
+  RowOverride,
+} from './types';
 import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
 import BulkActionsRow from './BulkActionsRow';
 
@@ -150,6 +157,7 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   enableSlicing?: boolean;
   /** Allows you to extend a row with additional information * */
   expandedSectionRenderers?: ExpandedSectionRenderers<Entity>;
+  rowOverride?: RowOverride<Entity>;
   /** User layout preferences */
   layoutPreferences: {
     attributes?: ColumnPreferences;
@@ -179,6 +187,10 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   entityActions?: (entity: Entity) => React.ReactNode;
   /** Meta data. */
   meta?: Meta;
+  /** Disable column reordering */
+  noColumnReordering?: boolean;
+  /** Disable page size select */
+  noPageSizeSelect?: boolean;
 };
 
 /**
@@ -197,6 +209,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   entityAttributesAreCamelCase,
   enableSlicing = false,
   expandedSectionRenderers = undefined,
+  rowOverride = undefined,
   layoutPreferences,
   meta = undefined,
   onChangeSlicing,
@@ -207,6 +220,8 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   pageSize = undefined,
   parentBgColor = undefined,
   appSection = undefined,
+  noColumnReordering = false,
+  noPageSizeSelect = false,
 }: Props<Entity, Meta>) => {
   const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection ?? []);
   const hasRowActions = typeof entityActions === 'function';
@@ -313,15 +328,22 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
           <ExpandedSectionsProvider>
             <ActionsRow>
               <div>{displayBulkAction && <BulkActionsRow bulkActions={actions} />}</div>
-              <LayoutConfigRow>
-                Show
-                <ButtonGroup>
-                  {displayPageSizeSelect && (
-                    <PageSizeSelect pageSize={pageSize} showLabel={false} onChange={onPageSizeChange} />
-                  )}
-                  <ColumnsVisibilitySelect<Entity> table={table} onResetLayoutPreferences={resetLayoutPreferences} />
-                </ButtonGroup>
-              </LayoutConfigRow>
+              {noColumnReordering && noPageSizeSelect ? null : (
+                <LayoutConfigRow>
+                  Show
+                  <ButtonGroup>
+                    {displayPageSizeSelect && !noPageSizeSelect && (
+                      <PageSizeSelect pageSize={pageSize} showLabel={false} onChange={onPageSizeChange} />
+                    )}
+                    {!noColumnReordering && (
+                      <ColumnsVisibilitySelect<Entity>
+                        table={table}
+                        onResetLayoutPreferences={resetLayoutPreferences}
+                      />
+                    )}
+                  </ButtonGroup>
+                </LayoutConfigRow>
+              )}
             </ActionsRow>
             <TableDndProvider table={table}>
               <DndStylesContext.Consumer>
@@ -339,6 +361,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                       <Table<Entity>
                         expandedSectionRenderers={expandedSectionRenderers}
                         headerGroups={headerGroups}
+                        rowOverride={rowOverride}
                         rows={table.getRowModel().rows}
                       />
                       <ScrollRightIndicator ref={scrolledToRightIndicator} />
