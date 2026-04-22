@@ -75,7 +75,7 @@ class SidecarRow extends React.Component<
         <td className={style.sidecarName}>
           <Link to={Routes.SYSTEM.SIDECARS.STATUS(sidecar.node_id)}>{sidecar.node_name}</Link>
         </td>
-        <td aria-label="Status">
+        <td>
           <StatusIndicator
             status={sidecarStatus.status}
             message={sidecarStatus.message}

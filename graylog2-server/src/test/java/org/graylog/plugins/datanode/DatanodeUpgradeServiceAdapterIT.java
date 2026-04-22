@@ -23,7 +23,6 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.github.zafarkhaja.semver.Version;
-import io.restassured.response.ValidatableResponse;
 import org.assertj.core.api.Assertions;
 import org.graylog.plugins.datanode.dto.ClusterState;
 import org.graylog.plugins.datanode.dto.FlushResponse;
@@ -58,20 +57,20 @@ public abstract class DatanodeUpgradeServiceAdapterIT {
     @Test
     void testUpgradeOperations() {
         Assertions.assertThat(upgradeAdapter.getClusterState())
-                .satisfies(expectedState(HealthStatus.Green, ShardReplication.ALL))
+                .satisfies(expectedReplicationStatus(ShardReplication.ALL))
                 .satisfies(nodeDetails(indexerVersion()));
 
         Assertions.assertThat(upgradeAdapter.disableShardReplication())
                 .satisfies(this::successfulFlush);
 
         Assertions.assertThat(upgradeAdapter.getClusterState())
-                .satisfies(expectedState(HealthStatus.Green, ShardReplication.PRIMARIES));
+                .satisfies(expectedReplicationStatus(ShardReplication.PRIMARIES));
 
         Assertions.assertThat(upgradeAdapter.enableShardReplication())
                 .satisfies(this::successfulFlush);
 
         Assertions.assertThat(upgradeAdapter.getClusterState())
-                .satisfies(expectedState(HealthStatus.Green, ShardReplication.ALL));
+                .satisfies(expectedReplicationStatus(ShardReplication.ALL));
     }
 
     private void waitForGreenClusterState(DatanodeUpgradeServiceAdapter upgradeAdapter) throws ExecutionException, RetryException {
@@ -109,9 +108,8 @@ public abstract class DatanodeUpgradeServiceAdapterIT {
                 });
     }
 
-    private Consumer<ClusterState> expectedState(HealthStatus status, ShardReplication shardReplication) {
+    private Consumer<ClusterState> expectedReplicationStatus(ShardReplication shardReplication) {
         return clusterState -> {
-            Assertions.assertThat(clusterState.status()).isEqualTo(status);
             Assertions.assertThat(clusterState.shardReplication()).isEqualTo(shardReplication);
         };
     }

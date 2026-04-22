@@ -15,10 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect } from 'react';
+import { useMemo } from 'react';
 
-import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
-import { useStore } from 'stores/connect';
+import { useMetrics } from 'hooks/useMetrics';
 
 type Props = {
   map: {};
@@ -26,17 +25,10 @@ type Props = {
 };
 
 const MetricsMapper = ({ map, computeValue }: Props) => {
-  const { metrics } = useStore(MetricsStore);
+  const metricNames = useMemo(() => Object.values(map) as string[], [map]);
+  const { data: metrics, isLoading } = useMetrics(metricNames);
 
-  useEffect(() => {
-    Object.keys(map).forEach((name) => MetricsActions.addGlobal(map[name]));
-
-    return () => {
-      Object.keys(map).forEach((name) => MetricsActions.removeGlobal(map[name]));
-    };
-  });
-
-  if (!metrics) {
+  if (isLoading || Object.keys(metrics).length === 0) {
     return null;
   }
 
@@ -47,7 +39,6 @@ const MetricsMapper = ({ map, computeValue }: Props) => {
       const metricName = map[key];
 
       if (metrics[nodeId][metricName]) {
-        // Only create the node entry if we actually have data
         if (!metricsMap[nodeId]) {
           metricsMap[nodeId] = {};
         }

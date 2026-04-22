@@ -77,6 +77,8 @@ jest.mock('views/logic/slices/widgetActions', () => ({
   updateWidget: jest.fn(() => async () => {}),
 }));
 
+const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+
 describe('Aggregation Widget', () => {
   useViewsPlugin();
 
@@ -140,7 +142,7 @@ describe('Aggregation Widget', () => {
       expect(saveButton).not.toBeDisabled();
     });
 
-    await userEvent.click(saveButton);
+    await setupUser().click(saveButton);
   };
 
   describe('on a dashboard', () => {
@@ -162,10 +164,10 @@ describe('Aggregation Widget', () => {
 
         // Change widget aggregation elements
         const addMetricButton = await screen.findByRole('button', { name: 'Add a Metric' });
-        await userEvent.click(addMetricButton);
+        await setupUser().click(addMetricButton);
 
         const nameInput = await screen.findByLabelText(/Name/);
-        await userEvent.type(nameInput, 'Metric name');
+        await setupUser().type(nameInput, 'Metric name');
 
         await selectEvent.chooseOption('Select a function', 'Count');
 
@@ -207,16 +209,16 @@ describe('Aggregation Widget', () => {
         const timeRangePickerButton = await screen.findByLabelText('Open Time Range Selector');
         // Suppressing nested form error for now, until usage of `NestedForms` is fixed
         await suppressConsole(async () => {
-          await userEvent.click(timeRangePickerButton);
+          await setupUser().click(timeRangePickerButton);
         });
 
         const absoluteTabButton = await screen.findByRole('tab', { name: /absolute/i });
         jest.setSystemTime(mockedUnixTime);
-        await userEvent.click(absoluteTabButton);
+        await setupUser().click(absoluteTabButton);
 
         const applyTimeRangeChangesButton = await screen.findByRole('button', { name: 'Update time range' });
         await waitFor(() => expect(applyTimeRangeChangesButton).not.toBeDisabled());
-        await userEvent.click(applyTimeRangeChangesButton);
+        await setupUser().click(applyTimeRangeChangesButton);
 
         const timeRangeDisplay = await screen.findByLabelText('Search Time Range, Opens Time Range Selector On Click');
         await within(timeRangeDisplay).findByText('2020-01-01 00:55:00.000');
@@ -245,10 +247,10 @@ describe('Aggregation Widget', () => {
 
         // Change widget aggregation elements
         const addMetricButton = await screen.findByRole('button', { name: 'Add a Metric' });
-        await userEvent.click(addMetricButton);
+        await setupUser().click(addMetricButton);
 
         const nameInput = await screen.findByLabelText(/Name/);
-        await userEvent.type(nameInput, 'Metric name');
+        await setupUser().type(nameInput, 'Metric name');
 
         await selectEvent.chooseOption('Select a function', 'Count');
 

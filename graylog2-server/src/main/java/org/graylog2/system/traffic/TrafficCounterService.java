@@ -37,6 +37,8 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -47,6 +49,7 @@ public class TrafficCounterService implements TrafficUpdater {
     private static final String FIELD_DECODED = "decoded";
     private static final String FIELD_OUTPUT = "output";
     private static final String FIELD_INPUT = "input";
+    private static final String FIELD_INPUT_INDEXED = "input_indexed";
     public static final String TRAFFIC_COLLECTION_NAME = "traffic";
 
     private final MongoCollection<TrafficDto> collection;
@@ -62,20 +65,22 @@ public class TrafficCounterService implements TrafficUpdater {
                               NodeId nodeId,
                               long inLastMinute,
                               long outLastMinute,
-                              long decodedLastMinute) {
+                              long decodedLastMinute,
+                              long inputIndexedLastMinute) {
         // we bucket traffic data by the hour and aggregate it to a day bucket for reporting
         final DateTime dayBucket = TrafficUpdater.getHourBucketStart(observationTime);
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Updating traffic for node {} at {}:  in/decoded/out {}/{}/{} bytes",
-                    nodeId, dayBucket, inLastMinute, decodedLastMinute, outLastMinute);
+            LOG.debug("Updating traffic for node {} at {}:  in/decoded/out/input-indexed {}/{}/{}/{} bytes",
+                    nodeId, dayBucket, inLastMinute, decodedLastMinute, outLastMinute, inputIndexedLastMinute);
         }
 
         final String escapedNodeId = nodeId.toEscapedString();
         UpdateResult update = collection.updateOne(Filters.eq(BUCKET, dayBucket), Updates.combine(
                 incUpdate(FIELD_INPUT, escapedNodeId, inLastMinute),
                 incUpdate(FIELD_OUTPUT, escapedNodeId, outLastMinute),
-                incUpdate(FIELD_DECODED, escapedNodeId, decodedLastMinute)
+                incUpdate(FIELD_DECODED, escapedNodeId, decodedLastMinute),
+                incUpdate(FIELD_INPUT_INDEXED, escapedNodeId, inputIndexedLastMinute)
         ), new UpdateOptions().upsert(true));
 
         if (!update.wasAcknowledged()) {
@@ -112,6 +117,8 @@ public class TrafficCounterService implements TrafficUpdater {
             trafficHistograms.add(FIELD_INPUT, trafficDto.bucket(), sumTraffic(trafficDto.input()));
             trafficHistograms.add(FIELD_OUTPUT, trafficDto.bucket(), sumTraffic(trafficDto.output()));
             trafficHistograms.add(FIELD_DECODED, trafficDto.bucket(), sumTraffic(trafficDto.decoded()));
+            trafficHistograms.add(FIELD_INPUT_INDEXED, trafficDto.bucket(),
+                    sumTraffic(trafficDto.inputIndexed() != null ? trafficDto.inputIndexed() : Collections.emptyMap()));
         });
 
         if (interval == TrafficCounterService.Interval.DAILY) {
@@ -123,7 +130,8 @@ public class TrafficCounterService implements TrafficUpdater {
                 trafficHistograms.getTo(),
                 trafficHistograms.getHistogramOrEmpty(FIELD_INPUT),
                 trafficHistograms.getHistogramOrEmpty(FIELD_OUTPUT),
-                trafficHistograms.getHistogramOrEmpty(FIELD_DECODED)
+                trafficHistograms.getHistogramOrEmpty(FIELD_DECODED),
+                trafficHistograms.getHistogramOrEmpty(FIELD_INPUT_INDEXED)
         );
 
     }
@@ -197,8 +205,10 @@ public class TrafficCounterService implements TrafficUpdater {
                                               @JsonProperty("to") DateTime to,
                                               @JsonProperty(FIELD_INPUT) Map<DateTime, Long> input,
                                               @JsonProperty(FIELD_OUTPUT) Map<DateTime, Long> output,
-                                              @JsonProperty(FIELD_DECODED) Map<DateTime, Long> decoded) {
-            return new AutoValue_TrafficCounterService_TrafficHistogram(from, to, input, output, decoded);
+                                              @JsonProperty(FIELD_DECODED) Map<DateTime, Long> decoded,
+                                              @JsonProperty(FIELD_INPUT_INDEXED) @Nullable Map<DateTime, Long> inputIndexed) {
+            return new AutoValue_TrafficCounterService_TrafficHistogram(from, to, input, output, decoded,
+                    inputIndexed != null ? inputIndexed : Map.of());
         }
 
         @JsonProperty
@@ -215,5 +225,8 @@ public class TrafficCounterService implements TrafficUpdater {
 
         @JsonProperty
         public abstract Map<DateTime, Long> decoded();
+
+        @JsonProperty("input_indexed")
+        public abstract Map<DateTime, Long> inputIndexed();
     }
 }

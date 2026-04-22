@@ -75,8 +75,9 @@ const defaultSettings = {
 };
 
 const getFormatSettingsWithCustomTickVals = (values: Array<any>, fieldType: FieldUnitType) => {
-  const min = Math.min(0, ...values);
-  const max = Math.max(...values);
+  const _values = values.map(Number);
+  const min = Math.min(0, ..._values);
+  const max = Math.max(..._values);
   const step = (max - min) / TIME_AXIS_LABELS_QUANTITY;
 
   const valueBaseUnit = getBaseUnit(fieldType);

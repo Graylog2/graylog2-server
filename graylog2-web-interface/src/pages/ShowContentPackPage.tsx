@@ -26,7 +26,12 @@ import ContentPackDetails from 'components/content-packs/ContentPackDetails';
 import ContentPackVersions from 'components/content-packs/ContentPackVersions';
 import ContentPackInstallations from 'components/content-packs/ContentPackInstallations';
 import ContentPackInstallEntityList from 'components/content-packs/ContentPackInstallEntityList';
-import { ContentPacksActions } from 'stores/content-packs/ContentPacksStore';
+import {
+  deleteContentPackRev,
+  installContentPack,
+  uninstallContentPack,
+  fetchUninstallDetails,
+} from 'hooks/useContentPackMutations';
 import useHistory from 'routing/useHistory';
 import useParams from 'routing/useParams';
 import useContentPackRevisions from 'components/content-packs/hooks/useContentPackRevisions';
@@ -73,7 +78,7 @@ const ShowContentPackPage = () => {
   const _deleteContentPackRev = (contentPackId: string, revision?: number) => {
     /* eslint-disable-next-line no-alert */
     if (window.confirm('You are about to delete this content pack revision, are you sure?')) {
-      ContentPacksActions.deleteRev(contentPackId, revision).then(
+      deleteContentPackRev(contentPackId, revision).then(
         () => {
           UserNotification.success('Content pack revision deleted successfully.', 'Success');
 
@@ -93,7 +98,7 @@ const ShowContentPackPage = () => {
   };
 
   const _onUninstallContentPackRev = (contentPackId: string, installId: string) => {
-    ContentPacksActions.uninstallDetails(contentPackId, installId).then((result: { entities: unknown }) => {
+    fetchUninstallDetails(contentPackId, installId).then((result: { entities: unknown }) => {
       setUninstallEntities(result.entities);
     });
 
@@ -110,7 +115,7 @@ const ShowContentPackPage = () => {
   };
 
   const _uninstallContentPackRev = () => {
-    ContentPacksActions.uninstall(uninstallContentPackId, uninstallInstallId).then(
+    uninstallContentPack(uninstallContentPackId, uninstallInstallId).then(
       () => {
         UserNotification.success('Content Pack uninstalled successfully.', 'Success');
         refetchInstallations();
@@ -128,7 +133,7 @@ const ShowContentPackPage = () => {
     parameters: {},
     shareRequest: EntitySharePayload,
   ) => {
-    ContentPacksActions.install(contentPackId, contentPackRev, parameters, shareRequest).then(
+    installContentPack(contentPackId, contentPackRev, parameters, shareRequest).then(
       () => {
         UserNotification.success('Content Pack installed successfully.', 'Success');
         refetchInstallations();

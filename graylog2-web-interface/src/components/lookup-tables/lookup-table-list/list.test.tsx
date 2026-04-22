@@ -67,10 +67,9 @@ jest.mock('hooks/useScopePermissions', () => ({
 }));
 
 jest.mock('components/lookup-tables/hooks/useLookupTablesAPI', () => ({
-  useFetchLookupTables: () => ({
-    fetchPaginatedLookupTables: mockFetchPaginatedLookupTables,
-    lookupTablesKeyFn: (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams],
-  }),
+  __esModule: true,
+  fetchPaginatedLookupTables: () => mockFetchPaginatedLookupTables(),
+  lookupTablesKeyFn: (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams],
   useDeleteLookupTable: () => ({
     deleteLookupTable: mockDeleteLookupTable,
     deletingLookupTable: false,
@@ -118,7 +117,7 @@ describe('Lookup Table List', () => {
   it('should be able to edit a table', async () => {
     renderSUT();
 
-    userEvent.click(await screen.findByRole('button', moreActionsName));
+    await userEvent.click(await screen.findByRole('button', moreActionsName));
 
     await screen.findByRole('menuitem', { name: /edit/i });
   });
@@ -126,9 +125,9 @@ describe('Lookup Table List', () => {
   it('should be able to delete a table', async () => {
     renderSUT();
 
-    userEvent.click(await screen.findByRole('button', moreActionsName));
-    userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
-    userEvent.click(await screen.findByRole('button', { name: /delete/i }));
+    await userEvent.click(await screen.findByRole('button', moreActionsName));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /delete/i }));
 
     expect(mockDeleteLookupTable).toHaveBeenLastCalledWith(LOOKUP_TABLES[0].id);
   });

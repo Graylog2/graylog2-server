@@ -18,29 +18,25 @@ import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 
-import type { SearchesConfig } from 'components/search/SearchConfig';
+import { asMock } from 'helpers/mocking';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
+import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
 
 import MessageActions from './MessageActions';
 
-const searchConfig: SearchesConfig = {
-  analysis_disabled_fields: [],
-  query_time_range_limit: 'PT0S',
-  relative_timerange_options: {},
-  surrounding_filter_fields: ['somefield', 'someotherfield'],
-  quick_access_timerange_presets: [],
-  surrounding_timerange_options: {
-    PT1S: '1 second',
-    PT1M: 'Only a minute',
-  },
-  auto_refresh_timerange_options: {
-    PT1S: '1 second',
-    PT1M: 'Only a minute',
-  },
-  default_auto_refresh_option: 'PT1M',
-  cancel_after_seconds: null,
-};
+jest.mock('hooks/useSearchConfiguration', () => jest.fn());
 
 describe('MessageActions', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    asMock(useSearchConfiguration).mockReturnValue({
+      config: mockSearchesClusterConfig,
+      refresh: jest.fn(),
+      isInitialLoading: false,
+    });
+  });
+
   const renderActions = (props = {}) =>
     render(
       <MessageActions
@@ -56,7 +52,6 @@ describe('MessageActions', () => {
         showOriginal
         toggleShowOriginal={() => {}}
         streams={Immutable.List()}
-        searchConfig={searchConfig}
         {...props}
       />,
     );

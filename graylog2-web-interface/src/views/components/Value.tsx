@@ -20,7 +20,6 @@ import styled from 'styled-components';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { ValueRenderer, ValueRendererProps } from 'views/components/messagelist/decoration/ValueRenderer';
-import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 import CustomHighlighting from 'views/components/highlighting/CustomHighlighting';
 
@@ -68,7 +67,6 @@ const InteractiveValue = ({
   type = FieldType.Unknown,
   unit = undefined,
 }: Props) => {
-  const queryId = useActiveQueryId();
   const RenderComponent: ValueRenderer = useMemo(
     () => render ?? ((props: ValueRendererProps) => props.value),
     [render],
@@ -82,7 +80,7 @@ const InteractiveValue = ({
   );
 
   return (
-    <ValueActions element={element} field={field} queryId={queryId} type={type} value={value}>
+    <ValueActions element={element} field={field} type={type} value={value}>
       <ValueActionTitle data-testid="value-actions-title">
         {field} = <TypeSpecificValue field={field} value={value} type={type} truncate />
       </ValueActionTitle>

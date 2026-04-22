@@ -130,7 +130,7 @@ describe('Lookup Table Details', () => {
   it('should purge all keys', async () => {
     renderView(LOOKUP_TABLES[0], CACHES[0], DATA_ADAPTERS[0]);
 
-    userEvent.click(await screen.findByRole('button', { name: /Purge all/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /Purge all/i }));
 
     expect(mockPurgeAllLookupTableKey).toHaveBeenCalledWith(LOOKUP_TABLES[0]);
   });
@@ -139,8 +139,8 @@ describe('Lookup Table Details', () => {
     const testKeyValue = 'test_key';
     renderView(LOOKUP_TABLES[0], CACHES[0], DATA_ADAPTERS[0]);
 
-    userEvent.type(await screen.findByTestId(/purgekey/i), testKeyValue);
-    userEvent.click(await screen.findByRole('button', { name: /Purge key/i }));
+    await userEvent.type(await screen.findByTestId(/purgekey/i), testKeyValue);
+    await userEvent.click(await screen.findByRole('button', { name: /Purge key/i }));
 
     expect(mockPurgeLookupTableKey).toHaveBeenCalledWith({ table: LOOKUP_TABLES[0], key: testKeyValue });
   });
@@ -168,8 +168,8 @@ describe('Lookup Table Details', () => {
 
     const testKeyInputs = await screen.findAllByRole('textbox', { name: /key/i });
 
-    userEvent.type(testKeyInputs[1], '203{tab}');
-    userEvent.click(await screen.findByTestId(/lookupbutton/i));
+    await userEvent.type(testKeyInputs[1], '203{tab}');
+    await userEvent.click(await screen.findByTestId(/lookupbutton/i));
 
     await screen.findByText(/"single_value": "Non-Authoritative Information"/i);
     screen.getByText(/"string_list_value": null/i);

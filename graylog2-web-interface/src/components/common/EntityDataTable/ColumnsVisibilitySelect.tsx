@@ -82,6 +82,7 @@ type Props<Entity> = {
 const ColumnsVisibilitySelect = <Entity extends EntityBase>({ table, onResetLayoutPreferences }: Props<Entity>) => (
   <StyledDropdownButton
     title="Columns"
+    withinPortal
     bsSize="small"
     pullRight
     aria-label="Configure visible columns"

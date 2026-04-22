@@ -15,16 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { Sort, Attribute } from 'stores/PaginationTypes';
-import EventDefinitionPriorityEnum, { EXCLUDE_INFO_FILTER } from 'logic/alerts/EventDefinitionPriorityEnum';
+import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import type { MiddleSectionProps } from 'components/common/PaginatedEntityTable/PaginatedEntityTable';
+import { ALPHABETICAL_SORT } from 'components/common/PaginatedEntityTable/slicing/slicingConstants';
 
 export const EVENTS_ENTITY_TABLE_ID = 'events';
 
 export const commonEventAttributes: Array<Attribute> = [
   {
     filter_options: [
-      { value: EXCLUDE_INFO_FILTER, title: 'Exclude Info' },
-      ...Object.keys(EventDefinitionPriorityEnum.properties).map((num) => ({ value: num, title: num })),
+      ...Object.keys(EventDefinitionPriorityEnum.properties)
+        .reverse()
+        .map((num) => ({ value: num, title: num })),
     ],
     filterable: true,
     id: 'priority',
@@ -33,6 +35,7 @@ export const commonEventAttributes: Array<Attribute> = [
     sortable: true,
     title: 'Priority',
     type: 'STRING',
+    slice_sort_default: { mode: ALPHABETICAL_SORT, direction: 'desc' },
   },
   {
     id: 'timestamp',

@@ -1,0 +1,9 @@
+rule "map_trailing_comma"
+when
+    true
+then
+    let f = {
+        field: "value",
+    };
+    trigger_test();
+end

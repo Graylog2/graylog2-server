@@ -22,6 +22,8 @@ import { defaultOnError } from 'util/conditional/onError';
 import TableFetchContext from 'components/common/PaginatedEntityTable/TableFetchContext';
 import type { Slice, SliceRenderers } from 'components/common/PaginatedEntityTable/slicing/Slicing';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
+import { slicesQueryKey } from 'components/common/PaginatedEntityTable/slicing/queryKeys';
+import useOnRefresh from 'components/common/PaginatedEntityTable/useOnRefresh';
 
 export type FetchSlices = (
   column: string,
@@ -34,8 +36,8 @@ const useFetchSlices = (fetchSlices: FetchSlices, sliceRenderers?: SliceRenderer
     searchParams: { sliceCol, query, filters },
   } = useContext(TableFetchContext);
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['slicing', sliceCol, query, filters],
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: slicesQueryKey(sliceCol, query, filters),
     queryFn: () =>
       defaultOnError(
         fetchSlices(sliceCol, query, filters).then(
@@ -44,8 +46,9 @@ const useFetchSlices = (fetchSlices: FetchSlices, sliceRenderers?: SliceRenderer
         'Error fetching table slices',
       ),
   });
+  useOnRefresh(refetch);
 
-  return { slices: data ?? [], isLoading };
+  return { slices: data ?? [], isLoading, refetchSlices: refetch };
 };
 
 export default useFetchSlices;

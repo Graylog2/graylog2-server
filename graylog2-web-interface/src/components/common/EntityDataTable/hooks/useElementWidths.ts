@@ -69,6 +69,7 @@ const useElementWidths = <Entity extends EntityBase, Meta>({
     columnWidths,
     tableIsCompressed: actionsColMinWidth === columnWidths[ACTIONS_COL_ID],
     actionsColMinWidth,
+    scrollContainerWidth,
   };
 };
 

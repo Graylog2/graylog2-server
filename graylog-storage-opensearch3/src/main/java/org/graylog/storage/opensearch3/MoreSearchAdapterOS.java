@@ -17,15 +17,16 @@
 package org.graylog.storage.opensearch3;
 
 import com.google.common.base.Stopwatch;
-import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.search.MoreSearch;
 import org.graylog.events.search.MoreSearchAdapter;
+import org.graylog.events.search.SourceStreamFilter;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.NumberRange;
 import org.graylog2.indexer.results.ChunkedResult;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.results.ResultChunk;
@@ -36,6 +37,7 @@ import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.rest.resources.entities.Slice;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch._types.ExpandWildcard;
 import org.opensearch.client.opensearch._types.FieldSort;
@@ -43,11 +45,13 @@ import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.SortOptions;
 import org.opensearch.client.opensearch._types.SortOrder;
 import org.opensearch.client.opensearch._types.aggregations.Aggregation;
+import org.opensearch.client.opensearch._types.aggregations.AggregationRange;
 import org.opensearch.client.opensearch._types.aggregations.DateHistogramAggregate;
 import org.opensearch.client.opensearch._types.aggregations.DateHistogramBucket;
 import org.opensearch.client.opensearch._types.aggregations.FieldDateMath;
 import org.opensearch.client.opensearch._types.aggregations.LongTermsAggregate;
 import org.opensearch.client.opensearch._types.aggregations.MultiBucketBase;
+import org.opensearch.client.opensearch._types.aggregations.RangeAggregation;
 import org.opensearch.client.opensearch._types.mapping.FieldType;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
@@ -78,6 +82,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(MoreSearchAdapterOS.class);
     private static final String TERMS_AGGREGATION_NAME = "alert_type";
     private static final String HISTOGRAM_AGGREGATION_NAME = "histogram";
+    private static final String SLICES_AGGREGATION_NAME = "slices";
 
     private final OfficialOpensearchClient opensearchClient;
     private final Boolean allowLeadingWildcard;
@@ -98,10 +103,10 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
     @Override
     public MoreSearch.Result eventSearch(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                          Sorting sorting, int page, int perPage, Set<String> eventStreams,
-                                         String filterString, Set<String> forbiddenSourceStreams, Map<String, Set<String>> extraFilters) {
+                                         String filterString, SourceStreamFilter sourceStreamFilter, Map<String, Set<String>> extraFilters) {
 
         final org.opensearch.client.opensearch.core.SearchRequest newSearchRequest = org.opensearch.client.opensearch.core.SearchRequest.of(builder -> {
-            builder.query(createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters));
+            builder.query(createQuery(queryString, timerange, eventStreams, filterString, sourceStreamFilter, extraFilters));
             builder.from((page - 1) * perPage);
             builder.size(perPage);
             builder.trackTotalHits(th -> th.enabled(true));
@@ -140,7 +145,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
                 .build();
     }
 
-    private Query createQuery(String queryString, TimeRange timerange, Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams, Map<String, Set<String>> extraFilters) {
+    private Query createQuery(String queryString, TimeRange timerange, Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter, Map<String, Set<String>> extraFilters) {
 
         final BoolQuery.Builder boolQuery = BoolQuery.builder();
 
@@ -153,38 +158,31 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
         boolQuery.filter(timerangeQuery(timerange));
 
 
-        extraFilters.entrySet()
-                .stream()
-                .flatMap(extraFilter -> extraFilter.getValue()
-                        .stream()
-                        .map(value -> buildExtraFilter(extraFilter.getKey(), value)))
-                .forEach(boolQuery::filter);
+        extraFilters.forEach((field, values) -> {
+            values.stream()
+                    .filter(MoreSearchAdapter::isRangeValue)
+                    .map(value -> buildExtraFilter(field, value))
+                    .forEach(boolQuery::filter);
+            final var termQueries = values.stream()
+                    .filter(v -> !MoreSearchAdapter.isRangeValue(v))
+                    .map(value -> buildExtraFilter(field, value))
+                    .toList();
+            if (!termQueries.isEmpty()) {
+                boolQuery.filter(Query.of(b -> b.bool(inner -> inner.should(termQueries).minimumShouldMatch("1"))));
+            }
+        });
 
         if (!isNullOrEmpty(filterString)) {
             boolQuery.filter(Query.builder().queryString(qs -> qs.query(filterString)).build());
         }
 
-        if (!forbiddenSourceStreams.isEmpty()) {
-            // If an event has any stream in "source_streams" that the calling search user is not allowed to access,
-            // the event must not be in the search result.
-            boolQuery.filter(forbiddenStreamsQuery(forbiddenSourceStreams));
+        if (!sourceStreamFilter.isAllAllowed()) {
+            boolQuery.filter(termsQuery(EventDto.FIELD_SOURCE_STREAMS, sourceStreamFilter.streamIds()));
         }
+
         return Query.of(b -> b.bool(boolQuery.build()));
     }
 
-    @Nonnull
-    private Query forbiddenStreamsQuery(Set<String> forbiddenSourceStreams) {
-        final List<FieldValue> values = forbiddenSourceStreams.stream().map(FieldValue::of).toList();
-        return Query.builder().bool(
-                boolQueryBuilder -> boolQueryBuilder.mustNot(
-                        mustNotBuilder -> mustNotBuilder.terms(
-                                termsQueryBuilder -> termsQueryBuilder.field(EventDto.FIELD_SOURCE_STREAMS).terms(
-                                        terms -> terms.value(values)
-                                )
-                        )
-                )
-        ).build();
-    }
 
     private Query timerangeQuery(TimeRange timerange) {
         return Query.builder().range(TimeRangeQueryFactory.createTimeRangeQuery(timerange)).build();
@@ -201,9 +199,9 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
 
     @Override
     public MoreSearch.Histogram eventHistogram(String queryString, AbsoluteRange timerange, Set<String> affectedIndices,
-                                               Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
+                                               Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
                                                ZoneId timeZone, Map<String, Set<String>> extraFilters) {
-        final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
+        final var filter = createQuery(queryString, timerange, eventStreams, filterString, sourceStreamFilter, extraFilters);
 
         final org.opensearch.client.opensearch.core.SearchRequest newSearchRequest = org.opensearch.client.opensearch.core.SearchRequest.of(builder -> {
             builder.query(filter);
@@ -223,17 +221,17 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
 
             final Aggregation histogramAggregation = Aggregation.builder().dateHistogram(dh -> {
 
-                dh.interval(t -> t.time(interval.getQuantity().toString() + interval.getUnit()));
+                        dh.interval(t -> t.time(interval.getQuantity().toString() + interval.getUnit()));
 
-                dh.field(EventDto.FIELD_EVENT_TIMESTAMP)
-                        .timeZone(timeZone.getId())
-                        .minDocCount(0)
-                        .extendedBounds(bounds -> bounds
-                                .min(FieldDateMath.builder().expr(Tools.buildElasticSearchTimeFormat(timerange.from())).build())
-                                .max(FieldDateMath.builder().expr(Tools.buildElasticSearchTimeFormat(timerange.to())).build()));
+                        dh.field(EventDto.FIELD_EVENT_TIMESTAMP)
+                                .timeZone(timeZone.getId())
+                                .minDocCount(0)
+                                .extendedBounds(bounds -> bounds
+                                        .min(FieldDateMath.builder().expr(Tools.buildElasticSearchTimeFormat(timerange.from())).build())
+                                        .max(FieldDateMath.builder().expr(Tools.buildElasticSearchTimeFormat(timerange.to())).build()));
 
-                return dh;
-            })
+                        return dh;
+                    })
                     .aggregations(TERMS_AGGREGATION_NAME, Aggregation.builder().terms(terms -> terms.minDocCount(0).field(EventDto.FIELD_ALERT)).build())
                     .build();
 
@@ -290,27 +288,26 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
         if (EventDto.FIELD_TIMERANGE_START.equals(sorting.getField())) {
             // When sorting by timerange start, add two separate sort clauses
             return List.of(
-                    SortOptions.of(builder -> builder.field(sort -> withUnmapped(sort.field(EventDto.FIELD_TIMERANGE_START).order(order), sorting))),
-                    SortOptions.of(builder -> builder.field(sort -> withUnmapped(sort.field(EventDto.FIELD_TIMERANGE_END).order(order), sorting)))
+                    SortOptions.of(builder -> builder.field(sort -> withUnmapped(sort.field(EventDto.FIELD_TIMERANGE_START).order(order), sorting, order))),
+                    SortOptions.of(builder -> builder.field(sort -> withUnmapped(sort.field(EventDto.FIELD_TIMERANGE_END).order(order), sorting, order)))
             );
         } else {
             return List.of(
-                    SortOptions.of(builder -> builder.field(sort -> withUnmapped(sort.field(sorting.getField()).order(order), sorting)))
+                    SortOptions.of(builder -> builder.field(sort -> withUnmapped(sort.field(sorting.getField()).order(order), sorting, order)))
             );
         }
     }
 
-    private FieldSort.Builder withUnmapped(FieldSort.Builder builder, Sorting sorting) {
+    private FieldSort.Builder withUnmapped(FieldSort.Builder builder, Sorting sorting, org.opensearch.client.opensearch._types.SortOrder order) {
         return sorting.getUnmappedType()
                 .map(unmappedType -> builder
                         .unmappedType(fieldType(unmappedType))
-                        .missing(missingValue(sorting)))
+                        .missing(missingValue(order)))
                 .orElse(builder);
     }
 
-    private FieldValue missingValue(Sorting sorting) {
-        final boolean first = sorting.getUppercasedDirection().equals(SortOrder.Asc.name());
-        return FieldValue.of(first ? "_first" : "_last");
+    private FieldValue missingValue(org.opensearch.client.opensearch._types.SortOrder order) {
+        return FieldValue.of(order.equals(SortOrder.Asc) ? "_first" : "_last");
     }
 
     private FieldType fieldType(String typeName) {
@@ -325,6 +322,99 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
                 .filter(s -> s.name().equalsIgnoreCase(sorting.getUppercasedDirection()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No sorting option named " + sorting.getUppercasedDirection()));
+    }
+
+    @Override
+    public List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                             Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
+                                             Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, int maxBuckets) {
+        final var filter = createQuery(queryString, timerange, eventStreams, filterString, sourceStreamFilter, extraFilters);
+
+        final org.opensearch.client.opensearch.core.SearchRequest searchRequest = org.opensearch.client.opensearch.core.SearchRequest.of(builder -> {
+            builder.query(filter);
+            builder.size(0);
+            builder.ignoreUnavailable(true);
+            builder.allowNoIndices(true);
+            builder.expandWildcards(ExpandWildcard.Open);
+
+            if (!affectedIndices.isEmpty()) {
+                builder.index(new ArrayList<>(affectedIndices));
+            }
+
+            builder.aggregations(SLICES_AGGREGATION_NAME, Aggregation.builder()
+                    .terms(terms -> terms.field(slicingColumn).size(maxBuckets))
+                    .build());
+
+            return builder;
+        });
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Query:\n{}", searchRequest.query().toJsonString());
+            LOG.debug("Execute aggregation: {}", searchRequest.toJsonString());
+        }
+
+        final SearchResponse<Map> searchResult = opensearchClient.sync(c -> c.search(searchRequest, Map.class), "Unable to perform slice aggregation query");
+        final var termsAgg = searchResult.aggregations().get(SLICES_AGGREGATION_NAME);
+
+        final List<Slice> result = new ArrayList<>();
+        if (termsAgg.isSterms()) {
+            termsAgg.sterms().buckets().array().forEach(b -> result.add(new Slice(b.key(), null, Math.toIntExact(b.docCount()), meta)));
+        } else if (termsAgg.isLterms()) {
+            termsAgg.lterms().buckets().array().forEach(b -> result.add(new Slice(b.keyAsString(), null, Math.toIntExact(b.docCount()), meta)));
+        } else if (termsAgg.isDterms()) {
+            termsAgg.dterms().buckets().array().forEach(b -> result.add(new Slice(b.keyAsString(), null, Math.toIntExact(b.docCount()), meta)));
+        }
+        return result;
+    }
+
+    @Override
+    public List<Slice> aggregateSlicesForRangeQuery(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                            Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
+                                            Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, List<NumberRange> ranges) {
+        final var filter = createQuery(queryString, timerange, eventStreams, filterString, sourceStreamFilter, extraFilters);
+
+        final RangeAggregation.Builder rangeBuilder = new RangeAggregation.Builder().field(slicingColumn);
+        ranges.forEach(r -> {
+            final AggregationRange.Builder range = new AggregationRange.Builder();
+            if (r.from() != null) {
+                range.from(JsonData.of(r.from()));
+            }
+            if (r.to() != null) {
+                range.to(JsonData.of(r.to()));
+            }
+            rangeBuilder.ranges(range.build());
+        });
+        rangeBuilder.keyed(false);
+
+        final org.opensearch.client.opensearch.core.SearchRequest searchRequest = org.opensearch.client.opensearch.core.SearchRequest.of(builder -> {
+            builder.query(filter);
+            builder.size(0);
+            builder.ignoreUnavailable(true);
+            builder.allowNoIndices(true);
+            builder.expandWildcards(ExpandWildcard.Open);
+
+            if (!affectedIndices.isEmpty()) {
+                builder.index(new ArrayList<>(affectedIndices));
+            }
+
+            builder.aggregations(SLICES_AGGREGATION_NAME, Aggregation.builder()
+                    .range(rangeBuilder.build())
+                    .build());
+
+            return builder;
+        });
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Query:\n{}", searchRequest.query().toJsonString());
+            LOG.debug("Execute range aggregation: {}", searchRequest.toJsonString());
+        }
+
+        final SearchResponse<Map> searchResult = opensearchClient.sync(c -> c.search(searchRequest, Map.class), "Unable to perform range slice aggregation query");
+        final var rangeAgg = searchResult.aggregations().get(SLICES_AGGREGATION_NAME).range();
+
+        final List<Slice> result = new ArrayList<>();
+        rangeAgg.buckets().array().forEach(b -> result.add(new Slice(b.key(), null, Math.toIntExact(b.docCount()), meta)));
+        return result;
     }
 
     @Override

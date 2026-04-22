@@ -150,13 +150,13 @@ describe('WidgetQueryControls pluggable controls', () => {
       renderSUT();
 
       const pluggableFormField = await screen.findByLabelText('Pluggable Control');
-      userEvent.type(pluggableFormField, '2');
+      await userEvent.type(pluggableFormField, '2');
 
       const searchButton = screen.getByRole('button', {
         name: /perform search \(changes were made after last search execution\)/i,
       });
       await waitFor(() => expect(searchButton).not.toHaveClass('disabled'));
-      userEvent.click(searchButton);
+      await userEvent.click(searchButton);
 
       await waitFor(() =>
         expect(mockOnSubmit).toHaveBeenCalledWith(

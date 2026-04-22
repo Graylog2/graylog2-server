@@ -29,10 +29,10 @@ const mockSendTelemetry = jest.fn();
 const mockInvalidateQueries = jest.fn();
 const mockUserNotificationSuccess = jest.fn();
 
-jest.mock('stores/streams/StreamRulesStore', () => ({
-  StreamRulesStore: {
-    create: (...args) => mockCreateStreamRule(...args),
-  },
+jest.mock('hooks/useStreamRuleMutations', () => () => ({
+  createStreamRule: (...args) => mockCreateStreamRule(...args),
+  updateStreamRule: jest.fn(),
+  removeStreamRule: jest.fn(),
 }));
 
 jest.mock('stores/streams/StreamsStore', () => ({
@@ -106,7 +106,7 @@ const TestComponent = ({ streamIsPaused }: TestComponentProps) => {
 
 describe('useCreateStreamRule', () => {
   beforeEach(() => {
-    mockCreateStreamRule.mockImplementation((_streamId, _rule, callback) => Promise.resolve().then(() => callback()));
+    mockCreateStreamRule.mockImplementation(() => Promise.resolve());
     mockResumeStream.mockImplementation((_streamId, callback) => Promise.resolve().then(() => callback()));
   });
 
@@ -117,7 +117,7 @@ describe('useCreateStreamRule', () => {
   it('creates a rule and does not prompt when stream is running', async () => {
     render(<TestComponent streamIsPaused={false} />);
 
-    userEvent.click(screen.getByRole('button', { name: /create-rule/i }));
+    await userEvent.click(screen.getByRole('button', { name: /create-rule/i }));
 
     await waitFor(() => expect(mockCreateStreamRule).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(mockSendTelemetry).toHaveBeenCalledTimes(1));
@@ -135,12 +135,12 @@ describe('useCreateStreamRule', () => {
   it('prompts to start stream after creating a rule for paused stream', async () => {
     render(<TestComponent streamIsPaused />);
 
-    userEvent.click(screen.getByRole('button', { name: /create-rule/i }));
+    await userEvent.click(screen.getByRole('button', { name: /create-rule/i }));
 
     await screen.findByText('start-dialog-open');
     await waitFor(() => expect(mockInvalidateQueries).toHaveBeenCalledTimes(1));
 
-    userEvent.click(screen.getByRole('button', { name: /start-stream/i }));
+    await userEvent.click(screen.getByRole('button', { name: /start-stream/i }));
 
     await waitFor(() => expect(mockResumeStream).toHaveBeenCalledWith('stream-id', expect.any(Function)));
     await waitFor(() => expect(mockInvalidateQueries).toHaveBeenCalledTimes(2));

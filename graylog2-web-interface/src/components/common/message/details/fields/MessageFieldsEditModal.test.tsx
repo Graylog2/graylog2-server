@@ -121,14 +121,14 @@ describe('MessageFieldsEditMode (integration, real components)', () => {
   it('cancel button runs mockedToggleEditMode', async () => {
     renderComponent();
     const backToMessageButton = await screen.findByRole('button', { name: /cancel/i });
-    userEvent.click(backToMessageButton);
+    await userEvent.click(backToMessageButton);
     expect(mockedToggleEditMode).toHaveBeenCalled();
   });
 
   it('Reset fields call the context handlers', async () => {
     renderComponent();
     const resetFieldsButton = await screen.findByRole('button', { name: /reset to default/i });
-    userEvent.click(resetFieldsButton);
+    await userEvent.click(resetFieldsButton);
     expect(resetFavoriteFields).toHaveBeenCalled();
     expect(mockedToggleEditMode).toHaveBeenCalled();
   });
@@ -136,7 +136,7 @@ describe('MessageFieldsEditMode (integration, real components)', () => {
   it('Save configuration call the context handlers', async () => {
     renderComponent();
     const saveFieldsButton = await screen.findByRole('button', { name: /save configuration/i });
-    userEvent.click(saveFieldsButton);
+    await userEvent.click(saveFieldsButton);
     expect(saveFavoriteFields).toHaveBeenCalled();
     expect(mockedToggleEditMode).toHaveBeenCalled();
   });
@@ -155,7 +155,7 @@ describe('MessageFieldsEditMode (integration, real components)', () => {
     await renderComponent();
 
     const removeIcon = await screen.findByTitle(/add rest1 to favorites/i);
-    userEvent.click(removeIcon);
+    await userEvent.click(removeIcon);
     expect(onFavoriteToggle).toHaveBeenCalledWith('rest1');
   });
 
@@ -163,7 +163,7 @@ describe('MessageFieldsEditMode (integration, real components)', () => {
     await renderComponent();
 
     const resetButton = await screen.findByRole('button', { name: /reset to default/i });
-    userEvent.click(resetButton);
+    await userEvent.click(resetButton);
     expect(resetFavoriteFields).toHaveBeenCalledWith();
   });
 });

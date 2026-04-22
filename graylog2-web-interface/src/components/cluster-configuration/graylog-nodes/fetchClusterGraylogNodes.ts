@@ -21,7 +21,7 @@ import PaginationURL from 'util/PaginationURL';
 import fetch from 'logic/rest/FetchProvider';
 import { defaultOnError } from 'util/conditional/onError';
 import type { Attribute, PaginatedResponseType, SearchParams } from 'stores/PaginationTypes';
-import type { Metric, NodeMetric } from 'stores/metrics/MetricsStore';
+import type { Metric, NodeMetric } from 'types/metrics';
 
 export const GRAYLOG_NODE_METRIC_NAMES = {
   journalSize: 'org.graylog2.journal.size',

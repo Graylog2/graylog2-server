@@ -30,7 +30,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-@DbEntity(collection = "datanodes", titleField = "node_id")
+@DbEntity(collection = "datanodes", titleField = "node_id",
+          readableFields = {})
 public class DataNodeEntity extends AbstractNode<DataNodeDto> {
 
     @JsonCreator

@@ -73,13 +73,8 @@ export default class WidgetFormattingSettings {
 
   static fromJSON(value: WidgetFormattingSettingsJSON) {
     const { chart_colors: chartColorJson } = value;
-    const chartColors: ChartColors = chartColorJson.reduce(
-      (acc, { field_name: fieldName, chart_color: chartColor }) => {
-        acc[fieldName] = chartColor;
-
-        return acc;
-      },
-      {},
+    const chartColors: ChartColors = Object.fromEntries(
+      chartColorJson.map(({ field_name: fieldName, chart_color: chartColor }) => [fieldName, chartColor]),
     );
 
     return WidgetFormattingSettings.create(chartColors);

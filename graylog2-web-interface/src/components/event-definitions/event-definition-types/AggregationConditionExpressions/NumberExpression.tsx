@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
-import get from 'lodash/get';
 
 import { Input, Col } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
@@ -43,7 +42,7 @@ const NumberExpression = ({ expression, onChange, renderLabel, validation = {} }
         name="threshold"
         label={renderLabel ? 'Threshold' : ''}
         type="number"
-        value={get(expression, 'value')}
+        value={expression?.value}
         bsStyle={validation.message ? 'error' : null}
         help={validation.message}
         onChange={handleChange}

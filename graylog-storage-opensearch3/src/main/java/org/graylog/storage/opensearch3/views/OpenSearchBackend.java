@@ -56,6 +56,7 @@ import org.graylog2.streams.StreamService;
 import org.joda.time.DateTimeZone;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch._types.ErrorCause;
+import org.opensearch.client.opensearch._types.ErrorResponse;
 import org.opensearch.client.opensearch._types.ExpandWildcard;
 import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.OpenSearchException;
@@ -338,7 +339,14 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
             final int searchTypeIndex = searchTypeIds.indexOf(searchTypeId);
             final MultiSearchResponseItem<JsonData> multiSearchResponse = results.get(searchTypeIndex);
             if (multiSearchResponse.isFailure()) {
-                ElasticsearchException e = new ElasticsearchException("Search type returned error: " + multiSearchResponse.failure().error().reason());
+                String errorResponse = multiSearchResponse.failure().toJsonString();
+                OpenSearchException failure = new OpenSearchException(OSSerializationUtils.fromJson(errorResponse, ErrorResponse._DESERIALIZER));
+                String msg = Optional.ofNullable(failure.error())
+                        .map(ErrorCause::rootCause)
+                        .map(List::getFirst)
+                        .map(rootCause -> f("%s - %s", rootCause.type(), rootCause.reason()))
+                        .orElse(failure.getMessage());
+                ElasticsearchException e = new ElasticsearchException("Search type returned error: " + msg);
                 queryContext.addError(SearchTypeErrorParser.parse(query, searchTypeId, e));
             } else {
                 Optional<ElasticsearchException> failedShards = checkForFailedShards(multiSearchResponse);

@@ -14,20 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useEffect } from 'react';
-
-import { useStore } from 'stores/connect';
-import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
+import useIndicesConfiguration from 'hooks/useIndicesConfiguration';
 
 const useMaxIndexRotationLimit = () => {
-  const { retentionStrategiesContext } = useStore(IndicesConfigurationStore);
-  const maxRetentionPeriod = retentionStrategiesContext?.max_index_retention_period;
+  const { retentionStrategiesContext } = useIndicesConfiguration();
 
-  useEffect(() => {
-    IndicesConfigurationActions.loadRetentionStrategies();
-  }, []);
-
-  return maxRetentionPeriod;
+  return retentionStrategiesContext?.max_index_retention_period;
 };
 
 export default useMaxIndexRotationLimit;
