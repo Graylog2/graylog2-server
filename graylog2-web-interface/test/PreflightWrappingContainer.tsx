@@ -29,7 +29,7 @@ type Props = {
 const PreflightWrappingContainer = ({ children }: Props) => (
   <PreflightThemeProvider>
     <DefaultQueryClientProvider>
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <ThemeWrapper>{children}</ThemeWrapper>
       </MemoryRouter>
     </DefaultQueryClientProvider>

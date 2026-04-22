@@ -32,11 +32,25 @@ export const renderWithWrapper = (Component: React.ReactElement<any>, options?: 
     ...options,
   });
 
+const dataRouterFuture = {
+  v7_relativeSplatPath: true,
+  v7_fetcherPersist: true,
+  v7_normalizeFormMethod: true,
+  v7_partialHydration: true,
+  v7_skipActionErrorRevalidation: true,
+} as const;
+
 export const renderWithDataRouter = (element: React.ReactElement<any>, options?: RenderOptions) =>
-  render(<RouterProvider router={createMemoryRouter([{ path: '/', element }])} />, {
-    wrapper: DefaultProviders,
-    ...options,
-  });
+  render(
+    <RouterProvider
+      router={createMemoryRouter([{ path: '/', element }], { future: dataRouterFuture })}
+      future={{ v7_startTransition: true }}
+    />,
+    {
+      wrapper: DefaultProviders,
+      ...options,
+    },
+  );
 
 export const renderPreflightWithWrapper = (Component: React.ReactElement<any>, options?: RenderOptions) =>
   render(Component, {

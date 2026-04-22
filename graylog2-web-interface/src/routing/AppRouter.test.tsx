@@ -64,10 +64,19 @@ const AppRouterWithContext = () => (
   </HotkeysProvider>
 );
 
+const dataRouterFuture = {
+  v7_relativeSplatPath: true,
+  v7_fetcherPersist: true,
+  v7_normalizeFormMethod: true,
+  v7_partialHydration: true,
+  v7_skipActionErrorRevalidation: true,
+} as const;
+
 const setInitialPath = (path: string) => {
   asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) =>
     createMemoryRouter(routes, {
       initialEntries: [path],
+      future: dataRouterFuture,
     }),
   );
 };
@@ -83,7 +92,9 @@ describe('AppRouter', () => {
   beforeEach(() => {
     asMock(AppConfig.isFeatureEnabled).mockReturnValue(false);
     asMock(usePluginEntities).mockReturnValue([]);
-    asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) => createMemoryRouter(routes));
+    asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) =>
+      createMemoryRouter(routes, { future: dataRouterFuture }),
+    );
   });
 
   it('routes to Getting Started Page for `/` or empty location', async () => {

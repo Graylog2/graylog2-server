@@ -27,7 +27,13 @@ jest.mock('logic/telemetry/useSendTelemetry');
 
 const wrapper =
   (pathname: string) =>
-  ({ children }: { children: React.ReactNode }) => <MemoryRouter initialEntries={[pathname]}>{children}</MemoryRouter>;
+  ({ children }: { children: React.ReactNode }) => (
+    <MemoryRouter
+      initialEntries={[pathname]}
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      {children}
+    </MemoryRouter>
+  );
 
 describe('useSendCollectorsTelemetry', () => {
   const sendTelemetry = jest.fn();

@@ -46,8 +46,22 @@ const routes = [
   { path: Routes.STARTPAGE, element: <span>Logged out</span> },
   { path: '/loggedin', element: <TestComponent /> },
 ];
+const dataRouterFuture = {
+  v7_relativeSplatPath: true,
+  v7_fetcherPersist: true,
+  v7_normalizeFormMethod: true,
+  v7_partialHydration: true,
+  v7_skipActionErrorRevalidation: true,
+} as const;
 const Wrapper = () => (
-  <RouterProvider router={createMemoryRouter(routes, { initialEntries: ['/loggedin'], initialIndex: 0 })} />
+  <RouterProvider
+    router={createMemoryRouter(routes, {
+      initialEntries: ['/loggedin'],
+      initialIndex: 0,
+      future: dataRouterFuture,
+    })}
+    future={{ v7_startTransition: true }}
+  />
 );
 
 const Providers = ({ children }: { children: React.ReactNode }) => (
