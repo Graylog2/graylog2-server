@@ -43,6 +43,14 @@ const renderHookWithWrapper = <TProps, TResult>(
     },
   });
 
+const dataRouterFuture = {
+  v7_relativeSplatPath: true,
+  v7_fetcherPersist: true,
+  v7_normalizeFormMethod: true,
+  v7_partialHydration: true,
+  v7_skipActionErrorRevalidation: true,
+} as const;
+
 const renderHookWithDataRouter = <TProps, TResult>(
   callback: (props: TProps) => TResult,
   options: RenderHookOptions<TProps> & { queryClientOptions?: QueryClientConfig } = {},
@@ -53,7 +61,12 @@ const renderHookWithDataRouter = <TProps, TResult>(
       const CustomWrapper = (options.wrapper as React.ElementType) ?? React.Fragment;
       const Wrapper = () => <CustomWrapper>{children}</CustomWrapper>;
 
-      return <RouterProvider router={createMemoryRouter([{ path: '/', element: <Wrapper /> }])} />;
+      return (
+        <RouterProvider
+          router={createMemoryRouter([{ path: '/', element: <Wrapper /> }], { future: dataRouterFuture })}
+          future={{ v7_startTransition: true }}
+        />
+      );
     },
   });
 

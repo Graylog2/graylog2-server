@@ -37,7 +37,7 @@ const noopMetricsContext = {
 const WrappingContainer = ({ children }: Props) => (
   <DefaultQueryClientProvider>
     <MetricsContext.Provider value={noopMetricsContext}>
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <DefaultQueryParamProvider>
           <DefaultProviders env="test">{children}</DefaultProviders>
         </DefaultQueryParamProvider>
