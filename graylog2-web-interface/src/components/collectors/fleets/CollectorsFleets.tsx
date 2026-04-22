@@ -18,6 +18,8 @@ import * as React from 'react';
 import { useEffect, useState, useMemo, useCallback } from 'react';
 
 import useLocation from 'routing/useLocation';
+import { Button, ButtonToolbar } from 'components/bootstrap';
+import { LinkContainer } from 'components/common';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import type { SearchParams } from 'stores/PaginationTypes';
 import Routes from 'routing/Routes';
@@ -27,6 +29,7 @@ import { FleetFormModal } from './index';
 import customColumnRenderers from './ColumnRenderers';
 import { DEFAULT_LAYOUT } from './Constants';
 
+import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
 import { fetchPaginatedFleets, fleetsKeyFn, useCollectorsMutations } from '../hooks';
 import type { Fleet } from '../types';
 
@@ -43,6 +46,17 @@ const CollectorsFleets = () => {
   const columnRenderers = useMemo(() => customColumnRenderers(), []);
 
   const fetchEntities = useCallback((searchParams: SearchParams) => fetchPaginatedFleets(searchParams), []);
+
+  const fleetActions = useCallback(
+    (fleet: Fleet) => (
+      <ButtonToolbar>
+        <LinkContainer to={collectorReceivedMessagesUrl('collector_fleet_id', fleet.id)}>
+          <Button bsSize="xsmall">Received messages</Button>
+        </LinkContainer>
+      </ButtonToolbar>
+    ),
+    [],
+  );
 
   const closeCreateModal = useCallback(() => {
     history.push(Routes.SYSTEM.COLLECTORS.FLEETS);
@@ -61,7 +75,7 @@ const CollectorsFleets = () => {
         keyFn={fleetsKeyFn}
         entityAttributesAreCamelCase={false}
         columnRenderers={columnRenderers}
-        entityActions={() => null}
+        entityActions={fleetActions}
       />
 
       {showFleetModal && <FleetFormModal onClose={closeCreateModal} onSave={handleSaveFleet} />}

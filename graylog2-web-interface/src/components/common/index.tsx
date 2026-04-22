@@ -55,6 +55,7 @@ export { default as EnterprisePluginNotFound } from './EnterprisePluginNotFound'
 export { default as EntityList } from './EntityList';
 export { default as EntityListItem } from './EntityListItem';
 export { default as ErrorAlert } from './ErrorAlert';
+export { default as FetchErrorAlert } from './FetchErrorAlert';
 export { default as ExpandableList } from './ExpandableList';
 export { default as ExpandableListItem } from './ExpandableListItem';
 export { default as ExpandableCheckboxListItem } from './ExpandableCheckboxListItem';
@@ -112,6 +113,7 @@ export { default as ReadOnlyFormGroup } from './ReadOnlyFormGroup';
 export { default as RelativeTime } from './RelativeTime';
 export { default as RestrictedAccessTooltip } from './RestrictedAccessTooltip';
 export { default as RingProgress } from './RingProgress';
+export { default as Sanitize } from './Sanitize';
 export { default as ScrollButton } from './ScrollButton';
 export { default as Skeleton } from './Skeleton';
 export { default as SearchForm } from './SearchForm';

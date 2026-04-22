@@ -144,9 +144,10 @@ public class EnrollmentTokenService {
      *
      * @param request the token creation request
      * @param creator the user who created the token
-     * @return the created token and its expiration time
+     * @return the created token, fleet ID, and its expiration time
      */
     public EnrollmentTokenResponse createToken(CreateEnrollmentTokenRequest request, EnrollmentTokenCreator creator) {
+        // TODO: Validate that request.fleetId is a valid fleet
         final var tokenSigningKey = getTokenSigningKey();
         final Instant now = Instant.now(clock);
         final @Nullable Instant expiresAt = request.expiresIn() != null ? now.plus(request.expiresIn()) : null;
@@ -164,7 +165,7 @@ public class EnrollmentTokenService {
                 .expiresAt(expiresAt)
                 .build());
 
-        return new EnrollmentTokenResponse(MongoUtils.insertedIdAsString(insertOneResult), token, expiresAt);
+        return new EnrollmentTokenResponse(MongoUtils.insertedIdAsString(insertOneResult), token, request.fleetId(), expiresAt);
     }
 
     /**
