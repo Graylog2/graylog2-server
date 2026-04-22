@@ -61,7 +61,9 @@ const CreateInputControl = () => {
   const [showWizard, setShowWizard] = useState<boolean>(false);
   const [createdInputId, setCreatedInputId] = useState<string | null>(null);
   const [createdInputData, setCreatedInputData] = useState<ConfiguredInput | null>(null);
-  const [pendingWizardInputId, setPendingWizardInputId] = useState<string | null>(() => Store.sessionGet<string>(SETUP_WIZARD_INPUT_ID_KEY) ?? null);
+  const [pendingWizardInputId, setPendingWizardInputId] = useState<string | null>(
+    () => Store.sessionGet<string>(SETUP_WIZARD_INPUT_ID_KEY) ?? null,
+  );
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const inputTypes = useInputTypes();
@@ -71,9 +73,7 @@ const CreateInputControl = () => {
 
   const hasPendingStorageWizard = inputSetupFeatureFlagIsEnabled && !!pendingWizardInputId;
   const showWizardFromStorage = hasPendingStorageWizard && !!pendingWizardInputData && !showWizard;
-  const wizardInputFromStorage = pendingWizardInputData
-    ? (pendingWizardInputData as unknown as Input)
-    : null;
+  const wizardInputFromStorage = pendingWizardInputData ? (pendingWizardInputData as unknown as Input) : null;
 
   useEffect(() => {
     if (showWizardFromStorage) {
@@ -241,7 +241,8 @@ const CreateInputControl = () => {
           <InputSetupWizard
             input={showWizard ? createInputForWizard() : wizardInputFromStorage}
             show
-            onClose={closeWizard} />
+            onClose={closeWizard}
+          />
         )}
       </Col>
     </Row>

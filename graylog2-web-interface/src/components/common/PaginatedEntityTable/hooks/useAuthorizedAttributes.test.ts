@@ -46,9 +46,7 @@ describe('useAuthorizedAttributes', () => {
   });
 
   it('should exclude attributes the user lacks permissions for', () => {
-    asMock(useCurrentUser).mockReturnValue(
-      defaultUser.toBuilder().permissions(Immutable.List()).build(),
-    );
+    asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
 
     const { result } = renderHook(() => useAuthorizedAttributes(attributes));
 
@@ -61,7 +59,10 @@ describe('useAuthorizedAttributes', () => {
 
   it('should include attributes the user has permissions for', () => {
     asMock(useCurrentUser).mockReturnValue(
-      defaultUser.toBuilder().permissions(Immutable.List(['restricted:read'])).build(),
+      defaultUser
+        .toBuilder()
+        .permissions(Immutable.List(['restricted:read']))
+        .build(),
     );
 
     const { result } = renderHook(() => useAuthorizedAttributes(attributes));
@@ -74,9 +75,7 @@ describe('useAuthorizedAttributes', () => {
   });
 
   it('should include attributes without permissions defined', () => {
-    asMock(useCurrentUser).mockReturnValue(
-      defaultUser.toBuilder().permissions(Immutable.List()).build(),
-    );
+    asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
 
     const { result } = renderHook(() => useAuthorizedAttributes(attributes));
 

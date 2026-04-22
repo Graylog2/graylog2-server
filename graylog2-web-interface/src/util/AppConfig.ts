@@ -25,7 +25,12 @@ declare global {
 }
 
 export type BrandingResource = { enabled?: boolean; url?: string | undefined };
-export type BrandingResourceKey = 'stream_rule_matcher_code' | 'contact_support' | 'contact_us' | 'marketplace' | 'forwarder_download_url';
+export type BrandingResourceKey =
+  | 'stream_rule_matcher_code'
+  | 'contact_support'
+  | 'contact_us'
+  | 'marketplace'
+  | 'forwarder_download_url';
 
 export type BrandingResources = Record<BrandingResourceKey, BrandingResource>;
 type FeatureToggle = { enabled?: boolean };

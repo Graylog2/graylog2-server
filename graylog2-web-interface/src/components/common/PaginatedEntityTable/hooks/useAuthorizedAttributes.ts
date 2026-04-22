@@ -22,8 +22,9 @@ import { isPermitted } from 'util/PermissionsMixin';
 const useAuthorizedAttributes = (attributes: Array<Attribute>) => {
   const currentUser = useCurrentUser();
 
-  return attributes.filter(({ permissions }) =>
-    !permissions?.length || isPermitted(currentUser.permissions, permissions));
+  return attributes.filter(
+    ({ permissions }) => !permissions?.length || isPermitted(currentUser.permissions, permissions),
+  );
 };
 
 export default useAuthorizedAttributes;
