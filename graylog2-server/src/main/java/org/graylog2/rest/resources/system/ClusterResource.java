@@ -137,7 +137,6 @@ public class ClusterResource extends RestResource {
     @GET
     @Timed
     @Path("/nodes")
-    @RequiresPermissions(RestPermissions.CLUSTER_CONFIGURATION_READ)
     @Operation(summary = "List all active nodes in this cluster.")
     public NodeSummaryList nodes() {
         final Map<String, Node> nodes = nodeService.allActive();
