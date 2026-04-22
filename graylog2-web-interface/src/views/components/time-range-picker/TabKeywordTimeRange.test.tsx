@@ -18,7 +18,6 @@ import userEvent from '@testing-library/user-event';
 import * as React from 'react';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';
-import { act } from 'react';
 
 import asMock from 'helpers/mocking/AsMock';
 import ToolsStore from 'stores/tools/ToolsStore';
@@ -65,31 +64,12 @@ describe('TabKeywordTimeRange', () => {
     asMock(ToolsStore.testNaturalDate).mockClear();
   });
 
-  const findValidationState = (container) => {
-    const formGroup = container.querySelector('.form-group');
-
-    return formGroup && formGroup.className.includes('has-error') ? 'error' : null;
+  const changeInput = async (input, value) => {
+    await userEvent.clear(input);
+    await userEvent.type(input, value);
   };
 
-  const changeInput = async (input, value) =>
-    act(async () => {
-      await userEvent.clear(input);
-      await userEvent.type(input, value);
-    });
-
-  const asyncRender = async (element) => {
-    let wrapper;
-
-    await act(async () => {
-      wrapper = render(element);
-    });
-
-    if (!wrapper) {
-      throw new Error('Render returned `null`.');
-    }
-
-    return wrapper;
-  };
+  const asyncRender = (element) => render(element);
 
   it('renders value passed to it', async () => {
     await asyncRender(<TabKeywordTimeRange keyword="Last hour" />);
@@ -125,9 +105,9 @@ describe('TabKeywordTimeRange', () => {
   it('shows validation errors', async () => {
     asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.reject());
 
-    const { container } = render(<TabKeywordTimeRange keyword="invalid" />);
+    render(<TabKeywordTimeRange keyword="invalid" />);
 
-    await waitFor(() => expect(findValidationState(container)).toEqual('error'));
+    await screen.findByText('validation error');
   });
 
   it('does not show keyword preview if parsing fails', async () => {

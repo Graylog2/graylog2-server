@@ -64,15 +64,18 @@ type Props = {
     description: string;
     path: string;
     exactPathMatch?: boolean;
+    BadgeComponent?: React.ComponentType<{ text: string }>;
   }>;
 };
 
 const NavTabs = ({ items }: Props) => (
   <Container>
-    {items.map(({ path, description, exactPathMatch }) => (
+    {items.map(({ path, description, exactPathMatch, BadgeComponent }) => (
       <LinkContainer to={path} relativeActive={!exactPathMatch} key={path}>
         <StyledButton bsStyle="transparent">
-          <NavItemStateIndicator>{description}</NavItemStateIndicator>
+          <NavItemStateIndicator>
+            {BadgeComponent ? <BadgeComponent text={description} /> : description}
+          </NavItemStateIndicator>
         </StyledButton>
       </LinkContainer>
     ))}

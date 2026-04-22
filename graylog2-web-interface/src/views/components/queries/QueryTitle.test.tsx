@@ -50,11 +50,11 @@ describe('QueryTitle', () => {
   const clickQueryAction = async (name: string) => {
     const openMenuTrigger = await screen.findByTestId('query-action-dropdown');
 
-    userEvent.click(openMenuTrigger);
+    await userEvent.click(openMenuTrigger);
 
     const menuItem = await screen.findByText(name);
 
-    userEvent.click(menuItem);
+    await userEvent.click(menuItem);
   };
 
   const SUT = (props: Partial<React.ComponentProps<typeof QueryTitle>>) => (

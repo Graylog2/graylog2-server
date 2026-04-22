@@ -44,7 +44,7 @@ describe('HideOnCloud', () => {
     expect(screen.getByText('The Content')).toBeInTheDocument();
   });
 
-  it('forwards props to its children', () => {
+  it('forwards props to its children', async () => {
     const onClick = jest.fn();
     asMock(AppConfig.isCloud).mockReturnValue(false);
 
@@ -55,7 +55,7 @@ describe('HideOnCloud', () => {
     );
 
     const childrenButton = screen.getByText('Click Me!');
-    userEvent.click(childrenButton);
+    await userEvent.click(childrenButton);
 
     expect(onClick).toHaveBeenCalledTimes(1);
   });

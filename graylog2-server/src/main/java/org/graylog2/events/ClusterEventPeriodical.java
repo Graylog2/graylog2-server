@@ -80,9 +80,8 @@ public class ClusterEventPeriodical extends Periodical {
                 .withWriteConcern(WriteConcern.JOURNALED);
 
         collection.createIndex(Indexes.ascending(
-                "timestamp",
-                "producer",
-                "consumers"));
+                "consumers",
+                "timestamp"));
 
         return collection;
     }

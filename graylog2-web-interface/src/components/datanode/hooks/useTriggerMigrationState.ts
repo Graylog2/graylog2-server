@@ -22,6 +22,8 @@ import { MIGRATION_STATE_QUERY_KEY } from 'components/datanode/hooks/useMigratio
 import UserNotification from 'util/UserNotification';
 import type { MigrationState, MigrationStepRequest } from 'components/datanode/Types';
 
+// @ts-expect-error
+const triggerMigration = (step: MigrationStepRequest): Promise<MigrationState> => Migration.trigger(step);
 const useTriggerMigrationState = (): {
   onTriggerNextState: (step: MigrationStepRequest) => Promise<MigrationState>;
   isLoadingNextMigrationState: boolean;
@@ -35,7 +37,7 @@ const useTriggerMigrationState = (): {
     error,
     isError,
   } = useMutation({
-    mutationFn: Migration.trigger,
+    mutationFn: triggerMigration,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: MIGRATION_STATE_QUERY_KEY });
     },
@@ -43,7 +45,7 @@ const useTriggerMigrationState = (): {
   });
 
   return {
-    onTriggerNextState: onTriggerNextState as (step: MigrationStepRequest) => Promise<MigrationState>,
+    onTriggerNextState,
     isLoadingNextMigrationState,
     isError,
     error,

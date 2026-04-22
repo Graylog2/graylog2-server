@@ -26,7 +26,6 @@ import { additionalAttributes } from 'components/events/Constants';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import parseTimerangeFilter from 'components/common/PaginatedEntityTable/parseTimerangeFilter';
 import type { TimeRange, RelativeTimeRange } from 'views/logic/queries/Query';
-
 const url = URLUtils.qualifyUrl('/events/search');
 
 type FiltersResult = {

@@ -22,6 +22,7 @@ import StreamsProvider from 'contexts/StreamsProvider';
 import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
 import TelemetryProvider from 'logic/telemetry/TelemetryProvider';
 import NodesProvider from 'contexts/NodesProvider';
+import MetricsProvider from 'contexts/MetricsProvider';
 import InputsProvider from 'contexts/InputsProvider';
 import SuggestReloadIfVersionChanged from 'routing/SuggestReloadIfVersionChanged';
 import Notifications from 'routing/Notifications';
@@ -32,11 +33,13 @@ const LoggedInPage = () => (
       <TelemetryProvider>
         <StreamsProvider>
           <NodesProvider>
-            <InputsProvider>
-              <Notifications />
-              <AppRouter />
-              <SuggestReloadIfVersionChanged />
-            </InputsProvider>
+            <MetricsProvider>
+              <InputsProvider>
+                <Notifications />
+                <AppRouter />
+                <SuggestReloadIfVersionChanged />
+              </InputsProvider>
+            </MetricsProvider>
           </NodesProvider>
         </StreamsProvider>
       </TelemetryProvider>

@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -54,10 +55,13 @@ public class NotificationsResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(NotificationsResource.class);
 
     private final NotificationService notificationService;
+    private final boolean isCloud;
 
     @Inject
-    public NotificationsResource(NotificationService notificationService) {
+    public NotificationsResource(NotificationService notificationService,
+                                 @Named("is_cloud") boolean isCloud) {
         this.notificationService = notificationService;
+        this.isCloud = isCloud;
     }
 
     public record NotificationsResponse(int total, List<Notification> notifications) {
@@ -72,6 +76,7 @@ public class NotificationsResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public NotificationsResponse listNotifications() {
         final var notifications = notificationService.all().stream()
+                .filter(notification -> !isCloud || !Notification.CLOUD_SUPPRESSED_TYPES.contains(notification.getType()))
                 .filter(notification -> isPermitted(RestPermissions.NOTIFICATIONS_READ, notification.getType().toString()))
                 .toList();
 

@@ -66,6 +66,11 @@ public record Grouping(@JsonProperty("field") @Valid @NotBlank String fieldName,
         this(fieldName, Optional.of(limit), Optional.empty(), Optional.empty(), Optional.empty());
     }
 
+    public Grouping(@JsonProperty("field") @Valid @NotBlank String fieldName,
+                    @JsonProperty("ranges") List<NumberRange> ranges) {
+        this(fieldName, Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(ranges));
+    }
+
     @Deprecated
     @Override
     public String fieldName() {

@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixed custom field form button always showing \"Add custom field\" even when editing an existing field."
+
+issues = ["23528"]
+pulls = ["25441"]

@@ -16,9 +16,6 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
-import { useQuery as useReactQuery } from '@tanstack/react-query';
-
-import { SystemInputs } from '@graylog/server-api';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import EditExtractor from 'components/extractors/EditExtractor';
@@ -30,12 +27,7 @@ import useMessage from 'views/hooks/useMessage';
 import useParams from 'routing/useParams';
 import useHistory from 'routing/useHistory';
 import useQuery from 'routing/useQuery';
-
-const useInput = (inputId: string) =>
-  useReactQuery({
-    queryKey: ['inputs', inputId],
-    queryFn: () => SystemInputs.get(inputId),
-  });
+import useInput from 'hooks/useInput';
 
 type QueryParameters = {
   example_index: string;

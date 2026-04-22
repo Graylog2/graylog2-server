@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
-import get from 'lodash/get';
 import omit from 'lodash/omit';
 
 import { Alert, Col, Row } from 'components/bootstrap';
@@ -38,6 +37,8 @@ type Props = {
   validation: {
     errors: {
       title?: string;
+      field_spec?: string[];
+      key_spec?: string[];
     };
   };
   onChange: (name: string, value: unknown) => void;
@@ -103,8 +104,8 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdi
     );
   }
 
-  const fieldErrors = get(validation, 'errors.field_spec', []);
-  const keyErrors = get(validation, 'errors.key_spec', []);
+  const fieldErrors = validation?.errors?.field_spec ?? [];
+  const keyErrors = validation?.errors?.key_spec ?? [];
   const errors = [...fieldErrors, ...keyErrors];
 
   return (

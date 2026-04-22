@@ -34,7 +34,7 @@ public interface OpensearchProcess extends ManagableProcess<OpensearchConfigurat
     List<String> stdOutLogs();
     List<String> stdErrLogs();
 
-    URI getOpensearchBaseUrl();
+    Optional<URI> getOpensearchBaseUrl();
     String getOpensearchClusterUrl();
     String getDatanodeRestApiUrl();
 
@@ -50,4 +50,6 @@ public interface OpensearchProcess extends ManagableProcess<OpensearchConfigurat
     boolean isManagerNode();
 
     List<String> configurationWarnings();
+
+    void removeConfiguration();
 }

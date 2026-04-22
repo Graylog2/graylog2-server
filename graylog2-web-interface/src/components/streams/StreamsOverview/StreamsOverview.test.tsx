@@ -18,6 +18,7 @@ import React from 'react';
 import { render, screen, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import * as Immutable from 'immutable';
+import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import { indexSets } from 'fixtures/indexSets';
 import { asMock, MockStore } from 'helpers/mocking';
@@ -183,7 +184,7 @@ describe('StreamsOverview', () => {
 
     const tableRow = await screen.findByTestId(`table-row-${streamWithRules.id}`);
 
-    userEvent.click(within(tableRow).getByTitle('Show stream rules'));
+    await userEvent.click(within(tableRow).getByTitle('Show stream rules'));
 
     await screen.findByText(/must match all of the 2 configured stream \./i);
     const deleteStreamRuleButtons = await screen.findAllByRole('button', { name: /delete stream rule/i });
@@ -235,14 +236,54 @@ describe('StreamsOverview', () => {
     renderSut();
 
     const filterRulesBadge = await screen.findByTitle('Show filter rules');
-    userEvent.click(filterRulesBadge);
+    await userEvent.click(filterRulesBadge);
 
     expect(screen.getByText('Only prod logs')).toBeInTheDocument();
     expect(screen.getByText(/Showing 1 configured filter/)).toBeInTheDocument();
 
     const hideFilterRulesBadge = await screen.findByTitle('Hide filter rules');
-    userEvent.click(hideFilterRulesBadge);
+    await userEvent.click(hideFilterRulesBadge);
 
     expect(screen.queryByText('Only prod logs')).not.toBeInTheDocument();
+  });
+
+  it('should render stream overview table elements from plugins', async () => {
+    const plugin = new PluginManifest(
+      {},
+      {
+        'components.streams.overview.tableElements': [
+          {
+            attributeName: 'data_lake',
+            attributes: [{ id: 'data_lake', title: 'Data Lake' }],
+            columnRenderers: {
+              data_lake: {
+                renderCell: () => 'Preview logs',
+                staticWidth: 'matchHeader',
+              },
+            },
+          },
+        ],
+      },
+    );
+
+    PluginStore.register(plugin);
+    asMock(useFetchEntities).mockReturnValue(paginatedStreams());
+    asMock(useUserLayoutPreferences).mockReturnValue({
+      data: {
+        ...layoutPreferences,
+        attributes: undefined,
+      },
+      isInitialLoading: false,
+      refetch: () => {},
+    });
+
+    try {
+      renderSut();
+
+      await screen.findByText('Data Lake');
+      await screen.findByText('Preview logs');
+    } finally {
+      PluginStore.unregister(plugin);
+    }
   });
 });

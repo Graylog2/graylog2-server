@@ -21,7 +21,6 @@ import styled from 'styled-components';
 
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import ElementDimensions from 'components/common/ElementDimensions';
-import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import isFilteredField from 'views/logic/IsFilteredField';
 
 import ListItem from './ListItem';
@@ -60,21 +59,13 @@ const _fieldsToShow = (
 type RowProps = {
   fieldList: ImmutableList<FieldTypeMapping>;
   activeQueryFields: ImmutableList<FieldTypeMapping>;
-  selectedQuery: string;
 };
 
-const RowComponent = ({ index, style, fieldList, activeQueryFields, selectedQuery }: RowComponentProps<RowProps>) => (
-  <ListItem
-    fieldType={fieldList.get(index)}
-    selectedQuery={selectedQuery}
-    activeQueryFields={activeQueryFields}
-    style={style}
-  />
+const RowComponent = ({ index, style, fieldList, activeQueryFields }: RowComponentProps<RowProps>) => (
+  <ListItem fieldType={fieldList.get(index)} activeQueryFields={activeQueryFields} style={style} />
 );
 
 const List = ({ filter, activeQueryFields, allFields, currentGroup }: Props) => {
-  const activeQuery = useActiveQueryId();
-
   if (!activeQueryFields) {
     return <span>No field information available.</span>;
   }
@@ -103,7 +94,6 @@ const List = ({ filter, activeQueryFields, allFields, currentGroup }: Props) => 
           rowProps={{
             fieldList,
             activeQueryFields,
-            selectedQuery: activeQuery,
           }}
         />
       )}

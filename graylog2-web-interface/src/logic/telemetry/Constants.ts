@@ -430,4 +430,52 @@ export const TELEMETRY_EVENT_TYPE = {
     SLICE_SORT_CHANGED: 'Entity Data Table Slice Sort Changed',
     SLICE_EMPTY_VALUES_TOGGLED: 'Entity Data Table Slice Empty Values Toggled',
   },
+  COLLECTORS: {
+    OVERVIEW: {
+      STAT_CARD_CLICKED: 'Collector Stat Card Clicked',
+      FLEET_CARD_CLICKED: 'Collector Overview Fleet Card Clicked',
+    },
+    FLEET: {
+      CREATE_OPENED: 'Fleet Create Opened',
+      CREATE_CANCELLED: 'Fleet Create Cancelled',
+      CREATED: 'Fleet Created',
+      UPDATED: 'Fleet Updated',
+      DELETED: 'Fleet Deleted',
+      TAB_SELECTED: 'Fleet Tab Selected',
+    },
+    SOURCE: {
+      CREATE_OPENED: 'Collector Source Create Opened',
+      CREATE_CANCELLED: 'Collector Source Create Cancelled',
+      CREATED: 'Collector Source Created',
+      UPDATED: 'Collector Source Updated',
+      DELETED: 'Collector Source Deleted',
+    },
+    INSTANCE: {
+      VIEW_LOGS_CLICKED: 'Collector Instance View Logs Clicked',
+      DETAILS_OPENED: 'Collector Instance Details Opened',
+      REASSIGNED: 'Collector Instance Reassigned',
+      DELETED: 'Collector Instance Deleted',
+      BULK_REASSIGNED: 'Collector Instances Bulk Reassigned',
+    },
+    ENROLLMENT_TOKEN: {
+      FLEET_SELECTED: 'Collector Deployment Fleet Selected',
+      EXPIRY_SELECTED: 'Collector Enrollment Token Expiry Selected',
+      GENERATED: 'Collector Enrollment Token Generated',
+      TOKEN_COPIED: 'Collector Enrollment Token Copied',
+      DELETED: 'Collector Enrollment Token Deleted',
+      BULK_DELETED: 'Collector Enrollment Tokens Bulk Deleted',
+    },
+    SETTINGS: {
+      UPDATED: 'Collector Settings Updated',
+      DIAGNOSTICS_OPENED: 'Collector Settings Diagnostics Opened',
+    },
+  },
+  RIGHT_SIDEBAR: {
+    OPENED: 'Right Sidebar Opened',
+    CLOSED: 'Right Sidebar Closed',
+    COLLAPSED: 'Right Sidebar Collapsed',
+    EXPANDED: 'Right Sidebar Expanded',
+    NAVIGATED_BACK: 'Right Sidebar Navigated Back',
+    NAVIGATED_FORWARD: 'Right Sidebar Navigated Forward',
+  },
 } as const;

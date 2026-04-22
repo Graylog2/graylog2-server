@@ -51,7 +51,7 @@ import java.util.Map;
  * @author Edgar Molina
  */
 public class MessageFactory {
-    private static final List<String> PAGER_DUTY_PRIORITIES = Arrays.asList("info", "warning", "critical", "critical");
+    private static final List<String> PAGER_DUTY_PRIORITIES = Arrays.asList("info", "info", "warning", "critical", "critical");
 
     private final EventNotificationService eventNotificationService;
     private final CustomizationConfig customizationConfig;
@@ -79,8 +79,8 @@ public class MessageFactory {
                 .map(customTitle -> templateEngine.transform(customTitle, messageModel))
                 .orElse(modelData.eventDefinitionTitle());
         String eventPriority = PAGER_DUTY_PRIORITIES.get(0);
-        int priority = ctx.eventDefinition().get().priority() - 1;
-        if (priority >= 0 && priority <= 3) {
+        int priority = ctx.eventDefinition().get().priority();
+        if (priority >= 0 && priority < PAGER_DUTY_PRIORITIES.size()) {
             eventPriority = PAGER_DUTY_PRIORITIES.get(priority);
         }
 

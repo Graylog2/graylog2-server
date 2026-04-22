@@ -20,6 +20,7 @@ import userEvent from '@testing-library/user-event';
 
 import selectEvent from 'helpers/selectEvent';
 import { AdditionalContext } from 'views/logic/ActionContext';
+import type { ActionContexts } from 'views/types';
 
 import SelectExtractorType from './SelectExtractorType';
 
@@ -46,7 +47,14 @@ describe('SelectExtractorType', () => {
   it('should render', async () => {
     render(
       <AdditionalContext.Provider key="message-key" value={{ message }}>
-        <SelectExtractorType onClose={() => {}} value={value} field={field} queryId="foo" type={FieldType.Unknown} />
+        <SelectExtractorType
+          onClose={() => {}}
+          queryId="query-id"
+          field={field}
+          type={FieldType.Unknown}
+          value={value}
+          contexts={{} as ActionContexts}
+        />
       </AdditionalContext.Provider>,
     );
 
@@ -56,7 +64,14 @@ describe('SelectExtractorType', () => {
   it('should select a extractor and open a new window', async () => {
     render(
       <AdditionalContext.Provider key="message-key" value={{ message }}>
-        <SelectExtractorType onClose={() => {}} value={value} field={field} queryId="foo" type={FieldType.Unknown} />
+        <SelectExtractorType
+          onClose={() => {}}
+          queryId="query-id"
+          field={field}
+          type={FieldType.Unknown}
+          value={value}
+          contexts={{} as ActionContexts}
+        />
       </AdditionalContext.Provider>,
     );
 

@@ -46,7 +46,7 @@ describe('DashboardPropertiesModal', () => {
 
     await userEvent.type(titleInput, 'My title');
 
-    userEvent.click(await screen.findByRole('button', { name: /create dashboard/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /create dashboard/i }));
 
     await waitFor(() => {
       expect(onSave).toHaveBeenCalledWith(

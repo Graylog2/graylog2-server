@@ -18,10 +18,10 @@ import { useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { useStore } from 'stores/connect';
-import InputStatesStore from 'stores/inputs/InputStatesStore';
 import { InputsStore, InputsActions } from 'stores/inputs/InputsStore';
-import { MetricsStore, MetricsActions } from 'stores/metrics/MetricsStore';
-import type { InputStateByNode, InputStates, InputState } from 'stores/inputs/InputStatesStore';
+import { useMetrics } from 'hooks/useMetrics';
+import useInputsStates from 'hooks/useInputsStates';
+import type { InputStateByNode, InputState } from 'hooks/useInputsStates';
 import type { Input } from 'components/messageloaders/Types';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -117,7 +117,7 @@ const useInputDiagnosis = (
     refetchInterval: 5000,
   });
 
-  const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
+  const { data: inputStates } = useInputsStates();
   const inputStateByNode = inputStates ? inputStates[inputId] || {} : ({} as InputStateByNode);
   const inputNodeStates = { total: Object.keys(inputStateByNode).length, states: {} };
 
@@ -158,16 +158,16 @@ const useInputDiagnosis = (
     [input, failures_indexing, failures_processing, failures_inputs_codecs, dropped_message_occurrence, failed_starts],
   );
 
-  const { metrics: metricsByNode } = useStore(MetricsStore);
+  const { data: metricsByNode } = useMetrics(InputDiagnosisMetricNames);
 
   const aggregateMetrics = () => {
     const result = {};
 
-    if (!metricsByNode) return result;
+    if (!metricsByNode || Object.keys(metricsByNode).length === 0) return result;
 
     InputDiagnosisMetricNames.forEach((metricName) => {
       result[metricName] = Object.keys(metricsByNode).reduce((previous, nodeId) => {
-        if (!metricsByNode[nodeId][metricName]) {
+        if (!metricsByNode[nodeId]?.[metricName]) {
           return previous;
         }
 
@@ -190,14 +190,6 @@ const useInputDiagnosis = (
 
     return Number.isFinite(value) ? value : undefined;
   }, [aggregatedMetrics, failed_starts]);
-
-  useEffect(() => {
-    InputDiagnosisMetricNames.forEach((metricName) => MetricsActions.addGlobal(metricName));
-
-    return () => {
-      InputDiagnosisMetricNames.forEach((metricName) => MetricsActions.removeGlobal(metricName));
-    };
-  }, [InputDiagnosisMetricNames]);
 
   return {
     input,

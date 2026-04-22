@@ -18,6 +18,7 @@ import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 
 import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
+import MetricsContext from 'contexts/MetricsContext';
 
 import DefaultQueryClientProvider from './DefaultQueryClientProvider';
 import DefaultProviders from './DefaultProviders';
@@ -26,13 +27,22 @@ type Props = {
   children: React.ReactNode;
 };
 
+const noopMetricsContext = {
+  metrics: {},
+  isLoading: false,
+  subscribe: () => {},
+  unsubscribe: () => {},
+};
+
 const WrappingContainer = ({ children }: Props) => (
   <DefaultQueryClientProvider>
-    <MemoryRouter>
-      <DefaultQueryParamProvider>
-        <DefaultProviders env="test">{children}</DefaultProviders>
-      </DefaultQueryParamProvider>
-    </MemoryRouter>
+    <MetricsContext.Provider value={noopMetricsContext}>
+      <MemoryRouter>
+        <DefaultQueryParamProvider>
+          <DefaultProviders env="test">{children}</DefaultProviders>
+        </DefaultQueryParamProvider>
+      </MemoryRouter>
+    </MetricsContext.Provider>
   </DefaultQueryClientProvider>
 );
 

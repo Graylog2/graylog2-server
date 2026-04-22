@@ -1,0 +1,5 @@
+type = "f"
+message = "Gracefully handle StackOverflowError in all grok pattern matching code paths instead of crashing."
+
+issues = ["graylog-plugin-enterprise#13717"]
+pulls = ["25510"]

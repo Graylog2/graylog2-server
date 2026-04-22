@@ -53,6 +53,8 @@ const config = {
   disabled: false,
 };
 
+const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+
 describe('UrlAllowlistForm', () => {
   beforeEach(() => {
     jest.useFakeTimers();
@@ -88,8 +90,8 @@ describe('UrlAllowlistForm', () => {
 
     const titleInput = screen.getByDisplayValue(config.entries[0].title);
 
-    userEvent.clear(titleInput);
-    userEvent.type(titleInput, nextValue);
+    await setupUser().clear(titleInput);
+    await setupUser().type(titleInput, nextValue);
 
     const numberCalls = 2; // First render + debounce
     await waitFor(() => expect(onUpdate).toHaveBeenCalledTimes(numberCalls));
@@ -141,7 +143,7 @@ describe('UrlAllowlistForm', () => {
 
     expect(button).toBeInTheDocument();
 
-    userEvent.click(button);
+    await setupUser().click(button);
 
     expect(screen.getByRole('cell', { name: String(config.entries.length + 1) })).toBeInTheDocument();
 
@@ -162,7 +164,7 @@ describe('UrlAllowlistForm', () => {
 
     expect(deleteButton).toBeInTheDocument();
 
-    userEvent.click(deleteButton);
+    await setupUser().click(deleteButton);
 
     await waitFor(() => expect(onUpdate).toHaveBeenCalledTimes(2));
 
@@ -185,8 +187,8 @@ describe('UrlAllowlistForm', () => {
 
       const urlInput = screen.getByDisplayValue(config.entries[0].value);
 
-      userEvent.clear(urlInput);
-      userEvent.type(urlInput, nextValue);
+      await setupUser().clear(urlInput);
+      await setupUser().type(urlInput, nextValue);
 
       const numberCalls = 2; // First render + debounce
       await waitFor(() => expect(onUpdate).toHaveBeenCalledTimes(numberCalls));
@@ -215,7 +217,7 @@ describe('UrlAllowlistForm', () => {
 
       expect(titleInput).toBeInTheDocument();
 
-      userEvent.clear(titleInput);
+      await setupUser().clear(titleInput);
 
       await screen.findByText(/Required field/i);
 

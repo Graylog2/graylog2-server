@@ -16,9 +16,10 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import styled, { css } from 'styled-components';
 
-import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { isInputRunning, isInputInSetupMode } from 'components/inputs/helpers/inputState';
+import useInputStateMutations from 'hooks/useInputsStateMutations';
 import useFeature from 'hooks/useFeature';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
@@ -35,11 +36,18 @@ type Props = {
   openWizard: () => void;
 };
 
+const StateActionButton = styled(Button)(
+  () => css`
+    min-width: 95px;
+  `,
+);
+
 const InputStateControl = ({ input, openWizard, inputStates }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
+  const { startInput: startInputMutation, stopInput: stopInputMutation } = useInputStateMutations(input as any);
 
   const startInput = () => {
     setIsLoading(true);
@@ -49,7 +57,7 @@ const InputStateControl = ({ input, openWizard, inputStates }: Props) => {
       app_action_value: 'start-input',
     });
 
-    InputStatesStore.start(input).finally(() => {
+    startInputMutation({ inputId: input.id }).finally(() => {
       setIsLoading(false);
     });
   };
@@ -62,7 +70,7 @@ const InputStateControl = ({ input, openWizard, inputStates }: Props) => {
       app_action_value: 'stop-input',
     });
 
-    InputStatesStore.stop(input).finally(() => {
+    stopInputMutation({ inputId: input.id }).finally(() => {
       setIsLoading(false);
     });
   };
@@ -78,24 +86,24 @@ const InputStateControl = ({ input, openWizard, inputStates }: Props) => {
 
   if (inputSetupFeatureFlagIsEnabled && isInputInSetupMode(inputStates, input.id)) {
     return (
-      <Button bsStyle="warning" bsSize="xsmall" onClick={setupInput}>
+      <StateActionButton bsStyle="warning" bsSize="xsmall" onClick={setupInput}>
         Set-up Input
-      </Button>
+      </StateActionButton>
     );
   }
 
   if (isInputRunning(inputStates, input.id)) {
     return (
-      <Button bsSize="xsmall" onClick={stopInput} disabled={isLoading}>
+      <StateActionButton bsSize="xsmall" onClick={stopInput} disabled={isLoading}>
         {isLoading ? 'Stopping...' : 'Stop input'}
-      </Button>
+      </StateActionButton>
     );
   }
 
   return (
-    <Button bsStyle="primary" bsSize="xsmall" onClick={startInput} disabled={isLoading}>
+    <StateActionButton bsStyle="primary" bsSize="xsmall" onClick={startInput} disabled={isLoading}>
       {isLoading ? 'Starting...' : 'Start input'}
-    </Button>
+    </StateActionButton>
   );
 };
 

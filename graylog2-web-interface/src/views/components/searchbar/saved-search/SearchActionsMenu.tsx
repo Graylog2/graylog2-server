@@ -210,9 +210,9 @@ const SearchActionsMenu = () => {
 
   useHotkey({
     actionKey: 'save',
-    callback: () => (loaded ? saveSearch(title) : openFormModal()),
+    callback: () => (loaded ? saveSearch(currentTitle) : openFormModal()),
     scope: 'search',
-    dependencies: [loaded, saveSearch, title],
+    dependencies: [loaded, saveSearch, currentTitle],
   });
 
   useHotkey({

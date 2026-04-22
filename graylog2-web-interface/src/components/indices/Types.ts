@@ -15,27 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-export type MaintenanceOptions = {
-  strategies: Array<unknown>;
-};
-
-export type IndicesConfigurationActionsType = {
-  loadRotationStrategies: () => Promise<MaintenanceOptions>;
-  loadRetentionStrategies: () => Promise<MaintenanceOptions>;
-};
-
 export interface RotationStrategyContext {
   time_size_optimizing_retention_fixed_leeway?: string;
 }
 
-export type IndicesConfigurationStoreState = {
-  activeRotationConfig: any;
-  rotationStrategies: any;
-  activeRetentionConfig: any;
-  retentionStrategies: any;
-  retentionStrategiesContext: RetentionStrategyContext;
-  rotationStrategiesContext: RotationStrategyContext;
-};
 export type SizeBasedRotationStrategyConfig = {
   type: string;
   max_size: number;

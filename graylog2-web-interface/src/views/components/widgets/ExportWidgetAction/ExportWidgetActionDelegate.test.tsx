@@ -30,13 +30,16 @@ const renderExportWidgetActionDelegate = () =>
 describe('ExtraMenuWidgetActions', () => {
   const plugExplanation =
     /export aggregation widget feature is available for the enterprise version\. This feature provides options to export your data into popular file formats such as CSV, JSON, YAML, XML, etc\./i;
+  const findNativeButton = (buttons: Array<HTMLElement>) => buttons.find((button) => button.tagName === 'BUTTON');
 
   it('Render plug when there is no WidgetExportActionComponent', async () => {
     asMock(useWidgetExportActionComponent).mockReturnValue(null);
 
     renderExportWidgetActionDelegate();
-    const exportButton = await screen.findByRole('button', { name: /export widget/i });
-    await userEvent.click(exportButton);
+    const exportButton = findNativeButton(await screen.findAllByRole('button', { name: /export widget/i }));
+
+    expect(exportButton).toBeDefined();
+    await userEvent.click(exportButton!);
 
     await screen.findByText(plugExplanation);
   });
@@ -51,7 +54,7 @@ describe('ExtraMenuWidgetActions', () => {
     renderExportWidgetActionDelegate();
     const exportButton = await screen.findByRole('button', { name: /dummy export action/i });
 
-    expect(screen.queryByRole('button', { name: /export widget/i })).not.toBeInTheDocument();
+    expect(screen.queryAllByRole('button', { name: /export widget/i })).toHaveLength(0);
 
     await userEvent.click(exportButton);
 

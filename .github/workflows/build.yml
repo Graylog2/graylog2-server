@@ -95,7 +95,7 @@ jobs:
         service:
           # Latest OpenSearch and MongoDB
           - search-server-distribution: "OpenSearch"
-            search-server-version: "2.19.3"
+            search-server-version: "2.19.5"
             mongodb-version: "8.0"
 
           # Data Node
