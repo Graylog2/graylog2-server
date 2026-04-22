@@ -16,9 +16,8 @@
  */
 import * as React from 'react';
 import type * as Immutable from 'immutable';
-import { JSONStringify } from 'json-with-bigint';
 
-import { LinkContainer, ClipboardButton } from 'components/common';
+import { LinkContainer, ClipboardButton, JSONClipboardButton } from 'components/common';
 import Routes from 'routing/Routes';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 import SurroundingSearchButton from 'components/search/SurroundingSearchButton';
@@ -132,7 +131,7 @@ const MessageActions = ({
       {pluggableActions}
 
       <ClipboardButton title="Copy ID" text={id} bsSize="small" />
-      <ClipboardButton title="Copy message" bsSize="small" text={JSONStringify(fields, null, 2)} />
+      <JSONClipboardButton title="Copy message" bsSize="small" content={fields} />
       {surroundingSearchButton}
       {disableTestAgainstStream ? null : <TestAgainstStreamButton streams={streams} id={id} index={index} />}
       {isFavoriteFieldsEnabled && <MessageEditFieldConfigurationAction />}

@@ -1,0 +1,4 @@
+type = "f"
+message = "Render Alerts & Events histogram in the user's configured timezone so its x-axis matches the events table below."
+
+pulls = ["25744"]

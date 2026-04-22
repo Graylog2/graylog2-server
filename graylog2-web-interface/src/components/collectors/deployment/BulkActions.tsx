@@ -18,22 +18,29 @@ import * as React from 'react';
 import { useCallback, useState } from 'react';
 
 import { DeleteMenuItem } from 'components/bootstrap';
-import { ConfirmDialog } from 'components/common';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import { ConfirmDialog } from 'components/common';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import { useCollectorsMutations } from '../hooks';
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 
 const BulkActions = () => {
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const { bulkDeleteEnrollmentTokens } = useCollectorsMutations();
+  const sendTelemetry = useSendCollectorsTelemetry();
   const [showConfirm, setShowConfirm] = useState(false);
 
   const handleConfirm = useCallback(async () => {
     await bulkDeleteEnrollmentTokens(selectedEntities);
+    sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.BULK_DELETED, {
+      app_action_value: 'token-bulk-delete',
+      count: selectedEntities.length,
+    });
     setSelectedEntities([]);
     setShowConfirm(false);
-  }, [selectedEntities, bulkDeleteEnrollmentTokens, setSelectedEntities]);
+  }, [selectedEntities, bulkDeleteEnrollmentTokens, sendTelemetry, setSelectedEntities]);
 
   return (
     <>
@@ -46,7 +53,7 @@ const BulkActions = () => {
           show
           onConfirm={handleConfirm}
           onCancel={() => setShowConfirm(false)}>
-          Are you sure you want to delete {selectedEntities.length} enrollment tokens? New collectors will not be able
+          Are you sure you want to delete {selectedEntities.length} enrollment tokens? New Collectors will not be able
           to enroll using the deleted tokens.
         </ConfirmDialog>
       )}

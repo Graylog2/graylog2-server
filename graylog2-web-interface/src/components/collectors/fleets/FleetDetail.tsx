@@ -20,8 +20,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import styled, { css } from 'styled-components';
 import URI from 'urijs';
 
-import { Button, ButtonToolbar, DeleteMenuItem, Label, SegmentedControl } from 'components/bootstrap';
-import { ConfirmDialog, Spinner } from 'components/common';
+import { Button, ButtonToolbar, DeleteMenuItem, SegmentedControl } from 'components/bootstrap';
+import { ConfirmDialog, Link, LinkContainer, Spinner } from 'components/common';
 import BetaBadge from 'components/common/BetaBadge';
 import { MoreActions } from 'components/common/EntityDataTable';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
@@ -29,6 +29,7 @@ import useHistory from 'routing/useHistory';
 import useQuery from 'routing/useQuery';
 import Routes from 'routing/Routes';
 import type { SearchParams } from 'stores/PaginationTypes';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import FleetSettings from './FleetSettings';
 
@@ -43,6 +44,8 @@ import {
   useCollectorsMutations,
   useDefaultInstanceFilters,
 } from '../hooks';
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
+import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
 import StatCard from '../common/StatCard';
 import { InstanceDetailDrawer } from '../instances';
 import BulkActions from '../instances/BulkActions';
@@ -93,6 +96,27 @@ const SEGMENTS = [
   { value: 'settings' as const, label: 'Settings' },
 ];
 
+type SourceActionsHandlers = {
+  onEdit: (source: Source) => void;
+  onDelete: (source: Source) => void;
+};
+
+export const sourceActionsFactory =
+  ({ onEdit, onDelete }: SourceActionsHandlers) =>
+  (source: Source) => (
+    <ButtonToolbar>
+      <LinkContainer to={collectorReceivedMessagesUrl('collector_source_id', source.id)}>
+        <Button bsSize="xsmall">Received messages</Button>
+      </LinkContainer>
+      <Button bsSize="xsmall" onClick={() => onEdit(source)}>
+        Edit
+      </Button>
+      <MoreActions>
+        <DeleteMenuItem onSelect={() => onDelete(source)} />
+      </MoreActions>
+    </ButtonToolbar>
+  );
+
 const FleetDetail = ({ fleetId }: Props) => {
   const queryClient = useQueryClient();
   const { data: fleet, isLoading: fleetLoading } = useFleet(fleetId);
@@ -109,6 +133,8 @@ const FleetDetail = ({ fleetId }: Props) => {
   const history = useHistory();
   const initialTab: FleetTab = VALID_TABS.includes(tabParam as FleetTab) ? (tabParam as FleetTab) : DEFAULT_TAB;
   const [activeTab, setActiveTab] = useState<FleetTab>(initialTab);
+
+  const sendTelemetry = useSendCollectorsTelemetry();
 
   const navigateToTab = useCallback(
     (nextTab: FleetTab, filters?: Array<string>) => {
@@ -135,9 +161,14 @@ const FleetDetail = ({ fleetId }: Props) => {
 
   const onTabChange = useCallback(
     (nextTab: FleetTab) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.FLEET.TAB_SELECTED, {
+        app_action_value: `tab-${nextTab}`,
+        fleet_id: fleetId,
+        tab: nextTab,
+      });
       navigateToTab(nextTab);
     },
-    [navigateToTab],
+    [fleetId, navigateToTab, sendTelemetry],
   );
 
   const fleetNames = useMemo(() => (fleet ? { [fleet.id]: fleet.name } : {}), [fleet]);
@@ -170,20 +201,17 @@ const FleetDetail = ({ fleetId }: Props) => {
     if (!deletingSource) return;
 
     await deleteSource({ fleetId, sourceId: deletingSource.id });
+    sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SOURCE.DELETED, {
+      app_action_value: 'source-delete',
+      fleet_id: fleetId,
+      source_id: deletingSource.id,
+      source_type: deletingSource.type,
+    });
     setDeletingSource(null);
-  }, [deletingSource, deleteSource, fleetId]);
+  }, [deletingSource, deleteSource, fleetId, sendTelemetry]);
 
-  const sourceActions = useCallback(
-    (source: Source) => (
-      <ButtonToolbar>
-        <Button bsSize="xsmall" onClick={() => setEditingSource(source)}>
-          Edit
-        </Button>
-        <MoreActions>
-          <DeleteMenuItem onSelect={() => setDeletingSource(source)} />
-        </MoreActions>
-      </ButtonToolbar>
-    ),
+  const sourceActions = useMemo(
+    () => sourceActionsFactory({ onEdit: setEditingSource, onDelete: setDeletingSource }),
     [],
   );
 
@@ -212,31 +240,102 @@ const FleetDetail = ({ fleetId }: Props) => {
         <h2>
           {fleet.name} <BetaBadge />
         </h2>
-        {fleet.target_version && <Label bsStyle="info">v{fleet.target_version}</Label>}
       </Header>
 
       <StatsRow>
-        <StatCard value={stats?.total_instances ?? 0} label="Instances" onClick={() => navigateToTab('instances')} />
+        <StatCard
+          value={stats?.total_instances ?? 0}
+          label="Instances"
+          helpText="Collector processes enrolled in this fleet."
+          onClick={() => {
+            sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.OVERVIEW.STAT_CARD_CLICKED, {
+              app_action_value: 'stat-card-instances',
+              card: 'instances',
+              value: stats?.total_instances ?? 0,
+              variant: 'default',
+              navigates_to: 'instances',
+              total_instances: stats?.total_instances ?? 0,
+              online_instances: stats?.online_instances ?? 0,
+              offline_instances: stats?.offline_instances ?? 0,
+              total_fleets: 0,
+              total_sources: stats?.total_sources ?? 0,
+            });
+            navigateToTab('instances');
+          }}
+        />
         <StatCard
           value={stats?.online_instances ?? 0}
           label="Online"
+          helpText="Instances that reported a heartbeat within the offline threshold."
           variant="success"
-          onClick={() => navigateToTab('instances', ['status=online'])}
+          onClick={() => {
+            sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.OVERVIEW.STAT_CARD_CLICKED, {
+              app_action_value: 'stat-card-online',
+              card: 'online',
+              value: stats?.online_instances ?? 0,
+              variant: 'success',
+              navigates_to: 'instances-online',
+              total_instances: stats?.total_instances ?? 0,
+              online_instances: stats?.online_instances ?? 0,
+              offline_instances: stats?.offline_instances ?? 0,
+              total_fleets: 0,
+              total_sources: stats?.total_sources ?? 0,
+            });
+            navigateToTab('instances', ['status=online']);
+          }}
         />
         <StatCard
           value={stats?.offline_instances ?? 0}
           label="Offline"
+          helpText="Instances that missed their heartbeat. Check host connectivity or Collector process status."
           variant="warning"
-          onClick={() => navigateToTab('instances', ['status=offline'])}
+          onClick={() => {
+            sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.OVERVIEW.STAT_CARD_CLICKED, {
+              app_action_value: 'stat-card-offline',
+              card: 'offline',
+              value: stats?.offline_instances ?? 0,
+              variant: 'warning',
+              navigates_to: 'instances-offline',
+              total_instances: stats?.total_instances ?? 0,
+              online_instances: stats?.online_instances ?? 0,
+              offline_instances: stats?.offline_instances ?? 0,
+              total_fleets: 0,
+              total_sources: stats?.total_sources ?? 0,
+            });
+            navigateToTab('instances', ['status=offline']);
+          }}
         />
-        <StatCard value={stats?.total_sources ?? 0} label="Sources" onClick={() => navigateToTab('sources')} />
+        <StatCard
+          value={stats?.total_sources ?? 0}
+          label="Sources"
+          helpText="Data collection configurations assigned to this fleet."
+          onClick={() => {
+            sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.OVERVIEW.STAT_CARD_CLICKED, {
+              app_action_value: 'stat-card-sources',
+              card: 'sources',
+              value: stats?.total_sources ?? 0,
+              variant: 'default',
+              navigates_to: 'sources',
+              total_instances: stats?.total_instances ?? 0,
+              online_instances: stats?.online_instances ?? 0,
+              offline_instances: stats?.offline_instances ?? 0,
+              total_fleets: 0,
+              total_sources: stats?.total_sources ?? 0,
+            });
+            navigateToTab('sources');
+          }}
+        />
       </StatsRow>
 
       <SegmentedControl<FleetTab> data={SEGMENTS} value={activeTab} onChange={onTabChange} />
 
       {activeTab === 'sources' && (
         <>
+          <p>Sources are automatically pushed to all Collectors in this fleet. Changes take effect within seconds.</p>
           <ActionsRow>
+            <LinkContainer to={collectorReceivedMessagesUrl('collector_fleet_id', fleet.id)}>
+              <Button>Received messages</Button>
+            </LinkContainer>
             <Button bsStyle="primary" onClick={() => setShowSourceModal(true)}>
               Add Source
             </Button>
@@ -254,17 +353,24 @@ const FleetDetail = ({ fleetId }: Props) => {
       )}
 
       {activeTab === 'instances' && (
-        <PaginatedEntityTable<CollectorInstanceView>
-          humanName="instances"
-          entityActions={instanceActions}
-          tableLayout={INSTANCES_LAYOUT}
-          fetchEntities={fetchInstances}
-          keyFn={(params) => [...instancesKeyFn(params), fleetId]}
-          entityAttributesAreCamelCase={false}
-          columnRenderers={instanceRenderers}
-          defaultFilters={defaultInstanceFilters}
-          bulkSelection={{ actions: <BulkActions /> }}
-        />
+        <>
+          <p>
+            Collector instances enrolled in this fleet. Each instance runs all enabled sources. To add more instances,{' '}
+            <Link to={Routes.SYSTEM.COLLECTORS.DEPLOYMENT}>deploy Collectors</Link> using an enrollment token for this
+            fleet.
+          </p>
+          <PaginatedEntityTable<CollectorInstanceView>
+            humanName="instances"
+            entityActions={instanceActions}
+            tableLayout={INSTANCES_LAYOUT}
+            fetchEntities={fetchInstances}
+            keyFn={(params) => [...instancesKeyFn(params), fleetId]}
+            entityAttributesAreCamelCase={false}
+            columnRenderers={instanceRenderers}
+            defaultFilters={defaultInstanceFilters}
+            bulkSelection={{ actions: <BulkActions /> }}
+          />
+        </>
       )}
 
       {activeTab === 'settings' && (
@@ -311,7 +417,8 @@ const FleetDetail = ({ fleetId }: Props) => {
           show
           onConfirm={handleConfirmDeleteSource}
           onCancel={() => setDeletingSource(null)}>
-          Are you sure you want to delete source <strong>{deletingSource.name}</strong>?
+          Are you sure you want to delete source <strong>{deletingSource.name}</strong>? Collectors in this fleet will
+          stop collecting data from this source within seconds.
         </ConfirmDialog>
       )}
     </div>

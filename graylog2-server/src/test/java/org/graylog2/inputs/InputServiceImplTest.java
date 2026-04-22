@@ -17,7 +17,9 @@
 package org.graylog2.inputs;
 
 import com.google.common.collect.ImmutableSet;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
@@ -356,6 +358,36 @@ public class InputServiceImplTest {
     }
 
     @Test
+    @MongoDBFixtures("InputServiceImplTest.json")
+    void testAddStaticFieldWithDuplicateKeyReplacesValue() throws Exception {
+        final String inputId = "54e3deadbeefdeadbeef0003";
+        final Input input = inputService.find(inputId);
+
+        // Add a static field with the same key but different value
+        inputService.addStaticField(input, "static_field", "bar");
+
+        // Should have exactly one entry with the new value, not a duplicate
+        final List<Map.Entry<String, String>> fields = inputService.getStaticFields(inputId);
+        assertThat(fields).hasSize(1).isEqualTo(List.of(Map.entry("static_field", "bar")));
+    }
+
+    @Test
+    @MongoDBFixtures("InputServiceImplTest.json")
+    void testAddStaticFieldWithNewKey() throws Exception {
+        final String inputId = "54e3deadbeefdeadbeef0003";
+        final Input input = inputService.find(inputId);
+
+        // Add a new static field with a different key
+        inputService.addStaticField(input, "new_field", "new_value");
+
+        // Should now have two static fields: the original and the new one
+        final List<Map.Entry<String, String>> fields = inputService.getStaticFields(inputId);
+        assertThat(fields).hasSize(2)
+                .contains(Map.entry("static_field", "foo"))
+                .contains(Map.entry("new_field", "new_value"));
+    }
+
+    @Test
     public void findIdsByDesiredState() throws Exception {
         InputImpl stoppedInput = InputImpl.builder()
                 .setTitle("stopped input")
@@ -384,6 +416,56 @@ public class InputServiceImplTest {
 
         Set<String> runningIds = inputService.findIdsByDesiredState(IOState.Type.RUNNING);
         assertThat(runningIds).containsExactly(runningInputId);
+    }
+
+    /**
+     * Guards against unintended serialization to the {@code inputs} collection.
+     * <p>
+     * {@link InputImpl} retains a {@code getFields()} Map view for back-compat with the legacy
+     * {@link org.graylog2.database.PersistedImpl}-style representation that the input update flow still
+     * relies on. Any unannotated getter on {@link Input} or {@link InputImpl} will be picked up by
+     * Jackson/mongojack and persisted — assert here that the on-disk top-level key set matches an
+     * explicit allowlist.
+     * <p>
+     * When intentionally adding a new field to the input document, update the allowlist below.
+     */
+    @Test
+    public void persistedDocumentContainsOnlyExpectedFields(MongoCollections mongoCollections) throws Exception {
+        final InputImpl input = InputImpl.builder()
+                .setTitle("contract test input")
+                .setType("test type")
+                .setCreatorUserId("admin")
+                .setCreatedAt(Tools.nowUTC())
+                .setConfiguration(Map.of("k", "v"))
+                .setPersistedDesiredState(IOState.Type.RUNNING)
+                .setGlobal(true)
+                .setContentPack("content-pack-1")
+                .setNodeId("node-123")
+                .setEmbeddedStaticFields(List.of(
+                        Map.of(InputImpl.FIELD_STATIC_FIELD_KEY, "static_key",
+                                InputImpl.FIELD_STATIC_FIELD_VALUE, "static_value")))
+                .build();
+
+        final String id = inputService.save(input);
+
+        final MongoCollection<Document> rawCollection =
+                mongoCollections.nonEntityCollection(InputServiceImpl.COLLECTION_NAME, Document.class);
+        final Document doc = rawCollection.find(Filters.eq(InputImpl.FIELD_ID, new ObjectId(id))).first();
+
+        assertThat(doc).isNotNull();
+        assertThat(doc.keySet()).containsExactlyInAnyOrder(
+                InputImpl.FIELD_ID,
+                InputImpl.FIELD_TITLE,
+                InputImpl.FIELD_TYPE,
+                InputImpl.FIELD_CREATOR_USER_ID,
+                InputImpl.FIELD_CREATED_AT,
+                InputImpl.FIELD_GLOBAL,
+                InputImpl.FIELD_CONFIGURATION,
+                InputImpl.EMBEDDED_STATIC_FIELDS,
+                InputImpl.FIELD_DESIRED_STATE,
+                InputImpl.FIELD_CONTENT_PACK,
+                InputImpl.FIELD_NODE_ID
+        );
     }
 
     private InputImpl createTestInput() {

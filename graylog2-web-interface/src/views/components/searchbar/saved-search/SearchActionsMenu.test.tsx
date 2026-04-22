@@ -289,6 +289,22 @@ describe('SearchActionsMenu', () => {
       await waitFor(() => expect(OnSaveViewAction).toHaveBeenCalledTimes(1));
     });
 
+    it('should preserve the original view title when saving via keyboard shortcut', async () => {
+      asMock(OnSaveViewAction).mockClear();
+      asMock(useView).mockReturnValue(_createView('some-id'));
+      asMock(useIsDirty).mockReturnValue(true);
+      render(<SimpleSearchActionsMenu />);
+      await userEvent.keyboard('{Meta>}s{/Meta}');
+
+      await waitFor(() => {
+        expect(OnSaveViewAction).toHaveBeenCalledTimes(1);
+
+        const savedView = asMock(OnSaveViewAction).mock.calls[0][0];
+
+        expect(savedView.title).toBe('title');
+      });
+    });
+
     describe('has "Share" option', () => {
       beforeEach(() => {
         asMock(useView).mockReturnValue(defaultView.toBuilder().id(adminUser.id).build());

@@ -16,10 +16,9 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import DOMPurify from 'dompurify';
 
 import { Alert } from 'components/bootstrap';
-import { RelativeTime, Spinner } from 'components/common';
+import { RelativeTime, Sanitize, Spinner } from 'components/common';
 import type { NotificationType } from 'components/notifications/types';
 import useNotificationDelete from 'components/notifications/useNotificationDelete';
 
@@ -50,8 +49,6 @@ const NotificationTimestamp = styled.span(
   `,
 );
 
-const _sanitizeDescription = (description: string) => DOMPurify.sanitize(description);
-
 const Notification = ({ notification }: Props) => {
   const message = useNotificationMessage(notification);
   const deleteNotification = useNotificationDelete();
@@ -67,23 +64,21 @@ const Notification = ({ notification }: Props) => {
     return <Spinner />;
   }
 
-  /* eslint-disable react/no-danger */
   return (
     <StyledAlert
       bsStyle="danger"
       title={
         <>
-          <div dangerouslySetInnerHTML={{ __html: _sanitizeDescription(message?.title) }} />
+          <Sanitize html={message?.title} />
           <NotificationTimestamp>
             (triggered <RelativeTime dateTime={notification.timestamp} />)
           </NotificationTimestamp>
         </>
       }
       onDismiss={_onClose}>
-      <div
-        dangerouslySetInnerHTML={{ __html: _sanitizeDescription(message?.description) }}
-        className="notification-description"
-      />
+      <div className="notification-description">
+        <Sanitize html={message?.description} />
+      </div>
     </StyledAlert>
   );
 };

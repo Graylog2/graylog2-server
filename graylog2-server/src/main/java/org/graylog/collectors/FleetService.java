@@ -96,12 +96,11 @@ public class FleetService {
         return Optional.ofNullable(collection.find(idEq(fleetId)).first());
     }
 
-    public FleetDTO create(String name, @Nullable String description, @Nullable String targetVersion) {
+    public FleetDTO create(String name, @Nullable String description) {
         final Instant now = Instant.now();
         final FleetDTO fleet = FleetDTO.builder()
                 .name(name)
                 .description(description)
-                .targetVersion(targetVersion)
                 .createdAt(now)
                 .updatedAt(now)
                 .build();
@@ -116,12 +115,11 @@ public class FleetService {
         return saved;
     }
 
-    public Optional<FleetDTO> update(String fleetId, String name, @Nullable String description, @Nullable String targetVersion) {
+    public Optional<FleetDTO> update(String fleetId, String name, @Nullable String description) {
         return get(fleetId).map(existing -> {
             final FleetDTO updated = existing.toBuilder()
                     .name(name)
                     .description(description)
-                    .targetVersion(targetVersion)
                     .updatedAt(Instant.now())
                     .build();
             collection.replaceOne(idEq(fleetId), updated);
