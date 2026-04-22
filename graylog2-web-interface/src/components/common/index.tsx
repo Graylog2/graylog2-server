@@ -113,6 +113,7 @@ export { default as ReadOnlyFormGroup } from './ReadOnlyFormGroup';
 export { default as RelativeTime } from './RelativeTime';
 export { default as RestrictedAccessTooltip } from './RestrictedAccessTooltip';
 export { default as RingProgress } from './RingProgress';
+export { default as Sanitize } from './Sanitize';
 export { default as ScrollButton } from './ScrollButton';
 export { default as Skeleton } from './Skeleton';
 export { default as SearchForm } from './SearchForm';
