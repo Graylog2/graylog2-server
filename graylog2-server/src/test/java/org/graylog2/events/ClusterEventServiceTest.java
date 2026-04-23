@@ -154,6 +154,24 @@ public class ClusterEventServiceTest {
     }
 
     @Test
+    public void cursorReopenDoesNotReprocessLastEvent() {
+        final SimpleEventHandler handler = new SimpleEventHandler();
+        serverEventBus.register(handler);
+
+        saveEvent(TIME.toDate(), SimpleEvent.class.getCanonicalName(), ImmutableMap.of("payload", "test"));
+
+        final var saved = collection.find().first();
+        final var lastId = saved.getObjectId("_id").toHexString();
+
+        // Simulate a cursor reopen from the offset of the just-processed event.
+        final var offsetAfterProcessing = new Offset(TIME.toDate(), lastId);
+        clusterEventService.iterateEvents(clusterEventService.eventsIterable(offsetAfterProcessing).iterator());
+
+        assertThat(handler.invocations).hasValue(0);
+        verify(serverEventBus, never()).post(any(SimpleEvent.class));
+    }
+
+    @Test
     public void runHandlesAutoValueCorrectly() throws Exception {
         final DebugEvent event = DebugEvent.create("Node ID", TIME, "test");
         saveEvent(TIME.toDate(), DebugEvent.class.getCanonicalName(), objectMapper.convertValue(event, Map.class));

@@ -36,6 +36,7 @@ import com.mongodb.client.model.UpdateOptions;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
@@ -202,10 +203,11 @@ public class ClusterEventService extends AbstractExecutionThreadService {
 
     @VisibleForTesting
     FindIterable<ClusterEvent> eventsIterable(Offset offset) {
+        final var lastSeen = offset.lastSeen();
         final var timestampQuery = offset.lastId() == null
-                ? Filters.gte(ClusterEvent.FIELD_TIMESTAMP, offset.lastSeen())
-                : Filters.or(Filters.gt(ClusterEvent.FIELD_TIMESTAMP, offset.lastSeen()),
-                Filters.and(Filters.eq(ClusterEvent.FIELD_TIMESTAMP, offset.lastSeen()), Filters.ne(ClusterEvent.FIELD_ID, offset.lastId())));
+                ? Filters.gte(ClusterEvent.FIELD_TIMESTAMP, lastSeen)
+                : Filters.or(Filters.gt(ClusterEvent.FIELD_TIMESTAMP, lastSeen),
+                Filters.and(Filters.eq(ClusterEvent.FIELD_TIMESTAMP, lastSeen), Filters.ne(ClusterEvent.FIELD_ID, new ObjectId(offset.lastId()))));
         final var query = Filters.and(Filters.ne(ClusterEvent.FIELD_PRODUCER, nodeId.getNodeId()), timestampQuery);
         return collection.find(query);
     }
