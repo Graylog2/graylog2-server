@@ -165,6 +165,22 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
     }
 
     @Override
+    public void updateNativeEntity(Entity entity, NativeEntity<EventDefinitionDto> existingEntity,
+                                   Map<String, ValueReference> parameters,
+                                   Map<EntityDescriptor, Object> nativeEntities, String username) {
+        if (!(entity instanceof EntityV1 entityV1)) {
+            return;
+        }
+        final EventDefinitionDto existing = existingEntity.entity();
+        final EventDefinitionEntity eventDefinitionEntity = objectMapper.convertValue(entityV1.data(),
+                EventDefinitionEntity.class);
+        final EventDefinitionDto decoded = eventDefinitionEntity.toNativeEntity(parameters, nativeEntities);
+        final EventDefinitionDto updated = decoded.toBuilder().id(existing.id()).build();
+        final boolean schedule = eventDefinitionEntity.isScheduled().asBoolean(parameters);
+        eventDefinitionHandler.update(updated, schedule);
+    }
+
+    @Override
     public void delete(EventDefinitionDto nativeEntity) {
         eventDefinitionHandler.deleteImmutable(nativeEntity.id());
     }

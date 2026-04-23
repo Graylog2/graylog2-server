@@ -164,6 +164,32 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
     }
 
     @Override
+    public void updateNativeEntity(Entity entity, NativeEntity<ViewDTO> existingEntity,
+                                   Map<String, ValueReference> parameters,
+                                   Map<EntityDescriptor, Object> nativeEntities, String username) {
+        ensureV1(entity);
+        final EntityV1 entityV1 = (EntityV1) entity;
+        final ViewDTO existingView = existingEntity.entity();
+        final ViewEntity viewEntity = objectMapper.convertValue(entityV1.data(), ViewEntity.class);
+
+        final Map<String, ViewStateDTO> viewStateMap = new LinkedHashMap<>(viewEntity.state().size());
+        for (Map.Entry<String, ViewStateEntity> entry : viewEntity.state().entrySet()) {
+            viewStateMap.put(entry.getKey(), entry.getValue().toNativeEntity(parameters, nativeEntities));
+        }
+
+        final ViewDTO.Builder viewBuilder = viewEntity.toNativeEntity(parameters, nativeEntities);
+        viewBuilder.id(existingView.id());
+        viewBuilder.state(viewStateMap);
+
+        final Search search = viewEntity.search().toNativeEntity(parameters, nativeEntities);
+        final Search searchWithId = search.toBuilder().id(existingView.searchId()).build();
+        searchDbService.save(searchWithId);
+
+        viewBuilder.searchId(existingView.searchId());
+        viewService.update(viewBuilder.build());
+    }
+
+    @Override
     public void delete(ViewDTO nativeEntity) {
         viewService.delete(nativeEntity.id());
     }
