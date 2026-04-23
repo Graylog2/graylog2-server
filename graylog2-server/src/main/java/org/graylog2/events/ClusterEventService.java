@@ -125,11 +125,21 @@ public class ClusterEventService extends AbstractExecutionThreadService {
                     .noCursorTimeout(true);
             try (final var cursor = events.iterator()) {
                 this.eventsCursor.set(cursor);
+                if (!isRunning()) {
+                    return;
+                }
                 iterateEvents(cursor);
-                Thread.sleep(1000);
             } catch (Exception e) {
                 if (!(e instanceof MongoQueryException mqe && mqe.getErrorCodeName().equals("QueryPlanKilled"))) {
                     LOG.warn("Error while reading cluster events from MongoDB, retrying.", e);
+                }
+            }
+            if (isRunning()) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return;
                 }
             }
         }
