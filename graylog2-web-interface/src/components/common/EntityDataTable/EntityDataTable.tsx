@@ -180,8 +180,6 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   onResetLayoutPreferences: () => Promise<void>;
   /** Active page size */
   pageSize?: number;
-  /** Required when parent container does not use contentBackground for the background */
-  parentBgColor?: string;
   appSection?: string;
   /** Actions for each row. */
   entityActions?: (entity: Entity) => React.ReactNode;
@@ -218,7 +216,6 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   onResetLayoutPreferences,
   onSortChange,
   pageSize = undefined,
-  parentBgColor = undefined,
   appSection = undefined,
   noColumnReordering = false,
   noPageSizeSelect = false,
@@ -362,7 +359,6 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                         headerGroups={headerGroups}
                         rowOverride={rowOverride}
                         rows={table.getRowModel().rows}
-                        parentBgColor={parentBgColor}
                       />
                       <ScrollRightIndicator ref={scrolledToRightIndicator} />
                     </InnerContainer>

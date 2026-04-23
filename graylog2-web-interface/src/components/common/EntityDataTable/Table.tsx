@@ -75,9 +75,8 @@ const Td = styled.td<{
   $hidePadding: boolean;
   $pinningPosition: ColumnPinningPosition;
   $isOddRow: boolean;
-  $parentBgColor?: string;
 }>(
-  ({ $colId, $hidePadding, $pinningPosition, $parentBgColor = undefined, $isOddRow, theme }) => css`
+  ({ $colId, $hidePadding, $pinningPosition, $isOddRow, theme }) => css`
     word-break: break-word;
     opacity: var(${columnOpacityVar($colId)}, 1);
     transform: var(${columnTransformVar($colId)}, none);
@@ -89,10 +88,10 @@ const Td = styled.td<{
           ${$pinningPosition === 'left' ? 'left' : 'right'}: 0;
           background-color: ${$isOddRow
             ? theme.utils.flattenColorStack([
-                $parentBgColor ?? theme.colors.global.contentBackground,
+                theme.colors.global.contentBackground,
                 theme.colors.table.row.backgroundStriped,
               ])
-            : ($parentBgColor ?? theme.colors.global.contentBackground)};
+            : theme.colors.global.contentBackground};
           ${ScrollShadow('left')}
           &::before {
             display: var(${displayScrollRightIndicatorVar}, none);
@@ -114,7 +113,6 @@ type Props<Entity extends EntityBase> = {
   rowOverride?: RowOverride<Entity>;
   headerGroups: Array<HeaderGroup<Entity>>;
   rows: Array<Row<Entity>>;
-  parentBgColor?: string;
 };
 
 const Table = <Entity extends EntityBase>({
@@ -122,7 +120,6 @@ const Table = <Entity extends EntityBase>({
   rowOverride = undefined,
   headerGroups,
   rows,
-  parentBgColor = undefined,
 }: Props<Entity>) => {
   const { expandedSections } = useContext(ExpandedEntitiesSectionsContext);
 
@@ -130,7 +127,7 @@ const Table = <Entity extends EntityBase>({
 
   return (
     <StyledTable striped condensed hover>
-      <TableHead headerGroups={headerGroups} parentBgColor={parentBgColor} />
+      <TableHead headerGroups={headerGroups} />
       {rows.map((row) => {
         const visibleCells = row.getVisibleCells();
         const visibleCellCount = visibleCells.length;
@@ -144,8 +141,7 @@ const Table = <Entity extends EntityBase>({
               $isOddRow={isOddRow}
               $colId={cell.column.id}
               $pinningPosition={cell.column.getIsPinned()}
-              $hidePadding={columnMeta?.hideCellPadding}
-              $parentBgColor={parentBgColor}>
+              $hidePadding={columnMeta?.hideCellPadding}>
               {flexRender(cell.column.columnDef.cell, cell.getContext())}
             </Td>
           );

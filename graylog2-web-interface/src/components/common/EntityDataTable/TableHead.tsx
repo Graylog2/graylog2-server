@@ -41,9 +41,8 @@ export const Th = styled.th<{
   $colId: string;
   $hidePadding: boolean;
   $pinningPosition: ColumnPinningPosition;
-  $parentBgColor: string;
 }>(
-  ({ $colId, $hidePadding, $pinningPosition, $parentBgColor, theme }) => css`
+  ({ $colId, $hidePadding, $pinningPosition, theme }) => css`
     width: var(${columnWidthVar($colId)});
     opacity: var(${columnOpacityVar($colId)}, 1);
     transform: var(${columnTransformVar($colId)}, translate3d(0, 0, 0));
@@ -54,7 +53,7 @@ export const Th = styled.th<{
       ? css`
           position: sticky;
           ${$pinningPosition === 'left' ? 'left' : 'right'}: 0;
-          background-color: ${$parentBgColor ?? theme.colors.global.contentBackground}!important;
+          background-color: ${theme.colors.table.head.background}!important;
         `
       : ''}
 
@@ -76,13 +75,7 @@ export const Th = styled.th<{
   `,
 );
 
-const TableHeaderCell = <Entity extends EntityBase>({
-  header,
-  parentBgColor,
-}: {
-  header: Header<Entity, unknown>;
-  parentBgColor: string;
-}) => {
+const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header<Entity, unknown> }) => {
   const columnMeta = header.column.columnDef.meta as ColumnMetaContext<Entity>;
 
   return (
@@ -91,8 +84,7 @@ const TableHeaderCell = <Entity extends EntityBase>({
       colSpan={header.colSpan}
       $colId={header.column.id}
       $hidePadding={columnMeta?.hideCellPadding}
-      $pinningPosition={header.column.getIsPinned()}
-      $parentBgColor={parentBgColor}>
+      $pinningPosition={header.column.getIsPinned()}>
       {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
     </Th>
   );
@@ -100,15 +92,14 @@ const TableHeaderCell = <Entity extends EntityBase>({
 
 type Props<Entity extends EntityBase> = {
   headerGroups: Array<HeaderGroup<Entity>>;
-  parentBgColor?: string;
 };
 
-const TableHead = <Entity extends EntityBase>({ headerGroups, parentBgColor = undefined }: Props<Entity>) => (
+const TableHead = <Entity extends EntityBase>({ headerGroups }: Props<Entity>) => (
   <Thead>
     {headerGroups.map((headerGroup) => (
       <tr key={headerGroup.id}>
         {headerGroup.headers.map((header) => (
-          <TableHeaderCell key={header.id} header={header} parentBgColor={parentBgColor} />
+          <TableHeaderCell key={header.id} header={header} />
         ))}
       </tr>
     ))}
