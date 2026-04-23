@@ -16,8 +16,13 @@
  */
 package org.graylog.datanode.rest;
 
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
 import org.apache.logging.log4j.LogManager;
@@ -25,13 +30,6 @@ import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.graylog.datanode.opensearch.OpensearchProcess;
-
-import jakarta.inject.Inject;
-
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
 import org.graylog.datanode.rest.config.OnlyInSecuredNode;
 import org.graylog2.log4j.MemoryAppender;
 
@@ -63,8 +61,8 @@ public class LogsController {
     }
 
     @GET
-    @OnlyInSecuredNode
     @Produces(MediaType.TEXT_PLAIN)
+    @OnlyInSecuredNode
     @Path("/internal")
     public Response getOpensearchInternal() {
         final Appender appender = getAppender(MEMORY_APPENDER_NAME);
