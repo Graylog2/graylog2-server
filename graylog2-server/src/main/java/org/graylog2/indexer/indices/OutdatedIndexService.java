@@ -17,5 +17,40 @@
 
 package org.graylog2.indexer.indices;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import org.apache.commons.lang3.StringUtils;
+import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
+
+import java.util.Optional;
+import java.util.Set;
+
+@Singleton
 public class OutdatedIndexService {
+
+    private final Indices indices;
+    private final IndexSetRegistry indexSetRegistry;
+    private final Cluster cluster;
+
+    @Inject
+    public OutdatedIndexService(Indices indices, IndexSetRegistry indexSetRegistry, Cluster cluster) {
+        this.indices = indices;
+        this.indexSetRegistry = indexSetRegistry;
+        this.cluster = cluster;
+    }
+
+    public Set<OutdatedIndex> getOutdatedIndices() {
+        int currentMajorVersion = Optional.ofNullable(cluster.elasticsearchStats().clusterVersion())
+                .map(version -> {
+                    try {
+                        return Integer.parseInt(StringUtils.substringBefore(version, "."));
+                    } catch (NumberFormatException e) {
+                        throw new IllegalStateException("Cluster version cannot be determined: " + version);
+                    }
+                }).orElseThrow(() -> new IllegalStateException("Cluster version cannot be determined: null"));
+        Set<OutdatedIndex> outdatedIndexes = indices.getOutdatedIndices(currentMajorVersion);
+        return outdatedIndexes;
+    }
+
 }
