@@ -51,7 +51,12 @@ export { default as Row } from './Row';
 export { default as SegmentedControl } from './SegmentedControl';
 export { default as SplitButton } from './SplitButton';
 export { default as Tab } from './Tab';
-export { default as Table } from './Table';
+export {
+  default as Table,
+  getPinnedCellClassName,
+  PINNED_COLUMN_CLASS_NAME,
+  STRIPED_PINNED_COLUMN_CLASS_NAME,
+} from './Table';
 export { default as Tabs } from './Tabs';
 export { default as Tooltip } from './Tooltip';
 export { default as Well } from './Well';

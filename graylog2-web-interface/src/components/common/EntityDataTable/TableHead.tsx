@@ -19,6 +19,7 @@ import styled, { css } from 'styled-components';
 import type { Header, HeaderGroup, ColumnPinningPosition } from '@tanstack/react-table';
 import { flexRender } from '@tanstack/react-table';
 
+import { PINNED_COLUMN_CLASS_NAME } from 'components/bootstrap';
 import {
   columnTransformVar,
   columnOpacityVar,
@@ -53,7 +54,6 @@ export const Th = styled.th<{
       ? css`
           position: sticky;
           ${$pinningPosition === 'left' ? 'left' : 'right'}: 0;
-          background-color: ${theme.colors.table.head.background}!important;
         `
       : ''}
 
@@ -84,6 +84,7 @@ const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header
       colSpan={header.colSpan}
       $colId={header.column.id}
       $hidePadding={columnMeta?.hideCellPadding}
+      className={header.column.getIsPinned() ? PINNED_COLUMN_CLASS_NAME : undefined}
       $pinningPosition={header.column.getIsPinned()}>
       {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
     </Th>

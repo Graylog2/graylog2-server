@@ -62,25 +62,17 @@ type StickyColumn = {
   leftMargin: number;
 };
 
-const getPinnedColumnStyles =
-  (tag: 'th' | 'td', stickyLeftMarginsByColumnIndex: Array<StickyColumn>, odd: boolean = false) =>
-  ({ theme }) => css`
-    ${stickyLeftMarginsByColumnIndex.map(
-      ({ index, leftMargin }) => css`
-        & ${tag}:nth-child(${index + 1}) {
-          position: sticky !important;
-          left: ${leftMargin}px;
-          z-index: 1;
-          background-color: ${odd
-            ? theme.utils.flattenColorStack([
-                theme.colors.global.contentBackground,
-                theme.colors.table.row.backgroundStriped,
-              ])
-            : theme.colors.global.contentBackground};
-        }
-      `,
-    )}
-  `;
+const getPinnedColumnStyles = (tag: 'th' | 'td', stickyLeftMarginsByColumnIndex: Array<StickyColumn>) => css`
+  ${stickyLeftMarginsByColumnIndex.map(
+    ({ index, leftMargin }) => css`
+      & ${tag}:nth-child(${index + 1}) {
+        position: sticky !important;
+        left: ${leftMargin}px;
+        z-index: 1;
+      }
+    `,
+  )}
+`;
 
 const THead = styled(TableHead)<{
   $stickyLeftMarginsByColumnIndex: Array<StickyColumn>;
@@ -94,20 +86,11 @@ const THead = styled(TableHead)<{
 
 const TBody = styled.tbody<{
   $stickyLeftMarginsByColumnIndex: Array<StickyColumn>;
-  $striped: boolean;
 }>(
-  ({ $stickyLeftMarginsByColumnIndex, $striped }) => css`
+  ({ $stickyLeftMarginsByColumnIndex }) => css`
     & tr {
       ${getPinnedColumnStyles('td', $stickyLeftMarginsByColumnIndex)}
     }
-
-    ${$striped
-      ? css`
-          & tr:nth-of-type(odd) {
-            ${getPinnedColumnStyles('td', $stickyLeftMarginsByColumnIndex, true)}
-          }
-        `
-      : css``}
   `,
 );
 
@@ -284,6 +267,10 @@ const DataTable = ({
 
     return res;
   }, [widget?.config?.visualizationConfig?.showRowNumbers, rowPivots, series, pinnedColumns, rowPivotColumnsWidth]);
+  const pinnedColumnIndexes = useMemo(
+    () => new Set(stickyLeftMarginsByColumnIndex.map(({ index }) => index)),
+    [stickyLeftMarginsByColumnIndex],
+  );
 
   const formattedRows = deduplicateValues(expandedRows, rowFieldNames).map((reducedItem, idx) => {
     const valuePath = rowFieldNames.map((pivotField) => ({ [pivotField]: expandedRows[idx][pivotField] }));
@@ -302,7 +289,8 @@ const DataTable = ({
         series={series}
         showRowNumbers={showRowNumbers}
         units={widgetUnits}
-        pinnedColumns={pinnedColumns}
+        pinnedColumnIndexes={pinnedColumnIndexes}
+        striped={striped}
       />
     );
   });
@@ -330,11 +318,12 @@ const DataTable = ({
               onSetColumnsWidth={onSetColumnsWidth}
               setLoadingState={setLoadingState}
               pinnedColumns={pinnedColumns}
+              pinnedColumnIndexes={pinnedColumnIndexes}
               togglePin={togglePin}
               showRowNumbers={showRowNumbers}
             />
           </THead>
-          <TBody $striped={striped} $stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>
+          <TBody $stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>
             {formattedRows}
           </TBody>
         </MessagesTable>

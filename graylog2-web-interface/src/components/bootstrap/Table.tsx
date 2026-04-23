@@ -18,6 +18,17 @@
 import { Table as BootstrapTable } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
+export const PINNED_COLUMN_CLASS_NAME = 'table-pinned-column';
+export const STRIPED_PINNED_COLUMN_CLASS_NAME = 'table-pinned-column-striped';
+
+export const getPinnedCellClassName = (isPinned: boolean, isStripedRow: boolean) => {
+  if (!isPinned) {
+    return undefined;
+  }
+
+  return isStripedRow ? STRIPED_PINNED_COLUMN_CLASS_NAME : PINNED_COLUMN_CLASS_NAME;
+};
+
 const variantRowStyles = css(({ theme }) => {
   const { table } = theme.colors;
   let styles = '';
@@ -113,6 +124,14 @@ const tableCss = css(
       .table {
         background-color: ${theme.colors.table.row.background};
       }
+
+      > thead > tr > th.${PINNED_COLUMN_CLASS_NAME} {
+        background-color: ${theme.colors.global.contentBackground};
+      }
+
+      > tbody > tr > .${PINNED_COLUMN_CLASS_NAME}, > tfoot > tr > .${PINNED_COLUMN_CLASS_NAME} {
+        background-color: ${theme.colors.global.contentBackground};
+      }
     }
 
     &.table-bordered {
@@ -130,6 +149,13 @@ const tableCss = css(
 
     &.table-striped > tbody > tr:nth-of-type(odd) {
       background-color: ${theme.colors.table.row.backgroundStriped};
+    }
+
+    &.table > tbody > tr > .${STRIPED_PINNED_COLUMN_CLASS_NAME} {
+      background-color: ${theme.utils.flattenColorStack([
+        theme.colors.global.contentBackground,
+        theme.colors.table.row.backgroundStriped,
+      ])};
     }
 
     &.table-hover > tbody > tr:hover {
