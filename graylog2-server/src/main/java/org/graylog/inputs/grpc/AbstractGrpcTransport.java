@@ -69,6 +69,8 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
     private static final String CK_TLS_CLIENT_CA = "tls_client_ca";
     private static final String CK_MAX_INBOUND_MSG_SIZE = "max_inbound_msg_size";
 
+    private static final boolean DEFAULT_INSECURE = false;
+
     protected final LocalMetricRegistry localMetricRegistry;
     private final Configuration configuration;
     private final EncryptedValueService encryptedValueService;
@@ -92,7 +94,7 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
 
         final var bindAddress = configuration.getString(CK_BIND_ADDRESS, "127.0.0.1");
         final var port = configuration.getInt(CK_PORT, 4317);
-        final var insecure = configuration.getBoolean(CK_INSECURE, false);
+        final var insecure = configuration.getBoolean(CK_INSECURE, DEFAULT_INSECURE);
         final var maxInboundMsgSize = configuration.getInt(CK_MAX_INBOUND_MSG_SIZE, GrpcUtil.DEFAULT_MAX_MESSAGE_SIZE);
         final var requireBearerToken = configuration.encryptedValueIsSet(CK_BEARER_TOKEN);
 
@@ -122,7 +124,7 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
     }
 
     public static void checkTlsConfiguration(Configuration configuration) throws ConfigurationException {
-        if (configuration.getBoolean(CK_INSECURE, false)) {
+        if (configuration.getBoolean(CK_INSECURE, DEFAULT_INSECURE)) {
             return;
         }
 
