@@ -25,6 +25,7 @@ import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Singleton
 public class OutdatedIndexService {
@@ -49,8 +50,9 @@ public class OutdatedIndexService {
                         throw new IllegalStateException("Cluster version cannot be determined: " + version);
                     }
                 }).orElseThrow(() -> new IllegalStateException("Cluster version cannot be determined: null"));
-        Set<OutdatedIndex> outdatedIndexes = indices.getOutdatedIndices(currentMajorVersion);
-        return outdatedIndexes;
+        return indices.getOutdatedIndices(currentMajorVersion).stream()
+                .map(index -> index.asManaged(indexSetRegistry.isManagedIndex(index.indexName())))
+                .collect(Collectors.toSet());
     }
 
 }

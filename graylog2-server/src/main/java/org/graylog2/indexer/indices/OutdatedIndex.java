@@ -17,7 +17,16 @@
 
 package org.graylog2.indexer.indices;
 
-public record OutdatedIndex(String indexName, String version, boolean warmIndex) {
+public record OutdatedIndex(String indexName, String version, boolean warmIndex, boolean managed) {
+
+    public OutdatedIndex(String indexName, String version, boolean warmIndex) {
+        this(indexName, version, warmIndex, false);
+    }
+
+    public OutdatedIndex asManaged(boolean managed) {
+        return new OutdatedIndex(indexName, version, warmIndex, managed);
+    }
+
     public boolean isSystemIndex() {
         return indexName.startsWith(".");
     }

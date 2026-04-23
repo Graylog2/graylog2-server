@@ -19,6 +19,7 @@ package org.graylog2.indexer.indices;
 
 import org.assertj.core.api.Assertions;
 import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.system.stats.elasticsearch.ElasticsearchStats;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,6 +41,9 @@ class OutdatedIndexServiceTest {
 
     @Mock
     Cluster cluster;
+
+    @Mock
+    IndexSetRegistry indexSetRegistry;
 
     @InjectMocks
     OutdatedIndexService outdatedIndexService;
@@ -65,8 +69,13 @@ class OutdatedIndexServiceTest {
                 new OutdatedIndex("outdated1", "1.3.0", false),
                 new OutdatedIndex("outdated2", "1.3.0", true)
         );
+        when(indexSetRegistry.isManagedIndex("outdated1")).thenReturn(true);
+        when(indexSetRegistry.isManagedIndex("outdated2")).thenReturn(false);
         when(indices.getOutdatedIndices(2)).thenReturn(outdatedIndices);
-        assertThat(outdatedIndexService.getOutdatedIndices()).isEqualTo(outdatedIndices);
+        assertThat(outdatedIndexService.getOutdatedIndices()).isEqualTo(Set.of(
+                new OutdatedIndex("outdated1", "1.3.0", false, true),
+                new OutdatedIndex("outdated2", "1.3.0", true, false)
+        ));
 
     }
 
