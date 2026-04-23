@@ -71,7 +71,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
@@ -678,13 +677,26 @@ public class InputServiceImpl implements InputService {
                 .projection(Projections.include(InputImpl.EMBEDDED_EXTRACTORS))
                 .into(new ArrayList<>())
                 .stream()
-                .flatMap(doc -> doc.get(InputImpl.EMBEDDED_EXTRACTORS) instanceof List<?> list ? list.stream() : Stream.empty())
-                .filter(item -> item instanceof Map<?, ?>)
-                .map(item -> ((Map<?, ?>) item).get(Extractor.FIELD_TYPE))
-                .map(String::valueOf)
-                .map(Extractor.Type::fuzzyValueOf)
-                .filter(Objects::nonNull)
+                .flatMap(InputServiceImpl::embeddedExtractors)
+                .flatMap(InputServiceImpl::extractorType)
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+    }
+
+    private static Stream<?> embeddedExtractors(Document doc) {
+        if (doc.get(InputImpl.EMBEDDED_EXTRACTORS) instanceof List<?> list) {
+            return list.stream();
+        }
+        return Stream.empty();
+    }
+
+    private static Stream<Extractor.Type> extractorType(Object item) {
+        if (item instanceof Map<?, ?> extractorDoc) {
+            return Optional.ofNullable(extractorDoc.get(Extractor.FIELD_TYPE))
+                    .map(String::valueOf)
+                    .map(Extractor.Type::fuzzyValueOf)
+                    .stream();
+        }
+        return Stream.empty();
     }
 
     private void publishChange(Object event) {
