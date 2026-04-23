@@ -25,10 +25,13 @@ import { SystemMessagesComponent } from 'components/systemmessages';
 import { TimesList } from 'components/times';
 import GraylogClusterOverview from 'components/cluster/GraylogClusterOverview';
 import HideOnCloud from 'util/conditional/HideOnCloud';
+import HealthModule from 'components/health/HealthModule';
 
 const SystemOverviewPage = () => (
   <DocumentTitle title="System overview">
     <span>
+      <HealthModule />
+
       <IfPermitted permissions="notifications:read">
         <NotificationsList />
       </IfPermitted>
