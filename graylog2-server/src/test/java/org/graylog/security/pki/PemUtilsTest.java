@@ -17,6 +17,7 @@
 package org.graylog.security.pki;
 
 import org.bouncycastle.asn1.x509.KeyUsage;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.graylog.testing.TestClocks;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,10 +26,13 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
+import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -102,6 +106,62 @@ class PemUtilsTest {
     void parseCertificateThrowsForInvalidPem() {
         assertThatThrownBy(() -> PemUtils.parseCertificate("not a certificate"))
                 .isInstanceOf(Exception.class);
+    }
+
+    // parseCsr tests
+
+    @Test
+    void parseCsrReturnsCsrForValidPem() throws Exception {
+        final KeyPair keyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+        final byte[] csrPem = builder.createCsr(keyPair, "test-agent");
+
+        final PKCS10CertificationRequest csr = PemUtils.parseCsr(new String(csrPem, StandardCharsets.UTF_8));
+
+        assertThat(csr).isNotNull();
+        assertThat(csr.getSubject().toString()).contains("CN=test-agent");
+    }
+
+    @Test
+    void parseCsrRejectsCertPem() throws Exception {
+        final CertificateEntry entry = builder.createRootCa("Test CA", Algorithm.ED25519, Duration.ofDays(365));
+
+        assertThatThrownBy(() -> PemUtils.parseCsr(entry.certificate()))
+                .isInstanceOf(CertificateException.class)
+                .hasMessageContaining("not contain a valid CSR");
+    }
+
+    @Test
+    void parseCsrRejectsGarbageInput() {
+        assertThatThrownBy(() -> PemUtils.parseCsr("not a CSR"))
+                .isInstanceOf(CertificateException.class);
+    }
+
+    @Test
+    void parseCsrRejectsTamperedSignature() throws Exception {
+        final KeyPair keyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+        final byte[] csrPem = builder.createCsr(keyPair, "test-agent");
+        final String original = new String(csrPem, StandardCharsets.UTF_8);
+
+        // Flip a bit in the middle of the base64 body to corrupt the signature without breaking the PEM framing.
+        final int midBody = original.indexOf("-----END") / 2;
+        final char replacement = original.charAt(midBody) == 'A' ? 'B' : 'A';
+        final String tampered = original.substring(0, midBody) + replacement + original.substring(midBody + 1);
+
+        assertThatThrownBy(() -> PemUtils.parseCsr(tampered))
+                .isInstanceOf(CertificateException.class);
+    }
+
+    // extractPublicKeyFromCsr tests
+
+    @Test
+    void extractPublicKeyFromCsrReturnsCsrPublicKey() throws Exception {
+        final KeyPair keyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+        final byte[] csrPem = builder.createCsr(keyPair, "test-agent");
+        final PKCS10CertificationRequest csr = PemUtils.parseCsr(new String(csrPem, StandardCharsets.UTF_8));
+
+        final PublicKey extracted = PemUtils.extractPublicKeyFromCsr(csr);
+
+        assertThat(Arrays.equals(keyPair.getPublic().getEncoded(), extracted.getEncoded())).isTrue();
     }
 
     // parsePrivateKey tests

@@ -203,6 +203,73 @@ class CollectorInstanceServiceTest {
     }
 
     @Test
+    void reEnrollUpdatesCertFleetTokenAndLastSeen() throws Exception {
+        final Instant enrollTime = Instant.parse("2025-01-01T00:00:00Z");
+        clock.setInstant(enrollTime);
+        final var original = enroll("uid-re");
+
+        final Instant reEnrollTime = enrollTime.plus(Duration.ofDays(30));
+        clock.setInstant(reEnrollTime);
+
+        final var newCert = certBuilder.createEndEntityCert("uid-re", issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
+        final var newIssued = new IssuedCertificate(newCert.fingerprint(), newCert.certificate(), newCert.notAfter(), issuerCert.id());
+
+        final var updated = collectorInstanceService.reEnroll(original.id(), "507f1f77bcf86cd799439999", newIssued, "new-token-id");
+
+        assertThat(updated.activeCertificateFingerprint()).isEqualTo(newIssued.fingerprint());
+        assertThat(updated.activeCertificatePem()).isEqualTo(newIssued.certPem());
+        assertThat(updated.activeCertificateExpiresAt()).isEqualTo(newIssued.notAfter());
+        assertThat(updated.issuingCaId()).isEqualTo(issuerCert.id());
+        assertThat(updated.fleetId()).isEqualTo("507f1f77bcf86cd799439999");
+        assertThat(updated.enrollmentTokenId()).isEqualTo("new-token-id");
+        assertThat(updated.lastSeen()).isEqualTo(reEnrollTime);
+    }
+
+    @Test
+    void reEnrollPreservesIdentityFields() throws Exception {
+        final Instant enrollTime = Instant.parse("2025-01-01T00:00:00Z");
+        clock.setInstant(enrollTime);
+        final var original = enroll("uid-preserve");
+
+        clock.setInstant(enrollTime.plus(Duration.ofDays(30)));
+        final var newCert = certBuilder.createEndEntityCert("uid-preserve", issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
+        final var newIssued = new IssuedCertificate(newCert.fingerprint(), newCert.certificate(), newCert.notAfter(), issuerCert.id());
+
+        final var updated = collectorInstanceService.reEnroll(original.id(), "507f1f77bcf86cd799439999", newIssued, "new-token-id");
+
+        assertThat(updated.instanceUid()).isEqualTo(original.instanceUid());
+        assertThat(updated.enrolledAt()).isEqualTo(enrollTime);
+        assertThat(updated.messageSeqNum()).isEqualTo(original.messageSeqNum());
+        assertThat(updated.capabilities()).isEqualTo(original.capabilities());
+    }
+
+    @Test
+    void reEnrollClearsNextCertificateFields() throws Exception {
+        final var original = enroll("uid-pending-renewal");
+        setNextCertificateFields("uid-pending-renewal", "sha256:next-fp", "next-cert-pem",
+                Instant.parse("2030-01-01T00:00:00Z"));
+
+        final var newCert = certBuilder.createEndEntityCert("uid-pending-renewal", issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
+        final var newIssued = new IssuedCertificate(newCert.fingerprint(), newCert.certificate(), newCert.notAfter(), issuerCert.id());
+
+        final var updated = collectorInstanceService.reEnroll(original.id(), "507f1f77bcf86cd799439012", newIssued, "token-x");
+
+        assertThat(updated.nextCertificateFingerprint()).isEmpty();
+        assertThat(updated.nextCertificatePem()).isEmpty();
+        assertThat(updated.nextCertificateExpiresAt()).isEmpty();
+    }
+
+    @Test
+    void reEnrollThrowsWhenRecordDoesNotExist() throws Exception {
+        final var cert = certBuilder.createEndEntityCert("ghost", issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
+        final var issued = new IssuedCertificate(cert.fingerprint(), cert.certificate(), cert.notAfter(), issuerCert.id());
+
+        assertThatThrownBy(() -> collectorInstanceService.reEnroll("507f1f77bcf86cd799439999", "507f1f77bcf86cd799439012", issued, "token"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("doesn't exist");
+    }
+
+    @Test
     void findByActiveOrNextFingerprintMatchesActiveFingerprint() throws Exception {
         final var instance = enroll("uid-active");
 
