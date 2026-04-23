@@ -17,18 +17,24 @@
 import * as React from 'react';
 import type { ColorVariant } from '@graylog/sawmill';
 import { Badge as MantineBadge } from '@mantine/core';
-import styled, { css } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
 
-const mapStyle = (style: ColorVariant) => (style === 'default' ? 'gray' : style);
+import type { BsSize } from 'components/bootstrap/types';
+import sizeForMantine from 'theme/utils/sizeForMantine';
+
+const mapStyle = (style: ColorVariant, theme: DefaultTheme) =>
+  style === 'default' ? theme.colors.variant.gray : theme.colors.variant[style];
 
 const StyledBadge = styled(MantineBadge)<{ color: ColorVariant }>(
   ({ theme, color }) => css`
     text-transform: none;
-    background: ${theme.colors.button[color].background};
-    color: ${theme.colors.button[color].color};
+    background-color: ${color};
+    color: ${theme.utils.contrastingColor(color)};
 
     .mantine-Badge-label {
       font-size: ${theme.fonts.size.small};
+      overflow: visible;
     }
   `,
 );
@@ -39,6 +45,10 @@ type Props = React.PropsWithChildren<{
   'data-testid'?: string;
   onClick?: () => void;
   title?: string;
+  bsSize?: BsSize;
+  variant?: string;
+  color?: string;
+  autoContrast?: boolean;
 }>;
 
 const Badge = (
@@ -49,10 +59,19 @@ const Badge = (
     'data-testid': dataTestid,
     onClick = undefined,
     title = undefined,
+    bsSize = 'md',
+    variant = 'filled',
+    color: customColor = undefined,
+    autoContrast = false,
   }: Props,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) => {
-  const color = mapStyle(bsStyle);
+  const theme = useTheme();
+  const color = customColor ?? mapStyle(bsStyle, theme);
+  console.log({ customColor, bsStyle, color });
+  const size = sizeForMantine(bsSize);
+
+  console.log({ variant });
 
   return (
     <StyledBadge
@@ -61,8 +80,10 @@ const Badge = (
       title={title}
       data-testid={dataTestid}
       ref={ref}
-      variant="filled"
-      onClick={onClick}>
+      variant={variant}
+      onClick={onClick}
+      size={size}
+      autoContrast={autoContrast}>
       {children}
     </StyledBadge>
   );
