@@ -42,6 +42,7 @@ import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
+import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.transports.AbstractTcpTransport;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
@@ -95,6 +96,7 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
                                  ThroughputCounter throughputCounter,
                                  LocalMetricRegistry localRegistry,
                                  TLSProtocolsConfiguration tlsConfiguration,
+                                 EncryptedValueService encryptedValueService,
                                  @Named("trusted_proxies") Set<IpSubnet> trustedProxies,
                                  String path) {
         super(configuration,
@@ -109,7 +111,7 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
         this.maxChunkSize = parseMaxChunkSize(configuration);
         this.idleWriterTimeout = configuration.intIsSet(CK_IDLE_WRITER_TIMEOUT) ? configuration.getInt(CK_IDLE_WRITER_TIMEOUT, DEFAULT_IDLE_WRITER_TIMEOUT) : DEFAULT_IDLE_WRITER_TIMEOUT;
         this.authorizationHeader = configuration.getString(CK_AUTHORIZATION_HEADER_NAME);
-        this.authorizationHeaderValue = configuration.getString(CK_AUTHORIZATION_HEADER_VALUE);
+        this.authorizationHeaderValue = encryptedValueService.decrypt(configuration.getEncryptedValue(CK_AUTHORIZATION_HEADER_VALUE));
         this.enableForwardedFor = configuration.getBoolean(CK_ENABLE_FORWARDED_FOR);
         this.requireTrustedProxies = configuration.getBoolean(CK_REQUIRE_TRUSTED_PROXIES);
         this.enableRealIpHeader = configuration.getBoolean(CK_ENABLE_REAL_IP_HEADER);
@@ -200,6 +202,7 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
                     "",
                     "The secret authorization header value which all request must have in order to authenticate successfully. e.g. Bearer: <api-token>N",
                     ConfigurationField.Optional.OPTIONAL,
+                    true,
                     TextField.Attribute.IS_PASSWORD));
             r.addField(new BooleanField(
                     CK_ENABLE_FORWARDED_FOR,
