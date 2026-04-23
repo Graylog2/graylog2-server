@@ -318,7 +318,7 @@ public class IndicesResource extends RestResource {
     @Operation(summary = "Get a list of indices that were created in a OpenSearch version prior to the recent one")
     @RequiresPermissions(RestPermissions.INDICES_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    public Set<OutdatedIndex> getOutdatedIndices() {
+    public List<OutdatedIndex> getOutdatedIndices() {
         return outdatedIndexService.getOutdatedIndices();
     }
 

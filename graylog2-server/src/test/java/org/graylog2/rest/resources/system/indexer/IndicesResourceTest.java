@@ -32,7 +32,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Set;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -65,9 +65,9 @@ class IndicesResourceTest {
     @Test
     @WithAuthorization(permissions = {"indices:read"})
     void getOutdatedIndicesSucceeds() {
-        Set<OutdatedIndex> outdatedIndices = Set.of(
-                new OutdatedIndex("outdated1", "1.3.0", false),
-                new OutdatedIndex("outdated2", "1.3.0", true)
+        List<OutdatedIndex> outdatedIndices = List.of(
+                new OutdatedIndex("outdated1", "1.3.0", false, false),
+                new OutdatedIndex("outdated2", "1.3.0", true, true)
         );
         when(outdatedIndexService.getOutdatedIndices()).thenReturn(outdatedIndices);
         assertThat(indicesResource.getOutdatedIndices()).isEqualTo(outdatedIndices);

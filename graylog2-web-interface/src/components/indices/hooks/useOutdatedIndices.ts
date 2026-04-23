@@ -24,15 +24,13 @@ export type OutdatedIndex = {
   index_name: string;
   version: string;
   warm_index: boolean;
+  managed_index: boolean;
   system_index: boolean;
 };
 
 const OUTDATED_INDICES_URL = qualifyUrl('/system/indexer/indices/outdated');
 
 const fetchOutdatedIndices = (): Promise<Array<OutdatedIndex>> => fetch('GET', OUTDATED_INDICES_URL);
-
-const sortOutdatedIndices = (indices: Array<OutdatedIndex>) =>
-  [...indices].sort((a, b) => a.index_name.localeCompare(b.index_name));
 
 const useOutdatedIndices = () => {
   const {
@@ -44,7 +42,6 @@ const useOutdatedIndices = () => {
     queryFn: () =>
       defaultOnError(fetchOutdatedIndices(), 'Loading outdated indices failed', 'Could not load outdated indices'),
     retry: false,
-    select: sortOutdatedIndices,
   });
 
   return {

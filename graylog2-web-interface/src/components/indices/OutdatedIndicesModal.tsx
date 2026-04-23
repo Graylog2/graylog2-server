@@ -50,14 +50,16 @@ const OutdatedIndicesModal = ({ show, onClose }: Props) => {
                 <tr>
                   <th>Index</th>
                   <th>Version</th>
+                  <th>Graylog-managed</th>
                   <th>Warm</th>
                 </tr>
               </thead>
               <tbody>
-                {outdatedIndices.map(({ index_name, version, warm_index }) => (
+                {outdatedIndices.map(({ index_name, version, warm_index, managed_index }) => (
                   <tr key={index_name}>
                     <td>{index_name}</td>
                     <td>{version}</td>
+                    <td>{managed_index ? 'Yes' : 'No'}</td>
                     <td>{warm_index ? 'Yes' : 'No'}</td>
                   </tr>
                 ))}

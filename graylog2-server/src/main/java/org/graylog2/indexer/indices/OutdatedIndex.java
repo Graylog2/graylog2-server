@@ -15,10 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+
 package org.graylog2.indexer.indices;
 
-public record OutdatedIndex(String indexName, String version, boolean warmIndex, boolean managed) {
-
+public record OutdatedIndex(String indexName, String version, boolean warmIndex,
+                            boolean managed) implements Comparable<OutdatedIndex> {
     public OutdatedIndex(String indexName, String version, boolean warmIndex) {
         this(indexName, version, warmIndex, false);
     }
@@ -29,5 +30,10 @@ public record OutdatedIndex(String indexName, String version, boolean warmIndex,
 
     public boolean isSystemIndex() {
         return indexName.startsWith(".");
+    }
+
+    @Override
+    public int compareTo(OutdatedIndex other) {
+        return this.indexName.compareTo(other.indexName);
     }
 }

@@ -23,9 +23,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Singleton
 public class OutdatedIndexService {
@@ -41,7 +40,7 @@ public class OutdatedIndexService {
         this.cluster = cluster;
     }
 
-    public Set<OutdatedIndex> getOutdatedIndices() {
+    public List<OutdatedIndex> getOutdatedIndices() {
         int currentMajorVersion = Optional.ofNullable(cluster.elasticsearchStats().clusterVersion())
                 .map(version -> {
                     try {
@@ -52,7 +51,7 @@ public class OutdatedIndexService {
                 }).orElseThrow(() -> new IllegalStateException("Cluster version cannot be determined: null"));
         return indices.getOutdatedIndices(currentMajorVersion).stream()
                 .map(index -> index.asManaged(indexSetRegistry.isManagedIndex(index.indexName())))
-                .collect(Collectors.toSet());
+                .sorted().toList();
     }
 
 }

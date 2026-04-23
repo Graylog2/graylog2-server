@@ -27,6 +27,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -66,13 +67,13 @@ class OutdatedIndexServiceTest {
     void getOutdatedIndicesSucceeds() {
         initializeElasticsearchStats("2.5.0");
         Set<OutdatedIndex> outdatedIndices = Set.of(
-                new OutdatedIndex("outdated1", "1.3.0", false),
-                new OutdatedIndex("outdated2", "1.3.0", true)
+                new OutdatedIndex("outdated2", "1.3.0", true),
+                new OutdatedIndex("outdated1", "1.3.0", false)
         );
         when(indexSetRegistry.isManagedIndex("outdated1")).thenReturn(true);
         when(indexSetRegistry.isManagedIndex("outdated2")).thenReturn(false);
         when(indices.getOutdatedIndices(2)).thenReturn(outdatedIndices);
-        assertThat(outdatedIndexService.getOutdatedIndices()).isEqualTo(Set.of(
+        assertThat(outdatedIndexService.getOutdatedIndices()).isEqualTo(List.of(
                 new OutdatedIndex("outdated1", "1.3.0", false, true),
                 new OutdatedIndex("outdated2", "1.3.0", true, false)
         ));
