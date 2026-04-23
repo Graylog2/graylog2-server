@@ -27,7 +27,7 @@ import Icon from 'components/common/Icon';
 import { Button, Table } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import type { Url, AllowListConfig } from 'stores/configurations/ConfigurationsStore';
-import ToolsStore from 'stores/tools/ToolsStore';
+import { testRegexValidity } from 'api/tools';
 import { isValidURL } from 'util/URLUtils';
 import generateId from 'logic/generateId';
 import useProductName from 'brand-customization/useProductName';
@@ -58,7 +58,7 @@ const validateUrlEntry = async (
   if (entry.type === 'literal') {
     valueValidation = isValidURL(entry.value) ? { valid: true } : { valid: false };
   } else if (entry.type === 'regex' && entry.value.trim().length > 0) {
-    valueValidation = (await ToolsStore.testRegexValidity(entry.value)).is_valid ? { valid: true } : { valid: false };
+    valueValidation = (await testRegexValidity(entry.value)).is_valid ? { valid: true } : { valid: false };
   }
 
   validationResult.value = valueValidation;

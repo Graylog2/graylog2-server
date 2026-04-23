@@ -20,16 +20,15 @@ import moment from 'moment';
 
 import { Col, Row } from 'components/bootstrap';
 import { Spinner, Timestamp, BrowserTime } from 'components/common';
-import { SystemStore } from 'stores/system/SystemStore';
 import useCurrentUser from 'hooks/useCurrentUser';
-import { useStore } from 'stores/connect';
+import useSystemInfo from 'hooks/useSystemStore';
 import useProductName from 'brand-customization/useProductName';
 
 const TimesList = () => {
   const productName = useProductName();
   const [time, setTime] = useState(moment());
   const currentUser = useCurrentUser();
-  const { system } = useStore(SystemStore);
+  const { data: system } = useSystemInfo();
 
   useEffect(() => {
     const interval = setInterval(() => setTime(moment()), 1000);

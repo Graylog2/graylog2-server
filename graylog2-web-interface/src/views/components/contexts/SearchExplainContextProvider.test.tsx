@@ -28,8 +28,6 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import SearchExplainContextProvider from 'views/components/contexts/SearchExplainContextProvider';
 import SearchExplainContext from 'views/components/contexts/SearchExplainContext';
 
-jest.mock('stores/system/SystemStore', () => ({ SystemStore: MockStore() }));
-
 jest.mock('stores/sessions/SessionStore', () => ({
   SessionStore: MockStore(['isLoggedIn', jest.fn()]),
 }));
