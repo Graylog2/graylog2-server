@@ -364,6 +364,10 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     @Parameter(value = "opensearch_plugins_security_audit_type")
     private String opensearchAuditLog;
 
+    @Documentation("Opensearch memory lock ensures the process locks its memory into RAM so it cannot be swapped to disk.")
+    @Parameter(value = "opensearch_bootstrap_memory_lock")
+    private boolean opensearchBootstrapMemoryLock = false;
+
     public String getOpensearchAuditLog() {
         return opensearchAuditLog;
     }
@@ -752,5 +756,9 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
 
     public Duration getIndexerJwtAuthTokenClockSkewTolerance() {
         return indexerJwtAuthTokeClockSkewTolerance;
+    }
+
+    public boolean getOpensearchBootstrapMemoryLock() {
+        return opensearchBootstrapMemoryLock;
     }
 }

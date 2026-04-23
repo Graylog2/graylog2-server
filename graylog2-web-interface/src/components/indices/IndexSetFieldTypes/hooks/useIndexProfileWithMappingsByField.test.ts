@@ -23,14 +23,12 @@ import useProfile from 'components/indices/IndexSetFieldTypeProfiles/hooks/usePr
 import useIndexProfileWithMappingsByField from 'components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField';
 
 jest.mock('routing/useParams', () => jest.fn(() => ({ indexSetId: '111' })));
-jest.mock('components/indices/hooks/useSingleIndexSet', () =>
-  jest.fn(() => ({
-    data: { id: '111', title: 'index set title', field_type_profile: 'profile-id-111' },
-    refetch: jest.fn(),
-    isSuccess: true,
-    isInitialLoading: false,
-  })),
-);
+jest.mock('components/indices/hooks/useSingleIndexSet', () => jest.fn(() => ({
+  data: { id: '111', title: 'index set title', field_type_profile: 'profile-id-111' },
+  refetch: jest.fn(),
+  isSuccess: true,
+  isInitialLoading: false,
+})));
 
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
 jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfile', () => jest.fn());

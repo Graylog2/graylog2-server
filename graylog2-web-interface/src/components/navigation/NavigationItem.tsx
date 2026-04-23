@@ -32,12 +32,12 @@ const shouldRender = (
   requiredPermissions: Permission | Array<Permission> | undefined,
   userPermissions: Immutable.List<Permission>,
 ) => {
-  if (requiredFeatureFlag) {
-    return AppConfig.isFeatureEnabled(requiredFeatureFlag);
+  if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) {
+    return false;
   }
 
-  if (requiredPermissions) {
-    return isPermitted(userPermissions, requiredPermissions);
+  if (requiredPermissions && !isPermitted(userPermissions, requiredPermissions)) {
+    return false;
   }
 
   return true;

@@ -40,7 +40,7 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
-import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
+import org.graylog2.rest.models.system.inputs.responses.InputStopped;
 import org.graylog2.rest.models.system.inputs.responses.InputSetup;
 import org.graylog2.rest.models.system.inputs.responses.InputStateSummary;
 import org.graylog2.rest.models.system.inputs.responses.InputStatesList;
@@ -109,7 +109,7 @@ public class ClusterInputStatesResource extends ProxiedResource {
             @ApiResponse(responseCode = "404", description = "No such input."),
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_STOP)
-    public Map<String, Optional<InputDeleted>> stop(@Parameter(name = "inputId", required = true) @PathParam("inputId") String inputId) {
+    public Map<String, Optional<InputStopped>> stop(@Parameter(name = "inputId", required = true) @PathParam("inputId") String inputId) {
         return stripCallResult(requestOnAllNodes(RemoteInputStatesResource.class, r -> r.stop(inputId)));
     }
 }
