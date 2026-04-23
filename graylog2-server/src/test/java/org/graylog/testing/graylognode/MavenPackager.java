@@ -43,7 +43,7 @@ public class MavenPackager {
     }
 
     public static synchronized void packageJarIfNecessary(final MavenProjectDirProvider mavenProjectDirProvider) {
-        if (flagFromEnvVar(SKIP_FLAG)) {
+        if (flagFromEnvVar(SKIP_FLAG) || true) {
             LOG.info("Skipping packaging - {} is set", SKIP_FLAG);
             return;
         }

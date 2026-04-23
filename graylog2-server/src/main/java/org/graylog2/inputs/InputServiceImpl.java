@@ -675,12 +675,13 @@ public class InputServiceImpl implements InputService {
         documentCollection.find(Filters.exists(InputImpl.EMBEDDED_EXTRACTORS))
                 .projection(Projections.include(InputImpl.EMBEDDED_EXTRACTORS))
                 .forEach(doc -> {
-                    List<Document> extractors = doc.getList(InputImpl.EMBEDDED_EXTRACTORS, Document.class);
+                    @SuppressWarnings("unchecked")
+                    List<Map<String, Object>> extractors = (List<Map<String, Object>>) (List<?>) doc.getList(InputImpl.EMBEDDED_EXTRACTORS, Map.class);
                     if (extractors == null) return;
 
-                    for (Document extractorDoc : extractors) {
-                        final String typeStr = extractorDoc.getString(Extractor.FIELD_TYPE);
-                        final Extractor.Type type = Extractor.Type.fuzzyValueOf(typeStr);
+                    for (Map<String, Object> extractorDoc : extractors) {
+                        final Object typeStr = extractorDoc.get(Extractor.FIELD_TYPE);
+                        final Extractor.Type type = Extractor.Type.fuzzyValueOf(String.valueOf(typeStr));
 
                         if (type != null) {
                             extractorsCountByType.merge(type, 1L, Long::sum);
