@@ -22,6 +22,7 @@ import type User from 'logic/users/User';
 import { isPermitted } from 'util/PermissionsMixin';
 import TelemetrySettingsDetails from 'logic/telemetry/TelemetrySettingsDetails';
 import useCurrentUser from 'hooks/useCurrentUser';
+import usePluginEntities from 'hooks/usePluginEntities';
 import TelemetrySettingsConfig from 'logic/telemetry/TelemetrySettingsConfig';
 
 import PreferencesSection from './PreferencesSection';
@@ -30,7 +31,6 @@ import RolesSection from './RolesSection';
 import SettingsSection from './SettingsSection';
 import SharedEntitiesSection from './SharedEntitiesSection';
 import TeamsSection from './TeamsSection';
-import CollectionsSection from './CollectionsSection';
 
 import PermissionsUpdateInfo from '../PermissionsUpdateInfo';
 
@@ -38,7 +38,7 @@ type Props = {
   user: User | null | undefined;
 };
 
-export type UserSegment = 'profile' | 'settings_preferences' | 'collections' | 'teams_roles' | 'shared_entities';
+export type UserSegment = 'profile' | 'settings_preferences' | 'teams_roles' | 'shared_entities' | (string & {});
 
 export const editableUserSegments: Array<{ value: UserSegment; label: string }> = [
   { value: 'profile', label: 'Profile' },
@@ -48,13 +48,18 @@ export const editableUserSegments: Array<{ value: UserSegment; label: string }> 
 
 const UserDetails = ({ user }: Props) => {
   const currentUser = useCurrentUser();
+  const pluggableSegments = usePluginEntities('users.details.segments');
+  const activePluggableSegments = pluggableSegments.filter((s) => (s.useCondition ? s.useCondition() : true));
 
   const userSegments: Array<{ value: UserSegment; label: string }> = [
     ...editableUserSegments,
-    { value: 'collections', label: 'Collections' },
+    ...activePluggableSegments.map((s) => ({ value: s.value, label: s.label })),
     { value: 'shared_entities', label: 'Shared Entities' },
   ];
-  const editPermissionRequiredSections = ['profile', 'settings_preferences', 'teams_roles', 'collections'];
+  const editPermissionRequiredSections = [
+    'profile', 'settings_preferences', 'teams_roles',
+    ...activePluggableSegments.filter((s) => s.editPermissionRequired).map((s) => s.value),
+  ];
 
   const filteredUserSegments = () => {
     if (isPermitted(currentUser.permissions, `users:edit:${user?.username}`)) {
@@ -100,7 +105,9 @@ const UserDetails = ({ user }: Props) => {
             </IfPermitted>
           </>
         )}
-        {selectedSegment === 'collections' && <CollectionsSection user={user} />}
+        {activePluggableSegments.map(({ value, component: SegmentComponent }) =>
+          selectedSegment === value ? <SegmentComponent key={value} user={user} /> : null,
+        )}
         {selectedSegment === 'shared_entities' && <SharedEntitiesSection userId={user.id} />}
       </Col>
     </Row>
