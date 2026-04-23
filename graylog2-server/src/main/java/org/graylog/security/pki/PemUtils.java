@@ -24,10 +24,14 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.openssl.PEMException;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
+import org.bouncycastle.operator.ContentVerifierProvider;
+import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -125,6 +129,64 @@ public final class PemUtils {
             }
             throw new CertificateException("PEM does not contain a valid X.509 certificate");
         }
+    }
+
+    /**
+     * Parses a PEM-encoded PKCS#10 Certificate Signing Request and verifies its self-signature.
+     * <p>
+     * A valid CSR self-signature proves that the requester holds the private key corresponding to
+     * the public key carried in the CSR. Any {@link PKCS10CertificationRequest} returned by this
+     * method has therefore already been cryptographically verified; callers do not need to verify
+     * it again.
+     * <p>
+     * This method is algorithm-agnostic — policy such as "CSRs must use Ed25519" is enforced by
+     * higher-level callers (e.g., {@link CertificateBuilder#signCsr}), not here.
+     *
+     * @param pem the PEM-encoded CSR
+     * @return the parsed and signature-verified CSR
+     * @throws CertificateException if the PEM does not contain a CSR or the CSR's self-signature
+     *                              cannot be verified
+     * @throws IOException          if the PEM cannot be read
+     */
+    public static PKCS10CertificationRequest parseCsr(String pem) throws IOException, CertificateException {
+        try (PEMParser pemParser = new PEMParser(new StringReader(pem))) {
+            final Object object = pemParser.readObject();
+            if (!(object instanceof PKCS10CertificationRequest csr)) {
+                throw new CertificateException("PEM does not contain a valid CSR");
+            }
+
+            // Verify CSR self-signature (proves agent possesses private key)
+            try {
+                final ContentVerifierProvider verifier = new JcaContentVerifierProviderBuilder()
+                        .setProvider("BC")
+                        .build(csr.getSubjectPublicKeyInfo());
+                if (!csr.isSignatureValid(verifier)) {
+                    throw new CertificateException("CSR signature is invalid");
+                }
+            } catch (Exception e) {
+                throw new CertificateException("CSR signature verification failed", e);
+            }
+
+            return csr;
+        }
+    }
+
+    /**
+     * Extracts the public key from a parsed PKCS#10 CSR.
+     * <p>
+     * This is a pure extractor: it performs no signature verification (use {@link #parseCsr} for
+     * that) and enforces no algorithm policy. Callers that require a specific key algorithm must
+     * check {@link PublicKey#getAlgorithm()} on the returned key themselves.
+     *
+     * @param csr the parsed CSR
+     * @return the public key contained in the CSR
+     * @throws PEMException if the CSR's {@code SubjectPublicKeyInfo} cannot be converted to a
+     *                      {@link PublicKey} (e.g., unsupported key algorithm)
+     */
+    public static PublicKey extractPublicKeyFromCsr(PKCS10CertificationRequest csr) throws PEMException {
+        return new org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter()
+                .setProvider("BC")
+                .getPublicKey(csr.getSubjectPublicKeyInfo());
     }
 
     /**

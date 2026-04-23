@@ -35,6 +35,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.threeten.extra.MutableClock;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -60,6 +61,7 @@ class CollectorInstanceServiceTest {
 
     private CollectorInstanceService collectorInstanceService;
     private MongoCollections mongoCollections;
+    private MutableClock clock;
 
     @BeforeAll
     static void beforeAll() throws Exception {
@@ -71,7 +73,8 @@ class CollectorInstanceServiceTest {
     @BeforeEach
     void setUp(MongoCollections coll) {
         mongoCollections = coll;
-        collectorInstanceService = new CollectorInstanceService(coll);
+        clock = TestClocks.mutableFixedEpoch();
+        collectorInstanceService = new CollectorInstanceService(coll, clock);
     }
 
     @Test
@@ -102,27 +105,11 @@ class CollectorInstanceServiceTest {
     }
 
     @Test
-    void existsByInstanceUidReturnsTrueForExisting() throws Exception {
-        enroll("instance-uid-1");
-
-        final boolean exists = collectorInstanceService.existsByInstanceUid("instance-uid-1");
-
-        assertThat(exists).isTrue();
-    }
-
-    @Test
-    void existsByInstanceUidReturnsFalseForUnknown() {
-        final boolean exists = collectorInstanceService.existsByInstanceUid("non-existent-uid");
-
-        assertThat(exists).isFalse();
-    }
-
-    @Test
     void countByFleetGroupedReturnsPerFleetCounts() throws Exception {
-        final Instant now = Instant.now();
-        final Instant recentlySeen = now.minusSeconds(30);
-        final Instant longAgo = now.minusSeconds(600);
-        final Instant onlineThreshold = now.minusSeconds(60);
+        final Instant reference = Instant.parse("2025-01-01T00:00:00Z");
+        final Instant recentlySeen = reference.minusSeconds(30);
+        final Instant longAgo = reference.minusSeconds(600);
+        final Instant onlineThreshold = reference.minusSeconds(60);
 
         final String fleetA = "507f1f77bcf86cd799439012";
         final String fleetB = "507f1f77bcf86cd799439013";
@@ -188,14 +175,15 @@ class CollectorInstanceServiceTest {
 
     @Test
     void deleteExpiredRemovesOldInstances() throws Exception {
-        final Instant now = Instant.now();
+        final Instant reference = Instant.parse("2025-01-01T00:00:00Z");
         final Duration threshold = Duration.ofDays(7);
 
-        // Expired: last seen 8 days ago
-        enrollWithFleetAndLastSeen("uid-expired", "507f1f77bcf86cd799439012", now.minus(Duration.ofDays(8)));
-        // Not expired: last seen 3 days ago
-        enrollWithFleetAndLastSeen("uid-recent", "507f1f77bcf86cd799439012", now.minus(Duration.ofDays(3)));
+        // Expired: last seen 8 days before reference
+        enrollWithFleetAndLastSeen("uid-expired", "507f1f77bcf86cd799439012", reference.minus(Duration.ofDays(8)));
+        // Not expired: last seen 3 days before reference
+        enrollWithFleetAndLastSeen("uid-recent", "507f1f77bcf86cd799439012", reference.minus(Duration.ofDays(3)));
 
+        clock.setInstant(reference);
         final long deleted = collectorInstanceService.deleteExpired(threshold);
 
         assertThat(deleted).isEqualTo(1);
@@ -205,9 +193,10 @@ class CollectorInstanceServiceTest {
 
     @Test
     void deleteExpiredReturnsZeroWhenNothingToDelete() throws Exception {
-        enrollWithFleetAndLastSeen("uid-fresh",
-                "507f1f77bcf86cd799439012", Instant.now());
+        final Instant reference = Instant.parse("2025-01-01T00:00:00Z");
+        enrollWithFleetAndLastSeen("uid-fresh", "507f1f77bcf86cd799439012", reference);
 
+        clock.setInstant(reference);
         final long deleted = collectorInstanceService.deleteExpired(Duration.ofDays(7));
 
         assertThat(deleted).isEqualTo(0);
@@ -543,15 +532,12 @@ class CollectorInstanceServiceTest {
 
     private CollectorInstanceDTO enroll(String instanceUid) throws Exception {
         final var cert = certBuilder.createEndEntityCert(instanceUid, issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
+        final var issuedCert = new IssuedCertificate(cert.fingerprint(), cert.certificate(), cert.notAfter(), issuerCert.id());
 
         return collectorInstanceService.enroll(
                 instanceUid,
                 "000000000000000000000000",
-                cert.fingerprint(),
-                cert.certificate(),
-                Date.from(cert.notAfter()),
-                issuerCert.id(),
-                Instant.now(),
+                issuedCert,
                 "000000000000000000000000"
         );
     }
@@ -560,17 +546,20 @@ class CollectorInstanceServiceTest {
                                             String fleetId,
                                             Instant lastSeen) throws Exception {
         final var cert = certBuilder.createEndEntityCert(instanceUid, issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
+        final var issuedCert = new IssuedCertificate(cert.fingerprint(), cert.certificate(), cert.notAfter(), issuerCert.id());
 
-        collectorInstanceService.enroll(
-                instanceUid,
-                fleetId,
-                cert.fingerprint(),
-                cert.certificate(),
-                Date.from(cert.notAfter()),
-                issuerCert.id(),
-                lastSeen,
-                "000000000000000000000000"
-        );
+        final Instant prev = clock.instant();
+        clock.setInstant(lastSeen);
+        try {
+            collectorInstanceService.enroll(
+                    instanceUid,
+                    fleetId,
+                    issuedCert,
+                    "000000000000000000000000"
+            );
+        } finally {
+            clock.setInstant(prev);
+        }
     }
 
     private Optional<Document> findRawDocument(String instanceUid) {
