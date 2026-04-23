@@ -108,7 +108,7 @@ public class FieldTypesMappingServiceIT {
                 clusterEventBus);
         final EntityScopeService entityScopeService = new EntityScopeService(Set.of(new DefaultEntityScope(), new NonDeletableSystemScope()));
         this.indexSetService = new MongoIndexSetService(mongoCollections, streamService, clusterConfigService, clusterEventBus, entityScopeService);
-        this.fieldTypeMappingsService = new FieldTypeMappingsService(indexSetService, mongoIndexSetFactory, indexFieldTypeProfileService);
+        this.fieldTypeMappingsService = new FieldTypeMappingsService(indexSetService, mongoIndexSetFactory, indexFieldTypeProfileService, new CustomMappingValidation());
         this.indexSetService.save(indexSetConfig);
     }
 
