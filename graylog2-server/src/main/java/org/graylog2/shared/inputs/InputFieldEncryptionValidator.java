@@ -42,7 +42,7 @@ public class InputFieldEncryptionValidator {
     public InputFieldEncryptionValidator(MessageInputFactory messageInputFactory) {
         final List<String> offenders = findOffenders(messageInputFactory);
         if (!offenders.isEmpty()) {
-            LOG.error("Input field(s) declared with IS_PASSWORD but not isEncrypted=true " +
+            LOG.warn("Input field(s) declared with IS_PASSWORD but not isEncrypted=true " +
                     "(UI masked, stored in plain text): {}", String.join(", ", offenders));
         }
     }
