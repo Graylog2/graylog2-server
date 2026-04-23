@@ -71,11 +71,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
@@ -670,22 +674,17 @@ public class InputServiceImpl implements InputService {
 
     @Override
     public Map<Extractor.Type, Long> totalExtractorCountByType() {
-        final Map<Extractor.Type, Long> extractorsCountByType = new HashMap<>();
-
-        documentCollection.find(Filters.exists(InputImpl.EMBEDDED_EXTRACTORS))
+        return documentCollection.find(Filters.exists(InputImpl.EMBEDDED_EXTRACTORS))
                 .projection(Projections.include(InputImpl.EMBEDDED_EXTRACTORS))
-                .forEach(doc -> {
-                    if (!(doc.get(InputImpl.EMBEDDED_EXTRACTORS) instanceof List<?> extractors)) return;
-                    for (Object item : extractors) {
-                        if (!(item instanceof Map<?, ?> extractorDoc)) continue;
-                        final Extractor.Type type = Extractor.Type.fuzzyValueOf(String.valueOf(extractorDoc.get(Extractor.FIELD_TYPE)));
-                        if (type != null) {
-                            extractorsCountByType.merge(type, 1L, Long::sum);
-                        }
-                    }
-                });
-
-        return extractorsCountByType;
+                .into(new ArrayList<>())
+                .stream()
+                .flatMap(doc -> doc.get(InputImpl.EMBEDDED_EXTRACTORS) instanceof List<?> list ? list.stream() : Stream.empty())
+                .filter(item -> item instanceof Map<?, ?>)
+                .map(item -> ((Map<?, ?>) item).get(Extractor.FIELD_TYPE))
+                .map(String::valueOf)
+                .map(Extractor.Type::fuzzyValueOf)
+                .filter(Objects::nonNull)
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
     }
 
     private void publishChange(Object event) {
