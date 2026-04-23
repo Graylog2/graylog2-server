@@ -40,6 +40,7 @@ import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
+import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.transports.AbstractTcpTransport;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
@@ -81,7 +82,9 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
                                  NettyTransportConfiguration nettyTransportConfiguration,
                                  ThroughputCounter throughputCounter,
                                  LocalMetricRegistry localRegistry,
-                                 TLSProtocolsConfiguration tlsConfiguration, String path) {
+                                 TLSProtocolsConfiguration tlsConfiguration,
+                                 EncryptedValueService encryptedValueService,
+                                 String path) {
         super(configuration,
                 throughputCounter,
                 localRegistry,
@@ -94,7 +97,7 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
         this.maxChunkSize = parseMaxChunkSize(configuration);
         this.idleWriterTimeout = configuration.intIsSet(CK_IDLE_WRITER_TIMEOUT) ? configuration.getInt(CK_IDLE_WRITER_TIMEOUT, DEFAULT_IDLE_WRITER_TIMEOUT) : DEFAULT_IDLE_WRITER_TIMEOUT;
         this.authorizationHeader = configuration.getString(CK_AUTHORIZATION_HEADER_NAME);
-        this.authorizationHeaderValue = configuration.getString(CK_AUTHORIZATION_HEADER_VALUE);
+        this.authorizationHeaderValue = encryptedValueService.decrypt(configuration.getEncryptedValue(CK_AUTHORIZATION_HEADER_VALUE));
         this.path = path;
     }
 
@@ -179,6 +182,7 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
                     "",
                     "The secret authorization header value which all request must have in order to authenticate successfully. e.g. Bearer: <api-token>N",
                     ConfigurationField.Optional.OPTIONAL,
+                    true,
                     TextField.Attribute.IS_PASSWORD));
             return r;
         }
