@@ -19,6 +19,7 @@ package org.graylog2.inputs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
@@ -26,6 +27,7 @@ import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.Sorts;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
@@ -79,6 +81,7 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
@@ -332,7 +335,7 @@ public class InputServiceImpl implements InputService {
     }
 
     @Override
-    public void addExtractor(Input input, Extractor extractor) throws ValidationException  {
+    public void addExtractor(Input input, Extractor extractor) throws ValidationException {
         validateExtractor(extractor);
         final Document embeddedDoc = new Document(extractor.getPersistedFields());
         final UpdateResult result = collection.updateOne(
@@ -673,13 +676,18 @@ public class InputServiceImpl implements InputService {
 
     @Override
     public Map<Extractor.Type, Long> totalExtractorCountByType() {
-        return documentCollection.find(Filters.exists(InputImpl.EMBEDDED_EXTRACTORS))
+        return stream(documentCollection
+                .find(Filters.exists(InputImpl.EMBEDDED_EXTRACTORS))
                 .projection(Projections.include(InputImpl.EMBEDDED_EXTRACTORS))
-                .into(new ArrayList<>())
-                .stream()
+        )
                 .flatMap(InputServiceImpl::embeddedExtractors)
                 .flatMap(InputServiceImpl::extractorType)
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+    }
+
+    @Nonnull
+    private static Stream<Document> stream(FindIterable<Document> projection) {
+        return StreamSupport.stream(projection.spliterator(), false);
     }
 
     private static Stream<?> embeddedExtractors(Document doc) {
