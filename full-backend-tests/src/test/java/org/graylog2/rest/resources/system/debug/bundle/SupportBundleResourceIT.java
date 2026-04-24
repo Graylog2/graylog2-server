@@ -379,7 +379,13 @@ public class SupportBundleResourceIT {
         assertThat(clusterJson.has("jvm")).isTrue();
         assertThat(clusterJson.has("process_buffer_dump")).isTrue();
         assertThat(clusterJson.has("installed_plugins")).isTrue();
-        assertThat(clusterJson.has("cluster_stats")).isTrue();
+        final JsonNode clusterStats = clusterJson.get("cluster_stats");
+        assertThat(clusterStats.isObject())
+                .as("cluster_stats must be a JSON object, not an error string")
+                .isTrue();
+        assertThat(clusterStats.has("elasticsearch")).isTrue();
+        assertThat(clusterStats.has("mongo")).isTrue();
+        assertThat(clusterStats.has("stream_count")).isTrue();
         assertThat(clusterJson.has("search_db")).isTrue();
         assertThat(clusterJson.has("datanodes")).isTrue();
 
