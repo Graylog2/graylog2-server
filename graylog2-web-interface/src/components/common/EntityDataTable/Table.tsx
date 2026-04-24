@@ -19,7 +19,7 @@ import type { Row, HeaderGroup, ColumnPinningPosition } from '@tanstack/react-ta
 import { flexRender } from '@tanstack/react-table';
 import styled, { css } from 'styled-components';
 
-import { Table as BaseTable } from 'components/bootstrap';
+import { getPinnedCellClassName, Table as BaseTable } from 'components/bootstrap';
 import EntityTableOverrideRow from 'components/common/EntityDataTable/EntityTableOverrideRow';
 import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
 import { ACTIONS_COL_ID, CELL_PADDING } from 'components/common/EntityDataTable/Constants';
@@ -74,9 +74,8 @@ const Td = styled.td<{
   $colId: string;
   $hidePadding: boolean;
   $pinningPosition: ColumnPinningPosition;
-  $isOddRow: boolean;
 }>(
-  ({ $colId, $hidePadding, $pinningPosition, $isOddRow, theme }) => css`
+  ({ $colId, $hidePadding, $pinningPosition }) => css`
     word-break: break-word;
     opacity: var(${columnOpacityVar($colId)}, 1);
     transform: var(${columnTransformVar($colId)}, none);
@@ -86,12 +85,6 @@ const Td = styled.td<{
       ? css`
           position: sticky;
           ${$pinningPosition === 'left' ? 'left' : 'right'}: 0;
-          background-color: ${$isOddRow
-            ? theme.utils.flattenColorStack([
-                theme.colors.global.contentBackground,
-                theme.colors.table.row.backgroundStriped,
-              ])
-            : theme.colors.global.contentBackground};
           ${ScrollShadow('left')}
           &::before {
             display: var(${displayScrollRightIndicatorVar}, none);
@@ -131,16 +124,17 @@ const Table = <Entity extends EntityBase>({
       {rows.map((row) => {
         const visibleCells = row.getVisibleCells();
         const visibleCellCount = visibleCells.length;
+        const isStripedRow = row.index % 2 !== 0;
         const renderCell = (cell) => {
           const columnMeta = cell.column.columnDef.meta as ColumnMetaContext<Entity>;
-          const isOddRow = row.index % 2 !== 0;
+          const className = getPinnedCellClassName(!!cell.column.getIsPinned(), isStripedRow);
 
           return (
             <Td
               key={cell.id}
-              $isOddRow={isOddRow}
               $colId={cell.column.id}
               $pinningPosition={cell.column.getIsPinned()}
+              className={className}
               $hidePadding={columnMeta?.hideCellPadding}>
               {flexRender(cell.column.columnDef.cell, cell.getContext())}
             </Td>
