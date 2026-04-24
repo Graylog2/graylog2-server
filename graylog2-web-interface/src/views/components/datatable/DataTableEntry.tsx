@@ -56,7 +56,7 @@ type Props = {
   valuePath: ValuePath;
   units: UnitsConfig;
   pinnedColumnIndexes: Set<number>;
-  striped: boolean;
+  striped?: boolean;
 };
 
 const _c = (field: string, value: any, path: ValuePath, source: string) => ({ field, value, path, source });
@@ -133,7 +133,7 @@ const DataTableEntry = ({
   types,
   units,
   pinnedColumnIndexes,
-  striped,
+  striped = false,
 }: Props) => {
   const classes = 'message-group';
   const activeQuery = useActiveQueryId();

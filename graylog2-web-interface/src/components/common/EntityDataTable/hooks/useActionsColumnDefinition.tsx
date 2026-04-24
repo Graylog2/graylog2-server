@@ -33,7 +33,7 @@ const AlignRight = styled.div`
   height: 100%;
 `;
 
-const BackgroundFoundation = styled.div<{ $parentBgColor: string }>`
+const BackgroundFoundation = styled.div`
   height: 100%;
   width: var(${actionsHeaderWidthVar});
 `;
@@ -56,12 +56,10 @@ const ActionCell = <Entity extends EntityBase>({
   row,
   entityActions,
   onWidthChange,
-  parentBgColor,
 }: {
   row: Row<Entity>;
   entityActions: (entity: Entity) => React.ReactNode | undefined;
   onWidthChange: (rowId: string, width: number) => void;
-  parentBgColor: string | undefined;
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -75,7 +73,7 @@ const ActionCell = <Entity extends EntityBase>({
 
   return (
     <AlignRight>
-      <BackgroundFoundation $parentBgColor={parentBgColor}>
+      <BackgroundFoundation>
         <Actions $isEvenRow={row.index % 2 === 0}>
           <ButtonToolbar ref={ref}>{entityActions(row.original)}</ButtonToolbar>
         </Actions>
@@ -89,37 +87,30 @@ const useActionsColumnDefinition = <Entity extends EntityBase>({
   entityActions,
   hasRowActions,
   onWidthChange,
-  parentBgColor,
 }: {
   colWidth: number;
   entityActions: (entity: Entity) => React.ReactNode | undefined;
   hasRowActions: boolean;
   minWidth: number;
   onWidthChange: (colId: string, width: number) => void;
-  parentBgColor: string | undefined;
 }) => {
   const columnHelper = createColumnHelper<Entity>();
 
   const cell = useCallback(
     ({ row }: { row: Row<Entity> }) =>
       entityActions ? (
-        <ActionCell<Entity>
-          row={row}
-          entityActions={entityActions}
-          onWidthChange={onWidthChange}
-          parentBgColor={parentBgColor}
-        />
+        <ActionCell<Entity> row={row} entityActions={entityActions} onWidthChange={onWidthChange} />
       ) : null,
-    [entityActions, onWidthChange, parentBgColor],
+    [entityActions, onWidthChange],
   );
 
   const header = useCallback(
     () => (
       <AlignRight>
-        <BackgroundFoundation $parentBgColor={parentBgColor} />
+        <BackgroundFoundation />
       </AlignRight>
     ),
-    [parentBgColor],
+    [],
   );
 
   return useMemo(
