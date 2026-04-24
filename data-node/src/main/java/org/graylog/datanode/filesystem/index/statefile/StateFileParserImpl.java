@@ -84,7 +84,7 @@ public class StateFileParserImpl implements StateFileParser {
             CodecUtil.checkHeader(indexInput, STATE_FILE_CODEC, MIN_COMPATIBLE_STATE_FILE_VERSION, STATE_FILE_VERSION);
             indexInput.skipBytes(Integer.BYTES); // xcontentType, not used
             final long filePointer = indexInput.getFilePointer();
-            final int contentSize = (int) (indexInput.length() - CodecUtil.footerLength() - filePointer);
+            final int contentSize = Math.toIntExact(indexInput.length() - CodecUtil.footerLength() - filePointer);
             final byte[] contentBytes = new byte[contentSize];
             indexInput.readBytes(contentBytes, 0, contentSize);
             final Map<String, Object> readValue = objectMapper.readValue(contentBytes, TypeReferences.MAP_STRING_OBJECT);
