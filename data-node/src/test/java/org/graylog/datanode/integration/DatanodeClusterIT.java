@@ -137,7 +137,25 @@ public class DatanodeClusterIT {
 
         nodeC.start();
         waitForNodesCount(3);
-        nodeC.stop();
+
+        final RestOperationParameters nodeCRestParameters = RestOperationParameters.builder()
+                .port(nodeC.getDatanodeRestPort())
+                .truststore(trustStore)
+                .jwtAuthToken(DatanodeContainerizedBackend.JWT_AUTH_TOKEN)
+                .build();
+
+        // Wait until nodeC is fully operational before triggering removal, so that the
+        // management API is reachable and the node is actually part of the cluster.
+        new DatanodeRestApiWait(nodeCRestParameters).waitForAvailableStatus();
+
+        // Use the datanode management API to decommission nodeC gracefully instead of
+        // hard-killing the container. A hard stop leaves shards unassigned and the cluster
+        // stays yellow/red while OpenSearch's delayed-allocation waits for the node to come
+        // back — that wait can exceed the retry budget and cause a spurious test failure.
+        // Graceful removal lets OpenSearch drain and reallocate shards before the node
+        // departs, so the cluster returns to green with 2 nodes within the normal timeout.
+        new DatanodeStatusChangeOperation(nodeCRestParameters).triggerNodeRemoval();
+
         waitForNodesCount(2);
     }
 
