@@ -72,7 +72,7 @@ const ElasticsearchUnavailableInformation = () => {
 const IndexSetPage = () => {
   const { indexSetId } = useParams<{ indexSetId?: string }>();
   const [indexSet, setIndexSet] = useState<IndexSet | undefined>(undefined);
-  const { data: indexerOverview, error: indexerOverviewError } = useIndexerOverview(indexSetId);
+  const { data: indexerOverview, error: indexerOverviewError, refetch } = useIndexerOverview(indexSetId);
   const { indices: indexDetailsIndices, closedIndices: indexDetailsClosedIndices } = useStore(IndicesStore) ?? {};
 
   useEffect(() => {
@@ -81,12 +81,13 @@ const IndexSetPage = () => {
 
     const timerId = setInterval(() => {
       IndicesActions.multiple();
+      refetch();
     }, REFRESH_INTERVAL);
 
     return () => {
       clearInterval(timerId);
     };
-  }, [indexSetId]);
+  }, [indexSetId, refetch]);
 
   if (!indexSet) {
     return <Spinner />;
