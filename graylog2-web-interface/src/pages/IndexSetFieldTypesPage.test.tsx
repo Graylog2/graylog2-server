@@ -54,14 +54,12 @@ jest.mock('routing/QueryParams', () => ({
   useQueryParam: jest.fn(),
 }));
 
-jest.mock('components/indices/hooks/useSingleIndexSet', () =>
-  jest.fn(() => ({
-    data: { id: '111', title: 'index set title', field_type_profile: null },
-    refetch: jest.fn(),
-    isSuccess: true,
-    isInitialLoading: false,
-  })),
-);
+jest.mock('components/indices/hooks/useSingleIndexSet', () => jest.fn(() => ({
+  data: { id: '111', title: 'index set title', field_type_profile: null },
+  refetch: jest.fn(),
+  isSuccess: true,
+  isInitialLoading: false,
+})));
 
 describe('IndexSetFieldTypesPage', () => {
   useViewsPlugin();

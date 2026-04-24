@@ -46,6 +46,7 @@ import useOnRefresh from 'components/common/PaginatedEntityTable/useOnRefresh';
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
 import Slicing, { type SliceRenderers } from 'components/common/PaginatedEntityTable/slicing';
 import type { FetchSlices } from 'components/common/PaginatedEntityTable/slicing/useFetchSlices';
+import useAuthorizedAttributes from 'components/common/PaginatedEntityTable/hooks/useAuthorizedAttributes';
 
 import { useWithLocalState, useWithURLParams } from './useFiltersAndPagination';
 
@@ -188,6 +189,8 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
     [additionalAttributes, paginatedEntities?.attributes],
   );
 
+  const attributes = useAuthorizedAttributes(paginatedEntities?.attributes ?? []);
+
   const onPaginationChange = withoutURLParams
     ? (currentPage: number, pageSize: number) => paginationState.setPagination({ page: currentPage, pageSize })
     : undefined;
@@ -200,7 +203,6 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
     list,
     meta,
     pagination: { total },
-    attributes = [],
   } = paginatedEntities;
 
   return (

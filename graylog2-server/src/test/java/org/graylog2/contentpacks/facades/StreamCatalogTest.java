@@ -18,6 +18,7 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.eventbus.EventBus;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -121,7 +122,8 @@ public class StreamCatalogTest {
                 entityRegistrar,
                 clusterEventBus,
                 Set.of(),
-                new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())));
+                new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())),
+                new EventBus());
         when(outputService.load("5adf239e4b900a0fdb4e5197")).thenReturn(
                 OutputImpl.create("5adf239e4b900a0fdb4e5197", "Title", "Type", "admin", Collections.emptyMap(), new Date(1524654085L), null)
         );

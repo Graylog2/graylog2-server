@@ -16,19 +16,23 @@
  */
 package org.graylog2.inputs;
 
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBExtension;
+import org.graylog2.ConfigurationException;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.converters.ConverterFactory;
+import org.graylog2.inputs.extractors.CopyInputExtractor;
 import org.graylog2.inputs.extractors.ExtractorFactory;
+import org.graylog2.inputs.extractors.RegexExtractor;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -358,6 +362,36 @@ public class InputServiceImplTest {
     }
 
     @Test
+    @MongoDBFixtures("InputServiceImplTest.json")
+    void testAddStaticFieldWithDuplicateKeyReplacesValue() throws Exception {
+        final String inputId = "54e3deadbeefdeadbeef0003";
+        final Input input = inputService.find(inputId);
+
+        // Add a static field with the same key but different value
+        inputService.addStaticField(input, "static_field", "bar");
+
+        // Should have exactly one entry with the new value, not a duplicate
+        final List<Map.Entry<String, String>> fields = inputService.getStaticFields(inputId);
+        assertThat(fields).hasSize(1).isEqualTo(List.of(Map.entry("static_field", "bar")));
+    }
+
+    @Test
+    @MongoDBFixtures("InputServiceImplTest.json")
+    void testAddStaticFieldWithNewKey() throws Exception {
+        final String inputId = "54e3deadbeefdeadbeef0003";
+        final Input input = inputService.find(inputId);
+
+        // Add a new static field with a different key
+        inputService.addStaticField(input, "new_field", "new_value");
+
+        // Should now have two static fields: the original and the new one
+        final List<Map.Entry<String, String>> fields = inputService.getStaticFields(inputId);
+        assertThat(fields).hasSize(2)
+                .contains(Map.entry("static_field", "foo"))
+                .contains(Map.entry("new_field", "new_value"));
+    }
+
+    @Test
     public void findIdsByDesiredState() throws Exception {
         InputImpl stoppedInput = InputImpl.builder()
                 .setTitle("stopped input")
@@ -436,6 +470,34 @@ public class InputServiceImplTest {
                 InputImpl.FIELD_CONTENT_PACK,
                 InputImpl.FIELD_NODE_ID
         );
+    }
+
+    @Test
+    void totalExtractorCountByTypeCountsExtractorsAcrossInputs() throws Exception {
+        final Input input1 = inputService.find(inputService.save(createTestInput()));
+        inputService.addExtractor(input1, createCopyInputExtractor());
+        inputService.addExtractor(input1, createCopyInputExtractor());
+        inputService.addExtractor(input1, createRegexExtractor());
+
+        final Input input2 = inputService.find(inputService.save(createTestInput()));
+        inputService.addExtractor(input2, createCopyInputExtractor());
+
+        final Map<Extractor.Type, Long> result = inputService.totalExtractorCountByType();
+        assertThat(result)
+                .containsEntry(Extractor.Type.COPY_INPUT, 3L)
+                .containsEntry(Extractor.Type.REGEX, 1L);
+    }
+
+    private static CopyInputExtractor createCopyInputExtractor() throws Extractor.ReservedFieldException {
+        return new CopyInputExtractor(new MetricRegistry(), new ObjectId().toHexString(), "copy extractor",
+                0, Extractor.CursorStrategy.COPY, "message", "target", Map.of(), "admin",
+                List.of(), Extractor.ConditionType.NONE, "");
+    }
+
+    private static RegexExtractor createRegexExtractor() throws Extractor.ReservedFieldException, ConfigurationException {
+        return new RegexExtractor(new MetricRegistry(), new ObjectId().toHexString(), "regex extractor",
+                0, Extractor.CursorStrategy.COPY, "message", "target", Map.of("regex_value", ".*"), "admin",
+                List.of(), Extractor.ConditionType.NONE, "");
     }
 
     private InputImpl createTestInput() {

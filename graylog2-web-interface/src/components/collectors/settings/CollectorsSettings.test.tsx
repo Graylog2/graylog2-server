@@ -24,7 +24,13 @@ import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendColle
 
 import CollectorsSettings from './CollectorsSettings';
 
-import { useCollectorsConfig, useCollectorInputIds, useCollectorsMutations, useCollectorInputDetails, useCollectorInputMutations } from '../hooks';
+import {
+  useCollectorsConfig,
+  useCollectorInputIds,
+  useCollectorsMutations,
+  useCollectorInputDetails,
+  useCollectorInputMutations,
+} from '../hooks';
 import type { CollectorsConfig } from '../types';
 import { mockCollectorsMutations } from '../testing/mockMutations';
 
