@@ -1,0 +1,7 @@
+type = "f"
+message = "Bump the mcp library to a newer version that supports the elicitation parameter in the format."
+
+issues = ["25322"]
+pulls = ["25748"]
+
+
