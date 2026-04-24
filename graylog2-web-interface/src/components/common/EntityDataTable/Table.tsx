@@ -19,7 +19,7 @@ import type { Row, HeaderGroup, ColumnPinningPosition } from '@tanstack/react-ta
 import { flexRender } from '@tanstack/react-table';
 import styled, { css } from 'styled-components';
 
-import { getPinnedCellClassName, Table as BaseTable } from 'components/bootstrap';
+import { Table as BaseTable } from 'components/bootstrap';
 import EntityTableOverrideRow from 'components/common/EntityDataTable/EntityTableOverrideRow';
 import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
 import { ACTIONS_COL_ID, CELL_PADDING } from 'components/common/EntityDataTable/Constants';
@@ -124,17 +124,14 @@ const Table = <Entity extends EntityBase>({
       {rows.map((row) => {
         const visibleCells = row.getVisibleCells();
         const visibleCellCount = visibleCells.length;
-        const isStripedRow = row.index % 2 !== 0;
         const renderCell = (cell) => {
           const columnMeta = cell.column.columnDef.meta as ColumnMetaContext<Entity>;
-          const className = getPinnedCellClassName(!!cell.column.getIsPinned(), isStripedRow);
 
           return (
             <Td
               key={cell.id}
               $colId={cell.column.id}
               $pinningPosition={cell.column.getIsPinned()}
-              className={className}
               $hidePadding={columnMeta?.hideCellPadding}>
               {flexRender(cell.column.columnDef.cell, cell.getContext())}
             </Td>
