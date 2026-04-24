@@ -243,13 +243,13 @@ public class CollectorInstanceService {
 
         final var updates = combine(
                 set(FIELD_FLEET_ID, fleetId),
-                set(FIELD_LAST_SEEN, clock.instant()),
+                set(FIELD_LAST_SEEN, Date.from(clock.instant())),
                 unset(FIELD_NEXT_CERTIFICATE_FINGERPRINT),
                 unset(FIELD_NEXT_CERTIFICATE_PEM),
                 unset(FIELD_NEXT_CERTIFICATE_EXPIRES_AT),
                 set(FIELD_ACTIVE_CERTIFICATE_FINGERPRINT, issuedCert.fingerprint()),
                 set(FIELD_ACTIVE_CERTIFICATE_PEM, issuedCert.certPem()),
-                set(FIELD_ACTIVE_CERTIFICATE_EXPIRES_AT, issuedCert.notAfter()),
+                set(FIELD_ACTIVE_CERTIFICATE_EXPIRES_AT, Date.from(issuedCert.notAfter())),
                 set(FIELD_ISSUING_CA_ID, issuedCert.issuerId()),
                 set(FIELD_ENROLLMENT_TOKEN_ID, enrollmentTokenId)
         );

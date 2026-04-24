@@ -260,6 +260,50 @@ class CollectorInstanceServiceTest {
     }
 
     @Test
+    void enrollAndReEnrollRoundTripThroughMongo() throws Exception {
+        final Instant enrollTime = Instant.parse("2025-01-01T00:00:00Z");
+        final Instant reEnrollTime = Instant.parse("2025-02-14T10:30:45Z");
+
+        clock.setInstant(enrollTime);
+        final var enrolled = enroll("uid-roundtrip");
+
+        // Fresh read after enroll — exercises the deserialize path independently of the insert's in-memory DTO.
+        final var afterEnroll = collectorInstanceService.findByInstanceUid("uid-roundtrip").orElseThrow();
+        assertThat(afterEnroll.enrolledAt()).isEqualTo(enrollTime);
+        assertThat(afterEnroll.lastSeen()).isEqualTo(enrollTime);
+        assertThat(afterEnroll.activeCertificateExpiresAt()).isEqualTo(enrolled.activeCertificateExpiresAt());
+
+        clock.setInstant(reEnrollTime);
+        final var newCert = certBuilder.createEndEntityCert("uid-roundtrip", issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
+        final var newIssued = new IssuedCertificate(newCert.fingerprint(), newCert.certificate(), newCert.notAfter(), issuerCert.id());
+        collectorInstanceService.reEnroll(enrolled.id(), "507f1f77bcf86cd799439999", newIssued, "token-2");
+
+        // Fresh read after re-enroll — exercises the post-update deserialize path.
+        final var afterReEnroll = collectorInstanceService.findByInstanceUid("uid-roundtrip").orElseThrow();
+        assertThat(afterReEnroll.enrolledAt()).isEqualTo(enrollTime);
+        assertThat(afterReEnroll.lastSeen()).isEqualTo(reEnrollTime);
+        assertThat(afterReEnroll.activeCertificateExpiresAt()).isEqualTo(newIssued.notAfter());
+        assertThat(afterReEnroll.activeCertificateFingerprint()).isEqualTo(newIssued.fingerprint());
+        assertThat(afterReEnroll.activeCertificatePem()).isEqualTo(newIssued.certPem());
+        assertThat(afterReEnroll.fleetId()).isEqualTo("507f1f77bcf86cd799439999");
+        assertThat(afterReEnroll.enrollmentTokenId()).isEqualTo("token-2");
+    }
+
+    @Test
+    void reEnrollStoresTemporalFieldsAsBsonDate() throws Exception {
+        final var uid = "uid-bson-types";
+        final var original = enroll(uid);
+
+        final var newCert = certBuilder.createEndEntityCert(uid, issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
+        final var newIssued = new IssuedCertificate(newCert.fingerprint(), newCert.certificate(), newCert.notAfter(), issuerCert.id());
+
+        collectorInstanceService.reEnroll(original.id(), "507f1f77bcf86cd799439012", newIssued, "token-x");
+
+        assertFieldIsDate(uid, CollectorInstanceDTO.FIELD_LAST_SEEN);
+        assertFieldIsDate(uid, CollectorInstanceDTO.FIELD_ACTIVE_CERTIFICATE_EXPIRES_AT);
+    }
+
+    @Test
     void reEnrollThrowsWhenRecordDoesNotExist() throws Exception {
         final var cert = certBuilder.createEndEntityCert("ghost", issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
         final var issued = new IssuedCertificate(cert.fingerprint(), cert.certificate(), cert.notAfter(), issuerCert.id());
