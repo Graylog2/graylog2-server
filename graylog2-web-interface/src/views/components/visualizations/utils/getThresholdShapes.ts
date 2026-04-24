@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import flatten from 'lodash/flatten';
-import type { Shape, Annotations } from 'plotly.js';
+import type { Shape, Annotations } from 'views/components/visualizations/types';
 import type { DefaultTheme } from 'styled-components';
 
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';

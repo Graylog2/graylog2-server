@@ -14,26 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useMemo } from 'react';
 import Immutable from 'immutable';
 import moment from 'moment';
+import { useTheme } from 'styled-components';
 
-import Plot from 'views/components/visualizations/plotly/AsyncPlot';
+import EChart from 'views/components/visualizations/echarts/EChart';
 
-const _formatTimestamp = (epoch) => moment.unix(epoch).format('YYYY-MM-DD HH:mm:ss');
-
-const _generateSeries = (results): Plotly.Data[] => {
-  const data = Immutable.OrderedMap<string, number>(results);
-
-  return [
-    {
-      type: 'bar',
-      x: data.keySeq().map(_formatTimestamp).toArray(),
-      y: data.valueSeq().toArray(),
-      name: 'took_ms',
-    },
-  ];
-};
+const _formatTimestamp = (epoch: number) => moment.unix(epoch).format('YYYY-MM-DD HH:mm:ss');
 
 type HistogramProps = {
   data: {
@@ -47,17 +35,33 @@ type HistogramProps = {
 };
 
 export default function Histogram({ data }: HistogramProps) {
-  return (
-    <Plot
-      data={_generateSeries(data.results)}
-      style={{ position: 'absolute' }}
-      layout={{
-        margin: {
-          t: 10,
-          pad: 10,
+  const theme = useTheme();
+
+  const option = useMemo(() => {
+    const ordered = Immutable.OrderedMap<string, number>(data.results);
+    const xData = ordered
+      .keySeq()
+      .map((k) => _formatTimestamp(Number(k)))
+      .toArray();
+    const yData = ordered.valueSeq().toArray();
+
+    return {
+      animation: false,
+      tooltip: {
+        trigger: 'axis' as const,
+        backgroundColor: theme.colors.global.contentBackground,
+        borderColor: theme.colors.variant.light.default,
+        textStyle: {
+          color: theme.colors.text.primary,
+          fontFamily: theme.fonts.family.body,
         },
-      }}
-      config={{ displayModeBar: false }}
-    />
-  );
+      },
+      xAxis: { type: 'category' as const, data: xData },
+      yAxis: { type: 'value' as const },
+      series: [{ type: 'bar' as const, name: 'took_ms', data: yData }],
+      grid: { top: 10, left: 10, right: 10, bottom: 10, containLabel: true },
+    };
+  }, [data.results, theme]);
+
+  return <EChart option={option} style={{ position: 'absolute', height: '100%', width: '100%' }} />;
 }

@@ -15,17 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useMemo, useCallback } from 'react';
-import styled, { css, useTheme } from 'styled-components';
+import { useContext, useMemo, useCallback, useRef } from 'react';
 import merge from 'lodash/merge';
-import type { Layout, PlotMouseEvent, PlotlyHTMLElement } from 'plotly.js';
-import type Plotly from 'plotly.js/lib/core';
+import { useTheme } from 'styled-components';
 
-import Plot from 'views/components/visualizations/plotly/AsyncPlot';
+import type { Layout, PlotMouseEvent, EChartsInstance } from 'views/components/visualizations/types';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import { EVENT_COLOR, eventsDisplayName } from 'views/logic/searchtypes/events/EventHandler';
 import { ROOT_FONT_SIZE } from 'theme/constants';
 import getDefaultPlotYLayoutSettings from 'views/components/visualizations/utils/getDefaultPlotYLayoutSettings';
+import EChart from 'views/components/visualizations/echarts/EChart';
+import plotlyToECharts from 'views/components/visualizations/echarts/plotlyAdapter';
 
 import ChartColorContext from './ChartColorContext';
 
@@ -33,29 +33,6 @@ import InteractiveContext from '../contexts/InteractiveContext';
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 
 export type PlotLayout = Layout;
-
-const StyledPlot = styled(Plot)(
-  ({ theme }) => css`
-    .customPopover .popover-content {
-      padding: 0;
-    }
-
-    .hoverlayer .hovertext {
-      rect {
-        fill: ${theme.colors.global.contentBackground} !important;
-        opacity: 0.9 !important;
-      }
-
-      .name {
-        fill: ${theme.colors.text.primary} !important;
-      }
-
-      path {
-        stroke: ${theme.colors.global.contentBackground} !important;
-      }
-    }
-  `,
-);
 
 export type OnClickMarkerEvent = {
   x: string;
@@ -101,22 +78,10 @@ type Props = {
   onHoverMarker?: (event: OnHoverMarkerEvent) => void;
   onUnhoverMarker?: () => void;
   onAfterPlot?: () => void;
-  onInitialized?: (figure: unknown, graphDiv: PlotlyHTMLElement) => void;
-};
-
-type Axis = {
-  autosize: boolean;
-};
-
-const nonInteractiveLayout = {
-  yaxis: { fixedrange: true },
-  xaxis: { fixedrange: true },
-  hovermode: false,
+  onInitialized?: (figure: unknown, graphDiv: EChartsInstance) => void;
 };
 
 const style = { height: '100%', width: '100%' };
-
-const config = { displayModeBar: false, doubleClick: false, responsive: true, showTips: false } as const;
 
 const usePlotLayout = (layout: Partial<Layout>) => {
   const theme = useTheme();
@@ -130,7 +95,7 @@ const usePlotLayout = (layout: Partial<Layout>) => {
       family: theme.fonts.family.body,
     };
 
-    const defaultLayout = {
+    const defaultLayout: Partial<Layout> = {
       shapes: [],
       autosize: true,
       showlegend: false,
@@ -165,12 +130,16 @@ const usePlotLayout = (layout: Partial<Layout>) => {
 
     const plotLayout = merge({}, defaultLayout, layout);
 
-    plotLayout.shapes = plotLayout.shapes.map((shape) => ({
+    plotLayout.shapes = (plotLayout.shapes ?? []).map((shape) => ({
       ...shape,
       line: { ...(shape?.line ?? {}), color: shape?.line?.color || colors.get(eventsDisplayName, EVENT_COLOR) },
     }));
 
-    return interactive ? plotLayout : merge({}, plotLayout, nonInteractiveLayout);
+    if (!interactive) {
+      plotLayout.hovermode = false;
+    }
+
+    return plotLayout;
   }, [colors, interactive, layout, theme]);
 };
 
@@ -213,8 +182,8 @@ const GenericPlot = ({
   layout = {},
   setChartColor = undefined,
   onClickMarker = () => {},
-  onHoverMarker = () => {},
-  onUnhoverMarker = () => {},
+  onHoverMarker: _onHoverMarker = () => {},
+  onUnhoverMarker: _onUnhoverMarker = () => {},
   onZoom = () => {},
   onAfterPlot = () => {},
   onInitialized = () => {},
@@ -223,64 +192,84 @@ const GenericPlot = ({
   const plotLayout = usePlotLayout(layout);
   const plotChartData = usePlotChartData(chartData, setChartColor);
   const onRenderComplete = useContext(RenderCompletionCallback);
+  const chartInstanceRef = useRef<EChartsInstance | null>(null);
 
-  const _onRelayout = useCallback(
-    (axis: Axis) => {
-      if (!axis.autosize && axis['xaxis.range[0]'] && axis['xaxis.range[1]']) {
-        const from = axis['xaxis.range[0]'];
-        const to = axis['xaxis.range[1]'];
+  const theme = useTheme();
 
-        onZoom(from, to);
-      }
+  const option = useMemo(() => {
+    const echartsOption = plotlyToECharts(plotChartData, plotLayout);
+
+    echartsOption.tooltip = {
+      ...echartsOption.tooltip,
+      backgroundColor: theme.colors.global.contentBackground,
+      borderColor: theme.colors.variant.light.default,
+      textStyle: {
+        color: theme.colors.text.primary,
+        fontFamily: theme.fonts.family.body,
+      },
+    };
+
+    return echartsOption;
+  }, [plotChartData, plotLayout, theme]);
+
+  const onChartReady = useCallback(
+    (instance: EChartsInstance) => {
+      chartInstanceRef.current = instance;
+      onRenderComplete();
+      onAfterPlot();
+      onInitialized(null, instance);
     },
-    [onZoom],
+    [onRenderComplete, onAfterPlot, onInitialized],
   );
 
-  const _onHoverMarker = useCallback(
-    (event: unknown) => {
-      const { points } = event as { points: Array<{ bbox: { x0: number; y0: number }; y: string; x: string }> };
+  const events = useMemo(() => {
+    if (!interactive) return {};
 
-      onHoverMarker?.({
-        positionX: points[0].bbox.x0,
-        positionY: points[0].bbox.y0,
-        x: points[0].x,
-        y: points[0].y,
-      });
-    },
-    [onHoverMarker],
-  );
+    return {
+      click: (params: any) => {
+        const x = params.name ?? params.data?.[0] ?? '';
+        const y = params.value ?? params.data?.[1] ?? '';
 
-  const _onMarkerClick = useCallback(
-    (e: Readonly<Plotly.PlotMouseEvent>) => {
-      onClickMarker?.(
-        {
-          x: e.points[0].x as string,
-          y: e.points[0].y as string,
-        },
-        e,
-      );
-    },
-    [onClickMarker],
-  );
+        const plotMouseEvent: PlotMouseEvent = {
+          points: [
+            {
+              curveNumber: params.seriesIndex ?? 0,
+              pointIndex: params.dataIndex,
+              pointNumber: params.dataIndex,
+              x,
+              y,
+              data: plotChartData[params.seriesIndex] ?? {},
+              fullData: plotChartData[params.seriesIndex] ?? {},
+              value: params.value,
+              label: params.name,
+              percent: params.percent,
+              z: params.data?.[2],
+              bbox: { x0: params.event?.offsetX ?? 0, y0: params.event?.offsetY ?? 0 },
+            },
+          ],
+          event: params.event?.event ?? params.event,
+        };
 
-  const _onAfterPlot = useCallback(() => {
-    onRenderComplete();
-    onAfterPlot();
-  }, [onRenderComplete, onAfterPlot]);
+        onClickMarker({ x: String(x), y: String(y) }, plotMouseEvent);
+      },
+      datazoom: (params: any) => {
+        if (params.batch?.[0]) {
+          const { startValue, endValue } = params.batch[0];
+
+          if (startValue && endValue) {
+            onZoom(String(startValue), String(endValue));
+          }
+        }
+      },
+    };
+  }, [interactive, onClickMarker, onZoom, plotChartData]);
 
   return (
-    <StyledPlot
-      data={plotChartData}
-      useResizeHandler
-      layout={plotLayout}
+    <EChart
+      option={option}
       style={style}
-      onAfterPlot={_onAfterPlot}
-      onClick={interactive ? _onMarkerClick : () => false}
-      onHover={_onHoverMarker}
-      onUnhover={onUnhoverMarker}
-      onRelayout={interactive ? _onRelayout : () => {}}
-      config={config}
-      onInitialized={onInitialized}
+      onEvents={events}
+      onChartReady={onChartReady}
     />
   );
 };

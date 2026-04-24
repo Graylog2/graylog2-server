@@ -18,7 +18,7 @@ import flatten from 'lodash/flatten';
 import flow from 'lodash/flow';
 import isEqual from 'lodash/isEqual';
 import set from 'lodash/set';
-import type { PlotData } from 'plotly.js';
+import type { PlotData } from 'views/components/visualizations/types';
 
 import type { Key, Leaf, Row, Rows, Value } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';

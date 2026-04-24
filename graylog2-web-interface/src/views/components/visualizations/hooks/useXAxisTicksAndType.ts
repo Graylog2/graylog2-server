@@ -16,7 +16,7 @@
  */
 import flatMap from 'lodash/flatMap';
 import compact from 'lodash/compact';
-import type { LayoutAxis } from 'plotly.js';
+import type { LayoutAxis } from 'views/components/visualizations/types';
 
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';

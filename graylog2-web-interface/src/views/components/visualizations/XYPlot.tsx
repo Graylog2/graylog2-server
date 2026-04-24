@@ -17,7 +17,7 @@
 
 import React, { useCallback } from 'react';
 import merge from 'lodash/merge';
-import type Plotly from 'plotly.js/lib/core';
+import type { EChartsInstance } from 'views/components/visualizations/types';
 
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
@@ -48,7 +48,7 @@ export type Props = {
   plotLayout?: Partial<PlotLayout>;
   onZoom?: (from: string, to: string, userTimezone: string) => boolean;
   onClickMarker?: GenericPlotProps['onClickMarker'];
-  onInitialized?: (figure: unknown, graphDiv: Plotly.PlotlyHTMLElement) => void;
+  onInitialized?: (figure: unknown, instance: EChartsInstance) => void;
 };
 
 const yLegendPosition = (containerHeight: number) => {
