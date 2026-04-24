@@ -295,7 +295,6 @@ public class ContentPackService {
         final ImmutableSet.Builder<NativeEntityDescriptor> allEntityDescriptors = ImmutableSet.builder();
 
         final Map<ModelId, Object> oldEntityObjects = new HashMap<>();
-        final Map<ModelId, List<GrantDTO>> oldEntityGrants = new HashMap<>();
 
         try {
             for (Entity entity : entitiesInOrder) {
@@ -327,10 +326,6 @@ public class ContentPackService {
                         final NativeEntity nativeEntity = existingEntity.get();
 
                         oldEntityObjects.put(entity.id(), nativeEntity.entity());
-                        final List<GrantDTO> grants = facade.resolveGrants(nativeEntity.entity());
-                        if (!grants.isEmpty()) {
-                            oldEntityGrants.put(entity.id(), grants);
-                        }
 
                         facade.updateNativeEntity(entity, nativeEntity, validatedParameters, allEntities, userContext.getUser().getName());
                         allEntityDescriptors.add(nativeEntity.descriptor());
@@ -374,7 +369,7 @@ public class ContentPackService {
                 .entityObjects(ImmutableMap.copyOf(oldEntityObjects))
                 .failedEntities(ImmutableSet.of())
                 .skippedEntities(ImmutableSet.of())
-                .entityGrants(ImmutableMap.copyOf(oldEntityGrants))
+                .entityGrants(ImmutableMap.of())
                 .build();
 
         return new ContentPackUpgrade(persistedInstallation, oldEntitySnapshots);
