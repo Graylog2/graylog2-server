@@ -100,7 +100,7 @@
         <opensearch.shaded.version>2.19.3-1</opensearch.shaded.version>
         <opensearch.client.version>3.2.0</opensearch.client.version>
         <airline.version>3.2.0</airline.version>
-        <amqp-client.version>5.29.0</amqp-client.version>
+        <amqp-client.version>5.30.0</amqp-client.version>
         <antlr.version>4.13.2</antlr.version>
         <apache-directory-version>2.1.7</apache-directory-version>
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
@@ -128,7 +128,7 @@
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.49.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
-        <gcs.version>2.66.0</gcs.version>
+        <gcs.version>2.67.0</gcs.version>
         <azure-blob-storage.version>12.33.3</azure-blob-storage.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>5.0.2</geoip2.version>
@@ -169,7 +169,7 @@
         <mongojack.version>5.1.0</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.2.12.Final</netty.version>
-        <netty-tcnative-boringssl-static.version>2.0.75.Final</netty-tcnative-boringssl-static.version>
+        <netty-tcnative-boringssl-static.version>2.0.77.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>5.3.2</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.61.0</opentelemetry.version>
@@ -188,8 +188,8 @@
         <siv-mode.version>1.6.1</siv-mode.version>
         <slf4j.version>2.0.17</slf4j.version>
         <streamex.version>0.8.4</streamex.version>
-        <swagger.version>2.2.47</swagger.version>
-        <swagger-parser.version>2.1.39</swagger-parser.version>
+        <swagger.version>2.2.48</swagger.version>
+        <swagger-parser.version>2.1.40</swagger-parser.version>
         <syslog4j.version>0.9.61</syslog4j.version>
         <threeten-extra.version>1.8.0</threeten-extra.version>
         <ulid.version>8.3.0</ulid.version>
@@ -773,7 +773,7 @@
                         <dependency>
                             <groupId>org.openrewrite</groupId>
                             <artifactId>rewrite-java</artifactId>
-                            <version>8.79.2</version>
+                            <version>8.79.5</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>

@@ -18,11 +18,10 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 
 import { Col, Tab, Tabs } from 'components/bootstrap';
-import connect from 'stores/connect';
 import MessageShow from 'components/search/MessageShow';
 import MessageLoader from 'components/extractors/MessageLoader';
 import StreamsStore from 'stores/streams/StreamsStore';
-import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
+import useInputsList, { inputsAsMap } from 'hooks/useInputs';
 import type { Message } from 'views/components/messagelist/Types';
 import type { Stream } from 'logic/streams/types';
 
@@ -87,8 +86,6 @@ class LoaderTabs extends React.Component<
   };
 
   loadData = () => {
-    InputsActions.list();
-
     StreamsStore.listStreams().then((response: Array<Stream>) => {
       const streams = {};
 
@@ -210,6 +207,11 @@ class LoaderTabs extends React.Component<
   }
 }
 
-export default connect(LoaderTabs, { inputs: InputsStore }, ({ inputs: { inputs } }) => ({
-  inputs: inputs ? Immutable.Map(InputsStore.inputsAsMap(inputs)) : undefined,
-}));
+const LoaderTabsWrapper = (props: Omit<LoaderTabsProps, 'inputs'>) => {
+  const { data: inputsList } = useInputsList();
+  const inputs = inputsList ? Immutable.Map(inputsAsMap(inputsList)) : undefined;
+
+  return <LoaderTabs {...props} inputs={inputs} />;
+};
+
+export default LoaderTabsWrapper;
