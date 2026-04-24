@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.indexset.profile;
 
+import jakarta.ws.rs.BadRequestException;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
@@ -33,7 +34,6 @@ import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConf
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.streams.StreamService;
-import jakarta.ws.rs.BadRequestException;
 import org.joda.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,8 +50,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
 @ExtendWith(MongoDBExtension.class)
@@ -62,8 +60,6 @@ public class IndexFieldTypeProfileServiceTest {
     private IndexFieldTypeProfileUsagesService indexFieldTypeProfileUsagesService;
 
     private MongoIndexSetService mongoIndexSetService;
-
-    private CustomMappingValidation customMappingValidation;
 
     @BeforeEach
     public void setUp(MongoCollections mongoCollections) {
@@ -76,12 +72,11 @@ public class IndexFieldTypeProfileServiceTest {
                 entityScopeService
         );
         indexFieldTypeProfileUsagesService = new IndexFieldTypeProfileUsagesService(mongoConnection);
-        customMappingValidation = mock(CustomMappingValidation.class);
         toTest = new IndexFieldTypeProfileService(
                 mongoCollections,
                 indexFieldTypeProfileUsagesService,
                 mongoIndexSetService,
-                customMappingValidation);
+                new CustomMappingValidation());
     }
 
     @Test
@@ -232,23 +227,17 @@ public class IndexFieldTypeProfileServiceTest {
 
     @Test
     public void testSaveThrowsWhenProfileIsInvalid() {
-        doThrow(new BadRequestException("invalid profile"))
-                .when(customMappingValidation).checkProfile(any(IndexFieldTypeProfile.class));
-
         final IndexFieldTypeProfile profile = new IndexFieldTypeProfile(null, "profile", "profile",
-                new CustomFieldMappings(List.of(new CustomFieldMapping("field", "bogus"))));
+                new CustomFieldMappings(List.of(new CustomFieldMapping("field", "wrong_type_that_causes_exception"))));
 
         assertThrows(BadRequestException.class, () -> toTest.save(profile));
     }
 
     @Test
     public void testUpdateThrowsWhenProfileIsInvalid() {
-        doThrow(new BadRequestException("invalid profile"))
-                .when(customMappingValidation).checkProfile(any(IndexFieldTypeProfile.class));
-
         final String profileId = "123400000000000000000001";
         final IndexFieldTypeProfile profile = new IndexFieldTypeProfile(profileId, "profile", "profile",
-                new CustomFieldMappings(List.of(new CustomFieldMapping("field", "bogus"))));
+                new CustomFieldMappings(List.of(new CustomFieldMapping("field", "wrong_type_that_causes_exception"))));
 
         assertThrows(BadRequestException.class, () -> toTest.update(profileId, profile));
     }
