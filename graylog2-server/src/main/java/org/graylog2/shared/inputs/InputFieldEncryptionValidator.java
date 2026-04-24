@@ -43,7 +43,7 @@ public class InputFieldEncryptionValidator {
         final List<String> offenders = findOffenders(messageInputFactory);
         if (!offenders.isEmpty()) {
             LOG.warn("""
-                    WARNING — Plain-text secrets at rest:
+                    WARNING! — Plain-text secrets at rest:
                     Input field(s) have IS_PASSWORD set without isEncrypted=true, so they are masked in the UI but stored as plain text.
                     Affected: {}""", String.join(", ", offenders));
         }
