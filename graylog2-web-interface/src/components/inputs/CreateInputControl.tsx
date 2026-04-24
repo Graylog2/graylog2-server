@@ -21,7 +21,7 @@ import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import { useQueryClient } from '@tanstack/react-query';
 
-import { InputsActions } from 'stores/inputs/InputsStore';
+import { createInput as createInputRequest } from 'hooks/useInputs';
 import type { InputDescription } from 'hooks/useInputType';
 import { fetchInputType } from 'hooks/useInputType';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -173,7 +173,7 @@ const CreateInputControl = () => {
       app_action_value: 'input-create',
     });
 
-    InputsActions.create(data).then((response: { id: string }) => {
+    createInputRequest(data).then((response: { id: string }) => {
       queryClient.invalidateQueries({ queryKey: KEY_PREFIX });
 
       if (inputSetupFeatureFlagIsEnabled && response?.id) {

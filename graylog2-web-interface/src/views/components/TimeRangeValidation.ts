@@ -28,7 +28,7 @@ import { isTypeAbsolute, isTypeRelativeWithEnd, isTypeKeyword } from 'views/type
 import type { DateTime } from 'util/DateTime';
 import { isValidDate, toDateObject } from 'util/DateTime';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
-import ToolsStore from 'stores/tools/ToolsStore';
+import { testNaturalDate } from 'api/tools';
 
 const invalidDateFormatError = 'Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]].';
 const rangeLimitError = 'Range is outside limit duration.';
@@ -106,7 +106,7 @@ const validateRelativeTimeRangeWithEnd = (timeRange: RelativeTimeRangeWithEnd, l
   return errors;
 };
 
-const debouncedTestNaturalDate = debounceWithPromise(ToolsStore.testNaturalDate, 350);
+const debouncedTestNaturalDate = debounceWithPromise(testNaturalDate, 350);
 
 const validateKeywordTimeRange = async (
   timeRange: KeywordTimeRange,
