@@ -24,7 +24,7 @@ import type { BsSize } from 'components/bootstrap/types';
 import sizeForMantine from 'theme/utils/sizeForMantine';
 
 const mapStyle = (style: ColorVariant, theme: DefaultTheme) =>
-  style === 'default' ? theme.colors.variant.gray : theme.colors.variant[style];
+  style === 'default' ? theme.colors.button.gray.background : theme.colors.variant[style];
 
 const StyledBadge = styled(MantineBadge)<{ color: ColorVariant }>(
   ({ theme, color }) => css`
@@ -48,7 +48,6 @@ type Props = React.PropsWithChildren<{
   bsSize?: BsSize;
   variant?: string;
   color?: string;
-  autoContrast?: boolean;
 }>;
 
 const Badge = (
@@ -62,16 +61,12 @@ const Badge = (
     bsSize = 'md',
     variant = 'filled',
     color: customColor = undefined,
-    autoContrast = false,
   }: Props,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) => {
   const theme = useTheme();
   const color = customColor ?? mapStyle(bsStyle, theme);
-  console.log({ customColor, bsStyle, color });
   const size = sizeForMantine(bsSize);
-
-  console.log({ variant });
 
   return (
     <StyledBadge
@@ -82,8 +77,7 @@ const Badge = (
       ref={ref}
       variant={variant}
       onClick={onClick}
-      size={size}
-      autoContrast={autoContrast}>
+      size={size}>
       {children}
     </StyledBadge>
   );
