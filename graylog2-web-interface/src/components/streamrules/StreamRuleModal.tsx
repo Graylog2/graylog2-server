@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { Formik, Form, Field } from 'formik';
-import { useCallback, useMemo, useEffect } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import type { StreamRule } from 'stores/streams/StreamsStore';
 import {
@@ -33,8 +33,7 @@ import HumanReadableStreamRule from 'components/streamrules//HumanReadableStream
 import { Col, Well, Input, Modal, Row } from 'components/bootstrap';
 import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
-import { useStore } from 'stores/connect';
-import { StreamRulesInputsStore, StreamRulesInputsActions } from 'stores/inputs/StreamRulesInputsStore';
+import useStreamRulesInputs from 'hooks/useStreamRulesInputs';
 import STREAM_RULE_TYPES from 'logic/streams/streamRuleTypes';
 import useStreamRuleTypes from 'components/streams/hooks/useStreamRuleTypes';
 import useResourceCustomization from 'brand-customization/useResourceCustomization';
@@ -88,12 +87,8 @@ const StreamRuleModal = ({
   },
 }: Props) => {
   const { enabled, url } = useResourceCustomization('stream_rule_matcher_code');
-  const { inputs } = useStore(StreamRulesInputsStore);
+  const { data: inputs } = useStreamRulesInputs();
   const { data: streamRuleTypes } = useStreamRuleTypes();
-
-  useEffect(() => {
-    StreamRulesInputsActions.list();
-  }, []);
 
   const _onSubmit = useCallback(
     (values: FormValues) => onSubmit(initialValues?.id, values).then(() => onClose()),
