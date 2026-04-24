@@ -21,26 +21,26 @@ import type { RootState } from 'views/types';
 import type { HistoryFunction } from 'routing/useHistory';
 import { setIsDirty, setIsNew } from 'views/logic/slices/viewSlice';
 import { createEntityShareState } from 'fixtures/entityShareState';
-import { EntityShareStore } from 'stores/permissions/EntityShareStore';
 import { createView } from 'views/api/views';
 
 import View from './View';
 import OriginalOnSaveNewDashboard from './OnSaveNewDashboard';
 import { loadDashboard } from './Actions';
+import useEntityShareState from 'hooks/useEntityShareState';
 
 jest.mock('views/api/views', () => ({
   createView: jest.fn((v) => Promise.resolve(v)).mockName('create'),
 }));
-jest.mock('stores/permissions/EntityShareStore', () => ({
+jest.mock('api/entity-share', () => ({
+  prepareEntityShare: jest.fn(() => Promise.resolve()),
+  updateEntityShare: jest.fn(() => Promise.resolve()),
+  loadUserSharesPaginated: jest.fn(() => Promise.resolve({ list: require('immutable').List(), pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 } })),
+}));
+jest.mock('hooks/useEntityShareState', () => ({
   __esModule: true,
-  EntityShareActions: {
-    prepare: jest.fn(() => Promise.resolve()),
-    update: jest.fn(() => Promise.resolve()),
-  },
-  EntityShareStore: {
-    listen: jest.fn(),
-    getInitialState: jest.fn(),
-  },
+  default: jest.fn(() => ({ data: undefined })),
+  useSetEntityShareState: jest.fn(() => jest.fn()),
+  entityShareQueryKey: jest.fn((grn) => ['entity-share', grn ?? 'new']),
 }));
 
 jest.mock('util/UserNotification');
@@ -57,7 +57,7 @@ const OnSaveNewDashboard = (view: View) => OriginalOnSaveNewDashboard(view, hist
 
 describe('OnSaveNewDashboard', () => {
   beforeEach(() => {
-    asMock(EntityShareStore.getInitialState).mockReturnValue({ state: createEntityShareState });
+    asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState } as any);
   });
 
   afterEach(() => {

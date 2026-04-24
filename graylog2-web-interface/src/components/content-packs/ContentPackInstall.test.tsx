@@ -18,12 +18,18 @@ import React, { act } from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import { StoreMock as MockStore } from 'helpers/mocking';
 import ContentPackInstall from 'components/content-packs/ContentPackInstall';
 
-jest.mock('stores/permissions/EntityShareStore', () => ({
-  EntityShareActions: { prepare: async () => {} },
-  EntityShareStore: MockStore(['getInitialState', () => ({})]),
+jest.mock('api/entity-share', () => ({
+  prepareEntityShare: jest.fn(() => Promise.resolve()),
+  updateEntityShare: jest.fn(() => Promise.resolve()),
+  loadUserSharesPaginated: jest.fn(() => Promise.resolve({ list: require('immutable').List(), pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 } })),
+}));
+jest.mock('hooks/useEntityShareState', () => ({
+  __esModule: true,
+  default: jest.fn(() => ({ data: undefined })),
+  useSetEntityShareState: jest.fn(() => jest.fn()),
+  entityShareQueryKey: jest.fn((grn) => ['entity-share', grn ?? 'new']),
 }));
 
 describe('<ContentPackInstall />', () => {
