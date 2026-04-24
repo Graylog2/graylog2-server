@@ -19,8 +19,7 @@ import { render } from 'wrappedTestingLibrary';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { asMock } from 'helpers/mocking';
-import useSystemInfo from 'hooks/useSystemStore';
-import { fetchSystemJvm } from 'hooks/useSystemStore';
+import useSystemInfo, { fetchSystemJvm } from 'hooks/useSystemStore';
 
 import Footer from './Footer';
 
