@@ -23,6 +23,7 @@ import Reflux from 'reflux';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import AppFacade from 'routing/AppFacade';
+import ServerAvailabilityProvider from 'contexts/ServerAvailabilityProvider';
 import ViewsBindings from 'views/bindings';
 import ThreatIntelBindings from 'threatintel/bindings';
 import AwsBindings from 'aws/bindings';
@@ -40,6 +41,7 @@ import ComponentsBindings from 'components/common/bindings';
 import EntityCreatorBindings from 'components/entityCreatorBindings';
 import UsersBindings from 'components/users/bindings';
 import SidecarsBindings from 'components/sidecars/bindings';
+import CollectorsBindings from 'components/collectors/bindings';
 import PipelinesBindings from 'components/pipelines/bindings';
 import IndicesBindings from 'components/indices/bindings';
 import LookupTablesBindings from 'components/lookup-tables/bindings';
@@ -66,6 +68,7 @@ PluginStore.register(new PluginManifest({}, SecurityBindings));
 PluginStore.register(new PluginManifest({}, EventsBindings));
 PluginStore.register(new PluginManifest({}, UsersBindings));
 PluginStore.register(new PluginManifest({}, SidecarsBindings));
+PluginStore.register(new PluginManifest({}, CollectorsBindings));
 PluginStore.register(new PluginManifest({}, ComponentsBindings));
 PluginStore.register(new PluginManifest({}, EntityCreatorBindings));
 PluginStore.register(new PluginManifest({}, PipelinesBindings));
@@ -79,9 +82,11 @@ const appContainer = document.querySelector('div#app-root');
 const root = createRoot(appContainer);
 
 root.render(
-  <TelemetryInit>
-    <LoginQueryClientProvider>
-      <AppFacade />
-    </LoginQueryClientProvider>
-  </TelemetryInit>,
+  <LoginQueryClientProvider>
+    <TelemetryInit>
+      <ServerAvailabilityProvider>
+        <AppFacade />
+      </ServerAvailabilityProvider>
+    </TelemetryInit>
+  </LoginQueryClientProvider>,
 );

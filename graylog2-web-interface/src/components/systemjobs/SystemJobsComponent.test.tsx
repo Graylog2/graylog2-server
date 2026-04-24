@@ -34,7 +34,7 @@ const job = {
   execution_duration: 'PT0.003S',
   percent_complete: 0,
   provides_progress: true,
-  job_status: 'runnable',
+  job_status: 'runnable' as const,
   is_cancelable: true,
 };
 describe('SystemJobsComponent', () => {

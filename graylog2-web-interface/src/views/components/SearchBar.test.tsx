@@ -75,7 +75,11 @@ describe('SearchBar', () => {
   useViewsPlugin();
 
   beforeEach(() => {
-    asMock(useSearchConfiguration).mockReturnValue({ config: mockSearchesClusterConfig, refresh: () => {} });
+    asMock(useSearchConfiguration).mockReturnValue({
+      config: mockSearchesClusterConfig,
+      refresh: () => {},
+      isInitialLoading: false,
+    });
     asMock(useCurrentQuery).mockReturnValue(query);
   });
 
@@ -111,6 +115,7 @@ describe('SearchBar', () => {
     asMock(useSearchConfiguration).mockReturnValue({
       config: { ...mockSearchesClusterConfig, query_time_range_limit: 'PT1M' },
       refresh: () => {},
+      isInitialLoading: false,
     });
     render(<SearchBar />);
 

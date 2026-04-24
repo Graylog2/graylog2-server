@@ -77,7 +77,11 @@ describe('Search', () => {
 
   beforeEach(() => {
     StreamsActions.refresh = mockAction();
-    asMock(useSearchConfiguration).mockReturnValue({ config: mockSearchesClusterConfig, refresh: () => {} });
+    asMock(useSearchConfiguration).mockReturnValue({
+      config: mockSearchesClusterConfig,
+      refresh: () => {},
+      isInitialLoading: false,
+    });
   });
 
   it('register a WindowLeaveMessage', async () => {

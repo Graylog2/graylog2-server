@@ -62,7 +62,14 @@ const queryClient = new QueryClient({
 const wrapper = ({ children }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 
 const renderTestHook = (streams: Array<Stream>, initialFavoriteFields: Array<string>) =>
-  renderHook(() => useMessageFavoriteFieldsMutation(streams, initialFavoriteFields), { wrapper });
+  renderHook(
+    () =>
+      useMessageFavoriteFieldsMutation(
+        Object.fromEntries(streams.map((stream) => [stream.id, stream.favorite_fields])),
+        initialFavoriteFields,
+      ),
+    { wrapper },
+  );
 describe('useMessageFavoriteFieldsMutation', () => {
   const streams: Array<Stream> = [
     {

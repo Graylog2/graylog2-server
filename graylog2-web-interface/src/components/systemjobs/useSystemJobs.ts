@@ -14,22 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
-import { useStore } from 'stores/connect';
-import { SystemJobsActions, SystemJobsStore } from 'stores/systemjobs/SystemJobsStore';
+import { ClusterJobs } from '@graylog/server-api';
 
-const useSystemJobs = (): Record<string, { jobs?: unknown[]; systemJobs?: unknown[] }> => {
-  useEffect(() => {
-    SystemJobsActions.list();
-    const interval = setInterval(SystemJobsActions.list, 2000);
+import { defaultOnError } from 'util/conditional/onError';
 
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
+export const SYSTEM_JOBS_QUERY_KEY = ['system', 'jobs'];
 
-  return useStore(SystemJobsStore, ({ jobs }) => jobs);
+const useSystemJobs = () => {
+  const { data: jobs } = useQuery({
+    queryKey: SYSTEM_JOBS_QUERY_KEY,
+    queryFn: () =>
+      defaultOnError(ClusterJobs.list(), 'Loading system jobs failed with status', 'Could not load system jobs'),
+    refetchInterval: 2000,
+  });
+
+  return jobs;
 };
 
 export default useSystemJobs;

@@ -18,9 +18,11 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useQueryClient } from '@tanstack/react-query';
 
+import { StaticFields } from '@graylog/server-api';
+
 import { Button, Table, ButtonToolbar } from 'components/bootstrap';
 import { ConfirmDialog, Icon, IfPermitted } from 'components/common';
-import { InputStaticFieldsStore } from 'stores/inputs/InputStaticFieldsStore';
+import UserNotification from 'util/UserNotification';
 import { StaticFieldForm } from 'components/inputs';
 import SectionGrid from 'components/common/Section/SectionGrid';
 import { KEY_PREFIX } from 'hooks/usePaginatedInputs';
@@ -53,11 +55,20 @@ const InputStaticFields = ({ input }: InputStaticFieldsProps) => {
   const queryClient = useQueryClient();
 
   const handleDeleteStaticField = () => {
-    InputStaticFieldsStore.destroy(input, fieldToDelete).finally(() => {
-      setFieldToDelete(null);
-      setShowConfirmDelete(false);
-      queryClient.invalidateQueries({ queryKey: KEY_PREFIX });
-    });
+    StaticFields.remove(fieldToDelete, input.id).then(
+      () => {
+        UserNotification.success(`Static field '${fieldToDelete}' removed from '${input.title}' successfully`);
+        setFieldToDelete(null);
+        setShowConfirmDelete(false);
+        queryClient.invalidateQueries({ queryKey: KEY_PREFIX });
+      },
+      (error) => {
+        UserNotification.error(
+          `Removing static field from input failed with: ${error}`,
+          `Could not remove static field '${fieldToDelete}' from input '${input.title}'`,
+        );
+      },
+    );
   };
   const onDeleteStaticField = (fieldName: string) => {
     setFieldToDelete(fieldName);

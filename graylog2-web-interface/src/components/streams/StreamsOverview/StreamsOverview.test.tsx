@@ -18,9 +18,10 @@ import React from 'react';
 import { render, screen, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import * as Immutable from 'immutable';
+import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import { indexSets } from 'fixtures/indexSets';
-import { asMock, MockStore } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
 import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
 import { stream } from 'fixtures/streams';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
@@ -29,6 +30,7 @@ import useStreamRuleTypes from 'components/streams/hooks/useStreamRuleTypes';
 import { streamRuleTypes } from 'fixtures/streamRuleTypes';
 import useStreamDestinationFilterRuleCount from 'components/streams/hooks/useStreamDestinationFilterRuleCount';
 import useStreamOutputFilters from 'components/streams/hooks/useStreamOutputFilters';
+import useStreamRulesInputs from 'hooks/useStreamRulesInputs';
 
 import StreamsOverview from './StreamsOverview';
 
@@ -37,18 +39,7 @@ jest.mock('components/streams/hooks/useStreamRuleTypes');
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 jest.mock('components/streams/hooks/useStreamDestinationFilterRuleCount');
 jest.mock('components/streams/hooks/useStreamOutputFilters');
-
-jest.mock('stores/inputs/StreamRulesInputsStore', () => ({
-  StreamRulesInputsActions: {
-    list: jest.fn(),
-  },
-  StreamRulesInputsStore: MockStore([
-    'getInitialState',
-    () => ({
-      inputs: [{ id: 'my-id', title: 'input title', name: 'name' }],
-    }),
-  ]),
-}));
+jest.mock('hooks/useStreamRulesInputs');
 
 const attributes = [
   {
@@ -98,6 +89,9 @@ describe('StreamsOverview', () => {
     });
 
     asMock(useStreamRuleTypes).mockReturnValue({ data: streamRuleTypes });
+    asMock(useStreamRulesInputs).mockReturnValue({
+      data: [{ id: 'my-id', title: 'input title', name: 'name' }],
+    } as any);
     asMock(useStreamDestinationFilterRuleCount).mockReturnValue({
       data: 0,
       refetch: () => {},
@@ -244,5 +238,45 @@ describe('StreamsOverview', () => {
     await userEvent.click(hideFilterRulesBadge);
 
     expect(screen.queryByText('Only prod logs')).not.toBeInTheDocument();
+  });
+
+  it('should render stream overview table elements from plugins', async () => {
+    const plugin = new PluginManifest(
+      {},
+      {
+        'components.streams.overview.tableElements': [
+          {
+            attributeName: 'data_lake',
+            attributes: [{ id: 'data_lake', title: 'Data Lake' }],
+            columnRenderers: {
+              data_lake: {
+                renderCell: () => 'Preview logs',
+                staticWidth: 'matchHeader',
+              },
+            },
+          },
+        ],
+      },
+    );
+
+    PluginStore.register(plugin);
+    asMock(useFetchEntities).mockReturnValue(paginatedStreams());
+    asMock(useUserLayoutPreferences).mockReturnValue({
+      data: {
+        ...layoutPreferences,
+        attributes: undefined,
+      },
+      isInitialLoading: false,
+      refetch: () => {},
+    });
+
+    try {
+      renderSut();
+
+      await screen.findByText('Data Lake');
+      await screen.findByText('Preview logs');
+    } finally {
+      PluginStore.unregister(plugin);
+    }
   });
 });

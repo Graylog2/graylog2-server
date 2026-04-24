@@ -27,18 +27,6 @@ import javax.annotation.Nullable;
 
 public class TimeRangeQueryFactory {
 
-    @Deprecated
-    @Nullable
-    public static org.graylog.shaded.opensearch2.org.opensearch.index.query.RangeQueryBuilder create(TimeRange range) {
-        if (range == null) {
-            return null;
-        }
-
-        return org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.rangeQuery(Message.FIELD_TIMESTAMP)
-                .gte(Tools.buildElasticSearchTimeFormat(range.getFrom()))
-                .lt(Tools.buildElasticSearchTimeFormat(range.getTo()));
-    }
-
     @Nullable
     public static RangeQuery createTimeRangeQuery(TimeRange range) {
         if (range == null) {

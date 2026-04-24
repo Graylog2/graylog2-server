@@ -18,12 +18,17 @@ package org.graylog.plugins.views.storage.migration.state.rest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -38,6 +43,7 @@ import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateM
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.KafkaJournalConfiguration;
+import org.graylog2.rest.resources.streams.responses.StreamCreatedResponse;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -63,11 +69,14 @@ public class MigrationStateResource {
     @NoAuditEvent("No Audit Event needed") // TODO: do we need audit log here?
     @RequiresPermissions(RestPermissions.DATANODE_MIGRATION)
     @Operation(summary = "trigger migration step")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Triggered migration step successfully",
+                         content = @Content(schema = @Schema(implementation = CurrentStateInformation.class)))
+    })
     public Response trigger(@Parameter(name = "request") @NotNull MigrationStepRequest request) {
         final CurrentStateInformation newState = stateMachine.trigger(request.step(), request.args());
-        Response.ResponseBuilder response = newState.hasErrors() ? Response.serverError() : Response.ok();
-        return response.entity(newState)
-                .build();
+        final var response = newState.hasErrors() ? Response.serverError() : Response.ok();
+        return response.entity(newState).build();
     }
 
     @GET

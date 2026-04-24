@@ -28,17 +28,22 @@ import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import type { Input } from 'components/messageloaders/Types';
 import { MESSAGE_FIELD } from 'views/Constants';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import { InputsStore } from 'stores/inputs/InputsStore';
+import useInputsList from 'hooks/useInputs';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { TableDataCell } from 'views/components/datatable';
 import MessageDetail from 'components/common/message/details/MessageDetail';
 import DecoratedValue from 'views/components/messagelist/decoration/DecoratedValue';
-import type { Message } from 'views/components/messagelist/Types';
+import type { BackendMessage, Message } from 'views/components/messagelist/Types';
 import CustomHighlighting from 'views/components/highlighting/CustomHighlighting';
 import TypeSpecificValue from 'views/components/TypeSpecificValue';
 import HighlightMessageContext from 'views/components/contexts/HighlightMessageContext';
+import { toSelectableMessageTableEntry } from 'views/components/widgets/MessageTableSelectedEntitiesProvider';
+import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
+import BulkSelectCell from 'components/common/message/messagetable/BulkSelectCell';
+import useSelectedMessageEntities from 'views/hooks/useSelectedMessageEntities';
 
+import MessageTableOverrideRow from './MessageTableOverrideRow';
 import MessagePreview from './MessagePreview';
 
 export const TableBody = styled.tbody<{ $expanded?: boolean; $highlighted?: boolean }>(
@@ -65,8 +70,8 @@ export const TableBody = styled.tbody<{ $expanded?: boolean; $highlighted?: bool
 `,
 );
 
-const FieldsRow = styled.tr`
-  cursor: pointer;
+const FieldsRow = styled.tr<{ $clickable: boolean }>`
+  cursor: ${({ $clickable }) => ($clickable ? 'pointer' : 'default')};
 
   && td {
     min-width: 50px;
@@ -77,6 +82,12 @@ const FieldsRow = styled.tr`
   time {
     line-height: 1;
   }
+`;
+
+const ActionsCell = styled(TableDataCell)`
+  width: 1%;
+  white-space: nowrap;
+  text-align: right;
 `;
 
 const MessageDetailRow = styled.tr`
@@ -101,9 +112,13 @@ type Props = {
   expanded: boolean;
   fields: FieldTypeMappingsList;
   message: Message;
+  rowActions?: React.ReactNode;
   selectedFields?: Immutable.OrderedSet<string>;
   showMessageRow?: boolean;
   toggleDetail: (messageId: string) => void;
+  displayBulkSelectCol?: boolean;
+  isEntitySelectable?: (entity: BackendMessage) => boolean;
+  overrideContent?: React.ReactNode;
 };
 
 const isDecoratedField = (field: string | number, decorationStats: Message['decoration_stats']) =>
@@ -118,6 +133,31 @@ const fieldType = (fieldName: string, { decoration_stats: decorationStats }: Mes
 const Strong = ({ children = undefined, strong }: React.PropsWithChildren<{ strong: boolean }>) =>
   strong ? <strong>{children}</strong> : <>{children}</>;
 
+const RowBulkCheckbox = ({
+  message,
+  isEntitySelectable = () => false,
+}: {
+  message: Message;
+  isEntitySelectable?: (entity: BackendMessage) => boolean;
+}) => {
+  const { toggleEntitySelect, isEntitySelected } = useSelectedMessageEntities();
+  const isSelected = isEntitySelected(message.index, message.id);
+  const checkboxTitle = `${isSelected ? 'Deselect' : 'Select'} message`;
+  const isSelectDisabled = !isEntitySelectable(toSelectableMessageTableEntry(message));
+
+  return (
+    <BulkSelectCell>
+      <RowCheckbox
+        onChange={() => toggleEntitySelect(message.index, message.id)}
+        title={!isSelectDisabled ? checkboxTitle : undefined}
+        checked={isSelected}
+        disabled={isSelectDisabled}
+        aria-label={checkboxTitle}
+      />
+    </BulkSelectCell>
+  );
+};
+
 const MessageTableEntry = ({
   config,
   disableSurroundingSearch = false,
@@ -125,13 +165,18 @@ const MessageTableEntry = ({
   expanded,
   fields,
   message,
+  rowActions = undefined,
   showMessageRow = false,
   selectedFields = Immutable.OrderedSet<string>(),
   toggleDetail,
+  displayBulkSelectCol = false,
+  isEntitySelectable = () => false,
+  overrideContent = undefined,
 }: Props) => {
-  const { inputs: inputsList = [] } = useStore(InputsStore);
+  const { data: inputsList = [] } = useInputsList();
   const { streams: streamsList = [] } = useStore(StreamsStore);
   const highlightMessageId = useContext(HighlightMessageContext);
+
   const sendTelemetry = useSendTelemetry();
   const additionalContextValue = useMemo(() => ({ message }), [message]);
   const allStreams = useMemo(() => Immutable.List<Stream>(streamsList), [streamsList]);
@@ -145,6 +190,10 @@ const MessageTableEntry = ({
   );
 
   const _toggleDetail = useCallback(() => {
+    if (overrideContent) {
+      return;
+    }
+
     const isSelectingText = !!window.getSelection()?.toString();
 
     if (!isSelectingText) {
@@ -155,9 +204,9 @@ const MessageTableEntry = ({
 
       toggleDetail(`${message.index}-${message.id}`);
     }
-  }, [message.id, message.index, sendTelemetry, toggleDetail]);
+  }, [overrideContent, message.id, message.index, sendTelemetry, toggleDetail]);
 
-  const colSpanFixup = selectedFields.size + 1;
+  const colSpanFixup = selectedFields.size + 1 + (rowActions ? 1 : 0) + (displayBulkSelectCol ? 1 : 0);
 
   const selectedFieldsList = useMemo(
     () =>
@@ -191,20 +240,29 @@ const MessageTableEntry = ({
   return (
     <AdditionalContext.Provider value={additionalContextValue}>
       <TableBody $expanded={expanded} $highlighted={message.id === highlightMessageId}>
-        <FieldsRow onClick={_toggleDetail} className="table-data-row">
-          {selectedFieldsList}
-        </FieldsRow>
+        {overrideContent ? (
+          <MessageTableOverrideRow colSpan={colSpanFixup} notice={overrideContent} rowActions={rowActions} />
+        ) : (
+          <FieldsRow onClick={_toggleDetail} className="table-data-row" $clickable>
+            {displayBulkSelectCol && <RowBulkCheckbox message={message} isEntitySelectable={isEntitySelectable} />}
+            {selectedFieldsList}
+            {rowActions && <ActionsCell $isNumeric={false}>{rowActions}</ActionsCell>}
+          </FieldsRow>
+        )}
 
-        <MessagePreview
-          showMessageRow={showMessageRow}
-          config={config}
-          colSpanFixup={colSpanFixup}
-          messageFieldType={messageFieldType}
-          onRowClick={_toggleDetail}
-          message={message}
-        />
+        {!overrideContent && (
+          <MessagePreview
+            showMessageRow={showMessageRow}
+            config={config}
+            colSpanFixup={colSpanFixup}
+            messageFieldType={messageFieldType}
+            onRowClick={_toggleDetail}
+            message={message}
+            displayBulkSelectCol={displayBulkSelectCol}
+          />
+        )}
 
-        {expanded && (
+        {expanded && !overrideContent && (
           <MessageDetailRow>
             <td colSpan={colSpanFixup}>
               <MessageDetail

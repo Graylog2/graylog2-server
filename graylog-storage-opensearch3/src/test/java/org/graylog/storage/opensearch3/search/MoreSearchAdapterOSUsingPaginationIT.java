@@ -43,6 +43,6 @@ public class MoreSearchAdapterOSUsingPaginationIT extends MoreSearchAdapterIT {
     @Override
     protected MoreSearchAdapter createMoreSearchAdapter() {
         return new MoreSearchAdapterOS(openSearchInstance.getOfficialOpensearchClient(), true,
-                new PaginationOS(resultMessageFactory, openSearchInstance.getOfficialOpensearchClient(), new SearchRequestFactoryOS(true, new IgnoreSearchFilters()), true), resultMessageFactory);
+                new PaginationOS(resultMessageFactory, openSearchInstance.getOfficialOpensearchClient(), new SearchRequestFactoryOS(true, true, new IgnoreSearchFilters())), resultMessageFactory);
     }
 }

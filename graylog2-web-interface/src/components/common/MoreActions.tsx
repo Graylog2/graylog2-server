@@ -17,10 +17,11 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { Icon } from 'components/common/index';
 import { DropdownButton } from 'components/bootstrap';
 import type { StyleProps } from 'components/bootstrap/Button';
-import type { SizeProp } from 'components/common/Icon';
+
+import Icon from './Icon';
+import type { SizeProp } from './Icon';
 
 type MoreActionsIconProps = {
   size?: SizeProp;

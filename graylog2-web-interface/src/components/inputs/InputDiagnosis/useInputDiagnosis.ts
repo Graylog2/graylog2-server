@@ -14,14 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
-import { useStore } from 'stores/connect';
-import InputStatesStore from 'stores/inputs/InputStatesStore';
-import { InputsStore, InputsActions } from 'stores/inputs/InputsStore';
+import { fetchInput } from 'hooks/useInputs';
 import { useMetrics } from 'hooks/useMetrics';
-import type { InputStateByNode, InputStates, InputState } from 'stores/inputs/InputStatesStore';
+import useInputsStates from 'hooks/useInputsStates';
+import type { InputStateByNode, InputState } from 'hooks/useInputsStates';
 import type { Input } from 'components/messageloaders/Types';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -98,11 +97,10 @@ const useInputDiagnosis = (
   inputNodeStates: InputNodeStates;
   inputMetrics: InputDiagnosisMetrics;
 } => {
-  const { input } = useStore(InputsStore);
-
-  useEffect(() => {
-    InputsActions.get(inputId);
-  }, [inputId]);
+  const { data: input } = useQuery({
+    queryKey: ['inputs', inputId],
+    queryFn: () => fetchInput(inputId),
+  });
 
   const { data: messageCountByStream } = useQuery({
     queryKey: ['input-diagnostics', inputId],
@@ -117,7 +115,7 @@ const useInputDiagnosis = (
     refetchInterval: 5000,
   });
 
-  const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
+  const { data: inputStates } = useInputsStates();
   const inputStateByNode = inputStates ? inputStates[inputId] || {} : ({} as InputStateByNode);
   const inputNodeStates = { total: Object.keys(inputStateByNode).length, states: {} };
 

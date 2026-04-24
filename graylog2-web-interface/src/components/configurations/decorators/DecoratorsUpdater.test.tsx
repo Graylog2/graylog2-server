@@ -20,8 +20,8 @@ const mockCreate = jest.fn((...args: any[]) => Promise.resolve(args));
 const mockUpdate = jest.fn((...args: any[]) => Promise.resolve(args));
 const mockRemove = jest.fn((...args: any[]) => Promise.resolve(args));
 
-jest.mock('stores/decorators/DecoratorsStore', () => ({
-  DecoratorsActions: {
+jest.mock('@graylog/server-api', () => ({
+  SearchDecorators: {
     create: (...args) => mockCreate(...args),
     update: (...args) => mockUpdate(...args),
     remove: (...args) => mockRemove(...args),

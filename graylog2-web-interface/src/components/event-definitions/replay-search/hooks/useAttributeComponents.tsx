@@ -22,9 +22,13 @@ import upperFirst from 'lodash/upperFirst';
 import { TIME_UNITS } from 'components/event-definitions/event-definition-types/FilterForm';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
-import { Timestamp, HoverForHelp, Link } from 'components/common';
-import Routes from 'routing/Routes';
+import { Timestamp, HoverForHelp } from 'components/common';
 import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
+import useFeature from 'hooks/useFeature';
+import SidebarNavigationLink from 'components/layout/RightSidebar/SidebarNavigationLink';
+import SidebarEventDefinitionDetails from 'components/event-definitions/SidebarEventDefinitionDetails';
+import Routes from 'routing/Routes';
+import Link from 'components/common/Link';
 
 import useAlertAndEventDefinitionData from './useAlertAndEventDefinitionData';
 
@@ -37,9 +41,23 @@ const AlertTimestamp = styled(Timestamp)(
   `,
 );
 
+const EventDefinitionTitle = () => {
+  const { alertId, definitionId } = useReplaySearchContext();
+  const { eventDefinition } = useAlertAndEventDefinitionData(alertId, definitionId);
+
+  return alertId ? (
+    <SidebarNavigationLink content={SidebarEventDefinitionDetails(definitionId)}>
+      {eventDefinition.title}
+    </SidebarNavigationLink>
+  ) : (
+    <Link to={Routes.ALERTS.DEFINITIONS.show(definitionId)}>{eventDefinition.title}</Link>
+  );
+};
+
 const useAttributeComponents = () => {
   const { alertId, definitionId, type } = useReplaySearchContext();
   const { eventData, eventDefinition } = useAlertAndEventDefinitionData(alertId, definitionId);
+  const isRightSidebarEnabled = useFeature('replay_search_right_sidebar');
 
   return useMemo(() => {
     const isEventDefinition = type === 'event_definition';
@@ -53,7 +71,11 @@ const useAttributeComponents = () => {
     const isEDUpdatedAfterEvent =
       !isEventDefinition && moment(eventDefinition.updated_at).diff(eventData?.timestamp) > 0;
 
-    return [
+    const components: Array<{
+      title: string;
+      content: React.ReactNode;
+      show?: boolean;
+    }> = [
       {
         title: 'Event definition updated at',
         content: (
@@ -69,11 +91,7 @@ const useAttributeComponents = () => {
       },
       {
         title: 'Event definition',
-        content: (
-          <Link target="_blank" to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>
-            {eventDefinition.title}
-          </Link>
-        ),
+        content: <EventDefinitionTitle />,
         show: !isEventDefinition,
       },
       {
@@ -94,14 +112,17 @@ const useAttributeComponents = () => {
         title: 'Notifications',
         content: <Notifications />,
       },
-      { title: 'Description', content: eventDefinition.description, inRows: true },
-      {
+      { title: 'Description', content: eventDefinition.description },
+    ];
+    if (!isRightSidebarEnabled) {
+      components.push({
         title: 'Aggregation conditions',
         content: <AggregationConditions />,
-        inRows: true,
-      },
-    ];
-  }, [eventData?.timestamp, eventDefinition, type]);
+      });
+    }
+
+    return components;
+  }, [eventData?.timestamp, eventDefinition, isRightSidebarEnabled, type]);
 };
 
 export default useAttributeComponents;

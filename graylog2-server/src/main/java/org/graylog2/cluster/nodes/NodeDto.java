@@ -47,6 +47,7 @@ public abstract class NodeDto implements Node, MongoEntity {
         return getId();
     }
 
+    @Nullable
     @JsonProperty("transport_address")
     public abstract String getTransportAddress();
 
@@ -69,7 +70,10 @@ public abstract class NodeDto implements Node, MongoEntity {
     public Map<String, Object> toEntityParameters() {
         HashMap<String, Object> params = new HashMap<>();
         params.put("node_id", getNodeId());
-        params.put("transport_address", getTransportAddress());
+        final String transportAddress = getTransportAddress();
+        if(transportAddress != null) {
+            params.put("transport_address", getTransportAddress());
+        }
         params.put("is_leader", isLeader());
         if (Objects.nonNull(getHostname())) {
             params.put("hostname", getHostname());
@@ -85,7 +89,7 @@ public abstract class NodeDto implements Node, MongoEntity {
         public abstract B setId(String id);
 
         @JsonProperty("transport_address")
-        public abstract B setTransportAddress(String transportAddress);
+        public abstract B setTransportAddress(@Nullable String transportAddress);
 
         @JsonProperty("last_seen")
         public abstract B setLastSeen(DateTime lastSeen);

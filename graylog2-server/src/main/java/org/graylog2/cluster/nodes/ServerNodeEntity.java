@@ -23,7 +23,12 @@ import org.graylog2.plugin.lifecycles.Lifecycle;
 
 import java.util.Map;
 
-@DbEntity(collection = "nodes", titleField = "node_id")
+import static org.graylog2.cluster.nodes.ServerNodeDto.FIELD_IS_PROCESSING;
+import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
+
+@DbEntity(collection = "nodes", titleField = "node_id",
+          readableFields = {ID_FIELD, "node_id", "hostname", "transport_address", "is_leader", "last_seen",
+                  FIELD_IS_PROCESSING})
 public class ServerNodeEntity extends AbstractNode<ServerNodeDto> {
 
     @JsonCreator
@@ -51,6 +56,13 @@ public class ServerNodeEntity extends AbstractNode<ServerNodeDto> {
         }
     }
 
+    public String getVersion() {
+        if (!fields.containsKey(ServerNodeDto.FIELD_VERSION)) {
+            return null;
+        }
+        return (String) fields.get(ServerNodeDto.FIELD_VERSION);
+    }
+
     @Override
     public ServerNodeDto toDto() {
         return ServerNodeDto.Builder.builder()
@@ -62,6 +74,7 @@ public class ServerNodeEntity extends AbstractNode<ServerNodeDto> {
                 .setLeader(this.isLeader())
                 .setProcessing(this.isProcessing())
                 .setLifecycle(this.getLifecycle())
+                .setVersion(this.getVersion())
                 .build();
     }
 

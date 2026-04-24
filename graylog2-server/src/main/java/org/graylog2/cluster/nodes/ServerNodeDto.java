@@ -38,6 +38,7 @@ public abstract class ServerNodeDto extends NodeDto {
     public static final String FIELD_IS_PROCESSING = "is_processing";
     public static final String FIELD_LOAD_BALANCER_STATUS = "lb_status";
     public static final String FIELD_LIFECYCLE = "lifecycle";
+    public static final String FIELD_VERSION = "version";
 
     @JsonProperty(FIELD_IS_PROCESSING)
     public abstract boolean isProcessing();
@@ -54,6 +55,10 @@ public abstract class ServerNodeDto extends NodeDto {
     @JsonProperty(FIELD_LIFECYCLE)
     public abstract Lifecycle getLifecycle();
 
+    @Nullable
+    @JsonProperty(FIELD_VERSION)
+    public abstract String getVersion();
+
     public abstract Builder toBuilder();
 
     @Override
@@ -62,6 +67,9 @@ public abstract class ServerNodeDto extends NodeDto {
         entityParameters.put(FIELD_IS_PROCESSING, isProcessing());
         if(getLifecycle() != null) {
             entityParameters.put(FIELD_LIFECYCLE, getLifecycle().name());
+        }
+        if(getVersion() != null) {
+            entityParameters.put(FIELD_VERSION, getVersion());
         }
         return entityParameters;
     }
@@ -75,6 +83,9 @@ public abstract class ServerNodeDto extends NodeDto {
 
         @JsonProperty(FIELD_LIFECYCLE)
         public abstract Builder setLifecycle(@Nullable Lifecycle lifecycle);
+
+        @JsonProperty(FIELD_VERSION)
+        public abstract Builder setVersion(@Nullable String version);
 
         @JsonCreator
         public static Builder builder() {

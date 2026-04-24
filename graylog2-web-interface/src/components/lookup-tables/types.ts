@@ -44,6 +44,7 @@ export interface DataAdapterPluginType {
   formComponent?: any;
   summaryComponent?: any;
   documentationComponent?: any;
+  prepareConfig?: (config: Record<string, unknown>) => Record<string, unknown>;
 }
 
 declare module 'graylog-web-plugin/plugin' {

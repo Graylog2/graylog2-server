@@ -18,15 +18,16 @@ import { useMemo } from 'react';
 import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
 
+import useParams from 'routing/useParams';
+import useSingleIndexSet from 'components/indices/hooks/useSingleIndexSet';
 import useProfile from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfile';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import type { CustomFieldMapping } from 'components/indices/IndexSetFieldTypeProfiles/types';
-import { useStore } from 'stores/connect';
-import { IndexSetsStore } from 'stores/indices/IndexSetsStore';
 import type { ProfileWithMappingsByField } from 'components/indices/IndexSetFieldTypes/types';
 
 const useIndexProfileWithMappingsByField = () => {
-  const { indexSet } = useStore(IndexSetsStore);
+  const { indexSetId } = useParams();
+  const { data: indexSet } = useSingleIndexSet(indexSetId);
   const {
     data: { customFieldMappings, name, description },
     isFetched,

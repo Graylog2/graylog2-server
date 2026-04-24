@@ -20,7 +20,7 @@ import type { KeyMapper } from 'views/components/visualizations/TransformKeys';
 import StreamsContext from 'contexts/StreamsContext';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type { Key } from 'views/logic/searchtypes/pivot/PivotHandler';
-import useInputs from 'hooks/useInputs';
+import { useInputs } from 'hooks/useInputs';
 import useNodeSummaries from 'hooks/useNodeSummaries';
 
 const formatNode = (node: { short_node_id: string; hostname: string }) => `${node.short_node_id} / ${node.hostname}`;
