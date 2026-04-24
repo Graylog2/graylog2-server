@@ -51,6 +51,7 @@ import org.graylog2.contentpacks.model.ContentPack;
 import org.graylog2.contentpacks.model.ContentPackInstallation;
 import org.graylog2.contentpacks.model.ContentPackUninstallDetails;
 import org.graylog2.contentpacks.model.ContentPackUninstallation;
+import org.graylog2.contentpacks.model.ContentPackUpgrade;
 import org.graylog2.contentpacks.model.ContentPackV1;
 import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.LegacyContentPack;
@@ -239,12 +240,12 @@ public class ContentPackService {
         return contentPackInstallationPersistenceService.insert(installation);
     }
 
-    public ContentPackInstallation upgradeContentPack(ContentPack contentPack,
-                                                      ContentPackInstallation oldInstallation,
-                                                      Map<String, ValueReference> parameters,
-                                                      String comment,
-                                                      String username,
-                                                      EntityShareRequest shareRequest) {
+    public ContentPackUpgrade upgradeContentPack(ContentPack contentPack,
+                                                 ContentPackInstallation oldInstallation,
+                                                 Map<String, ValueReference> parameters,
+                                                 String comment,
+                                                 String username,
+                                                 EntityShareRequest shareRequest) {
         return UserContext.runAs(username, userService, () -> {
             try {
                 final var userContext = new UserContext.Factory(userService).create();
@@ -255,12 +256,12 @@ public class ContentPackService {
         });
     }
 
-    public ContentPackInstallation upgradeContentPack(ContentPack contentPack,
-                                                      ContentPackInstallation oldInstallation,
-                                                      Map<String, ValueReference> parameters,
-                                                      String comment,
-                                                      UserContext userContext,
-                                                      EntityShareRequest shareRequest) {
+    public ContentPackUpgrade upgradeContentPack(ContentPack contentPack,
+                                                 ContentPackInstallation oldInstallation,
+                                                 Map<String, ValueReference> parameters,
+                                                 String comment,
+                                                 UserContext userContext,
+                                                 EntityShareRequest shareRequest) {
         if (contentPack instanceof ContentPackV1 contentPackV1) {
             return upgradeContentPack(contentPackV1, oldInstallation, parameters, comment, userContext, shareRequest);
         } else {
@@ -269,12 +270,12 @@ public class ContentPackService {
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private ContentPackInstallation upgradeContentPack(ContentPackV1 contentPack,
-                                                       ContentPackInstallation oldInstallation,
-                                                       Map<String, ValueReference> parameters,
-                                                       String comment,
-                                                       UserContext userContext,
-                                                       EntityShareRequest shareRequest) {
+    private ContentPackUpgrade upgradeContentPack(ContentPackV1 contentPack,
+                                                  ContentPackInstallation oldInstallation,
+                                                  Map<String, ValueReference> parameters,
+                                                  String comment,
+                                                  UserContext userContext,
+                                                  EntityShareRequest shareRequest) {
         ensureConstraints(contentPack.constraints());
 
         final Map<ModelId, NativeEntityDescriptor> oldEntityMapping = new HashMap<>();
@@ -292,6 +293,9 @@ public class ContentPackService {
         final Map<EntityDescriptor, Object> createdEntities = new LinkedHashMap<>();
         final Map<EntityDescriptor, Object> allEntities = getMapWithSystemStreamEntities();
         final ImmutableSet.Builder<NativeEntityDescriptor> allEntityDescriptors = ImmutableSet.builder();
+
+        final Map<ModelId, Object> oldEntityObjects = new HashMap<>();
+        final Map<ModelId, List<GrantDTO>> oldEntityGrants = new HashMap<>();
 
         try {
             for (Entity entity : entitiesInOrder) {
@@ -321,6 +325,13 @@ public class ContentPackService {
                     if (existingEntity.isPresent()) {
                         LOG.trace("Updating existing entity for {} (preserving ID {})", entityDescriptor, oldDescriptor.id());
                         final NativeEntity nativeEntity = existingEntity.get();
+
+                        oldEntityObjects.put(entity.id(), nativeEntity.entity());
+                        final List<GrantDTO> grants = facade.resolveGrants(nativeEntity.entity());
+                        if (!grants.isEmpty()) {
+                            oldEntityGrants.put(entity.id(), grants);
+                        }
+
                         facade.updateNativeEntity(entity, nativeEntity, validatedParameters, allEntities, userContext.getUser().getName());
                         allEntityDescriptors.add(nativeEntity.descriptor());
                         allEntities.put(entityDescriptor, nativeEntity.entity());
@@ -356,7 +367,17 @@ public class ContentPackService {
 
         shareEntities(installation, shareRequest, userContext);
 
-        return contentPackInstallationPersistenceService.insert(installation);
+        final ContentPackInstallation persistedInstallation = contentPackInstallationPersistenceService.insert(installation);
+
+        final ContentPackUninstallation oldEntitySnapshots = ContentPackUninstallation.builder()
+                .entities(ImmutableSet.copyOf(oldEntityMapping.values()))
+                .entityObjects(ImmutableMap.copyOf(oldEntityObjects))
+                .failedEntities(ImmutableSet.of())
+                .skippedEntities(ImmutableSet.of())
+                .entityGrants(ImmutableMap.copyOf(oldEntityGrants))
+                .build();
+
+        return new ContentPackUpgrade(persistedInstallation, oldEntitySnapshots);
     }
 
     public void shareEntities(ContentPackInstallation installation, EntityShareRequest shareRequest, UserContext userContext) {
