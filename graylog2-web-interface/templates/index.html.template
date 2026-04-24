@@ -2,11 +2,8 @@
 <html<% if(htmlWebpackPlugin.files.manifest) { %> manifest="<%= htmlWebpackPlugin.files.manifest %>"<% } %> lang="en">
   <head>
     <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
     <title><%=htmlWebpackPlugin.options.title || 'Webpack App'%></title>
-    <style id="preboot-theme">
-      body { background-color: #F6F7FC !important; }
-      @media (prefers-color-scheme: dark) { body { background-color: #12182B !important; } }
-    </style>
     <script defer src="/config.js"></script>
     <% for (var vendorChunk in vendorModule().files.js) { %>
     <script defer src="/<%= vendorModule().files.js[vendorChunk] %>"></script>
