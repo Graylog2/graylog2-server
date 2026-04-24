@@ -1,4 +1,4 @@
 type = "fixed"
-message = "Mask additional encrypted input fields, and warn at startup when an input declares IS_PASSWORD without isEncrypted=true."
+message = "Add startup warning for mismatched password fields, and mask additional encrypted input fields."
 
 pulls = ["25801"]
