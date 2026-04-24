@@ -29,7 +29,7 @@ import ErrorWidget from 'views/components/widgets/ErrorWidget';
 import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import type { BackendMessage } from 'views/components/messagelist/Types';
 import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
-import { InputsActions } from 'stores/inputs/InputsStore';
+import { fetchInputs } from 'hooks/useInputs';
 import useCurrentSearchTypesResults from 'views/components/widgets/useCurrentSearchTypesResults';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import reexecuteSearchTypes from 'views/components/widgets/reexecuteSearchTypes';
@@ -122,7 +122,7 @@ const useRenderCompletionCallback = () => {
   const renderCompletionCallback = useContext(RenderCompletionCallback);
 
   useEffect(() => {
-    InputsActions.list().then(() => renderCompletionCallback && renderCompletionCallback());
+    fetchInputs().then(() => renderCompletionCallback && renderCompletionCallback());
   }, [renderCompletionCallback]);
 };
 
