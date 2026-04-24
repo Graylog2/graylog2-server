@@ -26,7 +26,6 @@ import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
 import com.google.common.graph.Traverser;
-import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.ForbiddenException;
@@ -160,7 +159,85 @@ public class ContentPackService {
                                                        String comment,
                                                        UserContext userContext,
                                                        EntityShareRequest shareRequest) {
-        return installOrUpgradeContentPack(contentPack, null, parameters, comment, userContext, shareRequest).installation();
+        ensureConstraints(contentPack.constraints());
+
+        final Entity rootEntity = EntityV1.createRoot(contentPack);
+        final ImmutableMap<String, ValueReference> validatedParameters = validateParameters(parameters, contentPack.parameters());
+        final ImmutableGraph<Entity> dependencyGraph = buildEntityGraph(rootEntity, contentPack.entities(), validatedParameters);
+
+        final Traverser<Entity> entityTraverser = Traverser.forGraph(dependencyGraph);
+        final Iterable<Entity> entitiesInOrder = entityTraverser.depthFirstPostOrder(rootEntity);
+
+        // Insertion order is important for created entities so we can roll back in order!
+        final Map<EntityDescriptor, Object> createdEntities = new LinkedHashMap<>();
+        final Map<EntityDescriptor, Object> allEntities = getMapWithSystemStreamEntities();
+        final ImmutableSet.Builder<NativeEntityDescriptor> allEntityDescriptors = ImmutableSet.builder();
+
+        try {
+            for (Entity entity : entitiesInOrder) {
+                if (entity.equals(rootEntity)) {
+                    continue;
+                }
+
+                final EntityDescriptor entityDescriptor = entity.toEntityDescriptor();
+                final EntityWithExcerptFacade<?, ?> facade = entityFacades.getOrDefault(entity.type(), UnsupportedEntityFacade.INSTANCE);
+
+                facade.getCreatePermissions(entity).ifPresent(p -> checkPermissions(p, userContext));
+
+                if (configuration.isCloud() && entity.type().equals(INPUT_V1) && entity instanceof EntityV1 entityV1) {
+                    final InputEntity inputEntity = objectMapper.convertValue(entityV1.data(), InputEntity.class);
+                    String className = inputEntity.type().asString();
+                    Class inputClass = Class.forName(className);
+                    if (inputClass.getAnnotation(CloudCompatible.class) == null) {
+                        LOG.warn("Ignoring incompatible input {} in cloud", className);
+                        continue;
+                    }
+                }
+
+                final Optional<? extends NativeEntity<?>> existingEntity = facade.findExisting(entity, parameters);
+                if (existingEntity.isPresent()) {
+                    LOG.trace("Found existing entity for {}", entityDescriptor);
+                    final NativeEntity<?> nativeEntity = existingEntity.get();
+                    final NativeEntityDescriptor nativeEntityDescriptor = nativeEntity.descriptor();
+                    /* Found entity on the system or we found a other installation which stated that */
+                    if (contentPackInstallationPersistenceService.countInstallationOfEntityById(nativeEntityDescriptor.id()) <= 0 ||
+                            contentPackInstallationPersistenceService.countInstallationOfEntityByIdAndFoundOnSystem(nativeEntityDescriptor.id()) > 0) {
+                        final NativeEntityDescriptor serverDescriptor = nativeEntityDescriptor.toBuilder()
+                                .foundOnSystem(true)
+                                .build();
+                        allEntityDescriptors.add(serverDescriptor);
+                    } else {
+                        allEntityDescriptors.add(nativeEntity.descriptor());
+                    }
+                    allEntities.put(entityDescriptor, nativeEntity.entity());
+                } else {
+                    LOG.trace("Creating new entity for {}", entityDescriptor);
+                    final NativeEntity<?> createdEntity = facade.createNativeEntity(entity, validatedParameters, allEntities, userContext.getUser().getName());
+                    allEntityDescriptors.add(createdEntity.descriptor());
+                    createdEntities.put(entityDescriptor, createdEntity.entity());
+                    allEntities.put(entityDescriptor, createdEntity.entity());
+                }
+            }
+        } catch (Exception e) {
+            rollback(createdEntities);
+
+            throw new ContentPackException("Failed to install content pack <" + contentPack.id() + "/" + contentPack.revision() + ">", e);
+        }
+
+        final ContentPackInstallation installation = ContentPackInstallation.builder()
+                .contentPackId(contentPack.id())
+                .contentPackRevision(contentPack.revision())
+                .parameters(validatedParameters)
+                .comment(comment)
+                // TODO: Store complete entity instead of only the descriptor?
+                .entities(allEntityDescriptors.build())
+                .createdAt(Instant.now())
+                .createdBy(userContext.getUser().getName())
+                .build();
+
+        shareEntities(installation, shareRequest, userContext);
+
+        return contentPackInstallationPersistenceService.insert(installation);
     }
 
     public ContentPackUpgrade upgradeContentPack(ContentPack contentPack,
@@ -192,33 +269,18 @@ public class ContentPackService {
         }
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     private ContentPackUpgrade upgradeContentPack(ContentPackV1 contentPack,
                                                   ContentPackInstallation oldInstallation,
                                                   Map<String, ValueReference> parameters,
                                                   String comment,
                                                   UserContext userContext,
                                                   EntityShareRequest shareRequest) {
-        return installOrUpgradeContentPack(contentPack, oldInstallation, parameters, comment, userContext, shareRequest);
-    }
-
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private ContentPackUpgrade installOrUpgradeContentPack(ContentPackV1 contentPack,
-                                                           @Nullable ContentPackInstallation oldInstallation,
-                                                           Map<String, ValueReference> parameters,
-                                                           String comment,
-                                                           UserContext userContext,
-                                                           EntityShareRequest shareRequest) {
-        final boolean isUpgrade = oldInstallation != null;
         ensureConstraints(contentPack.constraints());
 
-        final Map<ModelId, NativeEntityDescriptor> oldEntityMapping;
-        if (isUpgrade) {
-            oldEntityMapping = new HashMap<>();
-            for (NativeEntityDescriptor descriptor : oldInstallation.entities()) {
-                oldEntityMapping.put(descriptor.contentPackEntityId(), descriptor);
-            }
-        } else {
-            oldEntityMapping = null;
+        final Map<ModelId, NativeEntityDescriptor> oldEntityMapping = new HashMap<>();
+        for (NativeEntityDescriptor descriptor : oldInstallation.entities()) {
+            oldEntityMapping.put(descriptor.contentPackEntityId(), descriptor);
         }
 
         final Entity rootEntity = EntityV1.createRoot(contentPack);
@@ -228,12 +290,11 @@ public class ContentPackService {
         final Traverser<Entity> entityTraverser = Traverser.forGraph(dependencyGraph);
         final Iterable<Entity> entitiesInOrder = entityTraverser.depthFirstPostOrder(rootEntity);
 
-        // Insertion order is important for created entities so we can roll back in order!
         final Map<EntityDescriptor, Object> createdEntities = new LinkedHashMap<>();
         final Map<EntityDescriptor, Object> allEntities = getMapWithSystemStreamEntities();
         final ImmutableSet.Builder<NativeEntityDescriptor> allEntityDescriptors = ImmutableSet.builder();
 
-        final Map<ModelId, Object> oldEntityObjects = isUpgrade ? new HashMap<>() : null;
+        final Map<ModelId, Object> oldEntityObjects = new HashMap<>();
 
         try {
             for (Entity entity : entitiesInOrder) {
@@ -257,54 +318,36 @@ public class ContentPackService {
                     }
                 }
 
-                if (isUpgrade) {
-                    final NativeEntityDescriptor oldDescriptor = oldEntityMapping.get(entity.id());
-                    if (oldDescriptor != null) {
-                        final Optional<NativeEntity<?>> existingEntity = (Optional) facade.loadNativeEntity(oldDescriptor);
-                        if (existingEntity.isPresent()) {
-                            LOG.trace("Updating existing entity for {} (preserving ID {})", entityDescriptor, oldDescriptor.id());
-                            final NativeEntity nativeEntity = existingEntity.get();
+                final NativeEntityDescriptor oldDescriptor = oldEntityMapping.get(entity.id());
+                if (oldDescriptor != null) {
+                    final Optional<NativeEntity<?>> existingEntity = (Optional) facade.loadNativeEntity(oldDescriptor);
+                    if (existingEntity.isPresent()) {
+                        LOG.trace("Updating existing entity for {} (preserving ID {})", entityDescriptor, oldDescriptor.id());
+                        final NativeEntity nativeEntity = existingEntity.get();
 
-                            oldEntityObjects.put(entity.id(), nativeEntity.entity());
+                        oldEntityObjects.put(entity.id(), nativeEntity.entity());
 
-                            facade.updateNativeEntity(entity, nativeEntity, validatedParameters, allEntities, userContext.getUser().getName());
-                            allEntityDescriptors.add(nativeEntity.descriptor());
-                            allEntities.put(entityDescriptor, nativeEntity.entity());
-                            continue;
-                        } else {
-                            LOG.trace("Old entity {} no longer exists in DB, creating new", entityDescriptor);
-                        }
+                        facade.updateNativeEntity(entity, nativeEntity, validatedParameters, allEntities, userContext.getUser().getName());
+                        allEntityDescriptors.add(nativeEntity.descriptor());
+                        allEntities.put(entityDescriptor, nativeEntity.entity());
+                    } else {
+                        LOG.trace("Old entity {} no longer exists in DB, creating new", entityDescriptor);
+                        final NativeEntity<?> createdEntity = facade.createNativeEntity(entity, validatedParameters, allEntities, userContext.getUser().getName());
+                        allEntityDescriptors.add(createdEntity.descriptor());
+                        createdEntities.put(entityDescriptor, createdEntity.entity());
+                        allEntities.put(entityDescriptor, createdEntity.entity());
                     }
                 } else {
-                    final Optional<? extends NativeEntity<?>> existingEntity = facade.findExisting(entity, parameters);
-                    if (existingEntity.isPresent()) {
-                        LOG.trace("Found existing entity for {}", entityDescriptor);
-                        final NativeEntity<?> nativeEntity = existingEntity.get();
-                        final NativeEntityDescriptor nativeEntityDescriptor = nativeEntity.descriptor();
-                        if (contentPackInstallationPersistenceService.countInstallationOfEntityById(nativeEntityDescriptor.id()) <= 0 ||
-                                contentPackInstallationPersistenceService.countInstallationOfEntityByIdAndFoundOnSystem(nativeEntityDescriptor.id()) > 0) {
-                            final NativeEntityDescriptor serverDescriptor = nativeEntityDescriptor.toBuilder()
-                                    .foundOnSystem(true)
-                                    .build();
-                            allEntityDescriptors.add(serverDescriptor);
-                        } else {
-                            allEntityDescriptors.add(nativeEntity.descriptor());
-                        }
-                        allEntities.put(entityDescriptor, nativeEntity.entity());
-                        continue;
-                    }
+                    LOG.trace("Creating new entity for {}", entityDescriptor);
+                    final NativeEntity<?> createdEntity = facade.createNativeEntity(entity, validatedParameters, allEntities, userContext.getUser().getName());
+                    allEntityDescriptors.add(createdEntity.descriptor());
+                    createdEntities.put(entityDescriptor, createdEntity.entity());
+                    allEntities.put(entityDescriptor, createdEntity.entity());
                 }
-
-                LOG.trace("Creating new entity for {}", entityDescriptor);
-                final NativeEntity<?> createdEntity = facade.createNativeEntity(entity, validatedParameters, allEntities, userContext.getUser().getName());
-                allEntityDescriptors.add(createdEntity.descriptor());
-                createdEntities.put(entityDescriptor, createdEntity.entity());
-                allEntities.put(entityDescriptor, createdEntity.entity());
             }
         } catch (Exception e) {
             rollback(createdEntities);
-            throw new ContentPackException("Failed to " + (isUpgrade ? "upgrade" : "install") +
-                    " content pack <" + contentPack.id() + "/" + contentPack.revision() + ">", e);
+            throw new ContentPackException("Failed to upgrade content pack <" + contentPack.id() + "/" + contentPack.revision() + ">", e);
         }
 
         final ContentPackInstallation installation = ContentPackInstallation.builder()
@@ -321,18 +364,13 @@ public class ContentPackService {
 
         final ContentPackInstallation persistedInstallation = contentPackInstallationPersistenceService.insert(installation);
 
-        final ContentPackUninstallation oldEntitySnapshots;
-        if (isUpgrade) {
-            oldEntitySnapshots = ContentPackUninstallation.builder()
-                    .entities(ImmutableSet.copyOf(oldEntityMapping.values()))
-                    .entityObjects(ImmutableMap.copyOf(oldEntityObjects))
-                    .failedEntities(ImmutableSet.of())
-                    .skippedEntities(ImmutableSet.of())
-                    .entityGrants(ImmutableMap.of())
-                    .build();
-        } else {
-            oldEntitySnapshots = null;
-        }
+        final ContentPackUninstallation oldEntitySnapshots = ContentPackUninstallation.builder()
+                .entities(ImmutableSet.copyOf(oldEntityMapping.values()))
+                .entityObjects(ImmutableMap.copyOf(oldEntityObjects))
+                .failedEntities(ImmutableSet.of())
+                .skippedEntities(ImmutableSet.of())
+                .entityGrants(ImmutableMap.of())
+                .build();
 
         return new ContentPackUpgrade(persistedInstallation, oldEntitySnapshots);
     }
