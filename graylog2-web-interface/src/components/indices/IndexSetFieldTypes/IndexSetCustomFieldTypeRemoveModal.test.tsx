@@ -34,14 +34,12 @@ const renderIndexSetCustomFieldTypeRemoveModal = () =>
     </TestStoreProvider>,
   );
 
-jest.mock('components/indices/hooks/useIndexSetsList', () =>
-  jest.fn(() => ({
-    data: { indexSets: [{ id: '111', title: 'index set title' }], indexSetsCount: 1, indexSetStats: null },
-    refetch: jest.fn(),
-    isSuccess: true,
-    isInitialLoading: false,
-  })),
-);
+jest.mock('components/indices/hooks/useIndexSetsList', () => jest.fn(() => ({
+  data: { indexSets: [{ id: '111', title: 'index set title' }], indexSetsCount: 1, indexSetStats: null },
+  refetch: jest.fn(),
+  isSuccess: true,
+  isInitialLoading: false,
+})));
 
 jest.mock('components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation', () => jest.fn());
 jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
