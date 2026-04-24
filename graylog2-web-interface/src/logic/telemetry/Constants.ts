@@ -442,7 +442,7 @@ export const TELEMETRY_EVENT_TYPE = {
       UPDATED: 'Fleet Updated',
       DELETED: 'Fleet Deleted',
       TAB_SELECTED: 'Fleet Tab Selected',
-      SHOW_RECEIVED_MESSAGES_CLICKED: 'Collector Fleet Show Received Messages Clicked',
+      SHOW_RECEIVED_MESSAGES_CLICKED: 'Fleet Show Received Messages Clicked',
     },
     SOURCE: {
       CREATE_OPENED: 'Collector Source Create Opened',
