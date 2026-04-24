@@ -16,7 +16,7 @@
  */
 
 import { useCallback, useMemo } from 'react';
-import type { Layout } from 'plotly.js';
+import type { Layout } from 'views/components/visualizations/types';
 import { useTheme } from 'styled-components';
 
 import { generateLayouts, generateMappersForYAxis } from 'views/components/visualizations/utils/chartLayoutGenerators';

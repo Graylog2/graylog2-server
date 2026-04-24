@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
-import type { Layout } from 'plotly.js';
+import type { Layout } from 'views/components/visualizations/types';
 
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';

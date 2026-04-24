@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type { PlotData, PlotMouseEvent, Datum, Color } from 'plotly.js';
+import type { PlotData, PlotDatum, Datum, Color } from 'views/components/visualizations/types';
 import type React from 'react';
 
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
@@ -36,7 +36,7 @@ export type ExtraPlotData = {
   percent: number;
   z: Datum;
 };
-export type ClickPoint = PlotMouseEvent['points'][number] & ExtraPlotData;
+export type ClickPoint = PlotDatum & ExtraPlotData;
 export type Rel = { x: number; y: number };
 export type FieldData = {
   field: string;

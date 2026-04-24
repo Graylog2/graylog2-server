@@ -40,6 +40,7 @@ module.exports = {
     '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
       require.resolve('./lib/mocking/fileMock.js'),
     '^@graylog/server-api(.*)$': '<rootDir>/target/api$1',
+    '^echarts-for-react$': require.resolve('./lib/mocking/echartsMock.js'),
   },
   testEnvironment: 'jsdom',
   testPathIgnorePatterns: ['.fixtures.[jt]s$', '^<rootDir>/target/'],

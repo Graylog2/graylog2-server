@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useMemo } from 'react';
-import type { Layout } from 'plotly.js';
+import type { Layout } from 'views/components/visualizations/types';
 
 import toPlotly from 'views/logic/aggregationbuilder/visualizations/Interpolation';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';

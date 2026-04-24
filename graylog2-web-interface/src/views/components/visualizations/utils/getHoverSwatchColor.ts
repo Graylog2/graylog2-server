@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type { Color } from 'plotly.js';
+import type { Color } from 'views/components/visualizations/types';
 
 import type { ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
 
