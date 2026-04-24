@@ -19,7 +19,12 @@ import React from 'react';
 import Routes from 'routing/Routes';
 import { Spinner } from 'components/common';
 import { Button, Alert, Table, Modal, BootstrapModalConfirm, BootstrapModalWrapper } from 'components/bootstrap';
-import { ConfigurationVariableActions } from 'stores/sidecars/ConfigurationVariableStore';
+import {
+  deleteConfigurationVariable,
+  fetchAllConfigurationVariables,
+  getConfigurationsForVariable,
+  saveConfigurationVariable,
+} from 'api/configuration-variables';
 
 import EditConfigurationVariableModal from './EditConfigurationVariableModal';
 import ConfigurationHelperStyle from './ConfigurationHelper.css';
@@ -74,7 +79,7 @@ class ConfigurationVariablesHelper extends React.Component<
   }
 
   _reloadVariables = () => {
-    ConfigurationVariableActions.all().then((configurationVariables: any) => {
+    fetchAllConfigurationVariables().then((configurationVariables: any) => {
       this.setState({ configurationVariables: configurationVariables });
     });
   };
@@ -94,15 +99,13 @@ class ConfigurationVariablesHelper extends React.Component<
   _handleDeleteConfirm = () => {
     const { variableToDelete } = this.state;
 
-    ConfigurationVariableActions.delete(variableToDelete).then(() =>
-      this._onSuccessfulUpdate(() => this._closeErrorModal()),
-    );
+    deleteConfigurationVariable(variableToDelete).then(() => this._onSuccessfulUpdate(() => this._closeErrorModal()));
   };
 
   _handleDeleteCheck = (configVar) => () => {
     this.setState({ variableToDelete: configVar });
 
-    ConfigurationVariableActions.getConfigurations(configVar).then((response: any) => {
+    getConfigurationsForVariable(configVar).then((response: any) => {
       // Variable still in use: Report error
       if (response.length > 0) {
         this.setState({ errorModalContent: _renderConfigList(response) });
@@ -157,7 +160,7 @@ class ConfigurationVariablesHelper extends React.Component<
   _saveConfigurationVariable = (configurationVariable, oldName, callback) => {
     const { onVariableRename } = this.props;
 
-    ConfigurationVariableActions.save.triggerPromise(configurationVariable).then(() =>
+    saveConfigurationVariable(configurationVariable).then(() =>
       this._onSuccessfulUpdate(() => {
         onVariableRename(oldName, configurationVariable.name);
         callback();

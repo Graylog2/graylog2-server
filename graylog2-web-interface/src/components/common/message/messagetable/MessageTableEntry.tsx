@@ -28,7 +28,7 @@ import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import type { Input } from 'components/messageloaders/Types';
 import { MESSAGE_FIELD } from 'views/Constants';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import { InputsStore } from 'stores/inputs/InputsStore';
+import useInputsList from 'hooks/useInputs';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { TableDataCell } from 'views/components/datatable';
@@ -173,7 +173,7 @@ const MessageTableEntry = ({
   isEntitySelectable = () => false,
   overrideContent = undefined,
 }: Props) => {
-  const { inputs: inputsList = [] } = useStore(InputsStore);
+  const { data: inputsList = [] } = useInputsList();
   const { streams: streamsList = [] } = useStore(StreamsStore);
   const highlightMessageId = useContext(HighlightMessageContext);
 
