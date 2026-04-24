@@ -67,6 +67,14 @@ class AbstractGrpcTransportTest {
         assertThat(insecureField.getDefaultValue()).isEqualTo(true);
     }
 
+    @Test
+    void secureModeIsAssumedWhenInsecureKeyIsAbsent() {
+        final Configuration config = config(Map.of());  // no CK_INSECURE key at all
+
+        assertThatThrownBy(() -> AbstractGrpcTransport.checkTlsConfiguration(config))
+                .isInstanceOf(ConfigurationException.class);
+    }
+
     private static Configuration config(Map<String, Object> values) {
         return new Configuration(new HashMap<>(values));
     }
