@@ -27,7 +27,7 @@ import IndexRangeSummary from 'components/indices/IndexRangeSummary';
 import ShardMeter from 'components/indices/ShardMeter';
 import ShardRoutingOverview from 'components/indices/ShardRoutingOverview';
 import type { IndexInfo } from 'stores/indices/IndicesStore';
-import type { IndexRange } from 'stores/indexers/IndexerOverviewStore';
+import type { IndexRange } from 'hooks/useIndexerOverview';
 import { IndicesActions } from 'stores/indices/IndicesStore';
 
 type Props = {
