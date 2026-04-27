@@ -1,10 +1,10 @@
 type = "changed"
-message = "Apply a case-insensitive, numeric-aware collation by default for paginated MongoDB queries."
+message = "Sorting and searching on paginated tables in the product changes from case-sensitive to case-insensitive."
 
 details.user = """
-Paginated list endpoints that previously sorted case-sensitively now sort case-insensitively and
-with natural numeric ordering by default (e.g. `Stream 2` before `Stream 10`). Callers that need
-the previous behavior can still supply their own `Collation` to the pagination helper.
+This applies to paginated entity tables throughout the product as well as the corresponding REST
+API endpoints. Sorting and searching by string fields (such as titles or names) is now case-insensitive
+and uses natural numeric ordering, so for example `Stream 2` is listed before `Stream 10`.
 """
 
 pulls = ["25808"]
