@@ -54,7 +54,6 @@ type Props = React.PropsWithChildren<{
   onClick?: () => void;
   title?: string;
   bsSize?: BsSize;
-  color?: string;
 }>;
 
 const Badge = (
@@ -66,12 +65,11 @@ const Badge = (
     onClick = undefined,
     title = undefined,
     bsSize = 'md',
-    color: customColor = undefined,
   }: Props,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) => {
   const theme = useTheme();
-  const color = customColor ?? mapStyle(bsStyle, theme);
+  const color = mapStyle(bsStyle, theme);
   const size = sizeForMantine(bsSize);
 
   return (
