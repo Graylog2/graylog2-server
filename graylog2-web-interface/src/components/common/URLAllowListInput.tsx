@@ -21,7 +21,7 @@ import { Input } from 'components/bootstrap';
 import { isValidURL } from 'util/URLUtils';
 // Explicit import to fix eslint import/no-cycle
 import URLAllowListFormModal from 'components/common/URLAllowListFormModal';
-import ToolsStore from 'stores/tools/ToolsStore';
+import { urlAllowListCheck, urlAllowListGenerateRegex } from 'api/tools';
 import { triggerInput } from 'util/FormsUtils';
 import type { ValidationState } from 'components/common/types';
 
@@ -59,7 +59,7 @@ const URLAllowListInput = ({
     const keyWildcard = '${key}';
 
     return type && type === 'regex' && isValidURL(typedUrl)
-      ? ToolsStore.urlAllowListGenerateRegex(typedUrl, keyWildcard)
+      ? urlAllowListGenerateRegex(typedUrl, keyWildcard)
       : typedUrl;
   };
 
@@ -69,7 +69,7 @@ const URLAllowListInput = ({
 
   const checkIsAllowlisted = useCallback(() => {
     if (url) {
-      const promise = ToolsStore.urlAllowListCheck(url);
+      const promise = urlAllowListCheck(url);
 
       promise.then((result) => {
         if (!result.is_allowlisted && validationState === null) {

@@ -23,7 +23,7 @@ import type { UserPreferences } from 'contexts/UserPreferencesContext';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
 import useCurrentUser from 'hooks/useCurrentUser';
 import Store from 'logic/local-storage/Store';
-import { PreferencesActions } from 'stores/users/PreferencesStore';
+import { saveUserPreferences } from 'api/preferences';
 import type User from 'logic/users/User';
 import useViewType from 'views/hooks/useViewType';
 
@@ -81,7 +81,7 @@ const _updateUserSidebarPinningPref = (
       ...userPreferences,
       [sidebarPinningPrefKey]: newIsPinned,
     };
-    PreferencesActions.saveUserPreferences(currentUser?.username, newUserPreferences, undefined, false);
+    saveUserPreferences(currentUser?.username, newUserPreferences, undefined, false);
   }
 };
 
