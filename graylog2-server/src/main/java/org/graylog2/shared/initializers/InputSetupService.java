@@ -21,6 +21,9 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 import com.google.common.util.concurrent.Uninterruptibles;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import org.graylog2.inputs.persistence.InputStateService;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.lifecycles.Lifecycle;
@@ -28,9 +31,6 @@ import org.graylog2.shared.inputs.InputLauncher;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -42,16 +42,19 @@ public class InputSetupService extends AbstractExecutionThreadService {
     private final InputRegistry inputRegistry;
     private final EventBus eventBus;
     private final InputLauncher inputLauncher;
+    private final InputStateService runtimeStateService;
 
     private final CountDownLatch startLatch = new CountDownLatch(1);
     private final CountDownLatch stopLatch = new CountDownLatch(1);
     private AtomicReference<Lifecycle> previousLifecycle = new AtomicReference<>(Lifecycle.UNINITIALIZED);
 
     @Inject
-    public InputSetupService(InputRegistry inputRegistry, EventBus eventBus, InputLauncher inputLauncher) {
+    public InputSetupService(InputRegistry inputRegistry, EventBus eventBus, InputLauncher inputLauncher,
+                             InputStateService runtimeStateService) {
         this.inputRegistry = inputRegistry;
         this.eventBus = eventBus;
         this.inputLauncher = inputLauncher;
+        this.runtimeStateService = runtimeStateService;
     }
 
     @Override
@@ -122,6 +125,13 @@ public class InputSetupService extends AbstractExecutionThreadService {
                 s.stop();
             }
         }
+
+        try {
+            runtimeStateService.removeAllForNode();
+        } catch (Exception e) {
+            LOG.warn("Failed to clean up input state documents during shutdown: {}", e.getMessage());
+        }
+
         LOG.debug("Stopped InputSetupService");
     }
 }

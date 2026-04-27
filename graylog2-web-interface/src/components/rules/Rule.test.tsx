@@ -32,7 +32,6 @@ jest.mock('./rule-helper/RuleHelper', () => mockComponent('RuleHelper'));
 jest.mock('./RuleForm', () => mockComponent('RuleForm'));
 jest.mock('./rule-builder/RuleBuilder', () => mockComponent('RuleBuilder'));
 jest.mock('hooks/useScopePermissions');
-jest.mock('components/perspectives/hooks/useActivePerspective');
 
 const ruleMock = {
   source: `rule "function howto"

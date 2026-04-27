@@ -24,17 +24,15 @@ import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 
 import java.time.ZoneId;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENTS_STREAM_ID;
+import static org.graylog.events.search.EventsSearchFilter.NULL_VALUE;
 
 public class EventsSearchService extends AbstractEventsSearchService {
     private final MoreSearch moreSearch;
@@ -50,21 +48,6 @@ public class EventsSearchService extends AbstractEventsSearchService {
         this.streamService = streamService;
     }
 
-    private String buildFilter(EventsSearchParameters parameters) {
-        return new EventsFilterBuilder(parameters).build();
-    }
-
-    private Set<String> allowedEventStreams(Subject subject) {
-        final var eventStreams = defaultEventStreams();
-        if (subject.isPermitted(RestPermissions.STREAMS_READ)) {
-            return eventStreams;
-        }
-
-        return eventStreams.stream()
-                .filter(streamId -> subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId)) || streamId.equals(DEFAULT_EVENTS_STREAM_ID))
-                .collect(Collectors.toSet());
-    }
-
     public EventsSearchResult search(EventsSearchParameters parameters, Subject subject) {
         final var eventStreams = allowedEventStreams(subject);
         if (eventStreams.isEmpty()) {
@@ -72,10 +55,31 @@ public class EventsSearchService extends AbstractEventsSearchService {
         }
 
         final var filter = buildFilter(parameters);
+        final var cleanedParameters = hasAssociatedAssetsForNullFilter(parameters) ? removeAssociatedAssetsForNullFilter(parameters) : parameters;
 
-        final MoreSearch.Result result = moreSearch.eventSearch(parameters, filter, eventStreams, forbiddenSourceStreams(subject));
+        final MoreSearch.Result result = moreSearch.eventSearch(cleanedParameters, filter, eventStreams, allowedSourceStreams(subject));
 
         return buildResultForSubject(parameters, result, subject);
+    }
+
+    EventsSearchParameters removeAssociatedAssetsForNullFilter(EventsSearchParameters parameters) {
+        final var extraFilters = parameters
+                .filter()
+                .extraFilters()
+                .entrySet()
+                .stream()
+                .filter(e -> !(e.getKey().equals(EventDto.FIELD_ASSOCIATED_ASSETS) && e.getValue().contains(NULL_VALUE)))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        final var filter = parameters.filter().toBuilder().extraFilters(extraFilters).build();
+        final var cleanedParameters = parameters.toBuilder().filter(filter).build();
+        return cleanedParameters;
+    }
+
+    boolean hasAssociatedAssetsForNullFilter(EventsSearchParameters parameters) {
+        final var filter = parameters.filter().extraFilters();
+        return filter.containsKey(EventDto.FIELD_ASSOCIATED_ASSETS)
+                && !filter.get(EventDto.FIELD_ASSOCIATED_ASSETS).isEmpty()
+                && filter.get(EventDto.FIELD_ASSOCIATED_ASSETS).contains(NULL_VALUE);
     }
 
     public EventsHistogramResult histogram(EventsSearchParameters parameters, Subject subject, ZoneId timeZone) {
@@ -85,7 +89,7 @@ public class EventsSearchService extends AbstractEventsSearchService {
         }
 
         final var filter = buildFilter(parameters);
-        final var result = moreSearch.histogram(parameters, filter, eventStreams, forbiddenSourceStreams(subject), timeZone);
+        final var result = moreSearch.histogram(parameters, filter, eventStreams, allowedSourceStreams(subject), timeZone);
 
         return EventsHistogramResult.fromResult(result);
     }
@@ -110,19 +114,8 @@ public class EventsSearchService extends AbstractEventsSearchService {
     // TODO: Loading all streams for a user is not very efficient. Not sure if we can find an alternative that is
     //       more efficient. Doing a separate ES query to get all source streams that would be in the result is
     //       most probably not more efficient.
-    private Set<String> forbiddenSourceStreams(Subject subject) {
-        // Users with the generic streams:read permission can read all streams so we don't need to check every single
-        // stream here and can take a short cut.
-        if (subject.isPermitted(RestPermissions.STREAMS_READ)) {
-            return Collections.emptySet();
-        }
-
-        try (var stream = streamService.streamAllIds()) {
-            return stream
-                    // Select all streams the user is NOT permitted to access
-                    .filter(streamId -> !subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId)))
-                    .collect(Collectors.toSet());
-        }
+    private SourceStreamFilter allowedSourceStreams(Subject subject) {
+        return SourceStreamFilter.forSubject(subject, streamService);
     }
 
     private EventsSearchResult buildResultForSubject(EventsSearchParameters parameters,

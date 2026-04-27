@@ -20,6 +20,7 @@ import styled, { css } from 'styled-components';
 import FormDataContext from 'integrations/contexts/FormDataContext';
 import useFetch from 'integrations/hooks/useFetch';
 import { StatusIcon } from 'components/common';
+import Store from 'logic/local-storage/Store';
 
 import { ApiRoutes } from './common/Routes';
 import { toAWSCloudTrailInputCreateRequest } from './common/formDataAdapter';
@@ -75,7 +76,13 @@ const StepReview = ({ onSubmit, externalInputSubmit = false }: Props) => {
 
   const [saveInput, setSaveInput] = useFetch(
     null,
-    () => onSubmit(),
+    (result) => {
+      if (result?.id) {
+        Store.sessionSet('setup_wizard_input_id', result.id);
+      }
+
+      onSubmit();
+    },
     'POST',
     toAWSCloudTrailInputCreateRequest(formData),
   );
@@ -126,10 +133,10 @@ const StepReview = ({ onSubmit, externalInputSubmit = false }: Props) => {
             <strong>S3 Region </strong>
             <span>{formData.awsCloudTrailS3Region.value}</span>
           </li>
-          {formData.assumeRoleArn?.value && (
+          {formData.awsAssumeRoleARN?.value && (
             <li>
               <strong>AWS Assume Role (ARN) </strong>
-              <span>{formData.assumeRoleArn?.value}</span>
+              <span>{formData.awsAssumeRoleARN?.value}</span>
             </li>
           )}
           <li>

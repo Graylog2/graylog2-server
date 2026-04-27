@@ -41,13 +41,6 @@ public class OpensearchConfigurationService extends AbstractIdleService {
     private final Configuration localConfiguration;
     private final DatanodeConfiguration datanodeConfiguration;
     private final Set<DatanodeConfigurationBean<OpensearchConfigurationParams>> opensearchConfigurationBeans;
-
-    /**
-     * This configuration won't survive datanode restart. But it can be repeatedly provided to the managed opensearch
-     */
-    private final Map<String, String> transientConfiguration = new ConcurrentHashMap<>();
-
-    private final List<X509Certificate> trustedCertificates = new ArrayList<>();
     private final EventBus eventBus;
 
     @Inject
@@ -79,34 +72,12 @@ public class OpensearchConfigurationService extends AbstractIdleService {
         triggerConfigurationChangedEvent();
     }
 
-
-    public void setAllowlist(List<String> allowlist, List<X509Certificate> trustedCertificates) {
-        this.trustedCertificates.addAll(trustedCertificates);
-        setTransientConfiguration("reindex.remote.allowlist", String.join(", ", allowlist));
-    }
-
-    public void removeAllowlist() {
-        removeTransientConfiguration("reindex.remote.allowlist");
-    }
-
-    public void setTransientConfiguration(String key, String value) {
-        this.transientConfiguration.put(key, value);
-        triggerConfigurationChangedEvent();
-    }
-
-    public void removeTransientConfiguration(String key) {
-        final Object removedValue = this.transientConfiguration.remove(key);
-        if (removedValue != null) {
-            triggerConfigurationChangedEvent();
-        }
-    }
-
     private OpensearchConfiguration get() {
 
         final OpensearchConfigurationDir targetConfigDir = datanodeConfiguration.datanodeDirectories().createUniqueOpensearchProcessConfigurationDir();
 
         final List<DatanodeConfigurationPart> configurationParts = opensearchConfigurationBeans.stream()
-                .map(bean -> bean.buildConfigurationPart(new OpensearchConfigurationParams(trustedCertificates, transientConfiguration, targetConfigDir.configurationRoot())))
+                .map(bean -> bean.buildConfigurationPart(new OpensearchConfigurationParams(targetConfigDir.configurationRoot())))
                 .collect(Collectors.toList());
 
         return new OpensearchConfiguration(

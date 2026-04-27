@@ -24,7 +24,7 @@ import org.apache.commons.lang.StringUtils;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
-import org.graylog.plugins.pipelineprocessor.processors.ConfigurationStateUpdater;
+import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreterStateUpdater;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
@@ -41,12 +41,12 @@ import java.util.UUID;
 
 public class RuleSimulator {
 
-    private final ConfigurationStateUpdater configurationStateUpdater;
+    private final PipelineInterpreterStateUpdater configurationStateUpdater;
     private final ObjectMapper objectMapper;
     private final MessageFactory messageFactory;
 
     @Inject
-    public RuleSimulator(ConfigurationStateUpdater configurationStateUpdater, ObjectMapper objectMapper,
+    public RuleSimulator(PipelineInterpreterStateUpdater configurationStateUpdater, ObjectMapper objectMapper,
                          MessageFactory messageFactory) {
         this.configurationStateUpdater = configurationStateUpdater;
         this.objectMapper = objectMapper;

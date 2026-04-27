@@ -18,7 +18,7 @@ import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { defaultOnError } from 'util/conditional/onError';
-import type { Metric, NodeMetric } from 'stores/metrics/MetricsStore';
+import type { Metric, NodeMetric } from 'types/metrics';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { DataNode } from 'components/datanode/Types';
 import { fetchDataNodes, keyFn as dataNodesKeyFn, type DataNodeResponse } from 'components/datanode/hooks/useDataNodes';
@@ -103,8 +103,15 @@ export const fetchClusterDataNodesWithMetrics = async (
   searchParams: SearchParams = DEFAULT_CLUSTER_DATA_NODES_SEARCH_PARAMS,
 ): Promise<DataNodeResponse & { list: Array<ClusterDataNode> }> => {
   const base = await fetchDataNodes(searchParams);
-  const hostnames = Array.from(new Set(base.list.map(({ hostname }) => hostname).filter(Boolean)));
-  const metricsByHostname = hostnames.length ? await fetchMetricsForHostnames(hostnames) : {};
+  const compatibleHostnames = new Set<string>();
+
+  base.list.forEach(({ hostname, version_compatible }) => {
+    if (version_compatible !== false && hostname) {
+      compatibleHostnames.add(hostname);
+    }
+  });
+
+  const metricsByHostname = compatibleHostnames.size ? await fetchMetricsForHostnames([...compatibleHostnames]) : {};
 
   return {
     ...base,

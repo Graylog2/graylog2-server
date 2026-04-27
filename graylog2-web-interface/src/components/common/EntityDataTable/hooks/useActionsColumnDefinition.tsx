@@ -130,6 +130,7 @@ const useActionsColumnDefinition = <Entity extends EntityBase>({
         enableHiding: false,
         enablePinning: true,
         enableResizing: false,
+        // The actions/tail column is always present. We only hide its content when there are no row actions.
         header: hasRowActions ? header : undefined,
         cell: hasRowActions ? cell : undefined,
         meta: {

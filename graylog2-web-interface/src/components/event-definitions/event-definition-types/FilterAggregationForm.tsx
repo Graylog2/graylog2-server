@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useState } from 'react';
-import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -92,29 +91,26 @@ const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validati
 
   const handleTypeChange = useCallback(
     (event: React.FormEvent<Radio>) => {
-      const nextConditionType = Number(FormsUtils.getValueFromInput(event.target));
+      const nextConditionType = Number(FormsUtils.getValueFromInput(event.target as HTMLInputElement));
 
       setConditionType(nextConditionType);
-      let newExistingAggregationConfig;
-
       if (nextConditionType === conditionTypes.FILTER) {
         // Store existing data temporarily in state, to restore it in case the type change was accidental
-        Object.keys(initialAggregationConfig).forEach((key) => {
-          newExistingAggregationConfig[key] = eventDefinition.config[key];
-        });
+        const savedAggregationConfig = Object.fromEntries(
+          Object.keys(initialAggregationConfig).map((key) => [key, eventDefinition.config[key]]),
+        ) as EventDefinition['config'];
 
         const nextConfig = { ...eventDefinition.config, ...initialAggregationConfig };
 
         propagateConfigChange(nextConfig as EventDefinition['config']);
+        setExistingAggregationConfig(savedAggregationConfig);
       } else if (existingAggregationConfig) {
         // Reset aggregation data from state if it exists
         const nextConfig = { ...eventDefinition.config, ...existingAggregationConfig };
 
         propagateConfigChange(nextConfig);
-        newExistingAggregationConfig = undefined;
+        setExistingAggregationConfig(undefined);
       }
-
-      setExistingAggregationConfig(newExistingAggregationConfig);
     },
     [eventDefinition.config, existingAggregationConfig, propagateConfigChange],
   );
@@ -164,11 +160,8 @@ const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validati
                   type="number"
                   bsStyle={validation.errors.event_limit ? 'error' : null}
                   help={
-                    get(
-                      validation,
-                      'errors.event_limit',
-                      'Maximum number of events to be created per execution of this event definition. Excess events will be suppressed.',
-                    ) as string
+                    (validation?.errors?.event_limit ??
+                      'Maximum number of events to be created per execution of this event definition. Excess events will be suppressed.') as string
                   }
                   value={eventDefinition.config.event_limit}
                   onChange={handleConfigChange}

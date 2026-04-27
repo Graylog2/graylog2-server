@@ -17,8 +17,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
 import { useStore } from 'stores/connect';
-import { Link } from 'components/common/router';
-import { SelectableList } from 'components/common';
+import { Link, SelectableList } from 'components/common';
 import { Button, ControlLabel, FormGroup, BootstrapModalForm, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import NumberUtils from 'util/NumberUtils';

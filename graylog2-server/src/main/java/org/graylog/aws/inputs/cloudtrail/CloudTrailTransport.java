@@ -151,7 +151,7 @@ public class CloudTrailTransport extends ThrottleableTransport2 {
                 .awsAccessKeyId(awsAccessKey)
                 .awsSecretAccessKey(secretAccessKey)
                 .assumeRoleArn(assumeRoleArn).build();
-        final AwsCredentialsProvider credentialsProvider = awsUtils.createCredentialsProvider(awsRequest);
+        final AwsCredentialsProvider credentialsProvider = awsUtils.createCredentialsProviderWithStsProxy(awsRequest);
 
         SQSClient sqsClient = sqsClientFactory.create(sqsQueueName, sqsRegionName, credentialsProvider, inputFailureRecorder);
         CloudTrailS3Client cloudTrailS3Client = cloudTrailClientFactory.getS3Client(s3RegionName, credentialsProvider,

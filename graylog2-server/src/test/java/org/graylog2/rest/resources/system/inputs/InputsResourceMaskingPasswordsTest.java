@@ -27,6 +27,7 @@ import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.diagnosis.InputDiagnosticService;
+import org.graylog2.inputs.diagnosis.InputRoutingRulesService;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.TextField;
@@ -50,6 +51,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+
+import org.graylog2.database.filtering.ComputedFieldRegistry;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -74,9 +78,11 @@ public class InputsResourceMaskingPasswordsTest {
 
     class InputsTestResource extends InputsResource {
         public InputsTestResource(InputService inputService, MessageInputFactory messageInputFactory) {
-            super(inputService, mock(InputDiagnosticService.class), mock(StreamService.class), mock(StreamRuleService.class),
+            super(inputService, mock(InputDiagnosticService.class), mock(InputRoutingRulesService.class),
+                    mock(StreamService.class), mock(StreamRuleService.class),
                     mock(PipelineService.class), messageInputFactory, new Configuration(),
-                    mock(MongoDbInputsMetadataService.class), mock(ClusterEventBus.class));
+                    mock(MongoDbInputsMetadataService.class), mock(ClusterEventBus.class),
+                    new ComputedFieldRegistry(Set.of()));
         }
 
         @Override

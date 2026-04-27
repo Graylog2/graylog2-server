@@ -38,12 +38,12 @@ public class MailServerContainer implements AutoCloseable {
     }
 
     public static MailServerContainer createStarted(Network network) {
-        final GenericContainer<?> genericContainer = new GenericContainer<>(DockerImageName.parse("mailhog/mailhog:v1.0.1"));
-        genericContainer.withNetwork(network);
-        genericContainer.withNetworkAliases("mailserver");
-        genericContainer.addExposedPorts(1025, API_PORT);
+        final var genericContainer = new GenericContainer<>(DockerImageName.parse("mailhog/mailhog:v1.0.1"))
+                .withNetwork(network)
+                .withNetworkAliases("mailserver")
+                .waitingFor(new HttpWaitStrategy().forPath("/api/v2/messages").forPort(API_PORT).withStartupTimeout(Duration.ofSeconds(10)))
+                .withExposedPorts(1025, API_PORT);
         genericContainer.start();
-        genericContainer.waitingFor(new HttpWaitStrategy().forPath("/api/v2/messages").forPort(API_PORT).withStartupTimeout(Duration.ofSeconds(10)));
         LOG.debug("Mailhog mailserver started");
         return new MailServerContainer(genericContainer);
     }

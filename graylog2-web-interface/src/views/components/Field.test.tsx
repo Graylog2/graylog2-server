@@ -41,7 +41,7 @@ describe('Field', () => {
   describe('handles value action menu depending on interactive context', () => {
     it('does not show value actions if interactive context is `false`', async () => {
       render(
-        <Field name="foo" interactive={false} queryId="someQueryId" type={FieldType.Unknown}>
+        <Field name="foo" interactive={false} type={FieldType.Unknown}>
           Foo
         </Field>,
       );
@@ -54,7 +54,7 @@ describe('Field', () => {
 
     it('shows value actions if interactive context is `true`', async () => {
       render(
-        <Field name="foo" interactive queryId="someQueryId" type={FieldType.Unknown}>
+        <Field name="foo" interactive type={FieldType.Unknown}>
           Foo
         </Field>,
       );

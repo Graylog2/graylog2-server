@@ -16,17 +16,23 @@
  */
 package org.graylog2.inputs;
 
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableSet;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBExtension;
+import org.graylog2.ConfigurationException;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.converters.ConverterFactory;
+import org.graylog2.inputs.extractors.CopyInputExtractor;
 import org.graylog2.inputs.extractors.ExtractorFactory;
+import org.graylog2.inputs.extractors.RegexExtractor;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -56,6 +62,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 
@@ -352,6 +359,145 @@ public class InputServiceImplTest {
         assertThat(inputService.getStaticFields("54e3deadbeefdeadbeef0002")).isEmpty();
         List<Map.Entry<String, String>> staticFields = inputService.getStaticFields("54e3deadbeefdeadbeef0003");
         assertThat(staticFields).isNotNull().hasSize(1).isEqualTo(List.of(Map.entry("static_field", "foo")));
+    }
+
+    @Test
+    @MongoDBFixtures("InputServiceImplTest.json")
+    void testAddStaticFieldWithDuplicateKeyReplacesValue() throws Exception {
+        final String inputId = "54e3deadbeefdeadbeef0003";
+        final Input input = inputService.find(inputId);
+
+        // Add a static field with the same key but different value
+        inputService.addStaticField(input, "static_field", "bar");
+
+        // Should have exactly one entry with the new value, not a duplicate
+        final List<Map.Entry<String, String>> fields = inputService.getStaticFields(inputId);
+        assertThat(fields).hasSize(1).isEqualTo(List.of(Map.entry("static_field", "bar")));
+    }
+
+    @Test
+    @MongoDBFixtures("InputServiceImplTest.json")
+    void testAddStaticFieldWithNewKey() throws Exception {
+        final String inputId = "54e3deadbeefdeadbeef0003";
+        final Input input = inputService.find(inputId);
+
+        // Add a new static field with a different key
+        inputService.addStaticField(input, "new_field", "new_value");
+
+        // Should now have two static fields: the original and the new one
+        final List<Map.Entry<String, String>> fields = inputService.getStaticFields(inputId);
+        assertThat(fields).hasSize(2)
+                .contains(Map.entry("static_field", "foo"))
+                .contains(Map.entry("new_field", "new_value"));
+    }
+
+    @Test
+    public void findIdsByDesiredState() throws Exception {
+        InputImpl stoppedInput = InputImpl.builder()
+                .setTitle("stopped input")
+                .setType("prototype")
+                .setCreatorUserId("admin")
+                .setCreatedAt(Tools.nowUTC())
+                .setConfiguration(Map.of("k", "v"))
+                .setPersistedDesiredState(IOState.Type.STOPPED)
+                .setGlobal(true)
+                .build();
+        String stoppedId = inputService.save(stoppedInput);
+
+        InputImpl runningInput = InputImpl.builder()
+                .setTitle("running input")
+                .setType("prototype")
+                .setCreatorUserId("admin")
+                .setCreatedAt(Tools.nowUTC())
+                .setConfiguration(Map.of("k", "v"))
+                .setPersistedDesiredState(IOState.Type.RUNNING)
+                .setGlobal(true)
+                .build();
+        String runningInputId = inputService.save(runningInput);
+
+        Set<String> stoppedIds = inputService.findIdsByDesiredState(IOState.Type.STOPPED);
+        assertThat(stoppedIds).containsExactly(stoppedId);
+
+        Set<String> runningIds = inputService.findIdsByDesiredState(IOState.Type.RUNNING);
+        assertThat(runningIds).containsExactly(runningInputId);
+    }
+
+    /**
+     * Guards against unintended serialization to the {@code inputs} collection.
+     * <p>
+     * {@link InputImpl} retains a {@code getFields()} Map view for back-compat with the legacy
+     * {@link org.graylog2.database.PersistedImpl}-style representation that the input update flow still
+     * relies on. Any unannotated getter on {@link Input} or {@link InputImpl} will be picked up by
+     * Jackson/mongojack and persisted — assert here that the on-disk top-level key set matches an
+     * explicit allowlist.
+     * <p>
+     * When intentionally adding a new field to the input document, update the allowlist below.
+     */
+    @Test
+    public void persistedDocumentContainsOnlyExpectedFields(MongoCollections mongoCollections) throws Exception {
+        final InputImpl input = InputImpl.builder()
+                .setTitle("contract test input")
+                .setType("test type")
+                .setCreatorUserId("admin")
+                .setCreatedAt(Tools.nowUTC())
+                .setConfiguration(Map.of("k", "v"))
+                .setPersistedDesiredState(IOState.Type.RUNNING)
+                .setGlobal(true)
+                .setContentPack("content-pack-1")
+                .setNodeId("node-123")
+                .setEmbeddedStaticFields(List.of(
+                        Map.of(InputImpl.FIELD_STATIC_FIELD_KEY, "static_key",
+                                InputImpl.FIELD_STATIC_FIELD_VALUE, "static_value")))
+                .build();
+
+        final String id = inputService.save(input);
+
+        final MongoCollection<Document> rawCollection =
+                mongoCollections.nonEntityCollection(InputServiceImpl.COLLECTION_NAME, Document.class);
+        final Document doc = rawCollection.find(Filters.eq(InputImpl.FIELD_ID, new ObjectId(id))).first();
+
+        assertThat(doc).isNotNull();
+        assertThat(doc.keySet()).containsExactlyInAnyOrder(
+                InputImpl.FIELD_ID,
+                InputImpl.FIELD_TITLE,
+                InputImpl.FIELD_TYPE,
+                InputImpl.FIELD_CREATOR_USER_ID,
+                InputImpl.FIELD_CREATED_AT,
+                InputImpl.FIELD_GLOBAL,
+                InputImpl.FIELD_CONFIGURATION,
+                InputImpl.EMBEDDED_STATIC_FIELDS,
+                InputImpl.FIELD_DESIRED_STATE,
+                InputImpl.FIELD_CONTENT_PACK,
+                InputImpl.FIELD_NODE_ID
+        );
+    }
+
+    @Test
+    void totalExtractorCountByTypeCountsExtractorsAcrossInputs() throws Exception {
+        final Input input1 = inputService.find(inputService.save(createTestInput()));
+        inputService.addExtractor(input1, createCopyInputExtractor());
+        inputService.addExtractor(input1, createCopyInputExtractor());
+        inputService.addExtractor(input1, createRegexExtractor());
+
+        final Input input2 = inputService.find(inputService.save(createTestInput()));
+        inputService.addExtractor(input2, createCopyInputExtractor());
+
+        final Map<Extractor.Type, Long> result = inputService.totalExtractorCountByType();
+        assertThat(result)
+                .containsEntry(Extractor.Type.COPY_INPUT, 3L)
+                .containsEntry(Extractor.Type.REGEX, 1L);
+    }
+
+    private static CopyInputExtractor createCopyInputExtractor() throws Extractor.ReservedFieldException {
+        return new CopyInputExtractor(new MetricRegistry(), new ObjectId().toHexString(), "copy extractor",
+                0, Extractor.CursorStrategy.COPY, "message", "target", Map.of(), "admin",
+                List.of(), Extractor.ConditionType.NONE, "");
+    }
+
+    private static RegexExtractor createRegexExtractor() throws Extractor.ReservedFieldException, ConfigurationException {
+        return new RegexExtractor(new MetricRegistry(), new ObjectId().toHexString(), "regex extractor",
+                0, Extractor.CursorStrategy.COPY, "message", "target", Map.of("regex_value", ".*"), "admin",
+                List.of(), Extractor.ConditionType.NONE, "");
     }
 
     private InputImpl createTestInput() {

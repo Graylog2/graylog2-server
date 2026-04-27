@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+import { SYSTEM_EVENT_DEFINITION_TYPE } from 'components/event-definitions/constants';
 
 export const eventDefinition: EventDefinition = {
   _scope: 'DEFAULT',
@@ -93,4 +94,12 @@ export const eventDefinition: EventDefinition = {
   remediation_steps: '',
   event_procedure: '',
   event_summary_template: null,
+};
+
+export const systemEventDefinition = {
+  ...eventDefinition,
+  config: {
+    ...eventDefinition.config,
+    type: SYSTEM_EVENT_DEFINITION_TYPE,
+  },
 };

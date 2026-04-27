@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-project-parent</artifactId>
-        <version>7.1.0-SNAPSHOT</version>
+        <version>7.2.0-SNAPSHOT</version>
         <relativePath>../graylog-project-parent</relativePath>
     </parent>
 
@@ -42,7 +42,7 @@
         <mainClass>org.graylog.datanode.bootstrap.Main</mainClass>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <opensearch.version>2.19.3</opensearch.version>
+        <opensearch.version>2.19.5</opensearch.version>
         <opensearch.mac.jdk.version>21.0.7</opensearch.mac.jdk.version>
         <opensearch.mac.jdk.build>6</opensearch.mac.jdk.build>
 
@@ -65,7 +65,7 @@
         </dependency>
         <dependency>
             <groupId>org.graylog</groupId>
-            <artifactId>graylog-storage-opensearch2</artifactId>
+            <artifactId>graylog-storage-opensearch3</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -466,6 +466,14 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.graylog</groupId>
+            <artifactId>graylog-storage-opensearch3</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
 
     </dependencies>
 
@@ -546,7 +554,7 @@
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-x64.tar.gz
                             </url>
                             <sha512>
-                                13c1df3bf6e8a46bff1e43d6ac664b82c3e839283b9a10c9fd549d1b44f9f039e24de91f51063d7d0a9945d6d6136e9d8a47588a7d9867405501274d4c943df3
+                                5594746235bc1321e8bfdccb23375c6b7f10b4cd5145bca6ff275abef4cc2a954b4381955f8dca66c0804446bbf58eaf812b2ac16e123d79f0bd6f4a976edfa6
                             </sha512>
                             <outputFileName>opensearch-${opensearch.version}-linux-x64.tar.gz</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
@@ -570,7 +578,7 @@
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-arm64.tar.gz
                             </url>
                             <sha512>
-                                64929d121359ca8fc4291a3398914b6212998f1be678a516056b72b614656c604e50ded47273d5f376265d15c43b2d0b1883e40faeebb84b04205d623c065a6b
+                                1b8263e3c1a3a6d49305e1cce3dc1f4841135c299efddb192eabc839a7943cc584d2241cc85390644572d5481cf938e8ba0602224e8367f0b28aabc9c43bef26
                             </sha512>
                             <outputFileName>opensearch-${opensearch.version}-linux-aarch64.tar.gz</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
@@ -596,7 +604,7 @@
                             <outputFileName>repository-s3-${opensearch.version}.zip</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
                             <sha512>
-                                098a94a0a959caa70ed286d232f8d4d9a064aa70f85c6a1198f1fd030196721c232b9084efcad9aa27188ad10827b7f6a8f89f54573ad12098dc7053e965990d
+                                8b41bc034043bde9e0b9b606c67d6bbf12f5d227f78ad8d8ff05328305ca63907c9c480df888fc5d619f8f7e203a8be9d42e2ce019a0c81bf445f5c454f01902
                             </sha512>
                         </configuration>
                     </execution>
@@ -613,7 +621,7 @@
                             <outputFileName>repository-gcs-${opensearch.version}.zip</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
                             <sha512>
-                                70a574d41f0269f7e91e1558960270a7dc98cc233653babd454d66f990ec4d8ee49f6fb6860a61c6760118c1ddc821c8f64ecb42b016ab4d57e89af7f6df00e1
+                                22647de144d64b6b9118c4abd92face19523729fdbe83c9299a771c6346e11752b80795e40722d6cdd5c91c3c22e3c84fcd927dbb83f9fcbd707b2c6444c83b2
                             </sha512>
                         </configuration>
                     </execution>
@@ -630,7 +638,7 @@
                             <outputFileName>repository-hdfs-${opensearch.version}.zip</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
                             <sha512>
-                                29167547c1d89ae5df44f9880f9fe8aa405d2518d1c7b4f29822b96ed18a0d6c4914b8c251a6b27553a6ccf43db3920addec23ee57e39a8345ce99f5748ca139
+                                078ad5529ba6f49651b1ccf314878694ea9c95daac534cce5b11bdc32f1ace6b952347e27da73f11458c80e2583528338bdb1467102b4456a832e33aff564d15
                             </sha512>
                         </configuration>
                     </execution>
@@ -647,7 +655,7 @@
                             <outputFileName>repository-azure-${opensearch.version}.zip</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
                             <sha512>
-                                4f34367bb0949112f0bc73e3cbe84559fe4125f1ba356a219eab37ffe6e3bc634b8176bb2eadc2b3f23c334d68e39269c2be8d9bb442422cda35a7cd8c5c644e
+                                6ebdcbff6c8abef43730f6f5d60c1e0c2b7e3afa09b6832c30ce60e0da4502786132eed9b3207430d951e65abd226cb9cb9bbe49f434f8e3aa118fe58f601c43
                             </sha512>
                         </configuration>
                     </execution>
@@ -672,7 +680,9 @@
                                 -->
                                 <chmod dir="${project.build.directory}/opensearch"
                                        includes="opensearch-*/config/**"
-                                       perm="ugo+r"/>
+                                       perm="ugo+r"
+                                       parallel="false"
+                                />
                             </target>
                         </configuration>
                     </execution>

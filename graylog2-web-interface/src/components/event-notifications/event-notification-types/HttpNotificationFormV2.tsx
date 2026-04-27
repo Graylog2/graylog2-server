@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { SyntheticEvent } from 'react';
 import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import styled from 'styled-components';
@@ -109,9 +108,8 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
     this.propagateChange(name, inputValue);
   };
 
-  handleUrlChange = (event: SyntheticEvent<EventTarget>) => {
-    const target = event.target as HTMLInputElement;
-    this.propagateChange('url', target.value);
+  handleUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.propagateChange('url', event.target.value);
   };
 
   handleTimeZoneChange = (nextValue: string) => {
@@ -156,9 +154,9 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
     onChange(nextConfig);
   };
 
-  handleSecretInputChange = (event: { target: { name: string } }) => {
+  handleSecretInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name } = event.target;
-    const inputValue = FormsUtils.getValueFromInput(event.target);
+    const inputValue = String(FormsUtils.getValueFromInput(event.target));
     const value = inputValue.length === 0 ? { delete_value: true } : { set_value: inputValue };
 
     this.setState({ [name]: inputValue });

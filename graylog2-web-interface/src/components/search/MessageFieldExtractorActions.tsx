@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer } from 'components/common';
 import { DropdownButton, MenuItem } from 'components/bootstrap';
 import ExtractorUtils from 'util/ExtractorUtils';
 

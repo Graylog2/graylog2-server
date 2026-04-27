@@ -1,0 +1,4 @@
+type = "f"
+message = "Showing neutral trend in number widget when delta is zero."
+
+pulls = ["25138"]

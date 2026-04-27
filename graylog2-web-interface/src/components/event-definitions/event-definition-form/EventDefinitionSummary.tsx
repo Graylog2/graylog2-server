@@ -146,6 +146,7 @@ const EventDefinitionSummary = ({
         config,
         currentUser,
         definitionId,
+        entityScope: eventDefinition._scope,
       })
     ) : (
       <p>

@@ -25,7 +25,7 @@ export type EventReplayInfo = {
 
 export interface Event {
   timerange_end: string;
-  timestamp_processing?: string;
+  timestamp_processing: string;
   origin_context?: string;
   scores?: {
     [_key: string]: number;

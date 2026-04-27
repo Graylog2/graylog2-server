@@ -49,7 +49,7 @@ describe('GeoIpResolverConfig', () => {
     expect(screen.getByText('MaxMind GeoIP')).toBeInTheDocument();
 
     const editButton = screen.getByRole('button', { name: /edit configuration/i });
-    userEvent.click(editButton);
+    await userEvent.click(editButton);
 
     expect(
       await screen.findByRole('heading', { name: /update geo-location processor configuration/i }),
@@ -60,13 +60,13 @@ describe('GeoIpResolverConfig', () => {
     mockUpdateConfig.mockResolvedValue({ ...defaultConfig, enabled: true });
     render(<GeoIpResolverConfig config={defaultConfig} updateConfig={mockUpdateConfig} />);
 
-    userEvent.click(await screen.findByRole('button', { name: /edit configuration/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /edit configuration/i }));
 
     const enabledCheckbox = await screen.findByLabelText(/enable geo-location processor/i);
-    userEvent.click(enabledCheckbox);
+    await userEvent.click(enabledCheckbox);
 
     const submitButton = screen.getByRole('button', { name: /update configuration/i });
-    userEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => {
       expect(mockUpdateConfig).toHaveBeenCalledWith(expect.objectContaining({ enabled: true }));
@@ -96,14 +96,14 @@ describe('GeoIpResolverConfig', () => {
   it('should disable form fields when processor is disabled', async () => {
     render(<GeoIpResolverConfig config={defaultConfig} updateConfig={mockUpdateConfig} />);
 
-    userEvent.click(await screen.findByRole('button', { name: /edit configuration/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /edit configuration/i }));
 
     await waitFor(() => {
       expect(screen.getByLabelText(/path to the city database/i)).toBeDisabled();
     });
 
     const enabledCheckbox = screen.getByLabelText(/enable geo-location processor/i);
-    userEvent.click(enabledCheckbox);
+    await userEvent.click(enabledCheckbox);
 
     await waitFor(() => {
       expect(screen.getByLabelText(/path to the city database/i)).not.toBeDisabled();

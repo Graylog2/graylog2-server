@@ -23,7 +23,7 @@ import FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 import useFeature from 'hooks/useFeature';
 import usePluginEntities from 'hooks/usePluginEntities';
 import FieldTypeValueRenderer from 'views/components/fieldtypes/FieldTypeValueRenderer';
-import useInputs from 'hooks/useInputs';
+import { useInputs } from 'hooks/useInputs';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 
 jest.mock('hooks/useFeature');

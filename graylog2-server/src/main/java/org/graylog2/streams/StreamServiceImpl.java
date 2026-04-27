@@ -22,6 +22,8 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.UpdateResult;
@@ -119,7 +121,8 @@ public class StreamServiceImpl implements StreamService {
                              EntityRegistrar entityRegistrar,
                              ClusterEventBus clusterEventBus,
                              Set<StreamDeletionGuard> streamDeletionGuards,
-                             EntityScopeService scopeService) {
+                             EntityScopeService scopeService,
+                             EventBus eventBus) {
         this.collection = mongoCollections.collection(COLLECTION_NAME, StreamDTO.class);
         this.mongoUtils = mongoCollections.utils(collection);
         this.scopedMongoUtils = mongoCollections.scopedEntityUtils(collection, scopeService);
@@ -131,6 +134,9 @@ public class StreamServiceImpl implements StreamService {
         this.clusterEventBus = clusterEventBus;
         this.streamDeletionGuards = streamDeletionGuards;
         this.scopeService = scopeService;
+
+        // TODO: This class needs lifecycle management to avoid leaking objects in the EventBus
+        eventBus.register(this);
 
         final CacheLoader<String, String> streamTitleLoader = new CacheLoader<>() {
             @Nonnull
@@ -149,6 +155,11 @@ public class StreamServiceImpl implements StreamService {
                 .expireAfterAccess(10, TimeUnit.SECONDS)
                 .build(streamTitleLoader);
 
+    }
+
+    @Subscribe
+    public void handleStreamsChanged(StreamsChangedEvent event) {
+        event.streamIds().forEach(streamTitleCache::invalidate);
     }
 
     @Nullable
@@ -550,6 +561,7 @@ public class StreamServiceImpl implements StreamService {
 
         final Stream updatedStream = streamBuilder.build();
         save(updatedStream);
+        streamTitleCache.invalidate(streamId);
         if (streamRenamedEvent != null) {
             clusterEventBus.post(streamRenamedEvent);
         }

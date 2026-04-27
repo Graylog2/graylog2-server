@@ -88,7 +88,8 @@ public class OpensearchCommonConfigurationBean implements DatanodeConfigurationB
             config.put("bootstrap.system_call_filter", "false");
         }
 
-        config.putAll(buildParams.transientConfiguration());
+        // In OpenSearch, the setting bootstrap.memory_lock controls whether the process is allowed to lock its memory (RAM) so it is not swapped out to disk.
+        config.put("bootstrap.memory_lock", Boolean.toString(localConfiguration.getOpensearchBootstrapMemoryLock()));
 
         return config.build();
     }

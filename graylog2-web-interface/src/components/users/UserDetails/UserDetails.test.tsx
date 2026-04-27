@@ -80,7 +80,7 @@ describe('UserDetails', () => {
     it('should display timezone', async () => {
       render(<UserDetails user={user} />);
       const tab = await screen.findByLabelText(/Preferences/i);
-      userEvent.click(tab);
+      await userEvent.click(tab);
       await waitFor(() => {
         if (!user.timezone) throw Error('timezone must be defined for provided user');
 
@@ -94,7 +94,7 @@ describe('UserDetails', () => {
         render(<UserDetails user={exampleUser} />);
 
         const tab = await screen.findByLabelText(/Preferences/i);
-        userEvent.click(tab);
+        await userEvent.click(tab);
 
         await screen.findByText('10 Seconds');
       });
@@ -103,7 +103,7 @@ describe('UserDetails', () => {
         render(<UserDetails user={user.toBuilder().sessionTimeoutMs(600000).build()} />);
 
         const tab = await screen.findByLabelText(/Preferences/i);
-        userEvent.click(tab);
+        await userEvent.click(tab);
 
         await screen.findByText('10 Minutes');
       });
@@ -112,7 +112,7 @@ describe('UserDetails', () => {
         render(<UserDetails user={user.toBuilder().sessionTimeoutMs(36000000).build()} />);
 
         const tab = await screen.findByLabelText(/Preferences/i);
-        userEvent.click(tab);
+        await userEvent.click(tab);
 
         await screen.findByText('10 Hours');
       });
@@ -121,7 +121,7 @@ describe('UserDetails', () => {
         render(<UserDetails user={user.toBuilder().sessionTimeoutMs(864000000).build()} />);
 
         const tab = await screen.findByLabelText(/Preferences/i);
-        userEvent.click(tab);
+        await userEvent.click(tab);
 
         await screen.findByText('10 Days');
       });
@@ -133,7 +133,7 @@ describe('UserDetails', () => {
       render(<UserDetails user={user} />);
 
       const tab = await screen.findByLabelText(/Teams & Roles/i);
-      userEvent.click(tab);
+      await userEvent.click(tab);
 
       await screen.findByText(assignedRole.name);
     });
@@ -144,7 +144,7 @@ describe('UserDetails', () => {
       render(<UserDetails user={user} />);
 
       const tab = await screen.findByLabelText(/Teams & Roles/i);
-      userEvent.click(tab);
+      await userEvent.click(tab);
 
       await screen.findAllByText(/Enterprise Feature/);
     });

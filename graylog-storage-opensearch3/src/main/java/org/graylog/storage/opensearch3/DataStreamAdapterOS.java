@@ -18,7 +18,6 @@ package org.graylog.storage.opensearch3;
 
 import com.google.common.annotations.VisibleForTesting;
 import jakarta.inject.Inject;
-import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.graylog.storage.opensearch3.ism.IsmApi;
 import org.graylog2.indexer.datastream.DataStreamAdapter;
 import org.graylog2.indexer.datastream.Policy;
@@ -49,15 +48,13 @@ public class DataStreamAdapterOS implements DataStreamAdapter {
     private final OfficialOpensearchClient opensearchClient;
     private final IsmApi ismApi;
     private final OpenSearchIndicesClient indicesClient;
-    private final OSSerializationUtils templateMapper;
 
 
     @Inject
-    public DataStreamAdapterOS(OfficialOpensearchClient opensearchClient, IsmApi ismApi, OSSerializationUtils templateMapper) {
+    public DataStreamAdapterOS(OfficialOpensearchClient opensearchClient, IsmApi ismApi) {
         this.opensearchClient = opensearchClient;
         this.indicesClient = opensearchClient.sync().indices();
         this.ismApi = ismApi;
-        this.templateMapper = templateMapper;
     }
 
     @Override
@@ -70,8 +67,8 @@ public class DataStreamAdapterOS implements DataStreamAdapter {
                             .build())
                     .indexPatterns(template.indexPatterns())
                     .template(IndexTemplateMapping.builder()
-                            .mappings(templateMapper.fromMap(template.mappings(), TypeMapping._DESERIALIZER))
-                            .settings(templateMapper.fromMap(template.settings(), IndexSettings._DESERIALIZER))
+                            .mappings(OSSerializationUtils.fromMap(template.mappings(), TypeMapping._DESERIALIZER))
+                            .settings(OSSerializationUtils.fromMap(template.settings(), IndexSettings._DESERIALIZER))
                             .build())
                     .priority(template.order().intValue())
                     .build();

@@ -20,6 +20,9 @@ import userEvent from '@testing-library/user-event';
 
 import ContentPackEditParameter from 'components/content-packs/ContentPackEditParameter';
 
+// eslint-disable-next-line no-restricted-properties -- component has no submit button, jsdom doesn't support implicit form submission
+const submitForm = async () => fireEvent.submit(await screen.findByTestId('parameter-form'));
+
 describe('<ContentPackEditParameter />', () => {
   it('should render with empty parameters', async () => {
     render(<ContentPackEditParameter />);
@@ -68,10 +71,10 @@ describe('<ContentPackEditParameter />', () => {
     await userEvent.type(screen.getByLabelText(/name/i), 'name');
     await userEvent.type(screen.getByLabelText(/title/i), 'title');
     await userEvent.type(screen.getByLabelText(/description/i), 'descr');
-    fireEvent.change(screen.getByLabelText(/type/i), { target: { value: 'integer' } });
+    await userEvent.selectOptions(screen.getByLabelText(/type/i), 'integer');
     await userEvent.type(screen.getByLabelText(/default value/i), '1');
 
-    fireEvent.submit(await screen.findByTestId('parameter-form'));
+    await submitForm();
 
     expect(changeFn).toHaveBeenCalledWith({
       name: 'name',
@@ -91,7 +94,7 @@ describe('<ContentPackEditParameter />', () => {
     await userEvent.type(screen.getByLabelText(/description/i), 'descr');
     await userEvent.type(screen.getByLabelText(/default value/i), 'test');
 
-    fireEvent.submit(await screen.findByTestId('parameter-form'));
+    await submitForm();
 
     expect(changeFn).not.toHaveBeenCalled();
   });
@@ -108,7 +111,7 @@ describe('<ContentPackEditParameter />', () => {
     await userEvent.clear(nameInput);
     await userEvent.type(nameInput, 'franz');
 
-    fireEvent.submit(await screen.findByTestId('parameter-form'));
+    await submitForm();
 
     expect(screen.getByText(/must be unique/i)).toBeInTheDocument();
   });
@@ -129,64 +132,64 @@ describe('<ContentPackEditParameter />', () => {
       const nameInput = screen.getByLabelText(/name/i);
       await userEvent.clear(nameInput);
       await userEvent.type(nameInput, 'hans');
-      fireEvent.submit(await screen.findByTestId('parameter-form'));
+      await submitForm();
 
       expect(screen.getByText(/must be unique/i)).toBeInTheDocument();
 
       await userEvent.clear(nameInput);
       await userEvent.type(nameInput, 'hans-dampf');
-      fireEvent.submit(await screen.findByTestId('parameter-form'));
+      await submitForm();
 
       expect(screen.getByText(/only contain A-Z, a-z, 0-9 and _/i)).toBeInTheDocument();
 
       await userEvent.clear(nameInput);
       await userEvent.type(nameInput, 'dampf');
-      fireEvent.submit(await screen.findByTestId('parameter-form'));
+      await submitForm();
 
       expect(screen.getByText(/must not contain a space/i)).toBeInTheDocument();
     });
 
     it('should validate the parameter input from type double', async () => {
-      fireEvent.change(screen.getByLabelText(/type/i), { target: { value: 'double' } });
+      await userEvent.selectOptions(screen.getByLabelText(/type/i), 'double');
       await userEvent.type(screen.getByLabelText(/default value/i), 'test');
-      fireEvent.submit(await screen.findByTestId('parameter-form'));
+      await submitForm();
 
       expect(screen.getByText(/not a double value/i)).toBeInTheDocument();
 
       const input = screen.getByLabelText(/default value/i);
       await userEvent.clear(input);
       await userEvent.type(input, '1.0');
-      fireEvent.submit(await screen.findByTestId('parameter-form'));
+      await submitForm();
 
       expect(screen.getByText(/default value if the parameter is not optional/i)).toBeInTheDocument();
     });
 
     it('should validate the parameter input from type integer', async () => {
-      fireEvent.change(screen.getByLabelText(/type/i), { target: { value: 'integer' } });
+      await userEvent.selectOptions(screen.getByLabelText(/type/i), 'integer');
       await userEvent.type(screen.getByLabelText(/default value/i), 'test');
-      fireEvent.submit(await screen.findByTestId('parameter-form'));
+      await submitForm();
 
       expect(screen.getByText(/not an integer value/i)).toBeInTheDocument();
 
       const input = screen.getByLabelText(/default value/i);
       await userEvent.clear(input);
       await userEvent.type(input, '1');
-      fireEvent.submit(await screen.findByTestId('parameter-form'));
+      await submitForm();
 
       expect(screen.getByText(/default value if the parameter is not optional/i)).toBeInTheDocument();
     });
 
     it('should validate the parameter input from type boolean', async () => {
-      fireEvent.change(screen.getByLabelText(/type/i), { target: { value: 'boolean' } });
+      await userEvent.selectOptions(screen.getByLabelText(/type/i), 'boolean');
       await userEvent.type(screen.getByLabelText(/default value/i), 'test');
-      fireEvent.submit(await screen.findByTestId('parameter-form'));
+      await submitForm();
 
       expect(screen.getByText(/must be either true or false/i)).toBeInTheDocument();
 
       const input = screen.getByLabelText(/default value/i);
       await userEvent.clear(input);
       await userEvent.type(input, 'true');
-      fireEvent.submit(await screen.findByTestId('parameter-form'));
+      await submitForm();
 
       expect(screen.getByText(/default value if the parameter is not optional/i)).toBeInTheDocument();
     });

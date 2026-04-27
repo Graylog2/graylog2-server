@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, act } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import HotkeysModalContainer from 'components/hotkeys/HotkeysModalContainer';
@@ -29,10 +29,7 @@ describe('HotkeysModalContainer', () => {
       </HotkeysProvider>,
     );
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    act(() => {
-      userEvent.keyboard('{Shift>}?{/Shift}');
-    });
+    await userEvent.keyboard('{Shift>}?{/Shift}');
 
     await screen.findByRole('heading', {
       name: /keyboard shortcuts/i,

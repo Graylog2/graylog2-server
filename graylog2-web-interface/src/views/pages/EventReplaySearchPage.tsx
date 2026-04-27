@@ -24,42 +24,28 @@ import { Spinner } from 'components/common';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import ErrorsActions from 'actions/errors/ErrorsActions';
-import ReplaySearch from 'components/events/ReplaySearch';
-import sidebarSections, { type SidebarSection } from 'views/components/sidebar/sidebarSections';
-import ReplaySearchSidebar from 'components/events/ReplaySearchSidebar/ReplaySearchSidebar';
+import EventReplaySearch from 'components/events/EventReplaySearch';
+import type FetchError from 'logic/errors/FetchError';
 
-export const onErrorHandler = (error) => {
+export const onErrorHandler = (error: FetchError) => {
   if (error.status === 404) {
     ErrorsActions.report(createFromFetchError(error));
   }
 };
 
-const replaySection: SidebarSection = {
-  key: 'eventDescription',
-  hoverTitle: 'Replay Details',
-  title: null,
-  icon: 'play_arrow',
-  content: ReplaySearchSidebar,
-};
-
-const searchPageLayout = {
-  sidebar: {
-    isShown: true,
-    title: 'Replayed Search',
-    sections: [replaySection, ...sidebarSections],
-    contentColumnWidth: 350,
-  },
-};
-
 const EventReplaySearchPage = () => {
   const [isNotificationLoaded, setIsNotificationLoaded] = useState(false);
-  const { alertId, definitionId } = useParams<{ alertId?: string; definitionId?: string }>();
+  const { alertId } = useParams<{ alertId?: string }>();
   const {
     data: eventData,
     isLoading: eventIsLoading,
     isFetched: eventIsFetched,
   } = useEventById(alertId, { onErrorHandler });
-  const { isLoading: EDIsLoading, isFetched: EDIsFetched } = useEventDefinition(eventData?.event_definition_id);
+  const {
+    isLoading: EDIsLoading,
+    isFetched: EDIsFetched,
+    data: eventDefinitionMappedData,
+  } = useEventDefinition(eventData?.event_definition_id);
 
   useEffect(() => {
     EventNotificationsActions.listAll().then(() => setIsNotificationLoaded(true));
@@ -70,12 +56,7 @@ const EventReplaySearchPage = () => {
   return isLoading ? (
     <Spinner />
   ) : (
-    <ReplaySearch
-      alertId={alertId}
-      definitionId={definitionId}
-      searchPageLayout={searchPageLayout}
-      forceSidebarPinned
-    />
+    <EventReplaySearch eventData={eventData} eventDefinitionMappedData={eventDefinitionMappedData} />
   );
 };
 

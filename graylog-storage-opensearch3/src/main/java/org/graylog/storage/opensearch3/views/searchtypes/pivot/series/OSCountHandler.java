@@ -20,29 +20,25 @@ import org.graylog.plugins.views.search.engine.IndexerGeneratedQueryContext;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.XContentBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregations;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.HasAggregations;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.missing.Missing;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ValueCount;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ValueCountAggregationBuilder;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
+import org.opensearch.client.opensearch._types.aggregations.MultiBucketBase;
+import org.opensearch.client.opensearch._types.aggregations.ValueCountAggregate;
+import org.opensearch.client.opensearch.core.msearch.MultiSearchItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
-public class OSCountHandler extends OSPivotSeriesSpecHandler<Count, ValueCount> {
+public class OSCountHandler extends OSPivotSeriesSpecHandler<Count> {
     private static final Logger LOG = LoggerFactory.getLogger(OSCountHandler.class);
 
     @Nonnull
@@ -51,9 +47,9 @@ public class OSCountHandler extends OSPivotSeriesSpecHandler<Count, ValueCount> 
         return count.field()
                 .map(field -> {
                     // the request was for a field count, we have to add a value_count sub aggregation
-                    final ValueCountAggregationBuilder value = AggregationBuilders.count(name).field(field);
                     queryContext.recordNameForPivotSpec(pivot, count, name);
-                    return List.of(SeriesAggregationBuilder.metric(value));
+                    return List.of(SeriesAggregationBuilder.metric(new MutableNamedAggregationBuilder(name,
+                            Aggregation.builder().valueCount(a -> a.field(field)))));
                 })
                 // doc_count is always present in elasticsearch's bucket aggregations, no need to add it
                 .orElse(List.of());
@@ -62,77 +58,37 @@ public class OSCountHandler extends OSPivotSeriesSpecHandler<Count, ValueCount> 
     @Override
     public Stream<Value> doHandleResult(Pivot pivot,
                                         Count count,
-                                        SearchResponse searchResult,
-                                        ValueCount valueCount,
+                                        MultiSearchItem<JsonData> searchResult,
+                                        Aggregate agg,
                                         OSGeneratedQueryContext esGeneratedQueryContext) {
         final Object value;
-        if (valueCount == null) {
+        if (agg == null) {
             LOG.error("Unexpected null aggregation result, returning 0 for the count. This is a bug.");
             value = 0;
-        } else if (valueCount instanceof MultiBucketsAggregation.Bucket) {
-            value = ((MultiBucketsAggregation.Bucket) valueCount).getDocCount();
-        } else if (valueCount instanceof Aggregations) {
-            value = searchResult.getHits().getTotalHits().value;
+        } else if (agg.isMultiTerms()) {
+            value = agg.multiTerms().buckets().array().getFirst().docCount();
+        } else if (agg.isValueCount()) {
+            value = Optional.ofNullable(agg.valueCount())
+                    .map(ValueCountAggregate::value)
+                    .map(Double::longValue)
+                    .orElse(0L);
         } else {
-            value = valueCount.getValue();
+            value = null;
         }
         return Stream.of(Value.create(count.id(), Count.NAME, value));
     }
 
     @Override
-    public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, IndexerGeneratedQueryContext<?> queryContext) {
+    public Aggregate extractAggregationFromResult(Pivot pivot, PivotSpec spec, MultiBucketBase aggregations, IndexerGeneratedQueryContext<?> queryContext) {
         final String agg = queryContext.getAggNameForPivotSpecFromContext(pivot, spec);
         if (agg == null) {
-            if (aggregations instanceof MultiBucketsAggregation.Bucket) {
-                return createValueCount(((MultiBucketsAggregation.Bucket) aggregations).getDocCount());
-            } else if (aggregations instanceof Missing) {
-                return createValueCount(((Missing) aggregations).getDocCount());
-            }
+            return ValueCountAggregate.of(v -> v
+                    .value((double) aggregations.docCount())
+            ).toAggregate();
         } else {
             // try to saved sub aggregation type. this might fail if we refer to the total result of the entire result instead of a specific
             // value_count aggregation. we'll handle that special case in doHandleResult above
-            return aggregations.getAggregations().get(agg);
+            return aggregations.aggregations().get(agg);
         }
-
-        return null;
-    }
-
-    private Aggregation createValueCount(final Long docCount) {
-        return new ValueCount() {
-            @Override
-            public long getValue() {
-                return docCount;
-            }
-
-            @Override
-            public double value() {
-                return docCount;
-            }
-
-            @Override
-            public String getValueAsString() {
-                return docCount.toString();
-            }
-
-            @Override
-            public String getName() {
-                return null;
-            }
-
-            @Override
-            public String getType() {
-                return null;
-            }
-
-            @Override
-            public Map<String, Object> getMetadata() {
-                return null;
-            }
-
-            @Override
-            public XContentBuilder toXContent(XContentBuilder xContentBuilder, Params params) throws IOException {
-                return null;
-            }
-        };
     }
 }

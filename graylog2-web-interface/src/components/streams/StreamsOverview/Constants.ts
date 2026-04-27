@@ -14,25 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
-import { PluginStore } from 'graylog-web-plugin/plugin';
-import type Immutable from 'immutable';
-import type { Permission } from 'graylog-web-plugin/plugin';
-
 import type { Attribute, Sort } from 'stores/PaginationTypes';
 
-const getStreamDataLakeTableElements = PluginStore.exports('dataLake')?.[0]?.getStreamDataLakeTableElements;
-
 const getStreamTableElements = (
-  permissions: Immutable.List<Permission>,
   isPipelineColumnPermitted: boolean,
-  pluggableAttributes?: {
+  extensionAttributes?: {
     attributeNames?: Array<string>;
     attributes?: Array<Attribute>;
   },
 ) => {
-  const streamDataLakeTableElements = getStreamDataLakeTableElements?.(permissions);
-
   const defaultLayout = {
     entityTableId: 'streams',
     defaultPageSize: 20,
@@ -40,26 +30,26 @@ const getStreamTableElements = (
     defaultDisplayedAttributes: [
       'title',
       'index_set_title',
-      'archiving',
-      ...(streamDataLakeTableElements?.attributeName ? [streamDataLakeTableElements.attributeName] : []),
       'rules',
       ...(isPipelineColumnPermitted ? ['pipelines'] : []),
-      ...(pluggableAttributes?.attributeNames || []),
       'outputs',
-      'throughput',
+      'archiving',
+      ...(extensionAttributes?.attributeNames || []),
+      'destination_filters',
       'disabled',
+      'throughput',
     ],
     defaultColumnOrder: [
       'title',
       'index_set_title',
-      'archiving',
-      ...(streamDataLakeTableElements?.attributeName ? [streamDataLakeTableElements.attributeName] : []),
       'rules',
       ...(isPipelineColumnPermitted ? ['pipelines'] : []),
-      ...(pluggableAttributes?.attributeNames || []),
       'outputs',
-      'throughput',
+      'archiving',
+      ...(extensionAttributes?.attributeNames || []),
+      'destination_filters',
       'disabled',
+      'throughput',
       'created_at',
     ],
   };
@@ -67,12 +57,12 @@ const getStreamTableElements = (
   const additionalAttributes: Array<Attribute> = [
     { id: 'index_set_title', title: 'Index Set', sortable: true, permissions: ['indexsets:read'] },
     { id: 'throughput', title: 'Throughput' },
-    { id: 'rules', title: 'Rules' },
+    { id: 'rules', title: 'Stream Rules' },
     ...(isPipelineColumnPermitted ? [{ id: 'pipelines', title: 'Pipelines' }] : []),
     { id: 'outputs', title: 'Outputs' },
     { id: 'archiving', title: 'Archiving' },
-    ...(streamDataLakeTableElements?.attributes || []),
-    ...(pluggableAttributes?.attributes || []),
+    ...(extensionAttributes?.attributes || []),
+    { id: 'destination_filters', title: 'Filter Rules' },
   ];
 
   return {

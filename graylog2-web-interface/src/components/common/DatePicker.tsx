@@ -36,6 +36,10 @@ const StyledDayPicker = styled(DayPicker)(
     .rdp-chevron {
       fill: ${theme.colors.gray[60]};
     }
+
+    .rdp-months {
+      margin: 0 auto;
+    }
   `,
 );
 
@@ -55,9 +59,16 @@ type Props = {
   onChange: (day: Date, modifiers: Modifiers, event: React.MouseEvent<HTMLDivElement>) => void;
   fromDate?: Date;
   showOutsideDays?: boolean;
+  timeZone?: string;
 };
 
-const DatePicker = ({ date = undefined, fromDate = undefined, onChange, showOutsideDays = false }: Props) => {
+const DatePicker = ({
+  date = undefined,
+  fromDate = undefined,
+  onChange,
+  showOutsideDays = false,
+  timeZone = 'UTC',
+}: Props) => {
   const selectedDate = useSelectedDate(date);
 
   const modifiers = useMemo(
@@ -67,13 +78,13 @@ const DatePicker = ({ date = undefined, fromDate = undefined, onChange, showOuts
           return false;
         }
 
-        return selectedDate === adjustFormat(moddedDate, 'date');
+        return selectedDate === adjustFormat(moddedDate, 'date', timeZone);
       },
       disabled: {
         before: new Date(fromDate),
       },
     }),
-    [fromDate, selectedDate],
+    [fromDate, selectedDate, timeZone],
   );
 
   return (
@@ -81,7 +92,7 @@ const DatePicker = ({ date = undefined, fromDate = undefined, onChange, showOuts
       defaultMonth={selectedDate ? toDateObject(selectedDate).toDate() : undefined}
       onDayClick={onChange}
       modifiers={modifiers}
-      timeZone="UTC"
+      timeZone={timeZone}
       showOutsideDays={showOutsideDays}
     />
   );

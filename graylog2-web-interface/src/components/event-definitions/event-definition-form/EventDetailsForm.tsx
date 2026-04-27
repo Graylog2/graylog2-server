@@ -34,6 +34,8 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
+import EventSummaryTemplateHelp from './EventSummaryTemplateHelp';
+
 import type { EventDefinition } from '../event-definitions-types';
 import { isSystemEventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
@@ -46,6 +48,22 @@ const StyledRow = styled.div`
   & .form-group {
     width: 100%;
   }
+`;
+
+const InputContainer = styled.div`
+  display: inline-block;
+  position: relative;
+  width: 100%;
+`;
+
+const InputFeedback = styled.div`
+  position: absolute;
+  right: 0;
+  top: 24px;
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+  padding-right: 3px;
 `;
 
 const priorityOptions = Object.entries(EventDefinitionPriorityEnum.properties)
@@ -93,7 +111,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name } = event.target;
 
-    onChange(name, FormsUtils.getValueFromInput(event.target));
+    onChange(name, String(FormsUtils.getValueFromInput(event.target)));
   };
 
   const handlePriorityChange = (nextPriority: string) => {
@@ -101,7 +119,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'event-definition-details',
       app_action_value: 'priority-select',
-      priority: priorityOptions[toNumber(nextPriority) - 1]?.label,
+      priority: priorityOptions.find((opt) => opt.value === nextPriority)?.label,
     });
 
     onChange('priority', toNumber(nextPriority));
@@ -143,16 +161,21 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
             </FormGroup>
           </StyledRow>
 
-          <Input
-            id="event-definition-event-summary-template"
-            name="event_summary_template"
-            label="Event Summary Template"
-            type="text"
-            help="Template used to generate the Event and Alert summaries."
-            value={eventDefinition.event_summary_template}
-            onChange={handleChange}
-            readOnly={readOnly}
-          />
+          <InputContainer className="input-container">
+            <Input
+              id="event-definition-event-summary-template"
+              name="event_summary_template"
+              label="Event Summary Template"
+              type="text"
+              help="Template used to generate the Event and Alert summaries."
+              value={eventDefinition.event_summary_template}
+              onChange={handleChange}
+              readOnly={readOnly}
+            />
+            <InputFeedback>
+              <EventSummaryTemplateHelp />
+            </InputFeedback>
+          </InputContainer>
 
           <Input
             id="event-definition-description"

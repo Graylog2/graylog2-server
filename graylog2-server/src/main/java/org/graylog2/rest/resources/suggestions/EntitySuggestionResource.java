@@ -21,6 +21,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -30,8 +31,15 @@ import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.database.suggestions.EntitySuggestionResponse;
 import org.graylog2.database.suggestions.EntitySuggestionService;
+import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
+
+import javax.annotation.Nullable;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
 
 @RequiresAuthentication
 @PublicCloudAPI
@@ -52,8 +60,17 @@ public class EntitySuggestionResource extends RestResource {
     @Operation(summary = "Get a paginated list of suggested entities")
     public EntitySuggestionResponse getPage(@Parameter(name = "collection")
                                             @QueryParam("collection") String collection,
+                                            @Parameter(name ="identifier")
+                                            @QueryParam("identifier") @DefaultValue(ID_FIELD)
+                                            String identifier,
                                             @Parameter(name = "column")
                                             @QueryParam("column") @DefaultValue("title") String column,
+                                            @Parameter(name = "display_fields", description = "Comma-separated list of fields to include in composite display")
+                                            @QueryParam("display_fields") @Nullable String displayFieldsParam,
+                                            @Parameter(name = "display_template", description = "Template for formatting display values (e.g., '{node_id} ({hostname})')")
+                                            @QueryParam("display_template") @Nullable String displayTemplate,
+                                            @Parameter(name = "identifier_type", description = "BSON type of the identifier field")
+                                            @QueryParam("identifier_type") @DefaultValue("OBJECT_ID") SearchQueryField.Type identifierType,
                                             @Parameter(name = "page")
                                             @QueryParam("page") @DefaultValue("1") int page,
                                             @Parameter(name = "per_page")
@@ -61,6 +78,15 @@ public class EntitySuggestionResource extends RestResource {
                                             @Parameter(name = "query")
                                             @QueryParam("query") @DefaultValue("") String query) {
 
-        return entitySuggestionService.suggest(collection, column, query, page, perPage, getSubject());
+        List<String> displayFields = null;
+        if (displayFieldsParam != null && !displayFieldsParam.isEmpty()) {
+            displayFields = Arrays.asList(displayFieldsParam.split(","));
+        }
+
+        try {
+            return entitySuggestionService.suggest(collection, identifier, column, displayFields, displayTemplate, query, page, perPage, getSubject());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e);
+        }
     }
 }

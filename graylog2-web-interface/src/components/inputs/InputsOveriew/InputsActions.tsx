@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useState } from 'react';
 
 import { Button, ButtonToolbar, DeleteMenuItem, MenuItem } from 'components/bootstrap';
-import { ConfirmDialog, IfPermitted } from 'components/common';
+import { ConfirmDialog, IfPermitted, LinkContainer } from 'components/common';
 import Routes from 'routing/Routes';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { isInputInSetupMode, isInputRunning } from 'components/inputs/helpers/inputState';
@@ -29,8 +29,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import useFeature from 'hooks/useFeature';
 import type { ConfiguredInput, Input } from 'components/messageloaders/Types';
-import InputStatesStore from 'stores/inputs/InputStatesStore';
-import { LinkContainer } from 'components/common/router';
+import useInputStateMutations from 'hooks/useInputsStateMutations';
 import { MoreActions } from 'components/common/EntityDataTable';
 import type { InputTypesSummary } from 'hooks/useInputTypes';
 import type { InputTypeDescriptionsResponse } from 'hooks/useInputTypesDescriptions';
@@ -69,6 +68,7 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
   const { data: inputStates, isLoading: isLoadingInputStates } = useInputsStates();
 
   const { updateInput, deleteInput } = useInputMutations();
+  const { setupInput, stopInput: stopInputMutation } = useInputStateMutations(input as any);
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
@@ -109,7 +109,7 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
       app_action_value: 'input-enter-setup',
     });
 
-    InputStatesStore.setup(input);
+    setupInput({ inputId: input.id });
   };
 
   const exitInputSetupMode = () => {
@@ -118,7 +118,7 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
       app_action_value: 'input-exit-setup',
     });
 
-    InputStatesStore.stop(input);
+    stopInputMutation({ inputId: input.id });
   };
 
   const handleConfirmDelete = async () => {

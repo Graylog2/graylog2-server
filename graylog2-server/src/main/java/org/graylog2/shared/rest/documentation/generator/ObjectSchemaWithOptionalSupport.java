@@ -19,6 +19,7 @@ package org.graylog2.shared.rest.documentation.generator;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.module.jsonSchema.jakarta.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.jakarta.types.ObjectSchema;
+import jakarta.annotation.Nullable;
 
 import java.util.Optional;
 
@@ -26,6 +27,9 @@ public class ObjectSchemaWithOptionalSupport extends ObjectSchema {
     @Override
     public void putOptionalProperty(BeanProperty property, JsonSchema jsonSchema) {
         if (property.getType().isTypeOrSubTypeOf(Optional.class)) {
+            jsonSchema.setRequired(false);
+        }
+        if (property.getType().getRawClass().isAnnotationPresent(Nullable.class)) {
             jsonSchema.setRequired(false);
         }
         super.putOptionalProperty(property, jsonSchema);

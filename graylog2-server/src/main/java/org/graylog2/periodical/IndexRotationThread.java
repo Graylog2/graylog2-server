@@ -21,7 +21,6 @@ import jakarta.inject.Provider;
 import org.graylog2.datatiering.DataTieringOrchestrator;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.cluster.Cluster;
-import org.graylog2.indexer.datanode.DatanodeMigrationLockService;
 import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
@@ -51,7 +50,6 @@ public class IndexRotationThread extends Periodical {
     private final Map<String, Provider<RotationStrategy>> rotationStrategyMap;
     private final DataTieringOrchestrator dataTieringOrchestrator;
     private final NotificationService notificationService;
-    private final DatanodeMigrationLockService migrationLockService;
 
     @Inject
     public IndexRotationThread(NotificationService notificationService,
@@ -61,7 +59,7 @@ public class IndexRotationThread extends Periodical {
                                ActivityWriter activityWriter,
                                NodeId nodeId,
                                Map<String, Provider<RotationStrategy>> rotationStrategyMap,
-                               DataTieringOrchestrator dataTieringOrchestrator, DatanodeMigrationLockService migrationLockService) {
+                               DataTieringOrchestrator dataTieringOrchestrator) {
         this.notificationService = notificationService;
         this.indexSetRegistry = indexSetRegistry;
         this.cluster = cluster;
@@ -70,7 +68,6 @@ public class IndexRotationThread extends Periodical {
         this.nodeId = nodeId;
         this.rotationStrategyMap = rotationStrategyMap;
         this.dataTieringOrchestrator = dataTieringOrchestrator;
-        this.migrationLockService = migrationLockService;
     }
 
     @Override
@@ -93,10 +90,8 @@ public class IndexRotationThread extends Periodical {
             indexSetRegistry.getAllIndexSets().forEach((indexSet) -> {
                 try {
                     if (indexSet.getConfig().isWritable()) {
-                        migrationLockService.tryRun(indexSet, IndexRotationThread.class, () -> {
-                            checkAndRepair(indexSet);
-                            checkForRotation(indexSet);
-                        });
+                        checkAndRepair(indexSet);
+                        checkForRotation(indexSet);
                     } else {
                         LOG.debug("Skipping non-writable index set <{}> ({})", indexSet.getConfig().id(), indexSet.getConfig().title());
                     }

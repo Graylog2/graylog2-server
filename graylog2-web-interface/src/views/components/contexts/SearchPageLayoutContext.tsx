@@ -35,8 +35,22 @@ export const BLANK = {
   actionsDropdown: { isShown: false },
 };
 
+export type LayoutSidebarTitleComponent = React.ComponentType<
+  React.PropsWithChildren<{
+    onClose: () => void;
+  }>
+>;
+
+export type LayoutSidebarTitle = string | LayoutSidebarTitleComponent;
+
 export type LayoutState = {
-  sidebar: { isShown: boolean; sections?: Array<SidebarSection>; title?: string; contentColumnWidth?: number };
+  sidebar: {
+    isShown: boolean;
+    initialSectionCollapsed?: boolean;
+    sections?: Array<SidebarSection>;
+    title?: LayoutSidebarTitle;
+    contentColumnWidth?: number;
+  };
   viewActions: {
     save: { isShown: boolean };
     saveAs: { isShown: boolean };

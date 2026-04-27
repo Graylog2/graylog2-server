@@ -14,16 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
-import EventDetailsTable from 'components/events/events/EventDetailsTable';
-import RemediationSteps from 'components/events/ReplaySearchSidebar/RemediationSteps';
+import EventDetailsDefinitionList from 'components/events/events/EventDetailsDefinitionList';
 import { eventTypeAttribute } from 'components/events/events/ColumnRenderers';
 import type { EventReplaySideBarDetailsProps } from 'views/types';
 import useEventsAdditionalData from 'components/events/ReplaySearchSidebar/hooks/useEventsAdditionalData';
 import useEventById from 'hooks/useEventById';
 import { Spinner } from 'components/common';
+import ExpandableSection from 'components/events/ReplaySearchSidebar/ExpandableSection';
+import EventDefinitionInfoList from 'components/event-definitions/replay-search/EventDefinitionInfoList';
+import ReplaySearchContext from 'components/event-definitions/replay-search/ReplaySearchContext';
+import type { ReplaySearchContextType } from 'components/event-definitions/replay-search/ReplaySearchContext';
 
 const attributesList = [
   {
@@ -53,26 +56,44 @@ const attributesRenderers = {
   message: { renderCell: WordBreakRenderer },
 };
 
-const GeneralEventSideBar = ({ alertId }: EventReplaySideBarDetailsProps) => {
+const GeneralEventSideBar = ({ alertId, definitionId }: EventReplaySideBarDetailsProps) => {
   const { data: eventData, isLoading: isLoadingEvent } = useEventById(alertId);
-  const { meta, eventDefinitionEventProcedureId, isLoadingEventDefinition } = useEventsAdditionalData({ eventData });
+  const resolvedDefinitionId = definitionId ?? eventData?.event_definition_id;
+  const { meta, isLoadingEventDefinition } = useEventsAdditionalData({
+    eventData,
+    definitionId: resolvedDefinitionId,
+  });
 
-  if (isLoadingEvent || isLoadingEventDefinition) return <Spinner />;
+  const replaySearchContext = useMemo<ReplaySearchContextType>(
+    () => ({
+      alertId,
+      definitionId: resolvedDefinitionId,
+      type: eventData?.alert ? 'alert' : 'event',
+    }),
+    [alertId, resolvedDefinitionId, eventData?.alert],
+  );
+
+  if ((alertId && isLoadingEvent) || isLoadingEventDefinition) return <Spinner />;
 
   return (
     <div>
-      <h2>Event Details</h2>
-      <EventDetailsTable
-        event={eventData}
-        meta={meta}
-        attributesList={attributesList}
-        attributesRenderers={attributesRenderers}
-      />
-      <RemediationSteps
-        event={eventData}
-        meta={meta}
-        eventDefinitionEventProcedureId={eventDefinitionEventProcedureId}
-      />
+      {alertId && (
+        <ExpandableSection title="Event Details">
+          <EventDetailsDefinitionList
+            event={eventData}
+            meta={meta}
+            attributesList={attributesList}
+            attributesRenderers={attributesRenderers}
+          />
+        </ExpandableSection>
+      )}
+      {resolvedDefinitionId && (
+        <ReplaySearchContext.Provider value={replaySearchContext}>
+          <ExpandableSection title="Event Definition Details">
+            <EventDefinitionInfoList />
+          </ExpandableSection>
+        </ReplaySearchContext.Provider>
+      )}
     </div>
   );
 };

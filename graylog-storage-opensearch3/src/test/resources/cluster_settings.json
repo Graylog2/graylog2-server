@@ -1,0 +1,9 @@
+{
+  "persistent": {
+    "opendistro.index_state_management.history.number_of_replicas": "0",
+    "plugins.index_state_management.metadata_migration.status": "1",
+    "plugins.index_state_management.template_migration.control": "-1",
+    "cluster.max_shards_per_node": "42"
+  },
+  "transient": {}
+}

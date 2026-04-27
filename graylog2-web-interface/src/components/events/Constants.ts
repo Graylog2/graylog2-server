@@ -17,18 +17,25 @@
 import type { Sort, Attribute } from 'stores/PaginationTypes';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import type { MiddleSectionProps } from 'components/common/PaginatedEntityTable/PaginatedEntityTable';
+import { ALPHABETICAL_SORT } from 'components/common/PaginatedEntityTable/slicing/slicingConstants';
 
 export const EVENTS_ENTITY_TABLE_ID = 'events';
 
 export const commonEventAttributes: Array<Attribute> = [
   {
-    filter_options: Object.keys(EventDefinitionPriorityEnum.properties).map((num) => ({ value: num, title: num })),
+    filter_options: [
+      ...Object.keys(EventDefinitionPriorityEnum.properties)
+        .reverse()
+        .map((num) => ({ value: num, title: num })),
+    ],
     filterable: true,
     id: 'priority',
     searchable: false,
+    sliceable: true,
     sortable: true,
     title: 'Priority',
     type: 'STRING',
+    slice_sort_default: { mode: ALPHABETICAL_SORT, direction: 'desc' },
   },
   {
     id: 'timestamp',
@@ -108,6 +115,7 @@ export const eventsTableSpecificAttributes: Array<Attribute> = [
     title: 'Type',
     type: 'BOOLEAN',
     sortable: true,
+    sliceable: true,
     filterable: true,
     filter_options: [
       { value: 'false', title: 'Event' },
@@ -147,6 +155,8 @@ export const eventsTableElements = {
     ],
   },
 };
+
+export const REPLAY_SESSION_ID_PARAM = 'replaySessionId';
 
 type EventsMetricsAction = {
   id: string;

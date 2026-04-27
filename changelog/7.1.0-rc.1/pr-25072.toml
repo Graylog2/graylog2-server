@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fixed STS assume-role error for the AWS CloudTrail input when using a configured HTTP proxy."
+
+pulls = ["25072"]

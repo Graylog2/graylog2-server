@@ -39,6 +39,7 @@ package org.graylog2.rest.resources.streams;
     import org.graylog.plugins.pipelineprocessor.db.RuleService;
     import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService;
     import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
+    import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
     import org.graylog2.database.NotFoundException;
     import org.graylog2.database.PaginatedList;
     import org.graylog2.rest.models.SortOrder;
@@ -51,6 +52,7 @@ package org.graylog2.rest.resources.streams;
     import org.graylog2.search.SearchQueryField;
     import org.graylog2.shared.rest.PublicCloudAPI;
     import org.graylog2.shared.rest.resources.RestResource;
+    import org.graylog2.shared.security.RestPermissions;
     import org.graylog2.streams.StreamService;
 
     import java.util.List;
@@ -73,8 +75,8 @@ public class StreamPipelineRulesResource extends RestResource {
             EntityAttribute.builder().id("rule_id").title("Pipeline Rule ID").searchable(false).hidden(true).build(),
             EntityAttribute.builder().id(ATTRIBUTE_PIPELINE_RULE).title("Pipeline Rule").searchable(false).build(),
             EntityAttribute.builder().id("pipeline_id").title("Pipeline ID").searchable(false).hidden(true).build(),
-            EntityAttribute.builder().id(ATTRIBUTE_PIPELINE).title("Pipeline").searchable(false).build(),
-            EntityAttribute.builder().id(ATTRIBUTE_CONNECTED_STREAM).title("Connected Streams").searchable(false).build()
+            EntityAttribute.builder().id(ATTRIBUTE_PIPELINE).title("Source pipeline").searchable(false).build(),
+            EntityAttribute.builder().id(ATTRIBUTE_CONNECTED_STREAM).title("Source streams").searchable(false).build()
     );
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT)))).build();
@@ -118,9 +120,12 @@ public class StreamPipelineRulesResource extends RestResource {
                        schema = @Schema(allowableValues = {"asc", "desc"}))
             @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order) {
 
+        checkPermission(RestPermissions.STREAMS_READ, streamId);
+
         // Pagination is primarily for UX purposes - OK to fetch all and then paginate in memory
         List<StreamPipelineRulesResponse> responseList =
                 mongoDbPipelineMetadataService.getRoutingPipelines(streamId).stream()
+                        .filter(dao -> isPermitted(PipelineRestPermissions.PIPELINE_READ, dao.pipelineId()))
                         .flatMap(dao -> buildResponse(dao, streamId))
                         .toList();
         final PaginatedList<StreamPipelineRulesResponse> paginatedList =
@@ -145,6 +150,7 @@ public class StreamPipelineRulesResource extends RestResource {
 
         List<StreamReference> connectedStreams = connectionsService.loadByPipelineId(pipelineDao.id()).stream()
                 .map(PipelineConnections::streamId)
+                .filter(id -> isPermitted(RestPermissions.STREAMS_READ, id))
                 .map(id -> {
                     try {
                         return new StreamReference(id, streamService.load(id).getTitle());

@@ -29,7 +29,7 @@ import {
   extractRangeFromString,
   timeRangeTitle,
 } from 'components/common/EntityFilters/helpers/timeRange';
-import DateTimePicker from 'views/components/searchbar/time-range-filter/time-range-picker/DateTimePicker';
+import DateTimePicker from 'views/components/time-range-picker/DateTimePicker';
 import StringUtils from 'util/StringUtils';
 
 import type { Filter } from '../types';

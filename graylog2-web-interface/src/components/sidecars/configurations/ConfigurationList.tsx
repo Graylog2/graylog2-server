@@ -16,9 +16,8 @@
  */
 import React from 'react';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, DataTable, PaginatedList, SearchForm } from 'components/common';
 import { Col, Row, Button } from 'components/bootstrap';
-import { DataTable, PaginatedList, SearchForm } from 'components/common';
 import Routes from 'routing/Routes';
 
 import ConfigurationRow from './ConfigurationRow';

@@ -17,9 +17,7 @@
 import { useContext, useMemo } from 'react';
 import type { Permission } from 'graylog-web-plugin/plugin';
 
-import { DEFAULT_PERSPECTIVE } from 'components/perspectives/contexts/PerspectivesProvider';
 import usePluginEntities from 'hooks/usePluginEntities';
-import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
 import { PAGE_TYPE, ACTION_TYPE, LINK_TYPE } from 'components/quick-jump/Constants';
 import usePermissions from 'hooks/usePermissions';
 import type { QualifiedUrl } from 'routing/Routes';
@@ -28,8 +26,6 @@ import AppConfig from 'util/AppConfig';
 import type { SearchResultItem } from 'components/quick-jump/Types';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
-import PerspectivesContext from 'components/perspectives/contexts/PerspectivesContext';
-import useHistory from 'routing/useHistory';
 
 const useEntityCreatorItems = () => {
   const { isPermitted } = usePermissions();
@@ -67,22 +63,6 @@ const useConfigurationPages = () => {
 
 const useQuickJumpActions = (): SearchResultItem[] => {
   const { isScratchpadVisible } = useContext(ScratchpadContext);
-  const { activePerspective, availablePerspectives, setActivePerspective } = useContext(PerspectivesContext);
-  const history = useHistory();
-  const perspectiveActions = useMemo(
-    () =>
-      availablePerspectives
-        .filter((perspective) => perspective !== activePerspective)
-        .map((perspective) => ({
-          type: ACTION_TYPE,
-          title: `Switch to ${perspective.title} perspective`,
-          action: () => {
-            setActivePerspective(perspective.id);
-            history.push(perspective.welcomeRoute);
-          },
-        })),
-    [activePerspective, availablePerspectives, history, setActivePerspective],
-  );
 
   return [
     {
@@ -106,7 +86,6 @@ const useQuickJumpActions = (): SearchResultItem[] => {
         toggleScratchpad();
       },
     },
-    ...perspectiveActions,
   ];
 };
 
@@ -162,9 +141,6 @@ const useHelpMenuItems = () => {
     });
 };
 
-const matchesPerspective = (activePerspective: string, itemPerspective: string) =>
-  activePerspective === DEFAULT_PERSPECTIVE ? !itemPerspective : itemPerspective === activePerspective;
-
 const isFeatureEnabled = (featureFlag?: string) => {
   if (!featureFlag) return true;
 
@@ -175,43 +151,37 @@ type BaseNavigationItem = {
   description: string;
   path: QualifiedUrl<string>;
   permissions?: Permission | Array<Permission>;
-  perspective?: string;
 };
 
 const useMainNavigationItems = () => {
   const { isPermitted } = usePermissions();
   const navigationItems = usePluginEntities('navigation');
-  const { activePerspective } = useActivePerspective();
 
   const allNavigationItems = navigationItems.flatMap((item) =>
     'children' in item
       ? item.children.map<BaseNavigationItem>((child) => ({
           ...child,
           description: `${item.description} / ${child.description}`,
-          perspective: item.perspective,
         }))
       : [item],
   );
 
   return allNavigationItems
-    .filter((item) => isPermitted(item.permissions) && matchesPerspective(activePerspective.id, item.perspective))
+    .filter((item) => isPermitted(item.permissions))
     .map((item) => ({ type: PAGE_TYPE, link: item.path, title: item.description }));
 };
 
 const usePageNavigationItems = () => {
-  const { activePerspective } = useActivePerspective();
   const { isPermitted } = usePermissions();
   const pageNavigationItems = usePluginEntities('pageNavigation');
 
-  return pageNavigationItems
-    .filter((group) => matchesPerspective(activePerspective.id, group.perspective))
-    .flatMap((group) =>
-      [...group.children]
-        .filter((page) => isFeatureEnabled(page.requiredFeatureFlag))
-        .filter((page) => isPermitted(page.permissions))
-        .slice(1)
-        .map((page) => ({ type: PAGE_TYPE, link: page.path, title: `${group.description} / ${page.description}` })),
-    );
+  return pageNavigationItems.flatMap((group) =>
+    [...group.children]
+      .filter((page) => isFeatureEnabled(page.requiredFeatureFlag))
+      .filter((page) => isPermitted(page.permissions))
+      .slice(1)
+      .map((page) => ({ type: PAGE_TYPE, link: page.path, title: `${group.description} / ${page.description}` })),
+  );
 };
 
 const useNavItems = () => {
