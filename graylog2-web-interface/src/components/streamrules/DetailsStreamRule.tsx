@@ -15,17 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import UserNotification from 'util/UserNotification';
 import { isPermitted } from 'util/PermissionsMixin';
 import HumanReadableStreamRule from 'components/streamrules/HumanReadableStreamRule';
-import { useStore } from 'stores/connect';
 import { ConfirmDialog, Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
 import StreamRuleModal from 'components/streamrules/StreamRuleModal';
-import { StreamRulesInputsActions, StreamRulesInputsStore } from 'stores/inputs/StreamRulesInputsStore';
+import useStreamRulesInputs from 'hooks/useStreamRulesInputs';
 import useStreamRuleMutations from 'hooks/useStreamRuleMutations';
 import type { StreamRule as StreamRuleTypeDefinition, Stream, StreamRule } from 'stores/streams/StreamsStore';
 
@@ -55,12 +54,8 @@ const DetailsStreamRule = ({ stream, streamRule, onSubmit = () => {}, onDelete =
   const { permissions } = useCurrentUser();
   const [showStreamRuleForm, setShowStreamRuleForm] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
-  const { inputs } = useStore(StreamRulesInputsStore);
+  const { data: inputs } = useStreamRulesInputs();
   const { removeStreamRule, updateStreamRule } = useStreamRuleMutations();
-
-  useEffect(() => {
-    StreamRulesInputsActions.list();
-  }, []);
 
   const onConfirmDelete = () => {
     removeStreamRule({ streamId: stream.id, streamRuleId: streamRule.id }).then(() => {

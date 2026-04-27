@@ -55,20 +55,24 @@ const renderIndexSetFieldTypesList = () =>
     </TestStoreProvider>,
   );
 
-jest.mock('components/indices/hooks/useSingleIndexSet', () => jest.fn(() => ({
-  data: { id: '111', title: 'index set title', field_type_profile: 'profile-id-111' },
-  refetch: jest.fn(),
-  isSuccess: true,
-  isInitialLoading: false,
-})));
+jest.mock('components/indices/hooks/useSingleIndexSet', () =>
+  jest.fn(() => ({
+    data: { id: '111', title: 'index set title', field_type_profile: 'profile-id-111' },
+    refetch: jest.fn(),
+    isSuccess: true,
+    isInitialLoading: false,
+  })),
+);
 
 jest.mock('routing/useParams', () => jest.fn());
-jest.mock('components/indices/hooks/useIndexSetsList', () => jest.fn(() => ({
-  data: { indexSets: [{ id: '111', title: 'index set title' }], indexSetsCount: 1, indexSetStats: null },
-  refetch: jest.fn(),
-  isSuccess: true,
-  isInitialLoading: false,
-})));
+jest.mock('components/indices/hooks/useIndexSetsList', () =>
+  jest.fn(() => ({
+    data: { indexSets: [{ id: '111', title: 'index set title' }], indexSetsCount: 1, indexSetStats: null },
+    refetch: jest.fn(),
+    isSuccess: true,
+    isInitialLoading: false,
+  })),
+);
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings');
 jest.mock('components/common/PaginatedEntityTable/useFetchEntities');
 

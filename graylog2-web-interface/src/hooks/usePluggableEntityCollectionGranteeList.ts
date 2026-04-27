@@ -18,8 +18,12 @@ import usePluginEntities from 'hooks/usePluginEntities';
 
 const usePluggableEntityCollectionGranteeList = () => {
   const pluggableCollectionGranteeList = usePluginEntities('components.collection');
+  const collection = pluggableCollectionGranteeList?.[0];
+  const conditionMet = collection?.useCondition ? collection.useCondition() : true;
 
-  return pluggableCollectionGranteeList?.[0]?.CollectionGranteeList ?? null;
+  if (!conditionMet) return null;
+
+  return collection?.CollectionGranteeList ?? null;
 };
 
 export default usePluggableEntityCollectionGranteeList;
