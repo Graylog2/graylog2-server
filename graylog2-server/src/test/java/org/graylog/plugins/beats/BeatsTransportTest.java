@@ -24,6 +24,7 @@ import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
+import org.graylog2.security.encryption.EncryptedValueService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -66,7 +67,8 @@ public class BeatsTransportTest {
                 nettyTransportConfiguration,
                 new ThroughputCounter(eventLoopGroup),
                 new LocalMetricRegistry(),
-                tlsConfiguration
+                tlsConfiguration,
+                mock(EncryptedValueService.class)
         );
 
         final MessageInput input = mock(MessageInput.class);
