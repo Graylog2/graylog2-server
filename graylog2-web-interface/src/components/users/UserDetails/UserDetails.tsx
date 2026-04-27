@@ -57,7 +57,9 @@ const UserDetails = ({ user }: Props) => {
     { value: 'shared_entities', label: 'Shared Entities' },
   ];
   const editPermissionRequiredSections = [
-    'profile', 'settings_preferences', 'teams_roles',
+    'profile',
+    'settings_preferences',
+    'teams_roles',
     ...activePluggableSegments.filter((s) => s.editPermissionRequired).map((s) => s.value),
   ];
 
