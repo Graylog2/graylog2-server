@@ -188,7 +188,7 @@
         <siv-mode.version>1.6.1</siv-mode.version>
         <slf4j.version>2.0.17</slf4j.version>
         <streamex.version>0.8.4</streamex.version>
-        <swagger.version>2.2.47</swagger.version>
+        <swagger.version>2.2.48</swagger.version>
         <swagger-parser.version>2.1.40</swagger-parser.version>
         <syslog4j.version>0.9.61</syslog4j.version>
         <threeten-extra.version>1.8.0</threeten-extra.version>
@@ -210,7 +210,7 @@
         <assertj-core.version>3.27.7</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.3.0</awaitility.version>
-        <equalsverifier.version>4.4.2</equalsverifier.version>
+        <equalsverifier.version>4.5</equalsverifier.version>
         <guice-extension.version>1.2.1</guice-extension.version>
         <junit-jupiter.version>6.0.3</junit-jupiter.version>
         <mockito.version>5.23.0</mockito.version>
@@ -773,7 +773,7 @@
                         <dependency>
                             <groupId>org.openrewrite</groupId>
                             <artifactId>rewrite-java</artifactId>
-                            <version>8.79.2</version>
+                            <version>8.79.5</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
