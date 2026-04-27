@@ -22,7 +22,7 @@ import { Col, Row, Button, Input } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
 import ExtractorUtils from 'util/ExtractorUtils';
 import { getValueFromInput } from 'util/FormsUtils';
-import ToolsStore from 'stores/tools/ToolsStore';
+import { testSplitAndIndex } from 'api/tools';
 
 const DEFAULT_CONFIGURATION = { index: 1 };
 
@@ -61,7 +61,7 @@ const SplitAndIndexExtractorConfiguration = ({
   const _onTryClick = useCallback(() => {
     setTrying(true);
 
-    const promise = ToolsStore.testSplitAndIndex(configuration.split_by, configuration.index, exampleMessage);
+    const promise = testSplitAndIndex(configuration.split_by, configuration.index, exampleMessage);
 
     promise.then((result) => {
       if (!result.successful) {
