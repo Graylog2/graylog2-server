@@ -30,12 +30,16 @@ jest.mock('api/entity-share', () => ({
   updateEntityShare: jest.fn(() => Promise.resolve()),
   loadUserSharesPaginated: jest.fn(() => Promise.resolve({ list: require('immutable').List(), pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 } })),
 }));
-jest.mock('hooks/useEntityShareState', () => ({
-  __esModule: true,
-  default: jest.fn(() => ({ data: undefined })),
-  useSetEntityShareState: jest.fn(() => jest.fn()),
-  entityShareQueryKey: jest.fn((grn) => ['entity-share', grn ?? 'new']),
-}));
+jest.mock('hooks/useEntityShareState', () => {
+  const mockSetEntityShareState = jest.fn();
+
+  return {
+    __esModule: true,
+    default: jest.fn(() => ({ data: undefined })),
+    useSetEntityShareState: jest.fn(() => mockSetEntityShareState),
+    entityShareQueryKey: jest.fn((grn) => ['entity-share', grn ?? 'new']),
+  };
+});
 
 const exampleUser = alice.toBuilder().sessionTimeoutMs(36000000).timezone('Europe/Berlin').build();
 

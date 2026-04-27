@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useState, useCallback } from 'react';
 import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import { AUTHZ_ROLES_QUERY_KEY } from 'hooks/useAuthzRoles';
@@ -81,6 +81,7 @@ const RolesOverview = () => {
   const { data: paginatedRoles, isFetching } = useQuery({
     queryKey: [...AUTHZ_ROLES_QUERY_KEY, 'paginated', { page, perPage, query }],
     queryFn: () => AuthzRolesDomain.loadRolesPaginated({ page, perPage, query }),
+    placeholderData: keepPreviousData,
   });
 
   const { list: roles } = paginatedRoles || {};

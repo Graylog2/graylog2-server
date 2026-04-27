@@ -84,7 +84,7 @@ describe('UsersSection', () => {
 
     await waitFor(() => expect(loadUsersForRole).toHaveBeenCalledTimes(2));
 
-    expect(loadUsersForRole).toHaveBeenCalledWith(exampleRole.id, exampleRole.name, {
+    expect(loadUsersForRole).toHaveBeenCalledWith(exampleRole.id, {
       page: 1,
       perPage: 5,
       query: 'name of an assigned user',

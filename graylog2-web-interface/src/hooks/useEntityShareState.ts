@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import type EntityShareState from 'logic/permissions/EntityShareState';
@@ -26,7 +27,8 @@ export const entityShareQueryKey = (entityGRN: GRN | null) => [...ENTITY_SHARE_Q
 const useEntityShareState = (entityGRN: GRN | null) =>
   useQuery<EntityShareState | undefined>({
     queryKey: entityShareQueryKey(entityGRN),
-    // No queryFn: consumers populate the cache via the setEntityShareState helper below
+    // queryFn is a noop because consumers populate the cache via the setEntityShareState helper below
+    queryFn: () => undefined,
     enabled: false,
     initialData: undefined,
   });
@@ -34,9 +36,12 @@ const useEntityShareState = (entityGRN: GRN | null) =>
 export const useSetEntityShareState = () => {
   const queryClient = useQueryClient();
 
-  return (entityGRN: GRN | null, state: EntityShareState) => {
-    queryClient.setQueryData(entityShareQueryKey(entityGRN), state);
-  };
+  return useCallback(
+    (entityGRN: GRN | null, state: EntityShareState) => {
+      queryClient.setQueryData(entityShareQueryKey(entityGRN), state);
+    },
+    [queryClient],
+  );
 };
 
 export default useEntityShareState;

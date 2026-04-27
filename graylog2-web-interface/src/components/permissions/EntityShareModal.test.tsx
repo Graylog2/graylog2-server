@@ -39,8 +39,8 @@ import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 import EntityShareModal from './EntityShareModal';
 import useEntityShareState from 'hooks/useEntityShareState';
 
-const mockEmptyStore = { state: undefined };
-const mockFailedStore = { state: failedEntityShareState };
+const mockEmptyResult = { data: undefined };
+const mockFailedResult = { data: failedEntityShareState };
 
 jest.mock('domainActions/permissions/EntityShareDomain', () => ({
   __esModule: true,
@@ -50,12 +50,16 @@ jest.mock('domainActions/permissions/EntityShareDomain', () => ({
     loadUserSharesPaginated: jest.fn(() => Promise.resolve({ list: require('immutable').List(), pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 } })),
   },
 }));
-jest.mock('hooks/useEntityShareState', () => ({
-  __esModule: true,
-  default: jest.fn(() => ({ data: undefined })),
-  useSetEntityShareState: jest.fn(() => jest.fn()),
-  entityShareQueryKey: jest.fn((grn) => ['entity-share', grn ?? 'new']),
-}));
+jest.mock('hooks/useEntityShareState', () => {
+  const mockSetEntityShareState = jest.fn();
+
+  return {
+    __esModule: true,
+    default: jest.fn(() => ({ data: undefined })),
+    useSetEntityShareState: jest.fn(() => mockSetEntityShareState),
+    entityShareQueryKey: jest.fn((grn) => ['entity-share', grn ?? 'new']),
+  };
+});
 
 jest.setTimeout(10000);
 
@@ -124,7 +128,7 @@ describe('EntityShareModal', () => {
 
   describe('displays', () => {
     it('loading spinner while loading entity share state', async () => {
-      asMock(useEntityShareState).mockReturnValue(mockEmptyStore as any);
+      asMock(useEntityShareState).mockReturnValue(mockEmptyResult as any);
       render(<SimpleEntityShareModal />);
 
       act(() => {
@@ -135,7 +139,7 @@ describe('EntityShareModal', () => {
     });
 
     it('displays an error if validation failed and disables submit', async () => {
-      asMock(useEntityShareState).mockReturnValue(mockFailedStore as any);
+      asMock(useEntityShareState).mockReturnValue(mockFailedResult as any);
       render(<SimpleEntityShareModal />);
 
       await screen.findByText('Removing the following owners will leave the entity ownerless:');
