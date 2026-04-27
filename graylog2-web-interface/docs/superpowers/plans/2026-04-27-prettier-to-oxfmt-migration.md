@@ -13,6 +13,7 @@
 ### Task 1: Set up oxfmt in `graylog2-web-interface`
 
 **Files:**
+
 - Modify: `graylog2-web-interface/package.json`
 - Create: `graylog2-web-interface/.oxfmtrc.json`
 - Delete: `graylog2-web-interface/.prettierrc.json`
@@ -96,6 +97,7 @@ Note: `git add -u` stages all tracked file modifications inside those directorie
 ### Task 2: Set up oxfmt in `graylog-plugin-enterprise`
 
 **Files:**
+
 - Modify: `enterprise/package.json`
 - Create: `enterprise/.oxfmtrc.json`
 - Delete: `enterprise/.prettierrc.json`
@@ -177,6 +179,7 @@ git commit -m "chore(enterprise): replace prettier with oxfmt"
 ### Task 3: Remove unused `eslint-config-prettier` from `packages/eslint-config-graylog`
 
 **Files:**
+
 - Modify: `graylog2-web-interface/packages/eslint-config-graylog/package.json`
 
 > Background: `eslint-config-prettier` appears in `packages/eslint-config-graylog/package.json` at version `10.1.5` but is never imported in `index.js`. Removing it is a dead-dep cleanup with no functional effect.

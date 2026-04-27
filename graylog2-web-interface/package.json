@@ -24,7 +24,7 @@
     "lint:changes": "./dev/lintChanges.sh",
     "test": "jest --maxWorkers=50%",
     "check-production-build": "node checkProductionBuild.js",
-    "format": "prettier --write src test docs"
+    "format": "oxfmt src test docs"
   },
   "eslintConfig": {
     "extends": "graylog"
@@ -109,7 +109,6 @@
   },
   "devDependencies": {
     "@cyclonedx/webpack-plugin": "^5.1.1",
-    "@graylog/prettier-config": "^1.0.3",
     "@types/chroma-js": "^2.1.3",
     "@types/crossfilter": "0.0.38",
     "@types/express": "^5.0.6",
@@ -156,7 +155,7 @@
     "less": "^4.4.1",
     "less-loader": "^12.3.0",
     "node-fetch": "^2.6.1",
-    "prettier": "^3.6.2",
+    "oxfmt": "^0.47.0",
     "puppeteer": "^24.19.0",
     "react-bootstrap": "0.33.1",
     "react-compiler-runtime": "^1.0.0",

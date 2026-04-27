@@ -9,26 +9,29 @@ Replace prettier with [oxfmt](https://oxc.rs/docs/guide/usage/formatter.html) (t
 
 ## Affected Repositories
 
-| Repo | Path |
-|------|------|
-| graylog2-server | `graylog2-web-interface/` |
-| graylog-plugin-enterprise | `enterprise/` |
+| Repo                      | Path                      |
+| ------------------------- | ------------------------- |
+| graylog2-server           | `graylog2-web-interface/` |
+| graylog-plugin-enterprise | `enterprise/`             |
 
 ## Changes
 
 ### 1. Both repos (identical steps)
 
 **Dependencies:**
+
 - Add `oxfmt` to `devDependencies`
 - Remove `prettier` from devDependencies (enterprise: remove from `dependencies`)
 - Remove `@graylog/prettier-config` from devDependencies (enterprise: from `dependencies`)
 
 **Config:**
+
 - Run `oxfmt --migrate=prettier` to generate `.oxfmtrc.json` from the existing `.prettierrc.json`
 - Verify generated config matches current settings: `singleQuote: true`, `printWidth: 120`, `bracketSameLine: true`, `quoteProps: "preserve"`
 - Delete `.prettierrc.json`
 
 **Scripts (`package.json`):**
+
 - `graylog2-web-interface`: `"format": "oxfmt src test docs"`
 - `enterprise`: `"format": "oxfmt src/web"`
 
