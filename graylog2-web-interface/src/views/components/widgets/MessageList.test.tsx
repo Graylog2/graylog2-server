@@ -20,13 +20,12 @@ import * as Immutable from 'immutable';
 import userEvent from '@testing-library/user-event';
 
 import useSearchResult from 'views/hooks/useSearchResult';
-import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import { TIMESTAMP_FIELD, Messages } from 'views/Constants';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
+import { fetchInputs } from 'hooks/useInputs';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useCurrentSearchTypesResults from 'views/components/widgets/useCurrentSearchTypesResults';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
@@ -52,9 +51,18 @@ const mockEffectiveTimeRange: AbsoluteTimeRange = {
   type: 'absolute',
 };
 
-jest.mock('stores/inputs/InputsStore', () => ({
-  InputsStore: MockStore(),
-  InputsActions: { list: jest.fn(() => Promise.resolve()) },
+jest.mock('hooks/useInputs', () => ({
+  __esModule: true,
+  default: jest.fn(() => ({ data: [] })),
+  fetchInputs: jest.fn(() => Promise.resolve({ inputs: [], total: 0 })),
+  fetchInput: jest.fn(),
+  createInput: jest.fn(),
+  updateInput: jest.fn(),
+  deleteInput: jest.fn(),
+  inputsAsMap: jest.fn(),
+  useInputs: jest.fn(),
+  useCreateInput: jest.fn(),
+  INPUTS_QUERY_KEY: ['inputs', 'list'],
 }));
 
 jest.mock('views/hooks/useAutoRefresh');
@@ -124,7 +132,6 @@ describe('MessageList', () => {
     asMock(useActiveQueryId).mockReturnValue('somequery');
     // @ts-expect-error
     asMock(useCurrentSearchTypesResults).mockReturnValue(searchTypeResults);
-    asMock(InputsStore.getInitialState).mockReturnValue({ inputs: [] });
     asMock(useMessageListPluggableBulkActions).mockReturnValue({
       pluggableBulkActions: null,
       pluggableBulkActionModals: null,
@@ -198,19 +205,10 @@ describe('MessageList', () => {
     expect(screen.queryByText('file_name')).not.toBeInTheDocument();
   });
 
-  // eslint-disable-next-line jest/expect-expect
-  it('renders also when `inputs` is undefined', async () => {
-    asMock(InputsStore.getInitialState).mockReturnValue({ inputs: undefined });
-
+  it('fetches inputs upon mount', () => {
     render(<SimpleMessageList />);
 
-    await findTable();
-  });
-
-  it('refreshs Inputs list upon mount', () => {
-    render(<SimpleMessageList />);
-
-    expect(InputsActions.list).toHaveBeenCalled();
+    expect(fetchInputs).toHaveBeenCalled();
   });
 
   it('reexecute query for search type, when using pagination', async () => {
