@@ -54,7 +54,6 @@ type Props = React.PropsWithChildren<{
   onClick?: () => void;
   title?: string;
   bsSize?: BsSize;
-  variant?: string;
   color?: string;
 }>;
 
@@ -67,7 +66,6 @@ const Badge = (
     onClick = undefined,
     title = undefined,
     bsSize = 'md',
-    variant = 'filled',
     color: customColor = undefined,
   }: Props,
   ref: React.ForwardedRef<HTMLDivElement>,
@@ -83,7 +81,7 @@ const Badge = (
       title={title}
       data-testid={dataTestid}
       ref={ref}
-      variant={variant}
+      variant="filled"
       onClick={onClick}
       size={size}>
       {children}
