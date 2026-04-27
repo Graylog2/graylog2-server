@@ -22,18 +22,26 @@ import type { DefaultTheme } from 'styled-components';
 
 import type { BsSize } from 'components/bootstrap/types';
 import sizeForMantine from 'theme/utils/sizeForMantine';
+import type { SupportedMantineSize } from 'theme/types';
 
 const mapStyle = (style: ColorVariant, theme: DefaultTheme) =>
   style === 'default' ? theme.colors.button.gray.background : theme.colors.variant[style];
 
-const StyledBadge = styled(MantineBadge)<{ color: ColorVariant }>(
-  ({ theme, color }) => css`
+const mapFontSize: Record<SupportedMantineSize, 'tiny' | 'small' | 'body'> = {
+  xs: 'tiny',
+  sm: 'small',
+  md: 'small',
+  lg: 'body',
+};
+
+const StyledBadge = styled(MantineBadge)<{ color: ColorVariant; size: SupportedMantineSize }>(
+  ({ theme, color, size }) => css`
     text-transform: none;
     background-color: ${color};
     color: ${theme.utils.contrastingColor(color)};
 
     .mantine-Badge-label {
-      font-size: ${theme.fonts.size.small};
+      font-size: ${theme.fonts.size[mapFontSize[size]]};
       overflow: visible;
     }
   `,

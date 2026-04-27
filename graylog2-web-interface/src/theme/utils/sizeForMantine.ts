@@ -1,6 +1,7 @@
 import type { BsSize } from 'components/bootstrap/types';
+import type { SupportedMantineSize } from 'theme/types';
 
-const sizeForMantine = (size: BsSize) => {
+const sizeForMantine = (size: BsSize): SupportedMantineSize => {
   switch (size) {
     case 'xs':
     case 'xsmall':
