@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
+import { render, screen } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 
 import { asMock } from 'helpers/mocking';
@@ -25,6 +26,7 @@ import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
 import MessageActions from './MessageActions';
 
 jest.mock('hooks/useSearchConfiguration', () => jest.fn());
+jest.mock('routing/useHistory', () => () => ({ push: jest.fn() }));
 
 describe('MessageActions', () => {
   beforeEach(() => {
@@ -66,5 +68,22 @@ describe('MessageActions', () => {
     const { queryByText } = renderActions({ disableSurroundingSearch: true });
 
     expect(queryByText('Show surrounding messages')).toBeNull();
+  });
+
+  it('renders streams in alphabetical order in the "Test against stream" dropdown', async () => {
+    const streams = Immutable.List([
+      { id: '1', title: 'Zebra Stream', is_default: false },
+      { id: '2', title: 'alpha Stream', is_default: false },
+      { id: '3', title: 'Mango Stream', is_default: false },
+    ]);
+
+    renderActions({ streams });
+    await userEvent.click(screen.getByText('Test against stream'));
+
+    const streamNames = ['alpha Stream', 'Mango Stream', 'Zebra Stream'];
+    const allButtons = screen.getAllByRole('button');
+    const streamButtons = allButtons.filter((el) => streamNames.includes(el.textContent?.trim()));
+
+    expect(streamButtons.map((el) => el.textContent?.trim())).toEqual(streamNames);
   });
 });

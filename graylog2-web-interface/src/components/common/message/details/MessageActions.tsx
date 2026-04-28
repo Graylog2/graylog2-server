@@ -17,9 +17,11 @@
 import * as React from 'react';
 import type * as Immutable from 'immutable';
 
-import { LinkContainer, ClipboardButton, JSONClipboardButton } from 'components/common';
+import { ClipboardButton, JSONClipboardButton } from 'components/common';
+import SelectPopover from 'components/common/SelectPopover';
 import Routes from 'routing/Routes';
-import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
+import useHistory from 'routing/useHistory';
+import { Button, ButtonGroup } from 'components/bootstrap';
 import SurroundingSearchButton from 'components/search/SurroundingSearchButton';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -39,6 +41,7 @@ const TestAgainstStreamButton = ({
   id: string;
 }) => {
   const sendTelemetry = useSendTelemetry();
+  const history = useHistory();
 
   const sendEvent = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_MESSAGE_TABLE_TEST_AGAINST_STREAM, {
@@ -47,26 +50,47 @@ const TestAgainstStreamButton = ({
     });
   };
 
-  const streamList = streams.map((stream) => {
-    if (stream.is_default) {
+  const sortedStreams = streams.sortBy((stream) => stream.title.toLowerCase());
+  const streamTitles = sortedStreams.map((stream) => stream.title).toArray();
+
+  const handleSelect = ([selectedTitle]: string[], hide: () => void) => {
+    const stream = sortedStreams.find((s) => s.title === selectedTitle);
+
+    if (!stream || stream.is_default) {
+      hide();
+
+      return;
+    }
+
+    sendEvent();
+    hide();
+
+    history.push(Routes.stream_edit_example(stream.id, index, id));
+  };
+
+  const itemFormatter = (title: string) => {
+    const stream = sortedStreams.find((s) => s.title === title);
+
+    if (stream?.is_default) {
       return (
-        <MenuItem key={stream.id} onClick={() => sendEvent()} disabled title="Cannot test against the default stream">
-          {stream.title}
-        </MenuItem>
+        <span title="Cannot test against the default stream" style={{ opacity: 0.5, cursor: 'default' }}>
+          {title}
+        </span>
       );
     }
 
-    return (
-      <LinkContainer key={stream.id} to={Routes.stream_edit_example(stream.id, index, id)}>
-        <MenuItem onClick={() => sendEvent()}>{stream.title}</MenuItem>
-      </LinkContainer>
-    );
-  });
+    return title;
+  };
 
   return (
-    <DropdownButton pullRight bsSize="small" title="Test against stream" id="select-stream-dropdown">
-      {streamList && !streamList.isEmpty() ? streamList.toArray() : <MenuItem header>No streams available</MenuItem>}
-    </DropdownButton>
+    <SelectPopover
+      title="Test against stream"
+      triggerNode={<Button bsSize="small" disabled={streams.isEmpty()}>Test against stream <span className="caret" /></Button>}
+      items={streamTitles}
+      itemFormatter={itemFormatter}
+      onItemSelect={handleSelect}
+      filterPlaceholder="Filter streams"
+    />
   );
 };
 
