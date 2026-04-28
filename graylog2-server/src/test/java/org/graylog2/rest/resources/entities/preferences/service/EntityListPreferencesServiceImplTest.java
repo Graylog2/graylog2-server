@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.entities.preferences.service;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.rest.resources.entities.preferences.model.EntityListPreferences;
+import org.graylog2.rest.resources.entities.preferences.model.SlicingPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.SortPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId;
@@ -27,10 +28,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.rest.resources.entities.preferences.model.SortPreferences.SortOrder.ASC;
-import static org.graylog2.rest.resources.entities.preferences.model.SortPreferences.SortOrder.DESC;
+import static org.graylog2.rest.resources.entities.preferences.model.SortOrder.ASC;
+import static org.graylog2.rest.resources.entities.preferences.model.SortOrder.DESC;
 
 @ExtendWith(MongoDBExtension.class)
 public class EntityListPreferencesServiceImplTest {
@@ -61,7 +64,16 @@ public class EntityListPreferencesServiceImplTest {
     public void performsSaveAndGetOperationsCorrectly() {
         final StoredEntityListPreferences existingPreference = StoredEntityListPreferences.builder()
                 .preferencesId(existingId)
-                .preferences(EntityListPreferences.create(List.of("title", "description"), 42, new SortPreferences("title", ASC)))
+                .preferences(
+                        new EntityListPreferences(
+                                Map.of("title", new EntityListPreferences.Attribute(EntityListPreferences.DisplayStatus.show, Optional.of(13))),
+                                List.of(),
+                                42,
+                                new SortPreferences("title", ASC),
+                                new SlicingPreferences("status", "Alphabetical", ASC),
+                                Map.of()
+                        )
+                )
                 .build();
 
         //save
@@ -71,6 +83,7 @@ public class EntityListPreferencesServiceImplTest {
         //check save
         StoredEntityListPreferences storedEntityListPreferences = toTest.get(existingId);
         assertThat(existingPreference).isEqualTo(storedEntityListPreferences);
+        assertThat(storedEntityListPreferences.preferences().slicing()).isNotNull();
 
         //check wrong does not exist
         storedEntityListPreferences = toTest.get(wrongId);
@@ -99,6 +112,7 @@ public class EntityListPreferencesServiceImplTest {
         //check update with save
         storedEntityListPreferences = toTest.get(existingId);
         assertThat(updatedPreference).isEqualTo(storedEntityListPreferences);
+        assertThat(storedEntityListPreferences.preferences().slicing()).isNull();
     }
 
 }
