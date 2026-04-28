@@ -14,24 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import mainAppWebpackConfig from '../../webpack.config.js';
+const path = require('path');
 
-export default async ({ config }) => {
-  // Merge the main app's config with Storybook's config
-  const mergedConfig = {
-    ...config,
-    ...mainAppWebpackConfig,
-    resolve: {
-      ...(config.resolve || {}), // Keep existing Storybook resolve settings)
-      ...(mainAppWebpackConfig.resolve || {}), // Merge in main app resolve settings
-      alias: {
-        ...(config.resolve ? config.resolve.alias : {}), // Existing Storybook aliases
-        ...(mainAppWebpackConfig.resolve && mainAppWebpackConfig.resolve.alias
-          ? mainAppWebpackConfig.resolve.alias
-          : {}), // Main app aliases
-      },
+const webInterfaceRoot = path.resolve(__dirname, '../..');
+
+// This file exists for eslint-config-graylog's webpack import resolver.
+// Storybook uses .storybook/main.ts for its own bundling configuration.
+module.exports = {
+  resolve: {
+    extensions: ['.ts', '.tsx'],
+    modules: [path.resolve(webInterfaceRoot, 'src'), 'node_modules'],
+    alias: {
+      '@graylog/server-api': path.resolve(webInterfaceRoot, 'target/api'),
     },
-  };
-
-  return mergedConfig;
+  },
 };

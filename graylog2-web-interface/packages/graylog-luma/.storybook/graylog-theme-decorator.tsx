@@ -25,7 +25,6 @@ import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 import Notifications from 'routing/Notifications';
 
-// eslint-disable-next-line import/prefer-default-export
 export const withGraylogTheme: Decorator = (Story) => (
   <GraylogThemeProvider userIsLoggedIn={true}>
     <GlobalThemeStyles />
