@@ -203,7 +203,7 @@ class CollectorInstanceServiceTest {
     }
 
     @Test
-    void reEnrollUpdatesCertFleetTokenAndLastSeen() throws Exception {
+    void reEnrollUpdatesCertTokenAndLastSeen() throws Exception {
         final Instant enrollTime = Instant.parse("2025-01-01T00:00:00Z");
         clock.setInstant(enrollTime);
         final var original = enroll("uid-re");
@@ -214,33 +214,32 @@ class CollectorInstanceServiceTest {
         final var newCert = certBuilder.createEndEntityCert("uid-re", issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
         final var newIssued = new IssuedCertificate(newCert.fingerprint(), newCert.certificate(), newCert.notAfter(), issuerCert.id());
 
-        final var updated = collectorInstanceService.reEnroll(original.id(), "507f1f77bcf86cd799439999", newIssued, "new-token-id");
+        final var updated = collectorInstanceService.reEnroll(original.id(), newIssued, "new-token-id");
 
         assertThat(updated.activeCertificateFingerprint()).isEqualTo(newIssued.fingerprint());
         assertThat(updated.activeCertificatePem()).isEqualTo(newIssued.certPem());
         assertThat(updated.activeCertificateExpiresAt()).isEqualTo(newIssued.notAfter());
         assertThat(updated.issuingCaId()).isEqualTo(issuerCert.id());
-        assertThat(updated.fleetId()).isEqualTo("507f1f77bcf86cd799439999");
         assertThat(updated.enrollmentTokenId()).isEqualTo("new-token-id");
         assertThat(updated.lastSeen()).isEqualTo(reEnrollTime);
     }
 
     @Test
-    void reEnrollPreservesIdentityFields() throws Exception {
+    void reEnrollPreservesExistingFields() throws Exception {
         final Instant enrollTime = Instant.parse("2025-01-01T00:00:00Z");
-        clock.setInstant(enrollTime);
-        final var original = enroll("uid-preserve");
+        final var original = enrollWithFleetAndLastSeen("uid-preserve", "507f1f77bcf86cd799439012", enrollTime);
 
         clock.setInstant(enrollTime.plus(Duration.ofDays(30)));
         final var newCert = certBuilder.createEndEntityCert("uid-preserve", issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
         final var newIssued = new IssuedCertificate(newCert.fingerprint(), newCert.certificate(), newCert.notAfter(), issuerCert.id());
 
-        final var updated = collectorInstanceService.reEnroll(original.id(), "507f1f77bcf86cd799439999", newIssued, "new-token-id");
+        final var updated = collectorInstanceService.reEnroll(original.id(), newIssued, "new-token-id");
 
         assertThat(updated.instanceUid()).isEqualTo(original.instanceUid());
         assertThat(updated.enrolledAt()).isEqualTo(enrollTime);
         assertThat(updated.messageSeqNum()).isEqualTo(original.messageSeqNum());
         assertThat(updated.capabilities()).isEqualTo(original.capabilities());
+        assertThat(updated.fleetId()).isEqualTo("507f1f77bcf86cd799439012");
     }
 
     @Test
@@ -252,7 +251,7 @@ class CollectorInstanceServiceTest {
         final var newCert = certBuilder.createEndEntityCert("uid-pending-renewal", issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
         final var newIssued = new IssuedCertificate(newCert.fingerprint(), newCert.certificate(), newCert.notAfter(), issuerCert.id());
 
-        final var updated = collectorInstanceService.reEnroll(original.id(), "507f1f77bcf86cd799439012", newIssued, "token-x");
+        final var updated = collectorInstanceService.reEnroll(original.id(), newIssued, "token-x");
 
         assertThat(updated.nextCertificateFingerprint()).isEmpty();
         assertThat(updated.nextCertificatePem()).isEmpty();
@@ -276,7 +275,7 @@ class CollectorInstanceServiceTest {
         clock.setInstant(reEnrollTime);
         final var newCert = certBuilder.createEndEntityCert("uid-roundtrip", issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
         final var newIssued = new IssuedCertificate(newCert.fingerprint(), newCert.certificate(), newCert.notAfter(), issuerCert.id());
-        collectorInstanceService.reEnroll(enrolled.id(), "507f1f77bcf86cd799439999", newIssued, "token-2");
+        collectorInstanceService.reEnroll(enrolled.id(), newIssued, "token-2");
 
         // Fresh read after re-enroll — exercises the post-update deserialize path.
         final var afterReEnroll = collectorInstanceService.findByInstanceUid("uid-roundtrip").orElseThrow();
@@ -285,7 +284,7 @@ class CollectorInstanceServiceTest {
         assertThat(afterReEnroll.activeCertificateExpiresAt()).isEqualTo(newIssued.notAfter());
         assertThat(afterReEnroll.activeCertificateFingerprint()).isEqualTo(newIssued.fingerprint());
         assertThat(afterReEnroll.activeCertificatePem()).isEqualTo(newIssued.certPem());
-        assertThat(afterReEnroll.fleetId()).isEqualTo("507f1f77bcf86cd799439999");
+        assertThat(afterReEnroll.fleetId()).isEqualTo("000000000000000000000000");
         assertThat(afterReEnroll.enrollmentTokenId()).isEqualTo("token-2");
     }
 
@@ -297,7 +296,7 @@ class CollectorInstanceServiceTest {
         final var newCert = certBuilder.createEndEntityCert(uid, issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
         final var newIssued = new IssuedCertificate(newCert.fingerprint(), newCert.certificate(), newCert.notAfter(), issuerCert.id());
 
-        collectorInstanceService.reEnroll(original.id(), "507f1f77bcf86cd799439012", newIssued, "token-x");
+        collectorInstanceService.reEnroll(original.id(), newIssued, "token-x");
 
         assertFieldIsDate(uid, CollectorInstanceDTO.FIELD_LAST_SEEN);
         assertFieldIsDate(uid, CollectorInstanceDTO.FIELD_ACTIVE_CERTIFICATE_EXPIRES_AT);
@@ -308,7 +307,7 @@ class CollectorInstanceServiceTest {
         final var cert = certBuilder.createEndEntityCert("ghost", issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
         final var issued = new IssuedCertificate(cert.fingerprint(), cert.certificate(), cert.notAfter(), issuerCert.id());
 
-        assertThatThrownBy(() -> collectorInstanceService.reEnroll("507f1f77bcf86cd799439999", "507f1f77bcf86cd799439012", issued, "token"))
+        assertThatThrownBy(() -> collectorInstanceService.reEnroll("507f1f77bcf86cd799439999", issued, "token"))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("doesn't exist");
     }
@@ -653,16 +652,16 @@ class CollectorInstanceServiceTest {
         );
     }
 
-    private void enrollWithFleetAndLastSeen(String instanceUid,
-                                            String fleetId,
-                                            Instant lastSeen) throws Exception {
+    private CollectorInstanceDTO enrollWithFleetAndLastSeen(String instanceUid,
+                                                            String fleetId,
+                                                            Instant lastSeen) throws Exception {
         final var cert = certBuilder.createEndEntityCert(instanceUid, issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
         final var issuedCert = new IssuedCertificate(cert.fingerprint(), cert.certificate(), cert.notAfter(), issuerCert.id());
 
         final Instant prev = clock.instant();
         clock.setInstant(lastSeen);
         try {
-            collectorInstanceService.enroll(
+            return collectorInstanceService.enroll(
                     instanceUid,
                     fleetId,
                     issuedCert,

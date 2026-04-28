@@ -228,8 +228,6 @@ public class CollectorInstanceService {
      * only enforces the identity-by-{@code _id} race guard.
      *
      * @param id                the Mongo {@code _id} of the record to update
-     * @param fleetId           the fleet the new enrollment token belongs to (may change if the
-     *                          token rotated to a different fleet)
      * @param issuedCert        the freshly signed agent certificate
      * @param enrollmentTokenId the id of the enrollment token that authorized this re-enrollment
      * @return the updated DTO (post-update state)
@@ -237,12 +235,10 @@ public class CollectorInstanceService {
      *                               was concurrently deleted or replaced
      */
     public CollectorInstanceDTO reEnroll(String id,
-                                         String fleetId,
                                          IssuedCertificate issuedCert,
                                          String enrollmentTokenId) {
 
         final var updates = combine(
-                set(FIELD_FLEET_ID, fleetId),
                 set(FIELD_LAST_SEEN, Date.from(clock.instant())),
                 unset(FIELD_NEXT_CERTIFICATE_FINGERPRINT),
                 unset(FIELD_NEXT_CERTIFICATE_PEM),

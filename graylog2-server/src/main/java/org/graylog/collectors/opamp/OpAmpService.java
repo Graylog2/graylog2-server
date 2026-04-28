@@ -271,9 +271,13 @@ public class OpAmpService {
 
             // (Re-)enroll
             existingInstance.ifPresentOrElse(instance -> {
-                final var enrolled = collectorInstanceService.reEnroll(instance.id(), auth.token().fleetId(), issuedCert,
-                        auth.token().id());
-                LOG.info("Re-enrolled existing collector {}. Assigned fleet: {}", enrolled.instanceUid(),
+                if (!instance.fleetId().equals(auth.token().fleetId())) {
+                    LOG.warn("Ignoring fleet {} from enrollment token for re-enrollment of existing collector {}. " +
+                                    "Current assignment to fleet {} will be kept.", auth.token().fleetId(),
+                            instance.instanceUid(), instance.fleetId());
+                }
+                final var enrolled = collectorInstanceService.reEnroll(instance.id(), issuedCert, auth.token().id());
+                LOG.info("Re-enrolled existing collector {}. Current fleet: {}", enrolled.instanceUid(),
                         enrolled.fleetId());
                 // Don't count token usage for consecutive enrollments of the same collector
                 if (!Objects.equals(auth.token().id(), instance.enrollmentTokenId())) {
