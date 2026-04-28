@@ -31,6 +31,7 @@ import org.graylog.storage.opensearch3.stats.ClusterStatsApi;
 import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
 import org.graylog.storage.opensearch3.stats.StatsApi;
 import org.graylog2.datatiering.WarmIndexInfo;
+import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.IndexMoveResult;
@@ -53,6 +54,7 @@ import org.joda.time.DateTimeZone;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch._types.ExpandWildcard;
 import org.opensearch.client.opensearch._types.OpenSearchException;
+import org.opensearch.client.opensearch._types.Time;
 import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 import org.opensearch.client.opensearch._types.aggregations.FilterAggregate;
 import org.opensearch.client.opensearch._types.aggregations.MaxAggregate;
@@ -81,6 +83,7 @@ import org.opensearch.client.opensearch.indices.GetIndicesSettingsRequest;
 import org.opensearch.client.opensearch.indices.GetIndicesSettingsResponse;
 import org.opensearch.client.opensearch.indices.GetMappingResponse;
 import org.opensearch.client.opensearch.indices.IndexState;
+import org.opensearch.client.opensearch.indices.IndexVersioning;
 import org.opensearch.client.opensearch.indices.OpenSearchIndicesClient;
 import org.opensearch.client.opensearch.indices.PutIndicesSettingsRequest;
 import org.opensearch.client.opensearch.indices.RefreshRequest;
@@ -197,6 +200,49 @@ public class IndicesAdapterOS implements IndicesAdapter {
     @Override
     public void create(String index, IndexSettings indexSettings, @Nullable Map<String, Object> mapping) {
         executeCreateIndexRequest(index, createIndexRequest(index, indexSettings, mapping));
+    }
+
+    @Override
+    public void move(String source, String target, boolean reEnableReplication) {
+        c.execute(() -> {
+            IndexState sourceState = indicesClient.get(r -> r.index(source).flatSettings(true)).get(source);
+            org.opensearch.client.opensearch.indices.IndexSettings sourceSettings = sourceState.settings();
+            if (sourceSettings == null) {
+                throw new ElasticsearchException("No index sourceSettings found for index " + source);
+            }
+            indicesClient.create(r -> r
+                    .index(target)
+                    .settings(adjustSourceSettings(sourceSettings, 0, Time.of(t -> t.offset(-1))))
+                    .mappings(sourceState.mappings())
+            );
+            reindex(source, target, result -> {
+                if (result.hasFailedItems()) {
+                    throw new ElasticsearchException("Error reindexing index " + source + " to " + target + ". Check your indexer log.");
+                }
+            });
+            delete(source);
+            org.opensearch.client.opensearch.indices.IndexSettings.Builder restoredSettings =
+                    org.opensearch.client.opensearch.indices.IndexSettings.builder();
+            restoredSettings.refreshInterval(sourceSettings.refreshInterval());
+            if (reEnableReplication) {
+                restoredSettings.numberOfReplicas(sourceSettings.numberOfReplicas());
+            }
+            indicesClient.putSettings(r -> r.settings(restoredSettings.build()));
+            return null;
+        }, "Error creating copy index for " + source);
+    }
+
+    private org.opensearch.client.opensearch.indices.IndexSettings adjustSourceSettings(
+            org.opensearch.client.opensearch.indices.IndexSettings sourceSettings,
+            int numberOfReplicas, Time refreshInterval) {
+        return sourceSettings.toBuilder()
+                .uuid(null)
+                .version((IndexVersioning) null)
+                .creationDate(null)
+                .providedName(null)
+                .numberOfReplicas(numberOfReplicas)
+                .refreshInterval(refreshInterval)
+                .build();
     }
 
     private CreateIndexRequest createIndexRequest(String index,

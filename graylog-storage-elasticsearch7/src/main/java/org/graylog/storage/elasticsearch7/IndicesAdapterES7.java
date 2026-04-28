@@ -179,6 +179,11 @@ public class IndicesAdapterES7 implements IndicesAdapter {
         executeCreateIndexRequest(index, createIndexRequest(index, indexSettings, mapping));
     }
 
+    @Override
+    public void move(String source, String target, boolean reEnableReplication) {
+        throw new UnsupportedOperationException("Not supported in Elasticsearch client.");
+    }
+
     private CreateIndexRequest createIndexRequest(String index,
                                                   IndexSettings indexSettings,
                                                   @Nullable Map<String, Object> mapping) {
