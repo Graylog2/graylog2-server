@@ -1,0 +1,5 @@
+type = "f"
+message = "Add validation to OpenTelemetry-gRPC input TLS config."
+
+issues = ["25417", "25419"]
+pulls = ["25764"]
