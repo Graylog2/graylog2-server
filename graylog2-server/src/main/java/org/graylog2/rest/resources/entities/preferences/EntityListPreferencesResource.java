@@ -54,8 +54,6 @@ import org.graylog2.shared.rest.PublicCloudAPI;
 @Path("/entitylists/preferences")
 public class EntityListPreferencesResource {
 
-    public static final String GENERAL_LAYOUT_VARIANT = "#general#";
-
     private final EntityListPreferencesService entityListPreferencesService;
 
     @Inject
@@ -131,6 +129,6 @@ public class EntityListPreferencesResource {
     }
 
     private String obtainLayoutVariant(final String layoutVariant) {
-        return layoutVariant == null || layoutVariant.isBlank() ? GENERAL_LAYOUT_VARIANT : layoutVariant;
+        return layoutVariant == null || layoutVariant.isBlank() ? StoredEntityListPreferencesId.GENERAL_LAYOUT_VARIANT : layoutVariant;
     }
 }

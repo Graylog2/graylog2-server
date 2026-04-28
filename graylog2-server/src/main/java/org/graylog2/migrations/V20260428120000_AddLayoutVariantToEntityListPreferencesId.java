@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-import static org.graylog2.rest.resources.entities.preferences.EntityListPreferencesResource.GENERAL_LAYOUT_VARIANT;
+import static org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId.GENERAL_LAYOUT_VARIANT;
 
 public class V20260428120000_AddLayoutVariantToEntityListPreferencesId extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20260428120000_AddLayoutVariantToEntityListPreferencesId.class);
@@ -72,7 +72,7 @@ public class V20260428120000_AddLayoutVariantToEntityListPreferencesId extends M
                             ))
                     )),
                     Aggregates.merge(COLLECTION_NAME, new MergeOptions()
-                            .whenMatched(MergeOptions.WhenMatched.FAIL)
+                            .whenMatched(MergeOptions.WhenMatched.KEEP_EXISTING)
                             .whenNotMatched(MergeOptions.WhenNotMatched.INSERT))
             )).toCollection();
 

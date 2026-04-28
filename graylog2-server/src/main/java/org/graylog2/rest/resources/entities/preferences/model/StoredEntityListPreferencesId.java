@@ -33,7 +33,9 @@ import javax.annotation.Nullable;
 public abstract class StoredEntityListPreferencesId {
 
     public static final String USER_ID_SUB_FIELD = "user_id";
+    public static final String GENERAL_LAYOUT_VARIANT = "#general#";
 
+    @Nullable
     @JsonProperty(USER_ID_SUB_FIELD)
     public abstract String userId();
 
@@ -54,13 +56,13 @@ public abstract class StoredEntityListPreferencesId {
     public abstract static class Builder {
 
         @JsonProperty(USER_ID_SUB_FIELD)
-        public abstract Builder userId(final String userId);
+        public abstract Builder userId(@Nullable final String userId);
 
         @JsonProperty("entity_list_id")
         public abstract Builder entityListId(final String entityListId);
 
         @JsonProperty("layout_variant")
-        public abstract Builder layoutVariant(@Nullable String layout);
+        public abstract Builder layoutVariant(@Nullable final String layoutVariant);
 
         public abstract StoredEntityListPreferencesId build();
 
