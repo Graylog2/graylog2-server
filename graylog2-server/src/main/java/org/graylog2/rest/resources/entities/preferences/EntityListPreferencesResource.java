@@ -33,6 +33,7 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -53,6 +54,8 @@ import org.graylog2.shared.rest.PublicCloudAPI;
 @Path("/entitylists/preferences")
 public class EntityListPreferencesResource {
 
+    public static final String GENERAL_LAYOUT_VARIANT = "#general#";
+
     private final EntityListPreferencesService entityListPreferencesService;
 
     @Inject
@@ -68,12 +71,14 @@ public class EntityListPreferencesResource {
     @NoAuditEvent("Audit logs are not stored for entity list preferences")
     public Response create(@RequestBody(required = true) EntityListPreferences entityListPreferences,
                            @Parameter(name = "entity_list_id", required = true) @PathParam("entity_list_id") @NotEmpty String entityListId,
+                           @QueryParam("layout_variant") String layoutVariant,
                            @Context UserContext userContext) throws ValidationException {
 
         final String currentUserId = userContext.getUserId();
         final StoredEntityListPreferencesId complexId = StoredEntityListPreferencesId.builder()
                 .userId(currentUserId)
                 .entityListId(entityListId)
+                .layoutVariant(obtainLayoutVariant(layoutVariant))
                 .build();
         final StoredEntityListPreferences storedPreferences = StoredEntityListPreferences.builder()
                 .preferencesId(complexId)
@@ -98,17 +103,34 @@ public class EntityListPreferencesResource {
     })
     @Produces(MediaType.APPLICATION_JSON)
     public EntityListPreferences get(@Parameter(name = "entity_list_id", required = true) @PathParam("entity_list_id") @NotEmpty String entityListId,
+                                     @QueryParam("layout_variant") String layoutVariant,
                                      @Context UserContext userContext) throws NotFoundException {
 
         final String currentUserId = userContext.getUserId();
-        final StoredEntityListPreferencesId complexId = StoredEntityListPreferencesId.builder()
+        final StoredEntityListPreferencesId complexIdOfUsersPreferences = StoredEntityListPreferencesId.builder()
                 .userId(currentUserId)
                 .entityListId(entityListId)
+                .layoutVariant(obtainLayoutVariant(layoutVariant))
                 .build();
-        final StoredEntityListPreferences entityListPreferences = entityListPreferencesService.get(complexId);
-        if (entityListPreferences == null) {
-            return null;
+        final StoredEntityListPreferences usersPreferences = entityListPreferencesService.get(complexIdOfUsersPreferences);
+        if (usersPreferences == null) {
+            final StoredEntityListPreferencesId complexIdOfGlobalPreferences = StoredEntityListPreferencesId.builder()
+                    .userId(null)
+                    .entityListId(entityListId)
+                    .layoutVariant(obtainLayoutVariant(layoutVariant))
+                    .build();
+            final StoredEntityListPreferences globalPreferences = entityListPreferencesService.get(complexIdOfGlobalPreferences);
+            if (globalPreferences == null) {
+                return null;
+            } else {
+                return globalPreferences.preferences();
+            }
+        } else {
+            return usersPreferences.preferences();
         }
-        return entityListPreferences.preferences();
+    }
+
+    private String obtainLayoutVariant(final String layoutVariant) {
+        return layoutVariant == null || layoutVariant.isBlank() ? GENERAL_LAYOUT_VARIANT : layoutVariant;
     }
 }
