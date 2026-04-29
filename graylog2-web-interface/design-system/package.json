@@ -1,0 +1,21 @@
+{
+  "name": "graylog-design-system",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "tsc": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "@storybook/addon-docs": "^10.3.5",
+    "@storybook/addon-webpack5-compiler-swc": "^4.0.3",
+    "@storybook/react-webpack5": "^10.3.5",
+    "storybook": "^10.3.5",
+    "typescript": "^5.9.3"
+  }
+}
