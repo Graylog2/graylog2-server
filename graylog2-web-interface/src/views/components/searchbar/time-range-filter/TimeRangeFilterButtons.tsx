@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import type { FormikErrors } from 'formik';
 import { useFormikContext } from 'formik';
 
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
@@ -30,7 +31,7 @@ type Props = {
   disabled?: boolean;
   hasErrorOnMount?: boolean;
   onPresetSelectOpen: () => void;
-  setCurrentTimeRange: (timeRange: TimeRange | NoTimeRangeOverride) => Promise<void>;
+  setCurrentTimeRange: (timeRange: TimeRange | NoTimeRangeOverride) => Promise<void | FormikErrors<any>>;
   toggleShow: () => void;
   showPresetDropdown?: boolean;
   submitOnPresetChange?: boolean;
