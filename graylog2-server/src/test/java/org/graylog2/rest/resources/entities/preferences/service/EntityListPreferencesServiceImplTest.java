@@ -68,12 +68,15 @@ public class EntityListPreferencesServiceImplTest {
                 .preferencesId(existingId)
                 .preferences(
                         new EntityListPreferences(
+                                "My List",
                                 Map.of("title", new EntityListPreferences.Attribute(EntityListPreferences.DisplayStatus.show, Optional.of(13))),
                                 List.of(),
                                 42,
                                 new SortPreferences("title", ASC),
                                 new SlicingPreferences("status", "Alphabetical", ASC),
-                                Map.of()
+                                Map.of(),
+                                0,
+                                List.of()
                         )
                 )
                 .build();
@@ -170,12 +173,15 @@ public class EntityListPreferencesServiceImplTest {
 
     public static EntityListPreferences createSimplifiedPreferencesForTest(final List<String> attributes, final SortPreferences sort) {
         return new EntityListPreferences(
+                "For test",
                 attributes.stream().collect(Collectors.toMap(Functions.identity(), attribute -> new EntityListPreferences.Attribute(EntityListPreferences.DisplayStatus.show, Optional.empty()))),
                 attributes,
                 42,
                 sort,
                 null,
-                Map.of());
+                Map.of(),
+                13,
+                List.of());
     }
 
 }

@@ -49,6 +49,7 @@ import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPr
 import org.graylog2.rest.resources.entities.preferences.service.EntityListPreferencesService;
 import org.graylog2.shared.rest.PublicCloudAPI;
 
+import java.util.Comparator;
 import java.util.List;
 
 @RequiresAuthentication
@@ -146,9 +147,11 @@ public class EntityListPreferencesResource {
         return entityListPreferencesService
                 .getPredefinedForEntityList(entityListId)
                 .stream()
-                .map(pref -> new PredefinedLayoutVariant(pref.preferencesId().layoutVariant(),
+                .sorted(Comparator.nullsFirst(Comparator.comparing(pref -> pref.preferences().priority())))
+                .map(pref -> new PredefinedLayoutVariant(
+                        pref.preferencesId().layoutVariant(),
                         pref.preferencesId().entityListId(),
-                        "TBD"))
+                        pref.preferences().displayName()))
                 .toList();
 
     }

@@ -24,16 +24,19 @@ import java.util.Map;
 import java.util.Optional;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
-public record EntityListPreferences(@JsonProperty("attributes") Map<String, Attribute> attributes,
+public record EntityListPreferences(@JsonProperty("display_name") String displayName,
+                                    @JsonProperty("attributes") Map<String, Attribute> attributes,
                                     @JsonProperty("order") List<String> order,
                                     @JsonProperty("per_page") Integer perPage,
                                     @JsonProperty("sort") SortPreferences sort,
                                     @JsonProperty("slicing") SlicingPreferences slicing,
-                                    @JsonProperty("custom_preferences") Map<String, Object> customPreferences) {
+                                    @JsonProperty("custom_preferences") Map<String, Object> customPreferences,
+                                    @JsonProperty("priority") Integer priority,
+                                    @JsonProperty("filters") List<String> filters) {
 
     public enum DisplayStatus {
         show,
-        hide;
+        hide
     }
 
     @JsonInclude(JsonInclude.Include.NON_ABSENT)
