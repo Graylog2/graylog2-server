@@ -30,13 +30,9 @@ public record EntityListPreferences(@JsonProperty("display_name") String display
                                     @JsonProperty("per_page") Integer perPage,
                                     @JsonProperty("sort") SortPreferences sort,
                                     @JsonProperty("slicing") SlicingPreferences slicing,
-<<<<<<< HEAD
                                     @JsonProperty("custom_preferences") Map<String, Object> customPreferences,
                                     @JsonProperty("priority") Integer priority,
                                     @JsonProperty("filters") List<String> filters) {
-=======
-                                    @JsonProperty("custom_preferences") Map<String, Object> customPreferences) {
->>>>>>> 6ab58a2e8d (Move create method, used in tests only, to the test class.)
 
     public enum DisplayStatus {
         show,
