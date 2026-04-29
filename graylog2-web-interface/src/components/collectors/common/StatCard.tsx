@@ -21,7 +21,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import { HoverForHelp } from 'components/common';
+import { HoverForHelp, AccessibleCard } from 'components/common';
 export type Variant = 'default' | 'success' | 'warning' | 'danger';
 
 type Props = {
@@ -32,27 +32,15 @@ type Props = {
   onClick?: () => void;
 };
 
-const StyledCard = styled.div<{ $variant: Variant; $clickable: boolean }>(
-  ({ theme, $variant, $clickable }) => css`
+const StyledCard = styled(AccessibleCard)<{ $variant: Variant }>(
+  ({ theme, $variant }) => css`
     position: relative;
     text-align: center;
     min-width: 100px;
     padding: ${theme.spacings.md};
-    background-color: ${theme.colors.cards.background};
-    border: 1px solid ${theme.colors.cards.border};
-    border-radius: 8px;
     font: inherit;
     color: inherit;
     width: auto;
-
-    ${$clickable &&
-    css`
-      cursor: pointer;
-
-      &:hover {
-        outline: 1px solid ${theme.colors.variant.info};
-      }
-    `}
 
     ${$variant !== 'default' &&
     css`
@@ -87,12 +75,7 @@ const Label = styled.div(
 );
 
 const StatCard = ({ value, label, helpText = undefined, variant = 'default', onClick = undefined }: Props) => (
-  <StyledCard
-    as={onClick ? 'button' : 'div'}
-    $variant={variant}
-    $clickable={!!onClick}
-    onClick={onClick}
-    type={onClick ? 'button' : undefined}>
+  <StyledCard $variant={variant} onClick={onClick}>
     {helpText && (
       <HelpCorner>
         <HoverForHelp title={label} triggerTitle="More info" placement="right" pullRight={false}>

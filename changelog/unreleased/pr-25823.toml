@@ -1,0 +1,4 @@
+type = "c"
+message = "Remove unused datanode controllers related to remote-reindex migration"
+
+pulls = ["25823"]
