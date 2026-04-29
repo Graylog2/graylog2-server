@@ -25,7 +25,7 @@ import { DropdownButton, MenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import withParams from 'routing/withParams';
-import { InputsActions } from 'stores/inputs/InputsStore';
+import { fetchInput } from 'hooks/useInputs';
 import { NodesActions, NodesStore } from 'stores/nodes/NodesStore';
 import { useStore } from 'stores/connect';
 import useParams from 'routing/useParams';
@@ -43,7 +43,7 @@ const ExtractorsPage = () => {
   });
   const { data: input } = useQuery({
     queryKey: ['input', params.inputId],
-    queryFn: () => InputsActions.get(params.inputId),
+    queryFn: () => fetchInput(params.inputId),
   });
 
   useEffect(() => {

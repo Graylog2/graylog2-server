@@ -104,7 +104,7 @@
     "react-window-infinite-loader": "^2.0.1",
     "toposort": "^2.0.2",
     "urijs": "^1.19.6",
-    "uuid": "13.0.0",
+    "uuid": "14.0.0",
     "wicg-inert": "^3.1.2"
   },
   "devDependencies": {

@@ -110,7 +110,8 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
                 eventLoopGroup,
                 eventLoopGroupFactory,
                 nettyTransportConfiguration,
-                tlsConfiguration);
+                tlsConfiguration,
+                encryptedValueService);
         this.enableBulkReceiving = configuration.getBoolean(CK_ENABLE_BULK_RECEIVING);
         this.enableCors = configuration.getBoolean(CK_ENABLE_CORS);
         this.maxChunkSize = parseMaxChunkSize(configuration);
