@@ -845,7 +845,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
                             indexSettings -> new OutdatedIndex(
                                     indexSettings.index(),
                                     indexSettings.settings().map(settings -> settings.get("index.version.created_string")).map(Object::toString).orElse(""),
-                                    indexSettings.settings().map(settings -> settings.get("index.store.type")).map(type -> type.equals("remote_snapshot")).orElse(false)
+                                    indexSettings.settings().map(settings -> settings.get("index.store.type")).map(type -> "remote_snapshot".equals(type)).orElse(false)
                             )
                     ).collect(Collectors.toSet());
         }, "Couldn't read settings for indices");

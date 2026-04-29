@@ -17,9 +17,10 @@
 
 package org.graylog2.indexer.indices;
 
+import com.github.zafarkhaja.semver.ParseException;
+import com.github.zafarkhaja.semver.Version;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.apache.commons.lang3.StringUtils;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 
@@ -44,8 +45,8 @@ public class OutdatedIndexService {
         int currentMajorVersion = Optional.ofNullable(cluster.elasticsearchStats().clusterVersion())
                 .map(version -> {
                     try {
-                        return Integer.parseInt(StringUtils.substringBefore(version, "."));
-                    } catch (NumberFormatException e) {
+                        return (int) Version.parse(version).majorVersion();
+                    } catch (ParseException e) {
                         throw new IllegalStateException("Cluster version cannot be determined: " + version);
                     }
                 }).orElseThrow(() -> new IllegalStateException("Cluster version cannot be determined: null"));

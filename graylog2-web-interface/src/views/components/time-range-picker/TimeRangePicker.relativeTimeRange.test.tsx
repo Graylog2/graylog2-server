@@ -20,7 +20,7 @@ import userEvent from '@testing-library/user-event';
 
 import OriginalTimeRangePicker from './TimeRangePicker';
 
-jest.mock('stores/tools/ToolsStore', () => ({}));
+jest.mock('api/tools', () => ({}));
 jest.mock('hooks/useHotkey', () => jest.fn());
 
 describe('TimeRangePicker relative time range', () => {

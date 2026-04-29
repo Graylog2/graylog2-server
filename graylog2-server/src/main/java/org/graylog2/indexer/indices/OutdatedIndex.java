@@ -19,7 +19,7 @@
 package org.graylog2.indexer.indices;
 
 public record OutdatedIndex(String indexName, String version, boolean warmIndex,
-                            boolean managed) implements Comparable<OutdatedIndex> {
+                            boolean managedIndex) implements Comparable<OutdatedIndex> {
     public OutdatedIndex(String indexName, String version, boolean warmIndex) {
         this(indexName, version, warmIndex, false);
     }

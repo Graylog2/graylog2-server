@@ -27,7 +27,7 @@ import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import withParams from 'routing/withParams';
 import type { Input } from 'components/messageloaders/Types';
 import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
-import { InputsActions } from 'stores/inputs/InputsStore';
+import { fetchInput } from 'hooks/useInputs';
 import { NodesActions } from 'stores/nodes/NodesStore';
 import { isLocalNode } from 'views/hooks/useIsLocalNode';
 import ViewsStoreProvider from 'views/stores/ViewsStoreProvider';
@@ -53,7 +53,7 @@ const useInputs = (sourceInputId: string | undefined, gl2SourceNode: string | un
   useEffect(() => {
     const fetchInputs = async () => {
       if (sourceInputId && (await isLocalNode(gl2SourceNode))) {
-        const input = await InputsActions.get(sourceInputId);
+        const input = await fetchInput(sourceInputId);
 
         if (input) {
           const newInputs = Immutable.Map({ [input.id]: input });
