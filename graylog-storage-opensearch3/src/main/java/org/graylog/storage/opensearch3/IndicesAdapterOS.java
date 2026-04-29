@@ -54,7 +54,6 @@ import org.joda.time.DateTimeZone;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch._types.ExpandWildcard;
 import org.opensearch.client.opensearch._types.OpenSearchException;
-import org.opensearch.client.opensearch._types.Time;
 import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 import org.opensearch.client.opensearch._types.aggregations.FilterAggregate;
 import org.opensearch.client.opensearch._types.aggregations.MaxAggregate;
@@ -83,7 +82,6 @@ import org.opensearch.client.opensearch.indices.GetIndicesSettingsRequest;
 import org.opensearch.client.opensearch.indices.GetIndicesSettingsResponse;
 import org.opensearch.client.opensearch.indices.GetMappingResponse;
 import org.opensearch.client.opensearch.indices.IndexState;
-import org.opensearch.client.opensearch.indices.IndexVersioning;
 import org.opensearch.client.opensearch.indices.OpenSearchIndicesClient;
 import org.opensearch.client.opensearch.indices.PutIndicesSettingsRequest;
 import org.opensearch.client.opensearch.indices.RefreshRequest;
@@ -203,46 +201,40 @@ public class IndicesAdapterOS implements IndicesAdapter {
     }
 
     @Override
-    public void move(String source, String target, boolean reEnableReplication) {
-        c.execute(() -> {
-            IndexState sourceState = indicesClient.get(r -> r.index(source).flatSettings(true)).get(source);
-            org.opensearch.client.opensearch.indices.IndexSettings sourceSettings = sourceState.settings();
+    public Map<String, Object> move(String source, String target, Map<String, Object> restoreSettings) {
+        return c.execute(() -> {
+            Map<String, Object> sourceSettings = getFlatIndexSettings(source);
+            Map<String, Object> sourceMapping = getIndexMapping(source);
             if (sourceSettings == null) {
                 throw new ElasticsearchException("No index sourceSettings found for index " + source);
             }
-            indicesClient.create(r -> r
-                    .index(target)
-                    .settings(adjustSourceSettings(sourceSettings, 0, Time.of(t -> t.offset(-1))))
-                    .mappings(sourceState.mappings())
-            );
+            Map<String, Object> cleanSettings = (restoreSettings == null) ? new HashMap<>() :
+                    restoreSettings.entrySet().stream()
+                            .filter(e -> {
+                                String key = e.getKey();
+                                return !key.startsWith("index.uuid") &&
+                                        !key.startsWith("index.version") &&
+                                        !key.startsWith("index.creation_date") &&
+                                        !key.startsWith("index.provided_name");
+                            })
+                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            cleanSettings.put("index.number_of_replicas", 0);
+            IndexSettings indexSettings = new IndexSettings(cleanSettings);
+            create(target, indexSettings, sourceMapping);
             reindex(source, target, result -> {
                 if (result.hasFailedItems()) {
                     throw new ElasticsearchException("Error reindexing index " + source + " to " + target + ". Check your indexer log.");
                 }
             });
             delete(source);
-            org.opensearch.client.opensearch.indices.IndexSettings.Builder restoredSettings =
-                    org.opensearch.client.opensearch.indices.IndexSettings.builder();
-            restoredSettings.refreshInterval(sourceSettings.refreshInterval());
-            if (reEnableReplication) {
-                restoredSettings.numberOfReplicas(sourceSettings.numberOfReplicas());
+            if (restoreSettings != null) {
+                Integer restoreReplicas = (Integer) restoreSettings.get("index.number_of_replicas");
+                if (restoreReplicas != null && restoreReplicas != 0) {
+                    indicesClient.putSettings(r -> r.index(target).settings(s -> s.numberOfReplicas(restoreReplicas)));
+                }
             }
-            indicesClient.putSettings(r -> r.settings(restoredSettings.build()));
-            return null;
+            return sourceSettings;
         }, "Error creating copy index for " + source);
-    }
-
-    private org.opensearch.client.opensearch.indices.IndexSettings adjustSourceSettings(
-            org.opensearch.client.opensearch.indices.IndexSettings sourceSettings,
-            int numberOfReplicas, Time refreshInterval) {
-        return sourceSettings.toBuilder()
-                .uuid(null)
-                .version((IndexVersioning) null)
-                .creationDate(null)
-                .providedName(null)
-                .numberOfReplicas(numberOfReplicas)
-                .refreshInterval(refreshInterval)
-                .build();
     }
 
     private CreateIndexRequest createIndexRequest(String index,

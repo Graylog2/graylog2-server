@@ -180,7 +180,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     }
 
     @Override
-    public void move(String source, String target, boolean reEnableReplication) {
+    public Map<String, Object> move(String source, String target, Map<String, Object> restoreSettings) {
         throw new UnsupportedOperationException("Not supported in deprecated client.");
     }
 

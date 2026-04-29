@@ -52,9 +52,10 @@ public interface IndicesAdapter {
      *
      * @param source              source index
      * @param target              target index
-     * @param reEnableReplication set to true to enable original replication settings
+     * @param restoreSettings set to true to enable original replication settings
      */
-    void move(String source, String target, boolean reEnableReplication);
+    Map<String, Object> move(String source, String target, Map<String, Object> restoreSettings);
+
 
     /**
      * Add fields to an existing index or to change search only settings of existing fields
