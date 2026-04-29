@@ -68,6 +68,7 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
     public static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_OWNER = "owner";
     public static final String FIELD_SKIP_NO_STREAMS_CHECK = "skip_no_streams_check";
+    public static final String FIELD_VIEW_ID = "view_id";
 
     // generated during build to help quickly find a parameter by name.
     private ImmutableMap<String, Parameter> parameterIndex;
@@ -99,6 +100,14 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
 
     @JsonProperty(FIELD_SKIP_NO_STREAMS_CHECK)
     public abstract boolean skipNoStreamsCheck();
+
+    @Nullable
+    @JsonProperty(FIELD_VIEW_ID)
+    public abstract Optional<String> viewId();
+
+    public Search withViewId(@Nonnull String viewId) {
+        return toBuilder().viewId(Optional.of(viewId)).build();
+    }
 
     @Override
     @JsonIgnore
@@ -295,6 +304,9 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
         @JsonProperty(FIELD_SKIP_NO_STREAMS_CHECK)
         public abstract Builder skipNoStreamsCheck(boolean skipNoStreamsCheck);
 
+        @JsonProperty(FIELD_VIEW_ID)
+        public abstract Builder viewId(Optional<String> viewId);
+
         abstract Search autoBuild();
 
         @JsonCreator
@@ -303,7 +315,8 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
                     .requires(Collections.emptyMap())
                     .createdAt(DateTime.now(DateTimeZone.UTC))
                     .parameters(ImmutableSet.of())
-                    .skipNoStreamsCheck(false);
+                    .skipNoStreamsCheck(false)
+                    .viewId(Optional.empty());
         }
 
         public Search build() {
