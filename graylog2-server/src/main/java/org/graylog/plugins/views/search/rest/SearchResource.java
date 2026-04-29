@@ -51,6 +51,8 @@ import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.SearchExecutor;
 import org.graylog.plugins.views.search.events.SearchJobExecutionEvent;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.searches.SearchesClusterConfig;
@@ -65,6 +67,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @PublicCloudAPI
@@ -83,20 +86,22 @@ public class SearchResource extends RestResource implements PluginRestResource {
     private final SearchExecutor searchExecutor;
     private final SearchJobService searchJobService;
     private final EventBus serverEventBus;
-
     private final ClusterConfigService clusterConfigService;
+    private final ViewService viewService;
 
     @Inject
     public SearchResource(final SearchDomain searchDomain,
                           final SearchExecutor searchExecutor,
                           final SearchJobService searchJobService,
                           final EventBus serverEventBus,
-                          final ClusterConfigService clusterConfigService) {
+                          final ClusterConfigService clusterConfigService,
+                          final ViewService viewService) {
         this.searchDomain = searchDomain;
         this.searchExecutor = searchExecutor;
         this.searchJobService = searchJobService;
         this.serverEventBus = serverEventBus;
         this.clusterConfigService = clusterConfigService;
+        this.viewService = viewService;
     }
 
     @POST
@@ -178,6 +183,14 @@ public class SearchResource extends RestResource implements PluginRestResource {
                 ExecutionState.empty().withDefaultQueryCancellationIfNotSpecified(searchesClusterConfig) : executionState.withDefaultQueryCancellationIfNotSpecified(searchesClusterConfig);
 
         final SearchJob searchJob = searchExecutor.executeAsync(id, searchUser, enrichedExecutionState);
+
+        final Search jobSearch = searchJob.getSearch();
+        Optional<ViewDTO> associatedView = jobSearch.viewId()
+                .flatMap(viewId -> viewService.get(viewId));
+        if (associatedView.isEmpty()) {
+            associatedView = viewService.forSearch(id).stream().findFirst();
+        }
+        associatedView.map(ViewDTO::lastUpdatedAt).ifPresent(searchJob::setViewLastUpdatedAt);
 
         postAuditEvent(searchJob);
 

@@ -16,8 +16,9 @@
  */
 import UserNotification from 'util/UserNotification';
 import type View from 'views/logic/views/View';
+import type { ViewJson } from 'views/logic/views/View';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
-import { setIsNew, setIsDirty } from 'views/logic/slices/viewSlice';
+import { setIsNew, setIsDirty, setView } from 'views/logic/slices/viewSlice';
 import type FetchError from 'logic/errors/FetchError';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import { updateView } from 'views/api/views';
@@ -29,7 +30,11 @@ const _extractErrorMessage = (error: FetchError) =>
 
 export default (view: View, entityShare?: EntitySharePayload) => async (dispatch: ViewsDispatch) => {
   try {
-    await updateView(view, entityShare);
+    const savedViewJson = (await updateView(view, entityShare)) as unknown as ViewJson;
+    const lastUpdatedAt = savedViewJson?.last_updated_at ? new Date(savedViewJson.last_updated_at) : undefined;
+    if (lastUpdatedAt) {
+      dispatch(setView(view.toBuilder().lastUpdatedAt(lastUpdatedAt).build()));
+    }
     dispatch(setIsNew(false));
     dispatch(setIsDirty(false));
     UserNotification.success(`Saving view "${view.title}" was successful!`, 'Success!');

@@ -28,6 +28,8 @@ import one.util.streamex.EntryStream;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.rest.ExecutionInfo;
 
+import org.joda.time.DateTime;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -57,6 +59,13 @@ public class SearchJob implements ParameterProvider {
     private Set<SearchError> errors = Sets.newHashSet();
 
     private final Integer cancelAfterSeconds;
+
+    @JsonProperty("view_last_updated_at")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private DateTime viewLastUpdatedAt;
+
+    public DateTime getViewLastUpdatedAt() { return viewLastUpdatedAt; }
+    public void setViewLastUpdatedAt(DateTime v) { this.viewLastUpdatedAt = v; }
 
     public SearchJob(String id,
                      Search search,
