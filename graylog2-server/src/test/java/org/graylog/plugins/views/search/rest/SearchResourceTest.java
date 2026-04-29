@@ -29,6 +29,7 @@ import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.SearchExecutor;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog2.plugin.database.users.User;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -74,7 +75,12 @@ public class SearchResourceTest {
 
 
     private SearchResource makeResource(SearchDomain searchDomain) {
-        return new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus, clusterConfigService, viewService);
+        return new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus, clusterConfigService, viewService) {
+            @Override
+            protected User getCurrentUser() {
+                return mock(User.class);
+            }
+        };
     }
 
     @Test
@@ -133,14 +139,12 @@ public class SearchResourceTest {
         final DateTime updatedAt = DateTime.now(DateTimeZone.UTC);
         final Search search = Search.builder().id("search-id").viewId(Optional.of(viewId)).build();
         final SearchJob job = new SearchJob("job-id", search, "owner", "node-1");
-        final SearchDomain searchDomain = mockSearchDomain(Optional.of(search));
         when(searchExecutor.executeAsync(eq("search-id"), any(), any())).thenReturn(job);
         final ViewDTO view = mock(ViewDTO.class);
         when(view.lastUpdatedAt()).thenReturn(updatedAt);
         when(viewService.get(viewId)).thenReturn(Optional.of(view));
-        when(viewService.forSearch(any())).thenReturn(List.of());
 
-        final Response response = makeResource(searchDomain).executeQuery("search-id", null, searchUser);
+        final Response response = makeResource(mock(SearchDomain.class)).executeQuery("search-id", null, searchUser);
         final SearchJob returned = (SearchJob) response.getEntity();
 
         assertThat(returned.getViewLastUpdatedAt()).isEqualTo(updatedAt);
@@ -151,14 +155,12 @@ public class SearchResourceTest {
         final DateTime updatedAt = DateTime.now(DateTimeZone.UTC);
         final Search search = Search.builder().id("search-id").build();
         final SearchJob job = new SearchJob("job-id", search, "owner", "node-1");
-        final SearchDomain searchDomain = mockSearchDomain(Optional.of(search));
         when(searchExecutor.executeAsync(eq("search-id"), any(), any())).thenReturn(job);
         final ViewDTO view = mock(ViewDTO.class);
         when(view.lastUpdatedAt()).thenReturn(updatedAt);
-        when(viewService.get(any())).thenReturn(Optional.empty());
         when(viewService.forSearch("search-id")).thenReturn(List.of(view));
 
-        final Response response = makeResource(searchDomain).executeQuery("search-id", null, searchUser);
+        final Response response = makeResource(mock(SearchDomain.class)).executeQuery("search-id", null, searchUser);
 
         assertThat(((SearchJob) response.getEntity()).getViewLastUpdatedAt()).isEqualTo(updatedAt);
     }
@@ -167,12 +169,10 @@ public class SearchResourceTest {
     public void executeQueryLeavesViewLastUpdatedAtNullWhenNoViewFound() {
         final Search search = Search.builder().id("search-id").build();
         final SearchJob job = new SearchJob("job-id", search, "owner", "node-1");
-        final SearchDomain searchDomain = mockSearchDomain(Optional.of(search));
         when(searchExecutor.executeAsync(eq("search-id"), any(), any())).thenReturn(job);
-        when(viewService.get(any())).thenReturn(Optional.empty());
         when(viewService.forSearch(any())).thenReturn(List.of());
 
-        final Response response = makeResource(searchDomain).executeQuery("search-id", null, searchUser);
+        final Response response = makeResource(mock(SearchDomain.class)).executeQuery("search-id", null, searchUser);
 
         assertThat(((SearchJob) response.getEntity()).getViewLastUpdatedAt()).isNull();
     }
