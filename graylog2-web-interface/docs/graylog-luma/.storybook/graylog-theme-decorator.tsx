@@ -20,15 +20,26 @@ import '@mantine/core/styles.css';
 import '@mantine/dropzone/styles.css';
 import '@mantine/notifications/styles.css';
 import type { Decorator } from '@storybook/react';
+import { useDarkMode } from 'storybook-dark-mode';
 
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 import Notifications from 'routing/Notifications';
 
+const GraylogThemeDecorator = ({ children }: { children: React.ReactNode }) => {
+  const colorScheme = useDarkMode() ? 'dark' : 'light';
+
+  return (
+    <GraylogThemeProvider initialThemeModeOverride={colorScheme} key={colorScheme} userIsLoggedIn={true}>
+      <GlobalThemeStyles />
+      <Notifications />
+      {children}
+    </GraylogThemeProvider>
+  );
+};
+
 export const withGraylogTheme: Decorator = (Story) => (
-  <GraylogThemeProvider userIsLoggedIn={true}>
-    <GlobalThemeStyles />
-    <Notifications />
+  <GraylogThemeDecorator>
     <Story />
-  </GraylogThemeProvider>
+  </GraylogThemeDecorator>
 );
