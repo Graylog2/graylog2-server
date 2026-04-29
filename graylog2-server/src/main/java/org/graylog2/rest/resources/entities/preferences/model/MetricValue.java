@@ -18,10 +18,7 @@ package org.graylog2.rest.resources.entities.preferences.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.List;
-
-public record PredefinedLayoutVariant(@JsonProperty("layout_variant") String layoutVariant,
-                                      @JsonProperty("entity_list_id") String entityListId,
-                                      @JsonProperty("display_name") String displayName,
-                                      @JsonProperty("metrics") List<MetricValue> metrics) {
+public record MetricValue(@JsonProperty("value") Integer value,
+                          @JsonProperty("meaning") String additionalMeaning,
+                          @JsonProperty("metric_name") String metricName) {
 }

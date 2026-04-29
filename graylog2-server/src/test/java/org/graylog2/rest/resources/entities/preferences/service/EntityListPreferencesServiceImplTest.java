@@ -76,7 +76,9 @@ public class EntityListPreferencesServiceImplTest {
                                 new SlicingPreferences("status", "Alphabetical", ASC),
                                 Map.of(),
                                 0,
+                                List.of(),
                                 List.of()
+
                         )
                 )
                 .build();
@@ -171,7 +173,7 @@ public class EntityListPreferencesServiceImplTest {
         assertThat(predefined).isNotNull().containsExactlyInAnyOrder(predefinedLayout1, predefinedLayout2);
     }
 
-    public static EntityListPreferences createSimplifiedPreferencesForTest(final List<String> attributes, final SortPreferences sort) {
+    private static EntityListPreferences createSimplifiedPreferencesForTest(final List<String> attributes, final SortPreferences sort) {
         return new EntityListPreferences(
                 "For test",
                 attributes.stream().collect(Collectors.toMap(Functions.identity(), attribute -> new EntityListPreferences.Attribute(EntityListPreferences.DisplayStatus.show, Optional.empty()))),
@@ -181,6 +183,7 @@ public class EntityListPreferencesServiceImplTest {
                 null,
                 Map.of(),
                 13,
+                List.of(),
                 List.of());
     }
 
