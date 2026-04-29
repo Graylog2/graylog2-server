@@ -31,7 +31,7 @@ type Props = {
   disabled?: boolean;
   hasErrorOnMount?: boolean;
   onPresetSelectOpen: () => void;
-  setCurrentTimeRange: (timeRange: TimeRange | NoTimeRangeOverride) => Promise<void | FormikErrors<any>>;
+  setCurrentTimeRange: (timeRange: TimeRange | NoTimeRangeOverride) => void | Promise<void | FormikErrors<any>>;
   toggleShow: () => void;
   showPresetDropdown?: boolean;
   submitOnPresetChange?: boolean;
@@ -65,13 +65,12 @@ const TimeRangeFilterButtons = ({
     toggleShow();
   };
 
-  const selectRelativeTimeRangePreset = (timerange: TimeRange | {}) => {
-    setCurrentTimeRange(normalizeIfAllMessagesRange(timerange)).then(() => {
+  const selectRelativeTimeRangePreset = (timerange: TimeRange | {}) =>
+    Promise.resolve(setCurrentTimeRange(normalizeIfAllMessagesRange(timerange))).then(() => {
       if (submitOnPresetChange) {
         submitForm();
       }
     });
-  };
 
   const _onPresetSelectToggle = (open: boolean) => {
     if (open) {

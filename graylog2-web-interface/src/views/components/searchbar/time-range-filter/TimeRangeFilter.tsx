@@ -53,7 +53,7 @@ type Props = {
   hasErrorOnMount?: boolean;
   limitDuration: number;
   noOverride?: boolean;
-  onChange: (timeRange: TimeRange | NoTimeRangeOverride) => Promise<void | FormikErrors<any>>;
+  onChange: (timeRange: TimeRange | NoTimeRangeOverride) => void | Promise<void | FormikErrors<any>>;
   position?: 'bottom' | 'bottom-start' | 'right';
   showPresetDropdown?: boolean;
   validTypes?: Array<SupportedTimeRangeType>;
