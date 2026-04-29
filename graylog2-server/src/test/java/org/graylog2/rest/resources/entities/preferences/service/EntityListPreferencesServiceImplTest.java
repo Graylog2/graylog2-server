@@ -171,17 +171,26 @@ public class EntityListPreferencesServiceImplTest {
         assertThat(predefined).isNotNull().containsExactlyInAnyOrder(predefinedLayout1, predefinedLayout2);
     }
 
+<<<<<<< HEAD
     private static EntityListPreferences createSimplifiedPreferencesForTest(final List<String> attributes, final SortPreferences sort) {
         return new EntityListPreferences(
                 "For test",
+=======
+    public static EntityListPreferences createSimplifiedPreferencesForTest(final List<String> attributes, final SortPreferences sort) {
+        return new EntityListPreferences(
+>>>>>>> 6ab58a2e8d (Move create method, used in tests only, to the test class.)
                 attributes.stream().collect(Collectors.toMap(Functions.identity(), attribute -> new EntityListPreferences.Attribute(EntityListPreferences.DisplayStatus.show, Optional.empty()))),
                 attributes,
                 42,
                 sort,
                 null,
+<<<<<<< HEAD
                 Map.of(),
                 13,
                 List.of());
+=======
+                Map.of());
+>>>>>>> 6ab58a2e8d (Move create method, used in tests only, to the test class.)
     }
 
 }
