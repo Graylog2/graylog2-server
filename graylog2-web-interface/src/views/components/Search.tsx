@@ -213,9 +213,7 @@ const Search = ({ forceSideBarPinned = false }: Props) => {
                                     <IfInteractive>
                                       <HeaderElements />
                                       {InfoBar && <InfoBar />}
-                                      <IfDashboard>
-                                        <ViewUpdateBanner />
-                                      </IfDashboard>
+                                      <ViewUpdateBanner />
                                       <IfDashboard>
                                         {!editingWidget && <DashboardSearchBar scrollContainer={scrollContainer} />}
                                       </IfDashboard>
