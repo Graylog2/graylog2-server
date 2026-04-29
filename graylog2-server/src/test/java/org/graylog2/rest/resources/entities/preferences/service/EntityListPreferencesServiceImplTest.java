@@ -115,4 +115,55 @@ public class EntityListPreferencesServiceImplTest {
         assertThat(storedEntityListPreferences.preferences().slicing()).isNull();
     }
 
+    @Test
+    public void fetchesPredefinedLayouts() {
+        final StoredEntityListPreferences usersPreference = StoredEntityListPreferences.builder()
+                .preferencesId(StoredEntityListPreferencesId.builder()
+                        .entityListId("list")
+                        .userId("user")
+                        .build())
+                .preferences(EntityListPreferences.create(List.of("title"), 42, new SortPreferences("title", ASC)))
+                .build();
+
+        boolean saved = toTest.save(usersPreference);
+        assertThat(saved).isTrue();
+
+        final StoredEntityListPreferences predefinedLayout1 = StoredEntityListPreferences.builder()
+                .preferencesId(StoredEntityListPreferencesId.builder()
+                        .entityListId("list")
+                        .layoutVariant("layout_1")
+                        .build())
+                .preferences(EntityListPreferences.create(List.of("title"), 42, new SortPreferences("title", ASC)))
+                .build();
+
+        saved = toTest.save(predefinedLayout1);
+        assertThat(saved).isTrue();
+
+        final StoredEntityListPreferences predefinedLayout2 = StoredEntityListPreferences.builder()
+                .preferencesId(StoredEntityListPreferencesId.builder()
+                        .entityListId("list")
+                        .layoutVariant("layout_2")
+                        .build())
+                .preferences(EntityListPreferences.create(List.of("title"), 42, new SortPreferences("title", ASC)))
+                .build();
+
+        saved = toTest.save(predefinedLayout2);
+        assertThat(saved).isTrue();
+
+        final StoredEntityListPreferences predefinedLayoutForDifferentEntityList = StoredEntityListPreferences.builder()
+                .preferencesId(StoredEntityListPreferencesId.builder()
+                        .entityListId("different_list")
+                        .layoutVariant("layout_2")
+                        .build())
+                .preferences(EntityListPreferences.create(List.of("title"), 42, new SortPreferences("title", ASC)))
+                .build();
+
+        saved = toTest.save(predefinedLayoutForDifferentEntityList);
+        assertThat(saved).isTrue();
+
+        final List<StoredEntityListPreferences> predefined = toTest.getPredefinedForEntityList("list");
+
+        assertThat(predefined).isNotNull().containsExactlyInAnyOrder(predefinedLayout1, predefinedLayout2);
+    }
+
 }
