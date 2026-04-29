@@ -25,6 +25,3 @@ docs/styleguide
 /web-modules.json
 
 .cache
-
-*storybook.log
-storybook-static
