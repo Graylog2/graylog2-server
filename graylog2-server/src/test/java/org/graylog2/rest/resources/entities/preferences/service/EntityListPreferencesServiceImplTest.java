@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.resources.entities.preferences.service;
 
+import com.google.common.base.Functions;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.rest.resources.entities.preferences.model.EntityListPreferences;
@@ -30,6 +31,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.rest.resources.entities.preferences.model.SortOrder.ASC;
@@ -92,7 +94,7 @@ public class EntityListPreferencesServiceImplTest {
         //update with save
         StoredEntityListPreferences updatedPreference = StoredEntityListPreferences.builder()
                 .preferencesId(existingId)
-                .preferences(EntityListPreferences.create(List.of("title", "description", "owner"), 13, new SortPreferences("title", DESC)))
+                .preferences(createSimplifiedPreferencesForTest(List.of("title", "description", "owner"), new SortPreferences("title", DESC)))
                 .build();
         saved = toTest.save(updatedPreference);
         assertThat(saved).isTrue();
@@ -104,7 +106,7 @@ public class EntityListPreferencesServiceImplTest {
         //update with some values cleaned
         updatedPreference = StoredEntityListPreferences.builder()
                 .preferencesId(existingId)
-                .preferences(EntityListPreferences.create(List.of("title", "description", "owner"), null, null))
+                .preferences(createSimplifiedPreferencesForTest(List.of("title", "description", "owner"), null))
                 .build();
         saved = toTest.save(updatedPreference);
         assertThat(saved).isTrue();
@@ -122,7 +124,7 @@ public class EntityListPreferencesServiceImplTest {
                         .entityListId("list")
                         .userId("user")
                         .build())
-                .preferences(EntityListPreferences.create(List.of("title"), 42, new SortPreferences("title", ASC)))
+                .preferences(createSimplifiedPreferencesForTest(List.of("title"), new SortPreferences("title", ASC)))
                 .build();
 
         boolean saved = toTest.save(usersPreference);
@@ -133,7 +135,7 @@ public class EntityListPreferencesServiceImplTest {
                         .entityListId("list")
                         .layoutVariant("layout_1")
                         .build())
-                .preferences(EntityListPreferences.create(List.of("title"), 42, new SortPreferences("title", ASC)))
+                .preferences(createSimplifiedPreferencesForTest(List.of("title"), new SortPreferences("title", ASC)))
                 .build();
 
         saved = toTest.save(predefinedLayout1);
@@ -144,7 +146,7 @@ public class EntityListPreferencesServiceImplTest {
                         .entityListId("list")
                         .layoutVariant("layout_2")
                         .build())
-                .preferences(EntityListPreferences.create(List.of("title"), 42, new SortPreferences("title", ASC)))
+                .preferences(createSimplifiedPreferencesForTest(List.of("title"), new SortPreferences("title", ASC)))
                 .build();
 
         saved = toTest.save(predefinedLayout2);
@@ -155,7 +157,7 @@ public class EntityListPreferencesServiceImplTest {
                         .entityListId("different_list")
                         .layoutVariant("layout_2")
                         .build())
-                .preferences(EntityListPreferences.create(List.of("title"), 42, new SortPreferences("title", ASC)))
+                .preferences(createSimplifiedPreferencesForTest(List.of("title"), new SortPreferences("title", ASC)))
                 .build();
 
         saved = toTest.save(predefinedLayoutForDifferentEntityList);
@@ -164,6 +166,16 @@ public class EntityListPreferencesServiceImplTest {
         final List<StoredEntityListPreferences> predefined = toTest.getPredefinedForEntityList("list");
 
         assertThat(predefined).isNotNull().containsExactlyInAnyOrder(predefinedLayout1, predefinedLayout2);
+    }
+
+    public static EntityListPreferences createSimplifiedPreferencesForTest(final List<String> attributes, final SortPreferences sort) {
+        return new EntityListPreferences(
+                attributes.stream().collect(Collectors.toMap(Functions.identity(), attribute -> new EntityListPreferences.Attribute(EntityListPreferences.DisplayStatus.show, Optional.empty()))),
+                attributes,
+                42,
+                sort,
+                null,
+                Map.of());
     }
 
 }
