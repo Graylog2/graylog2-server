@@ -30,7 +30,7 @@ import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.notifications.Notification;
-import org.graylog2.notifications.NotificationImpl;
+import org.graylog2.notifications.NotificationBuilder;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
@@ -252,7 +252,7 @@ public class MongoIndexSetTest {
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
         when(indices.create("graylog_0", mongoIndexSet.basicIndexSetConfig())).thenReturn(false);
 
-        Notification notification = new NotificationImpl();
+        Notification notification = new NotificationBuilder();
         when(notificationService.build()).thenReturn(notification);
 
         String errorMessage = "Could not create new target index <graylog_0>.";

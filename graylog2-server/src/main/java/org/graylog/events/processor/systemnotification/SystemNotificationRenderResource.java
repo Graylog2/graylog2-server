@@ -55,6 +55,7 @@ public class SystemNotificationRenderResource extends RestResource {
         this.systemNotificationRenderService = systemNotificationRenderService;
     }
 
+    @Deprecated
     @POST
     @NoAuditEvent("Doesn't change any data, only renders a notification message")
     @Path("/html/{type}")
@@ -68,6 +69,7 @@ public class SystemNotificationRenderResource extends RestResource {
         return render(type, null, SystemNotificationRenderService.Format.HTML, request);
     }
 
+    @Deprecated
     @POST
     @NoAuditEvent("Doesn't change any data, only renders a notification message")
     @Path("/html/{type}/{key}")
@@ -80,6 +82,7 @@ public class SystemNotificationRenderResource extends RestResource {
         return render(type, key, SystemNotificationRenderService.Format.HTML, request);
     }
 
+    @Deprecated
     @POST
     @NoAuditEvent("Doesn't change any data, only renders a notification message")
     @Path("/plaintext/{type}")
@@ -92,6 +95,7 @@ public class SystemNotificationRenderResource extends RestResource {
         return render(type, null, SystemNotificationRenderService.Format.PLAINTEXT, request);
     }
 
+    @Deprecated
     @POST
     @NoAuditEvent("Doesn't change any data, only renders a notification message")
     @Path("/plaintext/{type}/{key}")

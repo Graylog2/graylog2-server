@@ -51,7 +51,7 @@ import org.graylog2.inputs.persistence.MongoInputStateService;
 import org.graylog2.inputs.persistence.MongoInputStatusService;
 import org.graylog2.notifications.DeletedStreamNotificationListener;
 import org.graylog2.notifications.NotificationService;
-import org.graylog2.notifications.NotificationServiceImpl;
+import org.graylog2.notifications.NotificationServiceAdapter;
 import org.graylog2.rest.resources.entities.preferences.service.EntityListPreferencesService;
 import org.graylog2.rest.resources.entities.preferences.service.EntityListPreferencesServiceImpl;
 import org.graylog2.rest.resources.system.contentpacks.titles.EntityTitleService;
@@ -75,7 +75,7 @@ public class PersistenceServicesBindings extends AbstractModule {
     @Override
     protected void configure() {
         bind(SystemMessageService.class).to(SystemMessageServiceImpl.class).asEagerSingleton();
-        bind(NotificationService.class).to(NotificationServiceImpl.class).asEagerSingleton();
+        bind(NotificationService.class).to(NotificationServiceAdapter.class).asEagerSingleton();
         bind(DeletedStreamNotificationListener.class).asEagerSingleton();
         bind(IndexFailureService.class).to(IndexFailureServiceImpl.class).asEagerSingleton();
         bind(org.graylog2.cluster.NodeService.class).to(NodeServiceImpl.class);

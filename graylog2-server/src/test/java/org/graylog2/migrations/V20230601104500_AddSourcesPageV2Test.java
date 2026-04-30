@@ -36,7 +36,7 @@ import org.graylog2.contentpacks.model.ContentPackUninstallation;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.notifications.Notification;
-import org.graylog2.notifications.NotificationImpl;
+import org.graylog2.notifications.NotificationBuilder;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -164,7 +164,7 @@ class V20230601104500_AddSourcesPageV2Test {
     void previousInstallationWithLocalModificationsIsKept() {
         previousMigrationHasRun();
         thisMigrationHasNotRun();
-        when(notificationService.buildNow()).thenReturn(new NotificationImpl().addTimestamp(Tools.nowUTC()));
+        when(notificationService.buildNow()).thenReturn(new NotificationBuilder().addTimestamp(Tools.nowUTC()));
 
         this.migration.upgrade();
 

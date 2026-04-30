@@ -130,6 +130,8 @@ public class RestPermissions implements PluginPermissions {
     @Deprecated
     public static final String NODE_SHUTDOWN = "node:shutdown";
     public static final String MONITORING_READ = "monitoring:read";
+    public static final String NOTIFICATIONS_CONFIG_READ = "notifications:config_read";
+    public static final String NOTIFICATIONS_CONFIG_UPDATE = "notifications:config_update";
     public static final String NOTIFICATIONS_DELETE = "notifications:delete";
     public static final String NOTIFICATIONS_READ = "notifications:read";
     public static final String OUTPUTS_CREATE = "outputs:create";
@@ -296,6 +298,8 @@ public class RestPermissions implements PluginPermissions {
             .add(create(METRICS_READALL, ""))
             .add(create(METRICS_READHISTORY, ""))
             .add(create(NODE_SHUTDOWN, ""))
+            .add(create(NOTIFICATIONS_CONFIG_READ, ""))
+            .add(create(NOTIFICATIONS_CONFIG_UPDATE, ""))
             .add(create(NOTIFICATIONS_DELETE, ""))
             .add(create(NOTIFICATIONS_READ, ""))
             .add(create(OUTPUTS_CREATE, ""))

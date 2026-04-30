@@ -17,16 +17,12 @@
 package org.graylog2.notifications;
 
 import org.graylog2.cluster.Node;
-import org.graylog2.plugin.database.PersistedService;
 
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
-public interface NotificationService extends PersistedService {
+public interface NotificationService {
     Notification build();
 
     Notification buildNow();

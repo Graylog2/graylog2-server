@@ -32,7 +32,7 @@ import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.integrations.notifications.types.util.RequestClient;
 import org.graylog2.bindings.providers.JsonSafeEngineProvider;
 import org.graylog2.configuration.HttpConfiguration;
-import org.graylog2.notifications.NotificationImpl;
+import org.graylog2.notifications.NotificationBuilder;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.MessageSummary;
@@ -373,7 +373,7 @@ public class TeamsEventNotificationV2Test {
     }
 
     private void givenGoodNotificationService() {
-        given(mockNotificationService.buildNow()).willReturn(new NotificationImpl().addTimestamp(Tools.nowUTC()));
+        given(mockNotificationService.buildNow()).willReturn(new NotificationBuilder().addTimestamp(Tools.nowUTC()));
     }
 
     private void givenTeamsClientThrowsPermException() throws TemporaryEventNotificationException, PermanentEventNotificationException {

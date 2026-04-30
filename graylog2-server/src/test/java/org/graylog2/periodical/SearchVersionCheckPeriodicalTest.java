@@ -19,8 +19,8 @@ package org.graylog2.periodical;
 import com.github.joschi.jadconfig.util.Duration;
 import org.graylog2.configuration.SearchIndexerHosts;
 import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationBuilder;
 import org.graylog2.notifications.NotificationService;
-import org.graylog2.notifications.NotificationServiceImpl;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.security.jwt.IndexerJwtAuthToken;
 import org.graylog2.storage.SearchVersion;
@@ -48,9 +48,9 @@ class SearchVersionCheckPeriodicalTest {
 
     @BeforeEach
     void setUp() {
-        this.notificationService = mock(NotificationServiceImpl.class);
-        when(this.notificationService.build()).thenCallRealMethod();
-        when(this.notificationService.buildNow()).thenCallRealMethod();
+        this.notificationService = mock(NotificationService.class);
+        when(this.notificationService.build()).thenReturn(new NotificationBuilder());
+        when(this.notificationService.buildNow()).thenReturn(new NotificationBuilder());
     }
 
     @Test

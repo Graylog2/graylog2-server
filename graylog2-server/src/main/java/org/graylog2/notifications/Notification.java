@@ -18,7 +18,6 @@ package org.graylog2.notifications;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.graylog2.cluster.Node;
-import org.graylog2.plugin.database.Persisted;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
@@ -27,7 +26,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-public interface Notification extends Persisted {
+public interface Notification {
 
     /**
      * Notification types that are not actionable by cloud users and should be

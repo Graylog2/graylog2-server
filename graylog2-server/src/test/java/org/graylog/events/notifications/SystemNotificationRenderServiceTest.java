@@ -18,7 +18,7 @@ package org.graylog.events.notifications;
 
 import org.graylog.events.processor.systemnotification.SystemNotificationRenderService;
 import org.graylog2.notifications.Notification;
-import org.graylog2.notifications.NotificationImpl;
+import org.graylog2.notifications.NotificationBuilder;
 import org.graylog2.notifications.NotificationService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -51,7 +51,7 @@ class SystemNotificationRenderServiceTest {
 
     @Test
     void htmlRenderTestWithReplace() {
-        notification = new NotificationImpl()
+        notification = new NotificationBuilder()
                 .addNode("node")
                 .addSeverity(Notification.Severity.URGENT)
                 .addType(Notification.Type.EMAIL_TRANSPORT_CONFIGURATION_INVALID)
@@ -71,7 +71,7 @@ class SystemNotificationRenderServiceTest {
 
     @Test
     void plainRenderTestWithReplace() {
-        notification = new NotificationImpl()
+        notification = new NotificationBuilder()
                 .addNode("node")
                 .addSeverity(Notification.Severity.URGENT)
                 .addType(Notification.Type.EMAIL_TRANSPORT_CONFIGURATION_INVALID)
@@ -89,7 +89,7 @@ class SystemNotificationRenderServiceTest {
     @Test
     void testCloudTrue() {
         String url = "http://my.system.input";
-        notification = new NotificationImpl()
+        notification = new NotificationBuilder()
                 .addNode("node")
                 .addSeverity(Notification.Severity.URGENT)
                 .addType(Notification.Type.NO_INPUT_RUNNING)
@@ -106,7 +106,7 @@ class SystemNotificationRenderServiceTest {
     @Test
     void testCloudFalse() {
         String url = "http://my.system.input";
-        notification = new NotificationImpl()
+        notification = new NotificationBuilder()
                 .addNode("node")
                 .addSeverity(Notification.Severity.URGENT)
                 .addType(Notification.Type.NO_INPUT_RUNNING)
@@ -125,7 +125,7 @@ class SystemNotificationRenderServiceTest {
         List<String[]> blockDetails = new ArrayList<>();
         blockDetails.add(new String[]{"11", "12"});
         blockDetails.add(new String[]{"21", "22"});
-        notification = new NotificationImpl()
+        notification = new NotificationBuilder()
                 .addNode("node")
                 .addSeverity(Notification.Severity.URGENT)
                 .addType(Notification.Type.ES_INDEX_BLOCKED)
@@ -158,7 +158,7 @@ class SystemNotificationRenderServiceTest {
 
     @Test
     void htmlEscapingWithSubstitutionTest() {
-        notification = new NotificationImpl()
+        notification = new NotificationBuilder()
                 .addNode("node")
                 .addType(Notification.Type.GENERIC)
                 .addDetail("title", "Test: <123>")

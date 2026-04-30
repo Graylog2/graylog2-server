@@ -28,7 +28,7 @@ import org.graylog2.indexer.cluster.health.PercentageWatermarkSettings;
 import org.graylog2.indexer.cluster.health.SIUnitParser;
 import org.graylog2.indexer.cluster.health.WatermarkSettings;
 import org.graylog2.notifications.Notification;
-import org.graylog2.notifications.NotificationImpl;
+import org.graylog2.notifications.NotificationBuilder;
 import org.graylog2.notifications.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -168,7 +168,7 @@ public class IndexerClusterCheckerThreadTest {
                 buildThresholdTriggeredClusterAllocationDiskSettings(ES_NODE_DISK_WATERMARK_LOW,
                         WatermarkSettings.SettingsType.ABSOLUTE));
 
-        Notification notification = new NotificationImpl();
+        Notification notification = new NotificationBuilder();
         when(notificationService.buildNow()).thenReturn(notification);
         when(notificationService.isFirst(ES_NODE_DISK_WATERMARK_LOW)).thenReturn(true);
 
@@ -186,7 +186,7 @@ public class IndexerClusterCheckerThreadTest {
             when(cluster.getClusterAllocationDiskSettings()).thenReturn(buildThresholdTriggeredClusterAllocationDiskSettings(notificationType, WatermarkSettings.SettingsType.PERCENTAGE));
         }
         when(notificationService.isFirst(notificationType)).thenReturn(true);
-        Notification notification = new NotificationImpl();
+        Notification notification = new NotificationBuilder();
         when(notificationService.buildNow()).thenReturn(notification);
 
         indexerClusterCheckerThread.checkDiskUsage();
@@ -220,7 +220,7 @@ public class IndexerClusterCheckerThreadTest {
                 ))
         );
 
-        Notification notification = new NotificationImpl();
+        Notification notification = new NotificationBuilder();
         when(notificationService.buildNow()).thenReturn(notification);
         indexerClusterCheckerThread.checkShardAllocation();
         ArgumentCaptor<Notification> argument = ArgumentCaptor.forClass(Notification.class);

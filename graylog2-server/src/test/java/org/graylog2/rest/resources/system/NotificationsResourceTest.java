@@ -17,7 +17,7 @@
 package org.graylog2.rest.resources.system;
 
 import org.graylog2.notifications.Notification;
-import org.graylog2.notifications.NotificationImpl;
+import org.graylog2.notifications.NotificationBuilder;
 import org.graylog2.notifications.NotificationService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,8 +40,8 @@ class NotificationsResourceTest {
         assertThat(Notification.CLOUD_SUPPRESSED_TYPES).contains(Notification.Type.ES_CLUSTER_RED);
 
         when(notificationService.all()).thenReturn(List.of(
-                new NotificationImpl().addType(Notification.Type.ES_CLUSTER_RED),
-                new NotificationImpl().addType(Notification.Type.SEARCH_ERROR)
+                new NotificationBuilder().addType(Notification.Type.ES_CLUSTER_RED),
+                new NotificationBuilder().addType(Notification.Type.SEARCH_ERROR)
         ));
 
         final var response = new TestResource(notificationService, true).listNotifications();
@@ -54,8 +54,8 @@ class NotificationsResourceTest {
     @Test
     void nonCloudModeReturnsAll() {
         when(notificationService.all()).thenReturn(List.of(
-                new NotificationImpl().addType(Notification.Type.ES_CLUSTER_RED),
-                new NotificationImpl().addType(Notification.Type.SEARCH_ERROR)
+                new NotificationBuilder().addType(Notification.Type.ES_CLUSTER_RED),
+                new NotificationBuilder().addType(Notification.Type.SEARCH_ERROR)
         ));
 
         final var response = new TestResource(notificationService, false).listNotifications();
@@ -65,7 +65,7 @@ class NotificationsResourceTest {
 
     static class TestResource extends NotificationsResource {
         TestResource(NotificationService notificationService, boolean isCloud) {
-            super(notificationService, isCloud);
+            super(notificationService, null, null, null, null, isCloud);
         }
 
         @Override

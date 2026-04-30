@@ -26,7 +26,7 @@ import org.graylog.integrations.pagerduty.client.PagerDutyClient;
 import org.graylog.integrations.pagerduty.dto.PagerDutyMessage;
 import org.graylog.integrations.pagerduty.dto.PagerDutyResponse;
 import org.graylog2.notifications.Notification;
-import org.graylog2.notifications.NotificationImpl;
+import org.graylog2.notifications.NotificationBuilder;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
@@ -169,7 +169,7 @@ public class PagerDutyNotificationTest {
     }
 
     private void givenGoodNotificationService() {
-        given(mockNotificationService.buildNow()).willReturn(new NotificationImpl().addTimestamp(Tools.nowUTC()));
+        given(mockNotificationService.buildNow()).willReturn(new NotificationBuilder().addTimestamp(Tools.nowUTC()));
     }
 
     // WHENs

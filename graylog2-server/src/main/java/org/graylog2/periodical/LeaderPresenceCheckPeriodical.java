@@ -23,7 +23,6 @@ import org.graylog2.Configuration;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.leader.LeaderElectionMode;
 import org.graylog2.notifications.Notification;
-import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.periodical.Periodical;
@@ -76,7 +75,7 @@ public class LeaderPresenceCheckPeriodical extends Periodical {
                 }
                 if (fixNoLeaderNotification()) {
                     activityWriter.write(
-                            new Activity("Notification condition [" + NotificationImpl.Type.NO_LEADER + "] " +
+                            new Activity("Notification condition [" + Notification.Type.NO_LEADER + "] " +
                                     "has been fixed.", LeaderPresenceCheckPeriodical.class));
                 }
             } else {
