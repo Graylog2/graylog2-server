@@ -61,6 +61,15 @@ const SearchRow = styled.div`
 const Container = styled.div(
   ({ theme }) => css`
     display: flex;
+    flex-direction: column;
+    gap: ${theme.spacings.sm};
+    width: 100%;
+  `,
+);
+
+const RowContainer = styled.div(
+  ({ theme }) => css`
+    display: flex;
     flex-direction: row;
     gap: ${theme.spacings.sm};
     width: 100%;
@@ -123,6 +132,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   keyFn,
   layoutConfig,
   middleSection: MiddleSection = undefined,
+  topSection: TopSection = undefined,
   onChangeFilters,
   onChangeSlicing,
   onDataLoaded = undefined,
@@ -212,89 +222,92 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
       attributes={attributes}
       entityTableId={tableLayout.entityTableId}>
       <Container>
-        {fetchOptions.sliceCol && (
-          <Slicing
-            fetchSlices={fetchSlices}
-            appSection={appSection}
-            columnSchemas={columnSchemas}
-            sliceRenderers={sliceRenderers}
-            onChangeSlicing={onChangeSlicing}
-          />
-        )}
-        <TableWrapper>
-          {!externalSearch && (
-            <SearchRow>
-              <SearchForm
-                focusAfterMount={focusSearchAfterMount}
-                onSearch={onSearch}
-                onReset={onSearchReset}
-                query={fetchOptions.query}
-                placeholder={searchPlaceholder ?? `Search for ${humanName}`}
-                queryHelpComponent={queryHelpComponent}>
-                {attributes.length > 0 && (
-                  <div style={{ marginBottom: 5 }}>
-                    <EntityFilters
-                      attributes={attributes}
-                      urlQueryFilters={fetchOptions.filters}
-                      setUrlQueryFilters={onChangeFilters}
-                      filterValueRenderers={filterValueRenderers}
-                      appSection={appSection}
-                      activeSliceCol={fetchOptions.sliceCol}
-                      activeSlice={fetchOptions.slice}
-                    />
-                  </div>
-                )}
-              </SearchForm>
-              {topRightCol}
-            </SearchRow>
+        {TopSection ? <TopSection /> : null}
+        <RowContainer>
+          {fetchOptions.sliceCol && (
+            <Slicing
+              fetchSlices={fetchSlices}
+              appSection={appSection}
+              columnSchemas={columnSchemas}
+              sliceRenderers={sliceRenderers}
+              onChangeSlicing={onChangeSlicing}
+            />
           )}
-          {MiddleSection ? <MiddleSection searchParams={fetchOptions} setFilters={onChangeFilters} /> : null}
+          <TableWrapper>
+            {!externalSearch && (
+              <SearchRow>
+                <SearchForm
+                  focusAfterMount={focusSearchAfterMount}
+                  onSearch={onSearch}
+                  onReset={onSearchReset}
+                  query={fetchOptions.query}
+                  placeholder={searchPlaceholder ?? `Search for ${humanName}`}
+                  queryHelpComponent={queryHelpComponent}>
+                  {attributes.length > 0 && (
+                    <div style={{ marginBottom: 5 }}>
+                      <EntityFilters
+                        attributes={attributes}
+                        urlQueryFilters={fetchOptions.filters}
+                        setUrlQueryFilters={onChangeFilters}
+                        filterValueRenderers={filterValueRenderers}
+                        appSection={appSection}
+                        activeSliceCol={fetchOptions.sliceCol}
+                        activeSlice={fetchOptions.slice}
+                      />
+                    </div>
+                  )}
+                </SearchForm>
+                {topRightCol}
+              </SearchRow>
+            )}
+            {MiddleSection ? <MiddleSection searchParams={fetchOptions} setFilters={onChangeFilters} /> : null}
 
-          {isError ? (
-            <FetchErrorAlert message={`Fetching ${humanName} failed`} error={error} />
-          ) : (
-            <PaginatedList
-              pageSize={layoutConfig.pageSize}
-              showPageSizeSelect={false}
-              totalItems={total}
-              useQueryParameter={!withoutURLParams}
-              onChange={onPaginationChange}>
-              {list?.length === 0 ? (
-                <NoSearchResult>No {humanName} have been found.</NoSearchResult>
-              ) : (
-                <EntityDataTable<T, M>
-                  entities={list}
-                  defaultDisplayedColumns={tableLayout.defaultDisplayedAttributes}
-                  layoutPreferences={{
-                    attributes: layoutConfig.attributes,
-                    order: layoutConfig.order,
-                  }}
-                  defaultColumnOrder={tableLayout.defaultColumnOrder}
-                  onResetLayoutPreferences={onResetLayoutPreferences}
-                  onLayoutPreferencesChange={onLayoutPreferencesChange}
-                  onChangeSlicing={onChangeSlicing}
-                  expandedSectionRenderers={expandedSectionRenderers}
-                  rowOverride={rowOverride}
-                  enableSlicing={typeof fetchSlices === 'function'}
-                  bulkSelection={bulkSelection}
-                  onSortChange={onSortChange}
-                  onPageSizeChange={onPageSizeChange}
-                  pageSize={layoutConfig.pageSize}
-                  activeSort={layoutConfig.sort}
-                  activeSliceCol={fetchOptions.sliceCol}
-                  appSection={appSection}
-                  entityActions={entityActions}
-                  columnRenderers={columnRenderers}
-                  columnSchemas={columnSchemas}
-                  entityAttributesAreCamelCase={entityAttributesAreCamelCase}
-                  meta={meta}
-                  noPageSizeSelect={noPageSizeSelect}
-                  noColumnReordering={noColumnReordering}
-                />
-              )}
-            </PaginatedList>
-          )}
-        </TableWrapper>
+            {isError ? (
+              <FetchErrorAlert message={`Fetching ${humanName} failed`} error={error} />
+            ) : (
+              <PaginatedList
+                pageSize={layoutConfig.pageSize}
+                showPageSizeSelect={false}
+                totalItems={total}
+                useQueryParameter={!withoutURLParams}
+                onChange={onPaginationChange}>
+                {list?.length === 0 ? (
+                  <NoSearchResult>No {humanName} have been found.</NoSearchResult>
+                ) : (
+                  <EntityDataTable<T, M>
+                    entities={list}
+                    defaultDisplayedColumns={tableLayout.defaultDisplayedAttributes}
+                    layoutPreferences={{
+                      attributes: layoutConfig.attributes,
+                      order: layoutConfig.order,
+                    }}
+                    defaultColumnOrder={tableLayout.defaultColumnOrder}
+                    onResetLayoutPreferences={onResetLayoutPreferences}
+                    onLayoutPreferencesChange={onLayoutPreferencesChange}
+                    onChangeSlicing={onChangeSlicing}
+                    expandedSectionRenderers={expandedSectionRenderers}
+                    rowOverride={rowOverride}
+                    enableSlicing={typeof fetchSlices === 'function'}
+                    bulkSelection={bulkSelection}
+                    onSortChange={onSortChange}
+                    onPageSizeChange={onPageSizeChange}
+                    pageSize={layoutConfig.pageSize}
+                    activeSort={layoutConfig.sort}
+                    activeSliceCol={fetchOptions.sliceCol}
+                    appSection={appSection}
+                    entityActions={entityActions}
+                    columnRenderers={columnRenderers}
+                    columnSchemas={columnSchemas}
+                    entityAttributesAreCamelCase={entityAttributesAreCamelCase}
+                    meta={meta}
+                    noPageSizeSelect={noPageSizeSelect}
+                    noColumnReordering={noColumnReordering}
+                  />
+                )}
+              </PaginatedList>
+            )}
+          </TableWrapper>
+        </RowContainer>
       </Container>
     </TableFetchContextProvider>
   );
@@ -370,6 +383,7 @@ export type PaginatedEntityTableProps<T extends EntityBase, M> = {
   humanName: string;
   keyFn: (options: SearchParams) => Array<unknown>;
   middleSection?: React.ComponentType<MiddleSectionProps>;
+  topSection?: React.ComponentType;
   onDataLoaded?: (data: PaginatedResponse<T, M>) => void;
   queryHelpComponent?: React.ReactNode;
   searchPlaceholder?: string;

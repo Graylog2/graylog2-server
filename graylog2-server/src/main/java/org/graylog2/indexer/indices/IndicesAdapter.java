@@ -139,5 +139,5 @@ public interface IndicesAdapter {
 
     Optional<WarmIndexInfo> getWarmIndexInfo(String indexOrAlias);
 
-    Set<String> getOutdatedIndices(int currentMajorVersion);
+    Set<OutdatedIndex> getOutdatedIndices(int currentMajorVersion);
 }
