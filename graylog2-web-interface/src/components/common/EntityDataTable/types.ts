@@ -101,6 +101,7 @@ export type RowOverride<Entity extends EntityBase> = (entity: Entity) => React.R
 
 export type DefaultLayout = {
   entityTableId: string;
+  layoutVariant?: string;
   defaultSort: Sort;
   defaultDisplayedAttributes: Array<string>;
   defaultPageSize: number;

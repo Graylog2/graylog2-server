@@ -29,13 +29,17 @@ export type LayoutConfig = {
 
 const useTableLayout = ({
   entityTableId,
+  layoutVariant,
   defaultSort,
   defaultPageSize,
 }: DefaultLayout): {
   isInitialLoading: boolean;
   layoutConfig: LayoutConfig;
 } => {
-  const { data: userLayoutPreferences = {}, isInitialLoading } = useUserLayoutPreferences(entityTableId);
+  const { data: userLayoutPreferences = {}, isInitialLoading } = useUserLayoutPreferences(
+    entityTableId,
+    layoutVariant,
+  );
 
   return useMemo(
     () => ({
