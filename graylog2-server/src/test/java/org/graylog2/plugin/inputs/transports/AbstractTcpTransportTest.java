@@ -31,6 +31,7 @@ import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
+import org.graylog2.security.encryption.EncryptedValueService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -101,7 +102,7 @@ public class AbstractTcpTransportTest {
         );
 
         final AbstractTcpTransport transport = new AbstractTcpTransport(
-                configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration, tlsConfiguration) {
+                configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration, tlsConfiguration, mock(EncryptedValueService.class)) {
         };
         final MessageInput input = mock(MessageInput.class);
         assertThat(transport.getChildChannelHandlers(input)).containsKey("tls");
@@ -120,7 +121,7 @@ public class AbstractTcpTransportTest {
         );
 
         final AbstractTcpTransport transport = new AbstractTcpTransport(
-            configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration, tlsConfiguration) {};
+            configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration, tlsConfiguration, mock(EncryptedValueService.class)) {};
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Couldn't write to temporary directory: " + tmpDir.getAbsolutePath());
@@ -142,7 +143,7 @@ public class AbstractTcpTransportTest {
         );
 
         final AbstractTcpTransport transport = new AbstractTcpTransport(
-            configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration, tlsConfiguration) {};
+            configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration, tlsConfiguration, mock(EncryptedValueService.class)) {};
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Couldn't write to temporary directory: " + tmpDir.getAbsolutePath());
@@ -163,7 +164,7 @@ public class AbstractTcpTransportTest {
         );
 
         final AbstractTcpTransport transport = new AbstractTcpTransport(
-            configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration, tlsConfiguration) {};
+            configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration, tlsConfiguration, mock(EncryptedValueService.class)) {};
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Couldn't write to temporary directory: " + file.getAbsolutePath());
@@ -178,7 +179,7 @@ public class AbstractTcpTransportTest {
                 "bind_address", "127.0.0.1",
                 "port", 0));
         final AbstractTcpTransport transport = new AbstractTcpTransport(
-                configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration, tlsConfiguration) {
+                configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration, tlsConfiguration, mock(EncryptedValueService.class)) {
         };
         transport.launch(input);
 
@@ -210,7 +211,7 @@ public class AbstractTcpTransportTest {
                 "bind_address", "127.0.0.1",
                 "port", 0));
         final AbstractTcpTransport transport = new AbstractTcpTransport(
-                configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration, tlsConfiguration) {
+                configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration, tlsConfiguration, mock(EncryptedValueService.class)) {
         };
         transport.launch(input);
 

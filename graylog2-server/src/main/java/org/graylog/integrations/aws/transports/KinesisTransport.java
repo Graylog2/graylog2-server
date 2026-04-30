@@ -235,6 +235,7 @@ public class KinesisTransport extends ThrottleableTransport2 {
                     "",
                     "Secret key of an AWS user with sufficient permissions. (See documentation)",
                     ConfigurationField.Optional.OPTIONAL,
+                    true,
                     TextField.Attribute.IS_PASSWORD
             ));
 
