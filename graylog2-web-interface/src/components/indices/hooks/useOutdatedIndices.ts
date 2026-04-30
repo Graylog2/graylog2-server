@@ -14,17 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import {useQuery} from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
-import { defaultOnError } from 'util/conditional/onError';
+import {qualifyUrl} from 'util/URLUtils';
+import {defaultOnError} from 'util/conditional/onError';
+
+export type OutdatedIndex = {
+  index_name: string;
+  version: string;
+  warm_index: boolean;
+  managed_index: boolean;
+  system_index: boolean;
+};
 
 const OUTDATED_INDICES_URL = qualifyUrl('/system/indexer/indices/outdated');
 
-const fetchOutdatedIndices = (): Promise<Array<string>> => fetch('GET', OUTDATED_INDICES_URL);
-
-const sortOutdatedIndices = (indices: Array<string>) => Array.from(indices).sort();
+const fetchOutdatedIndices = (): Promise<Array<OutdatedIndex>> => fetch('GET', OUTDATED_INDICES_URL);
 
 const useOutdatedIndices = () => {
   const {
@@ -36,7 +42,6 @@ const useOutdatedIndices = () => {
     queryFn: () =>
       defaultOnError(fetchOutdatedIndices(), 'Loading outdated indices failed', 'Could not load outdated indices'),
     retry: false,
-    select: sortOutdatedIndices,
   });
 
   return {

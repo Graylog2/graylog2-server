@@ -27,6 +27,7 @@ import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.shared.initializers.InputSetupService;
 import org.graylog2.shared.initializers.JerseyService;
 import org.graylog2.shared.initializers.PeriodicalsService;
+import org.graylog2.shared.inputs.InputFieldEncryptionValidator;
 import org.graylog2.system.processing.MongoDBProcessingStatusRecorderService;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.graylog2.system.shutdown.GracefulShutdownService;
@@ -36,6 +37,7 @@ public class GenericInitializerBindings extends AbstractModule {
     protected void configure() {
         bind(ProcessingStatusRecorder.class).to(MongoDBProcessingStatusRecorderService.class).asEagerSingleton();
         bind(Offset.class).toProvider(OffsetFromCurrentMongoDBTimeProvider.class).asEagerSingleton();
+        bind(InputFieldEncryptionValidator.class).asEagerSingleton();
 
         Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
         serviceBinder.addBinding().to(InputSetupService.class);

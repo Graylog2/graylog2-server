@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import { Alert, Modal } from 'components/bootstrap';
+import { Alert, Modal, Table } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import useOutdatedIndices from 'components/indices/hooks/useOutdatedIndices';
 
@@ -45,11 +45,26 @@ const OutdatedIndicesModal = ({ show, onClose }: Props) => {
               were created with an outdated, previous major version of OpenSearch. These indices may need to be
               re-indexed for compatibility with future OpenSearch major versions.
             </Alert>
-            <ul>
-              {outdatedIndices.map((index) => (
-                <li key={index}>{index}</li>
-              ))}
-            </ul>
+            <Table striped hover condensed>
+              <thead>
+                <tr>
+                  <th>Index</th>
+                  <th>Version</th>
+                  <th>Graylog-managed</th>
+                  <th>Warm</th>
+                </tr>
+              </thead>
+              <tbody>
+                {outdatedIndices.map(({ index_name, version, warm_index, managed_index }) => (
+                  <tr key={index_name}>
+                    <td>{index_name}</td>
+                    <td>{version}</td>
+                    <td>{managed_index ? 'Yes' : 'No'}</td>
+                    <td>{warm_index ? 'Yes' : 'No'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
           </>
         )}
 

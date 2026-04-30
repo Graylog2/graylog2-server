@@ -16,8 +16,19 @@
  */
 package org.graylog2.rest.resources.entities.preferences.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 
-public record SortPreferences(@JsonProperty("field") String sortField,
-                              @JsonProperty("order") SortOrder sortOrder) {
+public enum SortOrder {
+    ASC("asc"), DESC("desc");
+
+    private final String title;
+
+    SortOrder(String title) {
+        this.title = title;
+    }
+
+    @JsonValue
+    public String getTitle() {
+        return title;
+    }
 }

@@ -146,3 +146,4 @@ export { default as SortIcon } from './SortIcon';
 export { default as Toggle } from './Switch';
 export { default as SearchFiltersFormControls } from './SearchFiltersFormControls';
 export { default as ModalButtonToolbar } from './ModalButtonToolbar';
+export { default as AccessibleCard } from './AccessibleCard';
