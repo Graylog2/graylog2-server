@@ -35,18 +35,18 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.NodeInfoCache;
-import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.index.IndexPattern;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.indices.OutdatedIndex;
+import org.graylog2.indexer.indices.OutdatedIndexService;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.indices.util.NumberBasedIndexNameComparator;
@@ -67,7 +67,6 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -81,14 +80,14 @@ public class IndicesResource extends RestResource {
     private final Indices indices;
     private final NodeInfoCache nodeInfoCache;
     private final IndexSetRegistry indexSetRegistry;
-    private final Cluster cluster;
+    private final OutdatedIndexService outdatedIndexService;
 
     @Inject
-    public IndicesResource(Indices indices, NodeInfoCache nodeInfoCache, IndexSetRegistry indexSetRegistry, Cluster cluster) {
+    public IndicesResource(Indices indices, NodeInfoCache nodeInfoCache, IndexSetRegistry indexSetRegistry, OutdatedIndexService outdatedIndexService) {
         this.indices = indices;
         this.nodeInfoCache = nodeInfoCache;
         this.indexSetRegistry = indexSetRegistry;
-        this.cluster = cluster;
+        this.outdatedIndexService = outdatedIndexService;
     }
 
     @GET
@@ -319,16 +318,8 @@ public class IndicesResource extends RestResource {
     @Operation(summary = "Get a list of indices that were created in a OpenSearch version prior to the recent one")
     @RequiresPermissions(RestPermissions.INDICES_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    public Set<String> getOutdatedIndices() {
-        int currentMajorVersion = Optional.ofNullable(cluster.elasticsearchStats().clusterVersion())
-                .map(version -> {
-                    try {
-                        return Integer.parseInt(StringUtils.substringBefore(version, "."));
-                    } catch (NumberFormatException e) {
-                        throw new IllegalStateException("Cluster version cannot be determined: " + version);
-                    }
-                }).orElseThrow(() -> new IllegalStateException("Cluster version cannot be determined: null"));
-        return indices.getOutdatedIndices(currentMajorVersion);
+    public List<OutdatedIndex> getOutdatedIndices() {
+        return outdatedIndexService.getOutdatedIndices();
     }
 
     private OpenIndicesInfo getOpenIndicesInfo(Set<IndexStatistics> indicesStatistics) {

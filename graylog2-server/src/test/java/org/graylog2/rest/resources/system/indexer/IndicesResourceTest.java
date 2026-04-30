@@ -20,22 +20,21 @@ package org.graylog2.rest.resources.system.indexer;
 import jakarta.ws.rs.ForbiddenException;
 import org.assertj.core.api.Assertions;
 import org.graylog2.indexer.NodeInfoCache;
-import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.indices.OutdatedIndex;
+import org.graylog2.indexer.indices.OutdatedIndexService;
 import org.graylog2.security.WithAuthorization;
 import org.graylog2.security.WithAuthorizationExtension;
-import org.graylog2.system.stats.elasticsearch.ElasticsearchStats;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Set;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -52,7 +51,7 @@ class IndicesResourceTest {
     IndexSetRegistry indexSetRegistry;
 
     @Mock
-    Cluster cluster;
+    OutdatedIndexService outdatedIndexService;
 
     @InjectMocks
     IndicesResource indicesResource;
@@ -65,32 +64,13 @@ class IndicesResourceTest {
 
     @Test
     @WithAuthorization(permissions = {"indices:read"})
-    void getOutdatedIndicesFailsIfNullOrIncorrectVersionProvided() {
-        String errorMessage = "Cluster version cannot be determined: ";
-        initializeElasticsearchStats(null);
-        Assertions.assertThatThrownBy(() -> indicesResource.getOutdatedIndices())
-                .isInstanceOf(IllegalStateException.class).hasMessageContaining(errorMessage + null);
-        initializeElasticsearchStats("nodot");
-        Assertions.assertThatThrownBy(() -> indicesResource.getOutdatedIndices())
-                .isInstanceOf(IllegalStateException.class).hasMessageContaining(errorMessage + "nodot");
-        initializeElasticsearchStats("not.sem.ver");
-        Assertions.assertThatThrownBy(() -> indicesResource.getOutdatedIndices())
-                .isInstanceOf(IllegalStateException.class).hasMessageContaining(errorMessage + "not.sem.ver");
-    }
-
-    @Test
-    @WithAuthorization(permissions = {"indices:read"})
     void getOutdatedIndicesSucceeds() {
-        initializeElasticsearchStats("2.5.0");
-        Set<String> outdatedIndices = Set.of("outdated1", "outdated2");
-        when(indices.getOutdatedIndices(2)).thenReturn(outdatedIndices);
+        List<OutdatedIndex> outdatedIndices = List.of(
+                new OutdatedIndex("outdated1", "1.3.0", false, false),
+                new OutdatedIndex("outdated2", "1.3.0", true, true)
+        );
+        when(outdatedIndexService.getOutdatedIndices()).thenReturn(outdatedIndices);
         assertThat(indicesResource.getOutdatedIndices()).isEqualTo(outdatedIndices);
-
     }
 
-    private void initializeElasticsearchStats(String version) {
-        ElasticsearchStats stats = mock(ElasticsearchStats.class);
-        when(stats.clusterVersion()).thenReturn(version);
-        when(cluster.elasticsearchStats()).thenReturn(stats);
-    }
 }

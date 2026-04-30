@@ -30,14 +30,12 @@ public record EntityListPreferences(@JsonProperty("attributes") Map<String, Attr
                                     @JsonProperty("order") List<String> order,
                                     @JsonProperty("per_page") Integer perPage,
                                     @JsonProperty("sort") SortPreferences sort,
+                                    @JsonProperty("slicing") SlicingPreferences slicing,
                                     @JsonProperty("custom_preferences") Map<String, Object> customPreferences) {
-    public static EntityListPreferences create(Map<String, Attribute> attributes, List<String> order, Integer perPage, SortPreferences sort) {
-        return new EntityListPreferences(attributes, order, perPage, sort, Map.of());
-    }
 
     public static EntityListPreferences create(List<String> attributes, Integer perPage, SortPreferences sort) {
         return new EntityListPreferences(attributes.stream()
-                .collect(Collectors.toMap(Functions.identity(), attribute -> new Attribute(DisplayStatus.show, Optional.empty()))), attributes, perPage, sort, Map.of());
+                .collect(Collectors.toMap(Functions.identity(), attribute -> new Attribute(DisplayStatus.show, Optional.empty()))), attributes, perPage, sort, null, Map.of());
     }
 
     public enum DisplayStatus {

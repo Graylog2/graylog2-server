@@ -24,6 +24,7 @@ import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
 import org.graylog.storage.opensearch3.stats.StatsApi;
 import org.graylog.storage.opensearch3.testing.client.mock.ServerlessOpenSearchClient;
 import org.graylog2.indexer.indices.IndexTemplateAdapter;
+import org.graylog2.indexer.indices.OutdatedIndex;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
@@ -171,11 +172,13 @@ class IndicesAdapterOSTest {
         final IndicesAdapterOS adapter = buildAdapterWithSettingsResponse("""
                 {
                   "current_index": {"settings": {"index.version.created_string": "2.5.0"}},
-                  "old_index":     {"settings": {"index.version.created_string": "1.3.0"}}
+                  "old_index":     {"settings": {"index.version.created_string": "1.3.0", "index.store.type": "local"}}
                 }
                 """);
 
-        assertThat(adapter.getOutdatedIndices(2)).containsExactly("old_index");
+        assertThat(adapter.getOutdatedIndices(2)).containsExactly(
+                new OutdatedIndex("old_index", "1.3.0", false)
+        );
     }
 
     @Test
@@ -200,7 +203,24 @@ class IndicesAdapterOSTest {
                 }
                 """);
 
-        assertThat(adapter.getOutdatedIndices(2)).containsExactlyInAnyOrder("no_settings", "no_version");
+        assertThat(adapter.getOutdatedIndices(2)).containsExactlyInAnyOrder(
+                new OutdatedIndex("no_settings", "", false),
+                new OutdatedIndex("no_version", "", false)
+        );
+    }
+
+    @Test
+    void testGetOutdatedIndicesShowsWarmIndex() {
+        final IndicesAdapterOS adapter = buildAdapterWithSettingsResponse("""
+                {
+                  "current_index": {"settings": {"index.version.created_string": "2.5.0"}},
+                  "old_index":     {"settings": {"index.version.created_string": "1.3.0", "index.store.type": "remote_snapshot"}}
+                }
+                """);
+
+        assertThat(adapter.getOutdatedIndices(2)).containsExactly(
+                new OutdatedIndex("old_index", "1.3.0", true)
+        );
     }
 
     private IndicesAdapterOS buildAdapterWithSettingsResponse(String settingsJson) {
