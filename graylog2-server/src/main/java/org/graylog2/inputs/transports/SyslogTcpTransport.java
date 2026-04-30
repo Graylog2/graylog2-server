@@ -30,6 +30,7 @@ import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
+import org.graylog2.security.encryption.EncryptedValueService;
 
 import java.util.LinkedHashMap;
 import java.util.concurrent.Callable;
@@ -42,14 +43,16 @@ public class SyslogTcpTransport extends TcpTransport {
                               NettyTransportConfiguration nettyTransportConfiguration,
                               ThroughputCounter throughputCounter,
                               LocalMetricRegistry localRegistry,
-                              TLSProtocolsConfiguration tlsConfiguration) {
+                              TLSProtocolsConfiguration tlsConfiguration,
+                              EncryptedValueService encryptedValueService) {
         super(configuration,
                 eventLoopGroup,
                 eventLoopGroupFactory,
                 nettyTransportConfiguration,
                 throughputCounter,
                 localRegistry,
-                tlsConfiguration);
+                tlsConfiguration,
+                encryptedValueService);
     }
 
     @Override
