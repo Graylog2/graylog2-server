@@ -16,8 +16,11 @@
  */
 package org.graylog2.rest.resources.entities.preferences.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record SortPreferences(@JsonProperty("field") String sortField,
-                              @JsonProperty("order") SortOrder sortOrder) {
+@JsonInclude(JsonInclude.Include.NON_ABSENT)
+public record SlicingPreferences(@JsonProperty("slice_column") String sliceColumn,
+                                 @JsonProperty("sort_by") String sortBy,
+                                 @JsonProperty("order") SortOrder sortOrder) {
 }
