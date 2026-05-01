@@ -23,6 +23,7 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.SortOrder;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -51,7 +52,7 @@ public abstract class NameOnlyEntityService<T extends BuildableMongoEntity<T, B>
 
     public T update(String id, String value) {
         final T existing = dbService.get(id)
-                .orElseThrow(() -> new NotFoundException(f("Unable to find %s to update", entityLabel().toLowerCase())));
+                .orElseThrow(() -> new NotFoundException(f("Unable to find %s to update", entityLabel().toLowerCase(Locale.ROOT))));
 
         final Optional<T> byValue = dbService.getByValue(value);
         if (byValue.isPresent()) {
@@ -70,7 +71,7 @@ public abstract class NameOnlyEntityService<T extends BuildableMongoEntity<T, B>
 
     public boolean delete(String id) {
         final T existing = dbService.get(id)
-                .orElseThrow(() -> new NotFoundException(f("Unable to find %s to delete", entityLabel().toLowerCase())));
+                .orElseThrow(() -> new NotFoundException(f("Unable to find %s to delete", entityLabel().toLowerCase(Locale.ROOT))));
         onBeforeDelete(entityValue(existing));
         return dbService.delete(id) == 1;
     }
