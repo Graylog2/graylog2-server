@@ -90,6 +90,8 @@ type Props = {
   onUpdate: (id: string, value: string) => Promise<unknown>;
   onDelete: (id: string) => Promise<unknown>;
   busy?: { adding?: boolean; updating?: boolean; deleting?: boolean };
+  /** Per-action permissions. Hide affordances the user can't use. Default to true. */
+  permissions?: { create?: boolean; edit?: boolean; delete?: boolean };
   /** Optional custom warning rendered inside the delete confirmation modal. */
   renderDeleteWarning?: (item: NameOnlyItem) => React.ReactNode;
   onTelemetry?: (event: NameOnlyTelemetryEvent) => void;
@@ -106,10 +108,14 @@ const NameOnlyEntityManager = ({
   onUpdate,
   onDelete,
   busy = {},
+  permissions = {},
   renderDeleteWarning = undefined,
   onTelemetry = undefined,
 }: Props) => {
   const labelKey = toKebabCase(entityLabel);
+  const canCreate = permissions.create ?? true;
+  const canEdit = permissions.edit ?? true;
+  const canDelete = permissions.delete ?? true;
   const [editId, setEditId] = useState('');
   const [editValue, setEditValue] = useState('');
   const [showAdd, setShowAdd] = useState(false);
@@ -164,13 +170,15 @@ const NameOnlyEntityManager = ({
     <SectionComponent
       title={title}
       headerActions={
-        <StyledButton
-          bsStyle="primary"
-          data-testid={`add-${labelKey}`}
-          onClick={() => setShowAdd(true)}
-          disabled={showAdd}>
-          Add New
-        </StyledButton>
+        canCreate ? (
+          <StyledButton
+            bsStyle="primary"
+            data-testid={`add-${labelKey}`}
+            onClick={() => setShowAdd(true)}
+            disabled={showAdd}>
+            Add New
+          </StyledButton>
+        ) : undefined
       }>
       {showAdd && (
         <DataRow key={`new-${labelKey}`}>
@@ -234,24 +242,28 @@ const NameOnlyEntityManager = ({
                   <div>{item.value}</div>
                 </div>
                 <div>
-                  <StyledIconButton
-                    data-testid={`delete-${labelKey}`}
-                    title={`Delete ${entityLabel}`}
-                    name="close"
-                    onClick={() => {
-                      setItemToDelete(item);
-                      setShowDeleteModal(true);
-                    }}
-                  />
-                  <StyledIconButton
-                    name="edit"
-                    data-testid={`edit-${labelKey}`}
-                    title={`Edit ${entityLabel}`}
-                    onClick={() => {
-                      setEditId(item.id);
-                      setEditValue(item.value);
-                    }}
-                  />
+                  {canDelete && (
+                    <StyledIconButton
+                      data-testid={`delete-${labelKey}`}
+                      title={`Delete ${entityLabel}`}
+                      name="close"
+                      onClick={() => {
+                        setItemToDelete(item);
+                        setShowDeleteModal(true);
+                      }}
+                    />
+                  )}
+                  {canEdit && (
+                    <StyledIconButton
+                      name="edit"
+                      data-testid={`edit-${labelKey}`}
+                      title={`Edit ${entityLabel}`}
+                      onClick={() => {
+                        setEditId(item.id);
+                        setEditValue(item.value);
+                      }}
+                    />
+                  )}
                 </div>
               </>
             )}

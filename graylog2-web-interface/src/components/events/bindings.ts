@@ -36,7 +36,7 @@ const eventsBindings: PluginExports = {
         {
           description: CONFIGURATION_TITLE,
           path: Routes.ALERTS.CONFIGURATION,
-          permissions: ['eventtags:edit' as const],
+          permissions: ['eventtags:read' as const],
         },
       ],
     },

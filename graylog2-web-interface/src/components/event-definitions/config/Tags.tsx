@@ -27,10 +27,12 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
+import usePermissions from 'hooks/usePermissions';
 
 const Tags = () => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
+  const { isPermitted } = usePermissions();
   const { tags, loadingTags, tagsLoadError } = useEventDefinitionTags();
   const { addTag, addingTag, updateTag, updatingTag, deleteTag, deletingTag } =
     useEventDefinitionTagMutations();
@@ -73,6 +75,11 @@ const Tags = () => {
       onUpdate={(id, value) => updateTag({ id, value })}
       onDelete={(id) => deleteTag(id)}
       busy={{ adding: addingTag, updating: updatingTag, deleting: deletingTag }}
+      permissions={{
+        create: isPermitted('eventtags:create'),
+        edit: isPermitted('eventtags:edit'),
+        delete: isPermitted('eventtags:delete'),
+      }}
       onTelemetry={handleTelemetry}
     />
   );
