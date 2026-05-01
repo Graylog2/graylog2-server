@@ -16,8 +16,12 @@
  */
 package org.graylog.events.tags;
 
+import com.mongodb.MongoWriteException;
+import com.mongodb.ServerAddress;
+import com.mongodb.WriteError;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
+import org.bson.BsonDocument;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +32,8 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -69,7 +75,7 @@ class TagServiceTest {
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining(NEW_VALUE);
 
-        verify(dbTagService, never()).save(org.mockito.ArgumentMatchers.any());
+        verify(dbTagService, never()).save(any());
     }
 
     @Test
@@ -92,8 +98,7 @@ class TagServiceTest {
         when(dbTagService.getByValue(OLD_VALUE)).thenReturn(Optional.of(existing));
 
         assertThat(tagService.update(TAG_ID, OLD_VALUE)).isEqualTo(existing);
-        verify(dbTagService, never()).update(org.mockito.ArgumentMatchers.anyString(),
-                org.mockito.ArgumentMatchers.anyString());
+        verify(dbTagService, never()).update(anyString(), anyString());
     }
 
     @Test
@@ -132,5 +137,35 @@ class TagServiceTest {
 
         assertThatThrownBy(() -> tagService.delete(TAG_ID))
                 .isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
+    void createRejectsBlankValue() {
+        assertThatThrownBy(() -> tagService.create("")).isInstanceOf(BadRequestException.class);
+        assertThatThrownBy(() -> tagService.create("   ")).isInstanceOf(BadRequestException.class);
+        assertThatThrownBy(() -> tagService.create(null)).isInstanceOf(BadRequestException.class);
+
+        verify(dbTagService, never()).save(any());
+    }
+
+    @Test
+    void updateRejectsBlankValue() {
+        assertThatThrownBy(() -> tagService.update(TAG_ID, "")).isInstanceOf(BadRequestException.class);
+        assertThatThrownBy(() -> tagService.update(TAG_ID, "   ")).isInstanceOf(BadRequestException.class);
+        assertThatThrownBy(() -> tagService.update(TAG_ID, null)).isInstanceOf(BadRequestException.class);
+
+        verify(dbTagService, never()).update(anyString(), anyString());
+    }
+
+    @Test
+    void createMapsDuplicateKeyRaceToBadRequest() {
+        when(dbTagService.getByValue(NEW_VALUE)).thenReturn(Optional.empty());
+        final WriteError dupKey = new WriteError(11000, "duplicate key", new BsonDocument());
+        final MongoWriteException race = new MongoWriteException(dupKey, new ServerAddress());
+        when(dbTagService.save(any())).thenThrow(race);
+
+        assertThatThrownBy(() -> tagService.create(NEW_VALUE))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining(NEW_VALUE);
     }
 }

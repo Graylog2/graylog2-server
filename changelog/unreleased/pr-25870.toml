@@ -1,4 +1,4 @@
 type = "a"
-message = "Added ability to assign tags to event definitions."
+message = "Added ability to manage event definition tags."
 
 pulls = ["25870"]

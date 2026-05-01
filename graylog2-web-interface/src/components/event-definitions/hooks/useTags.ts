@@ -32,7 +32,7 @@ const fetchTags = (): Promise<Array<EventDefinitionTag>> =>
   fetch('GET', qualifyUrl(`${TAGS_URL}/all`));
 
 export const useEventDefinitionTags = () => {
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: TAGS_QUERY_KEY,
     queryFn: fetchTags,
   });
@@ -41,6 +41,7 @@ export const useEventDefinitionTags = () => {
     tags: data ?? [],
     loadingTags: isLoading,
     tagsLoadError: isError,
+    tagsLoadErrorMessage: (error as Error)?.message,
   };
 };
 
@@ -85,7 +86,7 @@ export const useEventDefinitionTagMutations = () => {
   return {
     addTag: addMutation.mutateAsync,
     addingTag: addMutation.isPending,
-    updateTag: ({ id, value }: { id: string; value: string }) => updateMutation.mutateAsync({ id, value }),
+    updateTag: updateMutation.mutateAsync,
     updatingTag: updateMutation.isPending,
     deleteTag: deleteMutation.mutateAsync,
     deletingTag: deleteMutation.isPending,

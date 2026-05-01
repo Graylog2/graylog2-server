@@ -82,7 +82,7 @@ describe('<NameOnlyEntityManager />', () => {
     await userEvent.type(input, 'updated');
     await userEvent.click(screen.getByTestId('save-edit-tag'));
 
-    expect(onUpdate).toHaveBeenCalledWith(expect.any(String), 'updated');
+    expect(onUpdate).toHaveBeenCalledWith('2', 'updated');
   });
 
   it('confirms before deleting', async () => {

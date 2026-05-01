@@ -113,7 +113,6 @@ public class TagResource extends RestResource implements PluginRestResource {
 
     @DELETE
     @Path("/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
     @Operation(summary = "Delete an event definition tag")
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_EDIT)
     @AuditEvent(type = EventsAuditEventTypes.EVENT_TAG_DELETE)

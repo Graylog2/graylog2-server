@@ -39,19 +39,19 @@ const DataRow = styled.div`
   }
 `;
 
-const StyledInput = styled.input`
-  color: #fff;
-  background-color: #303030;
+const StyledInput = styled.input(
+  ({ theme }) => `
+  color: ${theme.colors.input.color};
+  background-color: ${theme.colors.input.background};
   padding: 6px 12px;
-  border: 1px solid #525252;
+  border: 1px solid ${theme.colors.input.border};
 
   &:focus {
-    border: 1px solid #5082bc;
-    box-shadow:
-      inset 0 1px 1px rgb(0 0 0 / 8%),
-      0 0 8px rgb(80 130 188 / 40%);
+    border-color: ${theme.colors.input.borderFocus};
+    box-shadow: ${theme.colors.input.boxShadow};
   }
-`;
+`,
+);
 
 const StyledButton = styled(Button)`
   justify-content: flex-end;
@@ -83,8 +83,10 @@ export type NameOnlyTelemetryEvent = 'added' | 'updated' | 'deleted';
 
 type Props = {
   title: string;
-  /** Lower-case label used in delete copy and aria-labels (e.g. "tag", "category"). */
+  /** Lower-case label used in user-visible copy (e.g. "tag", "category"). */
   entityLabel: string;
+  /** Optional labelKey used for testids/ids and DOM attribute hooks. Derived from entityLabel if omitted. */
+  testIdKey?: string;
   items: ReadonlyArray<NameOnlyItem>;
   onAdd: (value: string) => Promise<unknown>;
   onUpdate: (id: string, value: string) => Promise<unknown>;
@@ -95,9 +97,13 @@ type Props = {
   onTelemetry?: (event: NameOnlyTelemetryEvent) => void;
 };
 
+const toKebabCase = (label: string) =>
+  label.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+
 const NameOnlyEntityManager = ({
   title,
   entityLabel,
+  testIdKey = undefined,
   items,
   onAdd,
   onUpdate,
@@ -106,6 +112,7 @@ const NameOnlyEntityManager = ({
   renderDeleteWarning = undefined,
   onTelemetry = undefined,
 }: Props) => {
+  const labelKey = testIdKey ?? toKebabCase(entityLabel);
   const [editId, setEditId] = useState('');
   const [editValue, setEditValue] = useState('');
   const [showAdd, setShowAdd] = useState(false);
@@ -162,18 +169,18 @@ const NameOnlyEntityManager = ({
       headerActions={
         <StyledButton
           bsStyle="primary"
-          data-testid={`add-${entityLabel}`}
+          data-testid={`add-${labelKey}`}
           onClick={() => setShowAdd(true)}
           disabled={showAdd}>
           Add New
         </StyledButton>
       }>
       {showAdd && (
-        <DataRow key={`new-${entityLabel}`}>
+        <DataRow key={`new-${labelKey}`}>
           <div style={{ margin: '0' }}>
             <StyledInput
-              id={`add-${entityLabel}-input`}
-              data-testid={`new-${entityLabel}-input`}
+              id={`add-${labelKey}-input`}
+              data-testid={`new-${labelKey}-input`}
               type="text"
               autoComplete="off"
               style={{ marginBottom: '0px', paddingRight: '5px' }}
@@ -186,7 +193,7 @@ const NameOnlyEntityManager = ({
             <CancelButton onClick={resetAdd}>Cancel</CancelButton>
             <StyledButton
               bsStyle="primary"
-              data-testid={`save-new-${entityLabel}`}
+              data-testid={`save-new-${labelKey}`}
               disabled={!newValue || busy.adding}
               onClick={handleAdd}>
               Add

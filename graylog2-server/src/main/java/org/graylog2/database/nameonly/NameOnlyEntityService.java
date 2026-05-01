@@ -16,6 +16,7 @@
  */
 package org.graylog2.database.nameonly;
 
+import com.mongodb.MongoWriteException;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 import org.graylog2.database.BuildableMongoEntity;
@@ -48,7 +49,16 @@ public abstract class NameOnlyEntityService<T extends BuildableMongoEntity<T, B>
         if (dbService.getByValue(trimmed).isPresent()) {
             throw new BadRequestException(f("%s '%s' already exists", entityLabel(), trimmed));
         }
-        return dbService.save(buildEntity(trimmed));
+        try {
+            return dbService.save(buildEntity(trimmed));
+        } catch (MongoWriteException e) {
+            // Race between the duplicate check above and the unique-index insert can land here.
+            // Surface as 400 to match the explicit pre-flight rejection.
+            if (e.getError().getCode() == 11000) {
+                throw new BadRequestException(f("%s '%s' already exists", entityLabel(), trimmed), e);
+            }
+            throw e;
+        }
     }
 
     public T update(String id, String value) {
