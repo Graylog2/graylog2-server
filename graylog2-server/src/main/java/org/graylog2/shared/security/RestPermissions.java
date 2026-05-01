@@ -84,6 +84,10 @@ public class RestPermissions implements PluginPermissions {
     public static final String EVENT_NOTIFICATIONS_DELETE = "eventnotifications:delete";
     public static final String EVENT_NOTIFICATIONS_EDIT = "eventnotifications:edit";
     public static final String EVENT_NOTIFICATIONS_READ = "eventnotifications:read";
+    public static final String EVENT_TAGS_CREATE = "eventtags:create";
+    public static final String EVENT_TAGS_DELETE = "eventtags:delete";
+    public static final String EVENT_TAGS_EDIT = "eventtags:edit";
+    public static final String EVENT_TAGS_READ = "eventtags:read";
     public static final String FIELDNAMES_READ = "fieldnames:read";
     public static final String GRANTS_OVERVIEW_READ = "grantsoverview:read";
     public static final String GRAYLOG_CA_CREATE = "graylog_ca:create";
@@ -251,6 +255,10 @@ public class RestPermissions implements PluginPermissions {
             .add(create(EVENT_NOTIFICATIONS_DELETE, "").withOwnCapabilityFor(GRNTypes.EVENT_NOTIFICATION))
             .add(create(EVENT_NOTIFICATIONS_EDIT, "").withManageCapabilityFor(GRNTypes.EVENT_NOTIFICATION))
             .add(create(EVENT_NOTIFICATIONS_READ, "").withViewCapabilityFor(GRNTypes.EVENT_NOTIFICATION))
+            .add(create(EVENT_TAGS_CREATE, ""))
+            .add(create(EVENT_TAGS_DELETE, ""))
+            .add(create(EVENT_TAGS_EDIT, ""))
+            .add(create(EVENT_TAGS_READ, ""))
             .add(create(FIELDNAMES_READ, ""))
             .add(create(GRANTS_OVERVIEW_READ, ""))
             .add(create(INDEXERCLUSTER_READ, ""))

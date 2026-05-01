@@ -66,7 +66,7 @@ public class TagResource extends RestResource implements PluginRestResource {
 
     @GET
     @Operation(summary = "Get a paginated list of event definition tags")
-    @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_READ)
+    @RequiresPermissions(RestPermissions.EVENT_TAGS_READ)
     public PaginatedList<Tag> list(
             @Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
             @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("15") int perPage,
@@ -85,7 +85,7 @@ public class TagResource extends RestResource implements PluginRestResource {
     @GET
     @Path("/all")
     @Operation(summary = "Get all event definition tags")
-    @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_READ)
+    @RequiresPermissions(RestPermissions.EVENT_TAGS_READ)
     @NoAuditEvent("Not changing any data.")
     public List<Tag> getAll() {
         return tagService.getAll();
@@ -94,7 +94,7 @@ public class TagResource extends RestResource implements PluginRestResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(summary = "Create a new event definition tag")
-    @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_EDIT)
+    @RequiresPermissions(RestPermissions.EVENT_TAGS_CREATE)
     @AuditEvent(type = EventsAuditEventTypes.EVENT_TAG_CREATE)
     public Response create(@Parameter(name = "Tag value") String value) {
         return Response.ok().entity(tagService.create(value)).build();
@@ -104,7 +104,7 @@ public class TagResource extends RestResource implements PluginRestResource {
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(summary = "Update an event definition tag")
-    @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_EDIT)
+    @RequiresPermissions(RestPermissions.EVENT_TAGS_EDIT)
     @AuditEvent(type = EventsAuditEventTypes.EVENT_TAG_UPDATE)
     public Response update(@Parameter(name = "id", required = true) @PathParam("id") String id,
                            @Parameter(name = "Tag value") String value) {
@@ -114,7 +114,7 @@ public class TagResource extends RestResource implements PluginRestResource {
     @DELETE
     @Path("/{id}")
     @Operation(summary = "Delete an event definition tag")
-    @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_EDIT)
+    @RequiresPermissions(RestPermissions.EVENT_TAGS_DELETE)
     @AuditEvent(type = EventsAuditEventTypes.EVENT_TAG_DELETE)
     public Response delete(@Parameter(name = "id", required = true) @PathParam("id") String id) {
         return Response.ok().entity(tagService.delete(id)).build();

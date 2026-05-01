@@ -17,9 +17,8 @@
 package org.graylog2.migrations;
 
 import com.google.common.collect.ImmutableSet;
-import org.graylog2.shared.security.RestPermissions;
-
 import jakarta.inject.Inject;
+import org.graylog2.shared.security.RestPermissions;
 
 import java.time.ZonedDateTime;
 
@@ -47,7 +46,11 @@ public class V20190730100900_AddAlertsManagerRole extends Migration {
                 RestPermissions.EVENT_NOTIFICATIONS_CREATE,
                 RestPermissions.EVENT_NOTIFICATIONS_DELETE,
                 RestPermissions.EVENT_NOTIFICATIONS_EDIT,
-                RestPermissions.EVENT_NOTIFICATIONS_READ
+                RestPermissions.EVENT_NOTIFICATIONS_READ,
+                RestPermissions.EVENT_TAGS_CREATE,
+                RestPermissions.EVENT_TAGS_DELETE,
+                RestPermissions.EVENT_TAGS_EDIT,
+                RestPermissions.EVENT_TAGS_READ
         ));
     }
 }

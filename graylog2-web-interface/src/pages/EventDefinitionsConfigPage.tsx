@@ -25,7 +25,7 @@ import usePermissions from 'hooks/usePermissions';
 
 const EventDefinitionsConfigPage = () => {
   const { isPermitted } = usePermissions();
-  const canEdit = isPermitted('eventdefinitions:edit');
+  const canEdit = isPermitted('eventtags:edit');
 
   return (
     <DocumentTitle title="Event Definitions Configuration">
