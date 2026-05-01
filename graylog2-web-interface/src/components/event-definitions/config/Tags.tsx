@@ -31,7 +31,7 @@ import useLocation from 'routing/useLocation';
 const Tags = () => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
-  const { tags, loadingTags, tagsLoadError, tagsLoadErrorMessage } = useEventDefinitionTags();
+  const { tags, loadingTags, tagsLoadError } = useEventDefinitionTags();
   const { addTag, addingTag, updateTag, updatingTag, deleteTag, deletingTag } =
     useEventDefinitionTagMutations();
 
@@ -59,7 +59,7 @@ const Tags = () => {
   if (tagsLoadError) {
     return (
       <Alert bsStyle="danger" title="Could not load tags">
-        {tagsLoadErrorMessage ?? 'Failed to fetch event definition tags. Please try again.'}
+        Failed to fetch event definition tags. Please try again.
       </Alert>
     );
   }

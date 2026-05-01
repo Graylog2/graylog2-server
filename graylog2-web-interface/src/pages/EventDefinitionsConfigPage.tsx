@@ -17,13 +17,19 @@
 import * as React from 'react';
 
 import { DocumentTitle, PageHeader } from 'components/common';
+import DocsHelper from 'util/DocsHelper';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import EventDefinitionsConfigList from 'components/event-definitions/config/EventDefinitionsConfigList';
 
 const EventDefinitionsConfigPage = () => (
   <DocumentTitle title="Event Definitions Configuration">
     <EventsPageNavigation />
-    <PageHeader title="Event Definitions Configuration">
+    <PageHeader
+      title="Event Definitions Configuration"
+      documentationLink={{
+        title: 'Alerts documentation',
+        path: DocsHelper.PAGES.ALERTS,
+      }}>
       <span>Manage tags used to organize and categorize event definitions.</span>
     </PageHeader>
 

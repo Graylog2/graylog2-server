@@ -21,6 +21,7 @@ import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 import org.graylog2.database.BuildableMongoEntity;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.rest.models.SortOrder;
 
 import java.util.List;
@@ -54,7 +55,7 @@ public abstract class NameOnlyEntityService<T extends BuildableMongoEntity<T, B>
         } catch (MongoWriteException e) {
             // Race between the duplicate check above and the unique-index insert can land here.
             // Surface as 400 to match the explicit pre-flight rejection.
-            if (e.getError().getCode() == 11000) {
+            if (MongoUtils.isDuplicateKeyError(e)) {
                 throw new BadRequestException(f("%s '%s' already exists", entityLabel(), trimmed), e);
             }
             throw e;

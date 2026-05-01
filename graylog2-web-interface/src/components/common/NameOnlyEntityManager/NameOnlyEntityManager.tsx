@@ -83,10 +83,8 @@ export type NameOnlyTelemetryEvent = 'added' | 'updated' | 'deleted';
 
 type Props = {
   title: string;
-  /** Lower-case label used in user-visible copy (e.g. "tag", "category"). */
+  /** Lower-case label used in user-visible copy (e.g. "tag", "category"). Drives a kebab-cased key for testids and DOM ids. */
   entityLabel: string;
-  /** Optional labelKey used for testids/ids and DOM attribute hooks. Derived from entityLabel if omitted. */
-  testIdKey?: string;
   items: ReadonlyArray<NameOnlyItem>;
   onAdd: (value: string) => Promise<unknown>;
   onUpdate: (id: string, value: string) => Promise<unknown>;
@@ -103,7 +101,6 @@ const toKebabCase = (label: string) =>
 const NameOnlyEntityManager = ({
   title,
   entityLabel,
-  testIdKey = undefined,
   items,
   onAdd,
   onUpdate,
@@ -112,7 +109,7 @@ const NameOnlyEntityManager = ({
   renderDeleteWarning = undefined,
   onTelemetry = undefined,
 }: Props) => {
-  const labelKey = testIdKey ?? toKebabCase(entityLabel);
+  const labelKey = toKebabCase(entityLabel);
   const [editId, setEditId] = useState('');
   const [editValue, setEditValue] = useState('');
   const [showAdd, setShowAdd] = useState(false);

@@ -160,6 +160,7 @@ class TagServiceTest {
     @Test
     void createMapsDuplicateKeyRaceToBadRequest() {
         when(dbTagService.getByValue(NEW_VALUE)).thenReturn(Optional.empty());
+        // 11000 is the MongoDB wire-protocol code for a duplicate-key violation.
         final WriteError dupKey = new WriteError(11000, "duplicate key", new BsonDocument());
         final MongoWriteException race = new MongoWriteException(dupKey, new ServerAddress());
         when(dbTagService.save(any())).thenThrow(race);

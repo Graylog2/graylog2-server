@@ -32,7 +32,7 @@ const fetchTags = (): Promise<Array<EventDefinitionTag>> =>
   fetch('GET', qualifyUrl(`${TAGS_URL}/all`));
 
 export const useEventDefinitionTags = () => {
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: TAGS_QUERY_KEY,
     queryFn: fetchTags,
   });
@@ -41,7 +41,6 @@ export const useEventDefinitionTags = () => {
     tags: data ?? [],
     loadingTags: isLoading,
     tagsLoadError: isError,
-    tagsLoadErrorMessage: (error as Error)?.message,
   };
 };
 
