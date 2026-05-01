@@ -44,36 +44,49 @@ public abstract class NameOnlyEntityService<T extends BuildableMongoEntity<T, B>
     }
 
     public T create(String value) {
-        if (dbService.getByValue(value).isPresent()) {
-            throw new BadRequestException(f("%s '%s' already exists", entityLabel(), value));
+        final String trimmed = requireNonBlank(value);
+        if (dbService.getByValue(trimmed).isPresent()) {
+            throw new BadRequestException(f("%s '%s' already exists", entityLabel(), trimmed));
         }
-        return dbService.save(buildEntity(value));
+        return dbService.save(buildEntity(trimmed));
     }
 
     public T update(String id, String value) {
+        final String trimmed = requireNonBlank(value);
         final T existing = dbService.get(id)
                 .orElseThrow(() -> new NotFoundException(f("Unable to find %s to update", entityLabel().toLowerCase(Locale.ROOT))));
 
-        final Optional<T> byValue = dbService.getByValue(value);
+        final Optional<T> byValue = dbService.getByValue(trimmed);
         if (byValue.isPresent()) {
             if (!id.equals(byValue.get().id())) {
-                throw new BadRequestException(f("%s '%s' already exists", entityLabel(), value));
+                throw new BadRequestException(f("%s '%s' already exists", entityLabel(), trimmed));
             }
             // value unchanged — no-op
             return existing;
         }
 
         final String oldValue = entityValue(existing);
-        final T updated = dbService.update(id, value);
-        onValueRenamed(oldValue, value);
+        final T updated = dbService.update(id, trimmed);
+        onValueRenamed(oldValue, trimmed);
         return updated;
     }
 
-    public boolean delete(String id) {
+    /**
+     * Deletes the entity and returns the deleted instance so callers can surface the value (e.g. in audit messages).
+     */
+    public T delete(String id) {
         final T existing = dbService.get(id)
                 .orElseThrow(() -> new NotFoundException(f("Unable to find %s to delete", entityLabel().toLowerCase(Locale.ROOT))));
         onBeforeDelete(entityValue(existing));
-        return dbService.delete(id) == 1;
+        dbService.delete(id);
+        return existing;
+    }
+
+    private String requireNonBlank(String value) {
+        if (value == null || value.isBlank()) {
+            throw new BadRequestException(f("%s value cannot be empty", entityLabel()));
+        }
+        return value.trim();
     }
 
     public PaginatedList<T> findPaginated(String query, int page, int perPage, SortOrder order,

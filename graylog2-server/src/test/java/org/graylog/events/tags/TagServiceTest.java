@@ -117,13 +117,13 @@ class TagServiceTest {
     }
 
     @Test
-    void deleteRemovesTag() {
+    void deleteReturnsRemovedTag() {
         final Tag existing = Tag.builder().id(TAG_ID).value(OLD_VALUE).build();
 
         when(dbTagService.get(TAG_ID)).thenReturn(Optional.of(existing));
         when(dbTagService.delete(TAG_ID)).thenReturn(1L);
 
-        assertThat(tagService.delete(TAG_ID)).isTrue();
+        assertThat(tagService.delete(TAG_ID)).isEqualTo(existing);
     }
 
     @Test

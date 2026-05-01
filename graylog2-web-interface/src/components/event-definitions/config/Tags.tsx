@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 
+import { Alert } from 'components/bootstrap';
 import NameOnlyEntityManager from 'components/common/NameOnlyEntityManager';
 import { Spinner } from 'components/common';
 import {
@@ -24,12 +25,16 @@ import {
 } from 'components/event-definitions/hooks/useTags';
 
 const Tags = () => {
-  const { tags, loadingTags } = useEventDefinitionTags();
+  const { tags, loadingTags, tagsLoadError } = useEventDefinitionTags();
   const { addTag, addingTag, updateTag, updatingTag, deleteTag, deletingTag } =
     useEventDefinitionTagMutations();
 
   if (loadingTags) {
     return <Spinner text="Loading tags..." />;
+  }
+
+  if (tagsLoadError) {
+    return <Alert bsStyle="danger" title="Could not load tags">Failed to fetch event definition tags. Please try again.</Alert>;
   }
 
   return (

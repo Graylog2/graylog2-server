@@ -19,8 +19,8 @@ package org.graylog.events.tags.rest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -36,6 +36,7 @@ import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.events.audit.EventsAuditEventTypes;
+import org.graylog.events.tags.Tag;
 import org.graylog.events.tags.TagService;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -46,12 +47,15 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
 import java.util.List;
+import java.util.Set;
 
-@Tag(name = "Events/Tags", description = "Manage event definition tags")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Events/Tags", description = "Manage event definition tags")
 @Path("/events/tags")
 @RequiresAuthentication
 @Produces(MediaType.APPLICATION_JSON)
 public class TagResource extends RestResource implements PluginRestResource {
+
+    private static final Set<String> ALLOWED_SORT_FIELDS = Set.of(Tag.FIELD_VALUE);
 
     private final TagService tagService;
 
@@ -63,15 +67,18 @@ public class TagResource extends RestResource implements PluginRestResource {
     @GET
     @Operation(summary = "Get a paginated list of event definition tags")
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_READ)
-    public PaginatedList<org.graylog.events.tags.Tag> list(
+    public PaginatedList<Tag> list(
             @Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
             @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("15") int perPage,
             @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
             @Parameter(name = "sort", description = "The field to sort the result on", schema = @Schema(allowableValues = {"value"}))
-            @DefaultValue(org.graylog.events.tags.Tag.FIELD_VALUE) @QueryParam("sort") String sort,
+            @DefaultValue(Tag.FIELD_VALUE) @QueryParam("sort") String sort,
             @Parameter(name = "direction", description = "The sort direction", schema = @Schema(allowableValues = {"asc", "desc"}))
             @DefaultValue("asc") @QueryParam("direction") SortOrder order) {
 
+        if (!ALLOWED_SORT_FIELDS.contains(sort)) {
+            throw new BadRequestException("Unsupported sort field: " + sort);
+        }
         return tagService.findPaginated(query, page, perPage, order, sort, null);
     }
 
@@ -80,7 +87,7 @@ public class TagResource extends RestResource implements PluginRestResource {
     @Operation(summary = "Get all event definition tags")
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_READ)
     @NoAuditEvent("Not changing any data.")
-    public List<org.graylog.events.tags.Tag> getAll() {
+    public List<Tag> getAll() {
         return tagService.getAll();
     }
 
@@ -111,7 +118,6 @@ public class TagResource extends RestResource implements PluginRestResource {
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_EDIT)
     @AuditEvent(type = EventsAuditEventTypes.EVENT_TAG_DELETE)
     public Response delete(@Parameter(name = "id", required = true) @PathParam("id") String id) {
-        tagService.delete(id);
-        return Response.ok().build();
+        return Response.ok().entity(tagService.delete(id)).build();
     }
 }

@@ -19,7 +19,11 @@ package org.graylog2.database.nameonly;
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.BasicDBObject;
+import com.mongodb.MongoWriteException;
+import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.ReturnDocument;
+import jakarta.ws.rs.BadRequestException;
 import org.bson.conversions.Bson;
 import org.graylog2.database.BuildableMongoEntity;
 import org.graylog2.database.MongoCollection;
@@ -73,12 +77,21 @@ public abstract class DBNameOnlyEntityService<T extends BuildableMongoEntity<T, 
     }
 
     public T save(T entity) {
-        if (entity.id() != null) {
-            collection.replaceOne(MongoUtils.idEq(entity.id()), entity);
-            return entity;
+        try {
+            if (entity.id() != null) {
+                collection.replaceOne(MongoUtils.idEq(entity.id()), entity);
+                return entity;
+            }
+            final String id = insertedIdAsString(collection.insertOne(entity));
+            return entity.toBuilder().id(id).build();
+        } catch (MongoWriteException e) {
+            // Race between the service-layer duplicate check and the unique-index insert can land here.
+            // Surface as 400 instead of 500 to match the explicit pre-flight rejection.
+            if (e.getError().getCode() == 11000) {
+                throw new BadRequestException("An entity with this value already exists", e);
+            }
+            throw e;
         }
-        final String id = insertedIdAsString(collection.insertOne(entity));
-        return entity.toBuilder().id(id).build();
     }
 
     public long delete(String id) {
@@ -99,7 +112,10 @@ public abstract class DBNameOnlyEntityService<T extends BuildableMongoEntity<T, 
     }
 
     public T update(String id, String value) {
-        return collection.findOneAndUpdate(MongoUtils.idEq(id), set(valueField, value));
+        return collection.findOneAndUpdate(
+                MongoUtils.idEq(id),
+                set(valueField, value),
+                new FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER));
     }
 
     @MustBeClosed

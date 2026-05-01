@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 
 import { BootstrapModalConfirm, Button } from 'components/bootstrap';
@@ -113,7 +113,7 @@ const NameOnlyEntityManager = ({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<NameOnlyItem>({ id: '', value: '' });
 
-  const sortedItems = useMemo(() => [...items].sort((a, b) => (a.value > b.value ? 1 : -1)), [items]);
+  const sortedItems = [...items].sort((a, b) => (a.value > b.value ? 1 : -1));
 
   const resetAdd = () => {
     setNewValue('');
