@@ -77,9 +77,18 @@ public abstract class NameOnlyEntityService<T extends BuildableMongoEntity<T, B>
         }
 
         final String oldValue = entityValue(existing);
-        final T updated = dbService.update(id, trimmed);
-        onValueRenamed(oldValue, trimmed);
-        return updated;
+        try {
+            final T updated = dbService.update(id, trimmed);
+            onValueRenamed(oldValue, trimmed);
+            return updated;
+        } catch (MongoWriteException e) {
+            // Race between the duplicate check above and the unique-index update can land here.
+            // Surface as 400 to match the explicit pre-flight rejection.
+            if (MongoUtils.isDuplicateKeyError(e)) {
+                throw new BadRequestException(f("%s '%s' already exists", entityLabel(), trimmed), e);
+            }
+            throw e;
+        }
     }
 
     /**

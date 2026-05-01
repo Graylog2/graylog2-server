@@ -117,7 +117,7 @@ const NameOnlyEntityManager = ({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<NameOnlyItem>({ id: '', value: '' });
 
-  const sortedItems = [...items].sort((a, b) => (a.value > b.value ? 1 : -1));
+  const sortedItems = [...items].sort((a, b) => a.value.localeCompare(b.value));
 
   const resetAdd = () => {
     setNewValue('');
@@ -133,7 +133,7 @@ const NameOnlyEntityManager = ({
 
   const handleAddKeyDown = (e: React.KeyboardEvent) => {
     if (!newValue) return;
-    if (e.key === 'Enter') handleAdd();
+    if (e.key === 'Enter') handleAdd().catch(() => {});
     if (e.key === 'Escape') resetAdd();
   };
 
@@ -149,7 +149,7 @@ const NameOnlyEntityManager = ({
   };
 
   const handleEditKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') handleEdit();
+    if (e.key === 'Enter') handleEdit().catch(() => {});
     if (e.key === 'Escape') resetEdit();
   };
 
@@ -207,8 +207,8 @@ const NameOnlyEntityManager = ({
               <>
                 <div style={{ margin: '0' }}>
                   <StyledInput
-                    id={`edit-${entityLabel}-input`}
-                    data-testid={`${entityLabel}-input`}
+                    id={`edit-${labelKey}-input`}
+                    data-testid={`${labelKey}-input`}
                     type="text"
                     autoComplete="off"
                     style={{ marginBottom: '0px', paddingRight: '5px' }}
@@ -221,7 +221,7 @@ const NameOnlyEntityManager = ({
                   <CancelButton onClick={resetEdit}>Cancel</CancelButton>
                   <StyledButton
                     bsStyle="primary"
-                    data-testid={`save-edit-${entityLabel}`}
+                    data-testid={`save-edit-${labelKey}`}
                     disabled={busy.updating}
                     onClick={handleEdit}>
                     Save
@@ -235,7 +235,7 @@ const NameOnlyEntityManager = ({
                 </div>
                 <div>
                   <StyledIconButton
-                    data-testid={`delete-${entityLabel}`}
+                    data-testid={`delete-${labelKey}`}
                     title={`Delete ${entityLabel}`}
                     name="close"
                     onClick={() => {
@@ -245,7 +245,7 @@ const NameOnlyEntityManager = ({
                   />
                   <StyledIconButton
                     name="edit"
-                    data-testid={`edit-${entityLabel}`}
+                    data-testid={`edit-${labelKey}`}
                     title={`Edit ${entityLabel}`}
                     onClick={() => {
                       setEditId(item.id);

@@ -16,25 +16,38 @@
  */
 import * as React from 'react';
 
+import { Alert } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import EventDefinitionsConfigList from 'components/event-definitions/config/EventDefinitionsConfigList';
+import usePermissions from 'hooks/usePermissions';
 
-const EventDefinitionsConfigPage = () => (
-  <DocumentTitle title="Event Definitions Configuration">
-    <EventsPageNavigation />
-    <PageHeader
-      title="Event Definitions Configuration"
-      documentationLink={{
-        title: 'Alerts documentation',
-        path: DocsHelper.PAGES.ALERTS,
-      }}>
-      <span>Manage tags used to organize and categorize event definitions.</span>
-    </PageHeader>
+const EventDefinitionsConfigPage = () => {
+  const { isPermitted } = usePermissions();
+  const canEdit = isPermitted('eventdefinitions:edit');
 
-    <EventDefinitionsConfigList />
-  </DocumentTitle>
-);
+  return (
+    <DocumentTitle title="Event Definitions Configuration">
+      <EventsPageNavigation />
+      <PageHeader
+        title="Event Definitions Configuration"
+        documentationLink={{
+          title: 'Alerts documentation',
+          path: DocsHelper.PAGES.ALERTS,
+        }}>
+        <span>Manage tags used to organize and categorize event definitions.</span>
+      </PageHeader>
+
+      {canEdit ? (
+        <EventDefinitionsConfigList />
+      ) : (
+        <Alert bsStyle="warning" title="Insufficient permissions">
+          You are missing sufficient permissions to manage event definition tags.
+        </Alert>
+      )}
+    </DocumentTitle>
+  );
+};
 
 export default EventDefinitionsConfigPage;
