@@ -243,6 +243,7 @@ declare module 'graylog-web-plugin/plugin' {
     decorators: 'create' | 'edit' | 'read';
     eventdefinitions: 'create' | 'delete' | 'edit' | 'read';
     eventnotifications: 'create' | 'delete' | 'edit' | 'read';
+    eventtags: 'create' | 'delete' | 'edit' | 'read';
     fieldnames: 'read';
     grok_pattern: 'read';
     indexercluster: 'read';
