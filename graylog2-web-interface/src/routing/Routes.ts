@@ -75,6 +75,7 @@ const Routes = {
       edit: (notificationId: string) => `/alerts/notifications/${notificationId}/edit`,
       show: (notificationId: string) => `/alerts/notifications/${notificationId}`,
     },
+    CONFIGURATION: '/alerts/configuration',
   },
   SECURITY: {
     OVERVIEW: `${SECURITY_PATH}`,

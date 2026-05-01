@@ -24,6 +24,7 @@ import java.util.Set;
 public class EventsAuditEventTypes implements PluginAuditEventTypes {
     private static final String EVENT_DEFINITON_PREFIX = "events:definition:";
     private static final String EVENT_NOTIFICATION_PREFIX = "events:notification:";
+    private static final String EVENT_TAG_PREFIX = "events:tag:";
 
     public static final String EVENT_DEFINITION_CREATE = EVENT_DEFINITON_PREFIX + "create";
     public static final String EVENT_DEFINITION_DELETE = EVENT_DEFINITON_PREFIX + "delete";
@@ -33,6 +34,9 @@ public class EventsAuditEventTypes implements PluginAuditEventTypes {
     public static final String EVENT_NOTIFICATION_CREATE = EVENT_NOTIFICATION_PREFIX + "create";
     public static final String EVENT_NOTIFICATION_DELETE = EVENT_NOTIFICATION_PREFIX + "delete";
     public static final String EVENT_NOTIFICATION_UPDATE = EVENT_NOTIFICATION_PREFIX + "update";
+    public static final String EVENT_TAG_CREATE = EVENT_TAG_PREFIX + "create";
+    public static final String EVENT_TAG_UPDATE = EVENT_TAG_PREFIX + "update";
+    public static final String EVENT_TAG_DELETE = EVENT_TAG_PREFIX + "delete";
 
     private static final ImmutableSet<String> EVENT_TYPES = ImmutableSet.<String>builder()
             .add(EVENT_DEFINITION_CREATE)
@@ -43,6 +47,9 @@ public class EventsAuditEventTypes implements PluginAuditEventTypes {
         .add(EVENT_NOTIFICATION_CREATE)
         .add(EVENT_NOTIFICATION_DELETE)
         .add(EVENT_NOTIFICATION_UPDATE)
+        .add(EVENT_TAG_CREATE)
+        .add(EVENT_TAG_UPDATE)
+        .add(EVENT_TAG_DELETE)
         .build();
 
     @Override

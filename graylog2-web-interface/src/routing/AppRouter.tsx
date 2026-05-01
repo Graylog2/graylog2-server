@@ -43,6 +43,7 @@ import {
   EditContentPackPage,
   EditExtractorsPage,
   EnterprisePage,
+  EventDefinitionsConfigPage,
   EventDefinitionsPage,
   EventNotificationsPage,
   EventsPage,
@@ -233,6 +234,7 @@ const AppRouter = () => {
               path: RoutePaths.ALERTS.NOTIFICATIONS.show(':notificationId'),
               element: <ShowEventNotificationPage />,
             },
+            { path: RoutePaths.ALERTS.CONFIGURATION, element: <EventDefinitionsConfigPage /> },
 
             enableInputsRoute && { path: RoutePaths.SYSTEM.INPUTS, element: <InputsPage /> },
             { path: RoutePaths.SYSTEM.INPUT_DIAGNOSIS(':inputId'), element: <InputDiagnosisPage /> },

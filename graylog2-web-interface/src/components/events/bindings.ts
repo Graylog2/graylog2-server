@@ -22,6 +22,7 @@ import Routes from 'routing/Routes';
 export const EVENT_DEFINITIONS_TITLE = 'Event Definitions';
 export const ALERTS_TITLE = 'Alerts & Events';
 const NOTIFICATIONS_TITLE = 'Notifications';
+const CONFIGURATION_TITLE = 'Config';
 export const PAGE_NAVIGATION_TITLE = 'Alerts';
 
 const eventsBindings: PluginExports = {
@@ -32,6 +33,11 @@ const eventsBindings: PluginExports = {
         { description: ALERTS_TITLE, path: Routes.ALERTS.LIST, exactPathMatch: true },
         { description: EVENT_DEFINITIONS_TITLE, path: Routes.ALERTS.DEFINITIONS.LIST },
         { description: NOTIFICATIONS_TITLE, path: Routes.ALERTS.NOTIFICATIONS.LIST },
+        {
+          description: CONFIGURATION_TITLE,
+          path: Routes.ALERTS.CONFIGURATION,
+          permissions: ['eventdefinitions:edit' as const],
+        },
       ],
     },
   ],

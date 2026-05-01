@@ -1,0 +1,279 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import * as React from 'react';
+import { useMemo, useState } from 'react';
+import styled from 'styled-components';
+
+import { BootstrapModalConfirm, Button } from 'components/bootstrap';
+import SectionComponent from 'components/common/Section/SectionComponent';
+import { IconButton, Spinner } from 'components/common';
+
+const DataRow = styled.div`
+  width: 100%;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .default-button {
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+  }
+
+  &:hover .default-button {
+    opacity: 1;
+  }
+`;
+
+const StyledInput = styled.input`
+  color: #fff;
+  background-color: #303030;
+  padding: 6px 12px;
+  border: 1px solid #525252;
+
+  &:focus {
+    border: 1px solid #5082bc;
+    box-shadow:
+      inset 0 1px 1px rgb(0 0 0 / 8%),
+      0 0 8px rgb(80 130 188 / 40%);
+  }
+`;
+
+const StyledButton = styled(Button)`
+  justify-content: flex-end;
+`;
+
+const CancelButton = styled(StyledButton)`
+  margin-right: 5px;
+`;
+
+const StyledIconButton = styled(IconButton)`
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  float: right;
+  font-weight: bold;
+  line-height: 1;
+  opacity: 0.5;
+
+  &:hover {
+    background-color: transparent;
+    opacity: 0.7;
+  }
+`;
+
+export type NameOnlyItem = { id: string; value: string };
+
+export type NameOnlyTelemetryEvent = 'added' | 'updated' | 'deleted';
+
+type Props = {
+  title: string;
+  /** Lower-case label used in delete copy and aria-labels (e.g. "tag", "category"). */
+  entityLabel: string;
+  items: ReadonlyArray<NameOnlyItem>;
+  onAdd: (value: string) => Promise<unknown>;
+  onUpdate: (id: string, value: string) => Promise<unknown>;
+  onDelete: (id: string) => Promise<unknown>;
+  busy?: { adding?: boolean; updating?: boolean; deleting?: boolean };
+  /** Optional custom warning rendered inside the delete confirmation modal. */
+  renderDeleteWarning?: (item: NameOnlyItem) => React.ReactNode;
+  onTelemetry?: (event: NameOnlyTelemetryEvent) => void;
+};
+
+const NameOnlyEntityManager = ({
+  title,
+  entityLabel,
+  items,
+  onAdd,
+  onUpdate,
+  onDelete,
+  busy = {},
+  renderDeleteWarning = undefined,
+  onTelemetry = undefined,
+}: Props) => {
+  const [editId, setEditId] = useState('');
+  const [editValue, setEditValue] = useState('');
+  const [showAdd, setShowAdd] = useState(false);
+  const [newValue, setNewValue] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<NameOnlyItem>({ id: '', value: '' });
+
+  const sortedItems = useMemo(() => [...items].sort((a, b) => (a.value > b.value ? 1 : -1)), [items]);
+
+  const resetAdd = () => {
+    setNewValue('');
+    setShowAdd(false);
+  };
+
+  const handleAdd = async () => {
+    if (!newValue) return;
+    await onAdd(newValue);
+    resetAdd();
+    onTelemetry?.('added');
+  };
+
+  const handleAddKeyDown = (e: React.KeyboardEvent) => {
+    if (!newValue) return;
+    if (e.key === 'Enter') handleAdd();
+    if (e.key === 'Escape') resetAdd();
+  };
+
+  const resetEdit = () => {
+    setEditId('');
+    setEditValue('');
+  };
+
+  const handleEdit = async () => {
+    await onUpdate(editId, editValue);
+    resetEdit();
+    onTelemetry?.('updated');
+  };
+
+  const handleEditKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') handleEdit();
+    if (e.key === 'Escape') resetEdit();
+  };
+
+  const handleDelete = async (id: string) => {
+    await onDelete(id);
+    setShowDeleteModal(false);
+    setItemToDelete({ id: '', value: '' });
+    onTelemetry?.('deleted');
+  };
+
+  return (
+    <SectionComponent
+      title={title}
+      headerActions={
+        <StyledButton
+          bsStyle="primary"
+          data-testid={`add-${entityLabel}`}
+          onClick={() => setShowAdd(true)}
+          disabled={showAdd}>
+          Add New
+        </StyledButton>
+      }>
+      {showAdd && (
+        <DataRow key={`new-${entityLabel}`}>
+          <div style={{ margin: '0' }}>
+            <StyledInput
+              id={`add-${entityLabel}-input`}
+              data-testid={`new-${entityLabel}-input`}
+              type="text"
+              autoComplete="off"
+              style={{ marginBottom: '0px', paddingRight: '5px' }}
+              value={newValue}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewValue(e.target.value)}
+              onKeyDown={handleAddKeyDown}
+            />
+          </div>
+          <div>
+            <CancelButton onClick={resetAdd}>Cancel</CancelButton>
+            <StyledButton
+              bsStyle="primary"
+              data-testid={`save-new-${entityLabel}`}
+              disabled={!newValue || busy.adding}
+              onClick={handleAdd}>
+              Add
+            </StyledButton>
+          </div>
+        </DataRow>
+      )}
+      {sortedItems.map((item) => {
+        const isEditing = item.id === editId;
+
+        return (
+          <DataRow key={item.id}>
+            {isEditing ? (
+              <>
+                <div style={{ margin: '0' }}>
+                  <StyledInput
+                    id={`edit-${entityLabel}-input`}
+                    data-testid={`${entityLabel}-input`}
+                    type="text"
+                    autoComplete="off"
+                    style={{ marginBottom: '0px', paddingRight: '5px' }}
+                    value={editValue}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditValue(e.target.value)}
+                    onKeyDown={handleEditKeyDown}
+                  />
+                </div>
+                <div>
+                  <CancelButton onClick={resetEdit}>Cancel</CancelButton>
+                  <StyledButton
+                    bsStyle="primary"
+                    data-testid={`save-edit-${entityLabel}`}
+                    disabled={busy.updating}
+                    onClick={handleEdit}>
+                    Save
+                  </StyledButton>
+                </div>
+              </>
+            ) : (
+              <>
+                <div style={{ display: 'flex' }}>
+                  <div>{item.value}</div>
+                </div>
+                <div>
+                  <StyledIconButton
+                    data-testid={`delete-${entityLabel}`}
+                    title={`Delete ${entityLabel}`}
+                    name="close"
+                    onClick={() => {
+                      setItemToDelete(item);
+                      setShowDeleteModal(true);
+                    }}
+                  />
+                  <StyledIconButton
+                    name="edit"
+                    data-testid={`edit-${entityLabel}`}
+                    title={`Edit ${entityLabel}`}
+                    onClick={() => {
+                      setEditId(item.id);
+                      setEditValue(item.value);
+                    }}
+                  />
+                </div>
+              </>
+            )}
+          </DataRow>
+        );
+      })}
+      <BootstrapModalConfirm
+        showModal={showDeleteModal}
+        title={`Are you sure you want to delete this ${entityLabel}?`}
+        onConfirm={() => handleDelete(itemToDelete.id)}
+        onCancel={() => setShowDeleteModal(false)}
+        cancelButtonDisabled={busy.deleting}
+        confirmButtonDisabled={busy.deleting}>
+        {busy.deleting ? (
+          <Spinner text="Deleting..." />
+        ) : (
+          <>
+            <div>
+              You are about to delete this {entityLabel}: {itemToDelete.value}
+            </div>
+            {renderDeleteWarning && <div>{renderDeleteWarning(itemToDelete)}</div>}
+          </>
+        )}
+      </BootstrapModalConfirm>
+    </SectionComponent>
+  );
+};
+
+export default NameOnlyEntityManager;

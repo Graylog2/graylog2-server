@@ -69,6 +69,7 @@ import org.graylog.events.rest.AvailableEntityTypesResource;
 import org.graylog.events.rest.EventDefinitionsResource;
 import org.graylog.events.rest.EventNotificationsResource;
 import org.graylog.events.rest.EventsResource;
+import org.graylog.events.tags.rest.TagResource;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -104,6 +105,7 @@ public class EventsModule extends PluginModule {
         addSystemRestResource(EventNotificationsResource.class);
         addSystemRestResource(EventsResource.class);
         addSystemRestResource(SystemNotificationRenderResource.class);
+        addSystemRestResource(TagResource.class);
 
         addPeriodical(EventNotificationStatusCleanUp.class);
 
