@@ -44,7 +44,7 @@ public class DeletedStreamNotificationListener {
             Object rawValue = notification.getDetail("stream_id");
             if (rawValue != null && rawValue.toString().equals(streamId)) {
                 LOG.debug("Removing notification that references stream: {}", notification);
-                notificationService.destroy(notification);
+                notificationService.fixed(notification);
             }
         }
     }

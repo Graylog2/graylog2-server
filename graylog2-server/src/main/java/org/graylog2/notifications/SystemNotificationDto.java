@@ -117,18 +117,11 @@ public abstract class SystemNotificationDto implements BuildableMongoEntity<Syst
         public abstract String name();
 
         public static Actor system() {
-            return new AutoValue_SystemNotificationDto_Actor("system", "system");
+            return Actor.Builder.create().id("system").name("system").build();
         }
 
         public static Actor create(String id, String name) {
-            return new AutoValue_SystemNotificationDto_Actor(id, name);
-        }
-
-        @JsonCreator
-        public static Actor create(@JsonProperty("id") String id,
-                                   @JsonProperty("name") String name,
-                                   @SuppressWarnings("unused") @JsonProperty("_dummy") Void dummy) {
-            return new AutoValue_SystemNotificationDto_Actor(id, name);
+            return Actor.Builder.create().id(id).name(name).build();
         }
 
         @AutoValue.Builder

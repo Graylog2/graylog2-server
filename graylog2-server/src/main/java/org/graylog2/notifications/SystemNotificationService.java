@@ -16,7 +16,7 @@
  */
 package org.graylog2.notifications;
 
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexModel;
 import com.mongodb.client.model.IndexOptions;
@@ -24,12 +24,12 @@ import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Sorts;
 import com.mongodb.client.model.Updates;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 import org.graylog.events.processor.systemnotification.SystemNotificationRenderService;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.database.pagination.MongoPaginationHelper;
 import org.graylog2.database.utils.MongoUtils;
-import org.graylog2.rest.models.PaginatedList;
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +84,7 @@ public class SystemNotificationService {
                         new IndexOptions()
                                 .unique(true)
                                 .partialFilterExpression(Filters.and(
-                                        Filters.ne(FIELD_KEY, null),
+                                        Filters.type(FIELD_KEY, "string"),
                                         Filters.eq(FIELD_IS_READ, false)
                                 ))
                 ),
@@ -220,9 +220,11 @@ public class SystemNotificationService {
      * Toggles the read state of entries with the given IDs: unread entries become read, read entries become unread.
      */
     public void toggleReadState(List<String> ids, SystemNotificationDto.Actor actor) {
-        final List<SystemNotificationDto> entries = MongoUtils.stream(
-                collection.find(MongoUtils.idsIn(ids.stream().map(ObjectId::new).toList()))
-        ).toList();
+        final List<SystemNotificationDto> entries;
+        try (var stream = MongoUtils.stream(
+                collection.find(MongoUtils.idsIn(ids.stream().map(ObjectId::new).toList())))) {
+            entries = stream.toList();
+        }
 
         final List<String> readIds = entries.stream()
                 .filter(SystemNotificationDto::isRead)
@@ -270,10 +272,11 @@ public class SystemNotificationService {
      * Returns all unread entries (backward compat for legacy endpoint).
      */
     public List<SystemNotificationDto> findAllUnread() {
-        return MongoUtils.stream(
+        try (var stream = MongoUtils.stream(
                 collection.find(Filters.eq(FIELD_IS_READ, false))
-                        .sort(Sorts.descending(FIELD_TRIGGERED_AT))
-        ).toList();
+                        .sort(Sorts.descending(FIELD_TRIGGERED_AT)))) {
+            return stream.toList();
+        }
     }
 
     /**
@@ -299,7 +302,9 @@ public class SystemNotificationService {
                 .sort(Sorts.orderBy(Sorts.ascending(FIELD_IS_READ), Sorts.descending(FIELD_TRIGGERED_AT)))
                 .limit(1);
 
-        return MongoUtils.stream(results).findFirst();
+        try (var stream = MongoUtils.stream(results)) {
+            return stream.findFirst();
+        }
     }
 
     /**
@@ -338,11 +343,13 @@ public class SystemNotificationService {
         final long toDelete = total - maxCount;
 
         // Find the oldest entries that would be deleted
-        final List<SystemNotificationDto> oldest = MongoUtils.stream(
+        final List<SystemNotificationDto> oldest;
+        try (var stream = MongoUtils.stream(
                 collection.find()
                         .sort(Sorts.ascending(FIELD_TRIGGERED_AT))
-                        .limit((int) toDelete)
-        ).toList();
+                        .limit((int) toDelete))) {
+            oldest = stream.toList();
+        }
 
         final long unreadCount = oldest.stream().filter(d -> !d.isRead()).count();
         if (unreadCount > 0) {
@@ -351,6 +358,6 @@ public class SystemNotificationService {
         }
 
         final List<String> idsToDelete = oldest.stream().map(SystemNotificationDto::id).toList();
-        return collection.deleteMany(mongoUtils.idIn(idsToDelete)).getDeletedCount();
+        return collection.deleteMany(MongoUtils.stringIdsIn(idsToDelete)).getDeletedCount();
     }
 }

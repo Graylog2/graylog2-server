@@ -118,7 +118,7 @@ public class SystemNotificationRenderService {
         }
     }
 
-    public class RenderResponse {
+    public static class RenderResponse {
         public String title;
         public String description;
 

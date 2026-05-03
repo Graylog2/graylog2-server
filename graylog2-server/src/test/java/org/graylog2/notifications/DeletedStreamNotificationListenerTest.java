@@ -39,7 +39,7 @@ class DeletedStreamNotificationListenerTest {
         clusterEventBus.post(new StreamDeletedEvent("123", "stream title"));
 
         final ArgumentCaptor<Notification> argumentCaptor = ArgumentCaptor.forClass(Notification.class);
-        Mockito.verify(notificationService, Mockito.times(1)).destroy(argumentCaptor.capture());
+        Mockito.verify(notificationService, Mockito.times(1)).fixed(argumentCaptor.capture());
         Assertions.assertThat(argumentCaptor.getValue().getDetail("stream_id"))
                 .isEqualTo("123");
     }

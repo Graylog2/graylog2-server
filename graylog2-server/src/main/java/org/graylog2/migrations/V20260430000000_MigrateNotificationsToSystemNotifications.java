@@ -16,14 +16,13 @@
  */
 package org.graylog2.migrations;
 
-import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import org.graylog.events.processor.systemnotification.SystemNotificationRenderService;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationBuilder;
 import org.graylog2.notifications.SystemNotificationDto;
-import org.graylog2.notifications.SystemNotificationService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,9 +68,9 @@ public class V20260430000000_MigrateNotificationsToSystemNotifications extends M
             return;
         }
 
-        final MongoCollection<Document> oldCollection = mongoCollections.nonEntityCollection(OLD_COLLECTION, Document.class);
+        final com.mongodb.client.MongoCollection<Document> oldCollection = mongoCollections.nonEntityCollection(OLD_COLLECTION, Document.class);
         final MongoCollection<SystemNotificationDto> newCollection =
-                mongoCollections.collection(SystemNotificationService.COLLECTION_NAME, SystemNotificationDto.class);
+                mongoCollections.collection("system_notifications", SystemNotificationDto.class);
 
         int migrated = 0;
         int errors = 0;
