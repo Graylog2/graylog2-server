@@ -16,3 +16,7 @@
  */
 
 export const NOTIFICATIONS_QUERY_KEY = ['system', 'notifications'] as const;
+
+export const BADGE_COUNT_KEY = 'badge-count' as const;
+export const TABLE_KEY = 'table' as const;
+export const CONFIG_KEY = 'config' as const;
