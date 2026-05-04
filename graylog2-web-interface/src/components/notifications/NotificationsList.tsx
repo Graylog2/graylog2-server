@@ -42,7 +42,8 @@ const Notifications = ({ count, notifications }: { count: number; notifications:
   ) : (
     notifications?.map((notification) => (
       <Notification
-        key={`${notification.type}-${notification?.key}-${notification.timestamp}`}
+        // Phase 5 will delete this component; key uses triggered_at for compatibility with the new DTO.
+        key={`${notification.type}-${notification?.key}-${notification.triggered_at}`}
         notification={notification}
       />
     ))
@@ -68,7 +69,9 @@ const NotificationsList = () => {
           the documentation if you need more information or assistance.
         </p>
 
-        <Notifications count={total} notifications={notifications} />
+        {/* Phase 5 will delete this component; cast bridges the legacy `listNotifications`
+            response to the new SystemNotificationDto shape until then. */}
+        <Notifications count={total} notifications={notifications as unknown as Array<NotificationType>} />
       </Col>
     </Row>
   );

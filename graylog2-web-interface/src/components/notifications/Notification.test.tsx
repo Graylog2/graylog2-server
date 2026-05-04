@@ -27,6 +27,9 @@ const notificationMessageFixture = {
   description:
     '\n<span>\nThere is a node without any running inputs. This means that you are not receiving any messages from this\nnode at this point in time. This is most probably an indication of an error or misconfiguration.\n         You can click <a href="/system/inputs" target="_blank" rel="noreferrer">here</a> to solve this.\n</span>\n',
 };
+// Phase 5 will delete this component + test. Fixture is augmented with the
+// new SystemNotificationDto fields (actor, is_read, triggered_at, description,
+// title, last_changed) so it satisfies the flipped NotificationType.
 const notificationFixture = {
   id: 'deadbeef',
   details: {},
@@ -36,7 +39,13 @@ const notificationFixture = {
   type: 'no_input_running',
   key: 'test',
   timestamp: '2022-12-12T10:55:55.014Z',
+  triggered_at: '2022-12-12T10:55:55.014Z',
+  last_changed: '2022-12-12T10:55:55.014Z',
   node_id: '3fcc3889-18a3-4a0d-821c-0fd560d152e7',
+  is_read: false,
+  actor: { id: 'system', name: 'System' },
+  title: 'There is a node without any running inputs',
+  description: 'There is a node without any running inputs.',
 } as const;
 
 jest.mock('components/notifications/useNotificationMessage');

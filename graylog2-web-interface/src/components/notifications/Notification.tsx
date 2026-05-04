@@ -71,7 +71,8 @@ const Notification = ({ notification }: Props) => {
         <>
           <Sanitize html={message?.title} />
           <NotificationTimestamp>
-            (triggered <RelativeTime dateTime={notification.timestamp} />)
+            {/* Phase 5 will delete this component; field renamed timestamp -> triggered_at to match SystemNotificationDto. */}
+            (triggered <RelativeTime dateTime={notification.triggered_at} />)
           </NotificationTimestamp>
         </>
       }
