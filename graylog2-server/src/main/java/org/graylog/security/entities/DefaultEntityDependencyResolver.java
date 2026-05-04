@@ -77,6 +77,11 @@ public class DefaultEntityDependencyResolver implements EntityDependencyResolver
                         dependencyGraph.predecessors(dependency).stream().anyMatch(
                                 predecessor -> !ModelTypes.STREAM_V1.equals(predecessor.type()))
                 )
+                // Ignore lookup tables, adapters, and caches as dependencies. Lookup tables don't have a corresponding
+                // GRN type registered and cannot be resolved for permission checks.
+                .filter(dependency -> !ModelTypes.LOOKUP_TABLE_V1.equals(dependency.type()) &&
+                        !ModelTypes.LOOKUP_ADAPTER_V1.equals(dependency.type()) &&
+                        !ModelTypes.LOOKUP_CACHE_V1.equals(dependency.type()))
                 // TODO: Work around from using the content pack dependency resolver:
                 //  We've added stream_title content pack entities in https://github.com/Graylog2/graylog2-server/pull/17089,
                 //  but in this context we want to return the actual dependent Stream to add additional permissions to.

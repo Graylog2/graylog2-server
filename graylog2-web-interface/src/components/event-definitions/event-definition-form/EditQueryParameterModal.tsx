@@ -55,7 +55,9 @@ class EditQueryParameterModal extends React.Component<Props, State> {
   }
 
   openModal = () => {
-    this.setState({ showModal: true });
+    const { queryParameter } = this.props;
+
+    this.setState({ showModal: true, queryParameter });
   };
 
   _cleanState = () => {
