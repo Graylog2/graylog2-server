@@ -50,7 +50,21 @@ const useNotificationConfig = ({
     // not accept the body argument, so we drop down to fetch directly. The
     // response shape is still typed via the SDK derivation in
     // `components/notifications/types.ts`.
-    mutationFn: (config) => fetch('PUT', '/system/notifications/config', config),
+    //
+    // Internal permission guard: the consumer is expected to hide the save
+    // button when `isUpdateEnabled` is false (driven by
+    // `notifications_config:update`), but if `update` is fired anyway we
+    // refuse here rather than letting the request hit the network and fail
+    // 403 server-side.
+    mutationFn: (config) => {
+      if (!updateEnabled) {
+        return Promise.reject(
+          new Error('Update of notifications retention configuration is not enabled — check notifications_config:update.'),
+        );
+      }
+
+      return fetch('PUT', '/system/notifications/config', config);
+    },
     onSuccess: (updated) => {
       queryClient.setQueryData(configKey, updated);
       queryClient.invalidateQueries({ queryKey: configKey });
