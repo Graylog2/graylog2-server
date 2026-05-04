@@ -19,7 +19,7 @@ import React from 'react';
 import { Alert, Row, Col } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import Notification from 'components/notifications/Notification';
-import type { NotificationType } from 'components/notifications/types';
+import type { LegacyNotificationType } from 'components/notifications/types';
 
 import useNotifications from './useNotifications';
 
@@ -34,7 +34,7 @@ const _formatNotificationCount = (count: number) => {
 const Title = ({ count }: { count: number }) =>
   count === 0 ? 'No notifications' : `There ${_formatNotificationCount(count)}`;
 
-const Notifications = ({ count, notifications }: { count: number; notifications: Array<NotificationType> }) =>
+const Notifications = ({ count, notifications }: { count: number; notifications: Array<LegacyNotificationType> }) =>
   count === 0 ? (
     <Alert bsStyle="success" className="notifications-none">
       No notifications
@@ -42,8 +42,7 @@ const Notifications = ({ count, notifications }: { count: number; notifications:
   ) : (
     notifications?.map((notification) => (
       <Notification
-        // Phase 5 will delete this component; key uses triggered_at for compatibility with the new DTO.
-        key={`${notification.type}-${notification?.key}-${notification.triggered_at}`}
+        key={`${notification.type}-${notification?.key}-${notification.timestamp}`}
         notification={notification}
       />
     ))
@@ -69,9 +68,7 @@ const NotificationsList = () => {
           the documentation if you need more information or assistance.
         </p>
 
-        {/* Phase 5 will delete this component; cast bridges the legacy `listNotifications`
-            response to the new SystemNotificationDto shape until then. */}
-        <Notifications count={total} notifications={notifications as unknown as Array<NotificationType>} />
+        <Notifications count={total} notifications={notifications} />
       </Col>
     </Row>
   );
