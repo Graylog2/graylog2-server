@@ -16,10 +16,14 @@
  */
 
 import Routes from 'routing/Routes';
-import type { NotificationType } from 'components/notifications/types';
+import type { LegacyNotificationType, NotificationType } from 'components/notifications/types';
+
+// Accepts both the new SystemNotificationDto and the legacy listNotifications()
+// row — the factory only reads `type` and `details`, which are common to both.
+type AnyNotification = NotificationType | LegacyNotificationType;
 
 class NotificationsFactory {
-  static getValuesForNotification(notification: NotificationType) {
+  static getValuesForNotification(notification: AnyNotification) {
     switch (notification.type) {
       case 'legacy_ldap_config_migration': {
         const { auth_service_id: authServiceId } = notification.details;

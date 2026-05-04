@@ -19,13 +19,17 @@ import styled, { css } from 'styled-components';
 
 import { Alert } from 'components/bootstrap';
 import { RelativeTime, Sanitize, Spinner } from 'components/common';
-import type { NotificationType } from 'components/notifications/types';
+import type { LegacyNotificationType } from 'components/notifications/types';
 import useNotificationDelete from 'components/notifications/useNotificationDelete';
 
 import useNotificationMessage from './useNotificationMessage';
 
+// Phase 5 will delete this component. It still consumes the legacy
+// `listNotifications()` endpoint via NotificationsList, so it is typed against
+// LegacyNotificationType. useNotificationMessage and NotificationsFactory both
+// accept the legacy + new union, so no widening is needed here.
 type Props = {
-  notification: NotificationType;
+  notification: LegacyNotificationType;
 };
 
 const StyledAlert = styled(Alert)(
@@ -71,8 +75,7 @@ const Notification = ({ notification }: Props) => {
         <>
           <Sanitize html={message?.title} />
           <NotificationTimestamp>
-            {/* Phase 5 will delete this component; field renamed timestamp -> triggered_at to match SystemNotificationDto. */}
-            (triggered <RelativeTime dateTime={notification.triggered_at} />)
+            (triggered <RelativeTime dateTime={notification.timestamp} />)
           </NotificationTimestamp>
         </>
       }

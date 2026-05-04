@@ -24,6 +24,13 @@ export type NotificationType = Awaited<
   ReturnType<(typeof SystemNotifications)['getPaginated']>
 >['elements'][number];
 
+// Legacy shape returned by GET /system/notifications (the pre-paginated endpoint).
+// Still used by `useNotifications()`, `NotificationsList.tsx`, and `Notification.tsx`.
+// Phase 5 deletes those callers; this alias is the bridge until then.
+export type LegacyNotificationType = Awaited<
+  ReturnType<(typeof SystemNotifications)['listNotifications']>
+>['notifications'][number];
+
 // Retention configuration form payload — see Phase 4 (NotificationsConfig.tsx)
 // and Spec scenario `Configurable retention`. Backend exposes
 // GET /system/notifications/config and PUT /system/notifications/config.
