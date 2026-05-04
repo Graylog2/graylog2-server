@@ -48,7 +48,6 @@ class NotificationServiceAdapterTest {
 
     @BeforeEach
     void setUp() {
-        when(nodeId.getNodeId()).thenReturn("test-node-id");
         adapter = new NotificationServiceAdapter(systemNotificationService, nodeId, eventPublisher);
     }
 
