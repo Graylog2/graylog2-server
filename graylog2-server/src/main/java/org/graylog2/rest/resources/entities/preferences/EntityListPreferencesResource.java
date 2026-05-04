@@ -43,10 +43,14 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.rest.resources.entities.preferences.model.EntityListPreferences;
+import org.graylog2.rest.resources.entities.preferences.model.PredefinedLayoutVariant;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId;
 import org.graylog2.rest.resources.entities.preferences.service.EntityListPreferencesService;
 import org.graylog2.shared.rest.PublicCloudAPI;
+
+import java.util.Comparator;
+import java.util.List;
 
 @RequiresAuthentication
 @PublicCloudAPI
@@ -126,6 +130,30 @@ public class EntityListPreferencesResource {
         } else {
             return usersPreferences.preferences();
         }
+    }
+
+    @GET
+    @Path("/list_predefined/{entity_list_id}")
+    @Timed
+    @Operation(summary = "List predefined layout variants for entity list with given id")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "List of predefined layout variants retrieved successfully",
+                         content = @Content(schema = @Schema(implementation = PredefinedLayoutVariant[].class)))
+    })
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<PredefinedLayoutVariant> listPredefined(@Parameter(name = "entity_list_id", required = true)
+                                                        @PathParam("entity_list_id") @NotEmpty String entityListId) {
+
+        return entityListPreferencesService
+                .getPredefinedForEntityList(entityListId)
+                .stream()
+                .sorted(Comparator.nullsFirst(Comparator.comparing(pref -> pref.preferences().priority())))
+                .map(pref -> new PredefinedLayoutVariant(
+                        pref.preferencesId().layoutVariant(),
+                        pref.preferencesId().entityListId(),
+                        pref.preferences().displayName()))
+                .toList();
+
     }
 
     private String obtainLayoutVariant(final String layoutVariant) {
