@@ -31,7 +31,7 @@
 
     <groupId>org.graylog</groupId>
     <artifactId>graylog-parent</artifactId>
-    <version>7.1.0</version>
+    <version>7.1.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Graylog Parent POM</name>
