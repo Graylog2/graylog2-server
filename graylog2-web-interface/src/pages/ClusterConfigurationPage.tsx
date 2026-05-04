@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { DocumentTitle, PageHeader } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
@@ -25,8 +26,13 @@ import type { SearchParams } from 'stores/PaginationTypes';
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import IndexerClusterHealth from 'components/indexers/IndexerClusterHealth';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { isPermitted } from 'util/PermissionsMixin';
+import Routes from 'routing/Routes';
 
 const ClusterConfigurationPage = () => {
+  const currentUser = useCurrentUser();
+  const navigate = useNavigate();
   const clusterNodes = useClusterNodes();
   const searchParams: SearchParams = {
     query: '',
@@ -34,6 +40,12 @@ const ClusterConfigurationPage = () => {
     pageSize: 0,
     sort: { attributeId: 'hostname', direction: 'asc' },
   };
+
+  useEffect(() => {
+    if (!isPermitted(currentUser.permissions, 'clusterconfiguration:read')) {
+      navigate(Routes.NOTFOUND);
+    }
+  }, [currentUser.permissions, navigate]);
 
   return (
     <DocumentTitle title="Cluster Configuration">
