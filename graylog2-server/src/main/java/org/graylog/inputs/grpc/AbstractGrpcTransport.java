@@ -30,6 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
@@ -62,11 +63,13 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
     private static final String CK_BIND_ADDRESS = "bind_address";
     private static final String CK_PORT = "port";
     private static final String CK_BEARER_TOKEN = "bearer_token";
-    private static final String CK_INSECURE = "insecure";
-    private static final String CK_TLS_CERT = "tls_cert";
-    private static final String CK_TLS_KEY = "tls_key";
+    public static final String CK_INSECURE = "insecure";
+    public static final String CK_TLS_CERT = "tls_cert";
+    public static final String CK_TLS_KEY = "tls_key";
     private static final String CK_TLS_CLIENT_CA = "tls_client_ca";
     private static final String CK_MAX_INBOUND_MSG_SIZE = "max_inbound_msg_size";
+
+    private static final boolean DEFAULT_INSECURE = false;
 
     protected final LocalMetricRegistry localMetricRegistry;
     private final Configuration configuration;
@@ -91,7 +94,7 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
 
         final var bindAddress = configuration.getString(CK_BIND_ADDRESS, "127.0.0.1");
         final var port = configuration.getInt(CK_PORT, 4317);
-        final var insecure = configuration.getBoolean(CK_INSECURE, false);
+        final var insecure = configuration.getBoolean(CK_INSECURE, DEFAULT_INSECURE);
         final var maxInboundMsgSize = configuration.getInt(CK_MAX_INBOUND_MSG_SIZE, GrpcUtil.DEFAULT_MAX_MESSAGE_SIZE);
         final var requireBearerToken = configuration.encryptedValueIsSet(CK_BEARER_TOKEN);
 
@@ -120,9 +123,12 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
         }
     }
 
-    private SslContext getSslContext() {
-        final var fields = new Config().getRequestedConfiguration();
+    public static void checkTlsConfiguration(Configuration configuration) throws ConfigurationException {
+        if (configuration.getBoolean(CK_INSECURE, DEFAULT_INSECURE)) {
+            return;
+        }
 
+        final var fields = new Config().getRequestedConfiguration();
         final List<String> missingFieldNames = new ArrayList<>();
         if (configuration.getString(CK_TLS_CERT, "").isBlank()) {
             missingFieldNames.add(fields.getField(CK_TLS_CERT).getHumanName());
@@ -132,9 +138,17 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
         }
 
         if (!missingFieldNames.isEmpty()) {
-            throw new RuntimeException(f("Secure mode is enabled, but required configuration for %s is missing.",
+            throw new ConfigurationException(f("Secure mode is enabled, but required configuration for %s is missing.",
                     missingFieldNames.stream().map(s -> StringUtils.wrap(s, '"'))
                             .collect(Collectors.joining(", "))));
+        }
+    }
+
+    private SslContext getSslContext() {
+        try {
+            checkTlsConfiguration(configuration);
+        } catch (ConfigurationException e) {
+            throw new RuntimeException(e.getMessage(), e);
         }
 
         final Base64.Decoder base64Decoder = Base64.getDecoder();
@@ -198,7 +212,7 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
             request.addField(new BooleanField(
                     CK_INSECURE,
                     "Allow Insecure Connections",
-                    false,
+                    true,
                     "Disable TLS encryption to allow insecure connections to the server"
             ));
 

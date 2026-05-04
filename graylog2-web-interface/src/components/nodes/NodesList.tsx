@@ -19,8 +19,7 @@ import { useMemo } from 'react';
 
 import { Row, Col } from 'components/bootstrap';
 import { Spinner, EntityList, Pluralize } from 'components/common';
-import { ClusterOverviewStore } from 'stores/cluster/ClusterOverviewStore';
-import { useStore } from 'stores/connect';
+import useClusterOverview from 'hooks/useClusterOverview';
 
 import NodeListItem from './NodeListItem';
 
@@ -29,7 +28,7 @@ type Props = {
 };
 
 const NodesList = ({ nodes = undefined }: Props) => {
-  const { clusterOverview } = useStore(ClusterOverviewStore);
+  const { data: clusterOverview } = useClusterOverview();
 
   const _isLoading = !nodes || !clusterOverview;
 
