@@ -219,6 +219,7 @@ public class NotificationsResource extends RestResource {
             @QueryParam("filters") List<String> filters,
             @QueryParam("sort") @DefaultValue(SystemNotificationDto.FIELD_TRIGGERED_AT) String sortField,
             @QueryParam("order") @DefaultValue("desc") SortOrder order) {
+        checkPermission(RestPermissions.NOTIFICATIONS_READ);
 
         final Bson dbQuery = buildPaginatedQuery(filters, query);
         final Bson sort = order.toBsonSort(sortField);

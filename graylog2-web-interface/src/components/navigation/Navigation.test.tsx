@@ -53,10 +53,7 @@ describe('Navigation', () => {
         total: 1,
         notifications: [
           {
-            id: 'deadbeef',
             details: {},
-            validations: {},
-            fields: {},
             severity: 'urgent',
             type: 'no_input_running',
             key: 'test',

@@ -16,6 +16,8 @@
  */
 package org.graylog2.notifications;
 
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Sorts;
 import org.graylog.events.processor.systemnotification.SystemNotificationRenderService;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.database.MongoCollections;
@@ -221,5 +223,66 @@ class SystemNotificationServiceTest {
         final var result = service.findByTypeAndKey(Notification.Type.ES_UNAVAILABLE, null);
         assertThat(result).isPresent();
         assertThat(result.get().isRead()).isFalse();
+    }
+
+    @Test
+    void deleteExcessRemovesOldestAndKeepsNewest() {
+        // Publish 5 notifications with distinct types so dedup doesn't kick in
+        final Notification.Type[] types = {
+                Notification.Type.ES_UNAVAILABLE,
+                Notification.Type.ES_CLUSTER_RED,
+                Notification.Type.NO_LEADER,
+                Notification.Type.OUTDATED_VERSION,
+                Notification.Type.SEARCH_ERROR
+        };
+        for (Notification.Type type : types) {
+            service.publish(type, null, Notification.Severity.NORMAL, "node-1", Map.of());
+        }
+
+        // Mark 2 as read, leave 3 unread
+        service.markAsRead(Notification.Type.ES_UNAVAILABLE, SystemNotificationDto.Actor.system());
+        service.markAsRead(Notification.Type.ES_CLUSTER_RED, SystemNotificationDto.Actor.system());
+
+        // Safety cap of 3 should delete the 2 oldest by triggered_at
+        final long deleted = service.deleteExcess(3);
+
+        assertThat(deleted).isEqualTo(2);
+
+        // The 3 newest should remain
+        final var remaining = service.searchPaginated(
+                Filters.empty(), Sorts.descending(SystemNotificationDto.FIELD_TRIGGERED_AT), 1, 10);
+        assertThat(remaining).hasSize(3);
+    }
+
+    @Test
+    void searchPaginatedReturnsCorrectPage() {
+        // Publish 5 notifications
+        final Notification.Type[] types = {
+                Notification.Type.ES_UNAVAILABLE,
+                Notification.Type.ES_CLUSTER_RED,
+                Notification.Type.NO_LEADER,
+                Notification.Type.OUTDATED_VERSION,
+                Notification.Type.SEARCH_ERROR
+        };
+        for (Notification.Type type : types) {
+            service.publish(type, null, Notification.Severity.NORMAL, "node-1", Map.of());
+        }
+
+        // Request page 1 with perPage=2
+        final var page1 = service.searchPaginated(
+                Filters.empty(), Sorts.descending(SystemNotificationDto.FIELD_TRIGGERED_AT), 1, 2);
+
+        assertThat(page1).hasSize(2);
+        assertThat(page1.pagination().total()).isEqualTo(5);
+        assertThat(page1.pagination().page()).isEqualTo(1);
+        assertThat(page1.pagination().perPage()).isEqualTo(2);
+
+        // Request page 3 (should have 1 element)
+        final var page3 = service.searchPaginated(
+                Filters.empty(), Sorts.descending(SystemNotificationDto.FIELD_TRIGGERED_AT), 3, 2);
+
+        assertThat(page3).hasSize(1);
+        assertThat(page3.pagination().total()).isEqualTo(5);
+        assertThat(page3.pagination().page()).isEqualTo(3);
     }
 }

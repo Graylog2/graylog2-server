@@ -64,29 +64,25 @@ public class NotificationServiceAdapter implements NotificationService {
 
     @Override
     public boolean fixed(Notification.Type type) {
-        systemNotificationService.markAsRead(type, SystemNotificationDto.Actor.system());
-        return true;
+        return systemNotificationService.markAsRead(type, SystemNotificationDto.Actor.system());
     }
 
     @Override
     public boolean fixed(Notification.Type type, String key) {
-        systemNotificationService.markAsRead(type, key, SystemNotificationDto.Actor.system());
-        return true;
+        return systemNotificationService.markAsRead(type, key, SystemNotificationDto.Actor.system());
     }
 
     @Override
     public boolean fixed(Notification.Type type, Node node) {
         // node parameter is ignored -- no external callers use this overload,
         // and node_id was never part of the deduplication logic.
-        systemNotificationService.markAsRead(type, SystemNotificationDto.Actor.system());
-        return true;
+        return systemNotificationService.markAsRead(type, SystemNotificationDto.Actor.system());
     }
 
     @Override
     public boolean fixed(Notification notification) {
         // Matches current NotificationServiceImpl behavior which delegates to fixed(type, (Node) null)
-        systemNotificationService.markAsRead(notification.getType(), SystemNotificationDto.Actor.system());
-        return true;
+        return systemNotificationService.markAsRead(notification.getType(), SystemNotificationDto.Actor.system());
     }
 
     @Override

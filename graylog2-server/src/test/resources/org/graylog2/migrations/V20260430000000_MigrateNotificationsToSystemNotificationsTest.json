@@ -1,0 +1,47 @@
+{
+  "notifications": [
+    {
+      "_id": {
+        "$oid": "aaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "type": "es_cluster_red",
+      "severity": "urgent",
+      "node_id": "node-1",
+      "timestamp": {
+        "$date": "2026-04-15T08:00:00Z"
+      },
+      "details": {
+        "reason": "shards unassigned"
+      }
+    },
+    {
+      "_id": {
+        "$oid": "bbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "type": "input_failing",
+      "key": "syslog-udp-01",
+      "severity": "normal",
+      "node_id": "node-2",
+      "timestamp": {
+        "$date": "2026-04-16T12:00:00Z"
+      },
+      "details": {
+        "input_id": "syslog-udp-01",
+        "reason": "Connection refused"
+      }
+    },
+    {
+      "_id": {
+        "$oid": "cccccccccccccccccccccccc"
+      },
+      "type": "outdated_version",
+      "node_id": "node-1",
+      "timestamp": {
+        "$date": "2026-04-17T06:00:00Z"
+      },
+      "details": {
+        "current_version": "6.1.3"
+      }
+    }
+  ]
+}

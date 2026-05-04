@@ -157,35 +157,39 @@ public class SystemNotificationService {
 
     /**
      * Marks all unread entries matching the given type as read.
+     *
+     * @return {@code true} if at least one document was modified
      */
-    public void markAsRead(Notification.Type type, SystemNotificationDto.Actor actor) {
+    public boolean markAsRead(Notification.Type type, SystemNotificationDto.Actor actor) {
         final String typeStr = type.toString().toLowerCase(Locale.ENGLISH);
-        collection.updateMany(
+        return collection.updateMany(
                 Filters.and(Filters.eq(FIELD_TYPE, typeStr), Filters.eq(FIELD_IS_READ, false)),
                 Updates.combine(
                         Updates.set(FIELD_IS_READ, true),
                         Updates.set(SystemNotificationDto.FIELD_ACTOR, actor),
                         Updates.set(FIELD_LAST_CHANGED, Instant.now())
                 )
-        );
+        ).getModifiedCount() > 0;
     }
 
     /**
      * Marks the unread entry matching the given type+key as read.
+     *
+     * @return {@code true} if at least one document was modified
      */
-    public void markAsRead(Notification.Type type, String key, SystemNotificationDto.Actor actor) {
+    public boolean markAsRead(Notification.Type type, String key, SystemNotificationDto.Actor actor) {
         final String typeStr = type.toString().toLowerCase(Locale.ENGLISH);
         final Bson filter = key != null
                 ? Filters.and(Filters.eq(FIELD_TYPE, typeStr), Filters.eq(FIELD_KEY, key), Filters.eq(FIELD_IS_READ, false))
                 : Filters.and(Filters.eq(FIELD_TYPE, typeStr), Filters.eq(FIELD_KEY, null), Filters.eq(FIELD_IS_READ, false));
-        collection.updateMany(
+        return collection.updateMany(
                 filter,
                 Updates.combine(
                         Updates.set(FIELD_IS_READ, true),
                         Updates.set(SystemNotificationDto.FIELD_ACTOR, actor),
                         Updates.set(FIELD_LAST_CHANGED, Instant.now())
                 )
-        );
+        ).getModifiedCount() > 0;
     }
 
     /**
