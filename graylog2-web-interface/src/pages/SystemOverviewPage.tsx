@@ -26,11 +26,16 @@ import { TimesList } from 'components/times';
 import GraylogClusterOverview from 'components/cluster/GraylogClusterOverview';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import HealthModule from 'components/health/HealthModule';
+import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 
-const SystemOverviewPage = () => (
+const SystemOverviewPage = () => {
+  const { data: { valid: hasEnterpriseLicense } = { valid: false } } =
+    usePluggableLicenseCheck('/license/enterprise');
+
+  return (
   <DocumentTitle title="System overview">
     <span>
-      <HealthModule />
+      {true && <HealthModule />}
 
       <IfPermitted permissions="notifications:read">
         <NotificationsList />
@@ -58,6 +63,7 @@ const SystemOverviewPage = () => (
       </IfPermitted>
     </span>
   </DocumentTitle>
-);
+  );
+};
 
 export default SystemOverviewPage;

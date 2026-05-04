@@ -20,7 +20,7 @@ import type { DefaultTheme } from 'styled-components';
 
 import Icon from 'components/common/Icon';
 
-import type { HealthStatus } from './mockHealthTree';
+import type { HealthStatus } from './HealthReport.types';
 
 type Props = {
   className?: string;
@@ -36,23 +36,23 @@ const iconSize = {
 } as const;
 
 const iconName = {
-  success: 'check_circle',
+  healthy: 'check_circle',
   warning: 'warning',
-  danger: 'error',
-  disabled: 'help',
-};
+  critical: 'error',
+  unknown: 'help',
+} as const;
 
 const getColor = (status: HealthStatus, theme: DefaultTheme) => {
   switch (status) {
-    case 'success':
+    case 'healthy':
       return theme.colors.variant.success;
     case 'warning':
       return theme.colors.variant.warning;
-    case 'danger':
+    case 'critical':
       return theme.colors.variant.danger;
-    case 'disabled':
+    case 'unknown':
     default:
-      return theme.colors.variant.lighter.default;
+      return theme.colors.gray[60];
   }
 };
 
@@ -69,7 +69,8 @@ const HealthStatusIcon = ({ className = undefined, size = 'md', status, title = 
     size={iconSize[size]}
     $status={status}
     title={title}
-    aria-hidden={true} />
+    aria-hidden={true}
+  />
 );
 
 export default HealthStatusIcon;

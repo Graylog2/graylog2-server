@@ -1,0 +1,185 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import * as React from 'react';
+import type { useTree } from '@mantine/core';
+
+import { Button } from 'components/bootstrap';
+import { Icon, Link, LinkContainer } from 'components/common';
+
+import HealthStatusIcon from './HealthStatusIcon';
+import { countContainedChecks, formatLeafCount } from './healthTree';
+import { getStatusMeta, STATUS_LABELS } from './healthStatusCopy';
+import HEALTH_CHECK_DEFINITIONS, { getEntityListFor, getMeaningFor } from './healthCheckDefinitions';
+import type { HealthCheckDefinition } from './healthCheckDefinitions';
+import type { HealthNode, HealthStatus } from './HealthReport.types';
+import { isHealthFeature } from './HealthReport.types';
+import {
+  BodyText,
+  Breadcrumbs,
+  CauseList,
+  ChildButton,
+  ChildButtonMeta,
+  ChildButtonText,
+  ChildCountSuffix,
+  ChildList,
+  DetailsPane,
+  DetailSection,
+  DetailsTitle,
+  StatusSummary,
+} from './HealthModule.styles';
+
+type Props = {
+  tree: ReturnType<typeof useTree>;
+  selectedNode: HealthNode;
+  selectedPath: string[];
+};
+
+const formatCheckCount = (count: number) => `${count} check${count === 1 ? '' : 's'}`;
+
+const HealthDetailsPane = ({ tree, selectedNode, selectedPath }: Props) => {
+  const status = selectedNode.status;
+  const definition: HealthCheckDefinition | undefined = HEALTH_CHECK_DEFINITIONS[selectedNode.id];
+  const description = definition?.description;
+  const entityList = getEntityListFor(selectedNode.id);
+  const statusMeta = getStatusMeta(status);
+
+  const isFeatureWithChildren = isHealthFeature(selectedNode) && selectedNode.children.length > 0;
+  const isCheckLike = !isFeatureWithChildren;
+  const isUnhealthy = status !== 'healthy';
+
+  const meaning = isCheckLike && isUnhealthy ? getMeaningFor(selectedNode.id, status) : undefined;
+  const commonCauses = isCheckLike && isUnhealthy ? definition?.commonCauses : undefined;
+  const recommendedAction = isCheckLike && isUnhealthy ? definition?.recommendedAction : undefined;
+  const docsUrl = isCheckLike ? definition?.docsUrl : undefined;
+
+  const affectedChildren =
+    isFeatureWithChildren && isHealthFeature(selectedNode)
+      ? selectedNode.children.filter((child) => child.status !== 'healthy')
+      : [];
+
+  return (
+    <DetailsPane>
+      <Breadcrumbs>{selectedPath.join(' / ')}</Breadcrumbs>
+      <DetailsTitle>{selectedNode.title}</DetailsTitle>
+
+      <StatusSummary>
+        <HealthStatusIcon status={status} title={statusMeta.label} />
+        <span>
+          {statusMeta.label}. {statusMeta.description}
+        </span>
+      </StatusSummary>
+
+      {description ? <BodyText>{description}</BodyText> : null}
+
+      {affectedChildren.length > 0 ? (
+        <DetailSection>
+          <h4>Affected</h4>
+          <ChildList>
+            {affectedChildren.map((child) => (
+              <AffectedChildButton key={child.id} child={child} tree={tree} />
+            ))}
+          </ChildList>
+        </DetailSection>
+      ) : null}
+
+      {meaning ? (
+        <DetailSection>
+          <h4>What this means</h4>
+          <BodyText>{meaning}</BodyText>
+        </DetailSection>
+      ) : null}
+
+      {commonCauses?.length ? (
+        <DetailSection>
+          <h4>Common causes</h4>
+          <CauseList>
+            {commonCauses.map((cause) => (
+              <li key={cause}>{cause}</li>
+            ))}
+          </CauseList>
+        </DetailSection>
+      ) : null}
+
+      {recommendedAction ? (
+        <DetailSection>
+          <h4>Recommended action</h4>
+          <BodyText>{recommendedAction}</BodyText>
+        </DetailSection>
+      ) : null}
+
+      {isCheckLike && entityList ? (
+        <EntityListButton url={entityList.url} label={entityList.label} />
+      ) : null}
+
+      {docsUrl ? (
+        <DetailSection>
+          <BodyText>
+            <Link to={docsUrl} target="_blank" rel="noopener">
+              Learn more
+            </Link>
+          </BodyText>
+        </DetailSection>
+      ) : null}
+    </DetailsPane>
+  );
+};
+
+const AffectedChildButton = ({
+  child,
+  tree,
+}: {
+  child: HealthNode;
+  tree: ReturnType<typeof useTree>;
+}) => {
+  const childIsFeature = isHealthFeature(child);
+  const childCountSummary = childIsFeature ? undefined : formatLeafCount(child);
+
+  const handleClick = () => {
+    tree.select(child.id);
+
+    if (childIsFeature) tree.expand(child.id);
+  };
+
+  return (
+    <ChildButton type="button" onClick={handleClick}>
+      <ChildButtonMeta>
+        <HealthStatusIcon status={child.status} title={STATUS_LABELS[child.status as HealthStatus]} />
+        <ChildButtonText>
+          <strong>
+            {child.title}
+            {childCountSummary ? <ChildCountSuffix> ({childCountSummary})</ChildCountSuffix> : null}
+          </strong>
+          <span>{formatCheckCount(countContainedChecks(child))}</span>
+        </ChildButtonText>
+      </ChildButtonMeta>
+      <Icon name="keyboard_arrow_right" size="sm" />
+    </ChildButton>
+  );
+};
+
+// `<div>` wrapper prevents the button from stretching to fill the parent flex column.
+const EntityListButton = ({ url, label }: { url: string; label: string }) => (
+  <div>
+    <LinkContainer to={url}>
+      <Button bsStyle="primary" bsSize="small">
+        View {label} →
+      </Button>
+    </LinkContainer>
+  </div>
+);
+
+export default HealthDetailsPane;

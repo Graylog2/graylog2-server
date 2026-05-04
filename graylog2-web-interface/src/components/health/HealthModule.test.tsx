@@ -21,31 +21,51 @@ import { render, screen } from 'wrappedTestingLibrary';
 import HealthModule from './HealthModule';
 
 describe('HealthModule', () => {
-  it('renders the interpretation legend by default when the root node is selected', () => {
+  it('renders the interpretation legend by default when the synthetic root is selected', () => {
     render(<HealthModule />);
 
-    expect(screen.queryByText('Preview')).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Health of Graylog Deployment' })).toBeInTheDocument();
-    expect(screen.getByLabelText('Cluster health tree')).toBeInTheDocument();
     expect(screen.getByText('Cluster Health')).toBeInTheDocument();
-    expect(screen.queryByRole('heading', { name: 'Output Failures' })).not.toBeInTheDocument();
-
+    expect(screen.getByLabelText('Cluster health tree')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'How to interpret this health report:' })).toBeInTheDocument();
-    expect(screen.getByText(/Operating within the expected band/)).toBeInTheDocument();
-    expect(screen.getByText(/Requires attention before it turns into an outage/)).toBeInTheDocument();
-    expect(screen.getByText(/Actively impacting the cluster and needs intervention/)).toBeInTheDocument();
-    expect(screen.getByText(/Not currently evaluated or intentionally turned off/)).toBeInTheDocument();
+
+    expect(screen.getByText(/The feature is functioning properly/)).toBeInTheDocument();
+    expect(screen.getByText(/The feature is experiencing a problem/)).toBeInTheDocument();
+    expect(screen.getByText(/The feature has severe issues/)).toBeInTheDocument();
+    expect(screen.getByText(/The state could not be evaluated/)).toBeInTheDocument();
   });
 
-  it('updates the detail panel when a tree node is selected', async () => {
+  it('renders Affected list with non-healthy children when a feature is selected', async () => {
     render(<HealthModule />);
 
     await userEvent.click(screen.getByText('MongoDB'));
 
     expect(screen.getByRole('heading', { name: 'MongoDB' })).toBeInTheDocument();
-    expect(screen.getByText('Platform dependency checks for MongoDB connectivity, topology, and storage behavior.')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Connectivity 1 nested check/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Primary State 1 nested check/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Affected' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Connectivity/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Primary State/i })).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'How to interpret this health report:' })).not.toBeInTheDocument();
+  });
+
+  it('renders the full check panel when a non-healthy leaf is selected', async () => {
+    render(<HealthModule />);
+
+    await userEvent.click(screen.getByText('MongoDB'));
+    await userEvent.click(screen.getByText('Primary State'));
+
+    expect(screen.getByRole('heading', { name: 'Primary State' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'What this means' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Common causes' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Recommended action' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Affected' })).not.toBeInTheDocument();
+  });
+
+  it('renders the entity-list button with the configured label', async () => {
+    render(<HealthModule />);
+
+    await userEvent.click(screen.getByText('MongoDB'));
+    await userEvent.click(screen.getByText('Connectivity'));
+
+    expect(screen.getByRole('link', { name: /View MongoDB/i })).toBeInTheDocument();
   });
 });
