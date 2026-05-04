@@ -245,7 +245,7 @@ public class NotificationsResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.SYSTEM_NOTIFICATION_UPDATE)
-    public SystemNotificationDto toggleRead(@PathParam("id") String id,
+    public SystemNotificationDto toggleRead(@Parameter(name = "id") @PathParam("id") String id,
                                             @Context UserContext userContext) {
         checkPermission(RestPermissions.NOTIFICATIONS_READ);
 
@@ -311,7 +311,7 @@ public class NotificationsResource extends RestResource {
     @Operation(summary = "Render the HTML message for a notification by ID")
     @Produces(MediaType.APPLICATION_JSON)
     @NoAuditEvent("Read-only endpoint")
-    public TemplateRenderResponse renderHtmlById(@PathParam("id") String id) {
+    public TemplateRenderResponse renderHtmlById(@Parameter(name = "id") @PathParam("id") String id) {
         checkPermission(RestPermissions.NOTIFICATIONS_READ);
 
         final SystemNotificationDto dto = systemNotificationService.findById(id)
