@@ -14,22 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch3;
+package org.graylog2.rest.resources.entities.preferences.model;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import retrofit2.Call;
-import retrofit2.http.Body;
-import retrofit2.http.GET;
-import retrofit2.http.POST;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public interface DatanodeRemoteIndexStateResource {
-
-    @POST("index-state/get")
-    Call<IndexState> readState(@Body @Valid @NotNull IndexStateGetRequest request);
-
-    @POST("index-state/set")
-    Call<IndexState> changeState(@Body @Valid @NotNull IndexStateChangeRequest request);
-
-
+@JsonInclude(JsonInclude.Include.NON_ABSENT)
+public record SlicingPreferences(@JsonProperty("slice_column") String sliceColumn,
+                                 @JsonProperty("sort_by") String sortBy,
+                                 @JsonProperty("order") SortOrder sortOrder) {
 }
