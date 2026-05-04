@@ -53,8 +53,8 @@ const legacySearchPageLayout: Partial<LayoutState> = {
 const searchPageLayout: Partial<LayoutState> = {
   sidebar: {
     isShown: true,
-    initialSectionCollapsed: true
-  }
+    initialSectionCollapsed: true,
+  },
 };
 
 const EventDefinitionReplaySearch = ({ eventDefinitionMappedData }: Props) => {

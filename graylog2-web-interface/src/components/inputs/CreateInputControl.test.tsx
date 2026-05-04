@@ -23,7 +23,7 @@ import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
 import selectEvent from 'helpers/selectEvent';
 import asMock from 'helpers/mocking/AsMock';
 import { fetchInputType } from 'hooks/useInputType';
-import { InputsActions } from 'stores/inputs/InputsStore';
+import { createInput } from 'hooks/useInputs';
 import Store from 'logic/local-storage/Store';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
@@ -35,19 +35,21 @@ import CreateInputControl, { SETUP_WIZARD_INPUT_ID_KEY } from './CreateInputCont
 
 jest.mock('./useInputTypes');
 jest.mock('hooks/useInputType');
-jest.mock('stores/inputs/InputsStore');
+jest.mock('hooks/useInputs');
 jest.mock('logic/telemetry/useSendTelemetry');
 jest.mock('routing/useLocation');
 jest.mock('hooks/useFeature');
 jest.mock('hooks/useInput');
 jest.mock('components/inputs/InputSetupWizard', () => ({
   __esModule: true,
-  InputSetupWizard: ({ input, onClose }: { input: { id: string, title: string }, onClose: () => void }) => (
+  InputSetupWizard: ({ input, onClose }: { input: { id: string; title: string }; onClose: () => void }) => (
     <div data-testid="input-setup-wizard">
       <span>InputSetupWizard</span>
       <span>{input.title}</span>
       <span>{input.id}</span>
-      <button type="button" onClick={onClose}>Close wizard</button>
+      <button type="button" onClick={onClose}>
+        Close wizard
+      </button>
     </div>
   ),
   INPUT_SETUP_MODE_FEATURE_FLAG: 'setup_mode',
@@ -87,7 +89,7 @@ describe('CreateInputControl', () => {
       description: 'Test input type',
     } as any);
 
-    asMock(InputsActions.create).mockResolvedValue({ id: 'input-id-1' });
+    asMock(createInput).mockResolvedValue({ id: 'input-id-1' });
 
     asMock(useSendTelemetry).mockReturnValue(jest.fn());
     asMock(useLocation).mockReturnValue({
@@ -141,7 +143,7 @@ describe('CreateInputControl', () => {
     await userEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(InputsActions.create).toHaveBeenCalled();
+      expect(createInput).toHaveBeenCalled();
     });
   });
 
@@ -287,7 +289,7 @@ describe('CreateInputControl', () => {
         await user.click(submitButton);
 
         await waitFor(() => {
-          expect(InputsActions.create).toHaveBeenCalled();
+          expect(createInput).toHaveBeenCalled();
         });
 
         await React.act(async () => {

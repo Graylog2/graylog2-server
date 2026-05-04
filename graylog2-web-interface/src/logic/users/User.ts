@@ -17,7 +17,7 @@
 import * as Immutable from 'immutable';
 import type { Permission } from 'graylog-web-plugin/plugin';
 
-import type { PreferencesMap } from 'stores/users/PreferencesStore';
+import type { PreferencesMap } from 'api/preferences';
 
 import type { AccountStatus } from './UserOverview';
 
