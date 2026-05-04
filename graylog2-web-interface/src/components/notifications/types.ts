@@ -16,21 +16,18 @@
  */
 import type { SystemNotifications } from '@graylog/server-api';
 
-// TODO(1.8 follow-up): once @graylog/server-api regenerates against Patrick's
-// backend (graylog2-server#25873), flip the derivation from
-// `['notifications'][number]` to `['elements'][number]` to match the new
-// PageListResponse shape. Until then, we keep the legacy shape so the existing
-// SDK calls continue to compile.
+// Derived from the new paginated endpoint (GET /system/notifications/paginated)
+// per Patrick's backend in graylog2-server#25873. The DTO covers id, type,
+// title, description, severity, key, actor, is_read, last_changed, triggered_at,
+// node_id, and details.
 export type NotificationType = Awaited<
-  ReturnType<(typeof SystemNotifications)['listNotifications']>
->['notifications'][number];
+  ReturnType<(typeof SystemNotifications)['getPaginated']>
+>['elements'][number];
 
 // Retention configuration form payload — see Phase 4 (NotificationsConfig.tsx)
-// and Spec scenario `Configurable retention`. The backend exposes
-// GET /system/notifications/config and PUT /system/notifications/config returning
-// `{ retention_days: number }`. Once the SDK regenerates, prefer deriving this
-// from `SystemNotifications` directly; for now the explicit shape lets Phase 4
-// build against a mocked SDK.
-export type SystemNotificationConfig = {
-  retention_days: number;
-};
+// and Spec scenario `Configurable retention`. Backend exposes
+// GET /system/notifications/config and PUT /system/notifications/config.
+// Derived from the SDK's SystemNotificationRetentionConfig.
+export type SystemNotificationConfig = Awaited<
+  ReturnType<(typeof SystemNotifications)['getConfig']>
+>;
