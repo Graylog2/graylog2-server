@@ -25,6 +25,11 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId.ENTITY_LIST_ID_SUB_FIELD;
+import static org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId.LAYOUT_VARIANT_SUB_FIELD;
 import static org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId.USER_ID_SUB_FIELD;
 
 public class EntityListPreferencesServiceImpl implements EntityListPreferencesService {
@@ -42,6 +47,18 @@ public class EntityListPreferencesServiceImpl implements EntityListPreferencesSe
     @Override
     public StoredEntityListPreferences get(final StoredEntityListPreferencesId preferencesId) {
         return collection.find(Filters.eq("_id", preferencesId)).first();
+    }
+
+    @Override
+    public List<StoredEntityListPreferences> getPredefinedForEntityList(final String entityListId) {
+        return collection.find(
+                        Filters.and(
+                                Filters.eq("_id." + ENTITY_LIST_ID_SUB_FIELD, entityListId),
+                                Filters.exists("_id." + LAYOUT_VARIANT_SUB_FIELD),
+                                Filters.exists("_id." + USER_ID_SUB_FIELD, false)
+                        )
+                )
+                .into(new ArrayList<>());
     }
 
     @Override
