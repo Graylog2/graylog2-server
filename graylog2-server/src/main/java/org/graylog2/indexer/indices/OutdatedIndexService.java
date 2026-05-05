@@ -115,7 +115,7 @@ public class OutdatedIndexService {
                 cleaned.put(entry.getKey(), entry.getValue());
             } else if (entry.getValue() instanceof Map) {
                 //noinspection unchecked
-                Map<String, Object> indexMap = (Map<String, Object>) entry.getValue();
+                Map<String, Object> indexMap = new HashMap<>((Map<String, Object>) entry.getValue());
                 keysToRemove.forEach(indexMap.keySet()::remove);
                 if (!withReplicas) {
                     indexMap.put("number_of_replicas", 0);
