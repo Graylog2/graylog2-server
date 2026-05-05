@@ -43,6 +43,7 @@
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <opensearch.version>2.19.5</opensearch.version>
+        <opensearch.version.next>3.5.0</opensearch.version.next>
         <opensearch.mac.jdk.version>21.0.7</opensearch.mac.jdk.version>
         <opensearch.mac.jdk.build>6</opensearch.mac.jdk.build>
 
@@ -659,6 +660,123 @@
                             </sha512>
                         </configuration>
                     </execution>
+                    <!-- OpenSearch 3.x downloads -->
+                    <execution>
+                        <id>unpack-opensearch-tar-linux-x64-v3</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>
+                                https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version.next}/opensearch-${opensearch.version.next}-linux-x64.tar.gz
+                            </url>
+                            <sha512>
+                                b83c4f1ef7f6fd19aaf1d281b68a1c64039090a95c8b082bccdab714fd012bd289830596c47db31bc604eed46b2e58ab3e2616e739172987c3991ea199011c7c
+                            </sha512>
+                            <outputFileName>opensearch-${opensearch.version.next}-linux-x64.tar.gz</outputFileName>
+                            <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
+                            <unpack>true</unpack>
+                            <fileMappers>
+                                <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                                    <pattern>^(opensearch-\d+\.\d+\.\d+)/</pattern>
+                                    <replacement>$1-linux-x64/</replacement>
+                                </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                            </fileMappers>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>unpack-opensearch-tar-linux-aarch64-v3</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>
+                                https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version.next}/opensearch-${opensearch.version.next}-linux-arm64.tar.gz
+                            </url>
+                            <sha512>
+                                17bb9a809de88df1ad93e650c16f2b9a237f42ff4ff69e93136db2f43a9a9a948c13d7d6591be3d72afad224e6b88b1a70c5ed2b316e85fcebbb495edf008a14
+                            </sha512>
+                            <outputFileName>opensearch-${opensearch.version.next}-linux-aarch64.tar.gz</outputFileName>
+                            <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
+                            <unpack>true</unpack>
+                            <fileMappers>
+                                <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                                    <pattern>^(opensearch-\d+\.\d+\.\d+)/</pattern>
+                                    <replacement>$1-linux-aarch64/</replacement>
+                                </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                            </fileMappers>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>download-repository-s3-plugin-v3</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>
+                                https://artifacts.opensearch.org/releases/plugins/repository-s3/${opensearch.version.next}/repository-s3-${opensearch.version.next}.zip
+                            </url>
+                            <outputFileName>repository-s3-${opensearch.version.next}.zip</outputFileName>
+                            <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
+                            <sha512>
+                                650ca522b42155fd68a07a17e719bceaf419b572e7c0f82c48787f465b6dcd510793e7ae0faf3225f4cb1867acbf5458a8ce8616e6c0d4aed189660884d882a8
+                            </sha512>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>download-repository-gcs-plugin-v3</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>
+                                https://artifacts.opensearch.org/releases/plugins/repository-gcs/${opensearch.version.next}/repository-gcs-${opensearch.version.next}.zip
+                            </url>
+                            <outputFileName>repository-gcs-${opensearch.version.next}.zip</outputFileName>
+                            <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
+                            <sha512>
+                                748c46eb05870be9a928fde27bf52e4e832d80f858c4804ecccd84bfc99473fd3f4d7aa95d3c9e27e74518cac7351e0dfb3dd5fe148ce06a66a5498ec96337ee
+                            </sha512>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>download-repository-hdfs-plugin-v3</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>
+                                https://artifacts.opensearch.org/releases/plugins/repository-hdfs/${opensearch.version.next}/repository-hdfs-${opensearch.version.next}.zip
+                            </url>
+                            <outputFileName>repository-hdfs-${opensearch.version.next}.zip</outputFileName>
+                            <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
+                            <sha512>
+                                1e91ffbf746a65512af6c1d1183cbabcb0bfa53f4ce632dd05782ca18f3099c79a6812abafe4845b9d07163ea9b0449b1c535a91960ab007345e83651587f114
+                            </sha512>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>download-repository-azure-plugin-v3</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>
+                                https://artifacts.opensearch.org/releases/plugins/repository-azure/${opensearch.version.next}/repository-azure-${opensearch.version.next}.zip
+                            </url>
+                            <outputFileName>repository-azure-${opensearch.version.next}.zip</outputFileName>
+                            <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
+                            <sha512>
+                                3bde65ceb3694fc264fa9b063b9d6658b4814b2604ae8a52a10c0fb2d256657f884f12083478cff220bc2f981348f65f4f0bb25d786e177ae108c2091e22a9c6
+                            </sha512>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
@@ -780,6 +898,97 @@
                                 <argument>${project.build.directory}/opensearch-plugins/repository-gcs-${opensearch.version}.zip</argument>
                                 <argument>${project.build.directory}/opensearch-plugins/repository-hdfs-${opensearch.version}.zip</argument>
                                 <argument>${project.build.directory}/opensearch-plugins/repository-azure-${opensearch.version}.zip</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <!-- OpenSearch 3.x plugin management -->
+                    <execution>
+                        <id>remove-unused-opensearch-plugins-x64-v3</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>org.graylog.datanode.build.RemoveOpensearchPlugins</mainClass>
+                            <arguments>
+                                <argument>${project.build.directory}/opensearch/opensearch-${opensearch.version.next}-linux-x64</argument>
+                                <!--caution, the plugin order is relevant. Plugins have dependencies on other plugins
+                                and need to be removed in correct order-->
+                                <argument>opensearch-security-analytics</argument>
+                                <argument>opensearch-alerting</argument>
+                                <argument>opensearch-custom-codecs</argument>
+                                <argument>opensearch-geospatial</argument>
+                                <argument>opensearch-neural-search</argument>
+                                <argument>opensearch-knn</argument>
+                                <argument>opensearch-notifications</argument>
+                                <argument>opensearch-notifications-core</argument>
+                                <argument>opensearch-performance-analyzer</argument>
+                                <argument>opensearch-reports-scheduler</argument>
+                                <argument>opensearch-sql</argument>
+                                <argument>opensearch-observability</argument>
+                                <argument>query-insights</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>remove-unused-opensearch-plugins-aarch64-v3</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>org.graylog.datanode.build.RemoveOpensearchPlugins</mainClass>
+                            <arguments>
+                                <argument>${project.build.directory}/opensearch/opensearch-${opensearch.version.next}-linux-aarch64</argument>
+                                <!--caution, the plugin order is relevant. Plugins have dependencies on other plugins
+                                and need to be removed in correct order-->
+                                <argument>opensearch-security-analytics</argument>
+                                <argument>opensearch-alerting</argument>
+                                <argument>opensearch-custom-codecs</argument>
+                                <argument>opensearch-geospatial</argument>
+                                <argument>opensearch-neural-search</argument>
+                                <argument>opensearch-knn</argument>
+                                <argument>opensearch-notifications</argument>
+                                <argument>opensearch-notifications-core</argument>
+                                <argument>opensearch-performance-analyzer</argument>
+                                <argument>opensearch-reports-scheduler</argument>
+                                <argument>opensearch-sql</argument>
+                                <argument>opensearch-observability</argument>
+                                <argument>query-insights</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>install-required-opensearch-plugins-x64-v3</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>org.graylog.datanode.build.InstallOpensearchPlugins</mainClass>
+                            <arguments>
+                                <argument>${project.build.directory}/opensearch/opensearch-${opensearch.version.next}-linux-x64</argument>
+                                <argument>${project.build.directory}/opensearch-plugins/repository-s3-${opensearch.version.next}.zip</argument>
+                                <argument>${project.build.directory}/opensearch-plugins/repository-gcs-${opensearch.version.next}.zip</argument>
+                                <argument>${project.build.directory}/opensearch-plugins/repository-hdfs-${opensearch.version.next}.zip</argument>
+                                <argument>${project.build.directory}/opensearch-plugins/repository-azure-${opensearch.version.next}.zip</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>install-required-opensearch-plugins-aarch64-v3</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>org.graylog.datanode.build.InstallOpensearchPlugins</mainClass>
+                            <arguments>
+                                <argument>${project.build.directory}/opensearch/opensearch-${opensearch.version.next}-linux-aarch64</argument>
+                                <argument>${project.build.directory}/opensearch-plugins/repository-s3-${opensearch.version.next}.zip</argument>
+                                <argument>${project.build.directory}/opensearch-plugins/repository-gcs-${opensearch.version.next}.zip</argument>
+                                <argument>${project.build.directory}/opensearch-plugins/repository-hdfs-${opensearch.version.next}.zip</argument>
+                                <argument>${project.build.directory}/opensearch-plugins/repository-azure-${opensearch.version.next}.zip</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -1050,6 +1259,57 @@
                                     </sha512>
                                     <outputDirectory>
                                         ${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/jdk-mac
+                                    </outputDirectory>
+                                    <fileMappers>
+                                        <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                                            <pattern>^(jdk-.*/Contents/Home)/(.*)</pattern>
+                                            <replacement>$2</replacement>
+                                        </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                                    </fileMappers>
+                                    <unpack>true</unpack>
+                                </configuration>
+                            </execution>
+                            <!-- OpenSearch 3.x mac JDK -->
+                            <execution>
+                                <id>fix-mac-jdk-for-os-x64-v3</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>wget</goal>
+                                </goals>
+                                <configuration>
+                                    <url>
+                                        https://github.com/adoptium/temurin21-binaries/releases/download/jdk-${opensearch.mac.jdk.version}%2B${opensearch.mac.jdk.build}/OpenJDK21U-jdk_x64_mac_hotspot_${opensearch.mac.jdk.version}_${opensearch.mac.jdk.build}.tar.gz
+                                    </url>
+                                    <sha512>
+                                        981de4ed6629975b84f2604dd2c601e66633691b1da835e0b8741c4712d5b24b51e757686624dc1b2492e61a9e9a27c8ac73bfc9e571d6e8c1c5db8ec6a4189c
+                                    </sha512>
+                                    <outputDirectory>
+                                        ${project.build.directory}/opensearch/opensearch-${opensearch.version.next}-linux-x64/jdk-mac
+                                    </outputDirectory>
+                                    <fileMappers>
+                                        <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                                            <pattern>^(jdk-.*/Contents/Home)/(.*)</pattern>
+                                            <replacement>$2</replacement>
+                                        </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                                    </fileMappers>
+                                    <unpack>true</unpack>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>fix-mac-jdk-for-os-aarch-v3</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>wget</goal>
+                                </goals>
+                                <configuration>
+                                    <url>
+                                        https://github.com/adoptium/temurin21-binaries/releases/download/jdk-${opensearch.mac.jdk.version}%2B${opensearch.mac.jdk.build}/OpenJDK21U-jdk_aarch64_mac_hotspot_${opensearch.mac.jdk.version}_${opensearch.mac.jdk.build}.tar.gz
+                                    </url>
+                                    <sha512>
+                                        5bd61c1634daa5b6e0c473de6c0883ac2d29c0daa7101dd852113a5197b6cd60f790c0f7f53a64b2dbbb45f030ee4481c9d38745615a1a39b8efbef41e4b8115
+                                    </sha512>
+                                    <outputDirectory>
+                                        ${project.build.directory}/opensearch/opensearch-${opensearch.version.next}-linux-aarch64/jdk-mac
                                     </outputDirectory>
                                     <fileMappers>
                                         <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
