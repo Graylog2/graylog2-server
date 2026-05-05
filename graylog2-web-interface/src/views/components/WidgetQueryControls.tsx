@@ -270,12 +270,25 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                 )}
 
                 <Field name="streams">
-                  {({ field: { name, value, onChange } }) => (
+                  {({ field: { value, onChange } }) => (
                     <StreamsFilter
                       value={value}
                       streams={allStreams}
                       streamCategories={availableStreamCategories}
-                      onChange={(newStreams) => onChange({ target: { value: newStreams, name } })}
+                      onChange={(selected: { streams: string[]; categories: string[] }) => {
+                        onChange({
+                          target: {
+                            value: selected.streams,
+                            name: 'streams',
+                          },
+                        });
+                        onChange({
+                          target: {
+                            value: selected.categories,
+                            name: 'streamCategories',
+                          },
+                        });
+                      }}
                     />
                   )}
                 </Field>
