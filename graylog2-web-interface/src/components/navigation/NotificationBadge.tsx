@@ -21,7 +21,7 @@ import type * as Immutable from 'immutable';
 import { LinkContainer } from 'components/common';
 import { Badge, Nav } from 'components/bootstrap';
 import useCurrentUser from 'hooks/useCurrentUser';
-import useNotifications from 'components/notifications/useNotifications';
+import useNotificationBadgeCount from 'components/notifications/hooks/useNotificationBadgeCount';
 import Routes from 'routing/Routes';
 import { NAV_ITEM_HEIGHT } from 'theme/constants';
 
@@ -50,14 +50,17 @@ const StyledInactiveNavItem = styled(InactiveNavItem)`
 const NotificationBadge = () => {
   const currentUser = useCurrentUser();
   const enabled = hasNotificationPermission(currentUser.permissions);
-  const { data, isLoading } = useNotifications({ enabled });
+  // Badge count = unread system notifications, polled every 3s. The hook hits
+  // GET /system/notifications/paginated?filters=is_read:false&per_page=1 and
+  // returns data.pagination.total, so we read it directly.
+  const { data, isLoading } = useNotificationBadgeCount({ enabled });
 
-  return isLoading || !data || data.total === 0 ? null : (
+  return isLoading || !data ? null : (
     <StyledNav navbar>
       <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
         <StyledInactiveNavItem>
           <Badge bsStyle="danger" data-testid="notification-badge" title="System Notifications">
-            {data.total}
+            {data}
           </Badge>
         </StyledInactiveNavItem>
       </LinkContainer>
