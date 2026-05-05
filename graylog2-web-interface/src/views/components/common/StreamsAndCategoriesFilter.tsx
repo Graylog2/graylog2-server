@@ -18,7 +18,7 @@ import { useMemo } from 'react';
 import * as React from 'react';
 
 import { FormGroup, ControlLabel, HelpBlock } from 'components/bootstrap';
-import { MultiSelect } from 'components/common';
+import { Select } from 'components/common';
 import { defaultCompare } from 'logic/DefaultCompare';
 
 type StreamsAndCategoriesOption = {
@@ -38,31 +38,36 @@ const renderOption = (option: StreamsAndCategoriesOption) =>
     </>
   );
 
-type StreamsAndCategoriesFilterProps = {
+type StreamsAndCategoriesFilterProps = Omit<React.ComponentProps<typeof Select>, 'options'> & {
   onChange: (value: { streams: string[]; categories: string[] }) => void;
-  value: string;
   streams: Array<{ id: string; title: string; categories: string[] }>;
-  required?: boolean;
+  streamCategories?: string[] | undefined;
   showStreams?: boolean;
   showCategories?: boolean;
   grouping?: boolean;
 };
 
-const StreamsAndCategoriesFilter = ({
-  onChange,
-  streams,
-  value,
-  required = true,
-  showStreams = true,
-  showCategories = true,
-  grouping = true,
-}: StreamsAndCategoriesFilterProps) => {
+const StreamsAndCategoriesFilter = (props: StreamsAndCategoriesFilterProps) => {
+  const {
+    onChange,
+    streams,
+    streamCategories = undefined,
+    value,
+    required = true,
+    showStreams = true,
+    showCategories = true,
+    grouping = true,
+    multi = true,
+    id,
+  } = props;
+
   const options = useMemo(() => {
-    const sortedCategories = showCategories
-      ? [...new Set<string>(streams.flatMap((stream) => stream?.categories ?? []))]
-          .map((category) => ({ id: category, label: category, value: 'category_' + category, type: 'category' }))
-          .sort((a: StreamsAndCategoriesOption, b: StreamsAndCategoriesOption) => defaultCompare(a.label, b.label))
-      : [];
+    const sortedCategories =
+      showCategories && multi
+        ? [...new Set<string>(streams.flatMap((stream) => streamCategories ?? stream?.categories ?? []))]
+            .map((category) => ({ id: category, label: category, value: 'category_' + category, type: 'category' }))
+            .sort((a: StreamsAndCategoriesOption, b: StreamsAndCategoriesOption) => defaultCompare(a.label, b.label))
+        : [];
     const sortedStreams = showStreams
       ? streams
           .map((stream: { id: string; title: string }) => ({
@@ -79,7 +84,7 @@ const StreamsAndCategoriesFilter = ({
       : [...sortedCategories, ...sortedStreams].sort((a: StreamsAndCategoriesOption, b: StreamsAndCategoriesOption) =>
           defaultCompare(a.label, b.label),
         );
-  }, [grouping, showCategories, showStreams, streams]);
+  }, [grouping, multi, showCategories, showStreams, streams, streamCategories]);
 
   if (!options || options.length === 0) return null;
 
@@ -101,17 +106,19 @@ const StreamsAndCategoriesFilter = ({
     });
 
   return (
-    <FormGroup controlId="filter-streams-and-categories">
+    <FormGroup controlId={id}>
       <ControlLabel>
         {label} <small className="text-muted">{required ? '(Optional)' : ''}</small>
       </ControlLabel>
-      <MultiSelect
-        id="filter-streams-and-categories"
+      <Select
+        id={id}
         onChange={change}
         options={options}
         optionRenderer={renderOption}
         value={value}
         required={required}
+        multi={multi}
+        {...props}
       />
       <HelpBlock>Select {label} the search should include.</HelpBlock>
     </FormGroup>

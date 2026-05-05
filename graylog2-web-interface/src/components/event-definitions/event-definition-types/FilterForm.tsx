@@ -537,6 +537,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
       {onlyFilters || (
         <>
           <StreamsAndCategoriesFilter
+            id="filter-streams-and-categories"
             required={isStreamRequired}
             onChange={(selected) => handleStreamsAndCategoriesChange(selected)}
             value={[
