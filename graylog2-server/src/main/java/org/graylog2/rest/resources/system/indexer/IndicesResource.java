@@ -27,6 +27,7 @@ import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
@@ -34,6 +35,7 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -321,6 +323,16 @@ public class IndicesResource extends RestResource {
     public List<OutdatedIndex> getOutdatedIndices() {
         return outdatedIndexService.getOutdatedIndices();
     }
+
+    @POST
+    @Path("/outdated/{index}/reindex")
+    @Operation(summary = "Reindexes an outdated index to make it compatible with the next major version of OpenSearch")
+    @RequiresPermissions(RestPermissions.INDICES_REINDEX)
+    public void reindex(@Parameter(name = "index") @PathParam("index") @NotNull String index,
+                        @Parameter(name = "withReplication") @QueryParam("withReplication") @DefaultValue("true") boolean withReplication) {
+        outdatedIndexService.reindex(index, withReplication);
+    }
+
 
     private OpenIndicesInfo getOpenIndicesInfo(Set<IndexStatistics> indicesStatistics) {
         final List<IndexInfo> indexInfos = new LinkedList<>();
