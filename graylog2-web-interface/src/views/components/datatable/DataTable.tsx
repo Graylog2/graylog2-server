@@ -164,7 +164,7 @@ const DataTable = ({
   const _onSortChange = useCallback(
     (newSort: Array<SortConfig>) => {
       const dirty = formContext?.dirty;
-      const updateWidget = () => dispatch(updateWidgetConfig(widget.id, config.toBuilder().sort(newSort).build()));
+      const updateWidget = () => dispatch(updateWidgetConfig(widget?.id, config.toBuilder().sort(newSort).build()));
 
       if (!editing || (editing && !dirty)) {
         return updateWidget();
@@ -186,15 +186,15 @@ const DataTable = ({
 
       const updateWidget = () => {
         const curVisualizationConfig =
-          widget.config.visualizationConfig ?? DataTableVisualizationConfig.create([]).toBuilder().build();
+          widget?.config.visualizationConfig ?? DataTableVisualizationConfig.create([]).toBuilder().build();
         const pinnedColumns = curVisualizationConfig?.pinnedColumns?.has(field)
           ? curVisualizationConfig.pinnedColumns.delete(field)
           : curVisualizationConfig.pinnedColumns.add(field);
 
         return dispatch(
           updateWidgetConfig(
-            widget.id,
-            widget.config
+            widget?.id,
+            widget?.config
               .toBuilder()
               .visualizationConfig(curVisualizationConfig.toBuilder().pinnedColumns(pinnedColumns.toJS()).build())
               .build(),
@@ -323,9 +323,7 @@ const DataTable = ({
               showRowNumbers={showRowNumbers}
             />
           </THead>
-          <TBody $stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>
-            {formattedRows}
-          </TBody>
+          <TBody $stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>{formattedRows}</TBody>
         </MessagesTable>
       </div>
     </div>
