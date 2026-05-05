@@ -250,7 +250,6 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
     <K extends EventDefinitionConfigKeys>(key: K, value: EventDefinition['config'][K]) => {
       const config = cloneDeep(eventDefinition.config);
       config[key] = value;
-      console.log(value);
       setCurrentConfig(config);
 
       return config;
