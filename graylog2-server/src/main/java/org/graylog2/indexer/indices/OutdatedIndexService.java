@@ -86,6 +86,7 @@ public class OutdatedIndexService {
             }
             indices.reindex(index, tempIndex);
             // delete source index
+            indices.refresh(tempIndex);
             indices.delete(index);
             // recreate and reindex into source index
             indicesAdapter.create(index, new IndexSettings(cleanIndexSettings(sourceSettings, true)), sourceMapping);
@@ -96,6 +97,7 @@ public class OutdatedIndexService {
                 throw new IllegalStateException("Index " + index + " could not be recreated successfully: " + targetStatus);
             }
             indices.reindex(tempIndex, index);
+            indices.refresh(index);
             // delete temp index
             indices.delete(tempIndex);
         } catch (IOException e) {
