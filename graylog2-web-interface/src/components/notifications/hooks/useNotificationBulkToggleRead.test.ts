@@ -84,7 +84,7 @@ describe('useNotificationBulkToggleRead', () => {
     queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
     });
-    asMock(useCurrentUser).mockReturnValue({ id: 'user-1', username: 'tester' });
+    asMock(useCurrentUser).mockReturnValue({ id: 'user-1', username: 'tester' } as never);
   });
 
   it('per-row optimistic patches: a mixed selection produces a mixed result', async () => {
