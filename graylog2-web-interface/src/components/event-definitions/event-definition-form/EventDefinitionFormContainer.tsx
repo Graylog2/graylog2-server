@@ -82,6 +82,7 @@ const EventDefinitionFormContainer = ({
     config: {},
     field_spec: {},
     key_spec: [],
+    tags: [],
     notification_settings: {
       grace_period_ms: 300000,
       // Defaults to system setting for notification backlog size

@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import startCase from 'lodash/startCase';
 
-import { QueryHelper, RelativeTime, PaginatedEntityTable, Link } from 'components/common';
+import { QueryHelper, RelativeTime, PaginatedEntityTable, Link, TagList } from 'components/common';
 import Routes from 'routing/Routes';
 import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
 import { keyFn, fetchEventDefinitions } from 'components/event-definitions/hooks/useEventDefinitions';
@@ -66,6 +66,11 @@ const getCustomColumnRenderers = (pluggableColumnRenderers?: ColumnRenderersByAt
             : 'User Defined'}
         </span>
       ),
+    },
+    tags: {
+      renderCell: (_tags: string[], eventDefinition: EventDefinition) => <TagList tags={eventDefinition.tags} />,
+      width: 0.2,
+      minWidth: 160,
     },
     ...(pluggableColumnRenderers || {}),
   },

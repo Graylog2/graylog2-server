@@ -17,8 +17,10 @@
 package org.graylog.events.processor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.graylog.events.TestEventProcessorConfig;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationSettings;
@@ -193,5 +195,67 @@ public class EventDefinitionDtoTest {
 
     private static ValidationResult validate(EventDefinitionDto eventDefinitionDto) {
         return eventDefinitionDto.validate(null, new EventDefinitionConfiguration(), mock(UserContext.class));
+    }
+
+    @Test
+    public void tagsAreNormalizedOnBuild() {
+        final EventDefinitionDto dto = testSubject.toBuilder()
+                .tags(ImmutableSet.of("  Phishing  ", "lateral-MOVEMENT", "phishing", "", "   "))
+                .build();
+        // Trim + lowercase + dedupe + drop blanks
+        assertThat(dto.tags()).containsExactlyInAnyOrder("phishing", "lateral-movement");
+    }
+
+    @Test
+    public void tagsDefaultToEmpty() {
+        assertThat(testSubject.tags()).isEmpty();
+    }
+
+    @Test
+    public void tagsRoundTripThroughJson() throws JsonProcessingException {
+        final ObjectMapper mapper = new ObjectMapperProvider().get();
+        final EventDefinitionDto dto = testSubject.toBuilder()
+                .tags(ImmutableSet.of("phishing", "lateral-movement"))
+                .build();
+        final String json = mapper.writeValueAsString(dto);
+        assertThat(json).contains("\"tags\"");
+        final EventDefinitionDto roundTripped = mapper.readValue(json, EventDefinitionDto.class);
+        assertThat(roundTripped.tags()).containsExactlyInAnyOrder("phishing", "lateral-movement");
+    }
+
+    @Test
+    public void tagsDeserializeAsEmptyWhenAbsent() throws JsonProcessingException {
+        final ObjectMapper mapper = new ObjectMapperProvider().get();
+        // Build a JSON document missing the "tags" property; the builder default should kick in.
+        final String json = mapper.writeValueAsString(testSubject);
+        // Strip the tags property to simulate a pre-existing document persisted before this field existed.
+        final String legacyJson = json.replaceAll(",\"tags\":\\[\\]", "").replaceAll("\"tags\":\\[\\],", "");
+        final EventDefinitionDto roundTripped = mapper.readValue(legacyJson, EventDefinitionDto.class);
+        assertThat(roundTripped.tags()).isEmpty();
+    }
+
+    @Test
+    public void tagExceedingMaxLengthFailsValidation() {
+        final String tooLong = "a".repeat(EventDefinitionDto.MAX_TAG_LENGTH + 1);
+        final EventDefinitionDto invalid = testSubject.toBuilder()
+                .tags(ImmutableSet.of(tooLong))
+                .build();
+        final ValidationResult validationResult = validate(invalid);
+        assertThat(validationResult.failed()).isTrue();
+        assertThat(validationResult.getErrors()).containsKey("tags");
+    }
+
+    @Test
+    public void tagCountExceedingMaxFailsValidation() {
+        final ImmutableSet.Builder<String> tags = ImmutableSet.builder();
+        for (int i = 0; i <= EventDefinitionDto.MAX_TAGS; i++) {
+            tags.add("tag-" + i);
+        }
+        final EventDefinitionDto invalid = testSubject.toBuilder()
+                .tags(tags.build())
+                .build();
+        final ValidationResult validationResult = validate(invalid);
+        assertThat(validationResult.failed()).isTrue();
+        assertThat(validationResult.getErrors()).containsKey("tags");
     }
 }

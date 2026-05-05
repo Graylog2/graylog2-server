@@ -39,6 +39,7 @@ export const simpleEventDefinition: EventDefinition = {
   field_spec: {},
   id: 'event-definition-1-id',
   key_spec: [],
+  tags: [],
   notification_settings: {
     grace_period_ms: 0,
     backlog_size: 0,

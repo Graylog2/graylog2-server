@@ -64,6 +64,7 @@ public class EventImpl implements Event {
     private Map<String, Double> aggregationConditions = new HashMap<>();
     private final Map<String, Double> scores = new HashMap<>();
     private final Set<String> associatedAssets = new HashSet<>();
+    private final Set<String> tags = new HashSet<>();
     private EventReplayInfo replayInfo;
 
     EventImpl(String eventId,
@@ -265,6 +266,16 @@ public class EventImpl implements Event {
     }
 
     @Override
+    public Set<String> getTags() {
+        return ImmutableSet.copyOf(tags);
+    }
+
+    @Override
+    public void addTags(Set<String> tags) {
+        this.tags.addAll(tags);
+    }
+
+    @Override
     public boolean getAlert() {
         return alert;
     }
@@ -354,6 +365,7 @@ public class EventImpl implements Event {
                 .priority(getPriority())
                 .scores(ImmutableMap.copyOf(scores))
                 .associatedAssets(ImmutableSet.copyOf(associatedAssets))
+                .tags(ImmutableSet.copyOf(tags))
                 .alert(getAlert())
                 .fields(ImmutableMap.copyOf(fields))
                 .groupByFields(ImmutableMap.copyOf(groupByFields))
@@ -414,6 +426,7 @@ public class EventImpl implements Event {
                 Objects.equals(aggregationConditions, event.aggregationConditions) &&
                 Objects.equals(scores, event.scores) &&
                 Objects.equals(associatedAssets, event.associatedAssets) &&
+                Objects.equals(tags, event.tags) &&
                 Objects.equals(replayInfo, event.replayInfo);
     }
 
@@ -421,7 +434,8 @@ public class EventImpl implements Event {
     public int hashCode() {
         return Objects.hash(eventId, eventDefinitionType, eventDefinitionId, originContext, eventTimestamp,
                 processingTimestamp, timerangeStart, timerangeEnd, streams, sourceStreams, message, source,
-                keyTuple, priority, alert, fields, groupByFields, aggregationConditions, scores, replayInfo);
+                keyTuple, priority, alert, fields, groupByFields, aggregationConditions, scores,
+                associatedAssets, tags, replayInfo);
     }
 
     @Override
@@ -448,6 +462,7 @@ public class EventImpl implements Event {
                 .add("replayInfo", replayInfo)
                 .add("scores", scores)
                 .add("associatedAssets", associatedAssets)
+                .add("tags", tags)
                 .toString();
     }
 

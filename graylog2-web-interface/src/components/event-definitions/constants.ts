@@ -33,6 +33,7 @@ const getEventDefinitionTableElements = (pluggableAttributes?: {
       'scheduling',
       'status',
       'matched_at',
+      'tags',
       ...(pluggableAttributes?.attributeNames || []),
     ],
     defaultColumnOrder: [
@@ -43,6 +44,7 @@ const getEventDefinitionTableElements = (pluggableAttributes?: {
       'matched_at',
       'status',
       'scheduling',
+      'tags',
       ...(pluggableAttributes?.attributeNames || []),
     ],
   };
@@ -50,6 +52,7 @@ const getEventDefinitionTableElements = (pluggableAttributes?: {
   const additionalAttributes = [
     { id: 'scheduling', title: 'Scheduling', sortable: false },
     { id: 'matched_at', title: 'Last Matched', sortable: true },
+    { id: 'tags', title: 'Tags', sortable: false, searchable: true },
     ...(pluggableAttributes?.attributes || []),
   ];
 
