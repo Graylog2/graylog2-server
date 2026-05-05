@@ -88,4 +88,27 @@ const buildHealthModuleState = (report: HealthReport): HealthModuleState => {
 const useHealthModule = (): HealthModuleState =>
   useMemo(() => buildHealthModuleState(mockHealthReport), []);
 
+export type HealthSummary = {
+  overallStatus: HealthStatus;
+  nonHealthyCount: number;
+};
+
+const countNonHealthyLeaves = (node: HealthNode): number => {
+  if (!isHealthFeature(node)) return node.status === 'healthy' ? 0 : 1;
+
+  return node.children.reduce((count, child) => count + countNonHealthyLeaves(child), 0);
+};
+
+export const useHealthSummary = (): HealthSummary =>
+  useMemo(
+    () => ({
+      overallStatus: mockHealthReport.overall_status,
+      nonHealthyCount: mockHealthReport.features.reduce(
+        (count, feature) => count + countNonHealthyLeaves(feature),
+        0,
+      ),
+    }),
+    [],
+  );
+
 export default useHealthModule;

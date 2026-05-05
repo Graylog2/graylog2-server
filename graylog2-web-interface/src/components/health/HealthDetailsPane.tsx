@@ -176,7 +176,7 @@ const EntityListButton = ({ url, label }: { url: string; label: string }) => (
   <div>
     <LinkContainer to={url}>
       <Button bsStyle="primary" bsSize="small">
-        View {label} →
+        View {label} <Icon name="arrow_right_alt" />
       </Button>
     </LinkContainer>
   </div>
