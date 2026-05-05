@@ -328,6 +328,8 @@ public class IndicesResource extends RestResource {
     @Path("/outdated/{index}/reindex")
     @Operation(summary = "Reindexes an outdated index to make it compatible with the next major version of OpenSearch")
     @RequiresPermissions(RestPermissions.INDICES_REINDEX)
+    @Produces(MediaType.APPLICATION_JSON)
+    @AuditEvent(type = AuditEventTypes.ES_INDEX_REINDEX)
     public void reindex(@Parameter(name = "index") @PathParam("index") @NotNull String index,
                         @Parameter(name = "withReplication") @QueryParam("withReplication") @DefaultValue("true") boolean withReplication) {
         outdatedIndexService.reindex(index, withReplication);
