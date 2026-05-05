@@ -21,6 +21,7 @@ import SearchesConfig from 'components/configurations/SearchesConfig';
 import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';
 import SidecarConfig from 'components/configurations/SidecarConfig';
 import EventsConfig from 'components/configurations/EventsConfig';
+import NotificationsConfig from 'components/configurations/NotificationsConfig';
 import UrlAllowListConfig from 'components/configurations/UrlAllowListConfig';
 import DecoratorsConfig from 'components/configurations/DecoratorsConfig';
 import PermissionsConfig from 'components/configurations/PermissionsConfig';
@@ -61,6 +62,15 @@ const bindings: PluginExports = {
       props: {
         ConfigurationComponent: EventsConfig,
         title: 'Events',
+      },
+    },
+    {
+      name: 'Notifications',
+      permissions: ['notifications_config:read'],
+      SectionComponent: ConfigurationSection,
+      props: {
+        ConfigurationComponent: NotificationsConfig,
+        title: 'Notifications',
       },
     },
     {
