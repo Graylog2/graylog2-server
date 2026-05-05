@@ -18,9 +18,12 @@ import * as React from 'react';
 
 import { InputList } from 'components/common';
 
-// Mirror of EventDefinitionDto.normalizeTags / TagNormalizer on the server.
-// Keep these two definitions in sync.
+// Mirror of TagNormalizer on the server. Keep in sync.
 const normalizeTag = (raw: string): string => raw.trim().toLowerCase();
+
+// Mirror of EventDefinitionDto.MAX_TAGS / MAX_TAG_LENGTH. Keep in sync.
+const MAX_TAGS = 64;
+const MAX_TAG_LENGTH = 128;
 
 type Props = {
   tags: ReadonlyArray<string>;
@@ -37,16 +40,15 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
     const normalized = raw
       .map((value) => (typeof value === 'string' ? value : String(value)))
       .map(normalizeTag)
-      .filter((value) => value.length > 0);
+      .filter((value) => value.length > 0 && value.length <= MAX_TAG_LENGTH);
 
-    onChange(Array.from(new Set(normalized)));
+    onChange(Array.from(new Set(normalized)).slice(0, MAX_TAGS));
   };
 
   return (
     <InputList
       name="tags"
       id="event-definition-tags"
-      label="Tags"
       values={[...tags]}
       onChange={handleChange}
       placeholder="e.g. authentication, brute-force, compliance"

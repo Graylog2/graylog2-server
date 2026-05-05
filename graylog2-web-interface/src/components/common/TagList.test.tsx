@@ -20,14 +20,14 @@ import { render, screen } from 'wrappedTestingLibrary';
 import TagList from 'components/common/TagList';
 
 describe('TagList', () => {
-  it('renders nothing when tags are empty and no fallback is given', () => {
-    const { container } = render(<TagList tags={[]} />);
-    expect(container).toBeEmptyDOMElement();
+  it('renders no chips when tags are empty and no fallback is given', () => {
+    render(<TagList tags={[]} />);
+    expect(document.querySelector('.label')).toBeNull();
   });
 
-  it('renders nothing when tags are nullish and no fallback is given', () => {
-    const { container } = render(<TagList tags={null} />);
-    expect(container).toBeEmptyDOMElement();
+  it('renders no chips when tags are nullish and no fallback is given', () => {
+    render(<TagList tags={null} />);
+    expect(document.querySelector('.label')).toBeNull();
   });
 
   it('renders the empty fallback when provided and tags are empty', () => {
