@@ -17,10 +17,9 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import Select from 'components/common/Select';
-import { defaultCompare } from 'logic/DefaultCompare';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import StreamsAndCategoriesFilter from 'views/components/common/StreamsAndCategoriesFilter';
 
 const Container = styled.div`
   flex: 1;
@@ -31,33 +30,41 @@ type Props = {
   disabled?: boolean;
   value?: Array<string>;
   streams: Array<{ key: string; value: string }>;
-  onChange: (newStreamIds: Array<string>) => void;
+  streamCategories: Array<{ key: string; value: string }>;
+  onChange: (value: { streams: string[]; categories: string[] }) => void;
   multi?: boolean;
   clearable?: boolean;
 };
 
-const StreamsFilter = ({ disabled = false, value = [], streams, onChange, multi = true, clearable = true }: Props) => {
+const StreamsFilter = ({
+  disabled = false,
+  value = [],
+  streams,
+  streamCategories,
+  onChange,
+  multi = true,
+  clearable = true,
+}: Props) => {
   const sendTelemetry = useSendTelemetry();
   const selectedStreams = value.join(',');
   const placeholder = 'Select streams the search should include. Searches in all streams if empty.';
-  const options = streams.sort(({ key: key1 }, { key: key2 }) => defaultCompare(key1, key2));
 
-  const handleChange = (selected: string) => {
+  const handleChange = (selected: { streams: string[]; categories: string[] }) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_STREAM_INPUT_CHANGED, {
       app_pathname: 'search',
       app_section: 'search-bar',
       app_action_value: 'search-filter',
       event_details: {
-        streamsCount: selected.split(',').length,
+        streamsCount: streams.length,
       },
     });
 
-    onChange(selected === '' ? [] : selected.split(','));
+    onChange(selected);
   };
 
   return (
     <Container data-testid="streams-filter" title={placeholder}>
-      <Select
+      <StreamsAndCategoriesFilter
         placeholder={placeholder}
         disabled={disabled}
         clearable={clearable}
@@ -65,9 +72,11 @@ const StreamsFilter = ({ disabled = false, value = [], streams, onChange, multi 
         displayKey="key"
         inputId="streams-filter"
         onChange={handleChange}
-        options={options}
+        streams={streams.map((v) => ({ id: v.value, title: v.key, categories: [] }))}
+        streamCategories={streamCategories.map((v) => v.value)}
         multi={multi}
         value={selectedStreams}
+        required={false}
       />
     </Container>
   );

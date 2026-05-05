@@ -17,7 +17,6 @@
 import { useMemo } from 'react';
 import * as React from 'react';
 
-import { FormGroup, ControlLabel, HelpBlock } from 'components/bootstrap';
 import { Select } from 'components/common';
 import { defaultCompare } from 'logic/DefaultCompare';
 
@@ -88,12 +87,7 @@ const StreamsAndCategoriesFilter = (props: StreamsAndCategoriesFilterProps) => {
 
   if (!options || options.length === 0) return null;
 
-  const label =
-    (showStreams ? 'Streams ' : '') +
-    (showStreams && showCategories ? 'and ' : '') +
-    (showCategories ? 'Stream Categories ' : '');
-
-  const change = (selected: string) =>
+  const change = (selected: string) => {
     onChange({
       streams: selected
         .split(',')
@@ -104,24 +98,19 @@ const StreamsAndCategoriesFilter = (props: StreamsAndCategoriesFilterProps) => {
         .filter((v) => v.startsWith('category_'))
         .map((c) => c.substring('category_'.length)),
     });
+  };
 
   return (
-    <FormGroup controlId={id}>
-      <ControlLabel>
-        {label} <small className="text-muted">{required ? '(Optional)' : ''}</small>
-      </ControlLabel>
-      <Select
-        id={id}
-        onChange={change}
-        options={options}
-        optionRenderer={renderOption}
-        value={value}
-        required={required}
-        multi={multi}
-        {...props}
-      />
-      <HelpBlock>Select {label} the search should include.</HelpBlock>
-    </FormGroup>
+    <Select
+      {...props}
+      id={id}
+      onChange={change}
+      options={options}
+      optionRenderer={renderOption}
+      value={value}
+      required={required}
+      multi={multi}
+    />
   );
 };
 

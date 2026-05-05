@@ -28,7 +28,6 @@ import SearchButton from 'views/components/searchbar/SearchButton';
 import SearchActionsMenu from 'views/components/searchbar/saved-search/SearchActionsMenu';
 import TimeRangeFilter from 'views/components/searchbar/time-range-filter';
 import ViewsQueryInput from 'views/components/searchbar/ViewsQueryInput';
-import StreamsFilter from 'views/components/searchbar/StreamsFilter';
 import ViewsRefreshControls from 'views/components/searchbar/ViewsRefreshControls';
 import ScrollToHint from 'views/components/common/ScrollToHint';
 import { StreamsStore } from 'views/stores/StreamsStore';
@@ -73,10 +72,10 @@ import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
 import useIsLoading from 'views/hooks/useIsLoading';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import { defaultCompare } from 'logic/DefaultCompare';
-import StreamCategoryFilter from 'views/components/searchbar/StreamCategoryFilter';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
+import StreamsFilter from 'views/components/searchbar/StreamsFilter';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -265,38 +264,28 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
                       />
                       <StreamsAndRefresh>
                         <Field name="streams">
-                          {({ field: { name, value, onChange } }) => (
+                          {({ field: { value, onChange } }) => (
                             <StreamsFilter
                               value={value}
                               streams={availableStreams}
-                              onChange={(newStreams) =>
-                                onChange({
-                                  target: {
-                                    value: newStreams,
-                                    name,
-                                  },
-                                })
-                              }
-                            />
-                          )}
-                        </Field>
-                        <Field name="streamCategories">
-                          {({ field: { name, value, onChange } }) => (
-                            <StreamCategoryFilter
-                              value={value}
                               streamCategories={availableStreamCategories}
-                              onChange={(newCategories) =>
+                              onChange={(selected: { streams: string[]; categories: string[] }) => {
                                 onChange({
                                   target: {
-                                    value: newCategories,
-                                    name,
+                                    value: selected.streams,
+                                    name: 'streams',
                                   },
-                                })
-                              }
+                                });
+                                onChange({
+                                  target: {
+                                    value: selected.categories,
+                                    name: 'streamCategories',
+                                  },
+                                });
+                              }}
                             />
                           )}
                         </Field>
-
                         <ViewsRefreshControls disable={!isValid} />
                       </StreamsAndRefresh>
                     </TimeRangeRow>

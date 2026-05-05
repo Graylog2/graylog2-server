@@ -62,7 +62,6 @@ import QueryHistoryButton from 'views/components/searchbar/QueryHistoryButton';
 import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import { defaultCompare } from 'logic/DefaultCompare';
-import StreamCategoryFilter from 'views/components/searchbar/StreamCategoryFilter';
 import { executeActiveQuery } from 'views/logic/slices/viewSlice';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
@@ -275,23 +274,8 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                     <StreamsFilter
                       value={value}
                       streams={allStreams}
-                      onChange={(newStreams) => onChange({ target: { value: newStreams, name } })}
-                    />
-                  )}
-                </Field>
-                <Field name="streamCategories">
-                  {({ field: { name, value, onChange } }) => (
-                    <StreamCategoryFilter
-                      value={value}
                       streamCategories={availableStreamCategories}
-                      onChange={(newCategories) =>
-                        onChange({
-                          target: {
-                            value: newCategories,
-                            name,
-                          },
-                        })
-                      }
+                      onChange={(newStreams) => onChange({ target: { value: newStreams, name } })}
                     />
                   )}
                 </Field>

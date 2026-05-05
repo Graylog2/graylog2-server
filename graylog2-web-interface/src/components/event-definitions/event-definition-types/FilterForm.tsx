@@ -536,20 +536,26 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
 
       {onlyFilters || (
         <>
-          <StreamsAndCategoriesFilter
-            id="filter-streams-and-categories"
-            required={isStreamRequired}
-            onChange={(selected) => handleStreamsAndCategoriesChange(selected)}
-            value={[
-              ...(eventDefinition.config.stream_categories.map((c) => 'category_' + c) ?? []),
-              ...(eventDefinition.config.streams.map((s) => 'stream_' + s) ?? []),
-            ].join(',')}
-            streams={[...streams.map((s) => s.id), ...(eventDefinition?.config?.streams ?? [])].map((streamId) => {
-              const stream = streams.find((s) => s.id === streamId);
+          <FormGroup controlId="filter-streams-and-categories">
+            <ControlLabel>
+              Streams and Categories <small className="text-muted">{isStreamRequired ? '(Optional)' : ''}</small>
+            </ControlLabel>
+            <StreamsAndCategoriesFilter
+              id="filter-streams-and-categories"
+              required={isStreamRequired}
+              onChange={(selected) => handleStreamsAndCategoriesChange(selected)}
+              value={[
+                ...(eventDefinition.config.stream_categories.map((c) => 'category_' + c) ?? []),
+                ...(eventDefinition.config.streams.map((s) => 'stream_' + s) ?? []),
+              ].join(',')}
+              streams={[...streams.map((s) => s.id), ...(eventDefinition?.config?.streams ?? [])].map((streamId) => {
+                const stream = streams.find((s) => s.id === streamId);
 
-              return { title: stream?.title ?? streamId, id: streamId, categories: stream?.categories };
-            })}
-          />
+                return { title: stream?.title ?? streamId, id: streamId, categories: stream?.categories };
+              })}
+            />
+            <HelpBlock>Select streams the search should include.</HelpBlock>
+          </FormGroup>
           {isSearchingWarmTier(warmTierRanges) && (
             <Alert bsStyle="danger" title="Warm Tier Warning">
               The selected time range will include data stored in the Warm Tier. Events that must frequently retrieve
