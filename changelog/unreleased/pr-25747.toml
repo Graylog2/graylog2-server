@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix More button is misaligned in Entity Data Table Action column."
+
+issues = ["25565"]
+pulls = ["25747"]

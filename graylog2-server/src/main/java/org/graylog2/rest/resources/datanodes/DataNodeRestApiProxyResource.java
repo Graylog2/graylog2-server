@@ -57,8 +57,7 @@ public class DataNodeRestApiProxyResource extends RestResource {
             request -> isAllowed(request, "indices-directory", "GET", RestPermissions.DATANODE_MIGRATION),
             request -> isAllowed(request, "logs", "GET", RestPermissions.CLUSTER_CONFIGURATION_READ),
             request -> isAllowed(request, "metrics", "GET", RestPermissions.CLUSTER_CONFIGURATION_READ),
-            request -> isAllowed(request, "metrics", "POST", RestPermissions.CLUSTER_CONFIGURATION_READ),
-            request -> isAllowed(request, "connection-check", "POST", RestPermissions.CLUSTER_CONFIGURATION_READ)
+            request -> isAllowed(request, "metrics", "POST", RestPermissions.CLUSTER_CONFIGURATION_READ)
     );
 
     private static boolean isAllowed(ProxyRequestAdapter.ProxyRequest request, String path, String method, String permission) {

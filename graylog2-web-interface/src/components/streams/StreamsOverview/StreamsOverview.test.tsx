@@ -21,7 +21,7 @@ import * as Immutable from 'immutable';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import { indexSets } from 'fixtures/indexSets';
-import { asMock, MockStore } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
 import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
 import { stream } from 'fixtures/streams';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
@@ -30,6 +30,7 @@ import useStreamRuleTypes from 'components/streams/hooks/useStreamRuleTypes';
 import { streamRuleTypes } from 'fixtures/streamRuleTypes';
 import useStreamDestinationFilterRuleCount from 'components/streams/hooks/useStreamDestinationFilterRuleCount';
 import useStreamOutputFilters from 'components/streams/hooks/useStreamOutputFilters';
+import useStreamRulesInputs from 'hooks/useStreamRulesInputs';
 
 import StreamsOverview from './StreamsOverview';
 
@@ -38,18 +39,7 @@ jest.mock('components/streams/hooks/useStreamRuleTypes');
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 jest.mock('components/streams/hooks/useStreamDestinationFilterRuleCount');
 jest.mock('components/streams/hooks/useStreamOutputFilters');
-
-jest.mock('stores/inputs/StreamRulesInputsStore', () => ({
-  StreamRulesInputsActions: {
-    list: jest.fn(),
-  },
-  StreamRulesInputsStore: MockStore([
-    'getInitialState',
-    () => ({
-      inputs: [{ id: 'my-id', title: 'input title', name: 'name' }],
-    }),
-  ]),
-}));
+jest.mock('hooks/useStreamRulesInputs');
 
 const attributes = [
   {
@@ -99,6 +89,9 @@ describe('StreamsOverview', () => {
     });
 
     asMock(useStreamRuleTypes).mockReturnValue({ data: streamRuleTypes });
+    asMock(useStreamRulesInputs).mockReturnValue({
+      data: [{ id: 'my-id', title: 'input title', name: 'name' }],
+    } as any);
     asMock(useStreamDestinationFilterRuleCount).mockReturnValue({
       data: 0,
       refetch: () => {},

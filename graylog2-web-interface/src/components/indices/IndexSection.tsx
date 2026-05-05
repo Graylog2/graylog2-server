@@ -19,7 +19,7 @@ import styled, { css } from 'styled-components';
 
 import type { IndexInfo } from 'stores/indices/IndicesStore';
 import { Row, Col } from 'components/bootstrap';
-import type { IndexSummary as IndexSummaryType } from 'stores/indexers/IndexerOverviewStore';
+import type { IndexSummary as IndexSummaryType } from 'hooks/useIndexerOverview';
 import ClosedIndexDetails from 'components/indices/ClosedIndexDetails';
 import IndexDetails from 'components/indices/IndexDetails';
 import IndexSummary from 'components/indices/IndexSummary';
