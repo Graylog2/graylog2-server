@@ -34,7 +34,7 @@ import { isPermitted } from 'util/PermissionsMixin';
 import * as FormsUtils from 'util/FormsUtils';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import Store from 'logic/local-storage/Store';
-import { MultiSelect, TimeUnitInput, SearchFiltersFormControls, TimezoneSelect } from 'components/common';
+import { TimeUnitInput, SearchFiltersFormControls, TimezoneSelect } from 'components/common';
 import Query from 'views/logic/queries/Query';
 import type { RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
@@ -57,9 +57,9 @@ import type { Stream } from 'views/stores/StreamsStore';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import { indicesInWarmTier, isSearchingWarmTier } from 'views/components/searchbar/queryvalidation/warmTierValidation';
 import type { FiltersType } from 'views/types';
-import { defaultCompare } from 'logic/DefaultCompare';
 import type { EventDefinitionValidation } from 'components/event-definitions/types';
 import type { QueryString } from 'views/logic/queries/types';
+import StreamsAndCategoriesFilter from 'views/components/common/StreamsAndCategoriesFilter';
 
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
@@ -103,33 +103,6 @@ const WarmTierTimeStamp = () => {
   const latestWarmTierRangeEnd = warmTierRanges.map((range) => range.end).sort((a, b) => b - a)[0];
 
   return <RelativeTime dateTime={latestWarmTierRangeEnd} />;
-};
-
-type StreamCategorySelectorProps = {
-  onChange: (value: string) => void;
-  value: string;
-  streams: Array<Stream>;
-};
-const StreamCategorySelector = ({ onChange, streams, value }: StreamCategorySelectorProps) => {
-  const streamCategoryOptions = useMemo(
-    () =>
-      [...new Set<string>(streams.flatMap((stream) => stream?.categories ?? []))]
-        .sort(defaultCompare)
-        .map((category) => ({ label: category, value: category })),
-    [streams],
-  );
-
-  if (!streamCategoryOptions || streamCategoryOptions.length === 0) return null;
-
-  return (
-    <FormGroup controlId="filter-stream-categories">
-      <ControlLabel>
-        Stream Categories <small className="text-muted">(Optional)</small>
-      </ControlLabel>
-      <MultiSelect id="filter-stream-categories" onChange={onChange} options={streamCategoryOptions} value={value} />
-      <HelpBlock>Select stream categories the search should include.</HelpBlock>
-    </FormGroup>
-  );
 };
 
 type QueryParametersProps = {
@@ -277,6 +250,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
     <K extends EventDefinitionConfigKeys>(key: K, value: EventDefinition['config'][K]) => {
       const config = cloneDeep(eventDefinition.config);
       config[key] = value;
+      console.log(value);
       setCurrentConfig(config);
 
       return config;
@@ -459,15 +433,20 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
     setSearchFiltersHidden(value);
   }, []);
 
-  const handleStreamsChange = useCallback(
-    (nextValue: Array<string>) => {
+  const handleStreamsAndCategoriesChange = useCallback(
+    (selected: { streams: string[]; categories: string[] }) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_STREAM_SELECTED, {
         app_pathname: getPathnameWithoutId(pathname),
         app_section: 'event-definition-condition',
         app_action_value: 'stream-select',
       });
 
-      propagateChange(getUpdatedConfig('streams', nextValue));
+      if (selected.streams.length > 0) {
+        propagateChange(getUpdatedConfig('streams', selected.streams));
+      }
+      if (selected.categories.length > 0) {
+        propagateChange(getUpdatedConfig('stream_categories', selected.categories));
+      }
     },
     [getUpdatedConfig, pathname, propagateChange, sendTelemetry],
   );
@@ -510,15 +489,6 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
   );
 
   const onlyFilters = eventDefinition._scope === 'ILLUMINATE';
-
-  // Ensure deleted streams are still displayed in select
-  const formattedStreams = [...streams.map((s) => s.id), ...(eventDefinition?.config?.streams ?? [])]
-    .map((streamId) => {
-      const stream = streams.find((s) => s.id === streamId);
-
-      return { label: stream?.title ?? streamId, value: streamId };
-    })
-    .sort((s1, s2) => defaultCompare(s1.label, s2.label));
 
   return (
     <fieldset>
@@ -567,23 +537,18 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
 
       {onlyFilters || (
         <>
-          <FormGroup controlId="filter-streams">
-            <ControlLabel>Streams{!isStreamRequired && <small className="text-muted"> (Optional)</small>}</ControlLabel>
-            <MultiSelect
-              id="filter-streams"
-              required={isStreamRequired}
-              onChange={(selected) => handleStreamsChange(selected === '' ? [] : selected.split(','))}
-              options={formattedStreams}
-              value={(eventDefinition.config.streams ?? []).join(',')}
-            />
-            <HelpBlock>Select streams the search should include. Searches in all streams if empty.</HelpBlock>
-          </FormGroup>
-          <StreamCategorySelector
-            onChange={(selected) =>
-              propagateChange(getUpdatedConfig('stream_categories', selected === '' ? [] : selected.split(',')))
-            }
-            value={(eventDefinition.config.stream_categories ?? []).join(',')}
-            streams={streams}
+          <StreamsAndCategoriesFilter
+            required={isStreamRequired}
+            onChange={(selected) => handleStreamsAndCategoriesChange(selected)}
+            value={[
+              ...(eventDefinition.config.stream_categories.map((c) => 'category_' + c) ?? []),
+              ...(eventDefinition.config.streams.map((s) => 'stream_' + s) ?? []),
+            ].join(',')}
+            streams={[...streams.map((s) => s.id), ...(eventDefinition?.config?.streams ?? [])].map((streamId) => {
+              const stream = streams.find((s) => s.id === streamId);
+
+              return { title: stream?.title ?? streamId, id: streamId, categories: stream?.categories };
+            })}
           />
           {isSearchingWarmTier(warmTierRanges) && (
             <Alert bsStyle="danger" title="Warm Tier Warning">
@@ -659,7 +624,6 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
               {validation.errors.execute_every_ms && <HelpBlock>{validation.errors.execute_every_ms[0]}</HelpBlock>}
             </FormGroup>
           )}
-
           <Input
             id="schedule-checkbox"
             type="checkbox"
