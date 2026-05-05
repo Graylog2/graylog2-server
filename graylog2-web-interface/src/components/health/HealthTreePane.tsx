@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useEffect, useRef } from 'react';
 import type { useTree } from '@mantine/core';
 
 import { Icon } from 'components/common';
@@ -22,7 +23,8 @@ import { Icon } from 'components/common';
 import HealthStatusIcon from './HealthStatusIcon';
 import { collectDescendantFeatureIds, collectUnhealthyExpansionIds } from './healthTree';
 import { STATUS_LABELS } from './healthStatusCopy';
-import type { HealthFeature, HealthNode, HealthStatus } from './HealthReport.types';
+import type { HealthFeature, HealthNode } from './HealthReport.types';
+import { isHealthFeature } from './HealthReport.types';
 import type { HealthTreeDataNode } from './useHealthModule';
 import { ChevronSlot, StyledTree, TreeCountSuffix, TreeLabel, TreePane, TreeRow } from './HealthModule.styles';
 
@@ -33,37 +35,55 @@ type Props = {
   root: HealthFeature;
 };
 
-const HealthTreePane = ({ tree, treeData, lookup, root }: Props) => {
-  const handleRowClick = (
-    event: React.MouseEvent,
-    nodeValue: string,
-    nodeStatus: HealthStatus,
-    isFeature: boolean,
-    defaultOnClick?: (e: React.MouseEvent) => void,
-  ) => {
-    if (nodeValue === root.id) {
-      tree.select(root.id);
-      tree.expand(root.id);
+/**
+ * Watches Mantine's expanded state for user-initiated single-node toggles and
+ * applies cascade behavior:
+ *   - collapsing a feature also collapses every descendant feature
+ *   - expanding a non-healthy feature also expands the path to every non-healthy leaf
+ *
+ * Lives in an effect (not the click handler) so it covers both mouse and
+ * keyboard interactions consistently. Multi-node diffs are skipped because they
+ * are produced by our own cascade calls.
+ */
+const useExpansionCascade = (
+  tree: ReturnType<typeof useTree>,
+  lookup: Record<string, HealthNode>,
+  rootId: string,
+) => {
+  const previousExpandedRef = useRef<Record<string, boolean>>(tree.expandedState);
 
-      return;
-    }
+  useEffect(() => {
+    const previous = previousExpandedRef.current;
+    const current = tree.expandedState;
 
-    // Snapshot expansion BEFORE letting Mantine toggle — defaultOnClick mutates the state.
-    const wasExpanded = tree.expandedState[nodeValue];
-    defaultOnClick?.(event);
+    const changedIds = Array.from(new Set([...Object.keys(previous), ...Object.keys(current)])).filter(
+      (id) => Boolean(previous[id]) !== Boolean(current[id]),
+    );
 
-    if (!isFeature) return;
+    previousExpandedRef.current = current;
 
-    const subject = lookup[nodeValue];
+    if (changedIds.length !== 1) return;
 
-    if (!subject) return;
+    const changedId = changedIds[0];
 
-    if (wasExpanded) {
+    if (changedId === rootId) return;
+
+    const subject = lookup[changedId];
+
+    if (!subject || !isHealthFeature(subject)) return;
+
+    const isNowExpanded = Boolean(current[changedId]);
+
+    if (!isNowExpanded) {
       collectDescendantFeatureIds(subject).forEach((id) => tree.collapse(id));
-    } else if (nodeStatus !== 'healthy') {
+    } else if (subject.status !== 'healthy') {
       collectUnhealthyExpansionIds(subject).forEach((id) => tree.expand(id));
     }
-  };
+  }, [tree, lookup, rootId]);
+};
+
+const HealthTreePane = ({ tree, treeData, lookup, root }: Props) => {
+  useExpansionCascade(tree, lookup, root.id);
 
   return (
     <TreePane>
@@ -76,15 +96,10 @@ const HealthTreePane = ({ tree, treeData, lookup, root }: Props) => {
         renderNode={({ expanded, hasChildren, node, selected, elementProps }) => {
           const nodeProps = (node as HealthTreeDataNode).nodeProps;
           const isRootNode = node.value === root.id;
+          const accessibleName = `${node.label}, ${STATUS_LABELS[nodeProps.status]}`;
 
           return (
-            <TreeRow
-              {...elementProps}
-              $selected={selected}
-              aria-label={`${node.label}, ${STATUS_LABELS[nodeProps.status]}`}
-              onClick={(event) =>
-                handleRowClick(event, node.value, nodeProps.status, nodeProps.isFeature, elementProps.onClick)
-              }>
+            <TreeRow {...elementProps} $selected={selected} aria-label={accessibleName}>
               <ChevronSlot>
                 {hasChildren && !isRootNode ? (
                   <Icon name={expanded ? 'keyboard_arrow_down' : 'keyboard_arrow_right'} size="sm" />

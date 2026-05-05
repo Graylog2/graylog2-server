@@ -18,14 +18,14 @@ import * as React from 'react';
 import type { useTree } from '@mantine/core';
 
 import { Button } from 'components/bootstrap';
-import { Icon, Link, LinkContainer } from 'components/common';
+import { ExternalLink, Icon, LinkContainer } from 'components/common';
 
 import HealthStatusIcon from './HealthStatusIcon';
 import { countContainedChecks, formatLeafCount } from './healthTree';
 import { getStatusMeta, STATUS_LABELS } from './healthStatusCopy';
 import HEALTH_CHECK_DEFINITIONS, { getEntityListFor, getMeaningFor } from './healthCheckDefinitions';
 import type { HealthCheckDefinition } from './healthCheckDefinitions';
-import type { HealthNode, HealthStatus } from './HealthReport.types';
+import type { HealthNode } from './HealthReport.types';
 import { isHealthFeature } from './HealthReport.types';
 import {
   BodyText,
@@ -49,6 +49,50 @@ type Props = {
 };
 
 const formatCheckCount = (count: number) => `${count} check${count === 1 ? '' : 's'}`;
+
+const AffectedChildButton = ({
+  child,
+  tree,
+}: {
+  child: HealthNode;
+  tree: ReturnType<typeof useTree>;
+}) => {
+  const childIsFeature = isHealthFeature(child);
+  const childCountSummary = childIsFeature ? undefined : formatLeafCount(child);
+
+  const handleClick = () => {
+    tree.select(child.id);
+
+    if (childIsFeature) tree.expand(child.id);
+  };
+
+  return (
+    <ChildButton type="button" onClick={handleClick}>
+      <ChildButtonMeta>
+        <HealthStatusIcon status={child.status} title={STATUS_LABELS[child.status]} />
+        <ChildButtonText>
+          <strong>
+            {child.title}
+            {childCountSummary ? <ChildCountSuffix> ({childCountSummary})</ChildCountSuffix> : null}
+          </strong>
+          {childIsFeature ? <span>{formatCheckCount(countContainedChecks(child))}</span> : null}
+        </ChildButtonText>
+      </ChildButtonMeta>
+      <Icon name="keyboard_arrow_right" size="sm" />
+    </ChildButton>
+  );
+};
+
+// `<div>` wrapper prevents the button from stretching to fill the parent flex column.
+const EntityListButton = ({ url, label }: { url: string; label: string }) => (
+  <div>
+    <LinkContainer to={url}>
+      <Button bsStyle="primary" bsSize="small">
+        View {label} <Icon name="arrow_right_alt" />
+      </Button>
+    </LinkContainer>
+  </div>
+);
 
 const HealthDetailsPane = ({ tree, selectedNode, selectedPath }: Props) => {
   const status = selectedNode.status;
@@ -128,58 +172,12 @@ const HealthDetailsPane = ({ tree, selectedNode, selectedPath }: Props) => {
       {docsUrl ? (
         <DetailSection>
           <BodyText>
-            <Link to={docsUrl} target="_blank" rel="noopener">
-              Learn more
-            </Link>
+            <ExternalLink href={docsUrl}>Learn more</ExternalLink>
           </BodyText>
         </DetailSection>
       ) : null}
     </DetailsPane>
   );
 };
-
-const AffectedChildButton = ({
-  child,
-  tree,
-}: {
-  child: HealthNode;
-  tree: ReturnType<typeof useTree>;
-}) => {
-  const childIsFeature = isHealthFeature(child);
-  const childCountSummary = childIsFeature ? undefined : formatLeafCount(child);
-
-  const handleClick = () => {
-    tree.select(child.id);
-
-    if (childIsFeature) tree.expand(child.id);
-  };
-
-  return (
-    <ChildButton type="button" onClick={handleClick}>
-      <ChildButtonMeta>
-        <HealthStatusIcon status={child.status} title={STATUS_LABELS[child.status as HealthStatus]} />
-        <ChildButtonText>
-          <strong>
-            {child.title}
-            {childCountSummary ? <ChildCountSuffix> ({childCountSummary})</ChildCountSuffix> : null}
-          </strong>
-          <span>{formatCheckCount(countContainedChecks(child))}</span>
-        </ChildButtonText>
-      </ChildButtonMeta>
-      <Icon name="keyboard_arrow_right" size="sm" />
-    </ChildButton>
-  );
-};
-
-// `<div>` wrapper prevents the button from stretching to fill the parent flex column.
-const EntityListButton = ({ url, label }: { url: string; label: string }) => (
-  <div>
-    <LinkContainer to={url}>
-      <Button bsStyle="primary" bsSize="small">
-        View {label} <Icon name="arrow_right_alt" />
-      </Button>
-    </LinkContainer>
-  </div>
-);
 
 export default HealthDetailsPane;

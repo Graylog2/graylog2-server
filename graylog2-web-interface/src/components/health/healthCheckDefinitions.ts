@@ -53,7 +53,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
   },
   'graylog.output': {
     description:
-      'Health of message delivery — writing processed messages to storage and configured external destinations.',
+      'Health of message delivery and outputs — writing processed messages to storage, configured external destinations, and generated exports.',
   },
   'graylog.archiving': {
     description:
@@ -62,7 +62,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
   },
   'graylog.data_lake': {
     description:
-      'Health of the Data Lake pipeline that streams raw messages to object storage in parallel with normal indexing.',
+      'Health of Data Lake storage, preview, and retrieval for log data routed to configured Data Lake backends.',
     entityList: { url: '/data-lake/setup', label: 'data lake' },
   },
   'graylog.integrations': {
@@ -100,16 +100,16 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
     entityList: { url: '/system/forwarders', label: 'forwarders' },
   },
   collectors: {
-    description: 'The collector agents installed on customer hosts to gather and ship logs to Graylog.',
+    description: 'Sidecar agents and their managed collector processes that gather and ship logs to Graylog.',
     meaning:
-      'One or more collectors are unreachable, out of sync with their configuration, or reporting failures. Logs from affected hosts are not arriving as expected.',
+      'One or more Sidecars (or their managed collectors) are unreachable, out of sync with their configuration, or reporting failures. Logs from affected hosts are not arriving as expected.',
     commonCauses: [
-      'The collector host is offline, restarting, or disconnected from the network.',
-      'The collector has not picked up its latest configuration from Graylog.',
-      'A specific input on the collector is failing (file access, parser error, shipper error).',
+      'The Sidecar host is offline, restarting, or disconnected from the network.',
+      'The Sidecar has not picked up its latest configuration from Graylog.',
+      'A managed collector process is failing (file access, parser error, shipper error).',
     ],
     recommendedAction:
-      'Open the collectors page to inspect each collector’s status, last check-in, and configuration sync.',
+      'Open the Sidecars page to inspect each Sidecar’s status, last check-in, and configuration sync.',
     entityList: { url: Routes.SYSTEM.SIDECARS.OVERVIEW, label: 'collectors' },
   },
   'graylog.server.storage': {
@@ -149,16 +149,16 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'Open the affected node to inspect heap usage, GC logs, and recent search activity. Increase JVM heap allocation if undersized.',
   },
   'graylog.server.certificates': {
-    description: "Certificate validity for the Graylog server's TLS surfaces (HTTPS API, TLS inputs, data-node mTLS).",
+    description: "Certificate validity for the Graylog server's TLS surfaces (HTTPS/API and TLS-enabled inputs).",
     meaning:
       'One or more certificates used by Graylog are expired, expiring soon, or could not be validated. Affected services may stop accepting connections or be removed from rotation.',
     commonCauses: [
       'A certificate has reached or is approaching its expiry date.',
-      'A renewal job (e.g. data-node mTLS) failed or has not run.',
+      'A renewal job failed or has not run.',
       'The certificate inspection endpoint timed out or returned an error.',
     ],
     recommendedAction:
-      'Open the affected node to verify each TLS surface (HTTPS API, TLS inputs, data-node mTLS) and rotate certificates as needed.',
+      'Open the affected node to verify each TLS surface (HTTPS/API and TLS-enabled inputs) and rotate certificates as needed.',
   },
   'graylog.server.processing_state': {
     description:
@@ -181,7 +181,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
     commonCauses: [
       'The node was drained for a graceful shutdown or maintenance.',
       'override_lb_status was set manually via the API.',
-      'The node failed its readiness or health probe.',
+      'A lifecycle transition or journal-utilization throttling reduced the node’s LB status.',
     ],
     recommendedAction:
       'Open the affected node to verify its lifecycle state and any manual lb_status override.',
@@ -189,7 +189,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
   'graylog.input.input_buffer': {
     description: 'The in-memory queue holding messages just received by inputs, before they enter processing.',
     meaning:
-      'The input buffer is filling because messages arrive faster than they can be moved into processing. Once full, inputs stop accepting new messages and risk dropping data.',
+      'The input buffer is filling because messages arrive faster than they can be moved into processing. Once full, inputs stop accepting new messages; sources without retry or buffering may lose data.',
     commonCauses: [
       'Processing is paused or stalled on the node.',
       'A bottleneck downstream (processing buffer, journal, or output) is causing backpressure.',
@@ -201,7 +201,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
   'graylog.input.input_failures': {
     description: 'Configured inputs that are currently failing — not running, not accepting connections, or repeatedly crashing.',
     meaning:
-      'One or more configured inputs are not running and are not accepting messages. Any source pointed at a failed input is silently losing data.',
+      'One or more configured inputs are not running and are not accepting messages. Affected inputs may stop ingesting data; sources without retry/buffering may lose messages.',
     commonCauses: [
       'A port conflict or permission error preventing the input from binding.',
       'TLS certificate or authentication misconfiguration.',
@@ -211,7 +211,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'Open the inputs page to inspect the failed inputs and review their error messages.',
   },
   'graylog.processing.processing_buffer': {
-    description: 'The in-memory queue between ingest and output holding messages currently being processed by extractors, stream rules, and pipelines.',
+    description: 'The in-memory queue between ingest and output holding messages waiting to be processed by extractors, stream rules, and pipelines.',
     meaning:
       'Messages are accumulating in the processing buffer faster than they can be enriched and routed. Backpressure may propagate upstream to the input buffer and journal.',
     commonCauses: [
@@ -225,7 +225,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
   'graylog.processing.journal_size': {
     description: 'The on-disk message journal that provides a durable buffer when processing slows down or pauses.',
     meaning:
-      'The journal is filling because messages arrive faster than the node can process them, or processing has been paused. If it reaches the configured limit, new messages are dropped.',
+      'The journal is filling because messages arrive faster than the node can process them, or processing has been paused. If it reaches the configured max age or size, unprocessed messages can be dropped from the journal before being written.',
     commonCauses: [
       'Processing was paused on the node.',
       'A bottleneck in the search cluster is slowing index writes downstream.',
@@ -265,7 +265,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
     meaning:
       'One or more archive jobs failed. Messages in the affected indices have not been exported to long-term storage and may be lost when retention deletion runs.',
     commonCauses: [
-      'The archive backend (filesystem path, S3 bucket) is unreachable or out of space.',
+      'The archive backend (filesystem path or object-storage bucket/container) is unreachable or out of space.',
       'Credentials or permissions for the archive backend are invalid.',
       'A specific index could not be read due to corruption or shard issues.',
     ],
@@ -273,11 +273,11 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'Open the archives page to inspect failed archive jobs and the configured backend.',
   },
   'graylog.data_lake.connectivity': {
-    description: 'The connection between Graylog and the configured Data Lake object storage backend.',
+    description: 'The connection between Graylog and the configured Data Lake backend.',
     meaning:
-      'Graylog cannot reach the configured Data Lake backend. Raw messages destined for the Data Lake are not being delivered until connectivity is restored.',
+      'Graylog cannot reach the configured Data Lake backend. Logs/messages destined for the Data Lake are not being delivered until connectivity is restored.',
     commonCauses: [
-      'The object storage endpoint (S3 or compatible) is unreachable from the Graylog host.',
+      'The Data Lake backend is unreachable from the Graylog host.',
       'Credentials for the Data Lake backend are invalid or expired.',
       'A network firewall or proxy is blocking the connection.',
     ],
@@ -383,9 +383,9 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'Open the search nodes page to inspect each node’s state and recent cluster events.',
   },
   'search_cluster.index_management.rotation': {
-    description: 'Whether indices are rotating on schedule based on the configured strategy (size, time, or count).',
+    description: 'Whether indices are rotating when the configured rotation threshold is met (size, time, or count).',
     meaning:
-      'One or more index sets are not rotating on schedule. Active indices may grow beyond their target size, slowing queries and risking index-level limits.',
+      'One or more index sets are not rotating when their configured threshold is met. Active indices may grow beyond their target size, slowing queries and risking index-level limits.',
     commonCauses: [
       'The rotation strategy threshold (size or time) is misconfigured.',
       'A previous rotation job failed and was not retried.',
@@ -411,9 +411,8 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
     meaning:
       'One or more indices that should have moved to the warm tier have not. Hot-tier disks may fill faster than expected and query performance for older data may differ from the configured tiering.',
     commonCauses: [
-      'The warm-tier backend is unreachable or out of capacity.',
       'A previous tier-move job failed and was not retried.',
-      'The cluster lacks sufficient warm-tier-eligible nodes.',
+      'The warm storage repository is unreachable, full, or misconfigured.',
     ],
     recommendedAction:
       'Open the indices page to inspect the affected index sets and the warm-tier configuration.',
@@ -471,16 +470,13 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
     meaning:
       'Disk usage on one or more MongoDB nodes is approaching its limit. If the partition fills, MongoDB will refuse writes and Graylog configuration changes will fail.',
     commonCauses: [
-      'A collection (system messages, journal, audit logs) has grown beyond expectation.',
-      'Database fragmentation or unused indexes consuming disk.',
+      'Large collections (system messages, audit logs), oplog growth, indexes, or fragmentation.',
       'Other processes on the host competing for disk space.',
     ],
     recommendedAction:
       'Open the cluster page to inspect MongoDB disk usage and collection sizes.',
   },
 };
-
-export const getDescriptionFor = (id: string): string | undefined => HEALTH_CHECK_DEFINITIONS[id]?.description;
 
 export const getEntityListFor = (id: string): HealthEntityListLink | undefined => {
   const own = HEALTH_CHECK_DEFINITIONS[id]?.entityList;

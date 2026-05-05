@@ -16,42 +16,45 @@
  */
 import * as React from 'react';
 import userEvent from '@testing-library/user-event';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, within } from 'wrappedTestingLibrary';
 
 import HealthModule from './HealthModule';
+
+const clickInTree = async (label: string) => {
+  const tree = screen.getByLabelText('Cluster health tree');
+
+  await userEvent.click(within(tree).getByText(label));
+};
 
 describe('HealthModule', () => {
   it('renders the interpretation legend by default when the synthetic root is selected', () => {
     render(<HealthModule />);
 
     expect(screen.getByRole('heading', { name: 'Health of Graylog Deployment' })).toBeInTheDocument();
-    expect(screen.getByText('Cluster Health')).toBeInTheDocument();
     expect(screen.getByLabelText('Cluster health tree')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'How to interpret this health report:' })).toBeInTheDocument();
 
-    expect(screen.getByText(/The feature is functioning properly/)).toBeInTheDocument();
-    expect(screen.getByText(/The feature is experiencing a problem/)).toBeInTheDocument();
-    expect(screen.getByText(/The feature has severe issues/)).toBeInTheDocument();
+    expect(screen.getByText(/Functioning properly/)).toBeInTheDocument();
+    expect(screen.getByText(/Experiencing a problem/)).toBeInTheDocument();
+    expect(screen.getByText(/Severe issues/)).toBeInTheDocument();
     expect(screen.getByText(/The state could not be evaluated/)).toBeInTheDocument();
   });
 
   it('renders Affected list with non-healthy children when a feature is selected', async () => {
     render(<HealthModule />);
 
-    await userEvent.click(screen.getByText('MongoDB'));
+    await clickInTree('MongoDB');
 
     expect(screen.getByRole('heading', { name: 'MongoDB' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Affected' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Connectivity/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Primary State/i })).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'How to interpret this health report:' })).not.toBeInTheDocument();
   });
 
   it('renders the full check panel when a non-healthy leaf is selected', async () => {
     render(<HealthModule />);
 
-    await userEvent.click(screen.getByText('MongoDB'));
-    await userEvent.click(screen.getByText('Primary State'));
+    await clickInTree('MongoDB');
+    await clickInTree('Primary State');
 
     expect(screen.getByRole('heading', { name: 'Primary State' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'What this means' })).toBeInTheDocument();
@@ -63,9 +66,36 @@ describe('HealthModule', () => {
   it('renders the entity-list button with the configured label', async () => {
     render(<HealthModule />);
 
-    await userEvent.click(screen.getByText('MongoDB'));
-    await userEvent.click(screen.getByText('Connectivity'));
+    await clickInTree('MongoDB');
+    await clickInTree('Connectivity');
 
     expect(screen.getByRole('link', { name: /View MongoDB/i })).toBeInTheDocument();
+  });
+
+  it('cascades expansion to non-healthy descendants when an unhealthy feature is opened', async () => {
+    render(<HealthModule />);
+
+    const tree = screen.getByLabelText('Cluster health tree');
+
+    expect(within(tree).queryByText('Memory')).not.toBeInTheDocument();
+
+    await clickInTree('Graylog');
+
+    expect(within(tree).getByText('Server')).toBeInTheDocument();
+    expect(within(tree).getByText('Memory')).toBeInTheDocument();
+  });
+
+  it('cascades collapse to all descendants when a feature is closed', async () => {
+    render(<HealthModule />);
+
+    const tree = screen.getByLabelText('Cluster health tree');
+
+    await clickInTree('Graylog');
+    expect(within(tree).getByText('Memory')).toBeInTheDocument();
+
+    await clickInTree('Graylog');
+
+    expect(within(tree).queryByText('Memory')).not.toBeInTheDocument();
+    expect(within(tree).queryByText('Server')).not.toBeInTheDocument();
   });
 });

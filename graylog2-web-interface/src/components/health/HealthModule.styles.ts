@@ -131,6 +131,13 @@ export const StyledTree = styled(Tree)(
 
     .mantine-Tree-node {
       list-style: none;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    .mantine-Tree-node:focus-visible {
+      outline: 2px solid ${theme.colors.variant.info};
+      outline-offset: 2px;
     }
 
     .mantine-Tree-subtree {
@@ -162,11 +169,6 @@ export const TreeRow = styled.div<{ $selected: boolean }>(
 
     &:hover {
       background-color: ${$selected ? theme.colors.variant.lightest.default : theme.colors.table.row.backgroundHover};
-    }
-
-    &:focus-visible {
-      outline: 2px solid ${theme.colors.variant.info};
-      outline-offset: 2px;
     }
   `,
 );

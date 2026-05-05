@@ -34,7 +34,7 @@ const HealthModule = () => {
 
   const selectedValue = tree.selectedState[0] ?? root.id;
   const selectedNode = lookup[selectedValue] ?? root;
-  const selectedPath = paths[selectedNode.id];
+  const selectedPath = paths[selectedNode.id] ?? [];
   const isRootSelected = selectedNode.id === root.id;
 
   return (

@@ -14,19 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import useLocation from 'routing/useLocation';
+import useQuery from 'routing/useQuery';
 
-const HEALTH_QUERY_PARAM = 'health';
-const ON_VALUE = 'on';
+export const HEALTH_QUERY_PARAM = 'health';
+export const HEALTH_ON_VALUE = 'on';
 
 /**
  * Returns whether the Health module should be shown on the System Overview page.
  * Default: hidden. Add `?health=on` to the URL to show it.
  */
-const useHealthModuleVisible = (): boolean => {
-  const { search } = useLocation();
-
-  return new URLSearchParams(search).get(HEALTH_QUERY_PARAM) === ON_VALUE;
-};
+const useHealthModuleVisible = (): boolean => useQuery()[HEALTH_QUERY_PARAM] === HEALTH_ON_VALUE;
 
 export default useHealthModuleVisible;

@@ -35,36 +35,36 @@ const SystemOverviewPage = () => {
   const showHealthModule = useHealthModuleVisible();
 
   return (
-  <DocumentTitle title="System overview">
-    <span>
-      {showHealthModule && hasEnterpriseLicense && <HealthModule />}
+    <DocumentTitle title="System overview">
+      <span>
+        {showHealthModule && hasEnterpriseLicense && <HealthModule />}
 
-      <IfPermitted permissions="notifications:read">
-        <NotificationsList />
-      </IfPermitted>
-
-      <HideOnCloud>
-        <IfPermitted permissions="systemjobs:read">
-          <SystemJobsComponent />
+        <IfPermitted permissions="notifications:read">
+          <NotificationsList />
         </IfPermitted>
-      </HideOnCloud>
 
-      <GraylogClusterOverview showLicenseGraph />
+        <HideOnCloud>
+          <IfPermitted permissions="systemjobs:read">
+            <SystemJobsComponent />
+          </IfPermitted>
+        </HideOnCloud>
 
-      <HideOnCloud>
-        <IndexerClusterHealth />
-      </HideOnCloud>
+        <GraylogClusterOverview showLicenseGraph />
 
-      <IfPermitted permissions="indices:failures">
-        <IndexerSystemOverviewComponent />
-      </IfPermitted>
-      <TimesList />
+        <HideOnCloud>
+          <IndexerClusterHealth />
+        </HideOnCloud>
 
-      <IfPermitted permissions="systemmessages:read">
-        <SystemMessagesComponent />
-      </IfPermitted>
-    </span>
-  </DocumentTitle>
+        <IfPermitted permissions="indices:failures">
+          <IndexerSystemOverviewComponent />
+        </IfPermitted>
+        <TimesList />
+
+        <IfPermitted permissions="systemmessages:read">
+          <SystemMessagesComponent />
+        </IfPermitted>
+      </span>
+    </DocumentTitle>
   );
 };
 

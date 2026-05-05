@@ -26,9 +26,9 @@ export const STATUS_LABELS: Record<HealthStatus, string> = {
 };
 
 export const STATUS_DESCRIPTION: Record<HealthStatus, string> = {
-  healthy: 'The feature is functioning properly.',
-  warning: 'The feature is experiencing a problem that needs attention.',
-  critical: 'The feature has severe issues and is negatively impacting functionality.',
+  healthy: 'Functioning properly.',
+  warning: 'Experiencing a problem that needs attention.',
+  critical: 'Severe issues that are negatively impacting functionality.',
   unknown: 'The state could not be evaluated.',
 };
 
