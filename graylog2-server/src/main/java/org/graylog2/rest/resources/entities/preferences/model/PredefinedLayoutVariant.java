@@ -14,20 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.resources.entities.preferences.service;
+package org.graylog2.rest.resources.entities.preferences.model;
 
-import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferences;
-import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.List;
-
-public interface EntityListPreferencesService {
-
-    StoredEntityListPreferences get(final StoredEntityListPreferencesId preferencesId);
-
-    List<StoredEntityListPreferences> getPredefinedForEntityList(final String entityListId);
-
-    boolean save(final StoredEntityListPreferences preferences);
-
-    int deleteAllForUser(final String userId);
+public record PredefinedLayoutVariant(@JsonProperty("layout_variant") String layoutVariant,
+                                      @JsonProperty("entity_list_id") String entityListId,
+                                      @JsonProperty("display_name") String displayName) {
 }

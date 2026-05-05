@@ -77,6 +77,7 @@ import org.graylog2.indexer.indices.IndexStatus;
 import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.IndicesAdapter;
+import org.graylog2.indexer.indices.OutdatedIndex;
 import org.graylog2.indexer.indices.ShardsInfo;
 import org.graylog2.indexer.indices.Template;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
@@ -655,7 +656,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     }
 
     @Override
-    public Set<String> getOutdatedIndices(int currentMajorVersion) {
+    public Set<OutdatedIndex> getOutdatedIndices(int currentMajorVersion) {
         throw new UnsupportedOperationException("Outdated indices check only supported in OpenSearch versions > 2.x.");
     }
 }
