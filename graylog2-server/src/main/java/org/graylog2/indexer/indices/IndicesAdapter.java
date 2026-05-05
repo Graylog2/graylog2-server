@@ -47,17 +47,6 @@ public interface IndicesAdapter {
     void create(String index, IndexSettings indexSettings, @Nullable Map<String, Object> mapping);
 
     /**
-     * Moves an index to a new index, keeping settings and mapping of the original index.
-     * While reindexing, replication is disabled and can be reenabled using the reEnableReplication flag.
-     *
-     * @param source              source index
-     * @param target              target index
-     * @param restoreSettings set to true to enable original replication settings
-     */
-    Map<String, Object> move(String source, String target, Map<String, Object> restoreSettings);
-
-
-    /**
      * Add fields to an existing index or to change search only settings of existing fields
      * @param indexName existing index name
      * @param mappingType target mapping type (e.g. message). Not relevant for ES7+ (will be simply ignored).

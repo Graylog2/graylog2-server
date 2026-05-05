@@ -22,8 +22,6 @@ import org.graylog.testing.elasticsearch.SearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.indices.IndicesAdapterIT;
 
-import java.io.IOException;
-
 public class IndicesAdapterOS2IT extends IndicesAdapterIT {
 
     @SearchInstance
@@ -34,13 +32,4 @@ public class IndicesAdapterOS2IT extends IndicesAdapterIT {
         return openSearchInstance;
     }
 
-    @Override
-    public void testMove() throws IOException {
-        //not implemented in deprecated client
-    }
-
-    @Override
-    public void testMoveWithRestoreSettings() throws IOException {
-        //not implemented in deprecated client
-    }
 }

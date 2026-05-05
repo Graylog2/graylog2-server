@@ -20,7 +20,6 @@ package org.graylog2.indexer.indices;
 import com.github.joschi.jadconfig.util.Duration;
 import org.assertj.core.api.Assertions;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
-import org.graylog.testing.elasticsearch.SkipDefaultIndexTemplate;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -59,40 +58,6 @@ public abstract class IndicesAdapterIT extends ElasticsearchBaseTest {
             assertThat(result.tookMs()).isGreaterThan(0);
             assertThat(result.movedDocuments()).isEqualTo(0);
         });
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    @SkipDefaultIndexTemplate
-    public void testMove() throws IOException {
-        String originalIndex = "original_index";
-        Map<String, Object> mapping = Map.of("properties", Map.of("some_field", Map.of("type", "text", "analyzer", "standard")));
-        Map<String, Object> settings = Map.of("index.hidden", true);
-        indicesAdapter.create(originalIndex, new IndexSettings(settings), mapping);
-        String movedIndex = "moved_index";
-        indicesAdapter.move(originalIndex, movedIndex, null);
-        client().waitForGreenStatus(movedIndex);
-        Map<String, Object> index = (Map<String, Object>) indicesAdapter.getStructuredIndexSettings(movedIndex).get("index");
-        assertThat(index.get("hidden")).isNull();
-        Map<String, Object> indexMapping = (Map<String, Object>) indicesAdapter.getIndexMapping(movedIndex).get("properties");
-        assertThat(indexMapping).containsKey("some_field");
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    @SkipDefaultIndexTemplate
-    public void testMoveWithRestoreSettings() throws IOException {
-        String originalIndex = "original_index";
-        Map<String, Object> mapping = Map.of("properties", Map.of("some_field", Map.of("type", "text", "analyzer", "standard")));
-        indicesAdapter.create(originalIndex, IndexSettings.create(1, 0, null), mapping);
-        String movedIndex = "moved_index";
-        Map<String, Object> settings = Map.of("index.hidden", true);
-        indicesAdapter.move(originalIndex, movedIndex, settings);
-        client().waitForGreenStatus(movedIndex);
-        Map<String, Object> index = (Map<String, Object>) indicesAdapter.getStructuredIndexSettings(movedIndex).get("index");
-        assertThat(index.get("hidden")).isEqualTo("true");
-        Map<String, Object> indexMapping = (Map<String, Object>) indicesAdapter.getIndexMapping(movedIndex).get("properties");
-        assertThat(indexMapping).containsKey("some_field");
     }
 
     @Test

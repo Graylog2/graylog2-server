@@ -31,7 +31,6 @@ import org.graylog.storage.opensearch3.stats.ClusterStatsApi;
 import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
 import org.graylog.storage.opensearch3.stats.StatsApi;
 import org.graylog2.datatiering.WarmIndexInfo;
-import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.IndexMoveResult;
@@ -198,43 +197,6 @@ public class IndicesAdapterOS implements IndicesAdapter {
     @Override
     public void create(String index, IndexSettings indexSettings, @Nullable Map<String, Object> mapping) {
         executeCreateIndexRequest(index, createIndexRequest(index, indexSettings, mapping));
-    }
-
-    @Override
-    public Map<String, Object> move(String source, String target, Map<String, Object> restoreSettings) {
-        return c.execute(() -> {
-            Map<String, Object> sourceSettings = getFlatIndexSettings(source);
-            Map<String, Object> sourceMapping = getIndexMapping(source);
-            if (sourceSettings == null) {
-                throw new ElasticsearchException("No index sourceSettings found for index " + source);
-            }
-            Map<String, Object> cleanSettings = (restoreSettings == null) ? new HashMap<>() :
-                    restoreSettings.entrySet().stream()
-                            .filter(e -> {
-                                String key = e.getKey();
-                                return !key.startsWith("index.uuid") &&
-                                        !key.startsWith("index.version") &&
-                                        !key.startsWith("index.creation_date") &&
-                                        !key.startsWith("index.provided_name");
-                            })
-                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-            cleanSettings.put("index.number_of_replicas", 0);
-            IndexSettings indexSettings = new IndexSettings(cleanSettings);
-            create(target, indexSettings, sourceMapping);
-            reindex(source, target, result -> {
-                if (result.hasFailedItems()) {
-                    throw new ElasticsearchException("Error reindexing index " + source + " to " + target + ". Check your indexer log.");
-                }
-            });
-            delete(source);
-            if (restoreSettings != null) {
-                Integer restoreReplicas = (Integer) restoreSettings.get("index.number_of_replicas");
-                if (restoreReplicas != null && restoreReplicas != 0) {
-                    indicesClient.putSettings(r -> r.index(target).settings(s -> s.numberOfReplicas(restoreReplicas)));
-                }
-            }
-            return sourceSettings;
-        }, "Error creating copy index for " + source);
     }
 
     private CreateIndexRequest createIndexRequest(String index,
