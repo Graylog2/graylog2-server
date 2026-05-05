@@ -155,6 +155,14 @@ public class Indices {
         return indicesAdapter.getIndexStats(Collections.singleton(indexSet.getIndexWildcard()));
     }
 
+    /**
+     * Returns lightweight index statistics (docs + store only) for the given index wildcards.
+     * This is significantly faster than {@link #getIndicesStats(Collection)} which fetches full shard-level stats.
+     */
+    public JsonNode getIndexStats(final Collection<String> indexWildcards) {
+        return indicesAdapter.getIndexStats(indexWildcards);
+    }
+
     public boolean exists(String indexName) {
         try {
             return indicesAdapter.exists(indexName);
