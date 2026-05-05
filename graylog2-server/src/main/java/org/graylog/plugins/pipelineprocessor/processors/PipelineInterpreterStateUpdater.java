@@ -21,7 +21,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
@@ -29,10 +28,9 @@ import org.graylog.plugins.pipelineprocessor.events.PipelineConnectionsChangedEv
 import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.RuleMetricsConfigChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
+import org.graylog.scheduler.system.SystemJobManager;
 import org.graylog2.rest.resources.system.inputs.InputDeletedEvent;
 
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
@@ -41,8 +39,7 @@ import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory
 public class PipelineInterpreterStateUpdater {
     private static final RateLimitedLog log = createDefaultRateLimitedLog(PipelineInterpreterStateUpdater.class);
 
-    private final PipelineInterpreterStateBuilder stateBuilder;
-    private final ScheduledExecutorService scheduler;
+    private final SystemJobManager systemJobManager;
     /**
      * non-null if the update has successfully loaded a state
      */
@@ -52,25 +49,46 @@ public class PipelineInterpreterStateUpdater {
     @Inject
     public PipelineInterpreterStateUpdater(PipelineInterpreterStateBuilder stateBuilder,
                                      MetricRegistry metricRegistry,
-                                     @Named("daemonScheduler") ScheduledExecutorService scheduler,
+                                     SystemJobManager systemJobManager,
                                      EventBus serverEventBus) {
-        this.stateBuilder = stateBuilder;
-        this.scheduler = scheduler;
+        this.systemJobManager = systemJobManager;
         this.pipelineMetricRegistry = PipelineMetricRegistry.create(metricRegistry, Pipeline.class.getName(), Rule.class.getName());
+
+        // Perform synchronous initial load before registering on the event bus. This closes the race
+        // window where an async event could trigger a reload before the initial load completes.
+        // We load synchronously here because the system scheduler may not be ready during Guice injection.
+        try {
+            final PipelineInterpreter.State initialState = stateBuilder.buildState(pipelineMetricRegistry);
+            latestState.set(initialState);
+            log.debug("Pipeline interpreter state initialized");
+        } catch (Exception e) {
+            log.error("Failed to load initial pipeline interpreter state, will retry on next event", e);
+        }
 
         // listens to cluster wide Rule, Pipeline and pipeline stream connection changes
         serverEventBus.register(this);
-
-        reloadAndSave();
     }
 
-    // only the singleton instance should mutate itself, others are welcome to reload a new state, but we don't
-    // currently allow direct global state updates from external sources (if you need to, send an event on the bus instead)
-    private synchronized PipelineInterpreter.State reloadAndSave() {
-        final PipelineInterpreter.State newState = stateBuilder.buildState(pipelineMetricRegistry);
+    /**
+     * Updates the pipeline interpreter state. Refuses to replace a non-empty state with an empty
+     * one as a defense-in-depth measure against transient MongoDB failures producing empty results.
+     *
+     * @param newState the new state to set
+     */
+    public synchronized void updateState(PipelineInterpreter.State newState) {
+        final PipelineInterpreter.State currentState = latestState.get();
+        if (currentState != null && !isEmptyState(currentState) && isEmptyState(newState)) {
+            log.warn("Refusing to replace non-empty pipeline state with empty state. " +
+                    "This is likely caused by a transient MongoDB error. Current state has {} pipelines.",
+                    currentState.getCurrentPipelines().size());
+            return;
+        }
         latestState.set(newState);
         log.debug("Pipeline interpreter state got updated");
-        return newState;
+    }
+
+    private static boolean isEmptyState(PipelineInterpreter.State state) {
+        return state.getCurrentPipelines().isEmpty() && state.getStreamPipelineConnections().isEmpty();
     }
 
     /**
@@ -83,6 +101,10 @@ public class PipelineInterpreterStateUpdater {
         return latestState.get();
     }
 
+    private void scheduleReload() {
+        systemJobManager.submit(PipelineInterpreterStateReloadJob.create());
+    }
+
     // TODO avoid reloading everything on every change, certain changes can get away with doing less work
     @Subscribe
     public void handleRuleChanges(RulesChangedEvent event) {
@@ -91,7 +113,7 @@ public class PipelineInterpreterStateUpdater {
             pipelineMetricRegistry.removeRuleMetrics(ref.id());
         });
         event.updatedRules().forEach(ref -> log.debug("Refreshing rule {}", ref.id()));
-        scheduler.schedule(this::reloadAndSave, 0, TimeUnit.SECONDS);
+        scheduleReload();
     }
 
     @Subscribe
@@ -101,24 +123,24 @@ public class PipelineInterpreterStateUpdater {
             pipelineMetricRegistry.removePipelineMetrics(id);
         });
         event.updatedPipelineIds().forEach(id -> log.debug("Refreshing pipeline {}", id));
-        scheduler.schedule(this::reloadAndSave, 0, TimeUnit.SECONDS);
+        scheduleReload();
     }
 
     @Subscribe
     public void handlePipelineConnectionChanges(PipelineConnectionsChangedEvent event) {
         log.debug("Pipeline stream connection changed: {}", event);
-        scheduler.schedule(this::reloadAndSave, 0, TimeUnit.SECONDS);
+        scheduleReload();
     }
 
     @Subscribe
     public void handleRuleMetricsConfigChange(RuleMetricsConfigChangedEvent event) {
         log.debug("Rule metrics config changed: {}", event);
-        scheduler.schedule(this::reloadAndSave, 0, TimeUnit.SECONDS);
+        scheduleReload();
     }
 
     @Subscribe
     public void handleInputDeleted(InputDeletedEvent event) {
         log.debug("Input deleted: {}", event);
-        scheduler.schedule(this::reloadAndSave, 0, TimeUnit.SECONDS);
+        scheduleReload();
     }
 }

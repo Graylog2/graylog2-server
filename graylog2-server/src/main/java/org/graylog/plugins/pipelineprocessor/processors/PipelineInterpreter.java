@@ -103,6 +103,10 @@ public class PipelineInterpreter implements MessageProcessor {
     public Messages process(Messages messages) {
         try (Timer.Context ignored = executionTime.time()) {
             final State latestState = stateUpdater.getLatestState();
+            if (latestState == null) {
+                log.warn("Pipeline interpreter state is not yet available, passing messages through unchanged");
+                return messages;
+            }
             if (latestState.enableRuleMetrics()) {
                 return process(messages, new RuleMetricsListener(metricRegistry), latestState);
             }
