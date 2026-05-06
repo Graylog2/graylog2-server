@@ -126,7 +126,7 @@ class OpensearchDataDirCompatibilityCheckTest {
 
     private DatanodeConfiguration configFor(Path dataDir, String opensearchVersion) {
         final DatanodeDirectories directories = DatanodeTestUtils.tempDirectories(dataDir);
-        return new DatanodeConfiguration(() -> new OpensearchDistribution(Path.of("/opensearch"), opensearchVersion), directories, 0, IndexerJwtAuthToken.disabled());
+        return new DatanodeConfiguration(new OpensearchDistribution(Path.of("/opensearch"), opensearchVersion), directories, 0, IndexerJwtAuthToken.disabled());
     }
 
     private IndicesDirectoryParser realParser() {

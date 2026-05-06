@@ -60,7 +60,7 @@ public class OpensearchDataDirCompatibilityCheck implements PreflightCheck {
     public void runCheck() throws PreflightCheckException {
 
         final Path opensearchDataDir = datanodeConfiguration.datanodeDirectories().getDataTargetDir();
-        final String opensearchVersion = datanodeConfiguration.opensearchDistributionProvider().get().version();
+        final String opensearchVersion = datanodeConfiguration.opensearchDistribution().version();
 
         // We want to run the compatibility check only once per major opensearch version for this data dir. Let's memorize
         // the run and skip every time we are starting with the same major version in the same data dir.

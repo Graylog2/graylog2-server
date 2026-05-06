@@ -22,7 +22,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import org.apache.commons.io.FileUtils;
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.configuration.DatanodeDirectories;
+import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.configuration.snapshots.RepositoryConfiguration;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
@@ -59,7 +59,7 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
     private static final Logger LOG = LoggerFactory.getLogger(SearchableSnapshotsConfigurationBean.class);
 
     private final Configuration localConfiguration;
-    private final DatanodeDirectories datanodeDirectories;
+    private final DatanodeConfiguration datanodeConfiguration;
 
     private final Set<RepositoryConfiguration> repositoryConfigurations;
 
@@ -69,11 +69,11 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
     @Inject
     public SearchableSnapshotsConfigurationBean(
             Configuration localConfiguration,
-            DatanodeDirectories datanodeDirectories,
+            DatanodeConfiguration datanodeConfiguration,
             Set<RepositoryConfiguration> repositoryConfigurations,
             Provider<OpensearchUsableSpace> usableSpaceProvider) {
         this.localConfiguration = localConfiguration;
-        this.datanodeDirectories = datanodeDirectories;
+        this.datanodeConfiguration = datanodeConfiguration;
         this.repositoryConfigurations = repositoryConfigurations;
         this.usableSpaceProvider = usableSpaceProvider;
     }
@@ -93,7 +93,7 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
             if (searchRoleEnabled) {
                 LOG.info("Search role enabled, validating usable space and adding search role to opensearch configuration");
                 validateUsableSpace();
-                builder.addNodeRole(OpensearchNodeRole.SEARCH);
+                builder.addNodeRole(datanodeConfiguration.opensearchDistribution().distributionProperties().searchableSnapshotsRole());
             }
             return builder
                     .properties(properties(searchRoleEnabled, enabledRepositories))
@@ -109,12 +109,12 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
     }
 
     private boolean searchRoleExplicitlyConfigured() {
-        return localConfiguration.getNodeRoles() != null && localConfiguration.getNodeRoles().contains(OpensearchNodeRole.SEARCH);
+        return localConfiguration.getNodeRoles() != null && localConfiguration.getNodeRoles().contains(datanodeConfiguration.opensearchDistribution().distributionProperties().searchableSnapshotsRole());
     }
 
     private boolean searchRoleEnabled() {
         final boolean rolesNotConfigured = localConfiguration.getNodeRoles() == null || localConfiguration.getNodeRoles().isEmpty();
-        return rolesNotConfigured || localConfiguration.getNodeRoles().contains(OpensearchNodeRole.SEARCH);
+        return rolesNotConfigured || localConfiguration.getNodeRoles().contains(datanodeConfiguration.opensearchDistribution().distributionProperties().searchableSnapshotsRole());
     }
 
     private void validateUsableSpace() throws OpensearchConfigurationException {
@@ -183,7 +183,7 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
 
     private Collection<OpensearchKeystoreItem> keystoreItems(Set<RepositoryConfiguration> enabledRepositories) {
         return enabledRepositories.stream()
-                .flatMap(repo -> repo.keystoreItems(datanodeDirectories).stream())
+                .flatMap(repo -> repo.keystoreItems(datanodeConfiguration.datanodeDirectories()).stream())
                 .collect(Collectors.toSet());
     }
 }

@@ -54,7 +54,7 @@ public class IndicesDirectoryController {
     @Path("compatibility")
     public CompatibilityResult status() {
         final java.nio.file.Path dataTargetDir = datanodeConfiguration.datanodeDirectories().getDataTargetDir();
-        final String opensearchVersion = datanodeConfiguration.opensearchDistributionProvider().get().version();
+        final String opensearchVersion = datanodeConfiguration.opensearchDistribution().version();
         final String hostname = configuration.getHostname();
         try {
             directoryReadableValidator.validate(dataTargetDir.toUri().toString(), dataTargetDir);

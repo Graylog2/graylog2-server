@@ -82,7 +82,7 @@ public class OpensearchDefaultConfigFilesBean implements DatanodeConfigurationBe
             throw new RuntimeException(e);
         }
 
-        final String opensearchVersion = datanodeConfiguration.opensearchDistributionProvider().get().version();
+        final String opensearchVersion = datanodeConfiguration.opensearchDistribution().version();
         try {
             configFiles.addAll(readConfigFiles(Path.of("opensearch", "config", opensearchVersion)));
         } catch (URISyntaxException | IOException e) {
