@@ -29,6 +29,7 @@ import org.graylog.testing.GRNExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoJackExtension;
+import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.ContentPackEntityResolver;
 import org.graylog2.contentpacks.model.ModelId;
