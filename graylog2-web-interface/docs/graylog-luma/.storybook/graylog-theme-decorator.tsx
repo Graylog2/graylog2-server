@@ -15,10 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import '@graylog/sawmill/fonts';
-import '@mantine/core/styles.css';
-import '@mantine/dropzone/styles.css';
-import '@mantine/notifications/styles.css';
+import 'theme/theme-styles';
 import type { Decorator } from '@storybook/react';
 import { useDarkMode } from 'storybook-dark-mode';
 
