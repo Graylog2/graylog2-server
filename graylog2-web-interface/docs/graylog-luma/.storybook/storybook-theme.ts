@@ -14,9 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import SawmillMantine from '@graylog/sawmill/mantine';
+import SawmillSC from '@graylog/sawmill/styled-components';
 import { create } from 'storybook/theming';
 
 import graylogLogo from '../graylog-logo.png';
+
+// Mirrors the pure function calls inside useThemes, without the React hook wrappers.
+const { colors: light, fonts } = SawmillSC(SawmillMantine({ colorScheme: 'light' }));
+const { colors: dark } = SawmillSC(SawmillMantine({ colorScheme: 'dark' }));
+
+const accentColor = light.variant.info;
 
 const baseTheme = {
   brandTitle: 'Graylog Design System',
@@ -24,10 +32,10 @@ const baseTheme = {
   brandTarget: '_block',
   brandImage: graylogLogo,
 
-  fontBase: '"Poppins", sans-serif',
-  fontCode: '"Roboto Mono", monospace',
+  fontBase: fonts.family.body,
+  fontCode: fonts.family.monospace,
 
-  colorPrimary: '#03C2FF',
+  colorPrimary: accentColor,
   colorSecondary: '#9A6BFE',
 
   appBorderRadius: 4,
@@ -37,41 +45,41 @@ const baseTheme = {
 export const lightTheme = create({
   base: 'light',
   ...baseTheme,
-  appBg: '#F6F7FC',
-  appContentBg: '#FFFFFF',
-  appPreviewBg: '#F6F7FC',
-  appBorderColor: '#E1E4ED',
+  appBg: light.background.body,
+  appContentBg: light.background.content,
+  appPreviewBg: light.background.body,
+  appBorderColor: light.misc.divider,
 
-  textColor: '#252D47',
-  textInverseColor: '#252D478A',
+  textColor: light.text.primary,
+  textInverseColor: `${light.text.primary}8A`,
 
-  barTextColor: '#252D47',
-  barSelectedColor: '#03C2FF',
-  barHoverColor: '#03C2FF',
-  barBg: '#F6F7FC',
+  barTextColor: light.text.primary,
+  barSelectedColor: accentColor,
+  barHoverColor: accentColor,
+  barBg: light.background.body,
 
-  inputBg: '#F6F7FC',
-  inputBorder: '#12182B',
-  inputTextColor: '#252D47',
+  inputBg: light.background.body,
+  inputBorder: light.input.border,
+  inputTextColor: light.input.color,
 });
 
 export const darkTheme = create({
   base: 'dark',
   ...baseTheme,
-  appBg: '#12182B',
-  appContentBg: '#252D47',
-  appPreviewBg: '#12182B',
-  appBorderColor: '#1C2235',
+  appBg: dark.global.background,
+  appContentBg: dark.background.content,
+  appPreviewBg: dark.global.background,
+  appBorderColor: dark.background.secondaryNav,
 
-  textColor: '#E1E4ED',
-  textInverseColor: '#E1E4ED8A',
+  textColor: dark.text.primary,
+  textInverseColor: `${dark.text.primary}8A`,
 
-  barTextColor: '#E1E4ED',
-  barSelectedColor: '#03C2FF',
-  barHoverColor: '#03C2FF',
-  barBg: '#12182B',
+  barTextColor: dark.text.primary,
+  barSelectedColor: accentColor,
+  barHoverColor: accentColor,
+  barBg: dark.global.background,
 
-  inputBg: '#12182B',
-  inputBorder: '#394261',
-  inputTextColor: '#E1E4ED',
+  inputBg: dark.input.background,
+  inputBorder: dark.input.border,
+  inputTextColor: dark.input.color,
 });
