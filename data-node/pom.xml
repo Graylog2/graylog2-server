@@ -1082,7 +1082,7 @@
                         <version>${download-maven-plugin.version}</version>
                         <executions>
                             <execution>
-                                <id>fix-mac-jdk-for-os-x64</id>
+                                <id>download-mac-jdk-x64</id>
                                 <phase>generate-resources</phase>
                                 <goals>
                                     <goal>wget</goal>
@@ -1092,9 +1092,7 @@
                                         https://github.com/adoptium/temurin21-binaries/releases/download/jdk-${opensearch.mac.jdk.version}%2B${opensearch.mac.jdk.build}/OpenJDK21U-jdk_x64_mac_hotspot_${opensearch.mac.jdk.version}_${opensearch.mac.jdk.build}.tar.gz
                                     </url>
                                     <sha512>${opensearch.mac.jdk.sha512.x64}</sha512>
-                                    <outputDirectory>
-                                        ${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/jdk-mac
-                                    </outputDirectory>
+                                    <outputDirectory>${project.build.directory}/mac-jdk/${opensearch.version}/x64</outputDirectory>
                                     <fileMappers>
                                         <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
                                             <pattern>^(jdk-.*/Contents/Home)/(.*)</pattern>
@@ -1105,7 +1103,7 @@
                                 </configuration>
                             </execution>
                             <execution>
-                                <id>fix-mac-jdk-for-os-aarch</id>
+                                <id>download-mac-jdk-aarch64</id>
                                 <phase>generate-resources</phase>
                                 <goals>
                                     <goal>wget</goal>
@@ -1115,9 +1113,7 @@
                                         https://github.com/adoptium/temurin21-binaries/releases/download/jdk-${opensearch.mac.jdk.version}%2B${opensearch.mac.jdk.build}/OpenJDK21U-jdk_aarch64_mac_hotspot_${opensearch.mac.jdk.version}_${opensearch.mac.jdk.build}.tar.gz
                                     </url>
                                     <sha512>${opensearch.mac.jdk.sha512.aarch64}</sha512>
-                                    <outputDirectory>
-                                        ${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/jdk-mac
-                                    </outputDirectory>
+                                    <outputDirectory>${project.build.directory}/mac-jdk/${opensearch.version}/aarch64</outputDirectory>
                                     <fileMappers>
                                         <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
                                             <pattern>^(jdk-.*/Contents/Home)/(.*)</pattern>
@@ -1127,9 +1123,8 @@
                                     <unpack>true</unpack>
                                 </configuration>
                             </execution>
-                            <!-- OpenSearch 3.x mac JDK -->
                             <execution>
-                                <id>fix-mac-jdk-for-os-x64-v3</id>
+                                <id>download-mac-jdk-next-x64</id>
                                 <phase>generate-resources</phase>
                                 <goals>
                                     <goal>wget</goal>
@@ -1139,9 +1134,7 @@
                                         https://github.com/adoptium/temurin25-binaries/releases/download/jdk-${opensearch.next.mac.jdk.version}%2B${opensearch.next.mac.jdk.build}/OpenJDK25U-jdk_x64_mac_hotspot_${opensearch.next.mac.jdk.version}_${opensearch.next.mac.jdk.build}.tar.gz
                                     </url>
                                     <sha512>${opensearch.next.mac.jdk.sha512.x64}</sha512>
-                                    <outputDirectory>
-                                        ${project.build.directory}/opensearch/opensearch-${opensearch.next.version}-linux-x64/jdk-mac
-                                    </outputDirectory>
+                                    <outputDirectory>${project.build.directory}/mac-jdk/${opensearch.next.version}/x64</outputDirectory>
                                     <fileMappers>
                                         <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
                                             <pattern>^(jdk-.*/Contents/Home)/(.*)</pattern>
@@ -1152,7 +1145,7 @@
                                 </configuration>
                             </execution>
                             <execution>
-                                <id>fix-mac-jdk-for-os-aarch-v3</id>
+                                <id>download-mac-jdk-next-aarch64</id>
                                 <phase>generate-resources</phase>
                                 <goals>
                                     <goal>wget</goal>
@@ -1162,9 +1155,7 @@
                                         https://github.com/adoptium/temurin25-binaries/releases/download/jdk-${opensearch.next.mac.jdk.version}%2B${opensearch.next.mac.jdk.build}/OpenJDK25U-jdk_aarch64_mac_hotspot_${opensearch.next.mac.jdk.version}_${opensearch.next.mac.jdk.build}.tar.gz
                                     </url>
                                     <sha512>${opensearch.next.mac.jdk.sha512.aarch64}</sha512>
-                                    <outputDirectory>
-                                        ${project.build.directory}/opensearch/opensearch-${opensearch.next.version}-linux-aarch64/jdk-mac
-                                    </outputDirectory>
+                                    <outputDirectory>${project.build.directory}/mac-jdk/${opensearch.next.version}/aarch64</outputDirectory>
                                     <fileMappers>
                                         <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
                                             <pattern>^(jdk-.*/Contents/Home)/(.*)</pattern>
@@ -1172,6 +1163,26 @@
                                         </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
                                     </fileMappers>
                                     <unpack>true</unpack>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>install-mac-jdk</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                                <configuration>
+                                    <mainClass>org.graylog.datanode.build.InstallMacJdk</mainClass>
+                                    <arguments>
+                                        <argument>${project.build.directory}/opensearch</argument>
+                                        <argument>${project.build.directory}/mac-jdk</argument>
+                                    </arguments>
                                 </configuration>
                             </execution>
                         </executions>
