@@ -813,7 +813,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>remove-unused-opensearch-plugins-x64</id>
+                        <id>remove-unused-opensearch-plugins</id>
                         <phase>prepare-package</phase>
                         <goals>
                             <goal>java</goal>
@@ -821,7 +821,7 @@
                         <configuration>
                             <mainClass>org.graylog.datanode.build.RemoveOpensearchPlugins</mainClass>
                             <arguments>
-                                <argument>${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64</argument>
+                                <argument>${project.build.directory}/opensearch</argument>
                                 <!--caution, the plugin order is relevant. Plugins have dependencies on other plugins
                                 and need to be removed in correct order-->
                                 <argument>opensearch-security-analytics</argument>
@@ -841,35 +841,7 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>remove-unused-opensearch-plugins-aarch64</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                        <configuration>
-                            <mainClass>org.graylog.datanode.build.RemoveOpensearchPlugins</mainClass>
-                            <arguments>
-                                <argument>${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64</argument>
-                                <!--caution, the plugin order is relevant. Plugins have dependencies on other plugins
-                                and need to be removed in correct order-->
-                                <argument>opensearch-security-analytics</argument>
-                                <argument>opensearch-alerting</argument>
-                                <argument>opensearch-custom-codecs</argument>
-                                <argument>opensearch-geospatial</argument>
-                                <argument>opensearch-neural-search</argument>
-                                <argument>opensearch-knn</argument>
-                                <argument>opensearch-notifications</argument>
-                                <argument>opensearch-notifications-core</argument>
-                                <argument>opensearch-performance-analyzer</argument>
-                                <argument>opensearch-reports-scheduler</argument>
-                                <argument>opensearch-sql</argument>
-                                <argument>opensearch-observability</argument>
-                                <argument>query-insights</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>install-required-opensearch-plugins-x64</id>
+                        <id>install-required-opensearch-plugins</id>
                         <phase>prepare-package</phase>
                         <goals>
                             <goal>java</goal>
@@ -877,119 +849,8 @@
                         <configuration>
                             <mainClass>org.graylog.datanode.build.InstallOpensearchPlugins</mainClass>
                             <arguments>
-                                <argument>${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64</argument>
-                                <argument>${project.build.directory}/opensearch-plugins/repository-s3-${opensearch.version}.zip</argument>
-                                <argument>${project.build.directory}/opensearch-plugins/repository-gcs-${opensearch.version}.zip</argument>
-                                <argument>${project.build.directory}/opensearch-plugins/repository-hdfs-${opensearch.version}.zip</argument>
-                                <argument>${project.build.directory}/opensearch-plugins/repository-azure-${opensearch.version}.zip</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>install-required-opensearch-plugins-aarch64</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                        <configuration>
-                            <mainClass>org.graylog.datanode.build.InstallOpensearchPlugins</mainClass>
-                            <arguments>
-                                <argument>${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64</argument>
-                                <argument>${project.build.directory}/opensearch-plugins/repository-s3-${opensearch.version}.zip</argument>
-                                <argument>${project.build.directory}/opensearch-plugins/repository-gcs-${opensearch.version}.zip</argument>
-                                <argument>${project.build.directory}/opensearch-plugins/repository-hdfs-${opensearch.version}.zip</argument>
-                                <argument>${project.build.directory}/opensearch-plugins/repository-azure-${opensearch.version}.zip</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                    <!-- OpenSearch 3.x plugin management -->
-                    <execution>
-                        <id>remove-unused-opensearch-plugins-x64-v3</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                        <configuration>
-                            <mainClass>org.graylog.datanode.build.RemoveOpensearchPlugins</mainClass>
-                            <arguments>
-                                <argument>${project.build.directory}/opensearch/opensearch-${opensearch.next.version}-linux-x64</argument>
-                                <!--caution, the plugin order is relevant. Plugins have dependencies on other plugins
-                                and need to be removed in correct order-->
-                                <argument>opensearch-security-analytics</argument>
-                                <argument>opensearch-alerting</argument>
-                                <argument>opensearch-custom-codecs</argument>
-                                <argument>opensearch-geospatial</argument>
-                                <argument>opensearch-neural-search</argument>
-                                <argument>opensearch-knn</argument>
-                                <argument>opensearch-notifications</argument>
-                                <argument>opensearch-notifications-core</argument>
-                                <argument>opensearch-performance-analyzer</argument>
-                                <argument>opensearch-reports-scheduler</argument>
-                                <argument>opensearch-sql</argument>
-                                <argument>opensearch-observability</argument>
-                                <argument>query-insights</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>remove-unused-opensearch-plugins-aarch64-v3</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                        <configuration>
-                            <mainClass>org.graylog.datanode.build.RemoveOpensearchPlugins</mainClass>
-                            <arguments>
-                                <argument>${project.build.directory}/opensearch/opensearch-${opensearch.next.version}-linux-aarch64</argument>
-                                <!--caution, the plugin order is relevant. Plugins have dependencies on other plugins
-                                and need to be removed in correct order-->
-                                <argument>opensearch-security-analytics</argument>
-                                <argument>opensearch-alerting</argument>
-                                <argument>opensearch-custom-codecs</argument>
-                                <argument>opensearch-geospatial</argument>
-                                <argument>opensearch-neural-search</argument>
-                                <argument>opensearch-knn</argument>
-                                <argument>opensearch-notifications</argument>
-                                <argument>opensearch-notifications-core</argument>
-                                <argument>opensearch-performance-analyzer</argument>
-                                <argument>opensearch-reports-scheduler</argument>
-                                <argument>opensearch-sql</argument>
-                                <argument>opensearch-observability</argument>
-                                <argument>query-insights</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>install-required-opensearch-plugins-x64-v3</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                        <configuration>
-                            <mainClass>org.graylog.datanode.build.InstallOpensearchPlugins</mainClass>
-                            <arguments>
-                                <argument>${project.build.directory}/opensearch/opensearch-${opensearch.next.version}-linux-x64</argument>
-                                <argument>${project.build.directory}/opensearch-plugins/repository-s3-${opensearch.next.version}.zip</argument>
-                                <argument>${project.build.directory}/opensearch-plugins/repository-gcs-${opensearch.next.version}.zip</argument>
-                                <argument>${project.build.directory}/opensearch-plugins/repository-hdfs-${opensearch.next.version}.zip</argument>
-                                <argument>${project.build.directory}/opensearch-plugins/repository-azure-${opensearch.next.version}.zip</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>install-required-opensearch-plugins-aarch64-v3</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                        <configuration>
-                            <mainClass>org.graylog.datanode.build.InstallOpensearchPlugins</mainClass>
-                            <arguments>
-                                <argument>${project.build.directory}/opensearch/opensearch-${opensearch.next.version}-linux-aarch64</argument>
-                                <argument>${project.build.directory}/opensearch-plugins/repository-s3-${opensearch.next.version}.zip</argument>
-                                <argument>${project.build.directory}/opensearch-plugins/repository-gcs-${opensearch.next.version}.zip</argument>
-                                <argument>${project.build.directory}/opensearch-plugins/repository-hdfs-${opensearch.next.version}.zip</argument>
-                                <argument>${project.build.directory}/opensearch-plugins/repository-azure-${opensearch.next.version}.zip</argument>
+                                <argument>${project.build.directory}/opensearch</argument>
+                                <argument>${project.build.directory}/opensearch-plugins</argument>
                             </arguments>
                         </configuration>
                     </execution>
