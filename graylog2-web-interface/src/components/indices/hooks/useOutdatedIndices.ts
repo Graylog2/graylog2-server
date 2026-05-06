@@ -14,11 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import {useQuery} from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
-import {qualifyUrl} from 'util/URLUtils';
-import {defaultOnError} from 'util/conditional/onError';
+import { qualifyUrl } from 'util/URLUtils';
+import { defaultOnError } from 'util/conditional/onError';
 
 export type OutdatedIndex = {
   index_name: string;
