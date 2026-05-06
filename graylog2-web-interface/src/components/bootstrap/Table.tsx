@@ -33,26 +33,29 @@ const variantRowStyles = css(({ theme }) => {
   const { table } = theme.colors;
   let styles = '';
 
-  const variants = {
+  const tableVariant = table.variant as Record<string, string>;
+  const tableVariantHover = table.variantHover as Record<string, string>;
+
+  const variants: Record<string, { background: string; hover: string }> = {
     active: {
-      background: table.variant.active,
-      hover: table.variantHover.active,
+      background: tableVariant.active,
+      hover: tableVariantHover.active,
     },
     success: {
-      background: table.variant.success,
-      hover: table.variantHover.success,
+      background: tableVariant.success,
+      hover: tableVariantHover.success,
     },
     info: {
-      background: table.variant.info,
-      hover: table.variantHover.info,
+      background: tableVariant.info,
+      hover: tableVariantHover.info,
     },
     warning: {
-      background: table.variant.warning,
-      hover: table.variantHover.warning,
+      background: tableVariant.warning,
+      hover: tableVariantHover.warning,
     },
     danger: {
-      background: table.variant.danger,
-      hover: table.variantHover.danger,
+      background: tableVariant.danger,
+      hover: tableVariantHover.danger,
     },
   };
 
