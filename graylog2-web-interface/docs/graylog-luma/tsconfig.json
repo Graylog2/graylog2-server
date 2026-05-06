@@ -16,12 +16,7 @@
     ".storybook/**/*",
     "stories/**/*",
     "../../src/types.d.ts",
-    "../../src/@types/react/types.d.ts",
-    "../../src/@types/styled-components/index.d.ts",
-    "../../src/@types/moment/index.d.ts",
-    "../../src/@types/mantine/index.d.ts",
-    "../../src/@types/graylog-web-plugin/index.d.ts",
-    "../../src/@types/reflux/index.d.ts",
+    "../../src/@types/**/*",
     "../../src/components/content-stream/type.d.ts"
   ]
 }
