@@ -1,29 +1,26 @@
 {
   "name": "graylog-luma",
   "version": "1.0.0",
-  "description": "Luma - Graylog design system",
-  "main": "index.ts",
-  "author": "Graylog",
-  "license": "SSPL-1.0",
   "private": true,
-  "peerDependencies": {
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+  "description": "Luma - Graylog design system",
+  "license": "SSPL-1.0",
+  "author": "Graylog",
+  "main": "index.ts",
+  "scripts": {
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "devDependencies": {
     "@storybook/addon-docs": "^10.3.5",
     "@storybook/addon-webpack5-compiler-swc": "^4.0.3",
     "@storybook/react-webpack5": "^10.3.5",
-    "@types/node": "^25.6.0",
-    "@types/react": "^18.3.28",
-    "@types/react-dom": "^18.3.7",
     "eslint-plugin-storybook": "^10.3.5",
     "storybook": "^10.3.5",
     "storybook-dark-mode": "^5.0.0",
     "typescript": "^5.8.2"
   },
-  "scripts": {
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
   }
 }
