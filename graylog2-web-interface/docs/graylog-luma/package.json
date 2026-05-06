@@ -20,7 +20,7 @@
     "eslint-plugin-storybook": "^10.3.5",
     "storybook": "^10.3.5",
     "storybook-dark-mode": "^5.0.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.8.2"
   },
   "scripts": {
     "storybook": "storybook dev -p 6006",
