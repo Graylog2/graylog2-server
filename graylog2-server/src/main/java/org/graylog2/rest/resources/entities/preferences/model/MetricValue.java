@@ -18,7 +18,7 @@ package org.graylog2.rest.resources.entities.preferences.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record MetricValue(@JsonProperty("value") Integer value,
+public record MetricValue(@JsonProperty("value") Long value,
                           @JsonProperty("meaning") String additionalMeaning,
                           @JsonProperty("metric_name") String metricName) {
 }

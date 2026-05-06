@@ -173,7 +173,7 @@ public class EntityListPreferencesResource {
                         pref.preferences().metrics()
                                 .stream()
                                 .map(metricName -> metricProviders
-                                        .getOrDefault(metricName, (tr, sub) -> new MetricValue(0, "", metricName))
+                                        .getOrDefault(metricName, (tr, sub) -> new MetricValue(0L, "", metricName))
                                         .compute(timeRange, subject))
                                 .toList())
                 )
