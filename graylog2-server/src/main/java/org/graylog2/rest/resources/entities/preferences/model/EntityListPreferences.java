@@ -18,29 +18,25 @@ package org.graylog2.rest.resources.entities.preferences.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Functions;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
-public record EntityListPreferences(@JsonProperty("attributes") Map<String, Attribute> attributes,
+public record EntityListPreferences(@JsonProperty("display_name") String displayName,
+                                    @JsonProperty("attributes") Map<String, Attribute> attributes,
                                     @JsonProperty("order") List<String> order,
                                     @JsonProperty("per_page") Integer perPage,
                                     @JsonProperty("sort") SortPreferences sort,
                                     @JsonProperty("slicing") SlicingPreferences slicing,
-                                    @JsonProperty("custom_preferences") Map<String, Object> customPreferences) {
-
-    public static EntityListPreferences create(List<String> attributes, Integer perPage, SortPreferences sort) {
-        return new EntityListPreferences(attributes.stream()
-                .collect(Collectors.toMap(Functions.identity(), attribute -> new Attribute(DisplayStatus.show, Optional.empty()))), attributes, perPage, sort, null, Map.of());
-    }
+                                    @JsonProperty("custom_preferences") Map<String, Object> customPreferences,
+                                    @JsonProperty("priority") Integer priority,
+                                    @JsonProperty("filters") List<String> filters) {
 
     public enum DisplayStatus {
         show,
-        hide;
+        hide
     }
 
     @JsonInclude(JsonInclude.Include.NON_ABSENT)

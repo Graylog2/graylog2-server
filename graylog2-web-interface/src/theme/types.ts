@@ -92,6 +92,8 @@ interface EmailTemplateType {
   hooks?: EmailTemplateHooks;
 }
 
+export type SupportedMantineSize = 'xs' | 'md' | 'sm' | 'lg';
+
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     'customization.theme.customizer'?: Array<CustomizationType>;
