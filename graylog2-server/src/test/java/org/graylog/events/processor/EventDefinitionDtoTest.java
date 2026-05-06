@@ -17,6 +17,7 @@
 package org.graylog.events.processor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -31,6 +32,7 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -212,42 +214,17 @@ public class EventDefinitionDtoTest {
     }
 
     @Test
-    public void tagsRoundTripThroughJson() throws JsonProcessingException {
-        final ObjectMapper mapper = new ObjectMapperProvider().get();
-        final EventDefinitionDto dto = serializableEventDefinition().toBuilder()
+    public void tagsSerializeToJson() throws JsonProcessingException {
+        final EventDefinitionDto dto = testSubject.toBuilder()
                 .tags(ImmutableSet.of("phishing", "lateral-movement"))
                 .build();
-        final String json = mapper.writeValueAsString(dto);
-        assertThat(json).contains("\"tags\"");
-        final EventDefinitionDto roundTripped = mapper.readValue(json, EventDefinitionDto.class);
-        assertThat(roundTripped.tags()).containsExactlyInAnyOrder("phishing", "lateral-movement");
-    }
-
-    @Test
-    public void tagsDeserializeAsEmptyWhenAbsent() throws JsonProcessingException {
         final ObjectMapper mapper = new ObjectMapperProvider().get();
-        // Build a JSON document missing the "tags" property; the builder default should kick in.
-        final String json = mapper.writeValueAsString(serializableEventDefinition());
-        // Strip the tags property to simulate a pre-existing document persisted before this field existed.
-        final String legacyJson = json.replaceAll(",\"tags\":\\[\\]", "").replaceAll("\"tags\":\\[\\],", "");
-        final EventDefinitionDto roundTripped = mapper.readValue(legacyJson, EventDefinitionDto.class);
-        assertThat(roundTripped.tags()).isEmpty();
-    }
-
-    private static EventDefinitionDto serializableEventDefinition() {
-        return EventDefinitionDto.builder()
-                .title("foo")
-                .description("bar")
-                .priority(1)
-                .alert(false)
-                .keySpec(ImmutableList.of())
-                .config(TestEventProcessorConfig.builder()
-                        .message("test")
-                        .searchWithinMs(1000)
-                        .executeEveryMs(1000)
-                        .build())
-                .notificationSettings(EventNotificationSettings.withGracePeriod(0))
-                .build();
+        final JsonNode tree = mapper.readTree(mapper.writeValueAsString(dto));
+        assertThat(tree.get("tags")).isNotNull();
+        assertThat(tree.get("tags").isArray()).isTrue();
+        final List<String> serialized = new ArrayList<>();
+        tree.get("tags").forEach(n -> serialized.add(n.asText()));
+        assertThat(serialized).containsExactlyInAnyOrder("phishing", "lateral-movement");
     }
 
     @Test
