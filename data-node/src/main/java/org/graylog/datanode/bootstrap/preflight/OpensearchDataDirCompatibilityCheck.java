@@ -24,9 +24,9 @@ import org.graylog.datanode.filesystem.index.IncompatibleIndexVersionException;
 import org.graylog.datanode.filesystem.index.IndicesDirectoryParser;
 import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
 import org.graylog.datanode.filesystem.index.dto.NodeInformation;
-import org.graylog.shaded.opensearch2.org.opensearch.Version;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
+import org.opensearch.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
