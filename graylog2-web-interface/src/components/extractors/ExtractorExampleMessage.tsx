@@ -74,7 +74,9 @@ class ExtractorExampleMessage extends React.Component<
     if (example) {
       messagePreview = (
         <NewExampleWell bsSize="small">
-          <span id="xtrc-example"><FieldValue value={example} /></span>
+          <span id="xtrc-example">
+            <FieldValue value={example} />
+          </span>
         </NewExampleWell>
       );
     } else {
