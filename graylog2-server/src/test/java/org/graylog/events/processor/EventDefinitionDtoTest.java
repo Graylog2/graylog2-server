@@ -215,7 +215,20 @@ public class EventDefinitionDtoTest {
 
     @Test
     public void tagsSerializeToJson() throws JsonProcessingException {
-        final EventDefinitionDto dto = testSubject.toBuilder()
+        // Build with a real config so Jackson can serialize (testSubject's mock config has
+        // Mockito-internal fields that fail serialization).
+        final EventDefinitionDto dto = EventDefinitionDto.builder()
+                .title("foo")
+                .description("bar")
+                .priority(1)
+                .alert(false)
+                .keySpec(ImmutableList.of())
+                .config(TestEventProcessorConfig.builder()
+                        .message("test")
+                        .searchWithinMs(1000)
+                        .executeEveryMs(1000)
+                        .build())
+                .notificationSettings(EventNotificationSettings.withGracePeriod(0))
                 .tags(ImmutableSet.of("phishing", "lateral-movement"))
                 .build();
         final ObjectMapper mapper = new ObjectMapperProvider().get();
