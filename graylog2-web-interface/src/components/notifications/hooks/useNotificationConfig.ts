@@ -46,10 +46,15 @@ const useNotificationConfig = ({
   });
 
   const mutation = useMutation<SystemNotificationConfig, FetchError, SystemNotificationConfig>({
-    // PUT body is `{ retention_days }`. The generated SDK's `updateConfig` does
-    // not accept the body argument, so we drop down to fetch directly. The
-    // response shape is still typed via the SDK derivation in
-    // `components/notifications/types.ts`.
+    // PUT body is `{ retention_days }`. The generated `SystemNotifications.updateConfig`
+    // SDK stub takes only `requestOptions` — no body parameter — because the
+    // backend handler at NotificationsResource#updateConfig is missing the
+    // `@RequestBody(required = true, useParameterTypeSchema = true)` swagger
+    // annotation that other write endpoints (e.g. StreamResource#create,
+    // CollectorsConfigResource#put) carry. Until that annotation is added on
+    // the backend (graylog2-server#25873), we drop to fetch() so the body
+    // actually reaches the server. Response shape stays typed via the SDK
+    // derivation in `components/notifications/types.ts`.
     //
     // Internal permission guard: the consumer is expected to hide the save
     // button when `isUpdateEnabled` is false (driven by
