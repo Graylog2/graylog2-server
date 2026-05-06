@@ -61,8 +61,8 @@ const testMessage: Message = {
   fields: { message: 'hello world' },
 };
 
-let nextLoadedMessage: Message | undefined = testMessage;
-let nextLoadedOptions: { inputId?: string } = { inputId: 'input-1' };
+let mockLoadedMessage: Message | undefined = testMessage;
+let mockLoadedOptions: { inputId?: string } = { inputId: 'input-1' };
 
 jest.mock('components/messageloaders/RawMessageLoader', () => {
   const MockedRawMessageLoader = ({
@@ -70,7 +70,7 @@ jest.mock('components/messageloaders/RawMessageLoader', () => {
   }: {
     onMessageLoaded: (msg: Message | undefined, opts: { inputId?: string }) => void;
   }) => (
-    <button type="button" onClick={() => onMessageLoaded(nextLoadedMessage, nextLoadedOptions)}>
+    <button type="button" onClick={() => onMessageLoaded(mockLoadedMessage, mockLoadedOptions)}>
       Load message
     </button>
   );
@@ -90,8 +90,8 @@ const customStream = {
 
 describe('<ProcessorSimulator>', () => {
   beforeEach(() => {
-    nextLoadedMessage = testMessage;
-    nextLoadedOptions = { inputId: 'input-1' };
+    mockLoadedMessage = testMessage;
+    mockLoadedOptions = { inputId: 'input-1' };
     asMock(PipelinesSimulator.simulate).mockResolvedValue({
       messages: [],
       took_microseconds: 4242,
@@ -118,8 +118,8 @@ describe('<ProcessorSimulator>', () => {
   });
 
   it('does not render simulation results when the loaded message is undefined', async () => {
-    nextLoadedMessage = undefined;
-    nextLoadedOptions = {};
+    mockLoadedMessage = undefined;
+    mockLoadedOptions = {};
 
     render(<ProcessorSimulator streams={[defaultStream]} />);
 
