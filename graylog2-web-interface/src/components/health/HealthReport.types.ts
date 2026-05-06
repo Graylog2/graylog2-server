@@ -22,6 +22,7 @@ export type HealthCheck = {
   status: HealthStatus;
   total_affected: number;
   total?: number;
+  message?: string;
 };
 
 export type HealthFeature = {

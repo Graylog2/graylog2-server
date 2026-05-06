@@ -39,6 +39,7 @@ import {
   DetailsPane,
   DetailSection,
   DetailsTitle,
+  MessageBlock,
   StatusSummary,
 } from './HealthModule.styles';
 
@@ -104,9 +105,13 @@ const HealthDetailsPane = ({ tree, selectedNode, selectedPath }: Props) => {
   const isFeatureWithChildren = isHealthFeature(selectedNode) && selectedNode.children.length > 0;
   const isCheckLike = !isFeatureWithChildren;
   const isUnhealthy = status !== 'healthy';
+  const leafCheck = !isHealthFeature(selectedNode) ? selectedNode : undefined;
 
   const meaning = isCheckLike && isUnhealthy ? getMeaningFor(selectedNode.id, status) : undefined;
-  const commonCauses = isCheckLike && isUnhealthy ? definition?.commonCauses : undefined;
+  const message = isUnhealthy ? leafCheck?.message : undefined;
+  const latestMessage = message?.trim() ? message : undefined;
+  // Backend specifics supersede generic causes — when a message is present, hide commonCauses.
+  const commonCauses = isCheckLike && isUnhealthy && !latestMessage ? definition?.commonCauses : undefined;
   const recommendedAction = isCheckLike && isUnhealthy ? definition?.recommendedAction : undefined;
   const docsUrl = isCheckLike ? definition?.docsUrl : undefined;
 
@@ -167,6 +172,13 @@ const HealthDetailsPane = ({ tree, selectedNode, selectedPath }: Props) => {
 
       {isCheckLike && entityList ? (
         <EntityListButton url={entityList.url} label={entityList.label} />
+      ) : null}
+
+      {latestMessage ? (
+        <DetailSection>
+          <h4>Latest message</h4>
+          <MessageBlock>{latestMessage}</MessageBlock>
+        </DetailSection>
       ) : null}
 
       {docsUrl ? (

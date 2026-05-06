@@ -329,6 +329,21 @@ export const ChildCountSuffix = styled.span(
   `,
 );
 
+export const MessageBlock = styled.pre(
+  ({ theme }) => css`
+    margin: 0;
+    padding: ${theme.spacings.sm};
+    border-radius: 8px;
+    background-color: ${theme.colors.variant.lightest.default};
+    color: ${theme.colors.text.primary};
+    font-family: ${theme.fonts.family.monospace};
+    font-size: ${theme.fonts.size.small};
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+  `,
+);
+
 export const CauseList = styled.ul(
   ({ theme }) => css`
     margin: 0;

@@ -54,13 +54,25 @@ describe('HealthModule', () => {
     render(<HealthModule />);
 
     await clickInTree('MongoDB');
-    await clickInTree('Primary State');
+    await clickInTree('Slow Queries');
 
-    expect(screen.getByRole('heading', { name: 'Primary State' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Slow Queries' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'What this means' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Common causes' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Recommended action' })).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Affected' })).not.toBeInTheDocument();
+  });
+
+  it('renders the latest backend message instead of common causes when one is present', async () => {
+    render(<HealthModule />);
+
+    await clickInTree('MongoDB');
+    await clickInTree('Primary State');
+
+    expect(screen.getByRole('heading', { name: 'Primary State' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Latest message' })).toBeInTheDocument();
+    expect(screen.getByText('Replica set has no primary; 2 of 3 voting members are unreachable.')).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Common causes' })).not.toBeInTheDocument();
   });
 
   it('renders the entity-list button with the configured label', async () => {
@@ -69,7 +81,12 @@ describe('HealthModule', () => {
     await clickInTree('MongoDB');
     await clickInTree('Connectivity');
 
-    expect(screen.getByRole('link', { name: /View MongoDB/i })).toBeInTheDocument();
+    const recommendedActionHeading = screen.getByRole('heading', { name: 'Recommended action' });
+    const entityListLink = screen.getByRole('link', { name: /View MongoDB/i });
+    const latestMessageHeading = screen.getByRole('heading', { name: 'Latest message' });
+
+    expect(recommendedActionHeading.compareDocumentPosition(entityListLink) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(entityListLink.compareDocumentPosition(latestMessageHeading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('cascades expansion to non-healthy descendants when an unhealthy feature is opened', async () => {
