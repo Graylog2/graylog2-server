@@ -27,6 +27,7 @@ import useFeature from 'hooks/useFeature';
 import { MISSING_BUCKET_NAME } from 'views/Constants';
 import formatValueWithUnitLabel from 'views/components/visualizations/utils/formatValueWithUnitLabel';
 import usePluginEntities from 'hooks/usePluginEntities';
+import stringify from 'util/stringify';
 
 import EmptyValue from './EmptyValue';
 import type { ValueRendererProps, ValueRenderer } from './messagelist/decoration/ValueRenderer';
@@ -43,16 +44,6 @@ const usePluggableValueRenderer = () => {
 
 const defaultComponent = ({ value }: ValueRendererProps) => value;
 
-const stringify = (value: any) => {
-  switch (typeof value) {
-    case 'bigint':
-      return value.toString();
-    case 'string':
-      return value;
-    default:
-      return JSON.stringify(value);
-  }
-};
 const _formatValue = (field: string, value: any, truncate: boolean, render: ValueRenderer, type: FieldType) => {
   const stringified = stringify(value);
   const Component = render;
