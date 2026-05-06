@@ -18,14 +18,14 @@ import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import PipelinesPageNavigation from 'components/pipelines/PipelinesPageNavigation';
+import { DebugMetricsBanner } from 'components/pipelines/debug-metrics';
 import DocsHelper from 'util/DocsHelper';
-import { Row, Col, Button, ButtonToolbar } from 'components/bootstrap';
+import { Row, Col, ButtonToolbar } from 'components/bootstrap';
 import { SearchForm, PaginatedList, DocumentTitle, PageHeader, Spinner, QueryHelper } from 'components/common';
 import RuleList from 'components/rules/RuleList';
-import RuleMetricsConfigContainer from 'components/rules/RuleMetricsConfigContainer';
 import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
 import type { Pagination } from 'stores/PaginationTypes';
-import type { MetricsConfigType, PaginatedRules, RuleType } from 'stores/rules/RulesStore';
+import type { PaginatedRules, RuleType } from 'stores/rules/RulesStore';
 import { RulesActions } from 'stores/rules/RulesStore';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import CreateButton from 'components/common/CreateButton';
@@ -54,28 +54,16 @@ const _loadData = (
   });
 };
 
-const _loadRuleMetricData = (setMetricsConfig: (metricsConfig: MetricsConfigType) => void) => {
-  RulesActions.loadMetricsConfig().then((metricsConfig: MetricsConfigType) => {
-    setMetricsConfig(metricsConfig);
-  });
-};
-
 const RulesPage = () => {
   const { page, pageSize: perPage, resetPage, setPagination } = usePaginationQueryParameter();
   const [query, setQuery] = useState('');
   const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
-  const [openMetricsConfig, toggleMetricsConfig] = useState<boolean>(false);
-  const [metricsConfig, setMetricsConfig] = useState<MetricsConfigType>();
   const [paginatedRules, setPaginatedRules] = useState<PaginatedRules | undefined>();
   const { list: rules, pagination: { total = 0 } = {}, context: rulesContext } = paginatedRules ?? {};
 
   useEffect(() => {
     _loadData({ query, page, perPage }, setIsDataLoading, setPaginatedRules);
   }, [query, page, perPage]);
-
-  useEffect(() => {
-    _loadRuleMetricData(setMetricsConfig);
-  }, []);
 
   const handleSearch = (nextQuery: string) => {
     resetPage();
@@ -93,28 +81,10 @@ const RulesPage = () => {
     }
   };
 
-  const onCloseMetricsConfig = () => {
-    _loadRuleMetricData(setMetricsConfig);
-    toggleMetricsConfig(false);
-  };
-
-  const renderDebugMetricsButton = () => {
-    if (metricsConfig && metricsConfig.metrics_enabled) {
-      return (
-        <Button bsStyle="warning" onClick={toggleMetricsConfig}>
-          Debug Metrics: ON
-        </Button>
-      );
-    }
-
-    return <Button onClick={toggleMetricsConfig}>Debug Metrics</Button>;
-  };
-
   // eslint-disable-next-line react/no-unstable-nested-components
   const RulesButtonToolbar = () => (
     <ButtonToolbar className="pull-right">
       <CreateButton entityKey="Pipeline Rule" />
-      {renderDebugMetricsButton()}
     </ButtonToolbar>
   );
 
@@ -156,6 +126,7 @@ const RulesPage = () => {
 
       <Row className="content">
         <Col md={12}>
+          <DebugMetricsBanner />
           {isLoading ? (
             <Spinner />
           ) : (
@@ -168,7 +139,6 @@ const RulesPage = () => {
                     onDelete={handleDelete}
                     searchFilter={searchFilter}
                   />
-                  {openMetricsConfig && <RuleMetricsConfigContainer onClose={onCloseMetricsConfig} />}
                 </PaginatedList>
               </Col>
             </Row>
