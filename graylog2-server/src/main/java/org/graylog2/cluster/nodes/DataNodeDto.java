@@ -191,6 +191,7 @@ public abstract class DataNodeDto extends NodeDto {
 
         @JsonProperty(FIELD_CERT_VALID_UNTIL)
         public abstract Builder setCertValidUntil(Date certValidUntil);
+        //TODO: Is DateTime. will that work?
 
         @JsonProperty(FIELD_DATANODE_VERSION)
         public abstract Builder setDatanodeVersion(String datanodeVersion);

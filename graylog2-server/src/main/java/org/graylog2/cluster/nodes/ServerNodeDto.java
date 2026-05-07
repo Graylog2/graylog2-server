@@ -32,11 +32,16 @@ import org.joda.time.DateTimeZone;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.graylog2.cluster.nodes.ServerNodeDto.FIELD_IS_PROCESSING;
+import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
+
 @AutoValue
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonSerialize(as = ServerNodeDto.class)
 @JsonDeserialize(builder = ServerNodeDto.Builder.class)
-@DbEntity(collection = ServerNodeDto.COLLECTION_NAME, titleField = NodeDto.FIELD_NODE_ID)
+@DbEntity(collection = ServerNodeDto.COLLECTION_NAME, titleField = NodeDto.FIELD_NODE_ID,
+          readableFields = {ID_FIELD, "node_id", "hostname", "transport_address", "is_leader", "last_seen",
+                  FIELD_IS_PROCESSING})
 public abstract class ServerNodeDto extends NodeDto {
 
     public static final String COLLECTION_NAME = "nodes";
