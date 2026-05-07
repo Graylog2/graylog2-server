@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix session cache never retaining entries after a read miss, causing every authenticated API request to query MongoDB for the session."
+
+issues = ["graylog-plugin-enterprise#13300"]
