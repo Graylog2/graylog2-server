@@ -115,7 +115,8 @@ public class CloudTrailDriver {
                 .region(request.sqsRegion())
                 .awsAccessKeyId(awsAccessKey)
                 .awsSecretAccessKey(secretAccessKey)
-                .assumeRoleArn(request.assumeRoleArn()).build();
+                .assumeRoleArn(request.assumeRoleArn())
+                .externalId(request.externalId()).build();
         final AwsCredentialsProvider credentialsProvider = awsUtils.createCredentialsProvider(awsRequest);
         return cloudTrailClientFactory.checkCredentials(request.sqsQueueName(), credentialsProvider,
                 request.sqsRegion());
@@ -142,6 +143,7 @@ public class CloudTrailDriver {
         configuration.put(CloudTrailInput.CK_AWS_SQS_REGION, request.sqsRegion());
         configuration.put(CloudTrailInput.CK_AWS_S3_REGION, request.s3Region());
         configuration.put(CloudTrailInput.CK_ASSUME_ROLE_ARN, request.assumeRoleArn());
+        configuration.put(CloudTrailInput.CK_EXTERNAL_ID, request.externalId());
         configuration.put(CloudTrailInput.CK_AWS_SQS_QUEUE_NAME, request.sqsQueueName());
         configuration.put(CloudTrailInput.CK_POLLING_INTERVAL, request.pollingInterval());
         configuration.put(CloudTrailInput.CK_OVERRIDE_SOURCE, request.overrideSource());

@@ -60,6 +60,7 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
       aws_sqs_region: formData?.awsCloudTrailSqsRegion?.value || '',
       aws_s3_region: formData?.awsCloudTrailS3Region?.value || '',
       assume_role_arn: formData?.awsAssumeRoleARN?.value || '',
+      aws_external_id: formData?.awsExternalId?.value || '',
     })
       .then((result: any) => {
         if (result.result === 'valid') {

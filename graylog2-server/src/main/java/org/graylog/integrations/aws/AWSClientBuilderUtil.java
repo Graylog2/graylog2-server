@@ -66,7 +66,8 @@ public class AWSClientBuilderUtil {
                 request.region(),
                 request.awsAccessKeyId(),
                 decryptSecretAccessKey(request.awsSecretAccessKey()),
-                request.assumeRoleArn());
+                request.assumeRoleArn(),
+                request.externalId());
     }
 
     /**
@@ -80,6 +81,7 @@ public class AWSClientBuilderUtil {
                 request.awsAccessKeyId(),
                 decryptSecretAccessKey(request.awsSecretAccessKey()),
                 request.assumeRoleArn(),
+                request.externalId(),
                 proxyConfigurationProvider.get());
     }
 

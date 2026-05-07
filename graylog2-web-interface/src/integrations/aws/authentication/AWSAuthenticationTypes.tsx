@@ -42,7 +42,7 @@ type AWSAuthenticationTypesProps = {
 const AWSAuthenticationTypes = ({ onChange, requireCredentials = true }: AWSAuthenticationTypesProps) => {
   const { clearField, formData } = useContext(FormDataContext);
 
-  const { awsAuthenticationType, awsAccessKey, awsSecretKey, awsAssumeRoleARN } = formData;
+  const { awsAuthenticationType, awsAccessKey, awsSecretKey, awsAssumeRoleARN, awsExternalId } = formData;
 
   let defaultAuthTypeValue;
 
@@ -107,7 +107,7 @@ const AWSAuthenticationTypes = ({ onChange, requireCredentials = true }: AWSAuth
           </AuthWrapper>
         </>
       )}
-      <ARN awsARN={awsAssumeRoleARN} onChange={onChange} />
+      <ARN awsARN={awsAssumeRoleARN} awsExternalId={awsExternalId} onChange={onChange} />
     </>
   );
 };
