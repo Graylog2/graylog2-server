@@ -16,13 +16,14 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import EditExtractor from 'components/extractors/EditExtractor';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 import { ExtractorsActions, ExtractorsStore } from 'stores/extractors/ExtractorsStore';
-import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
+import { fetchInput } from 'hooks/useInputs';
 import universalSearch from 'stores/search/UniversalSearch';
 import { useStore } from 'stores/connect';
 import useParams from 'routing/useParams';
@@ -31,12 +32,14 @@ import useHistory from 'routing/useHistory';
 const EditExtractorsPage = () => {
   const history = useHistory();
   const { extractor } = useStore(ExtractorsStore);
-  const { input } = useStore(InputsStore);
   const { inputId, extractorId, nodeId } = useParams<{ inputId: string; extractorId: string; nodeId: string }>();
   const [exampleMessage, setExampleMessage] = useState<{ fields?: { [key: string]: any } }>({});
+  const { data: input } = useQuery({
+    queryKey: ['inputs', inputId],
+    queryFn: () => fetchInput(inputId),
+  });
 
   useEffect(() => {
-    InputsActions.get(inputId);
     ExtractorsActions.get(inputId, extractorId);
 
     universalSearch(

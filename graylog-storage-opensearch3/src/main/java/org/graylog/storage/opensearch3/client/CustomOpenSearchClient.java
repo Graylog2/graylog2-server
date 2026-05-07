@@ -18,7 +18,10 @@ package org.graylog.storage.opensearch3.client;
 
 import org.graylog.storage.opensearch3.OSSerializationUtils;
 import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch._types.ErrorResponse;
 import org.opensearch.client.opensearch._types.OpenSearchException;
+import org.opensearch.client.opensearch._types.ShardFailure;
+import org.opensearch.client.opensearch._types.ShardStatistics;
 import org.opensearch.client.opensearch.core.MsearchResponse;
 import org.opensearch.client.opensearch.core.SearchRequest;
 import org.opensearch.client.opensearch.core.SearchResponse;
@@ -26,6 +29,7 @@ import org.opensearch.client.opensearch.core.msearch.MultiSearchResponseItem;
 import org.opensearch.client.transport.OpenSearchTransport;
 
 import java.io.IOException;
+import java.util.Locale;
 
 public class CustomOpenSearchClient extends OpenSearchClient {
 
@@ -43,7 +47,9 @@ public class CustomOpenSearchClient extends OpenSearchClient {
 
         // msearch doesn't support scroll and slice, we can't switch to msearch in this case!
         if (request.scroll() != null || request.slice() != null) {
-            return super.search(request, tDocumentClass);
+            final SearchResponse<TDocument> response = super.search(request, tDocumentClass);
+            throwOnShardFailures(response.shards());
+            return response;
         }
 
         final MsearchResponse<TDocument> multiSearchResponse = super.msearch(req -> req.searches(OSSerializationUtils.toMsearch(request)), tDocumentClass);
@@ -51,7 +57,25 @@ public class CustomOpenSearchClient extends OpenSearchClient {
         if (resp.isFailure()) {
             throw new OpenSearchException(resp.failure());
         }
-        // if it's not failure, then it has to be a result, right?
-        return resp.result();
+        final SearchResponse<TDocument> result = resp.result();
+        throwOnShardFailures(result.shards());
+        return result;
+    }
+
+    static void throwOnShardFailures(ShardStatistics shards) {
+        if (shards.failed() <= 0) {
+            return;
+        }
+        final var reason = String.format(Locale.ROOT, "%d of %d shards failed", shards.failed(), shards.total());
+        final var rootCauses = shards.failures().stream()
+                .map(ShardFailure::reason)
+                .toList();
+        throw new OpenSearchException(ErrorResponse.of(r -> r
+                .status(500)
+                .error(cause -> cause
+                        .type("shard_failure")
+                        .reason(reason)
+                        .causedBy(rootCauses.getFirst())
+                        .rootCause(rootCauses))));
     }
 }
