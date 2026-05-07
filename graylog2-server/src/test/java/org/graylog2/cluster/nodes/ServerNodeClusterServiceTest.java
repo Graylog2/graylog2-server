@@ -18,7 +18,6 @@ package org.graylog2.cluster.nodes;
 
 import com.mongodb.DBCollection;
 import org.assertj.core.api.Assertions;
-import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog2.Configuration;
@@ -30,6 +29,8 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -68,7 +69,7 @@ public class ServerNodeClusterServiceTest {
         this.mongoCollections = mongoCollections;
         Mockito.when(configuration.getStaleLeaderTimeout()).thenReturn(STALE_LEADER_TIMEOUT_MS);
         this.nodeService =
-                new ServerNodeClusterService(mongoCollections.connection(), configuration);
+                new ServerNodeClusterService(mongoCollections, configuration);
     }
 
     @Test
@@ -158,11 +159,7 @@ public class ServerNodeClusterServiceTest {
 
         final long lastSeenMs = System.currentTimeMillis() - 2 * STALE_LEADER_TIMEOUT_MS;
 
-        final Map<String, Object> fields = node.toEntityParameters();
-        fields.put("last_seen", (int) (lastSeenMs / 1000));
-        ServerNodeEntity nodeEntity = new ServerNodeEntity(new ObjectId(node.getObjectId()), fields);
-
-        nodeService.save(nodeEntity);
+        nodeService.markAsAlive(node.toBuilder().setLastSeen(new DateTime(lastSeenMs, DateTimeZone.UTC)).build());
 
         final Node nodeAfterUpdate = nodeService.byNodeId(nodeId);
         final long lastSeenFromDb = nodeAfterUpdate.getLastSeen().toInstant().getMillis();

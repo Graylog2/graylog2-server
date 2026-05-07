@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.Map;
 
 public interface NodeService<T extends NodeDto> {
-    boolean registerServer(NodeDto dto);
+    boolean registerServer(T dto);
 
     T byNodeId(String nodeId) throws NodeNotFoundException;
 
@@ -35,7 +35,7 @@ public interface NodeService<T extends NodeDto> {
 
     void dropOutdated();
 
-    void markAsAlive(NodeDto dto) throws NodeNotFoundException;
+    void markAsAlive(T dto) throws NodeNotFoundException;
 
     boolean isOnlyLeader(NodeId nodeIde);
 
@@ -47,7 +47,7 @@ public interface NodeService<T extends NodeDto> {
      *
      * @param dto Dto of the node to be marked as alive
      */
-    void ping(NodeDto dto);
+    void ping(T dto);
 
-    void update(NodeDto dto);
+    void update(T dto);
 }
