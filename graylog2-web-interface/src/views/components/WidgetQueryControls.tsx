@@ -165,7 +165,12 @@ const useInitialFormValues = (widget: Widget) => {
   const initialValuesFromPlugins = usePluggableInitialValues(widget);
 
   return useMemo(
-    () => ({ timerange, streams, streamCategories, queryString, ...initialValuesFromPlugins }),
+    () => ({
+      timerange,
+      streamAndCategories: { streams: streams, categories: streamCategories },
+      queryString,
+      ...initialValuesFromPlugins,
+    }),
     [timerange, streams, streamCategories, queryString, initialValuesFromPlugins],
   );
 };

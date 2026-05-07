@@ -140,8 +140,9 @@ const useInitialFormValues = ({
   const initialValuesFromPlugins = usePluggableInitialValues(currentQuery);
   const streams = filtersToStreamSet(queryFilters.get(id, Immutable.Map())).toJS();
   const streamCategories = filtersToStreamCategorySet(queryFilters.get(id, Immutable.Map())).toJS();
+  const streamsAndCategories: StreamsAndCategoriesSelection = { streams: streams, categories: streamCategories };
 
-  return { timerange, streams, queryString, streamCategories, ...initialValuesFromPlugins };
+  return { timerange, streamsAndCategories, queryString, ...initialValuesFromPlugins };
 };
 
 const _validateQueryString = (
