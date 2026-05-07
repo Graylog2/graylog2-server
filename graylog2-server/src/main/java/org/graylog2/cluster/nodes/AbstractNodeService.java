@@ -21,6 +21,7 @@ import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.ReplaceOptions;
+import com.mongodb.client.result.UpdateResult;
 import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
 import org.graylog2.Configuration;
@@ -76,11 +77,12 @@ public abstract class AbstractNodeService<DTO extends NodeDto> implements NodeSe
 
     @Override
     public boolean registerServer(DTO dto) {
-        return this.db.replaceOne(
+        UpdateResult result = this.db.replaceOne(
                 new BasicDBObject("node_id", dto.getNodeId()),
                 dto,
                 new ReplaceOptions().upsert(true)
-        ).getModifiedCount() == 1;
+        );
+        return result.getMatchedCount() > 0 || result.getUpsertedId() != null;
     }
 
     @Override
