@@ -26,8 +26,6 @@ import jakarta.annotation.Nullable;
 import org.graylog2.database.DbEntity;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.lifecycles.LoadBalancerStatus;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
 import java.util.Map;
 import java.util.Optional;
