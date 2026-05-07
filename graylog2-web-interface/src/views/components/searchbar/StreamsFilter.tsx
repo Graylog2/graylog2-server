@@ -19,6 +19,7 @@ import styled from 'styled-components';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import type { StreamsAndCategoriesSelection } from 'views/components/common/StreamsAndCategoriesFilter';
 import StreamsAndCategoriesFilter from 'views/components/common/StreamsAndCategoriesFilter';
 
 const Container = styled.div`
@@ -28,10 +29,10 @@ const Container = styled.div`
 
 type Props = {
   disabled?: boolean;
-  value?: { streams: string[]; categories: string[] };
+  value?: StreamsAndCategoriesSelection;
   streams: Array<{ key: string; value: string }>;
   streamCategories: Array<{ key: string; value: string }>;
-  onChange: (value: { streams: string[]; categories: string[] }) => void;
+  onChange: (value: StreamsAndCategoriesSelection) => void;
   multi?: boolean;
   clearable?: boolean;
 };
@@ -52,7 +53,7 @@ const StreamsFilter = ({
   ].join(',');
   const placeholder = 'Select streams the search should include. Searches in all streams if empty.';
 
-  const handleChange = (selected: { streams: string[]; categories: string[] }) => {
+  const handleChange = (selected: StreamsAndCategoriesSelection) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_STREAM_INPUT_CHANGED, {
       app_pathname: 'search',
       app_section: 'search-bar',
