@@ -182,8 +182,8 @@ const _validateQueryString = (
     queryString: values?.queryString,
     timeRange: !isEmpty(globalOverride?.timerange) ? globalOverride.timerange : values?.timerange,
     filter: globalOverride?.query ? globalOverride.query : undefined,
-    streams: values?.streams,
-    streamCategories: values?.streamCategories,
+    streams: values?.streamsAndCategories?.streams,
+    streamCategories: values?.streamsAndCategories?.categories,
     ...pluggableValidationPayload(values, context, pluggableSearchBarControls),
   };
 
@@ -269,23 +269,20 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                   <TimeRangeOverrideInfo value={globalOverride?.timerange} onReset={_resetTimeRangeOverride} />
                 )}
 
-                <Field name="streams">
-                  {({ field: { value, onChange } }) => (
+                <Field name="streamsAndCategories">
+                  {({ field: { name, value, onChange } }) => (
                     <StreamsFilter
-                      value={value}
+                      value={[
+                        ...(value?.streams?.map((s) => 'stream_' + s) ?? []),
+                        ...(value?.categories?.map((c) => 'category_' + c) ?? []),
+                      ]}
                       streams={allStreams}
                       streamCategories={availableStreamCategories}
                       onChange={(selected: { streams: string[]; categories: string[] }) => {
                         onChange({
                           target: {
-                            value: selected.streams,
-                            name: 'streams',
-                          },
-                        });
-                        onChange({
-                          target: {
-                            value: selected.categories,
-                            name: 'streamCategories',
+                            value: selected,
+                            name,
                           },
                         });
                       }}
@@ -309,7 +306,7 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                                 timeRange={
                                   !isEmpty(globalOverride?.timerange) ? globalOverride.timerange : values?.timerange
                                 }
-                                streams={values?.streams}
+                                streams={values?.streamsAndCategories?.streams}
                                 placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
                                 error={error}
                                 ref={editorRef}
