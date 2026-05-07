@@ -67,15 +67,15 @@ describe('TagsEditor', () => {
     expect(onChange).toHaveBeenLastCalledWith(['phishing']);
   });
 
-  it('dedupes case-insensitively', async () => {
-    const onChange = jest.fn();
-    render(<Harness initial={['phishing']} onChange={onChange} />);
+  it('does not offer an "Add" affordance for a duplicate (case-insensitive)', async () => {
+    render(<Harness initial={['phishing']} />);
 
     const input = screen.getByRole('combobox');
     await userEvent.type(input, 'PHISHING');
-    await userEvent.keyboard('{Enter}');
 
-    expect(onChange).toHaveBeenLastCalledWith(['phishing']);
+    // react-select's CreatableSelect compares case-insensitively against selected values,
+    // so the "Add ..." option is suppressed when the typed input matches an existing tag.
+    expect(screen.queryByText(/Add "PHISHING"/i)).not.toBeInTheDocument();
   });
 
   describe('autocomplete', () => {

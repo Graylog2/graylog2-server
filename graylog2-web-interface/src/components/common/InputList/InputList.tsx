@@ -15,16 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useLayoutEffect, useRef, useState } from 'react';
+import {useLayoutEffect, useRef, useState} from 'react';
+import type {CreatableProps} from 'react-select/creatable';
 import CreatableSelect from 'react-select/creatable';
-import type { CreatableProps } from 'react-select/creatable';
 
-import { InputDescription } from 'components/common';
-import { FormGroup, ControlLabel } from 'components/bootstrap';
+import {InputDescription} from 'components/common';
+import {FormGroup, ControlLabel} from 'components/bootstrap';
 
 import useInputListStyles from './useInputListStyles';
-import { GenericChangeEvent } from './InputList.types';
-import type { GenericTarget } from './InputList.types';
+import type {GenericTarget} from './InputList.types';
+import {GenericChangeEvent} from './InputList.types';
 
 interface Option {
   readonly label: string | number;
@@ -73,6 +73,9 @@ const InputList = ({
 
   useLayoutEffect(() => setValue(values.map((val: string | number) => createOption(val))), [values]);
 
+  const suggestionsEnabled = suggestions !== undefined;
+  const options = suggestionsEnabled ? suggestions.map(createOption) : undefined;
+
   const dispatchOnChange = (newValue: Option[]) => {
     const newList = newValue.map((item: Option) => item.value);
     const event = new GenericChangeEvent<(string | number)[]>('change');
@@ -85,6 +88,9 @@ const InputList = ({
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
+    // When suggestions are enabled, defer to react-select's native Enter/Tab handling so the
+    // menu stays open after committing a value (isMulti behavior).
+    if (suggestionsEnabled) return;
     if (!inputValue) return;
 
     if (event.key === 'Enter' || event.key === 'Tab') {
@@ -106,9 +112,6 @@ const InputList = ({
     onSuggestionsInputChange?.(newValue);
   };
 
-  const suggestionsEnabled = suggestions !== undefined;
-  const options = suggestionsEnabled ? suggestions.map(createOption) : undefined;
-
   return (
     <FormGroup controlId={rest.id ? rest.id : name} validationState={error ? 'error' : bsStyle}>
       {label && <ControlLabel>{label}</ControlLabel>}
@@ -121,6 +124,7 @@ const InputList = ({
         options={options}
         isLoading={isLoadingSuggestions}
         formatCreateLabel={suggestionsEnabled ? (input) => `Add "${input}"` : undefined}
+        closeMenuOnSelect={suggestionsEnabled ? false : undefined}
         onChange={handleOnChange}
         onInputChange={handleInputChange}
         onKeyDown={handleKeyDown}

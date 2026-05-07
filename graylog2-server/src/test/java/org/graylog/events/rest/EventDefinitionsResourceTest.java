@@ -38,7 +38,6 @@ import org.graylog2.shared.security.RestPermissions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -110,8 +109,7 @@ public class EventDefinitionsResourceTest {
     @Test
     public void suggestTagsWithGlobalReadDoesNotEnumeratePermittedIds() {
         when(subject.isPermitted(RestPermissions.EVENT_DEFINITIONS_READ)).thenReturn(true);
-        when(dbService.suggestTags(eq("ph"), eq(10), eq(null)))
-                .thenReturn(List.of("phishing"));
+        when(dbService.suggestTags(eq("ph"), eq(10))).thenReturn(List.of("phishing"));
 
         final var response = resource.suggestTags("ph", 10);
 
@@ -120,59 +118,50 @@ public class EventDefinitionsResourceTest {
     }
 
     @Test
-    public void suggestTagsWithoutGlobalReadEnumeratesAndPushesInClause() {
+    public void suggestTagsWithoutGlobalReadEnumeratesAndPassesPermittedIds() {
         when(subject.isPermitted(RestPermissions.EVENT_DEFINITIONS_READ)).thenReturn(false);
         final var permittedId = new ObjectId();
         when(dbService.findPermittedIds(any())).thenReturn(List.of(permittedId));
-        when(dbService.suggestTags(eq(""), eq(10), any()))
+        when(dbService.suggestTags(eq(""), eq(10), eq(List.of(permittedId))))
                 .thenReturn(List.of("phishing"));
 
         final var response = resource.suggestTags("", 10);
 
         Assertions.assertThat(response.tags()).containsExactly("phishing");
         verify(dbService).findPermittedIds(any());
-
-        final ArgumentCaptor<org.bson.conversions.Bson> filterCaptor = ArgumentCaptor.forClass(org.bson.conversions.Bson.class);
-        verify(dbService).suggestTags(eq(""), eq(10), filterCaptor.capture());
-        // Render the Bson against the default codec registry and assert the $in array carries the permitted IDs.
-        final org.bson.BsonDocument rendered = filterCaptor.getValue()
-                .toBsonDocument(org.bson.BsonDocument.class, org.bson.codecs.configuration.CodecRegistries
-                        .fromProviders(new org.bson.codecs.BsonValueCodecProvider()));
-        Assertions.assertThat(rendered.getDocument("_id").getArray("$in"))
-                .containsExactly(new org.bson.BsonObjectId(permittedId));
+        verify(dbService).suggestTags(eq(""), eq(10), eq(List.of(permittedId)));
     }
 
     @Test
-    public void suggestTagsWithoutGlobalReadAndNoPermittedIdsShortCircuits() {
+    public void suggestTagsWithoutGlobalReadAndNoPermittedIdsReturnsEmpty() {
         when(subject.isPermitted(RestPermissions.EVENT_DEFINITIONS_READ)).thenReturn(false);
         when(dbService.findPermittedIds(any())).thenReturn(List.of());
+        when(dbService.suggestTags(eq(""), eq(10), eq(List.of()))).thenReturn(List.of());
 
         final var response = resource.suggestTags("", 10);
 
         Assertions.assertThat(response.tags()).isEmpty();
-        verify(dbService, never()).suggestTags(any(), org.mockito.ArgumentMatchers.anyInt(), any());
+        verify(dbService).suggestTags(eq(""), eq(10), eq(List.of()));
     }
 
     @Test
     public void suggestTagsClampsLimitAboveMax() {
         when(subject.isPermitted(RestPermissions.EVENT_DEFINITIONS_READ)).thenReturn(true);
-        when(dbService.suggestTags(eq(""), eq(100), eq(null)))
-                .thenReturn(List.of());
+        when(dbService.suggestTags(eq(""), eq(100))).thenReturn(List.of());
 
         resource.suggestTags("", 99999);
 
-        verify(dbService).suggestTags(eq(""), eq(100), eq(null));
+        verify(dbService).suggestTags(eq(""), eq(100));
     }
 
     @Test
     public void suggestTagsClampsLimitBelowOne() {
         when(subject.isPermitted(RestPermissions.EVENT_DEFINITIONS_READ)).thenReturn(true);
-        when(dbService.suggestTags(eq(""), eq(1), eq(null)))
-                .thenReturn(List.of());
+        when(dbService.suggestTags(eq(""), eq(1))).thenReturn(List.of());
 
         resource.suggestTags("", 0);
 
-        verify(dbService).suggestTags(eq(""), eq(1), eq(null));
+        verify(dbService).suggestTags(eq(""), eq(1));
     }
 
     static EventDefinitionDto eventDefinitionDto(EventProcessorConfig config) {
