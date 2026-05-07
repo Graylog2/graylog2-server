@@ -51,7 +51,7 @@ export const lightTheme = create({
   appBorderColor: light.misc.divider,
 
   textColor: light.text.primary,
-  textInverseColor: `${light.text.primary}8A`,
+  textInverseColor: light.global.textAlt,
 
   barTextColor: light.text.primary,
   barSelectedColor: accentColor,
@@ -72,7 +72,7 @@ export const darkTheme = create({
   appBorderColor: dark.background.secondaryNav,
 
   textColor: dark.text.primary,
-  textInverseColor: `${dark.text.primary}8A`,
+  textInverseColor: dark.global.textAlt,
 
   barTextColor: dark.text.primary,
   barSelectedColor: accentColor,
