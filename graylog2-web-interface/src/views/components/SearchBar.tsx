@@ -98,7 +98,7 @@ const defaultOnSubmit = async (
   currentQuery: Query,
   restartAutoRefresh: () => void,
 ) => {
-  const { timerange, streams, streamCategories, queryString } = values;
+  const { timerange, streamsAndCategories, queryString } = values;
   restartAutoRefresh();
   const queryWithPluginData = await executePluggableSubmitHandler(
     dispatch,
@@ -110,7 +110,7 @@ const defaultOnSubmit = async (
   const newQuery = queryWithPluginData
     .toBuilder()
     .timerange(timerange)
-    .filter(newFiltersForQuery(streams, streamCategories))
+    .filter(newFiltersForQuery(streamsAndCategories?.streams, streamsAndCategories?.categories))
     .query(createElasticsearchQueryString(queryString))
     .build();
 
@@ -151,8 +151,8 @@ const _validateQueryString = (
 ) => {
   const request = {
     timeRange: values?.timerange,
-    streams: values?.streams,
-    streamCategories: values?.streamCategories,
+    streams: values?.streamsAndCategories?.streams,
+    streamCategories: values?.streamsAndCategories?.categories,
     queryString: values?.queryString,
     ...pluggableValidationPayload(values, context, pluggableSearchBarControls),
   };
@@ -263,23 +263,22 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
                         }}
                       />
                       <StreamsAndRefresh>
-                        <Field name="streams">
-                          {({ field: { value, onChange } }) => (
+                        <Field name="streamsAndCategories">
+                          {({ field: { name, value, onChange } }) => (
                             <StreamsFilter
-                              value={value}
+                              value={[
+                                ...(value?.streams?.map((s) => 'stream_' + s) ?? []),
+                                ...(value?.categories?.map((c) => 'category_' + c) ?? []),
+                              ]}
                               streams={availableStreams}
                               streamCategories={availableStreamCategories}
                               onChange={(selected: { streams: string[]; categories: string[] }) => {
+                                console.log(selected);
+                                console.log(value);
                                 onChange({
                                   target: {
-                                    value: selected.streams,
-                                    name: 'streams',
-                                  },
-                                });
-                                onChange({
-                                  target: {
-                                    value: selected.categories,
-                                    name: 'streamCategories',
+                                    value: selected,
+                                    name,
                                   },
                                 });
                               }}
@@ -308,7 +307,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
                                         ref={editorRef}
                                         view={view}
                                         timeRange={values.timerange}
-                                        streams={values.streams}
+                                        streams={values.streamsAndCategories?.streams}
                                         name={name}
                                         onChange={onChange}
                                         placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'

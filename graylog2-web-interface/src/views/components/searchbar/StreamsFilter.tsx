@@ -69,7 +69,6 @@ const StreamsFilter = ({
         disabled={disabled}
         clearable={clearable}
         aria-label={placeholder}
-        displayKey="key"
         inputId="streams-filter"
         onChange={handleChange}
         streams={streams.map((v) => ({ id: v.value, title: v.key, categories: [] }))}
