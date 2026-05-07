@@ -82,6 +82,11 @@ public abstract class AbstractNodeService<DTO extends NodeDto> implements NodeSe
                 dto,
                 new ReplaceOptions().upsert(true)
         );
+        // set timestamp using db
+        db.updateOne(
+                new BasicDBObject("node_id", dto.getNodeId()),
+                new BasicDBObject("$currentDate", lastSeenFieldDefinition)
+        );
         return result.getMatchedCount() > 0 || result.getUpsertedId() != null;
     }
 
@@ -155,6 +160,11 @@ public abstract class AbstractNodeService<DTO extends NodeDto> implements NodeSe
         if (result.getMatchedCount() != 1) {
             throw new NodeNotFoundException("Unable to find node " + dto.getNodeId());
         }
+        // set timestamp using db
+        db.updateOne(
+                new BasicDBObject("node_id", dto.getNodeId()),
+                new BasicDBObject("$currentDate", lastSeenFieldDefinition)
+        );
     }
 
     @Override
