@@ -45,6 +45,11 @@ type Props = CreatableProps<any, boolean, any> & {
   bsStyle?: 'success' | 'warning' | 'error' | null;
   error?: React.ReactNode;
   help?: React.ReactNode;
+  // When `suggestions` is provided, the dropdown menu opens on input. When omitted,
+  // existing consumers are unaffected: no menu, no dropdown indicator.
+  suggestions?: ReadonlyArray<string | number>;
+  onSuggestionsInputChange?: (input: string) => void;
+  isLoadingSuggestions?: boolean;
 };
 
 const InputList = ({
@@ -56,6 +61,9 @@ const InputList = ({
   bsStyle = null,
   error = null,
   help = null,
+  suggestions,
+  onSuggestionsInputChange,
+  isLoadingSuggestions,
   ...rest
 }: Props) => {
   const { inputListTheme, styles } = useInputListStyles(size);
@@ -93,17 +101,28 @@ const InputList = ({
     dispatchOnChange(newValue);
   };
 
+  const handleInputChange = (newValue: string) => {
+    setInputValue(newValue);
+    onSuggestionsInputChange?.(newValue);
+  };
+
+  const suggestionsEnabled = suggestions !== undefined;
+  const options = suggestionsEnabled ? suggestions.map(createOption) : undefined;
+
   return (
     <FormGroup controlId={rest.id ? rest.id : name} validationState={error ? 'error' : bsStyle}>
       {label && <ControlLabel>{label}</ControlLabel>}
       <CreatableSelect
         ref={inputRef}
-        components={{ DropdownIndicator: null }}
+        components={suggestionsEnabled ? undefined : { DropdownIndicator: null }}
         inputValue={inputValue}
         isMulti
-        menuIsOpen={false}
+        menuIsOpen={suggestionsEnabled ? undefined : false}
+        options={options}
+        isLoading={isLoadingSuggestions}
+        formatCreateLabel={suggestionsEnabled ? (input) => `Add "${input}"` : undefined}
         onChange={handleOnChange}
-        onInputChange={(newValue: string) => setInputValue(newValue)}
+        onInputChange={handleInputChange}
         onKeyDown={handleKeyDown}
         value={value}
         styles={styles(!error)}
