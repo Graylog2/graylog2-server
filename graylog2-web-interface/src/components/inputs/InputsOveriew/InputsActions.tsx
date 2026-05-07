@@ -42,25 +42,13 @@ type Props = {
   input: Input;
   inputTypes: InputTypesSummary;
   inputTypeDescriptions: InputTypeDescriptionsResponse;
-  currentNode: {
-    node?: {
-      cluster_id: string;
-      hostname: string;
-      is_leader: boolean;
-      is_master: boolean;
-      last_seen: string;
-      node_id: string;
-      short_node_id: string;
-      transport_address: string;
-    };
-  };
 };
 
 const FORWARDER_SERVICE_INPUT = 'org.graylog.plugins.forwarder.input.ForwarderServiceInput';
 const GL2_FORWARDER_INPUT = 'gl2_forwarder_input';
 const GL2_SOURCE_INPUT = 'gl2_source_input';
 
-const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNode }: Props) => {
+const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions }: Props) => {
   const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState<boolean>(false);
   const [showStaticFieldForm, setShowStaticFieldForm] = useState<boolean>(false);
   const [showConfigurationForm, setShowConfigurationForm] = useState<boolean>(false);
@@ -177,7 +165,7 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
                 to={
                   input.global
                     ? Routes.global_input_extractors(input.id)
-                    : Routes.local_input_extractors(currentNode?.node?.node_id, input.id)
+                    : Routes.local_input_extractors(input.node, input.id)
                 }>
                 <MenuItem
                   onClick={() => {
