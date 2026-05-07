@@ -273,8 +273,6 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
                               streams={availableStreams}
                               streamCategories={availableStreamCategories}
                               onChange={(selected: { streams: string[]; categories: string[] }) => {
-                                console.log(selected);
-                                console.log(value);
                                 onChange({
                                   target: {
                                     value: selected,
