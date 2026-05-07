@@ -76,6 +76,7 @@ import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
 import StreamsFilter from 'views/components/searchbar/StreamsFilter';
+import type { StreamsAndCategoriesSelection } from 'views/components/common/StreamsAndCategoriesFilter';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -266,13 +267,10 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
                         <Field name="streamsAndCategories">
                           {({ field: { name, value, onChange } }) => (
                             <StreamsFilter
-                              value={[
-                                ...(value?.streams?.map((s) => 'stream_' + s) ?? []),
-                                ...(value?.categories?.map((c) => 'category_' + c) ?? []),
-                              ]}
+                              value={{ streams: value?.streams, categories: value?.categories }}
                               streams={availableStreams}
                               streamCategories={availableStreamCategories}
-                              onChange={(selected: { streams: string[]; categories: string[] }) => {
+                              onChange={(selected: StreamsAndCategoriesSelection) => {
                                 onChange({
                                   target: {
                                     value: selected,

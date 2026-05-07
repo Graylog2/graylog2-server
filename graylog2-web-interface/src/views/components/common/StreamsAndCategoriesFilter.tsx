@@ -27,6 +27,11 @@ type StreamsAndCategoriesOption = {
   type: 'stream' | 'category';
 };
 
+export type StreamsAndCategoriesSelection = {
+  streams: string[];
+  categories: string[];
+};
+
 const renderOption = (option: StreamsAndCategoriesOption) =>
   option.type === 'stream' ? (
     <>{option.label}</>
@@ -38,7 +43,7 @@ const renderOption = (option: StreamsAndCategoriesOption) =>
   );
 
 type StreamsAndCategoriesFilterProps = Omit<React.ComponentProps<typeof Select>, 'options'> & {
-  onChange: (value: { streams: string[]; categories: string[] }) => void;
+  onChange: (value: StreamsAndCategoriesSelection) => void;
   streams: Array<{ id: string; title: string; categories: string[] }>;
   streamCategories?: string[] | undefined;
   showStreams?: boolean;

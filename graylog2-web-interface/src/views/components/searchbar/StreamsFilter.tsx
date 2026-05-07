@@ -28,7 +28,7 @@ const Container = styled.div`
 
 type Props = {
   disabled?: boolean;
-  value?: Array<string>;
+  value?: { streams: string[]; categories: string[] };
   streams: Array<{ key: string; value: string }>;
   streamCategories: Array<{ key: string; value: string }>;
   onChange: (value: { streams: string[]; categories: string[] }) => void;
@@ -38,7 +38,7 @@ type Props = {
 
 const StreamsFilter = ({
   disabled = false,
-  value = [],
+  value = { streams: [], categories: [] },
   streams,
   streamCategories,
   onChange,
@@ -46,7 +46,10 @@ const StreamsFilter = ({
   clearable = true,
 }: Props) => {
   const sendTelemetry = useSendTelemetry();
-  const selectedStreams = value.join(',');
+  const selectedStreams = [
+    ...(value?.streams?.map((s) => 'stream_' + s) ?? []),
+    ...(value?.categories?.map((c) => 'category_' + c) ?? []),
+  ].join(',');
   const placeholder = 'Select streams the search should include. Searches in all streams if empty.';
 
   const handleChange = (selected: { streams: string[]; categories: string[] }) => {

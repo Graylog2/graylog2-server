@@ -63,6 +63,7 @@ import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import { defaultCompare } from 'logic/DefaultCompare';
 import { executeActiveQuery } from 'views/logic/slices/viewSlice';
+import type { StreamsAndCategoriesSelection } from 'views/components/common/StreamsAndCategoriesFilter';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeFilter from './searchbar/time-range-filter';
@@ -272,13 +273,10 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                 <Field name="streamsAndCategories">
                   {({ field: { name, value, onChange } }) => (
                     <StreamsFilter
-                      value={[
-                        ...(value?.streams?.map((s) => 'stream_' + s) ?? []),
-                        ...(value?.categories?.map((c) => 'category_' + c) ?? []),
-                      ]}
+                      value={{ streams: value?.streams, categories: value?.categories }}
                       streams={allStreams}
                       streamCategories={availableStreamCategories}
-                      onChange={(selected: { streams: string[]; categories: string[] }) => {
+                      onChange={(selected: StreamsAndCategoriesSelection) => {
                         onChange({
                           target: {
                             value: selected,
