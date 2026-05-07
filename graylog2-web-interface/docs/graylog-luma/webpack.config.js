@@ -14,12 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+/* eslint-disable @typescript-eslint/no-require-imports, no-undef */
+// This file exists for eslint-config-graylog's webpack import resolver.
+// Storybook uses .storybook/main.ts for its own bundling configuration.
 const path = require('path');
 
 const webInterfaceRoot = path.resolve(__dirname, '../..');
-
-// This file exists for eslint-config-graylog's webpack import resolver.
-// Storybook uses .storybook/main.ts for its own bundling configuration.
 module.exports = {
   resolve: {
     extensions: ['.ts', '.tsx'],
