@@ -22,6 +22,7 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.bson.BsonTimestamp;
 import org.graylog2.cluster.Node;
 import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
@@ -122,6 +123,9 @@ public abstract class NodeDto implements Node, MongoEntity {
                 final Object embedded = p.getEmbeddedObject();
                 if (embedded instanceof Date date) {
                     return new DateTime(date, DateTimeZone.UTC);
+                }
+                if (embedded instanceof BsonTimestamp ts) {
+                    return new DateTime(ts.getTime() * 1000L, DateTimeZone.UTC);
                 }
                 return (DateTime) ctxt.handleUnexpectedToken(DateTime.class, p);
             }
