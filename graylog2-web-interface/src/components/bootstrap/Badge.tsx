@@ -17,18 +17,32 @@
 import * as React from 'react';
 import type { ColorVariant } from '@graylog/sawmill';
 import { Badge as MantineBadge } from '@mantine/core';
-import styled, { css } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
 
-const mapStyle = (style: ColorVariant) => (style === 'default' ? 'gray' : style);
+import type { BsSize } from 'components/bootstrap/types';
+import sizeForMantine from 'theme/utils/sizeForMantine';
+import type { SupportedMantineSize } from 'theme/types';
 
-const StyledBadge = styled(MantineBadge)<{ color: ColorVariant }>(
-  ({ theme, color }) => css`
+const mapStyle = (style: ColorVariant, theme: DefaultTheme) =>
+  style === 'default' ? theme.colors.button.gray.background : theme.colors.variant[style];
+
+const mapFontSize: Record<SupportedMantineSize, 'tiny' | 'small' | 'body'> = {
+  xs: 'tiny',
+  sm: 'small',
+  md: 'small',
+  lg: 'body',
+};
+
+const StyledBadge = styled(MantineBadge)<{ color: ColorVariant; size: SupportedMantineSize }>(
+  ({ theme, color, size }) => css`
     text-transform: none;
-    background: ${theme.colors.button[color].background};
-    color: ${theme.colors.button[color].color};
+    background-color: ${color};
+    color: ${theme.utils.contrastingColor(color)};
 
     .mantine-Badge-label {
-      font-size: ${theme.fonts.size.small};
+      font-size: ${theme.fonts.size[mapFontSize[size]]};
+      overflow: visible;
     }
   `,
 );
@@ -39,6 +53,7 @@ type Props = React.PropsWithChildren<{
   'data-testid'?: string;
   onClick?: () => void;
   title?: string;
+  bsSize?: BsSize;
 }>;
 
 const Badge = (
@@ -49,10 +64,13 @@ const Badge = (
     'data-testid': dataTestid,
     onClick = undefined,
     title = undefined,
+    bsSize = 'md',
   }: Props,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) => {
-  const color = mapStyle(bsStyle);
+  const theme = useTheme();
+  const color = mapStyle(bsStyle, theme);
+  const size = sizeForMantine(bsSize);
 
   return (
     <StyledBadge
@@ -62,7 +80,8 @@ const Badge = (
       data-testid={dataTestid}
       ref={ref}
       variant="filled"
-      onClick={onClick}>
+      onClick={onClick}
+      size={size}>
       {children}
     </StyledBadge>
   );
