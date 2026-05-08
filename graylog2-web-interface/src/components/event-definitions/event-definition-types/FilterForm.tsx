@@ -258,16 +258,25 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
     [eventDefinition.config],
   );
 
+  const setConfigValue = <K extends EventDefinitionConfigKeys>(
+    config: EventDefinition['config'],
+    key: K,
+    value: EventDefinition['config'][K],
+  ) => {
+    // eslint-disable-next-line no-param-reassign
+    config[key] = value;
+  };
+
   const getUpdatedConfigMulti = useCallback(
-    <K extends EventDefinitionConfigKeys>(
-      key1: K,
-      value1: EventDefinition['config'][K],
-      key2: K,
-      value2: EventDefinition['config'][K],
+    (
+      updates: {
+        [K in EventDefinitionConfigKeys]: { key: K; value: EventDefinition['config'][K] };
+      }[EventDefinitionConfigKeys][],
     ) => {
       const config = cloneDeep(eventDefinition.config);
-      config[key1] = value1;
-      config[key2] = value2;
+      updates.forEach(({ key, value }) => {
+        setConfigValue(config, key, value);
+      });
       setCurrentConfig(config);
 
       return config;
@@ -458,7 +467,12 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
         app_action_value: 'stream-select',
       });
 
-      propagateChange(getUpdatedConfigMulti('streams', selected.streams, 'stream_categories', selected.categories));
+      propagateChange(
+        getUpdatedConfigMulti([
+          { key: 'streams', value: selected.streams },
+          { key: 'stream_categories', value: selected.categories },
+        ]),
+      );
     },
     [getUpdatedConfigMulti, pathname, propagateChange, sendTelemetry],
   );
