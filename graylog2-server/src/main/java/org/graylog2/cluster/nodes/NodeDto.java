@@ -38,6 +38,7 @@ import java.util.Objects;
 public abstract class NodeDto implements Node, MongoEntity {
     public static final String FIELD_NODE_ID = "node_id";
     public static final String FIELD_HOSTNAME = "hostname";
+    public static final String FIELD_ONLINE = "online";
 
     @Override
     public String id() {
@@ -71,6 +72,16 @@ public abstract class NodeDto implements Node, MongoEntity {
     @JsonProperty("is_leader")
     public abstract boolean isLeader();
 
+    @JsonProperty(FIELD_ONLINE)
+    public abstract boolean isOnline();
+
+    /**
+     * Returns a copy of this DTO marked as offline.
+     * Concrete subclasses decide which additional fields to clear; lifecycle and version-like fields
+     * are preserved so the row remains a useful inventory record.
+     */
+    public abstract NodeDto offline();
+
     @JsonProperty("short_node_id")
     public String getShortNodeId() {
         return getId().split("-")[0];
@@ -84,6 +95,7 @@ public abstract class NodeDto implements Node, MongoEntity {
             params.put("transport_address", getTransportAddress());
         }
         params.put("is_leader", isLeader());
+        params.put(FIELD_ONLINE, isOnline());
         if (Objects.nonNull(getHostname())) {
             params.put("hostname", getHostname());
         }
@@ -109,6 +121,9 @@ public abstract class NodeDto implements Node, MongoEntity {
 
         @JsonProperty("is_leader")
         public abstract B setLeader(boolean leader);
+
+        @JsonProperty(FIELD_ONLINE)
+        public abstract B setOnline(boolean online);
 
     }
 

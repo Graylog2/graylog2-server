@@ -160,6 +160,14 @@ public abstract class DataNodeDto extends NodeDto {
 
     public abstract Builder toBuilder();
 
+    @Override
+    public DataNodeDto offline() {
+        return toBuilder()
+                .setOnline(false)
+                .setLeader(false)
+                .build();
+    }
+
     public static Builder builder() {
         return Builder.builder();
     }
@@ -171,7 +179,8 @@ public abstract class DataNodeDto extends NodeDto {
         @JsonCreator
         public static Builder builder() {
             return new AutoValue_DataNodeDto.Builder()
-                    .setLeader(false);
+                    .setLeader(false)
+                    .setOnline(true);
         }
 
         @JsonProperty(FIELD_CLUSTER_ADDRESS)

@@ -92,7 +92,7 @@ public abstract class AbstractNodeService<DTO extends NodeDto> implements NodeSe
 
     @Override
     public DTO byNodeId(String nodeId) throws NodeNotFoundException {
-        return Optional.ofNullable(db.find(new BasicDBObject("node_id", nodeId)).first())
+        return Optional.ofNullable(db.find(onlineFilter(new BasicDBObject("node_id", nodeId))).first())
                 .orElseThrow(() -> new NodeNotFoundException("Unable to find node " + nodeId));
     }
 
@@ -102,10 +102,27 @@ public abstract class AbstractNodeService<DTO extends NodeDto> implements NodeSe
     }
 
     @Override
+    public Optional<DTO> byNodeIdAnyState(String nodeId) {
+        try (MongoCursor<DTO> result = db.find(new BasicDBObject("node_id", nodeId)).iterator()) {
+            return result.hasNext() ? Optional.of(result.next()) : Optional.empty();
+        }
+    }
+
+    @Override
     public Map<String, DTO> byNodeIds(Collection<String> nodeIds) {
-        try (var stream = MongoUtils.stream(db.find(new BasicDBObject("node_id", new BasicDBObject("$in", nodeIds))))) {
+        try (var stream = MongoUtils.stream(db.find(onlineFilter(
+                new BasicDBObject("node_id", new BasicDBObject("$in", nodeIds)))))) {
             return stream.collect(Collectors.toMap(Node::getNodeId, Function.identity()));
         }
+    }
+
+    /**
+     * Adds {@code online: {$ne: false}} to the filter so queries return only nodes that are currently online.
+     * The {@code $ne false} form treats a missing field as online, which preserves existing behavior for
+     * legacy rows that were written before the {@code online} flag was introduced.
+     */
+    private static BasicDBObject onlineFilter(BasicDBObject baseFilter) {
+        return baseFilter.append(NodeDto.FIELD_ONLINE, new BasicDBObject("$ne", false));
     }
 
     @MustBeClosed
@@ -115,9 +132,16 @@ public abstract class AbstractNodeService<DTO extends NodeDto> implements NodeSe
 
     @Override
     public Map<String, DTO> allActive() {
-        try (var stream = aggregate(recentHeartbeat(List.of(Map.of())))) {
+        try (var stream = aggregate(recentHeartbeat(List.of(Map.of(NodeDto.FIELD_ONLINE, Map.of("$ne", false)))))) {
             return stream
                     .collect(Collectors.toMap(Node::getNodeId, Function.identity()));
+        }
+    }
+
+    @Override
+    public Map<String, DTO> allKnown() {
+        try (var stream = MongoUtils.stream(db.find())) {
+            return stream.collect(Collectors.toMap(Node::getNodeId, Function.identity()));
         }
     }
 
@@ -134,16 +158,18 @@ public abstract class AbstractNodeService<DTO extends NodeDto> implements NodeSe
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void dropOutdated() {
         try (var stream = aggregate(List.of(
                 addLastSeenFieldAsDate,
-                new BasicDBObject("$match", Map.of("$expr", Map.of("$lt", List.of("$last_seen_date", Map.of("$subtract", List.of("$$NOW", this.pingTimeout))))))
+                new BasicDBObject("$match", new BasicDBObject()
+                        .append("$expr", Map.of("$lt", List.of("$last_seen_date", Map.of("$subtract", List.of("$$NOW", this.pingTimeout)))))
+                        .append(NodeDto.FIELD_ONLINE, Map.of("$ne", false)))
         ))) {
-            var outdatedIds = stream.map(DTO::id).toList();
-
-            if (!outdatedIds.isEmpty()) {
-                db.deleteMany(MongoUtils.stringIdsIn(outdatedIds));
-            }
+            stream.forEach(dto -> db.replaceOne(
+                    new BasicDBObject("node_id", dto.getNodeId()),
+                    (DTO) dto.offline()
+            ));
         }
     }
 
@@ -152,7 +178,8 @@ public abstract class AbstractNodeService<DTO extends NodeDto> implements NodeSe
         try (var stream = aggregate(recentHeartbeat(List.of(
                 Map.of(
                         "node_id", new BasicDBObject("$ne", nodeId.getNodeId()),
-                        "is_leader", true
+                        "is_leader", true,
+                        NodeDto.FIELD_ONLINE, Map.of("$ne", false)
                 )
         )))) {
             return stream.findAny().isEmpty();
@@ -163,7 +190,8 @@ public abstract class AbstractNodeService<DTO extends NodeDto> implements NodeSe
     public boolean isAnyLeaderPresent() {
         try (var stream = aggregate(recentHeartbeat(List.of(
                 Map.of(
-                        "is_leader", true
+                        "is_leader", true,
+                        NodeDto.FIELD_ONLINE, Map.of("$ne", false)
                 )
         )))) {
             return stream.findAny().isPresent();

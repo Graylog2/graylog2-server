@@ -19,6 +19,7 @@ package org.graylog.datanode.bindings;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.datanode.shared.system.activities.DataNodeActivityWriter;
+import org.graylog.datanode.shutdown.DataNodeShutdownListener;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.cluster.nodes.DataNodeClusterService;
 import org.graylog2.cluster.nodes.DataNodeDto;
@@ -46,6 +47,7 @@ public class DatanodeServerBindings extends Graylog2Module {
 
     private void bindSingletons() {
         bind(ClusterConfigService.class).to(ClusterConfigServiceImpl.class).asEagerSingleton();
+        bind(DataNodeShutdownListener.class).asEagerSingleton();
     }
 
     private void bindInterfaces() {
