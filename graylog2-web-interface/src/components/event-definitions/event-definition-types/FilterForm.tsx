@@ -18,7 +18,6 @@
 import * as React from 'react';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import camelCase from 'lodash/camelCase';
-import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
 import isEmpty from 'lodash/isEmpty';
 import merge from 'lodash/merge';
@@ -249,8 +248,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
 
   const getUpdatedConfig = useCallback(
     <K extends EventDefinitionConfigKeys>(key: K, value: EventDefinition['config'][K]) => {
-      const config = cloneDeep(eventDefinition.config);
-      config[key] = value;
+      const config = { ...eventDefinition.config, [key]: value };
       setCurrentConfig(config);
 
       return config;
@@ -258,25 +256,13 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
     [eventDefinition.config],
   );
 
-  const setConfigValue = <K extends EventDefinitionConfigKeys>(
-    config: EventDefinition['config'],
-    key: K,
-    value: EventDefinition['config'][K],
-  ) => {
-    // eslint-disable-next-line no-param-reassign
-    config[key] = value;
-  };
-
   const getUpdatedConfigMulti = useCallback(
     (
       updates: {
         [K in EventDefinitionConfigKeys]: { key: K; value: EventDefinition['config'][K] };
       }[EventDefinitionConfigKeys][],
     ) => {
-      const config = cloneDeep(eventDefinition.config);
-      updates.forEach(({ key, value }) => {
-        setConfigValue(config, key, value);
-      });
+      const config = { ...eventDefinition.config, ...Object.fromEntries(updates.map(({ key, value }) => [key, value])) };
       setCurrentConfig(config);
 
       return config;
@@ -437,16 +423,12 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { name } = event.target;
       const value = FormsUtils.getValueFromInput(event.target);
-      const newConfig = cloneDeep(eventDefinition.config);
-      newConfig[name] = value;
-
-      if (value) {
-        newConfig.cron_expression = '';
-        newConfig.cron_timezone = userTimezone;
-      } else {
-        newConfig.cron_expression = null;
-        newConfig.cron_timezone = null;
-      }
+      const newConfig = {
+        ...eventDefinition.config,
+        [name]: value,
+        cron_expression: value ? '' : null,
+        cron_timezone: value ? userTimezone : null,
+      };
 
       setCurrentConfig(newConfig);
       propagateChange(newConfig);
