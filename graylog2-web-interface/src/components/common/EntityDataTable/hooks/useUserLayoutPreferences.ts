@@ -36,17 +36,24 @@ const preferencesFromJSON = ({
   customPreferences: custom_preferences,
   order,
 });
-const fetchUserLayoutPreferences = (entityId: string) =>
-  fetch('GET', qualifyUrl(`/entitylists/preferences/${entityId}`)).then((res) => preferencesFromJSON(res ?? {}));
+const preferencesUrl = (entityId: string, layoutVariant?: string) => {
+  const params = layoutVariant ? `?layout_variant=${encodeURIComponent(layoutVariant)}` : '';
+
+  return qualifyUrl(`/entitylists/preferences/${entityId}${params}`);
+};
+
+const fetchUserLayoutPreferences = (entityId: string, layoutVariant?: string) =>
+  fetch('GET', preferencesUrl(entityId, layoutVariant)).then((res) => preferencesFromJSON(res ?? {}));
 
 const useUserLayoutPreferences = <T>(
   entityId: string,
+  layoutVariant?: string,
 ): { data: TableLayoutPreferences<T>; isInitialLoading: boolean; refetch: () => void } => {
   const { data, isInitialLoading, refetch } = useQuery({
-    queryKey: ['table-layout', entityId],
+    queryKey: ['table-layout', entityId, layoutVariant],
     queryFn: () =>
       defaultOnError(
-        fetchUserLayoutPreferences(entityId),
+        fetchUserLayoutPreferences(entityId, layoutVariant),
         `Loading layout preferences for "${entityId}" overview failed with`,
       ),
     placeholderData: keepPreviousData,
