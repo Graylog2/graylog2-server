@@ -55,6 +55,20 @@ describe('useUserSearchFilterQuery hook', () => {
     );
   });
 
+  it('should update user layout preferences for a layout variant', async () => {
+    const { result } = renderHook(() => useUpdateUserLayoutPreferences('streams', 'security-events'), { wrapper });
+
+    result.current.mutateAsync(layoutPreferences);
+
+    await waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith(
+        'POST',
+        expect.stringContaining('/entitylists/preferences/streams?layout_variant=security-events'),
+        layoutPreferencesJSON,
+      ),
+    );
+  });
+
   it('should allow partial update of user layout preferences', async () => {
     const { result } = renderHook(() => useUpdateUserLayoutPreferences('streams'), { wrapper });
 
