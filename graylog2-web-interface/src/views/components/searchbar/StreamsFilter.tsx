@@ -59,7 +59,7 @@ const StreamsFilter = ({
       app_section: 'search-bar',
       app_action_value: 'search-filter',
       event_details: {
-        streamsCount: streams.length,
+        streamsCount: selected?.streams?.length,
       },
     });
 

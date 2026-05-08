@@ -59,6 +59,7 @@ import { indicesInWarmTier, isSearchingWarmTier } from 'views/components/searchb
 import type { FiltersType } from 'views/types';
 import type { EventDefinitionValidation } from 'components/event-definitions/types';
 import type { QueryString } from 'views/logic/queries/types';
+import type { StreamsAndCategoriesSelection } from 'views/components/common/StreamsAndCategoriesFilter';
 import StreamsAndCategoriesFilter from 'views/components/common/StreamsAndCategoriesFilter';
 
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
@@ -433,7 +434,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
   }, []);
 
   const handleStreamsAndCategoriesChange = useCallback(
-    (selected: { streams: string[]; categories: string[] }) => {
+    (selected: StreamsAndCategoriesSelection) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_STREAM_SELECTED, {
         app_pathname: getPathnameWithoutId(pathname),
         app_section: 'event-definition-condition',
