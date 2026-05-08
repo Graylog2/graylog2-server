@@ -153,7 +153,6 @@ const ApiRoutes = {
   EventNotificationsApiController: {
     list: () => ({ url: '/events/notifications' }),
     paginated: () => ({ url: '/events/notifications/paginated' }),
-    multiple: () => ({ url: '/events/notifications/multiple' }),
     get: (definitionId: string) => ({ url: `/events/notifications/${definitionId}` }),
     create: () => ({ url: '/events/notifications' }),
     bulkDelete: () => ({ url: '/events/notifications/bulk_delete' }),

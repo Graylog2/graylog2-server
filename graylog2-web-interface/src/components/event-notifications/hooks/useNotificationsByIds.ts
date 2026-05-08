@@ -16,13 +16,12 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
-import ApiRoutes from 'routing/ApiRoutes';
+import { EventsNotifications } from '@graylog/server-api';
+
 import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
 
 const fetchNotificationsByIds = (ids: Array<string>): Promise<Array<EventNotification>> =>
-  fetch('POST', qualifyUrl(ApiRoutes.EventNotificationsApiController.multiple().url), { notification_ids: ids });
+  EventsNotifications.getBulk({ notification_ids: ids });
 
 type Result = {
   data: Array<EventNotification> | undefined;

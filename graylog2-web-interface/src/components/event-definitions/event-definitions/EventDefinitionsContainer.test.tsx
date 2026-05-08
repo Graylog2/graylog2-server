@@ -135,6 +135,27 @@ describe('EventDefinitionsContainer', () => {
     expect(slackLink).toHaveAttribute('href', '/alerts/notifications/n2');
   });
 
+  it('shows a loading indicator instead of notification ids while resolving notifications', async () => {
+    asMock(useNotificationsByIds).mockReturnValue({
+      data: undefined,
+      isLoading: true,
+    });
+
+    const definition: EventDefinition = {
+      ...simpleEventDefinition,
+      notifications: [buildNotification('n1')],
+    };
+    asMock(useFetchEntities).mockReturnValue(paginatedEventDefinitions(definition));
+
+    render(<EventDefinitionsContainer />);
+
+    const row = await screen.findByTestId(`table-row-${definition.id}`);
+    await userEvent.click(within(row).getByTitle(/show notifications/i));
+
+    expect(await screen.findByText('Loading notifications...')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'n1' })).not.toBeInTheDocument();
+  });
+
   it('renders an entry with the notification id when a referenced notification no longer exists', async () => {
     asMock(useNotificationsByIds).mockReturnValue({
       data: [{ id: 'n1', title: 'PagerDuty Alert', description: '', config: {} }],

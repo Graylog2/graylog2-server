@@ -18,6 +18,7 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import { ListGroup, ListGroupItem } from 'components/bootstrap';
+import { Spinner } from 'components/common';
 import EventNotificationLink from 'components/event-notifications/event-notifications/EventNotificationLink';
 import useResolvedNotifications from 'components/event-definitions/hooks/useResolvedNotifications';
 
@@ -35,7 +36,7 @@ type Props = {
 };
 
 const ExpandedNotificationsSection = ({ eventDefinition }: Props) => {
-  const resolved = useResolvedNotifications(eventDefinition);
+  const { resolved, isLoading } = useResolvedNotifications(eventDefinition);
 
   const notificationList = resolved.map(({ id, title }) => (
     <ListGroupItem key={id}>
@@ -46,7 +47,11 @@ const ExpandedNotificationsSection = ({ eventDefinition }: Props) => {
   return (
     <>
       <Description>Notifications fired when this event definition triggers.</Description>
-      <ListGroup componentClass="ul">{notificationList}</ListGroup>
+      {isLoading ? (
+        <Spinner text="Loading notifications..." />
+      ) : (
+        <ListGroup componentClass="ul">{notificationList}</ListGroup>
+      )}
     </>
   );
 };

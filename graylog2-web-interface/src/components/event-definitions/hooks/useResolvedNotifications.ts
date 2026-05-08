@@ -23,20 +23,28 @@ export type ResolvedNotification = {
   found: boolean;
 };
 
-const useResolvedNotifications = (eventDefinition: EventDefinition): ResolvedNotification[] => {
+type Result = {
+  resolved: Array<ResolvedNotification>;
+  isLoading: boolean;
+};
+
+const useResolvedNotifications = (eventDefinition: EventDefinition): Result => {
   const ids = eventDefinition.notifications.map(({ notification_id }) => notification_id);
-  const { data: notifications } = useNotificationsByIds(ids);
+  const { data: notifications, isLoading } = useNotificationsByIds(ids);
   const byId = Object.fromEntries((notifications ?? []).map((n) => [n.id, n]));
 
-  return ids.map((id) => {
-    const found = byId[id];
+  return {
+    resolved: ids.map((id) => {
+      const found = byId[id];
 
-    return {
-      id,
-      title: found?.title,
-      found: Boolean(found),
-    };
-  });
+      return {
+        id,
+        title: found?.title,
+        found: Boolean(found),
+      };
+    }),
+    isLoading,
+  };
 };
 
 export default useResolvedNotifications;
