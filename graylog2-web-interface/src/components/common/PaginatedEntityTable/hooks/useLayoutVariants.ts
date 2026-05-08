@@ -2,13 +2,11 @@ import { useQuery } from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
+import type {TimeRange} from 'views/logic/queries/Query';
 
 type Props = {
   entityListId: string;
-  timerange: {
-    from: string;
-    to: string;
-  };
+  timerange: TimeRange;
 };
 
 type LayoutVariantJSON = {
@@ -33,14 +31,10 @@ type LayoutVariant = {
   }>;
 };
 
-const url = ({ entityListId, timerange: { from, to } }: Props): string => {
-  const params = `?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`;
-
-  return qualifyUrl(`/plugins/org.graylog.aws/entitylists/preferences/list_predefined/${entityListId}${params}`);
-};
+const url = ({ entityListId }: Props): string => qualifyUrl(`/entitylists/preferences/list_predefined/${entityListId}`);
 
 const fetchLayoutVariants = (props: Props): Promise<Array<LayoutVariant>> =>
-  fetch('GET', url(props)).then((response: Array<LayoutVariantJSON>) =>
+  fetch('POST', url(props), props.timerange).then((response: Array<LayoutVariantJSON>) =>
     response.map(({ display_name, layout_variant, entity_list_id, metrics }) => ({
       displayName: display_name,
       entityListId: entity_list_id,
