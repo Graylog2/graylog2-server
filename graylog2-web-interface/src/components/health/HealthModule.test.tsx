@@ -53,10 +53,10 @@ describe('HealthModule', () => {
   it('renders the full check panel when a non-healthy leaf is selected', async () => {
     render(<HealthModule />);
 
-    await clickInTree('MongoDB');
-    await clickInTree('Slow Queries');
+    await clickInTree('Graylog');
+    await clickInTree('Memory');
 
-    expect(screen.getByRole('heading', { name: 'Slow Queries' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Memory' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'What this means' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Common causes' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Recommended action' })).toBeInTheDocument();
@@ -114,5 +114,16 @@ describe('HealthModule', () => {
 
     expect(within(tree).queryByText('Memory')).not.toBeInTheDocument();
     expect(within(tree).queryByText('Server')).not.toBeInTheDocument();
+  });
+
+  it('keeps the synthetic root expanded even when toggled', async () => {
+    render(<HealthModule />);
+
+    await clickInTree('Cluster Health');
+
+    const tree = screen.getByLabelText('Cluster health tree');
+
+    expect(within(tree).getByText('Graylog')).toBeInTheDocument();
+    expect(within(tree).getByText('MongoDB')).toBeInTheDocument();
   });
 });
