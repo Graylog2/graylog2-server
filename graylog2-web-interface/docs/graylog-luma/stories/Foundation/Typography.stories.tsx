@@ -18,48 +18,20 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import styled, { useTheme } from 'styled-components';
 
+import { FoundationItem, PageTitle, PxLabel, Strong, Token, TokenRow, UsageNote } from './shared';
+
 // Root font size matching theme/constants ROOT_FONT_SIZE
 const ROOT_FONT_SIZE = 16;
 const remToPx = (rem: string): string => `${Math.round(parseFloat(rem) * ROOT_FONT_SIZE)}px`;
 
-// ─── Shared primitives ─────────────────────────────────────────────────────
-
-const Token = styled.code`
-  font-family: ${({ theme }) => theme.fonts.family.monospace};
-  font-size: ${({ theme }) => theme.fonts.size.small};
-  color: ${({ theme }) => theme.colors.text.secondary};
-  background: rgba(128, 128, 128, 0.12);
-  padding: 1px 6px;
-  border-radius: 3px;
-`;
-
-const UsageNote = styled.p`
-  font-size: ${({ theme }) => theme.fonts.size.small};
-  color: ${({ theme }) => theme.colors.text.secondary};
-  margin: 4px 0 0;
-  line-height: 1.5;
-`;
-
-const Strong = styled.strong`
-  color: ${({ theme }) => theme.colors.text.primary};
-`;
-
 // ─── Font Families ─────────────────────────────────────────────────────────
-
-const FamilySection = styled.div`
-  padding: 24px 0;
-
-  & + & {
-    border-top: 1px solid rgba(128, 128, 128, 0.2);
-  }
-`;
 
 const FamilyLabel = styled.span`
   font-size: ${({ theme }) => theme.fonts.size.small};
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   display: block;
-  margin: 10px 0 4px;
+  margin: 4px 0 4px;
 `;
 
 type FontFamilyKey = 'body' | 'navigation' | 'monospace';
@@ -105,15 +77,16 @@ const FontFamiliesDoc = () => {
 
   return (
     <div>
+      <PageTitle>Font Families</PageTitle>
       {FONT_FAMILIES.map(({ key, label, token, specimen, when, not }) => (
-        <FamilySection key={key}>
+        <FoundationItem key={key}>
           <Token>{token}</Token>
           <p
             style={{
               fontFamily: (theme.fonts.family as Record<string, string>)[key],
               fontSize: '1.3rem',
               color: theme.colors.text.primary,
-              margin: '12px 0 2px',
+              margin: '6px 0 0',
               lineHeight: 1.35,
             }}>
             {specimen}
@@ -127,7 +100,7 @@ const FontFamiliesDoc = () => {
             <Strong>Not for: </Strong>
             {not}
           </UsageNote>
-        </FamilySection>
+        </FoundationItem>
       ))}
     </div>
   );
@@ -153,27 +126,6 @@ const GroupNote = styled.p`
   color: ${({ theme }) => theme.colors.text.secondary};
   margin: 0 0 16px;
   line-height: 1.5;
-`;
-
-const ScaleItem = styled.div`
-  padding: 16px 0;
-
-  & + & {
-    border-top: 1px solid rgba(128, 128, 128, 0.15);
-  }
-`;
-
-const ScaleMeta = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 6px;
-`;
-
-const PxLabel = styled.span`
-  font-family: ${({ theme }) => theme.fonts.family.monospace};
-  font-size: ${({ theme }) => theme.fonts.size.small};
-  color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
 type FontSizeKey =
@@ -319,6 +271,7 @@ const TypeScaleDoc = () => {
 
   return (
     <div>
+      <PageTitle>Type Scale</PageTitle>
       {TYPE_SCALE_GROUPS.map((group) => (
         <ScaleGroup key={group.label}>
           <GroupHeading>{group.label}</GroupHeading>
@@ -330,13 +283,13 @@ const TypeScaleDoc = () => {
             const familyValue = family ? families[family] : families.body;
 
             return (
-              <ScaleItem key={key}>
-                <ScaleMeta>
+              <FoundationItem key={key}>
+                <TokenRow>
                   <Token>{token}</Token>
                   <PxLabel>
                     {sizeValue} / {remToPx(sizeValue)}
                   </PxLabel>
-                </ScaleMeta>
+                </TokenRow>
                 <p
                   style={{
                     fontFamily: familyValue,
@@ -351,7 +304,7 @@ const TypeScaleDoc = () => {
                   <Strong>Use when: </Strong>
                   {when}
                 </UsageNote>
-              </ScaleItem>
+              </FoundationItem>
             );
           })}
         </ScaleGroup>
@@ -420,6 +373,7 @@ const TextColorsDoc = () => {
 
   return (
     <div>
+      <PageTitle>Text Colors</PageTitle>
       {TEXT_COLORS.map(({ token, getColor, specimen, when, not }) => {
         const color = getColor(theme);
 
