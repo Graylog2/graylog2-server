@@ -77,6 +77,7 @@ import org.graylog2.shared.security.RestPermissions;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -182,6 +183,19 @@ public class EventNotificationsResource extends RestResource implements PluginRe
         checkPermission(RestPermissions.EVENT_NOTIFICATIONS_READ, notificationId);
         return dbNotificationService.get(notificationId)
                 .orElseThrow(() -> new NotFoundException("Notification " + notificationId + " doesn't exist"));
+    }
+
+    @POST
+    @Path("/multiple")
+    @Operation(summary = "Retrieve the named notifications in bulk")
+    @NoAuditEvent("only used to get multiple notifications")
+    public Collection<NotificationDto> getBulk(@Parameter(name = "notifications") BulkNotificationsRequest request) {
+        if (request == null || request.notificationIds() == null || request.notificationIds().isEmpty()) {
+            return List.of();
+        }
+        return dbNotificationService.getByIds(request.notificationIds()).stream()
+                .filter(notification -> isPermitted(RestPermissions.EVENT_NOTIFICATIONS_READ, notification.id()))
+                .toList();
     }
 
     @POST

@@ -19,6 +19,7 @@ package org.graylog.events.notifications;
 import com.google.errorprone.annotations.MustBeClosed;
 import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 import org.graylog.security.entities.EntityRegistrar;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
@@ -28,6 +29,9 @@ import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.search.SearchQuery;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -86,6 +90,16 @@ public class DBNotificationService {
 
     public Optional<NotificationDto> get(String id) {
         return mongoUtils.getById(id);
+    }
+
+    public List<NotificationDto> getByIds(Collection<String> ids) {
+        final List<String> validIds = ids.stream()
+                .filter(ObjectId::isValid)
+                .toList();
+        if (validIds.isEmpty()) {
+            return List.of();
+        }
+        return mongoUtils.getByIds(validIds).into(new ArrayList<>());
     }
 
     @MustBeClosed
