@@ -41,9 +41,17 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useScopePermissions from 'hooks/useScopePermissions';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
+import useEventDefinitionSteps from './useEventDefinitionCommonSteps';
+import EventDetailsForm from './EventDetailsForm';
+import EventConditionForm from './EventConditionForm';
 import EventDefinitionForm, { getStepKeys } from './EventDefinitionForm';
 
 import useEventDefinitionMutations from '../hooks/useEventDefinitionMutations';
+
+const STEP_KEYS = {
+  EVENT_DETAILS: 'event-details',
+  CONDITION: 'condition',
+};
 
 const fetchNotifications = () => {
   EventNotificationsActions.listAll();
@@ -62,14 +70,12 @@ type Props = {
   onSubmit?: () => void;
 };
 
-const getConditionPlugin = (edType): any => {
-  if (edType === undefined) {
-    return {};
+export const getConditionPlugin = (type: string | undefined) => {
+  if (type === undefined) {
+    return { displayName: null, hideFieldsStep: false, defaultConfig: {} };
   }
 
-  return (
-    PluginStore.exports('eventDefinitionTypes').find((eventDefinitionType) => eventDefinitionType.type === edType) || {}
-  );
+  return PluginStore.exports('eventDefinitionTypes').find((edt) => edt.type === type) || {};
 };
 
 const EventDefinitionFormContainer = ({
@@ -100,7 +106,9 @@ const EventDefinitionFormContainer = ({
   const [activeStep, setActiveStep] = useState(initialStep);
   const [eventDefinition, setEventDefinition] = useState(eventDefinitionInitial);
   const [validation, setValidation] = useState({ errors: {} });
-  const [eventsClusterConfig, setEventsClusterConfig] = useState(undefined);
+  const [eventsClusterConfig, setEventsClusterConfig] = useState<
+    EventDefinition & { share_request: EntitySharePayload }
+  >(undefined);
   const [isDirty, setIsDirty] = useState(false);
   const { configFromLocalStorage, hasLocalStorageConfig } = useEventDefinitionConfigFromLocalStorage();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(eventDefinition);
@@ -119,8 +127,8 @@ const EventDefinitionFormContainer = ({
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
   const isNew = action === 'create';
-  const conditionPlugin = getConditionPlugin(eventDefinition.config.type);
-  const hideFieldsStep = conditionPlugin?.hideFieldsStep ?? false;
+  const eventDefinitionType = getConditionPlugin(eventDefinition.config.type);
+  const hideFieldsStep = eventDefinitionType?.hideFieldsStep ?? false;
   const currentStepKeys = getStepKeys(isNew, hideFieldsStep);
 
   const isLoading = !entityTypes || !notifications.all || !eventsClusterConfig;
@@ -147,6 +155,7 @@ const EventDefinitionFormContainer = ({
       const localStorageConditionPlugin = getConditionPlugin(configFromLocalStorage.type);
       const defaultConfig = localStorageConditionPlugin?.defaultConfig || ({} as EventDefinition['config']);
 
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setEventDefinition((cur) => {
         const cloned = cloneDeep(cur);
 
@@ -161,6 +170,54 @@ const EventDefinitionFormContainer = ({
       });
     }
   }, [configFromLocalStorage, fetchClusterConfig, hasLocalStorageConfig]);
+
+  const commonStepProps = {
+    key: eventDefinition.id, // Recreate components if ID changed
+    action,
+    entityTypes,
+    eventDefinition,
+    onChange: handleChange,
+    validation,
+    currentUser,
+  };
+
+  const canEdit = scopePermissions.is_mutable;
+  const canEditCondition = canEdit || eventDefinition._scope.toUpperCase() === 'ILLUMINATE';
+
+  const viewSteps = [
+    {
+      key: STEP_KEYS.EVENT_DETAILS,
+      title: 'Event Details',
+      component: (
+        <EventDetailsForm
+          {...commonStepProps}
+          eventDefinitionEventProcedure={eventDefinition?.event_procedure}
+          canEdit={scopePermissions.is_mutable}
+        />
+      ),
+    },
+    {
+      key: STEP_KEYS.CONDITION,
+      title: eventDefinitionType?.displayName ?? 'Condition',
+      component: <EventConditionForm {...commonStepProps} canEdit={canEditCondition} />,
+    },
+  ];
+
+  const steps = useEventDefinitionSteps({
+    viewSteps,
+    commonStepProps: {
+      key: eventDefinition.id, // Recreate components if ID changed
+      action,
+      entityTypes,
+      eventDefinition,
+      onChange: handleChange,
+      validation,
+      currentUser,
+    },
+    notifications: notifications.all,
+    notificationDefaults: defaults,
+    canEdit,
+  });
 
   const handleSubmitSuccessResponse = () => {
     setIsDirty(false);
@@ -256,21 +313,13 @@ const EventDefinitionFormContainer = ({
         <ConfirmLeaveDialog question="Do you really want to abandon this page and lose your changes? This action cannot be undone." />
       )}
       <EventDefinitionForm
+        steps={steps}
         action={action}
-        canEdit={scopePermissions.is_mutable}
-        currentUser={currentUser}
-        defaults={defaults}
         activeStep={activeStep}
-        entityTypes={entityTypes}
-        eventDefinition={eventDefinition}
         formControls={formControls}
-        notifications={notifications.all}
         onCancel={handleCancel}
-        onChange={handleChange}
         onChangeStep={changeStep}
         onSubmit={handleSubmit}
-        validation={validation}
-        hideFieldsStep={hideFieldsStep}
       />
     </>
   );

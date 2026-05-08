@@ -215,6 +215,8 @@ const AppRouter = () => {
             { path: RoutePaths.ALERTS.LIST, element: <EventsPage /> },
             { path: RoutePaths.ALERTS.DEFINITIONS.LIST, element: <EventDefinitionsPage /> },
             { path: RoutePaths.ALERTS.DEFINITIONS.CREATE, element: <CreateEventDefinitionPage /> },
+            { path: RoutePaths.ALERTS.DEFINITIONS.SIGMA.GIT_IMPORT, element: <CreateEventDefinitionPage /> },
+            { path: RoutePaths.ALERTS.DEFINITIONS.SIGMA.FILE_IMPORT, element: <CreateEventDefinitionPage /> },
             {
               path: RoutePaths.ALERTS.DEFINITIONS.edit(':definitionId'),
               element: <EditEventDefinitionPage />,

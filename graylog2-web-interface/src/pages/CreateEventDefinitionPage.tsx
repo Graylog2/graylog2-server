@@ -17,6 +17,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import useLocation from 'routing/useLocation';
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import EventDefinitionFormContainer from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
@@ -30,6 +31,10 @@ import useQuery from 'routing/useQuery';
 const CreateEventDefinitionPage = () => {
   const currentUser = useCurrentUser();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const pathAction = pathname.split('/').pop();
+
+  console.log('CreateEventDefinitionPage pathAction:', pathAction);
 
   const [eventDefinitionTitle, setEventDefinitionTitle] = useState();
   const { step } = useQuery();
