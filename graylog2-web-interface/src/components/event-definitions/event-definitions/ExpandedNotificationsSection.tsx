@@ -15,11 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled, { css } from 'styled-components';
 
+import { ListGroup, ListGroupItem } from 'components/bootstrap';
 import EventNotificationLink from 'components/event-notifications/event-notifications/EventNotificationLink';
 import useResolvedNotifications from 'components/event-definitions/hooks/useResolvedNotifications';
 
 import type { EventDefinition } from '../event-definitions-types';
+
+const Description = styled.p(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.xs};
+    color: ${theme.colors.gray[50]};
+  `,
+);
 
 type Props = {
   eventDefinition: EventDefinition;
@@ -28,14 +37,17 @@ type Props = {
 const ExpandedNotificationsSection = ({ eventDefinition }: Props) => {
   const resolved = useResolvedNotifications(eventDefinition);
 
+  const notificationList = resolved.map(({ id, title }) => (
+    <ListGroupItem key={id}>
+      <EventNotificationLink id={id} title={title} />
+    </ListGroupItem>
+  ));
+
   return (
-    <ul>
-      {resolved.map(({ id, title }) => (
-        <li key={id}>
-          <EventNotificationLink id={id} title={title} />
-        </li>
-      ))}
-    </ul>
+    <>
+      <Description>Notifications fired when this event definition triggers.</Description>
+      <ListGroup componentClass="ul">{notificationList}</ListGroup>
+    </>
   );
 };
 
