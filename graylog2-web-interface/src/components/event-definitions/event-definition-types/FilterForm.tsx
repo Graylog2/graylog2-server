@@ -258,6 +258,23 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
     [eventDefinition.config],
   );
 
+  const getUpdatedConfigMulti = useCallback(
+    <K extends EventDefinitionConfigKeys>(
+      key1: K,
+      value1: EventDefinition['config'][K],
+      key2: K,
+      value2: EventDefinition['config'][K],
+    ) => {
+      const config = cloneDeep(eventDefinition.config);
+      config[key1] = value1;
+      config[key2] = value2;
+      setCurrentConfig(config);
+
+      return config;
+    },
+    [eventDefinition.config],
+  );
+
   const propagateChange = useCallback(
     (config: EventDefinitionConfig) => {
       onChange('config', config);
@@ -441,14 +458,9 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
         app_action_value: 'stream-select',
       });
 
-      if (selected.streams.length > 0) {
-        propagateChange(getUpdatedConfig('streams', selected.streams));
-      }
-      if (selected.categories.length > 0) {
-        propagateChange(getUpdatedConfig('stream_categories', selected.categories));
-      }
+      propagateChange(getUpdatedConfigMulti('streams', selected.streams, 'stream_categories', selected.categories));
     },
-    [getUpdatedConfig, pathname, propagateChange, sendTelemetry],
+    [getUpdatedConfigMulti, pathname, propagateChange, sendTelemetry],
   );
 
   const handleTimeRangeChange = useCallback(
@@ -489,6 +501,19 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
   );
 
   const onlyFilters = eventDefinition._scope === 'ILLUMINATE';
+
+  const currentSelection = [
+    ...(eventDefinition.config.stream_categories.map((c) => 'category_' + c) ?? []),
+    ...(eventDefinition.config.streams.map((s) => 'stream_' + s) ?? []),
+  ];
+
+  const streamsAndCategories = [...streams.map((s) => s.id), ...(eventDefinition?.config?.streams ?? [])].map(
+    (streamId) => {
+      const stream = streams.find((s) => s.id === streamId);
+
+      return { title: stream?.title ?? streamId, id: streamId, categories: stream?.categories };
+    },
+  );
 
   return (
     <fieldset>
@@ -544,16 +569,9 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
             <StreamsAndCategoriesFilter
               id="filter-streams-and-categories"
               required={isStreamRequired}
-              onChange={(selected) => handleStreamsAndCategoriesChange(selected)}
-              value={[
-                ...(eventDefinition.config.stream_categories.map((c) => 'category_' + c) ?? []),
-                ...(eventDefinition.config.streams.map((s) => 'stream_' + s) ?? []),
-              ].join(',')}
-              streams={[...streams.map((s) => s.id), ...(eventDefinition?.config?.streams ?? [])].map((streamId) => {
-                const stream = streams.find((s) => s.id === streamId);
-
-                return { title: stream?.title ?? streamId, id: streamId, categories: stream?.categories };
-              })}
+              onChange={handleStreamsAndCategoriesChange}
+              value={currentSelection.join(',')}
+              streams={streamsAndCategories}
             />
             <HelpBlock>Select streams the search should include.</HelpBlock>
           </FormGroup>
