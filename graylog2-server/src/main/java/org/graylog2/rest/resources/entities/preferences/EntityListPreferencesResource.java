@@ -27,7 +27,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -45,8 +44,6 @@ import org.graylog.security.UserContext;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
-import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.resources.entities.preferences.metrics.EntityListMetricProvider;
 import org.graylog2.rest.resources.entities.preferences.model.EntityListPreferences;
@@ -144,7 +141,7 @@ public class EntityListPreferencesResource {
         }
     }
 
-    @GET
+    @POST
     @Path("/list_predefined/{entity_list_id}")
     @Timed
     @Operation(summary = "List predefined layout variants for entity list with given id")
@@ -153,14 +150,10 @@ public class EntityListPreferencesResource {
                          content = @Content(schema = @Schema(implementation = PredefinedLayoutVariant[].class)))
     })
     @Produces(MediaType.APPLICATION_JSON)
-    public List<PredefinedLayoutVariant> listPredefined(@Parameter(name = "entity_list_id", required = true)
-                                                            @PathParam("entity_list_id") @NotEmpty String entityListId,
-                                                        @Parameter(name = "from", required = true)
-                                                            @QueryParam("from") @NotEmpty String from,
-                                                        @Parameter(name = "to", required = true)
-                                                            @QueryParam("to") @NotEmpty String to) {
-
-        final TimeRange timeRange = buildTimeRange(from, to);
+    @Consumes(MediaType.APPLICATION_JSON)
+    @NoAuditEvent("Audit logs are not stored for entity list preferences")
+    public List<PredefinedLayoutVariant> listPredefined(@Parameter(name = "entity_list_id", required = true) @PathParam("entity_list_id") @NotEmpty String entityListId,
+                                                        @RequestBody(required = true) TimeRange timeRange) {
         final Subject subject = SecurityUtils.getSubject();
         return entityListPreferencesService
                 .getPredefinedForEntityList(entityListId)
@@ -179,14 +172,6 @@ public class EntityListPreferencesResource {
                 )
                 .toList();
 
-    }
-
-    private TimeRange buildTimeRange(final String from, final String to) {
-        try {
-            return AbsoluteRange.create(from, to);
-        } catch (InvalidRangeParametersException e) {
-            throw new BadRequestException("Invalid timerange parameters provided", e);
-        }
     }
 
     private String obtainLayoutVariant(final String layoutVariant) {
