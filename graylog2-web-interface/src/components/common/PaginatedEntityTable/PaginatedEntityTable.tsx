@@ -233,7 +233,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
       }
 
       updateTableLayout({
-        slicing: newSliceCol ? defaultSlicingPreferences(newSliceCol, columnSchemas) : undefined,
+        slicing: newSliceCol ? defaultSlicingPreferences(newSliceCol, columnSchemas) : null,
       });
     },
     [columnSchemas, fetchOptions.sliceCol, onChangeSlicingFilter, updateTableLayout],
