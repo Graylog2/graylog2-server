@@ -14,20 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.resources.entities.preferences.service;
+import { defineConfig } from 'oxfmt';
+import config from '@graylog/oxfmt-config' with { type: 'json' };
 
-import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferences;
-import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId;
-
-import java.util.List;
-
-public interface EntityListPreferencesService {
-
-    StoredEntityListPreferences get(final StoredEntityListPreferencesId preferencesId);
-
-    List<StoredEntityListPreferences> getPredefinedForEntityList(final String entityListId);
-
-    boolean save(final StoredEntityListPreferences preferences);
-
-    int deleteAllForUser(final String userId);
-}
+export default defineConfig(config);

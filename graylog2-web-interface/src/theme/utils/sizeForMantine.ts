@@ -14,20 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.resources.entities.preferences.service;
 
-import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferences;
-import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId;
+import type { BsSize } from 'components/bootstrap/types';
+import type { SupportedMantineSize } from 'theme/types';
 
-import java.util.List;
+const sizeForMantine = (size: BsSize): SupportedMantineSize => {
+  switch (size) {
+    case 'xs':
+    case 'xsmall':
+      return 'xs';
+    case 'sm':
+    case 'small':
+      return 'sm';
+    case 'lg':
+    case 'large':
+      return 'lg';
+    default:
+      return 'md';
+  }
+};
 
-public interface EntityListPreferencesService {
-
-    StoredEntityListPreferences get(final StoredEntityListPreferencesId preferencesId);
-
-    List<StoredEntityListPreferences> getPredefinedForEntityList(final String entityListId);
-
-    boolean save(final StoredEntityListPreferences preferences);
-
-    int deleteAllForUser(final String userId);
-}
+export default sizeForMantine;

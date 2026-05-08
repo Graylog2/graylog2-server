@@ -30,9 +30,9 @@
     "extends": "graylog"
   },
   "dependencies": {
-    "@graylog/sawmill": "4.0.0",
+    "@graylog/sawmill": "4.0.6",
     "@reduxjs/toolkit": "^2.5.1",
-    "@tanstack/react-query": "5.90.21",
+    "@tanstack/react-query": "5.100.6",
     "@types/react": "18.3.13",
     "babel-preset-graylog": "file:../babel-preset-graylog",
     "eslint-config-graylog": "file:../eslint-config-graylog",
@@ -41,7 +41,7 @@
     "html-webpack-plugin": "^5.5.0",
     "jest-preset-graylog": "file:../jest-preset-graylog",
     "moment": "2.30.1",
-    "moment-timezone": "0.6.1",
+    "moment-timezone": "0.6.2",
     "react": "18.3.1",
     "react-dom": "18.2.0",
     "react-redux": "^9.2.0",
