@@ -53,6 +53,13 @@ const useExpansionCascade = (
   const previousExpandedRef = useRef<Record<string, boolean>>(tree.expandedState);
 
   useEffect(() => {
+    // Synthetic root must always stay expanded — re-assert if anything collapsed it.
+    if (tree.expandedState[rootId] === false) {
+      tree.expand(rootId);
+
+      return;
+    }
+
     const previous = previousExpandedRef.current;
     const current = tree.expandedState;
 
@@ -65,9 +72,6 @@ const useExpansionCascade = (
     if (changedIds.length !== 1) return;
 
     const changedId = changedIds[0];
-
-    if (changedId === rootId) return;
-
     const subject = lookup[changedId];
 
     if (!subject || !isHealthFeature(subject)) return;

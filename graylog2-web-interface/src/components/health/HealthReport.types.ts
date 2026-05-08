@@ -22,6 +22,7 @@ export type HealthCheck = {
   status: HealthStatus;
   total_affected: number;
   total?: number;
+  /** Optional backend-emitted detail for this evaluation (e.g. error text or stack trace). Surfaced as "Latest message" and supersedes generic common causes when present. */
   message?: string;
 };
 
