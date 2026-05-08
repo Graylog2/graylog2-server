@@ -36,12 +36,18 @@ const preferencesToJSON = <T>({
   order,
 });
 
-const useUpdateUserLayoutPreferences = <T>(entityTableId: string) => {
-  const { data: userLayoutPreferences = {}, refetch } = useUserLayoutPreferences(entityTableId);
+const preferencesUrl = (entityTableId: string, layoutVariant?: string) => {
+  const params = layoutVariant ? `?layout_variant=${encodeURIComponent(layoutVariant)}` : '';
+
+  return qualifyUrl(`/entitylists/preferences/${entityTableId}${params}`);
+};
+
+const useUpdateUserLayoutPreferences = <T>(entityTableId: string, layoutVariant?: string) => {
+  const { data: userLayoutPreferences = {}, refetch } = useUserLayoutPreferences(entityTableId, layoutVariant);
   const mutationFn = (newPreferences: TableLayoutPreferences<T>) =>
     fetch(
       'POST',
-      qualifyUrl(`/entitylists/preferences/${entityTableId}`),
+      preferencesUrl(entityTableId, layoutVariant),
       preferencesToJSON({ ...userLayoutPreferences, ...newPreferences }),
     );
   const { mutateAsync } = useMutation({

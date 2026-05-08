@@ -148,7 +148,10 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   noPageSizeSelect = false,
   noColumnReordering = false,
 }: PaginatedEntityTableProps<T, M> & InnerProps) => {
-  const { mutateAsync: updateTableLayout } = useUpdateUserLayoutPreferences(tableLayout.entityTableId);
+  const { mutateAsync: updateTableLayout } = useUpdateUserLayoutPreferences(
+    tableLayout.entityTableId,
+    tableLayout.layoutVariant,
+  );
   const fetchKey = useMemo(() => keyFn(fetchOptions), [fetchOptions, keyFn]);
 
   const {
