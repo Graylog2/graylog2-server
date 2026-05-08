@@ -21,13 +21,25 @@ import { Link, Pluralize, Spinner } from 'components/common';
 import { ListGroup, ListGroupItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
+import type { Output } from 'hooks/useOutputs';
 import useStreamOutputs from 'hooks/useStreamOutputs';
+import usePermissions from 'hooks/usePermissions';
 
 const editOutputUrl = (streamId: string, outputId: string) =>
   `${Routes.stream_view(streamId)}?segment=destinations&edit_output=${outputId}`;
 
 type Props = {
   stream: Stream;
+};
+
+const OutputTitle = ({ streamId, output }: { streamId: string; output: Output }) => {
+  const { isPermitted } = usePermissions();
+
+  if (!isPermitted(`outputs:edit:${output.id}`)) {
+    return <>{output.title}</>;
+  }
+
+  return <Link to={editOutputUrl(streamId, output.id)}>{output.title}</Link>;
 };
 
 const ExpandedOutputsSection = ({ stream }: Props) => {
@@ -49,7 +61,7 @@ const ExpandedOutputsSection = ({ stream }: Props) => {
       <ListGroup componentClass="ul">
         {outputs.map((output) => (
           <ListGroupItem key={output.id}>
-            <Link to={editOutputUrl(stream.id, output.id)}>{output.title}</Link> <small>({output.type})</small>
+            <OutputTitle streamId={stream.id} output={output} /> <small>({output.type})</small>
           </ListGroupItem>
         ))}
       </ListGroup>

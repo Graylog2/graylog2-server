@@ -18,7 +18,9 @@ import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import ExpandedOutputsSection from 'components/streams/StreamsOverview/ExpandedOutputsSection';
+import CurrentUserContext from 'contexts/CurrentUserContext';
 import { stream } from 'fixtures/streams';
+import { alice } from 'fixtures/users';
 import { asMock } from 'helpers/mocking';
 import useStreamOutputs from 'hooks/useStreamOutputs';
 
@@ -39,6 +41,9 @@ const mockStreamOutputs = (outputs: ReturnType<typeof buildOutput>[]) => {
     isError: false,
   });
 };
+
+const findSummary = (summary: string) =>
+  screen.findByText((_, element) => element?.tagName.toLowerCase() === 'p' && element.textContent === summary);
 
 describe('ExpandedOutputsSection', () => {
   it('links each output to the destinations segment with edit_output for that output', async () => {
@@ -67,12 +72,25 @@ describe('ExpandedOutputsSection', () => {
     await screen.findByText(/\(org\.graylog2\.outputs\.GelfOutput\)/);
   });
 
+  it('renders an output title without edit link when the user lacks output edit permission', async () => {
+    mockStreamOutputs([buildOutput('out-1', 'Restricted output')]);
+
+    render(
+      <CurrentUserContext.Provider value={alice}>
+        <ExpandedOutputsSection stream={stream} />
+      </CurrentUserContext.Provider>,
+    );
+
+    expect(await screen.findByText('Restricted output')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /restricted output/i })).not.toBeInTheDocument();
+  });
+
   it('renders a summary line with the count of connected outputs', async () => {
     mockStreamOutputs([buildOutput('out-1', 'A'), buildOutput('out-2', 'B'), buildOutput('out-3', 'C')]);
 
     render(<ExpandedOutputsSection stream={stream} />);
 
-    await screen.findByText(/3 connected outputs\./i);
+    expect(await findSummary('3 connected outputs.')).toBeInTheDocument();
   });
 
   it('uses the singular form when only one output is connected', async () => {
@@ -80,7 +98,7 @@ describe('ExpandedOutputsSection', () => {
 
     render(<ExpandedOutputsSection stream={stream} />);
 
-    await screen.findByText(/1 connected output\./i);
+    expect(await findSummary('1 connected output.')).toBeInTheDocument();
   });
 
   it('renders outputs sorted by title', async () => {
@@ -93,7 +111,7 @@ describe('ExpandedOutputsSection', () => {
     expect(links.map((link) => link.textContent)).toEqual(['alpha', 'Mu', 'Zeta']);
   });
 
-  it('shows a spinner while loading', () => {
+  it('shows a spinner while loading', async () => {
     asMock(useStreamOutputs).mockReturnValue({
       data: undefined,
       refetch: () => {},
@@ -103,6 +121,6 @@ describe('ExpandedOutputsSection', () => {
 
     render(<ExpandedOutputsSection stream={stream} />);
 
-    expect(screen.getByText(/loading/i)).toBeInTheDocument();
+    expect(await screen.findByText(/loading/i)).toBeInTheDocument();
   });
 });

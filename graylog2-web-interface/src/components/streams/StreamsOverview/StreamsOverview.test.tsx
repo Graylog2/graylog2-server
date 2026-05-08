@@ -278,12 +278,16 @@ describe('StreamsOverview', () => {
 
     await userEvent.click(within(tableRow).getByTitle('Show stream outputs'));
 
-    expect(await screen.findByText(/1 connected output\./i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(
+        (_, element) => element?.tagName.toLowerCase() === 'p' && element.textContent === '1 connected output.',
+      ),
+    ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /my gelf output/i })).toHaveAttribute(
       'href',
       `/streams/${streamWithOutputs.id}/view?segment=destinations&edit_output=output-id-1`,
     );
-    expect(screen.getByRole('button', { name: /manage outputs/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /manage outputs/i })).toBeInTheDocument();
 
     await userEvent.click(within(tableRow).getByTitle('Hide stream outputs'));
 
