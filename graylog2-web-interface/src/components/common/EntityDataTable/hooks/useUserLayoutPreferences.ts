@@ -27,12 +27,20 @@ const preferencesFromJSON = ({
   attributes,
   sort,
   per_page,
+  slicing,
   custom_preferences,
   order,
 }: TableLayoutPreferencesJSON): TableLayoutPreferences => ({
   attributes,
   sort: sort ? { attributeId: sort.field, direction: sort.order } : undefined,
   perPage: per_page,
+  slicing: slicing
+    ? {
+        sliceColumn: slicing.slice_column,
+        sortBy: slicing.sort_by,
+        order: slicing.order,
+      }
+    : undefined,
   customPreferences: custom_preferences,
   order,
 });
