@@ -35,7 +35,6 @@ const useTableElements = ({
         input={listItem}
         inputTypes={inputTypes}
         inputTypeDescriptions={inputTypeDescriptions}
-        currentNode={null}
       />
     ),
     [inputTypes, inputTypeDescriptions],
