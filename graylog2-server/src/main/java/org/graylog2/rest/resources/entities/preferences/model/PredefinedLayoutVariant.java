@@ -14,17 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2;
+package org.graylog2.rest.resources.entities.preferences.model;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import retrofit2.Call;
-import retrofit2.http.Body;
-import retrofit2.http.POST;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public interface DatanodeRemoteConnectionCheckResource {
-
-    @POST("connection-check/opensearch")
-    Call<ConnectionCheckResponse> opensearch(@Body @Valid @NotNull ConnectionCheckRequest request);
-
+public record PredefinedLayoutVariant(@JsonProperty("layout_variant") String layoutVariant,
+                                      @JsonProperty("entity_list_id") String entityListId,
+                                      @JsonProperty("display_name") String displayName) {
 }

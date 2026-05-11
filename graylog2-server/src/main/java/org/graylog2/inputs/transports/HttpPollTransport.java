@@ -308,7 +308,8 @@ public class HttpPollTransport extends ThrottleableTransport2 {
                     "",
                     "Add a comma separated list of HTTP headers containing sensitive information, e.g. for authorization. For example: Authorization: Bearer <token>",
                     ConfigurationField.Optional.OPTIONAL,
-                    true
+                    true,
+                    TextField.Attribute.IS_PASSWORD
             ));
 
             r.addField(new TextField(

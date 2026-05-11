@@ -14,9 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2;
+import { defineConfig } from 'oxfmt';
+import config from '@graylog/oxfmt-config' with { type: 'json' };
 
-import java.net.URI;
-
-public record ConnectionCheckRequest(String host, String username, String password, boolean trustUnknownCerts) {
-}
+export default defineConfig(config);
