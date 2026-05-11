@@ -135,4 +135,51 @@ describe('TagsEditor', () => {
       expect(onChange).toHaveBeenLastCalledWith(['phishing']);
     });
   });
+
+  describe('character validation', () => {
+    it('drops tags with disallowed characters and surfaces an error', async () => {
+      const onChange = jest.fn();
+      render(<Harness onChange={onChange} />);
+
+      const input = screen.getByRole('combobox');
+      await userEvent.type(input, 'phish:ing');
+      await userEvent.keyboard('{Enter}');
+
+      expect(onChange).not.toHaveBeenCalledWith(expect.arrayContaining(['phish:ing']));
+      expect(
+        await screen.findByText(/only contain lowercase letters, digits, hyphens and underscores/i),
+      ).toBeInTheDocument();
+    });
+
+    it.each([
+      ['space', 'phish ing'],
+      ['dot', 'phish.ing'],
+      ['slash', 'phish/ing'],
+      ['quote', 'phish"ing'],
+    ])('rejects tags containing a %s', async (_label, raw) => {
+      const onChange = jest.fn();
+      render(<Harness onChange={onChange} />);
+
+      await userEvent.type(screen.getByRole('combobox'), raw);
+      await userEvent.keyboard('{Enter}');
+
+      expect(onChange).not.toHaveBeenCalledWith(expect.arrayContaining([raw.toLowerCase()]));
+      expect(
+        await screen.findByText(/only contain lowercase letters, digits, hyphens and underscores/i),
+      ).toBeInTheDocument();
+    });
+
+    it('accepts tags using only allowed characters', async () => {
+      const onChange = jest.fn();
+      render(<Harness onChange={onChange} />);
+
+      await userEvent.type(screen.getByRole('combobox'), 'lateral-movement_42');
+      await userEvent.keyboard('{Enter}');
+
+      expect(onChange).toHaveBeenLastCalledWith(['lateral-movement_42']);
+      expect(
+        screen.queryByText(/only contain lowercase letters, digits, hyphens and underscores/i),
+      ).not.toBeInTheDocument();
+    });
+  });
 });
