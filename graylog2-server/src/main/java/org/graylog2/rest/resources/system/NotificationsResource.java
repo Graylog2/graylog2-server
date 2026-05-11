@@ -20,6 +20,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.mongodb.client.model.Filters;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -362,7 +363,7 @@ public class NotificationsResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @RequiresPermissions(RestPermissions.NOTIFICATIONS_CONFIG_UPDATE)
     @AuditEvent(type = AuditEventTypes.CLUSTER_CONFIGURATION_UPDATE)
-    public SystemNotificationRetentionConfig updateConfig(@Valid @NotNull SystemNotificationRetentionConfig config) {
+    public SystemNotificationRetentionConfig updateConfig(@Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) SystemNotificationRetentionConfig config) {
         if (config.retentionDays() <= 0) {
             throw new BadRequestException("retention_days must be a positive integer");
         }
