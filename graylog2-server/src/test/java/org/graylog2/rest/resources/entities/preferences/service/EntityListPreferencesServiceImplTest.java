@@ -76,7 +76,9 @@ public class EntityListPreferencesServiceImplTest {
                                 new SlicingPreferences("status", "Alphabetical", ASC),
                                 Map.of(),
                                 0,
+                                List.of(),
                                 List.of()
+
                         )
                 )
                 .build();
@@ -181,6 +183,7 @@ public class EntityListPreferencesServiceImplTest {
                 null,
                 Map.of(),
                 13,
+                List.of(),
                 List.of());
     }
 

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
 import type { LayoutConfig } from 'components/common/EntityDataTable/hooks/useTableLayout';
@@ -36,6 +36,8 @@ import type {
   DefaultLayout,
   ExpandedSectionRenderers,
   RowOverride,
+  SlicingPreferences,
+  ColumnSchema,
 } from 'components/common/EntityDataTable/types';
 import EntityFilters from 'components/common/EntityFilters';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
@@ -47,6 +49,10 @@ import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryPar
 import Slicing, { type SliceRenderers } from 'components/common/PaginatedEntityTable/slicing';
 import type { FetchSlices } from 'components/common/PaginatedEntityTable/slicing/useFetchSlices';
 import useAuthorizedAttributes from 'components/common/PaginatedEntityTable/hooks/useAuthorizedAttributes';
+import {
+  ALPHABETICAL_SORT,
+  defaultSortDirectionForMode,
+} from 'components/common/PaginatedEntityTable/slicing/slicingConstants';
 
 import { useWithLocalState, useWithURLParams } from './useFiltersAndPagination';
 
@@ -101,13 +107,24 @@ const INITIAL_DATA = {
   meta: null,
 };
 
+const defaultSlicingPreferences = (sliceColumn: string, columnSchemas: Array<ColumnSchema>): SlicingPreferences => {
+  const sliceSortDefault = columnSchemas.find(({ id }) => id === sliceColumn)?.slice_sort_default;
+  const sortBy = sliceSortDefault?.mode ?? ALPHABETICAL_SORT;
+
+  return {
+    sliceColumn,
+    sortBy,
+    order: defaultSortDirectionForMode(sortBy, sliceSortDefault),
+  };
+};
+
 type InnerProps = {
   fetchOptions: SearchParams;
   isLoadingLayoutPreferences: boolean;
   layoutConfig: LayoutConfig;
   onDataLoaded?: (data: PaginatedResponse<unknown, unknown>) => void;
   onChangeFilters: (newFilters: UrlQueryFilters) => void;
-  onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void;
+  onChangeSlicingFilter: (slice?: string) => void;
   paginationState: PaginationQueryParameterResult;
   reactQueryOptions: FetchOptions;
   setQuery: (newQuery: string) => void;
@@ -134,7 +151,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   middleSection: MiddleSection = undefined,
   topSection: TopSection = undefined,
   onChangeFilters,
-  onChangeSlicing,
+  onChangeSlicingFilter,
   onDataLoaded = undefined,
   paginationState,
   queryHelpComponent = undefined,
@@ -148,7 +165,10 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   noPageSizeSelect = false,
   noColumnReordering = false,
 }: PaginatedEntityTableProps<T, M> & InnerProps) => {
-  const { mutateAsync: updateTableLayout } = useUpdateUserLayoutPreferences(tableLayout.entityTableId);
+  const { mutateAsync: updateTableLayout } = useUpdateUserLayoutPreferences(
+    tableLayout.entityTableId,
+    tableLayout.layoutVariant,
+  );
   const fetchKey = useMemo(() => keyFn(fetchOptions), [fetchOptions, keyFn]);
 
   const {
@@ -199,6 +219,26 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
     [additionalAttributes, paginatedEntities?.attributes],
   );
 
+  const onSlicingPreferencesChange = useCallback(
+    (slicing: SlicingPreferences) => updateTableLayout({ slicing }),
+    [updateTableLayout],
+  );
+
+  const onSlicingLayout = useCallback(
+    (newSliceCol: string | undefined, newSlice?: string) => {
+      onChangeSlicingFilter(newSlice);
+
+      if (newSliceCol === fetchOptions.sliceCol) {
+        return;
+      }
+
+      updateTableLayout({
+        slicing: newSliceCol ? defaultSlicingPreferences(newSliceCol, columnSchemas) : undefined,
+      });
+    },
+    [columnSchemas, fetchOptions.sliceCol, onChangeSlicingFilter, updateTableLayout],
+  );
+
   const attributes = useAuthorizedAttributes(paginatedEntities?.attributes ?? []);
 
   const onPaginationChange = withoutURLParams
@@ -224,13 +264,15 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
       <Container>
         {TopSection ? <TopSection /> : null}
         <RowContainer>
-          {fetchOptions.sliceCol && (
+          {fetchOptions.sliceCol && typeof fetchSlices === 'function' && (
             <Slicing
               fetchSlices={fetchSlices}
               appSection={appSection}
               columnSchemas={columnSchemas}
               sliceRenderers={sliceRenderers}
-              onChangeSlicing={onChangeSlicing}
+              onChangeSlicing={onSlicingLayout}
+              onSlicingPreferencesChange={onSlicingPreferencesChange}
+              slicingPreferences={layoutConfig.slicing}
             />
           )}
           <TableWrapper>
@@ -284,7 +326,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
                     defaultColumnOrder={tableLayout.defaultColumnOrder}
                     onResetLayoutPreferences={onResetLayoutPreferences}
                     onLayoutPreferencesChange={onLayoutPreferencesChange}
-                    onChangeSlicing={onChangeSlicing}
+                    onChangeSlicing={onSlicingLayout}
                     expandedSectionRenderers={expandedSectionRenderers}
                     rowOverride={rowOverride}
                     enableSlicing={typeof fetchSlices === 'function'}
@@ -321,7 +363,7 @@ type WrapperProps<T extends EntityBase, M> = PaginatedEntityTableProps<T, M> & {
 };
 
 const TableWithLocalState = <T extends EntityBase, M = unknown>({ ...props }: WrapperProps<T, M>) => {
-  const { fetchOptions, setQuery, onChangeFilters, onChangeSlicing, paginationState } = useWithLocalState(
+  const { fetchOptions, setQuery, onChangeFilters, onChangeSlicingFilter, paginationState } = useWithLocalState(
     props.layoutConfig,
     props.defaultFilters,
   );
@@ -334,7 +376,7 @@ const TableWithLocalState = <T extends EntityBase, M = unknown>({ ...props }: Wr
       {...props}
       fetchOptions={effectiveFetchOptions}
       setQuery={props.externalSearch ? () => {} : setQuery}
-      onChangeSlicing={onChangeSlicing}
+      onChangeSlicingFilter={onChangeSlicingFilter}
       onChangeFilters={onChangeFilters}
       paginationState={paginationState}
       onDataLoaded={props.onDataLoaded}
@@ -343,7 +385,7 @@ const TableWithLocalState = <T extends EntityBase, M = unknown>({ ...props }: Wr
 };
 
 const TableWithURLParams = <T extends EntityBase, M = unknown>({ ...props }: WrapperProps<T, M>) => {
-  const { fetchOptions, setQuery, onChangeFilters, paginationState, onChangeSlicing } = useWithURLParams(
+  const { fetchOptions, setQuery, onChangeFilters, paginationState, onChangeSlicingFilter } = useWithURLParams(
     props.layoutConfig,
     props.defaultFilters,
   );
@@ -357,7 +399,7 @@ const TableWithURLParams = <T extends EntityBase, M = unknown>({ ...props }: Wra
       fetchOptions={effectiveFetchOptions}
       setQuery={props.externalSearch ? () => {} : setQuery}
       onChangeFilters={onChangeFilters}
-      onChangeSlicing={onChangeSlicing}
+      onChangeSlicingFilter={onChangeSlicingFilter}
       paginationState={paginationState}
       onDataLoaded={props.onDataLoaded}
     />

@@ -14,14 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.resources.entities.preferences.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import type { BsSize } from 'components/bootstrap/types';
+import type { SupportedMantineSize } from 'theme/types';
 
-import java.util.List;
+const sizeForMantine = (size: BsSize): SupportedMantineSize => {
+  switch (size) {
+    case 'xs':
+    case 'xsmall':
+      return 'xs';
+    case 'sm':
+    case 'small':
+      return 'sm';
+    case 'lg':
+    case 'large':
+      return 'lg';
+    default:
+      return 'md';
+  }
+};
 
-public record PredefinedLayoutVariant(@JsonProperty("layout_variant") String layoutVariant,
-                                      @JsonProperty("entity_list_id") String entityListId,
-                                      @JsonProperty("display_name") String displayName,
-                                      @JsonProperty("metrics") List<MetricValue> metrics) {
-}
+export default sizeForMantine;

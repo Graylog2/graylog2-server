@@ -20,6 +20,7 @@ import com.google.common.util.concurrent.Service;
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
+import org.graylog.datanode.configuration.ConfigurationWarningsLogger;
 import org.graylog.datanode.configuration.DatanodeTrustManagerProvider;
 import org.graylog.datanode.configuration.OpensearchConfigurationService;
 import org.graylog.datanode.configuration.variants.DatanodeKeystoreOpensearchCertificatesProvider;
@@ -82,6 +83,8 @@ public class OpensearchProcessBindings extends AbstractModule {
         // this service both starts and provides the opensearch process
         serviceBinder.addBinding().to(OpensearchConfigurationService.class).asEagerSingleton();
         serviceBinder.addBinding().to(OpensearchProcessService.class).asEagerSingleton();
+
+        bind(ConfigurationWarningsLogger.class).asEagerSingleton();
 
         bind(DatanodeTrustManagerProvider.class);
 

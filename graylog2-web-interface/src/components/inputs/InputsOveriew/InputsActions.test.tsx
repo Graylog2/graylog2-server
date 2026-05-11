@@ -116,7 +116,6 @@ const renderSUT = (input = baseInput, extraProps = {}) =>
       input={input as any}
       inputTypes={{} as any}
       inputTypeDescriptions={inputTypeDescriptions}
-      currentNode={null}
       {...extraProps}
     />,
   );
@@ -318,10 +317,13 @@ describe('InputsActions', () => {
     renderSUT(input);
     await openMoreActions();
 
-    expect(screen.getByText('Manage extractors')).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Manage extractors' })).toHaveAttribute(
+      'href',
+      '/system/inputs/glob1/extractors',
+    );
   });
 
-  it('shows Manage extractors (local) when input is local', async () => {
+  it('links Manage extractors to the input node for local inputs', async () => {
     const input = {
       ...baseInput,
       id: 'loc1',
@@ -333,7 +335,10 @@ describe('InputsActions', () => {
     renderSUT(input);
     await openMoreActions();
 
-    expect(screen.getByText('Manage extractors')).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Manage extractors' })).toHaveAttribute(
+      'href',
+      '/system/inputs/node-1/loc1/extractors',
+    );
   });
 
   it('shows Delete input and is able to delete input on confirmation', async () => {

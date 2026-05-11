@@ -14,14 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.resources.entities.preferences.model;
+import { defineConfig } from 'oxfmt';
+import config from '@graylog/oxfmt-config' with { type: 'json' };
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.List;
-
-public record PredefinedLayoutVariant(@JsonProperty("layout_variant") String layoutVariant,
-                                      @JsonProperty("entity_list_id") String entityListId,
-                                      @JsonProperty("display_name") String displayName,
-                                      @JsonProperty("metrics") List<MetricValue> metrics) {
-}
+export default defineConfig(config);
