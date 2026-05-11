@@ -110,7 +110,7 @@
         <auto-service.version>1.1.1</auto-service.version>
         <auto-value.version>1.11.1</auto-value.version>
         <aws-java-sdk-1.version>1.12.797</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.43.0</aws-java-sdk-2.version>
+        <aws-java-sdk-2.version>2.44.0</aws-java-sdk-2.version>
         <aws-kinesis-client.version>3.4.3</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.3.5</aws-msk-iam-auth.version>
         <bouncycastle.version>1.84</bouncycastle.version>
@@ -168,7 +168,7 @@
         <mongodb-driver.version>5.7.0</mongodb-driver.version>
         <mongojack.version>5.1.0</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.2.12.Final</netty.version>
+        <netty.version>4.2.13.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.77.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>5.3.2</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
@@ -184,7 +184,7 @@
         <shiro.version>2.1.0</shiro.version>
         <snakeyaml.version>2.6</snakeyaml.version>
         <snappy-java.version>1.1.10.8</snappy-java.version>
-        <oshi.version>6.12.0</oshi.version>
+        <oshi.version>7.0.1</oshi.version>
         <siv-mode.version>1.6.1</siv-mode.version>
         <slf4j.version>2.0.17</slf4j.version>
         <streamex.version>0.8.4</streamex.version>
