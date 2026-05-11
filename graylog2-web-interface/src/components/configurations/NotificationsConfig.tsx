@@ -57,8 +57,6 @@ const NotificationsConfig = () => {
 
   const [showModal, setShowModal] = useState(false);
 
-  // Direct-nav guard (task 4.3): when the user lands on this page without
-  // notifications_config:read, render an info alert instead of the form.
   if (!canRead) {
     return (
       <div>

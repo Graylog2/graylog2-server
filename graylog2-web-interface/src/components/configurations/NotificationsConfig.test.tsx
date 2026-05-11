@@ -111,9 +111,6 @@ describe('<NotificationsConfig>', () => {
 
     render(<NotificationsConfig />);
 
-    // updateError is exposed by the hook; the form (or its consumer) can render
-    // it. This test asserts the error is at least surfaced through the hook
-    // mock — the visual placement is verified manually in Phase 7 smoke.
     expect(useNotificationConfig).toHaveBeenCalled();
     expect(asMock(useNotificationConfig).mock.results[0].value.updateError).toEqual({
       status: 400,

@@ -21,16 +21,13 @@ import { act, renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 import { SystemNotifications } from '@graylog/server-api';
 
 import suppressConsole from 'helpers/suppressConsole';
-import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 
 import useNotificationConfig from './useNotificationConfig';
 
 jest.mock('@graylog/server-api', () => ({
-  SystemNotifications: { getConfig: jest.fn() },
+  SystemNotifications: { getConfig: jest.fn(), updateConfig: jest.fn() },
 }));
-
-jest.mock('logic/rest/FetchProvider', () => ({ __esModule: true, default: jest.fn() }));
 
 jest.mock('util/UserNotification', () => ({
   __esModule: true,
@@ -38,7 +35,7 @@ jest.mock('util/UserNotification', () => ({
 }));
 
 const getConfigMock = SystemNotifications.getConfig as jest.Mock;
-const fetchMock = fetch as jest.Mock;
+const updateConfigMock = SystemNotifications.updateConfig as jest.Mock;
 
 const buildWrapper = (queryClient: QueryClient) => {
   const Wrapper = ({ children }: { children: React.ReactNode }) =>
@@ -71,9 +68,9 @@ describe('useNotificationConfig', () => {
     expect(getConfigMock).not.toHaveBeenCalled();
   });
 
-  it('sends PUT /system/notifications/config with body { retention_days: 90 } on update', async () => {
+  it('updates the retention config via the generated SDK', async () => {
     getConfigMock.mockResolvedValue({ retention_days: 30 });
-    fetchMock.mockResolvedValue({ retention_days: 90 });
+    updateConfigMock.mockResolvedValue({ retention_days: 90 });
 
     const { result } = renderHook(() => useNotificationConfig(), { wrapper: buildWrapper(queryClient) });
 
@@ -83,11 +80,7 @@ describe('useNotificationConfig', () => {
       await result.current.update({ retention_days: 90 });
     });
 
-    expect(fetchMock).toHaveBeenCalledWith(
-      'PUT',
-      '/system/notifications/config',
-      { retention_days: 90 },
-    );
+    expect(updateConfigMock).toHaveBeenCalledWith({ retention_days: 90 });
   });
 
   it('rejects update locally when isUpdateEnabled=false (no network call)', async () => {
@@ -104,12 +97,12 @@ describe('useNotificationConfig', () => {
       await expect(result.current.update({ retention_days: 90 })).rejects.toBeDefined();
     });
 
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(updateConfigMock).not.toHaveBeenCalled();
   });
 
   it('shows a permission toast on 403 update failure', async () => {
     getConfigMock.mockResolvedValue({ retention_days: 30 });
-    fetchMock.mockRejectedValue({ status: 403 });
+    updateConfigMock.mockRejectedValue({ status: 403 });
 
     const { result } = renderHook(() => useNotificationConfig(), { wrapper: buildWrapper(queryClient) });
 
@@ -129,7 +122,7 @@ describe('useNotificationConfig', () => {
 
   it('does NOT toast on 400 (consumer renders inline validation)', async () => {
     getConfigMock.mockResolvedValue({ retention_days: 30 });
-    fetchMock.mockRejectedValue({ status: 400 });
+    updateConfigMock.mockRejectedValue({ status: 400 });
 
     const { result } = renderHook(() => useNotificationConfig(), { wrapper: buildWrapper(queryClient) });
 
@@ -142,7 +135,6 @@ describe('useNotificationConfig', () => {
     });
 
     expect(UserNotification.error).not.toHaveBeenCalled();
-    // Wait for the mutation state to settle into the error.
     await waitFor(() => expect(result.current.updateError).toEqual({ status: 400 }));
   });
 });

@@ -18,7 +18,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { SystemNotifications } from '@graylog/server-api';
 
-import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import type FetchError from 'logic/errors/FetchError';
 import type { SystemNotificationConfig } from 'components/notifications/types';
@@ -46,29 +45,14 @@ const useNotificationConfig = ({
   });
 
   const mutation = useMutation<SystemNotificationConfig, FetchError, SystemNotificationConfig>({
-    // PUT body is `{ retention_days }`. The generated `SystemNotifications.updateConfig`
-    // SDK stub takes only `requestOptions` — no body parameter — because the
-    // backend handler at NotificationsResource#updateConfig is missing the
-    // `@RequestBody(required = true, useParameterTypeSchema = true)` swagger
-    // annotation that other write endpoints (e.g. StreamResource#create,
-    // CollectorsConfigResource#put) carry. Until that annotation is added on
-    // the backend (graylog2-server#25873), we drop to fetch() so the body
-    // actually reaches the server. Response shape stays typed via the SDK
-    // derivation in `components/notifications/types.ts`.
-    //
-    // Internal permission guard: the consumer is expected to hide the save
-    // button when `isUpdateEnabled` is false (driven by
-    // `notifications_config:update`), but if `update` is fired anyway we
-    // refuse here rather than letting the request hit the network and fail
-    // 403 server-side.
     mutationFn: (config) => {
       if (!updateEnabled) {
         return Promise.reject(
-          new Error('Update of notifications retention configuration is not enabled — check notifications_config:update.'),
+          new Error('You do not have permission to update the notifications retention configuration.'),
         );
       }
 
-      return fetch('PUT', '/system/notifications/config', config);
+      return SystemNotifications.updateConfig(config);
     },
     onSuccess: (updated) => {
       queryClient.setQueryData(configKey, updated);
@@ -84,8 +68,6 @@ const useNotificationConfig = ({
         return;
       }
 
-      // 400 surfaces server-side validation messages; let consumers display
-      // them inline rather than as a generic toast.
       if (error?.status !== 400) {
         UserNotification.error(
           'Failed to update notifications retention configuration. Please try again.',
