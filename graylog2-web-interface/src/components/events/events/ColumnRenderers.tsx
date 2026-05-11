@@ -16,19 +16,19 @@
  */
 
 import * as React from 'react';
-import { useMemo } from 'react';
+import {useMemo} from 'react';
 import styled from 'styled-components';
 import isEmpty from 'lodash/isEmpty';
 
-import type { ColumnRenderers } from 'components/common/EntityDataTable';
+import type {ColumnRenderers} from 'components/common/EntityDataTable';
 import EventTypeLabel from 'components/events/events/EventTypeLabel';
-import type { Event, EventsAdditionalData } from 'components/events/events/types';
+import type {Event, EventsAdditionalData} from 'components/events/events/types';
 import PriorityName from 'components/events/events/PriorityName';
 import usePluginEntities from 'hooks/usePluginEntities';
 import EventFields from 'components/events/events/EventFields';
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
-import { Timestamp } from 'components/common';
-import type { ColumnRenderersByAttribute, EntityBase } from 'components/common/EntityDataTable/types';
+import {Timestamp} from 'components/common';
+import type {ColumnRenderersByAttribute, EntityBase} from 'components/common/EntityDataTable/types';
 import EventDefinitionLink from 'components/events/events/EventDefinitionLink';
 import RemediationSteps from 'components/events/ReplaySearchSidebar/RemediationSteps';
 import TagsCell from 'components/events/TagsCell';
@@ -92,7 +92,7 @@ const TimeRangeRenderer = ({ eventData }: { eventData: Event }) =>
     <em>No time range</em>
   );
 
-const TagsRenderer = ({ tags }: { tags: string[] | undefined }) => {
+export const TagsRenderer = ({ tags }: { tags: ReadonlyArray<string> | undefined | null }) => {
   const onTagClick = useAppendTagFilter();
 
   return <TagsCell tags={tags} onTagClick={onTagClick} />;

@@ -33,7 +33,7 @@ const TagsDetailRow = ({ tags }: Props) => {
     <DefinitionList>
       <dt>Tags</dt>
       <dd>
-        <TagsCell tags={tags} collapsedCount={Number.POSITIVE_INFINITY} onTagClick={onTagClick} />
+        <TagsCell tags={tags} truncate={false} onTagClick={onTagClick} />
       </dd>
     </DefinitionList>
   );

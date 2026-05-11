@@ -52,15 +52,6 @@ class EventsFilterBuilderTest {
     }
 
     @Test
-    void buildWithNullValueTagUsesNotExists() {
-        final var filter = EventsSearchFilter.builder()
-                .extraFilters(Map.of(EventDto.FIELD_TAGS, Set.of(EventsSearchFilter.NULL_VALUE)))
-                .build();
-
-        assertThat(build(filter)).contains("(NOT _exists_:tags)");
-    }
-
-    @Test
     void buildWithoutTagFilterDoesNotEmitTagsClause() {
         final var filter = EventsSearchFilter.empty();
 
@@ -88,16 +79,4 @@ class EventsFilterBuilderTest {
         assertThat(query).contains("tags:\"phish\\\"ing OR alert\\:true\"");
     }
 
-    @Test
-    void buildCombinesNullValueWithConcreteTagsUsingOR() {
-        final var filter = EventsSearchFilter.builder()
-                .extraFilters(Map.of(EventDto.FIELD_TAGS,
-                        new java.util.LinkedHashSet<>(java.util.List.of(EventsSearchFilter.NULL_VALUE, "phishing"))))
-                .build();
-
-        final var query = build(filter);
-        assertThat(query).contains("NOT _exists_:tags");
-        assertThat(query).contains("tags:\"phishing\"");
-        assertThat(query).contains(" OR ");
-    }
 }

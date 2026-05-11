@@ -23,6 +23,12 @@ const useAppendTagFilter = () => {
   // Use the context directly (not the throwing hook) so the component is safe
   // to render outside a PaginatedEntityTable — falls back to whatever filters
   // are in the URL today.
+  //
+  // Read-from-context vs write-to-URL: when inside a table, the context's
+  // searchParams.filters reflects the canonical state (URL + defaults).
+  // Writing back via setUrlFilters propagates to context through the table's
+  // URL-sync mechanism, so the asymmetry is intentional and consistent with
+  // how other filter writers in the codebase work.
   const tableFetchContext = useContext(TableFetchContext);
   const [urlFilters, setUrlFilters] = useUrlQueryFilters();
 

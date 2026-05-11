@@ -86,6 +86,7 @@ type Props = {
   tags: ReadonlyArray<string> | undefined | null;
   onTagClick?: (tag: string) => void;
   collapsedCount?: number;
+  truncate?: boolean;
   emptyFallback?: React.ReactNode;
 };
 
@@ -93,6 +94,7 @@ const TagsCell = ({
   tags,
   onTagClick = undefined,
   collapsedCount = DEFAULT_COLLAPSED_COUNT,
+  truncate = true,
   emptyFallback = null,
 }: Props) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -101,7 +103,7 @@ const TagsCell = ({
     return <>{emptyFallback}</>;
   }
 
-  const isTruncated = tags.length > collapsedCount;
+  const isTruncated = truncate && tags.length > collapsedCount;
   const visibleTags = !isExpanded && isTruncated ? tags.slice(0, collapsedCount) : tags;
   const hiddenCount = tags.length - collapsedCount;
 
@@ -118,7 +120,10 @@ const TagsCell = ({
       <TagButton
         key={tag}
         type="button"
-        onClick={() => onTagClick(tag)}
+        onClick={(e: React.MouseEvent) => {
+          e.stopPropagation();
+          onTagClick(tag);
+        }}
         aria-label={`Filter by tag "${tag}"`}
         title={`Filter by tag "${tag}"`}>
         <HoverableLabel bsStyle="default">{tag}</HoverableLabel>
@@ -134,7 +139,10 @@ const TagsCell = ({
           type="button"
           aria-label={isExpanded ? 'Show fewer tags' : 'Show all tags'}
           title={isExpanded ? 'Show fewer tags' : 'Show all tags'}
-          onClick={() => setIsExpanded((v) => !v)}>
+          onClick={(e: React.MouseEvent) => {
+            e.stopPropagation();
+            setIsExpanded((v) => !v);
+          }}>
           <Badge>{isExpanded ? <Icon name="keyboard_arrow_up" /> : `+ ${hiddenCount}`}</Badge>
         </ToggleButton>
       )}

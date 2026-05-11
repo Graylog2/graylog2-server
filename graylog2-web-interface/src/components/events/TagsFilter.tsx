@@ -22,6 +22,7 @@ import { Events } from '@graylog/server-api';
 
 import type { FilterComponentProps } from 'stores/PaginationTypes';
 import SuggestionsList from 'components/common/EntityFilters/FilterConfiguration/SuggestionsList';
+import useQuery_ from 'routing/useQuery';
 
 const DEFAULT_SEARCH_PARAMS = {
   query: '',
@@ -29,8 +30,8 @@ const DEFAULT_SEARCH_PARAMS = {
   page: 1,
 };
 
-// Suggestions come from a 30d window, matching AssociatedAssetsFilter's parity. A follow-up
-// could narrow this to the table's active timerange via useTableFetchContext + parseTimerangeFilter.
+// 30d window matches AssociatedAssetsFilter parity. Surfaces tags seen on events in the last 30d.
+// Defined-but-unfired tags won't appear here; that's an accepted limitation.
 const TIMERANGE_30D = { type: 'relative', range: 30 * 24 * 60 * 60 };
 
 // Hard cap on rendered suggestions; relies on the search box to narrow further.
@@ -48,11 +49,11 @@ const emptyFilter = {
   key: [] as string[],
 };
 
-const fetchTagSuggestions = (): Promise<Suggestion[]> =>
+const fetchTagSuggestions = (streamId: string | undefined): Promise<Suggestion[]> =>
   Events.slices({
     include_all: true,
     slice_column: 'tags',
-    query: '',
+    query: streamId ? `source_streams:${streamId}` : '',
     filter: emptyFilter,
     timerange: TIMERANGE_30D,
   }).then((response) =>
@@ -65,9 +66,11 @@ const fetchTagSuggestions = (): Promise<Suggestion[]> =>
 
 const TagsFilter = ({ attribute, allActiveFilters, filter, filterValueRenderer, onSubmit }: FilterComponentProps) => {
   const [searchParams, setSearchParams] = useState(DEFAULT_SEARCH_PARAMS);
-  const { data: allSuggestions, isInitialLoading } = useQuery({
-    queryKey: ['events', 'tag-suggestions'],
-    queryFn: fetchTagSuggestions,
+  const { stream_id: streamId } = useQuery_();
+  const streamIdParam = typeof streamId === 'string' ? streamId : undefined;
+  const { data: allSuggestions, isInitialLoading, isError } = useQuery({
+    queryKey: ['events', 'tag-suggestions', streamIdParam ?? 'all', `t${TIMERANGE_30D.range}`],
+    queryFn: () => fetchTagSuggestions(streamIdParam),
   });
 
   const suggestions = useMemo(
@@ -80,6 +83,10 @@ const TagsFilter = ({ attribute, allActiveFilters, filter, filterValueRenderer, 
     [allSuggestions, searchParams.query],
   );
 
+  // Surface a fetch failure as an empty-but-flagged list so the user isn't left wondering why no
+  // suggestions appear. The dropdown's "No results" state already handles the visual.
+  const effectiveSuggestions = isError ? [] : suggestions;
+
   return (
     <SuggestionsList
       allActiveFilters={allActiveFilters}
@@ -87,11 +94,11 @@ const TagsFilter = ({ attribute, allActiveFilters, filter, filterValueRenderer, 
       multiSelect={!filter}
       filterValueRenderer={filterValueRenderer}
       onSubmit={onSubmit}
-      suggestions={suggestions}
+      suggestions={effectiveSuggestions}
       isLoading={isInitialLoading}
-      total={suggestions?.length ?? 0}
+      total={effectiveSuggestions?.length ?? 0}
       page={1}
-      pageSize={suggestions?.length ?? 0}
+      pageSize={effectiveSuggestions?.length ?? 0}
       setSearchParams={setSearchParams}
     />
   );

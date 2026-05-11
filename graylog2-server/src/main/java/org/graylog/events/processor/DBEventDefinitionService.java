@@ -304,8 +304,10 @@ public class DBEventDefinitionService {
         }
         pipeline.add(Aggregates.unwind("$" + EventDefinitionDto.FIELD_TAGS));
         if (prefix != null && !prefix.isBlank()) {
+            // Stored tags are already lowercased via TagNormalizer, so a plain anchored regex
+            // against the lowercased prefix is sufficient — no need for the case-insensitive flag.
             final String pattern = "^" + Pattern.quote(prefix.toLowerCase(Locale.ROOT));
-            pipeline.add(Aggregates.match(Filters.regex(EventDefinitionDto.FIELD_TAGS, pattern, "i")));
+            pipeline.add(Aggregates.match(Filters.regex(EventDefinitionDto.FIELD_TAGS, pattern)));
         }
         pipeline.add(Aggregates.group("$" + EventDefinitionDto.FIELD_TAGS));
         pipeline.add(Aggregates.sort(Sorts.ascending("_id")));

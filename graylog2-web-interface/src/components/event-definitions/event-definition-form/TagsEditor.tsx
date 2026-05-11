@@ -44,6 +44,7 @@ const HELP_TEXT = 'Press Enter or Tab to add. Tags are lowercased and deduplicat
 const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) => {
   const [input, setInput] = useState('');
   const [debouncedInput] = useDebouncedValue(input, DEBOUNCE_MS);
+  const [validationError, setValidationError] = useState<React.ReactNode>(null);
 
   const { data, isFetching } = useQuery({
     queryKey: ['event-definitions', 'tag-suggestions', debouncedInput],
@@ -56,12 +57,25 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
 
   const handleChange = (event: React.ChangeEvent<{ value: (string | number)[] }>) => {
     const raw = event.target.value as (string | number)[];
-    const normalized = raw
+    const allNormalized = raw
       .map((value) => (typeof value === 'string' ? value : String(value)))
       .map(normalizeTag)
-      .filter((value) => value.length > 0 && value.length <= MAX_TAG_LENGTH);
+      .filter((value) => value.length > 0);
 
-    onChange(Array.from(new Set(normalized)).slice(0, MAX_TAGS));
+    const tooLong = allNormalized.filter((value) => value.length > MAX_TAG_LENGTH);
+    const withinLength = allNormalized.filter((value) => value.length <= MAX_TAG_LENGTH);
+    const deduped = Array.from(new Set(withinLength));
+    const overCount = deduped.length > MAX_TAGS;
+
+    if (tooLong.length > 0) {
+      setValidationError(`Each tag must be ${MAX_TAG_LENGTH} characters or fewer. ${tooLong.length} tag(s) dropped.`);
+    } else if (overCount) {
+      setValidationError(`Cannot exceed ${MAX_TAGS} tags. Extra tags dropped.`);
+    } else {
+      setValidationError(null);
+    }
+
+    onChange(deduped.slice(0, MAX_TAGS));
   };
 
   return (
@@ -72,7 +86,7 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
       onChange={handleChange}
       placeholder="e.g. authentication, brute-force, compliance"
       help={HELP_TEXT}
-      error={error}
+      error={error ?? validationError}
       isClearable
       isDisabled={disabled}
       suggestions={disabled ? undefined : suggestions}
