@@ -135,7 +135,6 @@ public class StreamServiceImpl implements StreamService {
         this.streamDeletionGuards = streamDeletionGuards;
         this.scopeService = scopeService;
 
-        // TODO: This class needs lifecycle management to avoid leaking objects in the EventBus
         eventBus.register(this);
 
         final CacheLoader<String, String> streamTitleLoader = new CacheLoader<>() {
