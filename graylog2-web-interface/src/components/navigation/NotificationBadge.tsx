@@ -50,9 +50,6 @@ const StyledInactiveNavItem = styled(InactiveNavItem)`
 const NotificationBadge = () => {
   const currentUser = useCurrentUser();
   const enabled = hasNotificationPermission(currentUser.permissions);
-  // Badge count = unread system notifications, polled every 3s. The hook hits
-  // GET /system/notifications/paginated?filters=is_read:false&per_page=1 and
-  // returns data.pagination.total, so we read it directly.
   const { data, isLoading } = useNotificationBadgeCount({ enabled });
 
   return isLoading || !data ? null : (

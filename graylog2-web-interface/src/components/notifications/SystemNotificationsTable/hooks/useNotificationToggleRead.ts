@@ -84,7 +84,6 @@ const useNotificationToggleRead = () => {
     },
 
     onError: (error, _vars, context) => {
-      // Revert all snapshots to their pre-optimistic state.
       context?.snapshot.forEach(([key, data]) => {
         queryClient.setQueryData(key, data);
       });
@@ -121,10 +120,7 @@ const useNotificationToggleRead = () => {
     },
 
     onSettled: (_data, error) => {
-      // Skip invalidation on 403 — the server state is unchanged so a refetch
-      // would just thrash the cache. The 404 path explicitly invalidates the
-      // table prefix in onError, so it doesn't need a second pass here either,
-      // but invalidating both is harmless. Bail only on 403.
+      // Skip invalidation on 403 — the server state is unchanged.
       if (error?.status === 403) return;
 
       queryClient.invalidateQueries({ queryKey: tableKey });

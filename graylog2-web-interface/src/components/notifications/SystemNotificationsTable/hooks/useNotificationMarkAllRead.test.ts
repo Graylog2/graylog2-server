@@ -25,10 +25,6 @@ import UserNotification from 'util/UserNotification';
 
 import useNotificationMarkAllRead from './useNotificationMarkAllRead';
 
-// The confirmation-modal-precedes-API-call assertion lives in the Phase 2
-// MarkAllAsReadConfirmationModal test (tasks.md:2.10). This test focuses on
-// the hook's own contract: 204 → invalidate both prefixes; 403 → toast +
-// skip invalidation.
 jest.mock('@graylog/server-api', () => ({
   SystemNotifications: { readAll: jest.fn() },
 }));

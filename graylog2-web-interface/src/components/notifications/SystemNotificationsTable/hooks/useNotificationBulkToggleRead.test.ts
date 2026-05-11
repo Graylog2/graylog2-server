@@ -103,9 +103,6 @@ describe('useNotificationBulkToggleRead', () => {
       });
     });
 
-    // The optimistic patch flips each row from its initial state.
-    // After settle the table is invalidated, so the cache may be re-fetched.
-    // The fetch call shape is what matters.
     expect(fetchMock).toHaveBeenCalledWith(
       'POST',
       '/system/notifications/bulk/toggle_read',

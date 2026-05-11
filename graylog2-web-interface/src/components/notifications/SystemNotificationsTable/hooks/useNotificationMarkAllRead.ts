@@ -31,11 +31,6 @@ const useNotificationMarkAllRead = () => {
   const tableKey = [...NOTIFICATIONS_QUERY_KEY, TABLE_KEY] as const;
   const badgeKey = [...NOTIFICATIONS_QUERY_KEY, BADGE_COUNT_KEY] as const;
 
-  // One-directional: backend marks every notification the user can see as read.
-  // The consumer (table toolbar) MUST gate this behind a confirmation modal —
-  // see Phase 2 MarkAllAsReadConfirmationModal — so we do NOT optimistic-patch
-  // here. After the 204 response we just invalidate; the table re-fetches and
-  // shows the post-mark-all state.
   return useMutation<unknown, FetchError, void>({
     mutationFn: () => SystemNotifications.readAll(),
 
