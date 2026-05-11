@@ -114,7 +114,7 @@ public class StreamServiceImpl implements StreamService {
     private final Set<StreamDeletionGuard> streamDeletionGuards;
     private final EntityScopeService scopeService;
     private final LoadingCache<String, String> streamTitleCache;
-    private volatile Set<String> systemStreamIds;
+    private final LoadingCache<Boolean, Set<String>> systemStreamIdsCache;
 
     @Inject
     public StreamServiceImpl(MongoCollections mongoCollections,
@@ -158,12 +158,32 @@ public class StreamServiceImpl implements StreamService {
                 .expireAfterAccess(Duration.ofSeconds(10))
                 .build(streamTitleLoader);
 
+        this.systemStreamIdsCache = CacheBuilder.newBuilder()
+                .expireAfterAccess(Duration.ofSeconds(10))
+                .build(new CacheLoader<>() {
+                    @Nonnull
+                    @Override
+                    public Set<String> load(@Nonnull Boolean includeDefaultStream) {
+                        final Set<String> ids;
+                        try (var stream = streamAllDTOs()) {
+                            ids = stream
+                                    .filter(s -> ImmutableSystemScope.NAME.equals(s.getScope()))
+                                    .map(Stream::getId)
+                                    .collect(Collectors.toSet());
+                        }
+                        if (includeDefaultStream) {
+                            return java.util.stream.Stream.concat(ids.stream(),
+                                    java.util.stream.Stream.of(DEFAULT_STREAM_ID)).collect(Collectors.toSet());
+                        }
+                        return ids;
+                    }
+                });
     }
 
     @Subscribe
     public void handleStreamsChanged(StreamsChangedEvent event) {
         event.streamIds().forEach(streamTitleCache::invalidate);
-        systemStreamIds = null;
+        systemStreamIdsCache.invalidateAll();
     }
 
     @Nullable
@@ -208,16 +228,7 @@ public class StreamServiceImpl implements StreamService {
 
     @Override
     public Set<String> getSystemStreamIds(boolean includeDefaultStream) {
-        if (systemStreamIds == null) {
-            try (var stream = streamAllDTOs()) {
-                systemStreamIds = stream
-                        .filter(s -> ImmutableSystemScope.NAME.equals(s.getScope()))
-                        .map(Stream::getId)
-                        .collect(Collectors.toSet());
-            }
-        }
-        return includeDefaultStream ? java.util.stream.Stream.concat(systemStreamIds.stream(),
-                java.util.stream.Stream.of(DEFAULT_STREAM_ID)).collect(Collectors.toSet()) : systemStreamIds;
+        return systemStreamIdsCache.getUnchecked(includeDefaultStream);
     }
 
     @Override
