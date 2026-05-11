@@ -18,8 +18,6 @@
 import Routes from 'routing/Routes';
 import type { LegacyNotificationType, NotificationType } from 'components/notifications/types';
 
-// Accepts both the new SystemNotificationDto and the legacy listNotifications()
-// row — the factory only reads `type` and `details`, which are common to both.
 type AnyNotification = NotificationType | LegacyNotificationType;
 
 class NotificationsFactory {

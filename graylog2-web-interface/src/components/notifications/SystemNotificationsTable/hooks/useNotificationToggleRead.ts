@@ -27,18 +27,7 @@ import {
   BADGE_COUNT_KEY,
   TABLE_KEY,
 } from 'components/notifications/constants';
-
-type PageShape = {
-  elements: NotificationType[];
-  pagination?: { total?: number };
-} & Record<string, unknown>;
-
-type Snapshot = Array<[readonly unknown[], PageShape | undefined]>;
-
-const isPageShape = (value: unknown): value is PageShape =>
-  typeof value === 'object'
-  && value !== null
-  && Array.isArray((value as PageShape).elements);
+import { type PageShape, type Snapshot, isPageShape } from './pageShape';
 
 const patchPages =
   (id: string, patch: Partial<NotificationType>) =>
@@ -67,7 +56,6 @@ const useNotificationToggleRead = () => {
     mutationFn: ({ id }) => SystemNotifications.toggleRead(id) as Promise<NotificationType>,
 
     onMutate: async ({ id, currentIsRead }) => {
-      // Stop in-flight refetches so they can't overwrite the optimistic patch.
       await queryClient.cancelQueries({ queryKey: tableKey });
 
       const snapshot = queryClient.getQueriesData<PageShape>({ queryKey: tableKey });
@@ -114,8 +102,7 @@ const useNotificationToggleRead = () => {
     },
 
     onSuccess: (serverEntity) => {
-      // Reconcile with the authoritative server entity (covers fields like
-      // server-modified `actor` if the backend overrides our optimistic value).
+      // patch with server response — backend may override actor/timestamps set optimistically
       queryClient.setQueriesData({ queryKey: tableKey }, patchPages(serverEntity.id, serverEntity));
     },
 

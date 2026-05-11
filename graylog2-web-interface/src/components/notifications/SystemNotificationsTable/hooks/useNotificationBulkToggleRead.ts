@@ -26,22 +26,9 @@ import {
   BADGE_COUNT_KEY,
   TABLE_KEY,
 } from 'components/notifications/constants';
+import { type PageShape, type Snapshot, isPageShape } from './pageShape';
 
-// Per-row context captured before the optimistic patch so we can flip each row
-// from its initial state — a mixed selection (read + unread) produces a mixed
-// result rather than forcing every row to the same target.
 type RowSeed = { id: string; currentIsRead: boolean };
-
-type PageShape = {
-  elements: NotificationType[];
-} & Record<string, unknown>;
-
-type Snapshot = Array<[readonly unknown[], PageShape | undefined]>;
-
-const isPageShape = (value: unknown): value is PageShape =>
-  typeof value === 'object'
-  && value !== null
-  && Array.isArray((value as PageShape).elements);
 
 const flipRows = (
   patches: Map<string, Partial<NotificationType>>,
@@ -116,11 +103,7 @@ const useNotificationBulkToggleRead = () => {
       );
     },
 
-    // Backend silently drops unknown ids in the request and returns 204; partial
-    // success is therefore indistinguishable from full success on the wire. We
-    // re-fetch so the displayed table reflects the authoritative server state
-    // (rows that didn't actually flip drop back to their original is_read).
-    // 403 is skipped — server state is unchanged, no point thrashing the cache.
+    // re-fetch after success: backend silently drops unknown ids so the optimistic patch may not match server state
     onSettled: (_data, error) => {
       if (error?.status === 403) return;
 

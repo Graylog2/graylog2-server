@@ -14,8 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { NotificationType } from 'components/notifications/types';
 
-export const NOTIFICATIONS_QUERY_KEY = ['system', 'notifications'] as const;
+export type PageShape = {
+  elements: NotificationType[];
+  pagination?: { total?: number };
+} & Record<string, unknown>;
 
-export const BADGE_COUNT_KEY = 'badge-count' as const;
-export const TABLE_KEY = 'table' as const;
+export type Snapshot = Array<[readonly unknown[], PageShape | undefined]>;
+
+export const isPageShape = (value: unknown): value is PageShape =>
+  typeof value === 'object'
+  && value !== null
+  && Array.isArray((value as PageShape).elements);

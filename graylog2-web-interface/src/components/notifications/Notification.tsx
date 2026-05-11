@@ -24,10 +24,6 @@ import useNotificationDelete from 'components/notifications/useNotificationDelet
 
 import useNotificationMessage from './useNotificationMessage';
 
-// Phase 5 will delete this component. It still consumes the legacy
-// `listNotifications()` endpoint via NotificationsList, so it is typed against
-// LegacyNotificationType. useNotificationMessage and NotificationsFactory both
-// accept the legacy + new union, so no widening is needed here.
 type Props = {
   notification: LegacyNotificationType;
 };

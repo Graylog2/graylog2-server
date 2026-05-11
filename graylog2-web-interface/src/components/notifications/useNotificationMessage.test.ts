@@ -56,7 +56,7 @@ describe('useNotificationMessage', () => {
     asMock(useQuery).mockClear();
   });
 
-  it('includes notification id, key, and type in the React Query entry key (Spec OQ-FE-1)', () => {
+  it('includes notification id, key, and type in the React Query entry key', () => {
     renderHook(() => useNotificationMessage(baseNotification));
 
     expect(useQuery).toHaveBeenCalledTimes(1);
@@ -72,9 +72,6 @@ describe('useNotificationMessage', () => {
   });
 
   it('produces a different cache key for two notifications with the same type but different ids', () => {
-    // Regression for the type-only collision: previously, both calls below would
-    // share the same queryKey ['system','notifications','message','no_input_running']
-    // and React Query would serve the wrong cached body to whichever rendered second.
     const second = { ...baseNotification, id: 'second-id' } as unknown as NotificationType;
 
     renderHook(() => useNotificationMessage(baseNotification));

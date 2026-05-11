@@ -27,9 +27,6 @@ const notificationMessageFixture = {
   description:
     '\n<span>\nThere is a node without any running inputs. This means that you are not receiving any messages from this\nnode at this point in time. This is most probably an indication of an error or misconfiguration.\n         You can click <a href="/system/inputs" target="_blank" rel="noreferrer">here</a> to solve this.\n</span>\n',
 };
-// Phase 5 will delete this component + test. Fixture is augmented with the
-// new SystemNotificationDto fields (actor, is_read, triggered_at, description,
-// title, last_changed) so it satisfies the flipped NotificationType.
 const notificationFixture = {
   id: 'deadbeef',
   details: {},

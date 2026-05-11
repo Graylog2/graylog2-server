@@ -21,14 +21,12 @@ import { useQueryClient } from '@tanstack/react-query';
 import { MenuItem } from 'components/bootstrap';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
-import type { NotificationType } from 'components/notifications/types';
 import { NOTIFICATIONS_QUERY_KEY, TABLE_KEY } from 'components/notifications/constants';
 import useNotificationBulkToggleRead from 'components/notifications/SystemNotificationsTable/hooks/useNotificationBulkToggleRead';
 import useNotificationMarkAllRead from 'components/notifications/SystemNotificationsTable/hooks/useNotificationMarkAllRead';
+import type { PageShape } from 'components/notifications/SystemNotificationsTable/hooks/pageShape';
 
 import MarkAllAsReadConfirmationModal from './MarkAllAsReadConfirmationModal';
-
-type PageShape = { elements: NotificationType[] } & Record<string, unknown>;
 
 const BulkActions = () => {
   const queryClient = useQueryClient();
