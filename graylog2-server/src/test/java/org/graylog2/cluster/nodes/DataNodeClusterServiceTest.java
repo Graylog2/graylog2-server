@@ -123,7 +123,7 @@ public class DataNodeClusterServiceTest {
     }
 
     @Test
-    public void testAllActive() throws NodeNotFoundException {
+    public void testAllActive() {
         assertThat(nodeService.allActive().keySet()).isEmpty();
         nodeService.registerServer(DataNodeDto.Builder.builder()
                 .setId(nodeId.getNodeId())
@@ -134,6 +134,41 @@ public class DataNodeClusterServiceTest {
                 .build());
         assertThat(nodeService.allActive().keySet()).containsExactly(nodeId.getNodeId());
 
+    }
+
+    @Test
+    public void testDropOutdated() throws NodeNotFoundException {
+        final String staleNodeId = "stale-node-0000-0000-0000-000000000000";
+
+        nodeService.registerServer(DataNodeDto.Builder.builder()
+                .setId(nodeId.getNodeId())
+                .setLeader(false)
+                .setTransportAddress(TRANSPORT_URI.toString())
+                .setHostname(LOCAL_CANONICAL_HOSTNAME)
+                .setDataNodeStatus(DataNodeStatus.STARTING)
+                .build());
+
+        nodeService.registerServer(DataNodeDto.Builder.builder()
+                .setId(staleNodeId)
+                .setLeader(false)
+                .setTransportAddress("http://10.0.0.2:12900")
+                .setHostname("stale.example.com")
+                .setDataNodeStatus(DataNodeStatus.STARTING)
+                .build());
+
+        // now let's set the last_seen back in time, so it will be dropped during the dropOutdated call.
+        final long staleEpochSeconds = (System.currentTimeMillis() - 2L * STALE_LEADER_TIMEOUT_MS) / 1000L;
+        mongoCollections.mongoConnection().getMongoDatabase()
+                .getCollection(DataNodeDto.COLLECTION_NAME)
+                .updateOne(eq("node_id", staleNodeId), set("last_seen", staleEpochSeconds));
+
+        assertThat(nodeService.allActive()).containsOnlyKeys(nodeId.getNodeId());
+
+        nodeService.dropOutdated();
+
+        assertThat(nodeService.byNodeId(nodeId)).isNotNull();
+        Assertions.assertThatThrownBy(() -> nodeService.byNodeId(new SimpleNodeId(staleNodeId)))
+                .isInstanceOf(NodeNotFoundException.class);
     }
 
     @Test
