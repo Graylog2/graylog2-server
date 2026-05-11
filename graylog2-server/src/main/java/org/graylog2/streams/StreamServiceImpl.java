@@ -139,8 +139,6 @@ public class StreamServiceImpl implements StreamService {
         this.streamDeletionGuards = streamDeletionGuards;
         this.scopeService = scopeService;
 
-        eventBus.register(this);
-
         final CacheLoader<String, String> streamTitleLoader = new CacheLoader<>() {
             @Nonnull
             @Override
@@ -178,6 +176,10 @@ public class StreamServiceImpl implements StreamService {
                         return ids;
                     }
                 });
+
+        // Register with EventBus last, after all fields are initialized, to avoid
+        // NPE if a StreamsChangedEvent arrives during construction.
+        eventBus.register(this);
     }
 
     @Subscribe
