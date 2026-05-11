@@ -19,7 +19,6 @@ package org.graylog2.cluster.nodes;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.BasicDBObject;
-import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.result.UpdateResult;
 import jakarta.inject.Inject;
@@ -37,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -92,12 +92,8 @@ public abstract class AbstractNodeService<DTO extends NodeDto> implements NodeSe
 
     @Override
     public DTO byNodeId(String nodeId) throws NodeNotFoundException {
-        try (MongoCursor<DTO> result = db.find(new BasicDBObject("node_id", nodeId)).iterator()) {
-            if (!result.hasNext()) {
-                throw new NodeNotFoundException("Unable to find node " + nodeId);
-            }
-            return result.next();
-        }
+        return Optional.ofNullable(db.find(new BasicDBObject("node_id", nodeId)).first())
+                .orElseThrow(() -> new NodeNotFoundException("Unable to find node " + nodeId));
     }
 
     @Override
