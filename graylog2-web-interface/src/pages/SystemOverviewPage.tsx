@@ -19,15 +19,19 @@ import * as React from 'react';
 import { DocumentTitle, IfPermitted } from 'components/common';
 import { IndexerClusterHealth } from 'components/indexers';
 import IndexerSystemOverviewComponent from 'components/indexers/IndexerSystemOverviewComponent';
-import { NotificationsList } from 'components/notifications';
+import { NotificationsList, SystemNotificationsTable } from 'components/notifications';
 import { SystemJobsComponent } from 'components/systemjobs';
 import { SystemMessagesComponent } from 'components/systemmessages';
 import { TimesList } from 'components/times';
 import GraylogClusterOverview from 'components/cluster/GraylogClusterOverview';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import HealthModule from 'components/health/HealthModule';
+import useFeature from 'hooks/useFeature';
 
-const SystemOverviewPage = () => (
+const SystemOverviewPage = () => {
+  const hasNewTable = useFeature('system_notifications_entity_table');
+
+  return (
   <DocumentTitle title="System overview">
     <span>
       <HideOnCloud>
@@ -35,7 +39,7 @@ const SystemOverviewPage = () => (
       </HideOnCloud>
 
       <IfPermitted permissions="notifications:read">
-        <NotificationsList />
+        {hasNewTable ? <SystemNotificationsTable /> : <NotificationsList />}
       </IfPermitted>
 
       <HideOnCloud>
@@ -60,6 +64,7 @@ const SystemOverviewPage = () => (
       </IfPermitted>
     </span>
   </DocumentTitle>
-);
+  );
+};
 
 export default SystemOverviewPage;

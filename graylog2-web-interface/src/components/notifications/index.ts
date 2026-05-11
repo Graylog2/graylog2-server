@@ -17,4 +17,5 @@
 export { default as GlobalAppNotifications } from './GlobalAppNotifications';
 export { default as Notification } from './Notification';
 export { default as NotificationsList } from './NotificationsList';
+export { default as SystemNotificationsTable } from './SystemNotificationsTable/SystemNotificationsTable';
 export { default as WithGlobalAppNotifications } from './WithGlobalAppNotifications';
