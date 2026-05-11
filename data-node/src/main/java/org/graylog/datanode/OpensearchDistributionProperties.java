@@ -22,9 +22,6 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Properties;
 
-/**
- * These are typed keys to the opense
- */
 public class OpensearchDistributionProperties {
     private final Properties properties;
 
