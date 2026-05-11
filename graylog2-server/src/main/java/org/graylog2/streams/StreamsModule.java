@@ -30,7 +30,7 @@ public class StreamsModule extends Graylog2Module {
     protected void configure() {
         bind(StreamRuleService.class).to(StreamRuleServiceImpl.class);
         bind(StreamService.class).to(StreamServiceImpl.class).in(Singleton.class);
-        bind(FavoriteFieldsService.class).to(FavoriteFieldsServiceImpl.class);
+        bind(FavoriteFieldsService.class).asEagerSingleton();
 
         Multibinder<StreamRuleInputsProvider> uriBinder = Multibinder.newSetBinder(binder(), StreamRuleInputsProvider.class);
         uriBinder.addBinding().to(StreamRuleServerInputsProvider.class);

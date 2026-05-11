@@ -29,6 +29,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.UpdateResult;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -44,9 +45,9 @@ import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.database.utils.ScopedEntityMongoUtils;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.IndexSet;
-import org.graylog2.indexer.indexset.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indexset.MongoIndexSet;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
@@ -62,6 +63,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -72,7 +74,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -95,6 +96,9 @@ import static org.graylog2.streams.StreamImpl.FIELD_INDEX_SET_ID;
 import static org.graylog2.streams.StreamImpl.FIELD_OUTPUTS;
 import static org.graylog2.streams.StreamImpl.FIELD_TITLE;
 
+// This class registers with EventBus. If not bound as singleton, it would need lifecycle management to avoid leaking objects in the EventBus.
+
+@Singleton
 public class StreamServiceImpl implements StreamService {
     private static final Logger LOG = LoggerFactory.getLogger(StreamServiceImpl.class);
     public static final String COLLECTION_NAME = "streams";
@@ -110,7 +114,7 @@ public class StreamServiceImpl implements StreamService {
     private final Set<StreamDeletionGuard> streamDeletionGuards;
     private final EntityScopeService scopeService;
     private final LoadingCache<String, String> streamTitleCache;
-    private Set<String> systemStreamIds;
+    private volatile Set<String> systemStreamIds;
 
     @Inject
     public StreamServiceImpl(MongoCollections mongoCollections,
@@ -151,7 +155,7 @@ public class StreamServiceImpl implements StreamService {
         };
 
         this.streamTitleCache = CacheBuilder.newBuilder()
-                .expireAfterAccess(10, TimeUnit.SECONDS)
+                .expireAfterAccess(Duration.ofSeconds(10))
                 .build(streamTitleLoader);
 
     }
@@ -159,6 +163,7 @@ public class StreamServiceImpl implements StreamService {
     @Subscribe
     public void handleStreamsChanged(StreamsChangedEvent event) {
         event.streamIds().forEach(streamTitleCache::invalidate);
+        systemStreamIds = null;
     }
 
     @Nullable
