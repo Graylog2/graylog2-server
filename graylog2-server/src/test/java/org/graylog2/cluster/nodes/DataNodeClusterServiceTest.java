@@ -196,10 +196,110 @@ public class DataNodeClusterServiceTest {
         // The aggregation pipeline must coerce the numeric value to a Date and treat the node as stale.
         Assertions.assertThat(nodeService.allActive()).isEmpty();
 
-        // dropOutdated must remove the legacy-formatted node.
+        // dropOutdated must filter the legacy-formatted node from "alive" queries.
         nodeService.dropOutdated();
         Assertions.assertThatThrownBy(() -> nodeService.byNodeId(nodeId))
                 .isInstanceOf(NodeNotFoundException.class);
+    }
+
+    @Test
+    public void testDropOutdatedMarksOfflineAndPreservesInventoryFields() throws NodeNotFoundException {
+        final String datanodeVersion = "6.3.0";
+
+        nodeService.registerServer(DataNodeDto.Builder.builder()
+                .setId(nodeId.getNodeId())
+                .setLeader(true)
+                .setTransportAddress(TRANSPORT_URI.toString())
+                .setHostname(LOCAL_CANONICAL_HOSTNAME)
+                .setDataNodeStatus(DataNodeStatus.AVAILABLE)
+                .setDatanodeVersion(datanodeVersion)
+                .build());
+
+        // Simulate stale heartbeat.
+        final long staleEpochSeconds = (System.currentTimeMillis() - 2L * STALE_LEADER_TIMEOUT_MS) / 1000L;
+        mongoCollections.mongoConnection().getMongoDatabase()
+                .getCollection(DataNodeDto.COLLECTION_NAME)
+                .updateOne(eq("node_id", nodeId.getNodeId()), set("last_seen", staleEpochSeconds));
+
+        nodeService.dropOutdated();
+
+        // byNodeId filters out offline rows.
+        Assertions.assertThatThrownBy(() -> nodeService.byNodeId(nodeId))
+                .isInstanceOf(NodeNotFoundException.class);
+
+        // The row still exists as inventory and preserves version/status/hostname.
+        final DataNodeDto offlineDto = nodeService.byNodeIdAnyState(nodeId.getNodeId()).orElseThrow();
+        assertThat(offlineDto.isOnline()).isFalse();
+        assertThat(offlineDto.isLeader()).isFalse();
+        assertThat(offlineDto.getDatanodeVersion()).isEqualTo(datanodeVersion);
+        assertThat(offlineDto.getDataNodeStatus()).isEqualTo(DataNodeStatus.AVAILABLE);
+        assertThat(offlineDto.getHostname()).isEqualTo(LOCAL_CANONICAL_HOSTNAME);
+    }
+
+    @Test
+    public void testAllKnownIncludesOfflineAllActiveExcludesThem() {
+        final String secondNodeId = "ffffffff-aaaa-aaaa-aaaa-000000000002";
+
+        nodeService.registerServer(DataNodeDto.Builder.builder()
+                .setId(nodeId.getNodeId())
+                .setLeader(true)
+                .setTransportAddress(TRANSPORT_URI.toString())
+                .setHostname(LOCAL_CANONICAL_HOSTNAME)
+                .setDataNodeStatus(DataNodeStatus.AVAILABLE)
+                .build());
+
+        nodeService.registerServer(DataNodeDto.Builder.builder()
+                .setId(secondNodeId)
+                .setLeader(false)
+                .setTransportAddress("http://10.0.0.2:12900")
+                .setHostname("offline.example.com")
+                .setDataNodeStatus(DataNodeStatus.AVAILABLE)
+                .build());
+
+        // Take the second node offline via the same path the shutdown hook uses.
+        final DataNodeDto current = nodeService.byNodeIdAnyState(secondNodeId).orElseThrow();
+        nodeService.update(current.offline());
+
+        assertThat(nodeService.allActive().keySet()).containsExactly(nodeId.getNodeId());
+        assertThat(nodeService.allKnown().keySet()).containsExactlyInAnyOrder(nodeId.getNodeId(), secondNodeId);
+        assertThat(nodeService.byNodeIdAnyState(secondNodeId)).isPresent();
+    }
+
+    @Test
+    public void testOfflineFlagExcludesNodeFromLeaderChecksDespiteFreshHeartbeat() {
+        nodeService.registerServer(DataNodeDto.Builder.builder()
+                .setId(nodeId.getNodeId())
+                .setLeader(true)
+                .setTransportAddress(TRANSPORT_URI.toString())
+                .setHostname(LOCAL_CANONICAL_HOSTNAME)
+                .setDataNodeStatus(DataNodeStatus.AVAILABLE)
+                .build());
+
+        assertThat(nodeService.isAnyLeaderPresent())
+                .describedAs("Freshly registered leader must be visible to leader checks")
+                .isTrue();
+
+        // Shutdown-hook path: mark offline without touching last_seen.
+        final DataNodeDto current = nodeService.byNodeIdAnyState(nodeId.getNodeId()).orElseThrow();
+        nodeService.update(current.offline());
+
+        assertThat(nodeService.isAnyLeaderPresent())
+                .describedAs("An offline node must not count as a present leader, even with a fresh heartbeat")
+                .isFalse();
+    }
+
+    @Test
+    @MongoDBFixtures("DataNodeClusterTest-one-node.json")
+    public void testLegacyRowsWithoutOnlineFieldTreatedAsOnline() throws NodeNotFoundException {
+        // The fixture row has no `online` field. Refresh its last_seen so it passes the heartbeat filter,
+        // then verify queries treat it as online.
+        mongoCollections.mongoConnection().getMongoDatabase()
+                .getCollection(DataNodeDto.COLLECTION_NAME)
+                .updateOne(eq("node_id", NODE_ID), set("last_seen", new java.util.Date()));
+
+        assertThat(nodeService.byNodeId(nodeId)).isNotNull();
+        assertThat(nodeService.allActive().keySet()).containsExactly(NODE_ID);
+        assertThat(nodeService.byNodeIdAnyState(NODE_ID)).isPresent();
     }
 
 }
