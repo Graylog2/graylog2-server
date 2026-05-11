@@ -262,7 +262,10 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
         [K in EventDefinitionConfigKeys]: { key: K; value: EventDefinition['config'][K] };
       }[EventDefinitionConfigKeys][],
     ) => {
-      const config = { ...eventDefinition.config, ...Object.fromEntries(updates.map(({ key, value }) => [key, value])) };
+      const config = {
+        ...eventDefinition.config,
+        ...Object.fromEntries(updates.map(({ key, value }) => [key, value])),
+      };
       setCurrentConfig(config);
 
       return config;
@@ -499,8 +502,8 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
   const onlyFilters = eventDefinition._scope === 'ILLUMINATE';
 
   const currentSelection = [
-    ...(eventDefinition.config.stream_categories.map((c) => 'category_' + c) ?? []),
-    ...(eventDefinition.config.streams.map((s) => 'stream_' + s) ?? []),
+    ...(eventDefinition.config?.stream_categories?.map((c) => 'category_' + c) ?? []),
+    ...(eventDefinition.config?.streams?.map((s) => 'stream_' + s) ?? []),
   ];
 
   const streamsAndCategories = [...streams.map((s) => s.id), ...(eventDefinition?.config?.streams ?? [])].map(
