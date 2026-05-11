@@ -23,6 +23,7 @@ import com.mongodb.client.MongoIterable;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Collation;
 import com.mongodb.client.model.CollationStrength;
+import com.mongodb.client.model.CountOptions;
 import org.bson.conversions.Bson;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoEntity;
@@ -163,10 +164,10 @@ public class DefaultMongoPaginationHelper<T extends MongoEntity> implements Mong
         try (final var stream = stream(getFindIterableBase(pageNumber, perPage))) {
             documents = stream.toList();
         }
-        final int total = Ints.saturatedCast(collection.countDocuments(filter));
+        final int total = Ints.saturatedCast(countDocuments(filter));
 
         if (includeGrandTotal) {
-            final long grandTotal = collection.countDocuments(grandTotalFilter);
+            final long grandTotal = countDocuments(grandTotalFilter);
             return new PaginatedList<>(documents, total, pageNumber, perPage, grandTotal);
         } else {
             return new PaginatedList<>(documents, total, pageNumber, perPage);
@@ -190,11 +191,18 @@ public class DefaultMongoPaginationHelper<T extends MongoEntity> implements Mong
         }
 
         if (includeGrandTotal) {
-            final long grandTotal = collection.countDocuments(grandTotalFilter);
+            final long grandTotal = countDocuments(grandTotalFilter);
             return new PaginatedList<>(documents, total, pageNumber, perPage, grandTotal);
         } else {
             return new PaginatedList<>(documents, total, pageNumber, perPage);
         }
+    }
+
+    private long countDocuments(@Nullable Bson countFilter) {
+        if (countFilter == null) {
+            return collection.countDocuments();
+        }
+        return collection.countDocuments(countFilter, new CountOptions().collation(collation));
     }
 
     private static String bsonToString(@Nullable Bson bson) {

@@ -184,10 +184,40 @@ class DefaultMongoPaginationHelperTest {
 
     @Test
     void testGrandTotalFilter() {
+        // Under the default case-insensitive collation Filters.in matches both
+        // upper- and lower-case variants (e.g. "A" matches "a" too), so the
+        // grand total reflects all 6 matches across the 16-document fixture.
         final Bson filter = Filters.in("name", "A", "B", "C");
         assertThat(paginationHelper.includeGrandTotal(true).grandTotalFilter(filter).page(1).grandTotal())
                 .isEqualTo(paginationHelper.includeGrandTotal(true).grandTotalFilter(filter).page(1, alwaysTrue()).grandTotal())
-                .contains(3L);
+                .contains(6L);
+    }
+
+    @Test
+    void totalsHonorDefaultCaseInsensitiveCollation() {
+        // The page contents (find) and the total/grandTotal (count) must agree on
+        // which documents the filter matches. The default collation makes the filter
+        // case-insensitive, so "name = 'a'" matches both "A" and "a".
+        final Bson filter = Filters.eq("name", "a");
+        final PaginatedList<DTO> page = paginationHelper
+                .filter(filter)
+                .includeGrandTotal(true)
+                .grandTotalFilter(filter)
+                .page(1);
+
+        assertThat(page).hasSize(2);
+        assertThat(page.pagination().total()).isEqualTo(2);
+        assertThat(page.grandTotal()).contains(2L);
+
+        final PaginatedList<DTO> pageWithSelector = paginationHelper
+                .filter(filter)
+                .includeGrandTotal(true)
+                .grandTotalFilter(filter)
+                .page(1, alwaysTrue());
+
+        assertThat(pageWithSelector).hasSize(2);
+        assertThat(pageWithSelector.pagination().total()).isEqualTo(2);
+        assertThat(pageWithSelector.grandTotal()).contains(2L);
     }
 
     @Test
