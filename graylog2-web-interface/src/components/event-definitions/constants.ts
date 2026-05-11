@@ -52,7 +52,8 @@ const getEventDefinitionTableElements = (pluggableAttributes?: {
   const additionalAttributes = [
     { id: 'scheduling', title: 'Scheduling', sortable: false },
     { id: 'matched_at', title: 'Last Matched', sortable: true },
-    { id: 'tags', title: 'Tags', sortable: false, searchable: true },
+    // `tags` is supplied by the backend via EventDefinitionsResource attribute list; no need
+    // to add it here, otherwise PaginatedEntityTable renders a duplicate Tags column.
     ...(pluggableAttributes?.attributes || []),
   ];
 
