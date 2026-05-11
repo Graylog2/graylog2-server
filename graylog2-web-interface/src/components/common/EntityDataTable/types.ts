@@ -67,11 +67,24 @@ export type ColumnPreferences = {
   };
 };
 
+export type SlicingPreferences = {
+  sliceColumn: string;
+  sortBy: string;
+  order: 'asc' | 'desc';
+};
+
+export type SlicingPreferencesJSON = {
+  slice_column: string;
+  sort_by: string;
+  order: 'asc' | 'desc';
+};
+
 export type TableLayoutPreferences<T = { [key: string]: unknown }> = {
   attributes?: ColumnPreferences;
   sort?: Sort;
   perPage?: number;
   order?: Array<string>;
+  slicing?: SlicingPreferences;
   customPreferences?: T;
 };
 
@@ -82,6 +95,7 @@ export type TableLayoutPreferencesJSON<T = { [key: string]: unknown }> = {
     order: 'asc' | 'desc';
   };
   per_page?: number;
+  slicing?: SlicingPreferencesJSON;
   custom_preferences?: T;
   order?: Array<string>;
 };
@@ -101,6 +115,7 @@ export type RowOverride<Entity extends EntityBase> = (entity: Entity) => React.R
 
 export type DefaultLayout = {
   entityTableId: string;
+  layoutVariant?: string;
   defaultSort: Sort;
   defaultDisplayedAttributes: Array<string>;
   defaultPageSize: number;
