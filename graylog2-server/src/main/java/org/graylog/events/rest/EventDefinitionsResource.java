@@ -122,6 +122,8 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 public class EventDefinitionsResource extends RestResource implements PluginRestResource {
     private static final Logger LOG = LoggerFactory.getLogger(EventDefinitionsResource.class);
 
+    private static final int TAG_SUGGESTIONS_MAX_LIMIT = 100;
+
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
             .put("title", SearchQueryField.create(EventDefinitionDto.FIELD_TITLE))
@@ -249,6 +251,24 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         return PageListResponse.create(query, definitionDtos.pagination(),
                 definitionDtos.pagination().total(), sort, order, eventDefinitionDtos, attributes, settings);
     }
+
+    @GET
+    @Path("/tags")
+    @Operation(summary = "Suggest tag values across event definitions, optionally narrowed by case-insensitive prefix")
+    public TagSuggestionsResponse suggestTags(@Parameter(name = "prefix") @QueryParam("prefix") @DefaultValue("") String prefix,
+                                              @Parameter(name = "limit") @QueryParam("limit") @DefaultValue("10") int limit) {
+        final int boundedLimit = Math.max(1, Math.min(limit, TAG_SUGGESTIONS_MAX_LIMIT));
+
+        if (isPermitted(RestPermissions.EVENT_DEFINITIONS_READ)) {
+            return new TagSuggestionsResponse(dbService.suggestTags(prefix, boundedLimit));
+        }
+
+        final var permittedIds = dbService.findPermittedIds(
+                id -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, id));
+        return new TagSuggestionsResponse(dbService.suggestTags(prefix, boundedLimit, permittedIds));
+    }
+
+    public record TagSuggestionsResponse(@JsonProperty("tags") List<String> tags) { }
 
     @GET
     @Operation(summary = "List event definitions")

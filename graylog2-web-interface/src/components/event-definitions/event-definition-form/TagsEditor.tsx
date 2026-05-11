@@ -15,8 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { EventsDefinitions } from '@graylog/server-api';
 
 import { InputList } from 'components/common';
+import useDebouncedValue from 'hooks/useDebouncedValue';
 
 // Mirror of TagNormalizer on the server. Keep in sync.
 const normalizeTag = (raw: string): string => raw.trim().toLowerCase();
@@ -24,6 +28,9 @@ const normalizeTag = (raw: string): string => raw.trim().toLowerCase();
 // Mirror of EventDefinitionDto.MAX_TAGS / MAX_TAG_LENGTH. Keep in sync.
 const MAX_TAGS = 64;
 const MAX_TAG_LENGTH = 128;
+
+const SUGGESTION_LIMIT = 50;
+const DEBOUNCE_MS = 300;
 
 type Props = {
   tags: ReadonlyArray<string>;
@@ -35,6 +42,18 @@ type Props = {
 const HELP_TEXT = 'Press Enter or Tab to add. Tags are lowercased and deduplicated.';
 
 const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) => {
+  const [input, setInput] = useState('');
+  const [debouncedInput] = useDebouncedValue(input, DEBOUNCE_MS);
+
+  const { data, isFetching } = useQuery({
+    queryKey: ['event-definitions', 'tag-suggestions', debouncedInput],
+    queryFn: () => EventsDefinitions.suggestTags(debouncedInput, SUGGESTION_LIMIT),
+    placeholderData: keepPreviousData,
+    staleTime: 30_000,
+    enabled: !disabled,
+  });
+  const suggestions = (data?.tags ?? []).filter((s: string) => !tags.includes(s));
+
   const handleChange = (event: React.ChangeEvent<{ value: (string | number)[] }>) => {
     const raw = event.target.value as (string | number)[];
     const normalized = raw
@@ -56,6 +75,9 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
       error={error}
       isClearable
       isDisabled={disabled}
+      suggestions={disabled ? undefined : suggestions}
+      onSuggestionsInputChange={setInput}
+      isLoadingSuggestions={isFetching}
     />
   );
 };
