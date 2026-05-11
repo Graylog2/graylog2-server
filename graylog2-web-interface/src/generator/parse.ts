@@ -272,17 +272,20 @@ type RawOperation = {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE';
   nickname: string;
   type: string | RawType;
+  items?: RawType;
   parameters: Array<RawParameter>;
   path?: string;
   produces: Array<RawContentType>;
 };
 
-function createOperation({ summary, method, type, parameters, nickname, path, produces }: RawOperation): Operation {
+function createOperation({ summary, method, type, items, parameters, nickname, path, produces }: RawOperation): Operation {
+  const rawType: string | RawType = type === 'array' && items ? { type: 'array', items } : type;
+
   return {
     method,
     summary,
     nickname,
-    type: typeof type === 'string' ? createType({ type }) : createType(type),
+    type: typeof rawType === 'string' ? createType({ type: rawType }) : createType(rawType),
     parameters: parameters?.map(createParameter) ?? [],
     path,
     produces,

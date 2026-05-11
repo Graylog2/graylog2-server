@@ -44,7 +44,7 @@ public class OshiProcessProbe implements ProcessProbe {
 
         final ProcessStats.Cpu cpu = ProcessStats.Cpu.create(((short) proc.getProcessCpuLoadCumulative()), proc.getKernelTime(), proc.getUserTime(), proc.getUpTime());
 
-        final ProcessStats.Memory mem = ProcessStats.Memory.create(proc.getVirtualSize(), proc.getResidentSetSize(), -1);
+        final ProcessStats.Memory mem = ProcessStats.Memory.create(proc.getVirtualSize(), proc.getPrivateResidentMemory(), -1);
 
         return ProcessStats.create(pid, fs.getOpenFileDescriptors(), fs.getMaxFileDescriptors(), cpu, mem);
     }
