@@ -143,12 +143,11 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                     .sortable(false)
                     .filterable(true)
                     .filterOptions(DBEntitySourceService.FILTER_OPTIONS)
-                    .build(),
-            EntityAttribute.builder().id(EventDefinitionDto.FIELD_TAGS).title("Tags")
-                    .type(SearchQueryField.Type.STRING)
-                    .sortable(false)
-                    .searchable(true)
                     .build()
+            // Note: `tags` is registered as an Attribute on the frontend
+            // (event-definitions/constants.ts) because the filter UI needs a custom
+            // filter_component (EventDefinitionTagsFilter). The SEARCH_FIELDS map above
+            // keeps tags searchable from the query bar.
     );
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
@@ -222,11 +221,20 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         }
         Predicate<EventDefinitionDto> predicate = event -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id());
 
-        // The only filterable field currently is entity source. If new filterable fields are added, this logic needs to
-        // be adjusted so that other filters remain part of the filters, are included in the generation of searchQuery,
-        // and entity source filtering is still moved to the predicate to be applied after reading from the database.
+        // Entity-source filter and tags filter are applied via predicate after the Mongo read.
+        // Tags use AND semantics (event def must carry every selected tag), matching the
+        // GitHub-style label filter convention.
         final SourcedMongoEntityUtils.FilterPredicate<EventDefinitionDto> filterPredicate = SourcedMongoEntityUtils.handleScopedEntitySourceFilter(filters, predicate);
         predicate = filterPredicate.predicate();
+        final List<String> tagFilters = filters == null ? List.of() :
+                filters.stream()
+                        .filter(f -> f != null && f.startsWith(EventDefinitionDto.FIELD_TAGS + ":"))
+                        .map(f -> f.substring(EventDefinitionDto.FIELD_TAGS.length() + 1))
+                        .filter(v -> !v.isBlank())
+                        .toList();
+        if (!tagFilters.isEmpty()) {
+            predicate = predicate.and(event -> event.tags().containsAll(tagFilters));
+        }
 
         final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(
                 searchQuery,

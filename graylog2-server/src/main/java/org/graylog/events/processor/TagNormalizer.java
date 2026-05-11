@@ -22,8 +22,16 @@ import com.google.common.collect.Streams;
 import javax.annotation.Nullable;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 public final class TagNormalizer {
+    /**
+     * Allowed character set for an event-definition tag. Lowercase ASCII letters, digits, hyphen,
+     * and underscore. Restricting to this set keeps tag values safe to embed directly in search
+     * queries (no Lucene/Mongo metacharacters) and avoids surprises in URL filters.
+     */
+    public static final Pattern VALID_TAG_PATTERN = Pattern.compile("[a-z0-9_-]+");
+
     private TagNormalizer() {}
 
     public static ImmutableSet<String> normalize(@Nullable Iterable<String> tags) {
@@ -35,5 +43,10 @@ public final class TagNormalizer {
                 .map(tag -> tag.trim().toLowerCase(Locale.ROOT))
                 .filter(s -> !s.isEmpty())
                 .collect(ImmutableSet.toImmutableSet());
+    }
+
+    /** True if the tag (after normalization) contains only allowed characters. */
+    public static boolean isValid(String tag) {
+        return tag != null && VALID_TAG_PATTERN.matcher(tag).matches();
     }
 }

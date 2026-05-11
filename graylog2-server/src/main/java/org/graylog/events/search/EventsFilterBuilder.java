@@ -91,11 +91,14 @@ public class EventsFilterBuilder {
             }
         }
 
+        // Multi-tag filter uses AND semantics (match events tagged with ALL selected values),
+        // matching GitHub-style label filtering. Cross-attribute filters are AND'd via the
+        // outer joiningQueriesWithAND at the bottom of build().
         final Set<String> tags = parameters.filter().extraFilters().getOrDefault(EventDto.FIELD_TAGS, Set.of());
         if (!tags.isEmpty()) {
             filterBuilder.add(tags.stream()
                     .map(tagFilter -> EventDto.FIELD_TAGS + ":" + quote(luceneEscape(tagFilter)))
-                    .collect(joiningQueriesWithOR));
+                    .collect(joiningQueriesWithAND));
         }
 
         switch (parameters.filter().alerts()) {

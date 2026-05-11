@@ -40,15 +40,17 @@ class EventsFilterBuilderTest {
     }
 
     @Test
-    void buildWithMultipleTagFiltersJoinsWithOR() {
+    void buildWithMultipleTagFiltersJoinsWithAND() {
         final var filter = EventsSearchFilter.builder()
                 .extraFilters(Map.of(EventDto.FIELD_TAGS, new java.util.LinkedHashSet<>(java.util.List.of("phishing", "exfil"))))
                 .build();
 
         final var query = build(filter);
+        // AND semantics: event must carry all selected tags.
         assertThat(query).contains("tags:\"phishing\"");
         assertThat(query).contains("tags:\"exfil\"");
-        assertThat(query).contains(" OR ");
+        assertThat(query).contains(" AND ");
+        assertThat(query).doesNotContain(" OR ");
     }
 
     @Test

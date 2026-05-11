@@ -23,6 +23,7 @@ import { Events } from '@graylog/server-api';
 import type { FilterComponentProps } from 'stores/PaginationTypes';
 import SuggestionsList from 'components/common/EntityFilters/FilterConfiguration/SuggestionsList';
 import useQuery_ from 'routing/useQuery';
+import { MISSING_BUCKET_NAME } from 'views/Constants';
 
 const DEFAULT_SEARCH_PARAMS = {
   query: '',
@@ -59,49 +60,76 @@ const fetchTagSuggestions = (streamId: string | undefined): Promise<Suggestion[]
   }).then((response) =>
     (response?.slices ?? [])
       .map((slice) => slice?.value)
-      .filter((value): value is string => typeof value === 'string' && value.length > 0)
+      // Drop the scripting-API missing-bucket placeholder — events without tags would otherwise
+      // surface as a literal "(Empty Value)" suggestion, which isn't a real tag to filter by.
+      .filter((value): value is string =>
+        typeof value === 'string' && value.length > 0 && value !== MISSING_BUCKET_NAME)
       .sort()
       .map((value) => ({ id: value, value })),
   );
 
-const TagsFilter = ({ attribute, allActiveFilters, filter, filterValueRenderer, onSubmit }: FilterComponentProps) => {
-  const [searchParams, setSearchParams] = useState(DEFAULT_SEARCH_PARAMS);
-  const { stream_id: streamId } = useQuery_();
-  const streamIdParam = typeof streamId === 'string' ? streamId : undefined;
-  const { data: allSuggestions, isInitialLoading, isError } = useQuery({
-    queryKey: ['events', 'tag-suggestions', streamIdParam ?? 'all', `t${TIMERANGE_30D.range}`],
-    queryFn: () => fetchTagSuggestions(streamIdParam),
-  });
+type FetchSuggestions = (streamId: string | undefined) => Promise<Suggestion[]>;
 
-  const suggestions = useMemo(
-    () =>
-      allSuggestions
-        ? allSuggestions
-            .filter((s) => s.value.toLowerCase().includes(searchParams.query.toLowerCase()))
-            .slice(0, MAX_RENDERED_SUGGESTIONS)
-        : allSuggestions,
-    [allSuggestions, searchParams.query],
-  );
+/**
+ * Build a `filter_component` for the tags column. Different consumers use different sources of
+ * truth (indexed events vs. defined event definitions) so the fetcher is injected.
+ */
+export const createTagsFilter = ({
+  queryKeyPrefix,
+  fetchSuggestions,
+  streamScoped = false,
+}: {
+  queryKeyPrefix: ReadonlyArray<string>;
+  fetchSuggestions: FetchSuggestions;
+  streamScoped?: boolean;
+}) => {
+  const Filter = ({ attribute, allActiveFilters, filter, filterValueRenderer, onSubmit }: FilterComponentProps) => {
+    const [searchParams, setSearchParams] = useState(DEFAULT_SEARCH_PARAMS);
+    const { stream_id: streamId } = useQuery_();
+    const streamIdParam = streamScoped && typeof streamId === 'string' ? streamId : undefined;
+    const { data: allSuggestions, isInitialLoading, isError } = useQuery({
+      queryKey: [...queryKeyPrefix, streamIdParam ?? 'all'],
+      queryFn: () => fetchSuggestions(streamIdParam),
+    });
 
-  // Surface a fetch failure as an empty-but-flagged list so the user isn't left wondering why no
-  // suggestions appear. The dropdown's "No results" state already handles the visual.
-  const effectiveSuggestions = isError ? [] : suggestions;
+    const suggestions = useMemo(
+      () =>
+        allSuggestions
+          ? allSuggestions
+              .filter((s) => s.value.toLowerCase().includes(searchParams.query.toLowerCase()))
+              .slice(0, MAX_RENDERED_SUGGESTIONS)
+          : allSuggestions,
+      [allSuggestions, searchParams.query],
+    );
 
-  return (
-    <SuggestionsList
-      allActiveFilters={allActiveFilters}
-      attribute={attribute}
-      multiSelect={!filter}
-      filterValueRenderer={filterValueRenderer}
-      onSubmit={onSubmit}
-      suggestions={effectiveSuggestions}
-      isLoading={isInitialLoading}
-      total={effectiveSuggestions?.length ?? 0}
-      page={1}
-      pageSize={effectiveSuggestions?.length ?? 0}
-      setSearchParams={setSearchParams}
-    />
-  );
+    // Surface a fetch failure as an empty list so the user isn't left wondering why no
+    // suggestions appear. The dropdown's "No results" state already handles the visual.
+    const effectiveSuggestions = isError ? [] : suggestions;
+
+    return (
+      <SuggestionsList
+        allActiveFilters={allActiveFilters}
+        attribute={attribute}
+        multiSelect={!filter}
+        filterValueRenderer={filterValueRenderer}
+        onSubmit={onSubmit}
+        suggestions={effectiveSuggestions}
+        isLoading={isInitialLoading}
+        total={effectiveSuggestions?.length ?? 0}
+        page={1}
+        pageSize={effectiveSuggestions?.length ?? 0}
+        setSearchParams={setSearchParams}
+      />
+    );
+  };
+
+  return Filter;
 };
+
+const TagsFilter = createTagsFilter({
+  queryKeyPrefix: ['events', 'tag-suggestions', `t${TIMERANGE_30D.range}`],
+  fetchSuggestions: fetchTagSuggestions,
+  streamScoped: true,
+});
 
 export default TagsFilter;

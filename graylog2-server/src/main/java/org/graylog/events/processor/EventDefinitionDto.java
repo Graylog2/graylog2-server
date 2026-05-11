@@ -217,6 +217,11 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
             validation.addError(FIELD_TAGS, "Event Definition cannot have more than " + MAX_TAGS + " tags.");
         }
 
+        if (tags().stream().anyMatch(tag -> !TagNormalizer.isValid(tag))) {
+            validation.addError(FIELD_TAGS,
+                    "Event Definition tags may only contain lowercase letters, digits, hyphens and underscores.");
+        }
+
         return validation;
     }
 
