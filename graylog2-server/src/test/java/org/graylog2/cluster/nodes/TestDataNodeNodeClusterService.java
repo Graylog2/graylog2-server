@@ -83,8 +83,4 @@ public class TestDataNodeNodeClusterService implements NodeService<DataNodeDto> 
         throw new UnsupportedOperationException("Unsupported operation");
     }
 
-    @Override
-    public void markAsAlive(DataNodeDto dto) throws NodeNotFoundException {
-        throw new UnsupportedOperationException("Unsupported operation");
-    }
 }

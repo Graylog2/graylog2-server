@@ -151,22 +151,6 @@ public abstract class AbstractNodeService<DTO extends NodeDto> implements NodeSe
         }
     }
 
-    /**
-     * Mark this node as alive and probably update some settings that may have changed since last server boot.
-     */
-    @Override
-    public void markAsAlive(DTO dto) throws NodeNotFoundException {
-        var result = db.replaceOne(new BasicDBObject("node_id", dto.getNodeId()), dto);
-        if (result.getMatchedCount() != 1) {
-            throw new NodeNotFoundException("Unable to find node " + dto.getNodeId());
-        }
-        // set timestamp using db
-        db.updateOne(
-                new BasicDBObject("node_id", dto.getNodeId()),
-                new BasicDBObject("$currentDate", lastSeenFieldDefinition)
-        );
-    }
-
     @Override
     public boolean isOnlyLeader(NodeId nodeId) {
         try (var stream = aggregate(recentHeartbeat(List.of(
@@ -192,12 +176,16 @@ public abstract class AbstractNodeService<DTO extends NodeDto> implements NodeSe
 
     @Override
     public void ping(DTO dto) {
-        try {
-            markAsAlive(dto);
-        } catch (NodeNotFoundException e) {
+        var result = db.replaceOne(new BasicDBObject("node_id", dto.getNodeId()), dto);
+        if (result.getMatchedCount() != 1) {
             LOG.warn("Did not find meta info of this node. Re-registering.");
             registerServer(dto);
         }
+        // set timestamp using db
+        db.updateOne(
+                new BasicDBObject("node_id", dto.getNodeId()),
+                new BasicDBObject("$currentDate", lastSeenFieldDefinition)
+        );
         try {
             // Remove old nodes that are no longer running. (Just some housekeeping)
             dropOutdated();

@@ -35,8 +35,6 @@ public interface NodeService<T extends NodeDto> {
 
     void dropOutdated();
 
-    void markAsAlive(T dto) throws NodeNotFoundException;
-
     boolean isOnlyLeader(NodeId nodeIde);
 
     boolean isAnyLeaderPresent();
