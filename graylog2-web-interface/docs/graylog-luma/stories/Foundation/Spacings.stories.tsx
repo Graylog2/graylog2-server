@@ -18,7 +18,7 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import styled, { useTheme } from 'styled-components';
 
-import { FoundationItem, PageTitle, PxLabel, Strong, Token, TokenRow, UsageNote } from './shared';
+import { FoundationItem, PxLabel, StoryContainer, Token, TokenRow, UsageNote } from './shared';
 
 // ─── Spacings ──────────────────────────────────────────────────────────────
 
@@ -27,7 +27,7 @@ const SpacingBar = styled.div<{ $height: string }>`
   height: ${({ $height }) => $height};
   background-color: #6366f1;
   border-radius: 2px;
-  margin-bottom: 4px;
+  margin-bottom: ${({ theme }) => theme.spacings.xxs};
 `;
 
 type SpacingKey = 'xxs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
@@ -80,12 +80,12 @@ const SpacingsDoc = () => {
   const theme = useTheme();
 
   return (
-    <div>
-      <PageTitle>Spacings</PageTitle>
-      <UsageNote style={{ marginBottom: 24 }}>
-        Spacing tokens are for <Strong>component authors</Strong> building new reusable components.
-        When you are composing existing components, their internal spacing is already built in — you
-        do not need to apply these manually.
+    <StoryContainer>
+      <h1>Spacings</h1>
+      <UsageNote>
+        Spacing tokens are for <strong>component authors</strong> building new reusable components. When you are
+        composing existing components, their internal spacing is already built in — you do not need to apply these
+        manually.
       </UsageNote>
       {SPACINGS.map(({ key, token, when }) => {
         const value = (theme.spacings as Record<string, string>)[key];
@@ -101,13 +101,13 @@ const SpacingsDoc = () => {
             </TokenRow>
             <SpacingBar $height={value} />
             <UsageNote>
-              <Strong>Use for: </Strong>
+              <strong>Use for: </strong>
               {when}
             </UsageNote>
           </FoundationItem>
         );
       })}
-    </div>
+    </StoryContainer>
   );
 };
 

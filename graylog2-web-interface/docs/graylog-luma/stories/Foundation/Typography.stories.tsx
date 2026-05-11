@@ -18,7 +18,7 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import styled, { useTheme } from 'styled-components';
 
-import { FoundationItem, PageTitle, PxLabel, Strong, Token, TokenRow, UsageNote } from './shared';
+import { FoundationItem, PxLabel, StoryContainer, Token, TokenRow, UsageNote } from './shared';
 
 // Root font size matching theme/constants ROOT_FONT_SIZE
 const ROOT_FONT_SIZE = 16;
@@ -31,7 +31,7 @@ const FamilyLabel = styled.span`
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.primary};
   display: block;
-  margin: 4px 0 4px;
+  margin: ${({ theme }) => theme.spacings.xxs} 0 ${({ theme }) => theme.spacings.xxs};
 `;
 
 type FontFamilyKey = 'body' | 'navigation' | 'monospace';
@@ -76,8 +76,8 @@ const FontFamiliesDoc = () => {
   const theme = useTheme();
 
   return (
-    <div>
-      <PageTitle>Font Families</PageTitle>
+    <StoryContainer>
+      <h1 style={{ marginBottom: theme.spacings.lg }}>Font Families</h1>
       {FONT_FAMILIES.map(({ key, label, token, specimen, when, not }) => (
         <FoundationItem key={key}>
           <Token>{token}</Token>
@@ -86,30 +86,30 @@ const FontFamiliesDoc = () => {
               fontFamily: (theme.fonts.family as Record<string, string>)[key],
               fontSize: '1.3rem',
               color: theme.colors.text.primary,
-              margin: '6px 0 0',
+              margin: `${theme.spacings.xs} 0 0`,
               lineHeight: 1.35,
             }}>
             {specimen}
           </p>
           <FamilyLabel>{label}</FamilyLabel>
           <UsageNote>
-            <Strong>Use when: </Strong>
+            <strong>Use when: </strong>
             {when}
           </UsageNote>
           <UsageNote>
-            <Strong>Not for: </Strong>
+            <strong>Not for: </strong>
             {not}
           </UsageNote>
         </FoundationItem>
       ))}
-    </div>
+    </StoryContainer>
   );
 };
 
 // ─── Type Scale ────────────────────────────────────────────────────────────
 
 const ScaleGroup = styled.section`
-  margin-bottom: 40px;
+  margin-bottom: ${({ theme }) => theme.spacings.xl};
 `;
 
 const GroupHeading = styled.p`
@@ -118,13 +118,13 @@ const GroupHeading = styled.p`
   text-transform: uppercase;
   letter-spacing: 0.07em;
   color: ${({ theme }) => theme.colors.text.secondary};
-  margin: 0 0 8px;
+  margin: 0 0 ${({ theme }) => theme.spacings.sm};
 `;
 
 const GroupNote = styled.p`
   font-size: ${({ theme }) => theme.fonts.size.small};
   color: ${({ theme }) => theme.colors.text.secondary};
-  margin: 0 0 16px;
+  margin: 0 0 ${({ theme }) => theme.spacings.md};
   line-height: 1.5;
 `;
 
@@ -270,8 +270,8 @@ const TypeScaleDoc = () => {
   const theme = useTheme();
 
   return (
-    <div>
-      <PageTitle>Type Scale</PageTitle>
+    <StoryContainer>
+      <h1 style={{ marginBottom: theme.spacings.lg }}>Type Scale</h1>
       {TYPE_SCALE_GROUPS.map((group) => (
         <ScaleGroup key={group.label}>
           <GroupHeading>{group.label}</GroupHeading>
@@ -295,13 +295,13 @@ const TypeScaleDoc = () => {
                     fontFamily: familyValue,
                     fontSize: sizeValue,
                     color: theme.colors.text.primary,
-                    margin: '0 0 4px',
+                    margin: `0 0 ${theme.spacings.xxs}`,
                     lineHeight: 1.3,
                   }}>
                   {SIZE_KEY_LABELS[key]}: {specimen}
                 </p>
                 <UsageNote>
-                  <Strong>Use when: </Strong>
+                  <strong>Use when: </strong>
                   {when}
                 </UsageNote>
               </FoundationItem>
@@ -309,7 +309,7 @@ const TypeScaleDoc = () => {
           })}
         </ScaleGroup>
       ))}
-    </div>
+    </StoryContainer>
   );
 };
 
@@ -318,12 +318,13 @@ const TypeScaleDoc = () => {
 const ColorItem = styled.div`
   display: grid;
   grid-template-columns: 56px 1fr;
-  gap: 16px;
-  padding: 20px 0;
+  gap: ${({ theme }) => theme.spacings.md};
   align-items: start;
 
-  & + & {
-    border-top: 1px solid rgba(128, 128, 128, 0.15);
+  &:not(:last-child) {
+    margin-bottom: ${({ theme }) => theme.spacings.md};
+    border-bottom: 1px solid rgba(128, 128, 128, 0.15);
+    padding-bottom: ${({ theme }) => theme.spacings.md};
   }
 `;
 
@@ -372,8 +373,8 @@ const TextColorsDoc = () => {
   const theme = useTheme();
 
   return (
-    <div>
-      <PageTitle>Text Colors</PageTitle>
+    <StoryContainer>
+      <h1 style={{ marginBottom: theme.spacings.lg }}>Text Colors</h1>
       {TEXT_COLORS.map(({ token, getColor, specimen, when, not }) => {
         const color = getColor(theme);
 
@@ -387,24 +388,24 @@ const TextColorsDoc = () => {
                   fontFamily: theme.fonts.family.body,
                   fontSize: theme.fonts.size.body,
                   color,
-                  margin: '8px 0 4px',
+                  margin: `${theme.spacings.sm} 0 ${theme.spacings.xxs}`,
                   lineHeight: 1.4,
                 }}>
                 {specimen}
               </p>
               <UsageNote>
-                <Strong>Use when: </Strong>
+                <strong>Use when: </strong>
                 {when}
               </UsageNote>
               <UsageNote>
-                <Strong>Not for: </Strong>
+                <strong>Not for: </strong>
                 {not}
               </UsageNote>
             </div>
           </ColorItem>
         );
       })}
-    </div>
+    </StoryContainer>
   );
 };
 

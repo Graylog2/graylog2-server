@@ -21,7 +21,7 @@ export const Token = styled.code`
   font-size: ${({ theme }) => theme.fonts.size.small};
   color: ${({ theme }) => theme.colors.text.secondary};
   background: rgba(128, 128, 128, 0.12);
-  padding: 1px 6px;
+  padding: 1px ${({ theme }) => theme.spacings.xs};
   border-radius: 3px;
 `;
 
@@ -34,32 +34,25 @@ export const PxLabel = styled.span`
 export const UsageNote = styled.p`
   font-size: ${({ theme }) => theme.fonts.size.small};
   color: ${({ theme }) => theme.colors.text.secondary};
-  margin: 4px 0 0;
+  margin: ${({ theme }) => theme.spacings.xxs} 0 0;
   line-height: 1.5;
 `;
 
-export const Strong = styled.strong`
-  color: ${({ theme }) => theme.colors.text.primary};
-`;
-
-export const PageTitle = styled.h1`
-  font-family: ${({ theme }) => theme.fonts.family.navigation};
-  font-size: ${({ theme }) => theme.fonts.size.h1};
-  color: ${({ theme }) => theme.colors.text.primary};
-  margin: 0 0 24px;
-`;
-
 export const FoundationItem = styled.div`
-  padding: 16px 0;
-
-  & + & {
-    border-top: 1px solid rgba(128, 128, 128, 0.15);
+  &:not(:last-child) {
+    margin-bottom: ${({ theme }) => theme.spacings.md};
+    border-bottom: 1px solid rgba(128, 128, 128, 0.15);
+    padding-bottom: ${({ theme }) => theme.spacings.md};
   }
+`;
+
+export const StoryContainer = styled.div`
+  padding-bottom: ${({ theme }) => theme.spacings.xl};
 `;
 
 export const TokenRow = styled.div`
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 6px;
+  gap: ${({ theme }) => theme.spacings.sm};
+  margin-bottom: ${({ theme }) => theme.spacings.xs};
 `;
