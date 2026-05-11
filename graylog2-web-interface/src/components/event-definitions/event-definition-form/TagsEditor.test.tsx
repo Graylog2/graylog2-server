@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+
 import { EventsDefinitions } from '@graylog/server-api';
 
 import TagsEditor from 'components/event-definitions/event-definition-form/TagsEditor';

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
+
 import { Events } from '@graylog/server-api';
 
 import TagsFilter from 'components/events/TagsFilter';

@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
+
 import { EventsDefinitions } from '@graylog/server-api';
 
 import { InputList } from 'components/common';
