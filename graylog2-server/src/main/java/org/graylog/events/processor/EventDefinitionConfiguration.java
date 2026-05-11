@@ -31,7 +31,22 @@ public class EventDefinitionConfiguration {
     @Parameter(value = "event_definition_max_event_limit", validators = PositiveIntegerValidator.class)
     private int maxEventLimit = 1000;
 
+    @Documentation("""
+            Enforce strict format validation on MITRE tactic/technique IDs assigned to event definitions.
+            When enabled, tactic IDs must match the pattern TA followed by 4 digits (e.g. TA0004) and
+            technique IDs must match T followed by 4 digits with an optional 3-digit sub-technique
+            suffix (e.g. T1021 or T1021.006). Disable as an emergency override if MITRE introduces a
+            new ID format before Graylog ships an updated validator.
+            Default: true
+            """)
+    @Parameter(value = "event_definition_mitre_id_validation_enabled")
+    private boolean mitreIdValidationEnabled = true;
+
     public int getMaxEventLimit() {
         return maxEventLimit;
+    }
+
+    public boolean isMitreIdValidationEnabled() {
+        return mitreIdValidationEnabled;
     }
 }

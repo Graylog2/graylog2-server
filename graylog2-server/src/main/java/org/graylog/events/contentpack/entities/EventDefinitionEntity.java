@@ -65,6 +65,7 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
     private static final String MATCHED_AT = "matched_at";
     private static final String FIELD_EVENT_PROCEDURE = "event_procedure";
     private static final String FIELD_EVENT_SUMMARY_TEMPLATE = "event_summary_template";
+    private static final String FIELD_MITRE_CATEGORIES = EventDefinitionDto.FIELD_MITRE_CATEGORIES;
 
     @JsonProperty(FIELD_TITLE)
     public abstract ValueReference title();
@@ -119,6 +120,9 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
     @JsonProperty(FIELD_EVENT_SUMMARY_TEMPLATE)
     public abstract ValueReference eventSummaryTemplate();
 
+    @JsonProperty(FIELD_MITRE_CATEGORIES)
+    public abstract ImmutableList<String> mitreCategories();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -129,7 +133,9 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
     public static abstract class Builder extends ScopedContentPackEntity.AbstractBuilder<EventDefinitionEntity.Builder> {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_EventDefinitionEntity.Builder().isScheduled(ValueReference.of(true));
+            return new AutoValue_EventDefinitionEntity.Builder()
+                    .isScheduled(ValueReference.of(true))
+                    .mitreCategories(ImmutableList.of());
         }
 
         @JsonProperty(FIELD_TITLE)
@@ -180,6 +186,9 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
         @JsonProperty(FIELD_EVENT_SUMMARY_TEMPLATE)
         public abstract Builder eventSummaryTemplate(ValueReference eventSummaryTemplate);
 
+        @JsonProperty(FIELD_MITRE_CATEGORIES)
+        public abstract Builder mitreCategories(ImmutableList<String> mitreCategories);
+
         public abstract EventDefinitionEntity build();
     }
 
@@ -219,6 +228,7 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
                 .storage(storage())
                 .eventProcedureId(procedureId)
                 .eventSummaryTemplate(eventSummaryTemplate() != null ? eventSummaryTemplate().asString(parameters) : null)
+                .mitreCategories(mitreCategories())
                 .build();
     }
 

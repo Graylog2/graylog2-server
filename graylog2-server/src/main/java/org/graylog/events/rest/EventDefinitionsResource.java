@@ -126,6 +126,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
             .put("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
             .put("title", SearchQueryField.create(EventDefinitionDto.FIELD_TITLE))
             .put("description", SearchQueryField.create(EventDefinitionDto.FIELD_DESCRIPTION))
+            .put(EventDefinitionDto.FIELD_MITRE_CATEGORIES, SearchQueryField.create(EventDefinitionDto.FIELD_MITRE_CATEGORIES))
             .put(SourcedMongoEntityUtils.SEARCH_QUERY_TITLE, SearchQueryField.create(SourcedMongoEntityUtils.FILTERABLE_FIELD))
             .build();
     private static final String DEFAULT_SORT_FIELD = "title";
@@ -140,6 +141,11 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                     .sortable(false)
                     .filterable(true)
                     .filterOptions(DBEntitySourceService.FILTER_OPTIONS)
+                    .build(),
+            EntityAttribute.builder().id(EventDefinitionDto.FIELD_MITRE_CATEGORIES).title("MITRE")
+                    .type(SearchQueryField.Type.STRING)
+                    .sortable(false)
+                    .searchable(true)
                     .build()
     );
     private static final EntityDefaults settings = EntityDefaults.builder()

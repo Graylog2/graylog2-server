@@ -113,6 +113,10 @@ public interface Event extends Indexable {
 
     void addAssociatedAssets(Set<String> associatedAssets);
 
+    List<String> getMitreCategories();
+
+    void setMitreCategories(List<String> mitreCategories);
+
     EventDto toDto();
 
     static Event fromDto(EventDto from) {
@@ -131,6 +135,7 @@ public interface Event extends Indexable {
         from.timerangeEnd().ifPresent(event::setTimerangeEnd);
         from.originContext().ifPresent(event::setOriginContext);
         from.replayInfo().ifPresent(event::setReplayInfo);
+        event.setMitreCategories(from.mitreCategories());
 
         return event;
     }

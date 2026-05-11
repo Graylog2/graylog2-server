@@ -89,6 +89,7 @@ const EventDefinitionFormContainer = ({
     },
     notifications: [],
     alert: false,
+    mitre_categories: [],
   },
   formControls = undefined,
   initialStep = 'event-details',
@@ -209,11 +210,16 @@ const EventDefinitionFormContainer = ({
   const handleSubmit = () => {
     setIsDirty(false);
 
+    const mitreTelemetry = {
+      mitre_categories_count: eventDefinition.mitre_categories?.length ?? 0,
+    };
+
     if (action === 'create') {
       sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_SUMMARY.CREATE_CLICKED, {
         app_pathname: getPathnameWithoutId(pathname),
         app_section: 'new-event-definition',
         app_action_value: 'create-event-definition-button',
+        ...mitreTelemetry,
       });
 
       createEventDefinition(eventDefinition).then(handleSubmitSuccessResponse, handleSubmitFailureResponse);
@@ -222,6 +228,7 @@ const EventDefinitionFormContainer = ({
         app_pathname: getPathnameWithoutId(pathname),
         app_section: 'edit-event-definition',
         app_action_value: 'update-event-definition-button',
+        ...mitreTelemetry,
       });
 
       EventDefinitionsActions.update(eventDefinition.id, eventDefinition).then(

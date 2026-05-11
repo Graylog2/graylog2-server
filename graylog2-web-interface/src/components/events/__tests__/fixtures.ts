@@ -91,6 +91,7 @@ export const eventDefinition: EventDefinition = {
   ],
   scheduler: null,
   state: 'ENABLED',
+  mitre_categories: [],
   remediation_steps: '',
   event_procedure: '',
   event_summary_template: null,

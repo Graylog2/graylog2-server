@@ -65,6 +65,7 @@ public class EventImpl implements Event {
     private final Map<String, Double> scores = new HashMap<>();
     private final Set<String> associatedAssets = new HashSet<>();
     private EventReplayInfo replayInfo;
+    private List<String> mitreCategories = ImmutableList.of();
 
     EventImpl(String eventId,
               DateTime eventTimestamp,
@@ -325,6 +326,16 @@ public class EventImpl implements Event {
     }
 
     @Override
+    public List<String> getMitreCategories() {
+        return mitreCategories;
+    }
+
+    @Override
+    public void setMitreCategories(List<String> mitreCategories) {
+        this.mitreCategories = mitreCategories == null ? ImmutableList.of() : ImmutableList.copyOf(mitreCategories);
+    }
+
+    @Override
     public EventDto toDto() {
         final Map<String, String> fields = this.fields.entrySet()
                 .stream()
@@ -359,6 +370,7 @@ public class EventImpl implements Event {
                 .groupByFields(ImmutableMap.copyOf(groupByFields))
                 .aggregationConditions(ImmutableMap.copyOf(aggregationConditions))
                 .replayInfo(getReplayInfo())
+                .mitreCategories(getMitreCategories())
                 .build();
     }
 

@@ -111,6 +111,7 @@ export type EventDefinition = {
   matched_at: string;
   scheduler: Scheduler;
   event_summary_template: string;
+  mitre_categories: string[];
 };
 
 export type EventDefinitionFormControlsProps = {

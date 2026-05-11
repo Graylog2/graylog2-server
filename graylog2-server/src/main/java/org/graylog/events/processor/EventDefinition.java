@@ -98,4 +98,8 @@ public interface EventDefinition {
     default String eventSummaryTemplate() {
         return null;
     }
+
+    default ImmutableList<String> mitreCategories() {
+        return ImmutableList.of();
+    }
 }
