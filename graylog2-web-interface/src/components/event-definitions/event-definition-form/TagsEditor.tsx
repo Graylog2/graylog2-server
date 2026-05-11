@@ -30,6 +30,9 @@ const normalizeTag = (raw: string): string => raw.trim().toLowerCase();
 const MAX_TAGS = 64;
 const MAX_TAG_LENGTH = 128;
 
+// Mirror of TagNormalizer.VALID_TAG_PATTERN. Keep in sync.
+const VALID_TAG_PATTERN = /^[a-z0-9_-]+$/;
+
 const SUGGESTION_LIMIT = 50;
 const DEBOUNCE_MS = 300;
 
@@ -65,11 +68,15 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
 
     const tooLong = allNormalized.filter((value) => value.length > MAX_TAG_LENGTH);
     const withinLength = allNormalized.filter((value) => value.length <= MAX_TAG_LENGTH);
-    const deduped = Array.from(new Set(withinLength));
+    const invalidChars = withinLength.filter((value) => !VALID_TAG_PATTERN.test(value));
+    const valid = withinLength.filter((value) => VALID_TAG_PATTERN.test(value));
+    const deduped = Array.from(new Set(valid));
     const overCount = deduped.length > MAX_TAGS;
 
     if (tooLong.length > 0) {
       setValidationError(`Each tag must be ${MAX_TAG_LENGTH} characters or fewer. ${tooLong.length} tag(s) dropped.`);
+    } else if (invalidChars.length > 0) {
+      setValidationError(`Tags may only contain lowercase letters, digits, hyphens and underscores. ${invalidChars.length} tag(s) dropped.`);
     } else if (overCount) {
       setValidationError(`Cannot exceed ${MAX_TAGS} tags. Extra tags dropped.`);
     } else {
