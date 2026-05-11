@@ -29,9 +29,13 @@ public class PipelineConfig implements PluginConfigBean {
     @Parameter("cached_stageiterators")
     private boolean cachedStageIterators = true;
 
-    @Documentation("Sample rate for pipeline rule debug timers. 1 = every invocation timed (default). " +
-            "N > 1 = record one in N invocations. Reduces CPU and GC pressure on busy clusters with many rules. " +
-            "Set the same value on every node. Takes effect on JVM restart.")
+    @Documentation("""
+            Controls how often Graylog records pipeline rule debug timer samples.
+            The default, 1, records every invocation.
+            Use a higher value, for example 10, to record roughly one out of every 10 invocations.
+            This can reduce overhead on busy clusters with many rules.
+            Use the same value on every node. Changes require a JVM restart.
+            """)
     @Parameter(value = "rule_metrics_sample_rate", validators = PositiveIntegerValidator.class)
     private int ruleMetricsSampleRate = 1;
 
