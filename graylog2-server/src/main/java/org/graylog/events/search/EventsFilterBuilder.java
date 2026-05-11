@@ -26,8 +26,10 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.graylog.events.search.EventsSearchFilter.NULL_VALUE;
+import static org.graylog.events.search.MoreSearch.luceneEscape;
 import static org.graylog2.plugin.Tools.ES_DATE_FORMAT_FORMATTER;
 
 public class EventsFilterBuilder {
@@ -87,6 +89,21 @@ public class EventsFilterBuilder {
                 filterBuilder.add(assets.stream()
                         .map(assetFilter -> EventDto.FIELD_ASSOCIATED_ASSETS + ":" + quote(assetFilter))
                         .collect(joiningQueriesWithOR));
+            }
+        }
+
+        final Set<String> tags = parameters.filter().extraFilters().getOrDefault(EventDto.FIELD_TAGS, Set.of());
+        if (!tags.isEmpty()) {
+            final boolean wantsAbsent = tags.contains(NULL_VALUE);
+            final Stream<String> concreteClauses = tags.stream()
+                    .filter(t -> !NULL_VALUE.equals(t))
+                    .map(tagFilter -> EventDto.FIELD_TAGS + ":" + quote(luceneEscape(tagFilter)));
+            final Stream<String> clauses = wantsAbsent
+                    ? Stream.concat(Stream.of("NOT _exists_:" + EventDto.FIELD_TAGS), concreteClauses)
+                    : concreteClauses;
+            final String combined = clauses.collect(joiningQueriesWithOR);
+            if (!combined.isEmpty()) {
+                filterBuilder.add(combined);
             }
         }
 
