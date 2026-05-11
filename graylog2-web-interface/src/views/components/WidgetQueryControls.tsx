@@ -89,13 +89,13 @@ type Props = {
   availableStreams: Array<Stream>;
 };
 
-export const updateWidgetSearchControls = (widget, { timerange, streams, streamCategories, queryString }) =>
+export const updateWidgetSearchControls = (widget, { timerange, streamsAndCategories, queryString }) =>
   widget
     .toBuilder()
     .timerange(timerange)
     .query(createElasticsearchQueryString(queryString))
-    .streams(streams)
-    .streamCategories(streamCategories)
+    .streams(streamsAndCategories?.streams)
+    .streamCategories(streamsAndCategories?.categories)
     .build();
 
 const onSubmit = async (
@@ -104,7 +104,7 @@ const onSubmit = async (
   pluggableSearchBarControls: Array<() => SearchBarControl>,
   widget: Widget,
 ) => {
-  const { timerange, streams, streamCategories, queryString } = values;
+  const { timerange, streamsAndCategories, queryString } = values;
   const widgetWithPluginData = await executePluggableSubmitHandler(
     dispatch,
     values,
@@ -113,8 +113,7 @@ const onSubmit = async (
   );
   const newWidget = updateWidgetSearchControls(widgetWithPluginData, {
     timerange,
-    streams,
-    streamCategories,
+    streamsAndCategories,
     queryString,
   });
 
