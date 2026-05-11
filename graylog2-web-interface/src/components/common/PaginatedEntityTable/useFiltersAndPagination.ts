@@ -27,7 +27,6 @@ import type { LayoutConfig } from 'components/common/EntityDataTable/hooks/useTa
 export const useWithURLParams = (layoutConfig: LayoutConfig, defaultFilters?: UrlQueryFilters) => {
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setUrlQuery] = useQueryParam('query', StringParam);
-  const [sliceCol, setSliceCol] = useQueryParam('sliceCol', StringParam);
   const [slice, setSlice] = useQueryParam('slice', StringParam);
   const urlPagination = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
   const [hasUserModifiedFilters, setHasUserModifiedFilters] = useState(false);
@@ -44,13 +43,21 @@ export const useWithURLParams = (layoutConfig: LayoutConfig, defaultFilters?: Ur
     () => ({
       query,
       slice,
-      sliceCol,
+      sliceCol: layoutConfig.slicing?.sliceColumn,
       page: urlPagination.page,
       pageSize: layoutConfig.pageSize,
       sort: layoutConfig.sort,
       filters: effectiveFilters,
     }),
-    [query, slice, sliceCol, urlPagination.page, layoutConfig.pageSize, layoutConfig.sort, effectiveFilters],
+    [
+      query,
+      slice,
+      layoutConfig.slicing?.sliceColumn,
+      urlPagination.page,
+      layoutConfig.pageSize,
+      layoutConfig.sort,
+      effectiveFilters,
+    ],
   );
 
   const onChangeFilters = useCallback(
@@ -62,9 +69,8 @@ export const useWithURLParams = (layoutConfig: LayoutConfig, defaultFilters?: Ur
     [urlPagination, setUrlQueryFilters],
   );
 
-  const onChangeSlicing = (newSliceCol: string | undefined, newSlice?: string) => {
+  const onChangeSlicingFilter = (newSlice?: string) => {
     urlPagination.resetPage();
-    setSliceCol(newSliceCol);
     setSlice(newSlice);
   };
 
@@ -72,7 +78,7 @@ export const useWithURLParams = (layoutConfig: LayoutConfig, defaultFilters?: Ur
     fetchOptions,
     setQuery: setUrlQuery,
     onChangeFilters,
-    onChangeSlicing,
+    onChangeSlicingFilter,
     paginationState: urlPagination,
   };
 };
@@ -83,7 +89,6 @@ export const useWithLocalState = (layoutConfig: LayoutConfig, defaultFilters?: U
     page: DEFAULT_PAGE,
     filters: defaultFilters ?? OrderedMap<string, Array<string>>(),
     slice: undefined,
-    sliceCol: undefined,
   });
 
   const setPagination = useCallback(({ page, pageSize }: { page?: number; pageSize?: number }) => {
@@ -110,11 +115,10 @@ export const useWithLocalState = (layoutConfig: LayoutConfig, defaultFilters?: U
     }));
   }, []);
 
-  const onChangeSlicing = useCallback((sliceCol: string | undefined, slice?: string | undefined) => {
+  const onChangeSlicingFilter = useCallback((slice?: string | undefined) => {
     setTransientFetchOptions((cur) => ({
       ...cur,
       page: DEFAULT_PAGE,
-      sliceCol,
       slice,
     }));
   }, []);
@@ -130,10 +134,11 @@ export const useWithLocalState = (layoutConfig: LayoutConfig, defaultFilters?: U
   const fetchOptions: SearchParams = useMemo(
     () => ({
       ...transientFetchOptions,
+      sliceCol: layoutConfig.slicing?.sliceColumn,
       pageSize: layoutConfig.pageSize,
       sort: layoutConfig.sort,
     }),
-    [transientFetchOptions, layoutConfig.pageSize, layoutConfig.sort],
+    [transientFetchOptions, layoutConfig.pageSize, layoutConfig.slicing?.sliceColumn, layoutConfig.sort],
   );
 
   return useMemo(
@@ -141,7 +146,7 @@ export const useWithLocalState = (layoutConfig: LayoutConfig, defaultFilters?: U
       fetchOptions,
       setQuery,
       onChangeFilters,
-      onChangeSlicing,
+      onChangeSlicingFilter,
       paginationState: {
         page: fetchOptions.page,
         pageSize: fetchOptions.pageSize,
@@ -149,6 +154,6 @@ export const useWithLocalState = (layoutConfig: LayoutConfig, defaultFilters?: U
         setPagination,
       },
     }),
-    [fetchOptions, onChangeFilters, onChangeSlicing, resetPage, setPagination, setQuery],
+    [fetchOptions, onChangeFilters, onChangeSlicingFilter, resetPage, setPagination, setQuery],
   );
 };
