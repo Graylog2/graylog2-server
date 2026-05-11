@@ -16,8 +16,7 @@
  */
 package org.graylog.datanode;
 
-import org.jetbrains.annotations.NotNull;
-
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -29,7 +28,7 @@ import java.util.Properties;
 public class OpensearchDistributionProperties {
     private final Properties properties;
 
-    public static OpensearchDistributionProperties forVersion(@NotNull String version) {
+    public static OpensearchDistributionProperties forVersion(@Nonnull String version) {
         try (
                 final InputStream stream = OpensearchDistributionProperties.class.getResourceAsStream(Path.of("/", "opensearch", "config", version, "distribution.properties").toString())
         ) {
