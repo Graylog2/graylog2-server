@@ -41,6 +41,7 @@ const customColumnRenderers = {
       renderCell: (_description: string, row: NotificationType) => <DescriptionCell row={row} />,
     },
     is_read: {
+      renderHeader: () => 'Status',
       renderCell: (_is_read: boolean, row: NotificationType) => <StatusCell row={row} />,
     },
     'actor.name': {

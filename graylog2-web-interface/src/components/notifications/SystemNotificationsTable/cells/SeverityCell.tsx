@@ -26,9 +26,11 @@ const COLOR_BY_SEVERITY: Record<string, 'danger' | 'info' | 'default'> = {
 
 type Props = { row: NotificationType };
 
+const capitalize = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
+
 const SeverityCell = ({ row }: Props) => (
   <Badge bsStyle={COLOR_BY_SEVERITY[row.severity] ?? 'default'}>
-    {row.severity}
+    {capitalize(row.severity)}
   </Badge>
 );
 
