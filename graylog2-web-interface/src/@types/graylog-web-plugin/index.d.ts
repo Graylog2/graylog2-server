@@ -384,6 +384,11 @@ declare module 'graylog-web-plugin/plugin' {
     useCondition?: () => boolean;
   } & (PluginNavigationLink | PluginNavigationDropdown);
 
+  type EntityLinkResolver = {
+    uriSegment: string;
+    resolve: (trailingSegments: ReadonlyArray<string>) => { grnType: string; id: string } | null;
+  };
+
   interface PluginExports {
     navigation?: Array<PluginNavigation>;
     /**
@@ -432,6 +437,7 @@ declare module 'graylog-web-plugin/plugin' {
     inputsBadgeProviders?: Array<{
       useCondition: () => { hasIssues: boolean; title: string };
     }>;
+    'markdown.entityLinkResolvers'?: Array<EntityLinkResolver>;
   }
   interface PluginMetadata {
     name?: string;
