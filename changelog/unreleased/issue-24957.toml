@@ -1,0 +1,3 @@
+type = "fixed"
+message = "Fix pipeline stage badges being sorted lexicographically instead of numerically."
+issues = ["24957"]
