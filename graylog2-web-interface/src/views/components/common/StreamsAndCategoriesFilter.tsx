@@ -16,8 +16,9 @@
  */
 import { useMemo } from 'react';
 import * as React from 'react';
+import styled from 'styled-components';
 
-import { Select } from 'components/common';
+import {Select, Icon} from 'components/common';
 import { defaultCompare } from 'logic/DefaultCompare';
 
 type StreamsAndCategoriesOption = {
@@ -32,13 +33,17 @@ export type StreamsAndCategoriesSelection = {
   categories: string[];
 };
 
+const StyledIcon = styled(Icon)`
+  width: 24px;
+  vertical-align: middle;
+`;
+
 const renderOption = (option: StreamsAndCategoriesOption) =>
   option.type === 'stream' ? (
     <>{option.label}</>
   ) : (
     <>
-      <b>{option.label}</b>
-      <i> (Category)</i>
+      <StyledIcon name={'stacks'} size="xs" />{option.label}
     </>
   );
 
@@ -51,20 +56,18 @@ type StreamsAndCategoriesFilterProps = Omit<React.ComponentProps<typeof Select>,
   grouping?: boolean;
 };
 
-const StreamsAndCategoriesFilter = (props: StreamsAndCategoriesFilterProps) => {
-  const {
-    onChange,
-    streams,
-    streamCategories = undefined,
-    value,
-    required = true,
-    showStreams = true,
-    showCategories = true,
-    grouping = true,
-    multi = true,
-    id,
-  } = props;
-
+const StreamsAndCategoriesFilter = ( {
+                                       id,
+                                       onChange,
+                                       value,
+                                       streams,
+                                       streamCategories = undefined,
+                                       required = true,
+                                       showStreams = true,
+                                       showCategories = true,
+                                       grouping = true,
+                                       multi = true,
+                                       ...rest }: StreamsAndCategoriesFilterProps) => {
   const options = useMemo(() => {
     const sortedCategories =
       showCategories && multi
@@ -107,7 +110,7 @@ const StreamsAndCategoriesFilter = (props: StreamsAndCategoriesFilterProps) => {
 
   return (
     <Select
-      {...props}
+      {...rest}
       id={id}
       onChange={change}
       options={options}
@@ -115,7 +118,7 @@ const StreamsAndCategoriesFilter = (props: StreamsAndCategoriesFilterProps) => {
       value={value}
       required={required}
       multi={multi}
-    />
+      />
   );
 };
 
