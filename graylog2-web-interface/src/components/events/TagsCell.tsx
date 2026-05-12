@@ -25,20 +25,23 @@ const DEFAULT_COLLAPSED_COUNT = 3;
 
 const Wrapper = styled.div(
   ({ theme }) => css`
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: ${theme.spacings.xs};
     flex-wrap: wrap;
+    /* Fill the cell so max-width: 100% on chips resolves against the cell width. */
+    width: 100%;
+    min-width: 0;
   `,
 );
 
-const TagsContainer = styled.div<{ $isExpanded: boolean }>(
-  ({ theme, $isExpanded }) => css`
-    display: inline-flex;
+const TagsContainer = styled.div(
+  ({ theme }) => css`
+    display: flex;
     flex-wrap: wrap;
     gap: ${theme.spacings.xs};
-    max-height: ${$isExpanded ? '160px' : 'none'};
-    overflow: ${$isExpanded ? 'auto' : 'hidden'};
+    min-width: 0;
+    flex: 1 1 auto;
   `,
 );
 
@@ -46,8 +49,15 @@ const HoverableLabel = styled(Label)(
   ({ theme }) => css`
     transition: background-color 0.1s ease-in-out;
 
+    /* Override bootstrap Label defaults so a long tag wraps inside the cell. */
+    display: inline-block;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+
     button:hover > & {
-      background-color: ${theme.colors.gray[40]};
+      background-color: ${theme.colors.gray[60]};
     }
   `,
 );
@@ -58,6 +68,12 @@ const TagButton = styled.button(
     border: 0;
     padding: 0;
     cursor: pointer;
+
+    /* Inner Label/Badge components set their own cursor; force pointer everywhere
+       inside the button so the hover affordance is consistent. */
+    & * {
+      cursor: pointer;
+    }
 
     &:focus-visible {
       outline: 2px solid ${theme.colors.input.borderFocus};
@@ -73,6 +89,10 @@ const ToggleButton = styled.button(
     border: 0;
     padding: 0;
     cursor: pointer;
+
+    & * {
+      cursor: pointer;
+    }
 
     &:focus-visible {
       outline: 2px solid ${theme.colors.input.borderFocus};
@@ -103,9 +123,10 @@ const TagsCell = ({
     return <>{emptyFallback}</>;
   }
 
-  const isTruncated = truncate && tags.length > collapsedCount;
-  const visibleTags = !isExpanded && isTruncated ? tags.slice(0, collapsedCount) : tags;
-  const hiddenCount = tags.length - collapsedCount;
+  const sortedTags = [...tags].sort();
+  const isTruncated = truncate && sortedTags.length > collapsedCount;
+  const visibleTags = !isExpanded && isTruncated ? sortedTags.slice(0, collapsedCount) : sortedTags;
+  const hiddenCount = sortedTags.length - collapsedCount;
 
   const renderTag = (tag: string) => {
     if (!onTagClick) {
@@ -133,7 +154,7 @@ const TagsCell = ({
 
   return (
     <Wrapper>
-      <TagsContainer $isExpanded={isExpanded}>{visibleTags.map(renderTag)}</TagsContainer>
+      <TagsContainer>{visibleTags.map(renderTag)}</TagsContainer>
       {isTruncated && (
         <ToggleButton
           type="button"

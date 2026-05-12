@@ -137,17 +137,19 @@ describe('TagsEditor', () => {
   });
 
   describe('character validation', () => {
-    it('drops tags with disallowed characters and surfaces an error', async () => {
+    // Invalid inputs commit so the user sees the bad value as a chip and can fix or remove it.
+    // The chip is rendered with the danger styling (verified visually) and a validation
+    // error is surfaced below, mirroring the IP-address input pattern.
+    it('commits a tag with disallowed characters and surfaces an error', async () => {
       const onChange = jest.fn();
       render(<Harness onChange={onChange} />);
 
-      const input = screen.getByRole('combobox');
-      await userEvent.type(input, 'phish:ing');
+      await userEvent.type(screen.getByRole('combobox'), 'phish:ing');
       await userEvent.keyboard('{Enter}');
 
-      expect(onChange).not.toHaveBeenCalledWith(expect.arrayContaining(['phish:ing']));
+      expect(onChange).toHaveBeenLastCalledWith(['phish:ing']);
       expect(
-        await screen.findByText(/only contain lowercase letters, digits, hyphens and underscores/i),
+        await screen.findByText(/Tag "phish:ing" is invalid/i),
       ).toBeInTheDocument();
     });
 
@@ -156,20 +158,20 @@ describe('TagsEditor', () => {
       ['dot', 'phish.ing'],
       ['slash', 'phish/ing'],
       ['quote', 'phish"ing'],
-    ])('rejects tags containing a %s', async (_label, raw) => {
+    ])('commits tags containing a %s and surfaces an error', async (_label, raw) => {
       const onChange = jest.fn();
       render(<Harness onChange={onChange} />);
 
       await userEvent.type(screen.getByRole('combobox'), raw);
       await userEvent.keyboard('{Enter}');
 
-      expect(onChange).not.toHaveBeenCalledWith(expect.arrayContaining([raw.toLowerCase()]));
+      expect(onChange).toHaveBeenLastCalledWith([raw.toLowerCase()]);
       expect(
-        await screen.findByText(/only contain lowercase letters, digits, hyphens and underscores/i),
+        await screen.findByText(/is invalid\. Tags may only contain/i),
       ).toBeInTheDocument();
     });
 
-    it('accepts tags using only allowed characters', async () => {
+    it('accepts tags using only allowed characters with no error', async () => {
       const onChange = jest.fn();
       render(<Harness onChange={onChange} />);
 
@@ -177,9 +179,7 @@ describe('TagsEditor', () => {
       await userEvent.keyboard('{Enter}');
 
       expect(onChange).toHaveBeenLastCalledWith(['lateral-movement_42']);
-      expect(
-        screen.queryByText(/only contain lowercase letters, digits, hyphens and underscores/i),
-      ).not.toBeInTheDocument();
+      expect(screen.queryByText(/is invalid/i)).not.toBeInTheDocument();
     });
   });
 });

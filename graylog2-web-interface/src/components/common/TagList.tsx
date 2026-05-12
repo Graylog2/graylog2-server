@@ -39,7 +39,7 @@ const TagList = ({ tags, emptyFallback = null }: Props) => {
 
   return (
     <Container>
-      {tags.map((tag) => (
+      {[...tags].sort().map((tag) => (
         <Label key={tag} bsStyle="default">
           {tag}
         </Label>

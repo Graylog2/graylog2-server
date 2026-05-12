@@ -50,6 +50,9 @@ type Props = CreatableProps<any, boolean, any> & {
   suggestions?: ReadonlyArray<string | number>;
   onSuggestionsInputChange?: (input: string) => void;
   isLoadingSuggestions?: boolean;
+  // Chips whose value is in this set render with the variant.danger border/text color
+  // so the user can see which specific entries failed validation.
+  invalidValues?: ReadonlySet<string | number>;
 };
 
 const InputList = ({
@@ -61,9 +64,10 @@ const InputList = ({
   bsStyle = null,
   error = null,
   help = null,
-  suggestions,
-  onSuggestionsInputChange,
-  isLoadingSuggestions,
+  suggestions = undefined,
+  onSuggestionsInputChange = undefined,
+  isLoadingSuggestions = undefined,
+  invalidValues = undefined,
   ...rest
 }: Props) => {
   const { inputListTheme, styles } = useInputListStyles(size);
@@ -129,7 +133,7 @@ const InputList = ({
         onInputChange={handleInputChange}
         onKeyDown={handleKeyDown}
         value={value}
-        styles={styles(!error)}
+        styles={styles(!error, invalidValues)}
         theme={(theme) => ({ ...theme, ...inputListTheme })}
         {...rest}
       />

@@ -43,12 +43,25 @@ type Props = {
   error?: React.ReactNode;
 };
 
-const HELP_TEXT = 'Press Enter or Tab to add. Tags are lowercased and deduplicated.';
+const HELP_TEXT = 'Press Enter or Tab to add. Tags are lowercased and deduplicated. Only lowercase letters, digits, hyphens, and underscores are allowed.';
+
+const isInvalidTag = (tag: string): boolean =>
+  tag.length > MAX_TAG_LENGTH || !VALID_TAG_PATTERN.test(tag);
+
+const quote = (s: string): string => `"${s}"`;
+
+const buildInvalidTagsMessage = (invalidTags: ReadonlyArray<string>): string | null => {
+  if (invalidTags.length === 0) return null;
+
+  const isPlural = invalidTags.length > 1;
+
+  return `Tag${isPlural ? 's' : ''} ${invalidTags.map(quote).join(', ')} ${isPlural ? 'are' : 'is'} invalid. `
+    + `Tags may only contain lowercase letters, digits, hyphens and underscores (max ${MAX_TAG_LENGTH} chars each).`;
+};
 
 const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) => {
   const [input, setInput] = useState('');
   const [debouncedInput] = useDebouncedValue(input, DEBOUNCE_MS);
-  const [validationError, setValidationError] = useState<React.ReactNode>(null);
 
   const { data, isFetching } = useQuery({
     queryKey: ['event-definitions', 'tag-suggestions', debouncedInput],
@@ -59,32 +72,31 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
   });
   const suggestions = (data?.tags ?? []).filter((s: string) => !tags.includes(s));
 
+  // Commit every typed tag (only normalize + dedupe + dropping blanks). Invalid values
+  // and over-length values are kept so the user can see them as chips, with the offending
+  // chips visually marked invalid. Save is blocked by the parent form's validation, which
+  // surfaces the server-side rule violations the same way other fields work.
   const handleChange = (event: React.ChangeEvent<{ value: (string | number)[] }>) => {
     const raw = event.target.value as (string | number)[];
-    const allNormalized = raw
+    const normalized = raw
       .map((value) => (typeof value === 'string' ? value : String(value)))
       .map(normalizeTag)
       .filter((value) => value.length > 0);
-
-    const tooLong = allNormalized.filter((value) => value.length > MAX_TAG_LENGTH);
-    const withinLength = allNormalized.filter((value) => value.length <= MAX_TAG_LENGTH);
-    const invalidChars = withinLength.filter((value) => !VALID_TAG_PATTERN.test(value));
-    const valid = withinLength.filter((value) => VALID_TAG_PATTERN.test(value));
-    const deduped = Array.from(new Set(valid));
-    const overCount = deduped.length > MAX_TAGS;
-
-    if (tooLong.length > 0) {
-      setValidationError(`Each tag must be ${MAX_TAG_LENGTH} characters or fewer. ${tooLong.length} tag(s) dropped.`);
-    } else if (invalidChars.length > 0) {
-      setValidationError(`Tags may only contain lowercase letters, digits, hyphens and underscores. ${invalidChars.length} tag(s) dropped.`);
-    } else if (overCount) {
-      setValidationError(`Cannot exceed ${MAX_TAGS} tags. Extra tags dropped.`);
-    } else {
-      setValidationError(null);
-    }
+    const deduped = Array.from(new Set(normalized));
 
     onChange(deduped.slice(0, MAX_TAGS));
   };
+
+  // Duplicates: react-select's default behavior silently refuses to add a tag that's already
+  // in the list, leaving the typed text in the input so the user can adjust it. We don't try
+  // to surface a validation message for duplicates because the data model is a Set — there's
+  // no way to render the conflict as a chip alongside the original, and managing a
+  // parallel "duplicate-attempted" state alongside the real tags state created edge cases
+  // that weren't worth the marginal feedback gain. The existing chip with the same value is
+  // itself the implicit feedback.
+  const invalidTags = tags.filter(isInvalidTag);
+  const invalidValues = new Set<string | number>(invalidTags);
+  const localValidationError = buildInvalidTagsMessage(invalidTags);
 
   return (
     <InputList
@@ -94,7 +106,8 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
       onChange={handleChange}
       placeholder="e.g. authentication, brute-force, compliance"
       help={HELP_TEXT}
-      error={error ?? validationError}
+      error={error ?? localValidationError}
+      invalidValues={invalidValues}
       isClearable
       isDisabled={disabled}
       suggestions={disabled ? undefined : suggestions}
