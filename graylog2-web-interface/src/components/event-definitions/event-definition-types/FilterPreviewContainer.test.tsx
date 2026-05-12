@@ -60,6 +60,7 @@ const eventDefinition: EventDefinition = {
   storage: [],
   updated_at: null,
   state: 'ENABLED',
+  mitre_categories: [],
   remediation_steps: '',
   event_procedure: '',
   event_summary_template: null,
