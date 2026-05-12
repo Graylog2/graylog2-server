@@ -30,7 +30,7 @@ jobs:
       - name: Compile with Maven / Install dependencies
         run: ./mvnw --fail-fast -Dmaven.wagon.http.retryHandler.class=standard -Dmaven.wagon.http.retryHandler.count=3 -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 compile
       - name: Reviewbot
-        uses: Graylog2/reviewbot@v1
+        uses: Graylog2/reviewbot@d7dce82bcaade007c9ac2d8316cb5621e9d9b893
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           prefix: graylog2-web-interface
