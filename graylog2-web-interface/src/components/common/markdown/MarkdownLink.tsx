@@ -23,6 +23,7 @@ import ExternalLink from 'components/common/ExternalLink';
 import useRightSidebar from 'hooks/useRightSidebar';
 
 import resolveGraylogUri from './resolveGraylogUri';
+import type { EntityLinkResolution } from './resolveGraylogUri';
 
 const GRAYLOG_URI_PREFIX = 'graylog:///';
 
@@ -31,12 +32,12 @@ type Props = {
   children?: React.ReactNode;
 };
 
-type ResolvedLink = { to: string } | { onClick: React.MouseEventHandler<HTMLAnchorElement> };
+type OnClickHandler = Extract<EntityLinkResolution, { onClick: unknown }>['onClick'];
+type ResolvedLink = { to: string } | { onClick: OnClickHandler };
 
 const useResolvedGraylogLink = (href: string): ResolvedLink | null => {
   const resolvers = usePluginEntities('markdown.entityLinkResolvers');
   const getEntityRoute = useGetEntityRoute();
-  const { openSidebar } = useRightSidebar();
 
   if (!href.startsWith(GRAYLOG_URI_PREFIX)) {
     return null;
@@ -49,15 +50,33 @@ const useResolvedGraylogLink = (href: string): ResolvedLink | null => {
   }
 
   if ('onClick' in resolved) {
-    return {
-      onClick: (event) => {
-        event.preventDefault();
-        resolved.onClick({ openSidebar });
-      },
-    };
+    return { onClick: resolved.onClick };
   }
 
   return { to: getEntityRoute(resolved.id, resolved.grnType) };
+};
+
+const OnClickLink = ({
+  href,
+  handler,
+  children,
+}: {
+  href: string;
+  handler: OnClickHandler;
+  children: React.ReactNode;
+}) => {
+  const { openSidebar } = useRightSidebar();
+
+  return (
+    <a
+      href={href}
+      onClick={(event) => {
+        event.preventDefault();
+        handler({ openSidebar });
+      }}>
+      {children}
+    </a>
+  );
 };
 
 const MarkdownLink = ({ href, children = null }: Props) => {
@@ -69,9 +88,9 @@ const MarkdownLink = ({ href, children = null }: Props) => {
 
   if (resolved && 'onClick' in resolved) {
     return (
-      <a href={href} onClick={resolved.onClick}>
+      <OnClickLink href={href} handler={resolved.onClick}>
         {children}
-      </a>
+      </OnClickLink>
     );
   }
 
