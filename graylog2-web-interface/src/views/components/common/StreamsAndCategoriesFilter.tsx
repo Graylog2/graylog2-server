@@ -48,6 +48,7 @@ const renderOption = (option: StreamsAndCategoriesOption) =>
     </>
   );
 
+// eslint-disable-next-line react/require-default-props
 const MultiValueLabel = (props: React.ComponentProps<typeof ReactSelectComponents.MultiValueLabel>) => (
   <ReactSelectComponents.MultiValueLabel {...props}>
     {renderOption(props.data as StreamsAndCategoriesOption)}
