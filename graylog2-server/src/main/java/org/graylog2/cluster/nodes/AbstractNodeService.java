@@ -103,9 +103,7 @@ public abstract class AbstractNodeService<DTO extends NodeDto> implements NodeSe
 
     @Override
     public Optional<DTO> byNodeIdAnyState(String nodeId) {
-        try (MongoCursor<DTO> result = db.find(new BasicDBObject("node_id", nodeId)).iterator()) {
-            return result.hasNext() ? Optional.of(result.next()) : Optional.empty();
-        }
+        return Optional.ofNullable(db.find(new BasicDBObject("node_id", nodeId)).first());
     }
 
     @Override
