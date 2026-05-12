@@ -25,10 +25,10 @@ import asMock from 'helpers/mocking/AsMock';
 import useNotificationBadgeCount from './useNotificationBadgeCount';
 
 jest.mock('@graylog/server-api', () => ({
-  SystemNotifications: { getPaginated: jest.fn() },
+  SystemNotifications: { getUnreadCount: jest.fn() },
 }));
 
-const getPaginatedMock = asMock(SystemNotifications.getPaginated);
+const getUnreadCountMock = asMock(SystemNotifications.getUnreadCount);
 
 const buildWrapper = (queryClient: QueryClient) => {
   const Wrapper = ({ children }: { children: React.ReactNode }) =>
@@ -47,23 +47,20 @@ describe('useNotificationBadgeCount', () => {
     });
   });
 
-  it('calls SystemNotifications.getPaginated with is_read:false filter, per_page=1, and no session extension', async () => {
-    getPaginatedMock.mockResolvedValue({ pagination: { total: 7 }, elements: [], attributes: [] } as any);
+  it('calls SystemNotifications.getUnreadCount with no session extension', async () => {
+    getUnreadCountMock.mockResolvedValue(7);
 
     renderHook(() => useNotificationBadgeCount(), { wrapper: buildWrapper(queryClient) });
 
     await waitFor(() => {
-      expect(getPaginatedMock).toHaveBeenCalled();
+      expect(getUnreadCountMock).toHaveBeenCalled();
     });
 
-    expect(getPaginatedMock).toHaveBeenCalledWith(
-      1, 1, undefined, ['is_read:false'], undefined, undefined,
-      { requestShouldExtendSession: false },
-    );
+    expect(getUnreadCountMock).toHaveBeenCalledWith({ requestShouldExtendSession: false });
   });
 
-  it('extracts pagination.total as the badge count', async () => {
-    getPaginatedMock.mockResolvedValue({ pagination: { total: 42 }, elements: [], attributes: [] } as any);
+  it('returns the count from getUnreadCount', async () => {
+    getUnreadCountMock.mockResolvedValue(42);
 
     const { result } = renderHook(() => useNotificationBadgeCount(), { wrapper: buildWrapper(queryClient) });
 
@@ -71,18 +68,23 @@ describe('useNotificationBadgeCount', () => {
     expect(result.current.data).toBe(42);
   });
 
-  it('returns 0 when the response has no pagination.total (defensive default)', async () => {
-    getPaginatedMock.mockResolvedValue({ elements: [], attributes: [] } as any);
-
-    const { result } = renderHook(() => useNotificationBadgeCount(), { wrapper: buildWrapper(queryClient) });
-
-    await waitFor(() => expect(result.current.isLoading).toBe(false));
-    expect(result.current.data).toBe(0);
-  });
-
   it('does not fetch when enabled=false (permission-gate)', () => {
     renderHook(() => useNotificationBadgeCount({ enabled: false }), { wrapper: buildWrapper(queryClient) });
 
-    expect(getPaginatedMock).not.toHaveBeenCalled();
+    expect(getUnreadCountMock).not.toHaveBeenCalled();
+  });
+
+  it('invalidates the table query when the unread count changes between polls', async () => {
+    getUnreadCountMock.mockResolvedValueOnce(5).mockResolvedValueOnce(3);
+
+    const { result } = renderHook(() => useNotificationBadgeCount(), { wrapper: buildWrapper(queryClient) });
+
+    await waitFor(() => expect(result.current.data).toBe(5));
+
+    const invalidateSpy = jest.spyOn(queryClient, 'invalidateQueries');
+    await queryClient.refetchQueries({ queryKey: ['system', 'notifications', 'badge-count'] });
+
+    await waitFor(() => expect(result.current.data).toBe(3));
+    expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['system', 'notifications', 'table'] });
   });
 });

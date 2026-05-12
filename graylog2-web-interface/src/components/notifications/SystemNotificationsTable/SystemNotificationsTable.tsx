@@ -39,6 +39,7 @@ const TABLE_LAYOUT = {
   defaultSort: { attributeId: "triggered_at", direction: "desc" } as Sort,
   defaultDisplayedAttributes: [
     "title",
+    "severity",
     "description",
     "is_read",
     "actor.name",
@@ -46,6 +47,7 @@ const TABLE_LAYOUT = {
   ],
   defaultColumnOrder: [
     "title",
+    "severity",
     "description",
     "is_read",
     "actor.name",

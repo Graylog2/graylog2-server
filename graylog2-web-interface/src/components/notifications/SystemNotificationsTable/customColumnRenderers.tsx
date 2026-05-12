@@ -23,11 +23,19 @@ import DescriptionCell from './cells/DescriptionCell';
 import StatusCell from './cells/StatusCell';
 import ActorCell from './cells/ActorCell';
 import TriggeredAtCell from './cells/TriggeredAtCell';
+import SeverityCell from './cells/SeverityCell';
+import TypeCell from './cells/TypeCell';
 
 const customColumnRenderers = {
   attributes: {
     title: {
       renderCell: (_title: string, row: NotificationType) => <TitleCell row={row} />,
+    },
+    severity: {
+      renderCell: (_severity: string, row: NotificationType) => <SeverityCell row={row} />,
+    },
+    type: {
+      renderCell: (_type: string, row: NotificationType) => <TypeCell row={row} />,
     },
     description: {
       renderCell: (_description: string, row: NotificationType) => <DescriptionCell row={row} />,
