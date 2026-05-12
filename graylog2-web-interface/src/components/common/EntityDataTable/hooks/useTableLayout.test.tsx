@@ -65,6 +65,7 @@ describe('useTableLayout hook', () => {
       order: undefined,
       sort: layoutPreferences.sort,
       pageSize: layoutPreferences.perPage,
+      slicing: undefined,
     });
   });
 
@@ -85,6 +86,7 @@ describe('useTableLayout hook', () => {
       order: undefined,
       sort: defaultLayout.defaultSort,
       pageSize: defaultLayout.defaultPageSize,
+      slicing: undefined,
     });
   });
 
@@ -108,6 +110,33 @@ describe('useTableLayout hook', () => {
       order: undefined,
       sort: defaultLayout.defaultSort,
       pageSize: layoutPreferences.perPage,
+      slicing: undefined,
+    });
+  });
+
+  it('should provide slicing preferences', async () => {
+    const slicing = { sliceColumn: 'status', sortBy: 'risk_score', order: 'desc' as const };
+
+    asMock(useUserLayoutPreferences).mockReturnValue({
+      data: { slicing },
+      isInitialLoading: false,
+      refetch: () => {},
+    });
+    const { result } = renderHook(
+      () =>
+        useTableLayout({
+          entityTableId: 'streams',
+          ...defaultLayout,
+        }),
+      { wrapper },
+    );
+
+    expect(result.current.layoutConfig).toEqual({
+      attributes: undefined,
+      order: undefined,
+      sort: defaultLayout.defaultSort,
+      pageSize: defaultLayout.defaultPageSize,
+      slicing,
     });
   });
 });
