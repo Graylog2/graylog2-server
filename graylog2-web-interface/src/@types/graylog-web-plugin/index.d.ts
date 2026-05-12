@@ -28,6 +28,7 @@ import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTab
 import type { StepType } from 'components/common/Wizard';
 import type { InputSetupWizardStep } from 'components/inputs/InputSetupWizard';
 import type { TelemetryEventType } from 'logic/telemetry/TelemetryContext';
+import type { RightSidebarContextType } from 'contexts/RightSidebarContext';
 
 type PluginNavigationLink = {
   path: QualifiedUrl<string>;
@@ -384,11 +385,15 @@ declare module 'graylog-web-plugin/plugin' {
     useCondition?: () => boolean;
   } & (PluginNavigationLink | PluginNavigationDropdown);
 
+  type EntityLinkOnClickContext = {
+    openSidebar: RightSidebarContextType['openSidebar'];
+  };
+
   type EntityLinkResolver = {
     uriSegment: string;
     resolve: (
       trailingSegments: ReadonlyArray<string>,
-    ) => { grnType: string; id: string } | { onClick: () => void } | null;
+    ) => { grnType: string; id: string } | { onClick: (context: EntityLinkOnClickContext) => void } | null;
   };
 
   interface PluginExports {

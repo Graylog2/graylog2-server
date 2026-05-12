@@ -20,6 +20,7 @@ import { Link } from 'components/common';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { useGetEntityRoute } from 'routing/hooks/useShowRouteForEntity';
 import ExternalLink from 'components/common/ExternalLink';
+import useRightSidebar from 'hooks/useRightSidebar';
 
 import resolveGraylogUri from './resolveGraylogUri';
 
@@ -30,11 +31,12 @@ type Props = {
   children?: React.ReactNode;
 };
 
-type ResolvedLink = { to: string } | { onClick: () => void };
+type ResolvedLink = { to: string } | { onClick: React.MouseEventHandler<HTMLAnchorElement> };
 
 const useResolvedGraylogLink = (href: string): ResolvedLink | null => {
   const resolvers = usePluginEntities('markdown.entityLinkResolvers');
   const getEntityRoute = useGetEntityRoute();
+  const { openSidebar } = useRightSidebar();
 
   if (!href.startsWith(GRAYLOG_URI_PREFIX)) {
     return null;
@@ -47,7 +49,12 @@ const useResolvedGraylogLink = (href: string): ResolvedLink | null => {
   }
 
   if ('onClick' in resolved) {
-    return { onClick: resolved.onClick };
+    return {
+      onClick: (event) => {
+        event.preventDefault();
+        resolved.onClick({ openSidebar });
+      },
+    };
   }
 
   return { to: getEntityRoute(resolved.id, resolved.grnType) };
@@ -62,12 +69,7 @@ const MarkdownLink = ({ href, children = null }: Props) => {
 
   if (resolved && 'onClick' in resolved) {
     return (
-      <a
-        href={href}
-        onClick={(event) => {
-          event.preventDefault();
-          resolved.onClick();
-        }}>
+      <a href={href} onClick={resolved.onClick}>
         {children}
       </a>
     );
