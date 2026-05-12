@@ -14,17 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster.nodes;
+import type { Preview } from '@storybook/react-webpack5';
 
-import jakarta.inject.Inject;
-import org.graylog2.Configuration;
-import org.graylog2.database.MongoCollections;
+import { withGraylogTheme } from './graylog-theme-decorator';
+import { lightTheme, darkTheme } from './storybook-theme';
 
-public class DataNodeClusterService extends AbstractNodeService<DataNodeDto> {
+export const decorators = [withGraylogTheme];
 
-    @Inject
-    public DataNodeClusterService(MongoCollections mongoCollections, Configuration configuration) {
-        super(mongoCollections, configuration, DataNodeDto.COLLECTION_NAME, DataNodeDto.class);
-    }
+const preview: Preview = {
+  parameters: {
+    controls: {
+      matchers: {
+        color: /(background|color)$/i,
+        date: /Date$/i,
+      },
+    },
+    darkMode: {
+      dark: darkTheme,
+      light: lightTheme,
+      current: 'dark',
+      stylePreview: true,
+    },
+  },
+};
 
-}
+export default preview;
