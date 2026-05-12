@@ -386,7 +386,9 @@ declare module 'graylog-web-plugin/plugin' {
 
   type EntityLinkResolver = {
     uriSegment: string;
-    resolve: (trailingSegments: ReadonlyArray<string>) => { grnType: string; id: string } | null;
+    resolve: (
+      trailingSegments: ReadonlyArray<string>,
+    ) => { grnType: string; id: string } | { onClick: () => void } | null;
   };
 
   interface PluginExports {

@@ -1,20 +1,23 @@
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
-import { createGRN } from 'logic/permissions/GRN';
+type EntityLinkResolvers = NonNullable<PluginExports['markdown.entityLinkResolvers']>;
+export type EntityLinkResolution = NonNullable<ReturnType<EntityLinkResolvers[number]['resolve']>>;
 
 /**
- * Parses a `graylog:///<segment>(/<more>...)` URI and resolves it to a GRN by delegating to
- * the first matching {@link EntityLinkResolver} in the supplied registry.
+ * Parses a `graylog:///<segment>(/<more>...)` URI and delegates resolution to the first matching
+ * {@link EntityLinkResolver} in the supplied registry. Returns the resolver's result — either an
+ * entity descriptor `{ grnType, id }` that callers can turn into a route, or an `{ onClick }`
+ * handler the link should invoke when activated.
  *
- * Returns `null` when the URI doesn't match the scheme, no resolver claims the first segment,
- * or the matching resolver declines (e.g. the id isn't a valid 24-character hex).
- *
- * This is the function we expect core's `<Markdown>` (once extended) to call against the
- * merged `markdown.entityLinkResolvers` plugin namespace.
+ * Returns `null` when the URI doesn't match the scheme, no resolver claims the first segment, or
+ * the matching resolver declines.
  */
 const GRAYLOG_URI = /^graylog:\/\/\/([^/]+)(?:\/(.+))?$/;
 
-const resolveGraylogUri = (uri: string, resolvers: PluginExports['markdown.entityLinkResolvers']): string | null => {
+const resolveGraylogUri = (
+  uri: string,
+  resolvers: PluginExports['markdown.entityLinkResolvers'],
+): EntityLinkResolution | null => {
   const match: RegExpExecArray | null = GRAYLOG_URI.exec(uri);
 
   if (!match) {
@@ -30,13 +33,7 @@ const resolveGraylogUri = (uri: string, resolvers: PluginExports['markdown.entit
     return null;
   }
 
-  const resolved = resolver.resolve([trailingSegments.at(-1)]);
-
-  if (!resolved) {
-    return null;
-  }
-
-  return createGRN(resolved.grnType, resolved.id);
+  return resolver.resolve([trailingSegments.at(-1)]);
 };
 
 export default resolveGraylogUri;

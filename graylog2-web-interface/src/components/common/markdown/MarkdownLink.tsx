@@ -18,7 +18,6 @@ import * as React from 'react';
 
 import { Link } from 'components/common';
 import usePluginEntities from 'hooks/usePluginEntities';
-import { getValuesFromGRN } from 'logic/permissions/GRN';
 import { useGetEntityRoute } from 'routing/hooks/useShowRouteForEntity';
 import ExternalLink from 'components/common/ExternalLink';
 
@@ -31,7 +30,9 @@ type Props = {
   children?: React.ReactNode;
 };
 
-const useGraylogRoute = (href: string): string | null => {
+type ResolvedLink = { to: string } | { onClick: () => void };
+
+const useResolvedGraylogLink = (href: string): ResolvedLink | null => {
   const resolvers = usePluginEntities('markdown.entityLinkResolvers');
   const getEntityRoute = useGetEntityRoute();
 
@@ -39,22 +40,37 @@ const useGraylogRoute = (href: string): string | null => {
     return null;
   }
 
-  const grn = resolveGraylogUri(href, resolvers);
+  const resolved = resolveGraylogUri(href, resolvers);
 
-  if (!grn) {
+  if (!resolved) {
     return null;
   }
 
-  const { id, type } = getValuesFromGRN(grn);
+  if ('onClick' in resolved) {
+    return { onClick: resolved.onClick };
+  }
 
-  return getEntityRoute(id, type);
+  return { to: getEntityRoute(resolved.id, resolved.grnType) };
 };
 
 const MarkdownLink = ({ href, children = null }: Props) => {
-  const internalRoute = useGraylogRoute(href);
+  const resolved = useResolvedGraylogLink(href);
 
-  if (internalRoute) {
-    return <Link to={internalRoute}>{children}</Link>;
+  if (resolved && 'to' in resolved) {
+    return <Link to={resolved.to}>{children}</Link>;
+  }
+
+  if (resolved && 'onClick' in resolved) {
+    return (
+      <a
+        href={href}
+        onClick={(event) => {
+          event.preventDefault();
+          resolved.onClick();
+        }}>
+        {children}
+      </a>
+    );
   }
 
   return <ExternalLink href={href}>{children}</ExternalLink>;
