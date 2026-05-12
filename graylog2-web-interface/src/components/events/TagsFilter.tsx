@@ -16,13 +16,14 @@
  */
 import * as React from 'react';
 import { useMemo, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 
 import { Events } from '@graylog/server-api';
 
 import type { FilterComponentProps } from 'stores/PaginationTypes';
 import SuggestionsList from 'components/common/EntityFilters/FilterConfiguration/SuggestionsList';
 import useQuery_ from 'routing/useQuery';
+import useDebouncedValue from 'hooks/useDebouncedValue';
 import { MISSING_BUCKET_NAME } from 'views/Constants';
 
 const DEFAULT_SEARCH_PARAMS = {
@@ -38,6 +39,9 @@ const TIMERANGE_30D = { type: 'relative', range: 30 * 24 * 60 * 60 };
 // Hard cap on rendered suggestions; relies on the search box to narrow further.
 const MAX_RENDERED_SUGGESTIONS = 100;
 
+// Debounce window for forwarding the typed prefix to a server-side fetcher.
+const PREFIX_DEBOUNCE_MS = 300;
+
 type Suggestion = { id: string; value: string };
 
 const emptyFilter = {
@@ -50,7 +54,7 @@ const emptyFilter = {
   key: [] as string[],
 };
 
-const fetchTagSuggestions = (streamId: string | undefined): Promise<Suggestion[]> =>
+const fetchTagSuggestions = (streamId: string | undefined, _prefix?: string): Promise<Suggestion[]> =>
   Events.slices({
     include_all: true,
     slice_column: 'tags',
@@ -68,28 +72,38 @@ const fetchTagSuggestions = (streamId: string | undefined): Promise<Suggestion[]
       .map((value) => ({ id: value, value })),
   );
 
-type FetchSuggestions = (streamId: string | undefined) => Promise<Suggestion[]>;
+type FetchSuggestions = (streamId: string | undefined, prefix?: string) => Promise<Suggestion[]>;
 
 /**
  * Build a `filter_component` for the tags column. Different consumers use different sources of
  * truth (indexed events vs. defined event definitions) so the fetcher is injected.
+ *
+ * Set `serverSidePrefix` when the backend caps results (e.g. the event-definitions
+ * suggest endpoint, which is hard-capped at 100). In that mode the debounced search-box
+ * query is forwarded to the fetcher as a prefix and included in the React Query key so
+ * later keystrokes can reach entries past the server cap.
  */
 export const createTagsFilter = ({
   queryKeyPrefix,
   fetchSuggestions,
   streamScoped = false,
+  serverSidePrefix = false,
 }: {
   queryKeyPrefix: ReadonlyArray<string>;
   fetchSuggestions: FetchSuggestions;
   streamScoped?: boolean;
+  serverSidePrefix?: boolean;
 }) => {
   const Filter = ({ attribute, allActiveFilters, filter, filterValueRenderer, onSubmit }: FilterComponentProps) => {
     const [searchParams, setSearchParams] = useState(DEFAULT_SEARCH_PARAMS);
+    const [debouncedQuery] = useDebouncedValue(searchParams.query, PREFIX_DEBOUNCE_MS);
     const { stream_id: streamId } = useQuery_();
     const streamIdParam = streamScoped && typeof streamId === 'string' ? streamId : undefined;
+    const prefixParam = serverSidePrefix ? debouncedQuery : undefined;
     const { data: allSuggestions, isInitialLoading, isError } = useQuery({
-      queryKey: [...queryKeyPrefix, streamIdParam ?? 'all'],
-      queryFn: () => fetchSuggestions(streamIdParam),
+      queryKey: [...queryKeyPrefix, streamIdParam ?? 'all', ...(serverSidePrefix ? [prefixParam] : [])],
+      queryFn: () => fetchSuggestions(streamIdParam, prefixParam),
+      placeholderData: serverSidePrefix ? keepPreviousData : undefined,
     });
 
     const suggestions = useMemo(
