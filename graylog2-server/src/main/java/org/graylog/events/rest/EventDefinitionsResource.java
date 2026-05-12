@@ -124,6 +124,11 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
 
     private static final int TAG_SUGGESTIONS_MAX_LIMIT = 100;
 
+    // Note on multi-tag semantics: a single-clause `tags:phishing` query from the search bar works
+    // the same as selecting one tag in the filter UI. Multi-clause search-bar queries
+    // (`tags:phishing tags:exfil`) however are OR-joined by SearchQueryParser, while the filter UI
+    // applies multi-tag AND via the predicate in `getPage`. Users
+    // wanting AND across multiple tags should use the column-header filter dropdown.
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
             .put("title", SearchQueryField.create(EventDefinitionDto.FIELD_TITLE))

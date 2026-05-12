@@ -264,4 +264,14 @@ public class EventDefinitionDtoTest {
         assertThat(validationResult.failed()).isTrue();
         assertThat(validationResult.getErrors()).containsKey("tags");
     }
+
+    @Test
+    public void tagWithInvalidCharactersFailsValidation() {
+        final EventDefinitionDto invalid = testSubject.toBuilder()
+                .tags(ImmutableSet.of("phish:ing"))
+                .build();
+        final ValidationResult validationResult = validate(invalid);
+        assertThat(validationResult.failed()).isTrue();
+        assertThat(validationResult.getErrors()).containsKey("tags");
+    }
 }

@@ -15,16 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import {useLayoutEffect, useRef, useState} from 'react';
-import type {CreatableProps} from 'react-select/creatable';
+import { useLayoutEffect, useRef, useState } from 'react';
 import CreatableSelect from 'react-select/creatable';
+import type { CreatableProps } from 'react-select/creatable';
 
-import {InputDescription} from 'components/common';
-import {FormGroup, ControlLabel} from 'components/bootstrap';
+import { InputDescription } from 'components/common';
+import { FormGroup, ControlLabel } from 'components/bootstrap';
 
 import useInputListStyles from './useInputListStyles';
-import type {GenericTarget} from './InputList.types';
-import {GenericChangeEvent} from './InputList.types';
+import { GenericChangeEvent } from './InputList.types';
+import type { GenericTarget } from './InputList.types';
 
 interface Option {
   readonly label: string | number;
