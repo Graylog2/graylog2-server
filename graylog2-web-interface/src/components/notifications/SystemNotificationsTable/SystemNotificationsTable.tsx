@@ -14,27 +14,43 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { OrderedMap } from 'immutable';
+import * as React from "react";
+import { OrderedMap } from "immutable";
 
-import { PaginatedEntityTable } from 'components/common';
-import type { Sort } from 'stores/PaginationTypes';
-import type { NotificationType } from 'components/notifications/types';
-import { fetchNotifications, keyFn } from 'components/notifications/hooks/useNotificationsList';
+import { PaginatedEntityTable } from "components/common";
+import { Row, Col } from "components/bootstrap";
+import type { Sort } from "stores/PaginationTypes";
+import type { NotificationType } from "components/notifications/types";
+import {
+  fetchNotifications,
+  keyFn,
+} from "components/notifications/hooks/useNotificationsList";
 
-import expandedSections from './expandedSections';
-import BulkActions from './BulkActions';
-import ActionsCell from './cells/ActionsCell';
-import customColumnRenderers from './customColumnRenderers';
+import expandedSections from "./expandedSections";
+import BulkActions from "./BulkActions";
+import ActionsCell from "./cells/ActionsCell";
+import customColumnRenderers from "./customColumnRenderers";
 
-const DEFAULT_FILTERS = OrderedMap({ is_read: ['false'] });
+const DEFAULT_FILTERS = OrderedMap({ is_read: ["false"] });
 
 const TABLE_LAYOUT = {
-  entityTableId: 'system-notifications',
+  entityTableId: "system-notifications",
   defaultPageSize: 20,
-  defaultSort: { attributeId: 'triggered_at', direction: 'desc' } as Sort,
-  defaultDisplayedAttributes: ['title', 'description', 'is_read', 'actor.name', 'triggered_at'],
-  defaultColumnOrder: ['title', 'description', 'is_read', 'actor.name', 'triggered_at'],
+  defaultSort: { attributeId: "triggered_at", direction: "desc" } as Sort,
+  defaultDisplayedAttributes: [
+    "title",
+    "description",
+    "is_read",
+    "actor.name",
+    "triggered_at",
+  ],
+  defaultColumnOrder: [
+    "title",
+    "description",
+    "is_read",
+    "actor.name",
+    "triggered_at",
+  ],
 };
 
 const bulkSelection = { actions: <BulkActions /> };
@@ -42,19 +58,23 @@ const bulkSelection = { actions: <BulkActions /> };
 const renderActions = (row: NotificationType) => <ActionsCell row={row} />;
 
 const SystemNotificationsTable = () => (
-  <PaginatedEntityTable<NotificationType>
-    humanName="notifications"
-    tableLayout={TABLE_LAYOUT}
-    fetchEntities={fetchNotifications}
-    keyFn={keyFn}
-    entityAttributesAreCamelCase={false}
-    columnRenderers={customColumnRenderers}
-    entityActions={renderActions}
-    expandedSectionRenderers={expandedSections}
-    bulkSelection={bulkSelection}
-    defaultFilters={DEFAULT_FILTERS}
-    fetchOptions={{ retry: false }}
-  />
+  <Row className="content">
+    <Col md={12}>
+      <h2>Notifications</h2>
+      <PaginatedEntityTable<NotificationType>
+        humanName="notifications"
+        tableLayout={TABLE_LAYOUT}
+        fetchEntities={fetchNotifications}
+        keyFn={keyFn}
+        entityAttributesAreCamelCase={false}
+        columnRenderers={customColumnRenderers}
+        entityActions={renderActions}
+        expandedSectionRenderers={expandedSections}
+        bulkSelection={bulkSelection}
+        defaultFilters={DEFAULT_FILTERS}
+      />
+    </Col>
+  </Row>
 );
 
 export default SystemNotificationsTable;

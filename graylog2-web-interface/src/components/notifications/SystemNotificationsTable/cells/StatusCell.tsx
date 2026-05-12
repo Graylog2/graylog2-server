@@ -15,30 +15,35 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled, { css } from 'styled-components';
 
-import { Button } from 'components/bootstrap';
+import { Badge } from 'components/bootstrap';
+import { Icon } from 'components/common';
 import type { NotificationType } from 'components/notifications/types';
 import useNotificationToggleRead from 'components/notifications/hooks/useNotificationToggleRead';
+
+const ClickableBadge = styled(Badge)(
+  () => css`
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  `,
+);
 
 type Props = { row: NotificationType };
 
 const StatusCell = ({ row }: Props) => {
   const { mutate: toggleRead, isPending } = useNotificationToggleRead();
-  const label = row.is_read ? 'Mark as unread' : 'Mark as read';
-
-  const handleClick = () => {
-    toggleRead({ id: row.id, currentIsRead: row.is_read });
-  };
 
   return (
-    <Button
-      bsSize="xs"
+    <ClickableBadge
       bsStyle={row.is_read ? 'default' : 'info'}
-      onClick={handleClick}
-      disabled={isPending}
-      aria-label={label}>
-      {label}
-    </Button>
+      title={row.is_read ? 'Mark as unread' : 'Mark as read'}
+      onClick={isPending ? undefined : () => toggleRead({ id: row.id, currentIsRead: row.is_read })}>
+      <Icon name={row.is_read ? 'drafts' : 'mail'} size="sm" />
+      {row.is_read ? 'Read' : 'Unread'}
+    </ClickableBadge>
   );
 };
 
