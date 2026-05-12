@@ -32,6 +32,7 @@ export type PaginatedResponse<T, M = unknown> = {
 
 export type FetchOptions = {
   refetchInterval?: number;
+  retry?: boolean | number;
 };
 
 export const slicesToFilters = (searchParams: SearchParams) => {

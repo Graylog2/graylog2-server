@@ -28,7 +28,7 @@ jest.mock('@graylog/server-api', () => ({
   SystemNotifications: { getPaginated: jest.fn() },
 }));
 
-const getPaginatedMock = SystemNotifications.getPaginated as jest.Mock;
+const getPaginatedMock = asMock(SystemNotifications.getPaginated);
 
 const buildWrapper = (queryClient: QueryClient) => {
   const Wrapper = ({ children }: { children: React.ReactNode }) =>
@@ -47,12 +47,8 @@ describe('useNotificationBadgeCount', () => {
     });
   });
 
-  it('calls SystemNotifications.getPaginated with is_read:false filter and per_page=1', async () => {
-    getPaginatedMock.mockResolvedValue({
-      pagination: { page: 1, per_page: 1, total: 7 },
-      elements: [],
-      attributes: [],
-    });
+  it('calls SystemNotifications.getPaginated with is_read:false filter, per_page=1, and no session extension', async () => {
+    getPaginatedMock.mockResolvedValue({ pagination: { total: 7 }, elements: [], attributes: [] } as any);
 
     renderHook(() => useNotificationBadgeCount(), { wrapper: buildWrapper(queryClient) });
 
@@ -60,15 +56,14 @@ describe('useNotificationBadgeCount', () => {
       expect(getPaginatedMock).toHaveBeenCalled();
     });
 
-    expect(getPaginatedMock).toHaveBeenCalledWith(1, 1, undefined, ['is_read:false']);
+    expect(getPaginatedMock).toHaveBeenCalledWith(
+      1, 1, undefined, ['is_read:false'], undefined, undefined,
+      { requestShouldExtendSession: false },
+    );
   });
 
   it('extracts pagination.total as the badge count', async () => {
-    asMock(getPaginatedMock).mockResolvedValue({
-      pagination: { page: 1, per_page: 1, total: 42 },
-      elements: [],
-      attributes: [],
-    });
+    getPaginatedMock.mockResolvedValue({ pagination: { total: 42 }, elements: [], attributes: [] } as any);
 
     const { result } = renderHook(() => useNotificationBadgeCount(), { wrapper: buildWrapper(queryClient) });
 
@@ -77,7 +72,7 @@ describe('useNotificationBadgeCount', () => {
   });
 
   it('returns 0 when the response has no pagination.total (defensive default)', async () => {
-    asMock(getPaginatedMock).mockResolvedValue({ elements: [], attributes: [] });
+    getPaginatedMock.mockResolvedValue({ elements: [], attributes: [] } as any);
 
     const { result } = renderHook(() => useNotificationBadgeCount(), { wrapper: buildWrapper(queryClient) });
 

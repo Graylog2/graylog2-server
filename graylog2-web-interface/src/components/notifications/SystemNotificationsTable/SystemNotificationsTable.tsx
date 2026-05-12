@@ -53,6 +53,7 @@ const SystemNotificationsTable = () => (
     expandedSectionRenderers={expandedSections}
     bulkSelection={bulkSelection}
     defaultFilters={DEFAULT_FILTERS}
+    fetchOptions={{ retry: false }}
   />
 );
 

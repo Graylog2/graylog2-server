@@ -28,6 +28,8 @@ export const keyFn = (searchParams: SearchParams) => [...NOTIFICATIONS_QUERY_KEY
 
 type SortField = Parameters<typeof SystemNotifications.getPaginated>[4];
 
+const EMPTY_PAGE: PaginatedResponse<NotificationType> = { list: [], pagination: { total: 0 }, attributes: [] };
+
 export const fetchNotifications = (searchParams: SearchParams): Promise<PaginatedResponse<NotificationType>> =>
   SystemNotifications.getPaginated(
     searchParams.page,
@@ -40,7 +42,11 @@ export const fetchNotifications = (searchParams: SearchParams): Promise<Paginate
     list: elements,
     pagination,
     attributes,
-  }));
+  // 404 means the backend endpoint is not yet available; return empty rather than toasting.
+  })).catch((err: { status?: number }) => {
+    if (err?.status === 404) return EMPTY_PAGE;
+    throw err;
+  });
 
 const useNotificationsList = (
   searchParams: SearchParams,

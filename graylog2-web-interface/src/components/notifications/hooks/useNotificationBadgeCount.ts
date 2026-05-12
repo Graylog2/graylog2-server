@@ -18,14 +18,16 @@ import { useQuery } from '@tanstack/react-query';
 
 import { SystemNotifications } from '@graylog/server-api';
 
+import type { RequestOptions } from 'routing/request';
 import {
   NOTIFICATIONS_QUERY_KEY,
   BADGE_COUNT_KEY,
 } from 'components/notifications/constants';
 
 const POLL_INTERVAL = 3000;
+const NO_SESSION_EXT: RequestOptions = { requestShouldExtendSession: false };
 
-const fetchBadgeCount = () => SystemNotifications.getPaginated(1, 1, undefined, ['is_read:false']);
+const fetchBadgeCount = () => SystemNotifications.getPaginated(1, 1, undefined, ['is_read:false'], undefined, undefined, NO_SESSION_EXT);
 
 const useNotificationBadgeCount = ({ enabled = true }: { enabled?: boolean } = {}) => {
   const { data, isLoading } = useQuery({
