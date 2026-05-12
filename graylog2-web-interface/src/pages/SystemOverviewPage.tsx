@@ -26,46 +26,38 @@ import { TimesList } from 'components/times';
 import GraylogClusterOverview from 'components/cluster/GraylogClusterOverview';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import HealthModule from 'components/health/HealthModule';
-import useHealthModuleVisible from 'components/health/useHealthModuleVisible';
-import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 
-const SystemOverviewPage = () => {
-  const { data: { valid: hasEnterpriseLicense } = { valid: false } } =
-    usePluggableLicenseCheck('/license/enterprise');
-  const showHealthModule = useHealthModuleVisible();
+const SystemOverviewPage = () => (
+  <DocumentTitle title="System overview">
+    <span>
+      <HealthModule />
 
-  return (
-    <DocumentTitle title="System overview">
-      <span>
-        {showHealthModule && hasEnterpriseLicense && <HealthModule />}
+      <IfPermitted permissions="notifications:read">
+        <NotificationsList />
+      </IfPermitted>
 
-        <IfPermitted permissions="notifications:read">
-          <NotificationsList />
+      <HideOnCloud>
+        <IfPermitted permissions="systemjobs:read">
+          <SystemJobsComponent />
         </IfPermitted>
+      </HideOnCloud>
 
-        <HideOnCloud>
-          <IfPermitted permissions="systemjobs:read">
-            <SystemJobsComponent />
-          </IfPermitted>
-        </HideOnCloud>
+      <GraylogClusterOverview showLicenseGraph />
 
-        <GraylogClusterOverview showLicenseGraph />
+      <HideOnCloud>
+        <IndexerClusterHealth />
+      </HideOnCloud>
 
-        <HideOnCloud>
-          <IndexerClusterHealth />
-        </HideOnCloud>
+      <IfPermitted permissions="indices:failures">
+        <IndexerSystemOverviewComponent />
+      </IfPermitted>
+      <TimesList />
 
-        <IfPermitted permissions="indices:failures">
-          <IndexerSystemOverviewComponent />
-        </IfPermitted>
-        <TimesList />
-
-        <IfPermitted permissions="systemmessages:read">
-          <SystemMessagesComponent />
-        </IfPermitted>
-      </span>
-    </DocumentTitle>
-  );
-};
+      <IfPermitted permissions="systemmessages:read">
+        <SystemMessagesComponent />
+      </IfPermitted>
+    </span>
+  </DocumentTitle>
+);
 
 export default SystemOverviewPage;

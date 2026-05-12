@@ -21,18 +21,17 @@ import { isHealthFeature } from './HealthReport.types';
 import { formatLeafCount } from './healthTree';
 import mockHealthReport from './mockHealthReport';
 
-export const SYNTHETIC_ROOT_ID = 'cluster_health';
-export const SYNTHETIC_ROOT_TITLE = 'Cluster Health';
+const SYNTHETIC_ROOT_ID = 'cluster_health';
+const SYNTHETIC_ROOT_TITLE = 'Cluster Health';
 
 type TreeExpandedState = Record<string, boolean>;
 
 export type HealthTreeDataNode = TreeNodeData & {
-  nodeProps: { isFeature: boolean; status: HealthStatus; countSummary?: string };
+  nodeProps: { status: HealthStatus; countSummary?: string };
   children?: HealthTreeDataNode[];
 };
 
-export type HealthModuleState = {
-  report: HealthReport;
+type HealthModuleState = {
   root: HealthFeature;
   treeData: HealthTreeDataNode[];
   lookup: Record<string, HealthNode>;
@@ -44,26 +43,43 @@ const toTreeData = (node: HealthNode): HealthTreeDataNode => ({
   value: node.id,
   label: node.title,
   nodeProps: {
-    isFeature: isHealthFeature(node),
     status: node.status,
-    countSummary: isHealthFeature(node) ? undefined : formatLeafCount(node),
+    countSummary: formatLeafCount(node),
   },
   children: isHealthFeature(node) ? node.children.map(toTreeData) : undefined,
 });
 
-const buildLookup = (node: HealthNode): Record<string, HealthNode> => {
-  const childLookup = isHealthFeature(node) ? Object.assign({}, ...node.children.map(buildLookup)) : {};
+const buildLookup = (root: HealthNode): Record<string, HealthNode> => {
+  const lookup: Record<string, HealthNode> = {};
 
-  return { [node.id]: node, ...childLookup };
+  const visit = (node: HealthNode) => {
+    lookup[node.id] = node;
+
+    if (isHealthFeature(node)) {
+      node.children.forEach(visit);
+    }
+  };
+
+  visit(root);
+
+  return lookup;
 };
 
-const buildPaths = (node: HealthNode, parentPath: string[] = []): Record<string, string[]> => {
-  const path = [...parentPath, node.title];
-  const childPaths = isHealthFeature(node)
-    ? Object.assign({}, ...node.children.map((child) => buildPaths(child, path)))
-    : {};
+const buildPaths = (root: HealthNode): Record<string, string[]> => {
+  const paths: Record<string, string[]> = {};
 
-  return { [node.id]: path, ...childPaths };
+  const visit = (node: HealthNode, parentPath: string[] = []) => {
+    const path = [...parentPath, node.title];
+    paths[node.id] = path;
+
+    if (isHealthFeature(node)) {
+      node.children.forEach((child) => visit(child, path));
+    }
+  };
+
+  visit(root);
+
+  return paths;
 };
 
 const buildHealthModuleState = (report: HealthReport): HealthModuleState => {
@@ -75,7 +91,6 @@ const buildHealthModuleState = (report: HealthReport): HealthModuleState => {
   };
 
   return {
-    report,
     root,
     treeData: [toTreeData(root)],
     lookup: buildLookup(root),
@@ -88,7 +103,7 @@ const HEALTH_MODULE_STATE = buildHealthModuleState(mockHealthReport);
 
 const useHealthModule = (): HealthModuleState => HEALTH_MODULE_STATE;
 
-export type HealthSummary = {
+type HealthSummary = {
   overallStatus: HealthStatus;
 };
 

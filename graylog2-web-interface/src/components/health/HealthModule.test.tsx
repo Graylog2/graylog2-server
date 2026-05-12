@@ -20,6 +20,16 @@ import { render, screen, within } from 'wrappedTestingLibrary';
 
 import HealthModule from './HealthModule';
 
+jest.mock('./useHealthModuleVisible', () => ({
+  __esModule: true,
+  default: () => true,
+}));
+
+jest.mock('hooks/usePluggableLicenseCheck', () => ({
+  __esModule: true,
+  default: () => ({ data: { valid: true } }),
+}));
+
 const clickInTree = async (label: string) => {
   const tree = screen.getByLabelText('Cluster health tree');
 

@@ -35,7 +35,7 @@ export const ModuleLayout = styled.div(
     grid-template-columns: minmax(300px, 340px) minmax(0, 1fr);
     height: 640px;
 
-    @media (max-width: ${theme.breakpoints.max.md}) {
+    @media (max-width: ${theme.breakpoints.max.sm}) {
       grid-template-columns: 1fr;
       height: auto;
     }
@@ -51,7 +51,7 @@ export const TreePane = styled.div(
     max-height: 640px;
     overflow: auto;
 
-    @media (max-width: ${theme.breakpoints.max.md}) {
+    @media (max-width: ${theme.breakpoints.max.sm}) {
       padding-top: ${theme.spacings.md};
       padding-right: 0;
       margin-right: 0;

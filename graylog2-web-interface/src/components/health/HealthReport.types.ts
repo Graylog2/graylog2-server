@@ -16,20 +16,18 @@
  */
 export type HealthStatus = 'healthy' | 'warning' | 'critical' | 'unknown';
 
-export type HealthCheck = {
+type HealthNodeBase = {
   id: string;
   title: string;
   status: HealthStatus;
-  total_affected: number;
+  total_affected?: number;
   total?: number;
-  /** Optional backend-emitted detail for this evaluation (e.g. error text or stack trace). Surfaced as "Latest message" and supersedes generic common causes when present. */
   message?: string;
 };
 
-export type HealthFeature = {
-  id: string;
-  title: string;
-  status: HealthStatus;
+export type HealthCheck = HealthNodeBase;
+
+export type HealthFeature = HealthNodeBase & {
   children: HealthNode[];
 };
 

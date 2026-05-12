@@ -35,16 +35,6 @@ type Props = {
   root: HealthFeature;
 };
 
-/**
- * Watches Mantine's expanded state for user-initiated single-node toggles and
- * applies cascade behavior:
- *   - collapsing a feature also collapses every descendant feature
- *   - expanding a non-healthy feature also expands the path to every non-healthy leaf
- *
- * Lives in an effect (not the click handler) so it covers both mouse and
- * keyboard interactions consistently. Multi-node diffs are skipped because they
- * are produced by our own cascade calls.
- */
 const useExpansionCascade = (
   tree: ReturnType<typeof useTree>,
   lookup: Record<string, HealthNode>,

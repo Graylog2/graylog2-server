@@ -18,19 +18,26 @@ import * as React from 'react';
 import { useTree } from '@mantine/core';
 
 import { Col, Row } from 'components/bootstrap';
+import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 
 import HealthDetailsPane from './HealthDetailsPane';
 import HealthInterpretationLegend from './HealthInterpretationLegend';
 import HealthTreePane from './HealthTreePane';
 import useHealthModule from './useHealthModule';
+import useHealthModuleVisible from './useHealthModuleVisible';
 import { ModuleContent, ModuleLayout } from './HealthModule.styles';
 
 const HealthModule = () => {
+  const showHealthModule = useHealthModuleVisible();
+  const { data: { valid: hasEnterpriseLicense } = { valid: false } } =
+    usePluggableLicenseCheck('/license/enterprise');
   const { initialExpandedState, lookup, paths, root, treeData } = useHealthModule();
   const tree = useTree({
     initialExpandedState,
     initialSelectedState: [root.id],
   });
+
+  if (!showHealthModule || !hasEnterpriseLicense) return null;
 
   const selectedValue = tree.selectedState[0] ?? root.id;
   const selectedNode = lookup[selectedValue] ?? root;

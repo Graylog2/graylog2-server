@@ -16,16 +16,14 @@
  */
 import Routes from 'routing/Routes';
 
-import type { HealthStatus } from './HealthReport.types';
-
-export type HealthEntityListLink = {
+type HealthEntityListLink = {
   url: string;
   label: string;
 };
 
-export type HealthCheckDefinition = {
+type HealthCheckDefinition = {
   description?: string;
-  meaning?: Partial<Record<HealthStatus, string>> | string;
+  meaning?: string;
   commonCauses?: string[];
   recommendedAction?: string;
   docsUrl?: string;
@@ -486,16 +484,6 @@ export const getEntityListFor = (id: string): HealthEntityListLink | undefined =
   const lastDot = id.lastIndexOf('.');
 
   return lastDot === -1 ? undefined : getEntityListFor(id.slice(0, lastDot));
-};
-
-export const getMeaningFor = (id: string, status: HealthStatus): string | undefined => {
-  const def = HEALTH_CHECK_DEFINITIONS[id];
-
-  if (!def?.meaning) return undefined;
-
-  if (typeof def.meaning === 'string') return def.meaning;
-
-  return def.meaning[status];
 };
 
 export default HEALTH_CHECK_DEFINITIONS;

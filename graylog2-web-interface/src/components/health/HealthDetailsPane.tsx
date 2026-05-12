@@ -23,8 +23,7 @@ import { ExternalLink, Icon, LinkContainer } from 'components/common';
 import HealthStatusIcon from './HealthStatusIcon';
 import { countContainedChecks, formatLeafCount } from './healthTree';
 import { getStatusMeta, STATUS_LABELS } from './healthStatusCopy';
-import HEALTH_CHECK_DEFINITIONS, { getEntityListFor, getMeaningFor } from './healthCheckDefinitions';
-import type { HealthCheckDefinition } from './healthCheckDefinitions';
+import HEALTH_CHECK_DEFINITIONS, { getEntityListFor } from './healthCheckDefinitions';
 import type { HealthNode } from './HealthReport.types';
 import { isHealthFeature } from './HealthReport.types';
 import {
@@ -59,7 +58,7 @@ const AffectedChildButton = ({
   tree: ReturnType<typeof useTree>;
 }) => {
   const childIsFeature = isHealthFeature(child);
-  const childCountSummary = childIsFeature ? undefined : formatLeafCount(child);
+  const childCountSummary = formatLeafCount(child);
 
   const handleClick = () => {
     tree.select(child.id);
@@ -97,28 +96,23 @@ const EntityListButton = ({ url, label }: { url: string; label: string }) => (
 
 const HealthDetailsPane = ({ tree, selectedNode, selectedPath }: Props) => {
   const status = selectedNode.status;
-  const definition: HealthCheckDefinition | undefined = HEALTH_CHECK_DEFINITIONS[selectedNode.id];
+  const definition = HEALTH_CHECK_DEFINITIONS[selectedNode.id];
   const description = definition?.description;
   const entityList = getEntityListFor(selectedNode.id);
   const statusMeta = getStatusMeta(status);
 
   const isFeatureWithChildren = isHealthFeature(selectedNode) && selectedNode.children.length > 0;
-  const isCheckLike = !isFeatureWithChildren;
+  const isLeafNode = !isFeatureWithChildren;
   const isUnhealthy = status !== 'healthy';
-  const leafCheck = !isHealthFeature(selectedNode) ? selectedNode : undefined;
 
-  const meaning = isCheckLike && isUnhealthy ? getMeaningFor(selectedNode.id, status) : undefined;
-  const message = isUnhealthy ? leafCheck?.message : undefined;
-  const latestMessage = message?.trim() ? message : undefined;
+  const meaning = isLeafNode && isUnhealthy ? definition?.meaning : undefined;
+  const latestMessage = isUnhealthy && selectedNode.message?.trim() ? selectedNode.message : undefined;
   // Backend specifics supersede generic causes — when a message is present, hide commonCauses.
-  const commonCauses = isCheckLike && isUnhealthy && !latestMessage ? definition?.commonCauses : undefined;
-  const recommendedAction = isCheckLike && isUnhealthy ? definition?.recommendedAction : undefined;
-  const docsUrl = isCheckLike ? definition?.docsUrl : undefined;
+  const commonCauses = isLeafNode && isUnhealthy && !latestMessage ? definition?.commonCauses : undefined;
+  const recommendedAction = isLeafNode && isUnhealthy ? definition?.recommendedAction : undefined;
+  const docsUrl = isLeafNode ? definition?.docsUrl : undefined;
 
-  const affectedChildren =
-    isFeatureWithChildren && isHealthFeature(selectedNode)
-      ? selectedNode.children.filter((child) => child.status !== 'healthy')
-      : [];
+  const affectedChildren = isFeatureWithChildren ? selectedNode.children.filter((child) => child.status !== 'healthy') : [];
 
   return (
     <DetailsPane>
@@ -170,7 +164,7 @@ const HealthDetailsPane = ({ tree, selectedNode, selectedPath }: Props) => {
         </DetailSection>
       ) : null}
 
-      {isCheckLike && entityList ? (
+      {isLeafNode && entityList ? (
         <EntityListButton url={entityList.url} label={entityList.label} />
       ) : null}
 
