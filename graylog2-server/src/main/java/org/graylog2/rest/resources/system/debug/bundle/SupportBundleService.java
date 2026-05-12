@@ -495,6 +495,17 @@ public class SupportBundleService {
         var ignored = nodeDir.toFile().mkdirs();
 
         getProxiedLog(datanode, nodeDir, "datanode.log", RemoteDataNodeStatusResource::datanodeInternalLogs, errors);
+
+        final List<String> configWarnings = datanode.getConfigurationWarnings();
+        if (configWarnings != null && !configWarnings.isEmpty()) {
+            try (var warningsFile = new FileOutputStream(nodeDir.resolve("configuration-warnings.json").toFile())) {
+                objectMapper.writerWithDefaultPrettyPrinter().writeValue(warningsFile, configWarnings);
+            } catch (Exception e) {
+                LOG.warn("Failed to write configuration warnings for data node <{}>", datanode.getHostname(), e);
+                errors.add(BundleError.of(f("datanode/%s/configuration-warnings", datanode.getHostname()), e));
+            }
+        }
+
         try (var certificatesFile = new FileOutputStream(nodeDir.resolve("certificates.json").toFile())) {
             Map<String, Map<String, KeyStoreDto>> certificates = datanodeProxy.remoteInterface(datanode.getHostname(), RemoteCertificatesResource.class, RemoteCertificatesResource::certificates);
             if (certificates.containsKey(datanode.getHostname())) {
