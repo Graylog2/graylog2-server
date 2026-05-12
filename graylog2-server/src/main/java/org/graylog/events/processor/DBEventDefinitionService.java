@@ -275,26 +275,27 @@ public class DBEventDefinitionService {
     }
 
     /**
-     * Returns distinct tag values across all event definitions, optionally narrowed by
-     * case-insensitive prefix.
+     * Returns distinct tag values across all event definitions, optionally narrowed by a
+     * case-insensitive substring match. The match is substring (not prefix) to stay consistent
+     * with other filter dropdowns in the product, which all behave like "contains".
      */
-    public List<String> suggestTags(@Nullable String prefix, int limit) {
-        return runTagAggregation(prefix, limit, null);
+    public List<String> suggestTags(@Nullable String query, int limit) {
+        return runTagAggregation(query, limit, null);
     }
 
     /**
      * Returns distinct tag values across the event definitions identified by {@code permittedIds},
-     * optionally narrowed by case-insensitive prefix. Use this overload when the caller does not
-     * have unrestricted read; pre-enumerate the IDs via {@link #findPermittedIds}.
+     * optionally narrowed by a case-insensitive substring match. Use this overload when the caller
+     * does not have unrestricted read; pre-enumerate the IDs via {@link #findPermittedIds}.
      */
-    public List<String> suggestTags(@Nullable String prefix, int limit, List<ObjectId> permittedIds) {
+    public List<String> suggestTags(@Nullable String query, int limit, List<ObjectId> permittedIds) {
         if (permittedIds.isEmpty()) {
             return List.of();
         }
-        return runTagAggregation(prefix, limit, Filters.in("_id", permittedIds));
+        return runTagAggregation(query, limit, Filters.in("_id", permittedIds));
     }
 
-    private List<String> runTagAggregation(@Nullable String prefix, int limit, @Nullable Bson permissionMatch) {
+    private List<String> runTagAggregation(@Nullable String query, int limit, @Nullable Bson permissionMatch) {
         if (limit <= 0) {
             return List.of();
         }
@@ -303,10 +304,10 @@ public class DBEventDefinitionService {
             pipeline.add(Aggregates.match(permissionMatch));
         }
         pipeline.add(Aggregates.unwind("$" + EventDefinitionDto.FIELD_TAGS));
-        if (prefix != null && !prefix.isBlank()) {
-            // Stored tags are already lowercased via TagNormalizer, so a plain anchored regex
-            // against the lowercased prefix is sufficient — no need for the case-insensitive flag.
-            final String pattern = "^" + Pattern.quote(prefix.toLowerCase(Locale.ROOT));
+         if (query != null && !query.isBlank()) {
+            // Stored tags are already lowercased via TagNormalizer, so an unanchored regex
+            // against the lowercased query is sufficient — no need for the case-insensitive flag.
+            final String pattern = Pattern.quote(query.toLowerCase(Locale.ROOT));
             pipeline.add(Aggregates.match(Filters.regex(EventDefinitionDto.FIELD_TAGS, pattern)));
         }
         pipeline.add(Aggregates.group("$" + EventDefinitionDto.FIELD_TAGS));

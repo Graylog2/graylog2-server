@@ -20,7 +20,8 @@ import { useQuery, keepPreviousData } from '@tanstack/react-query';
 
 import { EventsDefinitions } from '@graylog/server-api';
 
-import { InputList } from 'components/common';
+import { FormGroup } from 'components/bootstrap';
+import { InputDescription, Select } from 'components/common';
 import useDebouncedValue from 'hooks/useDebouncedValue';
 
 // Mirror of TagNormalizer on the server. Keep in sync.
@@ -35,6 +36,10 @@ const VALID_TAG_PATTERN = /^[a-z0-9_-]+$/;
 
 const SUGGESTION_LIMIT = 50;
 const DEBOUNCE_MS = 300;
+
+// Unit-separator character; can't appear in a tag value (validation restricts tags to
+// [a-z0-9_-]) so it's safe to use as the delimiter Select uses to (de)serialize multi values.
+const VALUE_DELIMITER = '\x1F';
 
 type Props = {
   tags: ReadonlyArray<string>;
@@ -70,50 +75,39 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
     staleTime: 30_000,
     enabled: !disabled,
   });
-  const suggestions = (data?.tags ?? []).filter((s: string) => !tags.includes(s));
+  const suggestions = (data?.tags ?? [])
+    .filter((s: string) => !tags.includes(s))
+    .map((value: string) => ({ value, label: value }));
 
-  // Commit every typed tag (only normalize + dedupe + dropping blanks). Invalid values
-  // and over-length values are kept so the user can see them as chips, with the offending
-  // chips visually marked invalid. Save is blocked by the parent form's validation, which
-  // surfaces the server-side rule violations the same way other fields work.
-  const handleChange = (event: React.ChangeEvent<{ value: (string | number)[] }>) => {
-    const raw = event.target.value as (string | number)[];
-    const normalized = raw
-      .map((value) => (typeof value === 'string' ? value : String(value)))
-      .map(normalizeTag)
-      .filter((value) => value.length > 0);
+  const handleChange = (joined: string) => {
+    const raw = joined ? joined.split(VALUE_DELIMITER) : [];
+    const normalized = raw.map(normalizeTag).filter((value) => value.length > 0);
     const deduped = Array.from(new Set(normalized));
 
     onChange(deduped.slice(0, MAX_TAGS));
   };
 
-  // Duplicates: react-select's default behavior silently refuses to add a tag that's already
-  // in the list, leaving the typed text in the input so the user can adjust it. We don't try
-  // to surface a validation message for duplicates because the data model is a Set — there's
-  // no way to render the conflict as a chip alongside the original, and managing a
-  // parallel "duplicate-attempted" state alongside the real tags state created edge cases
-  // that weren't worth the marginal feedback gain. The existing chip with the same value is
-  // itself the implicit feedback.
   const invalidTags = tags.filter(isInvalidTag);
-  const invalidValues = new Set<string | number>(invalidTags);
   const localValidationError = buildInvalidTagsMessage(invalidTags);
+  const combinedError = error ?? localValidationError;
 
   return (
-    <InputList
-      name="tags"
-      id="event-definition-tags"
-      values={[...tags]}
-      onChange={handleChange}
-      placeholder="e.g. authentication, brute-force, compliance"
-      help={HELP_TEXT}
-      error={error ?? localValidationError}
-      invalidValues={invalidValues}
-      isClearable
-      isDisabled={disabled}
-      suggestions={disabled ? undefined : suggestions}
-      onSuggestionsInputChange={setInput}
-      isLoadingSuggestions={isFetching}
-    />
+    <FormGroup controlId="event-definition-tags" validationState={combinedError ? 'error' : null}>
+      <Select
+        inputId="event-definition-tags"
+        multi
+        allowCreate
+        delimiter={VALUE_DELIMITER}
+        options={suggestions}
+        value={tags.join(VALUE_DELIMITER)}
+        onChange={handleChange}
+        onInputChange={(value) => setInput(value)}
+        isLoading={isFetching}
+        disabled={disabled}
+        placeholder="e.g. authentication, brute-force, compliance"
+      />
+      <InputDescription error={combinedError} help={HELP_TEXT} />
+    </FormGroup>
   );
 };
 

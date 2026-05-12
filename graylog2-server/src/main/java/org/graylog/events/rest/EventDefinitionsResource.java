@@ -267,18 +267,18 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
 
     @GET
     @Path("/tags")
-    @Operation(summary = "Suggest tag values across event definitions, optionally narrowed by case-insensitive prefix")
-    public TagSuggestionsResponse suggestTags(@Parameter(name = "prefix") @QueryParam("prefix") @DefaultValue("") String prefix,
+    @Operation(summary = "Suggest tag values across event definitions, optionally narrowed by case-insensitive substring match")
+    public TagSuggestionsResponse suggestTags(@Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
                                               @Parameter(name = "limit") @QueryParam("limit") @DefaultValue("10") int limit) {
         final int boundedLimit = Math.max(1, Math.min(limit, TAG_SUGGESTIONS_MAX_LIMIT));
 
         if (isPermitted(RestPermissions.EVENT_DEFINITIONS_READ)) {
-            return new TagSuggestionsResponse(dbService.suggestTags(prefix, boundedLimit));
+            return new TagSuggestionsResponse(dbService.suggestTags(query, boundedLimit));
         }
 
         final var permittedIds = dbService.findPermittedIds(
                 id -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, id));
-        return new TagSuggestionsResponse(dbService.suggestTags(prefix, boundedLimit, permittedIds));
+        return new TagSuggestionsResponse(dbService.suggestTags(query, boundedLimit, permittedIds));
     }
 
     public record TagSuggestionsResponse(@JsonProperty("tags") List<String> tags) { }

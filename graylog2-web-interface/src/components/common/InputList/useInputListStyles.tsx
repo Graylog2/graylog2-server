@@ -45,56 +45,52 @@ const useInputListStyles = (size: 'small' | 'normal') => {
     },
   };
 
-  const styles = (isValid: boolean, invalidValues?: ReadonlySet<string | number>) => {
-    const isInvalidChip = (state: any) => invalidValues?.has(state?.data?.value) ?? false;
-
-    return {
-      valueContainer: (provided: any) => ({
-        ...provided,
-        padding: size === 'small' ? '0 8px' : '2px 12px',
-      }),
-      control: (provided: any, { isFocused }) => ({
-        ...provided,
-        borderWidth: isFocused ? 1 : provided.borderWidth,
-        outline: isFocused ? 0 : provided.outline,
-        boxShadow: isFocused ? inputListTheme.colors.input.boxShadow : null,
-        ...(size === 'small' ? { minHeight: 29, height: 29 } : { minHeight: 34 }),
-        borderRadius: INPUT_BORDER_RADIUS,
-        alignItems: 'center',
-        borderColor: isValid ? provided.borderColor : inputListTheme.colors.variant.danger,
-      }),
-      placeHolder: (provided: any) => ({
-        ...provided,
-        color: inputListTheme.colors.input.placeholder,
-        lineHeight: '28px',
-        fontFamily: inputListTheme.fonts.family.body,
-        fontSize: inputListTheme.fonts.size.body,
-        fontWeight: 400,
-        whiteSpace: 'nowrap',
-        textOverflow: 'ellipsis',
-        overflow: 'hidden',
-        maxWidth: '100%',
-        paddingRight: '20px',
-      }),
-      multiValue: (provided: any, state: any) => ({
-        ...provided,
-        border: `1px solid ${isInvalidChip(state) ? inputListTheme.colors.variant.danger : inputListTheme.colors.variant.lighter.info}`,
-      }),
-      multiValueLabel: (provided: any, state: any) => ({
-        ...provided,
-        color: isInvalidChip(state) ? inputListTheme.colors.variant.danger : provided.color,
-        padding: '2px 5px',
-        fontSize: inputListTheme.fonts.size.small,
-      }),
-      multiValueRemove: (provided: any, state: any) => ({
-        ...provided,
-        borderLeft: `1px solid ${isInvalidChip(state) ? inputListTheme.colors.variant.danger : inputListTheme.colors.variant.lighter.info}`,
-        paddingLeft: '5px',
-        paddingRight: '5px',
-        borderRadius: '0',
-      }),
-    };
-  };
+  const styles = (isValid: boolean) => ({
+    valueContainer: (provided: any) => ({
+      ...provided,
+      padding: size === 'small' ? '0 8px' : '2px 12px',
+    }),
+    control: (provided: any, { isFocused }) => ({
+      ...provided,
+      borderWidth: isFocused ? 1 : provided.borderWidth,
+      outline: isFocused ? 0 : provided.outline,
+      boxShadow: isFocused ? inputListTheme.colors.input.boxShadow : null,
+      ...(size === 'small' ? { minHeight: 29, height: 29 } : { minHeight: 34 }),
+      borderRadius: INPUT_BORDER_RADIUS,
+      alignItems: 'center',
+      borderColor: isValid ? provided.borderColor : inputListTheme.colors.variant.danger,
+    }),
+    placeHolder: (provided: any) => ({
+      ...provided,
+      color: inputListTheme.colors.input.placeholder,
+      lineHeight: '28px',
+      fontFamily: inputListTheme.fonts.family.body,
+      fontSize: inputListTheme.fonts.size.body,
+      fontWeight: 400,
+      whiteSpace: 'nowrap',
+      textOverflow: 'ellipsis',
+      overflow: 'hidden',
+      maxWidth: '100%',
+      paddingRight: '20px',
+    }),
+    multiValue: (provided: any) => ({
+      ...provided,
+      border: `1px solid ${inputListTheme.colors.variant.lighter.info}`,
+    }),
+    multiValueLabel: (provided: any) => ({
+      ...provided,
+      color: isValid ? provided.color : inputListTheme.colors.variant.danger,
+      padding: '2px 5px',
+      fontSize: inputListTheme.fonts.size.small,
+    }),
+    multiValueRemove: (provided: any) => ({
+      ...provided,
+      borderLeft: `1px solid ${inputListTheme.colors.variant.lighter.info}`,
+      paddingLeft: '5px',
+      paddingRight: '5px',
+      borderRadius: '0',
+    }),
+  });
 
   return { inputListTheme, styles };
 };

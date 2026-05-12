@@ -45,14 +45,6 @@ type Props = CreatableProps<any, boolean, any> & {
   bsStyle?: 'success' | 'warning' | 'error' | null;
   error?: React.ReactNode;
   help?: React.ReactNode;
-  // When `suggestions` is provided, the dropdown menu opens on input. When omitted,
-  // existing consumers are unaffected: no menu, no dropdown indicator.
-  suggestions?: ReadonlyArray<string | number>;
-  onSuggestionsInputChange?: (input: string) => void;
-  isLoadingSuggestions?: boolean;
-  // Chips whose value is in this set render with the variant.danger border/text color
-  // so the user can see which specific entries failed validation.
-  invalidValues?: ReadonlySet<string | number>;
 };
 
 const InputList = ({
@@ -64,10 +56,6 @@ const InputList = ({
   bsStyle = null,
   error = null,
   help = null,
-  suggestions = undefined,
-  onSuggestionsInputChange = undefined,
-  isLoadingSuggestions = undefined,
-  invalidValues = undefined,
   ...rest
 }: Props) => {
   const { inputListTheme, styles } = useInputListStyles(size);
@@ -76,9 +64,6 @@ const InputList = ({
   const [value, setValue] = useState<readonly Option[]>(values.map((val: string | number) => createOption(val)));
 
   useLayoutEffect(() => setValue(values.map((val: string | number) => createOption(val))), [values]);
-
-  const suggestionsEnabled = suggestions !== undefined;
-  const options = suggestionsEnabled ? suggestions.map(createOption) : undefined;
 
   const dispatchOnChange = (newValue: Option[]) => {
     const newList = newValue.map((item: Option) => item.value);
@@ -92,9 +77,6 @@ const InputList = ({
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    // When suggestions are enabled, defer to react-select's native Enter/Tab handling so the
-    // menu stays open after committing a value (isMulti behavior).
-    if (suggestionsEnabled) return;
     if (!inputValue) return;
 
     if (event.key === 'Enter' || event.key === 'Tab') {
@@ -111,29 +93,20 @@ const InputList = ({
     dispatchOnChange(newValue);
   };
 
-  const handleInputChange = (newValue: string) => {
-    setInputValue(newValue);
-    onSuggestionsInputChange?.(newValue);
-  };
-
   return (
     <FormGroup controlId={rest.id ? rest.id : name} validationState={error ? 'error' : bsStyle}>
       {label && <ControlLabel>{label}</ControlLabel>}
       <CreatableSelect
         ref={inputRef}
-        components={suggestionsEnabled ? undefined : { DropdownIndicator: null }}
+        components={{ DropdownIndicator: null }}
         inputValue={inputValue}
         isMulti
-        menuIsOpen={suggestionsEnabled ? undefined : false}
-        options={options}
-        isLoading={isLoadingSuggestions}
-        formatCreateLabel={suggestionsEnabled ? (input) => `Add "${input}"` : undefined}
-        closeMenuOnSelect={suggestionsEnabled ? false : undefined}
+        menuIsOpen={false}
         onChange={handleOnChange}
-        onInputChange={handleInputChange}
+        onInputChange={(newValue: string) => setInputValue(newValue)}
         onKeyDown={handleKeyDown}
         value={value}
-        styles={styles(!error, invalidValues)}
+        styles={styles(!error)}
         theme={(theme) => ({ ...theme, ...inputListTheme })}
         {...rest}
       />

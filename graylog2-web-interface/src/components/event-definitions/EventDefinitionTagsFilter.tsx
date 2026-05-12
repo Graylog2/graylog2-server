@@ -18,12 +18,12 @@ import { EventsDefinitions } from '@graylog/server-api';
 
 import { createTagsFilter } from 'components/events/TagsFilter';
 
-// Server hard-caps responses at 100; without forwarding the typed prefix, tenants
+// Server hard-caps responses at 100; without forwarding the typed query, tenants
 // with more than 100 distinct tags would have unreachable entries past the first page.
 const SUGGESTION_LIMIT = 100;
 
-const fetchSuggestions = (_streamId: string | undefined, prefix?: string) =>
-  EventsDefinitions.suggestTags(prefix ?? '', SUGGESTION_LIMIT).then((response) =>
+const fetchSuggestions = (_streamId: string | undefined, query?: string) =>
+  EventsDefinitions.suggestTags(query ?? '', SUGGESTION_LIMIT).then((response) =>
     (response?.tags ?? []).sort().map((value: string) => ({ id: value, value })),
   );
 

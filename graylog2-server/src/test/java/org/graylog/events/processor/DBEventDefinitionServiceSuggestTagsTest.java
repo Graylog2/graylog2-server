@@ -89,7 +89,7 @@ public class DBEventDefinitionServiceSuggestTagsTest {
     }
 
     @Test
-    public void prefixMatchIsCaseInsensitive() {
+    public void substringMatchIsCaseInsensitive() {
         save("a", ImmutableSet.of("phishing"));
         save("b", ImmutableSet.of("persistence"));
 
@@ -98,7 +98,16 @@ public class DBEventDefinitionServiceSuggestTagsTest {
     }
 
     @Test
-    public void prefixWithRegexMetaIsEscaped() {
+    public void substringMatchesAnywhereInTheTag() {
+        save("a", ImmutableSet.of("phishing", "lateral-movement", "persistence"));
+
+        // "ish" appears in the middle of "phishing"; "rsi" inside "persistence".
+        assertThat(dbService.suggestTags("ish", 100)).containsExactly("phishing");
+        assertThat(dbService.suggestTags("rsi", 100)).containsExactly("persistence");
+    }
+
+    @Test
+    public void substringWithRegexMetaIsEscaped() {
         save("a", ImmutableSet.of("phishing", "lateral-movement", "persistence"));
 
         assertThat(dbService.suggestTags("*", 100)).isEmpty();
