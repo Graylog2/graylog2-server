@@ -14,32 +14,34 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { SystemNotifications } from '@graylog/server-api';
+import { SystemNotifications } from "@graylog/server-api";
 
-import UserNotification from 'util/UserNotification';
-import useCurrentUser from 'hooks/useCurrentUser';
-import type FetchError from 'logic/errors/FetchError';
-import type { NotificationType } from 'components/notifications/types';
+import UserNotification from "util/UserNotification";
+import useCurrentUser from "hooks/useCurrentUser";
+import type FetchError from "logic/errors/FetchError";
+import type { NotificationType } from "components/notifications/types";
 import {
   NOTIFICATIONS_QUERY_KEY,
   BADGE_COUNT_KEY,
   TABLE_KEY,
-} from 'components/notifications/constants';
-import { type PageShape, type Snapshot, isPageShape } from './pageShape';
+} from "components/notifications/constants";
+
+import { type PageShape, type Snapshot, isPageShape } from "./pageShape";
 
 const patchPages =
   (id: string, patch: Partial<NotificationType>) =>
-    (data: PageShape | undefined): PageShape | undefined => {
-      if (!isPageShape(data)) return data;
+  (data: PageShape | undefined): PageShape | undefined => {
+    if (!isPageShape(data)) return data;
 
-      return {
-        ...data,
-        elements: data.elements.map((row) =>
-          (row.id === id ? { ...row, ...patch } : row)),
-      };
+    return {
+      ...data,
+      elements: data.elements.map((row) =>
+        row.id === id ? { ...row, ...patch } : row,
+      ),
     };
+  };
 
 const useNotificationToggleRead = () => {
   const queryClient = useQueryClient();
@@ -53,12 +55,15 @@ const useNotificationToggleRead = () => {
     { id: string; currentIsRead: boolean },
     { snapshot: Snapshot }
   >({
-    mutationFn: ({ id }) => SystemNotifications.toggleRead(id) as Promise<NotificationType>,
+    mutationFn: ({ id }) =>
+      SystemNotifications.toggleRead(id) as Promise<NotificationType>,
 
     onMutate: async ({ id, currentIsRead }) => {
       await queryClient.cancelQueries({ queryKey: tableKey });
 
-      const snapshot = queryClient.getQueriesData<PageShape>({ queryKey: tableKey });
+      const snapshot = queryClient.getQueriesData<PageShape>({
+        queryKey: tableKey,
+      });
 
       const optimistic: Partial<NotificationType> = {
         is_read: !currentIsRead,
@@ -66,7 +71,10 @@ const useNotificationToggleRead = () => {
         actor: { id: currentUser.id, name: currentUser.username },
       };
 
-      queryClient.setQueriesData({ queryKey: tableKey }, patchPages(id, optimistic));
+      queryClient.setQueriesData(
+        { queryKey: tableKey },
+        patchPages(id, optimistic),
+      );
 
       return { snapshot };
     },
@@ -78,8 +86,8 @@ const useNotificationToggleRead = () => {
 
       if (error?.status === 403) {
         UserNotification.error(
-          'You do not have permission to change this notification.',
-          'Action not allowed',
+          "You do not have permission to change this notification.",
+          "Action not allowed",
         );
 
         return;
@@ -87,8 +95,8 @@ const useNotificationToggleRead = () => {
 
       if (error?.status === 404) {
         UserNotification.warning(
-          'Notification no longer exists.',
-          'Notification not found',
+          "Notification no longer exists.",
+          "Notification not found",
         );
         queryClient.invalidateQueries({ queryKey: tableKey });
 
@@ -96,14 +104,17 @@ const useNotificationToggleRead = () => {
       }
 
       UserNotification.error(
-        'Failed to update notification read state. Please try again.',
-        'Update failed',
+        "Failed to update notification read state. Please try again.",
+        "Update failed",
       );
     },
 
     onSuccess: (serverEntity) => {
       // patch with server response — backend may override actor/timestamps set optimistically
-      queryClient.setQueriesData({ queryKey: tableKey }, patchPages(serverEntity.id, serverEntity));
+      queryClient.setQueriesData(
+        { queryKey: tableKey },
+        patchPages(serverEntity.id, serverEntity),
+      );
     },
 
     onSettled: (_data, error) => {

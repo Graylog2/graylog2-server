@@ -14,36 +14,42 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { useQuery } from "@tanstack/react-query";
 
-import { SystemNotificationMessage } from '@graylog/server-api';
+import { SystemNotificationMessage } from "@graylog/server-api";
 
-import NotificationsFactory from 'components/notifications/NotificationsFactory';
-import type { LegacyNotificationType, NotificationType } from 'components/notifications/types';
-import { NOTIFICATIONS_QUERY_KEY } from 'components/notifications/constants';
+import NotificationsFactory from "components/notifications/NotificationsFactory";
+import type {
+  LegacyNotificationType,
+  NotificationType,
+} from "components/notifications/types";
+import { NOTIFICATIONS_QUERY_KEY } from "components/notifications/constants";
 
 type Type = Parameters<typeof SystemNotificationMessage.renderHtmlWithKey>[0];
 
 type AnyNotification = NotificationType | LegacyNotificationType;
 
-// TODO: swap to GET /system/notifications/{id}/message/html once SDK types are regenerated from the deployed backend
 const fetchNotificationMessage = (notification: AnyNotification) => {
   const values = NotificationsFactory.getValuesForNotification(notification);
   const type = notification.type.toLocaleUpperCase() as Type;
 
   return notification.key
-    ? SystemNotificationMessage.renderHtmlWithKey(type, notification.key, values)
+    ? SystemNotificationMessage.renderHtmlWithKey(
+        type,
+        notification.key,
+        values,
+      )
     : SystemNotificationMessage.renderHtml(type, values);
 };
 
 const useNotificationMessage = (notification: AnyNotification) => {
   // include id so same-type notifications don't share a cache entry
-  const id = 'id' in notification ? notification.id : undefined;
+  const id = "id" in notification ? notification.id : undefined;
   const { data } = useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [
       ...NOTIFICATIONS_QUERY_KEY,
-      'message',
+      "message",
       id,
       notification.key,
       notification.type,

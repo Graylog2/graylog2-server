@@ -14,36 +14,37 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import fetch from 'logic/rest/FetchProvider';
-import UserNotification from 'util/UserNotification';
-import useCurrentUser from 'hooks/useCurrentUser';
-import type FetchError from 'logic/errors/FetchError';
-import type { NotificationType } from 'components/notifications/types';
+import fetch from "logic/rest/FetchProvider";
+import UserNotification from "util/UserNotification";
+import useCurrentUser from "hooks/useCurrentUser";
+import type FetchError from "logic/errors/FetchError";
+import type { NotificationType } from "components/notifications/types";
 import {
   NOTIFICATIONS_QUERY_KEY,
   BADGE_COUNT_KEY,
   TABLE_KEY,
-} from 'components/notifications/constants';
-import { type PageShape, type Snapshot, isPageShape } from './pageShape';
+} from "components/notifications/constants";
+
+import { type PageShape, type Snapshot, isPageShape } from "./pageShape";
 
 type RowSeed = { id: string; currentIsRead: boolean };
 
-const flipRows = (
-  patches: Map<string, Partial<NotificationType>>,
-) => (data: PageShape | undefined): PageShape | undefined => {
-  if (!isPageShape(data)) return data;
+const flipRows =
+  (patches: Map<string, Partial<NotificationType>>) =>
+  (data: PageShape | undefined): PageShape | undefined => {
+    if (!isPageShape(data)) return data;
 
-  return {
-    ...data,
-    elements: data.elements.map((row) => {
-      const patch = patches.get(row.id);
+    return {
+      ...data,
+      elements: data.elements.map((row) => {
+        const patch = patches.get(row.id);
 
-      return patch ? { ...row, ...patch } : row;
-    }),
+        return patch ? { ...row, ...patch } : row;
+      }),
+    };
   };
-};
 
 const useNotificationBulkToggleRead = () => {
   const queryClient = useQueryClient();
@@ -51,14 +52,23 @@ const useNotificationBulkToggleRead = () => {
   const tableKey = [...NOTIFICATIONS_QUERY_KEY, TABLE_KEY] as const;
   const badgeKey = [...NOTIFICATIONS_QUERY_KEY, BADGE_COUNT_KEY] as const;
 
-  return useMutation<unknown, FetchError, { rows: RowSeed[] }, { snapshot: Snapshot }>({
+  return useMutation<
+    unknown,
+    FetchError,
+    { rows: RowSeed[] },
+    { snapshot: Snapshot }
+  >({
     mutationFn: ({ rows }) =>
-      fetch('POST', '/system/notifications/bulk/toggle_read', { entity_ids: rows.map(({ id }) => id) }),
+      fetch("POST", "/system/notifications/bulk/toggle_read", {
+        entity_ids: rows.map(({ id }) => id),
+      }),
 
     onMutate: async ({ rows }) => {
       await queryClient.cancelQueries({ queryKey: tableKey });
 
-      const snapshot = queryClient.getQueriesData<PageShape>({ queryKey: tableKey });
+      const snapshot = queryClient.getQueriesData<PageShape>({
+        queryKey: tableKey,
+      });
       const now = new Date().toISOString();
 
       const patches = new Map<string, Partial<NotificationType>>(
@@ -84,22 +94,25 @@ const useNotificationBulkToggleRead = () => {
 
       if (error?.status === 403) {
         UserNotification.error(
-          'You do not have permission to update one or more selected notifications.',
-          'Action not allowed',
+          "You do not have permission to update one or more selected notifications.",
+          "Action not allowed",
         );
 
         return;
       }
 
       if (error?.status === 400) {
-        UserNotification.warning('No notifications selected.', 'Nothing to update');
+        UserNotification.warning(
+          "No notifications selected.",
+          "Nothing to update",
+        );
 
         return;
       }
 
       UserNotification.error(
-        'Failed to update notification read states. Please try again.',
-        'Update failed',
+        "Failed to update notification read states. Please try again.",
+        "Update failed",
       );
     },
 
