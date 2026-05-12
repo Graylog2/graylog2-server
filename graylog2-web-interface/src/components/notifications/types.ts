@@ -27,3 +27,15 @@ export type LegacyNotificationType = Awaited<
 export type SystemNotificationConfig = Awaited<
   ReturnType<(typeof SystemNotifications)['getConfig']>
 >;
+
+export type PageShape = {
+  elements: NotificationType[];
+  pagination?: { total?: number };
+} & Record<string, unknown>;
+
+export type Snapshot = Array<[readonly unknown[], PageShape | undefined]>;
+
+export const isPageShape = (value: unknown): value is PageShape =>
+  typeof value === 'object'
+  && value !== null
+  && Array.isArray((value as PageShape).elements);

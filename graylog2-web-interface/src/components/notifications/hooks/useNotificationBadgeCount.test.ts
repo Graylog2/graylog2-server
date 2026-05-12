@@ -18,17 +18,17 @@ import * as React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 
-import { fetchPeriodically } from 'logic/rest/FetchProvider';
+import { SystemNotifications } from '@graylog/server-api';
+
+import asMock from 'helpers/mocking/AsMock';
 
 import useNotificationBadgeCount from './useNotificationBadgeCount';
 
-jest.mock('logic/rest/FetchProvider', () => ({
-  __esModule: true,
-  default: jest.fn(),
-  fetchPeriodically: jest.fn(),
+jest.mock('@graylog/server-api', () => ({
+  SystemNotifications: { getPaginated: jest.fn() },
 }));
 
-const fetchPeriodicallyMock = fetchPeriodically as jest.Mock;
+const getPaginatedMock = SystemNotifications.getPaginated as jest.Mock;
 
 const buildWrapper = (queryClient: QueryClient) => {
   const Wrapper = ({ children }: { children: React.ReactNode }) =>
@@ -47,31 +47,27 @@ describe('useNotificationBadgeCount', () => {
     });
   });
 
-  it('calls /system/notifications/paginated with filters=is_read:false and per_page=1', async () => {
-    fetchPeriodicallyMock.mockResolvedValue({
+  it('calls SystemNotifications.getPaginated with is_read:false filter and per_page=1', async () => {
+    getPaginatedMock.mockResolvedValue({
       pagination: { page: 1, per_page: 1, total: 7 },
       elements: [],
+      attributes: [],
     });
 
     renderHook(() => useNotificationBadgeCount(), { wrapper: buildWrapper(queryClient) });
 
     await waitFor(() => {
-      expect(fetchPeriodicallyMock).toHaveBeenCalled();
+      expect(getPaginatedMock).toHaveBeenCalled();
     });
 
-    const [method, url] = fetchPeriodicallyMock.mock.calls[0];
-
-    expect(method).toBe('GET');
-    expect(url).toContain('/system/notifications/paginated');
-    expect(url).toContain('per_page=1');
-    // PaginationURL URI-encodes the colon: filters=is_read%3Afalse
-    expect(url).toMatch(/filters=is_read(%3A|:)false/);
+    expect(getPaginatedMock).toHaveBeenCalledWith(1, 1, undefined, ['is_read:false']);
   });
 
-  it('extracts data.pagination.total as the badge count', async () => {
-    fetchPeriodicallyMock.mockResolvedValue({
+  it('extracts pagination.total as the badge count', async () => {
+    asMock(getPaginatedMock).mockResolvedValue({
       pagination: { page: 1, per_page: 1, total: 42 },
       elements: [],
+      attributes: [],
     });
 
     const { result } = renderHook(() => useNotificationBadgeCount(), { wrapper: buildWrapper(queryClient) });
@@ -81,7 +77,7 @@ describe('useNotificationBadgeCount', () => {
   });
 
   it('returns 0 when the response has no pagination.total (defensive default)', async () => {
-    fetchPeriodicallyMock.mockResolvedValue({ elements: [] });
+    asMock(getPaginatedMock).mockResolvedValue({ elements: [], attributes: [] });
 
     const { result } = renderHook(() => useNotificationBadgeCount(), { wrapper: buildWrapper(queryClient) });
 
@@ -92,6 +88,6 @@ describe('useNotificationBadgeCount', () => {
   it('does not fetch when enabled=false (permission-gate)', () => {
     renderHook(() => useNotificationBadgeCount({ enabled: false }), { wrapper: buildWrapper(queryClient) });
 
-    expect(fetchPeriodicallyMock).not.toHaveBeenCalled();
+    expect(getPaginatedMock).not.toHaveBeenCalled();
   });
 });

@@ -15,5 +15,5 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 export { default as GlobalAppNotifications } from './GlobalAppNotifications';
-export { default as SystemNotificationsTable } from './SystemNotificationsTable/SystemNotificationsTable';
+export { default as SystemNotificationsTable } from './SystemNotificationsTable';
 export { default as WithGlobalAppNotifications } from './WithGlobalAppNotifications';

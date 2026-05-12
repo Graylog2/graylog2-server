@@ -20,6 +20,8 @@ import com.codahale.metrics.annotation.Timed;
 import com.mongodb.client.model.Filters;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,26 +34,32 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.conversions.Bson;
 import org.graylog.events.processor.systemnotification.SystemNotificationRenderService;
 import org.graylog.events.processor.systemnotification.TemplateRenderResponse;
+import org.graylog.security.UserContext;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.database.filtering.ComputedFieldRegistry;
 import org.graylog2.database.filtering.DbQueryCreator;
 import org.graylog2.notifications.Notification;
-import org.graylog2.notifications.NotificationPaginationService;
 import org.graylog2.notifications.NotificationService;
-import org.graylog2.notifications.NotificationSummaryDto;
+import org.graylog2.notifications.SystemNotificationDto;
+import org.graylog2.notifications.SystemNotificationRetentionConfig;
+import org.graylog2.notifications.SystemNotificationService;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
@@ -67,11 +75,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -83,51 +91,58 @@ public class NotificationsResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(NotificationsResource.class);
 
-    // MongoDB field names from the notifications collection (mirrors NotificationImpl constants)
-    private static final String FIELD_TYPE = "type";
-    private static final String FIELD_SEVERITY = "severity";
-    private static final String FIELD_NODE_ID = "node_id";
-    private static final String FIELD_TIMESTAMP = "timestamp";
-
     private static final List<EntityAttribute> ATTRIBUTES = List.of(
-            EntityAttribute.builder().id(FIELD_TYPE).title("Type")
-                    .type(SearchQueryField.Type.STRING).sortable(true).filterable(true).searchable(true)
-                    .filterOptions(notificationTypeFilterOptions()).build(),
-            EntityAttribute.builder().id(FIELD_SEVERITY).title("Severity")
+            EntityAttribute.builder().id(SystemNotificationDto.FIELD_TITLE).title("Title")
+                    .type(SearchQueryField.Type.STRING).sortable(true).searchable(true).build(),
+            EntityAttribute.builder().id(SystemNotificationDto.FIELD_DESCRIPTION).title("Description")
+                    .type(SearchQueryField.Type.STRING).sortable(false).searchable(true).hidden(true).build(),
+            EntityAttribute.builder().id(SystemNotificationDto.FIELD_TYPE).title("Type")
+                    .type(SearchQueryField.Type.STRING).sortable(true).filterable(true).searchable(true).build(),
+            EntityAttribute.builder().id(SystemNotificationDto.FIELD_SEVERITY).title("Severity")
                     .type(SearchQueryField.Type.STRING).sortable(true).filterable(true)
                     .filterOptions(Set.of(
                             FilterOption.create("normal", "Normal"),
                             FilterOption.create("urgent", "Urgent")
                     )).build(),
-            EntityAttribute.builder().id("title").title("Title")
-                    .type(SearchQueryField.Type.STRING).sortable(false).build(),
-            EntityAttribute.builder().id("description").title("Description")
+            EntityAttribute.builder().id(SystemNotificationDto.FIELD_IS_READ).title("Read")
+                    .type(SearchQueryField.Type.BOOLEAN).sortable(true).filterable(true)
+                    .filterOptions(Set.of(
+                            FilterOption.create("true", "Read"),
+                            FilterOption.create("false", "Unread")
+                    )).build(),
+            EntityAttribute.builder().id("actor.id").title("Actor ID").dbField("actor.id")
                     .type(SearchQueryField.Type.STRING).sortable(false).hidden(true).build(),
-            EntityAttribute.builder().id(FIELD_NODE_ID).title("Node")
+            EntityAttribute.builder().id("actor.name").title("Actor").dbField("actor.name")
                     .type(SearchQueryField.Type.STRING).sortable(true).build(),
-            EntityAttribute.builder().id(FIELD_TIMESTAMP).title("Triggered")
-                    .type(SearchQueryField.Type.STRING).sortable(true).build()
+            EntityAttribute.builder().id(SystemNotificationDto.FIELD_TRIGGERED_AT).title("Triggered")
+                    .type(SearchQueryField.Type.DATE).sortable(true).build(),
+            EntityAttribute.builder().id(SystemNotificationDto.FIELD_LAST_CHANGED).title("Last changed")
+                    .type(SearchQueryField.Type.DATE).sortable(true).hidden(true).build()
     );
 
     private static final EntityDefaults DEFAULTS = EntityDefaults.builder()
-            .sort(Sorting.create(FIELD_TIMESTAMP, Sorting.Direction.DESC))
+            .sort(Sorting.create(SystemNotificationDto.FIELD_TRIGGERED_AT, Sorting.Direction.DESC))
             .build();
 
     private final NotificationService notificationService;
-    private final NotificationPaginationService paginationService;
+    private final SystemNotificationService systemNotificationService;
     private final SystemNotificationRenderService renderService;
+    private final ClusterConfigService clusterConfigService;
     private final DbQueryCreator dbQueryCreator;
     private final boolean isCloud;
 
     @Inject
     public NotificationsResource(NotificationService notificationService,
-                                 NotificationPaginationService paginationService,
+                                 SystemNotificationService systemNotificationService,
                                  SystemNotificationRenderService renderService,
+                                 ClusterConfigService clusterConfigService,
+                                 ComputedFieldRegistry computedFieldRegistry,
                                  @Named("is_cloud") boolean isCloud) {
         this.notificationService = notificationService;
-        this.paginationService = paginationService;
+        this.systemNotificationService = systemNotificationService;
         this.renderService = renderService;
-        this.dbQueryCreator = new DbQueryCreator(FIELD_TYPE, ATTRIBUTES);
+        this.clusterConfigService = clusterConfigService;
+        this.dbQueryCreator = new DbQueryCreator(SystemNotificationDto.FIELD_TITLE, ATTRIBUTES, computedFieldRegistry);
         this.isCloud = isCloud;
     }
 
@@ -161,7 +176,7 @@ public class NotificationsResource extends RestResource {
             @ApiResponse(responseCode = "204", description = "Success"),
             @ApiResponse(responseCode = "404", description = "No such notification type.")
     })
-    @AuditEvent(type = AuditEventTypes.SYSTEM_NOTIFICATION_DELETE)
+    @AuditEvent(type = AuditEventTypes.SYSTEM_NOTIFICATION_UPDATE)
     public void deleteNotification(@Parameter(name = "notificationType")
                                    @PathParam("notificationType") String notificationType) {
         deleteKeyedNotification(notificationType, null);
@@ -176,7 +191,7 @@ public class NotificationsResource extends RestResource {
             @ApiResponse(responseCode = "204", description = "Success"),
             @ApiResponse(responseCode = "404", description = "No such notification type.")
     })
-    @AuditEvent(type = AuditEventTypes.SYSTEM_NOTIFICATION_DELETE)
+    @AuditEvent(type = AuditEventTypes.SYSTEM_NOTIFICATION_UPDATE)
     public void deleteKeyedNotification(@Parameter(name = "notificationType") @PathParam("notificationType") String notificationType,
                                         @Parameter(name = "notificationKey") @PathParam("notificationKey") @Nullable String notificationKey) {
         Notification.Type type;
@@ -191,7 +206,7 @@ public class NotificationsResource extends RestResource {
         notificationService.destroyAllByTypeAndKey(type, notificationKey);
     }
 
-    // ---- Paginated entity table endpoints ----
+    // ---- New paginated entity table endpoints ----
 
     @GET
     @Timed
@@ -199,61 +214,98 @@ public class NotificationsResource extends RestResource {
     @Operation(summary = "Get paginated system notifications")
     @Produces(MediaType.APPLICATION_JSON)
     @NoAuditEvent("Read-only endpoint")
-    public PageListResponse<NotificationSummaryDto> getPaginated(
+    public PageListResponse<SystemNotificationDto> getPaginated(
             @Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
             @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
             @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
             @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
-            @Parameter(name = "sort") @QueryParam("sort") @DefaultValue(FIELD_TIMESTAMP) String sortField,
-            @Parameter(name = "order") @QueryParam("order") @DefaultValue("desc") SortOrder order) {
+            @Parameter(name = "sort", description = "The field to sort the result on",
+                       schema = @Schema(allowableValues = {SystemNotificationDto.FIELD_TRIGGERED_AT, "title", "is_read"}))
+            @DefaultValue(SystemNotificationDto.FIELD_TRIGGERED_AT) @QueryParam("sort") String sortField,
+            @Parameter(name = "order", description = "The sort direction",
+                       schema = @Schema(allowableValues = {"asc", "desc"}))
+            @DefaultValue("desc") @QueryParam("order") SortOrder order) {
         checkPermission(RestPermissions.NOTIFICATIONS_READ);
 
         final Bson dbQuery = buildPaginatedQuery(filters, query);
         final Bson sort = order.toBsonSort(sortField);
 
-        final var result = paginationService.searchPaginated(dbQuery, sort, page, perPage);
+        final var result = systemNotificationService.searchPaginated(dbQuery, sort, page, perPage);
 
-        return PageListResponse.create(query, result, sortField, order.name().toLowerCase(Locale.ENGLISH),
-                ATTRIBUTES, DEFAULTS);
+        return PageListResponse.create(
+                query,
+                result.pagination(),
+                result.pagination().total(),
+                sortField,
+                order,
+                result,
+                ATTRIBUTES,
+                DEFAULTS
+        );
     }
 
-    @GET
+    @PUT
     @Timed
-    @Path("/count")
-    @Operation(summary = "Get the count of active system notifications")
+    @Path("/{id}/toggle_read")
+    @Operation(summary = "Toggle a notification's read state")
     @Produces(MediaType.APPLICATION_JSON)
-    @NoAuditEvent("Read-only endpoint")
-    public long getCount() {
+    @Consumes(MediaType.APPLICATION_JSON)
+    @AuditEvent(type = AuditEventTypes.SYSTEM_NOTIFICATION_UPDATE)
+    public SystemNotificationDto toggleRead(@Parameter(name = "id") @PathParam("id") String id,
+                                            @Context UserContext userContext) {
         checkPermission(RestPermissions.NOTIFICATIONS_READ);
-        return paginationService.count(cloudSuppressionFilter());
-    }
 
-    @DELETE
-    @Timed
-    @Path("/id/{id}")
-    @Operation(summary = "Delete a notification by its ID")
-    @Produces(MediaType.APPLICATION_JSON)
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Success"),
-            @ApiResponse(responseCode = "404", description = "Notification not found.")
-    })
-    @AuditEvent(type = AuditEventTypes.SYSTEM_NOTIFICATION_DELETE)
-    public void deleteNotificationById(@Parameter(name = "id") @PathParam("id") String id) {
-        checkPermission(RestPermissions.NOTIFICATIONS_DELETE);
-        if (!paginationService.deleteById(id)) {
-            throw new NotFoundException(f("Notification <%s> not found", id));
+        final SystemNotificationDto dto = systemNotificationService.findById(id)
+                .orElseThrow(() -> new jakarta.ws.rs.NotFoundException(f("Notification <%s> not found", id)));
+
+        final var actor = SystemNotificationDto.Actor.create(
+                userContext.getUserId(),
+                userContext.getUser().getFullName()
+        );
+
+        if (dto.isRead()) {
+            systemNotificationService.markAsUnread(List.of(id), actor);
+        } else {
+            systemNotificationService.markAsRead(List.of(id), actor);
         }
+
+        return systemNotificationService.findById(id).orElseThrow();
     }
 
     @POST
     @Timed
-    @Path("/bulk/delete")
-    @Operation(summary = "Bulk delete notifications by their IDs")
+    @Path("/bulk/toggle_read")
+    @Operation(summary = "Toggle the read state of selected notifications")
     @Consumes(MediaType.APPLICATION_JSON)
-    @AuditEvent(type = AuditEventTypes.SYSTEM_NOTIFICATION_DELETE)
-    public Response bulkDelete(@Valid @NotNull BulkOperationRequest request) {
-        checkPermission(RestPermissions.NOTIFICATIONS_DELETE);
-        paginationService.bulkDelete(request.entityIds());
+    @AuditEvent(type = AuditEventTypes.SYSTEM_NOTIFICATION_UPDATE)
+    public Response bulkToggleRead(@Parameter(name = "JSON Body") @Valid @NotNull BulkOperationRequest request,
+                                   @Context UserContext userContext) {
+        checkPermission(RestPermissions.NOTIFICATIONS_READ);
+
+        final var actor = SystemNotificationDto.Actor.create(
+                userContext.getUserId(),
+                userContext.getUser().getFullName()
+        );
+
+        systemNotificationService.toggleReadState(request.entityIds(), actor);
+        return Response.noContent().build();
+    }
+
+    @POST
+    @Timed
+    @Path("/bulk/read_all")
+    @Operation(summary = "Mark all notifications as read")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @AuditEvent(type = AuditEventTypes.SYSTEM_NOTIFICATION_UPDATE)
+    public Response readAll(@Context UserContext userContext) {
+        checkPermission(RestPermissions.NOTIFICATIONS_READ);
+
+        final var actor = SystemNotificationDto.Actor.create(
+                userContext.getUserId(),
+                userContext.getUser().getFullName()
+        );
+
+        systemNotificationService.markAllAsRead(actor);
         return Response.noContent().build();
     }
 
@@ -268,42 +320,75 @@ public class NotificationsResource extends RestResource {
     public TemplateRenderResponse renderHtmlById(@Parameter(name = "id") @PathParam("id") String id) {
         checkPermission(RestPermissions.NOTIFICATIONS_READ);
 
-        final var notification = paginationService.findById(id)
-                .orElseThrow(() -> new NotFoundException(f("Notification <%s> not found", id)));
+        final SystemNotificationDto dto = systemNotificationService.findById(id)
+                .orElseThrow(() -> new jakarta.ws.rs.NotFoundException(f("Notification <%s> not found", id)));
 
-        final var rendered = renderService.render(notification, SystemNotificationRenderService.Format.HTML, null);
+        final Notification.Type type;
+        try {
+            type = Notification.Type.valueOf(dto.type().toUpperCase(Locale.ENGLISH));
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(f("Unknown notification type: %s", dto.type()));
+        }
+
+        final Map<String, Object> values = new HashMap<>();
+        if (dto.details() != null) {
+            values.putAll(dto.details());
+        }
+
+        final var rendered = renderService.render(
+                new org.graylog2.notifications.NotificationView(dto),
+                SystemNotificationRenderService.Format.HTML,
+                values
+        );
+
         return TemplateRenderResponse.create(rendered.title, rendered.description);
+    }
+
+    // ---- Retention config endpoints ----
+
+    @GET
+    @Timed
+    @Path("/config")
+    @Operation(summary = "Get the notification retention configuration")
+    @Produces(MediaType.APPLICATION_JSON)
+    @RequiresPermissions(RestPermissions.NOTIFICATIONS_CONFIG_READ)
+    @NoAuditEvent("Read-only endpoint")
+    public SystemNotificationRetentionConfig getConfig() {
+        return clusterConfigService.getOrDefault(
+                SystemNotificationRetentionConfig.class,
+                SystemNotificationRetentionConfig.createDefault()
+        );
+    }
+
+    @PUT
+    @Timed
+    @Path("/config")
+    @Operation(summary = "Update the notification retention configuration")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @RequiresPermissions(RestPermissions.NOTIFICATIONS_CONFIG_UPDATE)
+    @AuditEvent(type = AuditEventTypes.CLUSTER_CONFIGURATION_UPDATE)
+    public SystemNotificationRetentionConfig updateConfig(@Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) SystemNotificationRetentionConfig config) {
+        if (config.retentionDays() <= 0) {
+            throw new BadRequestException("retention_days must be a positive integer");
+        }
+        clusterConfigService.write(config);
+        return config;
     }
 
     // ---- Private helpers ----
 
     private Bson buildPaginatedQuery(List<String> filters, String query) {
         final Bson baseQuery = dbQueryCreator.createDbQuery(filters, query);
-        return Filters.and(baseQuery, cloudSuppressionFilter());
-    }
 
-    private Bson cloudSuppressionFilter() {
         if (isCloud) {
+            // Suppress cloud-excluded notification types
             final List<String> suppressedTypes = Notification.CLOUD_SUPPRESSED_TYPES.stream()
                     .map(t -> t.toString().toLowerCase(Locale.ENGLISH))
                     .toList();
-            return Filters.nin(FIELD_TYPE, suppressedTypes);
+            return Filters.and(baseQuery, Filters.nin(SystemNotificationDto.FIELD_TYPE, suppressedTypes));
         }
-        return Filters.empty();
-    }
 
-    private static Set<FilterOption> notificationTypeFilterOptions() {
-        return Arrays.stream(Notification.Type.values())
-                .filter(t -> !isDeprecated(t))
-                .map(t -> FilterOption.create(t.json(), t.json()))
-                .collect(Collectors.toSet());
-    }
-
-    private static boolean isDeprecated(Notification.Type type) {
-        try {
-            return Notification.Type.class.getField(type.name()).isAnnotationPresent(Deprecated.class);
-        } catch (NoSuchFieldException e) {
-            return false;
-        }
+        return baseQuery;
     }
 }

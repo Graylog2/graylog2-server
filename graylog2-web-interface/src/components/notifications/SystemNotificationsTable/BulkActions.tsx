@@ -22,9 +22,9 @@ import { MenuItem } from 'components/bootstrap';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import { NOTIFICATIONS_QUERY_KEY, TABLE_KEY } from 'components/notifications/constants';
-import useNotificationBulkToggleRead from 'components/notifications/SystemNotificationsTable/hooks/useNotificationBulkToggleRead';
-import useNotificationMarkAllRead from 'components/notifications/SystemNotificationsTable/hooks/useNotificationMarkAllRead';
-import type { PageShape } from 'components/notifications/SystemNotificationsTable/hooks/pageShape';
+import useNotificationBulkToggleRead from 'components/notifications/hooks/useNotificationBulkToggleRead';
+import useNotificationMarkAllRead from 'components/notifications/hooks/useNotificationMarkAllRead';
+import type { PageShape } from 'components/notifications/types';
 
 import MarkAllAsReadConfirmationModal from './MarkAllAsReadConfirmationModal';
 

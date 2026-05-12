@@ -16,27 +16,16 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import type { SystemNotifications } from '@graylog/server-api';
+import { SystemNotifications } from '@graylog/server-api';
 
-import { fetchPeriodically } from 'logic/rest/FetchProvider';
-import PaginationURL from 'util/PaginationURL';
 import {
   NOTIFICATIONS_QUERY_KEY,
   BADGE_COUNT_KEY,
 } from 'components/notifications/constants';
 
 const POLL_INTERVAL = 3000;
-const PER_PAGE = 1;
 
-type PaginatedResponse = Awaited<ReturnType<(typeof SystemNotifications)['getPaginated']>>;
-
-const fetchBadgeCount = (): Promise<PaginatedResponse> =>
-  fetchPeriodically(
-    'GET',
-    PaginationURL('/system/notifications/paginated', 1, PER_PAGE, undefined, {
-      filters: ['is_read:false'],
-    }),
-  );
+const fetchBadgeCount = () => SystemNotifications.getPaginated(1, 1, undefined, ['is_read:false']);
 
 const useNotificationBadgeCount = ({ enabled = true }: { enabled?: boolean } = {}) => {
   const { data, isLoading } = useQuery({

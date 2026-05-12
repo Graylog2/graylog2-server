@@ -14,16 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from '@tanstack/react-query';
 
-import { SystemNotificationMessage } from "@graylog/server-api";
+import { SystemNotificationMessage } from '@graylog/server-api';
 
-import NotificationsFactory from "components/notifications/NotificationsFactory";
+import NotificationsFactory from 'components/notifications/NotificationsFactory';
 import type {
   LegacyNotificationType,
   NotificationType,
-} from "components/notifications/types";
-import { NOTIFICATIONS_QUERY_KEY } from "components/notifications/constants";
+} from 'components/notifications/types';
+import { NOTIFICATIONS_QUERY_KEY } from 'components/notifications/constants';
 
 type Type = Parameters<typeof SystemNotificationMessage.renderHtmlWithKey>[0];
 
@@ -44,12 +44,12 @@ const fetchNotificationMessage = (notification: AnyNotification) => {
 
 const useNotificationMessage = (notification: AnyNotification) => {
   // include id so same-type notifications don't share a cache entry
-  const id = "id" in notification ? notification.id : undefined;
+  const id = 'id' in notification ? notification.id : undefined;
   const { data } = useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [
       ...NOTIFICATIONS_QUERY_KEY,
-      "message",
+      'message',
       id,
       notification.key,
       notification.type,

@@ -14,35 +14,35 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from "react";
-import { render, screen, within } from "wrappedTestingLibrary";
-import userEvent from "@testing-library/user-event";
+import * as React from 'react';
+import { render, screen, within } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
-import { asMock } from "helpers/mocking";
-import useFetchEntities from "components/common/PaginatedEntityTable/useFetchEntities";
-import useUserLayoutPreferences from "components/common/EntityDataTable/hooks/useUserLayoutPreferences";
-import { layoutPreferences } from "fixtures/entityListLayoutPreferences";
-import useNotificationToggleRead from "components/notifications/SystemNotificationsTable/hooks/useNotificationToggleRead";
-import useNotificationBulkToggleRead from "components/notifications/SystemNotificationsTable/hooks/useNotificationBulkToggleRead";
-import useNotificationMarkAllRead from "components/notifications/SystemNotificationsTable/hooks/useNotificationMarkAllRead";
-import useNotificationBody from "components/notifications/SystemNotificationsTable/hooks/useNotificationBody";
-import type { NotificationType } from "components/notifications/types";
+import { asMock } from 'helpers/mocking';
+import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
+import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
+import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
+import useNotificationToggleRead from 'components/notifications/hooks/useNotificationToggleRead';
+import useNotificationBulkToggleRead from 'components/notifications/hooks/useNotificationBulkToggleRead';
+import useNotificationMarkAllRead from 'components/notifications/hooks/useNotificationMarkAllRead';
+import useNotificationBody from 'components/notifications/hooks/useNotificationBody';
+import type { NotificationType } from 'components/notifications/types';
 
-import SystemNotificationsTable from "./SystemNotificationsTable";
+import SystemNotificationsTable from './SystemNotificationsTable';
 
 jest.mock("components/common/PaginatedEntityTable/useFetchEntities");
 jest.mock("components/common/EntityDataTable/hooks/useUserLayoutPreferences");
 jest.mock(
-  "components/notifications/SystemNotificationsTable/hooks/useNotificationToggleRead",
+  "components/notifications/hooks/useNotificationToggleRead",
 );
 jest.mock(
-  "components/notifications/SystemNotificationsTable/hooks/useNotificationBulkToggleRead",
+  "components/notifications/hooks/useNotificationBulkToggleRead",
 );
 jest.mock(
-  "components/notifications/SystemNotificationsTable/hooks/useNotificationMarkAllRead",
+  "components/notifications/hooks/useNotificationMarkAllRead",
 );
 jest.mock(
-  "components/notifications/SystemNotificationsTable/hooks/useNotificationBody",
+  "components/notifications/hooks/useNotificationBody",
 );
 
 const notif1: NotificationType = {

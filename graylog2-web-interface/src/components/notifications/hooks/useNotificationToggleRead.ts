@@ -14,21 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { SystemNotifications } from "@graylog/server-api";
+import { SystemNotifications } from '@graylog/server-api';
 
-import UserNotification from "util/UserNotification";
-import useCurrentUser from "hooks/useCurrentUser";
-import type FetchError from "logic/errors/FetchError";
-import type { NotificationType } from "components/notifications/types";
+import UserNotification from 'util/UserNotification';
+import useCurrentUser from 'hooks/useCurrentUser';
+import type FetchError from 'logic/errors/FetchError';
+import { type NotificationType, type PageShape, type Snapshot, isPageShape } from 'components/notifications/types';
 import {
   NOTIFICATIONS_QUERY_KEY,
   BADGE_COUNT_KEY,
   TABLE_KEY,
-} from "components/notifications/constants";
-
-import { type PageShape, type Snapshot, isPageShape } from "./pageShape";
+} from 'components/notifications/constants';
 
 const patchPages =
   (id: string, patch: Partial<NotificationType>) =>
@@ -86,8 +84,8 @@ const useNotificationToggleRead = () => {
 
       if (error?.status === 403) {
         UserNotification.error(
-          "You do not have permission to change this notification.",
-          "Action not allowed",
+          'You do not have permission to change this notification.',
+          'Action not allowed',
         );
 
         return;
@@ -95,8 +93,8 @@ const useNotificationToggleRead = () => {
 
       if (error?.status === 404) {
         UserNotification.warning(
-          "Notification no longer exists.",
-          "Notification not found",
+          'Notification no longer exists.',
+          'Notification not found',
         );
         queryClient.invalidateQueries({ queryKey: tableKey });
 
@@ -104,8 +102,8 @@ const useNotificationToggleRead = () => {
       }
 
       UserNotification.error(
-        "Failed to update notification read state. Please try again.",
-        "Update failed",
+        'Failed to update notification read state. Please try again.',
+        'Update failed',
       );
     },
 

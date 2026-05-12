@@ -18,7 +18,7 @@ import * as React from 'react';
 
 import { Button } from 'components/bootstrap';
 import type { NotificationType } from 'components/notifications/types';
-import useNotificationToggleRead from 'components/notifications/SystemNotificationsTable/hooks/useNotificationToggleRead';
+import useNotificationToggleRead from 'components/notifications/hooks/useNotificationToggleRead';
 
 type Props = { row: NotificationType };
 

@@ -18,7 +18,7 @@ import * as React from 'react';
 
 import { Sanitize, Spinner } from 'components/common';
 import type { NotificationType } from 'components/notifications/types';
-import useNotificationBody from 'components/notifications/SystemNotificationsTable/hooks/useNotificationBody';
+import useNotificationBody from 'components/notifications/hooks/useNotificationBody';
 
 const FALLBACK_MESSAGE = 'Could not load full notification body.';
 

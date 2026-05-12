@@ -14,20 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import fetch from "logic/rest/FetchProvider";
-import UserNotification from "util/UserNotification";
-import useCurrentUser from "hooks/useCurrentUser";
-import type FetchError from "logic/errors/FetchError";
-import type { NotificationType } from "components/notifications/types";
+import { SystemNotifications } from '@graylog/server-api';
+
+import UserNotification from 'util/UserNotification';
+import useCurrentUser from 'hooks/useCurrentUser';
+import type FetchError from 'logic/errors/FetchError';
+import { type NotificationType, type PageShape, type Snapshot, isPageShape } from 'components/notifications/types';
 import {
   NOTIFICATIONS_QUERY_KEY,
   BADGE_COUNT_KEY,
   TABLE_KEY,
-} from "components/notifications/constants";
-
-import { type PageShape, type Snapshot, isPageShape } from "./pageShape";
+} from 'components/notifications/constants';
 
 type RowSeed = { id: string; currentIsRead: boolean };
 
@@ -59,9 +58,7 @@ const useNotificationBulkToggleRead = () => {
     { snapshot: Snapshot }
   >({
     mutationFn: ({ rows }) =>
-      fetch("POST", "/system/notifications/bulk/toggle_read", {
-        entity_ids: rows.map(({ id }) => id),
-      }),
+      SystemNotifications.bulkToggleRead({ entity_ids: rows.map(({ id }) => id) }),
 
     onMutate: async ({ rows }) => {
       await queryClient.cancelQueries({ queryKey: tableKey });
@@ -94,8 +91,8 @@ const useNotificationBulkToggleRead = () => {
 
       if (error?.status === 403) {
         UserNotification.error(
-          "You do not have permission to update one or more selected notifications.",
-          "Action not allowed",
+          'You do not have permission to update one or more selected notifications.',
+          'Action not allowed',
         );
 
         return;
@@ -103,16 +100,16 @@ const useNotificationBulkToggleRead = () => {
 
       if (error?.status === 400) {
         UserNotification.warning(
-          "No notifications selected.",
-          "Nothing to update",
+          'No notifications selected.',
+          'Nothing to update',
         );
 
         return;
       }
 
       UserNotification.error(
-        "Failed to update notification read states. Please try again.",
-        "Update failed",
+        'Failed to update notification read states. Please try again.',
+        'Update failed',
       );
     },
 

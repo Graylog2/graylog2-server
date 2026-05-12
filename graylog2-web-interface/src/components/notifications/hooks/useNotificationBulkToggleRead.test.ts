@@ -18,15 +18,18 @@ import * as React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 
+import { SystemNotifications } from '@graylog/server-api';
+
 import asMock from 'helpers/mocking/AsMock';
 import suppressConsole from 'helpers/suppressConsole';
-import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import useCurrentUser from 'hooks/useCurrentUser';
 
 import useNotificationBulkToggleRead from './useNotificationBulkToggleRead';
 
-jest.mock('logic/rest/FetchProvider', () => ({ __esModule: true, default: jest.fn() }));
+jest.mock('@graylog/server-api', () => ({
+  SystemNotifications: { bulkToggleRead: jest.fn() },
+}));
 
 jest.mock('util/UserNotification', () => ({
   __esModule: true,
@@ -67,7 +70,7 @@ const buildPage = (rows: ReturnType<typeof row>[]) => ({
   elements: rows,
 });
 
-const fetchMock = fetch as jest.Mock;
+const bulkToggleReadMock = SystemNotifications.bulkToggleRead as jest.Mock;
 
 const buildWrapper = (queryClient: QueryClient) => {
   const Wrapper = ({ children }: { children: React.ReactNode }) =>
@@ -89,7 +92,7 @@ describe('useNotificationBulkToggleRead', () => {
 
   it('per-row optimistic patches: a mixed selection produces a mixed result', async () => {
     queryClient.setQueryData(TABLE_KEY, buildPage([row('a', false), row('b', true), row('c', false)]));
-    fetchMock.mockResolvedValue(undefined);
+    bulkToggleReadMock.mockResolvedValue(undefined);
 
     const { result } = renderHook(() => useNotificationBulkToggleRead(), { wrapper: buildWrapper(queryClient) });
 
@@ -103,16 +106,12 @@ describe('useNotificationBulkToggleRead', () => {
       });
     });
 
-    expect(fetchMock).toHaveBeenCalledWith(
-      'POST',
-      '/system/notifications/bulk/toggle_read',
-      { entity_ids: ['a', 'b', 'c'] },
-    );
+    expect(bulkToggleReadMock).toHaveBeenCalledWith({ entity_ids: ['a', 'b', 'c'] });
   });
 
   it('reverts the cache and shows a permission toast on 403', async () => {
     queryClient.setQueryData(TABLE_KEY, buildPage([row('a', false)]));
-    fetchMock.mockRejectedValue({ status: 403 });
+    bulkToggleReadMock.mockRejectedValue({ status: 403 });
 
     const { result } = renderHook(() => useNotificationBulkToggleRead(), { wrapper: buildWrapper(queryClient) });
 
@@ -132,7 +131,7 @@ describe('useNotificationBulkToggleRead', () => {
 
   it('reverts and warns on 400 (empty array)', async () => {
     queryClient.setQueryData(TABLE_KEY, buildPage([row('a', false)]));
-    fetchMock.mockRejectedValue({ status: 400 });
+    bulkToggleReadMock.mockRejectedValue({ status: 400 });
 
     const { result } = renderHook(() => useNotificationBulkToggleRead(), { wrapper: buildWrapper(queryClient) });
 
@@ -150,7 +149,7 @@ describe('useNotificationBulkToggleRead', () => {
 
   it('partial-success: 204 with silently-dropped unknown ids triggers a re-fetch via invalidation', async () => {
     queryClient.setQueryData(TABLE_KEY, buildPage([row('a', false)]));
-    fetchMock.mockResolvedValue(undefined);
+    bulkToggleReadMock.mockResolvedValue(undefined);
     const invalidateSpy = jest.spyOn(queryClient, 'invalidateQueries');
 
     const { result } = renderHook(() => useNotificationBulkToggleRead(), { wrapper: buildWrapper(queryClient) });
@@ -172,7 +171,7 @@ describe('useNotificationBulkToggleRead', () => {
 
   it('skips invalidation on 403', async () => {
     queryClient.setQueryData(TABLE_KEY, buildPage([row('a', false)]));
-    fetchMock.mockRejectedValue({ status: 403 });
+    bulkToggleReadMock.mockRejectedValue({ status: 403 });
     const invalidateSpy = jest.spyOn(queryClient, 'invalidateQueries');
 
     const { result } = renderHook(() => useNotificationBulkToggleRead(), { wrapper: buildWrapper(queryClient) });
