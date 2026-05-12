@@ -42,6 +42,9 @@
         <mainClass>org.graylog.datanode.bootstrap.Main</mainClass>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <!-- Lucene version required by opensearch-core 3.x -->
+        <lucene.version>10.3.2</lucene.version>
+
         <!-- 2.x versions -->
         <opensearch.version>2.19.5</opensearch.version>
         <opensearch.mac.jdk.version>21.0.7</opensearch.mac.jdk.version>
