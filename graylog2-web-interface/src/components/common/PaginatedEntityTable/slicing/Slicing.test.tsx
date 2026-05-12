@@ -167,6 +167,60 @@ describe('Slicing', () => {
     await screen.findByRole('menuitem', { name: /risk score/i });
   });
 
+  it('applies slicing preferences for initial slice sort', async () => {
+    renderSUT({
+      slicingPreferences: { sliceColumn: 'status', sortBy: 'risk_score', order: 'desc' },
+      fetchSlices: () =>
+        Promise.resolve({
+          slices: [
+            { value: 'Alpha', count: 1, meta: { risk_score: 2 } },
+            { value: 'Beta', count: 1, meta: { risk_score: 10 } },
+          ],
+        }),
+    });
+
+    await screen.findByText('Alpha');
+
+    expect(screen.getByRole('button', { name: /risk score/i })).toBeInTheDocument();
+
+    const getItems = () => within(screen.getByTestId('slices-list')).getAllByRole('button');
+    expect(getItems()[0]).toHaveTextContent('Beta');
+    expect(getItems()[1]).toHaveTextContent('Alpha');
+  });
+
+  it('updates slicing preferences when slice sort changes', async () => {
+    const onSlicingPreferencesChange = jest.fn();
+    renderSUT({
+      onSlicingPreferencesChange,
+      fetchSlices: () =>
+        Promise.resolve({
+          slices: [
+            { value: 'Alpha', count: 1, meta: { risk_score: 2 } },
+            { value: 'Beta', count: 1, meta: { risk_score: 10 } },
+          ],
+        }),
+    });
+
+    await screen.findByText('Alpha');
+
+    await userEvent.click(screen.getByRole('button', { name: /alphabetical/i }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /risk score/i }));
+
+    expect(onSlicingPreferencesChange).toHaveBeenCalledWith({
+      sliceColumn: 'status',
+      sortBy: 'risk_score',
+      order: 'asc',
+    });
+
+    await userEvent.click(screen.getByRole('button', { name: /sort descending/i }));
+
+    expect(onSlicingPreferencesChange).toHaveBeenCalledWith({
+      sliceColumn: 'status',
+      sortBy: 'risk_score',
+      order: 'desc',
+    });
+  });
+
   it('sorts slices by additional slice sort metadata', async () => {
     renderSUT({
       fetchSlices: () =>
