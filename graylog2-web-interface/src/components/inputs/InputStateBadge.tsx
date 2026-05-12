@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import { OverlayTrigger, LinkToNode, Spinner } from 'components/common';
 import { Label } from 'components/bootstrap';
@@ -30,6 +31,15 @@ type Props = {
 };
 
 const comparator = new InputStateComparator();
+
+const NodeState = styled.small(
+  ({ theme }) => css`
+    display: block;
+    overflow-wrap: anywhere;
+    padding: ${theme.spacings.xxs} 0;
+    white-space: normal;
+  `,
+);
 
 const getLabelClassForState = (sortedStates, input: InputSummary, nodes: { [nodeId: string]: NodeInfo }) => {
   const nodesWithKnownState = sortedStates.reduce((numberOfNodes, state) => numberOfNodes + state.count, 0);
@@ -89,10 +99,9 @@ const InputStateBadge = ({ input, inputStates = undefined }: Props) => {
   if (sorted.length > 0) {
     const popOverText = sorted.map((state) =>
       sortedInputStates[state.state].map((node) => (
-        <small key={`${input.id}-state-${state.state}-node-${node}`}>
+        <NodeState key={`${input.id}-state-${state.state}-node-${node}`}>
           <LinkToNode nodeId={node} />: {state.state}
-          <br />
-        </small>
+        </NodeState>
       )),
     );
 
