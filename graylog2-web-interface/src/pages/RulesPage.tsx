@@ -54,6 +54,12 @@ const _loadData = (
   });
 };
 
+const rulesButtonToolbar = (
+  <ButtonToolbar className="pull-right">
+    <CreateButton entityKey="Pipeline Rule" />
+  </ButtonToolbar>
+);
+
 const RulesPage = () => {
   const { page, pageSize: perPage, resetPage, setPagination } = usePaginationQueryParameter();
   const [query, setQuery] = useState('');
@@ -81,13 +87,6 @@ const RulesPage = () => {
     }
   };
 
-  // eslint-disable-next-line react/no-unstable-nested-components
-  const RulesButtonToolbar = () => (
-    <ButtonToolbar className="pull-right">
-      <CreateButton entityKey="Pipeline Rule" />
-    </ButtonToolbar>
-  );
-
   const isLoading = !rules;
 
   const searchFilter = (
@@ -113,7 +112,7 @@ const RulesPage = () => {
       <PipelinesPageNavigation />
       <PageHeader
         title="Pipeline Rules"
-        actions={<RulesButtonToolbar />}
+        actions={rulesButtonToolbar}
         documentationLink={{
           title: 'Pipeline rules documentation',
           path: DocsHelper.PAGES.PIPELINE_RULES,
