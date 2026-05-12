@@ -33,6 +33,7 @@ import org.graylog.collectors.CollectorsModule;
 import org.graylog.enterprise.EnterpriseModule;
 import org.graylog.events.EventsModule;
 import org.graylog.events.processor.EventDefinitionConfiguration;
+import org.graylog2.metrics.cache.MetricsCacheConfiguration;
 import org.graylog.grn.GRNTypesModule;
 import org.graylog.mcp.server.McpServerModule;
 import org.graylog.metrics.prometheus.PrometheusExporterConfiguration;
@@ -156,6 +157,7 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
     private final ContentStreamConfiguration contentStreamConfiguration = new ContentStreamConfiguration();
     private final DnsLookupAdapterConfiguration dnsLookupAdapterConfiguration = new DnsLookupAdapterConfiguration();
     private final EventDefinitionConfiguration eventDefinitionConfiguration = new EventDefinitionConfiguration();
+    private final MetricsCacheConfiguration metricsCacheConfiguration = new MetricsCacheConfiguration();
 
     @Option(name = {"-l", "--local"}, description = "Run Graylog in local mode. Only interesting for Graylog developers.")
     private boolean local = false;
@@ -259,7 +261,8 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
                 telemetryConfiguration,
                 contentStreamConfiguration,
                 dnsLookupAdapterConfiguration,
-                eventDefinitionConfiguration);
+                eventDefinitionConfiguration,
+                metricsCacheConfiguration);
     }
 
     @Override
