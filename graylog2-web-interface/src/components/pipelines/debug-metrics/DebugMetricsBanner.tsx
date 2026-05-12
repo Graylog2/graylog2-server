@@ -63,7 +63,6 @@ const DebugMetricsBanner = () => {
             </BannerActions>
           </IfPermitted>
         </Alert>
-        {showConfigModal && <RuleMetricsConfigContainer onClose={closeConfigModal} />}
       </>
     );
   }
