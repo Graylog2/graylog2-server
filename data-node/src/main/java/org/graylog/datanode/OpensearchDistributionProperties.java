@@ -20,6 +20,7 @@ import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.Locale;
 import java.util.Properties;
 
 public class OpensearchDistributionProperties {
@@ -49,7 +50,7 @@ public class OpensearchDistributionProperties {
         if (properties.containsKey(name)) {
             return (T) properties.getProperty(name);
         } else {
-            throw new IllegalArgumentException(String.format("Opensearch distribution property '%s' not found", name));
+            throw new IllegalArgumentException(String.format(Locale.ROOT, "Opensearch distribution property '%s' not found", name));
         }
     }
 }
