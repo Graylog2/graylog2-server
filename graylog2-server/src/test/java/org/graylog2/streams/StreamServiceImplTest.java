@@ -78,15 +78,17 @@ public class StreamServiceImplTest {
     private StreamService streamService;
     private MongoCollections mongoCollections;
     private EventBus localEventBus;
+    private StreamCache streamCache;
 
     @BeforeEach
     public void setUp(MongoCollections mongoCollections) throws Exception {
         this.mongoCollections = mongoCollections;
         this.localEventBus = new EventBus();
+        this.streamCache = new StreamCache(mongoCollections, localEventBus);
         this.streamService = new StreamServiceImpl(mongoCollections, streamRuleService,
                 outputService, indexSetService, factory, entityRegistrar, eventBus, Set.of(),
                 new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())),
-                localEventBus);
+                streamCache);
     }
 
     @Test

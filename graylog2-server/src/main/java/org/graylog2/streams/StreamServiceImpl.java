@@ -17,19 +17,12 @@
 package org.graylog2.streams;
 
 import com.google.common.base.Strings;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
 import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.UpdateResult;
-import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -63,7 +56,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -88,17 +80,12 @@ import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.idsIn;
 import static org.graylog2.database.utils.MongoUtils.stream;
 import static org.graylog2.database.utils.MongoUtils.stringIdsIn;
-import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
-import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.graylog2.streams.StreamImpl.FIELD_CATEGORIES;
 import static org.graylog2.streams.StreamImpl.FIELD_DISABLED;
 import static org.graylog2.streams.StreamImpl.FIELD_INDEX_SET_ID;
 import static org.graylog2.streams.StreamImpl.FIELD_OUTPUTS;
 import static org.graylog2.streams.StreamImpl.FIELD_TITLE;
 
-// This class registers with EventBus. If not bound as singleton, it would need lifecycle management to avoid leaking objects in the EventBus.
-
-@Singleton
 public class StreamServiceImpl implements StreamService {
     private static final Logger LOG = LoggerFactory.getLogger(StreamServiceImpl.class);
     public static final String COLLECTION_NAME = "streams";
@@ -113,8 +100,7 @@ public class StreamServiceImpl implements StreamService {
     private final ClusterEventBus clusterEventBus;
     private final Set<StreamDeletionGuard> streamDeletionGuards;
     private final EntityScopeService scopeService;
-    private final LoadingCache<String, String> streamTitleCache;
-    private final LoadingCache<Boolean, Set<String>> systemStreamIdsCache;
+    private final StreamCache streamCache;
 
     @Inject
     public StreamServiceImpl(MongoCollections mongoCollections,
@@ -126,7 +112,7 @@ public class StreamServiceImpl implements StreamService {
                              ClusterEventBus clusterEventBus,
                              Set<StreamDeletionGuard> streamDeletionGuards,
                              EntityScopeService scopeService,
-                             EventBus eventBus) {
+                             StreamCache streamCache) {
         this.collection = mongoCollections.collection(COLLECTION_NAME, StreamDTO.class);
         this.mongoUtils = mongoCollections.utils(collection);
         this.scopedMongoUtils = mongoCollections.scopedEntityUtils(collection, scopeService);
@@ -138,54 +124,7 @@ public class StreamServiceImpl implements StreamService {
         this.clusterEventBus = clusterEventBus;
         this.streamDeletionGuards = streamDeletionGuards;
         this.scopeService = scopeService;
-
-        final CacheLoader<String, String> streamTitleLoader = new CacheLoader<>() {
-            @Nonnull
-            @Override
-            public String load(@Nonnull String streamId) throws NotFoundException {
-                String title = loadStreamTitles(List.of(streamId)).get(streamId);
-                if (title != null) {
-                    return title;
-                } else {
-                    throw new NotFoundException(f("Couldn't find stream %s", streamId));
-                }
-            }
-        };
-
-        this.streamTitleCache = CacheBuilder.newBuilder()
-                .expireAfterAccess(Duration.ofSeconds(10))
-                .build(streamTitleLoader);
-
-        this.systemStreamIdsCache = CacheBuilder.newBuilder()
-                .expireAfterAccess(Duration.ofSeconds(10))
-                .build(new CacheLoader<>() {
-                    @Nonnull
-                    @Override
-                    public Set<String> load(@Nonnull Boolean includeDefaultStream) {
-                        final Set<String> ids;
-                        try (var stream = streamAllDTOs()) {
-                            ids = stream
-                                    .filter(s -> ImmutableSystemScope.NAME.equals(s.getScope()))
-                                    .map(Stream::getId)
-                                    .collect(Collectors.toSet());
-                        }
-                        if (includeDefaultStream) {
-                            return java.util.stream.Stream.concat(ids.stream(),
-                                    java.util.stream.Stream.of(DEFAULT_STREAM_ID)).collect(Collectors.toSet());
-                        }
-                        return ids;
-                    }
-                });
-
-        // Register with EventBus last, after all fields are initialized, to avoid
-        // NPE if a StreamsChangedEvent arrives during construction.
-        eventBus.register(this);
-    }
-
-    @Subscribe
-    public void handleStreamsChanged(StreamsChangedEvent event) {
-        event.streamIds().forEach(streamTitleCache::invalidate);
-        systemStreamIdsCache.invalidateAll();
+        this.streamCache = streamCache;
     }
 
     @Nullable
@@ -230,7 +169,7 @@ public class StreamServiceImpl implements StreamService {
 
     @Override
     public Set<String> getSystemStreamIds(boolean includeDefaultStream) {
-        return systemStreamIdsCache.getUnchecked(includeDefaultStream);
+        return streamCache.getSystemStreamIds(includeDefaultStream);
     }
 
     @Override
@@ -270,11 +209,7 @@ public class StreamServiceImpl implements StreamService {
     @Override
     @Nullable
     public String streamTitleFromCache(String streamId) {
-        try {
-            return streamTitleCache.get(streamId);
-        } catch (Exception e) {
-            return null;
-        }
+        return streamCache.streamTitleFromCache(streamId);
     }
 
     @Override
@@ -578,7 +513,7 @@ public class StreamServiceImpl implements StreamService {
 
         final Stream updatedStream = streamBuilder.build();
         save(updatedStream);
-        streamTitleCache.invalidate(streamId);
+        streamCache.invalidateTitle(streamId);
         if (streamRenamedEvent != null) {
             clusterEventBus.post(streamRenamedEvent);
         }
