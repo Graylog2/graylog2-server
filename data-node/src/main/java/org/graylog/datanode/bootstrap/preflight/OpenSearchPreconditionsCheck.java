@@ -21,8 +21,8 @@ import org.graylog2.bootstrap.preflight.PreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import oshi.PlatformEnum;
 import oshi.util.FileUtil;
+import oshi.util.PlatformEnum;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
