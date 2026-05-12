@@ -17,6 +17,7 @@
 import { useMemo } from 'react';
 import * as React from 'react';
 import styled from 'styled-components';
+import { components as ReactSelectComponents } from 'react-select';
 
 import {Select, Icon} from 'components/common';
 import { defaultCompare } from 'logic/DefaultCompare';
@@ -46,6 +47,12 @@ const renderOption = (option: StreamsAndCategoriesOption) =>
       <StyledIcon name={'stacks'} size="xs" />{option.label}
     </>
   );
+
+const MultiValueLabel = (props: React.ComponentProps<typeof ReactSelectComponents.MultiValueLabel>) => (
+  <ReactSelectComponents.MultiValueLabel {...props}>
+    {renderOption(props.data as StreamsAndCategoriesOption)}
+  </ReactSelectComponents.MultiValueLabel>
+);
 
 type StreamsAndCategoriesFilterProps = Omit<React.ComponentProps<typeof Select>, 'options'> & {
   onChange: (value: StreamsAndCategoriesSelection) => void;
@@ -115,6 +122,8 @@ const StreamsAndCategoriesFilter = ( {
       onChange={change}
       options={options}
       optionRenderer={renderOption}
+      valueRenderer={renderOption}
+      components={{ MultiValueLabel }}
       value={value}
       required={required}
       multi={multi}
