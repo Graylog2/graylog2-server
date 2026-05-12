@@ -14,27 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import useLocation from 'routing/useLocation';
-import { Col, Row } from 'components/bootstrap';
-import { DocumentTitle, PageHeader } from 'components/common';
-import EventDefinitionFormContainer from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
-import Routes from 'routing/Routes';
-import DocsHelper from 'util/DocsHelper';
-import { isPermitted } from 'util/PermissionsMixin';
-import EventsPageNavigation from 'components/events/EventsPageNavigation';
-import useCurrentUser from 'hooks/useCurrentUser';
-import useQuery from 'routing/useQuery';
+import { Col, Row } from "components/bootstrap";
+import { DocumentTitle, PageHeader } from "components/common";
+import EventDefinitionFormContainer from "components/event-definitions/event-definition-form/EventDefinitionFormContainer";
+import Routes from "routing/Routes";
+import DocsHelper from "util/DocsHelper";
+import { isPermitted } from "util/PermissionsMixin";
+import EventsPageNavigation from "components/events/EventsPageNavigation";
+import useCurrentUser from "hooks/useCurrentUser";
+import useQuery from "routing/useQuery";
 
 const CreateEventDefinitionPage = () => {
   const currentUser = useCurrentUser();
   const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const pathAction = pathname.split('/').pop();
-
-  console.log('CreateEventDefinitionPage pathAction:', pathAction);
 
   const [eventDefinitionTitle, setEventDefinitionTitle] = useState();
   const { step } = useQuery();
@@ -49,7 +44,10 @@ const CreateEventDefinitionPage = () => {
   );
 
   const pageTitle = useMemo(
-    () => (eventDefinitionTitle ? `New Event Definition "${eventDefinitionTitle}"` : 'New Event Definition'),
+    () =>
+      eventDefinitionTitle
+        ? `New Event Definition "${eventDefinitionTitle}"`
+        : "New Event Definition",
     [eventDefinitionTitle],
   );
 
@@ -58,7 +56,7 @@ const CreateEventDefinitionPage = () => {
   }, [navigate]);
 
   useEffect(() => {
-    if (!isPermitted(currentUser.permissions, 'eventdefinitions:create')) {
+    if (!isPermitted(currentUser.permissions, "eventdefinitions:create")) {
       navigate(Routes.NOTFOUND);
     }
   }, [currentUser.permissions, navigate]);
@@ -70,10 +68,14 @@ const CreateEventDefinitionPage = () => {
       <PageHeader
         title={pageTitle}
         documentationLink={{
-          title: 'Alerts documentation',
+          title: "Alerts documentation",
           path: DocsHelper.PAGES.ALERTS,
-        }}>
-        <span>Event Definitions allow you to create Alerts from different Conditions and alert on them.</span>
+        }}
+      >
+        <span>
+          Event Definitions allow you to create Alerts from different Conditions
+          and alert on them.
+        </span>
       </PageHeader>
 
       <Row className="content">
