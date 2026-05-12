@@ -16,10 +16,8 @@
  */
 package org.graylog2.rest.resources.system;
 
-import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
-import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import org.assertj.core.api.Assertions;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.Configuration;
@@ -43,7 +41,6 @@ import org.mockito.Mockito;
 
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 @ExtendWith(MongoDBExtension.class)
@@ -58,7 +55,7 @@ class ClusterResourceIT {
     @BeforeEach
     void setUp(MongoCollections mongoCollections) throws ValidationException, RepositoryException {
         final Configuration configuration = configuration(Collections.singletonMap("stale_leader_timeout", String.valueOf(STALE_LEADER_TIMEOUT_MS)));
-        final ServerNodeClusterService serverNodeService = new ServerNodeClusterService(mongoCollections.mongoConnection(), configuration);
+        final ServerNodeClusterService serverNodeService = new ServerNodeClusterService(mongoCollections, configuration);
         serverNodeService.registerServer(node("my-hostname", true, "5ca1ab1e-0000-4000-a000-100000000000"));
         serverNodeService.registerServer(node("aaa-hostname", false, "5ca1ab1e-0000-4000-a000-200000000000"));
         serverNodeService.registerServer(node("zzz-hostname", false, "5ca1ab1e-0000-4000-a000-300000000000"));
