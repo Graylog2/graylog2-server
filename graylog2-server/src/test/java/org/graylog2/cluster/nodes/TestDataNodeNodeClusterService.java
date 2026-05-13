@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -49,6 +50,15 @@ public class TestDataNodeNodeClusterService implements NodeService<DataNodeDto> 
     }
 
     @Override
+    public Optional<DataNodeDto> byNodeIdAnyState(String nodeId) {
+        try {
+            return Optional.of(byNodeId(nodeId));
+        } catch (NodeNotFoundException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
     public Map<String, DataNodeDto> byNodeIds(Collection<String> nodeIds) {
         return nodes.stream().filter(n -> nodeIds.contains(n.getNodeId())).collect(Collectors.toMap(Node::getNodeId, Function.identity()));
     }
@@ -56,6 +66,11 @@ public class TestDataNodeNodeClusterService implements NodeService<DataNodeDto> 
     @Override
     public Map<String, DataNodeDto> allActive() {
         return nodes.stream().collect(Collectors.toMap(Node::getNodeId, Function.identity()));
+    }
+
+    @Override
+    public Map<String, DataNodeDto> allKnown() {
+        return allActive();
     }
 
     @Override
