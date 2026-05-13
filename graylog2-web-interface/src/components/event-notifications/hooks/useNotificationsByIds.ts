@@ -16,28 +16,45 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import { EventsNotifications } from '@graylog/server-api';
+import { SystemCatalog } from '@graylog/server-api';
 
-import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
+const ENTITY_TYPE = 'event_notifications';
 
-const fetchNotificationsByIds = (ids: Array<string>): Promise<Array<EventNotification>> =>
-  EventsNotifications.getBulk({ notification_ids: ids });
+export type ResolvedNotificationTitle = {
+  id: string;
+  title: string;
+};
+
+const fetchTitles = (ids: Array<string>) =>
+  SystemCatalog.getTitles({
+    entities: ids.map((id) => ({
+      id,
+      type: ENTITY_TYPE,
+      identifier_field: undefined,
+      identifier_type: undefined,
+      display_fields: undefined,
+      display_template: undefined,
+    })),
+  });
 
 type Result = {
-  data: Array<EventNotification> | undefined;
+  data: Array<ResolvedNotificationTitle> | undefined;
   isLoading: boolean;
 };
 
 const useNotificationsByIds = (ids: Array<string>): Result => {
   const sortedIds = [...new Set(ids)].sort();
   const { data, isLoading } = useQuery({
-    queryKey: ['eventNotifications', 'byIds', sortedIds],
-    queryFn: () => fetchNotificationsByIds(sortedIds),
+    queryKey: ['eventNotifications', 'titles', sortedIds],
+    queryFn: () => fetchTitles(sortedIds),
     enabled: sortedIds.length > 0,
     staleTime: 30_000,
   });
 
-  return { data, isLoading };
+  return {
+    data: data?.entities?.map(({ id, title }) => ({ id, title })),
+    isLoading,
+  };
 };
 
 export default useNotificationsByIds;

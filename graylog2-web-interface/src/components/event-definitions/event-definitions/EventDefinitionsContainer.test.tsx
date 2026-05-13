@@ -111,8 +111,8 @@ describe('EventDefinitionsContainer', () => {
   it('lists each attached notification as a link to its detail page when the count badge is expanded', async () => {
     asMock(useNotificationsByIds).mockReturnValue({
       data: [
-        { id: 'n1', title: 'PagerDuty Alert', description: '', config: {} },
-        { id: 'n2', title: 'Slack Channel', description: '', config: {} },
+        { id: 'n1', title: 'PagerDuty Alert' },
+        { id: 'n2', title: 'Slack Channel' },
       ],
       isLoading: false,
     });
@@ -158,7 +158,7 @@ describe('EventDefinitionsContainer', () => {
 
   it('renders an entry with the notification id when a referenced notification no longer exists', async () => {
     asMock(useNotificationsByIds).mockReturnValue({
-      data: [{ id: 'n1', title: 'PagerDuty Alert', description: '', config: {} }],
+      data: [{ id: 'n1', title: 'PagerDuty Alert' }],
       isLoading: false,
     });
 
