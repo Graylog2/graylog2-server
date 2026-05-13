@@ -16,6 +16,7 @@
  */
 package org.graylog.mcp.server;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.mcp.resources.DashboardResourceProvider;
 import org.graylog.mcp.resources.EventDefinitionResourceProvider;
 import org.graylog.mcp.resources.StreamResourceProvider;
@@ -36,6 +37,9 @@ import org.graylog2.plugin.PluginModule;
 public class McpServerModule extends PluginModule {
     @Override
     protected void configure() {
+        bind(ObjectMapper.class).annotatedWith(McpProtocolObjectMapper.class)
+                .toInstance(new ObjectMapper());
+
         // Initialize schema module binder (empty set by default, plugins can contribute)
         schemaModuleBinder();
 
