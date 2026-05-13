@@ -14,17 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster.nodes;
-
-import jakarta.inject.Inject;
-import org.graylog2.Configuration;
-import org.graylog2.database.MongoCollections;
-
-public class DataNodeClusterService extends AbstractNodeService<DataNodeDto> {
-
-    @Inject
-    public DataNodeClusterService(MongoCollections mongoCollections, Configuration configuration) {
-        super(mongoCollections, configuration, DataNodeDto.COLLECTION_NAME, DataNodeDto.class);
-    }
-
-}
+import '@graylog/sawmill/fonts';
+import '@mantine/core/styles.css';
+import '@mantine/dropzone/styles.css';
+import '@mantine/notifications/styles.css';

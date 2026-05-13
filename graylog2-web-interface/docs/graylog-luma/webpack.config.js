@@ -14,17 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster.nodes;
+/* eslint-disable @typescript-eslint/no-require-imports, no-undef */
+// This file exists for eslint-config-graylog's webpack import resolver.
+// Storybook uses .storybook/main.ts for its own bundling configuration.
+const path = require('path');
 
-import jakarta.inject.Inject;
-import org.graylog2.Configuration;
-import org.graylog2.database.MongoCollections;
-
-public class DataNodeClusterService extends AbstractNodeService<DataNodeDto> {
-
-    @Inject
-    public DataNodeClusterService(MongoCollections mongoCollections, Configuration configuration) {
-        super(mongoCollections, configuration, DataNodeDto.COLLECTION_NAME, DataNodeDto.class);
-    }
-
-}
+const webInterfaceRoot = path.resolve(__dirname, '../..');
+module.exports = {
+  resolve: {
+    extensions: ['.ts', '.tsx'],
+    modules: [path.resolve(webInterfaceRoot, 'src'), 'node_modules'],
+    alias: {
+      '@graylog/server-api': path.resolve(webInterfaceRoot, 'target/api'),
+    },
+  },
+};
