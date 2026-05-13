@@ -20,7 +20,6 @@ import jakarta.inject.Inject;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.datanode.process.statemachine.tracer.StateMachineTracer;
-import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.datanode.DataNodeLifecycleTrigger;
@@ -47,18 +46,14 @@ public class ClusterNodeStateTracer implements StateMachineTracer<OpensearchStat
 
     @Override
     public void transition(OpensearchEvent processEvent, OpensearchState source, OpensearchState destination) {
-        try {
-            if (!source.equals(destination)) {
-                log.info("Updating cluster node {} from {} to {} (reason: {})", nodeId.getNodeId(),
-                        source.getDataNodeStatus(), destination.getDataNodeStatus(), processEvent.name());
-                DataNodeDto node = nodeService.byNodeId(nodeId);
-                nodeService.update(node.toBuilder()
-                        .setDataNodeStatus(destination.getDataNodeStatus())
-                        .setActionQueue(DataNodeLifecycleTrigger.CLEAR)
-                        .build());
-            }
-        } catch (NodeNotFoundException e) {
-            throw new RuntimeException("Node not registered, this should not happen.");
+        if (!source.equals(destination)) {
+            log.info("Updating cluster node {} from {} to {} (reason: {})", nodeId.getNodeId(),
+                    source.getDataNodeStatus(), destination.getDataNodeStatus(), processEvent.name());
+            nodeService.byNodeIdAnyState(nodeId.getNodeId())
+                    .ifPresent(node -> nodeService.update(node.toBuilder()
+                            .setDataNodeStatus(destination.getDataNodeStatus())
+                            .setActionQueue(DataNodeLifecycleTrigger.CLEAR)
+                            .build()));
         }
     }
 
