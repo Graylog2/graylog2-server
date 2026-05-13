@@ -23,6 +23,7 @@ import org.graylog.datanode.DirectoryReadableValidator;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.filesystem.index.IncompatibleIndexVersionException;
 import org.graylog.datanode.filesystem.index.IndicesDirectoryParser;
+import org.graylog.datanode.filesystem.index.OpensearchUtils;
 import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
 import org.graylog.datanode.filesystem.index.dto.NodeInformation;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
@@ -115,7 +116,7 @@ public class OpensearchDataDirCompatibilityCheck implements PreflightCheck {
         for (NodeInformation node : info.nodes()) {
             if (node.nodeVersion() != null) {
                 final Version nodeVersion = Version.parse(node.nodeVersion());
-                if (!isCompatible(currentVersion, nodeVersion)) {
+                if (!OpensearchUtils.isCompatible(currentVersion, nodeVersion)) {
                     final String error = String.format(Locale.ROOT, "Current version %s of Opensearch is not compatible with index version %s", currentVersion, nodeVersion);
                     throw new IncompatibleIndexVersionException(error);
                 }
@@ -123,12 +124,5 @@ public class OpensearchDataDirCompatibilityCheck implements PreflightCheck {
         }
     }
 
-    /**
-     * Two OpenSearch versions are compatible if their major versions differ by at most one,
-     * mirroring OpenSearch's own Version.isCompatible() contract for versions >= 3.
-     */
-    static boolean isCompatible(Version current, Version node) {
-         final long diff = current.majorVersion() - node.majorVersion();
-        return diff >= -1 && diff <= 1;
-    }
+
 }
