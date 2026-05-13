@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.bootstrap.preflight;
 
+import com.github.zafarkhaja.semver.Version;
 import org.assertj.core.api.Assertions;
 import org.graylog.datanode.DatanodeTestUtils;
 import org.graylog.datanode.OpensearchDistribution;
@@ -122,6 +123,27 @@ class OpensearchDataDirCompatibilityCheckTest {
         Assertions.assertThatThrownBy(check::runCheck)
                 .isInstanceOf(PreflightCheckException.class)
                 .hasMessageContaining("is not compatible with current version " + OPENSEARCH_VERSION);
+    }
+
+    @Test
+    void testIsCompatible() {
+        // same major
+        Assertions.assertThat(isCompatible("2.19.0", "2.19.0")).isTrue();
+        Assertions.assertThat(isCompatible("2.19.0", "2.5.0")).isTrue();
+        Assertions.assertThat(isCompatible("3.5.0", "3.0.0")).isTrue();
+
+        // adjacent majors
+        Assertions.assertThat(isCompatible("2.19.0", "3.5.0")).isTrue();
+        Assertions.assertThat(isCompatible("3.5.0", "2.19.0")).isTrue();
+
+        // two majors apart
+        Assertions.assertThat(isCompatible("1.0.0", "3.5.0")).isFalse();
+        Assertions.assertThat(isCompatible("3.5.0", "1.0.0")).isFalse();
+        Assertions.assertThat(isCompatible("4.0.0", "2.0.0")).isFalse();
+    }
+
+    private static boolean isCompatible(String current, String node) {
+        return OpensearchDataDirCompatibilityCheck.isCompatible(Version.parse(current), Version.parse(node));
     }
 
     private DatanodeConfiguration configFor(Path dataDir, String opensearchVersion) {
