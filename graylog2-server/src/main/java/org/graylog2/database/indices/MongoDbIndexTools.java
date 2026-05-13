@@ -123,7 +123,7 @@ public class MongoDbIndexTools {
         // attributes is enough to detect a stale index from before this collation was canonicalized.
         return Objects.equals(existingCollation.getString("locale"), expected.getLocale())
                 && Objects.equals(existingCollation.getInteger("strength"), expected.getStrength().getIntRepresentation())
-                && Objects.equals(existingCollation.getBoolean("numericOrdering", false), Boolean.TRUE.equals(expected.getNumericOrdering()));
+                && Objects.equals(existingCollation.getBoolean("numericOrdering", false), expected.getNumericOrdering());
     }
 
     private Optional<Document> getExistingIndex(final ListIndexesIterable<Document> existingIndices, final String sortField) {
