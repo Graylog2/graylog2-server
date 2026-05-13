@@ -24,6 +24,7 @@ import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.filesystem.index.IncompatibleIndexVersionException;
 import org.graylog.datanode.filesystem.index.IndicesDirectoryParser;
+import org.graylog.datanode.filesystem.index.OpensearchUtils;
 import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
 import org.graylog.datanode.filesystem.index.indexreader.ShardStatsParserImpl;
 import org.graylog.datanode.filesystem.index.statefile.StateFileParserImpl;
@@ -143,7 +144,7 @@ class OpensearchDataDirCompatibilityCheckTest {
     }
 
     private static boolean isCompatible(String current, String node) {
-        return OpensearchDataDirCompatibilityCheck.isCompatible(Version.parse(current), Version.parse(node));
+        return OpensearchUtils.isCompatible(Version.parse(current), Version.parse(node));
     }
 
     private DatanodeConfiguration configFor(Path dataDir, String opensearchVersion) {

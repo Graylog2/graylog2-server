@@ -101,22 +101,28 @@ public class OpensearchDistributionProvider implements Provider<OpensearchDistri
         LOG.info("Found following opensearch distributions: " + opensearchDistributions.stream().map(d -> d.directory().toAbsolutePath()).toList());
 
         final List<OpensearchDistribution> candidates = requestedVersion
-                .map(v -> opensearchDistributions.stream().filter(d -> v.equals(d.version())).toList())
+                .map(v -> filterByVersion(opensearchDistributions, v))
                 .orElse(opensearchDistributions);
-
-        if (candidates.isEmpty()) {
-            throw new IllegalArgumentException(f(
-                    "No OpenSearch distribution found for requested version '%s'. Available versions: %s",
-                    requestedVersion.get(),
-                    opensearchDistributions.stream().map(OpensearchDistribution::version).distinct().sorted().toList()
-            ));
-        }
 
         final OpensearchDistribution result = findByArchitecture(candidates, arch)
                 .orElseGet(() -> findWithoutArchitecture(candidates)
                         .orElseThrow(() -> createErrorMessage(directory, arch, "No Opensearch distribution found for your system architecture")));
         LOG.info("Using opensearch distribution {}", result.directory().toAbsolutePath());
         return result;
+    }
+
+    private static List<OpensearchDistribution> filterByVersion(List<OpensearchDistribution> distributions, String version) {
+        final List<OpensearchDistribution> matches = distributions.stream()
+                .filter(d -> version.equals(d.version()))
+                .toList();
+        if (matches.isEmpty()) {
+            throw new IllegalArgumentException(f(
+                    "No OpenSearch distribution found for requested version '%s'. Available versions: %s",
+                    version,
+                    distributions.stream().map(OpensearchDistribution::version).distinct().sorted().toList()
+            ));
+        }
+        return matches;
     }
 
     private static IllegalArgumentException createErrorMessage(Path directory, OpensearchArchitecture arch, String message) {
