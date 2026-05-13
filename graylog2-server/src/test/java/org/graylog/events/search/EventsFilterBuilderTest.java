@@ -19,12 +19,16 @@ package org.graylog.events.search;
 import org.graylog.events.event.EventDto;
 import org.junit.jupiter.api.Test;
 
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class EventsFilterBuilderTest {
+
+    private static final String EVENT_DEFINITION_ID_CLAUSE = "(_exists_:event_definition_id)";
 
     private String build(EventsSearchFilter filter) {
         return new EventsFilterBuilder(EventsSearchParameters.builder().filter(filter).build()).build();
@@ -36,28 +40,25 @@ class EventsFilterBuilderTest {
                 .extraFilters(Map.of(EventDto.FIELD_TAGS, Set.of("phishing")))
                 .build();
 
-        assertThat(build(filter)).contains("(tags:\"phishing\")");
+        assertThat(build(filter)).isEqualTo(EVENT_DEFINITION_ID_CLAUSE + " AND (tags:\"phishing\")");
     }
 
     @Test
     void buildWithMultipleTagFiltersJoinsWithAND() {
+        // LinkedHashSet keeps insertion order so the assertion against the full query string is
+        // deterministic — EventsFilterBuilder iterates the tag set as-is.
         final var filter = EventsSearchFilter.builder()
-                .extraFilters(Map.of(EventDto.FIELD_TAGS, new java.util.LinkedHashSet<>(java.util.List.of("phishing", "exfil"))))
+                .extraFilters(Map.of(EventDto.FIELD_TAGS, new LinkedHashSet<>(List.of("phishing", "exfil"))))
                 .build();
 
-        final var query = build(filter);
-        // AND semantics: event must carry all selected tags.
-        assertThat(query).contains("tags:\"phishing\"");
-        assertThat(query).contains("tags:\"exfil\"");
-        assertThat(query).contains(" AND ");
-        assertThat(query).doesNotContain(" OR ");
+        assertThat(build(filter)).isEqualTo(EVENT_DEFINITION_ID_CLAUSE + " AND (tags:\"phishing\" AND tags:\"exfil\")");
     }
 
     @Test
     void buildWithoutTagFilterDoesNotEmitTagsClause() {
         final var filter = EventsSearchFilter.empty();
 
-        assertThat(build(filter)).doesNotContain("tags:");
+        assertThat(build(filter)).isEqualTo(EVENT_DEFINITION_ID_CLAUSE);
     }
 
     @Test
@@ -66,7 +67,7 @@ class EventsFilterBuilderTest {
                 .extraFilters(Map.of(EventDto.FIELD_TAGS, Set.of()))
                 .build();
 
-        assertThat(build(filter)).doesNotContain("tags:");
+        assertThat(build(filter)).isEqualTo(EVENT_DEFINITION_ID_CLAUSE);
     }
 
     @Test
@@ -75,10 +76,7 @@ class EventsFilterBuilderTest {
                 .extraFilters(Map.of(EventDto.FIELD_TAGS, Set.of("phish\"ing OR alert:true")))
                 .build();
 
-        final var query = build(filter);
-        assertThat(query).doesNotContain("OR alert:true\"");
-        // Positive assertion: full escaped value appears once inside a quoted clause.
-        assertThat(query).contains("tags:\"phish\\\"ing OR alert\\:true\"");
+        assertThat(build(filter)).isEqualTo(EVENT_DEFINITION_ID_CLAUSE + " AND (tags:\"phish\\\"ing OR alert\\:true\")");
     }
 
 }

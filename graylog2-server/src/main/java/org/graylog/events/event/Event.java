@@ -115,7 +115,7 @@ public interface Event extends Indexable {
 
     Set<String> getTags();
 
-    void addTags(Set<String> tags);
+    void setTags(Set<String> tags);
 
     EventDto toDto();
 
@@ -135,7 +135,7 @@ public interface Event extends Indexable {
         from.timerangeEnd().ifPresent(event::setTimerangeEnd);
         from.originContext().ifPresent(event::setOriginContext);
         from.replayInfo().ifPresent(event::setReplayInfo);
-        event.addTags(from.tags());
+        event.setTags(from.tags());
 
         return event;
     }

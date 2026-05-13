@@ -28,6 +28,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nonnull;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -267,11 +268,14 @@ public class EventImpl implements Event {
 
     @Override
     public Set<String> getTags() {
-        return ImmutableSet.copyOf(tags);
+        // unmodifiableSet wraps without copying; setTags is called at most once during
+        // construction so callers don't need a snapshot, just a mutation guard.
+        return Collections.unmodifiableSet(tags);
     }
 
     @Override
-    public void addTags(Set<String> tags) {
+    public void setTags(Set<String> tags) {
+        this.tags.clear();
         this.tags.addAll(tags);
     }
 
