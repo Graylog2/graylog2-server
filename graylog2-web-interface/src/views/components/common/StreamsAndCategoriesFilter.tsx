@@ -14,19 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo } from 'react';
-import * as React from 'react';
-import styled from 'styled-components';
-import { components as ReactSelectComponents } from 'react-select';
+import { useMemo } from "react";
+import * as React from "react";
+import styled from "styled-components";
 
-import {Select, Icon} from 'components/common';
-import { defaultCompare } from 'logic/DefaultCompare';
+import { Select, Icon } from "components/common";
+import { defaultCompare } from "logic/DefaultCompare";
 
 type StreamsAndCategoriesOption = {
   id: string;
   label: string;
   value: string;
-  type: 'stream' | 'category';
+  type: "stream" | "category";
 };
 
 export type StreamsAndCategoriesSelection = {
@@ -40,22 +39,16 @@ const StyledIcon = styled(Icon)`
 `;
 
 const renderOption = (option: StreamsAndCategoriesOption) =>
-  option.type === 'stream' ? (
+  option.type === "stream" ? (
     <>{option.label}</>
   ) : (
     <>
-      <StyledIcon name={'stacks'} size="xs" />{option.label}
+      <StyledIcon name={"stacks"} size="xs" />
+      {option.label}
     </>
   );
 
-// eslint-disable-next-line react/require-default-props
-const MultiValueLabel = (props: React.ComponentProps<typeof ReactSelectComponents.MultiValueLabel>) => (
-  <ReactSelectComponents.MultiValueLabel {...props}>
-    {renderOption(props.data as StreamsAndCategoriesOption)}
-  </ReactSelectComponents.MultiValueLabel>
-);
-
-type StreamsAndCategoriesFilterProps = Omit<React.ComponentProps<typeof Select>, 'options'> & {
+type StreamsAndCategoriesFilterProps = Omit<React.ComponentProps<typeof Select>, "options"> & {
   onChange: (value: StreamsAndCategoriesSelection) => void;
   streams: Array<{ id: string; title: string; categories: string[] }>;
   streamCategories?: string[] | undefined;
@@ -64,40 +57,55 @@ type StreamsAndCategoriesFilterProps = Omit<React.ComponentProps<typeof Select>,
   grouping?: boolean;
 };
 
-const StreamsAndCategoriesFilter = ( {
-                                       id,
-                                       onChange,
-                                       value,
-                                       streams,
-                                       streamCategories = undefined,
-                                       required = true,
-                                       showStreams = true,
-                                       showCategories = true,
-                                       grouping = true,
-                                       multi = true,
-                                       ...rest }: StreamsAndCategoriesFilterProps) => {
+const StreamsAndCategoriesFilter = ({
+  id,
+  onChange,
+  value,
+  streams,
+  streamCategories = undefined,
+  required = true,
+  showStreams = true,
+  showCategories = true,
+  grouping = true,
+  multi = true,
+  ...rest
+}: StreamsAndCategoriesFilterProps) => {
   const options = useMemo(() => {
     const sortedCategories =
       showCategories && multi
-        ? [...new Set<string>(streams.flatMap((stream) => streamCategories ?? stream?.categories ?? []))]
-            .map((category) => ({ id: category, label: category, value: 'category_' + category, type: 'category' }))
-            .sort((a: StreamsAndCategoriesOption, b: StreamsAndCategoriesOption) => defaultCompare(a.label, b.label))
+        ? [
+            ...new Set<string>(
+              streams.flatMap((stream) => streamCategories ?? stream?.categories ?? []),
+            ),
+          ]
+            .map((category) => ({
+              id: category,
+              label: category,
+              value: "category_" + category,
+              type: "category",
+            }))
+            .sort((a: StreamsAndCategoriesOption, b: StreamsAndCategoriesOption) =>
+              defaultCompare(a.label, b.label),
+            )
         : [];
     const sortedStreams = showStreams
       ? streams
           .map((stream: { id: string; title: string }) => ({
             id: stream.id,
-            value: 'stream_' + stream.id,
+            value: "stream_" + stream.id,
             label: stream.title,
-            type: 'stream',
+            type: "stream",
           }))
-          .sort((a: StreamsAndCategoriesOption, b: StreamsAndCategoriesOption) => defaultCompare(a.label, b.label))
+          .sort((a: StreamsAndCategoriesOption, b: StreamsAndCategoriesOption) =>
+            defaultCompare(a.label, b.label),
+          )
       : [];
 
     return grouping
       ? [...sortedCategories, ...sortedStreams]
-      : [...sortedCategories, ...sortedStreams].sort((a: StreamsAndCategoriesOption, b: StreamsAndCategoriesOption) =>
-          defaultCompare(a.label, b.label),
+      : [...sortedCategories, ...sortedStreams].sort(
+          (a: StreamsAndCategoriesOption, b: StreamsAndCategoriesOption) =>
+            defaultCompare(a.label, b.label),
         );
   }, [grouping, multi, showCategories, showStreams, streams, streamCategories]);
 
@@ -106,13 +114,13 @@ const StreamsAndCategoriesFilter = ( {
   const change = (selected: string) => {
     onChange({
       streams: selected
-        .split(',')
-        .filter((v) => v.startsWith('stream_'))
-        .map((s) => s.substring('stream_'.length)),
+        .split(",")
+        .filter((v) => v.startsWith("stream_"))
+        .map((s) => s.substring("stream_".length)),
       categories: selected
-        .split(',')
-        .filter((v) => v.startsWith('category_'))
-        .map((c) => c.substring('category_'.length)),
+        .split(",")
+        .filter((v) => v.startsWith("category_"))
+        .map((c) => c.substring("category_".length)),
     });
   };
 
@@ -124,11 +132,10 @@ const StreamsAndCategoriesFilter = ( {
       options={options}
       optionRenderer={renderOption}
       valueRenderer={renderOption}
-      components={{ MultiValueLabel }}
       value={value}
       required={required}
       multi={multi}
-      />
+    />
   );
 };
 
