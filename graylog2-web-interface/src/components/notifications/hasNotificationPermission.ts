@@ -14,24 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import type * as Immutable from 'immutable';
 
-import { RelativeTime } from 'components/common';
-import type { NotificationType } from 'components/notifications/types';
+const hasNotificationPermission = (permissions: Immutable.List<string>): boolean =>
+  permissions.some((p) => p === '*' || p === 'notifications:*' || p.startsWith('notifications:read'));
 
-type Props = { row: NotificationType };
-
-const ActorCell = ({ row }: Props) => {
-  const name = row.actor?.name ?? 'System';
-
-  return (
-    <span>
-      {name}
-      {' ('}
-      <RelativeTime dateTime={row.last_changed} />
-      {')'}
-    </span>
-  );
-};
-
-export default ActorCell;
+export default hasNotificationPermission;

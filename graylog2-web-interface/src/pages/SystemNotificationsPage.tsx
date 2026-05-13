@@ -18,56 +18,27 @@ import * as React from 'react';
 
 import { DocumentTitle, IfPermitted } from 'components/common';
 import PageNavigation from 'components/common/PageNavigation';
-import { IndexerClusterHealth } from 'components/indexers';
-import IndexerSystemOverviewComponent from 'components/indexers/IndexerSystemOverviewComponent';
-import { SystemJobsComponent } from 'components/systemjobs';
-import { SystemMessagesComponent } from 'components/systemmessages';
-import { TimesList } from 'components/times';
-import GraylogClusterOverview from 'components/cluster/GraylogClusterOverview';
-import { Row } from 'components/bootstrap';
+import { SystemNotificationsTable } from 'components/notifications';
 import NotificationsNavTab from 'components/notifications/NotificationsNavTab';
+import { Row } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import HideOnCloud from 'util/conditional/HideOnCloud';
-import HealthModule from 'components/health/HealthModule';
 
 const OVERVIEW_TABS = [
   { description: 'Status', path: Routes.SYSTEM.OVERVIEW },
   { description: 'Notifications', path: Routes.SYSTEM.NOTIFICATIONS, BadgeComponent: NotificationsNavTab },
 ];
 
-const SystemOverviewPage = () => (
-  <DocumentTitle title="System overview">
+const SystemNotificationsPage = () => (
+  <DocumentTitle title="System notifications">
     <span>
-      <HideOnCloud>
-        <HealthModule />
-      </HideOnCloud>
-
       <Row>
         <PageNavigation items={OVERVIEW_TABS} />
       </Row>
-
-      <HideOnCloud>
-        <IfPermitted permissions="systemjobs:read">
-          <SystemJobsComponent />
-        </IfPermitted>
-      </HideOnCloud>
-
-      <GraylogClusterOverview showLicenseGraph />
-
-      <HideOnCloud>
-        <IndexerClusterHealth />
-      </HideOnCloud>
-
-      <IfPermitted permissions="indices:failures">
-        <IndexerSystemOverviewComponent />
-      </IfPermitted>
-      <TimesList />
-
-      <IfPermitted permissions="systemmessages:read">
-        <SystemMessagesComponent />
+      <IfPermitted permissions="notifications:read">
+        <SystemNotificationsTable />
       </IfPermitted>
     </span>
   </DocumentTitle>
 );
 
-export default SystemOverviewPage;
+export default SystemNotificationsPage;

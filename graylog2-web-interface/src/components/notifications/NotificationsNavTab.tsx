@@ -15,51 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 
-import { LinkContainer } from 'components/common';
-import { Badge, Nav } from 'components/bootstrap';
+import { Badge } from 'components/bootstrap';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useNotificationBadgeCount from 'components/notifications/hooks/useNotificationBadgeCount';
 import hasNotificationPermission from 'components/notifications/hasNotificationPermission';
-import Routes from 'routing/Routes';
-import { NAV_ITEM_HEIGHT } from 'theme/constants';
 
-import InactiveNavItem from './InactiveNavItem';
-
-const StyledNav = styled(Nav)`
-  > li > a {
-    min-height: ${NAV_ITEM_HEIGHT};
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px;
-  }
-`;
-
-const StyledInactiveNavItem = styled(InactiveNavItem)`
-  a:hover {
-    border: 0;
-    text-decoration: none;
-  }
-`;
-
-const NotificationBadge = () => {
+const NotificationsNavTab = ({ text }: { text: string }) => {
   const currentUser = useCurrentUser();
   const enabled = hasNotificationPermission(currentUser.permissions);
   const { data, isLoading } = useNotificationBadgeCount({ enabled });
+  const showBadge = !isLoading && !!data;
 
-  return isLoading || !data ? null : (
-    <StyledNav navbar>
-      <LinkContainer to={Routes.SYSTEM.NOTIFICATIONS}>
-        <StyledInactiveNavItem>
-          <Badge bsStyle="danger" data-testid="notification-badge" title="System Notifications">
-            {data}
-          </Badge>
-        </StyledInactiveNavItem>
-      </LinkContainer>
-    </StyledNav>
+  return (
+    <span>
+      {text}{showBadge && <> <Badge bsStyle="danger">{data}</Badge></>}
+    </span>
   );
 };
 
-export default NotificationBadge;
+export default NotificationsNavTab;

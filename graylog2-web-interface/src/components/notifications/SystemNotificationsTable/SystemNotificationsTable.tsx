@@ -16,6 +16,7 @@
  */
 import * as React from "react";
 import { OrderedMap } from "immutable";
+import styled, { css } from "styled-components";
 
 import { PaginatedEntityTable } from "components/common";
 import { Row, Col } from "components/bootstrap";
@@ -30,6 +31,12 @@ import expandedSections from "./expandedSections";
 import BulkActions from "./BulkActions";
 import ActionsCell from "./cells/ActionsCell";
 import customColumnRenderers from "./customColumnRenderers";
+
+const StyledHeading = styled.h2(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.md};
+  `,
+);
 
 const DEFAULT_FILTERS = OrderedMap({ is_read: ["false"] });
 
@@ -61,7 +68,7 @@ const renderActions = (row: NotificationType) => <ActionsCell row={row} />;
 const SystemNotificationsTable = () => (
   <Row className="content">
     <Col md={12}>
-      <h2>Notifications</h2>
+      <StyledHeading>Notifications</StyledHeading>
       <PaginatedEntityTable<NotificationType>
         humanName="notifications"
         tableLayout={TABLE_LAYOUT}

@@ -137,7 +137,7 @@ describe("SystemNotificationsTable", () => {
     await screen.findByRole("columnheader", { name: /title/i });
     await screen.findByRole("columnheader", { name: /description/i });
     await screen.findByRole("columnheader", { name: /status/i });
-    await screen.findByRole("columnheader", { name: /actor/i });
+    await screen.findByRole("columnheader", { name: /last changed by/i });
     await screen.findByRole("columnheader", { name: /triggered at/i });
   });
 
@@ -150,7 +150,7 @@ describe("SystemNotificationsTable", () => {
 
     await within(row).findByText("Disk full on node1");
     await within(row).findByText(/The data directory is almost full/);
-    await within(row).findByText("alice");
+    await within(row).findByText(/alice/);
   });
 
   it('renders "System" for notifications without an actor', async () => {
@@ -160,7 +160,7 @@ describe("SystemNotificationsTable", () => {
 
     const row = await screen.findByTestId("table-row-notif-2");
 
-    await within(row).findByText("System");
+    await within(row).findByText(/System/);
   });
 
   it('shows "Mark as read" label in status cell for unread notification', async () => {

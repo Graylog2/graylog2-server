@@ -45,6 +45,7 @@ const customColumnRenderers = {
       renderCell: (_is_read: boolean, row: NotificationType) => <StatusCell row={row} />,
     },
     'actor.name': {
+      renderHeader: () => 'Last changed by',
       renderCell: (_actorName: string, row: NotificationType) => <ActorCell row={row} />,
     },
     triggered_at: {
