@@ -273,6 +273,13 @@ public class SystemNotificationService {
     }
 
     /**
+     * Returns the count of unread notifications.
+     */
+    public long countUnread() {
+        return collection.countDocuments(Filters.eq(FIELD_IS_READ, false));
+    }
+
+    /**
      * Returns all unread entries (backward compat for legacy endpoint).
      */
     public List<SystemNotificationDto> findAllUnread() {

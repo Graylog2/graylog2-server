@@ -203,6 +203,23 @@ class SystemNotificationServiceTest {
     }
 
     @Test
+    void countUnread() {
+        assertThat(service.countUnread()).isZero();
+
+        service.publish(Notification.Type.ES_UNAVAILABLE, null, Notification.Severity.URGENT, "node-1", Map.of());
+        assertThat(service.countUnread()).isEqualTo(1);
+
+        service.publish(Notification.Type.INPUT_FAILED_TO_START, "input-1", Notification.Severity.NORMAL, "node-1", Map.of());
+        assertThat(service.countUnread()).isEqualTo(2);
+
+        service.markAsRead(Notification.Type.ES_UNAVAILABLE, SystemNotificationDto.Actor.system());
+        assertThat(service.countUnread()).isEqualTo(1);
+
+        service.markAllAsRead(SystemNotificationDto.Actor.system());
+        assertThat(service.countUnread()).isZero();
+    }
+
+    @Test
     void hasUnread() {
         assertThat(service.hasUnread(Notification.Type.ES_UNAVAILABLE)).isFalse();
 

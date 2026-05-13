@@ -239,6 +239,17 @@ public class NotificationsResource extends RestResource {
         );
     }
 
+    @GET
+    @Timed
+    @Path("/unread/count")
+    @Operation(summary = "Get the count of unread system notifications")
+    @Produces(MediaType.APPLICATION_JSON)
+    @NoAuditEvent("Read-only endpoint")
+    public long getUnreadCount() {
+        checkPermission(RestPermissions.NOTIFICATIONS_READ);
+        return systemNotificationService.countUnread();
+    }
+
     @PUT
     @Timed
     @Path("/{id}/toggle_read")
