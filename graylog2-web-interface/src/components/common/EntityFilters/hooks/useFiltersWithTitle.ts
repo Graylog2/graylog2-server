@@ -29,7 +29,14 @@ import {
   isAttributeWithFilterOptions,
   isAttributeWithRelatedCollection,
 } from 'components/common/EntityFilters/helpers/AttributeIdentification';
-import { timeRangeTitle, extractRangeFromString } from 'components/common/EntityFilters/helpers/timeRange';
+import {
+  extractRangeFromString,
+  isKeywordFilterValue,
+  isRelativeFilterValue,
+  keywordTimeRangeTitle,
+  relativeTimeRangeTitle,
+  timeRangeTitle,
+} from 'components/common/EntityFilters/helpers/timeRange';
 import { defaultOnError } from 'util/conditional/onError';
 
 type CollectionsByAttributeId = {
@@ -129,8 +136,15 @@ const filterTitle = (
   isErrorFetchingTitles: boolean,
 ) => {
   if (isDateAttribute(attribute)) {
-    const [from, until] = extractRangeFromString(filterValue);
+    if (isRelativeFilterValue(filterValue)) {
+      return relativeTimeRangeTitle(filterValue);
+    }
 
+    if (isKeywordFilterValue(filterValue)) {
+      return keywordTimeRangeTitle(filterValue);
+    }
+
+    const [from, until] = extractRangeFromString(filterValue);
     const fromDate = from ? formatTime(from) : undefined;
     const untilDate = until ? formatTime(until) : undefined;
 

@@ -38,6 +38,24 @@ jest.mock('logic/generateId', () => jest.fn(() => 'filter-id'));
 jest.mock('components/common/EntityFilters/hooks/useFilterValueSuggestions');
 jest.mock('components/common/EntityFilters/hooks/useFiltersWithTitle');
 
+const MOCK_DATE_FILTER_VALUE = '2020-01-13T12:42:23.000+00:00><';
+const MOCK_DATE_FILTER_TITLE = '2020-01-13 13:42:23 - Now';
+
+jest.mock('components/common/EntityFilters/FilterConfiguration/DateRangeForm', () => {
+  // eslint-disable-next-line global-require
+  const React = require('react');
+
+  const MockDateRangeForm = ({ filter, onSubmit }: { filter?: { value: string }; onSubmit: (f: { title: string; value: string }) => void }) =>
+    React.createElement('div', { 'data-testid': 'time-range-form' },
+      React.createElement('button', {
+        type: 'button',
+        onClick: () => onSubmit({ title: '2020-01-13 13:42:23 - Now', value: '2020-01-13T12:42:23.000+00:00><' }),
+      }, filter ? 'Update filter' : 'Create filter'),
+    );
+
+  return { __esModule: true, default: MockDateRangeForm };
+});
+
 const CustomFilterInput = ({ filter, onSubmit }: FilterComponentProps) => (
   <div data-testid="custom-component-form">
     <Formik initialValues={{ value: filter?.value }} onSubmit={({ value }) => onSubmit({ title: value, value })}>
@@ -334,65 +352,27 @@ describe('<EntityFilters />', () => {
     it('should create filter', async () => {
       render(<EntityFilters urlQueryFilters={undefined} />);
 
-      await setupUser().click(
-        await screen.findByRole('button', {
-          name: /create filter/i,
-        }),
-      );
-
-      await setupUser().click(
-        await screen.findByRole('menuitem', {
-          name: /created at/i,
-        }),
-      );
+      await setupUser().click(await screen.findByRole('button', { name: /create filter/i }));
+      await setupUser().click(await screen.findByRole('menuitem', { name: /created at/i }));
 
       const timeRangeForm = await screen.findByTestId('time-range-form');
-
-      const fromPicker = await screen.findByTestId('date-picker-from');
-      await setupUser().click(await within(fromPicker).findByRole('button', { name: /Monday, January 13th, 2020/i }));
-      await setupUser().clear(await screen.findByRole('spinbutton', { name: /from hour/i }));
-      await setupUser().type(await screen.findByRole('spinbutton', { name: /from hour/i }), '13');
-      await setupUser().clear(await screen.findByRole('spinbutton', { name: /from minutes/i }));
-      await setupUser().type(await screen.findByRole('spinbutton', { name: /from minutes/i }), '42');
-      await setupUser().clear(await screen.findByRole('spinbutton', { name: /from seconds/i }));
-      await setupUser().type(await screen.findByRole('spinbutton', { name: /from seconds/i }), '23');
-
-      const submitButton = within(timeRangeForm).getByRole('button', {
-        name: /create filter/i,
-      });
-      await setupUser().click(submitButton);
+      await setupUser().click(within(timeRangeForm).getByRole('button', { name: /create filter/i }));
 
       await waitFor(() =>
         expect(onChangeFiltersWithTitle).toHaveBeenCalledWith(
-          OrderedMap({
-            created_at: [
-              {
-                title: '2020-01-13 13:42:23 - Now',
-                value: '2020-01-13T12:42:23.000+00:00><',
-              },
-            ],
-          }),
-          OrderedMap({ created_at: ['2020-01-13T12:42:23.000+00:00><'] }),
+          OrderedMap({ created_at: [{ title: MOCK_DATE_FILTER_TITLE, value: MOCK_DATE_FILTER_VALUE }] }),
+          OrderedMap({ created_at: [MOCK_DATE_FILTER_VALUE] }),
         ),
       );
 
-      await waitFor(() =>
-        expect(setUrlQueryFilters).toHaveBeenCalledWith(
-          OrderedMap({ created_at: ['2020-01-13T12:42:23.000+00:00><'] }),
-        ),
-      );
+      await waitFor(() => expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ created_at: [MOCK_DATE_FILTER_VALUE] })));
       await waitFor(() => dropdownIsHidden('create created filter'));
     });
 
     it('should update active filter', async () => {
       asMock(useFiltersWithTitle).mockReturnValue({
         data: OrderedMap({
-          created_at: [
-            {
-              title: '2020-01-01 00:55:00 - Now',
-              value: '2019-12-31T23:55:00.001+00:00',
-            },
-          ],
+          created_at: [{ title: '2020-01-01 00:55:00 - Now', value: '2019-12-31T23:55:00.001+00:00' }],
         }),
         onChange: onChangeFiltersWithTitle,
         isInitialLoading: false,
@@ -401,46 +381,19 @@ describe('<EntityFilters />', () => {
       render(<EntityFilters urlQueryFilters={OrderedMap({ created_at: ['2019-12-31T23:55:00.000+00:00><'] })} />);
 
       const activeFilter = await screen.findByTestId('created_at-filter-2019-12-31T23:55:00.001+00:00');
-
-      const toggleFilterButton = within(activeFilter).getByRole('button', {
-        name: /change filter value/i,
-      });
-      await setupUser().click(toggleFilterButton);
-
-      const fromPicker = await screen.findByTestId('date-picker-from');
-      await setupUser().click(await within(fromPicker).findByRole('button', { name: /Monday, January 13th, 2020/i }));
-      await setupUser().clear(await screen.findByRole('spinbutton', { name: /from hour/i }));
-      await setupUser().type(await screen.findByRole('spinbutton', { name: /from hour/i }), '13');
-      await setupUser().clear(await screen.findByRole('spinbutton', { name: /from minutes/i }));
-      await setupUser().type(await screen.findByRole('spinbutton', { name: /from minutes/i }), '42');
-      await setupUser().clear(await screen.findByRole('spinbutton', { name: /from seconds/i }));
-      await setupUser().type(await screen.findByRole('spinbutton', { name: /from seconds/i }), '23');
+      await setupUser().click(within(activeFilter).getByRole('button', { name: /change filter value/i }));
 
       const timeRangeForm = await screen.findByTestId('time-range-form');
-      const submitButton = within(timeRangeForm).getByRole('button', {
-        name: /update filter/i,
-      });
-      await setupUser().click(submitButton);
+      await setupUser().click(within(timeRangeForm).getByRole('button', { name: /update filter/i }));
 
       await waitFor(() =>
         expect(onChangeFiltersWithTitle).toHaveBeenCalledWith(
-          OrderedMap({
-            created_at: [
-              {
-                title: '2020-01-13 13:42:23 - Now',
-                value: '2020-01-13T12:42:23.000+00:00><',
-              },
-            ],
-          }),
-          OrderedMap({ created_at: ['2020-01-13T12:42:23.000+00:00><'] }),
+          OrderedMap({ created_at: [{ title: MOCK_DATE_FILTER_TITLE, value: MOCK_DATE_FILTER_VALUE }] }),
+          OrderedMap({ created_at: [MOCK_DATE_FILTER_VALUE] }),
         ),
       );
 
-      await waitFor(() =>
-        expect(setUrlQueryFilters).toHaveBeenCalledWith(
-          OrderedMap({ created_at: ['2020-01-13T12:42:23.000+00:00><'] }),
-        ),
-      );
+      await waitFor(() => expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ created_at: [MOCK_DATE_FILTER_VALUE] })));
       await waitFor(() => dropdownIsHidden('edit created filter'));
     });
   });

@@ -15,33 +15,27 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import styled, { css } from 'styled-components';
-import { Formik, Form, useField } from 'formik';
-import moment from 'moment/moment';
+import { Formik, Form } from 'formik';
 
 import useUserDateTime from 'hooks/useUserDateTime';
-import { ModalSubmit, Icon } from 'components/common';
-import { Checkbox } from 'components/bootstrap';
-import { isValidDate, toUTCFromTz, adjustFormat } from 'util/DateTime';
-import {
-  DATE_SEPARATOR,
-  extractRangeFromString,
-  timeRangeTitle,
-} from 'components/common/EntityFilters/helpers/timeRange';
-import DateTimePicker from 'views/components/time-range-picker/DateTimePicker';
-import StringUtils from 'util/StringUtils';
+import { ModalSubmit } from 'components/common';
+import { filterValueTitle } from 'components/common/EntityFilters/helpers/timeRange';
+import parseTimerangeFilter, { timeRangeToFilterValue } from 'components/common/PaginatedEntityTable/parseTimerangeFilter';
+import TimeRangeTabs from 'views/components/time-range-picker/TimeRangePickerTabs';
+import type { TimeRangePickerFormValues } from 'views/components/time-range-picker/TimeRangePicker';
+import { normalizeFromPickerForSearchBar } from 'views/logic/queries/NormalizeTimeRange';
+import { classifyRelativeTimeRange, normalizeIfClassifiedRelativeTimeRange } from 'views/components/time-range-picker/RelativeTimeRangeClassifiedHelper';
+import validateTimeRange from 'views/components/TimeRangeValidation';
+import { isTimeRange, isTypeRelative } from 'views/typeGuards/timeRange';
+import type { DateTime, DateTimeFormats } from 'util/DateTime';
+import { toDateObject } from 'util/DateTime';
 
 import type { Filter } from '../types';
 
-type FormValues = {
-  from: string | undefined;
-  until: string | undefined;
-};
-
 const Container = styled.div`
   padding: 3px 10px;
-  max-width: fit-content;
 `;
 
 const Info = styled.p(
@@ -51,103 +45,52 @@ const Info = styled.p(
   `,
 );
 
-const SectionHeader = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 3px;
-`;
+const defaultAbsoluteRange = (formatTime: (time: DateTime, format?: DateTimeFormats) => string) => ({
+  type: 'absolute' as const,
+  from: formatTime(toDateObject(new Date()).subtract(300, 'seconds'), 'complete'),
+  to: formatTime(toDateObject(new Date()), 'complete'),
+});
 
-const StyledLabel = styled.label`
-  margin: 0;
-`;
+const buildInitialValues = (
+  filter: Filter | undefined,
+  formatTime: (time: DateTime, format?: DateTimeFormats) => string,
+): TimeRangePickerFormValues => {
+  if (!filter) {
+    const absolute = defaultAbsoluteRange(formatTime);
 
-const StyledCheckbox = styled(Checkbox)`
-  &.checkbox {
-    margin: 0;
+    return { timeRangeTabs: { absolute }, activeTab: 'absolute' };
   }
-`;
 
-const useInitialValues = (filter: Filter | undefined) => {
-  const { formatTime } = useUserDateTime();
+  const timeRange = parseTimerangeFilter(filter.value);
 
-  if (filter) {
-    const [from, until] = extractRangeFromString(filter.value);
+  if (!timeRange) {
+    const absolute = defaultAbsoluteRange(formatTime);
 
-    return {
-      from: from ? formatTime(from, 'complete') : undefined,
-      until: until ? formatTime(until, 'complete') : undefined,
-    };
+    return { timeRangeTabs: { absolute }, activeTab: 'absolute' };
   }
+
+  const pickerValue = isTypeRelative(timeRange) ? classifyRelativeTimeRange(timeRange) : timeRange;
 
   return {
-    from: formatTime(moment().subtract(5, 'minutes'), 'complete'),
-    until: undefined,
+    timeRangeTabs: { [timeRange.type]: pickerValue },
+    activeTab: timeRange.type,
   };
 };
 
-const formatError = 'Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]].';
-const rangeError = 'The "Until" date must come after the "From" date.';
+const dateTimeValidate = async (
+  { timeRangeTabs, activeTab }: TimeRangePickerFormValues,
+  formatTime: (dateTime: DateTime, format: string) => string,
+  userTimezone: string,
+) => {
+  const activeTabTimeRange = timeRangeTabs[activeTab];
 
-const validate = (values: FormValues) => {
-  let errors: {
-    from?: string;
-    until?: string;
-  } = {};
+  if (!activeTabTimeRange) return {};
 
-  if (values.from && !isValidDate(values.from)) {
-    errors = { ...errors, from: formatError };
-  }
+  const normalized = normalizeIfClassifiedRelativeTimeRange(activeTabTimeRange);
+  const errors = await validateTimeRange(normalized, 0, formatTime, userTimezone);
 
-  if (values.until && !isValidDate(values.until)) {
-    errors = { ...errors, until: formatError };
-  }
-
-  if (values.from >= values.until) {
-    errors = { ...errors, until: rangeError };
-  }
-
-  return errors;
+  return Object.keys(errors).length !== 0 ? { timeRangeTabs: { [activeTabTimeRange.type]: errors } } : {};
 };
-
-const PickerContainer = styled.div`
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-  gap: 10px;
-`;
-
-const PickerWrap = styled.div`
-  max-width: 295px;
-`;
-
-type PickerProps = { name: 'from' | 'until' };
-const Picker = ({ name }: PickerProps) => {
-  const { formatTime } = useUserDateTime();
-  const label = StringUtils.capitalizeFirstLetter(name);
-  const [{ onChange, value }, meta] = useField(name);
-  const _onChange = useCallback(
-    (newValue: string) => onChange({ target: { name, value: newValue } }),
-    [onChange, name],
-  );
-  const onChangeAllTime = () => _onChange(value ? undefined : formatTime(new Date(), 'complete'));
-  const checkboxLabel = name === 'from' ? 'All Time' : 'Now';
-  const isChecked = !value;
-
-  return (
-    <PickerWrap data-testid={`date-picker-${name}`}>
-      <SectionHeader>
-        <StyledLabel htmlFor={`date-input-${name}`}>{label}</StyledLabel>
-        <StyledCheckbox onChange={onChangeAllTime} checked={isChecked}>
-          {checkboxLabel}
-        </StyledCheckbox>
-      </SectionHeader>
-      <DateTimePicker disabled={isChecked} error={meta.error} onChange={_onChange} value={value} range={label} />
-    </PickerWrap>
-  );
-};
-const FromPicker = () => <Picker name="from" />;
-const UntilPicker = () => <Picker name="until" />;
 
 type Props = {
   onSubmit: (filter: { title: string; value: string }) => void;
@@ -155,39 +98,43 @@ type Props = {
 };
 
 const DateRangeForm = ({ filter, onSubmit }: Props) => {
-  const { userTimezone } = useUserDateTime();
-  const initialValues = useInitialValues(filter);
+  const { formatTime, userTimezone } = useUserDateTime();
+  const initialValues = useMemo(() => buildInitialValues(filter, formatTime), [filter, formatTime]);
 
-  const _onSubmit = (formValues: FormValues) => {
-    const toInternalTime = (date: string) => adjustFormat(toUTCFromTz(date, userTimezone), 'internal');
-    const utcFrom = formValues.from ? toInternalTime(formValues.from) : '';
-    const utcUntil = formValues.until ? toInternalTime(formValues.until) : '';
+  const _onSubmit = useCallback(
+    ({ timeRangeTabs, activeTab }: TimeRangePickerFormValues) => {
+      const timeRange = normalizeFromPickerForSearchBar(timeRangeTabs[activeTab]);
 
-    onSubmit({
-      title: timeRangeTitle(formValues.from, formValues.until),
-      value: `${utcFrom}${DATE_SEPARATOR}${utcUntil}`,
-    });
-  };
+      if (!isTimeRange(timeRange)) return;
+
+      const value = timeRangeToFilterValue(timeRange);
+      onSubmit({ title: filterValueTitle(value), value });
+    },
+    [onSubmit],
+  );
+
+  const _validate = useCallback(
+    (values: TimeRangePickerFormValues) => dateTimeValidate(values, formatTime, userTimezone),
+    [formatTime, userTimezone],
+  );
 
   return (
     <Container data-testid="time-range-form">
-      <Formik initialValues={initialValues} onSubmit={_onSubmit} validate={validate}>
-        {({ isValid }) => (
+      <Formik<TimeRangePickerFormValues>
+        initialValues={initialValues}
+        onSubmit={_onSubmit}
+        validate={_validate}
+        validateOnMount>
+        {({ isValid, isValidating }) => (
           <Form>
-            <PickerContainer>
-              <FromPicker />
-
-              <Icon name="arrow_right_alt" />
-
-              <UntilPicker />
-            </PickerContainer>
+            <TimeRangeTabs limitDuration={0} validTypes={['absolute', 'relative', 'keyword']} />
             <Info>
-              All timezones using: <b>{userTimezone}</b>.
+              All timezones using: <b>{userTimezone}</b>
             </Info>
             <ModalSubmit
               submitButtonText={`${filter ? 'Update' : 'Create'} filter`}
               bsSize="small"
-              disabledSubmit={!isValid}
+              disabledSubmit={!isValid || isValidating}
               displayCancel={false}
             />
           </Form>

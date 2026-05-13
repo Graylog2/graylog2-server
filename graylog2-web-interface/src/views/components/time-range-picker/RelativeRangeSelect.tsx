@@ -21,7 +21,7 @@ import styled, { css } from 'styled-components';
 import moment from 'moment';
 
 import { RELATIVE_RANGE_TYPES } from 'views/Constants';
-import { Select } from 'components/common';
+import Select from 'components/common/Select';
 
 import type { RangeClassified } from './types';
 import { isTypeRelativeClassified, RELATIVE_CLASSIFIED_ALL_TIME_RANGE } from './RelativeTimeRangeClassifiedHelper';
