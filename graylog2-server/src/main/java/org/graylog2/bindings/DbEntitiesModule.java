@@ -18,8 +18,8 @@ package org.graylog2.bindings;
 
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.plugins.views.search.views.ViewDTO;
-import org.graylog2.cluster.nodes.DataNodeEntity;
-import org.graylog2.cluster.nodes.ServerNodeEntity;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.ServerNodeDto;
 import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
 import org.graylog2.database.dbcatalog.DbEntitiesCatalogProvider;
 import org.graylog2.decorators.DecoratorImpl;
@@ -43,7 +43,7 @@ public class DbEntitiesModule extends PluginModule {
 
         addDbEntities(
                 AccessTokenImpl.class,
-                DataNodeEntity.class,
+                DataNodeDto.class,
                 DecoratorImpl.class,
                 EventDefinition.class,
                 IndexFailureImpl.class,
@@ -51,7 +51,7 @@ public class DbEntitiesModule extends PluginModule {
                 InputImpl.class,
                 NotificationImpl.class,
                 OutputImpl.class,
-                ServerNodeEntity.class,
+                ServerNodeDto.class,
                 StreamDestinationFilterRuleDTO.class,
                 StreamImpl.class,
                 StreamRuleImpl.class,
