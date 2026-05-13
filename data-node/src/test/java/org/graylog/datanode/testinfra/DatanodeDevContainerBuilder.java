@@ -17,8 +17,6 @@
 package org.graylog.datanode.testinfra;
 
 import com.google.common.base.Suppliers;
-import org.apache.commons.lang3.tuple.Pair;
-import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.OpensearchArchitecture;
 import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.graylog.testing.datanode.DatanodeDockerHooks;
@@ -220,11 +218,11 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
         // see opensearch.properties file, mapping the versions from pom.xml
         Stream.of("opensearchCompatVersion", "opensearchLatestVersion")
                 .map(DatanodeDevContainerBuilder::getOpensearchVersion)
-                .map(version -> readOpensearchDistribution(container, version))
+                .map(DatanodeDevContainerBuilder::readOpensearchDistribution)
                 .forEach(d -> container.withFileSystemBind(d.distributionPath().toString(), IMAGE_WORKING_DIR + "/" + d.distributionName(), BindMode.READ_ONLY));
     }
 
-    private static OpensearchDistribution readOpensearchDistribution(GenericContainer<?> container, String version) {
+    private static OpensearchDistribution readOpensearchDistribution(String version) {
         final String distributionName = "opensearch-" + version + "-linux-" + OpensearchArchitecture.fromOperatingSystem();
         final Path distributionPath = getPath().resolve(Path.of("opensearch", distributionName));
         if (!Files.exists(distributionPath)) {
