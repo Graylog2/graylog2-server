@@ -53,11 +53,11 @@ public class ServerNodeShutdownListener implements GracefulShutdownHook {
     @Override
     public void doGracefulShutdown() throws Exception {
         try {
-            final ServerNodeDto current = nodeService.byNodeIdAnyState(nodeId.getNodeId())
-                    .orElseThrow(() -> new NodeNotFoundException("Node " + nodeId.getNodeId() + " not registered."));
-            nodeService.update(current.offline());
-        } catch (NodeNotFoundException e) {
-            LOG.debug("Node {} not registered in database during shutdown; skipping offline marker.", nodeId.getNodeId());
+            nodeService.byNodeIdAnyState(nodeId.getNodeId())
+                    .ifPresent(node -> {
+                        nodeService.update(node.offline());
+                        System.out.println("Setting offline");
+                    });
         } catch (Exception e) {
             LOG.warn("Failed to mark node {} offline during shutdown.", nodeId.getNodeId(), e);
         }
