@@ -48,22 +48,20 @@ const DebugMetricsBanner = () => {
 
   if (metricsEnabled) {
     return (
-      <>
-        <Alert bsStyle="warning" title="Debug metrics are enabled">
-          <p>
-            Debug metrics add overhead to message processing and increase memory usage. Disable them when you are
-            finished troubleshooting. Pipeline Load values are smoothed over a 15-minute window and may take a few
-            minutes to stabilize after enabling.
-          </p>
-          <IfPermitted permissions={[EDIT_PERMISSION]}>
-            <BannerActions>
-              <Button bsStyle="warning" bsSize="small" onClick={disable}>
-                Disable debug metrics
-              </Button>
-            </BannerActions>
-          </IfPermitted>
-        </Alert>
-      </>
+      <Alert bsStyle="warning" title="Debug metrics are enabled">
+        <p>
+          Debug metrics add overhead to message processing and increase memory usage. Disable them when you are
+          finished troubleshooting. Pipeline Load values are smoothed over a 15-minute window and may take a few
+          minutes to stabilize after enabling.
+       </p>
+        <IfPermitted permissions={[EDIT_PERMISSION]}>
+          <BannerActions>
+            <Button bsStyle="warning" bsSize="small" onClick={disable}>
+              Disable debug metrics
+            </Button>
+          </BannerActions>
+        </IfPermitted>
+      </Alert>
     );
   }
 
