@@ -128,6 +128,7 @@ public class OpensearchDataDirCompatibilityCheck implements PreflightCheck {
      * mirroring OpenSearch's own Version.isCompatible() contract for versions >= 3.
      */
     static boolean isCompatible(Version current, Version node) {
-        return Math.abs(current.majorVersion() - node.majorVersion()) <= 1;
+         final long diff = current.majorVersion() - node.majorVersion();
+        return diff >= -1 && diff <= 1;
     }
 }
