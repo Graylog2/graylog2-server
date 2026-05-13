@@ -109,7 +109,6 @@ const ReplayedSearch = ({
 
   return (
     <EventReplaySearch
-      key={selectedEvent.event.id}
       eventData={selectedEvent.event}
       eventDefinitionMappedData={eventDefinitionMappedData}
       searchPageLayout={searchPageLayout}
