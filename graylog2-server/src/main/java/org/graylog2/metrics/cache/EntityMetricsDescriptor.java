@@ -16,22 +16,16 @@
  */
 package org.graylog2.metrics.cache;
 
-import org.graylog.plugins.views.search.permissions.SearchUser;
-
-import java.util.Collection;
-import java.util.Map;
-
 /**
- * Pluggable descriptor for a single entity metric field. Defines the entity type,
- * field name, and how the value is computed.
+ * Base interface for pluggable entity metric descriptors. Defines the entity type
+ * and field name that this descriptor provides.
  * <p>
- * Multiple descriptors can be registered for the same entity type via Guice multibinding.
- * Each descriptor handles exactly one field. Authorization is handled internally by each
- * descriptor — either by filtering results in {@link #computeField} or by checking
- * feature flags / licenses before returning data.
+ * Implementations should use one of the sub-interfaces:
+ * <ul>
+ *   <li>{@link EntityCachedMetricsDescriptor} — for fields cached in MongoDB (e.g. OpenSearch aggregations)</li>
+ *   <li>{@link EntityUncachedMetricsDescriptor} — for fields computed fresh per request (e.g. domain model queries)</li>
+ * </ul>
  * </p>
- *
- * @see EntityCachedMetricsDescriptor for fields that should be cached in MongoDB
  */
 public interface EntityMetricsDescriptor {
 
@@ -45,15 +39,4 @@ public interface EntityMetricsDescriptor {
      * The field name this descriptor provides (e.g. "message_count", "pipeline_count").
      */
     String fieldName();
-
-    /**
-     * Computes fresh values for the given entity IDs.
-     * Implementations should handle their own authorization (e.g. filtering results
-     * by per-entity permissions, checking feature flags).
-     *
-     * @param entityIds  the entity IDs to compute values for
-     * @param searchUser the current user for search and entity permissions
-     * @return map of entity ID to computed value
-     */
-    Map<String, Object> computeField(Collection<String> entityIds, SearchUser searchUser);
 }

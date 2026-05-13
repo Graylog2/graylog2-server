@@ -62,6 +62,30 @@ public interface MoreSearchAdapter {
                                            Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
                                            Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, List<NumberRange> ranges);
 
+    /**
+     * Groups documents by {@code groupByField}, then performs a terms sub-aggregation on {@code termsField}
+     * within each bucket. Returns a map of group key to sub-term counts.
+     *
+     * @return map of group key → (sub-term key → doc count)
+     */
+    Map<String, Map<String, Long>> aggregateGroupedTerms(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                                         SourceStreamFilter sourceStreamFilter,
+                                                         String groupByField, String termsField,
+                                                         int maxBuckets, int maxSubBuckets);
+
+    enum MetricType { AVG, MAX }
+
+    /**
+     * Groups documents by {@code groupByField}, then computes a metric (avg or max) of {@code metricField}
+     * within each bucket.
+     *
+     * @return map of group key → metric value
+     */
+    Map<String, Double> aggregateGroupedMetric(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                               SourceStreamFilter sourceStreamFilter,
+                                               String groupByField, MetricType metricType, String metricField,
+                                               int maxBuckets);
+
     default ChunkCommand buildScrollCommand(String queryString, TimeRange timeRange, Set<String> affectedIndices, List<UsedSearchFilter> filters, Set<String> streams, int batchSize) {
         ChunkCommand.Builder commandBuilder = ChunkCommand.builder()
                 .query(queryString)

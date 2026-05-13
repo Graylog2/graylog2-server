@@ -20,6 +20,7 @@ import jakarta.ws.rs.BadRequestException;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.metrics.cache.EntityCachedMetricsDescriptor;
 import org.graylog2.metrics.cache.EntityMetricsDescriptor;
+import org.graylog2.metrics.cache.EntityUncachedMetricsDescriptor;
 import org.graylog2.metrics.cache.MetricsCacheService;
 
 import java.time.Duration;
@@ -68,28 +69,28 @@ public class EntityMetricsService {
         validateFields(fields);
 
         final var builder = EntityMetricValues.builder();
-        final Map<String, Duration> cachedFieldTtls = new HashMap<>();
+        final Map<String, EntityCachedMetricsDescriptor> cachedDescriptors = new HashMap<>();
 
         for (final String field : fields) {
             final EntityMetricsDescriptor descriptor = descriptorsByField.get(field);
             if (descriptor instanceof EntityCachedMetricsDescriptor cached) {
-                cachedFieldTtls.put(field, cached.cacheTtl());
-            } else {
-                computeFresh(descriptor, entityIds, searchUser, builder);
+                cachedDescriptors.put(field, cached);
+            } else if (descriptor instanceof EntityUncachedMetricsDescriptor uncached) {
+                computeFresh(uncached, entityIds, searchUser, builder);
             }
         }
 
-        final var cacheResult = cachedFieldTtls.isEmpty()
-                ? null
-                : cacheService.checkCache(entityIds, entityType, cachedFieldTtls, cachedFieldTtls.keySet());
+        if (!cachedDescriptors.isEmpty()) {
+            final Map<String, Duration> fieldTtls = cachedDescriptors.entrySet().stream()
+                    .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().cacheTtl()));
 
-        if (cacheResult != null) {
-            mergeCachedFields(cacheResult.freshFields(), searchUser, builder);
+            final var cacheResult = cacheService.checkCache(entityIds, entityType, fieldTtls, fieldTtls.keySet());
+            mergeCachedFields(cacheResult.freshFields(), cachedDescriptors, searchUser, builder);
 
-            for (final String field : cachedFieldTtls.keySet()) {
-                final Set<String> staleIds = cacheResult.staleEntityIdsForField(field);
+            for (final var entry : cachedDescriptors.entrySet()) {
+                final Set<String> staleIds = cacheResult.staleEntityIdsForField(entry.getKey());
                 if (!staleIds.isEmpty()) {
-                    computeAndCache(descriptorsByField.get(field), staleIds, searchUser, builder);
+                    computeAndCache(entry.getValue(), staleIds, searchUser, builder);
                 }
             }
         }
@@ -98,38 +99,33 @@ public class EntityMetricsService {
     }
 
     private void mergeCachedFields(Map<String, Map<String, Object>> freshFields,
+                                   Map<String, EntityCachedMetricsDescriptor> cachedDescriptors,
                                    SearchUser searchUser,
                                    EntityMetricValues.Builder builder) {
         for (final var entityEntry : freshFields.entrySet()) {
-            final String entityId = entityEntry.getKey();
             for (final var fieldEntry : entityEntry.getValue().entrySet()) {
-                final String field = fieldEntry.getKey();
-                final Object rawValue = fieldEntry.getValue();
-                final EntityMetricsDescriptor descriptor = descriptorsByField.get(field);
-
-                final Object filteredValue;
-                if (descriptor instanceof EntityCachedMetricsDescriptor cached) {
-                    filteredValue = cached.filterValue(rawValue, searchUser);
-                } else {
-                    filteredValue = rawValue;
-                }
-                builder.put(entityId, field, filteredValue);
+                builder.put(entityEntry.getKey(),
+                        fieldEntry.getKey(),
+                        cachedDescriptors.get(fieldEntry.getKey())
+                                .applyPermissionFilter(fieldEntry.getValue(), searchUser)
+                );
             }
         }
     }
 
-    private void computeAndCache(EntityMetricsDescriptor descriptor,
+    private void computeAndCache(EntityCachedMetricsDescriptor descriptor,
                                  Collection<String> entityIds,
                                  SearchUser searchUser,
                                  EntityMetricValues.Builder builder) {
-        final Map<String, Object> computed = descriptor.computeField(entityIds, searchUser);
+        final Map<String, Object> computed = descriptor.computeField(entityIds);
         cacheService.putFieldBatch(entityType, descriptor.fieldName(), computed);
         for (final var entry : computed.entrySet()) {
-            builder.put(entry.getKey(), descriptor.fieldName(), entry.getValue());
+            final Object filteredValue = descriptor.applyPermissionFilter(entry.getValue(), searchUser);
+            builder.put(entry.getKey(), descriptor.fieldName(), filteredValue);
         }
     }
 
-    private void computeFresh(EntityMetricsDescriptor descriptor,
+    private void computeFresh(EntityUncachedMetricsDescriptor descriptor,
                               Collection<String> entityIds,
                               SearchUser searchUser,
                               EntityMetricValues.Builder builder) {

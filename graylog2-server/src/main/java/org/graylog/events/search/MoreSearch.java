@@ -220,6 +220,30 @@ public class MoreSearch {
                 filterString, sourceStreamFilter, Map.of(), slicingColumn, meta, ranges);
     }
 
+    public Map<String, Map<String, Long>> aggregateGroupedTerms(String queryString, TimeRange timeRange,
+                                                              SourceStreamFilter sourceStreamFilter,
+                                                              String groupByField, String termsField,
+                                                              int maxBuckets, int maxSubBuckets) {
+        final Set<String> affectedIndices = getAffectedIndices(Set.of(), timeRange);
+        if (affectedIndices == null || affectedIndices.isEmpty()) {
+            return Map.of();
+        }
+        return moreSearchAdapter.aggregateGroupedTerms(queryString, timeRange, affectedIndices,
+                sourceStreamFilter, groupByField, termsField, maxBuckets, maxSubBuckets);
+    }
+
+    public Map<String, Double> aggregateGroupedMetric(String queryString, TimeRange timeRange,
+                                                      SourceStreamFilter sourceStreamFilter,
+                                                      String groupByField, MoreSearchAdapter.MetricType metricType,
+                                                      String metricField, int maxBuckets) {
+        final Set<String> affectedIndices = getAffectedIndices(Set.of(), timeRange);
+        if (affectedIndices == null || affectedIndices.isEmpty()) {
+            return Map.of();
+        }
+        return moreSearchAdapter.aggregateGroupedMetric(queryString, timeRange, affectedIndices,
+                sourceStreamFilter, groupByField, metricType, metricField, maxBuckets);
+    }
+
     /**
      * Helper to perform basic Lucene escaping of query string values
      *

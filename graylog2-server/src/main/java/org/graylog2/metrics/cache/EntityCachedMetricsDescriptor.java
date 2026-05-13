@@ -19,14 +19,15 @@ package org.graylog2.metrics.cache;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 
 import java.time.Duration;
+import java.util.Collection;
+import java.util.Map;
 
 /**
- * Extension of {@link EntityMetricsDescriptor} for fields that should be cached
- * in MongoDB via {@link MetricsCacheService}.
+ * Descriptor for entity metric fields that are cached in MongoDB via {@link MetricsCacheService}.
  * <p>
- * The cache stores the full unfiltered value. On cache read, {@link #filterValue}
- * is called to apply per-user permission filtering (e.g. filtering a list of
- * associated entity IDs by the user's per-entity read permissions).
+ * Computation ({@link #computeField}) runs without user context — the cache stores
+ * the full, unfiltered result. On cache read, {@link #applyPermissionFilter} is called
+ * to filter the cached value based on the current user's permissions.
  * </p>
  */
 public interface EntityCachedMetricsDescriptor extends EntityMetricsDescriptor {
@@ -38,20 +39,26 @@ public interface EntityCachedMetricsDescriptor extends EntityMetricsDescriptor {
     Duration cacheTtl();
 
     /**
+     * Computes fresh values for the given entity IDs. Runs without user context —
+     * the result is stored in the shared cache and must not be filtered by user permissions.
+     *
+     * @param entityIds the entity IDs to compute values for
+     * @return map of entity ID to computed value
+     */
+    Map<String, Object> computeField(Collection<String> entityIds);
+
+    /**
      * Filters a cached value based on the current user's permissions.
-     * Called when serving a value from the cache to ensure users only see
-     * data they are authorized to access.
+     * Called on every cache read to ensure users only see data they are authorized to access.
      * <p>
-     * Default implementation returns the value as-is (no filtering).
-     * Override for list-type fields that need per-entity permission filtering
-     * (e.g. filtering associated stream/input IDs by read permissions).
+     * For example, a list of associated stream IDs should be filtered to only include
+     * streams the user has {@code streams:read:<id>} permission for. A per-stream count
+     * breakdown should be summed only for permitted streams.
      * </p>
      *
-     * @param cachedValue the raw cached value
+     * @param cachedValue the raw cached value (as stored by {@link #computeField})
      * @param searchUser  the current user
-     * @return the filtered value
+     * @return the permission-filtered value to return to the user
      */
-    default Object filterValue(Object cachedValue, SearchUser searchUser) {
-        return cachedValue;
-    }
+    Object applyPermissionFilter(Object cachedValue, SearchUser searchUser);
 }

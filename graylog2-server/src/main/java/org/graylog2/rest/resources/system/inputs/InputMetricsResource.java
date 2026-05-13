@@ -28,6 +28,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog2.metrics.EntityMetricsResponse;
 import org.graylog2.metrics.EntityMetricsService;
 import org.graylog2.metrics.cache.EntityMetricsDescriptor;
 import org.graylog2.metrics.cache.MetricsCacheService;
@@ -35,7 +36,6 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static org.graylog2.metrics.MetricsModule.ENTITY_TYPE_INPUTS;
@@ -56,7 +56,7 @@ public class InputMetricsResource extends RestResource {
 
     @GET
     @Operation(summary = "Get metrics for multiple inputs")
-    public Map<String, Map<String, Object>> getMetrics(
+    public EntityMetricsResponse getMetrics(
             @Parameter(description = "Comma-separated list of input IDs", required = true)
             @QueryParam("input_ids") List<String> inputIds,
             @Parameter(description = "Comma-separated list of metric fields to return", required = true)
@@ -65,6 +65,7 @@ public class InputMetricsResource extends RestResource {
 
         inputIds.forEach(inputId -> checkPermission(RestPermissions.INPUTS_READ, inputId));
 
-        return metricsService.getMetrics(inputIds, Set.copyOf(fields), searchUser).toMap();
+        return EntityMetricsResponse.fromValues(
+                metricsService.getMetrics(inputIds, Set.copyOf(fields), searchUser));
     }
 }
