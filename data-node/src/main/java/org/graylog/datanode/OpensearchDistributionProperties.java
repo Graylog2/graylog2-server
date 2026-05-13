@@ -16,6 +16,8 @@
  */
 package org.graylog.datanode;
 
+import org.graylog.datanode.configuration.OpensearchConfigurationException;
+
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +37,7 @@ public class OpensearchDistributionProperties {
             properties.load(stream);
             return new OpensearchDistributionProperties(properties);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new OpensearchConfigurationException("Failed to load distribution properties for OpenSearch version " + version + " from resource: " + resourcePath, e);
         }
     }
 
