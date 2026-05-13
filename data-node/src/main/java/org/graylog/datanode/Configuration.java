@@ -92,7 +92,7 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     @Parameter(value = "opensearch_location")
     private String opensearchDistributionRoot = "dist";
 
-    @Documentation("OpenSearch version to use (e.g. '2.19.5' or '3.5.0'). When not set, the latest available version found in the distribution directory is used.")
+    @Documentation("OpenSearch version to use (e.g. '2.19.5' or '3.5.0'). When not set, the oldest available version found in the distribution directory is used.")
     @Parameter(value = "opensearch_version")
     private String opensearchVersion = null;
 

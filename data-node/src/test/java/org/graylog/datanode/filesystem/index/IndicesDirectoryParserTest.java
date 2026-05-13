@@ -16,12 +16,11 @@
  */
 package org.graylog.datanode.filesystem.index;
 
-import org.apache.lucene.index.IndexFormatTooOldException;
 import org.assertj.core.api.Assertions;
-import org.graylog.datanode.filesystem.index.indexreader.ShardStatsParserImpl;
-import org.graylog.datanode.filesystem.index.statefile.StateFileParserImpl;
 import org.graylog.datanode.filesystem.index.dto.IndexInformation;
 import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
+import org.graylog.datanode.filesystem.index.indexreader.ShardStatsParserImpl;
+import org.graylog.datanode.filesystem.index.statefile.StateFileParserImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;

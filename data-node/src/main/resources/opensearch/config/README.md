@@ -16,5 +16,5 @@ version. For 2.19.5, we'll copy files from main/resources/opensearch/config/2.19
 
 
 ## Distribution properties
-If there are some version-specifc names, roles, config options, they can be configured in the distribution.properties
+If there are some version-specific names, roles, config options, they can be configured in the distribution.properties
 file for each version. These are then available through OpensearchDistribution class.

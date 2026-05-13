@@ -63,7 +63,7 @@ class OpensearchClusterConfigurationBeanTest {
                 .setTransportAddress("https://my_warm_node:9200")
                 .setHostname("my_search_node")
                 .setDataNodeStatus(DataNodeStatus.AVAILABLE)
-                .setOpensearchRoles(List.of("SEARCH"))
+                .setOpensearchRoles(List.of("search"))
                 .build());
     }
 
@@ -86,7 +86,7 @@ class OpensearchClusterConfigurationBeanTest {
     @Test
     void testManagerNodesWithSelfNoManager(@TempDir Path tempDir) throws ValidationException, RepositoryException {
         final OpensearchClusterConfigurationBean configurationBean = new OpensearchClusterConfigurationBean(DatanodeTestUtils.datanodeConfiguration(
-                Map.of("hostname", "this_node_cannot_be_manager", "node_roles", "SEARCH"), tempDir), testNodeService);
+                Map.of("hostname", "this_node_cannot_be_manager", "node_roles", "search"), tempDir), testNodeService);
 
         final DatanodeConfigurationPart configurationPart = configurationBean.buildConfigurationPart(new OpensearchConfigurationParams(tempDir));
 

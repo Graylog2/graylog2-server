@@ -19,7 +19,6 @@ package org.graylog.datanode;
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -27,9 +26,11 @@ public class OpensearchDistributionProperties {
     private final Properties properties;
 
     public static OpensearchDistributionProperties forVersion(@Nonnull String version) {
-        try (
-                final InputStream stream = OpensearchDistributionProperties.class.getResourceAsStream(Path.of("/", "opensearch", "config", version, "distribution.properties").toString())
-        ) {
+        final String resourcePath = "/opensearch/config/" + version + "/distribution.properties";
+        try (final InputStream stream = OpensearchDistributionProperties.class.getResourceAsStream(resourcePath)) {
+            if (stream == null) {
+                throw new IllegalArgumentException("No distribution properties found for OpenSearch version " + version + " (looked for resource: " + resourcePath + ")");
+            }
             Properties properties = new Properties();
             properties.load(stream);
             return new OpensearchDistributionProperties(properties);
