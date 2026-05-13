@@ -64,7 +64,7 @@ public class McpRestResource extends RestResource {
     private static final String HEADER_MCP_SESSION_ID = "Mcp-Session-Id";
     private static final String HEADER_MCP_PROTOCOL_VERSION = "MCP-Protocol-Version";
 
-    private final ObjectMapper protocolObjectMapper;
+    private final ObjectMapper protocolObjectMapper = new ObjectMapper();
 
     private final McpService mcpService;
 
@@ -73,10 +73,9 @@ public class McpRestResource extends RestResource {
     private final ClusterConfigService clusterConfig;
 
     @Inject
-    public McpRestResource(final ClusterConfigService clusterConfig, final McpService mcpService, @McpProtocolObjectMapper final ObjectMapper protocolObjectMapper, final SecurityContext securityContext) {
+    public McpRestResource(final ClusterConfigService clusterConfig, final McpService mcpService, final SecurityContext securityContext) {
         this.clusterConfig = clusterConfig;
         this.mcpService = mcpService;
-        this.protocolObjectMapper = protocolObjectMapper;
         this.securityContext = securityContext;
     }
 

@@ -34,7 +34,6 @@ public class McpRestResourceTest {
         // we have to create mocks for the rest, too
         resource = new McpRestResource(clusterConfigService,
                                        null,
-                                       null,
                                        null);
         clusterConfigService.write(McpConfiguration.create(false, false));
     }

@@ -59,7 +59,7 @@ public class McpService {
     static final List<String> ALL_SUPPORTED_MCP_VERSIONS = List.of(LATEST_SUPPORTED_MCP_VERSION);
 
     private final ObjectMapper objectMapper;
-    private final ObjectMapper protocolObjectMapper;
+    private final ObjectMapper protocolObjectMapper = new ObjectMapper();
     private final AuditEventSender auditEventSender;
     private final CustomizationConfig customizationConfig;
     private final GRNRegistry grnRegistry;
@@ -68,14 +68,12 @@ public class McpService {
 
     @Inject
     protected McpService(ObjectMapper objectMapper,
-                         @McpProtocolObjectMapper ObjectMapper protocolObjectMapper,
                          AuditEventSender auditEventSender,
                          CustomizationConfig customizationConfig,
                          GRNRegistry grnRegistry,
                          Map<String, Tool<?, ?>> tools,
                          Map<GRNType, ? extends ResourceProvider> resourceProviders) {
         this.objectMapper = objectMapper;
-        this.protocolObjectMapper = protocolObjectMapper;
         this.auditEventSender = auditEventSender;
         this.customizationConfig = customizationConfig;
         this.grnRegistry = grnRegistry;

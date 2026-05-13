@@ -81,7 +81,6 @@ class McpServiceTest {
 
         mcpService = new McpService(
                 objectMapper,
-                objectMapper,
                 auditEventSender,
                 new CustomizationConfig(null),
                 GRNRegistry.createWithBuiltinTypes(),
