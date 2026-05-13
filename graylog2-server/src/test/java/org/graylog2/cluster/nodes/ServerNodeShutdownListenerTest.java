@@ -16,7 +16,7 @@
  */
 package org.graylog2.cluster.nodes;
 
-import com.google.common.eventbus.EventBus;
+import org.graylog2.cluster.nodes.mongodb.TestShutdownService;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
@@ -41,21 +41,14 @@ class ServerNodeShutdownListenerTest {
     private final NodeId nodeId = new SimpleNodeId(NODE_ID);
 
     @Mock
-    private EventBus eventBus;
-
-    @Mock
     private NodeService<ServerNodeDto> nodeService;
 
-    private ServerNodeShutdownListener listener;
+    private final TestShutdownService gracefulShutdownService = new TestShutdownService();
+
 
     @BeforeEach
     void setUp() {
-        listener = new ServerNodeShutdownListener(eventBus, nodeService, nodeId);
-    }
-
-    @Test
-    void registersItselfWithTheEventBus() {
-        verify(eventBus).register(listener);
+        new ServerNodeShutdownListener(gracefulShutdownService, nodeService, nodeId);
     }
 
     @Test
@@ -70,7 +63,7 @@ class ServerNodeShutdownListenerTest {
                 .build();
         when(nodeService.byNodeIdAnyState(NODE_ID)).thenReturn(Optional.of(current));
 
-        listener.onLifecycle(Lifecycle.HALTING);
+        gracefulShutdownService.shutDown();
 
         final ArgumentCaptor<ServerNodeDto> captor = ArgumentCaptor.forClass(ServerNodeDto.class);
         verify(nodeService).update(captor.capture());
@@ -84,22 +77,13 @@ class ServerNodeShutdownListenerTest {
         assertThat(written.getHostname()).isEqualTo("host.example.com");
     }
 
-    @Test
-    void nonHaltingLifecycleEventsAreIgnored() {
-        listener.onLifecycle(Lifecycle.RUNNING);
-        listener.onLifecycle(Lifecycle.PAUSED);
-        listener.onLifecycle(Lifecycle.STARTING);
-
-        verify(nodeService, never()).byNodeIdAnyState(org.mockito.ArgumentMatchers.anyString());
-        verify(nodeService, never()).update(org.mockito.ArgumentMatchers.any());
-    }
 
     @Test
     void missingNodeIsLoggedAndDoesNotThrow() {
         when(nodeService.byNodeIdAnyState(NODE_ID)).thenReturn(Optional.empty());
 
         // Must not throw — shutdown should not be blocked by a missing inventory row.
-        listener.onLifecycle(Lifecycle.HALTING);
+        gracefulShutdownService.shutDown();
 
         verify(nodeService, never()).update(org.mockito.ArgumentMatchers.any());
     }
@@ -110,7 +94,7 @@ class ServerNodeShutdownListenerTest {
                 .thenThrow(new RuntimeException("mongo unreachable"));
 
         // Must not propagate — failure during shutdown shouldn't block the JVM exit.
-        listener.onLifecycle(Lifecycle.HALTING);
+        gracefulShutdownService.shutDown();
 
         verify(nodeService, never()).update(org.mockito.ArgumentMatchers.any());
     }

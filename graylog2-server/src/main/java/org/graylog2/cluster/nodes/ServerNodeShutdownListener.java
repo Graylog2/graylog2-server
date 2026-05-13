@@ -16,12 +16,12 @@
  */
 package org.graylog2.cluster.nodes;
 
-import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
 import jakarta.inject.Inject;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.system.shutdown.GracefulShutdownHook;
+import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,26 +35,23 @@ import org.slf4j.LoggerFactory;
  * MongoDB connection is shut down, so the write is reliable. Any failure is swallowed: if Mongo
  * is unreachable for any reason, we don't want to block shutdown.</p>
  */
-public class ServerNodeShutdownListener {
+public class ServerNodeShutdownListener implements GracefulShutdownHook {
     private static final Logger LOG = LoggerFactory.getLogger(ServerNodeShutdownListener.class);
 
     private final NodeService<ServerNodeDto> nodeService;
     private final NodeId nodeId;
 
     @Inject
-    public ServerNodeShutdownListener(EventBus eventBus,
+    public ServerNodeShutdownListener(GracefulShutdownService gracefulShutdownService,
                                       NodeService<ServerNodeDto> nodeService,
                                       NodeId nodeId) {
         this.nodeService = nodeService;
         this.nodeId = nodeId;
-        eventBus.register(this);
+        gracefulShutdownService.register(this);
     }
 
-    @Subscribe
-    public void onLifecycle(Lifecycle lifecycle) {
-        if (lifecycle != Lifecycle.HALTING) {
-            return;
-        }
+    @Override
+    public void doGracefulShutdown() throws Exception {
         try {
             final ServerNodeDto current = nodeService.byNodeIdAnyState(nodeId.getNodeId())
                     .orElseThrow(() -> new NodeNotFoundException("Node " + nodeId.getNodeId() + " not registered."));
