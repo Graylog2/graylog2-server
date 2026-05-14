@@ -14,55 +14,47 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useEffect, useState } from "react";
-import { PluginStore } from "graylog-web-plugin/plugin";
-import cloneDeep from "lodash/cloneDeep";
-import { useQuery } from "@tanstack/react-query";
+import React, { useCallback, useEffect, useState } from 'react';
+import { PluginStore } from 'graylog-web-plugin/plugin';
+import cloneDeep from 'lodash/cloneDeep';
 
-import { useStore } from "stores/connect";
-import { ConfirmLeaveDialog, Spinner } from "components/common";
-import { ConfigurationsActions } from "stores/configurations/ConfigurationsStore";
-import fetch from "logic/rest/FetchProvider";
-import { qualifyUrl, getPathnameWithoutId } from "util/URLUtils";
-import { defaultOnError } from "util/conditional/onError";
-import { EventDefinitionsActions } from "stores/event-definitions/EventDefinitionsStore";
-import {
-  EventNotificationsActions,
-  EventNotificationsStore,
-} from "stores/event-notifications/EventNotificationsStore";
-import { CurrentUserStore } from "stores/users/CurrentUserStore";
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { ConfirmLeaveDialog, Spinner } from 'components/common';
+import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import type {
   EventDefinition,
   EventDefinitionFormControlsProps,
-} from "components/event-definitions/event-definitions-types";
-import useCurrentUser from "hooks/useCurrentUser";
-import useEventDefinitionConfigFromLocalStorage from "components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage";
-import useSendTelemetry from "logic/telemetry/useSendTelemetry";
-import useLocation from "routing/useLocation";
-import { TELEMETRY_EVENT_TYPE } from "logic/telemetry/Constants";
-import useScopePermissions from "hooks/useScopePermissions";
-import type { EntitySharePayload } from "actions/permissions/EntityShareActions";
+} from 'components/event-definitions/event-definitions-types';
+import useCurrentUser from 'hooks/useCurrentUser';
+import useEventDefinitionConfigFromLocalStorage from 'components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useScopePermissions from 'hooks/useScopePermissions';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
-import useEventDefinitionSteps, {
-  INITIAL_EVENT_DEFINITION,
-} from "./useEventDefinitionCommonSteps";
-import EventDetailsForm from "./EventDetailsForm";
-import EventConditionForm from "./EventConditionForm";
-import EventDefinitionForm, { getStepKeys } from "./EventDefinitionForm";
+import useEventDefinitionSteps, { INITIAL_EVENT_DEFINITION } from './useEventDefinitionCommonSteps';
+import EventDetailsForm from './EventDetailsForm';
+import EventConditionForm from './EventConditionForm';
+import EventDefinitionForm, { getStepKeys } from './EventDefinitionForm';
+import EventDefinitionSummary from './EventDefinitionSummary';
 
-import useEventDefinitionMutations from "../hooks/useEventDefinitionMutations";
+import useEventDefinitionMutations from '../hooks/useEventDefinitionMutations';
+import {
+  useGetEntityTypes,
+  useGetListEventsClusterConfig,
+  useGetEventNotifications,
+} from '../hooks/useEventDefinitions';
 
 const STEP_KEYS = {
-  EVENT_DETAILS: "event-details",
-  CONDITION: "condition",
-};
-
-const fetchNotifications = () => {
-  EventNotificationsActions.listAll();
+  EVENT_DETAILS: 'event-details',
+  CONDITION: 'condition',
+  SUMMARY: 'summary',
 };
 
 type Props = {
-  action?: "edit" | "create";
+  action?: 'edit' | 'create';
   eventDefinition?: EventDefinition & {
     share_request?: EntitySharePayload;
   };
@@ -79,65 +71,41 @@ export const getConditionPlugin = (type: string | undefined) => {
     return { displayName: null, hideFieldsStep: false, defaultConfig: {} };
   }
 
-  return (
-    PluginStore.exports("eventDefinitionTypes").find(
-      (edt) => edt.type === type,
-    ) || {}
-  );
+  return PluginStore.exports('eventDefinitionTypes').find((edt) => edt.type === type) || {};
 };
 
 const EventDefinitionFormContainer = ({
-  action = "edit",
+  action = 'edit',
   eventDefinition: eventDefinitionInitial = INITIAL_EVENT_DEFINITION,
   formControls = undefined,
-  initialStep = "event-details",
+  initialStep = 'event-details',
   onCancel = undefined,
   onChangeStep = undefined,
   onEventDefinitionChange = () => {},
   onSubmit = undefined,
 }: Props) => {
   const [activeStep, setActiveStep] = useState(initialStep);
-  const [eventDefinition, setEventDefinition] = useState<EventDefinition>(
-    eventDefinitionInitial,
-  );
+  const [eventDefinition, setEventDefinition] = useState<EventDefinition>(eventDefinitionInitial);
   const [validation, setValidation] = useState({ errors: {} });
-  const [eventsClusterConfig, setEventsClusterConfig] = useState(undefined);
   const [isDirty, setIsDirty] = useState(false);
-  const { configFromLocalStorage, hasLocalStorageConfig } =
-    useEventDefinitionConfigFromLocalStorage();
-  const { loadingScopePermissions, scopePermissions } =
-    useScopePermissions(eventDefinition);
+  const { configFromLocalStorage, hasLocalStorageConfig } = useEventDefinitionConfigFromLocalStorage();
+  const { loadingScopePermissions, scopePermissions } = useScopePermissions(eventDefinition);
   const { createEventDefinition } = useEventDefinitionMutations();
-  // TODO: Put this in a separate query hook
-  const { data: entityTypes } = useQuery({
-    queryKey: ["event-definitions", "entity-types"],
-    queryFn: () =>
-      defaultOnError(
-        fetch("GET", qualifyUrl("/events/entity_types")),
-        "Loading event definition entity types failed with status",
-        "Could not load event definition entity types",
-      ),
-  });
-  const notifications = useStore(EventNotificationsStore);
+  const { entityTypes, loadingEntityTypes } = useGetEntityTypes();
+  const { eventsClusterConfig, loadingEventsClusterConfig } = useGetListEventsClusterConfig();
+  const { eventNotifications, loadingEventNotifications } = useGetEventNotifications();
   const currentUser = useCurrentUser();
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
-  const isNew = action === "create";
+  const isNew = action === 'create';
   const eventDefinitionType = getConditionPlugin(eventDefinition.config.type);
   const hideFieldsStep = eventDefinitionType?.hideFieldsStep ?? false;
   const currentStepKeys = getStepKeys(isNew, hideFieldsStep);
 
-  const isLoading = !entityTypes || !notifications.all || !eventsClusterConfig;
+  const isLoading = !entityTypes || loadingEntityTypes || loadingEventNotifications || loadingEventsClusterConfig;
   const defaults = {
-    default_backlog_size:
-      eventsClusterConfig?.events_notification_default_backlog,
+    default_backlog_size: eventsClusterConfig?.events_notification_default_backlog as number,
   };
-
-  const fetchClusterConfig = useCallback(() => {
-    ConfigurationsActions.listEventsClusterConfig().then((config) =>
-      setEventsClusterConfig(config),
-    );
-  }, []);
 
   const handleChange = useCallback(
     (key: string, value: unknown) => {
@@ -149,16 +117,9 @@ const EventDefinitionFormContainer = ({
   );
 
   useEffect(() => {
-    fetchClusterConfig();
-    fetchNotifications();
-
     if (hasLocalStorageConfig) {
-      const localStorageConditionPlugin = getConditionPlugin(
-        configFromLocalStorage.type,
-      );
-      const defaultConfig =
-        localStorageConditionPlugin?.defaultConfig ||
-        ({} as EventDefinition["config"]);
+      const localStorageConditionPlugin = getConditionPlugin(configFromLocalStorage.type);
+      const defaultConfig = localStorageConditionPlugin?.defaultConfig || ({} as EventDefinition['config']);
 
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setEventDefinition((cur: any) => {
@@ -174,7 +135,7 @@ const EventDefinitionFormContainer = ({
         };
       });
     }
-  }, [configFromLocalStorage, fetchClusterConfig, hasLocalStorageConfig]);
+  }, [configFromLocalStorage, hasLocalStorageConfig]);
 
   const commonStepProps = {
     key: eventDefinition.id, // Recreate components if ID changed
@@ -187,13 +148,12 @@ const EventDefinitionFormContainer = ({
   };
 
   const canEdit = scopePermissions.is_mutable;
-  const canEditCondition =
-    canEdit || eventDefinition._scope.toUpperCase() === "ILLUMINATE";
+  const canEditCondition = canEdit || eventDefinition._scope.toUpperCase() === 'ILLUMINATE';
 
   const viewSteps = [
     {
       key: STEP_KEYS.EVENT_DETAILS,
-      title: "Event Details",
+      title: 'Event Details',
       component: (
         <EventDetailsForm
           {...commonStepProps}
@@ -204,19 +164,30 @@ const EventDefinitionFormContainer = ({
     },
     {
       key: STEP_KEYS.CONDITION,
-      title: eventDefinitionType?.displayName ?? "Condition",
-      component: (
-        <EventConditionForm {...commonStepProps} canEdit={canEditCondition} />
-      ),
+      title: eventDefinitionType?.displayName ?? 'Condition',
+      component: <EventConditionForm {...commonStepProps} canEdit={canEditCondition} />,
     },
   ];
 
   const steps = useEventDefinitionSteps({
     viewSteps,
     commonStepProps,
-    notifications: notifications.all,
+    notifications: eventNotifications.all,
     notificationDefaults: defaults,
     canEdit,
+  });
+
+  steps.push({
+    key: STEP_KEYS.SUMMARY,
+    title: 'Summary',
+    component: (
+      <EventDefinitionSummary
+        eventDefinition={commonStepProps.eventDefinition}
+        currentUser={commonStepProps.currentUser}
+        notifications={eventNotifications?.all}
+        validation={commonStepProps.validation}
+      />
+    ),
   });
 
   const handleSubmitSuccessResponse = () => {
@@ -241,24 +212,22 @@ const EventDefinitionFormContainer = ({
         return;
       }
 
-      if (body.type && body.type === "ApiError") {
+      if (body.type && body.type === 'ApiError') {
         if (
-          body.message.includes("org.graylog.events.conditions.Expression") ||
-          body.message.includes("org.graylog.events.conditions.Expr") ||
-          body.message.includes(
-            "org.graylog.events.processor.aggregation.AggregationSeries",
-          )
+          body.message.includes('org.graylog.events.conditions.Expression') ||
+          body.message.includes('org.graylog.events.conditions.Expr') ||
+          body.message.includes('org.graylog.events.processor.aggregation.AggregationSeries')
         ) {
           showValidationErrors({
-            errors: { conditions: ["Aggregation condition is not valid"] },
+            errors: { conditions: ['Aggregation condition is not valid'] },
           });
 
           return;
         }
 
-        if (body.message.includes("embryonic")) {
+        if (body.message.includes('embryonic')) {
           showValidationErrors({
-            errors: { query_parameters: ["Query parameters must be declared"] },
+            errors: { query_parameters: ['Query parameters must be declared'] },
           });
         }
       }
@@ -268,29 +237,20 @@ const EventDefinitionFormContainer = ({
   const handleSubmit = () => {
     setIsDirty(false);
 
-    if (action === "create") {
-      sendTelemetry(
-        TELEMETRY_EVENT_TYPE.EVENTDEFINITION_SUMMARY.CREATE_CLICKED,
-        {
-          app_pathname: getPathnameWithoutId(pathname),
-          app_section: "new-event-definition",
-          app_action_value: "create-event-definition-button",
-        },
-      );
+    if (action === 'create') {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_SUMMARY.CREATE_CLICKED, {
+        app_pathname: getPathnameWithoutId(pathname),
+        app_section: 'new-event-definition',
+        app_action_value: 'create-event-definition-button',
+      });
 
-      createEventDefinition(eventDefinition).then(
-        handleSubmitSuccessResponse,
-        handleSubmitFailureResponse,
-      );
+      createEventDefinition(eventDefinition).then(handleSubmitSuccessResponse, handleSubmitFailureResponse);
     } else {
-      sendTelemetry(
-        TELEMETRY_EVENT_TYPE.EVENTDEFINITION_SUMMARY.UPDATE_CLICKED,
-        {
-          app_pathname: getPathnameWithoutId(pathname),
-          app_section: "edit-event-definition",
-          app_action_value: "update-event-definition-button",
-        },
-      );
+      sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_SUMMARY.UPDATE_CLICKED, {
+        app_pathname: getPathnameWithoutId(pathname),
+        app_section: 'edit-event-definition',
+        app_action_value: 'update-event-definition-button',
+      });
 
       EventDefinitionsActions.update(eventDefinition.id, eventDefinition).then(
         handleSubmitSuccessResponse,
@@ -302,9 +262,8 @@ const EventDefinitionFormContainer = ({
   const handleCancel = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_SUMMARY.CANCEL_CLICKED, {
       app_pathname: getPathnameWithoutId(pathname),
-      app_section:
-        action === "create" ? "new-event-definition" : "edit-event-definition",
-      app_action_value: "cancel-button",
+      app_section: action === 'create' ? 'new-event-definition' : 'edit-event-definition',
+      app_action_value: 'cancel-button',
     });
 
     onCancel();
