@@ -16,6 +16,7 @@
  */
 package org.graylog.mcp.server;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.modelcontextprotocol.spec.McpError;
@@ -64,7 +65,8 @@ public class McpRestResource extends RestResource {
     private static final String HEADER_MCP_SESSION_ID = "Mcp-Session-Id";
     private static final String HEADER_MCP_PROTOCOL_VERSION = "MCP-Protocol-Version";
 
-    private final ObjectMapper protocolObjectMapper = new ObjectMapper();
+    private final ObjectMapper protocolObjectMapper = new ObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     private final McpService mcpService;
 
