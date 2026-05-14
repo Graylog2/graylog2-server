@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix save search popover not closeable with Esc key"
+
+pulls = ["26011"]
