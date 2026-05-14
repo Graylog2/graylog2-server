@@ -41,7 +41,6 @@ const TagsContainer = styled.div(
     flex-wrap: wrap;
     gap: ${theme.spacings.xs};
     min-width: 0;
-    flex: 1 1 auto;
   `,
 );
 
