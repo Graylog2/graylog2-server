@@ -17,7 +17,6 @@
 
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 
-// eslint-disable-next-line import/prefer-default-export
 export const simpleEventDefinition: EventDefinition = {
   alert: false,
   config: {
