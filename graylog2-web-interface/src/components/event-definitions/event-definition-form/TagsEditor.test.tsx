@@ -136,20 +136,15 @@ describe('TagsEditor', () => {
     });
   });
 
-  describe('character validation', () => {
-    // Invalid inputs commit so the user sees the bad value as a chip and can fix or remove it.
-    // The chip is rendered with the danger styling (verified visually) and a validation
-    // error is surfaced below, mirroring the IP-address input pattern.
-    it('commits a tag with disallowed characters and surfaces an error', async () => {
-      const onChange = jest.fn();
-      render(<Harness onChange={onChange} />);
+  describe('validation messages', () => {
+    it('surfaces an invalid-characters message when committing a tag with disallowed chars', async () => {
+      render(<Harness />);
 
       await userEvent.type(screen.getByRole('combobox'), 'phish:ing');
       await userEvent.keyboard('{Enter}');
 
-      expect(onChange).toHaveBeenLastCalledWith(['phish:ing']);
       expect(
-        await screen.findByText(/Tag "phish:ing" is invalid/i),
+        await screen.findByText(/Tag "phish:ing" contains invalid characters/i),
       ).toBeInTheDocument();
     });
 
@@ -158,16 +153,14 @@ describe('TagsEditor', () => {
       ['dot', 'phish.ing'],
       ['slash', 'phish/ing'],
       ['quote', 'phish"ing'],
-    ])('commits tags containing a %s and surfaces an error', async (_label, raw) => {
-      const onChange = jest.fn();
-      render(<Harness onChange={onChange} />);
+    ])('surfaces an invalid-characters message for a %s', async (_label, raw) => {
+      render(<Harness />);
 
       await userEvent.type(screen.getByRole('combobox'), raw);
       await userEvent.keyboard('{Enter}');
 
-      expect(onChange).toHaveBeenLastCalledWith([raw.toLowerCase()]);
       expect(
-        await screen.findByText(/is invalid\. Tags may only contain/i),
+        await screen.findByText(/contains invalid characters/i),
       ).toBeInTheDocument();
     });
 
@@ -179,7 +172,58 @@ describe('TagsEditor', () => {
       await userEvent.keyboard('{Enter}');
 
       expect(onChange).toHaveBeenLastCalledWith(['lateral-movement_42']);
-      expect(screen.queryByText(/is invalid/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/contains invalid characters/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/exceeds the maximum length/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/already been added/i)).not.toBeInTheDocument();
+    });
+
+    it('surfaces a too-long message when committing a tag over the length limit', async () => {
+      render(<Harness />);
+
+      const overLong = 'a'.repeat(129);
+      await userEvent.type(screen.getByRole('combobox'), overLong);
+      await userEvent.keyboard('{Enter}');
+
+      expect(
+        await screen.findByText(/exceeds the maximum length of 128 characters/i),
+      ).toBeInTheDocument();
+    });
+
+    it('surfaces a duplicate message when committing an existing tag', async () => {
+      render(<Harness initial={['phishing']} />);
+
+      await userEvent.type(screen.getByRole('combobox'), 'phishing');
+      await userEvent.keyboard('{Enter}');
+
+      expect(
+        await screen.findByText(/Tag "phishing" has already been added/i),
+      ).toBeInTheDocument();
+    });
+
+    it('surfaces a duplicate message on Tab (without committing)', async () => {
+      render(<Harness initial={['phishing']} />);
+
+      await userEvent.type(screen.getByRole('combobox'), 'phishing');
+      await userEvent.keyboard('{Tab}');
+
+      expect(
+        await screen.findByText(/Tag "phishing" has already been added/i),
+      ).toBeInTheDocument();
+    });
+
+    it('clears the validation message as soon as the user edits the input', async () => {
+      render(<Harness initial={['phishing']} />);
+
+      await userEvent.type(screen.getByRole('combobox'), 'phishing');
+      await userEvent.keyboard('{Enter}');
+
+      expect(
+        await screen.findByText(/has already been added/i),
+      ).toBeInTheDocument();
+
+      await userEvent.type(screen.getByRole('combobox'), 'x');
+
+      expect(screen.queryByText(/has already been added/i)).not.toBeInTheDocument();
     });
   });
 });

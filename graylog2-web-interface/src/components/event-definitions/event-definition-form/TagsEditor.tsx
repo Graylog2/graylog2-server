@@ -50,22 +50,37 @@ type Props = {
 
 const HELP_TEXT = 'Press Enter or Tab to add. Tags are lowercased and deduplicated. Only lowercase letters, digits, hyphens, and underscores are allowed.';
 
-const isInvalidTag = (tag: string): boolean =>
-  tag.length > MAX_TAG_LENGTH || !VALID_TAG_PATTERN.test(tag);
+const isTooLong = (tag: string): boolean => tag.length > MAX_TAG_LENGTH;
+const hasInvalidChars = (tag: string): boolean => !VALID_TAG_PATTERN.test(tag);
 
 const quote = (s: string): string => `"${s}"`;
 
-const buildInvalidTagsMessage = (invalidTags: ReadonlyArray<string>): string | null => {
-  if (invalidTags.length === 0) return null;
+const buildTooLongMessage = (tagsList: ReadonlyArray<string>): string | null => {
+  if (tagsList.length === 0) return null;
 
-  const isPlural = invalidTags.length > 1;
+  const isPlural = tagsList.length > 1;
 
-  return `Tag${isPlural ? 's' : ''} ${invalidTags.map(quote).join(', ')} ${isPlural ? 'are' : 'is'} invalid. `
-    + `Tags may only contain lowercase letters, digits, hyphens and underscores (max ${MAX_TAG_LENGTH} chars each).`;
+  return `Tag${isPlural ? 's' : ''} ${tagsList.map(quote).join(', ')} `
+    + `${isPlural ? 'exceed' : 'exceeds'} the maximum length of ${MAX_TAG_LENGTH} characters.`;
+};
+
+const buildInvalidCharsMessage = (tagsList: ReadonlyArray<string>): string | null => {
+  if (tagsList.length === 0) return null;
+
+  const isPlural = tagsList.length > 1;
+
+  return `Tag${isPlural ? 's' : ''} ${tagsList.map(quote).join(', ')} `
+    + `${isPlural ? 'contain' : 'contains'} invalid characters. `
+    + 'Only lowercase letters, digits, hyphens, and underscores are allowed.';
 };
 
 const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) => {
   const [input, setInput] = useState('');
+  // Track only duplicate-commit attempts here. Invalid-character and over-length values are
+  // committed by react-select (they land in `tags`), so they're already covered by the
+  // categorization below. Duplicates are silently rejected by react-select, so we need to
+  // surface them explicitly.
+  const [duplicateAttempt, setDuplicateAttempt] = useState<string | null>(null);
   const [debouncedInput] = useDebouncedValue(input, DEBOUNCE_MS);
 
   const { data, isFetching } = useQuery({
@@ -85,10 +100,44 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
     const deduped = Array.from(new Set(normalized));
 
     onChange(deduped.slice(0, MAX_TAGS));
+    // A tag was just committed — clear the typed text. react-select's internal blur/clear
+    // events are ignored below, so this is now the only path that empties the input.
+    setInput('');
+    setDuplicateAttempt(null);
   };
 
-  const invalidTags = tags.filter(isInvalidTag);
-  const localValidationError = buildInvalidTagsMessage(invalidTags);
+  // react-select silently rejects duplicates with no chip and no callback — flag those on
+  // Enter/Tab/blur so the user gets explicit feedback. (Invalid-character and over-length
+  // values do commit, so the chip-categorization below already covers them.)
+  const flagDuplicateAttempt = () => {
+    const trimmed = input.trim();
+    if (!trimmed) return;
+
+    const normalized = normalizeTag(trimmed);
+    if (tags.includes(normalized)) {
+      setDuplicateAttempt(normalized);
+    }
+  };
+
+  // Each committed tag falls into at most one failure bucket so messages stay focused per
+  // failure mode (too long, invalid chars, duplicate).
+  const tooLongTags = tags.filter(isTooLong);
+  const invalidCharTags = tags.filter((tag) => !isTooLong(tag) && hasInvalidChars(tag));
+  const messages = [
+    buildTooLongMessage(tooLongTags),
+    buildInvalidCharsMessage(invalidCharTags),
+    duplicateAttempt ? `Tag "${duplicateAttempt}" has already been added.` : null,
+  ].filter((m): m is string => m !== null);
+
+  const localValidationError = messages.length === 0
+    ? null
+    : (
+      <>
+        {messages.map((m) => (
+          <div key={m}>{m}</div>
+        ))}
+      </>
+    );
   const combinedError = error ?? localValidationError;
 
   return (
@@ -97,11 +146,31 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
         inputId="event-definition-tags"
         multi
         allowCreate
+        // Stop Tab from committing the focused option and clearing the typed value — when the
+        // user is mid-typing a duplicate, Tab should leave the text in the input.
+        tabSelectsValue={false}
+        // Fully control the input value so react-select's internal blur/menu-close clears can
+        // be ignored. Without this, pressing Tab on a duplicate triggers an `input-blur`
+        // action with an empty value and the typed text disappears.
+        inputValue={input}
         delimiter={VALUE_DELIMITER}
         options={suggestions}
         value={tags.join(VALUE_DELIMITER)}
         onChange={handleChange}
-        onInputChange={(value) => setInput(value)}
+        onInputChange={(value, actionMeta) => {
+          if (actionMeta?.action === 'input-change') {
+            setInput(value);
+            // The user is editing — clear any stale duplicate warning. It re-evaluates on
+            // the next commit attempt.
+            setDuplicateAttempt(null);
+          }
+        }}
+        onKeyDown={(e: React.KeyboardEvent) => {
+          if (e.key === 'Enter' || e.key === 'Tab') {
+            flagDuplicateAttempt();
+          }
+        }}
+        onBlur={flagDuplicateAttempt}
         isLoading={isFetching}
         disabled={disabled}
         placeholder="e.g. authentication, brute-force, compliance"

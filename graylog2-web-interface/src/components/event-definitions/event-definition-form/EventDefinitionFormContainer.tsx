@@ -154,6 +154,15 @@ const EventDefinitionFormContainer = ({
       setEventDefinition((prev) => ({ ...prev, [key]: value }));
       onEventDefinitionChange({ ...eventDefinition, [key]: value });
       setIsDirty(true);
+      // Drop any stale submit-time validation error for the field being edited so the user
+      // gets immediate feedback on their fix. Each field still owns its live client-side
+      // validation; this only clears the server-returned error from the last submit attempt.
+      setValidation((prev) => {
+        if (!prev.errors || !(key in prev.errors)) return prev;
+        const { [key]: _dropped, ...remaining } = prev.errors as Record<string, unknown>;
+
+        return { ...prev, errors: remaining };
+      });
     },
     [eventDefinition, onEventDefinitionChange, setEventDefinition, setIsDirty],
   );
