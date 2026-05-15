@@ -143,12 +143,14 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
   return (
     <FormGroup controlId="event-definition-tags" validationState={combinedError ? 'error' : null}>
       <Select
+        // Stop Tab from committing the focused option and clearing the typed value — when the
+        // user is mid-typing a duplicate, Tab should leave the text in the input. `Select`'s
+        // type doesn't surface react-select's `tabSelectsValue`, but it spreads unknown props
+        // through, so the cast narrows the TS surface without altering runtime behavior.
+        {...({ tabSelectsValue: false } as object)}
         inputId="event-definition-tags"
         multi
         allowCreate
-        // Stop Tab from committing the focused option and clearing the typed value — when the
-        // user is mid-typing a duplicate, Tab should leave the text in the input.
-        tabSelectsValue={false}
         // Fully control the input value so react-select's internal blur/menu-close clears can
         // be ignored. Without this, pressing Tab on a duplicate triggers an `input-blur`
         // action with an empty value and the typed text disappears.
