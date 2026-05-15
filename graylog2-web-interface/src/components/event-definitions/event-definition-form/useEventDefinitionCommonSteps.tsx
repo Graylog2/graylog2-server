@@ -87,7 +87,7 @@ type Args = {
       share_request?: EntitySharePayload;
     };
     onChange: (key: string, value: unknown) => void;
-    validation: {
+    validation?: {
       errors: {
         config?: unknown;
         title?: string;
@@ -96,7 +96,8 @@ type Args = {
     currentUser: User;
   };
   notifications?: Array<EventNotification>;
-  notificationDefaults: { default_backlog_size: number };
+  notificationDefaults?: { default_backlog_size: number };
+  hideFieldsStep?: boolean;
   canEdit?: boolean;
 };
 
@@ -104,32 +105,38 @@ function useEventDefinitionSteps({
   viewSteps,
   commonStepProps = defaultCommonStepProps,
   notifications = [],
-  notificationDefaults,
+  notificationDefaults = { default_backlog_size: 0 },
+  hideFieldsStep = false,
   canEdit = false,
 }: Args): Array<StepType<string>> {
   const isNew = commonStepProps.action === 'create';
   const conditionPlugin = getConditionPlugin(commonStepProps?.eventDefinition?.config?.type);
-  const hideFieldsStep = conditionPlugin?.hideFieldsStep ?? false;
+  const shouldHideFieldsStep = hideFieldsStep || (conditionPlugin?.hideFieldsStep ?? false);
+
+  const resolvedCommonStepProps = {
+    ...commonStepProps,
+    validation: commonStepProps.validation ?? { errors: {} },
+  };
 
   return [
     ...viewSteps,
     {
       key: COMMON_STEP_KEYS.FIELDS,
       title: 'Fields',
-      component: <FieldsForm {...commonStepProps} canEdit={canEdit} />,
-      hidden: hideFieldsStep,
+      component: <FieldsForm {...resolvedCommonStepProps} canEdit={canEdit} />,
+      hidden: shouldHideFieldsStep,
     },
     {
       key: COMMON_STEP_KEYS.NOTIFICATIONS,
       title: 'Notifications',
       component: (
-        <NotificationsForm {...commonStepProps} notifications={notifications} defaults={notificationDefaults} />
+        <NotificationsForm {...resolvedCommonStepProps} notifications={notifications} defaults={notificationDefaults} />
       ),
     },
     {
       key: COMMON_STEP_KEYS.SHARE,
       title: 'Share',
-      component: <ShareForm {...commonStepProps} />,
+      component: <ShareForm {...resolvedCommonStepProps} />,
       hidden: !isNew,
     },
   ].filter((step) => !step.hidden);
