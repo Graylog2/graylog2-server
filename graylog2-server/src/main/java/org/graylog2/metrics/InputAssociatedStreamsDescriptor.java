@@ -33,19 +33,26 @@ import java.util.stream.Collectors;
 
 import static org.graylog2.plugin.Message.FIELD_GL2_SOURCE_INPUT;
 
+/**
+ * Provides {@code associated_streams} metrics for regular inputs.
+ * Returns the list of stream IDs that received messages from each input in the last 24h.
+ * <p>
+ * The cache stores the full unfiltered list of stream IDs per input.
+ * On read, {@link #computeForUser} filters by the user's {@code streams:read:<id>} permissions.
+ * </p>
+ */
+public class InputAssociatedStreamsDescriptor implements EntityCachedMetricsDescriptor<List<String>, List<String>> {
 
-public class InputMessageCountDescriptor implements EntityCachedMetricsDescriptor<Map<String, Long>, Long> {
+    public static final String FIELD_NAME = "associated_streams";
 
-    public static final String FIELD_NAME = "message_count";
-
-    private static final int MESSAGE_COUNT_RANGE_SECONDS = 86400; // 24h
+    private static final int RANGE_SECONDS = 86400; // 24h
 
     private final MoreSearch moreSearch;
     private final Duration cacheTtl;
 
     @Inject
-    public InputMessageCountDescriptor(MoreSearch moreSearch,
-                                       @Named(MetricsCacheConfiguration.METRICS_CACHE_TTL_LONG) Duration cacheTtl) {
+    public InputAssociatedStreamsDescriptor(MoreSearch moreSearch,
+                                           @Named(MetricsCacheConfiguration.METRICS_CACHE_TTL_LONG) Duration cacheTtl) {
         this.moreSearch = moreSearch;
         this.cacheTtl = cacheTtl;
     }
@@ -61,26 +68,25 @@ public class InputMessageCountDescriptor implements EntityCachedMetricsDescripto
     }
 
     @Override
-    public List<EntityMetric<Map<String, Long>>> compute(Collection<String> entityIds) {
+    public List<EntityMetric<List<String>>> compute(Collection<String> entityIds) {
         final Map<String, Map<String, Long>> grouped = moreSearch.aggregateGroupedTerms(
                 entityIds.stream()
                         .map(id -> FIELD_GL2_SOURCE_INPUT + ":" + id)
                         .collect(Collectors.joining(" OR ")),
-                RelativeRange.create(MESSAGE_COUNT_RANGE_SECONDS),
+                RelativeRange.create(RANGE_SECONDS),
                 SourceStreamFilter.allAllowed(),
                 FIELD_GL2_SOURCE_INPUT, "streams",
                 entityIds.size(), Integer.MAX_VALUE);
 
         return entityIds.stream()
-                .map(id -> new EntityMetric<>(id, grouped.getOrDefault(id, Map.of())))
+                .map(id -> new EntityMetric<>(id, List.copyOf(grouped.getOrDefault(id, Map.of()).keySet())))
                 .toList();
     }
 
     @Override
-    public Long computeForUser(Map<String, Long> countsByStream, SearchUser searchUser) {
-        return countsByStream.entrySet().stream()
-                .filter(e -> searchUser.canReadStream(e.getKey()))
-                .mapToLong(Map.Entry::getValue)
-                .sum();
+    public List<String> computeForUser(List<String> streamIds, SearchUser searchUser) {
+        return streamIds.stream()
+                .filter(searchUser::canReadStream)
+                .toList();
     }
 }

@@ -16,8 +16,10 @@
  */
 package org.graylog2.metrics;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Holds metric values per entity: entity ID → field name → value.
@@ -40,7 +42,11 @@ public record EntityMetricValues(Map<String, Map<String, Object>> values) {
         }
 
         public EntityMetricValues build() {
-            return new EntityMetricValues(values);
+            return new EntityMetricValues(values.entrySet().stream()
+                    .collect(Collectors.toUnmodifiableMap(
+                            Map.Entry::getKey,
+                            e -> Collections.unmodifiableMap(e.getValue())
+                    )));
         }
     }
 }

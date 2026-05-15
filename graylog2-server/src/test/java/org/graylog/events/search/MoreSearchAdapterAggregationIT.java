@@ -155,7 +155,7 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
         final Map<String, Double> result = adapter.aggregateGroupedMetric(
                 "*", RelativeRange.allTime(), Set.of(INDEX_NAME),
                 allAllowed(),
-                "streams", MoreSearchAdapter.MetricType.AVG, "processing_time",
+                "streams", MoreSearchAdapter.AggregationType.AVG, "processing_time",
                 100);
 
         assertThat(result)
@@ -168,7 +168,7 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
         final Map<String, Double> result = adapter.aggregateGroupedMetric(
                 "*", RelativeRange.allTime(), Set.of(INDEX_NAME),
                 allAllowed(),
-                "streams", MoreSearchAdapter.MetricType.MAX, "processing_time",
+                "streams", MoreSearchAdapter.AggregationType.MAX, "processing_time",
                 100);
 
         assertThat(result)
@@ -181,7 +181,7 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
         final Map<String, Double> result = adapter.aggregateGroupedMetric(
                 "gl2_source_input:input-1", RelativeRange.allTime(), Set.of(INDEX_NAME),
                 allAllowed(),
-                "streams", MoreSearchAdapter.MetricType.AVG, "processing_time",
+                "streams", MoreSearchAdapter.AggregationType.AVG, "processing_time",
                 100);
 
         assertThat(result)
@@ -194,7 +194,7 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
         final Map<String, Double> result = adapter.aggregateGroupedMetric(
                 "gl2_source_input:nonexistent", RelativeRange.allTime(), Set.of(INDEX_NAME),
                 allAllowed(),
-                "streams", MoreSearchAdapter.MetricType.AVG, "processing_time",
+                "streams", MoreSearchAdapter.AggregationType.AVG, "processing_time",
                 100);
 
         assertThat(result).isEmpty();

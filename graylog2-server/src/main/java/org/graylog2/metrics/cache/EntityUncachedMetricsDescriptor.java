@@ -17,26 +17,29 @@
 package org.graylog2.metrics.cache;
 
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog2.metrics.EntityMetric;
 
 import java.util.Collection;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Descriptor for entity metric fields that are computed fresh on every request.
  * Use this for cheap queries (e.g. domain model lookups) where caching is unnecessary.
  * <p>
- * The {@link SearchUser} is passed to {@link #computeField} so that implementations
+ * The {@link SearchUser} is passed to {@link #compute} so that implementations
  * can filter results by the user's permissions (e.g. count only pipelines the user can read).
  * </p>
+ *
+ * @param <R> the type of the computed result
  */
-public interface EntityUncachedMetricsDescriptor extends EntityMetricsDescriptor {
+public interface EntityUncachedMetricsDescriptor<R> extends EntityMetricsDescriptor {
 
     /**
      * Computes fresh values for the given entity IDs, filtered by the user's permissions.
      *
      * @param entityIds  the entity IDs to compute values for
      * @param searchUser the current user for permission filtering
-     * @return map of entity ID to computed value
+     * @return computed metric values per entity
      */
-    Map<String, Object> computeField(Collection<String> entityIds, SearchUser searchUser);
+    List<EntityMetric<R>> compute(Collection<String> entityIds, SearchUser searchUser);
 }

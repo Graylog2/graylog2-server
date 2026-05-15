@@ -17,8 +17,10 @@
 package org.graylog2.metrics.cache;
 
 /**
- * Base interface for pluggable entity metric descriptors. Defines the entity type
- * and field name that this descriptor provides.
+ * Base interface for pluggable entity metric descriptors.
+ * <p>
+ * The entity type is determined by the Guice named multibinding, not by the descriptor itself.
+ * </p>
  * <p>
  * Implementations should use one of the sub-interfaces:
  * <ul>
@@ -28,12 +30,6 @@ package org.graylog2.metrics.cache;
  * </p>
  */
 public interface EntityMetricsDescriptor {
-
-    /**
-     * The entity type identifier (e.g. "inputs", "streams").
-     * Should match the MongoDB collection name from {@code @DbEntity}.
-     */
-    String entityType();
 
     /**
      * The field name this descriptor provides (e.g. "message_count", "pipeline_count").

@@ -31,10 +31,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import java.time.Clock;
 import java.time.Duration;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -57,18 +57,16 @@ class EntityMetricsServiceTest {
 
     @Test
     void cacheMiss_appliesPermissionFilter() {
-        // Descriptor returns per-stream breakdown, filter sums permitted streams only
         final var descriptor = new TestCachedDescriptor(
                 "message_count",
                 Duration.ofMinutes(5),
-                // computeField returns per-stream breakdown
+                // compute returns per-stream breakdown
                 Map.of(
                         "entity-1", Map.of("stream-a", 100L, "stream-b", 200L),
                         "entity-2", Map.of("stream-a", 50L, "stream-c", 150L)
                 )
         );
 
-        // User can read stream-a but not stream-b or stream-c
         when(searchUser.canReadStream("stream-a")).thenReturn(true);
         when(searchUser.canReadStream("stream-b")).thenReturn(false);
         when(searchUser.canReadStream("stream-c")).thenReturn(false);
@@ -158,20 +156,18 @@ class EntityMetricsServiceTest {
     /**
      * Test cached descriptor that stores per-stream breakdowns and filters by stream permissions.
      */
-    private static class TestCachedDescriptor implements EntityCachedMetricsDescriptor {
+    private static class TestCachedDescriptor implements EntityCachedMetricsDescriptor<Map<String, Long>, Long> {
         private final String fieldName;
         private final Duration cacheTtl;
-        private final Map<String, Object> computeResult;
+        private final List<EntityMetric<Map<String, Long>>> computeResult;
 
-        TestCachedDescriptor(String fieldName, Duration cacheTtl, Map<String, ?> computeResult) {
+        TestCachedDescriptor(String fieldName, Duration cacheTtl, Map<String, Map<String, Long>> computeResult) {
             this.fieldName = fieldName;
             this.cacheTtl = cacheTtl;
-            this.computeResult = new HashMap<>();
-            computeResult.forEach((k, v) -> this.computeResult.put(k, v));
+            this.computeResult = computeResult.entrySet().stream()
+                    .map(e -> new EntityMetric<>(e.getKey(), e.getValue()))
+                    .toList();
         }
-
-        @Override
-        public String entityType() { return ENTITY_TYPE; }
 
         @Override
         public String fieldName() { return fieldName; }
@@ -180,14 +176,12 @@ class EntityMetricsServiceTest {
         public Duration cacheTtl() { return cacheTtl; }
 
         @Override
-        public Map<String, Object> computeField(Collection<String> entityIds) {
+        public List<EntityMetric<Map<String, Long>>> compute(Collection<String> entityIds) {
             return computeResult;
         }
 
-        @SuppressWarnings("unchecked")
         @Override
-        public Object applyPermissionFilter(Object cachedValue, SearchUser searchUser) {
-            final Map<String, Long> countsByStream = (Map<String, Long>) cachedValue;
+        public Long computeForUser(Map<String, Long> countsByStream, SearchUser searchUser) {
             return countsByStream.entrySet().stream()
                     .filter(e -> searchUser.canReadStream(e.getKey()))
                     .mapToLong(Map.Entry::getValue)
@@ -198,7 +192,7 @@ class EntityMetricsServiceTest {
     /**
      * Test uncached descriptor that filters pipelines by user permissions.
      */
-    private static class TestUncachedDescriptor implements EntityUncachedMetricsDescriptor {
+    private static class TestUncachedDescriptor implements EntityUncachedMetricsDescriptor<Integer> {
         private final String fieldName;
 
         TestUncachedDescriptor(String fieldName) {
@@ -206,23 +200,16 @@ class EntityMetricsServiceTest {
         }
 
         @Override
-        public String entityType() { return ENTITY_TYPE; }
-
-        @Override
         public String fieldName() { return fieldName; }
 
         @Override
-        public Map<String, Object> computeField(Collection<String> entityIds, SearchUser searchUser) {
-            // Simulates counting pipelines the user can read
-            final int count = List.of("pipeline-1", "pipeline-2").stream()
+        public List<EntityMetric<Integer>> compute(Collection<String> entityIds, SearchUser searchUser) {
+            final int count = (int) Stream.of("pipeline-1", "pipeline-2")
                     .filter(id -> searchUser.isPermitted("pipelines:read", id))
-                    .toList()
-                    .size();
-            final Map<String, Object> result = new HashMap<>();
-            for (final String entityId : entityIds) {
-                result.put(entityId, count);
-            }
-            return result;
+                    .count();
+            return entityIds.stream()
+                    .map(id -> new EntityMetric<>(id, count))
+                    .toList();
         }
     }
 }

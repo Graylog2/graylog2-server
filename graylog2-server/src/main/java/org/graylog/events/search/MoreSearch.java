@@ -234,7 +234,7 @@ public class MoreSearch {
 
     public Map<String, Double> aggregateGroupedMetric(String queryString, TimeRange timeRange,
                                                       SourceStreamFilter sourceStreamFilter,
-                                                      String groupByField, MoreSearchAdapter.MetricType metricType,
+                                                      String groupByField, MoreSearchAdapter.AggregationType metricType,
                                                       String metricField, int maxBuckets) {
         final Set<String> affectedIndices = getAffectedIndices(Set.of(), timeRange);
         if (affectedIndices == null || affectedIndices.isEmpty()) {

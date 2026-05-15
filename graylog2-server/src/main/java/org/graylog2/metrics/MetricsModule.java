@@ -42,5 +42,6 @@ public class MetricsModule extends AbstractModule {
         final Multibinder<EntityMetricsDescriptor> inputDescriptors =
                 Multibinder.newSetBinder(binder(), EntityMetricsDescriptor.class, Names.named(ENTITY_TYPE_INPUTS));
         inputDescriptors.addBinding().to(InputMessageCountDescriptor.class);
+        inputDescriptors.addBinding().to(InputAssociatedStreamsDescriptor.class);
     }
 }

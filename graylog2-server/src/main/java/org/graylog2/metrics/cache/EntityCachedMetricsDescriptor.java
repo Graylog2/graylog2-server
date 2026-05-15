@@ -17,20 +17,24 @@
 package org.graylog2.metrics.cache;
 
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog2.metrics.EntityMetric;
 
 import java.time.Duration;
 import java.util.Collection;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Descriptor for entity metric fields that are cached in MongoDB via {@link MetricsCacheService}.
  * <p>
- * Computation ({@link #computeField}) runs without user context — the cache stores
- * the full, unfiltered result. On cache read, {@link #applyPermissionFilter} is called
+ * Computation ({@link #compute}) runs without user context — the cache stores
+ * the full, unfiltered result. On cache read, {@link #computeForUser} is called
  * to filter the cached value based on the current user's permissions.
  * </p>
+ *
+ * @param <C> the type of the cached value (e.g. {@code Map<String, Long>} for per-stream breakdowns)
+ * @param <R> the type of the result after permission filtering (e.g. {@code Long} for a summed count)
  */
-public interface EntityCachedMetricsDescriptor extends EntityMetricsDescriptor {
+public interface EntityCachedMetricsDescriptor<C, R> extends EntityMetricsDescriptor {
 
     /**
      * The cache TTL for this field. After this duration, the cached value is considered
@@ -43,22 +47,21 @@ public interface EntityCachedMetricsDescriptor extends EntityMetricsDescriptor {
      * the result is stored in the shared cache and must not be filtered by user permissions.
      *
      * @param entityIds the entity IDs to compute values for
-     * @return map of entity ID to computed value
+     * @return computed metric values per entity
      */
-    Map<String, Object> computeField(Collection<String> entityIds);
+    List<EntityMetric<C>> compute(Collection<String> entityIds);
 
     /**
-     * Filters a cached value based on the current user's permissions.
-     * Called on every cache read to ensure users only see data they are authorized to access.
+     * Transforms a cached value into the user-facing result, filtered by the user's permissions.
      * <p>
-     * For example, a list of associated stream IDs should be filtered to only include
-     * streams the user has {@code streams:read:<id>} permission for. A per-stream count
-     * breakdown should be summed only for permitted streams.
+     * For example, a per-stream count breakdown is summed for only the streams the user
+     * has {@code streams:read:<id>} permission for. A list of associated stream IDs is
+     * filtered to only include permitted streams.
      * </p>
      *
-     * @param cachedValue the raw cached value (as stored by {@link #computeField})
+     * @param cachedValue the raw cached value (as stored by {@link #compute})
      * @param searchUser  the current user
-     * @return the permission-filtered value to return to the user
+     * @return the user-facing result
      */
-    Object applyPermissionFilter(Object cachedValue, SearchUser searchUser);
+    R computeForUser(C cachedValue, SearchUser searchUser);
 }

@@ -371,7 +371,7 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
     @Override
     public Map<String, Double> aggregateGroupedMetric(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                                       SourceStreamFilter sourceStreamFilter,
-                                                      String groupByField, MetricType metricType, String metricField,
+                                                      String groupByField, AggregationType metricType, String metricField,
                                                       int maxBuckets) {
         final var filter = createSimpleQuery(queryString, timerange, sourceStreamFilter);
         final var metricAgg = switch (metricType) {

@@ -116,7 +116,7 @@ public class MetricsCacheService {
      * @param fieldName        the field name
      * @param valuesByEntityId map of entity ID to field value
      */
-    public void putFieldBatch(String entityType, String fieldName, Map<String, Object> valuesByEntityId) {
+    public void putFieldBatch(String entityType, String fieldName, Map<String, ?> valuesByEntityId) {
         if (valuesByEntityId.isEmpty()) {
             return;
         }

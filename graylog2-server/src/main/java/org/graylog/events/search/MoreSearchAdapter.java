@@ -73,7 +73,7 @@ public interface MoreSearchAdapter {
                                                          String groupByField, String termsField,
                                                          int maxBuckets, int maxSubBuckets);
 
-    enum MetricType { AVG, MAX }
+    enum AggregationType { AVG, MAX }
 
     /**
      * Groups documents by {@code groupByField}, then computes a metric (avg or max) of {@code metricField}
@@ -83,7 +83,7 @@ public interface MoreSearchAdapter {
      */
     Map<String, Double> aggregateGroupedMetric(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                                SourceStreamFilter sourceStreamFilter,
-                                               String groupByField, MetricType metricType, String metricField,
+                                               String groupByField, AggregationType aggregationType, String metricField,
                                                int maxBuckets);
 
     default ChunkCommand buildScrollCommand(String queryString, TimeRange timeRange, Set<String> affectedIndices, List<UsedSearchFilter> filters, Set<String> streams, int batchSize) {

@@ -399,7 +399,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
     @Override
     public Map<String, Double> aggregateGroupedMetric(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                                       SourceStreamFilter sourceStreamFilter,
-                                                      String groupByField, MetricType metricType, String metricField,
+                                                      String groupByField, AggregationType metricType, String metricField,
                                                       int maxBuckets) {
         final var filter = createSimpleQuery(queryString, timerange, sourceStreamFilter);
         final Aggregation metricAgg = switch (metricType) {
@@ -466,7 +466,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
         return counts;
     }
 
-    private double extractMetricValue(org.opensearch.client.opensearch._types.aggregations.Aggregate agg, MetricType metricType) {
+    private double extractMetricValue(org.opensearch.client.opensearch._types.aggregations.Aggregate agg, AggregationType metricType) {
         return switch (metricType) {
             case AVG -> agg.avg().value();
             case MAX -> agg.max().value();
