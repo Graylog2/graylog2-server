@@ -143,14 +143,24 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
   return (
     <FormGroup controlId="event-definition-tags" validationState={combinedError ? 'error' : null}>
       <Select
-        // `Select`'s type doesn't surface a few react-select props (`tabSelectsValue`,
-        // `inputValue`) we need here, but it spreads unknown props through at runtime, so
-        // we cast just these to satisfy tsc without altering behavior.
+        // `Select`'s Props type doesn't surface a handful of react-select props we need
+        // here (`tabSelectsValue`, `inputValue`, `onKeyDown`), but it spreads unknown props
+        // through at runtime, so we cast just these to satisfy tsc without altering behavior.
         // - `tabSelectsValue: false` — Tab leaves the typed value in the input rather than
         //   committing the focused suggestion (matters when correcting a duplicate).
         // - `inputValue` — fully control the typed text so react-select's internal blur /
         //   menu-close clears can be ignored (otherwise Tab/blur drops the user's text).
-        {...({ tabSelectsValue: false, inputValue: input } as object)}
+        // - `onKeyDown` — flag a duplicate-commit attempt on Enter / Tab so the error
+        //   message surfaces even when react-select silently rejects the commit.
+        {...({
+          tabSelectsValue: false,
+          inputValue: input,
+          onKeyDown: (e: React.KeyboardEvent) => {
+            if (e.key === 'Enter' || e.key === 'Tab') {
+              flagDuplicateAttempt();
+            }
+          },
+        } as object)}
         inputId="event-definition-tags"
         multi
         allowCreate
@@ -164,11 +174,6 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
             // The user is editing — clear any stale duplicate warning. It re-evaluates on
             // the next commit attempt.
             setDuplicateAttempt(null);
-          }
-        }}
-        onKeyDown={(e: React.KeyboardEvent) => {
-          if (e.key === 'Enter' || e.key === 'Tab') {
-            flagDuplicateAttempt();
           }
         }}
         onBlur={flagDuplicateAttempt}
