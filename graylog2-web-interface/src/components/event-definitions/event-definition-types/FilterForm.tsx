@@ -501,10 +501,10 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
 
   const onlyFilters = eventDefinition._scope === 'ILLUMINATE';
 
-  const currentSelection = [
-    ...(eventDefinition.config?.stream_categories?.map((c) => 'category_' + c) ?? []),
-    ...(eventDefinition.config?.streams?.map((s) => 'stream_' + s) ?? []),
-  ];
+  const currentSelection: StreamsAndCategoriesSelection = {
+    streams: eventDefinition.config?.streams ?? [],
+    categories: eventDefinition.config?.stream_categories ?? [],
+  };
 
   const streamsAndCategories = [...streams.map((s) => s.id), ...(eventDefinition?.config?.streams ?? [])].map(
     (streamId) => {
@@ -569,7 +569,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
               id="filter-streams-and-categories"
               required={isStreamRequired}
               onChange={handleStreamsAndCategoriesChange}
-              value={currentSelection.join(',')}
+              value={currentSelection}
               streams={streamsAndCategories}
             />
             <HelpBlock>Select streams the search should include.</HelpBlock>

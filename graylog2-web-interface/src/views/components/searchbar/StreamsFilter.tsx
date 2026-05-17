@@ -47,10 +47,6 @@ const StreamsFilter = ({
   clearable = true,
 }: Props) => {
   const sendTelemetry = useSendTelemetry();
-  const selectedStreams = [
-    ...(value?.streams?.map((s) => 'stream_' + s) ?? []),
-    ...(value?.categories?.map((c) => 'category_' + c) ?? []),
-  ].join(',');
   const placeholder = 'Select streams the search should include. Searches in all streams if empty.';
 
   const handleChange = (selected: StreamsAndCategoriesSelection) => {
@@ -78,7 +74,7 @@ const StreamsFilter = ({
         streams={streams.map((v) => ({ id: v.value, title: v.key, categories: [] }))}
         streamCategories={streamCategories.map((v) => v.value)}
         multi={multi}
-        value={selectedStreams}
+        value={value}
         required={false}
       />
     </Container>

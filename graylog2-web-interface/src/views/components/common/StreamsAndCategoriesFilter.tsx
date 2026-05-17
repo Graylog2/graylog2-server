@@ -21,10 +21,15 @@ import styled from "styled-components";
 import { Select, Icon } from "components/common";
 import { defaultCompare } from "logic/DefaultCompare";
 
+type StreamsAndCategoriesOptionValue = {
+  id: string;
+  type: "stream" | "category";
+};
+
 type StreamsAndCategoriesOption = {
   id: string;
   label: string;
-  value: string;
+  value: StreamsAndCategoriesOptionValue;
   type: "stream" | "category";
 };
 
@@ -48,8 +53,9 @@ const renderOption = (option: StreamsAndCategoriesOption) =>
     </>
   );
 
-type StreamsAndCategoriesFilterProps = Omit<React.ComponentProps<typeof Select>, "options"> & {
+type StreamsAndCategoriesFilterProps = Omit<React.ComponentProps<typeof Select>, "options" | "value"> & {
   onChange: (value: StreamsAndCategoriesSelection) => void;
+  value?: StreamsAndCategoriesSelection;
   streams: Array<{ id: string; title: string; categories: string[] }>;
   streamCategories?: string[] | undefined;
   showStreams?: boolean;
@@ -81,7 +87,7 @@ const StreamsAndCategoriesFilter = ({
             .map((category) => ({
               id: category,
               label: category,
-              value: "category_" + category,
+              value: { id: category, type: "category" } as StreamsAndCategoriesOptionValue,
               type: "category",
             }))
             .sort((a: StreamsAndCategoriesOption, b: StreamsAndCategoriesOption) =>
@@ -92,7 +98,7 @@ const StreamsAndCategoriesFilter = ({
       ? streams
           .map((stream: { id: string; title: string }) => ({
             id: stream.id,
-            value: "stream_" + stream.id,
+            value: { id: stream.id, type: "stream" } as StreamsAndCategoriesOptionValue,
             label: stream.title,
             type: "stream",
           }))
@@ -111,16 +117,17 @@ const StreamsAndCategoriesFilter = ({
 
   if (!options || options.length === 0) return null;
 
-  const change = (selected: string) => {
+  const selectedOptions = options.filter(
+    (o) =>
+      (o.type === "stream" && value?.streams?.includes(o.id)) ||
+      (o.type === "category" && value?.categories?.includes(o.id)),
+  );
+
+  const handleReactSelectChange = (selected: StreamsAndCategoriesOption | StreamsAndCategoriesOption[]) => {
+    const selectedArray = Array.isArray(selected) ? selected : selected ? [selected] : [];
     onChange({
-      streams: selected
-        .split(",")
-        .filter((v) => v.startsWith("stream_"))
-        .map((s) => s.substring("stream_".length)),
-      categories: selected
-        .split(",")
-        .filter((v) => v.startsWith("category_"))
-        .map((c) => c.substring("category_".length)),
+      streams: selectedArray.filter((o) => o.type === "stream").map((o) => o.id),
+      categories: selectedArray.filter((o) => o.type === "category").map((o) => o.id),
     });
   };
 
@@ -128,11 +135,12 @@ const StreamsAndCategoriesFilter = ({
     <Select
       {...rest}
       id={id}
-      onChange={change}
+      onChange={() => {}}
+      onReactSelectChange={handleReactSelectChange}
       options={options}
       optionRenderer={renderOption}
       valueRenderer={renderOption}
-      value={value}
+      value={selectedOptions}
       required={required}
       multi={multi}
     />

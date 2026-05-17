@@ -460,6 +460,10 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       return [];
     }
 
+    if (Array.isArray(value)) {
+      return value;
+    }
+
     if ((allowCreate || async) && typeof value === "string") {
       return value.split(delimiter).map((optionValue: string) => {
         const predicate = {
@@ -576,7 +580,11 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       isClearable,
       loadOptions,
       getOptionLabel: (option: { label?: string }) => option[displayKey] || option.label,
-      getOptionValue: (option) => option[valueKey],
+      getOptionValue: (option) => {
+        const v = option[valueKey];
+
+        return typeof v === "object" && v !== null ? JSON.stringify(v) : String(v ?? "");
+      },
       filterOption: customFilter,
       components: mergedComponents,
       menuPortalTarget: document.body,
