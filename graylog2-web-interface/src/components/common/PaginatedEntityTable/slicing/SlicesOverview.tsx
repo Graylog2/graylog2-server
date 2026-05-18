@@ -23,6 +23,7 @@ import { Button } from 'components/bootstrap';
 import { PaginatedList, Spinner } from 'components/common';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import type { SlicingPreferences } from 'components/common/EntityDataTable/types';
 
 import SliceFilters, {
   ALPHABETICAL_SORT,
@@ -78,6 +79,8 @@ type Props = {
   fetchSlices: FetchSlices;
   sortOptions: Array<SortOption>;
   defaultSliceSort?: { mode: string; direction: SortDirection };
+  onSlicingPreferencesChange: (slicing: SlicingPreferences) => void;
+  slicingPreferences?: SlicingPreferences;
 };
 
 type UseAutoExpandEmptySlicesArgs = {
@@ -131,14 +134,21 @@ const SlicesOverview = ({
   fetchSlices,
   sortOptions,
   defaultSliceSort = undefined,
+  onSlicingPreferencesChange,
+  slicingPreferences = undefined,
 }: Props) => {
   const [showEmptySlices, setShowEmptySlices] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [nonEmptyPage, setNonEmptyPage] = useState(1);
   const [emptyPage, setEmptyPage] = useState(1);
-  const [sortMode, setSortMode] = useState<SortMode>(defaultSliceSort?.mode ?? ALPHABETICAL_SORT);
+  const preferredSortMode = slicingPreferences?.sortBy;
+  const initialSortMode =
+    preferredSortMode && sortOptions.some((option) => option.value === preferredSortMode)
+      ? preferredSortMode
+      : (defaultSliceSort?.mode ?? ALPHABETICAL_SORT);
+  const [sortMode, setSortMode] = useState<SortMode>(initialSortMode);
   const [sortDirection, setSortDirection] = useState<SortDirection>(
-    defaultSortDirectionForMode(sortMode, defaultSliceSort),
+    slicingPreferences?.order ?? defaultSortDirectionForMode(initialSortMode, defaultSliceSort),
   );
   const sendTelemetry = useSendTelemetry();
   const { isLoading, refetchSlices, hasEmptySlices, emptySliceCount, visibleNonEmptySlices, visibleEmptySlices } =
@@ -162,15 +172,25 @@ const SlicesOverview = ({
     setEmptyPage(1);
   };
   const onSortModeUpdate = (mode: SortMode) => {
+    const direction = defaultSortDirectionForMode(mode, defaultSliceSort);
+
     setSortMode(mode);
-    setSortDirection(defaultSortDirectionForMode(mode, defaultSliceSort));
+    setSortDirection(direction);
     setNonEmptyPage(1);
     setEmptyPage(1);
+
+    if (sliceCol) {
+      onSlicingPreferencesChange({ sliceColumn: sliceCol, sortBy: mode, order: direction });
+    }
   };
   const onSortDirectionUpdate = (direction: SortDirection) => {
     setSortDirection(direction);
     setNonEmptyPage(1);
     setEmptyPage(1);
+
+    if (sliceCol) {
+      onSlicingPreferencesChange({ sliceColumn: sliceCol, sortBy: sortMode, order: direction });
+    }
   };
 
   const onToggleEmptySlices = () => {
