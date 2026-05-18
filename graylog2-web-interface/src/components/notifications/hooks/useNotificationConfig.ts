@@ -57,6 +57,7 @@ const useNotificationConfig = ({
     onSuccess: (updated) => {
       queryClient.setQueryData(configKey, updated);
       queryClient.invalidateQueries({ queryKey: configKey });
+      UserNotification.success('Notifications configuration updated successfully', 'Success!');
     },
     onError: (error) => {
       if (error?.status === 403) {

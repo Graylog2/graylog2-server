@@ -66,7 +66,7 @@ const bindings: PluginExports = {
     },
     {
       name: 'Notifications',
-      permissions: ['notifications_config:read'],
+      permissions: ['notifications:config_read'],
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: NotificationsConfig,

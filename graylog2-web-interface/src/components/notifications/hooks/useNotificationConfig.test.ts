@@ -100,6 +100,24 @@ describe('useNotificationConfig', () => {
     expect(updateConfigMock).not.toHaveBeenCalled();
   });
 
+  it('shows a success toast after a successful update', async () => {
+    getConfigMock.mockResolvedValue({ retention_days: 30 });
+    updateConfigMock.mockResolvedValue({ retention_days: 90 });
+
+    const { result } = renderHook(() => useNotificationConfig(), { wrapper: buildWrapper(queryClient) });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    await act(async () => {
+      await result.current.update({ retention_days: 90 });
+    });
+
+    expect(UserNotification.success).toHaveBeenCalledWith(
+      'Notifications configuration updated successfully',
+      'Success!',
+    );
+  });
+
   it('shows a permission toast on 403 update failure', async () => {
     getConfigMock.mockResolvedValue({ retention_days: 30 });
     updateConfigMock.mockRejectedValue({ status: 403 });

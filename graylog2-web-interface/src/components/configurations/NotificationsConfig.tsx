@@ -47,8 +47,8 @@ const validate = (values: SystemNotificationConfig) => {
 const NotificationsConfig = () => {
   const currentUser = useCurrentUser();
   const userPermissions = currentUser?.permissions ?? [];
-  const canRead = isPermitted(userPermissions, ['notifications_config:read']);
-  const canUpdate = isPermitted(userPermissions, ['notifications_config:update']);
+  const canRead = isPermitted(userPermissions, ['notifications:config_read']);
+  const canUpdate = isPermitted(userPermissions, ['notifications:config_update']);
 
   const { config, isLoading, update } = useNotificationConfig({
     readEnabled: canRead,
@@ -93,7 +93,7 @@ const NotificationsConfig = () => {
         <dd>{config.retention_days} {config.retention_days === 1 ? 'day' : 'days'}</dd>
       </dl>
 
-      <IfPermitted permissions="notifications_config:update">
+      <IfPermitted permissions="notifications:config_update">
         <p>
           <Button type="button" bsSize="xs" bsStyle="info" onClick={() => setShowModal(true)}>
             Edit configuration

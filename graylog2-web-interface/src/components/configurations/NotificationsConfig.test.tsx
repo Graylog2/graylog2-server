@@ -58,7 +58,7 @@ describe('<NotificationsConfig>', () => {
   });
 
   it('renders the current retention with the default value 30', () => {
-    mockUserWithPermissions(['notifications_config:read', 'notifications_config:update']);
+    mockUserWithPermissions(['notifications:config_read', 'notifications:config_update']);
     mockHook();
 
     render(<NotificationsConfig />);
@@ -66,7 +66,7 @@ describe('<NotificationsConfig>', () => {
     expect(screen.getByText(/30/)).toBeInTheDocument();
   });
 
-  it('shows an info alert and no form when the user lacks notifications_config:read', () => {
+  it('shows an info alert and no form when the user lacks notifications:config_read', () => {
     mockUserWithPermissions([]);
     mockHook();
 
@@ -76,8 +76,8 @@ describe('<NotificationsConfig>', () => {
     expect(screen.queryByRole('button', { name: /edit configuration/i })).not.toBeInTheDocument();
   });
 
-  it('hides the edit button when notifications_config:update is missing', () => {
-    mockUserWithPermissions(['notifications_config:read']);
+  it('hides the edit button when notifications:config_update is missing', () => {
+    mockUserWithPermissions(['notifications:config_read']);
     mockHook({ isUpdateEnabled: false } as never);
 
     render(<NotificationsConfig />);
@@ -86,7 +86,7 @@ describe('<NotificationsConfig>', () => {
   });
 
   it('opens the edit modal and saves a new retention value of 90', async () => {
-    mockUserWithPermissions(['notifications_config:read', 'notifications_config:update']);
+    mockUserWithPermissions(['notifications:config_read', 'notifications:config_update']);
     mockHook();
 
     render(<NotificationsConfig />);
@@ -106,7 +106,7 @@ describe('<NotificationsConfig>', () => {
   });
 
   it('surfaces a backend 400 error on the form (no toast, inline via updateError)', async () => {
-    mockUserWithPermissions(['notifications_config:read', 'notifications_config:update']);
+    mockUserWithPermissions(['notifications:config_read', 'notifications:config_update']);
     mockHook({ updateError: { status: 400, message: 'retention_days must be positive' } } as never);
 
     render(<NotificationsConfig />);
