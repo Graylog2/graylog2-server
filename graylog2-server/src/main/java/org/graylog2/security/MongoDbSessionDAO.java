@@ -20,6 +20,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import jakarta.inject.Inject;
 import org.apache.shiro.session.Session;
+import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.session.mgt.SimpleSession;
 import org.apache.shiro.session.mgt.eis.CachingSessionDAO;
 import org.slf4j.Logger;
@@ -83,6 +84,30 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
             return null;
         }
         return mongoDBSessionService.daoToSimpleSession(dbSession);
+    }
+
+    /**
+     * Overrides {@link CachingSessionDAO#readSession(Serializable)} to ensure that sessions
+     * retrieved from the database on a cache miss are placed into the cache.
+     * <p>
+     * The default Shiro implementation in {@code CachingSessionDAO.readSession()} only checks the
+     * cache and, on a miss, delegates to {@code doReadSession()} but never caches the result.
+     * This causes every authenticated API request to hit MongoDB when the session is not yet cached.
+     */
+    @Override
+    public Session readSession(Serializable sessionId) throws UnknownSessionException {
+        final Session cachedSession = getCachedSession(sessionId);
+        if (cachedSession != null) {
+            return cachedSession;
+        }
+
+        final Session s = doReadSession(sessionId);
+        if (s == null) {
+            throw new UnknownSessionException("There is no session with id [" + sessionId + "]");
+        }
+
+        cache(s, sessionId);
+        return s;
     }
 
     @Override

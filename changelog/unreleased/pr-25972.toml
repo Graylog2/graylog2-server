@@ -1,0 +1,21 @@
+# One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+type = "s"
+message = "Update netty to 4.2.13, addressing multiple advisories"
+
+issues = [""]
+pulls = ["25972"]
+
+details.user = """
+The following security advisories are addressed with this change:
+ * [GHSA-f6hv-jmp6-3vwv](https://github.com/advisories/GHSA-f6hv-jmp6-3vwv)
+ * [GHSA-rwm7-x88c-3g2p](https://github.com/advisories/GHSA-rwm7-x88c-3g2p)
+ * [GHSA-cm33-6792-r9fm](https://github.com/advisories/GHSA-cm33-6792-r9fm)
+ * [GHSA-57rv-r2g8-2cj3](https://github.com/advisories/GHSA-57rv-r2g8-2cj3)
+ * [GHSA-38f8-5428-x5cv](https://github.com/advisories/GHSA-38f8-5428-x5cv)
+ * [GHSA-m4cv-j2px-7723](https://github.com/advisories/GHSA-m4cv-j2px-7723)
+ * [GHSA-xxqh-mfjm-7mv9](https://github.com/advisories/GHSA-xxqh-mfjm-7mv9)
+ * [GHSA-v8h7-rr48-vmmv](https://github.com/advisories/GHSA-v8h7-rr48-vmmv)
+ * [GHSA-mj4r-2hfc-f8p6](https://github.com/advisories/GHSA-mj4r-2hfc-f8p6)
+ * [GHSA-45q3-82m4-75jr](https://github.com/advisories/GHSA-45q3-82m4-75jr)
+"""
+
