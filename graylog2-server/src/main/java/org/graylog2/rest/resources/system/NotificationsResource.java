@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
+import com.mongodb.MongoException;
 import com.mongodb.client.model.Filters;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -53,6 +54,7 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.filtering.ComputedFieldRegistry;
 import org.graylog2.database.filtering.DbQueryCreator;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.notifications.SystemNotificationDto;
@@ -74,11 +76,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -96,12 +100,13 @@ public class NotificationsResource extends RestResource {
             EntityAttribute.builder().id(SystemNotificationDto.FIELD_DESCRIPTION).title("Description")
                     .type(SearchQueryField.Type.STRING).sortable(false).searchable(true).hidden(true).build(),
             EntityAttribute.builder().id(SystemNotificationDto.FIELD_TYPE).title("Type")
-                    .type(SearchQueryField.Type.STRING).sortable(true).filterable(true).searchable(true).build(),
-            EntityAttribute.builder().id(SystemNotificationDto.FIELD_SEVERITY).title("Severity")
+                    .type(SearchQueryField.Type.STRING).sortable(true).filterable(true).searchable(true)
+                    .filterOptions(notificationTypeFilterOptions()).build(),
+            EntityAttribute.builder().id(SystemNotificationDto.FIELD_PRIORITY).title("Priority")
                     .type(SearchQueryField.Type.STRING).sortable(true).filterable(true)
                     .filterOptions(Set.of(
                             FilterOption.create("normal", "Normal"),
-                            FilterOption.create("urgent", "Urgent")
+                            FilterOption.create("high", "High")
                     )).build(),
             EntityAttribute.builder().id(SystemNotificationDto.FIELD_IS_READ).title("Read")
                     .type(SearchQueryField.Type.BOOLEAN).sortable(true).filterable(true)
@@ -269,10 +274,18 @@ public class NotificationsResource extends RestResource {
                 userContext.getUser().getFullName()
         );
 
-        if (dto.isRead()) {
-            systemNotificationService.markAsUnread(List.of(id), actor);
-        } else {
-            systemNotificationService.markAsRead(List.of(id), actor);
+        try {
+            if (dto.isRead()) {
+                systemNotificationService.markAsUnread(List.of(id), actor);
+            } else {
+                systemNotificationService.markAsRead(List.of(id), actor);
+            }
+        } catch (MongoException e) {
+            if (MongoUtils.isDuplicateKeyError(e)) {
+                throw new BadRequestException(
+                        f("Cannot mark notification as unread because an unread notification of type <%s> already exists", dto.type()));
+            }
+            throw e;
         }
 
         return systemNotificationService.findById(id).orElseThrow();
@@ -396,5 +409,20 @@ public class NotificationsResource extends RestResource {
         }
 
         return baseQuery;
+    }
+
+    private static Set<FilterOption> notificationTypeFilterOptions() {
+        return Arrays.stream(Notification.Type.values())
+                .filter(t -> !isDeprecated(t))
+                .map(t -> FilterOption.create(t.json(), t.json()))
+                .collect(Collectors.toSet());
+    }
+
+    private static boolean isDeprecated(Notification.Type type) {
+        try {
+            return Notification.Type.class.getField(type.name()).isAnnotationPresent(Deprecated.class);
+        } catch (NoSuchFieldException e) {
+            return false;
+        }
     }
 }

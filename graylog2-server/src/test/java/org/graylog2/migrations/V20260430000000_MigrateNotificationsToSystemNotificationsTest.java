@@ -72,11 +72,11 @@ class V20260430000000_MigrateNotificationsToSystemNotificationsTest {
         final var newCollection = mongoCollections.collection("system_notifications", SystemNotificationDto.class);
         assertThat(newCollection.countDocuments()).isEqualTo(3);
 
-        // Verify first document (no key, urgent severity)
+        // Verify first document (no key, high priority)
         final var esRed = newCollection.find(Filters.eq("type", "es_cluster_red")).first();
         assertThat(esRed).isNotNull();
         assertThat(esRed.key()).isNull();
-        assertThat(esRed.severity()).isEqualTo("urgent");
+        assertThat(esRed.priority()).isEqualTo("high");
         assertThat(esRed.nodeId()).isEqualTo("node-1");
         assertThat(esRed.title()).isEqualTo("Rendered Title");
         assertThat(esRed.description()).isEqualTo("Rendered Description");
@@ -89,13 +89,13 @@ class V20260430000000_MigrateNotificationsToSystemNotificationsTest {
         final var inputFailing = newCollection.find(Filters.eq("type", "input_failing")).first();
         assertThat(inputFailing).isNotNull();
         assertThat(inputFailing.key()).isEqualTo("syslog-udp-01");
-        assertThat(inputFailing.severity()).isEqualTo("normal");
+        assertThat(inputFailing.priority()).isEqualTo("normal");
         assertThat(inputFailing.nodeId()).isEqualTo("node-2");
 
-        // Verify document with missing severity defaults to "normal"
+        // Verify document with missing priority defaults to "normal"
         final var outdated = newCollection.find(Filters.eq("type", "outdated_version")).first();
         assertThat(outdated).isNotNull();
-        assertThat(outdated.severity()).isEqualTo("normal");
+        assertThat(outdated.priority()).isEqualTo("normal");
 
         // Old collection should be dropped
         final Set<String> collections = mongoCollections.mongoConnection().getMongoDatabase()
@@ -144,7 +144,7 @@ class V20260430000000_MigrateNotificationsToSystemNotificationsTest {
         assertThat(esRed.title()).isNull();
         assertThat(esRed.description()).isNull();
         // Other fields should still be populated correctly
-        assertThat(esRed.severity()).isEqualTo("urgent");
+        assertThat(esRed.priority()).isEqualTo("high");
         assertThat(esRed.details()).containsEntry("reason", "shards unassigned");
 
         verify(clusterConfigService).write(any(V20260430000000_MigrateNotificationsToSystemNotifications.MigrationCompleted.class));

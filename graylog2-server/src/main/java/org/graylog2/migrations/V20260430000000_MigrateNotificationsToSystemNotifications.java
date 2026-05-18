@@ -121,7 +121,7 @@ public class V20260430000000_MigrateNotificationsToSystemNotifications extends M
                 final SystemNotificationDto dto = SystemNotificationDto.builder()
                         .type(typeStr)
                         .key(key)
-                        .severity(severity != null ? severity : "normal")
+                        .priority(severity != null ? severity.replace("urgent", "high") : "normal")
                         .nodeId(nodeId != null ? nodeId : "")
                         .title(title)
                         .description(description)

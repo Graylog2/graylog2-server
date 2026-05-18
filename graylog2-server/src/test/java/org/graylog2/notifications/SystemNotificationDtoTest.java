@@ -54,7 +54,7 @@ class SystemNotificationDtoTest {
         final SystemNotificationDto original = SystemNotificationDto.builder()
                 .type("es_cluster_red")
                 .key("some-key")
-                .severity("urgent")
+                .priority("urgent")
                 .nodeId("node-1")
                 .title("Indexer cluster unhealthy")
                 .description("The cluster state is RED")
@@ -72,7 +72,7 @@ class SystemNotificationDtoTest {
         assertThat(result.id()).isNotNull();
         assertThat(result.type()).isEqualTo("es_cluster_red");
         assertThat(result.key()).isEqualTo("some-key");
-        assertThat(result.severity()).isEqualTo("urgent");
+        assertThat(result.priority()).isEqualTo("urgent");
         assertThat(result.nodeId()).isEqualTo("node-1");
         assertThat(result.title()).isEqualTo("Indexer cluster unhealthy");
         assertThat(result.description()).isEqualTo("The cluster state is RED");
@@ -91,7 +91,7 @@ class SystemNotificationDtoTest {
 
         final SystemNotificationDto original = SystemNotificationDto.builder()
                 .type("es_unavailable")
-                .severity("normal")
+                .priority("normal")
                 .nodeId("node-1")
                 .details(Map.of())
                 .isRead(false)
@@ -118,7 +118,7 @@ class SystemNotificationDtoTest {
 
         final SystemNotificationDto dto = SystemNotificationDto.builder()
                 .type("es_unavailable")
-                .severity("normal")
+                .priority("normal")
                 .nodeId("node-1")
                 .details(Map.of())
                 .isRead(true)
@@ -144,7 +144,7 @@ class SystemNotificationDtoTest {
     void actorSubdocumentStoredCorrectly() {
         final SystemNotificationDto dto = SystemNotificationDto.builder()
                 .type("es_unavailable")
-                .severity("normal")
+                .priority("normal")
                 .nodeId("node-1")
                 .details(Map.of())
                 .isRead(true)

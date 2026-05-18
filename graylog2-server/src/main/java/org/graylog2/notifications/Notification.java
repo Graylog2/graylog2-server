@@ -139,7 +139,10 @@ public interface Notification {
 
         @JsonValue
         public String json() {
-            return this.name().toLowerCase(Locale.ROOT);
+            return switch (this) {
+                case URGENT -> "high";
+                default -> this.name().toLowerCase(Locale.ROOT);
+            };
         }
     }
 }

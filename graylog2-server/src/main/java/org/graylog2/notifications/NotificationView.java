@@ -16,6 +16,7 @@
  */
 package org.graylog2.notifications;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.cluster.Node;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -48,9 +49,12 @@ public class NotificationView implements Notification {
         return dto.key();
     }
 
+    @JsonProperty("priority")
     @Override
     public Severity getSeverity() {
-        return Severity.valueOf(dto.severity().toUpperCase(Locale.ENGLISH));
+        final String stored = dto.priority();
+        final String normalized = "urgent".equals(stored) ? "HIGH" : stored.toUpperCase(Locale.ENGLISH);
+        return Severity.valueOf(normalized);
     }
 
     @Override
