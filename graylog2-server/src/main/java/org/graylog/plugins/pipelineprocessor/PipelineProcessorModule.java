@@ -29,6 +29,7 @@ import org.graylog.plugins.pipelineprocessor.processors.PipelineResolver;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnectionsResource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineResource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
+import org.graylog.plugins.pipelineprocessor.rest.ProcessingLoadResource;
 import org.graylog.plugins.pipelineprocessor.rest.RuleResource;
 import org.graylog.plugins.pipelineprocessor.rest.SimulatorResource;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderModule;
@@ -45,6 +46,7 @@ public class PipelineProcessorModule extends PluginModule {
 
         addSystemRestResource(PipelineConnectionsResource.class);
         addSystemRestResource(PipelineResource.class);
+        addSystemRestResource(ProcessingLoadResource.class);
         addSystemRestResource(RuleResource.class);
         addSystemRestResource(SimulatorResource.class);
 
