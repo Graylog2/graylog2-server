@@ -14,17 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster.nodes;
 
-import jakarta.inject.Inject;
-import org.graylog2.Configuration;
-import org.graylog2.database.MongoCollections;
-
-public class DataNodeClusterService extends AbstractNodeService<DataNodeDto> {
-
-    @Inject
-    public DataNodeClusterService(MongoCollections mongoCollections, Configuration configuration) {
-        super(mongoCollections, configuration, DataNodeDto.COLLECTION_NAME, DataNodeDto.class);
-    }
-
+// Enterprise plugin keys (e.g. 'components.collection') are defined in the enterprise
+// repo and not available in this compilation context. The index signature allows any
+// string key so TypeScript doesn't error on those call sites.
+declare module 'graylog-web-plugin/plugin' {
+  interface PluginExports {
+    [key: string]: any;
+  }
 }
