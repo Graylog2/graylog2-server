@@ -30,6 +30,11 @@ public class MetricsCacheConfiguration {
     public static final String METRICS_CACHE_TTL_LONG = "metrics_cache_ttl_long";
     public static final String METRICS_CACHE_CLEANUP_TTL = "metrics_cache_cleanup_ttl";
 
+    /** Query time range for long-window metrics (message count, associated entities). */
+    public static final int RANGE_SECONDS_24H = 86400;
+    /** Query time range for short-window metrics (avg/max processing time, failure counts). */
+    public static final int RANGE_SECONDS_15M = 900;
+
     @Documentation(value = "Cache TTL for short-window metrics (e.g. avg/max processing time with a 15m window).")
     @Parameter(value = "metrics_cache_ttl_short", converter = JavaDurationConverter.class)
     private Duration shortTtl = Duration.ofMinutes(1);

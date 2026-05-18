@@ -45,7 +45,6 @@ public class InputAssociatedStreamsDescriptor implements EntityCachedMetricsDesc
 
     public static final String FIELD_NAME = "associated_streams";
 
-    private static final int RANGE_SECONDS = 86400; // 24h
 
     private final MoreSearch moreSearch;
     private final Duration cacheTtl;
@@ -73,7 +72,7 @@ public class InputAssociatedStreamsDescriptor implements EntityCachedMetricsDesc
                 entityIds.stream()
                         .map(id -> FIELD_GL2_SOURCE_INPUT + ":" + id)
                         .collect(Collectors.joining(" OR ")),
-                RelativeRange.create(RANGE_SECONDS),
+                RelativeRange.create(MetricsCacheConfiguration.RANGE_SECONDS_24H),
                 SourceStreamFilter.allAllowed(),
                 FIELD_GL2_SOURCE_INPUT, "streams",
                 entityIds.size(), Integer.MAX_VALUE);

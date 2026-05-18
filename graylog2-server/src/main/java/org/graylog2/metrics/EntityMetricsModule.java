@@ -33,7 +33,7 @@ import org.graylog2.metrics.cache.EntityMetricsDescriptor;
  * aligning with {@code @DbEntity} registrations and the catalog title resolution API.
  * </p>
  */
-public class MetricsModule extends AbstractModule {
+public class EntityMetricsModule extends AbstractModule {
 
     public static final String ENTITY_TYPE_INPUTS = InputServiceImpl.COLLECTION_NAME;
 

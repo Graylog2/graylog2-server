@@ -59,7 +59,7 @@ import org.graylog2.inputs.InputRuntimeStatusProvider;
 import org.graylog2.inputs.InputStateListener;
 import org.graylog2.inputs.PersistedInputsImpl;
 import org.graylog2.lookup.LookupModule;
-import org.graylog2.metrics.MetricsModule;
+import org.graylog2.metrics.EntityMetricsModule;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterIdFactory;
 import org.graylog2.plugin.cluster.ClusterIdService;
@@ -202,7 +202,7 @@ public class ServerBindings extends Graylog2Module {
         bind(ErrorPageGenerator.class).to(GraylogErrorPageGenerator.class).asEagerSingleton();
         bind(Clock.class).toProvider(Clock::systemUTC).asEagerSingleton();
 
-        install(new MetricsModule());
+        install(new EntityMetricsModule());
     }
 
     private void bindInterfaces() {

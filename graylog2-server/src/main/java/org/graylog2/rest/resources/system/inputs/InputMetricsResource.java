@@ -38,7 +38,7 @@ import org.graylog2.shared.security.RestPermissions;
 import java.util.List;
 import java.util.Set;
 
-import static org.graylog2.metrics.MetricsModule.ENTITY_TYPE_INPUTS;
+import static org.graylog2.metrics.EntityMetricsModule.ENTITY_TYPE_INPUTS;
 
 @RequiresAuthentication
 @Path("/system/inputs/metrics")

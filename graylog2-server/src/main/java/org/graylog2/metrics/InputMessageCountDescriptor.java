@@ -38,7 +38,6 @@ public class InputMessageCountDescriptor implements EntityCachedMetricsDescripto
 
     public static final String FIELD_NAME = "message_count";
 
-    private static final int MESSAGE_COUNT_RANGE_SECONDS = 86400; // 24h
 
     private final MoreSearch moreSearch;
     private final Duration cacheTtl;
@@ -66,7 +65,7 @@ public class InputMessageCountDescriptor implements EntityCachedMetricsDescripto
                 entityIds.stream()
                         .map(id -> FIELD_GL2_SOURCE_INPUT + ":" + id)
                         .collect(Collectors.joining(" OR ")),
-                RelativeRange.create(MESSAGE_COUNT_RANGE_SECONDS),
+                RelativeRange.create(MetricsCacheConfiguration.RANGE_SECONDS_24H),
                 SourceStreamFilter.allAllowed(),
                 FIELD_GL2_SOURCE_INPUT, "streams",
                 entityIds.size(), Integer.MAX_VALUE);
