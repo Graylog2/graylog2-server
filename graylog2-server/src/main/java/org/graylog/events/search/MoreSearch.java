@@ -224,20 +224,7 @@ public class MoreSearch {
                                                               SourceStreamFilter sourceStreamFilter,
                                                               String groupByField, String termsField,
                                                               int maxBuckets, int maxSubBuckets) {
-        return aggregateGroupedTerms(queryString, timeRange, sourceStreamFilter,
-                groupByField, termsField, maxBuckets, maxSubBuckets, Set.of());
-    }
-
-    /**
-     * Same as {@link #aggregateGroupedTerms(String, TimeRange, SourceStreamFilter, String, String, int, int)}
-     * but resolves indices only for the specified streams. Pass an empty set to search all indices.
-     */
-    public Map<String, Map<String, Long>> aggregateGroupedTerms(String queryString, TimeRange timeRange,
-                                                              SourceStreamFilter sourceStreamFilter,
-                                                              String groupByField, String termsField,
-                                                              int maxBuckets, int maxSubBuckets,
-                                                              Set<String> streamIds) {
-        final Set<String> affectedIndices = getAffectedIndices(streamIds, timeRange);
+        final Set<String> affectedIndices = getAffectedIndices(Set.of(), timeRange);
         if (affectedIndices == null || affectedIndices.isEmpty()) {
             return Map.of();
         }

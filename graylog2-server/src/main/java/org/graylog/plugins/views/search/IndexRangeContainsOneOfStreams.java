@@ -27,8 +27,8 @@ public class IndexRangeContainsOneOfStreams {
 
     public boolean test(final IndexRange indexRange,
                         final Set<Stream> validStreams) {
-        // If index range is incomplete (e.g. active write index), check the prefix against the valid index sets.
-        if (indexRange.streamIds() == null || indexRange.streamIds().isEmpty()) {
+        // If index range is incomplete, check the prefix against the valid index sets.
+        if (indexRange.streamIds() == null) {
             return validStreams.stream()
                     .map(Stream::getIndexSet)
                     .anyMatch(indexSet -> indexSet.isManagedIndex(indexRange.indexName()));
