@@ -20,10 +20,8 @@ import { act, renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 
 import { SystemNotifications } from '@graylog/server-api';
 
-import asMock from 'helpers/mocking/AsMock';
 import suppressConsole from 'helpers/suppressConsole';
 import UserNotification from 'util/UserNotification';
-import useCurrentUser from 'hooks/useCurrentUser';
 
 import useNotificationBulkToggleRead from './useNotificationBulkToggleRead';
 
@@ -36,39 +34,8 @@ jest.mock('util/UserNotification', () => ({
   default: { error: jest.fn(), warning: jest.fn(), success: jest.fn() },
 }));
 
-jest.mock('hooks/useCurrentUser', () => ({
-  __esModule: true,
-  default: jest.fn(() => ({ id: 'user-1', username: 'tester' })),
-}));
-
 const TABLE_KEY = ['system', 'notifications', 'table'] as const;
 const BADGE_KEY = ['system', 'notifications', 'badge-count'] as const;
-
-const row = (id: string, isRead: boolean) => ({
-  id,
-  type: 'no_input_running',
-  title: id,
-  description: '',
-  severity: 'normal',
-  key: id,
-  triggered_at: '2026-05-01T00:00:00.000Z',
-  last_changed: '2026-05-01T00:00:00.000Z',
-  node_id: 'node-1',
-  details: {},
-  is_read: isRead,
-  actor: { id: 'system', name: 'System' },
-});
-
-const buildPage = (rows: ReturnType<typeof row>[]) => ({
-  total: rows.length,
-  pagination: { page: 1, per_page: 10, total: rows.length },
-  defaults: { sort: { id: 'triggered_at', direction: 'DESC' as const } },
-  query: '',
-  attributes: [],
-  sort: 'triggered_at',
-  order: 'desc' as const,
-  elements: rows,
-});
 
 const bulkToggleReadMock = SystemNotifications.bulkToggleRead as jest.Mock;
 
@@ -87,11 +54,9 @@ describe('useNotificationBulkToggleRead', () => {
     queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
     });
-    asMock(useCurrentUser).mockReturnValue({ id: 'user-1', username: 'tester' } as never);
   });
 
-  it('per-row optimistic patches: a mixed selection produces a mixed result', async () => {
-    queryClient.setQueryData(TABLE_KEY, buildPage([row('a', false), row('b', true), row('c', false)]));
+  it('calls bulkToggleRead with the given entity ids', async () => {
     bulkToggleReadMock.mockResolvedValue(undefined);
 
     const { result } = renderHook(() => useNotificationBulkToggleRead(), { wrapper: buildWrapper(queryClient) });
@@ -109,8 +74,23 @@ describe('useNotificationBulkToggleRead', () => {
     expect(bulkToggleReadMock).toHaveBeenCalledWith({ entity_ids: ['a', 'b', 'c'] });
   });
 
-  it('reverts the cache and shows a permission toast on 403', async () => {
-    queryClient.setQueryData(TABLE_KEY, buildPage([row('a', false)]));
+  it('invalidates table and badge-count keys on success', async () => {
+    bulkToggleReadMock.mockResolvedValue(undefined);
+    const invalidateSpy = jest.spyOn(queryClient, 'invalidateQueries');
+
+    const { result } = renderHook(() => useNotificationBulkToggleRead(), { wrapper: buildWrapper(queryClient) });
+
+    await act(async () => {
+      await result.current.mutateAsync({ rows: [{ id: 'a', currentIsRead: false }] });
+    });
+
+    await waitFor(() => {
+      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: TABLE_KEY });
+      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: BADGE_KEY });
+    });
+  });
+
+  it('skips toast on 403', async () => {
     bulkToggleReadMock.mockRejectedValue({ status: 403 });
 
     const { result } = renderHook(() => useNotificationBulkToggleRead(), { wrapper: buildWrapper(queryClient) });
@@ -121,16 +101,11 @@ describe('useNotificationBulkToggleRead', () => {
       });
     });
 
-    expect(UserNotification.error).toHaveBeenCalledWith(
-      expect.stringMatching(/permission/i),
-      expect.any(String),
-    );
-    const cached = queryClient.getQueryData<ReturnType<typeof buildPage>>(TABLE_KEY);
-    expect(cached?.elements?.[0].is_read).toBe(false);
+    expect(UserNotification.error).not.toHaveBeenCalled();
+    expect(UserNotification.warning).not.toHaveBeenCalled();
   });
 
-  it('reverts and warns on 400 (empty array)', async () => {
-    queryClient.setQueryData(TABLE_KEY, buildPage([row('a', false)]));
+  it('shows "no notifications selected" warning on 400', async () => {
     bulkToggleReadMock.mockRejectedValue({ status: 400 });
 
     const { result } = renderHook(() => useNotificationBulkToggleRead(), { wrapper: buildWrapper(queryClient) });
@@ -147,30 +122,21 @@ describe('useNotificationBulkToggleRead', () => {
     );
   });
 
-  it('partial-success: 204 with silently-dropped unknown ids triggers a re-fetch via invalidation', async () => {
-    queryClient.setQueryData(TABLE_KEY, buildPage([row('a', false)]));
-    bulkToggleReadMock.mockResolvedValue(undefined);
-    const invalidateSpy = jest.spyOn(queryClient, 'invalidateQueries');
+  it('shows an error toast on non-403 failures', async () => {
+    bulkToggleReadMock.mockRejectedValue({ status: 500 });
 
     const { result } = renderHook(() => useNotificationBulkToggleRead(), { wrapper: buildWrapper(queryClient) });
 
-    await act(async () => {
-      await result.current.mutateAsync({
-        rows: [
-          { id: 'a', currentIsRead: false },
-          { id: 'unknown-id', currentIsRead: false },
-        ],
+    await suppressConsole(async () => {
+      await act(async () => {
+        await result.current.mutateAsync({ rows: [{ id: 'a', currentIsRead: false }] }).catch(() => {});
       });
     });
 
-    await waitFor(() => {
-      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: TABLE_KEY });
-      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: BADGE_KEY });
-    });
+    expect(UserNotification.error).toHaveBeenCalledWith(expect.stringMatching(/failed to update/i), expect.any(String));
   });
 
   it('skips invalidation on 403', async () => {
-    queryClient.setQueryData(TABLE_KEY, buildPage([row('a', false)]));
     bulkToggleReadMock.mockRejectedValue({ status: 403 });
     const invalidateSpy = jest.spyOn(queryClient, 'invalidateQueries');
 

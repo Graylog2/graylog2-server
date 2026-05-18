@@ -19,9 +19,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { SystemNotifications } from '@graylog/server-api';
 
 import UserNotification from 'util/UserNotification';
-import useCurrentUser from 'hooks/useCurrentUser';
 import type FetchError from 'logic/errors/FetchError';
-import { type NotificationType, type PageShape, type Snapshot, isPageShape } from 'components/notifications/types';
 import {
   NOTIFICATIONS_QUERY_KEY,
   BADGE_COUNT_KEY,
@@ -30,95 +28,29 @@ import {
 
 type RowSeed = { id: string; currentIsRead: boolean };
 
-const flipRows =
-  (patches: Map<string, Partial<NotificationType>>) =>
-  (data: PageShape | undefined): PageShape | undefined => {
-    if (!isPageShape(data)) return data;
-
-    return {
-      ...data,
-      elements: data.elements.map((row) => {
-        const patch = patches.get(row.id);
-
-        return patch ? { ...row, ...patch } : row;
-      }),
-    };
-  };
-
 const useNotificationBulkToggleRead = () => {
   const queryClient = useQueryClient();
-  const currentUser = useCurrentUser();
   const tableKey = [...NOTIFICATIONS_QUERY_KEY, TABLE_KEY] as const;
   const badgeKey = [...NOTIFICATIONS_QUERY_KEY, BADGE_COUNT_KEY] as const;
 
-  return useMutation<
-    unknown,
-    FetchError,
-    { rows: RowSeed[] },
-    { snapshot: Snapshot }
-  >({
+  return useMutation<unknown, FetchError, { rows: RowSeed[] }>({
     mutationFn: ({ rows }) =>
       SystemNotifications.bulkToggleRead({ entity_ids: rows.map(({ id }) => id) }),
 
-    onMutate: async ({ rows }) => {
-      await queryClient.cancelQueries({ queryKey: tableKey });
-
-      const snapshot = queryClient.getQueriesData<PageShape>({
-        queryKey: tableKey,
-      });
-      const now = new Date().toISOString();
-
-      const patches = new Map<string, Partial<NotificationType>>(
-        rows.map(({ id, currentIsRead }) => [
-          id,
-          {
-            is_read: !currentIsRead,
-            last_changed: now,
-            actor: { id: currentUser.id, name: currentUser.username },
-          },
-        ]),
-      );
-
-      queryClient.setQueriesData({ queryKey: tableKey }, flipRows(patches));
-
-      return { snapshot };
-    },
-
-    onError: (error, _vars, context) => {
-      context?.snapshot.forEach(([key, data]) => {
-        queryClient.setQueryData(key, data);
-      });
-
-      if (error?.status === 403) {
-        UserNotification.error(
-          'You do not have permission to update one or more selected notifications.',
-          'Action not allowed',
-        );
-
-        return;
-      }
-
-      if (error?.status === 400) {
-        UserNotification.warning(
-          'No notifications selected.',
-          'Nothing to update',
-        );
-
-        return;
-      }
-
-      UserNotification.error(
-        'Failed to update notification read states. Please try again.',
-        'Update failed',
-      );
-    },
-
-    // re-fetch after success: backend silently drops unknown ids so the optimistic patch may not match server state
-    onSettled: (_data, error) => {
-      if (error?.status === 403) return;
-
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: tableKey });
       queryClient.invalidateQueries({ queryKey: badgeKey });
+    },
+
+    onError: (error) => {
+      if (error?.status === 403) return;
+
+      if (error?.status === 400) {
+        UserNotification.warning('No notifications selected.', 'Nothing to update');
+        return;
+      }
+
+      UserNotification.error('Failed to update notification read states. Please try again.', 'Update failed');
     },
   });
 };
