@@ -16,9 +16,11 @@
  */
 package org.graylog.storage.opensearch2;
 
+import com.google.inject.Provides;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
+import jakarta.inject.Singleton;
 import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.plugins.datanode.DatanodeUpgradeServiceAdapter;
 import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
@@ -50,6 +52,7 @@ import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.searches.SearchesAdapter;
+import org.graylog2.indexer.security.AdminIndexer;
 import org.graylog2.indexer.security.SecurityAdapter;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.plugin.VersionAwareModule;
@@ -112,5 +115,17 @@ public class OpenSearch2Module extends VersionAwareModule {
 
     private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass) {
         return bindForVersion(supportedVersion, interfaceClass);
+    }
+
+    /**
+     * OpenSearch 2 has no security-plugin admin-cert auth path; the {@link AdminIndexer}
+     * qualifier resolves to the default {@link IndicesAdapter} so services that inject it work
+     * on this backend without a separate auth.
+     */
+    @Provides
+    @AdminIndexer
+    @Singleton
+    public IndicesAdapter adminIndicesAdapter(IndicesAdapter defaultIndicesAdapter) {
+        return defaultIndicesAdapter;
     }
 }

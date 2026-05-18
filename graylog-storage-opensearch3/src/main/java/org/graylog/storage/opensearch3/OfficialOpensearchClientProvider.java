@@ -45,6 +45,7 @@ import org.opensearch.client.transport.httpclient5.ApacheHttpClient5TransportBui
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLContext;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -113,6 +114,16 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
      */
     @Nonnull
     public OpenSearchTransport buildTransport(List<URI> uris) {
+        return buildTransport(uris, TransportConfig.defaults());
+    }
+
+    /**
+     * Builds a new {@link OpenSearchTransport} with overrides for SSL context and auth.
+     * Used by callers that need a non-default authentication mechanism (e.g. client certificate
+     * authentication for OpenSearch security-plugin admin operations).
+     */
+    @Nonnull
+    public OpenSearchTransport buildTransport(List<URI> uris, TransportConfig config) {
         final HttpHost[] hosts = uris.stream().map(uri -> new HttpHost(uri.getScheme(), uri.getHost(), uri.getPort())).toArray(HttpHost[]::new);
 
         final ApacheHttpClient5TransportBuilder builder = ApacheHttpClient5TransportBuilder.builder(hosts);
@@ -137,12 +148,15 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
                                     .setSocketTimeout(timeout(clientConfiguration.elasticsearchSocketTimeout()))
                                     .build()
                     );
-            tlsStrategy(trustManagerAndSocketFactoryProvider).ifPresent(connectionManagerBuilder::setTlsStrategy);
+            tlsStrategy(config.sslContextOverride().orElse(null), trustManagerAndSocketFactoryProvider)
+                    .ifPresent(connectionManagerBuilder::setTlsStrategy);
             httpClientBuilder.setConnectionManager(connectionManagerBuilder.build());
 
-            httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+            if (config.useCredentials()) {
+                httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+            }
 
-            if (indexerJwtAuthToken.isJwtAuthEnabled()) {
+            if (config.useJwt() && indexerJwtAuthToken.isJwtAuthEnabled()) {
                 httpClientBuilder.addRequestInterceptorLast(jwtInterceptor(indexerJwtAuthToken));
             }
 
@@ -154,6 +168,30 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
         });
 
         return builder.build();
+    }
+
+    /**
+     * Builds an {@link OfficialOpensearchClient} from given hosts and transport configuration.
+     * Used by non-default-auth callers (e.g. admin certificate client). The caller is responsible
+     * for closing the returned client when no longer needed.
+     */
+    @Nonnull
+    public OfficialOpensearchClient buildClient(List<URI> uris, TransportConfig config) {
+        return buildClientFromTransport(buildTransport(uris, config));
+    }
+
+    /**
+     * Per-call transport configuration. Defaults match the existing singleton client: default
+     * basic-auth credentials provider, JWT interceptor when enabled, trust-only TLS context.
+     */
+    public record TransportConfig(boolean useCredentials, boolean useJwt, Optional<SSLContext> sslContextOverride) {
+        public static TransportConfig defaults() {
+            return new TransportConfig(true, true, Optional.empty());
+        }
+
+        public static TransportConfig clientCertAuth(SSLContext sslContext) {
+            return new TransportConfig(false, false, Optional.of(sslContext));
+        }
     }
 
     /**
@@ -188,14 +226,16 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
         });
     }
 
-    private static Optional<TlsStrategy> tlsStrategy(@Nullable TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider) {
-        return Optional.ofNullable(trustManagerAndSocketFactoryProvider)
-                .map(TrustManagerAndSocketFactoryProvider::getSslContext)
-                .map(sslContext -> ClientTlsStrategyBuilder.create()
-                        .setSslContext(sslContext)
-                        // See https://issues.apache.org/jira/browse/HTTPCLIENT-2219
-                        .setTlsDetailsFactory(sslEngine -> new TlsDetails(sslEngine.getSession(), sslEngine.getApplicationProtocol()))
-                        .build());
+    private static Optional<TlsStrategy> tlsStrategy(@Nullable SSLContext sslContextOverride,
+                                                     @Nullable TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider) {
+        final Optional<SSLContext> sslContext = sslContextOverride != null
+                ? Optional.of(sslContextOverride)
+                : Optional.ofNullable(trustManagerAndSocketFactoryProvider).map(TrustManagerAndSocketFactoryProvider::getSslContext);
+        return sslContext.map(ctx -> ClientTlsStrategyBuilder.create()
+                .setSslContext(ctx)
+                // See https://issues.apache.org/jira/browse/HTTPCLIENT-2219
+                .setTlsDetailsFactory(sslEngine -> new TlsDetails(sslEngine.getSession(), sslEngine.getApplicationProtocol()))
+                .build());
     }
 
     private static Timeout timeout(Duration duration) {

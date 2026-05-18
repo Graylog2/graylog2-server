@@ -19,6 +19,7 @@ package org.graylog.storage.opensearch3;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
+import jakarta.inject.Singleton;
 import org.apache.hc.client5.http.auth.CredentialsProvider;
 import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.plugins.datanode.DatanodeUpgradeServiceAdapter;
@@ -53,6 +54,7 @@ import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.searches.SearchesAdapter;
+import org.graylog2.indexer.security.AdminIndexer;
 import org.graylog2.indexer.security.SecurityAdapter;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.plugin.VersionAwareModule;
@@ -104,6 +106,10 @@ public class OpenSearch3Module extends VersionAwareModule {
         bind(OfficialOpensearchClientProvider.class).asEagerSingleton();
         bind(OfficialOpensearchClient.class).toProvider(OfficialOpensearchClientProvider.class);
         bind(CredentialsProvider.class).toProvider(OpensearchCredentialsProvider.class);
+        bind(AdminOpensearchClientProvider.class);
+        bind(IndicesAdapter.class).annotatedWith(AdminIndexer.class)
+                .toProvider(AdminIndicesAdapterProvider.class)
+                .in(Singleton.class);
         bindForSupportedVersion(DatanodeUpgradeServiceAdapter.class).to(DatanodeUpgradeServiceAdapterOS.class);
 
         Multibinder<NodesSniffer> nodeSniffers = Multibinder.newSetBinder(binder(), NodesSniffer.class);
