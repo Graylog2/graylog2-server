@@ -30,7 +30,9 @@ import HealthModule from 'components/health/HealthModule';
 const SystemOverviewPage = () => (
   <DocumentTitle title="System overview">
     <span>
-      <HealthModule />
+      <HideOnCloud>
+        <HealthModule />
+      </HideOnCloud>
 
       <IfPermitted permissions="notifications:read">
         <NotificationsList />
