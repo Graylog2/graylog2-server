@@ -22,18 +22,13 @@ import UserNotification from 'util/UserNotification';
 import type FetchError from 'logic/errors/FetchError';
 import { NOTIFICATIONS_QUERY_KEY, BADGE_COUNT_KEY, TABLE_KEY } from 'components/notifications/constants';
 
-type RowSeed = { id: string; currentIsRead: boolean };
-
-const useNotificationBulkReadAll = () => {
+const useNotificationDismiss = () => {
   const queryClient = useQueryClient();
   const tableKey = [...NOTIFICATIONS_QUERY_KEY, TABLE_KEY] as const;
   const badgeKey = [...NOTIFICATIONS_QUERY_KEY, BADGE_COUNT_KEY] as const;
 
-  return useMutation<unknown, FetchError, { rows: RowSeed[] }>({
-    mutationFn: ({ rows }) =>
-      SystemNotifications.bulkToggleRead({
-        entity_ids: rows.map(({ id }) => id),
-      }),
+  return useMutation<void, FetchError, { id: string }>({
+    mutationFn: ({ id }) => SystemNotifications.deleteById(id),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: tableKey });
@@ -43,15 +38,15 @@ const useNotificationBulkReadAll = () => {
     onError: (error) => {
       if (error?.status === 403) return;
 
-      if (error?.status === 400) {
-        UserNotification.warning('No notifications selected.', 'Nothing to update');
+      if (error?.status === 404) {
+        queryClient.invalidateQueries({ queryKey: tableKey });
 
         return;
       }
 
-      UserNotification.error('Failed to update notification read states. Please try again.', 'Update failed');
+      UserNotification.error('Failed to dismiss notification. Please try again.', 'Dismiss failed');
     },
   });
 };
 
-export default useNotificationBulkReadAll;
+export default useNotificationDismiss;

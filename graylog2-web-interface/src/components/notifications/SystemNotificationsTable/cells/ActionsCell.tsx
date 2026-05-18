@@ -18,22 +18,21 @@ import * as React from 'react';
 
 import { Button } from 'components/bootstrap';
 import type { NotificationType } from 'components/notifications/types';
-import useNotificationToggleRead from 'components/notifications/hooks/useNotificationToggleRead';
+import useNotificationDismiss from 'components/notifications/hooks/useNotificationDismiss';
 
 type Props = { row: NotificationType };
 
 const ActionsCell = ({ row }: Props) => {
-  const { mutate: toggleRead, isPending } = useNotificationToggleRead();
-  const label = row.is_read ? 'Mark as unread' : 'Mark as read';
+  const { mutate: dismiss, isPending } = useNotificationDismiss();
 
   return (
     <Button
       bsSize="xs"
       bsStyle="default"
-      onClick={() => toggleRead({ id: row.id, currentIsRead: row.is_read })}
+      onClick={() => dismiss({ id: row.id })}
       disabled={isPending}
-      aria-label={label}>
-      {label}
+      aria-label="Dismiss">
+      Dismiss
     </Button>
   );
 };

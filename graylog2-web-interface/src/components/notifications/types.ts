@@ -24,9 +24,6 @@ export type LegacyNotificationType = Awaited<
   ReturnType<(typeof SystemNotifications)['listNotifications']>
 >['notifications'][number];
 
-export type SystemNotificationConfig = Awaited<
-  ReturnType<(typeof SystemNotifications)['getConfig']>
->;
 
 export type PageShape = {
   elements: NotificationType[];

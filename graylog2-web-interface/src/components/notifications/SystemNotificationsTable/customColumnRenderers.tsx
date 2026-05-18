@@ -20,11 +20,8 @@ import type { NotificationType } from 'components/notifications/types';
 
 import TitleCell from './cells/TitleCell';
 import DescriptionCell from './cells/DescriptionCell';
-import StatusCell from './cells/StatusCell';
-import ActorCell from './cells/ActorCell';
 import TriggeredAtCell from './cells/TriggeredAtCell';
 import SeverityCell from './cells/SeverityCell';
-import TypeCell from './cells/TypeCell';
 
 const customColumnRenderers = {
   attributes: {
@@ -34,19 +31,8 @@ const customColumnRenderers = {
     severity: {
       renderCell: (_severity: string, row: NotificationType) => <SeverityCell row={row} />,
     },
-    type: {
-      renderCell: (_type: string, row: NotificationType) => <TypeCell row={row} />,
-    },
     description: {
       renderCell: (_description: string, row: NotificationType) => <DescriptionCell row={row} />,
-    },
-    is_read: {
-      renderHeader: () => 'Status',
-      renderCell: (_is_read: boolean, row: NotificationType) => <StatusCell row={row} />,
-    },
-    'actor.name': {
-      renderHeader: () => 'Last changed by',
-      renderCell: (_actorName: string, row: NotificationType) => <ActorCell row={row} />,
     },
     triggered_at: {
       renderCell: (triggeredAt: string) => <TriggeredAtCell triggeredAt={triggeredAt} />,

@@ -20,16 +20,15 @@ import { SystemNotifications } from '@graylog/server-api';
 
 import UserNotification from 'util/UserNotification';
 import type FetchError from 'logic/errors/FetchError';
-import type { NotificationType } from 'components/notifications/types';
 import { NOTIFICATIONS_QUERY_KEY, BADGE_COUNT_KEY, TABLE_KEY } from 'components/notifications/constants';
 
-const useNotificationToggleRead = () => {
+const useNotificationBulkDismiss = () => {
   const queryClient = useQueryClient();
   const tableKey = [...NOTIFICATIONS_QUERY_KEY, TABLE_KEY] as const;
   const badgeKey = [...NOTIFICATIONS_QUERY_KEY, BADGE_COUNT_KEY] as const;
 
-  return useMutation<NotificationType, FetchError, { id: string; currentIsRead: boolean }>({
-    mutationFn: ({ id }) => SystemNotifications.toggleRead(id) as Promise<NotificationType>,
+  return useMutation<unknown, FetchError, { entity_ids: string[] }>({
+    mutationFn: ({ entity_ids }) => SystemNotifications.bulkDelete({ entity_ids }),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: tableKey });
@@ -39,16 +38,15 @@ const useNotificationToggleRead = () => {
     onError: (error) => {
       if (error?.status === 403) return;
 
-      if (error?.status === 404) {
-        UserNotification.warning('Notification no longer exists.', 'Notification not found');
-        queryClient.invalidateQueries({ queryKey: tableKey });
+      if (error?.status === 400) {
+        UserNotification.warning('No notifications selected.', 'Nothing to dismiss');
 
         return;
       }
 
-      UserNotification.error('Failed to update notification read state. Please try again.', 'Update failed');
+      UserNotification.error('Failed to dismiss notifications. Please try again.', 'Dismiss failed');
     },
   });
 };
 
-export default useNotificationToggleRead;
+export default useNotificationBulkDismiss;

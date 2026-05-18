@@ -23,10 +23,10 @@ import { SystemNotifications } from '@graylog/server-api';
 import suppressConsole from 'helpers/suppressConsole';
 import UserNotification from 'util/UserNotification';
 
-import useNotificationToggleRead from './useNotificationToggleRead';
+import useNotificationDismiss from './useNotificationDismiss';
 
 jest.mock('@graylog/server-api', () => ({
-  SystemNotifications: { toggleRead: jest.fn() },
+  SystemNotifications: { deleteById: jest.fn() },
 }));
 
 jest.mock('util/UserNotification', () => ({
@@ -37,7 +37,7 @@ jest.mock('util/UserNotification', () => ({
 const TABLE_KEY = ['system', 'notifications', 'table'] as const;
 const BADGE_KEY = ['system', 'notifications', 'badge-count'] as const;
 
-const toggleReadMock = SystemNotifications.toggleRead as jest.Mock;
+const deleteByIdMock = SystemNotifications.deleteById as jest.Mock;
 
 const buildWrapper = (queryClient: QueryClient) => {
   const Wrapper = ({ children }: { children: React.ReactNode }) =>
@@ -46,7 +46,7 @@ const buildWrapper = (queryClient: QueryClient) => {
   return Wrapper;
 };
 
-describe('useNotificationToggleRead', () => {
+describe('useNotificationDismiss', () => {
   let queryClient: QueryClient;
 
   beforeEach(() => {
@@ -56,26 +56,26 @@ describe('useNotificationToggleRead', () => {
     });
   });
 
-  it('calls toggleRead with the given id', async () => {
-    toggleReadMock.mockResolvedValue({ id: 'row-1', is_read: true });
+  it('calls deleteById with the given id', async () => {
+    deleteByIdMock.mockResolvedValue(undefined);
 
-    const { result } = renderHook(() => useNotificationToggleRead(), { wrapper: buildWrapper(queryClient) });
+    const { result } = renderHook(() => useNotificationDismiss(), { wrapper: buildWrapper(queryClient) });
 
     await act(async () => {
-      await result.current.mutateAsync({ id: 'row-1', currentIsRead: false });
+      await result.current.mutateAsync({ id: 'row-1' });
     });
 
-    expect(toggleReadMock).toHaveBeenCalledWith('row-1');
+    expect(deleteByIdMock).toHaveBeenCalledWith('row-1');
   });
 
   it('invalidates table and badge-count keys on success', async () => {
-    toggleReadMock.mockResolvedValue({ id: 'row-1', is_read: true });
+    deleteByIdMock.mockResolvedValue(undefined);
     const invalidateSpy = jest.spyOn(queryClient, 'invalidateQueries');
 
-    const { result } = renderHook(() => useNotificationToggleRead(), { wrapper: buildWrapper(queryClient) });
+    const { result } = renderHook(() => useNotificationDismiss(), { wrapper: buildWrapper(queryClient) });
 
     await act(async () => {
-      await result.current.mutateAsync({ id: 'row-1', currentIsRead: false });
+      await result.current.mutateAsync({ id: 'row-1' });
     });
 
     await waitFor(() => {
@@ -84,63 +84,49 @@ describe('useNotificationToggleRead', () => {
     });
   });
 
-  it('shows a "no longer exists" warning and invalidates the table on 404', async () => {
-    toggleReadMock.mockRejectedValue({ status: 404 });
+  it('silently invalidates table on 404 (notification already gone)', async () => {
+    deleteByIdMock.mockRejectedValue({ status: 404 });
     const invalidateSpy = jest.spyOn(queryClient, 'invalidateQueries');
 
-    const { result } = renderHook(() => useNotificationToggleRead(), { wrapper: buildWrapper(queryClient) });
+    const { result } = renderHook(() => useNotificationDismiss(), { wrapper: buildWrapper(queryClient) });
 
     await suppressConsole(async () => {
       await act(async () => {
-        await result.current.mutateAsync({ id: 'row-1', currentIsRead: false }).catch(() => {});
-      });
-    });
-
-    expect(UserNotification.warning).toHaveBeenCalledWith(expect.stringMatching(/no longer exists/i), expect.any(String));
-    expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: TABLE_KEY });
-  });
-
-  it('shows an error toast on non-403 failures', async () => {
-    toggleReadMock.mockRejectedValue({ status: 500 });
-
-    const { result } = renderHook(() => useNotificationToggleRead(), { wrapper: buildWrapper(queryClient) });
-
-    await suppressConsole(async () => {
-      await act(async () => {
-        await result.current.mutateAsync({ id: 'row-1', currentIsRead: false }).catch(() => {});
-      });
-    });
-
-    expect(UserNotification.error).toHaveBeenCalledWith(expect.stringMatching(/failed to update/i), expect.any(String));
-  });
-
-  it('skips toast on 403', async () => {
-    toggleReadMock.mockRejectedValue({ status: 403 });
-
-    const { result } = renderHook(() => useNotificationToggleRead(), { wrapper: buildWrapper(queryClient) });
-
-    await suppressConsole(async () => {
-      await act(async () => {
-        await result.current.mutateAsync({ id: 'row-1', currentIsRead: false }).catch(() => {});
+        await result.current.mutateAsync({ id: 'row-1' }).catch(() => {});
       });
     });
 
     expect(UserNotification.error).not.toHaveBeenCalled();
-    expect(UserNotification.warning).not.toHaveBeenCalled();
+    expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: TABLE_KEY });
   });
 
-  it('skips invalidation on 403', async () => {
-    toggleReadMock.mockRejectedValue({ status: 403 });
-    const invalidateSpy = jest.spyOn(queryClient, 'invalidateQueries');
+  it('shows an error toast on non-403/404 failures', async () => {
+    deleteByIdMock.mockRejectedValue({ status: 500 });
 
-    const { result } = renderHook(() => useNotificationToggleRead(), { wrapper: buildWrapper(queryClient) });
+    const { result } = renderHook(() => useNotificationDismiss(), { wrapper: buildWrapper(queryClient) });
 
     await suppressConsole(async () => {
       await act(async () => {
-        await result.current.mutateAsync({ id: 'row-1', currentIsRead: false }).catch(() => {});
+        await result.current.mutateAsync({ id: 'row-1' }).catch(() => {});
       });
     });
 
+    expect(UserNotification.error).toHaveBeenCalledWith(expect.stringMatching(/failed to dismiss/i), expect.any(String));
+  });
+
+  it('skips toast and invalidation on 403', async () => {
+    deleteByIdMock.mockRejectedValue({ status: 403 });
+    const invalidateSpy = jest.spyOn(queryClient, 'invalidateQueries');
+
+    const { result } = renderHook(() => useNotificationDismiss(), { wrapper: buildWrapper(queryClient) });
+
+    await suppressConsole(async () => {
+      await act(async () => {
+        await result.current.mutateAsync({ id: 'row-1' }).catch(() => {});
+      });
+    });
+
+    expect(UserNotification.error).not.toHaveBeenCalled();
     expect(invalidateSpy).not.toHaveBeenCalled();
   });
 });

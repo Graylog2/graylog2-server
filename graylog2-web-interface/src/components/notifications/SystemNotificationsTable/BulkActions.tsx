@@ -15,41 +15,25 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 
 import { MenuItem } from 'components/bootstrap';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
-import { NOTIFICATIONS_QUERY_KEY, TABLE_KEY } from 'components/notifications/constants';
-import useNotificationBulkToggleRead from 'components/notifications/hooks/useNotificationBulkToggleRead';
-import type { PageShape } from 'components/notifications/types';
+import useNotificationBulkDismiss from 'components/notifications/hooks/useNotificationBulkDismiss';
 
 const BulkActions = () => {
-  const queryClient = useQueryClient();
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
-  const { mutate: bulkToggleRead } = useNotificationBulkToggleRead();
-  const tableKey = [...NOTIFICATIONS_QUERY_KEY, TABLE_KEY] as const;
+  const { mutate: bulkDismiss } = useNotificationBulkDismiss();
 
-  const getSelectedRowSeeds = () => {
-    const cachedPages = queryClient.getQueriesData<PageShape>({ queryKey: tableKey });
-    const allRows = cachedPages.flatMap(([, data]) => data?.elements ?? []);
-
-    return selectedEntities.map((id) => {
-      const row = allRows.find((r) => r.id === id);
-
-      return { id, currentIsRead: row?.is_read ?? false };
-    });
-  };
-
-  const handleBulkToggle = () => {
-    bulkToggleRead({ rows: getSelectedRowSeeds() }, {
+  const handleBulkDismiss = () => {
+    bulkDismiss({ entity_ids: selectedEntities }, {
       onSuccess: () => setSelectedEntities([]),
     });
   };
 
   return (
     <BulkActionsDropdown>
-      <MenuItem onSelect={handleBulkToggle}>Toggle read state</MenuItem>
+      <MenuItem onSelect={handleBulkDismiss}>Dismiss</MenuItem>
     </BulkActionsDropdown>
   );
 };

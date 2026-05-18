@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from "react";
-import { OrderedMap } from "immutable";
 import styled, { css } from "styled-components";
 
 import { PaginatedEntityTable } from "components/common";
@@ -38,27 +37,12 @@ const StyledHeading = styled.h2(
   `,
 );
 
-const DEFAULT_FILTERS = OrderedMap({ is_read: ["false"] });
-
 const TABLE_LAYOUT = {
   entityTableId: "system-notifications",
   defaultPageSize: 20,
   defaultSort: { attributeId: "triggered_at", direction: "desc" } as Sort,
-  defaultDisplayedAttributes: [
-    "title",
-    "is_read",
-    "severity",
-    "triggered_at",
-    "actor.name",
-  ],
-  defaultColumnOrder: [
-    "title",
-    "is_read",
-    "severity",
-    "description",
-    "triggered_at",
-    "actor.name",
-  ],
+  defaultDisplayedAttributes: ["title", "severity", "triggered_at"],
+  defaultColumnOrder: ["title", "severity", "description", "triggered_at"],
 };
 
 const REFETCH_INTERVAL = 3000;
@@ -81,7 +65,6 @@ const SystemNotificationsTable = () => (
         entityActions={renderActions}
         expandedSectionRenderers={expandedSections}
         bulkSelection={bulkSelection}
-        defaultFilters={DEFAULT_FILTERS}
         fetchOptions={{ refetchInterval: REFETCH_INTERVAL }}
       />
     </Col>
