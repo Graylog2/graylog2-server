@@ -57,9 +57,9 @@ public class InputMetricsResource extends RestResource {
     @GET
     @Operation(summary = "Get metrics for multiple inputs")
     public EntityMetricsResponse getMetrics(
-            @Parameter(description = "Comma-separated list of input IDs", required = true)
+            @Parameter(description = "List of input IDs", required = true)
             @QueryParam("input_ids") List<String> inputIds,
-            @Parameter(description = "Comma-separated list of metric fields to return", required = true)
+            @Parameter(description = "List of metric fields to return", required = true)
             @QueryParam("fields") List<String> fields,
             @Context SearchUser searchUser) {
 
