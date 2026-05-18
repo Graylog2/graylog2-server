@@ -19,8 +19,8 @@ import * as React from 'react';
 import { Badge } from 'components/bootstrap';
 import type { NotificationType } from 'components/notifications/types';
 
-const COLOR_BY_SEVERITY: Record<string, 'danger' | 'info' | 'default'> = {
-  urgent: 'danger',
+const COLOR_BY_PRIORITY: Record<string, 'danger' | 'info' | 'default'> = {
+  high: 'danger',
   normal: 'info',
 };
 
@@ -28,10 +28,10 @@ type Props = { row: NotificationType };
 
 const capitalize = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
 
-const SeverityCell = ({ row }: Props) => (
-  <Badge bsStyle={COLOR_BY_SEVERITY[row.severity] ?? 'default'}>
-    {capitalize(row.severity)}
+const PriorityCell = ({ row }: Props) => (
+  <Badge bsStyle={COLOR_BY_PRIORITY[row.priority] ?? 'default'}>
+    {capitalize(row.priority)}
   </Badge>
 );
 
-export default SeverityCell;
+export default PriorityCell;
