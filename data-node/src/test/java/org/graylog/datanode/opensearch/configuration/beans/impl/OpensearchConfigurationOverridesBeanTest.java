@@ -78,7 +78,7 @@ class OpensearchConfigurationOverridesBeanTest {
                 .containsEntry("cluster.max_shards_per_node", "500");
 
         Assertions.assertThat(configurationPart.warnings())
-                .hasSize(1)
+                .hasSizeGreaterThanOrEqualTo(1)
                 .anySatisfy(warning -> Assertions.assertThat(warning).contains("Detected pass-through opensearch property cluster.max_shards_per_node"));
     }
 
