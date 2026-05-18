@@ -97,7 +97,7 @@ public class NotificationsResource extends RestResource {
             EntityAttribute.builder().id(SystemNotificationDto.FIELD_DESCRIPTION).title("Description")
                     .type(SearchQueryField.Type.STRING).sortable(false).searchable(true).hidden(true).build(),
             EntityAttribute.builder().id(SystemNotificationDto.FIELD_TYPE).title("Type")
-                    .type(SearchQueryField.Type.STRING).sortable(true).filterable(true).searchable(true).hidden(true).build(),
+                    .type(SearchQueryField.Type.STRING).sortable(true).filterable(true).searchable(true).build(),
             EntityAttribute.builder().id(SystemNotificationDto.FIELD_SEVERITY).title("Severity")
                     .type(SearchQueryField.Type.STRING).sortable(true).filterable(true)
                     .filterOptions(Set.of(
