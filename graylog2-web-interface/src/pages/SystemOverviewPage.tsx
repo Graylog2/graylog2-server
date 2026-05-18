@@ -25,15 +25,9 @@ import { SystemMessagesComponent } from 'components/systemmessages';
 import { TimesList } from 'components/times';
 import GraylogClusterOverview from 'components/cluster/GraylogClusterOverview';
 import { Row } from 'components/bootstrap';
-import NotificationsNavTab from 'components/notifications/NotificationsNavTab';
-import Routes from 'routing/Routes';
+import SYSTEM_OVERVIEW_TABS from 'components/notifications/systemOverviewTabs';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import HealthModule from 'components/health/HealthModule';
-
-const OVERVIEW_TABS = [
-  { description: 'Status', path: Routes.SYSTEM.OVERVIEW },
-  { description: 'Notifications', path: Routes.SYSTEM.NOTIFICATIONS, BadgeComponent: NotificationsNavTab },
-];
 
 const SystemOverviewPage = () => (
   <DocumentTitle title="System overview">
@@ -43,7 +37,7 @@ const SystemOverviewPage = () => (
       </HideOnCloud>
 
       <Row>
-        <PageNavigation items={OVERVIEW_TABS} />
+        <PageNavigation items={SYSTEM_OVERVIEW_TABS} />
       </Row>
 
       <HideOnCloud>
