@@ -1,0 +1,3 @@
+type = "f"
+message = "Fix over-wide bars on stacked time-bucket charts where some series only contain data for a single timestamp."
+pulls = ["26030"]
