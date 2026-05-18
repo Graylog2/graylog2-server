@@ -14,23 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useEffect, useRef } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import { SystemNotifications } from '@graylog/server-api';
 
 import type { RequestOptions } from 'routing/request';
-import {
-  NOTIFICATIONS_QUERY_KEY,
-  BADGE_COUNT_KEY,
-  TABLE_KEY,
-} from 'components/notifications/constants';
+import { NOTIFICATIONS_QUERY_KEY, BADGE_COUNT_KEY } from 'components/notifications/constants';
 
 const POLL_INTERVAL = 3000;
 const NO_SESSION_EXT: RequestOptions = { requestShouldExtendSession: false };
 
 const useNotificationBadgeCount = ({ enabled = true }: { enabled?: boolean } = {}) => {
-  const queryClient = useQueryClient();
   const { data, isLoading } = useQuery({
     queryKey: [...NOTIFICATIONS_QUERY_KEY, BADGE_COUNT_KEY],
     queryFn: () => SystemNotifications.getUnreadCount(NO_SESSION_EXT),
@@ -38,18 +32,7 @@ const useNotificationBadgeCount = ({ enabled = true }: { enabled?: boolean } = {
     enabled,
   });
 
-  const count = data ?? 0;
-  const previous = useRef<number | undefined>(undefined);
-
-  useEffect(() => {
-    if (data === undefined) return;
-    if (previous.current !== undefined && previous.current !== count) {
-      queryClient.invalidateQueries({ queryKey: [...NOTIFICATIONS_QUERY_KEY, TABLE_KEY] });
-    }
-    previous.current = count;
-  }, [count, data, queryClient]);
-
-  return { data: count, isLoading };
+  return { data: data ?? 0, isLoading };
 };
 
 export default useNotificationBadgeCount;

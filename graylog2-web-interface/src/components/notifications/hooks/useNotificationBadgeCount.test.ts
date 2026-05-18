@@ -74,17 +74,4 @@ describe('useNotificationBadgeCount', () => {
     expect(getUnreadCountMock).not.toHaveBeenCalled();
   });
 
-  it('invalidates the table query when the unread count changes between polls', async () => {
-    getUnreadCountMock.mockResolvedValueOnce(5).mockResolvedValueOnce(3);
-
-    const { result } = renderHook(() => useNotificationBadgeCount(), { wrapper: buildWrapper(queryClient) });
-
-    await waitFor(() => expect(result.current.data).toBe(5));
-
-    const invalidateSpy = jest.spyOn(queryClient, 'invalidateQueries');
-    await queryClient.refetchQueries({ queryKey: ['system', 'notifications', 'badge-count'] });
-
-    await waitFor(() => expect(result.current.data).toBe(3));
-    expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['system', 'notifications', 'table'] });
-  });
 });

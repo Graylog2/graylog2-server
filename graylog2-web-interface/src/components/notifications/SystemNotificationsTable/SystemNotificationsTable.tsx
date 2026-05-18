@@ -61,6 +61,8 @@ const TABLE_LAYOUT = {
   ],
 };
 
+const REFETCH_INTERVAL = 3000;
+
 const bulkSelection = { actions: <BulkActions /> };
 
 const renderActions = (row: NotificationType) => <ActionsCell row={row} />;
@@ -80,6 +82,7 @@ const SystemNotificationsTable = () => (
         expandedSectionRenderers={expandedSections}
         bulkSelection={bulkSelection}
         defaultFilters={DEFAULT_FILTERS}
+        fetchOptions={{ refetchInterval: REFETCH_INTERVAL }}
       />
     </Col>
   </Row>
