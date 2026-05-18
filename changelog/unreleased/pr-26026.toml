@@ -1,4 +1,4 @@
 type = "f"
-message = "Fix TypeError in remediation steps sidebar when the event is still loading."
+message = "Fix event definition procedure in sidebar when security license is absent."
 issues = ["Graylog2/graylog-plugin-enterprise#14259"]
 pulls = ["26026"]
