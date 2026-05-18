@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix TypeError in remediation steps sidebar when the event is still loading."
+issues = ["Graylog2/graylog-plugin-enterprise#14259"]
+pulls = ["26026"]
