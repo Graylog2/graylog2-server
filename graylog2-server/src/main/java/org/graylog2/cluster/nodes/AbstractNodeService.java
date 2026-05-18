@@ -17,41 +17,39 @@
 package org.graylog2.cluster.nodes;
 
 import com.google.common.collect.ImmutableList;
-import com.mongodb.AggregationOptions;
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.mongodb.WriteResult;
+import com.mongodb.client.model.ReplaceOptions;
+import com.mongodb.client.result.UpdateResult;
 import jakarta.inject.Inject;
-import org.bson.types.ObjectId;
+import org.bson.conversions.Bson;
 import org.graylog2.Configuration;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PersistedServiceImpl;
+import org.graylog2.database.MongoCollection;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Spliterator;
-import java.util.Spliterators;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
-public abstract class AbstractNodeService<T extends AbstractNode<? extends NodeDto>, DTO extends NodeDto> extends PersistedServiceImpl implements NodeService<DTO> {
+public abstract class AbstractNodeService<DTO extends NodeDto> implements NodeService<DTO> {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNodeService.class);
 
     public static final String LAST_SEEN_FIELD = "$last_seen";
     private final long pingTimeout;
     private final static Map<String, Object> lastSeenFieldDefinition = Map.of("last_seen", Map.of("$type", "timestamp"));
-    private final static DBObject addLastSeenFieldAsDate = new BasicDBObject("$addFields", Map.of("last_seen_date", Map.of("$cond",
+    private final static BasicDBObject addLastSeenFieldAsDate = new BasicDBObject("$addFields",
+            Map.of("last_seen_date", Map.of("$cond",
             Map.of(
                     "if", Map.of("$isNumber", LAST_SEEN_FIELD),
                     "then", Map.of("$toDate", Map.of("$toLong", LAST_SEEN_FIELD)),
@@ -59,60 +57,43 @@ public abstract class AbstractNodeService<T extends AbstractNode<? extends NodeD
             )
     )));
 
-    private final Class<T> nodeClass;
+    private final MongoCollection<DTO> db;
 
     @Inject
-    public AbstractNodeService(final MongoConnection mongoConnection, Configuration configuration, Class<T> nodeClass) {
-        this(mongoConnection, configuration.getStaleLeaderTimeout(), nodeClass);
+    public AbstractNodeService(final MongoCollections mongoCollections,
+                               Configuration configuration,
+                               String collectionName,
+                               Class<DTO> nodeClass) {
+        this(mongoCollections, configuration.getStaleLeaderTimeout(), collectionName, nodeClass);
     }
 
-    private AbstractNodeService(final MongoConnection mongoConnection, final int staleLeaderTimeout, Class<T> nodeClass) {
-        super(mongoConnection);
+    private AbstractNodeService(final MongoCollections mongoCollections,
+                                final int staleLeaderTimeout,
+                                String collectionName,
+                                Class<DTO> nodeClass) {
+        this.db = mongoCollections.collection(collectionName, nodeClass);
         this.pingTimeout = staleLeaderTimeout;
-        this.nodeClass = nodeClass;
     }
 
     @Override
-    public boolean registerServer(NodeDto dto) {
-        final var params = dto.toEntityParameters();
-
-        final Map<String, Object> fields = Map.of(
-                "$set", params,
-                "$currentDate", lastSeenFieldDefinition
+    public boolean registerServer(DTO dto) {
+        UpdateResult result = this.db.replaceOne(
+                new BasicDBObject("node_id", dto.getNodeId()),
+                dto,
+                new ReplaceOptions().upsert(true)
         );
-
-        final WriteResult result = this.collection(nodeClass).update(
-                new BasicDBObject("node_id", dto.getId()),
-                new BasicDBObject(fields),
-                true,
-                false
+        // set timestamp using db
+        db.updateOne(
+                new BasicDBObject("node_id", dto.getNodeId()),
+                new BasicDBObject("$currentDate", lastSeenFieldDefinition)
         );
-        return result.getN() == 1;
+        return result.getMatchedCount() > 0 || result.getUpsertedId() != null;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public DTO byNodeId(String nodeId) throws NodeNotFoundException {
-        DBObject query = new BasicDBObject("node_id", nodeId);
-        DBObject o = findOne(nodeClass, query);
-
-        if (o == null || !o.containsField("node_id")) {
-            throw new NodeNotFoundException("Unable to find node " + nodeId);
-        }
-
-        return (DTO) construct((ObjectId) o.get("_id"), o.toMap()).toDto();
-    }
-
-    protected T construct(ObjectId id, Map map) {
-        try {
-            return nodeClass
-                    .getDeclaredConstructor(ObjectId.class, Map.class)
-                    .newInstance(id, map);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                 NoSuchMethodException e) {
-            LOG.error("Could not construct node {}", nodeClass.getName(), e);
-            throw new RuntimeException("Could not construct node");
-        }
+        return Optional.ofNullable(db.find(new BasicDBObject("node_id", nodeId)).first())
+                .orElseThrow(() -> new NodeNotFoundException("Unable to find node " + nodeId));
     }
 
     @Override
@@ -120,27 +101,27 @@ public abstract class AbstractNodeService<T extends AbstractNode<? extends NodeD
         return byNodeId(nodeId.getNodeId());
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Map<String, DTO> byNodeIds(Collection<String> nodeIds) {
-        return query(nodeClass, new BasicDBObject("node_id", new BasicDBObject("$in", nodeIds)))
-                .stream()
-                .map(o -> (DTO) construct((ObjectId) o.get("_id"), o.toMap()).toDto())
-                .collect(Collectors.toMap(Node::getNodeId, Function.identity()));
+        try (var stream = MongoUtils.stream(db.find(new BasicDBObject("node_id", new BasicDBObject("$in", nodeIds))))) {
+            return stream.collect(Collectors.toMap(Node::getNodeId, Function.identity()));
+        }
     }
 
-    private Stream<DBObject> aggregate(List<? extends DBObject> pipeline) {
-        return cursorToStream(this.collection(nodeClass).aggregate(pipeline, AggregationOptions.builder().build()));
+    @MustBeClosed
+    private Stream<DTO> aggregate(List<Bson> pipeline) {
+        return MongoUtils.stream(db.aggregate(pipeline));
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Map<String, DTO> allActive() {
-        return aggregate(recentHeartbeat(List.of(Map.of())))
-                .collect(Collectors.toMap(obj -> (String) obj.get("node_id"), obj -> (DTO) construct((ObjectId) obj.get("_id"), obj.toMap()).toDto()));
+        try (var stream = aggregate(recentHeartbeat(List.of(Map.of())))) {
+            return stream
+                    .collect(Collectors.toMap(Node::getNodeId, Function.identity()));
+        }
     }
 
-    private List<? extends DBObject> recentHeartbeat(List<? extends Map<String, Object>> additionalMatches) {
+    private List<Bson> recentHeartbeat(List<? extends Map<String, Object>> additionalMatches) {
         var match = ImmutableList.builder()
                 .add(Map.of("$expr", Map.of("$gte", List.of("$last_seen_date", Map.of("$subtract", List.of("$$NOW", this.pingTimeout))))))
                 .addAll(additionalMatches)
@@ -154,72 +135,53 @@ public abstract class AbstractNodeService<T extends AbstractNode<? extends NodeD
 
     @Override
     public void dropOutdated() {
-        var outdatedIds = aggregate(List.of(
+        try (var stream = aggregate(List.of(
                 addLastSeenFieldAsDate,
-                new BasicDBObject("$match", Map.of("$expr", Map.of("$lt", List.of("$last_seen_date", Map.of("$subtract", List.of("$$NOW", this.pingTimeout)))))),
-                new BasicDBObject("$project", Map.of("_id", "$_id"))
-        ))
-                .map(obj -> obj.get("_id"))
-                .toList();
+                new BasicDBObject("$match", Map.of("$expr", Map.of("$lt", List.of("$last_seen_date", Map.of("$subtract", List.of("$$NOW", this.pingTimeout))))))
+        ))) {
+            var outdatedIds = stream.map(DTO::id).toList();
 
-        if (!outdatedIds.isEmpty()) {
-            final BasicDBObject query = new BasicDBObject("_id", Map.of("$in", outdatedIds));
-            destroyAll(nodeClass, query);
-        }
-    }
-
-    private Stream<DBObject> cursorToStream(Iterator<DBObject> cursor) {
-        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(cursor, Spliterator.ORDERED), false);
-    }
-
-    /**
-     * Mark this node as alive and probably update some settings that may have changed since last server boot.
-     */
-    @Override
-    public void markAsAlive(NodeDto dto) throws NodeNotFoundException {
-        BasicDBObject query = new BasicDBObject("node_id", dto.getId());
-        final var params = dto.toEntityParameters();
-
-        final BasicDBObject update = new BasicDBObject(Map.of(
-                "$set", params,
-                "$currentDate", lastSeenFieldDefinition
-        ));
-
-        final WriteResult result = super.collection(nodeClass).update(query, update);
-
-        final int updatedDocumentsCount = result.getN();
-        if (updatedDocumentsCount != 1) {
-            throw new NodeNotFoundException("Unable to find node " + dto.getId());
+            if (!outdatedIds.isEmpty()) {
+                db.deleteMany(MongoUtils.stringIdsIn(outdatedIds));
+            }
         }
     }
 
     @Override
     public boolean isOnlyLeader(NodeId nodeId) {
-        return aggregate(recentHeartbeat(List.of(
+        try (var stream = aggregate(recentHeartbeat(List.of(
                 Map.of(
                         "node_id", new BasicDBObject("$ne", nodeId.getNodeId()),
                         "is_leader", true
                 )
-        ))).findAny().isEmpty();
+        )))) {
+            return stream.findAny().isEmpty();
+        }
     }
 
     @Override
     public boolean isAnyLeaderPresent() {
-        return aggregate(recentHeartbeat(List.of(
+        try (var stream = aggregate(recentHeartbeat(List.of(
                 Map.of(
                         "is_leader", true
                 )
-        ))).findAny().isPresent();
+        )))) {
+            return stream.findAny().isPresent();
+        }
     }
 
     @Override
-    public void ping(NodeDto dto) {
-        try {
-            markAsAlive(dto);
-        } catch (NodeNotFoundException e) {
+    public void ping(DTO dto) {
+        var result = db.replaceOne(new BasicDBObject("node_id", dto.getNodeId()), dto);
+        if (result.getMatchedCount() != 1) {
             LOG.warn("Did not find meta info of this node. Re-registering.");
             registerServer(dto);
         }
+        // set timestamp using db
+        db.updateOne(
+                new BasicDBObject("node_id", dto.getNodeId()),
+                new BasicDBObject("$currentDate", lastSeenFieldDefinition)
+        );
         try {
             // Remove old nodes that are no longer running. (Just some housekeeping)
             dropOutdated();
@@ -229,10 +191,8 @@ public abstract class AbstractNodeService<T extends AbstractNode<? extends NodeD
     }
 
     @Override
-    public void update(NodeDto dto) {
-        BasicDBObject query = new BasicDBObject("node_id", dto.getNodeId());
-        final BasicDBObject update = new BasicDBObject(Map.of("$set", dto.toEntityParameters()));
-        super.collection(nodeClass).update(query, update);
+    public void update(DTO dto) {
+        db.replaceOne(new BasicDBObject("node_id", dto.getNodeId()), dto);
     }
 
 }

@@ -63,7 +63,7 @@ public class NodeServiceImplTest {
         this.mongoCollections = mongoCollections;
         Mockito.when(configuration.getStaleLeaderTimeout()).thenReturn(STALE_LEADER_TIMEOUT_MS);
         this.nodeService = new NodeServiceImpl(
-                new ServerNodeClusterService(mongoCollections.mongoConnection(), configuration));
+                new ServerNodeClusterService(mongoCollections, configuration));
     }
 
     @Test

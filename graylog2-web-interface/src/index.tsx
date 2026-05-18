@@ -49,10 +49,7 @@ import AuthenticationBindings from 'components/authentication/bindings';
 import ClusterConfigurationBindings from 'components/cluster-configuration/bindings';
 import ConfigurationBindings from 'components/configurations/bindings';
 
-import '@graylog/sawmill/fonts';
-import '@mantine/core/styles.css';
-import '@mantine/dropzone/styles.css';
-import '@mantine/notifications/styles.css';
+import 'theme/theme-styles';
 
 Reflux.setPromiseFactory((handlers) => CancellablePromise.of(new Promise(handlers)));
 
