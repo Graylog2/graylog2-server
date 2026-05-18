@@ -24,7 +24,6 @@ import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/us
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import useNotificationToggleRead from 'components/notifications/hooks/useNotificationToggleRead';
 import useNotificationBulkToggleRead from 'components/notifications/hooks/useNotificationBulkToggleRead';
-import useNotificationMarkAllRead from 'components/notifications/hooks/useNotificationMarkAllRead';
 import useNotificationBody from 'components/notifications/hooks/useNotificationBody';
 import type { NotificationType } from 'components/notifications/types';
 
@@ -37,9 +36,6 @@ jest.mock(
 );
 jest.mock(
   "components/notifications/hooks/useNotificationBulkToggleRead",
-);
-jest.mock(
-  "components/notifications/hooks/useNotificationMarkAllRead",
 );
 jest.mock(
   "components/notifications/hooks/useNotificationBody",
@@ -117,9 +113,6 @@ describe("SystemNotificationsTable", () => {
       isPending: false,
     } as any);
     asMock(useNotificationBulkToggleRead).mockReturnValue({
-      mutate: mockMutate,
-    } as any);
-    asMock(useNotificationMarkAllRead).mockReturnValue({
       mutate: mockMutate,
     } as any);
     asMock(useNotificationBody).mockReturnValue({
@@ -220,7 +213,7 @@ describe("SystemNotificationsTable", () => {
   });
 
   describe("bulk actions", () => {
-    it("renders bulk actions dropdown with toggle and mark-all items", async () => {
+    it("renders bulk actions dropdown with toggle read state item", async () => {
       asMock(useFetchEntities).mockReturnValue(mockFetchData([notif1]));
 
       render(<SystemNotificationsTable />);
@@ -238,71 +231,7 @@ describe("SystemNotificationsTable", () => {
       await userEvent.click(bulkDropdown);
 
       await screen.findByRole("menuitem", { name: /toggle read state/i });
-      await screen.findByRole("menuitem", { name: /mark all as read/i });
-    });
-
-    it("opens confirmation modal before marking all as read", async () => {
-      asMock(useFetchEntities).mockReturnValue(mockFetchData([notif1]));
-
-      render(<SystemNotificationsTable />);
-
-      await screen.findByTestId("table-row-notif-1");
-
-      const selectAll = screen.getByRole("checkbox", { name: /select all/i });
-
-      await userEvent.click(selectAll);
-
-      const bulkDropdown = await screen.findByRole("button", {
-        name: /bulk actions/i,
-      });
-
-      await userEvent.click(bulkDropdown);
-
-      const markAllItem = await screen.findByRole("menuitem", {
-        name: /mark all as read/i,
-      });
-
-      await userEvent.click(markAllItem);
-
-      await screen.findByText(/mark all notifications as read/i);
-      await screen.findByText(/all notifications you have permission to view/i);
-    });
-
-    it("does not call markAllRead when cancel is clicked in confirmation modal", async () => {
-      asMock(useFetchEntities).mockReturnValue(mockFetchData([notif1]));
-
-      render(<SystemNotificationsTable />);
-
-      await screen.findByTestId("table-row-notif-1");
-
-      const selectAll = screen.getByRole("checkbox", { name: /select all/i });
-
-      await userEvent.click(selectAll);
-
-      const bulkDropdown = await screen.findByRole("button", {
-        name: /bulk actions/i,
-      });
-
-      await userEvent.click(bulkDropdown);
-
-      await userEvent.click(
-        await screen.findByRole("menuitem", { name: /mark all as read/i }),
-      );
-
-      await screen.findByText(/mark all notifications as read/i);
-
-      const markAllMutate = jest.fn();
-
-      asMock(useNotificationMarkAllRead).mockReturnValue({
-        mutate: markAllMutate,
-      } as any);
-
-      await userEvent.click(screen.getByRole("button", { name: /cancel/i }));
-
-      expect(markAllMutate).not.toHaveBeenCalled();
-      expect(
-        screen.queryByText(/mark all notifications as read/i),
-      ).not.toBeInTheDocument();
+      expect(screen.queryByRole("menuitem", { name: /mark all as read/i })).not.toBeInTheDocument();
     });
   });
 

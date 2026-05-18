@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { MenuItem } from 'components/bootstrap';
@@ -23,17 +22,12 @@ import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDr
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import { NOTIFICATIONS_QUERY_KEY, TABLE_KEY } from 'components/notifications/constants';
 import useNotificationBulkToggleRead from 'components/notifications/hooks/useNotificationBulkToggleRead';
-import useNotificationMarkAllRead from 'components/notifications/hooks/useNotificationMarkAllRead';
 import type { PageShape } from 'components/notifications/types';
-
-import MarkAllAsReadConfirmationModal from './MarkAllAsReadConfirmationModal';
 
 const BulkActions = () => {
   const queryClient = useQueryClient();
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const { mutate: bulkToggleRead } = useNotificationBulkToggleRead();
-  const { mutate: markAllRead } = useNotificationMarkAllRead();
-  const [showMarkAllModal, setShowMarkAllModal] = useState(false);
   const tableKey = [...NOTIFICATIONS_QUERY_KEY, TABLE_KEY] as const;
 
   const getSelectedRowSeeds = () => {
@@ -53,25 +47,10 @@ const BulkActions = () => {
     });
   };
 
-  const handleMarkAllConfirm = () => {
-    markAllRead(undefined, {
-      onSuccess: () => setSelectedEntities([]),
-    });
-    setShowMarkAllModal(false);
-  };
-
   return (
-    <>
-      <BulkActionsDropdown>
-        <MenuItem onSelect={handleBulkToggle}>Toggle read state</MenuItem>
-        <MenuItem onSelect={() => setShowMarkAllModal(true)}>Mark all as read</MenuItem>
-      </BulkActionsDropdown>
-      <MarkAllAsReadConfirmationModal
-        show={showMarkAllModal}
-        onClose={() => setShowMarkAllModal(false)}
-        onConfirm={handleMarkAllConfirm}
-      />
-    </>
+    <BulkActionsDropdown>
+      <MenuItem onSelect={handleBulkToggle}>Toggle read state</MenuItem>
+    </BulkActionsDropdown>
   );
 };
 
