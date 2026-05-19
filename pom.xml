@@ -181,7 +181,7 @@
         <slf4j.version>2.0.17</slf4j.version>
         <streamex.version>0.8.3</streamex.version>
         <swagger.version>1.6.16</swagger.version>
-        <syslog4j.version>0.9.61</syslog4j.version>
+        <syslog4j.version>0.9.63</syslog4j.version>
         <threeten-extra.version>1.8.0</threeten-extra.version>
         <ulid.version>8.3.0</ulid.version>
         <unboundid-ldap.version>7.0.3</unboundid-ldap.version>
