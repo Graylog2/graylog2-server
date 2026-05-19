@@ -16,7 +16,7 @@
  */
 import { useMemo } from 'react';
 
-import type { DefaultLayout, ColumnPreferences } from 'components/common/EntityDataTable/types';
+import type { DefaultLayout, ColumnPreferences, SlicingPreferences } from 'components/common/EntityDataTable/types';
 
 import useUserLayoutPreferences from './useUserLayoutPreferences';
 
@@ -24,6 +24,7 @@ export type LayoutConfig = {
   attributes: ColumnPreferences;
   order: Array<string>;
   pageSize: number;
+  slicing?: SlicingPreferences;
   sort: DefaultLayout['defaultSort'];
 };
 
@@ -36,10 +37,7 @@ const useTableLayout = ({
   isInitialLoading: boolean;
   layoutConfig: LayoutConfig;
 } => {
-  const { data: userLayoutPreferences = {}, isInitialLoading } = useUserLayoutPreferences(
-    entityTableId,
-    layoutVariant,
-  );
+  const { data: userLayoutPreferences = {}, isInitialLoading } = useUserLayoutPreferences(entityTableId, layoutVariant);
 
   return useMemo(
     () => ({
@@ -47,6 +45,7 @@ const useTableLayout = ({
         attributes: userLayoutPreferences?.attributes,
         order: userLayoutPreferences.order,
         pageSize: userLayoutPreferences.perPage ?? defaultPageSize,
+        slicing: userLayoutPreferences.slicing,
         sort: userLayoutPreferences.sort ?? defaultSort,
       },
       isInitialLoading,
@@ -58,6 +57,7 @@ const useTableLayout = ({
       userLayoutPreferences?.attributes,
       userLayoutPreferences.order,
       userLayoutPreferences.perPage,
+      userLayoutPreferences.slicing,
       userLayoutPreferences.sort,
     ],
   );
