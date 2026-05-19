@@ -45,9 +45,9 @@ const baseTheme = {
 export const lightTheme = create({
   base: 'light',
   ...baseTheme,
-  appBg: light.background.body,
-  appContentBg: light.background.content,
-  appPreviewBg: light.background.body,
+  appBg: light.global.contentBackground,
+  appContentBg: light.global.contentBackground,
+  appPreviewBg: light.global.contentBackground,
   appBorderColor: light.misc.divider,
 
   textColor: light.text.primary,
@@ -56,9 +56,9 @@ export const lightTheme = create({
   barTextColor: light.text.primary,
   barSelectedColor: accentColor,
   barHoverColor: accentColor,
-  barBg: light.background.body,
+  barBg: light.global.contentBackground,
 
-  inputBg: light.background.body,
+  inputBg: light.global.contentBackground,
   inputBorder: light.input.border,
   inputTextColor: light.input.color,
 });
@@ -66,9 +66,9 @@ export const lightTheme = create({
 export const darkTheme = create({
   base: 'dark',
   ...baseTheme,
-  appBg: dark.global.background,
-  appContentBg: dark.background.content,
-  appPreviewBg: dark.global.background,
+  appBg: dark.global.contentBackground,
+  appContentBg: dark.global.contentBackground,
+  appPreviewBg: dark.global.contentBackground,
   appBorderColor: dark.background.secondaryNav,
 
   textColor: dark.text.primary,
@@ -77,7 +77,7 @@ export const darkTheme = create({
   barTextColor: dark.text.primary,
   barSelectedColor: accentColor,
   barHoverColor: accentColor,
-  barBg: dark.global.background,
+  barBg: dark.misc.divider,
 
   inputBg: dark.input.background,
   inputBorder: dark.input.border,
