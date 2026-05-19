@@ -21,7 +21,7 @@ import jakarta.inject.Named;
 import org.graylog.events.search.MoreSearch;
 import org.graylog.events.search.SourceStreamFilter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog2.metrics.cache.EntityCachedMetricsDescriptor;
+import org.graylog2.metrics.cache.EntityCachedMetricDescriptor;
 import org.graylog2.metrics.cache.MetricsCacheConfiguration;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 
@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 import static org.graylog2.plugin.Message.FIELD_GL2_SOURCE_INPUT;
 
 
-public class InputMessageCountDescriptor implements EntityCachedMetricsDescriptor<Map<String, Long>, Long> {
+public class InputMessageCountDescriptor implements EntityCachedMetricDescriptor<Map<String, Long>, Long> {
 
     public static final String FIELD_NAME = "message_count";
 

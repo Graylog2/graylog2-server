@@ -34,7 +34,7 @@ import java.util.List;
  * @param <C> the type of the cached value (e.g. {@code Map<String, Long>} for per-stream breakdowns)
  * @param <R> the type of the result after permission filtering (e.g. {@code Long} for a summed count)
  */
-public interface EntityCachedMetricsDescriptor<C, R> extends EntityMetricsDescriptor {
+public interface EntityCachedMetricDescriptor<C, R> extends EntityMetricDescriptor {
 
     /**
      * The cache TTL for this field. After this duration, the cached value is considered

@@ -18,9 +18,9 @@ package org.graylog2.metrics;
 
 import jakarta.ws.rs.BadRequestException;
 import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog2.metrics.cache.EntityCachedMetricsDescriptor;
-import org.graylog2.metrics.cache.EntityMetricsDescriptor;
-import org.graylog2.metrics.cache.EntityUncachedMetricsDescriptor;
+import org.graylog2.metrics.cache.EntityCachedMetricDescriptor;
+import org.graylog2.metrics.cache.EntityMetricDescriptor;
+import org.graylog2.metrics.cache.EntityUncachedMetricDescriptor;
 import org.graylog2.metrics.cache.MetricsCacheService;
 
 import java.time.Duration;
@@ -35,7 +35,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * Generic service that orchestrates entity metrics: cache lookup, permission filtering,
- * and delegating computation to the appropriate {@link EntityMetricsDescriptor}.
+ * and delegating computation to the appropriate {@link EntityMetricDescriptor}.
  * <p>
  * Each entity type (input, stream, etc.) gets its own instance, constructed with the set
  * of descriptors registered for that entity type via Guice multibinding.
@@ -44,16 +44,16 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 public class EntityMetricsService {
 
     private final String entityType;
-    private final Map<String, EntityMetricsDescriptor> descriptorsByField;
+    private final Map<String, EntityMetricDescriptor> descriptorsByField;
     private final MetricsCacheService cacheService;
 
     public EntityMetricsService(String entityType,
-                                Set<EntityMetricsDescriptor> descriptors,
+                                Set<EntityMetricDescriptor> descriptors,
                                 MetricsCacheService cacheService) {
         this.entityType = entityType;
         this.cacheService = cacheService;
         this.descriptorsByField = descriptors.stream()
-                .collect(Collectors.toMap(EntityMetricsDescriptor::fieldName, d -> d));
+                .collect(Collectors.toMap(EntityMetricDescriptor::fieldName, d -> d));
     }
 
     /**
@@ -70,13 +70,13 @@ public class EntityMetricsService {
         validateFields(fields);
 
         final var builder = EntityMetricValues.builder();
-        final Map<String, EntityCachedMetricsDescriptor<?, ?>> cachedDescriptors = new HashMap<>();
+        final Map<String, EntityCachedMetricDescriptor<?, ?>> cachedDescriptors = new HashMap<>();
 
         for (final String field : fields) {
-            final EntityMetricsDescriptor descriptor = descriptorsByField.get(field);
-            if (descriptor instanceof EntityCachedMetricsDescriptor<?, ?> cached) {
+            final EntityMetricDescriptor descriptor = descriptorsByField.get(field);
+            if (descriptor instanceof EntityCachedMetricDescriptor<?, ?> cached) {
                 cachedDescriptors.put(field, cached);
-            } else if (descriptor instanceof EntityUncachedMetricsDescriptor<?> uncached) {
+            } else if (descriptor instanceof EntityUncachedMetricDescriptor<?> uncached) {
                 uncached.compute(entityIds, searchUser)
                         .forEach(metric -> builder.put(metric.entityId(), uncached.fieldName(), metric.value()));
             }
@@ -101,7 +101,7 @@ public class EntityMetricsService {
     }
 
     private void mergeCachedFields(Map<String, Map<String, Object>> freshFields,
-                                   Map<String, EntityCachedMetricsDescriptor<?, ?>> cachedDescriptors,
+                                   Map<String, EntityCachedMetricDescriptor<?, ?>> cachedDescriptors,
                                    SearchUser searchUser,
                                    EntityMetricValues.Builder builder) {
         freshFields.forEach((entityId, fields) ->
@@ -112,7 +112,7 @@ public class EntityMetricsService {
         );
     }
 
-    private <C, R> void computeAndCache(EntityCachedMetricsDescriptor<C, R> descriptor,
+    private <C, R> void computeAndCache(EntityCachedMetricDescriptor<C, R> descriptor,
                                         Collection<String> entityIds,
                                         SearchUser searchUser,
                                         EntityMetricValues.Builder builder) {
@@ -127,7 +127,7 @@ public class EntityMetricsService {
     }
 
     @SuppressWarnings("unchecked")
-    private static <C, R> R applyFilter(EntityCachedMetricsDescriptor<C, R> descriptor,
+    private static <C, R> R applyFilter(EntityCachedMetricDescriptor<C, R> descriptor,
                                         Object cachedValue,
                                         SearchUser searchUser) {
         return descriptor.computeForUser((C) cachedValue, searchUser);

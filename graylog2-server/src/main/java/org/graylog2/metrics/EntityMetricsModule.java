@@ -20,12 +20,12 @@ import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import org.graylog2.inputs.InputServiceImpl;
-import org.graylog2.metrics.cache.EntityMetricsDescriptor;
+import org.graylog2.metrics.cache.EntityMetricDescriptor;
 
 /**
  * Guice module for entity metrics bindings.
  * <p>
- * Registers open-source {@link EntityMetricsDescriptor} implementations via named multibindings.
+ * Registers open-source {@link EntityMetricDescriptor} implementations via named multibindings.
  * Enterprise plugins add additional descriptors to the same named sets in their own modules.
  * </p>
  * <p>
@@ -39,8 +39,8 @@ public class EntityMetricsModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        final Multibinder<EntityMetricsDescriptor> inputDescriptors =
-                Multibinder.newSetBinder(binder(), EntityMetricsDescriptor.class, Names.named(ENTITY_TYPE_INPUTS));
+        final Multibinder<EntityMetricDescriptor> inputDescriptors =
+                Multibinder.newSetBinder(binder(), EntityMetricDescriptor.class, Names.named(ENTITY_TYPE_INPUTS));
         inputDescriptors.addBinding().to(InputMessageCountDescriptor.class);
         inputDescriptors.addBinding().to(InputAssociatedStreamsDescriptor.class);
     }

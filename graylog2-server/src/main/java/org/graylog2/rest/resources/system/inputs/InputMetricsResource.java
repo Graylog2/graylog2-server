@@ -30,7 +30,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.metrics.EntityMetricsResponse;
 import org.graylog2.metrics.EntityMetricsService;
-import org.graylog2.metrics.cache.EntityMetricsDescriptor;
+import org.graylog2.metrics.cache.EntityMetricDescriptor;
 import org.graylog2.metrics.cache.MetricsCacheService;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
@@ -48,7 +48,7 @@ public class InputMetricsResource extends RestResource {
     private final EntityMetricsService metricsService;
 
     @Inject
-    public InputMetricsResource(@Named(ENTITY_TYPE_INPUTS) Set<EntityMetricsDescriptor> descriptors,
+    public InputMetricsResource(@Named(ENTITY_TYPE_INPUTS) Set<EntityMetricDescriptor> descriptors,
                                 MetricsCacheService cacheService) {
         this.metricsService = new EntityMetricsService(
                 ENTITY_TYPE_INPUTS, descriptors, cacheService);

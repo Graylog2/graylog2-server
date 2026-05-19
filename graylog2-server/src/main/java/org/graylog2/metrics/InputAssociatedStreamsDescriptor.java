@@ -21,7 +21,7 @@ import jakarta.inject.Named;
 import org.graylog.events.search.MoreSearch;
 import org.graylog.events.search.SourceStreamFilter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog2.metrics.cache.EntityCachedMetricsDescriptor;
+import org.graylog2.metrics.cache.EntityCachedMetricDescriptor;
 import org.graylog2.metrics.cache.MetricsCacheConfiguration;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 
@@ -41,7 +41,7 @@ import static org.graylog2.plugin.Message.FIELD_GL2_SOURCE_INPUT;
  * On read, {@link #computeForUser} filters by the user's {@code streams:read:<id>} permissions.
  * </p>
  */
-public class InputAssociatedStreamsDescriptor implements EntityCachedMetricsDescriptor<List<String>, List<String>> {
+public class InputAssociatedStreamsDescriptor implements EntityCachedMetricDescriptor<List<String>, List<String>> {
 
     public static final String FIELD_NAME = "associated_streams";
 

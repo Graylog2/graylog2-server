@@ -20,9 +20,9 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.database.MongoCollections;
-import org.graylog2.metrics.cache.EntityCachedMetricsDescriptor;
-import org.graylog2.metrics.cache.EntityMetricsDescriptor;
-import org.graylog2.metrics.cache.EntityUncachedMetricsDescriptor;
+import org.graylog2.metrics.cache.EntityCachedMetricDescriptor;
+import org.graylog2.metrics.cache.EntityMetricDescriptor;
+import org.graylog2.metrics.cache.EntityUncachedMetricDescriptor;
 import org.graylog2.metrics.cache.MetricsCacheService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -149,14 +149,14 @@ class EntityMetricsServiceTest {
                 .containsEntry("pipeline_count", 2);
     }
 
-    private EntityMetricsService createService(EntityMetricsDescriptor descriptor) {
+    private EntityMetricsService createService(EntityMetricDescriptor descriptor) {
         return new EntityMetricsService(ENTITY_TYPE, Set.of(descriptor), cacheService);
     }
 
     /**
      * Test cached descriptor that stores per-stream breakdowns and filters by stream permissions.
      */
-    private static class TestCachedDescriptor implements EntityCachedMetricsDescriptor<Map<String, Long>, Long> {
+    private static class TestCachedDescriptor implements EntityCachedMetricDescriptor<Map<String, Long>, Long> {
         private final String fieldName;
         private final Duration cacheTtl;
         private final List<EntityMetric<Map<String, Long>>> computeResult;
@@ -192,7 +192,7 @@ class EntityMetricsServiceTest {
     /**
      * Test uncached descriptor that filters pipelines by user permissions.
      */
-    private static class TestUncachedDescriptor implements EntityUncachedMetricsDescriptor<Integer> {
+    private static class TestUncachedDescriptor implements EntityUncachedMetricDescriptor<Integer> {
         private final String fieldName;
 
         TestUncachedDescriptor(String fieldName) {

@@ -24,12 +24,12 @@ package org.graylog2.metrics.cache;
  * <p>
  * Implementations should use one of the sub-interfaces:
  * <ul>
- *   <li>{@link EntityCachedMetricsDescriptor} — for fields cached in MongoDB (e.g. OpenSearch aggregations)</li>
- *   <li>{@link EntityUncachedMetricsDescriptor} — for fields computed fresh per request (e.g. domain model queries)</li>
+ *   <li>{@link EntityCachedMetricDescriptor} — for fields cached in MongoDB (e.g. OpenSearch aggregations)</li>
+ *   <li>{@link EntityUncachedMetricDescriptor} — for fields computed fresh per request (e.g. domain model queries)</li>
  * </ul>
  * </p>
  */
-public interface EntityMetricsDescriptor {
+public interface EntityMetricDescriptor {
 
     /**
      * The field name this descriptor provides (e.g. "message_count", "pipeline_count").

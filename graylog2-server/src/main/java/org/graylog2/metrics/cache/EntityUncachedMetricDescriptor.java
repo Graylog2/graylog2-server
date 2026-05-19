@@ -32,7 +32,7 @@ import java.util.List;
  *
  * @param <R> the type of the computed result
  */
-public interface EntityUncachedMetricsDescriptor<R> extends EntityMetricsDescriptor {
+public interface EntityUncachedMetricDescriptor<R> extends EntityMetricDescriptor {
 
     /**
      * Computes fresh values for the given entity IDs, filtered by the user's permissions.
