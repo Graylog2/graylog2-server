@@ -21,65 +21,40 @@ import { create } from 'storybook/theming';
 import graylogLogo from '../graylog-logo.png';
 
 // Mirrors the pure function calls inside useThemes, without the React hook wrappers.
-const { colors: light, fonts } = SawmillSC(SawmillMantine({ colorScheme: 'light' }));
-const { colors: dark } = SawmillSC(SawmillMantine({ colorScheme: 'dark' }));
 
-const accentColor = light.variant.info;
-
-const baseTheme = {
+const baseConfiguration = {
   brandTitle: 'Graylog Design System',
   brandUrl: 'https://graylog.org/',
   brandTarget: '_block',
   brandImage: graylogLogo,
 
-  fontBase: fonts.family.body,
-  fontCode: fonts.family.monospace,
-
-  colorPrimary: accentColor,
-  colorSecondary: '#9A6BFE',
-
   appBorderRadius: 4,
   inputBorderRadius: 2,
 };
 
-export const lightTheme = create({
-  base: 'light',
-  ...baseTheme,
-  appBg: light.global.contentBackground,
-  appContentBg: light.global.contentBackground,
-  appPreviewBg: light.global.contentBackground,
-  appBorderColor: light.misc.divider,
+const colorsConfiguration = (colorScheme: 'light' | 'dark') => {
+  const { colors, fonts } = SawmillSC(SawmillMantine({ colorScheme }));
 
-  textColor: light.text.primary,
-  textInverseColor: light.global.textAlt,
+  return {
+    appBg: colors.global.contentBackground,
+    appContentBg: colors.global.contentBackground,
+    appPreviewBg: colors.global.contentBackground,
+    appBorderColor: colors.misc.divider,
+    colorPrimary: colors.brand.primary,
 
-  barTextColor: light.text.primary,
-  barSelectedColor: accentColor,
-  barHoverColor: accentColor,
-  barBg: light.global.contentBackground,
+    textColor: colors.text.primary,
+    textInverseColor: colors.global.textAlt,
+    fontBase: fonts.family.body,
+    fontCode: fonts.family.monospace,
 
-  inputBg: light.global.contentBackground,
-  inputBorder: light.input.border,
-  inputTextColor: light.input.color,
-});
+    barBg: colors.global.contentBackground,
+    barTextColor: colors.text.primary,
 
-export const darkTheme = create({
-  base: 'dark',
-  ...baseTheme,
-  appBg: dark.global.contentBackground,
-  appContentBg: dark.global.contentBackground,
-  appPreviewBg: dark.global.contentBackground,
-  appBorderColor: dark.background.secondaryNav,
+    inputBg: colors.input.background,
+    inputBorder: colors.input.border,
+    inputTextColor: colors.input.color,
+  };
+};
 
-  textColor: dark.text.primary,
-  textInverseColor: dark.global.textAlt,
-
-  barTextColor: dark.text.primary,
-  barSelectedColor: accentColor,
-  barHoverColor: accentColor,
-  barBg: dark.misc.divider,
-
-  inputBg: dark.input.background,
-  inputBorder: dark.input.border,
-  inputTextColor: dark.input.color,
-});
+export const lightTheme = create({ base: 'light', ...baseConfiguration, ...colorsConfiguration('light') });
+export const darkTheme = create({ base: 'dark', ...baseConfiguration, ...colorsConfiguration('dark') });
