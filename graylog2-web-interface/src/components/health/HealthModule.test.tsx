@@ -18,17 +18,22 @@ import * as React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen, within } from 'wrappedTestingLibrary';
 
+import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
+
 import HealthModule from './HealthModule';
+import useHealthModuleVisible from './useHealthModuleVisible';
 
-jest.mock('./useHealthModuleVisible', () => ({
-  __esModule: true,
-  default: () => true,
-}));
+jest.mock('./useHealthModuleVisible');
+jest.mock('hooks/usePluggableLicenseCheck');
 
-jest.mock('hooks/usePluggableLicenseCheck', () => ({
-  __esModule: true,
-  default: () => ({ data: { valid: true } }),
-}));
+const mockedUseHealthModuleVisible = jest.mocked(useHealthModuleVisible);
+const mockedUsePluggableLicenseCheck = jest.mocked(usePluggableLicenseCheck);
+
+const licenseCheckResult = (valid: boolean): ReturnType<typeof usePluggableLicenseCheck> => ({
+  data: { valid, expired: false, violated: false },
+  isInitialLoading: false,
+  refetch: () => {},
+});
 
 const clickInTree = async (label: string) => {
   const tree = screen.getByLabelText('Cluster health tree');
@@ -37,6 +42,11 @@ const clickInTree = async (label: string) => {
 };
 
 describe('HealthModule', () => {
+  beforeEach(() => {
+    mockedUseHealthModuleVisible.mockReturnValue(true);
+    mockedUsePluggableLicenseCheck.mockReturnValue(licenseCheckResult(true));
+  });
+
   it('renders the interpretation legend by default when the synthetic root is selected', () => {
     render(<HealthModule />);
 
@@ -135,5 +145,21 @@ describe('HealthModule', () => {
 
     expect(within(tree).getByText('Graylog')).toBeInTheDocument();
     expect(within(tree).getByText('MongoDB')).toBeInTheDocument();
+  });
+
+  it('does not render when the visibility flag is off', () => {
+    mockedUseHealthModuleVisible.mockReturnValue(false);
+
+    render(<HealthModule />);
+
+    expect(screen.queryByRole('heading', { name: 'Health of Graylog Deployment' })).not.toBeInTheDocument();
+  });
+
+  it('does not render when no enterprise license is present', () => {
+    mockedUsePluggableLicenseCheck.mockReturnValue(licenseCheckResult(false));
+
+    render(<HealthModule />);
+
+    expect(screen.queryByRole('heading', { name: 'Health of Graylog Deployment' })).not.toBeInTheDocument();
   });
 });
