@@ -28,12 +28,8 @@ import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
 
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -81,7 +77,7 @@ public class OpensearchConfigurationService extends AbstractIdleService {
                 .collect(Collectors.toList());
 
         return new OpensearchConfiguration(
-                datanodeConfiguration.opensearchDistributionProvider().get(),
+                datanodeConfiguration.opensearchDistribution(),
                 datanodeConfiguration.datanodeDirectories(),
                 targetConfigDir,
                 localConfiguration.getHostname(),
