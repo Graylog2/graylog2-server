@@ -350,7 +350,7 @@ public class UsersResourceTest {
     }
 
     @Test
-    void usersCanRevokeTheirOwnToken() {
+    public void usersCanRevokeTheirOwnToken() {
         final AccessToken accessToken = prepareRevokeMocks(USERNAME, true, true);
         try {
             usersResource.revokeToken(USERNAME, TOKEN_NAME);
@@ -362,7 +362,7 @@ public class UsersResourceTest {
     }
 
     @Test
-    void revokingWithoutPermissionThrowsForbidden() {
+    public void revokingWithoutPermissionThrowsForbidden() {
         prepareRevokeMocks(USERNAME, false, true);
         try {
             assertThrows(ForbiddenException.class, () -> usersResource.revokeToken(USERNAME, TOKEN_NAME));
@@ -373,7 +373,7 @@ public class UsersResourceTest {
     }
 
     @Test
-    void usersCanNotRevokeOtherUsersToken() {
+    public void usersCanNotRevokeOtherUsersToken() {
         final String accessingUser = "Dee-Dee";
         prepareRevokeMocks(accessingUser, true, true);
         try {
@@ -385,7 +385,7 @@ public class UsersResourceTest {
     }
 
     @Test
-    void revokingNonExistingTokenThrowsNotFound() {
+    public void revokingNonExistingTokenThrowsNotFound() {
         prepareRevokeMocks(USERNAME, true, false);
         try {
             assertThrows(jakarta.ws.rs.NotFoundException.class, () -> usersResource.revokeToken(USERNAME, TOKEN_NAME));
