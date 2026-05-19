@@ -14,12 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+package org.graylog.plugins.views.search.errors;
 
-type PopoverProps = {
-  children: any;
-};
+import org.graylog.plugins.views.search.Query;
 
-const Popover = ({ children }: PopoverProps) => <>{children}</>;
+import javax.annotation.Nonnull;
 
-export default Popover;
+public class QueryTimeRangeLimitError extends QueryError {
+    public QueryTimeRangeLimitError(@Nonnull Query query, @Nonnull String description, boolean fatal) {
+        super(query, description, fatal);
+    }
+}
