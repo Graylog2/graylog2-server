@@ -41,6 +41,7 @@ import {
   newFiltersForQuery,
 } from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
+import { QUERY_TIME_RANGE_LIMIT_ERROR_TYPE } from 'views/Constants';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
@@ -75,6 +76,7 @@ import { defaultCompare } from 'logic/DefaultCompare';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
+import useSearchResultTimeRangeErrorCheck from 'views/hooks/useSearchResultTimeRangeErrorCheck';
 import StreamsFilter from 'views/components/searchbar/StreamsFilter';
 import type { StreamsAndCategoriesSelection } from 'views/components/common/StreamsAndCategoriesFilter';
 
@@ -212,6 +214,8 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
   const handlerContext = useHandlerContext();
   const isLoadingExecution = useIsLoading();
 
+  const searchResultTimeRangeErrorCheck = useSearchResultTimeRangeErrorCheck(QUERY_TIME_RANGE_LIMIT_ERROR_TYPE);
+
   if (!currentQuery || !config) {
     return <Spinner />;
   }
@@ -241,7 +245,9 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
               setFieldValue,
               validateForm,
             }) => {
-              const disableSearchSubmit = isSubmitting || isValidating || !isValid || isLoadingExecution;
+              const showTimeRangeErrorFromResults = searchResultTimeRangeErrorCheck(values?.timerange);
+              const disableSearchSubmit =
+                isSubmitting || isValidating || !isValid || isLoadingExecution || showTimeRangeErrorFromResults;
 
               return (
                 <>
@@ -257,7 +263,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
                         limitDuration={limitDuration}
                         onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                         value={values?.timerange}
-                        hasErrorOnMount={!!errors.timerange}
+                        hasErrorOnMount={!!errors.timerange || showTimeRangeErrorFromResults}
                         moveRangeProps={{
                           effectiveTimerange: results?.effectiveTimerange,
                           initialTimerange: currentQuery.timerange,

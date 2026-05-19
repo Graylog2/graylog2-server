@@ -110,7 +110,7 @@ class OpensearchCommonConfigurationBeanTest {
 
     private DatanodeConfiguration mockDatanodeConfiguration(Path tempDir) {
         return new DatanodeConfiguration(
-                () -> new OpensearchDistribution(tempDir, "2.19.5"),
+                new OpensearchDistribution(tempDir, "2.19.5"),
                 DatanodeTestUtils.tempDirectories(tempDir),
                 100,
                 IndexerJwtAuthToken.disabled()

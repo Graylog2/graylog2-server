@@ -29,7 +29,7 @@ import connect from 'stores/connect';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import type Widget from 'views/logic/widgets/Widget';
 import type { SearchBarFormValues } from 'views/Constants';
-import { DEFAULT_TIMERANGE } from 'views/Constants';
+import { SEARCH_TYPE_RANGE_LIMIT_ERROR_TYPE, DEFAULT_TIMERANGE } from 'views/Constants';
 import type GlobalOverride from 'views/logic/search/GlobalOverride';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import { PropagateDisableSubmissionState } from 'views/components/aggregationwizard';
@@ -63,6 +63,7 @@ import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import { defaultCompare } from 'logic/DefaultCompare';
 import { executeActiveQuery } from 'views/logic/slices/viewSlice';
+import useSearchResultTimeRangeErrorCheck from 'views/hooks/useSearchResultTimeRangeErrorCheck';
 import type { StreamsAndCategoriesSelection } from 'views/components/common/StreamsAndCategoriesFilter';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
@@ -242,6 +243,8 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
 
   useBindApplySearchControlsChanges(formRef);
 
+  const searchResultTimeRangeErrorCheck = useSearchResultTimeRangeErrorCheck(SEARCH_TYPE_RANGE_LIMIT_ERROR_TYPE);
+
   return (
     <FormWarningsProvider>
       <SearchBarForm
@@ -251,7 +254,8 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
         onSubmit={_onSubmit}
         validateQueryString={validate}>
         {({ dirty, errors, isValid, isSubmitting, handleSubmit, values, setFieldValue, validateForm }) => {
-          const disableSearchSubmit = isSubmitting || isValidatingQuery || !isValid;
+          const showTimeRangeErrorFromResults = searchResultTimeRangeErrorCheck(values?.timerange);
+          const disableSearchSubmit = isSubmitting || isValidatingQuery || !isValid || showTimeRangeErrorFromResults;
 
           return (
             <Container>
@@ -267,7 +271,7 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                     limitDuration={limitDuration}
                     onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                     value={values?.timerange}
-                    hasErrorOnMount={!!errors.timerange}
+                    hasErrorOnMount={!!errors.timerange || showTimeRangeErrorFromResults}
                   />
                 )}
                 {hasTimeRangeOverride && (
