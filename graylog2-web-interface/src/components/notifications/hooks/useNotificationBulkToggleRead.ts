@@ -14,21 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { SystemNotifications } from "@graylog/server-api";
+import { SystemNotifications } from '@graylog/server-api';
 
-import UserNotification from "util/UserNotification";
-import type FetchError from "logic/errors/FetchError";
-import {
-  NOTIFICATIONS_QUERY_KEY,
-  BADGE_COUNT_KEY,
-  TABLE_KEY,
-} from "components/notifications/constants";
+import UserNotification from 'util/UserNotification';
+import type FetchError from 'logic/errors/FetchError';
+import { NOTIFICATIONS_QUERY_KEY, BADGE_COUNT_KEY, TABLE_KEY } from 'components/notifications/constants';
 
 type RowSeed = { id: string; currentIsRead: boolean };
 
-const useNotificationBulkToggleRead = () => {
+const useNotificationBulkReadAll = () => {
   const queryClient = useQueryClient();
   const tableKey = [...NOTIFICATIONS_QUERY_KEY, TABLE_KEY] as const;
   const badgeKey = [...NOTIFICATIONS_QUERY_KEY, BADGE_COUNT_KEY] as const;
@@ -48,20 +44,14 @@ const useNotificationBulkToggleRead = () => {
       if (error?.status === 403) return;
 
       if (error?.status === 400) {
-        UserNotification.warning(
-          "No notifications selected.",
-          "Nothing to update",
-        );
+        UserNotification.warning('No notifications selected.', 'Nothing to update');
 
         return;
       }
 
-      UserNotification.error(
-        "Failed to update notification read states. Please try again.",
-        "Update failed",
-      );
+      UserNotification.error('Failed to update notification read states. Please try again.', 'Update failed');
     },
   });
 };
 
-export default useNotificationBulkToggleRead;
+export default useNotificationBulkReadAll;
