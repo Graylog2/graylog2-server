@@ -14,10 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.metrics.cache;
+package org.graylog2.metrics.entity.cache;
 
 import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog2.metrics.EntityMetric;
+import org.graylog2.metrics.entity.EntityMetric;
+import org.graylog2.metrics.entity.EntityMetricDescriptor;
 
 import java.time.Duration;
 import java.util.Collection;

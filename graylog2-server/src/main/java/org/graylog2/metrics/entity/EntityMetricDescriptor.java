@@ -14,7 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.metrics.cache;
+package org.graylog2.metrics.entity;
+
+import org.graylog2.metrics.entity.cache.EntityCachedMetricDescriptor;
 
 /**
  * Base interface for pluggable entity metric descriptors.

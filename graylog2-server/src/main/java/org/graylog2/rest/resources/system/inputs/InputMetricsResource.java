@@ -28,17 +28,17 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog2.metrics.EntityMetricsResponse;
-import org.graylog2.metrics.EntityMetricsService;
-import org.graylog2.metrics.cache.EntityMetricDescriptor;
-import org.graylog2.metrics.cache.MetricsCacheService;
+import org.graylog2.metrics.entity.EntityMetricDescriptor;
+import org.graylog2.metrics.entity.EntityMetricsResponse;
+import org.graylog2.metrics.entity.EntityMetricsService;
+import org.graylog2.metrics.entity.cache.MetricsCacheService;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
 import java.util.List;
 import java.util.Set;
 
-import static org.graylog2.metrics.EntityMetricsModule.ENTITY_TYPE_INPUTS;
+import static org.graylog2.metrics.entity.EntityMetricsModule.ENTITY_TYPE_INPUTS;
 
 @RequiresAuthentication
 @Path("/system/inputs/metrics")

@@ -14,16 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.metrics;
+package org.graylog2.metrics.entity;
 
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.database.MongoCollections;
-import org.graylog2.metrics.cache.EntityCachedMetricDescriptor;
-import org.graylog2.metrics.cache.EntityMetricDescriptor;
-import org.graylog2.metrics.cache.EntityUncachedMetricDescriptor;
-import org.graylog2.metrics.cache.MetricsCacheService;
+import org.graylog2.metrics.entity.cache.EntityCachedMetricDescriptor;
+import org.graylog2.metrics.entity.cache.MetricsCacheService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

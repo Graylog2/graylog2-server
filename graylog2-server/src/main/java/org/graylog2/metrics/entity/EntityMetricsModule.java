@@ -14,13 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.metrics;
+package org.graylog2.metrics.entity;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import org.graylog2.inputs.InputServiceImpl;
-import org.graylog2.metrics.cache.EntityMetricDescriptor;
+import org.graylog2.inputs.metrics.InputAssociatedStreamsDescriptor;
+import org.graylog2.inputs.metrics.InputMessageCountDescriptor;
 
 /**
  * Guice module for entity metrics bindings.

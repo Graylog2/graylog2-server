@@ -14,11 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.metrics;
+package org.graylog2.inputs.metrics;
 
 import org.graylog.events.search.MoreSearch;
 import org.graylog.events.search.SourceStreamFilter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog2.metrics.entity.EntityMetric;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

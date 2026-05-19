@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.metrics.cache;
+package org.graylog2.metrics.entity.cache;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.graylog2.database.indices.MongoDbIndexTools.ensureTTLIndex;
-import static org.graylog2.metrics.cache.MetricsCacheConfiguration.METRICS_CACHE_CLEANUP_TTL;
+import static org.graylog2.metrics.entity.cache.MetricsCacheConfiguration.METRICS_CACHE_CLEANUP_TTL;
 
 /**
  * Service for caching expensive entity metrics (e.g. OpenSearch aggregations) in MongoDB.

@@ -14,16 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.metrics;
+package org.graylog2.metrics.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.Map;
-
-public record EntityMetricsResponse(
-        @JsonProperty("metrics") Map<String, Map<String, Object>> metrics
-) {
-    public static EntityMetricsResponse fromValues(EntityMetricValues values) {
-        return new EntityMetricsResponse(values.toMap());
-    }
+public record EntityMetric<T>(String entityId, T value) {
 }
