@@ -40,7 +40,7 @@ public class OpensearchBinPreflightCheck implements PreflightCheck {
 
     @Inject
     public OpensearchBinPreflightCheck(DatanodeConfiguration datanodeConfiguration) {
-        this(datanodeConfiguration.opensearchDistributionProvider()::get);
+        this(datanodeConfiguration::opensearchDistribution);
     }
 
     OpensearchBinPreflightCheck(Supplier<OpensearchDistribution> distribution) {

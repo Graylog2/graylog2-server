@@ -1,0 +1,22 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@storybook/react": ["./node_modules/@storybook/react/dist/index.d.ts"],
+      "@storybook/react-webpack5": ["./node_modules/@storybook/react-webpack5/dist/index.d.ts"],
+      "storybook/theming": ["./node_modules/storybook/dist/theming/index.d.ts"],
+      "storybook/test": ["./node_modules/storybook/dist/test/index.d.ts"],
+      "csstype": ["../../node_modules/csstype/index"],
+      "@graylog/server-api": ["../../target/api"],
+      "*": ["../../src/*", "../../test/*"]
+    }
+  },
+  "include": [
+    ".storybook/**/*",
+    "stories/**/*",
+    "../../src/types.d.ts",
+    "../../src/@types/**/*",
+    "../../src/components/content-stream/type.d.ts"
+  ]
+}
