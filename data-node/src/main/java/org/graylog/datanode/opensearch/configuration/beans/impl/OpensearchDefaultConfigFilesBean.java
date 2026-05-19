@@ -17,6 +17,8 @@
 package org.graylog.datanode.opensearch.configuration.beans.impl;
 
 import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
+import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
@@ -43,6 +45,13 @@ import java.util.List;
 
 public class OpensearchDefaultConfigFilesBean implements DatanodeConfigurationBean<OpensearchConfigurationParams> {
 
+    private final DatanodeConfiguration datanodeConfiguration;
+
+    @Inject
+    public OpensearchDefaultConfigFilesBean(DatanodeConfiguration datanodeConfiguration) {
+        this.datanodeConfiguration = datanodeConfiguration;
+    }
+
     @Override
     public DatanodeConfigurationPart buildConfigurationPart(OpensearchConfigurationParams configurationParams) {
         return DatanodeConfigurationPart.builder()
@@ -60,17 +69,26 @@ public class OpensearchDefaultConfigFilesBean implements DatanodeConfigurationBe
     }
 
     private List<DatanodeConfigFile> collectConfigFiles() {
-        // this is a directory in main/resources that holds all the initial configuration files needed by the opensearch
+        List<DatanodeConfigFile> configFiles = new LinkedList<>();
+        // this is a directory in main/resources that holds all the common initial configuration files needed by the opensearch
         // we manage this directory in git. Generally we assume that this is a read-only location and we need to copy
         // its content to a read-write location for the managed opensearch process.
         // This copy happens during each opensearch process start and will override any files that already exist
         // from previous runs.
-        final Path sourceOfInitialConfiguration = Path.of("opensearch", "config");
+        final Path sourceOfInitialConfiguration = Path.of("opensearch", "config", "common");
         try {
-            return readConfigFiles(sourceOfInitialConfiguration);
+            configFiles.addAll(readConfigFiles(sourceOfInitialConfiguration));
         } catch (URISyntaxException | IOException e) {
             throw new RuntimeException(e);
         }
+
+        final String opensearchVersion = datanodeConfiguration.opensearchDistribution().version();
+        try {
+            configFiles.addAll(readConfigFiles(Path.of("opensearch", "config", opensearchVersion)));
+        } catch (URISyntaxException | IOException e) {
+            throw new RuntimeException(e);
+        }
+        return configFiles;
     }
 
     public List<DatanodeConfigFile> readConfigFiles(Path configRelativePath) throws URISyntaxException, IOException {
