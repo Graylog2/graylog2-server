@@ -38,6 +38,7 @@ const Popover = ({ opened, onDismiss, onChange, ...props }: React.ComponentProps
 
       if (dismissedByMantineRef.current) {
         dismissedByMantineRef.current = false;
+
         return;
       }
 
