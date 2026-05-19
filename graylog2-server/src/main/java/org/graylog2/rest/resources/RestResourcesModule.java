@@ -42,7 +42,9 @@ import org.graylog2.rest.resources.datanodes.DataNodeManagementResource;
 import org.graylog2.rest.resources.datanodes.DataNodeRestApiProxyResource;
 import org.graylog2.rest.resources.datanodes.DatanodeResource;
 import org.graylog2.rest.resources.datanodes.DatanodeUpgradeResource;
+import com.google.inject.multibindings.MapBinder;
 import org.graylog2.rest.resources.entities.preferences.EntityListPreferencesResource;
+import org.graylog2.rest.resources.entities.preferences.metrics.EntityListMetricProvider;
 import org.graylog2.rest.resources.messages.MessageResource;
 import org.graylog2.rest.resources.mongodb.MongodbClusterResource;
 import org.graylog2.rest.resources.roles.RolesResource;
@@ -164,6 +166,7 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(TrafficResource.class);
         addSystemRestResource(SearchVersionResource.class);
         addSystemRestResource(EntityListPreferencesResource.class);
+        MapBinder.newMapBinder(binder(), String.class, EntityListMetricProvider.class);
         addSystemRestResource(TelemetryResource.class);
         addSystemRestResource(ContentStreamResource.class);
         addSystemRestResource(CertificateRenewalResource.class);

@@ -22,6 +22,8 @@ import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import org.assertj.core.api.Assertions;
 import org.graylog.datanode.DatanodeTestUtils;
+import org.graylog.datanode.OpensearchDistribution;
+import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.configuration.snapshots.AzureRepositoryConfiguration;
@@ -33,6 +35,7 @@ import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationPara
 import org.graylog.datanode.opensearch.configuration.OpensearchUsableSpace;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
 import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreItem;
+import org.graylog2.security.jwt.IndexerJwtAuthToken;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -54,18 +57,19 @@ class SearchableSnapshotsConfigurationBeanTest {
 
         ));
 
+        final DatanodeConfiguration datanodeConfiguration = datanodeConfiguration(tempDir);
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
                 DatanodeTestUtils.datanodeConfiguration(Map.of(
                         "node_search_cache_size", "10gb"
                 ), tempDir),
-                datanodeDirectories(tempDir),
+                datanodeConfiguration,
                 Set.of(config),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
 
         Assertions.assertThat(configurationPart.nodeRoles())
-                .contains(OpensearchNodeRole.SEARCH);
+                .contains(datanodeConfiguration.opensearchDistribution().distributionProperties().searchableSnapshotsRole());
 
         Assertions.assertThat(configurationPart.keystoreItems())
                 .map(OpensearchKeystoreItem::key)
@@ -75,8 +79,8 @@ class SearchableSnapshotsConfigurationBeanTest {
                 .containsKeys("s3.client.default.endpoint", "node.search.cache.size");
     }
 
-    private DatanodeDirectories datanodeDirectories(Path tempDir) {
-        return new DatanodeDirectories(tempDir, tempDir, tempDir, tempDir);
+    private DatanodeConfiguration datanodeConfiguration(Path tempDir) {
+        return new DatanodeConfiguration(new OpensearchDistribution(tempDir, "2.19.5"), new DatanodeDirectories(tempDir, tempDir, tempDir, tempDir), 100, IndexerJwtAuthToken.disabled());
     }
 
     @Test
@@ -89,18 +93,19 @@ class SearchableSnapshotsConfigurationBeanTest {
                 "gcs_credentials_file", credentialsFileName
         ));
 
+        final DatanodeConfiguration datanodeConfiguration = datanodeConfiguration(tempDir);
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
                 DatanodeTestUtils.datanodeConfiguration(Map.of(
                         "node_search_cache_size", "10gb"
                 ), tempDir),
-                datanodeDirectories(tempDir),
+                datanodeConfiguration,
                 Set.of(gcsRepositoryConfiguration),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
 
         Assertions.assertThat(configurationPart.nodeRoles())
-                .contains(OpensearchNodeRole.SEARCH);
+                .contains(datanodeConfiguration.opensearchDistribution().distributionProperties().searchableSnapshotsRole());
 
         Assertions.assertThat(configurationPart.keystoreItems())
                 .hasSize(1)
@@ -117,18 +122,19 @@ class SearchableSnapshotsConfigurationBeanTest {
                 "hdfs_repository_enabled", "true"
         ));
 
+        final DatanodeConfiguration datanodeConfiguration = datanodeConfiguration(tempDir);
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
                 DatanodeTestUtils.datanodeConfiguration(Map.of(
                         "node_search_cache_size", "10gb"
                 ), tempDir),
-                datanodeDirectories(tempDir),
+                datanodeConfiguration,
                 Set.of(hdfsConfiguration),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
 
         Assertions.assertThat(configurationPart.nodeRoles())
-                .contains(OpensearchNodeRole.SEARCH);
+                .contains(datanodeConfiguration.opensearchDistribution().distributionProperties().searchableSnapshotsRole());
 
         Assertions.assertThat(configurationPart.properties())
                 .containsEntry("node.search.cache.size", "10gb");
@@ -142,18 +148,19 @@ class SearchableSnapshotsConfigurationBeanTest {
                 "azure_client_default_key", "12345"
         ));
 
+        final DatanodeConfiguration datanodeConfiguration = datanodeConfiguration(tempDir);
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
                 DatanodeTestUtils.datanodeConfiguration(Map.of(
                         "node_search_cache_size", "10gb"
                 ), tempDir),
-                datanodeDirectories(tempDir),
+                datanodeConfiguration,
                 Set.of(azureConfiguration),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
 
         Assertions.assertThat(configurationPart.nodeRoles())
-                .contains(OpensearchNodeRole.SEARCH);
+                .contains(datanodeConfiguration.opensearchDistribution().distributionProperties().searchableSnapshotsRole());
 
         Assertions.assertThat(configurationPart.properties())
                 .containsEntry("node.search.cache.size", "10gb");
@@ -176,18 +183,19 @@ class SearchableSnapshotsConfigurationBeanTest {
 
 
         // only path_repo in general datanode configuration
+        final DatanodeConfiguration datanodeConfiguration = datanodeConfiguration(tempDir);
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
                 DatanodeTestUtils.datanodeConfiguration(Map.of(
                         "node_search_cache_size", "10gb"
                 ), tempDir),
-                datanodeDirectories(tempDir),
+                datanodeConfiguration,
                 Set.of(config),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
 
         Assertions.assertThat(configurationPart.nodeRoles())
-                .contains(OpensearchNodeRole.SEARCH);
+                .contains(datanodeConfiguration.opensearchDistribution().distributionProperties().searchableSnapshotsRole());
 
         Assertions.assertThat(configurationPart.keystoreItems())
                 .isEmpty();
@@ -206,7 +214,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 DatanodeTestUtils.datanodeConfiguration(Map.of(
                         "node_search_cache_size", "10gb"
                 ), tempDir),
-                datanodeDirectories(tempDir),
+                datanodeConfiguration(tempDir),
                 Collections.emptySet(),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
@@ -235,7 +243,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 DatanodeTestUtils.datanodeConfiguration(Map.of(
                         "node_search_cache_size", "10gb"
                 ), tempDir),
-                datanodeDirectories(tempDir),
+                datanodeConfiguration(tempDir),
                 Set.of(config),
                 () -> new OpensearchUsableSpace(tempDir, 8L * 1024 * 1024 * 1024));
 
@@ -258,7 +266,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                         "path_repo", snapshotsPath,
                         "node_search_cache_size", "10gb"
                 ), tempDir),
-                datanodeDirectories(tempDir),
+                datanodeConfiguration(tempDir),
                 Set.of(fsRepo),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
