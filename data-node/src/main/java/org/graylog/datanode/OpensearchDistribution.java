@@ -16,14 +16,29 @@
  */
 package org.graylog.datanode;
 
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import org.apache.commons.exec.OS;
 import org.graylog.datanode.configuration.OpensearchArchitecture;
 
 import javax.annotation.Nullable;
 import java.nio.file.Path;
 
-public record OpensearchDistribution(Path directory, String version, @Nullable String platform,
-                                     @Nullable OpensearchArchitecture architecture) {
+public class OpensearchDistribution {
+
+    private final Path directory;
+    private final String version;
+    private final String platform;
+    private final OpensearchArchitecture architecture;
+    private final Supplier<OpensearchDistributionProperties> opensearchDistributionConfig;
+
+    public OpensearchDistribution(Path directory, String version, @Nullable String platform, @Nullable OpensearchArchitecture architecture) {
+        this.directory = directory;
+        this.version = version;
+        this.platform = platform;
+        this.architecture = architecture;
+        this.opensearchDistributionConfig = Suppliers.memoize(() -> OpensearchDistributionProperties.forVersion(version));
+    }
 
     public OpensearchDistribution(Path path, String version) {
         this(path, version, null, null);
@@ -43,5 +58,25 @@ public record OpensearchDistribution(Path directory, String version, @Nullable S
         } else {
             return directory.resolve("jdk");
         }
+    }
+
+    public OpensearchDistributionProperties distributionProperties() {
+        return opensearchDistributionConfig.get();
+    }
+
+    public Path directory() {
+        return directory;
+    }
+
+    public String version() {
+        return version;
+    }
+
+    public String platform() {
+        return platform;
+    }
+
+    public OpensearchArchitecture architecture() {
+        return architecture;
     }
 }
