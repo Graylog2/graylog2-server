@@ -17,6 +17,12 @@
 import { Tree } from '@mantine/core';
 import styled, { css } from 'styled-components';
 
+const PANEL_HEIGHT = '640px';
+const TREE_PANE_MIN_WIDTH = '300px';
+const TREE_PANE_MAX_WIDTH = '340px';
+const MOBILE_TREE_MAX_HEIGHT = '420px';
+const BORDER_RADIUS = '8px';
+
 export const ModuleContent = styled.div(
   ({ theme }) => css`
     padding-top: ${theme.spacings.md};
@@ -32,8 +38,8 @@ export const ModuleContent = styled.div(
 export const ModuleLayout = styled.div(
   ({ theme }) => css`
     display: grid;
-    grid-template-columns: minmax(300px, 340px) minmax(0, 1fr);
-    height: 640px;
+    grid-template-columns: minmax(${TREE_PANE_MIN_WIDTH}, ${TREE_PANE_MAX_WIDTH}) minmax(0, 1fr);
+    height: ${PANEL_HEIGHT};
 
     @media (max-width: ${theme.breakpoints.max.sm}) {
       grid-template-columns: 1fr;
@@ -48,7 +54,7 @@ export const TreePane = styled.div(
     padding-right: ${theme.spacings.md};
     margin-right: ${theme.spacings.md};
     border-right: 1px solid ${theme.colors.variant.lighter.default};
-    max-height: 640px;
+    max-height: ${PANEL_HEIGHT};
     overflow: auto;
 
     @media (max-width: ${theme.breakpoints.max.sm}) {
@@ -59,7 +65,7 @@ export const TreePane = styled.div(
       margin-bottom: ${theme.spacings.md};
       border-right: 0;
       border-bottom: 1px solid ${theme.colors.variant.lighter.default};
-      max-height: 420px;
+      max-height: ${MOBILE_TREE_MAX_HEIGHT};
     }
   `,
 );
@@ -131,7 +137,7 @@ export const StyledTree = styled(Tree)(
 
     .mantine-Tree-node {
       list-style: none;
-      border-radius: 8px;
+      border-radius: ${BORDER_RADIUS};
       outline: none;
     }
 
@@ -157,7 +163,7 @@ export const TreeRow = styled.div<{ $selected: boolean }>(
     padding-top: ${theme.spacings.xxs};
     padding-right: ${theme.spacings.xs};
     padding-bottom: ${theme.spacings.xxs};
-    border-radius: 8px;
+    border-radius: ${BORDER_RADIUS};
     min-height: 34px;
     cursor: pointer;
     color: ${theme.colors.text.primary};
@@ -273,7 +279,7 @@ export const ChildButton = styled.button`
     width: 100%;
     border: 1px solid ${theme.colors.variant.lighter.default};
     background-color: ${theme.colors.global.contentBackground};
-    border-radius: 8px;
+    border-radius: ${BORDER_RADIUS};
     padding: ${theme.spacings.sm};
     display: flex;
     align-items: center;
@@ -333,7 +339,7 @@ export const MessageBlock = styled.pre(
   ({ theme }) => css`
     margin: 0;
     padding: ${theme.spacings.sm};
-    border-radius: 8px;
+    border-radius: ${BORDER_RADIUS};
     background-color: ${theme.colors.variant.lightest.default};
     color: ${theme.colors.text.primary};
     font-family: ${theme.fonts.family.monospace};
