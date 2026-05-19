@@ -25,24 +25,28 @@ export type ResolvedNotification = {
 
 type Result = {
   resolved: Array<ResolvedNotification>;
+  notPermittedIds: Array<string>;
   isLoading: boolean;
 };
 
 const useResolvedNotifications = (eventDefinition: EventDefinition): Result => {
   const ids = eventDefinition.notifications.map(({ notification_id }) => notification_id);
-  const { data: notifications, isLoading } = useNotificationsByIds(ids);
+  const { data: notifications, notPermittedIds, isLoading } = useNotificationsByIds(ids);
   const byId = Object.fromEntries((notifications ?? []).map((n) => [n.id, n]));
 
   return {
-    resolved: ids.map((id) => {
-      const found = byId[id];
+    resolved: ids
+      .filter((id) => !notPermittedIds.includes(id))
+      .map((id) => {
+        const found = byId[id];
 
-      return {
-        id,
-        title: found?.title,
-        found: Boolean(found),
-      };
-    }),
+        return {
+          id,
+          title: found?.title,
+          found: Boolean(found),
+        };
+      }),
+    notPermittedIds,
     isLoading,
   };
 };

@@ -74,6 +74,7 @@ describe('EventDefinitionsContainer', () => {
 
     asMock(useNotificationsByIds).mockReturnValue({
       data: [],
+      notPermittedIds: [],
       isLoading: false,
     });
   });
@@ -114,6 +115,7 @@ describe('EventDefinitionsContainer', () => {
         { id: 'n1', title: 'PagerDuty Alert' },
         { id: 'n2', title: 'Slack Channel' },
       ],
+      notPermittedIds: [],
       isLoading: false,
     });
 
@@ -138,6 +140,7 @@ describe('EventDefinitionsContainer', () => {
   it('shows a loading indicator instead of notification ids while resolving notifications', async () => {
     asMock(useNotificationsByIds).mockReturnValue({
       data: undefined,
+      notPermittedIds: [],
       isLoading: true,
     });
 
@@ -159,6 +162,7 @@ describe('EventDefinitionsContainer', () => {
   it('renders an entry with the notification id when a referenced notification no longer exists', async () => {
     asMock(useNotificationsByIds).mockReturnValue({
       data: [{ id: 'n1', title: 'PagerDuty Alert' }],
+      notPermittedIds: [],
       isLoading: false,
     });
 
@@ -175,6 +179,30 @@ describe('EventDefinitionsContainer', () => {
 
     const fallbackLink = await screen.findByRole('link', { name: 'missing-id' });
     expect(fallbackLink).toHaveAttribute('href', '/alerts/notifications/missing-id');
+  });
+
+  it('warns about notifications the user is not permitted to view', async () => {
+    asMock(useNotificationsByIds).mockReturnValue({
+      data: [{ id: 'n1', title: 'PagerDuty Alert' }],
+      notPermittedIds: ['secret-id'],
+      isLoading: false,
+    });
+
+    const definition: EventDefinition = {
+      ...simpleEventDefinition,
+      notifications: [buildNotification('n1'), buildNotification('secret-id')],
+    };
+    asMock(useFetchEntities).mockReturnValue(paginatedEventDefinitions(definition));
+
+    render(<EventDefinitionsContainer />);
+
+    const row = await screen.findByTestId(`table-row-${definition.id}`);
+    await userEvent.click(within(row).getByTitle(/show notifications/i));
+
+    const warning = await screen.findByRole('alert');
+    expect(warning).toHaveTextContent(/Missing Notifications Permissions for/i);
+    expect(warning).toHaveTextContent('secret-id');
+    expect(screen.queryByRole('link', { name: 'secret-id' })).not.toBeInTheDocument();
   });
 
   it('lists notifications among the default visible columns', async () => {

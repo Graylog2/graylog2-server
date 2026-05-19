@@ -39,6 +39,7 @@ const fetchTitles = (ids: Array<string>) =>
 
 type Result = {
   data: Array<ResolvedNotificationTitle> | undefined;
+  notPermittedIds: Array<string>;
   isLoading: boolean;
 };
 
@@ -51,8 +52,13 @@ const useNotificationsByIds = (ids: Array<string>): Result => {
     staleTime: 30_000,
   });
 
+  const notPermittedIds = data?.not_permitted_to_view ?? [];
+
   return {
-    data: data?.entities?.map(({ id, title }) => ({ id, title })),
+    data: data?.entities
+      ?.filter(({ id }) => !notPermittedIds.includes(id))
+      .map(({ id, title }) => ({ id, title })),
+    notPermittedIds,
     isLoading,
   };
 };

@@ -17,7 +17,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import { ListGroup, ListGroupItem } from 'components/bootstrap';
+import { Alert, ListGroup, ListGroupItem } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import EventNotificationLink from 'components/event-notifications/event-notifications/EventNotificationLink';
 import useResolvedNotifications from 'components/event-definitions/hooks/useResolvedNotifications';
@@ -36,7 +36,7 @@ type Props = {
 };
 
 const ExpandedNotificationsSection = ({ eventDefinition }: Props) => {
-  const { resolved, isLoading } = useResolvedNotifications(eventDefinition);
+  const { resolved, notPermittedIds, isLoading } = useResolvedNotifications(eventDefinition);
 
   const notificationList = resolved.map(({ id, title }) => (
     <ListGroupItem key={id}>
@@ -47,6 +47,13 @@ const ExpandedNotificationsSection = ({ eventDefinition }: Props) => {
   return (
     <>
       <Description>Notifications fired when this event definition triggers.</Description>
+      {notPermittedIds.length > 0 && (
+        <Alert bsStyle="warning">
+          Missing Notifications Permissions for:
+          <br />
+          {notPermittedIds.join(', ')}
+        </Alert>
+      )}
       {isLoading ? (
         <Spinner text="Loading notifications..." />
       ) : (
