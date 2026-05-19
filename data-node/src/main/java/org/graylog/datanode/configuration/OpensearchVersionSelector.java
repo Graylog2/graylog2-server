@@ -16,17 +16,23 @@
  */
 package org.graylog.datanode.configuration;
 
-import org.graylog.datanode.OpensearchDistribution;
-import org.graylog2.security.jwt.IndexerJwtAuthToken;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import org.graylog.datanode.Configuration;
 
-/**
- * DatanodeConfiguration holds the static configuration as parsed during the datanode startup, either from the
- * config file or from the ENV properties.
- */
-public record DatanodeConfiguration(
-        OpensearchDistribution opensearchDistribution,
-        DatanodeDirectories datanodeDirectories,
-        int processLogsBufferSize,
-        IndexerJwtAuthToken indexerJwtAuthToken
-) {
+import java.util.Optional;
+
+@Singleton
+public class OpensearchVersionSelector {
+
+    private final Optional<String> requestedVersion;
+
+    @Inject
+    public OpensearchVersionSelector(final Configuration configuration) {
+        this.requestedVersion = Optional.ofNullable(configuration.getOpensearchVersion());
+    }
+
+    public Optional<String> requestedVersion() {
+        return requestedVersion;
+    }
 }
