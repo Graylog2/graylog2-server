@@ -16,6 +16,13 @@
  */
 import Routes from 'routing/Routes';
 
+const EnterpriseRoutes = {
+  ARCHIVES: '/system/archives',
+  DATA_LAKE: '/data-lake/setup',
+  FORWARDERS: '/system/forwarders',
+  REPORTS: '/reports',
+} as const;
+
 type HealthEntityListLink = {
   url: string;
   label: string;
@@ -56,12 +63,12 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
   'graylog.archiving': {
     description:
       'Health of long-term message archival — exporting indexed data to cold storage for retention or compliance.',
-    entityList: { url: '/system/archives', label: 'archives' },
+    entityList: { url: EnterpriseRoutes.ARCHIVES, label: 'archives' },
   },
   'graylog.data_lake': {
     description:
       'Health of Data Lake storage, preview, and retrieval for log data routed to configured Data Lake backends.',
-    entityList: { url: '/data-lake/setup', label: 'data lake' },
+    entityList: { url: EnterpriseRoutes.DATA_LAKE, label: 'data lake' },
   },
   'graylog.integrations': {
     description:
@@ -95,7 +102,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
     ],
     recommendedAction:
       'Open the forwarders page to inspect each forwarder’s connection state, throughput, and recent errors.',
-    entityList: { url: '/system/forwarders', label: 'forwarders' },
+    entityList: { url: EnterpriseRoutes.FORWARDERS, label: 'forwarders' },
   },
   collectors: {
     description: 'Sidecar agents and their managed collector processes that gather and ship logs to Graylog.',
@@ -256,7 +263,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
     ],
     recommendedAction:
       'Open the reports page to inspect each failed report and review its job logs.',
-    entityList: { url: '/reports', label: 'reports' },
+    entityList: { url: EnterpriseRoutes.REPORTS, label: 'reports' },
   },
   'graylog.archiving.archive_failures': {
     description: 'Errors encountered while exporting indexed messages to long-term archival storage.',
