@@ -155,16 +155,18 @@ public final class PemUtils {
                 throw new CertificateException("PEM does not contain a valid CSR");
             }
 
-            // Verify CSR self-signature (proves agent possesses private key)
+            final boolean signatureValid;
             try {
                 final ContentVerifierProvider verifier = new JcaContentVerifierProviderBuilder()
                         .setProvider("BC")
                         .build(csr.getSubjectPublicKeyInfo());
-                if (!csr.isSignatureValid(verifier)) {
-                    throw new CertificateException("CSR signature is invalid");
-                }
+                signatureValid = csr.isSignatureValid(verifier);
             } catch (Exception e) {
                 throw new CertificateException("CSR signature verification failed", e);
+            }
+
+            if (!signatureValid) {
+                throw new CertificateException("CSR signature is invalid");
             }
 
             return csr;
