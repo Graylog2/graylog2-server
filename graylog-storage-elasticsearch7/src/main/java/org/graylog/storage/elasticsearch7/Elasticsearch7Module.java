@@ -16,10 +16,8 @@
  */
 package org.graylog.storage.elasticsearch7;
 
-import com.google.inject.Provides;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
-import jakarta.inject.Singleton;
 import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.plugins.datanode.DatanodeUpgradeServiceAdapter;
 import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
@@ -66,6 +64,7 @@ public class Elasticsearch7Module extends VersionAwareModule {
         bindForSupportedVersion(CountsAdapter.class).to(CountsAdapterES7.class);
         bindForSupportedVersion(ClusterAdapter.class).to(ClusterAdapterES7.class);
         bindForSupportedVersion(IndicesAdapter.class).to(IndicesAdapterES7.class);
+        bindForSupportedVersion(IndicesAdapter.class, AdminIndexer.class).to(IndicesAdapterES7.class);
         bindForSupportedVersion(DataStreamAdapter.class).to(DataStreamAdapterES7.class);
         if (useComposableIndexTemplates) {
             bindForSupportedVersion(IndexTemplateAdapter.class).to(ComposableIndexTemplateAdapter.class);
@@ -103,15 +102,8 @@ public class Elasticsearch7Module extends VersionAwareModule {
         return bindForVersion(supportedVersion, interfaceClass);
     }
 
-    /**
-     * Elasticsearch 7 has no security-plugin admin-cert auth path; the {@link AdminIndexer}
-     * qualifier resolves to the default {@link IndicesAdapter} so services that inject it work
-     * on this backend without a separate auth.
-     */
-    @Provides
-    @AdminIndexer
-    @Singleton
-    public IndicesAdapter adminIndicesAdapter(IndicesAdapter defaultIndicesAdapter) {
-        return defaultIndicesAdapter;
+    private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass,
+                                                                Class<? extends java.lang.annotation.Annotation> qualifier) {
+        return bindForVersion(supportedVersion, interfaceClass, qualifier);
     }
 }

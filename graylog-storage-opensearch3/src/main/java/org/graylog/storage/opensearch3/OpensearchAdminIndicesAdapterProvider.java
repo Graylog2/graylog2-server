@@ -31,11 +31,11 @@ import org.graylog2.indexer.indices.IndicesAdapter;
  * {@code @AdminIndexer IndicesAdapter} binding, which routes its calls through
  * {@link AdminOpensearchClientProvider}.
  *
- * <p>The provider runs once (Guice singleton scope on the binding); the returned adapter holds
+ * <p>T\he returned adapter holds
  * a stable client reference because {@link AdminOpensearchClientProvider} hot-swaps the
  * underlying transport rather than replacing the client.
  */
-public class AdminIndicesAdapterProvider implements Provider<IndicesAdapter> {
+public class OpensearchAdminIndicesAdapterProvider implements Provider<IndicesAdapter> {
 
     private final AdminOpensearchClientProvider adminClientProvider;
     private final StatsApi statsApi;
@@ -46,7 +46,7 @@ public class AdminIndicesAdapterProvider implements Provider<IndicesAdapter> {
     private final ObjectMapper objectMapper;
 
     @Inject
-    public AdminIndicesAdapterProvider(AdminOpensearchClientProvider adminClientProvider,
+    public OpensearchAdminIndicesAdapterProvider(AdminOpensearchClientProvider adminClientProvider,
                                        StatsApi statsApi,
                                        ClusterStatsApi clusterStatsApi,
                                        ClusterStateApi clusterStateApi,

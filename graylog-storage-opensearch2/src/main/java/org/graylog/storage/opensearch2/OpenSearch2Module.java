@@ -16,11 +16,9 @@
  */
 package org.graylog.storage.opensearch2;
 
-import com.google.inject.Provides;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
-import jakarta.inject.Singleton;
 import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.plugins.datanode.DatanodeUpgradeServiceAdapter;
 import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
@@ -73,6 +71,7 @@ public class OpenSearch2Module extends VersionAwareModule {
         bindForSupportedVersion(CountsAdapter.class).to(CountsAdapterOS2.class);
         bindForSupportedVersion(ClusterAdapter.class).to(ClusterAdapterOS2.class);
         bindForSupportedVersion(IndicesAdapter.class).to(IndicesAdapterOS2.class);
+        bindForSupportedVersion(IndicesAdapter.class, AdminIndexer.class).to(IndicesAdapterOS2.class);
         bindForSupportedVersion(DataStreamAdapter.class).to(DataStreamAdapterOS2.class);
         bindForSupportedVersion(SecurityAdapter.class).to(SecurityAdapterOS.class);
         if (useComposableIndexTemplates) {
@@ -117,15 +116,8 @@ public class OpenSearch2Module extends VersionAwareModule {
         return bindForVersion(supportedVersion, interfaceClass);
     }
 
-    /**
-     * OpenSearch 2 has no security-plugin admin-cert auth path; the {@link AdminIndexer}
-     * qualifier resolves to the default {@link IndicesAdapter} so services that inject it work
-     * on this backend without a separate auth.
-     */
-    @Provides
-    @AdminIndexer
-    @Singleton
-    public IndicesAdapter adminIndicesAdapter(IndicesAdapter defaultIndicesAdapter) {
-        return defaultIndicesAdapter;
+    private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass,
+                                                                Class<? extends java.lang.annotation.Annotation> qualifier) {
+        return bindForVersion(supportedVersion, interfaceClass, qualifier);
     }
 }

@@ -29,8 +29,8 @@ import java.lang.annotation.Target;
  * system indices, which require a certificate-based identity matching the Data Node's
  * {@code plugins.security.authcz.admin_dn}.
  *
- * <p>On non-Data-Node backends (Elasticsearch 7, OpenSearch 2), this qualifier resolves to the
- * default adapter — no separate auth path is required there.
+ * <p>On legacy backends (Elasticsearch 7, OpenSearch 2), this qualifier should resolve to the
+ * default adapter.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})

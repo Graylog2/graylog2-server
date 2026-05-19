@@ -19,7 +19,6 @@ package org.graylog.storage.opensearch3;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
-import jakarta.inject.Singleton;
 import org.apache.hc.client5.http.auth.CredentialsProvider;
 import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.plugins.datanode.DatanodeUpgradeServiceAdapter;
@@ -107,9 +106,8 @@ public class OpenSearch3Module extends VersionAwareModule {
         bind(OfficialOpensearchClient.class).toProvider(OfficialOpensearchClientProvider.class);
         bind(CredentialsProvider.class).toProvider(OpensearchCredentialsProvider.class);
         bind(AdminOpensearchClientProvider.class);
-        bind(IndicesAdapter.class).annotatedWith(AdminIndexer.class)
-                .toProvider(AdminIndicesAdapterProvider.class)
-                .in(Singleton.class);
+        bindForSupportedVersion(IndicesAdapter.class, AdminIndexer.class)
+                .toProvider(OpensearchAdminIndicesAdapterProvider.class);
         bindForSupportedVersion(DatanodeUpgradeServiceAdapter.class).to(DatanodeUpgradeServiceAdapterOS.class);
 
         Multibinder<NodesSniffer> nodeSniffers = Multibinder.newSetBinder(binder(), NodesSniffer.class);
@@ -130,5 +128,10 @@ public class OpenSearch3Module extends VersionAwareModule {
 
     private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass) {
         return bindForVersion(supportedVersion, interfaceClass);
+    }
+
+    private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass,
+                                                                Class<? extends java.lang.annotation.Annotation> qualifier) {
+        return bindForVersion(supportedVersion, interfaceClass, qualifier);
     }
 }
