@@ -17,7 +17,9 @@
 package org.graylog.datanode.periodicals;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog.datanode.opensearch.OpensearchProcess;
 import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchCommonConfigurationBean;
@@ -51,6 +53,7 @@ public class NodePingPeriodical extends Periodical {
     private final Supplier<Date> certValidUntil;
     private final Supplier<List<String>> opensearchRoles;
     private final Supplier<List<String>> configurationWarnings;
+    private final Supplier<Optional<String>> opensearchVersion;
 
     private final Version version = Version.CURRENT_CLASSPATH;
 
@@ -67,8 +70,19 @@ public class NodePingPeriodical extends Periodical {
                 () -> managedOpenSearch.processInfo().state(),
                 datanodeKeystore::getCertificateExpiration,
                 managedOpenSearch::getOpensearchRoles,
-                managedOpenSearch::configurationWarnings
+                managedOpenSearch::configurationWarnings,
+                opensearchVersionIfAvailable(managedOpenSearch)
         );
+    }
+
+    /**
+     * Returns a supplier that provides the OpenSearch distribution version when the process is in the
+     * {@link OpensearchState#AVAILABLE} state, and an empty Optional otherwise.
+     */
+    private static Supplier<Optional<String>> opensearchVersionIfAvailable(OpensearchProcess process) {
+        return () -> process.processInfo().state() == OpensearchState.AVAILABLE
+                ? Optional.of(process.getOpensearchVersion())
+                : Optional.empty();
     }
 
     NodePingPeriodical(
@@ -81,7 +95,8 @@ public class NodePingPeriodical extends Periodical {
             Supplier<OpensearchState> processState,
             Supplier<Date> certValidUntil,
             Supplier<List<String>> opensearchRoles,
-            Supplier<List<String>> configurationWarnings
+            Supplier<List<String>> configurationWarnings,
+            Supplier<Optional<String>> opensearchVersion
     ) {
         this.nodeService = nodeService;
         this.nodeId = nodeId;
@@ -93,6 +108,7 @@ public class NodePingPeriodical extends Periodical {
         this.certValidUntil = certValidUntil;
         this.opensearchRoles = opensearchRoles;
         this.configurationWarnings = configurationWarnings;
+        this.opensearchVersion = opensearchVersion;
     }
 
     @Override
@@ -147,6 +163,7 @@ public class NodePingPeriodical extends Periodical {
                 .setRestApiAddress(datanodeRestApiUri.get())
                 .setCertValidUntil(certValidUntil.get())
                 .setDatanodeVersion(version.getVersion().toString())
+                .setOpensearchVersion(opensearchVersion.get().orElse(null))
                 .setOpensearchRoles(getOpensearchRoles())
                 .setConfigurationWarnings(configurationWarnings.get())
                 .build();
@@ -172,6 +189,7 @@ public class NodePingPeriodical extends Periodical {
                 .setDataNodeStatus(DataNodeStatus.STARTING)
                 .setCertValidUntil(certValidUntil.get())
                 .setDatanodeVersion(version.getVersion().toString())
+                .setOpensearchVersion(opensearchVersion.get().orElse(null))
                 .setOpensearchRoles(getOpensearchRoles())
                 .setConfigurationWarnings(configurationWarnings.get())
                 .build());

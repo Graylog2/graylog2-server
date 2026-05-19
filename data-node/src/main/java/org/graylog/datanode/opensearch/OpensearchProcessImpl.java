@@ -179,6 +179,11 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         return opensearchConfiguration.map(OpensearchConfiguration::opensearchRoles).orElse(List.of());
     }
 
+    @Override
+    public String getOpensearchVersion() {
+        return datanodeConfiguration.opensearchDistribution().version();
+    }
+
     public void onEvent(OpensearchEvent event) {
         LOG.debug("Process event: " + event);
         this.processState.fire(event);
