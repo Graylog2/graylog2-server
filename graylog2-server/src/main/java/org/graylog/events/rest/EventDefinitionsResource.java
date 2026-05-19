@@ -93,6 +93,7 @@ import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
+import org.graylog2.rest.resources.entities.FilterOption;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
@@ -126,6 +127,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
             .put("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
             .put("title", SearchQueryField.create(EventDefinitionDto.FIELD_TITLE))
             .put("description", SearchQueryField.create(EventDefinitionDto.FIELD_DESCRIPTION))
+            .put("state", SearchQueryField.create(EventDefinitionDto.FIELD_STATE))
             .put(SourcedMongoEntityUtils.SEARCH_QUERY_TITLE, SearchQueryField.create(SourcedMongoEntityUtils.FILTERABLE_FIELD))
             .build();
     private static final String DEFAULT_SORT_FIELD = "title";
@@ -134,7 +136,14 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
             EntityAttribute.builder().id("title").title("Title").build(),
             EntityAttribute.builder().id("description").title("Description").build(),
             EntityAttribute.builder().id("priority").title("Priority").type(SearchQueryField.Type.INT).build(),
-            EntityAttribute.builder().id("status").title("Status").type(SearchQueryField.Type.BOOLEAN).sortable(false).build(),
+            EntityAttribute.builder().id("status").title("Status").type(SearchQueryField.Type.STRING)
+                    .sortable(true)
+                    .filterable(true)
+                    .filterOptions(Set.of(
+                            FilterOption.create("ENABLED", "Enabled"),
+                            FilterOption.create("DISABLED", "Disabled")
+                    ))
+                    .build(),
             EntityAttribute.builder().id(SourcedMongoEntityUtils.FILTERABLE_FIELD).title("Source")
                     .type(SearchQueryField.Type.STRING)
                     .sortable(false)
@@ -203,22 +212,23 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                                                    schema = @Schema(allowableValues = {"asc", "desc"}))
                                                         @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order) {
 
-        SearchQuery searchQuery;
-        try {
-            searchQuery = searchQueryParser.parse(query);
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
-        }
         if ("status".equals(sort)) {
-            sort = "alert";
+            sort = "state";
         }
         Predicate<EventDefinitionDto> predicate = event -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id());
 
-        // The only filterable field currently is entity source. If new filterable fields are added, this logic needs to
-        // be adjusted so that other filters remain part of the filters, are included in the generation of searchQuery,
-        // and entity source filtering is still moved to the predicate to be applied after reading from the database.
+        // Extract entity source filters into a predicate (can't be queried in MongoDB directly).
+        // Remaining filters (e.g., status) are included in the search query for MongoDB filtering.
         final SourcedMongoEntityUtils.FilterPredicate<EventDefinitionDto> filterPredicate = SourcedMongoEntityUtils.handleScopedEntitySourceFilter(filters, predicate);
         predicate = filterPredicate.predicate();
+
+        final String queryWithFilters = buildQueryWithFilters(query, filterPredicate.filters());
+        SearchQuery searchQuery;
+        try {
+            searchQuery = searchQueryParser.parse(queryWithFilters);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
+        }
 
         final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(
                 searchQuery,
@@ -575,5 +585,20 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                     oldEventDefinition.config().type(), updatedEventDefinition.config().type());
             throw new ForbiddenException("Condition type not changeable");
         }
+    }
+
+    /**
+     * Maps UI filter field names to MongoDB field names and appends them to the query string.
+     * Currently handles: status → state
+     */
+    private static String buildQueryWithFilters(String query, List<String> filters) {
+        final String filterQuery = filters.stream()
+                .map(f -> f.startsWith("status:") ? "state:" + f.substring("status:".length()) : null)
+                .filter(java.util.Objects::nonNull)
+                .collect(Collectors.joining(" AND "));
+        if (filterQuery.isEmpty()) {
+            return query;
+        }
+        return query.isEmpty() ? filterQuery : query + " AND " + filterQuery;
     }
 }
