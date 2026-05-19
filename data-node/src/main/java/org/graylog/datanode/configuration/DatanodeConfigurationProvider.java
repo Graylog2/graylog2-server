@@ -20,6 +20,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.OpensearchDistribution;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.jwt.IndexerJwtAuthToken;
 
@@ -32,10 +33,10 @@ public class DatanodeConfigurationProvider implements Provider<DatanodeConfigura
     public DatanodeConfigurationProvider(
             final Configuration localConfiguration,
             IndexerJwtAuthToken jwtAuthToken,
-            OpensearchDistributionProvider opensearchDistributionProvider,
+            OpensearchDistribution opensearchDistribution,
             NodeId nodeId) {
         datanodeConfiguration = new DatanodeConfiguration(
-                opensearchDistributionProvider,
+                opensearchDistribution,
                 DatanodeDirectories.fromConfiguration(localConfiguration, nodeId),
                 localConfiguration.getProcessLogsBufferSize(),
                 jwtAuthToken
