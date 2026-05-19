@@ -22,7 +22,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryVisitor;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
