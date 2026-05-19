@@ -61,7 +61,7 @@
         <opensearch.compat.mac.jdk.sha512.aarch64>5bd61c1634daa5b6e0c473de6c0883ac2d29c0daa7101dd852113a5197b6cd60f790c0f7f53a64b2dbbb45f030ee4481c9d38745615a1a39b8efbef41e4b8115</opensearch.compat.mac.jdk.sha512.aarch64>
 
         <!-- 3.x versions -->
-        <opensearch.latest.version>3.5.0</opensearch.latest.version>
+        <opensearch.latest.version>3.6.0</opensearch.latest.version>
         <opensearch.latest.mac.jdk.version>25.0.2</opensearch.latest.mac.jdk.version>
         <opensearch.latest.mac.jdk.build>10</opensearch.latest.mac.jdk.build>
 
