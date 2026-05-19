@@ -14,17 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { SystemNotifications } from '@graylog/server-api';
+import { SystemNotifications } from "@graylog/server-api";
 
-import UserNotification from 'util/UserNotification';
-import type FetchError from 'logic/errors/FetchError';
+import UserNotification from "util/UserNotification";
+import type FetchError from "logic/errors/FetchError";
 import {
   NOTIFICATIONS_QUERY_KEY,
   BADGE_COUNT_KEY,
   TABLE_KEY,
-} from 'components/notifications/constants';
+} from "components/notifications/constants";
 
 type RowSeed = { id: string; currentIsRead: boolean };
 
@@ -35,7 +35,9 @@ const useNotificationBulkToggleRead = () => {
 
   return useMutation<unknown, FetchError, { rows: RowSeed[] }>({
     mutationFn: ({ rows }) =>
-      SystemNotifications.bulkToggleRead({ entity_ids: rows.map(({ id }) => id) }),
+      SystemNotifications.bulkToggleRead({
+        entity_ids: rows.map(({ id }) => id),
+      }),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: tableKey });
@@ -46,11 +48,18 @@ const useNotificationBulkToggleRead = () => {
       if (error?.status === 403) return;
 
       if (error?.status === 400) {
-        UserNotification.warning('No notifications selected.', 'Nothing to update');
+        UserNotification.warning(
+          "No notifications selected.",
+          "Nothing to update",
+        );
+
         return;
       }
 
-      UserNotification.error('Failed to update notification read states. Please try again.', 'Update failed');
+      UserNotification.error(
+        "Failed to update notification read states. Please try again.",
+        "Update failed",
+      );
     },
   });
 };
