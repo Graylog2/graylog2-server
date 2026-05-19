@@ -65,7 +65,7 @@ class SystemNotificationServiceTest {
         final var unread = service.findAllUnread();
         assertThat(unread).hasSize(1);
         assertThat(unread.get(0).type()).isEqualTo("es_unavailable");
-        assertThat(unread.get(0).priority()).isEqualTo("high");
+        assertThat(unread.get(0).severity()).isEqualTo("urgent");
         assertThat(unread.get(0).isRead()).isFalse();
         assertThat(unread.get(0).actor()).isNull();
         assertThat(unread.get(0).lastChanged()).isNull();

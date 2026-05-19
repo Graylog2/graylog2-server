@@ -54,7 +54,7 @@ describe('Navigation', () => {
         notifications: [
           {
             details: {},
-            severity: 'high',
+            severity: 'urgent',
             type: 'no_input_running',
             key: 'test',
             timestamp: '2022-12-12T10:55:55.014Z',

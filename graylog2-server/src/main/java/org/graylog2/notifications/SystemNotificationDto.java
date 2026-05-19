@@ -39,7 +39,7 @@ public abstract class SystemNotificationDto implements BuildableMongoEntity<Syst
 
     public static final String FIELD_TYPE = "type";
     public static final String FIELD_KEY = "key";
-    public static final String FIELD_PRIORITY = "priority";
+    public static final String FIELD_SEVERITY = "severity";
     public static final String FIELD_NODE_ID = "node_id";
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
@@ -63,8 +63,8 @@ public abstract class SystemNotificationDto implements BuildableMongoEntity<Syst
     @JsonProperty(FIELD_KEY)
     public abstract String key();
 
-    @JsonProperty(FIELD_PRIORITY)
-    public abstract String priority();
+    @JsonProperty(FIELD_SEVERITY)
+    public abstract String severity();
 
     @JsonProperty(FIELD_NODE_ID)
     public abstract String nodeId();
@@ -163,8 +163,8 @@ public abstract class SystemNotificationDto implements BuildableMongoEntity<Syst
         @JsonProperty(FIELD_KEY)
         public abstract Builder key(@Nullable String key);
 
-        @JsonProperty(FIELD_PRIORITY)
-        public abstract Builder priority(String priority);
+        @JsonProperty(FIELD_SEVERITY)
+        public abstract Builder severity(String severity);
 
         @JsonProperty(FIELD_NODE_ID)
         public abstract Builder nodeId(String nodeId);

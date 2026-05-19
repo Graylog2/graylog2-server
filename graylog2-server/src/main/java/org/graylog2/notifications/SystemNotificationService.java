@@ -108,7 +108,7 @@ public class SystemNotificationService {
     public boolean publish(Notification.Type type, String key, Notification.Severity severity,
                            String nodeId, Map<String, Object> details) {
         final String typeStr = type.toString().toLowerCase(Locale.ENGLISH);
-        final String priorityStr = severity.json();
+        final String severityStr = severity.toString().toLowerCase(Locale.ENGLISH);
 
         // Check for existing unread entry (dedup)
         final Bson dedupFilter = key != null
@@ -140,7 +140,7 @@ public class SystemNotificationService {
         final SystemNotificationDto dto = SystemNotificationDto.builder()
                 .type(typeStr)
                 .key(key)
-                .priority(priorityStr)
+                .severity(severityStr)
                 .nodeId(nodeId)
                 .title(title)
                 .description(description)
