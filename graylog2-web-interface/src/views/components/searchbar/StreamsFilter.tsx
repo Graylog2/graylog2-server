@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import styled from 'styled-components';
+import React from "react";
+import styled from "styled-components";
 
-import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import type { StreamsAndCategoriesSelection } from 'views/components/common/StreamsAndCategoriesFilter';
-import StreamsAndCategoriesFilter from 'views/components/common/StreamsAndCategoriesFilter';
+import useSendTelemetry from "logic/telemetry/useSendTelemetry";
+import { TELEMETRY_EVENT_TYPE } from "logic/telemetry/Constants";
+import type { StreamsAndCategoriesSelection } from "views/components/common/StreamsAndCategoriesFilter";
+import StreamsAndCategoriesFilter from "views/components/common/StreamsAndCategoriesFilter";
 
 const Container = styled.div`
   flex: 1;
@@ -47,13 +47,13 @@ const StreamsFilter = ({
   clearable = true,
 }: Props) => {
   const sendTelemetry = useSendTelemetry();
-  const placeholder = 'Select streams the search should include. Searches in all streams if empty.';
+  const placeholder = "Select streams the search should include. Searches in all streams if empty.";
 
   const handleChange = (selected: StreamsAndCategoriesSelection) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_STREAM_INPUT_CHANGED, {
-      app_pathname: 'search',
-      app_section: 'search-bar',
-      app_action_value: 'search-filter',
+      app_pathname: "search",
+      app_section: "search-bar",
+      app_action_value: "search-filter",
       event_details: {
         streamsCount: selected?.streams?.length,
       },

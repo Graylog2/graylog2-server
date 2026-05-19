@@ -506,13 +506,13 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
     categories: eventDefinition.config?.stream_categories ?? [],
   };
 
-  const streamsAndCategories = [...streams.map((s) => s.id), ...(eventDefinition?.config?.streams ?? [])].map(
-    (streamId) => {
-      const stream = streams.find((s) => s.id === streamId);
+  const streamsAndCategories = [
+    ...new Set([...streams.map((s) => s.id), ...(eventDefinition?.config?.streams ?? [])]),
+  ].map((streamId) => {
+    const stream = streams.find((s) => s.id === streamId);
 
-      return { title: stream?.title ?? streamId, id: streamId, categories: stream?.categories };
-    },
-  );
+    return { title: stream?.title ?? streamId, id: streamId, categories: stream?.categories };
+  });
 
   return (
     <fieldset>

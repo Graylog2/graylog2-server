@@ -21,16 +21,9 @@ import styled from "styled-components";
 import { Select, Icon } from "components/common";
 import { defaultCompare } from "logic/DefaultCompare";
 
-type StreamsAndCategoriesOptionValue = {
-  id: string;
-  type: "stream" | "category";
-};
-
 type StreamsAndCategoriesOption = {
-  id: string;
   label: string;
-  value: StreamsAndCategoriesOptionValue;
-  type: "stream" | "category";
+  value: { id: string; type: "stream" | "category" };
 };
 
 export type StreamsAndCategoriesSelection = {
@@ -44,7 +37,7 @@ const StyledIcon = styled(Icon)`
 `;
 
 const renderOption = (option: StreamsAndCategoriesOption) =>
-  option.type === "stream" ? (
+  option.value.type === "stream" ? (
     <>{option.label}</>
   ) : (
     <>
@@ -53,7 +46,10 @@ const renderOption = (option: StreamsAndCategoriesOption) =>
     </>
   );
 
-type StreamsAndCategoriesFilterProps = Omit<React.ComponentProps<typeof Select>, "options" | "value"> & {
+type StreamsAndCategoriesFilterProps = Omit<
+  React.ComponentProps<typeof Select>,
+  "options" | "value"
+> & {
   onChange: (value: StreamsAndCategoriesSelection) => void;
   value?: StreamsAndCategoriesSelection;
   streams: Array<{ id: string; title: string; categories: string[] }>;
@@ -85,10 +81,8 @@ const StreamsAndCategoriesFilter = ({
             ),
           ]
             .map((category) => ({
-              id: category,
               label: category,
-              value: { id: category, type: "category" } as StreamsAndCategoriesOptionValue,
-              type: "category",
+              value: { id: category, type: "category" as const },
             }))
             .sort((a: StreamsAndCategoriesOption, b: StreamsAndCategoriesOption) =>
               defaultCompare(a.label, b.label),
@@ -97,10 +91,8 @@ const StreamsAndCategoriesFilter = ({
     const sortedStreams = showStreams
       ? streams
           .map((stream: { id: string; title: string }) => ({
-            id: stream.id,
-            value: { id: stream.id, type: "stream" } as StreamsAndCategoriesOptionValue,
             label: stream.title,
-            type: "stream",
+            value: { id: stream.id, type: "stream" as const },
           }))
           .sort((a: StreamsAndCategoriesOption, b: StreamsAndCategoriesOption) =>
             defaultCompare(a.label, b.label),
@@ -119,15 +111,17 @@ const StreamsAndCategoriesFilter = ({
 
   const selectedOptions = options.filter(
     (o) =>
-      (o.type === "stream" && value?.streams?.includes(o.id)) ||
-      (o.type === "category" && value?.categories?.includes(o.id)),
+      (o.value.type === "stream" && value?.streams?.includes(o.value.id)) ||
+      (o.value.type === "category" && value?.categories?.includes(o.value.id)),
   );
 
-  const handleReactSelectChange = (selected: StreamsAndCategoriesOption | StreamsAndCategoriesOption[]) => {
+  const handleReactSelectChange = (
+    selected: StreamsAndCategoriesOption | StreamsAndCategoriesOption[],
+  ) => {
     const selectedArray = Array.isArray(selected) ? selected : selected ? [selected] : [];
     onChange({
-      streams: selectedArray.filter((o) => o.type === "stream").map((o) => o.id),
-      categories: selectedArray.filter((o) => o.type === "category").map((o) => o.id),
+      streams: selectedArray.filter((o) => o.value.type === "stream").map((o) => o.value.id),
+      categories: selectedArray.filter((o) => o.value.type === "category").map((o) => o.value.id),
     });
   };
 
