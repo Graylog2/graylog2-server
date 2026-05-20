@@ -17,14 +17,15 @@
 package org.graylog.datanode.bootstrap.preflight;
 
 import com.github.joschi.jadconfig.ValidationException;
+import com.github.zafarkhaja.semver.Version;
 import jakarta.inject.Inject;
 import org.graylog.datanode.DirectoryReadableValidator;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.filesystem.index.IncompatibleIndexVersionException;
 import org.graylog.datanode.filesystem.index.IndicesDirectoryParser;
+import org.graylog.datanode.filesystem.index.OpensearchUtils;
 import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
 import org.graylog.datanode.filesystem.index.dto.NodeInformation;
-import org.graylog.shaded.opensearch2.org.opensearch.Version;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.slf4j.Logger;
@@ -60,13 +61,13 @@ public class OpensearchDataDirCompatibilityCheck implements PreflightCheck {
     public void runCheck() throws PreflightCheckException {
 
         final Path opensearchDataDir = datanodeConfiguration.datanodeDirectories().getDataTargetDir();
-        final String opensearchVersion = datanodeConfiguration.opensearchDistributionProvider().get().version();
+        final String opensearchVersion = datanodeConfiguration.opensearchDistribution().version();
 
         // We want to run the compatibility check only once per major opensearch version for this data dir. Let's memorize
         // the run and skip every time we are starting with the same major version in the same data dir.
         // A change in the major version will re-run the full check; minor/patch upgrades are skipped.
         if (isCompatibilityAlreadyVerified(opensearchDataDir, opensearchVersion)) {
-            LOG.info("Opensearch data directory compatibility already successfully verified for data directory {} and opensearch major version {}, skipping check", opensearchDataDir, Version.fromString(opensearchVersion).major);
+            LOG.info("Opensearch data directory compatibility already successfully verified for data directory {} and opensearch major version {}, skipping check", opensearchDataDir, Version.parse(opensearchVersion).majorVersion());
             return;
         }
 
@@ -92,8 +93,8 @@ public class OpensearchDataDirCompatibilityCheck implements PreflightCheck {
         }
         try {
             final String storedVersion = Files.readString(checkFile, StandardCharsets.UTF_8).trim();
-            final int storedMajor = Version.fromString(storedVersion).major;
-            final int currentMajor = Version.fromString(opensearchVersion).major;
+            final long storedMajor = Version.parse(storedVersion).majorVersion();
+            final long currentMajor = Version.parse(opensearchVersion).majorVersion();
             return storedMajor == currentMajor;
         } catch (Exception e) {
             LOG.warn("Failed to read compatibility check file, re-running check", e);
@@ -111,13 +112,17 @@ public class OpensearchDataDirCompatibilityCheck implements PreflightCheck {
     }
 
     private void checkCompatibility(String opensearchVersion, IndexerDirectoryInformation info) {
-        final Version currentVersion = Version.fromString(opensearchVersion);
+        final Version currentVersion = Version.parse(opensearchVersion);
         for (NodeInformation node : info.nodes()) {
-            final Version nodeVersion = Version.fromString(node.nodeVersion());
-            if (node.nodeVersion() != null && !currentVersion.isCompatible(nodeVersion)) {
-                final String error = String.format(Locale.ROOT, "Current version %s of Opensearch is not compatible with index version %s", currentVersion, nodeVersion);
-                throw new IncompatibleIndexVersionException(error);
+            if (node.nodeVersion() != null) {
+                final Version nodeVersion = Version.parse(node.nodeVersion());
+                if (!OpensearchUtils.isCompatible(currentVersion, nodeVersion)) {
+                    final String error = String.format(Locale.ROOT, "Current version %s of Opensearch is not compatible with index version %s", currentVersion, nodeVersion);
+                    throw new IncompatibleIndexVersionException(error);
+                }
             }
         }
     }
+
+
 }
