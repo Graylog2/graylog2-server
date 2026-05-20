@@ -58,7 +58,7 @@ const AffectedChildButton = ({
   tree: ReturnType<typeof useTree>;
 }) => {
   const childIsFeature = isHealthFeature(child);
-  const childCountSummary = formatLeafCountVerbose(child);
+  const childCountSummary = formatLeafCountVerbose(child, getEntityListFor(child.id)?.label);
 
   const handleClick = () => {
     tree.select(child.id);
@@ -104,7 +104,7 @@ const HealthDetailsPane = ({ tree, selectedNode, selectedPath }: Props) => {
   const isFeatureWithChildren = isHealthFeature(selectedNode) && selectedNode.children.length > 0;
   const isLeafNode = !isFeatureWithChildren;
   const isUnhealthy = status !== 'healthy';
-  const countSummary = formatLeafCountVerbose(selectedNode);
+  const countSummary = formatLeafCountVerbose(selectedNode, entityList?.label);
 
   const meaning = isLeafNode && isUnhealthy ? definition?.meaning : undefined;
   const latestMessage = isUnhealthy && selectedNode.message?.trim() ? selectedNode.message : undefined;

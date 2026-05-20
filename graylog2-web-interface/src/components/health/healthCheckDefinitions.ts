@@ -68,7 +68,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
   'graylog.data_lake': {
     description:
       'Health of Data Lake storage, preview, and retrieval for log data routed to configured Data Lake backends.',
-    entityList: { url: EnterpriseRoutes.DATA_LAKE, label: 'data lake' },
+    entityList: { url: EnterpriseRoutes.DATA_LAKE, label: 'data lake backends' },
   },
   'graylog.integrations': {
     description:
@@ -88,7 +88,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
   },
   mongodb: {
     description: 'The configuration database that stores all Graylog settings, entities, and metadata.',
-    entityList: { url: Routes.SYSTEM.CLUSTER.NODES, label: 'MongoDB' },
+    entityList: { url: Routes.SYSTEM.CLUSTER.NODES, label: 'MongoDB nodes' },
   },
   forwarders: {
     description:

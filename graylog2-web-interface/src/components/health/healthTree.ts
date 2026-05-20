@@ -24,11 +24,12 @@ export const formatLeafCount = (node: HealthNode): string | undefined => {
   return `${node.total_affected}`;
 };
 
-export const formatLeafCountVerbose = (node: HealthNode): string | undefined => {
+export const formatLeafCountVerbose = (node: HealthNode, noun?: string): string | undefined => {
   if (!node.total_affected) return undefined;
-  if (typeof node.total === 'number') return `${node.total_affected} of ${node.total} affected`;
+  const nounPart = noun ? ` ${noun}` : '';
+  if (typeof node.total === 'number') return `${node.total_affected} of ${node.total}${nounPart} affected`;
 
-  return `${node.total_affected} affected`;
+  return `${node.total_affected}${nounPart} affected`;
 };
 
 export const countContainedChecks = (node: HealthNode): number => {
