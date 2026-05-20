@@ -177,5 +177,8 @@ updates:
     groups:
       storybook:
         patterns:
+          - "storybook"
           - "@storybook/*"
+          - "eslint-plugin-storybook"
+          - "storybook-dark-mode"
 
