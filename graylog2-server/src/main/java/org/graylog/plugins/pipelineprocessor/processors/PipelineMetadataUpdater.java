@@ -107,6 +107,12 @@ public class PipelineMetadataUpdater {
         inputsMetadataService.deleteInput(event.inputId());
     }
 
+    public void handleStreamChanged(String streamId, PipelineInterpreter.State state) {
+        Set<String> pipelineIds = pipelineMetadataService.getPipelinesReferencingStream(streamId);
+        Set<PipelineDao> pipelineDaos = loadPipelineDaos(pipelineIds);
+        handleUpdates(pipelineDaos, state);
+    }
+
     private void deleteInputMentionsForPipelines(PipelinesChangedEvent event) {
         Stream.concat(event.deletedPipelineIds().stream(), event.updatedPipelineIds().stream())
                 .forEach(inputsMetadataService::deleteInputMentionsByPipelineId);
