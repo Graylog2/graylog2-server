@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix system notification polling extending user sessions."
+issues = ["25995"]
+pulls = ["25996"]

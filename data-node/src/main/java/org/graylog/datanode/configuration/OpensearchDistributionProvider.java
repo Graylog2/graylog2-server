@@ -16,19 +16,20 @@
  */
 package org.graylog.datanode.configuration;
 
+import com.github.zafarkhaja.semver.Version;
 import com.google.common.base.Suppliers;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.OpensearchDistribution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-import jakarta.inject.Singleton;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -36,6 +37,8 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @Singleton
 public class OpensearchDistributionProvider implements Provider<OpensearchDistribution> {
@@ -47,12 +50,21 @@ public class OpensearchDistributionProvider implements Provider<OpensearchDistri
     private final Supplier<OpensearchDistribution> distribution;
 
     @Inject
-    public OpensearchDistributionProvider(final Configuration localConfiguration) {
-        this(Path.of(localConfiguration.getOpensearchDistributionRoot()), OpensearchArchitecture.fromOperatingSystem());
+    public OpensearchDistributionProvider(final Configuration localConfiguration,
+                                          final OpensearchVersionSelector versionSelector) {
+        this(
+                Path.of(localConfiguration.getOpensearchDistributionRoot()),
+                OpensearchArchitecture.fromOperatingSystem(),
+                versionSelector.requestedVersion()
+        );
     }
 
     public OpensearchDistributionProvider(final Path opensearchDistributionRoot, OpensearchArchitecture architecture) {
-        this.distribution = Suppliers.memoize(() -> detectInDirectory(opensearchDistributionRoot, architecture));
+        this(opensearchDistributionRoot, architecture, Optional.empty());
+    }
+
+    public OpensearchDistributionProvider(final Path opensearchDistributionRoot, OpensearchArchitecture architecture, Optional<String> requestedVersion) {
+        this.distribution = Suppliers.memoize(() -> detectInDirectory(opensearchDistributionRoot, architecture, requestedVersion));
     }
 
     @Override
@@ -60,17 +72,16 @@ public class OpensearchDistributionProvider implements Provider<OpensearchDistri
         return distribution.get();
     }
 
-    private static OpensearchDistribution detectInDirectory(Path rootDistDirectory, OpensearchArchitecture osArch) {
+    private static OpensearchDistribution detectInDirectory(Path rootDistDirectory, OpensearchArchitecture osArch, Optional<String> requestedVersion) {
         Objects.requireNonNull(rootDistDirectory, "Dist directory needs to be provided");
 
         // if the base directory points directly to one opensearch distribution, we should return it directly.
         // If the format doesn't fit, we'll look for opensearch distributions in this root directory.
         final Optional<OpensearchDistribution> distDirectory = parse(rootDistDirectory);
-        return distDirectory.orElseGet(() -> detectInSubdirectory(rootDistDirectory, osArch));
-
+        return distDirectory.orElseGet(() -> detectInSubdirectory(rootDistDirectory, osArch, requestedVersion));
     }
 
-    private static OpensearchDistribution detectInSubdirectory(Path directory, OpensearchArchitecture arch) {
+    private static OpensearchDistribution detectInSubdirectory(Path directory, OpensearchArchitecture arch, Optional<String> requestedVersion) {
         final List<OpensearchDistribution> opensearchDistributions;
         try (
                 var files = Files.list(directory);
@@ -89,9 +100,29 @@ public class OpensearchDistributionProvider implements Provider<OpensearchDistri
 
         LOG.info("Found following opensearch distributions: " + opensearchDistributions.stream().map(d -> d.directory().toAbsolutePath()).toList());
 
-        return findByArchitecture(opensearchDistributions, arch)
-                .orElseGet(() -> findWithoutArchitecture(opensearchDistributions)
+        final List<OpensearchDistribution> candidates = requestedVersion
+                .map(v -> filterByVersion(opensearchDistributions, v))
+                .orElse(opensearchDistributions);
+
+        final OpensearchDistribution result = findByArchitecture(candidates, arch)
+                .orElseGet(() -> findWithoutArchitecture(candidates)
                         .orElseThrow(() -> createErrorMessage(directory, arch, "No Opensearch distribution found for your system architecture")));
+        LOG.info("Using opensearch distribution {}", result.directory().toAbsolutePath());
+        return result;
+    }
+
+    private static List<OpensearchDistribution> filterByVersion(List<OpensearchDistribution> distributions, String version) {
+        final List<OpensearchDistribution> matches = distributions.stream()
+                .filter(d -> version.equals(d.version()))
+                .toList();
+        if (matches.isEmpty()) {
+            throw new IllegalArgumentException(f(
+                    "No OpenSearch distribution found for requested version '%s'. Available versions: %s",
+                    version,
+                    distributions.stream().map(OpensearchDistribution::version).distinct().sorted().toList()
+            ));
+        }
+        return matches;
     }
 
     private static IllegalArgumentException createErrorMessage(Path directory, OpensearchArchitecture arch, String message) {
@@ -118,11 +149,19 @@ public class OpensearchDistributionProvider implements Provider<OpensearchDistri
     private static Optional<OpensearchDistribution> findByArchitecture(List<OpensearchDistribution> available, OpensearchArchitecture arch) {
         return available.stream()
                 .filter(d -> arch.equals(d.architecture()))
-                .findAny();
+                .min(Comparator.comparing(OpensearchDistribution::version, OpensearchDistributionProvider::compareVersions));
     }
 
     private static Optional<OpensearchDistribution> findWithoutArchitecture(List<OpensearchDistribution> available) {
-        return available.stream().filter(d -> d.architecture() == null).findFirst();
+        return available.stream()
+                .filter(d -> d.architecture() == null)
+                .min(Comparator.comparing(OpensearchDistribution::version, OpensearchDistributionProvider::compareVersions));
+    }
+
+    private static int compareVersions(String v1, String v2) {
+        final Version version1 = Version.parse(v1);
+        final Version version2 = Version.parse(v2);
+        return version1.compareTo(version2);
     }
 
     private static Optional<OpensearchDistribution> parse(Path path) {
