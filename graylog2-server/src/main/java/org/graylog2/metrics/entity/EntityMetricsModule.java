@@ -27,6 +27,8 @@ import org.graylog2.streams.metrics.StreamAssociatedInputsDescriptor;
 import org.graylog2.streams.metrics.StreamAvgProcessingTimeDescriptor;
 import org.graylog2.streams.metrics.StreamMaxProcessingTimeDescriptor;
 import org.graylog2.streams.metrics.StreamMessageCountDescriptor;
+import org.graylog2.streams.metrics.StreamPipelinesDescriptor;
+import org.graylog2.streams.metrics.StreamRoutingPipelinesDescriptor;
 
 /**
  * Guice module for entity metrics bindings.
@@ -57,5 +59,7 @@ public class EntityMetricsModule extends AbstractModule {
         streamDescriptors.addBinding().to(StreamAvgProcessingTimeDescriptor.class);
         streamDescriptors.addBinding().to(StreamMaxProcessingTimeDescriptor.class);
         streamDescriptors.addBinding().to(StreamAssociatedInputsDescriptor.class);
+        streamDescriptors.addBinding().to(StreamPipelinesDescriptor.class);
+        streamDescriptors.addBinding().to(StreamRoutingPipelinesDescriptor.class);
     }
 }
