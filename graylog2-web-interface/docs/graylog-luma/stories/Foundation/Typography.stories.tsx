@@ -18,7 +18,7 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import styled, { useTheme } from 'styled-components';
 
-import { FoundationItem, FoundationTable, PxLabel, StoryContainer, Token, UsageNote } from './shared';
+import { FoundationTable, PxLabel, StoryContainer, Token } from './shared';
 
 // Root font size matching theme/constants ROOT_FONT_SIZE
 const ROOT_FONT_SIZE = 16;
@@ -26,82 +26,74 @@ const remToPx = (rem: string): string => `${Math.round(parseFloat(rem) * ROOT_FO
 
 // ─── Font Families ─────────────────────────────────────────────────────────
 
-const FamilyLabel = styled.span`
-  font-size: ${({ theme }) => theme.fonts.size.small};
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.text.primary};
-  display: block;
-  margin: ${({ theme }) => theme.spacings.xxs} 0 ${({ theme }) => theme.spacings.xxs};
-`;
-
 type FontFamilyKey = 'body' | 'navigation' | 'monospace';
 
 type FamilyEntry = {
   key: FontFamilyKey;
   label: string;
   token: string;
-  specimen: string;
   when: string;
-  not: string;
 };
 
 const FONT_FAMILIES: FamilyEntry[] = [
   {
     key: 'body',
-    label: 'Source Sans Pro — Body',
+    label: 'Body — Source Sans Pro',
     token: 'theme.fonts.family.body',
-    specimen: 'The quick brown fox jumps over the lazy dog. 0123456789',
     when: 'All UI copy by default: paragraphs, labels, form inputs, buttons, table cells, tooltips, descriptions. GlobalThemeStyles applies this globally — you rarely need to set it explicitly.',
-    not: 'Headings h1/h2 (use navigation family) and code or log output (use monospace).',
   },
   {
     key: 'navigation',
-    label: 'DM Sans — Navigation',
+    label: 'Navigation — DM Sans',
     token: 'theme.fonts.family.navigation',
-    specimen: 'The quick brown fox jumps over the lazy dog. 0123456789',
     when: 'h1 and h2 headings only. GlobalThemeStyles applies this automatically — you do not need to set it on h1/h2 elements yourself.',
-    not: 'Body text, nav links, or any heading below h2. DM Sans is intentionally reserved for the top two heading levels to create hierarchy.',
   },
   {
     key: 'monospace',
-    label: 'Ubuntu Mono — Monospace',
+    label: 'Monospace — Ubuntu Mono',
     token: 'theme.fonts.family.monospace',
-    specimen: 'The quick brown fox jumps over the lazy dog. 0123456789',
     when: 'All programmatic content: code blocks, inline code, log output, search queries, pipeline rules, configuration values, and technical identifiers.',
-    not: 'Human-readable labels or descriptions, even if they reference technical concepts by name.',
   },
 ];
 
 const FontFamiliesDoc = () => {
   const theme = useTheme();
+  const families = theme.fonts.family as Record<string, string>;
+
+  const columns = [
+    {
+      header: 'Style',
+      width: '320px',
+      render: (row: FamilyEntry) => (
+        <p
+          style={{
+            fontFamily: families[row.key],
+            fontSize: '1.1rem',
+            color: theme.colors.text.primary,
+            margin: 0,
+            lineHeight: 1.5,
+          }}>
+          {row.label}
+          <br />
+          0123456789
+        </p>
+      ),
+    },
+    {
+      header: 'Variable',
+      width: '240px',
+      render: (row: FamilyEntry) => <Token>{row.token}</Token>,
+    },
+    {
+      header: 'Usage',
+      render: (row: FamilyEntry) => row.when,
+    },
+  ];
 
   return (
     <StoryContainer>
       <h1 style={{ marginBottom: theme.spacings.lg }}>Font Families</h1>
-      {FONT_FAMILIES.map(({ key, label, token, specimen, when, not }) => (
-        <FoundationItem key={key}>
-          <Token>{token}</Token>
-          <p
-            style={{
-              fontFamily: (theme.fonts.family as Record<string, string>)[key],
-              fontSize: '1.3rem',
-              color: theme.colors.text.primary,
-              margin: `${theme.spacings.xs} 0 0`,
-              lineHeight: 1.35,
-            }}>
-            {specimen}
-          </p>
-          <FamilyLabel>{label}</FamilyLabel>
-          <UsageNote>
-            <strong>Use when: </strong>
-            {when}
-          </UsageNote>
-          <UsageNote>
-            <strong>Not for: </strong>
-            {not}
-          </UsageNote>
-        </FoundationItem>
-      ))}
+      <FoundationTable columns={columns} rows={FONT_FAMILIES} keyBy={(row) => row.key} />
     </StoryContainer>
   );
 };
