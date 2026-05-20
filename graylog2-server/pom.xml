@@ -1441,6 +1441,18 @@
                             </execution>
 
                             <execution>
+                                <id>luma: yarn tsc</id>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <arguments>tsc</arguments>
+                                    <workingDirectory>docs/luma</workingDirectory>
+                                </configuration>
+                            </execution>
+
+                            <execution>
                                 <id>yarn run check-production-build</id>
                                 <phase>verify</phase>
                                 <goals>
