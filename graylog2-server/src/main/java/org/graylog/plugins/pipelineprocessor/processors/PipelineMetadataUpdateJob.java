@@ -39,6 +39,8 @@ import org.graylog.scheduler.system.SystemJobInfo;
 import org.graylog.scheduler.system.SystemJobResult;
 import org.graylog2.rest.resources.system.inputs.InputDeletedEvent;
 import org.graylog2.rest.resources.system.inputs.InputRenamedEvent;
+import org.graylog2.streams.events.StreamDeletedEvent;
+import org.graylog2.streams.events.StreamRenamedEvent;
 
 import java.util.Objects;
 import java.util.Set;
@@ -87,6 +89,8 @@ public class PipelineMetadataUpdateJob implements SystemJob<PipelineMetadataUpda
                 case PIPELINE_CONNECTIONS_CHANGED -> metadataUpdater.handleConnectionChanges(config.connectionsEvent(), state);
                 case INPUT_DELETED -> metadataUpdater.handleInputDeleted(config.inputDeletedEvent(), state);
                 case INPUT_RENAMED -> handleInputRenamed(state);
+                case STREAM_RENAMED -> metadataUpdater.handleStreamChanged(config.streamRenamedEvent().streamId(), state);
+                case STREAM_DELETED -> metadataUpdater.handleStreamChanged(config.streamDeletedEvent().streamId(), state);
             }
             return SystemJobResult.success();
         } catch (Exception e) {
@@ -111,7 +115,9 @@ public class PipelineMetadataUpdateJob implements SystemJob<PipelineMetadataUpda
         PIPELINES_CHANGED,
         PIPELINE_CONNECTIONS_CHANGED,
         INPUT_DELETED,
-        INPUT_RENAMED
+        INPUT_RENAMED,
+        STREAM_RENAMED,
+        STREAM_DELETED
     }
 
     public static Config forRulesChanged(RulesChangedEvent event) {
@@ -134,6 +140,14 @@ public class PipelineMetadataUpdateJob implements SystemJob<PipelineMetadataUpda
         return Config.Builder.create().eventType(EventType.INPUT_RENAMED).inputRenamedEvent(event).build();
     }
 
+    public static Config forStreamRenamed(StreamRenamedEvent event) {
+        return Config.Builder.create().eventType(EventType.STREAM_RENAMED).streamRenamedEvent(event).build();
+    }
+
+    public static Config forStreamDeleted(StreamDeletedEvent event) {
+        return Config.Builder.create().eventType(EventType.STREAM_DELETED).streamDeletedEvent(event).build();
+    }
+
     @AutoValue
     @JsonDeserialize(builder = Config.Builder.class)
     @JsonTypeName(TYPE_NAME)
@@ -145,6 +159,8 @@ public class PipelineMetadataUpdateJob implements SystemJob<PipelineMetadataUpda
         private static final String FIELD_CONNECTIONS_EVENT = "connections_event";
         private static final String FIELD_INPUT_DELETED_EVENT = "input_deleted_event";
         private static final String FIELD_INPUT_RENAMED_EVENT = "input_renamed_event";
+        private static final String FIELD_STREAM_RENAMED_EVENT = "stream_renamed_event";
+        private static final String FIELD_STREAM_DELETED_EVENT = "stream_deleted_event";
 
         @JsonProperty(FIELD_EVENT_TYPE)
         public abstract EventType eventType();
@@ -168,6 +184,14 @@ public class PipelineMetadataUpdateJob implements SystemJob<PipelineMetadataUpda
         @JsonProperty(FIELD_INPUT_RENAMED_EVENT)
         @Nullable
         public abstract InputRenamedEvent inputRenamedEvent();
+
+        @JsonProperty(FIELD_STREAM_RENAMED_EVENT)
+        @Nullable
+        public abstract StreamRenamedEvent streamRenamedEvent();
+
+        @JsonProperty(FIELD_STREAM_DELETED_EVENT)
+        @Nullable
+        public abstract StreamDeletedEvent streamDeletedEvent();
 
         @Override
         public SystemJobInfo toInfo() {
@@ -204,6 +228,12 @@ public class PipelineMetadataUpdateJob implements SystemJob<PipelineMetadataUpda
 
             @JsonProperty(FIELD_INPUT_RENAMED_EVENT)
             public abstract Builder inputRenamedEvent(InputRenamedEvent event);
+
+            @JsonProperty(FIELD_STREAM_RENAMED_EVENT)
+            public abstract Builder streamRenamedEvent(StreamRenamedEvent event);
+
+            @JsonProperty(FIELD_STREAM_DELETED_EVENT)
+            public abstract Builder streamDeletedEvent(StreamDeletedEvent event);
 
             public abstract Config build();
         }
