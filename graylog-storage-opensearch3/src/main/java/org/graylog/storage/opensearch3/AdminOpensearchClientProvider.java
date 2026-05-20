@@ -17,6 +17,7 @@
 package org.graylog.storage.opensearch3;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -109,14 +110,22 @@ public class AdminOpensearchClientProvider {
      */
     @Nonnull
     public OfficialOpensearchClient getAdminClient() {
-        if (cachedClient != null && !needsRefresh(Instant.now())) {
+        if (cachedClient != null && !needsRefresh(now())) {
             return cachedClient;
         }
         return initOrRefresh();
     }
 
+    /**
+     * Overridable for tests that need to control time.
+     */
+    @VisibleForTesting
+    Instant now() {
+        return Instant.now();
+    }
+
     private synchronized OfficialOpensearchClient initOrRefresh() {
-        final Instant now = Instant.now();
+        final Instant now = now();
         if (cachedClient != null && !needsRefresh(now)) {
             return cachedClient;
         }
