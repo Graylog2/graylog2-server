@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.MutableGraph;
 import jakarta.annotation.Nullable;
 import org.graylog.events.fields.EventFieldSpec;
@@ -57,6 +58,7 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
     private static final String FIELD_CONFIG = "config";
     private static final String FIELD_FIELD_SPEC = "field_spec";
     private static final String FIELD_KEY_SPEC = "key_spec";
+    private static final String FIELD_TAGS = EventDefinitionDto.FIELD_TAGS;
     private static final String FIELD_NOTIFICATION_SETTINGS = "notification_settings";
     private static final String FIELD_NOTIFICATIONS = "notifications";
     private static final String FIELD_STORAGE = "storage";
@@ -108,6 +110,9 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
     @JsonProperty(FIELD_STORAGE)
     public abstract ImmutableList<EventStorageHandler.Config> storage();
 
+    @JsonProperty(FIELD_TAGS)
+    public abstract ImmutableSet<String> tags();
+
     @JsonProperty(FIELD_IS_SCHEDULED)
     public abstract ValueReference isScheduled();
 
@@ -129,7 +134,9 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
     public static abstract class Builder extends ScopedContentPackEntity.AbstractBuilder<EventDefinitionEntity.Builder> {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_EventDefinitionEntity.Builder().isScheduled(ValueReference.of(true));
+            return new AutoValue_EventDefinitionEntity.Builder()
+                    .isScheduled(ValueReference.of(true))
+                    .tags(ImmutableSet.of());
         }
 
         @JsonProperty(FIELD_TITLE)
@@ -170,6 +177,9 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
 
         @JsonProperty(FIELD_STORAGE)
         public abstract Builder storage(ImmutableList<EventStorageHandler.Config> storage);
+
+        @JsonProperty(FIELD_TAGS)
+        public abstract Builder tags(ImmutableSet<String> tags);
 
         @JsonProperty(FIELD_IS_SCHEDULED)
         public abstract Builder isScheduled(ValueReference isScheduled);
@@ -217,6 +227,7 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
                 .notificationSettings(notificationSettings())
                 .notifications(notificationList)
                 .storage(storage())
+                .tags(tags())
                 .eventProcedureId(procedureId)
                 .eventSummaryTemplate(eventSummaryTemplate() != null ? eventSummaryTemplate().asString(parameters) : null)
                 .build();

@@ -278,7 +278,16 @@ type RawOperation = {
   produces: Array<RawContentType>;
 };
 
-function createOperation({ summary, method, type, items, parameters, nickname, path, produces }: RawOperation): Operation {
+function createOperation({
+  summary,
+  method,
+  type,
+  items,
+  parameters,
+  nickname,
+  path,
+  produces,
+}: RawOperation): Operation {
   const rawType: string | RawType = type === 'array' && items ? { type: 'array', items } : type;
 
   return {
