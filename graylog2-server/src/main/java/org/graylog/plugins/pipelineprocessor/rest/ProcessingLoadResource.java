@@ -42,12 +42,10 @@ import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.rest.resources.system.RemoteMetricsResource;
 
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
-import java.util.function.Predicate;
 
 @RequiresAuthentication
 @PublicCloudAPI
@@ -96,19 +94,14 @@ public class ProcessingLoadResource extends ProxiedResource {
             return ProcessingLoadResponse.unavailable();
         }
 
-        final PermissionCache perms = new PermissionCache(
-                id -> isPermitted(PipelineRestPermissions.PIPELINE_READ, id),
-                id -> isPermitted(PipelineRestPermissions.PIPELINE_RULE_READ, id)
-        );
-
-        if (!hasAnyVisibleEntity(combinations, perms)) {
+        if (!hasAnyVisibleEntity(combinations)) {
             throw new ForbiddenException("No read permission on any active pipeline or rule.");
         }
 
         final List<String> expectedTimerNames = processingLoadService.expectedTimerNames(combinations);
         final Map<String, NodeTimerSnapshot> perNodeSnapshots = fetchNodeSnapshots(expectedTimerNames);
         final ProcessingLoadResponse full = processingLoadService.compute(combinations, perNodeSnapshots);
-        return processingLoadService.filterByPermissions(full, perms::canReadPipeline, perms::canReadRule);
+        return processingLoadService.filterByPermissions(full, this::canReadPipeline, this::canReadRule);
     }
 
     private Map<String, NodeTimerSnapshot> fetchNodeSnapshots(List<String> metricNames) {
@@ -128,31 +121,16 @@ public class ProcessingLoadResource extends ProxiedResource {
         return perNodeSnapshots;
     }
 
-    private static boolean hasAnyVisibleEntity(List<ActiveCombination> combinations, PermissionCache perms) {
+    private boolean hasAnyVisibleEntity(List<ActiveCombination> combinations) {
         return combinations.stream()
-                .anyMatch(c -> perms.canReadPipeline(c.pipelineId()) || perms.canReadRule(c.ruleId()));
+                .anyMatch(c -> canReadPipeline(c.pipelineId()) || canReadRule(c.ruleId()));
     }
 
-    /**
-     * Caches per-id Shiro permission lookups so each id is asked once, not once per stage_rule entry.
-     */
-    private static final class PermissionCache {
-        private final Predicate<String> pipelineLookup;
-        private final Predicate<String> ruleLookup;
-        private final Map<String, Boolean> pipelines = new HashMap<>();
-        private final Map<String, Boolean> rules = new HashMap<>();
+    private boolean canReadPipeline(String pipelineId) {
+        return isPermitted(PipelineRestPermissions.PIPELINE_READ, pipelineId);
+    }
 
-        PermissionCache(Predicate<String> pipelineLookup, Predicate<String> ruleLookup) {
-            this.pipelineLookup = pipelineLookup;
-            this.ruleLookup = ruleLookup;
-        }
-
-        boolean canReadPipeline(String pipelineId) {
-            return pipelines.computeIfAbsent(pipelineId, pipelineLookup::test);
-        }
-
-        boolean canReadRule(String ruleId) {
-            return rules.computeIfAbsent(ruleId, ruleLookup::test);
-        }
+    private boolean canReadRule(String ruleId) {
+        return isPermitted(PipelineRestPermissions.PIPELINE_RULE_READ, ruleId);
     }
 }
