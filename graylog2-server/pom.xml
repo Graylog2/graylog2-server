@@ -1374,6 +1374,7 @@
                             <nodeVersion>${nodejs.version}</nodeVersion>
                             <yarnVersion>${yarn.version}</yarnVersion>
                             <nodeDownloadRoot>https://graylog-ci-cache.s3.eu-west-1.amazonaws.com/downloads/node/</nodeDownloadRoot>
+                            <installDirectory>${webInterface.path}/node</installDirectory>
                         </configuration>
 
                         <executions>
@@ -1448,7 +1449,7 @@
                                 <phase>compile</phase>
                                 <configuration>
                                     <arguments>tsc</arguments>
-                                    <workingDirectory>../graylog2-web-interface/docs/graylog-luma</workingDirectory>
+                                    <workingDirectory>${webInterface.path}/docs/graylog-luma</workingDirectory>
                                 </configuration>
                             </execution>
 
