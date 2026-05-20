@@ -129,7 +129,7 @@ public class PipelineAnalyzer {
                     List<Rule> stageRules = stage.getRules();
                     if (stageRules == null) continue;
                     for (Rule rule : stageRules) {
-                        if (rule == null) continue;
+                        if (rule == null || rule.id() == null) continue;
                         ruleSet.add(rule.id());
                         ruleTitles.put(rule.id(), rule.name());
                         boolean ruleHasReferences = analyzeRule(
