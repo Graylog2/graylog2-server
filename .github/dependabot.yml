@@ -174,4 +174,8 @@ updates:
     labels:
       - dependencies
     rebase-strategy: "disabled"
+    groups:
+      storybook:
+        patterns:
+          - "@storybook/*"
 
