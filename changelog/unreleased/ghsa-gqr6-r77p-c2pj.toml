@@ -1,0 +1,2 @@
+type = "s"
+message = "Fix FortiGate syslog parser handling of quoted values. [GHSA-gqr6-r77p-c2pj](https://github.com/Graylog2/graylog2-server/security/advisories/GHSA-gqr6-r77p-c2pj)"
