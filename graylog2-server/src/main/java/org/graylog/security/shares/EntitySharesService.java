@@ -390,6 +390,11 @@ public class EntitySharesService {
         return updateEntityShares(grnClone, shareRequest, sharingUser);
     }
 
+    public List<GrantDTO> getGrantsForTarget(final GRNType type, final String id) {
+        final GRN grn = grnRegistry.newGRN(type, id);
+        return grantService.getForTarget(grn);
+    }
+
     private void postUpdateEvent(EntitySharesUpdateEvent updateEvent) {
         this.serverEventBus.post(updateEvent);
     }
