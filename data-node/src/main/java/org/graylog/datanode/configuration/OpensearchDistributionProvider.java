@@ -114,9 +114,12 @@ public class OpensearchDistributionProvider implements Provider<OpensearchDistri
             throw createErrorMessage(directory, arch, "No Opensearch distribution found for your system architecture");
         }
 
-        final OpensearchDistribution result = selector.apply(candidates);
-        LOG.info("Using opensearch distribution {}", result.directory().toAbsolutePath());
-        return result;
+        final OpensearchDistribution selected = selector.apply(candidates);
+
+        final List<OpensearchDistribution> otherCandidates = candidates.stream().filter(c -> !c.equals(selected)).toList();
+
+        LOG.info("Using opensearch distribution {}", selected.directory().toAbsolutePath());
+        return selected.withOtherCandidates(otherCandidates);
     }
 
     private static List<OpensearchDistribution> filterByArchitecture(List<OpensearchDistribution> available, OpensearchArchitecture arch) {
