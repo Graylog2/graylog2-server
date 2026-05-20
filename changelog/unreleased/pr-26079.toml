@@ -1,0 +1,4 @@
+type = "changed"
+message = "Allow dots in event-definition tags and expose the tags input via an ARIA label."
+
+pulls = ["26079"]
