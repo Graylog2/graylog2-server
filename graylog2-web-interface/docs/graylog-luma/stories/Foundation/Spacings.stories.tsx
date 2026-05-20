@@ -18,7 +18,7 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import styled, { useTheme } from 'styled-components';
 
-import { FoundationTable, H1, PxLabel, SectionDescription, StoryContainer, Token } from './shared';
+import { COL_WIDTH_SIZE, COL_WIDTH_VARIABLE, FoundationTable, H1, PxLabel, SectionDescription, StoryContainer, Token } from './shared';
 
 // ─── Spacings ──────────────────────────────────────────────────────────────
 
@@ -94,12 +94,12 @@ const SpacingsDoc = () => {
     },
     {
       header: 'Variable',
-      width: '220px',
+      width: COL_WIDTH_VARIABLE,
       render: (row: SpacingEntry) => <Token>{row.token}</Token>,
     },
     {
       header: 'Size',
-      width: '140px',
+      width: COL_WIDTH_SIZE,
       render: (row: SpacingEntry) => (
         <PxLabel>
           {spacings[row.key]} / {spacingsPx[row.key]}px

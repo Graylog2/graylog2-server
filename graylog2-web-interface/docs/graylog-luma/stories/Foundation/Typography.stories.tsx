@@ -264,7 +264,7 @@ const TypeScaleDoc = () => {
     },
     {
       header: 'Size',
-      width: '140px',
+      width: COL_WIDTH_SIZE,
       render: (row: ScaleEntry) => {
         const sizeValue = sizes[row.key] ?? '1rem';
 

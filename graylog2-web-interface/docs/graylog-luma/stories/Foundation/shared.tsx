@@ -14,21 +14,67 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 
 export const COL_WIDTH_STYLE = '200px';
 export const COL_WIDTH_VARIABLE = '220px';
 export const COL_WIDTH_SIZE = '140px';
 
-export const Token = styled.code`
+const TokenWrapper = styled.span`
+  position: relative;
+  display: inline-block;
+`;
+
+const StyledToken = styled.code`
   font-family: ${({ theme }) => theme.fonts.family.monospace};
   font-size: ${({ theme }) => theme.fonts.size.small};
   color: ${({ theme }) => theme.colors.text.secondary};
   background: rgba(128, 128, 128, 0.12);
   padding: 1px ${({ theme }) => theme.spacings.xs};
   border-radius: 3px;
+  cursor: pointer;
+  user-select: none;
+
+  &:hover {
+    background: rgba(128, 128, 128, 0.22);
+  }
 `;
+
+const CopiedHint = styled.span<{ $visible: boolean }>`
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: ${({ $visible }) => ($visible ? 1 : 0)};
+  transition: opacity 0.2s;
+`;
+
+export const Token = ({ children }: { children: string }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleClick = () => {
+    navigator.clipboard.writeText(children);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+
+  return (
+    <TokenWrapper>
+      <StyledToken onClick={handleClick} title="Click to copy">
+        {children}
+      </StyledToken>
+      <CopiedHint $visible={copied}>Copied!</CopiedHint>
+    </TokenWrapper>
+  );
+};
 
 export const PxLabel = styled.span`
   font-family: ${({ theme }) => theme.fonts.family.monospace};
