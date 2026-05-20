@@ -18,7 +18,7 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import styled, { useTheme } from 'styled-components';
 
-import { FoundationTable, PxLabel, StoryContainer, Token } from './shared';
+import { FoundationTable, H1, H2, H3, PxLabel, SectionDescription, StoryContainer, Token } from './shared';
 
 // Root font size matching theme/constants ROOT_FONT_SIZE
 const ROOT_FONT_SIZE = 16;
@@ -63,13 +63,12 @@ const FontFamiliesDoc = () => {
   const columns = [
     {
       header: 'Style',
-      width: '320px',
+      width: '260px',
       render: (row: FamilyEntry) => (
         <p
           style={{
             fontFamily: families[row.key],
             fontSize: '1.1rem',
-            color: theme.colors.text.primary,
             margin: 0,
             lineHeight: 1.5,
           }}>
@@ -92,7 +91,7 @@ const FontFamiliesDoc = () => {
 
   return (
     <StoryContainer>
-      <h2 style={{ marginBottom: theme.spacings.lg }}>Font Families</h2>
+      <H2>Font Families</H2>
       <FoundationTable columns={columns} rows={FONT_FAMILIES} keyBy={(row) => row.key} />
     </StoryContainer>
   );
@@ -108,10 +107,9 @@ const ScaleGroup = styled.section`
   }
 `;
 
-
 const GroupNote = styled.p`
-  font-size: ${({ theme }) => theme.fonts.size.small};
-  color: ${({ theme }) => theme.colors.text.secondary};
+  font-size: ${({ theme }) => theme.fonts.size.body};
+  color: ${({ theme }) => theme.colors.text.primary};
   margin: 0 0 ${({ theme }) => theme.spacings.md};
   line-height: 1.5;
 `;
@@ -266,32 +264,34 @@ const TypeScaleDoc = () => {
     },
     {
       header: 'Variable',
-      width: '260px',
+      width: '240px',
       render: (row: ScaleEntry) => <Token>{row.token}</Token>,
     },
     {
-      header: 'Usage',
+      header: 'Size',
+      width: '140px',
       render: (row: ScaleEntry) => {
         const sizeValue = sizes[row.key] ?? '1rem';
 
         return (
-          <>
-            <PxLabel>
-              {sizeValue} / {remToPx(sizeValue)}
-            </PxLabel>
-            <div>{row.usage}</div>
-          </>
+          <PxLabel>
+            {sizeValue} / {remToPx(sizeValue)}
+          </PxLabel>
         );
       },
+    },
+    {
+      header: 'Usage',
+      render: (row: ScaleEntry) => row.usage,
     },
   ];
 
   return (
     <StoryContainer>
-      <h2 style={{ marginBottom: theme.spacings.lg }}>Type Scale</h2>
+      <H2>Type Scale</H2>
       {TYPE_SCALE_GROUPS.map((group) => (
         <ScaleGroup key={group.label}>
-          <h3>{group.label}</h3>
+          <H3>{group.label}</H3>
           <GroupNote>{group.note}</GroupNote>
           <FoundationTable
             columns={columns}
@@ -319,7 +319,6 @@ const Swatch = styled.div<{ $color: string; $labelColor: string }>`
   font-size: ${({ theme }) => theme.fonts.size.small};
   font-weight: 600;
   color: ${({ $labelColor }) => $labelColor};
-  flex-shrink: 0;
 `;
 
 type ColorEntry = {
@@ -369,7 +368,7 @@ const TextColorsDoc = () => {
     },
     {
       header: 'Variable',
-      width: '260px',
+      width: '220px',
       render: (row: ColorEntry) => <Token>{row.token}</Token>,
     },
     {
@@ -380,7 +379,12 @@ const TextColorsDoc = () => {
 
   return (
     <StoryContainer>
-      <h2 style={{ marginBottom: theme.spacings.lg }}>Text Colors</h2>
+      <H2>Text Colors</H2>
+      <SectionDescription>
+        Our text color palette is designed to provide optimal contrast for light and dark themes. We aim to ensure
+        that information is easy to read and does not strain readers&apos; eyes while they browse their data. These
+        standards also help us meet our customers&apos; accessibility requirements.
+      </SectionDescription>
       <FoundationTable columns={columns} rows={TEXT_COLORS} keyBy={(row) => row.token} />
     </StoryContainer>
   );
@@ -404,25 +408,21 @@ const meta: Meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const TypographyDoc = () => {
-  const theme = useTheme();
-
-  return (
-    <>
-      <StoryContainer>
-        <h1>Typography</h1>
-        <p style={{ color: theme.colors.text.secondary, lineHeight: 1.6 }}>
-          Typography in our design system ensures clarity, consistency, and accessibility across all
-          user interfaces. We use a dual-typeface approach to distinguish between general interface
-          content and technical or system-specific elements.
-        </p>
-      </StoryContainer>
-      <FontFamiliesDoc />
-      <TypeScaleDoc />
-      <TextColorsDoc />
-    </>
-  );
-};
+const TypographyDoc = () => (
+  <>
+    <StoryContainer>
+      <H1>Typography</H1>
+      <p style={{ lineHeight: 1.6 }}>
+        Typography in our design system ensures clarity, consistency, and accessibility across all
+        user interfaces. We use a dual-typeface approach to distinguish between general interface
+        content and technical or system-specific elements.
+      </p>
+    </StoryContainer>
+    <FontFamiliesDoc />
+    <TypeScaleDoc />
+    <TextColorsDoc />
+  </>
+);
 
 export const Typography: Story = {
   render: TypographyDoc,

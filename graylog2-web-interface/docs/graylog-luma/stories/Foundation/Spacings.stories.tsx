@@ -18,7 +18,7 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import styled, { useTheme } from 'styled-components';
 
-import { FoundationItem, PxLabel, StoryContainer, Token, TokenRow, UsageNote } from './shared';
+import { FoundationTable, H1, PxLabel, SectionDescription, StoryContainer, Token } from './shared';
 
 // ─── Spacings ──────────────────────────────────────────────────────────────
 
@@ -27,7 +27,6 @@ const SpacingBar = styled.div<{ $height: string }>`
   height: ${({ $height }) => $height};
   background-color: #6366f1;
   border-radius: 2px;
-  margin-bottom: ${({ theme }) => theme.spacings.xxs};
 `;
 
 type SpacingKey = 'xxs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
@@ -35,78 +34,86 @@ type SpacingKey = 'xxs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
 type SpacingEntry = {
   key: SpacingKey;
   token: string;
-  when: string;
+  usage: string;
 };
 
 const SPACINGS: SpacingEntry[] = [
   {
     key: 'xxs',
     token: 'theme.spacings.xxs',
-    when: 'Corner radius on interactive elements (buttons, inputs, cards). Border widths. The minimum meaningful visual unit — not for padding or layout gaps.',
+    usage: 'Corner radius on interactive elements (buttons, inputs, cards). Border widths. The minimum meaningful visual unit — not for padding or layout gaps.',
   },
   {
     key: 'xs',
     token: 'theme.spacings.xs',
-    when: 'Padding within compact elements (chips, badges, icon buttons). Horizontal gap between inline siblings such as an icon and its label.',
+    usage: 'Padding within compact elements (chips, badges, icon buttons). Horizontal gap between inline siblings such as an icon and its label.',
   },
   {
     key: 'sm',
     token: 'theme.spacings.sm',
-    when: 'Standard padding inside components (inputs, list items, table cells). Vertical gap between a label and its associated control. Gap between tightly related elements within a component.',
+    usage: 'Standard padding inside components (inputs, list items, table cells). Vertical gap between a label and its associated control. Gap between tightly related elements within a component.',
   },
   {
     key: 'md',
     token: 'theme.spacings.md',
-    when: 'Default gap in flex and grid layouts. Padding inside medium-sized containers. Vertical separation between elements that belong to the same section but are visually distinct.',
+    usage: 'Default gap in flex and grid layouts. Padding inside medium-sized containers. Vertical separation between elements that belong to the same section but are visually distinct.',
   },
   {
     key: 'lg',
     token: 'theme.spacings.lg',
-    when: 'Margin between visually distinct groups within a panel. Larger padding for prominent containers such as empty states or dialog content areas.',
+    usage: 'Margin between visually distinct groups within a panel. Larger padding for prominent containers such as empty states or dialog content areas.',
   },
   {
     key: 'xl',
     token: 'theme.spacings.xl',
-    when: 'Separation between major independent sections on a page. Use sparingly — most layouts do not need this.',
+    usage: 'Separation between major independent sections on a page. Use sparingly — most layouts do not need this.',
   },
   {
     key: 'xxl',
     token: 'theme.spacings.xxl',
-    when: 'Page-level whitespace only. Rarely appropriate in component authoring — prefer structural layout components over manual large margins.',
+    usage: 'Page-level whitespace only. Rarely appropriate in component authoring — prefer structural layout components over manual large margins.',
   },
 ];
 
 const SpacingsDoc = () => {
   const theme = useTheme();
+  const spacings = theme.spacings as Record<string, string>;
+  const spacingsPx = theme.spacings.px as Record<string, number>;
+
+  const columns = [
+    {
+      header: 'Style',
+      width: '120px',
+      render: (row: SpacingEntry) => <SpacingBar $height={spacings[row.key]} />,
+    },
+    {
+      header: 'Variable',
+      width: '220px',
+      render: (row: SpacingEntry) => <Token>{row.token}</Token>,
+    },
+    {
+      header: 'Size',
+      width: '140px',
+      render: (row: SpacingEntry) => (
+        <PxLabel>
+          {spacings[row.key]} / {spacingsPx[row.key]}px
+        </PxLabel>
+      ),
+    },
+    {
+      header: 'Usage',
+      render: (row: SpacingEntry) => row.usage,
+    },
+  ];
 
   return (
     <StoryContainer>
-      <h1>Spacings</h1>
-      <UsageNote>
-        Spacing tokens are for <strong>component authors</strong> building new reusable components. When you are
-        composing existing components, their internal spacing is already built in — you do not need to apply these
-        manually.
-      </UsageNote>
-      {SPACINGS.map(({ key, token, when }) => {
-        const value = (theme.spacings as Record<string, string>)[key];
-        const px = (theme.spacings.px as Record<string, number>)[key];
-
-        return (
-          <FoundationItem key={key}>
-            <TokenRow>
-              <Token>{token}</Token>
-              <PxLabel>
-                {value} / {px}px
-              </PxLabel>
-            </TokenRow>
-            <SpacingBar $height={value} />
-            <UsageNote>
-              <strong>Use for: </strong>
-              {when}
-            </UsageNote>
-          </FoundationItem>
-        );
-      })}
+      <H1>Spacings</H1>
+      <SectionDescription>
+        Spacing tokens are for <strong>component authors</strong> building new reusable components. When composing
+        existing components, their internal spacing is already built in — you do not need to apply these manually.
+      </SectionDescription>
+      <FoundationTable columns={columns} rows={SPACINGS} keyBy={(row) => row.key} />
     </StoryContainer>
   );
 };

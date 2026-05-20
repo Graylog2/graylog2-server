@@ -32,30 +32,27 @@ export const PxLabel = styled.span`
   color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
-export const UsageNote = styled.p`
-  font-size: ${({ theme }) => theme.fonts.size.small};
-  color: ${({ theme }) => theme.colors.text.secondary};
-  margin: ${({ theme }) => theme.spacings.xxs} 0 0;
-  line-height: 1.5;
-`;
-
-export const FoundationItem = styled.div`
-  &:not(:last-child) {
-    margin-bottom: ${({ theme }) => theme.spacings.md};
-    border-bottom: 1px solid rgba(128, 128, 128, 0.15);
-    padding-bottom: ${({ theme }) => theme.spacings.md};
-  }
-`;
-
 export const StoryContainer = styled.div`
   padding-bottom: ${({ theme }) => theme.spacings.xl};
 `;
 
-export const TokenRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${({ theme }) => theme.spacings.sm};
-  margin-bottom: ${({ theme }) => theme.spacings.xs};
+export const SectionDescription = styled.p`
+  line-height: 1.6;
+  margin-bottom: ${({ theme }) => theme.spacings.lg};
+`;
+
+// ─── Story Headings ───────────────────────────────────────────────────────
+
+export const H1 = styled.h1`
+  margin: 0 0 ${({ theme }) => theme.spacings.md};
+`;
+
+export const H2 = styled.h2`
+  margin: 0 0 ${({ theme }) => theme.spacings.sm};
+`;
+
+export const H3 = styled.h3`
+  margin: 0 0 ${({ theme }) => theme.spacings.xs};
 `;
 
 // ─── Foundation Table ──────────────────────────────────────────────────────
@@ -75,11 +72,11 @@ const Th = styled.th<{ $width?: string }>`
   letter-spacing: 0.07em;
   color: ${({ theme }) => theme.colors.text.secondary};
   border-bottom: 2px solid rgba(128, 128, 128, 0.2);
-  width: ${({ $width }) => $width ?? 'auto'};
+  ${({ $width }) => $width && `width: ${$width};`}
 `;
 
 const Td = styled.td`
-  padding: ${({ theme }) => `${theme.spacings.sm} ${theme.spacings.sm}`};
+  padding: ${({ theme }) => theme.spacings.sm};
   vertical-align: top;
   border-bottom: 1px solid rgba(128, 128, 128, 0.12);
   line-height: 1.5;
