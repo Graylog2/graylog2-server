@@ -163,6 +163,34 @@ class ProcessingLoadServiceTest {
     }
 
     @Test
+    void pipelineShareIsScopedToPipeline() {
+        // Costs (µs/s): A=30, B=70 → P1=100; C=100 → P2=100; cluster=200.
+        final Rule a = mockRule("rule-A");
+        final Rule b = mockRule("rule-B");
+        final Rule c = mockRule("rule-C");
+        final Pipeline p1 = pipeline("P1", List.of(stage(0, a, b)));
+        final Pipeline p2 = pipeline("P2", List.of(stage(0, c)));
+        final PipelineInterpreter.State state = stateWith(p1, p2);
+
+        final NodeTimerSnapshot snapshot = NodeTimerSnapshot.builder()
+                .timer(timerName("rule-A", "P1", 0, EVALUATE), 10.0d, 3.0d)
+                .timer(timerName("rule-B", "P1", 0, EVALUATE), 10.0d, 7.0d)
+                .timer(timerName("rule-C", "P2", 0, EVALUATE), 10.0d, 10.0d)
+                .build();
+
+        final ProcessingLoadResponse response = compute(state, Map.of("node-1", snapshot));
+
+        assertThat(response.totalCostMicrosecondsPerSecond()).isEqualTo(200.0d);
+        assertThat(response.stageRules())
+                .extracting(StageRuleLoad::ruleId, StageRuleLoad::loadPercent, StageRuleLoad::pipelineSharePercent)
+                .containsExactlyInAnyOrder(
+                        tuple("rule-A", 15.0d, 30.0d),
+                        tuple("rule-B", 35.0d, 70.0d),
+                        tuple("rule-C", 50.0d, 100.0d)
+                );
+    }
+
+    @Test
     void unavailableWhenNoPipelines() {
         final PipelineInterpreter.State state = stateWith();
         final ProcessingLoadResponse response = compute(state, Map.of(
@@ -301,8 +329,8 @@ class ProcessingLoadServiceTest {
                 true,
                 100.0d,
                 List.of(
-                        StageRuleLoad.create("rule-a", "pipe-1", 0, 30.0d),
-                        StageRuleLoad.create("rule-b", "pipe-2", 0, 70.0d)
+                        StageRuleLoad.create("rule-a", "pipe-1", 0, 30.0d, 100.0d),
+                        StageRuleLoad.create("rule-b", "pipe-2", 0, 70.0d, 100.0d)
                 ),
                 List.of(
                         PipelineLoad.create("pipe-1", 30.0d),
@@ -339,7 +367,7 @@ class ProcessingLoadServiceTest {
         final ProcessingLoadResponse full = ProcessingLoadResponse.create(
                 true,
                 100.0d,
-                List.of(StageRuleLoad.create("rule-a", "pipe-1", 0, 100.0d)),
+                List.of(StageRuleLoad.create("rule-a", "pipe-1", 0, 100.0d, 100.0d)),
                 List.of(PipelineLoad.create("pipe-1", 100.0d)),
                 List.of(RuleLoad.create("rule-a", 100.0d))
         );
@@ -360,7 +388,7 @@ class ProcessingLoadServiceTest {
         final ProcessingLoadResponse full = ProcessingLoadResponse.create(
                 true,
                 100.0d,
-                List.of(StageRuleLoad.create("rule-a", "pipe-1", 0, 100.0d)),
+                List.of(StageRuleLoad.create("rule-a", "pipe-1", 0, 100.0d, 100.0d)),
                 List.of(PipelineLoad.create("pipe-1", 100.0d)),
                 List.of(RuleLoad.create("rule-a", 100.0d))
         );

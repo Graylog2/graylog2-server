@@ -108,7 +108,8 @@ public class ProcessingLoadService {
                         c.combination.ruleId(),
                         c.combination.pipelineId(),
                         c.combination.stage(),
-                        percentage(c.cost, clusterTotal)
+                        percentage(c.cost, clusterTotal),
+                        percentage(c.cost, perPipeline.get(c.combination.pipelineId()))
                 ))
                 .sorted(Comparator.comparingDouble(StageRuleLoad::loadPercent).reversed())
                 .toList();

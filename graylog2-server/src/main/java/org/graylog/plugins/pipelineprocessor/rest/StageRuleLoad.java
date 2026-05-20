@@ -30,10 +30,20 @@ public abstract class StageRuleLoad {
     @JsonProperty("stage")
     public abstract int stage();
 
+    /**
+     * Share of the cluster-wide load.
+     */
     @JsonProperty("load_percent")
     public abstract double loadPercent();
 
-    public static StageRuleLoad create(String ruleId, String pipelineId, int stage, double loadPercent) {
-        return new AutoValue_StageRuleLoad(ruleId, pipelineId, stage, loadPercent);
+    /**
+     * Share of the parent pipeline's load. Sums to ~100% per pipeline.
+     */
+    @JsonProperty("pipeline_share_percent")
+    public abstract double pipelineSharePercent();
+
+    public static StageRuleLoad create(String ruleId, String pipelineId, int stage,
+                                       double loadPercent, double pipelineSharePercent) {
+        return new AutoValue_StageRuleLoad(ruleId, pipelineId, stage, loadPercent, pipelineSharePercent);
     }
 }
