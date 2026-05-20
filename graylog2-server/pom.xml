@@ -1442,6 +1442,18 @@
                             </execution>
 
                             <execution>
+                                <id>luma: yarn install</id>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <arguments>install</arguments>
+                                    <workingDirectory>${webInterface.path}/docs/graylog-luma</workingDirectory>
+                                </configuration>
+                            </execution>
+
+                            <execution>
                                 <id>luma: yarn tsc</id>
                                 <goals>
                                     <goal>yarn</goal>
