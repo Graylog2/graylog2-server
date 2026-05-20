@@ -60,7 +60,7 @@ const useUserLayoutPreferences = <T>(
   entityId: string,
   layoutVariant?: string,
 ): { data: TableLayoutPreferences<T>; isInitialLoading: boolean; refetch: () => void } => {
-  const { data, isInitialLoading, refetch } = useQuery({
+  const { data, isLoading: isInitialLoading, refetch } = useQuery({
     queryKey: ['table-layout', entityId, layoutVariant],
     queryFn: () =>
       defaultOnError(
