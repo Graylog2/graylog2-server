@@ -49,6 +49,7 @@ import static org.graylog.plugins.pipelineprocessor.processors.PipelineTestUtil.
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineTestUtil.STREAM2_TITLE;
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineTestUtil.STREAM3_ID;
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineTestUtil.STREAM3_TITLE;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -215,6 +216,32 @@ class PipelineAnalyzerTest {
                 .orElseThrow();
 
         assertEquals(Set.of(FromInput.NAME), metadataDao.functions());
+    }
+
+    @Test
+    void skipsRuleWithNullId() {
+        // Simulates an unresolved rule — referenced by name in pipeline source but deleted from DB
+        Rule unresolvedRule = mock(Rule.class);
+        when(unresolvedRule.id()).thenReturn(null);
+        when(unresolvedRule.name()).thenReturn("deleted_rule");
+        when(unresolvedRule.when()).thenReturn(mock(LogicalExpression.class));
+        when(unresolvedRule.then()).thenReturn(List.of());
+
+        final Pipeline pipeline = testUtil.createPipelineWithRules("pipeline_with_null_id_rule",
+                List.of(testUtil.ALWAYS_TRUE, unresolvedRule));
+
+        pipelineAnalyzer.analyzePipelines(
+                ImmutableMap.of(pipeline.id(), pipeline), ruleRecords, routingRuleRecords);
+
+        final PipelineRulesMetadataDao metadataDao = ruleRecords.stream()
+                .filter(dao -> dao.pipelineId().equals(pipeline.id()))
+                .findFirst()
+                .orElseThrow();
+
+        // The unresolved rule should be skipped — only ALWAYS_TRUE should be in the metadata
+        assertThat(metadataDao.rules()).containsExactly(PipelineTestUtil.ALWAYS_TRUE_ID);
+        assertThat(metadataDao.ruleTitlesById()).containsKey(PipelineTestUtil.ALWAYS_TRUE_ID);
+        assertThat(metadataDao.ruleTitlesById()).doesNotContainKey(null);
     }
 
     private Pipeline createPipelineWithFailingRule() {
