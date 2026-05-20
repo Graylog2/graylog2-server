@@ -32,13 +32,13 @@ const MAX_TAGS = 64;
 const MAX_TAG_LENGTH = 128;
 
 // Mirror of TagNormalizer.VALID_TAG_PATTERN. Keep in sync.
-const VALID_TAG_PATTERN = /^[a-z0-9_-]+$/;
+const VALID_TAG_PATTERN = /^[a-z0-9_.-]+$/;
 
 const SUGGESTION_LIMIT = 50;
 const DEBOUNCE_MS = 300;
 
 // Unit-separator character; can't appear in a tag value (validation restricts tags to
-// [a-z0-9_-]) so it's safe to use as the delimiter Select uses to (de)serialize multi values.
+// [a-z0-9_.-]) so it's safe to use as the delimiter Select uses to (de)serialize multi values.
 const VALUE_DELIMITER = '\x1F';
 
 type Props = {
@@ -48,7 +48,7 @@ type Props = {
   error?: React.ReactNode;
 };
 
-const HELP_TEXT = 'Press Enter or Tab to add. Tags are lowercased and deduplicated. Only lowercase letters, digits, hyphens, and underscores are allowed.';
+const HELP_TEXT = 'Press Enter or Tab to add. Tags are lowercased and deduplicated. Only lowercase letters, digits, hyphens, underscores, and dots are allowed.';
 
 const isTooLong = (tag: string): boolean => tag.length > MAX_TAG_LENGTH;
 const hasInvalidChars = (tag: string): boolean => !VALID_TAG_PATTERN.test(tag);
@@ -71,7 +71,7 @@ const buildInvalidCharsMessage = (tagsList: ReadonlyArray<string>): string | nul
 
   return `Tag${isPlural ? 's' : ''} ${tagsList.map(quote).join(', ')} `
     + `${isPlural ? 'contain' : 'contains'} invalid characters. `
-    + 'Only lowercase letters, digits, hyphens, and underscores are allowed.';
+    + 'Only lowercase letters, digits, hyphens, underscores, and dots are allowed.';
 };
 
 const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) => {
