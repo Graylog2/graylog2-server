@@ -18,7 +18,7 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import styled, { useTheme } from 'styled-components';
 
-import { FoundationItem, PxLabel, StoryContainer, Token, TokenRow, UsageNote } from './shared';
+import { FoundationItem, FoundationTable, PxLabel, StoryContainer, Token, TokenRow, UsageNote } from './shared';
 
 // Root font size matching theme/constants ROOT_FONT_SIZE
 const ROOT_FONT_SIZE = 16;
@@ -315,96 +315,64 @@ const TypeScaleDoc = () => {
 
 // ─── Text Colors ───────────────────────────────────────────────────────────
 
-const ColorItem = styled.div`
-  display: grid;
-  grid-template-columns: 56px 1fr;
-  gap: ${({ theme }) => theme.spacings.md};
-  align-items: start;
-
-  &:not(:last-child) {
-    margin-bottom: ${({ theme }) => theme.spacings.md};
-    border-bottom: 1px solid rgba(128, 128, 128, 0.15);
-    padding-bottom: ${({ theme }) => theme.spacings.md};
-  }
-`;
-
 const Swatch = styled.div<{ $color: string }>`
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 6px;
   background-color: ${({ $color }) => $color};
   border: 1px solid rgba(128, 128, 128, 0.25);
+  margin-bottom: ${({ theme }) => theme.spacings.xs};
   flex-shrink: 0;
 `;
 
 type ColorEntry = {
   token: string;
   getColor: (theme: any) => string;
-  specimen: string;
-  when: string;
-  not: string;
+  usage: string;
 };
 
 const TEXT_COLORS: ColorEntry[] = [
   {
     token: 'theme.colors.text.primary',
     getColor: (t) => t.colors.text.primary,
-    specimen: 'Primary text carries the essential information the user must read.',
-    when: 'All primary readable content: headings, body copy, button labels, input values, table cell data. This is the default — use it unless the text is explicitly supporting or de-emphasized.',
-    not: 'Labels and hints that support a primary value — those should use secondary.',
+    usage: 'Primary text. This should be used for all text in the app.',
   },
   {
     token: 'theme.colors.text.secondary',
     getColor: (t) => t.colors.text.secondary,
-    specimen: 'Secondary text supports and contextualizes the primary content.',
-    when: 'Supporting information: form field hints, timestamps below a title, column sub-labels, empty-state descriptions. Signals "this is contextual, not essential".',
-    not: 'Content the user needs to act on. If they must read it to complete a task, use primary.',
+    usage: 'Light theme secondary text. Used for most descriptions, charts, and table headers.',
   },
   {
     token: 'theme.colors.text.disabled',
     getColor: (t) => t.colors.text.disabled,
-    specimen: 'Disabled text indicates an unavailable state.',
-    when: 'Text inside disabled form inputs, greyed-out menu items, or any element the user cannot currently interact with.',
-    not: 'De-emphasized but readable content — use secondary instead. Disabled implies "not interactive", not "less important".',
+    usage: 'Light theme disabled text.',
   },
 ];
 
 const TextColorsDoc = () => {
   const theme = useTheme();
 
+  const columns = [
+    {
+      header: 'Style',
+      width: '220px',
+      render: (row: ColorEntry) => <Swatch $color={row.getColor(theme)} />,
+    },
+    {
+      header: 'Variable',
+      width: '260px',
+      render: (row: ColorEntry) => <Token>{row.token}</Token>,
+    },
+    {
+      header: 'Usage',
+      render: (row: ColorEntry) => row.usage,
+    },
+  ];
+
   return (
     <StoryContainer>
       <h1 style={{ marginBottom: theme.spacings.lg }}>Text Colors</h1>
-      {TEXT_COLORS.map(({ token, getColor, specimen, when, not }) => {
-        const color = getColor(theme);
-
-        return (
-          <ColorItem key={token}>
-            <Swatch $color={color} />
-            <div>
-              <Token>{token}</Token>
-              <p
-                style={{
-                  fontFamily: theme.fonts.family.body,
-                  fontSize: theme.fonts.size.body,
-                  color,
-                  margin: `${theme.spacings.sm} 0 ${theme.spacings.xxs}`,
-                  lineHeight: 1.4,
-                }}>
-                {specimen}
-              </p>
-              <UsageNote>
-                <strong>Use when: </strong>
-                {when}
-              </UsageNote>
-              <UsageNote>
-                <strong>Not for: </strong>
-                {not}
-              </UsageNote>
-            </div>
-          </ColorItem>
-        );
-      })}
+      <FoundationTable columns={columns} rows={TEXT_COLORS} keyBy={(row) => row.token} />
     </StoryContainer>
   );
 };
