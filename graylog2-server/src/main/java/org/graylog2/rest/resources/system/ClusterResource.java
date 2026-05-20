@@ -31,6 +31,7 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
@@ -41,6 +42,7 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.models.system.cluster.responses.NodeSummary;
 import org.graylog2.rest.models.system.cluster.responses.NodeSummaryList;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,6 +84,7 @@ public class ClusterResource extends RestResource {
     @GET
     @Timed
     @Path("/node")
+    @RequiresPermissions(RestPermissions.CLUSTER_CONFIGURATION_READ)
     @ApiOperation(value = "Information about this node.",
                   notes = "This is returning information of this node in context to its state in the cluster. " +
                           "Use the system API of the node itself to get system information.")
@@ -92,6 +95,7 @@ public class ClusterResource extends RestResource {
     @GET
     @Timed
     @Path("/nodes/{nodeId}")
+    @RequiresPermissions(RestPermissions.CLUSTER_CONFIGURATION_READ)
     @ApiOperation(value = "Information about a node.",
                   notes = "This is returning information of a node in context to its state in the cluster. " +
                           "Use the system API of the node itself to get system information.")
