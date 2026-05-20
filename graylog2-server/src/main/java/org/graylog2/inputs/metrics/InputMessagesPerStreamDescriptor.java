@@ -35,17 +35,17 @@ import java.util.stream.Collectors;
 import static org.graylog2.plugin.Message.FIELD_GL2_SOURCE_INPUT;
 
 
-public class InputMessageCountDescriptor implements EntityCachedMetricDescriptor<Map<String, Long>, Map<String, Long>> {
+public class InputMessagesPerStreamDescriptor implements EntityCachedMetricDescriptor<Map<String, Long>, Map<String, Long>> {
 
-    public static final String FIELD_NAME = "message_count";
+    public static final String FIELD_NAME = "messages_per_stream";
 
 
     private final MoreSearch moreSearch;
     private final Duration cacheTtl;
 
     @Inject
-    public InputMessageCountDescriptor(MoreSearch moreSearch,
-                                       @Named(MetricsCacheConfiguration.METRICS_CACHE_TTL_LONG) Duration cacheTtl) {
+    public InputMessagesPerStreamDescriptor(MoreSearch moreSearch,
+                                            @Named(MetricsCacheConfiguration.METRICS_CACHE_TTL_LONG) Duration cacheTtl) {
         this.moreSearch = moreSearch;
         this.cacheTtl = cacheTtl;
     }

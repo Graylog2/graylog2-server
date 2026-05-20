@@ -38,17 +38,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class InputMessageCountDescriptorTest {
+class InputMessagesPerStreamDescriptorTest {
 
     private MoreSearch moreSearch;
     private SearchUser searchUser;
-    private InputMessageCountDescriptor descriptor;
+    private InputMessagesPerStreamDescriptor descriptor;
 
     @BeforeEach
     void setUp() {
         moreSearch = mock(MoreSearch.class);
         searchUser = mock(SearchUser.class);
-        descriptor = new InputMessageCountDescriptor(moreSearch, Duration.ofMinutes(5));
+        descriptor = new InputMessagesPerStreamDescriptor(moreSearch, Duration.ofMinutes(5));
     }
 
     @Test
