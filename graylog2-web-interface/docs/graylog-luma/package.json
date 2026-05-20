@@ -17,7 +17,7 @@
     "eslint-plugin-storybook": "^10.4.0",
     "storybook": "^10.4.0",
     "storybook-dark-mode": "^5.0.0",
-    "typescript": "^6.0.3"
+    "typescript": "^5.8.2"
   },
   "peerDependencies": {
     "react": "^18.0.0",
