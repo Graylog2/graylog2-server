@@ -22,6 +22,8 @@ import org.graylog.datanode.shared.system.activities.DataNodeActivityWriter;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.cluster.nodes.DataNodeClusterService;
 import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.DataNodeMetadataService;
+import org.graylog2.cluster.nodes.DataNodeMetadataServiceImpl;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterIdFactory;
@@ -46,6 +48,7 @@ public class DatanodeServerBindings extends Graylog2Module {
 
     private void bindSingletons() {
         bind(ClusterConfigService.class).to(ClusterConfigServiceImpl.class).asEagerSingleton();
+        bind(DataNodeMetadataService.class).to(DataNodeMetadataServiceImpl.class).asEagerSingleton();
     }
 
     private void bindInterfaces() {

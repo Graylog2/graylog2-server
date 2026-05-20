@@ -17,12 +17,15 @@
 package org.graylog.datanode.opensearch.statemachine.tracer;
 
 import com.github.zafarkhaja.semver.Version;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.datanode.process.statemachine.tracer.StateMachineTracer;
+import org.graylog2.cluster.nodes.DataNodeMetadataService;
+import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,10 +37,14 @@ public class OpensearchVersionTracer implements StateMachineTracer<OpensearchSta
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchVersionTracer.class);
 
     private final DatanodeConfiguration configuration;
+    private final DataNodeMetadataService metadataService;
+    private final NodeId nodeId;
 
     @Inject
-    public OpensearchVersionTracer(DatanodeConfiguration configuration) {
+    public OpensearchVersionTracer(DatanodeConfiguration configuration, DataNodeMetadataService metadataService, NodeId nodeId) {
         this.configuration = configuration;
+        this.metadataService = metadataService;
+        this.nodeId = nodeId;
     }
 
     @Override
@@ -49,9 +56,13 @@ public class OpensearchVersionTracer implements StateMachineTracer<OpensearchSta
         if (source != destination && destination == OpensearchState.AVAILABLE) {
             final OpensearchDistribution opensearchDistribution = configuration.opensearchDistribution();
             final String osVersion = opensearchDistribution.version();
-            LOG.info("Confirmed Opensearch version {}", osVersion);
 
-            final Version currentVersion = Version.parse(opensearchDistribution.version());
+            final Version currentVersion = Version.parse(osVersion);
+
+            if (isCurrentNewerThanPeristed(currentVersion)) {
+                metadataService.setOpensearchVersion(nodeId.getNodeId(), osVersion);
+                LOG.info("Persisting confirmed opensearch version in data node metadata {}", osVersion);
+            }
 
             if (!opensearchDistribution.otherCandidates().isEmpty()) {
                 final Optional<OpensearchDistribution> newerVersion = opensearchDistribution.otherCandidates().stream()
@@ -64,5 +75,12 @@ public class OpensearchVersionTracer implements StateMachineTracer<OpensearchSta
             }
 
         }
+    }
+
+    @Nonnull
+    private Boolean isCurrentNewerThanPeristed(Version currentVersion) {
+        return metadataService.findByNodeId(nodeId.getNodeId())
+                .map(m -> currentVersion.isHigherThan(Version.parse(m.opensearchVersion())))
+                .orElse(true);
     }
 }
