@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -75,10 +76,10 @@ class EntityMetricsServiceTest {
                 Set.of("message_count"),
                 searchUser);
 
-        // entity-1: only stream-a counts → 100
-        assertThat(result.toMap().get("entity-1")).containsEntry("message_count", 100L);
-        // entity-2: only stream-a counts → 50
-        assertThat(result.toMap().get("entity-2")).containsEntry("message_count", 50L);
+        // entity-1: only stream-a permitted → filtered map
+        assertThat(result.toMap().get("entity-1")).containsEntry("message_count", Map.of("stream-a", 100L));
+        // entity-2: only stream-a permitted → filtered map
+        assertThat(result.toMap().get("entity-2")).containsEntry("message_count", Map.of("stream-a", 50L));
     }
 
     @Test
@@ -97,7 +98,7 @@ class EntityMetricsServiceTest {
         final var firstResult = service.getMetrics(
                 List.of("entity-1"), Set.of("message_count"), searchUser);
 
-        assertThat(firstResult.toMap().get("entity-1")).containsEntry("message_count", 300L);
+        assertThat(firstResult.toMap().get("entity-1")).containsEntry("message_count", Map.of("stream-a", 100L, "stream-b", 200L));
 
         // Second call with different user — reads from cache, filters differently
         final SearchUser restrictedUser = mock(SearchUser.class);
@@ -107,7 +108,7 @@ class EntityMetricsServiceTest {
         final var secondResult = service.getMetrics(
                 List.of("entity-1"), Set.of("message_count"), restrictedUser);
 
-        assertThat(secondResult.toMap().get("entity-1")).containsEntry("message_count", 100L);
+        assertThat(secondResult.toMap().get("entity-1")).containsEntry("message_count", Map.of("stream-a", 100L));
     }
 
     @Test
@@ -143,7 +144,7 @@ class EntityMetricsServiceTest {
                 List.of("entity-1"), Set.of("message_count", "pipeline_count"), searchUser);
 
         assertThat(result.toMap().get("entity-1"))
-                .containsEntry("message_count", 500L)
+                .containsEntry("message_count", Map.of("stream-a", 500L))
                 .containsEntry("pipeline_count", 2);
     }
 
@@ -154,7 +155,7 @@ class EntityMetricsServiceTest {
     /**
      * Test cached descriptor that stores per-stream breakdowns and filters by stream permissions.
      */
-    private static class TestCachedDescriptor implements EntityCachedMetricDescriptor<Map<String, Long>, Long> {
+    private static class TestCachedDescriptor implements EntityCachedMetricDescriptor<Map<String, Long>, Map<String, Long>> {
         private final String fieldName;
         private final Duration cacheTtl;
         private final List<EntityMetric<Map<String, Long>>> computeResult;
@@ -179,11 +180,10 @@ class EntityMetricsServiceTest {
         }
 
         @Override
-        public Long computeForUser(Map<String, Long> countsByStream, SearchUser searchUser) {
+        public Map<String, Long> computeForUser(Map<String, Long> countsByStream, SearchUser searchUser) {
             return countsByStream.entrySet().stream()
                     .filter(e -> searchUser.canReadStream(e.getKey()))
-                    .mapToLong(Map.Entry::getValue)
-                    .sum();
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         }
     }
 

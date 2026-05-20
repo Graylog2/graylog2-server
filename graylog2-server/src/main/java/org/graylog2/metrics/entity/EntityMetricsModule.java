@@ -21,6 +21,7 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import org.graylog2.inputs.InputServiceImpl;
 import org.graylog2.inputs.metrics.InputAssociatedStreamsDescriptor;
+import org.graylog2.inputs.metrics.InputExtractorCountDescriptor;
 import org.graylog2.inputs.metrics.InputMessageCountDescriptor;
 import org.graylog2.streams.StreamServiceImpl;
 import org.graylog2.streams.metrics.StreamAssociatedInputsDescriptor;
@@ -52,6 +53,7 @@ public class EntityMetricsModule extends AbstractModule {
                 Multibinder.newSetBinder(binder(), EntityMetricDescriptor.class, Names.named(ENTITY_TYPE_INPUTS));
         inputDescriptors.addBinding().to(InputMessageCountDescriptor.class);
         inputDescriptors.addBinding().to(InputAssociatedStreamsDescriptor.class);
+        inputDescriptors.addBinding().to(InputExtractorCountDescriptor.class);
 
         final Multibinder<EntityMetricDescriptor> streamDescriptors =
                 Multibinder.newSetBinder(binder(), EntityMetricDescriptor.class, Names.named(ENTITY_TYPE_STREAMS));

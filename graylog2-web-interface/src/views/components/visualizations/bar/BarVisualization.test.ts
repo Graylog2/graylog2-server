@@ -44,10 +44,7 @@ describe('defineSingleDateBarWidth', () => {
   });
 
   it('widens bars when the entire chart has only a single timestamp', () => {
-    const chartDataResult = [
-      bar('a', ['2026-05-12T14:30:00.000Z']),
-      bar('b', ['2026-05-12T14:30:00.000Z']),
-    ];
+    const chartDataResult = [bar('a', ['2026-05-12T14:30:00.000Z']), bar('b', ['2026-05-12T14:30:00.000Z'])];
 
     const result = defineSingleDateBarWidth(chartDataResult, timePivotConfig, timeRangeFrom, timeRangeTo);
 
@@ -78,11 +75,7 @@ describe('defineSingleDateBarWidth', () => {
       x: ['2026-05-12T14:36:00.000Z'],
       y: [0],
     };
-    const chartDataResult = [
-      bar('a', ['2026-05-12T14:30:00.000Z']),
-      bar('b', ['2026-05-12T14:30:00.000Z']),
-      scatter,
-    ];
+    const chartDataResult = [bar('a', ['2026-05-12T14:30:00.000Z']), bar('b', ['2026-05-12T14:30:00.000Z']), scatter];
 
     const result = defineSingleDateBarWidth(chartDataResult, timePivotConfig, timeRangeFrom, timeRangeTo);
 

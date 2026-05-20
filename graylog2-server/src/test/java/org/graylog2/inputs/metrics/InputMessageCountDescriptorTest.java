@@ -94,30 +94,32 @@ class InputMessageCountDescriptorTest {
     }
 
     @Test
-    void computeForUser_sumsOnlyPermittedStreams() {
+    void computeForUser_filtersToPermittedStreams() {
         when(searchUser.canReadStream("stream-a")).thenReturn(true);
         when(searchUser.canReadStream("stream-b")).thenReturn(false);
         when(searchUser.canReadStream("stream-c")).thenReturn(true);
 
         final Map<String, Long> breakdown = Map.of("stream-a", 100L, "stream-b", 200L, "stream-c", 50L);
-        final Long filtered = descriptor.computeForUser(breakdown, searchUser);
+        final Map<String, Long> filtered = descriptor.computeForUser(breakdown, searchUser);
 
-        assertThat(filtered).isEqualTo(150L);
+        assertThat(filtered).containsOnly(
+                Map.entry("stream-a", 100L),
+                Map.entry("stream-c", 50L));
     }
 
     @Test
-    void computeForUser_returnsZeroWhenNoStreamsPermitted() {
+    void computeForUser_returnsEmptyWhenNoStreamsPermitted() {
         when(searchUser.canReadStream("stream-a")).thenReturn(false);
 
-        final Long filtered = descriptor.computeForUser(Map.of("stream-a", 100L), searchUser);
+        final Map<String, Long> filtered = descriptor.computeForUser(Map.of("stream-a", 100L), searchUser);
 
-        assertThat(filtered).isEqualTo(0L);
+        assertThat(filtered).isEmpty();
     }
 
     @Test
-    void computeForUser_returnsZeroForEmptyBreakdown() {
-        final Long filtered = descriptor.computeForUser(Map.of(), searchUser);
+    void computeForUser_returnsEmptyForEmptyBreakdown() {
+        final Map<String, Long> filtered = descriptor.computeForUser(Map.of(), searchUser);
 
-        assertThat(filtered).isEqualTo(0L);
+        assertThat(filtered).isEmpty();
     }
 }

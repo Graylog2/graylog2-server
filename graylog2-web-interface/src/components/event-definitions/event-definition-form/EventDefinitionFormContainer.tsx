@@ -82,6 +82,7 @@ const EventDefinitionFormContainer = ({
     config: {},
     field_spec: {},
     key_spec: [],
+    tags: [],
     notification_settings: {
       grace_period_ms: 300000,
       // Defaults to system setting for notification backlog size
@@ -98,11 +99,29 @@ const EventDefinitionFormContainer = ({
   onSubmit = undefined,
 }: Props) => {
   const [activeStep, setActiveStep] = useState(initialStep);
-  const [eventDefinition, setEventDefinition] = useState(eventDefinitionInitial);
+  const { configFromLocalStorage, hasLocalStorageConfig } = useEventDefinitionConfigFromLocalStorage();
+  // Merge the optional localStorage-stored config into the initial event definition once, at
+  // first render. Previously this happened in a useEffect that called setEventDefinition,
+  // which trips the react-hooks/set-state-in-effect rule.
+  const [eventDefinition, setEventDefinition] = useState(() => {
+    if (!hasLocalStorageConfig) return eventDefinitionInitial;
+
+    const localStorageConditionPlugin = getConditionPlugin(configFromLocalStorage.type);
+    const defaultConfig = localStorageConditionPlugin?.defaultConfig || ({} as EventDefinition['config']);
+    const cloned = cloneDeep(eventDefinitionInitial);
+
+    return {
+      ...cloned,
+      config: {
+        ...defaultConfig,
+        ...cloned.config,
+        ...configFromLocalStorage,
+      },
+    };
+  });
   const [validation, setValidation] = useState({ errors: {} });
   const [eventsClusterConfig, setEventsClusterConfig] = useState(undefined);
   const [isDirty, setIsDirty] = useState(false);
-  const { configFromLocalStorage, hasLocalStorageConfig } = useEventDefinitionConfigFromLocalStorage();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(eventDefinition);
   const { createEventDefinition } = useEventDefinitionMutations();
   const { data: entityTypes } = useQuery({
@@ -135,6 +154,15 @@ const EventDefinitionFormContainer = ({
       setEventDefinition((prev) => ({ ...prev, [key]: value }));
       onEventDefinitionChange({ ...eventDefinition, [key]: value });
       setIsDirty(true);
+      // Drop any stale submit-time validation error for the field being edited so the user
+      // gets immediate feedback on their fix. Each field still owns its live client-side
+      // validation; this only clears the server-returned error from the last submit attempt.
+      setValidation((prev) => {
+        if (!prev.errors || !(key in prev.errors)) return prev;
+        const { [key]: _dropped, ...remaining } = prev.errors as Record<string, unknown>;
+
+        return { ...prev, errors: remaining };
+      });
     },
     [eventDefinition, onEventDefinitionChange, setEventDefinition, setIsDirty],
   );
@@ -142,25 +170,7 @@ const EventDefinitionFormContainer = ({
   useEffect(() => {
     fetchClusterConfig();
     fetchNotifications();
-
-    if (hasLocalStorageConfig) {
-      const localStorageConditionPlugin = getConditionPlugin(configFromLocalStorage.type);
-      const defaultConfig = localStorageConditionPlugin?.defaultConfig || ({} as EventDefinition['config']);
-
-      setEventDefinition((cur) => {
-        const cloned = cloneDeep(cur);
-
-        return {
-          ...cloned,
-          config: {
-            ...defaultConfig,
-            ...cloned.config,
-            ...configFromLocalStorage,
-          },
-        };
-      });
-    }
-  }, [configFromLocalStorage, fetchClusterConfig, hasLocalStorageConfig]);
+  }, [fetchClusterConfig]);
 
   const handleSubmitSuccessResponse = () => {
     setIsDirty(false);

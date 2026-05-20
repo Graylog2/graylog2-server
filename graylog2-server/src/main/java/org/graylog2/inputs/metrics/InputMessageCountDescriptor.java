@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 import static org.graylog2.plugin.Message.FIELD_GL2_SOURCE_INPUT;
 
 
-public class InputMessageCountDescriptor implements EntityCachedMetricDescriptor<Map<String, Long>, Long> {
+public class InputMessageCountDescriptor implements EntityCachedMetricDescriptor<Map<String, Long>, Map<String, Long>> {
 
     public static final String FIELD_NAME = "message_count";
 
@@ -77,10 +77,9 @@ public class InputMessageCountDescriptor implements EntityCachedMetricDescriptor
     }
 
     @Override
-    public Long computeForUser(Map<String, Long> countsByStream, SearchUser searchUser) {
+    public Map<String, Long> computeForUser(Map<String, Long> countsByStream, SearchUser searchUser) {
         return countsByStream.entrySet().stream()
                 .filter(e -> searchUser.canReadStream(e.getKey()))
-                .mapToLong(Map.Entry::getValue)
-                .sum();
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }
