@@ -54,7 +54,6 @@ public abstract class DataNodeDto extends NodeDto {
     public static final String FIELD_DATANODE_STATUS = "datanode_status";
     public static final String FIELD_CERT_VALID_UNTIL = "cert_valid_until";
     public static final String FIELD_DATANODE_VERSION = "datanode_version";
-    public static final String FIELD_OPENSEARCH_VERSION = "opensearch_version";
     public static final String FIELD_CONFIGURATION_WARNINGS = "configuration_warnings";
     public static final String FIELD_OPENSEARCH_ROLES = "opensearch_roles";
 
@@ -80,10 +79,6 @@ public abstract class DataNodeDto extends NodeDto {
     @Nullable
     @JsonProperty(FIELD_DATANODE_VERSION)
     public abstract String getDatanodeVersion();
-
-    @Nullable
-    @JsonProperty(FIELD_OPENSEARCH_VERSION)
-    public abstract String getOpensearchVersion();
 
     @Nullable
     @JsonProperty(FIELD_OPENSEARCH_ROLES)
@@ -152,10 +147,6 @@ public abstract class DataNodeDto extends NodeDto {
             params.put(FIELD_DATANODE_VERSION, getDatanodeVersion());
         }
 
-        if (Objects.nonNull(getOpensearchVersion())) {
-            params.put(FIELD_OPENSEARCH_VERSION, getOpensearchVersion());
-        }
-
         if (Objects.nonNull(getOpensearchRoles())) {
             params.put(FIELD_OPENSEARCH_ROLES, getOpensearchRoles());
         }
@@ -200,9 +191,6 @@ public abstract class DataNodeDto extends NodeDto {
 
         @JsonProperty(FIELD_DATANODE_VERSION)
         public abstract Builder setDatanodeVersion(String datanodeVersion);
-
-        @JsonProperty(FIELD_OPENSEARCH_VERSION)
-        public abstract Builder setOpensearchVersion(String opensearchVersion);
 
         @JsonProperty(FIELD_OPENSEARCH_ROLES)
         public abstract Builder setOpensearchRoles(List<String> opensearchRoles);

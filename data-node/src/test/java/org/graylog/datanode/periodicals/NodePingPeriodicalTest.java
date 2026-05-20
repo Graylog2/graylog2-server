@@ -62,8 +62,7 @@ class NodePingPeriodicalTest {
                 () -> OpensearchState.AVAILABLE,
                 Date::new,
                 () -> List.of("search", "ingest"),
-                Collections::emptyList,
-                () -> Optional.of("2.19.5")
+                Collections::emptyList
         );
 
         task.doRun();
@@ -78,7 +77,6 @@ class NodePingPeriodicalTest {
                     Assertions.assertThat(nodeDto.getLastSeen()).isNotNull();
                     Assertions.assertThat(nodeDto.getProvisioningInformation().certValidUntil()).isNotNull();
                     Assertions.assertThat(nodeDto.getOpensearchRoles().containsAll(List.of("search", "ingest"))).isTrue();
-                    Assertions.assertThat(nodeDto.getOpensearchVersion()).isEqualTo("2.19.5");
                 });
     }
 
