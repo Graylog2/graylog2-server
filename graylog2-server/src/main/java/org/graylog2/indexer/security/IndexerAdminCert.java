@@ -30,10 +30,10 @@ import java.lang.annotation.Target;
  * {@code plugins.security.authcz.admin_dn}.
  *
  * <p>On legacy backends (Elasticsearch 7, OpenSearch 2), this qualifier should resolve to the
- * default adapter.
+ * default adapter, because we don't offer this functionality there.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
 @BindingAnnotation
-public @interface AdminIndexer {
+public @interface IndexerAdminCert {
 }

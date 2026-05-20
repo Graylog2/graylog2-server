@@ -43,7 +43,7 @@ import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.searches.SearchesAdapter;
-import org.graylog2.indexer.security.AdminIndexer;
+import org.graylog2.indexer.security.IndexerAdminCert;
 import org.graylog2.indexer.security.SecurityAdapter;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.plugin.VersionAwareModule;
@@ -64,7 +64,7 @@ public class Elasticsearch7Module extends VersionAwareModule {
         bindForSupportedVersion(CountsAdapter.class).to(CountsAdapterES7.class);
         bindForSupportedVersion(ClusterAdapter.class).to(ClusterAdapterES7.class);
         bindForSupportedVersion(IndicesAdapter.class).to(IndicesAdapterES7.class);
-        bindForSupportedVersion(IndicesAdapter.class, AdminIndexer.class).to(IndicesAdapterES7.class);
+        bindForSupportedVersion(IndicesAdapter.class, IndexerAdminCert.class).to(IndicesAdapterES7.class);
         bindForSupportedVersion(DataStreamAdapter.class).to(DataStreamAdapterES7.class);
         if (useComposableIndexTemplates) {
             bindForSupportedVersion(IndexTemplateAdapter.class).to(ComposableIndexTemplateAdapter.class);

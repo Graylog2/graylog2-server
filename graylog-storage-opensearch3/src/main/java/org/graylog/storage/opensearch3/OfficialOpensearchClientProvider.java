@@ -171,16 +171,6 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
     }
 
     /**
-     * Builds an {@link OfficialOpensearchClient} from given hosts and transport configuration.
-     * Used by non-default-auth callers (e.g. admin certificate client). The caller is responsible
-     * for closing the returned client when no longer needed.
-     */
-    @Nonnull
-    public OfficialOpensearchClient buildClient(List<URI> uris, TransportConfig config) {
-        return buildClientFromTransport(buildTransport(uris, config));
-    }
-
-    /**
      * Per-call transport configuration. Defaults match the existing singleton client: default
      * basic-auth credentials provider, JWT interceptor when enabled, trust-only TLS context.
      */

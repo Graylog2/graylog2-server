@@ -72,7 +72,7 @@ import static org.graylog.storage.opensearch3.OfficialOpensearchClientProvider.T
 @Singleton
 public class AdminOpensearchClientProvider {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AdminOpensearchClientProvider.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AdminOpensearchClientProvider.class);
 
     static final Duration CERT_LIFETIME = Duration.ofMinutes(15);
     static final Duration REFRESH_BEFORE_EXPIRY = Duration.ofMinutes(1);
@@ -137,10 +137,10 @@ public class AdminOpensearchClientProvider {
                         new CustomOpenSearchClient(dynamicTransport),
                         new CustomAsyncOpenSearchClient(dynamicTransport),
                         objectMapper);
-                LOGGER.info("Built admin OpenSearch client with a {} min cert lifetime.", CERT_LIFETIME.toMinutes());
+                LOG.info("Built admin OpenSearch client with a {} min cert lifetime.", CERT_LIFETIME.toMinutes());
             } else {
                 dynamicTransport.swap(newTransport);
-                LOGGER.debug("Rotated admin OpenSearch client certificate.");
+                LOG.debug("Rotated admin OpenSearch client certificate.");
             }
             this.currentCertExpiresAt = now.plus(CERT_LIFETIME);
         } catch (Exception e) {

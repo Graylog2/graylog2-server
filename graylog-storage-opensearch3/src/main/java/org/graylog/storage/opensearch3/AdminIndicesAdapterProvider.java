@@ -35,7 +35,7 @@ import org.graylog2.indexer.indices.IndicesAdapter;
  * a stable client reference because {@link AdminOpensearchClientProvider} hot-swaps the
  * underlying transport rather than replacing the client.
  */
-public class OpensearchAdminIndicesAdapterProvider implements Provider<IndicesAdapter> {
+public class AdminIndicesAdapterProvider implements Provider<IndicesAdapter> {
 
     private final AdminOpensearchClientProvider adminClientProvider;
     private final StatsApi statsApi;
@@ -46,7 +46,7 @@ public class OpensearchAdminIndicesAdapterProvider implements Provider<IndicesAd
     private final ObjectMapper objectMapper;
 
     @Inject
-    public OpensearchAdminIndicesAdapterProvider(AdminOpensearchClientProvider adminClientProvider,
+    public AdminIndicesAdapterProvider(AdminOpensearchClientProvider adminClientProvider,
                                        StatsApi statsApi,
                                        ClusterStatsApi clusterStatsApi,
                                        ClusterStateApi clusterStateApi,

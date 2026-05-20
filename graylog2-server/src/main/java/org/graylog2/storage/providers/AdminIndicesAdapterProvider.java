@@ -19,7 +19,7 @@ package org.graylog2.storage.providers;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import org.graylog2.indexer.indices.IndicesAdapter;
-import org.graylog2.indexer.security.AdminIndexer;
+import org.graylog2.indexer.security.IndexerAdminCert;
 import org.graylog2.storage.DetectedSearchVersion;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.storage.VersionAwareProvider;
@@ -34,7 +34,7 @@ import java.util.Map;
 public class AdminIndicesAdapterProvider extends VersionAwareProvider<IndicesAdapter> {
     @Inject
     public AdminIndicesAdapterProvider(@DetectedSearchVersion SearchVersion version,
-                                       @AdminIndexer Map<SearchVersion, Provider<IndicesAdapter>> pluginBindings) {
+                                       @IndexerAdminCert Map<SearchVersion, Provider<IndicesAdapter>> pluginBindings) {
         super(version, pluginBindings);
     }
 }
