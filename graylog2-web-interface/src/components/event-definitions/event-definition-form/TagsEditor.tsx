@@ -162,6 +162,7 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
           },
         } as object)}
         inputId="event-definition-tags"
+        aria-label="Event Definition Tags"
         multi
         allowCreate
         delimiter={VALUE_DELIMITER}
