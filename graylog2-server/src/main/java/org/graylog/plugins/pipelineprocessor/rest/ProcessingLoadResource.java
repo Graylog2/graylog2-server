@@ -41,7 +41,6 @@ import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.rest.resources.system.RemoteMetricsResource;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -58,14 +57,12 @@ public class ProcessingLoadResource extends ProxiedResource {
     private final RuleMetricsConfigService ruleMetricsConfigService;
     private final ProcessingLoadService processingLoadService;
     private final NodeTimerSnapshotParser snapshotParser;
-    private final Duration callTimeout;
 
     @Inject
     public ProcessingLoadResource(NodeService nodeService,
                                   RemoteInterfaceProvider remoteInterfaceProvider,
                                   @Context HttpHeaders httpHeaders,
                                   @Named("proxiedRequestsExecutorService") ExecutorService executorService,
-                                  @Named("proxied_requests_default_call_timeout") com.github.joschi.jadconfig.util.Duration defaultCallTimeout,
                                   PipelineInterpreterStateUpdater stateUpdater,
                                   RuleMetricsConfigService ruleMetricsConfigService,
                                   ProcessingLoadService processingLoadService,
@@ -75,7 +72,6 @@ public class ProcessingLoadResource extends ProxiedResource {
         this.ruleMetricsConfigService = ruleMetricsConfigService;
         this.processingLoadService = processingLoadService;
         this.snapshotParser = snapshotParser;
-        this.callTimeout = Duration.ofMillis(Math.min(defaultCallTimeout.toMilliseconds(), 2000));
     }
 
     @GET
@@ -107,11 +103,7 @@ public class ProcessingLoadResource extends ProxiedResource {
     private Map<String, NodeTimerSnapshot> fetchNodeSnapshots(List<String> metricNames) {
         final MetricsReadRequest request = MetricsReadRequest.create(metricNames);
         final Map<String, Optional<MetricsSummaryResponse>> perNodeResponses = stripCallResult(
-                requestOnAllNodes(
-                        RemoteMetricsResource.class,
-                        r -> r.multipleMetrics(request),
-                        callTimeout
-                )
+                requestOnAllNodes(RemoteMetricsResource.class, r -> r.multipleMetrics(request))
         );
 
         final Map<String, NodeTimerSnapshot> perNodeSnapshots = Maps.newHashMapWithExpectedSize(perNodeResponses.size());
