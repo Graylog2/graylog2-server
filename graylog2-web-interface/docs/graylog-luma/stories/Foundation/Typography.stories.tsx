@@ -92,7 +92,7 @@ const FontFamiliesDoc = () => {
 
   return (
     <StoryContainer>
-      <h1 style={{ marginBottom: theme.spacings.lg }}>Font Families</h1>
+      <h2 style={{ marginBottom: theme.spacings.lg }}>Font Families</h2>
       <FoundationTable columns={columns} rows={FONT_FAMILIES} keyBy={(row) => row.key} />
     </StoryContainer>
   );
@@ -102,16 +102,12 @@ const FontFamiliesDoc = () => {
 
 const ScaleGroup = styled.section`
   margin-bottom: ${({ theme }) => theme.spacings.xl};
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 `;
 
-const GroupHeading = styled.p`
-  font-size: ${({ theme }) => theme.fonts.size.small};
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: ${({ theme }) => theme.colors.text.secondary};
-  margin: 0 0 ${({ theme }) => theme.spacings.sm};
-`;
 
 const GroupNote = styled.p`
   font-size: ${({ theme }) => theme.fonts.size.small};
@@ -161,6 +157,13 @@ const TYPE_SCALE_GROUPS: ScaleGroupEntry[] = [
         usage: 'Used for all page titles.',
       },
       {
+        key: 'h2',
+        token: 'theme.fonts.size.h2',
+        family: 'navigation',
+        specimen: 'Heading 2',
+        usage: 'Major sections within a page.',
+      },
+      {
         key: 'h3',
         token: 'theme.fonts.size.h3',
         specimen: 'Heading 3',
@@ -178,6 +181,12 @@ const TYPE_SCALE_GROUPS: ScaleGroupEntry[] = [
         specimen: 'Heading 5',
         usage: 'Used for section titles.',
       },
+      {
+        key: 'h6',
+        token: 'theme.fonts.size.h6',
+        specimen: 'Heading 6',
+        usage: 'Avoid if possible. A bold body-sized label is usually more appropriate.',
+      },
     ],
   },
   {
@@ -185,49 +194,46 @@ const TYPE_SCALE_GROUPS: ScaleGroupEntry[] = [
     note: 'Source Sans Pro. Paragraph spacing is 8px for all body text.',
     items: [
       {
+        key: 'huge',
+        token: 'theme.fonts.size.huge',
+        specimen: 'Huge',
+        usage: 'Large dashboard metric values or hero numbers.',
+      },
+      {
+        key: 'large',
+        token: 'theme.fonts.size.large',
+        specimen: 'Large',
+        usage: 'Lead paragraph or introductory sentence that needs a visual step above regular body without being a heading.',
+      },
+      {
         key: 'body',
         token: 'theme.fonts.size.body',
-        specimen: 'Body MD',
+        specimen: 'Body',
         usage: 'Typically used for infographics and messages.',
       },
       {
         key: 'small',
         token: 'theme.fonts.size.small',
-        specimen: 'Body SM',
+        specimen: 'Small',
         usage: 'Our main font size for all content.',
       },
       {
         key: 'tiny',
         token: 'theme.fonts.size.tiny',
-        specimen: 'Body XS',
+        specimen: 'Tiny',
         usage: 'Used sparingly for small elements such as badges and buttons. Not recommended for large bodies of text because its size can be hard to read.',
       },
     ],
   },
   {
-    label: 'Monospace',
-    note: 'Ubuntu Mono. Reserved for log messages, code snippets, and other system-related content. Its fixed-width design improves scannability and makes it easier to differentiate between characters.',
+    label: 'Navigation',
+    note: 'Used exclusively for navigation links. Applied by navigation components — do not set manually in other contexts.',
     items: [
       {
-        key: 'body',
-        token: 'theme.fonts.size.body',
-        family: 'monospace',
-        specimen: 'Body MD',
-        usage: 'Typically used for reports.',
-      },
-      {
-        key: 'small',
-        token: 'theme.fonts.size.small',
-        family: 'monospace',
-        specimen: 'Body SM',
-        usage: 'Our main font size for all system related content.',
-      },
-      {
-        key: 'tiny',
-        token: 'theme.fonts.size.tiny',
-        family: 'monospace',
-        specimen: 'Body XS',
-        usage: 'Used sparingly. Not recommended for large bodies of text because its size can be hard to read.',
+        key: 'navigation',
+        token: 'theme.fonts.size.navigation',
+        specimen: 'Navigation',
+        usage: 'Link and dropdown labels in the navigation. Applied by navigation components — do not set manually.',
       },
     ],
   },
@@ -282,10 +288,10 @@ const TypeScaleDoc = () => {
 
   return (
     <StoryContainer>
-      <h1 style={{ marginBottom: theme.spacings.lg }}>Type Scale</h1>
+      <h2 style={{ marginBottom: theme.spacings.lg }}>Type Scale</h2>
       {TYPE_SCALE_GROUPS.map((group) => (
         <ScaleGroup key={group.label}>
-          <GroupHeading>{group.label}</GroupHeading>
+          <h3>{group.label}</h3>
           <GroupNote>{group.note}</GroupNote>
           <FoundationTable
             columns={columns}
@@ -356,7 +362,7 @@ const TextColorsDoc = () => {
 
   return (
     <StoryContainer>
-      <h1 style={{ marginBottom: theme.spacings.lg }}>Text Colors</h1>
+      <h2 style={{ marginBottom: theme.spacings.lg }}>Text Colors</h2>
       <FoundationTable columns={columns} rows={TEXT_COLORS} keyBy={(row) => row.token} />
     </StoryContainer>
   );
@@ -380,38 +386,26 @@ const meta: Meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const FontFamilies: Story = {
-  render: FontFamiliesDoc,
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Three font families cover every content type. The choice is dictated by the nature of the content, not visual preference.',
-      },
-    },
-  },
+const TypographyDoc = () => {
+  const theme = useTheme();
+
+  return (
+    <>
+      <StoryContainer>
+        <h1>Typography</h1>
+        <p style={{ color: theme.colors.text.secondary, lineHeight: 1.6 }}>
+          Typography in our design system ensures clarity, consistency, and accessibility across all
+          user interfaces. We use a dual-typeface approach to distinguish between general interface
+          content and technical or system-specific elements.
+        </p>
+      </StoryContainer>
+      <FontFamiliesDoc />
+      <TypeScaleDoc />
+      <TextColorsDoc />
+    </>
+  );
 };
 
-export const TypeScale: Story = {
-  render: TypeScaleDoc,
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Sizes are expressed in `rem` relative to a 16 px root and organized by semantic role. Use the token name — never hardcode pixel values.',
-      },
-    },
-  },
-};
-
-export const TextColors: Story = {
-  render: TextColorsDoc,
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Text colors adapt to light and dark mode automatically. Toggle the mode in the Storybook toolbar to preview both. Never use hardcoded hex values for text.',
-      },
-    },
-  },
+export const Typography: Story = {
+  render: TypographyDoc,
 };
