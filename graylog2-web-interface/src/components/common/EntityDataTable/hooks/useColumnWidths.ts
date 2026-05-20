@@ -148,7 +148,6 @@ const useColumnWidths = <Entity extends EntityBase>({
   );
 
   useLayoutEffect(() => {
-    console.log('useLayoutEffect');
     if (!scrollContainerWidth) {
       return;
     }
