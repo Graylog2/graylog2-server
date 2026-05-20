@@ -34,6 +34,7 @@ import jakarta.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Provides paginated access to the existing {@code notifications} MongoDB collection for the entity table UI,
@@ -83,6 +84,17 @@ public class NotificationPaginationService {
                 .toList();
 
         return new PaginatedList<>(dtos, Ints.saturatedCast(total), page, perPage);
+    }
+
+    /**
+     * Finds a single notification by its MongoDB document ID.
+     */
+    public Optional<NotificationImpl> findById(String id) {
+        final Document doc = collection.find(Filters.eq("_id", new ObjectId(id))).first();
+        if (doc == null) {
+            return Optional.empty();
+        }
+        return Optional.of(new NotificationImpl(doc.getObjectId("_id"), doc));
     }
 
     /**

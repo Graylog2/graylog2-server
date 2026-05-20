@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.system;
 
 import jakarta.ws.rs.NotFoundException;
+import org.graylog.events.processor.systemnotification.SystemNotificationRenderService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationImpl;
@@ -52,13 +53,16 @@ class NotificationsResourceTest {
     @Mock
     private NotificationPaginationService paginationService;
 
+    @Mock
+    private SystemNotificationRenderService renderService;
+
     private TestResource resource;
     private TestResource cloudResource;
 
     @BeforeEach
     void setUp() {
-        resource = new TestResource(notificationService, paginationService, false);
-        cloudResource = new TestResource(notificationService, paginationService, true);
+        resource = new TestResource(notificationService, paginationService, renderService, false);
+        cloudResource = new TestResource(notificationService, paginationService, renderService, true);
     }
 
     // ---- Legacy endpoint tests ----
@@ -167,8 +171,9 @@ class NotificationsResourceTest {
     // ---- Helper ----
 
     static class TestResource extends NotificationsResource {
-        TestResource(NotificationService notificationService, NotificationPaginationService paginationService, boolean isCloud) {
-            super(notificationService, paginationService, isCloud);
+        TestResource(NotificationService notificationService, NotificationPaginationService paginationService,
+                     SystemNotificationRenderService renderService, boolean isCloud) {
+            super(notificationService, paginationService, renderService, isCloud);
         }
 
         @Override

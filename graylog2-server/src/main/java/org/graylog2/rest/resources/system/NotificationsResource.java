@@ -42,6 +42,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.bson.conversions.Bson;
+import org.graylog.events.processor.systemnotification.SystemNotificationRenderService;
+import org.graylog.events.processor.systemnotification.TemplateRenderResponse;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -113,15 +115,18 @@ public class NotificationsResource extends RestResource {
 
     private final NotificationService notificationService;
     private final NotificationPaginationService paginationService;
+    private final SystemNotificationRenderService renderService;
     private final DbQueryCreator dbQueryCreator;
     private final boolean isCloud;
 
     @Inject
     public NotificationsResource(NotificationService notificationService,
                                  NotificationPaginationService paginationService,
+                                 SystemNotificationRenderService renderService,
                                  @Named("is_cloud") boolean isCloud) {
         this.notificationService = notificationService;
         this.paginationService = paginationService;
+        this.renderService = renderService;
         this.dbQueryCreator = new DbQueryCreator(FIELD_TYPE, ATTRIBUTES);
         this.isCloud = isCloud;
     }
@@ -195,12 +200,12 @@ public class NotificationsResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @NoAuditEvent("Read-only endpoint")
     public PageListResponse<NotificationSummaryDto> getPaginated(
-            @QueryParam("page") @DefaultValue("1") int page,
-            @QueryParam("per_page") @DefaultValue("50") int perPage,
-            @QueryParam("query") @DefaultValue("") String query,
-            @QueryParam("filters") List<String> filters,
-            @QueryParam("sort") @DefaultValue(FIELD_TIMESTAMP) String sortField,
-            @QueryParam("order") @DefaultValue("desc") SortOrder order) {
+            @Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+            @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+            @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+            @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
+            @Parameter(name = "sort") @QueryParam("sort") @DefaultValue(FIELD_TIMESTAMP) String sortField,
+            @Parameter(name = "order") @QueryParam("order") @DefaultValue("desc") SortOrder order) {
         checkPermission(RestPermissions.NOTIFICATIONS_READ);
 
         final Bson dbQuery = buildPaginatedQuery(filters, query);
@@ -250,6 +255,24 @@ public class NotificationsResource extends RestResource {
         checkPermission(RestPermissions.NOTIFICATIONS_DELETE);
         paginationService.bulkDelete(request.entityIds());
         return Response.noContent().build();
+    }
+
+    // ---- HTML render endpoint ----
+
+    @GET
+    @Timed
+    @Path("/{id}/message/html")
+    @Operation(summary = "Render the HTML message for a notification by ID")
+    @Produces(MediaType.APPLICATION_JSON)
+    @NoAuditEvent("Read-only endpoint")
+    public TemplateRenderResponse renderHtmlById(@Parameter(name = "id") @PathParam("id") String id) {
+        checkPermission(RestPermissions.NOTIFICATIONS_READ);
+
+        final var notification = paginationService.findById(id)
+                .orElseThrow(() -> new NotFoundException(f("Notification <%s> not found", id)));
+
+        final var rendered = renderService.render(notification, SystemNotificationRenderService.Format.HTML, null);
+        return TemplateRenderResponse.create(rendered.title, rendered.description);
     }
 
     // ---- Private helpers ----
