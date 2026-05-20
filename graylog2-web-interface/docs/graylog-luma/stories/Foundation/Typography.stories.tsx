@@ -306,17 +306,24 @@ const TypeScaleDoc = () => {
 
 // ─── Text Colors ───────────────────────────────────────────────────────────
 
-const Swatch = styled.div<{ $color: string }>`
-  width: 40px;
-  height: 40px;
+const Swatch = styled.div<{ $color: string; $labelColor: string }>`
+  width: 120px;
+  height: 64px;
   border-radius: 6px;
   background-color: ${({ $color }) => $color};
   border: 1px solid rgba(128, 128, 128, 0.25);
-  margin-bottom: ${({ theme }) => theme.spacings.xs};
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: ${({ theme }) => theme.spacings.xs};
+  font-size: ${({ theme }) => theme.fonts.size.small};
+  font-weight: 600;
+  color: ${({ $labelColor }) => $labelColor};
   flex-shrink: 0;
 `;
 
 type ColorEntry = {
+  name: string;
   token: string;
   getColor: (theme: any) => string;
   usage: string;
@@ -324,16 +331,19 @@ type ColorEntry = {
 
 const TEXT_COLORS: ColorEntry[] = [
   {
+    name: 'Primary',
     token: 'theme.colors.text.primary',
     getColor: (t) => t.colors.text.primary,
     usage: 'Primary text. This should be used for all text in the app.',
   },
   {
+    name: 'Secondary',
     token: 'theme.colors.text.secondary',
     getColor: (t) => t.colors.text.secondary,
     usage: 'Light theme secondary text. Used for most descriptions, charts, and table headers.',
   },
   {
+    name: 'Disabled',
     token: 'theme.colors.text.disabled',
     getColor: (t) => t.colors.text.disabled,
     usage: 'Light theme disabled text.',
@@ -346,8 +356,16 @@ const TextColorsDoc = () => {
   const columns = [
     {
       header: 'Style',
-      width: '220px',
-      render: (row: ColorEntry) => <Swatch $color={row.getColor(theme)} />,
+      width: '160px',
+      render: (row: ColorEntry) => {
+        const color = row.getColor(theme);
+
+        return (
+          <Swatch $color={color} $labelColor={theme.utils.readableColor(color)}>
+            {row.name}
+          </Swatch>
+        );
+      },
     },
     {
       header: 'Variable',
