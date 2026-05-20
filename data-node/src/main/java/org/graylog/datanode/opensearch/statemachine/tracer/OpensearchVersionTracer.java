@@ -46,14 +46,14 @@ public class OpensearchVersionTracer implements StateMachineTracer<OpensearchSta
 
     @Override
     public void transition(OpensearchEvent trigger, OpensearchState source, OpensearchState destination) {
-        if(source != destination && destination == OpensearchState.AVAILABLE) {
+        if (source != destination && destination == OpensearchState.AVAILABLE) {
             final OpensearchDistribution opensearchDistribution = configuration.opensearchDistribution();
             final String osVersion = opensearchDistribution.version();
-            LOG.info(String.format("Confirmed Opensearch version %s", osVersion));
+            LOG.info("Confirmed Opensearch version {}", osVersion);
 
             final Version currentVersion = Version.parse(opensearchDistribution.version());
 
-            if(!opensearchDistribution.otherCandidates().isEmpty()) {
+            if (!opensearchDistribution.otherCandidates().isEmpty()) {
                 final Optional<OpensearchDistribution> newerVersion = opensearchDistribution.otherCandidates().stream()
                         .filter(candidate -> Version.parse(candidate.version()).isHigherThan(currentVersion))
                         .max(Comparator.comparing(d -> Version.parse(d.version())));
