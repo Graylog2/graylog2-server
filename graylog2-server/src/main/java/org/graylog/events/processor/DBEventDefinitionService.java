@@ -94,7 +94,11 @@ public class DBEventDefinitionService {
 
     public PaginatedList<EventDefinitionDto> searchPaginated(SearchQuery query, Predicate<EventDefinitionDto> filter,
                                                              Bson sort, int page, int perPage) {
-        final Bson dbQuery = query.toBson();
+        return searchPaginated(query.toBson(), filter, sort, page, perPage);
+    }
+
+    public PaginatedList<EventDefinitionDto> searchPaginated(Bson dbQuery, Predicate<EventDefinitionDto> filter,
+                                                             Bson sort, int page, int perPage) {
         final PaginatedList<EventDefinitionDto> list = filter == null ?
                 paginationHelper.filter(dbQuery).includeSourceMetadata(true).sort(sort).perPage(perPage).page(page) :
                 paginationHelper.filter(dbQuery).includeSourceMetadata(true).sort(sort).perPage(perPage).page(page, filter);

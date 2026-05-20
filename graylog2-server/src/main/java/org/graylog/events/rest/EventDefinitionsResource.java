@@ -18,6 +18,7 @@ package org.graylog.events.rest;
 
 
 import com.codahale.metrics.annotation.Timed;
+import com.mongodb.client.model.Filters;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
@@ -52,6 +53,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.commons.lang.StringUtils;
+import org.bson.conversions.Bson;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.events.audit.EventsAuditEventTypes;
@@ -93,11 +95,10 @@ import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
+import org.graylog2.database.filtering.DbQueryCreator;
 import org.graylog2.rest.resources.entities.FilterOption;
 import org.graylog2.rest.resources.entities.Sorting;
-import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
-import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
@@ -123,26 +124,21 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 public class EventDefinitionsResource extends RestResource implements PluginRestResource {
     private static final Logger LOG = LoggerFactory.getLogger(EventDefinitionsResource.class);
 
-    private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
-            .put("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
-            .put("title", SearchQueryField.create(EventDefinitionDto.FIELD_TITLE))
-            .put("description", SearchQueryField.create(EventDefinitionDto.FIELD_DESCRIPTION))
-            .put("state", SearchQueryField.create(EventDefinitionDto.FIELD_STATE))
-            .put(SourcedMongoEntityUtils.SEARCH_QUERY_TITLE, SearchQueryField.create(SourcedMongoEntityUtils.FILTERABLE_FIELD))
-            .build();
     private static final String DEFAULT_SORT_FIELD = "title";
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
-            EntityAttribute.builder().id("title").title("Title").build(),
-            EntityAttribute.builder().id("description").title("Description").build(),
+            EntityAttribute.builder().id("title").title("Title").searchable(true).build(),
+            EntityAttribute.builder().id("description").title("Description").searchable(true).build(),
             EntityAttribute.builder().id("priority").title("Priority").type(SearchQueryField.Type.INT).build(),
             EntityAttribute.builder().id("status").title("Status").type(SearchQueryField.Type.STRING)
+                    .dbField(EventDefinitionDto.FIELD_STATE)
                     .sortable(true)
                     .filterable(true)
                     .filterOptions(Set.of(
                             FilterOption.create("ENABLED", "Enabled"),
                             FilterOption.create("DISABLED", "Disabled")
                     ))
+                    .bsonFilterCreator((name, value) -> Filters.eq(name, value.getValue().toString()))
                     .build(),
             EntityAttribute.builder().id(SourcedMongoEntityUtils.FILTERABLE_FIELD).title("Source")
                     .type(SearchQueryField.Type.STRING)
@@ -160,7 +156,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     private final EventDefinitionContextService contextService;
     private final EventProcessorEngine engine;
     private final EventDefinitionConfiguration eventDefinitionConfiguration;
-    private final SearchQueryParser searchQueryParser;
+    private final DbQueryCreator dbQueryCreator;
     private final RecentActivityService recentActivityService;
     private final BulkExecutor<EventDefinitionDto, UserContext> bulkDeletionExecutor;
     private final BulkExecutor<EventDefinitionDto, UserContext> bulkScheduleExecutor;
@@ -185,7 +181,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         this.contextService = contextService;
         this.engine = engine;
         this.eventDefinitionConfiguration = eventDefinitionConfiguration;
-        this.searchQueryParser = new SearchQueryParser(EventDefinitionDto.FIELD_TITLE, SEARCH_FIELD_MAPPING);
+        this.dbQueryCreator = new DbQueryCreator(EventDefinitionDto.FIELD_TITLE, attributes);
         this.recentActivityService = recentActivityService;
         this.bulkDeletionExecutor = new SequentialBulkExecutor<>(this::delete, auditEventSender, objectMapper);
         this.bulkScheduleExecutor = new SequentialBulkExecutor<>(this::schedule, auditEventSender, objectMapper);
@@ -218,20 +214,14 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         Predicate<EventDefinitionDto> predicate = event -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id());
 
         // Extract entity source filters into a predicate (can't be queried in MongoDB directly).
-        // Remaining filters (e.g., status) are included in the search query for MongoDB filtering.
+        // Remaining filters (e.g., status) are handled by DbQueryCreator as MongoDB filters.
         final SourcedMongoEntityUtils.FilterPredicate<EventDefinitionDto> filterPredicate = SourcedMongoEntityUtils.handleScopedEntitySourceFilter(filters, predicate);
         predicate = filterPredicate.predicate();
 
-        final String queryWithFilters = buildQueryWithFilters(query, filterPredicate.filters());
-        SearchQuery searchQuery;
-        try {
-            searchQuery = searchQueryParser.parse(queryWithFilters);
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
-        }
+        final Bson dbQuery = dbQueryCreator.createDbQuery(filterPredicate.filters(), query);
 
         final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(
-                searchQuery,
+                dbQuery,
                 predicate,
                 order.toBsonSort(sort),
                 page,
@@ -260,14 +250,9 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     public PaginatedResponse<EventDefinitionDto> list(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                       @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                       @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query) {
-        SearchQuery searchQuery;
-        try {
-            searchQuery = searchQueryParser.parse(query);
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
-        }
+        final Bson dbQuery = dbQueryCreator.createDbQuery(List.of(), query);
         final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(
-                searchQuery,
+                dbQuery,
                 event -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id()),
                 SortOrder.ASCENDING.toBsonSort("title"),
                 page,
@@ -587,18 +572,4 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         }
     }
 
-    /**
-     * Maps UI filter field names to MongoDB field names and appends them to the query string.
-     * Currently handles: status → state
-     */
-    private static String buildQueryWithFilters(String query, List<String> filters) {
-        final String filterQuery = filters.stream()
-                .map(f -> f.startsWith("status:") ? "state:" + f.substring("status:".length()) : null)
-                .filter(java.util.Objects::nonNull)
-                .collect(Collectors.joining(" AND "));
-        if (filterQuery.isEmpty()) {
-            return query;
-        }
-        return query.isEmpty() ? filterQuery : query + " AND " + filterQuery;
-    }
 }
