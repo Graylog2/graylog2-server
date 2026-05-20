@@ -122,7 +122,7 @@ public class OutdatedIndexService {
                 }
                 cleaned.put("index", indexMap);
             } else {
-                throw new IllegalStateException("Index " + entry.getKey() + " is not a Map");
+                throw new IllegalStateException("Settings key " + entry.getKey() + " is not a Map");
             }
         }
         return cleaned;
