@@ -1448,7 +1448,7 @@
                                 <phase>compile</phase>
                                 <configuration>
                                     <arguments>tsc</arguments>
-                                    <workingDirectory>docs/luma</workingDirectory>
+                                    <workingDirectory>../graylog2-web-interface/docs/graylog-luma</workingDirectory>
                                 </configuration>
                             </execution>
 
