@@ -21,6 +21,8 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog2.rest.models.metrics.responses.TimerRateMetricsResponse;
 import org.graylog2.rest.models.system.metrics.responses.MetricsSummaryResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -30,6 +32,8 @@ import java.util.Map;
  */
 @Singleton
 public final class NodeTimerSnapshotParser {
+
+    private static final Logger LOG = LoggerFactory.getLogger(NodeTimerSnapshotParser.class);
 
     private final ObjectMapper objectMapper;
 
@@ -51,7 +55,8 @@ public final class NodeTimerSnapshotParser {
             final TimerRateMetricsResponse timer;
             try {
                 timer = objectMapper.convertValue(metric, TimerRateMetricsResponse.class);
-            } catch (IllegalArgumentException ignored) {
+            } catch (IllegalArgumentException e) {
+                LOG.warn("Failed to parse metric '{}' as a timer. Skipping.", name, e);
                 continue;
             }
             if (timer == null || timer.rate == null || timer.time == null) {
