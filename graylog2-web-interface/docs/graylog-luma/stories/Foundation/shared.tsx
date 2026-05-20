@@ -17,6 +17,10 @@
 import React from 'react';
 import styled from 'styled-components';
 
+export const COL_WIDTH_STYLE = '200px';
+export const COL_WIDTH_VARIABLE = '220px';
+export const COL_WIDTH_SIZE = '140px';
+
 export const Token = styled.code`
   font-family: ${({ theme }) => theme.fonts.family.monospace};
   font-size: ${({ theme }) => theme.fonts.size.small};

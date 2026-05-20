@@ -18,7 +18,7 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import styled, { useTheme } from 'styled-components';
 
-import { FoundationTable, H1, H2, H3, PxLabel, SectionDescription, StoryContainer, Token } from './shared';
+import { COL_WIDTH_SIZE, COL_WIDTH_STYLE, COL_WIDTH_VARIABLE, FoundationTable, H1, H2, H3, PxLabel, SectionDescription, StoryContainer, Token } from './shared';
 
 // Root font size matching theme/constants ROOT_FONT_SIZE
 const ROOT_FONT_SIZE = 16;
@@ -63,7 +63,7 @@ const FontFamiliesDoc = () => {
   const columns = [
     {
       header: 'Style',
-      width: '200px',
+      width: COL_WIDTH_STYLE,
       render: (row: FamilyEntry) => (
         <span style={{ fontFamily: families[row.key] }}>
           {row.label}
@@ -74,7 +74,7 @@ const FontFamiliesDoc = () => {
     },
     {
       header: 'Variable',
-      width: '220px',
+      width: COL_WIDTH_VARIABLE,
       render: (row: FamilyEntry) => <Token>{row.token}</Token>,
     },
     {
@@ -240,7 +240,7 @@ const TypeScaleDoc = () => {
   const columns = [
     {
       header: 'Style',
-      width: '200px',
+      width: COL_WIDTH_STYLE,
       render: (row: ScaleEntry) => {
         const sizeValue = sizes[row.key] ?? '1rem';
 
@@ -259,7 +259,7 @@ const TypeScaleDoc = () => {
     },
     {
       header: 'Variable',
-      width: '240px',
+      width: COL_WIDTH_VARIABLE,
       render: (row: ScaleEntry) => <Token>{row.token}</Token>,
     },
     {
@@ -350,7 +350,7 @@ const TextColorsDoc = () => {
   const columns = [
     {
       header: 'Style',
-      width: '200px',
+      width: COL_WIDTH_STYLE,
       render: (row: ColorEntry) => {
         const color = row.getColor(theme);
 
@@ -363,7 +363,7 @@ const TextColorsDoc = () => {
     },
     {
       header: 'Variable',
-      width: '220px',
+      width: COL_WIDTH_VARIABLE,
       render: (row: ColorEntry) => <Token>{row.token}</Token>,
     },
     {
