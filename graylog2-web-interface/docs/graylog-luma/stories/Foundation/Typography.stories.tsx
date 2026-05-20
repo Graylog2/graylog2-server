@@ -63,7 +63,7 @@ const FontFamiliesDoc = () => {
   const columns = [
     {
       header: 'Style',
-      width: '260px',
+      width: '200px',
       render: (row: FamilyEntry) => (
         <span style={{ fontFamily: families[row.key] }}>
           {row.label}
@@ -74,7 +74,7 @@ const FontFamiliesDoc = () => {
     },
     {
       header: 'Variable',
-      width: '240px',
+      width: '220px',
       render: (row: FamilyEntry) => <Token>{row.token}</Token>,
     },
     {
@@ -350,7 +350,7 @@ const TextColorsDoc = () => {
   const columns = [
     {
       header: 'Style',
-      width: '160px',
+      width: '200px',
       render: (row: ColorEntry) => {
         const color = row.getColor(theme);
 
