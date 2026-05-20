@@ -18,7 +18,7 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import styled, { useTheme } from 'styled-components';
 
-import { FoundationItem, FoundationTable, PxLabel, StoryContainer, Token, TokenRow, UsageNote } from './shared';
+import { FoundationItem, FoundationTable, PxLabel, StoryContainer, Token, UsageNote } from './shared';
 
 // Root font size matching theme/constants ROOT_FONT_SIZE
 const ROOT_FONT_SIZE = 16;
@@ -147,7 +147,7 @@ type ScaleEntry = {
   token: string;
   family?: FontFamilyKey;
   specimen: string;
-  when: string;
+  usage: string;
 };
 
 type ScaleGroupEntry = {
@@ -159,115 +159,134 @@ type ScaleGroupEntry = {
 const TYPE_SCALE_GROUPS: ScaleGroupEntry[] = [
   {
     label: 'Headings',
-    note: 'Applied automatically by GlobalThemeStyles to h1–h6 HTML elements. h1 and h2 additionally inherit DM Sans from the navigation font family.',
+    note: 'Applied automatically by GlobalThemeStyles to h1–h6 HTML elements. h1 additionally inherits DM Sans from the navigation font family.',
     items: [
       {
         key: 'h1',
         token: 'theme.fonts.size.h1',
         family: 'navigation',
-        specimen: 'Page Title',
-        when: 'One per view. The primary title at the top of a page or full-screen dialog.',
-      },
-      {
-        key: 'h2',
-        token: 'theme.fonts.size.h2',
-        family: 'navigation',
-        specimen: 'Section Title',
-        when: 'Major sections within a page — e.g. "General settings", "Advanced options".',
+        specimen: 'Heading 1',
+        usage: 'Used for all page titles.',
       },
       {
         key: 'h3',
         token: 'theme.fonts.size.h3',
-        specimen: 'Sub-section Heading',
-        when: 'Sub-sections within an h2 area, or card and panel titles.',
+        specimen: 'Heading 3',
+        usage: 'Used for modal and drawer titles.',
       },
       {
         key: 'h4',
         token: 'theme.fonts.size.h4',
-        specimen: 'Group Label',
-        when: 'Grouped settings or widget titles within a panel.',
+        specimen: 'Heading 4',
+        usage: 'Used for card and section titles.',
       },
       {
         key: 'h5',
         token: 'theme.fonts.size.h5',
-        specimen: 'Minor Heading',
-        when: 'Rarely needed. Prefer h3/h4. Use for fine-grained labeling when more than three heading levels are unavoidable.',
-      },
-      {
-        key: 'h6',
-        token: 'theme.fonts.size.h6',
-        specimen: 'Smallest Heading',
-        when: 'Avoid if possible. A bold body-sized label is usually more appropriate.',
+        specimen: 'Heading 5',
+        usage: 'Used for section titles.',
       },
     ],
   },
   {
     label: 'Body',
-    note: 'Use these for all non-heading text. Default is body — only deviate when hierarchy requires it.',
+    note: 'Source Sans Pro. Paragraph spacing is 8px for all body text.',
     items: [
-      {
-        key: 'huge',
-        token: 'theme.fonts.size.huge',
-        specimen: 'Display number',
-        when: 'Large dashboard metric values or hero numbers. Use only in data-heavy views where a dominant number is the focal point.',
-      },
-      {
-        key: 'large',
-        token: 'theme.fonts.size.large',
-        specimen: 'Slightly emphasized body text',
-        when: 'Lead paragraph or introductory sentence that needs a visual step above regular body without being a heading.',
-      },
       {
         key: 'body',
         token: 'theme.fonts.size.body',
-        specimen: 'Regular body text — the default for all UI copy and labels',
-        when: 'Everything: paragraphs, labels, form inputs, button labels, table cells. This is the baseline — use it unless you have a specific reason to deviate.',
+        specimen: 'Body MD',
+        usage: 'Typically used for infographics and messages.',
       },
       {
         key: 'small',
         token: 'theme.fonts.size.small',
-        specimen: 'Helper text, timestamps, form field hints',
-        when: 'Secondary information: help text beneath form inputs, timestamps, captions. Never use for primary readable content.',
+        specimen: 'Body SM',
+        usage: 'Our main font size for all content.',
       },
       {
         key: 'tiny',
         token: 'theme.fonts.size.tiny',
-        specimen: 'Badge labels, count indicators',
-        when: 'De-emphasized metadata: version badges, counts in compact lists, table sub-labels. Use sparingly.',
+        specimen: 'Body XS',
+        usage: 'Used sparingly for small elements such as badges and buttons. Not recommended for large bodies of text because its size can be hard to read.',
       },
     ],
   },
   {
-    label: 'Navigation',
-    note: 'Used exclusively for navigation links. Applied by navigation components — do not set manually in other contexts.',
+    label: 'Monospace',
+    note: 'Ubuntu Mono. Reserved for log messages, code snippets, and other system-related content. Its fixed-width design improves scannability and makes it easier to differentiate between characters.',
     items: [
       {
-        key: 'navigation',
-        token: 'theme.fonts.size.navigation',
-        specimen: 'Navigation item',
-        when: 'Link and dropdown labels in the navigation. Applied by navigation components — do not set manually.',
+        key: 'body',
+        token: 'theme.fonts.size.body',
+        family: 'monospace',
+        specimen: 'Body MD',
+        usage: 'Typically used for reports.',
+      },
+      {
+        key: 'small',
+        token: 'theme.fonts.size.small',
+        family: 'monospace',
+        specimen: 'Body SM',
+        usage: 'Our main font size for all system related content.',
+      },
+      {
+        key: 'tiny',
+        token: 'theme.fonts.size.tiny',
+        family: 'monospace',
+        specimen: 'Body XS',
+        usage: 'Used sparingly. Not recommended for large bodies of text because its size can be hard to read.',
       },
     ],
   },
 ];
 
-const SIZE_KEY_LABELS: Record<FontSizeKey, string> = {
-  h1: 'Heading 1',
-  h2: 'Heading 2',
-  h3: 'Heading 3',
-  h4: 'Heading 4',
-  h5: 'Heading 5',
-  h6: 'Heading 6',
-  huge: 'Huge',
-  large: 'Large',
-  body: 'Body',
-  small: 'Small',
-  tiny: 'Tiny',
-  navigation: 'Navigation',
-};
-
 const TypeScaleDoc = () => {
   const theme = useTheme();
+  const sizes = theme.fonts.size as Record<string, string>;
+  const families = theme.fonts.family as Record<string, string>;
+
+  const columns = [
+    {
+      header: 'Style',
+      width: '200px',
+      render: (row: ScaleEntry) => {
+        const sizeValue = sizes[row.key] ?? '1rem';
+
+        return (
+          <span
+            style={{
+              fontFamily: families[row.family ?? 'body'],
+              fontSize: sizeValue,
+              color: theme.colors.text.primary,
+              lineHeight: 1.3,
+            }}>
+            {row.specimen}
+          </span>
+        );
+      },
+    },
+    {
+      header: 'Variable',
+      width: '260px',
+      render: (row: ScaleEntry) => <Token>{row.token}</Token>,
+    },
+    {
+      header: 'Usage',
+      render: (row: ScaleEntry) => {
+        const sizeValue = sizes[row.key] ?? '1rem';
+
+        return (
+          <>
+            <PxLabel>
+              {sizeValue} / {remToPx(sizeValue)}
+            </PxLabel>
+            <div>{row.usage}</div>
+          </>
+        );
+      },
+    },
+  ];
 
   return (
     <StoryContainer>
@@ -276,37 +295,11 @@ const TypeScaleDoc = () => {
         <ScaleGroup key={group.label}>
           <GroupHeading>{group.label}</GroupHeading>
           <GroupNote>{group.note}</GroupNote>
-          {group.items.map(({ key, token, family, specimen, when }) => {
-            const sizes = theme.fonts.size as Record<string, string>;
-            const families = theme.fonts.family as Record<string, string>;
-            const sizeValue = sizes[key] ?? '1rem';
-            const familyValue = family ? families[family] : families.body;
-
-            return (
-              <FoundationItem key={key}>
-                <TokenRow>
-                  <Token>{token}</Token>
-                  <PxLabel>
-                    {sizeValue} / {remToPx(sizeValue)}
-                  </PxLabel>
-                </TokenRow>
-                <p
-                  style={{
-                    fontFamily: familyValue,
-                    fontSize: sizeValue,
-                    color: theme.colors.text.primary,
-                    margin: `0 0 ${theme.spacings.xxs}`,
-                    lineHeight: 1.3,
-                  }}>
-                  {SIZE_KEY_LABELS[key]}: {specimen}
-                </p>
-                <UsageNote>
-                  <strong>Use when: </strong>
-                  {when}
-                </UsageNote>
-              </FoundationItem>
-            );
-          })}
+          <FoundationTable
+            columns={columns}
+            rows={group.items}
+            keyBy={(row) => `${row.key}-${row.family ?? 'default'}`}
+          />
         </ScaleGroup>
       ))}
     </StoryContainer>
