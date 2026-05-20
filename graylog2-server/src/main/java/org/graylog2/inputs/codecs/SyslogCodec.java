@@ -42,6 +42,7 @@ import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.syslog4j.server.SyslogServerEventIF;
 import org.graylog2.syslog4j.server.impl.event.CiscoSyslogServerEvent;
+import org.graylog2.syslog4j.server.impl.event.FortiGateSyslogEvent;
 import org.graylog2.syslog4j.server.impl.event.SyslogServerEvent;
 import org.graylog2.syslog4j.server.impl.event.structured.StructuredSyslogServerEvent;
 import org.joda.time.DateTime;
@@ -138,7 +139,7 @@ public class SyslogCodec extends AbstractCodec {
         } else if (CISCO_WITH_SEQUENCE_NUMBERS_PATTERN.matcher(msg).matches()) {
             e = new CiscoSyslogServerEvent(msg, remoteAddress, defaultTimeZone);
         } else if (FORTIGATE_PATTERN.matcher(msg).matches()) {
-            e = new GLFortiGateSyslogEvent(msg.trim(), defaultTimeZone);
+            e = new FortiGateSyslogEvent(msg.trim(), defaultTimeZone);
         } else {
             e = new SyslogServerEvent(msg, remoteAddress, defaultTimeZone);
         }
@@ -162,8 +163,8 @@ public class SyslogCodec extends AbstractCodec {
         if (e instanceof CiscoSyslogServerEvent) {
             m.addField("sequence_number", ((CiscoSyslogServerEvent) e).getSequenceNumber());
         }
-        if (e instanceof GLFortiGateSyslogEvent) {
-            final HashMap<String, Object> fields = new HashMap<>(((GLFortiGateSyslogEvent) e).getFields());
+        if (e instanceof FortiGateSyslogEvent) {
+            final HashMap<String, Object> fields = new HashMap<>(((FortiGateSyslogEvent) e).getFields());
             // The FortiGate "level" field is a string, Graylog requires a numeric value.
             fields.remove("level");
             m.addFields(fields);
