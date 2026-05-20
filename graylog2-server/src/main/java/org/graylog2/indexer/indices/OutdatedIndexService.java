@@ -23,6 +23,8 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -32,6 +34,8 @@ import java.util.Optional;
 
 @Singleton
 public class OutdatedIndexService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(OutdatedIndexService.class);
 
     private final Indices indices;
     private final IndicesAdapter indicesAdapter;
@@ -77,7 +81,8 @@ public class OutdatedIndexService {
         try {
             // create and reindex into temp index
             if (indicesAdapter.exists(tempIndex)) {
-                throw new IllegalStateException("Temporary index for reindexing already exists: " + tempIndex);
+                LOG.warn("Temporary index for reindexing already exists, deleting it: {}", tempIndex);
+                indicesAdapter.delete(tempIndex);
             }
             indicesAdapter.create(tempIndex, new IndexSettings(tempSettings), sourceMapping);
             HealthStatus tempStatus = indices.waitForRecovery(tempIndex);
