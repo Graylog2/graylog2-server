@@ -66,6 +66,7 @@ public class EventProcessorEventFactory implements EventFactory {
                 eventDefinition.alert()
         );
         event.setMitreCategories(eventDefinition.mitreCategories());
+        event.setTags(eventDefinition.tags());
         return event;
     }
 }

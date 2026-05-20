@@ -38,6 +38,7 @@ export interface Event {
   message: string;
   associated_assets?: string[];
   mitre_categories?: string[];
+  tags?: string[];
   group_by_fields: {
     [_key: string]: string;
   };

@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.MutableGraph;
 import org.graylog.events.contentpack.entities.EventDefinitionEntity;
 import org.graylog.events.contentpack.entities.EventNotificationHandlerConfigEntity;
@@ -79,6 +80,9 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
     public static final int MAX_MITRE_VALUES = 64;
     // Single regex covers tactics (TA0000), techniques (T0000), and sub-techniques (T0000.000).
     static final Pattern MITRE_CATEGORY_PATTERN = Pattern.compile("^(TA\\d{4}|T\\d{4}(\\.\\d{3})?)$");
+    public static final String FIELD_TAGS = "tags";
+    public static final int MAX_TAG_LENGTH = 128;
+    public static final int MAX_TAGS = 64;
     private static final String FIELD_FIELD_SPEC = "field_spec";
     private static final String FIELD_KEY_SPEC = "key_spec";
     private static final String FIELD_NOTIFICATION_SETTINGS = "notification_settings";
@@ -148,6 +152,10 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
     @Override
     @JsonProperty(FIELD_STORAGE)
     public abstract ImmutableList<EventStorageHandler.Config> storage();
+
+    @Override
+    @JsonProperty(FIELD_TAGS)
+    public abstract ImmutableSet<String> tags();
 
     @Override
     @JsonProperty(value = FIELD_SCHEDULERCTX, access = JsonProperty.Access.READ_ONLY)
@@ -223,6 +231,19 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
             }
         }
 
+        if (tags().stream().anyMatch(tag -> tag.length() > MAX_TAG_LENGTH)) {
+            validation.addError(FIELD_TAGS, "Event Definition tags cannot exceed " + MAX_TAG_LENGTH + " characters.");
+        }
+
+        if (tags().size() > MAX_TAGS) {
+            validation.addError(FIELD_TAGS, "Event Definition cannot have more than " + MAX_TAGS + " tags.");
+        }
+
+        if (tags().stream().anyMatch(tag -> !TagNormalizer.isValid(tag))) {
+            validation.addError(FIELD_TAGS,
+                    "Event Definition tags may only contain lowercase letters, digits, hyphens and underscores.");
+        }
+
         return validation;
     }
 
@@ -236,6 +257,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
                     .notifications(ImmutableList.of())
                     .storage(ImmutableList.of())
                     .mitreCategories(ImmutableList.of())
+                    .tags(ImmutableSet.of())
                     .state(EventDefinition.State.DISABLED);
         }
 
@@ -291,6 +313,9 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
         @JsonProperty(FIELD_STORAGE)
         public abstract Builder storage(ImmutableList<EventStorageHandler.Config> storageHandlers);
 
+        @JsonProperty(FIELD_TAGS)
+        public abstract Builder tags(ImmutableSet<String> tags);
+
         @JsonProperty(FIELD_STATE)
         public abstract Builder state(EventDefinition.State state);
 
@@ -306,9 +331,12 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
         @JsonProperty(FIELD_MITRE_CATEGORIES)
         public abstract Builder mitreCategories(ImmutableList<String> mitreCategories);
 
+        abstract ImmutableSet<String> tags();
+
         abstract EventDefinitionDto autoBuild();
 
         public EventDefinitionDto build() {
+            tags(TagNormalizer.normalize(tags()));
             final EventDefinitionDto dto = autoBuild();
             final PersistToStreamsStorageHandler.Config withSystemEventsStream = PersistToStreamsStorageHandler.Config.createWithSystemEventsStream();
             if (dto.storage().stream().anyMatch(withSystemEventsStream::equals)) {
@@ -363,6 +391,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
                 .fieldSpec(fieldSpec())
                 .keySpec(keySpec())
                 .storage(storage())
+                .tags(tags())
                 .eventProcedureId(ValueReference.ofNullable(procedureDescriptorId))
                 .eventSummaryTemplate(ValueReference.ofNullable(eventSummaryTemplate()))
                 .mitreCategories(mitreCategories())

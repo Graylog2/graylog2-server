@@ -78,6 +78,7 @@ export const eventDefinition: EventDefinition = {
   },
   field_spec: {},
   key_spec: ['mightyalert', 'secondkey'],
+  tags: [],
   notification_settings: {
     grace_period_ms: 300000,
     backlog_size: 0,

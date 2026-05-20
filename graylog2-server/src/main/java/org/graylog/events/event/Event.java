@@ -117,6 +117,10 @@ public interface Event extends Indexable {
 
     void setMitreCategories(List<String> mitreCategories);
 
+    Set<String> getTags();
+
+    void setTags(Set<String> tags);
+
     EventDto toDto();
 
     static Event fromDto(EventDto from) {
@@ -136,6 +140,7 @@ public interface Event extends Indexable {
         from.originContext().ifPresent(event::setOriginContext);
         from.replayInfo().ifPresent(event::setReplayInfo);
         event.setMitreCategories(from.mitreCategories());
+        event.setTags(from.tags());
 
         return event;
     }

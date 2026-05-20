@@ -203,6 +203,9 @@ public abstract class EventsIndexMapping extends AbstractMapping {
                 .put(EventDto.FIELD_MITRE_CATEGORIES, map()
                         .put("type", "keyword")
                         .build())
+                .put(EventDto.FIELD_TAGS, map()
+                        .put("type", "keyword")
+                        .build())
                 /* TODO: Enable the typed fields once we decided if that's the way to go
                 .put("fields_typed", map()
                         .put("type", "object")

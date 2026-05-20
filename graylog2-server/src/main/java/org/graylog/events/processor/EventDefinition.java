@@ -18,6 +18,7 @@ package org.graylog.events.processor;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.graylog.events.context.EventDefinitionContextService;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationHandler;
@@ -83,6 +84,10 @@ public interface EventDefinition {
     ImmutableList<EventNotificationHandler.Config> notifications();
 
     ImmutableList<EventStorageHandler.Config> storage();
+
+    default ImmutableSet<String> tags() {
+        return ImmutableSet.of();
+    }
 
     EventDefinitionContextService.SchedulerCtx schedulerCtx();
 

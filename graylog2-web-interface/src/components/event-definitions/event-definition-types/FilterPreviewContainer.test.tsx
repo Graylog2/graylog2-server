@@ -52,6 +52,7 @@ const eventDefinition: EventDefinition = {
   },
   field_spec: {},
   key_spec: [],
+  tags: [],
   notification_settings: {
     grace_period_ms: 300,
     backlog_size: 10,

@@ -141,6 +141,20 @@ describe('fetchEvents', () => {
 
       expect(result.filter.part_of_detection_chain).toBe('true');
     });
+
+    it('routes tags filter into extra_filters', () => {
+      const filters: UrlQueryFilters = OrderedMap({ tags: ['phishing', 'lateral-movement'] });
+      const result = parseFilters(filters);
+
+      expect(result.filter.extra_filters).toEqual({ tags: ['phishing', 'lateral-movement'] });
+    });
+
+    it('does not set tags in extra_filters when no tags filter is present', () => {
+      const filters: UrlQueryFilters = OrderedMap();
+      const result = parseFilters(filters);
+
+      expect(result.filter.extra_filters?.tags).toBeUndefined();
+    });
   });
 
   describe('fetchEvents', () => {
