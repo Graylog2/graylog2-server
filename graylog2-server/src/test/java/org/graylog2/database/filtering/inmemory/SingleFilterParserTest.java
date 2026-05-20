@@ -19,6 +19,10 @@ package org.graylog2.database.filtering.inmemory;
 import org.bson.types.ObjectId;
 import org.graylog2.database.filtering.RangeFilter;
 import org.graylog2.database.filtering.SingleValueFilter;
+import org.graylog2.database.filtering.TimeRangeFilter;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.search.SearchQueryField;
 import org.joda.time.DateTime;
@@ -29,6 +33,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.graylog2.database.filtering.inmemory.SingleFilterParser.RANGE_VALUES_SEPARATOR;
+import static org.graylog2.database.filtering.inmemory.SingleFilterParser.TIME_RANGE_TYPE_SEPARATOR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SingleFilterParserTest {
@@ -124,6 +129,14 @@ class SingleFilterParserTest {
                 toTest.parseSingleExpression("created_at:" + RANGE_VALUES_SEPARATOR,
                         entityAttributes
                 ));
+
+        //works the same if absolute time range type is specified explicitly
+        assertEquals(
+                new RangeFilter("created_at", null, null),
+
+                toTest.parseSingleExpression("created_at:" + AbsoluteRange.ABSOLUTE + TIME_RANGE_TYPE_SEPARATOR + RANGE_VALUES_SEPARATOR,
+                        entityAttributes
+                ));
     }
 
     @Test
@@ -145,6 +158,18 @@ class SingleFilterParserTest {
                 ),
 
                 toTest.parseSingleExpression("created_at:" + fromString + RANGE_VALUES_SEPARATOR + toString,
+                        entityAttributes
+                ));
+
+        //works the same if absolute time range type is specified explicitly
+        assertEquals(
+                new RangeFilter("created_at",
+                        new DateTime(2012, 12, 12, 12, 12, 12, DateTimeZone.UTC).toDate(),
+                        new DateTime(2022, 12, 12, 12, 12, 12, DateTimeZone.UTC).toDate()
+                ),
+
+                toTest.parseSingleExpression("created_at:" + AbsoluteRange.ABSOLUTE + TIME_RANGE_TYPE_SEPARATOR +
+                                fromString + RANGE_VALUES_SEPARATOR + toString,
                         entityAttributes
                 ));
     }
@@ -172,6 +197,58 @@ class SingleFilterParserTest {
                 toTest.parseSingleExpression("created_at:" + RANGE_VALUES_SEPARATOR + dateString,
                         entityAttributes
                 ));
+
+        //works the same if absolute time range type is specified explicitly
+        assertEquals(
+                new RangeFilter("created_at", dateObject.toDate(), null),
+                toTest.parseSingleExpression("created_at:" + AbsoluteRange.ABSOLUTE + TIME_RANGE_TYPE_SEPARATOR + dateString + RANGE_VALUES_SEPARATOR,
+                        entityAttributes
+                ));
+
+        assertEquals(
+                new RangeFilter("created_at", null, dateObject.toDate()),
+                toTest.parseSingleExpression("created_at:" + AbsoluteRange.ABSOLUTE + TIME_RANGE_TYPE_SEPARATOR + RANGE_VALUES_SEPARATOR + dateString,
+                        entityAttributes
+                ));
+    }
+
+    @Test
+    void parsesFilterExpressionCorrectlyForRelativeTimeRange() {
+        final List<EntityAttribute> entityAttributes = List.of(EntityAttribute.builder()
+                .id("created_at")
+                .title("Creation Date")
+                .type(SearchQueryField.Type.DATE)
+                .filterable(true)
+                .build());
+
+        assertEquals(
+                new TimeRangeFilter("created_at", RelativeRange.create(300)),
+                toTest.parseSingleExpression("created_at:" + RelativeRange.RELATIVE + TIME_RANGE_TYPE_SEPARATOR + "300",
+                        entityAttributes
+                ));
+
+        assertEquals(
+                new TimeRangeFilter("created_at", RelativeRange.Builder.builder().from(1500).to(300).build()),
+                toTest.parseSingleExpression("created_at:" + RelativeRange.RELATIVE + TIME_RANGE_TYPE_SEPARATOR + "1500" + RANGE_VALUES_SEPARATOR + "300",
+                        entityAttributes
+                ));
+    }
+
+    @Test
+    void parsesFilterExpressionCorrectlyForKeywordTimeRange() {
+        final List<EntityAttribute> entityAttributes = List.of(EntityAttribute.builder()
+                .id("created_at")
+                .title("Creation Date")
+                .type(SearchQueryField.Type.DATE)
+                .filterable(true)
+                .build());
+
+        assertEquals(
+                new TimeRangeFilter("created_at", KeywordRange.create("last 5 minutes", null)),
+                toTest.parseSingleExpression("created_at:" + KeywordRange.KEYWORD + TIME_RANGE_TYPE_SEPARATOR + "last 5 minutes",
+                        entityAttributes
+                ));
+
     }
 
     @Test
