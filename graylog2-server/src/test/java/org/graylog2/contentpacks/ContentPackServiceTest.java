@@ -56,6 +56,7 @@ import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListCon
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.security.Capability;
 import org.graylog.security.UserContext;
+import org.graylog.security.shares.EntityGrantLookup;
 import org.graylog.security.shares.EntityShareRequest;
 import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.Configuration;
@@ -206,6 +207,8 @@ public class ContentPackServiceTest {
     @Mock
     private EntitySharesService entitySharesService;
     @Mock
+    private EntityGrantLookup grantLookup;
+    @Mock
     private FavoriteFieldsService favoriteFieldsService;
 
     private ContentPackService contentPackService;
@@ -228,8 +231,8 @@ public class ContentPackServiceTest {
                 ModelTypes.GROK_PATTERN_V1, new GrokPatternFacade(objectMapper, patternService),
                 ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, streamRuleService, indexSetService, userService, favoriteFieldsService),
                 ModelTypes.OUTPUT_V1, new OutputFacade(objectMapper, outputService, pluginMetaData, outputFactories, outputFactories2),
-                ModelTypes.SEARCH_V1, new SearchFacade(objectMapper, searchDbService, viewService, viewSummaryService, userService, entitySharesService),
-                ModelTypes.EVENT_DEFINITION_V1, new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService, entitySharesService),
+                ModelTypes.SEARCH_V1, new SearchFacade(objectMapper, searchDbService, viewService, viewSummaryService, userService, grantLookup),
+                ModelTypes.EVENT_DEFINITION_V1, new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService, grantLookup),
                 ModelTypes.INPUT_V1, new InputFacade(objectMapper, inputService, inputRegistry, lookupTableService, grokPatternService, messageInputFactory,
                         extractorFactory, converterFactory, serverStatus, pluginMetaData, new HashMap<>())
         );
