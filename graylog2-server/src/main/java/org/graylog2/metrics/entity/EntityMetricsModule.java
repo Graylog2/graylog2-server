@@ -22,6 +22,11 @@ import com.google.inject.name.Names;
 import org.graylog2.inputs.InputServiceImpl;
 import org.graylog2.inputs.metrics.InputAssociatedStreamsDescriptor;
 import org.graylog2.inputs.metrics.InputMessageCountDescriptor;
+import org.graylog2.streams.StreamServiceImpl;
+import org.graylog2.streams.metrics.StreamAssociatedInputsDescriptor;
+import org.graylog2.streams.metrics.StreamAvgProcessingTimeDescriptor;
+import org.graylog2.streams.metrics.StreamMaxProcessingTimeDescriptor;
+import org.graylog2.streams.metrics.StreamMessageCountDescriptor;
 
 /**
  * Guice module for entity metrics bindings.
@@ -37,6 +42,7 @@ import org.graylog2.inputs.metrics.InputMessageCountDescriptor;
 public class EntityMetricsModule extends AbstractModule {
 
     public static final String ENTITY_TYPE_INPUTS = InputServiceImpl.COLLECTION_NAME;
+    public static final String ENTITY_TYPE_STREAMS = StreamServiceImpl.COLLECTION_NAME;
 
     @Override
     protected void configure() {
@@ -44,5 +50,12 @@ public class EntityMetricsModule extends AbstractModule {
                 Multibinder.newSetBinder(binder(), EntityMetricDescriptor.class, Names.named(ENTITY_TYPE_INPUTS));
         inputDescriptors.addBinding().to(InputMessageCountDescriptor.class);
         inputDescriptors.addBinding().to(InputAssociatedStreamsDescriptor.class);
+
+        final Multibinder<EntityMetricDescriptor> streamDescriptors =
+                Multibinder.newSetBinder(binder(), EntityMetricDescriptor.class, Names.named(ENTITY_TYPE_STREAMS));
+        streamDescriptors.addBinding().to(StreamMessageCountDescriptor.class);
+        streamDescriptors.addBinding().to(StreamAvgProcessingTimeDescriptor.class);
+        streamDescriptors.addBinding().to(StreamMaxProcessingTimeDescriptor.class);
+        streamDescriptors.addBinding().to(StreamAssociatedInputsDescriptor.class);
     }
 }
