@@ -24,6 +24,13 @@ export const formatLeafCount = (node: HealthNode): string | undefined => {
   return `${node.total_affected}`;
 };
 
+export const formatLeafCountVerbose = (node: HealthNode): string | undefined => {
+  if (!node.total_affected) return undefined;
+  if (typeof node.total === 'number') return `${node.total_affected} of ${node.total} affected`;
+
+  return `${node.total_affected} affected`;
+};
+
 export const countContainedChecks = (node: HealthNode): number => {
   if (!isHealthFeature(node)) return 1;
 

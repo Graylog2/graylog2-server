@@ -21,7 +21,7 @@ import { Button } from 'components/bootstrap';
 import { ExternalLink, Icon, LinkContainer } from 'components/common';
 
 import HealthStatusIcon from './HealthStatusIcon';
-import { countContainedChecks, formatLeafCount } from './healthTree';
+import { countContainedChecks, formatLeafCountVerbose } from './healthTree';
 import { getStatusMeta, STATUS_LABELS } from './healthStatusCopy';
 import HEALTH_CHECK_DEFINITIONS, { getEntityListFor } from './healthCheckDefinitions';
 import type { HealthNode } from './HealthReport.types';
@@ -58,7 +58,7 @@ const AffectedChildButton = ({
   tree: ReturnType<typeof useTree>;
 }) => {
   const childIsFeature = isHealthFeature(child);
-  const childCountSummary = formatLeafCount(child);
+  const childCountSummary = formatLeafCountVerbose(child);
 
   const handleClick = () => {
     tree.select(child.id);
@@ -104,6 +104,7 @@ const HealthDetailsPane = ({ tree, selectedNode, selectedPath }: Props) => {
   const isFeatureWithChildren = isHealthFeature(selectedNode) && selectedNode.children.length > 0;
   const isLeafNode = !isFeatureWithChildren;
   const isUnhealthy = status !== 'healthy';
+  const countSummary = formatLeafCountVerbose(selectedNode);
 
   const meaning = isLeafNode && isUnhealthy ? definition?.meaning : undefined;
   const latestMessage = isUnhealthy && selectedNode.message?.trim() ? selectedNode.message : undefined;
@@ -123,6 +124,7 @@ const HealthDetailsPane = ({ tree, selectedNode, selectedPath }: Props) => {
         <HealthStatusIcon status={status} title={statusMeta.label} />
         <span>
           {statusMeta.label}. {statusMeta.description}
+          {countSummary ? ` · (${countSummary})` : null}
         </span>
       </StatusSummary>
 
