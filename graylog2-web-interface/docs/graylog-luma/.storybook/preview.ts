@@ -25,7 +25,7 @@ const preview: Preview = {
   parameters: {
     options: {
       storySort: {
-        order: ['Foundation', 'Components'],
+        order: ['Foundation', ['Typography', 'Spacings'], 'Components'],
       },
     },
     controls: {

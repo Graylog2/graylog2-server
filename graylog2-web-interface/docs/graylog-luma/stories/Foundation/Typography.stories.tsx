@@ -40,19 +40,19 @@ const FONT_FAMILIES: FamilyEntry[] = [
     key: 'body',
     label: 'Body — Source Sans Pro',
     token: 'theme.fonts.family.body',
-    when: 'All UI copy by default: paragraphs, labels, form inputs, buttons, table cells, tooltips, descriptions. GlobalThemeStyles applies this globally — you rarely need to set it explicitly.',
+    when: 'Default font for all text and elements.',
   },
   {
     key: 'navigation',
     label: 'Navigation — DM Sans',
     token: 'theme.fonts.family.navigation',
-    when: 'h1 and h2 headings only. GlobalThemeStyles applies this automatically — you do not need to set it on h1/h2 elements yourself.',
+    when: 'In main navigation and for headlines.',
   },
   {
     key: 'monospace',
     label: 'Monospace — Ubuntu Mono',
     token: 'theme.fonts.family.monospace',
-    when: 'All programmatic content: code blocks, inline code, log output, search queries, pipeline rules, configuration values, and technical identifiers.',
+    when: 'For code blocks, inline code, log output, search queries, pipeline rules, etc.',
   },
 ];
 
@@ -65,17 +65,11 @@ const FontFamiliesDoc = () => {
       header: 'Style',
       width: '260px',
       render: (row: FamilyEntry) => (
-        <p
-          style={{
-            fontFamily: families[row.key],
-            fontSize: '1.1rem',
-            margin: 0,
-            lineHeight: 1.5,
-          }}>
+        <span style={{ fontFamily: families[row.key] }}>
           {row.label}
           <br />
           0123456789
-        </p>
+        </span>
       ),
     },
     {
@@ -138,14 +132,14 @@ type ScaleEntry = {
 
 type ScaleGroupEntry = {
   label: string;
-  note: string;
+  note?: string;
   items: ScaleEntry[];
 };
 
 const TYPE_SCALE_GROUPS: ScaleGroupEntry[] = [
   {
     label: 'Headings',
-    note: 'Applied automatically by GlobalThemeStyles to h1–h6 HTML elements. h1 additionally inherits DM Sans from the navigation font family.',
+    note: 'Applied automatically to h1–h6 HTML elements.',
     items: [
       {
         key: 'h1',
@@ -189,7 +183,6 @@ const TYPE_SCALE_GROUPS: ScaleGroupEntry[] = [
   },
   {
     label: 'Body',
-    note: 'Source Sans Pro. Paragraph spacing is 8px for all body text.',
     items: [
       {
         key: 'huge',
@@ -201,7 +194,8 @@ const TYPE_SCALE_GROUPS: ScaleGroupEntry[] = [
         key: 'large',
         token: 'theme.fonts.size.large',
         specimen: 'Large',
-        usage: 'Lead paragraph or introductory sentence that needs a visual step above regular body without being a heading.',
+        usage:
+          'Lead paragraph or introductory sentence that needs a visual step above regular body without being a heading.',
       },
       {
         key: 'body',
@@ -219,13 +213,14 @@ const TYPE_SCALE_GROUPS: ScaleGroupEntry[] = [
         key: 'tiny',
         token: 'theme.fonts.size.tiny',
         specimen: 'Tiny',
-        usage: 'Used sparingly for small elements such as badges and buttons. Not recommended for large bodies of text because its size can be hard to read.',
+        usage:
+          'Used sparingly for small elements such as badges and buttons. Not recommended for large bodies of text because its size can be hard to read.',
       },
     ],
   },
   {
     label: 'Navigation',
-    note: 'Used exclusively for navigation links. Applied by navigation components — do not set manually in other contexts.',
+    note: 'Used exclusively for navigation links. Applied by navigation components. Do not set manually in other contexts.',
     items: [
       {
         key: 'navigation',
@@ -381,9 +376,9 @@ const TextColorsDoc = () => {
     <StoryContainer>
       <H2>Text Colors</H2>
       <SectionDescription>
-        Our text color palette is designed to provide optimal contrast for light and dark themes. We aim to ensure
-        that information is easy to read and does not strain readers&apos; eyes while they browse their data. These
-        standards also help us meet our customers&apos; accessibility requirements.
+        Our text color palette is designed to provide optimal contrast for light and dark themes. We aim to ensure that
+        information is easy to read and does not strain readers&apos; eyes while they browse their data. These standards
+        also help us meet our customers&apos; accessibility requirements.
       </SectionDescription>
       <FoundationTable columns={columns} rows={TEXT_COLORS} keyBy={(row) => row.token} />
     </StoryContainer>
@@ -413,9 +408,9 @@ const TypographyDoc = () => (
     <StoryContainer>
       <H1>Typography</H1>
       <p style={{ lineHeight: 1.6 }}>
-        Typography in our design system ensures clarity, consistency, and accessibility across all
-        user interfaces. We use a dual-typeface approach to distinguish between general interface
-        content and technical or system-specific elements.
+        Typography in our design system ensures clarity, consistency, and accessibility across all user interfaces. We
+        use a dual-typeface approach to distinguish between general interface content and technical or system-specific
+        elements.
       </p>
     </StoryContainer>
     <FontFamiliesDoc />

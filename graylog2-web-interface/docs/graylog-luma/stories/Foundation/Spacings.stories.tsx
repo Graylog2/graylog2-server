@@ -41,27 +41,32 @@ const SPACINGS: SpacingEntry[] = [
   {
     key: 'xxs',
     token: 'theme.spacings.xxs',
-    usage: 'Corner radius on interactive elements (buttons, inputs, cards). Border widths. The minimum meaningful visual unit — not for padding or layout gaps.',
+    usage:
+      'Corner radius on interactive elements (buttons, inputs, cards). Border widths. The minimum meaningful visual unit — not for padding or layout gaps.',
   },
   {
     key: 'xs',
     token: 'theme.spacings.xs',
-    usage: 'Padding within compact elements (chips, badges, icon buttons). Horizontal gap between inline siblings such as an icon and its label.',
+    usage:
+      'Padding within compact elements (chips, badges, icon buttons). Horizontal gap between inline siblings such as an icon and its label.',
   },
   {
     key: 'sm',
     token: 'theme.spacings.sm',
-    usage: 'Standard padding inside components (inputs, list items, table cells). Vertical gap between a label and its associated control. Gap between tightly related elements within a component.',
+    usage:
+      'Standard padding inside components (inputs, list items, table cells). Vertical gap between a label and its associated control. Gap between tightly related elements within a component.',
   },
   {
     key: 'md',
     token: 'theme.spacings.md',
-    usage: 'Default gap in flex and grid layouts. Padding inside medium-sized containers. Vertical separation between elements that belong to the same section but are visually distinct.',
+    usage:
+      'Default gap in flex and grid layouts. Padding inside medium-sized containers. Vertical separation between elements that belong to the same section but are visually distinct.',
   },
   {
     key: 'lg',
     token: 'theme.spacings.lg',
-    usage: 'Margin between visually distinct groups within a panel. Larger padding for prominent containers such as empty states or dialog content areas.',
+    usage:
+      'Margin between visually distinct groups within a panel. Larger padding for prominent containers such as empty states or dialog content areas.',
   },
   {
     key: 'xl',
@@ -71,7 +76,8 @@ const SPACINGS: SpacingEntry[] = [
   {
     key: 'xxl',
     token: 'theme.spacings.xxl',
-    usage: 'Page-level whitespace only. Rarely appropriate in component authoring — prefer structural layout components over manual large margins.',
+    usage:
+      'Page-level whitespace only. Rarely appropriate in component authoring — prefer structural layout components over manual large margins.',
   },
 ];
 
@@ -110,8 +116,8 @@ const SpacingsDoc = () => {
     <StoryContainer>
       <H1>Spacings</H1>
       <SectionDescription>
-        Spacing tokens are for <strong>component authors</strong> building new reusable components. When composing
-        existing components, their internal spacing is already built in — you do not need to apply these manually.
+        Spacing tokens are for <strong>component authors</strong> building new reusable components. When importing an
+        existing components, their internal spacing is already built in and you do not need to apply these manually.
       </SectionDescription>
       <FoundationTable columns={columns} rows={SPACINGS} keyBy={(row) => row.key} />
     </StoryContainer>
@@ -136,14 +142,6 @@ const meta: Meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Scale: Story = {
+export const Spacings: Story = {
   render: SpacingsDoc,
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Each bar is rendered at the actual spacing height so the scale is immediately visible. The three most-used tokens in practice are `xs`, `sm`, and `md`.',
-      },
-    },
-  },
 };
