@@ -143,17 +143,15 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
   return (
     <FormGroup controlId="event-definition-tags" validationState={combinedError ? 'error' : null}>
       <Select
-        // `Select`'s Props type doesn't surface a handful of react-select props we need
-        // here (`tabSelectsValue`, `inputValue`, `onKeyDown`), but it spreads unknown props
-        // through at runtime, so we cast just these to satisfy tsc without altering behavior.
-        // - `tabSelectsValue: false` — Tab leaves the typed value in the input rather than
-        //   committing the focused suggestion (matters when correcting a duplicate).
+        // `Select`'s Props type doesn't surface a couple of react-select props we need here
+        // (`inputValue`, `onKeyDown`), but it spreads unknown props through at runtime, so
+        // we cast just these to satisfy tsc without altering behavior.
         // - `inputValue` — fully control the typed text so react-select's internal blur /
-        //   menu-close clears can be ignored (otherwise Tab/blur drops the user's text).
+        //   menu-close clears can be ignored (otherwise Tab/blur drops the user's text on a
+        //   duplicate).
         // - `onKeyDown` — flag a duplicate-commit attempt on Enter / Tab so the error
         //   message surfaces even when react-select silently rejects the commit.
         {...({
-          tabSelectsValue: false,
           inputValue: input,
           onKeyDown: (e: React.KeyboardEvent) => {
             if (e.key === 'Enter' || e.key === 'Tab') {
