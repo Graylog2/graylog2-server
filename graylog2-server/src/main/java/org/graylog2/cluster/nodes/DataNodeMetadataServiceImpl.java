@@ -17,7 +17,8 @@
 package org.graylog2.cluster.nodes;
 
 import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.ReplaceOptions;
+import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.model.Updates;
 import jakarta.inject.Inject;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
@@ -35,10 +36,25 @@ public class DataNodeMetadataServiceImpl implements DataNodeMetadataService {
 
     @Override
     public void setOpensearchVersion(String nodeId, String version) {
-        collection.replaceOne(
+        collection.updateOne(
                 Filters.eq(DataNodeMetadata.FIELD_NODE_ID, nodeId),
-                new DataNodeMetadata(nodeId, version),
-                new ReplaceOptions().upsert(true)
+                Updates.combine(
+                        Updates.setOnInsert(DataNodeMetadata.FIELD_NODE_ID, nodeId),
+                        Updates.set(DataNodeMetadata.FIELD_CURRENT_OPENSEARCH_VERSION, version)
+                ),
+                new UpdateOptions().upsert(true)
+        );
+    }
+
+    @Override
+    public void setLatestAvailableOpensearchVersion(String nodeId, String version) {
+        collection.updateOne(
+                Filters.eq(DataNodeMetadata.FIELD_NODE_ID, nodeId),
+                Updates.combine(
+                        Updates.setOnInsert(DataNodeMetadata.FIELD_NODE_ID, nodeId),
+                        Updates.set(DataNodeMetadata.FIELD_LATEST_AVAILABLE_OPENSEARCH_VERSION, version)
+                ),
+                new UpdateOptions().upsert(true)
         );
     }
 

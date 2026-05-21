@@ -66,7 +66,7 @@ class OpensearchVersionTracerTest {
         tracer.transition(OpensearchEvent.HEALTH_CHECK_OK, OpensearchState.STARTING, OpensearchState.AVAILABLE);
 
         assertThat(metadataService.findByNodeId(NODE_ID))
-                .hasValueSatisfying(m -> assertThat(m.opensearchVersion()).isEqualTo("2.19.5"));
+                .hasValueSatisfying(m -> assertThat(m.currentOpensearchVersion()).isEqualTo("2.19.5"));
     }
 
     @Test
@@ -77,7 +77,7 @@ class OpensearchVersionTracerTest {
         tracer.transition(OpensearchEvent.HEALTH_CHECK_OK, OpensearchState.STARTING, OpensearchState.AVAILABLE);
 
         assertThat(metadataService.findByNodeId(NODE_ID))
-                .hasValueSatisfying(m -> assertThat(m.opensearchVersion()).isEqualTo("2.19.5"));
+                .hasValueSatisfying(m -> assertThat(m.currentOpensearchVersion()).isEqualTo("2.19.5"));
     }
 
     @Test
@@ -88,7 +88,7 @@ class OpensearchVersionTracerTest {
         tracer.transition(OpensearchEvent.HEALTH_CHECK_OK, OpensearchState.STARTING, OpensearchState.AVAILABLE);
 
         assertThat(metadataService.findByNodeId(NODE_ID))
-                .hasValueSatisfying(m -> assertThat(m.opensearchVersion()).isEqualTo("2.19.5"));
+                .hasValueSatisfying(m -> assertThat(m.currentOpensearchVersion()).isEqualTo("2.19.5"));
     }
 
     @Test
@@ -99,7 +99,7 @@ class OpensearchVersionTracerTest {
         tracer.transition(OpensearchEvent.HEALTH_CHECK_OK, OpensearchState.STARTING, OpensearchState.AVAILABLE);
 
         assertThat(metadataService.findByNodeId(NODE_ID))
-                .hasValueSatisfying(m -> assertThat(m.opensearchVersion()).isEqualTo("2.19.5"));
+                .hasValueSatisfying(m -> assertThat(m.currentOpensearchVersion()).isEqualTo("2.19.5"));
     }
 
     private OpensearchVersionTracer tracerWithVersion(String version) {

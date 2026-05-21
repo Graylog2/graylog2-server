@@ -55,24 +55,22 @@ public class OpensearchVersionTracer implements StateMachineTracer<OpensearchSta
     public void transition(OpensearchEvent trigger, OpensearchState source, OpensearchState destination) {
         if (source != destination && destination == OpensearchState.AVAILABLE) {
             final OpensearchDistribution opensearchDistribution = configuration.opensearchDistribution();
-            final String osVersion = opensearchDistribution.version();
+            final String opensearchVersion = opensearchDistribution.version();
 
-            final Version currentVersion = Version.parse(osVersion);
+            final Version currentVersion = Version.parse(opensearchVersion);
 
             if (isCurrentNewerThanPeristed(currentVersion)) {
-                metadataService.setOpensearchVersion(nodeId.getNodeId(), osVersion);
-                LOG.info("Persisting confirmed opensearch version in data node metadata {}", osVersion);
+                metadataService.setOpensearchVersion(nodeId.getNodeId(), opensearchVersion);
+                LOG.info("Persisting confirmed opensearch version in data node metadata {}", opensearchVersion);
             }
 
-            if (!opensearchDistribution.otherCandidates().isEmpty()) {
-                final Optional<OpensearchDistribution> newerVersion = opensearchDistribution.otherCandidates().stream()
-                        .filter(candidate -> Version.parse(candidate.version()).isHigherThan(currentVersion))
-                        .max(Comparator.comparing(d -> Version.parse(d.version())));
-                newerVersion.ifPresent(candidate -> {
-                    // TODO: trigger notification here!
-                    LOG.warn("You are running outdated Opensearch version. Perform index migration to activate latest version {}", candidate.version());
-                });
-            }
+            opensearchDistribution.otherCandidates().stream()
+                    .filter(candidate -> Version.parse(candidate.version()).isHigherThan(currentVersion))
+                    .max(Comparator.comparing(d -> Version.parse(d.version())))
+                    .ifPresent(candidate -> {
+                        LOG.warn("You are running outdated Opensearch version. Perform index migration to activate latest version {}", candidate.version());
+                        metadataService.setLatestAvailableOpensearchVersion(nodeId.getNodeId(), candidate.version());
+                    });
 
         }
     }
@@ -80,7 +78,7 @@ public class OpensearchVersionTracer implements StateMachineTracer<OpensearchSta
     @Nonnull
     private Boolean isCurrentNewerThanPeristed(Version currentVersion) {
         return metadataService.findByNodeId(nodeId.getNodeId())
-                .map(m -> currentVersion.isHigherThan(Version.parse(m.opensearchVersion())))
+                .map(m -> currentVersion.isHigherThan(Version.parse(m.currentOpensearchVersion())))
                 .orElse(true);
     }
 }

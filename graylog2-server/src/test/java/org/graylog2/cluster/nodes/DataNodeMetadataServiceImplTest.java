@@ -73,13 +73,44 @@ class DataNodeMetadataServiceImplTest {
 
         assertThat(service.findByNodeId(NODE_ID)).hasValueSatisfying(metadata -> {
             assertThat(metadata.nodeId()).isEqualTo(NODE_ID);
-            assertThat(metadata.opensearchVersion()).isEqualTo("2.19.5");
+            assertThat(metadata.currentOpensearchVersion()).isEqualTo("2.19.5");
         });
+    }
+
+    @Test
+    void storesLatestAvailableVersion() {
+        service.setOpensearchVersion(NODE_ID, "2.18.0");
+        service.setLatestAvailableOpensearchVersion(NODE_ID, "2.19.5");
+
+        assertThat(service.findByNodeId(NODE_ID)).hasValueSatisfying(metadata -> {
+            assertThat(metadata.currentOpensearchVersion()).isEqualTo("2.18.0");
+            assertThat(metadata.latestAvailableOpensearchVersion()).isEqualTo("2.19.5");
+        });
+    }
+
+    @Test
+    void settingOpensearchVersionDoesNotClearLatestAvailableVersion() {
+        service.setOpensearchVersion(NODE_ID, "2.18.0");
+        service.setLatestAvailableOpensearchVersion(NODE_ID, "2.19.5");
+        service.setOpensearchVersion(NODE_ID, "2.19.5");
+
+        assertThat(service.findByNodeId(NODE_ID)).hasValueSatisfying(metadata -> {
+            assertThat(metadata.currentOpensearchVersion()).isEqualTo("2.19.5");
+            assertThat(metadata.latestAvailableOpensearchVersion()).isEqualTo("2.19.5");
+        });
+    }
+
+    @Test
+    void settingLatestAvailableVersionDoesNotClearOpensearchVersion() {
+        service.setOpensearchVersion(NODE_ID, "2.18.0");
+        service.setLatestAvailableOpensearchVersion(NODE_ID, "2.19.5");
+
+        assertThat(storedVersion(NODE_ID)).isEqualTo("2.18.0");
     }
 
     private String storedVersion(String nodeId) {
         return service.findByNodeId(nodeId)
-                .map(DataNodeMetadata::opensearchVersion)
+                .map(DataNodeMetadata::currentOpensearchVersion)
                 .orElse(null);
     }
 }

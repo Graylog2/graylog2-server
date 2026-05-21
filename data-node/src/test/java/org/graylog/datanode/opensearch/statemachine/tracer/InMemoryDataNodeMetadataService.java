@@ -29,7 +29,16 @@ class InMemoryDataNodeMetadataService implements DataNodeMetadataService {
 
     @Override
     public void setOpensearchVersion(String nodeId, String version) {
-        store.put(nodeId, new DataNodeMetadata(nodeId, version));
+        final DataNodeMetadata existing = store.get(nodeId);
+        final String latestAvailable = existing != null ? existing.latestAvailableOpensearchVersion() : null;
+        store.put(nodeId, new DataNodeMetadata(null, nodeId, version, latestAvailable));
+    }
+
+    @Override
+    public void setLatestAvailableOpensearchVersion(String nodeId, String version) {
+        final DataNodeMetadata existing = store.get(nodeId);
+        final String opensearchVersion = existing != null ? existing.currentOpensearchVersion() : null;
+        store.put(nodeId, new DataNodeMetadata(null, nodeId, opensearchVersion, version));
     }
 
     @Override
