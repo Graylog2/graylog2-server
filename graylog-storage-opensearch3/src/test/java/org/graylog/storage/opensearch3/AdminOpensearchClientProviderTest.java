@@ -17,33 +17,23 @@
 package org.graylog.storage.opensearch3;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graylog.security.certutil.CaKeystore;
 import org.graylog.security.certutil.CaKeystoreException;
-import org.graylog.security.certutil.CertRequest;
-import org.graylog.security.certutil.CertificateGenerator;
-import org.graylog.security.certutil.KeyPair;
-import org.graylog.security.certutil.cert.CertificateChain;
-import org.graylog.security.certutil.csr.CsrSigner;
-import org.graylog2.cluster.certificates.CertificateSigningRequest;
-import org.graylog2.indexer.security.IndexerAdminCertConstants;
-import org.graylog2.security.TrustManagerAndSocketFactoryProvider;
+import org.graylog.security.certutil.ClientCertSslContextFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.opensearch.client.transport.OpenSearchTransport;
 
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.SSLContext;
 import java.net.URI;
-import java.security.cert.X509Certificate;
-import java.time.Duration;
+import java.time.Clock;
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -51,36 +41,30 @@ import static org.mockito.Mockito.when;
 
 class AdminOpensearchClientProviderTest {
 
-    private TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider;
+    private ClientCertSslContextFactory sslContextFactory;
     private OfficialOpensearchClientProvider transportProvider;
     private List<URI> hosts;
     private ObjectMapper objectMapper;
-    private KeyPair caKeyPair;
-    private CsrSigner csrSigner;
 
     @BeforeEach
-    void setUp() throws Exception {
-        this.trustManagerAndSocketFactoryProvider = mock(TrustManagerAndSocketFactoryProvider.class);
-        when(trustManagerAndSocketFactoryProvider.getTrustManager()).thenReturn(mock(X509TrustManager.class));
+    void setUp() {
+        this.sslContextFactory = mock(ClientCertSslContextFactory.class);
+        when(sslContextFactory.buildClientCertSslContext(any(), any()))
+                .thenAnswer(inv -> SSLContext.getInstance("TLS"));
 
         this.transportProvider = mock(OfficialOpensearchClientProvider.class);
         when(transportProvider.buildTransport(any(), any())).thenAnswer(inv -> mock(OpenSearchTransport.class));
 
         this.hosts = List.of(URI.create("http://localhost:9200"));
         this.objectMapper = new ObjectMapper();
-
-        this.caKeyPair = CertificateGenerator.generate(
-                CertRequest.selfSigned("test-ca").isCA(true).validity(Duration.ofDays(1)));
-        this.csrSigner = new CsrSigner();
     }
 
     @Test
-    void throwsWhenNoCaConfigured() {
-        final CaKeystore caKeystore = mock(CaKeystore.class);
-        when(caKeystore.exists()).thenReturn(false);
+    void propagatesNoCaError() {
+        when(sslContextFactory.buildClientCertSslContext(any(), any()))
+                .thenThrow(new CaKeystoreException("Cannot mint client certificate: no CA configured."));
 
-        final AdminOpensearchClientProvider provider = new AdminOpensearchClientProvider(
-                caKeystore, hosts, trustManagerAndSocketFactoryProvider, transportProvider, objectMapper);
+        final AdminOpensearchClientProvider provider = newProvider(Clock.systemUTC());
 
         assertThatThrownBy(provider::getAdminClient)
                 .isInstanceOf(CaKeystoreException.class)
@@ -89,78 +73,77 @@ class AdminOpensearchClientProviderTest {
 
     @Test
     void cachesClientAcrossCalls() {
-        final AdminOpensearchClientProvider provider = newProviderWithSigningCa();
+        final AdminOpensearchClientProvider provider = newProvider(Clock.systemUTC());
 
         final OfficialOpensearchClient first = provider.getAdminClient();
         final OfficialOpensearchClient second = provider.getAdminClient();
 
         assertThat(second).isSameAs(first);
+        verify(sslContextFactory, times(1)).buildClientCertSslContext(any(), any());
         verify(transportProvider, times(1)).buildTransport(any(), any());
     }
 
     @Test
     void refreshesTransportWhenCertNearsExpiryButKeepsClientReference() {
-        final AtomicReference<Instant> clock = new AtomicReference<>(Instant.now());
-        final AdminOpensearchClientProvider provider = newProviderWithSigningCa(clock::get);
+        final Instant start = Instant.parse("2026-01-01T00:00:00Z");
+        final MutableClock clock = new MutableClock(start);
+        final AdminOpensearchClientProvider provider = newProvider(clock);
 
         final OfficialOpensearchClient initialClient = provider.getAdminClient();
 
         // Jump past the refresh window (cert lifetime minus the 1-minute refresh buffer).
-        clock.set(clock.get().plus(AdminOpensearchClientProvider.CERT_LIFETIME));
+        clock.advance(AdminOpensearchClientProvider.CERT_LIFETIME);
 
         final OfficialOpensearchClient afterRefresh = provider.getAdminClient();
 
         assertThat(afterRefresh)
                 .as("client reference must remain stable across cert rotation")
                 .isSameAs(initialClient);
+        verify(sslContextFactory, times(2)).buildClientCertSslContext(any(), any());
         verify(transportProvider, times(2)).buildTransport(any(), any());
     }
 
     @Test
-    void mintsCertWithAdminCommonName() {
-        final CaKeystore caKeystore = signingCaKeystore();
-        final AdminOpensearchClientProvider provider = new AdminOpensearchClientProvider(
-                caKeystore, hosts, trustManagerAndSocketFactoryProvider, transportProvider, objectMapper);
+    void requestsCertWithAdminCommonNameAndConfiguredLifetime() {
+        newProvider(Clock.systemUTC()).getAdminClient();
 
-        provider.getAdminClient();
-
-        final ArgumentCaptor<CertificateSigningRequest> csrCaptor = ArgumentCaptor.forClass(CertificateSigningRequest.class);
-        verify(caKeystore).signCertificateRequest(csrCaptor.capture(), any());
-        assertThat(csrCaptor.getValue().nodeId()).isEqualTo(IndexerAdminCertConstants.ADMIN_CN);
-        assertThat(csrCaptor.getValue().request().getSubject().toString())
-                .isEqualTo("CN=" + IndexerAdminCertConstants.ADMIN_CN);
+        verify(sslContextFactory).buildClientCertSslContext(
+                eq("graylog-admin"),
+                eq(AdminOpensearchClientProvider.CERT_LIFETIME));
     }
 
-    private AdminOpensearchClientProvider newProviderWithSigningCa() {
-        return newProviderWithSigningCa(Instant::now);
-    }
-
-    private AdminOpensearchClientProvider newProviderWithSigningCa(Supplier<Instant> clock) {
-        final CaKeystore caKeystore = signingCaKeystore();
-        return new AdminOpensearchClientProvider(
-                caKeystore, hosts, trustManagerAndSocketFactoryProvider, transportProvider, objectMapper) {
-            @Override
-            protected Instant now() {
-                return clock.get();
-            }
-        };
+    private AdminOpensearchClientProvider newProvider(Clock clock) {
+        return new AdminOpensearchClientProvider(sslContextFactory, hosts, transportProvider, objectMapper, clock);
     }
 
     /**
-     * Builds a mocked {@link CaKeystore} whose {@code signCertificateRequest} actually signs
-     * the incoming CSR using an in-test CA, so the resulting cert's public key matches the
-     * key pair generated by the provider and {@code SSLContext.init} succeeds.
+     * Mutable test clock — {@link Clock#fixed(Instant, ZoneOffset)} is fixed for the life of
+     * the instance, which doesn't work for tests that advance time.
      */
-    private CaKeystore signingCaKeystore() {
-        final CaKeystore caKeystore = mock(CaKeystore.class);
-        when(caKeystore.exists()).thenReturn(true);
-        when(caKeystore.signCertificateRequest(any(), any())).thenAnswer(inv -> {
-            final CertificateSigningRequest req = inv.getArgument(0);
-            final Duration lifetime = inv.getArgument(1);
-            final X509Certificate signed = csrSigner.sign(
-                    caKeyPair.privateKey(), caKeyPair.certificate(), req.request(), lifetime);
-            return new CertificateChain(signed, List.of(caKeyPair.certificate()));
-        });
-        return caKeystore;
+    private static final class MutableClock extends Clock {
+        private Instant current;
+
+        MutableClock(Instant initial) {
+            this.current = initial;
+        }
+
+        void advance(java.time.Duration delta) {
+            current = current.plus(delta);
+        }
+
+        @Override
+        public ZoneOffset getZone() {
+            return ZoneOffset.UTC;
+        }
+
+        @Override
+        public Clock withZone(java.time.ZoneId zone) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Instant instant() {
+            return current;
+        }
     }
 }

@@ -17,37 +17,21 @@
 package org.graylog.storage.opensearch3;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.annotations.VisibleForTesting;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.graylog.security.certutil.CaKeystore;
-import org.graylog.security.certutil.CaKeystoreException;
-import org.graylog.security.certutil.CertRequest;
-import org.graylog.security.certutil.CertificateGenerator;
-import org.graylog.security.certutil.KeyPair;
-import org.graylog.security.certutil.cert.CertificateChain;
-import org.graylog.security.certutil.csr.CsrGenerator;
-import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
+import org.graylog.security.certutil.ClientCertSslContextFactory;
 import org.graylog.storage.opensearch3.client.CustomAsyncOpenSearchClient;
 import org.graylog.storage.opensearch3.client.CustomOpenSearchClient;
-import org.graylog2.cluster.certificates.CertificateSigningRequest;
 import org.graylog2.configuration.IndexerHosts;
 import org.graylog2.indexer.security.IndexerAdminCertConstants;
-import org.graylog2.security.TrustManagerAndSocketFactoryProvider;
 import org.opensearch.client.transport.OpenSearchTransport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import java.net.URI;
-import java.security.KeyStore;
-import java.security.SecureRandom;
+import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -77,13 +61,12 @@ public class AdminOpensearchClientProvider {
 
     static final Duration CERT_LIFETIME = Duration.ofMinutes(15);
     static final Duration REFRESH_BEFORE_EXPIRY = Duration.ofMinutes(1);
-    private static final String KEY_ALIAS = "admin";
 
-    private final CaKeystore caKeystore;
+    private final ClientCertSslContextFactory sslContextFactory;
     private final List<URI> hosts;
-    private final TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider;
     private final OfficialOpensearchClientProvider transportProvider;
     private final ObjectMapper objectMapper;
+    private final Clock clock;
 
     private volatile OfficialOpensearchClient cachedClient;
     private volatile DynamicTransport dynamicTransport;
@@ -91,16 +74,16 @@ public class AdminOpensearchClientProvider {
     private volatile Instant currentCertExpiresAt;
 
     @Inject
-    public AdminOpensearchClientProvider(CaKeystore caKeystore,
+    public AdminOpensearchClientProvider(ClientCertSslContextFactory sslContextFactory,
                                          @IndexerHosts List<URI> hosts,
-                                         TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider,
                                          OfficialOpensearchClientProvider transportProvider,
-                                         ObjectMapper objectMapper) {
-        this.caKeystore = caKeystore;
+                                         ObjectMapper objectMapper,
+                                         Clock clock) {
+        this.sslContextFactory = sslContextFactory;
         this.hosts = hosts;
-        this.trustManagerAndSocketFactoryProvider = trustManagerAndSocketFactoryProvider;
         this.transportProvider = transportProvider;
         this.objectMapper = objectMapper;
+        this.clock = clock;
     }
 
     /**
@@ -110,33 +93,21 @@ public class AdminOpensearchClientProvider {
      */
     @Nonnull
     public OfficialOpensearchClient getAdminClient() {
-        if (cachedClient != null && !needsRefresh(now())) {
+        if (cachedClient != null && !needsRefresh(clock.instant())) {
             return cachedClient;
         }
         return initOrRefresh();
     }
 
-    /**
-     * Overridable for tests that need to control time.
-     */
-    @VisibleForTesting
-    Instant now() {
-        return Instant.now();
-    }
-
     private synchronized OfficialOpensearchClient initOrRefresh() {
-        final Instant now = now();
+        final Instant now = clock.instant();
         if (cachedClient != null && !needsRefresh(now)) {
             return cachedClient;
         }
 
-        if (!caKeystore.exists()) {
-            throw new CaKeystoreException("Cannot build admin OpenSearch client: no CA configured. "
-                    + "This feature requires running with the Graylog Data Node.");
-        }
-
         try {
-            final SSLContext sslContext = buildAdminSslContext();
+            final SSLContext sslContext = sslContextFactory.buildClientCertSslContext(
+                    IndexerAdminCertConstants.ADMIN_CN, CERT_LIFETIME);
             final OpenSearchTransport newTransport = transportProvider.buildTransport(hosts, TransportConfig.clientCertAuth(sslContext));
 
             if (cachedClient == null) {
@@ -152,6 +123,8 @@ public class AdminOpensearchClientProvider {
                 LOG.debug("Rotated admin OpenSearch client certificate.");
             }
             this.currentCertExpiresAt = now.plus(CERT_LIFETIME);
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             throw new IllegalStateException("Failed to build admin OpenSearch client", e);
         }
@@ -162,33 +135,6 @@ public class AdminOpensearchClientProvider {
     private boolean needsRefresh(Instant now) {
         return currentCertExpiresAt == null
                 || !now.isBefore(currentCertExpiresAt.minus(REFRESH_BEFORE_EXPIRY));
-    }
-
-    private SSLContext buildAdminSslContext() throws Exception {
-        final CertRequest certRequest = CertRequest.selfSigned(IndexerAdminCertConstants.ADMIN_CN)
-                .isCA(false)
-                .validity(CERT_LIFETIME);
-        final KeyPair keyPair = CertificateGenerator.generate(certRequest);
-
-        final char[] keystorePassword = RandomStringUtils.secure().nextAlphanumeric(96).toCharArray();
-        final KeyStore csrKeystore = keyPair.toKeystore(KEY_ALIAS, keystorePassword);
-        final InMemoryKeystoreInformation csrKeystoreInfo = new InMemoryKeystoreInformation(csrKeystore, keystorePassword);
-
-        final PKCS10CertificationRequest csr = CsrGenerator.generateCSR(
-                csrKeystoreInfo, KEY_ALIAS, IndexerAdminCertConstants.ADMIN_CN, List.of());
-        final CertificateChain certChain = caKeystore.signCertificateRequest(
-                new CertificateSigningRequest(IndexerAdminCertConstants.ADMIN_CN, csr), CERT_LIFETIME);
-
-        final KeyStore signedKeystore = KeyStore.getInstance("PKCS12");
-        signedKeystore.load(null, null);
-        signedKeystore.setKeyEntry(KEY_ALIAS, keyPair.privateKey(), keystorePassword, certChain.toCertificateChainArray());
-
-        final KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
-        kmf.init(signedKeystore, keystorePassword);
-        final X509TrustManager trustManager = trustManagerAndSocketFactoryProvider.getTrustManager();
-        final SSLContext sslContext = SSLContext.getInstance("TLS");
-        sslContext.init(kmf.getKeyManagers(), new TrustManager[]{trustManager}, new SecureRandom());
-        return sslContext;
     }
 
     private static ScheduledExecutorService createDrainScheduler() {
