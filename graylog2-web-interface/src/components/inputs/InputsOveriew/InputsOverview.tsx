@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import * as Immutable from 'immutable';
 
 import type { NodeInfo } from 'stores/nodes/NodesStore';
@@ -29,8 +29,13 @@ import type { InputTypesSummary } from 'hooks/useInputTypes';
 import type { InputTypeDescriptionsResponse } from 'hooks/useInputTypesDescriptions';
 import useInputsStates from 'hooks/useInputsStates';
 import useTableElements from 'components/inputs/InputsOveriew/useTableElements';
+import { InputMetricsProvider } from 'components/inputs/InputsOveriew/InputMetricsContext';
+import { backendFieldsForVisibleColumns } from 'components/inputs/InputsOveriew/metricColumns';
+import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
+import { ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
 import { IfPermitted } from 'components/common';
 import type { SearchParams } from 'stores/PaginationTypes';
+import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
 
 type Input = {
   id: string;
@@ -85,6 +90,22 @@ const InputsOverview = ({
     return fetchInputs(optionsCopy);
   };
 
+  const [visibleInputIds, setVisibleInputIds] = useState<Array<string>>([]);
+  const onDataLoaded = useCallback((data: PaginatedResponse<Input>) => {
+    setVisibleInputIds(data.list.map((entity) => entity.id));
+  }, []);
+
+  const { data: layoutPreferences } = useUserLayoutPreferences(resolvedTableLayout.entityTableId);
+  const requestedFields = useMemo(() => {
+    const userPrefs = layoutPreferences?.attributes ?? {};
+    const userSelection = Object.entries(userPrefs)
+      .filter(([, pref]) => pref.status === ATTRIBUTE_STATUS.show)
+      .map(([attributeId]) => attributeId);
+    const visibleColumns = userSelection.length > 0 ? userSelection : resolvedTableLayout.defaultDisplayedAttributes;
+
+    return backendFieldsForVisibleColumns(visibleColumns);
+  }, [layoutPreferences, resolvedTableLayout.defaultDisplayedAttributes]);
+
   return (
     <div>
       {!node && !global && (
@@ -92,21 +113,24 @@ const InputsOverview = ({
           <CreateInputControl />
         </IfPermitted>
       )}
-      <PaginatedEntityTable<Input>
-        humanName="inputs"
-        additionalAttributes={additionalAttributes}
-        queryHelpComponent={<QueryHelper entityName={entityName} />}
-        entityActions={entityActions}
-        tableLayout={resolvedTableLayout}
-        fetchEntities={fetchEntities}
-        expandedSectionRenderers={expandedSections}
-        keyFn={resolvedKeyFn}
-        bulkSelection={undefined}
-        withoutURLParams={withoutURLParams}
-        entityAttributesAreCamelCase={false}
-        filterValueRenderers={{}}
-        columnRenderers={columnRenderers}
-      />
+      <InputMetricsProvider inputIds={visibleInputIds} fields={requestedFields}>
+        <PaginatedEntityTable<Input>
+          humanName="inputs"
+          additionalAttributes={additionalAttributes}
+          queryHelpComponent={<QueryHelper entityName={entityName} />}
+          entityActions={entityActions}
+          tableLayout={resolvedTableLayout}
+          fetchEntities={fetchEntities}
+          onDataLoaded={onDataLoaded}
+          expandedSectionRenderers={expandedSections}
+          keyFn={resolvedKeyFn}
+          bulkSelection={undefined}
+          withoutURLParams={withoutURLParams}
+          entityAttributesAreCamelCase={false}
+          filterValueRenderers={{}}
+          columnRenderers={columnRenderers}
+        />
+      </InputMetricsProvider>
     </div>
   );
 };
