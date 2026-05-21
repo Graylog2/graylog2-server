@@ -52,6 +52,7 @@ public abstract class EventDto {
     public static final String FIELD_PRIORITY = "priority";
     public static final String FIELD_SCORES = "scores";
     public static final String FIELD_ASSOCIATED_ASSETS = "associated_assets";
+    public static final String FIELD_TAGS = "tags";
     public static final String FIELD_FIELDS = "fields";
     public static final String FIELD_GROUP_BY_FIELDS = "group_by_fields";
     public static final String FIELD_AGGREGATION_CONDITIONS = "aggregation_conditions";
@@ -109,6 +110,9 @@ public abstract class EventDto {
     @JsonProperty(FIELD_ASSOCIATED_ASSETS)
     public abstract Set<String> associatedAssets();
 
+    @JsonProperty(FIELD_TAGS)
+    public abstract Set<String> tags();
+
     @JsonProperty(FIELD_ALERT)
     public abstract boolean alert();
 
@@ -143,7 +147,8 @@ public abstract class EventDto {
                     .groupByFields(ImmutableMap.of())
                     .aggregationConditions(ImmutableMap.of())
                     .scores(ImmutableMap.of())
-                    .associatedAssets(ImmutableSet.of());
+                    .associatedAssets(ImmutableSet.of())
+                    .tags(ImmutableSet.of());
         }
 
         @JsonProperty(FIELD_ID)
@@ -200,6 +205,9 @@ public abstract class EventDto {
 
         @JsonProperty(FIELD_ASSOCIATED_ASSETS)
         public abstract Builder associatedAssets(Set<String> associatedAssets);
+
+        @JsonProperty(FIELD_TAGS)
+        public abstract Builder tags(Set<String> tags);
 
         @JsonProperty(FIELD_ALERT)
         public abstract Builder alert(boolean alert);

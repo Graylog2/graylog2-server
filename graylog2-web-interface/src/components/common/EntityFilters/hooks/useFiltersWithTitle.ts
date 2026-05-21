@@ -37,12 +37,14 @@ type CollectionsByAttributeId = {
 };
 
 type IdentifierMetaByAttributeId = {
-  [attributeId: string]: {
-    identifier_field?: string;
-    identifier_type?: string;
-    display_fields?: string[];
-    display_template?: string;
-  } | undefined;
+  [attributeId: string]:
+    | {
+        identifier_field?: string;
+        identifier_type?: string;
+        display_fields?: string[];
+        display_template?: string;
+      }
+    | undefined;
 };
 
 type RequestedFilterTitles = Array<{
@@ -65,21 +67,24 @@ const _collectionsByAttributeId = (attributesMetaData: Attributes) =>
   }, {});
 
 const _identifierMetaByAttributeId = (attributesMetaData: Attributes): IdentifierMetaByAttributeId =>
-  attributesMetaData?.reduce((col, { id, related_collection, related_identifier, type, related_display_fields, related_display_template }) => {
-    if (!related_collection) {
-      return col;
-    }
+  attributesMetaData?.reduce(
+    (col, { id, related_collection, related_identifier, type, related_display_fields, related_display_template }) => {
+      if (!related_collection) {
+        return col;
+      }
 
-    return {
-      ...col,
-      [id]: {
-        identifier_field: related_identifier,
-        identifier_type: related_identifier ? type : undefined,
-        display_fields: related_display_fields,
-        display_template: related_display_template,
-      },
-    };
-  }, {});
+      return {
+        ...col,
+        [id]: {
+          identifier_field: related_identifier,
+          identifier_type: related_identifier ? type : undefined,
+          display_fields: related_display_fields,
+          display_template: related_display_template,
+        },
+      };
+    },
+    {},
+  );
 
 const _urlQueryFiltersWithoutTitle = (filters: UrlQueryFilters, collectionsByAttributeId: CollectionsByAttributeId) =>
   filters.entrySeq().reduce((col, [attributeId, filterValues]) => {
@@ -215,7 +220,11 @@ const useFiltersWithTitle = (
   const collectionsByAttributeId = _collectionsByAttributeId(attributesMetaData);
   const identifierMetaByAttributeId = _identifierMetaByAttributeId(attributesMetaData);
   const urlQueryFiltersWithoutTitle = _urlQueryFiltersWithoutTitle(urlQueryFilters, collectionsByAttributeId);
-  const payload = filtersWithoutTitlePayload(urlQueryFiltersWithoutTitle, collectionsByAttributeId, identifierMetaByAttributeId);
+  const payload = filtersWithoutTitlePayload(
+    urlQueryFiltersWithoutTitle,
+    collectionsByAttributeId,
+    identifierMetaByAttributeId,
+  );
   const { data, isInitialLoading, isError } = useQuery({
     queryKey: ['entity_titles', payload],
 
@@ -240,7 +249,11 @@ const useFiltersWithTitle = (
   const onChange = useCallback(
     (newFiltersWithTitle: Filters, newUrlQueryFilters: UrlQueryFilters) => {
       const newURLQueryFiltersWithoutTitle = _urlQueryFiltersWithoutTitle(newUrlQueryFilters, collectionsByAttributeId);
-      const newPayload = filtersWithoutTitlePayload(newURLQueryFiltersWithoutTitle, collectionsByAttributeId, identifierMetaByAttributeId);
+      const newPayload = filtersWithoutTitlePayload(
+        newURLQueryFiltersWithoutTitle,
+        collectionsByAttributeId,
+        identifierMetaByAttributeId,
+      );
       const newResponse = filtersWithTitleToResponse(newFiltersWithTitle, attributesMetaData);
 
       queryClient.setQueryData(['entity_titles', newPayload], { entities: newResponse });
