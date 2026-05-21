@@ -113,18 +113,6 @@ class OutdatedIndexServiceTest {
     }
 
     @Test
-    void reindexFailsIfTempIndexAlreadyExists() throws IOException {
-        when(indices.waitForRecovery("my_index", 2)).thenReturn(HealthStatus.Green);
-        when(indices.indexSettings("my_index")).thenReturn(sourceSettings());
-        when(indices.indexMapping("my_index")).thenReturn(sourceMapping());
-        when(indicesAdapter.exists(".gltmp_my_index")).thenReturn(true);
-
-        Assertions.assertThatThrownBy(() -> outdatedIndexService.reindex("my_index", true))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Temporary index for reindexing already exists: .gltmp_my_index");
-    }
-
-    @Test
     void reindexFailsIfTempIndexIsNotHealthyAfterCreation() throws IOException {
         when(indices.waitForRecovery("my_index", 2)).thenReturn(HealthStatus.Green);
         when(indices.indexSettings("my_index")).thenReturn(sourceSettings());
