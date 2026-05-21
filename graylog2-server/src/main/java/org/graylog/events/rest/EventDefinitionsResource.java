@@ -146,10 +146,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                     .sortable(false)
                     .filterable(true)
                     .filterOptions(DBEntitySourceService.FILTER_OPTIONS)
-                    .build(),
-            // Tags filter UI uses a custom filter_component (EventDefinitionTagsFilter) on the frontend.
-            // Tags are searchable from the query bar; filtering uses AND predicate in getPage().
-            EntityAttribute.builder().id(EventDefinitionDto.FIELD_TAGS).title("Tags").searchable(true).build()
+                    .build()
+            // Note: `tags` is not listed here — see comment on dbQueryCreator below.
     );
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
@@ -185,7 +183,13 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         this.contextService = contextService;
         this.engine = engine;
         this.eventDefinitionConfiguration = eventDefinitionConfiguration;
-        this.dbQueryCreator = new DbQueryCreator(EventDefinitionDto.FIELD_TITLE, attributes);
+        // Tags are registered as extraSearchFields instead of in the attributes list because
+        // the frontend adds a tags attribute with a custom filter_component (EventDefinitionTagsFilter).
+        // Including it in both places would cause a duplicate column.
+        // extraSearchFields makes `tags:phishing` work in the search bar (OR-joined by SearchQueryParser)
+        // while the filter UI applies multi-tag AND via the predicate in `getPage`.
+        this.dbQueryCreator = new DbQueryCreator(EventDefinitionDto.FIELD_TITLE, attributes,
+                Map.of(EventDefinitionDto.FIELD_TAGS, SearchQueryField.create(EventDefinitionDto.FIELD_TAGS)));
         this.recentActivityService = recentActivityService;
         this.bulkDeletionExecutor = new SequentialBulkExecutor<>(this::delete, auditEventSender, objectMapper);
         this.bulkScheduleExecutor = new SequentialBulkExecutor<>(this::schedule, auditEventSender, objectMapper);
@@ -221,8 +225,9 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         // Remaining filters (e.g., status) are handled by DbQueryCreator as MongoDB filters.
         final SourcedMongoEntityUtils.FilterPredicate<EventDefinitionDto> filterPredicate = SourcedMongoEntityUtils.handleScopedEntitySourceFilter(filters, predicate);
         predicate = filterPredicate.predicate();
-        final List<String> tagFilters = filters == null ? List.of() :
-                filters.stream()
+        final List<String> remainingFilters = filterPredicate.filters();
+        final List<String> tagFilters = remainingFilters == null ? List.of() :
+                remainingFilters.stream()
                         .filter(f -> f != null && f.startsWith(EventDefinitionDto.FIELD_TAGS + ":"))
                         .map(f -> f.substring(EventDefinitionDto.FIELD_TAGS.length() + 1))
                         .filter(v -> !v.isBlank())
@@ -231,7 +236,13 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
             predicate = predicate.and(event -> event.tags().containsAll(tagFilters));
         }
 
-        final Bson dbQuery = dbQueryCreator.createDbQuery(filterPredicate.filters(), query);
+        // Strip tags filters before passing to DbQueryCreator (tags are handled by predicate above)
+        final List<String> dbFilters = remainingFilters == null ? List.of() :
+                remainingFilters.stream()
+                        .filter(f -> f == null || !f.startsWith(EventDefinitionDto.FIELD_TAGS + ":"))
+                        .toList();
+
+        final Bson dbQuery = dbQueryCreator.createDbQuery(dbFilters, query);
 
         final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(
                 dbQuery,
