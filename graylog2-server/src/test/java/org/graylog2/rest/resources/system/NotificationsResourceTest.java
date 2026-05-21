@@ -129,9 +129,17 @@ class NotificationsResourceTest {
 
     @Test
     void getCountDelegatesToPaginationService() {
-        when(paginationService.count()).thenReturn(42L);
+        when(paginationService.count(any())).thenReturn(42L);
 
         assertThat(resource.getCount()).isEqualTo(42L);
+    }
+
+    @Test
+    void getCountInCloudModePassesSuppressionFilter() {
+        when(paginationService.count(any())).thenReturn(5L);
+
+        assertThat(cloudResource.getCount()).isEqualTo(5L);
+        verify(paginationService).count(any());
     }
 
     // ---- Delete by ID tests ----

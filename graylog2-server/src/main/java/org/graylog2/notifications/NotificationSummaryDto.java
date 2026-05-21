@@ -34,5 +34,5 @@ public record NotificationSummaryDto(
         @JsonProperty("title") @Nullable String title,
         @JsonProperty("description") @Nullable String description,
         @JsonProperty("details") @Nullable Map<String, Object> details,
-        @JsonProperty("triggered_at") String triggeredAt
+        @JsonProperty("timestamp") String timestamp
 ) {}

@@ -136,7 +136,7 @@ class NotificationPaginationServiceTest {
         assertThat(dto.nodeId()).isEqualTo("node-abc");
         assertThat(dto.title()).isEqualTo("My Title");
         assertThat(dto.description()).isEqualTo("My Description");
-        assertThat(dto.triggeredAt()).isEqualTo(ts);
+        assertThat(dto.timestamp()).isEqualTo(ts);
         assertThat(dto.details()).containsEntry("input_id", "input-42");
     }
 
@@ -181,12 +181,21 @@ class NotificationPaginationServiceTest {
 
     @Test
     void countReturnsDocumentCount() {
-        assertThat(service.count()).isZero();
+        assertThat(service.count(Filters.empty())).isZero();
 
         insertNotification("es_unavailable", null, "urgent", "node-1", "2026-01-01T00:00:00.000Z");
         insertNotification("no_input_running", null, "normal", "node-2", "2026-01-02T00:00:00.000Z");
 
-        assertThat(service.count()).isEqualTo(2);
+        assertThat(service.count(Filters.empty())).isEqualTo(2);
+    }
+
+    @Test
+    void countRespectsFilter() {
+        insertNotification("es_unavailable", null, "urgent", "node-1", "2026-01-01T00:00:00.000Z");
+        insertNotification("no_input_running", null, "normal", "node-2", "2026-01-02T00:00:00.000Z");
+        insertNotification("input_failing", null, "normal", "node-1", "2026-01-03T00:00:00.000Z");
+
+        assertThat(service.count(Filters.nin("type", "es_unavailable"))).isEqualTo(2);
     }
 
     // ---- Helpers ----

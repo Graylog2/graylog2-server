@@ -225,7 +225,7 @@ public class NotificationsResource extends RestResource {
     @NoAuditEvent("Read-only endpoint")
     public long getCount() {
         checkPermission(RestPermissions.NOTIFICATIONS_READ);
-        return paginationService.count();
+        return paginationService.count(cloudSuppressionFilter());
     }
 
     @DELETE
@@ -279,15 +279,17 @@ public class NotificationsResource extends RestResource {
 
     private Bson buildPaginatedQuery(List<String> filters, String query) {
         final Bson baseQuery = dbQueryCreator.createDbQuery(filters, query);
+        return Filters.and(baseQuery, cloudSuppressionFilter());
+    }
 
+    private Bson cloudSuppressionFilter() {
         if (isCloud) {
             final List<String> suppressedTypes = Notification.CLOUD_SUPPRESSED_TYPES.stream()
                     .map(t -> t.toString().toLowerCase(Locale.ENGLISH))
                     .toList();
-            return Filters.and(baseQuery, Filters.nin(FIELD_TYPE, suppressedTypes));
+            return Filters.nin(FIELD_TYPE, suppressedTypes);
         }
-
-        return baseQuery;
+        return Filters.empty();
     }
 
     private static Set<FilterOption> notificationTypeFilterOptions() {

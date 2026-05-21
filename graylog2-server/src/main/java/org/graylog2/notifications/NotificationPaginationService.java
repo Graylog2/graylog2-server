@@ -121,10 +121,10 @@ public class NotificationPaginationService {
     }
 
     /**
-     * Returns the total number of active notifications.
+     * Returns the number of notifications matching the given filter.
      */
-    public long count() {
-        return collection.countDocuments();
+    public long count(Bson filter) {
+        return collection.countDocuments(filter);
     }
 
     @SuppressWarnings("unchecked")
