@@ -76,8 +76,7 @@ const StyledBadge = styled(Badge)`
 `;
 
 const HealthStatusBadge = () => {
-  const { data: { valid: hasEnterpriseLicense } = { valid: false } } =
-    usePluggableLicenseCheck('/license/enterprise');
+  const { data: { valid: hasEnterpriseLicense } = { valid: false } } = usePluggableLicenseCheck('/license/enterprise');
   const showHealthModule = useHealthModuleVisible();
   const { overallStatus } = useHealthSummary();
   const currentUser = useCurrentUser();
@@ -89,9 +88,10 @@ const HealthStatusBadge = () => {
   const notificationCount = notifications?.total ?? 0;
   const statusLabel = STATUS_LABELS[overallStatus];
   const overviewWithHealthOn = `${Routes.SYSTEM.OVERVIEW}?${HEALTH_QUERY_PARAM}=${HEALTH_ON_VALUE}`;
-  const accessibleLabel = notificationCount > 0
-    ? `Cluster health: ${statusLabel}, ${notificationCount} system notifications`
-    : `Cluster health: ${statusLabel}`;
+  const accessibleLabel =
+    notificationCount > 0
+      ? `Cluster health: ${statusLabel}, ${notificationCount} system notifications`
+      : `Cluster health: ${statusLabel}`;
 
   return (
     <StyledNav navbar>
