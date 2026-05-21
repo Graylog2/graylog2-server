@@ -57,6 +57,7 @@ jest.mock('react-router-dom', () => ({
 }));
 
 jest.mock('components/navigation/NotificationBadge', () => () => null);
+jest.mock('components/navigation/HealthStatusBadge', () => () => null);
 
 const AppRouterWithContext = () => (
   <HotkeysProvider>
