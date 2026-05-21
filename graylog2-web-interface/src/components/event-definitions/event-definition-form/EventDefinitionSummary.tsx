@@ -25,6 +25,7 @@ import 'moment-duration-format';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { MarkdownPreview } from 'components/common/MarkdownEditor';
 import { Alert, Col, Row } from 'components/bootstrap';
+import { TagList } from 'components/common';
 import { isPermitted } from 'util/PermissionsMixin';
 import usePluginEntities from 'hooks/usePluginEntities';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
@@ -86,6 +87,10 @@ const EventDefinitionSummary = ({
         <dd>{eventDefinition.description || 'No description given'}</dd>
         <dt>Priority</dt>
         <dd>{upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</dd>
+        <dt>Tags</dt>
+        <dd>
+          <TagList tags={eventDefinition.tags} emptyFallback={<em>No tags</em>} />
+        </dd>
         {eventDefinition.event_summary_template && (
           <>
             <dt>Event Summary Template</dt>
