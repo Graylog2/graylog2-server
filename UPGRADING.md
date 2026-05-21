@@ -20,6 +20,13 @@ See the [Adaptive Card documentation](https://adaptivecards.io/explorer/TextBloc
 
 ## Breaking Changes
 
+### Graylog API Description and API Browser
+
+The API description has been updated to use the OpenAPI 3.1 format. The built-in API browser has been modernized and
+is accessible from the help menu (the `?` icon on the right side of the top navigation bar).
+
+**The per-node API browser is no longer available and has been removed from the node details page.**
+
 ### Plugins: Removal of Perspective Plugin API
 
 This release includes frontend plugin API changes related to perspectives.
@@ -75,21 +82,3 @@ for reference, showing their name and whether they were previously enabled. Howe
 configuration (indices, feature fields, intervals, etc.) will not be displayed and detectors can no longer be
 edited or re-enabled. **Note: If you have custom anomaly detectors, you should note down their configuration 
 before upgrading.**
-
-## Configuration File Changes
-
-| Option | Action    | Description |
-| ------ | --------- | ----------- |
-| `tbd`  | **added** |             |
-
-## Java API Changes
-
-- tbd
-
-## REST API Endpoint Changes
-
-The following REST API changes have been made.
-
-| Endpoint          | Description                        |
-| ----------------- | ---------------------------------- |
-| `GET /<endpoint>` | Description of the endpoint change |
