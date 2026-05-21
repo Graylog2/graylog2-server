@@ -148,6 +148,67 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
         assertThat(result).hasSize(1);
     }
 
+    // --- aggregateTerms tests ---
+
+    @Test
+    public void aggregateTerms_countsByField() {
+        final Map<String, Long> result = adapter.aggregateTerms(
+                "*", RelativeRange.allTime(), Set.of(INDEX_NAME),
+                allAllowed(),
+                "streams", 100);
+
+        assertThat(result)
+                .containsEntry("stream-a", 3L)
+                .containsEntry("stream-b", 3L);
+    }
+
+    @Test
+    public void aggregateTerms_withQueryFilter() {
+        final Map<String, Long> result = adapter.aggregateTerms(
+                "gl2_source_input:input-2", RelativeRange.allTime(), Set.of(INDEX_NAME),
+                allAllowed(),
+                "streams", 100);
+
+        assertThat(result)
+                .containsEntry("stream-a", 1L)
+                .containsEntry("stream-b", 2L);
+    }
+
+    @Test
+    public void aggregateTerms_emptyResultForNoMatch() {
+        final Map<String, Long> result = adapter.aggregateTerms(
+                "gl2_source_input:nonexistent", RelativeRange.allTime(), Set.of(INDEX_NAME),
+                allAllowed(),
+                "streams", 100);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    public void aggregateTerms_respectsMaxBuckets() {
+        final Map<String, Long> result = adapter.aggregateTerms(
+                "*", RelativeRange.allTime(), Set.of(INDEX_NAME),
+                allAllowed(),
+                "gl2_source_input", 1);
+
+        assertThat(result).hasSize(1);
+    }
+
+    @Test
+    public void aggregateTerms_countsMultiStreamDocumentsCorrectly() {
+        // Doc agg-2 is in both stream-a and stream-b.
+        // aggregateTerms should count it in both buckets (doc_count), unlike
+        // aggregateGroupedTerms which could miss it with a same-field sub-aggregation.
+        final Map<String, Long> result = adapter.aggregateTerms(
+                "streams:stream-a OR streams:stream-b", RelativeRange.allTime(), Set.of(INDEX_NAME),
+                allAllowed(),
+                "streams", 100);
+
+        assertThat(result)
+                .containsEntry("stream-a", 3L)
+                .containsEntry("stream-b", 3L);
+    }
+
     // --- aggregateGroupedMetric tests ---
 
     @Test

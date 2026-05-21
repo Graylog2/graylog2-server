@@ -64,21 +64,16 @@ public class StreamMessageCountDescriptor implements EntityCachedMetricDescripto
 
     @Override
     public List<EntityMetric<Long>> compute(Collection<String> entityIds) {
-        final Map<String, Map<String, Long>> grouped = moreSearch.aggregateGroupedTerms(
+        final Map<String, Long> counts = moreSearch.aggregateTerms(
                 entityIds.stream()
                         .map(id -> FIELD_STREAMS + ":" + id)
                         .collect(Collectors.joining(" OR ")),
                 RelativeRange.create(MetricsCacheConfiguration.RANGE_SECONDS_24H),
                 SourceStreamFilter.allAllowed(),
-                FIELD_STREAMS, FIELD_STREAMS,
-                entityIds.size(), 1);
+                FIELD_STREAMS, entityIds.size());
 
         return entityIds.stream()
-                .map(id -> {
-                    final Map<String, Long> counts = grouped.getOrDefault(id, Map.of());
-                    final long count = counts.getOrDefault(id, 0L);
-                    return new EntityMetric<>(id, count);
-                })
+                .map(id -> new EntityMetric<>(id, counts.getOrDefault(id, 0L)))
                 .toList();
     }
 

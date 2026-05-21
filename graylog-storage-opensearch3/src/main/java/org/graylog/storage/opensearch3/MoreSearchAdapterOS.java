@@ -397,6 +397,19 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
     }
 
     @Override
+    public Map<String, Long> aggregateTerms(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                            SourceStreamFilter sourceStreamFilter,
+                                            String termsField, int maxBuckets) {
+        final var filter = createSimpleQuery(queryString, timerange, sourceStreamFilter);
+        final var aggregation = Aggregation.builder()
+                .terms(terms -> terms.field(termsField).size(maxBuckets))
+                .build();
+
+        final var searchResult = executeAggregation(filter, affectedIndices, GROUP_BY_AGGREGATION_NAME, aggregation);
+        return extractTermsBucketCounts(searchResult.aggregations().get(GROUP_BY_AGGREGATION_NAME));
+    }
+
+    @Override
     public Map<String, Double> aggregateGroupedMetric(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                                       SourceStreamFilter sourceStreamFilter,
                                                       String groupByField, AggregationType metricType, String metricField,

@@ -232,6 +232,17 @@ public class MoreSearch {
                 sourceStreamFilter, groupByField, termsField, maxBuckets, maxSubBuckets);
     }
 
+    public Map<String, Long> aggregateTerms(String queryString, TimeRange timeRange,
+                                            SourceStreamFilter sourceStreamFilter,
+                                            String termsField, int maxBuckets) {
+        final Set<String> affectedIndices = getAffectedIndices(Set.of(), timeRange);
+        if (affectedIndices == null || affectedIndices.isEmpty()) {
+            return Map.of();
+        }
+        return moreSearchAdapter.aggregateTerms(queryString, timeRange, affectedIndices,
+                sourceStreamFilter, termsField, maxBuckets);
+    }
+
     public Map<String, Double> aggregateGroupedMetric(String queryString, TimeRange timeRange,
                                                       SourceStreamFilter sourceStreamFilter,
                                                       String groupByField, MoreSearchAdapter.AggregationType metricType,
