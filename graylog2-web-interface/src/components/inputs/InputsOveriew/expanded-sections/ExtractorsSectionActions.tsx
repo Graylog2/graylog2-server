@@ -18,8 +18,9 @@ import * as React from 'react';
 
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 import { Button } from 'components/bootstrap';
-import { LinkContainer } from 'components/common';
+import { IfPermitted, LinkContainer } from 'components/common';
 import Routes from 'routing/Routes';
+import HideOnCloud from 'util/conditional/HideOnCloud';
 
 type Props = {
   input: InputSummary;
@@ -31,11 +32,15 @@ const extractorsLink = (input: InputSummary) =>
     : Routes.local_input_extractors(input.node, input.id);
 
 const ExtractorsSectionActions = ({ input }: Props) => (
-  <LinkContainer to={extractorsLink(input)}>
-    <Button bsStyle="link" bsSize="xsmall">
-      Manage extractors
-    </Button>
-  </LinkContainer>
+  <HideOnCloud>
+    <IfPermitted permissions={[`inputs:edit:${input.id}`, `input_types:create:${input.type}`]}>
+      <LinkContainer to={extractorsLink(input)}>
+        <Button bsStyle="link" bsSize="xsmall">
+          Manage extractors
+        </Button>
+      </LinkContainer>
+    </IfPermitted>
+  </HideOnCloud>
 );
 
 export default ExtractorsSectionActions;
