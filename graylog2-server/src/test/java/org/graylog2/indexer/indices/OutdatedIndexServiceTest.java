@@ -257,7 +257,7 @@ class OutdatedIndexServiceTest {
 
         Assertions.assertThatThrownBy(() -> outdatedIndexService.reindex("my_index", true))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Index index is not a Map");
+                .hasMessageContaining("Settings key index is not a Map");
     }
 
     private void initializeElasticsearchStats(String version) {
