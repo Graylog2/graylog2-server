@@ -147,7 +147,7 @@ public class ClusterEventService extends AbstractExecutionThreadService {
     @VisibleForTesting
     void iterateEvents(MongoCursor<ClusterEvent> cursor) {
         LOG.debug("Opened MongoDB cursor on \"{}\"", COLLECTION_NAME);
-        while (isRunning()) {
+        while (isRunning() && cursor.getServerCursor() != null) {
             final var clusterEvent = cursor.tryNext();
             if (clusterEvent != null) {
                 LOG.trace("Processing cluster event: {}", clusterEvent);
