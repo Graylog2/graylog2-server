@@ -30,7 +30,7 @@ const url = URLUtils.qualifyUrl('/events/search');
 
 type FiltersResult = {
   filter: {
-    readonly extra_filters: {
+    extra_filters: {
       readonly [_key: string]: string[];
     };
 
@@ -97,6 +97,12 @@ export const parseFilters = (filters: UrlQueryFilters, defaultTimerange: TimeRan
 
   if (filters.get('part_of_detection_chain')?.length > 0) {
     result.filter.part_of_detection_chain = filters.get('part_of_detection_chain')[0];
+  }
+
+  const tagFilters = filters.get('tags');
+
+  if (tagFilters?.length > 0) {
+    result.filter.extra_filters = { ...(result.filter.extra_filters ?? {}), tags: [...tagFilters] };
   }
 
   return result;
