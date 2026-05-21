@@ -33,6 +33,7 @@ import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigService;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreterStateUpdater;
 import org.graylog.plugins.pipelineprocessor.rest.ProcessingLoadService.ActiveCombination;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.models.system.metrics.requests.MetricsReadRequest;
@@ -74,8 +75,8 @@ public class ProcessingLoadResource extends ProxiedResource {
         this.snapshotParser = snapshotParser;
     }
 
-  @GET                                                   
-  @NoAuditEvent("Read-only endpoint, no audit event needed")
+    @GET
+    @NoAuditEvent("Read-only endpoint, no audit event needed")
     @Operation(summary = "Get cluster-aggregated pipeline rule Processing Load percentages",
                description = "Returns Processing Load % per pipeline-stage-rule, per pipeline, and per rule. " +
                        "Requires debug metrics enable.")
