@@ -128,6 +128,7 @@ export { default as Spinner } from './Spinner';
 export { default as Spoiler } from './Spoiler';
 export { default as StatusIcon } from './StatusIcon';
 export { default as Switch } from './Switch';
+export { default as TagList } from './TagList';
 export { default as TextOverflowEllipsis } from './TextOverflowEllipsis';
 export { default as Timeline } from './Timeline';
 export { default as TimeUnit } from './TimeUnit';

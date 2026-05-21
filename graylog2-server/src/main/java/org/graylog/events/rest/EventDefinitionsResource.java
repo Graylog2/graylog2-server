@@ -124,6 +124,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 public class EventDefinitionsResource extends RestResource implements PluginRestResource {
     private static final Logger LOG = LoggerFactory.getLogger(EventDefinitionsResource.class);
 
+    private static final int TAG_SUGGESTIONS_MAX_LIMIT = 100;
     private static final String DEFAULT_SORT_FIELD = "title";
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
@@ -145,7 +146,10 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                     .sortable(false)
                     .filterable(true)
                     .filterOptions(DBEntitySourceService.FILTER_OPTIONS)
-                    .build()
+                    .build(),
+            // Tags filter UI uses a custom filter_component (EventDefinitionTagsFilter) on the frontend.
+            // Tags are searchable from the query bar; filtering uses AND predicate in getPage().
+            EntityAttribute.builder().id(EventDefinitionDto.FIELD_TAGS).title("Tags").searchable(true).build()
     );
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
@@ -213,10 +217,19 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         }
         Predicate<EventDefinitionDto> predicate = event -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id());
 
-        // Extract entity source filters into a predicate (can't be queried in MongoDB directly).
+        // Entity-source and tags filters are applied via predicate after the Mongo read.
         // Remaining filters (e.g., status) are handled by DbQueryCreator as MongoDB filters.
         final SourcedMongoEntityUtils.FilterPredicate<EventDefinitionDto> filterPredicate = SourcedMongoEntityUtils.handleScopedEntitySourceFilter(filters, predicate);
         predicate = filterPredicate.predicate();
+        final List<String> tagFilters = filters == null ? List.of() :
+                filters.stream()
+                        .filter(f -> f != null && f.startsWith(EventDefinitionDto.FIELD_TAGS + ":"))
+                        .map(f -> f.substring(EventDefinitionDto.FIELD_TAGS.length() + 1))
+                        .filter(v -> !v.isBlank())
+                        .toList();
+        if (!tagFilters.isEmpty()) {
+            predicate = predicate.and(event -> event.tags().containsAll(tagFilters));
+        }
 
         final Bson dbQuery = dbQueryCreator.createDbQuery(filterPredicate.filters(), query);
 
@@ -243,6 +256,24 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         return PageListResponse.create(query, definitionDtos.pagination(),
                 definitionDtos.pagination().total(), sort, order, eventDefinitionDtos, attributes, settings);
     }
+
+    @GET
+    @Path("/tags")
+    @Operation(summary = "Suggest tag values across event definitions, optionally narrowed by case-insensitive substring match")
+    public TagSuggestionsResponse suggestTags(@Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                              @Parameter(name = "limit") @QueryParam("limit") @DefaultValue("10") int limit) {
+        final int boundedLimit = Math.max(1, Math.min(limit, TAG_SUGGESTIONS_MAX_LIMIT));
+
+        if (isPermitted(RestPermissions.EVENT_DEFINITIONS_READ)) {
+            return new TagSuggestionsResponse(dbService.suggestTags(query, boundedLimit));
+        }
+
+        final var permittedIds = dbService.findPermittedIds(
+                id -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, id));
+        return new TagSuggestionsResponse(dbService.suggestTags(query, boundedLimit, permittedIds));
+    }
+
+    public record TagSuggestionsResponse(@JsonProperty("tags") List<String> tags) { }
 
     @GET
     @Operation(summary = "List event definitions")
