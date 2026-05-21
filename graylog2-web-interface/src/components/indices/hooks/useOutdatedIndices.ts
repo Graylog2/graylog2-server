@@ -16,8 +16,8 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+import { IndexerIndices } from '@graylog/server-api';
+
 import { defaultOnError } from 'util/conditional/onError';
 
 export type OutdatedIndex = {
@@ -28,26 +28,66 @@ export type OutdatedIndex = {
   system_index: boolean;
 };
 
-const OUTDATED_INDICES_URL = qualifyUrl('/system/indexer/indices/outdated');
-
-const fetchOutdatedIndices = (): Promise<Array<OutdatedIndex>> => fetch('GET', OUTDATED_INDICES_URL);
+// TODO: REMOVE — local UI mock for OutdatedIndicesTable. Delete this block to restore real data.
+const USE_MOCK_OUTDATED_INDICES = true;
+const MOCK_VERSIONS = ['7.10.2', '6.8.23', '1.3.18'];
+const mockVersion = (i: number) => MOCK_VERSIONS[i % MOCK_VERSIONS.length];
+const MOCK_OUTDATED_INDICES: Array<OutdatedIndex> = [
+  ...Array.from({ length: 20 }, (_, i) => ({
+    index_name: `graylog_${i}`,
+    version: mockVersion(i),
+    warm_index: i % 4 === 0,
+    managed_index: true,
+    system_index: false,
+  })),
+  ...Array.from({ length: 21 }, (_, i) => ({
+    index_name: `.system_index_${i}`,
+    version: mockVersion(i),
+    warm_index: false,
+    managed_index: false,
+    system_index: true,
+  })),
+  ...Array.from({ length: 22 }, (_, i) => ({
+    index_name: `legacy_unknown_${i}`,
+    version: mockVersion(i),
+    warm_index: false,
+    managed_index: false,
+    system_index: false,
+  })),
+];
 
 const useOutdatedIndices = () => {
   const {
     data = [],
     isError,
     isLoading,
+    refetch,
   } = useQuery({
     queryKey: ['outdatedIndices'],
     queryFn: () =>
-      defaultOnError(fetchOutdatedIndices(), 'Loading outdated indices failed', 'Could not load outdated indices'),
+      defaultOnError(
+        IndexerIndices.getOutdatedIndices() as Promise<Array<OutdatedIndex>>,
+        'Loading outdated indices failed',
+        'Could not load outdated indices',
+      ),
     retry: false,
+    enabled: !USE_MOCK_OUTDATED_INDICES,
   });
+
+  if (USE_MOCK_OUTDATED_INDICES) {
+    return {
+      data: MOCK_OUTDATED_INDICES,
+      isError: false,
+      isLoading: false,
+      refetch,
+    };
+  }
 
   return {
     data,
     isError,
     isLoading,
+    refetch,
   };
 };
 
