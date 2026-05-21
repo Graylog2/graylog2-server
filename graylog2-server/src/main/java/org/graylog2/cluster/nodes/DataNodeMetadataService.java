@@ -22,5 +22,7 @@ public interface DataNodeMetadataService {
 
     void setOpensearchVersion(String nodeId, String version);
 
+    void setLatestAvailableOpensearchVersion(String nodeId, String version);
+
     Optional<DataNodeMetadata> findByNodeId(String nodeId);
 }

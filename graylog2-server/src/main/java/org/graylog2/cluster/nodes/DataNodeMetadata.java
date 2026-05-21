@@ -25,15 +25,17 @@ import javax.annotation.Nullable;
 public record DataNodeMetadata(
         @Id @JsonProperty(FIELD_ID) @Nullable String id,
         @JsonProperty(FIELD_NODE_ID) String nodeId,
-        @JsonProperty(FIELD_OPENSEARCH_VERSION) String opensearchVersion
+        @JsonProperty(FIELD_CURRENT_OPENSEARCH_VERSION) String currentOpensearchVersion,
+        @JsonProperty(FIELD_LATEST_AVAILABLE_OPENSEARCH_VERSION) @Nullable String latestAvailableOpensearchVersion
 ) implements MongoEntity {
     public static final String COLLECTION_NAME = "datanode_metadata";
 
     public static final String FIELD_ID = "id";
     public static final String FIELD_NODE_ID = "node_id";
-    public static final String FIELD_OPENSEARCH_VERSION = "opensearch_version";
+    public static final String FIELD_CURRENT_OPENSEARCH_VERSION = "current_opensearch_version";
+    public static final String FIELD_LATEST_AVAILABLE_OPENSEARCH_VERSION = "latest_available_opensearch_version";
 
-    public DataNodeMetadata(String nodeId, String opensearchVersion) {
-        this(null, nodeId, opensearchVersion);
+    public DataNodeMetadata(String nodeId, String currentOpensearchVersion) {
+        this(null, nodeId, currentOpensearchVersion, null);
     }
 }
