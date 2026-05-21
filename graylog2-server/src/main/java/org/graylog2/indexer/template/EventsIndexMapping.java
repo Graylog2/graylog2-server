@@ -17,6 +17,7 @@
 package org.graylog2.indexer.template;
 
 import com.google.common.collect.ImmutableMap;
+import org.graylog.events.event.EventDto;
 import org.graylog2.indexer.indexset.IndexSetMappingTemplate;
 import org.graylog2.indexer.indices.Template;
 
@@ -197,6 +198,9 @@ public abstract class EventsIndexMapping extends AbstractMapping {
                         .put("dynamic", true)
                         .build())
                 .put(FIELD_ASSOCIATED_ASSETS, map()
+                        .put("type", "keyword")
+                        .build())
+                .put(EventDto.FIELD_TAGS, map()
                         .put("type", "keyword")
                         .build())
                 /* TODO: Enable the typed fields once we decided if that's the way to go

@@ -133,6 +133,7 @@ export const mockEventDefinitionTwoAggregations: EventDefinition = {
   },
   field_spec: {},
   key_spec: [],
+  tags: [],
   notification_settings: {
     grace_period_ms: 60000,
     backlog_size: 0,

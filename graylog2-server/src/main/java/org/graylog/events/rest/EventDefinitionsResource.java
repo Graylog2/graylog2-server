@@ -122,10 +122,18 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 public class EventDefinitionsResource extends RestResource implements PluginRestResource {
     private static final Logger LOG = LoggerFactory.getLogger(EventDefinitionsResource.class);
 
+    private static final int TAG_SUGGESTIONS_MAX_LIMIT = 100;
+
+    // Note on multi-tag semantics: a single-clause `tags:phishing` query from the search bar works
+    // the same as selecting one tag in the filter UI. Multi-clause search-bar queries
+    // (`tags:phishing tags:exfil`) however are OR-joined by SearchQueryParser, while the filter UI
+    // applies multi-tag AND via the predicate in `getPage`. Users
+    // wanting AND across multiple tags should use the column-header filter dropdown.
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
             .put("title", SearchQueryField.create(EventDefinitionDto.FIELD_TITLE))
             .put("description", SearchQueryField.create(EventDefinitionDto.FIELD_DESCRIPTION))
+            .put(EventDefinitionDto.FIELD_TAGS, SearchQueryField.create(EventDefinitionDto.FIELD_TAGS))
             .put(SourcedMongoEntityUtils.SEARCH_QUERY_TITLE, SearchQueryField.create(SourcedMongoEntityUtils.FILTERABLE_FIELD))
             .build();
     private static final String DEFAULT_SORT_FIELD = "title";
@@ -141,6 +149,10 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                     .filterable(true)
                     .filterOptions(DBEntitySourceService.FILTER_OPTIONS)
                     .build()
+            // Note: `tags` is registered as an Attribute on the frontend
+            // (event-definitions/constants.ts) because the filter UI needs a custom
+            // filter_component (EventDefinitionTagsFilter). The SEARCH_FIELDS map above
+            // keeps tags searchable from the query bar.
     );
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
@@ -214,11 +226,20 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         }
         Predicate<EventDefinitionDto> predicate = event -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id());
 
-        // The only filterable field currently is entity source. If new filterable fields are added, this logic needs to
-        // be adjusted so that other filters remain part of the filters, are included in the generation of searchQuery,
-        // and entity source filtering is still moved to the predicate to be applied after reading from the database.
+        // Entity-source filter and tags filter are applied via predicate after the Mongo read.
+        // Tags use AND semantics (event def must carry every selected tag), matching the
+        // GitHub-style label filter convention.
         final SourcedMongoEntityUtils.FilterPredicate<EventDefinitionDto> filterPredicate = SourcedMongoEntityUtils.handleScopedEntitySourceFilter(filters, predicate);
         predicate = filterPredicate.predicate();
+        final List<String> tagFilters = filters == null ? List.of() :
+                filters.stream()
+                        .filter(f -> f != null && f.startsWith(EventDefinitionDto.FIELD_TAGS + ":"))
+                        .map(f -> f.substring(EventDefinitionDto.FIELD_TAGS.length() + 1))
+                        .filter(v -> !v.isBlank())
+                        .toList();
+        if (!tagFilters.isEmpty()) {
+            predicate = predicate.and(event -> event.tags().containsAll(tagFilters));
+        }
 
         final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(
                 searchQuery,
@@ -243,6 +264,24 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         return PageListResponse.create(query, definitionDtos.pagination(),
                 definitionDtos.pagination().total(), sort, order, eventDefinitionDtos, attributes, settings);
     }
+
+    @GET
+    @Path("/tags")
+    @Operation(summary = "Suggest tag values across event definitions, optionally narrowed by case-insensitive substring match")
+    public TagSuggestionsResponse suggestTags(@Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                              @Parameter(name = "limit") @QueryParam("limit") @DefaultValue("10") int limit) {
+        final int boundedLimit = Math.max(1, Math.min(limit, TAG_SUGGESTIONS_MAX_LIMIT));
+
+        if (isPermitted(RestPermissions.EVENT_DEFINITIONS_READ)) {
+            return new TagSuggestionsResponse(dbService.suggestTags(query, boundedLimit));
+        }
+
+        final var permittedIds = dbService.findPermittedIds(
+                id -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, id));
+        return new TagSuggestionsResponse(dbService.suggestTags(query, boundedLimit, permittedIds));
+    }
+
+    public record TagSuggestionsResponse(@JsonProperty("tags") List<String> tags) { }
 
     @GET
     @Operation(summary = "List event definitions")
