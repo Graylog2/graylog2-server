@@ -16,6 +16,7 @@
  */
 package org.graylog2.bindings;
 
+import org.graylog.events.notifications.NotificationDto;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog2.cluster.nodes.DataNodeDto;
@@ -49,6 +50,7 @@ public class DbEntitiesModule extends PluginModule {
                 IndexFailureImpl.class,
                 IndexSetConfig.class,
                 InputImpl.class,
+                NotificationDto.class,
                 NotificationImpl.class,
                 OutputImpl.class,
                 ServerNodeDto.class,

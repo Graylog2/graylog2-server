@@ -30,6 +30,7 @@ const getEventDefinitionTableElements = (pluggableAttributes?: {
       'title',
       'description',
       'priority',
+      'notifications',
       'scheduling',
       'status',
       'matched_at',
@@ -40,6 +41,7 @@ const getEventDefinitionTableElements = (pluggableAttributes?: {
       'title',
       'description',
       'priority',
+      'notifications',
       '_entity_source.source',
       'matched_at',
       'status',
@@ -55,6 +57,7 @@ const getEventDefinitionTableElements = (pluggableAttributes?: {
   const additionalAttributes: Array<Attribute> = [
     { id: 'scheduling', title: 'Scheduling', sortable: false },
     { id: 'matched_at', title: 'Last Matched', sortable: true },
+    { id: 'notifications', title: 'Notifications', sortable: false },
     ...(pluggableAttributes?.attributes || []),
   ];
 
