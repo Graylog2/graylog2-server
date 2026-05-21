@@ -74,7 +74,8 @@ public class ProcessingLoadResource extends ProxiedResource {
         this.snapshotParser = snapshotParser;
     }
 
-    @GET
+  @GET                                                   
+  @NoAuditEvent("Read-only endpoint, no audit event needed")
     @Operation(summary = "Get cluster-aggregated pipeline rule Processing Load percentages",
                description = "Returns Processing Load % per pipeline-stage-rule, per pipeline, and per rule. " +
                        "Requires debug metrics enable.")
