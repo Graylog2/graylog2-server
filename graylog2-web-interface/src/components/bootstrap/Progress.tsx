@@ -17,10 +17,12 @@
 import * as React from 'react';
 import { Progress as MantineProgress } from '@mantine/core';
 
-const Root = ({ ...props }: React.ComponentProps<typeof MantineProgress.Root>) => <MantineProgress.Root {...props} />;
-const Section = ({ ...props }: React.ComponentProps<typeof MantineProgress.Section>) => (
-  <MantineProgress.Section {...props} />
-);
+const Root = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof MantineProgress.Root>>((props, ref) => (
+  <MantineProgress.Root ref={ref} {...props} />
+));
+const Section = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof MantineProgress.Section>>((props, ref) => (
+  <MantineProgress.Section ref={ref} {...props} />
+));
 const Label = ({ ...props }: React.ComponentProps<typeof MantineProgress.Label>) => (
   <MantineProgress.Label {...props} />
 );
