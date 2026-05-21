@@ -147,20 +147,24 @@ public class ClusterEventService extends AbstractExecutionThreadService {
     @VisibleForTesting
     void iterateEvents(MongoCursor<ClusterEvent> cursor) {
         LOG.debug("Opened MongoDB cursor on \"{}\"", COLLECTION_NAME);
-        while (isRunning() && cursor.getServerCursor() != null) {
+        while (isRunning()) {
             final var clusterEvent = cursor.tryNext();
-            if (clusterEvent != null) {
-                LOG.trace("Processing cluster event: {}", clusterEvent);
-                Object payload = extractPayload(clusterEvent.payload(), clusterEvent.eventClass());
-                if (payload != null) {
-                    serverEventBus.post(payload);
-                } else {
-                    LOG.warn("Couldn't extract payload of cluster event with ID <{}>", clusterEvent.id());
-                    LOG.debug("Invalid payload in cluster event: {}", clusterEvent);
+            if (clusterEvent == null) {
+                if (cursor.getServerCursor() == null) {
+                    return;
                 }
-
-                this.offset = new Offset(clusterEvent.timestamp(), clusterEvent.id());
+                continue;
             }
+            LOG.trace("Processing cluster event: {}", clusterEvent);
+            Object payload = extractPayload(clusterEvent.payload(), clusterEvent.eventClass());
+            if (payload != null) {
+                serverEventBus.post(payload);
+            } else {
+                LOG.warn("Couldn't extract payload of cluster event with ID <{}>", clusterEvent.id());
+                LOG.debug("Invalid payload in cluster event: {}", clusterEvent);
+            }
+
+            this.offset = new Offset(clusterEvent.timestamp(), clusterEvent.id());
         }
     }
 

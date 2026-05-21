@@ -137,8 +137,8 @@ public class ClusterEventServiceTest {
 
     private void runService(Offset offset) {
         clusterEventService = spy(clusterEventService);
+        when(clusterEventService.isRunning()).thenReturn(true);
         try (final var cursor = clusterEventService.eventsIterable(offset).iterator()) {
-            when(clusterEventService.isRunning()).thenAnswer(inv -> cursor.hasNext());
             clusterEventService.iterateEvents(cursor);
         }
     }
