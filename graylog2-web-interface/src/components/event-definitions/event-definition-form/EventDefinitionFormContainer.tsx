@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -85,10 +85,29 @@ const EventDefinitionFormContainer = ({
   onSubmit = undefined,
 }: Props) => {
   const [activeStep, setActiveStep] = useState(initialStep);
-  const [eventDefinition, setEventDefinition] = useState<EventDefinition>(eventDefinitionInitial);
+  const { configFromLocalStorage, hasLocalStorageConfig } = useEventDefinitionConfigFromLocalStorage();
+  // Merge the optional localStorage-stored config into the initial event definition once, at
+  // first render. Previously this happened in a useEffect that called setEventDefinition,
+  // which trips the react-hooks/set-state-in-effect rule.
+  const [eventDefinition, setEventDefinition] = useState<EventDefinition>(() => {
+    if (!hasLocalStorageConfig) return eventDefinitionInitial;
+
+    const localStorageConditionPlugin = getConditionPlugin(configFromLocalStorage.type);
+    const defaultConfig = localStorageConditionPlugin?.defaultConfig || ({} as EventDefinition['config']);
+    const cloned = cloneDeep(eventDefinitionInitial);
+
+    return {
+      ...cloned,
+      config: {
+        ...defaultConfig,
+        ...cloned.config,
+        ...configFromLocalStorage,
+      },
+    } as EventDefinition;
+  });
+
   const [validation, setValidation] = useState({ errors: {} });
   const [isDirty, setIsDirty] = useState(false);
-  const { configFromLocalStorage, hasLocalStorageConfig } = useEventDefinitionConfigFromLocalStorage();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(eventDefinition);
   const { createEventDefinition } = useEventDefinitionMutations();
   const { entityTypes, loadingEntityTypes } = useGetEntityTypes();
@@ -110,32 +129,20 @@ const EventDefinitionFormContainer = ({
   const handleChange = useCallback(
     (key: string, value: unknown) => {
       setEventDefinition((prev) => ({ ...prev, [key]: value }));
-      onEventDefinitionChange({ ...eventDefinition, [key]: value });
+      onEventDefinitionChange({ ...eventDefinition, [key]: value } as EventDefinition);
       setIsDirty(true);
+      // Drop any stale submit-time validation error for the field being edited so the user
+      // gets immediate feedback on their fix. Each field still owns its live client-side
+      // validation; this only clears the server-returned error from the last submit attempt.
+      setValidation((prev) => {
+        if (!prev.errors || !(key in prev.errors)) return prev;
+        const { [key]: _dropped, ...remaining } = prev.errors as Record<string, unknown>;
+
+        return { ...prev, errors: remaining };
+      });
     },
     [eventDefinition, onEventDefinitionChange, setEventDefinition, setIsDirty],
   );
-
-  useEffect(() => {
-    if (hasLocalStorageConfig) {
-      const localStorageConditionPlugin = getConditionPlugin(configFromLocalStorage.type);
-      const defaultConfig = localStorageConditionPlugin?.defaultConfig || ({} as EventDefinition['config']);
-
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setEventDefinition((cur: any) => {
-        const cloned = cloneDeep(cur);
-
-        return {
-          ...cloned,
-          config: {
-            ...defaultConfig,
-            ...cloned.config,
-            ...configFromLocalStorage,
-          },
-        };
-      });
-    }
-  }, [configFromLocalStorage, hasLocalStorageConfig]);
 
   const commonStepProps = {
     key: eventDefinition.id, // Recreate components if ID changed
