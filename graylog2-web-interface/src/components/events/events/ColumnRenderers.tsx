@@ -31,6 +31,8 @@ import { Timestamp } from 'components/common';
 import type { ColumnRenderersByAttribute, EntityBase } from 'components/common/EntityDataTable/types';
 import EventDefinitionLink from 'components/events/events/EventDefinitionLink';
 import RemediationSteps from 'components/events/ReplaySearchSidebar/RemediationSteps';
+import TagsCell from 'components/events/TagsCell';
+import useAppendTagFilter from 'components/events/useAppendTagFilter';
 
 const EventDefinitionRenderer = ({
   eventDefinitionId,
@@ -90,6 +92,12 @@ const TimeRangeRenderer = ({ eventData }: { eventData: Event }) =>
     <em>No time range</em>
   );
 
+export const TagsRenderer = ({ tags }: { tags: ReadonlyArray<string> | undefined | null }) => {
+  const onTagClick = useAppendTagFilter();
+
+  return <TagsCell tags={tags} onTagClick={onTagClick} />;
+};
+
 export const eventTypeAttribute = {
   renderCell: (alert: boolean) => <EventTypeLabel isAlert={alert} />,
   staticWidth: 100,
@@ -126,6 +134,10 @@ export const getGeneralEventAttributeRenderers = <T extends EntityBase, M = unkn
   group_by_fields: {
     renderCell: (groupByFields: Record<string, string>) => <GroupByFieldsRenderer groupByFields={groupByFields} />,
     staticWidth: 400,
+  },
+  tags: {
+    renderCell: (tags: string[]) => <TagsRenderer tags={tags} />,
+    width: 0.3,
   },
 });
 
