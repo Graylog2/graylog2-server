@@ -33,6 +33,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -41,6 +42,7 @@ import org.graylog2.shared.rest.PublicCloudAPI;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -262,10 +264,32 @@ class OpenAPIContextFactoryTest {
             assertThat(value).isNotNull();
             assertThat(value.getTypes()).isNull();
             assertThat(value.getType()).isNull();
-        } catch (AssertionError | NullPointerException e) {
+
+            // Verify the *serialized* JSON does not contain "type": null for the items or value schemas.
+            final var json = Json31.pretty(generatedDescription);
+            final var tree = new ObjectMapper().readTree(json);
+            final var responseNode = tree.at("/components/schemas/org.graylog2.shared.rest.documentation.openapi.OpenAPIContextFactoryTest.RawObjectResponse");
+            final var itemsNode = responseNode.at("/properties/values/items");
+            assertThat(itemsNode.has("type")).as("items schema should not have a type field, got: %s", itemsNode).isFalse();
+            final var valueNode = responseNode.at("/properties/value");
+            assertThat(valueNode.has("type")).as("value schema should not have a type field, got: %s", valueNode).isFalse();
+
+            // Verify the real SearchTypeExecutionState#searchAfter (the original bug reproducer). The field is
+            // @Nullable List<Object>; swagger emits "type": ["array", "null"] with empty items. We strip "null"
+            // from the type union since items are already "any value" — the OpenAPI 3.1 union form rendered as
+            // garbage in openapi-explorer.
+            final var stesNode = tree.at("/components/schemas/org.graylog.plugins.views.search.rest.SearchTypeExecutionState");
+            assertThat(stesNode.isMissingNode()).as("SearchTypeExecutionState should be in the OpenAPI components").isFalse();
+            final var afterNode = stesNode.at("/properties/after");
+            assertThat(afterNode.isMissingNode()).as("after property should exist on SearchTypeExecutionState").isFalse();
+            assertThat(afterNode.at("/type").asText()).as("after.type should be a single string \"array\", got: %s", afterNode).isEqualTo("array");
+            final var afterItemsNode = afterNode.at("/items");
+            assertThat(afterItemsNode.isMissingNode()).as("after.items should exist on SearchTypeExecutionState").isFalse();
+            assertThat(afterItemsNode.has("type")).as("after.items should not have a type field, got: %s", afterItemsNode).isFalse();
+        } catch (AssertionError | NullPointerException | IOException e) {
             System.err.println("Test failed. Full OpenAPI description:");
             System.err.println(Json31.pretty(generatedDescription));
-            throw e;
+            throw new AssertionError(e);
         }
     }
 
@@ -410,11 +434,11 @@ class OpenAPIContextFactoryTest {
         @NoAuditEvent("Test")
         @GET
         public RawObjectResponse get() {
-            return new RawObjectResponse(List.of("a", 1), new Object());
+            return new RawObjectResponse(List.of("a", 1), new Object(), null);
         }
     }
 
-    public record RawObjectResponse(List<Object> values, Object value) {}
+    public record RawObjectResponse(List<Object> values, Object value, SearchTypeExecutionState searchTypeExecutionState) {}
 
     public record TestRequest(
             String name,

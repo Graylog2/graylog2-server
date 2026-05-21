@@ -148,7 +148,45 @@ public class CustomModelConverter extends ModelResolver {
             }
         }
 
-        return super.resolve(annotatedType, new CustomConverterContext(context), next);
+        final Schema<?> resolved = super.resolve(annotatedType, new CustomConverterContext(context), next);
+        stripNullFromNullableUnknownArray(resolved);
+        return resolved;
+    }
+
+    /**
+     * When swagger generates a schema for a {@code @Nullable List<Object>} (or similar nullable collection of raw
+     * Object), it emits {@code "type": ["array", "null"]} with {@code "items": {}}. The OpenAPI 3.1 union form is
+     * technically valid but renders as garbage in openapi-explorer (e.g. {@code "array,null of undefined"}).
+     * Since the items are already "any value" — and "any value" trivially includes null — dropping {@code "null"}
+     * from the type union loses no real semantics for this case. Strip it.
+     */
+    private static void stripNullFromNullableUnknownArray(Schema<?> schema) {
+        if (schema == null) {
+            return;
+        }
+        final var types = schema.getTypes();
+        if (types == null || types.size() <= 1 || !types.contains("array") || !types.contains("null")) {
+            return;
+        }
+        final var items = schema.getItems();
+        if (items == null || !isUnknownSchema(items)) {
+            return;
+        }
+        final var stripped = new java.util.LinkedHashSet<>(types);
+        stripped.remove("null");
+        schema.setTypes(stripped);
+    }
+
+    // True when the schema imposes no constraints — i.e. an empty "any value" schema.
+    private static boolean isUnknownSchema(Schema<?> schema) {
+        return schema.getType() == null
+                && (schema.getTypes() == null || schema.getTypes().isEmpty())
+                && schema.get$ref() == null
+                && (schema.getProperties() == null || schema.getProperties().isEmpty())
+                && schema.getAllOf() == null
+                && schema.getOneOf() == null
+                && schema.getAnyOf() == null
+                && schema.getItems() == null;
     }
 
     // helper to clone the given AnnotatedType with a replacement "inner" type
