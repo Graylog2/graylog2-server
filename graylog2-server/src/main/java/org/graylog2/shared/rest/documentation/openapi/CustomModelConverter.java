@@ -139,6 +139,12 @@ public class CustomModelConverter extends ModelResolver {
                 return new ObjectSchema()
                         .addProperty("start", new IntegerSchema())
                         .addProperty("length", new IntegerSchema());
+            } else if (Object.class.equals(rawClass)) {
+                // Raw Object (e.g. List<Object>, Map<String, Object>) means "any value".
+                // In OpenAPI 3.1 / JSON Schema this is expressed as an empty schema (no "type" field).
+                // Without this, swagger-core emits a schema with "type": null, which breaks consumers
+                // like openapi-explorer.
+                return new Schema<>();
             }
         }
 

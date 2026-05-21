@@ -41,6 +41,7 @@ import org.graylog2.shared.rest.PublicCloudAPI;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
@@ -60,7 +61,8 @@ class OpenAPIContextFactoryTest {
     static void beforeAll() {
         final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources =
                 Map.of("my.plugin.id", Set.of(TestResource.class, TestResource2.class,
-                        NotPublicCloudResource.class, SchemaConflictResource.class, ImmutableMapsResource.class));
+                        NotPublicCloudResource.class, SchemaConflictResource.class, ImmutableMapsResource.class,
+                        RawObjectResource.class));
 
         objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(
@@ -92,7 +94,8 @@ class OpenAPIContextFactoryTest {
             // Verify that paths and schemas are generated
             assertThat(generatedDescription.getPaths()).containsOnlyKeys("/test", "/plugins/my.plugin.id/test",
                     "/plugins/my.plugin.id/subtypes", "/plugins/my.plugin.id/response-schema-name-conflict/pkg1",
-                    "/plugins/my.plugin.id/response-schema-name-conflict/pkg2", "/plugins/my.plugin.id/immutable-maps");
+                    "/plugins/my.plugin.id/response-schema-name-conflict/pkg2", "/plugins/my.plugin.id/immutable-maps",
+                    "/plugins/my.plugin.id/raw-object");
             assertThat(generatedDescription.getComponents().getSchemas()).isNotEmpty();
         } catch (AssertionError | NullPointerException e) {
             System.err.println("Test failed. Full OpenAPI description:");
@@ -239,6 +242,34 @@ class OpenAPIContextFactoryTest {
     }
 
     @Test
+    void rawObjectIsResolvedAsAnyValueSchema() {
+        try {
+            // List<Object> / raw Object means "any value" in JSON Schema. In OpenAPI 3.1 that is an empty
+            // schema with no "type" set. Without the workaround in CustomModelConverter, swagger-core emits
+            // schemas with a null/invalid type for raw Object, which breaks consumers like openapi-explorer.
+            final Schema<?> responseSchema = generatedDescription.getComponents().getSchemas()
+                    .get("org.graylog2.shared.rest.documentation.openapi.OpenAPIContextFactoryTest.RawObjectResponse");
+            assertThat(responseSchema).isNotNull();
+
+            final var values = (Schema<?>) responseSchema.getProperties().get("values");
+            assertThat(values.getTypes()).containsExactly("array");
+            final var itemsSchema = (Schema<?>) values.getItems();
+            assertThat(itemsSchema).isNotNull();
+            assertThat(itemsSchema.getTypes()).isNull();
+            assertThat(itemsSchema.getType()).isNull();
+
+            final var value = (Schema<?>) responseSchema.getProperties().get("value");
+            assertThat(value).isNotNull();
+            assertThat(value.getTypes()).isNull();
+            assertThat(value.getType()).isNull();
+        } catch (AssertionError | NullPointerException e) {
+            System.err.println("Test failed. Full OpenAPI description:");
+            System.err.println(Json31.pretty(generatedDescription));
+            throw e;
+        }
+    }
+
+    @Test
     void usesMapSchemaForImmutableMaps() {
         try {
             // Verify ChildType1 has allOf with ParentType reference
@@ -369,6 +400,21 @@ class OpenAPIContextFactoryTest {
             return ImmutableMap.of("key", true);
         }
     }
+
+    @PublicCloudAPI
+    @Path("/raw-object")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public static class RawObjectResource implements PluginRestResource {
+
+        @NoAuditEvent("Test")
+        @GET
+        public RawObjectResponse get() {
+            return new RawObjectResponse(List.of("a", 1), new Object());
+        }
+    }
+
+    public record RawObjectResponse(List<Object> values, Object value) {}
 
     public record TestRequest(
             String name,
