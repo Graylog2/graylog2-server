@@ -31,6 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.plugin.Message.FIELD_GL2_PROCESSING_DURATION_MS;
 import static org.graylog2.plugin.Message.FIELD_STREAMS;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -53,7 +54,8 @@ class StreamMaxProcessingTimeDescriptorTest {
     void compute_queriesMaxProcessingTime() {
         when(moreSearch.aggregateGroupedMetric(
                 anyString(), any(RelativeRange.class),
-                anyString(), any(MoreSearchAdapter.AggregationType.class), anyString(), anyInt()))
+                anyString(), any(MoreSearchAdapter.AggregationType.class), anyString(), anyInt(),
+                anyCollection()))
                 .thenReturn(Map.of("stream1", 150.0));
 
         final List<EntityMetric<Double>> result = descriptor.compute(List.of("stream1"));
@@ -63,7 +65,8 @@ class StreamMaxProcessingTimeDescriptorTest {
                 any(RelativeRange.class),
                 eq(FIELD_STREAMS), eq(MoreSearchAdapter.AggregationType.MAX),
                 eq(FIELD_GL2_PROCESSING_DURATION_MS),
-                eq(1));
+                eq(1),
+                eq(List.of("stream1")));
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().value()).isEqualTo(150.0);
@@ -73,7 +76,8 @@ class StreamMaxProcessingTimeDescriptorTest {
     void compute_returnsZeroForMissingStreams() {
         when(moreSearch.aggregateGroupedMetric(
                 anyString(), any(RelativeRange.class),
-                anyString(), any(MoreSearchAdapter.AggregationType.class), anyString(), anyInt()))
+                anyString(), any(MoreSearchAdapter.AggregationType.class), anyString(), anyInt(),
+                anyCollection()))
                 .thenReturn(Map.of());
 
         final List<EntityMetric<Double>> result = descriptor.compute(List.of("stream1"));

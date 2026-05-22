@@ -29,6 +29,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.plugin.Message.FIELD_STREAMS;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -51,7 +52,7 @@ class StreamMessageCountDescriptorTest {
     void compute_queriesByStreamIds() {
         when(moreSearch.aggregateTerms(
                 anyString(), any(RelativeRange.class),
-                anyString(), anyInt()))
+                anyString(), anyInt(), anyCollection()))
                 .thenReturn(Map.of("stream1", 500L, "stream2", 200L));
 
         final List<EntityMetric<Long>> result = descriptor.compute(List.of("stream1", "stream2"));
@@ -59,7 +60,8 @@ class StreamMessageCountDescriptorTest {
         verify(moreSearch).aggregateTerms(
                 eq(FIELD_STREAMS + ":stream1 OR " + FIELD_STREAMS + ":stream2"),
                 any(RelativeRange.class),
-                eq(FIELD_STREAMS), eq(2));
+                eq(FIELD_STREAMS), eq(2),
+                eq(List.of("stream1", "stream2")));
 
         assertThat(result).extracting(EntityMetric::entityId).containsExactlyInAnyOrder("stream1", "stream2");
         assertThat(result).filteredOn(m -> m.entityId().equals("stream1"))
@@ -72,7 +74,7 @@ class StreamMessageCountDescriptorTest {
     void compute_returnsZeroForMissingStreams() {
         when(moreSearch.aggregateTerms(
                 anyString(), any(RelativeRange.class),
-                anyString(), anyInt()))
+                anyString(), anyInt(), anyCollection()))
                 .thenReturn(Map.of());
 
         final List<EntityMetric<Long>> result = descriptor.compute(List.of("stream1"));

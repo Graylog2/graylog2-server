@@ -33,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.plugin.Message.FIELD_GL2_SOURCE_INPUT;
 import static org.graylog2.plugin.Message.FIELD_STREAMS;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -57,7 +58,8 @@ class StreamAssociatedInputsDescriptorTest {
     void compute_returnsInputIdLists() {
         when(moreSearch.aggregateGroupedTerms(
                 anyString(), any(RelativeRange.class),
-                anyString(), anyString(), anyInt(), anyInt()))
+                anyString(), anyString(), anyInt(), anyInt(),
+                anyCollection()))
                 .thenReturn(Map.of(
                         "stream1", Map.of("input-a", 100L, "input-b", 200L)
                 ));
@@ -68,7 +70,8 @@ class StreamAssociatedInputsDescriptorTest {
                 eq(FIELD_STREAMS + ":stream1"),
                 any(RelativeRange.class),
                 eq(FIELD_STREAMS), eq(FIELD_GL2_SOURCE_INPUT),
-                eq(1), eq(MetricsCacheConfiguration.MAX_TERMS_SIZE));
+                eq(1), eq(MetricsCacheConfiguration.MAX_TERMS_SIZE),
+                eq(List.of("stream1")));
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().value()).containsExactlyInAnyOrder("input-a", "input-b");
@@ -78,7 +81,8 @@ class StreamAssociatedInputsDescriptorTest {
     void compute_returnsEmptyListForMissingStreams() {
         when(moreSearch.aggregateGroupedTerms(
                 anyString(), any(RelativeRange.class),
-                anyString(), anyString(), anyInt(), anyInt()))
+                anyString(), anyString(), anyInt(), anyInt(),
+                anyCollection()))
                 .thenReturn(Map.of());
 
         final List<EntityMetric<List<String>>> result = descriptor.compute(List.of("stream1"));

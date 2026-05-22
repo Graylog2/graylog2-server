@@ -81,7 +81,7 @@ public class StreamAssociatedInputsDescriptor implements EntityCachedMetricDescr
                         .collect(Collectors.joining(" OR ")),
                 RelativeRange.create(MetricsCacheConfiguration.RANGE_SECONDS_24H),
                 FIELD_STREAMS, FIELD_GL2_SOURCE_INPUT,
-                entityIds.size(), MetricsCacheConfiguration.MAX_TERMS_SIZE);
+                entityIds.size(), MetricsCacheConfiguration.MAX_TERMS_SIZE, entityIds);
 
         return entityIds.stream()
                 .map(id -> new EntityMetric<>(id, List.copyOf(grouped.getOrDefault(id, Map.of()).keySet())))

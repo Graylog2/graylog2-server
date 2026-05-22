@@ -77,7 +77,7 @@ public class StreamAvgProcessingTimeDescriptor implements EntityCachedMetricDesc
                         .collect(Collectors.joining(" OR ")),
                 RelativeRange.create(MetricsCacheConfiguration.RANGE_SECONDS_15M),
                 FIELD_STREAMS, MoreSearchAdapter.AggregationType.AVG, FIELD_GL2_PROCESSING_DURATION_MS,
-                entityIds.size());
+                entityIds.size(), entityIds);
 
         return entityIds.stream()
                 .map(id -> new EntityMetric<>(id, results.getOrDefault(id, 0.0)))
