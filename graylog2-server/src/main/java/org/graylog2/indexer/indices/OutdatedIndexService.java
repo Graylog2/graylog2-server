@@ -22,7 +22,6 @@ import com.github.zafarkhaja.semver.Version;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotNull;
-import jakarta.ws.rs.NotFoundException;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
@@ -68,11 +67,7 @@ public class OutdatedIndexService {
     }
 
     public void reindex(String index, boolean withReplicas) {
-        OutdatedIndex outdatedIndex = getOutdatedIndices().stream()
-                .filter(OutdatedIndex::isSystemIndex)
-                .filter(i -> i.indexName().equals(index))
-                .findAny().orElseThrow(() -> new NotFoundException("Index " + index + " not found or is no system index"));
-        HealthStatus sourceStatus = indicesAdapter.waitForRecovery(outdatedIndex.indexName(), 2);
+        HealthStatus sourceStatus = indicesAdapter.waitForRecovery(index, 2);
         if (sourceStatus != HealthStatus.Green) {
             throw new IllegalStateException("Index " + index + " state is not healthy: " + sourceStatus);
         }
@@ -156,10 +151,6 @@ public class OutdatedIndexService {
     }
 
     public void delete(@NotNull String index) {
-        OutdatedIndex outdatedIndex = getOutdatedIndices().stream()
-                .filter(i -> !i.managedIndex())
-                .filter(i -> i.indexName().equals(index))
-                .findAny().orElseThrow(() -> new NotFoundException("Index " + index + " not found or is an index managed by Graylog"));
-        indicesAdapter.delete(outdatedIndex.indexName());
+        indicesAdapter.delete(index);
     }
 }

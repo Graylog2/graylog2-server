@@ -332,7 +332,11 @@ public class IndicesResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.ES_INDEX_REINDEX)
     public void reindex(@Parameter(name = "index") @PathParam("index") @NotNull String index,
                         @Parameter(name = "withReplication") @QueryParam("withReplication") @DefaultValue("true") boolean withReplication) {
-        outdatedIndexService.reindex(index, withReplication);
+        OutdatedIndex outdatedIndex = getOutdatedIndices().stream()
+                .filter(OutdatedIndex::isSystemIndex)
+                .filter(i -> i.indexName().equals(index))
+                .findAny().orElseThrow(() -> new NotFoundException("Index " + index + " not found or is no system index"));
+        outdatedIndexService.reindex(outdatedIndex.indexName(), withReplication);
     }
 
     @DELETE
@@ -342,7 +346,11 @@ public class IndicesResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.ES_INDEX_DELETE)
     public void deleteOutdated(@Parameter(name = "index") @PathParam("index") @NotNull String index) {
-        outdatedIndexService.delete(index);
+        OutdatedIndex outdatedIndex = getOutdatedIndices().stream()
+                .filter(i -> !i.managedIndex())
+                .filter(i -> i.indexName().equals(index))
+                .findAny().orElseThrow(() -> new NotFoundException("Index " + index + " not found or is an index managed by Graylog"));
+        outdatedIndexService.delete(outdatedIndex.indexName());
     }
 
     private OpenIndicesInfo getOpenIndicesInfo(Set<IndexStatistics> indicesStatistics) {
