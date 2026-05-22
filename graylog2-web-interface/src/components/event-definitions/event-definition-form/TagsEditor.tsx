@@ -48,7 +48,8 @@ type Props = {
   error?: React.ReactNode;
 };
 
-const HELP_TEXT = 'Press Enter or Tab to add. Tags are lowercased and deduplicated. Only lowercase letters, digits, hyphens, and underscores are allowed.';
+const HELP_TEXT =
+  'Press Enter or Tab to add. Tags are lowercased and deduplicated. Only lowercase letters, digits, hyphens, and underscores are allowed.';
 
 const isTooLong = (tag: string): boolean => tag.length > MAX_TAG_LENGTH;
 const hasInvalidChars = (tag: string): boolean => !VALID_TAG_PATTERN.test(tag);
@@ -60,8 +61,10 @@ const buildTooLongMessage = (tagsList: ReadonlyArray<string>): string | null => 
 
   const isPlural = tagsList.length > 1;
 
-  return `Tag${isPlural ? 's' : ''} ${tagsList.map(quote).join(', ')} `
-    + `${isPlural ? 'exceed' : 'exceeds'} the maximum length of ${MAX_TAG_LENGTH} characters.`;
+  return (
+    `Tag${isPlural ? 's' : ''} ${tagsList.map(quote).join(', ')} ` +
+    `${isPlural ? 'exceed' : 'exceeds'} the maximum length of ${MAX_TAG_LENGTH} characters.`
+  );
 };
 
 const buildInvalidCharsMessage = (tagsList: ReadonlyArray<string>): string | null => {
@@ -69,9 +72,11 @@ const buildInvalidCharsMessage = (tagsList: ReadonlyArray<string>): string | nul
 
   const isPlural = tagsList.length > 1;
 
-  return `Tag${isPlural ? 's' : ''} ${tagsList.map(quote).join(', ')} `
-    + `${isPlural ? 'contain' : 'contains'} invalid characters. `
-    + 'Only lowercase letters, digits, hyphens, and underscores are allowed.';
+  return (
+    `Tag${isPlural ? 's' : ''} ${tagsList.map(quote).join(', ')} ` +
+    `${isPlural ? 'contain' : 'contains'} invalid characters. ` +
+    'Only lowercase letters, digits, hyphens, and underscores are allowed.'
+  );
 };
 
 const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) => {
@@ -129,9 +134,8 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
     duplicateAttempt ? `Tag "${duplicateAttempt}" has already been added.` : null,
   ].filter((m): m is string => m !== null);
 
-  const localValidationError = messages.length === 0
-    ? null
-    : (
+  const localValidationError =
+    messages.length === 0 ? null : (
       <>
         {messages.map((m) => (
           <div key={m}>{m}</div>

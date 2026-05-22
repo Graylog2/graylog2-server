@@ -86,7 +86,12 @@ const mockHealthReport: HealthReport = {
           title: 'Archiving',
           status: 'healthy',
           children: [
-            { id: 'graylog.archiving.archive_failures', title: 'Archive Failures', status: 'healthy', total_affected: 0 },
+            {
+              id: 'graylog.archiving.archive_failures',
+              title: 'Archive Failures',
+              status: 'healthy',
+              total_affected: 0,
+            },
           ],
         },
         {

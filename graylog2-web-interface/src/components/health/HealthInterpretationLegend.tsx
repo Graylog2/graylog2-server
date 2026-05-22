@@ -18,7 +18,14 @@ import * as React from 'react';
 
 import HealthStatusIcon from './HealthStatusIcon';
 import { STATUS_DESCRIPTION, STATUS_LABELS, STATUS_ORDER } from './healthStatusCopy';
-import { BodyText, InterpretationPane, InterpretationTitle, LegendItem, LegendList, LegendText } from './HealthModule.styles';
+import {
+  BodyText,
+  InterpretationPane,
+  InterpretationTitle,
+  LegendItem,
+  LegendList,
+  LegendText,
+} from './HealthModule.styles';
 
 const HealthInterpretationLegend = () => (
   <InterpretationPane>

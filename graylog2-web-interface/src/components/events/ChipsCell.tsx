@@ -29,6 +29,7 @@ const Wrapper = styled.div(
     align-items: center;
     gap: ${theme.spacings.xs};
     flex-wrap: wrap;
+
     /* Fill the cell so max-width: 100% on chips resolves against the cell width. */
     width: 100%;
     min-width: 0;
