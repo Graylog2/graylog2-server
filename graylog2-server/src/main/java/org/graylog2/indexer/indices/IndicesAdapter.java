@@ -36,7 +36,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 public interface IndicesAdapter {
-    void move(String source, String target, Consumer<IndexMoveResult> resultCallback);
+    void reindex(String source, String target, Consumer<IndexMoveResult> resultCallback);
 
     void delete(String indexName);
 

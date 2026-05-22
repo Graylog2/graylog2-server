@@ -153,13 +153,13 @@ public class IndicesAdapterOS implements IndicesAdapter {
     }
 
     @Override
-    public void move(String source, String target, Consumer<IndexMoveResult> resultCallback) {
+    public void reindex(String source, String target, Consumer<IndexMoveResult> resultCallback) {
         ReindexResponse result = c.execute(() -> openSearchClient.reindex(
                         org.opensearch.client.opensearch.core.ReindexRequest.builder()
                                 .source(Source.builder().index(source).build())
                                 .dest(Destination.builder().index(target).build())
                                 .build()),
-                "Error moving index " + source + " to " + target);
+                "Error reindexing index " + source + " to " + target);
 
         final IndexMoveResult indexMoveResult = IndexMoveResult.create(
                 Math.toIntExact(getIfNull(result.total(), 0L)),
