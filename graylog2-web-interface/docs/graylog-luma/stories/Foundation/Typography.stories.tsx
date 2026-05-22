@@ -18,7 +18,19 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import styled, { useTheme } from 'styled-components';
 
-import { COL_WIDTH_SIZE, COL_WIDTH_STYLE, COL_WIDTH_VARIABLE, FoundationTable, H1, H2, H3, PxLabel, SectionDescription, StoryContainer, Token } from './shared';
+import {
+  COL_WIDTH_SIZE,
+  COL_WIDTH_STYLE,
+  COL_WIDTH_VARIABLE,
+  FoundationTable,
+  H1,
+  H2,
+  H3,
+  PxLabel,
+  SectionDescription,
+  StoryContainer,
+  Token,
+} from './shared';
 
 // Root font size matching theme/constants ROOT_FONT_SIZE
 const ROOT_FONT_SIZE = 16;
@@ -234,20 +246,18 @@ const TYPE_SCALE_GROUPS: ScaleGroupEntry[] = [
 
 const TypeScaleDoc = () => {
   const theme = useTheme();
-  const sizes = theme.fonts.size as Record<string, string>;
-  const families = theme.fonts.family as Record<string, string>;
 
   const columns = [
     {
       header: 'Style',
       width: COL_WIDTH_STYLE,
       render: (row: ScaleEntry) => {
-        const sizeValue = sizes[row.key] ?? '1rem';
+        const sizeValue = theme.fonts.size[row.key] ?? '1rem';
 
         return (
           <span
             style={{
-              fontFamily: families[row.family ?? 'body'],
+              fontFamily: theme.fonts.family[row.family ?? 'body'],
               fontSize: sizeValue,
               color: theme.colors.text.primary,
               lineHeight: 1.3,
@@ -266,7 +276,7 @@ const TypeScaleDoc = () => {
       header: 'Size',
       width: COL_WIDTH_SIZE,
       render: (row: ScaleEntry) => {
-        const sizeValue = sizes[row.key] ?? '1rem';
+        const sizeValue = theme.fonts.size[row.key] ?? '1rem';
 
         return (
           <PxLabel>

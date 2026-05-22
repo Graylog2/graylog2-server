@@ -91,14 +91,12 @@ const SPACINGS: SpacingEntry[] = [
 
 const SpacingsDoc = () => {
   const theme = useTheme();
-  const spacings = theme.spacings as Record<string, string>;
-  const spacingsPx = theme.spacings.px as Record<string, number>;
 
   const columns = [
     {
       header: 'Style',
       width: '120px',
-      render: (row: SpacingEntry) => <SpacingBar $height={spacings[row.key]} />,
+      render: (row: SpacingEntry) => <SpacingBar $height={theme.spacings[row.key]} />,
     },
     {
       header: 'Variable',
@@ -110,7 +108,7 @@ const SpacingsDoc = () => {
       width: COL_WIDTH_SIZE,
       render: (row: SpacingEntry) => (
         <PxLabel>
-          {spacings[row.key]} / {spacingsPx[row.key]}px
+          {theme.spacings[row.key]} / {theme.spacings.px[row.key]}px
         </PxLabel>
       ),
     },
