@@ -29,9 +29,7 @@ jest.mock('@graylog/server-api', () => ({
   },
 }));
 
-const mockedSuggestTags = EventsDefinitions.suggestTags as jest.MockedFunction<
-  typeof EventsDefinitions.suggestTags
->;
+const mockedSuggestTags = EventsDefinitions.suggestTags as jest.MockedFunction<typeof EventsDefinitions.suggestTags>;
 
 const Harness = ({ initial = [] as string[], onChange = (_: string[]) => {} }) => {
   const [tags, setTags] = useState<string[]>(initial);
@@ -154,9 +152,7 @@ describe('TagsEditor', () => {
       await userEvent.type(screen.getByRole('combobox'), 'phish:ing');
       await userEvent.keyboard('{Enter}');
 
-      expect(
-        await screen.findByText(/Tag "phish:ing" contains invalid characters/i),
-      ).toBeInTheDocument();
+      expect(await screen.findByText(/Tag "phish:ing" contains invalid characters/i)).toBeInTheDocument();
     });
 
     it.each([
@@ -170,9 +166,7 @@ describe('TagsEditor', () => {
       await userEvent.type(screen.getByRole('combobox'), raw);
       await userEvent.keyboard('{Enter}');
 
-      expect(
-        await screen.findByText(/contains invalid characters/i),
-      ).toBeInTheDocument();
+      expect(await screen.findByText(/contains invalid characters/i)).toBeInTheDocument();
     });
 
     it('accepts tags using only allowed characters with no error', async () => {
@@ -206,9 +200,7 @@ describe('TagsEditor', () => {
       await userEvent.type(screen.getByRole('combobox'), overLong);
       await userEvent.keyboard('{Enter}');
 
-      expect(
-        await screen.findByText(/exceeds the maximum length of 128 characters/i),
-      ).toBeInTheDocument();
+      expect(await screen.findByText(/exceeds the maximum length of 128 characters/i)).toBeInTheDocument();
     });
 
     it('surfaces a duplicate message when committing an existing tag', async () => {
@@ -217,9 +209,7 @@ describe('TagsEditor', () => {
       await userEvent.type(screen.getByRole('combobox'), 'phishing');
       await userEvent.keyboard('{Enter}');
 
-      expect(
-        await screen.findByText(/Tag "phishing" has already been added/i),
-      ).toBeInTheDocument();
+      expect(await screen.findByText(/Tag "phishing" has already been added/i)).toBeInTheDocument();
     });
 
     it('surfaces a duplicate message on Tab (without committing)', async () => {
@@ -228,9 +218,7 @@ describe('TagsEditor', () => {
       await userEvent.type(screen.getByRole('combobox'), 'phishing');
       await userEvent.keyboard('{Tab}');
 
-      expect(
-        await screen.findByText(/Tag "phishing" has already been added/i),
-      ).toBeInTheDocument();
+      expect(await screen.findByText(/Tag "phishing" has already been added/i)).toBeInTheDocument();
     });
 
     it('surfaces an invalid-characters message when committing a tag via Tab', async () => {
@@ -239,9 +227,7 @@ describe('TagsEditor', () => {
       await userEvent.type(screen.getByRole('combobox'), 'phish:ing');
       await userEvent.keyboard('{Tab}');
 
-      expect(
-        await screen.findByText(/Tag "phish:ing" contains invalid characters/i),
-      ).toBeInTheDocument();
+      expect(await screen.findByText(/Tag "phish:ing" contains invalid characters/i)).toBeInTheDocument();
     });
 
     it('surfaces a too-long message when committing a tag via Tab', async () => {
@@ -251,9 +237,7 @@ describe('TagsEditor', () => {
       await userEvent.type(screen.getByRole('combobox'), overLong);
       await userEvent.keyboard('{Tab}');
 
-      expect(
-        await screen.findByText(/exceeds the maximum length of 128 characters/i),
-      ).toBeInTheDocument();
+      expect(await screen.findByText(/exceeds the maximum length of 128 characters/i)).toBeInTheDocument();
     });
 
     it('clears the validation message as soon as the user edits the input', async () => {
@@ -262,9 +246,7 @@ describe('TagsEditor', () => {
       await userEvent.type(screen.getByRole('combobox'), 'phishing');
       await userEvent.keyboard('{Enter}');
 
-      expect(
-        await screen.findByText(/has already been added/i),
-      ).toBeInTheDocument();
+      expect(await screen.findByText(/has already been added/i)).toBeInTheDocument();
 
       await userEvent.type(screen.getByRole('combobox'), 'x');
 
