@@ -17,6 +17,7 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import styled, { useTheme } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
 
 import {
   COL_WIDTH_SIZE,
@@ -32,22 +33,15 @@ import {
   Token,
 } from './shared';
 
-// Root font size matching theme/constants ROOT_FONT_SIZE
-const ROOT_FONT_SIZE = 16;
-const remToPx = (rem: string): string => `${Math.round(parseFloat(rem) * ROOT_FONT_SIZE)}px`;
-
 // ─── Font Families ─────────────────────────────────────────────────────────
-
-type FontFamilyKey = 'body' | 'navigation' | 'monospace';
-
 type FamilyEntry = {
-  key: FontFamilyKey;
+  key: string;
   label: string;
   token: string;
   when: string;
 };
 
-const FONT_FAMILIES: FamilyEntry[] = [
+const FONT_FAMILIES: Array<FamilyEntry> = [
   {
     key: 'body',
     label: 'Body — Source Sans Pro',
@@ -137,7 +131,7 @@ type FontSizeKey =
 type ScaleEntry = {
   key: FontSizeKey;
   token: string;
-  family?: FontFamilyKey;
+  family?: string;
   specimen: string;
   usage: string;
 };
@@ -145,10 +139,10 @@ type ScaleEntry = {
 type ScaleGroupEntry = {
   label: string;
   note?: string;
-  items: ScaleEntry[];
+  items: Array<ScaleEntry>;
 };
 
-const TYPE_SCALE_GROUPS: ScaleGroupEntry[] = [
+const TYPE_SCALE_GROUPS: Array<ScaleGroupEntry> = [
   {
     label: 'Headings',
     note: 'Applied automatically to h1–h6 HTML elements.',
@@ -246,6 +240,7 @@ const TYPE_SCALE_GROUPS: ScaleGroupEntry[] = [
 
 const TypeScaleDoc = () => {
   const theme = useTheme();
+  const remToPx = (rem: string): string => `${Math.round(parseFloat(rem) * parseFloat(theme.fonts.size.root))}px`;
 
   const columns = [
     {
@@ -329,11 +324,11 @@ const Swatch = styled.div<{ $color: string; $labelColor: string }>`
 type ColorEntry = {
   name: string;
   token: string;
-  getColor: (theme: any) => string;
+  getColor: (theme: DefaultTheme) => string;
   usage: string;
 };
 
-const TEXT_COLORS: ColorEntry[] = [
+const TEXT_COLORS: Array<ColorEntry> = [
   {
     name: 'Primary',
     token: 'theme.colors.text.primary',
