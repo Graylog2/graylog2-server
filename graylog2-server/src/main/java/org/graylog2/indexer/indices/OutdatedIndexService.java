@@ -151,5 +151,6 @@ public class OutdatedIndexService {
     }
 
     public void delete(@NotNull String index) {
+        indicesAdapter.delete(index);
     }
 }
