@@ -29,47 +29,29 @@ import type { NotificationType } from 'components/notifications/types';
 
 import SystemNotificationsTable from './SystemNotificationsTable';
 
-jest.mock("components/common/PaginatedEntityTable/useFetchEntities");
-jest.mock("components/common/EntityDataTable/hooks/useUserLayoutPreferences");
-jest.mock("components/notifications/hooks/useNotificationDismiss");
-jest.mock("components/notifications/hooks/useNotificationBulkDismiss");
-jest.mock("components/notifications/hooks/useNotificationBody");
+jest.mock('components/common/PaginatedEntityTable/useFetchEntities');
+jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
+jest.mock('components/notifications/hooks/useNotificationDismiss');
+jest.mock('components/notifications/hooks/useNotificationBulkDismiss');
+jest.mock('components/notifications/hooks/useNotificationBody');
 
 const notif1: NotificationType = {
-  id: "notif-1",
-  title: "Disk full on node1",
-  description: "The data directory is almost full.",
-  is_read: false,
-  actor: { id: "user-1", name: "alice" },
-  triggered_at: "2024-01-15T10:00:00.000Z",
-  last_changed: "2024-01-15T10:00:00.000Z",
-  severity: "urgent",
-  type: "legacy_no_master",
-  key: "no_master",
-  node_id: "node-1",
-  details: {},
-};
-
-const notif2: NotificationType = {
-  id: "notif-2",
-  title: "High journal utilization",
-  description: "Journal utilization is above 90%.",
-  is_read: false,
-  actor: null,
-  triggered_at: "2024-01-14T08:00:00.000Z",
-  last_changed: "2024-01-14T09:00:00.000Z",
-  severity: "normal",
-  type: "legacy_no_master",
-  key: "journal_utilization",
-  node_id: "node-2",
+  id: 'notif-1',
+  title: 'Disk full on node1',
+  description: 'The data directory is almost full.',
+  timestamp: '2024-01-15T10:00:00.000Z',
+  severity: 'urgent',
+  type: 'legacy_no_master',
+  key: 'no_master',
+  node_id: 'node-1',
   details: {},
 };
 
 const attributes = [
-  { id: "title", title: "Title", sortable: true },
-  { id: "description", title: "Description", sortable: false },
-  { id: "severity", title: "Severity", sortable: true },
-  { id: "triggered_at", title: "Triggered at", sortable: true },
+  { id: 'title', title: 'Title', sortable: true },
+  { id: 'description', title: 'Description', sortable: false },
+  { id: 'severity', title: 'Severity', sortable: true },
+  { id: 'timestamp', title: 'Timestamp', sortable: true },
 ];
 
 const mockFetchData = (list: NotificationType[] = [notif1]) => ({
@@ -84,16 +66,16 @@ const mockFetchData = (list: NotificationType[] = [notif1]) => ({
 
 const mockMutate = jest.fn();
 
-describe("SystemNotificationsTable", () => {
+describe('SystemNotificationsTable', () => {
   beforeEach(() => {
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: {
         ...layoutPreferences,
         attributes: {
-          title: { status: "show" },
-          description: { status: "show" },
-          severity: { status: "show" },
-          triggered_at: { status: "show" },
+          title: { status: 'show' },
+          description: { status: 'show' },
+          severity: { status: 'show' },
+          timestamp: { status: 'show' },
         },
       },
       isInitialLoading: false,
@@ -114,28 +96,28 @@ describe("SystemNotificationsTable", () => {
     });
   });
 
-  it("renders column headers for default-visible attributes", async () => {
+  it('renders column headers for default-visible attributes', async () => {
     asMock(useFetchEntities).mockReturnValue(mockFetchData());
 
     render(<SystemNotificationsTable />);
 
-    await screen.findByRole("columnheader", { name: /title/i });
-    await screen.findByRole("columnheader", { name: /severity/i });
-    await screen.findByRole("columnheader", { name: /triggered at/i });
+    await screen.findByRole('columnheader', { name: /title/i });
+    await screen.findByRole('columnheader', { name: /severity/i });
+    await screen.findByRole('columnheader', { name: /timestamp/i });
 
-    expect(screen.queryByRole("columnheader", { name: /status/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole("columnheader", { name: /last changed by/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole("columnheader", { name: /type/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('columnheader', { name: /status/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('columnheader', { name: /last changed by/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('columnheader', { name: /type/i })).not.toBeInTheDocument();
   });
 
-  it("renders notification title and description", async () => {
+  it('renders notification title and description', async () => {
     asMock(useFetchEntities).mockReturnValue(mockFetchData());
 
     render(<SystemNotificationsTable />);
 
-    const row = await screen.findByTestId("table-row-notif-1");
+    const row = await screen.findByTestId('table-row-notif-1');
 
-    await within(row).findByText("Disk full on node1");
+    await within(row).findByText('Disk full on node1');
     await within(row).findByText(/The data directory is almost full/);
   });
 
@@ -144,50 +126,50 @@ describe("SystemNotificationsTable", () => {
 
     render(<SystemNotificationsTable />);
 
-    const row = await screen.findByTestId("table-row-notif-1");
+    const row = await screen.findByTestId('table-row-notif-1');
 
-    await within(row).findByRole("button", { name: /dismiss/i });
+    await within(row).findByRole('button', { name: /dismiss/i });
   });
 
-  it("calls dismiss mutation when the Dismiss button is clicked", async () => {
+  it('calls dismiss mutation when the Dismiss button is clicked', async () => {
     asMock(useFetchEntities).mockReturnValue(mockFetchData([notif1]));
 
     render(<SystemNotificationsTable />);
 
-    const row = await screen.findByTestId("table-row-notif-1");
-    const dismissButton = within(row).getByRole("button", { name: /dismiss/i });
+    const row = await screen.findByTestId('table-row-notif-1');
+    const dismissButton = within(row).getByRole('button', { name: /dismiss/i });
 
     await userEvent.click(dismissButton);
 
-    expect(mockMutate).toHaveBeenCalledWith({ id: "notif-1" });
+    expect(mockMutate).toHaveBeenCalledWith({ id: 'notif-1' });
   });
 
-  describe("bulk actions", () => {
-    it("renders bulk actions dropdown with a Dismiss item and no read-state items", async () => {
+  describe('bulk actions', () => {
+    it('renders bulk actions dropdown with a Dismiss item and no read-state items', async () => {
       asMock(useFetchEntities).mockReturnValue(mockFetchData([notif1]));
 
       render(<SystemNotificationsTable />);
 
-      await screen.findByTestId("table-row-notif-1");
+      await screen.findByTestId('table-row-notif-1');
 
-      const selectAll = screen.getByRole("checkbox", { name: /select all/i });
+      const selectAll = screen.getByRole('checkbox', { name: /select all/i });
 
       await userEvent.click(selectAll);
 
-      const bulkDropdown = await screen.findByRole("button", {
+      const bulkDropdown = await screen.findByRole('button', {
         name: /bulk actions/i,
       });
 
       await userEvent.click(bulkDropdown);
 
-      await screen.findByRole("menuitem", { name: /^dismiss$/i });
-      expect(screen.queryByRole("menuitem", { name: /toggle read state/i })).not.toBeInTheDocument();
-      expect(screen.queryByRole("menuitem", { name: /mark all as read/i })).not.toBeInTheDocument();
+      await screen.findByRole('menuitem', { name: /^dismiss$/i });
+      expect(screen.queryByRole('menuitem', { name: /toggle read state/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('menuitem', { name: /mark all as read/i })).not.toBeInTheDocument();
     });
   });
 
-  describe("row expansion", () => {
-    it("shows spinner while body is loading", async () => {
+  describe('row expansion', () => {
+    it('shows spinner while body is loading', async () => {
       asMock(useFetchEntities).mockReturnValue(mockFetchData([notif1]));
       asMock(useNotificationBody).mockReturnValue({
         data: undefined,
@@ -197,21 +179,21 @@ describe("SystemNotificationsTable", () => {
 
       render(<SystemNotificationsTable />);
 
-      const titleButton = await screen.findByRole("button", {
+      const titleButton = await screen.findByRole('button', {
         name: /show full message for: disk full on node1/i,
       });
 
       await userEvent.click(titleButton);
 
-      await screen.findByText("Loading...");
+      await screen.findByText('Loading...');
     });
 
-    it("renders HTML body in expanded section", async () => {
+    it('renders HTML body in expanded section', async () => {
       asMock(useFetchEntities).mockReturnValue(mockFetchData([notif1]));
       asMock(useNotificationBody).mockReturnValue({
         data: {
-          title: "Disk full on node1",
-          description: "<p>Full body content here</p>",
+          title: 'Disk full on node1',
+          description: '<p>Full body content here</p>',
         },
         isLoading: false,
         isError: false,
@@ -219,7 +201,7 @@ describe("SystemNotificationsTable", () => {
 
       render(<SystemNotificationsTable />);
 
-      const titleButton = await screen.findByRole("button", {
+      const titleButton = await screen.findByRole('button', {
         name: /show full message for: disk full on node1/i,
       });
 
@@ -228,7 +210,7 @@ describe("SystemNotificationsTable", () => {
       await screen.findByText(/full body content here/i);
     });
 
-    it("shows fallback message when body fetch fails", async () => {
+    it('shows fallback message when body fetch fails', async () => {
       asMock(useFetchEntities).mockReturnValue(mockFetchData([notif1]));
       asMock(useNotificationBody).mockReturnValue({
         data: undefined,
@@ -238,7 +220,7 @@ describe("SystemNotificationsTable", () => {
 
       render(<SystemNotificationsTable />);
 
-      const titleButton = await screen.findByRole("button", {
+      const titleButton = await screen.findByRole('button', {
         name: /show full message for: disk full on node1/i,
       });
 
@@ -248,8 +230,8 @@ describe("SystemNotificationsTable", () => {
     });
   });
 
-  describe("empty and error states", () => {
-    it("shows empty state when there are no notifications", async () => {
+  describe('empty and error states', () => {
+    it('shows empty state when there are no notifications', async () => {
       asMock(useFetchEntities).mockReturnValue({
         data: {
           list: [],
@@ -265,7 +247,7 @@ describe("SystemNotificationsTable", () => {
       await screen.findByText(/no notifications have been found/i);
     });
 
-    it("shows loading state while fetching", async () => {
+    it('shows loading state while fetching', async () => {
       asMock(useFetchEntities).mockReturnValue({
         data: undefined,
         refetch: jest.fn(),
@@ -274,7 +256,7 @@ describe("SystemNotificationsTable", () => {
 
       render(<SystemNotificationsTable />);
 
-      await screen.findByText("Loading...");
+      await screen.findByText('Loading...');
     });
   });
 });

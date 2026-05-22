@@ -29,9 +29,7 @@ type Props = { row: NotificationType };
 const capitalize = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
 
 const SeverityCell = ({ row }: Props) => (
-  <Badge bsStyle={COLOR_BY_SEVERITY[row.severity] ?? 'default'}>
-    {capitalize(row.severity)}
-  </Badge>
+  <Badge bsStyle={COLOR_BY_SEVERITY[row.severity] ?? 'default'}>{capitalize(row.severity)}</Badge>
 );
 
 export default SeverityCell;

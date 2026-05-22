@@ -95,7 +95,10 @@ describe('useNotificationBulkDismiss', () => {
       });
     });
 
-    expect(UserNotification.warning).toHaveBeenCalledWith(expect.stringMatching(/no notifications selected/i), expect.any(String));
+    expect(UserNotification.warning).toHaveBeenCalledWith(
+      expect.stringMatching(/no notifications selected/i),
+      expect.any(String),
+    );
   });
 
   it('shows an error toast on non-403/400 failures', async () => {
@@ -109,7 +112,10 @@ describe('useNotificationBulkDismiss', () => {
       });
     });
 
-    expect(UserNotification.error).toHaveBeenCalledWith(expect.stringMatching(/failed to dismiss/i), expect.any(String));
+    expect(UserNotification.error).toHaveBeenCalledWith(
+      expect.stringMatching(/failed to dismiss/i),
+      expect.any(String),
+    );
   });
 
   it('skips toast and invalidation on 403', async () => {

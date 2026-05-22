@@ -39,7 +39,10 @@ const TitleCell = ({ row }: Props) => {
   const { toggleSection } = useExpandedSections();
 
   return (
-    <TitleButton type="button" onClick={() => toggleSection(row.id, 'body')} aria-label={`Show full message for: ${row.title}`}>
+    <TitleButton
+      type="button"
+      onClick={() => toggleSection(row.id, 'body')}
+      aria-label={`Show full message for: ${row.title}`}>
       {row.title}
     </TitleButton>
   );

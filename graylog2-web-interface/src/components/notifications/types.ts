@@ -16,14 +16,11 @@
  */
 import type { SystemNotifications } from '@graylog/server-api';
 
-export type NotificationType = Awaited<
-  ReturnType<(typeof SystemNotifications)['getPaginated']>
->['elements'][number];
+export type NotificationType = Awaited<ReturnType<(typeof SystemNotifications)['getPaginated']>>['elements'][number];
 
 export type LegacyNotificationType = Awaited<
   ReturnType<(typeof SystemNotifications)['listNotifications']>
 >['notifications'][number];
-
 
 export type PageShape = {
   elements: NotificationType[];
@@ -33,6 +30,4 @@ export type PageShape = {
 export type Snapshot = Array<[readonly unknown[], PageShape | undefined]>;
 
 export const isPageShape = (value: unknown): value is PageShape =>
-  typeof value === 'object'
-  && value !== null
-  && Array.isArray((value as PageShape).elements);
+  typeof value === 'object' && value !== null && Array.isArray((value as PageShape).elements);

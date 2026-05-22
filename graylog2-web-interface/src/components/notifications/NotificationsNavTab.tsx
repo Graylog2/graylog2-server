@@ -29,7 +29,13 @@ const NotificationsNavTab = ({ text }: { text: string }) => {
 
   return (
     <span>
-      {text}{showBadge && <> <Badge bsStyle="danger">{data}</Badge></>}
+      {text}
+      {showBadge && (
+        <>
+          {' '}
+          <Badge bsStyle="danger">{data}</Badge>
+        </>
+      )}
     </span>
   );
 };

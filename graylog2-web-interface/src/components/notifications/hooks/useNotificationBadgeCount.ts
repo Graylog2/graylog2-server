@@ -27,7 +27,7 @@ const NO_SESSION_EXT: RequestOptions = { requestShouldExtendSession: false };
 const useNotificationBadgeCount = ({ enabled = true }: { enabled?: boolean } = {}) => {
   const { data, isLoading } = useQuery({
     queryKey: [...NOTIFICATIONS_QUERY_KEY, BADGE_COUNT_KEY],
-    queryFn: () => SystemNotifications.getUnreadCount(NO_SESSION_EXT),
+    queryFn: () => SystemNotifications.getCount(NO_SESSION_EXT),
     refetchInterval: POLL_INTERVAL,
     enabled,
   });

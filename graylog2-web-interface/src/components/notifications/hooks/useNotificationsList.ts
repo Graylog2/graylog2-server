@@ -38,20 +38,19 @@ export const fetchNotifications = (searchParams: SearchParams): Promise<Paginate
     searchParams.filters ? FiltersForQueryParams(searchParams.filters) : undefined,
     searchParams.sort.attributeId as SortField,
     searchParams.sort.direction,
-  ).then(({ elements, pagination, attributes }) => ({
-    list: elements,
-    pagination,
-    attributes,
-  // 404 means the backend endpoint is not yet available; return empty rather than toasting.
-  })).catch((err: { status?: number }) => {
-    if (err?.status === 404) return EMPTY_PAGE;
-    throw err;
-  });
+  )
+    .then(({ elements, pagination, attributes }) => ({
+      list: elements,
+      pagination,
+      attributes,
+      // 404 means the backend endpoint is not yet available; return empty rather than toasting.
+    }))
+    .catch((err: { status?: number }) => {
+      if (err?.status === 404) return EMPTY_PAGE;
+      throw err;
+    });
 
-const useNotificationsList = (
-  searchParams: SearchParams,
-  { enabled = true }: { enabled?: boolean } = {},
-) => {
+const useNotificationsList = (searchParams: SearchParams, { enabled = true }: { enabled?: boolean } = {}) => {
   const { data, isLoading, refetch } = useQuery({
     queryKey: keyFn(searchParams),
     queryFn: () => fetchNotifications(searchParams),

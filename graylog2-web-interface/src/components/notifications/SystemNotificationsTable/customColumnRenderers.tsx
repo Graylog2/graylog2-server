@@ -34,7 +34,7 @@ const customColumnRenderers = {
     description: {
       renderCell: (_description: string, row: NotificationType) => <DescriptionCell row={row} />,
     },
-    triggered_at: {
+    timestamp: {
       renderCell: (triggeredAt: string) => <TriggeredAtCell triggeredAt={triggeredAt} />,
     },
   },

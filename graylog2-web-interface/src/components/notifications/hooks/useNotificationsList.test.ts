@@ -32,7 +32,7 @@ const baseParams: SearchParams = {
   pageSize: 20,
   query: '',
   filters: undefined,
-  sort: { attributeId: 'triggered_at', direction: 'desc' },
+  sort: { attributeId: 'timestamp', direction: 'desc' },
 };
 
 describe('fetchNotifications', () => {
@@ -51,7 +51,7 @@ describe('fetchNotifications', () => {
 
     expect(result.list).toEqual([{ id: 'n-1' }]);
     expect(result.pagination.total).toBe(1);
-    expect(getPaginatedMock).toHaveBeenCalledWith(1, 20, '', undefined, 'triggered_at', 'desc');
+    expect(getPaginatedMock).toHaveBeenCalledWith(1, 20, '', undefined, 'timestamp', 'desc');
   });
 
   it('returns an empty page silently on 404 instead of throwing', async () => {

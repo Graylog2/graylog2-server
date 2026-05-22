@@ -28,7 +28,7 @@ const useNotificationDismiss = () => {
   const badgeKey = [...NOTIFICATIONS_QUERY_KEY, BADGE_COUNT_KEY] as const;
 
   return useMutation<void, FetchError, { id: string }>({
-    mutationFn: ({ id }) => SystemNotifications.deleteById(id),
+    mutationFn: ({ id }) => SystemNotifications.deleteNotificationById(id),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: tableKey });

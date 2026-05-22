@@ -26,7 +26,7 @@ import UserNotification from 'util/UserNotification';
 import useNotificationDismiss from './useNotificationDismiss';
 
 jest.mock('@graylog/server-api', () => ({
-  SystemNotifications: { deleteById: jest.fn() },
+  SystemNotifications: { deleteNotificationById: jest.fn() },
 }));
 
 jest.mock('util/UserNotification', () => ({
@@ -37,7 +37,7 @@ jest.mock('util/UserNotification', () => ({
 const TABLE_KEY = ['system', 'notifications', 'table'] as const;
 const BADGE_KEY = ['system', 'notifications', 'badge-count'] as const;
 
-const deleteByIdMock = SystemNotifications.deleteById as jest.Mock;
+const deleteNotificationByIdMock = SystemNotifications.deleteNotificationById as jest.Mock;
 
 const buildWrapper = (queryClient: QueryClient) => {
   const Wrapper = ({ children }: { children: React.ReactNode }) =>
@@ -56,8 +56,8 @@ describe('useNotificationDismiss', () => {
     });
   });
 
-  it('calls deleteById with the given id', async () => {
-    deleteByIdMock.mockResolvedValue(undefined);
+  it('calls deleteNotificationById with the given id', async () => {
+    deleteNotificationByIdMock.mockResolvedValue(undefined);
 
     const { result } = renderHook(() => useNotificationDismiss(), { wrapper: buildWrapper(queryClient) });
 
@@ -65,11 +65,11 @@ describe('useNotificationDismiss', () => {
       await result.current.mutateAsync({ id: 'row-1' });
     });
 
-    expect(deleteByIdMock).toHaveBeenCalledWith('row-1');
+    expect(deleteNotificationByIdMock).toHaveBeenCalledWith('row-1');
   });
 
   it('invalidates table and badge-count keys on success', async () => {
-    deleteByIdMock.mockResolvedValue(undefined);
+    deleteNotificationByIdMock.mockResolvedValue(undefined);
     const invalidateSpy = jest.spyOn(queryClient, 'invalidateQueries');
 
     const { result } = renderHook(() => useNotificationDismiss(), { wrapper: buildWrapper(queryClient) });
@@ -85,7 +85,7 @@ describe('useNotificationDismiss', () => {
   });
 
   it('silently invalidates table on 404 (notification already gone)', async () => {
-    deleteByIdMock.mockRejectedValue({ status: 404 });
+    deleteNotificationByIdMock.mockRejectedValue({ status: 404 });
     const invalidateSpy = jest.spyOn(queryClient, 'invalidateQueries');
 
     const { result } = renderHook(() => useNotificationDismiss(), { wrapper: buildWrapper(queryClient) });
@@ -101,7 +101,7 @@ describe('useNotificationDismiss', () => {
   });
 
   it('shows an error toast on non-403/404 failures', async () => {
-    deleteByIdMock.mockRejectedValue({ status: 500 });
+    deleteNotificationByIdMock.mockRejectedValue({ status: 500 });
 
     const { result } = renderHook(() => useNotificationDismiss(), { wrapper: buildWrapper(queryClient) });
 
@@ -111,11 +111,14 @@ describe('useNotificationDismiss', () => {
       });
     });
 
-    expect(UserNotification.error).toHaveBeenCalledWith(expect.stringMatching(/failed to dismiss/i), expect.any(String));
+    expect(UserNotification.error).toHaveBeenCalledWith(
+      expect.stringMatching(/failed to dismiss/i),
+      expect.any(String),
+    );
   });
 
   it('skips toast and invalidation on 403', async () => {
-    deleteByIdMock.mockRejectedValue({ status: 403 });
+    deleteNotificationByIdMock.mockRejectedValue({ status: 403 });
     const invalidateSpy = jest.spyOn(queryClient, 'invalidateQueries');
 
     const { result } = renderHook(() => useNotificationDismiss(), { wrapper: buildWrapper(queryClient) });

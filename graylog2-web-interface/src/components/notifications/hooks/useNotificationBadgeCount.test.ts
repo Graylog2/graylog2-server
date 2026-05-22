@@ -25,10 +25,10 @@ import asMock from 'helpers/mocking/AsMock';
 import useNotificationBadgeCount from './useNotificationBadgeCount';
 
 jest.mock('@graylog/server-api', () => ({
-  SystemNotifications: { getUnreadCount: jest.fn() },
+  SystemNotifications: { getCount: jest.fn() },
 }));
 
-const getUnreadCountMock = asMock(SystemNotifications.getUnreadCount);
+const getCountMock = asMock(SystemNotifications.getCount);
 
 const buildWrapper = (queryClient: QueryClient) => {
   const Wrapper = ({ children }: { children: React.ReactNode }) =>
@@ -47,20 +47,20 @@ describe('useNotificationBadgeCount', () => {
     });
   });
 
-  it('calls SystemNotifications.getUnreadCount with no session extension', async () => {
-    getUnreadCountMock.mockResolvedValue(7);
+  it('calls SystemNotifications.getCount with no session extension', async () => {
+    getCountMock.mockResolvedValue(7);
 
     renderHook(() => useNotificationBadgeCount(), { wrapper: buildWrapper(queryClient) });
 
     await waitFor(() => {
-      expect(getUnreadCountMock).toHaveBeenCalled();
+      expect(getCountMock).toHaveBeenCalled();
     });
 
-    expect(getUnreadCountMock).toHaveBeenCalledWith({ requestShouldExtendSession: false });
+    expect(getCountMock).toHaveBeenCalledWith({ requestShouldExtendSession: false });
   });
 
-  it('returns the count from getUnreadCount', async () => {
-    getUnreadCountMock.mockResolvedValue(42);
+  it('returns the count from getCount', async () => {
+    getCountMock.mockResolvedValue(42);
 
     const { result } = renderHook(() => useNotificationBadgeCount(), { wrapper: buildWrapper(queryClient) });
 
@@ -71,7 +71,6 @@ describe('useNotificationBadgeCount', () => {
   it('does not fetch when enabled=false (permission-gate)', () => {
     renderHook(() => useNotificationBadgeCount({ enabled: false }), { wrapper: buildWrapper(queryClient) });
 
-    expect(getUnreadCountMock).not.toHaveBeenCalled();
+    expect(getCountMock).not.toHaveBeenCalled();
   });
-
 });

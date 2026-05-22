@@ -26,9 +26,12 @@ const BulkActions = () => {
   const { mutate: bulkDismiss } = useNotificationBulkDismiss();
 
   const handleBulkDismiss = () => {
-    bulkDismiss({ entity_ids: selectedEntities }, {
-      onSuccess: () => setSelectedEntities([]),
-    });
+    bulkDismiss(
+      { entity_ids: selectedEntities },
+      {
+        onSuccess: () => setSelectedEntities([]),
+      },
+    );
   };
 
   return (

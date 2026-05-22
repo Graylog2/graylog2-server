@@ -14,22 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from "react";
-import styled, { css } from "styled-components";
+import * as React from 'react';
+import styled, { css } from 'styled-components';
 
-import { PaginatedEntityTable } from "components/common";
-import { Row, Col } from "components/bootstrap";
-import type { Sort } from "stores/PaginationTypes";
-import type { NotificationType } from "components/notifications/types";
-import {
-  fetchNotifications,
-  keyFn,
-} from "components/notifications/hooks/useNotificationsList";
+import { PaginatedEntityTable } from 'components/common';
+import { Row, Col } from 'components/bootstrap';
+import type { Sort } from 'stores/PaginationTypes';
+import type { NotificationType } from 'components/notifications/types';
+import { fetchNotifications, keyFn } from 'components/notifications/hooks/useNotificationsList';
 
-import expandedSections from "./expandedSections";
-import BulkActions from "./BulkActions";
-import ActionsCell from "./cells/ActionsCell";
-import customColumnRenderers from "./customColumnRenderers";
+import expandedSections from './expandedSections';
+import BulkActions from './BulkActions';
+import ActionsCell from './cells/ActionsCell';
+import customColumnRenderers from './customColumnRenderers';
 
 const StyledHeading = styled.h2(
   ({ theme }) => css`
@@ -38,11 +35,11 @@ const StyledHeading = styled.h2(
 );
 
 const TABLE_LAYOUT = {
-  entityTableId: "system-notifications",
+  entityTableId: 'system-notifications',
   defaultPageSize: 20,
-  defaultSort: { attributeId: "triggered_at", direction: "desc" } as Sort,
-  defaultDisplayedAttributes: ["title", "severity", "triggered_at"],
-  defaultColumnOrder: ["title", "severity", "description", "triggered_at"],
+  defaultSort: { attributeId: 'timestamp', direction: 'desc' } as Sort,
+  defaultDisplayedAttributes: ['title', 'severity', 'timestamp'],
+  defaultColumnOrder: ['title', 'severity', 'description', 'timestamp'],
 };
 
 const REFETCH_INTERVAL = 3000;

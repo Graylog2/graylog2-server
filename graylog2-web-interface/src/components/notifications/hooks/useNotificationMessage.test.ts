@@ -62,12 +62,7 @@ describe('useNotificationMessage', () => {
     expect(useQuery).toHaveBeenCalledTimes(1);
     const queryKey = asMock(useQuery).mock.calls[0][0].queryKey;
 
-    expect(queryKey.slice(0, 4)).toEqual([
-      'system',
-      'notifications',
-      'message',
-      'first-id',
-    ]);
+    expect(queryKey.slice(0, 4)).toEqual(['system', 'notifications', 'message', 'first-id']);
     expect(queryKey).toContain('no_input_running');
   });
 

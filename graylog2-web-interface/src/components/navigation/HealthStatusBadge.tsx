@@ -20,7 +20,7 @@ import type * as Immutable from 'immutable';
 
 import { Icon, LinkContainer } from 'components/common';
 import { Badge, Nav } from 'components/bootstrap';
-import useNotifications from 'components/notifications/useNotifications';
+import useNotificationBadgeCount from 'components/notifications/hooks/useNotificationBadgeCount';
 import { STATUS_LABELS } from 'components/health/healthStatusCopy';
 import { useHealthSummary } from 'components/health/useHealthModule';
 import useHealthModuleVisible, { HEALTH_QUERY_PARAM, HEALTH_ON_VALUE } from 'components/health/useHealthModuleVisible';
@@ -81,11 +81,9 @@ const HealthStatusBadge = () => {
   const { overallStatus } = useHealthSummary();
   const currentUser = useCurrentUser();
   const canReadNotifications = hasNotificationPermission(currentUser.permissions);
-  const { data: notifications } = useNotifications({ enabled: canReadNotifications });
+  const { data: notificationCount } = useNotificationBadgeCount({ enabled: canReadNotifications });
 
   if (!hasEnterpriseLicense || !showHealthModule) return null;
-
-  const notificationCount = notifications?.total ?? 0;
   const statusLabel = STATUS_LABELS[overallStatus];
   const overviewWithHealthOn = `${Routes.SYSTEM.OVERVIEW}?${HEALTH_QUERY_PARAM}=${HEALTH_ON_VALUE}`;
   const accessibleLabel =
