@@ -25,8 +25,11 @@ import { keyFn, fetchEventDefinitions } from 'components/event-definitions/hooks
 import BulkActions from 'components/event-definitions/event-definitions/BulkActions';
 import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
 import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
+import { TagsRenderer } from 'components/events/events/ColumnRenderers';
 
 import EventDefinitionActions from './EventDefinitionActions';
+import EventDefinitionNotificationsCell from './EventDefinitionNotificationsCell';
+import ExpandedNotificationsSection from './ExpandedNotificationsSection';
 import SchedulingCell from './SchedulingCell';
 import StatusCell from './StatusCell';
 
@@ -58,6 +61,11 @@ const getCustomColumnRenderers = (pluggableColumnRenderers?: ColumnRenderersByAt
     priority: {
       staticWidth: 'matchHeader' as const,
     },
+    notifications: {
+      renderCell: (_notifications: EventDefinition['notifications'], eventDefinition: EventDefinition) => (
+        <EventDefinitionNotificationsCell eventDefinition={eventDefinition} />
+      ),
+    },
     '_entity_source.source': {
       renderCell: (_title: string, eventDefinition: EventDefinition) => (
         <span>
@@ -66,6 +74,11 @@ const getCustomColumnRenderers = (pluggableColumnRenderers?: ColumnRenderersByAt
             : 'User Defined'}
         </span>
       ),
+    },
+    tags: {
+      renderCell: (_tags: string[], eventDefinition: EventDefinition) => <TagsRenderer tags={eventDefinition.tags} />,
+      width: 0.2,
+      minWidth: 160,
     },
     ...(pluggableColumnRenderers || {}),
   },
@@ -78,12 +91,22 @@ const renderEventDefinitionActions = (listItem: EventDefinition) => (
   <EventDefinitionActions eventDefinition={listItem} />
 );
 
+const renderExpandedNotifications = (eventDefinition: EventDefinition) => (
+  <ExpandedNotificationsSection eventDefinition={eventDefinition} />
+);
+
+const notificationsExpandedSection = {
+  title: 'Notifications',
+  content: renderExpandedNotifications,
+};
+
 const EventDefinitionsContainer = () => {
   const { pluggableColumnRenderers, pluggableAttributes, pluggableExpandedSections } =
     usePluggableEntityTableElements<EventDefinition>(null, 'event_definition');
   const { defaultLayout, additionalAttributes } = getEventDefinitionTableElements(pluggableAttributes);
   const expandedSections = useMemo(
     () => ({
+      notifications: notificationsExpandedSection,
       ...pluggableExpandedSections,
     }),
     [pluggableExpandedSections],
