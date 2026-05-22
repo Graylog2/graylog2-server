@@ -73,7 +73,7 @@ public class InputMessagesPerStreamDescriptor implements EntityCachedMetricDescr
                         .collect(Collectors.joining(" OR ")),
                 RelativeRange.create(MetricsCacheConfiguration.RANGE_SECONDS_24H),
                 FIELD_GL2_SOURCE_INPUT, "streams",
-                entityIds.size(), Integer.MAX_VALUE);
+                entityIds.size(), MetricsCacheConfiguration.MAX_TERMS_SIZE);
 
         return entityIds.stream()
                 .map(id -> new EntityMetric<>(id, grouped.getOrDefault(id, Map.of())))

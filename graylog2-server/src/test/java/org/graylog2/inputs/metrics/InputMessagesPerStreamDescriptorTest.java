@@ -19,6 +19,7 @@ package org.graylog2.inputs.metrics;
 import org.graylog.events.search.MoreSearch;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.metrics.entity.EntityMetric;
+import org.graylog2.metrics.entity.cache.MetricsCacheConfiguration;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -66,7 +67,7 @@ class InputMessagesPerStreamDescriptorTest {
                 eq(FIELD_GL2_SOURCE_INPUT + ":input1 OR " + FIELD_GL2_SOURCE_INPUT + ":input2"),
                 any(RelativeRange.class),
                 eq(FIELD_GL2_SOURCE_INPUT), eq("streams"),
-                eq(2), eq(Integer.MAX_VALUE));
+                eq(2), eq(MetricsCacheConfiguration.MAX_TERMS_SIZE));
 
         assertThat(result).extracting(EntityMetric::entityId).containsExactlyInAnyOrder("input1", "input2");
         assertThat(result).filteredOn(m -> m.entityId().equals("input1"))
