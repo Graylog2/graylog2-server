@@ -73,6 +73,15 @@ public interface MoreSearchAdapter {
                                                          String groupByField, String termsField,
                                                          int maxBuckets, int maxSubBuckets);
 
+    /**
+     * Performs a terms aggregation on {@code termsField} and returns the doc count per term.
+     *
+     * @return map of term value → doc count
+     */
+    Map<String, Long> aggregateTerms(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                     SourceStreamFilter sourceStreamFilter,
+                                     String termsField, int maxBuckets);
+
     enum AggregationType { AVG, MAX }
 
     /**
