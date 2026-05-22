@@ -35,7 +35,7 @@ const Wrapper = styled.div(
   `,
 );
 
-const TagsContainer = styled.div(
+const ChipsContainer = styled.div(
   ({ theme }) => css`
     display: flex;
     flex-wrap: wrap;
@@ -48,7 +48,7 @@ const HoverableLabel = styled(Label)(
   ({ theme }) => css`
     transition: background-color 0.1s ease-in-out;
 
-    /* Override bootstrap Label defaults so a long tag wraps inside the cell. */
+    /* Override bootstrap Label defaults so a long chip wraps inside the cell. */
     display: inline-block;
     max-width: 100%;
     white-space: normal;
@@ -61,7 +61,7 @@ const HoverableLabel = styled(Label)(
   `,
 );
 
-const TagButton = styled.button(
+const ChipButton = styled.button(
   ({ theme }) => css`
     background: transparent;
     border: 0;
@@ -102,63 +102,70 @@ const ToggleButton = styled.button(
 );
 
 type Props = {
-  tags: ReadonlyArray<string> | undefined | null;
-  onTagClick?: (tag: string) => void;
+  items: ReadonlyArray<string> | undefined | null;
+  onItemClick?: (item: string) => void;
   collapsedCount?: number;
   truncate?: boolean;
   emptyFallback?: React.ReactNode;
+  renderItem?: (item: string) => React.ReactNode;
+  itemLabel?: string;
 };
 
-const TagsCell = ({
-  tags,
-  onTagClick = undefined,
+const ChipsCell = ({
+  items,
+  onItemClick = undefined,
   collapsedCount = DEFAULT_COLLAPSED_COUNT,
   truncate = true,
   emptyFallback = null,
+  renderItem: customRenderItem = undefined,
+  itemLabel = 'item',
 }: Props) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  if (!tags?.length) {
+  if (!items?.length) {
     return <>{emptyFallback}</>;
   }
 
-  const sortedTags = [...tags].sort();
-  const isTruncated = truncate && sortedTags.length > collapsedCount;
-  const visibleTags = !isExpanded && isTruncated ? sortedTags.slice(0, collapsedCount) : sortedTags;
-  const hiddenCount = sortedTags.length - collapsedCount;
+  const sorted = [...items].sort();
+  const isTruncated = truncate && sorted.length > collapsedCount;
+  const visible = !isExpanded && isTruncated ? sorted.slice(0, collapsedCount) : sorted;
+  const hiddenCount = sorted.length - collapsedCount;
 
-  const renderTag = (tag: string) => {
-    if (!onTagClick) {
+  const renderChip = (item: string) => {
+    if (customRenderItem) {
+      return <React.Fragment key={item}>{customRenderItem(item)}</React.Fragment>;
+    }
+    if (!onItemClick) {
       return (
-        <span key={tag}>
-          <HoverableLabel bsStyle="default">{tag}</HoverableLabel>
+        <span key={item}>
+          <HoverableLabel bsStyle="default">{item}</HoverableLabel>
         </span>
       );
     }
 
     return (
-      <TagButton
-        key={tag}
+      <ChipButton
+        key={item}
         type="button"
         onClick={(e: React.MouseEvent) => {
           e.stopPropagation();
-          onTagClick(tag);
+          onItemClick(item);
         }}
-        aria-label={`Filter by tag "${tag}"`}
-        title={`Filter by tag "${tag}"`}>
-        <HoverableLabel bsStyle="default">{tag}</HoverableLabel>
-      </TagButton>
+        aria-label={`Filter by ${itemLabel} "${item}"`}
+        title={`Filter by ${itemLabel} "${item}"`}>
+        <HoverableLabel bsStyle="default">{item}</HoverableLabel>
+      </ChipButton>
     );
   };
 
   return (
     <Wrapper>
-      <TagsContainer>{visibleTags.map(renderTag)}</TagsContainer>
+      <ChipsContainer>{visible.map(renderChip)}</ChipsContainer>
       {isTruncated && (
         <ToggleButton
           type="button"
-          aria-label={isExpanded ? 'Show fewer tags' : 'Show all tags'}
-          title={isExpanded ? 'Show fewer tags' : 'Show all tags'}
+          aria-label={isExpanded ? 'Show fewer' : 'Show all'}
+          title={isExpanded ? 'Show fewer' : 'Show all'}
           onClick={(e: React.MouseEvent) => {
             e.stopPropagation();
             setIsExpanded((v) => !v);
@@ -170,4 +177,4 @@ const TagsCell = ({
   );
 };
 
-export default TagsCell;
+export default ChipsCell;

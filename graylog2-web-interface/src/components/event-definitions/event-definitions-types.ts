@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { SyntheticEvent } from 'react';
+import type { ComponentType, ReactNode, SyntheticEvent } from 'react';
 
 import type { StepsType } from 'components/common/Wizard';
 import type { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
@@ -112,7 +112,7 @@ export type EventDefinition = {
   matched_at: string;
   scheduler: Scheduler;
   event_summary_template: string;
-  mitre_categories: string[];
+  tactics_techniques: string[];
 };
 
 export type EventDefinitionFormControlsProps = {
@@ -133,3 +133,23 @@ export const isAggregationEventDefinition = (eventDefinition: EventDefinition) =
 
 export const isSigmaEventDefinition = (eventDefinition: EventDefinition) =>
   eventDefinition?.config?.type === 'sigma-v1';
+
+export type TacticsTechniquesEditorPlugin = {
+  component: ComponentType<{
+    value: ReadonlyArray<string>;
+    onChange: (next: string[]) => void;
+    disabled?: boolean;
+    error?: ReactNode;
+  }>;
+};
+
+export type TacticsTechniquesChipPlugin = {
+  component: ComponentType<{ id: string }>;
+};
+
+declare module 'graylog-web-plugin/plugin' {
+  interface PluginExports {
+    'eventDefinitions.tacticsTechniquesEditor'?: Array<TacticsTechniquesEditorPlugin>;
+    'eventDefinitions.tacticsTechniquesChip'?: Array<TacticsTechniquesChipPlugin>;
+  }
+}

@@ -58,7 +58,7 @@ public abstract class EventDto {
     public static final String FIELD_GROUP_BY_FIELDS = "group_by_fields";
     public static final String FIELD_AGGREGATION_CONDITIONS = "aggregation_conditions";
     public static final String FIELD_REPLAY_INFO = "replay_info";
-    public static final String FIELD_MITRE_CATEGORIES = "mitre_categories";
+    public static final String FIELD_TACTICS_TECHNIQUES = "tactics_techniques";
 
     @JsonProperty(FIELD_ID)
     public abstract String id();
@@ -131,8 +131,8 @@ public abstract class EventDto {
     @JsonProperty(FIELD_REPLAY_INFO)
     public abstract Optional<EventReplayInfo> replayInfo();
 
-    @JsonProperty(FIELD_MITRE_CATEGORIES)
-    public abstract List<String> mitreCategories();
+    @JsonProperty(FIELD_TACTICS_TECHNIQUES)
+    public abstract List<String> tacticsTechniques();
 
     public static Builder builder() {
         return Builder.create();
@@ -153,7 +153,7 @@ public abstract class EventDto {
                     .aggregationConditions(ImmutableMap.of())
                     .scores(ImmutableMap.of())
                     .associatedAssets(ImmutableSet.of())
-                    .mitreCategories(ImmutableList.of())
+                    .tacticsTechniques(ImmutableList.of())
                     .tags(ImmutableSet.of());
         }
 
@@ -230,8 +230,8 @@ public abstract class EventDto {
         @JsonProperty(FIELD_REPLAY_INFO)
         public abstract Builder replayInfo(@Nullable EventReplayInfo replayInfo);
 
-        @JsonProperty(FIELD_MITRE_CATEGORIES)
-        public abstract Builder mitreCategories(List<String> mitreCategories);
+        @JsonProperty(FIELD_TACTICS_TECHNIQUES)
+        public abstract Builder tacticsTechniques(List<String> tacticsTechniques);
 
         public abstract EventDto build();
     }

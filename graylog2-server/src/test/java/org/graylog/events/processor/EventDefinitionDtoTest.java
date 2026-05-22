@@ -139,6 +139,14 @@ public class EventDefinitionDtoTest {
     }
 
     @Test
+    public void testTacticsTechniquesCanonicalizedToUpperCaseOnBuild() {
+        final EventDefinitionDto dto = testSubject.toBuilder()
+                .tacticsTechniques(ImmutableList.of("ta0002", "T1059", "t1059.001"))
+                .build();
+        assertThat(dto.tacticsTechniques()).containsExactly("TA0002", "T1059", "T1059.001");
+    }
+
+    @Test
     public void testValidEventDefinitionWithKeySpecInFieldSpec() {
         final EventFieldSpec fieldSpecMock = mock(EventFieldSpec.class);
         final EventDefinitionDto invalidEventDefinition = testSubject.toBuilder()

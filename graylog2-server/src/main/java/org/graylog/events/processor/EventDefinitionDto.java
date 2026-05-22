@@ -57,7 +57,6 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @AutoValue
@@ -76,10 +75,8 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
     public static final String FIELD_PRIORITY = "priority";
     public static final String FIELD_ALERT = "alert";
     public static final String FIELD_CONFIG = "config";
-    public static final String FIELD_MITRE_CATEGORIES = "mitre_categories";
-    public static final int MAX_MITRE_VALUES = 64;
-    // Single regex covers tactics (TA0000), techniques (T0000), and sub-techniques (T0000.000).
-    static final Pattern MITRE_CATEGORY_PATTERN = Pattern.compile("^(TA\\d{4}|T\\d{4}(\\.\\d{3})?)$");
+    public static final String FIELD_TACTICS_TECHNIQUES = "tactics_techniques";
+    public static final int MAX_TACTICS_TECHNIQUES = 64;
     public static final String FIELD_TAGS = "tags";
     public static final int MAX_TAG_LENGTH = 128;
     public static final int MAX_TAGS = 64;
@@ -178,8 +175,8 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
     public abstract String eventSummaryTemplate();
 
     @Override
-    @JsonProperty(FIELD_MITRE_CATEGORIES)
-    public abstract ImmutableList<String> mitreCategories();
+    @JsonProperty(FIELD_TACTICS_TECHNIQUES)
+    public abstract ImmutableList<String> tacticsTechniques();
 
     public static Builder builder() {
         return Builder.create();
@@ -218,14 +215,14 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
             validation.addError(FIELD_KEY_SPEC, "Event Definition key_spec can only contain fields defined in field_spec.");
         }
 
-        if (mitreCategories().size() > MAX_MITRE_VALUES) {
-            validation.addError(FIELD_MITRE_CATEGORIES, "Event Definition cannot have more than " + MAX_MITRE_VALUES + " MITRE categories.");
+        if (tacticsTechniques().size() > MAX_TACTICS_TECHNIQUES) {
+            validation.addError(FIELD_TACTICS_TECHNIQUES, "Event Definition cannot have more than " + MAX_TACTICS_TECHNIQUES + " tactics/techniques.");
         }
-        if (eventDefinitionConfiguration.isMitreIdValidationEnabled()) {
-            for (String category : mitreCategories()) {
-                if (!MITRE_CATEGORY_PATTERN.matcher(category).matches()) {
-                    validation.addError(FIELD_MITRE_CATEGORIES,
-                            "Invalid MITRE ID: \"" + category + "\". Expected format: TA0000, T0000, or T0000.000.");
+        if (eventDefinitionConfiguration.isTacticsTechniquesValidationEnabled()) {
+            for (String id : tacticsTechniques()) {
+                if (!TacticsTechniquesNormalizer.isValid(id)) {
+                    validation.addError(FIELD_TACTICS_TECHNIQUES,
+                            "Invalid MITRE ATT&CK™ ID: \"" + id + "\". Expected format: TA0000, T0000, or T0000.000.");
                     break;
                 }
             }
@@ -256,7 +253,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
                     .fieldSpec(ImmutableMap.of())
                     .notifications(ImmutableList.of())
                     .storage(ImmutableList.of())
-                    .mitreCategories(ImmutableList.of())
+                    .tacticsTechniques(ImmutableList.of())
                     .tags(ImmutableSet.of())
                     .state(EventDefinition.State.DISABLED);
         }
@@ -328,15 +325,18 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
         @JsonProperty(FIELD_EVENT_SUMMARY_TEMPLATE)
         public abstract Builder eventSummaryTemplate(@Nullable String eventSummaryTemplate);
 
-        @JsonProperty(FIELD_MITRE_CATEGORIES)
-        public abstract Builder mitreCategories(ImmutableList<String> mitreCategories);
+        @JsonProperty(FIELD_TACTICS_TECHNIQUES)
+        public abstract Builder tacticsTechniques(ImmutableList<String> tacticsTechniques);
 
         abstract ImmutableSet<String> tags();
+
+        abstract ImmutableList<String> tacticsTechniques();
 
         abstract EventDefinitionDto autoBuild();
 
         public EventDefinitionDto build() {
             tags(TagNormalizer.normalize(tags()));
+            tacticsTechniques(TacticsTechniquesNormalizer.normalize(tacticsTechniques()));
             final EventDefinitionDto dto = autoBuild();
             final PersistToStreamsStorageHandler.Config withSystemEventsStream = PersistToStreamsStorageHandler.Config.createWithSystemEventsStream();
             if (dto.storage().stream().anyMatch(withSystemEventsStream::equals)) {
@@ -394,7 +394,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
                 .tags(tags())
                 .eventProcedureId(ValueReference.ofNullable(procedureDescriptorId))
                 .eventSummaryTemplate(ValueReference.ofNullable(eventSummaryTemplate()))
-                .mitreCategories(mitreCategories())
+                .tacticsTechniques(tacticsTechniques())
                 .build();
     }
 

@@ -58,7 +58,7 @@ export const simpleEventDefinition: EventDefinition = {
     entity_type: 'event_definition',
   },
   state: 'ENABLED',
-  mitre_categories: [],
+  tactics_techniques: [],
   remediation_steps: '',
   event_procedure: '',
   event_summary_template: '',

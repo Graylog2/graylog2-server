@@ -14,29 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog.events.processor;
 
-import DefinitionList from 'components/common/DefinitionList';
-import ChipsCell from 'components/events/ChipsCell';
-import useAppendTagFilter from 'components/events/useAppendTagFilter';
+import org.graylog2.plugin.rest.ValidationResult;
 
-type Props = {
-  tags: ReadonlyArray<string> | undefined | null;
-};
+/** Extension point for tactics_techniques validation. Enterprise overrides the OSS no-op. */
+public interface TacticsTechniquesValidator {
+    void validate(EventDefinitionDto dto, ValidationResult result);
 
-const TagsDetailRow = ({ tags }: Props) => {
-  const onTagClick = useAppendTagFilter();
-
-  if (!tags?.length) return null;
-
-  return (
-    <DefinitionList>
-      <dt>Tags</dt>
-      <dd>
-        <ChipsCell items={tags} truncate={false} onItemClick={onTagClick} itemLabel="tag" />
-      </dd>
-    </DefinitionList>
-  );
-};
-
-export default TagsDetailRow;
+    final class NoOp implements TacticsTechniquesValidator {
+        @Override
+        public void validate(EventDefinitionDto dto, ValidationResult result) {}
+    }
+}

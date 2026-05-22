@@ -200,7 +200,7 @@ public abstract class EventsIndexMapping extends AbstractMapping {
                 .put(FIELD_ASSOCIATED_ASSETS, map()
                         .put("type", "keyword")
                         .build())
-                .put(EventDto.FIELD_MITRE_CATEGORIES, map()
+                .put(EventDto.FIELD_TACTICS_TECHNIQUES, map()
                         .put("type", "keyword")
                         .build())
                 .put(EventDto.FIELD_TAGS, map()

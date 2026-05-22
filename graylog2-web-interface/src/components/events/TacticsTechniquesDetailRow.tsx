@@ -18,25 +18,22 @@ import * as React from 'react';
 
 import DefinitionList from 'components/common/DefinitionList';
 import ChipsCell from 'components/events/ChipsCell';
-import useAppendTagFilter from 'components/events/useAppendTagFilter';
 
 type Props = {
-  tags: ReadonlyArray<string> | undefined | null;
+  tacticsTechniques: ReadonlyArray<string> | undefined | null;
 };
 
-const TagsDetailRow = ({ tags }: Props) => {
-  const onTagClick = useAppendTagFilter();
-
-  if (!tags?.length) return null;
+const TacticsTechniquesDetailRow = ({ tacticsTechniques }: Props) => {
+  if (!tacticsTechniques?.length) return null;
 
   return (
     <DefinitionList>
-      <dt>Tags</dt>
+      <dt>Tactics/Techniques</dt>
       <dd>
-        <ChipsCell items={tags} truncate={false} onItemClick={onTagClick} itemLabel="tag" />
+        <ChipsCell items={tacticsTechniques} truncate={false} />
       </dd>
     </DefinitionList>
   );
 };
 
-export default TagsDetailRow;
+export default TacticsTechniquesDetailRow;

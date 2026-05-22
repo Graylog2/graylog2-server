@@ -99,6 +99,9 @@ public class EventsModule extends PluginModule {
         OptionalBinder.newOptionalBinder(binder(), EventResolver.class)
                 .setDefault().to(DefaultEventResolver.class);
 
+        OptionalBinder.newOptionalBinder(binder(), org.graylog.events.processor.TacticsTechniquesValidator.class)
+                .setDefault().to(org.graylog.events.processor.TacticsTechniquesValidator.NoOp.class);
+
         addSystemRestResource(AvailableEntityTypesResource.class);
         addSystemRestResource(EventDefinitionsResource.class);
         addSystemRestResource(EventNotificationsResource.class);

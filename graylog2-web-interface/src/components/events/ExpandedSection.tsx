@@ -23,6 +23,7 @@ import useNonDisplayedAttributes from 'components/events/events/hooks/useNonDisp
 import type { DefaultLayout } from 'components/common/EntityDataTable/types';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
+import TacticsTechniquesDetailRow from 'components/events/TacticsTechniquesDetailRow';
 import TagsDetailRow from 'components/events/TagsDetailRow';
 
 const noDetails = <em>No further details</em>;
@@ -36,8 +37,9 @@ const GeneralEventDetails = ({ defaultLayout, event }: Props) => {
   const { meta } = useMetaDataContext<EventsAdditionalData>();
   const nonDisplayedAttributes = useNonDisplayedAttributes(defaultLayout);
   const hasTags = !!event.tags?.length;
+  const hasTacticsTechniques = !!event.tactics_techniques?.length;
 
-  if (!nonDisplayedAttributes.length && !hasTags) return noDetails;
+  if (!nonDisplayedAttributes.length && !hasTags && !hasTacticsTechniques) return noDetails;
 
   return (
     <>
@@ -45,6 +47,7 @@ const GeneralEventDetails = ({ defaultLayout, event }: Props) => {
         <GeneralEventDetailsTable attributesList={nonDisplayedAttributes} event={event} meta={meta} />
       ) : null}
       <TagsDetailRow tags={event.tags} />
+      <TacticsTechniquesDetailRow tacticsTechniques={event.tactics_techniques} />
     </>
   );
 };

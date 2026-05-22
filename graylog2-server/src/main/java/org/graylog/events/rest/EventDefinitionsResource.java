@@ -133,7 +133,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
             .put("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
             .put("title", SearchQueryField.create(EventDefinitionDto.FIELD_TITLE))
             .put("description", SearchQueryField.create(EventDefinitionDto.FIELD_DESCRIPTION))
-            .put(EventDefinitionDto.FIELD_MITRE_CATEGORIES, SearchQueryField.create(EventDefinitionDto.FIELD_MITRE_CATEGORIES))
+            .put(EventDefinitionDto.FIELD_TACTICS_TECHNIQUES, SearchQueryField.create(EventDefinitionDto.FIELD_TACTICS_TECHNIQUES))
             .put(EventDefinitionDto.FIELD_TAGS, SearchQueryField.create(EventDefinitionDto.FIELD_TAGS))
             .put(SourcedMongoEntityUtils.SEARCH_QUERY_TITLE, SearchQueryField.create(SourcedMongoEntityUtils.FILTERABLE_FIELD))
             .build();
@@ -150,7 +150,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                     .filterable(true)
                     .filterOptions(DBEntitySourceService.FILTER_OPTIONS)
                     .build(),
-            EntityAttribute.builder().id(EventDefinitionDto.FIELD_MITRE_CATEGORIES).title("MITRE")
+            EntityAttribute.builder().id(EventDefinitionDto.FIELD_TACTICS_TECHNIQUES).title("Tactics/Techniques")
                     .type(SearchQueryField.Type.STRING)
                     .sortable(false)
                     .searchable(true)
@@ -176,6 +176,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     private final BulkExecutor<EventDefinitionDto, UserContext> bulkUnscheduleExecutor;
     private final EventResolver eventResolver;
     private final EntitySharesService entitySharesService;
+    private final org.graylog.events.processor.TacticsTechniquesValidator tacticsTechniquesValidator;
 
     @Inject
     public EventDefinitionsResource(DBEventDefinitionService dbService,
@@ -187,7 +188,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                     ObjectMapper objectMapper,
                                     EventResolver eventResolver,
                                     EventDefinitionConfiguration eventDefinitionConfiguration,
-                                    EntitySharesService entitySharesService
+                                    EntitySharesService entitySharesService,
+                                    org.graylog.events.processor.TacticsTechniquesValidator tacticsTechniquesValidator
     ) {
         this.dbService = dbService;
         this.eventDefinitionHandler = eventDefinitionHandler;
@@ -201,6 +203,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         this.bulkUnscheduleExecutor = new SequentialBulkExecutor<>(this::unschedule, auditEventSender, objectMapper);
         this.eventResolver = eventResolver;
         this.entitySharesService = entitySharesService;
+        this.tacticsTechniquesValidator = tacticsTechniquesValidator;
     }
 
     @GET
@@ -363,6 +366,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         checkEventDefinitionPermissions(dto, "create");
 
         final ValidationResult result = dto.validate(null, eventDefinitionConfiguration, userContext);
+        tacticsTechniquesValidator.validate(dto, result);
         if (result.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
         }
@@ -396,6 +400,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         checkProcessorConfig(oldDto, dto);
 
         final ValidationResult result = dto.validate(oldDto, eventDefinitionConfiguration, userContext);
+        tacticsTechniquesValidator.validate(dto, result);
         if (!definitionId.equals(dto.id())) {
             result.addError("id", "Event definition IDs don't match");
         }
@@ -577,6 +582,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         EventProcessorConfig oldConfig = dbService.get(toValidate.id()).map(EventDefinition::config).orElse(null);
         ValidationResult validationResult = toValidate.config().validate(userContext);
         validationResult.addAll(toValidate.config().validate(userContext, oldConfig, eventDefinitionConfiguration));
+        tacticsTechniquesValidator.validate(toValidate, validationResult);
         return validationResult;
     }
 

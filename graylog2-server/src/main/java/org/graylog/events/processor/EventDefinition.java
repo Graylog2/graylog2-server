@@ -104,7 +104,7 @@ public interface EventDefinition {
         return null;
     }
 
-    default ImmutableList<String> mitreCategories() {
+    default ImmutableList<String> tacticsTechniques() {
         return ImmutableList.of();
     }
 }

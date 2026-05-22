@@ -91,6 +91,10 @@ const EventDefinitionSummary = ({
         <dd>
           <TagList tags={eventDefinition.tags} emptyFallback={<em>No tags</em>} />
         </dd>
+        <dt>Tactics/Techniques</dt>
+        <dd>
+          <TagList tags={eventDefinition.tactics_techniques ?? []} emptyFallback={<em>None</em>} />
+        </dd>
         {eventDefinition.event_summary_template && (
           <>
             <dt>Event Summary Template</dt>
