@@ -52,19 +52,19 @@ class StreamMessageCountDescriptorTest {
         when(moreSearch.aggregateTerms(
                 anyString(), any(RelativeRange.class),
                 anyString(), anyInt()))
-                .thenReturn(Map.of("stream-1", 500L, "stream-2", 200L));
+                .thenReturn(Map.of("stream1", 500L, "stream2", 200L));
 
-        final List<EntityMetric<Long>> result = descriptor.compute(List.of("stream-1", "stream-2"));
+        final List<EntityMetric<Long>> result = descriptor.compute(List.of("stream1", "stream2"));
 
         verify(moreSearch).aggregateTerms(
-                eq(FIELD_STREAMS + ":stream-1 OR " + FIELD_STREAMS + ":stream-2"),
+                eq(FIELD_STREAMS + ":stream1 OR " + FIELD_STREAMS + ":stream2"),
                 any(RelativeRange.class),
                 eq(FIELD_STREAMS), eq(2));
 
-        assertThat(result).extracting(EntityMetric::entityId).containsExactlyInAnyOrder("stream-1", "stream-2");
-        assertThat(result).filteredOn(m -> m.entityId().equals("stream-1"))
+        assertThat(result).extracting(EntityMetric::entityId).containsExactlyInAnyOrder("stream1", "stream2");
+        assertThat(result).filteredOn(m -> m.entityId().equals("stream1"))
                 .first().extracting(EntityMetric::value).isEqualTo(500L);
-        assertThat(result).filteredOn(m -> m.entityId().equals("stream-2"))
+        assertThat(result).filteredOn(m -> m.entityId().equals("stream2"))
                 .first().extracting(EntityMetric::value).isEqualTo(200L);
     }
 
@@ -75,7 +75,7 @@ class StreamMessageCountDescriptorTest {
                 anyString(), anyInt()))
                 .thenReturn(Map.of());
 
-        final List<EntityMetric<Long>> result = descriptor.compute(List.of("stream-1"));
+        final List<EntityMetric<Long>> result = descriptor.compute(List.of("stream1"));
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().value()).isEqualTo(0L);

@@ -20,6 +20,7 @@ import org.graylog.events.search.MoreSearch;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.metrics.entity.EntityMetric;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.metrics.entity.cache.MetricsCacheConfiguration;
 import org.graylog2.shared.security.RestPermissions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,16 +59,16 @@ class StreamAssociatedInputsDescriptorTest {
                 anyString(), any(RelativeRange.class),
                 anyString(), anyString(), anyInt(), anyInt()))
                 .thenReturn(Map.of(
-                        "stream-1", Map.of("input-a", 100L, "input-b", 200L)
+                        "stream1", Map.of("input-a", 100L, "input-b", 200L)
                 ));
 
-        final List<EntityMetric<List<String>>> result = descriptor.compute(List.of("stream-1"));
+        final List<EntityMetric<List<String>>> result = descriptor.compute(List.of("stream1"));
 
         verify(moreSearch).aggregateGroupedTerms(
-                eq(FIELD_STREAMS + ":stream-1"),
+                eq(FIELD_STREAMS + ":stream1"),
                 any(RelativeRange.class),
                 eq(FIELD_STREAMS), eq(FIELD_GL2_SOURCE_INPUT),
-                eq(1), eq(Integer.MAX_VALUE));
+                eq(1), eq(MetricsCacheConfiguration.MAX_TERMS_SIZE));
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().value()).containsExactlyInAnyOrder("input-a", "input-b");
@@ -80,7 +81,7 @@ class StreamAssociatedInputsDescriptorTest {
                 anyString(), anyString(), anyInt(), anyInt()))
                 .thenReturn(Map.of());
 
-        final List<EntityMetric<List<String>>> result = descriptor.compute(List.of("stream-1"));
+        final List<EntityMetric<List<String>>> result = descriptor.compute(List.of("stream1"));
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().value()).isEmpty();

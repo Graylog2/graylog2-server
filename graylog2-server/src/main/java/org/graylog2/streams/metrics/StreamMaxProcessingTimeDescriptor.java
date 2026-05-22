@@ -73,7 +73,7 @@ public class StreamMaxProcessingTimeDescriptor implements EntityCachedMetricDesc
     public List<EntityMetric<Double>> compute(Collection<String> entityIds) {
         final Map<String, Double> results = moreSearch.aggregateGroupedMetric(
                 entityIds.stream()
-                        .map(id -> FIELD_STREAMS + ":" + id)
+                        .map(id -> FIELD_STREAMS + ":" + MoreSearch.luceneEscape(id))
                         .collect(Collectors.joining(" OR ")),
                 RelativeRange.create(MetricsCacheConfiguration.RANGE_SECONDS_15M),
                 FIELD_STREAMS, MoreSearchAdapter.AggregationType.MAX, FIELD_GL2_PROCESSING_DURATION_MS,

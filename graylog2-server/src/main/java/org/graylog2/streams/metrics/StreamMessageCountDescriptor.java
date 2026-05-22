@@ -71,7 +71,7 @@ public class StreamMessageCountDescriptor implements EntityCachedMetricDescripto
     public List<EntityMetric<Long>> compute(Collection<String> entityIds) {
         final Map<String, Long> counts = moreSearch.aggregateTerms(
                 entityIds.stream()
-                        .map(id -> FIELD_STREAMS + ":" + id)
+                        .map(id -> FIELD_STREAMS + ":" + MoreSearch.luceneEscape(id))
                         .collect(Collectors.joining(" OR ")),
                 RelativeRange.create(MetricsCacheConfiguration.RANGE_SECONDS_24H),
                 FIELD_STREAMS, entityIds.size());

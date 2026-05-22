@@ -54,12 +54,12 @@ class StreamAvgProcessingTimeDescriptorTest {
         when(moreSearch.aggregateGroupedMetric(
                 anyString(), any(RelativeRange.class),
                 anyString(), any(MoreSearchAdapter.AggregationType.class), anyString(), anyInt()))
-                .thenReturn(Map.of("stream-1", 42.5));
+                .thenReturn(Map.of("stream1", 42.5));
 
-        final List<EntityMetric<Double>> result = descriptor.compute(List.of("stream-1"));
+        final List<EntityMetric<Double>> result = descriptor.compute(List.of("stream1"));
 
         verify(moreSearch).aggregateGroupedMetric(
-                eq(FIELD_STREAMS + ":stream-1"),
+                eq(FIELD_STREAMS + ":stream1"),
                 any(RelativeRange.class),
                 eq(FIELD_STREAMS), eq(MoreSearchAdapter.AggregationType.AVG),
                 eq(FIELD_GL2_PROCESSING_DURATION_MS),
@@ -76,7 +76,7 @@ class StreamAvgProcessingTimeDescriptorTest {
                 anyString(), any(MoreSearchAdapter.AggregationType.class), anyString(), anyInt()))
                 .thenReturn(Map.of());
 
-        final List<EntityMetric<Double>> result = descriptor.compute(List.of("stream-1"));
+        final List<EntityMetric<Double>> result = descriptor.compute(List.of("stream1"));
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().value()).isEqualTo(0.0);

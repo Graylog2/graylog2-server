@@ -77,11 +77,11 @@ public class StreamAssociatedInputsDescriptor implements EntityCachedMetricDescr
     public List<EntityMetric<List<String>>> compute(Collection<String> entityIds) {
         final Map<String, Map<String, Long>> grouped = moreSearch.aggregateGroupedTerms(
                 entityIds.stream()
-                        .map(id -> FIELD_STREAMS + ":" + id)
+                        .map(id -> FIELD_STREAMS + ":" + MoreSearch.luceneEscape(id))
                         .collect(Collectors.joining(" OR ")),
                 RelativeRange.create(MetricsCacheConfiguration.RANGE_SECONDS_24H),
                 FIELD_STREAMS, FIELD_GL2_SOURCE_INPUT,
-                entityIds.size(), Integer.MAX_VALUE);
+                entityIds.size(), MetricsCacheConfiguration.MAX_TERMS_SIZE);
 
         return entityIds.stream()
                 .map(id -> new EntityMetric<>(id, List.copyOf(grouped.getOrDefault(id, Map.of()).keySet())))
