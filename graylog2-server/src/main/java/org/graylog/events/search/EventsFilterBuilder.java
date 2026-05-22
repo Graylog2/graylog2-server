@@ -28,6 +28,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import static org.graylog.events.search.EventsSearchFilter.NULL_VALUE;
+import static org.graylog.events.search.MoreSearch.luceneEscape;
 import static org.graylog2.plugin.Tools.ES_DATE_FORMAT_FORMATTER;
 
 public class EventsFilterBuilder {
@@ -88,6 +89,16 @@ public class EventsFilterBuilder {
                         .map(assetFilter -> EventDto.FIELD_ASSOCIATED_ASSETS + ":" + quote(assetFilter))
                         .collect(joiningQueriesWithOR));
             }
+        }
+
+        // Multi-tag filter uses AND semantics (match events tagged with ALL selected values),
+        // matching GitHub-style label filtering. Cross-attribute filters are AND'd via the
+        // outer joiningQueriesWithAND at the bottom of build().
+        final Set<String> tags = parameters.filter().extraFilters().getOrDefault(EventDto.FIELD_TAGS, Set.of());
+        if (!tags.isEmpty()) {
+            filterBuilder.add(tags.stream()
+                    .map(tagFilter -> EventDto.FIELD_TAGS + ":" + quote(luceneEscape(tagFilter)))
+                    .collect(joiningQueriesWithAND));
         }
 
         switch (parameters.filter().alerts()) {

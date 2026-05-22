@@ -17,6 +17,7 @@
 package org.graylog.datanode.opensearch.configuration.beans.impl;
 
 import com.google.common.collect.Maps;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
@@ -31,6 +32,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,7 +100,22 @@ public class OpensearchConfigurationOverridesBean implements DatanodeConfigurati
         return properties.entrySet().stream()
                 .filter(this::shouldPrintWarning)
                 .map(this::formatWarning)
-                .collect(Collectors.toList());
+                .collect(Collectors.collectingAndThen(Collectors.toList(), list -> {
+                    if(list.isEmpty()) {
+                        return Collections.emptyList();
+                    } else {
+                        return prependOverridesWarning(list);
+                    }
+                }));
+    }
+
+    @Nonnull
+    private static List<String> prependOverridesWarning(List<String> list) {
+        final List<String> warnings = new ArrayList<>(list.size() + 1);
+        warnings.add("Your system is overriding forbidden opensearch configuration properties. " +
+                "This may cause unexpected results and may break in any future release!");
+        warnings.addAll(list);
+        return warnings;
     }
 
     protected String formatWarning(Map.Entry<String, String> entry) {

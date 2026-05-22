@@ -26,22 +26,36 @@ const preferencesToJSON = <T>({
   attributes,
   sort,
   perPage,
+  slicing,
   customPreferences,
   order,
 }: TableLayoutPreferences<T>): TableLayoutPreferencesJSON<T> => ({
   attributes,
   sort: sort ? { order: sort.direction, field: sort.attributeId } : undefined,
   per_page: perPage,
+  slicing: slicing
+    ? {
+        slice_column: slicing.sliceColumn,
+        sort_by: slicing.sortBy,
+        order: slicing.order,
+      }
+    : undefined,
   custom_preferences: customPreferences,
   order,
 });
 
-const useUpdateUserLayoutPreferences = <T>(entityTableId: string) => {
-  const { data: userLayoutPreferences = {}, refetch } = useUserLayoutPreferences(entityTableId);
+const preferencesUrl = (entityTableId: string, layoutVariant?: string) => {
+  const params = layoutVariant ? `?layout_variant=${encodeURIComponent(layoutVariant)}` : '';
+
+  return qualifyUrl(`/entitylists/preferences/${entityTableId}${params}`);
+};
+
+const useUpdateUserLayoutPreferences = <T>(entityTableId: string, layoutVariant?: string) => {
+  const { data: userLayoutPreferences = {}, refetch } = useUserLayoutPreferences(entityTableId, layoutVariant);
   const mutationFn = (newPreferences: TableLayoutPreferences<T>) =>
     fetch(
       'POST',
-      qualifyUrl(`/entitylists/preferences/${entityTableId}`),
+      preferencesUrl(entityTableId, layoutVariant),
       preferencesToJSON({ ...userLayoutPreferences, ...newPreferences }),
     );
   const { mutateAsync } = useMutation({
