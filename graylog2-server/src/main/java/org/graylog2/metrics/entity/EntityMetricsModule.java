@@ -16,12 +16,17 @@
  */
 package org.graylog2.metrics.entity;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import org.graylog2.inputs.InputServiceImpl;
 import org.graylog2.inputs.metrics.InputExtractorCountDescriptor;
 import org.graylog2.inputs.metrics.InputMessagesPerStreamDescriptor;
+import org.graylog2.metrics.entity.cache.MetricsCacheService;
 import org.graylog2.streams.StreamServiceImpl;
 import org.graylog2.streams.metrics.StreamAssociatedInputsDescriptor;
 import org.graylog2.streams.metrics.StreamAvgProcessingTimeDescriptor;
@@ -29,6 +34,8 @@ import org.graylog2.streams.metrics.StreamMaxProcessingTimeDescriptor;
 import org.graylog2.streams.metrics.StreamMessageCountDescriptor;
 import org.graylog2.streams.metrics.StreamPipelinesDescriptor;
 import org.graylog2.streams.metrics.StreamRoutingPipelinesDescriptor;
+
+import java.util.Set;
 
 /**
  * Guice module for entity metrics bindings.
@@ -61,5 +68,25 @@ public class EntityMetricsModule extends AbstractModule {
         streamDescriptors.addBinding().to(StreamAssociatedInputsDescriptor.class);
         streamDescriptors.addBinding().to(StreamPipelinesDescriptor.class);
         streamDescriptors.addBinding().to(StreamRoutingPipelinesDescriptor.class);
+    }
+
+    @SuppressWarnings("unused")
+    @Provides
+    @Singleton
+    @Named(ENTITY_TYPE_INPUTS)
+    EntityMetricsService inputMetricsService(@Named(ENTITY_TYPE_INPUTS) Set<EntityMetricDescriptor> descriptors,
+                                             MetricsCacheService cacheService,
+                                             ObjectMapper objectMapper) {
+        return new EntityMetricsService(ENTITY_TYPE_INPUTS, descriptors, cacheService, objectMapper);
+    }
+
+    @SuppressWarnings("unused")
+    @Provides
+    @Singleton
+    @Named(ENTITY_TYPE_STREAMS)
+    EntityMetricsService streamMetricsService(@Named(ENTITY_TYPE_STREAMS) Set<EntityMetricDescriptor> descriptors,
+                                              MetricsCacheService cacheService,
+                                              ObjectMapper objectMapper) {
+        return new EntityMetricsService(ENTITY_TYPE_STREAMS, descriptors, cacheService, objectMapper);
     }
 }

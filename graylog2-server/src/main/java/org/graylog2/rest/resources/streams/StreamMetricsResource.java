@@ -16,7 +16,6 @@
  */
 package org.graylog2.rest.resources.streams;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.inject.Inject;
@@ -29,10 +28,8 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog2.metrics.entity.EntityMetricDescriptor;
 import org.graylog2.metrics.entity.EntityMetricsResponse;
 import org.graylog2.metrics.entity.EntityMetricsService;
-import org.graylog2.metrics.entity.cache.MetricsCacheService;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -49,11 +46,8 @@ public class StreamMetricsResource extends RestResource {
     private final EntityMetricsService metricsService;
 
     @Inject
-    public StreamMetricsResource(@Named(ENTITY_TYPE_STREAMS) Set<EntityMetricDescriptor> descriptors,
-                                 MetricsCacheService cacheService,
-                                 ObjectMapper objectMapper) {
-        this.metricsService = new EntityMetricsService(
-                ENTITY_TYPE_STREAMS, descriptors, cacheService, objectMapper);
+    public StreamMetricsResource(@Named(ENTITY_TYPE_STREAMS) EntityMetricsService metricsService) {
+        this.metricsService = metricsService;
     }
 
     @GET
