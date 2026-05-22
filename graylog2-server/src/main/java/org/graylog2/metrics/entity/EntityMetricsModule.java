@@ -16,12 +16,19 @@
  */
 package org.graylog2.metrics.entity;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import org.graylog2.inputs.InputServiceImpl;
 import org.graylog2.inputs.metrics.InputExtractorCountDescriptor;
 import org.graylog2.inputs.metrics.InputMessagesPerStreamDescriptor;
+import org.graylog2.metrics.entity.cache.MetricsCacheService;
+
+import java.util.Set;
 
 /**
  * Guice module for entity metrics bindings.
@@ -44,5 +51,15 @@ public class EntityMetricsModule extends AbstractModule {
                 Multibinder.newSetBinder(binder(), EntityMetricDescriptor.class, Names.named(ENTITY_TYPE_INPUTS));
         inputDescriptors.addBinding().to(InputMessagesPerStreamDescriptor.class);
         inputDescriptors.addBinding().to(InputExtractorCountDescriptor.class);
+    }
+
+    @SuppressWarnings("unused")
+    @Provides
+    @Singleton
+    @Named(ENTITY_TYPE_INPUTS)
+    EntityMetricsService inputMetricsService(@Named(ENTITY_TYPE_INPUTS) Set<EntityMetricDescriptor> descriptors,
+                                             MetricsCacheService cacheService,
+                                             ObjectMapper objectMapper) {
+        return new EntityMetricsService(ENTITY_TYPE_INPUTS, descriptors, cacheService, objectMapper);
     }
 }
