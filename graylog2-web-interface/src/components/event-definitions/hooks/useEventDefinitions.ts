@@ -157,7 +157,7 @@ export function useGetEventNotifications(): {
   eventNotifications: { all: Array<EventNotification> };
   loadingEventNotifications: boolean;
 } {
-  const { data, isLoading } = useQuery<{ all: Array<EventNotification> }, Error>({
+  const { data, isLoading } = useQuery<{ notifications: Array<EventNotification> }, Error>({
     queryKey: ['event-definitions', 'event-notifications'],
     queryFn: () =>
       defaultOnError(
@@ -168,7 +168,7 @@ export function useGetEventNotifications(): {
   });
 
   return {
-    eventNotifications: isLoading ? { all: [] } : data || { all: [] },
+    eventNotifications: { all: isLoading ? [] : data?.notifications || [] },
     loadingEventNotifications: isLoading,
   };
 }
