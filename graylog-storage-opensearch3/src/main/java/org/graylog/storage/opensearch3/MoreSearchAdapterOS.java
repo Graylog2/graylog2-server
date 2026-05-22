@@ -375,10 +375,9 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
 
     @Override
     public Map<String, Map<String, Long>> aggregateGroupedTerms(String queryString, TimeRange timerange, Set<String> affectedIndices,
-                                                                SourceStreamFilter sourceStreamFilter,
                                                                 String groupByField, String termsField,
                                                                 int maxBuckets, int maxSubBuckets) {
-        final var filter = createSimpleQuery(queryString, timerange, sourceStreamFilter);
+        final var filter = createSimpleQuery(queryString, timerange);
         final var aggregation = Aggregation.builder()
                 .terms(terms -> terms.field(groupByField).size(maxBuckets))
                 .aggregations(SUB_TERMS_AGGREGATION_NAME, Aggregation.of(a -> a
@@ -398,9 +397,8 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
 
     @Override
     public Map<String, Long> aggregateTerms(String queryString, TimeRange timerange, Set<String> affectedIndices,
-                                            SourceStreamFilter sourceStreamFilter,
                                             String termsField, int maxBuckets) {
-        final var filter = createSimpleQuery(queryString, timerange, sourceStreamFilter);
+        final var filter = createSimpleQuery(queryString, timerange);
         final var aggregation = Aggregation.builder()
                 .terms(terms -> terms.field(termsField).size(maxBuckets))
                 .build();
@@ -411,10 +409,9 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
 
     @Override
     public Map<String, Double> aggregateGroupedMetric(String queryString, TimeRange timerange, Set<String> affectedIndices,
-                                                      SourceStreamFilter sourceStreamFilter,
                                                       String groupByField, AggregationType metricType, String metricField,
                                                       int maxBuckets) {
-        final var filter = createSimpleQuery(queryString, timerange, sourceStreamFilter);
+        final var filter = createSimpleQuery(queryString, timerange);
         final Aggregation metricAgg = switch (metricType) {
             case AVG -> Aggregation.of(a -> a.avg(avg -> avg.field(metricField)));
             case MAX -> Aggregation.of(a -> a.max(max -> max.field(metricField)));
@@ -486,7 +483,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
         };
     }
 
-    private Query createSimpleQuery(String queryString, TimeRange timerange, SourceStreamFilter sourceStreamFilter) {
+    private Query createSimpleQuery(String queryString, TimeRange timerange) {
         final BoolQuery.Builder boolQuery = BoolQuery.builder();
 
         final Query query = (queryString.isEmpty() || queryString.equals("*"))
@@ -495,10 +492,6 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
 
         boolQuery.filter(query);
         boolQuery.filter(timerangeQuery(timerange));
-
-        if (!sourceStreamFilter.isAllAllowed()) {
-            boolQuery.filter(termsQuery(EventDto.FIELD_SOURCE_STREAMS, sourceStreamFilter.streamIds()));
-        }
 
         return Query.of(b -> b.bool(boolQuery.build()));
     }
