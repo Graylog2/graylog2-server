@@ -55,9 +55,7 @@ const useNotificationsByIds = (ids: Array<string>): Result => {
   const notPermittedIds = data?.not_permitted_to_view ?? [];
 
   return {
-    data: data?.entities
-      ?.filter(({ id }) => !notPermittedIds.includes(id))
-      .map(({ id, title }) => ({ id, title })),
+    data: data?.entities?.filter(({ id }) => !notPermittedIds.includes(id)).map(({ id, title }) => ({ id, title })),
     notPermittedIds,
     isLoading,
   };

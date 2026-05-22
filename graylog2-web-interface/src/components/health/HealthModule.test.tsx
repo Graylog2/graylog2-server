@@ -105,8 +105,12 @@ describe('HealthModule', () => {
     const entityListLink = screen.getByRole('link', { name: /View MongoDB/i });
     const latestMessageHeading = screen.getByRole('heading', { name: 'Latest message' });
 
-    expect(recommendedActionHeading.compareDocumentPosition(entityListLink) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(entityListLink.compareDocumentPosition(latestMessageHeading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(
+      recommendedActionHeading.compareDocumentPosition(entityListLink) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(
+      entityListLink.compareDocumentPosition(latestMessageHeading) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 
   it('cascades expansion to non-healthy descendants when an unhealthy feature is opened', async () => {

@@ -29,8 +29,7 @@ import { ModuleContent, ModuleLayout } from './HealthModule.styles';
 
 const HealthModule = () => {
   const showHealthModule = useHealthModuleVisible();
-  const { data: { valid: hasEnterpriseLicense } = { valid: false } } =
-    usePluggableLicenseCheck('/license/enterprise');
+  const { data: { valid: hasEnterpriseLicense } = { valid: false } } = usePluggableLicenseCheck('/license/enterprise');
   const { initialExpandedState, lookup, paths, root, treeData } = useHealthModule();
   const tree = useTree({
     initialExpandedState,
