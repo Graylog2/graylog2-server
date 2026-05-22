@@ -66,8 +66,9 @@ const fetchTagSuggestions = (streamId: string | undefined, _prefix?: string): Pr
       .map((slice) => slice?.value)
       // Drop the scripting-API missing-bucket placeholder — events without tags would otherwise
       // surface as a literal "(Empty Value)" suggestion, which isn't a real tag to filter by.
-      .filter((value): value is string =>
-        typeof value === 'string' && value.length > 0 && value !== MISSING_BUCKET_NAME)
+      .filter(
+        (value): value is string => typeof value === 'string' && value.length > 0 && value !== MISSING_BUCKET_NAME,
+      )
       .sort()
       .map((value) => ({ id: value, value })),
   );
@@ -100,7 +101,11 @@ export const createTagsFilter = ({
     const { stream_id: streamId } = useQuery_();
     const streamIdParam = streamScoped && typeof streamId === 'string' ? streamId : undefined;
     const prefixParam = serverSidePrefix ? debouncedQuery : undefined;
-    const { data: allSuggestions, isInitialLoading, isError } = useQuery({
+    const {
+      data: allSuggestions,
+      isInitialLoading,
+      isError,
+    } = useQuery({
       queryKey: [...queryKeyPrefix, streamIdParam ?? 'all', ...(serverSidePrefix ? [prefixParam] : [])],
       queryFn: () => fetchSuggestions(streamIdParam, prefixParam),
       placeholderData: serverSidePrefix ? keepPreviousData : undefined,

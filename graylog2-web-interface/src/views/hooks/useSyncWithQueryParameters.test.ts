@@ -254,9 +254,7 @@ describe('SyncWithQueryParameters', () => {
       );
       renderHook(() => useSyncWithQueryParameters('/dashboards/abc'));
 
-      expect(history.replace).toHaveBeenCalledWith(
-        '/dashboards/abc?q=source%3Anginx&rangetype=relative&relative=3600',
-      );
+      expect(history.replace).toHaveBeenCalledWith('/dashboards/abc?q=source%3Anginx&rangetype=relative&relative=3600');
     });
 
     it('preserves unrelated query parameters', () => {

@@ -113,8 +113,13 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdi
   return (
     <Row>
       <Col md={12}>
-        <h2 className={commonStyles.title}>Tags <small>(optional)</small></h2>
-        <p>Attach labels to this Event Definition. Tags propagate onto every Event it produces and make filtering and grouping easier on the Alerts &amp; Events list.</p>
+        <h2 className={commonStyles.title}>
+          Tags <small>(optional)</small>
+        </h2>
+        <p>
+          Attach labels to this Event Definition. Tags propagate onto every Event it produces and make filtering and
+          grouping easier on the Alerts &amp; Events list.
+        </p>
         <TagsEditor
           tags={eventDefinition.tags ?? []}
           onChange={(next) => onChange('tags', next)}
