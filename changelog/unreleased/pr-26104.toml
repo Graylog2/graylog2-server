@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix API browser by rolling back swagger version."
+
+pulls = ["26104"]
