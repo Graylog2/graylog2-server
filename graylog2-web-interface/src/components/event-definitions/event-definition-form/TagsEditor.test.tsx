@@ -66,6 +66,17 @@ describe('TagsEditor', () => {
     expect(onChange).toHaveBeenLastCalledWith(['phishing']);
   });
 
+  it('commits a new tag via Tab key', async () => {
+    const onChange = jest.fn();
+    render(<Harness onChange={onChange} />);
+
+    const input = screen.getByRole('combobox');
+    await userEvent.type(input, 'phishing');
+    await userEvent.keyboard('{Tab}');
+
+    expect(onChange).toHaveBeenLastCalledWith(['phishing']);
+  });
+
   it('does not offer an "Add" affordance for a duplicate (case-insensitive)', async () => {
     render(<Harness initial={['phishing']} />);
 
@@ -146,9 +157,9 @@ describe('TagsEditor', () => {
 
     it.each([
       ['space', 'phish ing'],
-      ['dot', 'phish.ing'],
       ['slash', 'phish/ing'],
       ['quote', 'phish"ing'],
+      ['colon', 'phish:ing'],
     ])('surfaces an invalid-characters message for a %s', async (_label, raw) => {
       render(<Harness />);
 
@@ -169,6 +180,17 @@ describe('TagsEditor', () => {
       expect(screen.queryByText(/contains invalid characters/i)).not.toBeInTheDocument();
       expect(screen.queryByText(/exceeds the maximum length/i)).not.toBeInTheDocument();
       expect(screen.queryByText(/already been added/i)).not.toBeInTheDocument();
+    });
+
+    it('accepts tags containing dots', async () => {
+      const onChange = jest.fn();
+      render(<Harness onChange={onChange} />);
+
+      await userEvent.type(screen.getByRole('combobox'), 'attack.t1110');
+      await userEvent.keyboard('{Enter}');
+
+      expect(onChange).toHaveBeenLastCalledWith(['attack.t1110']);
+      expect(screen.queryByText(/contains invalid characters/i)).not.toBeInTheDocument();
     });
 
     it('surfaces a too-long message when committing a tag over the length limit', async () => {
@@ -197,6 +219,25 @@ describe('TagsEditor', () => {
       await userEvent.keyboard('{Tab}');
 
       expect(await screen.findByText(/Tag "phishing" has already been added/i)).toBeInTheDocument();
+    });
+
+    it('surfaces an invalid-characters message when committing a tag via Tab', async () => {
+      render(<Harness />);
+
+      await userEvent.type(screen.getByRole('combobox'), 'phish:ing');
+      await userEvent.keyboard('{Tab}');
+
+      expect(await screen.findByText(/Tag "phish:ing" contains invalid characters/i)).toBeInTheDocument();
+    });
+
+    it('surfaces a too-long message when committing a tag via Tab', async () => {
+      render(<Harness />);
+
+      const overLong = 'a'.repeat(129);
+      await userEvent.type(screen.getByRole('combobox'), overLong);
+      await userEvent.keyboard('{Tab}');
+
+      expect(await screen.findByText(/exceeds the maximum length of 128 characters/i)).toBeInTheDocument();
     });
 
     it('clears the validation message as soon as the user edits the input', async () => {

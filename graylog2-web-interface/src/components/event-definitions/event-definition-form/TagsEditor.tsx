@@ -32,13 +32,13 @@ const MAX_TAGS = 64;
 const MAX_TAG_LENGTH = 128;
 
 // Mirror of TagNormalizer.VALID_TAG_PATTERN. Keep in sync.
-const VALID_TAG_PATTERN = /^[a-z0-9_-]+$/;
+const VALID_TAG_PATTERN = /^[a-z0-9_.-]+$/;
 
 const SUGGESTION_LIMIT = 50;
 const DEBOUNCE_MS = 300;
 
 // Unit-separator character; can't appear in a tag value (validation restricts tags to
-// [a-z0-9_-]) so it's safe to use as the delimiter Select uses to (de)serialize multi values.
+// [a-z0-9_.-]) so it's safe to use as the delimiter Select uses to (de)serialize multi values.
 const VALUE_DELIMITER = '\x1F';
 
 type Props = {
@@ -49,7 +49,7 @@ type Props = {
 };
 
 const HELP_TEXT =
-  'Press Enter or Tab to add. Tags are lowercased and deduplicated. Only lowercase letters, digits, hyphens, and underscores are allowed.';
+  'Press Enter or Tab to add. Tags are lowercased and deduplicated. Only lowercase letters, digits, hyphens, underscores, and dots are allowed.';
 
 const isTooLong = (tag: string): boolean => tag.length > MAX_TAG_LENGTH;
 const hasInvalidChars = (tag: string): boolean => !VALID_TAG_PATTERN.test(tag);
@@ -75,7 +75,7 @@ const buildInvalidCharsMessage = (tagsList: ReadonlyArray<string>): string | nul
   return (
     `Tag${isPlural ? 's' : ''} ${tagsList.map(quote).join(', ')} ` +
     `${isPlural ? 'contain' : 'contains'} invalid characters. ` +
-    'Only lowercase letters, digits, hyphens, and underscores are allowed.'
+    'Only lowercase letters, digits, hyphens, underscores, and dots are allowed.'
   );
 };
 
@@ -147,17 +147,15 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
   return (
     <FormGroup controlId="event-definition-tags" validationState={combinedError ? 'error' : null}>
       <Select
-        // `Select`'s Props type doesn't surface a handful of react-select props we need
-        // here (`tabSelectsValue`, `inputValue`, `onKeyDown`), but it spreads unknown props
-        // through at runtime, so we cast just these to satisfy tsc without altering behavior.
-        // - `tabSelectsValue: false` — Tab leaves the typed value in the input rather than
-        //   committing the focused suggestion (matters when correcting a duplicate).
+        // `Select`'s Props type doesn't surface a couple of react-select props we need here
+        // (`inputValue`, `onKeyDown`), but it spreads unknown props through at runtime, so
+        // we cast just these to satisfy tsc without altering behavior.
         // - `inputValue` — fully control the typed text so react-select's internal blur /
-        //   menu-close clears can be ignored (otherwise Tab/blur drops the user's text).
+        //   menu-close clears can be ignored (otherwise Tab/blur drops the user's text on a
+        //   duplicate).
         // - `onKeyDown` — flag a duplicate-commit attempt on Enter / Tab so the error
         //   message surfaces even when react-select silently rejects the commit.
         {...({
-          tabSelectsValue: false,
           inputValue: input,
           onKeyDown: (e: React.KeyboardEvent) => {
             if (e.key === 'Enter' || e.key === 'Tab') {
@@ -166,6 +164,7 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
           },
         } as object)}
         inputId="event-definition-tags"
+        aria-label="Event Definition Tags"
         multi
         allowCreate
         delimiter={VALUE_DELIMITER}
