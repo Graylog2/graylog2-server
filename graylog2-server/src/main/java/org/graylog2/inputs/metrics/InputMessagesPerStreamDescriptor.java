@@ -70,7 +70,7 @@ public class InputMessagesPerStreamDescriptor implements EntityCachedMetricDescr
     public List<EntityMetric<Map<String, Long>>> compute(Collection<String> entityIds) {
         final Map<String, Map<String, Long>> grouped = moreSearch.aggregateGroupedTerms(
                 entityIds.stream()
-                        .map(id -> FIELD_GL2_SOURCE_INPUT + ":" + id)
+                        .map(id -> FIELD_GL2_SOURCE_INPUT + ":" + MoreSearch.luceneEscape(id))
                         .collect(Collectors.joining(" OR ")),
                 RelativeRange.create(MetricsCacheConfiguration.RANGE_SECONDS_24H),
                 SourceStreamFilter.allAllowed(),

@@ -69,6 +69,9 @@ public class EntityMetricsService {
     public EntityMetricValues getMetrics(Collection<String> entityIds,
                                          Set<String> fields,
                                          SearchUser searchUser) {
+        if (entityIds.isEmpty()) {
+            return EntityMetricValues.builder().build();
+        }
         validateFields(fields);
 
         final var builder = EntityMetricValues.builder();
