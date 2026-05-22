@@ -18,7 +18,16 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import styled, { useTheme } from 'styled-components';
 
-import { COL_WIDTH_SIZE, COL_WIDTH_VARIABLE, FoundationTable, H1, PxLabel, SectionDescription, StoryContainer, Token } from './shared';
+import {
+  COL_WIDTH_SIZE,
+  COL_WIDTH_VARIABLE,
+  FoundationTable,
+  H1,
+  PxLabel,
+  SectionDescription,
+  StoryContainer,
+  Token,
+} from './shared';
 
 // ─── Spacings ──────────────────────────────────────────────────────────────
 
@@ -71,13 +80,12 @@ const SPACINGS: SpacingEntry[] = [
   {
     key: 'xl',
     token: 'theme.spacings.xl',
-    usage: 'Separation between major independent sections on a page. Use sparingly — most layouts do not need this.',
+    usage: 'Separation between major independent sections on a page. Use sparingly, most layouts do not need this.',
   },
   {
     key: 'xxl',
     token: 'theme.spacings.xxl',
-    usage:
-      'Page-level whitespace only. Rarely appropriate in component authoring — prefer structural layout components over manual large margins.',
+    usage: 'Page-level whitespace only. Rarely appropriate in component authoring.',
   },
 ];
 
