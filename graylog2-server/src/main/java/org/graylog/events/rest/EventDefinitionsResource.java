@@ -18,6 +18,7 @@ package org.graylog.events.rest;
 
 
 import com.codahale.metrics.annotation.Timed;
+import com.mongodb.client.model.Filters;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
@@ -52,6 +53,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.commons.lang.StringUtils;
+import org.bson.conversions.Bson;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.events.audit.EventsAuditEventTypes;
@@ -93,10 +95,10 @@ import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
+import org.graylog2.database.filtering.DbQueryCreator;
+import org.graylog2.rest.resources.entities.FilterOption;
 import org.graylog2.rest.resources.entities.Sorting;
-import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
-import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
@@ -123,27 +125,22 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     private static final Logger LOG = LoggerFactory.getLogger(EventDefinitionsResource.class);
 
     private static final int TAG_SUGGESTIONS_MAX_LIMIT = 100;
-
-    // Note on multi-tag semantics: a single-clause `tags:phishing` query from the search bar works
-    // the same as selecting one tag in the filter UI. Multi-clause search-bar queries
-    // (`tags:phishing tags:exfil`) however are OR-joined by SearchQueryParser, while the filter UI
-    // applies multi-tag AND via the predicate in `getPage`. Users
-    // wanting AND across multiple tags should use the column-header filter dropdown.
-    private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
-            .put("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
-            .put("title", SearchQueryField.create(EventDefinitionDto.FIELD_TITLE))
-            .put("description", SearchQueryField.create(EventDefinitionDto.FIELD_DESCRIPTION))
-            .put(EventDefinitionDto.FIELD_TACTICS_TECHNIQUES, SearchQueryField.create(EventDefinitionDto.FIELD_TACTICS_TECHNIQUES))
-            .put(EventDefinitionDto.FIELD_TAGS, SearchQueryField.create(EventDefinitionDto.FIELD_TAGS))
-            .put(SourcedMongoEntityUtils.SEARCH_QUERY_TITLE, SearchQueryField.create(SourcedMongoEntityUtils.FILTERABLE_FIELD))
-            .build();
     private static final String DEFAULT_SORT_FIELD = "title";
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
-            EntityAttribute.builder().id("title").title("Title").build(),
-            EntityAttribute.builder().id("description").title("Description").build(),
+            EntityAttribute.builder().id("title").title("Title").searchable(true).build(),
+            EntityAttribute.builder().id("description").title("Description").searchable(true).build(),
             EntityAttribute.builder().id("priority").title("Priority").type(SearchQueryField.Type.INT).build(),
-            EntityAttribute.builder().id("status").title("Status").type(SearchQueryField.Type.BOOLEAN).sortable(false).build(),
+            EntityAttribute.builder().id("status").title("Status").type(SearchQueryField.Type.STRING)
+                    .dbField(EventDefinitionDto.FIELD_STATE)
+                    .sortable(true)
+                    .filterable(true)
+                    .filterOptions(Set.of(
+                            FilterOption.create("ENABLED", "Enabled"),
+                            FilterOption.create("DISABLED", "Disabled")
+                    ))
+                    .bsonFilterCreator((name, value) -> Filters.eq(name, value.getValue().toString()))
+                    .build(),
             EntityAttribute.builder().id(SourcedMongoEntityUtils.FILTERABLE_FIELD).title("Source")
                     .type(SearchQueryField.Type.STRING)
                     .sortable(false)
@@ -155,10 +152,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                     .sortable(false)
                     .searchable(true)
                     .build()
-            // Note: `tags` is registered as an Attribute on the frontend
-            // (event-definitions/constants.ts) because the filter UI needs a custom
-            // filter_component (EventDefinitionTagsFilter). The SEARCH_FIELDS map above
-            // keeps tags searchable from the query bar.
+            // Note: `tags` is not listed here — see comment on dbQueryCreator below.
     );
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
@@ -169,7 +163,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     private final EventDefinitionContextService contextService;
     private final EventProcessorEngine engine;
     private final EventDefinitionConfiguration eventDefinitionConfiguration;
-    private final SearchQueryParser searchQueryParser;
+    private final DbQueryCreator dbQueryCreator;
     private final RecentActivityService recentActivityService;
     private final BulkExecutor<EventDefinitionDto, UserContext> bulkDeletionExecutor;
     private final BulkExecutor<EventDefinitionDto, UserContext> bulkScheduleExecutor;
@@ -196,7 +190,13 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         this.contextService = contextService;
         this.engine = engine;
         this.eventDefinitionConfiguration = eventDefinitionConfiguration;
-        this.searchQueryParser = new SearchQueryParser(EventDefinitionDto.FIELD_TITLE, SEARCH_FIELD_MAPPING);
+        // Tags are registered as extraSearchFields instead of in the attributes list because
+        // the frontend adds a tags attribute with a custom filter_component (EventDefinitionTagsFilter).
+        // Including it in both places would cause a duplicate column.
+        // extraSearchFields makes `tags:phishing` work in the search bar (OR-joined by SearchQueryParser)
+        // while the filter UI applies multi-tag AND via the predicate in `getPage`.
+        this.dbQueryCreator = new DbQueryCreator(EventDefinitionDto.FIELD_TITLE, attributes,
+                Map.of(EventDefinitionDto.FIELD_TAGS, SearchQueryField.create(EventDefinitionDto.FIELD_TAGS)));
         this.recentActivityService = recentActivityService;
         this.bulkDeletionExecutor = new SequentialBulkExecutor<>(this::delete, auditEventSender, objectMapper);
         this.bulkScheduleExecutor = new SequentialBulkExecutor<>(this::schedule, auditEventSender, objectMapper);
@@ -224,24 +224,18 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                                                    schema = @Schema(allowableValues = {"asc", "desc"}))
                                                         @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order) {
 
-        SearchQuery searchQuery;
-        try {
-            searchQuery = searchQueryParser.parse(query);
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
-        }
         if ("status".equals(sort)) {
-            sort = "alert";
+            sort = "state";
         }
         Predicate<EventDefinitionDto> predicate = event -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id());
 
-        // Entity-source filter and tags filter are applied via predicate after the Mongo read.
-        // Tags use AND semantics (event def must carry every selected tag), matching the
-        // GitHub-style label filter convention.
+        // Entity-source and tags filters are applied via predicate after the Mongo read.
+        // Remaining filters (e.g., status) are handled by DbQueryCreator as MongoDB filters.
         final SourcedMongoEntityUtils.FilterPredicate<EventDefinitionDto> filterPredicate = SourcedMongoEntityUtils.handleScopedEntitySourceFilter(filters, predicate);
         predicate = filterPredicate.predicate();
-        final List<String> tagFilters = filters == null ? List.of() :
-                filters.stream()
+        final List<String> remainingFilters = filterPredicate.filters();
+        final List<String> tagFilters = remainingFilters == null ? List.of() :
+                remainingFilters.stream()
                         .filter(f -> f != null && f.startsWith(EventDefinitionDto.FIELD_TAGS + ":"))
                         .map(f -> f.substring(EventDefinitionDto.FIELD_TAGS.length() + 1))
                         .filter(v -> !v.isBlank())
@@ -250,8 +244,16 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
             predicate = predicate.and(event -> event.tags().containsAll(tagFilters));
         }
 
+        // Strip tags filters before passing to DbQueryCreator (tags are handled by predicate above)
+        final List<String> dbFilters = remainingFilters == null ? List.of() :
+                remainingFilters.stream()
+                        .filter(f -> f == null || !f.startsWith(EventDefinitionDto.FIELD_TAGS + ":"))
+                        .toList();
+
+        final Bson dbQuery = dbQueryCreator.createDbQuery(dbFilters, query);
+
         final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(
-                searchQuery,
+                dbQuery,
                 predicate,
                 order.toBsonSort(sort),
                 page,
@@ -298,14 +300,9 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     public PaginatedResponse<EventDefinitionDto> list(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                       @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                       @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query) {
-        SearchQuery searchQuery;
-        try {
-            searchQuery = searchQueryParser.parse(query);
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
-        }
+        final Bson dbQuery = dbQueryCreator.createDbQuery(List.of(), query);
         final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(
-                searchQuery,
+                dbQuery,
                 event -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id()),
                 SortOrder.ASCENDING.toBsonSort("title"),
                 page,
@@ -627,4 +624,5 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
             throw new ForbiddenException("Condition type not changeable");
         }
     }
+
 }
