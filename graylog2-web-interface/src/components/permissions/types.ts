@@ -18,7 +18,11 @@
 import type React from 'react';
 
 import type { Attribute } from 'stores/PaginationTypes';
-import type { ColumnRenderer, EntityBase, ExpandedSectionRenderer } from 'components/common/EntityDataTable/types';
+import type {
+  ColumnRenderersByAttribute,
+  EntityBase,
+  ExpandedSectionRenderer,
+} from 'components/common/EntityDataTable/types';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import type SharedEntity from 'logic/permissions/SharedEntity';
 
@@ -51,9 +55,9 @@ export type EntitySharedAction<T, M> = {
 export type TableElement<T extends EntityBase> = {
   attributeName: string;
   attributes: Array<Attribute>;
-  getColumnRenderer: (entityType: string) => ColumnRenderer<T, unknown>;
-  expandedSection: (entityType: string) => { [sectionName: string]: ExpandedSectionRenderer<T> };
-  tableCellComponent: React.ComponentType<{
+  getColumnRenderer: (entityType: string) => ColumnRenderersByAttribute<T, unknown>;
+  expandedSection?: (entityType: string) => { [sectionName: string]: ExpandedSectionRenderer<T> };
+  tableCellComponent?: React.ComponentType<{
     entityId: string;
     entityType: string;
   }>;

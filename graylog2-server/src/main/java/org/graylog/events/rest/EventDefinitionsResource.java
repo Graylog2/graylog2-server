@@ -146,13 +146,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                     .sortable(false)
                     .filterable(true)
                     .filterOptions(DBEntitySourceService.FILTER_OPTIONS)
-                    .build(),
-            EntityAttribute.builder().id(EventDefinitionDto.FIELD_TACTICS_TECHNIQUES).title("Tactics/Techniques")
-                    .type(SearchQueryField.Type.STRING)
-                    .sortable(false)
-                    .searchable(true)
                     .build()
-            // Note: `tags` is not listed here — see comment on dbQueryCreator below.
+            // Note: `tags` and `tactics_techniques` are not listed here — see comment on dbQueryCreator below.
     );
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
@@ -195,8 +190,11 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         // Including it in both places would cause a duplicate column.
         // extraSearchFields makes `tags:phishing` work in the search bar (OR-joined by SearchQueryParser)
         // while the filter UI applies multi-tag AND via the predicate in `getPage`.
+        // tactics_techniques is also registered here so API search (`tactics_techniques:T1059`) works,
+        // without exposing it as a default column on the Event Definitions list (gated to enterprise UI).
         this.dbQueryCreator = new DbQueryCreator(EventDefinitionDto.FIELD_TITLE, attributes,
-                Map.of(EventDefinitionDto.FIELD_TAGS, SearchQueryField.create(EventDefinitionDto.FIELD_TAGS)));
+                Map.of(EventDefinitionDto.FIELD_TAGS, SearchQueryField.create(EventDefinitionDto.FIELD_TAGS),
+                       EventDefinitionDto.FIELD_TACTICS_TECHNIQUES, SearchQueryField.create(EventDefinitionDto.FIELD_TACTICS_TECHNIQUES)));
         this.recentActivityService = recentActivityService;
         this.bulkDeletionExecutor = new SequentialBulkExecutor<>(this::delete, auditEventSender, objectMapper);
         this.bulkScheduleExecutor = new SequentialBulkExecutor<>(this::schedule, auditEventSender, objectMapper);
