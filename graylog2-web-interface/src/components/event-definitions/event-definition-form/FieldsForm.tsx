@@ -135,22 +135,16 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdi
         />
 
         {tacticsTechniquesEditorPlugin ? (
-          <>
-            <h2 className={commonStyles.title}>Tactics/Techniques <small>(optional)</small></h2>
-            <p>
-              Tag this Event Definition with MITRE ATT&CK&trade; tactic, technique, or sub-technique IDs.
-            </p>
-            <tacticsTechniquesEditorPlugin.component
-              value={eventDefinition.tactics_techniques ?? []}
-              onChange={(next: string[]) => onChange('tactics_techniques', next)}
-              disabled={!canEditCondition}
-              error={
-                Array.isArray(validation?.errors?.tactics_techniques)
-                  ? validation.errors.tactics_techniques.join(' ')
-                  : (validation?.errors?.tactics_techniques ?? null)
-              }
-            />
-          </>
+          <tacticsTechniquesEditorPlugin.component
+            value={eventDefinition.tactics_techniques ?? []}
+            onChange={(next: string[]) => onChange('tactics_techniques', next)}
+            disabled={!canEditCondition}
+            error={
+              Array.isArray(validation?.errors?.tactics_techniques)
+                ? validation.errors.tactics_techniques.join(' ')
+                : (validation?.errors?.tactics_techniques ?? null)
+            }
+          />
         ) : null}
 
         <h2 className={commonStyles.title}>

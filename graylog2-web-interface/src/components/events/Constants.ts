@@ -131,12 +131,6 @@ export const eventsTableSpecificAttributes: Array<Attribute> = [
     filterable: true,
     filter_component: TagsFilter,
   },
-  {
-    id: 'tactics_techniques',
-    title: 'Tactics/Techniques',
-    type: 'STRING',
-    sortable: false,
-  },
 ];
 export const additionalAttributes: Array<Attribute> = [...eventsTableSpecificAttributes, ...detailsAttributes];
 
@@ -153,7 +147,6 @@ export const eventsTableElements = {
       'event_definition_id',
       'event_definition_type',
       'tags',
-      'tactics_techniques',
       'timestamp',
     ],
     defaultColumnOrder: [
@@ -165,7 +158,6 @@ export const eventsTableElements = {
       'event_definition_id',
       'event_definition_type',
       'tags',
-      'tactics_techniques',
       'timestamp',
       'fields',
       'group_by_fields',

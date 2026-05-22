@@ -19,7 +19,6 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import styled from 'styled-components';
 import isEmpty from 'lodash/isEmpty';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import EventTypeLabel from 'components/events/events/EventTypeLabel';
@@ -99,19 +98,6 @@ export const TagsRenderer = ({ tags }: { tags: ReadonlyArray<string> | undefined
   return <ChipsCell items={tags} onItemClick={onTagClick} itemLabel="tag" />;
 };
 
-export const TacticsTechniquesRenderer = ({
-  tacticsTechniques,
-}: {
-  tacticsTechniques: ReadonlyArray<string> | undefined | null;
-}) => {
-  // Enterprise contributes a chip component that renders "ID: name" via the MITRE LUT.
-  // OSS falls back to the bare ID.
-  const chipPlugin = PluginStore.exports('eventDefinitions.tacticsTechniquesChip')[0];
-  const renderItem = chipPlugin ? (id: string) => <chipPlugin.component id={id} /> : undefined;
-
-  return <ChipsCell items={tacticsTechniques} renderItem={renderItem} />;
-};
-
 export const eventTypeAttribute = {
   renderCell: (alert: boolean) => <EventTypeLabel isAlert={alert} />,
   staticWidth: 100,
@@ -151,10 +137,6 @@ export const getGeneralEventAttributeRenderers = <T extends EntityBase, M = unkn
   },
   tags: {
     renderCell: (tags: string[]) => <TagsRenderer tags={tags} />,
-    width: 0.3,
-  },
-  tactics_techniques: {
-    renderCell: (tacticsTechniques: string[]) => <TacticsTechniquesRenderer tacticsTechniques={tacticsTechniques} />,
     width: 0.3,
   },
 });
