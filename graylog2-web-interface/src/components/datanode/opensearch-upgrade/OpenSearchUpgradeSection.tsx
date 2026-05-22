@@ -118,12 +118,13 @@ const OpenSearchUpgradeSection = () => {
         <Row>
           <Col xs={12}>
             <ButtonToolbar>
-              <Button bsStyle="default" onClick={() => {}} disabled={hasOutdatedIndices} type="button">
-                Apply OpenSearch upgrade on next restart
-              </Button>
-              {isRollingUpgradePossible && (
+              {isRollingUpgradePossible ? (
                 <Button bsStyle="primary" onClick={() => {}} disabled={hasOutdatedIndices} type="button">
                   Start OpenSearch Rolling Upgrade
+                </Button>
+              ) : (
+                <Button bsStyle="default" onClick={() => {}} disabled={hasOutdatedIndices} type="button">
+                  Apply OpenSearch upgrade on next restart
                 </Button>
               )}
             </ButtonToolbar>

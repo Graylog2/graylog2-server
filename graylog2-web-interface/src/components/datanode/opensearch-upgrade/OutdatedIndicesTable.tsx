@@ -21,6 +21,7 @@ import { ArchiveClusterArchives, IndexerIndices } from '@graylog/server-api';
 
 import { Alert, Button, ButtonToolbar, Label, SegmentedControl, Table } from 'components/bootstrap';
 import { ConfirmDialog, Spinner } from 'components/common';
+import useCanArchive from 'components/indices/hooks/useCanArchive';
 import useOutdatedIndices from 'components/indices/hooks/useOutdatedIndices';
 import type { OutdatedIndex } from 'components/indices/hooks/useOutdatedIndices';
 import UserNotification from 'util/UserNotification';
@@ -164,9 +165,11 @@ const groupOutdatedIndices = (indices: Array<OutdatedIndex>): Array<IndicesGroup
 const OutdatedIndexActions = ({
   index,
   onAction,
+  canArchive,
 }: {
   index: OutdatedIndex;
   onAction: (action: ConfirmedAction) => void;
+  canArchive: boolean;
 }) => {
   if (index.system_index) {
     return (
@@ -178,7 +181,7 @@ const OutdatedIndexActions = ({
 
   return (
     <ButtonToolbar style={{ justifyContent: 'flex-end' }}>
-      {index.managed_index && (
+      {index.managed_index && canArchive && (
         <Button bsSize="xs" bsStyle="warning" onClick={() => onAction({ action: 'archive-delete', index })}>
           Archive and delete
         </Button>
@@ -193,9 +196,11 @@ const OutdatedIndexActions = ({
 const IndicesGroupTable = ({
   group,
   onAction,
+  canArchive,
 }: {
   group: IndicesGroup;
   onAction: (action: ConfirmedAction) => void;
+  canArchive: boolean;
 }) => {
   if (group.indices.length === 0) {
     return <Alert bsStyle="info">No outdated {group.shortLabel} indices.</Alert>;
@@ -227,7 +232,7 @@ const IndicesGroupTable = ({
               </td>
               <td>{index.version || 'Unknown'}</td>
               <td>
-                <OutdatedIndexActions index={index} onAction={onAction} />
+                <OutdatedIndexActions index={index} onAction={onAction} canArchive={canArchive} />
               </td>
             </tr>
           ))}
@@ -239,6 +244,7 @@ const IndicesGroupTable = ({
 
 const OutdatedIndicesTable = () => {
   const { data: outdatedIndices, isError, isLoading, refetch } = useOutdatedIndices();
+  const canArchive = useCanArchive();
   const [confirmedAction, setConfirmedAction] = useState<ConfirmedAction | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const indicesGroups = useMemo(() => groupOutdatedIndices(outdatedIndices), [outdatedIndices]);
@@ -304,7 +310,7 @@ const OutdatedIndicesTable = () => {
     <>
       <Heading>Outdated indices</Heading>
       <SegmentedControl data={segments} value={selectedGroupLabel} onChange={setSelectedGroupLabel} />
-      <IndicesGroupTable group={selectedGroup} onAction={setConfirmedAction} />
+      <IndicesGroupTable group={selectedGroup} onAction={setConfirmedAction} canArchive={canArchive} />
 
       {confirmedAction && (
         <ConfirmDialog
