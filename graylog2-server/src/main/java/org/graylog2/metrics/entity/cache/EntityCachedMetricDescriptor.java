@@ -16,6 +16,7 @@
  */
 package org.graylog2.metrics.entity.cache;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.metrics.entity.EntityMetric;
 import org.graylog2.metrics.entity.EntityMetricDescriptor;
@@ -36,6 +37,13 @@ import java.util.List;
  * @param <R> the type of the result after permission filtering (e.g. {@code Long} for a summed count)
  */
 public interface EntityCachedMetricDescriptor<C, R> extends EntityMetricDescriptor {
+
+    /**
+     * The Jackson type reference for the cached value type {@code C}.
+     * Used to safely deserialize values read from MongoDB, avoiding BSON type
+     * coercion issues (e.g. {@code Integer} vs {@code Long}).
+     */
+    TypeReference<C> cacheType();
 
     /**
      * The cache TTL for this field. After this duration, the cached value is considered

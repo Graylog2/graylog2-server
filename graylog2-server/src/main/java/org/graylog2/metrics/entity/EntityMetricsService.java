@@ -16,6 +16,7 @@
  */
 package org.graylog2.metrics.entity;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.BadRequestException;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.metrics.entity.cache.EntityCachedMetricDescriptor;
@@ -44,12 +45,15 @@ public class EntityMetricsService {
     private final String entityType;
     private final Map<String, EntityMetricDescriptor> descriptorsByField;
     private final MetricsCacheService cacheService;
+    private final ObjectMapper objectMapper;
 
     public EntityMetricsService(String entityType,
                                 Set<EntityMetricDescriptor> descriptors,
-                                MetricsCacheService cacheService) {
+                                MetricsCacheService cacheService,
+                                ObjectMapper objectMapper) {
         this.entityType = entityType;
         this.cacheService = cacheService;
+        this.objectMapper = objectMapper;
         this.descriptorsByField = descriptors.stream()
                 .collect(Collectors.toMap(EntityMetricDescriptor::fieldName, d -> d));
     }
@@ -124,11 +128,11 @@ public class EntityMetricsService {
         cacheService.putFieldBatch(entityType, descriptor.fieldName(), forCache);
     }
 
-    @SuppressWarnings("unchecked")
-    private static <C, R> R applyFilter(EntityCachedMetricDescriptor<C, R> descriptor,
-                                        Object cachedValue,
-                                        SearchUser searchUser) {
-        return descriptor.computeForUser((C) cachedValue, searchUser);
+    private <C, R> R applyFilter(EntityCachedMetricDescriptor<C, R> descriptor,
+                                  Object cachedValue,
+                                  SearchUser searchUser) {
+        final C typedValue = objectMapper.convertValue(cachedValue, descriptor.cacheType());
+        return descriptor.computeForUser(typedValue, searchUser);
     }
 
     private void validateFields(Set<String> fields) {

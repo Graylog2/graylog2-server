@@ -16,6 +16,7 @@
  */
 package org.graylog2.inputs.metrics;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog.events.search.MoreSearch;
@@ -48,6 +49,11 @@ public class InputMessagesPerStreamDescriptor implements EntityCachedMetricDescr
                                             @Named(MetricsCacheConfiguration.METRICS_CACHE_TTL_LONG) Duration cacheTtl) {
         this.moreSearch = moreSearch;
         this.cacheTtl = cacheTtl;
+    }
+
+    @Override
+    public TypeReference<Map<String, Long>> cacheType() {
+        return new TypeReference<>() {};
     }
 
     @Override
