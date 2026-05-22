@@ -16,12 +16,14 @@
  */
 package org.graylog2.metrics.entity;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.metrics.entity.cache.EntityCachedMetricDescriptor;
 import org.graylog2.metrics.entity.cache.MetricsCacheService;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -139,7 +141,7 @@ class EntityMetricsServiceTest {
         when(searchUser.isPermitted("pipelines:read", "pipeline-2")).thenReturn(true);
 
         final var service = new EntityMetricsService(ENTITY_TYPE,
-                Set.of(cachedDescriptor, uncachedDescriptor), cacheService);
+                Set.of(cachedDescriptor, uncachedDescriptor), cacheService, new ObjectMapperProvider().get());
         final var result = service.getMetrics(
                 List.of("entity-1"), Set.of("message_count", "pipeline_count"), searchUser);
 
@@ -149,7 +151,7 @@ class EntityMetricsServiceTest {
     }
 
     private EntityMetricsService createService(EntityMetricDescriptor descriptor) {
-        return new EntityMetricsService(ENTITY_TYPE, Set.of(descriptor), cacheService);
+        return new EntityMetricsService(ENTITY_TYPE, Set.of(descriptor), cacheService, new ObjectMapperProvider().get());
     }
 
     /**
@@ -167,6 +169,9 @@ class EntityMetricsServiceTest {
                     .map(e -> new EntityMetric<>(e.getKey(), e.getValue()))
                     .toList();
         }
+
+        @Override
+        public TypeReference<Map<String, Long>> cacheType() { return new TypeReference<>() {}; }
 
         @Override
         public String fieldName() { return fieldName; }

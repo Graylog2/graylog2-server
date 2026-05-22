@@ -221,7 +221,6 @@ public class MoreSearch {
     }
 
     public Map<String, Map<String, Long>> aggregateGroupedTerms(String queryString, TimeRange timeRange,
-                                                              SourceStreamFilter sourceStreamFilter,
                                                               String groupByField, String termsField,
                                                               int maxBuckets, int maxSubBuckets) {
         final Set<String> affectedIndices = getAffectedIndices(Set.of(), timeRange);
@@ -229,22 +228,20 @@ public class MoreSearch {
             return Map.of();
         }
         return moreSearchAdapter.aggregateGroupedTerms(queryString, timeRange, affectedIndices,
-                sourceStreamFilter, groupByField, termsField, maxBuckets, maxSubBuckets);
+                groupByField, termsField, maxBuckets, maxSubBuckets);
     }
 
     public Map<String, Long> aggregateTerms(String queryString, TimeRange timeRange,
-                                            SourceStreamFilter sourceStreamFilter,
                                             String termsField, int maxBuckets) {
         final Set<String> affectedIndices = getAffectedIndices(Set.of(), timeRange);
         if (affectedIndices == null || affectedIndices.isEmpty()) {
             return Map.of();
         }
         return moreSearchAdapter.aggregateTerms(queryString, timeRange, affectedIndices,
-                sourceStreamFilter, termsField, maxBuckets);
+                termsField, maxBuckets);
     }
 
     public Map<String, Double> aggregateGroupedMetric(String queryString, TimeRange timeRange,
-                                                      SourceStreamFilter sourceStreamFilter,
                                                       String groupByField, MoreSearchAdapter.AggregationType metricType,
                                                       String metricField, int maxBuckets) {
         final Set<String> affectedIndices = getAffectedIndices(Set.of(), timeRange);
@@ -252,7 +249,7 @@ public class MoreSearch {
             return Map.of();
         }
         return moreSearchAdapter.aggregateGroupedMetric(queryString, timeRange, affectedIndices,
-                sourceStreamFilter, groupByField, metricType, metricField, maxBuckets);
+                groupByField, metricType, metricField, maxBuckets);
     }
 
     /**

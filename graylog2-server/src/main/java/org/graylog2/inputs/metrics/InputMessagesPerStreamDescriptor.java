@@ -16,10 +16,10 @@
  */
 package org.graylog2.inputs.metrics;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog.events.search.MoreSearch;
-import org.graylog.events.search.SourceStreamFilter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.metrics.entity.EntityMetric;
 import org.graylog2.metrics.entity.cache.EntityCachedMetricDescriptor;
@@ -51,6 +51,11 @@ public class InputMessagesPerStreamDescriptor implements EntityCachedMetricDescr
     }
 
     @Override
+    public TypeReference<Map<String, Long>> cacheType() {
+        return new TypeReference<>() {};
+    }
+
+    @Override
     public String fieldName() {
         return FIELD_NAME;
     }
@@ -64,12 +69,11 @@ public class InputMessagesPerStreamDescriptor implements EntityCachedMetricDescr
     public List<EntityMetric<Map<String, Long>>> compute(Collection<String> entityIds) {
         final Map<String, Map<String, Long>> grouped = moreSearch.aggregateGroupedTerms(
                 entityIds.stream()
-                        .map(id -> FIELD_GL2_SOURCE_INPUT + ":" + id)
+                        .map(id -> FIELD_GL2_SOURCE_INPUT + ":" + MoreSearch.luceneEscape(id))
                         .collect(Collectors.joining(" OR ")),
                 RelativeRange.create(MetricsCacheConfiguration.RANGE_SECONDS_24H),
-                SourceStreamFilter.allAllowed(),
                 FIELD_GL2_SOURCE_INPUT, "streams",
-                entityIds.size(), Integer.MAX_VALUE);
+                entityIds.size(), MetricsCacheConfiguration.MAX_TERMS_SIZE);
 
         return entityIds.stream()
                 .map(id -> new EntityMetric<>(id, grouped.getOrDefault(id, Map.of())))

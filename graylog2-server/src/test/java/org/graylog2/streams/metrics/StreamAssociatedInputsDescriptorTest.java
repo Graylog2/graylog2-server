@@ -17,7 +17,6 @@
 package org.graylog2.streams.metrics;
 
 import org.graylog.events.search.MoreSearch;
-import org.graylog.events.search.SourceStreamFilter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.metrics.entity.EntityMetric;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -56,7 +55,7 @@ class StreamAssociatedInputsDescriptorTest {
     @Test
     void compute_returnsInputIdLists() {
         when(moreSearch.aggregateGroupedTerms(
-                anyString(), any(RelativeRange.class), any(SourceStreamFilter.class),
+                anyString(), any(RelativeRange.class),
                 anyString(), anyString(), anyInt(), anyInt()))
                 .thenReturn(Map.of(
                         "stream-1", Map.of("input-a", 100L, "input-b", 200L)
@@ -67,7 +66,6 @@ class StreamAssociatedInputsDescriptorTest {
         verify(moreSearch).aggregateGroupedTerms(
                 eq(FIELD_STREAMS + ":stream-1"),
                 any(RelativeRange.class),
-                eq(SourceStreamFilter.allAllowed()),
                 eq(FIELD_STREAMS), eq(FIELD_GL2_SOURCE_INPUT),
                 eq(1), eq(Integer.MAX_VALUE));
 
@@ -78,7 +76,7 @@ class StreamAssociatedInputsDescriptorTest {
     @Test
     void compute_returnsEmptyListForMissingStreams() {
         when(moreSearch.aggregateGroupedTerms(
-                anyString(), any(RelativeRange.class), any(SourceStreamFilter.class),
+                anyString(), any(RelativeRange.class),
                 anyString(), anyString(), anyInt(), anyInt()))
                 .thenReturn(Map.of());
 

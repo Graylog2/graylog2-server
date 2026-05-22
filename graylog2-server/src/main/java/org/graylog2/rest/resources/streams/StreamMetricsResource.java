@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.resources.streams;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.inject.Inject;
@@ -49,9 +50,10 @@ public class StreamMetricsResource extends RestResource {
 
     @Inject
     public StreamMetricsResource(@Named(ENTITY_TYPE_STREAMS) Set<EntityMetricDescriptor> descriptors,
-                                 MetricsCacheService cacheService) {
+                                 MetricsCacheService cacheService,
+                                 ObjectMapper objectMapper) {
         this.metricsService = new EntityMetricsService(
-                ENTITY_TYPE_STREAMS, descriptors, cacheService);
+                ENTITY_TYPE_STREAMS, descriptors, cacheService, objectMapper);
     }
 
     @GET

@@ -17,7 +17,6 @@
 package org.graylog2.streams.metrics;
 
 import org.graylog.events.search.MoreSearch;
-import org.graylog.events.search.SourceStreamFilter;
 import org.graylog2.metrics.entity.EntityMetric;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,7 +50,7 @@ class StreamMessageCountDescriptorTest {
     @Test
     void compute_queriesByStreamIds() {
         when(moreSearch.aggregateTerms(
-                anyString(), any(RelativeRange.class), any(SourceStreamFilter.class),
+                anyString(), any(RelativeRange.class),
                 anyString(), anyInt()))
                 .thenReturn(Map.of("stream-1", 500L, "stream-2", 200L));
 
@@ -60,7 +59,6 @@ class StreamMessageCountDescriptorTest {
         verify(moreSearch).aggregateTerms(
                 eq(FIELD_STREAMS + ":stream-1 OR " + FIELD_STREAMS + ":stream-2"),
                 any(RelativeRange.class),
-                eq(SourceStreamFilter.allAllowed()),
                 eq(FIELD_STREAMS), eq(2));
 
         assertThat(result).extracting(EntityMetric::entityId).containsExactlyInAnyOrder("stream-1", "stream-2");
@@ -73,7 +71,7 @@ class StreamMessageCountDescriptorTest {
     @Test
     void compute_returnsZeroForMissingStreams() {
         when(moreSearch.aggregateTerms(
-                anyString(), any(RelativeRange.class), any(SourceStreamFilter.class),
+                anyString(), any(RelativeRange.class),
                 anyString(), anyInt()))
                 .thenReturn(Map.of());
 

@@ -16,11 +16,11 @@
  */
 package org.graylog2.streams.metrics;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog.events.search.MoreSearch;
 import org.graylog.events.search.MoreSearchAdapter;
-import org.graylog.events.search.SourceStreamFilter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.metrics.entity.EntityMetric;
 import org.graylog2.metrics.entity.cache.EntityCachedMetricDescriptor;
@@ -55,6 +55,11 @@ public class StreamMaxProcessingTimeDescriptor implements EntityCachedMetricDesc
     }
 
     @Override
+    public TypeReference<Double> cacheType() {
+        return new TypeReference<>() {};
+    }
+
+    @Override
     public String fieldName() {
         return FIELD_NAME;
     }
@@ -71,7 +76,6 @@ public class StreamMaxProcessingTimeDescriptor implements EntityCachedMetricDesc
                         .map(id -> FIELD_STREAMS + ":" + id)
                         .collect(Collectors.joining(" OR ")),
                 RelativeRange.create(MetricsCacheConfiguration.RANGE_SECONDS_15M),
-                SourceStreamFilter.allAllowed(),
                 FIELD_STREAMS, MoreSearchAdapter.AggregationType.MAX, FIELD_GL2_PROCESSING_DURATION_MS,
                 entityIds.size());
 

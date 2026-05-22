@@ -34,6 +34,15 @@ public class MetricsCacheConfiguration {
     public static final int RANGE_SECONDS_24H = 86400;
     /** Query time range for short-window metrics (avg/max processing time, failure counts). */
     public static final int RANGE_SECONDS_15M = 900;
+    /**
+     * Upper bound for the {@code size} parameter in OpenSearch terms aggregations.
+     * Large values increase memory and compute on every shard ({@code shard_size = size * 1.5 + 10}).
+     * 10,000 is well beyond any realistic cardinality (streams per input, inputs per stream)
+     * while staying safely below the default {@code search.max_buckets} limit (65,535).
+     *
+     * @see <a href="https://docs.opensearch.org/latest/aggregations/bucket/terms/">OpenSearch terms aggregation</a>
+     */
+    public static final int MAX_TERMS_SIZE = 10_000;
 
     @Documentation(value = "Cache TTL for short-window metrics (e.g. avg/max processing time with a 15m window).")
     @Parameter(value = "metrics_cache_ttl_short", converter = JavaDurationConverter.class)

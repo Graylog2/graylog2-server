@@ -18,7 +18,6 @@ package org.graylog2.streams.metrics;
 
 import org.graylog.events.search.MoreSearch;
 import org.graylog.events.search.MoreSearchAdapter;
-import org.graylog.events.search.SourceStreamFilter;
 import org.graylog2.metrics.entity.EntityMetric;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,7 +52,7 @@ class StreamAvgProcessingTimeDescriptorTest {
     @Test
     void compute_queriesAvgProcessingTime() {
         when(moreSearch.aggregateGroupedMetric(
-                anyString(), any(RelativeRange.class), any(SourceStreamFilter.class),
+                anyString(), any(RelativeRange.class),
                 anyString(), any(MoreSearchAdapter.AggregationType.class), anyString(), anyInt()))
                 .thenReturn(Map.of("stream-1", 42.5));
 
@@ -62,7 +61,6 @@ class StreamAvgProcessingTimeDescriptorTest {
         verify(moreSearch).aggregateGroupedMetric(
                 eq(FIELD_STREAMS + ":stream-1"),
                 any(RelativeRange.class),
-                eq(SourceStreamFilter.allAllowed()),
                 eq(FIELD_STREAMS), eq(MoreSearchAdapter.AggregationType.AVG),
                 eq(FIELD_GL2_PROCESSING_DURATION_MS),
                 eq(1));
@@ -74,7 +72,7 @@ class StreamAvgProcessingTimeDescriptorTest {
     @Test
     void compute_returnsZeroForMissingStreams() {
         when(moreSearch.aggregateGroupedMetric(
-                anyString(), any(RelativeRange.class), any(SourceStreamFilter.class),
+                anyString(), any(RelativeRange.class),
                 anyString(), any(MoreSearchAdapter.AggregationType.class), anyString(), anyInt()))
                 .thenReturn(Map.of());
 

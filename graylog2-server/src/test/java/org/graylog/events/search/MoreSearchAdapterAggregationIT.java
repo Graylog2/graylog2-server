@@ -94,7 +94,6 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
     public void aggregateGroupedTerms_groupsByPrimaryAndSecondary() {
         final Map<String, Map<String, Long>> result = adapter.aggregateGroupedTerms(
                 "*", RelativeRange.allTime(), Set.of(INDEX_NAME),
-                allAllowed(),
                 "gl2_source_input", "streams",
                 100, 100);
 
@@ -114,7 +113,6 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
     public void aggregateGroupedTerms_withQueryFilter() {
         final Map<String, Map<String, Long>> result = adapter.aggregateGroupedTerms(
                 "gl2_source_input:input-2", RelativeRange.allTime(), Set.of(INDEX_NAME),
-                allAllowed(),
                 "gl2_source_input", "streams",
                 100, 100);
 
@@ -130,7 +128,6 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
     public void aggregateGroupedTerms_emptyResultForNoMatch() {
         final Map<String, Map<String, Long>> result = adapter.aggregateGroupedTerms(
                 "gl2_source_input:nonexistent", RelativeRange.allTime(), Set.of(INDEX_NAME),
-                allAllowed(),
                 "gl2_source_input", "streams",
                 100, 100);
 
@@ -141,7 +138,6 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
     public void aggregateGroupedTerms_respectsMaxBuckets() {
         final Map<String, Map<String, Long>> result = adapter.aggregateGroupedTerms(
                 "*", RelativeRange.allTime(), Set.of(INDEX_NAME),
-                allAllowed(),
                 "gl2_source_input", "streams",
                 1, 100);
 
@@ -154,7 +150,6 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
     public void aggregateTerms_countsByField() {
         final Map<String, Long> result = adapter.aggregateTerms(
                 "*", RelativeRange.allTime(), Set.of(INDEX_NAME),
-                allAllowed(),
                 "streams", 100);
 
         assertThat(result)
@@ -166,7 +161,6 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
     public void aggregateTerms_withQueryFilter() {
         final Map<String, Long> result = adapter.aggregateTerms(
                 "gl2_source_input:input-2", RelativeRange.allTime(), Set.of(INDEX_NAME),
-                allAllowed(),
                 "streams", 100);
 
         assertThat(result)
@@ -178,7 +172,6 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
     public void aggregateTerms_emptyResultForNoMatch() {
         final Map<String, Long> result = adapter.aggregateTerms(
                 "gl2_source_input:nonexistent", RelativeRange.allTime(), Set.of(INDEX_NAME),
-                allAllowed(),
                 "streams", 100);
 
         assertThat(result).isEmpty();
@@ -188,7 +181,6 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
     public void aggregateTerms_respectsMaxBuckets() {
         final Map<String, Long> result = adapter.aggregateTerms(
                 "*", RelativeRange.allTime(), Set.of(INDEX_NAME),
-                allAllowed(),
                 "gl2_source_input", 1);
 
         assertThat(result).hasSize(1);
@@ -201,7 +193,6 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
         // aggregateGroupedTerms which could miss it with a same-field sub-aggregation.
         final Map<String, Long> result = adapter.aggregateTerms(
                 "streams:stream-a OR streams:stream-b", RelativeRange.allTime(), Set.of(INDEX_NAME),
-                allAllowed(),
                 "streams", 100);
 
         assertThat(result)
@@ -215,7 +206,6 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
     public void aggregateGroupedMetric_avgByStream() {
         final Map<String, Double> result = adapter.aggregateGroupedMetric(
                 "*", RelativeRange.allTime(), Set.of(INDEX_NAME),
-                allAllowed(),
                 "streams", MoreSearchAdapter.AggregationType.AVG, "processing_time",
                 100);
 
@@ -228,7 +218,6 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
     public void aggregateGroupedMetric_maxByStream() {
         final Map<String, Double> result = adapter.aggregateGroupedMetric(
                 "*", RelativeRange.allTime(), Set.of(INDEX_NAME),
-                allAllowed(),
                 "streams", MoreSearchAdapter.AggregationType.MAX, "processing_time",
                 100);
 
@@ -241,7 +230,6 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
     public void aggregateGroupedMetric_withQueryFilter() {
         final Map<String, Double> result = adapter.aggregateGroupedMetric(
                 "gl2_source_input:input-1", RelativeRange.allTime(), Set.of(INDEX_NAME),
-                allAllowed(),
                 "streams", MoreSearchAdapter.AggregationType.AVG, "processing_time",
                 100);
 
@@ -254,7 +242,6 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
     public void aggregateGroupedMetric_emptyResultForNoMatch() {
         final Map<String, Double> result = adapter.aggregateGroupedMetric(
                 "gl2_source_input:nonexistent", RelativeRange.allTime(), Set.of(INDEX_NAME),
-                allAllowed(),
                 "streams", MoreSearchAdapter.AggregationType.AVG, "processing_time",
                 100);
 
