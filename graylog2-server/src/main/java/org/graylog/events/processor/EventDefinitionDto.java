@@ -222,7 +222,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
             for (String id : tacticsTechniques()) {
                 if (!TacticsTechniquesNormalizer.isValid(id)) {
                     validation.addError(FIELD_TACTICS_TECHNIQUES,
-                            "Invalid MITRE ATT&CK™ ID: \"" + id + "\". Expected format: TA0000, T0000, or T0000.000.");
+                            "Invalid tactic/technique ID: \"" + id + "\". Expected format: TA0000, T0000, or T0000.000.");
                     break;
                 }
             }
