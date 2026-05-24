@@ -282,4 +282,21 @@ public class EventDefinitionDtoTest {
         assertThat(validationResult.failed()).isTrue();
         assertThat(validationResult.getErrors()).containsKey("tags");
     }
+
+    @Test
+    public void invalidTacticsTechniquesAreAllReportedInOneMessage() {
+        final EventDefinitionDto invalid = testSubject.toBuilder()
+                .tacticsTechniques(ImmutableList.of("TA0002", "bogus", "also-bad", "T1059"))
+                .build();
+        final ValidationResult validationResult = validate(invalid);
+        assertThat(validationResult.failed()).isTrue();
+        assertThat(validationResult.getErrors()).containsKey("tactics_techniques");
+        final var errors = (java.util.List<String>) validationResult.getErrors().get("tactics_techniques");
+        assertThat(errors).hasSize(1);
+        assertThat(errors.get(0))
+                .contains("\"bogus\"")
+                .contains("\"also-bad\"")
+                .doesNotContain("\"TA0002\"")
+                .doesNotContain("\"T1059\"");
+    }
 }

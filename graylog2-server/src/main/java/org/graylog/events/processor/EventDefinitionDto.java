@@ -219,12 +219,14 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
             validation.addError(FIELD_TACTICS_TECHNIQUES, "Event Definition cannot have more than " + MAX_TACTICS_TECHNIQUES + " tactics/techniques.");
         }
         if (eventDefinitionConfiguration.isTacticsTechniquesValidationEnabled()) {
-            for (String id : tacticsTechniques()) {
-                if (!TacticsTechniquesNormalizer.isValid(id)) {
-                    validation.addError(FIELD_TACTICS_TECHNIQUES,
-                            "Invalid tactic/technique ID: \"" + id + "\". Expected format: TA0000, T0000, or T0000.000.");
-                    break;
-                }
+            final List<String> invalidIds = tacticsTechniques().stream()
+                    .filter(id -> !TacticsTechniquesNormalizer.isValid(id))
+                    .toList();
+            if (!invalidIds.isEmpty()) {
+                final String quoted = invalidIds.stream().map(id -> "\"" + id + "\"").collect(Collectors.joining(", "));
+                validation.addError(FIELD_TACTICS_TECHNIQUES,
+                        "Invalid tactic/technique ID" + (invalidIds.size() > 1 ? "s" : "") + ": " + quoted
+                                + ". Expected format: TA0000, T0000, or T0000.000.");
             }
         }
 

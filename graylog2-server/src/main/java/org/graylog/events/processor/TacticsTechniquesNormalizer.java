@@ -41,6 +41,7 @@ public final class TacticsTechniquesNormalizer {
                 .filter(Objects::nonNull)
                 .map(id -> id.trim().toUpperCase(Locale.ROOT))
                 .filter(s -> !s.isEmpty())
+                .distinct()
                 .collect(ImmutableList.toImmutableList());
     }
 

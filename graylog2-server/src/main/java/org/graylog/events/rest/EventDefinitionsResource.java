@@ -69,6 +69,7 @@ import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.processor.EventProcessorParameters;
 import org.graylog.events.processor.EventProcessorParametersWithTimerange;
 import org.graylog.events.processor.EventResolver;
+import org.graylog.events.processor.TacticsTechniquesValidator;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.scheduler.schedule.CronUtils;
@@ -165,7 +166,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     private final BulkExecutor<EventDefinitionDto, UserContext> bulkUnscheduleExecutor;
     private final EventResolver eventResolver;
     private final EntitySharesService entitySharesService;
-    private final org.graylog.events.processor.TacticsTechniquesValidator tacticsTechniquesValidator;
+    private final TacticsTechniquesValidator tacticsTechniquesValidator;
 
     @Inject
     public EventDefinitionsResource(DBEventDefinitionService dbService,
@@ -178,7 +179,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                     EventResolver eventResolver,
                                     EventDefinitionConfiguration eventDefinitionConfiguration,
                                     EntitySharesService entitySharesService,
-                                    org.graylog.events.processor.TacticsTechniquesValidator tacticsTechniquesValidator
+                                    TacticsTechniquesValidator tacticsTechniquesValidator
     ) {
         this.dbService = dbService;
         this.eventDefinitionHandler = eventDefinitionHandler;

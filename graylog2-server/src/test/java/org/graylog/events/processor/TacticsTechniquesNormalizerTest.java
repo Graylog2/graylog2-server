@@ -42,6 +42,12 @@ class TacticsTechniquesNormalizerTest {
     }
 
     @Test
+    void normalizeDeduplicatesEntries() {
+        assertThat(TacticsTechniquesNormalizer.normalize(List.of("TA0002", "ta0002", "T1059", "T1059", "t1059")))
+                .containsExactly("TA0002", "T1059");
+    }
+
+    @Test
     void isValidAcceptsCanonicalShapes() {
         assertThat(TacticsTechniquesNormalizer.isValid("TA0002")).isTrue();
         assertThat(TacticsTechniquesNormalizer.isValid("T1059")).isTrue();
