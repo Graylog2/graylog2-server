@@ -18,7 +18,7 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import ChipsCell from 'components/events/ChipsCell';
+import ChipsCell from 'components/common/ChipsCell';
 
 describe('ChipsCell', () => {
   it('renders nothing when items are empty', () => {
@@ -77,10 +77,7 @@ describe('ChipsCell', () => {
 
   it('uses a custom renderItem when supplied', () => {
     render(
-      <ChipsCell
-        items={['T1059', 'T1003']}
-        renderItem={(t) => <span data-testid="custom-chip">CUSTOM-{t}</span>}
-      />,
+      <ChipsCell items={['T1059', 'T1003']} renderItem={(t) => <span data-testid="custom-chip">CUSTOM-{t}</span>} />,
     );
 
     expect(screen.getByText('CUSTOM-T1003')).toBeInTheDocument();

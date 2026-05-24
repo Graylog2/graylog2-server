@@ -94,7 +94,7 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdi
   };
 
   const canEditCondition = canEdit && !isSystemEventDefinition(eventDefinition);
-  const tacticsTechniquesEditorPlugin = PluginStore.exports('eventDefinitions.tacticsTechniquesEditor')[0];
+  const tacticsTechniquesEditorPlugin = PluginStore.exports('eventDefinitions.components.tacticsTechniquesEditor')[0];
 
   if (showFieldForm) {
     return (

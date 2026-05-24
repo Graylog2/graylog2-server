@@ -31,7 +31,7 @@ import { Timestamp } from 'components/common';
 import type { ColumnRenderersByAttribute, EntityBase } from 'components/common/EntityDataTable/types';
 import EventDefinitionLink from 'components/events/events/EventDefinitionLink';
 import RemediationSteps from 'components/events/ReplaySearchSidebar/RemediationSteps';
-import ChipsCell from 'components/events/ChipsCell';
+import ChipsCell from 'components/common/ChipsCell';
 import useAppendTagFilter from 'components/events/useAppendTagFilter';
 
 const EventDefinitionRenderer = ({

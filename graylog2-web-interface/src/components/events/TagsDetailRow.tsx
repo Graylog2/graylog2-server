@@ -17,7 +17,7 @@
 import * as React from 'react';
 
 import DefinitionList from 'components/common/DefinitionList';
-import ChipsCell from 'components/events/ChipsCell';
+import ChipsCell from 'components/common/ChipsCell';
 import useAppendTagFilter from 'components/events/useAppendTagFilter';
 
 type Props = {

@@ -102,15 +102,19 @@ const ToggleButton = styled.button(
   `,
 );
 
-type Props = {
+type BaseProps = {
   items: ReadonlyArray<string> | undefined | null;
-  onItemClick?: (item: string) => void;
   collapsedCount?: number;
   truncate?: boolean;
   emptyFallback?: React.ReactNode;
   renderItem?: (item: string) => React.ReactNode;
-  itemLabel?: string;
 };
+
+// itemLabel is required when chips are clickable so the aria-label reads as e.g.
+// "Filter by tag" rather than "Filter by item".
+type Props =
+  | (BaseProps & { onItemClick?: undefined; itemLabel?: never })
+  | (BaseProps & { onItemClick: (item: string) => void; itemLabel: string });
 
 const ChipsCell = ({
   items,
@@ -119,7 +123,7 @@ const ChipsCell = ({
   truncate = true,
   emptyFallback = null,
   renderItem: customRenderItem = undefined,
-  itemLabel = 'item',
+  itemLabel,
 }: Props) => {
   const [isExpanded, setIsExpanded] = useState(false);
 

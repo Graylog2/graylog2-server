@@ -59,10 +59,20 @@ export interface EventDefinitionType {
   useCondition: () => boolean;
   hideFieldsStep?: boolean;
 }
+export type TacticsTechniquesEditorPlugin = {
+  component: React.ComponentType<{
+    value: ReadonlyArray<string>;
+    onChange: (next: string[]) => void;
+    disabled?: boolean;
+    error?: React.ReactNode;
+  }>;
+};
+
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     'eventDefinitionTypes'?: Array<EventDefinitionType>;
     'eventDefinitions.components.searchForm'?: Array<() => SearchBarControl | null>;
     'eventDefinitions.components.editSigmaModal'?: Array<{ component: React.FC; key: string }>;
+    'eventDefinitions.components.tacticsTechniquesEditor'?: Array<TacticsTechniquesEditorPlugin>;
   }
 }
