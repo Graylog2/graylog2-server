@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
 import * as React from 'react';
 
 import type { Stream } from 'stores/streams/StreamsStore';
@@ -27,27 +26,23 @@ type Props = {
   stream: Stream;
 };
 
-const SECTION_NAME = METRIC_COLUMN_IDS.pipelines;
+const SECTION_NAME = METRIC_COLUMN_IDS.associatedInputs;
 
-const PipelinesCell = ({ stream }: Props) => {
+const AssociatedInputsCell = ({ stream }: Props) => {
   const { metrics, isInitialLoading, isError } = useStreamMetricsFor(stream.id);
   const { toggleSection, expandedSections } = useExpandedSections();
-
-  if (stream.is_default || !stream.is_editable) {
-    return null;
-  }
 
   if (isInitialLoading && !metrics) {
     return <Spinner size="xs" />;
   }
 
-  if (isError || !metrics?.pipelines) {
-    return <span aria-label={`No connected pipelines available for stream ${stream.title}`}>—</span>;
+  if (isError || !metrics?.associated_inputs) {
+    return <span aria-label={`No associated inputs available for stream ${stream.title}`}>—</span>;
   }
 
-  const count = metrics.pipelines.length;
+  const count = metrics.associated_inputs.length;
   const isOpen = expandedSections?.[stream.id]?.includes(SECTION_NAME) ?? false;
-  const title = `${isOpen ? 'Hide' : 'Show'} connected pipelines for ${stream.title}`;
+  const title = `${isOpen ? 'Hide' : 'Show'} associated inputs for ${stream.title}`;
 
   return (
     <CountBadge
@@ -59,4 +54,4 @@ const PipelinesCell = ({ stream }: Props) => {
   );
 };
 
-export default PipelinesCell;
+export default AssociatedInputsCell;
