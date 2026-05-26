@@ -41,21 +41,25 @@ const ContentCell = styled.td`
   }
 `;
 
-const Content = styled.div`
-  position: sticky;
-  left: 0;
-  width: 100%;
-  max-width: var(${scrollContainerWidthVar}, 100%);
-  padding: ${CELL_PADDING}px ${CELL_PADDING}px ${({ theme }) => theme.spacings.md} ${({ theme }) => theme.spacings.lg};
-  background-color: ${({ theme }) => theme.colors.table.row.backgroundStriped};
-`;
+const Content = styled.div(
+  ({ theme }) => css`
+    position: sticky;
+    left: 0;
+    width: 100%;
+    max-width: var(${scrollContainerWidthVar}, 100%);
+    padding: ${CELL_PADDING}px ${CELL_PADDING}px ${theme.spacings.md} ${theme.spacings.lg};
+    background-color: ${theme.colors.table.row.backgroundStriped};
+  `,
+);
 
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: ${({ theme }) => theme.spacings.sm};
-`;
+const Header = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: ${theme.spacings.sm};
+  `,
+);
 
 const Actions = styled(ButtonToolbar)`
   display: flex;

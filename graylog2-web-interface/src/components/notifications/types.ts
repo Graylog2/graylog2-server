@@ -70,14 +70,3 @@ export type NotificationType = {
   details: Record<string, unknown>;
   timestamp: string;
 };
-
-
-export type PageShape = {
-  elements: NotificationType[];
-  pagination?: { total?: number };
-} & Record<string, unknown>;
-
-export type Snapshot = Array<[readonly unknown[], PageShape | undefined]>;
-
-export const isPageShape = (value: unknown): value is PageShape =>
-  typeof value === 'object' && value !== null && Array.isArray((value as PageShape).elements);
