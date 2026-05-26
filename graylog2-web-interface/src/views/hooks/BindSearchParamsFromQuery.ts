@@ -21,13 +21,41 @@ import type { ViewHook, ViewHookArguments } from 'views/logic/hooks/ViewHook';
 import View from 'views/logic/views/View';
 import normalizeSearchURLQueryParams from 'views/logic/NormalizeSearchURLQueryParams';
 import createSearch from 'views/logic/slices/createSearch';
+import GlobalOverride from 'views/logic/search/GlobalOverride';
 
 const bindSearchParamsFromQuery: ViewHook = async ({ query, view, executionState }: ViewHookArguments) => {
+  const { queryString, timeRange, streamsFilter, streamCategoriesFilter } = normalizeSearchURLQueryParams(query);
+
+  if (view.type === View.Type.Dashboard) {
+    if (!queryString && !timeRange) {
+      return [view, executionState];
+    }
+
+    const currentOverride = executionState.globalOverride ?? GlobalOverride.empty();
+    let overrideBuilder = currentOverride.toBuilder();
+
+    if (queryString) {
+      overrideBuilder = overrideBuilder.query(queryString);
+    }
+
+    if (timeRange) {
+      overrideBuilder = overrideBuilder.timerange(timeRange);
+    }
+
+    const newOverride = overrideBuilder.build();
+
+    if (isDeepEqual(newOverride, currentOverride)) {
+      return [view, executionState];
+    }
+
+    const newExecutionState = executionState.toBuilder().globalOverride(newOverride).build();
+
+    return [view, newExecutionState];
+  }
+
   if (view.type !== View.Type.Search) {
     return [view, executionState];
   }
-
-  const { queryString, timeRange, streamsFilter, streamCategoriesFilter } = normalizeSearchURLQueryParams(query);
 
   if (!queryString && !timeRange && !streamsFilter && !streamCategoriesFilter) {
     return [view, executionState];
