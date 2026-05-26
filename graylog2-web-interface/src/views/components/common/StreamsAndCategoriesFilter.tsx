@@ -62,8 +62,8 @@ type StreamsAndCategoriesFilterProps = Omit<
 const StreamsAndCategoriesFilter = ({
   id,
   onChange,
-  value,
   streams,
+  value = undefined,
   streamCategories = undefined,
   required = true,
   showStreams = true,
@@ -118,6 +118,7 @@ const StreamsAndCategoriesFilter = ({
   const handleReactSelectChange = (
     selected: StreamsAndCategoriesOption | StreamsAndCategoriesOption[],
   ) => {
+    // eslint-disable-next-line no-nested-ternary
     const selectedArray = Array.isArray(selected) ? selected : selected ? [selected] : [];
     onChange({
       streams: selectedArray.filter((o) => o.value.type === "stream").map((o) => o.value.id),
