@@ -41,7 +41,7 @@ const notif1: NotificationType = {
   description: 'The data directory is almost full.',
   timestamp: '2024-01-15T10:00:00.000Z',
   severity: 'urgent',
-  type: 'legacy_no_master',
+  type: 'no_master',
   key: 'no_master',
   node_id: 'node-1',
   details: {},

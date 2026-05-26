@@ -14,19 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export type NotificationType = {
-  id: string;
-  type: string;
-  key: string;
-  severity: string;
-  node_id: string;
-  title: string;
-  description: string;
-  details: Record<string, unknown>;
-  timestamp: string;
-};
-
-export type LegacyNotificationKind =
+export type NotificationKind =
   | 'data_node_needs_provisioning'
   | 'deflector_exists_as_index'
   | 'multi_master'
@@ -71,17 +59,18 @@ export type LegacyNotificationKind =
   | 'data_tiering_rollover_error'
   | 'data_node_heap_warning';
 
-export type LegacyNotificationType = {
+export type NotificationType = {
   id: string;
-  type: LegacyNotificationKind;
+  type: NotificationKind;
   key: string;
-  severity: 'normal' | 'urgent';
+  severity: string;
   node_id: string;
-  timestamp: string;
+  title: string;
+  description: string;
   details: Record<string, unknown>;
-  fields: Record<string, unknown>;
-  validations: Record<string, unknown>;
+  timestamp: string;
 };
+
 
 export type PageShape = {
   elements: NotificationType[];

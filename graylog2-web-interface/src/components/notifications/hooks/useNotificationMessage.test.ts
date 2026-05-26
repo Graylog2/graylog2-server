@@ -39,17 +39,17 @@ jest.mock('components/notifications/NotificationsFactory', () => ({
   default: { getValuesForNotification: jest.fn(() => ({})) },
 }));
 
-const baseNotification = {
+const baseNotification: NotificationType = {
   id: 'first-id',
   type: 'no_input_running',
-  key: undefined,
+  key: '',
   details: {},
-  validations: {},
-  fields: {},
   severity: 'urgent',
   timestamp: '2026-01-01T00:00:00.000Z',
   node_id: 'node-1',
-} as unknown as NotificationType;
+  title: '',
+  description: '',
+};
 
 describe('useNotificationMessage', () => {
   beforeEach(() => {

@@ -40,10 +40,9 @@ export const fetchNotifications = (searchParams: SearchParams): Promise<Paginate
     searchParams.sort.direction,
   )
     .then(({ elements, pagination, attributes }) => ({
-      list: elements,
+      list: elements as NotificationType[],
       pagination,
       attributes,
-      // 404 means the backend endpoint is not yet available; return empty rather than toasting.
     }))
     .catch((err: { status?: number }) => {
       if (err?.status === 404) return EMPTY_PAGE;

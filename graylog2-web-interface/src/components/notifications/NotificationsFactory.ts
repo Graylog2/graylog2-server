@@ -16,12 +16,10 @@
  */
 
 import Routes from 'routing/Routes';
-import type { LegacyNotificationType, NotificationType } from 'components/notifications/types';
-
-type AnyNotification = NotificationType | LegacyNotificationType;
+import type { NotificationType } from 'components/notifications/types';
 
 class NotificationsFactory {
-  static getValuesForNotification(notification: AnyNotification) {
+  static getValuesForNotification(notification: NotificationType) {
     switch (notification.type) {
       case 'legacy_ldap_config_migration': {
         const { auth_service_id: authServiceId } = notification.details;

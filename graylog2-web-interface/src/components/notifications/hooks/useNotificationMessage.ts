@@ -19,14 +19,12 @@ import { useQuery } from '@tanstack/react-query';
 import { SystemNotificationMessage } from '@graylog/server-api';
 
 import NotificationsFactory from 'components/notifications/NotificationsFactory';
-import type { LegacyNotificationType, NotificationType } from 'components/notifications/types';
+import type { NotificationType } from 'components/notifications/types';
 import { NOTIFICATIONS_QUERY_KEY } from 'components/notifications/constants';
 
 type Type = Parameters<typeof SystemNotificationMessage.renderHtmlWithKey>[0];
 
-type AnyNotification = NotificationType | LegacyNotificationType;
-
-const fetchNotificationMessage = (notification: AnyNotification) => {
+const fetchNotificationMessage = (notification: NotificationType) => {
   const values = NotificationsFactory.getValuesForNotification(notification);
   const type = notification.type.toLocaleUpperCase() as Type;
 
@@ -35,12 +33,10 @@ const fetchNotificationMessage = (notification: AnyNotification) => {
     : SystemNotificationMessage.renderHtml(type, values);
 };
 
-const useNotificationMessage = (notification: AnyNotification) => {
-  // include id so same-type notifications don't share a cache entry
-  const id = 'id' in notification ? notification.id : undefined;
+const useNotificationMessage = (notification: NotificationType) => {
   const { data } = useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: [...NOTIFICATIONS_QUERY_KEY, 'message', id, notification.key, notification.type],
+    queryKey: [...NOTIFICATIONS_QUERY_KEY, 'message', notification.id, notification.key, notification.type],
     queryFn: () => fetchNotificationMessage(notification),
   });
 
