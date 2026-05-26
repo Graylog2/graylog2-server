@@ -63,9 +63,7 @@ describe('TagsFilter', () => {
     );
 
     await waitFor(() => {
-      expect(mockedSlices).toHaveBeenCalledWith(
-        expect.objectContaining({ slice_column: 'tags', include_all: true }),
-      );
+      expect(mockedSlices).toHaveBeenCalledWith(expect.objectContaining({ slice_column: 'tags', include_all: true }));
     });
 
     expect(await screen.findByText('exfil')).toBeInTheDocument();

@@ -1374,6 +1374,7 @@
                             <nodeVersion>${nodejs.version}</nodeVersion>
                             <yarnVersion>${yarn.version}</yarnVersion>
                             <nodeDownloadRoot>https://graylog-ci-cache.s3.eu-west-1.amazonaws.com/downloads/node/</nodeDownloadRoot>
+                            <installDirectory>${webInterface.path}/node</installDirectory>
                         </configuration>
 
                         <executions>
@@ -1437,6 +1438,30 @@
                                 </goals>
                                 <configuration>
                                     <arguments>run build:preflight</arguments>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>luma: yarn install</id>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <arguments>install</arguments>
+                                    <workingDirectory>${webInterface.path}/docs/graylog-luma</workingDirectory>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>luma: yarn tsc</id>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <arguments>tsc</arguments>
+                                    <workingDirectory>${webInterface.path}/docs/graylog-luma</workingDirectory>
                                 </configuration>
                             </execution>
 

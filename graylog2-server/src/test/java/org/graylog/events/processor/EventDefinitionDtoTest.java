@@ -274,4 +274,15 @@ public class EventDefinitionDtoTest {
         assertThat(validationResult.failed()).isTrue();
         assertThat(validationResult.getErrors()).containsKey("tags");
     }
+
+    @Test
+    public void tagWithDotIsValid() {
+        // The test fixture may have unrelated validation errors, so we only assert that
+        // no tags-specific error is reported.
+        final EventDefinitionDto valid = testSubject.toBuilder()
+                .tags(ImmutableSet.of("attack.t1110", "auth.failed"))
+                .build();
+        final ValidationResult validationResult = validate(valid);
+        assertThat(validationResult.getErrors()).doesNotContainKey("tags");
+    }
 }
