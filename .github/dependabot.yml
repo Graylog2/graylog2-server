@@ -162,3 +162,23 @@ updates:
       - dependencies
     rebase-strategy: "disabled"
 
+  - package-ecosystem: npm
+    directory: "/graylog2-web-interface/docs/graylog-luma"
+    schedule:
+      interval: daily
+      time: "02:00"
+      timezone: "Europe/Berlin"
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 10
+    labels:
+      - dependencies
+    rebase-strategy: "disabled"
+    groups:
+      storybook:
+        patterns:
+          - "storybook"
+          - "@storybook/*"
+          - "eslint-plugin-storybook"
+          - "storybook-dark-mode"
+
