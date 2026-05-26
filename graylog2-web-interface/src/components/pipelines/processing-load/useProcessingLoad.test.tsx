@@ -18,6 +18,7 @@ import { renderHook } from 'wrappedTestingLibrary/hooks';
 import { waitFor } from 'wrappedTestingLibrary';
 
 import { PipelinesProcessingLoad } from '@graylog/server-api';
+
 import asMock from 'helpers/mocking/AsMock';
 
 import useProcessingLoad from './useProcessingLoad';
