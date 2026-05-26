@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Add missing redirect to new API browser."
+
+pulls = ["26093"]
