@@ -251,7 +251,7 @@ public class NotificationsResource extends RestResource {
     @Operation(summary = "Bulk delete notifications by their IDs")
     @Consumes(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.SYSTEM_NOTIFICATION_DELETE)
-    public Response bulkDelete(@Valid @NotNull BulkOperationRequest request) {
+    public Response bulkDelete(@Parameter(name = "Notification IDs to delete", required = true) @Valid @NotNull BulkOperationRequest request) {
         checkPermission(RestPermissions.NOTIFICATIONS_DELETE);
         paginationService.bulkDelete(request.entityIds());
         return Response.noContent().build();
