@@ -33,8 +33,8 @@ const baseResponse: ProcessingLoadResponse = {
   ],
   rules: [{ rule_id: 'r1', load_percent: 40 }],
   stage_rules: [
-    { pipeline_id: 'p1', rule_id: 'r1', stage: 0, load_percent: 25 },
-    { pipeline_id: 'p1', rule_id: 'r1', stage: 1, load_percent: 15 },
+    { pipeline_id: 'p1', rule_id: 'r1', stage: 0, load_percent: 25, pipeline_share_percent: 60 },
+    { pipeline_id: 'p1', rule_id: 'r1', stage: 1, load_percent: 15, pipeline_share_percent: 40 },
   ],
 };
 

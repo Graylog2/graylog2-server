@@ -29,6 +29,7 @@ export type StageRuleLoadEntry = {
   rule_id: string;
   stage: number;
   load_percent: number;
+  pipeline_share_percent: number;
 };
 
 export type ProcessingLoadResponse = {
