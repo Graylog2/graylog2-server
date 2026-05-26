@@ -51,7 +51,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class ClusterEventService extends AbstractExecutionThreadService {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterEventService.class);
@@ -64,7 +63,6 @@ public class ClusterEventService extends AbstractExecutionThreadService {
     private final ObjectMapper objectMapper;
     private final EventBus serverEventBus;
     private final RestrictedChainingClassLoader chainingClassLoader;
-    private final AtomicReference<MongoCursor<ClusterEvent>> eventsCursor = new AtomicReference<>();
     private Offset offset;
 
     @Inject
@@ -123,9 +121,9 @@ public class ClusterEventService extends AbstractExecutionThreadService {
         while (isRunning()) {
             final var events = eventsIterable(this.offset)
                     .cursorType(CursorType.TailableAwait)
+                    .maxAwaitTime(1, TimeUnit.SECONDS)
                     .noCursorTimeout(true);
             try (final var cursor = events.iterator()) {
-                this.eventsCursor.set(cursor);
                 if (!isRunning()) {
                     return;
                 }
@@ -149,20 +147,24 @@ public class ClusterEventService extends AbstractExecutionThreadService {
     @VisibleForTesting
     void iterateEvents(MongoCursor<ClusterEvent> cursor) {
         LOG.debug("Opened MongoDB cursor on \"{}\"", COLLECTION_NAME);
-        while (cursor.hasNext()) {
+        while (isRunning()) {
             final var clusterEvent = cursor.tryNext();
-            if (clusterEvent != null) {
-                LOG.trace("Processing cluster event: {}", clusterEvent);
-                Object payload = extractPayload(clusterEvent.payload(), clusterEvent.eventClass());
-                if (payload != null) {
-                    serverEventBus.post(payload);
-                } else {
-                    LOG.warn("Couldn't extract payload of cluster event with ID <{}>", clusterEvent.id());
-                    LOG.debug("Invalid payload in cluster event: {}", clusterEvent);
+            if (clusterEvent == null) {
+                if (cursor.getServerCursor() == null) {
+                    return;
                 }
-
-                this.offset = new Offset(clusterEvent.timestamp(), clusterEvent.id());
+                continue;
             }
+            LOG.trace("Processing cluster event: {}", clusterEvent);
+            Object payload = extractPayload(clusterEvent.payload(), clusterEvent.eventClass());
+            if (payload != null) {
+                serverEventBus.post(payload);
+            } else {
+                LOG.warn("Couldn't extract payload of cluster event with ID <{}>", clusterEvent.id());
+                LOG.debug("Invalid payload in cluster event: {}", clusterEvent);
+            }
+
+            this.offset = new Offset(clusterEvent.timestamp(), clusterEvent.id());
         }
     }
 
@@ -226,11 +228,4 @@ public class ClusterEventService extends AbstractExecutionThreadService {
         return null;
     }
 
-    @Override
-    protected void triggerShutdown() {
-        final var cursor = this.eventsCursor.get();
-        if (cursor != null) {
-            cursor.close();
-        }
-    }
 }
