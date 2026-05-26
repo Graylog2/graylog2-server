@@ -33,7 +33,7 @@ const CreateButtonWithSigma = () => {
   return (
     <>
       <CreateButton entityKey="Event Definition" />
-      <SigmaOptionsComponent />
+      {SigmaOptionsComponent ? <SigmaOptionsComponent /> : null}
     </>
   );
 };

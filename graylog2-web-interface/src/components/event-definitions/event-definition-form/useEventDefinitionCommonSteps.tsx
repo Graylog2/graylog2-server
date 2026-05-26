@@ -42,6 +42,7 @@ export const COMMON_STEP_TELEMETRY_KEYS = [
 ];
 
 export const INITIAL_EVENT_DEFINITION: EventDefinition = {
+  _scope: 'DEFAULT',
   title: '',
   description: '',
   priority: EventDefinitionPriorityEnum.MEDIUM,
@@ -55,6 +56,7 @@ export const INITIAL_EVENT_DEFINITION: EventDefinition = {
     backlog_size: null,
   },
   notifications: [],
+  tags: [],
   alert: false,
 };
 
