@@ -17,13 +17,12 @@
 import * as React from 'react';
 
 import { Badge } from 'components/bootstrap';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 import useNotificationBadgeCount from 'components/notifications/hooks/useNotificationBadgeCount';
-import hasNotificationPermission from 'components/notifications/hasNotificationPermission';
 
 const NotificationsNavTab = ({ text }: { text: string }) => {
-  const currentUser = useCurrentUser();
-  const enabled = hasNotificationPermission(currentUser.permissions);
+  const { isPermitted } = usePermissions();
+  const enabled = isPermitted('notifications:read');
   const { data, isLoading } = useNotificationBadgeCount({ enabled });
   const showBadge = !isLoading && !!data;
 

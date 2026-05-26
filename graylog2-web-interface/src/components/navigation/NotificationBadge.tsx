@@ -19,9 +19,8 @@ import styled from 'styled-components';
 
 import { LinkContainer } from 'components/common';
 import { Badge, Nav } from 'components/bootstrap';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 import useNotificationBadgeCount from 'components/notifications/hooks/useNotificationBadgeCount';
-import hasNotificationPermission from 'components/notifications/hasNotificationPermission';
 import Routes from 'routing/Routes';
 import { NAV_ITEM_HEIGHT } from 'theme/constants';
 
@@ -45,8 +44,8 @@ const StyledInactiveNavItem = styled(InactiveNavItem)`
 `;
 
 const NotificationBadge = () => {
-  const currentUser = useCurrentUser();
-  const enabled = hasNotificationPermission(currentUser.permissions);
+  const { isPermitted } = usePermissions();
+  const enabled = isPermitted('notifications:read');
   const { data, isLoading } = useNotificationBadgeCount({ enabled });
 
   return isLoading || !data ? null : (
