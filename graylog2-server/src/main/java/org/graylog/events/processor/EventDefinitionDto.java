@@ -240,7 +240,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
 
         if (tags().stream().anyMatch(tag -> !TagNormalizer.isValid(tag))) {
             validation.addError(FIELD_TAGS,
-                    "Event Definition tags may only contain lowercase letters, digits, hyphens and underscores.");
+                    "Event Definition tags may only contain lowercase letters, digits, hyphens, underscores, and dots.");
         }
 
         return validation;
