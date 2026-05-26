@@ -20,6 +20,7 @@ import type React from 'react';
 import type { SearchBarControl } from 'views/types';
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+import type { Attribute } from 'stores/PaginationTypes';
 
 export type AlertType = 'alert' | 'event' | 'event_definition';
 
@@ -68,11 +69,20 @@ export type TacticsTechniquesEditorPlugin = {
   }>;
 };
 
+export type TacticsTechniquesColumnPlugin = {
+  attribute: Attribute;
+  component: React.ComponentType<{ entity: EventDefinition }>;
+  // Hook evaluated inside EventDefinitionsContainer to decide whether to render the column.
+  // Lets the plugin gate on license/feature state without OSS knowing about it.
+  useCondition?: () => boolean;
+};
+
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     'eventDefinitionTypes'?: Array<EventDefinitionType>;
     'eventDefinitions.components.searchForm'?: Array<() => SearchBarControl | null>;
     'eventDefinitions.components.editSigmaModal'?: Array<{ component: React.FC; key: string }>;
     'eventDefinitions.components.tacticsTechniquesEditor'?: Array<TacticsTechniquesEditorPlugin>;
+    'eventDefinitions.components.tacticsTechniquesColumn'?: Array<TacticsTechniquesColumnPlugin>;
   }
 }
