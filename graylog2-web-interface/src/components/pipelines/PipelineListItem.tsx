@@ -25,12 +25,12 @@ import { Button, Label } from 'components/bootstrap';
 import type { PipelineType } from 'components/pipelines/types';
 import type { PipelineConnectionsType } from 'hooks/usePipelineConnections';
 import type { Stream } from 'logic/streams/types';
-import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import RuleDeprecationInfo from 'components/rules/RuleDeprecationInfo';
 import usePermissions from 'hooks/usePermissions';
 
 import PipelineProcessingErrors from './PipelineProcessingErrors';
+import getUsedStages from './PipelineStages';
 
 import ButtonToolbar from '../bootstrap/ButtonToolbar';
 
@@ -76,9 +76,6 @@ const DefaultLabel = styled(Label)(
   `,
 );
 
-const getStagesWithoutDuplicates = (pipelineStages: Array<number>, usedStagesAcc: Array<number> = []) =>
-  Array.from(new Set([...usedStagesAcc, ...pipelineStages]));
-
 const PipelineListItem = ({ pipeline, pipelines, connections, streams, onDeletePipeline }: Props) => {
   const { isPermitted } = usePermissions();
   const { loadingScopePermissions, scopePermissions } = useGetPermissionsByScope(pipeline);
@@ -90,25 +87,17 @@ const PipelineListItem = ({ pipeline, pipelines, connections, streams, onDeleteP
   const _formatStages = () => {
     const stageNumbers = stages.map((stage) => stage.stage);
 
-    return pipelines
-      .map(({ stages: pipelineStages }) => pipelineStages.map(({ stage }) => stage))
-      .reduce(
-        (usedStagesAcc: number[], pipelineStages: number[]) =>
-          getStagesWithoutDuplicates(pipelineStages, usedStagesAcc),
-        [],
-      )
-      .sort(naturalSort)
-      .map((usedStage) => {
-        if (stageNumbers.indexOf(usedStage) === -1) {
-          return (
-            <PipelineStage key={`${pipeline.id}-stage${usedStage}`} $idle>
-              Idle
-            </PipelineStage>
-          );
-        }
+    return getUsedStages(pipelines).map((usedStage) => {
+      if (stageNumbers.indexOf(usedStage) === -1) {
+        return (
+          <PipelineStage key={`${pipeline.id}-stage${usedStage}`} $idle>
+            Idle
+          </PipelineStage>
+        );
+      }
 
-        return <PipelineStage key={`${pipeline.id}-stage${usedStage}`}>Stage {usedStage}</PipelineStage>;
-      });
+      return <PipelineStage key={`${pipeline.id}-stage${usedStage}`}>Stage {usedStage}</PipelineStage>;
+    });
   };
   if (loadingScopePermissions) {
     return <Spinner text="Loading pipeline..." />;
