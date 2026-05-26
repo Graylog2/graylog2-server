@@ -293,9 +293,11 @@ public class EventDefinitionDtoTest {
         assertThat(validationResult.getErrors()).containsKey("tactics_techniques");
         final var errors = (java.util.List<String>) validationResult.getErrors().get("tactics_techniques");
         assertThat(errors).hasSize(1);
+        // Inputs are uppercased by TacticsTechniquesNormalizer before validation, so the
+        // error message reflects the canonical (upper-cased) form.
         assertThat(errors.get(0))
-                .contains("\"bogus\"")
-                .contains("\"also-bad\"")
+                .contains("\"BOGUS\"")
+                .contains("\"ALSO-BAD\"")
                 .doesNotContain("\"TA0002\"")
                 .doesNotContain("\"T1059\"");
     }
