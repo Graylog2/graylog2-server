@@ -50,13 +50,7 @@ type Props = {
 
 const formatCheckCount = (count: number) => `${count} check${count === 1 ? '' : 's'}`;
 
-const AffectedChildButton = ({
-  child,
-  tree,
-}: {
-  child: HealthNode;
-  tree: ReturnType<typeof useTree>;
-}) => {
+const AffectedChildButton = ({ child, tree }: { child: HealthNode; tree: ReturnType<typeof useTree> }) => {
   const childIsFeature = isHealthFeature(child);
   const childCountSummary = formatLeafCountVerbose(child, getEntityListFor(child.id)?.label);
 
@@ -113,7 +107,9 @@ const HealthDetailsPane = ({ tree, selectedNode, selectedPath }: Props) => {
   const recommendedAction = isLeafNode && isUnhealthy ? definition?.recommendedAction : undefined;
   const docsUrl = isLeafNode ? definition?.docsUrl : undefined;
 
-  const affectedChildren = isFeatureWithChildren ? selectedNode.children.filter((child) => child.status !== 'healthy') : [];
+  const affectedChildren = isFeatureWithChildren
+    ? selectedNode.children.filter((child) => child.status !== 'healthy')
+    : [];
 
   return (
     <DetailsPane>
@@ -166,9 +162,7 @@ const HealthDetailsPane = ({ tree, selectedNode, selectedPath }: Props) => {
         </DetailSection>
       ) : null}
 
-      {isLeafNode && entityList ? (
-        <EntityListButton url={entityList.url} label={entityList.label} />
-      ) : null}
+      {isLeafNode && entityList ? <EntityListButton url={entityList.url} label={entityList.label} /> : null}
 
       {latestMessage ? (
         <DetailSection>
