@@ -90,6 +90,7 @@ const getCustomColumnRenderers = (
           [tacticsTechniquesPlugin.attribute.id]: {
             renderCell: (_: unknown, eventDefinition: EventDefinition) => {
               const Cell = tacticsTechniquesPlugin.component;
+
               return <Cell entity={eventDefinition} />;
             },
             width: 0.2,
