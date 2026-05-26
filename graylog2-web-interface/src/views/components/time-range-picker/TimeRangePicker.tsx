@@ -20,7 +20,7 @@ import { Formik } from 'formik';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
 
-import { Button, Col, Row } from 'components/bootstrap';
+import { Button } from 'components/bootstrap';
 import Popover from 'components/common/Popover';
 import { Icon, KeyCapture, ModalSubmit, NestedForm } from 'components/common';
 import type { AbsoluteTimeRange, KeywordTimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
@@ -35,8 +35,11 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import type { RelativeTimeRangeClassified } from './types';
 import { classifyRelativeTimeRange, normalizeIfClassifiedRelativeTimeRange } from './RelativeTimeRangeClassifiedHelper';
-import TimeRangeTabs, { timeRangePickerTabs } from './TimeRangePickerTabs';
-import TimeRangePresetRow from './TimeRangePresetRow';
+import TimeRangePickerFormContent, { allTimeRangeTypes } from './TimeRangePickerFormContent';
+import type { SupportedTimeRangeType } from './TimeRangePickerFormContent';
+
+export { allTimeRangeTypes };
+export type { SupportedTimeRangeType } from './TimeRangePickerFormContent';
 
 export type TimeRangePickerFormValues = {
   timeRangeTabs: {
@@ -49,20 +52,6 @@ export type TimeRangePickerFormValues = {
 
 export type TimeRangePickerTimeRange =
   TimeRangePickerFormValues['timeRangeTabs'][keyof TimeRangePickerFormValues['timeRangeTabs']];
-export type SupportedTimeRangeType = keyof typeof timeRangePickerTabs;
-
-export const allTimeRangeTypes = Object.keys(timeRangePickerTabs) as Array<SupportedTimeRangeType>;
-
-const Timezone = styled.p(
-  ({ theme }) => css`
-    font-size: ${theme.fonts.size.small};
-    padding-left: 3px;
-    margin: 0;
-    min-height: 34px;
-    display: flex;
-    align-items: center;
-  `,
-);
 
 const PopoverTitle = styled.span`
   display: flex;
@@ -238,34 +227,20 @@ const TimeRangePicker = ({
                 },
               ]}>
               <NestedForm>
-                <Row>
-                  <Col md={12}>
-                    <TimeRangePresetRow limitDuration={limitDuration} />
-                    <TimeRangeTabs limitDuration={limitDuration} validTypes={validTypes} />
-                  </Col>
-                </Row>
-
-                <Row className="row-sm">
-                  <Col md={6}>
-                    <Timezone>
-                      All timezones using: <b>{userTimezone}</b>
-                    </Timezone>
-                  </Col>
-                  <Col md={6}>
-                    <ModalSubmit
-                      leftCol={
-                        noOverride && (
-                          <Button bsStyle="link" onClick={handleNoOverride}>
-                            No Override
-                          </Button>
-                        )
-                      }
-                      onCancel={handleCancel}
-                      disabledSubmit={!isValid || isValidating}
-                      submitButtonText="Update time range"
-                    />
-                  </Col>
-                </Row>
+                <TimeRangePickerFormContent limitDuration={limitDuration} validTypes={validTypes}>
+                  <ModalSubmit
+                    leftCol={
+                      noOverride && (
+                        <Button bsStyle="link" onClick={handleNoOverride}>
+                          No Override
+                        </Button>
+                      )
+                    }
+                    onCancel={handleCancel}
+                    disabledSubmit={!isValid || isValidating}
+                    submitButtonText="Update time range"
+                  />
+                </TimeRangePickerFormContent>
               </NestedForm>
             </KeyCapture>
           )}
