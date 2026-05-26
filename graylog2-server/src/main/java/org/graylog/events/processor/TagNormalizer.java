@@ -27,10 +27,10 @@ import java.util.regex.Pattern;
 public final class TagNormalizer {
     /**
      * Allowed character set for an event-definition tag. Lowercase ASCII letters, digits, hyphen,
-     * and underscore. Restricting to this set keeps tag values safe to embed directly in search
-     * queries (no Lucene/Mongo metacharacters) and avoids surprises in URL filters.
+     * underscore, and dot. Restricting to this set keeps tag values safe to embed directly in
+     * search queries (no Lucene/Mongo metacharacters) and avoids surprises in URL filters.
      */
-    public static final Pattern VALID_TAG_PATTERN = Pattern.compile("[a-z0-9_-]+");
+    public static final Pattern VALID_TAG_PATTERN = Pattern.compile("[a-z0-9_.-]+");
 
     private TagNormalizer() {}
 
