@@ -14,8 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 
-export const NOTIFICATIONS_QUERY_KEY = ['system', 'notifications'] as const;
+import { Button } from 'components/bootstrap';
+import type { NotificationType } from 'components/notifications/types';
+import useNotificationDismiss from 'components/notifications/hooks/useNotificationDismiss';
 
-export const BADGE_COUNT_KEY = 'badge-count' as const;
-export const TABLE_KEY = 'table' as const;
+type Props = { row: NotificationType };
+
+const ActionsCell = ({ row }: Props) => {
+  const { mutate: dismiss, isPending } = useNotificationDismiss();
+
+  return (
+    <Button
+      bsSize="xs"
+      bsStyle="default"
+      onClick={() => dismiss({ id: row.id })}
+      disabled={isPending}
+      aria-label="Dismiss">
+      Dismiss
+    </Button>
+  );
+};
+
+export default ActionsCell;

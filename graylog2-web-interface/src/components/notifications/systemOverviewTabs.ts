@@ -14,23 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import NotificationsNavTab from 'components/notifications/NotificationsNavTab';
+import Routes from 'routing/Routes';
 
-import { SystemNotifications } from '@graylog/server-api';
+const SYSTEM_OVERVIEW_TABS = [
+  { description: 'Overview', path: Routes.SYSTEM.OVERVIEW },
+  { description: 'Health', path: Routes.SYSTEM.NOTIFICATIONS, BadgeComponent: NotificationsNavTab },
+];
 
-import { NOTIFICATIONS_QUERY_KEY } from 'components/notifications/constants';
-
-const POLL_INTERVAL = 3000;
-
-const fetchNotifications = () => SystemNotifications.listNotifications({ requestShouldExtendSession: false });
-const useNotifications = ({ enabled = true }: { enabled?: boolean } = {}) => {
-  const { data, isLoading } = useQuery({
-    queryKey: NOTIFICATIONS_QUERY_KEY,
-    queryFn: fetchNotifications,
-    refetchInterval: POLL_INTERVAL,
-    enabled,
-  });
-
-  return { data, isLoading };
-};
-export default useNotifications;
+export default SYSTEM_OVERVIEW_TABS;
