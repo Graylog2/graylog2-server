@@ -106,7 +106,7 @@ class LoaderTabs extends React.Component<
   _isTabVisible = (tabKey: TabType) => {
     const { tabs } = this.props;
 
-    return tabs === tabKey || tabs.indexOf(tabKey) !== -1;
+    return tabs.indexOf(tabKey) !== -1;
   };
 
   _getActiveTab = (): TabType => {
