@@ -55,7 +55,7 @@ public class EventProcessorEventFactory implements EventFactory {
 
     @Override
     public Event createEvent(EventDefinition eventDefinition, DateTime eventTime, String message) {
-        return new EventImpl(
+        final EventImpl event = new EventImpl(
                 ulid.nextULID(),
                 eventTime.withZone(DateTimeZone.UTC),
                 eventDefinition.config().type(),
@@ -65,5 +65,7 @@ public class EventProcessorEventFactory implements EventFactory {
                 eventDefinition.priority(),
                 eventDefinition.alert()
         );
+        event.setTags(eventDefinition.tags());
+        return event;
     }
 }
