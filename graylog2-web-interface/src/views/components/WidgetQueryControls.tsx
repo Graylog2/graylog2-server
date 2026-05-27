@@ -14,73 +14,66 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from "react";
-import { useCallback, useEffect, useContext, useRef, useMemo } from "react";
-import { Field } from "formik";
-import moment from "moment";
-import styled from "styled-components";
-import isEmpty from "lodash/isEmpty";
-import { useIsFetching } from "@tanstack/react-query";
+import * as React from 'react';
+import { useCallback, useEffect, useContext, useRef, useMemo } from 'react';
+import { Field } from 'formik';
+import moment from 'moment';
+import styled from 'styled-components';
+import isEmpty from 'lodash/isEmpty';
+import { useIsFetching } from '@tanstack/react-query';
 
-import WidgetEditApplyAllChangesContext from "views/components/contexts/WidgetEditApplyAllChangesContext";
-import type { Stream } from "views/stores/StreamsStore";
-import { StreamsStore } from "views/stores/StreamsStore";
-import connect from "stores/connect";
-import { createElasticsearchQueryString } from "views/logic/queries/Query";
-import type Widget from "views/logic/widgets/Widget";
-import type { SearchBarFormValues } from "views/Constants";
-import { SEARCH_TYPE_RANGE_LIMIT_ERROR_TYPE, DEFAULT_TIMERANGE } from "views/Constants";
-import type GlobalOverride from "views/logic/search/GlobalOverride";
-import WidgetContext from "views/components/contexts/WidgetContext";
-import { PropagateDisableSubmissionState } from "views/components/aggregationwizard";
-import ViewsQueryValidation from "views/components/searchbar/queryvalidation/ViewsQueryValidation";
-import FormWarningsContext from "contexts/FormWarningsContext";
-import FormWarningsProvider from "contexts/FormWarningsProvider";
-import useParameters from "views/hooks/useParameters";
-import debounceWithPromise from "views/logic/debounceWithPromise";
-import validateQuery from "views/components/searchbar/queryvalidation/validateQuery";
-import ValidateOnParameterChange from "views/components/searchbar/ValidateOnParameterChange";
+import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
+import type { Stream } from 'views/stores/StreamsStore';
+import { StreamsStore } from 'views/stores/StreamsStore';
+import connect from 'stores/connect';
+import { createElasticsearchQueryString } from 'views/logic/queries/Query';
+import type Widget from 'views/logic/widgets/Widget';
+import type { SearchBarFormValues } from 'views/Constants';
+import { SEARCH_TYPE_RANGE_LIMIT_ERROR_TYPE, DEFAULT_TIMERANGE } from 'views/Constants';
+import type GlobalOverride from 'views/logic/search/GlobalOverride';
+import WidgetContext from 'views/components/contexts/WidgetContext';
+import { PropagateDisableSubmissionState } from 'views/components/aggregationwizard';
+import ViewsQueryValidation from 'views/components/searchbar/queryvalidation/ViewsQueryValidation';
+import FormWarningsContext from 'contexts/FormWarningsContext';
+import FormWarningsProvider from 'contexts/FormWarningsProvider';
+import useParameters from 'views/hooks/useParameters';
+import debounceWithPromise from 'views/logic/debounceWithPromise';
+import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
+import ValidateOnParameterChange from 'views/components/searchbar/ValidateOnParameterChange';
 import {
   executeDashboardWidgetSubmitHandler as executePluggableSubmitHandler,
   useInitialDashboardWidgetValues as usePluggableInitialValues,
   pluggableValidationPayload,
-} from "views/logic/searchbar/pluggableSearchBarControlsHandler";
-import type { CombinedSearchBarFormValues, SearchBarControl, HandlerContext } from "views/types";
-import usePluginEntities from "hooks/usePluginEntities";
-import useUserDateTime from "hooks/useUserDateTime";
-import {
-  SEARCH_BAR_GAP,
-  TimeRangeRow,
-  SearchQueryRow,
-} from "views/components/searchbar/SearchBarLayout";
-import PluggableCommands from "views/components/searchbar/queryinput/PluggableCommands";
-import useGlobalOverride from "views/hooks/useGlobalOverride";
-import type { ViewsDispatch } from "views/stores/useViewsDispatch";
-import { updateWidget } from "views/logic/slices/widgetActions";
-import {
-  setGlobalOverrideQuery,
-  setGlobalOverrideTimerange,
-} from "views/logic/slices/searchExecutionSlice";
-import useViewsDispatch from "views/stores/useViewsDispatch";
-import useHandlerContext from "views/components/useHandlerContext";
-import useView from "views/hooks/useView";
-import { normalizeFromSearchBarForBackend } from "views/logic/queries/NormalizeTimeRange";
-import QueryHistoryButton from "views/components/searchbar/QueryHistoryButton";
-import type { Editor } from "views/components/searchbar/queryinput/ace-types";
-import useSearchConfiguration from "hooks/useSearchConfiguration";
-import { defaultCompare } from "logic/DefaultCompare";
-import { executeActiveQuery } from "views/logic/slices/viewSlice";
-import useSearchResultTimeRangeErrorCheck from "views/hooks/useSearchResultTimeRangeErrorCheck";
-import type { StreamsAndCategoriesSelection } from "views/components/common/StreamsAndCategoriesFilter";
+} from 'views/logic/searchbar/pluggableSearchBarControlsHandler';
+import type { CombinedSearchBarFormValues, SearchBarControl, HandlerContext } from 'views/types';
+import usePluginEntities from 'hooks/usePluginEntities';
+import useUserDateTime from 'hooks/useUserDateTime';
+import { SEARCH_BAR_GAP, TimeRangeRow, SearchQueryRow } from 'views/components/searchbar/SearchBarLayout';
+import PluggableCommands from 'views/components/searchbar/queryinput/PluggableCommands';
+import useGlobalOverride from 'views/hooks/useGlobalOverride';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
+import { updateWidget } from 'views/logic/slices/widgetActions';
+import { setGlobalOverrideQuery, setGlobalOverrideTimerange } from 'views/logic/slices/searchExecutionSlice';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
+import useHandlerContext from 'views/components/useHandlerContext';
+import useView from 'views/hooks/useView';
+import { normalizeFromSearchBarForBackend } from 'views/logic/queries/NormalizeTimeRange';
+import QueryHistoryButton from 'views/components/searchbar/QueryHistoryButton';
+import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
+import { defaultCompare } from 'logic/DefaultCompare';
+import { executeActiveQuery } from 'views/logic/slices/viewSlice';
+import useSearchResultTimeRangeErrorCheck from 'views/hooks/useSearchResultTimeRangeErrorCheck';
+import type { StreamsAndCategoriesSelection } from 'views/components/common/StreamsAndCategoriesFilter';
 
-import TimeRangeOverrideInfo from "./searchbar/WidgetTimeRangeOverride";
-import TimeRangeFilter from "./searchbar/time-range-filter";
-import StreamsFilter from "./searchbar/StreamsFilter";
-import SearchButton from "./searchbar/SearchButton";
-import ViewsQueryInput from "./searchbar/ViewsQueryInput";
-import SearchBarForm from "./searchbar/SearchBarForm";
-import WidgetQueryOverride from "./WidgetQueryOverride";
-import PluggableSearchBarControls from "./searchbar/PluggableSearchBarControls";
+import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
+import TimeRangeFilter from './searchbar/time-range-filter';
+import StreamsFilter from './searchbar/StreamsFilter';
+import SearchButton from './searchbar/SearchButton';
+import ViewsQueryInput from './searchbar/ViewsQueryInput';
+import SearchBarForm from './searchbar/SearchBarForm';
+import WidgetQueryOverride from './WidgetQueryOverride';
+import PluggableSearchBarControls from './searchbar/PluggableSearchBarControls';
 
 const Container = styled.div`
   display: flex;
@@ -97,10 +90,7 @@ type Props = {
   availableStreams: Array<Stream>;
 };
 
-export const updateWidgetSearchControls = (
-  widget,
-  { timerange, streamsAndCategories, queryString },
-) =>
+export const updateWidgetSearchControls = (widget, { timerange, streamsAndCategories, queryString }) =>
   widget
     .toBuilder()
     .timerange(timerange)
@@ -171,7 +161,7 @@ const useBindApplySearchControlsChanges = (formRef) => {
 const useInitialFormValues = (widget: Widget) => {
   const { streams, streamCategories } = widget;
   const timerange = widget.timerange ?? DEFAULT_TIMERANGE;
-  const { query_string: queryString } = widget.query ?? createElasticsearchQueryString("");
+  const { query_string: queryString } = widget.query ?? createElasticsearchQueryString('');
   const initialValuesFromPlugins = usePluggableInitialValues(widget);
 
   return useMemo(
@@ -214,9 +204,9 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
   const { userTimezone } = useUserDateTime();
   const { config } = useSearchConfiguration();
   const isValidatingQuery = !!useIsFetching({
-    queryKey: ["validateSearchQuery"],
+    queryKey: ['validateSearchQuery'],
   });
-  const pluggableSearchBarControls = usePluginEntities("views.components.searchBar");
+  const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const limitDuration = moment.duration(config?.query_time_range_limit).asSeconds() ?? 0;
   const hasTimeRangeOverride = globalOverride?.timerange !== undefined;
   const hasQueryOverride = !!globalOverride?.query?.query_string;
@@ -225,20 +215,13 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
   const handlerContext = useHandlerContext();
   const validate = useCallback(
     (values: SearchBarFormValues) =>
-      _validateQueryString(
-        values,
-        globalOverride,
-        pluggableSearchBarControls,
-        userTimezone,
-        handlerContext,
-      ),
+      _validateQueryString(values, globalOverride, pluggableSearchBarControls, userTimezone, handlerContext),
     [globalOverride, pluggableSearchBarControls, userTimezone, handlerContext],
   );
   const initialValues = useInitialFormValues(widget);
   const dispatch = useViewsDispatch();
   const _onSubmit = useCallback(
-    (values: CombinedSearchBarFormValues) =>
-      onSubmit(dispatch, values, pluggableSearchBarControls, widget),
+    (values: CombinedSearchBarFormValues) => onSubmit(dispatch, values, pluggableSearchBarControls, widget),
     [dispatch, pluggableSearchBarControls, widget],
   );
   const _resetTimeRangeOverride = useCallback(() => dispatch(resetTimeRangeOverride), [dispatch]);
@@ -260,9 +243,7 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
 
   useBindApplySearchControlsChanges(formRef);
 
-  const searchResultTimeRangeErrorCheck = useSearchResultTimeRangeErrorCheck(
-    SEARCH_TYPE_RANGE_LIMIT_ERROR_TYPE,
-  );
+  const searchResultTimeRangeErrorCheck = useSearchResultTimeRangeErrorCheck(SEARCH_TYPE_RANGE_LIMIT_ERROR_TYPE);
 
   return (
     <FormWarningsProvider>
@@ -271,21 +252,10 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
         limitDuration={limitDuration}
         formRef={formRef}
         onSubmit={_onSubmit}
-        validateQueryString={validate}
-      >
-        {({
-          dirty,
-          errors,
-          isValid,
-          isSubmitting,
-          handleSubmit,
-          values,
-          setFieldValue,
-          validateForm,
-        }) => {
+        validateQueryString={validate}>
+        {({ dirty, errors, isValid, isSubmitting, handleSubmit, values, setFieldValue, validateForm }) => {
           const showTimeRangeErrorFromResults = searchResultTimeRangeErrorCheck(values?.timerange);
-          const disableSearchSubmit =
-            isSubmitting || isValidatingQuery || !isValid || showTimeRangeErrorFromResults;
+          const disableSearchSubmit = isSubmitting || isValidatingQuery || !isValid || showTimeRangeErrorFromResults;
 
           return (
             <Container>
@@ -299,16 +269,13 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                   <TimeRangeFilter
                     disabled={hasTimeRangeOverride}
                     limitDuration={limitDuration}
-                    onChange={(nextTimeRange) => setFieldValue("timerange", nextTimeRange)}
+                    onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                     value={values?.timerange}
                     hasErrorOnMount={!!errors.timerange || showTimeRangeErrorFromResults}
                   />
                 )}
                 {hasTimeRangeOverride && (
-                  <TimeRangeOverrideInfo
-                    value={globalOverride?.timerange}
-                    onReset={_resetTimeRangeOverride}
-                  />
+                  <TimeRangeOverrideInfo value={globalOverride?.timerange} onReset={_resetTimeRangeOverride} />
                 )}
 
                 <Field name="streamsAndCategories">
@@ -331,11 +298,7 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
               </TimeRangeRow>
 
               <SearchQueryRow>
-                <SearchButton
-                  disabled={disableSearchSubmit}
-                  dirty={dirty}
-                  displaySpinner={isSubmitting}
-                />
+                <SearchButton disabled={disableSearchSubmit} dirty={dirty} displaySpinner={isSubmitting} />
                 <SearchInputAndValidation>
                   <Field name="queryString">
                     {({ field: { name, value, onChange }, meta: { error } }) => (
@@ -347,9 +310,7 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                                 value={value}
                                 view={view}
                                 timeRange={
-                                  !isEmpty(globalOverride?.timerange)
-                                    ? globalOverride.timerange
-                                    : values?.timerange
+                                  !isEmpty(globalOverride?.timerange) ? globalOverride.timerange : values?.timerange
                                 }
                                 streams={values?.streamsAndCategories?.streams}
                                 placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
@@ -376,10 +337,7 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                 </SearchInputAndValidation>
 
                 {hasQueryOverride && (
-                  <WidgetQueryOverride
-                    value={globalOverride?.query}
-                    onReset={_resetQueryOverride}
-                  />
+                  <WidgetQueryOverride value={globalOverride?.query} onReset={_resetQueryOverride} />
                 )}
               </SearchQueryRow>
               <PluggableSearchBarControls />

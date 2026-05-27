@@ -14,16 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo } from "react";
-import * as React from "react";
-import styled from "styled-components";
+import { useMemo } from 'react';
+import * as React from 'react';
+import styled from 'styled-components';
 
-import { Select, Icon } from "components/common";
-import { defaultCompare } from "logic/DefaultCompare";
+import { Select, Icon } from 'components/common';
+import { defaultCompare } from 'logic/DefaultCompare';
 
 type StreamsAndCategoriesOption = {
   label: string;
-  value: { id: string; type: "stream" | "category" };
+  value: { id: string; type: 'stream' | 'category' };
 };
 
 export type StreamsAndCategoriesSelection = {
@@ -37,19 +37,16 @@ const StyledIcon = styled(Icon)`
 `;
 
 const renderOption = (option: StreamsAndCategoriesOption) =>
-  option.value.type === "stream" ? (
+  option.value.type === 'stream' ? (
     <>{option.label}</>
   ) : (
     <>
-      <StyledIcon name={"stacks"} size="xs" />
+      <StyledIcon name={'stacks'} size="xs" />
       {option.label}
     </>
   );
 
-type StreamsAndCategoriesFilterProps = Omit<
-  React.ComponentProps<typeof Select>,
-  "options" | "value"
-> & {
+type StreamsAndCategoriesFilterProps = Omit<React.ComponentProps<typeof Select>, 'options' | 'value'> & {
   onChange: (value: StreamsAndCategoriesSelection) => void;
   value?: StreamsAndCategoriesSelection;
   streams: Array<{ id: string; title: string; categories: string[] }>;
@@ -75,35 +72,26 @@ const StreamsAndCategoriesFilter = ({
   const options = useMemo(() => {
     const sortedCategories =
       showCategories && multi
-        ? [
-            ...new Set<string>(
-              streams.flatMap((stream) => streamCategories ?? stream?.categories ?? []),
-            ),
-          ]
+        ? [...new Set<string>(streams.flatMap((stream) => streamCategories ?? stream?.categories ?? []))]
             .map((category) => ({
               label: category,
-              value: { id: category, type: "category" as const },
+              value: { id: category, type: 'category' as const },
             }))
-            .sort((a: StreamsAndCategoriesOption, b: StreamsAndCategoriesOption) =>
-              defaultCompare(a.label, b.label),
-            )
+            .sort((a: StreamsAndCategoriesOption, b: StreamsAndCategoriesOption) => defaultCompare(a.label, b.label))
         : [];
     const sortedStreams = showStreams
       ? streams
           .map((stream: { id: string; title: string }) => ({
             label: stream.title,
-            value: { id: stream.id, type: "stream" as const },
+            value: { id: stream.id, type: 'stream' as const },
           }))
-          .sort((a: StreamsAndCategoriesOption, b: StreamsAndCategoriesOption) =>
-            defaultCompare(a.label, b.label),
-          )
+          .sort((a: StreamsAndCategoriesOption, b: StreamsAndCategoriesOption) => defaultCompare(a.label, b.label))
       : [];
 
     return grouping
       ? [...sortedCategories, ...sortedStreams]
-      : [...sortedCategories, ...sortedStreams].sort(
-          (a: StreamsAndCategoriesOption, b: StreamsAndCategoriesOption) =>
-            defaultCompare(a.label, b.label),
+      : [...sortedCategories, ...sortedStreams].sort((a: StreamsAndCategoriesOption, b: StreamsAndCategoriesOption) =>
+          defaultCompare(a.label, b.label),
         );
   }, [grouping, multi, showCategories, showStreams, streams, streamCategories]);
 
@@ -111,18 +99,16 @@ const StreamsAndCategoriesFilter = ({
 
   const selectedOptions = options.filter(
     (o) =>
-      (o.value.type === "stream" && value?.streams?.includes(o.value.id)) ||
-      (o.value.type === "category" && value?.categories?.includes(o.value.id)),
+      (o.value.type === 'stream' && value?.streams?.includes(o.value.id)) ||
+      (o.value.type === 'category' && value?.categories?.includes(o.value.id)),
   );
 
-  const handleReactSelectChange = (
-    selected: StreamsAndCategoriesOption | StreamsAndCategoriesOption[],
-  ) => {
+  const handleReactSelectChange = (selected: StreamsAndCategoriesOption | StreamsAndCategoriesOption[]) => {
     // eslint-disable-next-line no-nested-ternary
     const selectedArray = Array.isArray(selected) ? selected : selected ? [selected] : [];
     onChange({
-      streams: selectedArray.filter((o) => o.value.type === "stream").map((o) => o.value.id),
-      categories: selectedArray.filter((o) => o.value.type === "category").map((o) => o.value.id),
+      streams: selectedArray.filter((o) => o.value.type === 'stream').map((o) => o.value.id),
+      categories: selectedArray.filter((o) => o.value.type === 'category').map((o) => o.value.id),
     });
   };
 

@@ -14,45 +14,45 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from "react";
-import { useCallback, useRef } from "react";
-import * as Immutable from "immutable";
-import { Field } from "formik";
-import styled from "styled-components";
-import moment from "moment";
+import * as React from 'react';
+import { useCallback, useRef } from 'react';
+import * as Immutable from 'immutable';
+import { Field } from 'formik';
+import styled from 'styled-components';
+import moment from 'moment';
 
-import useView from "views/hooks/useView";
-import { useStore } from "stores/connect";
-import { Spinner } from "components/common";
-import SearchButton from "views/components/searchbar/SearchButton";
-import SearchActionsMenu from "views/components/searchbar/saved-search/SearchActionsMenu";
-import TimeRangeFilter from "views/components/searchbar/time-range-filter";
-import ViewsQueryInput from "views/components/searchbar/ViewsQueryInput";
-import ViewsRefreshControls from "views/components/searchbar/ViewsRefreshControls";
-import ScrollToHint from "views/components/common/ScrollToHint";
-import { StreamsStore } from "views/stores/StreamsStore";
-import ViewsQueryValidation from "views/components/searchbar/queryvalidation/ViewsQueryValidation";
-import type { FilterType, QueryId } from "views/logic/queries/Query";
-import type Query from "views/logic/queries/Query";
+import useView from 'views/hooks/useView';
+import { useStore } from 'stores/connect';
+import { Spinner } from 'components/common';
+import SearchButton from 'views/components/searchbar/SearchButton';
+import SearchActionsMenu from 'views/components/searchbar/saved-search/SearchActionsMenu';
+import TimeRangeFilter from 'views/components/searchbar/time-range-filter';
+import ViewsQueryInput from 'views/components/searchbar/ViewsQueryInput';
+import ViewsRefreshControls from 'views/components/searchbar/ViewsRefreshControls';
+import ScrollToHint from 'views/components/common/ScrollToHint';
+import { StreamsStore } from 'views/stores/StreamsStore';
+import ViewsQueryValidation from 'views/components/searchbar/queryvalidation/ViewsQueryValidation';
+import type { FilterType, QueryId } from 'views/logic/queries/Query';
+import type Query from 'views/logic/queries/Query';
 import {
   createElasticsearchQueryString,
   filtersToStreamSet,
   filtersToStreamCategorySet,
   newFiltersForQuery,
-} from "views/logic/queries/Query";
-import type { SearchBarFormValues } from "views/Constants";
-import { QUERY_TIME_RANGE_LIMIT_ERROR_TYPE } from "views/Constants";
-import WidgetFocusContext from "views/components/contexts/WidgetFocusContext";
-import FormWarningsContext from "contexts/FormWarningsContext";
-import FormWarningsProvider from "contexts/FormWarningsProvider";
-import debounceWithPromise from "views/logic/debounceWithPromise";
-import validateQuery from "views/components/searchbar/queryvalidation/validateQuery";
-import usePluginEntities from "hooks/usePluginEntities";
-import PluggableSearchBarControls from "views/components/searchbar/PluggableSearchBarControls";
-import useParameters from "views/hooks/useParameters";
-import ValidateOnParameterChange from "views/components/searchbar/ValidateOnParameterChange";
-import type { SearchBarControl, HandlerContext } from "views/types";
-import useUserDateTime from "hooks/useUserDateTime";
+} from 'views/logic/queries/Query';
+import type { SearchBarFormValues } from 'views/Constants';
+import { QUERY_TIME_RANGE_LIMIT_ERROR_TYPE } from 'views/Constants';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import FormWarningsContext from 'contexts/FormWarningsContext';
+import FormWarningsProvider from 'contexts/FormWarningsProvider';
+import debounceWithPromise from 'views/logic/debounceWithPromise';
+import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
+import usePluginEntities from 'hooks/usePluginEntities';
+import PluggableSearchBarControls from 'views/components/searchbar/PluggableSearchBarControls';
+import useParameters from 'views/hooks/useParameters';
+import ValidateOnParameterChange from 'views/components/searchbar/ValidateOnParameterChange';
+import type { SearchBarControl, HandlerContext } from 'views/types';
+import useUserDateTime from 'hooks/useUserDateTime';
 import {
   SEARCH_BAR_GAP,
   TimeRangeRow,
@@ -60,33 +60,33 @@ import {
   SearchQueryRow,
   SearchButtonAndQuery,
   SearchInputAndValidationContainer,
-} from "views/components/searchbar/SearchBarLayout";
-import PluggableCommands from "views/components/searchbar/queryinput/PluggableCommands";
-import useCurrentQuery from "views/logic/queries/useCurrentQuery";
-import useQueryFilters from "views/logic/queries/useQueryFilters";
-import type { ViewsDispatch } from "views/stores/useViewsDispatch";
-import useViewsDispatch from "views/stores/useViewsDispatch";
-import { updateQuery, executeActiveQuery } from "views/logic/slices/viewSlice";
-import useHandlerContext from "views/components/useHandlerContext";
-import QueryHistoryButton from "views/components/searchbar/QueryHistoryButton";
-import type { Editor } from "views/components/searchbar/queryinput/ace-types";
-import useIsLoading from "views/hooks/useIsLoading";
-import useSearchConfiguration from "hooks/useSearchConfiguration";
-import { defaultCompare } from "logic/DefaultCompare";
-import useAutoRefresh from "views/hooks/useAutoRefresh";
-import useViewsSelector from "views/stores/useViewsSelector";
-import { selectCurrentQueryResults } from "views/logic/slices/viewSelectors";
-import useSearchResultTimeRangeErrorCheck from "views/hooks/useSearchResultTimeRangeErrorCheck";
-import StreamsFilter from "views/components/searchbar/StreamsFilter";
-import type { StreamsAndCategoriesSelection } from "views/components/common/StreamsAndCategoriesFilter";
+} from 'views/components/searchbar/SearchBarLayout';
+import PluggableCommands from 'views/components/searchbar/queryinput/PluggableCommands';
+import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
+import useQueryFilters from 'views/logic/queries/useQueryFilters';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
+import { updateQuery, executeActiveQuery } from 'views/logic/slices/viewSlice';
+import useHandlerContext from 'views/components/useHandlerContext';
+import QueryHistoryButton from 'views/components/searchbar/QueryHistoryButton';
+import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
+import useIsLoading from 'views/hooks/useIsLoading';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
+import { defaultCompare } from 'logic/DefaultCompare';
+import useAutoRefresh from 'views/hooks/useAutoRefresh';
+import useViewsSelector from 'views/stores/useViewsSelector';
+import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
+import useSearchResultTimeRangeErrorCheck from 'views/hooks/useSearchResultTimeRangeErrorCheck';
+import StreamsFilter from 'views/components/searchbar/StreamsFilter';
+import type { StreamsAndCategoriesSelection } from 'views/components/common/StreamsAndCategoriesFilter';
 
-import SearchBarForm from "./searchbar/SearchBarForm";
+import SearchBarForm from './searchbar/SearchBarForm';
 
 import {
   executeSearchSubmitHandler as executePluggableSubmitHandler,
   useInitialSearchValues as usePluggableInitialValues,
   pluggableValidationPayload,
-} from "../logic/searchbar/pluggableSearchBarControlsHandler";
+} from '../logic/searchbar/pluggableSearchBarControlsHandler';
 
 const StreamsAndRefresh = styled.div`
   display: flex;
@@ -205,7 +205,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
   const currentQuery = useCurrentQuery();
   const queryFilters = useQueryFilters();
   const results = useViewsSelector(selectCurrentQueryResults);
-  const pluggableSearchBarControls = usePluginEntities("views.components.searchBar");
+  const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const initialValues = useInitialFormValues({ queryFilters, currentQuery });
   const dispatch = useViewsDispatch();
   const { restartAutoRefresh } = useAutoRefresh();
@@ -217,9 +217,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
   const handlerContext = useHandlerContext();
   const isLoadingExecution = useIsLoading();
 
-  const searchResultTimeRangeErrorCheck = useSearchResultTimeRangeErrorCheck(
-    QUERY_TIME_RANGE_LIMIT_ERROR_TYPE,
-  );
+  const searchResultTimeRangeErrorCheck = useSearchResultTimeRangeErrorCheck(QUERY_TIME_RANGE_LIMIT_ERROR_TYPE);
 
   if (!currentQuery || !config) {
     return <Spinner />;
@@ -238,8 +236,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
             onSubmit={_onSubmit}
             validateQueryString={(values) =>
               _validateQueryString(values, pluggableSearchBarControls, userTimezone, handlerContext)
-            }
-          >
+            }>
             {({
               dirty,
               errors,
@@ -251,15 +248,9 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
               setFieldValue,
               validateForm,
             }) => {
-              const showTimeRangeErrorFromResults = searchResultTimeRangeErrorCheck(
-                values?.timerange,
-              );
+              const showTimeRangeErrorFromResults = searchResultTimeRangeErrorCheck(values?.timerange);
               const disableSearchSubmit =
-                isSubmitting ||
-                isValidating ||
-                !isValid ||
-                isLoadingExecution ||
-                showTimeRangeErrorFromResults;
+                isSubmitting || isValidating || !isValid || isLoadingExecution || showTimeRangeErrorFromResults;
 
               return (
                 <>
@@ -273,13 +264,13 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
                     <TimeRangeRow>
                       <TimeRangeFilter
                         limitDuration={limitDuration}
-                        onChange={(nextTimeRange) => setFieldValue("timerange", nextTimeRange)}
+                        onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                         value={values?.timerange}
                         hasErrorOnMount={!!errors.timerange || showTimeRangeErrorFromResults}
                         moveRangeProps={{
                           effectiveTimerange: results?.effectiveTimerange,
                           initialTimerange: currentQuery.timerange,
-                          initialTimerangeFormat: "internalIndexer",
+                          initialTimerangeFormat: 'internalIndexer',
                         }}
                       />
                       <StreamsAndRefresh>
