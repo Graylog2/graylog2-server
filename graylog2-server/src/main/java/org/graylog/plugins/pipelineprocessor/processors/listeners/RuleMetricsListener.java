@@ -39,7 +39,13 @@ import static com.codahale.metrics.MetricRegistry.name;
  */
 public class RuleMetricsListener implements InterpreterListener {
     public enum Type {
-        EXECUTE, EVALUATE
+        EXECUTE, EVALUATE;
+
+        private final String lowerName = name().toLowerCase(Locale.US);
+
+        String lowerName() {
+            return lowerName;
+        }
     }
 
     private final MetricRegistry metricRegistry;
@@ -51,7 +57,7 @@ public class RuleMetricsListener implements InterpreterListener {
     }
 
     public static String getMetricName(String name, Type type) {
-        return name(Rule.class, name, "trace", type.toString().toLowerCase(Locale.US), "duration");
+        return name(Rule.class, name, "trace", type.lowerName(), "duration");
     }
 
     private void forEachStage(Rule rule, Pipeline pipeline, Consumer<Stage> consumer) {

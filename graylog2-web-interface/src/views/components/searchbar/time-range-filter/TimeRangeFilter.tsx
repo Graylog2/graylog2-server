@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useContext, useRef, useState } from 'react';
 import styled from 'styled-components';
+import type { FormikErrors } from 'formik';
 
 import type { TimeRange, NoTimeRangeOverride, AbsoluteTimeRange } from 'views/logic/queries/Query';
 import { SEARCH_BAR_GAP } from 'views/components/searchbar/SearchBarLayout';
@@ -52,7 +53,7 @@ type Props = {
   hasErrorOnMount?: boolean;
   limitDuration: number;
   noOverride?: boolean;
-  onChange: (timeRange: TimeRange | NoTimeRangeOverride) => void;
+  onChange: (timeRange: TimeRange | NoTimeRangeOverride) => void | Promise<void | FormikErrors<any>>;
   position?: 'bottom' | 'bottom-start' | 'right';
   showPresetDropdown?: boolean;
   validTypes?: Array<SupportedTimeRangeType>;
