@@ -1381,6 +1381,13 @@ public class FunctionsSnippetsTest extends BaseParserTest {
             assertThat(message.getField("mixed_friendly")).isEqualTo("1 week 1 day 3 hours 15 minutes");
             assertThat(message.getField("sub_friendly")).isEqualTo("250 ms");
 
+            // Sub-second remainder shown when total interval < 1 minute...
+            assertThat(message.getField("mix_sub_friendly")).isEqualTo("1 second 500 ms");
+            // ...and suppressed when total interval >= 1 minute (raw millis still has it)
+            assertThat(message.getField("mix_min_friendly")).isEqualTo("1 minute");
+            // Negative mixed sub-second
+            assertThat(message.getField("mix_neg_friendly")).isEqualTo("-1 second 500 ms");
+
             // to_date($message.timestamp) drives a realistic "session duration" calc.
             // The test clock fixes the message timestamp at GRAYLOG_EPOCH (2010-07-30T16:03:25Z),
             // and session_open is set 30 minutes earlier in the rule.

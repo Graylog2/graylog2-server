@@ -49,15 +49,15 @@ public class DateDiff extends AbstractFunction<Map<String, Object>> {
 
     public DateDiff() {
         left = ParameterDescriptor.type(LEFT, DateTime.class)
-                .description("The earlier date (start of the interval)")
+                .description("Start of the interval. May be before or after the end; the result is signed by default (end - start).")
                 .ruleBuilderVariable()
                 .build();
         right = ParameterDescriptor.type(RIGHT, DateTime.class)
-                .description("The later date (end of the interval)")
+                .description("End of the interval. May be before or after the start.")
                 .build();
         absolute = ParameterDescriptor.bool(ABSOLUTE)
                 .optional()
-                .description("If true, return absolute values; otherwise the result is signed (right - left), defaults to false")
+                .description("If true, return absolute values; otherwise the result is signed (end - start). Defaults to false.")
                 .build();
     }
 
@@ -102,7 +102,9 @@ public class DateDiff extends AbstractFunction<Map<String, Object>> {
 
     /**
      * Human-readable rendering of the (possibly signed) interval. Zero-valued components are
-     * omitted. Sub-second intervals are rendered in milliseconds.
+     * omitted. Sub-second remainder is included as a "ms" component only when the total
+     * interval is below one minute, so long intervals aren't cluttered with millisecond noise;
+     * the raw {@code millis} field always carries the exact value.
      */
     private static String friendly(long signedMillis) {
         if (signedMillis == 0) {
@@ -114,28 +116,33 @@ public class DateDiff extends AbstractFunction<Map<String, Object>> {
         if (neg) {
             sb.append('-');
         }
-        if (m < MS_PER_SECOND) {
-            sb.append(m).append(" ms");
-            return sb.toString();
-        }
         final long weeks   = m / MS_PER_WEEK;
         final long days    = (m / MS_PER_DAY)    % 7;
         final long hours   = (m / MS_PER_HOUR)   % 24;
         final long minutes = (m / MS_PER_MINUTE) % 60;
         final long seconds = (m / MS_PER_SECOND) % 60;
+        final long millis  = m % MS_PER_SECOND;
         appendPart(sb, weeks,   "week",   "weeks");
         appendPart(sb, days,    "day",    "days");
         appendPart(sb, hours,   "hour",   "hours");
         appendPart(sb, minutes, "minute", "minutes");
         appendPart(sb, seconds, "second", "seconds");
-        return sb.toString().trim();
+        // Include sub-second remainder when the interval is below a minute, so callers see
+        // precision for short deltas without "2 weeks ... 47 ms" noise on long ones.
+        if (millis > 0 && m < MS_PER_MINUTE) {
+            appendPart(sb, millis, "ms", "ms");
+        }
+        return sb.toString();
     }
 
     private static void appendPart(StringBuilder sb, long value, String singular, String plural) {
         if (value == 0) {
             return;
         }
-        sb.append(value).append(' ').append(value == 1 ? singular : plural).append(' ');
+        if (sb.length() > 0 && sb.charAt(sb.length() - 1) != '-') {
+            sb.append(' ');
+        }
+        sb.append(value).append(' ').append(value == 1 ? singular : plural);
     }
 
     @Override
@@ -148,9 +155,9 @@ public class DateDiff extends AbstractFunction<Map<String, Object>> {
                 .params(ImmutableList.of(left, right, absolute))
                 .description("Computes the difference between two dates and returns it as a map keyed by " +
                         "unit (millis, seconds, minutes, hours, days, weeks). The map also contains " +
-                        "'direction' (\"ahead\" | \"behind\" | \"equal\", describing right relative to left) " +
-                        "and 'friendly' (a human-readable rendering of the interval). By default the numeric " +
-                        "values are signed (right - left); pass absolute=true to get absolute values. " +
+                        "'direction' (\"ahead\" | \"behind\" | \"equal\", describing the end relative to the " +
+                        "start) and 'friendly' (a human-readable rendering of the interval). By default the " +
+                        "numeric values are signed (end - start); pass absolute=true to get absolute values. " +
                         "'direction' is always derived from the signed result and is preserved when " +
                         "absolute=true.")
                 .ruleBuilderEnabled()
