@@ -77,6 +77,20 @@ export type TacticsTechniquesColumnPlugin = {
   useCondition?: () => boolean;
 };
 
+export type TacticsTechniquesDetailRowPlugin = {
+  // Renders a Tactics/Techniques row inside the event details expanded section.
+  // Plugin owns the dual-read between the new tactics_techniques field and legacy
+  // sigma_rule_tag_* shape so callers don't have to know about either.
+  component: React.ComponentType<{ entity: { tactics_techniques?: string[]; fields?: Record<string, unknown> } }>;
+  useCondition?: () => boolean;
+};
+
+export type TacticsTechniquesSummaryPlugin = {
+  // Renders a Tactics/Techniques row on the event definition summary view.
+  component: React.ComponentType<{ eventDefinition: EventDefinition }>;
+  useCondition?: () => boolean;
+};
+
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     'eventDefinitionTypes'?: Array<EventDefinitionType>;
@@ -84,5 +98,7 @@ declare module 'graylog-web-plugin/plugin' {
     'eventDefinitions.components.editSigmaModal'?: Array<{ component: React.FC; key: string }>;
     'eventDefinitions.components.tacticsTechniquesEditor'?: Array<TacticsTechniquesEditorPlugin>;
     'eventDefinitions.components.tacticsTechniquesColumn'?: Array<TacticsTechniquesColumnPlugin>;
+    'eventDefinitions.components.tacticsTechniquesSummary'?: Array<TacticsTechniquesSummaryPlugin>;
+    'events.components.tacticsTechniquesDetailRow'?: Array<TacticsTechniquesDetailRowPlugin>;
   }
 }
