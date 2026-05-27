@@ -46,18 +46,14 @@ const StyledPanelGroup = styled(PanelGroup)`
   }
 `;
 
-const PanelToggle: React.ComponentType<React.ComponentProps<typeof Panel.Toggle> & { $clickable: boolean }> = styled(
-  Panel.Toggle,
-)(
+const PanelToggle = styled(Panel.Toggle)<{ $clickable?: boolean }>(
   ({ $clickable = true }) => css`
     cursor: ${$clickable ? 'pointer' : 'none'};
     pointer-events: ${$clickable ? 'auto' : 'none'};
   `,
 );
 
-const PanelBody: React.ComponentType<React.ComponentProps<typeof Panel.Body> & { $editable: boolean }> = styled(
-  Panel.Body,
-)(
+const PanelBody = styled(Panel.Body)<{ $editable?: boolean }>(
   ({ $editable = false }) => css`
     cursor: ${$editable ? 'inherit' : 'none'};
     pointer-events: ${$editable ? 'inherit' : 'none'};
