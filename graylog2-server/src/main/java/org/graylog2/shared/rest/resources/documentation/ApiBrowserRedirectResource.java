@@ -16,6 +16,7 @@
  */
 package org.graylog2.shared.rest.resources.documentation;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -34,6 +35,7 @@ import static java.util.Objects.requireNonNull;
  * new frontend route at {@code /api-browser}, so that existing bookmarks keep
  * working after the server-side Swagger UI was removed.
  */
+@Hidden
 @Path("/api-browser{route: .*}")
 public class ApiBrowserRedirectResource {
     private final HttpConfiguration httpConfiguration;
