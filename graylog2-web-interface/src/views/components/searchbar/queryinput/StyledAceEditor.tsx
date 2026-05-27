@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 import styled, { css } from 'styled-components';
 import type { DefaultTheme } from 'styled-components';
 
@@ -27,7 +28,14 @@ type Props = {
   disabled: boolean;
 };
 
-const StyledAceEditor = styled(AceEditor)<Props>(
+// AceEditor's prop union from `react-ace` is wide enough that styled-components 6.4.2's
+// `OverrideStyle<NoInfer<Substitute<...>>>` wrappers push TypeScript past its recursion
+// budget at every use site. Cast to a plain ComponentType first to collapse the polymorphic
+// layers before they compound.
+type AceProps = React.ComponentProps<typeof AceEditor>;
+const PlainAceEditor = AceEditor as unknown as React.ComponentType<AceProps>;
+
+const StyledAceEditor = styled(PlainAceEditor)<Props>(
   ({ $scTheme, $height, disabled }) => css`
     &.ace-queryinput {
       ${$height ? `height: ${$height}px !important` : ''}
