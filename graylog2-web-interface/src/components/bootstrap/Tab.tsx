@@ -14,19 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line no-restricted-imports
-import { Tab as BootstrapTab } from 'react-bootstrap';
-import styled, { css } from 'styled-components';
+import React from 'react';
 
-const Tab = styled(BootstrapTab)(
-  ({ theme }) => css`
-    background-color: ${theme.colors.global.contentBackground};
-    border: 1px solid ${theme.colors.variant.default};
-    border-top: 0;
-    border-radius: 0 0 4px 4px;
-    padding: 9px;
-  `,
-);
+export type TabProps = {
+  eventKey: string | number;
+  title: React.ReactNode;
+  disabled?: boolean;
+  tabClassName?: string;
+  children?: React.ReactNode;
+};
+
+// Renders nothing — props are consumed by the parent <Tabs> component,
+// which builds Mantine's Tabs.List and Tabs.Panel from each Tab's props.
+const Tab = (_props: TabProps) => null;
 
 /** @component */
 export default Tab;
