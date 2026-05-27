@@ -29,13 +29,19 @@ import org.joda.time.Duration;
 
 import java.util.Map;
 
-public class DateDiff extends AbstractFunction<Map<String, Long>> {
+public class DateDiff extends AbstractFunction<Map<String, Object>> {
 
     public static final String NAME = "date_diff";
 
     private static final String LEFT = "left";
     private static final String RIGHT = "right";
     private static final String ABSOLUTE = "absolute";
+
+    private static final long MS_PER_SECOND = 1000L;
+    private static final long MS_PER_MINUTE = 60L * MS_PER_SECOND;
+    private static final long MS_PER_HOUR   = 60L * MS_PER_MINUTE;
+    private static final long MS_PER_DAY    = 24L * MS_PER_HOUR;
+    private static final long MS_PER_WEEK   = 7L  * MS_PER_DAY;
 
     private final ParameterDescriptor<DateTime, DateTime> left;
     private final ParameterDescriptor<DateTime, DateTime> right;
@@ -56,7 +62,7 @@ public class DateDiff extends AbstractFunction<Map<String, Long>> {
     }
 
     @Override
-    public Map<String, Long> evaluate(FunctionArgs args, EvaluationContext context) {
+    public Map<String, Object> evaluate(FunctionArgs args, EvaluationContext context) {
         final DateTime leftValue = left.required(args, context);
         final DateTime rightValue = right.required(args, context);
         if (leftValue == null || rightValue == null) {
@@ -64,32 +70,89 @@ public class DateDiff extends AbstractFunction<Map<String, Long>> {
         }
         final boolean abs = absolute.optional(args, context).orElse(false);
 
-        final long millis = new Duration(leftValue, rightValue).getMillis();
-        final long value = (abs && millis < 0) ? -millis : millis;
+        final long signedMillis = new Duration(leftValue, rightValue).getMillis();
+        final long value = (abs && signedMillis < 0) ? -signedMillis : signedMillis;
 
-        return ImmutableMap.<String, Long>builder()
+        return ImmutableMap.<String, Object>builder()
                 .put("millis", value)
-                .put("seconds", value / 1000L)
-                .put("minutes", value / (60L * 1000L))
-                .put("hours", value / (60L * 60L * 1000L))
-                .put("days", value / (24L * 60L * 60L * 1000L))
-                .put("weeks", value / (7L * 24L * 60L * 60L * 1000L))
+                .put("seconds", value / MS_PER_SECOND)
+                .put("minutes", value / MS_PER_MINUTE)
+                .put("hours",   value / MS_PER_HOUR)
+                .put("days",    value / MS_PER_DAY)
+                .put("weeks",   value / MS_PER_WEEK)
+                .put("direction", direction(signedMillis))
+                .put("friendly",  friendly(value))
                 .build();
     }
 
+    /**
+     * Describes {@code right} relative to {@code left}. Computed from the signed millis,
+     * so direction is preserved even when {@code absolute=true} strips the sign from the
+     * numeric components.
+     */
+    private static String direction(long signedMillis) {
+        if (signedMillis > 0) {
+            return "ahead";
+        }
+        if (signedMillis < 0) {
+            return "behind";
+        }
+        return "equal";
+    }
+
+    /**
+     * Human-readable rendering of the (possibly signed) interval. Zero-valued components are
+     * omitted. Sub-second intervals are rendered in milliseconds.
+     */
+    private static String friendly(long signedMillis) {
+        if (signedMillis == 0) {
+            return "0 ms";
+        }
+        final boolean neg = signedMillis < 0;
+        final long m = neg ? -signedMillis : signedMillis;
+        final StringBuilder sb = new StringBuilder();
+        if (neg) {
+            sb.append('-');
+        }
+        if (m < MS_PER_SECOND) {
+            sb.append(m).append(" ms");
+            return sb.toString();
+        }
+        final long weeks   = m / MS_PER_WEEK;
+        final long days    = (m / MS_PER_DAY)    % 7;
+        final long hours   = (m / MS_PER_HOUR)   % 24;
+        final long minutes = (m / MS_PER_MINUTE) % 60;
+        final long seconds = (m / MS_PER_SECOND) % 60;
+        appendPart(sb, weeks,   "week",   "weeks");
+        appendPart(sb, days,    "day",    "days");
+        appendPart(sb, hours,   "hour",   "hours");
+        appendPart(sb, minutes, "minute", "minutes");
+        appendPart(sb, seconds, "second", "seconds");
+        return sb.toString().trim();
+    }
+
+    private static void appendPart(StringBuilder sb, long value, String singular, String plural) {
+        if (value == 0) {
+            return;
+        }
+        sb.append(value).append(' ').append(value == 1 ? singular : plural).append(' ');
+    }
+
     @Override
-    public FunctionDescriptor<Map<String, Long>> descriptor() {
+    public FunctionDescriptor<Map<String, Object>> descriptor() {
         @SuppressWarnings({"unchecked", "rawtypes"})
-        final Class<? extends Map<String, Long>> returnType = (Class) Map.class;
-        return FunctionDescriptor.<Map<String, Long>>builder()
+        final Class<? extends Map<String, Object>> returnType = (Class) Map.class;
+        return FunctionDescriptor.<Map<String, Object>>builder()
                 .name(NAME)
                 .returnType(returnType)
                 .params(ImmutableList.of(left, right, absolute))
                 .description("Computes the difference between two dates and returns it as a map keyed by " +
-                        "unit: millis, seconds, minutes, hours, days, weeks. By default the result is signed " +
-                        "(right - left); pass absolute=true to get absolute values. Each unit is the full " +
-                        "interval converted to that unit (e.g. 2 days = 48 hours = 2880 minutes), truncated " +
-                        "toward zero.")
+                        "unit (millis, seconds, minutes, hours, days, weeks). The map also contains " +
+                        "'direction' (\"ahead\" | \"behind\" | \"equal\", describing right relative to left) " +
+                        "and 'friendly' (a human-readable rendering of the interval). By default the numeric " +
+                        "values are signed (right - left); pass absolute=true to get absolute values. " +
+                        "'direction' is always derived from the signed result and is preserved when " +
+                        "absolute=true.")
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Date difference")
                 .ruleBuilderTitle("Difference between '${left}' and '${right}'")

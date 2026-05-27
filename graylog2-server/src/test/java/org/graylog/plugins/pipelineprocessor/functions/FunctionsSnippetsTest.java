@@ -1358,20 +1358,35 @@ public class FunctionsSnippetsTest extends BaseParserTest {
             assertThat(message.getField("pos_hours")).isEqualTo(48L);
             assertThat(message.getField("pos_days")).isEqualTo(2L);
             assertThat(message.getField("pos_weeks")).isEqualTo(0L);
+            assertThat(message.getField("pos_direction")).isEqualTo("ahead");
+            assertThat(message.getField("pos_friendly")).isEqualTo("2 days");
 
             // signed result: later - earlier when args are swapped should be negative
             assertThat(message.getField("neg_millis")).isEqualTo(-twoDaysMillis);
             assertThat(message.getField("neg_days")).isEqualTo(-2L);
+            assertThat(message.getField("neg_direction")).isEqualTo("behind");
+            assertThat(message.getField("neg_friendly")).isEqualTo("-2 days");
 
-            // absolute=true clears the sign
+            // absolute=true clears the sign on the numeric values but direction is preserved
             assertThat(message.getField("abs_millis")).isEqualTo(twoDaysMillis);
             assertThat(message.getField("abs_days")).isEqualTo(2L);
+            assertThat(message.getField("abs_direction")).isEqualTo("behind");
+            assertThat(message.getField("abs_friendly")).isEqualTo("2 days");
+
+            // equal instants
+            assertThat(message.getField("eq_direction")).isEqualTo("equal");
+            assertThat(message.getField("eq_friendly")).isEqualTo("0 ms");
+
+            // multi-component friendly + sub-second friendly
+            assertThat(message.getField("mixed_friendly")).isEqualTo("1 week 1 day 3 hours 15 minutes");
+            assertThat(message.getField("sub_friendly")).isEqualTo("250 ms");
 
             // to_date($message.timestamp) drives a realistic "session duration" calc.
             // The test clock fixes the message timestamp at GRAYLOG_EPOCH (2010-07-30T16:03:25Z),
             // and session_open is set 30 minutes earlier in the rule.
             assertThat(message.getField("session_minutes")).isEqualTo(30L);
             assertThat(message.getField("session_seconds")).isEqualTo(30L * 60);
+            assertThat(message.getField("session_friendly")).isEqualTo("30 minutes");
         } finally {
             DateTimeUtils.setCurrentMillisSystem();
         }

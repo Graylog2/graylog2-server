@@ -6,20 +6,40 @@ then
     let later   = parse_date(value: "2023-05-12T00:00:00.000+0000", pattern: "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
     let positive = date_diff(earlier, later);
-    set_field("pos_millis",  positive.millis);
-    set_field("pos_seconds", positive.seconds);
-    set_field("pos_minutes", positive.minutes);
-    set_field("pos_hours",   positive.hours);
-    set_field("pos_days",    positive.days);
-    set_field("pos_weeks",   positive.weeks);
+    set_field("pos_millis",    positive.millis);
+    set_field("pos_seconds",   positive.seconds);
+    set_field("pos_minutes",   positive.minutes);
+    set_field("pos_hours",     positive.hours);
+    set_field("pos_days",      positive.days);
+    set_field("pos_weeks",     positive.weeks);
+    set_field("pos_direction", positive.direction);
+    set_field("pos_friendly",  positive.friendly);
 
     let negative = date_diff(later, earlier);
-    set_field("neg_millis", negative.millis);
-    set_field("neg_days",   negative.days);
+    set_field("neg_millis",    negative.millis);
+    set_field("neg_days",      negative.days);
+    set_field("neg_direction", negative.direction);
+    set_field("neg_friendly",  negative.friendly);
 
     let abs = date_diff(left: later, right: earlier, absolute: true);
-    set_field("abs_millis", abs.millis);
-    set_field("abs_days",   abs.days);
+    set_field("abs_millis",    abs.millis);
+    set_field("abs_days",      abs.days);
+    set_field("abs_direction", abs.direction);
+    set_field("abs_friendly",  abs.friendly);
+
+    let equal = date_diff(earlier, earlier);
+    set_field("eq_direction", equal.direction);
+    set_field("eq_friendly",  equal.friendly);
+
+    // Multi-component friendly: 1 week, 1 day, 3 hours, 15 minutes
+    let mixed_end = parse_date(value: "2023-05-18T03:15:00.000+0000", pattern: "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    let mixed = date_diff(earlier, mixed_end);
+    set_field("mixed_friendly", mixed.friendly);
+
+    // Sub-second friendly
+    let near = parse_date(value: "2023-05-10T00:00:00.250+0000", pattern: "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    let sub = date_diff(earlier, near);
+    set_field("sub_friendly", sub.friendly);
 
     // Realistic flow: compare a parsed field against the message timestamp via to_date().
     // The test fixture's message timestamp is GRAYLOG_EPOCH = 2010-07-30T16:03:25Z (UTC).
@@ -28,4 +48,5 @@ then
     let session      = date_diff(session_open, event_time);
     set_field("session_seconds", session.seconds);
     set_field("session_minutes", session.minutes);
+    set_field("session_friendly", session.friendly);
 end
