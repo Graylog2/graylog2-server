@@ -42,7 +42,7 @@ const Tabs = ({
   value = undefined,
   onChange = undefined,
   variant = 'outline',
-  className,
+  className = undefined,
 }: Props) => (
   <MantineTabs defaultValue={defaultValue} value={value} onChange={onChange} variant={variant} className={className}>
     {children}
