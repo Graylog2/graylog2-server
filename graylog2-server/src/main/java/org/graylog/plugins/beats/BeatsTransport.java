@@ -25,6 +25,7 @@ import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
@@ -40,6 +41,13 @@ import java.util.LinkedHashMap;
 import java.util.concurrent.Callable;
 
 public class BeatsTransport extends AbstractTcpTransport {
+
+    private static final String CK_MAX_COMPRESSED_PAYLOAD_SIZE = "max_compressed_payload_size";
+    private static final String CK_MAX_DECOMPRESSED_PAYLOAD_SIZE = "max_decompressed_payload_size";
+    private final int maxCompressedPayloadSize;
+    private final int maxDecompressedPayloadSize;
+
+
     @Inject
     public BeatsTransport(@Assisted Configuration configuration,
                           EventLoopGroup eventLoopGroup,
@@ -50,12 +58,14 @@ public class BeatsTransport extends AbstractTcpTransport {
                           TLSProtocolsConfiguration tlsConfiguration,
                           EncryptedValueService encryptedValueService) {
         super(configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration, tlsConfiguration, encryptedValueService);
+        maxCompressedPayloadSize = configuration.getInt(CK_MAX_COMPRESSED_PAYLOAD_SIZE, BeatsFrameDecoder.DEFAULT_MAX_COMPRESSED_PAYLOAD_SIZE);
+        maxDecompressedPayloadSize = configuration.getInt(CK_MAX_DECOMPRESSED_PAYLOAD_SIZE, BeatsFrameDecoder.DEFAULT_MAX_DECOMPRESSED_PAYLOAD_SIZE);
     }
 
     @Override
     protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getCustomChildChannelHandlers(MessageInput input) {
         final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlers = new LinkedHashMap<>(super.getCustomChildChannelHandlers(input));
-        handlers.put("beats", BeatsFrameDecoder::new);
+        handlers.put("beats", () -> new BeatsFrameDecoder(maxCompressedPayloadSize, maxDecompressedPayloadSize));
 
         return handlers;
     }
@@ -77,6 +87,22 @@ public class BeatsTransport extends AbstractTcpTransport {
             if (cr.containsField(NettyTransport.CK_PORT)) {
                 cr.getField(NettyTransport.CK_PORT).setDefaultValue(5044);
             }
+            cr.addField(new NumberField(
+                    CK_MAX_COMPRESSED_PAYLOAD_SIZE,
+                    "Maximum allowed compressed payload size",
+                    BeatsFrameDecoder.DEFAULT_MAX_COMPRESSED_PAYLOAD_SIZE,
+                    "Payloads larger than this value are rejected. If you use a non-default bulk_max_size " +
+                            "and have large messages, check that this value is sufficient.",
+                    NumberField.Attribute.ONLY_POSITIVE
+            ));
+            cr.addField(new NumberField(
+                    CK_MAX_DECOMPRESSED_PAYLOAD_SIZE,
+                    "Maximum allowed decompressed payload size",
+                    BeatsFrameDecoder.DEFAULT_MAX_DECOMPRESSED_PAYLOAD_SIZE,
+                    "If a payload after decompressing it exceeds this size, it is rejected. This protects against " +
+                            "decompression attacks and rarely needs to be adjusted.",
+                    NumberField.Attribute.ONLY_POSITIVE
+            ));
             return cr;
         }
     }

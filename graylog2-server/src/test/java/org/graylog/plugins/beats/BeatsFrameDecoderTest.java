@@ -28,6 +28,7 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.zip.Deflater;
@@ -42,7 +43,7 @@ public class BeatsFrameDecoderTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        decoder = new BeatsFrameDecoder();
+        decoder = new BeatsFrameDecoder(1024, 10*1024);
         channel = new EmbeddedChannel(new LoggingHandler(), decoder);
     }
 
@@ -280,6 +281,88 @@ public class BeatsFrameDecoderTest {
         assertThatThrownBy(() -> {
             channel.writeInbound(frame);
             channel.checkException();
+        }).isInstanceOf(DecoderException.class);
+    }
+
+    // --- Compressed frame limit tests ---
+
+    private static EmbeddedChannel channelWith(BeatsFrameDecoder decoder) {
+        return new EmbeddedChannel(new LoggingHandler(), decoder);
+    }
+
+    private static byte[] buildInnerJsonFrameBytes(int count, byte[] jsonBytes) {
+        final ByteBuf inner = Unpooled.buffer();
+        for (int i = 0; i < count; i++) {
+            inner.writeByte('2');
+            inner.writeByte('J');
+            inner.writeInt(i);
+            inner.writeInt(jsonBytes.length);
+            inner.writeBytes(jsonBytes);
+        }
+        final byte[] result = new byte[inner.readableBytes()];
+        inner.readBytes(result);
+        inner.release();
+        return result;
+    }
+
+    private static ByteBuf buildCompressedFrameFromPayload(byte[] uncompressedPayload) {
+        final Deflater deflater = new Deflater(Deflater.BEST_COMPRESSION);
+        deflater.setInput(uncompressedPayload);
+        deflater.finish();
+
+        final ByteArrayOutputStream compressedOut = new ByteArrayOutputStream();
+        final byte[] buf = new byte[1024];
+        while (!deflater.finished()) {
+            final int count = deflater.deflate(buf);
+            compressedOut.write(buf, 0, count);
+        }
+        deflater.end();
+        final byte[] compressed = compressedOut.toByteArray();
+
+        final ByteBuf frame = Unpooled.buffer(6 + compressed.length);
+        frame.writeByte('2');
+        frame.writeByte('C');
+        frame.writeInt(compressed.length);
+        frame.writeBytes(compressed);
+        return frame;
+    }
+
+    @Test
+    public void rejectsCompressedFrameWithOversizedCompressedPayload() {
+        final int maxCompressed = 64;
+        final BeatsFrameDecoder limitedDecoder = new BeatsFrameDecoder(maxCompressed, 64 * 1024 * 1024);
+        final EmbeddedChannel ch = channelWith(limitedDecoder);
+
+        final byte[] innerPayload = buildInnerJsonFrameBytes(50,
+                "{\"k\":\"v\"}".getBytes(StandardCharsets.UTF_8));
+        final ByteBuf frame = buildCompressedFrameFromPayload(innerPayload);
+
+        final int compressedSize = frame.readableBytes() - 6;
+        assertThat(compressedSize)
+                .as("compressed payload must exceed limit for this test to be valid")
+                .isGreaterThan(maxCompressed);
+
+        assertThatThrownBy(() -> {
+            ch.writeInbound(frame);
+            ch.checkException();
+        }).isInstanceOf(DecoderException.class);
+    }
+
+    @Test
+    public void rejectsCompressedFrameExceedingDecompressionLimit() {
+        final int maxDecompressed = 256;
+        final BeatsFrameDecoder limitedDecoder = new BeatsFrameDecoder(16 * 1024 * 1024, maxDecompressed);
+        final EmbeddedChannel ch = channelWith(limitedDecoder);
+
+        final byte[] innerPayload = buildInnerJsonFrameBytes(20,
+                "{\"m\":\"AAAA\"}".getBytes(StandardCharsets.UTF_8));
+        assertThat(innerPayload.length).isGreaterThan(maxDecompressed);
+
+        final ByteBuf frame = buildCompressedFrameFromPayload(innerPayload);
+
+        assertThatThrownBy(() -> {
+            ch.writeInbound(frame);
+            ch.checkException();
         }).isInstanceOf(DecoderException.class);
     }
 }
