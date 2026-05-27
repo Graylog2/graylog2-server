@@ -142,24 +142,22 @@ const TimeRangeTabs = ({ limitDuration, validTypes }: Props) => {
   const defaultRanges = useMemo(() => createDefaultRanges(formatTime), [formatTime]);
 
   const onSelect = useCallback(
-    (nextTab: string | null) => {
+    (nextTab: AbsoluteTimeRange['type'] | RelativeTimeRange['type'] | KeywordTimeRange['type'] | 'disabled' | null) => {
       if (!nextTab || nextTab === 'disabled') return;
-
-      const typedNextTab = nextTab as AbsoluteTimeRange['type'] | RelativeTimeRange['type'] | KeywordTimeRange['type'];
 
       setValues({
         timeRangeTabs: {
           ...timeRangeTabs,
-          [typedNextTab]: newTabTimeRange({
+          [nextTab]: newTabTimeRange({
             activeTab,
-            nextTab: typedNextTab,
+            nextTab,
             timeRangeTabs,
             formatTime,
             defaultRanges,
             userTimezone,
           }),
         },
-        activeTab: typedNextTab,
+        activeTab: nextTab,
       });
 
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_TIMERANGE_PICKER_TAB_SELECTED, {

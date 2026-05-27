@@ -18,28 +18,40 @@ import React from 'react';
 import { Tabs as MantineTabs } from '@mantine/core';
 import styled, { css } from 'styled-components';
 
-type TabsProps = {
-  children: React.ReactNode;
+const StyledTab = styled(MantineTabs.Tab)`
+  height: 40px;
+`;
+
+const StyledPanel = styled(MantineTabs.Panel)(
+  ({ theme }) => css`
+    padding: ${theme.spacings.sm};
+  `,
+);
+
+type Props = React.PropsWithChildren<{
   defaultValue?: string;
   value?: string | null;
   onChange?: (value: string | null) => void;
   variant?: 'default' | 'outline' | 'pills';
   className?: string;
-};
+}>;
 
-const StyledTabsBase = styled(MantineTabs)(
-  () => css`
-    .mantine-Tabs-tab {
-      height: 40px;
-    }
-  `,
+const Tabs = ({
+  children = undefined,
+  defaultValue = undefined,
+  value = undefined,
+  onChange = undefined,
+  variant = 'outline',
+  className,
+}: Props) => (
+  <MantineTabs defaultValue={defaultValue} value={value} onChange={onChange} variant={variant} className={className}>
+    {children}
+  </MantineTabs>
 );
 
-const Tabs = ({ variant = 'outline', ...props }: TabsProps) => <StyledTabsBase variant={variant} {...props} />;
-
 Tabs.List = MantineTabs.List;
-Tabs.Tab = MantineTabs.Tab;
-Tabs.Panel = MantineTabs.Panel;
+Tabs.Tab = StyledTab;
+Tabs.Panel = StyledPanel;
 
 /** @component */
 export default Tabs;
