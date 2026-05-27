@@ -159,7 +159,7 @@
         <json-org.version>20251224</json-org.version>
         <json-path.version>3.0.0</json-path.version>
         <jsoup.version>1.22.2</jsoup.version>
-        <kafka.version>4.2.0</kafka.version>
+        <kafka.version>4.3.0</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <log4j.version>2.26.0</log4j.version>
         <lucene.version>9.12.3</lucene.version>
@@ -177,7 +177,7 @@
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.18</pkts.version>
         <prometheus-client.version>0.16.0</prometheus-client.version>
-        <protobuf.version>4.34.1</protobuf.version>
+        <protobuf.version>4.35.0</protobuf.version>
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>3.0.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
@@ -189,7 +189,8 @@
         <slf4j.version>2.0.18</slf4j.version>
         <streamex.version>0.8.4</streamex.version>
         <swagger.version>2.2.50</swagger.version>
-        <swagger-parser.version>2.1.41</swagger-parser.version>
+        <swagger-parser.version>2.1.42</swagger-parser.version>
+
         <syslog4j.version>0.9.63</syslog4j.version>
         <threeten-extra.version>1.8.0</threeten-extra.version>
         <ulid.version>8.3.0</ulid.version>
@@ -212,7 +213,7 @@
         <awaitility.version>4.3.0</awaitility.version>
         <equalsverifier.version>4.5</equalsverifier.version>
         <guice-extension.version>1.2.1</guice-extension.version>
-        <junit-jupiter.version>6.0.3</junit-jupiter.version>
+        <junit-jupiter.version>6.1.0</junit-jupiter.version>
         <mockito.version>5.23.0</mockito.version>
         <restassured.version>6.0.0</restassured.version>
         <testcontainers.version>2.0.5</testcontainers.version>
@@ -773,7 +774,7 @@
                         <dependency>
                             <groupId>org.openrewrite</groupId>
                             <artifactId>rewrite-java</artifactId>
-                            <version>8.82.0</version>
+                            <version>8.82.1</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>

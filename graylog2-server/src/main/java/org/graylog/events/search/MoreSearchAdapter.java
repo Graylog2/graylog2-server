@@ -62,6 +62,39 @@ public interface MoreSearchAdapter {
                                            Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
                                            Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, List<NumberRange> ranges);
 
+    // The aggregation methods below do not perform stream-based permission filtering.
+    // Callers are responsible for their own permission checks (e.g. via computeForUser in descriptors).
+
+    /**
+     * Groups documents by {@code groupByField}, then performs a terms sub-aggregation on {@code termsField}
+     * within each bucket. Returns a map of group key to sub-term counts.
+     *
+     * @return map of group key → (sub-term key → doc count)
+     */
+    Map<String, Map<String, Long>> aggregateGroupedTerms(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                                         String groupByField, String termsField,
+                                                         int maxBuckets, int maxSubBuckets);
+
+    /**
+     * Performs a terms aggregation on {@code termsField} and returns the doc count per term.
+     *
+     * @return map of term value → doc count
+     */
+    Map<String, Long> aggregateTerms(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                     String termsField, int maxBuckets);
+
+    enum AggregationType { AVG, MAX }
+
+    /**
+     * Groups documents by {@code groupByField}, then computes a metric (avg or max) of {@code metricField}
+     * within each bucket.
+     *
+     * @return map of group key → metric value
+     */
+    Map<String, Double> aggregateGroupedMetric(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                               String groupByField, AggregationType aggregationType, String metricField,
+                                               int maxBuckets);
+
     default ChunkCommand buildScrollCommand(String queryString, TimeRange timeRange, Set<String> affectedIndices, List<UsedSearchFilter> filters, Set<String> streams, int batchSize) {
         ChunkCommand.Builder commandBuilder = ChunkCommand.builder()
                 .query(queryString)
