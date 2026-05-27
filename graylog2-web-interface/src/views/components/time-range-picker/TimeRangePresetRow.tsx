@@ -31,8 +31,9 @@ import { classifyRelativeTimeRange } from 'views/components/time-range-picker/Re
 import { ButtonToolbar } from 'components/bootstrap';
 
 const Container = styled(ButtonToolbar)`
-  float: right;
-  margin-top: 6px;
+  position: absolute;
+  right: 15px;
+  top: 6px;
 `;
 
 const normalizePresetTimeRange = (timeRange: TimeRange) => {

@@ -28,46 +28,9 @@ type TabsProps = {
 };
 
 const StyledTabsBase = styled(MantineTabs)(
-  ({ theme }) => css`
-    .mantine-Tabs-list {
-      border-bottom-color: ${theme.colors.variant.default};
-      flex-wrap: wrap;
-    }
-
+  () => css`
     .mantine-Tabs-tab {
-      color: ${theme.colors.text.primary};
-      border-color: ${theme.colors.variant.lighter.default} ${theme.colors.variant.lighter.default}
-        ${theme.colors.variant.default};
-      transition: background-color 150ms ease-in-out;
-
-      &:hover:not([data-active]):not([data-disabled]) {
-        background-color: ${theme.colors.variant.lightest.default};
-        color: ${theme.colors.text.primary};
-      }
-
-      &[data-active] {
-        color: ${theme.colors.variant.darkest.default};
-        background-color: ${theme.colors.global.contentBackground};
-        border-color: ${theme.colors.variant.default};
-        border-bottom-color: ${theme.colors.global.contentBackground};
-      }
-
-      &[data-disabled] {
-        color: ${theme.colors.gray[60]};
-        background-color: ${theme.colors.gray[100]};
-        border-color: ${theme.colors.gray[100]} ${theme.colors.gray[100]}
-          ${theme.colors.variant.default};
-        cursor: not-allowed;
-        opacity: 1;
-      }
-    }
-
-    .mantine-Tabs-panel {
-      background-color: ${theme.colors.global.contentBackground};
-      border: 1px solid ${theme.colors.variant.default};
-      border-top: 0;
-      border-radius: 0 0 4px 4px;
-      padding: 9px;
+      height: 40px;
     }
   `,
 );
