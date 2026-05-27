@@ -220,6 +220,38 @@ public class MoreSearch {
                 filterString, sourceStreamFilter, Map.of(), slicingColumn, meta, ranges);
     }
 
+    public Map<String, Map<String, Long>> aggregateGroupedTerms(String queryString, TimeRange timeRange,
+                                                              String groupByField, String termsField,
+                                                              int maxBuckets, int maxSubBuckets) {
+        final Set<String> affectedIndices = getAffectedIndices(Set.of(), timeRange);
+        if (affectedIndices == null || affectedIndices.isEmpty()) {
+            return Map.of();
+        }
+        return moreSearchAdapter.aggregateGroupedTerms(queryString, timeRange, affectedIndices,
+                groupByField, termsField, maxBuckets, maxSubBuckets);
+    }
+
+    public Map<String, Long> aggregateTerms(String queryString, TimeRange timeRange,
+                                            String termsField, int maxBuckets) {
+        final Set<String> affectedIndices = getAffectedIndices(Set.of(), timeRange);
+        if (affectedIndices == null || affectedIndices.isEmpty()) {
+            return Map.of();
+        }
+        return moreSearchAdapter.aggregateTerms(queryString, timeRange, affectedIndices,
+                termsField, maxBuckets);
+    }
+
+    public Map<String, Double> aggregateGroupedMetric(String queryString, TimeRange timeRange,
+                                                      String groupByField, MoreSearchAdapter.AggregationType metricType,
+                                                      String metricField, int maxBuckets) {
+        final Set<String> affectedIndices = getAffectedIndices(Set.of(), timeRange);
+        if (affectedIndices == null || affectedIndices.isEmpty()) {
+            return Map.of();
+        }
+        return moreSearchAdapter.aggregateGroupedMetric(queryString, timeRange, affectedIndices,
+                groupByField, metricType, metricField, maxBuckets);
+    }
+
     /**
      * Helper to perform basic Lucene escaping of query string values
      *
