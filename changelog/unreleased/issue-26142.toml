@@ -1,0 +1,4 @@
+type = "a"
+message = "Add `date_diff` pipeline function to compute the difference between two date objects."
+
+issues = ["26142"]

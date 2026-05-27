@@ -51,6 +51,7 @@ import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion
 import org.graylog.plugins.pipelineprocessor.functions.conversion.MapConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.dates.DateConversion;
+import org.graylog.plugins.pipelineprocessor.functions.dates.DateDiff;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FlexParseDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FormatDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.IsDate;
@@ -321,6 +322,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(ParseDate.NAME, new ParseDate());
         functions.put(ParseUnixMilliseconds.NAME, new ParseUnixMilliseconds());
         functions.put(FormatDate.NAME, new FormatDate());
+        functions.put(DateDiff.NAME, new DateDiff());
 
         functions.put(Years.NAME, new Years());
         functions.put(Months.NAME, new Months());
@@ -1333,6 +1335,128 @@ public class FunctionsSnippetsTest extends BaseParserTest {
             assertThat(message.getFieldAs(DateTime.class, "long_time_ago")).matches(date -> date.plus(Period.years(10000)).equals(GRAYLOG_EPOCH));
 
             assertThat(message.getTimestamp()).isEqualTo(GRAYLOG_EPOCH.plusHours(1));
+        } finally {
+            DateTimeUtils.setCurrentMillisSystem();
+        }
+    }
+
+    @Test
+    void dateDiff() {
+        final InstantMillisProvider clock = new InstantMillisProvider(GRAYLOG_EPOCH);
+        DateTimeUtils.setCurrentMillisProvider(clock);
+        try {
+            final Rule rule = parser.parseRule(ruleForTest(), true);
+            final Message message = evaluateRule(rule);
+
+            assertThat(message).isNotNull();
+
+            // 2 days between 2023-05-10 and 2023-05-12
+            final long twoDaysMillis = 2L * 24 * 60 * 60 * 1000;
+            assertThat(message.getField("pos_millis")).isEqualTo(twoDaysMillis);
+            assertThat(message.getField("pos_seconds")).isEqualTo(twoDaysMillis / 1000L);
+            assertThat(message.getField("pos_minutes")).isEqualTo(twoDaysMillis / (60L * 1000L));
+            assertThat(message.getField("pos_hours")).isEqualTo(48L);
+            assertThat(message.getField("pos_days")).isEqualTo(2L);
+            assertThat(message.getField("pos_weeks")).isEqualTo(0L);
+
+            // signed result: later - earlier when args are swapped should be negative
+            assertThat(message.getField("neg_millis")).isEqualTo(-twoDaysMillis);
+            assertThat(message.getField("neg_days")).isEqualTo(-2L);
+
+            // absolute=true clears the sign
+            assertThat(message.getField("abs_millis")).isEqualTo(twoDaysMillis);
+            assertThat(message.getField("abs_days")).isEqualTo(2L);
+
+            // to_date($message.timestamp) drives a realistic "session duration" calc.
+            // The test clock fixes the message timestamp at GRAYLOG_EPOCH (2010-07-30T16:03:25Z),
+            // and session_open is set 30 minutes earlier in the rule.
+            assertThat(message.getField("session_minutes")).isEqualTo(30L);
+            assertThat(message.getField("session_seconds")).isEqualTo(30L * 60);
+        } finally {
+            DateTimeUtils.setCurrentMillisSystem();
+        }
+    }
+
+    @Test
+    void dateDiffPrExamples() {
+        final InstantMillisProvider clock = new InstantMillisProvider(DateTime.parse("2025-05-27T14:00:00.000Z"));
+        DateTimeUtils.setCurrentMillisProvider(clock);
+        try {
+            // Example 1: VPN session duration
+            final String vpnRule =
+                    "rule \"vpn session duration\"\n" +
+                    "when\n" +
+                    "    has_field(\"acct_session_start\")\n" +
+                    "then\n" +
+                    "    let start_dt = parse_date(value: to_string($message.acct_session_start),\n" +
+                    "                              pattern: \"yyyy-MM-dd'T'HH:mm:ss.SSSZ\");\n" +
+                    "    let end_dt   = to_date($message.timestamp);\n" +
+                    "\n" +
+                    "    let session = date_diff(start_dt, end_dt);\n" +
+                    "    set_field(\"session_seconds\", session.seconds);\n" +
+                    "    set_field(\"session_minutes\", session.minutes);\n" +
+                    "    set_field(\"session_hours\",   session.hours);\n" +
+                    "end";
+            final Rule vpn = parser.parseRule(vpnRule, true);
+            final Message vpnMsg = evaluateRule(vpn, msg -> msg.addField("acct_session_start", "2025-05-27T13:42:10.000+0000"));
+            assertThat(vpnMsg).isNotNull();
+            // 17m 50s elapsed = 1070s
+            assertThat(vpnMsg.getField("session_seconds")).isEqualTo(1070L);
+            assertThat(vpnMsg.getField("session_minutes")).isEqualTo(17L);
+            assertThat(vpnMsg.getField("session_hours")).isEqualTo(0L);
+
+            // Example 2: Account age at login
+            final String ageRule =
+                    "rule \"tag new account logins\"\n" +
+                    "when\n" +
+                    "    has_field(\"event_type\") && to_string($message.event_type) == \"user_login\"\n" +
+                    "then\n" +
+                    "    let created = parse_date(value: to_string($message.user_created),\n" +
+                    "                             pattern: \"MM/dd/yyyy\");\n" +
+                    "    let age = date_diff(left: created, right: now(), absolute: true);\n" +
+                    "\n" +
+                    "    set_field(\"account_age_days\", age.days);\n" +
+                    "    set_field(\"account_is_new\",   to_long(age.days) < 7);\n" +
+                    "end";
+            final Rule ageR = parser.parseRule(ageRule, true);
+            final Message ageMsgFresh = evaluateRule(ageR, msg -> {
+                msg.addField("event_type", "user_login");
+                msg.addField("user_created", "05/25/2025"); // 2 days ago
+            });
+            assertThat(ageMsgFresh).isNotNull();
+            assertThat(ageMsgFresh.getField("account_age_days")).isEqualTo(2L);
+            assertThat(ageMsgFresh.getField("account_is_new")).isEqualTo(true);
+
+            final Message ageMsgOld = evaluateRule(ageR, msg -> {
+                msg.addField("event_type", "user_login");
+                msg.addField("user_created", "03/15/2024");
+            });
+            assertThat(ageMsgOld).isNotNull();
+            assertThat(ageMsgOld.getField("account_is_new")).isEqualTo(false);
+
+            // Example 3: HTTP request latency
+            final String latencyRule =
+                    "rule \"http latency\"\n" +
+                    "when\n" +
+                    "    has_field(\"request_received_at\") && has_field(\"response_sent_at\")\n" +
+                    "then\n" +
+                    "    let req = parse_date(value: to_string($message.request_received_at),\n" +
+                    "                         pattern: \"yyyy-MM-dd'T'HH:mm:ss.SSSZ\");\n" +
+                    "    let res = parse_date(value: to_string($message.response_sent_at),\n" +
+                    "                         pattern: \"yyyy-MM-dd'T'HH:mm:ss.SSSZ\");\n" +
+                    "\n" +
+                    "    let latency = date_diff(req, res);\n" +
+                    "    set_field(\"latency_ms\",      latency.millis);\n" +
+                    "    set_field(\"latency_seconds\", latency.seconds);\n" +
+                    "end";
+            final Rule lat = parser.parseRule(latencyRule, true);
+            final Message latMsg = evaluateRule(lat, msg -> {
+                msg.addField("request_received_at", "2025-05-27T13:59:59.750+0000");
+                msg.addField("response_sent_at",    "2025-05-27T14:00:00.123+0000");
+            });
+            assertThat(latMsg).isNotNull();
+            assertThat(latMsg.getField("latency_ms")).isEqualTo(373L);
+            assertThat(latMsg.getField("latency_seconds")).isEqualTo(0L);
         } finally {
             DateTimeUtils.setCurrentMillisSystem();
         }
