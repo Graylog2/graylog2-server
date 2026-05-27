@@ -21,7 +21,7 @@ import styled from 'styled-components';
 import { useFormikContext } from 'formik';
 
 import { availableTimeRangeTypes } from 'views/Constants';
-import { Tab, Tabs } from 'components/bootstrap';
+import { Tabs } from 'components/bootstrap';
 import type { AbsoluteTimeRange, KeywordTimeRange, RelativeTimeRange } from 'views/logic/queries/Query';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { isTimeRange } from 'views/typeGuards/timeRange';
@@ -31,7 +31,6 @@ import type { DateTime, DateTimeFormats } from 'util/DateTime';
 import { toDateObject } from 'util/DateTime';
 import { RELATIVE_CLASSIFIED_ALL_TIME_RANGE } from 'views/components/time-range-picker/RelativeTimeRangeClassifiedHelper';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import type { SelectCallback } from 'components/bootstrap/types';
 
 import TabAbsoluteTimeRange from './TabAbsoluteTimeRange';
 import TabKeywordTimeRange from './TabKeywordTimeRange';
@@ -51,22 +50,28 @@ type TimeRangeTabsArguments = {
   tabs: Array<SupportedTimeRangeType>;
 };
 
+type TabDefinition = {
+  type: SupportedTimeRangeType;
+  name: string;
+  content: React.ReactNode;
+};
+
 const StyledTabs = styled(Tabs)`
   margin-top: 1px;
   margin-bottom: 9px;
 `;
 
-const timeRangeTypeTabs = ({ activeTab, limitDuration, tabs }: TimeRangeTabsArguments) =>
+const timeRangeTypeTabs = ({ activeTab, limitDuration, tabs }: TimeRangeTabsArguments): TabDefinition[] =>
   availableTimeRangeTypes
     .filter(({ type }) => tabs.includes(type))
     .map(({ type, name }) => {
       const TimeRangeTypeTab = timeRangePickerTabs[type];
 
-      return (
-        <Tab title={name} key={`time-range-type-selector-${type}`} eventKey={type}>
-          {type === activeTab && <TimeRangeTypeTab disabled={false} limitDuration={limitDuration} />}
-        </Tab>
-      );
+      return {
+        type,
+        name,
+        content: type === activeTab ? <TimeRangeTypeTab disabled={false} limitDuration={limitDuration} /> : null,
+      };
     });
 
 const createDefaultRanges = (formatTime: (time: DateTime, format: DateTimeFormats) => string) => ({
@@ -137,20 +142,24 @@ const TimeRangeTabs = ({ limitDuration, validTypes }: Props) => {
   const defaultRanges = useMemo(() => createDefaultRanges(formatTime), [formatTime]);
 
   const onSelect = useCallback(
-    (nextTab: AbsoluteTimeRange['type'] | RelativeTimeRange['type'] | KeywordTimeRange['type']) => {
+    (nextTab: string | null) => {
+      if (!nextTab || nextTab === 'disabled') return;
+
+      const typedNextTab = nextTab as AbsoluteTimeRange['type'] | RelativeTimeRange['type'] | KeywordTimeRange['type'];
+
       setValues({
         timeRangeTabs: {
           ...timeRangeTabs,
-          [nextTab]: newTabTimeRange({
+          [typedNextTab]: newTabTimeRange({
             activeTab,
-            nextTab,
+            nextTab: typedNextTab,
             timeRangeTabs,
             formatTime,
             defaultRanges,
             userTimezone,
           }),
         },
-        activeTab: nextTab,
+        activeTab: typedNextTab,
       });
 
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_TIMERANGE_PICKER_TAB_SELECTED, {
@@ -164,7 +173,7 @@ const TimeRangeTabs = ({ limitDuration, validTypes }: Props) => {
     [activeTab, defaultRanges, formatTime, sendTelemetry, setValues, timeRangeTabs, userTimezone],
   );
 
-  const tabs = useMemo(
+  const tabDefs = useMemo(
     () =>
       timeRangeTypeTabs({
         activeTab,
@@ -175,14 +184,22 @@ const TimeRangeTabs = ({ limitDuration, validTypes }: Props) => {
   );
 
   return (
-    <StyledTabs
-      id="dateTimeTypes"
-      defaultActiveKey={availableTimeRangeTypes[0].type}
-      activeKey={activeTab ?? -1}
-      onSelect={onSelect as SelectCallback}
-      animation={false}>
-      {tabs}
-      {!activeTab && <TabDisabledTimeRange />}
+    <StyledTabs value={activeTab ?? 'disabled'} onChange={onSelect}>
+      <Tabs.List>
+        {tabDefs.map(({ type, name }) => (
+          <Tabs.Tab key={type} value={type}>
+            {name}
+          </Tabs.Tab>
+        ))}
+      </Tabs.List>
+      {tabDefs.map(({ type, content }) => (
+        <Tabs.Panel key={type} value={type}>
+          {content}
+        </Tabs.Panel>
+      ))}
+      <Tabs.Panel value="disabled">
+        <TabDisabledTimeRange />
+      </Tabs.Panel>
     </StyledTabs>
   );
 };

@@ -18,21 +18,16 @@ import React from 'react';
 import { Tabs as MantineTabs } from '@mantine/core';
 import styled, { css } from 'styled-components';
 
-import Tab from './Tab';
-import type { TabProps } from './Tab';
-
 type TabsProps = {
   children: React.ReactNode;
-  defaultActiveKey?: string | number;
-  activeKey?: string | number | null;
-  onSelect?: (eventKey: string | null) => void;
-  id?: string;
-  animation?: boolean;
+  defaultValue?: string;
+  value?: string | null;
+  onChange?: (value: string | null) => void;
+  variant?: 'default' | 'outline' | 'pills';
   className?: string;
-  onClick?: React.MouseEventHandler;
 };
 
-const StyledTabs = styled(MantineTabs)(
+const StyledTabsBase = styled(MantineTabs)(
   ({ theme }) => css`
     .mantine-Tabs-list {
       border-bottom-color: ${theme.colors.variant.default};
@@ -77,56 +72,11 @@ const StyledTabs = styled(MantineTabs)(
   `,
 );
 
-const Tabs = ({
-  children,
-  defaultActiveKey,
-  activeKey,
-  onSelect,
-  id: _id,
-  animation: _animation,
-  className,
-  ...rest
-}: TabsProps) => {
-  const tabChildren = React.Children.toArray(children).filter(
-    (child): child is React.ReactElement<TabProps> =>
-      React.isValidElement(child) && child.type === Tab,
-  );
+const Tabs = ({ variant = 'outline', ...props }: TabsProps) => <StyledTabsBase variant={variant} {...props} />;
 
-  const nonTabChildren = React.Children.toArray(children).filter(
-    (child) => !React.isValidElement(child) || child.type !== Tab,
-  );
-
-  const mantineValue =
-    activeKey !== undefined ? (activeKey !== null ? String(activeKey) : null) : undefined;
-
-  return (
-    <StyledTabs
-      defaultValue={defaultActiveKey !== undefined ? String(defaultActiveKey) : undefined}
-      value={mantineValue}
-      onChange={onSelect}
-      className={className}
-      variant="outline"
-      {...rest}>
-      <MantineTabs.List>
-        {tabChildren.map((tab) => (
-          <MantineTabs.Tab
-            key={tab.props.eventKey}
-            value={String(tab.props.eventKey)}
-            disabled={tab.props.disabled}
-            className={tab.props.tabClassName}>
-            {tab.props.title}
-          </MantineTabs.Tab>
-        ))}
-      </MantineTabs.List>
-      {tabChildren.map((tab) => (
-        <MantineTabs.Panel key={tab.props.eventKey} value={String(tab.props.eventKey)}>
-          {tab.props.children}
-        </MantineTabs.Panel>
-      ))}
-      {nonTabChildren}
-    </StyledTabs>
-  );
-};
+Tabs.List = MantineTabs.List;
+Tabs.Tab = MantineTabs.Tab;
+Tabs.Panel = MantineTabs.Panel;
 
 /** @component */
 export default Tabs;
