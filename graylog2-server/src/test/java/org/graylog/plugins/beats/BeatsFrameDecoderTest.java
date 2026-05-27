@@ -43,7 +43,7 @@ public class BeatsFrameDecoderTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        decoder = new BeatsFrameDecoder(1024, 10*1024);
+        decoder = new BeatsFrameDecoder();
         channel = new EmbeddedChannel(new LoggingHandler(), decoder);
     }
 
