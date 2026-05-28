@@ -106,7 +106,7 @@
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
         <apache-httpclient5.version>5.5.1</apache-httpclient5.version>
         <apache-httpcore.version>4.4.16</apache-httpcore.version>
-        <asm.version>9.9.1</asm.version>
+        <asm.version>9.10</asm.version>
         <auto-service.version>1.1.1</auto-service.version>
         <auto-value.version>1.11.1</auto-value.version>
         <aws-java-sdk-1.version>1.12.797</aws-java-sdk-1.version>
@@ -129,7 +129,7 @@
         <error-prone.version>2.49.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
         <gcs.version>2.68.0</gcs.version>
-        <azure-blob-storage.version>12.33.4</azure-blob-storage.version>
+        <azure-blob-storage.version>12.34.0</azure-blob-storage.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>5.1.0</geoip2.version>
         <grizzly-websockets.version>4.0.2</grizzly-websockets.version> <!-- Should match the version used by Jersey -->
@@ -159,7 +159,7 @@
         <json-org.version>20251224</json-org.version>
         <json-path.version>3.0.0</json-path.version>
         <jsoup.version>1.22.2</jsoup.version>
-        <kafka.version>4.2.0</kafka.version>
+        <kafka.version>4.3.0</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <log4j.version>2.26.0</log4j.version>
         <lucene.version>9.12.3</lucene.version>
@@ -168,20 +168,20 @@
         <mongodb-driver.version>5.7.0</mongodb-driver.version>
         <mongojack.version>5.1.0</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.2.13.Final</netty.version>
+        <netty.version>4.2.14.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.77.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>5.3.2</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.62.0</opentelemetry.version>
-        <opentelemetry-instrumentation.version>2.27.0</opentelemetry-instrumentation.version>
+        <opentelemetry-instrumentation.version>2.28.1</opentelemetry-instrumentation.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.18</pkts.version>
         <prometheus-client.version>0.16.0</prometheus-client.version>
-        <protobuf.version>4.34.1</protobuf.version>
+        <protobuf.version>4.35.0</protobuf.version>
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>3.0.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
-        <shiro.version>2.1.0</shiro.version>
+        <shiro.version>2.2.0</shiro.version>
         <snakeyaml.version>2.6</snakeyaml.version>
         <snappy-java.version>1.1.10.8</snappy-java.version>
         <oshi.version>7.1.0</oshi.version>
@@ -189,14 +189,15 @@
         <slf4j.version>2.0.18</slf4j.version>
         <streamex.version>0.8.4</streamex.version>
         <swagger.version>2.2.50</swagger.version>
-        <swagger-parser.version>2.1.41</swagger-parser.version>
+        <swagger-parser.version>2.1.42</swagger-parser.version>
+
         <syslog4j.version>0.9.63</syslog4j.version>
         <threeten-extra.version>1.8.0</threeten-extra.version>
         <ulid.version>8.3.0</ulid.version>
         <unboundid-ldap.version>7.0.4</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.1.1</validation-api.version>
-        <zstd.version>1.5.7-8</zstd.version>
+        <zstd.version>1.5.7-9</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.13.0</jjwt.version>
@@ -212,7 +213,7 @@
         <awaitility.version>4.3.0</awaitility.version>
         <equalsverifier.version>4.5</equalsverifier.version>
         <guice-extension.version>1.2.1</guice-extension.version>
-        <junit-jupiter.version>6.0.3</junit-jupiter.version>
+        <junit-jupiter.version>6.1.0</junit-jupiter.version>
         <mockito.version>5.23.0</mockito.version>
         <restassured.version>6.0.0</restassured.version>
         <testcontainers.version>2.0.5</testcontainers.version>
@@ -736,7 +737,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.6.2</version>
+                    <version>3.6.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.cyclonedx</groupId>
@@ -773,7 +774,7 @@
                         <dependency>
                             <groupId>org.openrewrite</groupId>
                             <artifactId>rewrite-java</artifactId>
-                            <version>8.81.12</version>
+                            <version>8.82.1</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
