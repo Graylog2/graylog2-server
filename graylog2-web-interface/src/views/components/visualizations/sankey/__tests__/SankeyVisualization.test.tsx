@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 
 import mockComponent from 'helpers/mocking/MockComponent';
@@ -87,6 +87,12 @@ describe('SankeyVisualization', () => {
 
     expect(trace.type).toBe('sankey');
     expect(trace.node.label).toEqual(['a1', 'b1', 'b2', 'a2']);
+    expect(trace.node.customdata).toEqual([
+      { field: 'a', value: 'a1' },
+      { field: 'b', value: 'b1' },
+      { field: 'b', value: 'b2' },
+      { field: 'a', value: 'a2' },
+    ]);
     expect(trace.link.source).toEqual([0, 0, 3]);
     expect(trace.link.target).toEqual([1, 2, 1]);
     expect(trace.link.value).toEqual([5, 3, 7]);
@@ -188,7 +194,7 @@ describe('SankeyVisualization', () => {
     expect(trace.link.value).toEqual([1, 1, 1]);
   });
 
-  it('renders an empty trace when there are no rows', () => {
+  it('renders an empty-state message when there are no rows', () => {
     const config = AggregationWidgetConfig.builder()
       .rowPivots([Pivot.createValues(['a']), Pivot.createValues(['b'])])
       .series([Series.forFunction('count()')])
@@ -197,11 +203,7 @@ describe('SankeyVisualization', () => {
 
     render(<WrappedSankey {...baseProps} config={config} data={{ chart: [] }} />);
 
-    const trace = lastTrace();
-
-    expect(trace.node.label).toEqual([]);
-    expect(trace.link.source).toEqual([]);
-    expect(trace.link.target).toEqual([]);
-    expect(trace.link.value).toEqual([]);
+    expect(screen.getByText(/No flows to display/i)).toBeInTheDocument();
+    expect(GenericPlot).not.toHaveBeenCalled();
   });
 });
