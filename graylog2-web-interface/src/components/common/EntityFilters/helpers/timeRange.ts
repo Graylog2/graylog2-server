@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { DateTime, DateTimeFormats } from 'util/DateTime';
-import type { TimeRangePickerFormValues } from 'views/components/time-range-picker/TimeRangePicker';
+import type { TimeRangePickerFormValues } from 'views/components/time-range-picker/types';
 import {
   normalizeFromPickerForSearchBar,
   normalizeFromSearchBarForBackend,

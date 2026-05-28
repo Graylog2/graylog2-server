@@ -22,8 +22,7 @@ import useUserDateTime from 'hooks/useUserDateTime';
 
 import TimeRangeTabs, { timeRangePickerTabs } from './TimeRangePickerTabs';
 import TimeRangePresetRow from './TimeRangePresetRow';
-
-export type SupportedTimeRangeType = keyof typeof timeRangePickerTabs;
+import type { SupportedTimeRangeType } from './types';
 
 export const allTimeRangeTypes = Object.keys(timeRangePickerTabs) as Array<SupportedTimeRangeType>;
 

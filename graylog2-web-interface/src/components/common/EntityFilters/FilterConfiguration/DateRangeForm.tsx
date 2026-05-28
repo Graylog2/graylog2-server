@@ -22,7 +22,7 @@ import { Formik, Form } from 'formik';
 import ModalSubmit from 'components/common/ModalSubmit';
 import loadAsync from 'routing/loadAsync';
 import useUserDateTime from 'hooks/useUserDateTime';
-import type { TimeRangePickerFormValues } from 'views/components/time-range-picker/TimeRangePicker';
+import type { TimeRangePickerFormValues } from 'views/components/time-range-picker/types';
 import {
   classifyFromRange,
   classifyToRange,
@@ -31,6 +31,7 @@ import {
 import type { AbsoluteTimeRange, RelativeTimeRange, TimeRange } from 'views/logic/queries/Query';
 import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 import type { DateTime, DateTimeFormats } from 'util/DateTime';
+import useTimeRangeValidation from 'views/components/time-range-picker/useTimeRangeValidation';
 
 import { parseFilterValue, timeRangePickerFormValuesToFilterValue } from '../helpers/timeRange';
 import type { Filter } from '../types';
@@ -126,6 +127,7 @@ type Props = {
 
 const DateRangeForm = ({ filter, onSubmit }: Props) => {
   const { formatTime, userTimezone } = useUserDateTime();
+  const validate = useTimeRangeValidation();
   const initialValues = useMemo(
     () => filterValueToTimeRangePickerFormValues(filter?.value, formatTime),
     [filter?.value, formatTime],
@@ -142,7 +144,11 @@ const DateRangeForm = ({ filter, onSubmit }: Props) => {
 
   return (
     <Container data-testid="time-range-form">
-      <Formik<TimeRangePickerFormValues> initialValues={initialValues} onSubmit={_onSubmit} enableReinitialize>
+      <Formik<TimeRangePickerFormValues>
+        initialValues={initialValues}
+        onSubmit={_onSubmit}
+        enableReinitialize
+        validate={validate}>
         {({ isValid }) => (
           <Form>
             <TimeRangePickerFormContent limitDuration={0}>
