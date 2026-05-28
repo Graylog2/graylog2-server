@@ -14,12 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports,no-undef
 const { applyTimeoutMultiplier } = require('./lib/timeouts');
 
+// eslint-disable-next-line no-undef
 module.exports = {
   rootDir: '../../',
   collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}'],
   setupFiles: [
+    /* eslint-disable no-undef */
     require.resolve('./lib/setup-files/mock-FetchProvider.js'),
     require.resolve('./lib/setup-files/mock-Version.js'),
     require.resolve('./lib/setup-files/mock-IntersectionObserver.js'),
@@ -29,15 +33,18 @@ module.exports = {
     require.resolve('./lib/setup-files/console-warnings-fail-tests.js'),
     require.resolve('./lib/setup-files/mock-crypto-getrandomvalues.js'),
     require.resolve('./lib/setup-files/mock-styled-components.js'),
+    /* eslint-enable no-undef */
     'jest-canvas-mock',
   ],
   moduleDirectories: ['src', 'test', 'node_modules'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   moduleNameMapper: {
     '^file-loader(\\?esModule=false)?!(.+)$': '$2',
+    // eslint-disable-next-line no-undef
     '(\\.lazy|leaflet)\\.css$': require.resolve('./lib/mocking/useable-css-proxy.js'),
     '\\.(css|less)$': 'identity-obj-proxy',
     '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
+      // eslint-disable-next-line no-undef
       require.resolve('./lib/mocking/fileMock.js'),
     '^@graylog/server-api(.*)$': '<rootDir>/target/api$1',
   },
