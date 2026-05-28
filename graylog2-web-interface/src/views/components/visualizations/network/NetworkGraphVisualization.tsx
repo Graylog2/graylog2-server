@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import styled, { css, useTheme } from 'styled-components';
-import { forceSimulation, forceLink, forceManyBody, forceCenter } from 'd3-force';
+import { forceSimulation, forceLink, forceManyBody, forceCenter, forceCollide } from 'd3-force';
 
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -53,7 +53,8 @@ const EmptyState = styled.div(
 type SimNode = { id: number; x?: number; y?: number };
 type SimLink = { source: number | SimNode; target: number | SimNode };
 
-const LAYOUT_ITERATIONS = 300;
+const LAYOUT_ITERATIONS = 500;
+const NODE_RADIUS = 75;
 
 const runLayout = (nodeCount: number, links: ReadonlyArray<{ source: number; target: number }>): Array<SimNode> => {
   const simNodes: Array<SimNode> = Array.from({ length: nodeCount }, (_, i) => ({ id: i }));
@@ -64,15 +65,55 @@ const runLayout = (nodeCount: number, links: ReadonlyArray<{ source: number; tar
       'link',
       forceLink(simLinks as never)
         .id((d: SimNode) => d.id)
-        .distance(60),
+        .distance(200),
     )
-    .force('charge', forceManyBody().strength(-220))
+    .force('charge', forceManyBody().strength(-900))
+    .force('collide', forceCollide(NODE_RADIUS))
     .force('center', forceCenter(0, 0))
     .stop();
 
   for (let i = 0; i < LAYOUT_ITERATIONS; i += 1) simulation.tick();
 
   return simNodes;
+};
+
+type TextPosition =
+  | 'top left'
+  | 'top center'
+  | 'top right'
+  | 'middle left'
+  | 'middle right'
+  | 'bottom left'
+  | 'bottom center'
+  | 'bottom right';
+
+const radialTextPosition = (x: number, y: number): TextPosition => {
+  if (x === 0 && y === 0) return 'top center';
+
+  // Plotly's y axis points up, so y > 0 is visually "top".
+  const angle = Math.atan2(y, x);
+  const slice = Math.round((angle / Math.PI) * 4);
+
+  switch (((slice % 8) + 8) % 8) {
+    case 0:
+      return 'middle right';
+    case 1:
+      return 'top right';
+    case 2:
+      return 'top center';
+    case 3:
+      return 'top left';
+    case 4:
+      return 'middle left';
+    case 5:
+      return 'bottom left';
+    case 6:
+      return 'bottom center';
+    case 7:
+      return 'bottom right';
+    default:
+      return 'top center';
+  }
 };
 
 type EdgeTrace = {
@@ -93,14 +134,25 @@ type NodeTrace = {
   x: Array<number>;
   y: Array<number>;
   text: Array<string>;
-  textposition: 'top center';
+  textposition: Array<TextPosition>;
   textfont: FontStyle;
+  cliponaxis: false;
   marker: {
     size: number;
     color: Array<number>;
     colorscale: string;
     showscale: boolean;
-    colorbar: { title: { text: string; font: FontStyle }; thickness: number; tickfont: FontStyle };
+    colorbar: {
+      title: { text: string; font: FontStyle; side: 'top' };
+      orientation: 'h';
+      x: number;
+      xanchor: 'center';
+      y: number;
+      yanchor: 'top';
+      len: number;
+      thickness: number;
+      tickfont: FontStyle;
+    };
     line: { width: number; color: string };
   };
   customdata: Array<NodeCustomData>;
@@ -109,7 +161,7 @@ type NodeTrace = {
 };
 
 const buildLayout = (width: number, height: number) => ({
-  margin: { t: 20, b: 20, l: 20, r: 20 },
+  margin: { t: 20, b: 70, l: 20, r: 20 },
   xaxis: { visible: false, zeroline: false, showgrid: false, fixedrange: true, autorange: true as const },
   yaxis: { visible: false, zeroline: false, showgrid: false, fixedrange: true, autorange: true as const },
   showlegend: false,
@@ -169,22 +221,32 @@ const NetworkGraphVisualization = makeVisualization(
 
       const displayLabels = nodes.map((n) => String(mapKeys(n.value, n.field) ?? n.label));
 
+      const xs = positions.map((p) => p.x ?? 0);
+      const ys = positions.map((p) => p.y ?? 0);
+
       const nodeTrace: NodeTrace = {
         type: 'scatter',
         mode: 'markers+text',
-        x: positions.map((p) => p.x ?? 0),
-        y: positions.map((p) => p.y ?? 0),
+        x: xs,
+        y: ys,
         text: displayLabels,
-        textposition: 'top center',
+        textposition: positions.map((p) => radialTextPosition(p.x ?? 0, p.y ?? 0)),
         textfont: { color: textColor },
+        cliponaxis: false,
         marker: {
           size: 14,
           color: nodes.map((n) => n.degree),
           colorscale: 'YlGnBu',
           showscale: true,
           colorbar: {
-            title: { text: 'Connections', font: { color: textColor } },
-            thickness: 12,
+            title: { text: 'Connections', font: { color: textColor }, side: 'top' },
+            orientation: 'h',
+            x: 0.5,
+            xanchor: 'center',
+            y: -0.05,
+            yanchor: 'top',
+            len: 0.5,
+            thickness: 10,
             tickfont: { color: textColor },
           },
           line: { width: 1.5, color: theme.colors.global.contentBackground },
