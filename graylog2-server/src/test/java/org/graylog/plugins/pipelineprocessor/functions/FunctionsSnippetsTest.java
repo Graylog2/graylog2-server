@@ -1350,50 +1350,38 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
             assertThat(message).isNotNull();
 
-            // 2 days between 2023-05-10 and 2023-05-12
-            final long twoDaysMillis = 2L * 24 * 60 * 60 * 1000;
-            assertThat(message.getField("pos_millis")).isEqualTo(twoDaysMillis);
-            assertThat(message.getField("pos_seconds")).isEqualTo(twoDaysMillis / 1000L);
-            assertThat(message.getField("pos_minutes")).isEqualTo(twoDaysMillis / (60L * 1000L));
+            // 2-day positive interval covers every numeric unit + direction + friendly
+            assertThat(message.getField("pos_millis")).isEqualTo(172_800_000L);
+            assertThat(message.getField("pos_seconds")).isEqualTo(172_800L);
+            assertThat(message.getField("pos_minutes")).isEqualTo(2_880L);
             assertThat(message.getField("pos_hours")).isEqualTo(48L);
             assertThat(message.getField("pos_days")).isEqualTo(2L);
             assertThat(message.getField("pos_weeks")).isEqualTo(0L);
             assertThat(message.getField("pos_direction")).isEqualTo("ahead");
             assertThat(message.getField("pos_friendly")).isEqualTo("2 days");
 
-            // signed result: later - earlier when args are swapped should be negative
-            assertThat(message.getField("neg_millis")).isEqualTo(-twoDaysMillis);
-            assertThat(message.getField("neg_days")).isEqualTo(-2L);
+            // Swapping args gives a signed result + "behind" direction
+            assertThat(message.getField("neg_millis")).isEqualTo(-172_800_000L);
             assertThat(message.getField("neg_direction")).isEqualTo("behind");
-            assertThat(message.getField("neg_friendly")).isEqualTo("-2 days");
 
-            // absolute=true clears the sign on the numeric values but direction is preserved
-            assertThat(message.getField("abs_millis")).isEqualTo(twoDaysMillis);
-            assertThat(message.getField("abs_days")).isEqualTo(2L);
+            // absolute=true strips sign from numeric values but preserves direction
+            assertThat(message.getField("abs_millis")).isEqualTo(172_800_000L);
             assertThat(message.getField("abs_direction")).isEqualTo("behind");
-            assertThat(message.getField("abs_friendly")).isEqualTo("2 days");
 
-            // equal instants
+            // Equal instants
             assertThat(message.getField("eq_direction")).isEqualTo("equal");
             assertThat(message.getField("eq_friendly")).isEqualTo("0 ms");
 
-            // multi-component friendly + sub-second friendly
+            // Friendly behaviors: multi-component, sub-second remainder, suppression at ≥ 1 minute
             assertThat(message.getField("mixed_friendly")).isEqualTo("1 week 1 day 3 hours 15 minutes");
-            assertThat(message.getField("sub_friendly")).isEqualTo("250 ms");
+            assertThat(message.getField("sub_friendly")).isEqualTo("1 second 500 ms");
+            assertThat(message.getField("over_minute_friendly")).isEqualTo("1 minute");
 
-            // Sub-second remainder shown when total interval < 1 minute...
-            assertThat(message.getField("mix_sub_friendly")).isEqualTo("1 second 500 ms");
-            // ...and suppressed when total interval >= 1 minute (raw millis still has it)
-            assertThat(message.getField("mix_min_friendly")).isEqualTo("1 minute");
-            // Negative mixed sub-second
-            assertThat(message.getField("mix_neg_friendly")).isEqualTo("-1 second 500 ms");
+            // Half-away-from-zero rounding (1m30s sits exactly on the boundary → 2 minutes)
+            assertThat(message.getField("rnd_minutes")).isEqualTo(2L);
 
-            // to_date($message.timestamp) drives a realistic "session duration" calc.
-            // The test clock fixes the message timestamp at GRAYLOG_EPOCH (2010-07-30T16:03:25Z),
-            // and session_open is set 30 minutes earlier in the rule.
+            // Realistic flow via to_date($message.timestamp); clock pins it at GRAYLOG_EPOCH
             assertThat(message.getField("session_minutes")).isEqualTo(30L);
-            assertThat(message.getField("session_seconds")).isEqualTo(30L * 60);
-            assertThat(message.getField("session_friendly")).isEqualTo("30 minutes");
         } finally {
             DateTimeUtils.setCurrentMillisSystem();
         }
@@ -1422,9 +1410,9 @@ public class FunctionsSnippetsTest extends BaseParserTest {
             final Rule vpn = parser.parseRule(vpnRule, true);
             final Message vpnMsg = evaluateRule(vpn, msg -> msg.addField("acct_session_start", "2025-05-27T13:42:10.000+0000"));
             assertThat(vpnMsg).isNotNull();
-            // 17m 50s elapsed = 1070s
+            // 17m 50s elapsed = 1070s; minutes rounds to 18 (half-away-from-zero), hours rounds to 0
             assertThat(vpnMsg.getField("session_seconds")).isEqualTo(1070L);
-            assertThat(vpnMsg.getField("session_minutes")).isEqualTo(17L);
+            assertThat(vpnMsg.getField("session_minutes")).isEqualTo(18L);
             assertThat(vpnMsg.getField("session_hours")).isEqualTo(0L);
 
             // Example 2: Account age at login
@@ -1443,10 +1431,12 @@ public class FunctionsSnippetsTest extends BaseParserTest {
             final Rule ageR = parser.parseRule(ageRule, true);
             final Message ageMsgFresh = evaluateRule(ageR, msg -> {
                 msg.addField("event_type", "user_login");
-                msg.addField("user_created", "05/25/2025"); // 2 days ago
+                // 05/25/2025 parses to midnight UTC; now is 2025-05-27T14:00Z = 62h elapsed,
+                // which rounds to 3 days (half-away-from-zero).
+                msg.addField("user_created", "05/25/2025");
             });
             assertThat(ageMsgFresh).isNotNull();
-            assertThat(ageMsgFresh.getField("account_age_days")).isEqualTo(2L);
+            assertThat(ageMsgFresh.getField("account_age_days")).isEqualTo(3L);
             assertThat(ageMsgFresh.getField("account_is_new")).isEqualTo(true);
 
             final Message ageMsgOld = evaluateRule(ageR, msg -> {

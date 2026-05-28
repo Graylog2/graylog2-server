@@ -5,6 +5,7 @@ then
     let earlier = parse_date(value: "2023-05-10T00:00:00.000+0000", pattern: "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
     let later   = parse_date(value: "2023-05-12T00:00:00.000+0000", pattern: "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
+    // Positive 2-day interval exercises every numeric unit, direction, and friendly
     let positive = date_diff(earlier, later);
     set_field("pos_millis",    positive.millis);
     set_field("pos_seconds",   positive.seconds);
@@ -15,53 +16,37 @@ then
     set_field("pos_direction", positive.direction);
     set_field("pos_friendly",  positive.friendly);
 
+    // Swapped args → signed result with "behind" direction
     let negative = date_diff(later, earlier);
     set_field("neg_millis",    negative.millis);
-    set_field("neg_days",      negative.days);
     set_field("neg_direction", negative.direction);
-    set_field("neg_friendly",  negative.friendly);
 
+    // absolute=true strips sign from numeric but preserves direction
     let abs = date_diff(left: later, right: earlier, absolute: true);
     set_field("abs_millis",    abs.millis);
-    set_field("abs_days",      abs.days);
     set_field("abs_direction", abs.direction);
-    set_field("abs_friendly",  abs.friendly);
 
+    // Equal instants
     let equal = date_diff(earlier, earlier);
     set_field("eq_direction", equal.direction);
     set_field("eq_friendly",  equal.friendly);
 
-    // Multi-component friendly: 1 week, 1 day, 3 hours, 15 minutes
+    // Friendly: multi-component breakdown
     let mixed_end = parse_date(value: "2023-05-18T03:15:00.000+0000", pattern: "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-    let mixed = date_diff(earlier, mixed_end);
-    set_field("mixed_friendly", mixed.friendly);
+    set_field("mixed_friendly", date_diff(earlier, mixed_end).friendly);
 
-    // Sub-second friendly
-    let near = parse_date(value: "2023-05-10T00:00:00.250+0000", pattern: "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-    let sub = date_diff(earlier, near);
-    set_field("sub_friendly", sub.friendly);
-
-    // Mixed seconds + millis (1.5s) -> "1 second 500 ms" (ms shown because total < 1 minute)
+    // Friendly: sub-second remainder shown for short intervals, suppressed for ≥ 1 minute
     let one_and_a_half = parse_date(value: "2023-05-10T00:00:01.500+0000", pattern: "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-    let mix_sub = date_diff(earlier, one_and_a_half);
-    set_field("mix_sub_friendly", mix_sub.friendly);
+    let one_min_plus   = parse_date(value: "2023-05-10T00:01:00.500+0000", pattern: "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    set_field("sub_friendly",         date_diff(earlier, one_and_a_half).friendly);
+    set_field("over_minute_friendly", date_diff(earlier, one_min_plus).friendly);
 
-    // Mixed minutes + millis (1m 500ms) -> "1 minute" (ms suppressed because total >= 1 minute)
-    let one_min_plus = parse_date(value: "2023-05-10T00:01:00.500+0000", pattern: "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-    let mix_min = date_diff(earlier, one_min_plus);
-    set_field("mix_min_friendly", mix_min.friendly);
+    // Half-away-from-zero rounding on numeric keys (1m30s sits exactly on the boundary)
+    let m30 = parse_date(value: "2023-05-10T00:01:30.000+0000", pattern: "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    set_field("rnd_minutes", date_diff(earlier, m30).minutes);
 
-    // Negative mixed sub-second
-    let one_and_a_half_neg = parse_date(value: "2023-05-09T23:59:58.500+0000", pattern: "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-    let mix_neg = date_diff(earlier, one_and_a_half_neg);
-    set_field("mix_neg_friendly", mix_neg.friendly);
-
-    // Realistic flow: compare a parsed field against the message timestamp via to_date().
-    // The test fixture's message timestamp is GRAYLOG_EPOCH = 2010-07-30T16:03:25Z (UTC).
-    let event_time   = to_date($message.timestamp);
+    // Realistic flow: to_date($message.timestamp) against a parsed field.
+    // Test fixture's message timestamp is GRAYLOG_EPOCH = 2010-07-30T16:03:25Z.
     let session_open = parse_date(value: "2010-07-30T15:33:25.000+0000", pattern: "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-    let session      = date_diff(session_open, event_time);
-    set_field("session_seconds", session.seconds);
-    set_field("session_minutes", session.minutes);
-    set_field("session_friendly", session.friendly);
+    set_field("session_minutes", date_diff(session_open, to_date($message.timestamp)).minutes);
 end

@@ -75,14 +75,24 @@ public class DateDiff extends AbstractFunction<Map<String, Object>> {
 
         return ImmutableMap.<String, Object>builder()
                 .put("millis", value)
-                .put("seconds", value / MS_PER_SECOND)
-                .put("minutes", value / MS_PER_MINUTE)
-                .put("hours",   value / MS_PER_HOUR)
-                .put("days",    value / MS_PER_DAY)
-                .put("weeks",   value / MS_PER_WEEK)
+                .put("seconds", roundDiv(value, MS_PER_SECOND))
+                .put("minutes", roundDiv(value, MS_PER_MINUTE))
+                .put("hours",   roundDiv(value, MS_PER_HOUR))
+                .put("days",    roundDiv(value, MS_PER_DAY))
+                .put("weeks",   roundDiv(value, MS_PER_WEEK))
                 .put("direction", direction(signedMillis))
                 .put("friendly",  friendly(value))
                 .build();
+    }
+
+    /**
+     * Divide {@code value} by {@code divisor} with half-away-from-zero rounding, symmetric
+     * across positive and negative values. e.g. 2350000ms ÷ 60000 = 39.17 → 39 minutes;
+     * 2370000ms ÷ 60000 = 39.5 → 40 minutes; -2370000ms → -40 minutes.
+     */
+    private static long roundDiv(long value, long divisor) {
+        final long half = divisor / 2;
+        return value >= 0 ? (value + half) / divisor : (value - half) / divisor;
     }
 
     /**
@@ -153,13 +163,13 @@ public class DateDiff extends AbstractFunction<Map<String, Object>> {
                 .name(NAME)
                 .returnType(returnType)
                 .params(ImmutableList.of(left, right, absolute))
-                .description("Computes the difference between two dates and returns it as a map keyed by " +
-                        "unit (millis, seconds, minutes, hours, days, weeks). The map also contains " +
-                        "'direction' (\"ahead\" | \"behind\" | \"equal\", describing the end relative to the " +
-                        "start) and 'friendly' (a human-readable rendering of the interval). By default the " +
-                        "numeric values are signed (end - start); pass absolute=true to get absolute values. " +
-                        "'direction' is always derived from the signed result and is preserved when " +
-                        "absolute=true.")
+                .description("Returns the difference between two dates as a map. The numeric units " +
+                        "(millis, seconds, minutes, hours, days, weeks) are rounded to the nearest whole " +
+                        "unit. The map also contains 'direction', which describes the end relative to the " +
+                        "start as \"ahead\", \"behind\", or \"equal\", and 'friendly', a human-readable " +
+                        "breakdown of the interval. Numeric values are signed by default (end - start). " +
+                        "Pass absolute=true to return absolute values; direction is always derived from " +
+                        "the signed result and is preserved.")
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Date difference")
                 .ruleBuilderTitle("Difference between '${left}' and '${right}'")
