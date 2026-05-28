@@ -146,7 +146,6 @@ const useExecutePreview = (config: EventDefinition['config']) => {
   );
 
   const { data, isFetching } = useQuery({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- startJob/executeJobResult come from context and are not referentially stable
     queryKey: ['filter-preview', debouncedConfig, searchTypeId, queryId],
     queryFn: async () => {
       const search = constructSearch(debouncedConfig, searchTypeId, queryId);
