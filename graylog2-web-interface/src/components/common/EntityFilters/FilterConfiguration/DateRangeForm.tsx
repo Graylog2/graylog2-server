@@ -28,15 +28,11 @@ import {
   classifyToRange,
   RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
 } from 'views/components/time-range-picker/RelativeTimeRangeClassifiedHelper';
-import type { AbsoluteTimeRange, KeywordTimeRange, RelativeTimeRange, TimeRange } from 'views/logic/queries/Query';
+import type { AbsoluteTimeRange, RelativeTimeRange, TimeRange } from 'views/logic/queries/Query';
 import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 import type { DateTime, DateTimeFormats } from 'util/DateTime';
 
-import {
-  DATE_SEPARATOR,
-  TIME_RANGE_TYPE_SEPARATOR,
-  timeRangePickerFormValuesToFilterValue,
-} from '../helpers/timeRange';
+import { parseFilterValue, timeRangePickerFormValuesToFilterValue } from '../helpers/timeRange';
 import type { Filter } from '../types';
 
 const TimeRangePickerFormContent = loadAsync(
@@ -49,12 +45,6 @@ const Container = styled.div`
 `;
 
 type FormatTime = (dateTime: DateTime, format?: DateTimeFormats) => string;
-
-const decodeKeywordValue = (value: string) => decodeURIComponent(value.replace(/\+/g, '%20'));
-const decodeAbsoluteValue = (value: string) => decodeURIComponent(value);
-
-const isNumericRangeValue = (value: string | undefined) =>
-  value !== undefined && value !== '' && Number.isFinite(Number(value));
 
 const defaultInitialValues = (): TimeRangePickerFormValues => ({
   timeRangeTabs: {
@@ -118,72 +108,6 @@ const timeRangeToFormValues = (timeRange: TimeRange, formatTime: FormatTime): Ti
       };
     default:
       throw new Error(`Invalid time range type: ${timeRange}`);
-  }
-};
-
-const parseRelativeTimeRange = (value: string): RelativeTimeRange => {
-  const [from, to] = value.split(DATE_SEPARATOR);
-  const fromRange = Number(from);
-
-  if (!Number.isFinite(fromRange)) {
-    throw new Error(`Invalid relative time range value: ${value}`);
-  }
-
-  if (to !== undefined && to !== '') {
-    const toRange = Number(to);
-
-    return {
-      type: 'relative',
-      from: fromRange,
-      ...(Number.isFinite(toRange) && { to: toRange }),
-    };
-  }
-
-  return {
-    type: 'relative',
-    range: fromRange,
-  };
-};
-
-const parseAbsoluteTimeRange = (value: string): AbsoluteTimeRange => {
-  const [from, to = ''] = value.split(DATE_SEPARATOR);
-
-  return {
-    type: 'absolute',
-    from: decodeAbsoluteValue(from),
-    to: decodeAbsoluteValue(to),
-  };
-};
-
-const parseUntypedTimeRange = (value: string): TimeRange => {
-  const ranges = value.split(DATE_SEPARATOR);
-  const isRelative = ranges.every((range) => range === '' || isNumericRangeValue(range));
-
-  return isRelative ? parseRelativeTimeRange(value) : parseAbsoluteTimeRange(value);
-};
-
-const parseFilterValue = (filterValue: string): TimeRange => {
-  const separatorIndex = filterValue.indexOf(TIME_RANGE_TYPE_SEPARATOR);
-
-  if (separatorIndex < 0) {
-    return parseUntypedTimeRange(filterValue);
-  }
-
-  const type = filterValue.slice(0, separatorIndex);
-  const value = filterValue.slice(separatorIndex + TIME_RANGE_TYPE_SEPARATOR.length);
-
-  switch (type) {
-    case 'relative':
-      return parseRelativeTimeRange(value);
-    case 'keyword':
-      return {
-        type,
-        keyword: decodeKeywordValue(value),
-      } satisfies KeywordTimeRange;
-    case 'absolute':
-      return parseAbsoluteTimeRange(value);
-    default:
-      return parseUntypedTimeRange(filterValue);
   }
 };
 

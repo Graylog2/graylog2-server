@@ -78,7 +78,7 @@ const parseUntypedTimeRange = (value: string): TimeRange => {
   return isRelative ? parseRelativeTimeRange(value) : parseAbsoluteTimeRange(value);
 };
 
-const parseFilterValue = (filterValue: string): TimeRange => {
+export const parseFilterValue = (filterValue: string): TimeRange => {
   const separatorIndex = filterValue.indexOf(TIME_RANGE_TYPE_SEPARATOR);
 
   if (separatorIndex < 0) {
