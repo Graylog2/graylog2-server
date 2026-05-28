@@ -463,6 +463,19 @@ public class InputServiceImpl implements InputService {
     }
 
     @Override
+    public Map<String, Integer> extractorCountByInputId(Collection<String> inputIds) {
+        final List<Bson> pipeline = List.of(
+                Aggregates.match(MongoUtils.stringIdsIn(inputIds)),
+                Aggregates.project(Projections.computed("count",
+                        new Document("$size", new Document("$ifNull", List.of("$" + InputImpl.EMBEDDED_EXTRACTORS, List.of())))))
+        );
+        final Map<String, Integer> result = new HashMap<>();
+        documentCollection.aggregate(pipeline).forEach(doc ->
+                result.put(doc.getObjectId("_id").toHexString(), doc.getInteger("count", 0)));
+        return result;
+    }
+
+    @Override
     public Extractor getExtractor(final Input input, final String extractorId) throws NotFoundException {
         final Document doc = documentCollection.find(
                         Filters.and(
