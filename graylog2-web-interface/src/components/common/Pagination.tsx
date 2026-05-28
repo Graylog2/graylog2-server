@@ -39,6 +39,25 @@ const LastIcon = () => <Icon name="keyboard_double_arrow_right" />;
 
 const StyledPagination = styled(MantinePagination)`
   margin-top: 10px;
+  overflow: hidden;
+  padding-bottom: 2px;
+
+  .mantine-Group-root {
+    gap: 0;
+    justify-content: center;
+  }
+
+  .mantine-Pagination-control {
+    border-color: ${({ theme }) => theme.colors.input.border};
+
+    &:not([data-active]) {
+      background-color: transparent;
+    }
+
+    & + .mantine-Pagination-control {
+      border-left: none;
+    }
+  }
 `;
 
 const Pagination = ({
