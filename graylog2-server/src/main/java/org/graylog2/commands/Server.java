@@ -97,6 +97,7 @@ import org.graylog2.indexer.rotation.RotationStrategyBindings;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
 import org.graylog2.lookup.adapters.dnslookup.DnsLookupAdapterConfiguration;
 import org.graylog2.messageprocessors.MessageProcessorModule;
+import org.graylog2.metrics.entity.cache.MetricsCacheConfiguration;
 import org.graylog2.migrations.MigrationsModule;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -156,6 +157,7 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
     private final ContentStreamConfiguration contentStreamConfiguration = new ContentStreamConfiguration();
     private final DnsLookupAdapterConfiguration dnsLookupAdapterConfiguration = new DnsLookupAdapterConfiguration();
     private final EventDefinitionConfiguration eventDefinitionConfiguration = new EventDefinitionConfiguration();
+    private final MetricsCacheConfiguration metricsCacheConfiguration = new MetricsCacheConfiguration();
 
     @Option(name = {"-l", "--local"}, description = "Run Graylog in local mode. Only interesting for Graylog developers.")
     private boolean local = false;
@@ -259,7 +261,8 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
                 telemetryConfiguration,
                 contentStreamConfiguration,
                 dnsLookupAdapterConfiguration,
-                eventDefinitionConfiguration);
+                eventDefinitionConfiguration,
+                metricsCacheConfiguration);
     }
 
     @Override
