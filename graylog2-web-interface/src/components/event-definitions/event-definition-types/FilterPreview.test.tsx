@@ -23,8 +23,6 @@ import { asMock } from 'helpers/mocking';
 
 import FilterPreview from './FilterPreview';
 
-let resolveSearch: (value: unknown) => void;
-
 const mockExecuteJobResult = jest.fn();
 const mockStartJob = jest.fn(() => Promise.resolve({ jobIds: ['job-1'] }));
 
@@ -85,12 +83,7 @@ describe('FilterPreview', () => {
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(mockDefaultUser);
 
-    mockExecuteJobResult.mockImplementation(
-      () =>
-        new Promise((resolve) => {
-          resolveSearch = resolve;
-        }),
-    );
+    mockExecuteJobResult.mockImplementation(() => new Promise(() => {}));
   });
 
   it('should show loading spinner while query is in-flight', async () => {
@@ -114,12 +107,7 @@ describe('FilterPreview', () => {
 
     await screen.findByText('Test message');
 
-    mockExecuteJobResult.mockImplementation(
-      () =>
-        new Promise((resolve) => {
-          resolveSearch = resolve;
-        }),
-    );
+    mockExecuteJobResult.mockImplementation(() => new Promise(() => {}));
 
     rerender(<FilterPreview config={{ ...config, query: 'new_query' }} />);
 
