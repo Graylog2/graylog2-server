@@ -46,6 +46,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.ParsedDateHistogram;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.range.ParsedRange;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.range.RangeAggregationBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.IncludeExclude;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.ParsedTerms;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.sort.FieldSortBuilder;
@@ -69,6 +70,7 @@ import java.io.UncheckedIOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -351,10 +353,14 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
     @Override
     public Map<String, Map<String, Long>> aggregateGroupedTerms(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                                                 String groupByField, String termsField,
-                                                                int maxBuckets, int maxSubBuckets) {
+                                                                int maxBuckets, int maxSubBuckets,
+                                                                Collection<String> includeTerms) {
         final var filter = createSimpleQuery(queryString, timerange);
-        final var aggregation = AggregationBuilders.terms(GROUP_BY_AGGREGATION_NAME).field(groupByField).size(maxBuckets)
-                .subAggregation(AggregationBuilders.terms(SUB_TERMS_AGGREGATION_NAME).field(termsField).size(maxSubBuckets));
+        final var termsAgg = AggregationBuilders.terms(GROUP_BY_AGGREGATION_NAME).field(groupByField).size(maxBuckets);
+        if (includeTerms != null && !includeTerms.isEmpty()) {
+            termsAgg.includeExclude(new IncludeExclude(includeTerms.toArray(String[]::new), null));
+        }
+        final var aggregation = termsAgg.subAggregation(AggregationBuilders.terms(SUB_TERMS_AGGREGATION_NAME).field(termsField).size(maxSubBuckets));
 
         final SearchResponse searchResult = executeAggregation(filter, affectedIndices, aggregation);
         final ParsedTerms outerTerms = searchResult.getAggregations().get(GROUP_BY_AGGREGATION_NAME);
@@ -369,11 +375,15 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
 
     @Override
     public Map<String, Long> aggregateTerms(String queryString, TimeRange timerange, Set<String> affectedIndices,
-                                            String termsField, int maxBuckets) {
+                                            String termsField, int maxBuckets,
+                                            Collection<String> includeTerms) {
         final var filter = createSimpleQuery(queryString, timerange);
-        final var aggregation = AggregationBuilders.terms(GROUP_BY_AGGREGATION_NAME).field(termsField).size(maxBuckets);
+        final var termsAgg = AggregationBuilders.terms(GROUP_BY_AGGREGATION_NAME).field(termsField).size(maxBuckets);
+        if (includeTerms != null && !includeTerms.isEmpty()) {
+            termsAgg.includeExclude(new IncludeExclude(includeTerms.toArray(String[]::new), null));
+        }
 
-        final SearchResponse searchResult = executeAggregation(filter, affectedIndices, aggregation);
+        final SearchResponse searchResult = executeAggregation(filter, affectedIndices, termsAgg);
         final ParsedTerms terms = searchResult.getAggregations().get(GROUP_BY_AGGREGATION_NAME);
 
         return extractTermsBucketCounts(terms);
@@ -382,14 +392,17 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
     @Override
     public Map<String, Double> aggregateGroupedMetric(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                                       String groupByField, AggregationType metricType, String metricField,
-                                                      int maxBuckets) {
+                                                      int maxBuckets, Collection<String> includeTerms) {
         final var filter = createSimpleQuery(queryString, timerange);
         final var metricAgg = switch (metricType) {
             case AVG -> AggregationBuilders.avg(METRIC_AGGREGATION_NAME).field(metricField);
             case MAX -> AggregationBuilders.max(METRIC_AGGREGATION_NAME).field(metricField);
         };
-        final var aggregation = AggregationBuilders.terms(GROUP_BY_AGGREGATION_NAME).field(groupByField).size(maxBuckets)
-                .subAggregation(metricAgg);
+        final var termsAgg = AggregationBuilders.terms(GROUP_BY_AGGREGATION_NAME).field(groupByField).size(maxBuckets);
+        if (includeTerms != null && !includeTerms.isEmpty()) {
+            termsAgg.includeExclude(new IncludeExclude(includeTerms.toArray(String[]::new), null));
+        }
+        final var aggregation = termsAgg.subAggregation(metricAgg);
 
         final SearchResponse searchResult = executeAggregation(filter, affectedIndices, aggregation);
         final ParsedTerms outerTerms = searchResult.getAggregations().get(GROUP_BY_AGGREGATION_NAME);
