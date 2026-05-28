@@ -32,6 +32,7 @@ import { ButtonToolbar } from 'components/bootstrap';
 
 const Container = styled(ButtonToolbar)`
   position: absolute;
+  z-index: 1;
   right: 15px;
   top: 6px;
 `;
