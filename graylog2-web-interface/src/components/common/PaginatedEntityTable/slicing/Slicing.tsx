@@ -20,6 +20,7 @@ import { useMemo, useContext } from 'react';
 import styled, { css } from 'styled-components';
 
 import type { ColumnSchema } from 'components/common/EntityDataTable';
+import type { SlicingPreferences } from 'components/common/EntityDataTable/types';
 import TableFetchContext from 'components/common/PaginatedEntityTable/TableFetchContext';
 
 import SliceHeaderControls from './SliceHeaderControls';
@@ -55,11 +56,21 @@ type Props = {
   appSection: string;
   columnSchemas: Array<ColumnSchema>;
   onChangeSlicing: (sliceCol: string | undefined, slice?: string | undefined) => void;
+  onSlicingPreferencesChange?: (slicing: SlicingPreferences) => void;
+  slicingPreferences?: SlicingPreferences;
   sliceRenderers?: SliceRenderers;
   fetchSlices: FetchSlices;
 };
 
-const Slicing = ({ appSection, columnSchemas, onChangeSlicing, sliceRenderers = undefined, fetchSlices }: Props) => {
+const Slicing = ({
+  appSection,
+  columnSchemas,
+  onChangeSlicing,
+  onSlicingPreferencesChange = () => {},
+  slicingPreferences = undefined,
+  sliceRenderers = undefined,
+  fetchSlices,
+}: Props) => {
   const {
     searchParams: { sliceCol, slice: activeSlice },
   } = useContext(TableFetchContext);
@@ -93,6 +104,8 @@ const Slicing = ({ appSection, columnSchemas, onChangeSlicing, sliceRenderers = 
         fetchSlices={fetchSlices}
         sortOptions={sortOptions}
         defaultSliceSort={activeColumn?.slice_sort_default}
+        onSlicingPreferencesChange={onSlicingPreferencesChange}
+        slicingPreferences={slicingPreferences}
       />
     </Container>
   );

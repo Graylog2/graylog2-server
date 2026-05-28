@@ -26,6 +26,7 @@ import HoverForHelp from 'components/common/HoverForHelp';
 
 import FieldForm from './FieldForm';
 import FieldsList from './FieldsList';
+import TagsEditor from './TagsEditor';
 
 import type { EventDefinition } from '../event-definitions-types';
 import { isSystemEventDefinition } from '../event-definitions-types';
@@ -39,6 +40,7 @@ type Props = {
       title?: string;
       field_spec?: string[];
       key_spec?: string[];
+      tags?: string[] | string;
     };
   };
   onChange: (name: string, value: unknown) => void;
@@ -111,6 +113,24 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdi
   return (
     <Row>
       <Col md={12}>
+        <h2 className={commonStyles.title}>
+          Tags <small>(optional)</small>
+        </h2>
+        <p>
+          Attach labels to this Event Definition. Tags propagate onto every Event it produces and make filtering and
+          grouping easier on the Alerts &amp; Events list.
+        </p>
+        <TagsEditor
+          tags={eventDefinition.tags ?? []}
+          onChange={(next) => onChange('tags', next)}
+          disabled={!canEditCondition}
+          error={
+            Array.isArray(validation?.errors?.tags)
+              ? validation.errors.tags.join(' ')
+              : (validation?.errors?.tags ?? null)
+          }
+        />
+
         <h2 className={commonStyles.title}>
           Event Fields <small>(optional)</small>
         </h2>

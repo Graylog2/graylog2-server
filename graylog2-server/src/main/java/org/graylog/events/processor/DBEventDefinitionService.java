@@ -17,12 +17,18 @@
 package org.graylog.events.processor;
 
 import com.google.errorprone.annotations.MustBeClosed;
+import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Projections;
+import com.mongodb.client.model.Sorts;
 import com.mongodb.client.model.Updates;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFiltersReFetcher;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
@@ -44,6 +50,7 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -51,6 +58,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -70,6 +78,7 @@ public class DBEventDefinitionService {
     private static final String ILLUMINATE_SCOPE_NAME = "ILLUMINATE";
 
     private final MongoCollection<EventDefinitionDto> collection;
+    private final com.mongodb.client.MongoCollection<Document> documentCollection;
     private final MongoUtils<EventDefinitionDto> mongoUtils;
     private final ScopedEntityMongoUtils<EventDefinitionDto> scopedEntityMongoUtils;
     private final MongoPaginationHelper<EventDefinitionDto> paginationHelper;
@@ -84,6 +93,7 @@ public class DBEventDefinitionService {
                                     EntityScopeService entityScopeService,
                                     SearchFiltersReFetcher searchFiltersRefetcher) {
         this.collection = mongoCollections.collection(COLLECTION_NAME, EventDefinitionDto.class);
+        this.documentCollection = mongoCollections.nonEntityCollection(COLLECTION_NAME, Document.class);
         this.mongoUtils = mongoCollections.utils(collection);
         this.scopedEntityMongoUtils = mongoCollections.scopedEntityUtils(collection, entityScopeService);
         this.paginationHelper = mongoCollections.paginationHelper(collection);
@@ -94,7 +104,11 @@ public class DBEventDefinitionService {
 
     public PaginatedList<EventDefinitionDto> searchPaginated(SearchQuery query, Predicate<EventDefinitionDto> filter,
                                                              Bson sort, int page, int perPage) {
-        final Bson dbQuery = query.toBson();
+        return searchPaginated(query.toBson(), filter, sort, page, perPage);
+    }
+
+    public PaginatedList<EventDefinitionDto> searchPaginated(Bson dbQuery, Predicate<EventDefinitionDto> filter,
+                                                             Bson sort, int page, int perPage) {
         final PaginatedList<EventDefinitionDto> list = filter == null ?
                 paginationHelper.filter(dbQuery).includeSourceMetadata(true).sort(sort).perPage(perPage).page(page) :
                 paginationHelper.filter(dbQuery).includeSourceMetadata(true).sort(sort).perPage(perPage).page(page, filter);
@@ -262,6 +276,78 @@ public class DBEventDefinitionService {
         collection.updateMany(
                 Filters.eq(EventDefinitionDto.FIELD_EVENT_PROCEDURE, procedureId),
                 Updates.unset(EventDefinitionDto.FIELD_EVENT_PROCEDURE));
+    }
+
+    /**
+     * Returns distinct tag values across all event definitions, optionally narrowed by a
+     * case-insensitive substring match. The match is substring (not prefix) to stay consistent
+     * with other filter dropdowns in the product, which all behave like "contains".
+     */
+    public List<String> suggestTags(@Nullable String query, int limit) {
+        return runTagAggregation(query, limit, null);
+    }
+
+    /**
+     * Returns distinct tag values across the event definitions identified by {@code permittedIds},
+     * optionally narrowed by a case-insensitive substring match. Use this overload when the caller
+     * does not have unrestricted read; pre-enumerate the IDs via {@link #findPermittedIds}.
+     */
+    public List<String> suggestTags(@Nullable String query, int limit, List<ObjectId> permittedIds) {
+        if (permittedIds.isEmpty()) {
+            return List.of();
+        }
+        return runTagAggregation(query, limit, Filters.in("_id", permittedIds));
+    }
+
+    private List<String> runTagAggregation(@Nullable String query, int limit, @Nullable Bson permissionMatch) {
+        if (limit <= 0) {
+            return List.of();
+        }
+        final List<Bson> pipeline = new ArrayList<>();
+        if (permissionMatch != null) {
+            pipeline.add(Aggregates.match(permissionMatch));
+        }
+        pipeline.add(Aggregates.unwind("$" + EventDefinitionDto.FIELD_TAGS));
+         if (query != null && !query.isBlank()) {
+            // Stored tags are already lowercased via TagNormalizer, so an unanchored regex
+            // against the lowercased query is sufficient — no need for the case-insensitive flag.
+            final String pattern = Pattern.quote(query.toLowerCase(Locale.ROOT));
+            pipeline.add(Aggregates.match(Filters.regex(EventDefinitionDto.FIELD_TAGS, pattern)));
+        }
+        pipeline.add(Aggregates.group("$" + EventDefinitionDto.FIELD_TAGS));
+        pipeline.add(Aggregates.sort(Sorts.ascending("_id")));
+        pipeline.add(Aggregates.limit(limit));
+
+        final List<String> result = new ArrayList<>();
+        try (var cursor = collection.aggregate(pipeline, Document.class).cursor()) {
+            while (cursor.hasNext()) {
+                result.add(cursor.next().getString("_id"));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Returns the IDs of event definitions that pass {@code idIsPermitted}. Projects only {@code _id}
+     * to keep the wire payload small.
+     *
+     * <p><b>Cost:</b> O(N) over the full event-definitions collection per call. Only invoke this
+     * after confirming the caller lacks unrestricted read; do not use it for users that already
+     * hold {@code EVENT_DEFINITIONS_READ}.
+     */
+    public List<ObjectId> findPermittedIds(Predicate<String> idIsPermitted) {
+        final List<ObjectId> permitted = new ArrayList<>();
+        try (var cursor = documentCollection.find()
+                                            .projection(Projections.include("_id"))
+                                            .cursor()) {
+            while (cursor.hasNext()) {
+                final ObjectId id = cursor.next().getObjectId("_id");
+                if (idIsPermitted.test(id.toHexString())) {
+                    permitted.add(id);
+                }
+            }
+        }
+        return permitted;
     }
 
     /**

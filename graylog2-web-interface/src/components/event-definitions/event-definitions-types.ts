@@ -107,6 +107,7 @@ export type EventDefinition = {
     type: string;
     streams: number[] | string[];
   }>;
+  tags: string[];
   updated_at: string | null;
   matched_at: string;
   scheduler: Scheduler;
