@@ -79,6 +79,14 @@ const CustomSingleValue =
     </Components.SingleValue>
   );
 
+const CustomMultiValueLabel =
+  (valueRenderer: (option: Option) => React.ReactElement) =>
+  ({ data, ...props }: React.ComponentProps<typeof Components.MultiValueLabel>) => (
+    <Components.MultiValueLabel data={data} {...props}>
+      {valueRenderer(data)}
+    </Components.MultiValueLabel>
+  );
+
 const CustomInput = (inputProps: { [key: string]: any }) => (props) => <Components.Input {...props} {...inputProps} />;
 
 const dropdownIndicator = (base, state) => ({
@@ -305,6 +313,7 @@ const getCustomComponents = (
 
   if (valueRenderer) {
     customComponents.SingleValue = CustomSingleValue(valueRenderer);
+    customComponents.MultiValueLabel = CustomMultiValueLabel(valueRenderer);
   }
 
   customComponents.MenuList = async ? AsyncCustomMenuList : CustomMenuList;
@@ -376,7 +385,9 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       optionRenderer !== nextProps.optionRenderer ||
       valueRenderer !== nextProps.valueRenderer
     ) {
-      this.setState({ customComponents: getCustomComponents(inputProps, optionRenderer, valueRenderer, async) });
+      this.setState({
+        customComponents: getCustomComponents(inputProps, optionRenderer, valueRenderer, async),
+      });
     }
   }
 
@@ -432,6 +443,10 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       return [];
     }
 
+    if (Array.isArray(value)) {
+      return value;
+    }
+
     if ((allowCreate || async) && typeof value === 'string') {
       return value.split(delimiter).map((optionValue: string) => {
         const predicate = {
@@ -482,7 +497,10 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
   createCustomFilter = () => {
     const { ignoreAccents } = this.props;
 
-    return createFilter({ ignoreAccents, stringify: (option: { label: unknown }) => String(option.label) });
+    return createFilter({
+      ignoreAccents,
+      stringify: (option: { label: unknown }) => String(option.label),
+    });
   };
 
   render() {
@@ -534,7 +552,11 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       isClearable,
       loadOptions,
       getOptionLabel: (option: { label?: string }) => option[displayKey] || option.label,
-      getOptionValue: (option) => option[valueKey],
+      getOptionValue: (option) => {
+        const v = option[valueKey];
+
+        return typeof v === 'object' && v !== null ? JSON.stringify(v) : String(v ?? '');
+      },
       filterOption: customFilter,
       components: mergedComponents,
       menuPortalTarget: document.body,
