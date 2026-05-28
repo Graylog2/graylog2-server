@@ -22,8 +22,7 @@ import type { VisualizationComponentProps } from 'views/components/aggregationbu
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import type { Key, Row } from 'views/logic/searchtypes/pivot/PivotHandler';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
-
-import useSankeyOnClickPopover from './useSankeyOnClickPopover';
+import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
 
 import GenericPlot from '../GenericPlot';
 
@@ -179,7 +178,7 @@ const layout = { margin: { t: 20, b: 20, l: 20, r: 20 } };
 const SankeyVisualization = makeVisualization(({ config, data, height, width }: VisualizationComponentProps) => {
   const rows = retrieveChartData(data);
   const mapKeys = useMapKeys();
-  const { onChartClick, popover } = useSankeyOnClickPopover();
+  const { onChartClick, initializeGraphDivRef, popover } = usePlotOnClickPopover('sankey', config);
 
   const trace = useMemo<SankeyTrace | null>(() => {
     const rowFields = config.rowPivots.flatMap((pivot) => pivot.fields);
@@ -205,7 +204,12 @@ const SankeyVisualization = makeVisualization(({ config, data, height, width }: 
   return (
     <Container $height={height} $width={width}>
       {trace ? (
-        <GenericPlot chartData={[trace]} layout={layout} onClickMarker={onChartClick} />
+        <GenericPlot
+          chartData={[trace]}
+          layout={layout}
+          onClickMarker={onChartClick}
+          onInitialized={initializeGraphDivRef}
+        />
       ) : (
         <EmptyState>No flows to display. Adjust your search or grouping to see results.</EmptyState>
       )}

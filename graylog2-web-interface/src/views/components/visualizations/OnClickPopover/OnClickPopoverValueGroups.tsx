@@ -76,25 +76,30 @@ type GroupingActionsProps = {
   columnPivotValues: Array<ValueGroupItem>;
   rowPivotValues: Array<ValueGroupItem>;
   setFieldData: Props['setFieldData'];
-  metricValue: ValueGroupItem;
+  metricValue?: ValueGroupItem;
 };
 
-const GroupingActions = ({ columnPivotValues, rowPivotValues, setFieldData, metricValue }: GroupingActionsProps) => {
+const GroupingActions = ({
+  columnPivotValues,
+  rowPivotValues,
+  setFieldData,
+  metricValue = undefined,
+}: GroupingActionsProps) => {
   const valuePath = [...columnPivotValues, ...rowPivotValues].map(({ value, field }) => ({ [field]: value }));
 
   return (
     <ListGroupItem
       onClick={() =>
         setFieldData({
-          value: metricValue.value,
-          field: metricValue.field,
+          value: metricValue?.value ?? '',
+          field: metricValue?.field ?? '',
           contexts: { valuePath },
         })
       }>
       <ValueRenderer
         field=""
         value={valuePath.map((o) => Object.values(o)[0]).join(humanSeparator)}
-        traceColor={metricValue.traceColor}
+        traceColor={metricValue?.traceColor ?? null}
       />
     </ListGroupItem>
   );

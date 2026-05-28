@@ -27,6 +27,7 @@ import OnClickPopoverWrapper from 'views/components/visualizations/OnClickPopove
 import CartesianOnClickPopoverDropdown from 'views/components/visualizations/OnClickPopover/CartesianOnClickPopoverDropdown';
 import HeatmapOnClickPopover from 'views/components/visualizations/OnClickPopover/HeatmapOnClickPopover';
 import PieOnClickPopoverDropdown from 'views/components/visualizations/OnClickPopover/PieOnClickPopoverDropdown';
+import SankeyOnClickPopover from 'views/components/visualizations/OnClickPopover/SankeyOnClickPopover';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { CANDIDATE_PICK_RADIUS } from 'views/components/visualizations/Constants';
 import DropdownSwitcher from 'views/components/visualizations/OnClickPopover/DropdownSwitcher';
@@ -288,6 +289,50 @@ const getScatterLineElements = (gd: PlotlyHTMLElement, click: Px, pt: ClickPoint
   });
 };
 
+/** ---------- sankey anchor ---------- */
+const isSankeyLinkPoint = (pt: ClickPoint): boolean => {
+  const p = pt as unknown as { source?: unknown; target?: unknown };
+
+  return (
+    !!p.source &&
+    !!p.target &&
+    typeof p.source === 'object' &&
+    typeof p.target === 'object' &&
+    !Array.isArray(p.source) &&
+    !Array.isArray(p.target)
+  );
+};
+
+const getSankeyAnchorElement = (gd: HTMLElement, pt: ClickPoint): Element | null => {
+  const idx = (pt as unknown as { index?: number; pointNumber?: number }).index ?? (pt as ClickPoint).pointNumber;
+
+  if (typeof idx !== 'number') return null;
+
+  const selector = isSankeyLinkPoint(pt) ? '.sankey-link' : '.sankey-node';
+  const elements = gd.querySelectorAll(selector);
+
+  return (elements[idx] as Element | undefined) ?? null;
+};
+
+const sankeyAnchorKey = (anchor: ElementAnchor): string => {
+  const pt = anchor.pt as unknown as { pointNumber?: number; index?: number; source?: unknown; target?: unknown };
+  const isLink = isSankeyLinkPoint(anchor.pt);
+  const idx = pt.pointNumber ?? pt.index ?? 0;
+
+  return `${isLink ? 'l' : 'n'}-${idx}`;
+};
+
+const makeSankeyAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): ElementAnchor | null => {
+  const graphDiv = gd as unknown as HTMLElement;
+  const pt = e.points?.[0] as ClickPoint | undefined;
+
+  if (!pt) return null;
+
+  const el = getSankeyAnchorElement(graphDiv, pt) ?? graphDiv;
+
+  return { el, pt, rel: { x: 0.5, y: 0.5 } };
+};
+
 const makeScatterAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): Anchor | null => {
   const graphDiv = gd;
   const markerCandidates = e.points
@@ -327,7 +372,7 @@ const makeScatterAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): Anchor | n
   return { rel, el, pt, pointsInRadius };
 };
 
-type ChartType = 'bar' | 'scatter' | 'pie' | 'heatmap';
+type ChartType = 'bar' | 'scatter' | 'pie' | 'heatmap' | 'sankey';
 
 const popoverComponent = (chartType: ChartType) => {
   switch (chartType) {
@@ -369,12 +414,24 @@ const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetCo
   const onPopoverClose = () => setAnchor(null);
 
   const onChartClick = (_: OnClickMarkerEvent, e: PlotMouseEvent) => {
+    const targetEl = e.event?.target;
+    const targetElForClosest = targetEl instanceof Element ? targetEl : null;
     const gd =
-      gdRef.current ?? ((e.event?.target as HTMLElement)?.closest('.js-plotly-plot') as PlotlyHTMLElement | null);
+      gdRef.current ?? (targetElForClosest?.closest('.js-plotly-plot') as PlotlyHTMLElement | null);
     if (!gd) return;
-    const a = chartType === 'scatter' ? makeScatterAnchor(e, gd) : makeElementAnchor(e, gd, chartType);
+    let a: Anchor | null;
+    if (chartType === 'scatter') a = makeScatterAnchor(e, gd);
+    else if (chartType === 'sankey') a = makeSankeyAnchor(e, gd);
+    else a = makeElementAnchor(e, gd, chartType);
     if (!a) return;
-    setAnchor(a);
+    setAnchor((prev) => {
+      // Avoid recreating the anchor for the same element — a new object reference
+      // would cause DropdownSwitcher's `useEffect` to reset the step back to
+      // 'values' and dismiss the action menu the user just opened.
+      if (prev && prev.el === a.el) return prev;
+
+      return a;
+    });
   };
 
   const onPopoverChange = (isOpen: boolean) => {
@@ -391,13 +448,23 @@ const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetCo
       onPopoverChange={onPopoverChange}
       ref={refs.setFloating}
       style={floatingStyles}>
-      <DropdownSwitcher
-        component={PopoverComponent}
-        clickPoint={anchor?.pt}
-        config={config}
-        clickPointsInRadius={anchor?.pointsInRadius}
-        onPopoverClose={onPopoverClose}
-      />
+      {chartType === 'sankey' && anchor ? (
+        <SankeyOnClickPopover
+          // Remount per anchor so internal selection state resets when the user clicks a different element.
+          key={sankeyAnchorKey(anchor)}
+          clickPoint={anchor.pt}
+          config={config}
+          onPopoverClose={onPopoverClose}
+        />
+      ) : (
+        <DropdownSwitcher
+          component={PopoverComponent}
+          clickPoint={anchor?.pt}
+          config={config}
+          clickPointsInRadius={anchor?.pointsInRadius}
+          onPopoverClose={onPopoverClose}
+        />
+      )}
     </OnClickPopoverWrapper>
   );
 
