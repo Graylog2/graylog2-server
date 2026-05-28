@@ -17,6 +17,11 @@
 import type { DateTime, DateTimeFormats } from 'util/DateTime';
 import type { TimeRangePickerFormValues } from 'views/components/time-range-picker/types';
 import {
+  classifyFromRange,
+  classifyToRange,
+  RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
+} from 'views/components/time-range-picker/RelativeTimeRangeClassifiedHelper';
+import {
   normalizeFromPickerForSearchBar,
   normalizeFromSearchBarForBackend,
 } from 'views/logic/queries/NormalizeTimeRange';
@@ -78,7 +83,7 @@ const parseUntypedTimeRange = (value: string): TimeRange => {
   return isRelative ? parseRelativeTimeRange(value) : parseAbsoluteTimeRange(value);
 };
 
-export const parseFilterValue = (filterValue: string): TimeRange => {
+export const parseStringTimerangeFilterValue = (filterValue: string): TimeRange => {
   const separatorIndex = filterValue.indexOf(TIME_RANGE_TYPE_SEPARATOR);
 
   if (separatorIndex < 0) {
@@ -123,6 +128,71 @@ const absoluteTimeRangeTitle = (timeRange: AbsoluteTimeRange, formatTime: Format
   return `${from} - ${until}`;
 };
 
+const defaultInitialValues = (): TimeRangePickerFormValues => ({
+  timeRangeTabs: {
+    relative: {
+      type: 'relative',
+      from: {
+        value: 5,
+        unit: 'minutes',
+        isAllTime: false,
+      },
+      to: RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
+    },
+  },
+  activeTab: 'relative',
+});
+
+const relativeTimeRangeToFormValue = (timeRange: RelativeTimeRange) => {
+  if (isTypeRelativeWithStartOnly(timeRange)) {
+    return {
+      type: 'relative' as const,
+      from: classifyFromRange(timeRange.range),
+      to: RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
+    };
+  }
+
+  return {
+    type: 'relative' as const,
+    from: classifyFromRange(timeRange.from),
+    to: typeof timeRange.to === 'number' ? classifyToRange(timeRange.to) : RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
+  };
+};
+
+const absoluteTimeRangeToFormValue = (timeRange: AbsoluteTimeRange, formatTime: FormatTime) => ({
+  type: 'absolute' as const,
+  from: timeRange.from ? formatTime(timeRange.from, 'complete') : '',
+  to: timeRange.to ? formatTime(timeRange.to, 'complete') : formatTime(new Date(), 'complete'),
+});
+
+const timeRangeToFormValues = (timeRange: TimeRange, formatTime: FormatTime): TimeRangePickerFormValues => {
+  switch (timeRange.type) {
+    case 'relative':
+      return {
+        timeRangeTabs: {
+          relative: relativeTimeRangeToFormValue(timeRange),
+        },
+        activeTab: 'relative',
+      };
+    case 'keyword':
+      return {
+        timeRangeTabs: {
+          keyword: timeRange,
+        },
+        activeTab: 'keyword',
+      };
+    case 'absolute':
+      return {
+        timeRangeTabs: {
+          absolute: absoluteTimeRangeToFormValue(timeRange, formatTime),
+        },
+        activeTab: 'absolute',
+      };
+    default:
+      throw new Error(`Invalid time range type: ${timeRange}`);
+  }
+};
+
 const serializeTimeRange = (timeRange: TimeRange | undefined) => {
   if (!timeRange) {
     return '';
@@ -153,7 +223,7 @@ export const timeRangeTitle = (timeRange: TimeRange | string | undefined, format
     return '';
   }
 
-  const parsedTimeRange = typeof timeRange === 'string' ? parseFilterValue(timeRange) : timeRange;
+  const parsedTimeRange = typeof timeRange === 'string' ? parseStringTimerangeFilterValue(timeRange) : timeRange;
 
   switch (parsedTimeRange.type) {
     case 'relative':
@@ -165,6 +235,14 @@ export const timeRangeTitle = (timeRange: TimeRange | string | undefined, format
     default:
       throw new Error(`Invalid time range type: ${parsedTimeRange}`);
   }
+};
+
+export const filterValueToTimeRangePickerFormValues = (filterValue: string | undefined, formatTime: FormatTime) => {
+  if (!filterValue) {
+    return defaultInitialValues();
+  }
+
+  return timeRangeToFormValues(parseStringTimerangeFilterValue(filterValue), formatTime);
 };
 
 export const timeRangePickerFormValuesToFilterValue = (

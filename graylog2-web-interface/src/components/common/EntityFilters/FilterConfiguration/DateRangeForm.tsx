@@ -23,17 +23,12 @@ import ModalSubmit from 'components/common/ModalSubmit';
 import loadAsync from 'routing/loadAsync';
 import useUserDateTime from 'hooks/useUserDateTime';
 import type { TimeRangePickerFormValues } from 'views/components/time-range-picker/types';
-import {
-  classifyFromRange,
-  classifyToRange,
-  RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
-} from 'views/components/time-range-picker/RelativeTimeRangeClassifiedHelper';
-import type { AbsoluteTimeRange, RelativeTimeRange, TimeRange } from 'views/logic/queries/Query';
-import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
-import type { DateTime, DateTimeFormats } from 'util/DateTime';
 import useTimeRangeValidation from 'views/components/time-range-picker/useTimeRangeValidation';
 
-import { parseFilterValue, timeRangePickerFormValuesToFilterValue } from '../helpers/timeRange';
+import {
+  filterValueToTimeRangePickerFormValues,
+  timeRangePickerFormValuesToFilterValue,
+} from '../helpers/timeRange';
 import type { Filter } from '../types';
 
 const TimeRangePickerFormContent = loadAsync(
@@ -44,81 +39,6 @@ const Container = styled.div`
   padding: 3px 10px;
   width: 735px;
 `;
-
-type FormatTime = (dateTime: DateTime, format?: DateTimeFormats) => string;
-
-const defaultInitialValues = (): TimeRangePickerFormValues => ({
-  timeRangeTabs: {
-    relative: {
-      type: 'relative',
-      from: {
-        value: 5,
-        unit: 'minutes',
-        isAllTime: false,
-      },
-      to: RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
-    },
-  },
-  activeTab: 'relative',
-});
-
-const relativeTimeRangeToFormValue = (timeRange: RelativeTimeRange) => {
-  if (isTypeRelativeWithStartOnly(timeRange)) {
-    return {
-      type: 'relative' as const,
-      from: classifyFromRange(timeRange.range),
-      to: RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
-    };
-  }
-
-  return {
-    type: 'relative' as const,
-    from: classifyFromRange(timeRange.from),
-    to: typeof timeRange.to === 'number' ? classifyToRange(timeRange.to) : RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
-  };
-};
-
-const absoluteTimeRangeToFormValue = (timeRange: AbsoluteTimeRange, formatTime: FormatTime) => ({
-  type: 'absolute' as const,
-  from: timeRange.from ? formatTime(timeRange.from, 'complete') : '',
-  to: timeRange.to ? formatTime(timeRange.to, 'complete') : formatTime(new Date(), 'complete'),
-});
-
-const timeRangeToFormValues = (timeRange: TimeRange, formatTime: FormatTime): TimeRangePickerFormValues => {
-  switch (timeRange.type) {
-    case 'relative':
-      return {
-        timeRangeTabs: {
-          relative: relativeTimeRangeToFormValue(timeRange),
-        },
-        activeTab: 'relative',
-      };
-    case 'keyword':
-      return {
-        timeRangeTabs: {
-          keyword: timeRange,
-        },
-        activeTab: 'keyword',
-      };
-    case 'absolute':
-      return {
-        timeRangeTabs: {
-          absolute: absoluteTimeRangeToFormValue(timeRange, formatTime),
-        },
-        activeTab: 'absolute',
-      };
-    default:
-      throw new Error(`Invalid time range type: ${timeRange}`);
-  }
-};
-
-export const filterValueToTimeRangePickerFormValues = (filterValue: string | undefined, formatTime: FormatTime) => {
-  if (!filterValue) {
-    return defaultInitialValues();
-  }
-
-  return timeRangeToFormValues(parseFilterValue(filterValue), formatTime);
-};
 
 type Props = {
   onSubmit: (filter: { title: string; value: string }) => void;
