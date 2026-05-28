@@ -15,14 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 export { default as Alert } from './Alert';
-export { default as Box } from './Box';
 export { default as Badge } from './Badge';
 export { default as BootstrapModalConfirm } from './BootstrapModalConfirm';
 export { default as BootstrapModalForm } from './BootstrapModalForm';
 export { default as BootstrapModalWrapper } from './BootstrapModalWrapper';
 export { default as Button } from './Button';
 export { default as ButtonGroup } from './ButtonGroup';
-export { default as Group } from './Group';
 export { default as ButtonToolbar } from './ButtonToolbar';
 export { default as Checkbox } from './Checkbox';
 export { default as ControlLabel } from './ControlLabel';
@@ -48,15 +46,12 @@ export { default as NavDropdown } from './NavDropdown';
 export { default as NavItem } from './NavItem';
 export { default as Navbar } from './Navbar';
 export { default as Panel } from './Panel';
-export { default as Progress } from './Progress';
 export { default as Row } from './Row';
 export { default as SegmentedControl } from './SegmentedControl';
-export { default as Stack } from './Stack';
 export { default as SplitButton } from './SplitButton';
 export { default as Tab } from './Tab';
 export { default as Table } from './Table';
 export { default as Tabs } from './Tabs';
-export { default as Title } from './Title';
 export { default as Well } from './Well';
 
 export * from './imports';
