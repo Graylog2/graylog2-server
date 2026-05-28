@@ -17,8 +17,11 @@
 package org.graylog.events.processor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.graylog.events.TestEventProcessorConfig;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationSettings;
@@ -29,6 +32,7 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -193,5 +197,92 @@ public class EventDefinitionDtoTest {
 
     private static ValidationResult validate(EventDefinitionDto eventDefinitionDto) {
         return eventDefinitionDto.validate(null, new EventDefinitionConfiguration(), mock(UserContext.class));
+    }
+
+    @Test
+    public void tagsAreNormalizedOnBuild() {
+        final EventDefinitionDto dto = testSubject.toBuilder()
+                .tags(ImmutableSet.of("  Phishing  ", "lateral-MOVEMENT", "phishing", "", "   "))
+                .build();
+        // Trim + lowercase + dedupe + drop blanks
+        assertThat(dto.tags()).containsExactlyInAnyOrder("phishing", "lateral-movement");
+    }
+
+    @Test
+    public void tagsDefaultToEmpty() {
+        assertThat(testSubject.tags()).isEmpty();
+    }
+
+    @Test
+    public void tagsSerializeToJson() throws JsonProcessingException {
+        // Build with a real config so Jackson can serialize (testSubject's mock config has
+        // Mockito-internal fields that fail serialization).
+        final EventDefinitionDto dto = EventDefinitionDto.builder()
+                .title("foo")
+                .description("bar")
+                .priority(1)
+                .alert(false)
+                .keySpec(ImmutableList.of())
+                .config(TestEventProcessorConfig.builder()
+                        .message("test")
+                        .searchWithinMs(1000)
+                        .executeEveryMs(1000)
+                        .build())
+                .notificationSettings(EventNotificationSettings.withGracePeriod(0))
+                .tags(ImmutableSet.of("phishing", "lateral-movement"))
+                .build();
+        final ObjectMapper mapper = new ObjectMapperProvider().get();
+        final JsonNode tree = mapper.readTree(mapper.writeValueAsString(dto));
+        assertThat(tree.get("tags")).isNotNull();
+        assertThat(tree.get("tags").isArray()).isTrue();
+        final List<String> serialized = new ArrayList<>();
+        tree.get("tags").forEach(n -> serialized.add(n.asText()));
+        assertThat(serialized).containsExactlyInAnyOrder("phishing", "lateral-movement");
+    }
+
+    @Test
+    public void tagExceedingMaxLengthFailsValidation() {
+        final String tooLong = "a".repeat(EventDefinitionDto.MAX_TAG_LENGTH + 1);
+        final EventDefinitionDto invalid = testSubject.toBuilder()
+                .tags(ImmutableSet.of(tooLong))
+                .build();
+        final ValidationResult validationResult = validate(invalid);
+        assertThat(validationResult.failed()).isTrue();
+        assertThat(validationResult.getErrors()).containsKey("tags");
+    }
+
+    @Test
+    public void tagCountExceedingMaxFailsValidation() {
+        final ImmutableSet.Builder<String> tags = ImmutableSet.builder();
+        for (int i = 0; i <= EventDefinitionDto.MAX_TAGS; i++) {
+            tags.add("tag-" + i);
+        }
+        final EventDefinitionDto invalid = testSubject.toBuilder()
+                .tags(tags.build())
+                .build();
+        final ValidationResult validationResult = validate(invalid);
+        assertThat(validationResult.failed()).isTrue();
+        assertThat(validationResult.getErrors()).containsKey("tags");
+    }
+
+    @Test
+    public void tagWithInvalidCharactersFailsValidation() {
+        final EventDefinitionDto invalid = testSubject.toBuilder()
+                .tags(ImmutableSet.of("phish:ing"))
+                .build();
+        final ValidationResult validationResult = validate(invalid);
+        assertThat(validationResult.failed()).isTrue();
+        assertThat(validationResult.getErrors()).containsKey("tags");
+    }
+
+    @Test
+    public void tagWithDotIsValid() {
+        // The test fixture may have unrelated validation errors, so we only assert that
+        // no tags-specific error is reported.
+        final EventDefinitionDto valid = testSubject.toBuilder()
+                .tags(ImmutableSet.of("attack.t1110", "auth.failed"))
+                .build();
+        final ValidationResult validationResult = validate(valid);
+        assertThat(validationResult.getErrors()).doesNotContainKey("tags");
     }
 }
