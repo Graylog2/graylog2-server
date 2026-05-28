@@ -42,7 +42,9 @@ import org.graylog2.rest.resources.datanodes.DataNodeManagementResource;
 import org.graylog2.rest.resources.datanodes.DataNodeRestApiProxyResource;
 import org.graylog2.rest.resources.datanodes.DatanodeResource;
 import org.graylog2.rest.resources.datanodes.DatanodeUpgradeResource;
+import com.google.inject.multibindings.MapBinder;
 import org.graylog2.rest.resources.entities.preferences.EntityListPreferencesResource;
+import org.graylog2.rest.resources.entities.preferences.metrics.EntityListMetricProvider;
 import org.graylog2.rest.resources.messages.MessageResource;
 import org.graylog2.rest.resources.mongodb.MongodbClusterResource;
 import org.graylog2.rest.resources.roles.RolesResource;
@@ -99,6 +101,7 @@ import org.graylog2.rest.resources.system.indices.RetentionStrategyResource;
 import org.graylog2.rest.resources.system.indices.RotationStrategyResource;
 import org.graylog2.rest.resources.system.inputs.ExtractorsResource;
 import org.graylog2.rest.resources.system.inputs.InputStatesResource;
+import org.graylog2.rest.resources.system.inputs.InputMetricsResource;
 import org.graylog2.rest.resources.system.inputs.InputsResource;
 import org.graylog2.rest.resources.system.inputs.StaticFieldsResource;
 import org.graylog2.rest.resources.system.jobs.ServiceManagerResource;
@@ -164,6 +167,7 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(TrafficResource.class);
         addSystemRestResource(SearchVersionResource.class);
         addSystemRestResource(EntityListPreferencesResource.class);
+        MapBinder.newMapBinder(binder(), String.class, EntityListMetricProvider.class);
         addSystemRestResource(TelemetryResource.class);
         addSystemRestResource(ContentStreamResource.class);
         addSystemRestResource(CertificateRenewalResource.class);
@@ -243,6 +247,7 @@ public class RestResourcesModule extends Graylog2Module {
     private void addProcessingResources() {
         addSystemRestResource(GrokResource.class);
         addSystemRestResource(InputsResource.class);
+        addSystemRestResource(InputMetricsResource.class);
         addSystemRestResource(InputStatesResource.class);
         addSystemRestResource(StaticFieldsResource.class);
         addSystemRestResource(LookupTableResource.class);

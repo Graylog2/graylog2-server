@@ -23,6 +23,7 @@ import Reflux from 'reflux';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import AppFacade from 'routing/AppFacade';
+import ServerAvailabilityProvider from 'contexts/ServerAvailabilityProvider';
 import ViewsBindings from 'views/bindings';
 import ThreatIntelBindings from 'threatintel/bindings';
 import AwsBindings from 'aws/bindings';
@@ -48,10 +49,7 @@ import AuthenticationBindings from 'components/authentication/bindings';
 import ClusterConfigurationBindings from 'components/cluster-configuration/bindings';
 import ConfigurationBindings from 'components/configurations/bindings';
 
-import '@graylog/sawmill/fonts';
-import '@mantine/core/styles.css';
-import '@mantine/dropzone/styles.css';
-import '@mantine/notifications/styles.css';
+import 'theme/theme-styles';
 
 Reflux.setPromiseFactory((handlers) => CancellablePromise.of(new Promise(handlers)));
 
@@ -81,9 +79,11 @@ const appContainer = document.querySelector('div#app-root');
 const root = createRoot(appContainer);
 
 root.render(
-  <TelemetryInit>
-    <LoginQueryClientProvider>
-      <AppFacade />
-    </LoginQueryClientProvider>
-  </TelemetryInit>,
+  <LoginQueryClientProvider>
+    <TelemetryInit>
+      <ServerAvailabilityProvider>
+        <AppFacade />
+      </ServerAvailabilityProvider>
+    </TelemetryInit>
+  </LoginQueryClientProvider>,
 );

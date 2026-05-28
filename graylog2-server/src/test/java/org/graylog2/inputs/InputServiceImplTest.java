@@ -16,19 +16,23 @@
  */
 package org.graylog2.inputs;
 
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBExtension;
+import org.graylog2.ConfigurationException;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.converters.ConverterFactory;
+import org.graylog2.inputs.extractors.CopyInputExtractor;
 import org.graylog2.inputs.extractors.ExtractorFactory;
+import org.graylog2.inputs.extractors.RegexExtractor;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -466,6 +470,61 @@ public class InputServiceImplTest {
                 InputImpl.FIELD_CONTENT_PACK,
                 InputImpl.FIELD_NODE_ID
         );
+    }
+
+    @Test
+    void totalExtractorCountByTypeCountsExtractorsAcrossInputs() throws Exception {
+        final Input input1 = inputService.find(inputService.save(createTestInput()));
+        inputService.addExtractor(input1, createCopyInputExtractor());
+        inputService.addExtractor(input1, createCopyInputExtractor());
+        inputService.addExtractor(input1, createRegexExtractor());
+
+        final Input input2 = inputService.find(inputService.save(createTestInput()));
+        inputService.addExtractor(input2, createCopyInputExtractor());
+
+        final Map<Extractor.Type, Long> result = inputService.totalExtractorCountByType();
+        assertThat(result)
+                .containsEntry(Extractor.Type.COPY_INPUT, 3L)
+                .containsEntry(Extractor.Type.REGEX, 1L);
+    }
+
+    @Test
+    void extractorCountByInputId_returnsCounts() throws Exception {
+        final Input input1 = inputService.find(inputService.save(createTestInput()));
+        inputService.addExtractor(input1, createCopyInputExtractor());
+        inputService.addExtractor(input1, createCopyInputExtractor());
+        inputService.addExtractor(input1, createRegexExtractor());
+
+        final Input input2 = inputService.find(inputService.save(createTestInput()));
+        inputService.addExtractor(input2, createCopyInputExtractor());
+
+        final Input input3 = inputService.find(inputService.save(createTestInput()));
+
+        final Map<String, Integer> result = inputService.extractorCountByInputId(
+                List.of(input1.getId(), input2.getId(), input3.getId()));
+
+        assertThat(result)
+                .containsEntry(input1.getId(), 3)
+                .containsEntry(input2.getId(), 1)
+                .containsEntry(input3.getId(), 0);
+    }
+
+    @Test
+    void extractorCountByInputId_returnsEmptyForNoInputs() {
+        final Map<String, Integer> result = inputService.extractorCountByInputId(List.of());
+        assertThat(result).isEmpty();
+    }
+
+    private static CopyInputExtractor createCopyInputExtractor() throws Extractor.ReservedFieldException {
+        return new CopyInputExtractor(new MetricRegistry(), new ObjectId().toHexString(), "copy extractor",
+                0, Extractor.CursorStrategy.COPY, "message", "target", Map.of(), "admin",
+                List.of(), Extractor.ConditionType.NONE, "");
+    }
+
+    private static RegexExtractor createRegexExtractor() throws Extractor.ReservedFieldException, ConfigurationException {
+        return new RegexExtractor(new MetricRegistry(), new ObjectId().toHexString(), "regex extractor",
+                0, Extractor.CursorStrategy.COPY, "message", "target", Map.of("regex_value", ".*"), "admin",
+                List.of(), Extractor.ConditionType.NONE, "");
     }
 
     private InputImpl createTestInput() {

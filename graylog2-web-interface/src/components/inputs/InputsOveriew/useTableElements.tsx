@@ -31,12 +31,7 @@ const useTableElements = ({
 }) => {
   const entityActions = useCallback(
     (listItem: Input) => (
-      <InputsActions
-        input={listItem}
-        inputTypes={inputTypes}
-        inputTypeDescriptions={inputTypeDescriptions}
-        currentNode={null}
-      />
+      <InputsActions input={listItem} inputTypes={inputTypes} inputTypeDescriptions={inputTypeDescriptions} />
     ),
     [inputTypes, inputTypeDescriptions],
   );

@@ -30,26 +30,34 @@ const getEventDefinitionTableElements = (pluggableAttributes?: {
       'title',
       'description',
       'priority',
+      'notifications',
       'scheduling',
       'status',
       'matched_at',
+      'tags',
       ...(pluggableAttributes?.attributeNames || []),
     ],
     defaultColumnOrder: [
       'title',
       'description',
       'priority',
+      'notifications',
       '_entity_source.source',
       'matched_at',
       'status',
       'scheduling',
+      'tags',
       ...(pluggableAttributes?.attributeNames || []),
     ],
   };
 
-  const additionalAttributes = [
+  // `tags` is supplied via the fetchEventDefinitions response (so it shows up in the filter
+  // dropdown with its custom filter_component) and is NOT added here, otherwise
+  // PaginatedEntityTable would render a duplicate Tags column.
+  const additionalAttributes: Array<Attribute> = [
     { id: 'scheduling', title: 'Scheduling', sortable: false },
     { id: 'matched_at', title: 'Last Matched', sortable: true },
+    { id: 'notifications', title: 'Notifications', sortable: false },
     ...(pluggableAttributes?.attributes || []),
   ];
 

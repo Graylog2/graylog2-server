@@ -421,6 +421,13 @@ declare module 'graylog-web-plugin/plugin' {
     entityRoutes?: Array<RouteGenerator>;
     entityTypeRoute?: Array<EntityTypeRouteGenerator>;
     entityCreators?: Array<EntityCreator>;
+    'users.details.segments'?: Array<{
+      value: string;
+      label: string;
+      component: React.ComponentType<{ user: User }>;
+      editPermissionRequired?: boolean;
+      useCondition?: () => boolean;
+    }>;
     indexRetentionConfig?: Array<IndexRetentionConfig>;
     inputsBadgeProviders?: Array<{
       useCondition: () => { hasIssues: boolean; title: string };

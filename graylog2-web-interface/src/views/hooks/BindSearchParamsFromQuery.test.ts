@@ -21,6 +21,7 @@ import Query, { createElasticsearchQueryString } from 'views/logic/queries/Query
 import Search from 'views/logic/search/Search';
 import mockDispatch from 'views/test/mockDispatch';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import GlobalOverride from 'views/logic/search/GlobalOverride';
 
 import bindSearchParamsFromQuery from './BindSearchParamsFromQuery';
 
@@ -47,15 +48,16 @@ describe('BindSearchParamsFromQuery should', () => {
 
   const findMockQuery = (v: View) => v.search.queries.find((q) => q.id === MOCK_VIEW_QUERY_ID);
 
-  it('not update query when provided view is not a search', async () => {
+  it('update dashboard globalOverride.query when q param is provided', async () => {
     const input = {
       ...defaultInput,
       view: view.toBuilder().type(View.Type.Dashboard).build(),
+      query: { q: 'source:nginx' },
     };
 
-    const [newView] = await bindSearchParamsFromQuery(input);
+    const [, newExecutionState] = await bindSearchParamsFromQuery(input);
 
-    expect(findMockQuery(newView).query.query_string).toBe('');
+    expect(newExecutionState.globalOverride?.query?.query_string).toBe('source:nginx');
   });
 
   it('not update query when query is already up to date', async () => {
@@ -177,5 +179,102 @@ describe('BindSearchParamsFromQuery should', () => {
     const [newView] = await bindSearchParamsFromQuery(input);
 
     expect(newView).toEqual(view);
+  });
+
+  it('not update executionState when dashboard receives no URL params', async () => {
+    const input = {
+      ...defaultInput,
+      view: view.toBuilder().type(View.Type.Dashboard).build(),
+    };
+
+    const [, newExecutionState] = await bindSearchParamsFromQuery(input);
+
+    expect(newExecutionState).toBe(defaultInput.executionState);
+  });
+
+  it('update dashboard globalOverride.timerange when relative range param is provided', async () => {
+    const input = {
+      ...defaultInput,
+      view: view.toBuilder().type(View.Type.Dashboard).build(),
+      query: { relative: '3600' },
+    };
+
+    const [, newExecutionState] = await bindSearchParamsFromQuery(input);
+
+    expect(newExecutionState.globalOverride?.timerange).toEqual({ type: 'relative', range: 3600 });
+  });
+
+  it('update dashboard globalOverride.timerange when absolute range params are provided', async () => {
+    const input = {
+      ...defaultInput,
+      view: view.toBuilder().type(View.Type.Dashboard).build(),
+      query: { rangetype: 'absolute', from: '2024-01-01T00:00:00.000Z', to: '2024-01-02T00:00:00.000Z' },
+    };
+
+    const [, newExecutionState] = await bindSearchParamsFromQuery(input);
+
+    expect(newExecutionState.globalOverride?.timerange).toEqual({
+      type: 'absolute',
+      from: '2024-01-01T00:00:00.000Z',
+      to: '2024-01-02T00:00:00.000Z',
+    });
+  });
+
+  it('update dashboard globalOverride.timerange when keyword range param is provided', async () => {
+    const input = {
+      ...defaultInput,
+      view: view.toBuilder().type(View.Type.Dashboard).build(),
+      query: { rangetype: 'keyword', keyword: 'Last five days' },
+    };
+
+    const [, newExecutionState] = await bindSearchParamsFromQuery(input);
+
+    expect(newExecutionState.globalOverride?.timerange).toEqual({ type: 'keyword', keyword: 'Last five days' });
+  });
+
+  it('preserve existing override timerange when only q param is provided on dashboard', async () => {
+    const existingOverride = GlobalOverride.create({ type: 'relative', range: 300 });
+    const existingExecutionState = defaultInput.executionState.toBuilder().globalOverride(existingOverride).build();
+    const input = {
+      ...defaultInput,
+      view: view.toBuilder().type(View.Type.Dashboard).build(),
+      executionState: existingExecutionState,
+      query: { q: 'source:nginx' },
+    };
+
+    const [, newExecutionState] = await bindSearchParamsFromQuery(input);
+
+    expect(newExecutionState.globalOverride?.query?.query_string).toBe('source:nginx');
+    expect(newExecutionState.globalOverride?.timerange).toEqual({ type: 'relative', range: 300 });
+  });
+
+  it('preserve existing override query when only timerange param is provided on dashboard', async () => {
+    const existingOverride = GlobalOverride.builder()
+      .query({ type: 'elasticsearch', query_string: 'persisted:override' })
+      .build();
+    const existingExecutionState = defaultInput.executionState.toBuilder().globalOverride(existingOverride).build();
+    const input = {
+      ...defaultInput,
+      view: view.toBuilder().type(View.Type.Dashboard).build(),
+      executionState: existingExecutionState,
+      query: { relative: '900' },
+    };
+
+    const [, newExecutionState] = await bindSearchParamsFromQuery(input);
+
+    expect(newExecutionState.globalOverride?.query?.query_string).toBe('persisted:override');
+    expect(newExecutionState.globalOverride?.timerange).toEqual({ type: 'relative', range: 900 });
+  });
+
+  it('ignore streams param on dashboard view', async () => {
+    const input = {
+      ...defaultInput,
+      view: view.toBuilder().type(View.Type.Dashboard).build(),
+      query: { streams: 'stream1,stream2' },
+    };
+
+    const [, newExecutionState] = await bindSearchParamsFromQuery(input);
+
+    expect(newExecutionState).toBe(defaultInput.executionState);
   });
 });

@@ -123,7 +123,8 @@ public class CloudTrailInput extends MessageInput {
                     "",
                     "Secret key of an AWS user with sufficient permissions. (See documentation)",
                     ConfigurationField.Optional.OPTIONAL,
-                    true
+                    true,
+                    TextField.Attribute.IS_PASSWORD
             ));
             r.addField(new DropdownField(
                     CK_AWS_SQS_REGION,

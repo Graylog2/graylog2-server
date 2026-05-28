@@ -113,6 +113,10 @@ public interface Event extends Indexable {
 
     void addAssociatedAssets(Set<String> associatedAssets);
 
+    Set<String> getTags();
+
+    void setTags(Set<String> tags);
+
     EventDto toDto();
 
     static Event fromDto(EventDto from) {
@@ -131,6 +135,7 @@ public interface Event extends Indexable {
         from.timerangeEnd().ifPresent(event::setTimerangeEnd);
         from.originContext().ifPresent(event::setOriginContext);
         from.replayInfo().ifPresent(event::setReplayInfo);
+        event.setTags(from.tags());
 
         return event;
     }

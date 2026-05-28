@@ -19,6 +19,7 @@ package org.graylog.plugins.pipelineprocessor;
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.documentation.Documentation;
 import com.github.joschi.jadconfig.documentation.DocumentationSection;
+import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import org.graylog2.plugin.PluginConfigBean;
 
 @DocumentationSection(heading = "Pipeline configuration", description = "")
@@ -27,4 +28,18 @@ public class PipelineConfig implements PluginConfigBean {
     @Documentation(value = "tbd")
     @Parameter("cached_stageiterators")
     private boolean cachedStageIterators = true;
+
+    @Documentation("""
+            Controls how often Graylog records pipeline rule debug timer samples.
+            The default, 1, records every invocation.
+            Use a higher value, for example 10, to record roughly one out of every 10 invocations.
+            This can reduce overhead on busy clusters with many rules.
+            Use the same value on every node. Changes require a JVM restart.
+            """)
+    @Parameter(value = "rule_metrics_sample_rate", validators = PositiveIntegerValidator.class)
+    private int ruleMetricsSampleRate = 1;
+
+    public int getRuleMetricsSampleRate() {
+        return ruleMetricsSampleRate;
+    }
 }
