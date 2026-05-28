@@ -32,6 +32,13 @@ type Props = {
   warnIfPageOutOfBounds?: boolean;
 };
 
+const controlAriaLabels = {
+  first: 'Open first page',
+  previous: 'Open previous page',
+  next: 'Open next page',
+  last: 'Open last page',
+};
+
 const PrevIcon = () => <Icon name="chevron_left" />;
 const NextIcon = () => <Icon name="chevron_right" />;
 const FirstIcon = () => <Icon name="keyboard_double_arrow_left" />;
@@ -98,6 +105,8 @@ const Pagination = ({
       nextIcon={NextIcon}
       firstIcon={FirstIcon}
       lastIcon={LastIcon}
+      getControlProps={(control) => ({ 'aria-label': controlAriaLabels[control] })}
+      getItemProps={(page) => ({ 'aria-label': `Open page ${page}` })}
       data-testid="graylog-pagination"
     />
   );
