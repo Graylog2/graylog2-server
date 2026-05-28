@@ -27,6 +27,13 @@ import org.graylog2.inputs.InputServiceImpl;
 import org.graylog2.inputs.metrics.InputExtractorCountDescriptor;
 import org.graylog2.inputs.metrics.InputMessagesPerStreamDescriptor;
 import org.graylog2.metrics.entity.cache.MetricsCacheService;
+import org.graylog2.streams.StreamServiceImpl;
+import org.graylog2.streams.metrics.StreamAssociatedInputsDescriptor;
+import org.graylog2.streams.metrics.StreamAvgProcessingTimeDescriptor;
+import org.graylog2.streams.metrics.StreamMaxProcessingTimeDescriptor;
+import org.graylog2.streams.metrics.StreamMessageCountDescriptor;
+import org.graylog2.streams.metrics.StreamPipelinesDescriptor;
+import org.graylog2.streams.metrics.StreamRoutingPipelinesDescriptor;
 
 import java.util.Set;
 
@@ -44,6 +51,7 @@ import java.util.Set;
 public class EntityMetricsModule extends AbstractModule {
 
     public static final String ENTITY_TYPE_INPUTS = InputServiceImpl.COLLECTION_NAME;
+    public static final String ENTITY_TYPE_STREAMS = StreamServiceImpl.COLLECTION_NAME;
 
     @Override
     protected void configure() {
@@ -51,6 +59,15 @@ public class EntityMetricsModule extends AbstractModule {
                 Multibinder.newSetBinder(binder(), EntityMetricDescriptor.class, Names.named(ENTITY_TYPE_INPUTS));
         inputDescriptors.addBinding().to(InputMessagesPerStreamDescriptor.class);
         inputDescriptors.addBinding().to(InputExtractorCountDescriptor.class);
+
+        final Multibinder<EntityMetricDescriptor> streamDescriptors =
+                Multibinder.newSetBinder(binder(), EntityMetricDescriptor.class, Names.named(ENTITY_TYPE_STREAMS));
+        streamDescriptors.addBinding().to(StreamMessageCountDescriptor.class);
+        streamDescriptors.addBinding().to(StreamAvgProcessingTimeDescriptor.class);
+        streamDescriptors.addBinding().to(StreamMaxProcessingTimeDescriptor.class);
+        streamDescriptors.addBinding().to(StreamAssociatedInputsDescriptor.class);
+        streamDescriptors.addBinding().to(StreamPipelinesDescriptor.class);
+        streamDescriptors.addBinding().to(StreamRoutingPipelinesDescriptor.class);
     }
 
     @SuppressWarnings("unused")
@@ -61,5 +78,15 @@ public class EntityMetricsModule extends AbstractModule {
                                              MetricsCacheService cacheService,
                                              ObjectMapper objectMapper) {
         return new EntityMetricsService(ENTITY_TYPE_INPUTS, descriptors, cacheService, objectMapper);
+    }
+
+    @SuppressWarnings("unused")
+    @Provides
+    @Singleton
+    @Named(ENTITY_TYPE_STREAMS)
+    EntityMetricsService streamMetricsService(@Named(ENTITY_TYPE_STREAMS) Set<EntityMetricDescriptor> descriptors,
+                                              MetricsCacheService cacheService,
+                                              ObjectMapper objectMapper) {
+        return new EntityMetricsService(ENTITY_TYPE_STREAMS, descriptors, cacheService, objectMapper);
     }
 }
