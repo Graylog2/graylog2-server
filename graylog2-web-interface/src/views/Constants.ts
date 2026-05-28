@@ -20,11 +20,11 @@ import type { TimeRange, RelativeTimeRangeWithEnd, RelativeTimeRange } from 'vie
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import type { ArrayElement } from 'views/types';
 import type { AutoTimeConfig } from 'views/logic/aggregationbuilder/Pivot';
+import type { StreamsAndCategoriesSelection } from 'views/components/common/StreamsAndCategoriesFilter';
 
 export type SearchBarFormValues = {
   timerange: TimeRange;
-  streams: Array<string>;
-  streamCategories: Array<string>;
+  streamsAndCategories: StreamsAndCategoriesSelection;
   queryString: string;
 };
 
