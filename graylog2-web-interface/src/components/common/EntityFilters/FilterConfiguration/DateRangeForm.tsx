@@ -143,10 +143,11 @@ const DateRangeForm = ({ filter, onSubmit }: Props) => {
   return (
     <Container data-testid="time-range-form">
       <Formik<TimeRangePickerFormValues> initialValues={initialValues} onSubmit={_onSubmit} enableReinitialize>
-        {() => (
+        {({ isValid }) => (
           <Form>
             <TimeRangePickerFormContent limitDuration={0}>
               <ModalSubmit
+                disabledSubmit={!isValid}
                 submitButtonText={`${filter ? 'Update' : 'Create'} filter`}
                 bsSize="small"
                 displayCancel={false}
