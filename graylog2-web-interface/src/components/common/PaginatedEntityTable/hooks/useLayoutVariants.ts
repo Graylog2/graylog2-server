@@ -19,6 +19,13 @@ import { useQuery } from '@tanstack/react-query';
 
 import { EntityLists } from '@graylog/server-api';
 
+import type { TimeRange } from 'views/logic/queries/Query';
+
+type Props = {
+  entityListId: string;
+  timerange: TimeRange;
+};
+
 type LayoutVariantJSON = {
   display_name: string;
   entity_list_id: string;
@@ -41,10 +48,10 @@ type LayoutVariant = {
   }>;
 };
 
-const fetchLayoutVariants = (entityListId: string): Promise<Array<LayoutVariant>> =>
+const fetchLayoutVariants = ({ entityListId, timerange }: Props): Promise<Array<LayoutVariant>> =>
   // TODO temporary solution to pass the build. We need to fix be to generte server-api correctly
   // @ts-ignore
-   EntityLists.listPredefined(entityListId, { type: 'keyword', keyword: 'last 30 days' }).then(
+  EntityLists.listPredefined(entityListId, timerange).then(
     (response: Array<LayoutVariantJSON>) =>
       response.map(({ display_name, layout_variant, entity_list_id, metrics }) => ({
         displayName: display_name,
@@ -56,13 +63,12 @@ const fetchLayoutVariants = (entityListId: string): Promise<Array<LayoutVariant>
           value,
         })),
       })),
-  )
+  );
 
-const useLayoutVariants = (entityListId: string) => {
-
+const useLayoutVariants = (props: Props) => {
   const { data = [], isFetching } = useQuery({
-    queryKey: ['layout-variants', entityListId],
-    queryFn: () => fetchLayoutVariants(entityListId),
+    queryKey: ['layout-variants', props],
+    queryFn: () => fetchLayoutVariants(props),
   });
 
   return {
