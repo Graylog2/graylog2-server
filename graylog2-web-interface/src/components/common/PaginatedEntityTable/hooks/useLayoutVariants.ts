@@ -19,13 +19,6 @@ import { useQuery } from '@tanstack/react-query';
 
 import { EntityLists } from '@graylog/server-api';
 
-import type { TimeRange } from 'views/logic/queries/Query';
-
-type Props = {
-  entityListId: string;
-  timerange: TimeRange;
-};
-
 type LayoutVariantJSON = {
   display_name: string;
   entity_list_id: string;
@@ -48,8 +41,8 @@ type LayoutVariant = {
   }>;
 };
 
-const fetchLayoutVariants = ({ entityListId }: Props): Promise<Array<LayoutVariant>> =>
-  EntityLists.listPredefined(entityListId, { type: 'relative', range: 2042592000 }).then(
+const fetchLayoutVariants = (entityListId: string): Promise<Array<LayoutVariant>> =>
+  EntityLists.listPredefined(entityListId, { type: 'keyword', keyword: 'last 5 years' }).then(
     (response: Array<LayoutVariantJSON>) =>
       response.map(({ display_name, layout_variant, entity_list_id, metrics }) => ({
         displayName: display_name,
@@ -63,12 +56,11 @@ const fetchLayoutVariants = ({ entityListId }: Props): Promise<Array<LayoutVaria
       })),
   );
 
-const useLayoutVariants = (props: Props) => {
-  console.log({ props })
+const useLayoutVariants = (entityListId: string) => {
 
   const { data = [], isFetching } = useQuery({
-    queryKey: ['layout-variants', props],
-    queryFn: () => fetchLayoutVariants(props),
+    queryKey: ['layout-variants', entityListId],
+    queryFn: () => fetchLayoutVariants(entityListId),
   });
 
   return {
