@@ -63,7 +63,8 @@ jest.mock('views/stores/StreamsStore', () => ({
   StreamsStore: MockStore([
     'getInitialState',
     () => ({
-      streams: [{ title: 'Stream 1', id: 'stream-id-1' }],
+      streams: [{ title: 'Stream 1', id: 'stream-id-1', categories: [] }],
+      categories: [],
     }),
   ]),
 }));
@@ -159,7 +160,12 @@ describe('Aggregation Widget', () => {
           .build();
         const updatedConfig = dataTableWidget.config.toBuilder().series([newSeries]).build();
 
-        const updatedWidget = dataTableWidget.toBuilder().config(updatedConfig).streams(['stream-id-1']).build();
+        const updatedWidget = dataTableWidget
+          .toBuilder()
+          .config(updatedConfig)
+          .streams(['stream-id-1'])
+          .streamCategories([])
+          .build();
         render(<AggregationWidget editing />);
 
         // Change widget aggregation elements
