@@ -49,8 +49,6 @@ type LayoutVariant = {
 };
 
 const fetchLayoutVariants = ({ entityListId, timerange }: Props): Promise<Array<LayoutVariant>> =>
-  // TODO temporary solution to pass the build. We need to fix be to generte server-api correctly
-  // @ts-ignore
   EntityLists.listPredefined(entityListId, timerange).then(
     (response: Array<LayoutVariantJSON>) =>
       response.map(({ display_name, layout_variant, entity_list_id, metrics }) => ({
