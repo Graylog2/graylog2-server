@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.embedded.EmbeddedChannel;
+import io.netty.handler.codec.DecoderException;
 import io.netty.handler.logging.LoggingHandler;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -32,6 +33,7 @@ import java.util.Map;
 import java.util.zip.Deflater;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class BeatsFrameDecoderTest {
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
@@ -237,5 +239,47 @@ public class BeatsFrameDecoderTest {
         final long seqNum = buffer.readUnsignedInt();
         assertThat(buffer.readableBytes()).isEqualTo(0);
         return seqNum;
+    }
+
+    @Test
+    public void rejectsJsonFrameExceedingLengthLimit() {
+        final byte[] oversizedJson = ("{\"message\":\"" + "X".repeat(16 * 1024 * 1024) + "\"}")
+                .getBytes(StandardCharsets.UTF_8);
+
+        final ByteBuf frame = buildJsonFrame(oversizedJson, 0);
+
+        assertThatThrownBy(() -> {
+            channel.writeInbound(frame);
+            channel.checkException();
+        }).isInstanceOf(DecoderException.class);
+    }
+
+    @Test
+    public void rejectsDataFrameExceedingPairLimit() {
+        final ByteBuf frame = Unpooled.buffer();
+        frame.writeByte('2');
+        frame.writeByte('D');
+        frame.writeInt(0);
+        frame.writeInt(1025);
+
+        assertThatThrownBy(() -> {
+            channel.writeInbound(frame);
+            channel.checkException();
+        }).isInstanceOf(DecoderException.class);
+    }
+
+    @Test
+    public void rejectsDataItemExceedingLengthLimit() {
+        final ByteBuf frame = Unpooled.buffer();
+        frame.writeByte('2');
+        frame.writeByte('D');
+        frame.writeInt(0);
+        frame.writeInt(1);
+        frame.writeInt(1024 * 1024 + 1);
+
+        assertThatThrownBy(() -> {
+            channel.writeInbound(frame);
+            channel.checkException();
+        }).isInstanceOf(DecoderException.class);
     }
 }
