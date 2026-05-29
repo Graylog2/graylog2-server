@@ -53,8 +53,6 @@ export const getStageRuleLoadPercent = (
 ): number | undefined =>
   isLoadable(response) ? lookupStageRule(response, pipelineId, ruleId, stage)?.load_percent : undefined;
 
-// Share of the parent pipeline's load (sums to ~100% per pipeline). Use this on the Pipeline Details page,
-// where rows belong to a single pipeline; load_percent is cluster-wide and tends to be tiny.
 export const getStageRulePipelineSharePercent = (
   response: ProcessingLoadResponse | undefined,
   pipelineId: string,
