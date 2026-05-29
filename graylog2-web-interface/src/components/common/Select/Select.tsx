@@ -573,6 +573,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       options: sortedOptions,
       onChange: onReactSelectChange || this._onChange,
       onInputChange: this._onInputChange,
+      inputValue,
       'aria-label': ariaLabel ?? placeholder,
       placeholder,
       async,
