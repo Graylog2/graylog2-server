@@ -106,7 +106,10 @@ const Pagination = ({
       firstIcon={FirstIcon}
       lastIcon={LastIcon}
       getControlProps={(control) => ({ 'aria-label': controlAriaLabels[control] })}
-      getItemProps={(page) => ({ 'aria-label': `Open page ${page}` })}
+      getItemProps={(page) => ({
+        'aria-label': `Open page ${page}`,
+        ...(page === currentPage ? { title: 'Active page' } : {}),
+      })}
       data-testid="graylog-pagination"
     />
   );
