@@ -16,10 +16,15 @@
  */
 import * as React from 'react';
 import { asElement, render, screen } from 'wrappedTestingLibrary';
+import * as Immutable from 'immutable';
+import userEvent from '@testing-library/user-event';
+import URI from 'urijs';
 
 import type { TimeRange } from 'views/logic/queries/Query';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import type { QueryString } from 'views/logic/queries/types';
+import type { FiltersType, SearchFilter } from 'views/types';
+import Store from 'logic/local-storage/Store';
 
 import ReplaySearchButton from './ReplaySearchButton';
 
@@ -27,7 +32,18 @@ type OptionalOverrides = {
   streams?: Array<string>;
   query?: QueryString;
   timerange?: TimeRange;
+  filters?: FiltersType;
 };
+
+const filter = (queryString: string): SearchFilter => ({
+  type: 'inlineQueryString',
+  queryString,
+  disabled: false,
+  negation: false,
+});
+
+const findReplayButton = async () =>
+  asElement(await screen.findByRole('link', { name: /replay search/i }), HTMLAnchorElement);
 
 describe('ReplaySearchButton', () => {
   it('renders play button', async () => {
@@ -37,10 +53,17 @@ describe('ReplaySearchButton', () => {
   });
 
   describe('generates link', () => {
-    const renderWithContext = async ({ query, timerange, streams }: OptionalOverrides = {}) => {
-      render(<ReplaySearchButton queryString={query?.query_string} timerange={timerange} streams={streams} />);
+    const renderWithContext = async ({ query, timerange, streams, filters }: OptionalOverrides = {}) => {
+      render(
+        <ReplaySearchButton
+          queryString={query?.query_string}
+          timerange={timerange}
+          streams={streams}
+          filters={filters}
+        />,
+      );
 
-      return asElement(await screen.findByRole('link', { name: /replay search/i }), HTMLAnchorElement);
+      return findReplayButton();
     };
 
     it('including query string', async () => {
@@ -67,6 +90,44 @@ describe('ReplaySearchButton', () => {
       const button = await renderWithContext({ streams: ['stream1', 'stream2', 'someotherstream'] });
 
       expect(button.href).toContain('streams=stream1%2Cstream2%2Csomeotherstream');
+    });
+
+    it('adds a session-id when search filters are configured', async () => {
+      const button = await renderWithContext({ filters: Immutable.List([filter('foo:bar')]) });
+
+      expect(button.href).toMatch(/session-id=replay-search-/);
+    });
+
+    it('omits the session-id when neither parameters nor filters are configured', async () => {
+      const button = await renderWithContext();
+
+      expect(button.href).not.toContain('session-id=');
+    });
+
+    it('omits the session-id when filters are empty', async () => {
+      const button = await renderWithContext({ filters: Immutable.List() });
+
+      expect(button.href).not.toContain('session-id=');
+    });
+  });
+
+  describe('on click', () => {
+    it('persists search filters to local storage so the replayed search can consume them', async () => {
+      const filters = Immutable.List([filter('source:my-host'), filter('level:ERROR')]);
+      render(<ReplaySearchButton filters={filters} />);
+      const button = await findReplayButton();
+      const sessionId = new URI(button.href).search(true)['session-id'] as string | undefined;
+
+      expect(sessionId).toMatch(/^replay-search-/);
+
+      await userEvent.click(button);
+
+      const raw = Store.get<string>(sessionId);
+
+      expect(raw).toBeDefined();
+      expect(JSON.parse(raw!)).toEqual({
+        filters: [filter('source:my-host'), filter('level:ERROR')],
+      });
     });
   });
 });

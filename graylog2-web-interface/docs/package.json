@@ -2,9 +2,9 @@
   "name": "@graylog/frontend-documentation",
   "version": "1.0.0",
   "description": "Graylog Frontend Documentation",
-  "main": "index.js",
-  "author": "Graylog <hello@graylog.com>",
   "license": "MIT",
+  "author": "Graylog <hello@graylog.com>",
+  "main": "index.js",
   "scripts": {
     "docs:build": "styleguidist build",
     "docs:server": "styleguidist server"

@@ -29,6 +29,7 @@ import { RulesActions } from 'stores/rules/RulesStore';
 import usePipeline from 'hooks/usePipeline';
 import usePipelineMutations from 'hooks/usePipelineMutations';
 import usePipelineConnections, { usePipelineConnectionMutation } from 'hooks/usePipelineConnections';
+import { ProcessingLoadDebugMetricsBanner, ProcessingLoadProvider } from 'components/pipelines/processing-load';
 
 import PipelinesPageNavigation from '../components/pipelines/PipelinesPageNavigation';
 
@@ -36,8 +37,9 @@ const _isNewPipeline = (pipelineId: string) => pipelineId === 'new';
 
 const PipelineDetailsPage = () => {
   const params = useParams<{ pipelineId: string }>();
+  const isNewPipeline = _isNewPipeline(params.pipelineId);
   const { data: pipeline } = usePipeline(params?.pipelineId, {
-    enabled: !_isNewPipeline(params.pipelineId) && !!params?.pipelineId,
+    enabled: !isNewPipeline && !!params?.pipelineId,
   });
 
   const { createPipeline, updatePipeline } = usePipelineMutations();
@@ -91,13 +93,13 @@ const PipelineDetailsPage = () => {
     }
   };
 
-  const _isLoading = !_isNewPipeline(params.pipelineId) && (!pipeline || !connections || !streams);
+  const _isLoading = !isNewPipeline && (!pipeline || !connections || !streams);
 
   if (_isLoading) {
     return <Spinner />;
   }
 
-  const title = _isNewPipeline(params.pipelineId) ? (
+  const title = isNewPipeline ? (
     'New pipeline'
   ) : (
     <span>
@@ -105,7 +107,7 @@ const PipelineDetailsPage = () => {
     </span>
   );
 
-  const content = _isNewPipeline(params.pipelineId) ? (
+  const content = isNewPipeline ? (
     <NewPipeline onChange={_savePipeline} />
   ) : (
     <Pipeline
@@ -118,7 +120,7 @@ const PipelineDetailsPage = () => {
     />
   );
 
-  const pageTitle = _isNewPipeline(params.pipelineId) ? 'New pipeline' : `Pipeline ${pipeline.title}`;
+  const pageTitle = isNewPipeline ? 'New pipeline' : `Pipeline ${pipeline.title}`;
 
   return (
     <DocumentTitle title={pageTitle}>
@@ -140,7 +142,16 @@ const PipelineDetailsPage = () => {
         </PageHeader>
 
         <Row className="content">
-          <Col md={12}>{content}</Col>
+          <Col md={12}>
+            {isNewPipeline ? (
+              content
+            ) : (
+              <ProcessingLoadProvider>
+                <ProcessingLoadDebugMetricsBanner />
+                {content}
+              </ProcessingLoadProvider>
+            )}
+          </Col>
         </Row>
       </div>
     </DocumentTitle>

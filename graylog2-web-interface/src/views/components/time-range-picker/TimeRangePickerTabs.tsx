@@ -37,7 +37,7 @@ import TabAbsoluteTimeRange from './TabAbsoluteTimeRange';
 import TabKeywordTimeRange from './TabKeywordTimeRange';
 import TabRelativeTimeRange from './TabRelativeTimeRange';
 import TabDisabledTimeRange from './TabDisabledTimeRange';
-import type { SupportedTimeRangeType, TimeRangePickerFormValues } from './TimeRangePicker';
+import type { SupportedTimeRangeType, TimeRangePickerFormValues } from './types';
 
 export const timeRangePickerTabs = {
   absolute: TabAbsoluteTimeRange,

@@ -49,16 +49,7 @@ const StyledTable = styled(Table as React.ComponentType<React.ComponentProps<typ
     }
 
     > tbody td {
-      background-color: ${theme.colors.global.contentBackground};
       color: ${theme.utils.contrastingColor(theme.colors.global.contentBackground)};
-    }
-
-    &.table-striped > tbody > tr:nth-of-type(odd) > td {
-      background-color: ${theme.colors.global.contentBackground};
-    }
-
-    &.table-striped > tbody > tr:nth-of-type(even) > td {
-      background-color: ${theme.colors.table.row.background};
     }
 
     tr {

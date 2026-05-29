@@ -153,12 +153,16 @@ const useExecutePreview = (config: EventDefinition['config']) => {
     [executeJobResult, searchTypeId, startJob],
   );
 
+  const hasEmbryonicParams = config?.query_parameters?.some(
+    (param: LookupTableParameterJsonEmbryonic) => param.embryonic,
+  );
+
   useEffect(() => {
-    if (isPermittedToSeePreview(currentUser, config)) {
+    if (isPermittedToSeePreview(currentUser, config) && !hasEmbryonicParams) {
       const search = constructSearch(config, searchTypeId, queryId);
       executeSearch(search);
     }
-  }, [config, currentUser, executeSearch, queryId, searchTypeId]);
+  }, [config, currentUser, executeSearch, hasEmbryonicParams, queryId, searchTypeId]);
 
   return {
     errors: results?.result?.errors,

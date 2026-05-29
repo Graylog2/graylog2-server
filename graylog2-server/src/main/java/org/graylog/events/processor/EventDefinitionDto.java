@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.MutableGraph;
 import org.graylog.events.contentpack.entities.EventDefinitionEntity;
 import org.graylog.events.contentpack.entities.EventNotificationHandlerConfigEntity;
@@ -74,6 +75,9 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
     public static final String FIELD_PRIORITY = "priority";
     public static final String FIELD_ALERT = "alert";
     public static final String FIELD_CONFIG = "config";
+    public static final String FIELD_TAGS = "tags";
+    public static final int MAX_TAG_LENGTH = 128;
+    public static final int MAX_TAGS = 64;
     private static final String FIELD_FIELD_SPEC = "field_spec";
     private static final String FIELD_KEY_SPEC = "key_spec";
     private static final String FIELD_NOTIFICATION_SETTINGS = "notification_settings";
@@ -145,6 +149,10 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
     public abstract ImmutableList<EventStorageHandler.Config> storage();
 
     @Override
+    @JsonProperty(FIELD_TAGS)
+    public abstract ImmutableSet<String> tags();
+
+    @Override
     @JsonProperty(value = FIELD_SCHEDULERCTX, access = JsonProperty.Access.READ_ONLY)
     @Nullable
     public abstract EventDefinitionContextService.SchedulerCtx schedulerCtx();
@@ -201,6 +209,19 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
             validation.addError(FIELD_KEY_SPEC, "Event Definition key_spec can only contain fields defined in field_spec.");
         }
 
+        if (tags().stream().anyMatch(tag -> tag.length() > MAX_TAG_LENGTH)) {
+            validation.addError(FIELD_TAGS, "Event Definition tags cannot exceed " + MAX_TAG_LENGTH + " characters.");
+        }
+
+        if (tags().size() > MAX_TAGS) {
+            validation.addError(FIELD_TAGS, "Event Definition cannot have more than " + MAX_TAGS + " tags.");
+        }
+
+        if (tags().stream().anyMatch(tag -> !TagNormalizer.isValid(tag))) {
+            validation.addError(FIELD_TAGS,
+                    "Event Definition tags may only contain lowercase letters, digits, hyphens, underscores, and dots.");
+        }
+
         return validation;
     }
 
@@ -213,6 +234,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
                     .fieldSpec(ImmutableMap.of())
                     .notifications(ImmutableList.of())
                     .storage(ImmutableList.of())
+                    .tags(ImmutableSet.of())
                     .state(EventDefinition.State.DISABLED);
         }
 
@@ -268,6 +290,9 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
         @JsonProperty(FIELD_STORAGE)
         public abstract Builder storage(ImmutableList<EventStorageHandler.Config> storageHandlers);
 
+        @JsonProperty(FIELD_TAGS)
+        public abstract Builder tags(ImmutableSet<String> tags);
+
         @JsonProperty(FIELD_STATE)
         public abstract Builder state(EventDefinition.State state);
 
@@ -280,9 +305,12 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
         @JsonProperty(FIELD_EVENT_SUMMARY_TEMPLATE)
         public abstract Builder eventSummaryTemplate(@Nullable String eventSummaryTemplate);
 
+        abstract ImmutableSet<String> tags();
+
         abstract EventDefinitionDto autoBuild();
 
         public EventDefinitionDto build() {
+            tags(TagNormalizer.normalize(tags()));
             final EventDefinitionDto dto = autoBuild();
             final PersistToStreamsStorageHandler.Config withSystemEventsStream = PersistToStreamsStorageHandler.Config.createWithSystemEventsStream();
             if (dto.storage().stream().anyMatch(withSystemEventsStream::equals)) {
@@ -337,6 +365,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
                 .fieldSpec(fieldSpec())
                 .keySpec(keySpec())
                 .storage(storage())
+                .tags(tags())
                 .eventProcedureId(ValueReference.ofNullable(procedureDescriptorId))
                 .eventSummaryTemplate(ValueReference.ofNullable(eventSummaryTemplate()))
                 .build();
