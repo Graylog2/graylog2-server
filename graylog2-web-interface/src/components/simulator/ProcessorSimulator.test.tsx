@@ -19,6 +19,7 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import { PipelinesSimulator } from '@graylog/server-api';
+
 import asMock from 'helpers/mocking/AsMock';
 import type { Stream } from 'logic/streams/types';
 import type { Message } from 'views/components/messagelist/Types';
@@ -35,9 +36,9 @@ jest.mock(
   './SimulationResults',
   () =>
     ({
-      originalMessage,
-      simulationResults,
-      isLoading,
+      originalMessage = undefined,
+      simulationResults = undefined,
+      isLoading = false,
     }: {
       originalMessage?: { id: string };
       simulationResults?: { took_microseconds: number };
@@ -64,19 +65,15 @@ const testMessage: Message = {
 let mockLoadedMessage: Message | undefined = testMessage;
 let mockLoadedOptions: { inputId?: string } = { inputId: 'input-1' };
 
-jest.mock('components/messageloaders/RawMessageLoader', () => {
-  const MockedRawMessageLoader = ({
-    onMessageLoaded,
-  }: {
-    onMessageLoaded: (msg: Message | undefined, opts: { inputId?: string }) => void;
-  }) => (
-    <button type="button" onClick={() => onMessageLoaded(mockLoadedMessage, mockLoadedOptions)}>
-      Load message
-    </button>
-  );
-
-  return MockedRawMessageLoader;
-});
+jest.mock(
+  'components/messageloaders/RawMessageLoader',
+  () =>
+    ({ onMessageLoaded }: { onMessageLoaded: (msg: Message | undefined, opts: { inputId?: string }) => void }) => (
+      <button type="button" onClick={() => onMessageLoaded(mockLoadedMessage, mockLoadedOptions)}>
+        Load message
+      </button>
+    ),
+);
 
 const defaultStream = {
   id: '000000000000000000000001',
