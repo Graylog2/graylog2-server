@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 
-import * as JSON from 'util/json';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { getPrettifiedValue } from 'views/components/visualizations/utils/unitConverters';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
