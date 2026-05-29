@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useState, useLayoutEffect, useMemo } from 'react';
+import { useState, useLayoutEffect, useMemo, useRef } from 'react';
 import isEqual from 'lodash/isEqual';
 
 import {
@@ -136,6 +136,7 @@ const useColumnWidths = <Entity extends EntityBase>({
   headerMinWidths: { [colId: string]: number };
 }) => {
   const [columnWidths, setColumnWidths] = useState({});
+  const prevColumnWidthsRef = useRef<Record<string, number>>({});
   const staticColumnWidths = useMemo(
     () =>
       calculateStaticColumnWidths({
@@ -173,7 +174,10 @@ const useColumnWidths = <Entity extends EntityBase>({
     })
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setColumnWidths((cur) => isEqual(cur, newColumnWidths) ? cur : newColumnWidths)
+    if (!isEqual(prevColumnWidthsRef.current, newColumnWidths)) {
+      prevColumnWidthsRef.current = newColumnWidths;
+      setColumnWidths(newColumnWidths);
+    }
   }, [actionsColMinWidth, bulkSelectColWidth, columnRenderersByAttribute, columnIds, scrollContainerWidth, columnWidthPreferences, staticColumnWidths, headerMinWidths]);
 
   return columnWidths;

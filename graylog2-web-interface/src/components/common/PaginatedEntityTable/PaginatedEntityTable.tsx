@@ -318,7 +318,6 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
                 ) : (
                   <EntityDataTable<T, M>
                     entities={list}
-                    key={`${tableLayout?.entityTableId}${tableLayout?.layoutVariant}`}
                     defaultDisplayedColumns={tableLayout.defaultDisplayedAttributes}
                     layoutPreferences={{
                       attributes: layoutConfig.attributes,
