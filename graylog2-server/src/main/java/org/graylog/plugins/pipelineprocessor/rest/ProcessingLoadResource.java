@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
 @Produces(MediaType.APPLICATION_JSON)
 public class ProcessingLoadResource extends ProxiedResource {
 
-    private final ProcessingLoadSnapshotter snapshotter;
+    private final ProcessingLoadBuilder processingLoadBuilder;
     private final ProcessingLoadService processingLoadService;
 
     @Inject
@@ -58,10 +58,10 @@ public class ProcessingLoadResource extends ProxiedResource {
                                   RemoteInterfaceProvider remoteInterfaceProvider,
                                   @Context HttpHeaders httpHeaders,
                                   @Named("proxiedRequestsExecutorService") ExecutorService executorService,
-                                  ProcessingLoadSnapshotter snapshotter,
+                                  ProcessingLoadBuilder processingLoadBuilder,
                                   ProcessingLoadService processingLoadService) {
         super(httpHeaders, nodeService, remoteInterfaceProvider, executorService);
-        this.snapshotter = snapshotter;
+        this.processingLoadBuilder = processingLoadBuilder;
         this.processingLoadService = processingLoadService;
     }
 
@@ -71,7 +71,7 @@ public class ProcessingLoadResource extends ProxiedResource {
                description = "Returns Processing Load % per pipeline-stage-rule, per pipeline, and per rule. " +
                        "Requires debug metrics enable.")
     public ProcessingLoadResponse processingLoad() {
-        final List<ActiveCombination> combinations = snapshotter.activeCombinations();
+        final List<ActiveCombination> combinations = processingLoadBuilder.activeCombinations();
         if (combinations.isEmpty()) {
             return ProcessingLoadResponse.unavailable();
         }
@@ -79,7 +79,7 @@ public class ProcessingLoadResource extends ProxiedResource {
             throw new ForbiddenException("No read permission on any active pipeline or rule.");
         }
 
-        final ProcessingLoadResponse full = snapshotter.buildUnfiltered(combinations, this::fetchPerNodeMetrics);
+        final ProcessingLoadResponse full = processingLoadBuilder.buildUnfiltered(combinations, this::fetchPerNodeMetrics);
         return processingLoadService.filterByPermissions(full, this::canReadPipeline, this::canReadRule);
     }
 

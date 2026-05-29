@@ -34,7 +34,7 @@ import java.util.Map;
  * per-node {@code multipleMetrics} fan-out is transported.
  */
 @Singleton
-public class ProcessingLoadSnapshotter {
+public class ProcessingLoadBuilder {
 
     private final PipelineInterpreterStateUpdater stateUpdater;
     private final RuleMetricsConfigService ruleMetricsConfigService;
@@ -42,7 +42,7 @@ public class ProcessingLoadSnapshotter {
     private final NodeTimerSnapshotParser snapshotParser;
 
     @Inject
-    public ProcessingLoadSnapshotter(PipelineInterpreterStateUpdater stateUpdater,
+    public ProcessingLoadBuilder(PipelineInterpreterStateUpdater stateUpdater,
                                      RuleMetricsConfigService ruleMetricsConfigService,
                                      ProcessingLoadService processingLoadService,
                                      NodeTimerSnapshotParser snapshotParser) {

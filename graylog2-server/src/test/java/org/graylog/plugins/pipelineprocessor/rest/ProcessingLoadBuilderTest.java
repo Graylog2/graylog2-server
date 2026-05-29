@@ -46,7 +46,7 @@ import static org.graylog.plugins.pipelineprocessor.processors.listeners.RuleMet
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class ProcessingLoadSnapshotterTest {
+class ProcessingLoadBuilderTest {
 
     private static final String RULE_A = "rule-A";
     private static final String PIPELINE_P = "pipeline-P";
@@ -54,14 +54,14 @@ class ProcessingLoadSnapshotterTest {
 
     private PipelineInterpreterStateUpdater stateUpdater;
     private RuleMetricsConfigService ruleMetricsConfigService;
-    private ProcessingLoadSnapshotter snapshotter;
+    private ProcessingLoadBuilder processingLoadBuilder;
 
     @BeforeEach
     void setUp() {
         stateUpdater = mock(PipelineInterpreterStateUpdater.class);
         ruleMetricsConfigService = mock(RuleMetricsConfigService.class);
         final NodeTimerSnapshotParser snapshotParser = new NodeTimerSnapshotParser(new ObjectMapper());
-        snapshotter = new ProcessingLoadSnapshotter(stateUpdater, ruleMetricsConfigService, new ProcessingLoadService(), snapshotParser);
+        processingLoadBuilder = new ProcessingLoadBuilder(stateUpdater, ruleMetricsConfigService, new ProcessingLoadService(), snapshotParser);
     }
 
     @Test
@@ -69,7 +69,7 @@ class ProcessingLoadSnapshotterTest {
         when(ruleMetricsConfigService.get()).thenReturn(metricsConfig(false));
 
         final AtomicBoolean fetcherInvoked = new AtomicBoolean(false);
-        final ProcessingLoadResponse response = snapshotter.buildUnfiltered(timerNames -> {
+        final ProcessingLoadResponse response = processingLoadBuilder.buildUnfiltered(timerNames -> {
             fetcherInvoked.set(true);
             return Map.of();
         });
@@ -85,7 +85,7 @@ class ProcessingLoadSnapshotterTest {
         when(stateUpdater.getLatestState()).thenReturn(state);
 
         final AtomicBoolean fetcherInvoked = new AtomicBoolean(false);
-        final ProcessingLoadResponse response = snapshotter.buildUnfiltered(timerNames -> {
+        final ProcessingLoadResponse response = processingLoadBuilder.buildUnfiltered(timerNames -> {
             fetcherInvoked.set(true);
             return Map.of();
         });
@@ -100,7 +100,7 @@ class ProcessingLoadSnapshotterTest {
         when(ruleMetricsConfigService.get()).thenReturn(metricsConfig(true));
         when(stateUpdater.getLatestState()).thenReturn(state);
 
-        final ProcessingLoadResponse response = snapshotter.buildUnfiltered(timerNames -> {
+        final ProcessingLoadResponse response = processingLoadBuilder.buildUnfiltered(timerNames -> {
             assertThat(timerNames).containsExactlyInAnyOrder(
                     timerName(RULE_A, PIPELINE_P, STAGE_0, EVALUATE),
                     timerName(RULE_A, PIPELINE_P, STAGE_0, EXECUTE)
@@ -122,7 +122,7 @@ class ProcessingLoadSnapshotterTest {
         when(ruleMetricsConfigService.get()).thenReturn(metricsConfig(true));
         when(stateUpdater.getLatestState()).thenReturn(state);
 
-        final ProcessingLoadResponse response = snapshotter.buildUnfiltered(timerNames -> Map.of(
+        final ProcessingLoadResponse response = processingLoadBuilder.buildUnfiltered(timerNames -> Map.of(
                 "node-1", metricsResponse(List.of(
                         timerEntry(timerName(RULE_A, PIPELINE_P, STAGE_0, EVALUATE), 100.0d, 10.0d),
                         timerEntry(timerName(RULE_A, PIPELINE_P, STAGE_0, EXECUTE), 100.0d, 90.0d)
@@ -136,16 +136,16 @@ class ProcessingLoadSnapshotterTest {
     @Test
     void metricsEnabledReflectsConfig() {
         when(ruleMetricsConfigService.get()).thenReturn(metricsConfig(true));
-        assertThat(snapshotter.metricsEnabled()).isTrue();
+        assertThat(processingLoadBuilder.metricsEnabled()).isTrue();
 
         when(ruleMetricsConfigService.get()).thenReturn(metricsConfig(false));
-        assertThat(snapshotter.metricsEnabled()).isFalse();
+        assertThat(processingLoadBuilder.metricsEnabled()).isFalse();
     }
 
     @Test
     void activeCombinationsEmptyWhenMetricsOff() {
         when(ruleMetricsConfigService.get()).thenReturn(metricsConfig(false));
-        assertThat(snapshotter.activeCombinations()).isEmpty();
+        assertThat(processingLoadBuilder.activeCombinations()).isEmpty();
     }
 
     @Test
@@ -154,7 +154,7 @@ class ProcessingLoadSnapshotterTest {
         when(ruleMetricsConfigService.get()).thenReturn(metricsConfig(true));
         when(stateUpdater.getLatestState()).thenReturn(state);
 
-        assertThat(snapshotter.activeCombinations()).isEmpty();
+        assertThat(processingLoadBuilder.activeCombinations()).isEmpty();
     }
 
     @Test
@@ -163,7 +163,7 @@ class ProcessingLoadSnapshotterTest {
         when(ruleMetricsConfigService.get()).thenReturn(metricsConfig(true));
         when(stateUpdater.getLatestState()).thenReturn(state);
 
-        final List<ActiveCombination> combinations = snapshotter.activeCombinations();
+        final List<ActiveCombination> combinations = processingLoadBuilder.activeCombinations();
         assertThat(combinations).hasSize(1);
         assertThat(combinations.getFirst().ruleId()).isEqualTo(RULE_A);
         assertThat(combinations.getFirst().pipelineId()).isEqualTo(PIPELINE_P);

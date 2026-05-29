@@ -22,7 +22,7 @@ import jakarta.ws.rs.core.HttpHeaders;
 import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineLoad;
 import org.graylog.plugins.pipelineprocessor.rest.ProcessingLoadResponse;
-import org.graylog.plugins.pipelineprocessor.rest.ProcessingLoadSnapshotter;
+import org.graylog.plugins.pipelineprocessor.rest.ProcessingLoadBuilder;
 import org.graylog.plugins.pipelineprocessor.rest.RuleLoad;
 import org.graylog.plugins.pipelineprocessor.rest.StageRuleLoad;
 import org.graylog2.cluster.Node;
@@ -73,7 +73,7 @@ class SupportBundleServiceIT {
     private VersionProbeFactory versionProbeFactory;
     private ClusterAdapter searchDbClusterAdapter;
     private DatanodeRestApiProxy datanodeProxy;
-    private ProcessingLoadSnapshotter processingLoadSnapshotter;
+    private ProcessingLoadBuilder processingLoadBuilder;
 
     @BeforeEach
     void setUp() {
@@ -86,7 +86,7 @@ class SupportBundleServiceIT {
         versionProbeFactory = mock(VersionProbeFactory.class);
         searchDbClusterAdapter = mock(ClusterAdapter.class);
         datanodeProxy = mock(DatanodeRestApiProxy.class);
-        processingLoadSnapshotter = mock(ProcessingLoadSnapshotter.class);
+        processingLoadBuilder = mock(ProcessingLoadBuilder.class);
     }
 
     @AfterEach
@@ -141,7 +141,7 @@ class SupportBundleServiceIT {
         final SupportBundleService service = new SupportBundleService(
                 executor, nodeServiceWithNode, datanodeService, remoteInterfaceProvider,
                 tempDir, objectMapperProvider, clusterStatsService, versionProbeFactory,
-                List.of(), searchDbClusterAdapter, datanodeProxy, processingLoadSnapshotter);
+                List.of(), searchDbClusterAdapter, datanodeProxy, processingLoadBuilder);
 
         assertThatNoException().isThrownBy(
                 () -> service.buildBundle(mock(HttpHeaders.class), mock(Subject.class)));
@@ -163,7 +163,7 @@ class SupportBundleServiceIT {
     @Test
     void buildBundleOmitsProcessingLoadSnapshotWhenDebugMetricsOff() throws Exception {
         when(datanodeService.allActive()).thenReturn(Map.of());
-        when(processingLoadSnapshotter.metricsEnabled()).thenReturn(false);
+        when(processingLoadBuilder.metricsEnabled()).thenReturn(false);
 
         final SupportBundleService service = buildService();
         assertThatNoException().isThrownBy(
@@ -179,8 +179,8 @@ class SupportBundleServiceIT {
     @Test
     void buildBundleOmitsProcessingLoadSnapshotWhenMetricsOnButUnavailable() throws Exception {
         when(datanodeService.allActive()).thenReturn(Map.of());
-        when(processingLoadSnapshotter.metricsEnabled()).thenReturn(true);
-        when(processingLoadSnapshotter.buildUnfiltered(any())).thenReturn(ProcessingLoadResponse.create(
+        when(processingLoadBuilder.metricsEnabled()).thenReturn(true);
+        when(processingLoadBuilder.buildUnfiltered(any())).thenReturn(ProcessingLoadResponse.create(
                 false, 0.0d, List.of(), List.of(), List.of()));
 
         final SupportBundleService service = buildService();
@@ -198,14 +198,14 @@ class SupportBundleServiceIT {
                     zip.getInputStream(errorsEntry).readAllBytes(), StandardCharsets.UTF_8);
             assertThat(content)
                     .contains("cluster/processing-load")
-                    .contains("snapshot omitted");
+                    .contains("Snapshot omitted");
         }
     }
 
     @Test
     void buildBundleIncludesProcessingLoadSnapshotWhenDebugMetricsOn() throws Exception {
         when(datanodeService.allActive()).thenReturn(Map.of());
-        when(processingLoadSnapshotter.metricsEnabled()).thenReturn(true);
+        when(processingLoadBuilder.metricsEnabled()).thenReturn(true);
 
         final ProcessingLoadResponse snapshot = ProcessingLoadResponse.create(
                 true,
@@ -214,7 +214,7 @@ class SupportBundleServiceIT {
                 List.of(PipelineLoad.create("pipe-1", 100.0d)),
                 List.of(RuleLoad.create("rule-A", 29.41d))
         );
-        when(processingLoadSnapshotter.buildUnfiltered(any())).thenReturn(snapshot);
+        when(processingLoadBuilder.buildUnfiltered(any())).thenReturn(snapshot);
 
         final SupportBundleService service = buildService();
         assertThatNoException().isThrownBy(
@@ -249,6 +249,6 @@ class SupportBundleServiceIT {
         return new SupportBundleService(
                 executor, nodeService, datanodeService, remoteInterfaceProvider,
                 tempDir, objectMapperProvider, clusterStatsService, versionProbeFactory,
-                List.of(), searchDbClusterAdapter, datanodeProxy, processingLoadSnapshotter);
+                List.of(), searchDbClusterAdapter, datanodeProxy, processingLoadBuilder);
     }
 }

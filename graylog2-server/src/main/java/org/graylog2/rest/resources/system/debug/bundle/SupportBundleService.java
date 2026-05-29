@@ -35,7 +35,7 @@ import org.apache.logging.log4j.core.appender.RollingFileAppender;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.pipelineprocessor.rest.ProcessingLoadResponse;
-import org.graylog.plugins.pipelineprocessor.rest.ProcessingLoadSnapshotter;
+import org.graylog.plugins.pipelineprocessor.rest.ProcessingLoadBuilder;
 import org.graylog.security.certutil.KeyStoreDto;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.nodes.DataNodeDto;
@@ -137,7 +137,7 @@ public class SupportBundleService {
     private final List<URI> elasticsearchHosts;
     private final ClusterAdapter searchDbClusterAdapter;
     private final DatanodeRestApiProxy datanodeProxy;
-    private final ProcessingLoadSnapshotter processingLoadSnapshotter;
+    private final ProcessingLoadBuilder processingLoadBuilder;
 
     @Inject
     public SupportBundleService(@Named("proxiedRequestsExecutorService") ExecutorService executor,
@@ -151,7 +151,7 @@ public class SupportBundleService {
                                 @IndexerHosts List<URI> searchDbHosts,
                                 ClusterAdapter searchDbClusterAdapter,
                                 DatanodeRestApiProxy datanodeProxy,
-                                ProcessingLoadSnapshotter processingLoadSnapshotter) {
+                                ProcessingLoadBuilder processingLoadBuilder) {
         this.executor = executor;
         this.nodeService = nodeService;
         this.datanodeService = datanodeService;
@@ -163,7 +163,7 @@ public class SupportBundleService {
         this.elasticsearchHosts = searchDbHosts;
         this.searchDbClusterAdapter = searchDbClusterAdapter;
         this.datanodeProxy = datanodeProxy;
-        this.processingLoadSnapshotter = processingLoadSnapshotter;
+        this.processingLoadBuilder = processingLoadBuilder;
     }
 
     public void buildBundle(HttpHeaders httpHeaders, Subject currentSubject) {
@@ -197,11 +197,9 @@ public class SupportBundleService {
 
         // fetchClusterInfos runs concurrently with per-node collection — they are independent.
         // Its requestOnAllNodes wrappers run on their own orchestrationExecutor (created inside
-        // the method), so only 4 simple leaf tasks land on `executor`. tryFetchProcessingLoadSnapshot
-        // adds one more `executor` task that runs a single requestOnAllNodes fan-out inline (one
-        // fan-out gains nothing from a separate executor — the worker blocks on it either way). All
-        // node calls use a bounded Future timeout, so a saturated pool degrades to per-node timeouts
-        // rather than a hang.
+        // the method), so only 4 simple leaf tasks land on `executor`.
+        // tryFetchProcessingLoadSnapshot adds one more `executor` task that runs at most one fan-out inline
+        // (none when debug metrics are off).
         final List<CompletableFuture<Void>> futures = new ArrayList<>();
 
         nodeManifests.entrySet().stream()
@@ -250,7 +248,7 @@ public class SupportBundleService {
     private void tryFetchProcessingLoadSnapshot(ProxiedResourceHelper proxiedResourceHelper,
                                                 Path spoolDir, List<BundleError> errors) {
         try {
-            if (!processingLoadSnapshotter.metricsEnabled()) {
+            if (!processingLoadBuilder.metricsEnabled()) {
                 return;
             }
             fetchProcessingLoadSnapshot(proxiedResourceHelper, spoolDir, errors);
@@ -262,7 +260,7 @@ public class SupportBundleService {
 
     private void fetchProcessingLoadSnapshot(ProxiedResourceHelper proxiedResourceHelper, Path spoolDir,
                                              List<BundleError> errors) throws IOException {
-        final ProcessingLoadResponse snapshot = processingLoadSnapshotter.buildUnfiltered(
+        final ProcessingLoadResponse snapshot = processingLoadBuilder.buildUnfiltered(
                 timerNames -> fetchPerNodeMetrics(proxiedResourceHelper, timerNames, errors));
 
         if (!snapshot.available()) {
