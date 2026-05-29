@@ -28,5 +28,6 @@ export {
   getPipelineLoadPercent,
   getRuleLoadPercent,
   getStageRuleLoadPercent,
+  getStageRulePipelineSharePercent,
 } from './lookups';
 export type { ProcessingLoadResponse, PipelineLoadEntry, RuleLoadEntry, StageRuleLoadEntry } from './types';
