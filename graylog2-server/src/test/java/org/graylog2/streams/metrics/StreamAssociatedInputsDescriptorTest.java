@@ -1,0 +1,114 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+package org.graylog2.streams.metrics;
+
+import org.graylog.events.search.MoreSearch;
+import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog2.metrics.entity.EntityMetric;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.metrics.entity.cache.MetricsCacheConfiguration;
+import org.graylog2.shared.security.RestPermissions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.plugin.Message.FIELD_GL2_SOURCE_INPUT;
+import static org.graylog2.plugin.Message.FIELD_STREAMS;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyCollection;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+class StreamAssociatedInputsDescriptorTest {
+
+    private MoreSearch moreSearch;
+    private SearchUser searchUser;
+    private StreamAssociatedInputsDescriptor descriptor;
+
+    @BeforeEach
+    void setUp() {
+        moreSearch = mock(MoreSearch.class);
+        searchUser = mock(SearchUser.class);
+        descriptor = new StreamAssociatedInputsDescriptor(moreSearch, Duration.ofMinutes(5));
+    }
+
+    @Test
+    void compute_returnsInputIdLists() {
+        when(moreSearch.aggregateGroupedTerms(
+                anyString(), any(RelativeRange.class),
+                anyString(), anyString(), anyInt(), anyInt(),
+                anyCollection()))
+                .thenReturn(Map.of(
+                        "stream1", Map.of("input-a", 100L, "input-b", 200L)
+                ));
+
+        final List<EntityMetric<List<String>>> result = descriptor.compute(List.of("stream1"));
+
+        verify(moreSearch).aggregateGroupedTerms(
+                eq(FIELD_STREAMS + ":stream1"),
+                any(RelativeRange.class),
+                eq(FIELD_STREAMS), eq(FIELD_GL2_SOURCE_INPUT),
+                eq(1), eq(MetricsCacheConfiguration.MAX_TERMS_SIZE),
+                eq(List.of("stream1")));
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().value()).containsExactlyInAnyOrder("input-a", "input-b");
+    }
+
+    @Test
+    void compute_returnsEmptyListForMissingStreams() {
+        when(moreSearch.aggregateGroupedTerms(
+                anyString(), any(RelativeRange.class),
+                anyString(), anyString(), anyInt(), anyInt(),
+                anyCollection()))
+                .thenReturn(Map.of());
+
+        final List<EntityMetric<List<String>>> result = descriptor.compute(List.of("stream1"));
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().value()).isEmpty();
+    }
+
+    @Test
+    void computeForUser_filtersToPermittedInputs() {
+        when(searchUser.isPermitted(RestPermissions.INPUTS_READ, "input-a")).thenReturn(true);
+        when(searchUser.isPermitted(RestPermissions.INPUTS_READ, "input-b")).thenReturn(false);
+        when(searchUser.isPermitted(RestPermissions.INPUTS_READ, "input-c")).thenReturn(true);
+
+        final List<String> filtered = descriptor.computeForUser(
+                List.of("input-a", "input-b", "input-c"), searchUser);
+
+        assertThat(filtered).containsExactlyInAnyOrder("input-a", "input-c");
+    }
+
+    @Test
+    void computeForUser_returnsEmptyWhenNoInputsPermitted() {
+        when(searchUser.isPermitted(RestPermissions.INPUTS_READ, "input-a")).thenReturn(false);
+
+        final List<String> filtered = descriptor.computeForUser(List.of("input-a"), searchUser);
+
+        assertThat(filtered).isEmpty();
+    }
+}
