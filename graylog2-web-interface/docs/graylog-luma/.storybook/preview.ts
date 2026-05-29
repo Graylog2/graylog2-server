@@ -16,13 +16,19 @@
  */
 import type { Preview } from '@storybook/react-webpack5';
 
-import { withGraylogTheme } from './graylog-theme-decorator';
+import { withGraylogTheme } from './withGraylogTheme';
 import { lightTheme, darkTheme } from './storybook-theme';
+import { DocsContainer } from './DocsContainer';
 
 export const decorators = [withGraylogTheme];
 
 const preview: Preview = {
   parameters: {
+    options: {
+      storySort: {
+        order: ['Foundation', ['Typography', 'Spacings'], 'Components'],
+      },
+    },
     controls: {
       matchers: {
         color: /(background|color)$/i,
@@ -34,6 +40,9 @@ const preview: Preview = {
       light: lightTheme,
       current: 'dark',
       stylePreview: true,
+    },
+    docs: {
+      container: DocsContainer,
     },
   },
 };

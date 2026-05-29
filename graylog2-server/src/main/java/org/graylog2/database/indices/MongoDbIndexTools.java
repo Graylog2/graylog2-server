@@ -23,6 +23,7 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.graylog2.database.pagination.DefaultMongoPaginationHelper;
 import org.graylog2.database.utils.MongoUtils;
 
 import java.time.Duration;
@@ -80,8 +81,8 @@ public class MongoDbIndexTools {
                 if (caseInsensitiveStringSortFields.contains(sortField)) { //index string fields with collation for more efficient case-insensitive sorting
                     if (existingIndex.isEmpty()) {
                         createCaseInsensitiveStringIndex(sortField);
-                    } else if (existingIndex.get().get(COLLATION_KEY) == null) {
-                        //replace simple index with "collation" index
+                    } else if (!hasMatchingCollation(existingIndex.get())) {
+                        //replace simple or differently-collated index with the expected case-insensitive collation index
                         dropIndex(sortField);
                         createCaseInsensitiveStringIndex(sortField);
                     }
@@ -107,7 +108,22 @@ public class MongoDbIndexTools {
     }
 
     private void createCaseInsensitiveStringIndex(final String sortField) {
-        this.db.createIndex(Indexes.ascending(sortField), new IndexOptions().collation(Collation.builder().locale("en").build()));
+        this.db.createIndex(Indexes.ascending(sortField),
+                new IndexOptions().collation(DefaultMongoPaginationHelper.DEFAULT_COLLATION_WITH_CASE_INSENSITIVE_SORTING));
+    }
+
+    private boolean hasMatchingCollation(final Document indexDoc) {
+        final Document existingCollation = indexDoc.get(COLLATION_KEY, Document.class);
+        if (existingCollation == null) {
+            return false;
+        }
+        final Collation expected = DefaultMongoPaginationHelper.DEFAULT_COLLATION_WITH_CASE_INSENSITIVE_SORTING;
+        // MongoDB stores collation strength as an integer; numericOrdering as a boolean. Other fields (caseLevel,
+        // caseFirst, alternate, …) get populated to driver defaults, so explicit comparison of the meaningful
+        // attributes is enough to detect a stale index from before this collation was canonicalized.
+        return Objects.equals(existingCollation.getString("locale"), expected.getLocale())
+                && Objects.equals(existingCollation.getInteger("strength"), expected.getStrength().getIntRepresentation())
+                && Objects.equals(existingCollation.getBoolean("numericOrdering", false), expected.getNumericOrdering());
     }
 
     private Optional<Document> getExistingIndex(final ListIndexesIterable<Document> existingIndices, final String sortField) {
