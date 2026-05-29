@@ -18,6 +18,7 @@ import type { TimeRange } from 'views/logic/queries/Query';
 import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
 import type Parameter from 'views/logic/parameters/Parameter';
 import type { QueryString } from 'views/logic/queries/types';
+import type { SearchFilter } from 'views/types';
 
 import View from './View';
 import ViewStateGenerator from './ViewStateGenerator';
@@ -33,6 +34,7 @@ export default async ({
   timeRange,
   queryString,
   parameters,
+  searchFilters,
 }: {
   type: ViewType;
   streamId?: string | string[];
@@ -40,8 +42,9 @@ export default async ({
   timeRange?: TimeRange;
   queryString?: QueryString;
   parameters?: Array<Parameter>;
+  searchFilters?: Array<SearchFilter>;
 }) => {
-  const query = QueryGenerator(streamId, streamCategory, undefined, timeRange, queryString);
+  const query = QueryGenerator(streamId, streamCategory, undefined, timeRange, queryString, searchFilters);
   const search = Search.create().toBuilder().queries([query]).parameters(parameters).build();
   const viewState = await ViewStateGenerator(type, streamId);
 
