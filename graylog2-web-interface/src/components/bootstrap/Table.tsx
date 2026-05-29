@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line no-restricted-imports
-import { Table as BootstrapTable } from 'react-bootstrap';
+import React from 'react';
+import { Table as MantineTable } from '@mantine/core';
 import styled, { css } from 'styled-components';
 
 export const PINNED_CELL_CLASS_NAME = 'table-pinned-cell';
@@ -29,149 +29,37 @@ export const getPinnedCellClassName = (isPinned: boolean, isStripedRow: boolean)
   return isStripedRow ? PINNED_CELL_STRIPED_CLASS_NAME : PINNED_CELL_CLASS_NAME;
 };
 
-const variantRowStyles = css(({ theme }) => {
-  const { table } = theme.colors;
-  let styles = '';
+type Props = React.PropsWithChildren<{
+  className?: string;
+}>;
 
-  const tableVariant = table.variant as Record<string, string>;
-  const tableVariantHover = table.variantHover as Record<string, string>;
-
-  const variants: Record<string, { background: string; hover: string }> = {
-    active: {
-      background: tableVariant.active,
-      hover: tableVariantHover.active,
-    },
-    success: {
-      background: tableVariant.success,
-      hover: tableVariantHover.success,
-    },
-    info: {
-      background: tableVariant.info,
-      hover: tableVariantHover.info,
-    },
-    warning: {
-      background: tableVariant.warning,
-      hover: tableVariantHover.warning,
-    },
-    danger: {
-      background: tableVariant.danger,
-      hover: tableVariantHover.danger,
-    },
-  };
-
-  Object.keys(variants).forEach((variant) => {
-    const { background, hover } = variants[variant];
-
-    styles += `
-      &.table > thead > tr,
-      &.table > tfoot > tr,
-      &.table > tbody > tr {
-        > td.${variant},
-        > th.${variant},
-        &.${variant} > td,
-        &.${variant} > th {
-          background-color: ${background};
-        }
-      }
-
-      &.table-hover > tbody > tr {
-        > td.${variant}:hover,
-        > th.${variant}:hover,
-        &.${variant}:hover > td,
-        &:hover > .${variant},
-        &.${variant}:hover > th {
-          background-color: ${hover};
-        }
-      }
-    `;
-  });
-
-  return css`
-    ${styles}
-  `;
-});
-
-const tableCss = css(
+const StyledTable = styled(MantineTable)(
   ({ theme }) => css`
-    &.table {
-      > thead > tr,
-      > tbody > tr,
-      > tfoot > tr {
-        > th,
-        > td {
-          border-top-color: ${theme.colors.table.row.divider};
-          border-width: 1px;
-        }
-      }
+    --table-border-color: ${theme.colors.table.row.divider};
+    font-size: inherit;
 
-      > thead > tr > th {
-        background: ${theme.colors.table.head.background};
-        white-space: nowrap;
-        border-bottom-color: ${theme.colors.table.row.divider};
-        border-width: 1px;
-      }
-
-      > tbody > tr {
-        background-color: ${theme.colors.global.contentBackground};
-        transition: background-color 150ms ease-in-out;
-      }
-
-      > tbody + tbody {
-        border-top-color: ${theme.colors.table.row.divider};
-        border-width: 1px;
-      }
-
-      .table {
-        background-color: ${theme.colors.table.row.background};
-      }
-
-      > thead > tr > th.${PINNED_CELL_CLASS_NAME} {
-        background-color: ${theme.utils.flattenColorStack([
-          theme.colors.global.contentBackground,
-          theme.colors.table.head.background,
-        ])};
-      }
-
-      > tbody > tr > .${PINNED_CELL_CLASS_NAME}, > tfoot > tr > .${PINNED_CELL_CLASS_NAME} {
-        background-color: ${theme.utils.flattenColorStack([
-          theme.colors.global.contentBackground,
-          theme.colors.table.row.background,
-        ])};
-      }
+    & th,
+    & td {
+      padding: 8px;
+      vertical-align: top;
+      border-top: 1px solid ${theme.colors.table.row.divider};
     }
 
-    &.table-bordered {
-      border-color: ${theme.colors.table.row.divider};
-
-      > thead > tr,
-      > tfoot > tr,
-      > tbody > tr {
-        > td,
-        > th {
-          border-color: ${theme.colors.table.row.divider};
-        }
-      }
+    & thead > tr > th {
+      background-color: ${theme.colors.table.head.background};
+      white-space: nowrap;
+      vertical-align: bottom;
+      border-top: none;
+      border-bottom: 1px solid ${theme.colors.table.row.divider};
     }
 
-    &.table-striped > tbody > tr:nth-of-type(odd) {
-      background-color: ${theme.colors.table.row.backgroundStriped};
+    & tbody > tr {
+      background-color: ${theme.colors.global.contentBackground};
+      transition: background-color 150ms ease-in-out;
     }
-
-    &.table > tbody > tr > .${PINNED_CELL_STRIPED_CLASS_NAME} {
-      background-color: ${theme.utils.flattenColorStack([
-        theme.colors.global.contentBackground,
-        theme.colors.table.row.backgroundStriped,
-      ])};
-    }
-
-    &.table-hover > tbody > tr:hover {
-      background-color: ${theme.colors.table.row.backgroundHover};
-    }
-
-    ${variantRowStyles}
 
     @media print {
-      &.table > thead > tr > th {
+      & thead > tr > th {
         white-space: break-spaces;
         word-break: break-all;
       }
@@ -179,11 +67,7 @@ const tableCss = css(
   `,
 );
 
-const Table = styled(BootstrapTable)`
-  ${tableCss}
-`;
+const Table = ({ children, className }: Props) => <StyledTable className={className}>{children}</StyledTable>;
 
 /** @component */
 export default Table;
-
-export { tableCss };

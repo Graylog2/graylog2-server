@@ -52,19 +52,25 @@ const StyledTable = styled(BaseTable)(
     }
 
     && {
-      > tbody:nth-of-type(even) > tr {
-        background-color: ${theme.colors.table.row.backgroundStriped};
-      }
+      > tbody:nth-of-type(even) {
+        --row-bg: ${theme.colors.table.row.backgroundStriped};
 
-      > tbody:nth-of-type(odd) > tr {
-        background-color: ${theme.colors.table.row.background};
-      }
-      > tbody > tr.active {
-        background-color: ${theme.colors.table.row.backgroundStriped} !important;
-
-        & td {
-          background-color: transparent !important;
+        > tr {
+          background-color: ${theme.colors.table.row.backgroundStriped};
         }
+      }
+
+      > tbody:nth-of-type(odd) {
+        --row-bg: ${theme.colors.table.row.background};
+
+        > tr {
+          background-color: ${theme.colors.table.row.background};
+        }
+      }
+
+      > tbody > tr.active {
+        --row-bg: ${theme.colors.table.row.backgroundStriped};
+        background-color: ${theme.colors.table.row.backgroundStriped} !important;
       }
     }
   `,
@@ -75,7 +81,7 @@ const Td = styled.td<{
   $hidePadding: boolean;
   $pinningPosition: ColumnPinningPosition;
 }>(
-  ({ $colId, $hidePadding, $pinningPosition }) => css`
+  ({ $colId, $hidePadding, $pinningPosition, theme }) => css`
     word-break: break-word;
     opacity: var(${columnOpacityVar($colId)}, 1);
     transform: var(${columnTransformVar($colId)}, none);
@@ -85,6 +91,7 @@ const Td = styled.td<{
       ? css`
           position: sticky;
           ${$pinningPosition === 'left' ? 'left' : 'right'}: 0;
+          background-color: var(--row-bg, ${theme.colors.table.row.background});
           ${ScrollShadow('left')}
           &::before {
             display: var(${displayScrollRightIndicatorVar}, none);
@@ -119,7 +126,7 @@ const Table = <Entity extends EntityBase>({
   const isRowExpanded = (rowId: string) => !!expandedSections?.[rowId];
 
   return (
-    <StyledTable striped condensed hover>
+    <StyledTable>
       <TableHead headerGroups={headerGroups} />
       {rows.map((row) => {
         const visibleCells = row.getVisibleCells();
