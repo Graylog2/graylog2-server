@@ -19,6 +19,7 @@ import { useMemo } from 'react';
 import trim from 'lodash/trim';
 import trunc from 'lodash/truncate';
 
+import * as JSON from 'util/json';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { getPrettifiedValue } from 'views/components/visualizations/utils/unitConverters';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';

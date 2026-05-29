@@ -98,7 +98,13 @@ const useTableEventHandlers = ({
 
     paginationQueryParameter.resetPage();
 
-    return updateTableLayout({ attributes: null, order: null, sort: undefined, perPage: undefined });
+    return updateTableLayout({
+      attributes: null,
+      order: null,
+      slicing: undefined,
+      sort: undefined,
+      perPage: undefined,
+    });
   }, [appSection, paginationQueryParameter, sendTelemetry, updateTableLayout]);
 
   const onSearchReset = useCallback(() => {
