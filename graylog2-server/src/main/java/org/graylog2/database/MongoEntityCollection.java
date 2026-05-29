@@ -23,6 +23,7 @@ import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.DistinctIterable;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.ListIndexesIterable;
+import com.mongodb.client.model.CountOptions;
 import com.mongodb.client.model.FindOneAndReplaceOptions;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.model.IndexModel;
@@ -108,6 +109,11 @@ public class MongoEntityCollection<T extends MongoEntity> implements MongoCollec
     @Override
     public long countDocuments(@Nonnull Bson filter) {
         return delegate.countDocuments(filter);
+    }
+
+    @Override
+    public long countDocuments(@Nonnull Bson filter, @Nonnull CountOptions options) {
+        return delegate.countDocuments(filter, options);
     }
 
     @Nonnull
