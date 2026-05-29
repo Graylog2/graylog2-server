@@ -67,6 +67,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -376,10 +377,17 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
     @Override
     public Map<String, Map<String, Long>> aggregateGroupedTerms(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                                                 String groupByField, String termsField,
-                                                                int maxBuckets, int maxSubBuckets) {
+                                                                int maxBuckets, int maxSubBuckets,
+                                                                Collection<String> includeTerms) {
         final var filter = createSimpleQuery(queryString, timerange);
         final var aggregation = Aggregation.builder()
-                .terms(terms -> terms.field(groupByField).size(maxBuckets))
+                .terms(terms -> {
+                    terms.field(groupByField).size(maxBuckets);
+                    if (includeTerms != null && !includeTerms.isEmpty()) {
+                        terms.include(inc -> inc.terms(includeTerms.stream().toList()));
+                    }
+                    return terms;
+                })
                 .aggregations(SUB_TERMS_AGGREGATION_NAME, Aggregation.of(a -> a
                         .terms(t -> t.field(termsField).size(maxSubBuckets))))
                 .build();
@@ -397,10 +405,17 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
 
     @Override
     public Map<String, Long> aggregateTerms(String queryString, TimeRange timerange, Set<String> affectedIndices,
-                                            String termsField, int maxBuckets) {
+                                            String termsField, int maxBuckets,
+                                            Collection<String> includeTerms) {
         final var filter = createSimpleQuery(queryString, timerange);
         final var aggregation = Aggregation.builder()
-                .terms(terms -> terms.field(termsField).size(maxBuckets))
+                .terms(terms -> {
+                    terms.field(termsField).size(maxBuckets);
+                    if (includeTerms != null && !includeTerms.isEmpty()) {
+                        terms.include(inc -> inc.terms(includeTerms.stream().toList()));
+                    }
+                    return terms;
+                })
                 .build();
 
         final var searchResult = executeAggregation(filter, affectedIndices, GROUP_BY_AGGREGATION_NAME, aggregation);
@@ -410,14 +425,20 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
     @Override
     public Map<String, Double> aggregateGroupedMetric(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                                       String groupByField, AggregationType metricType, String metricField,
-                                                      int maxBuckets) {
+                                                      int maxBuckets, Collection<String> includeTerms) {
         final var filter = createSimpleQuery(queryString, timerange);
         final Aggregation metricAgg = switch (metricType) {
             case AVG -> Aggregation.of(a -> a.avg(avg -> avg.field(metricField)));
             case MAX -> Aggregation.of(a -> a.max(max -> max.field(metricField)));
         };
         final var aggregation = Aggregation.builder()
-                .terms(terms -> terms.field(groupByField).size(maxBuckets))
+                .terms(terms -> {
+                    terms.field(groupByField).size(maxBuckets);
+                    if (includeTerms != null && !includeTerms.isEmpty()) {
+                        terms.include(inc -> inc.terms(includeTerms.stream().toList()));
+                    }
+                    return terms;
+                })
                 .aggregations(METRIC_AGGREGATION_NAME, metricAgg)
                 .build();
 
