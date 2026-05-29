@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.resources.system.debug.bundle;
 
+import org.graylog.plugins.pipelineprocessor.rest.ProcessingLoadSnapshotter;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -54,6 +55,9 @@ public class SupportBundleServiceTest {
 
     @Mock
     private ObjectMapperProvider objectMapperProvider;
+
+    @Mock
+    private ProcessingLoadSnapshotter processingLoadSnapshotter;
 
     @InjectMocks
     private SupportBundleService supportBundleService;
