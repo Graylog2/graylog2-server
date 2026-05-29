@@ -23,6 +23,7 @@ import useNonDisplayedAttributes from 'components/events/events/hooks/useNonDisp
 import type { DefaultLayout } from 'components/common/EntityDataTable/types';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
+import TagsDetailRow from 'components/events/TagsDetailRow';
 
 const noDetails = <em>No further details</em>;
 
@@ -34,10 +35,18 @@ type Props = {
 const GeneralEventDetails = ({ defaultLayout, event }: Props) => {
   const { meta } = useMetaDataContext<EventsAdditionalData>();
   const nonDisplayedAttributes = useNonDisplayedAttributes(defaultLayout);
+  const hasTags = !!event.tags?.length;
 
-  if (!nonDisplayedAttributes.length) return noDetails;
+  if (!nonDisplayedAttributes.length && !hasTags) return noDetails;
 
-  return <GeneralEventDetailsTable attributesList={nonDisplayedAttributes} event={event} meta={meta} />;
+  return (
+    <>
+      {nonDisplayedAttributes.length ? (
+        <GeneralEventDetailsTable attributesList={nonDisplayedAttributes} event={event} meta={meta} />
+      ) : null}
+      <TagsDetailRow tags={event.tags} />
+    </>
+  );
 };
 
 const ExpandedSection = ({ defaultLayout, event }: Props) => {

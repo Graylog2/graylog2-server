@@ -92,6 +92,10 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     @Parameter(value = "opensearch_location")
     private String opensearchDistributionRoot = "dist";
 
+    @Documentation("OpenSearch version to use (e.g. '2.19.5' or '3.5.0'). When not set, the oldest available version found in the distribution directory is used.")
+    @Parameter(value = "opensearch_version")
+    private String opensearchVersion = null;
+
     @Documentation("""
             Data directory of the embedded opensearch. Contains indices of the opensearch.
             May be pointed to an existing opensearch directory during in-place migration to Datanode
@@ -404,6 +408,10 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
 
     public String getOpensearchDistributionRoot() {
         return opensearchDistributionRoot;
+    }
+
+    public String getOpensearchVersion() {
+        return opensearchVersion;
     }
 
     /**
