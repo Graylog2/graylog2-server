@@ -15,33 +15,50 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type * as Immutable from 'immutable';
+import { useCallback, useRef, useState } from 'react';
+import debounce from 'lodash/debounce';
 
 import { ClipboardButton, JSONClipboardButton } from 'components/common';
-import SelectPopover from 'components/common/SelectPopover';
+import OverlayTrigger from 'components/common/OverlayTrigger';
+import PaginatedList from 'components/common/PaginatedList';
+import Spinner from 'components/common/Spinner';
 import Routes from 'routing/Routes';
 import useHistory from 'routing/useHistory';
-import { Button, ButtonGroup } from 'components/bootstrap';
+import { Button, ButtonGroup, Input, ListGroup, ListGroupItem } from 'components/bootstrap';
 import SurroundingSearchButton from 'components/search/SurroundingSearchButton';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import MessagePermalinkButton from 'views/components/common/MessagePermalinkButton';
 import useFeature from 'hooks/useFeature';
+import useStreams from 'components/streams/hooks/useStreams';
+import type { Stream } from 'stores/streams/StreamsStore';
 
 import MessageEditFieldConfigurationAction from './fields/MessageEditFieldConfigurationAction';
 
+const PAGE_SIZE = 10;
+
 const TestAgainstStreamButton = ({
-  streams,
   index,
   id,
 }: {
-  streams: Immutable.List<any>;
   index: string;
   id: string;
 }) => {
   const sendTelemetry = useSendTelemetry();
   const history = useHistory();
+  const overlayRef = useRef<{ hide: () => void }>(null);
+  const [searchParams, setSearchParams] = useState({
+    query: '',
+    page: 1,
+    pageSize: PAGE_SIZE,
+    sort: { attributeId: 'title', direction: 'asc' as const },
+  });
+
+  const {
+    data: { list: streams, pagination },
+    isInitialLoading,
+  } = useStreams(searchParams);
 
   const sendEvent = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_MESSAGE_TABLE_TEST_AGAINST_STREAM, {
@@ -50,47 +67,77 @@ const TestAgainstStreamButton = ({
     });
   };
 
-  const sortedStreams = streams.sortBy((stream) => stream.title.toLowerCase());
-  const streamTitles = sortedStreams.map((stream) => stream.title).toArray();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleSearch = useCallback(
+    debounce((value: string) => {
+      setSearchParams((cur) => ({ ...cur, query: value, page: 1 }));
+    }, 300),
+    [],
+  );
 
-  const handleSelect = ([selectedTitle]: string[], hide: () => void) => {
-    const stream = sortedStreams.find((s) => s.title === selectedTitle);
+  const handlePageChange = (newPage: number) => {
+    setSearchParams((cur) => ({ ...cur, page: newPage }));
+  };
 
-    if (!stream || stream.is_default) {
-      hide();
-
-      return;
-    }
+  const handleStreamSelect = (stream: Stream) => {
+    if (stream.is_default) return;
 
     sendEvent();
-    hide();
-
+    overlayRef.current?.hide();
     history.push(Routes.stream_edit_example(stream.id, index, id));
   };
 
-  const itemFormatter = (title: string) => {
-    const stream = sortedStreams.find((s) => s.title === title);
-
-    if (stream?.is_default) {
-      return (
-        <span title="Cannot test against the default stream" style={{ opacity: 0.5, cursor: 'default' }}>
-          {title}
-        </span>
-      );
-    }
-
-    return title;
-  };
+  const popoverContent = (
+    <>
+      <Input
+        type="text"
+        id="stream-filter-input"
+        formGroupClassName=""
+        placeholder="Filter streams"
+        onChange={({ target: { value } }) => handleSearch(value)}
+      />
+      {isInitialLoading && <Spinner />}
+      <PaginatedList
+        showPageSizeSelect={false}
+        totalItems={pagination.total}
+        hidePreviousAndNextPageLinks
+        hideFirstAndLastPageLinks
+        activePage={searchParams.page}
+        pageSize={PAGE_SIZE}
+        onChange={handlePageChange}
+        useQueryParameter={false}>
+        <ListGroup>
+          {streams.map((stream) =>
+            stream.is_default ? (
+              <ListGroupItem key={stream.id} disabled title="Cannot test against the default stream">
+                {stream.title}
+              </ListGroupItem>
+            ) : (
+              <ListGroupItem key={stream.id} onClick={() => handleStreamSelect(stream)}>
+                {stream.title}
+              </ListGroupItem>
+            ),
+          )}
+          {!isInitialLoading && streams.length === 0 && (
+            <ListGroupItem>No streams available</ListGroupItem>
+          )}
+        </ListGroup>
+      </PaginatedList>
+    </>
+  );
 
   return (
-    <SelectPopover
+    <OverlayTrigger
+      ref={overlayRef}
+      trigger="click"
+      placement="bottom"
+      overlay={popoverContent}
       title="Test against stream"
-      triggerNode={<Button bsSize="small" disabled={streams.isEmpty()}>Test against stream <span className="caret" /></Button>}
-      items={streamTitles}
-      itemFormatter={itemFormatter}
-      onItemSelect={handleSelect}
-      filterPlaceholder="Filter streams"
-    />
+      rootClose>
+      <Button bsSize="small">
+        Test against stream <span className="caret" />
+      </Button>
+    </OverlayTrigger>
   );
 };
 
@@ -114,7 +161,6 @@ type Props = {
   disableTestAgainstStream: boolean;
   showOriginal: boolean;
   toggleShowOriginal: () => void;
-  streams: Immutable.List<any>;
 };
 
 const MessageActions = ({
@@ -127,7 +173,6 @@ const MessageActions = ({
   disableTestAgainstStream,
   showOriginal,
   toggleShowOriginal,
-  streams,
 }: Props) => {
   const pluggableActions = usePluggableMessageActions(id, index);
   const isFavoriteFieldsEnabled = useFeature('message_table_favorite_fields');
@@ -157,7 +202,7 @@ const MessageActions = ({
       <ClipboardButton title="Copy ID" text={id} bsSize="small" />
       <JSONClipboardButton title="Copy message" bsSize="small" content={fields} />
       {surroundingSearchButton}
-      {disableTestAgainstStream ? null : <TestAgainstStreamButton streams={streams} id={id} index={index} />}
+      {disableTestAgainstStream ? null : <TestAgainstStreamButton id={id} index={index} />}
       {isFavoriteFieldsEnabled && <MessageEditFieldConfigurationAction />}
     </ButtonGroup>
   );

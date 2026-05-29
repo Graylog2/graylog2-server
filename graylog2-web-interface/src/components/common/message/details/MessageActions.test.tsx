@@ -17,16 +17,25 @@
 import * as React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from 'wrappedTestingLibrary';
-import * as Immutable from 'immutable';
 
 import { asMock } from 'helpers/mocking';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
+import useStreams from 'components/streams/hooks/useStreams';
 
 import MessageActions from './MessageActions';
 
 jest.mock('hooks/useSearchConfiguration', () => jest.fn());
 jest.mock('routing/useHistory', () => () => ({ push: jest.fn() }));
+jest.mock('components/streams/hooks/useStreams', () => jest.fn());
+
+const mockUseStreams = (streams = [], total = 0) => {
+  asMock(useStreams).mockReturnValue({
+    data: { list: streams, pagination: { total }, attributes: [] },
+    refetch: jest.fn(),
+    isInitialLoading: false,
+  });
+};
 
 describe('MessageActions', () => {
   beforeEach(() => {
@@ -37,6 +46,8 @@ describe('MessageActions', () => {
       refresh: jest.fn(),
       isInitialLoading: false,
     });
+
+    mockUseStreams();
   });
 
   const renderActions = (props = {}) =>
@@ -53,7 +64,6 @@ describe('MessageActions', () => {
         decorationStats={{}}
         showOriginal
         toggleShowOriginal={() => {}}
-        streams={Immutable.List()}
         {...props}
       />,
     );
@@ -70,20 +80,29 @@ describe('MessageActions', () => {
     expect(queryByText('Show surrounding messages')).toBeNull();
   });
 
-  it('renders streams in alphabetical order in the "Test against stream" dropdown', async () => {
-    const streams = Immutable.List([
+  it('renders streams in the "Test against stream" popover', async () => {
+    const streams = [
       { id: '1', title: 'Zebra Stream', is_default: false },
       { id: '2', title: 'alpha Stream', is_default: false },
       { id: '3', title: 'Mango Stream', is_default: false },
-    ]);
+    ];
 
-    renderActions({ streams });
+    mockUseStreams(streams, streams.length);
+    renderActions();
     await userEvent.click(screen.getByText('Test against stream'));
 
-    const streamNames = ['alpha Stream', 'Mango Stream', 'Zebra Stream'];
-    const allButtons = screen.getAllByRole('button');
-    const streamButtons = allButtons.filter((el) => streamNames.includes(el.textContent?.trim()));
+    expect(screen.getByText('Zebra Stream')).toBeInTheDocument();
+    expect(screen.getByText('alpha Stream')).toBeInTheDocument();
+    expect(screen.getByText('Mango Stream')).toBeInTheDocument();
+  });
 
-    expect(streamButtons.map((el) => el.textContent?.trim())).toEqual(streamNames);
+  it('renders default stream as disabled', async () => {
+    const streams = [{ id: '1', title: 'Default Stream', is_default: true }];
+
+    mockUseStreams(streams, streams.length);
+    renderActions();
+    await userEvent.click(screen.getByText('Test against stream'));
+
+    expect(screen.getByTitle('Cannot test against the default stream')).toBeInTheDocument();
   });
 });

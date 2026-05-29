@@ -179,7 +179,6 @@ const MessageTableEntry = ({
 
   const sendTelemetry = useSendTelemetry();
   const additionalContextValue = useMemo(() => ({ message }), [message]);
-  const allStreams = useMemo(() => Immutable.List<Stream>(streamsList), [streamsList]);
   const streams = useMemo(
     () => Immutable.Map<string, Stream>(streamsList.map((stream) => [stream.id, stream])),
     [streamsList],
@@ -269,7 +268,6 @@ const MessageTableEntry = ({
                 message={message}
                 fields={fields}
                 streams={streams}
-                allStreams={allStreams}
                 inputs={inputs}
                 disableSurroundingSearch={disableSurroundingSearch}
                 expandAllRenderAsync={expandAllRenderAsync}
