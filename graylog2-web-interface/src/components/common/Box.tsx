@@ -14,20 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as PipelineLoadCell } from './PipelineLoadCell';
-export { default as useProcessingLoad } from './useProcessingLoad';
-export {
-  ProcessingLoadDebugMetricsBanner,
-  ProcessingLoadProvider,
-  useProcessingLoadContext,
-} from './ProcessingLoadProvider';
-export {
-  lookupPipeline,
-  lookupRule,
-  lookupStageRule,
-  getPipelineLoadPercent,
-  getRuleLoadPercent,
-  getStageRuleLoadPercent,
-  getStageRulePipelineSharePercent,
-} from './lookups';
-export type { ProcessingLoadResponse, PipelineLoadEntry, RuleLoadEntry, StageRuleLoadEntry } from './types';
+import * as React from 'react';
+import { Box as MantineBox } from '@mantine/core';
+
+const Box = ({ ...props }: React.ComponentProps<typeof MantineBox>) => <MantineBox {...props} />;
+
+export default Box;

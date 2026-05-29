@@ -14,20 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as PipelineLoadCell } from './PipelineLoadCell';
-export { default as useProcessingLoad } from './useProcessingLoad';
-export {
-  ProcessingLoadDebugMetricsBanner,
-  ProcessingLoadProvider,
-  useProcessingLoadContext,
-} from './ProcessingLoadProvider';
-export {
-  lookupPipeline,
-  lookupRule,
-  lookupStageRule,
-  getPipelineLoadPercent,
-  getRuleLoadPercent,
-  getStageRuleLoadPercent,
-  getStageRulePipelineSharePercent,
-} from './lookups';
-export type { ProcessingLoadResponse, PipelineLoadEntry, RuleLoadEntry, StageRuleLoadEntry } from './types';
+import * as React from 'react';
+import { Progress as MantineProgress } from '@mantine/core';
+
+const Root = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof MantineProgress.Root>>((props, ref) => (
+  <MantineProgress.Root ref={ref} {...props} />
+));
+const Section = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof MantineProgress.Section>>((props, ref) => (
+  <MantineProgress.Section ref={ref} {...props} />
+));
+const Label = ({ ...props }: React.ComponentProps<typeof MantineProgress.Label>) => (
+  <MantineProgress.Label {...props} />
+);
+
+const Progress = { Root, Section, Label };
+
+export default Progress;
