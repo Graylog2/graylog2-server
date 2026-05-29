@@ -177,7 +177,6 @@ const Search = ({ forceSideBarPinned = false }: Props) => {
   return (
     <>
       <SynchronizationComponent />
-      {/*{test.test}*/}
       <ViewsFieldActionsProvider>
         <ExternalValueActionsProvider>
           <SearchExplainContextProvider>
