@@ -1,5 +1,5 @@
 type = "a"
-message = "Use different types of time ranges in entity data table filters."
+message = "Add support for relative, keyword, and absolute time ranges in entity data table filters."
 
 issues = ["26129"]
 pulls = ["26125"]
