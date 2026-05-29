@@ -54,14 +54,8 @@ describe('ExpandedOutputsSection', () => {
     const gelfLink = await screen.findByRole('link', { name: /graylog gelf output/i });
     const syslogLink = await screen.findByRole('link', { name: /syslog forwarder/i });
 
-    expect(gelfLink).toHaveAttribute(
-      'href',
-      `/streams/${stream.id}/view?segment=destinations&edit_output=out-1`,
-    );
-    expect(syslogLink).toHaveAttribute(
-      'href',
-      `/streams/${stream.id}/view?segment=destinations&edit_output=out-2`,
-    );
+    expect(gelfLink).toHaveAttribute('href', `/streams/${stream.id}/view?segment=destinations&edit_output=out-1`);
+    expect(syslogLink).toHaveAttribute('href', `/streams/${stream.id}/view?segment=destinations&edit_output=out-2`);
   });
 
   it('renders the output type alongside the title', async () => {
