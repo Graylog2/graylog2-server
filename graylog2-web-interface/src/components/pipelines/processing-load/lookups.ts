@@ -52,3 +52,11 @@ export const getStageRuleLoadPercent = (
   stage: number,
 ): number | undefined =>
   isLoadable(response) ? lookupStageRule(response, pipelineId, ruleId, stage)?.load_percent : undefined;
+
+export const getStageRulePipelineSharePercent = (
+  response: ProcessingLoadResponse | undefined,
+  pipelineId: string,
+  ruleId: string,
+  stage: number,
+): number | undefined =>
+  isLoadable(response) ? lookupStageRule(response, pipelineId, ruleId, stage)?.pipeline_share_percent : undefined;
