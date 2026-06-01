@@ -24,9 +24,9 @@ import { makeVisualization, retrieveChartData } from 'views/components/aggregati
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import extractLeafPaths from 'views/components/visualizations/utils/extractLeafPaths';
 import type { NodeCustomData } from 'views/components/visualizations/sankey/SankeyVisualization';
+import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
 
 import buildGraph from './buildGraph';
-import useNetworkOnClickPopover from './useNetworkOnClickPopover';
 
 import GenericPlot from '../GenericPlot';
 
@@ -116,17 +116,25 @@ const radialTextPosition = (x: number, y: number): TextPosition => {
   }
 };
 
+type EdgeEndpoint = { customdata: NodeCustomData; label: string };
+type EdgeCustomData = { source: EdgeEndpoint; target: EdgeEndpoint; value: number };
+
 type EdgeTrace = {
   type: 'scatter';
   mode: 'lines';
   x: Array<number | null>;
   y: Array<number | null>;
   line: { width: number; color: string };
+  // Per-point customdata so plotly attaches the edge metadata to whichever point the
+  // user lands on when clicking the line segment.
+  customdata: Array<EdgeCustomData | null>;
   hoverinfo: 'none';
   showlegend: false;
 };
 
 type FontStyle = { color: string };
+
+type ColorScale = Array<[number, string]>;
 
 type NodeTrace = {
   type: 'scatter';
@@ -140,7 +148,7 @@ type NodeTrace = {
   marker: {
     size: number;
     color: Array<number>;
-    colorscale: string;
+    colorscale: ColorScale;
     showscale: boolean;
     colorbar: {
       title: { text: string; font: FontStyle; side: 'top' };
@@ -175,7 +183,7 @@ const NetworkGraphVisualization = makeVisualization(
     const rows = retrieveChartData(data);
     const mapKeys = useMapKeys();
     const theme = useTheme();
-    const { onChartClick, popover } = useNetworkOnClickPopover();
+    const { onChartClick, initializeGraphDivRef, popover } = usePlotOnClickPopover('network', config);
 
     const traces = useMemo<[EdgeTrace, NodeTrace] | null>(() => {
       const rowFields = config.rowPivots.flatMap((pivot) => pivot.fields);
@@ -197,17 +205,42 @@ const NetworkGraphVisualization = makeVisualization(
 
       const edgeX: Array<number | null> = [];
       const edgeY: Array<number | null> = [];
+      const edgeCustomData: Array<EdgeCustomData | null> = [];
       edges.forEach((edge) => {
         const s = positions[edge.source];
         const t = positions[edge.target];
 
         if (s.x === undefined || s.y === undefined || t.x === undefined || t.y === undefined) return;
 
+        const sourceNode = nodes[edge.source];
+        const targetNode = nodes[edge.target];
+        const cd: EdgeCustomData = {
+          source: {
+            customdata: { field: sourceNode.field, value: sourceNode.value },
+            label: sourceNode.label,
+          },
+          target: {
+            customdata: { field: targetNode.field, value: targetNode.value },
+            label: targetNode.label,
+          },
+          value: edge.value,
+        };
+
         edgeX.push(s.x, t.x, null);
         edgeY.push(s.y, t.y, null);
+        // Both points carry the same edge metadata; the separator slot is `null` so
+        // plotly won't surface a click between segments.
+        edgeCustomData.push(cd, cd, null);
       });
 
       const textColor = theme.colors.text.primary;
+      // Start the gradient at the saturated `info` shade — the `lightest`/`lighter` tints
+      // blend into the chart background and bury low-degree nodes.
+      const nodeColorscale: ColorScale = [
+        [0, theme.colors.variant.info],
+        [0.5, theme.colors.variant.dark.info],
+        [1, theme.colors.variant.darkest.info],
+      ];
 
       const edgeTrace: EdgeTrace = {
         type: 'scatter',
@@ -215,6 +248,7 @@ const NetworkGraphVisualization = makeVisualization(
         x: edgeX,
         y: edgeY,
         line: { width: 1, color: theme.colors.text.secondary },
+        customdata: edgeCustomData,
         hoverinfo: 'none',
         showlegend: false,
       };
@@ -236,7 +270,7 @@ const NetworkGraphVisualization = makeVisualization(
         marker: {
           size: 14,
           color: nodes.map((n) => n.degree),
-          colorscale: 'YlGnBu',
+          colorscale: nodeColorscale,
           showscale: true,
           colorbar: {
             title: { text: 'Connections', font: { color: textColor }, side: 'top' },
@@ -264,7 +298,12 @@ const NetworkGraphVisualization = makeVisualization(
     return (
       <Container $height={height} $width={width}>
         {traces ? (
-          <GenericPlot chartData={traces} layout={layout} onClickMarker={onChartClick} />
+          <GenericPlot
+            chartData={traces}
+            layout={layout}
+            onClickMarker={onChartClick}
+            onInitialized={initializeGraphDivRef}
+          />
         ) : (
           <EmptyState>No connections to display. Adjust your search or grouping to see results.</EmptyState>
         )}

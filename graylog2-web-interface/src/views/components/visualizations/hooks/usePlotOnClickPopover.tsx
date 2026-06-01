@@ -315,11 +315,21 @@ const getSankeyAnchorElement = (gd: HTMLElement, pt: ClickPoint): Element | null
 };
 
 const sankeyAnchorKey = (anchor: ElementAnchor): string => {
-  const pt = anchor.pt as unknown as { pointNumber?: number; index?: number; source?: unknown; target?: unknown };
-  const isLink = isSankeyLinkPoint(anchor.pt);
+  const pt = anchor.pt as unknown as {
+    pointNumber?: number;
+    index?: number;
+    curveNumber?: number;
+    source?: unknown;
+    target?: unknown;
+    customdata?: { source?: unknown; target?: unknown };
+  };
+  const isLink =
+    isSankeyLinkPoint(anchor.pt) ||
+    !!(pt.customdata && typeof pt.customdata === 'object' && pt.customdata.source && pt.customdata.target);
+  const curve = pt.curveNumber ?? 0;
   const idx = pt.pointNumber ?? pt.index ?? 0;
 
-  return `${isLink ? 'l' : 'n'}-${idx}`;
+  return `${curve}-${isLink ? 'l' : 'n'}-${idx}`;
 };
 
 const makeSankeyAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): ElementAnchor | null => {
@@ -372,7 +382,11 @@ const makeScatterAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): Anchor | n
   return { rel, el, pt, pointsInRadius };
 };
 
-type ChartType = 'bar' | 'scatter' | 'pie' | 'heatmap' | 'sankey';
+type ChartType = 'bar' | 'scatter' | 'pie' | 'heatmap' | 'sankey' | 'network';
+
+// Visualizations that route their click popover through SankeyOnClickPopover (which
+// can render both node + edge interactions inside a single, never-unmounted dropdown).
+const usesSankeyPopover = (chartType: ChartType) => chartType === 'sankey' || chartType === 'network';
 
 const popoverComponent = (chartType: ChartType) => {
   switch (chartType) {
@@ -420,7 +434,7 @@ const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetCo
       gdRef.current ?? (targetElForClosest?.closest('.js-plotly-plot') as PlotlyHTMLElement | null);
     if (!gd) return;
     let a: Anchor | null;
-    if (chartType === 'scatter') a = makeScatterAnchor(e, gd);
+    if (chartType === 'scatter' || chartType === 'network') a = makeScatterAnchor(e, gd);
     else if (chartType === 'sankey') a = makeSankeyAnchor(e, gd);
     else a = makeElementAnchor(e, gd, chartType);
     if (!a) return;
@@ -448,7 +462,7 @@ const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetCo
       onPopoverChange={onPopoverChange}
       ref={refs.setFloating}
       style={floatingStyles}>
-      {chartType === 'sankey' && anchor ? (
+      {usesSankeyPopover(chartType) && anchor ? (
         <SankeyOnClickPopover
           // Remount per anchor so internal selection state resets when the user clicks a different element.
           key={sankeyAnchorKey(anchor)}

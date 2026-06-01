@@ -38,18 +38,24 @@ import useOverflowingComponents from 'views/hooks/useOverflowingComponents';
 
 type NodeCustomData = { field: string; value: unknown };
 
-type SankeyNodePoint = {
+type LinkEndpoint = {
   customdata?: NodeCustomData;
   label?: string;
 };
 
+type EdgeCustomData = {
+  source?: LinkEndpoint;
+  target?: LinkEndpoint;
+  value?: number;
+};
+
 type SankeyClickPoint = {
-  customdata?: NodeCustomData;
+  customdata?: NodeCustomData | EdgeCustomData;
   index?: number;
   label?: string;
   value?: number;
-  source?: SankeyNodePoint;
-  target?: SankeyNodePoint;
+  source?: LinkEndpoint;
+  target?: LinkEndpoint;
 };
 
 const DivContainer = styled.div(
@@ -60,8 +66,30 @@ const DivContainer = styled.div(
   `,
 );
 
-const isSankeyLink = (pt: SankeyClickPoint): boolean =>
-  !!pt.source && !!pt.target && typeof pt.source === 'object' && typeof pt.target === 'object';
+// Sankey natively emits link clicks with `source`/`target` at the top level of the click point.
+// Other viz (e.g. network graph rendered as a scatter trace) instead encode link metadata into
+// the trace's `customdata` so we treat that shape as a link too.
+const linkContext = (
+  pt: SankeyClickPoint,
+): { source: LinkEndpoint; target: LinkEndpoint; value?: number } | null => {
+  if (pt.source && pt.target && typeof pt.source === 'object' && typeof pt.target === 'object') {
+    return { source: pt.source, target: pt.target, value: pt.value };
+  }
+
+  const cd = pt.customdata as EdgeCustomData | undefined;
+
+  if (cd?.source && cd?.target && typeof cd.source === 'object' && typeof cd.target === 'object') {
+    return { source: cd.source, target: cd.target, value: cd.value };
+  }
+
+  return null;
+};
+
+const nodeContext = (pt: SankeyClickPoint): NodeCustomData | null => {
+  const cd = pt.customdata as NodeCustomData | undefined;
+
+  return cd && typeof (cd as NodeCustomData).field === 'string' ? cd : null;
+};
 
 type Props = {
   clickPoint: ClickPoint;
@@ -120,13 +148,15 @@ const SankeyOnClickPopover = ({ clickPoint, config, onPopoverClose }: Props) => 
   const valueGroups = useMemo<ValueGroups & { title: string }>(() => {
     if (!pt) return { title: '' };
 
-    if (isSankeyLink(pt)) {
-      const srcLabel = pt.source?.label ?? '';
-      const tgtLabel = pt.target?.label ?? '';
+    const link = linkContext(pt);
+
+    if (link) {
+      const srcLabel = link.source.label ?? '';
+      const tgtLabel = link.target.label ?? '';
       const linkTitle = srcLabel && tgtLabel ? `${srcLabel} → ${tgtLabel}` : 'Connection';
-      const srcCustom = pt.source?.customdata;
-      const tgtCustom = pt.target?.customdata;
-      const linkValue = pt.value;
+      const srcCustom = link.source.customdata;
+      const tgtCustom = link.target.customdata;
+      const linkValue = link.value;
       const metric = config?.series?.[0];
 
       return {
@@ -158,17 +188,17 @@ const SankeyOnClickPopover = ({ clickPoint, config, onPopoverClose }: Props) => 
       };
     }
 
-    const nodeCustom = pt.customdata;
+    const node = nodeContext(pt);
 
-    if (!nodeCustom) return { title: pt.label ?? '' };
+    if (!node) return { title: pt.label ?? '' };
 
     return {
-      title: pt.label ?? String(nodeCustom.value),
+      title: pt.label ?? String(node.value),
       rowPivotValues: [
         {
-          field: nodeCustom.field,
-          value: nodeCustom.value as Datum,
-          text: String(nodeCustom.value),
+          field: node.field,
+          value: node.value as Datum,
+          text: String(node.value),
           traceColor: null,
         },
       ],
