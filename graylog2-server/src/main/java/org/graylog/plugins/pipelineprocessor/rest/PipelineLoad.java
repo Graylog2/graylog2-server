@@ -14,19 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line no-restricted-imports
-import { Tab as BootstrapTab } from 'react-bootstrap';
-import styled, { css } from 'styled-components';
+package org.graylog.plugins.pipelineprocessor.rest;
 
-const Tab = styled(BootstrapTab)(
-  ({ theme }) => css`
-    background-color: ${theme.colors.global.contentBackground};
-    border: 1px solid ${theme.colors.variant.default};
-    border-top: 0;
-    border-radius: 0 0 4px 4px;
-    padding: 9px;
-  `,
-);
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
-/** @component */
-export default Tab;
+@AutoValue
+public abstract class PipelineLoad {
+    @JsonProperty("pipeline_id")
+    public abstract String pipelineId();
+
+    @JsonProperty("load_percent")
+    public abstract double loadPercent();
+
+    public static PipelineLoad create(String pipelineId, double loadPercent) {
+        return new AutoValue_PipelineLoad(pipelineId, loadPercent);
+    }
+}

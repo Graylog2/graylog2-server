@@ -20,49 +20,20 @@ import { Formik } from 'formik';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
 
-import { Button, Col, Row } from 'components/bootstrap';
+import { Button } from 'components/bootstrap';
 import Popover from 'components/common/Popover';
 import { Icon, KeyCapture, ModalSubmit, NestedForm } from 'components/common';
-import type { AbsoluteTimeRange, KeywordTimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
+import type { NoTimeRangeOverride } from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
 import { isTimeRange, isTypeRelative } from 'views/typeGuards/timeRange';
 import { normalizeFromPickerForSearchBar } from 'views/logic/queries/NormalizeTimeRange';
-import validateTimeRange from 'views/components/TimeRangeValidation';
-import type { DateTime } from 'util/DateTime';
-import useUserDateTime from 'hooks/useUserDateTime';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-import type { RelativeTimeRangeClassified } from './types';
-import { classifyRelativeTimeRange, normalizeIfClassifiedRelativeTimeRange } from './RelativeTimeRangeClassifiedHelper';
-import TimeRangeTabs, { timeRangePickerTabs } from './TimeRangePickerTabs';
-import TimeRangePresetRow from './TimeRangePresetRow';
-
-export type TimeRangePickerFormValues = {
-  timeRangeTabs: {
-    relative?: RelativeTimeRangeClassified | undefined;
-    absolute?: AbsoluteTimeRange | undefined;
-    keyword?: KeywordTimeRange | undefined;
-  };
-  activeTab: 'relative' | 'absolute' | 'keyword' | undefined;
-};
-
-export type TimeRangePickerTimeRange =
-  TimeRangePickerFormValues['timeRangeTabs'][keyof TimeRangePickerFormValues['timeRangeTabs']];
-export type SupportedTimeRangeType = keyof typeof timeRangePickerTabs;
-
-export const allTimeRangeTypes = Object.keys(timeRangePickerTabs) as Array<SupportedTimeRangeType>;
-
-const Timezone = styled.p(
-  ({ theme }) => css`
-    font-size: ${theme.fonts.size.small};
-    padding-left: 3px;
-    margin: 0;
-    min-height: 34px;
-    display: flex;
-    align-items: center;
-  `,
-);
+import type { SupportedTimeRangeType, TimeRangePickerFormValues } from './types';
+import { classifyRelativeTimeRange } from './RelativeTimeRangeClassifiedHelper';
+import TimeRangePickerFormContent, { allTimeRangeTypes } from './TimeRangePickerFormContent';
+import useTimeRangeValidation from './useTimeRangeValidation';
 
 const PopoverTitle = styled.span`
   display: flex;
@@ -87,24 +58,6 @@ const LimitLabel = styled.span(
     }
   `,
 );
-
-const dateTimeValidate = async (
-  activeTabTimeRange: TimeRangePickerTimeRange,
-  limitDuration: number,
-  formatTime: (dateTime: DateTime, format: string) => string,
-  userTimezone: string,
-) => {
-  if (!activeTabTimeRange) {
-    return {};
-  }
-
-  const normalizedTimeRange = normalizeIfClassifiedRelativeTimeRange(activeTabTimeRange);
-  const timeRangeErrors = await validateTimeRange(normalizedTimeRange, limitDuration, formatTime, userTimezone);
-
-  return Object.keys(timeRangeErrors).length !== 0
-    ? { timeRangeTabs: { [activeTabTimeRange.type]: timeRangeErrors } }
-    : {};
-};
 
 const initialFormValues = (currentTimeRange: SearchBarFormValues['timerange'] | NoTimeRangeOverride) => {
   if (isTimeRange(currentTimeRange)) {
@@ -148,8 +101,8 @@ const TimeRangePicker = ({
   limitDuration,
   withinPortal = true,
 }: Props) => {
-  const { formatTime, userTimezone } = useUserDateTime();
   const sendTelemetry = useSendTelemetry();
+  const validateTimeRange = useTimeRangeValidation(limitDuration);
 
   const handleNoOverride = useCallback(() => {
     setCurrentTimeRange({});
@@ -196,11 +149,6 @@ const TimeRangePicker = ({
     </PopoverTitle>
   );
 
-  const _validateTimeRange = useCallback(
-    ({ timeRangeTabs, activeTab }: TimeRangePickerFormValues) =>
-      dateTimeValidate(timeRangeTabs[activeTab], limitDuration, formatTime, userTimezone),
-    [formatTime, limitDuration, userTimezone],
-  );
   const initialValues = useMemo(() => initialFormValues(currentTimeRange), [currentTimeRange]);
 
   return (
@@ -218,7 +166,7 @@ const TimeRangePicker = ({
       <Popover.Dropdown title={title}>
         <Formik<TimeRangePickerFormValues>
           initialValues={initialValues}
-          validate={_validateTimeRange}
+          validate={validateTimeRange}
           onSubmit={onSubmit}
           validateOnMount>
           {({ isValid, submitForm, isValidating }) => (
@@ -238,34 +186,20 @@ const TimeRangePicker = ({
                 },
               ]}>
               <NestedForm>
-                <Row>
-                  <Col md={12}>
-                    <TimeRangePresetRow limitDuration={limitDuration} />
-                    <TimeRangeTabs limitDuration={limitDuration} validTypes={validTypes} />
-                  </Col>
-                </Row>
-
-                <Row className="row-sm">
-                  <Col md={6}>
-                    <Timezone>
-                      All timezones using: <b>{userTimezone}</b>
-                    </Timezone>
-                  </Col>
-                  <Col md={6}>
-                    <ModalSubmit
-                      leftCol={
-                        noOverride && (
-                          <Button bsStyle="link" onClick={handleNoOverride}>
-                            No Override
-                          </Button>
-                        )
-                      }
-                      onCancel={handleCancel}
-                      disabledSubmit={!isValid || isValidating}
-                      submitButtonText="Update time range"
-                    />
-                  </Col>
-                </Row>
+                <TimeRangePickerFormContent limitDuration={limitDuration} validTypes={validTypes}>
+                  <ModalSubmit
+                    leftCol={
+                      noOverride && (
+                        <Button bsStyle="link" onClick={handleNoOverride}>
+                          No Override
+                        </Button>
+                      )
+                    }
+                    onCancel={handleCancel}
+                    disabledSubmit={!isValid || isValidating}
+                    submitButtonText="Update time range"
+                  />
+                </TimeRangePickerFormContent>
               </NestedForm>
             </KeyCapture>
           )}
