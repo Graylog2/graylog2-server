@@ -23,8 +23,12 @@ import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQuer
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import type { LayoutConfig } from 'components/common/EntityDataTable/hooks/useTableLayout';
+import type { PaginatedEntityTableFilterContextValue } from 'components/common/PaginatedEntityTable/PaginatedEntityTableFilterContext';
 
-export const useWithURLParams = (layoutConfig: LayoutConfig, defaultFilters?: UrlQueryFilters) => {
+export const useWithURLParams = (
+  layoutConfig: LayoutConfig,
+  defaultFilters?: UrlQueryFilters,
+): PaginatedEntityTableFilterContextValue => {
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setUrlQuery] = useQueryParam('query', StringParam);
   const [slice, setSlice] = useQueryParam('slice', StringParam);
@@ -69,27 +73,46 @@ export const useWithURLParams = (layoutConfig: LayoutConfig, defaultFilters?: Ur
     [urlPagination, setUrlQueryFilters],
   );
 
-  const onChangeSlicingFilter = (newSlice?: string) => {
+  const onChangeSlicingFilter = useCallback((newSlice?: string) => {
     urlPagination.resetPage();
     setSlice(newSlice);
-  };
+  }, [setSlice, urlPagination]);
 
-  return {
-    fetchOptions,
-    setQuery: setUrlQuery,
-    onChangeFilters,
-    onChangeSlicingFilter,
-    paginationState: urlPagination,
-  };
+  const resetFilters = useCallback(() => {
+    setHasUserModifiedFilters(false);
+    setUrlQueryFilters(OrderedMap({}));
+    setSlice(undefined);
+    urlPagination.resetPage();
+  }, [setSlice, setUrlQueryFilters, urlPagination]);
+
+  return useMemo(
+    () => ({
+      fetchOptions,
+      setQuery: setUrlQuery,
+      onChangeFilters,
+      onChangeSlicingFilter,
+      paginationState: urlPagination,
+      resetFilters,
+    }),
+    [fetchOptions, onChangeFilters, onChangeSlicingFilter, resetFilters, setUrlQuery, urlPagination],
+  );
 };
 
-export const useWithLocalState = (layoutConfig: LayoutConfig, defaultFilters?: UrlQueryFilters) => {
-  const [transientFetchOptions, setTransientFetchOptions] = useState<any>({
-    query: '',
-    page: DEFAULT_PAGE,
-    filters: defaultFilters ?? OrderedMap<string, Array<string>>(),
-    slice: undefined,
-  });
+export const useWithLocalState = (
+  layoutConfig: LayoutConfig,
+  defaultFilters?: UrlQueryFilters,
+): PaginatedEntityTableFilterContextValue => {
+  const defaultState = useMemo(
+    () => ({
+      query: '',
+      page: DEFAULT_PAGE,
+      filters: defaultFilters ?? OrderedMap<string, Array<string>>(),
+      slice: undefined,
+    }),
+    [defaultFilters],
+  );
+
+  const [transientFetchOptions, setTransientFetchOptions] = useState<any>(defaultState);
 
   const setPagination = useCallback(({ page, pageSize }: { page?: number; pageSize?: number }) => {
     setTransientFetchOptions((cur) => ({
@@ -141,6 +164,10 @@ export const useWithLocalState = (layoutConfig: LayoutConfig, defaultFilters?: U
     [transientFetchOptions, layoutConfig.pageSize, layoutConfig.slicing?.sliceColumn, layoutConfig.sort],
   );
 
+  const resetFilters = useCallback(() => {
+    setTransientFetchOptions(defaultState);
+  }, [defaultState]);
+
   return useMemo(
     () => ({
       fetchOptions,
@@ -153,7 +180,8 @@ export const useWithLocalState = (layoutConfig: LayoutConfig, defaultFilters?: U
         resetPage,
         setPagination,
       },
+      resetFilters,
     }),
-    [fetchOptions, onChangeFilters, onChangeSlicingFilter, resetPage, setPagination, setQuery],
+    [fetchOptions, onChangeFilters, onChangeSlicingFilter, resetFilters, resetPage, setPagination, setQuery],
   );
 };

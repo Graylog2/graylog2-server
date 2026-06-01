@@ -42,10 +42,10 @@ import type {
 import EntityFilters from 'components/common/EntityFilters';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import TableFetchContextProvider from 'components/common/PaginatedEntityTable/TableFetchContextProvider';
+import PaginatedEntityTableFilterContextProvider from 'components/common/PaginatedEntityTable/PaginatedEntityTableFilterContextProvider';
 import type { PaginatedResponse, FetchOptions } from 'components/common/PaginatedEntityTable/useFetchEntities';
 import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
 import useOnRefresh from 'components/common/PaginatedEntityTable/useOnRefresh';
-import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
 import Slicing, { type SliceRenderers } from 'components/common/PaginatedEntityTable/slicing';
 import type { FetchSlices } from 'components/common/PaginatedEntityTable/slicing/useFetchSlices';
 import useAuthorizedAttributes from 'components/common/PaginatedEntityTable/hooks/useAuthorizedAttributes';
@@ -55,6 +55,7 @@ import {
 } from 'components/common/PaginatedEntityTable/slicing/slicingConstants';
 
 import { useWithLocalState, useWithURLParams } from './useFiltersAndPagination';
+import usePaginatedEntityTableFilterContext from './usePaginatedEntityTableFilterContext';
 
 const SearchRow = styled.div`
   margin-bottom: 5px;
@@ -119,15 +120,10 @@ const defaultSlicingPreferences = (sliceColumn: string, columnSchemas: Array<Col
 };
 
 type InnerProps = {
-  fetchOptions: SearchParams;
   isLoadingLayoutPreferences: boolean;
   layoutConfig: LayoutConfig;
   onDataLoaded?: (data: PaginatedResponse<unknown, unknown>) => void;
-  onChangeFilters: (newFilters: UrlQueryFilters) => void;
-  onChangeSlicingFilter: (slice?: string) => void;
-  paginationState: PaginationQueryParameterResult;
   reactQueryOptions: FetchOptions;
-  setQuery: (newQuery: string) => void;
 };
 
 const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
@@ -140,7 +136,6 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   rowOverride = undefined,
   externalSearch = undefined,
   fetchEntities,
-  fetchOptions,
   fetchSlices = undefined,
   filterValueRenderers = undefined,
   focusSearchAfterMount = false,
@@ -150,21 +145,19 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   layoutConfig,
   middleSection: MiddleSection = undefined,
   topSection: TopSection = undefined,
-  onChangeFilters,
-  onChangeSlicingFilter,
   onDataLoaded = undefined,
-  paginationState,
   queryHelpComponent = undefined,
   reactQueryOptions,
   searchPlaceholder = undefined,
   sliceRenderers = undefined,
-  setQuery,
   tableLayout,
   topRightCol = undefined,
   withoutURLParams = false,
   noPageSizeSelect = false,
   noColumnReordering = false,
 }: PaginatedEntityTableProps<T, M> & InnerProps) => {
+  const { fetchOptions, setQuery, onChangeFilters, onChangeSlicingFilter, paginationState } =
+    usePaginatedEntityTableFilterContext();
   const { mutateAsync: updateTableLayout } = useUpdateUserLayoutPreferences(
     tableLayout.entityTableId,
     tableLayout.layoutVariant,
@@ -363,46 +356,22 @@ type WrapperProps<T extends EntityBase, M> = PaginatedEntityTableProps<T, M> & {
 };
 
 const TableWithLocalState = <T extends EntityBase, M = unknown>({ ...props }: WrapperProps<T, M>) => {
-  const { fetchOptions, setQuery, onChangeFilters, onChangeSlicingFilter, paginationState } = useWithLocalState(
-    props.layoutConfig,
-    props.defaultFilters,
-  );
-  const effectiveFetchOptions = props.externalSearch
-    ? { ...fetchOptions, query: props.externalSearch.query }
-    : fetchOptions;
+  const contextValue = useWithLocalState(props.layoutConfig, props.defaultFilters);
 
   return (
-    <PaginatedEntityTableInner<T, M>
-      {...props}
-      fetchOptions={effectiveFetchOptions}
-      setQuery={props.externalSearch ? () => {} : setQuery}
-      onChangeSlicingFilter={onChangeSlicingFilter}
-      onChangeFilters={onChangeFilters}
-      paginationState={paginationState}
-      onDataLoaded={props.onDataLoaded}
-    />
+    <PaginatedEntityTableFilterContextProvider value={contextValue} externalSearch={props.externalSearch}>
+      <PaginatedEntityTableInner<T, M> {...props} />
+    </PaginatedEntityTableFilterContextProvider>
   );
 };
 
 const TableWithURLParams = <T extends EntityBase, M = unknown>({ ...props }: WrapperProps<T, M>) => {
-  const { fetchOptions, setQuery, onChangeFilters, paginationState, onChangeSlicingFilter } = useWithURLParams(
-    props.layoutConfig,
-    props.defaultFilters,
-  );
-  const effectiveFetchOptions = props.externalSearch
-    ? { ...fetchOptions, query: props.externalSearch.query }
-    : fetchOptions;
+  const contextValue = useWithURLParams(props.layoutConfig, props.defaultFilters);
 
   return (
-    <PaginatedEntityTableInner<T, M>
-      {...props}
-      fetchOptions={effectiveFetchOptions}
-      setQuery={props.externalSearch ? () => {} : setQuery}
-      onChangeFilters={onChangeFilters}
-      onChangeSlicingFilter={onChangeSlicingFilter}
-      paginationState={paginationState}
-      onDataLoaded={props.onDataLoaded}
-    />
+    <PaginatedEntityTableFilterContextProvider value={contextValue} externalSearch={props.externalSearch}>
+      <PaginatedEntityTableInner<T, M> {...props} />
+    </PaginatedEntityTableFilterContextProvider>
   );
 };
 
@@ -418,6 +387,7 @@ export type PaginatedEntityTableProps<T extends EntityBase, M> = {
   rowOverride?: RowOverride<T>;
   externalSearch?: ExternalSearch;
   fetchEntities: (options: SearchParams) => Promise<PaginatedResponse<T, M>>;
+  // eslint-disable-next-line react/no-unused-prop-types
   fetchOptions?: FetchOptions;
   fetchSlices?: FetchSlices;
   filterValueRenderers?: React.ComponentProps<typeof EntityFilters>['filterValueRenderers'];
