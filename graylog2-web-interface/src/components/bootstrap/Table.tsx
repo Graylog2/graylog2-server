@@ -49,6 +49,7 @@ const StyledTable = styled(MantineTable)<StyledProps>(
   ({ theme, $striped, $hover, $condensed, $bordered }) => css`
     --table-border-color: ${theme.colors.table.row.divider};
     font-size: inherit;
+    line-height: inherit;
 
     ${$bordered && css`border: 1px solid ${theme.colors.table.row.divider};`}
 
