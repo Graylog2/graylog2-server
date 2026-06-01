@@ -14,19 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line no-restricted-imports
-import { Tab as BootstrapTab } from 'react-bootstrap';
-import styled, { css } from 'styled-components';
+export type PipelineLoadEntry = {
+  pipeline_id: string;
+  load_percent: number;
+};
 
-const Tab = styled(BootstrapTab)(
-  ({ theme }) => css`
-    background-color: ${theme.colors.global.contentBackground};
-    border: 1px solid ${theme.colors.variant.default};
-    border-top: 0;
-    border-radius: 0 0 4px 4px;
-    padding: 9px;
-  `,
-);
+export type RuleLoadEntry = {
+  rule_id: string;
+  load_percent: number;
+};
 
-/** @component */
-export default Tab;
+export type StageRuleLoadEntry = {
+  pipeline_id: string;
+  rule_id: string;
+  stage: number;
+  load_percent: number;
+  pipeline_share_percent: number;
+};
+
+export type ProcessingLoadResponse = {
+  available: boolean;
+  total_cost_microseconds_per_second: number;
+  pipelines: Array<PipelineLoadEntry>;
+  rules: Array<RuleLoadEntry>;
+  stage_rules: Array<StageRuleLoadEntry>;
+};

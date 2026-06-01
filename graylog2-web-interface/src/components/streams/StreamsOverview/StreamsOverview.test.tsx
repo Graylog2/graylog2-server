@@ -31,6 +31,7 @@ import { streamRuleTypes } from 'fixtures/streamRuleTypes';
 import useStreamDestinationFilterRuleCount from 'components/streams/hooks/useStreamDestinationFilterRuleCount';
 import useStreamOutputFilters from 'components/streams/hooks/useStreamOutputFilters';
 import useStreamRulesInputs from 'hooks/useStreamRulesInputs';
+import useStreamOutputs from 'hooks/useStreamOutputs';
 
 import StreamsOverview from './StreamsOverview';
 
@@ -40,6 +41,7 @@ jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 jest.mock('components/streams/hooks/useStreamDestinationFilterRuleCount');
 jest.mock('components/streams/hooks/useStreamOutputFilters');
 jest.mock('hooks/useStreamRulesInputs');
+jest.mock('hooks/useStreamOutputs');
 
 const attributes = [
   {
@@ -82,6 +84,7 @@ describe('StreamsOverview', () => {
           description: { status: 'show' },
           rules: { status: 'show' },
           destination_filters: { status: 'show' },
+          outputs: { status: 'show' },
         },
       },
       isInitialLoading: false,
@@ -97,6 +100,12 @@ describe('StreamsOverview', () => {
       refetch: () => {},
       isInitialLoading: false,
       error: undefined,
+      isError: false,
+    });
+    asMock(useStreamOutputs).mockReturnValue({
+      data: { outputs: [], total: 0 },
+      refetch: () => {},
+      isInitialLoading: false,
       isError: false,
     });
     asMock(useStreamOutputFilters).mockReturnValue({
@@ -238,6 +247,51 @@ describe('StreamsOverview', () => {
     await userEvent.click(hideFilterRulesBadge);
 
     expect(screen.queryByText('Only prod logs')).not.toBeInTheDocument();
+  });
+
+  it('should open and close outputs overview for a stream', async () => {
+    const streamWithOutputs = {
+      ...stream,
+      outputs: ['output-id-1'] as any,
+    };
+    asMock(useFetchEntities).mockReturnValue(paginatedStreams(streamWithOutputs));
+    asMock(useStreamOutputs).mockReturnValue({
+      data: {
+        outputs: [
+          {
+            id: 'output-id-1',
+            title: 'My GELF Output',
+            type: 'org.graylog2.outputs.GelfOutput',
+            configuration: {},
+          },
+        ],
+        total: 1,
+      },
+      refetch: () => {},
+      isInitialLoading: false,
+      isError: false,
+    });
+
+    renderSut();
+
+    const tableRow = await screen.findByTestId(`table-row-${streamWithOutputs.id}`);
+
+    await userEvent.click(within(tableRow).getByTitle('Show stream outputs'));
+
+    expect(
+      await screen.findByText(
+        (_, element) => element?.tagName.toLowerCase() === 'p' && element.textContent === '1 connected output.',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /my gelf output/i })).toHaveAttribute(
+      'href',
+      `/streams/${streamWithOutputs.id}/view?segment=destinations&edit_output=output-id-1`,
+    );
+    expect(screen.getByRole('link', { name: /manage outputs/i })).toBeInTheDocument();
+
+    await userEvent.click(within(tableRow).getByTitle('Hide stream outputs'));
+
+    expect(screen.queryByText(/1 connected output\./i)).not.toBeInTheDocument();
   });
 
   it('should render stream overview table elements from plugins', async () => {

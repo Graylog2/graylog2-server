@@ -24,6 +24,8 @@ import ExpandedRulesSection from 'components/streams/StreamsOverview/ExpandedRul
 import ExpandedRulesActions from 'components/streams/StreamsOverview/ExpandedRulesActions';
 import ExpandedDestinationFilterRulesSection from 'components/streams/StreamsOverview/ExpandedDestinationFilterRulesSection';
 import ExpandedDestinationFilterRulesActions from 'components/streams/StreamsOverview/ExpandedDestinationFilterRulesActions';
+import ExpandedOutputsSection from 'components/streams/StreamsOverview/ExpandedOutputsSection';
+import ExpandedOutputsActions from 'components/streams/StreamsOverview/ExpandedOutputsActions';
 import type { ExpandedSectionRenderer } from 'components/common/EntityDataTable/types';
 
 const useTableElements = ({
@@ -51,6 +53,11 @@ const useTableElements = ({
         title: 'Filter Rules',
         content: (stream: Stream) => <ExpandedDestinationFilterRulesSection stream={stream} />,
         actions: (stream: Stream) => <ExpandedDestinationFilterRulesActions stream={stream} />,
+      },
+      outputs: {
+        title: 'Outputs',
+        content: (stream: Stream) => <ExpandedOutputsSection stream={stream} />,
+        actions: (stream: Stream) => <ExpandedOutputsActions stream={stream} />,
       },
       ...pluggableExpandedSections,
     }),
