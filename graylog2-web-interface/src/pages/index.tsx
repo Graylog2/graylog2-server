@@ -29,6 +29,7 @@ const ClusterConfigurationPage = loadAsync(() => import('./ClusterConfigurationP
 const ConfigurationsPage = loadAsync(() => import('./ConfigurationsPage'));
 const ContentPacksPage = loadAsync(() => import('./ContentPacksPage'));
 const CreateEventDefinitionPage = loadAsync(() => import('./CreateEventDefinitionPage'));
+const SigmaEventDefinitionPage = loadAsync(() => import('./SigmaEventDefinitionPage'));
 const CreateEventNotificationPage = loadAsync(() => import('./CreateEventNotificationPage'));
 const CreateContentPackPage = loadAsync(() => import('pages/CreateContentPackPage'));
 const CreateExtractorsPage = loadAsync(() => import('./CreateExtractorsPage'));
@@ -140,6 +141,7 @@ export {
   ConfigurationsPage,
   ContentPacksPage,
   CreateEventDefinitionPage,
+  SigmaEventDefinitionPage,
   CreateEventNotificationPage,
   CreateContentPackPage,
   CreateExtractorsPage,
