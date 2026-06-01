@@ -475,6 +475,7 @@ public class PipelineInterpreter implements MessageProcessor {
     public static class State {
         private final Logger LOG = LoggerFactory.getLogger(getClass());
         protected static final String STAGE_CACHE_METRIC_SUFFIX = "stage-cache";
+        private static final Object METRIC_REGISTRATION_LOCK = new Object();
 
         private final ImmutableMap<String, Pipeline> currentPipelines;
         private final ImmutableSetMultimap<String, Pipeline> streamPipelineConnections;
@@ -504,9 +505,12 @@ public class PipelineInterpreter implements MessageProcessor {
                         }
                     });
 
-            // we have to remove the metrics, because otherwise we leak references to the cache (and the register call with throw)
-            metricRegistry.removeMatching((name, metric) -> name.startsWith(getStageCacheMetricName()));
-            MetricUtils.safelyRegisterAll(metricRegistry, new CacheStatsSet(getStageCacheMetricName(), cache));
+            // Synchronized to prevent concurrent State constructions from racing on remove+register,
+            // which would cause duplicate metric registration errors. (See #26080)
+            synchronized (METRIC_REGISTRATION_LOCK) {
+                metricRegistry.removeMatching((name, metric) -> name.startsWith(getStageCacheMetricName()));
+                MetricUtils.safelyRegisterAll(metricRegistry, new CacheStatsSet(getStageCacheMetricName(), cache));
+            }
         }
 
         protected String getStageCacheMetricName() {
