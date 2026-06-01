@@ -37,6 +37,7 @@ import ViewsExecutionInfo from 'views/components/views/ViewsExecutionInto';
 import RightSidebarContext from 'contexts/RightSidebarContext';
 import SidebarEventDetails from 'components/events/SidebarEventDetails';
 import SidebarEventDefinitionDetails from 'components/event-definitions/SidebarEventDefinitionDetails';
+import Button from 'components/bootstrap/Button';
 
 type Crumb = {
   label: string;
@@ -142,22 +143,6 @@ const StyledIcon = styled(Icon)`
   font-size: 0.5rem;
 `;
 
-const CrumbButton = styled.button(
-  ({ theme }) => css`
-    background: none;
-    border: 0;
-    padding: 0;
-    font: inherit;
-    color: ${theme.colors.global.link};
-    cursor: pointer;
-
-    &:hover {
-      color: ${theme.colors.global.linkHover};
-      text-decoration: underline;
-    }
-  `,
-);
-
 const CrumbLink = ({
   label,
   link,
@@ -179,9 +164,9 @@ const CrumbLink = ({
 
   if (onClick) {
     return (
-      <CrumbButton type="button" onClick={onClick} data-testid={dataTestId}>
+      <Button bsStyle="link" onClick={onClick} data-testid={dataTestId}>
         {label}
-      </CrumbButton>
+      </Button>
     );
   }
 
