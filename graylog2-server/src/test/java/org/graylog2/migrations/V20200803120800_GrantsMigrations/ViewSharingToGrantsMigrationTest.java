@@ -94,7 +94,7 @@ class ViewSharingToGrantsMigrationTest {
             return createUser(argument);
         });
 
-        final EntityRegistrar entityRegistrar = new EntityRegistrar(grantService, grnRegistry,
+        final EntityRegistrar entityRegistrar = new EntityRegistrar(grnRegistry,
                 () -> Set.of(new EntityOwnershipRegistrationHandler(grantService, grnRegistry)));
         final TestViewService viewService = new TestViewService(clusterConfigService, entityRegistrar, mongoCollections);
 

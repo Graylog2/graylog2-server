@@ -49,7 +49,6 @@ export { default as Panel } from './Panel';
 export { default as Row } from './Row';
 export { default as SegmentedControl } from './SegmentedControl';
 export { default as SplitButton } from './SplitButton';
-export { default as Tab } from './Tab';
 export { default as Table } from './Table';
 export { default as Tabs } from './Tabs';
 export { default as Well } from './Well';
