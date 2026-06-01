@@ -115,9 +115,7 @@ describe('processing-load lookups', () => {
     });
 
     it('returns undefined when the response is unavailable or denominator-zero', () => {
-      expect(
-        getStageRulePipelineSharePercent({ ...baseResponse, available: false }, 'p1', 'r1', 0),
-      ).toBeUndefined();
+      expect(getStageRulePipelineSharePercent({ ...baseResponse, available: false }, 'p1', 'r1', 0)).toBeUndefined();
       expect(
         getStageRulePipelineSharePercent({ ...baseResponse, total_cost_microseconds_per_second: 0 }, 'p1', 'r1', 0),
       ).toBeUndefined();
