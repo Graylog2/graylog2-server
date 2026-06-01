@@ -173,7 +173,6 @@ const useColumnWidths = <Entity extends EntityBase>({
       headerMinWidths,
     })
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!isEqual(prevColumnWidthsRef.current, newColumnWidths)) {
       prevColumnWidthsRef.current = newColumnWidths;
       setColumnWidths(newColumnWidths);
