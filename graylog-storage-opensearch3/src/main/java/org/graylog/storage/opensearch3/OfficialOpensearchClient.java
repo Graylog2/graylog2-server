@@ -16,13 +16,12 @@
  */
 package org.graylog.storage.opensearch3;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
+import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.core5.http.ContentTooLongException;
 import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
-import org.graylog.storage.exceptions.ParsedOpenSearchException;
 import org.graylog2.indexer.BatchSizeTooLargeException;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.InvalidWriteTargetException;
@@ -38,12 +37,12 @@ import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch.generic.Body;
 import org.opensearch.client.opensearch.generic.Request;
 import org.opensearch.client.opensearch.generic.Response;
+import org.opensearch.client.transport.httpclient5.ApacheHttpClient5Options;
 import org.opensearch.client.transport.httpclient5.ResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -93,12 +92,20 @@ public final class OfficialOpensearchClient {
     }
 
     /**
-     * Uses a timeout to wait for results from an asynchronous request.
-     * Attention: This is a client timeout, not a server timeout. This doesn't mean the request is cancelled after the timeout.
+     * Executes an asynchronous request with a per-request HTTP response timeout, overriding the
+     * globally configured socket timeout. The Java-level get() acts as a safety net for the same
+     * duration. The request is not cancelled server-side if the timeout fires.
      */
     <T> T executeWithClientTimeout(ThrowingAsyncFunction<CompletableFuture<T>> operation, String errorMessage, Duration timeout) {
         try {
-            CompletableFuture<T> futureResponse = async(operation, errorMessage);
+            final ApacheHttpClient5Options options = ApacheHttpClient5Options.DEFAULT.toBuilder()
+                    .setRequestConfig(RequestConfig.custom()
+                            .setResponseTimeout(timeout.toMilliseconds(), TimeUnit.MILLISECONDS)
+                            .build())
+                    .build();
+            CompletableFuture<T> futureResponse = async(
+                    asyncClient -> operation.apply(asyncClient.withTransportOptions(options)),
+                    errorMessage);
             return futureResponse.get(timeout.toMilliseconds(), TimeUnit.MILLISECONDS);
         } catch (Throwable t) {
             throw mapException(t, errorMessage);
