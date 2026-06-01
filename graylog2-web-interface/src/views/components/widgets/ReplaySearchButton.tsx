@@ -135,15 +135,7 @@ const ReplaySearchButton = ({
   parameterBindings = undefined,
 }: Props) => {
   const sessionId = useMemo(() => `replay-search-${generateId()}`, []);
-  const searchLink = buildSearchLink(
-    sessionId,
-    timerange,
-    queryString,
-    streams,
-    streamCategories,
-    parameters,
-    filters,
-  );
+  const searchLink = buildSearchLink(sessionId, timerange, queryString, streams, streamCategories, parameters, filters);
 
   const onReplaySearch = useCallback(() => {
     if (parameters?.size || filters?.size) {
