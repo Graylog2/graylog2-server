@@ -85,6 +85,28 @@ const StyledTable = styled(MantineTable)<StyledProps>(
       }
     `}
 
+    & thead > tr > th.${PINNED_CELL_CLASS_NAME} {
+      background-color: ${theme.utils.flattenColorStack([
+        theme.colors.global.contentBackground,
+        theme.colors.table.head.background,
+      ])};
+    }
+
+    & tbody > tr > .${PINNED_CELL_CLASS_NAME},
+    & tfoot > tr > .${PINNED_CELL_CLASS_NAME} {
+      background-color: ${theme.utils.flattenColorStack([
+        theme.colors.global.contentBackground,
+        theme.colors.table.row.background,
+      ])};
+    }
+
+    & tbody > tr > .${PINNED_CELL_STRIPED_CLASS_NAME} {
+      background-color: ${theme.utils.flattenColorStack([
+        theme.colors.global.contentBackground,
+        theme.colors.table.row.backgroundStriped,
+      ])};
+    }
+
     @media print {
       & thead > tr > th {
         white-space: break-spaces;
