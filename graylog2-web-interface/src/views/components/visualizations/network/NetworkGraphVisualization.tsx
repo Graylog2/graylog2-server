@@ -279,7 +279,7 @@ const NetworkGraphVisualization = makeVisualization(
             thickness: 10,
             tickfont: { color: textColor },
           },
-          line: { width: 1.5, color: theme.colors.global.contentBackground },
+          line: { width: 1.5, color: theme.colors.text.primary },
         },
         customdata: nodes.map((n) => ({ field: n.field, value: n.value })),
         hovertemplate: '%{text}<br>Connections: %{marker.color}<extra></extra>',
