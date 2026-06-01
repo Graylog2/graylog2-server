@@ -104,8 +104,8 @@ const TestAgainstStreamButton = ({
         <ListGroup>
           {streams.map((stream) =>
             stream.is_default ? (
-              <ListGroupItem key={stream.id} disabled title="Cannot test against the default stream">
-                {stream.title}
+              <ListGroupItem key={stream.id} disabled>
+                <span title="Cannot test against the default stream">{stream.title}</span>
               </ListGroupItem>
             ) : (
               <ListGroupItem key={stream.id} onClick={() => handleStreamSelect(stream)}>
