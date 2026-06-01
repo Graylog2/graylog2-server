@@ -30,8 +30,18 @@ class DefaultMessageFactory implements MessageFactory {
     }
 
     @Override
+    public Message createUnaccountedMessage(final String message, final String source, final DateTime timestamp) {
+        return new Message(message, source, timestamp, true);
+    }
+
+    @Override
     public Message createMessage(final Map<String, Object> fields) {
         return new Message(fields);
+    }
+
+    @Override
+    public Message createUnaccountedMessage(Map<String, Object> fields) {
+        return new Message(fields, true);
     }
 
     @Override
@@ -40,7 +50,7 @@ class DefaultMessageFactory implements MessageFactory {
     }
 
     @Override
-    public Message createUnaccountedMessage(final String message, final String source, final DateTime timestamp) {
-        return new Message(message, source, timestamp, true);
+    public Message createUnaccountedMessage(String id, Map<String, Object> newFields) {
+        return new Message(id, newFields, true);
     }
 }

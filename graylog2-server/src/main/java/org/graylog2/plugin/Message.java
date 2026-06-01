@@ -411,17 +411,26 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         this(message, source, timestamp, false);
     }
 
-    // Intentionally package-private to enforce MessageFactory usage.
-    Message(final Map<String, Object> fields) {
-        this((String) fields.get(FIELD_ID), Maps.filterKeys(fields, not(equalTo(FIELD_ID))));
+    Message(final Map<String, Object> fields, boolean excludedFromTrafficAccounting) {
+        this((String) fields.get(FIELD_ID), Maps.filterKeys(fields, not(equalTo(FIELD_ID))), excludedFromTrafficAccounting);
     }
 
     // Intentionally package-private to enforce MessageFactory usage.
-    Message(String id, Map<String, Object> newFields) {
+    Message(final Map<String, Object> fields) {
+        this(fields, false);
+    }
+
+    // Intentionally package-private to enforce MessageFactory usage.
+    Message(String id, Map<String, Object> newFields, boolean excludedFromTrafficAccounting) {
         this.excludedFromTrafficAccounting = false;
         Preconditions.checkArgument(id != null, "message id cannot be null");
         fields.put(FIELD_ID, id);
         addFields(newFields);
+    }
+
+    // Intentionally package-private to enforce MessageFactory usage.
+    Message(String id, Map<String, Object> newFields) {
+        this(id, newFields, false);
     }
 
     public boolean isComplete() {
@@ -716,11 +725,42 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         return valueSize;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Returns the accumulated size of all message fields. The value stays factual even for messages
+     * excluded from accounting (it is also stored as {@link #FIELD_GL2_ACCOUNTED_MESSAGE_SIZE});
+     * exclusion is signaled via {@link #isExcludedFromTrafficAccounting()}, which removes the message
+     * from the traffic counters, rather than by zeroing this value.
+     */
     @Override
     public long getSize() {
-        return excludedFromTrafficAccounting ? 0 : sizeCounter.getCount();
+        return sizeCounter.getCount();
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Returns the raw input size recorded in {@link #FIELD_GL2_INPUT_MESSAGE_SIZE} (set by the decoding
+     * layer from the original transport payload). When no input size was recorded — e.g. for messages
+     * created in-process rather than decoded from an input — it falls back to {@link #getSize()} so the
+     * message is still accounted under input-based licensing rather than escaping it. Note that
+     * exclusion from accounting is signalled via {@link #isExcludedFromTrafficAccounting()}, not by
+     * returning {@code 0} here.
+     */
+    @Override
+    public long getInputMessageSize() {
+        final Object value = getField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE);
+        return value instanceof Number n ? n.longValue() : getSize();
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The flag is fixed at construction (a message is created as excluded via the
+     * {@code MessageFactory.createUnaccountedMessage(...)} factory method) and is never toggled
+     * between accounted and unaccounted afterward.
+     */
     @Override
     public boolean isExcludedFromTrafficAccounting() {
         return excludedFromTrafficAccounting;

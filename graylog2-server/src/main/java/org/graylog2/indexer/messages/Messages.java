@@ -241,9 +241,7 @@ public class Messages {
         final long totalInputSizeOfIndexedMessages = requests.stream()
                 .map(IndexingSuccess::message)
                 .filter(message -> !message.isExcludedFromTrafficAccounting())
-                .filter(ImmutableMessage.class::isInstance)
-                .map(ImmutableMessage.class::cast)
-                .mapToLong(ImmutableMessage::getInputMessageSize)
+                .mapToLong(Indexable::getInputMessageSize)
                 .sum();
 
         if (isSystemTraffic) {
