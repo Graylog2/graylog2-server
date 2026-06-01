@@ -28,7 +28,6 @@ import SearchButton from 'views/components/searchbar/SearchButton';
 import SearchActionsMenu from 'views/components/searchbar/saved-search/SearchActionsMenu';
 import TimeRangeFilter from 'views/components/searchbar/time-range-filter';
 import ViewsQueryInput from 'views/components/searchbar/ViewsQueryInput';
-import StreamsFilter from 'views/components/searchbar/StreamsFilter';
 import ViewsRefreshControls from 'views/components/searchbar/ViewsRefreshControls';
 import ScrollToHint from 'views/components/common/ScrollToHint';
 import { StreamsStore } from 'views/stores/StreamsStore';
@@ -74,11 +73,12 @@ import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
 import useIsLoading from 'views/hooks/useIsLoading';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import { defaultCompare } from 'logic/DefaultCompare';
-import StreamCategoryFilter from 'views/components/searchbar/StreamCategoryFilter';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
 import useSearchResultTimeRangeErrorCheck from 'views/hooks/useSearchResultTimeRangeErrorCheck';
+import StreamsFilter from 'views/components/searchbar/StreamsFilter';
+import type { StreamsAndCategoriesSelection } from 'views/components/common/StreamsAndCategoriesFilter';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -101,7 +101,7 @@ const defaultOnSubmit = async (
   currentQuery: Query,
   restartAutoRefresh: () => void,
 ) => {
-  const { timerange, streams, streamCategories, queryString } = values;
+  const { timerange, streamsAndCategories, queryString } = values;
   restartAutoRefresh();
   const queryWithPluginData = await executePluggableSubmitHandler(
     dispatch,
@@ -113,7 +113,7 @@ const defaultOnSubmit = async (
   const newQuery = queryWithPluginData
     .toBuilder()
     .timerange(timerange)
-    .filter(newFiltersForQuery(streams, streamCategories))
+    .filter(newFiltersForQuery(streamsAndCategories?.streams, streamsAndCategories?.categories))
     .query(createElasticsearchQueryString(queryString))
     .build();
 
@@ -142,8 +142,12 @@ const useInitialFormValues = ({
   const initialValuesFromPlugins = usePluggableInitialValues(currentQuery);
   const streams = filtersToStreamSet(queryFilters.get(id, Immutable.Map())).toJS();
   const streamCategories = filtersToStreamCategorySet(queryFilters.get(id, Immutable.Map())).toJS();
+  const streamsAndCategories: StreamsAndCategoriesSelection = {
+    streams: streams,
+    categories: streamCategories,
+  };
 
-  return { timerange, streams, queryString, streamCategories, ...initialValuesFromPlugins };
+  return { timerange, streamsAndCategories, queryString, ...initialValuesFromPlugins };
 };
 
 const _validateQueryString = (
@@ -154,8 +158,8 @@ const _validateQueryString = (
 ) => {
   const request = {
     timeRange: values?.timerange,
-    streams: values?.streams,
-    streamCategories: values?.streamCategories,
+    streams: values?.streamsAndCategories?.streams,
+    streamCategories: values?.streamsAndCategories?.categories,
     queryString: values?.queryString,
     ...pluggableValidationPayload(values, context, pluggableSearchBarControls),
   };
@@ -270,39 +274,23 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
                         }}
                       />
                       <StreamsAndRefresh>
-                        <Field name="streams">
+                        <Field name="streamsAndCategories">
                           {({ field: { name, value, onChange } }) => (
                             <StreamsFilter
-                              value={value}
+                              value={{ streams: value?.streams, categories: value?.categories }}
                               streams={availableStreams}
-                              onChange={(newStreams) =>
-                                onChange({
-                                  target: {
-                                    value: newStreams,
-                                    name,
-                                  },
-                                })
-                              }
-                            />
-                          )}
-                        </Field>
-                        <Field name="streamCategories">
-                          {({ field: { name, value, onChange } }) => (
-                            <StreamCategoryFilter
-                              value={value}
                               streamCategories={availableStreamCategories}
-                              onChange={(newCategories) =>
+                              onChange={(selected: StreamsAndCategoriesSelection) => {
                                 onChange({
                                   target: {
-                                    value: newCategories,
+                                    value: selected,
                                     name,
                                   },
-                                })
-                              }
+                                });
+                              }}
                             />
                           )}
                         </Field>
-
                         <ViewsRefreshControls disable={!isValid} />
                       </StreamsAndRefresh>
                     </TimeRangeRow>
@@ -325,7 +313,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
                                         ref={editorRef}
                                         view={view}
                                         timeRange={values.timerange}
-                                        streams={values.streams}
+                                        streams={values.streamsAndCategories?.streams}
                                         name={name}
                                         onChange={onChange}
                                         placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'

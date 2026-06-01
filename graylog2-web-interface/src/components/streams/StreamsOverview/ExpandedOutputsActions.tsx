@@ -15,14 +15,24 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { TabsProps } from '@mantine/core';
-import { Tabs as MantineTabs } from '@mantine/core';
 
-type Props = TabsProps;
+import type { Stream } from 'stores/streams/StreamsStore';
+import { Button } from 'components/bootstrap';
+import { LinkContainer, IfPermitted } from 'components/common';
+import Routes from 'routing/Routes';
 
-const Tabs = ({ children, ...props }: Props) => <MantineTabs {...props}>{children}</MantineTabs>;
+type Props = {
+  stream: Stream;
+};
 
-Tabs.List = MantineTabs.List;
-Tabs.Tab = MantineTabs.Tab;
-Tabs.Panel = MantineTabs.Panel;
-export default Tabs;
+const ExpandedOutputsActions = ({ stream }: Props) => (
+  <IfPermitted permissions={[`streams:edit:${stream.id}`]}>
+    <LinkContainer to={`${Routes.stream_view(stream.id)}?segment=destinations`}>
+      <Button bsStyle="link" bsSize="xsmall" disabled={stream.is_default || !stream.is_editable}>
+        Manage Outputs
+      </Button>
+    </LinkContainer>
+  </IfPermitted>
+);
+
+export default ExpandedOutputsActions;
