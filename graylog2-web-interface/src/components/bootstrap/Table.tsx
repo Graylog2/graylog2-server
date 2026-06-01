@@ -31,18 +31,33 @@ export const getPinnedCellClassName = (isPinned: boolean, isStripedRow: boolean)
 
 type Props = React.PropsWithChildren<{
   className?: string;
+  striped?: boolean;
+  hover?: boolean;
+  condensed?: boolean;
+  bordered?: boolean;
+  responsive?: boolean;
 }>;
 
-const StyledTable = styled(MantineTable)(
-  ({ theme }) => css`
+type StyledProps = {
+  $striped?: boolean;
+  $hover?: boolean;
+  $condensed?: boolean;
+  $bordered?: boolean;
+};
+
+const StyledTable = styled(MantineTable)<StyledProps>(
+  ({ theme, $striped, $hover, $condensed, $bordered }) => css`
     --table-border-color: ${theme.colors.table.row.divider};
     font-size: inherit;
 
+    ${$bordered && css`border: 1px solid ${theme.colors.table.row.divider};`}
+
     & th,
     & td {
-      padding: 8px;
+      padding: ${$condensed ? '5px' : '8px'};
       vertical-align: top;
       border-top: 1px solid ${theme.colors.table.row.divider};
+      ${$bordered && css`border: 1px solid ${theme.colors.table.row.divider};`}
     }
 
     & thead > tr > th {
@@ -58,6 +73,18 @@ const StyledTable = styled(MantineTable)(
       transition: background-color 150ms ease-in-out;
     }
 
+    ${$striped && css`
+      & tbody > tr:nth-of-type(odd) {
+        background-color: ${theme.colors.table.row.backgroundStriped};
+      }
+    `}
+
+    ${$hover && css`
+      & tbody > tr:hover {
+        background-color: ${theme.colors.table.row.backgroundHover};
+      }
+    `}
+
     @media print {
       & thead > tr > th {
         white-space: break-spaces;
@@ -67,7 +94,24 @@ const StyledTable = styled(MantineTable)(
   `,
 );
 
-const Table = ({ children, className }: Props) => <StyledTable className={className}>{children}</StyledTable>;
+const Table = ({ children, className, striped, hover, condensed, bordered, responsive }: Props) => {
+  const table = (
+    <StyledTable
+      className={className}
+      $striped={striped}
+      $hover={hover}
+      $condensed={condensed}
+      $bordered={bordered}>
+      {children}
+    </StyledTable>
+  );
+
+  if (responsive) {
+    return <div style={{ overflowX: 'auto' }}>{table}</div>;
+  }
+
+  return table;
+};
 
 /** @component */
 export default Table;
