@@ -91,9 +91,9 @@ describe('MessageActions', () => {
     renderActions();
     await userEvent.click(screen.getByText('Test against stream'));
 
-    expect(screen.getByText('Zebra Stream')).toBeInTheDocument();
-    expect(screen.getByText('alpha Stream')).toBeInTheDocument();
-    expect(screen.getByText('Mango Stream')).toBeInTheDocument();
+    await screen.findByText('Zebra Stream');
+    await screen.findByText('alpha Stream');
+    await screen.findByText('Mango Stream');
   });
 
   it('renders default stream as disabled', async () => {
@@ -103,6 +103,6 @@ describe('MessageActions', () => {
     renderActions();
     await userEvent.click(screen.getByText('Test against stream'));
 
-    expect(screen.getByTitle('Cannot test against the default stream')).toBeInTheDocument();
+    await screen.findByTitle('Cannot test against the default stream');
   });
 });

@@ -87,7 +87,6 @@ const TestAgainstStreamButton = ({
     <>
       <Input
         type="text"
-        id="stream-filter-input"
         formGroupClassName=""
         placeholder="Filter streams"
         onChange={({ target: { value } }) => handleSearch(value)}
