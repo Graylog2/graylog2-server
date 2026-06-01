@@ -14,15 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { forwardRef } from 'react';
+import React from 'react';
 import styled, { css } from 'styled-components';
-// eslint-disable-next-line no-restricted-imports
-import { Jumbotron as BootstrapJumbotron } from 'react-bootstrap';
 
-export const StyledJumbotron = styled(BootstrapJumbotron)(
+import { RowContentStyles } from 'components/bootstrap/Row';
+
+export const Container = styled.div(
   ({ theme }) => css`
-    color: ${theme.colors.text.primary};
-    background-color: ${theme.colors.global.contentBackground};
+    ${RowContentStyles}
+
+    padding: ${theme.spacings.lg} ${theme.spacings.md};
+
+    @media (min-width: ${theme.breakpoints.min.sm}) {
+      padding: ${theme.spacings.xl} ${theme.spacings.lg};
+    }
+
+    @media (min-width: ${theme.breakpoints.min.md}) {
+      padding: ${theme.spacings.xl};
+    }
 
     h2 {
       font-weight: bold;
@@ -36,10 +45,13 @@ export const StyledJumbotron = styled(BootstrapJumbotron)(
   `,
 );
 
-const Jumbotron = forwardRef(
-  (props: React.ComponentPropsWithoutRef<typeof BootstrapJumbotron>, ref: React.Ref<any>) => (
-    <StyledJumbotron ref={ref} {...props} />
-  ),
+type JumbotronProps = {
+  children: React.ReactNode;
+  className?: string;
+};
+
+const Jumbotron = ({ children, className = undefined }: JumbotronProps) => (
+  <Container className={className}>{children}</Container>
 );
 
 export default Jumbotron;
