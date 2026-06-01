@@ -48,7 +48,17 @@ public class StateTest {
     @Test
     public void concurrentStateConstructionDoesNotCauseDuplicateMetricErrors() throws Exception {
         final int threadCount = 10;
-        final MetricRegistry sharedRegistry = new MetricRegistry();
+        final MetricRegistry sharedRegistry = new MetricRegistry() {
+            @Override
+            public void registerAll(com.codahale.metrics.MetricSet metrics) throws IllegalArgumentException {
+                try {
+                    super.registerAll(metrics);
+                } catch (IllegalArgumentException e) {
+                    // Fail the test if duplicate metric registration is attempted (this would normally only be logged).
+                    throw new AssertionError("Duplicate metric set registered", e);
+                }
+            }
+        };
         final CountDownLatch startLatch = new CountDownLatch(1);
         final ExecutorService executor = Executors.newFixedThreadPool(threadCount,
                 new ThreadFactoryBuilder().setNameFormat("state-test-%d").build());
