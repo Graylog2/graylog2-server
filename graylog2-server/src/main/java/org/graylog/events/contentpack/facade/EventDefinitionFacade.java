@@ -175,9 +175,14 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
         final EventDefinitionEntity eventDefinitionEntity = objectMapper.convertValue(entityV1.data(),
                 EventDefinitionEntity.class);
         final EventDefinitionDto decoded = eventDefinitionEntity.toNativeEntity(parameters, nativeEntities);
-        final EventDefinitionDto updated = decoded.toBuilder().id(existing.id()).build();
+        // Preserve the existing entity's ID and scope: the force-update below bypasses the scope
+        // mutability check, so we must not let the decoded content silently change either.
+        final EventDefinitionDto updated = decoded.toBuilder().id(existing.id()).scope(existing.scope()).build();
         final boolean schedule = eventDefinitionEntity.isScheduled().asBoolean(parameters);
-        eventDefinitionHandler.update(updated, schedule);
+        // checkMutability = false: this is a content-pack-driven (installer) write. Illuminate event
+        // definitions are immutable-scoped for user edits, but the installer must rewrite their content
+        // in place to preserve the entity ID across an upgrade.
+        eventDefinitionHandler.update(updated, schedule, false);
     }
 
     @Override
