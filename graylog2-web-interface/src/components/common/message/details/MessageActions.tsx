@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import debounce from 'lodash/debounce';
 
 import { ClipboardButton, JSONClipboardButton } from 'components/common';
@@ -67,13 +67,9 @@ const TestAgainstStreamButton = ({
     });
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleSearch = useCallback(
-    debounce((value: string) => {
-      setSearchParams((cur) => ({ ...cur, query: value, page: 1 }));
-    }, 300),
-    [],
-  );
+  const handleSearch = debounce((value: string) => {
+    setSearchParams((cur) => ({ ...cur, query: value, page: 1 }));
+  }, 300);
 
   const handlePageChange = (newPage: number) => {
     setSearchParams((cur) => ({ ...cur, page: newPage }));
