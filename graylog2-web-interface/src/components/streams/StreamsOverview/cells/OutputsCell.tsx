@@ -19,6 +19,7 @@ import * as React from 'react';
 import { useRef } from 'react';
 
 import type { Stream } from 'stores/streams/StreamsStore';
+import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
 import { CountBadge } from 'components/common';
 
 type Props = {
@@ -27,17 +28,29 @@ type Props = {
 
 const OutputsCell = ({ stream }: Props) => {
   const buttonRef = useRef();
+  const { toggleSection, expandedSections } = useExpandedSections();
 
   if (stream.is_default || !stream.is_editable) {
     return null;
   }
 
-  const outputCount = stream.outputs?.length || 0;
+  const outputCount = stream.outputs?.length ?? 0;
   if (outputCount === 0) {
     return null;
   }
 
-  return <CountBadge count={outputCount} ref={buttonRef} title="Stream Outputs" />;
+  const outputsSectionIsOpen = expandedSections?.[stream.id]?.includes('outputs');
+  const outputsSectionTitle = `${outputsSectionIsOpen ? 'Hide' : 'Show'} stream outputs`;
+
+  return (
+    <CountBadge
+      count={outputCount}
+      iconName={outputsSectionIsOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
+      onClick={() => toggleSection(stream.id, 'outputs')}
+      ref={buttonRef}
+      title={outputsSectionTitle}
+    />
+  );
 };
 
 export default OutputsCell;

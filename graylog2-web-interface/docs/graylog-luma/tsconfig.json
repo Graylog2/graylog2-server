@@ -3,6 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "@storybook/addon-docs/blocks": ["./node_modules/@storybook/addon-docs/dist/blocks.d.ts"],
       "@storybook/react": ["./node_modules/@storybook/react/dist/index.d.ts"],
       "@storybook/react-webpack5": ["./node_modules/@storybook/react-webpack5/dist/index.d.ts"],
       "storybook/theming": ["./node_modules/storybook/dist/theming/index.d.ts"],

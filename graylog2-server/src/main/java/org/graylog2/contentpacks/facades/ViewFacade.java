@@ -34,7 +34,7 @@ import org.graylog.plugins.views.search.views.ViewStateDTO;
 import org.graylog.plugins.views.search.views.ViewSummaryDTO;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog.security.GrantDTO;
-import org.graylog.security.entities.EntityRegistrar;
+import org.graylog.security.shares.EntityGrantLookup;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
@@ -74,7 +74,7 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
     private final SearchDbService searchDbService;
     private final ViewSummaryService viewSummaryService;
     protected final UserService userService;
-    private final EntityRegistrar entityRegistrar;
+    private final EntityGrantLookup grantLookup;
 
     @Inject
     public ViewFacade(ObjectMapper objectMapper,
@@ -82,13 +82,13 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
                       ViewService viewService,
                       ViewSummaryService viewSummaryService,
                       UserService userService,
-                      EntityRegistrar entityRegistrar) {
+                      EntityGrantLookup grantLookup) {
         this.objectMapper = objectMapper;
         this.searchDbService = searchDbService;
         this.viewService = viewService;
         this.viewSummaryService = viewSummaryService;
         this.userService = userService;
-        this.entityRegistrar = entityRegistrar;
+        this.grantLookup = grantLookup;
     }
 
     @Override
@@ -223,7 +223,7 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
     @Override
     public List<GrantDTO> resolveGrants(ViewDTO nativeEntity) {
         final GRNType type = nativeEntity.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH;
-        return entityRegistrar.getGrantsForTarget(type, nativeEntity.id());
+        return grantLookup.getGrantsForTarget(type, nativeEntity.id());
     }
 
     @SuppressWarnings("UnstableApiUsage")
