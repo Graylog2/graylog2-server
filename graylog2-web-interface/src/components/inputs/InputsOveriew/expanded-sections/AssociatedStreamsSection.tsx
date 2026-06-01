@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
 
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 import useEntityTitles from 'hooks/useEntityTitles';
@@ -32,8 +31,8 @@ const AssociatedStreamsSection = ({ input }: Props) => {
   const { metrics, isInitialLoading, isError } = useInputMetricsFor(input.id);
   const messagesPerStream = metrics?.messages_per_stream;
 
-  const streamIds = useMemo(() => (messagesPerStream ? Object.keys(messagesPerStream) : []), [messagesPerStream]);
-  const titleEntities = useMemo(() => streamIds.map((id) => ({ id, type: 'streams' })), [streamIds]);
+  const streamIds = messagesPerStream ? Object.keys(messagesPerStream) : [];
+  const titleEntities = streamIds.map((id) => ({ id, type: 'streams' }));
   const { titlesById, isInitialLoading: areTitlesLoading } = useEntityTitles(titleEntities);
 
   if (isInitialLoading && !messagesPerStream) {

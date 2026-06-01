@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import Qs from 'qs';
 
@@ -56,8 +55,8 @@ const useInputMetrics = (
   isInitialLoading: boolean;
   isError: boolean;
 } => {
-  const stableIds = useMemo(() => sortedUnique(inputIds), [inputIds]);
-  const stableFields = useMemo(() => sortedUnique(fields), [fields]);
+  const stableIds = sortedUnique(inputIds);
+  const stableFields = sortedUnique(fields);
   const enabled = stableIds.length > 0 && stableFields.length > 0;
 
   const { data, isInitialLoading, isError } = useQuery({

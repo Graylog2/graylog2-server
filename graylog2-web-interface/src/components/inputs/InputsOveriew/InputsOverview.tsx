@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo, useState } from 'react';
+import { useState } from 'react';
 import * as Immutable from 'immutable';
 
 import type { NodeInfo } from 'stores/nodes/NodesStore';
@@ -69,15 +69,16 @@ const InputsOverview = ({
   const { data: inputStates } = useInputsStates();
   const { tableLayout, additionalAttributes } = getInputsTableElements();
   const resolvedTableLayout = entityTableId ? { ...tableLayout, entityTableId } : tableLayout;
-  const resolvedKeyFn = useCallback(
-    (searchParams: SearchParams) => [...KEY_PREFIX, entityTableId ?? tableLayout.entityTableId, searchParams],
-    [entityTableId, tableLayout.entityTableId],
-  );
+  const resolvedKeyFn = (searchParams: SearchParams) => [
+    ...KEY_PREFIX,
+    entityTableId ?? tableLayout.entityTableId,
+    searchParams,
+  ];
   const { entityActions, expandedSections } = useTableElements({
     inputTypes,
     inputTypeDescriptions,
   });
-  const columnRenderers = useMemo(() => customColumnRenderers({ inputTypes, inputStates }), [inputTypes, inputStates]);
+  const columnRenderers = customColumnRenderers({ inputTypes, inputStates });
   const fetchEntities = (options: SearchParams) => {
     const optionsCopy = { ...options };
 
@@ -91,20 +92,25 @@ const InputsOverview = ({
   };
 
   const [visibleInputIds, setVisibleInputIds] = useState<Array<string>>([]);
-  const onDataLoaded = useCallback((data: PaginatedResponse<Input>) => {
-    setVisibleInputIds(data.list.map((entity) => entity.id));
-  }, []);
+  const onDataLoaded = (data: PaginatedResponse<Input>) => {
+    const nextVisibleInputIds = data.list.map((entity) => entity.id);
+
+    setVisibleInputIds((currentVisibleInputIds) => {
+      const hasSameInputIds =
+        currentVisibleInputIds.length === nextVisibleInputIds.length &&
+        currentVisibleInputIds.every((inputId, index) => inputId === nextVisibleInputIds[index]);
+
+      return hasSameInputIds ? currentVisibleInputIds : nextVisibleInputIds;
+    });
+  };
 
   const { data: layoutPreferences } = useUserLayoutPreferences(resolvedTableLayout.entityTableId);
-  const requestedFields = useMemo(() => {
-    const userPrefs = layoutPreferences?.attributes ?? {};
-    const userSelection = Object.entries(userPrefs)
-      .filter(([, pref]) => pref.status === ATTRIBUTE_STATUS.show)
-      .map(([attributeId]) => attributeId);
-    const visibleColumns = userSelection.length > 0 ? userSelection : resolvedTableLayout.defaultDisplayedAttributes;
-
-    return backendFieldsForVisibleColumns(visibleColumns);
-  }, [layoutPreferences, resolvedTableLayout.defaultDisplayedAttributes]);
+  const userPrefs = layoutPreferences?.attributes ?? {};
+  const userSelection = Object.entries(userPrefs)
+    .filter(([, pref]) => pref.status === ATTRIBUTE_STATUS.show)
+    .map(([attributeId]) => attributeId);
+  const visibleColumns = userSelection.length > 0 ? userSelection : resolvedTableLayout.defaultDisplayedAttributes;
+  const requestedFields = backendFieldsForVisibleColumns(visibleColumns);
 
   return (
     <div>

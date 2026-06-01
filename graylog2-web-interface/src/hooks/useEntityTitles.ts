@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { SystemCatalog } from '@graylog/server-api';
@@ -33,7 +32,7 @@ const useEntityTitles = (
   isInitialLoading: boolean;
   isError: boolean;
 } => {
-  const stableEntities = useMemo(() => [...entities].sort((a, b) => a.id.localeCompare(b.id)), [entities]);
+  const stableEntities = [...entities].sort((a, b) => a.id.localeCompare(b.id));
   const enabled = stableEntities.length > 0;
 
   const { data, isInitialLoading, isError } = useQuery({
@@ -48,16 +47,12 @@ const useEntityTitles = (
     placeholderData: keepPreviousData,
   });
 
-  const titlesById = useMemo(() => {
-    const result: Record<string, string> = {};
-    (data?.entities ?? []).forEach((entry) => {
-      result[entry.id] = entry.title;
-    });
+  const titlesById: Record<string, string> = {};
+  (data?.entities ?? []).forEach((entry) => {
+    titlesById[entry.id] = entry.title;
+  });
 
-    return result;
-  }, [data]);
-
-  const notPermittedIds = useMemo(() => new Set(data?.not_permitted_to_view ?? []), [data]);
+  const notPermittedIds = new Set(data?.not_permitted_to_view ?? []);
 
   return {
     titlesById,

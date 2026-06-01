@@ -17,11 +17,11 @@
 import * as React from 'react';
 import { useQuery } from '@tanstack/react-query';
 
+import { Extractors } from '@graylog/server-api';
+
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 import { Spinner } from 'components/common';
 import { Table } from 'components/bootstrap';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
 import { defaultOnError } from 'util/conditional/onError';
 
 type ExtractorEntry = {
@@ -37,8 +37,7 @@ type ExtractorSummaryList = {
   extractors: Array<ExtractorEntry>;
 };
 
-const fetchExtractors = (inputId: string): Promise<ExtractorSummaryList> =>
-  fetch('GET', qualifyUrl(`/system/inputs/${inputId}/extractors`));
+const fetchExtractors = (inputId: string): Promise<ExtractorSummaryList> => Extractors.list(inputId);
 
 const useInputExtractors = (inputId: string) =>
   useQuery({

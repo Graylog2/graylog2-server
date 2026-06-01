@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
+import styled from 'styled-components';
 
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 import useEntityTitles from 'hooks/useEntityTitles';
@@ -29,12 +29,29 @@ type Props = {
   input: InputSummary;
 };
 
+const StreamColumn = styled.col`
+  width: 80%;
+`;
+
+const MessagesColumn = styled.col`
+  width: 20%;
+`;
+
+const MessageCountHeadCell = styled.th`
+  text-align: right;
+`;
+
+const MessageCountCell = styled.td`
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+`;
+
 const MessagesPerStreamSection = ({ input }: Props) => {
   const { metrics, isInitialLoading, isError } = useInputMetricsFor(input.id);
   const messagesPerStream = metrics?.messages_per_stream;
 
-  const streamIds = useMemo(() => (messagesPerStream ? Object.keys(messagesPerStream) : []), [messagesPerStream]);
-  const titleEntities = useMemo(() => streamIds.map((id) => ({ id, type: 'streams' })), [streamIds]);
+  const streamIds = messagesPerStream ? Object.keys(messagesPerStream) : [];
+  const titleEntities = streamIds.map((id) => ({ id, type: 'streams' }));
   const { titlesById, isInitialLoading: areTitlesLoading } = useEntityTitles(titleEntities);
 
   if (isInitialLoading && !messagesPerStream) {
@@ -53,10 +70,14 @@ const MessagesPerStreamSection = ({ input }: Props) => {
 
   return (
     <Table bordered condensed striped hover>
+      <colgroup>
+        <StreamColumn />
+        <MessagesColumn />
+      </colgroup>
       <thead>
         <tr>
           <th>Stream</th>
-          <th>Messages</th>
+          <MessageCountHeadCell>Messages</MessageCountHeadCell>
         </tr>
       </thead>
       <tbody>
@@ -67,7 +88,7 @@ const MessagesPerStreamSection = ({ input }: Props) => {
           return (
             <tr key={streamId}>
               <td>{title ? <Link to={Routes.stream_view(streamId)}>{label}</Link> : label}</td>
-              <td>{formatCount(count)}</td>
+              <MessageCountCell>{formatCount(count)}</MessageCountCell>
             </tr>
           );
         })}

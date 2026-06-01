@@ -17,37 +17,19 @@
 import * as React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
+import { Extractors } from '@graylog/server-api';
+
 import { asMock } from 'helpers/mocking';
-import fetch from 'logic/rest/FetchProvider';
 
 import ExtractorsSection from './ExtractorsSection';
 
-jest.mock('logic/rest/FetchProvider', () => {
-  const mockFetch = jest.fn();
+jest.mock('@graylog/server-api', () => ({
+  Extractors: {
+    list: jest.fn(),
+  },
+}));
 
-  /* eslint-disable class-methods-use-this */
-  class MockBuilder {
-    authenticated = () => this;
-    session = () => this;
-    setHeader = () => this;
-    setHeaders = () => this;
-    json = () => this;
-    plaintext = () => this;
-    noSessionExtension = () => this;
-    build = () => Promise.resolve({});
-  }
-  /* eslint-enable class-methods-use-this */
-
-  return {
-    __esModule: true,
-    default: mockFetch,
-    Builder: MockBuilder,
-    FetchError: class {},
-    fetchPlainText: jest.fn(() => Promise.resolve({})),
-    fetchPeriodically: jest.fn(() => Promise.resolve({})),
-    fetchFile: jest.fn(() => Promise.resolve({})),
-  };
-});
+type ExtractorsListResponse = Awaited<ReturnType<typeof Extractors.list>>;
 
 const input = {
   id: 'input-1',
@@ -69,26 +51,24 @@ describe('ExtractorsSection', () => {
   });
 
   it('lazy-loads extractors from the per-input endpoint', async () => {
-    asMock(fetch).mockResolvedValue({
+    asMock(Extractors.list).mockResolvedValue({
       total: 2,
       extractors: [
         { id: 'e1', title: 'Parse JSON', type: 'json', source_field: 'message', target_field: 'parsed' },
         { id: 'e2', title: 'Grok message', type: 'grok', source_field: 'message', target_field: 'fields' },
       ],
-    });
+    } as ExtractorsListResponse);
 
     render(<ExtractorsSection input={input} />);
 
-    await waitFor(() =>
-      expect(fetch).toHaveBeenCalledWith('GET', expect.stringContaining('/system/inputs/input-1/extractors')),
-    );
+    await waitFor(() => expect(Extractors.list).toHaveBeenCalledWith('input-1'));
 
     expect(await screen.findByText('Parse JSON')).toBeInTheDocument();
     expect(screen.getByText('Grok message')).toBeInTheDocument();
   });
 
   it('shows an empty-state when the input has no configured extractors', async () => {
-    asMock(fetch).mockResolvedValue({ total: 0, extractors: [] });
+    asMock(Extractors.list).mockResolvedValue({ total: 0, extractors: [] } as ExtractorsListResponse);
 
     render(<ExtractorsSection input={input} />);
 
