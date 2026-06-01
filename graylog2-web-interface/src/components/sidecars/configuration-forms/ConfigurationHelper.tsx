@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { Col, Panel, Row, Tab, Tabs } from 'components/bootstrap';
+import { Col, Panel, Row, Tabs } from 'components/bootstrap';
 
 import TemplatesHelper from './TemplatesHelper';
 import ConfigurationVariablesHelper from './ConfigurationVariablesHelper';
@@ -30,14 +30,19 @@ const ConfigurationHelper = ({ onVariableRename }: Props) => (
   <Panel header="Collector Configuration Reference">
     <Row className="row-sm">
       <Col md={12}>
-        <Tabs id="configurationsHelper" defaultActiveKey={1} animation={false}>
-          <Tab eventKey={1} title="Runtime Variables">
+        <Tabs defaultValue="runtime-variables">
+          <Tabs.List>
+            <Tabs.Tab value="runtime-variables">Runtime Variables</Tabs.Tab>
+            <Tabs.Tab value="variables">Variables</Tabs.Tab>
+            <Tabs.Tab value="reference">Reference</Tabs.Tab>
+          </Tabs.List>
+          <Tabs.Panel value="runtime-variables">
             <p className={ConfigurationHelperStyle.marginQuickReferenceText}>
               These variables will be filled with the runtime information from each Sidecar
             </p>
             <TemplatesHelper />
-          </Tab>
-          <Tab eventKey={2} title="Variables">
+          </Tabs.Panel>
+          <Tabs.Panel value="variables">
             <p className={ConfigurationHelperStyle.marginQuickReferenceText}>
               Use variables to share text snippets across multiple configurations.
               <br />
@@ -46,8 +51,8 @@ const ConfigurationHelper = ({ onVariableRename }: Props) => (
               <code>$&#123;&apos;$&apos;&#125;&#123;foo&#125;</code>.
             </p>
             <ConfigurationVariablesHelper onVariableRename={onVariableRename} />
-          </Tab>
-          <Tab eventKey={3} title="Reference">
+          </Tabs.Panel>
+          <Tabs.Panel value="reference">
             <Row className="row-sm">
               <Col md={12}>
                 <p className={ConfigurationHelperStyle.marginQuickReferenceText}>
@@ -83,7 +88,7 @@ const ConfigurationHelper = ({ onVariableRename }: Props) => (
                 </ul>
               </Col>
             </Row>
-          </Tab>
+          </Tabs.Panel>
         </Tabs>
       </Col>
     </Row>
