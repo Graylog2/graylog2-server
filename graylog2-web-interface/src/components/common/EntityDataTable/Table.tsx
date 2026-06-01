@@ -51,18 +51,8 @@ const StyledTable = styled(BaseTable)(
       padding: ${CELL_PADDING}px;
     }
 
-    && {
-      > tbody:nth-of-type(even) > tr {
-        background-color: ${theme.colors.table.row.backgroundStriped};
-      }
-
-      > tbody:nth-of-type(odd) > tr {
-        background-color: ${theme.colors.table.row.background};
-      }
-
-      > tbody > tr.active {
-        background-color: ${theme.colors.table.row.backgroundStriped} !important;
-      }
+    tbody > tr.active {
+      background-color: ${theme.colors.table.row.backgroundStriped} !important;
     }
   `,
 );
@@ -116,7 +106,7 @@ const Table = <Entity extends EntityBase>({
   const isRowExpanded = (rowId: string) => !!expandedSections?.[rowId];
 
   return (
-    <StyledTable>
+    <StyledTable striped>
       <TableHead headerGroups={headerGroups} />
       {rows.map((row) => {
         const visibleCells = row.getVisibleCells();
