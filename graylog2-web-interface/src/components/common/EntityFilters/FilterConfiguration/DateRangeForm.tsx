@@ -25,10 +25,7 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import type { TimeRangePickerFormValues } from 'views/components/time-range-picker/types';
 import useTimeRangeValidation from 'views/components/time-range-picker/useTimeRangeValidation';
 
-import {
-  filterValueToTimeRangePickerFormValues,
-  timeRangePickerFormValuesToFilterValue,
-} from '../helpers/timeRange';
+import { filterValueToTimeRangePickerFormValues, timeRangePickerFormValuesToFilterValue } from '../helpers/timeRange';
 import type { Filter } from '../types';
 
 const TimeRangePickerFormContent = loadAsync(
