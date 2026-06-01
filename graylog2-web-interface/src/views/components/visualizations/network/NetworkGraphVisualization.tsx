@@ -25,6 +25,7 @@ import useMapKeys from 'views/components/visualizations/useMapKeys';
 import extractLeafPaths from 'views/components/visualizations/utils/extractLeafPaths';
 import type { NodeCustomData } from 'views/components/visualizations/sankey/SankeyVisualization';
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
+import NetworkVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NetworkVisualizationConfig';
 
 import buildGraph from './buildGraph';
 
@@ -134,8 +135,6 @@ type EdgeTrace = {
 
 type FontStyle = { color: string };
 
-type ColorScale = Array<[number, string]>;
-
 type NodeTrace = {
   type: 'scatter';
   mode: 'markers+text';
@@ -148,7 +147,8 @@ type NodeTrace = {
   marker: {
     size: number;
     color: Array<number>;
-    colorscale: ColorScale;
+    colorscale: string;
+    reversescale: boolean;
     showscale: boolean;
     colorbar: {
       title: { text: string; font: FontStyle; side: 'top' };
@@ -184,6 +184,8 @@ const NetworkGraphVisualization = makeVisualization(
     const mapKeys = useMapKeys();
     const theme = useTheme();
     const { onChartClick, initializeGraphDivRef, popover } = usePlotOnClickPopover('network', config);
+    const visualizationConfig = (config.visualizationConfig ??
+      NetworkVisualizationConfig.empty()) as NetworkVisualizationConfig;
 
     const traces = useMemo<[EdgeTrace, NodeTrace] | null>(() => {
       const rowFields = config.rowPivots.flatMap((pivot) => pivot.fields);
@@ -234,13 +236,6 @@ const NetworkGraphVisualization = makeVisualization(
       });
 
       const textColor = theme.colors.text.primary;
-      // Start the gradient at the saturated `info` shade — the `lightest`/`lighter` tints
-      // blend into the chart background and bury low-degree nodes.
-      const nodeColorscale: ColorScale = [
-        [0, theme.colors.variant.info],
-        [0.5, theme.colors.variant.dark.info],
-        [1, theme.colors.variant.darkest.info],
-      ];
 
       const edgeTrace: EdgeTrace = {
         type: 'scatter',
@@ -270,7 +265,8 @@ const NetworkGraphVisualization = makeVisualization(
         marker: {
           size: 14,
           color: nodes.map((n) => n.degree),
-          colorscale: nodeColorscale,
+          colorscale: visualizationConfig.colorScale,
+          reversescale: visualizationConfig.reverseScale,
           showscale: true,
           colorbar: {
             title: { text: 'Connections', font: { color: textColor }, side: 'top' },
@@ -291,7 +287,7 @@ const NetworkGraphVisualization = makeVisualization(
       };
 
       return [edgeTrace, nodeTrace];
-    }, [config, mapKeys, rows, theme]);
+    }, [config, mapKeys, rows, theme, visualizationConfig]);
 
     const layout = useMemo(() => buildLayout(width, height), [width, height]);
 

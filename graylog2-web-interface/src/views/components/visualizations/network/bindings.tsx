@@ -16,7 +16,16 @@
  */
 import type { VisualizationType } from 'views/types';
 import NetworkGraphVisualization from 'views/components/visualizations/network/NetworkGraphVisualization';
+import NetworkVisualizationConfig, {
+  COLORSCALES,
+} from 'views/logic/aggregationbuilder/visualizations/NetworkVisualizationConfig';
+import { defaultCompare } from 'logic/DefaultCompare';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
+
+type NetworkVisualizationConfigFormValues = {
+  colorScale: (typeof COLORSCALES)[number];
+  reverseScale: boolean;
+};
 
 const countGroupingFields = (formValues: WidgetConfigFormValues) =>
   (formValues.groupBy?.groupings ?? []).reduce((total, grouping) => total + (grouping.fields?.length ?? 0), 0);
@@ -29,10 +38,37 @@ const validate = (formValues: WidgetConfigFormValues) => {
   return {};
 };
 
-const networkGraph: VisualizationType<typeof NetworkGraphVisualization.type> = {
+const networkGraph: VisualizationType<
+  typeof NetworkGraphVisualization.type,
+  NetworkVisualizationConfig,
+  NetworkVisualizationConfigFormValues
+> = {
   type: NetworkGraphVisualization.type,
   displayName: 'Network Graph',
   component: NetworkGraphVisualization,
+  config: {
+    fromConfig: (config: NetworkVisualizationConfig = NetworkVisualizationConfig.empty()) => ({
+      colorScale: config.colorScale,
+      reverseScale: config.reverseScale,
+    }),
+    toConfig: ({ colorScale, reverseScale = false }: NetworkVisualizationConfigFormValues) =>
+      NetworkVisualizationConfig.create(colorScale, reverseScale),
+    createConfig: () => ({ colorScale: 'YlOrRd', reverseScale: false }),
+    fields: [
+      {
+        name: 'colorScale',
+        title: 'Color Scale',
+        required: true,
+        type: 'select',
+        options: [...COLORSCALES].sort(defaultCompare),
+      },
+      {
+        name: 'reverseScale',
+        type: 'boolean',
+        title: 'Reverse Scale',
+      },
+    ],
+  },
   validate,
 };
 
