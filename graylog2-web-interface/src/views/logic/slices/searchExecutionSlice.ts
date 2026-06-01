@@ -241,7 +241,7 @@ export const executeWithExecutionState =
         return searchExecutors.startJob(search, searchTypesToSearch, executionState, [activeQuery]);
       })
       .then((jobIds: JobIds) => {
-        if (jobIds.viewLastUpdatedAt) {
+        if (jobIds?.viewLastUpdatedAt) {
           const view = selectView(getState());
           if (view?.lastUpdatedAt && new Date(jobIds.viewLastUpdatedAt) > view.lastUpdatedAt) {
             dispatch(setServerViewLastUpdatedAt(jobIds.viewLastUpdatedAt));
