@@ -34,6 +34,7 @@ import static org.graylog.events.notifications.EventNotificationModelData.FIELD_
 
 public class EventSummaryModifier implements EventModifier {
     private final Engine templateEngine;
+    public static final String EMPTY_MESSAGE_AFTER_TRANSFORMATION = "(empty message after event summary template transformation)";
 
     @Inject
     public EventSummaryModifier(Engine templateEngine) {
@@ -65,7 +66,7 @@ public class EventSummaryModifier implements EventModifier {
             final ImmutableMap<String, Object> dataModel = dataModelBuilder.build();
 
             final var message = templateEngine.transform(eventDefinition.eventSummaryTemplate(), dataModel);
-            event.setMessage(Strings.isNullOrEmpty(message) ? "(empty message after event summary template transformation)" : message);
+            event.setMessage(Strings.isNullOrEmpty(message) ? EMPTY_MESSAGE_AFTER_TRANSFORMATION : message);
         }
     }
 }
