@@ -25,6 +25,7 @@ import com.github.joschi.jadconfig.util.Duration;
 import jakarta.inject.Inject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.EnumUtils;
+import org.apache.hc.client5.http.config.RequestConfig;
 import org.graylog.storage.opensearch3.blocks.BlockSettingsParser;
 import org.graylog.storage.opensearch3.cluster.ClusterStateApi;
 import org.graylog.storage.opensearch3.stats.ClusterStatsApi;
@@ -88,6 +89,7 @@ import org.opensearch.client.opensearch.indices.get_mapping.IndexMappingRecord;
 import org.opensearch.client.opensearch.indices.stats.IndicesStats;
 import org.opensearch.client.opensearch.indices.update_aliases.AddAction;
 import org.opensearch.client.opensearch.indices.update_aliases.RemoveAction;
+import org.opensearch.client.transport.httpclient5.ApacheHttpClient5Options;
 import org.opensearch.client.transport.httpclient5.ResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,6 +108,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -628,15 +631,23 @@ public class IndicesAdapterOS implements IndicesAdapter {
 
     @Override
     public void optimizeIndex(String index, int maxNumSegments, Duration timeout) {
-        ForcemergeRequest request = ForcemergeRequest.of(b -> b
+        final ForcemergeRequest request = ForcemergeRequest.of(b -> b
                 .index(index)
                 .maxNumSegments(Integer.toUnsignedLong(maxNumSegments))
                 .flush(true)
         );
 
-        String errorMessage = "Force merge of index " + index + " did not complete in " + timeout.toString() + ", not waiting for completion any longer.";
-        c.executeWithClientTimeout((asyncClient) -> asyncClient.indices().forcemerge(request), errorMessage, timeout);
+        final ApacheHttpClient5Options options = ApacheHttpClient5Options.DEFAULT.toBuilder()
+                .setRequestConfig(RequestConfig.custom()
+                        .setResponseTimeout(timeout.toMilliseconds(), TimeUnit.MILLISECONDS)
+                        .build())
+                .build();
 
+        final String errorMessage = "Force merge of index " + index + " did not complete in " + timeout + ", not waiting for completion any longer.";
+        c.executeWithClientTimeout(
+                (asyncClient) -> asyncClient.withTransportOptions(options).indices().forcemerge(request),
+                errorMessage,
+                timeout);
     }
 
     @Override

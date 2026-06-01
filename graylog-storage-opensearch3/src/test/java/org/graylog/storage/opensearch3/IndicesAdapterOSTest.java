@@ -18,6 +18,7 @@ package org.graylog.storage.opensearch3;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.joschi.jadconfig.util.Duration;
 import org.graylog.storage.opensearch3.cluster.ClusterStateApi;
 import org.graylog.storage.opensearch3.stats.ClusterStatsApi;
 import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
@@ -35,12 +36,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opensearch.client.opensearch._types.FlushStats;
 import org.opensearch.client.opensearch.indices.stats.IndexStats;
 import org.opensearch.client.opensearch.indices.stats.IndicesStats;
+import org.opensearch.client.transport.TransportOptions;
+import org.opensearch.client.transport.httpclient5.ApacheHttpClient5Options;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -221,6 +225,23 @@ class IndicesAdapterOSTest {
         assertThat(adapter.getOutdatedIndices(2)).containsExactly(
                 new OutdatedIndex("old_index", "1.3.0", true)
         );
+    }
+
+    @Test
+    void testOptimizeIndexSetsResponseTimeoutOnRequest() {
+        final Duration timeout = Duration.hours(1);
+        final AtomicReference<TransportOptions> capturedOptions = new AtomicReference<>();
+
+        final OfficialOpensearchClient client = ServerlessOpenSearchClient.builder()
+                .captureOptions(capturedOptions::set)
+                .stubResponse("POST", "/*/_forcemerge", "{\"_shards\":{\"total\":1,\"successful\":1,\"failed\":0}}")
+                .build();
+        buildAdapter(client).optimizeIndex("test_index", 1, timeout);
+
+        assertThat(capturedOptions.get()).isInstanceOf(ApacheHttpClient5Options.class);
+        final var httpOptions = (ApacheHttpClient5Options) capturedOptions.get();
+        assertThat(httpOptions.getRequestConfig().getResponseTimeout().toMilliseconds())
+                .isEqualTo(timeout.toMilliseconds());
     }
 
     private IndicesAdapterOS buildAdapterWithSettingsResponse(String settingsJson) {
