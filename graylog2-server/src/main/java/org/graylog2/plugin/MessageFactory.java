@@ -48,6 +48,8 @@ public interface MessageFactory {
      */
     Message createMessage(String id, Map<String, Object> newFields);
 
+    Message createUnaccountedMessage(String message, String source, DateTime timestamp);
+
     /**
      * Returns a fake {@link Message}. This message must not be used for real message processing!
      *

@@ -227,4 +227,9 @@ public class SerializationMemoizingMessage implements ImmutableMessage {
     public Object getMessageQueueId() {
         return delegate.getMessageQueueId();
     }
+
+    @Override
+    public boolean isExcludedFromTrafficAccounting() {
+        return delegate.isExcludedFromTrafficAccounting();
+    }
 }

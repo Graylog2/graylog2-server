@@ -363,6 +363,8 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
     private List<ProcessingError> processingErrors;
 
+    private final boolean excludedFromTrafficAccounting;
+
     private static final IdentityHashMap<Class<?>, Integer> classSizes = Maps.newIdentityHashMap();
 
     static {
@@ -396,11 +398,17 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     }
 
     // Intentionally package-private to enforce MessageFactory usage.
-    Message(final String message, final String source, final DateTime timestamp) {
+    Message(final String message, final String source, final DateTime timestamp, boolean excludedFromTrafficAccounting) {
+        this.excludedFromTrafficAccounting = excludedFromTrafficAccounting;
         fields.put(FIELD_ID, new UUID().toString());
         addRequiredField(FIELD_MESSAGE, message);
         addRequiredField(FIELD_SOURCE, source);
         addRequiredField(FIELD_TIMESTAMP, timestamp);
+    }
+
+    // Intentionally package-private to enforce MessageFactory usage.
+    Message(final String message, final String source, final DateTime timestamp) {
+        this(message, source, timestamp, false);
     }
 
     // Intentionally package-private to enforce MessageFactory usage.
@@ -410,6 +418,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
     // Intentionally package-private to enforce MessageFactory usage.
     Message(String id, Map<String, Object> newFields) {
+        this.excludedFromTrafficAccounting = false;
         Preconditions.checkArgument(id != null, "message id cannot be null");
         fields.put(FIELD_ID, id);
         addFields(newFields);
@@ -709,7 +718,12 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
     @Override
     public long getSize() {
-        return sizeCounter.getCount();
+        return excludedFromTrafficAccounting ? 0 : sizeCounter.getCount();
+    }
+
+    @Override
+    public boolean isExcludedFromTrafficAccounting() {
+        return excludedFromTrafficAccounting;
     }
 
     public static boolean validKey(final String key) {

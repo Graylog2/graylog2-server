@@ -71,4 +71,8 @@ public interface Indexable {
     default boolean supportsFailureHandling() {
         return false;
     }
+
+    default boolean isExcludedFromTrafficAccounting() {
+        return false;
+    }
 }
