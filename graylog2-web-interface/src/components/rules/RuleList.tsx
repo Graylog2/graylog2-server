@@ -18,10 +18,9 @@ import React from 'react';
 
 import { DataTable } from 'components/common';
 import type { RuleType, RulesContext } from 'stores/rules/RulesStore';
+import { useProcessingLoadContext, type ProcessingLoadResponse } from 'components/pipelines/processing-load';
 
 import RuleListEntry from './RuleListEntry';
-
-const headers = ['Title', 'Description', 'Created', 'Last modified', 'Throughput', 'Errors', 'Pipelines', 'Actions'];
 
 const headerCellFormatter = (header: React.ReactNode) => <th>{header}</th>;
 
@@ -30,15 +29,49 @@ type Props = {
   rulesContext?: RulesContext;
   onDelete: (ruleType: RuleType) => () => void;
   searchFilter: React.ReactNode;
+  showLoadColumn?: boolean;
+  processingLoad?: ProcessingLoadResponse;
+  processingLoadError?: boolean;
 };
 
-const RuleList = ({ rules, searchFilter, onDelete, rulesContext = undefined }: Props) => {
+const RuleList = ({
+  rules,
+  searchFilter,
+  onDelete,
+  rulesContext = undefined,
+  showLoadColumn: showLoadColumnProp = undefined,
+  processingLoad: processingLoadProp = undefined,
+  processingLoadError: processingLoadErrorProp = undefined,
+}: Props) => {
+  const {
+    metricsEnabled,
+    processingLoad: processingLoadContext,
+    processingLoadError: processingLoadErrorContext,
+  } = useProcessingLoadContext();
+  const showLoadColumn = showLoadColumnProp ?? metricsEnabled;
+  const processingLoad = processingLoadProp ?? processingLoadContext;
+  const processingLoadError = processingLoadErrorProp ?? processingLoadErrorContext;
+  const headers = [
+    'Title',
+    'Description',
+    'Created',
+    'Last modified',
+    'Throughput',
+    'Errors',
+    ...(showLoadColumn ? ['Pipeline Load (15m)'] : []),
+    'Pipelines',
+    'Actions',
+  ];
+
   const ruleInfoFormatter = (rule) => (
     <RuleListEntry
       key={rule.id}
       rule={rule}
       usingPipelines={rulesContext?.used_in_pipelines[rule.id]}
       onDelete={onDelete}
+      showLoadColumn={showLoadColumn}
+      processingLoad={processingLoad}
+      processingLoadError={processingLoadError}
     />
   );
 

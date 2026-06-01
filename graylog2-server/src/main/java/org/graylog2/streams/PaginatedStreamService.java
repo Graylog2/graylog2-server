@@ -27,6 +27,7 @@ import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.database.pagination.DefaultMongoPaginationHelper;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
 import org.graylog2.rest.models.SortOrder;
@@ -35,9 +36,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 public class PaginatedStreamService {
-
     private static final String COLLECTION_NAME = "streams";
-    private static final List<String> STRING_FIELDS = List.of("title", "description", "index_set_title");
     private final MongoCollection<StreamDTO> collection;
     private final EntityScopeService scopeService;
 
@@ -73,20 +72,14 @@ public class PaginatedStreamService {
                     .add(Aggregates.unset("index_set"));
         }
 
-        if (isStringField(sortField)) {
-            pipelineBuilder.add(Aggregates.set(new Field<>("lower" + sortField, doc("$toLower", "$" + sortField))))
-                    .add(Aggregates.sort(order.toBsonSort("lower" + sortField)))
-                    .add(Aggregates.unset("lower" + sortField));
-        } else {
-            pipelineBuilder.add(Aggregates.sort(order.toBsonSort(sortField)));
-        }
+        pipelineBuilder.add(Aggregates.sort(order.toBsonSort(sortField)));
 
         if (sortField.equals("index_set_title")) {
             pipelineBuilder.add(Aggregates.unset("index_set_title"));
         }
 
         final List<StreamImpl> streamsList;
-        try (final var results = MongoUtils.stream(collection.aggregate(pipelineBuilder.build()))) {
+        try (final var results = MongoUtils.stream(collection.aggregate(pipelineBuilder.build()).collation(DefaultMongoPaginationHelper.DEFAULT_COLLATION_WITH_CASE_INSENSITIVE_SORTING))) {
             streamsList = results
                     // Since we are bypassing the StreamService which properly sets the isEditable field when loading
                     // streams we need to set the field here.
@@ -109,10 +102,6 @@ public class PaginatedStreamService {
                 : streamsList;
 
         return new PaginatedList<>(paginatedStreams, streamsList.size(), page, perPage, grandTotal);
-    }
-
-    private boolean isStringField(String sortField) {
-        return STRING_FIELDS.contains(sortField);
     }
 
     private Document doc(String key, Object value) {

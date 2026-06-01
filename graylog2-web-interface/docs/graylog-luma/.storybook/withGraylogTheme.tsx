@@ -19,10 +19,18 @@ import 'theme/theme-styles';
 import type { Decorator } from '@storybook/react';
 import { useDarkMode } from 'storybook-dark-mode';
 import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from '@graylog/sawmill';
+import { createGlobalStyle, css } from 'styled-components';
 
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 import GlobalThemeStyles from 'theme/GlobalThemeStyles';
-import Notifications from 'routing/Notifications';
+
+const StoryBodyBackground = createGlobalStyle(
+  ({ theme }) => css`
+    body {
+      background-color: ${theme.colors.global.contentBackground};
+    }
+  `,
+);
 
 const GraylogThemeDecorator = ({ children }: { children: React.ReactNode }) => {
   const colorScheme = useDarkMode() ? COLOR_SCHEME_DARK : COLOR_SCHEME_LIGHT;
@@ -30,7 +38,7 @@ const GraylogThemeDecorator = ({ children }: { children: React.ReactNode }) => {
   return (
     <GraylogThemeProvider initialThemeModeOverride={colorScheme} key={colorScheme} userIsLoggedIn={true}>
       <GlobalThemeStyles />
-      <Notifications />
+      <StoryBodyBackground />
       {children}
     </GraylogThemeProvider>
   );
