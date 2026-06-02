@@ -422,7 +422,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
     // Intentionally package-private to enforce MessageFactory usage.
     Message(String id, Map<String, Object> newFields, boolean excludedFromTrafficAccounting) {
-        this.excludedFromTrafficAccounting = false;
+        this.excludedFromTrafficAccounting = excludedFromTrafficAccounting;
         Preconditions.checkArgument(id != null, "message id cannot be null");
         fields.put(FIELD_ID, id);
         addFields(newFields);
