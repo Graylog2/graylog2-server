@@ -31,19 +31,12 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import MessagePermalinkButton from 'views/components/common/MessagePermalinkButton';
 import useFeature from 'hooks/useFeature';
 import useStreams from 'components/streams/hooks/useStreams';
-import type { Stream } from 'stores/streams/StreamsStore';
 
 import MessageEditFieldConfigurationAction from './fields/MessageEditFieldConfigurationAction';
 
 const PAGE_SIZE = 10;
 
-const TestAgainstStreamButton = ({
-  index,
-  id,
-}: {
-  index: string;
-  id: string;
-}) => {
+const TestAgainstStreamButton = ({ index, id }: { index: string; id: string }) => {
   const sendTelemetry = useSendTelemetry();
   const [searchParams, setSearchParams] = useState({
     query: '',
@@ -57,10 +50,11 @@ const TestAgainstStreamButton = ({
     isInitialLoading,
   } = useStreams(searchParams);
 
-  const sendEvent = () => sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_MESSAGE_TABLE_TEST_AGAINST_STREAM, {
-    app_section: 'search-message-table',
-    app_action_value: 'seach-message-table-test-against-stream',
-  });
+  const sendEvent = () =>
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_MESSAGE_TABLE_TEST_AGAINST_STREAM, {
+      app_section: 'search-message-table',
+      app_action_value: 'seach-message-table-test-against-stream',
+    });
 
   const handleSearch = debounce((value: string) => {
     setSearchParams((cur) => ({ ...cur, query: value, page: 1 }));
@@ -102,21 +96,14 @@ const TestAgainstStreamButton = ({
               </ListGroupItem>
             ),
           )}
-          {!isInitialLoading && streams.length === 0 && (
-            <ListGroupItem>No streams available</ListGroupItem>
-          )}
+          {!isInitialLoading && streams.length === 0 && <ListGroupItem>No streams available</ListGroupItem>}
         </ListGroup>
       </PaginatedList>
     </>
   );
 
   return (
-    <OverlayTrigger
-      trigger="click"
-      placement="bottom"
-      overlay={popoverContent}
-      title="Test against stream"
-      rootClose>
+    <OverlayTrigger trigger="click" placement="bottom" overlay={popoverContent} title="Test against stream" rootClose>
       <Button bsSize="small">
         Test against stream <span className="caret" />
       </Button>
