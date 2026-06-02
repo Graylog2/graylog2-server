@@ -38,6 +38,7 @@ import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch.generic.Body;
 import org.opensearch.client.opensearch.generic.Request;
 import org.opensearch.client.opensearch.generic.Response;
+import org.opensearch.client.transport.TransportOptions;
 import org.opensearch.client.transport.httpclient5.ApacheHttpClient5Options;
 import org.opensearch.client.transport.httpclient5.ResponseException;
 import org.slf4j.Logger;
@@ -126,10 +127,11 @@ public final class OfficialOpensearchClient {
         if (baseOptions instanceof ApacheHttpClient5Options o) {
             return o;
         }
+        final String optionsClassName = Optional.ofNullable(baseOptions).map(TransportOptions::getClass).map(Class::getName).orElse("null");
         LOG.warn("Transport options are {} rather than ApacheHttpClient5Options; falling back to defaults. " +
                         "Base request config settings (connectionRequestTimeout, expectContinueEnabled, " +
                         "authenticationEnabled) will not be preserved on per-request overrides.",
-                baseOptions.getClass().getName());
+                optionsClassName);
         return ApacheHttpClient5Options.DEFAULT;
     }
 
