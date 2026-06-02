@@ -30,18 +30,17 @@ type LayoutPreferences = {
   };
 };
 
-const getInitialColumnWidthPreferences = (
-  layoutPreferences?: LayoutPreferences,
-): ColumnWidthPreferences => Object.fromEntries(
+const getInitialColumnWidthPreferences = (layoutPreferences?: LayoutPreferences): ColumnWidthPreferences =>
+  Object.fromEntries(
     Object.entries(layoutPreferences?.attributes ?? {}).flatMap(([key, { width }]) =>
       typeof width === 'number' ? [[key, width]] : [],
     ),
-  )
+  );
 
-const  useInternalLayoutPreferences = ({
-                                        layoutPreferences,
-                                        defaultColumnOrder,
-                                      }: {
+const useInternalLayoutPreferences = ({
+  layoutPreferences,
+  defaultColumnOrder,
+}: {
   layoutPreferences?: LayoutPreferences;
   defaultColumnOrder: Array<string>;
 }) => {
@@ -56,14 +55,13 @@ const  useInternalLayoutPreferences = ({
     () => prevInitialState.internalAttributeColumnOrder,
   );
 
-  const [internalColumnWidthPreferences, setInternalColumnWidthPreferences] =
-    useState<ColumnWidthPreferences>(() => prevInitialState.internalColumnWidthPreferences);
+  const [internalColumnWidthPreferences, setInternalColumnWidthPreferences] = useState<ColumnWidthPreferences>(
+    () => prevInitialState.internalColumnWidthPreferences,
+  );
 
   const nextInitialState = getInitialState();
 
-  if (
-    !isEqual(nextInitialState, prevInitialState)
-  ) {
+  if (!isEqual(nextInitialState, prevInitialState)) {
     setPrevInitialState(nextInitialState);
     setInternalAttributeColumnOrder(nextInitialState.internalAttributeColumnOrder);
     setInternalColumnWidthPreferences(nextInitialState.internalColumnWidthPreferences);
@@ -75,6 +73,6 @@ const  useInternalLayoutPreferences = ({
     internalColumnWidthPreferences,
     setInternalColumnWidthPreferences,
   };
-}
+};
 
-export default useInternalLayoutPreferences
+export default useInternalLayoutPreferences;
