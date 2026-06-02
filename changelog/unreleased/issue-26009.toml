@@ -2,4 +2,4 @@ type = "fixed"
 message = "Fix extractors being deleted when an input is started, stopped, or updated."
 
 issues = ["26009"]
-pulls = [""]
+pulls = ["26198"]
