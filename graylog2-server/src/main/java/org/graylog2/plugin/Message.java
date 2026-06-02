@@ -749,6 +749,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
      * returning {@code 0} here.
      */
     @Override
+    @JsonIgnore
     public long getInputMessageSize() {
         final Object value = getField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE);
         return value instanceof Number n ? n.longValue() : getSize();
@@ -762,6 +763,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
      * between accounted and unaccounted afterward.
      */
     @Override
+    @JsonIgnore
     public boolean isExcludedFromTrafficAccounting() {
         return excludedFromTrafficAccounting;
     }
