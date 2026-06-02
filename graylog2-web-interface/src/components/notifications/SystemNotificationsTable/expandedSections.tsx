@@ -15,10 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
 import { Sanitize, Spinner } from 'components/common';
 import type { NotificationType } from 'components/notifications/types';
 import useNotificationBody from 'components/notifications/hooks/useNotificationBody';
+
+const StyledPre = styled.pre`
+  white-space: normal;
+`;
 
 const FALLBACK_MESSAGE = 'Could not load full notification body.';
 
@@ -28,7 +33,7 @@ const NotificationBody = ({ row }: { row: NotificationType }) => {
   if (isLoading) return <Spinner />;
   if (isError || !data) return <span>{FALLBACK_MESSAGE}</span>;
 
-  return <pre><Sanitize html={data.description.trim()} /></pre>;
+  return <StyledPre><Sanitize html={data.description.trim()} /></StyledPre>;
 };
 
 const expandedSections = {
