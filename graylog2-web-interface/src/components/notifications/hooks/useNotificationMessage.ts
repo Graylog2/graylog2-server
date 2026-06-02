@@ -32,9 +32,11 @@ const fetchNotificationMessage = (notification: NotificationType) => {
     ? SystemNotificationMessage.renderHtmlWithKey(type, notification.key, values)
     : SystemNotificationMessage.renderHtml(type, values);
 };
+
 const useNotificationMessage = (notification: NotificationType) => {
   const { data } = useQuery({
-    queryKey: [...NOTIFICATIONS_QUERY_KEY, 'message', notification.type],
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: [...NOTIFICATIONS_QUERY_KEY, 'message', notification.id, notification.key, notification.type],
     queryFn: () => fetchNotificationMessage(notification),
   });
 
