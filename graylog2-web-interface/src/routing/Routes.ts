@@ -149,7 +149,7 @@ const Routes = {
     THREADDUMP: (nodeId: string) => `/system/threaddump/${nodeId}`,
     OUTPUTS: '/system/outputs',
     OVERVIEW: '/system/overview',
-    NOTIFICATIONS: '/system/notifications',
+    HEALTH: '/system/health',
     PROCESSBUFFERDUMP: (nodeId: string) => `/system/processbufferdump/${nodeId}`,
     SYSTEMLOGS: (nodeId: string) => `/system/logs/recent/${nodeId}`,
     AUTHENTICATION: {
