@@ -18,6 +18,7 @@ package org.graylog.events.event;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -57,6 +58,7 @@ public abstract class EventDto {
     public static final String FIELD_GROUP_BY_FIELDS = "group_by_fields";
     public static final String FIELD_AGGREGATION_CONDITIONS = "aggregation_conditions";
     public static final String FIELD_REPLAY_INFO = "replay_info";
+    public static final String FIELD_EXCLUDED_BY_RULE_ID = "excluded_by_rule_id";
 
     @JsonProperty(FIELD_ID)
     public abstract String id();
@@ -128,6 +130,11 @@ public abstract class EventDto {
 
     @JsonProperty(FIELD_REPLAY_INFO)
     public abstract Optional<EventReplayInfo> replayInfo();
+
+    @Nullable
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonProperty(FIELD_EXCLUDED_BY_RULE_ID)
+    public abstract String excludedByRuleId();
 
     public static Builder builder() {
         return Builder.create();
@@ -223,6 +230,9 @@ public abstract class EventDto {
 
         @JsonProperty(FIELD_REPLAY_INFO)
         public abstract Builder replayInfo(@Nullable EventReplayInfo replayInfo);
+
+        @JsonProperty(FIELD_EXCLUDED_BY_RULE_ID)
+        public abstract Builder excludedByRuleId(@Nullable String excludedByRuleId);
 
         public abstract EventDto build();
     }

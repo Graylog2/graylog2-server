@@ -115,6 +115,10 @@ public interface Event extends Indexable {
 
     Set<String> getAssociatedAssets();
 
+    String getExcludedByRuleId();
+
+    void setExcludedByRuleId(String ruleId);
+
     Set<String> getTags();
 
     void setTags(Set<String> tags);
