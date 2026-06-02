@@ -36,6 +36,8 @@ import { isSystemEventDefinition } from 'components/event-definitions/event-defi
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import usePluginEntities from 'hooks/usePluginEntities';
 
+import useEventDefinitionDetailSections from './useEventDefinitionDetailSections';
+
 type SigmaEventDefinitionConfig = EventDefinition['config'] & {
   sigma_rule_id: string;
 };
@@ -51,6 +53,7 @@ const ViewEventDefinitionPage = () => {
   const navigate = useNavigate();
   const [showSigmaModal, setShowSigmaModal] = useState(false);
   const [refetch, setRefetch] = useState(true);
+  const detailSections = useEventDefinitionDetailSections();
 
   const pluggableSigmaModal = usePluginEntities('eventDefinitions.components.editSigmaModal').find(
     (entity: { key: string }) => entity.key === 'coreSigmaModal',
@@ -159,6 +162,9 @@ const ViewEventDefinitionPage = () => {
               currentUser={currentUser}
               notifications={notifications}
             />
+            {detailSections.map(({ key, component: Component }) => (
+              <Component key={key} eventDefinition={eventDefinition} />
+            ))}
           </Col>
         </Row>
       </DocumentTitle>

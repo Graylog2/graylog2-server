@@ -69,5 +69,10 @@ declare module 'graylog-web-plugin/plugin' {
       component: React.ComponentType;
       order?: number;
     }>;
+    'eventDefinitions.components.detailPageSections'?: Array<{
+      key: string;
+      component: React.ComponentType<{ eventDefinition: EventDefinition }>;
+      order?: number;
+    }>;
   }
 }
