@@ -51,14 +51,20 @@ const StyledTable = styled(MantineTable)<StyledProps>(
     font-size: inherit;
     line-height: inherit;
 
-    ${$bordered && css`border: 1px solid ${theme.colors.table.row.divider};`}
+    ${$bordered &&
+    css`
+      border: 1px solid ${theme.colors.table.row.divider};
+    `}
 
     & th,
     & td {
       padding: ${$condensed ? '5px' : '8px'};
       vertical-align: top;
       border-top: 1px solid ${theme.colors.table.row.divider};
-      ${$bordered && css`border: 1px solid ${theme.colors.table.row.divider};`}
+      ${$bordered &&
+      css`
+        border: 1px solid ${theme.colors.table.row.divider};
+      `}
     }
 
     & thead > tr > th {
@@ -74,7 +80,8 @@ const StyledTable = styled(MantineTable)<StyledProps>(
       transition: background-color 150ms ease-in-out;
     }
 
-    ${$striped && css`
+    ${$striped &&
+    css`
       & tbody:only-of-type > tr:nth-of-type(odd) {
         background-color: ${theme.colors.table.row.backgroundStriped};
       }
@@ -88,7 +95,8 @@ const StyledTable = styled(MantineTable)<StyledProps>(
       }
     `}
 
-    ${$hover && css`
+    ${$hover &&
+    css`
       & tbody > tr:hover {
         background-color: ${theme.colors.table.row.backgroundHover};
       }
@@ -101,8 +109,7 @@ const StyledTable = styled(MantineTable)<StyledProps>(
       ])};
     }
 
-    & tbody > tr > .${PINNED_CELL_CLASS_NAME},
-    & tfoot > tr > .${PINNED_CELL_CLASS_NAME} {
+    & tbody > tr > .${PINNED_CELL_CLASS_NAME}, & tfoot > tr > .${PINNED_CELL_CLASS_NAME} {
       background-color: ${theme.utils.flattenColorStack([
         theme.colors.global.contentBackground,
         theme.colors.table.row.background,
@@ -125,14 +132,17 @@ const StyledTable = styled(MantineTable)<StyledProps>(
   `,
 );
 
-const Table = ({ children, className, striped, hover, condensed, bordered, responsive }: Props) => {
+const Table = ({
+  children = undefined,
+  className = undefined,
+  striped = undefined,
+  hover = undefined,
+  condensed = undefined,
+  bordered = undefined,
+  responsive = undefined,
+}: Props) => {
   const table = (
-    <StyledTable
-      className={className}
-      $striped={striped}
-      $hover={hover}
-      $condensed={condensed}
-      $bordered={bordered}>
+    <StyledTable className={className} $striped={striped} $hover={hover} $condensed={condensed} $bordered={bordered}>
       {children}
     </StyledTable>
   );
