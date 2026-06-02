@@ -488,6 +488,33 @@ public class InputServiceImplTest {
                 .containsEntry(Extractor.Type.REGEX, 1L);
     }
 
+    @Test
+    void extractorCountByInputId_returnsCounts() throws Exception {
+        final Input input1 = inputService.find(inputService.save(createTestInput()));
+        inputService.addExtractor(input1, createCopyInputExtractor());
+        inputService.addExtractor(input1, createCopyInputExtractor());
+        inputService.addExtractor(input1, createRegexExtractor());
+
+        final Input input2 = inputService.find(inputService.save(createTestInput()));
+        inputService.addExtractor(input2, createCopyInputExtractor());
+
+        final Input input3 = inputService.find(inputService.save(createTestInput()));
+
+        final Map<String, Integer> result = inputService.extractorCountByInputId(
+                List.of(input1.getId(), input2.getId(), input3.getId()));
+
+        assertThat(result)
+                .containsEntry(input1.getId(), 3)
+                .containsEntry(input2.getId(), 1)
+                .containsEntry(input3.getId(), 0);
+    }
+
+    @Test
+    void extractorCountByInputId_returnsEmptyForNoInputs() {
+        final Map<String, Integer> result = inputService.extractorCountByInputId(List.of());
+        assertThat(result).isEmpty();
+    }
+
     private static CopyInputExtractor createCopyInputExtractor() throws Extractor.ReservedFieldException {
         return new CopyInputExtractor(new MetricRegistry(), new ObjectId().toHexString(), "copy extractor",
                 0, Extractor.CursorStrategy.COPY, "message", "target", Map.of(), "admin",

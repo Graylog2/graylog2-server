@@ -14,19 +14,38 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line no-restricted-imports
-import { Tab as BootstrapTab } from 'react-bootstrap';
+import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-const Tab = styled(BootstrapTab)(
+import { Label } from 'components/bootstrap';
+
+const Container = styled.div(
   ({ theme }) => css`
-    background-color: ${theme.colors.global.contentBackground};
-    border: 1px solid ${theme.colors.variant.default};
-    border-top: 0;
-    border-radius: 0 0 4px 4px;
-    padding: 9px;
+    display: inline-flex;
+    gap: ${theme.spacings.xs};
+    flex-wrap: wrap;
   `,
 );
 
-/** @component */
-export default Tab;
+type Props = {
+  tags: ReadonlyArray<string> | undefined | null;
+  emptyFallback?: React.ReactNode;
+};
+
+const TagList = ({ tags, emptyFallback = null }: Props) => {
+  if (!tags?.length) {
+    return emptyFallback ?? null;
+  }
+
+  return (
+    <Container>
+      {[...tags].sort().map((tag) => (
+        <Label key={tag} bsStyle="default">
+          {tag}
+        </Label>
+      ))}
+    </Container>
+  );
+};
+
+export default TagList;
