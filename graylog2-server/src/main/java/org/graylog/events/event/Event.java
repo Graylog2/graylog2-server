@@ -113,6 +113,8 @@ public interface Event extends Indexable {
 
     void addAssociatedAssets(Set<String> associatedAssets);
 
+    Set<String> getAssociatedAssets();
+
     Set<String> getTags();
 
     void setTags(Set<String> tags);

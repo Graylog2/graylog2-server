@@ -267,6 +267,11 @@ public class EventImpl implements Event {
     }
 
     @Override
+    public Set<String> getAssociatedAssets() {
+        return ImmutableSet.copyOf(associatedAssets);
+    }
+
+    @Override
     public Set<String> getTags() {
         // unmodifiableSet wraps without copying; setTags is called at most once during
         // construction so callers don't need a snapshot, just a mutation guard.
