@@ -42,7 +42,7 @@ import type {
 import EntityFilters from 'components/common/EntityFilters';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import TableFetchContextProvider from 'components/common/PaginatedEntityTable/TableFetchContextProvider';
-import PaginatedEntityTableFilterContextProvider from 'components/common/PaginatedEntityTable/PaginatedEntityTableFilterContextProvider';
+import TableFilterProvider from 'components/common/PaginatedEntityTable/TableFilterProvider';
 import type { PaginatedResponse, FetchOptions } from 'components/common/PaginatedEntityTable/useFetchEntities';
 import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
 import useOnRefresh from 'components/common/PaginatedEntityTable/useOnRefresh';
@@ -366,9 +366,9 @@ const TableWithLocalState = <T extends EntityBase, M = unknown>({ ...props }: Wr
   const contextValue = useWithLocalState(props.layoutConfig, props.defaultFilters);
 
   return (
-    <PaginatedEntityTableFilterContextProvider value={contextValue} externalSearch={props.externalSearch}>
+    <TableFilterProvider value={contextValue} externalSearch={props.externalSearch}>
       <PaginatedEntityTableInner<T, M> {...props} />
-    </PaginatedEntityTableFilterContextProvider>
+    </TableFilterProvider>
   );
 };
 
@@ -376,9 +376,9 @@ const TableWithURLParams = <T extends EntityBase, M = unknown>({ ...props }: Wra
   const contextValue = useWithURLParams(props.layoutConfig, props.defaultFilters);
 
   return (
-    <PaginatedEntityTableFilterContextProvider value={contextValue} externalSearch={props.externalSearch}>
+    <TableFilterProvider value={contextValue} externalSearch={props.externalSearch}>
       <PaginatedEntityTableInner<T, M> {...props} />
-    </PaginatedEntityTableFilterContextProvider>
+    </TableFilterProvider>
   );
 };
 

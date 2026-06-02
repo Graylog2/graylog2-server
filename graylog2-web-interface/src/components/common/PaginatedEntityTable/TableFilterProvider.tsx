@@ -18,19 +18,19 @@ import * as React from 'react';
 import { useMemo } from 'react';
 
 import PaginatedEntityTableFilterContext, {
-  type PaginatedEntityTableFilterContextValue,
-} from './PaginatedEntityTableFilterContext';
+  type TableFilterContextValue,
+} from './TableFilterContext';
 
 type Props = React.PropsWithChildren<{
   externalSearch?: {
     query: string;
   };
-  value: PaginatedEntityTableFilterContextValue;
+  value: TableFilterContextValue;
 }>;
 
 const noop = () => {};
 
-const PaginatedEntityTableFilterContextProvider = ({
+const TableFilterProvider = ({
   children = undefined,
   externalSearch = undefined,
   value,
@@ -57,4 +57,4 @@ const PaginatedEntityTableFilterContextProvider = ({
   );
 };
 
-export default PaginatedEntityTableFilterContextProvider;
+export default TableFilterProvider;

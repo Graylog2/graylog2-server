@@ -21,7 +21,7 @@ import type { SearchParams } from 'stores/PaginationTypes';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
 
-export type PaginatedEntityTableFilterContextValue = {
+export type TableFilterContextValue = {
   fetchOptions: SearchParams;
   setQuery: (newQuery: string) => void;
   onChangeFilters: (newFilters: UrlQueryFilters) => void;
@@ -30,8 +30,8 @@ export type PaginatedEntityTableFilterContextValue = {
   resetFilters: () => void;
 };
 
-const PaginatedEntityTableFilterContext = React.createContext<PaginatedEntityTableFilterContextValue | undefined>(
+const TableFilterContext = React.createContext<TableFilterContextValue | undefined>(
   undefined,
 );
 
-export default singleton('contexts.PaginatedEntityTableFilterContext', () => PaginatedEntityTableFilterContext);
+export default singleton('contexts.TableFilterContext', () => TableFilterContext);

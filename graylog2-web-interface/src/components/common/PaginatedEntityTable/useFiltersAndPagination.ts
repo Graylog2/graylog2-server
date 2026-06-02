@@ -23,12 +23,12 @@ import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQuer
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import type { LayoutConfig } from 'components/common/EntityDataTable/hooks/useTableLayout';
-import type { PaginatedEntityTableFilterContextValue } from 'components/common/PaginatedEntityTable/PaginatedEntityTableFilterContext';
+import type { TableFilterContextValue } from 'components/common/PaginatedEntityTable/TableFilterContext';
 
 export const useWithURLParams = (
   layoutConfig: LayoutConfig,
   defaultFilters?: UrlQueryFilters,
-): PaginatedEntityTableFilterContextValue => {
+): TableFilterContextValue => {
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setUrlQuery] = useQueryParam('query', StringParam);
   const [slice, setSlice] = useQueryParam('slice', StringParam);
@@ -101,7 +101,7 @@ export const useWithURLParams = (
 export const useWithLocalState = (
   layoutConfig: LayoutConfig,
   defaultFilters?: UrlQueryFilters,
-): PaginatedEntityTableFilterContextValue => {
+): TableFilterContextValue => {
   const defaultState = useMemo(
     () => ({
       query: '',

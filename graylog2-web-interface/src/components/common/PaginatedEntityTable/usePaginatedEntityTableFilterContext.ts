@@ -16,7 +16,7 @@
  */
 import { useContext } from 'react';
 
-import PaginatedEntityTableFilterContext from './PaginatedEntityTableFilterContext';
+import PaginatedEntityTableFilterContext from './TableFilterContext';
 
 const usePaginatedEntityTableFilterContext = () => {
   const contextValue = useContext(PaginatedEntityTableFilterContext);
