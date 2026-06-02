@@ -64,5 +64,10 @@ declare module 'graylog-web-plugin/plugin' {
     'eventDefinitionTypes'?: Array<EventDefinitionType>;
     'eventDefinitions.components.searchForm'?: Array<() => SearchBarControl | null>;
     'eventDefinitions.components.editSigmaModal'?: Array<{ component: React.FC; key: string }>;
+    'eventDefinitions.components.overviewPageSections'?: Array<{
+      key: string;
+      component: React.ComponentType;
+      order?: number;
+    }>;
   }
 }

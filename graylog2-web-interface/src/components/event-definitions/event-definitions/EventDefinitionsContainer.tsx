@@ -32,6 +32,7 @@ import EventDefinitionNotificationsCell from './EventDefinitionNotificationsCell
 import ExpandedNotificationsSection from './ExpandedNotificationsSection';
 import SchedulingCell from './SchedulingCell';
 import StatusCell from './StatusCell';
+import useEventDefinitionOverviewSections from './useEventDefinitionOverviewSections';
 
 import type { EventDefinition } from '../event-definitions-types';
 import getEventDefinitionTableElements from '../constants';
@@ -104,6 +105,7 @@ const EventDefinitionsContainer = () => {
   const { pluggableColumnRenderers, pluggableAttributes, pluggableExpandedSections } =
     usePluggableEntityTableElements<EventDefinition>(null, 'event_definition');
   const { defaultLayout, additionalAttributes } = getEventDefinitionTableElements(pluggableAttributes);
+  const overviewSections = useEventDefinitionOverviewSections();
   const expandedSections = useMemo(
     () => ({
       notifications: notificationsExpandedSection,
@@ -113,20 +115,25 @@ const EventDefinitionsContainer = () => {
   );
 
   return (
-    <PaginatedEntityTable<EventDefinition>
-      humanName="event definitions"
-      additionalAttributes={additionalAttributes}
-      queryHelpComponent={<QueryHelper entityName="event definition" />}
-      tableLayout={defaultLayout}
-      fetchEntities={fetchEventDefinitions}
-      entityActions={renderEventDefinitionActions}
-      keyFn={keyFn}
-      entityAttributesAreCamelCase={false}
-      expandedSectionRenderers={expandedSections}
-      filterValueRenderers={FilterValueRenderers}
-      columnRenderers={getCustomColumnRenderers(pluggableColumnRenderers)}
-      bulkSelection={bulkSelection}
-    />
+    <>
+      {overviewSections.map(({ key, component: Component }) => (
+        <Component key={key} />
+      ))}
+      <PaginatedEntityTable<EventDefinition>
+        humanName="event definitions"
+        additionalAttributes={additionalAttributes}
+        queryHelpComponent={<QueryHelper entityName="event definition" />}
+        tableLayout={defaultLayout}
+        fetchEntities={fetchEventDefinitions}
+        entityActions={renderEventDefinitionActions}
+        keyFn={keyFn}
+        entityAttributesAreCamelCase={false}
+        expandedSectionRenderers={expandedSections}
+        filterValueRenderers={FilterValueRenderers}
+        columnRenderers={getCustomColumnRenderers(pluggableColumnRenderers)}
+        bulkSelection={bulkSelection}
+      />
+    </>
   );
 };
 
