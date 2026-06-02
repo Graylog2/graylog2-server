@@ -163,7 +163,10 @@ describe('WidgetQueryControls pluggable controls', () => {
           {
             pluggableControl: 'Initial Value2',
             queryString: '',
-            streams: undefined,
+            'streamsAndCategories': {
+              'categories': undefined,
+              'streams': undefined,
+            },
             timerange: { from: 300, type: 'relative' },
           },
           expect.any(Function),
@@ -182,7 +185,10 @@ describe('WidgetQueryControls pluggable controls', () => {
         {
           pluggableControl: 'Initial Value',
           queryString: '',
-          streams: undefined,
+          'streamsAndCategories': {
+            'categories': undefined,
+            'streams': undefined,
+          },
           timerange: { from: 300, type: 'relative' },
         },
         {

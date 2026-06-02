@@ -67,7 +67,9 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -83,6 +85,10 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
     private static final String TERMS_AGGREGATION_NAME = "alert_type";
     private static final String HISTOGRAM_AGGREGATION_NAME = "histogram";
     private static final String SLICES_AGGREGATION_NAME = "slices";
+    private static final String GROUP_BY_AGGREGATION_NAME = "group_by";
+    private static final String SUB_TERMS_AGGREGATION_NAME = "sub_terms";
+    private static final String METRIC_AGGREGATION_NAME = "metric";
+
 
     private final OfficialOpensearchClient opensearchClient;
     private final Boolean allowLeadingWildcard;
@@ -116,7 +122,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
             builder.expandWildcards(ExpandWildcard.Open);
             builder.allowNoIndices(true);
 
-            if(!affectedIndices.isEmpty()) {
+            if (!affectedIndices.isEmpty()) {
                 builder.index(new ArrayList<>(affectedIndices));
             }
 
@@ -212,7 +218,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
             builder.allowNoIndices(true);
             builder.expandWildcards(ExpandWildcard.Open);
 
-            if(!affectedIndices.isEmpty()) {
+            if (!affectedIndices.isEmpty()) {
                 builder.index(new LinkedList<>(affectedIndices));
             }
 
@@ -238,7 +244,6 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
             builder.aggregations(HISTOGRAM_AGGREGATION_NAME, histogramAggregation);
             return builder;
         });
-
 
 
         if (LOG.isDebugEnabled()) {
@@ -326,51 +331,25 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
 
     @Override
     public List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timerange, Set<String> affectedIndices,
-                                             Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
-                                             Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, int maxBuckets) {
+                                                Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
+                                                Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, int maxBuckets) {
         final var filter = createQuery(queryString, timerange, eventStreams, filterString, sourceStreamFilter, extraFilters);
+        final var aggregation = Aggregation.builder()
+                .terms(terms -> terms.field(slicingColumn).size(maxBuckets))
+                .build();
 
-        final org.opensearch.client.opensearch.core.SearchRequest searchRequest = org.opensearch.client.opensearch.core.SearchRequest.of(builder -> {
-            builder.query(filter);
-            builder.size(0);
-            builder.ignoreUnavailable(true);
-            builder.allowNoIndices(true);
-            builder.expandWildcards(ExpandWildcard.Open);
-
-            if (!affectedIndices.isEmpty()) {
-                builder.index(new ArrayList<>(affectedIndices));
-            }
-
-            builder.aggregations(SLICES_AGGREGATION_NAME, Aggregation.builder()
-                    .terms(terms -> terms.field(slicingColumn).size(maxBuckets))
-                    .build());
-
-            return builder;
-        });
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Query:\n{}", searchRequest.query().toJsonString());
-            LOG.debug("Execute aggregation: {}", searchRequest.toJsonString());
-        }
-
-        final SearchResponse<Map> searchResult = opensearchClient.sync(c -> c.search(searchRequest, Map.class), "Unable to perform slice aggregation query");
-        final var termsAgg = searchResult.aggregations().get(SLICES_AGGREGATION_NAME);
+        final var searchResult = executeAggregation(filter, affectedIndices, SLICES_AGGREGATION_NAME, aggregation);
 
         final List<Slice> result = new ArrayList<>();
-        if (termsAgg.isSterms()) {
-            termsAgg.sterms().buckets().array().forEach(b -> result.add(new Slice(b.key(), null, Math.toIntExact(b.docCount()), meta)));
-        } else if (termsAgg.isLterms()) {
-            termsAgg.lterms().buckets().array().forEach(b -> result.add(new Slice(b.keyAsString(), null, Math.toIntExact(b.docCount()), meta)));
-        } else if (termsAgg.isDterms()) {
-            termsAgg.dterms().buckets().array().forEach(b -> result.add(new Slice(b.keyAsString(), null, Math.toIntExact(b.docCount()), meta)));
-        }
+        forEachTermsBucket(searchResult.aggregations().get(SLICES_AGGREGATION_NAME),
+                (key, docCount, bucketAggs) -> result.add(new Slice(key, null, Math.toIntExact(docCount), meta)));
         return result;
     }
 
     @Override
     public List<Slice> aggregateSlicesForRangeQuery(String queryString, TimeRange timerange, Set<String> affectedIndices,
-                                            Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
-                                            Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, List<NumberRange> ranges) {
+                                                    Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
+                                                    Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, List<NumberRange> ranges) {
         final var filter = createQuery(queryString, timerange, eventStreams, filterString, sourceStreamFilter, extraFilters);
 
         final RangeAggregation.Builder rangeBuilder = new RangeAggregation.Builder().field(slicingColumn);
@@ -386,35 +365,156 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
         });
         rangeBuilder.keyed(false);
 
-        final org.opensearch.client.opensearch.core.SearchRequest searchRequest = org.opensearch.client.opensearch.core.SearchRequest.of(builder -> {
-            builder.query(filter);
-            builder.size(0);
-            builder.ignoreUnavailable(true);
-            builder.allowNoIndices(true);
-            builder.expandWildcards(ExpandWildcard.Open);
-
-            if (!affectedIndices.isEmpty()) {
-                builder.index(new ArrayList<>(affectedIndices));
-            }
-
-            builder.aggregations(SLICES_AGGREGATION_NAME, Aggregation.builder()
-                    .range(rangeBuilder.build())
-                    .build());
-
-            return builder;
-        });
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Query:\n{}", searchRequest.query().toJsonString());
-            LOG.debug("Execute range aggregation: {}", searchRequest.toJsonString());
-        }
-
-        final SearchResponse<Map> searchResult = opensearchClient.sync(c -> c.search(searchRequest, Map.class), "Unable to perform range slice aggregation query");
+        final var aggregation = Aggregation.builder().range(rangeBuilder.build()).build();
+        final var searchResult = executeAggregation(filter, affectedIndices, SLICES_AGGREGATION_NAME, aggregation);
         final var rangeAgg = searchResult.aggregations().get(SLICES_AGGREGATION_NAME).range();
 
         final List<Slice> result = new ArrayList<>();
         rangeAgg.buckets().array().forEach(b -> result.add(new Slice(b.key(), null, Math.toIntExact(b.docCount()), meta)));
         return result;
+    }
+
+    @Override
+    public Map<String, Map<String, Long>> aggregateGroupedTerms(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                                                String groupByField, String termsField,
+                                                                int maxBuckets, int maxSubBuckets,
+                                                                Collection<String> includeTerms) {
+        final var filter = createSimpleQuery(queryString, timerange);
+        final var aggregation = Aggregation.builder()
+                .terms(terms -> {
+                    terms.field(groupByField).size(maxBuckets);
+                    if (includeTerms != null && !includeTerms.isEmpty()) {
+                        terms.include(inc -> inc.terms(includeTerms.stream().toList()));
+                    }
+                    return terms;
+                })
+                .aggregations(SUB_TERMS_AGGREGATION_NAME, Aggregation.of(a -> a
+                        .terms(t -> t.field(termsField).size(maxSubBuckets))))
+                .build();
+
+        final var searchResult = executeAggregation(filter, affectedIndices, GROUP_BY_AGGREGATION_NAME, aggregation);
+
+        final Map<String, Map<String, Long>> result = new HashMap<>();
+        forEachTermsBucket(searchResult.aggregations().get(GROUP_BY_AGGREGATION_NAME),
+                (key, docCount, bucketAggs) -> {
+                    final Map<String, Long> subCounts = extractTermsBucketCounts(bucketAggs.get(SUB_TERMS_AGGREGATION_NAME));
+                    result.put(key, subCounts);
+                });
+        return result;
+    }
+
+    @Override
+    public Map<String, Long> aggregateTerms(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                            String termsField, int maxBuckets,
+                                            Collection<String> includeTerms) {
+        final var filter = createSimpleQuery(queryString, timerange);
+        final var aggregation = Aggregation.builder()
+                .terms(terms -> {
+                    terms.field(termsField).size(maxBuckets);
+                    if (includeTerms != null && !includeTerms.isEmpty()) {
+                        terms.include(inc -> inc.terms(includeTerms.stream().toList()));
+                    }
+                    return terms;
+                })
+                .build();
+
+        final var searchResult = executeAggregation(filter, affectedIndices, GROUP_BY_AGGREGATION_NAME, aggregation);
+        return extractTermsBucketCounts(searchResult.aggregations().get(GROUP_BY_AGGREGATION_NAME));
+    }
+
+    @Override
+    public Map<String, Double> aggregateGroupedMetric(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                                      String groupByField, AggregationType metricType, String metricField,
+                                                      int maxBuckets, Collection<String> includeTerms) {
+        final var filter = createSimpleQuery(queryString, timerange);
+        final Aggregation metricAgg = switch (metricType) {
+            case AVG -> Aggregation.of(a -> a.avg(avg -> avg.field(metricField)));
+            case MAX -> Aggregation.of(a -> a.max(max -> max.field(metricField)));
+        };
+        final var aggregation = Aggregation.builder()
+                .terms(terms -> {
+                    terms.field(groupByField).size(maxBuckets);
+                    if (includeTerms != null && !includeTerms.isEmpty()) {
+                        terms.include(inc -> inc.terms(includeTerms.stream().toList()));
+                    }
+                    return terms;
+                })
+                .aggregations(METRIC_AGGREGATION_NAME, metricAgg)
+                .build();
+
+        final var searchResult = executeAggregation(filter, affectedIndices, GROUP_BY_AGGREGATION_NAME, aggregation);
+
+        final Map<String, Double> result = new HashMap<>();
+        forEachTermsBucket(searchResult.aggregations().get(GROUP_BY_AGGREGATION_NAME),
+                (key, docCount, bucketAggs) -> {
+                    final double value = extractMetricValue(bucketAggs.get(METRIC_AGGREGATION_NAME), metricType);
+                    result.put(key, value);
+                });
+        return result;
+    }
+
+    private SearchResponse<Map> executeAggregation(Query filter, Set<String> affectedIndices,
+                                                   String aggName, Aggregation aggregation) {
+        final var searchRequest = org.opensearch.client.opensearch.core.SearchRequest.of(builder -> {
+            builder.query(filter)
+                    .size(0)
+                    .ignoreUnavailable(true)
+                    .allowNoIndices(true)
+                    .expandWildcards(ExpandWildcard.Open);
+            if (!affectedIndices.isEmpty()) {
+                builder.index(new ArrayList<>(affectedIndices));
+            }
+            builder.aggregations(aggName, aggregation);
+            return builder;
+        });
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Execute aggregation: {}", searchRequest.toJsonString());
+        }
+
+        return opensearchClient.sync(c -> c.search(searchRequest, Map.class), "Unable to perform aggregation query");
+    }
+
+    @FunctionalInterface
+    private interface TermsBucketConsumer {
+        void accept(String key, long docCount, Map<String, org.opensearch.client.opensearch._types.aggregations.Aggregate> aggregations);
+    }
+
+    private void forEachTermsBucket(org.opensearch.client.opensearch._types.aggregations.Aggregate agg,
+                                    TermsBucketConsumer consumer) {
+        if (agg.isSterms()) {
+            agg.sterms().buckets().array().forEach(b -> consumer.accept(b.key(), b.docCount(), b.aggregations()));
+        } else if (agg.isLterms()) {
+            agg.lterms().buckets().array().forEach(b -> consumer.accept(b.keyAsString(), b.docCount(), b.aggregations()));
+        } else if (agg.isDterms()) {
+            agg.dterms().buckets().array().forEach(b -> consumer.accept(b.keyAsString(), b.docCount(), b.aggregations()));
+        }
+    }
+
+    private Map<String, Long> extractTermsBucketCounts(org.opensearch.client.opensearch._types.aggregations.Aggregate agg) {
+        final Map<String, Long> counts = new HashMap<>();
+        forEachTermsBucket(agg, (key, docCount, bucketAggs) -> counts.put(key, docCount));
+        return counts;
+    }
+
+    private double extractMetricValue(org.opensearch.client.opensearch._types.aggregations.Aggregate agg, AggregationType metricType) {
+        return switch (metricType) {
+            case AVG -> agg.avg().value();
+            case MAX -> agg.max().value();
+        };
+    }
+
+    private Query createSimpleQuery(String queryString, TimeRange timerange) {
+        final BoolQuery.Builder boolQuery = BoolQuery.builder();
+
+        final Query query = (queryString.isEmpty() || queryString.equals("*"))
+                ? Query.builder().matchAll(m -> m).build()
+                : queryStringQuery(queryString, allowLeadingWildcard);
+
+        boolQuery.filter(query);
+        boolQuery.filter(timerangeQuery(timerange));
+
+        return Query.of(b -> b.bool(boolQuery.build()));
     }
 
     @Override

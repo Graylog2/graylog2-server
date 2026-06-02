@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.ZoneId;
+import java.util.Collection;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
@@ -218,6 +219,58 @@ public class MoreSearch {
         }
         return moreSearchAdapter.aggregateSlicesForRangeQuery(queryString, timeRange, affectedIndices, eventStreams,
                 filterString, sourceStreamFilter, Map.of(), slicingColumn, meta, ranges);
+    }
+
+    public Map<String, Map<String, Long>> aggregateGroupedTerms(String queryString, TimeRange timeRange,
+                                                              String groupByField, String termsField,
+                                                              int maxBuckets, int maxSubBuckets) {
+        return aggregateGroupedTerms(queryString, timeRange, groupByField, termsField, maxBuckets, maxSubBuckets, Set.of());
+    }
+
+    public Map<String, Map<String, Long>> aggregateGroupedTerms(String queryString, TimeRange timeRange,
+                                                              String groupByField, String termsField,
+                                                              int maxBuckets, int maxSubBuckets,
+                                                              Collection<String> includeTerms) {
+        final Set<String> affectedIndices = getAffectedIndices(Set.of(), timeRange);
+        if (affectedIndices == null || affectedIndices.isEmpty()) {
+            return Map.of();
+        }
+        return moreSearchAdapter.aggregateGroupedTerms(queryString, timeRange, affectedIndices,
+                groupByField, termsField, maxBuckets, maxSubBuckets, includeTerms);
+    }
+
+    public Map<String, Long> aggregateTerms(String queryString, TimeRange timeRange,
+                                            String termsField, int maxBuckets) {
+        return aggregateTerms(queryString, timeRange, termsField, maxBuckets, Set.of());
+    }
+
+    public Map<String, Long> aggregateTerms(String queryString, TimeRange timeRange,
+                                            String termsField, int maxBuckets,
+                                            Collection<String> includeTerms) {
+        final Set<String> affectedIndices = getAffectedIndices(Set.of(), timeRange);
+        if (affectedIndices == null || affectedIndices.isEmpty()) {
+            return Map.of();
+        }
+        return moreSearchAdapter.aggregateTerms(queryString, timeRange, affectedIndices,
+                termsField, maxBuckets, includeTerms);
+    }
+
+    public Map<String, Double> aggregateGroupedMetric(String queryString, TimeRange timeRange,
+                                                      String groupByField, MoreSearchAdapter.AggregationType metricType,
+                                                      String metricField, int maxBuckets) {
+        return aggregateGroupedMetric(queryString, timeRange, groupByField, metricType, metricField, maxBuckets, Set.of());
+    }
+
+    public Map<String, Double> aggregateGroupedMetric(String queryString, TimeRange timeRange,
+                                                      String groupByField, MoreSearchAdapter.AggregationType metricType,
+                                                      String metricField, int maxBuckets,
+                                                      Collection<String> includeTerms) {
+        final Set<String> affectedIndices = getAffectedIndices(Set.of(), timeRange);
+        if (affectedIndices == null || affectedIndices.isEmpty()) {
+            return Map.of();
+        }
+        return moreSearchAdapter.aggregateGroupedMetric(queryString, timeRange, affectedIndices,
+                groupByField, metricType, metricField, maxBuckets, includeTerms);
     }
 
     /**

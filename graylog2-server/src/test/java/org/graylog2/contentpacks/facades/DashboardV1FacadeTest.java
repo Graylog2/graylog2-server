@@ -39,10 +39,9 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.TimeHistogramC
 import org.graylog.plugins.views.search.views.widgets.aggregation.ValueConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSortConfig;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
-import org.graylog.security.entities.EntityRegistrar;
+import org.graylog.security.shares.EntityGrantLookup;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.facades.dashboardV1.DashboardV1Facade;
 import org.graylog2.contentpacks.facades.dashboardV1.DashboardWidgetConverter;
 import org.graylog2.contentpacks.facades.dashboardV1.EntityConverter;
@@ -54,7 +53,6 @@ import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.PivotEntity;
 import org.graylog2.database.MongoCollections;
-import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.streams.Stream;
@@ -111,13 +109,13 @@ public class DashboardV1FacadeTest {
         ViewFacadeTest.TestViewService viewService = new ViewFacadeTest.TestViewService(null, mongoCollections);
         ViewFacadeTest.TestViewSummaryService viewSummaryService = new ViewFacadeTest.TestViewSummaryService(mongoCollections);
         UserService userService = mock(UserService.class);
-        EntityRegistrar entityRegistrar = mock(EntityRegistrar.class);
+        EntityGrantLookup grantLookup = mock(EntityGrantLookup.class);
         final UserImpl fakeUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()),
                 mock(ClusterConfigService.class), new ObjectMapperProvider().get(), ImmutableMap.of("username", "testuser"));
         when(userService.load("testuser")).thenReturn(fakeUser);
         final DashboardWidgetConverter dashboardWidgetConverter = new DashboardWidgetConverter();
         final EntityConverter entityConverter = new EntityConverter(dashboardWidgetConverter);
-        DashboardV1Facade facade = new DashboardV1Facade(objectMapper, searchDbService, entityConverter, viewService, viewSummaryService, userService, entityRegistrar);
+        DashboardV1Facade facade = new DashboardV1Facade(objectMapper, searchDbService, entityConverter, viewService, viewSummaryService, userService, grantLookup);
         final URL resourceUrl = Resources.getResource(DashboardV1Facade.class, "content-pack-dashboard-v1.json");
         final ContentPack contentPack = objectMapper.readValue(resourceUrl, ContentPack.class);
         assertThat(contentPack).isInstanceOf(ContentPackV1.class);

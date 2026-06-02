@@ -24,6 +24,12 @@ import { MetricContainer, CounterRate } from 'components/metrics';
 import type { PipelineType, StageType } from 'components/pipelines/types';
 import type { RuleType } from 'stores/rules/RulesStore';
 import RuleDeprecationInfo from 'components/rules/RuleDeprecationInfo';
+import {
+  PipelineLoadCell,
+  getStageRulePipelineSharePercent,
+  useProcessingLoadContext,
+  type ProcessingLoadResponse,
+} from 'components/pipelines/processing-load';
 
 type Props = {
   pipeline: PipelineType;
@@ -32,6 +38,9 @@ type Props = {
   canRemoveRoutingRules?: boolean;
   removingRuleId?: string;
   onRemoveRule?: (rule: RuleType) => void;
+  showLoadColumn?: boolean;
+  processingLoad?: ProcessingLoadResponse;
+  processingLoadError?: boolean;
 };
 
 type InvalidRule = {
@@ -55,8 +64,26 @@ const StageRules = ({
   canRemoveRoutingRules = false,
   removingRuleId = undefined,
   onRemoveRule = undefined,
+  showLoadColumn: showLoadColumnProp = undefined,
+  processingLoad: processingLoadProp = undefined,
+  processingLoadError: processingLoadErrorProp = undefined,
 }: Props) => {
-  const headers = ['Title', 'Description', 'Throughput', 'Errors', ...(canRemoveRoutingRules ? ['Actions'] : [])];
+  const {
+    metricsEnabled,
+    processingLoad: processingLoadContext,
+    processingLoadError: processingLoadErrorContext,
+  } = useProcessingLoadContext();
+  const showLoadColumn = showLoadColumnProp ?? metricsEnabled;
+  const processingLoad = processingLoadProp ?? processingLoadContext;
+  const processingLoadError = processingLoadErrorProp ?? processingLoadErrorContext;
+  const headers = [
+    'Title',
+    'Description',
+    'Throughput',
+    'Errors',
+    ...(showLoadColumn ? ['Pipeline Load (15m)'] : []),
+    ...(canRemoveRoutingRules ? ['Actions'] : []),
+  ];
 
   const headerCellFormatter = useCallback((header: string) => <th>{header}</th>, []);
 
@@ -121,6 +148,16 @@ const StageRules = ({
               <CounterRate showTotal suffix="errors/s" />
             </MetricContainer>
           </td>
+          {showLoadColumn && (
+            <td>
+              {isInvalid ? null : (
+                <PipelineLoadCell
+                  loadPercent={getStageRulePipelineSharePercent(processingLoad, pipeline.id, rule.id, stage.stage)}
+                  error={processingLoadError}
+                />
+              )}
+            </td>
+          )}
           {canRemoveRoutingRules && (
             <td className="actions">
               {showRemoveAction && (
@@ -138,7 +175,18 @@ const StageRules = ({
         </tr>
       );
     },
-    [canRemoveRoutingRules, getRuleData, getMetricName, onRemoveRule, removingRuleId],
+    [
+      canRemoveRoutingRules,
+      getRuleData,
+      getMetricName,
+      onRemoveRule,
+      removingRuleId,
+      showLoadColumn,
+      processingLoad,
+      processingLoadError,
+      pipeline.id,
+      stage.stage,
+    ],
   );
 
   return (

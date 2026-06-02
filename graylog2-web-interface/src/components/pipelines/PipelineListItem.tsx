@@ -29,6 +29,12 @@ import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import RuleDeprecationInfo from 'components/rules/RuleDeprecationInfo';
 import usePermissions from 'hooks/usePermissions';
+import {
+  PipelineLoadCell,
+  getPipelineLoadPercent,
+  useProcessingLoadContext,
+  type ProcessingLoadResponse,
+} from 'components/pipelines/processing-load';
 
 import PipelineProcessingErrors from './PipelineProcessingErrors';
 
@@ -40,6 +46,9 @@ type Props = {
   connections: Array<PipelineConnectionsType>;
   streams: Array<Stream>;
   onDeletePipeline: () => void;
+  showLoadColumn?: boolean;
+  processingLoad?: ProcessingLoadResponse;
+  processingLoadError?: boolean;
 };
 const PipelineNameTD = styled.td`
   max-width: 300px;
@@ -79,7 +88,24 @@ const DefaultLabel = styled(Label)(
 const getStagesWithoutDuplicates = (pipelineStages: Array<number>, usedStagesAcc: Array<number> = []) =>
   Array.from(new Set([...usedStagesAcc, ...pipelineStages]));
 
-const PipelineListItem = ({ pipeline, pipelines, connections, streams, onDeletePipeline }: Props) => {
+const PipelineListItem = ({
+  pipeline,
+  pipelines,
+  connections,
+  streams,
+  onDeletePipeline,
+  showLoadColumn: showLoadColumnProp = undefined,
+  processingLoad: processingLoadProp = undefined,
+  processingLoadError: processingLoadErrorProp = undefined,
+}: Props) => {
+  const {
+    metricsEnabled,
+    processingLoad: processingLoadContext,
+    processingLoadError: processingLoadErrorContext,
+  } = useProcessingLoadContext();
+  const showLoadColumn = showLoadColumnProp ?? metricsEnabled;
+  const processingLoad = processingLoadProp ?? processingLoadContext;
+  const processingLoadError = processingLoadErrorProp ?? processingLoadErrorContext;
   const { isPermitted } = usePermissions();
   const { loadingScopePermissions, scopePermissions } = useGetPermissionsByScope(pipeline);
   const { id, title, description, stages } = pipeline;
@@ -145,6 +171,14 @@ const PipelineListItem = ({ pipeline, pipelines, connections, streams, onDeleteP
       <td>
         <PipelineProcessingErrors pipeline={pipeline} />
       </td>
+      {showLoadColumn && (
+        <td>
+          <PipelineLoadCell
+            loadPercent={getPipelineLoadPercent(processingLoad, pipeline.id)}
+            error={processingLoadError}
+          />
+        </td>
+      )}
       <td>{_formatStages()}</td>
       <td>
         <ButtonToolbar>
