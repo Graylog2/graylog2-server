@@ -38,7 +38,7 @@ jest.mock('logic/rest/FetchProvider', () =>
 describe('useFiltersWithTitle', () => {
   const urlQueryFilters = OrderedMap({
     index_set_id: ['index_set_id_1', 'index_set_id_2'],
-    created_at: ['2023-03-23T13:42:50.733+00:00><'],
+    created_at: ['2023-03-23T13:42:50.733+00:00><', 'relative@300', 'keyword@Last five minutes'],
     disabled: ['false'],
   });
 
@@ -83,6 +83,14 @@ describe('useFiltersWithTitle', () => {
             {
               title: '2023-03-23 14:42:50 - Now',
               value: '2023-03-23T13:42:50.733+00:00><',
+            },
+            {
+              title: 'from 5 minutes ago until now',
+              value: 'relative@300',
+            },
+            {
+              title: 'Last five minutes',
+              value: 'keyword@Last five minutes',
             },
           ],
           disabled: [{ title: 'Running', value: 'false' }],

@@ -24,8 +24,8 @@ import useProductName, { DEFAULT_PRODUCT_NAME } from 'brand-customization/usePro
 
 const H1 = styled.h1(
   ({ theme }) => css`
-    font-size: ${theme.fonts.size.extraLarge};
-    margin-bottom: 15px;
+    font-size: ${theme.fonts.size.huge};
+    margin-bottom: ${theme.spacings.md};
   `,
 );
 

@@ -1,0 +1,10 @@
+type = "changed"
+message = "Sorting and searching on paginated tables in the product changes from case-sensitive to case-insensitive."
+
+details.user = """
+This applies to paginated entity tables throughout the product as well as the corresponding REST
+API endpoints. Sorting and searching by string fields (such as titles or names) is now case-insensitive
+and uses natural numeric ordering, so for example `Stream 2` is listed before `Stream 10`.
+"""
+
+pulls = ["25808"]

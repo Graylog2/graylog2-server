@@ -19,7 +19,7 @@ import React, { useEffect, useState } from 'react';
 import ObjectUtils from 'util/ObjectUtils';
 import connect from 'stores/connect';
 import { PaginatedList, Spinner, SearchForm } from 'components/common';
-import { Row, Col, Panel, Tabs, Tab } from 'components/bootstrap';
+import { Row, Col, Panel, Tabs } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import DocsHelper from 'util/DocsHelper';
@@ -133,8 +133,12 @@ const RuleHelper = ({ functionDescriptors = undefined, paginationQueryParameter,
           </Col>
         ) : (
           <Col md={12}>
-            <Tabs id="functionsHelper" defaultActiveKey={1} animation={false}>
-              <Tab eventKey={1} title="Functions">
+            <Tabs defaultValue="functions">
+              <Tabs.List>
+                <Tabs.Tab value="functions">Functions</Tabs.Tab>
+                <Tabs.Tab value="example">Example</Tabs.Tab>
+              </Tabs.List>
+              <Tabs.Panel value="functions">
                 <Row className="rule-ref-descriptions">
                   <Col sm={12}>
                     <p className={RuleHelperStyle.marginTab}>
@@ -166,13 +170,13 @@ const RuleHelper = ({ functionDescriptors = undefined, paginationQueryParameter,
                     </div>
                   </Col>
                 </Row>
-              </Tab>
-              <Tab eventKey={2} title="Example">
+              </Tabs.Panel>
+              <Tabs.Panel value="example">
                 <p className={RuleHelperStyle.marginTab}>
                   Do you want to see how a pipeline rule looks like? Take a look at this example:
                 </p>
                 <pre className={`${RuleHelperStyle.marginTab} ${RuleHelperStyle.exampleFunction}`}>{ruleTemplate}</pre>
-              </Tab>
+              </Tabs.Panel>
             </Tabs>
           </Col>
         )}
