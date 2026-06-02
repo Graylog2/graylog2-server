@@ -28,7 +28,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -136,13 +136,18 @@ class MatcherEvaluatorTest {
 
     @Test
     void userMatcherFallsBackThroughKnownFields() {
-        lenient().when(event.getField("target_user")).thenReturn(FieldValue.string("alice"));
+        when(event.getField("gl2_source_user")).thenReturn(null);
+        when(event.getField("user_name")).thenReturn(null);
+        when(event.getField("target_user")).thenReturn(FieldValue.string("alice"));
         final Matcher matcher = Matcher.builder()
                 .type(MatcherType.USER)
                 .values(ImmutableList.of("alice"))
                 .build();
 
         assertThat(evaluator.matches(matcher, event)).isTrue();
+        verify(event).getField("gl2_source_user");
+        verify(event).getField("user_name");
+        verify(event).getField("target_user");
     }
 
     @Test
