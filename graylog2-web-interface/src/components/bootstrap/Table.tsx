@@ -31,6 +31,7 @@ export const getPinnedCellClassName = (isPinned: boolean, isStripedRow: boolean)
 
 type Props = React.PropsWithChildren<{
   className?: string;
+  'data-testid'?: string;
   striped?: boolean;
   hover?: boolean;
   condensed?: boolean;
@@ -135,6 +136,7 @@ const StyledTable = styled(MantineTable)<StyledProps>(
 const Table = ({
   children = undefined,
   className = undefined,
+  'data-testid': dataTestId = undefined,
   striped = undefined,
   hover = undefined,
   condensed = undefined,
@@ -142,7 +144,7 @@ const Table = ({
   responsive = undefined,
 }: Props) => {
   const table = (
-    <StyledTable className={className} $striped={striped} $hover={hover} $condensed={condensed} $bordered={bordered}>
+    <StyledTable className={className} data-testid={dataTestId} $striped={striped} $hover={hover} $condensed={condensed} $bordered={bordered}>
       {children}
     </StyledTable>
   );
