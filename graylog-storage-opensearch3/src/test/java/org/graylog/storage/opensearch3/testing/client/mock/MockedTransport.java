@@ -44,11 +44,17 @@ class MockedTransport implements OpenSearchTransport {
     private final JacksonJsonpMapper jacksonJsonpMapper;
     private final Set<MockedResponse> responses;
     private final Consumer<TransportOptions> optionsConsumer;
+    private final TransportOptions baseOptions;
 
     MockedTransport(Set<MockedResponse> responses, Consumer<TransportOptions> optionsConsumer) {
+        this(responses, optionsConsumer, TransportOptions.builder().build());
+    }
+
+    MockedTransport(Set<MockedResponse> responses, Consumer<TransportOptions> optionsConsumer, TransportOptions baseOptions) {
         jacksonJsonpMapper = new JacksonJsonpMapper(OBJECT_MAPPER);
         this.responses = responses;
         this.optionsConsumer = optionsConsumer;
+        this.baseOptions = baseOptions;
     }
 
     @Override
@@ -108,7 +114,7 @@ class MockedTransport implements OpenSearchTransport {
 
     @Override
     public TransportOptions options() {
-        return TransportOptions.builder().build();
+        return baseOptions;
     }
 
     @Override

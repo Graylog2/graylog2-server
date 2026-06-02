@@ -18,10 +18,14 @@
 package org.graylog.storage.opensearch3;
 
 import com.github.joschi.jadconfig.util.Duration;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.core5.util.Timeout;
 import org.graylog.storage.opensearch3.testing.client.mock.ServerlessOpenSearchClient;
 import org.junit.jupiter.api.Test;
+import org.opensearch.client.transport.httpclient5.ApacheHttpClient5Options;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -37,6 +41,26 @@ class OfficialOpensearchClientTest {
                 client.executeWithClientTimeout(c -> asyncCall(100), "Error getting data", Duration.milliseconds(50)))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Error getting data");
+    }
+
+    @Test
+    void baseRequestConfigFieldsArePreservedWhenMergingResponseTimeout() {
+        final RequestConfig baseConfig = RequestConfig.custom()
+                .setConnectionRequestTimeout(42, TimeUnit.SECONDS)
+                .setExpectContinueEnabled(true)
+                .build();
+        final ApacheHttpClient5Options baseOptions = ApacheHttpClient5Options.DEFAULT.toBuilder()
+                .setRequestConfig(baseConfig)
+                .build();
+
+        final OfficialOpensearchClient client = ServerlessOpenSearchClient.builder()
+                .withBaseOptions(baseOptions)
+                .build();
+
+        final RequestConfig mergedConfig = client.clientOptionsWithTimeout(Duration.seconds(5)).getRequestConfig();
+        assertThat(mergedConfig.getConnectionRequestTimeout()).isEqualTo(Timeout.ofSeconds(42));
+        assertThat(mergedConfig.isExpectContinueEnabled()).isTrue();
+        assertThat(mergedConfig.getResponseTimeout()).isEqualTo(Timeout.ofSeconds(5));
     }
 
     private CompletableFuture<String> asyncCall(long timeout) {

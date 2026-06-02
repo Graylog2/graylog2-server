@@ -45,6 +45,7 @@ public class ServerlessOpenSearchClient {
     public static class Builder {
         private final LinkedHashSet<MockedResponse> responses = new LinkedHashSet<>();
         private Consumer<TransportOptions> optionsConsumer;
+        private TransportOptions baseOptions;
 
         public Builder stubResponse(String method, String url, String body) {
             responses.add(new StringResponse(method, compilePattern(url), body));
@@ -66,13 +67,20 @@ public class ServerlessOpenSearchClient {
             return this;
         }
 
+        public Builder withBaseOptions(TransportOptions options) {
+            this.baseOptions = options;
+            return this;
+        }
+
         private PathMatcher compilePattern(String glob) {
             // todo: this is not good, but works as expected for now
             return FileSystems.getDefault().getPathMatcher("glob:" + glob);
         }
 
         public OfficialOpensearchClient build() {
-            final MockedTransport transport = new MockedTransport(responses, optionsConsumer);
+            final MockedTransport transport = baseOptions != null
+                    ? new MockedTransport(responses, optionsConsumer, baseOptions)
+                    : new MockedTransport(responses, optionsConsumer);
             return new OfficialOpensearchClient(new OpenSearchClient(transport), new OpenSearchAsyncClient(transport), new ObjectMapper());
         }
     }

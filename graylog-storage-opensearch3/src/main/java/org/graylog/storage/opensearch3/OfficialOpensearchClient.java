@@ -108,8 +108,8 @@ public final class OfficialOpensearchClient {
     }
 
     @Nonnull
-    private ApacheHttpClient5Options clientOptionsWithTimeout(Duration timeout) {
-        final ApacheHttpClient5Options baseApacheOptions = getApacheHttpClientOtions();
+    ApacheHttpClient5Options clientOptionsWithTimeout(Duration timeout) {
+        final ApacheHttpClient5Options baseApacheOptions = getApacheHttpClientOptions();
         final RequestConfig baseRequestConfig = baseApacheOptions.getRequestConfig();
 
         final RequestConfig requestConfig = (baseRequestConfig != null ? RequestConfig.copy(baseRequestConfig) : RequestConfig.custom())
@@ -121,9 +121,16 @@ public final class OfficialOpensearchClient {
                 .build();
     }
 
-    private ApacheHttpClient5Options getApacheHttpClientOtions() {
+    private ApacheHttpClient5Options getApacheHttpClientOptions() {
         final var baseOptions = async._transport().options();
-        return baseOptions instanceof ApacheHttpClient5Options o ? o : ApacheHttpClient5Options.DEFAULT;
+        if (baseOptions instanceof ApacheHttpClient5Options o) {
+            return o;
+        }
+        LOG.warn("Transport options are {} rather than ApacheHttpClient5Options; falling back to defaults. " +
+                        "Base request config settings (connectionRequestTimeout, expectContinueEnabled, " +
+                        "authenticationEnabled) will not be preserved on per-request overrides.",
+                baseOptions.getClass().getName());
+        return ApacheHttpClient5Options.DEFAULT;
     }
 
     public <T> CompletableFuture<T> async(ThrowingAsyncFunction<CompletableFuture<T>> operation, String errorMessage) {
