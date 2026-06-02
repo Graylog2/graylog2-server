@@ -17,13 +17,15 @@
 import * as React from 'react';
 
 import { DocumentTitle, IfPermitted } from 'components/common';
+import PageNavigation from 'components/common/PageNavigation';
 import { IndexerClusterHealth } from 'components/indexers';
 import IndexerSystemOverviewComponent from 'components/indexers/IndexerSystemOverviewComponent';
-import { NotificationsList } from 'components/notifications';
 import { SystemJobsComponent } from 'components/systemjobs';
 import { SystemMessagesComponent } from 'components/systemmessages';
 import { TimesList } from 'components/times';
 import GraylogClusterOverview from 'components/cluster/GraylogClusterOverview';
+import { Row } from 'components/bootstrap';
+import SYSTEM_OVERVIEW_TABS from 'components/notifications/systemOverviewTabs';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import HealthModule from 'components/health/HealthModule';
 
@@ -34,9 +36,9 @@ const SystemOverviewPage = () => (
         <HealthModule />
       </HideOnCloud>
 
-      <IfPermitted permissions="notifications:read">
-        <NotificationsList />
-      </IfPermitted>
+      <Row>
+        <PageNavigation items={SYSTEM_OVERVIEW_TABS} />
+      </Row>
 
       <HideOnCloud>
         <IfPermitted permissions="systemjobs:read">
