@@ -65,7 +65,6 @@ public class ServerlessOpenSearchClient {
             this.optionsConsumer = consumer;
             return this;
         }
-        }
 
         private PathMatcher compilePattern(String glob) {
             // todo: this is not good, but works as expected for now
