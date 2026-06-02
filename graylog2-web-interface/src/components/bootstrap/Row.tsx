@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
 // Direct port of Bootstrap 3's `.row`, which is the variant in use per
@@ -58,15 +59,14 @@ const StyledRow = styled.div`
   }
 `;
 
-const Row = React.forwardRef<HTMLDivElement, Props>(
-  ({ children = undefined, as = undefined, ...rest }, ref) => (
-    <StyledRow ref={ref} as={as} {...rest}>
-      {children}
-    </StyledRow>
-  ),
+const Row = (
+  { children = undefined, as = undefined, ...rest }: Props,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) => (
+  <StyledRow ref={ref} as={as} {...rest}>
+    {children}
+  </StyledRow>
 );
 
-Row.displayName = 'Row';
-
 /** @component */
-export default Row;
+export default forwardRef(Row);

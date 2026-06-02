@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
 // Direct port of Bootstrap 3's `.col-*-*` rules. Breakpoint values are taken
@@ -220,79 +221,75 @@ const StyledCol = styled.div<StyledProps>`
     `}
 `;
 
-const Col = React.forwardRef<HTMLDivElement, Props>(
-  (
-    {
-      xs = undefined,
-      sm = undefined,
-      md = undefined,
-      lg = undefined,
-      xsOffset = undefined,
-      smOffset = undefined,
-      mdOffset = undefined,
-      lgOffset = undefined,
-      xsPush = undefined,
-      smPush = undefined,
-      mdPush = undefined,
-      lgPush = undefined,
-      xsPull = undefined,
-      smPull = undefined,
-      mdPull = undefined,
-      lgPull = undefined,
-      xsHidden = false,
-      // `sm` resolves to the same breakpoint as `md` in this project's RB
-      // config, and the .hidden-sm media query (min-width: 992px and
-      // max-width: 991px) is an empty range — so `smHidden` is a no-op
-      // visually, matching what Bootstrap renders.
-      smHidden = false,
-      mdHidden = false,
-      lgHidden = false,
-      componentClass = undefined,
-      className = undefined,
-      style = undefined,
-      id = undefined,
-      children = undefined,
-      'data-testid': dataTestid = undefined,
-    },
-    ref,
-  ) => {
-    // `smHidden` is intentionally ignored (see above).
-    void smHidden;
+const Col = (
+  {
+    xs = undefined,
+    sm = undefined,
+    md = undefined,
+    lg = undefined,
+    xsOffset = undefined,
+    smOffset = undefined,
+    mdOffset = undefined,
+    lgOffset = undefined,
+    xsPush = undefined,
+    smPush = undefined,
+    mdPush = undefined,
+    lgPush = undefined,
+    xsPull = undefined,
+    smPull = undefined,
+    mdPull = undefined,
+    lgPull = undefined,
+    xsHidden = false,
+    // `sm` resolves to the same breakpoint as `md` in this project's RB
+    // config, and the .hidden-sm media query (min-width: 992px and
+    // max-width: 991px) is an empty range — so `smHidden` is a no-op
+    // visually, matching what Bootstrap renders.
+    smHidden = false,
+    mdHidden = false,
+    lgHidden = false,
+    componentClass = undefined,
+    className = undefined,
+    style = undefined,
+    id = undefined,
+    children = undefined,
+    'data-testid': dataTestid = undefined,
+  }: Props,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) => {
+  // `smHidden` is intentionally ignored (see above).
+  void smHidden;
 
-    return (
-      <StyledCol
-        ref={ref}
-        as={componentClass}
-        $xs={xs}
-        $sm={sm}
-        $md={md}
-        $lg={lg}
-        $xsOffset={xsOffset}
-        $smOffset={smOffset}
-        $mdOffset={mdOffset}
-        $lgOffset={lgOffset}
-        $xsPush={xsPush}
-        $smPush={smPush}
-        $mdPush={mdPush}
-        $lgPush={lgPush}
-        $xsPull={xsPull}
-        $smPull={smPull}
-        $mdPull={mdPull}
-        $lgPull={lgPull}
-        $xsHidden={xsHidden}
-        $mdHidden={mdHidden}
-        $lgHidden={lgHidden}
-        className={className}
-        style={style}
-        id={id}
-        data-testid={dataTestid}>
-        {children}
-      </StyledCol>
-    );
-  },
-);
-
-Col.displayName = 'Col';
+  return (
+    <StyledCol
+      ref={ref}
+      as={componentClass}
+      $xs={xs}
+      $sm={sm}
+      $md={md}
+      $lg={lg}
+      $xsOffset={xsOffset}
+      $smOffset={smOffset}
+      $mdOffset={mdOffset}
+      $lgOffset={lgOffset}
+      $xsPush={xsPush}
+      $smPush={smPush}
+      $mdPush={mdPush}
+      $lgPush={lgPush}
+      $xsPull={xsPull}
+      $smPull={smPull}
+      $mdPull={mdPull}
+      $lgPull={lgPull}
+      $xsHidden={xsHidden}
+      $mdHidden={mdHidden}
+      $lgHidden={lgHidden}
+      className={className}
+      style={style}
+      id={id}
+      data-testid={dataTestid}>
+      {children}
+    </StyledCol>
+  );
+};
 
 /** @component */
-export default Col;
+export default forwardRef(Col);
