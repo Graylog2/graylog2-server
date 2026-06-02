@@ -28,11 +28,7 @@ const NotificationBody = ({ row }: { row: NotificationType }) => {
   if (isLoading) return <Spinner />;
   if (isError || !data) return <span>{FALLBACK_MESSAGE}</span>;
 
-  return (
-    <pre>
-      <Sanitize html={data.description.trim()} />
-    </pre>
-  );
+  return <pre><Sanitize html={data.description.trim()} /></pre>;
 };
 
 const expandedSections = {
