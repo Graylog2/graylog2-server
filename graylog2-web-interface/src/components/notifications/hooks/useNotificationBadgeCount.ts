@@ -14,23 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import { SystemNotifications } from '@graylog/server-api';
 
-import { NOTIFICATIONS_QUERY_KEY } from 'components/notifications/constants';
+import type { RequestOptions } from 'routing/request';
+import { NOTIFICATIONS_QUERY_KEY, BADGE_COUNT_KEY } from 'components/notifications/constants';
 
-const deleteNotification = ({ type, key }: { type: string; key: string }) =>
-  key ? SystemNotifications.deleteKeyedNotification(type, key) : SystemNotifications.deleteNotification(type);
+const POLL_INTERVAL = 3000;
+const NO_SESSION_EXT: RequestOptions = { requestShouldExtendSession: false };
 
-const useNotificationDelete = () => {
-  const queryClient = useQueryClient();
-  const { mutateAsync } = useMutation({
-    mutationFn: deleteNotification,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: NOTIFICATIONS_QUERY_KEY }),
+const useNotificationBadgeCount = ({ enabled = true }: { enabled?: boolean } = {}) => {
+  const { data, isLoading } = useQuery({
+    queryKey: [...NOTIFICATIONS_QUERY_KEY, BADGE_COUNT_KEY],
+    queryFn: () => SystemNotifications.getCount(NO_SESSION_EXT),
+    refetchInterval: POLL_INTERVAL,
+    enabled,
   });
 
-  return mutateAsync;
+  return { data: data ?? 0, isLoading };
 };
 
-export default useNotificationDelete;
+export default useNotificationBadgeCount;

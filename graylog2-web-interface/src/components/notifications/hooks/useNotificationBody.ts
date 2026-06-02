@@ -14,8 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { useQuery } from '@tanstack/react-query';
 
-export const NOTIFICATIONS_QUERY_KEY = ['system', 'notifications'] as const;
+import { SystemNotifications } from '@graylog/server-api';
 
-export const BADGE_COUNT_KEY = 'badge-count' as const;
-export const TABLE_KEY = 'table' as const;
+import { NOTIFICATIONS_QUERY_KEY } from 'components/notifications/constants';
+
+const useNotificationBody = (id: string) => {
+  const { data, isLoading, isError } = useQuery({
+    queryKey: [...NOTIFICATIONS_QUERY_KEY, 'message', id],
+    queryFn: () => SystemNotifications.renderHtmlById(id),
+    retry: false,
+    throwOnError: false,
+  });
+
+  return { data, isLoading, isError };
+};
+
+export default useNotificationBody;
