@@ -55,7 +55,7 @@ import {
 } from 'components/common/PaginatedEntityTable/slicing/slicingConstants';
 
 import { useWithLocalState, useWithURLParams } from './useFiltersAndPagination';
-import usePaginatedEntityTableFilterContext from './usePaginatedEntityTableFilterContext';
+import useTableFilterContext from './useTableFilterContext';
 
 const SearchRow = styled.div`
   margin-bottom: 5px;
@@ -164,7 +164,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   noColumnReordering = false,
 }: PaginatedEntityTableInnerProps<T, M>) => {
   const { fetchOptions, setQuery, onChangeFilters, onChangeSlicingFilter, paginationState } =
-    usePaginatedEntityTableFilterContext();
+    useTableFilterContext();
   const { mutateAsync: updateTableLayout } = useUpdateUserLayoutPreferences(
     tableLayout.entityTableId,
     tableLayout.layoutVariant,

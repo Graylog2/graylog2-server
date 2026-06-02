@@ -16,9 +16,9 @@
  */
 
 import PaginatedEntityTable from './PaginatedEntityTable';
-import usePaginatedEntityTableFilterContext from './usePaginatedEntityTableFilterContext';
+import useTableFilterContext from './useTableFilterContext';
 import useTableFetchContext from './useTableFetchContext';
 
-export { usePaginatedEntityTableFilterContext, useTableFetchContext };
+export { useTableFilterContext, useTableFetchContext };
 
 export default PaginatedEntityTable;

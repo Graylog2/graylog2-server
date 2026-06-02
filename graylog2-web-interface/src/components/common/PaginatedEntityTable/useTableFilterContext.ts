@@ -16,18 +16,18 @@
  */
 import { useContext } from 'react';
 
-import PaginatedEntityTableFilterContext from './TableFilterContext';
+import TableFilterContext from './TableFilterContext';
 
-const usePaginatedEntityTableFilterContext = () => {
-  const contextValue = useContext(PaginatedEntityTableFilterContext);
+const useTableFilterContext = () => {
+  const contextValue = useContext(TableFilterContext);
 
   if (!contextValue) {
     throw new Error(
-      'usePaginatedEntityTableFilterContext hook needs to be used inside PaginatedEntityTableFilterContext.Provider',
+      'useTableFilterContext hook needs to be used inside TableFilterContext.Provider',
     );
   }
 
   return contextValue;
 };
 
-export default usePaginatedEntityTableFilterContext;
+export default useTableFilterContext;
