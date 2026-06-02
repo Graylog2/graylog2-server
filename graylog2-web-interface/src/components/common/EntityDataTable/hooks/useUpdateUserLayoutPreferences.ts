@@ -18,9 +18,30 @@ import { useMutation } from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import type { TableLayoutPreferences, TableLayoutPreferencesJSON } from 'components/common/EntityDataTable/types';
+import type {
+  SlicingPreferences,
+  SlicingPreferencesJSON,
+  TableLayoutPreferences,
+  TableLayoutPreferencesJSON,
+} from 'components/common/EntityDataTable/types';
 import UserNotification from 'util/UserNotification';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
+
+const slicingToJSON = (slicing?: SlicingPreferences | null): SlicingPreferencesJSON | null | undefined => {
+  if (slicing === null) {
+    return null;
+  }
+
+  if (!slicing) {
+    return undefined;
+  }
+
+  return {
+    slice_column: slicing.sliceColumn,
+    sort_by: slicing.sortBy,
+    order: slicing.order,
+  };
+};
 
 const preferencesToJSON = <T>({
   attributes,
@@ -33,13 +54,7 @@ const preferencesToJSON = <T>({
   attributes,
   sort: sort ? { order: sort.direction, field: sort.attributeId } : undefined,
   per_page: perPage,
-  slicing: slicing
-    ? {
-        slice_column: slicing.sliceColumn,
-        sort_by: slicing.sortBy,
-        order: slicing.order,
-      }
-    : undefined,
+  slicing: slicingToJSON(slicing),
   custom_preferences: customPreferences,
   order,
 });

@@ -30,14 +30,9 @@ const useLayoutVariant = () => {
     [activeLayoutVariant, setActiveLayout],
   );
 
-  const resetLayoutVariant = useCallback(() => {
-    setActiveLayout(undefined);
-  }, [setActiveLayout]);
-
   return {
     activeLayoutVariant,
     selectLayoutVariant,
-    resetLayoutVariant,
   };
 };
 
