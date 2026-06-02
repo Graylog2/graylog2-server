@@ -17,6 +17,7 @@
 import * as React from 'react';
 
 import { Button } from 'components/bootstrap';
+import { IfPermitted } from 'components/common';
 import type { NotificationType } from 'components/notifications/types';
 import useNotificationDismiss from 'components/notifications/hooks/useNotificationDismiss';
 
@@ -26,14 +27,16 @@ const ActionsCell = ({ row }: Props) => {
   const { mutate: dismiss, isPending } = useNotificationDismiss();
 
   return (
-    <Button
-      bsSize="xs"
-      bsStyle="default"
-      onClick={() => dismiss({ id: row.id })}
-      disabled={isPending}
-      aria-label="Dismiss">
-      Dismiss
-    </Button>
+    <IfPermitted permissions="notifications:delete">
+      <Button
+        bsSize="xs"
+        bsStyle="default"
+        onClick={() => dismiss({ id: row.id })}
+        disabled={isPending}
+        aria-label="Dismiss">
+        Dismiss
+      </Button>
+    </IfPermitted>
   );
 };
 

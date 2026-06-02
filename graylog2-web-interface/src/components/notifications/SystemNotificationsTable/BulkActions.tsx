@@ -17,6 +17,7 @@
 import * as React from 'react';
 
 import { MenuItem } from 'components/bootstrap';
+import { IfPermitted } from 'components/common';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import useNotificationBulkDismiss from 'components/notifications/hooks/useNotificationBulkDismiss';
@@ -36,7 +37,9 @@ const BulkActions = () => {
 
   return (
     <BulkActionsDropdown>
-      <MenuItem onSelect={handleBulkDismiss}>Dismiss</MenuItem>
+      <IfPermitted permissions="notifications:delete">
+        <MenuItem onSelect={handleBulkDismiss}>Dismiss</MenuItem>
+      </IfPermitted>
     </BulkActionsDropdown>
   );
 };

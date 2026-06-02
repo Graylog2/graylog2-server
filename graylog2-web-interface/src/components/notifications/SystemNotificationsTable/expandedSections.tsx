@@ -28,12 +28,17 @@ const NotificationBody = ({ row }: { row: NotificationType }) => {
   if (isLoading) return <Spinner />;
   if (isError || !data) return <span>{FALLBACK_MESSAGE}</span>;
 
-  return <Sanitize html={data.description} />;
+  return (
+    <pre>
+      <Sanitize html={data.description} />
+    </pre>
+  );
 };
 
 const expandedSections = {
   body: {
-    title: 'Full message',
+    title: '',
+    disableHeader: true,
     content: (row: NotificationType) => <NotificationBody row={row} />,
   },
 };
