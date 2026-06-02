@@ -27,6 +27,7 @@ import com.google.common.graph.MutableGraph;
 import jakarta.inject.Inject;
 import org.graylog.events.contentpack.entities.EventDefinitionEntity;
 import org.graylog.events.processor.DBEventDefinitionService;
+import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
 import org.graylog.events.processor.EventProcessorExecutionJob;
@@ -174,14 +175,14 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
         final EventDefinitionDto existing = existingEntity.entity();
         final EventDefinitionEntity eventDefinitionEntity = objectMapper.convertValue(entityV1.data(),
                 EventDefinitionEntity.class);
-        final EventDefinitionDto decoded = eventDefinitionEntity.toNativeEntity(parameters, nativeEntities);
-        // Preserve the existing entity's ID and scope: the force-update below bypasses the scope
-        // mutability check, so we must not let the decoded content silently change either.
-        final EventDefinitionDto updated = decoded.toBuilder().id(existing.id()).scope(existing.scope()).build();
-        final boolean schedule = eventDefinitionEntity.isScheduled().asBoolean(parameters);
-        // checkMutability = false: this is a content-pack-driven (installer) write. Illuminate event
-        // definitions are immutable-scoped for user edits, but the installer must rewrite their content
-        // in place to preserve the entity ID across an upgrade.
+        // Seed with the existing entity so fields the pack doesn't carry (id, state, ...) keep their
+        // stored values; guard scope since the mutability bypass below would otherwise let the pack change it.
+        final EventDefinitionDto updated = eventDefinitionEntity
+                .toNativeEntity(parameters, nativeEntities, existing.toBuilder())
+                .toBuilder().scope(existing.scope()).build();
+        // Scheduling follows the user's enabled/disabled choice, not the pack's is_scheduled flag.
+        final boolean schedule = existing.state() == EventDefinition.State.ENABLED;
+        // checkMutability = false: installer-driven write, must rewrite immutable Illuminate content in place.
         eventDefinitionHandler.update(updated, schedule, false);
     }
 
