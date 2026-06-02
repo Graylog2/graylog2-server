@@ -58,11 +58,15 @@ const StyledRow = styled.div`
   }
 `;
 
-const Row = ({ children = undefined, as = undefined, ...rest }: Props) => (
-  <StyledRow as={as} {...rest}>
-    {children}
-  </StyledRow>
+const Row = React.forwardRef<HTMLDivElement, Props>(
+  ({ children = undefined, as = undefined, ...rest }, ref) => (
+    <StyledRow ref={ref} as={as} {...rest}>
+      {children}
+    </StyledRow>
+  ),
 );
+
+Row.displayName = 'Row';
 
 /** @component */
 export default Row;
