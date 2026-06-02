@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { parseStringTimerangeFilterValue} from 'components/common/EntityFilters/helpers/timeRange';
+import { parseStringTimerangeFilterValue } from 'components/common/EntityFilters/helpers/timeRange';
 import type { TimeRange } from 'views/logic/queries/Query';
 
 const parseTimerangeFilter = (timestamp: string | undefined, defaultTimerange?: TimeRange): TimeRange => {

@@ -15,14 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { TabsProps } from '@mantine/core';
-import { Tabs as MantineTabs } from '@mantine/core';
+import styled from 'styled-components';
 
-type Props = TabsProps;
+import type { NotificationType } from 'components/notifications/types';
 
-const Tabs = ({ children, ...props }: Props) => <MantineTabs {...props}>{children}</MantineTabs>;
+const Truncated = styled.span`
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+`;
 
-Tabs.List = MantineTabs.List;
-Tabs.Tab = MantineTabs.Tab;
-Tabs.Panel = MantineTabs.Panel;
-export default Tabs;
+type Props = { row: NotificationType };
+
+const DescriptionCell = ({ row }: Props) => <Truncated title={row.description}>{row.description}</Truncated>;
+
+export default DescriptionCell;

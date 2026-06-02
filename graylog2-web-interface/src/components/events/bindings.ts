@@ -21,7 +21,7 @@ import Routes from 'routing/Routes';
 
 export const EVENT_DEFINITIONS_TITLE = 'Event Definitions';
 export const ALERTS_TITLE = 'Alerts & Events';
-const NOTIFICATIONS_TITLE = 'Notifications';
+export const NOTIFICATIONS_TITLE = 'Notifications';
 export const PAGE_NAVIGATION_TITLE = 'Alerts';
 
 const eventsBindings: PluginExports = {
