@@ -19,6 +19,7 @@ package org.graylog.storage.opensearch3;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
+import jakarta.annotation.Nonnull;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.core5.http.ContentTooLongException;
 import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
@@ -98,18 +99,31 @@ public final class OfficialOpensearchClient {
      */
     <T> T executeWithClientTimeout(ThrowingAsyncFunction<CompletableFuture<T>> operation, String errorMessage, Duration timeout) {
         try {
-            final ApacheHttpClient5Options options = ApacheHttpClient5Options.DEFAULT.toBuilder()
-                    .setRequestConfig(RequestConfig.custom()
-                            .setResponseTimeout(timeout.toMilliseconds(), TimeUnit.MILLISECONDS)
-                            .build())
-                    .build();
-            CompletableFuture<T> futureResponse = async(
-                    asyncClient -> operation.apply(asyncClient.withTransportOptions(options)),
-                    errorMessage);
+            final ApacheHttpClient5Options options = clientOptionsWithTimeout(timeout);
+            CompletableFuture<T> futureResponse = async(asyncClient -> operation.apply(asyncClient.withTransportOptions(options)), errorMessage);
             return futureResponse.get(timeout.toMilliseconds(), TimeUnit.MILLISECONDS);
         } catch (Throwable t) {
             throw mapException(t, errorMessage);
         }
+    }
+
+    @Nonnull
+    private ApacheHttpClient5Options clientOptionsWithTimeout(Duration timeout) {
+        final ApacheHttpClient5Options baseApacheOptions = getApacheHttpClientOtions();
+        final RequestConfig baseRequestConfig = baseApacheOptions.getRequestConfig();
+
+        final RequestConfig requestConfig = (baseRequestConfig != null ? RequestConfig.copy(baseRequestConfig) : RequestConfig.custom())
+                .setResponseTimeout(timeout.toMilliseconds(), TimeUnit.MILLISECONDS)
+                .build();
+
+        return baseApacheOptions.toBuilder()
+                .setRequestConfig(requestConfig)
+                .build();
+    }
+
+    private ApacheHttpClient5Options getApacheHttpClientOtions() {
+        final var baseOptions = async._transport().options();
+        return baseOptions instanceof ApacheHttpClient5Options o ? o : ApacheHttpClient5Options.DEFAULT;
     }
 
     public <T> CompletableFuture<T> async(ThrowingAsyncFunction<CompletableFuture<T>> operation, String errorMessage) {
