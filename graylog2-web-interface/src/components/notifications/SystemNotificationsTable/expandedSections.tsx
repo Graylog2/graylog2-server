@@ -30,7 +30,7 @@ const NotificationBody = ({ row }: { row: NotificationType }) => {
 
   return (
     <pre>
-      <Sanitize html={data.description} />
+      <Sanitize html={data.description.trim()} />
     </pre>
   );
 };
