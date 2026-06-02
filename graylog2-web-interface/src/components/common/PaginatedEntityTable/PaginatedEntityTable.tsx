@@ -108,12 +108,16 @@ const INITIAL_DATA = {
   meta: null,
 };
 
-const defaultSlicingPreferences = (sliceColumn: string | null, columnSchemas: Array<ColumnSchema>): SlicingPreferences => {
-  if(sliceColumn === null) return ({
-    sliceColumn: null,
-    sortBy: null,
-    order: null,
-  })
+const defaultSlicingPreferences = (
+  sliceColumn: string | null,
+  columnSchemas: Array<ColumnSchema>,
+): SlicingPreferences => {
+  if (sliceColumn === null)
+    return {
+      sliceColumn: null,
+      sortBy: null,
+      order: null,
+    };
 
   const sliceSortDefault = columnSchemas.find(({ id }) => id === sliceColumn)?.slice_sort_default;
   const sortBy = sliceSortDefault?.mode ?? ALPHABETICAL_SORT;
