@@ -1,0 +1,2 @@
+type = "added"
+message = "Event definitions can now declare exclusion rules that suppress notifications for matching events. Excluded events still persist for audit but do not trigger notifications."

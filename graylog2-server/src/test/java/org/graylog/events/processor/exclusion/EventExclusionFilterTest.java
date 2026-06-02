@@ -19,6 +19,7 @@ package org.graylog.events.processor.exclusion;
 import com.google.common.collect.ImmutableList;
 import org.graylog.events.event.Event;
 import org.graylog.events.event.EventWithContext;
+import org.graylog.events.fields.FieldValue;
 import org.graylog.events.processor.EventDefinition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -117,6 +119,34 @@ class EventExclusionFilterTest {
 
         verify(event).setExcludedByRuleId("first");
         verify(event, never()).setExcludedByRuleId(eq("second"));
+    }
+
+    @Test
+    void integratesWithRealMatcherEvaluator() {
+        final EventExclusionFilter realFilter = new EventExclusionFilter(new MatcherEvaluator());
+
+        final ExclusionRule rule = ExclusionRule.builder()
+                .id("scanner-rule").title("Suppress scanner traffic")
+                .matchers(ImmutableList.of(Matcher.builder()
+                        .type(MatcherType.USER)
+                        .values(ImmutableList.of("alice"))
+                        .build()))
+                .build();
+        final EventDefinition def = mock(EventDefinition.class);
+        when(def.exclusions()).thenReturn(ImmutableList.of(rule));
+
+        final Event aliceEvent = mock(Event.class);
+        final Event bobEvent = mock(Event.class);
+        when(aliceEvent.getField("gl2_source_user")).thenReturn(FieldValue.string("alice"));
+        when(bobEvent.getField("gl2_source_user")).thenReturn(FieldValue.string("bob"));
+
+        final List<EventWithContext> result = realFilter.filter(def,
+                List.of(withContext(aliceEvent), withContext(bobEvent)));
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).event()).isSameAs(bobEvent);
+        verify(aliceEvent).setExcludedByRuleId("scanner-rule");
+        verify(bobEvent, never()).setExcludedByRuleId(anyString());
     }
 
     private static EventWithContext withContext(Event event) {
