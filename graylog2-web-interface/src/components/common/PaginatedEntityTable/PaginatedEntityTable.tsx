@@ -129,8 +129,10 @@ const defaultSlicingPreferences = (
   };
 };
 
-type PaginatedEntityTableInnerProps<T extends EntityBase, M> =
-  Omit<PaginatedEntityTableProps<T, M>, 'defaultFilters' | 'fetchOptions'> & {
+type PaginatedEntityTableInnerProps<T extends EntityBase, M> = Omit<
+  PaginatedEntityTableProps<T, M>,
+  'defaultFilters' | 'fetchOptions'
+> & {
   isLoadingLayoutPreferences: boolean;
   layoutConfig: LayoutConfig;
   onDataLoaded?: (data: PaginatedResponse<unknown, unknown>) => void;
@@ -167,13 +169,12 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   noPageSizeSelect = false,
   noColumnReordering = false,
 }: PaginatedEntityTableInnerProps<T, M>) => {
-  const { fetchOptions, setQuery, onChangeFilters, onChangeSlicingFilter, paginationState } =
-    useTableFilterContext();
+  const { searchParams, setQuery, onChangeFilters, onChangeSlicingFilter, paginationState } = useTableFilterContext();
   const { mutateAsync: updateTableLayout } = useUpdateUserLayoutPreferences(
     tableLayout.entityTableId,
     tableLayout.layoutVariant,
   );
-  const fetchKey = useMemo(() => keyFn(fetchOptions), [fetchOptions, keyFn]);
+  const fetchKey = useMemo(() => keyFn(searchParams), [searchParams, keyFn]);
 
   const {
     data: paginatedEntities = INITIAL_DATA,
@@ -183,7 +184,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
     error,
   } = useFetchEntities<T, M>({
     fetchKey,
-    searchParams: fetchOptions,
+    searchParams,
     enabled: !isLoadingLayoutPreferences,
     fetchEntities,
     humanName,
@@ -232,7 +233,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
     (newSliceCol: string | undefined, newSlice?: string) => {
       onChangeSlicingFilter(newSlice);
 
-      if (newSliceCol === fetchOptions.sliceCol) {
+      if (newSliceCol === searchParams.sliceCol) {
         return;
       }
 
@@ -240,7 +241,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
         slicing: newSliceCol !== undefined ? defaultSlicingPreferences(newSliceCol, columnSchemas) : null,
       });
     },
-    [columnSchemas, fetchOptions.sliceCol, onChangeSlicingFilter, updateTableLayout],
+    [columnSchemas, searchParams.sliceCol, onChangeSlicingFilter, updateTableLayout],
   );
 
   const attributes = useAuthorizedAttributes(paginatedEntities?.attributes ?? []);
@@ -260,15 +261,11 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   } = paginatedEntities;
 
   return (
-    <TableFetchContextProvider
-      refetch={refetch}
-      searchParams={fetchOptions}
-      attributes={attributes}
-      entityTableId={tableLayout.entityTableId}>
+    <TableFetchContextProvider refetch={refetch} attributes={attributes} entityTableId={tableLayout.entityTableId}>
       <Container>
         {TopSection ? <TopSection /> : null}
         <RowContainer>
-          {fetchOptions.sliceCol && typeof fetchSlices === 'function' && (
+          {searchParams.sliceCol && typeof fetchSlices === 'function' && (
             <Slicing
               fetchSlices={fetchSlices}
               appSection={appSection}
@@ -286,19 +283,19 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
                   focusAfterMount={focusSearchAfterMount}
                   onSearch={onSearch}
                   onReset={onSearchReset}
-                  query={fetchOptions.query}
+                  query={searchParams.query}
                   placeholder={searchPlaceholder ?? `Search for ${humanName}`}
                   queryHelpComponent={queryHelpComponent}>
                   {attributes.length > 0 && (
                     <div style={{ marginBottom: 5 }}>
                       <EntityFilters
                         attributes={attributes}
-                        urlQueryFilters={fetchOptions.filters}
+                        urlQueryFilters={searchParams.filters}
                         setUrlQueryFilters={onChangeFilters}
                         filterValueRenderers={filterValueRenderers}
                         appSection={appSection}
-                        activeSliceCol={fetchOptions.sliceCol}
-                        activeSlice={fetchOptions.slice}
+                        activeSliceCol={searchParams.sliceCol}
+                        activeSlice={searchParams.slice}
                       />
                     </div>
                   )}
@@ -306,7 +303,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
                 {topRightCol}
               </SearchRow>
             )}
-            {MiddleSection ? <MiddleSection searchParams={fetchOptions} setFilters={onChangeFilters} /> : null}
+            {MiddleSection ? <MiddleSection searchParams={searchParams} setFilters={onChangeFilters} /> : null}
 
             {isError ? (
               <FetchErrorAlert message={`Fetching ${humanName} failed`} error={error} />
@@ -339,7 +336,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
                     onPageSizeChange={onPageSizeChange}
                     pageSize={layoutConfig.pageSize}
                     activeSort={layoutConfig.sort}
-                    activeSliceCol={fetchOptions.sliceCol}
+                    activeSliceCol={searchParams.sliceCol}
                     appSection={appSection}
                     entityActions={entityActions}
                     columnRenderers={columnRenderers}

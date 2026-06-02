@@ -43,7 +43,7 @@ export const useWithURLParams = (
     return urlQueryFilters;
   }, [hasUserModifiedFilters, urlQueryFilters, defaultFilters]);
 
-  const fetchOptions: SearchParams = useMemo(
+  const searchParams: SearchParams = useMemo(
     () => ({
       query,
       slice,
@@ -73,10 +73,13 @@ export const useWithURLParams = (
     [urlPagination, setUrlQueryFilters],
   );
 
-  const onChangeSlicingFilter = useCallback((newSlice?: string) => {
-    urlPagination.resetPage();
-    setSlice(newSlice);
-  }, [setSlice, urlPagination]);
+  const onChangeSlicingFilter = useCallback(
+    (newSlice?: string) => {
+      urlPagination.resetPage();
+      setSlice(newSlice);
+    },
+    [setSlice, urlPagination],
+  );
 
   const resetFilters = useCallback(() => {
     setHasUserModifiedFilters(false);
@@ -87,14 +90,14 @@ export const useWithURLParams = (
 
   return useMemo(
     () => ({
-      fetchOptions,
+      searchParams,
       setQuery: setUrlQuery,
       onChangeFilters,
       onChangeSlicingFilter,
       paginationState: urlPagination,
       resetFilters,
     }),
-    [fetchOptions, onChangeFilters, onChangeSlicingFilter, resetFilters, setUrlQuery, urlPagination],
+    [searchParams, onChangeFilters, onChangeSlicingFilter, resetFilters, setUrlQuery, urlPagination],
   );
 };
 
@@ -154,7 +157,7 @@ export const useWithLocalState = (
     }));
   }, []);
 
-  const fetchOptions: SearchParams = useMemo(
+  const searchParams: SearchParams = useMemo(
     () => ({
       ...transientFetchOptions,
       sliceCol: layoutConfig.slicing?.sliceColumn,
@@ -170,18 +173,18 @@ export const useWithLocalState = (
 
   return useMemo(
     () => ({
-      fetchOptions,
+      searchParams,
       setQuery,
       onChangeFilters,
       onChangeSlicingFilter,
       paginationState: {
-        page: fetchOptions.page,
-        pageSize: fetchOptions.pageSize,
+        page: searchParams.page,
+        pageSize: searchParams.pageSize,
         resetPage,
         setPagination,
       },
       resetFilters,
     }),
-    [fetchOptions, onChangeFilters, onChangeSlicingFilter, resetFilters, resetPage, setPagination, setQuery],
+    [searchParams, onChangeFilters, onChangeSlicingFilter, resetFilters, resetPage, setPagination, setQuery],
   );
 };

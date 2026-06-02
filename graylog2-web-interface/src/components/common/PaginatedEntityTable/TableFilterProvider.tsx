@@ -17,9 +17,7 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 
-import PaginatedEntityTableFilterContext, {
-  type TableFilterContextValue,
-} from './TableFilterContext';
+import PaginatedEntityTableFilterContext, { type TableFilterContextValue } from './TableFilterContext';
 
 type Props = React.PropsWithChildren<{
   externalSearch?: {
@@ -30,11 +28,7 @@ type Props = React.PropsWithChildren<{
 
 const noop = () => {};
 
-const TableFilterProvider = ({
-  children = undefined,
-  externalSearch = undefined,
-  value,
-}: Props) => {
+const TableFilterProvider = ({ children = undefined, externalSearch = undefined, value }: Props) => {
   const contextValue = useMemo(() => {
     if (!externalSearch) {
       return value;
@@ -42,8 +36,8 @@ const TableFilterProvider = ({
 
     return {
       ...value,
-      fetchOptions: {
-        ...value.fetchOptions,
+      searchParams: {
+        ...value.searchParams,
         query: externalSearch.query,
       },
       setQuery: noop,

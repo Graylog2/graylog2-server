@@ -22,7 +22,7 @@ import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
 
 export type TableFilterContextValue = {
-  fetchOptions: SearchParams;
+  searchParams: SearchParams;
   setQuery: (newQuery: string) => void;
   onChangeFilters: (newFilters: UrlQueryFilters) => void;
   onChangeSlicingFilter: (slice?: string) => void;
@@ -30,8 +30,6 @@ export type TableFilterContextValue = {
   resetFilters: () => void;
 };
 
-const TableFilterContext = React.createContext<TableFilterContextValue | undefined>(
-  undefined,
-);
+const TableFilterContext = React.createContext<TableFilterContextValue | undefined>(undefined);
 
 export default singleton('contexts.TableFilterContext', () => TableFilterContext);

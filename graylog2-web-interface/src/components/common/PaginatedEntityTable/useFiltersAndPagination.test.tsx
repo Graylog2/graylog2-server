@@ -114,19 +114,19 @@ describe('useFiltersAndPagination', () => {
 
       const { result } = renderHook(() => useWithURLParams(layoutConfig, defaultFilters));
 
-      expect(filtersAsObject(result.current.fetchOptions.filters)).toEqual({ status: ['OPEN'] });
-      expect(result.current.fetchOptions.query).toEqual('message:error');
-      expect(result.current.fetchOptions.slice).toEqual('admin');
-      expect(result.current.fetchOptions.page).toEqual(5);
+      expect(filtersAsObject(result.current.searchParams.filters)).toEqual({ status: ['OPEN'] });
+      expect(result.current.searchParams.query).toEqual('message:error');
+      expect(result.current.searchParams.slice).toEqual('admin');
+      expect(result.current.searchParams.page).toEqual(5);
 
       act(() => {
         result.current.resetFilters();
       });
 
-      expect(filtersAsObject(result.current.fetchOptions.filters)).toEqual(defaultFilters.toJS());
-      expect(result.current.fetchOptions.query).toEqual('message:error');
-      expect(result.current.fetchOptions.slice).toBeUndefined();
-      expect(result.current.fetchOptions.page).toEqual(1);
+      expect(filtersAsObject(result.current.searchParams.filters)).toEqual(defaultFilters.toJS());
+      expect(result.current.searchParams.query).toEqual('message:error');
+      expect(result.current.searchParams.slice).toBeUndefined();
+      expect(result.current.searchParams.page).toEqual(1);
       expect(mockSetQueryParam).toHaveBeenCalledWith('filters', []);
       expect(mockSetQueryParam).toHaveBeenCalledWith('slice', undefined);
       expect(mockSetQueryParams).toHaveBeenCalledWith({ page: 1, pageSize: undefined });
@@ -135,20 +135,20 @@ describe('useFiltersAndPagination', () => {
     it('reapplies default filters after user filters were changed', () => {
       const { result } = renderHook(() => useWithURLParams(layoutConfig, defaultFilters));
 
-      expect(filtersAsObject(result.current.fetchOptions.filters)).toEqual(defaultFilters.toJS());
+      expect(filtersAsObject(result.current.searchParams.filters)).toEqual(defaultFilters.toJS());
 
       act(() => {
         result.current.onChangeFilters(OrderedMap({ status: ['OPEN'] }));
       });
 
-      expect(filtersAsObject(result.current.fetchOptions.filters)).toEqual({ status: ['OPEN'] });
+      expect(filtersAsObject(result.current.searchParams.filters)).toEqual({ status: ['OPEN'] });
 
       act(() => {
         result.current.resetFilters();
       });
 
-      expect(filtersAsObject(result.current.fetchOptions.filters)).toEqual(defaultFilters.toJS());
-      expect(result.current.fetchOptions.page).toEqual(1);
+      expect(filtersAsObject(result.current.searchParams.filters)).toEqual(defaultFilters.toJS());
+      expect(result.current.searchParams.page).toEqual(1);
     });
   });
 
@@ -163,22 +163,22 @@ describe('useFiltersAndPagination', () => {
         result.current.paginationState.setPagination({ page: 5, pageSize: 100 });
       });
 
-      expect(result.current.fetchOptions.query).toEqual('message:error');
-      expect(filtersAsObject(result.current.fetchOptions.filters)).toEqual({ status: ['OPEN'] });
-      expect(result.current.fetchOptions.slice).toEqual('admin');
-      expect(result.current.fetchOptions.page).toEqual(5);
+      expect(result.current.searchParams.query).toEqual('message:error');
+      expect(filtersAsObject(result.current.searchParams.filters)).toEqual({ status: ['OPEN'] });
+      expect(result.current.searchParams.slice).toEqual('admin');
+      expect(result.current.searchParams.page).toEqual(5);
 
       act(() => {
         result.current.resetFilters();
       });
 
-      expect(result.current.fetchOptions.query).toEqual('');
-      expect(filtersAsObject(result.current.fetchOptions.filters)).toEqual(defaultFilters.toJS());
-      expect(result.current.fetchOptions.slice).toBeUndefined();
-      expect(result.current.fetchOptions.page).toEqual(1);
-      expect(result.current.fetchOptions.pageSize).toEqual(layoutConfig.pageSize);
-      expect(result.current.fetchOptions.sliceCol).toEqual(layoutConfig.slicing?.sliceColumn);
-      expect(result.current.fetchOptions.sort).toEqual(layoutConfig.sort);
+      expect(result.current.searchParams.query).toEqual('');
+      expect(filtersAsObject(result.current.searchParams.filters)).toEqual(defaultFilters.toJS());
+      expect(result.current.searchParams.slice).toBeUndefined();
+      expect(result.current.searchParams.page).toEqual(1);
+      expect(result.current.searchParams.pageSize).toEqual(layoutConfig.pageSize);
+      expect(result.current.searchParams.sliceCol).toEqual(layoutConfig.slicing?.sliceColumn);
+      expect(result.current.searchParams.sort).toEqual(layoutConfig.sort);
     });
   });
 });
