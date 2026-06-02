@@ -15,15 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import debounce from 'lodash/debounce';
 
-import { ClipboardButton, JSONClipboardButton } from 'components/common';
+import { ClipboardButton, JSONClipboardButton, Link } from 'components/common';
 import OverlayTrigger from 'components/common/OverlayTrigger';
 import PaginatedList from 'components/common/PaginatedList';
 import Spinner from 'components/common/Spinner';
 import Routes from 'routing/Routes';
-import useHistory from 'routing/useHistory';
 import { Button, ButtonGroup, Input, ListGroup, ListGroupItem } from 'components/bootstrap';
 import SurroundingSearchButton from 'components/search/SurroundingSearchButton';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -46,8 +45,6 @@ const TestAgainstStreamButton = ({
   id: string;
 }) => {
   const sendTelemetry = useSendTelemetry();
-  const history = useHistory();
-  const overlayRef = useRef<{ hide: () => void }>(null);
   const [searchParams, setSearchParams] = useState({
     query: '',
     page: 1,
@@ -60,12 +57,10 @@ const TestAgainstStreamButton = ({
     isInitialLoading,
   } = useStreams(searchParams);
 
-  const sendEvent = () => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_MESSAGE_TABLE_TEST_AGAINST_STREAM, {
-      app_section: 'search-message-table',
-      app_action_value: 'seach-message-table-test-against-stream',
-    });
-  };
+  const sendEvent = () => sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_MESSAGE_TABLE_TEST_AGAINST_STREAM, {
+    app_section: 'search-message-table',
+    app_action_value: 'seach-message-table-test-against-stream',
+  });
 
   const handleSearch = debounce((value: string) => {
     setSearchParams((cur) => ({ ...cur, query: value, page: 1 }));
@@ -73,14 +68,6 @@ const TestAgainstStreamButton = ({
 
   const handlePageChange = (newPage: number) => {
     setSearchParams((cur) => ({ ...cur, page: newPage }));
-  };
-
-  const handleStreamSelect = (stream: Stream) => {
-    if (stream.is_default) return;
-
-    sendEvent();
-    overlayRef.current?.hide();
-    history.push(Routes.stream_edit_example(stream.id, index, id));
   };
 
   const popoverContent = (
@@ -108,8 +95,10 @@ const TestAgainstStreamButton = ({
                 <span title="Cannot test against the default stream">{stream.title}</span>
               </ListGroupItem>
             ) : (
-              <ListGroupItem key={stream.id} onClick={() => handleStreamSelect(stream)}>
-                {stream.title}
+              <ListGroupItem key={stream.id}>
+                <Link to={Routes.stream_edit_example(stream.id, index, id)} onClick={sendEvent}>
+                  {stream.title}
+                </Link>
               </ListGroupItem>
             ),
           )}
@@ -123,7 +112,6 @@ const TestAgainstStreamButton = ({
 
   return (
     <OverlayTrigger
-      ref={overlayRef}
       trigger="click"
       placement="bottom"
       overlay={popoverContent}
