@@ -125,7 +125,8 @@ const defaultSlicingPreferences = (sliceColumn: string | null, columnSchemas: Ar
   };
 };
 
-type InnerProps = {
+type PaginatedEntityTableInnerProps<T extends EntityBase, M> =
+  Omit<PaginatedEntityTableProps<T, M>, 'defaultFilters' | 'fetchOptions'> & {
   isLoadingLayoutPreferences: boolean;
   layoutConfig: LayoutConfig;
   onDataLoaded?: (data: PaginatedResponse<unknown, unknown>) => void;
@@ -161,7 +162,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   withoutURLParams = false,
   noPageSizeSelect = false,
   noColumnReordering = false,
-}: PaginatedEntityTableProps<T, M> & InnerProps) => {
+}: PaginatedEntityTableInnerProps<T, M>) => {
   const { fetchOptions, setQuery, onChangeFilters, onChangeSlicingFilter, paginationState } =
     usePaginatedEntityTableFilterContext();
   const { mutateAsync: updateTableLayout } = useUpdateUserLayoutPreferences(
@@ -385,7 +386,6 @@ export type PaginatedEntityTableProps<T extends EntityBase, M> = {
   additionalAttributes?: Array<Attribute>;
   bulkSelection?: EntityDataTableProps['bulkSelection'];
   columnRenderers: EntityDataTableProps['columnRenderers'];
-  // eslint-disable-next-line react/no-unused-prop-types
   defaultFilters?: UrlQueryFilters;
   entityActions?: EntityDataTableProps['entityActions'];
   entityAttributesAreCamelCase: boolean;
@@ -393,7 +393,6 @@ export type PaginatedEntityTableProps<T extends EntityBase, M> = {
   rowOverride?: RowOverride<T>;
   externalSearch?: ExternalSearch;
   fetchEntities: (options: SearchParams) => Promise<PaginatedResponse<T, M>>;
-  // eslint-disable-next-line react/no-unused-prop-types
   fetchOptions?: FetchOptions;
   fetchSlices?: FetchSlices;
   filterValueRenderers?: React.ComponentProps<typeof EntityFilters>['filterValueRenderers'];
