@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 package org.graylog.events.processor.exclusion;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -69,5 +85,60 @@ class ExclusionRuleTest {
                 .build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("fieldName");
+    }
+
+    @Test
+    void allowsNonFieldMatchersWithoutFieldName() {
+        final Matcher matcher = Matcher.builder()
+                .type(MatcherType.USER)
+                .values(ImmutableList.of("scanner-bot"))
+                .build();
+        assertThat(matcher.fieldName()).isNull();
+        assertThat(matcher.type()).isEqualTo(MatcherType.USER);
+    }
+
+    @Test
+    void toBuilderProducesEqualRuleAndAllowsMutation() {
+        final ExclusionRule original = ExclusionRule.builder()
+                .id("original-id")
+                .title("Original")
+                .matchers(ImmutableList.of(
+                        Matcher.builder()
+                                .type(MatcherType.USER)
+                                .values(ImmutableList.of("scanner-bot"))
+                                .build()))
+                .build();
+
+        final ExclusionRule mutated = original.toBuilder().id("new-id").build();
+
+        assertThat(mutated.id()).isEqualTo("new-id");
+        assertThat(original.id()).isEqualTo("original-id");
+    }
+
+    @Test
+    void rejectsRuleWithBlankId() {
+        assertThatThrownBy(() -> ExclusionRule.builder()
+                .id("  ")
+                .matchers(ImmutableList.of(
+                        Matcher.builder()
+                                .type(MatcherType.USER)
+                                .values(ImmutableList.of("scanner-bot"))
+                                .build()))
+                .build())
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("id");
+    }
+
+    @Test
+    void rejectsRuleWithNullId() {
+        assertThatThrownBy(() -> ExclusionRule.builder()
+                .matchers(ImmutableList.of(
+                        Matcher.builder()
+                                .type(MatcherType.USER)
+                                .values(ImmutableList.of("scanner-bot"))
+                                .build()))
+                .build())
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("id");
     }
 }

@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 package org.graylog.events.processor.exclusion;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -53,7 +69,18 @@ public abstract class ExclusionRule {
         abstract ExclusionRule autoBuild();
 
         public ExclusionRule build() {
-            final ExclusionRule rule = autoBuild();
+            final ExclusionRule rule;
+            try {
+                rule = autoBuild();
+            } catch (IllegalStateException e) {
+                if (e.getMessage() != null && e.getMessage().contains("id")) {
+                    throw new IllegalArgumentException("ExclusionRule requires non-blank id", e);
+                }
+                throw e;
+            }
+            if (rule.id().isBlank()) {
+                throw new IllegalArgumentException("ExclusionRule requires non-blank id");
+            }
             if (rule.matchers().isEmpty()) {
                 throw new IllegalArgumentException("ExclusionRule must contain at least one matcher");
             }
