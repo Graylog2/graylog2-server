@@ -61,9 +61,10 @@ public class ServerlessOpenSearchClient {
             return this;
         }
 
-        public Builder  captureOptions(Consumer<TransportOptions> consumer) {
+        public Builder captureOptions(Consumer<TransportOptions> consumer) {
             this.optionsConsumer = consumer;
             return this;
+        }
         }
 
         private PathMatcher compilePattern(String glob) {
