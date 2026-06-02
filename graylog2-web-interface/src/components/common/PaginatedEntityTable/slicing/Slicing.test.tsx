@@ -139,7 +139,7 @@ describe('Slicing', () => {
     const noSlicingButton = await screen.findByRole('button', { name: /no slicing/i });
     await userEvent.click(noSlicingButton);
 
-    expect(onChangeSlicing).toHaveBeenCalledWith(undefined, undefined);
+    expect(onChangeSlicing).toHaveBeenCalledWith(null, null);
   });
 
   it('filters slices based on search query', async () => {
