@@ -30,7 +30,7 @@ jest.mock('logic/rest/FetchProvider', () => {
   return {
     ...actual,
     __esModule: true,
-    default: (method: string, url: string) => mockFetch(method, url),
+    default: (method: string, url: string, body?: unknown) => mockFetch(method, url, body),
   };
 });
 
@@ -112,5 +112,23 @@ describe('AssetValueInput', () => {
     await userEvent.click(removeButtons[0]);
 
     expect(handleChange).toHaveBeenLastCalledWith(['asset-2']);
+  });
+
+  it('resolves preselected ids to names via the byIds endpoint', async () => {
+    mockFetch.mockImplementation((method: string, url: string) => {
+      if (method === 'POST' && url.includes('/assets/byIds')) {
+        return Promise.resolve({
+          'asset-1': { id: 'asset-1', name: 'Production DB' },
+          'asset-2': { id: 'asset-2', name: 'Staging API' },
+        });
+      }
+
+      return Promise.resolve({ assets: [] });
+    });
+
+    wrap(<AssetValueInput values={['asset-1', 'asset-2']} onChange={jest.fn()} />);
+
+    expect(await screen.findByText('Production DB')).toBeInTheDocument();
+    expect(await screen.findByText('Staging API')).toBeInTheDocument();
   });
 });
