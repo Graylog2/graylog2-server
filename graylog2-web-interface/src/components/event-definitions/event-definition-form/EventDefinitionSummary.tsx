@@ -36,6 +36,7 @@ import type { EntitySharePayload } from 'actions/permissions/EntityShareActions'
 
 import EventDefinitionValidationSummary from './EventDefinitionValidationSummary';
 import styles from './EventDefinitionSummary.css';
+import ExclusionRulesSummary from './exclusions/ExclusionRulesSummary';
 import ShareDetails from './ShareDetails';
 
 import type { EventDefinition } from '../event-definitions-types';
@@ -324,6 +325,14 @@ const EventDefinitionSummary = ({
             </Col>
           )}
         </Row>
+        {(eventDefinition.exclusions?.length ?? 0) > 0 && (
+          <Row>
+            <Col md={11}>
+              <h3 className={commonStyles.title}>Exclusion rules</h3>
+              <ExclusionRulesSummary exclusions={eventDefinition.exclusions} />
+            </Col>
+          </Row>
+        )}
         <Row>
           {!isSystemEventDefinition && (
             <Col md={5}>{renderFields(eventDefinition.field_spec, eventDefinition.key_spec)}</Col>
