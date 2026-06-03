@@ -18,3 +18,20 @@ After upgrading:
   matched only `test` now also matches `Test` and `TEST`. API clients relying on exact-case matching
   via paginated endpoints will see additional results.
 
+### Removed deprecated License REST endpoints
+
+Four deprecated License REST endpoints (under `/api/plugins/org.graylog.plugins.license/licenses`)
+that serialized the internal `LicenseStatus` model directly have been removed. They were marked
+`@Deprecated(forRemoval = true)` and were no longer used by the Graylog web interface:
+
+- `GET /licenses`
+- `GET /licenses/{licenseId}`
+- `GET /licenses/status`
+- `GET /licenses/status/for-subject`
+
+API clients still calling these will now receive a `404`. Use the following endpoints instead:
+
+- `GET /licenses/status/active` for the active license status.
+- `GET /licenses/status/paginated` for a paginated list of license statuses.
+- `GET /licenses/validity/for-subject` to check license validity for a subject.
+
