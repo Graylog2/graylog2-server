@@ -27,7 +27,7 @@ import { rolesList } from 'fixtures/roles';
 import { UsersActions } from 'stores/users/UsersStore';
 import { asMock } from 'helpers/mocking';
 
-import UserCreate from './UserCreate';
+import UserCreatePage from './UserCreatePage';
 
 const mockLoadRolesPromise = Promise.resolve({
   list: rolesList,
@@ -62,7 +62,7 @@ jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 
 const extendedTimeout = applyTimeoutMultiplier(15000);
 
-describe('<UserCreate />', () => {
+describe('<UserCreatePage />', () => {
   const findSubmitButton = () => screen.findByRole('button', { name: /create user/i });
 
   beforeEach(() => {
@@ -72,7 +72,7 @@ describe('<UserCreate />', () => {
   it(
     'should create user',
     async () => {
-      render(<UserCreate />);
+      render(<UserCreatePage />);
 
       const usernameInput = await screen.findByLabelText('Username');
       const firstNameInput = await screen.findByLabelText('First Name');
@@ -121,7 +121,7 @@ describe('<UserCreate />', () => {
   it(
     'should trim the username',
     async () => {
-      render(<UserCreate />);
+      render(<UserCreatePage />);
 
       const usernameInput = await screen.findByLabelText('Username');
       const firstNameInput = await screen.findByLabelText('First Name');
@@ -163,7 +163,7 @@ describe('<UserCreate />', () => {
     async () => {
       asMock(Users.checkUsernameAvailability).mockReturnValue(Promise.resolve({ available: false }));
 
-      render(<UserCreate />);
+      render(<UserCreatePage />);
 
       const usernameInput = await screen.findByLabelText('Username');
 
@@ -178,7 +178,7 @@ describe('<UserCreate />', () => {
   it(
     'should display warning, if password repeat does not match password',
     async () => {
-      render(<UserCreate />);
+      render(<UserCreatePage />);
 
       const passwordInput = await screen.findByPlaceholderText('Password');
       const passwordRepeatInput = await screen.findByPlaceholderText('Repeat password');

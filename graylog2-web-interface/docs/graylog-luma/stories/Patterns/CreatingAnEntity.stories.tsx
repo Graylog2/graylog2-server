@@ -300,8 +300,9 @@ export const NewContextPage: Story = {
     <CreatePage<StoryValues>
       entityName="Stream"
       overviewRoute="/streams"
+      detailsRoute={(id) => `/streams/${id}`}
       initialValues={{ title: '', description: '' }}
-      onSubmit={async () => '/streams/new-stream-id'}
+      onSubmit={async () => ({ id: 'new-stream-id' })}
       description="Streams route incoming messages into categories. Route a message into a stream by applying matching rules.">
       <FormFields />
     </CreatePage>

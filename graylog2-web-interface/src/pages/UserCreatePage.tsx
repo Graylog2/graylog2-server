@@ -16,32 +16,46 @@
  */
 import * as React from 'react';
 
-import { LinkContainer, PageHeader, DocumentTitle } from 'components/common';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import { Button } from 'components/bootstrap';
-import UserCreate from 'components/users/UserCreate';
+import { CreatePage } from 'components/common';
 import UsersPageNavigation from 'components/users/navigation/UsersPageNavigation';
+import UserCreate from 'components/users/UserCreate';
+import useUserCreateValidate from 'components/users/UserCreate/useUserCreateValidate';
+import useUserCreateSubmit from 'components/users/UserCreate/useUserCreateSubmit';
 
-const UserCreatePage = () => (
-  <DocumentTitle title="Create New User">
-    <UsersPageNavigation />
-    <PageHeader
-      title="Create New User"
-      actions={
-        <LinkContainer to={Routes.SYSTEM.USERS.CREATE}>
-          <Button bsStyle="primary">Create user</Button>
-        </LinkContainer>
-      }
-      documentationLink={{
-        title: 'Permissions documentation',
-        path: DocsHelper.PAGES.USERS_ROLES,
-      }}>
-      <span>Use this page to create new users for the web interface or the REST API.</span>
-    </PageHeader>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type FormValues = Record<string, any>;
 
-    <UserCreate />
-  </DocumentTitle>
-);
+const UserCreatePage = () => {
+  const validate = useUserCreateValidate();
+  const createUser = useUserCreateSubmit();
+
+  const handleSubmit = async (values: FormValues): Promise<{ id: string }> => {
+    const createdUser = await createUser(values);
+
+    return { id: createdUser.id };
+  };
+
+  return (
+    <>
+      <UsersPageNavigation />
+      <CreatePage<FormValues>
+        entityName="User"
+        overviewRoute={Routes.SYSTEM.USERS.OVERVIEW}
+        detailsRoute={Routes.SYSTEM.USERS.show}
+        initialValues={{ roles: ['Reader'] }}
+        onSubmit={handleSubmit}
+        validate={validate}
+        documentationLink={{
+          title: 'Permissions documentation',
+          path: DocsHelper.PAGES.USERS_ROLES,
+        }}
+        description="Use this page to create new users for the web interface or the REST API.">
+        <UserCreate />
+      </CreatePage>
+    </>
+  );
+};
 
 export default UserCreatePage;
