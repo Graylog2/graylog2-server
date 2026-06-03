@@ -627,15 +627,17 @@ public class IndicesAdapterOS implements IndicesAdapter {
 
     @Override
     public void optimizeIndex(String index, int maxNumSegments, Duration timeout) {
-        ForcemergeRequest request = ForcemergeRequest.of(b -> b
+        final ForcemergeRequest request = ForcemergeRequest.of(b -> b
                 .index(index)
                 .maxNumSegments(Integer.toUnsignedLong(maxNumSegments))
                 .flush(true)
         );
 
-        String errorMessage = "Force merge of index " + index + " did not complete in " + timeout.toString() + ", not waiting for completion any longer.";
-        c.executeWithClientTimeout((asyncClient) -> asyncClient.indices().forcemerge(request), errorMessage, timeout);
-
+        final String errorMessage = "Force merge of index " + index + " did not complete in " + timeout + ", not waiting for completion any longer.";
+        c.executeWithClientTimeout(
+                (asyncClient) -> asyncClient.indices().forcemerge(request),
+                errorMessage,
+                timeout);
     }
 
     @Override
