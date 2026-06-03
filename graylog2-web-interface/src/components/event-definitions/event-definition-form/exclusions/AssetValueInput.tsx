@@ -23,7 +23,8 @@ import Select from 'components/common/Select/Select';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 
-type AssetMatch = { id: string; name?: string };
+type AssetMatch = { _id: string; name?: string };
+type AssetsResponse = { assets?: AssetMatch[] };
 
 type Props = {
   values: ReadonlyArray<string>;
@@ -41,12 +42,14 @@ const Hint = styled.div`
 `;
 
 const fetchAssets = async (query: string): Promise<AssetMatch[]> => {
-  const response: { results?: AssetMatch[] } | AssetMatch[] = await fetch(
+  const response: AssetsResponse = await fetch(
     'GET',
-    qualifyUrl(`/assets/search?query=${encodeURIComponent(query)}&limit=${SUGGESTION_LIMIT}`),
+    qualifyUrl(
+      `/plugins/org.graylog.plugins.securityapp.asset/assets/names?query=${encodeURIComponent(query)}&page=1&per_page=${SUGGESTION_LIMIT}`,
+    ),
   );
 
-  return Array.isArray(response) ? response : (response?.results ?? []);
+  return response?.assets ?? [];
 };
 
 const AssetValueInput = ({ values, onChange, disabled = false }: Props) => {
@@ -69,7 +72,7 @@ const AssetValueInput = ({ values, onChange, disabled = false }: Props) => {
   // Build option list. When matches are available, label them with the asset name (falling back
   // to the id). Ensure currently-selected ids remain in the option list so the Select can render
   // chips with their existing label even when the lookup hasn't returned them.
-  const matchOptions = (data ?? []).map((a) => ({ value: a.id, label: a.name ?? a.id }));
+  const matchOptions = (data ?? []).map((a) => ({ value: a._id, label: a.name ?? a._id }));
   const selectedOptions = values
     .filter((v) => !matchOptions.some((o) => o.value === v))
     .map((v) => ({ value: v, label: v }));

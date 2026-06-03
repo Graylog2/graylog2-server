@@ -77,7 +77,7 @@ describe('AssetValueInput', () => {
   });
 
   it('calls onChange with the asset id when a suggestion is selected', async () => {
-    mockFetch.mockResolvedValue([{ id: 'asset-42', name: 'Production DB' }]);
+    mockFetch.mockResolvedValue({ assets: [{ _id: 'asset-42', name: 'Production DB' }] });
     const handleChange = jest.fn();
     wrap(<Harness onChange={handleChange} />);
 
