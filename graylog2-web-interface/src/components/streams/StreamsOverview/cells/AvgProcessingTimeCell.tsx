@@ -36,6 +36,10 @@ const AvgProcessingTimeCell = ({ stream }: Props) => {
     return <span aria-label={`No average processing time available for stream ${stream.title}`}>—</span>;
   }
 
+  if (metrics.avg_processing_time_ms === 0) {
+    return null;
+  }
+
   return (
     <ProcessingTimeBadge
       ms={metrics.avg_processing_time_ms}

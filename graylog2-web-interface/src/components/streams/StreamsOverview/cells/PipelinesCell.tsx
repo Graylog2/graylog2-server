@@ -46,6 +46,10 @@ const PipelinesCell = ({ stream }: Props) => {
   }
 
   const count = metrics.pipelines.length;
+  if (count === 0) {
+    return null;
+  }
+
   const isOpen = expandedSections?.[stream.id]?.includes(SECTION_NAME) ?? false;
   const title = `${isOpen ? 'Hide' : 'Show'} connected pipelines for ${stream.title}`;
 

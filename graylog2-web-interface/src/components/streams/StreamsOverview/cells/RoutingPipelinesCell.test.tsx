@@ -51,16 +51,17 @@ describe('RoutingPipelinesCell (Streams)', () => {
     expect(screen.getByText('3')).toBeInTheDocument();
   });
 
-  it('renders 0 when there are no routing pipelines', () => {
+  it('renders an empty cell when there are no routing pipelines', () => {
     asMock(useStreamMetricsFor).mockReturnValue({
       metrics: { routing_pipelines: [] },
       isInitialLoading: false,
       isError: false,
     });
 
-    render(<RoutingPipelinesCell stream={stream} />);
+    const { container } = render(<RoutingPipelinesCell stream={stream} />);
 
-    expect(screen.getByText('0')).toBeInTheDocument();
+    expect(screen.queryByText('0')).not.toBeInTheDocument();
+    expect(container).toBeEmptyDOMElement();
   });
 
   it('toggles the routing_pipelines section on click', async () => {

@@ -36,6 +36,10 @@ const MaxProcessingTimeCell = ({ stream }: Props) => {
     return <span aria-label={`No max processing time available for stream ${stream.title}`}>—</span>;
   }
 
+  if (metrics.max_processing_time_ms === 0) {
+    return null;
+  }
+
   return (
     <ProcessingTimeBadge
       ms={metrics.max_processing_time_ms}

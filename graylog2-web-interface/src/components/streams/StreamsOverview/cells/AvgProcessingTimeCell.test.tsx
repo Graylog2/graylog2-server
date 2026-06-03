@@ -57,6 +57,18 @@ describe('AvgProcessingTimeCell (Streams)', () => {
     expect(screen.getByText('—')).toBeInTheDocument();
   });
 
+  it('renders an empty cell when the value is zero', () => {
+    asMock(useStreamMetricsFor).mockReturnValue({
+      metrics: { avg_processing_time_ms: 0 },
+      isInitialLoading: false,
+      isError: false,
+    });
+
+    const { container } = render(<AvgProcessingTimeCell stream={stream} />);
+
+    expect(container).toBeEmptyDOMElement();
+  });
+
   it('renders a dash on error', () => {
     asMock(useStreamMetricsFor).mockReturnValue({
       metrics: undefined,

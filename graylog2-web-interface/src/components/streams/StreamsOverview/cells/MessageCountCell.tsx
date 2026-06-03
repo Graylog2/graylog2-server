@@ -36,6 +36,10 @@ const MessageCountCell = ({ stream }: Props) => {
     return <span aria-label={`No message count available for stream ${stream.title}`}>—</span>;
   }
 
+  if (metrics.message_count === 0) {
+    return null;
+  }
+
   return <CountBadge count={formatCount(metrics.message_count)} title={`${metrics.message_count} messages in the last 24 hours`} />;
 };
 

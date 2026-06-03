@@ -63,16 +63,17 @@ describe('PipelinesCell (Streams)', () => {
     expect(screen.queryByText('1')).not.toBeInTheDocument();
   });
 
-  it('renders 0 when there are zero connected pipelines', () => {
+  it('renders an empty cell when there are zero connected pipelines', () => {
     asMock(useStreamMetricsFor).mockReturnValue({
       metrics: { pipelines: [] },
       isInitialLoading: false,
       isError: false,
     });
 
-    render(<PipelinesCell stream={stream} />);
+    const { container } = render(<PipelinesCell stream={stream} />);
 
-    expect(screen.getByText('0')).toBeInTheDocument();
+    expect(screen.queryByText('0')).not.toBeInTheDocument();
+    expect(container).toBeEmptyDOMElement();
   });
 
   it('renders the count of connected pipelines', () => {

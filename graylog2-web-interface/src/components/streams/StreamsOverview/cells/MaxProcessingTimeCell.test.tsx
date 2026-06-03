@@ -45,6 +45,18 @@ describe('MaxProcessingTimeCell (Streams)', () => {
     expect(screen.getByText(/2 min 36 s/)).toBeInTheDocument();
   });
 
+  it('renders an empty cell when the value is zero', () => {
+    asMock(useStreamMetricsFor).mockReturnValue({
+      metrics: { max_processing_time_ms: 0 },
+      isInitialLoading: false,
+      isError: false,
+    });
+
+    const { container } = render(<MaxProcessingTimeCell stream={stream} />);
+
+    expect(container).toBeEmptyDOMElement();
+  });
+
   it('renders a dash when the value is missing', () => {
     asMock(useStreamMetricsFor).mockReturnValue({
       metrics: {},

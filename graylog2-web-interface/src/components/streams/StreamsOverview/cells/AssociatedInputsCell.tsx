@@ -41,6 +41,10 @@ const AssociatedInputsCell = ({ stream }: Props) => {
   }
 
   const count = metrics.associated_inputs.length;
+  if (count === 0) {
+    return null;
+  }
+
   const isOpen = expandedSections?.[stream.id]?.includes(SECTION_NAME) ?? false;
   const title = `${isOpen ? 'Hide' : 'Show'} associated inputs for ${stream.title}`;
 

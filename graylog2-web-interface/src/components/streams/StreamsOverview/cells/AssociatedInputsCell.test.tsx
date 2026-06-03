@@ -64,6 +64,19 @@ describe('AssociatedInputsCell (Streams)', () => {
     expect(toggleSection).toHaveBeenCalledWith('stream-1', 'associated_inputs');
   });
 
+  it('renders an empty cell when there are no associated inputs', () => {
+    asMock(useStreamMetricsFor).mockReturnValue({
+      metrics: { associated_inputs: [] },
+      isInitialLoading: false,
+      isError: false,
+    });
+
+    const { container } = render(<AssociatedInputsCell stream={stream} />);
+
+    expect(screen.queryByText('0')).not.toBeInTheDocument();
+    expect(container).toBeEmptyDOMElement();
+  });
+
   it('renders a dash on error', () => {
     asMock(useStreamMetricsFor).mockReturnValue({
       metrics: undefined,

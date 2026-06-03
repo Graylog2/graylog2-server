@@ -41,6 +41,10 @@ const RoutingPipelinesCell = ({ stream }: Props) => {
   }
 
   const count = metrics.routing_pipelines.length;
+  if (count === 0) {
+    return null;
+  }
+
   const isOpen = expandedSections?.[stream.id]?.includes(SECTION_NAME) ?? false;
   const title = `${isOpen ? 'Hide' : 'Show'} routing pipelines for ${stream.title}`;
 

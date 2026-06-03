@@ -45,16 +45,17 @@ describe('MessageCountCell (Streams)', () => {
     expect(screen.getByText('126,648')).toBeInTheDocument();
   });
 
-  it('renders 0 when the count is zero', () => {
+  it('renders an empty cell when the count is zero', () => {
     asMock(useStreamMetricsFor).mockReturnValue({
       metrics: { message_count: 0 },
       isInitialLoading: false,
       isError: false,
     });
 
-    render(<MessageCountCell stream={stream} />);
+    const { container } = render(<MessageCountCell stream={stream} />);
 
-    expect(screen.getByText('0')).toBeInTheDocument();
+    expect(screen.queryByText('0')).not.toBeInTheDocument();
+    expect(container).toBeEmptyDOMElement();
   });
 
   it('renders a spinner while loading with no cached data', async () => {
