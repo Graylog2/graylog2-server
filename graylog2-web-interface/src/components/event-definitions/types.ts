@@ -100,5 +100,8 @@ declare module 'graylog-web-plugin/plugin' {
     'eventDefinitions.components.tacticsTechniquesColumn'?: Array<TacticsTechniquesColumnPlugin>;
     'eventDefinitions.components.tacticsTechniquesSummary'?: Array<TacticsTechniquesSummaryPlugin>;
     'events.components.tacticsTechniquesDetailRow'?: Array<TacticsTechniquesDetailRowPlugin>;
+    'eventDefinitions.components.sigmaGitImport'?: Array<{ component: React.FC; key: string }>;
+    'eventDefinitions.components.sigmaFileUpload'?: Array<{ component: React.FC; key: string }>;
+    'eventDefinitions.components.sigmaOptions'?: Array<{ component: React.FC; key: string }>;
   }
 }

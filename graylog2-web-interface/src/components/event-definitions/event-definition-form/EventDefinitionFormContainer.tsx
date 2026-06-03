@@ -14,20 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import cloneDeep from 'lodash/cloneDeep';
-import { useQuery } from '@tanstack/react-query';
 
-import { useStore } from 'stores/connect';
-import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
+import { getPathnameWithoutId } from 'util/URLUtils';
 import { ConfirmLeaveDialog, Spinner } from 'components/common';
-import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl, getPathnameWithoutId } from 'util/URLUtils';
-import { defaultOnError } from 'util/conditional/onError';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
-import { EventNotificationsActions, EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import type {
   EventDefinition,
@@ -41,12 +34,23 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useScopePermissions from 'hooks/useScopePermissions';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
+import useEventDefinitionSteps, { INITIAL_EVENT_DEFINITION } from './useEventDefinitionCommonSteps';
+import EventDetailsForm from './EventDetailsForm';
+import EventConditionForm from './EventConditionForm';
 import EventDefinitionForm, { getStepKeys } from './EventDefinitionForm';
+import EventDefinitionSummary from './EventDefinitionSummary';
 
 import useEventDefinitionMutations from '../hooks/useEventDefinitionMutations';
+import {
+  useGetEntityTypes,
+  useGetListEventsClusterConfig,
+  useGetEventNotifications,
+} from '../hooks/useEventDefinitions';
 
-const fetchNotifications = () => {
-  EventNotificationsActions.listAll();
+const STEP_KEYS = {
+  EVENT_DETAILS: 'event-details',
+  CONDITION: 'condition',
+  SUMMARY: 'summary',
 };
 
 type Props = {
@@ -62,36 +66,17 @@ type Props = {
   onSubmit?: () => void;
 };
 
-const getConditionPlugin = (edType): any => {
-  if (edType === undefined) {
-    return {};
+export const getConditionPlugin = (type: string | undefined) => {
+  if (type === undefined) {
+    return { displayName: null, hideFieldsStep: false, defaultConfig: {} };
   }
 
-  return (
-    PluginStore.exports('eventDefinitionTypes').find((eventDefinitionType) => eventDefinitionType.type === edType) || {}
-  );
+  return PluginStore.exports('eventDefinitionTypes').find((edt) => edt.type === type) || {};
 };
 
 const EventDefinitionFormContainer = ({
   action = 'edit',
-  eventDefinition: eventDefinitionInitial = {
-    title: '',
-    description: '',
-    priority: EventDefinitionPriorityEnum.MEDIUM,
-    // @ts-ignore
-    config: {},
-    field_spec: {},
-    key_spec: [],
-    tags: [],
-    notification_settings: {
-      grace_period_ms: 300000,
-      // Defaults to system setting for notification backlog size
-      backlog_size: null,
-    },
-    notifications: [],
-    alert: false,
-    tactics_techniques: [],
-  },
+  eventDefinition: eventDefinitionInitial = INITIAL_EVENT_DEFINITION,
   formControls = undefined,
   initialStep = 'event-details',
   onCancel = undefined,
@@ -104,7 +89,7 @@ const EventDefinitionFormContainer = ({
   // Merge the optional localStorage-stored config into the initial event definition once, at
   // first render. Previously this happened in a useEffect that called setEventDefinition,
   // which trips the react-hooks/set-state-in-effect rule.
-  const [eventDefinition, setEventDefinition] = useState(() => {
+  const [eventDefinition, setEventDefinition] = useState<EventDefinition>(() => {
     if (!hasLocalStorageConfig) return eventDefinitionInitial;
 
     const localStorageConditionPlugin = getConditionPlugin(configFromLocalStorage.type);
@@ -118,42 +103,33 @@ const EventDefinitionFormContainer = ({
         ...cloned.config,
         ...configFromLocalStorage,
       },
-    };
+    } as EventDefinition;
   });
+
   const [validation, setValidation] = useState({ errors: {} });
-  const [eventsClusterConfig, setEventsClusterConfig] = useState(undefined);
   const [isDirty, setIsDirty] = useState(false);
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(eventDefinition);
   const { createEventDefinition } = useEventDefinitionMutations();
-  const { data: entityTypes } = useQuery({
-    queryKey: ['event-definitions', 'entity-types'],
-    queryFn: () =>
-      defaultOnError(
-        fetch('GET', qualifyUrl('/events/entity_types')),
-        'Loading event definition entity types failed with status',
-        'Could not load event definition entity types',
-      ),
-  });
-  const notifications = useStore(EventNotificationsStore);
+  const { entityTypes, loadingEntityTypes } = useGetEntityTypes();
+  const { eventsClusterConfig, loadingEventsClusterConfig } = useGetListEventsClusterConfig();
+  const { eventNotifications, loadingEventNotifications } = useGetEventNotifications();
   const currentUser = useCurrentUser();
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
   const isNew = action === 'create';
-  const conditionPlugin = getConditionPlugin(eventDefinition.config.type);
-  const hideFieldsStep = conditionPlugin?.hideFieldsStep ?? false;
+  const eventDefinitionType = getConditionPlugin(eventDefinition.config.type);
+  const hideFieldsStep = eventDefinitionType?.hideFieldsStep ?? false;
   const currentStepKeys = getStepKeys(isNew, hideFieldsStep);
 
-  const isLoading = !entityTypes || !notifications.all || !eventsClusterConfig;
-  const defaults = { default_backlog_size: eventsClusterConfig?.events_notification_default_backlog };
-
-  const fetchClusterConfig = useCallback(() => {
-    ConfigurationsActions.listEventsClusterConfig().then((config) => setEventsClusterConfig(config));
-  }, []);
+  const isLoading = !entityTypes || loadingEntityTypes || loadingEventNotifications || loadingEventsClusterConfig;
+  const defaults = {
+    default_backlog_size: eventsClusterConfig?.events_notification_default_backlog as number,
+  };
 
   const handleChange = useCallback(
     (key: string, value: unknown) => {
       setEventDefinition((prev) => ({ ...prev, [key]: value }));
-      onEventDefinitionChange({ ...eventDefinition, [key]: value });
+      onEventDefinitionChange({ ...eventDefinition, [key]: value } as EventDefinition);
       setIsDirty(true);
       // Drop any stale submit-time validation error for the field being edited so the user
       // gets immediate feedback on their fix. Each field still owns its live client-side
@@ -168,10 +144,58 @@ const EventDefinitionFormContainer = ({
     [eventDefinition, onEventDefinitionChange, setEventDefinition, setIsDirty],
   );
 
-  useEffect(() => {
-    fetchClusterConfig();
-    fetchNotifications();
-  }, [fetchClusterConfig]);
+  const commonStepProps = {
+    key: eventDefinition.id, // Recreate components if ID changed
+    action,
+    entityTypes,
+    eventDefinition,
+    onChange: handleChange,
+    validation,
+    currentUser,
+  };
+
+  const canEdit = scopePermissions.is_mutable;
+  const canEditCondition = canEdit || eventDefinition._scope.toUpperCase() === 'ILLUMINATE';
+
+  const viewSteps = [
+    {
+      key: STEP_KEYS.EVENT_DETAILS,
+      title: 'Event Details',
+      component: (
+        <EventDetailsForm
+          {...commonStepProps}
+          eventDefinitionEventProcedure={eventDefinition?.event_procedure}
+          canEdit={scopePermissions.is_mutable}
+        />
+      ),
+    },
+    {
+      key: STEP_KEYS.CONDITION,
+      title: eventDefinitionType?.displayName ?? 'Condition',
+      component: <EventConditionForm {...commonStepProps} canEdit={canEditCondition} />,
+    },
+  ];
+
+  const steps = useEventDefinitionSteps({
+    viewSteps,
+    commonStepProps,
+    notifications: eventNotifications.all,
+    notificationDefaults: defaults,
+    canEdit,
+  });
+
+  steps.push({
+    key: STEP_KEYS.SUMMARY,
+    title: 'Summary',
+    component: (
+      <EventDefinitionSummary
+        eventDefinition={commonStepProps.eventDefinition}
+        currentUser={commonStepProps.currentUser}
+        notifications={eventNotifications?.all}
+        validation={commonStepProps.validation}
+      />
+    ),
+  });
 
   const handleSubmitSuccessResponse = () => {
     setIsDirty(false);
@@ -185,7 +209,7 @@ const EventDefinitionFormContainer = ({
     setActiveStep(currentStepKeys[currentStepKeys.length - 1]);
   };
 
-  const handleSubmitFailureResponse = (errorResponse) => {
+  const handleSubmitFailureResponse = (errorResponse: any) => {
     const { body } = errorResponse.additional;
 
     if (errorResponse.status === 400) {
@@ -273,21 +297,13 @@ const EventDefinitionFormContainer = ({
         <ConfirmLeaveDialog question="Do you really want to abandon this page and lose your changes? This action cannot be undone." />
       )}
       <EventDefinitionForm
+        steps={steps}
         action={action}
-        canEdit={scopePermissions.is_mutable}
-        currentUser={currentUser}
-        defaults={defaults}
         activeStep={activeStep}
-        entityTypes={entityTypes}
-        eventDefinition={eventDefinition}
         formControls={formControls}
-        notifications={notifications.all}
         onCancel={handleCancel}
-        onChange={handleChange}
         onChangeStep={changeStep}
         onSubmit={handleSubmit}
-        validation={validation}
-        hideFieldsStep={hideFieldsStep}
       />
     </>
   );
