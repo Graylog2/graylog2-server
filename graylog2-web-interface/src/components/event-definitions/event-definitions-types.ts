@@ -84,6 +84,20 @@ export type EventProcessorConfig = {
   cron_timezone?: string;
   event_limit?: number;
 };
+export type MatcherType = 'ASSET' | 'USER' | 'FIELD';
+
+export type Matcher = {
+  type: MatcherType;
+  field_name?: string;
+  values: string[];
+};
+
+export type ExclusionRule = {
+  id?: string;
+  title?: string;
+  matchers: Matcher[];
+};
+
 export type EventDefinition = {
   _scope: string;
   _entity_source: any;
@@ -108,6 +122,7 @@ export type EventDefinition = {
     streams: number[] | string[];
   }>;
   tags: string[];
+  exclusions?: ExclusionRule[];
   updated_at: string | null;
   matched_at: string;
   scheduler: Scheduler;
