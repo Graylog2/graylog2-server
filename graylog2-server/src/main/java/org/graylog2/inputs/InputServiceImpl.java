@@ -296,6 +296,11 @@ public class InputServiceImpl implements InputService {
             builder.setEmbeddedStaticFields(staticFields);
         }
 
+        final List<Map<String, Object>> extractors = (List<Map<String, Object>>) fields.get(InputImpl.EMBEDDED_EXTRACTORS);
+        if (extractors != null && !extractors.isEmpty()) {
+            builder.setEmbeddedExtractors(extractors);
+        }
+
         if (!isGlobal) {
             builder.setNodeId((String) fields.get(MessageInput.FIELD_NODE_ID));
         }
@@ -749,8 +754,12 @@ public class InputServiceImpl implements InputService {
 
     @Override
     public void persistDesiredState(Input input, IOState.Type desiredState) throws ValidationException {
-        final Input updatedInput = input.withDesiredState(desiredState);
-        saveWithoutEvents(updatedInput);
+        // Use a targeted update instead of saving the whole input to avoid overwriting concurrent changes
+        // to other parts of the input document.
+        collection.updateOne(
+                MongoUtils.idEq(input.getId()),
+                Updates.set(InputImpl.FIELD_DESIRED_STATE, desiredState.name())
+        );
     }
 
     @Override
