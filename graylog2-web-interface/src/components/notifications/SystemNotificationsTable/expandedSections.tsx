@@ -33,7 +33,11 @@ const NotificationBody = ({ row }: { row: NotificationType }) => {
   if (isLoading) return <Spinner />;
   if (isError || !data) return <span>{FALLBACK_MESSAGE}</span>;
 
-  return <StyledPre><Sanitize html={data.description.trim()} /></StyledPre>;
+  return (
+    <StyledPre>
+      <Sanitize html={data.description.trim()} />
+    </StyledPre>
+  );
 };
 
 const expandedSections = {
