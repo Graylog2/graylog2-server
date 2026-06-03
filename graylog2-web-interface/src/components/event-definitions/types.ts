@@ -64,5 +64,8 @@ declare module 'graylog-web-plugin/plugin' {
     'eventDefinitionTypes'?: Array<EventDefinitionType>;
     'eventDefinitions.components.searchForm'?: Array<() => SearchBarControl | null>;
     'eventDefinitions.components.editSigmaModal'?: Array<{ component: React.FC; key: string }>;
+    'eventDefinitions.components.sigmaGitImport'?: Array<{ component: React.FC; key: string }>;
+    'eventDefinitions.components.sigmaFileUpload'?: Array<{ component: React.FC; key: string }>;
+    'eventDefinitions.components.sigmaOptions'?: Array<{ component: React.FC; key: string }>;
   }
 }
