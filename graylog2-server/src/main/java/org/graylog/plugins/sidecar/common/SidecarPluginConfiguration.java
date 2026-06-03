@@ -61,11 +61,11 @@ public class SidecarPluginConfiguration implements PluginConfigBean {
     @Parameter(value = PREFIX + "host_variable", validator = ConfigurationVariableNameValidator.class)
     private String hostVariable = "graylog_host";
 
-    @Documentation("tbd")
+    @Documentation("Expiration time for entries in the Sidecar ETag caches.")
     @Parameter(value = PREFIX + "cache_time", validator = PositiveDurationValidator.class)
     private Duration cacheTime = Duration.hours(1L);
 
-    @Documentation("tbd")
+    @Documentation("Maximum number of entries held by each of the Sidecar ETag caches.")
     @Parameter(value = PREFIX + "cache_max_size", validator = PositiveIntegerValidator.class)
     private int cacheMaxSize = 5000;
 
