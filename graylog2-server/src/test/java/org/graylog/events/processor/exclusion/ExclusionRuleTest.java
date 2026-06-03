@@ -116,29 +116,14 @@ class ExclusionRuleTest {
     }
 
     @Test
-    void rejectsRuleWithBlankId() {
-        assertThatThrownBy(() -> ExclusionRule.builder()
-                .id("  ")
-                .matchers(ImmutableList.of(
-                        Matcher.builder()
-                                .type(MatcherType.USER)
-                                .values(ImmutableList.of("scanner-bot"))
-                                .build()))
-                .build())
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("id");
-    }
-
-    @Test
-    void rejectsRuleWithNullId() {
-        assertThatThrownBy(() -> ExclusionRule.builder()
-                .matchers(ImmutableList.of(
-                        Matcher.builder()
-                                .type(MatcherType.USER)
-                                .values(ImmutableList.of("scanner-bot"))
-                                .build()))
-                .build())
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("id");
+    void allowsNullIdOnBuild() {
+        final ExclusionRule rule = ExclusionRule.builder()
+                .title("anonymous")
+                .matchers(ImmutableList.of(Matcher.builder()
+                        .type(MatcherType.USER)
+                        .values(ImmutableList.of("alice"))
+                        .build()))
+                .build();
+        assertThat(rule.id()).isNull();
     }
 }

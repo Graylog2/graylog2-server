@@ -33,6 +33,8 @@ public abstract class ExclusionRule {
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_MATCHERS = "matchers";
 
+    @Nullable
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty(FIELD_ID)
     public abstract String id();
 
@@ -58,7 +60,7 @@ public abstract class ExclusionRule {
         }
 
         @JsonProperty(FIELD_ID)
-        public abstract Builder id(String id);
+        public abstract Builder id(@Nullable String id);
 
         @JsonProperty(FIELD_TITLE)
         public abstract Builder title(@Nullable String title);
@@ -69,18 +71,7 @@ public abstract class ExclusionRule {
         abstract ExclusionRule autoBuild();
 
         public ExclusionRule build() {
-            final ExclusionRule rule;
-            try {
-                rule = autoBuild();
-            } catch (IllegalStateException e) {
-                if (e.getMessage() != null && e.getMessage().contains("id")) {
-                    throw new IllegalArgumentException("ExclusionRule requires non-blank id", e);
-                }
-                throw e;
-            }
-            if (rule.id().isBlank()) {
-                throw new IllegalArgumentException("ExclusionRule requires non-blank id");
-            }
+            final ExclusionRule rule = autoBuild();
             if (rule.matchers().isEmpty()) {
                 throw new IllegalArgumentException("ExclusionRule must contain at least one matcher");
             }
