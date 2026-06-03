@@ -36,7 +36,7 @@ class CustomOpenSearchClientTest {
     }
 
     @Test
-    void throwOnShardFailuresThrowsWhenAnyShardFailed() {
+    void throwOnShardFailuresDoesNothingWhenSomeShardsFailedButOthersSucceeded() {
         final ShardFailure failure = ShardFailure.of(b -> b
                 .index("graylog_0")
                 .shard(2)
@@ -49,13 +49,30 @@ class CustomOpenSearchClientTest {
                 .failures(failure)
         );
 
+        assertThatCode(() -> CustomOpenSearchClient.throwOnShardFailures(shards)).doesNotThrowAnyException();
+    }
+
+    @Test
+    void throwOnShardFailuresThrowsWhenAllShardsFailed() {
+        final ShardFailure failure = ShardFailure.of(b -> b
+                .index("graylog_0")
+                .shard(2)
+                .reason(ErrorCause.of(c -> c.type("query_shard_exception").reason("parse error")))
+        );
+        final ShardStatistics shards = ShardStatistics.of(b -> b
+                .total(5)
+                .successful(0)
+                .failed(5)
+                .failures(failure)
+        );
+
         assertThatThrownBy(() -> CustomOpenSearchClient.throwOnShardFailures(shards))
                 .isInstanceOf(OpenSearchException.class)
                 .satisfies(thrown -> {
                     final var ex = (OpenSearchException) thrown;
                     assertThat(ex.status()).isEqualTo(500);
                     assertThat(ex.error().type()).isEqualTo("shard_failure");
-                    assertThat(ex.error().reason()).isEqualTo("1 of 5 shards failed");
+                    assertThat(ex.error().reason()).isEqualTo("5 of 5 shards failed");
                     assertThat(ex.error().rootCause()).singleElement().satisfies(rc -> {
                         assertThat(rc.type()).isEqualTo("query_shard_exception");
                         assertThat(rc.reason()).isEqualTo("parse error");
