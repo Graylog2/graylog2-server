@@ -86,7 +86,6 @@ const ShowMessagePage = ({ message, messageId, index }: ShowMessagePageProps) =>
     () => Immutable.Map(Object.fromEntries(streams.map((stream) => [stream.id, stream]))),
     [streams],
   );
-  const streamsList = useMemo(() => Immutable.List(streams), [streams]);
   const inputs = useInputs(message?.source_input_id, message?.fields.gl2_source_node);
 
   useEffect(() => {
@@ -115,7 +114,6 @@ const ShowMessagePage = ({ message, messageId, index }: ShowMessagePageProps) =>
                         <MessageDetail
                           fields={all}
                           streams={streamsMap}
-                          allStreams={streamsList}
                           disableSurroundingSearch
                           inputs={inputs}
                           message={message}
