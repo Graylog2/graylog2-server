@@ -88,8 +88,9 @@ const CreatePageContent = ({
 type Props<TValues extends object> = {
   entityName: string;
   overviewRoute: string;
+  detailsRoute: (id: string) => string;
   initialValues: TValues;
-  onSubmit: (values: TValues) => Promise<void>;
+  onSubmit: (values: TValues) => Promise<{ id: string }>;
   validate?: (values: TValues) => FormikErrors<TValues> | Promise<FormikErrors<TValues>>;
   description?: React.ReactNode;
   documentationLink?: { title: string; path: string };
@@ -100,6 +101,7 @@ type Props<TValues extends object> = {
 const CreatePage = <TValues extends object>({
   entityName,
   overviewRoute,
+  detailsRoute,
   initialValues,
   onSubmit,
   validate = undefined,
@@ -117,19 +119,15 @@ const CreatePage = <TValues extends object>({
     setSubmitError(null);
 
     try {
-      await onSubmit(values);
-      history.push(overviewRoute);
+      const { id } = await onSubmit(values);
+      history.push(detailsRoute(id));
     } catch (error) {
       setSubmitError(error?.message ?? 'An error occurred. Please try again.');
     }
   };
 
   return (
-    <Formik<TValues>
-      initialValues={initialValues}
-      onSubmit={handleSubmit}
-      validate={validate}
-      validateOnBlur={false}>
+    <Formik<TValues> initialValues={initialValues} onSubmit={handleSubmit} validate={validate} validateOnBlur={false}>
       <CreatePageContent
         entityName={entityName}
         onCancel={handleCancel}

@@ -73,7 +73,7 @@ const StoryNavLink = ({ storyId, children }: { storyId: string; children: React.
     href="#"
     onClick={(e) => {
       e.preventDefault();
-      // eslint-disable-next-line no-underscore-dangle
+       
       (window as any).__STORYBOOK_ADDONS_CHANNEL__?.emit('selectStory', { storyId });
     }}>
     {children}
@@ -175,9 +175,7 @@ const CreateEntityPatternDoc = () => (
             own context, use a Page instead.
           </ContextBody>
 
-          <StoryNavLink storyId="patterns-creating-an-entity--current-context-modal">
-            View example →
-          </StoryNavLink>
+          <StoryNavLink storyId="patterns-creating-an-entity--current-context-modal">View example →</StoryNavLink>
 
           <RuleListHeading>Do</RuleListHeading>
           <RuleList>
@@ -198,9 +196,7 @@ const CreateEntityPatternDoc = () => (
             to.
           </ContextBody>
 
-          <StoryNavLink storyId="patterns-creating-an-entity--new-context-page">
-            View example →
-          </StoryNavLink>
+          <StoryNavLink storyId="patterns-creating-an-entity--new-context-page">View example →</StoryNavLink>
         </ContextCard>
       </SectionGroup>
 
@@ -300,8 +296,9 @@ export const NewContextPage: Story = {
     <CreatePage<StoryValues>
       entityName="Stream"
       overviewRoute="/streams"
+      detailsRoute={(id) => `/streams/${id}`}
       initialValues={{ title: '', description: '' }}
-      onSubmit={fn()}
+      onSubmit={async () => ({ id: 'new-stream-id' })}
       description="Streams route incoming messages into categories. Route a message into a stream by applying matching rules.">
       <FormFields />
     </CreatePage>
