@@ -18,6 +18,7 @@ import {
   getPipelineLoadPercent,
   getRuleLoadPercent,
   getStageRuleLoadPercent,
+  getStageRulePipelineSharePercent,
   lookupPipeline,
   lookupRule,
   lookupStageRule,
@@ -100,6 +101,28 @@ describe('processing-load lookups', () => {
 
     it('returns undefined for an undefined response', () => {
       expect(getPipelineLoadPercent(undefined, 'p1')).toBeUndefined();
+    });
+  });
+
+  describe('getStageRulePipelineSharePercent', () => {
+    it('returns the pipeline_share_percent for a known stage-rule', () => {
+      expect(getStageRulePipelineSharePercent(baseResponse, 'p1', 'r1', 0)).toBe(60);
+      expect(getStageRulePipelineSharePercent(baseResponse, 'p1', 'r1', 1)).toBe(40);
+    });
+
+    it('returns undefined for missing stage-rule entries', () => {
+      expect(getStageRulePipelineSharePercent(baseResponse, 'p1', 'r1', 99)).toBeUndefined();
+    });
+
+    it('returns undefined when the response is unavailable or denominator-zero', () => {
+      expect(getStageRulePipelineSharePercent({ ...baseResponse, available: false }, 'p1', 'r1', 0)).toBeUndefined();
+      expect(
+        getStageRulePipelineSharePercent({ ...baseResponse, total_cost_microseconds_per_second: 0 }, 'p1', 'r1', 0),
+      ).toBeUndefined();
+    });
+
+    it('returns undefined for an undefined response', () => {
+      expect(getStageRulePipelineSharePercent(undefined, 'p1', 'r1', 0)).toBeUndefined();
     });
   });
 });

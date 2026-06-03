@@ -14,19 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line no-restricted-imports
-import { Tab as BootstrapTab } from 'react-bootstrap';
-import styled, { css } from 'styled-components';
+import * as React from 'react';
 
-const Tab = styled(BootstrapTab)(
-  ({ theme }) => css`
-    background-color: ${theme.colors.global.contentBackground};
-    border: 1px solid ${theme.colors.variant.default};
-    border-top: 0;
-    border-radius: 0 0 4px 4px;
-    padding: 9px;
-  `,
-);
+import { RelativeTime } from 'components/common';
 
-/** @component */
-export default Tab;
+type Props = { triggeredAt: string };
+
+const TriggeredAtCell = ({ triggeredAt }: Props) => <RelativeTime dateTime={triggeredAt} />;
+
+export default TriggeredAtCell;

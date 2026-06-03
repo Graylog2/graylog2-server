@@ -89,6 +89,7 @@ public abstract class EventDto {
     public abstract Set<String> sourceStreams();
 
     @JsonProperty(FIELD_MESSAGE)
+    @Nullable
     public abstract String message();
 
     @JsonProperty(FIELD_SOURCE)
