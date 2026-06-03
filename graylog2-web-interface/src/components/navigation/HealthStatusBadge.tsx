@@ -31,7 +31,6 @@ import { NAV_ITEM_HEIGHT } from 'theme/constants';
 
 import InactiveNavItem from './InactiveNavItem';
 
-
 const STATUS_TO_BS_STYLE = {
   healthy: 'success',
   warning: 'warning',
