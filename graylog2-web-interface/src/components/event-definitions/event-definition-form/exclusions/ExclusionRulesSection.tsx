@@ -66,9 +66,6 @@ const ruleHasError = (rule: ExclusionRule): boolean => {
   });
 };
 
-const ruleKey = (rule: ExclusionRule, idx: number): string =>
-  rule.id ?? `new-${idx}-${rule.title ?? ''}-${rule.matchers.length}`;
-
 type Props = {
   exclusions: ExclusionRule[];
   onChange: (next: ExclusionRule[]) => void;
@@ -108,7 +105,7 @@ const ExclusionRulesSection = ({ exclusions, onChange }: Props) => {
       )}
       {expanded && exclusions.map((rule, idx) => (
         <ExclusionRuleEditor
-          key={ruleKey(rule, idx)}
+          key={rule.id ?? idx}
           rule={rule}
           onChange={(next) => handleRuleChange(idx, next)}
           onRemove={() => handleRuleRemove(idx)} />

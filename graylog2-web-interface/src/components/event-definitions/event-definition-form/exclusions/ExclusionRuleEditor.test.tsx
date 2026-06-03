@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -97,5 +98,19 @@ describe('ExclusionRuleEditor', () => {
     wrap(<ExclusionRuleEditor rule={baseRule} onChange={jest.fn()} onRemove={handleRemove} />);
     await userEvent.click(screen.getByRole('button', { name: /remove rule/i }));
     expect(handleRemove).toHaveBeenCalled();
+  });
+
+  it('keeps title input focused while typing', async () => {
+    const Harness = () => {
+      const [r, setR] = useState<ExclusionRule>(baseRule);
+
+      return <ExclusionRuleEditor rule={r} onChange={setR} onRemove={() => {}} />;
+    };
+    wrap(<Harness />);
+    const titleInput = screen.getByDisplayValue('My rule');
+    titleInput.focus();
+    await userEvent.type(titleInput, 'Hello');
+    expect(titleInput).toHaveFocus();
+    expect(screen.getByDisplayValue(/Hello/)).toBe(titleInput);
   });
 });

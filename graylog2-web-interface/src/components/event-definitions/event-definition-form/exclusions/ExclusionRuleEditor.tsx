@@ -46,9 +46,6 @@ const ErrorText = styled.div`
 
 const defaultMatcher = (): Matcher => ({ type: 'USER', values: [] });
 
-const matcherKey = (m: Matcher, idx: number) =>
-  `${m.type}-${m.field_name ?? ''}-${m.values.join('|')}-${idx}`;
-
 type Props = {
   rule: ExclusionRule;
   onChange: (next: ExclusionRule) => void;
@@ -93,7 +90,8 @@ const ExclusionRuleEditor = ({ rule, onChange, onRemove }: Props) => {
       </Header>
       {rule.matchers.map((m, idx) => (
         <MatcherEditor
-          key={matcherKey(m, idx)}
+          // eslint-disable-next-line react/no-array-index-key
+          key={idx}
           matcher={m}
           onChange={(next) => handleMatcherChange(idx, next)}
           onRemove={() => handleMatcherRemove(idx)} />
