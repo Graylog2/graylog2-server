@@ -15,9 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo } from 'react';
 import styled from 'styled-components';
 
 import type { ExclusionRule, Matcher } from 'components/event-definitions/event-definitions-types';
+
+import useResolvedAssetNames from './useResolvedAssetNames';
 
 const Wrapper = styled.dl`
   margin: 0;
@@ -32,17 +35,30 @@ const RuleBody = styled.dd`
   margin: 0 0 0.25rem 1rem;
 `;
 
-const matcherToString = (m: Matcher): string => {
+const matcherToString = (m: Matcher, assetNames: Record<string, string>): string => {
   const head = m.type === 'FIELD' && m.field_name
     ? `FIELD(${m.field_name})`
     : m.type;
+  const values = m.type === 'ASSET'
+    ? m.values.map((v) => assetNames[v] ?? v)
+    : m.values;
 
-  return `${head} IN [${m.values.join(', ')}]`;
+  return `${head} IN [${values.join(', ')}]`;
 };
 
 type Props = { exclusions?: ExclusionRule[] };
 
 const ExclusionRulesSummary = ({ exclusions = [] }: Props) => {
+  const allAssetIds = useMemo(
+    () => Array.from(new Set(
+      (exclusions ?? []).flatMap((r) =>
+        r.matchers.filter((m) => m.type === 'ASSET').flatMap((m) => m.values),
+      ),
+    )),
+    [exclusions],
+  );
+  const resolvedById = useResolvedAssetNames(allAssetIds);
+
   if (exclusions.length === 0) {
     return null;
   }
@@ -62,7 +78,7 @@ const ExclusionRulesSummary = ({ exclusions = [] }: Props) => {
                 return (
                   <React.Fragment key={matcherKey}>
                     {idx > 0 && <span> AND </span>}
-                    <span>{matcherToString(m)}</span>
+                    <span>{matcherToString(m, resolvedById)}</span>
                   </React.Fragment>
                 );
               })}

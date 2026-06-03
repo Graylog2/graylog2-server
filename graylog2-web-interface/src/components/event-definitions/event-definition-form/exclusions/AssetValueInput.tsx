@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 
@@ -23,10 +23,10 @@ import Select from 'components/common/Select/Select';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 
+import useResolvedAssetNames from './useResolvedAssetNames';
+
 type AssetMatch = { _id: string; name?: string };
 type AssetsResponse = { assets?: AssetMatch[] };
-type AssetDetails = { id: string; name?: string };
-type AssetsByIdsResponse = Record<string, AssetDetails>;
 
 type Props = {
   values: ReadonlyArray<string>;
@@ -54,16 +54,6 @@ const fetchAssets = async (query: string): Promise<AssetMatch[]> => {
   return response?.assets ?? [];
 };
 
-const resolveAssetsByIds = async (ids: string[]): Promise<AssetsByIdsResponse> => {
-  const response: AssetsByIdsResponse | undefined = await fetch(
-    'POST',
-    qualifyUrl('/plugins/org.graylog.plugins.securityapp.asset/assets/byIds'),
-    { asset_ids: ids },
-  );
-
-  return response ?? {};
-};
-
 const AssetValueInput = ({ values, onChange, disabled = false }: Props) => {
   const [query, setQuery] = useState('');
 
@@ -76,14 +66,7 @@ const AssetValueInput = ({ values, onChange, disabled = false }: Props) => {
     retry: false,
   });
 
-  const sortedIds = useMemo(() => [...values].sort(), [values]);
-  const { data: resolvedById } = useQuery({
-    queryKey: ['assets', 'byIds', sortedIds],
-    queryFn: () => resolveAssetsByIds(sortedIds),
-    enabled: sortedIds.length > 0,
-    notifyOnChangeProps: ['data'],
-    retry: false,
-  });
+  const resolvedById = useResolvedAssetNames(values);
 
   const handleChange = (joined: string) => {
     const next = joined ? joined.split(VALUE_DELIMITER).filter((v) => v.length > 0) : [];
@@ -96,7 +79,7 @@ const AssetValueInput = ({ values, onChange, disabled = false }: Props) => {
   const matchOptions = (data ?? []).map((a) => ({ value: a._id, label: a.name ?? a._id }));
   const selectedOptions = values
     .filter((v) => !matchOptions.some((o) => o.value === v))
-    .map((v) => ({ value: v, label: resolvedById?.[v]?.name ?? v }));
+    .map((v) => ({ value: v, label: resolvedById[v] ?? v }));
   const options = [...selectedOptions, ...matchOptions];
 
   return (

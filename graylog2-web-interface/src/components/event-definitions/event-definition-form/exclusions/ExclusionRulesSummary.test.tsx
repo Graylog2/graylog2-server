@@ -16,19 +16,51 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import type { ExclusionRule } from 'components/event-definitions/event-definitions-types';
 
 import ExclusionRulesSummary from './ExclusionRulesSummary';
 
+const mockFetch = jest.fn();
+
+jest.mock('logic/rest/FetchProvider', () => {
+  const actual = jest.requireActual('logic/rest/FetchProvider');
+
+  return {
+    ...actual,
+    __esModule: true,
+    default: (method: string, url: string, body?: unknown) => mockFetch(method, url, body),
+  };
+});
+
+const wrap = (ui: React.ReactNode) =>
+  render(
+    <QueryClientProvider
+      client={
+        new QueryClient({
+          defaultOptions: {
+            queries: { retry: false },
+          },
+        })
+      }>
+      {ui}
+    </QueryClientProvider>,
+  );
+
+beforeEach(() => {
+  mockFetch.mockReset();
+  mockFetch.mockResolvedValue({});
+});
+
 describe('ExclusionRulesSummary', () => {
   it('renders nothing when there are no exclusions', () => {
-    render(<ExclusionRulesSummary exclusions={[]} />);
+    wrap(<ExclusionRulesSummary exclusions={[]} />);
     expect(screen.queryByTestId('exclusion-rules-summary')).not.toBeInTheDocument();
   });
 
   it('renders nothing when exclusions is undefined', () => {
-    render(<ExclusionRulesSummary exclusions={undefined} />);
+    wrap(<ExclusionRulesSummary exclusions={undefined} />);
     expect(screen.queryByTestId('exclusion-rules-summary')).not.toBeInTheDocument();
   });
 
@@ -43,7 +75,7 @@ describe('ExclusionRulesSummary', () => {
         ],
       },
     ];
-    render(<ExclusionRulesSummary exclusions={exclusions} />);
+    wrap(<ExclusionRulesSummary exclusions={exclusions} />);
     expect(screen.getByText(/Suppress scanner traffic/)).toBeInTheDocument();
     expect(screen.getByText(/USER IN \[scanner-bot, qa-runner\]/)).toBeInTheDocument();
     expect(screen.getByText(/FIELD\(src_subnet\) IN \[10\.0\.0\.0\/24\]/)).toBeInTheDocument();
@@ -55,7 +87,7 @@ describe('ExclusionRulesSummary', () => {
       { id: 'r1', title: 'A', matchers: [{ type: 'USER', values: ['alice'] }] },
       { id: 'r2', title: 'B', matchers: [{ type: 'ASSET', values: ['asset-1'] }] },
     ];
-    render(<ExclusionRulesSummary exclusions={exclusions} />);
+    wrap(<ExclusionRulesSummary exclusions={exclusions} />);
     expect(screen.getByText('A')).toBeInTheDocument();
     expect(screen.getByText('B')).toBeInTheDocument();
   });
@@ -64,7 +96,31 @@ describe('ExclusionRulesSummary', () => {
     const exclusions: ExclusionRule[] = [
       { id: 'r1', matchers: [{ type: 'USER', values: ['alice'] }] },
     ];
-    render(<ExclusionRulesSummary exclusions={exclusions} />);
+    wrap(<ExclusionRulesSummary exclusions={exclusions} />);
     expect(screen.getByText(/Unnamed rule/i)).toBeInTheDocument();
+  });
+
+  it('resolves ASSET matcher values to asset names via the byIds endpoint', async () => {
+    mockFetch.mockImplementation((method: string, url: string) => {
+      if (method === 'POST' && url.includes('/assets/byIds')) {
+        return Promise.resolve({
+          'asset-1': { id: 'asset-1', name: 'Production DB' },
+          'asset-2': { id: 'asset-2', name: 'Staging API' },
+        });
+      }
+
+      return Promise.resolve({});
+    });
+
+    const exclusions: ExclusionRule[] = [
+      {
+        id: 'r1',
+        title: 'Suppress prod scanners',
+        matchers: [{ type: 'ASSET', values: ['asset-1', 'asset-2'] }],
+      },
+    ];
+    wrap(<ExclusionRulesSummary exclusions={exclusions} />);
+
+    expect(await screen.findByText(/ASSET IN \[Production DB, Staging API\]/)).toBeInTheDocument();
   });
 });
