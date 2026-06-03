@@ -14,8 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 
-export const NOTIFICATIONS_QUERY_KEY = ['system', 'notifications'] as const;
+import { RelativeTime } from 'components/common';
 
-export const BADGE_COUNT_KEY = 'badge-count' as const;
-export const TABLE_KEY = 'table' as const;
+type Props = { triggeredAt: string };
+
+const TriggeredAtCell = ({ triggeredAt }: Props) => <RelativeTime dateTime={triggeredAt} />;
+
+export default TriggeredAtCell;

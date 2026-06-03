@@ -14,8 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 
-export const NOTIFICATIONS_QUERY_KEY = ['system', 'notifications'] as const;
+import { Badge } from 'components/bootstrap';
+import type { NotificationType } from 'components/notifications/types';
 
-export const BADGE_COUNT_KEY = 'badge-count' as const;
-export const TABLE_KEY = 'table' as const;
+const COLOR_BY_SEVERITY: Record<string, 'danger' | 'info' | 'default'> = {
+  urgent: 'danger',
+  normal: 'info',
+};
+
+type Props = { row: NotificationType };
+
+const capitalize = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
+
+const SeverityCell = ({ row }: Props) => (
+  <Badge bsStyle={COLOR_BY_SEVERITY[row.severity] ?? 'default'}>{capitalize(row.severity)}</Badge>
+);
+
+export default SeverityCell;
