@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -69,5 +70,22 @@ describe('ExclusionRulesSection', () => {
     ];
     wrap(<ExclusionRulesSection exclusions={broken} onChange={jest.fn()} />);
     expect(screen.getByText(/2 rules have errors/i)).toBeInTheDocument();
+  });
+
+  it('keeps rule title input focused while typing (regression test for content-derived keys)', async () => {
+    const Harness = () => {
+      const [rules, setRules] = useState<ExclusionRule[]>([
+        { id: undefined, title: '', matchers: [{ type: 'USER', values: ['alice'] }] },
+      ]);
+
+      return <ExclusionRulesSection exclusions={rules} onChange={setRules} />;
+    };
+    wrap(<Harness />);
+    await userEvent.click(screen.getByRole('button', { name: /Exclusion rules/i }));
+    const titleInput = screen.getByLabelText(/rule title/i);
+    titleInput.focus();
+    await userEvent.type(titleInput, 'Suppress scanners');
+    expect(titleInput).toHaveFocus();
+    expect(screen.getByDisplayValue(/Suppress scanners/)).toBe(titleInput);
   });
 });
