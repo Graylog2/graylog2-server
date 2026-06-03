@@ -99,10 +99,6 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
       return 'System Event Definition cannot be deleted';
     }
 
-    if (isSigmaEventDefinition(eventDefinition)) {
-      return 'Sigma Rules must be deleted from the Sigma Rules page';
-    }
-
     return undefined;
   };
 
@@ -258,11 +254,13 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
           bsSize="xsmall"
         />
         <MoreActions>
-          <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
-            <MenuItem onClick={onEditEventDefinition} data-testid="edit-button">
-              Edit
-            </MenuItem>
-          </IfPermitted>
+          {(!isSigmaEventDefinition(eventDefinition) || showActions()) && (
+            <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
+              <MenuItem onClick={onEditEventDefinition} data-testid="edit-button">
+                Edit
+              </MenuItem>
+            </IfPermitted>
+          )}
           <IfPermitted permissions="eventdefinitions:create">
             {!isSystemEventDefinition(eventDefinition) && !isSigmaEventDefinition(eventDefinition) && (
               <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
@@ -287,10 +285,10 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
             <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
               <MenuItem divider />
               <DeleteMenuItem
-                disabled={isSystemEventDefinition(eventDefinition) || isSigmaEventDefinition(eventDefinition)}
+                disabled={isSystemEventDefinition(eventDefinition)}
                 title={getDeleteActionTitle()}
                 onClick={
-                  isSystemEventDefinition(eventDefinition) || isSigmaEventDefinition(eventDefinition)
+                  isSystemEventDefinition(eventDefinition)
                     ? undefined
                     : () => handleAction(DIALOG_TYPES.DELETE, eventDefinition)
                 }
