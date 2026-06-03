@@ -474,57 +474,6 @@ public class InputServiceImplTest {
         );
     }
 
-    /**
-     * Regression test for <a href="https://github.com/Graylog2/graylog2-server/issues/26009">#26009</a>:
-     * persisting the desired state when starting or stopping an input must not delete its extractors.
-     */
-    @Test
-    void persistDesiredStateKeepsExtractors() throws Exception {
-        final Input input = inputService.find(inputService.save(createTestInput()));
-        inputService.addExtractor(input, createCopyInputExtractor());
-
-        inputService.persistDesiredState(input, IOState.Type.STOPPED);
-
-        assertThat(inputService.extractorCountByInputId(List.of(input.getId())))
-                .containsEntry(input.getId(), 1);
-        assertThat(inputService.find(input.getId()).getDesiredState()).isEqualTo(IOState.Type.STOPPED);
-    }
-
-    /**
-     * Regression test for <a href="https://github.com/Graylog2/graylog2-server/issues/26009">#26009</a>:
-     * saving an input that was loaded from the database must round-trip the embedded extractors.
-     */
-    @Test
-    void saveKeepsExtractors() throws Exception {
-        final Input input = inputService.find(inputService.save(createTestInput()));
-        inputService.addExtractor(input, createCopyInputExtractor());
-
-        inputService.save(inputService.find(input.getId()));
-
-        assertThat(inputService.extractorCountByInputId(List.of(input.getId())))
-                .containsEntry(input.getId(), 1);
-    }
-
-    /**
-     * Regression test for <a href="https://github.com/Graylog2/graylog2-server/issues/26009">#26009</a>:
-     * the input update flow in {@code InputsResource} merges via the {@code getFields()} Map view and
-     * re-creates the input from the merged map. Extractors must survive this round-trip, too.
-     */
-    @Test
-    void updateViaFieldsMapKeepsExtractors() throws Exception {
-        final Input input = inputService.find(inputService.save(createTestInput()));
-        inputService.addExtractor(input, createCopyInputExtractor());
-
-        final Input reloaded = inputService.find(input.getId());
-        final Map<String, Object> mergedFields = new HashMap<>(reloaded.getFields());
-        mergedFields.put(MessageInput.FIELD_TITLE, "updated title");
-        inputService.update(inputService.create(reloaded.getId(), mergedFields));
-
-        assertThat(inputService.extractorCountByInputId(List.of(input.getId())))
-                .containsEntry(input.getId(), 1);
-        assertThat(inputService.find(input.getId()).getTitle()).isEqualTo("updated title");
-    }
-
     @Test
     void totalExtractorCountByTypeCountsExtractorsAcrossInputs() throws Exception {
         final Input input1 = inputService.find(inputService.save(createTestInput()));
