@@ -14,14 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import { fn } from 'storybook/test';
 import { MemoryRouter } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { Input } from 'components/bootstrap';
-import { CreatePage } from 'components/common';
+import { Button, Input } from 'components/bootstrap';
+import { CreateModal, CreatePage } from 'components/common';
 
 import Mermaid from './Mermaid';
 
@@ -61,9 +61,32 @@ const ContextGrid = styled.div`
 
 const ContextCard = styled.div``;
 
+const StoryLinkAnchor = styled.a`
+  font-size: ${({ theme }) => theme.fonts.size.small};
+  display: inline-block;
+  margin-bottom: ${({ theme }) => theme.spacings.md};
+  cursor: pointer;
+`;
+
+const StoryNavLink = ({ storyId, children }: { storyId: string; children: React.ReactNode }) => (
+  <StoryLinkAnchor
+    href="#"
+    onClick={(e) => {
+      e.preventDefault();
+      // eslint-disable-next-line no-underscore-dangle
+      (window as any).__STORYBOOK_ADDONS_CHANNEL__?.emit('selectStory', { storyId });
+    }}>
+    {children}
+  </StoryLinkAnchor>
+);
+
 const SectionGroup = styled.div`
   display: flex;
   flex-direction: column;
+
+  ${ContextCard} + ${ContextCard} {
+    margin-top: ${({ theme }) => theme.spacings.lg};
+  }
 `;
 
 const ContextLabel = styled.p`
@@ -152,6 +175,10 @@ const CreateEntityPatternDoc = () => (
             own context, use a Page instead.
           </ContextBody>
 
+          <StoryNavLink storyId="patterns-creating-an-entity--current-context-modal">
+            View example →
+          </StoryNavLink>
+
           <RuleListHeading>Do</RuleListHeading>
           <RuleList>
             <RuleItem $type="do">Show a toast notification on successful creation</RuleItem>
@@ -170,6 +197,10 @@ const CreateEntityPatternDoc = () => (
             completion is taken to the entity detail page. Pages have a browser history entry and can be directly linked
             to.
           </ContextBody>
+
+          <StoryNavLink storyId="patterns-creating-an-entity--new-context-page">
+            View example →
+          </StoryNavLink>
         </ContextCard>
       </SectionGroup>
 
@@ -230,6 +261,27 @@ type Story = StoryObj<typeof meta>;
 
 export const Overview: Story = {
   render: () => <CreateEntityPatternDoc />,
+};
+
+export const CurrentContextModal: Story = {
+  name: 'Current Context — Modal',
+  render: () => {
+    const [show, setShow] = useState(false);
+
+    return (
+      <>
+        <Button onClick={() => setShow(true)}>Create Stream</Button>
+        <CreateModal<StoryValues>
+          entityName="Stream"
+          show={show}
+          onClose={() => setShow(false)}
+          initialValues={{ title: '', description: '' }}
+          onSubmit={fn()}>
+          <FormFields />
+        </CreateModal>
+      </>
+    );
+  },
 };
 
 export const NewContextPage: Story = {
