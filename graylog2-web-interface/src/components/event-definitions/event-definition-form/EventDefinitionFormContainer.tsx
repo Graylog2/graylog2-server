@@ -89,6 +89,7 @@ const EventDefinitionFormContainer = ({
       backlog_size: null,
     },
     notifications: [],
+    exclusions: [],
     alert: false,
   },
   formControls = undefined,
