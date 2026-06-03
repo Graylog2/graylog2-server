@@ -103,6 +103,7 @@ import org.graylog2.rest.resources.system.inputs.ExtractorsResource;
 import org.graylog2.rest.resources.system.inputs.InputStatesResource;
 import org.graylog2.rest.resources.system.inputs.InputMetricsResource;
 import org.graylog2.rest.resources.system.inputs.InputsResource;
+import org.graylog2.rest.resources.streams.StreamMetricsResource;
 import org.graylog2.rest.resources.system.inputs.StaticFieldsResource;
 import org.graylog2.rest.resources.system.jobs.ServiceManagerResource;
 import org.graylog2.rest.resources.system.jobs.SystemJobResource;
@@ -280,6 +281,7 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(StreamDestinationFilterBuilderResource.class);
         addSystemRestResource(FavoriteFieldsResource.class);
         addSystemRestResource(StreamPipelineRulesResource.class);
+        addSystemRestResource(StreamMetricsResource.class);
     }
 
     private void addMonitoringResources() {
