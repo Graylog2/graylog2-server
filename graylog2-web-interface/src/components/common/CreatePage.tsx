@@ -89,7 +89,7 @@ type Props<TValues extends object> = {
   entityName: string;
   overviewRoute: string;
   initialValues: TValues;
-  onSubmit: (values: TValues) => Promise<void>;
+  onSubmit: (values: TValues) => Promise<string>;
   validate?: (values: TValues) => FormikErrors<TValues> | Promise<FormikErrors<TValues>>;
   description?: React.ReactNode;
   documentationLink?: { title: string; path: string };
@@ -117,8 +117,8 @@ const CreatePage = <TValues extends object>({
     setSubmitError(null);
 
     try {
-      await onSubmit(values);
-      history.push(overviewRoute);
+      const detailsRoute = await onSubmit(values);
+      history.push(detailsRoute);
     } catch (error) {
       setSubmitError(error?.message ?? 'An error occurred. Please try again.');
     }
