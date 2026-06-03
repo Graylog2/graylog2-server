@@ -267,7 +267,7 @@ declare module 'graylog-web-plugin/plugin' {
     messagecount: 'read';
     messages: 'analyze' | 'read';
     node: 'shutdown';
-    notifications: 'read';
+    notifications: 'delete' | 'read';
     outputs: 'create' | 'edit' | 'read' | 'terminate';
     pipeline: 'create' | 'delete' | 'edit' | 'read';
     pipeline_rule: 'create' | 'delete' | 'edit' | 'read';
