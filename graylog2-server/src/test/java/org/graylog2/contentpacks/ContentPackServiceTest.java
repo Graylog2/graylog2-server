@@ -462,8 +462,13 @@ public class ContentPackServiceTest {
 
     @Test
     @WithAuthorization(permissions = {"inputs:create"})
-    public void upgradeContentPackUpdatesExistingEntity() throws Exception {
-        when(patternService.load("dead-beef1")).thenReturn(grokPattern);
+    public void upgradeContentPackRecreatesNonUpdatableEntityType() throws Exception {
+        // GrokPatternFacade does not implement UpdatableEntityFacade, so an existing grok pattern
+        // falls back to delete-and-recreate on upgrade: content stays fresh, but the ID changes.
+        GrokPattern existingPattern = GrokPattern.builder().id("dead-beef1").name("NAME").pattern("\\w").build();
+        when(patternService.load("dead-beef1")).thenReturn(existingPattern);
+        GrokPattern recreatedPattern = GrokPattern.builder().id("recreated-id").name("NAME").pattern("\\w").build();
+        when(patternService.save(any())).thenReturn(recreatedPattern);
         when(mockUser.getName()).thenReturn(TEST_USER);
         when(userService.loadById(any())).thenReturn(mockUser);
         when(contentPackInstallService.insert(any())).thenAnswer(i -> i.getArgument(0));
@@ -472,16 +477,16 @@ public class ContentPackServiceTest {
         ContentPackUpgrade result = contentPackService.upgradeContentPack(
                 contentPack, contentPackInstallation, Collections.emptyMap(), "Upgrade", userContext, EntityShareRequest.EMPTY);
 
-        assertThat(result.installation()).isNotNull();
+        verify(patternService).delete("dead-beef1");
+
         assertThat(result.installation().entities()).hasSize(1);
         NativeEntityDescriptor descriptor = result.installation().entities().iterator().next();
-        assertThat(descriptor.id()).isEqualTo(ModelId.of("dead-beef1"));
+        assertThat(descriptor.id()).isEqualTo(ModelId.of("recreated-id"));
         assertThat(descriptor.contentPackEntityId()).isEqualTo(ModelId.of("12345"));
 
-        assertThat(result.oldEntitySnapshots()).isNotNull();
+        // The old entity is still snapshotted for the preservation service.
         assertThat(result.oldEntitySnapshots().entityObjects()).containsKey(ModelId.of("12345"));
-        assertThat(result.oldEntitySnapshots().entityObjects().get(ModelId.of("12345"))).isEqualTo(grokPattern);
-        assertThat(result.oldEntitySnapshots().entities()).hasSize(1);
+        assertThat(result.oldEntitySnapshots().entityObjects().get(ModelId.of("12345"))).isEqualTo(existingPattern);
     }
 
     @Test
@@ -601,29 +606,22 @@ public class ContentPackServiceTest {
     }
 
     @Test
-    @WithAuthorization(permissions = {"inputs:create"})
+    @WithAuthorization(permissions = {ViewsRestPermissions.VIEW_CREATE, "inputs:create"})
     public void upgradeContentPackMixedExistingAndNewEntities() throws Exception {
-        Map<String, String> entityData1 = new HashMap<>();
-        entityData1.put("name", "EXISTING");
-        entityData1.put("pattern", "\\w");
-        Map<String, String> entityData2 = new HashMap<>();
-        entityData2.put("name", "NEW_PATTERN");
-        entityData2.put("pattern", "\\d+");
-
-        EntityV1 existingEntityV1 = EntityV1.builder()
-                .id(ModelId.of("entity-1"))
-                .type(ModelTypes.GROK_PATTERN_V1)
-                .data(objectMapper.convertValue(entityData1, JsonNode.class))
-                .build();
+        // Existing entity: a view (updatable facade, update branch). New entity: a grok pattern
+        // (create branch, which does not require update support).
+        Map<String, String> entityData = new HashMap<>();
+        entityData.put("name", "NEW_PATTERN");
+        entityData.put("pattern", "\\d+");
         EntityV1 newEntityV1 = EntityV1.builder()
                 .id(ModelId.of("entity-2"))
                 .type(ModelTypes.GROK_PATTERN_V1)
-                .data(objectMapper.convertValue(entityData2, JsonNode.class))
+                .data(objectMapper.convertValue(entityData, JsonNode.class))
                 .build();
 
         ContentPackV1 newPack = ContentPackV1.builder()
                 .description("test")
-                .entities(ImmutableSet.of(existingEntityV1, newEntityV1))
+                .entities(ImmutableSet.of(createTestViewEntity(), newEntityV1))
                 .name("test")
                 .revision(2)
                 .summary("")
@@ -633,7 +631,7 @@ public class ContentPackServiceTest {
                 .build();
 
         NativeEntityDescriptor oldDescriptor = NativeEntityDescriptor.create(
-                ModelId.of("entity-1"), "native-1", ModelTypes.GROK_PATTERN_V1, "EXISTING");
+                ModelId.of("1"), "view-native-id", ModelTypes.SEARCH_V1, "title", false);
         ContentPackInstallation oldInstall = ContentPackInstallation.builder()
                 .contentPackId(ModelId.of("dead-beef"))
                 .contentPackRevision(1)
@@ -644,8 +642,15 @@ public class ContentPackServiceTest {
                 .createdBy("me")
                 .build();
 
-        GrokPattern existingPattern = GrokPattern.builder().id("native-1").name("EXISTING").pattern("\\w").build();
-        when(patternService.load("native-1")).thenReturn(existingPattern);
+        when(streamService.getSystemStreamIds(true)).thenReturn(ALL_SYSTEM_STREAM_IDS);
+        for (String id : ALL_SYSTEM_STREAM_IDS) {
+            when(streamService.load(id)).thenReturn(createTestStream(id));
+            when(streamService.isSystemStream(id)).thenReturn(true);
+        }
+
+        ViewDTO existingView = ViewDTO.builder().id("view-native-id").title("title").searchId("search-id").state(Collections.emptyMap()).build();
+        when(viewService.get("view-native-id")).thenReturn(Optional.of(existingView));
+
         GrokPattern newPattern = GrokPattern.builder().id("native-2").name("NEW_PATTERN").pattern("\\d+").build();
         when(patternService.save(any())).thenReturn(newPattern);
         when(mockUser.getName()).thenReturn(TEST_USER);
@@ -660,10 +665,10 @@ public class ContentPackServiceTest {
         Set<ModelId> nativeIds = result.installation().entities().stream()
                 .map(NativeEntityDescriptor::id)
                 .collect(Collectors.toSet());
-        assertThat(nativeIds).containsExactlyInAnyOrder(ModelId.of("native-1"), ModelId.of("native-2"));
+        assertThat(nativeIds).containsExactlyInAnyOrder(ModelId.of("view-native-id"), ModelId.of("native-2"));
 
         assertThat(result.oldEntitySnapshots().entityObjects()).hasSize(1);
-        assertThat(result.oldEntitySnapshots().entityObjects()).containsKey(ModelId.of("entity-1"));
+        assertThat(result.oldEntitySnapshots().entityObjects()).containsKey(ModelId.of("1"));
     }
 
     @Test

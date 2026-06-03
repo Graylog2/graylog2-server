@@ -38,6 +38,7 @@ import org.graylog.security.GrantDTO;
 import org.graylog.security.shares.EntityGrantLookup;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.facades.EntityFacade;
+import org.graylog2.contentpacks.facades.UpdatableEntityFacade;
 import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -63,7 +64,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
+public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto>, UpdatableEntityFacade<EventDefinitionDto> {
     private static final Logger LOG = LoggerFactory.getLogger(EventDefinitionFacade.class);
 
     private final ObjectMapper objectMapper;

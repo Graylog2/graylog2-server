@@ -47,6 +47,7 @@ import org.graylog2.contentpacks.exceptions.UnexpectedEntitiesException;
 import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
 import org.graylog2.contentpacks.facades.StreamFacade;
 import org.graylog2.contentpacks.facades.UnsupportedEntityFacade;
+import org.graylog2.contentpacks.facades.UpdatableEntityFacade;
 import org.graylog2.contentpacks.model.ContentPack;
 import org.graylog2.contentpacks.model.ContentPackInstallation;
 import org.graylog2.contentpacks.model.ContentPackUninstallDetails;
@@ -322,14 +323,25 @@ public class ContentPackService {
                 if (oldDescriptor != null) {
                     final Optional<NativeEntity<?>> existingEntity = (Optional) facade.loadNativeEntity(oldDescriptor);
                     if (existingEntity.isPresent()) {
-                        LOG.trace("Updating existing entity for {} (preserving ID {})", entityDescriptor, oldDescriptor.id());
                         final NativeEntity nativeEntity = existingEntity.get();
-
                         oldEntityObjects.put(entity.id(), nativeEntity.entity());
 
-                        facade.updateNativeEntity(entity, nativeEntity, validatedParameters, allEntities, userContext.getUser().getName());
-                        allEntityDescriptors.add(nativeEntity.descriptor());
-                        allEntities.put(entityDescriptor, nativeEntity.entity());
+                        if (facade instanceof UpdatableEntityFacade updatableFacade) {
+                            LOG.trace("Updating existing entity for {} (preserving ID {})", entityDescriptor, oldDescriptor.id());
+                            updatableFacade.updateNativeEntity(entity, nativeEntity, validatedParameters, allEntities, userContext.getUser().getName());
+                            allEntityDescriptors.add(nativeEntity.descriptor());
+                            allEntities.put(entityDescriptor, nativeEntity.entity());
+                        } else {
+                            // The facade doesn't support in-place updates, so fall back to
+                            // delete-and-recreate: content stays fresh, but the ID changes.
+                            LOG.debug("Entity type {} does not support in-place update, recreating entity {}",
+                                    entity.type(), entityDescriptor);
+                            facade.delete(nativeEntity.entity());
+                            final NativeEntity<?> recreatedEntity = facade.createNativeEntity(entity, validatedParameters, allEntities, userContext.getUser().getName());
+                            allEntityDescriptors.add(recreatedEntity.descriptor());
+                            createdEntities.put(entityDescriptor, recreatedEntity.entity());
+                            allEntities.put(entityDescriptor, recreatedEntity.entity());
+                        }
                     } else {
                         LOG.trace("Old entity {} no longer exists in DB, creating new", entityDescriptor);
                         final NativeEntity<?> createdEntity = facade.createNativeEntity(entity, validatedParameters, allEntities, userContext.getUser().getName());

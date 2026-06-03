@@ -66,7 +66,7 @@ import java.util.stream.Stream;
 
 import static org.graylog2.contentpacks.facades.StreamReferenceFacade.resolveStreamEntity;
 
-public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, ViewSummaryDTO> {
+public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, ViewSummaryDTO>, UpdatableEntityFacade<ViewDTO> {
     private static final Logger LOG = LoggerFactory.getLogger(ViewFacade.class);
 
     private final ObjectMapper objectMapper;

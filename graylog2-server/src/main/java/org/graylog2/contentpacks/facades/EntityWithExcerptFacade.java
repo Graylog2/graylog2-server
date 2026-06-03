@@ -79,20 +79,6 @@ public interface EntityWithExcerptFacade<EntityClass, ExcerptClass> {
     }
 
     /**
-     * Update an existing native entity's content during a content pack upgrade.
-     * Called when {@link #findExisting} finds an entity already on the system, allowing
-     * the facade to update the entity's content while preserving its ID.
-     *
-     * <p>Default implementation is a no-op (existing behavior: found entities are left as-is).</p>
-     */
-    default void updateNativeEntity(Entity entity,
-                                    NativeEntity<EntityClass> existingEntity,
-                                    Map<String, ValueReference> parameters,
-                                    Map<EntityDescriptor, Object> nativeEntities,
-                                    String username) {
-    }
-
-    /**
      * Loads the native entity instance for the given native entity descriptor.
      *
      * @param nativeEntityDescriptor the native entity descriptor
