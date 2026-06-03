@@ -15,6 +15,7 @@
     "@storybook/addon-webpack5-compiler-swc": "^4.0.3",
     "@storybook/react-webpack5": "^10.4.1",
     "eslint-plugin-storybook": "^10.4.1",
+    "mermaid": "^11.15.0",
     "storybook": "^10.4.1",
     "storybook-dark-mode": "^5.0.0",
     "typescript": "^5.8.2"
