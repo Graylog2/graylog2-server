@@ -448,6 +448,7 @@ public class InputServiceImplTest {
                 .setEmbeddedStaticFields(List.of(
                         Map.of(InputImpl.FIELD_STATIC_FIELD_KEY, "static_key",
                                 InputImpl.FIELD_STATIC_FIELD_VALUE, "static_value")))
+                .setEmbeddedExtractors(List.of(createCopyInputExtractor().getPersistedFields()))
                 .build();
 
         final String id = inputService.save(input);
@@ -466,6 +467,7 @@ public class InputServiceImplTest {
                 InputImpl.FIELD_GLOBAL,
                 InputImpl.FIELD_CONFIGURATION,
                 InputImpl.EMBEDDED_STATIC_FIELDS,
+                InputImpl.EMBEDDED_EXTRACTORS,
                 InputImpl.FIELD_DESIRED_STATE,
                 InputImpl.FIELD_CONTENT_PACK,
                 InputImpl.FIELD_NODE_ID
