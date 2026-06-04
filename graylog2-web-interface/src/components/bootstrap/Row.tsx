@@ -37,7 +37,7 @@ type Props = React.HTMLAttributes<HTMLDivElement> & {
   'data-testid'?: string;
   // Allow callers to pass styled-components transient props (e.g. when wrapping
   // Row in `styled(Row)\`...\``) without each one being declared up front.
-  [key: `$${string}`]: unknown;
+  className?: string;
 };
 
 const StyledRow = styled.div`
@@ -59,10 +59,7 @@ const StyledRow = styled.div`
   }
 `;
 
-const Row = (
-  { children = undefined, as = undefined, ...rest }: Props,
-  ref: React.ForwardedRef<HTMLDivElement>,
-) => (
+const Row = ({ children = undefined, as = undefined, ...rest }: Props, ref: React.ForwardedRef<HTMLDivElement>) => (
   <StyledRow ref={ref} as={as} {...rest}>
     {children}
   </StyledRow>

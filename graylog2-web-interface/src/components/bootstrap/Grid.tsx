@@ -21,6 +21,7 @@ import styled from 'styled-components';
 
 type Props = Omit<ContainerProps, 'size'> & {
   fluid?: boolean;
+  className?: string;
 };
 
 // react-bootstrap's `.container-fluid` uses exactly 15px horizontal padding
@@ -33,7 +34,7 @@ const StyledContainer = styled(Container)`
   padding-right: 15px;
 `;
 
-const Grid = ({ fluid = false, ...props }: Props) => <StyledContainer fluid={fluid} {...props} />;
+const Grid = ({ fluid = false, className }: Props) => <StyledContainer fluid={fluid} className={className} />;
 
 /** @component */
 export default Grid;
