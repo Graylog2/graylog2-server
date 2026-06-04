@@ -19,7 +19,12 @@ import Routes from 'routing/Routes';
 
 const SYSTEM_OVERVIEW_TABS = [
   { description: 'Overview', path: Routes.SYSTEM.OVERVIEW },
-  { description: 'Health', path: Routes.SYSTEM.HEALTH, permissions: 'notifications:read', BadgeComponent: NotificationsNavTab },
+  {
+    description: 'Health',
+    path: Routes.SYSTEM.HEALTH,
+    permissions: 'notifications:read',
+    BadgeComponent: NotificationsNavTab,
+  },
 ];
 
 export default SYSTEM_OVERVIEW_TABS;
