@@ -102,7 +102,7 @@
         <airline.version>3.2.0</airline.version>
         <amqp-client.version>5.30.0</amqp-client.version>
         <antlr.version>4.13.2</antlr.version>
-        <apache-directory-version>2.1.7</apache-directory-version>
+        <apache-directory-version>2.1.8</apache-directory-version>
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
         <apache-httpclient5.version>5.5.1</apache-httpclient5.version>
         <apache-httpcore.version>4.4.16</apache-httpcore.version>
@@ -164,7 +164,7 @@
         <log4j.version>2.26.0</log4j.version>
         <lucene.version>9.12.3</lucene.version>
         <lz4.version>1.11.0</lz4.version>
-        <metrics.version>4.2.38</metrics.version>
+        <metrics.version>4.2.39</metrics.version>
         <mongodb-driver.version>5.7.0</mongodb-driver.version>
         <mongojack.version>5.1.0</mongojack.version>
         <natty.version>0.13</natty.version>
@@ -189,7 +189,7 @@
         <slf4j.version>2.0.18</slf4j.version>
         <streamex.version>0.8.4</streamex.version>
         <swagger.version>2.2.50</swagger.version>
-        <swagger-parser.version>2.1.42</swagger-parser.version>
+        <swagger-parser.version>2.1.43</swagger-parser.version>
 
         <syslog4j.version>0.9.63</syslog4j.version>
         <threeten-extra.version>1.8.0</threeten-extra.version>
@@ -692,12 +692,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.5.5</version>
+                    <version>3.5.6</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.5.5</version>
+                    <version>3.5.6</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
