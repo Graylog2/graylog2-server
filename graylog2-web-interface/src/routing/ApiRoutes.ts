@@ -253,15 +253,6 @@ const ApiRoutes = {
     multipleAllNodes: () => ({ url: '/cluster/metrics/multiple' }),
     byNamespace: (nodeId: string, namespace: string) => ({ url: `/cluster/${nodeId}/metrics/namespace/${namespace}` }),
   },
-  NotificationsApiController: {
-    delete: (type: string) => ({ url: `/system/notifications/${type}` }),
-    deleteWithKey: (type: string, key: string) => ({ url: `/system/notifications/${type}/${key}` }),
-    list: () => ({ url: '/system/notifications' }),
-    getHtmlMessage: (type: string) => ({ url: `/system/notification/message/html/${type.toLocaleUpperCase()}` }),
-    getHtmlMessageWithKey: (type: string, key: string) => ({
-      url: `/system/notification/message/html/${type.toLocaleUpperCase()}/${key}`,
-    }),
-  },
   OutputsApiController: {
     index: () => ({ url: '/system/outputs' }),
     create: () => ({ url: '/system/outputs' }),

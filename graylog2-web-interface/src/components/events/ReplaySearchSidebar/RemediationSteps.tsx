@@ -59,7 +59,7 @@ const RemediationSteps = ({ event, meta, eventDefinitionEventProcedureId }: Prop
   return validSecurityLicense ? (
     <EventProcedureRenderer eventProcedureId={eventDefinitionEventProcedureId} eventId={event?.id} />
   ) : (
-    <RemediationStepRenderer meta={meta} eventDefinitionId={event.event_definition_id} />
+    <RemediationStepRenderer meta={meta} eventDefinitionId={event?.event_definition_id} />
   );
 };
 export default RemediationSteps;
