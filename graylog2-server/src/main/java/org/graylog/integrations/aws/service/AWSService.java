@@ -127,6 +127,7 @@ public class AWSService {
         configuration.put(AWSInput.CK_ACCESS_KEY, request.awsAccessKeyId());
         configuration.put(AWSInput.CK_SECRET_KEY, request.awsSecretAccessKey());
         configuration.put(AWSInput.CK_ASSUME_ROLE_ARN, request.assumeRoleArn());
+        configuration.put(AWSInput.CK_EXTERNAL_ID, request.externalId());
         configuration.put(AWSInput.CK_CLOUDWATCH_ENDPOINT, request.cloudwatchEndpoint());
         configuration.put(AWSInput.CK_DYNAMODB_ENDPOINT, request.dynamodbEndpoint());
         configuration.put(AWSInput.CK_IAM_ENDPOINT, request.iamEndpoint());
