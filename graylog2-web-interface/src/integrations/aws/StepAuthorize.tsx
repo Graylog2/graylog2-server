@@ -27,6 +27,7 @@ import { ApiRoutes } from 'integrations/aws/common/Routes';
 import { AWS_AUTH_TYPES } from 'integrations/aws/common/constants';
 import useFetch from 'integrations/hooks/useFetch';
 import formValidation from 'integrations/aws/utils/formValidation';
+import { validateExternalIdRequiresArn } from 'integrations/aws/utils/awsValidation';
 import AWSAuthenticationTypes from 'integrations/aws/authentication/AWSAuthenticationTypes';
 import AWSCustomEndpoints from 'integrations/aws/authentication/AWSCustomEndpoints';
 import { toAWSRequest } from 'integrations/aws/common/formDataAdapter';
@@ -96,6 +97,20 @@ const StepAuthorize = ({ onChange, onSubmit, sidebarComponent = null }: StepAuth
   }, [fetchRegionsStatus.error, fetchStreamsStatus.error, onSubmit, setStreams, setStreamsFetch]);
 
   const handleSubmit = () => {
+    // Validate that External ID is only used with Assume Role ARN
+    const externalIdError = validateExternalIdRequiresArn(
+      formData?.awsAssumeRoleARN?.value,
+      formData?.awsExternalId?.value,
+    );
+
+    if (externalIdError) {
+      setFormError({
+        full_message: externalIdError,
+        nice_message: externalIdError,
+      });
+      return;
+    }
+
     setStreamsFetch(ApiRoutes.INTEGRATIONS.AWS.KINESIS.STREAMS);
   };
 
