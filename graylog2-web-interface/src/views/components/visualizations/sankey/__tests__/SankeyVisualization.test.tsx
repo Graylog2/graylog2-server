@@ -194,6 +194,22 @@ describe('SankeyVisualization', () => {
     expect(trace.link.value).toEqual([1, 1, 1]);
   });
 
+  it('themes the link color for visibility while leaving node colors to the default palette', () => {
+    const config = AggregationWidgetConfig.builder()
+      .rowPivots([Pivot.createValues(['a']), Pivot.createValues(['b'])])
+      .series([Series.forFunction('count()')])
+      .visualization('sankey')
+      .build();
+
+    render(<WrappedSankey {...baseProps} config={config} data={fixtures.twoRowPivots} />);
+
+    const trace = lastTrace();
+
+    expect(typeof trace.link.color).toBe('string');
+    expect(trace.link.color).not.toHaveLength(0);
+    expect(trace.node.color).toBeUndefined();
+  });
+
   it('renders an empty-state message when there are no rows', () => {
     const config = AggregationWidgetConfig.builder()
       .rowPivots([Pivot.createValues(['a']), Pivot.createValues(['b'])])

@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
+import chroma from 'chroma-js';
 
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -55,7 +56,7 @@ export type SankeyTrace = {
   orientation: 'h';
   arrangement: 'fixed';
   node: { label: Array<string>; customdata: Array<NodeCustomData>; pad: number; thickness: number };
-  link: { source: Array<number>; target: Array<number>; value: Array<number>; label: Array<string> };
+  link: { source: Array<number>; target: Array<number>; value: Array<number>; label: Array<string>; color: string };
 };
 
 const STAGE_SEPARATOR = ' ';
@@ -114,6 +115,7 @@ const buildSankeyTrace = (
   paths: Array<LeafPath>,
   displayKeys: Array<Array<string>>,
   allFields: Array<string>,
+  linkColor: string,
 ): SankeyTrace => {
   const nodeIndex = new Map<string, number>();
   const labels: Array<string> = [];
@@ -169,7 +171,7 @@ const buildSankeyTrace = (
     orientation: 'h',
     arrangement: 'fixed',
     node: { label: labels, customdata, pad: 15, thickness: 18 },
-    link: { source, target, value, label },
+    link: { source, target, value, label, color: linkColor },
   };
 };
 
@@ -178,7 +180,12 @@ const layout = { margin: { t: 20, b: 20, l: 20, r: 20 } };
 const SankeyVisualization = makeVisualization(({ config, data, height, width }: VisualizationComponentProps) => {
   const rows = retrieveChartData(data);
   const mapKeys = useMapKeys();
+  const theme = useTheme();
   const { onChartClick, initializeGraphDivRef, popover } = usePlotOnClickPopover('sankey', config);
+
+  // Translucent so overlapping flows stay distinguishable; based on the theme's text color
+  // so the links remain visible in both light and dark themes (plotly's default is too faint).
+  const linkColor = chroma(theme.colors.text.secondary).alpha(0.3).css();
 
   const trace = useMemo<SankeyTrace | null>(() => {
     const rowFields = config.rowPivots.flatMap((pivot) => pivot.fields);
@@ -198,8 +205,8 @@ const SankeyVisualization = makeVisualization(({ config, data, height, width }: 
 
     const displayKeys = paths.map((path) => path.keys.map((k, i) => String(mapKeys(k, allFields[i]) ?? k)));
 
-    return buildSankeyTrace(paths, displayKeys, allFields);
-  }, [config, mapKeys, rows]);
+    return buildSankeyTrace(paths, displayKeys, allFields, linkColor);
+  }, [config, mapKeys, rows, linkColor]);
 
   return (
     <Container $height={height} $width={width}>
