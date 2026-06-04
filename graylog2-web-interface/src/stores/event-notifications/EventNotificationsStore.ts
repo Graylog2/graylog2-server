@@ -155,11 +155,11 @@ export const EventNotificationsStore = singletonStore('core.EventNotifications',
       promise.then((response) => {
         this.all = response.notifications;
         this.propagateChanges();
-
-        return response;
       });
 
       EventNotificationsActions.listAll.promise(promise);
+
+      return promise;
     },
 
     listPaginated({ query = '', page = 1, pageSize = 10 }) {
