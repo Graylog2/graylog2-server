@@ -40,7 +40,7 @@ class ExclusionRuleTest {
                 .title("Suppress scanner traffic")
                 .matchers(ImmutableList.of(
                         Matcher.builder()
-                                .type(MatcherType.USER)
+                                .type(MatcherType.ASSET)
                                 .values(ImmutableList.of("scanner-bot", "qa-runner"))
                                 .build(),
                         Matcher.builder()
@@ -90,11 +90,11 @@ class ExclusionRuleTest {
     @Test
     void allowsNonFieldMatchersWithoutFieldName() {
         final Matcher matcher = Matcher.builder()
-                .type(MatcherType.USER)
+                .type(MatcherType.ASSET)
                 .values(ImmutableList.of("scanner-bot"))
                 .build();
         assertThat(matcher.fieldName()).isNull();
-        assertThat(matcher.type()).isEqualTo(MatcherType.USER);
+        assertThat(matcher.type()).isEqualTo(MatcherType.ASSET);
     }
 
     @Test
@@ -104,7 +104,7 @@ class ExclusionRuleTest {
                 .title("Original")
                 .matchers(ImmutableList.of(
                         Matcher.builder()
-                                .type(MatcherType.USER)
+                                .type(MatcherType.ASSET)
                                 .values(ImmutableList.of("scanner-bot"))
                                 .build()))
                 .build();
@@ -120,7 +120,7 @@ class ExclusionRuleTest {
         final ExclusionRule rule = ExclusionRule.builder()
                 .title("anonymous")
                 .matchers(ImmutableList.of(Matcher.builder()
-                        .type(MatcherType.USER)
+                        .type(MatcherType.ASSET)
                         .values(ImmutableList.of("alice"))
                         .build()))
                 .build();

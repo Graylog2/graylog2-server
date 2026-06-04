@@ -52,7 +52,7 @@ const ErrorRoll = styled.div`
 `;
 
 const defaultRule = (): ExclusionRule => ({
-  matchers: [{ type: 'USER', values: [] }],
+  matchers: [{ type: 'ASSET', values: [] }],
 });
 
 const ruleHasError = (rule: ExclusionRule): boolean => {

@@ -70,21 +70,21 @@ describe('ExclusionRulesSummary', () => {
         id: 'r1',
         title: 'Suppress scanner traffic',
         matchers: [
-          { type: 'USER', values: ['scanner-bot', 'qa-runner'] },
+          { type: 'ASSET', values: ['scanner-bot', 'qa-runner'] },
           { type: 'FIELD', field_name: 'src_subnet', values: ['10.0.0.0/24'] },
         ],
       },
     ];
     wrap(<ExclusionRulesSummary exclusions={exclusions} />);
     expect(screen.getByText(/Suppress scanner traffic/)).toBeInTheDocument();
-    expect(screen.getByText(/USER IN \[scanner-bot, qa-runner\]/)).toBeInTheDocument();
+    expect(screen.getByText(/ASSET IN \[scanner-bot, qa-runner\]/)).toBeInTheDocument();
     expect(screen.getByText(/FIELD\(src_subnet\) IN \[10\.0\.0\.0\/24\]/)).toBeInTheDocument();
     expect(screen.getByText('AND')).toBeInTheDocument();
   });
 
   it('renders multiple rules', () => {
     const exclusions: ExclusionRule[] = [
-      { id: 'r1', title: 'A', matchers: [{ type: 'USER', values: ['alice'] }] },
+      { id: 'r1', title: 'A', matchers: [{ type: 'ASSET', values: ['alice'] }] },
       { id: 'r2', title: 'B', matchers: [{ type: 'ASSET', values: ['asset-1'] }] },
     ];
     wrap(<ExclusionRulesSummary exclusions={exclusions} />);
@@ -94,7 +94,7 @@ describe('ExclusionRulesSummary', () => {
 
   it('falls back to a placeholder title when none is set', () => {
     const exclusions: ExclusionRule[] = [
-      { id: 'r1', matchers: [{ type: 'USER', values: ['alice'] }] },
+      { id: 'r1', matchers: [{ type: 'ASSET', values: ['alice'] }] },
     ];
     wrap(<ExclusionRulesSummary exclusions={exclusions} />);
     expect(screen.getByText(/Unnamed rule/i)).toBeInTheDocument();
@@ -124,27 +124,4 @@ describe('ExclusionRulesSummary', () => {
     expect(await screen.findByText(/ASSET IN \[Production DB, Staging API\]/)).toBeInTheDocument();
   });
 
-  it('resolves USER matcher values to asset names via the byIds endpoint', async () => {
-    mockFetch.mockImplementation((method: string, url: string) => {
-      if (method === 'POST' && url.includes('/assets/byIds')) {
-        return Promise.resolve({
-          'user-asset-1': { id: 'user-asset-1', name: 'Alice Anderson' },
-          'user-asset-2': { id: 'user-asset-2', name: 'Bob Brown' },
-        });
-      }
-
-      return Promise.resolve({});
-    });
-
-    const exclusions: ExclusionRule[] = [
-      {
-        id: 'r1',
-        title: 'Suppress known users',
-        matchers: [{ type: 'USER', values: ['user-asset-1', 'user-asset-2'] }],
-      },
-    ];
-    wrap(<ExclusionRulesSummary exclusions={exclusions} />);
-
-    expect(await screen.findByText(/USER IN \[Alice Anderson, Bob Brown\]/)).toBeInTheDocument();
-  });
 });

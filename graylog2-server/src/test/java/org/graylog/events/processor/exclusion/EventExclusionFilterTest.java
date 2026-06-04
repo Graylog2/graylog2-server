@@ -59,7 +59,7 @@ class EventExclusionFilterTest {
     @Test
     void filtersOutMatchingEventsAndTagsThem() {
         final Matcher matcher = Matcher.builder()
-                .type(MatcherType.USER).values(ImmutableList.of("alice")).build();
+                .type(MatcherType.ASSET).values(ImmutableList.of("alice")).build();
         final ExclusionRule rule = ExclusionRule.builder()
                 .id("rule-1").title("t")
                 .matchers(ImmutableList.of(matcher))
@@ -84,7 +84,7 @@ class EventExclusionFilterTest {
 
     @Test
     void ruleMatchesOnlyWhenAllMatchersMatch() {
-        final Matcher m1 = Matcher.builder().type(MatcherType.USER).values(ImmutableList.of("a")).build();
+        final Matcher m1 = Matcher.builder().type(MatcherType.ASSET).values(ImmutableList.of("a")).build();
         final Matcher m2 = Matcher.builder().type(MatcherType.ASSET).values(ImmutableList.of("x")).build();
         final ExclusionRule rule = ExclusionRule.builder()
                 .id("r").title("t").matchers(ImmutableList.of(m1, m2)).build();
@@ -104,8 +104,8 @@ class EventExclusionFilterTest {
 
     @Test
     void recordsFirstMatchingRuleByDeclarationOrder() {
-        final Matcher mA = Matcher.builder().type(MatcherType.USER).values(ImmutableList.of("a")).build();
-        final Matcher mB = Matcher.builder().type(MatcherType.USER).values(ImmutableList.of("b")).build();
+        final Matcher mA = Matcher.builder().type(MatcherType.ASSET).values(ImmutableList.of("a")).build();
+        final Matcher mB = Matcher.builder().type(MatcherType.ASSET).values(ImmutableList.of("b")).build();
         final ExclusionRule r1 = ExclusionRule.builder().id("first").title("t").matchers(ImmutableList.of(mA)).build();
         final ExclusionRule r2 = ExclusionRule.builder().id("second").title("t").matchers(ImmutableList.of(mB)).build();
         final EventDefinition def = mock(EventDefinition.class);
@@ -128,7 +128,7 @@ class EventExclusionFilterTest {
         final ExclusionRule rule = ExclusionRule.builder()
                 .id("scanner-rule").title("Suppress scanner traffic")
                 .matchers(ImmutableList.of(Matcher.builder()
-                        .type(MatcherType.USER)
+                        .type(MatcherType.ASSET)
                         .values(ImmutableList.of("alice-asset"))
                         .build()))
                 .build();

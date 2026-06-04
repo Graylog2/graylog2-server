@@ -22,7 +22,6 @@ import { Input } from 'components/bootstrap';
 import type { Matcher, MatcherType } from 'components/event-definitions/event-definitions-types';
 
 import AssetValueInput from './AssetValueInput';
-import UserValueInput from './UserValueInput';
 
 const Row = styled.div`
   display: grid;
@@ -80,10 +79,6 @@ const MatcherEditor = ({ matcher, onChange, onRemove }: Props) => {
       return <AssetValueInput values={matcher.values} onChange={handleValuesChange} />;
     }
 
-    if (matcher.type === 'USER') {
-      return <UserValueInput values={matcher.values} onChange={handleValuesChange} />;
-    }
-
     // FIELD: free-text creatable Select
     const options = matcher.values.map((v) => ({ label: v, value: v }));
 
@@ -116,7 +111,6 @@ const MatcherEditor = ({ matcher, onChange, onRemove }: Props) => {
           handleTypeChange(e.target.value as MatcherType)
         }>
         <option value="ASSET">ASSET</option>
-        <option value="USER">USER</option>
         <option value="FIELD">FIELD</option>
       </Input>
       {matcher.type === 'FIELD' ? (

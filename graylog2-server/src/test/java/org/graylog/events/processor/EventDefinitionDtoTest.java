@@ -301,7 +301,7 @@ public class EventDefinitionDtoTest {
                         .id("r")
                         .title("t")
                         .matchers(ImmutableList.of(Matcher.builder()
-                                .type(MatcherType.USER)
+                                .type(MatcherType.ASSET)
                                 .values(ImmutableList.of("alice"))
                                 .build()))
                         .build()))

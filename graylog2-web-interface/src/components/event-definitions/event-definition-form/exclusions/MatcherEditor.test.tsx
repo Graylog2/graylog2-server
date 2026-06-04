@@ -35,18 +35,18 @@ const wrap = (ui: React.ReactNode) => render(
   </QueryClientProvider>,
 );
 
-const userMatcher: Matcher = { type: 'USER', values: ['alice'] };
+const assetMatcher: Matcher = { type: 'ASSET', values: ['alice'] };
 const fieldMatcher: Matcher = { type: 'FIELD', field_name: 'src_ip', values: ['10.0.0.1'] };
 
 describe('MatcherEditor', () => {
   it('renders the type dropdown with the current type selected', () => {
-    wrap(<MatcherEditor matcher={userMatcher} onChange={jest.fn()} onRemove={jest.fn()} />);
+    wrap(<MatcherEditor matcher={assetMatcher} onChange={jest.fn()} onRemove={jest.fn()} />);
     const typeSelect = screen.getByLabelText(/matcher type/i) as HTMLSelectElement;
-    expect(typeSelect.value).toBe('USER');
+    expect(typeSelect.value).toBe('ASSET');
   });
 
   it('shows field_name input only when type is FIELD', () => {
-    const { rerender } = wrap(<MatcherEditor matcher={userMatcher} onChange={jest.fn()} onRemove={jest.fn()} />);
+    const { rerender } = wrap(<MatcherEditor matcher={assetMatcher} onChange={jest.fn()} onRemove={jest.fn()} />);
     expect(screen.queryByLabelText(/field name/i)).not.toBeInTheDocument();
     rerender(<MatcherEditor matcher={fieldMatcher} onChange={jest.fn()} onRemove={jest.fn()} />);
     expect(screen.getByLabelText(/field name/i)).toHaveValue('src_ip');
@@ -56,12 +56,12 @@ describe('MatcherEditor', () => {
     const handleChange = jest.fn();
     wrap(<MatcherEditor matcher={fieldMatcher} onChange={handleChange} onRemove={jest.fn()} />);
     const typeSelect = screen.getByLabelText(/matcher type/i);
-    await userEvent.selectOptions(typeSelect, 'USER');
-    expect(handleChange).toHaveBeenLastCalledWith({ type: 'USER', values: ['10.0.0.1'] });
+    await userEvent.selectOptions(typeSelect, 'ASSET');
+    expect(handleChange).toHaveBeenLastCalledWith({ type: 'ASSET', values: ['10.0.0.1'] });
   });
 
   it('renders an error message when values is empty', () => {
-    wrap(<MatcherEditor matcher={{ type: 'USER', values: [] }} onChange={jest.fn()} onRemove={jest.fn()} />);
+    wrap(<MatcherEditor matcher={{ type: 'ASSET', values: [] }} onChange={jest.fn()} onRemove={jest.fn()} />);
     expect(screen.getByText(/at least one value/i)).toBeInTheDocument();
   });
 
@@ -72,7 +72,7 @@ describe('MatcherEditor', () => {
 
   it('calls onRemove when the remove button is clicked', async () => {
     const handleRemove = jest.fn();
-    wrap(<MatcherEditor matcher={userMatcher} onChange={jest.fn()} onRemove={handleRemove} />);
+    wrap(<MatcherEditor matcher={assetMatcher} onChange={jest.fn()} onRemove={handleRemove} />);
     await userEvent.click(screen.getByRole('button', { name: /remove matcher/i }));
     expect(handleRemove).toHaveBeenCalled();
   });

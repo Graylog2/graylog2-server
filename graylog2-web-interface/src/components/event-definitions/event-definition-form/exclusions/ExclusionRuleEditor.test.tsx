@@ -39,14 +39,14 @@ const wrap = (ui: React.ReactNode) => render(
 const baseRule: ExclusionRule = {
   id: 'r1',
   title: 'My rule',
-  matchers: [{ type: 'USER', values: ['alice'] }],
+  matchers: [{ type: 'ASSET', values: ['alice'] }],
 };
 
 describe('ExclusionRuleEditor', () => {
   it('renders the title and matcher list', () => {
     wrap(<ExclusionRuleEditor rule={baseRule} onChange={jest.fn()} onRemove={jest.fn()} />);
     expect(screen.getByDisplayValue('My rule')).toBeInTheDocument();
-    expect((screen.getByLabelText(/matcher type/i) as HTMLSelectElement).value).toBe('USER');
+    expect((screen.getByLabelText(/matcher type/i) as HTMLSelectElement).value).toBe('ASSET');
   });
 
   it('calls onChange with updated title when the title input changes', async () => {
@@ -64,8 +64,8 @@ describe('ExclusionRuleEditor', () => {
     await userEvent.click(screen.getByRole('button', { name: /add matcher/i }));
     expect(handleChange).toHaveBeenLastCalledWith(expect.objectContaining({
       matchers: [
-        { type: 'USER', values: ['alice'] },
-        { type: 'USER', values: [] },
+        { type: 'ASSET', values: ['alice'] },
+        { type: 'ASSET', values: [] },
       ],
     }));
   });
@@ -81,7 +81,7 @@ describe('ExclusionRuleEditor', () => {
     const ruleWithTwo: ExclusionRule = {
       ...baseRule,
       matchers: [
-        { type: 'USER', values: ['alice'] },
+        { type: 'ASSET', values: ['alice'] },
         { type: 'ASSET', values: ['asset-1'] },
       ],
     };

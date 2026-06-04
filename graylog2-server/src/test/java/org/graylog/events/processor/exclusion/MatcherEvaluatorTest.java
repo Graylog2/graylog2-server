@@ -122,36 +122,4 @@ class MatcherEvaluatorTest {
         assertThat(evaluator.matches(matcher, event)).isFalse();
     }
 
-    @Test
-    void userMatcherMatchesWhenAnyAssociatedAssetInValues() {
-        when(event.getAssociatedAssets()).thenReturn(Set.of("user-asset-1"));
-        final Matcher matcher = Matcher.builder()
-                .type(MatcherType.USER)
-                .values(ImmutableList.of("user-asset-1"))
-                .build();
-
-        assertThat(evaluator.matches(matcher, event)).isTrue();
-    }
-
-    @Test
-    void userMatcherDoesNotMatchWhenNoOverlap() {
-        when(event.getAssociatedAssets()).thenReturn(Set.of("user-asset-1"));
-        final Matcher matcher = Matcher.builder()
-                .type(MatcherType.USER)
-                .values(ImmutableList.of("user-asset-2"))
-                .build();
-
-        assertThat(evaluator.matches(matcher, event)).isFalse();
-    }
-
-    @Test
-    void userMatcherReturnsFalseWhenNoAssociatedAssets() {
-        when(event.getAssociatedAssets()).thenReturn(Set.of());
-        final Matcher matcher = Matcher.builder()
-                .type(MatcherType.USER)
-                .values(ImmutableList.of("user-asset-1"))
-                .build();
-
-        assertThat(evaluator.matches(matcher, event)).isFalse();
-    }
 }

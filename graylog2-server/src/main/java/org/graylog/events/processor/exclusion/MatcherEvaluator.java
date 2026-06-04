@@ -28,7 +28,6 @@ public class MatcherEvaluator {
     public boolean matches(Matcher matcher, Event event) {
         return switch (matcher.type()) {
             case FIELD -> fieldMatches(matcher.fieldName(), matcher.values(), event);
-            case USER -> assetMatches(matcher.values(), event);
             case ASSET -> assetMatches(matcher.values(), event);
         };
     }

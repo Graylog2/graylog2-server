@@ -41,7 +41,7 @@ class DBEventDefinitionServiceNormalizeTest {
         final ExclusionRule rule = ExclusionRule.builder()
                 .title("scanner")
                 .matchers(ImmutableList.of(Matcher.builder()
-                        .type(MatcherType.USER).values(ImmutableList.of("alice")).build()))
+                        .type(MatcherType.ASSET).values(ImmutableList.of("alice")).build()))
                 .build();
         final EventDefinitionDto dto = sampleBuilder().exclusions(ImmutableList.of(rule)).build();
 
@@ -57,7 +57,7 @@ class DBEventDefinitionServiceNormalizeTest {
                 .id("   ")
                 .title("scanner")
                 .matchers(ImmutableList.of(Matcher.builder()
-                        .type(MatcherType.USER).values(ImmutableList.of("alice")).build()))
+                        .type(MatcherType.ASSET).values(ImmutableList.of("alice")).build()))
                 .build();
         final EventDefinitionDto dto = sampleBuilder().exclusions(ImmutableList.of(rule)).build();
 
@@ -75,7 +75,7 @@ class DBEventDefinitionServiceNormalizeTest {
                 .id("user-supplied-id")
                 .title("scanner")
                 .matchers(ImmutableList.of(Matcher.builder()
-                        .type(MatcherType.USER).values(ImmutableList.of("alice")).build()))
+                        .type(MatcherType.ASSET).values(ImmutableList.of("alice")).build()))
                 .build();
         final EventDefinitionDto dto = sampleBuilder().exclusions(ImmutableList.of(rule)).build();
 

@@ -84,7 +84,7 @@ export type EventProcessorConfig = {
   cron_timezone?: string;
   event_limit?: number;
 };
-export type MatcherType = 'ASSET' | 'USER' | 'FIELD';
+export type MatcherType = 'ASSET' | 'FIELD';
 
 export type Matcher = {
   type: MatcherType;

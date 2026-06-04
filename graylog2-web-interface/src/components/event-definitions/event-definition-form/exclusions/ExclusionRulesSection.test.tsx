@@ -45,7 +45,7 @@ describe('ExclusionRulesSection', () => {
 
   it('expands when the header is clicked and shows rule editors', async () => {
     const rules: ExclusionRule[] = [
-      { id: 'r1', title: 'A', matchers: [{ type: 'USER', values: ['alice'] }] },
+      { id: 'r1', title: 'A', matchers: [{ type: 'ASSET', values: ['alice'] }] },
     ];
     wrap(<ExclusionRulesSection exclusions={rules} onChange={jest.fn()} />);
     const header = screen.getByRole('button', { name: /Exclusion rules/i });
@@ -58,15 +58,15 @@ describe('ExclusionRulesSection', () => {
     wrap(<ExclusionRulesSection exclusions={[]} onChange={handleChange} />);
     await userEvent.click(screen.getByRole('button', { name: /add rule/i }));
     expect(handleChange).toHaveBeenLastCalledWith([
-      expect.objectContaining({ matchers: [{ type: 'USER', values: [] }] }),
+      expect.objectContaining({ matchers: [{ type: 'ASSET', values: [] }] }),
     ]);
   });
 
   it('shows a validation roll-up when rules have errors', () => {
     const broken: ExclusionRule[] = [
       { id: 'r1', title: 'bad', matchers: [] },
-      { id: 'r2', title: 'also bad', matchers: [{ type: 'USER', values: [] }] },
-      { id: 'r3', title: 'fine', matchers: [{ type: 'USER', values: ['ok'] }] },
+      { id: 'r2', title: 'also bad', matchers: [{ type: 'ASSET', values: [] }] },
+      { id: 'r3', title: 'fine', matchers: [{ type: 'ASSET', values: ['ok'] }] },
     ];
     wrap(<ExclusionRulesSection exclusions={broken} onChange={jest.fn()} />);
     expect(screen.getByText(/2 rules have errors/i)).toBeInTheDocument();
@@ -75,7 +75,7 @@ describe('ExclusionRulesSection', () => {
   it('keeps rule title input focused while typing (regression test for content-derived keys)', async () => {
     const Harness = () => {
       const [rules, setRules] = useState<ExclusionRule[]>([
-        { id: undefined, title: '', matchers: [{ type: 'USER', values: ['alice'] }] },
+        { id: undefined, title: '', matchers: [{ type: 'ASSET', values: ['alice'] }] },
       ]);
 
       return <ExclusionRulesSection exclusions={rules} onChange={setRules} />;

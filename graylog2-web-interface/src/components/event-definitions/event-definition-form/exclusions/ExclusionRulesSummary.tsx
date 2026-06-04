@@ -39,7 +39,7 @@ const matcherToString = (m: Matcher, assetNames: Record<string, string>): string
   const head = m.type === 'FIELD' && m.field_name
     ? `FIELD(${m.field_name})`
     : m.type;
-  const values = (m.type === 'ASSET' || m.type === 'USER')
+  const values = m.type === 'ASSET'
     ? m.values.map((v) => assetNames[v] ?? v)
     : m.values;
 
@@ -53,7 +53,7 @@ const ExclusionRulesSummary = ({ exclusions = [] }: Props) => {
     () => Array.from(new Set(
       (exclusions ?? []).flatMap((r) =>
         r.matchers
-          .filter((m) => m.type === 'ASSET' || m.type === 'USER')
+          .filter((m) => m.type === 'ASSET')
           .flatMap((m) => m.values),
       ),
     )),

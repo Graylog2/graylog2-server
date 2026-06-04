@@ -78,7 +78,7 @@ public class DBEventDefinitionServiceTest {
         final ExclusionRule ruleWithoutId = ExclusionRule.builder()
                 .title("Suppress scanner traffic")
                 .matchers(ImmutableList.of(Matcher.builder()
-                        .type(MatcherType.USER)
+                        .type(MatcherType.ASSET)
                         .values(ImmutableList.of("scanner-bot"))
                         .build()))
                 .build();
@@ -100,7 +100,7 @@ public class DBEventDefinitionServiceTest {
                 .id("pre-existing-id")
                 .title("Suppress scanner traffic")
                 .matchers(ImmutableList.of(Matcher.builder()
-                        .type(MatcherType.USER)
+                        .type(MatcherType.ASSET)
                         .values(ImmutableList.of("scanner-bot"))
                         .build()))
                 .build();
