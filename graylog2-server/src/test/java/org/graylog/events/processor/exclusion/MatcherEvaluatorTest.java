@@ -28,7 +28,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -124,37 +123,33 @@ class MatcherEvaluatorTest {
     }
 
     @Test
-    void userMatcherMatchesAnyOfTheKnownUserFields() {
-        when(event.getField("gl2_source_user")).thenReturn(FieldValue.string("alice"));
+    void userMatcherMatchesWhenAnyAssociatedAssetInValues() {
+        when(event.getAssociatedAssets()).thenReturn(Set.of("user-asset-1"));
         final Matcher matcher = Matcher.builder()
                 .type(MatcherType.USER)
-                .values(ImmutableList.of("alice"))
+                .values(ImmutableList.of("user-asset-1"))
                 .build();
 
         assertThat(evaluator.matches(matcher, event)).isTrue();
     }
 
     @Test
-    void userMatcherFallsBackThroughKnownFields() {
-        when(event.getField("gl2_source_user")).thenReturn(null);
-        when(event.getField("user_name")).thenReturn(null);
-        when(event.getField("target_user")).thenReturn(FieldValue.string("alice"));
+    void userMatcherDoesNotMatchWhenNoOverlap() {
+        when(event.getAssociatedAssets()).thenReturn(Set.of("user-asset-1"));
         final Matcher matcher = Matcher.builder()
                 .type(MatcherType.USER)
-                .values(ImmutableList.of("alice"))
+                .values(ImmutableList.of("user-asset-2"))
                 .build();
 
-        assertThat(evaluator.matches(matcher, event)).isTrue();
-        verify(event).getField("gl2_source_user");
-        verify(event).getField("user_name");
-        verify(event).getField("target_user");
+        assertThat(evaluator.matches(matcher, event)).isFalse();
     }
 
     @Test
-    void userMatcherReturnsFalseWhenNoneOfTheUserFieldsMatch() {
+    void userMatcherReturnsFalseWhenNoAssociatedAssets() {
+        when(event.getAssociatedAssets()).thenReturn(Set.of());
         final Matcher matcher = Matcher.builder()
                 .type(MatcherType.USER)
-                .values(ImmutableList.of("alice"))
+                .values(ImmutableList.of("user-asset-1"))
                 .build();
 
         assertThat(evaluator.matches(matcher, event)).isFalse();

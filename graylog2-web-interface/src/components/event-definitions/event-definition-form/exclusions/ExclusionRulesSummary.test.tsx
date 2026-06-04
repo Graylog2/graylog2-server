@@ -123,4 +123,28 @@ describe('ExclusionRulesSummary', () => {
 
     expect(await screen.findByText(/ASSET IN \[Production DB, Staging API\]/)).toBeInTheDocument();
   });
+
+  it('resolves USER matcher values to asset names via the byIds endpoint', async () => {
+    mockFetch.mockImplementation((method: string, url: string) => {
+      if (method === 'POST' && url.includes('/assets/byIds')) {
+        return Promise.resolve({
+          'user-asset-1': { id: 'user-asset-1', name: 'Alice Anderson' },
+          'user-asset-2': { id: 'user-asset-2', name: 'Bob Brown' },
+        });
+      }
+
+      return Promise.resolve({});
+    });
+
+    const exclusions: ExclusionRule[] = [
+      {
+        id: 'r1',
+        title: 'Suppress known users',
+        matchers: [{ type: 'USER', values: ['user-asset-1', 'user-asset-2'] }],
+      },
+    ];
+    wrap(<ExclusionRulesSummary exclusions={exclusions} />);
+
+    expect(await screen.findByText(/USER IN \[Alice Anderson, Bob Brown\]/)).toBeInTheDocument();
+  });
 });

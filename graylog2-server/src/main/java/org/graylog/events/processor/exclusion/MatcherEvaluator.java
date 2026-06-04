@@ -25,13 +25,10 @@ import java.util.Set;
 
 @Singleton
 public class MatcherEvaluator {
-    private static final ImmutableList<String> USER_FIELDS =
-            ImmutableList.of("gl2_source_user", "user_name", "target_user");
-
     public boolean matches(Matcher matcher, Event event) {
         return switch (matcher.type()) {
             case FIELD -> fieldMatches(matcher.fieldName(), matcher.values(), event);
-            case USER -> USER_FIELDS.stream().anyMatch(f -> fieldMatches(f, matcher.values(), event));
+            case USER -> assetMatches(matcher.values(), event);
             case ASSET -> assetMatches(matcher.values(), event);
         };
     }

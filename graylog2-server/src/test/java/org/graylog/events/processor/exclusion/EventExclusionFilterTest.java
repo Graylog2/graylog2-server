@@ -19,12 +19,12 @@ package org.graylog.events.processor.exclusion;
 import com.google.common.collect.ImmutableList;
 import org.graylog.events.event.Event;
 import org.graylog.events.event.EventWithContext;
-import org.graylog.events.fields.FieldValue;
 import org.graylog.events.processor.EventDefinition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -129,7 +129,7 @@ class EventExclusionFilterTest {
                 .id("scanner-rule").title("Suppress scanner traffic")
                 .matchers(ImmutableList.of(Matcher.builder()
                         .type(MatcherType.USER)
-                        .values(ImmutableList.of("alice"))
+                        .values(ImmutableList.of("alice-asset"))
                         .build()))
                 .build();
         final EventDefinition def = mock(EventDefinition.class);
@@ -137,8 +137,8 @@ class EventExclusionFilterTest {
 
         final Event aliceEvent = mock(Event.class);
         final Event bobEvent = mock(Event.class);
-        when(aliceEvent.getField("gl2_source_user")).thenReturn(FieldValue.string("alice"));
-        when(bobEvent.getField("gl2_source_user")).thenReturn(FieldValue.string("bob"));
+        when(aliceEvent.getAssociatedAssets()).thenReturn(Set.of("alice-asset"));
+        when(bobEvent.getAssociatedAssets()).thenReturn(Set.of("bob-asset"));
 
         final List<EventWithContext> result = realFilter.filter(def,
                 List.of(withContext(aliceEvent), withContext(bobEvent)));

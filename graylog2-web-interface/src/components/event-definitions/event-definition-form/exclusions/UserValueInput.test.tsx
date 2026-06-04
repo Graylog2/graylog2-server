@@ -30,7 +30,7 @@ jest.mock('logic/rest/FetchProvider', () => {
   return {
     ...actual,
     __esModule: true,
-    default: (method: string, url: string) => mockFetch(method, url),
+    default: (method: string, url: string, body?: unknown) => mockFetch(method, url, body),
   };
 });
 
@@ -70,14 +70,14 @@ beforeEach(() => {
 });
 
 describe('UserValueInput', () => {
-  it('renders preselected usernames as chips', () => {
-    wrap(<UserValueInput values={['alice']} onChange={jest.fn()} />);
+  it('renders preselected ids as chips', () => {
+    wrap(<UserValueInput values={['user-asset-1']} onChange={jest.fn()} />);
 
-    expect(screen.getByText('alice')).toBeInTheDocument();
+    expect(screen.getByText('user-asset-1')).toBeInTheDocument();
   });
 
-  it('calls onChange with the username when a suggestion is selected', async () => {
-    mockFetch.mockResolvedValue({ users: [{ username: 'alice', full_name: 'Alice Anderson' }] });
+  it('calls onChange with the asset id when a suggestion is selected', async () => {
+    mockFetch.mockResolvedValue({ assets: [{ _id: 'asset-42', name: 'Alice Anderson' }] });
     const handleChange = jest.fn();
     wrap(<Harness onChange={handleChange} />);
 
@@ -86,7 +86,7 @@ describe('UserValueInput', () => {
     const option = await screen.findByText(/Alice Anderson/i);
     await userEvent.click(option);
 
-    expect(handleChange).toHaveBeenLastCalledWith(['alice']);
+    expect(handleChange).toHaveBeenLastCalledWith(['asset-42']);
   });
 
   it('falls back to free-text creatable input when lookup fails', async () => {
@@ -96,7 +96,7 @@ describe('UserValueInput', () => {
 
     const input = screen.getByRole('combobox');
     await userEvent.type(input, 'a');
-    expect(await screen.findByText(/User lookup unavailable/i)).toBeInTheDocument();
+    expect(await screen.findByText(/User asset lookup unavailable/i)).toBeInTheDocument();
 
     await userEvent.clear(input);
     await userEvent.type(input, 'user-manual{enter}');
@@ -106,11 +106,29 @@ describe('UserValueInput', () => {
 
   it('removes a value when a chip is dismissed', async () => {
     const handleChange = jest.fn();
-    wrap(<Harness initial={['alice', 'bob']} onChange={handleChange} />);
+    wrap(<Harness initial={['user-asset-1', 'user-asset-2']} onChange={handleChange} />);
 
     const removeButtons = screen.getAllByRole('button', { name: /remove/i });
     await userEvent.click(removeButtons[0]);
 
-    expect(handleChange).toHaveBeenLastCalledWith(['bob']);
+    expect(handleChange).toHaveBeenLastCalledWith(['user-asset-2']);
+  });
+
+  it('resolves preselected ids to names via the byIds endpoint', async () => {
+    mockFetch.mockImplementation((method: string, url: string) => {
+      if (method === 'POST' && url.includes('/assets/byIds')) {
+        return Promise.resolve({
+          'user-asset-1': { id: 'user-asset-1', name: 'Alice Anderson' },
+          'user-asset-2': { id: 'user-asset-2', name: 'Bob Brown' },
+        });
+      }
+
+      return Promise.resolve({ assets: [] });
+    });
+
+    wrap(<UserValueInput values={['user-asset-1', 'user-asset-2']} onChange={jest.fn()} />);
+
+    expect(await screen.findByText('Alice Anderson')).toBeInTheDocument();
+    expect(await screen.findByText('Bob Brown')).toBeInTheDocument();
   });
 });

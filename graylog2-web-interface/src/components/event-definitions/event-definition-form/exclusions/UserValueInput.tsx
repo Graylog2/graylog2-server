@@ -23,7 +23,10 @@ import Select from 'components/common/Select/Select';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 
-type UserMatch = { username: string; full_name?: string };
+import useResolvedAssetNames from './useResolvedAssetNames';
+
+type UserAssetMatch = { _id: string; name?: string };
+type UserAssetsResponse = { assets?: UserAssetMatch[] };
 
 type Props = {
   values: ReadonlyArray<string>;
@@ -31,7 +34,7 @@ type Props = {
   disabled?: boolean;
 };
 
-// Unit-separator character; safe because usernames should not contain it.
+// Unit-separator character; safe because asset ids should not contain it.
 const VALUE_DELIMITER = '\x1F';
 const SUGGESTION_LIMIT = 20;
 
@@ -40,39 +43,43 @@ const Hint = styled.div`
   margin-top: 0.25rem;
 `;
 
-const fetchUsers = async (query: string): Promise<UserMatch[]> => {
-  const response: { users?: UserMatch[] } = await fetch(
+const fetchUserAssets = async (query: string): Promise<UserAssetMatch[]> => {
+  const response: UserAssetsResponse = await fetch(
     'GET',
-    qualifyUrl(`/users/paginated?query=${encodeURIComponent(query)}&per_page=${SUGGESTION_LIMIT}`),
+    qualifyUrl(
+      `/plugins/org.graylog.plugins.securityapp.asset/assets/names?asset_type=user&query=${encodeURIComponent(query)}&page=1&per_page=${SUGGESTION_LIMIT}`,
+    ),
   );
 
-  return response?.users ?? [];
+  return response?.assets ?? [];
 };
 
 const UserValueInput = ({ values, onChange, disabled = false }: Props) => {
   const [query, setQuery] = useState('');
 
   const { data, error } = useQuery({
-    queryKey: ['users', 'search', query],
-    queryFn: () => fetchUsers(query),
+    queryKey: ['assets', 'search', 'user', query],
+    queryFn: () => fetchUserAssets(query),
     enabled: !disabled && query.length > 0,
     placeholderData: keepPreviousData,
     staleTime: 30_000,
     retry: false,
   });
 
+  const resolvedById = useResolvedAssetNames(values);
+
   const handleChange = (joined: string) => {
     const next = joined ? joined.split(VALUE_DELIMITER).filter((v) => v.length > 0) : [];
     onChange(Array.from(new Set(next)));
   };
 
-  // Build option list. When matches are available, label them with the user's full name (falling
-  // back to the username). Ensure currently-selected usernames remain in the option list so the
-  // Select can render chips with their existing label even when the lookup hasn't returned them.
-  const matchOptions = (data ?? []).map((u) => ({ value: u.username, label: u.full_name ?? u.username }));
+  // Build option list. When matches are available, label them with the user asset's name (falling
+  // back to the id). Ensure currently-selected ids remain in the option list so the Select can
+  // render chips with their existing label even when the lookup hasn't returned them.
+  const matchOptions = (data ?? []).map((a) => ({ value: a._id, label: a.name ?? a._id }));
   const selectedOptions = values
     .filter((v) => !matchOptions.some((o) => o.value === v))
-    .map((v) => ({ value: v, label: v }));
+    .map((v) => ({ value: v, label: resolvedById[v] ?? v }));
   const options = [...selectedOptions, ...matchOptions];
 
   return (
@@ -92,11 +99,11 @@ const UserValueInput = ({ values, onChange, disabled = false }: Props) => {
           }
         }}
         disabled={disabled}
-        placeholder="Search users or enter a username"
+        placeholder="Search users or enter an id"
       />
       {error && (
         <Hint data-testid="user-value-input-hint">
-          User lookup unavailable ({(error as Error).message}) — enter usernames directly.
+          User asset lookup unavailable ({(error as Error).message}) — enter ids directly.
         </Hint>
       )}
     </div>
