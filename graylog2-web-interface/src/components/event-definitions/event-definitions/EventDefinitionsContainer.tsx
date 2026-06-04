@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import startCase from 'lodash/startCase';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { QueryHelper, RelativeTime, PaginatedEntityTable, Link } from 'components/common';
 import Routes from 'routing/Routes';
@@ -34,9 +35,13 @@ import SchedulingCell from './SchedulingCell';
 import StatusCell from './StatusCell';
 
 import type { EventDefinition } from '../event-definitions-types';
+import type { TacticsTechniquesColumnPlugin } from '../types';
 import getEventDefinitionTableElements from '../constants';
 
-const getCustomColumnRenderers = (pluggableColumnRenderers?: ColumnRenderersByAttribute<EventDefinition>) => ({
+const getCustomColumnRenderers = (
+  pluggableColumnRenderers?: ColumnRenderersByAttribute<EventDefinition>,
+  tacticsTechniquesPlugin?: TacticsTechniquesColumnPlugin,
+) => ({
   attributes: {
     title: {
       renderCell: (title: string, eventDefinition: EventDefinition) => (
@@ -80,6 +85,19 @@ const getCustomColumnRenderers = (pluggableColumnRenderers?: ColumnRenderersByAt
       width: 0.2,
       minWidth: 160,
     },
+    ...(tacticsTechniquesPlugin
+      ? {
+          [tacticsTechniquesPlugin.attribute.id]: {
+            renderCell: (_: unknown, eventDefinition: EventDefinition) => {
+              const Cell = tacticsTechniquesPlugin.component;
+
+              return <Cell entity={eventDefinition} />;
+            },
+            width: 0.2,
+            minWidth: 160,
+          },
+        }
+      : {}),
     ...(pluggableColumnRenderers || {}),
   },
 });
@@ -103,7 +121,15 @@ const notificationsExpandedSection = {
 const EventDefinitionsContainer = () => {
   const { pluggableColumnRenderers, pluggableAttributes, pluggableExpandedSections } =
     usePluggableEntityTableElements<EventDefinition>(null, 'event_definition');
-  const { defaultLayout, additionalAttributes } = getEventDefinitionTableElements(pluggableAttributes);
+
+  const tacticsTechniquesPlugin = PluginStore.exports('eventDefinitions.components.tacticsTechniquesColumn')[0];
+  const tacticsTechniquesEnabled = tacticsTechniquesPlugin?.useCondition?.() ?? !!tacticsTechniquesPlugin;
+  const activeTacticsTechniquesPlugin = tacticsTechniquesEnabled ? tacticsTechniquesPlugin : undefined;
+
+  const { defaultLayout, additionalAttributes } = getEventDefinitionTableElements(
+    pluggableAttributes,
+    activeTacticsTechniquesPlugin?.attribute,
+  );
   const expandedSections = useMemo(
     () => ({
       notifications: notificationsExpandedSection,
@@ -124,7 +150,7 @@ const EventDefinitionsContainer = () => {
       entityAttributesAreCamelCase={false}
       expandedSectionRenderers={expandedSections}
       filterValueRenderers={FilterValueRenderers}
-      columnRenderers={getCustomColumnRenderers(pluggableColumnRenderers)}
+      columnRenderers={getCustomColumnRenderers(pluggableColumnRenderers, activeTacticsTechniquesPlugin)}
       bulkSelection={bulkSelection}
     />
   );
