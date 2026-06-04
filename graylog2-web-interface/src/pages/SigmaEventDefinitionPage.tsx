@@ -26,7 +26,10 @@ const PAGE_TITLE_BY_ACTION: Record<string, string> = {
   'file-import': 'Create Event Definitions - File Import',
 };
 
-const PLUGIN_KEY_BY_ACTION: Record<string, 'eventDefinitions.components.sigmaGitImport' | 'eventDefinitions.components.sigmaFileUpload'> = {
+const PLUGIN_KEY_BY_ACTION: Record<
+  string,
+  'eventDefinitions.components.sigmaGitImport' | 'eventDefinitions.components.sigmaFileUpload'
+> = {
   'git-import': 'eventDefinitions.components.sigmaGitImport',
   'file-import': 'eventDefinitions.components.sigmaFileUpload',
 };
