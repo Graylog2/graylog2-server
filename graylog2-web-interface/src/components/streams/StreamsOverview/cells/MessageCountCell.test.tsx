@@ -52,10 +52,10 @@ describe('MessageCountCell (Streams)', () => {
       isError: false,
     });
 
-    const { container } = render(<MessageCountCell stream={stream} />);
+    render(<MessageCountCell stream={stream} />);
 
     expect(screen.queryByText('0')).not.toBeInTheDocument();
-    expect(container).toBeEmptyDOMElement();
+    expect(screen.queryByTitle(/messages in the last 24 hours/i)).not.toBeInTheDocument();
   });
 
   it('renders a spinner while loading with no cached data', async () => {
@@ -70,7 +70,7 @@ describe('MessageCountCell (Streams)', () => {
     expect(await screen.findByText(/loading/i)).toBeInTheDocument();
   });
 
-  it('renders a dash on error', () => {
+  it('renders an empty cell on error', () => {
     asMock(useStreamMetricsFor).mockReturnValue({
       metrics: undefined,
       isInitialLoading: false,
@@ -79,6 +79,6 @@ describe('MessageCountCell (Streams)', () => {
 
     render(<MessageCountCell stream={stream} />);
 
-    expect(screen.getByText('—')).toBeInTheDocument();
+    expect(screen.queryByTitle(/messages in the last 24 hours/i)).not.toBeInTheDocument();
   });
 });

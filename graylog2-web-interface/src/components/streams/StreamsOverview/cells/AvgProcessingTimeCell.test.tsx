@@ -45,7 +45,7 @@ describe('AvgProcessingTimeCell (Streams)', () => {
     expect(screen.getByText('3.1 s')).toBeInTheDocument();
   });
 
-  it('renders a dash when the value is missing', () => {
+  it('renders an empty cell when the value is missing', () => {
     asMock(useStreamMetricsFor).mockReturnValue({
       metrics: {},
       isInitialLoading: false,
@@ -54,7 +54,7 @@ describe('AvgProcessingTimeCell (Streams)', () => {
 
     render(<AvgProcessingTimeCell stream={stream} />);
 
-    expect(screen.getByText('—')).toBeInTheDocument();
+    expect(screen.queryByTitle(/average processing time/i)).not.toBeInTheDocument();
   });
 
   it('renders an empty cell when the value is zero', () => {
@@ -64,12 +64,12 @@ describe('AvgProcessingTimeCell (Streams)', () => {
       isError: false,
     });
 
-    const { container } = render(<AvgProcessingTimeCell stream={stream} />);
+    render(<AvgProcessingTimeCell stream={stream} />);
 
-    expect(container).toBeEmptyDOMElement();
+    expect(screen.queryByTitle(/average processing time/i)).not.toBeInTheDocument();
   });
 
-  it('renders a dash on error', () => {
+  it('renders an empty cell on error', () => {
     asMock(useStreamMetricsFor).mockReturnValue({
       metrics: undefined,
       isInitialLoading: false,
@@ -78,7 +78,7 @@ describe('AvgProcessingTimeCell (Streams)', () => {
 
     render(<AvgProcessingTimeCell stream={stream} />);
 
-    expect(screen.getByText('—')).toBeInTheDocument();
+    expect(screen.queryByTitle(/average processing time/i)).not.toBeInTheDocument();
   });
 
   it('renders a spinner while loading with no cached data', async () => {

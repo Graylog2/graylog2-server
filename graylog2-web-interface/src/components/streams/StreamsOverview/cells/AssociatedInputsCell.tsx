@@ -36,14 +36,11 @@ const AssociatedInputsCell = ({ stream }: Props) => {
     return <Spinner size="xs" />;
   }
 
-  if (isError || !metrics?.associated_inputs) {
-    return <span aria-label={`No associated inputs available for stream ${stream.title}`}>—</span>;
+  if (isError || !metrics?.associated_inputs?.length) {
+    return null;
   }
 
   const count = metrics.associated_inputs.length;
-  if (count === 0) {
-    return null;
-  }
 
   const isOpen = expandedSections?.[stream.id]?.includes(SECTION_NAME) ?? false;
   const title = `${isOpen ? 'Hide' : 'Show'} associated inputs for ${stream.title}`;

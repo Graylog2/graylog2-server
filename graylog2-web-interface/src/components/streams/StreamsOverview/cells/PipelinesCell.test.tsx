@@ -70,10 +70,10 @@ describe('PipelinesCell (Streams)', () => {
       isError: false,
     });
 
-    const { container } = render(<PipelinesCell stream={stream} />);
+    render(<PipelinesCell stream={stream} />);
 
     expect(screen.queryByText('0')).not.toBeInTheDocument();
-    expect(container).toBeEmptyDOMElement();
+    expect(screen.queryByTitle(/connected pipelines/i)).not.toBeInTheDocument();
   });
 
   it('renders the count of connected pipelines', () => {

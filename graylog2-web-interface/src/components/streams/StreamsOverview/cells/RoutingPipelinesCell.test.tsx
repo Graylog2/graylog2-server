@@ -58,10 +58,10 @@ describe('RoutingPipelinesCell (Streams)', () => {
       isError: false,
     });
 
-    const { container } = render(<RoutingPipelinesCell stream={stream} />);
+    render(<RoutingPipelinesCell stream={stream} />);
 
     expect(screen.queryByText('0')).not.toBeInTheDocument();
-    expect(container).toBeEmptyDOMElement();
+    expect(screen.queryByTitle(/routing pipelines/i)).not.toBeInTheDocument();
   });
 
   it('toggles the routing_pipelines section on click', async () => {

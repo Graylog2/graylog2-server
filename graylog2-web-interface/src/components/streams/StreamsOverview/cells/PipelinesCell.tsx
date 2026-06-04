@@ -41,14 +41,11 @@ const PipelinesCell = ({ stream }: Props) => {
     return <Spinner size="xs" />;
   }
 
-  if (isError || !metrics?.pipelines) {
-    return <span aria-label={`No connected pipelines available for stream ${stream.title}`}>—</span>;
+  if (isError || !metrics?.pipelines?.length) {
+    return null;
   }
 
   const count = metrics.pipelines.length;
-  if (count === 0) {
-    return null;
-  }
 
   const isOpen = expandedSections?.[stream.id]?.includes(SECTION_NAME) ?? false;
   const title = `${isOpen ? 'Hide' : 'Show'} connected pipelines for ${stream.title}`;

@@ -32,11 +32,7 @@ const MaxProcessingTimeCell = ({ stream }: Props) => {
     return <Spinner size="xs" />;
   }
 
-  if (isError || metrics?.max_processing_time_ms === undefined) {
-    return <span aria-label={`No max processing time available for stream ${stream.title}`}>—</span>;
-  }
-
-  if (metrics.max_processing_time_ms === 0) {
+  if (isError || !metrics?.max_processing_time_ms) {
     return null;
   }
 

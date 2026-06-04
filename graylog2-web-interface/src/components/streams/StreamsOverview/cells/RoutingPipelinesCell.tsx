@@ -36,14 +36,11 @@ const RoutingPipelinesCell = ({ stream }: Props) => {
     return <Spinner size="xs" />;
   }
 
-  if (isError || !metrics?.routing_pipelines) {
-    return <span aria-label={`No routing pipelines available for stream ${stream.title}`}>—</span>;
+  if (isError || !metrics?.routing_pipelines?.length) {
+    return null;
   }
 
   const count = metrics.routing_pipelines.length;
-  if (count === 0) {
-    return null;
-  }
 
   const isOpen = expandedSections?.[stream.id]?.includes(SECTION_NAME) ?? false;
   const title = `${isOpen ? 'Hide' : 'Show'} routing pipelines for ${stream.title}`;

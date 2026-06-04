@@ -32,11 +32,7 @@ const AvgProcessingTimeCell = ({ stream }: Props) => {
     return <Spinner size="xs" />;
   }
 
-  if (isError || metrics?.avg_processing_time_ms === undefined) {
-    return <span aria-label={`No average processing time available for stream ${stream.title}`}>—</span>;
-  }
-
-  if (metrics.avg_processing_time_ms === 0) {
+  if (isError || !metrics?.avg_processing_time_ms) {
     return null;
   }
 

@@ -71,13 +71,13 @@ describe('AssociatedInputsCell (Streams)', () => {
       isError: false,
     });
 
-    const { container } = render(<AssociatedInputsCell stream={stream} />);
+    render(<AssociatedInputsCell stream={stream} />);
 
     expect(screen.queryByText('0')).not.toBeInTheDocument();
-    expect(container).toBeEmptyDOMElement();
+    expect(screen.queryByTitle(/associated inputs/i)).not.toBeInTheDocument();
   });
 
-  it('renders a dash on error', () => {
+  it('renders an empty cell on error', () => {
     asMock(useStreamMetricsFor).mockReturnValue({
       metrics: undefined,
       isInitialLoading: false,
@@ -86,6 +86,6 @@ describe('AssociatedInputsCell (Streams)', () => {
 
     render(<AssociatedInputsCell stream={stream} />);
 
-    expect(screen.getByText('—')).toBeInTheDocument();
+    expect(screen.queryByTitle(/associated inputs/i)).not.toBeInTheDocument();
   });
 });

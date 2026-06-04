@@ -32,11 +32,7 @@ const MessageCountCell = ({ stream }: Props) => {
     return <Spinner size="xs" />;
   }
 
-  if (isError || metrics?.message_count === undefined) {
-    return <span aria-label={`No message count available for stream ${stream.title}`}>—</span>;
-  }
-
-  if (metrics.message_count === 0) {
+  if (isError || !metrics?.message_count) {
     return null;
   }
 

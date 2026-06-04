@@ -52,12 +52,12 @@ describe('MaxProcessingTimeCell (Streams)', () => {
       isError: false,
     });
 
-    const { container } = render(<MaxProcessingTimeCell stream={stream} />);
+    render(<MaxProcessingTimeCell stream={stream} />);
 
-    expect(container).toBeEmptyDOMElement();
+    expect(screen.queryByTitle(/max processing time/i)).not.toBeInTheDocument();
   });
 
-  it('renders a dash when the value is missing', () => {
+  it('renders an empty cell when the value is missing', () => {
     asMock(useStreamMetricsFor).mockReturnValue({
       metrics: {},
       isInitialLoading: false,
@@ -66,6 +66,6 @@ describe('MaxProcessingTimeCell (Streams)', () => {
 
     render(<MaxProcessingTimeCell stream={stream} />);
 
-    expect(screen.getByText('—')).toBeInTheDocument();
+    expect(screen.queryByTitle(/max processing time/i)).not.toBeInTheDocument();
   });
 });
