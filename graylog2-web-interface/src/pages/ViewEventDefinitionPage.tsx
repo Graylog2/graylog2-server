@@ -157,14 +157,14 @@ const ViewEventDefinitionPage = () => {
 
         <Row className="content">
           <Col md={12}>
+            {detailSections.map(({ key, component: Component }) => (
+              <Component key={key} eventDefinition={eventDefinition} />
+            ))}
             <EventDefinitionSummary
               eventDefinition={eventDefinition}
               currentUser={currentUser}
               notifications={notifications}
             />
-            {detailSections.map(({ key, component: Component }) => (
-              <Component key={key} eventDefinition={eventDefinition} />
-            ))}
           </Col>
         </Row>
       </DocumentTitle>
