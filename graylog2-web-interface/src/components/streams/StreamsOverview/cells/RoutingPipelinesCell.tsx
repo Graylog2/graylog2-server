@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
 import * as React from 'react';
 
 import type { Stream } from 'stores/streams/StreamsStore';
@@ -27,28 +26,24 @@ type Props = {
   stream: Stream;
 };
 
-const SECTION_NAME = METRIC_COLUMN_IDS.pipelines;
+const SECTION_NAME = METRIC_COLUMN_IDS.routingPipelines;
 
-const PipelinesCell = ({ stream }: Props) => {
+const RoutingPipelinesCell = ({ stream }: Props) => {
   const { metrics, isInitialLoading, isError } = useStreamMetricsFor(stream.id);
   const { toggleSection, expandedSections } = useExpandedSections();
-
-  if (stream.is_default || !stream.is_editable) {
-    return null;
-  }
 
   if (isInitialLoading && !metrics) {
     return <Spinner size="xs" />;
   }
 
-  if (isError || !metrics?.pipelines?.length) {
+  if (isError || !metrics?.routing_pipelines?.length) {
     return null;
   }
 
-  const count = metrics.pipelines.length;
+  const count = metrics.routing_pipelines.length;
 
   const isOpen = expandedSections?.[stream.id]?.includes(SECTION_NAME) ?? false;
-  const title = `${isOpen ? 'Hide' : 'Show'} connected pipelines for ${stream.title}`;
+  const title = `${isOpen ? 'Hide' : 'Show'} routing pipelines for ${stream.title}`;
 
   return (
     <CountBadge
@@ -60,4 +55,4 @@ const PipelinesCell = ({ stream }: Props) => {
   );
 };
 
-export default PipelinesCell;
+export default RoutingPipelinesCell;

@@ -14,50 +14,34 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
 import * as React from 'react';
 
 import type { Stream } from 'stores/streams/StreamsStore';
-import { CountBadge, Spinner } from 'components/common';
-import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
+import { Spinner } from 'components/common';
 import { useStreamMetricsFor } from 'components/streams/StreamsOverview/StreamMetricsContext';
-import { METRIC_COLUMN_IDS } from 'components/streams/StreamsOverview/metricColumns';
+import ProcessingTimeBadge from 'components/streams/StreamsOverview/cells/ProcessingTimeBadge';
 
 type Props = {
   stream: Stream;
 };
 
-const SECTION_NAME = METRIC_COLUMN_IDS.pipelines;
-
-const PipelinesCell = ({ stream }: Props) => {
+const AvgProcessingTimeCell = ({ stream }: Props) => {
   const { metrics, isInitialLoading, isError } = useStreamMetricsFor(stream.id);
-  const { toggleSection, expandedSections } = useExpandedSections();
-
-  if (stream.is_default || !stream.is_editable) {
-    return null;
-  }
 
   if (isInitialLoading && !metrics) {
     return <Spinner size="xs" />;
   }
 
-  if (isError || !metrics?.pipelines?.length) {
+  if (isError || !metrics?.avg_processing_time_ms) {
     return null;
   }
 
-  const count = metrics.pipelines.length;
-
-  const isOpen = expandedSections?.[stream.id]?.includes(SECTION_NAME) ?? false;
-  const title = `${isOpen ? 'Hide' : 'Show'} connected pipelines for ${stream.title}`;
-
   return (
-    <CountBadge
-      count={count}
-      iconName={isOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
-      onClick={() => toggleSection(stream.id, SECTION_NAME)}
-      title={title}
+    <ProcessingTimeBadge
+      ms={metrics.avg_processing_time_ms}
+      title={`Average processing time: ${metrics.avg_processing_time_ms.toFixed(2)} ms (last 15 minutes)`}
     />
   );
 };
 
-export default PipelinesCell;
+export default AvgProcessingTimeCell;
