@@ -19,19 +19,25 @@ import { DocsContainer as BaseDocsContainer } from '@storybook/addon-docs/blocks
 import type { DocsContainerProps } from '@storybook/addon-docs/blocks';
 import { useDarkMode } from 'storybook-dark-mode';
 import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from '@graylog/sawmill';
-import { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle, css } from 'styled-components';
 
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 
 import { darkTheme, lightTheme } from './storybook-theme';
 
-const DocsFontOverride = createGlobalStyle`
-  p:not(.sb-anchor):not(.sb-unstyled),
-  li:not(.sb-unstyled) {
-    font-size: 1rem;
-  }
-`;
+const DocsOverride = createGlobalStyle(
+  ({ theme }) => css`
+    p:not(.sb-anchor):not(.sb-unstyled),
+    li:not(.sb-unstyled) {
+      font-size: 1rem;
+    }
+
+    .docs-story {
+      background-color: ${theme.colors.global.background};
+    }
+  `,
+);
 
 export const DocsContainer = (props: DocsContainerProps) => {
   const isDark = useDarkMode();
@@ -40,7 +46,7 @@ export const DocsContainer = (props: DocsContainerProps) => {
   return (
     <GraylogThemeProvider initialThemeModeOverride={colorScheme} key={colorScheme} userIsLoggedIn>
       <GlobalThemeStyles />
-      <DocsFontOverride />
+      <DocsOverride />
       <BaseDocsContainer {...props} theme={isDark ? darkTheme : lightTheme} />
     </GraylogThemeProvider>
   );
