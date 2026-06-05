@@ -14,21 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQueryParams, useQueryParam, StringParam, NumberParam, ArrayParam } from 'use-query-params';
+import * as React from 'react';
 
-import * as JSON from 'util/json';
+import stringify from 'util/stringify';
 
-const parseNestedObject = (fieldQueryString: string) => {
-  try {
-    return JSON.parse(decodeURIComponent(fieldQueryString));
-  } catch (_error) {
-    return undefined;
-  }
-};
-
-const NestedObjectParam = {
-  encode: (object: object | null | undefined) => encodeURIComponent(JSON.stringify(object)),
-  decode: (objectStr: string | null | undefined) => parseNestedObject(objectStr),
-};
-
-export { useQueryParams, useQueryParam, StringParam, NumberParam, NestedObjectParam, ArrayParam };
+type Props = { value: number | string | bigint };
+const FieldValue = ({ value }: Props) => <>{stringify(value)}</>;
+export default FieldValue;

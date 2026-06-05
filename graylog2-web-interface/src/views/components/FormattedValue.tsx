@@ -15,27 +15,30 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import trim from 'lodash/trim';
+import trunc from 'lodash/truncate';
 
 import type FieldType from 'views/logic/fieldtypes/FieldType';
-import FormattedValue from 'views/components/FormattedValue';
-
-import type { ValueRendererProps } from './messagelist/decoration/ValueRenderer';
+import type { ValueRenderer } from 'views/components/messagelist/decoration/ValueRenderer';
+import stringify from 'util/stringify';
+import EmptyValue from 'views/components/EmptyValue';
 
 type Props = {
   field: string;
   value: any;
   truncate: boolean;
-  render: React.ComponentType<ValueRendererProps>;
+  render: ValueRenderer;
   type: FieldType;
 };
+const FormattedValue = ({ field, value, truncate, render, type }: Props) => {
+  const stringified = stringify(value);
+  const Component = render;
 
-const DecoratorValue = ({ field, value, truncate, render, type }: Props) =>
-  value && value.href && value.type ? (
-    <a href={value.href} target="_blank" rel="noreferrer">
-      <FormattedValue field={field} value={value.href} truncate={truncate} render={render} type={type} />
-    </a>
+  return trim(stringified) === '' ? (
+    <EmptyValue />
   ) : (
-    <FormattedValue field={field} value={value} truncate={truncate} render={render} type={type} />
+    <Component field={field} value={truncate ? trunc(stringified) : stringified} type={type} />
   );
+};
 
-export default DecoratorValue;
+export default FormattedValue;
