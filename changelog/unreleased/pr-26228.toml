@@ -1,5 +1,0 @@
-type = "changed" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
-message = "Make Tool.apply method with typed parameters available to call directly by widening its visibility"
-
-issues = [""]
-pulls = ["26228"]
