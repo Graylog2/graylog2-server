@@ -14,11 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog2.contentpacks.model;
 
-import PaginatedEntityTable from './PaginatedEntityTable';
-import useTableFilterContext from './useTableFilterContext';
-import useTableFetchContext from './useTableFetchContext';
-
-export { useTableFilterContext, useTableFetchContext };
-
-export default PaginatedEntityTable;
+/**
+ * Result of {@link org.graylog2.contentpacks.ContentPackService#upgradeContentPack}.
+ * Bundles the new installation with a snapshot of old entity state captured before the
+ * in-place update, so callers can preserve user customizations (notifications, search filters, etc.).
+ */
+public record ContentPackUpgrade(ContentPackInstallation installation, ContentPackUninstallation oldEntitySnapshots) {
+}

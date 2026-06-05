@@ -14,11 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { useContext } from 'react';
 
-import PaginatedEntityTable from './PaginatedEntityTable';
-import useTableFilterContext from './useTableFilterContext';
-import useTableFetchContext from './useTableFetchContext';
+import TableFilterContext from './TableFilterContext';
 
-export { useTableFilterContext, useTableFetchContext };
+const useTableFilterContext = () => {
+  const contextValue = useContext(TableFilterContext);
 
-export default PaginatedEntityTable;
+  if (!contextValue) {
+    throw new Error(
+      'useTableFilterContext hook needs to be used inside TableFilterContext.Provider',
+    );
+  }
+
+  return contextValue;
+};
+
+export default useTableFilterContext;
