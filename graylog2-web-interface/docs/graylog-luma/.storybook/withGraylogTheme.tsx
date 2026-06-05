@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import 'preload';
 import 'theme/theme-styles';
 import type { Decorator } from '@storybook/react';
 import { useDarkMode } from 'storybook-dark-mode';

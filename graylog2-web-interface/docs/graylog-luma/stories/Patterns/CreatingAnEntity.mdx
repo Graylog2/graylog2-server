@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */}
 
-import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import { Canvas, Meta, Unstyled } from '@storybook/addon-docs/blocks';
 import { Alert } from 'components/bootstrap';
 import * as CreatingAnEntityStories from './CreatingAnEntity.stories';
 import Mermaid from './Mermaid';
@@ -56,7 +56,7 @@ Details page, toast shown\`"])
 
 Entity creation is a foundational interaction in Graylog. This guide helps you decide how to implement a creation flow consistently.
 
-<Alert bsStyle="info"><strong>Design principle:</strong> Entity creation is organized around two decisions: choose the appropriate surface, then choose the appropriate method.</Alert>
+<Unstyled><Alert bsStyle="info"><strong>Design principle:</strong> Entity creation is organized around two decisions: choose the appropriate surface, then choose the appropriate method.</Alert></Unstyled>
 
 <Mermaid chart={DIAGRAM} />
 
@@ -76,7 +76,7 @@ Use a Modal when creation is part of the task the user is already performing and
 - Completion returns users to their previous location.
 - Successful creation closes the modal and shows a toast notification.
 
-<Canvas of={CreatingAnEntityStories.CurrentContextModal} />
+<Unstyled><Canvas of={CreatingAnEntityStories.CurrentContextModal} /></Unstyled>
 
 ### New Context: Page
 
@@ -90,9 +90,9 @@ Use a Page when creation benefits from a dedicated experience with its own focus
 - Successful creation navigates users to the newly created entity.
 - A toast notification communicates successful creation.
 
-<Canvas of={CreatingAnEntityStories.NewContextPage} />
+<Unstyled><Canvas of={CreatingAnEntityStories.NewContextPage} /></Unstyled>
 
-<Alert bsStyle="info">If it is unclear whether creation belongs in the current context or a dedicated one, involve Product and Design before implementation. Context decisions affect navigation, workflow continuity, and long-term consistency across the product.</Alert>
+<Unstyled><Alert bsStyle="info">If it is unclear whether creation belongs in the current context or a dedicated one, involve Product and Design before implementation. Context decisions affect navigation, workflow continuity, and long-term consistency across the product.</Alert></Unstyled>
 
 ## Choosing the Method
 
