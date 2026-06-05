@@ -16,13 +16,12 @@
  */
 import * as React from 'react';
 import { Container } from '@mantine/core';
-import type { ContainerProps } from '@mantine/core';
 import styled from 'styled-components';
 
-type Props = Omit<ContainerProps, 'size'> & {
+type Props = React.PropsWithChildren<{
   fluid?: boolean;
   className?: string;
-};
+}>;
 
 // react-bootstrap's `.container-fluid` uses exactly 15px horizontal padding
 // and does not set max-width. Mantine's `Container` defaults to
@@ -34,7 +33,11 @@ const StyledContainer = styled(Container)`
   padding-right: 15px;
 `;
 
-const Grid = ({ fluid = false, className }: Props) => <StyledContainer fluid={fluid} className={className} />;
+const Grid = ({ fluid = false, className, children }: Props) => (
+  <StyledContainer fluid={fluid} className={className}>
+    {children}
+  </StyledContainer>
+);
 
 /** @component */
 export default Grid;
