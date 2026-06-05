@@ -16,27 +16,8 @@
  */
 import * as React from 'react';
 
-import DefinitionList from 'components/common/DefinitionList';
-import ChipsCell from 'components/common/ChipsCell';
-import useAppendTagFilter from 'components/events/useAppendTagFilter';
+import stringify from 'util/stringify';
 
-type Props = {
-  tags: ReadonlyArray<string> | undefined | null;
-};
-
-const TagsDetailRow = ({ tags }: Props) => {
-  const onTagClick = useAppendTagFilter();
-
-  if (!tags?.length) return null;
-
-  return (
-    <DefinitionList>
-      <dt>Tags</dt>
-      <dd>
-        <ChipsCell items={tags} truncate={false} onItemClick={onTagClick} itemLabel="tag" />
-      </dd>
-    </DefinitionList>
-  );
-};
-
-export default TagsDetailRow;
+type Props = { value: number | string | bigint };
+const FieldValue = ({ value }: Props) => <>{stringify(value)}</>;
+export default FieldValue;
