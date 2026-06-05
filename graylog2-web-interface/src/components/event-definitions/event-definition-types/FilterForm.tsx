@@ -529,7 +529,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
               <Input
                 id="filter-query"
                 name="query"
-                type="text"
+                type="textarea"
                 value={currentConfig.query ?? ''}
                 onChange={handleQueryChange}
               />
