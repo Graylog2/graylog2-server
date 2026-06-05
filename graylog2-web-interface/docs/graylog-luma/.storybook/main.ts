@@ -16,13 +16,20 @@
  */
 // This file has been automatically migrated to valid ESM format by Storybook.
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
+import { createRequire } from 'module';
 
 import type { StorybookConfig } from '@storybook/react-webpack5';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const webInterfaceRoot = path.resolve(__dirname, '../../..');
+
+const require = createRequire(pathToFileURL(__filename).href);
+const { createBootstrapLessRule, lessRule } = require(path.resolve(webInterfaceRoot, 'webpack/bootstrap-less'));
+
+// style-loader v4 (used by Storybook) dropped function support for `insert`; use a string selector instead
+const bootstrapLessRule = createBootstrapLessRule({ insert: 'head' });
 
 const config: StorybookConfig = {
   stories: ['../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)', '../stories/**/*.mdx'],
@@ -33,6 +40,14 @@ const config: StorybookConfig = {
   },
   webpackFinal: (sbConfig) => ({
     ...sbConfig,
+    module: {
+      ...sbConfig.module,
+      rules: [
+        ...(sbConfig.module?.rules ?? []),
+        bootstrapLessRule,
+        lessRule,
+      ],
+    },
     resolve: {
       ...sbConfig.resolve,
       modules: [

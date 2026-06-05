@@ -73,7 +73,9 @@ export const NewContextPage: StoryObj = {
   decorators: [
     (Story) => (
       <MemoryRouter>
-        <Story />
+        <div className="container-fluid">
+          <Story />
+        </div>
       </MemoryRouter>
     ),
   ],
