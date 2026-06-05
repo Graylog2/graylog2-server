@@ -158,8 +158,10 @@ describe('SearchBar pluggable controls', () => {
           {
             pluggableControl: 'Initial Value2',
             queryString: '*',
-            streams: [],
-            streamCategories: [],
+            'streamsAndCategories': {
+              'categories': [],
+              'streams': [],
+            },
             timerange: { from: 300, type: 'relative' },
           },
           expect.any(Function),
@@ -178,8 +180,10 @@ describe('SearchBar pluggable controls', () => {
         {
           pluggableControl: 'Initial Value',
           queryString: '*',
-          streams: [],
-          streamCategories: [],
+          'streamsAndCategories': {
+            'categories': [],
+            'streams': [],
+          },
           timerange: { from: 300, type: 'relative' },
         },
         {

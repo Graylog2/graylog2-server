@@ -14,15 +14,44 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line no-restricted-imports
-import { Tabs as BootstrapTabs } from 'react-bootstrap';
-import styled from 'styled-components';
+import React from 'react';
+import { Tabs as MantineTabs } from '@mantine/core';
+import styled, { css } from 'styled-components';
 
-import navTabsStyles from './styles/nav-tabs';
-
-const Tabs = styled(BootstrapTabs)`
-  ${navTabsStyles}
+const StyledTab = styled(MantineTabs.Tab)`
+  height: 40px;
 `;
+
+const StyledPanel = styled(MantineTabs.Panel)(
+  ({ theme }) => css`
+    padding: ${theme.spacings.sm};
+  `,
+);
+
+type Props = React.PropsWithChildren<{
+  defaultValue?: string;
+  value?: string | null;
+  onChange?: (value: string | null) => void;
+  variant?: 'default' | 'outline' | 'pills';
+  className?: string;
+}>;
+
+const Tabs = ({
+  children = undefined,
+  defaultValue = undefined,
+  value = undefined,
+  onChange = undefined,
+  variant = 'outline',
+  className = undefined,
+}: Props) => (
+  <MantineTabs defaultValue={defaultValue} value={value} onChange={onChange} variant={variant} className={className}>
+    {children}
+  </MantineTabs>
+);
+
+Tabs.List = MantineTabs.List;
+Tabs.Tab = StyledTab;
+Tabs.Panel = StyledPanel;
 
 /** @component */
 export default Tabs;

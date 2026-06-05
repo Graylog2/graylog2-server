@@ -81,7 +81,7 @@ const SliceHeaderControls = ({
       app_action_value: 'slice-remove',
       event_details: { attribute_id: sliceCol },
     });
-    onChangeSlicing(undefined, undefined);
+    onChangeSlicing(null, null);
   };
 
   return (
