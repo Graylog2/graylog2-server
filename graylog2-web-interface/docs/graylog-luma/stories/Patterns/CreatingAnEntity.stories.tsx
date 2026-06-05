@@ -16,6 +16,7 @@
  */
 import React, { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
+import { Canvas } from '@storybook/addon-docs/blocks';
 import { MemoryRouter } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -28,6 +29,7 @@ import Mermaid from './Mermaid';
 
 const DocContainer = styled.div`
   max-width: 900px;
+  padding: 1rem;
 `;
 
 const DocH1 = styled.h1`
@@ -93,62 +95,6 @@ const CharacteristicList = styled.ul`
   }
 `;
 
-const ExampleLabel = styled.p`
-  font-size: ${({ theme }) => theme.fonts.size.small};
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: ${({ theme }) => theme.colors.text.secondary};
-  margin: 0 0 ${({ theme }) => theme.spacings.xs};
-`;
-
-const ExampleWrapper = styled.div`
-  border: 1px solid rgba(128, 128, 128, 0.25);
-  border-radius: 4px;
-  padding: ${({ theme }) => theme.spacings.md};
-  margin-bottom: ${({ theme }) => theme.spacings.xs};
-`;
-
-const PagePreviewWrapper = styled.div`
-  border: 1px solid rgba(128, 128, 128, 0.25);
-  border-radius: 4px;
-  overflow-y: auto;
-  height: 520px;
-  margin-bottom: ${({ theme }) => theme.spacings.xs};
-`;
-
-const CodeDetails = styled.details`
-  margin-bottom: ${({ theme }) => theme.spacings.lg};
-
-  summary {
-    cursor: pointer;
-    font-size: ${({ theme }) => theme.fonts.size.small};
-    color: ${({ theme }) => theme.colors.text.secondary};
-    user-select: none;
-    list-style: none;
-
-    &::before {
-      content: '▶  Show code';
-    }
-  }
-
-  &[open] summary::before {
-    content: '▼  Hide code';
-  }
-`;
-
-const CodeBlock = styled.pre`
-  margin: ${({ theme }) => theme.spacings.xs} 0 0;
-  padding: ${({ theme }) => theme.spacings.md};
-  background: rgba(128, 128, 128, 0.07);
-  border: 1px solid rgba(128, 128, 128, 0.2);
-  border-radius: 4px;
-  font-size: 13px;
-  line-height: 1.5;
-  overflow-x: auto;
-  white-space: pre;
-`;
-
 // ─── Flowchart ────────────────────────────────────────────────────────────────
 
 const DIAGRAM = `flowchart TD
@@ -181,34 +127,6 @@ Modal closes, toast shown\`"])
 Details page, toast shown\`"])
 `;
 
-// ─── Code snippets ────────────────────────────────────────────────────────────
-
-const MODAL_CODE = `const [show, setShow] = useState(false);
-
-return (
-  <>
-    <Button onClick={() => setShow(true)}>Create Stream</Button>
-    <CreateModal
-      entityName="Stream"
-      show={show}
-      onClose={() => setShow(false)}
-      initialValues={{ title: '', description: '' }}
-      onSubmit={handleSubmit}>
-      <FormFields />
-    </CreateModal>
-  </>
-);`;
-
-const PAGE_CODE = `<CreatePage
-  entityName="Stream"
-  overviewRoute="/streams"
-  detailsRoute={(id) => \`/streams/\${id}\`}
-  initialValues={{ title: '', description: '' }}
-  onSubmit={handleSubmit}
-  description="Streams route incoming messages into categories.">
-  <FormFields />
-</CreatePage>`;
-
 // ─── Form fields used in the interactive examples ─────────────────────────────
 
 type StoryValues = { title: string; description: string };
@@ -237,180 +155,188 @@ const FormFields = () => (
   </>
 );
 
-// ─── Pattern Overview Doc ────────────────────────────────────────────────────
+// ─── Stories (hidden from sidebar, embedded via Canvas in the docs page) ──────
 
-const CreateEntityPatternDoc = () => {
-  const [showModal, setShowModal] = useState(false);
+export const CurrentContextModal: StoryObj = {
+  tags: ['!dev'],
+  render: () => {
+    const [show, setShow] = useState(false);
 
-  return (
-    <DocContainer>
-      <DocH1>Creating an Entity</DocH1>
-
-      <DocLead>
-        Entity creation is a foundational interaction in Graylog. This guide helps you decide how to implement a
-        creation flow consistently.
-      </DocLead>
-
-      <Alert bsStyle="info">
-        <strong>Design principle:</strong> Entity creation is organized around two decisions: choose the appropriate
-        surface, then choose the appropriate method.
-      </Alert>
-
-      <DiagramWrapper>
-        <Mermaid chart={DIAGRAM} />
-      </DiagramWrapper>
-
-      <ContextGrid>
-        <SectionGroup>
-          <DocH2>Choosing the Surface</DocH2>
-
-          <ContextBody>
-            Choose the surface based on whether creation should happen within the user's current workflow or in a
-            dedicated creation experience.
-          </ContextBody>
-
-          <ContextCard>
-            <DocH3 id="current-context">Current Context: Modal</DocH3>
-
-            <ContextBody>
-              Use a Modal when creation is part of the task the user is already performing and they should be able to
-              continue where they left off when creation is complete.
-            </ContextBody>
-
-            <CharacteristicHeading>Characteristics</CharacteristicHeading>
-            <CharacteristicList>
-              <li>Users remain in their current workflow.</li>
-              <li>The parent view remains visible.</li>
-              <li>Creation is completed without changing pages.</li>
-              <li>Completion returns users to their previous location.</li>
-              <li>Successful creation closes the modal and shows a toast notification.</li>
-            </CharacteristicList>
-
-            <ExampleLabel>Example</ExampleLabel>
-            <ExampleWrapper>
-              <Button onClick={() => setShowModal(true)}>Create Stream</Button>
-              <CreateModal<StoryValues>
-                entityName="Stream"
-                show={showModal}
-                onClose={() => setShowModal(false)}
-                initialValues={{ title: '', description: '' }}
-                onSubmit={async () => {}}>
-                <FormFields />
-              </CreateModal>
-            </ExampleWrapper>
-            <CodeDetails>
-              <summary />
-              <CodeBlock>{MODAL_CODE}</CodeBlock>
-            </CodeDetails>
-          </ContextCard>
-
-          <ContextCard>
-            <DocH3 id="new-context">New Context: Page</DocH3>
-
-            <ContextBody>
-              Use a Page when creation benefits from a dedicated experience with its own focus, navigation state, and
-              destination.
-            </ContextBody>
-
-            <CharacteristicHeading>Characteristics</CharacteristicHeading>
-            <CharacteristicList>
-              <li>Users move into a focused creation experience.</li>
-              <li>The flow has its own URL and browser history entry.</li>
-              <li>Additional guidance, content, or validation can be accommodated.</li>
-              <li>Successful creation navigates users to the newly created entity.</li>
-              <li>A toast notification communicates successful creation.</li>
-            </CharacteristicList>
-
-            <ExampleLabel>Example</ExampleLabel>
-            <PagePreviewWrapper>
-              <MemoryRouter>
-                <CreatePage<StoryValues>
-                  entityName="Stream"
-                  overviewRoute="/streams"
-                  detailsRoute={(id) => `/streams/${id}`}
-                  initialValues={{ title: '', description: '' }}
-                  onSubmit={async () => ({ id: 'new-stream-id' })}
-                  description="Streams route incoming messages into categories. Route a message into a stream by applying matching rules.">
-                  <FormFields />
-                </CreatePage>
-              </MemoryRouter>
-            </PagePreviewWrapper>
-            <CodeDetails>
-              <summary />
-              <CodeBlock>{PAGE_CODE}</CodeBlock>
-            </CodeDetails>
-          </ContextCard>
-
-          <Alert bsStyle="info">
-            If it is unclear whether creation belongs in the current context or a dedicated one, involve Product and
-            Design before implementation. Context decisions affect navigation, workflow continuity, and long-term
-            consistency across the product.
-          </Alert>
-        </SectionGroup>
-
-        <SectionGroup>
-          <DocH2>Choosing the Method</DocH2>
-
-          <ContextBody>
-            After selecting the surface, choose the creation method. A Form and a Wizard can both be used in either a
-            Modal or a Page.
-          </ContextBody>
-
-          <ContextCard>
-            <DocH3>Form</DocH3>
-
-            <ContextBody>Use a Form when users can reasonably complete creation in a single step.</ContextBody>
-
-            <CharacteristicHeading>Characteristics</CharacteristicHeading>
-            <CharacteristicList>
-              <li>Fields can be displayed together.</li>
-              <li>There are no significant dependencies between steps.</li>
-              <li>The workflow is primarily data entry.</li>
-            </CharacteristicList>
-          </ContextCard>
-
-          <ContextCard>
-            <DocH3>Wizard</DocH3>
-
-            <ContextBody>Use a Wizard when users benefit from progressive guidance and decision making.</ContextBody>
-
-            <CharacteristicHeading>Characteristics</CharacteristicHeading>
-            <CharacteristicList>
-              <li>The flow contains multiple dependent decisions.</li>
-              <li>Information is naturally grouped into stages.</li>
-              <li>Showing everything at once would be overwhelming.</li>
-              <li>Users benefit from being guided through the process.</li>
-            </CharacteristicList>
-          </ContextCard>
-
-          <ContextCard>
-            <DocH3>Avoid Wizards When</DocH3>
-
-            <CharacteristicList>
-              <li>The only purpose is reducing scroll length.</li>
-              <li>Steps do not depend on one another.</li>
-              <li>Users would frequently need to jump between sections.</li>
-              <li>The workflow can be understood in a single view.</li>
-            </CharacteristicList>
-          </ContextCard>
-        </SectionGroup>
-      </ContextGrid>
-    </DocContainer>
-  );
+    return (
+      <>
+        <Button onClick={() => setShow(true)}>Create Stream</Button>
+        <CreateModal<StoryValues>
+          entityName="Stream"
+          show={show}
+          onClose={() => setShow(false)}
+          initialValues={{ title: '', description: '' }}
+          onSubmit={async () => {}}>
+          <FormFields />
+        </CreateModal>
+      </>
+    );
+  },
 };
 
-// ─── Meta & Stories ───────────────────────────────────────────────────────────
+export const NewContextPage: StoryObj = {
+  tags: ['!dev'],
+  decorators: [
+    (Story) => (
+      <MemoryRouter>
+        <Story />
+      </MemoryRouter>
+    ),
+  ],
+  render: () => (
+    <CreatePage<StoryValues>
+      entityName="Stream"
+      overviewRoute="/streams"
+      detailsRoute={(id) => `/streams/${id}`}
+      initialValues={{ title: '', description: '' }}
+      onSubmit={async () => ({ id: 'new-stream-id' })}
+      description="Streams route incoming messages into categories. Route a message into a stream by applying matching rules.">
+      <FormFields />
+    </CreatePage>
+  ),
+};
+
+// ─── Docs page ────────────────────────────────────────────────────────────────
+
+const CreateEntityPattern = () => (
+  <DocContainer>
+    <DocH1>Creating an Entity</DocH1>
+
+    <DocLead>
+      Entity creation is a foundational interaction in Graylog. This guide helps you decide how to implement a creation
+      flow consistently.
+    </DocLead>
+
+    <Alert bsStyle="info">
+      <strong>Design principle:</strong> Entity creation is organized around two decisions: choose the appropriate
+      surface, then choose the appropriate method.
+    </Alert>
+
+    <DiagramWrapper>
+      <Mermaid chart={DIAGRAM} />
+    </DiagramWrapper>
+
+    <ContextGrid>
+      <SectionGroup>
+        <DocH2>Choosing the Surface</DocH2>
+
+        <ContextBody>
+          Choose the surface based on whether creation should happen within the user's current workflow or in a
+          dedicated creation experience.
+        </ContextBody>
+
+        <ContextCard>
+          <DocH3 id="current-context">Current Context: Modal</DocH3>
+
+          <ContextBody>
+            Use a Modal when creation is part of the task the user is already performing and they should be able to
+            continue where they left off when creation is complete.
+          </ContextBody>
+
+          <CharacteristicHeading>Characteristics</CharacteristicHeading>
+          <CharacteristicList>
+            <li>Users remain in their current workflow.</li>
+            <li>The parent view remains visible.</li>
+            <li>Creation is completed without changing pages.</li>
+            <li>Completion returns users to their previous location.</li>
+            <li>Successful creation closes the modal and shows a toast notification.</li>
+          </CharacteristicList>
+
+          <Canvas of={CurrentContextModal} />
+        </ContextCard>
+
+        <ContextCard>
+          <DocH3 id="new-context">New Context: Page</DocH3>
+
+          <ContextBody>
+            Use a Page when creation benefits from a dedicated experience with its own focus, navigation state, and
+            destination.
+          </ContextBody>
+
+          <CharacteristicHeading>Characteristics</CharacteristicHeading>
+          <CharacteristicList>
+            <li>Users move into a focused creation experience.</li>
+            <li>The flow has its own URL and browser history entry.</li>
+            <li>Additional guidance, content, or validation can be accommodated.</li>
+            <li>Successful creation navigates users to the newly created entity.</li>
+            <li>A toast notification communicates successful creation.</li>
+          </CharacteristicList>
+
+          <Canvas of={NewContextPage} />
+        </ContextCard>
+
+        <Alert bsStyle="info">
+          If it is unclear whether creation belongs in the current context or a dedicated one, involve Product and
+          Design before implementation. Context decisions affect navigation, workflow continuity, and long-term
+          consistency across the product.
+        </Alert>
+      </SectionGroup>
+
+      <SectionGroup>
+        <DocH2>Choosing the Method</DocH2>
+
+        <ContextBody>
+          After selecting the surface, choose the creation method. A Form and a Wizard can both be used in either a
+          Modal or a Page.
+        </ContextBody>
+
+        <ContextCard>
+          <DocH3>Form</DocH3>
+
+          <ContextBody>Use a Form when users can reasonably complete creation in a single step.</ContextBody>
+
+          <CharacteristicHeading>Characteristics</CharacteristicHeading>
+          <CharacteristicList>
+            <li>Fields can be displayed together.</li>
+            <li>There are no significant dependencies between steps.</li>
+            <li>The workflow is primarily data entry.</li>
+          </CharacteristicList>
+        </ContextCard>
+
+        <ContextCard>
+          <DocH3>Wizard</DocH3>
+
+          <ContextBody>Use a Wizard when users benefit from progressive guidance and decision making.</ContextBody>
+
+          <CharacteristicHeading>Characteristics</CharacteristicHeading>
+          <CharacteristicList>
+            <li>The flow contains multiple dependent decisions.</li>
+            <li>Information is naturally grouped into stages.</li>
+            <li>Showing everything at once would be overwhelming.</li>
+            <li>Users benefit from being guided through the process.</li>
+          </CharacteristicList>
+        </ContextCard>
+
+        <ContextCard>
+          <DocH3>Avoid Wizards When</DocH3>
+
+          <CharacteristicList>
+            <li>The only purpose is reducing scroll length.</li>
+            <li>Steps do not depend on one another.</li>
+            <li>Users would frequently need to jump between sections.</li>
+            <li>The workflow can be understood in a single view.</li>
+          </CharacteristicList>
+        </ContextCard>
+      </SectionGroup>
+    </ContextGrid>
+  </DocContainer>
+);
+
+// ─── Meta ─────────────────────────────────────────────────────────────────────
 
 const meta: Meta = {
   title: 'Patterns/Creating an Entity',
+  tags: ['autodocs'],
   parameters: {
     layout: 'padded',
+    docs: {
+      page: CreateEntityPattern,
+    },
   },
 };
 
 export default meta;
-type Story = StoryObj<typeof meta>;
-
-export const Overview: Story = {
-  render: () => <CreateEntityPatternDoc />,
-};
