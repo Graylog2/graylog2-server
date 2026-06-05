@@ -35,8 +35,6 @@ export const RowContentStyles = css(
 type Props = React.HTMLAttributes<HTMLDivElement> & {
   as?: React.ElementType;
   'data-testid'?: string;
-  // Allow callers to pass styled-components transient props (e.g. when wrapping
-  // Row in `styled(Row)\`...\``) without each one being declared up front.
   className?: string;
 };
 
