@@ -25,7 +25,7 @@ const __dirname = path.dirname(__filename);
 const webInterfaceRoot = path.resolve(__dirname, '../../..');
 
 const config: StorybookConfig = {
-  stories: ['../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
+  stories: ['../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)', '../stories/**/*.mdx'],
   addons: ['@storybook/addon-webpack5-compiler-swc', '@storybook/addon-docs', 'storybook-dark-mode'],
   framework: {
     name: '@storybook/react-webpack5',
