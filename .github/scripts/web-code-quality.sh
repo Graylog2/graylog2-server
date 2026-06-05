@@ -13,6 +13,8 @@ TS_FILES=`find src -name \*.ts -o -name \*.tsx|wc -l`
 ENZYME_TESTS=`grep -lr wrappedEnzyme src|wc -l`
 TESTING_LIBRARY_TESTS=`grep -lr wrappedTestingLibrary src|wc -l`
 
+BOOTSTRAP_USAGES=`grep -rlE "from ['\"]react-bootstrap(/[^'\"]*)?['\"]" src|wc -l`
+
 PAYLOAD=$(cat <<- EOF
  {
     "version": "1.1",
@@ -28,6 +30,7 @@ PAYLOAD=$(cat <<- EOF
     "_ts_files": ${TS_FILES},
     "_enzyme_tests": ${ENZYME_TESTS},
     "_testing_library_tests": ${TESTING_LIBRARY_TESTS},
+    "_bootstrap_usages": ${BOOTSTRAP_USAGES},
     "timestamp": ${TIMESTAMP}
    }
 EOF

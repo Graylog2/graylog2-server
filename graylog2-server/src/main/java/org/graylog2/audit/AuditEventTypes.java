@@ -64,6 +64,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String ES_INDEX_CREATE = PREFIX + "es_index:create";
     public static final String ES_INDEX_DELETE = PREFIX + "es_index:delete";
     public static final String ES_INDEX_OPEN = PREFIX + "es_index:open";
+    public static final String ES_INDEX_REINDEX = PREFIX + "es_index:reindex";
     public static final String ES_INDEX_RANGE_CREATE = PREFIX + "es_index_range:create";
     public static final String ES_INDEX_RANGE_DELETE = PREFIX + "es_index_range:delete";
     public static final String ES_INDEX_RANGE_UPDATE_JOB = PREFIX + "es_index_range_update_job:start";
@@ -250,6 +251,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(ES_INDEX_CREATE)
             .add(ES_INDEX_DELETE)
             .add(ES_INDEX_OPEN)
+            .add(ES_INDEX_REINDEX)
             .add(ES_INDEX_RANGE_CREATE)
             .add(ES_INDEX_RANGE_DELETE)
             .add(ES_INDEX_RANGE_UPDATE_JOB)

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.joda.time.DateTime;
@@ -57,6 +58,7 @@ public abstract class EventDto {
     public static final String FIELD_GROUP_BY_FIELDS = "group_by_fields";
     public static final String FIELD_AGGREGATION_CONDITIONS = "aggregation_conditions";
     public static final String FIELD_REPLAY_INFO = "replay_info";
+    public static final String FIELD_TACTICS_TECHNIQUES = "tactics_techniques";
 
     @JsonProperty(FIELD_ID)
     public abstract String id();
@@ -130,6 +132,9 @@ public abstract class EventDto {
     @JsonProperty(FIELD_REPLAY_INFO)
     public abstract Optional<EventReplayInfo> replayInfo();
 
+    @JsonProperty(FIELD_TACTICS_TECHNIQUES)
+    public abstract List<String> tacticsTechniques();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -149,6 +154,7 @@ public abstract class EventDto {
                     .aggregationConditions(ImmutableMap.of())
                     .scores(ImmutableMap.of())
                     .associatedAssets(ImmutableSet.of())
+                    .tacticsTechniques(ImmutableList.of())
                     .tags(ImmutableSet.of());
         }
 
@@ -224,6 +230,9 @@ public abstract class EventDto {
 
         @JsonProperty(FIELD_REPLAY_INFO)
         public abstract Builder replayInfo(@Nullable EventReplayInfo replayInfo);
+
+        @JsonProperty(FIELD_TACTICS_TECHNIQUES)
+        public abstract Builder tacticsTechniques(List<String> tacticsTechniques);
 
         public abstract EventDto build();
     }

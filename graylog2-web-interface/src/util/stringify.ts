@@ -14,29 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import * as JSON from 'util/json';
 
-import DefinitionList from 'components/common/DefinitionList';
-import ChipsCell from 'components/common/ChipsCell';
-import useAppendTagFilter from 'components/events/useAppendTagFilter';
-
-type Props = {
-  tags: ReadonlyArray<string> | undefined | null;
+const stringify = (value: any) => {
+  switch (typeof value) {
+    case 'bigint':
+      return value.toString();
+    case 'string':
+      return value;
+    default:
+      return JSON.stringify(value);
+  }
 };
 
-const TagsDetailRow = ({ tags }: Props) => {
-  const onTagClick = useAppendTagFilter();
-
-  if (!tags?.length) return null;
-
-  return (
-    <DefinitionList>
-      <dt>Tags</dt>
-      <dd>
-        <ChipsCell items={tags} truncate={false} onItemClick={onTagClick} itemLabel="tag" />
-      </dd>
-    </DefinitionList>
-  );
-};
-
-export default TagsDetailRow;
+export default stringify;
