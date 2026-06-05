@@ -20,7 +20,7 @@ import { fn } from 'storybook/test';
 import { MemoryRouter } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { Button, Input } from 'components/bootstrap';
+import { Alert, Button, Input } from 'components/bootstrap';
 import { CreateModal, CreatePage } from 'components/common';
 
 import Mermaid from './Mermaid';
@@ -45,7 +45,6 @@ const DocH3 = styled.h3`
 
 const DocLead = styled.p`
   line-height: 1.6;
-  color: ${({ theme }) => theme.colors.text.secondary};
   margin: 0 0 ${({ theme }) => theme.spacings.xl};
 `;
 
@@ -73,7 +72,7 @@ const StoryNavLink = ({ storyId, children }: { storyId: string; children: React.
     href="#"
     onClick={(e) => {
       e.preventDefault();
-       
+
       (window as any).__STORYBOOK_ADDONS_CHANNEL__?.emit('selectStory', { storyId });
     }}>
     {children}
@@ -89,21 +88,12 @@ const SectionGroup = styled.div`
   }
 `;
 
-const ContextLabel = styled.p`
-  font-size: ${({ theme }) => theme.fonts.size.small};
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: ${({ theme }) => theme.colors.text.secondary};
-  margin: 0 0 ${({ theme }) => theme.spacings.xs};
-`;
-
 const ContextBody = styled.p`
   line-height: 1.6;
   margin: 0 0 ${({ theme }) => theme.spacings.md};
 `;
 
-const RuleListHeading = styled.p`
+const CharacteristicHeading = styled.p`
   font-size: ${({ theme }) => theme.fonts.size.small};
   font-weight: 600;
   text-transform: uppercase;
@@ -112,23 +102,14 @@ const RuleListHeading = styled.p`
   margin: 0 0 ${({ theme }) => theme.spacings.xs};
 `;
 
-const RuleList = styled.ul`
-  list-style: none;
-  padding: 0;
+const CharacteristicList = styled.ul`
+  list-style-type: disc;
   margin: 0 0 ${({ theme }) => theme.spacings.md};
-`;
+  padding-left: ${({ theme }) => theme.spacings.lg};
 
-const RuleItem = styled.li<{ $type: 'do' | 'dont' }>`
-  padding: ${({ theme }) => theme.spacings.xs} 0;
-  padding-left: 1.4em;
-  position: relative;
-  line-height: 1.5;
-
-  &::before {
-    position: absolute;
-    left: 0;
-    font-weight: 700;
-    ${({ $type }) => ($type === 'do' ? "content: '✓'; color: #22c55e;" : "content: '✕'; color: #ef4444;")}
+  li {
+    line-height: 1.5;
+    margin-bottom: ${({ theme }) => theme.spacings.xs};
   }
 `;
 
@@ -136,22 +117,32 @@ const RuleItem = styled.li<{ $type: 'do' | 'dont' }>`
 
 const DIAGRAM = `flowchart TD
   A(["User's current view"])
-  A --> B{{"\`Must keep user
-in current context?\`"}}
-  B -->|Yes| MODAL(["\`**Modal**
+  A --> B{{"\`Should users remain
+in their current workflow?\`"}}
+  B -->|Yes| MODAL
+  B -->|No| PAGE
+
+  subgraph Surface["Surface"]
+    MODAL(["\`**Modal**
 Current context preserved\`"])
-  B -->|No| PAGE(["\`**Page**
-New context, full focus\`"])
-  MODAL --> MW(["\`**Form or Wizard**
-No secondary context or workflow\`"])
-  PAGE --> FORM(["\`**Form**
-Static or dynamic fields\`"])
-  PAGE --> WIZARD(["\`**Wizard**
-Multi-step, guided flow\`"])
-  MW --> RC(["\`**Return to current context**
+    PAGE(["\`**Page**
+Dedicated creation experience\`"])
+  end
+
+  subgraph Method["Method"]
+    MW(["\`**Form or Wizard**
+Single-step or guided workflow\`"])
+    FW(["\`**Form or Wizard**
+Single-step or guided workflow\`"])
+  end
+
+  MODAL --> MW
+  PAGE --> FW
+
+  MW --> RC(["\`**Return to current workflow**
 Modal closes, toast shown\`"])
-  FORM & WIZARD --> NC(["\`**Navigate to new context**
-Detail page, list, or origin\`"])
+  FW --> NC(["\`**Navigate to entity**
+Details page, toast shown\`"])
 `;
 
 // ─── Pattern Overview Doc ────────────────────────────────────────────────────
@@ -159,56 +150,120 @@ Detail page, list, or origin\`"])
 const CreateEntityPatternDoc = () => (
   <DocContainer>
     <DocH1>Creating an Entity</DocH1>
+
+    <DocLead>
+      Entity creation is a foundational interaction in Graylog. This guide helps you decide how to implement a creation
+      flow consistently.
+    </DocLead>
+
+    <Alert bsStyle="info">
+      <strong>Design principle:</strong> Entity creation is organized around two decisions: choose the appropriate
+      context, then choose the appropriate method.
+    </Alert>
+
     <DiagramWrapper>
       <Mermaid chart={DIAGRAM} />
     </DiagramWrapper>
 
     <ContextGrid>
       <SectionGroup>
-        <DocH2>Surface</DocH2>
+        <DocH2>Choosing the Surface</DocH2>
+        <ContextBody>
+          Choose the surface based on whether creation should happen within the user’s current workflow or in a
+          dedicated creation experience.
+        </ContextBody>
 
         <ContextCard>
-          <DocH3 id="current-context">Modal</DocH3>
+          <DocH3 id="current-context">Current Context: Modal</DocH3>
+
           <ContextBody>
-            Use a Modal to keep the user in their current context. The parent view stays visible, and on completion the
-            modal closes and returns the user to where they started. Use a Form or Wizard — if the workflow requires its
-            own context, use a Page instead.
+            Use a Modal when creation is part of the task the user is already performing and they should be able to
+            continue where they left off when creation is complete.
           </ContextBody>
 
+          <CharacteristicHeading>Characteristics</CharacteristicHeading>
+          <CharacteristicList>
+            <li>Users remain in their current workflow.</li>
+            <li>The parent view remains visible.</li>
+            <li>Creation is completed without changing pages.</li>
+            <li>Completion returns users to their previous location.</li>
+            <li>Successful creation closes the modal and shows a toast notification.</li>
+          </CharacteristicList>
+
           <StoryNavLink storyId="patterns-creating-an-entity--current-context-modal">View example →</StoryNavLink>
-
-          <RuleListHeading>Do</RuleListHeading>
-          <RuleList>
-            <RuleItem $type="do">Show a toast notification on successful creation</RuleItem>
-          </RuleList>
-
-          <RuleListHeading>Do not</RuleListHeading>
-          <RuleList>
-            <RuleItem $type="dont">Open a modal on top of another modal</RuleItem>
-          </RuleList>
         </ContextCard>
 
         <ContextCard>
-          <DocH3 id="new-context">Page</DocH3>
+          <DocH3 id="new-context">New Context: Page</DocH3>
+
           <ContextBody>
-            Use a Page when a context shift is appropriate. The user gets a dedicated creation experience and on
-            completion is taken to the entity detail page. Pages have a browser history entry and can be directly linked
-            to.
+            Use a Page when creation benefits from a dedicated experience with its own focus, navigation state, and
+            destination.
           </ContextBody>
+
+          <CharacteristicHeading>Characteristics</CharacteristicHeading>
+          <CharacteristicList>
+            <li>Users move into a focused creation experience.</li>
+            <li>The flow has its own URL and browser history entry.</li>
+            <li>Additional guidance, content, or validation can be accommodated.</li>
+            <li>Successful creation navigates users to the newly created entity.</li>
+            <li>A toast notification communicates successful creation.</li>
+          </CharacteristicList>
 
           <StoryNavLink storyId="patterns-creating-an-entity--new-context-page">View example →</StoryNavLink>
         </ContextCard>
+
+        <Alert bsStyle="info">
+          If it is unclear whether creation belongs in the current context or a dedicated one, involve Product and
+          Design before implementation. Context decisions affect navigation, workflow continuity, and long-term
+          consistency across the product.
+        </Alert>
       </SectionGroup>
 
       <SectionGroup>
-        <DocH2>Method</DocH2>
+        <DocH2>Choosing the Method</DocH2>
+
+        <ContextBody>
+          After selecting the context, choose the creation method. A Form and a Wizard can both be used in either a
+          Modal or a Page.
+        </ContextBody>
 
         <ContextCard>
-          <DocH3>Form vs Wizard</DocH3>
-          <ContextBody>
-            Use a Form for single-step creation with a manageable number of fields. Use a Wizard when creation involves
-            multiple dependent steps or too many fields to show at once.
-          </ContextBody>
+          <DocH3>Form</DocH3>
+
+          <ContextBody>Use a Form when users can reasonably complete creation in a single step.</ContextBody>
+
+          <CharacteristicHeading>Characteristics</CharacteristicHeading>
+          <CharacteristicList>
+            <li>Fields can be displayed together.</li>
+            <li>There are no significant dependencies between steps.</li>
+            <li>The workflow is primarily data entry.</li>
+          </CharacteristicList>
+        </ContextCard>
+
+        <ContextCard>
+          <DocH3>Wizard</DocH3>
+
+          <ContextBody>Use a Wizard when users benefit from progressive guidance and decision making.</ContextBody>
+
+          <CharacteristicHeading>Characteristics</CharacteristicHeading>
+          <CharacteristicList>
+            <li>The flow contains multiple dependent decisions.</li>
+            <li>Information is naturally grouped into stages.</li>
+            <li>Showing everything at once would be overwhelming.</li>
+            <li>Users benefit from being guided through the process.</li>
+          </CharacteristicList>
+        </ContextCard>
+
+        <ContextCard>
+          <DocH3>Avoid Wizards When</DocH3>
+
+          <CharacteristicList>
+            <li>The only purpose is reducing scroll length.</li>
+            <li>Steps do not depend on one another.</li>
+            <li>Users would frequently need to jump between sections.</li>
+            <li>The workflow can be understood in a single view.</li>
+          </CharacteristicList>
         </ContextCard>
       </SectionGroup>
     </ContextGrid>
