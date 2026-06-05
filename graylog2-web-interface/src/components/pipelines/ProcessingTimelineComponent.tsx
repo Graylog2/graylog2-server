@@ -25,6 +25,7 @@ import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import usePipelineConnections from 'hooks/usePipelineConnections';
 import usePipelineMutations from 'hooks/usePipelineMutations';
 import usePipelinesPaginated from 'hooks/usePipelinesPaginated';
+import { useProcessingLoadContext } from 'components/pipelines/processing-load';
 
 import type { PipelineType } from './types';
 import PipelineListItem from './PipelineListItem';
@@ -58,6 +59,7 @@ const PipelineFilter = ({ query, onSearch }: { query: string; onSearch: (query: 
 );
 
 const ProcessingTimelineComponent = () => {
+  const { metricsEnabled } = useProcessingLoadContext();
   const { data: connections } = usePipelineConnections();
   const { page, pageSize: perPage, resetPage, setPagination } = usePaginationQueryParameter();
   const [query, setQuery] = useState('');
@@ -124,7 +126,14 @@ const ProcessingTimelineComponent = () => {
       onDeletePipeline={() => _deletePipeline(pipelineItem)}
     />
   );
-  const headers = ['Pipeline', 'Connected to Streams', 'Processing Errors', 'Processing Timeline', 'Actions'];
+  const headers = [
+    'Pipeline',
+    'Connected to Streams',
+    'Processing Errors',
+    ...(metricsEnabled ? ['Pipeline Load (15m)'] : []),
+    'Processing Timeline',
+    'Actions',
+  ];
 
   return (
     <div>

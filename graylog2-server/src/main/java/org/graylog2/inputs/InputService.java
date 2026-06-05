@@ -119,6 +119,11 @@ public interface InputService {
 
     List<Extractor> getExtractors(String inputId);
 
+    /**
+     * Returns the number of embedded extractors for each of the given input IDs in a single query.
+     */
+    Map<String, Integer> extractorCountByInputId(Collection<String> inputIds);
+
     Extractor getExtractor(Input input, String extractorId) throws NotFoundException;
 
     void updateExtractor(Input input, Extractor extractor) throws ValidationException;

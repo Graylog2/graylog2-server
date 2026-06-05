@@ -525,7 +525,8 @@ public class PipelineInterpreterTest {
         final PipelineInterpreter interpreter = new PipelineInterpreter(
                 messageQueueAcknowledger,
                 metricRegistry,
-                stateUpdater);
+                stateUpdater,
+                1);
 
         // Create message on default stream only
         final Message msg = messageFactory.createMessage("test message", "test", Tools.nowUTC());
@@ -582,7 +583,8 @@ public class PipelineInterpreterTest {
         return new PipelineInterpreter(
                 messageQueueAcknowledger,
                 metricRegistry,
-                stateUpdater);
+                stateUpdater,
+                1);
     }
 
     @Test
@@ -642,7 +644,8 @@ public class PipelineInterpreterTest {
         final PipelineInterpreter interpreter = new PipelineInterpreter(
                 mock(MessageQueueAcknowledger.class),
                 metricRegistry,
-                stateUpdater);
+                stateUpdater,
+                1);
 
         interpreter.process(messageInDefaultStream("", ""));
 

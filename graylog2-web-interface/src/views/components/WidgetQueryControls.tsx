@@ -29,7 +29,7 @@ import connect from 'stores/connect';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import type Widget from 'views/logic/widgets/Widget';
 import type { SearchBarFormValues } from 'views/Constants';
-import { DEFAULT_TIMERANGE } from 'views/Constants';
+import { SEARCH_TYPE_RANGE_LIMIT_ERROR_TYPE, DEFAULT_TIMERANGE } from 'views/Constants';
 import type GlobalOverride from 'views/logic/search/GlobalOverride';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import { PropagateDisableSubmissionState } from 'views/components/aggregationwizard';
@@ -62,8 +62,9 @@ import QueryHistoryButton from 'views/components/searchbar/QueryHistoryButton';
 import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import { defaultCompare } from 'logic/DefaultCompare';
-import StreamCategoryFilter from 'views/components/searchbar/StreamCategoryFilter';
 import { executeActiveQuery } from 'views/logic/slices/viewSlice';
+import useSearchResultTimeRangeErrorCheck from 'views/hooks/useSearchResultTimeRangeErrorCheck';
+import type { StreamsAndCategoriesSelection } from 'views/components/common/StreamsAndCategoriesFilter';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeFilter from './searchbar/time-range-filter';
@@ -89,13 +90,13 @@ type Props = {
   availableStreams: Array<Stream>;
 };
 
-export const updateWidgetSearchControls = (widget, { timerange, streams, streamCategories, queryString }) =>
+export const updateWidgetSearchControls = (widget, { timerange, streamsAndCategories, queryString }) =>
   widget
     .toBuilder()
     .timerange(timerange)
     .query(createElasticsearchQueryString(queryString))
-    .streams(streams)
-    .streamCategories(streamCategories)
+    .streams(streamsAndCategories?.streams)
+    .streamCategories(streamsAndCategories?.categories)
     .build();
 
 const onSubmit = async (
@@ -104,7 +105,7 @@ const onSubmit = async (
   pluggableSearchBarControls: Array<() => SearchBarControl>,
   widget: Widget,
 ) => {
-  const { timerange, streams, streamCategories, queryString } = values;
+  const { timerange, streamsAndCategories, queryString } = values;
   const widgetWithPluginData = await executePluggableSubmitHandler(
     dispatch,
     values,
@@ -113,8 +114,7 @@ const onSubmit = async (
   );
   const newWidget = updateWidgetSearchControls(widgetWithPluginData, {
     timerange,
-    streams,
-    streamCategories,
+    streamsAndCategories,
     queryString,
   });
 
@@ -165,7 +165,12 @@ const useInitialFormValues = (widget: Widget) => {
   const initialValuesFromPlugins = usePluggableInitialValues(widget);
 
   return useMemo(
-    () => ({ timerange, streams, streamCategories, queryString, ...initialValuesFromPlugins }),
+    () => ({
+      timerange,
+      streamsAndCategories: { streams: streams, categories: streamCategories },
+      queryString,
+      ...initialValuesFromPlugins,
+    }),
     [timerange, streams, streamCategories, queryString, initialValuesFromPlugins],
   );
 };
@@ -183,8 +188,8 @@ const _validateQueryString = (
     queryString: values?.queryString,
     timeRange: !isEmpty(globalOverride?.timerange) ? globalOverride.timerange : values?.timerange,
     filter: globalOverride?.query ? globalOverride.query : undefined,
-    streams: values?.streams,
-    streamCategories: values?.streamCategories,
+    streams: values?.streamsAndCategories?.streams,
+    streamCategories: values?.streamsAndCategories?.categories,
     ...pluggableValidationPayload(values, context, pluggableSearchBarControls),
   };
 
@@ -238,6 +243,8 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
 
   useBindApplySearchControlsChanges(formRef);
 
+  const searchResultTimeRangeErrorCheck = useSearchResultTimeRangeErrorCheck(SEARCH_TYPE_RANGE_LIMIT_ERROR_TYPE);
+
   return (
     <FormWarningsProvider>
       <SearchBarForm
@@ -247,7 +254,8 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
         onSubmit={_onSubmit}
         validateQueryString={validate}>
         {({ dirty, errors, isValid, isSubmitting, handleSubmit, values, setFieldValue, validateForm }) => {
-          const disableSearchSubmit = isSubmitting || isValidatingQuery || !isValid;
+          const showTimeRangeErrorFromResults = searchResultTimeRangeErrorCheck(values?.timerange);
+          const disableSearchSubmit = isSubmitting || isValidatingQuery || !isValid || showTimeRangeErrorFromResults;
 
           return (
             <Container>
@@ -263,35 +271,27 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                     limitDuration={limitDuration}
                     onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                     value={values?.timerange}
-                    hasErrorOnMount={!!errors.timerange}
+                    hasErrorOnMount={!!errors.timerange || showTimeRangeErrorFromResults}
                   />
                 )}
                 {hasTimeRangeOverride && (
                   <TimeRangeOverrideInfo value={globalOverride?.timerange} onReset={_resetTimeRangeOverride} />
                 )}
 
-                <Field name="streams">
+                <Field name="streamsAndCategories">
                   {({ field: { name, value, onChange } }) => (
                     <StreamsFilter
-                      value={value}
+                      value={{ streams: value?.streams, categories: value?.categories }}
                       streams={allStreams}
-                      onChange={(newStreams) => onChange({ target: { value: newStreams, name } })}
-                    />
-                  )}
-                </Field>
-                <Field name="streamCategories">
-                  {({ field: { name, value, onChange } }) => (
-                    <StreamCategoryFilter
-                      value={value}
                       streamCategories={availableStreamCategories}
-                      onChange={(newCategories) =>
+                      onChange={(selected: StreamsAndCategoriesSelection) => {
                         onChange({
                           target: {
-                            value: newCategories,
+                            value: selected,
                             name,
                           },
-                        })
-                      }
+                        });
+                      }}
                     />
                   )}
                 </Field>
@@ -312,7 +312,7 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                                 timeRange={
                                   !isEmpty(globalOverride?.timerange) ? globalOverride.timerange : values?.timerange
                                 }
-                                streams={values?.streams}
+                                streams={values?.streamsAndCategories?.streams}
                                 placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
                                 error={error}
                                 ref={editorRef}

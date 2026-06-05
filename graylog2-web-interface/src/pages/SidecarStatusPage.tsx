@@ -62,7 +62,7 @@ const SidecarStatusPage = () => {
         }
         documentationLink={{
           title: 'Sidecars documentation',
-          path: DocsHelper.PAGES.COLLECTOR_STATUS,
+          path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
         }}>
         <span>A status overview of the Sidecar.</span>
       </PageHeader>

@@ -107,7 +107,17 @@ const INITIAL_DATA = {
   meta: null,
 };
 
-const defaultSlicingPreferences = (sliceColumn: string, columnSchemas: Array<ColumnSchema>): SlicingPreferences => {
+const defaultSlicingPreferences = (
+  sliceColumn: string | null,
+  columnSchemas: Array<ColumnSchema>,
+): SlicingPreferences => {
+  if (sliceColumn === null)
+    return {
+      sliceColumn: null,
+      sortBy: null,
+      order: null,
+    };
+
   const sliceSortDefault = columnSchemas.find(({ id }) => id === sliceColumn)?.slice_sort_default;
   const sortBy = sliceSortDefault?.mode ?? ALPHABETICAL_SORT;
 
@@ -233,7 +243,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
       }
 
       updateTableLayout({
-        slicing: newSliceCol ? defaultSlicingPreferences(newSliceCol, columnSchemas) : undefined,
+        slicing: newSliceCol !== undefined ? defaultSlicingPreferences(newSliceCol, columnSchemas) : null,
       });
     },
     [columnSchemas, fetchOptions.sliceCol, onChangeSlicingFilter, updateTableLayout],

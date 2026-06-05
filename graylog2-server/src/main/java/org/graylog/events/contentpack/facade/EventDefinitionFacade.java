@@ -34,7 +34,7 @@ import org.graylog.grn.GRNTypes;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.security.GrantDTO;
-import org.graylog.security.entities.EntityRegistrar;
+import org.graylog.security.shares.EntityGrantLookup;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.facades.EntityFacade;
 import org.graylog2.contentpacks.model.EntityPermissions;
@@ -71,7 +71,7 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
     private final DBEventDefinitionService eventDefinitionService;
     private final Set<PluginMetaData> pluginMetaData;
     private final UserService userService;
-    private final EntityRegistrar entityRegistrar;
+    private final EntityGrantLookup grantLookup;
 
     @Inject
     public EventDefinitionFacade(ObjectMapper objectMapper,
@@ -80,14 +80,14 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
                                  DBJobDefinitionService jobDefinitionService,
                                  DBEventDefinitionService eventDefinitionService,
                                  UserService userService,
-                                 EntityRegistrar entityRegistrar) {
+                                 EntityGrantLookup grantLookup) {
         this.objectMapper = objectMapper;
         this.pluginMetaData = pluginMetaData;
         this.eventDefinitionHandler = eventDefinitionHandler;
         this.jobDefinitionService = jobDefinitionService;
         this.eventDefinitionService = eventDefinitionService;
         this.userService = userService;
-        this.entityRegistrar = entityRegistrar;
+        this.grantLookup = grantLookup;
     }
 
     @VisibleForTesting
@@ -230,7 +230,7 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
 
     @Override
     public List<GrantDTO> resolveGrants(EventDefinitionDto nativeEntity) {
-        return entityRegistrar.getGrantsForTarget(GRNTypes.EVENT_DEFINITION, nativeEntity.id());
+        return grantLookup.getGrantsForTarget(GRNTypes.EVENT_DEFINITION, nativeEntity.id());
     }
 
     @Override
