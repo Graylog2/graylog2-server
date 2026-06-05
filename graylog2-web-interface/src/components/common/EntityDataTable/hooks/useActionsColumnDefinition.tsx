@@ -38,6 +38,15 @@ const BackgroundFoundation = styled.div`
   width: var(${actionsHeaderWidthVar});
 `;
 
+const HeaderBackground = styled(BackgroundFoundation)(
+  ({ theme }) => css`
+    background-color: ${theme.utils.flattenColorStack([
+      theme.colors.global.contentBackground,
+      theme.colors.table.head.background,
+    ])};
+  `,
+);
+
 const Actions = styled.div<{ $isEvenRow: boolean }>(
   ({ $isEvenRow, theme }) => css`
     display: flex;
@@ -107,7 +116,7 @@ const useActionsColumnDefinition = <Entity extends EntityBase>({
   const header = useCallback(
     () => (
       <AlignRight>
-        <BackgroundFoundation />
+        <HeaderBackground />
       </AlignRight>
     ),
     [],
