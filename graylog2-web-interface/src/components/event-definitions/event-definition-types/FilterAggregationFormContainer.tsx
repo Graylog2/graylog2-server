@@ -16,25 +16,20 @@
  */
 import * as React from 'react';
 import { useContext } from 'react';
-import { Provider } from 'react-redux';
 
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import StreamsContext from 'contexts/StreamsContext';
 import type { EventDefinitionType } from 'components/event-definitions/types';
-import createStore from 'store';
 
 import FilterAggregationForm from './FilterAggregationForm';
 
 const FilterAggregationFormContainer: EventDefinitionType['formComponent'] = (props) => {
   const streams = useContext(StreamsContext);
-  const minimalStore = createStore([], {});
 
   return (
-    <Provider store={minimalStore}>
-      <FormWarningsProvider>
-        <FilterAggregationForm streams={streams} {...props} />
-      </FormWarningsProvider>
-    </Provider>
+    <FormWarningsProvider>
+      <FilterAggregationForm streams={streams} {...props} />
+    </FormWarningsProvider>
   );
 };
 
