@@ -553,7 +553,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     const sortedOptions =
       !async && inputValue
         ? matchSorter(rawOptions, inputValue, {
-            keys: [displayKey ?? 'label'],
+            keys: [displayKey, 'label'],
             keepDiacritics: !ignoreAccents,
           })
         : rawOptions;
