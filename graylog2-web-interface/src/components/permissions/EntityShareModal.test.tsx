@@ -37,7 +37,7 @@ import ActiveShare from 'logic/permissions/ActiveShare';
 import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 import EntityShareModal from './EntityShareModal';
-import useEntityShareState from 'hooks/useEntityShareState';
+import useEntityShareState, { useSetEntityShareState } from 'hooks/useEntityShareState';
 
 const mockEmptyResult = { data: undefined };
 const mockFailedResult = { data: failedEntityShareState };
@@ -204,6 +204,33 @@ describe('EntityShareModal', () => {
         ${everyone} | ${'everyone'} | ${manager}
         ${security} | ${'team'}     | ${owner}
       `('sends new grantee $granteeType to preparation', addGrantee);
+
+      it('writes the response from prepare back into the entity share cache', async () => {
+        const updatedShareState = mockEntityShareState
+          .toBuilder()
+          .selectedGranteeCapabilities(
+            mockEntityShareState.selectedGranteeCapabilities.merge({ [john.id]: viewer.id }),
+          )
+          .build();
+        // First call (from initial useEffect in EntityShareModal) returns the initial state;
+        // second call (from _handleSelection after clicking Add Collaborator) returns the updated state.
+        asMock(EntityShareDomain.prepare)
+          .mockResolvedValueOnce(mockEntityShareState)
+          .mockResolvedValueOnce(updatedShareState);
+
+        render(<SimpleEntityShareModal />);
+
+        await selectEvent.chooseOption('Search for users and teams', john.title);
+        await selectEvent.chooseOption('Select a capability', viewer.title);
+
+        await setupUser().click(await screen.findByRole('button', { name: /add collaborator/i }));
+
+        const setEntityShareStateMock = (useSetEntityShareState as jest.Mock).mock.results[0]?.value;
+
+        await waitFor(() => {
+          expect(setEntityShareStateMock).toHaveBeenCalledWith(mockEntityShareState.entity, updatedShareState);
+        });
+      });
     });
 
     it('shows confirmation dialog on save if a collaborator got selected, but not added', async () => {
