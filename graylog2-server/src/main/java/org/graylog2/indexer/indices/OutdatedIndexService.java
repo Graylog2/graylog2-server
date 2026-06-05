@@ -21,6 +21,7 @@ import com.github.zafarkhaja.semver.ParseException;
 import com.github.zafarkhaja.semver.Version;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import jakarta.validation.constraints.NotNull;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.slf4j.Logger;
@@ -133,4 +134,7 @@ public class OutdatedIndexService {
         return cleaned;
     }
 
+    public void delete(@NotNull String index) {
+        indicesAdapter.delete(index);
+    }
 }
