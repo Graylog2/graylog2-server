@@ -30,7 +30,6 @@ type ContentProps = {
   onCancel: () => void;
   description?: React.ReactNode;
   documentationLink?: { title: string; path: string };
-  disabledSubmit?: boolean;
   submitError: string | null;
   children: React.ReactNode;
 };
@@ -40,7 +39,6 @@ const CreatePageContent = ({
   onCancel,
   description = undefined,
   documentationLink = undefined,
-  disabledSubmit = false,
   submitError,
   children,
 }: ContentProps) => {
@@ -73,7 +71,7 @@ const CreatePageContent = ({
                   submitLoadingText={`Creating ${entityNameLower}...`}
                   isSubmitting={isSubmitting}
                   isAsyncSubmit
-                  disabledSubmit={!isValid || isValidating || disabledSubmit}
+                  disabledSubmit={!isValid || isValidating}
                   onCancel={onCancel}
                 />
               </Col>
@@ -94,7 +92,6 @@ type Props<TValues extends object> = {
   validate?: (values: TValues) => FormikErrors<TValues> | Promise<FormikErrors<TValues>>;
   description?: React.ReactNode;
   documentationLink?: { title: string; path: string };
-  disabledSubmit?: boolean;
   children: React.ReactNode;
 };
 
@@ -107,13 +104,12 @@ const CreatePage = <TValues extends object>({
   validate = undefined,
   description = undefined,
   documentationLink = undefined,
-  disabledSubmit = false,
   children,
 }: Props<TValues>) => {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const history = useHistory();
 
-  const handleCancel = () => history.push(overviewRoute);
+  const handleCancel = () => (history.length > 1 ? history.goBack() : history.push(overviewRoute));
 
   const handleSubmit = async (values: TValues) => {
     setSubmitError(null);
@@ -133,7 +129,6 @@ const CreatePage = <TValues extends object>({
         onCancel={handleCancel}
         description={description}
         documentationLink={documentationLink}
-        disabledSubmit={disabledSubmit}
         submitError={submitError}>
         {children}
       </CreatePageContent>

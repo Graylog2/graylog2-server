@@ -25,7 +25,6 @@ import ModalSubmit from 'components/common/ModalSubmit';
 type ContentProps = {
   entityName: string;
   onCancel: () => void;
-  disabledSubmit?: boolean;
   submitError: string | null;
   children: React.ReactNode;
 };
@@ -33,7 +32,6 @@ type ContentProps = {
 const CreateModalContent = ({
   entityName,
   onCancel,
-  disabledSubmit = false,
   submitError,
   children,
 }: ContentProps) => {
@@ -41,7 +39,7 @@ const CreateModalContent = ({
   const entityNameLower = entityName.toLowerCase();
 
   return (
-    <Form>
+    <Form className="form form-horizontal">
       <Modal.Header>
         <Modal.Title>Create {entityName}</Modal.Title>
       </Modal.Header>
@@ -61,7 +59,7 @@ const CreateModalContent = ({
           submitLoadingText={`Creating ${entityNameLower}...`}
           isSubmitting={isSubmitting}
           isAsyncSubmit
-          disabledSubmit={!isValid || isValidating || disabledSubmit}
+          disabledSubmit={!isValid || isValidating}
           onCancel={onCancel}
         />
       </Modal.Footer>
@@ -76,7 +74,6 @@ type Props<TValues extends object> = {
   initialValues: TValues;
   onSubmit: (values: TValues) => Promise<void>;
   validate?: (values: TValues) => FormikErrors<TValues> | Promise<FormikErrors<TValues>>;
-  disabledSubmit?: boolean;
   children: React.ReactNode;
 };
 
@@ -87,7 +84,6 @@ const CreateModal = <TValues extends object>({
   initialValues,
   onSubmit,
   validate = undefined,
-  disabledSubmit = false,
   children,
 }: Props<TValues>) => {
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -113,7 +109,6 @@ const CreateModal = <TValues extends object>({
         <CreateModalContent
           entityName={entityName}
           onCancel={onClose}
-          disabledSubmit={disabledSubmit}
           submitError={submitError}>
           {children}
         </CreateModalContent>
