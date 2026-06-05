@@ -16,27 +16,59 @@
  */
 import React, { useEffect, useRef } from 'react';
 import mermaid from 'mermaid';
-
-mermaid.initialize({ startOnLoad: false, theme: 'neutral', fontFamily: 'inherit' });
+import styled, { useTheme } from 'styled-components';
+import { Unstyled } from '@storybook/addon-docs/blocks';
 
 let _counter = 0;
 
 type Props = { chart: string };
 
+const Container = styled.div(
+  ({ theme }) => `
+    display: flex;
+    justify-content: center;
+    margin-bottom: ${theme.spacings.lg};
+
+    .label {
+      font-weight: normal;
+    }
+
+    .cluster rect {
+      stroke-dasharray: 6, 4;
+    }
+  `,
+);
+
 const Mermaid = ({ chart }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const idRef = useRef(`mermaid-${++_counter}`);
+  const theme = useTheme();
 
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
+    if (!containerRef.current) return;
+
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      fontFamily: 'inherit',
+      themeVariables: {
+        primaryColor: theme.colors.global.contentBackground,
+        primaryBorderColor: theme.colors.input.border,
+        primaryTextColor: theme.colors.text.primary,
+        lineColor: theme.colors.text.secondary,
+        edgeLabelBackground: theme.colors.global.contentBackground,
+        clusterBkg: 'transparent',
+        clusterBorder: theme.colors.input.border,
+        titleColor: theme.colors.text.primary,
+      },
+    });
 
     mermaid.render(idRef.current, chart).then(({ svg }) => {
       if (containerRef.current) containerRef.current.innerHTML = svg;
     });
-  }, [chart]);
+  }, [chart, theme]);
 
-  return <div ref={containerRef} />;
+  return <Unstyled><Container ref={containerRef} /></Unstyled>;
 };
 
 export default Mermaid;
