@@ -26,6 +26,7 @@ import { OrderedMap } from 'immutable';
 import type * as Immutable from 'immutable';
 import type { Permission } from 'graylog-web-plugin/plugin';
 import { useQuery } from '@tanstack/react-query';
+import { Formik } from 'formik';
 
 import { describeExpression } from 'util/CronUtils';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -60,6 +61,8 @@ import type { EventDefinitionValidation } from 'components/event-definitions/typ
 import type { QueryString } from 'views/logic/queries/types';
 import type { StreamsAndCategoriesSelection } from 'views/components/common/StreamsAndCategoriesFilter';
 import StreamsAndCategoriesFilter from 'views/components/common/StreamsAndCategoriesFilter';
+import WarmTierQueryValidation from 'views/components/searchbar/queryvalidation/WarmTierQueryValidation';
+import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
 
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
@@ -519,20 +522,28 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
       <h2 className={commonStyles.title}>Filter</h2>
       <p>Add information to filter the log messages that are relevant for this Event Definition.</p>
       {onlyFilters || (
-        <Input
-          id="filter-query"
-          name="query"
-          label="Search Query"
-          type="text"
-          help={
-            <span>
-              Search query that Messages should match. You can use the same syntax as in the Search page, including
-              declaring Query Parameters from Lookup Tables by using the <code>$newParameter$</code> syntax.
-            </span>
-          }
-          value={currentConfig.query ?? ''}
-          onChange={handleQueryChange}
-        />
+        <FormGroup controlId="query-string">
+          <ControlLabel>Search Query</ControlLabel>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ flex: 1 }}>
+              <Input
+                id="filter-query"
+                name="query"
+                type="text"
+                value={currentConfig.query ?? ''}
+                onChange={handleQueryChange}
+              />
+            </div>
+
+            <Formik initialValues={{ queryString: currentConfig.query ?? '' }} onSubmit={() => {}}>
+              <QueryValidation validationExplanations={[WarmTierQueryValidation]} />
+            </Formik>
+          </div>
+          <HelpBlock>
+            Search query that Messages should match. You can use the same syntax as in the Search page, including
+            declaring Query Parameters from Lookup Tables by using the <code>$newParameter$</code> syntax.
+          </HelpBlock>
+        </FormGroup>
       )}
 
       {onlyFilters || (
