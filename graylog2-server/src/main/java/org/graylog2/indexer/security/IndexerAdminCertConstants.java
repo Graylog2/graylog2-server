@@ -14,23 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import styled, { css } from 'styled-components';
+package org.graylog2.indexer.security;
 
-const TableHeaderCell = styled.th<{ $isNumeric?: boolean; $borderedHeader?: boolean }>(
-  ({ $isNumeric, $borderedHeader, theme }) => css`
-    && {
-      background-color: ${theme.colors.table.head.background};
-      min-width: 50px;
-      border: ${$borderedHeader ? `1px solid ${theme.colors.table.row.divider}` : '0'};
-      border-top: 0;
-      padding: 0 5px;
-      vertical-align: middle;
-      white-space: nowrap;
-      font-weight: normal;
-      font-size: ${theme.fonts.size.small};
-      ${$isNumeric ? 'text-align: right' : ''}
-    }
-  `,
-);
+/**
+ * Shared identity used for short-lived OpenSearch admin certificates that bypass the
+ * security plugin (see {@code plugins.security.authcz.admin_dn} on the Data Node side).
+ * Both the certificate-minting code on the server and the Data Node's OpenSearch
+ * security config must agree on this value.
+ */
+public final class IndexerAdminCertConstants {
+    public static final String ADMIN_CN = "graylog-admin";
+    public static final String ADMIN_DN = "CN=" + ADMIN_CN;
 
-export default TableHeaderCell;
+    private IndexerAdminCertConstants() {}
+}
