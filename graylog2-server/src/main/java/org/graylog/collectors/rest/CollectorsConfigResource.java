@@ -25,7 +25,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -35,17 +34,14 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog.collectors.CollectorCaService;
 import org.graylog.collectors.CollectorIngestInputService;
-import org.graylog.collectors.CollectorLogsDestinationService;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
+import org.graylog.collectors.CollectorsInitializer;
 import org.graylog.collectors.CollectorsPermissions;
 import org.graylog.collectors.FleetService;
 import org.graylog.collectors.FleetTransactionLogService;
-import org.graylog.collectors.TokenSigningKey;
 import org.graylog.collectors.db.MarkerType;
-import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -73,30 +69,24 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 public class CollectorsConfigResource extends RestResource {
     private final CollectorsConfigService collectorsConfigService;
     private final CollectorIngestInputService collectorIngestInputService;
-    private final CollectorLogsDestinationService collectorLogsDestinationService;
     private final URI httpExternalUri;
     private final FleetService fleetService;
     private final FleetTransactionLogService fleetTransactionLogService;
-    private final EnrollmentTokenService enrollmentTokenService;
-    private final CollectorCaService collectorCaService;
+    private final CollectorsInitializer collectorsInitializer;
 
     @Inject
     public CollectorsConfigResource(CollectorsConfigService collectorsConfigService,
                                     CollectorIngestInputService collectorIngestInputService,
-                                    CollectorLogsDestinationService collectorLogsDestinationService,
                                     HttpConfiguration httpConfiguration,
                                     FleetService fleetService,
                                     FleetTransactionLogService fleetTransactionLogService,
-                                    EnrollmentTokenService enrollmentTokenService,
-                                    CollectorCaService collectorCaService) {
+                                    CollectorsInitializer collectorsInitializer) {
         this.collectorsConfigService = collectorsConfigService;
         this.collectorIngestInputService = collectorIngestInputService;
-        this.collectorLogsDestinationService = collectorLogsDestinationService;
         this.httpExternalUri = httpConfiguration.getHttpExternalUri();
         this.fleetService = fleetService;
         this.fleetTransactionLogService = fleetTransactionLogService;
-        this.enrollmentTokenService = enrollmentTokenService;
-        this.collectorCaService = collectorCaService;
+        this.collectorsInitializer = collectorsInitializer;
     }
 
     @GET
@@ -140,48 +130,24 @@ public class CollectorsConfigResource extends RestResource {
     @Operation(summary = "Update collectors configuration")
     @RequiresPermissions(CollectorsPermissions.CONFIGURATION_EDIT)
     public CollectorsConfig put(@Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) CollectorsConfigRequest request) throws ValidationException {
-        validateThresholds(request);
-        collectorLogsDestinationService.ensureExists();
 
         final var existing = collectorsConfigService.get();
 
-        final Duration effectiveOffline = request.collectorOfflineThreshold() != null
-                ? request.collectorOfflineThreshold() : CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD;
-        final Duration effectiveVisibility = request.collectorDefaultVisibilityThreshold() != null
-                ? request.collectorDefaultVisibilityThreshold() : CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD;
-        final Duration effectiveExpiration = request.collectorExpirationThreshold() != null
-                ? request.collectorExpirationThreshold() : CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD;
-
-        final TokenSigningKey tokenSigningKey;
-        final CollectorCaService.CaHierarchy caHierarchy;
-        if (existing.isPresent()) {
-            tokenSigningKey = existing.get().tokenSigningKey();
-            caHierarchy = collectorCaService.loadHierarchy();
+        final CollectorsConfig config;
+        if (existing.isEmpty()) {
+            final var newConfig = request.applyTo(CollectorsConfig.builder()).build();
+            validateThresholds(newConfig);
+            config = collectorsInitializer.initialize(newConfig);
         } else {
-            caHierarchy = collectorCaService.initializeCa();
-            try {
-                tokenSigningKey = enrollmentTokenService.createTokenSigningKey();
-            } catch (Exception e) {
-                throw new InternalServerErrorException("Could not create token signing key", e);
-            }
+            config = request.applyTo(existing.get().toBuilder()).build();
+            validateThresholds(config);
         }
 
-        final var config = CollectorsConfig.builder()
-                .caCertId(caHierarchy.caCert().id())
-                .signingCertId(caHierarchy.signingCert().id())
-                .tokenSigningKey(tokenSigningKey)
-                .otlpServerCertId(caHierarchy.otlpServerCert().id())
-                .http(request.http().toConfig())
-                .collectorOfflineThreshold(effectiveOffline)
-                .collectorDefaultVisibilityThreshold(effectiveVisibility)
-                .collectorExpirationThreshold(effectiveExpiration)
-                .build();
+        collectorsConfigService.save(config);
 
         if (request.createInput()) {
             collectorIngestInputService.createInput(getSubject(), getCurrentUser().getName(), request.http().port());
         }
-
-        collectorsConfigService.save(config);
 
         // TODO: We should probably compare the existing and new config to avoid the marker for unrelated changes.
         final var fleetIds = fleetService.getAllFleetIds();
@@ -192,10 +158,10 @@ public class CollectorsConfigResource extends RestResource {
         return config;
     }
 
-    private void validateThresholds(CollectorsConfigRequest request) throws ValidationException {
-        final Duration offlineThreshold = request.collectorOfflineThreshold();
-        final Duration visibilityThreshold = request.collectorDefaultVisibilityThreshold();
-        final Duration expirationThreshold = request.collectorExpirationThreshold();
+    private void validateThresholds(CollectorsConfig config) throws ValidationException {
+        final Duration offlineThreshold = config.collectorOfflineThreshold();
+        final Duration visibilityThreshold = config.collectorDefaultVisibilityThreshold();
+        final Duration expirationThreshold = config.collectorExpirationThreshold();
         final Map<String, List<ValidationResult>> errors = new HashMap<>();
 
         if (offlineThreshold != null && (offlineThreshold.isZero() || offlineThreshold.isNegative())) {
