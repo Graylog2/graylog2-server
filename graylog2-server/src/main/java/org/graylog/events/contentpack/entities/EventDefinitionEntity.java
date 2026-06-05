@@ -67,6 +67,7 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
     private static final String MATCHED_AT = "matched_at";
     private static final String FIELD_EVENT_PROCEDURE = "event_procedure";
     private static final String FIELD_EVENT_SUMMARY_TEMPLATE = "event_summary_template";
+    private static final String FIELD_TACTICS_TECHNIQUES = EventDefinitionDto.FIELD_TACTICS_TECHNIQUES;
 
     @JsonProperty(FIELD_TITLE)
     public abstract ValueReference title();
@@ -124,6 +125,9 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
     @JsonProperty(FIELD_EVENT_SUMMARY_TEMPLATE)
     public abstract ValueReference eventSummaryTemplate();
 
+    @JsonProperty(FIELD_TACTICS_TECHNIQUES)
+    public abstract ImmutableList<String> tacticsTechniques();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -136,6 +140,7 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
         public static Builder create() {
             return new AutoValue_EventDefinitionEntity.Builder()
                     .isScheduled(ValueReference.of(true))
+                    .tacticsTechniques(ImmutableList.of())
                     .tags(ImmutableSet.of());
         }
 
@@ -190,6 +195,9 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
         @JsonProperty(FIELD_EVENT_SUMMARY_TEMPLATE)
         public abstract Builder eventSummaryTemplate(ValueReference eventSummaryTemplate);
 
+        @JsonProperty(FIELD_TACTICS_TECHNIQUES)
+        public abstract Builder tacticsTechniques(ImmutableList<String> tacticsTechniques);
+
         public abstract EventDefinitionEntity build();
     }
 
@@ -240,6 +248,7 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
                 .tags(tags())
                 .eventProcedureId(procedureId)
                 .eventSummaryTemplate(eventSummaryTemplate() != null ? eventSummaryTemplate().asString(parameters) : null)
+                .tacticsTechniques(tacticsTechniques())
                 .build();
     }
 

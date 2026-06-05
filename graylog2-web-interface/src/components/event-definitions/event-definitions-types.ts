@@ -114,6 +114,7 @@ export type EventDefinition = {
   matched_at: string;
   scheduler: Scheduler;
   event_summary_template: string;
+  tactics_techniques?: string[];
 };
 
 export type EventDefinitionFormControlsProps = {
