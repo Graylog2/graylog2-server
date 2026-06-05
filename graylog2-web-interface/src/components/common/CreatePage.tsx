@@ -109,7 +109,7 @@ const CreatePage = <TValues extends object>({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const history = useHistory();
 
-  const handleCancel = () => (history.length > 1 ? history.goBack() : history.push(overviewRoute));
+  const handleCancel = () => (window.history.length > 1 ? history.goBack() : history.push(overviewRoute));
 
   const handleSubmit = async (values: TValues) => {
     setSubmitError(null);
