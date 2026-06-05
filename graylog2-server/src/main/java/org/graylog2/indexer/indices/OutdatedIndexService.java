@@ -22,10 +22,8 @@ import com.github.zafarkhaja.semver.Version;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotNull;
-import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
-import org.graylog2.indexer.security.IndexerAdminCert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,13 +38,14 @@ public class OutdatedIndexService {
 
     private static final Logger LOG = LoggerFactory.getLogger(OutdatedIndexService.class);
 
+    private final Indices indices;
     private final IndicesAdapter indicesAdapter;
     private final IndexSetRegistry indexSetRegistry;
     private final Cluster cluster;
 
     @Inject
-    public OutdatedIndexService(@IndexerAdminCert IndicesAdapter indicesAdapter,
-                                IndexSetRegistry indexSetRegistry, Cluster cluster) {
+    public OutdatedIndexService(Indices indices, IndicesAdapter indicesAdapter, IndexSetRegistry indexSetRegistry, Cluster cluster) {
+        this.indices = indices;
         this.indicesAdapter = indicesAdapter;
         this.indexSetRegistry = indexSetRegistry;
         this.cluster = cluster;
@@ -61,19 +60,19 @@ public class OutdatedIndexService {
                         throw new IllegalStateException("Cluster version cannot be determined: " + version);
                     }
                 }).orElseThrow(() -> new IllegalStateException("Cluster version cannot be determined: null"));
-        return indicesAdapter.getOutdatedIndices(currentMajorVersion).stream()
+        return indices.getOutdatedIndices(currentMajorVersion).stream()
                 .map(index -> index.asManaged(indexSetRegistry.isManagedIndex(index.indexName())))
                 .sorted().toList();
     }
 
     public void reindex(String index, boolean withReplicas) {
-        HealthStatus sourceStatus = indicesAdapter.waitForRecovery(index, 2);
+        HealthStatus sourceStatus = indices.waitForRecovery(index, 2);
         if (sourceStatus != HealthStatus.Green) {
             throw new IllegalStateException("Index " + index + " state is not healthy: " + sourceStatus);
         }
         // get settings & mapping of source index
-        Map<String, Object> sourceSettings = indicesAdapter.getStructuredIndexSettings(index);
-        Map<String, Object> sourceMapping = indicesAdapter.getIndexMapping(index);
+        Map<String, Object> sourceSettings = indices.indexSettings(index);
+        Map<String, Object> sourceMapping = indices.indexMapping(index);
         if (sourceSettings == null) {
             throw new IllegalStateException("No index sourceSettings found for index " + index);
         }
@@ -87,45 +86,30 @@ public class OutdatedIndexService {
                 indicesAdapter.delete(tempIndex);
             }
             indicesAdapter.create(tempIndex, new IndexSettings(tempSettings), sourceMapping);
-            HealthStatus tempStatus = indicesAdapter.waitForRecovery(tempIndex);
+            HealthStatus tempStatus = indices.waitForRecovery(tempIndex);
             if (tempStatus != HealthStatus.Green) {
                 throw new IllegalStateException("Temporary index " + tempIndex + " could not be created successfully: " + tempStatus);
             }
-            reindex(index, tempIndex);
+            indices.reindex(index, tempIndex);
             // delete source index
-            indicesAdapter.refresh(tempIndex);
-            indicesAdapter.delete(index);
+            indices.refresh(tempIndex);
+            indices.delete(index);
             // recreate and reindex into source index
             indicesAdapter.create(index, new IndexSettings(cleanIndexSettings(sourceSettings, true)), sourceMapping);
             // TODO: Benchmark if creating the target index with replicas 0 and reindexing and setting replicas afterwards is better
             //  (would need an additional health check before deleting temp)
-            HealthStatus targetStatus = indicesAdapter.waitForRecovery(index);
+            HealthStatus targetStatus = indices.waitForRecovery(index);
             if (targetStatus != HealthStatus.Green) {
                 throw new IllegalStateException("Index " + index + " could not be recreated successfully: " + targetStatus);
             }
-            reindex(tempIndex, index);
-            indicesAdapter.refresh(index);
+            indices.reindex(tempIndex, index);
+            indices.refresh(index);
             // delete temp index
-            indicesAdapter.delete(tempIndex);
+            indices.delete(tempIndex);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-    }
-
-    private void reindex(String source, String target) {
-        indicesAdapter.reindex(source, target, result -> {
-            LOG.info("Reindexing index <{}> to <{}>: Bulk indexed {} messages, took {} ms, failures: {}",
-                    source,
-                    target,
-                    result,
-                    result.tookMs(),
-                    result.hasFailedItems());
-
-            if (result.hasFailedItems()) {
-                throw new ElasticsearchException("Failed to reindex a message. Check your indexer log.");
-            }
-        });
     }
 
     private Map<String, Object> cleanIndexSettings(Map<String, Object> settings, boolean withReplicas) {

@@ -21,32 +21,18 @@ import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
 import { asMock } from 'helpers/mocking';
 import { adminUser } from 'fixtures/users';
 import useCurrentUser from 'hooks/useCurrentUser';
-import useNotifications from 'components/notifications/useNotifications';
+import useNotificationBadgeCount from 'components/notifications/hooks/useNotificationBadgeCount';
 
 import NotificationBadge from './NotificationBadge';
 
 const BADGE_ID = 'notification-badge';
 
 jest.mock('hooks/useCurrentUser');
-jest.mock('components/notifications/useNotifications');
+jest.mock('components/notifications/hooks/useNotificationBadgeCount');
 
-const notificationFixture = {
-  id: 'deadbeef',
-  details: {},
-  validations: {},
-  fields: {},
-  severity: 'urgent',
-  type: 'no_input_running',
-  key: 'test',
-  timestamp: '2022-12-12T10:55:55.014Z',
-  node_id: '3fcc3889-18a3-4a0d-821c-0fd560d152e7',
-} as const;
-
-const createNotifications = (count: number) => new Array(count).fill(notificationFixture);
-
-const setNotificationCount = (count: number) =>
-  asMock(useNotifications).mockReturnValue({
-    data: { total: count, notifications: createNotifications(count) },
+const setBadgeCount = (count: number) =>
+  asMock(useNotificationBadgeCount).mockReturnValue({
+    data: count,
     isLoading: false,
   });
 
@@ -61,35 +47,34 @@ describe('NotificationBadge', () => {
       .permissions(Immutable.List(['dashboards:read']))
       .build();
     asMock(useCurrentUser).mockReturnValue(userWithoutPermissions);
-    asMock(useNotifications).mockReturnValue({ data: undefined, isLoading: false });
+    asMock(useNotificationBadgeCount).mockReturnValue({ data: undefined, isLoading: false } as never);
 
     render(<NotificationBadge />);
 
-    expect(useNotifications).toHaveBeenCalledWith({ enabled: false });
+    expect(useNotificationBadgeCount).toHaveBeenCalledWith({ enabled: false });
     expect(screen.queryByTestId(BADGE_ID)).not.toBeInTheDocument();
   });
 
-  it('renders nothing when there are no notifications', () => {
-    setNotificationCount(0);
+  it('renders nothing while loading', () => {
+    asMock(useNotificationBadgeCount).mockReturnValue({ data: undefined, isLoading: true } as never);
 
     render(<NotificationBadge />);
 
     expect(screen.queryByTestId(BADGE_ID)).not.toBeInTheDocument();
   });
 
-  it('renders count when there are notifications', async () => {
-    setNotificationCount(42);
+  it('renders count when there are unread notifications', async () => {
+    setBadgeCount(42);
 
     render(<NotificationBadge />);
 
-    await screen.findByTestId(BADGE_ID);
     const badge = await screen.findByTestId(BADGE_ID);
 
     expect(within(badge).getByText(42)).toBeInTheDocument();
   });
 
-  it('updates notification count when triggered by store', async () => {
-    setNotificationCount(42);
+  it('updates the badge count on subsequent polls', async () => {
+    setBadgeCount(42);
 
     const { rerender } = render(<NotificationBadge />);
 
@@ -97,7 +82,7 @@ describe('NotificationBadge', () => {
 
     expect(within(badgeBefore).getByText(42)).toBeInTheDocument();
 
-    setNotificationCount(23);
+    setBadgeCount(23);
 
     rerender(<NotificationBadge />);
 

@@ -20,7 +20,7 @@ import { fn } from 'storybook/test';
 import { Button } from 'components/bootstrap';
 
 const meta = {
-  title: 'Components/Bootstrap/Button',
+  title: 'Components/Buttons/Button',
   component: Button,
   parameters: {
     layout: 'centered',

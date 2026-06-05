@@ -17,7 +17,7 @@
 import * as React from 'react';
 
 import DefinitionList from 'components/common/DefinitionList';
-import TagsCell from 'components/events/TagsCell';
+import ChipsCell from 'components/common/ChipsCell';
 import useAppendTagFilter from 'components/events/useAppendTagFilter';
 
 type Props = {
@@ -33,7 +33,7 @@ const TagsDetailRow = ({ tags }: Props) => {
     <DefinitionList>
       <dt>Tags</dt>
       <dd>
-        <TagsCell tags={tags} truncate={false} onTagClick={onTagClick} />
+        <ChipsCell items={tags} truncate={false} onItemClick={onTagClick} itemLabel="tag" />
       </dd>
     </DefinitionList>
   );
