@@ -153,6 +153,7 @@ jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
   EventNotificationsActions: { listAll: jest.fn() },
   EventNotificationsStore: {
     listen: () => jest.fn(),
+    listAll: jest.fn(() => Promise.resolve({ notifications: mockEventNotifications })),
     getInitialState: () => ({
       all: mockEventNotifications,
       allLegacyTypes: [],
