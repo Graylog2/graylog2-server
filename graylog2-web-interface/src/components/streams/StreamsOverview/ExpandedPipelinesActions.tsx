@@ -14,17 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 
-// eslint-disable-next-line no-restricted-imports
-import {
-  /* 👇 no custom theme colors needed 👇 */
-  Clearfix,
-  Collapse,
-  Dropdown,
-  Form,
-  PanelGroup,
-  Radio, // NOTE: do we want custom or keep OS styles
-  /* 👆 no custom theme colors needed 👆 */
-} from 'react-bootstrap';
+import { Button } from 'components/bootstrap';
+import { IfPermitted, LinkContainer } from 'components/common';
+import Routes from 'routing/Routes';
 
-export { Clearfix, Collapse, Dropdown, Form, PanelGroup, Radio };
+const ExpandedPipelinesActions = () => (
+  <IfPermitted permissions={['pipeline:read']}>
+    <LinkContainer to={Routes.SYSTEM.PIPELINES.OVERVIEW}>
+      <Button bsStyle="link" bsSize="xsmall">
+        Manage Pipelines
+      </Button>
+    </LinkContainer>
+  </IfPermitted>
+);
+
+export default ExpandedPipelinesActions;
