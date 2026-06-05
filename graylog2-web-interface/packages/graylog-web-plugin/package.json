@@ -52,8 +52,8 @@
     "styled-components": "6.1.1",
     "typescript": "6.0.3",
     "use-query-params": "^2.2.0",
-    "webpack": "5.107.1",
-    "webpack-cli": "7.0.2",
+    "webpack": "5.107.2",
+    "webpack-cli": "7.0.3",
     "webpack-merge": "^6.0.1"
   }
 }
