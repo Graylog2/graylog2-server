@@ -97,13 +97,7 @@ const ViewEventDefinitionPage = () => {
     });
   };
 
-  const onEditEventDefinition = () => {
-    if (eventDefinition.config.type === 'sigma-v1') {
-      setShowSigmaModal(true);
-    } else {
-      navigate(Routes.ALERTS.DEFINITIONS.edit(params.definitionId));
-    }
-  };
+  const onEditEventDefinition = () => navigate(Routes.ALERTS.DEFINITIONS.edit(params.definitionId));
 
   const onSigmaModalClose = () => {
     queryClient.invalidateQueries({ queryKey: ['get-event-definition', params.definitionId] });

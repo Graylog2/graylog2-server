@@ -31,7 +31,6 @@ import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import { MoreActions } from 'components/common/EntityDataTable';
-import usePluginEntities from 'hooks/usePluginEntities';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 import usePluggableEntitySharedActions from 'hooks/usePluggableEntitySharedActions';
 
@@ -41,10 +40,6 @@ import {
   isSystemEventDefinition,
   isSigmaEventDefinition,
 } from '../event-definitions-types';
-
-type SigmaEventDefinitionConfig = EventDefinition['config'] & {
-  sigma_rule_id: string;
-};
 
 type Props = {
   eventDefinition: EventDefinition;
@@ -84,7 +79,6 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
   const [showDialog, setShowDialog] = useState(false);
   const [dialogType, setDialogType] = useState(null);
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
-  const [showSigmaModal, setShowSigmaModal] = useState(false);
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
   const navigate = useNavigate();
@@ -101,14 +95,6 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
 
     return undefined;
   };
-
-  const pluggableSigmaModal = usePluginEntities('eventDefinitions.components.editSigmaModal').find(
-    (entity: { key: string }) => entity.key === 'coreSigmaModal',
-  );
-
-  const CoreSigmaModal = pluggableSigmaModal
-    ? (pluggableSigmaModal.component as React.FC<{ ruleId: string; onCancel: () => void; onConfirm: () => void }>)
-    : null;
 
   const updateState = ({ show, type, definition }) => {
     setShowDialog(show);
@@ -229,18 +215,7 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
     }
   };
 
-  const onEditEventDefinition = () => {
-    if (isSigmaEventDefinition(eventDefinition)) {
-      setShowSigmaModal(true);
-    } else {
-      navigate(Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id));
-    }
-  };
-
-  const onSigmaModalClose = () => {
-    refetchEventDefinitions();
-    setShowSigmaModal(false);
-  };
+  const onEditEventDefinition = () => navigate(Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id));
 
   const isEnabled = eventDefinition?.state === 'ENABLED';
 
@@ -331,13 +306,6 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
           entityTitle={eventDefinition.title}
           description="Search for a User or Team to add as collaborator on this event definition."
           onClose={() => setShowEntityShareModal(false)}
-        />
-      )}
-      {showSigmaModal && CoreSigmaModal && (
-        <CoreSigmaModal
-          ruleId={(eventDefinition.config as SigmaEventDefinitionConfig).sigma_rule_id}
-          onCancel={onSigmaModalClose}
-          onConfirm={onSigmaModalClose}
         />
       )}
       {pluggableActionModals}
