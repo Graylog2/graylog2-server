@@ -22,6 +22,7 @@ import ProcessingTimelineComponent from 'components/pipelines/ProcessingTimeline
 import DocsHelper from 'util/DocsHelper';
 import PipelinesPageNavigation from 'components/pipelines/PipelinesPageNavigation';
 import CreateButton from 'components/common/CreateButton';
+import { ProcessingLoadDebugMetricsBanner, ProcessingLoadProvider } from 'components/pipelines/processing-load';
 
 const PipelinesOverviewPage = () => (
   <DocumentTitle title="Pipelines">
@@ -40,7 +41,10 @@ const PipelinesOverviewPage = () => (
     </PageHeader>
     <Row className="content">
       <Col md={12}>
-        <ProcessingTimelineComponent />
+        <ProcessingLoadProvider>
+          <ProcessingLoadDebugMetricsBanner />
+          <ProcessingTimelineComponent />
+        </ProcessingLoadProvider>
       </Col>
     </Row>
   </DocumentTitle>

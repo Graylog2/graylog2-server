@@ -239,6 +239,7 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
             streamCategories={streamCategories}
             parameterBindings={parameterBindings}
             parameters={parameters}
+            filters={widget.filters}
           />
         </IfDashboard>
         <ExtraMenuWidgetActions widget={widget} />

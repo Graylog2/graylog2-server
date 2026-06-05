@@ -35,11 +35,7 @@ type Props = {
   root: HealthFeature;
 };
 
-const useExpansionCascade = (
-  tree: ReturnType<typeof useTree>,
-  lookup: Record<string, HealthNode>,
-  rootId: string,
-) => {
+const useExpansionCascade = (tree: ReturnType<typeof useTree>, lookup: Record<string, HealthNode>, rootId: string) => {
   const previousExpandedRef = useRef<Record<string, boolean>>(tree.expandedState);
 
   useEffect(() => {

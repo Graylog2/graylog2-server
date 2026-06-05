@@ -189,7 +189,8 @@ public class EventDefinitionsResourceTest {
 
         TestEventDefinitionsResource(Subject subject) {
             super(dbService, eventDefinitionHandler, contextService, engine, recentActivityService,
-                    auditEventSender, objectMapper, new DefaultEventResolver(), new EventDefinitionConfiguration(), entitySharesService);
+                    auditEventSender, objectMapper, new DefaultEventResolver(), new EventDefinitionConfiguration(),
+                    entitySharesService, new org.graylog.events.processor.TacticsTechniquesValidator.NoOp());
             this.subject = subject;
         }
 

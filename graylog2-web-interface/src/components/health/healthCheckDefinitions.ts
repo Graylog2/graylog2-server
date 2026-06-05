@@ -48,8 +48,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
     entityList: { url: Routes.SYSTEM.CLUSTER.NODES, label: 'Graylog nodes' },
   },
   'graylog.input': {
-    description:
-      'Health of message ingest — whether configured inputs are open and accepting data from their sources.',
+    description: 'Health of message ingest — whether configured inputs are open and accepting data from their sources.',
     entityList: { url: Routes.SYSTEM.INPUTS, label: 'inputs' },
   },
   'graylog.processing': {
@@ -75,8 +74,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'Health of third-party integrations Graylog relies on for authentication, notifications, and external service calls.',
   },
   search_cluster: {
-    description:
-      'The search backend (OpenSearch or Elasticsearch) where Graylog stores and queries indexed messages.',
+    description: 'The search backend (OpenSearch or Elasticsearch) where Graylog stores and queries indexed messages.',
   },
   'search_cluster.server': {
     description: 'Operational health of each individual node in the search cluster.',
@@ -91,8 +89,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
     entityList: { url: Routes.SYSTEM.CLUSTER.NODES, label: 'MongoDB nodes' },
   },
   forwarders: {
-    description:
-      'The forwarder agents that ship messages to Graylog from remote sites or restricted networks.',
+    description: 'The forwarder agents that ship messages to Graylog from remote sites or restricted networks.',
     meaning:
       'One or more forwarders are not connected, falling behind, or reporting errors. Messages from sites pointed at affected forwarders are queued locally and may be lost if their buffer fills.',
     commonCauses: [
@@ -118,7 +115,8 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
     entityList: { url: Routes.SYSTEM.SIDECARS.OVERVIEW, label: 'collectors' },
   },
   'graylog.server.storage': {
-    description: 'Disk usage on each Graylog server node, typically the partition holding the message journal and logs.',
+    description:
+      'Disk usage on each Graylog server node, typically the partition holding the message journal and logs.',
     meaning:
       'Disk usage on one or more Graylog nodes is approaching or has reached its limit. If the partition fills, the journal can no longer accept new messages and ingestion stops.',
     commonCauses: [
@@ -126,8 +124,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'Application or system logs accumulating without rotation.',
       'A leftover snapshot, archive, or temp file consuming the partition.',
     ],
-    recommendedAction:
-      'Open the affected node to inspect disk usage, journal size, and log retention configuration.',
+    recommendedAction: 'Open the affected node to inspect disk usage, journal size, and log retention configuration.',
   },
   'graylog.server.cpu': {
     description: 'Per-node CPU utilization across the Graylog server cluster.',
@@ -166,8 +163,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'Open the affected node to verify each TLS surface (HTTPS/API and TLS-enabled inputs) and rotate certificates as needed.',
   },
   'graylog.server.processing_state': {
-    description:
-      'Whether each Graylog node is actively processing messages or has been paused/halted.',
+    description: 'Whether each Graylog node is actively processing messages or has been paused/halted.',
     meaning:
       'One or more Graylog nodes have stopped processing messages. Cluster throughput may degrade and the affected nodes’ journals will start to fill.',
     commonCauses: [
@@ -188,8 +184,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'override_lb_status was set manually via the API.',
       'A lifecycle transition or journal-utilization throttling reduced the node’s LB status.',
     ],
-    recommendedAction:
-      'Open the affected node to verify its lifecycle state and any manual lb_status override.',
+    recommendedAction: 'Open the affected node to verify its lifecycle state and any manual lb_status override.',
   },
   'graylog.input.input_buffer': {
     description: 'The in-memory queue holding messages just received by inputs, before they enter processing.',
@@ -200,11 +195,11 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'A bottleneck downstream (processing buffer, journal, or output) is causing backpressure.',
       'A burst in ingestion rate exceeding sustained capacity.',
     ],
-    recommendedAction:
-      'Open the affected node to check processing state and downstream buffer / journal usage.',
+    recommendedAction: 'Open the affected node to check processing state and downstream buffer / journal usage.',
   },
   'graylog.input.input_failures': {
-    description: 'Configured inputs that are currently failing — not running, not accepting connections, or repeatedly crashing.',
+    description:
+      'Configured inputs that are currently failing — not running, not accepting connections, or repeatedly crashing.',
     meaning:
       'One or more configured inputs are not running and are not accepting messages. Affected inputs may stop ingesting data; sources without retry/buffering may lose messages.',
     commonCauses: [
@@ -212,11 +207,11 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'TLS certificate or authentication misconfiguration.',
       'An unhandled exception in the input plugin (visible in node logs).',
     ],
-    recommendedAction:
-      'Open the inputs page to inspect the failed inputs and review their error messages.',
+    recommendedAction: 'Open the inputs page to inspect the failed inputs and review their error messages.',
   },
   'graylog.processing.processing_buffer': {
-    description: 'The in-memory queue between ingest and output holding messages waiting to be processed by extractors, stream rules, and pipelines.',
+    description:
+      'The in-memory queue between ingest and output holding messages waiting to be processed by extractors, stream rules, and pipelines.',
     meaning:
       'Messages are accumulating in the processing buffer faster than they can be enriched and routed. Backpressure may propagate upstream to the input buffer and journal.',
     commonCauses: [
@@ -224,8 +219,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'Output backpressure from the search cluster slowing the entire pipeline.',
       'Sustained ingest above the node’s processing capacity.',
     ],
-    recommendedAction:
-      'Open the affected node to inspect pipeline/extractor performance and downstream output health.',
+    recommendedAction: 'Open the affected node to inspect pipeline/extractor performance and downstream output health.',
   },
   'graylog.processing.journal_size': {
     description: 'The on-disk message journal that provides a durable buffer when processing slows down or pauses.',
@@ -240,7 +234,8 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'Open the affected node to check processing state, downstream indexing health, and pipeline performance.',
   },
   'graylog.output.output_buffer': {
-    description: 'The in-memory queue holding processed messages waiting to be written to storage or external destinations.',
+    description:
+      'The in-memory queue holding processed messages waiting to be written to storage or external destinations.',
     meaning:
       'Processed messages are queueing up faster than the configured outputs can deliver them. If the buffer fills, processing backs up and ingest may eventually stall.',
     commonCauses: [
@@ -248,8 +243,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'An external output (Kafka, AMQP, HTTP) is unavailable or rate-limited.',
       'Network latency between the Graylog node and its outputs.',
     ],
-    recommendedAction:
-      'Open the affected node and inspect search cluster health and any configured external outputs.',
+    recommendedAction: 'Open the affected node and inspect search cluster health and any configured external outputs.',
     entityList: { url: Routes.SYSTEM.CLUSTER.NODES, label: 'Graylog nodes' },
   },
   'graylog.output.report_generation': {
@@ -261,8 +255,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'The rendering process timed out or ran out of memory.',
       'Email/SMTP delivery failed for the generated report.',
     ],
-    recommendedAction:
-      'Open the reports page to inspect each failed report and review its job logs.',
+    recommendedAction: 'Open the reports page to inspect each failed report and review its job logs.',
     entityList: { url: EnterpriseRoutes.REPORTS, label: 'reports' },
   },
   'graylog.archiving.archive_failures': {
@@ -274,8 +267,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'Credentials or permissions for the archive backend are invalid.',
       'A specific index could not be read due to corruption or shard issues.',
     ],
-    recommendedAction:
-      'Open the archives page to inspect failed archive jobs and the configured backend.',
+    recommendedAction: 'Open the archives page to inspect failed archive jobs and the configured backend.',
   },
   'graylog.data_lake.connectivity': {
     description: 'The connection between Graylog and the configured Data Lake backend.',
@@ -286,11 +278,11 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'Credentials for the Data Lake backend are invalid or expired.',
       'A network firewall or proxy is blocking the connection.',
     ],
-    recommendedAction:
-      'Open the Data Lake page to verify the backend configuration and connectivity.',
+    recommendedAction: 'Open the Data Lake page to verify the backend configuration and connectivity.',
   },
   'graylog.data_lake.message_drops': {
-    description: 'Messages lost or dropped before reaching the Data Lake, typically due to backpressure or storage errors.',
+    description:
+      'Messages lost or dropped before reaching the Data Lake, typically due to backpressure or storage errors.',
     meaning:
       'Some messages were dropped before being written to the Data Lake. Data has been lost and cannot be recovered unless the source replays it.',
     commonCauses: [
@@ -298,8 +290,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'Transient storage errors (5xx responses) from the object store.',
       'A queue between the pipeline and the Data Lake exceeded its configured limit.',
     ],
-    recommendedAction:
-      'Open the Data Lake page to inspect recent write errors and the configured backend.',
+    recommendedAction: 'Open the Data Lake page to inspect recent write errors and the configured backend.',
   },
   'graylog.integrations.idp_sync': {
     description: 'Synchronization with the configured identity provider for users, groups, and role mappings.',
@@ -323,8 +314,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'SMTP credentials are invalid or have expired.',
       'TLS handshake with the SMTP host is failing.',
     ],
-    recommendedAction:
-      'Open the configurations page to verify the SMTP transport settings and test connectivity.',
+    recommendedAction: 'Open the configurations page to verify the SMTP transport settings and test connectivity.',
     entityList: { url: Routes.SYSTEM.CONFIGURATIONS, label: 'configurations' },
   },
   'search_cluster.server.storage': {
@@ -336,8 +326,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'A spike in ingestion volume that hasn’t been compensated for.',
       'Old or orphaned indices were not deleted as expected.',
     ],
-    recommendedAction:
-      'Open the search nodes page to inspect per-node disk usage and review retention configuration.',
+    recommendedAction: 'Open the search nodes page to inspect per-node disk usage and review retention configuration.',
   },
   'search_cluster.server.cpu': {
     description: 'Per-node CPU utilization across the search cluster.',
@@ -360,8 +349,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'A specific aggregation, fielddata, or shard size is consuming excessive heap.',
       'System memory is undersized — leaving too little room for the OS file cache.',
     ],
-    recommendedAction:
-      'Open the search nodes page to inspect heap usage, fielddata, and host-level memory.',
+    recommendedAction: 'Open the search nodes page to inspect heap usage, fielddata, and host-level memory.',
   },
   'search_cluster.server.certificates': {
     description: "Certificate validity for the search cluster's TLS surfaces (transport, REST API, mTLS to Graylog).",
@@ -372,8 +360,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'A renewal job (data-node mTLS, transport CA) failed or has not run.',
       'The certificate inspection endpoint timed out or returned an error.',
     ],
-    recommendedAction:
-      'Open the search nodes page to verify each TLS surface and rotate certificates as needed.',
+    recommendedAction: 'Open the search nodes page to verify each TLS surface and rotate certificates as needed.',
   },
   'search_cluster.server.state': {
     description: 'Whether each node is up and reachable, and whether the cluster as a whole has a healthy quorum.',
@@ -384,8 +371,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'A network partition between cluster nodes.',
       'Insufficient master-eligible nodes online to form a quorum.',
     ],
-    recommendedAction:
-      'Open the search nodes page to inspect each node’s state and recent cluster events.',
+    recommendedAction: 'Open the search nodes page to inspect each node’s state and recent cluster events.',
   },
   'search_cluster.index_management.rotation': {
     description: 'Whether indices are rotating when the configured rotation threshold is met (size, time, or count).',
@@ -396,8 +382,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'A previous rotation job failed and was not retried.',
       'Cluster pressure (disk, memory, shard count) is preventing new index creation.',
     ],
-    recommendedAction:
-      'Open the indices page to inspect the affected index set and its rotation strategy.',
+    recommendedAction: 'Open the indices page to inspect the affected index set and its rotation strategy.',
   },
   'search_cluster.index_management.retention_delete': {
     description: 'Whether old indices are being deleted on schedule per the retention policy.',
@@ -408,8 +393,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'Old indices are locked open by a snapshot, archive, or close operation.',
       'A retention deletion job failed and has not been retried.',
     ],
-    recommendedAction:
-      'Open the indices page to inspect the affected index set and its retention configuration.',
+    recommendedAction: 'Open the indices page to inspect the affected index set and its retention configuration.',
   },
   'search_cluster.index_management.warm_tier_move': {
     description: 'Whether indices are being demoted to warm-tier storage per the data tiering configuration.',
@@ -419,11 +403,11 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'A previous tier-move job failed and was not retried.',
       'The warm storage repository is unreachable, full, or misconfigured.',
     ],
-    recommendedAction:
-      'Open the indices page to inspect the affected index sets and the warm-tier configuration.',
+    recommendedAction: 'Open the indices page to inspect the affected index sets and the warm-tier configuration.',
   },
   'search_cluster.index_management.shard_count': {
-    description: 'The total number of shards on the cluster relative to recommended limits — too many shards degrade performance.',
+    description:
+      'The total number of shards on the cluster relative to recommended limits — too many shards degrade performance.',
     meaning:
       'The total shard count is above the recommended limit for the cluster size. Each shard consumes memory and metadata overhead; excess shards slow searches and increase recovery time.',
     commonCauses: [
@@ -455,8 +439,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'The previous primary became unreachable and a new one has not yet been elected.',
       'Insufficient voting members are online.',
     ],
-    recommendedAction:
-      'Open the cluster page to inspect each MongoDB node’s state and replication health.',
+    recommendedAction: 'Open the cluster page to inspect each MongoDB node’s state and replication health.',
   },
   'mongodb.slow_queries': {
     description: 'Queries against MongoDB taking longer than the configured slow-query threshold.',
@@ -467,8 +450,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'A node is under CPU, memory, or disk-IO pressure.',
       'A specific collection (e.g. system messages) has grown beyond reasonable size.',
     ],
-    recommendedAction:
-      'Open the cluster page to inspect MongoDB node health and review slow-query logs.',
+    recommendedAction: 'Open the cluster page to inspect MongoDB node health and review slow-query logs.',
   },
   'mongodb.storage': {
     description: 'Disk usage on each MongoDB node holding the database files.',
@@ -478,8 +460,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'Large collections (system messages, audit logs), oplog growth, indexes, or fragmentation.',
       'Other processes on the host competing for disk space.',
     ],
-    recommendedAction:
-      'Open the cluster page to inspect MongoDB disk usage and collection sizes.',
+    recommendedAction: 'Open the cluster page to inspect MongoDB disk usage and collection sizes.',
   },
 };
 
