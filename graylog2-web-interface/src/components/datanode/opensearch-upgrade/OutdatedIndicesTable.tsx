@@ -286,8 +286,8 @@ const OutdatedIndicesTable = () => {
       }
 
       if (confirmedAction.action === 'reindex-system-index') {
-        // TODO
-        UserNotification.warning('Reindexing system indices is not available yet.');
+        await IndexerIndices.reindex(confirmedAction.index.index_name);
+        UserNotification.success(`Index "${confirmedAction.index.index_name}" was reindexed.`);
       }
 
       await refetch();
