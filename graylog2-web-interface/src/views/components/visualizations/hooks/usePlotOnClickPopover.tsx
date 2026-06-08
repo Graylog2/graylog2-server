@@ -30,6 +30,7 @@ import PieOnClickPopoverDropdown from 'views/components/visualizations/OnClickPo
 import SankeyOnClickPopover from 'views/components/visualizations/OnClickPopover/SankeyOnClickPopover';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { CANDIDATE_PICK_RADIUS } from 'views/components/visualizations/Constants';
+import { SANKEY_VISUALIZATION_TYPE } from 'views/components/visualizations/sankey/Constants';
 import DropdownSwitcher from 'views/components/visualizations/OnClickPopover/DropdownSwitcher';
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
@@ -372,7 +373,7 @@ const makeScatterAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): Anchor | n
   return { rel, el, pt, pointsInRadius };
 };
 
-type ChartType = 'bar' | 'scatter' | 'pie' | 'heatmap' | 'sankey';
+type ChartType = 'bar' | 'scatter' | 'pie' | 'heatmap' | typeof SANKEY_VISUALIZATION_TYPE;
 
 const popoverComponent = (chartType: ChartType) => {
   switch (chartType) {
@@ -421,7 +422,7 @@ const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetCo
     if (!gd) return;
     let a: Anchor | null;
     if (chartType === 'scatter') a = makeScatterAnchor(e, gd);
-    else if (chartType === 'sankey') a = makeSankeyAnchor(e, gd);
+    else if (chartType === SANKEY_VISUALIZATION_TYPE) a = makeSankeyAnchor(e, gd);
     else a = makeElementAnchor(e, gd, chartType);
     if (!a) return;
     setAnchor((prev) => {
@@ -448,7 +449,7 @@ const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetCo
       onPopoverChange={onPopoverChange}
       ref={refs.setFloating}
       style={floatingStyles}>
-      {chartType === 'sankey' && anchor ? (
+      {chartType === SANKEY_VISUALIZATION_TYPE && anchor ? (
         <SankeyOnClickPopover
           // Remount per anchor so internal selection state resets when the user clicks a different element.
           key={sankeyAnchorKey(anchor)}
