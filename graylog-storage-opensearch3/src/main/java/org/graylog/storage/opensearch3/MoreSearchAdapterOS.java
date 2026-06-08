@@ -21,6 +21,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.EventProcessorException;
+import org.graylog.events.search.MitreBackwardsCompatibilityFilter;
 import org.graylog.events.search.MoreSearch;
 import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.events.search.SourceStreamFilter;
@@ -164,7 +165,17 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
         boolQuery.filter(timerangeQuery(timerange));
 
 
-        extraFilters.forEach((field, values) -> {
+        final BoolQuery.Builder mitreOr = BoolQuery.builder().minimumShouldMatch("1");
+        if (MitreBackwardsCompatibilityFilter.emitShouldClauses(extraFilters,
+                (k, v) -> mitreOr.should(buildExtraFilter(k, v)))) {
+            boolQuery.filter(Query.of(b -> b.bool(mitreOr.build())));
+        }
+
+        extraFilters.entrySet().stream()
+                .filter(e -> !MitreBackwardsCompatibilityFilter.isMitreKey(e.getKey()))
+                .forEach(e -> {
+            final var field = e.getKey();
+            final var values = e.getValue();
             values.stream()
                     .filter(MoreSearchAdapter::isRangeValue)
                     .map(value -> buildExtraFilter(field, value))
