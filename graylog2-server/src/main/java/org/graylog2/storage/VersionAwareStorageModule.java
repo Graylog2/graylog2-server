@@ -43,8 +43,10 @@ import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.searches.SearchesAdapter;
+import org.graylog2.indexer.security.IndexerAdminCert;
 import org.graylog2.indexer.security.SecurityAdapter;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
+import org.graylog2.storage.providers.AdminIndicesAdapterProvider;
 import org.graylog2.storage.providers.ClusterAdapterProvider;
 import org.graylog2.storage.providers.CountsAdapterProvider;
 import org.graylog2.storage.providers.DataStreamAdapterProvider;
@@ -79,6 +81,7 @@ public class VersionAwareStorageModule extends AbstractModule {
         bind(StreamsForFieldRetriever.class).toProvider(StreamsForFieldRetrieverProvider.class);
         bind(CountsAdapter.class).toProvider(CountsAdapterProvider.class);
         bind(IndicesAdapter.class).toProvider(IndicesAdapterProvider.class);
+        bind(IndicesAdapter.class).annotatedWith(IndexerAdminCert.class).toProvider(AdminIndicesAdapterProvider.class);
         bind(DataStreamAdapter.class).toProvider(DataStreamAdapterProvider.class);
         bind(SecurityAdapter.class).toProvider(SecurityAdapterProvider.class);
         bind(SearchesAdapter.class).toProvider(SearchesAdapterProvider.class);
