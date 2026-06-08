@@ -23,15 +23,15 @@ import {Spinner} from 'components/common';
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import {TELEMETRY_EVENT_TYPE} from 'logic/telemetry/Constants';
+import type {CollectorStats} from 'components/collectors/types';
 
 import FleetCardsGrid from './FleetCardsGrid';
 import RecentActivity from './RecentActivity';
+import FirstOnboarding from './FirstOnboarding';
 
 import {useCollectorStats, useFleetsBulkStats} from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import StatCard, {type Variant as StatCardVariant} from '../common/StatCard';
-import {CollectorStats} from 'components/collectors/types';
-import FirstOnboarding from './FirstOnboarding';
 
 const StatsRow = styled.div(
   ({theme}) => css`
