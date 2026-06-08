@@ -20,7 +20,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
 import upperFirst from 'lodash/upperFirst';
 
-import { ColorPickerPopover, FormSubmit, Select, SourceCodeEditor } from 'components/common';
+import { ColorPickerPopover, FormSubmit, InputDescription, Select, SourceCodeEditor } from 'components/common';
 import { Button, Col, ControlLabel, FormControl, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
@@ -260,10 +260,10 @@ const ConfigurationForm = ({
       return (
         <>
           <FormControl.Static>{_formatCollector(collector)}</FormControl.Static>
-          <HelpBlock bsClass="warning">
-            <b>Note:</b> Log Collector cannot change while the Configuration is in use. Clone the Configuration to test
-            it using another Collector.
-          </HelpBlock>
+          <InputDescription
+            error="Log Collector cannot change while the Configuration is in use. Clone the Configuration to test
+            it using another Collector."
+          />
         </>
       );
     }
