@@ -36,22 +36,27 @@ public class SidecarPluginConfiguration implements PluginConfigBean {
     private String user = "graylog-sidecar";
 
     @Documentation("Directory holding the Linux collector binaries from the Sidecar package; used for the default " +
-            "collector executable paths. Set it to match the installed packages.")
+            "collector executable paths. Set it to match the installed packages. Applied only when the default " +
+            "collectors are first created; existing collectors keep their " +
+            "executable paths.")
     @Parameter(value = PREFIX + "collector_binary_dir", validator = StringNotEmptyValidator.class)
     private String collectorBinaryDir = "/usr/lib/graylog-sidecar";
 
     @Documentation("Default Linux collector spool directory; used as the spoolDir fallback in the default collector " +
-            "configurations. Set it to match the installed packages.")
+            "configurations. Set it to match the installed packages. Applied when the default configurations are " +
+            "first created.")
     @Parameter(value = PREFIX + "spool_dir", validator = StringNotEmptyValidator.class)
     private String spoolDir = "/var/lib/graylog-sidecar";
 
     @Documentation("Windows Sidecar installation directory; used for the default Windows executable paths and spoolDir " +
-            "fallbacks. Set it to match the installed packages.")
+            "fallbacks. Set it to match the installed packages. Applied when the default collectors are first " +
+            "created; existing collectors keep their executable paths.")
     @Parameter(value = PREFIX + "windows_install_dir", validator = StringNotEmptyValidator.class)
     private String windowsInstallDir = "C:\\Program Files\\Graylog\\sidecar";
 
     @Documentation("Server configuration directory monitored by the default auditbeat file-integrity config. Override " +
-            "it for custom or relocated server installations.")
+            "it for custom or relocated server installations. Applied when the default configuration is first " +
+            "created.")
     @Parameter(value = PREFIX + "server_config_dir", validator = StringNotEmptyValidator.class)
     private String serverConfigDir = "/etc/graylog/server";
 
