@@ -16,12 +16,12 @@
  */
 
 import * as React from 'react';
-import { useMemo, useContext } from 'react';
+import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
 import type { ColumnSchema } from 'components/common/EntityDataTable';
 import type { SlicingPreferences } from 'components/common/EntityDataTable/types';
-import TableFetchContext from 'components/common/PaginatedEntityTable/TableFetchContext';
+import useTableFilterContext from 'components/common/PaginatedEntityTable/useTableFilterContext';
 
 import SliceHeaderControls from './SliceHeaderControls';
 import { DEFAULT_SORT_OPTIONS } from './SliceFilters';
@@ -73,7 +73,7 @@ const Slicing = ({
 }: Props) => {
   const {
     searchParams: { sliceCol, slice: activeSlice },
-  } = useContext(TableFetchContext);
+  } = useTableFilterContext();
   const activeColumn = columnSchemas.find(({ id }) => id === sliceCol);
   const sortOptions = useMemo(
     () => [
