@@ -41,7 +41,9 @@ import org.graylog.collectors.CollectorsInitializer;
 import org.graylog.collectors.CollectorsPermissions;
 import org.graylog.collectors.FleetService;
 import org.graylog.collectors.FleetTransactionLogService;
+import org.graylog.collectors.IngestEndpointConfig;
 import org.graylog.collectors.db.MarkerType;
+import org.graylog2.Configuration;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -49,6 +51,8 @@ import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.validators.ValidationResult;
 import org.graylog2.rest.RestTools;
+import org.graylog2.shared.rest.HideOnCloud;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import java.net.URI;
@@ -61,11 +65,19 @@ import java.util.Map;
 import static org.apache.commons.lang3.time.DurationFormatUtils.formatDurationWords;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
+/**
+ * Manages the collector ingest configuration. Bound in both on-prem and Cloud nodes; the only behavioral difference is
+ * that in Cloud the ingest endpoint is server-provisioned (the client-supplied {@code http} is ignored and derived from
+ * the node's external URI) and there is no persisted ingest input — so the input-management endpoints are
+ * {@link HideOnCloud hidden in Cloud} and {@code PUT} never creates an input. The in-memory ingest input is launched in
+ * Cloud by {@code CloudCollectorIngestService}, activated by the config save below.
+ */
 @Tag(name = "Collectors/Config", description = "Managed collector configuration")
 @Path("/collectors/config")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
+@PublicCloudAPI
 public class CollectorsConfigResource extends RestResource {
     private final CollectorsConfigService collectorsConfigService;
     private final CollectorIngestInputService collectorIngestInputService;
@@ -73,6 +85,7 @@ public class CollectorsConfigResource extends RestResource {
     private final FleetService fleetService;
     private final FleetTransactionLogService fleetTransactionLogService;
     private final CollectorsInitializer collectorsInitializer;
+    private final boolean isCloud;
 
     @Inject
     public CollectorsConfigResource(CollectorsConfigService collectorsConfigService,
@@ -80,23 +93,23 @@ public class CollectorsConfigResource extends RestResource {
                                     HttpConfiguration httpConfiguration,
                                     FleetService fleetService,
                                     FleetTransactionLogService fleetTransactionLogService,
-                                    CollectorsInitializer collectorsInitializer) {
+                                    CollectorsInitializer collectorsInitializer,
+                                    Configuration configuration) {
         this.collectorsConfigService = collectorsConfigService;
         this.collectorIngestInputService = collectorIngestInputService;
         this.httpExternalUri = httpConfiguration.getHttpExternalUri();
         this.fleetService = fleetService;
         this.fleetTransactionLogService = fleetTransactionLogService;
         this.collectorsInitializer = collectorsInitializer;
+        this.isCloud = configuration.isCloud();
     }
 
     @GET
     @Operation(summary = "Get collectors configuration")
     @RequiresPermissions(CollectorsPermissions.CONFIGURATION_READ)
     public CollectorsConfig get(@Context ContainerRequestContext requestContext) {
-        return collectorsConfigService.get().orElseGet(() -> {
-            final var hostname = RestTools.buildExternalUri(requestContext.getHeaders(), httpExternalUri).getHost();
-            return CollectorsConfig.createDefault(hostname);
-        });
+        return collectorsConfigService.get()
+                .orElseGet(() -> CollectorsConfig.createDefault(derivedHostname(requestContext)));
     }
 
     // Separate endpoint so the UI can check input existence without needing read permission on each input.
@@ -107,6 +120,7 @@ public class CollectorsConfigResource extends RestResource {
     @Path("/inputs")
     @Operation(summary = "Get collector ingest input IDs")
     @RequiresPermissions(CollectorsPermissions.CONFIGURATION_READ)
+    @HideOnCloud
     public CollectorInputIdsResponse getInputIds() {
         return new CollectorInputIdsResponse(collectorIngestInputService.getInputIds());
     }
@@ -118,6 +132,7 @@ public class CollectorsConfigResource extends RestResource {
     // Input permissions are checked inline in CollectorIngestInputService#createInput. Collectors config is not
     // altered, only read in this process.
     @RequiresPermissions(CollectorsPermissions.CONFIGURATION_READ)
+    @HideOnCloud
     public CollectorInputIdsResponse createInput() throws ValidationException {
         final var config = collectorsConfigService.get()
                 .orElseThrow(() -> new BadRequestException("Collectors config has not been initialized yet"));
@@ -129,23 +144,35 @@ public class CollectorsConfigResource extends RestResource {
     @PUT
     @Operation(summary = "Update collectors configuration")
     @RequiresPermissions(CollectorsPermissions.CONFIGURATION_EDIT)
-    public CollectorsConfig put(@Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) CollectorsConfigRequest request) throws ValidationException {
+    public CollectorsConfig put(@Context ContainerRequestContext requestContext,
+                                @Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) CollectorsConfigRequest request) throws ValidationException {
 
         final var existing = collectorsConfigService.get();
 
         final CollectorsConfig config;
         if (existing.isEmpty()) {
-            final var newConfig = request.applyTo(CollectorsConfig.builder()).build();
+            final var builder = request.applyTo(CollectorsConfig.builder());
+            if (isCloud) {
+                // The ingest endpoint is server-provisioned in Cloud; ignore any client-supplied hostname/port.
+                builder.http(new IngestEndpointConfig(derivedHostname(requestContext), CollectorsConfig.DEFAULT_HTTP_PORT));
+            }
+            final var newConfig = builder.build();
             validateThresholds(newConfig);
             config = collectorsInitializer.initialize(newConfig);
         } else {
-            config = request.applyTo(existing.get().toBuilder()).build();
+            final var builder = request.applyTo(existing.get().toBuilder());
+            if (isCloud) {
+                // Keep the server-provisioned endpoint; thresholds are the only thing a Cloud tenant may change.
+                builder.http(existing.get().http());
+            }
+            config = builder.build();
             validateThresholds(config);
         }
 
         collectorsConfigService.save(config);
 
-        if (request.createInput()) {
+        // No persisted ingest input exists in Cloud — the input is launched in-memory by CloudCollectorIngestService.
+        if (!isCloud && request.createInput()) {
             collectorIngestInputService.createInput(getSubject(), getCurrentUser().getName(), request.http().port());
         }
 
@@ -156,6 +183,10 @@ public class CollectorsConfigResource extends RestResource {
         }
 
         return config;
+    }
+
+    private String derivedHostname(ContainerRequestContext requestContext) {
+        return RestTools.buildExternalUri(requestContext.getHeaders(), httpExternalUri).getHost();
     }
 
     private void validateThresholds(CollectorsConfig config) throws ValidationException {

@@ -29,6 +29,7 @@ import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.IngestEndpointConfig;
 import org.graylog.collectors.TokenSigningKey;
 import org.graylog.collectors.db.MarkerType;
+import org.graylog2.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.validators.ValidationResult;
@@ -76,19 +77,27 @@ class CollectorsConfigResourceTest {
     private CollectorsInitializer collectorsInitializer;
     @Mock
     private ContainerRequestContext requestContext;
+    @Mock
+    private Configuration configuration;
 
     private CollectorsConfigResource resource;
 
     @BeforeEach
     void setUp() {
         when(httpConfiguration.getHttpExternalUri()).thenReturn(URI.create("https://graylog.example.com:443/"));
-        resource = new CollectorsConfigResource(
+        resource = newResource();
+    }
+
+    // isCloud is read once in the constructor, so Cloud tests stub configuration.isCloud() then rebuild via this.
+    private CollectorsConfigResource newResource() {
+        return new CollectorsConfigResource(
                 collectorsConfigService,
                 collectorIngestInputService,
                 httpConfiguration,
                 fleetService,
                 fleetTransactionLogService,
-                collectorsInitializer
+                collectorsInitializer,
+                configuration
         );
     }
 
@@ -123,7 +132,7 @@ class CollectorsConfigResourceTest {
         when(collectorsConfigService.get()).thenReturn(Optional.empty());
         when(collectorsInitializer.initialize(any())).thenAnswer(returnsFirstArg());
 
-        resource.put(request(null, null, null, false));
+        resource.put(requestContext, request(null, null, null, false));
 
         verify(collectorsInitializer).initialize(any(CollectorsConfig.class));
         verify(collectorsConfigService).save(any(CollectorsConfig.class));
@@ -141,7 +150,7 @@ class CollectorsConfigResourceTest {
                 .build();
         when(collectorsConfigService.get()).thenReturn(Optional.of(existing));
 
-        final var result = resource.put(request(Duration.ofMinutes(10), null, null, false));
+        final var result = resource.put(requestContext, request(Duration.ofMinutes(10), null, null, false));
 
         verify(collectorsInitializer, never()).initialize(any());
         verify(collectorsConfigService).save(any(CollectorsConfig.class));
@@ -164,7 +173,7 @@ class CollectorsConfigResourceTest {
         when(collectorsConfigService.get()).thenReturn(Optional.of(existing));
 
         // Only the offline threshold is provided; the others keep their existing values (PATCH semantics).
-        final var result = resource.put(request(Duration.ofMinutes(10), null, null, false));
+        final var result = resource.put(requestContext, request(Duration.ofMinutes(10), null, null, false));
 
         assertThat(result.collectorOfflineThreshold()).isEqualTo(Duration.ofMinutes(10));
         assertThat(result.collectorDefaultVisibilityThreshold()).isEqualTo(Duration.ofDays(3));
@@ -178,7 +187,7 @@ class CollectorsConfigResourceTest {
         final var fleetIds = Set.of("fleet-1", "fleet-2");
         when(fleetService.getAllFleetIds()).thenReturn(fleetIds);
 
-        resource.put(request(null, null, null, false));
+        resource.put(requestContext, request(null, null, null, false));
 
         verify(fleetTransactionLogService).appendFleetMarker(eq(fleetIds), eq(MarkerType.INGEST_CONFIG_CHANGED));
     }
@@ -188,7 +197,7 @@ class CollectorsConfigResourceTest {
         when(collectorsConfigService.get()).thenReturn(Optional.empty());
         when(collectorsInitializer.initialize(any())).thenAnswer(returnsFirstArg());
 
-        final var result = resource.put(request(Duration.ofMinutes(10), Duration.ofHours(12), Duration.ofDays(3), false));
+        final var result = resource.put(requestContext, request(Duration.ofMinutes(10), Duration.ofHours(12), Duration.ofDays(3), false));
 
         assertThat(result.collectorOfflineThreshold()).isEqualTo(Duration.ofMinutes(10));
         assertThat(result.collectorDefaultVisibilityThreshold()).isEqualTo(Duration.ofHours(12));
@@ -200,7 +209,7 @@ class CollectorsConfigResourceTest {
         when(collectorsConfigService.get()).thenReturn(Optional.empty());
         when(collectorsInitializer.initialize(any())).thenAnswer(returnsFirstArg());
 
-        final var result = resource.put(request(null, null, null, false));
+        final var result = resource.put(requestContext, request(null, null, null, false));
 
         assertThat(result.collectorOfflineThreshold()).isEqualTo(CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD);
         assertThat(result.collectorDefaultVisibilityThreshold()).isEqualTo(CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD);
@@ -213,7 +222,7 @@ class CollectorsConfigResourceTest {
     void putRejectsZeroVisibilityThreshold() {
         when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> resource.put(request(null, Duration.ZERO, null, false)))
+        assertThatThrownBy(() -> resource.put(requestContext, request(null, Duration.ZERO, null, false)))
                 .isInstanceOf(ValidationException.class)
                 .satisfies(ex -> assertThat(error((ValidationException) ex, "collector_default_visibility_threshold"))
                         .isEqualTo("Must be a positive duration"));
@@ -226,7 +235,7 @@ class CollectorsConfigResourceTest {
     void putRejectsVisibilityThresholdBelowOfflineThreshold() {
         when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> resource.put(request(null, Duration.ofMinutes(3), null, false)))
+        assertThatThrownBy(() -> resource.put(requestContext, request(null, Duration.ofMinutes(3), null, false)))
                 .isInstanceOf(ValidationException.class)
                 .satisfies(ex -> assertThat(error((ValidationException) ex, "collector_default_visibility_threshold"))
                         .isEqualTo("Must be greater than the offline threshold (5 minutes)"));
@@ -236,7 +245,7 @@ class CollectorsConfigResourceTest {
     void putRejectsExpirationNotGreaterThanVisibility() {
         when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> resource.put(request(null, Duration.ofDays(2), Duration.ofDays(1), false)))
+        assertThatThrownBy(() -> resource.put(requestContext, request(null, Duration.ofDays(2), Duration.ofDays(1), false)))
                 .isInstanceOf(ValidationException.class)
                 .satisfies(ex -> assertThat(error((ValidationException) ex, "collector_expiration_threshold"))
                         .isEqualTo("Must be greater than the visibility threshold (2 days)"));
@@ -246,7 +255,7 @@ class CollectorsConfigResourceTest {
     void putRejectsOfflineThresholdBelowOneMinute() {
         when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> resource.put(request(Duration.ofSeconds(30), null, null, false)))
+        assertThatThrownBy(() -> resource.put(requestContext, request(Duration.ofSeconds(30), null, null, false)))
                 .isInstanceOf(ValidationException.class)
                 .satisfies(ex -> assertThat(((ValidationException) ex).getErrors())
                         .containsKey("collector_offline_threshold"));
@@ -256,7 +265,7 @@ class CollectorsConfigResourceTest {
     void putRejectsMultipleInvalidThresholds() {
         when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> resource.put(request(null, Duration.ofMinutes(-5), Duration.ofMinutes(-10), false)))
+        assertThatThrownBy(() -> resource.put(requestContext, request(null, Duration.ofMinutes(-5), Duration.ofMinutes(-10), false)))
                 .isInstanceOf(ValidationException.class)
                 .satisfies(ex -> {
                     final var errors = ((ValidationException) ex).getErrors();
@@ -272,7 +281,7 @@ class CollectorsConfigResourceTest {
         when(collectorsConfigService.get()).thenReturn(Optional.empty());
         when(collectorsInitializer.initialize(any())).thenAnswer(returnsFirstArg());
 
-        resource.put(request(null, null, null, true));
+        resource.put(requestContext, request(null, null, null, true));
 
         verify(collectorIngestInputService).createInput(any(Subject.class), eq("admin"), eq(14401));
         verify(collectorsConfigService).save(any(CollectorsConfig.class));
@@ -283,7 +292,61 @@ class CollectorsConfigResourceTest {
         when(collectorsConfigService.get()).thenReturn(Optional.empty());
         when(collectorsInitializer.initialize(any())).thenAnswer(returnsFirstArg());
 
-        resource.put(request(null, null, null, false));
+        resource.put(requestContext, request(null, null, null, false));
+
+        verify(collectorIngestInputService, never()).createInput(any(), any(), any(int.class));
+        verify(collectorsConfigService).save(any(CollectorsConfig.class));
+    }
+
+    // --- PUT: Cloud mode (ingest endpoint is server-provisioned; no input creation) ---
+
+    @Test
+    void cloudPutDerivesEndpointAndIgnoresClientSuppliedHttp() throws Exception {
+        when(configuration.isCloud()).thenReturn(true);
+        resource = newResource();
+        when(collectorsConfigService.get()).thenReturn(Optional.empty());
+        when(requestContext.getHeaders()).thenReturn(new MultivaluedHashMap<>());
+        when(collectorsInitializer.initialize(any())).thenAnswer(returnsFirstArg());
+
+        // The client sends an arbitrary endpoint; in Cloud it must be ignored and derived from the node's URI.
+        final var bogusHttp = new CollectorsConfigRequest.IngestEndpointRequest("attacker.example.com", 9999);
+        final var result = resource.put(requestContext,
+                new CollectorsConfigRequest(bogusHttp, null, null, null, false));
+
+        assertThat(result.http().hostname()).isEqualTo("graylog.example.com");
+        assertThat(result.http().port()).isEqualTo(14401);
+    }
+
+    @Test
+    void cloudPutKeepsProvisionedEndpointOnUpdate() throws Exception {
+        when(configuration.isCloud()).thenReturn(true);
+        resource = newResource();
+        final var existing = CollectorsConfig.builder()
+                .caCertId("existing-ca")
+                .tokenSigningKey(new TokenSigningKey(EncryptedValue.createUnset(), "pub", "fp", Instant.now()))
+                .http(new IngestEndpointConfig("provisioned-host", 14401))
+                .build();
+        when(collectorsConfigService.get()).thenReturn(Optional.of(existing));
+
+        final var bogusHttp = new CollectorsConfigRequest.IngestEndpointRequest("attacker.example.com", 9999);
+        final var result = resource.put(requestContext,
+                new CollectorsConfigRequest(bogusHttp, Duration.ofMinutes(10), null, null, false));
+
+        // The provisioned endpoint is preserved; only the threshold the tenant supplied is applied.
+        assertThat(result.http()).isEqualTo(existing.http());
+        assertThat(result.collectorOfflineThreshold()).isEqualTo(Duration.ofMinutes(10));
+    }
+
+    @Test
+    void cloudPutNeverCreatesInputEvenWhenRequested() throws Exception {
+        when(configuration.isCloud()).thenReturn(true);
+        resource = newResource();
+        when(collectorsConfigService.get()).thenReturn(Optional.empty());
+        when(requestContext.getHeaders()).thenReturn(new MultivaluedHashMap<>());
+        when(collectorsInitializer.initialize(any())).thenAnswer(returnsFirstArg());
+
+        // create_input is meaningless in Cloud (no persisted input) and must be ignored.
+        resource.put(requestContext, request(null, null, null, true));
 
         verify(collectorIngestInputService, never()).createInput(any(), any(), any(int.class));
         verify(collectorsConfigService).save(any(CollectorsConfig.class));
