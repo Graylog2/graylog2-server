@@ -14,18 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useContext } from 'react';
+package org.graylog2.contentpacks.model;
 
-import TableFilterContext from './TableFilterContext';
-
-const useTableFilterContext = () => {
-  const contextValue = useContext(TableFilterContext);
-
-  if (!contextValue) {
-    throw new Error('useTableFilterContext hook needs to be used inside TableFilterContext.Provider');
-  }
-
-  return contextValue;
-};
-
-export default useTableFilterContext;
+/**
+ * Result of {@link org.graylog2.contentpacks.ContentPackService#upgradeContentPack}.
+ * Bundles the new installation with a snapshot of old entity state captured before the
+ * in-place update, so callers can preserve user customizations (notifications, search filters, etc.).
+ */
+public record ContentPackUpgrade(ContentPackInstallation installation, ContentPackUninstallation oldEntitySnapshots) {
+}
