@@ -36,7 +36,12 @@ const MessageCountCell = ({ stream }: Props) => {
     return null;
   }
 
-  return <CountBadge count={formatCount(metrics.message_count)} title={`${metrics.message_count} messages in the last 24 hours`} />;
+  return (
+    <CountBadge
+      count={formatCount(metrics.message_count)}
+      title={`${metrics.message_count} messages in the last 24 hours`}
+    />
+  );
 };
 
 export default MessageCountCell;
