@@ -29,7 +29,11 @@ import { RulesActions } from 'stores/rules/RulesStore';
 import usePipeline from 'hooks/usePipeline';
 import usePipelineMutations from 'hooks/usePipelineMutations';
 import usePipelineConnections, { usePipelineConnectionMutation } from 'hooks/usePipelineConnections';
-import { ProcessingLoadDebugMetricsBanner, ProcessingLoadProvider } from 'components/pipelines/processing-load';
+import {
+  EnableDebugMetricsButton,
+  ProcessingLoadDebugMetricsBanner,
+  ProcessingLoadProvider,
+} from 'components/pipelines/processing-load';
 
 import PipelinesPageNavigation from '../components/pipelines/PipelinesPageNavigation';
 
@@ -128,6 +132,7 @@ const PipelineDetailsPage = () => {
         <PipelinesPageNavigation />
         <PageHeader
           title={title}
+          actions={<EnableDebugMetricsButton />}
           documentationLink={{
             title: 'Pipelines documentation',
             path: DocsHelper.PAGES.PIPELINES,
