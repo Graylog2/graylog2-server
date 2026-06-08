@@ -48,12 +48,6 @@ describe('ExpandedSection', () => {
   ];
 
   asMock(useTableFetchContext).mockReturnValue({
-    searchParams: {
-      page: 1,
-      pageSize: 10,
-      query: '',
-      sort: { attributeId: 'timestamp', direction: 'desc' },
-    },
     refetch: jest.fn(),
     attributes,
     entityTableId: eventsTableElements.defaultLayout.entityTableId,

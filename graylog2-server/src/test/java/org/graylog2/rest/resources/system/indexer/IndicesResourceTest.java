@@ -83,10 +83,11 @@ class IndicesResourceTest {
     }
 
     @Test
-    @WithAuthorization(permissions = {"indices:reindex"})
+    @WithAuthorization(permissions = {"indices:read", "indices:reindex"})
     void reindexSucceeds() {
-        indicesResource.reindex("outdated1", true);
-        verify(outdatedIndexService, times(1)).reindex("outdated1", true);
+        when(outdatedIndexService.getOutdatedIndices()).thenReturn(List.of(new OutdatedIndex(".outdated1", "1.3.0", false, false)));
+        indicesResource.reindex(".outdated1", true);
+        verify(outdatedIndexService, times(1)).reindex(".outdated1", true);
     }
 
 }
