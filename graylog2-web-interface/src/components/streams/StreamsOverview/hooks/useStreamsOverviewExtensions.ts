@@ -45,7 +45,10 @@ const useStreamsOverviewExtensions = (): {
       ...pluggableColumnRenderers,
     },
     attributes: {
-      attributeNames: [...pluginTableElements.map(({ attributeName }) => attributeName), ...pluggableAttributes.attributeNames],
+      attributeNames: [
+        ...pluginTableElements.map(({ attributeName }) => attributeName),
+        ...pluggableAttributes.attributeNames,
+      ],
       attributes: [...pluginTableElements.flatMap(({ attributes }) => attributes), ...pluggableAttributes.attributes],
     },
     expandedSections: pluggableExpandedSections,

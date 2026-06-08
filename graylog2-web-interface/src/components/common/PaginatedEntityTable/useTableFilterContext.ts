@@ -22,9 +22,7 @@ const useTableFilterContext = () => {
   const contextValue = useContext(TableFilterContext);
 
   if (!contextValue) {
-    throw new Error(
-      'useTableFilterContext hook needs to be used inside TableFilterContext.Provider',
-    );
+    throw new Error('useTableFilterContext hook needs to be used inside TableFilterContext.Provider');
   }
 
   return contextValue;
