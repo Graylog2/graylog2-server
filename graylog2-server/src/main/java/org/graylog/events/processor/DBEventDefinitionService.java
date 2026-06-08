@@ -129,6 +129,17 @@ public class DBEventDefinitionService {
     }
 
     public EventDefinitionDto save(final EventDefinitionDto entity) {
+        return save(entity, true);
+    }
+
+    /**
+     * Save an event definition, optionally bypassing the scope mutability check.
+     *
+     * <p>Passing {@code checkMutability = false} is intended only for system-driven writes such as
+     * Illuminate content-pack upgrades, which must rewrite the content of immutable Illuminate-scoped
+     * definitions in place (to preserve their IDs). Never pass {@code false} for user-initiated API requests.</p>
+     */
+    public EventDefinitionDto save(final EventDefinitionDto entity, final boolean checkMutability) {
         EventDefinitionDto enrichedWithUpdateDate = entity
                 .toBuilder()
                 .updatedAt(DateTime.now(DateTimeZone.UTC))
@@ -137,8 +148,10 @@ public class DBEventDefinitionService {
         if (enrichedWithUpdateDate.id() == null) {
             final String id = scopedEntityMongoUtils.create(enrichedWithUpdateDate);
             enrichedWithUpdateDate = enrichedWithUpdateDate.toBuilder().id(id).build();
-        } else {
+        } else if (checkMutability) {
             scopedEntityMongoUtils.update(enrichedWithUpdateDate);
+        } else {
+            scopedEntityMongoUtils.forceUpdate(enrichedWithUpdateDate);
         }
         return getEventDefinitionWithRefetchedFilters(enrichedWithUpdateDate);
     }

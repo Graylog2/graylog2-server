@@ -16,14 +16,20 @@
  */
 import * as React from 'react';
 
-import type { Attribute } from 'stores/PaginationTypes';
 import { singleton } from 'logic/singleton';
+import type { SearchParams } from 'stores/PaginationTypes';
+import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
+import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
 
-export type ContextValue = {
-  refetch: () => void;
-  attributes: Array<Attribute>;
-  entityTableId: string;
+export type TableFilterContextValue = {
+  searchParams: SearchParams;
+  setQuery: (newQuery: string) => void;
+  onChangeFilters: (newFilters: UrlQueryFilters) => void;
+  onChangeSlicingFilter: (slice?: string) => void;
+  paginationState: PaginationQueryParameterResult;
+  resetFilters: () => void;
 };
 
-const TableFetchContext = React.createContext<ContextValue | undefined>(undefined);
-export default singleton('contexts.TableFetchContext', () => TableFetchContext);
+const TableFilterContext = React.createContext<TableFilterContextValue | undefined>(undefined);
+
+export default singleton('contexts.TableFilterContext', () => TableFilterContext);
