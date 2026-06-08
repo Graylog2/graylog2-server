@@ -95,10 +95,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
     data: { valid: validSecurityLicense },
   } = usePluggableLicenseCheck('/license/security');
 
-  const readOnly = useMemo(
-    () => !canEdit || isSystemEventDefinition(eventDefinition) || eventDefinition.config.type === 'sigma-v1',
-    [canEdit, eventDefinition],
-  );
+  const readOnly = useMemo(() => !canEdit || isSystemEventDefinition(eventDefinition), [canEdit, eventDefinition]);
   const showEventProcedureSummary = useMemo(
     () => !!eventDefinitionEventProcedure && !showAddEventProcedureForm && validSecurityLicense,
     [eventDefinitionEventProcedure, showAddEventProcedureForm, validSecurityLicense],

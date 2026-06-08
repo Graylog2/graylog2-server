@@ -40,18 +40,7 @@ jest.mock('views/api/views', () => ({
   deleteView: jest.fn(() => Promise.resolve()),
 }));
 
-const mockSearchParams = {
-  page: 1,
-  pageSize: 10,
-  query: '',
-  sort: {
-    attributeId: 'name',
-    direction: 'asc',
-  },
-} as const;
-
 const mockContextValue = {
-  searchParams: mockSearchParams,
   refetch: jest.fn(),
   attributes: [],
   entityTableId: 'entity-table',
