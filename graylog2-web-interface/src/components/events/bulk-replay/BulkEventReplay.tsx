@@ -60,14 +60,14 @@ const ReplaySearchSidebarSection = () => {
   if (!isRightSidebarEnabled) {
     return (
       <div>
-        <SidebarBulkEventReplay/>
-        <hr/>
+        <SidebarBulkEventReplay />
+        <hr />
         <ReplaySearchSidebar alertId={alertId} definitionId={definitionId} />
       </div>
     );
   }
 
-  return <SidebarBulkEventReplay/>;
+  return <SidebarBulkEventReplay />;
 };
 
 const replaySection: SidebarSection = {
@@ -81,9 +81,10 @@ const replaySection: SidebarSection = {
 const searchPageLayout: Partial<LayoutState> = {
   sidebar: {
     isShown: true,
-    title: "Replay Search",
+    title: 'Replay Search',
     sections: [replaySection, ...sidebarSections],
   },
+  synchronizeUrl: false,
 };
 
 const ReplayedSearch = ({

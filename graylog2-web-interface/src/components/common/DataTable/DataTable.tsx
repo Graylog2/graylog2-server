@@ -16,18 +16,13 @@
  */
 import React from 'react';
 import isEqual from 'lodash/isEqual';
-import styled from 'styled-components';
 
-import { tableCss } from 'components/bootstrap/Table';
+import Table from 'components/bootstrap/Table';
 
 import Filter from './Filter';
 import DataTableElement from './DataTableElement';
 
 import NoEntitiesExist from '../NoEntitiesExist';
-
-const StyledTable = styled.table`
-  ${tableCss}
-`;
 
 const NoData = ({ noDataText }) => {
   if (typeof noDataText === 'string') {
@@ -194,10 +189,10 @@ class DataTable extends React.Component<
       data = <p>Filter does not match any data.</p>;
     } else {
       data = (
-        <StyledTable className={`table ${className ?? ''}`}>
+        <Table className={className}>
           <thead>{this.getFormattedHeaders()}</thead>
           <tbody>{this.getFormattedDataRows()}</tbody>
-        </StyledTable>
+        </Table>
       );
     }
 

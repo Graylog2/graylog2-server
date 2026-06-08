@@ -27,7 +27,9 @@ import type { Event } from 'components/events/events/types';
 import useReplayBulkAction from './useReplayBulkAction';
 
 jest.mock('routing/useHistory');
-jest.mock('routing/useLocation', () => jest.fn(() => ({ pathname: '/alerts', search: '', state: {}, key: '', hash: '' })));
+jest.mock('routing/useLocation', () =>
+  jest.fn(() => ({ pathname: '/alerts', search: '', state: {}, key: '', hash: '' })),
+);
 jest.mock('logic/local-storage/Store', () => ({ sessionSet: jest.fn() }));
 jest.mock('logic/generateId', () => jest.fn(() => 'mock-session-id'));
 jest.mock('components/events/events/hooks/useSendEventActionTelemetry', () => jest.fn(() => jest.fn()));

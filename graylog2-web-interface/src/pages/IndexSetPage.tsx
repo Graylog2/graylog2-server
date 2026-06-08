@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import numeral from 'numeral';
 
 import HideOnCloud from 'util/conditional/HideOnCloud';
@@ -31,13 +31,11 @@ import {
 import { IndexerClusterHealthSummary } from 'components/indexers';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
-import withParams from 'routing/withParams';
-import connect from 'stores/connect';
+import useParams from 'routing/useParams';
+import { useStore } from 'stores/connect';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { fetchIndexSet } from 'stores/indices/IndexSetsStore';
-import type { IndexerOverview } from 'stores/indexers/IndexerOverviewStore';
-import type { Indices } from 'stores/indices/IndicesStore';
-import { IndexerOverviewActions, IndexerOverviewStore } from 'stores/indexers/IndexerOverviewStore';
+import useIndexerOverview from 'hooks/useIndexerOverview';
 import { IndicesActions, IndicesStore } from 'stores/indices/IndicesStore';
 
 const REFRESH_INTERVAL = 2000;
@@ -71,179 +69,109 @@ const ElasticsearchUnavailableInformation = () => {
   );
 };
 
-type Props = {
-  params: {
-    indexSetId?: string;
-  };
-  indexerOverview?: IndexerOverview;
-  indexerOverviewError?: string;
-  indexDetails: {
-    closedIndices?: Indices;
-    indices?: Indices;
-  };
-};
+const IndexSetPage = () => {
+  const { indexSetId } = useParams<{ indexSetId?: string }>();
+  const [indexSet, setIndexSet] = useState<IndexSet | undefined>(undefined);
+  const { data: indexerOverview, error: indexerOverviewError, refetch } = useIndexerOverview(indexSetId);
+  const { indices: indexDetailsIndices, closedIndices: indexDetailsClosedIndices } = useStore(IndicesStore) ?? {};
 
-type State = {
-  timerId?: NodeJS.Timeout;
-  indexSet?: IndexSet;
-};
-
-class IndexSetPage extends React.Component<Props, State> {
-  static defaultProps = {
-    indexerOverview: undefined,
-    indexerOverviewError: undefined,
-  };
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      timerId: undefined,
-      indexSet: undefined,
-    };
-  }
-
-  componentDidMount() {
-    const {
-      params: { indexSetId },
-    } = this.props;
-    fetchIndexSet(indexSetId).then((response) => this.setState({ indexSet: response }));
+  useEffect(() => {
+    fetchIndexSet(indexSetId).then((response) => setIndexSet(response));
     IndicesActions.list(indexSetId);
 
     const timerId = setInterval(() => {
       IndicesActions.multiple();
-      IndexerOverviewActions.list(indexSetId);
+      refetch();
     }, REFRESH_INTERVAL);
-    this.setState({ timerId: timerId });
-  }
 
-  componentWillUnmount() {
-    const { timerId } = this.state;
-
-    if (timerId) {
+    return () => {
       clearInterval(timerId);
-    }
+    };
+  }, [indexSetId, refetch]);
+
+  if (!indexSet) {
+    return <Spinner />;
   }
 
-  _totalIndexCount = () => {
-    const {
-      indexerOverview: { indices = [] },
-    } = this.props;
+  const pageHeader = (
+    <PageHeader
+      title={`Index Set: ${indexSet.title}`}
+      documentationLink={{
+        title: 'Index model documentation',
+        path: DocsHelper.PAGES.INDEX_MODEL,
+      }}
+      actions={
+        <ButtonToolbar>
+          <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(indexSet.id, 'details')}>
+            <Button bsStyle="info">Edit Index Set</Button>
+          </LinkContainer>
+          <IndicesMaintenanceDropdown indexSetId={indexSetId} indexSet={indexSet} />
+          <IndicesConfigurationDropdown indexSetId={indexSetId} />
+        </ButtonToolbar>
+      }>
+      <span>
+        This is an overview of all indices (message stores) in this index set currently being considered for searches
+        and analysis.
+      </span>
+    </PageHeader>
+  );
 
-    return indices.length;
-  };
-
-  _isLoading = () => {
-    const { indexSet } = this.state;
-
-    return !indexSet;
-  };
-
-  render() {
-    if (this._isLoading()) {
-      return <Spinner />;
-    }
-
-    const {
-      indexerOverview,
-      indexerOverviewError,
-      params: { indexSetId },
-      indexDetails: { indices: indexDetailsIndices, closedIndices: indexDetailsClosedIndices },
-    } = this.props;
-    const { indexSet } = this.state;
-
-    const pageHeader = indexSet && (
-      <PageHeader
-        title={`Index Set: ${indexSet.title}`}
-        documentationLink={{
-          title: 'Index model documentation',
-          path: DocsHelper.PAGES.INDEX_MODEL,
-        }}
-        actions={
-          <ButtonToolbar>
-            <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(indexSet.id, 'details')}>
-              <Button bsStyle="info">Edit Index Set</Button>
-            </LinkContainer>
-            <IndicesMaintenanceDropdown indexSetId={indexSetId} indexSet={indexSet} />
-            <IndicesConfigurationDropdown indexSetId={indexSetId} />
-          </ButtonToolbar>
-        }>
-        <span>
-          This is an overview of all indices (message stores) in this index set currently being considered for searches
-          and analysis.
-        </span>
-      </PageHeader>
-    );
-
-    if (indexerOverviewError) {
-      return (
-        <span>
-          {pageHeader}
-          <ElasticsearchUnavailableInformation />
-        </span>
-      );
-    }
-
-    let indicesInfo;
-    let indicesOverview;
-
-    if (indexerOverview && indexDetailsClosedIndices) {
-      const deflectorInfo = indexerOverview.deflector;
-
-      indicesInfo = (
-        <span>
-          <Alert bsStyle="success" style={{ marginTop: '10' }}>
-            {this._totalIndexCount()} indices with a total of {numeral(indexerOverview.counts.events).format('0,0')}{' '}
-            messages under management, current write-active index is <i>{deflectorInfo.current_target}</i>.
-          </Alert>
-          <HideOnCloud>
-            <IndexerClusterHealthSummary health={indexerOverview.indexer_cluster.health} />
-          </HideOnCloud>
-        </span>
-      );
-
-      indicesOverview = (
-        <IndicesOverview indices={indexerOverview.indices} indexDetails={indexDetailsIndices} indexSetId={indexSetId} />
-      );
-    } else {
-      indicesInfo = <Spinner />;
-      indicesOverview = <Spinner />;
-    }
-
+  if (indexerOverviewError) {
     return (
-      <DocumentTitle title={`Index Set - ${indexSet ? indexSet.title : ''}`}>
-        <IndicesPageNavigation />
-        <div>
-          {pageHeader}
-
-          <Row className="content">
-            <Col md={12}>
-              <IndexSetDetails indexSet={indexSet} />
-            </Col>
-          </Row>
-
-          <Row className="content">
-            <Col md={12}>{indicesInfo}</Col>
-          </Row>
-
-          {indicesOverview}
-        </div>
-      </DocumentTitle>
+      <span>
+        {pageHeader}
+        <ElasticsearchUnavailableInformation />
+      </span>
     );
   }
-}
 
-export default connect(
-  withParams(IndexSetPage),
-  {
-    indexerOverview: IndexerOverviewStore,
-    indices: IndicesStore,
-  },
-  ({ indexerOverview, indices }) => ({
-    // @ts-ignore
-    indexerOverview: indexerOverview && indexerOverview.indexerOverview,
-    // @ts-ignore
-    indexerOverviewError: indexerOverview && indexerOverview.indexerOverviewError,
-    indexDetails: indices,
-  }),
-);
+  let indicesInfo;
+  let indicesOverview;
+
+  if (indexerOverview && indexDetailsClosedIndices) {
+    const deflectorInfo = indexerOverview.deflector;
+
+    indicesInfo = (
+      <span>
+        <Alert bsStyle="success" style={{ marginTop: '10' }}>
+          {indexerOverview.indices.length} indices with a total of{' '}
+          {numeral(indexerOverview.counts.events).format('0,0')} messages under management, current write-active index
+          is <i>{deflectorInfo.current_target}</i>.
+        </Alert>
+        <HideOnCloud>
+          <IndexerClusterHealthSummary health={indexerOverview.indexer_cluster.health} />
+        </HideOnCloud>
+      </span>
+    );
+
+    indicesOverview = (
+      <IndicesOverview indices={indexerOverview.indices} indexDetails={indexDetailsIndices} indexSetId={indexSetId} />
+    );
+  } else {
+    indicesInfo = <Spinner />;
+    indicesOverview = <Spinner />;
+  }
+
+  return (
+    <DocumentTitle title={`Index Set - ${indexSet ? indexSet.title : ''}`}>
+      <IndicesPageNavigation />
+      <div>
+        {pageHeader}
+
+        <Row className="content">
+          <Col md={12}>
+            <IndexSetDetails indexSet={indexSet} />
+          </Col>
+        </Row>
+
+        <Row className="content">
+          <Col md={12}>{indicesInfo}</Col>
+        </Row>
+
+        {indicesOverview}
+      </div>
+    </DocumentTitle>
+  );
+};
+
+export default IndexSetPage;

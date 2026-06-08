@@ -21,7 +21,7 @@ import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import { useQueryClient } from '@tanstack/react-query';
 
-import { InputsActions } from 'stores/inputs/InputsStore';
+import { createInput as createInputRequest } from 'hooks/useInputs';
 import type { InputDescription } from 'hooks/useInputType';
 import { fetchInputType } from 'hooks/useInputType';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -61,7 +61,9 @@ const CreateInputControl = () => {
   const [showWizard, setShowWizard] = useState<boolean>(false);
   const [createdInputId, setCreatedInputId] = useState<string | null>(null);
   const [createdInputData, setCreatedInputData] = useState<ConfiguredInput | null>(null);
-  const [pendingWizardInputId, setPendingWizardInputId] = useState<string | null>(() => Store.sessionGet<string>(SETUP_WIZARD_INPUT_ID_KEY) ?? null);
+  const [pendingWizardInputId, setPendingWizardInputId] = useState<string | null>(
+    () => Store.sessionGet<string>(SETUP_WIZARD_INPUT_ID_KEY) ?? null,
+  );
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const inputTypes = useInputTypes();
@@ -71,9 +73,7 @@ const CreateInputControl = () => {
 
   const hasPendingStorageWizard = inputSetupFeatureFlagIsEnabled && !!pendingWizardInputId;
   const showWizardFromStorage = hasPendingStorageWizard && !!pendingWizardInputData && !showWizard;
-  const wizardInputFromStorage = pendingWizardInputData
-    ? (pendingWizardInputData as unknown as Input)
-    : null;
+  const wizardInputFromStorage = pendingWizardInputData ? (pendingWizardInputData as unknown as Input) : null;
 
   useEffect(() => {
     if (showWizardFromStorage) {
@@ -173,7 +173,7 @@ const CreateInputControl = () => {
       app_action_value: 'input-create',
     });
 
-    InputsActions.create(data).then((response: { id: string }) => {
+    createInputRequest(data).then((response: { id: string }) => {
       queryClient.invalidateQueries({ queryKey: KEY_PREFIX });
 
       if (inputSetupFeatureFlagIsEnabled && response?.id) {
@@ -241,7 +241,8 @@ const CreateInputControl = () => {
           <InputSetupWizard
             input={showWizard ? createInputForWizard() : wizardInputFromStorage}
             show
-            onClose={closeWizard} />
+            onClose={closeWizard}
+          />
         )}
       </Col>
     </Row>

@@ -18,7 +18,8 @@ package org.graylog.datanode.filesystem.index.indexreader;
 
 import jakarta.inject.Singleton;
 import org.apache.lucene.index.IndexFormatTooOldException;
-import org.apache.lucene.index.StandardDirectoryReader;
+import org.apache.lucene.index.SegmentCommitInfo;
+import org.apache.lucene.index.SegmentInfos;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
@@ -32,12 +33,13 @@ import java.nio.file.Path;
 public class ShardStatsParserImpl implements ShardStatsParser {
     @Override
     public ShardStats read(Path shardPath) throws IncompatibleIndexVersionException {
-        try (
-                Directory directory = FSDirectory.open(shardPath.resolve("index"));
-                StandardDirectoryReader reader = (StandardDirectoryReader) org.apache.lucene.index.DirectoryReader.open(directory)
-        ) {
-            final int documentsCount = getDocumentsCount(reader);
-            final Version minSegmentLuceneVersion = reader.getSegmentInfos().getMinSegmentLuceneVersion();
+        try (Directory directory = FSDirectory.open(shardPath.resolve("index"))) {
+            // SegmentInfos.readLatestCommit reads only the segments_N file and per-segment
+            // .si metadata files — it does not open any codec readers (stored fields, doc
+            // values, postings, etc.), making it far cheaper than DirectoryReader.open().
+            final SegmentInfos segmentInfos = SegmentInfos.readLatestCommit(directory);
+            final int documentsCount = computeDocumentsCount(segmentInfos);
+            final Version minSegmentLuceneVersion = segmentInfos.getMinSegmentLuceneVersion();
             return new ShardStats(shardPath, documentsCount, minSegmentLuceneVersion);
         } catch (IndexFormatTooOldException e) {
             throw new IncompatibleIndexVersionException(e);
@@ -46,9 +48,16 @@ public class ShardStatsParserImpl implements ShardStatsParser {
         }
     }
 
-    private int getDocumentsCount(StandardDirectoryReader reader) {
-        // use IndexSearcher if you want to count documents smarter, filtering by field or query
-        // IndexSearcher searcher = new IndexSearcher(reader);
-        return reader.numDocs();
+    /**
+     * Equivalent to {@code DirectoryReader.numDocs()}: sums live (non-hard-deleted) documents
+     * across all segments. Soft deletes are not subtracted here, matching Lucene's own
+     * {@code SegmentReader.numDocs()} which is based on the hard live-docs bitset.
+     */
+    private int computeDocumentsCount(SegmentInfos segmentInfos) {
+        int count = 0;
+        for (SegmentCommitInfo sci : segmentInfos) {
+            count += sci.info.maxDoc() - sci.getDelCount();
+        }
+        return count;
     }
 }

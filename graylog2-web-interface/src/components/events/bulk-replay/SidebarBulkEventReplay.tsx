@@ -86,8 +86,8 @@ const SidebarBulkEventReplay = () => {
     <Container>
       <EventsListSidebar>
         <p>
-          The following list contains all of the events/alerts you selected in the previous step, allowing you to
-          review the replayed search for each of them.
+          The following list contains all of the events/alerts you selected in the previous step, allowing you to review
+          the replayed search for each of them.
         </p>
         <Row>
           <i>

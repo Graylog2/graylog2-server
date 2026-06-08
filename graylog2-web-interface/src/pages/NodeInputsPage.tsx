@@ -16,15 +16,15 @@
  */
 import React from 'react';
 
-import {Row, Col} from 'components/bootstrap';
-import {Link, DocumentTitle, PageHeader, Spinner} from 'components/common';
+import { Row, Col } from 'components/bootstrap';
+import { Link, DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
-import {NodesStore} from 'stores/nodes/NodesStore';
+import { NodesStore } from 'stores/nodes/NodesStore';
 import useParams from 'routing/useParams';
-import {useStore} from 'stores/connect';
+import { useStore } from 'stores/connect';
 import useProductName from 'brand-customization/useProductName';
-import {InputsOverview} from 'components/inputs/InputsOveriew';
+import { InputsOverview } from 'components/inputs/InputsOveriew';
 import useInputTypes from 'hooks/useInputTypes';
 import useInputTypesDescriptions from 'hooks/useInputTypesDescriptions';
 

@@ -22,10 +22,22 @@ import type { RuleType } from 'stores/rules/RulesStore';
 import { asMock } from 'helpers/mocking';
 import type { ScopeParams } from 'hooks/useScopePermissions';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
+import type { ProcessingLoadResponse } from 'components/pipelines/processing-load';
 
 import RuleListEntry from './RuleListEntry';
 
 jest.mock('hooks/useScopePermissions');
+
+const baseProcessingLoad: ProcessingLoadResponse = {
+  available: true,
+  total_cost_microseconds_per_second: 100,
+  pipelines: [],
+  rules: [
+    { rule_id: 'rule-1', load_percent: 42.4242 },
+    { rule_id: 'rule-zero', load_percent: 0 },
+  ],
+  stage_rules: [],
+};
 
 const ruleMock = {
   source: `rule "function howto"
@@ -45,10 +57,12 @@ const onDeleteMock = jest.fn();
 const entityScope = {
   is_mutable: false,
 } as unknown as ScopeParams;
-const SUT = ({ rule }: { rule: RuleType }) => (
+type SUTProps = { rule: RuleType } & Partial<Omit<React.ComponentProps<typeof RuleListEntry>, 'rule'>>;
+
+const SUT = ({ rule, ...props }: SUTProps) => (
   <table>
     <tbody>
-      <RuleListEntry rule={rule} onDelete={onDeleteMock} usingPipelines={[]} />
+      <RuleListEntry rule={rule} onDelete={onDeleteMock} usingPipelines={[]} {...props} />
     </tbody>
   </table>
 );
@@ -106,5 +120,75 @@ describe('Rule', () => {
     ).toBeInTheDocument();
 
     expect(await screen.findByText(/managed by application/i)).toBeInTheDocument();
+  });
+});
+
+describe('RuleListEntry Pipeline Load cell', () => {
+  beforeEach(() => {
+    asMock(useGetPermissionsByScope).mockReturnValue({
+      loadingScopePermissions: false,
+      scopePermissions: undefined,
+      checkPermissions: jest.fn(),
+    });
+  });
+
+  it('does not render the load cell when showLoadColumn is false', () => {
+    render(
+      <SUT
+        rule={{ ...ruleMock, id: 'rule-1' } as RuleType}
+        showLoadColumn={false}
+        processingLoad={baseProcessingLoad}
+      />,
+    );
+
+    expect(screen.queryByText(/%$/)).not.toBeInTheDocument();
+  });
+
+  it('renders the load percent formatted to two decimals', () => {
+    render(<SUT rule={{ ...ruleMock, id: 'rule-1' } as RuleType} showLoadColumn processingLoad={baseProcessingLoad} />);
+
+    expect(screen.getByText('42.42%')).toBeInTheDocument();
+  });
+
+  it('renders 0.00% for participating zero-cost rules', () => {
+    render(
+      <SUT rule={{ ...ruleMock, id: 'rule-zero' } as RuleType} showLoadColumn processingLoad={baseProcessingLoad} />,
+    );
+
+    expect(screen.getByText('0.00%')).toBeInTheDocument();
+  });
+
+  it('renders blank for rules missing from the response', () => {
+    render(
+      <SUT rule={{ ...ruleMock, id: 'unknown-rule' } as RuleType} showLoadColumn processingLoad={baseProcessingLoad} />,
+    );
+
+    expect(screen.queryByText(/%$/)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/Pipeline Load is unavailable/i)).not.toBeInTheDocument();
+  });
+
+  it('renders blank when total_cost is zero (denominator-zero)', () => {
+    render(
+      <SUT
+        rule={{ ...ruleMock, id: 'rule-1' } as RuleType}
+        showLoadColumn
+        processingLoad={{ ...baseProcessingLoad, total_cost_microseconds_per_second: 0 }}
+      />,
+    );
+
+    expect(screen.queryByText(/%$/)).not.toBeInTheDocument();
+  });
+
+  it('renders an em-dash with an accessible error label when processingLoadError is true', () => {
+    render(
+      <SUT
+        rule={{ ...ruleMock, id: 'rule-1' } as RuleType}
+        showLoadColumn
+        processingLoad={undefined}
+        processingLoadError
+      />,
+    );
+
+    expect(screen.getByLabelText(/Pipeline Load is unavailable/i)).toBeInTheDocument();
   });
 });

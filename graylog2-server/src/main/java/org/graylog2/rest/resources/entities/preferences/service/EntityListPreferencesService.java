@@ -19,9 +19,13 @@ package org.graylog2.rest.resources.entities.preferences.service;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId;
 
+import java.util.List;
+
 public interface EntityListPreferencesService {
 
     StoredEntityListPreferences get(final StoredEntityListPreferencesId preferencesId);
+
+    List<StoredEntityListPreferences> getPredefinedForEntityList(final String entityListId);
 
     boolean save(final StoredEntityListPreferences preferences);
 

@@ -1,0 +1,5 @@
+type = "f"
+message = "Sort streams alphabetically in the \"Test against stream\" dropdown and make the dropdown searchable."
+
+issues = ["18694"]
+pulls = ["25849"]
