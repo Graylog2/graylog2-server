@@ -100,17 +100,17 @@
         <opensearch.shaded.version>2.19.3-1</opensearch.shaded.version>
         <opensearch.client.version>3.2.0</opensearch.client.version>
         <airline.version>3.2.0</airline.version>
-        <amqp-client.version>5.30.0</amqp-client.version>
+        <amqp-client.version>5.31.0</amqp-client.version>
         <antlr.version>4.13.2</antlr.version>
-        <apache-directory-version>2.1.7</apache-directory-version>
+        <apache-directory-version>2.1.8</apache-directory-version>
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
         <apache-httpclient5.version>5.5.1</apache-httpclient5.version>
         <apache-httpcore.version>4.4.16</apache-httpcore.version>
-        <asm.version>9.10</asm.version>
+        <asm.version>9.10.1</asm.version>
         <auto-service.version>1.1.1</auto-service.version>
         <auto-value.version>1.11.1</auto-value.version>
         <aws-java-sdk-1.version>1.12.797</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.44.0</aws-java-sdk-2.version>
+        <aws-java-sdk-2.version>2.45.0</aws-java-sdk-2.version>
         <aws-kinesis-client.version>3.4.3</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.3.6</aws-msk-iam-auth.version>
         <bouncycastle.version>1.84</bouncycastle.version>
@@ -156,20 +156,20 @@
         <jmte.version>7.0.3</jmte.version>
         <joda-time.version>2.14.2</joda-time.version>
         <jool.version>0.9.15</jool.version>
-        <json-org.version>20251224</json-org.version>
+        <json-org.version>20260522</json-org.version>
         <json-path.version>3.0.0</json-path.version>
         <jsoup.version>1.22.2</jsoup.version>
         <kafka.version>4.3.0</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <log4j.version>2.26.0</log4j.version>
-        <lucene.version>9.12.3</lucene.version>
+        <lucene.version>10.3.2</lucene.version>
         <lz4.version>1.11.0</lz4.version>
-        <metrics.version>4.2.38</metrics.version>
-        <mongodb-driver.version>5.7.0</mongodb-driver.version>
+        <metrics.version>4.2.39</metrics.version>
+        <mongodb-driver.version>5.8.0</mongodb-driver.version>
         <mongojack.version>5.1.0</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.2.14.Final</netty.version>
-        <netty-tcnative-boringssl-static.version>2.0.77.Final</netty-tcnative-boringssl-static.version>
+        <netty-tcnative-boringssl-static.version>2.0.78.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>5.3.2</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.62.0</opentelemetry.version>
@@ -189,10 +189,10 @@
         <slf4j.version>2.0.18</slf4j.version>
         <streamex.version>0.8.4</streamex.version>
         <swagger.version>2.2.50</swagger.version>
-        <swagger-parser.version>2.1.42</swagger-parser.version>
+        <swagger-parser.version>2.1.43</swagger-parser.version>
 
         <syslog4j.version>0.9.63</syslog4j.version>
-        <threeten-extra.version>1.8.0</threeten-extra.version>
+        <threeten-extra.version>1.9.0</threeten-extra.version>
         <ulid.version>8.3.0</ulid.version>
         <unboundid-ldap.version>7.0.4</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
@@ -692,12 +692,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.5.5</version>
+                    <version>3.5.6</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.5.5</version>
+                    <version>3.5.6</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -774,7 +774,7 @@
                         <dependency>
                             <groupId>org.openrewrite</groupId>
                             <artifactId>rewrite-java</artifactId>
-                            <version>8.83.0</version>
+                            <version>8.83.4</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
@@ -789,7 +789,7 @@
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-static-analysis</artifactId>
-                            <version>2.35.0</version>
+                            <version>2.36.0</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>

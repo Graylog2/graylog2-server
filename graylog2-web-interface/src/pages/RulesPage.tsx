@@ -18,7 +18,11 @@ import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import PipelinesPageNavigation from 'components/pipelines/PipelinesPageNavigation';
-import { ProcessingLoadDebugMetricsBanner, ProcessingLoadProvider } from 'components/pipelines/processing-load';
+import {
+  EnableDebugMetricsButton,
+  ProcessingLoadDebugMetricsBanner,
+  ProcessingLoadProvider,
+} from 'components/pipelines/processing-load';
 import DocsHelper from 'util/DocsHelper';
 import { Row, Col, ButtonToolbar } from 'components/bootstrap';
 import { SearchForm, PaginatedList, DocumentTitle, PageHeader, Spinner, QueryHelper } from 'components/common';
@@ -56,6 +60,7 @@ const _loadData = (
 
 const rulesButtonToolbar = (
   <ButtonToolbar className="pull-right">
+    <EnableDebugMetricsButton />
     <CreateButton entityKey="Pipeline Rule" />
   </ButtonToolbar>
 );
