@@ -22,6 +22,18 @@ declare module '*.css' {
   export default classes;
 }
 
+declare module '*.less' {
+  interface CSSClasses {
+    [key: string]: any;
+  }
+  const classes: CSSClasses;
+  export default classes;
+}
+
+// Imported only for its side effects (font-face injection). Its types live behind
+// an `exports` subpath that `moduleResolution: node10` cannot resolve.
+declare module '@graylog/sawmill/fonts';
+
 declare module '*.jpg' {
   export default string;
 }

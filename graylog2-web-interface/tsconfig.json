@@ -9,6 +9,7 @@
     "types": ["node"],
     "allowJs": false,
     "downlevelIteration": true,
+    "ignoreDeprecations": "6.0",
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
