@@ -144,7 +144,13 @@ const Table = ({
   responsive = undefined,
 }: Props) => {
   const table = (
-    <StyledTable className={className} data-testid={dataTestId} $striped={striped} $hover={hover} $condensed={condensed} $bordered={bordered}>
+    <StyledTable
+      className={className}
+      data-testid={dataTestId}
+      $striped={striped}
+      $hover={hover}
+      $condensed={condensed}
+      $bordered={bordered}>
       {children}
     </StyledTable>
   );
