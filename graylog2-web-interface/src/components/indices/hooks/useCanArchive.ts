@@ -16,10 +16,10 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import { ArchiveConfig } from '@graylog/server-api';
-
+import fetch from 'logic/rest/FetchProvider';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 import { defaultOnError } from 'util/conditional/onError';
+import { qualifyUrl } from 'util/URLUtils';
 
 const useCanArchive = (): boolean => {
   const { data: license } = usePluggableLicenseCheck('/license/enterprise/archive');
@@ -29,7 +29,9 @@ const useCanArchive = (): boolean => {
     queryKey: ['archive-config'],
     queryFn: () =>
       defaultOnError(
-        ArchiveConfig.get() as Promise<{ backend_id: string }>,
+        fetch('GET', qualifyUrl('/plugins/org.graylog.plugins.archive/config')) as Promise<{
+          backend_id: string;
+        }>,
         'Loading archive config failed',
         'Could not load archive config',
       ),

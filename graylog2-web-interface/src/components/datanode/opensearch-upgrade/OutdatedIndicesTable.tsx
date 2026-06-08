@@ -17,14 +17,16 @@
 import React, { useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import { ArchiveClusterArchives, IndexerIndices } from '@graylog/server-api';
+import { IndexerIndices } from '@graylog/server-api';
 
 import { Alert, Button, ButtonToolbar, Label, SegmentedControl, Table } from 'components/bootstrap';
 import { ConfirmDialog, Spinner } from 'components/common';
 import useCanArchive from 'components/indices/hooks/useCanArchive';
 import useOutdatedIndices from 'components/indices/hooks/useOutdatedIndices';
 import type { OutdatedIndex } from 'components/indices/hooks/useOutdatedIndices';
+import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
+import { qualifyUrl } from 'util/URLUtils';
 
 const Heading = styled.h4(
   ({ theme }) => css`
@@ -40,6 +42,7 @@ const ScrollableTableWrapper = styled.div(
 
     & > table {
       margin-bottom: 0;
+      table-layout: fixed;
     }
 
     & thead,
@@ -208,7 +211,7 @@ const IndicesGroupTable = ({
 
   return (
     <ScrollableTableWrapper>
-      <Table condensed hover striped style={{ tableLayout: 'fixed' }}>
+      <Table condensed hover striped>
         <thead>
           <tr>
             <th>{group.indexLabel}</th>
@@ -273,7 +276,12 @@ const OutdatedIndicesTable = () => {
       }
 
       if (confirmedAction.action === 'archive-delete') {
-        await ArchiveClusterArchives.run(confirmedAction.index.index_name, 'DELETE');
+        await fetch(
+          'POST',
+          qualifyUrl(
+            `/plugins/org.graylog.plugins.archive/cluster/archives/${confirmedAction.index.index_name}?index_action=DELETE`,
+          ),
+        );
         UserNotification.success(`Archive and delete job for "${confirmedAction.index.index_name}" was started.`);
       }
 
