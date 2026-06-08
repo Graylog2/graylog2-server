@@ -90,6 +90,58 @@ describe('useTableLayout hook', () => {
     });
   });
 
+  it('should provide default slicing preferences when there are no user slicing preferences', async () => {
+    const defaultSlicing = { sliceColumn: 'status', sortBy: 'risk_score', order: 'desc' as const };
+
+    asMock(useUserLayoutPreferences).mockReturnValue({ data: undefined, isInitialLoading: false, refetch: () => {} });
+
+    const { result } = renderHook(
+      () =>
+        useTableLayout({
+          entityTableId: 'streams',
+          ...defaultLayout,
+          defaultSlicing,
+        }),
+      { wrapper },
+    );
+
+    expect(result.current.layoutConfig).toEqual({
+      attributes: undefined,
+      order: undefined,
+      sort: defaultLayout.defaultSort,
+      pageSize: defaultLayout.defaultPageSize,
+      slicing: defaultSlicing,
+    });
+  });
+
+  it('should allow user preferences to disable default slicing', async () => {
+    const defaultSlicing = { sliceColumn: 'status', sortBy: 'risk_score', order: 'desc' as const };
+
+    asMock(useUserLayoutPreferences).mockReturnValue({
+      data: { slicing: null },
+      isInitialLoading: false,
+      refetch: () => {},
+    });
+
+    const { result } = renderHook(
+      () =>
+        useTableLayout({
+          entityTableId: 'streams',
+          ...defaultLayout,
+          defaultSlicing,
+        }),
+      { wrapper },
+    );
+
+    expect(result.current.layoutConfig).toEqual({
+      attributes: undefined,
+      order: undefined,
+      sort: defaultLayout.defaultSort,
+      pageSize: defaultLayout.defaultPageSize,
+      slicing: undefined,
+    });
+  });
+
   it('should merge user preferences with defaults', async () => {
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: { perPage: layoutPreferences.perPage },

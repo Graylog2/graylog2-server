@@ -84,7 +84,7 @@ export type TableLayoutPreferences<T = { [key: string]: unknown }> = {
   sort?: Sort;
   perPage?: number;
   order?: Array<string>;
-  slicing?: SlicingPreferences;
+  slicing?: SlicingPreferences | null;
   customPreferences?: T;
 };
 
@@ -95,7 +95,7 @@ export type TableLayoutPreferencesJSON<T = { [key: string]: unknown }> = {
     order: 'asc' | 'desc';
   };
   per_page?: number;
-  slicing?: SlicingPreferencesJSON;
+  slicing?: SlicingPreferencesJSON | null;
   custom_preferences?: T;
   order?: Array<string>;
 };
@@ -117,6 +117,7 @@ export type DefaultLayout = {
   entityTableId: string;
   layoutVariant?: string;
   defaultSort: Sort;
+  defaultSlicing?: SlicingPreferences;
   defaultDisplayedAttributes: Array<string>;
   defaultPageSize: number;
   defaultColumnOrder: Array<string>;

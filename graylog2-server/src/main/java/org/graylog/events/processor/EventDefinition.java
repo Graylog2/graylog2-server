@@ -106,4 +106,8 @@ public interface EventDefinition {
     default String eventSummaryTemplate() {
         return null;
     }
+
+    default ImmutableList<String> tacticsTechniques() {
+        return ImmutableList.of();
+    }
 }

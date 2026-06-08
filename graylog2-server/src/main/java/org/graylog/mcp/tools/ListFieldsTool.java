@@ -67,7 +67,7 @@ public class ListFieldsTool extends Tool<ListFieldsTool.Parameters, ListFieldsTo
     }
 
     @Override
-    protected Result apply(final PermissionHelper permissionHelper, final ListFieldsTool.Parameters parameters) {
+    public Result apply(final PermissionHelper permissionHelper, final ListFieldsTool.Parameters parameters) {
         final Set<String> messageStreamIds = permissionHelper.getSearchUser().streams().loadAllMessageStreams();
         Set<String> filteredMessageStreamIds = messageStreamIds;
         if (parameters.streams() != null && !parameters.streams().isEmpty()) {

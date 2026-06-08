@@ -100,6 +100,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String INDICES_DELETE = "indices:delete";
     public static final String INDICES_FAILURES = "indices:failures";
     public static final String INDICES_READ = "indices:read";
+    public static final String INDICES_REINDEX = "indices:reindex";
     public static final String INPUTS_CHANGESTATE = "inputs:changestate";
     public static final String INPUTS_CREATE = "inputs:create";
     public static final String INPUTS_EDIT = "inputs:edit";
@@ -268,6 +269,7 @@ public class RestPermissions implements PluginPermissions {
             .add(create(INDICES_DELETE, ""))
             .add(create(INDICES_FAILURES, ""))
             .add(create(INDICES_READ, ""))
+            .add(create(INDICES_REINDEX, ""))
             .add(create(INPUTS_CHANGESTATE, ""))
             .add(create(INPUTS_CREATE, ""))
             .add(create(INPUTS_EDIT, ""))

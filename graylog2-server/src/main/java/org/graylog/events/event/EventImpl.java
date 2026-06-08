@@ -68,6 +68,7 @@ public class EventImpl implements Event {
     private final Set<String> tags = new HashSet<>();
     private EventReplayInfo replayInfo;
     private String excludedByRuleId;
+    private List<String> tacticsTechniques = ImmutableList.of();
 
     EventImpl(String eventId,
               DateTime eventTimestamp,
@@ -356,6 +357,16 @@ public class EventImpl implements Event {
     }
 
     @Override
+    public List<String> getTacticsTechniques() {
+        return tacticsTechniques;
+    }
+
+    @Override
+    public void setTacticsTechniques(List<String> tacticsTechniques) {
+        this.tacticsTechniques = tacticsTechniques == null ? ImmutableList.of() : ImmutableList.copyOf(tacticsTechniques);
+    }
+
+    @Override
     public EventDto toDto() {
         final Map<String, String> fields = this.fields.entrySet()
                 .stream()
@@ -392,6 +403,7 @@ public class EventImpl implements Event {
                 .aggregationConditions(ImmutableMap.copyOf(aggregationConditions))
                 .replayInfo(getReplayInfo())
                 .excludedByRuleId(excludedByRuleId)
+                .tacticsTechniques(getTacticsTechniques())
                 .build();
     }
 
@@ -448,6 +460,7 @@ public class EventImpl implements Event {
                 Objects.equals(scores, event.scores) &&
                 Objects.equals(associatedAssets, event.associatedAssets) &&
                 Objects.equals(tags, event.tags) &&
+                Objects.equals(tacticsTechniques, event.tacticsTechniques) &&
                 Objects.equals(replayInfo, event.replayInfo);
     }
 
@@ -456,7 +469,7 @@ public class EventImpl implements Event {
         return Objects.hash(eventId, eventDefinitionType, eventDefinitionId, originContext, eventTimestamp,
                 processingTimestamp, timerangeStart, timerangeEnd, streams, sourceStreams, message, source,
                 keyTuple, priority, alert, fields, groupByFields, aggregationConditions, scores,
-                associatedAssets, tags, replayInfo);
+                associatedAssets, tags, tacticsTechniques, replayInfo);
     }
 
     @Override
@@ -484,6 +497,7 @@ public class EventImpl implements Event {
                 .add("scores", scores)
                 .add("associatedAssets", associatedAssets)
                 .add("tags", tags)
+                .add("tacticsTechniques", tacticsTechniques)
                 .toString();
     }
 
