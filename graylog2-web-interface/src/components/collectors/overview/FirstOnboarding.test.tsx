@@ -15,10 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
+import selectEvent from 'helpers/selectEvent';
 
 import FirstOnboarding from './FirstOnboarding';
 
@@ -50,7 +51,13 @@ const mockFleets = [
 
 const multipleFleets = [
   { id: 'fleet-1', name: 'Production', created_at: '2026-01-01T00:00:00Z', updated_at: '2026-01-01T00:00:00Z' },
-  { id: 'fleet-2', name: 'Staging', created_at: '2026-01-02T00:00:00Z', updated_at: '2026-01-02T00:00:00Z' },
+  {
+    id: 'fleet-2',
+    name: 'Staging',
+    description: 'Pre-release staging environment',
+    created_at: '2026-01-02T00:00:00Z',
+    updated_at: '2026-01-02T00:00:00Z',
+  },
 ];
 
 describe('FirstOnboarding', () => {
@@ -73,6 +80,7 @@ describe('FirstOnboarding', () => {
     createFleet.mockResolvedValue({
       id: 'new-fleet-id',
       name: 'Onboarding - 2026-05-28',
+      description: 'Created by Graylog 7.1 onboarding wizard',
       created_at: '2026-05-28T00:00:00Z',
       updated_at: '2026-05-28T00:00:00Z',
     });
@@ -99,11 +107,28 @@ describe('FirstOnboarding', () => {
     expect(createEnrollmentToken).toHaveBeenCalledWith({
       name: 'onboarding',
       fleetId: 'fleet-1',
-      expiresIn: 'P7D',
+      expiresIn: 'P1D',
     });
 
     expect(screen.getByText(/test-token-abc/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /linux/i })).toBeInTheDocument();
+
+    // A single fleet auto-selects without prompting, but the (changeable) fleet box is still shown.
+    expect(screen.queryByRole('button', { name: /create new fleet/i })).not.toBeInTheDocument();
+    expect(screen.getByText('Default Fleet')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /change fleet/i })).toBeInTheDocument();
+  });
+
+  it('lets the user change the auto-selected fleet when only one exists', async () => {
+    render(<FirstOnboarding />);
+
+    await userEvent.click(screen.getByRole('button', { name: /linux/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /change fleet/i }));
+
+    // Changing reveals the full create-or-select choice.
+    expect(screen.getByRole('button', { name: /create new fleet/i })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /select existing fleet/i })).toBeInTheDocument();
+    expect(screen.queryByText(/run this on linux/i)).not.toBeInTheDocument();
   });
 
   it('creates an onboarding fleet when no fleets exist', async () => {
@@ -128,17 +153,129 @@ describe('FirstOnboarding', () => {
       expect(createEnrollmentToken).toHaveBeenCalledWith({
         name: 'onboarding',
         fleetId: 'new-fleet-id',
-        expiresIn: 'P7D',
+        expiresIn: 'P1D',
       });
     });
   });
 
-  it('shows fleet selector when multiple fleets exist', () => {
+  it('does not show the fleet choice until a platform is selected', () => {
     asMock(useFleets).mockReturnValue({ data: multipleFleets, isLoading: false });
 
     render(<FirstOnboarding />);
 
-    expect(screen.getByText(/choose a fleet/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /linux/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /create new fleet/i })).not.toBeInTheDocument();
+  });
+
+  it('shows the fleet choice after a platform is selected, before any command', async () => {
+    asMock(useFleets).mockReturnValue({ data: multipleFleets, isLoading: false });
+
+    render(<FirstOnboarding />);
+
+    await userEvent.click(screen.getByRole('button', { name: /linux/i }));
+
+    expect(await screen.findByRole('button', { name: /create new fleet/i })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /select existing fleet/i })).toBeInTheDocument();
+
+    // No fleet decided yet: the command box must not appear.
+    expect(screen.queryByText(/run this on linux/i)).not.toBeInTheDocument();
+    expect(createEnrollmentToken).not.toHaveBeenCalled();
+  });
+
+  it('creates a new fleet from the create-new button when multiple fleets exist', async () => {
+    asMock(useFleets).mockReturnValue({ data: multipleFleets, isLoading: false });
+
+    render(<FirstOnboarding />);
+
+    await userEvent.click(screen.getByRole('button', { name: /linux/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /create new fleet/i }));
+
+    await waitFor(() => {
+      expect(createFleet).toHaveBeenCalledWith(
+        expect.objectContaining({ name: expect.stringContaining('Onboarding') }),
+      );
+    });
+
+    expect(createSource).toHaveBeenCalledTimes(3);
+
+    await waitFor(() => {
+      expect(createEnrollmentToken).toHaveBeenCalledWith({
+        name: 'onboarding',
+        fleetId: 'new-fleet-id',
+        expiresIn: 'P1D',
+      });
+    });
+
+    expect(await screen.findByText(/run this on linux/i)).toBeInTheDocument();
+  });
+
+  it('uses an existing fleet selected from the dropdown', async () => {
+    asMock(useFleets).mockReturnValue({ data: multipleFleets, isLoading: false });
+
+    render(<FirstOnboarding />);
+
+    await userEvent.click(screen.getByRole('button', { name: /linux/i }));
+    await screen.findByRole('button', { name: /create new fleet/i });
+
+    await selectEvent.chooseOption('Select existing fleet', 'Staging');
+
+    await waitFor(() => {
+      expect(createEnrollmentToken).toHaveBeenCalledWith({
+        name: 'onboarding',
+        fleetId: 'fleet-2',
+        expiresIn: 'P1D',
+      });
+    });
+
+    expect(createFleet).not.toHaveBeenCalled();
+    expect(await screen.findByText(/run this on linux/i)).toBeInTheDocument();
+  });
+
+  it('shows the selected fleet name and description with a change button once chosen', async () => {
+    asMock(useFleets).mockReturnValue({ data: multipleFleets, isLoading: false });
+
+    render(<FirstOnboarding />);
+
+    await userEvent.click(screen.getByRole('button', { name: /linux/i }));
+    await screen.findByRole('button', { name: /create new fleet/i });
+    await selectEvent.chooseOption('Select existing fleet', 'Staging');
+
+    expect(await screen.findByText(/run this on linux/i)).toBeInTheDocument();
+
+    // The choice controls are replaced by a summary of the selected fleet.
+    expect(screen.getByText('Staging')).toBeInTheDocument();
+    expect(screen.getByText(/pre-release staging environment/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /change fleet/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /create new fleet/i })).not.toBeInTheDocument();
+  });
+
+  it('shows the newly created fleet details after using the create-new button', async () => {
+    asMock(useFleets).mockReturnValue({ data: multipleFleets, isLoading: false });
+
+    render(<FirstOnboarding />);
+
+    await userEvent.click(screen.getByRole('button', { name: /linux/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /create new fleet/i }));
+
+    expect(await screen.findByText('Onboarding - 2026-05-28')).toBeInTheDocument();
+    expect(screen.getByText(/created by graylog 7\.1 onboarding wizard/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /change fleet/i })).toBeInTheDocument();
+  });
+
+  it('returns to the fleet choice and hides the command when changing the fleet', async () => {
+    asMock(useFleets).mockReturnValue({ data: multipleFleets, isLoading: false });
+
+    render(<FirstOnboarding />);
+
+    await userEvent.click(screen.getByRole('button', { name: /linux/i }));
+    await screen.findByRole('button', { name: /create new fleet/i });
+    await selectEvent.chooseOption('Select existing fleet', 'Staging');
+
+    await userEvent.click(await screen.findByRole('button', { name: /change fleet/i }));
+
+    expect(screen.getByRole('button', { name: /create new fleet/i })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /select existing fleet/i })).toBeInTheDocument();
+    expect(screen.queryByText(/run this on linux/i)).not.toBeInTheDocument();
   });
 
   it('reuses the token when switching platforms', async () => {
@@ -153,7 +290,7 @@ describe('FirstOnboarding', () => {
     await userEvent.click(screen.getByRole('button', { name: /windows/i }));
 
     await waitFor(() => {
-      expect(screen.getByText(/install on windows/i)).toBeInTheDocument();
+      expect(screen.getByText(/run this on windows/i)).toBeInTheDocument();
     });
 
     expect(createEnrollmentToken).toHaveBeenCalledTimes(1);
@@ -173,6 +310,37 @@ describe('FirstOnboarding', () => {
     expect(screen.getByText(/collector connected/i)).toBeInTheDocument();
     // web-prod-01 appears twice: as the connection hostname and as an auto-detected host asset
     expect(screen.getAllByText(/web-prod-01/i).length).toBeGreaterThan(0);
+  });
+
+  it('collapses to a compact, non-interactive summary once connected', async () => {
+    asMock(useFleets).mockReturnValue({ data: multipleFleets, isLoading: false });
+
+    render(<FirstOnboarding />);
+
+    await userEvent.click(screen.getByRole('button', { name: /linux/i }));
+    await screen.findByRole('button', { name: /create new fleet/i });
+    await selectEvent.chooseOption('Select existing fleet', 'Staging');
+
+    await waitFor(() => {
+      expect(screen.getByText(/run this on linux/i)).toBeInTheDocument();
+    });
+
+    // While waiting, the fleet box is still editable.
+    expect(screen.getByRole('button', { name: /change fleet/i })).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: /simulate connection/i }));
+
+    expect(screen.getByText(/collector connected/i)).toBeInTheDocument();
+
+    // The OS grid and the editable fleet box collapse — nothing left to change.
+    expect(screen.queryByText(/get started with collectors/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /change fleet/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: /select existing fleet/i })).not.toBeInTheDocument();
+
+    // A compact read-only summary shows the platform and fleet name.
+    const summary = screen.getByTestId('onboarding-summary');
+    expect(within(summary).getByText('Linux')).toBeInTheDocument();
+    expect(within(summary).getByText('Staging')).toBeInTheDocument();
   });
 
   it('shows spinner while config or fleets are loading', async () => {

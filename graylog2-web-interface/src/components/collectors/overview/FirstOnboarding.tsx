@@ -25,14 +25,18 @@ import PlatformPicker from './onboarding/PlatformPicker';
 import InstallCommand from './onboarding/InstallCommand';
 import WaitingForConnection from './onboarding/WaitingForConnection';
 import ConnectionSuccess from './onboarding/ConnectionSuccess';
-import FleetSelector from './onboarding/FleetSelector';
+import FleetChoice from './onboarding/FleetChoice';
+import type { FleetChoiceValue } from './onboarding/FleetChoice';
+import OnboardingSummary from './onboarding/OnboardingSummary';
 import PLATFORMS from './onboarding/platforms';
 import type { PlatformId } from './onboarding/platforms';
 import DEFAULT_SOURCES from './onboarding/defaultSources';
 
 import { useCollectorsConfig, useCollectorsMutations, useFleets } from '../hooks';
+import type { Fleet } from '../types';
 
-type Phase = 'pick' | 'waiting' | 'connected';
+// 'setup' = still collecting platform/fleet; 'waiting'/'connected' = command box is live.
+type Phase = 'setup' | 'waiting' | 'connected';
 
 // The platform picker (700px) and fleet selector (400px) own their own centered widths.
 // The install/connected body gets a wider column so the command, stat cards, and asset grid have room.
@@ -50,14 +54,16 @@ const formatDate = () => {
 };
 
 const FirstOnboarding = () => {
-  const [phase, setPhase] = useState<Phase>('pick');
+  const [phase, setPhase] = useState<Phase>('setup');
   const [selectedPlatform, setSelectedPlatform] = useState<PlatformId | null>(null);
   const [installCommand, setInstallCommand] = useState<string>('');
-  const [selectedFleetId, setSelectedFleetId] = useState<string | null>(null);
-  const [createNewFleet, setCreateNewFleet] = useState(false);
+  // Only ever set by the fleet-choice UI, which renders only when more than one fleet exists.
+  const [fleetChoice, setFleetChoice] = useState<FleetChoiceValue | null>(null);
+  // The fleet the collector will enroll into, once resolved (looked up or freshly created).
+  const [resolvedFleet, setResolvedFleet] = useState<Fleet | null>(null);
 
+  // The enrollment token is minted once and reused while switching platforms.
   const tokenRef = useRef<string | null>(null);
-  const fleetIdRef = useRef<string | null>(null);
 
   const { data: config, isLoading: isConfigLoading } = useCollectorsConfig();
   const { data: fleets, isLoading: isFleetsLoading } = useFleets();
@@ -91,76 +97,73 @@ const FirstOnboarding = () => {
       DEFAULT_SOURCES.map((source) => createSource({ fleetId: fleet.id, source, silent: true })),
     );
 
-    return fleet.id;
+    return fleet;
   }, [createFleet, createSource]);
 
-  const resolveFleetId = useCallback(async (): Promise<string | null> => {
-    if (fleetIdRef.current) return fleetIdRef.current;
-
-    if (!fleets) return null;
-
-    if (fleets.length === 0 || createNewFleet) {
-      const newFleetId = await createOnboardingFleet();
-      fleetIdRef.current = newFleetId;
-
-      return newFleetId;
-    }
-
-    if (fleets.length === 1) {
-      fleetIdRef.current = fleets[0].id;
-
-      return fleets[0].id;
-    }
-
-    if (selectedFleetId) {
-      fleetIdRef.current = selectedFleetId;
-
-      return selectedFleetId;
-    }
+  // The fleet to use without asking the user: none -> create one, exactly one -> use it,
+  // more than one -> null (the user must decide via the fleet-choice UI).
+  const autoChoice = useCallback((): FleetChoiceValue | null => {
+    if (!fleets || fleets.length === 0) return { kind: 'create-new' };
+    if (fleets.length === 1) return { kind: 'existing', fleetId: fleets[0].id };
 
     return null;
-  }, [fleets, createNewFleet, selectedFleetId, createOnboardingFleet]);
+  }, [fleets]);
 
-  const handleFleetSelect = useCallback((fleetId: string | null, isCreateNew: boolean) => {
-    setSelectedFleetId(fleetId);
-    setCreateNewFleet(isCreateNew);
-    fleetIdRef.current = null;
-    tokenRef.current = null;
-  }, []);
-
-  const handlePlatformSelect = useCallback(
-    async (platformId: PlatformId) => {
-      if (!config) return;
-
-      setSelectedPlatform(platformId);
-
-      if (tokenRef.current) {
-        setInstallCommand(buildCommand(platformId, tokenRef.current));
-        setPhase('waiting');
-
-        return;
-      }
-
+  // Both gates (platform, fleet) converge here once both are known. Builds the command box.
+  const showCommand = useCallback(
+    async (platformId: PlatformId, choice: FleetChoiceValue) => {
       try {
-        const fleetId = await resolveFleetId();
+        if (!tokenRef.current) {
+          const fleet = choice.kind === 'create-new'
+            ? await createOnboardingFleet()
+            : fleets?.find((f) => f.id === choice.fleetId);
 
-        if (!fleetId) return;
+          if (!fleet) return;
 
-        const response = await createEnrollmentToken({
-          name: 'onboarding',
-          fleetId,
-          expiresIn: 'P1D',
-        });
+          // Reflect the fleet right away so the box lands on its details view without a flash of the prompt.
+          setResolvedFleet(fleet);
 
-        tokenRef.current = response.token;
-        setInstallCommand(buildCommand(platformId, response.token));
+          const { token } = await createEnrollmentToken({ name: 'onboarding', fleetId: fleet.id, expiresIn: 'P1D' });
+          tokenRef.current = token;
+        }
+
+        setInstallCommand(buildCommand(platformId, tokenRef.current));
         setPhase('waiting');
       } catch {
         // Error notification handled by useCollectorsMutations onError callback
       }
     },
-    [config, resolveFleetId, createEnrollmentToken, buildCommand],
+    [fleets, createOnboardingFleet, createEnrollmentToken, buildCommand],
   );
+
+  const handlePlatformSelect = useCallback(
+    (platformId: PlatformId) => {
+      setSelectedPlatform(platformId);
+
+      // 0/1-fleet falls straight through; >1 fleets waits for the user's choice.
+      const choice = fleetChoice ?? autoChoice();
+      if (choice) showCommand(platformId, choice);
+    },
+    [fleetChoice, autoChoice, showCommand],
+  );
+
+  const handleFleetChoice = useCallback(
+    (choice: FleetChoiceValue) => {
+      setFleetChoice(choice);
+      tokenRef.current = null; // fleet changed -> a new token is needed
+
+      if (selectedPlatform) showCommand(selectedPlatform, choice);
+    },
+    [selectedPlatform, showCommand],
+  );
+
+  // "Change fleet": drop the resolved fleet and token, and fall back to the choice UI.
+  const handleChangeFleet = useCallback(() => {
+    setFleetChoice(null);
+    setResolvedFleet(null);
+    tokenRef.current = null;
+    setPhase('setup');
+  }, []);
 
   const handleSimulateConnection = useCallback(() => {
     setPhase('connected');
@@ -169,27 +172,40 @@ const FirstOnboarding = () => {
   if (isConfigLoading || isFleetsLoading) return <Spinner />;
 
   const isBusy = isCreatingFleet || isCreatingEnrollmentToken;
-  const showFleetSelector = (fleets?.length ?? 0) > 1;
-  const needsFleetSelection = showFleetSelector && !selectedFleetId && !createNewFleet;
+  // Show the fleet box whenever an existing fleet could be chosen. With exactly one fleet it
+  // auto-resolves (no prompt — see autoChoice), but stays visible so the user can change it.
+  const showFleetChoice = (fleets?.length ?? 0) >= 1;
 
   return (
     <div>
-      {showFleetSelector && (
-        <FleetSelector
-          fleets={fleets!}
-          selectedFleetId={selectedFleetId}
-          onSelect={handleFleetSelect}
-          disabled={isBusy}
-        />
+      {phase === 'connected' && selectedPlatform ? (
+        // Connected: the OS grid and fleet picker are pointless now — show a read-only recap.
+        <OnboardingSummary platformId={selectedPlatform} fleetName={resolvedFleet?.name} />
+      ) : (
+        <>
+          {/* 1. Always: pick the operating system. */}
+          <PlatformPicker
+            onSelect={handlePlatformSelect}
+            selectedPlatform={selectedPlatform}
+            disabled={isBusy}
+          />
+
+          {/* 2. Only when a platform is picked and at least one fleet exists.
+                Shows the choice controls until a fleet is resolved, then its details. */}
+          {selectedPlatform && showFleetChoice && (
+            <FleetChoice
+              fleets={fleets!}
+              selectedFleet={resolvedFleet}
+              onSelect={handleFleetChoice}
+              onChange={handleChangeFleet}
+              disabled={isBusy}
+            />
+          )}
+        </>
       )}
 
-      <PlatformPicker
-        onSelect={handlePlatformSelect}
-        selectedPlatform={selectedPlatform}
-        disabled={isBusy || needsFleetSelection}
-      />
-
-      {phase !== 'pick' && selectedPlatform && (
+      {/* 3. The command box, once the preconditions are satisfied. */}
+      {phase !== 'setup' && selectedPlatform && (
         <BodyContainer>
           {phase === 'waiting' && (
             <>
