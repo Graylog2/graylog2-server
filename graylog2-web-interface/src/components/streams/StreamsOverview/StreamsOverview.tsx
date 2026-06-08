@@ -69,7 +69,10 @@ const StreamsOverview = ({ indexSets }: Props) => {
   useRefetchStreamsOnStoreChange(() => queryClient.invalidateQueries({ queryKey: KEY_PREFIX }));
 
   const columnRenderers = CustomColumnRenderers(indexSets, isPipelineColumnPermitted, extensionColumnRenderers);
-  const { additionalAttributes, defaultLayout } = getStreamTableElements(isPipelineColumnPermitted, extensionAttributes);
+  const { additionalAttributes, defaultLayout } = getStreamTableElements(
+    isPipelineColumnPermitted,
+    extensionAttributes,
+  );
 
   const fetchEntities = (options: SearchParams): Promise<PaginatedResponse<Stream>> => {
     CurrentUserStore.update(CurrentUserStore.getInitialState().currentUser.username);

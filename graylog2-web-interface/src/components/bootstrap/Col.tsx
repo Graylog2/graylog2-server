@@ -87,12 +87,7 @@ type StyledProps = {
 // 15px horizontal padding) to elements with an actual `col-*-N` class. Apply
 // them only when at least one size prop is set, so a bare `<Col>` (used in
 // places as a generic container) renders as a plain div like in RB.
-const hasAnySize = ({
-  $xs,
-  $sm,
-  $md,
-  $lg,
-}: Pick<StyledProps, '$xs' | '$sm' | '$md' | '$lg'>) =>
+const hasAnySize = ({ $xs, $sm, $md, $lg }: Pick<StyledProps, '$xs' | '$sm' | '$md' | '$lg'>) =>
   $xs !== undefined || $sm !== undefined || $md !== undefined || $lg !== undefined;
 
 const StyledCol = styled.div<StyledProps>`
