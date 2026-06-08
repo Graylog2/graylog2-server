@@ -19,6 +19,7 @@ package org.graylog.aws.inputs.cloudtrail.api;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
 import org.graylog.aws.config.AWSPluginConfiguration;
+import org.graylog.aws.inputs.cloudtrail.CloudTrailCodec;
 import org.graylog.aws.inputs.cloudtrail.CloudTrailInput;
 import org.graylog.aws.inputs.cloudtrail.api.requests.CloudTrailCreateInputRequest;
 import org.graylog.aws.inputs.cloudtrail.api.requests.CloudTrailRequest;
@@ -145,6 +146,7 @@ public class CloudTrailDriver {
         configuration.put(CloudTrailInput.CK_POLLING_INTERVAL, request.pollingInterval());
         configuration.put(CloudTrailInput.CK_OVERRIDE_SOURCE, request.overrideSource());
         configuration.put(CloudTrailInput.CK_SQS_MESSAGE_BATCH_SIZE, request.sqsMessageBatchSize());
+        configuration.put(CloudTrailCodec.CK_INCLUDE_FULL_MESSAGE_JSON, request.includeFullMessageJson());
 
         final InputCreateRequest inputCreateRequest = InputCreateRequest.create(request.name(),
                 CloudTrailInput.TYPE,

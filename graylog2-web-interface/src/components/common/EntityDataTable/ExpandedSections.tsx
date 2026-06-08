@@ -20,6 +20,8 @@ import styled, { css } from 'styled-components';
 
 import IconButton from 'components/common/IconButton';
 import { ButtonToolbar } from 'components/bootstrap';
+import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
+import { scrollContainerWidthVar } from 'components/common/EntityDataTable/CSSVariables';
 
 import type { EntityBase, ExpandedSectionRenderers } from './types';
 import ExpandedEntitiesSectionsContext from './contexts/ExpandedSectionsContext';
@@ -32,11 +34,32 @@ const Container = styled.tr(
   `,
 );
 
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 5px;
+const ContentCell = styled.td`
+  && {
+    padding: 0;
+    border-top-color: ${({ theme }) => theme.colors.table.row.backgroundStriped} !important;
+  }
 `;
+
+const Content = styled.div(
+  ({ theme }) => css`
+    position: sticky;
+    left: 0;
+    width: 100%;
+    max-width: var(${scrollContainerWidthVar}, 100%);
+    padding: ${CELL_PADDING}px ${CELL_PADDING}px ${theme.spacings.md} ${theme.spacings.lg};
+    background-color: ${theme.colors.table.row.backgroundStriped};
+  `,
+);
+
+const Header = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: ${theme.spacings.sm};
+  `,
+);
 
 const Actions = styled(ButtonToolbar)`
   display: flex;
@@ -63,29 +86,31 @@ const ExpandedSections = <Entity extends EntityBase>({
 
   return (
     <Container>
-      <td colSpan={1000}>
-        {Object.entries(expandedSectionRenderers ?? {})
-          .filter(([sectionName]) => expandedEntitySections.includes(sectionName))
-          .map(([sectionName, section]) => {
-            const hideSection = () => toggleSection(entity.id, sectionName);
-            const actions = section.actions?.(entity);
+      <ContentCell colSpan={1000}>
+        <Content>
+          {Object.entries(expandedSectionRenderers ?? {})
+            .filter(([sectionName]) => expandedEntitySections.includes(sectionName))
+            .map(([sectionName, section]) => {
+              const hideSection = () => toggleSection(entity.id, sectionName);
+              const actions = section.actions?.(entity);
 
-            return (
-              <div key={`${sectionName}-${entity.id}`}>
-                {section.disableHeader !== true ? (
-                  <Header>
-                    <h3>{section.title}</h3>
-                    <Actions>
-                      {actions}
-                      <HideSectionButton name="close" onClick={hideSection} title="Hide section" />
-                    </Actions>
-                  </Header>
-                ) : null}
-                {section.content(entity)}
-              </div>
-            );
-          })}
-      </td>
+              return (
+                <div key={`${sectionName}-${entity.id}`}>
+                  {section.disableHeader !== true ? (
+                    <Header>
+                      <h3>{section.title}</h3>
+                      <Actions>
+                        {actions}
+                        <HideSectionButton name="keyboard_arrow_up" onClick={hideSection} title="Collapse section" />
+                      </Actions>
+                    </Header>
+                  ) : null}
+                  {section.content(entity)}
+                </div>
+              );
+            })}
+        </Content>
+      </ContentCell>
     </Container>
   );
 };

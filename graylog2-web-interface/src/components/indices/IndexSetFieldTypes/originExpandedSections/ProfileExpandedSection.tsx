@@ -18,7 +18,7 @@ import React from 'react';
 
 import useIndexProfileWithMappingsByField from 'components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField';
 import Routes from 'routing/Routes';
-import { Link } from 'components/common/router';
+import { Link } from 'components/common';
 import type { ExpandedSectionProps } from 'components/indices/IndexSetFieldTypes/types';
 
 const IndexExpandedSection = ({ type }: ExpandedSectionProps) => {

@@ -48,7 +48,7 @@ const EditEventDefinitionPage = () => {
   useEffect(() => {
     if (isPermitted(currentUser.permissions, `eventdefinitions:edit:${params.definitionId}`)) {
       EventDefinitionsActions.get(params.definitionId).then(
-        (response) => {
+        (response: any) => {
           const eventDefinitionResponse = response.event_definition;
 
           // Inject an internal "_is_scheduled" field to indicate if the event definition should be scheduled in the

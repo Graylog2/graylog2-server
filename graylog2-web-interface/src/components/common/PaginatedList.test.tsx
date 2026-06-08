@@ -16,37 +16,45 @@
  */
 import React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
-import type { Location } from 'history';
 import userEvent from '@testing-library/user-event';
 
-import useLocation from 'routing/useLocation';
+import { useQueryParams } from 'routing/QueryParams';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import { asMock } from 'helpers/mocking';
 
 import PaginatedList from './PaginatedList';
 
-jest.mock('routing/useLocation', () => jest.fn(() => ({ search: '' })));
+const setQueryParams = jest.fn();
+
+jest.mock('routing/QueryParams', () => ({
+  ...jest.requireActual('routing/QueryParams'),
+  useQueryParams: jest.fn(),
+}));
 
 describe('PaginatedList', () => {
+  beforeEach(() => {
+    asMock(useQueryParams).mockImplementation(() => [{}, jest.fn()]);
+  });
+
   it('should display Pagination', () => {
-    const { getByText } = render(
+    render(
       <PaginatedList totalItems={100} onChange={() => {}}>
         <div>The list</div>
       </PaginatedList>,
     );
 
-    expect(getByText('The list')).not.toBeNull();
-    expect(getByText('1')).not.toBeNull();
+    expect(screen.getByText('The list')).not.toBeNull();
+    expect(screen.getByText('1')).not.toBeNull();
   });
 
   it('should not dived by 0 if pageSize is 0 Pagination', () => {
-    const { getByText } = render(
+    render(
       <PaginatedList totalItems={100} pageSize={0} onChange={() => {}}>
         <div>The list</div>
       </PaginatedList>,
     );
 
-    expect(getByText('The list')).not.toBeNull();
+    expect(screen.getByText('The list')).not.toBeNull();
   });
 
   it('should not display Pagination, when context is not interactive', () => {
@@ -88,37 +96,32 @@ describe('PaginatedList', () => {
   describe('with state based on URL query params', () => {
     it('should set <page> query parameter as active page', async () => {
       const currentPage = 4;
+      asMock(useQueryParams).mockImplementation(() => [{ page: currentPage }, setQueryParams]);
 
-      asMock(useLocation).mockReturnValue({
-        search: `?page=${currentPage}`,
-      } as Location);
-
-      const { findByTestId } = render(
+      render(
         <PaginatedList totalItems={200} onChange={() => {}} activePage={3}>
           <div>The list</div>
         </PaginatedList>,
       );
 
-      const graylogPagination = await findByTestId('graylog-pagination');
-      const activePageElement = graylogPagination.getElementsByClassName('active');
+      const activePageElement = await screen.findByTitle('Active page');
 
       expect(activePageElement).not.toBeNull();
-      expect(activePageElement[0].textContent).toContain(`${currentPage}`);
+      expect(activePageElement).toHaveTextContent(`${currentPage}`);
     });
   });
 
   describe('with internal state', () => {
     it('should update active page, when prop changes', async () => {
-      const { findByTestId, rerender } = render(
+      const { rerender } = render(
         <PaginatedList totalItems={200} onChange={() => {}} activePage={3} useQueryParameter={false}>
           <div>The list</div>
         </PaginatedList>,
       );
 
-      const graylogPagination = await findByTestId('graylog-pagination');
-      const activePageElement = graylogPagination.getElementsByClassName('active');
+      const activePageElement = await screen.findByTitle('Active page');
 
-      expect(activePageElement[0].textContent).toContain('3');
+      expect(activePageElement).toHaveTextContent('3');
 
       rerender(
         <PaginatedList totalItems={200} onChange={() => {}} activePage={1} useQueryParameter={false}>
@@ -126,10 +129,9 @@ describe('PaginatedList', () => {
         </PaginatedList>,
       );
 
-      await findByTestId('graylog-pagination');
-      const newActivePageElement = graylogPagination.getElementsByClassName('active');
+      const newActivePageElement = await screen.findByTitle('Active page');
 
-      expect(newActivePageElement[0].textContent).toContain('1');
+      expect(newActivePageElement).toHaveTextContent('1');
     });
   });
 });

@@ -81,18 +81,21 @@ public class PipelineInterpreter implements MessageProcessor {
     private final Meter filteredOutMessages;
     private final Timer executionTime;
     private final MetricRegistry metricRegistry;
-    private final ConfigurationStateUpdater stateUpdater;
+    private final PipelineInterpreterStateUpdater stateUpdater;
+    private final int ruleMetricsSampleRate;
 
     @Inject
     public PipelineInterpreter(MessageQueueAcknowledger messageQueueAcknowledger,
                                MetricRegistry metricRegistry,
-                               ConfigurationStateUpdater stateUpdater) {
+                               PipelineInterpreterStateUpdater stateUpdater,
+                               @Named("rule_metrics_sample_rate") int ruleMetricsSampleRate) {
 
         this.messageQueueAcknowledger = messageQueueAcknowledger;
         this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
         this.executionTime = metricRegistry.timer(name(PipelineInterpreter.class, "executionTime"));
         this.metricRegistry = metricRegistry;
         this.stateUpdater = stateUpdater;
+        this.ruleMetricsSampleRate = ruleMetricsSampleRate;
     }
 
     /**
@@ -104,7 +107,7 @@ public class PipelineInterpreter implements MessageProcessor {
         try (Timer.Context ignored = executionTime.time()) {
             final State latestState = stateUpdater.getLatestState();
             if (latestState.enableRuleMetrics()) {
-                return process(messages, new RuleMetricsListener(metricRegistry), latestState);
+                return process(messages, new RuleMetricsListener(metricRegistry, ruleMetricsSampleRate), latestState);
             }
             return process(messages, new NoopInterpreterListener(), latestState);
         }
@@ -140,9 +143,7 @@ public class PipelineInterpreter implements MessageProcessor {
             for (Message message : currentSet) {
                 final String msgId = message.getId();
 
-                // this makes a copy of the list, which is mutated later in updateStreamBlacklist
-                // it serves as a worklist, to keep track of which <msg, stream> tuples need to be re-run again
-                final Set<String> initialStreamIds = message.getStreams().stream().map(Stream::getId).collect(Collectors.toSet());
+                final ImmutableSet<String> initialStreamIds = message.getStreamsUnmodifiable().stream().map(Stream::getId).collect(ImmutableSet.toImmutableSet());
 
                 final ImmutableSet<Pipeline> pipelinesToRun = selectPipelines(interpreterListener,
                         processingBlacklist,
@@ -190,10 +191,10 @@ public class PipelineInterpreter implements MessageProcessor {
     // <msgid, stream> that should not be run again (which prevents re-running pipelines over and over again)
     private boolean updateStreamBlacklist(Set<Tuple2<String, String>> processingBlacklist,
                                           Message message,
-                                          Set<String> initialStreamIds) {
+                                          ImmutableSet<String> initialStreamIds) {
         boolean addedStreams = false;
-        for (Stream stream : message.getStreams()) {
-            if (!initialStreamIds.remove(stream.getId())) {
+        for (Stream stream : message.getStreamsUnmodifiable()) {
+            if (!initialStreamIds.contains(stream.getId())) {
                 addedStreams = true;
             } else {
                 // only add pre-existing streams to blacklist, this has the effect of only adding already processed streams,
@@ -205,11 +206,10 @@ public class PipelineInterpreter implements MessageProcessor {
     }
 
     // determine which pipelines should be executed give the stream-pipeline connections and the current message
-    // the initialStreamIds are not mutated, but are being passed for efficiency, as they are used later in #process()
     private ImmutableSet<Pipeline> selectPipelines(InterpreterListener interpreterListener,
                                                    Set<Tuple2<String, String>> processingBlacklist,
                                                    Message message,
-                                                   Set<String> initialStreamIds,
+                                                   ImmutableSet<String> initialStreamIds,
                                                    ImmutableSetMultimap<String, Pipeline> streamConnection) {
         final String msgId = message.getId();
 

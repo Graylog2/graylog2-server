@@ -70,7 +70,6 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20230904073300_MigrateThemePreferences.class);
         addMigration(V20240312140000_RemoveFieldTypeMappingsManagerRole.class);
         addMigration(V202404170856_UpdateIndexSetTemplates.class);
-        addMigration(V20240927120300_DataNodeMigrationIndexSet.class);
         addMigration(V20250304102900_ScopeMigration.class);
         addMigration(V20250206105400_TokenManagementConfiguration.class);
         addMigration(V20250219134200_DefaultTTLForNewTokens.class);
@@ -85,5 +84,7 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20251003000000_AddMcpConfigurationMigration.class);
         addMigration(V20251222123500_CreatePipelineMetadata.class);
         addMigration(V20251103123300_MigrateEntityListPreferences.class);
+        addMigration(V20260416120000_RemoveStrayFieldsFromInputs.class);
+        addMigration(V20260428120000_AddLayoutVariantToEntityListPreferencesId.class);
     }
 }

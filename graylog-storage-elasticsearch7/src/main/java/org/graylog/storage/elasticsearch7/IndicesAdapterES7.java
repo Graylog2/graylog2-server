@@ -73,9 +73,11 @@ import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.IndexMoveResult;
 import org.graylog2.indexer.indices.IndexSettings;
+import org.graylog2.indexer.indices.IndexStatus;
 import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.IndicesAdapter;
+import org.graylog2.indexer.indices.OutdatedIndex;
 import org.graylog2.indexer.indices.ShardsInfo;
 import org.graylog2.indexer.indices.Template;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
@@ -136,7 +138,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     }
 
     @Override
-    public void move(String source, String target, Consumer<IndexMoveResult> resultCallback) {
+    public void reindex(String source, String target, Consumer<IndexMoveResult> resultCallback) {
         final ReindexRequest request = new ReindexRequest();
         request.setSourceIndices(source);
         request.setDestIndex(target);
@@ -467,8 +469,16 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     }
 
     @Override
-    public Set<String> indices(String indexWildcard, List<String> status, String indexSetId) {
-        return catApi.indices(indexWildcard, status, "Couldn't get index list for index set <" + indexSetId + ">");
+    public Set<String> indices(String indexWildcard, List<IndexStatus> status, String indexSetId) {
+        final List<String> indexStatus = status.stream().map(this::toStatusName).toList();
+        return catApi.indices(indexWildcard, indexStatus, "Couldn't get index list for index set <" + indexSetId + ">");
+    }
+
+    private String toStatusName(IndexStatus status) {
+        return switch (status) {
+            case OPEN -> "open";
+            case CLOSED -> "close";
+        };
     }
 
     @Override
@@ -643,5 +653,10 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     @Override
     public Optional<WarmIndexInfo> getWarmIndexInfo(String index) {
         return Optional.empty();
+    }
+
+    @Override
+    public Set<OutdatedIndex> getOutdatedIndices(int currentMajorVersion) {
+        throw new UnsupportedOperationException("Outdated indices check only supported in OpenSearch versions > 2.x.");
     }
 }

@@ -1,0 +1,5 @@
+type = "a"
+message = "Provide information on input launch failures."
+
+pulls = ["24754"]
+issues = ["Graylog2/graylog-plugin-enterprise#10701"]

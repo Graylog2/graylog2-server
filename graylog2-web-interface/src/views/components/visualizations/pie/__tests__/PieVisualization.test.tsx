@@ -59,7 +59,7 @@ const SimplePieVisualization = (props: Pick<React.ComponentProps<typeof PieVisua
 
 describe('PieVisualization', () => {
   const openActionsDropdown = async () => {
-    userEvent.click(await screen.findByText('show'));
+    await userEvent.click(await screen.findByText('show'));
     await screen.findByRole('menu');
   };
 

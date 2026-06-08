@@ -15,8 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import { Alert } from 'components/bootstrap';
+
+const DangerRow = styled.tr(
+  ({ theme }) => css`
+    background-color: ${theme.colors.variant.light.danger};
+  `,
+);
 
 import CommonNotificationSummary from './CommonNotificationSummary';
 import commonStyles from './LegacyNotificationCommonStyles.css';
@@ -47,12 +54,12 @@ const LegacyNotificationSummary = (props: Props) => {
     ));
   } else {
     content = (
-      <tr className="danger">
+      <DangerRow>
         <td>Type</td>
         <td>
           Unknown legacy alarm callback type: <code>{callbackType}</code>. Please make sure the plugin is installed.
         </td>
-      </tr>
+      </DangerRow>
     );
   }
 

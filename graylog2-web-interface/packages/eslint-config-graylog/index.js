@@ -110,7 +110,7 @@ export default [
       'no-loop-func': 'error',
 
       'import/prefer-default-export': 'off',
-      'jsx-a11y/control-has-associated-label': 'error',
+      'jsx-a11y/control-has-associated-label': ['error', { depth: 3, ignoreElements: ['td', 'th'] }],
       'react/no-array-index-key': 'error',
       'react/no-danger': 'error',
       'react/no-unstable-nested-components': 'error',
@@ -166,6 +166,16 @@ export default [
             {
               name: 'react-bootstrap',
               message: 'Please use `components/bootstrap` instead.',
+            },
+            {
+              name: 'react-router-dom',
+              importNames: ['Link'],
+              message: 'Please use Link from `components/common` instead.',
+            },
+            {
+              name: 'react-router-dom',
+              importNames: ['useLocation'],
+              message: 'Please use `routing/useLocation` instead.',
             },
             {
               name: 'create-react-class',

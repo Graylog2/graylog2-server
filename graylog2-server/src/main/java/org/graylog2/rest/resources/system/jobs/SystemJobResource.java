@@ -19,7 +19,6 @@ package org.graylog2.rest.resources.system.jobs;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -47,6 +46,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.scheduler.rest.JobResourceHandlerService;
+import org.graylog.scheduler.system.SystemJobManager;
 import org.graylog.security.UserContext;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -55,16 +55,18 @@ import org.graylog2.rest.models.system.SystemJobSummary;
 import org.graylog2.rest.models.system.jobs.requests.TriggerRequest;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.system.jobs.LegacySystemJob;
+import org.graylog2.system.jobs.LegacySystemJobFactory;
+import org.graylog2.system.jobs.LegacySystemJobManager;
 import org.graylog2.system.jobs.NoSuchJobException;
-import org.graylog2.system.jobs.SystemJob;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
-import org.graylog2.system.jobs.SystemJobFactory;
-import org.graylog2.system.jobs.SystemJobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RequiresAuthentication
 @Tag(name = "System/Jobs", description = "System Jobs")
@@ -73,18 +75,21 @@ public class SystemJobResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(SystemJobResource.class);
 
-    private final SystemJobFactory systemJobFactory;
+    private final LegacySystemJobFactory systemJobFactory;
+    private final LegacySystemJobManager legacySystemJobManager;
     private final SystemJobManager systemJobManager;
     private final NodeId nodeId;
 
     private final JobResourceHandlerService jobResourceHandlerService;
 
     @Inject
-    public SystemJobResource(SystemJobFactory systemJobFactory,
+    public SystemJobResource(LegacySystemJobFactory systemJobFactory,
+                             LegacySystemJobManager legacySystemJobManager,
                              SystemJobManager systemJobManager,
                              NodeId nodeId,
                              JobResourceHandlerService jobResourceHandlerService) {
         this.systemJobFactory = systemJobFactory;
+        this.legacySystemJobManager = legacySystemJobManager;
         this.systemJobManager = systemJobManager;
         this.nodeId = nodeId;
         this.jobResourceHandlerService = jobResourceHandlerService;
@@ -95,12 +100,12 @@ public class SystemJobResource extends RestResource {
     @Operation(summary = "List currently running jobs")
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, List<SystemJobSummary>> list() {
-        final List<SystemJobSummary> jobs = Lists.newArrayListWithCapacity(systemJobManager.getRunningJobs().size());
+        final List<SystemJobSummary> jobs = new ArrayList<>();
 
-        for (Map.Entry<String, SystemJob> entry : systemJobManager.getRunningJobs().entrySet()) {
+        for (Map.Entry<String, LegacySystemJob> entry : legacySystemJobManager.getRunningJobs().entrySet()) {
             // TODO jobId is ephemeral, this is not a good key for permission checks. we should use the name of the job type (but there is no way to get it yet)
             if (isPermitted(RestPermissions.SYSTEMJOBS_READ, entry.getKey())) {
-                final SystemJob systemJob = entry.getValue();
+                final LegacySystemJob systemJob = entry.getValue();
                 jobs.add(SystemJobSummary.create(
                         systemJob.getId(),
                         systemJob.getDescription(),
@@ -112,6 +117,12 @@ public class SystemJobResource extends RestResource {
                         systemJob.isCancelable(),
                         systemJob.providesProgress()
                 ));
+            }
+        }
+
+        for (final var summary : systemJobManager.getRunningJobs(nodeId).values()) {
+            if (isPermitted(RestPermissions.SYSTEMJOBS_READ, summary.jobType())) {
+                jobs.add(summary);
             }
         }
 
@@ -129,25 +140,30 @@ public class SystemJobResource extends RestResource {
     })
     public SystemJobSummary get(@Parameter(name = "jobId", required = true)
                                 @PathParam("jobId") @NotEmpty String jobId) {
-        // TODO jobId is ephemeral, this is not a good key for permission checks. we should use the name of the job type (but there is no way to get it yet)
-        checkPermission(RestPermissions.SYSTEMJOBS_READ, jobId);
-
-        SystemJob systemJob = systemJobManager.getRunningJobs().get(jobId);
-        if (systemJob == null) {
-            throw new NotFoundException("No system job with ID <" + jobId + "> found");
+        final LegacySystemJob systemJob = legacySystemJobManager.getRunningJobs().get(jobId);
+        if (systemJob != null) {
+            // TODO jobId is ephemeral, this is not a good key for permission checks. we should use the name of the job type (but there is no way to get it yet)
+            checkPermission(RestPermissions.SYSTEMJOBS_READ, jobId);
+            return SystemJobSummary.create(
+                    systemJob.getId(),
+                    systemJob.getDescription(),
+                    systemJob.getClassName(),
+                    systemJob.getInfo(),
+                    nodeId.getNodeId(),
+                    systemJob.getStartedAt(),
+                    systemJob.getProgress(),
+                    systemJob.isCancelable(),
+                    systemJob.providesProgress()
+            );
         }
 
-        return SystemJobSummary.create(
-                systemJob.getId(),
-                systemJob.getDescription(),
-                systemJob.getClassName(),
-                systemJob.getInfo(),
-                nodeId.getNodeId(),
-                systemJob.getStartedAt(),
-                systemJob.getProgress(),
-                systemJob.isCancelable(),
-                systemJob.providesProgress()
-        );
+        final Optional<SystemJobSummary> systemJobSummary = systemJobManager.getRunningJob(jobId);
+        if (systemJobSummary.isPresent()) {
+            checkPermission(RestPermissions.SYSTEMJOBS_READ, systemJobSummary.get().jobType());
+            return systemJobSummary.get();
+        }
+
+        throw new NotFoundException("No system job with ID <" + jobId + "> found");
     }
 
     @POST
@@ -167,7 +183,7 @@ public class SystemJobResource extends RestResource {
         // TODO cleanup jobId vs jobName checking in permissions
         checkPermission(RestPermissions.SYSTEMJOBS_CREATE, tr.jobName());
 
-        SystemJob job;
+        LegacySystemJob job;
         try {
             job = systemJobFactory.build(tr.jobName());
         } catch (NoSuchJobException e) {
@@ -176,7 +192,7 @@ public class SystemJobResource extends RestResource {
         }
 
         try {
-            systemJobManager.submit(job);
+            legacySystemJobManager.submit(job);
         } catch (SystemJobConcurrencyException e) {
             LOG.error("Maximum concurrency level of this job reached. ", e);
             throw new ForbiddenException("Maximum concurrency level of this job reached", e);
@@ -192,7 +208,7 @@ public class SystemJobResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.SYSTEM_JOB_STOP)
     public SystemJobSummary cancel(@Parameter(name = "jobId", required = true) @PathParam("jobId") @NotEmpty String jobId) {
-        SystemJob systemJob = systemJobManager.getRunningJobs().get(jobId);
+        LegacySystemJob systemJob = legacySystemJobManager.getRunningJobs().get(jobId);
         if (systemJob == null) {
             throw new NotFoundException("No system job with ID <" + jobId + "> found");
         }

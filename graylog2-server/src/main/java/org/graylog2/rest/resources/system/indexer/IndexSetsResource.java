@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.eventbus.EventBus;
 import com.mongodb.MongoException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -57,6 +58,7 @@ import org.graylog2.indexer.indexset.restrictions.IndexSetRestrictionsService;
 import org.graylog2.indexer.indexset.validation.IndexSetValidator;
 import org.graylog2.indexer.indexset.validation.IndexSetValidator.Violation;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.system.indices.DataTieringStatusService;
@@ -68,7 +70,7 @@ import org.graylog2.rest.resources.system.indexer.responses.IndexSetsResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
-import org.graylog2.system.jobs.SystemJobManager;
+import org.graylog2.system.jobs.LegacySystemJobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,10 +99,11 @@ public class IndexSetsResource extends RestResource {
     private final IndexSetCleanupJob.Factory indexSetCleanupJobFactory;
     private final IndexSetStatsCreator indexSetStatsCreator;
     private final ClusterConfigService clusterConfigService;
-    private final SystemJobManager systemJobManager;
+    private final LegacySystemJobManager systemJobManager;
     private final DataTieringStatusService tieringStatusService;
     private final Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories;
     private final IndexSetRestrictionsService indexSetRestrictionsService;
+    private final EventBus eventBus;
 
     @Inject
     public IndexSetsResource(final Indices indices,
@@ -110,9 +113,10 @@ public class IndexSetsResource extends RestResource {
                              final IndexSetCleanupJob.Factory indexSetCleanupJobFactory,
                              final IndexSetStatsCreator indexSetStatsCreator,
                              final ClusterConfigService clusterConfigService,
-                             final SystemJobManager systemJobManager,
+                             final LegacySystemJobManager systemJobManager,
                              final DataTieringStatusService tieringStatusService,
-                             final Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories, IndexSetRestrictionsService indexSetRestrictionsService) {
+                             final Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories, IndexSetRestrictionsService indexSetRestrictionsService,
+                             final EventBus eventBus) {
         this.indices = requireNonNull(indices);
         this.indexSetService = requireNonNull(indexSetService);
         this.indexSetRegistry = indexSetRegistry;
@@ -124,6 +128,7 @@ public class IndexSetsResource extends RestResource {
         this.tieringStatusService = tieringStatusService;
         this.openIndexSetFilterFactories = openIndexSetFilterFactories;
         this.indexSetRestrictionsService = indexSetRestrictionsService;
+        this.eventBus = eventBus;
     }
 
     @GET
@@ -393,6 +398,13 @@ public class IndexSetsResource extends RestResource {
                     systemJobManager.submit(indexSetCleanupJobFactory.create(indexSet));
                 } catch (SystemJobConcurrencyException e) {
                     LOG.error("Error running system job", e);
+                }
+            } else {
+                final String[] managedIndices = indexSet.getManagedIndices();
+                if (managedIndices != null) {
+                    for (String indexName : managedIndices) {
+                        eventBus.post(IndicesDeletedEvent.create(indexName));
+                    }
                 }
             }
         }

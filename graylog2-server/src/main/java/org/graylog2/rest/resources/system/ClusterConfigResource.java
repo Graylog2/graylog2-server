@@ -24,6 +24,7 @@ import com.fasterxml.jackson.module.jsonSchema.jakarta.factories.SchemaFactoryWr
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BadRequestException;
@@ -49,15 +50,13 @@ import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.models.system.config.ClusterConfigList;
 import org.graylog2.security.RestrictedChainingClassLoader;
 import org.graylog2.security.UnsafeClassLoadingAttemptException;
+import org.graylog2.security.encryption.ConfigUpdatePreparation;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
@@ -131,11 +130,19 @@ public class ClusterConfigResource extends RestResource {
             throw new NotFoundException(createNoClassMsg(configClass));
         }
 
-        final Object configObject = parseConfigObject(configClass, body, cls);
-        validateConfigObject(configObject);
-        writeConfigObject(configClass, configObject);
+        final Object updatedConfigObject = parseConfigObject(configClass, body, cls);
+        final Object preparedConfig;
+        final Object existingConfig = clusterConfigService.get(cls);
+        if (existingConfig != null && updatedConfigObject instanceof ConfigUpdatePreparation encryptedConfig) {
+            preparedConfig = encryptedConfig.prepareConfigUpdate(existingConfig);
+        } else {
+            preparedConfig = updatedConfigObject;
+        }
 
-        return Response.accepted(configObject).build();
+        validateConfigObject(preparedConfig);
+        writeConfigObject(configClass, preparedConfig);
+
+        return Response.accepted(updatedConfigObject).build();
     }
 
     private void writeConfigObject(String configClass, Object configObject) {

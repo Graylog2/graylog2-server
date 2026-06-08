@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { Sort } from 'stores/PaginationTypes';
+import { METRIC_COLUMN_IDS, METRIC_COLUMN_TITLES } from 'components/inputs/InputsOveriew/metricColumns';
 
 const getInputsTableElements = () => {
   const tableLayout = {
@@ -27,17 +28,35 @@ const getInputsTableElements = () => {
       'direction',
       'desired_state',
       'traffic',
+      'input_failures',
       'node_id',
       'address',
       'port',
     ],
-    defaultColumnOrder: ['title', 'type', 'direction', 'desired_state', 'traffic', 'node_id', 'address', 'port'],
+    defaultColumnOrder: [
+      'title',
+      'type',
+      'direction',
+      'desired_state',
+      'traffic',
+      'input_failures',
+      METRIC_COLUMN_IDS.messagesPerStream,
+      METRIC_COLUMN_IDS.extractorCount,
+      METRIC_COLUMN_IDS.associatedStreams,
+      'node_id',
+      'address',
+      'port',
+    ],
   };
 
   const additionalAttributes = [
     { id: 'traffic', title: 'Traffic Last Minute' },
+    { id: 'input_failures', title: 'Input Failures' },
     { id: 'address', title: 'Address' },
     { id: 'port', title: 'Port' },
+    { id: METRIC_COLUMN_IDS.messagesPerStream, title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.messagesPerStream] },
+    { id: METRIC_COLUMN_IDS.extractorCount, title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.extractorCount] },
+    { id: METRIC_COLUMN_IDS.associatedStreams, title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.associatedStreams] },
   ];
 
   return {

@@ -19,7 +19,6 @@ import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import { Formik } from 'formik';
 import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
-import { act } from 'wrappedTestingLibrary/hooks';
 import userEvent from '@testing-library/user-event';
 
 import TestStoreProvider from 'views/test/TestStoreProvider';
@@ -83,9 +82,7 @@ describe('MetricConfiguration', () => {
     renderComponent(baseProps, { metrics: [baseProps.currentMetric], visualization: { type: 'bar' } });
 
     const checkbox = await screen.findByRole('checkbox', { name: /show line thresholds/i });
-    await act(async () => {
-      await userEvent.click(checkbox);
-    });
+    await userEvent.click(checkbox);
 
     await screen.findByTestId('threshold-item-0-0');
   });

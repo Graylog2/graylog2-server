@@ -1210,6 +1210,9 @@ metric_mappings:
   - metric_name: "traffic_system_output_traffic"
     match_pattern: "org.graylog2.traffic.system-output-traffic"
 
+  - metric_name: "traffic_input_indexed"
+    match_pattern: "org.graylog2.traffic.input-indexed"
+
   - metric_name: "forwarder_grpc_method_invocations"
     match_pattern: "org.graylog.plugins.forwarder.grpc.ServerMetricsInterceptor.method.org.graylog.cloud.forwarder.*.invocations"
     wildcard_extract_labels:
@@ -1340,6 +1343,12 @@ metric_mappings:
 
   - metric_name: "data_lake_journal_size"
     match_pattern: "org.graylog.plugins.datalake.output.journal.size"
+
+  - metric_name: "data_lake_journal_size_limit"
+    match_pattern: "org.graylog.plugins.datalake.output.journal.size-limit"
+
+  - metric_name: "data_lake_journal_utilization_ratio"
+    match_pattern: "org.graylog.plugins.datalake.output.journal.utilization-ratio"
 
   - metric_name: "data_lake_journal_uncommitted_messages"
     match_pattern: "org.graylog.plugins.datalake.output.journal.uncommittedMessages"

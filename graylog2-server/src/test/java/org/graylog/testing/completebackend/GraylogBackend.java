@@ -32,6 +32,8 @@ public interface GraylogBackend {
 
     void importMongoDBFixture(String resourcePath, Class<?> testClass);
 
+    long countDocumentsInMongoDBCollection(String collection);
+
     void dropCollection(String collectionName);
 
     void importElasticsearchFixture(String resourcePath, Class<?> testClass);

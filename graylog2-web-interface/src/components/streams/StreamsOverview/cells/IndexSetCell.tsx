@@ -20,7 +20,7 @@ import type { Stream } from 'stores/streams/StreamsStore';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted } from 'util/PermissionsMixin';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import { Link } from 'components/common/router';
+import { Link } from 'components/common';
 import Routes from 'routing/Routes';
 
 type Props = {

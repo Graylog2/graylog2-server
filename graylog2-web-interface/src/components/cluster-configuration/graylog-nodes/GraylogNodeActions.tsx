@@ -16,16 +16,16 @@
  */
 import React, { useState } from 'react';
 
-import { LinkContainer } from 'components/common/router';
-import { ConfirmDialog, IfPermitted } from 'components/common';
+import { LinkContainer, ConfirmDialog, IfPermitted } from 'components/common';
 import { MoreActions } from 'components/common/EntityDataTable';
 import { MenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import HideOnCloud from 'util/conditional/HideOnCloud';
-import { SystemLoadBalancerStore } from 'stores/load-balancer/SystemLoadBalancerStore';
-import { SystemProcessingStore } from 'stores/system-processing/SystemProcessingStore';
+import { overrideLoadBalancerStatus } from 'api/system-load-balancer';
+import { pauseProcessing, resumeProcessing } from 'api/system-processing';
 
-import type { ClusterGraylogNode as GraylogNode } from './fetchClusterGraylogNodes';
+import { LOAD_BALANCER_STATUS } from './fetchClusterGraylogNodes';
+import type { ClusterGraylogNode as GraylogNode, LoadBalancerStatus } from './fetchClusterGraylogNodes';
 
 type Props = {
   node: GraylogNode;
@@ -33,7 +33,7 @@ type Props = {
 
 const GraylogNodeActions = ({ node }: Props) => {
   const [showMessageProcessingModal, setShowMessageProcessingModal] = useState<boolean>(false);
-  const [loadBalancerStatusToConfirm, setLoadBalancerStatusToConfirm] = useState<'ALIVE' | 'DEAD' | undefined>(
+  const [loadBalancerStatusToConfirm, setLoadBalancerStatusToConfirm] = useState<LoadBalancerStatus | undefined>(
     undefined,
   );
 
@@ -41,15 +41,15 @@ const GraylogNodeActions = ({ node }: Props) => {
 
   const toggleMessageProcessing = () => {
     if (node.is_processing) {
-      SystemProcessingStore.pause(node.node_id);
+      pauseProcessing(node.node_id);
     } else {
-      SystemProcessingStore.resume(node.node_id);
+      resumeProcessing(node.node_id);
     }
     setShowMessageProcessingModal(false);
   };
 
-  const updateLoadBalancerStatus = (status: 'ALIVE' | 'DEAD') => {
-    SystemLoadBalancerStore.override(node.node_id, status);
+  const updateLoadBalancerStatus = (status: LoadBalancerStatus) => {
+    overrideLoadBalancerStatus(node.node_id, status);
     setLoadBalancerStatusToConfirm(undefined);
   };
 
@@ -62,13 +62,13 @@ const GraylogNodeActions = ({ node }: Props) => {
           </MenuItem>
         </IfPermitted>
         <IfPermitted permissions="lbstatus:change">
-          {node.lb_status === 'alive' ? (
-            <MenuItem onSelect={() => setLoadBalancerStatusToConfirm('DEAD')}>
-              Override load Balancer status to DEAD
+          {node.lb_status === LOAD_BALANCER_STATUS.ALIVE ? (
+            <MenuItem onSelect={() => setLoadBalancerStatusToConfirm(LOAD_BALANCER_STATUS.DEAD)}>
+              Override load balancer status to DEAD
             </MenuItem>
           ) : (
-            <MenuItem onSelect={() => setLoadBalancerStatusToConfirm('ALIVE')}>
-              Override load Balancer status to ALIVE
+            <MenuItem onSelect={() => setLoadBalancerStatusToConfirm(LOAD_BALANCER_STATUS.ALIVE)}>
+              Override load balancer status to ALIVE
             </MenuItem>
           )}
         </IfPermitted>

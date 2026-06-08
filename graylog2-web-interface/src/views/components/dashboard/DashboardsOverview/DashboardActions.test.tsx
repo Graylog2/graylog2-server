@@ -40,18 +40,7 @@ jest.mock('views/api/views', () => ({
   deleteView: jest.fn(() => Promise.resolve()),
 }));
 
-const mockSearchParams = {
-  page: 1,
-  pageSize: 10,
-  query: '',
-  sort: {
-    attributeId: 'name',
-    direction: 'asc',
-  },
-} as const;
-
 const mockContextValue = {
-  searchParams: mockSearchParams,
   refetch: jest.fn(),
   attributes: [],
   entityTableId: 'entity-table',
@@ -69,10 +58,12 @@ const DashboardActions = ({
 describe('DashboardActions', () => {
   const simpleDashboard = simpleView();
   const menuIsHidden = () => expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+  const renderSUT = (props: React.ComponentProps<typeof DashboardActions> = { dashboard: simpleDashboard }) =>
+    render(<DashboardActions {...props} />);
 
   const clickDashboardAction = async (action: string) => {
-    userEvent.click(await screen.findByRole('button', { name: /more/i }));
-    userEvent.click(await screen.findByRole('menuitem', { name: action }));
+    await userEvent.click(await screen.findByRole('button', { name: /more/i }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: action }));
     await waitFor(() => menuIsHidden());
   };
 
@@ -95,7 +86,7 @@ describe('DashboardActions', () => {
   it('does not delete dashboard when user clicks cancel', async () => {
     asMock(window.confirm).mockReturnValue(false);
 
-    render(<DashboardActions dashboard={simpleDashboard} />);
+    renderSUT();
 
     await clickDashboardAction('Delete');
 
@@ -107,7 +98,7 @@ describe('DashboardActions', () => {
   it('deletes dashboard when user confirms deletion', async () => {
     asMock(window.confirm).mockReturnValue(true);
 
-    render(<DashboardActions dashboard={simpleDashboard} />);
+    renderSUT();
 
     await clickDashboardAction('Delete');
 
@@ -123,7 +114,7 @@ describe('DashboardActions', () => {
       .build();
     asMock(useCurrentUser).mockReturnValue(currentUser);
 
-    render(<DashboardActions dashboard={simpleDashboard} />);
+    renderSUT();
 
     await screen.findByRole('button', { name: /share/i });
 
@@ -150,7 +141,7 @@ describe('DashboardActions', () => {
     });
 
     it('triggers hook when deleting dashboard', async () => {
-      render(<DashboardActions dashboard={simpleDashboard} />);
+      renderSUT();
 
       await clickDashboardAction('Delete');
 
@@ -164,7 +155,7 @@ describe('DashboardActions', () => {
         ...mockContextValue,
         refetch: jest.fn(),
       };
-      render(<DashboardActions dashboard={simpleDashboard} contextValue={contextValue} />);
+      renderSUT({ dashboard: simpleDashboard, contextValue });
 
       await clickDashboardAction('Delete');
 
@@ -176,7 +167,7 @@ describe('DashboardActions', () => {
     it('does not delete dashboard when hook returns false', async () => {
       asMock(deletingDashboard).mockResolvedValue(false);
 
-      render(<DashboardActions dashboard={simpleDashboard} />);
+      renderSUT();
 
       await clickDashboardAction('Delete');
 
@@ -189,7 +180,7 @@ describe('DashboardActions', () => {
       asMock(deletingDashboard).mockReturnValue(null);
       asMock(window.confirm).mockReturnValue(true);
 
-      render(<DashboardActions dashboard={simpleDashboard} />);
+      renderSUT();
 
       await clickDashboardAction('Delete');
 
@@ -207,7 +198,7 @@ describe('DashboardActions', () => {
       });
       asMock(window.confirm).mockReturnValue(true);
 
-      render(<DashboardActions dashboard={simpleDashboard} />);
+      renderSUT();
 
       /* eslint-disable no-console */
       const oldConsoleTrace = console.trace;

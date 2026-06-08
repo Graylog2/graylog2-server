@@ -17,9 +17,11 @@
 
 import React, { useEffect, useState } from 'react';
 
+import { Enterprise } from '@graylog/server-api';
+
 import { Spinner } from 'components/common';
 import usePluginEntities from 'hooks/usePluginEntities';
-import { EnterpriseActions } from 'stores/enterprise/EnterpriseStore';
+import { defaultOnError } from 'util/conditional/onError';
 
 import IndexerFailuresComponent from './IndexerFailuresComponent';
 
@@ -33,7 +35,7 @@ const IndexerSystemOverviewComponent = () => {
 
   useEffect(() => {
     if (EnterpriseIndexerFailures) {
-      EnterpriseActions.getLicenseInfo().then((response) => {
+      defaultOnError(Enterprise.licenseInfo(), "Couldn't load license information", 'Error').then((response: any) => {
         setLoadIndexerFailuresComponent(
           response.license_info.license_status === 'installed' ? (
             <EnterpriseIndexerFailures />
@@ -43,6 +45,7 @@ const IndexerSystemOverviewComponent = () => {
         );
       });
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoadIndexerFailuresComponent(<IndexerFailuresComponent />);
     }
   }, [EnterpriseIndexerFailures, setLoadIndexerFailuresComponent]);

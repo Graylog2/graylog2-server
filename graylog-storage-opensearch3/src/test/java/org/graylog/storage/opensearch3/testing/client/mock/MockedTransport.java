@@ -22,42 +22,80 @@ import jakarta.annotation.Nullable;
 import org.opensearch.client.json.JsonpMapper;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;
 import org.opensearch.client.json.jackson.JacksonJsonpParser;
+import org.opensearch.client.opensearch.generic.Response;
 import org.opensearch.client.transport.Endpoint;
+import org.opensearch.client.transport.GenericEndpoint;
 import org.opensearch.client.transport.OpenSearchTransport;
 import org.opensearch.client.transport.TransportOptions;
 import org.opensearch.client.transport.endpoints.SimpleEndpoint;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 class MockedTransport implements OpenSearchTransport {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private final JacksonJsonpMapper jacksonJsonpMapper;
     private final Set<MockedResponse> responses;
+    private final Consumer<TransportOptions> optionsConsumer;
+    private final TransportOptions baseOptions;
 
-    MockedTransport(Set<MockedResponse> responses) {
+    MockedTransport(Set<MockedResponse> responses, Consumer<TransportOptions> optionsConsumer) {
+        this(responses, optionsConsumer, TransportOptions.builder().build());
+    }
+
+    MockedTransport(Set<MockedResponse> responses, Consumer<TransportOptions> optionsConsumer, TransportOptions baseOptions) {
         jacksonJsonpMapper = new JacksonJsonpMapper(OBJECT_MAPPER);
         this.responses = responses;
+        this.optionsConsumer = optionsConsumer;
+        this.baseOptions = baseOptions;
     }
 
     @Override
     public <RequestT, ResponseT, ErrorT> ResponseT performRequest(RequestT request, Endpoint<RequestT, ResponseT, ErrorT> endpoint, @Nullable TransportOptions options) throws IOException {
+        if (optionsConsumer != null) {
+            optionsConsumer.accept(options);
+        }
         final String url = endpoint.requestUrl(request);
         final String method = endpoint.method(request);
 
-        final String rawBody = responses.stream()
+        final MockedResponse mockedResponse = responses.stream()
                 .filter(r -> r.method().equals(method))
-                .filter(r -> r.url().equals(url))
-                .map(MockedResponse::body)
+                .filter(r -> matchesUrl(url, r.urlPattern()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No response body provided for " + method + " and " + url));
 
-        final JsonParser parser = OBJECT_MAPPER.createParser(rawBody);
-        final JacksonJsonpParser jsonpParser = new JacksonJsonpParser(parser);
-        final Object response = ((SimpleEndpoint) endpoint).responseDeserializer().deserialize(jsonpParser, jsonpMapper());
-        return (ResponseT) response;
+        try (
+                final InputStream rawBody = mockedResponse.newInputStream();
+        ) {
+            if (endpoint instanceof GenericEndpoint genericEndpoint) {
+                final Response response = (Response) genericEndpoint.responseDeserializer(url, method, "http", mockedResponse.responseCode(), mockedResponse.isError() ? "err" : "ok", Collections.emptyList(), "application/json", rawBody);
+                return (ResponseT) response;
+            } else if (endpoint instanceof SimpleEndpoint simpleEndpoint) {
+                if(mockedResponse instanceof org.graylog.storage.opensearch3.testing.client.mock.ErrorResponse error) {
+                    throw new IOException("[Mocked HTTP error]" + error.responseCode() + ":" + error.error());
+                } else {
+                    final JsonParser parser = OBJECT_MAPPER.createParser(rawBody);
+                    final JacksonJsonpParser jsonpParser = new JacksonJsonpParser(parser);
+                    final Object response = simpleEndpoint.responseDeserializer().deserialize(jsonpParser, jsonpMapper());
+                    return (ResponseT) response;
+                }
+
+            } else {
+                throw new IllegalArgumentException("Unsupported endpoint type " + endpoint.getClass().getName());
+            }
+
+        }
+    }
+
+    private boolean matchesUrl(String url, PathMatcher urlPattern) {
+        return urlPattern.matches(Path.of(url));
     }
 
     @Override
@@ -76,7 +114,7 @@ class MockedTransport implements OpenSearchTransport {
 
     @Override
     public TransportOptions options() {
-        return TransportOptions.builder().build();
+        return baseOptions;
     }
 
     @Override

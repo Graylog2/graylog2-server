@@ -21,7 +21,6 @@ import Field from 'views/components/Field';
 import Value from 'views/components/Value';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { FULL_MESSAGE_FIELD } from 'views/Constants';
-import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 import DecoratedValue from './decoration/DecoratedValue';
 import type { Message } from './Types';
@@ -64,12 +63,11 @@ type MessageFieldValueProps = {
 };
 
 export const MessageFieldName = ({ fieldName, fieldType, message }: MessageFieldNamePros) => {
-  const activeQuery = useActiveQueryId();
   const isDecoratedField =
     message?.decoration_stats?.added_fields?.[fieldName] || message?.decoration_stats?.changed_fields?.[fieldName];
 
   return (
-    <Field queryId={activeQuery} name={fieldName} type={isDecoratedField ? FieldType.Decorated : fieldType}>
+    <Field name={fieldName} type={isDecoratedField ? FieldType.Decorated : fieldType}>
       {fieldName}
     </Field>
   );

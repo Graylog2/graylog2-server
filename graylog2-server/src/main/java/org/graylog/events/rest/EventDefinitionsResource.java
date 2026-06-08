@@ -18,6 +18,7 @@ package org.graylog.events.rest;
 
 
 import com.codahale.metrics.annotation.Timed;
+import com.mongodb.client.model.Filters;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
@@ -52,6 +53,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.commons.lang.StringUtils;
+import org.bson.conversions.Bson;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.events.audit.EventsAuditEventTypes;
@@ -67,6 +69,7 @@ import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.processor.EventProcessorParameters;
 import org.graylog.events.processor.EventProcessorParametersWithTimerange;
 import org.graylog.events.processor.EventResolver;
+import org.graylog.events.processor.TacticsTechniquesValidator;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.scheduler.schedule.CronUtils;
@@ -77,6 +80,7 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.NonDeletableSystemScope;
 import org.graylog2.database.entities.source.DBEntitySourceService;
 import org.graylog2.database.utils.SourcedMongoEntityUtils;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -92,10 +96,10 @@ import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
+import org.graylog2.database.filtering.DbQueryCreator;
+import org.graylog2.rest.resources.entities.FilterOption;
 import org.graylog2.rest.resources.entities.Sorting;
-import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
-import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
@@ -121,25 +125,30 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 public class EventDefinitionsResource extends RestResource implements PluginRestResource {
     private static final Logger LOG = LoggerFactory.getLogger(EventDefinitionsResource.class);
 
-    private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
-            .put("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
-            .put("title", SearchQueryField.create(EventDefinitionDto.FIELD_TITLE))
-            .put("description", SearchQueryField.create(EventDefinitionDto.FIELD_DESCRIPTION))
-            .put(SourcedMongoEntityUtils.SEARCH_QUERY_TITLE, SearchQueryField.create(SourcedMongoEntityUtils.FILTERABLE_FIELD))
-            .build();
+    private static final int TAG_SUGGESTIONS_MAX_LIMIT = 100;
     private static final String DEFAULT_SORT_FIELD = "title";
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
-            EntityAttribute.builder().id("title").title("Title").build(),
-            EntityAttribute.builder().id("description").title("Description").build(),
+            EntityAttribute.builder().id("title").title("Title").searchable(true).build(),
+            EntityAttribute.builder().id("description").title("Description").searchable(true).build(),
             EntityAttribute.builder().id("priority").title("Priority").type(SearchQueryField.Type.INT).build(),
-            EntityAttribute.builder().id("status").title("Status").type(SearchQueryField.Type.BOOLEAN).sortable(false).build(),
+            EntityAttribute.builder().id("status").title("Status").type(SearchQueryField.Type.STRING)
+                    .dbField(EventDefinitionDto.FIELD_STATE)
+                    .sortable(true)
+                    .filterable(true)
+                    .filterOptions(Set.of(
+                            FilterOption.create("ENABLED", "Enabled"),
+                            FilterOption.create("DISABLED", "Disabled")
+                    ))
+                    .bsonFilterCreator((name, value) -> Filters.eq(name, value.getValue().toString()))
+                    .build(),
             EntityAttribute.builder().id(SourcedMongoEntityUtils.FILTERABLE_FIELD).title("Source")
                     .type(SearchQueryField.Type.STRING)
                     .sortable(false)
                     .filterable(true)
                     .filterOptions(DBEntitySourceService.FILTER_OPTIONS)
                     .build()
+            // Note: `tags` and `tactics_techniques` are not listed here — see comment on dbQueryCreator below.
     );
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
@@ -150,13 +159,14 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     private final EventDefinitionContextService contextService;
     private final EventProcessorEngine engine;
     private final EventDefinitionConfiguration eventDefinitionConfiguration;
-    private final SearchQueryParser searchQueryParser;
+    private final DbQueryCreator dbQueryCreator;
     private final RecentActivityService recentActivityService;
     private final BulkExecutor<EventDefinitionDto, UserContext> bulkDeletionExecutor;
     private final BulkExecutor<EventDefinitionDto, UserContext> bulkScheduleExecutor;
     private final BulkExecutor<EventDefinitionDto, UserContext> bulkUnscheduleExecutor;
     private final EventResolver eventResolver;
     private final EntitySharesService entitySharesService;
+    private final TacticsTechniquesValidator tacticsTechniquesValidator;
 
     @Inject
     public EventDefinitionsResource(DBEventDefinitionService dbService,
@@ -168,20 +178,31 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                     ObjectMapper objectMapper,
                                     EventResolver eventResolver,
                                     EventDefinitionConfiguration eventDefinitionConfiguration,
-                                    EntitySharesService entitySharesService
+                                    EntitySharesService entitySharesService,
+                                    TacticsTechniquesValidator tacticsTechniquesValidator
     ) {
         this.dbService = dbService;
         this.eventDefinitionHandler = eventDefinitionHandler;
         this.contextService = contextService;
         this.engine = engine;
         this.eventDefinitionConfiguration = eventDefinitionConfiguration;
-        this.searchQueryParser = new SearchQueryParser(EventDefinitionDto.FIELD_TITLE, SEARCH_FIELD_MAPPING);
+        // Tags are registered as extraSearchFields instead of in the attributes list because
+        // the frontend adds a tags attribute with a custom filter_component (EventDefinitionTagsFilter).
+        // Including it in both places would cause a duplicate column.
+        // extraSearchFields makes `tags:phishing` work in the search bar (OR-joined by SearchQueryParser)
+        // while the filter UI applies multi-tag AND via the predicate in `getPage`.
+        // tactics_techniques is also registered here so API search (`tactics_techniques:T1059`) works,
+        // without exposing it as a default column on the Event Definitions list (gated to enterprise UI).
+        this.dbQueryCreator = new DbQueryCreator(EventDefinitionDto.FIELD_TITLE, attributes,
+                Map.of(EventDefinitionDto.FIELD_TAGS, SearchQueryField.create(EventDefinitionDto.FIELD_TAGS),
+                       EventDefinitionDto.FIELD_TACTICS_TECHNIQUES, SearchQueryField.create(EventDefinitionDto.FIELD_TACTICS_TECHNIQUES)));
         this.recentActivityService = recentActivityService;
         this.bulkDeletionExecutor = new SequentialBulkExecutor<>(this::delete, auditEventSender, objectMapper);
         this.bulkScheduleExecutor = new SequentialBulkExecutor<>(this::schedule, auditEventSender, objectMapper);
         this.bulkUnscheduleExecutor = new SequentialBulkExecutor<>(this::unschedule, auditEventSender, objectMapper);
         this.eventResolver = eventResolver;
         this.entitySharesService = entitySharesService;
+        this.tacticsTechniquesValidator = tacticsTechniquesValidator;
     }
 
     @GET
@@ -202,25 +223,36 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                                                    schema = @Schema(allowableValues = {"asc", "desc"}))
                                                         @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order) {
 
-        SearchQuery searchQuery;
-        try {
-            searchQuery = searchQueryParser.parse(query);
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
-        }
         if ("status".equals(sort)) {
-            sort = "alert";
+            sort = "state";
         }
         Predicate<EventDefinitionDto> predicate = event -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id());
 
-        // The only filterable field currently is entity source. If new filterable fields are added, this logic needs to
-        // be adjusted so that other filters remain part of the filters, are included in the generation of searchQuery,
-        // and entity source filtering is still moved to the predicate to be applied after reading from the database.
+        // Entity-source and tags filters are applied via predicate after the Mongo read.
+        // Remaining filters (e.g., status) are handled by DbQueryCreator as MongoDB filters.
         final SourcedMongoEntityUtils.FilterPredicate<EventDefinitionDto> filterPredicate = SourcedMongoEntityUtils.handleScopedEntitySourceFilter(filters, predicate);
         predicate = filterPredicate.predicate();
+        final List<String> remainingFilters = filterPredicate.filters();
+        final List<String> tagFilters = remainingFilters == null ? List.of() :
+                remainingFilters.stream()
+                        .filter(f -> f != null && f.startsWith(EventDefinitionDto.FIELD_TAGS + ":"))
+                        .map(f -> f.substring(EventDefinitionDto.FIELD_TAGS.length() + 1))
+                        .filter(v -> !v.isBlank())
+                        .toList();
+        if (!tagFilters.isEmpty()) {
+            predicate = predicate.and(event -> event.tags().containsAll(tagFilters));
+        }
+
+        // Strip tags filters before passing to DbQueryCreator (tags are handled by predicate above)
+        final List<String> dbFilters = remainingFilters == null ? List.of() :
+                remainingFilters.stream()
+                        .filter(f -> f == null || !f.startsWith(EventDefinitionDto.FIELD_TAGS + ":"))
+                        .toList();
+
+        final Bson dbQuery = dbQueryCreator.createDbQuery(dbFilters, query);
 
         final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(
-                searchQuery,
+                dbQuery,
                 predicate,
                 order.toBsonSort(sort),
                 page,
@@ -244,19 +276,32 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     }
 
     @GET
+    @Path("/tags")
+    @Operation(summary = "Suggest tag values across event definitions, optionally narrowed by case-insensitive substring match")
+    public TagSuggestionsResponse suggestTags(@Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                              @Parameter(name = "limit") @QueryParam("limit") @DefaultValue("10") int limit) {
+        final int boundedLimit = Math.max(1, Math.min(limit, TAG_SUGGESTIONS_MAX_LIMIT));
+
+        if (isPermitted(RestPermissions.EVENT_DEFINITIONS_READ)) {
+            return new TagSuggestionsResponse(dbService.suggestTags(query, boundedLimit));
+        }
+
+        final var permittedIds = dbService.findPermittedIds(
+                id -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, id));
+        return new TagSuggestionsResponse(dbService.suggestTags(query, boundedLimit, permittedIds));
+    }
+
+    public record TagSuggestionsResponse(@JsonProperty("tags") List<String> tags) { }
+
+    @GET
     @Operation(summary = "List event definitions")
     @Deprecated
     public PaginatedResponse<EventDefinitionDto> list(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                       @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                       @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query) {
-        SearchQuery searchQuery;
-        try {
-            searchQuery = searchQueryParser.parse(query);
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
-        }
+        final Bson dbQuery = dbQueryCreator.createDbQuery(List.of(), query);
         final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(
-                searchQuery,
+                dbQuery,
                 event -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id()),
                 SortOrder.ASCENDING.toBsonSort("title"),
                 page,
@@ -317,6 +362,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         checkEventDefinitionPermissions(dto, "create");
 
         final ValidationResult result = dto.validate(null, eventDefinitionConfiguration, userContext);
+        tacticsTechniquesValidator.validate(dto, result);
         if (result.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
         }
@@ -350,6 +396,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         checkProcessorConfig(oldDto, dto);
 
         final ValidationResult result = dto.validate(oldDto, eventDefinitionConfiguration, userContext);
+        tacticsTechniquesValidator.validate(dto, result);
         if (!definitionId.equals(dto.id())) {
             result.addError("id", "Event definition IDs don't match");
         }
@@ -357,8 +404,14 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         if (result.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
         }
-
-        dto = dto.toBuilder().state(schedule ? EventDefinition.State.ENABLED : EventDefinition.State.DISABLED).build();
+        if (NonDeletableSystemScope.NAME.equals(dto.scope())) {
+            //never change the state of system definitions, as the state cannot be later on changed in the UI
+            dto = dto.toBuilder().build();
+        } else {
+            dto = dto.toBuilder()
+                    .state(schedule ? EventDefinition.State.ENABLED : EventDefinition.State.DISABLED)
+                    .build();
+        }
         recentActivityService.update(definitionId, GRNTypes.EVENT_DEFINITION, userContext.getUser());
         return Response.ok().entity(eventDefinitionHandler.update(dto, schedule)).build();
     }
@@ -524,7 +577,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                      @Context UserContext userContext) {
         EventProcessorConfig oldConfig = dbService.get(toValidate.id()).map(EventDefinition::config).orElse(null);
         ValidationResult validationResult = toValidate.config().validate(userContext);
-        validationResult.addAll(toValidate.config().validate(oldConfig, eventDefinitionConfiguration));
+        validationResult.addAll(toValidate.config().validate(userContext, oldConfig, eventDefinitionConfiguration));
+        tacticsTechniquesValidator.validate(toValidate, validationResult);
         return validationResult;
     }
 
@@ -569,4 +623,5 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
             throw new ForbiddenException("Condition type not changeable");
         }
     }
+
 }

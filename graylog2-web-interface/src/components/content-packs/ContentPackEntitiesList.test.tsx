@@ -25,6 +25,7 @@ import Entity from 'logic/content-packs/Entity';
 import { SEARCH_DEBOUNCE_THRESHOLD } from '../common/SearchForm';
 
 jest.useFakeTimers();
+const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
 
 jest.mock('logic/generateId', () => jest.fn(() => 'dead-beef'));
 
@@ -89,7 +90,7 @@ describe('<ContentPackEntitiesList />', () => {
     await screen.findByText('test');
 
     const searchInput = await screen.findByPlaceholderText('Enter search query...');
-    await userEvent.type(searchInput, 'Bad');
+    await setupUser().type(searchInput, 'Bad');
 
     act(() => {
       jest.advanceTimersByTime(SEARCH_DEBOUNCE_THRESHOLD);
@@ -99,7 +100,7 @@ describe('<ContentPackEntitiesList />', () => {
       expect(screen.queryByText('test')).not.toBeInTheDocument();
     });
 
-    await userEvent.click(await screen.findByRole('button', { name: 'Reset search' }));
+    await setupUser().click(await screen.findByRole('button', { name: 'Reset search' }));
 
     await screen.findByText('test');
   });

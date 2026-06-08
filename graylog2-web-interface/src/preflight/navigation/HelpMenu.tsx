@@ -23,6 +23,7 @@ import Menu from 'components/bootstrap/Menu';
 import Icon from 'components/common/Icon';
 import DocsHelper from 'util/DocsHelper';
 import useResourceCustomization from 'brand-customization/useResourceCustomization';
+import MenuItem from 'components/bootstrap/menuitem/MenuItem';
 
 const StyledButton = styled(Button)(
   ({ theme }) => css`
@@ -46,31 +47,27 @@ const HelpMenu = () => {
         </StyledButton>
       </Menu.Target>
       <Menu.Dropdown>
-        <Menu.Item
-          component="a"
-          rightSection={<Icon name="open_in_new" />}
-          href={DocsHelper.versionedDocsHomePage()}
-          target="_blank">
+        <MenuItem component="a" href={DocsHelper.versionedDocsHomePage()} target="_blank" icon="open_in_new">
           Documentation
-        </Menu.Item>
-        <Menu.Item
+        </MenuItem>
+        <MenuItem
           component="a"
-          rightSection={<Icon name="open_in_new" />}
           href={DocsHelper.toString(DocsHelper.PAGES.CHANGELOG)}
-          target="_blank">
+          target="_blank"
+          icon="open_in_new">
           Changelogs
-        </Menu.Item>
-        <Menu.Item
+        </MenuItem>
+        <MenuItem
           component="a"
-          rightSection={<Icon name="open_in_new" />}
           href={DocsHelper.toString(DocsHelper.PAGES.OPERATIONS_CHANGELOG)}
-          target="_blank">
+          target="_blank"
+          icon="open_in_new">
           Operations changelogs
-        </Menu.Item>
+        </MenuItem>
         {enabled && (
-          <Menu.Item component="a" rightSection={<Icon name="open_in_new" />} href={url} target="_blank">
+          <MenuItem component="a" href={url} target="_blank" icon="open_in_new">
             Support
-          </Menu.Item>
+          </MenuItem>
         )}
       </Menu.Dropdown>
     </Menu>

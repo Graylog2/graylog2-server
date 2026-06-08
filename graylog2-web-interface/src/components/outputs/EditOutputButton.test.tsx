@@ -40,12 +40,12 @@ describe('EditOutputButton', () => {
 
     render(<EditOutputButton output={mockOutput} getTypeDefinition={getTypeDefinition} />);
 
-    userEvent.click(await screen.findByRole('button', { name: /edit/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /edit/i }));
 
     expect(getTypeDefinition).toHaveBeenCalledWith('test-type', expect.any(Function));
 
     await screen.findByRole('heading', { name: /Editing Output Test Output/i });
-    userEvent.click(await screen.findByRole('button', { name: /update output/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /update output/i }));
   });
 
   it('calls onUpdate and closes modal form on submit', async () => {
@@ -55,8 +55,8 @@ describe('EditOutputButton', () => {
     const onUpdate = jest.fn();
     render(<EditOutputButton output={mockOutput} getTypeDefinition={getTypeDefinition} onUpdate={onUpdate} />);
 
-    userEvent.click(await screen.findByRole('button', { name: /edit/i }));
-    userEvent.click(await screen.findByRole('button', { name: /update output/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /edit/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /update output/i }));
 
     expect(onUpdate).toHaveBeenCalledWith(mockOutput, expect.anything());
 
@@ -70,10 +70,10 @@ describe('EditOutputButton', () => {
     const onUpdate = jest.fn();
     render(<EditOutputButton output={mockOutput} getTypeDefinition={getTypeDefinition} onUpdate={onUpdate} />);
 
-    userEvent.click(await screen.findByRole('button', { name: /edit/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /edit/i }));
 
     await screen.findByRole('heading', { name: /Editing Output Test Output/i });
-    userEvent.click(await screen.findByRole('button', { name: /cancel/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /cancel/i }));
 
     expect(onUpdate).not.toHaveBeenCalled();
     expect(screen.queryByRole('heading', { name: /Editing Output Test Output/i })).not.toBeInTheDocument();

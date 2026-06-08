@@ -29,7 +29,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog.plugins.pipelineprocessor.processors.ConfigurationStateUpdater;
+import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreterStateUpdater;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
 import org.graylog.plugins.pipelineprocessor.simulator.PipelineInterpreterTracer;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -57,14 +57,14 @@ import java.util.Map;
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class SimulatorResource extends RestResource implements PluginRestResource {
-    private final ConfigurationStateUpdater pipelineStateUpdater;
+    private final PipelineInterpreterStateUpdater pipelineStateUpdater;
     private final StreamService streamService;
     private final MessageFactory messageFactory;
     private final PipelineInterpreter pipelineInterpreter;
 
     @Inject
     public SimulatorResource(PipelineInterpreter pipelineInterpreter,
-                             ConfigurationStateUpdater pipelineStateUpdater,
+                             PipelineInterpreterStateUpdater pipelineStateUpdater,
                              StreamService streamService,
                              MessageFactory messageFactory) {
         this.pipelineInterpreter = pipelineInterpreter;

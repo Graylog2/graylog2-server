@@ -173,6 +173,11 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
     }
 
     @Override
+    public long countDocumentsInMongoDBCollection(final String collection) {
+        return services.getMongoDBInstance().mongoCollection(collection).countDocuments();
+    }
+
+    @Override
     public void dropCollection(String collectionName) {
         services.getMongoDBInstance().mongoCollection(collectionName).drop();
     }

@@ -17,7 +17,6 @@
 package org.graylog2.rest.resources;
 
 import org.graylog.plugins.views.search.engine.monitoring.data.histogram.rest.HistogramResponseWriter;
-import org.graylog.plugins.views.storage.migration.RemoteReindexResource;
 import org.graylog.security.rest.CAResource;
 import org.graylog.security.rest.CertificateRenewalResource;
 import org.graylog.security.rest.CertificatesResource;
@@ -43,8 +42,11 @@ import org.graylog2.rest.resources.datanodes.DataNodeManagementResource;
 import org.graylog2.rest.resources.datanodes.DataNodeRestApiProxyResource;
 import org.graylog2.rest.resources.datanodes.DatanodeResource;
 import org.graylog2.rest.resources.datanodes.DatanodeUpgradeResource;
+import com.google.inject.multibindings.MapBinder;
 import org.graylog2.rest.resources.entities.preferences.EntityListPreferencesResource;
+import org.graylog2.rest.resources.entities.preferences.metrics.EntityListMetricProvider;
 import org.graylog2.rest.resources.messages.MessageResource;
+import org.graylog2.rest.resources.mongodb.MongodbClusterResource;
 import org.graylog2.rest.resources.roles.RolesResource;
 import org.graylog2.rest.resources.search.AbsoluteSearchResource;
 import org.graylog2.rest.resources.search.DecoratorResource;
@@ -99,7 +101,9 @@ import org.graylog2.rest.resources.system.indices.RetentionStrategyResource;
 import org.graylog2.rest.resources.system.indices.RotationStrategyResource;
 import org.graylog2.rest.resources.system.inputs.ExtractorsResource;
 import org.graylog2.rest.resources.system.inputs.InputStatesResource;
+import org.graylog2.rest.resources.system.inputs.InputMetricsResource;
 import org.graylog2.rest.resources.system.inputs.InputsResource;
+import org.graylog2.rest.resources.streams.StreamMetricsResource;
 import org.graylog2.rest.resources.system.inputs.StaticFieldsResource;
 import org.graylog2.rest.resources.system.jobs.ServiceManagerResource;
 import org.graylog2.rest.resources.system.jobs.SystemJobResource;
@@ -164,15 +168,16 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(TrafficResource.class);
         addSystemRestResource(SearchVersionResource.class);
         addSystemRestResource(EntityListPreferencesResource.class);
+        MapBinder.newMapBinder(binder(), String.class, EntityListMetricProvider.class);
         addSystemRestResource(TelemetryResource.class);
         addSystemRestResource(ContentStreamResource.class);
         addSystemRestResource(CertificateRenewalResource.class);
         addSystemRestResource(DatanodeResource.class);
+        addSystemRestResource(MongodbClusterResource.class);
         addSystemRestResource(DataNodeApiProxyResource.class);
         addSystemRestResource(DataNodeRestApiProxyResource.class);
         addSystemRestResource(DataNodeManagementResource.class);
         addSystemRestResource(DatanodeUpgradeResource.class);
-        addSystemRestResource(RemoteReindexResource.class);
         addSystemRestResource(CAResource.class);
         addSystemRestResource(ClientCertResource.class);
         addSystemRestResource(CertificatesResource.class);
@@ -243,6 +248,7 @@ public class RestResourcesModule extends Graylog2Module {
     private void addProcessingResources() {
         addSystemRestResource(GrokResource.class);
         addSystemRestResource(InputsResource.class);
+        addSystemRestResource(InputMetricsResource.class);
         addSystemRestResource(InputStatesResource.class);
         addSystemRestResource(StaticFieldsResource.class);
         addSystemRestResource(LookupTableResource.class);
@@ -275,6 +281,7 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(StreamDestinationFilterBuilderResource.class);
         addSystemRestResource(FavoriteFieldsResource.class);
         addSystemRestResource(StreamPipelineRulesResource.class);
+        addSystemRestResource(StreamMetricsResource.class);
     }
 
     private void addMonitoringResources() {

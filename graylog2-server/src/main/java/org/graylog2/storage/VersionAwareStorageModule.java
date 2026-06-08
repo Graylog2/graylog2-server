@@ -34,7 +34,6 @@ import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.datanode.ProxyRequestAdapter;
-import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.datastream.DataStreamAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
@@ -44,8 +43,10 @@ import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.searches.SearchesAdapter;
+import org.graylog2.indexer.security.IndexerAdminCert;
 import org.graylog2.indexer.security.SecurityAdapter;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
+import org.graylog2.storage.providers.AdminIndicesAdapterProvider;
 import org.graylog2.storage.providers.ClusterAdapterProvider;
 import org.graylog2.storage.providers.CountsAdapterProvider;
 import org.graylog2.storage.providers.DataStreamAdapterProvider;
@@ -60,7 +61,6 @@ import org.graylog2.storage.providers.MoreSearchAdapterProvider;
 import org.graylog2.storage.providers.MultiChunkResultRetrieverProvider;
 import org.graylog2.storage.providers.NodeAdapterProvider;
 import org.graylog2.storage.providers.ProxyRequestAdapterProvider;
-import org.graylog2.storage.providers.RemoteReindexingMigrationAdapterProvider;
 import org.graylog2.storage.providers.SearchesAdapterProvider;
 import org.graylog2.storage.providers.SecurityAdapterProvider;
 import org.graylog2.storage.providers.StreamsForFieldRetrieverProvider;
@@ -81,6 +81,7 @@ public class VersionAwareStorageModule extends AbstractModule {
         bind(StreamsForFieldRetriever.class).toProvider(StreamsForFieldRetrieverProvider.class);
         bind(CountsAdapter.class).toProvider(CountsAdapterProvider.class);
         bind(IndicesAdapter.class).toProvider(IndicesAdapterProvider.class);
+        bind(IndicesAdapter.class).annotatedWith(IndexerAdminCert.class).toProvider(AdminIndicesAdapterProvider.class);
         bind(DataStreamAdapter.class).toProvider(DataStreamAdapterProvider.class);
         bind(SecurityAdapter.class).toProvider(SecurityAdapterProvider.class);
         bind(SearchesAdapter.class).toProvider(SearchesAdapterProvider.class);
@@ -97,7 +98,6 @@ public class VersionAwareStorageModule extends AbstractModule {
         bind(V20200730000000_AddGl2MessageIdFieldAliasForEvents.ElasticsearchAdapter.class)
                 .toProvider(V20200730000000_AddGl2MessageIdFieldAliasForEventsElasticsearchAdapterProvider.class);
         bind(ProxyRequestAdapter.class).toProvider(ProxyRequestAdapterProvider.class);
-        bind(RemoteReindexingMigrationAdapter.class).toProvider(RemoteReindexingMigrationAdapterProvider.class);
         bind(DatanodeUpgradeServiceAdapter.class).toProvider(DatanodeUpgradeAdapterProvider.class);
 
         bind(IndexerHostsAdapter.class).toProvider(IndexerHostsAdapterProvider.class);

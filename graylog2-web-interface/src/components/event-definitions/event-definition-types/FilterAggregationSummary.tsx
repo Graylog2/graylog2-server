@@ -18,15 +18,18 @@ import * as React from 'react';
 import { useContext } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import upperFirst from 'lodash/upperFirst';
+import styled from 'styled-components';
 
 import { describeExpression } from 'util/CronUtils';
-import { Link } from 'components/common/router';
+import { Link } from 'components/common';
 import { Alert } from 'components/bootstrap';
+import { DataWell } from 'components/lookup-tables/layout-componets';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import { isPermitted } from 'util/PermissionsMixin';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import Routes from 'routing/Routes';
 import validateExpression from 'logic/alerts/AggregationExpressionValidation';
+import type { Expression } from 'logic/alerts/AggregationExpressionValidation';
 import type { Stream } from 'views/stores/StreamsStore';
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
@@ -38,6 +41,16 @@ import { TIME_UNITS } from './FilterForm';
 import styles from './FilterAggregationSummary.css';
 
 import LinkToReplaySearch from '../replay-search/LinkToReplaySearch';
+
+const StyledDataWell = styled(DataWell)`
+  line-height: 1.8;
+  white-space: pre;
+  font-family: monospace;
+  font-size: medium;
+  color: ${({ theme }) => (theme.mode === 'light' ? 'darkslateblue' : 'lightsteelblue')};
+  overflow: auto;
+  text-wrap: auto;
+`;
 
 const StreamOrId = ({ streamOrId }: { streamOrId: Stream | string }) => {
   if (typeof streamOrId === 'string') {
@@ -88,7 +101,7 @@ type Props = {
 };
 
 const SearchFilters = ({ filters }: { filters: EventDefinition['config']['filters'] }) => {
-  if (!filters || filters.length === 0) {
+  if (!filters || filters?.length === 0) {
     return <dd>No filters configured</dd>;
   }
 
@@ -111,12 +124,12 @@ type StreamsProps = {
 };
 
 const Streams = ({ streams, streamIds, streamIdsWithMissingPermission }: StreamsProps) => {
-  if ((!streamIds || streamIds.length === 0) && streamIdsWithMissingPermission.length <= 0) {
+  if ((!streamIds || streamIds?.length === 0) && streamIdsWithMissingPermission?.length <= 0) {
     return <>No Streams selected, searches in all Streams</>;
   }
 
   const warning =
-    streamIdsWithMissingPermission.length > 0 ? (
+    streamIdsWithMissingPermission?.length > 0 ? (
       <Alert bsStyle="warning">
         Missing Stream Permissions for:
         <br />
@@ -129,7 +142,7 @@ const Streams = ({ streams, streamIds, streamIdsWithMissingPermission }: Streams
     .sort((s1, s2) =>
       naturalSortIgnoreCase(typeof s1 === 'object' ? s1.title : s1, typeof s2 === 'object' ? s2.title : s2),
     )
-    .map((s) => <StreamOrId streamOrId={s} />);
+    .map((s) => <StreamOrId key={typeof s === 'object' ? s.id : s} streamOrId={s} />);
 
   return (
     <>
@@ -166,7 +179,7 @@ const FilterAggregationSummary = ({ config, currentUser, definitionId = undefine
   const effectiveStreamIds = configStreams?.filter((s) => isPermitted(currentUser.permissions, `streams:read:${s}`));
   const streamIdsWithMissingPermission = configStreams?.filter((s) => !effectiveStreamIds.includes(s));
 
-  const validationResults = validateExpression(conditions.expression, series);
+  const validationResults = validateExpression(conditions?.expression as Expression | null, series);
 
   const renderCronExpression = (expression) => {
     if (expression) {
@@ -177,9 +190,9 @@ const FilterAggregationSummary = ({ config, currentUser, definitionId = undefine
   };
 
   const renderStreamCategories = () => {
-    if (!streamCategories || streamCategories.length === 0) return null;
+    if (!streamCategories || streamCategories?.length === 0) return null;
 
-    const renderedCategories = streamCategories.map((s) => <StreamOrId streamOrId={s} />);
+    const renderedCategories = streamCategories.map((s) => <StreamOrId key={s} streamOrId={s} />);
 
     return (
       <>
@@ -194,8 +207,10 @@ const FilterAggregationSummary = ({ config, currentUser, definitionId = undefine
       <dt>Type</dt>
       <dd>{upperFirst(conditionType)}</dd>
       <dt>Search Query</dt>
-      <dd>{query || '*'}</dd>
-      {queryParameters.length > 0 && <QueryParameters queryParameters={queryParameters} />}
+      <dd>
+        <StyledDataWell>{query || '*'}</StyledDataWell>
+      </dd>
+      {queryParameters?.length > 0 && <QueryParameters queryParameters={queryParameters} />}
       <dt>Search Filters</dt>
       <SearchFilters filters={config.filters} />
       <dt>Streams</dt>
@@ -241,7 +256,7 @@ const FilterAggregationSummary = ({ config, currentUser, definitionId = undefine
       {conditionType === 'aggregation' && (
         <>
           <dt>Group by Field(s)</dt>
-          <dd>{groupBy && groupBy.length > 0 ? groupBy.join(', ') : 'No Group by configured'}</dd>
+          <dd>{groupBy && groupBy?.length > 0 ? groupBy.join(', ') : 'No Group by configured'}</dd>
           <dt>Create Events if</dt>
           <dd>
             {validationResults.isValid ? (

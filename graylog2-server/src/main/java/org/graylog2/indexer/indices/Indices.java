@@ -108,9 +108,9 @@ public class Indices {
         }
     }
 
-    public void move(String source, String target) {
-        indicesAdapter.move(source, target, result -> {
-            LOG.info("Moving index <{}> to <{}>: Bulk indexed {} messages, took {} ms, failures: {}",
+    public void reindex(String source, String target) {
+        indicesAdapter.reindex(source, target, result -> {
+            LOG.info("Reindexing index <{}> to <{}>: Bulk indexed {} messages, took {} ms, failures: {}",
                     source,
                     target,
                     result,
@@ -118,7 +118,7 @@ public class Indices {
                     result.hasFailedItems());
 
             if (result.hasFailedItems()) {
-                throw new ElasticsearchException("Failed to move a message. Check your indexer log.");
+                throw new ElasticsearchException("Failed to reindex a message. Check your indexer log.");
             }
         });
     }
@@ -346,10 +346,14 @@ public class Indices {
         return getClosedIndices(Collections.singleton(indexSet.getIndexWildcard()));
     }
 
-    public Set<String> getIndices(final IndexSet indexSet, final String... statusFilter) {
+    public Set<String> getIndices(final IndexSet indexSet, final IndexStatus... statusFilter) {
         final String indexWildcard = indexSet.getIndexWildcard();
-        final List<String> status = Arrays.asList(statusFilter);
+        final List<IndexStatus> status = Arrays.asList(statusFilter);
         return indicesAdapter.indices(indexWildcard, status, indexSet.getConfig().id());
+    }
+
+    public Set<OutdatedIndex> getOutdatedIndices(int currentMajorVersion) {
+        return indicesAdapter.getOutdatedIndices(currentMajorVersion);
     }
 
     public boolean isOpen(final String indexName) {

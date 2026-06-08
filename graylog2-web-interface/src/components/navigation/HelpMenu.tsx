@@ -15,13 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Link } from 'react-router-dom';
 
 import usePluginEntities from 'hooks/usePluginEntities';
-import { NavDropdown } from 'components/bootstrap';
-import { Icon } from 'components/common';
+import { NavDropdown, MenuItem } from 'components/bootstrap';
 import useHotkeysContext from 'hooks/useHotkeysContext';
-import Menu from 'components/bootstrap/Menu';
 import NavIcon from 'components/navigation/NavIcon';
 import usePermissions from 'hooks/usePermissions';
 
@@ -36,32 +33,27 @@ const HelpMenu = () => {
       {availableMenuItems.map((item) => {
         if ('externalLink' in item) {
           return (
-            <Menu.Item
-              key={item.description}
-              component="a"
-              href={item.externalLink}
-              target="_blank"
-              leftSection={<Icon name="open_in_new" />}>
+            <MenuItem key={item.description} component="a" href={item.externalLink} target="_blank" icon="open_in_new">
               {item.description}
-            </Menu.Item>
+            </MenuItem>
           );
         }
 
         if ('path' in item) {
           return (
-            <Menu.Item key={item.description} component={Link} to={item.path}>
+            <MenuItem key={item.description} component="a" href={item.path}>
               {item.description}
-            </Menu.Item>
+            </MenuItem>
           );
         }
 
         if ('action' in item) {
           return (
-            <Menu.Item
+            <MenuItem
               key={item.description}
               onClick={() => item.action({ showHotkeysModal: () => setShowHotkeysModal(true) })}>
               {item.description}
-            </Menu.Item>
+            </MenuItem>
           );
         }
 

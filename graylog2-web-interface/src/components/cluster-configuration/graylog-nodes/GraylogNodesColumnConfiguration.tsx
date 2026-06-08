@@ -27,6 +27,7 @@ import ProcessingStateCell from './cells/ProcessingStateCell';
 import ThroughputMetricsCell from './cells/ThroughputMetricsCell';
 
 import CpuMetricsCell from '../shared-components/CpuMetricsCell';
+import { SecondaryText, StyledLabel } from '../shared-components/NodeMetricsLayout';
 import SizeAndRatioMetric from '../shared-components/SizeAndRatioMetric';
 
 const JOURNAL_WARNING_THRESHOLD = 0.1;
@@ -38,6 +39,7 @@ const CPU_DANGER_THRESHOLD = 0.9;
 
 export const DEFAULT_VISIBLE_COLUMNS = [
   'hostname',
+  'version',
   'lifecycle',
   'cpu',
   'jvm',
@@ -63,6 +65,20 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
     hostname: {
       renderCell: (_value, entity) => <HostnameCell node={entity} />,
       minWidth: 300,
+    },
+    is_leader: {
+      renderCell: (isLeader: boolean) => (
+        <SecondaryText>{isLeader ? <StyledLabel bsSize="xs">Leader</StyledLabel> : <span>-</span>}</SecondaryText>
+      ),
+      staticWidth: 'matchHeader',
+    },
+    version: {
+      renderCell: (_value, entity) => (
+        <SecondaryText>
+          <span>{entity.version ?? 'N/A'}</span>
+        </SecondaryText>
+      ),
+      minWidth: 150,
     },
     lifecycle: {
       renderCell: (_value, entity) => <LifecycleCell node={entity} />,

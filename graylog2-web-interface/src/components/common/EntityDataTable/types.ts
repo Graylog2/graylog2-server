@@ -27,7 +27,18 @@ export type ColumnSchema = {
   anyPermissions?: boolean;
   // Indicates that a column does not exist as an attribute in table data
   isDerived?: boolean;
-} & Pick<Attribute, 'id' | 'title' | 'type' | 'sortable' | 'hidden' | 'permissions'>;
+} & Pick<
+  Attribute,
+  | 'id'
+  | 'title'
+  | 'type'
+  | 'sortable'
+  | 'hidden'
+  | 'permissions'
+  | 'sliceable'
+  | 'slice_sort_options'
+  | 'slice_sort_default'
+>;
 
 // A column render should have either a `width` and optionally a `minWidth` or only a `staticWidth`.
 export type ColumnRenderer<Entity extends EntityBase, Meta = unknown> = {
@@ -56,11 +67,24 @@ export type ColumnPreferences = {
   };
 };
 
+export type SlicingPreferences = {
+  sliceColumn: string;
+  sortBy: string;
+  order: 'asc' | 'desc';
+};
+
+export type SlicingPreferencesJSON = {
+  slice_column: string;
+  sort_by: string;
+  order: 'asc' | 'desc';
+};
+
 export type TableLayoutPreferences<T = { [key: string]: unknown }> = {
   attributes?: ColumnPreferences;
   sort?: Sort;
   perPage?: number;
   order?: Array<string>;
+  slicing?: SlicingPreferences | null;
   customPreferences?: T;
 };
 
@@ -71,6 +95,7 @@ export type TableLayoutPreferencesJSON<T = { [key: string]: unknown }> = {
     order: 'asc' | 'desc';
   };
   per_page?: number;
+  slicing?: SlicingPreferencesJSON | null;
   custom_preferences?: T;
   order?: Array<string>;
 };
@@ -86,9 +111,13 @@ export type ExpandedSectionRenderers<Entity> = {
   [sectionName: string]: ExpandedSectionRenderer<Entity>;
 };
 
+export type RowOverride<Entity extends EntityBase> = (entity: Entity) => React.ReactNode;
+
 export type DefaultLayout = {
   entityTableId: string;
+  layoutVariant?: string;
   defaultSort: Sort;
+  defaultSlicing?: SlicingPreferences;
   defaultDisplayedAttributes: Array<string>;
   defaultPageSize: number;
   defaultColumnOrder: Array<string>;
@@ -98,6 +127,7 @@ export type ColumnMetaContext<Entity extends EntityBase> =
   | {
       columnRenderer?: ColumnRenderer<Entity>;
       enableColumnOrdering?: boolean;
+      enableSlicing?: boolean;
       hideCellPadding?: boolean;
       label?: string;
     }

@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useState, useLayoutEffect, useMemo } from 'react';
+import { useState, useLayoutEffect, useMemo, useRef } from 'react';
+import isEqual from 'lodash/isEqual';
 
 import {
   DEFAULT_COL_MIN_WIDTH,
@@ -25,7 +26,7 @@ import {
 
 import type { EntityBase, ColumnRenderersByAttribute } from '../types';
 
-const assignableTableWidth = ({
+const calculateAssignableWidth = ({
   scrollContainerWidth,
   actionsColMinWidth,
   bulkSelectColWidth,
@@ -70,7 +71,10 @@ const calculateColumnWidths = ({
     return total + width;
   }, 0);
 
-  const flexColWidth = assignableWidth / totalFlexColumns;
+  const hasFlexColumns = totalFlexColumns > 0;
+  const flexColWidth = hasFlexColumns ? assignableWidth / totalFlexColumns : 0;
+  const actionsColWidth =
+    !hasFlexColumns && assignableWidth > 0 ? assignableWidth + actionsColMinWidth : actionsColMinWidth;
 
   return {
     ...Object.fromEntries(
@@ -83,8 +87,9 @@ const calculateColumnWidths = ({
         return [id, !staticColumnWidths[id] && targetWidth < resolvedMinWidth ? resolvedMinWidth : targetWidth];
       }),
     ),
-    [ACTIONS_COL_ID]:
-      assignableWidth > 0 && !totalFlexColumns ? assignableWidth + actionsColMinWidth : actionsColMinWidth,
+    // When all data columns have static widths, the actions column acts as the elastic tail.
+    // It fills any remaining space so the table spans the container even without row actions.
+    [ACTIONS_COL_ID]: actionsColWidth,
     ...(bulkSelectColWidth ? { [BULK_SELECT_COL_ID]: bulkSelectColWidth } : {}),
   };
 };
@@ -131,6 +136,7 @@ const useColumnWidths = <Entity extends EntityBase>({
   headerMinWidths: { [colId: string]: number };
 }) => {
   const [columnWidths, setColumnWidths] = useState({});
+  const prevColumnWidthsRef = useRef<Record<string, number>>({});
   const staticColumnWidths = useMemo(
     () =>
       calculateStaticColumnWidths({
@@ -148,7 +154,8 @@ const useColumnWidths = <Entity extends EntityBase>({
     }
 
     // Calculate available width for columns which do not have a static width
-    const assignableWidth = assignableTableWidth({
+    // Width that can be assigned to flex columns (or to the actions tail when there are none).
+    const assignableWidth = calculateAssignableWidth({
       actionsColMinWidth,
       columnIds,
       bulkSelectColWidth,
@@ -156,18 +163,20 @@ const useColumnWidths = <Entity extends EntityBase>({
       staticColumnWidths,
     });
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setColumnWidths(
-      calculateColumnWidths({
-        actionsColMinWidth,
-        assignableWidth,
-        attributeColumnIds: columnIds,
-        attributeColumnRenderers: columnRenderersByAttribute,
-        bulkSelectColWidth,
-        staticColumnWidths,
-        headerMinWidths,
-      }),
-    );
+    const newColumnWidths = calculateColumnWidths({
+      actionsColMinWidth,
+      assignableWidth,
+      attributeColumnIds: columnIds,
+      attributeColumnRenderers: columnRenderersByAttribute,
+      bulkSelectColWidth,
+      staticColumnWidths,
+      headerMinWidths,
+    });
+
+    if (!isEqual(prevColumnWidthsRef.current, newColumnWidths)) {
+      prevColumnWidthsRef.current = newColumnWidths;
+      setColumnWidths(newColumnWidths);
+    }
   }, [
     actionsColMinWidth,
     bulkSelectColWidth,

@@ -55,12 +55,14 @@ jest.mock('stores/roles/AuthzRolesStore', () => ({
 }));
 
 describe('RolesOverview', () => {
+  const renderSUT = () => render(<RolesOverview />);
+
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('should display table header', async () => {
-    render(<RolesOverview />);
+    renderSUT();
     const headers = ['Name', 'Description', 'Actions'];
 
     // wait until list is displayed
@@ -72,14 +74,14 @@ describe('RolesOverview', () => {
   });
 
   it('should fetch and list roles with name and description', async () => {
-    render(<RolesOverview />);
+    renderSUT();
 
     await screen.findByText(mockRoles.first().name);
     await screen.findByText(mockRoles.first().description);
   });
 
   it('should allow searching for roles', async () => {
-    render(<RolesOverview />);
+    renderSUT();
 
     const searchInput = await screen.findByPlaceholderText('Enter search query...');
     await userEvent.type(searchInput, 'name:manager');
@@ -94,7 +96,7 @@ describe('RolesOverview', () => {
   });
 
   it('should reset search', async () => {
-    render(<RolesOverview />);
+    renderSUT();
 
     const searchInput = await screen.findByPlaceholderText('Enter search query...');
     await userEvent.type(searchInput, 'name:manager');

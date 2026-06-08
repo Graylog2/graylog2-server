@@ -93,13 +93,13 @@ public class MongoIndexRangeServiceTest {
     @MongoDBFixtures("MongoIndexRangeServiceTest-LegacyIndexRanges.json")
     public void getIgnoresLegacyIndexRange() throws Exception {
         assertThrows(NotFoundException.class, () ->
-            indexRangeService.get("graylog_0"));
+                indexRangeService.get("graylog_0"));
     }
 
     @Test
     public void getThrowsNotFoundException() throws Exception {
         assertThrows(NotFoundException.class, () ->
-            indexRangeService.get("does-not-exist"));
+                indexRangeService.get("does-not-exist"));
     }
 
     /**
@@ -223,6 +223,41 @@ public class MongoIndexRangeServiceTest {
         assertThatThrownBy(() -> indexRangeService.calculateRange("does-not-exist"))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Unable to calculate range for index <does-not-exist>, index is unhealthy: Red");
+    }
+
+    @Test
+    void calculateAndSave() {
+        final String index = "graylog";
+        final DateTime min = new DateTime(2015, 1, 1, 1, 0, DateTimeZone.UTC);
+        final DateTime max = new DateTime(2015, 1, 1, 5, 0, DateTimeZone.UTC);
+        when(indices.waitForRecovery(index)).thenReturn(HealthStatus.Green);
+        when(indices.indexRangeStatsOfIndex(index)).thenReturn(IndexRangeStats.create(min, max));
+
+        indexRangeService.save(indexRangeService.calculateRange(index));
+
+        final var ranges = indexRangeService.findAll();
+
+        assertThat(ranges).hasSize(1);
+
+        final var savedRange = ranges.first();
+
+        assertThat(savedRange.indexName()).isEqualTo(index);
+        assertThat(savedRange.begin()).isEqualTo(min);
+        assertThat(savedRange.end()).isEqualTo(max);
+
+        when(indices.indexRangeStatsOfIndex(index)).thenReturn(IndexRangeStats.create(min.plusYears(1), max.plusYears(1)));
+
+        assertThat(indexRangeService.calculateRangeAndSave(index)).isTrue();
+
+        final var updatedRanges = indexRangeService.findAll();
+
+        assertThat(updatedRanges).hasSize(1);
+
+        final var updatedRange = updatedRanges.first();
+
+        assertThat(updatedRange.indexName()).isEqualTo(index);
+        assertThat(updatedRange.begin()).isEqualTo(min.plusYears(1));
+        assertThat(updatedRange.end()).isEqualTo(max.plusYears(1));
     }
 
     @Test

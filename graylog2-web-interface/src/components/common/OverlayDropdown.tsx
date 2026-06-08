@@ -19,29 +19,27 @@ import styled, { css } from 'styled-components';
 
 import Menu from 'components/bootstrap/Menu';
 
-type Placement = 'top' | 'right' | 'bottom' | 'left';
+type Placement = 'top' | 'right' | 'bottom' | 'left' | 'bottom-start';
 
 const ToggleDropdown = styled.span<{ $alwaysShowCaret: boolean }>(
   ({ $alwaysShowCaret }) => css`
     cursor: pointer;
 
-    ${$alwaysShowCaret
-      ? ''
-      : css`
-          .caret {
-            visibility: hidden;
-          }
+    .caret {
+      visibility: ${$alwaysShowCaret ? 'visible' : 'hidden'};
+    }
 
-          &:hover .caret {
-            visibility: visible;
-          }
-        `}
+    /* stylelint-disable-next-line nesting-selector-no-missing-scoping-root -- & refers to the styled.span root */
+    &:hover .caret {
+      visibility: visible;
+    }
   `,
 );
 
 type Props = {
   alwaysShowCaret?: boolean;
   children: React.ReactNode;
+  className?: string;
   closeOnSelect?: boolean;
   dropdownZIndex?: number;
   menuContainer?: HTMLElement;
@@ -55,6 +53,7 @@ type Props = {
 const OverlayDropdown = ({
   alwaysShowCaret = false,
   children,
+  className = undefined,
   closeOnSelect = true,
   dropdownZIndex = undefined,
   menuContainer = document.body,
@@ -76,7 +75,12 @@ const OverlayDropdown = ({
       portalProps={{ target: menuContainer }}
       zIndex={dropdownZIndex}>
       <Menu.Target>
-        <ToggleDropdown $alwaysShowCaret={alwaysShowCaret} onClick={onToggle} ref={toggleTarget} role="presentation">
+        <ToggleDropdown
+          $alwaysShowCaret={alwaysShowCaret}
+          className={className}
+          onClick={onToggle}
+          ref={toggleTarget}
+          role="presentation">
           {toggleChild}
         </ToggleDropdown>
       </Menu.Target>

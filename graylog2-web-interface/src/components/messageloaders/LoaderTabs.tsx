@@ -17,12 +17,11 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
-import { Col, Tab, Tabs } from 'components/bootstrap';
-import connect from 'stores/connect';
+import { Col, Tabs } from 'components/bootstrap';
 import MessageShow from 'components/search/MessageShow';
 import MessageLoader from 'components/extractors/MessageLoader';
 import StreamsStore from 'stores/streams/StreamsStore';
-import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
+import useInputsList, { inputsAsMap } from 'hooks/useInputs';
 import type { Message } from 'views/components/messagelist/Types';
 import type { Stream } from 'logic/streams/types';
 
@@ -38,6 +37,12 @@ type LoaderTabsProps = {
   selectedInputId?: string;
   customFieldActions?: React.ReactElement;
   inputs?: any;
+};
+
+type TabDefinition = {
+  key: TabType;
+  title: string;
+  content: React.ReactNode;
 };
 
 class LoaderTabs extends React.Component<
@@ -58,12 +63,6 @@ class LoaderTabs extends React.Component<
     inputs: undefined,
   };
 
-  TAB_KEYS = {
-    recent: 1,
-    messageId: 2,
-    raw: 3,
-  };
-
   constructor(props: LoaderTabsProps) {
     super(props);
 
@@ -77,6 +76,12 @@ class LoaderTabs extends React.Component<
     this.loadData();
   }
 
+  TAB_KEYS: Record<TabType, TabType> = {
+    recent: 'recent',
+    messageId: 'messageId',
+    raw: 'raw',
+  };
+
   onMessageLoaded = (message: Message) => {
     this.setState({ message });
     const { onMessageLoaded } = this.props;
@@ -87,8 +92,6 @@ class LoaderTabs extends React.Component<
   };
 
   loadData = () => {
-    InputsActions.list();
-
     StreamsStore.listStreams().then((response: Array<Stream>) => {
       const streams = {};
 
@@ -100,13 +103,13 @@ class LoaderTabs extends React.Component<
     });
   };
 
-  _isTabVisible = (tabKey) => {
+  _isTabVisible = (tabKey: TabType) => {
     const { tabs } = this.props;
 
-    return tabs === tabKey || tabs.indexOf(tabKey) !== -1;
+    return tabs.indexOf(tabKey) !== -1;
   };
 
-  _getActiveTab = () => {
+  _getActiveTab = (): TabType => {
     const { activeTab } = this.state;
 
     if (activeTab) {
@@ -130,68 +133,76 @@ class LoaderTabs extends React.Component<
     return this.TAB_KEYS.raw;
   };
 
-  _changeActiveTab = (selectedTab) => {
+  _changeActiveTab = (selectedTab: string | null) => {
     const { activeTab } = this.state;
 
     if (activeTab !== selectedTab) {
-      this.setState({ activeTab: selectedTab, message: undefined });
+      this.setState({ activeTab: selectedTab as TabType, message: undefined });
     }
   };
 
-  _formatMessageLoaders = () => {
-    const messageLoaders = [];
+  _getTabDefinitions = (): TabDefinition[] => {
+    const { inputs, selectedInputId, messageId, index } = this.props;
+    const defs: TabDefinition[] = [];
 
     if (this._isTabVisible('recent')) {
-      const { inputs, selectedInputId } = this.props;
-
-      messageLoaders.push(
-        <Tab key="recent" eventKey={this.TAB_KEYS.recent} title="Recent Message" style={{ marginBottom: 10 }}>
+      defs.push({
+        key: 'recent',
+        title: 'Recent Message',
+        content: (
           <RecentMessageLoader
             inputs={inputs}
             selectedInputId={selectedInputId}
             onMessageLoaded={this.onMessageLoaded}
           />
-        </Tab>,
-      );
+        ),
+      });
     }
 
     if (this._isTabVisible('messageId')) {
-      const { messageId, index } = this.props;
-
-      messageLoaders.push(
-        <Tab key="messageId" eventKey={this.TAB_KEYS.messageId} title="Message ID" style={{ marginBottom: 10 }}>
-          <div style={{ marginTop: 5, marginBottom: 15 }}>
-            Please provide the id and index of the message that you want to load in this form:
-          </div>
-          <MessageLoader
-            messageId={messageId}
-            index={index}
-            onMessageLoaded={this.onMessageLoaded}
-            hidden={false}
-            hideText
-          />
-        </Tab>,
-      );
+      defs.push({
+        key: 'messageId',
+        title: 'Message ID',
+        content: (
+          <>
+            <div style={{ marginTop: 5, marginBottom: 15 }}>
+              Please provide the id and index of the message that you want to load in this form:
+            </div>
+            <MessageLoader
+              messageId={messageId}
+              index={index}
+              onMessageLoaded={this.onMessageLoaded}
+              hidden={false}
+              hideText
+            />
+          </>
+        ),
+      });
     }
 
     if (this._isTabVisible('raw')) {
-      messageLoaders.push(
-        <Tab key="raw" eventKey={this.TAB_KEYS.raw} title="Raw Message" style={{ marginBottom: 10 }}>
-          <div style={{ marginTop: 5, marginBottom: 15 }}>
-            Load a message from text, as if it was sent by a log source.
-          </div>
-
-          <RawMessageLoader onMessageLoaded={this.onMessageLoaded} />
-        </Tab>,
-      );
+      defs.push({
+        key: 'raw',
+        title: 'Raw Message',
+        content: (
+          <>
+            <div style={{ marginTop: 5, marginBottom: 15 }}>
+              Load a message from text, as if it was sent by a log source.
+            </div>
+            <RawMessageLoader onMessageLoaded={this.onMessageLoaded} />
+          </>
+        ),
+      });
     }
 
-    return messageLoaders;
+    return defs;
   };
 
   render() {
     const { streams, message } = this.state;
     const { customFieldActions, inputs } = this.props;
+    const tabDefs = this._getTabDefinitions();
+
     const displayMessage =
       message && inputs ? (
         <Col md={12}>
@@ -201,8 +212,19 @@ class LoaderTabs extends React.Component<
 
     return (
       <div>
-        <Tabs id="loaderTabs" activeKey={this._getActiveTab()} onSelect={this._changeActiveTab} animation={false}>
-          {this._formatMessageLoaders()}
+        <Tabs value={this._getActiveTab()} onChange={this._changeActiveTab}>
+          <Tabs.List>
+            {tabDefs.map(({ key, title }) => (
+              <Tabs.Tab key={key} value={key}>
+                {title}
+              </Tabs.Tab>
+            ))}
+          </Tabs.List>
+          {tabDefs.map(({ key, content }) => (
+            <Tabs.Panel key={key} value={key} style={{ marginBottom: 10 }}>
+              {content}
+            </Tabs.Panel>
+          ))}
         </Tabs>
         {displayMessage}
       </div>
@@ -210,6 +232,11 @@ class LoaderTabs extends React.Component<
   }
 }
 
-export default connect(LoaderTabs, { inputs: InputsStore }, ({ inputs: { inputs } }) => ({
-  inputs: inputs ? Immutable.Map(InputsStore.inputsAsMap(inputs)) : undefined,
-}));
+const LoaderTabsWrapper = (props: Omit<LoaderTabsProps, 'inputs'>) => {
+  const { data: inputsList } = useInputsList();
+  const inputs = inputsList ? Immutable.Map(inputsAsMap(inputsList)) : undefined;
+
+  return <LoaderTabs {...props} inputs={inputs} />;
+};
+
+export default LoaderTabsWrapper;

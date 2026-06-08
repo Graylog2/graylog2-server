@@ -77,6 +77,18 @@ public interface EventProcessorConfig extends ContentPackable<EventProcessorConf
      *
      * @return the validation result
      */
+    @JsonIgnore
+    default ValidationResult validate(UserContext userContext,
+                                      @Nullable EventProcessorConfig oldEventProcessorConfig,
+                                      EventDefinitionConfiguration eventDefinitionConfiguration) {
+        return validate(oldEventProcessorConfig, eventDefinitionConfiguration);
+    }
+
+    /**
+     * Validates the event processor configuration.
+     *
+     * @return the validation result
+     */
     ValidationResult validate(UserContext userContext);
 
     /**

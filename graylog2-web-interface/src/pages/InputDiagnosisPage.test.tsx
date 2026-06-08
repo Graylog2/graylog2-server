@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
 import useInputDiagnosis from 'components/inputs/InputDiagnosis/useInputDiagnosis';
@@ -29,6 +30,7 @@ jest.mock('routing/useParams', () =>
 );
 
 jest.mock('components/inputs/InputDiagnosis/useInputDiagnosis');
+jest.mock('components/inputs/InputDiagnosis/InputDiagnosisRulesTab', () => () => <div>Rules Tab Content</div>);
 
 const input = {
   id: 'test-input-id',
@@ -120,6 +122,41 @@ describe('Input Diagnosis Page', () => {
     expect(nodeStateIndicator).toHaveClass('danger');
   });
 
+  it('shows last failed timestamp when provided', async () => {
+    asMock(useInputDiagnosis).mockReturnValue({
+      ...useInputDiagnosisMock,
+      inputNodeStates: {
+        ...useInputDiagnosisMock.inputNodeStates,
+        states: {
+          ...useInputDiagnosisMock.inputNodeStates.states,
+          FAILED: [
+            {
+              node_id: 'test-node-id-2',
+              detailed_message: 'failed for testing',
+              last_failed_at: '2024-01-01T00:00:00.000Z',
+            },
+          ],
+        },
+      },
+    });
+
+    render(<InputDiagnosisPage />);
+
+    expect(await screen.findByText(/Last failed:/i)).toBeInTheDocument();
+  });
+
+  it('shows failed starts 15m count when available', async () => {
+    asMock(useInputDiagnosis).mockReturnValue({
+      ...useInputDiagnosisMock,
+      inputMetrics: { ...useInputDiagnosisMock.inputMetrics, failedStarts15mCount: 42 },
+    });
+
+    render(<InputDiagnosisPage />);
+
+    expect(await screen.findByText(/Failed starts \(last 15min\):/)).toBeInTheDocument();
+    expect(await screen.findByText('42')).toBeInTheDocument();
+  });
+
   it('shows node state success indicator', async () => {
     asMock(useInputDiagnosis).mockReturnValue({
       ...useInputDiagnosisMock,
@@ -152,5 +189,21 @@ describe('Input Diagnosis Page', () => {
     render(<InputDiagnosisPage />);
 
     expect(await screen.findByText(/TCP Traffic\./i)).toBeInTheDocument();
+  });
+
+  it('defaults to Overview tab', async () => {
+    render(<InputDiagnosisPage />);
+
+    expect(await screen.findByText(/inputTitle/)).toBeInTheDocument();
+    expect(screen.queryByText('Rules Tab Content')).not.toBeInTheDocument();
+  });
+
+  it('switches to Rules tab when clicked', async () => {
+    render(<InputDiagnosisPage />);
+
+    const rulesTab = screen.getByText('Rules');
+    await userEvent.click(rulesTab);
+
+    expect(await screen.findByText('Rules Tab Content')).toBeInTheDocument();
   });
 });

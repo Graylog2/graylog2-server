@@ -54,9 +54,6 @@ class ComposableIndexTemplateAdapterTest {
     private ComposableIndexTemplateAdapter toTest;
 
     @Mock
-    private OSSerializationUtils templateMapper;
-
-    @Mock
     private OpenSearchIndicesClient indicesClient;
 
     @BeforeEach
@@ -66,7 +63,7 @@ class ComposableIndexTemplateAdapterTest {
         doReturn(syncClient).when(officialOpensearchClient).sync();
         doReturn(indicesClient).when(syncClient).indices();
 
-        toTest = new ComposableIndexTemplateAdapter(officialOpensearchClient, templateMapper);
+        toTest = new ComposableIndexTemplateAdapter(officialOpensearchClient);
     }
 
     @Test
@@ -79,8 +76,6 @@ class ComposableIndexTemplateAdapterTest {
                 13L,
                 new Template.Settings(Map.of())
         );
-        doReturn(typeMapping).when(templateMapper).fromMap(template.mappings(), TypeMapping._DESERIALIZER);
-        doReturn(indexSettings).when(templateMapper).fromMap(template.settings(), IndexSettings._DESERIALIZER);
 
         doReturn(PutIndexTemplateResponse.builder().acknowledged(true).build())
                 .when(indicesClient)

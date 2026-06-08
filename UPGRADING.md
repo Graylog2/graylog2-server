@@ -1,44 +1,20 @@
-Upgrading to Graylog 7.1.x
+Upgrading to Graylog 7.2.x
 ==========================
-
-## User Session Termination
-
-All user sessions will be terminated when upgrading because the internal storage format for sessions has been changed.
-Users will have to log in again.
 
 ## Breaking Changes
 
-### External Authentication Services: Changed Default User Time Zone
+### Paginated REST APIs: Case-Insensitive Matching and Sorting
 
-The authentication backends for Active Directory, LDAP, OIDC, Okta, and SAML previously set the time zone for
-newly synchronized users to the value of the `root_timezone` config file setting. ("UTC" by default)
+Paginated entity endpoints (e.g. Streams, Event Definitions, Notifications, Lookup Tables, Dashboards,
+Sigma Rules, Investigations, etc.) now share a case-insensitive, numeric-aware collation for both
+**sorting** and **filtering**. Previously, only sort order was affected when individual endpoints
+opted in; matching was always case-sensitive.
 
-Graylog 7.1 introduces a configurable "default user time zone" setting for all authentication backends.
-The default value is unset, meaning that the browser's time zone will be used by default.
+After upgrading:
 
-### Formatting Change of `aggregation_conditions` Field in Aggregation Events
+- Sorting by string fields such as `title` or `name` interleaves upper- and lower-case entries,
+  and strings containing numbers sort naturally (`Stream 2` before `Stream 10`).
+- Filter expressions on string fields match case-insensitively. For example, a query that previously
+  matched only `test` now also matches `Test` and `TEST`. API clients relying on exact-case matching
+  via paginated endpoints will see additional results.
 
-The `aggregation_conditions` map previously used keys with parentheses on the aggregation type. These needed to be
-escaped if they were used directly in Notification templates, e.g. `${aggregation_conditions.count\\(\\)}`,
-`${aggregation_conditions.sum\\(fieldname\\)}`. To avoid the need for escaping, their format has been modified to use
-underscores instead, e.g. `${aggregation_conditions.count}`, `${aggregation_conditions.sum_fieldname}`. Any
-existing notifications using the escaping of parentheses in explicit `aggregation_conditions` key names will need to
-be modified to instead use the underscore format.
-
-## Configuration File Changes
-
-| Option | Action    | Description |
-|--------|-----------|-------------|
-| `tbd`  | **added** |             |
-
-## Java API Changes
-
-- tbd
-
-## REST API Endpoint Changes
-
-The following REST API changes have been made.
-
-| Endpoint             | Description                        |
-|----------------------|------------------------------------|
-| `GET /<endpoint>`    | Description of the endpoint change |

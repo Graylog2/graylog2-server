@@ -18,7 +18,6 @@
 import * as React from 'react';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import camelCase from 'lodash/camelCase';
-import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
 import isEmpty from 'lodash/isEmpty';
 import merge from 'lodash/merge';
@@ -26,15 +25,15 @@ import moment from 'moment';
 import { OrderedMap } from 'immutable';
 import type * as Immutable from 'immutable';
 import type { Permission } from 'graylog-web-plugin/plugin';
+import { useQuery } from '@tanstack/react-query';
 
 import { describeExpression } from 'util/CronUtils';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { isPermitted } from 'util/PermissionsMixin';
 import * as FormsUtils from 'util/FormsUtils';
 import FormWarningsContext from 'contexts/FormWarningsContext';
-import { useStore } from 'stores/connect';
 import Store from 'logic/local-storage/Store';
-import { MultiSelect, TimeUnitInput, SearchFiltersFormControls, TimezoneSelect } from 'components/common';
+import { TimeUnitInput, SearchFiltersFormControls, TimezoneSelect } from 'components/common';
 import Query from 'views/logic/queries/Query';
 import type { RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
@@ -43,7 +42,7 @@ import { Alert, ButtonToolbar, ControlLabel, FormGroup, HelpBlock, Input } from 
 import RelativeTime from 'components/common/RelativeTime';
 import type { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
-import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
+import { fetchAllLookupTables } from 'components/lookup-tables/hooks/api/lookupTablesAPI';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import generateId from 'logic/generateId';
 import parseSearch from 'views/logic/slices/parseSearch';
@@ -57,9 +56,10 @@ import type { Stream } from 'views/stores/StreamsStore';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import { indicesInWarmTier, isSearchingWarmTier } from 'views/components/searchbar/queryvalidation/warmTierValidation';
 import type { FiltersType } from 'views/types';
-import { defaultCompare } from 'logic/DefaultCompare';
 import type { EventDefinitionValidation } from 'components/event-definitions/types';
 import type { QueryString } from 'views/logic/queries/types';
+import type { StreamsAndCategoriesSelection } from 'views/components/common/StreamsAndCategoriesFilter';
+import StreamsAndCategoriesFilter from 'views/components/common/StreamsAndCategoriesFilter';
 
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
@@ -105,33 +105,6 @@ const WarmTierTimeStamp = () => {
   return <RelativeTime dateTime={latestWarmTierRangeEnd} />;
 };
 
-type StreamCategorySelectorProps = {
-  onChange: (value: string) => void;
-  value: string;
-  streams: Array<Stream>;
-};
-const StreamCategorySelector = ({ onChange, streams, value }: StreamCategorySelectorProps) => {
-  const streamCategoryOptions = useMemo(
-    () =>
-      [...new Set<string>(streams.flatMap((stream) => stream?.categories ?? []))]
-        .sort(defaultCompare)
-        .map((category) => ({ label: category, value: category })),
-    [streams],
-  );
-
-  if (!streamCategoryOptions || streamCategoryOptions.length === 0) return null;
-
-  return (
-    <FormGroup controlId="filter-stream-categories">
-      <ControlLabel>
-        Stream Categories <small className="text-muted">(Optional)</small>
-      </ControlLabel>
-      <MultiSelect id="filter-stream-categories" onChange={onChange} options={streamCategoryOptions} value={value} />
-      <HelpBlock>Select stream categories the search should include.</HelpBlock>
-    </FormGroup>
-  );
-};
-
 type QueryParametersProps = {
   eventDefinition: EventDefinition;
   onChange: (config: EventDefinitionConfig) => void;
@@ -139,7 +112,11 @@ type QueryParametersProps = {
   validation: Props['validation'];
 };
 const QueryParameters = ({ eventDefinition, onChange, userCanViewLookupTables, validation }: QueryParametersProps) => {
-  const { tables = {} } = useStore(LookupTablesStore);
+  const { data: tables = [] } = useQuery({
+    queryKey: ['lookup-tables', 'all'],
+    queryFn: () => fetchAllLookupTables(),
+    enabled: userCanViewLookupTables,
+  });
   const queryParameters = eventDefinition?.config?.query_parameters ?? [];
 
   const onChangeQueryParameters = useCallback(
@@ -161,7 +138,7 @@ const QueryParameters = ({ eventDefinition, onChange, userCanViewLookupTables, v
       queryParameter={LookupTableParameter.fromJSON(queryParam)}
       embryonic={!!(queryParam as LookupTableParameterJsonEmbryonic).embryonic}
       queryParameters={queryParameters}
-      lookupTables={Object.values(tables)}
+      lookupTables={tables}
       onChange={onChangeQueryParameters}
     />
   ));
@@ -254,12 +231,6 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
   );
 
   useEffect(() => {
-    if (userCanViewLookupTables) {
-      LookupTablesActions.searchPaginated(1, 0, undefined, false);
-    }
-  }, [userCanViewLookupTables]);
-
-  useEffect(() => {
     validateQueryString(
       eventDefinition.config.query,
       eventDefinition.config.streams,
@@ -277,8 +248,24 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
 
   const getUpdatedConfig = useCallback(
     <K extends EventDefinitionConfigKeys>(key: K, value: EventDefinition['config'][K]) => {
-      const config = cloneDeep(eventDefinition.config);
-      config[key] = value;
+      const config = { ...eventDefinition.config, [key]: value };
+      setCurrentConfig(config);
+
+      return config;
+    },
+    [eventDefinition.config],
+  );
+
+  const getUpdatedConfigMulti = useCallback(
+    (
+      updates: {
+        [K in EventDefinitionConfigKeys]: { key: K; value: EventDefinition['config'][K] };
+      }[EventDefinitionConfigKeys][],
+    ) => {
+      const config = {
+        ...eventDefinition.config,
+        ...Object.fromEntries(updates.map(({ key, value }) => [key, value])),
+      };
       setCurrentConfig(config);
 
       return config;
@@ -390,7 +377,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
       const value = FormsUtils.getValueFromInput(event.target);
       const newConfig = getUpdatedConfig(name as EventDefinitionConfigKeys, value);
       handleConfigChange(name, newConfig);
-      debouncedParseQuery(value, newConfig);
+      debouncedParseQuery(value as string, newConfig);
     },
     [debouncedParseQuery, getUpdatedConfig, handleConfigChange],
   );
@@ -439,16 +426,12 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { name } = event.target;
       const value = FormsUtils.getValueFromInput(event.target);
-      const newConfig = cloneDeep(eventDefinition.config);
-      newConfig[name] = value;
-
-      if (value) {
-        newConfig.cron_expression = '';
-        newConfig.cron_timezone = userTimezone;
-      } else {
-        newConfig.cron_expression = null;
-        newConfig.cron_timezone = null;
-      }
+      const newConfig = {
+        ...eventDefinition.config,
+        [name]: value,
+        cron_expression: value ? '' : null,
+        cron_timezone: value ? userTimezone : null,
+      };
 
       setCurrentConfig(newConfig);
       propagateChange(newConfig);
@@ -461,17 +444,22 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
     setSearchFiltersHidden(value);
   }, []);
 
-  const handleStreamsChange = useCallback(
-    (nextValue: Array<string>) => {
+  const handleStreamsAndCategoriesChange = useCallback(
+    (selected: StreamsAndCategoriesSelection) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_STREAM_SELECTED, {
         app_pathname: getPathnameWithoutId(pathname),
         app_section: 'event-definition-condition',
         app_action_value: 'stream-select',
       });
 
-      propagateChange(getUpdatedConfig('streams', nextValue));
+      propagateChange(
+        getUpdatedConfigMulti([
+          { key: 'streams', value: selected.streams },
+          { key: 'stream_categories', value: selected.categories },
+        ]),
+      );
     },
-    [getUpdatedConfig, pathname, propagateChange, sendTelemetry],
+    [getUpdatedConfigMulti, pathname, propagateChange, sendTelemetry],
   );
 
   const handleTimeRangeChange = useCallback(
@@ -513,14 +501,18 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
 
   const onlyFilters = eventDefinition._scope === 'ILLUMINATE';
 
-  // Ensure deleted streams are still displayed in select
-  const formattedStreams = [...streams.map((s) => s.id), ...(eventDefinition?.config?.streams ?? [])]
-    .map((streamId) => {
-      const stream = streams.find((s) => s.id === streamId);
+  const currentSelection: StreamsAndCategoriesSelection = {
+    streams: eventDefinition.config?.streams ?? [],
+    categories: eventDefinition.config?.stream_categories ?? [],
+  };
 
-      return { label: stream?.title ?? streamId, value: streamId };
-    })
-    .sort((s1, s2) => defaultCompare(s1.label, s2.label));
+  const streamsAndCategories = [
+    ...new Set([...streams.map((s) => s.id), ...(eventDefinition?.config?.streams ?? [])]),
+  ].map((streamId) => {
+    const stream = streams.find((s) => s.id === streamId);
+
+    return { title: stream?.title ?? streamId, id: streamId, categories: stream?.categories };
+  });
 
   return (
     <fieldset>
@@ -569,24 +561,19 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
 
       {onlyFilters || (
         <>
-          <FormGroup controlId="filter-streams">
-            <ControlLabel>Streams{!isStreamRequired && <small className="text-muted"> (Optional)</small>}</ControlLabel>
-            <MultiSelect
-              id="filter-streams"
+          <FormGroup controlId="filter-streams-and-categories">
+            <ControlLabel>
+              Streams and Categories <small className="text-muted">{isStreamRequired ? '(Optional)' : ''}</small>
+            </ControlLabel>
+            <StreamsAndCategoriesFilter
+              id="filter-streams-and-categories"
               required={isStreamRequired}
-              onChange={(selected) => handleStreamsChange(selected === '' ? [] : selected.split(','))}
-              options={formattedStreams}
-              value={(eventDefinition.config.streams ?? []).join(',')}
+              onChange={handleStreamsAndCategoriesChange}
+              value={currentSelection}
+              streams={streamsAndCategories}
             />
-            <HelpBlock>Select streams the search should include. Searches in all streams if empty.</HelpBlock>
+            <HelpBlock>Select streams the search should include.</HelpBlock>
           </FormGroup>
-          <StreamCategorySelector
-            onChange={(selected) =>
-              propagateChange(getUpdatedConfig('stream_categories', selected === '' ? [] : selected.split(',')))
-            }
-            value={(eventDefinition.config.stream_categories ?? []).join(',')}
-            streams={streams}
-          />
           {isSearchingWarmTier(warmTierRanges) && (
             <Alert bsStyle="danger" title="Warm Tier Warning">
               The selected time range will include data stored in the Warm Tier. Events that must frequently retrieve
@@ -661,7 +648,6 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
               {validation.errors.execute_every_ms && <HelpBlock>{validation.errors.execute_every_ms[0]}</HelpBlock>}
             </FormGroup>
           )}
-
           <Input
             id="schedule-checkbox"
             type="checkbox"

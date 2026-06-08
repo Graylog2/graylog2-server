@@ -25,6 +25,7 @@ import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationPara
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +55,15 @@ public class OpensearchCommonConfigurationBean implements DatanodeConfigurationB
                 .javaOpt("-Xms%s".formatted(localConfiguration.getOpensearchHeap()))
                 .javaOpt("-Xmx%s".formatted(localConfiguration.getOpensearchHeap()))
                 .javaOpt("-Dopensearch.transport.cname_in_publish_address=true")
+                .withWarnings(warnings(localConfiguration))
                 .build();
+    }
+
+    private List<String> warnings(Configuration localConfiguration) {
+        if (localConfiguration.isInsecureStartup()) {
+            return Collections.singletonList("Data node is running in insecure mode(insecure_startup=true). There is neither HTTPS nor any auth enabled!");
+        }
+        return Collections.emptyList();
     }
 
     public static List<String> getNodeRoles(Configuration localConfiguration) {
@@ -88,7 +97,8 @@ public class OpensearchCommonConfigurationBean implements DatanodeConfigurationB
             config.put("bootstrap.system_call_filter", "false");
         }
 
-        config.putAll(buildParams.transientConfiguration());
+        // In OpenSearch, the setting bootstrap.memory_lock controls whether the process is allowed to lock its memory (RAM) so it is not swapped out to disk.
+        config.put("bootstrap.memory_lock", Boolean.toString(localConfiguration.getOpensearchBootstrapMemoryLock()));
 
         return config.build();
     }

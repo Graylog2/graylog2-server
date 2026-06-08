@@ -1,0 +1,5 @@
+type = "added"
+message = "Added MongoDB cluster nodes overview to the System / Cluster Configuration page"
+
+pulls = ["24990"]
+issues = ["graylog-plugin-enterprise#13215"]

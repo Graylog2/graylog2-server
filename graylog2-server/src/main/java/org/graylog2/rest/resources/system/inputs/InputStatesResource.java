@@ -34,16 +34,18 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
+import org.graylog2.inputs.persistence.InputStateService;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
-import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
 import org.graylog2.rest.models.system.inputs.responses.InputSetup;
+import org.graylog2.rest.models.system.inputs.responses.InputStopped;
 import org.graylog2.rest.models.system.inputs.responses.InputStateSummary;
 import org.graylog2.rest.models.system.inputs.responses.InputStatesList;
 import org.graylog2.rest.models.system.inputs.responses.InputSummary;
@@ -53,6 +55,7 @@ import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -65,16 +68,19 @@ public class InputStatesResource extends AbstractInputsResource {
     private final InputRegistry inputRegistry;
     private final EventBus serverEventBus;
     private final InputService inputService;
+    private final InputStateService inputStateService;
 
     @Inject
     public InputStatesResource(InputRegistry inputRegistry,
                                EventBus serverEventBus,
                                InputService inputService,
-                               MessageInputFactory messageInputFactory) {
+                               MessageInputFactory messageInputFactory,
+                               InputStateService inputStateService) {
         super(messageInputFactory.getAvailableInputs());
         this.inputRegistry = inputRegistry;
         this.serverEventBus = serverEventBus;
         this.inputService = inputService;
+        this.inputStateService = inputStateService;
     }
 
     @GET
@@ -87,6 +93,15 @@ public class InputStatesResource extends AbstractInputsResource {
                 .collect(Collectors.toSet());
 
         return InputStatesList.create(result);
+    }
+
+    @GET
+    @Path("/summary")
+    @Timed
+    @Operation(summary = "Get lightweight cluster input state summary from DB")
+    @RequiresPermissions(RestPermissions.INPUTS_READ)
+    public Map<String, Set<String>> summary() {
+        return inputStateService.getClusterStatuses();
     }
 
     @GET
@@ -165,7 +180,7 @@ public class InputStatesResource extends AbstractInputsResource {
             @ApiResponse(responseCode = "404", description = "No such input on this node."),
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_STOP)
-    public InputDeleted stop(@Parameter(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
+    public InputStopped stop(@Parameter(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_CHANGESTATE, inputId);
         final Input input = inputService.find(inputId);
         checkPermission(RestPermissions.INPUT_TYPES_CREATE, input.getType()); // remove after sharing inputs implemented
@@ -175,7 +190,7 @@ public class InputStatesResource extends AbstractInputsResource {
             throw new BadRequestException(e);
         }
 
-        final InputDeleted result = InputDeleted.create(inputId);
+        final InputStopped result = InputStopped.create(inputId);
         this.serverEventBus.post(result);
 
         return result;
@@ -187,6 +202,7 @@ public class InputStatesResource extends AbstractInputsResource {
                 messageInput.getId(),
                 inputState.getState().toString(),
                 inputState.getStartedAt(),
+                inputState.getLastFailedAt(),
                 inputState.getDetailedMessage(),
                 InputSummary.create(
                         messageInput.getTitle(),

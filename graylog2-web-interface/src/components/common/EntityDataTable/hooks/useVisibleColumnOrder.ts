@@ -49,6 +49,8 @@ const useVisibleColumnOrder = (
     // Additional: visible attributes not in attributeColumnOrder
     const additionalVisible = [...visibleAttributeColumns].filter((id) => !attributeColumnOrder.includes(id));
 
+    // Keep actions as the trailing column even when there are no row actions.
+    // It doubles as the "tail" column to consume leftover width for fully-static layouts.
     return [...(displayBulkSelectCol ? [BULK_SELECT_COL_ID] : []), ...coreOrder, ...additionalVisible, ACTIONS_COL_ID];
   }, [columnPreferences, defaultDisplayedColumns, attributeColumnOrder, displayBulkSelectCol]);
 

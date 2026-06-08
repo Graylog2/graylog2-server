@@ -17,7 +17,7 @@
 import React from 'react';
 
 import ErrorPage from 'components/errors/ErrorPage';
-import { Link } from 'components/common/router';
+import { Link } from 'components/common';
 import Routes from 'routing/Routes';
 
 type Props = {

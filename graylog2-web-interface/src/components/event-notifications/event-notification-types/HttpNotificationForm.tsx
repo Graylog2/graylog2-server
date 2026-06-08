@@ -39,15 +39,6 @@ class HttpNotificationForm extends React.Component<
     [key: string]: any;
   }
 > {
-  static defaultConfig = {
-    url: '',
-    api_key_as_header: false,
-    api_key: '',
-    api_secret: { keep_value: true },
-    basic_auth: { keep_value: true },
-    skip_tls_verification: false,
-  };
-
   constructor(props) {
     super(props);
 
@@ -74,6 +65,15 @@ class HttpNotificationForm extends React.Component<
     this.setState({ api_secret: config.api_secret.is_set ? '******' : '' });
   }
 
+  static defaultConfig = {
+    url: '',
+    api_key_as_header: false,
+    api_key: '',
+    api_secret: { keep_value: true },
+    basic_auth: { keep_value: true },
+    skip_tls_verification: false,
+  };
+
   propagateChange = (key, value) => {
     const { config, onChange } = this.props;
     const nextConfig = cloneDeep(config);
@@ -91,7 +91,7 @@ class HttpNotificationForm extends React.Component<
 
   handleSecretInputChange = (event) => {
     const { name } = event.target;
-    const inputValue = FormsUtils.getValueFromInput(event.target);
+    const inputValue = String(FormsUtils.getValueFromInput(event.target));
     const value = inputValue.length === 0 ? { delete_value: true } : { set_value: inputValue };
 
     this.setState({ [name]: inputValue });

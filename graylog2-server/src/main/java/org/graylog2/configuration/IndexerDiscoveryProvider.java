@@ -90,6 +90,7 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
 
         // configured hosts, just use these and don't try any detection
         if (hosts != null && !hosts.isEmpty()) {
+            LOG.info("Indexer hosts are set in configuration, using {} provided hosts", hosts.size()); // do not log hosts, may contain uname+pass
             return hosts;
         }
 
@@ -100,17 +101,18 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
         // if preflight is finished, we assume that there will be some datanode registered via node-service.
         if (preflightResult == PreflightConfigResult.FINISHED) {
             try {
+                LOG.info("Discovering data nodes");
                 //noinspection UnstableApiUsage
-                return RetryerBuilder.<List<URI>>newBuilder()
+                final List<URI> discoveredDatanodes = RetryerBuilder.<List<URI>>newBuilder()
                         .retryIfResult(List::isEmpty)
                         .withRetryListener(new RetryListener() {
                             @Override
                             public void onRetry(Attempt attempt) {
                                 if (!attempt.hasResult() || isEmptyList(attempt.getResult())) {
                                     if (connectionAttempts == 0) {
-                                        LOG.info("Datanode is not available. Retry #{}", attempt.getAttemptNumber());
+                                        LOG.info("No datanode is available. Retry #{}", attempt.getAttemptNumber());
                                     } else {
-                                        LOG.info("Datanode is not available. Retry #{}/{}", attempt.getAttemptNumber(), connectionAttempts);
+                                        LOG.info("No datanode is available. Retry #{}/{}", attempt.getAttemptNumber(), connectionAttempts);
                                     }
 
                                 }
@@ -120,6 +122,8 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
                         .withWaitStrategy(WaitStrategies.fixedWait(delayBetweenAttempts.getQuantity(), delayBetweenAttempts.getUnit()))
                         .withStopStrategy((connectionAttempts == 0) ? StopStrategies.neverStop() : StopStrategies.stopAfterAttempt(connectionAttempts))
                         .build().call(this::discover);
+                LOG.info("Discovered {} datanodes, these will be configured as indexers", discoveredDatanodes.size());
+                return discoveredDatanodes;
             } catch (ExecutionException | RetryException e) {
                 LOG.error("Unable to retrieve Datanode connection: ", e);
                 throw new IllegalStateException("Unable to retrieve Datanode connection", e);
@@ -143,6 +147,7 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
                 .map(Node::getTransportAddress)
                 .filter(address -> address != null && !address.isBlank())
                 .map(URI::create)
+                .filter(uri -> uri.getHost() != null)
                 .collect(Collectors.toList());
     }
 }

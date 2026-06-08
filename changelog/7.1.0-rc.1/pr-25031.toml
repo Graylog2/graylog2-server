@@ -1,0 +1,5 @@
+type = "f"
+message = "Prevent URL length overflow in archive restore."
+
+pulls = ["25031"]
+issues = ["Graylog2/graylog-plugin-enterprise#12681"]

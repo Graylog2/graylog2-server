@@ -874,24 +874,25 @@ public class UsersResource extends RestResource {
     public void revokeToken(
             @Parameter(name = "userId", required = true) @PathParam("userId") String userId,
             @Parameter(name = "idOrToken", required = true) @PathParam("idOrToken") String idOrToken) {
-        final User user = loadUserById(userId);
-        final String username = user.getName();
-        if (!isPermitted(USERS_TOKENREMOVE, username)) {
-            throw new ForbiddenException("Not allowed to remove tokens for user " + username);
-        }
+        // The user must be logged in already, so we check the permission based on that info and the username of the
+        // token to be deleted. That way, the `userId`-parameter is indeed unused. Removing it would be a breaking change.
 
         // The endpoint supports both, deletion by token ID and deletion by using the token value itself.
         // The latter should not be used anymore because the plain text token will be part of the URL and URLs
         // will most probably be logged. We keep the old behavior for backwards compatibility.
         // TODO: Remove support for old behavior in 4.0
         final AccessToken accessToken = Optional.ofNullable(accessTokenService.loadById(idOrToken))
-                .orElse(accessTokenService.load(idOrToken));
+                .orElseGet(() -> accessTokenService.load(idOrToken));
 
-        if (accessToken != null) {
-            accessTokenService.destroy(accessToken);
-        } else {
-            throw new NotFoundException("Couldn't find access token for user " + username);
+        if (accessToken == null) {
+            throw new NotFoundException("Couldn't find access token for user.");
         }
+
+        if (!isPermitted(USERS_TOKENREMOVE, accessToken.getUserName())) {
+            throw new ForbiddenException("Not allowed to remove token for user " + accessToken.getUserName());
+        }
+
+        accessTokenService.destroy(accessToken);
     }
 
     private User loadUserById(String userId) {

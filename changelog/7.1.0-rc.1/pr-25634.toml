@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Reduce log noise by suppressing errors for read timeouts in HTTP inputs."
+
+issues = ["25622"]
+pulls = ["25634"]

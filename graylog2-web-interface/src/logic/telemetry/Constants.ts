@@ -123,6 +123,7 @@ export const TELEMETRY_EVENT_TYPE = {
   EVENTDEFINITION_DUPLICATED: 'EventDefinition Duplicated',
   EVENTDEFINITION_NEXT_CLICKED: 'EventDefinition Next Clicked',
   EVENTDEFINITION_PREVIOUS_CLICKED: 'EventDefinition Previous Clicked',
+  EVENTDEFINITION_REPLAY_SEARCH_CLICKED: 'EventDefinition Replay Search Clicked',
   EVENTDEFINITION_DETAILS: {
     STEP_CLICKED: 'EventDefinition Details Step Clicked',
     PRIORITY_CHANGED: 'EventDefinition Details Priority Changed',
@@ -408,20 +409,6 @@ export const TELEMETRY_EVENT_TYPE = {
       'Datanode Migration Inplace Journal Size Downtime Warning Next Clicked',
     INPLACE_STOP_MESSAGE_PROCESSING_NEXT_CLICKED: 'Datanode Migration Inplace Stop Message Processing Next Clicked',
     INPLACE_RESTART_GRAYLOG_NEXT_CLICKED: 'Datanode Migration Inplace Restart Graylog Next Clicked',
-    REMOTEREINDEX_WELCOME_NEXT_CLICKED: 'Datanode Migration RemoteReindex Welcome Next Clicked',
-    REMOTEREINDEX_MIGRATE_EXISTING_DATA_QUESTION_NEXT_CLICKED:
-      'Datanode Migration RemoteReindex Migrate Existing Data Question Next Clicked',
-    REMOTEREINDEX_MIGRATE_EXISTING_DATA_QUESTION_SKIP_CLICKED:
-      'Datanode Migration RemoteReindex Migrate Existing Data Question Skip Clicked',
-    REMOTEREINDEX_MIGRATE_EXISTING_DATA_CHECK_CONNECTION_CLICKED:
-      'Datanode Migration RemoteReindex Migrate Existing Data Check Connection Clicked',
-    REMOTEREINDEX_MIGRATE_EXISTING_DATA_START_CLICKED:
-      'Datanode Migration RemoteReindex Migrate Existing Data Start Clicked',
-    REMOTEREINDEX_RUNNING_LOGVIEW_CLICKED: 'Datanode Migration RemoteReindex Running Logview Clicked',
-    REMOTEREINDEX_RUNNING_RETRY_CLICKED: 'Datanode Migration RemoteReindex Running Retry Clicked',
-    REMOTEREINDEX_RUNNING_RETRY_CONFIRM_CLICKED: 'Datanode Migration RemoteReindex Running Retry Confirm Clicked',
-    REMOTEREINDEX_SHUTDOWN_OLD_CLUSTER_NEXT_CLICKED:
-      'Datanode Migration RemoteReindex Shutdown Old Cluster Next Clicked',
   },
   ALERTS_AND_EVENTS: {
     ACTION_RAN: 'Alerts And Events Action Ran',
@@ -435,5 +422,60 @@ export const TELEMETRY_EVENT_TYPE = {
     FILTER_CREATED: 'Entity Data Table Filter Created',
     FILTER_DELETED: 'Entity Data Table Filter Deleted',
     FILTER_CHANGED: 'Entity Data Table Filter Changed',
+    SLICE_COLUMN_SELECTED_HEADER: 'Entity Data Table Slice Column Selected (Header)',
+    SLICE_COLUMN_SELECTED_SECTION: 'Entity Data Table Slice Column Selected (Section)',
+    SLICE_REMOVED: 'Entity Data Table Slice Removed',
+    SLICE_VALUE_SELECTED: 'Entity Data Table Slice Value Selected',
+    SLICE_SEARCH_CHANGED: 'Entity Data Table Slice Search Changed',
+    SLICE_SORT_CHANGED: 'Entity Data Table Slice Sort Changed',
+    SLICE_EMPTY_VALUES_TOGGLED: 'Entity Data Table Slice Empty Values Toggled',
+  },
+  COLLECTORS: {
+    OVERVIEW: {
+      STAT_CARD_CLICKED: 'Collector Stat Card Clicked',
+      FLEET_CARD_CLICKED: 'Collector Overview Fleet Card Clicked',
+    },
+    FLEET: {
+      CREATE_OPENED: 'Fleet Create Opened',
+      CREATE_CANCELLED: 'Fleet Create Cancelled',
+      CREATED: 'Fleet Created',
+      UPDATED: 'Fleet Updated',
+      DELETED: 'Fleet Deleted',
+      TAB_SELECTED: 'Fleet Tab Selected',
+    },
+    SOURCE: {
+      CREATE_OPENED: 'Collector Source Create Opened',
+      CREATE_CANCELLED: 'Collector Source Create Cancelled',
+      CREATED: 'Collector Source Created',
+      UPDATED: 'Collector Source Updated',
+      DELETED: 'Collector Source Deleted',
+    },
+    INSTANCE: {
+      VIEW_LOGS_CLICKED: 'Collector Instance View Logs Clicked',
+      DETAILS_OPENED: 'Collector Instance Details Opened',
+      REASSIGNED: 'Collector Instance Reassigned',
+      DELETED: 'Collector Instance Deleted',
+      BULK_REASSIGNED: 'Collector Instances Bulk Reassigned',
+    },
+    ENROLLMENT_TOKEN: {
+      FLEET_SELECTED: 'Collector Deployment Fleet Selected',
+      EXPIRY_SELECTED: 'Collector Enrollment Token Expiry Selected',
+      GENERATED: 'Collector Enrollment Token Generated',
+      TOKEN_COPIED: 'Collector Enrollment Token Copied',
+      DELETED: 'Collector Enrollment Token Deleted',
+      BULK_DELETED: 'Collector Enrollment Tokens Bulk Deleted',
+    },
+    SETTINGS: {
+      UPDATED: 'Collector Settings Updated',
+      DIAGNOSTICS_OPENED: 'Collector Settings Diagnostics Opened',
+    },
+  },
+  RIGHT_SIDEBAR: {
+    OPENED: 'Right Sidebar Opened',
+    CLOSED: 'Right Sidebar Closed',
+    COLLAPSED: 'Right Sidebar Collapsed',
+    EXPANDED: 'Right Sidebar Expanded',
+    NAVIGATED_BACK: 'Right Sidebar Navigated Back',
+    NAVIGATED_FORWARD: 'Right Sidebar Navigated Forward',
   },
 } as const;

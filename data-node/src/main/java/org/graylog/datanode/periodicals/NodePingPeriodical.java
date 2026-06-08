@@ -35,6 +35,7 @@ import javax.annotation.Nonnull;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public class NodePingPeriodical extends Periodical {
@@ -42,7 +43,7 @@ public class NodePingPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(NodePingPeriodical.class);
     private final NodeService<DataNodeDto> nodeService;
     private final NodeId nodeId;
-    private final Supplier<URI> opensearchBaseUri;
+    private final Supplier<Optional<URI>> opensearchBaseUri;
     private final Supplier<String> opensearchClusterUri;
     private final Supplier<String> datanodeRestApiUri;
     private final Configuration configuration;
@@ -74,7 +75,7 @@ public class NodePingPeriodical extends Periodical {
             NodeService<DataNodeDto> nodeService,
             NodeId nodeId,
             Configuration configuration,
-            Supplier<URI> opensearchBaseUri,
+            Supplier<Optional<URI>> opensearchBaseUri,
             Supplier<String> opensearchClusterUri,
             Supplier<String> datanodeRestApiUri,
             Supplier<OpensearchState> processState,
@@ -139,7 +140,7 @@ public class NodePingPeriodical extends Periodical {
     public void doRun() {
         final DataNodeDto dto = DataNodeDto.Builder.builder()
                 .setId(nodeId.getNodeId())
-                .setTransportAddress(opensearchBaseUri.get().toString())
+                .setTransportAddress(opensearchBaseUri.get().map(URI::toString).orElse(null))
                 .setClusterAddress(opensearchClusterUri.get())
                 .setDataNodeStatus(processState.get().getDataNodeStatus())
                 .setHostname(configuration.getHostname())
@@ -165,7 +166,7 @@ public class NodePingPeriodical extends Periodical {
     private void registerServer() {
         final boolean registrationSucceeded = nodeService.registerServer(DataNodeDto.Builder.builder()
                 .setId(nodeId.getNodeId())
-                .setTransportAddress(opensearchBaseUri.get().toString())
+                .setTransportAddress(opensearchBaseUri.get().map(URI::toString).orElse(null))
                 .setClusterAddress(opensearchClusterUri.get())
                 .setHostname(configuration.getHostname())
                 .setDataNodeStatus(DataNodeStatus.STARTING)

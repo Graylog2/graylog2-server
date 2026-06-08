@@ -18,7 +18,6 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
@@ -35,17 +34,14 @@ const renderIndexSetCustomFieldTypeRemoveModal = () =>
     </TestStoreProvider>,
   );
 
-jest.mock('stores/indices/IndexSetsStore', () => ({
-  IndexSetsActions: {
-    list: jest.fn(),
-  },
-  IndexSetsStore: MockStore([
-    'getInitialState',
-    () => ({
-      indexSets: [{ id: '111', title: 'index set title' }],
-    }),
-  ]),
-}));
+jest.mock('components/indices/hooks/useIndexSetsList', () =>
+  jest.fn(() => ({
+    data: { indexSets: [{ id: '111', title: 'index set title' }], indexSetsCount: 1, indexSetStats: null },
+    refetch: jest.fn(),
+    isSuccess: true,
+    isInitialLoading: false,
+  })),
+);
 
 jest.mock('components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation', () => jest.fn());
 jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');

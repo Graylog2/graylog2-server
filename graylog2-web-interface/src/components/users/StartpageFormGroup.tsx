@@ -155,7 +155,7 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
     data: { valid: validSecurityLicense },
   } = usePluggableLicenseCheck('/license/security');
   const { options, isLoading } = useStartPageOptions(userId, permissions);
-  const securityOverviewOption = { value: 'graylog_security_welcome', label: 'Security Overview' };
+  const securityOverviewOption = { value: 'graylog_security_welcome', label: 'Threat Coverage' };
 
   if (isLoading) {
     return <Spinner />;

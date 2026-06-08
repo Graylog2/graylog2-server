@@ -17,6 +17,7 @@
 package org.graylog.storage.opensearch3.indextemplates;
 
 import jakarta.inject.Inject;
+import org.graylog.storage.opensearch3.OSSerializationUtils;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.Template;
@@ -32,13 +33,10 @@ import org.opensearch.client.transport.endpoints.BooleanResponse;
 
 public class ComposableIndexTemplateAdapter implements IndexTemplateAdapter {
     private final OfficialOpensearchClient client;
-    private final OSSerializationUtils templateMapper;
 
     @Inject
-    public ComposableIndexTemplateAdapter(final OfficialOpensearchClient client,
-                                          final OSSerializationUtils templateMapper) {
+    public ComposableIndexTemplateAdapter(final OfficialOpensearchClient client) {
         this.client = client;
-        this.templateMapper = templateMapper;
     }
 
     @Override
@@ -50,8 +48,8 @@ public class ComposableIndexTemplateAdapter implements IndexTemplateAdapter {
                     .name(templateName)
                     .indexPatterns(template.indexPatterns())
                     .template(IndexTemplateMapping.builder()
-                            .mappings(templateMapper.fromMap(template.mappings(), TypeMapping._DESERIALIZER))
-                            .settings(templateMapper.fromMap(template.settings(), IndexSettings._DESERIALIZER))
+                            .mappings(OSSerializationUtils.fromMap(template.mappings(), TypeMapping._DESERIALIZER))
+                            .settings(OSSerializationUtils.fromMap(template.settings(), IndexSettings._DESERIALIZER))
                             .build())
                     .priority(template.order().intValue())
                     .build();

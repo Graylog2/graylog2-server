@@ -19,11 +19,12 @@ import type Immutable from 'immutable';
 
 import type FetchError from 'logic/errors/FetchError';
 import type { DataTieringConfig } from 'components/indices/data-tiering';
+import type { Attribute } from 'stores/PaginationTypes';
 import type { QualifiedUrl } from 'routing/Routes';
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { Stream } from 'logic/streams/types';
-import type { ColumnRenderer } from 'components/common/EntityDataTable/types';
+import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 import type { StepType } from 'components/common/Wizard';
 import type { InputSetupWizardStep } from 'components/inputs/InputSetupWizard';
 import type { TelemetryEventType } from 'logic/telemetry/TelemetryContext';
@@ -147,8 +148,8 @@ type InputSetupWizard = {
 };
 
 type License = {
-  EnterpriseTrafficGraph: React.ComponentType;
-  LicenseGraphWithMetrics: React.ComponentType;
+  TrafficGraph: React.ComponentType;
+  TrafficGraphWithLicenseMetrics: React.ComponentType;
   EnterpriseProductLink: React.ComponentType<{
     children: React.ReactNode;
     href: string;
@@ -198,6 +199,17 @@ type IndexRetentionConfig = {
   summaryComponent: React.ComponentType<IndexRetentionSummaryComponentProps>;
 };
 
+type StreamsOverviewTableElement = {
+  attributeName: string;
+  attributes: Array<Attribute>;
+  columnRenderers: ColumnRenderersByAttribute<Stream>;
+  // Optional map of column id → backend metric fields. Plugins use this to plug their
+  // columns into the open-source `GET /streams/metrics` request (e.g. enterprise's
+  // `failure_count`). When the column is visible, the listed fields are added to the
+  // metrics request automatically.
+  metricFields?: Record<string, Array<string>>;
+};
+
 declare module 'graylog-web-plugin/plugin' {
   type Id = string;
   type Wildcard = '*';
@@ -228,6 +240,8 @@ declare module 'graylog-web-plugin/plugin' {
     clusterconfig: 'read';
     clusterconfigentry: 'read' | 'edit';
     clusterconfiguration: 'read';
+    collector_fleets: 'read';
+    collectors_config: 'read';
     contentpack: 'read';
     dashboards: 'create' | 'edit' | 'read';
     datanode: 'start';
@@ -254,12 +268,14 @@ declare module 'graylog-web-plugin/plugin' {
     lookuptables: 'read';
     mappingprofiles: 'read';
     metrics: 'read';
+    mongodb: 'enableprofiling';
     messagecount: 'read';
     messages: 'analyze' | 'read';
     node: 'shutdown';
-    notifications: 'read';
+    notifications: 'delete' | 'read';
     outputs: 'create' | 'edit' | 'read' | 'terminate';
     pipeline: 'create' | 'delete' | 'edit' | 'read';
+    pipeline_rule: 'create' | 'delete' | 'edit' | 'read';
     pipeline_connection: 'edit' | 'read';
     processbuffer: 'dump';
     processing: 'changestate';
@@ -323,11 +339,6 @@ declare module 'graylog-web-plugin/plugin' {
       timestamp_to: string;
       restore_history: Array<{ id: string }>;
     }>;
-    getStreamDataLakeTableElements: (permission: Immutable.List<string>) => {
-      attributeName: string;
-      attributes: Array<{ id: string; title: string }>;
-      columnRenderer: { data_lake: ColumnRenderer<Stream> };
-    };
     DataLakeStreamDeleteWarning: React.ComponentType;
   }
 
@@ -338,7 +349,6 @@ declare module 'graylog-web-plugin/plugin' {
 
   interface PageNavigation {
     description: string;
-    perspective?: string;
     children: Array<{
       description: string;
       position?: PluginNavigation['position'];
@@ -347,6 +357,7 @@ declare module 'graylog-web-plugin/plugin' {
       requiredFeatureFlag?: string;
       path: QualifiedUrl<string>;
       exactPathMatch?: boolean;
+      BadgeComponent?: React.ComponentType<{ text: string }>;
     }>;
   }
 
@@ -372,7 +383,6 @@ declare module 'graylog-web-plugin/plugin' {
   type PluginNavigation = {
     description: string;
     requiredFeatureFlag?: string;
-    perspective?: string;
     BadgeComponent?: React.ComponentType<{ text: string }>;
     position?: { last: true } | { after: string } | undefined;
     permissions?: Permission | Array<Permission>;
@@ -388,6 +398,9 @@ declare module 'graylog-web-plugin/plugin' {
      */
     pageNavigation?: Array<PageNavigation>;
     dataLake?: Array<PluginDataLake>;
+    // Use this for stream-overview-only columns. Use `components.shared.entityTableElements`
+    // when the extension should participate in the generic entity-table mechanism.
+    'components.streams.overview.tableElements'?: Array<StreamsOverviewTableElement>;
     dataTiering?: Array<DataTiering>;
     defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
@@ -398,11 +411,10 @@ declare module 'graylog-web-plugin/plugin' {
     inputSetupWizard?: Array<InputSetupWizard>;
     // Global context providers allow to fetch and process data once
     // and provide the result for all components in your plugin.
-    globalContextProviders?: Array<React.ComponentType<React.PropsWithChildrean<{}>>>;
+    globalContextProviders?: Array<React.ComponentType<React.PropsWithChildren<{}>>>;
     // Difference between page context providers and global context providers
-    // is that page context providers are rendered within the <App> giving it
-    // access to certain contexts like PerspectivesContext
-    pageContextProviders?: Array<React.ComponentType<React.PropsWithChildrean<{}>>>;
+    // is that page context providers are rendered within the <App>.
+    pageContextProviders?: Array<React.ComponentType<React.PropsWithChildren<{}>>>;
     routes?: Array<PluginRoute>;
     pages?: PluginPages;
     pageFooter?: Array<PluginPageFooter>;
@@ -414,7 +426,17 @@ declare module 'graylog-web-plugin/plugin' {
     entityRoutes?: Array<RouteGenerator>;
     entityTypeRoute?: Array<EntityTypeRouteGenerator>;
     entityCreators?: Array<EntityCreator>;
+    'users.details.segments'?: Array<{
+      value: string;
+      label: string;
+      component: React.ComponentType<{ user: User }>;
+      editPermissionRequired?: boolean;
+      useCondition?: () => boolean;
+    }>;
     indexRetentionConfig?: Array<IndexRetentionConfig>;
+    inputsBadgeProviders?: Array<{
+      useCondition: () => { hasIssues: boolean; title: string };
+    }>;
   }
   interface PluginMetadata {
     name?: string;

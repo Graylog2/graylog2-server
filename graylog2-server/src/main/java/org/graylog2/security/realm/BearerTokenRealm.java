@@ -21,7 +21,6 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAccount;
-import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
 import org.apache.shiro.authc.pam.UnsupportedTokenException;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.graylog.security.authservice.AuthServiceAuthenticator;
@@ -49,7 +48,7 @@ public class BearerTokenRealm extends AuthenticatingRealm {
         setCachingEnabled(false);
 
         // Credentials will be matched via the authentication service itself so we don't need Shiro to do it
-        setCredentialsMatcher(new AllowAllCredentialsMatcher());
+        setCredentialsMatcher(new ServiceValidatedCredentialsMatcher());
     }
 
     @Override
@@ -90,7 +89,7 @@ public class BearerTokenRealm extends AuthenticatingRealm {
     private AuthenticationInfo toAuthenticationInfo(AuthServiceResult result) {
         String realmName = NAME + "/" + result.backendType();
 
-        final var account = new SimpleAccount(result.userProfileId(), null, realmName);
+        final var account = new SimpleAccount(result.userProfileId(), ServiceValidatedCredentialsMatcher.AUTHENTICATED, realmName);
         final var sessionAuthContext = result.sessionAuthContext();
         if (sessionAuthContext.isPresent()) {
             return new AuthenticationInfoWithSessionAuthContext(account, sessionAuthContext.get());

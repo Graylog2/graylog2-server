@@ -73,9 +73,13 @@ public class MultiGrokMatch extends AbstractFunction<GrokMatch.GrokResult> {
         for (String pattern : patterns) {
             final Grok grok = grokPatternRegistry.cachedGrokForPattern(pattern, onlyNamedCaptures);
 
-            final Match match = grok.match(value);
-            if (!match.isNull()) {
-                return new GrokMatch.GrokResult(match.captureFlattened());
+            try {
+                final Match match = grok.match(value);
+                if (!match.isNull()) {
+                    return new GrokMatch.GrokResult(match.captureFlattened());
+                }
+            } catch (StackOverflowError e) {
+                throw new IllegalStateException("Pattern caused a stack overflow during matching. Simplify the pattern to avoid deeply nested or repeated groups.");
             }
         }
         return new GrokMatch.GrokResult(Map.of());

@@ -74,7 +74,7 @@ const usePluggableSearchAction = (loaded: boolean, view: View) => {
   const pluggableSearchActions = usePluginEntities('views.components.searchActions');
 
   const actions = pluggableSearchActions
-    .filter((perspective) => (perspective.useCondition ? !!perspective.useCondition() : true))
+    .filter((action) => (action.useCondition ? !!action.useCondition() : true))
     .map(({ component: PluggableSearchAction, key, modals }) => {
       if (modals) {
         const refs = Object.fromEntries(
@@ -210,9 +210,9 @@ const SearchActionsMenu = () => {
 
   useHotkey({
     actionKey: 'save',
-    callback: () => (loaded ? saveSearch(title) : openFormModal()),
+    callback: () => (loaded ? saveSearch(currentTitle) : openFormModal()),
     scope: 'search',
-    dependencies: [loaded, saveSearch, title],
+    dependencies: [loaded, saveSearch, currentTitle],
   });
 
   useHotkey({

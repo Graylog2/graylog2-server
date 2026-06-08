@@ -27,9 +27,9 @@ import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.datanode.periodicals.MetricsCollector;
 import org.graylog.datanode.process.statemachine.tracer.StateMachineTracer;
-import org.graylog.storage.opensearch2.DataStreamAdapterOS2;
-import org.graylog.storage.opensearch2.OpenSearchClient;
-import org.graylog.storage.opensearch2.ism.IsmApi;
+import org.graylog.storage.opensearch3.DataStreamAdapterOS;
+import org.graylog.storage.opensearch3.OfficialOpensearchClient;
+import org.graylog.storage.opensearch3.ism.IsmApi;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.indexer.datastream.DataStreamService;
@@ -54,7 +54,7 @@ import java.util.stream.Collectors;
 
 public class ConfigureMetricsIndexSettings implements StateMachineTracer<OpensearchState, OpensearchEvent> {
 
-    private final Logger log = LoggerFactory.getLogger(ConfigureMetricsIndexSettings.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigureMetricsIndexSettings.class);
 
     private final AtomicBoolean datastreamCreated = new AtomicBoolean(false);
 
@@ -83,20 +83,23 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer<Opensea
         // finally starts (due to slow startup or limited resources) and then the source state is not starting,
         // as originally assumed. Instead, let's remember if we have already created a datastream once.
         if (destination == OpensearchState.AVAILABLE && process.isManagerNode()) {
+            LOGGER.debug("Transition to AVAILABLE and manager process, tracer instance: {}", this);
             process.openSearchClient().ifPresent(client -> {
+                LOGGER.debug("Opensearch client available, tracer instance: {}, client: {}", this, client);
                 if (datastreamCreated.compareAndSet(false, true)) {
+                    LOGGER.info("Initial creation of metric templates and datastreams, tracer instance: {}, client: {}", this, client);
                     createDatastream(client);
                 }
             });
         }
     }
 
-    private void createDatastream(OpenSearchClient client) {
+    private void createDatastream(OfficialOpensearchClient client) {
         final IsmApi ismApi = new IsmApi(client, objectMapper);
         int replicas = nodeService.allActive().size() == 1 ? 0 : 1;
 
         final DataStreamService dataStreamService = new DataStreamServiceImpl(
-                new DataStreamAdapterOS2(client, objectMapper, ismApi),
+                new DataStreamAdapterOS(client, ismApi),
                 indexFieldTypesService,
                 replicas
         );
@@ -143,7 +146,7 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer<Opensea
                 null);
 
         try {
-            log.debug("Creating ISM configuration for metrics data stream {}",
+            LOGGER.debug("Creating ISM configuration for metrics data stream {}",
                     objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(policy));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

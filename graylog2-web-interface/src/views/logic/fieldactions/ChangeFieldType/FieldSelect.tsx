@@ -16,10 +16,12 @@
  */
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
+import { useFormikContext } from 'formik';
 
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 import useIndexSetFieldTypesAll from 'views/logic/fieldactions/ChangeFieldType/hooks/useIndexSetFieldTypesAll';
+import type { FormValues } from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
 
 const StyledLabel = styled.h5`
   font-weight: bold;
@@ -32,11 +34,13 @@ const StyledSelect = styled(Select)`
 
 type Props = {
   indexSetId: string;
-  onFieldChange: (param: { fieldName: string; type: string }) => void;
   field: string;
+  name: string;
 };
 
-const FieldSelect = ({ indexSetId, onFieldChange, field }: Props) => {
+const FieldSelect = ({ indexSetId, field, name }: Props) => {
+  const { setFieldValue } = useFormikContext<FormValues>();
+
   const {
     data: { options, currentTypes },
     isLoading,
@@ -44,17 +48,19 @@ const FieldSelect = ({ indexSetId, onFieldChange, field }: Props) => {
 
   const _onFieldChange = useCallback(
     (value: string) => {
-      onFieldChange({ fieldName: value, type: currentTypes?.[value] });
+      setFieldValue(name, value);
+      setFieldValue('field_type', currentTypes?.[value]);
     },
-    [currentTypes, onFieldChange],
+    [currentTypes, name, setFieldValue],
   );
 
   return (
     <>
       <StyledLabel>Select Field</StyledLabel>
-      <Input id="field">
+      <Input id={name}>
         <StyledSelect
-          inputId="field"
+          inputId={name}
+          name={name}
           options={options}
           value={field}
           onChange={_onFieldChange}

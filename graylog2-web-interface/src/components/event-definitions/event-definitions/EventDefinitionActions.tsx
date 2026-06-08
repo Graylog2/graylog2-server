@@ -19,8 +19,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Routes from 'routing/Routes';
-import { LinkContainer } from 'components/common/router';
-import { IfPermitted, ShareButton, ConfirmDialog } from 'components/common';
+import { LinkContainer, IfPermitted, ShareButton, ConfirmDialog } from 'components/common';
 import { ButtonToolbar, MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
@@ -32,7 +31,6 @@ import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import { MoreActions } from 'components/common/EntityDataTable';
-import usePluginEntities from 'hooks/usePluginEntities';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 import usePluggableEntitySharedActions from 'hooks/usePluggableEntitySharedActions';
 
@@ -42,10 +40,6 @@ import {
   isSystemEventDefinition,
   isSigmaEventDefinition,
 } from '../event-definitions-types';
-
-type SigmaEventDefinitionConfig = EventDefinition['config'] & {
-  sigma_rule_id: string;
-};
 
 type Props = {
   eventDefinition: EventDefinition;
@@ -85,7 +79,6 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
   const [showDialog, setShowDialog] = useState(false);
   const [dialogType, setDialogType] = useState(null);
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
-  const [showSigmaModal, setShowSigmaModal] = useState(false);
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
   const navigate = useNavigate();
@@ -100,20 +93,8 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
       return 'System Event Definition cannot be deleted';
     }
 
-    if (isSigmaEventDefinition(eventDefinition)) {
-      return 'Sigma Rules must be deleted from the Sigma Rules page';
-    }
-
     return undefined;
   };
-
-  const pluggableSigmaModal = usePluginEntities('eventDefinitions.components.editSigmaModal').find(
-    (entity: { key: string }) => entity.key === 'coreSigmaModal',
-  );
-
-  const CoreSigmaModal = pluggableSigmaModal
-    ? (pluggableSigmaModal.component as React.FC<{ ruleId: string; onCancel: () => void; onConfirm: () => void }>)
-    : null;
 
   const updateState = ({ show, type, definition }) => {
     setShowDialog(show);
@@ -234,18 +215,7 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
     }
   };
 
-  const onEditEventDefinition = () => {
-    if (isSigmaEventDefinition(eventDefinition)) {
-      setShowSigmaModal(true);
-    } else {
-      navigate(Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id));
-    }
-  };
-
-  const onSigmaModalClose = () => {
-    refetchEventDefinitions();
-    setShowSigmaModal(false);
-  };
+  const onEditEventDefinition = () => navigate(Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id));
 
   const isEnabled = eventDefinition?.state === 'ENABLED';
 
@@ -259,11 +229,13 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
           bsSize="xsmall"
         />
         <MoreActions>
-          <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
-            <MenuItem onClick={onEditEventDefinition} data-testid="edit-button">
-              Edit
-            </MenuItem>
-          </IfPermitted>
+          {(!isSigmaEventDefinition(eventDefinition) || showActions()) && (
+            <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
+              <MenuItem onClick={onEditEventDefinition} data-testid="edit-button">
+                Edit
+              </MenuItem>
+            </IfPermitted>
+          )}
           <IfPermitted permissions="eventdefinitions:create">
             {!isSystemEventDefinition(eventDefinition) && !isSigmaEventDefinition(eventDefinition) && (
               <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
@@ -284,15 +256,14 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
               {isEnabled ? 'Disable' : 'Enable'}
             </MenuItem>
           </IfPermitted>
-          {moreActions}
           {showActions() && (
             <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
               <MenuItem divider />
               <DeleteMenuItem
-                disabled={isSystemEventDefinition(eventDefinition) || isSigmaEventDefinition(eventDefinition)}
+                disabled={isSystemEventDefinition(eventDefinition)}
                 title={getDeleteActionTitle()}
                 onClick={
-                  isSystemEventDefinition(eventDefinition) || isSigmaEventDefinition(eventDefinition)
+                  isSystemEventDefinition(eventDefinition)
                     ? undefined
                     : () => handleAction(DIALOG_TYPES.DELETE, eventDefinition)
                 }
@@ -311,10 +282,11 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
                 <MenuItem divider />
               </IfPermitted>
               <LinkContainer to={Routes.ALERTS.DEFINITIONS.replay_search(eventDefinition.id)}>
-                <MenuItem>Replay search</MenuItem>
+                <MenuItem>Replay Search</MenuItem>
               </LinkContainer>
             </>
           )}
+          {moreActions}
         </MoreActions>
       </ButtonToolbar>
       {showDialog && (
@@ -334,13 +306,6 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
           entityTitle={eventDefinition.title}
           description="Search for a User or Team to add as collaborator on this event definition."
           onClose={() => setShowEntityShareModal(false)}
-        />
-      )}
-      {showSigmaModal && CoreSigmaModal && (
-        <CoreSigmaModal
-          ruleId={(eventDefinition.config as SigmaEventDefinitionConfig).sigma_rule_id}
-          onCancel={onSigmaModalClose}
-          onConfirm={onSigmaModalClose}
         />
       )}
       {pluggableActionModals}

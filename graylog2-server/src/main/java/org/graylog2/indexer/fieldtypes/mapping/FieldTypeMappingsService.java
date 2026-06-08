@@ -43,31 +43,32 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.graylog2.plugin.Message.FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS;
-
 public class FieldTypeMappingsService {
 
     private static final Logger LOG = LoggerFactory.getLogger(FieldTypeMappingsService.class);
 
     private final IndexSetService indexSetService;
     private final MongoIndexSet.Factory mongoIndexSetFactory;
+    private final CustomMappingValidation customMappingValidation;
 
     private final IndexFieldTypeProfileService profileService;
 
     @Inject
     public FieldTypeMappingsService(final IndexSetService indexSetService,
                                     final MongoIndexSet.Factory mongoIndexSetFactory,
-                                    final IndexFieldTypeProfileService profileService) {
+                                    final IndexFieldTypeProfileService profileService,
+                                    final CustomMappingValidation customMappingValidation) {
         this.indexSetService = indexSetService;
         this.mongoIndexSetFactory = mongoIndexSetFactory;
         this.profileService = profileService;
+        this.customMappingValidation = customMappingValidation;
     }
 
     public void changeFieldType(final CustomFieldMapping customMapping,
                                 final Set<String> indexSetsIds,
                                 final boolean rotateImmediately) {
-        checkFieldTypeCanBeChanged(customMapping.fieldName());
-        checkType(customMapping);
+        customMappingValidation.checkFieldTypeCanBeChanged(customMapping.fieldName());
+        customMappingValidation.checkType(customMapping);
         checkAllIndicesSupportFieldTypeChange(customMapping.fieldName(), indexSetsIds);
 
         final Set<String> indexSetIdsWithError = new HashSet<>();
@@ -233,27 +234,13 @@ public class FieldTypeMappingsService {
         mongoIndexSet.cycle();
     }
 
-    private void checkType(final CustomFieldMapping customMapping) {
-        var type = CustomFieldMappings.AVAILABLE_TYPES.get(customMapping.type());
-        if (type == null) {
-            throw new BadRequestException("Invalid type provided: " + customMapping.type() + " - available types: " + CustomFieldMappings.AVAILABLE_TYPES.keySet());
-        }
-    }
-
     private void checkProfile(final String profileId) {
         final Optional<IndexFieldTypeProfile> fieldTypeProfile = profileService.get(profileId);
         if (fieldTypeProfile.isPresent()) {
-            fieldTypeProfile.get().customFieldMappings().forEach(mapping -> checkFieldTypeCanBeChanged(mapping.fieldName()));
+            customMappingValidation.checkProfile(fieldTypeProfile.get());
         } else {
             throw new NotFoundException("No profile with id : " + profileId);
         }
-    }
-
-    private void checkFieldTypeCanBeChanged(final String fieldName) {
-        if (FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS.contains(fieldName)) {
-            throw new BadRequestException("Unable to change field type of " + fieldName + ", not allowed to change type of these fields: " + FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS);
-        }
-
     }
 
     private void checkAllIndicesSupportFieldTypeChange(final String fieldName, final Set<String> indexSetsIds) {

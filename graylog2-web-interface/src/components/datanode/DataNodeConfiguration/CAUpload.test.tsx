@@ -27,7 +27,6 @@ import CAUpload from './CAUpload';
 
 jest.mock('logic/rest/FetchProvider', () => ({ fetchMultiPartFormData: jest.fn() }));
 jest.mock('stores/sessions/SessionStore', () => ({ SessionStore: MockStore(['isLoggedIn', jest.fn()]) }));
-jest.mock('stores/system/SystemStore', () => ({ SystemStore: MockStore() }));
 
 jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
@@ -59,8 +58,8 @@ describe('CAUpload', () => {
     render(<CAUpload />);
 
     const dropzone = await findDropZone();
-    userEvent.upload(dropzone, files);
-    userEvent.click(await screen.findByRole('button', { name: /Upload CA/i }));
+    await userEvent.upload(dropzone, files);
+    await userEvent.click(await screen.findByRole('button', { name: /Upload CA/i }));
 
     await waitFor(() =>
       expect(fetchMultiPartFormData).toHaveBeenCalledWith(expect.stringContaining('/ca/upload'), formData(), false),
@@ -79,9 +78,9 @@ describe('CAUpload', () => {
     );
 
     const dropzone = await findDropZone();
-    userEvent.upload(dropzone, files);
+    await userEvent.upload(dropzone, files);
 
-    userEvent.click(await screen.findByRole('button', { name: /Upload CA/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /Upload CA/i }));
 
     await waitFor(() =>
       expect(fetchMultiPartFormData).toHaveBeenCalledWith(expect.stringContaining('/ca/upload'), formData(), false),

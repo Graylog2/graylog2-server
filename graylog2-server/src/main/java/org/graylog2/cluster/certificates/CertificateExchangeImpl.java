@@ -221,9 +221,7 @@ public class CertificateExchangeImpl implements CertificateExchange {
     }
 
     public CertificateChain parseCertificateChain(String certificate) {
-        try {
-            Reader pemReader = new BufferedReader(new StringReader(certificate));
-            PEMParser pemParser = new PEMParser(pemReader);
+        try (PEMParser pemParser = new PEMParser(new BufferedReader(new StringReader(certificate)))) {
             List<X509Certificate> caCerts = new LinkedList<>();
             X509Certificate signedCert = readSingleCert(pemParser);
 
@@ -255,9 +253,7 @@ public class CertificateExchangeImpl implements CertificateExchange {
     }
 
     private PKCS10CertificationRequest parseCSR(String csr) {
-        try {
-            final var pemReader = new BufferedReader(new StringReader(csr));
-            final var pemParser = new PEMParser(pemReader);
+        try (PEMParser pemParser = new PEMParser(new BufferedReader(new StringReader(csr)))) {
             final var parsedObj = pemParser.readObject();
             return (PKCS10CertificationRequest) parsedObj;
         } catch (Exception e) {

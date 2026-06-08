@@ -19,8 +19,7 @@ import { useState, useEffect } from 'react';
 import upperFirst from 'lodash/upperFirst';
 
 import Routes from 'routing/Routes';
-import { Link } from 'components/common/router';
-import { IfPermitted, ReadOnlyFormGroup } from 'components/common';
+import { Link, IfPermitted, ReadOnlyFormGroup } from 'components/common';
 import type User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import { StreamsActions } from 'stores/streams/StreamsStore';

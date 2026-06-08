@@ -56,6 +56,8 @@ public abstract class JobTriggerDto implements MongoEntity {
     public static final String FIELD_IS_CANCELLED = "is_cancelled";
     public static final String FIELD_CONCURRENCY_RESCHEDULE_COUNT = "concurrency_reschedule_count";
 
+    public static final String FIELD_LOCK_OWNER = FIELD_LOCK + "." + JobTriggerLock.FIELD_OWNER;
+
     @Id
     @ObjectId
     @Nullable

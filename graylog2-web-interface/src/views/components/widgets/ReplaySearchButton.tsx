@@ -22,6 +22,7 @@ import URI from 'urijs';
 
 import IconButton from 'components/common/IconButton';
 import Icon from 'components/common/Icon';
+import { LinkContainer } from 'components/common';
 import SearchLink from 'views/logic/search/SearchLink';
 import Store from 'logic/local-storage/Store';
 import type { TimeRange } from 'views/logic/queries/Query';
@@ -29,6 +30,7 @@ import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import generateId from 'logic/generateId';
 import type Parameter from 'views/logic/parameters/Parameter';
 import type { ParameterBindings } from 'views/logic/search/SearchExecutionState';
+import type { FiltersType } from 'views/types';
 
 const NeutralLink = styled.a`
   display: inline-flex;
@@ -56,6 +58,7 @@ const buildSearchLink = (
   streams: Array<string>,
   streamCategories: Array<string>,
   parameters?: Immutable.Set<Parameter>,
+  filters?: FiltersType,
 ) => {
   let searchLink = SearchLink.builder()
     .query(createElasticsearchQueryString(queryString))
@@ -65,7 +68,7 @@ const buildSearchLink = (
     .build()
     .toURL();
 
-  if (parameters?.size) {
+  if (parameters?.size || filters?.size) {
     searchLink = new URI(searchLink).setSearch('session-id', sessionId).toString();
   }
 
@@ -96,15 +99,17 @@ export const ReplaySearchButtonComponent = ({
   const title = 'Replay search';
 
   return (
-    <Component href={searchLink} target="_blank" rel="noopener noreferrer" title={title} onClick={onClick}>
-      {children ? (
-        <>
-          {children} <StyledIcon name={iconName} />
-        </>
-      ) : (
-        <IconButton name={iconName} focusable={false} title={title} />
-      )}
-    </Component>
+    <LinkContainer to={searchLink}>
+      <Component title={title} onClick={onClick}>
+        {children ? (
+          <>
+            {children} <StyledIcon name={iconName} />
+          </>
+        ) : (
+          <IconButton name={iconName} focusable={false} title={title} />
+        )}
+      </Component>
+    </LinkContainer>
   );
 };
 
@@ -114,6 +119,7 @@ type Props = {
   streams?: string[] | undefined;
   streamCategories?: string[] | undefined;
   parameters?: Immutable.Set<Parameter>;
+  filters?: FiltersType;
   children?: React.ReactNode;
   parameterBindings?: ParameterBindings;
 };
@@ -124,17 +130,25 @@ const ReplaySearchButton = ({
   streams = undefined,
   streamCategories = undefined,
   parameters = undefined,
+  filters = undefined,
   children = undefined,
   parameterBindings = undefined,
 }: Props) => {
   const sessionId = useMemo(() => `replay-search-${generateId()}`, []);
-  const searchLink = buildSearchLink(sessionId, timerange, queryString, streams, streamCategories, parameters);
+  const searchLink = buildSearchLink(sessionId, timerange, queryString, streams, streamCategories, parameters, filters);
 
   const onReplaySearch = useCallback(() => {
-    if (parameters?.size) {
-      Store.set(sessionId, JSON.stringify({ parameters, parameterBindings }));
+    if (parameters?.size || filters?.size) {
+      Store.set(
+        sessionId,
+        JSON.stringify({
+          parameters,
+          parameterBindings,
+          filters: filters?.toArray() ?? [],
+        }),
+      );
     }
-  }, [sessionId, parameters, parameterBindings]);
+  }, [sessionId, parameters, parameterBindings, filters]);
 
   return (
     <ReplaySearchButtonComponent searchLink={searchLink} onClick={onReplaySearch}>

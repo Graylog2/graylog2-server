@@ -22,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.Multimap;
 import org.graylog2.lookup.adapters.LookupDataAdapterValidationContext;
 
+import jakarta.annotation.Nonnull;
+
 import java.util.Optional;
 
 @JsonTypeInfo(
@@ -69,5 +71,23 @@ public interface LookupDataAdapterConfiguration {
     @JsonIgnore
     default boolean isCloudCompatible() {
         return true;
+    }
+
+    /**
+     * Prepares the config for an update by merging encrypted values from the existing config.
+     * <p>
+     * When a config contains {@link org.graylog2.security.encryption.EncryptedValue} fields,
+     * the client sends {@code {"keep_value": true}} to indicate the existing value should be preserved.
+     * Implementations must override this method to replace such sentinel values with the actual
+     * encrypted values from the existing (this) config.
+     * <p>
+     * This method is called on the <b>existing</b> config with the <b>new</b> config as argument.
+     *
+     * @param newConfig the incoming config from the update request
+     * @return the merged config with encrypted values properly resolved
+     */
+    @JsonIgnore
+    default LookupDataAdapterConfiguration prepareConfigUpdate(@Nonnull LookupDataAdapterConfiguration newConfig) {
+        return newConfig;
     }
 }

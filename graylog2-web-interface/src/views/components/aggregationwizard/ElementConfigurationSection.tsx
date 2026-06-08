@@ -19,47 +19,38 @@ import styled, { css } from 'styled-components';
 
 import IconButton from 'components/common/IconButton';
 
-const Wrapper = styled.div(
-  ({ theme }) => css`
-    border-radius: 6px;
-    margin-bottom: 6px;
+const Wrapper = styled.div`
+  border-radius: 6px;
+  margin-bottom: 6px;
 
-    &:last-child {
-      margin-bottom: 0;
-    }
+  &:last-child {
+    margin-bottom: 0;
+  }
 
-    div[class^='col-'] {
-      padding-right: 0;
-      padding-left: 0;
-    }
+  div[class^='col-'] {
+    padding-right: 0;
+    padding-left: 0;
+  }
 
-    input {
-      font-size: ${theme.fonts.size.body};
-    }
+  .form-group {
+    margin: 0 0 3px;
+  }
 
-    .form-group {
-      margin: 0 0 3px;
-    }
+  .control-label {
+    padding-top: 5px;
+    text-align: left;
+    hyphens: auto;
+  }
 
-    .control-label {
-      padding-left: 0;
-      padding-right: 5px;
-      padding-top: 5px;
-      font-weight: normal;
-      text-align: left;
-      hyphens: auto;
-    }
+  .help-block {
+    margin: 0;
+    hyphens: auto;
+  }
 
-    .help-block {
-      margin: 0;
-      hyphens: auto;
-    }
-
-    .checkbox {
-      min-height: auto;
-    }
-  `,
-);
+  .checkbox {
+    min-height: auto;
+  }
+`;
 
 const Header = styled.div<{ $isEmpty: boolean }>(
   ({ theme, $isEmpty }) => css`

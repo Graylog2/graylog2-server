@@ -21,6 +21,8 @@ import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
 import org.graylog2.storage.SearchVersion;
 
+import java.lang.annotation.Annotation;
+
 public abstract class VersionAwareModule extends PluginModule {
     protected  <T> LinkedBindingBuilder<T> bindForVersion(SearchVersion supportedVersion, Class<T> interfaceClass) {
         return mapBinder(interfaceClass).addBinding(supportedVersion);
@@ -36,5 +38,17 @@ public abstract class VersionAwareModule extends PluginModule {
 
     private <T> MapBinder<SearchVersion, T> mapBinder(TypeLiteral<T> interfaceClass) {
         return MapBinder.newMapBinder(binder(), new TypeLiteral<SearchVersion>() {}, interfaceClass);
+    }
+
+    /**
+     * Variant that registers the binding into a {@code MapBinder} qualified with the given
+     * annotation, so consumers can inject {@code @Qualifier Map<SearchVersion, T>} or — via a
+     * paired {@link org.graylog2.storage.VersionAwareProvider} — {@code @Qualifier T}.
+     */
+    protected <T> LinkedBindingBuilder<T> bindForVersion(SearchVersion supportedVersion,
+                                                         Class<T> interfaceClass,
+                                                         Class<? extends Annotation> qualifier) {
+        return MapBinder.newMapBinder(binder(), SearchVersion.class, interfaceClass, qualifier)
+                .addBinding(supportedVersion);
     }
 }

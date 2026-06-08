@@ -16,6 +16,7 @@
  */
 package org.graylog2.inputs;
 
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.eventbus.EventBus;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.database.NotFoundException;
@@ -26,6 +27,7 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
+import org.graylog2.rest.models.system.inputs.responses.InputStopped;
 import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
 import org.graylog2.shared.inputs.InputLauncher;
 import org.graylog2.shared.inputs.InputRegistry;
@@ -77,7 +79,7 @@ public class InputEventListenerTest {
     @BeforeEach
     public void setUp() throws Exception {
         final EventBus eventBus = new EventBus(this.getClass().getSimpleName());
-        listener = new InputEventListener(eventBus, inputLauncher, inputRegistry, inputService, nodeId, leaderElectionService, persistedInputs, serverStatus);
+        listener = new InputEventListener(eventBus, inputLauncher, inputRegistry, inputService, nodeId, leaderElectionService, persistedInputs, serverStatus, mock(MetricRegistry.class));
     }
 
     @Test
@@ -277,5 +279,23 @@ public class InputEventListenerTest {
         listener.inputDeleted(InputDeleted.create(INPUT_ID));
 
         verify(inputRegistry, never()).remove(any(MessageInput.class));
+    }
+
+    @Test
+    public void inputStoppedRemovesInputFromRegistry() {
+        when(inputRegistry.getInputState(INPUT_ID)).thenReturn(inputState);
+
+        listener.inputStopped(InputStopped.create(INPUT_ID));
+
+        verify(inputRegistry, times(1)).remove(inputState);
+    }
+
+    @Test
+    public void inputStoppedDoesNothingIfInputIsNotInRegistry() {
+        when(inputRegistry.getInputState(INPUT_ID)).thenReturn(null);
+
+        listener.inputStopped(InputStopped.create(INPUT_ID));
+
+        verify(inputRegistry, never()).remove(Mockito.<IOState<MessageInput>>any());
     }
 }

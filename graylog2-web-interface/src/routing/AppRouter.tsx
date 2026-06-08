@@ -31,6 +31,7 @@ import {
   ContentPacksPage,
   CreateContentPackPage,
   CreateEventDefinitionPage,
+  SigmaEventDefinitionPage,
   CreateEventNotificationPage,
   CreateExtractorsPage,
   DataNodePage,
@@ -100,12 +101,19 @@ import {
   SidecarNewConfigurationPage,
   SidecarsPage,
   SidecarStatusPage,
+  CollectorsOverviewPage,
+  CollectorsFleetsPage,
+  CollectorsFleetDetailPage,
+  CollectorsInstancesPage,
+  CollectorsDeploymentPage,
+  CollectorsSettingsPage,
   SimulatorPage,
   StartPage,
   StreamEditPage,
   StreamOutputsPage,
   StreamsPage,
   StreamDetailsPage,
+  SystemNotificationsPage,
   SystemOutputsPage,
   SystemOverviewPage,
   ThreadDumpPage,
@@ -176,6 +184,7 @@ const AppRouter = () => {
   }
 
   const enableDataNodeMigration = AppConfig.isFeatureEnabled('data_node_migration');
+  const enableCollectors = AppConfig.isFeatureEnabled('collectors');
 
   const router = createBrowserRouter([
     ...pluginRoutesWithNullParent,
@@ -208,6 +217,8 @@ const AppRouter = () => {
             { path: RoutePaths.ALERTS.LIST, element: <EventsPage /> },
             { path: RoutePaths.ALERTS.DEFINITIONS.LIST, element: <EventDefinitionsPage /> },
             { path: RoutePaths.ALERTS.DEFINITIONS.CREATE, element: <CreateEventDefinitionPage /> },
+            { path: RoutePaths.ALERTS.DEFINITIONS.SIGMA.GIT_IMPORT, element: <SigmaEventDefinitionPage /> },
+            { path: RoutePaths.ALERTS.DEFINITIONS.SIGMA.FILE_IMPORT, element: <SigmaEventDefinitionPage /> },
             {
               path: RoutePaths.ALERTS.DEFINITIONS.edit(':definitionId'),
               element: <EditEventDefinitionPage />,
@@ -359,6 +370,7 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.AUTHZROLES.edit(':roleId'), element: <RoleEditPage /> },
 
             { path: RoutePaths.SYSTEM.OVERVIEW, element: <SystemOverviewPage /> },
+            { path: RoutePaths.SYSTEM.HEALTH, element: <SystemNotificationsPage /> },
             { path: RoutePaths.SYSTEM.PROCESSBUFFERDUMP(':nodeId'), element: <ProcessBufferDumpPage /> },
             { path: RoutePaths.SYSTEM.THREADDUMP(':nodeId'), element: <ThreadDumpPage /> },
             { path: RoutePaths.SYSTEM.SYSTEMLOGS(':nodeId'), element: <SystemLogsPage /> },
@@ -376,6 +388,19 @@ const AppRouter = () => {
             },
             { path: RoutePaths.SYSTEM.SIDECARS.NEW_COLLECTOR, element: <SidecarNewCollectorPage /> },
             { path: RoutePaths.SYSTEM.SIDECARS.EDIT_COLLECTOR(':collectorId'), element: <SidecarEditCollectorPage /> },
+
+            ...(enableCollectors
+              ? [
+                  { path: RoutePaths.SYSTEM.COLLECTORS.OVERVIEW, element: <CollectorsOverviewPage /> },
+                  { path: RoutePaths.SYSTEM.COLLECTORS.FLEETS, element: <CollectorsFleetsPage /> },
+                  { path: `${RoutePaths.SYSTEM.COLLECTORS.FLEETS}/new`, element: <CollectorsFleetsPage /> },
+                  { path: `${RoutePaths.SYSTEM.COLLECTORS.FLEETS}/:fleetId`, element: <CollectorsFleetDetailPage /> },
+                  { path: RoutePaths.SYSTEM.COLLECTORS.INSTANCES, element: <CollectorsInstancesPage /> },
+                  { path: RoutePaths.SYSTEM.COLLECTORS.DEPLOYMENT, element: <CollectorsDeploymentPage /> },
+                  { path: RoutePaths.SYSTEM.COLLECTORS.SETTINGS, element: <CollectorsSettingsPage /> },
+                ]
+              : []),
+
             { path: RoutePaths.KEYBOARD_SHORTCUTS, element: <KeyboardShortcutsPage /> },
             {
               path: RoutePaths.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW,
