@@ -186,7 +186,10 @@ public class CollectorsConfigResource extends RestResource {
     }
 
     private String derivedHostname(ContainerRequestContext requestContext) {
-        return RestTools.buildExternalUri(requestContext.getHeaders(), httpExternalUri).getHost();
+        final var host = RestTools.buildExternalUri(requestContext.getHeaders(), httpExternalUri).getHost();
+        // In Cloud the ingest endpoint is exposed under an "ingest-"-prefixed hostname (same scheme the forwarder
+        // ingest endpoint uses).
+        return isCloud ? "ingest-" + host : host;
     }
 
     private void validateThresholds(CollectorsConfig config) throws ValidationException {
