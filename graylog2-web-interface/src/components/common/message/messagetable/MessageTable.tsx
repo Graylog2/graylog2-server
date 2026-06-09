@@ -160,8 +160,8 @@ const MessageTable = ({
 
   return (
     <MessageTableProviders>
-      <TableWrapper className="table-responsive" id="sticky-augmentations-container" ref={scrollContainerRef}>
-        <Table className="table table-condensed">
+      <TableWrapper id="sticky-augmentations-container" ref={scrollContainerRef}>
+        <Table responsive>
           <TableHead>
             <tr>
               {displayBulkSelectCol && (
