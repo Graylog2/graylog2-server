@@ -26,7 +26,7 @@ import { keyFn, fetchEventDefinitions } from 'components/event-definitions/hooks
 import BulkActions from 'components/event-definitions/event-definitions/BulkActions';
 import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
 import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
-import { TagsRenderer } from 'components/events/events/ColumnRenderers';
+import { TagsRenderer, EventDefinitionTypeRenderer } from 'components/events/events/ColumnRenderers';
 
 import EventDefinitionActions from './EventDefinitionActions';
 import EventDefinitionNotificationsCell from './EventDefinitionNotificationsCell';
@@ -62,6 +62,12 @@ const getCustomColumnRenderers = (
         <StatusCell eventDefinition={eventDefinition} />
       ),
       staticWidth: 110,
+    },
+    type: {
+      renderCell: (_type: string, eventDefinition: EventDefinition) => (
+        <EventDefinitionTypeRenderer type={eventDefinition.config?.type} />
+      ),
+      staticWidth: 'matchHeader' as const,
     },
     priority: {
       staticWidth: 'matchHeader' as const,
