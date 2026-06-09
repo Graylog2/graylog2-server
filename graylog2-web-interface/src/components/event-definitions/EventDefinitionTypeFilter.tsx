@@ -15,52 +15,27 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
 
 import type { FilterComponentProps } from 'stores/PaginationTypes';
-import SuggestionsList from 'components/common/EntityFilters/FilterConfiguration/SuggestionsList';
+import StaticOptionsList from 'components/common/EntityFilters/FilterConfiguration/StaticOptionsList';
 import usePluginEntities from 'hooks/usePluginEntities';
 
-const DEFAULT_SEARCH_PARAMS = {
-  query: '',
-  pageSize: 10,
-  page: 1,
-};
-
-// Options are sourced from the `eventDefinitionTypes` plugin registry rather than a backend
-// distinct-values call, so the dropdown lists every registered (and licensed) definition type
-// with its display name. The backend `type` attribute (config.type) does the actual filtering.
-const EventDefinitionTypeFilter = ({
-  attribute,
-  allActiveFilters,
-  filter,
-  filterValueRenderer,
-  onSubmit,
-}: FilterComponentProps) => {
-  const [filterQuery, setFilterQuery] = useState(DEFAULT_SEARCH_PARAMS);
+// Renders the same searchless option list as the Status/Source filters, but builds its options
+// from the `eventDefinitionTypes` plugin registry (gated by useCondition() like the create form)
+// instead of a backend filter_options enum. The backend `type` attribute (config.type) filters.
+const EventDefinitionTypeFilter = ({ attribute, allActiveFilters, filterValueRenderer, onSubmit }: FilterComponentProps) => {
   const eventDefinitionTypes = usePluginEntities('eventDefinitionTypes');
 
-  const suggestions = eventDefinitionTypes
-    // Match the create form (EventConditionForm): only offer types whose license/feature
-    // gate is satisfied, so unlicensed enterprise types aren't listed.
+  const filterOptions = eventDefinitionTypes
     .filter((edt) => edt.useCondition())
-    .map((edt) => ({ id: edt.type, value: edt.displayName }))
-    .filter((suggestion) => suggestion.value.toLowerCase().includes(filterQuery.query.toLowerCase()))
-    .sort((a, b) => a.value.localeCompare(b.value));
+    .map((edt) => ({ value: edt.type, title: edt.displayName }));
 
   return (
-    <SuggestionsList
+    <StaticOptionsList
+      attribute={{ ...attribute, filter_options: filterOptions }}
       allActiveFilters={allActiveFilters}
-      attribute={attribute}
-      multiSelect={!filter}
       filterValueRenderer={filterValueRenderer}
       onSubmit={onSubmit}
-      suggestions={suggestions}
-      isLoading={false}
-      total={suggestions.length}
-      page={1}
-      pageSize={suggestions.length}
-      setSearchParams={setFilterQuery}
     />
   );
 };
