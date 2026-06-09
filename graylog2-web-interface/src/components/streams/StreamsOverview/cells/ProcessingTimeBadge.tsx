@@ -19,10 +19,7 @@ import styled, { css } from 'styled-components';
 
 import { Badge } from 'components/bootstrap';
 import { Icon } from 'components/common';
-import {
-  formatProcessingTime,
-  processingTimeSeverity,
-} from 'components/streams/StreamsOverview/formatProcessingTime';
+import { formatProcessingTime, processingTimeSeverity } from 'components/streams/StreamsOverview/formatProcessingTime';
 
 type Props = {
   ms: number;
