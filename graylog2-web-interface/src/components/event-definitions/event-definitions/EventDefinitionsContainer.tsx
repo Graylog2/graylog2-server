@@ -67,7 +67,8 @@ const getCustomColumnRenderers = (
       renderCell: (_type: string, eventDefinition: EventDefinition) => (
         <EventDefinitionTypeRenderer type={eventDefinition.config?.type} />
       ),
-      staticWidth: 'matchHeader' as const,
+      width: 0.15,
+      minWidth: 150,
     },
     priority: {
       staticWidth: 'matchHeader' as const,
