@@ -99,6 +99,7 @@ yarn tsc && yarn lint:changes && yarn test
 - Register: `PluginStore.register(new PluginManifest({}, { key: [data] }));`
 - Consume: `usePluginEntities('key')`
 - No central documentation of plugin store keys — search the codebase for usage.
+- **Merging bindings:** whenever you combine multiple plugin bindings (`PluginExports` objects) into one — e.g. assembling a `bindings.tsx` from sub-plugins, or aggregating bindings for `PluginStore.register` — you **must** use `mergePluginBindings` from `util/mergePluginBindings`. Do **not** use `lodash/merge`, `Immutable.Map().mergeWith`, object spreads (`{ ...a, ...b }`), or hand-written per-key array concatenation: those overwrite or index-merge array-valued keys (e.g. `pageNavigation`, `routes`) and silently drop entries. `mergePluginBindings` concatenates array-valued keys while deep-merging the rest.
 
 ## Finishing work
 
