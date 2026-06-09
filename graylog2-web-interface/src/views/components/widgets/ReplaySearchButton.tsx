@@ -108,15 +108,11 @@ export const ReplaySearchButtonComponent = ({
     <IconButton name={iconName} focusable={false} title={title} />
   );
 
-  if (newTab) {
-    return (
-      <Component href={searchLink} target="_blank" rel="noopener noreferrer" title={title} onClick={onClick}>
-        {content}
-      </Component>
-    );
-  }
-
-  return (
+  return newTab ? (
+    <Component href={searchLink} target="_blank" rel="noopener noreferrer" title={title} onClick={onClick}>
+      {content}
+    </Component>
+  ) : (
     <LinkContainer to={searchLink}>
       <Component title={title} onClick={onClick}>
         {content}
@@ -132,7 +128,6 @@ type Props = {
   streamCategories?: string[] | undefined;
   parameters?: Immutable.Set<Parameter>;
   filters?: FiltersType;
-  children?: React.ReactNode;
   parameterBindings?: ParameterBindings;
   newTab?: boolean;
 };
@@ -144,7 +139,6 @@ const ReplaySearchButton = ({
   streamCategories = undefined,
   parameters = undefined,
   filters = undefined,
-  children = undefined,
   parameterBindings = undefined,
   newTab = false,
 }: Props) => {
@@ -164,11 +158,7 @@ const ReplaySearchButton = ({
     }
   }, [sessionId, parameters, parameterBindings, filters]);
 
-  return (
-    <ReplaySearchButtonComponent searchLink={searchLink} onClick={onReplaySearch} newTab={newTab}>
-      {children}
-    </ReplaySearchButtonComponent>
-  );
+  return <ReplaySearchButtonComponent searchLink={searchLink} onClick={onReplaySearch} newTab={newTab} />;
 };
 
 export default ReplaySearchButton;
