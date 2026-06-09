@@ -555,6 +555,9 @@ public class Message implements Messages, Indexable, Acknowledgeable {
      * internal Graylog format ({@code yyyy-MM-dd HH:mm:ss.SSS}) for strings, so we fall back to these before treating
      * the value as a genuine error. All of these require a complete date and time, so partial values (e.g. a bare
      * year like "1234") are still rejected. See https://github.com/Graylog2/graylog2-server/issues/26025
+     *
+     * Ordering is significant: from cheap to expensive
+     * All formatters must use withZoneUTC() for correct zoning
      */
     private static final List<DateTimeFormatter> LENIENT_TIMESTAMP_FORMATTERS = List.of(
             Tools.ES_DATE_FORMAT_NO_MS_FORMATTER,   // yyyy-MM-dd HH:mm:ss
