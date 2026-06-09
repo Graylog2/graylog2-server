@@ -17,7 +17,9 @@
 package org.graylog.integrations.aws;
 
 import com.google.common.base.Preconditions;
+import jakarta.inject.Inject;
 import jakarta.inject.Provider;
+import jakarta.ws.rs.BadRequestException;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.aws.AWSProxyConfigurationProvider;
 import org.graylog.integrations.aws.resources.requests.AWSRequest;
@@ -34,8 +36,6 @@ import software.amazon.awssdk.services.iam.IamClient;
 import software.amazon.awssdk.services.iam.IamClientBuilder;
 import software.amazon.awssdk.services.kinesis.KinesisClient;
 import software.amazon.awssdk.services.kinesis.KinesisClientBuilder;
-
-import jakarta.inject.Inject;
 
 import java.net.URI;
 import java.util.Optional;
@@ -61,6 +61,9 @@ public class AWSClientBuilderUtil {
     }
 
     public AwsCredentialsProvider createCredentialsProvider(AWSRequest request) {
+        if (StringUtils.isNotBlank(request.externalId()) && StringUtils.isBlank(request.assumeRoleArn())) {
+            throw new BadRequestException("External ID can only be used when an Assume Role ARN is provided.");
+        }
         return authFactoryProvider.get().create(
                 configuration.isCloud(),
                 request.region(),
@@ -75,6 +78,9 @@ public class AWSClientBuilderUtil {
      * Use this for inputs that support HTTP proxy (S3, Security Lake) but NOT for Kinesis.
      */
     public AwsCredentialsProvider createCredentialsProviderWithStsProxy(AWSRequest request) {
+        if (StringUtils.isNotBlank(request.externalId()) && StringUtils.isBlank(request.assumeRoleArn())) {
+            throw new BadRequestException("External ID can only be used when an Assume Role ARN is provided.");
+        }
         return authFactoryProvider.get().create(
                 configuration.isCloud(),
                 request.region(),
