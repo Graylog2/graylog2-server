@@ -18,8 +18,11 @@ package org.graylog.datanode.opensearch.statemachine.tracer;
 
 import org.graylog2.cluster.nodes.DataNodeMetadata;
 import org.graylog2.cluster.nodes.DataNodeMetadataService;
+import org.graylog2.cluster.nodes.OpensearchVersionsOverview;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -44,5 +47,10 @@ class InMemoryDataNodeMetadataService implements DataNodeMetadataService {
     @Override
     public Optional<DataNodeMetadata> findByNodeId(String nodeId) {
         return Optional.ofNullable(store.get(nodeId));
+    }
+
+    @Override
+    public OpensearchVersionsOverview getVersionsOverview() {
+        return OpensearchVersionsOverview.of(new ArrayList<>(store.values()), Map.of());
     }
 }

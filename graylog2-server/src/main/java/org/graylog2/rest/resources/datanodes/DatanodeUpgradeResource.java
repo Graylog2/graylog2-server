@@ -29,12 +29,12 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.datanode.dto.FlushResponse;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.cluster.nodes.DataNodeMetadataService;
+import org.graylog2.cluster.nodes.OpensearchVersionsOverview;
 import org.graylog2.datanode.DatanodeUpgradeService;
 import org.graylog2.datanode.DatanodeUpgradeStatus;
-import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.shared.security.RestPermissions;
 
-import static org.graylog2.audit.AuditEventTypes.DATANODE_START;
 import static org.graylog2.audit.AuditEventTypes.DATANODE_START_REPLICATION;
 import static org.graylog2.audit.AuditEventTypes.DATANODE_STOP_REPLICATION;
 
@@ -45,10 +45,12 @@ import static org.graylog2.audit.AuditEventTypes.DATANODE_STOP_REPLICATION;
 public class DatanodeUpgradeResource {
 
     private final DatanodeUpgradeService upgradeService;
+    private final DataNodeMetadataService dataNodeMetadataService;
 
     @Inject
-    public DatanodeUpgradeResource(DatanodeUpgradeService upgradeService) {
+    public DatanodeUpgradeResource(DatanodeUpgradeService upgradeService, DataNodeMetadataService dataNodeMetadataService) {
         this.upgradeService = upgradeService;
+        this.dataNodeMetadataService = dataNodeMetadataService;
     }
 
 
@@ -58,6 +60,14 @@ public class DatanodeUpgradeResource {
     @RequiresPermissions(RestPermissions.DATANODE_READ)
     public DatanodeUpgradeStatus status() {
         return upgradeService.status();
+    }
+
+    @GET
+    @Path("/indexer/overview")
+    @Operation(summary = "Returns which opensearch versions are available and used in the data node cluster")
+    @RequiresPermissions(RestPermissions.DATANODE_READ)
+    public OpensearchVersionsOverview opensearchVersions() {
+        return dataNodeMetadataService.getVersionsOverview();
     }
 
     @POST

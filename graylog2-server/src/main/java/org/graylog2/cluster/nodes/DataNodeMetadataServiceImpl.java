@@ -22,16 +22,30 @@ import com.mongodb.client.model.Updates;
 import jakarta.inject.Inject;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.datanode.DataNodeInformation;
+import org.graylog2.datanode.DatanodeUpgradeService;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class DataNodeMetadataServiceImpl implements DataNodeMetadataService {
 
     private final MongoCollection<DataNodeMetadata> collection;
+    private final DataNodeClusterService dataNodeClusterService;
+    private final DatanodeUpgradeService datanodeUpgradeService;
 
     @Inject
-    public DataNodeMetadataServiceImpl(MongoCollections mongoCollections) {
+    public DataNodeMetadataServiceImpl(MongoCollections mongoCollections,
+                                       DataNodeClusterService dataNodeClusterService,
+                                       DatanodeUpgradeService datanodeUpgradeService) {
         this.collection = mongoCollections.collection(DataNodeMetadata.COLLECTION_NAME, DataNodeMetadata.class);
+        this.dataNodeClusterService = dataNodeClusterService;
+        this.datanodeUpgradeService = datanodeUpgradeService;
     }
 
     @Override
@@ -63,5 +77,27 @@ public class DataNodeMetadataServiceImpl implements DataNodeMetadataService {
         return Optional.ofNullable(
                 collection.find(Filters.eq(DataNodeMetadata.FIELD_NODE_ID, nodeId)).first()
         );
+    }
+
+    @Override
+    public OpensearchVersionsOverview getVersionsOverview() {
+        final List<DataNodeMetadata> nodes = collection.find().into(new ArrayList<>());
+        final Set<String> nodeIds = nodes.stream().map(DataNodeMetadata::nodeId).collect(Collectors.toSet());
+        final Map<String, DataNodeDto> datanodeDtos = dataNodeClusterService.byNodeIds(nodeIds);
+
+        final var upgradeStatus = datanodeUpgradeService.status();
+        final Map<String, DataNodeInformation> informationByHostname = Stream
+                .concat(upgradeStatus.upToDateNodes().stream(), upgradeStatus.outdatedNodes().stream())
+                .collect(Collectors.toMap(DataNodeInformation::hostname, i -> i));
+
+        final Map<String, DataNodeInformation> informationByNodeId = datanodeDtos.entrySet().stream()
+                .filter(e -> e.getValue().getHostname() != null)
+                .filter(e -> informationByHostname.containsKey(e.getValue().getHostname()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> informationByHostname.get(e.getValue().getHostname())
+                ));
+
+        return OpensearchVersionsOverview.of(nodes, informationByNodeId);
     }
 }
