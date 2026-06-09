@@ -20,7 +20,6 @@ import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
 import usePluginEntities from 'hooks/usePluginEntities';
-import Menu from 'components/bootstrap/Menu';
 import type { Attribute } from 'stores/PaginationTypes';
 
 import EventDefinitionTypeFilter from './EventDefinitionTypeFilter';
@@ -41,17 +40,13 @@ describe('EventDefinitionTypeFilter', () => {
 
   const renderFilter = (props: Partial<React.ComponentProps<typeof EventDefinitionTypeFilter>> = {}) =>
     render(
-      <Menu opened>
-        <Menu.Dropdown>
-          <EventDefinitionTypeFilter
-            attribute={attribute}
-            allActiveFilters={undefined}
-            filterValueRenderer={(_value, title) => title}
-            onSubmit={onSubmit}
-            {...props}
-          />
-        </Menu.Dropdown>
-      </Menu>,
+      <EventDefinitionTypeFilter
+        attribute={attribute}
+        allActiveFilters={undefined}
+        filterValueRenderer={(_value, title) => title}
+        onSubmit={onSubmit}
+        {...props}
+      />,
     );
 
   beforeEach(() => {
@@ -59,13 +54,18 @@ describe('EventDefinitionTypeFilter', () => {
     asMock(usePluginEntities).mockReturnValue(TYPES);
   });
 
-  it('lists licensed type display names sorted alphabetically', () => {
-    renderFilter();
+  it('lists registered type display names sorted alphabetically', () => {
+    const { container } = renderFilter();
 
-    // Sorted by display name; 'License Usage Monitoring' (useCondition: () => false) is excluded.
-    const items = screen.getAllByRole('menuitem').map((item) => item.textContent);
+    expect(screen.getByText('Filter & Aggregation')).toBeInTheDocument();
+    expect(screen.getByText('Sigma Rule')).toBeInTheDocument();
 
-    expect(items).toEqual(['Filter & Aggregation', 'Sigma Rule']);
+    // Unlicensed type (useCondition: () => false) is excluded.
+    expect(screen.queryByText('License Usage Monitoring')).not.toBeInTheDocument();
+
+    // 'Filter & Aggregation' sorts before 'Sigma Rule' despite the reversed input order.
+    const html = container.innerHTML;
+    expect(html.indexOf('Filter &amp; Aggregation')).toBeLessThan(html.indexOf('Sigma Rule'));
   });
 
   it('submits the type id (config.type value) when a suggestion is clicked', async () => {
@@ -73,6 +73,6 @@ describe('EventDefinitionTypeFilter', () => {
 
     await userEvent.click(screen.getByText('Sigma Rule'));
 
-    expect(onSubmit).toHaveBeenCalledWith({ value: 'sigma-v1', title: 'Sigma Rule' });
+    expect(onSubmit).toHaveBeenCalledWith({ value: 'sigma-v1', title: 'Sigma Rule' }, true);
   });
 });
