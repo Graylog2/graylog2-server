@@ -1,5 +1,5 @@
 type = "a"
-message = "Adds the ability to filter the Event Definitions list by event definition type."
+message = "Added a new event definition type filter and column on the main Event Definitions page."
 
-issues = ["11986"]
+issues = ["Graylog2/graylog-plugin-enterprise#11986"]
 pulls = ["26279"]
