@@ -1,4 +1,3 @@
-# One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
 type = "a"
 message = "Adds the ability to filter the Event Definitions list by event definition type."
 
