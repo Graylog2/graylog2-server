@@ -179,6 +179,14 @@ class DateTimeConverterTest {
     }
 
     @Test
+    void convertFromIsoStringWithMillisWithoutOffsetIsRejected() {
+        // The millis variant routes through a different formatter than the no-ms case above, but a value
+        // without zone/offset is equally ambiguous and must be rejected.
+        assertThatThrownBy(() -> DateTimeConverter.convertToDateTime("2026-05-18T08:57:55.123"))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
     void convertFromUnsupportedStringFormat() {
         assertThatThrownBy(() -> DateTimeConverter.convertToDateTime("not-a-timestamp"))
                 .isInstanceOf(IllegalArgumentException.class)
