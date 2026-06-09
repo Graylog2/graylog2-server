@@ -63,7 +63,7 @@ const listSubplotOrder = (gd: HTMLElement): string[] => {
   });
 };
 
-const createBarElementGetter = (gd: PlotlyHTMLElement & { _fullData: Array<any> }) => {
+const createBarElementGetter = (gd: PlotlyHTMLElementWithInternals) => {
   const fullData = gd._fullData;
   const curveNumberGroupedBySubPlot: Record<string, number[]> = {};
 
@@ -85,7 +85,7 @@ const getScatterMarkerElement = (graphDiv: HTMLElement, pt: ClickPoint): Element
     pointIndex,
   } = pt;
 
-  const trace = graphDiv.querySelector(`.scatterlayer .trace.trace${uid}`) as HTMLElement | undefined;
+  const trace = graphDiv.querySelector(`.scatterlayer .trace.trace${uid}`);
   if (!trace) return null;
 
   return trace.querySelectorAll('.points .point')[pointIndex] ?? null;
@@ -151,7 +151,7 @@ const dataToPagePx = (
   if (!Number.isFinite(gx) || !Number.isFinite(gy)) return null;
 
   // Add graph container offsets (_size.l/t are margins inside the SVG)
-  const rect = (gd as HTMLElement).getBoundingClientRect();
+  const rect = gd.getBoundingClientRect();
 
   return { x: rect.left + fl._size.l + gx, y: rect.top + fl._size.t + gy };
 };
@@ -165,14 +165,14 @@ const pickNearestElementAnchor = (
   e: PlotMouseEvent,
   candidates: { pt: ClickPoint; el: Element; rect: DOMRect }[],
 ): ElementAnchor | null => {
-  const { clientX, clientY } = e.event as MouseEvent;
+  const { clientX, clientY } = e.event;
   if (!candidates.length) return null;
   const inside = candidates.find(
     ({ rect }) => clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom,
   );
 
   const candidatesWithDistances = candidates.map((candidate) => {
-    const rect = candidate.rect as DOMRect;
+    const rect = candidate.rect;
     const d = distToRect(rect, { x: clientX, y: clientY });
 
     return { d, candidate };
@@ -202,10 +202,10 @@ const makeElementAnchor = (
 ): ElementAnchor | null => {
   const getEl =
     chartType === 'bar'
-      ? createBarElementGetter(gd as PlotlyHTMLElement & { _fullData: Array<any> })
+      ? createBarElementGetter(gd)
       : (graphDiv: HTMLElement, pt: ClickPoint, targetEl: Element) => getPieSliceElement(graphDiv, pt, targetEl);
-  const graphDiv = gd as unknown as HTMLElement;
-  const targetEl = (e.event?.target as Element) || graphDiv;
+  const graphDiv = gd;
+  const targetEl = (e.event?.target as Element) ?? graphDiv;
   const candidates = e.points
     .map((pt: ClickPoint) => {
       const el = getEl(graphDiv, pt, targetEl);
@@ -291,32 +291,22 @@ const getScatterLineElements = (gd: PlotlyHTMLElement, click: Px, pt: ClickPoint
 };
 
 /** ---------- sankey anchor ---------- */
-const isSankeyLinkPoint = (pt: ClickPoint): boolean => {
-  const p = pt as unknown as { source?: unknown; target?: unknown };
+type SankeyClickPoint = ClickPoint & { source?: Array<unknown>; target?: Array<unknown>; index?: number };
+const isSankeyLinkPoint = (pt: SankeyClickPoint): boolean => !Array.isArray(pt?.source) && !Array.isArray(pt?.target);
 
-  return (
-    !!p.source &&
-    !!p.target &&
-    typeof p.source === 'object' &&
-    typeof p.target === 'object' &&
-    !Array.isArray(p.source) &&
-    !Array.isArray(p.target)
-  );
-};
-
-const getSankeyAnchorElement = (gd: HTMLElement, pt: ClickPoint): Element | null => {
-  const idx = (pt as unknown as { index?: number; pointNumber?: number }).index ?? (pt as ClickPoint).pointNumber;
+const getSankeyAnchorElement = (gd: HTMLElement, pt: SankeyClickPoint): Element | null => {
+  const idx = pt.index ?? pt.pointNumber;
 
   if (typeof idx !== 'number') return null;
 
   const selector = isSankeyLinkPoint(pt) ? '.sankey-link' : '.sankey-node';
   const elements = gd.querySelectorAll(selector);
 
-  return (elements[idx] as Element | undefined) ?? null;
+  return elements[idx] ?? null;
 };
 
 const sankeyAnchorKey = (anchor: ElementAnchor): string => {
-  const pt = anchor.pt as unknown as { pointNumber?: number; index?: number; source?: unknown; target?: unknown };
+  const pt: SankeyClickPoint = anchor.pt;
   const isLink = isSankeyLinkPoint(anchor.pt);
   const idx = pt.pointNumber ?? pt.index ?? 0;
 
@@ -324,7 +314,7 @@ const sankeyAnchorKey = (anchor: ElementAnchor): string => {
 };
 
 const makeSankeyAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): ElementAnchor | null => {
-  const graphDiv = gd as unknown as HTMLElement;
+  const graphDiv = gd;
   const pt = e.points?.[0] as ClickPoint | undefined;
 
   if (!pt) return null;
@@ -338,7 +328,7 @@ const makeScatterAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): Anchor | n
   const graphDiv = gd;
   const markerCandidates = e.points
     .map((pt: ClickPoint) => {
-      const el = getScatterMarkerElement(graphDiv, pt as ClickPoint);
+      const el = getScatterMarkerElement(graphDiv, pt);
 
       return el ? { pt, el, rect: el.getBoundingClientRect() } : null;
     })
@@ -346,7 +336,7 @@ const makeScatterAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): Anchor | n
 
   const bestMarker = pickNearestElementAnchor(e, markerCandidates);
   if (bestMarker) return bestMarker;
-  const { clientX, clientY } = e.event as MouseEvent;
+  const { clientX, clientY } = e.event;
   const click: Px = { x: clientX, y: clientY };
   const lineCandidates = e.points
     .flatMap((pt: ClickPoint) => getScatterLineElements(graphDiv, click, pt))
@@ -373,7 +363,7 @@ const makeScatterAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): Anchor | n
   return { rel, el, pt, pointsInRadius };
 };
 
-type ChartType = 'bar' | 'scatter' | 'pie' | 'heatmap' | typeof SANKEY_VISUALIZATION_TYPE;
+type ChartType = 'bar' | 'scatter' | 'pie' | 'heatmap' | 'sankey';
 
 const popoverComponent = (chartType: ChartType) => {
   switch (chartType) {
@@ -417,8 +407,7 @@ const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetCo
   const onChartClick = (_: OnClickMarkerEvent, e: PlotMouseEvent) => {
     const targetEl = e.event?.target;
     const targetElForClosest = targetEl instanceof Element ? targetEl : null;
-    const gd =
-      gdRef.current ?? (targetElForClosest?.closest('.js-plotly-plot') as PlotlyHTMLElement | null);
+    const gd = gdRef.current ?? targetElForClosest?.closest('.js-plotly-plot');
     if (!gd) return;
     let a: Anchor | null;
     if (chartType === 'scatter') a = makeScatterAnchor(e, gd);
