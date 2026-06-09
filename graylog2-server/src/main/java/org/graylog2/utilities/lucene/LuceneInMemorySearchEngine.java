@@ -27,8 +27,6 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
-import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
-import org.apache.lucene.queryparser.flexible.standard.config.PointsConfig;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
@@ -41,15 +39,10 @@ import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.text.NumberFormat;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -91,7 +84,7 @@ public class LuceneInMemorySearchEngine<U extends InMemorySearchableEntity> impl
                 TopDocs results = searcher.search(luceneQuery, end, sort); // fetch enough docs
                 final List<U> searchResults = extractSearchResults(results, searcher, start, perPage, entries);
 
-                final int totalCount = Math.toIntExact(results.totalHits.value);
+                final int totalCount = Math.toIntExact(results.totalHits.value());
                 return new PaginatedList<>(searchResults, totalCount, page, perPage);
             }
         }
