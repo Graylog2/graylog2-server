@@ -47,6 +47,7 @@ import org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory;
 import org.graylog2.shared.messageq.Acknowledgeable;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +67,7 @@ import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -547,10 +549,30 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         addTimestampField(FIELD_GL2_ORIGINAL_TIMESTAMP, oldTimeStamp);
     }
 
+    /**
+     * Additional formatters used to leniently parse a timestamp that was assigned as a string during processing
+     * (e.g. by the {@code set_fields} pipeline function or an extractor). {@link DateTimeConverter} only accepts the
+     * internal Graylog format ({@code yyyy-MM-dd HH:mm:ss.SSS}) for strings, so we fall back to these before treating
+     * the value as a genuine error. All of these require a complete date and time, so partial values (e.g. a bare
+     * year like "1234") are still rejected. See https://github.com/Graylog2/graylog2-server/issues/26025
+     */
+    private static final List<DateTimeFormatter> LENIENT_TIMESTAMP_FORMATTERS = List.of(
+            Tools.ES_DATE_FORMAT_NO_MS_FORMATTER,   // yyyy-MM-dd HH:mm:ss
+            Tools.ISO_DATE_FORMAT_FORMATTER,        // ISO-8601 with milliseconds and offset, e.g. ...T08:57:55.123Z
+            Tools.ISO_DATE_FORMAT_NO_MS_FORMATTER); // ISO-8601 without milliseconds, e.g. ...T08:57:55+0200
+
     private DateTime convertToDateTime(@Nonnull Object value) {
         try {
             return DateTimeConverter.convertToDateTime(value);
         } catch (IllegalArgumentException e) {
+            // A string timestamp in a valid but non-Graylog format (e.g. ISO-8601 from a firewall) is not a
+            // processing failure - try to parse it leniently before recording an error and forcing the current time.
+            if (value instanceof String) {
+                final Optional<DateTime> leniently = parseTimestampLeniently((String) value);
+                if (leniently.isPresent()) {
+                    return leniently.get();
+                }
+            }
             final String error = "Invalid value for field timestamp in message <" + getId() + ">, forcing to current time.";
             LOG.trace("{}: {}", error, e);
             addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException,
@@ -558,6 +580,17 @@ public class Message implements Messages, Indexable, Acknowledgeable {
                     , "Value <" + value + "> caused exception: " + ExceptionUtils.getRootCauseMessage(e)));
             return Tools.nowUTC();
         }
+    }
+
+    private static Optional<DateTime> parseTimestampLeniently(String value) {
+        for (final DateTimeFormatter formatter : LENIENT_TIMESTAMP_FORMATTERS) {
+            try {
+                return Optional.of(formatter.parseDateTime(value));
+            } catch (IllegalArgumentException ignored) {
+                // try the next formatter
+            }
+        }
+        return Optional.empty();
     }
 
     private DateTime fallbackForNullTimestamp() {
