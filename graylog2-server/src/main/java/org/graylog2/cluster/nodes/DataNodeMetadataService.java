@@ -25,4 +25,6 @@ public interface DataNodeMetadataService {
     void setLatestAvailableOpensearchVersion(String nodeId, String version);
 
     Optional<DataNodeMetadata> findByNodeId(String nodeId);
+
+    OpensearchVersionsOverview getVersionsOverview();
 }
