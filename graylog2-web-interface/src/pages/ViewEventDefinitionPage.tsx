@@ -53,7 +53,6 @@ const ViewEventDefinitionPage = () => {
   const sendTelemetry = useSendTelemetry();
   const navigate = useNavigate();
   const [showSigmaModal, setShowSigmaModal] = useState(false);
-  const [refetch, setRefetch] = useState(true);
   const detailSections = useEventDefinitionDetailSections();
 
   const pluggableSigmaModal = usePluginEntities('eventDefinitions.components.editSigmaModal').find(
