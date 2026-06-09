@@ -41,6 +41,7 @@ const preferencesFromJSON = (preferences: TableLayoutPreferencesJSON): TableLayo
           sliceColumn: slicing.slice_column,
           sortBy: slicing.sort_by,
           order: slicing.order,
+          ...(slicing.read_only !== undefined ? { readOnly: slicing.read_only } : {}),
         }
       : null;
   }

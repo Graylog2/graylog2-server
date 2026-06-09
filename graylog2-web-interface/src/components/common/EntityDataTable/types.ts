@@ -71,12 +71,14 @@ export type SlicingPreferences = {
   sliceColumn: string;
   sortBy: string;
   order: 'asc' | 'desc';
+  readOnly?: boolean;
 };
 
 export type SlicingPreferencesJSON = {
   slice_column: string;
   sort_by: string;
   order: 'asc' | 'desc';
+  read_only?: boolean;
 };
 
 export type TableLayoutPreferences<T = { [key: string]: unknown }> = {

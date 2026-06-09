@@ -52,6 +52,7 @@ type Props = {
   sliceCol: string | undefined;
   columnSchemas: Array<ColumnSchema>;
   onChangeSlicing: (sliceCol: string | undefined, slice?: string | undefined) => void;
+  isSlicingReadOnly: boolean;
 };
 
 const SliceHeaderControls = ({
@@ -61,6 +62,7 @@ const SliceHeaderControls = ({
   sliceCol,
   columnSchemas,
   onChangeSlicing,
+  isSlicingReadOnly,
 }: Props) => {
   const { isPermitted } = usePermissions();
   const sliceableColumns = columnSchemas
@@ -86,7 +88,7 @@ const SliceHeaderControls = ({
 
   return (
     <SliceHeader>
-      <DropdownButton bsSize="small" title={activeColumnTitle ?? 'Slice by'}>
+      <DropdownButton bsSize="small" title={activeColumnTitle ?? 'Slice by'} disabled={isSlicingReadOnly}>
         <MenuItem header>Slice by</MenuItem>
         {sliceableColumns.map((schema) => (
           <MenuItem key={schema.id} onClick={() => onSliceColumn(schema.id)}>
@@ -100,7 +102,7 @@ const SliceHeaderControls = ({
             Unselect slice
           </Button>
         )}
-        <IconButton name="close" title="No slicing" onClick={onRemoveSlicing} />
+        <IconButton disabled={isSlicingReadOnly} name="close" title="No slicing" onClick={onRemoveSlicing} />
       </HeaderActions>
     </SliceHeader>
   );
