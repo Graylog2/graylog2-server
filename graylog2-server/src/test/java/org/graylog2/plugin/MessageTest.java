@@ -802,7 +802,7 @@ public class MessageTest {
             assertThat(e).hasSize(1);
             assertThat(e.get(0).getCause()).isEqualTo(ProcessingFailureCause.InvalidTimestampException);
             assertThat(e.get(0).getMessage()).startsWith("Replaced invalid timestamp value in message <");
-            assertThat(e.get(0).getDetails()).startsWith("Value <1234> caused exception: Invalid format: \"1234\" is too short");
+            assertThat(e.get(0).getDetails()).startsWith("Value <1234> caused exception: Unsupported timestamp string format: <1234>");
         });
     }
 
