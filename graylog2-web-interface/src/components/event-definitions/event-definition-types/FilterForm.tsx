@@ -61,8 +61,9 @@ import type { EventDefinitionValidation } from 'components/event-definitions/typ
 import type { QueryString } from 'views/logic/queries/types';
 import type { StreamsAndCategoriesSelection } from 'views/components/common/StreamsAndCategoriesFilter';
 import StreamsAndCategoriesFilter from 'views/components/common/StreamsAndCategoriesFilter';
-import WarmTierQueryValidation from 'views/components/searchbar/queryvalidation/WarmTierQueryValidation';
+import ViewsQueryInput from 'views/components/searchbar/ViewsQueryInput';
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
+import WarmTierQueryValidation from 'views/components/searchbar/queryvalidation/WarmTierQueryValidation';
 
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
@@ -375,12 +376,13 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
   );
 
   const handleQueryChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const { name } = event.target;
-      const value = FormsUtils.getValueFromInput(event.target);
+    (event: { target: { value: string; name: string } }): Promise<string> => {
+      const { name, value } = event.target;
       const newConfig = getUpdatedConfig(name as EventDefinitionConfigKeys, value);
       handleConfigChange(name, newConfig);
-      debouncedParseQuery(value as string, newConfig);
+      debouncedParseQuery(value, newConfig);
+
+      return Promise.resolve(value);
     },
     [debouncedParseQuery, getUpdatedConfig, handleConfigChange],
   );
@@ -524,21 +526,22 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
       {onlyFilters || (
         <FormGroup controlId="query-string">
           <ControlLabel>Search Query</ControlLabel>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <div style={{ flex: 1 }}>
-              <Input
-                id="filter-query"
-                name="query"
-                type="textarea"
-                value={currentConfig.query ?? ''}
-                onChange={handleQueryChange}
-              />
-            </div>
-
-            <Formik initialValues={{ queryString: currentConfig.query ?? '' }} onSubmit={() => {}}>
-              <QueryValidation validationExplanations={[WarmTierQueryValidation]} />
-            </Formik>
-          </div>
+          <ViewsQueryInput
+            inputId="filter-query"
+            name="query"
+            value={currentConfig.query ?? ''}
+            onChange={handleQueryChange}
+            isValidating={false}
+            validate={() => Promise.resolve({})}
+            onExecute={() => {}}
+            streams={eventDefinition.config.streams}
+            timeRange={toTimeRange(eventDefinition.config.search_within_ms)}
+            error={validationState?.status === 'ERROR' ? validationState : undefined}
+            warning={validationState?.status === 'WARNING' ? validationState : undefined}
+          />
+          <Formik initialValues={{ queryString: currentConfig.query ?? '' }} onSubmit={() => {}}>
+            <QueryValidation validationExplanations={[WarmTierQueryValidation]} />
+          </Formik>
           <HelpBlock>
             Search query that Messages should match. You can use the same syntax as in the Search page, including
             declaring Query Parameters from Lookup Tables by using the <code>$newParameter$</code> syntax.
