@@ -436,6 +436,7 @@ const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetCo
     <OnClickPopoverWrapper
       isPopoverOpen={isPopoverOpen}
       onPopoverChange={onPopoverChange}
+      // eslint-disable-next-line react-hooks/refs
       ref={refs.setFloating}
       style={floatingStyles}>
       {chartType === SANKEY_VISUALIZATION_TYPE && anchor ? (
