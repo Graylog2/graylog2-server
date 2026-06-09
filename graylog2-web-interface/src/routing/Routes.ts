@@ -68,6 +68,10 @@ const Routes = {
       edit: (definitionId: string) => `/alerts/definitions/${definitionId}/edit`,
       show: (definitionId: string) => `/alerts/definitions/${definitionId}`,
       replay_search: (definitionId: string) => `/alerts/definitions/${definitionId}/replay-search`,
+      SIGMA: {
+        GIT_IMPORT: '/alerts/definitions/sigma/git-import',
+        FILE_IMPORT: '/alerts/definitions/sigma/file-import',
+      },
     },
     NOTIFICATIONS: {
       LIST: '/alerts/notifications',

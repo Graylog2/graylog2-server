@@ -21,22 +21,32 @@ import com.github.zafarkhaja.semver.ParseException;
 import com.github.zafarkhaja.semver.Version;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import jakarta.validation.constraints.NotNull;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Singleton
 public class OutdatedIndexService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(OutdatedIndexService.class);
+
     private final Indices indices;
+    private final IndicesAdapter indicesAdapter;
     private final IndexSetRegistry indexSetRegistry;
     private final Cluster cluster;
 
     @Inject
-    public OutdatedIndexService(Indices indices, IndexSetRegistry indexSetRegistry, Cluster cluster) {
+    public OutdatedIndexService(Indices indices, IndicesAdapter indicesAdapter, IndexSetRegistry indexSetRegistry, Cluster cluster) {
         this.indices = indices;
+        this.indicesAdapter = indicesAdapter;
         this.indexSetRegistry = indexSetRegistry;
         this.cluster = cluster;
     }
@@ -55,4 +65,76 @@ public class OutdatedIndexService {
                 .sorted().toList();
     }
 
+    public void reindex(String index, boolean withReplicas) {
+        HealthStatus sourceStatus = indices.waitForRecovery(index, 2);
+        if (sourceStatus != HealthStatus.Green) {
+            throw new IllegalStateException("Index " + index + " state is not healthy: " + sourceStatus);
+        }
+        // get settings & mapping of source index
+        Map<String, Object> sourceSettings = indices.indexSettings(index);
+        Map<String, Object> sourceMapping = indices.indexMapping(index);
+        if (sourceSettings == null) {
+            throw new IllegalStateException("No index sourceSettings found for index " + index);
+        }
+        // clean index settings for creation
+        Map<String, Object> tempSettings = cleanIndexSettings(sourceSettings, withReplicas);
+        String tempIndex = ".gltmp_" + index.replaceAll("\\.", "");
+        try {
+            // create and reindex into temp index
+            if (indicesAdapter.exists(tempIndex)) {
+                LOG.warn("Temporary index for reindexing already exists, deleting it: {}", tempIndex);
+                indicesAdapter.delete(tempIndex);
+            }
+            indicesAdapter.create(tempIndex, new IndexSettings(tempSettings), sourceMapping);
+            HealthStatus tempStatus = indices.waitForRecovery(tempIndex);
+            if (tempStatus != HealthStatus.Green) {
+                throw new IllegalStateException("Temporary index " + tempIndex + " could not be created successfully: " + tempStatus);
+            }
+            indices.reindex(index, tempIndex);
+            // delete source index
+            indices.refresh(tempIndex);
+            indices.delete(index);
+            // recreate and reindex into source index
+            indicesAdapter.create(index, new IndexSettings(cleanIndexSettings(sourceSettings, true)), sourceMapping);
+            // TODO: Benchmark if creating the target index with replicas 0 and reindexing and setting replicas afterwards is better
+            //  (would need an additional health check before deleting temp)
+            HealthStatus targetStatus = indices.waitForRecovery(index);
+            if (targetStatus != HealthStatus.Green) {
+                throw new IllegalStateException("Index " + index + " could not be recreated successfully: " + targetStatus);
+            }
+            indices.reindex(tempIndex, index);
+            indices.refresh(index);
+            // delete temp index
+            indices.delete(tempIndex);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    private Map<String, Object> cleanIndexSettings(Map<String, Object> settings, boolean withReplicas) {
+        // Keys to remove from the nested 'index' map
+        final List<String> keysToRemove = List.of("uuid", "version", "creation_date", "provided_name");
+        HashMap<String, Object> cleaned = new HashMap<>();
+        for (Map.Entry<String, Object> entry : settings.entrySet()) {
+            if (!"index".equals(entry.getKey())) {
+                cleaned.put(entry.getKey(), entry.getValue());
+            } else if (entry.getValue() instanceof Map) {
+                //noinspection unchecked
+                Map<String, Object> indexMap = new HashMap<>((Map<String, Object>) entry.getValue());
+                keysToRemove.forEach(indexMap.keySet()::remove);
+                if (!withReplicas) {
+                    indexMap.put("number_of_replicas", 0);
+                }
+                cleaned.put("index", indexMap);
+            } else {
+                throw new IllegalStateException("Settings key " + entry.getKey() + " is not a Map");
+            }
+        }
+        return cleaned;
+    }
+
+    public void delete(@NotNull String index) {
+        indicesAdapter.delete(index);
+    }
 }
