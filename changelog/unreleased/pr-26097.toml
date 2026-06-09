@@ -1,0 +1,5 @@
+type = "a"
+message = "Data node's OpenSearch upgrade UI"
+
+issues = ["Graylog2/graylog-plugin-enterprise#14262"]
+pulls = ["26097"]
