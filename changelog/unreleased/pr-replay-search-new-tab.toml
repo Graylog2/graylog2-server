@@ -1,0 +1,2 @@
+type = "f"
+message = "Replaying a dashboard widget again opens the replayed search in a new browser tab, keeping the dashboard open."
