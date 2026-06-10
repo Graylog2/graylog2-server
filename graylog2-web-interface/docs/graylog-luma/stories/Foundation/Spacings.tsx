@@ -17,14 +17,7 @@
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
 
-import {
-  COL_WIDTH_SIZE,
-  COL_WIDTH_VARIABLE,
-  FoundationTable,
-  PxLabel,
-  StoryContainer,
-  Token,
-} from './shared';
+import { COL_WIDTH_SIZE, COL_WIDTH_VARIABLE, FoundationTable, PxLabel, StoryContainer, Token } from './shared';
 
 // ─── Spacings ──────────────────────────────────────────────────────────────
 
