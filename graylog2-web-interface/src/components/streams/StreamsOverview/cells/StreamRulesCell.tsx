@@ -15,12 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useRef, useCallback } from 'react';
 import * as React from 'react';
+import { useRef, useCallback } from 'react';
 
-import StreamCountBadge from 'components/streams/StreamCountBadge';
 import type { Stream } from 'stores/streams/StreamsStore';
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
+import { CountBadge } from 'components/common';
 
 type Props = {
   stream: Stream;
@@ -36,16 +36,22 @@ const StreamRulesCell = ({ stream }: Props) => {
     return null;
   }
 
+  const streamRulesCount = stream.rules.length;
+  if (streamRulesCount === 0) {
+    return null;
+  }
+
   const streamRulesSectionIsOpen = expandedSections?.[stream.id]?.includes('rules');
+  const streamRulesSectionTitle = `${streamRulesSectionIsOpen ? 'Hide' : 'Show'} stream rules`;
 
   return (
-    <StreamCountBadge
-      disabled={stream.rules.length === 0}
+    <CountBadge
+      count={streamRulesCount}
+      iconName={streamRulesSectionIsOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
       onClick={toggleRulesSection}
       ref={buttonRef}
-      title={`${streamRulesSectionIsOpen ? 'Hide' : 'Show'} stream rules`}>
-      {stream.rules.length}
-    </StreamCountBadge>
+      title={streamRulesSectionTitle}
+    />
   );
 };
 

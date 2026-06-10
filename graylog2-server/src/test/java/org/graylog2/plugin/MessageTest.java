@@ -26,19 +26,20 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.graylog.failure.FailureCause;
 import org.graylog.failure.ProcessingFailureCause;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -59,21 +60,26 @@ import java.util.regex.Pattern;
 import static com.google.common.collect.Sets.symmetricDifference;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_COLLECTOR_FLEET_ID;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_COLLECTOR_INSTANCE_UID;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_COLLECTOR_RECEIVER_TYPE;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_ID;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_CATEGORY;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class MessageTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     private Message message;
@@ -81,7 +87,7 @@ public class MessageTest {
     private MetricRegistry metricRegistry;
     private Meter invalidTimestampMeter;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         DateTimeUtils.setCurrentMillisFixed(1524139200000L);
 
@@ -92,7 +98,7 @@ public class MessageTest {
 
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         DateTimeUtils.setCurrentMillisSystem();
     }
@@ -196,10 +202,12 @@ public class MessageTest {
         assertEquals(Lists.newArrayList("hello"), message.getFieldAs(List.class, "fields"));
     }
 
-    @Test(expected = ClassCastException.class)
+    @Test
     public void testGetFieldAsWithIncompatibleCast() throws Exception {
-        message.addField("fields", Lists.newArrayList("hello"));
-        message.getFieldAs(Map.class, "fields");
+        assertThrows(ClassCastException.class, () -> {
+            message.addField("fields", Lists.newArrayList("hello"));
+            message.getFieldAs(Map.class, "fields");
+        });
     }
 
     @Test
@@ -320,8 +328,8 @@ public class MessageTest {
         final Map<String, Object> elasticSearchObject = message.toElasticSearchObject(objectMapper, invalidTimestampMeter);
         final Object esTimestampFormatted = elasticSearchObject.get(Message.FIELD_TIMESTAMP);
 
-        assertEquals("Setting message timestamp as java.util.Date results in correct format for elasticsearch",
-                Tools.buildElasticSearchTimeFormat(dateTime), esTimestampFormatted);
+        assertEquals(Tools.buildElasticSearchTimeFormat(dateTime),
+                esTimestampFormatted, "Setting message timestamp as java.util.Date results in correct format for elasticsearch");
     }
 
     @Test
@@ -417,8 +425,8 @@ public class MessageTest {
         final Map<String, Object> object = message.toElasticSearchObject(objectMapper, invalidTimestampMeter);
 
         // Elasticsearch >=2.0 does not allow "." in keys. Make sure we replace them before writing the message.
-        assertEquals("#toElasticsearchObject() should replace \".\" in keys with a \"_\"",
-                "dot", object.get("field_3"));
+        assertEquals("dot",
+                object.get("field_3"), "#toElasticsearchObject() should replace \".\" in keys with a \"_\"");
 
         assertEquals("foo", object.get("message"));
         assertEquals("bar", object.get("source"));
@@ -464,6 +472,24 @@ public class MessageTest {
     }
 
     @Test
+    public void toElasticsearchObjectAddsInputMessageSize() {
+        final long inputMessageSize = 12345L;
+        message.addField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, inputMessageSize);
+        final Map<String, Object> esObject = message.toElasticSearchObject(objectMapper, invalidTimestampMeter);
+        assertThat(esObject.get(Message.FIELD_GL2_INPUT_MESSAGE_SIZE)).isEqualTo(inputMessageSize);
+    }
+
+    @Test
+    public void inputMessageSizeDoesNotAffectAccountedMessageSize() {
+        final Message message = new Message("message", "source", Tools.nowUTC());
+        final long sizeBeforeInputField = message.getSize();
+
+        message.addField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, 12345L);
+
+        assertThat(message.getSize()).isEqualTo(sizeBeforeInputField);
+    }
+
+    @Test
     public void messageSizes() {
         final Message message = new Message("1234567890", "12345", Tools.nowUTC());
         assertThat(message.getSize()).isEqualTo(45);
@@ -486,6 +512,23 @@ public class MessageTest {
         assertThat(message.getSize()).isEqualTo(45);
 
         // this field should increase message size
+        message.addField("http_url", "https//www.wikipedia.org");
+        assertThat(message.getSize()).isEqualTo(77);
+    }
+
+    @Test
+    public void testMessageSizeIgnoresCollectorFields() {
+        final Message message = new Message("1234567890", "12345", Tools.nowUTC());
+        assertThat(message.getSize()).isEqualTo(45);
+
+        // None of the collector metadata fields should contribute to the overall message size.
+        message.addField(FIELD_COLLECTOR_RECEIVER_TYPE, "filelog");
+        message.addField(FIELD_COLLECTOR_INSTANCE_UID, "uid-42");
+        message.addField(FIELD_COLLECTOR_SOURCE_ID, "source-abc");
+        message.addField(FIELD_COLLECTOR_FLEET_ID, "fleet-xyz");
+        assertThat(message.getSize()).isEqualTo(45);
+
+        // A non-excluded field should still increase the size.
         message.addField("http_url", "https//www.wikipedia.org");
         assertThat(message.getSize()).isEqualTo(77);
     }
@@ -518,27 +561,31 @@ public class MessageTest {
         assertEquals(message.getField("timestamp"), fields.get("timestamp"));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void testGetFieldsReturnsImmutableMap() throws Exception {
-        final Map<String, Object> fields = message.getFields();
+        assertThrows(UnsupportedOperationException.class, () -> {
+            final Map<String, Object> fields = message.getFields();
 
-        fields.put("foo", "bar");
+            fields.put("foo", "bar");
+        });
     }
 
     @Test
     public void testGetFieldNames() throws Exception {
-        assertTrue("Missing fields in set!", symmetricDifference(message.getFieldNames(), Sets.newHashSet("_id", "timestamp", "source", "message")).isEmpty());
+        assertTrue(symmetricDifference(message.getFieldNames(), Sets.newHashSet("_id", "timestamp", "source", "message")).isEmpty(), "Missing fields in set!");
 
         message.addField("testfield", "testvalue");
 
-        assertTrue("Missing fields in set!", symmetricDifference(message.getFieldNames(), Sets.newHashSet("_id", "timestamp", "source", "message", "testfield")).isEmpty());
+        assertTrue(symmetricDifference(message.getFieldNames(), Sets.newHashSet("_id", "timestamp", "source", "message", "testfield")).isEmpty(), "Missing fields in set!");
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void testGetFieldNamesReturnsUnmodifiableSet() throws Exception {
-        final Set<String> fieldNames = message.getFieldNames();
+        assertThrows(UnsupportedOperationException.class, () -> {
+            final Set<String> fieldNames = message.getFieldNames();
 
-        fieldNames.remove("_id");
+            fieldNames.remove("_id");
+        });
     }
 
     @Test
@@ -755,7 +802,7 @@ public class MessageTest {
             assertThat(e).hasSize(1);
             assertThat(e.get(0).getCause()).isEqualTo(ProcessingFailureCause.InvalidTimestampException);
             assertThat(e.get(0).getMessage()).startsWith("Replaced invalid timestamp value in message <");
-            assertThat(e.get(0).getDetails()).startsWith("Value <1234> caused exception: Invalid format: \"1234\" is too short");
+            assertThat(e.get(0).getDetails()).startsWith("Value <1234> caused exception: Unsupported timestamp string format: <1234>");
         });
     }
 
@@ -796,6 +843,55 @@ public class MessageTest {
         assertThat(message.getTimestamp()).isEqualTo(expectedLocalDateEquivalent);
 
         assertThat(message.processingErrors()).isEmpty();
+    }
+
+    @Test
+    public void assignIsoStringWithOffsetAsTimestamp() {
+        // Reproduces https://github.com/Graylog2/graylog2-server/issues/26025: a pipeline rule (set_fields with
+        // key_value) assigns a string timestamp in ISO-8601 format with a numeric offset. This must be parsed
+        // leniently and must not record a processing error.
+        final Message message = new Message("message", "source", Tools.nowUTC());
+        message.addField(Message.FIELD_TIMESTAMP, "2026-05-18T08:57:55+0200");
+
+        // +0200 means the instant is 06:57:55 UTC
+        assertThat(message.getTimestamp()).isEqualTo(new DateTime(2026, 5, 18, 6, 57, 55, DateTimeZone.UTC));
+        assertThat(message.processingErrors()).isEmpty();
+    }
+
+    @Test
+    public void assignIsoStringInUtcAsTimestamp() {
+        final Message message = new Message("message", "source", Tools.nowUTC());
+        message.addField(Message.FIELD_TIMESTAMP, "2026-05-18T08:57:55.123Z");
+
+        assertThat(message.getTimestamp()).isEqualTo(new DateTime(2026, 5, 18, 8, 57, 55, 123, DateTimeZone.UTC));
+        assertThat(message.processingErrors()).isEmpty();
+    }
+
+    @Test
+    public void assignEsFormatStringWithoutMillisAsTimestamp() {
+        final Message message = new Message("message", "source", Tools.nowUTC());
+        message.addField(Message.FIELD_TIMESTAMP, "2026-05-18 08:57:55");
+
+        assertThat(message.getTimestamp()).isEqualTo(new DateTime(2026, 5, 18, 8, 57, 55, DateTimeZone.UTC));
+        assertThat(message.processingErrors()).isEmpty();
+    }
+
+    @Test
+    public void assignUnparseableStringStillRecordsProcessingError() {
+        // Do not use fixed time from setUp() in this test
+        DateTimeUtils.setCurrentMillisSystem();
+
+        final Message message = new Message("message", "source", Tools.nowUTC().minusMinutes(2));
+        final DateTime previousTimestamp = message.getTimestamp();
+
+        message.addField(Message.FIELD_TIMESTAMP, "not-a-timestamp");
+
+        // genuinely invalid value still falls back to the current time and records an error
+        assertThat(message.getTimestamp()).isNotEqualTo(previousTimestamp);
+        assertThat(message.processingErrors()).satisfies(e -> {
+            assertThat(e).hasSize(1);
+            assertThat(e.get(0).getCause()).isEqualTo(ProcessingFailureCause.InvalidTimestampException);
+        });
     }
 
     // Arguably, a message should not allow null values for basic fields, but it is what it is. Here we are checking

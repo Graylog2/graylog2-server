@@ -1,10 +1,11 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`ViewTransformer transform with all attributes should transform a view with search from a json fixture 1`] = `
 {
   "_value": {
     "createdAt": 2019-10-14T07:58:06.562Z,
     "description": "",
+    "entitySource": undefined,
     "favorite": undefined,
     "id": Any<String>,
     "lastUpdatedAt": undefined,

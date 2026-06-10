@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { Permission } from 'graylog-web-plugin/plugin';
 
-// eslint-disable-next-line import/prefer-default-export
 export const View = {
-  Edit: (id: string) => `view:edit:${id}`,
+  Edit: (id: string): Permission => `view:edit:${id}`,
 } as const;

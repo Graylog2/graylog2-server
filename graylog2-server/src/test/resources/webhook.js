@@ -1,5 +1,15 @@
 const http = require('http');
 
+process.on('SIGTERM', () => {
+  console.log('SIGTERM signal received.');
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT signal received.');
+  process.exit(0);
+});
+
 let requests = [];
 
 http.createServer(function (req, res) {
@@ -12,7 +22,7 @@ http.createServer(function (req, res) {
     bodyChunks.push(chunk);
   }).on('end', () => {
     requests.push(
-      { method, url, timestamp, headers, body: Buffer.concat(bodyChunks).toString()},
+      { method, url, timestamp, headers, body: Buffer.concat(bodyChunks).toString() },
     );
   });
 

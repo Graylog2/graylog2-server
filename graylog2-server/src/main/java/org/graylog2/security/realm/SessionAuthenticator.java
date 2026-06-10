@@ -16,17 +16,18 @@
  */
 package org.graylog2.security.realm;
 
+import jakarta.inject.Inject;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAccount;
-import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.rest.models.system.sessions.SessionUtils;
 import org.graylog2.security.headerauth.HTTPHeaderAuthConfig;
 import org.graylog2.shared.security.SessionIdToken;
 import org.graylog2.shared.security.ShiroRequestHeadersBinder;
@@ -34,24 +35,29 @@ import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
 import java.util.Optional;
 
 public class SessionAuthenticator extends AuthenticatingRealm {
     private static final Logger LOG = LoggerFactory.getLogger(SessionAuthenticator.class);
     public static final String NAME = "mongodb-session";
     public static final String X_GRAYLOG_NO_SESSION_EXTENSION = "X-Graylog-No-Session-Extension";
+    private static final Duration TOUCH_INTERVAL = Duration.ofMinutes(1);
 
     private final UserService userService;
     private final ClusterConfigService clusterConfigService;
+    private final Clock clock;
 
     @Inject
-    SessionAuthenticator(UserService userService, ClusterConfigService clusterConfigService) {
+    SessionAuthenticator(UserService userService, ClusterConfigService clusterConfigService, Clock clock) {
         this.userService = userService;
         this.clusterConfigService = clusterConfigService;
+        this.clock = clock;
         // this realm either rejects a session, or allows the associated user implicitly
-        setCredentialsMatcher(new AllowAllCredentialsMatcher());
+        setCredentialsMatcher(new ServiceValidatedCredentialsMatcher());
         setAuthenticationTokenClass(SessionIdToken.class);
         setCachingEnabled(false);
     }
@@ -78,12 +84,13 @@ public class SessionAuthenticator extends AuthenticatingRealm {
             LOG.debug("Found session for userId {}", userId);
         }
 
-        final String sessionUsername = (String) session.getAttribute(HTTPHeaderAuthenticationRealm.SESSION_AUTH_HEADER);
-        if (sessionUsername != null) {
-            final HTTPHeaderAuthConfig httpHeaderConfig = loadHTTPHeaderConfig();
+        // If trusted header authentication is enabled, ensure that the username in the session still matches the
+        // username in the header. If there is a mismatch, the session will be terminated.
+        final HTTPHeaderAuthConfig httpHeaderConfig = loadHTTPHeaderConfig();
+        if (httpHeaderConfig.enabled()) {
+            final String sessionUsername = (String) session.getAttribute(SessionUtils.USERNAME_SESSION_KEY);
             final Optional<String> usernameHeader = ShiroRequestHeadersBinder.getHeaderFromThreadContext(httpHeaderConfig.usernameHeader());
-
-            if (httpHeaderConfig.enabled() && usernameHeader.isPresent() && !usernameHeader.get().equalsIgnoreCase(sessionUsername)) {
+            if (usernameHeader.isPresent() && !usernameHeader.get().equalsIgnoreCase(sessionUsername)) {
                 LOG.warn("Terminating session where user <{}> does not match trusted HTTP header <{}>.", sessionUsername, usernameHeader.get());
                 session.stop();
                 return null;
@@ -93,12 +100,27 @@ public class SessionAuthenticator extends AuthenticatingRealm {
         final Optional<String> noSessionExtension = ShiroRequestHeadersBinder.getHeaderFromThreadContext(X_GRAYLOG_NO_SESSION_EXTENSION);
         if (noSessionExtension.isPresent() && "true".equalsIgnoreCase(noSessionExtension.get())) {
             LOG.debug("Not extending session because the request indicated not to.");
-        } else {
+        } else if (shouldTouch(session)) {
             session.touch();
         }
         ThreadContext.bind(subject);
 
-        return new SimpleAccount(user.getId(), null, "session authenticator");
+        return new SimpleAccount(user.getId(), ServiceValidatedCredentialsMatcher.AUTHENTICATED, "session authenticator");
+    }
+
+    private boolean shouldTouch(Session session) {
+        final Date lastAccessTime = session.getLastAccessTime();
+        if (lastAccessTime == null) {
+            return true;
+        }
+        final var elapsed = Duration.between(lastAccessTime.toInstant(), Instant.now(clock));
+        // A negative elapsed time indicates clock skew between cluster nodes.
+        // Treat that as stale so we touch the session and correct the timestamp to local time.
+        if (elapsed.isNegative()) {
+            LOG.warn("Session last access time is in the future (by {}). This may indicate clock skew between cluster nodes.", elapsed.abs());
+            return true;
+        }
+        return elapsed.compareTo(TOUCH_INTERVAL) >= 0;
     }
 
     private HTTPHeaderAuthConfig loadHTTPHeaderConfig() {

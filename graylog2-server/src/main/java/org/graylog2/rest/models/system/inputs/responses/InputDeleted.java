@@ -20,14 +20,12 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 public abstract class InputDeleted {
 
-    @JsonProperty
+    @JsonProperty("id")
     public abstract String id();
 
     @JsonCreator

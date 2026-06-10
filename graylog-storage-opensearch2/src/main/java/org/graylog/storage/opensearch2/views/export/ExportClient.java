@@ -23,8 +23,8 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRespons
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.core.action.ShardOperationFailedException;
+import org.graylog.storage.function.ThrowingBiFunction;
 import org.graylog.storage.opensearch2.OpenSearchClient;
-import org.graylog.storage.opensearch2.ThrowingBiFunction;
 import org.graylog2.indexer.ElasticsearchException;
 
 import java.io.IOException;
@@ -58,14 +58,6 @@ public class ExportClient {
 
     private ExportException wrapException(Exception e) {
         return new ExportException("Unable to complete export: ", new ElasticsearchException(e));
-    }
-
-    public SearchResponse singleSearch(SearchRequest request, String errorMessage) {
-        try {
-            return this.client.singleSearch(request, errorMessage);
-        } catch (Exception e) {
-            throw wrapException(e);
-        }
     }
 
     public <R> R execute(ThrowingBiFunction<RestHighLevelClient, RequestOptions, R, IOException> fn, String errorMessage) {

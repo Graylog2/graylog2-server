@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer } from 'components/common';
 import type AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import Routes from 'routing/Routes';
 import { ButtonToolbar, Button } from 'components/bootstrap';
@@ -37,7 +37,7 @@ const BackendActionLinks = ({ activeBackend, finishedLoading }: Props) => (
       </Button>
     </LinkContainer>
     <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.CREATE}>
-      <Button bsStyle="success" type="button">
+      <Button bsStyle="primary" type="button">
         Create service
       </Button>
     </LinkContainer>

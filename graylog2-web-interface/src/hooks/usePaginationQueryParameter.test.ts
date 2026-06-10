@@ -15,149 +15,108 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { renderHook, act } from 'wrappedTestingLibrary/hooks';
-import { MemoryRouter as Router } from 'react-router-dom';
-import type { Location } from 'history';
 
-import useLocation from 'routing/useLocation';
+import { useQueryParams } from 'routing/QueryParams';
 import { asMock } from 'helpers/mocking';
 
 import usePaginationQueryParameter, { DEFAULT_PAGE } from './usePaginationQueryParameter';
 
 const DEFAULT_PAGE_SIZES = [10, 50, 100];
-const mockNavigate = jest.fn();
+const setQueryParams = jest.fn();
+let queryParams: { page?: string | number; pageSize?: string | number; filters?: string };
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: () => mockNavigate,
+jest.mock('routing/QueryParams', () => ({
+  ...jest.requireActual('routing/QueryParams'),
+  useQueryParams: jest.fn(),
 }));
 
-jest.mock('routing/useLocation', () => jest.fn(() => ({ pathname: '', search: '' })));
-
-const options = { wrapper: Router };
-
 describe('usePaginationQueryParameter custom hook', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    queryParams = {};
+    asMock(useQueryParams).mockImplementation(() => [queryParams, setQueryParams]);
+  });
+
   it('should use default pagination if there is no <page> query parameter', () => {
-    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES), options);
+    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES));
 
-    const { page } = result.current;
-
-    expect(page).toEqual(DEFAULT_PAGE);
+    expect(result.current.page).toEqual(DEFAULT_PAGE);
   });
 
   it('should use default pageSize if there is no <pageSize> query parameter', () => {
-    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES), options);
+    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES));
 
-    const { pageSize } = result.current;
-
-    expect(pageSize).toEqual(DEFAULT_PAGE_SIZES[0]);
+    expect(result.current.pageSize).toEqual(DEFAULT_PAGE_SIZES[0]);
   });
 
   it('should set <page> query parameter with the value sent in setPagination', () => {
-    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES), options);
+    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES));
 
-    const { page, setPagination } = result.current;
+    act(() => result.current.setPagination({ page: 4 }));
 
-    expect(page).toEqual(DEFAULT_PAGE);
-
-    const nextPage = 4;
-
-    act(() => setPagination({ page: nextPage }));
-
-    expect(mockNavigate).toHaveBeenCalledWith(`?page=${nextPage}&pageSize=10`);
+    expect(setQueryParams).toHaveBeenCalledWith({ page: 4, pageSize: 10 });
   });
 
   it('should set <pageSize> query parameter with the value sent in setPagination and initialize the <page> query parameter', () => {
-    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES), options);
+    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES));
 
-    const { pageSize, setPagination } = result.current;
+    act(() => result.current.setPagination({ pageSize: DEFAULT_PAGE_SIZES[1] }));
 
-    expect(pageSize).toEqual(DEFAULT_PAGE_SIZES[0]);
-
-    const nextPageSize = DEFAULT_PAGE_SIZES[1];
-
-    act(() => setPagination({ pageSize: nextPageSize }));
-
-    expect(mockNavigate).toHaveBeenCalledWith(`?page=${DEFAULT_PAGE}&pageSize=${nextPageSize}`);
+    expect(setQueryParams).toHaveBeenCalledWith({ page: DEFAULT_PAGE, pageSize: DEFAULT_PAGE_SIZES[1] });
   });
 
   it('should get the page value from <page> query parameter', () => {
     const currentPage = 7;
+    queryParams = { page: currentPage };
 
-    asMock(useLocation).mockReturnValue({
-      search: `?page=${currentPage}`,
-    } as Location);
+    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES));
 
-    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES), options);
-
-    const { page } = result.current;
-
-    expect(page).toEqual(currentPage);
+    expect(result.current.page).toEqual(currentPage);
   });
 
   it('should get the pageSize value from <pageSize> query parameter', () => {
     const currentPageSize = DEFAULT_PAGE_SIZES[2];
+    queryParams = { pageSize: currentPageSize };
 
-    asMock(useLocation).mockReturnValue({
-      search: `?pageSize=${currentPageSize}`,
-    } as Location);
+    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES));
 
-    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES), options);
-
-    const { pageSize } = result.current;
-
-    expect(pageSize).toEqual(currentPageSize);
+    expect(result.current.pageSize).toEqual(currentPageSize);
   });
 
   it('should only accept <pageSize> query parameter if the value is in the DEFAULT_PAGE_SIZES', () => {
     const currentPageSize = 999;
+    queryParams = { pageSize: currentPageSize };
 
-    asMock(useLocation).mockReturnValue({
-      search: `?pageSize=${currentPageSize}`,
-    } as Location);
+    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES));
 
-    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES), options);
-
-    const { pageSize } = result.current;
-
-    expect(pageSize).not.toEqual(currentPageSize);
-    expect(pageSize).toEqual(DEFAULT_PAGE_SIZES[0]);
+    expect(result.current.pageSize).toEqual(DEFAULT_PAGE_SIZES[0]);
   });
 
   it('should reset current page', () => {
-    const currentPage = 3;
-    const currentPageSize = 50;
+    queryParams = { page: 3, pageSize: 50 };
+    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES));
 
-    asMock(useLocation).mockReturnValue({
-      search: `?page=${currentPage}&pageSize=${currentPageSize}`,
-      pathname: 'example.org',
-    } as Location);
+    act(() => result.current.resetPage());
 
-    const { result } = renderHook(() => usePaginationQueryParameter());
-
-    expect(result.current.page).toEqual(currentPage);
-    expect(result.current.pageSize).toEqual(currentPageSize);
-
-    result.current.resetPage();
-
-    expect(mockNavigate).toHaveBeenCalledWith(`example.org?page=1&pageSize=${currentPageSize}`);
+    expect(setQueryParams).toHaveBeenCalledWith({ page: DEFAULT_PAGE, pageSize: 50 });
   });
 
   it('should always use provided page size and not update pageSize query param, when syncPageSizeFromQuery is false', () => {
-    const queryParamsPage = 3;
+    queryParams = { page: 3, pageSize: 50 };
     const providedPageSize = 20;
-
-    asMock(useLocation).mockReturnValue({
-      search: `?page=${queryParamsPage}&pageSize=50`,
-      pathname: 'example.org',
-    } as Location);
-
     const { result } = renderHook(() => usePaginationQueryParameter(undefined, providedPageSize, false));
 
-    expect(result.current.page).toEqual(queryParamsPage);
-    expect(result.current.pageSize).toEqual(providedPageSize);
+    act(() => result.current.setPagination({ page: 4, pageSize: 100 }));
 
-    result.current.setPagination({ page: 4, pageSize: 100 });
+    expect(setQueryParams).toHaveBeenCalledWith({ page: 4, pageSize: undefined });
+  });
 
-    expect(mockNavigate).toHaveBeenCalledWith('example.org?page=4');
+  it('should update page without replacing unrelated query params like filters', () => {
+    queryParams = { page: 2, filters: 'owner=local:admin' };
+    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES));
+
+    act(() => result.current.setPagination({ page: 1 }));
+
+    expect(setQueryParams).toHaveBeenCalledWith({ page: 1, pageSize: 10 });
   });
 });

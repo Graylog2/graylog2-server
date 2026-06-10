@@ -25,6 +25,7 @@ import 'moment-duration-format';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { MarkdownPreview } from 'components/common/MarkdownEditor';
 import { Alert, Col, Row } from 'components/bootstrap';
+import { TagList } from 'components/common';
 import { isPermitted } from 'util/PermissionsMixin';
 import usePluginEntities from 'hooks/usePluginEntities';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
@@ -62,6 +63,9 @@ const EventDefinitionSummary = ({
 }: Props) => {
   const [showValidation, setShowValidation] = useState<boolean>(false);
   const pluggableEventProcedureSummary = usePluginEntities('views.components.eventProcedureSummary');
+  const tacticsTechniquesSummaryPlugin = usePluginEntities('eventDefinitions.components.tacticsTechniquesSummary')[0];
+  const tacticsTechniquesSummaryEnabled =
+    tacticsTechniquesSummaryPlugin?.useCondition?.() ?? !!tacticsTechniquesSummaryPlugin;
   const {
     data: { valid: validSecurityLicense },
   } = usePluggableLicenseCheck('/license/security');
@@ -86,6 +90,19 @@ const EventDefinitionSummary = ({
         <dd>{eventDefinition.description || 'No description given'}</dd>
         <dt>Priority</dt>
         <dd>{upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</dd>
+        <dt>Tags</dt>
+        <dd>
+          <TagList tags={eventDefinition.tags} emptyFallback={<em>No tags</em>} />
+        </dd>
+        {tacticsTechniquesSummaryEnabled && tacticsTechniquesSummaryPlugin ? (
+          <tacticsTechniquesSummaryPlugin.component eventDefinition={eventDefinition} />
+        ) : null}
+        {eventDefinition.event_summary_template && (
+          <>
+            <dt>Event Summary Template</dt>
+            <dd>{eventDefinition.event_summary_template}</dd>
+          </>
+        )}
         {validSecurityLicense ? (
           <>
             {eventDefinition?.event_procedure ? (
@@ -93,10 +110,7 @@ const EventDefinitionSummary = ({
                 <dt style={{ margin: '16px 0 0' }}>Event Procedure Summary</dt>
                 <dd>
                   {pluggableEventProcedureSummary.map(({ component: PluggableEventProcedureSummary, key }) => (
-                    <PluggableEventProcedureSummary
-                      eventDefinitionEventProcedure={eventDefinition?.event_procedure}
-                      key={key}
-                    />
+                    <PluggableEventProcedureSummary eventProcedureId={eventDefinition?.event_procedure} key={key} />
                   ))}
                 </dd>
               </>
@@ -143,6 +157,7 @@ const EventDefinitionSummary = ({
         config,
         currentUser,
         definitionId,
+        entityScope: eventDefinition._scope,
       })
     ) : (
       <p>

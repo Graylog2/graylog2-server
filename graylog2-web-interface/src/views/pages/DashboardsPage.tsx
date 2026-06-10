@@ -16,56 +16,33 @@
  */
 import * as React from 'react';
 
-import { LinkContainer } from 'components/common/router';
-import { Col, Row, Button } from 'components/bootstrap';
-import { DocumentTitle, PageHeader, IfPermitted } from 'components/common';
-import Routes from 'routing/Routes';
+import { Col, Row } from 'components/bootstrap';
+import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import DashboardsOverview from 'views/components/dashboard/DashboardsOverview';
-import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import CreateButton from 'components/common/CreateButton';
 
-const DashboardsPage = () => {
-  const sendTelemetry = useSendTelemetry();
+const DashboardsPage = () => (
+  <DocumentTitle title="Dashboards">
+    <PageHeader
+      title="Dashboards"
+      actions={<CreateButton entityKey="Dashboard" />}
+      documentationLink={{
+        title: 'Dashboard documentation',
+        path: DocsHelper.PAGES.DASHBOARDS,
+      }}>
+      <span>
+        Use dashboards to create specific views on your messages. Create a new dashboard here and add any graph or chart
+        you create in other parts of the application with one click.
+      </span>
+    </PageHeader>
 
-  return (
-    <DocumentTitle title="Dashboards">
-      <PageHeader
-        title="Dashboards"
-        actions={
-          <IfPermitted permissions="dashboards:create">
-            <LinkContainer to={Routes.pluginRoute('DASHBOARDS_NEW')}>
-              <Button
-                bsStyle="success"
-                onClick={() => {
-                  sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_CREATE_CLICKED, {
-                    app_pathname: 'dashboard',
-                    app_section: 'dashboard',
-                    app_action_value: 'dashboard-create-button',
-                  });
-                }}>
-                Create new dashboard
-              </Button>
-            </LinkContainer>
-          </IfPermitted>
-        }
-        documentationLink={{
-          title: 'Dashboard documentation',
-          path: DocsHelper.PAGES.DASHBOARDS,
-        }}>
-        <span>
-          Use dashboards to create specific views on your messages. Create a new dashboard here and add any graph or
-          chart you create in other parts of the application with one click.
-        </span>
-      </PageHeader>
-
-      <Row className="content">
-        <Col md={12}>
-          <DashboardsOverview />
-        </Col>
-      </Row>
-    </DocumentTitle>
-  );
-};
+    <Row className="content">
+      <Col md={12}>
+        <DashboardsOverview />
+      </Col>
+    </Row>
+  </DocumentTitle>
+);
 
 export default DashboardsPage;

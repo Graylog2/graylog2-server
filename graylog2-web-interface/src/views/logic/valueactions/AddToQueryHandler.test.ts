@@ -24,6 +24,10 @@ import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import mockDispatch from 'views/test/mockDispatch';
 import { updateQueryString } from 'views/logic/slices/viewSlice';
 import type { RootState } from 'views/types';
+import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import { alice } from 'fixtures/users';
+import type { Message } from 'views/components/messagelist/Types';
 
 import AddToQueryHandler from './AddToQueryHandler';
 
@@ -90,6 +94,38 @@ describe('AddToQueryHandler', () => {
     );
 
     expect(updateQueryString).toHaveBeenCalledWith('anotherQueryId', 'foo:23 AND bar:42');
+  });
+
+  it('updates query string for multiple values from context', async () => {
+    const query = createQuery('anotherQueryId', 'foo:23');
+    const view = createViewWithQuery(query);
+    const state = { ...mockRootState, view: { view } } as RootState;
+    const dispatch = mockDispatch(state);
+
+    const widget = AggregationWidget.builder()
+      .id('widget1')
+      .config(AggregationWidgetConfig.builder().visualization('bar').build())
+      .build();
+    const contexts = {
+      view,
+      widget,
+      valuePath: [{ bar: 43 }, { baz: 44 }],
+      analysisDisabledFields: [],
+      currentUser: alice,
+      message: {} as Message,
+      isLocalNode: true,
+    };
+    await dispatch(
+      AddToQueryHandler({
+        queryId: 'anotherQueryId',
+        field: 'bar',
+        value: 42,
+        type: new FieldType('keyword', [], []),
+        contexts,
+      }),
+    );
+
+    expect(updateQueryString).toHaveBeenCalledWith('anotherQueryId', 'foo:23 AND bar:43 AND baz:44');
   });
 
   it('appends NOT _exists_ fragment for proper field in case of missing bucket in input', async () => {

@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.bson.types.ObjectId;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.DbEntity;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.ScopedEntity;
@@ -36,15 +35,28 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
 import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
+import static org.graylog2.streams.StreamDTO.FIELD_CATEGORIES;
+import static org.graylog2.streams.StreamDTO.FIELD_CREATED_AT;
+import static org.graylog2.streams.StreamDTO.FIELD_CREATOR_USER_ID;
+import static org.graylog2.streams.StreamDTO.FIELD_DEFAULT_STREAM;
+import static org.graylog2.streams.StreamDTO.FIELD_DESCRIPTION;
+import static org.graylog2.streams.StreamDTO.FIELD_DISABLED;
+import static org.graylog2.streams.StreamDTO.FIELD_INDEX_SET_ID;
+import static org.graylog2.streams.StreamDTO.FIELD_IS_EDITABLE;
+import static org.graylog2.streams.StreamDTO.FIELD_MATCHING_TYPE;
+import static org.graylog2.streams.StreamDTO.FIELD_TITLE;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 @JsonDeserialize(builder = StreamDTO.Builder.class)
-@DbEntity(collection = "streams", readPermission = STREAMS_READ)
+@DbEntity(collection = "streams", readPermission = STREAMS_READ,
+          readableFields = {ID_FIELD, FIELD_TITLE, FIELD_DESCRIPTION, FIELD_DISABLED, FIELD_CREATED_AT,
+                  FIELD_CREATOR_USER_ID, FIELD_MATCHING_TYPE, FIELD_INDEX_SET_ID,
+                  FIELD_IS_EDITABLE, FIELD_CATEGORIES, FIELD_DEFAULT_STREAM})
 // Package-private to prevent usage outside the streams package.
-abstract class StreamDTO extends ScopedEntity {
+abstract class StreamDTO implements ScopedEntity<StreamDTO.Builder> {
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_RULES = "rules";
@@ -61,6 +73,7 @@ abstract class StreamDTO extends ScopedEntity {
     public static final String EMBEDDED_ALERT_CONDITIONS = "alert_conditions";
     public static final String FIELD_IS_EDITABLE = "is_editable";
     public static final String FIELD_CATEGORIES = "categories";
+    public static final String FIELD_FAVORITE_FIELDS = "favorite_fields";
     public static final Stream.MatchingType DEFAULT_MATCHING_TYPE = Stream.MatchingType.AND;
 
     @JsonProperty(FIELD_CREATOR_USER_ID)
@@ -118,6 +131,10 @@ abstract class StreamDTO extends ScopedEntity {
     @Nullable
     public abstract List<String> categories();
 
+    @JsonProperty(FIELD_FAVORITE_FIELDS)
+    @Nullable
+    public abstract List<String> favoriteFields();
+
     public abstract Builder toBuilder();
 
     public static Builder builder() {
@@ -126,7 +143,7 @@ abstract class StreamDTO extends ScopedEntity {
 
     @AutoValue.Builder
     // Package-private to prevent usage outside the streams package.
-    abstract static class Builder extends AbstractBuilder<Builder> {
+    abstract static class Builder implements ScopedEntity.Builder<Builder> {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_StreamDTO.Builder()
@@ -138,6 +155,9 @@ abstract class StreamDTO extends ScopedEntity {
                     .categories(List.of())
                     .outputIds(Set.of());
         }
+
+        @JsonProperty(FIELD_SCOPE)
+        public abstract Builder scope(String scope);
 
         @JsonProperty(FIELD_CREATOR_USER_ID)
         public abstract Builder creatorUserId(String creatorUserId);
@@ -185,6 +205,9 @@ abstract class StreamDTO extends ScopedEntity {
 
         @JsonProperty(FIELD_CATEGORIES)
         public abstract Builder categories(List<String> categories);
+
+        @JsonProperty(FIELD_FAVORITE_FIELDS)
+        public abstract Builder favoriteFields(List<String> favoriteFields);
 
         public abstract String id();
 

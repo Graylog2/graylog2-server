@@ -16,8 +16,8 @@
  */
 package org.graylog.security.authservice.rest;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.security.authservice.AuthServiceBackendDTO;
@@ -43,7 +43,7 @@ import java.util.Optional;
 @Path("/system/authentication/services")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Api(value = "System/Authentication/Services", description = "Manage authentication services")
+@Tag(name = "System/Authentication/Services", description = "Manage authentication services")
 @RequiresAuthentication
 public class AuthServicesResource extends RestResource {
     private final GlobalAuthServiceConfig authServiceConfig;
@@ -58,7 +58,7 @@ public class AuthServicesResource extends RestResource {
 
     @GET
     @Path("active-backend")
-    @ApiOperation("Get active authentication service backend")
+    @Operation(summary = "Get active authentication service backend")
     @RequiresPermissions(RestPermissions.AUTH_SERVICE_GLOBAL_CONFIG_READ)
     public Response get() {
         final Optional<AuthServiceBackendDTO> activeConfig = getActiveBackendConfig();

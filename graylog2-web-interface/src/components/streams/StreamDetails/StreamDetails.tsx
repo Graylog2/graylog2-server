@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { useQueryClient } from '@tanstack/react-query';
@@ -24,17 +24,17 @@ import URI from 'urijs';
 import upperCase from 'lodash/upperCase';
 
 import Routes from 'routing/Routes';
-import { Button, Col, DropdownButton, MenuItem, Row, SegmentedControl } from 'components/bootstrap';
+import { Button, Col, MenuItem, Row, SegmentedControl } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
 import { Icon, IfPermitted } from 'components/common';
 import { StreamsStore, type Stream } from 'stores/streams/StreamsStore';
-import { useStore } from 'stores/connect';
-import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useQuery from 'routing/useQuery';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useCurrentUser from 'hooks/useCurrentUser';
+import { MoreActionsMenu } from 'components/common/MoreActions';
 
 import StreamDataRoutingIntake from './StreamDataRoutingIntake';
 import StreamDataRoutingProcessing from './StreamDataRoutingProcessing';
@@ -161,7 +161,9 @@ const StreamDetails = ({ stream }: Props) => {
   const [currentSegment, setCurrentSegment] = useState<DetailsSegment>((segment as DetailsSegment) || INTAKE_SEGMENT);
   const DataLakeJobComponent = PluginStore.exports('dataLake')?.[0]?.DataLakeJobs;
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const { indexSets } = useStore(IndexSetsStore);
+  const {
+    data: { indexSets },
+  } = useIndexSetsList(false);
   const queryClient = useQueryClient();
   const history = useHistory();
   const currentUser = useCurrentUser();
@@ -180,10 +182,6 @@ const StreamDetails = ({ stream }: Props) => {
     setCurrentSegment(nextSegment);
     updateURLStepQueryParam(nextSegment);
   };
-
-  useEffect(() => {
-    IndexSetsActions.list(false);
-  }, []);
 
   const toggleUpdateModal = useCallback(() => {
     setShowUpdateModal((cur) => !cur);
@@ -218,9 +216,9 @@ const StreamDetails = ({ stream }: Props) => {
             <h1>Stream: {stream.title}</h1>
 
             <IfPermitted permissions={`streams:edit:${stream.id}`}>
-              <DropdownButton title={<Icon name="more_horiz" />} id="stream-actions" noCaret bsSize="xs">
+              <MoreActionsMenu id="stream-actions">
                 <MenuItem onClick={() => toggleUpdateModal()}>Edit</MenuItem>
-              </DropdownButton>
+              </MoreActionsMenu>
             </IfPermitted>
           </LeftCol>
           <RightCol />

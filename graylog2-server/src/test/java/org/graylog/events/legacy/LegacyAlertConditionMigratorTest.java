@@ -50,26 +50,29 @@ import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.capabilities.SchedulerCapabilitiesService;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.security.entities.EntityRegistrar;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScope;
 import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.users.UserService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.Map;
@@ -85,15 +88,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class LegacyAlertConditionMigratorTest {
     private static final int CHECK_INTERVAL = 60;
     public static final Set<EntityScope> ENTITY_SCOPES = Collections.singleton(new DefaultEntityScope());
-
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private LegacyAlertConditionMigrator migrator;
 
@@ -109,8 +109,8 @@ public class LegacyAlertConditionMigratorTest {
     @Mock
     private SchedulerCapabilitiesService schedulerCapabilitiesService;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    public void setUp(MongoDBTestService dbTestService) throws Exception {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
         objectMapper.registerSubtypes(new NamedType(AggregationEventProcessorConfig.class, AggregationEventProcessorConfig.TYPE_NAME));
@@ -131,14 +131,15 @@ public class LegacyAlertConditionMigratorTest {
         objectMapper.registerSubtypes(new NamedType(Sum.class, Sum.NAME));
 
         final MongoJackObjectMapperProvider mongoJackObjectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-        final MongoConnection mongoConnection = mongodb.mongoConnection();
+        final MongoConnection mongoConnection = dbTestService.mongoConnection();
+        final var mongoCollections = new MongoCollections(mongoJackObjectMapperProvider, mongoConnection);
+
         final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
-        final DBJobDefinitionService jobDefinitionService = new DBJobDefinitionService(new MongoCollections(mongoJackObjectMapperProvider, mongoConnection), mongoJackObjectMapperProvider);
-        final MongoCollections mongoCollections = new MongoCollections(mongoJackObjectMapperProvider, mongoConnection);
+        final DBJobDefinitionService jobDefinitionService = new DBJobDefinitionService(mongoCollections, mongoJackObjectMapperProvider);
         final DBJobTriggerService jobTriggerService = new DBJobTriggerService(mongoCollections, new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"), clock, schedulerCapabilitiesService, Duration.minutes(5));
         notificationService = new DBNotificationService(mongoCollections, mock(EntityRegistrar.class));
         this.eventDefinitionService = new DBEventDefinitionService(mongoCollections, mock(DBEventProcessorStateService.class), mock(EntityRegistrar.class), new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters());
-        this.eventDefinitionHandler = spy(new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, mock(Provider.class), clock, mock(ClusterEventBus.class)));
+        this.eventDefinitionHandler = spy(new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, mock(Provider.class), clock, mock(ClusterEventBus.class), mock(EntitySourceService.class)));
         this.notificationResourceHandler = spy(new NotificationResourceHandler(notificationService, jobDefinitionService, eventDefinitionService, eventNotificationFactories));
         this.userService = mock(UserService.class);
         when(userService.getRootUser()).thenReturn(Optional.empty());
@@ -284,7 +285,7 @@ public class LegacyAlertConditionMigratorTest {
                             assertThat(config.series().get(0).type()).isEqualTo(Count.NAME);
                             assertThat(((HasOptionalField) config.series().get(0)).field()).isEmpty();
 
-                            assertThat(config.conditions()).get().satisfies(conditions -> {
+                            assertThat(config.conditions()).get().satisfies(conditions ->
                                 assertThat(conditions.expression()).get().satisfies(expression -> {
                                     assertThat(expression).isInstanceOf(Expr.Greater.class);
 
@@ -292,8 +293,7 @@ public class LegacyAlertConditionMigratorTest {
 
                                     assertThat(greater.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
                                     assertThat(greater.right()).isEqualTo(Expr.NumberValue.create(1));
-                                });
-                            });
+                                }));
                         });
                     });
         }
@@ -324,7 +324,7 @@ public class LegacyAlertConditionMigratorTest {
                             assertThat(config.series().get(0).type()).isEqualTo(Count.NAME);
                             assertThat(((HasOptionalField) config.series().get(0)).field()).isEmpty();
 
-                            assertThat(config.conditions()).get().satisfies(conditions -> {
+                            assertThat(config.conditions()).get().satisfies(conditions ->
                                 assertThat(conditions.expression()).get().satisfies(expression -> {
                                     assertThat(expression).isInstanceOf(Expr.Lesser.class);
 
@@ -332,8 +332,7 @@ public class LegacyAlertConditionMigratorTest {
 
                                     assertThat(lesser.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
                                     assertThat(lesser.right()).isEqualTo(Expr.NumberValue.create(42));
-                                });
-                            });
+                                }));
                         });
                     });
         }
@@ -361,7 +360,7 @@ public class LegacyAlertConditionMigratorTest {
                             assertThat(config.series().get(0).type()).isEqualTo(Average.NAME);
                             assertThat(((HasField) config.series().get(0)).field()).isEqualTo("test_field_1");
 
-                            assertThat(config.conditions()).get().satisfies(conditions -> {
+                            assertThat(config.conditions()).get().satisfies(conditions ->
                                 assertThat(conditions.expression()).get().satisfies(expression -> {
                                     assertThat(expression).isInstanceOf(Expr.Greater.class);
 
@@ -369,8 +368,7 @@ public class LegacyAlertConditionMigratorTest {
 
                                     assertThat(greater.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
                                     assertThat(greater.right()).isEqualTo(Expr.NumberValue.create(23));
-                                });
-                            });
+                                }));
                         });
                     });
         }
@@ -398,7 +396,7 @@ public class LegacyAlertConditionMigratorTest {
                             assertThat(config.series().get(0).type()).isEqualTo(Sum.NAME);
                             assertThat(((HasField) config.series().get(0)).field()).isEqualTo("test_field_1");
 
-                            assertThat(config.conditions()).get().satisfies(conditions -> {
+                            assertThat(config.conditions()).get().satisfies(conditions ->
                                 assertThat(conditions.expression()).get().satisfies(expression -> {
                                     assertThat(expression).isInstanceOf(Expr.Lesser.class);
 
@@ -406,8 +404,7 @@ public class LegacyAlertConditionMigratorTest {
 
                                     assertThat(lesser.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
                                     assertThat(lesser.right()).isEqualTo(Expr.NumberValue.create(23));
-                                });
-                            });
+                                }));
                         });
                     });
         }
@@ -435,7 +432,7 @@ public class LegacyAlertConditionMigratorTest {
                             assertThat(config.series().get(0).type()).isEqualTo(Min.NAME);
                             assertThat(((HasField) config.series().get(0)).field()).isEqualTo("test_field_1");
 
-                            assertThat(config.conditions()).get().satisfies(conditions -> {
+                            assertThat(config.conditions()).get().satisfies(conditions ->
                                 assertThat(conditions.expression()).get().satisfies(expression -> {
                                     assertThat(expression).isInstanceOf(Expr.Lesser.class);
 
@@ -443,8 +440,7 @@ public class LegacyAlertConditionMigratorTest {
 
                                     assertThat(lesser.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
                                     assertThat(lesser.right()).isEqualTo(Expr.NumberValue.create(23));
-                                });
-                            });
+                                }));
                         });
                     });
         }
@@ -472,7 +468,7 @@ public class LegacyAlertConditionMigratorTest {
                             assertThat(config.series().get(0).type()).isEqualTo(Max.NAME);
                             assertThat(((HasField) config.series().get(0)).field()).isEqualTo("test_field_1");
 
-                            assertThat(config.conditions()).get().satisfies(conditions -> {
+                            assertThat(config.conditions()).get().satisfies(conditions ->
                                 assertThat(conditions.expression()).get().satisfies(expression -> {
                                     assertThat(expression).isInstanceOf(Expr.Lesser.class);
 
@@ -480,8 +476,7 @@ public class LegacyAlertConditionMigratorTest {
 
                                     assertThat(lesser.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
                                     assertThat(lesser.right()).isEqualTo(Expr.NumberValue.create(23));
-                                });
-                            });
+                                }));
                         });
                     });
         }
@@ -509,7 +504,7 @@ public class LegacyAlertConditionMigratorTest {
                             assertThat(config.series().get(0).type()).isEqualTo(StdDev.NAME);
                             assertThat(((HasField) config.series().get(0)).field()).isEqualTo("test_field_1");
 
-                            assertThat(config.conditions()).get().satisfies(conditions -> {
+                            assertThat(config.conditions()).get().satisfies(conditions ->
                                 assertThat(conditions.expression()).get().satisfies(expression -> {
                                     assertThat(expression).isInstanceOf(Expr.Greater.class);
 
@@ -517,8 +512,7 @@ public class LegacyAlertConditionMigratorTest {
 
                                     assertThat(greater.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
                                     assertThat(greater.right()).isEqualTo(Expr.NumberValue.create(23));
-                                });
-                            });
+                                }));
                         });
                     });
         }
@@ -549,7 +543,7 @@ public class LegacyAlertConditionMigratorTest {
                             assertThat(config.series().get(0).type()).isEqualTo(Count.NAME);
                             assertThat(((HasOptionalField) config.series().get(0)).field()).isEmpty();
 
-                            assertThat(config.conditions()).get().satisfies(conditions -> {
+                            assertThat(config.conditions()).get().satisfies(conditions ->
                                 assertThat(conditions.expression()).get().satisfies(expression -> {
                                     assertThat(expression).isInstanceOf(Expr.Greater.class);
 
@@ -557,8 +551,7 @@ public class LegacyAlertConditionMigratorTest {
 
                                     assertThat(greater.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
                                     assertThat(greater.right()).isEqualTo(Expr.NumberValue.create(0));
-                                });
-                            });
+                                }));
                         });
                     });
         }
@@ -589,7 +582,7 @@ public class LegacyAlertConditionMigratorTest {
                             assertThat(config.series().get(0).type()).isEqualTo(Count.NAME);
                             assertThat(((HasOptionalField) config.series().get(0)).field()).isEmpty();
 
-                            assertThat(config.conditions()).get().satisfies(conditions -> {
+                            assertThat(config.conditions()).get().satisfies(conditions ->
                                 assertThat(conditions.expression()).get().satisfies(expression -> {
                                     assertThat(expression).isInstanceOf(Expr.Greater.class);
 
@@ -597,8 +590,7 @@ public class LegacyAlertConditionMigratorTest {
 
                                     assertThat(greater.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
                                     assertThat(greater.right()).isEqualTo(Expr.NumberValue.create(0));
-                                });
-                            });
+                                }));
                         });
                     });
         }
@@ -629,7 +621,7 @@ public class LegacyAlertConditionMigratorTest {
                             assertThat(config.series().get(0).type()).isEqualTo(Count.NAME);
                             assertThat(((HasOptionalField) config.series().get(0)).field()).isEmpty();
 
-                            assertThat(config.conditions()).get().satisfies(conditions -> {
+                            assertThat(config.conditions()).get().satisfies(conditions ->
                                 assertThat(conditions.expression()).get().satisfies(expression -> {
                                     assertThat(expression).isInstanceOf(Expr.Greater.class);
 
@@ -637,8 +629,7 @@ public class LegacyAlertConditionMigratorTest {
 
                                     assertThat(greater.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
                                     assertThat(greater.right()).isEqualTo(Expr.NumberValue.create(0));
-                                });
-                            });
+                                }));
                         });
                     });
         }

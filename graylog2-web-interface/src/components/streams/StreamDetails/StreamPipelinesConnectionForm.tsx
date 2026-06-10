@@ -20,8 +20,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { BootstrapModalForm, Button, ControlLabel, HelpBlock, FormGroup } from 'components/bootstrap';
-import { SelectableList } from 'components/common';
-import { Link } from 'components/common/router';
+import { SelectableList, Link } from 'components/common';
 import Routes from 'routing/Routes';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';

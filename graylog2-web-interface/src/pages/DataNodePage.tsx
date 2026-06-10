@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 import type { DataNode } from 'components/datanode/Types';
 import useParams from 'routing/useParams';
 import DocsHelper from 'util/DocsHelper';
-import { Row, Col, Label } from 'components/bootstrap';
+import { Alert, Row, Col, Label } from 'components/bootstrap';
 import { DocumentTitle, NoSearchResult, PageHeader, RelativeTime, Spinner } from 'components/common';
 import { CertRenewalButton } from 'components/datanode/DataNodeConfiguration/CertificateRenewal';
 import useDataNode from 'components/datanode/hooks/useDataNode';
@@ -70,7 +70,7 @@ const DataNodePage = () => {
   }
 
   const datanode = data as DataNode;
-  const datanodeDisabled = datanode.data_node_status !== 'AVAILABLE';
+  const datanodeDisabled = datanode.datanode_status !== 'AVAILABLE';
 
   return (
     <DocumentTitle title={`Data Nodes: ${datanode.hostname}`}>
@@ -95,10 +95,10 @@ const DataNodePage = () => {
               <dd>
                 <StatusLabel
                   bsStyle={datanodeDisabled ? 'warning' : 'success'}
-                  title={datanode.data_node_status}
-                  aria-label={datanode.data_node_status}
+                  title={datanode.datanode_status}
+                  aria-label={datanode.datanode_status}
                   role="button">
-                  {datanode.data_node_status || 'N/A'}
+                  {datanode.datanode_status || 'N/A'}
                 </StatusLabel>
               </dd>
               <dt>Certificate valid until:</dt>
@@ -114,6 +114,17 @@ const DataNodePage = () => {
             <DataNodeActions dataNode={datanode} refetch={refetch} displayAs="buttons" />
           </ActionsCol>
         </Col>
+        {datanode.configuration_warnings?.length > 0 && (
+          <Col xs={12}>
+            <Alert bsStyle="warning" title="Configuration warnings">
+              <ul>
+                {datanode.configuration_warnings.map((warning) => (
+                  <li key={warning}>{warning}</li>
+                ))}
+              </ul>
+            </Alert>
+          </Col>
+        )}
       </Row>
     </DocumentTitle>
   );

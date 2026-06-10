@@ -16,13 +16,32 @@
  */
 package org.graylog2.rest.models.system.sessions.responses;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Date;
 
 public interface SessionResponse {
+    @JsonProperty("valid_until")
     Date validUntil();
 
-    @JsonIgnore
-    String getAuthenticationToken();
+    @JsonProperty("session_id")
+    String sessionId();
+
+    @JsonProperty("username")
+    String username();
+
+    @JsonProperty("user_id")
+    String userId();
+
+    interface Builder<T extends SessionResponse, B extends Builder<T, B>> {
+        B validUntil(Date validUntil);
+
+        B sessionId(String sessionId);
+
+        B username(String username);
+
+        B userId(String userId);
+
+        T build();
+    }
 }

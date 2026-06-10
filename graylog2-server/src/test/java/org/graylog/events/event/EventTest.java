@@ -21,13 +21,13 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.events.fields.FieldValueType;
 import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class EventTest {
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
     }
 
@@ -55,6 +55,7 @@ public class EventTest {
                 .alert(false)
                 .fields(ImmutableMap.of("hello", "world"))
                 .scores(ImmutableMap.of("test", 1.2D))
+                .tags(ImmutableSet.of("phishing", "lateral-movement"))
                 .build();
 
         assertThat(Event.fromDto(eventDto)).satisfies(event -> {
@@ -76,6 +77,7 @@ public class EventTest {
             assertThat(event.getField("hello").dataType()).isEqualTo(FieldValueType.STRING);
             assertThat(event.getField("hello").value()).isEqualTo("world");
             assertThat(event.getScore("test")).isPresent().hasValue(1.2D);
+            assertThat(event.getTags()).containsExactlyInAnyOrder("phishing", "lateral-movement");
         });
     }
 }

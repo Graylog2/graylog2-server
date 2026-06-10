@@ -30,7 +30,6 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import AppConfig from 'util/AppConfig';
 import GlobalContextProviders from 'contexts/GlobalContextProviders';
 import HotkeysProvider from 'contexts/HotkeysProvider';
-import { defaultPerspective as mockDefaultPerspective } from 'fixtures/perspectives';
 
 import AppRouter from './AppRouter';
 
@@ -48,7 +47,7 @@ jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
   gl2ServerUrl: jest.fn(() => undefined),
   gl2DevMode: jest.fn(() => false),
-  isFeatureEnabled: jest.fn(() => false),
+  isFeatureEnabled: jest.fn(() => true),
   isCloud: jest.fn(() => false),
 }));
 
@@ -57,14 +56,8 @@ jest.mock('react-router-dom', () => ({
   createBrowserRouter: jest.fn(),
 }));
 
-jest.mock('components/perspectives/hooks/useActivePerspective', () => ({
-  __esModule: true,
-  default: () => ({
-    activePerspective: mockDefaultPerspective,
-  }),
-}));
-
 jest.mock('components/navigation/NotificationBadge', () => () => null);
+jest.mock('components/navigation/HealthStatusBadge', () => () => null);
 
 const AppRouterWithContext = () => (
   <HotkeysProvider>
@@ -88,17 +81,13 @@ const mockRoutes = (routes: PluginExports['routes']) => {
   const pluginExports: PluginExports = {
     routes,
   };
-  asMock(usePluginEntities).mockImplementation((key: keyof PluginExports) => pluginExports[key] ?? []);
+  asMock(usePluginEntities).mockImplementation((key: 'routes'): PluginExports['routes'] => pluginExports[key] ?? []);
 };
 
 describe('AppRouter', () => {
-  const defaultPlugins = {
-    perspectives: [mockDefaultPerspective],
-  };
-
   beforeEach(() => {
-    asMock(usePluginEntities).mockImplementation((entityKey) => defaultPlugins[entityKey] ?? []);
     AppConfig.isFeatureEnabled = jest.fn(() => false);
+    asMock(usePluginEntities).mockReturnValue([]);
     asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) => createMemoryRouter(routes));
   });
 

@@ -16,36 +16,14 @@
  */
 import * as React from 'react';
 
-import AppConfig from 'util/AppConfig';
 import PageNavigation from 'components/common/PageNavigation';
-import Routes from 'routing/Routes';
 import { Row } from 'components/bootstrap';
-import useShowDatanodeMigration from 'components/datanode/hooks/useShowDatanodeMigration';
+import { PAGE_NAV_TITLE } from 'components/cluster-configuration/bindings';
 
-const ClusterConfigurationPageNavigation = () => {
-  const { showDatanodeMigration, isDatanodeConfiguredAndUsed } = useShowDatanodeMigration();
-  const enableDataNodeMigration = AppConfig.isFeatureEnabled('data_node_migration');
-
-  const NAV_ITEMS = [
-    { description: 'Cluster Configuration', path: Routes.SYSTEM.CLUSTER.NODES, exactPathMatch: true },
-    isDatanodeConfiguredAndUsed && {
-      description: 'Certificate Management',
-      path: Routes.SYSTEM.CLUSTER.CERTIFICATE_MANAGEMENT,
-    },
-    isDatanodeConfiguredAndUsed && {
-      description: 'Data Node Dashboard',
-      path: Routes.SYSTEM.CLUSTER.DATANODE_DASHBOARD,
-    },
-    isDatanodeConfiguredAndUsed && { description: 'Data Node Upgrade', path: Routes.SYSTEM.CLUSTER.DATANODE_UPGRADE },
-    showDatanodeMigration &&
-      enableDataNodeMigration && { description: 'Data Node Migration', path: Routes.SYSTEM.CLUSTER.DATANODE_MIGRATION },
-  ];
-
-  return (
-    <Row>
-      <PageNavigation items={NAV_ITEMS} />
-    </Row>
-  );
-};
+const ClusterConfigurationPageNavigation = () => (
+  <Row>
+    <PageNavigation page={PAGE_NAV_TITLE} />
+  </Row>
+);
 
 export default ClusterConfigurationPageNavigation;

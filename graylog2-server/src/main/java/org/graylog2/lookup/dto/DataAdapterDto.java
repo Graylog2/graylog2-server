@@ -20,15 +20,17 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
+import org.mongojack.Id;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.TimeUnit;
 
 @AutoValue
 @JsonDeserialize(builder = DataAdapterDto.Builder.class)
-public abstract class DataAdapterDto extends ScopedEntity {
+public abstract class DataAdapterDto implements ScopedEntity<DataAdapterDto.Builder> {
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_NAME = "name";
@@ -65,18 +67,28 @@ public abstract class DataAdapterDto extends ScopedEntity {
     public abstract LookupDataAdapterConfiguration config();
 
     public static Builder builder() {
-        return new AutoValue_DataAdapterDto.Builder();
+        return Builder.create();
     }
 
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
-    public abstract static class Builder extends ScopedEntity.AbstractBuilder<Builder> {
+    public abstract static class Builder implements ScopedEntity.Builder<Builder> {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_DataAdapterDto.Builder()
+                    .scope(DefaultEntityScope.NAME)
                     .customErrorTTLEnabled(false);
         }
+
+        @Override
+        @Id
+        @JsonProperty(FIELD_ID)
+        public abstract Builder id(String id);
+
+        @Override
+        @JsonProperty(FIELD_SCOPE)
+        public abstract Builder scope(String scope);
 
         @JsonProperty(FIELD_TITLE)
         public abstract Builder title(String title);

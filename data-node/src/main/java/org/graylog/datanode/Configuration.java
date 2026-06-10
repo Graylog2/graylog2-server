@@ -25,6 +25,7 @@ import com.github.joschi.jadconfig.converters.IntegerConverter;
 import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.converters.StringSetConverter;
 import com.github.joschi.jadconfig.util.Duration;
+import com.github.joschi.jadconfig.util.Size;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
@@ -35,8 +36,8 @@ import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.docs.DocumentationConstants;
 import org.graylog2.CommonNodeConfiguration;
 import org.graylog2.Configuration.SafeClassesValidator;
-import org.graylog2.configuration.Documentation;
-import org.graylog2.configuration.DocumentationSection;
+import com.github.joschi.jadconfig.documentation.Documentation;
+import com.github.joschi.jadconfig.documentation.DocumentationSection;
 import org.graylog2.configuration.NativeLibPathConfiguration;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.SuppressForbidden;
@@ -90,6 +91,10 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     @Documentation("Directory where Datanode will search for an opensearch distribution.")
     @Parameter(value = "opensearch_location")
     private String opensearchDistributionRoot = "dist";
+
+    @Documentation("OpenSearch version to use (e.g. '2.19.5' or '3.5.0'). When not set, the oldest available version found in the distribution directory is used.")
+    @Parameter(value = "opensearch_version")
+    private String opensearchVersion = null;
 
     @Documentation("""
             Data directory of the embedded opensearch. Contains indices of the opensearch.
@@ -333,13 +338,6 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     @Parameter(value = "node_search_cache_size")
     private String searchCacheSize = "10gb";
 
-    /**
-     * <a href="https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/snapshot-restore/#shared-file-system">See snapshot documentation</a>
-     */
-    @Documentation("Filesystem path where searchable snapshots should be stored")
-    @Parameter(value = "path_repo", converter = PathListConverter.class, validators = DirectoriesWritableValidator.class)
-    private List<Path> pathRepo;
-
     @Documentation("This setting limits the number of clauses a Lucene BooleanQuery can have.")
     @Parameter(value = "opensearch_indices_query_bool_max_clause_count")
     private Integer indicesQueryBoolMaxClauseCount = 32768;
@@ -371,11 +369,23 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     @Parameter(value = "opensearch_plugins_security_audit_type")
     private String opensearchAuditLog;
 
+    @Documentation("Opensearch memory lock ensures the process locks its memory into RAM so it cannot be swapped to disk.")
+    @Parameter(value = "opensearch_bootstrap_memory_lock")
+    private boolean opensearchBootstrapMemoryLock = false;
+
     public String getOpensearchAuditLog() {
         return opensearchAuditLog;
     }
 
-     /**
+    @Documentation("""
+            This parameter defines the maximum size in bytes of cluster events. When it is exceeded, oldest events will
+            be overwritten. This should be as small as possible (for performance), but large enough to hold events long
+            enough for all nodes to process them.
+            """)
+    @Parameter(value = "max_events_collection_size")
+    private Size maxEventsCollectionSize = Size.megabytes(100);
+
+    /**
      * The insecure flag causes problems on many places. We should replace it with autosecurity option, that would
      * configure all the CA and certs automatically.
      */
@@ -398,6 +408,10 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
 
     public String getOpensearchDistributionRoot() {
         return opensearchDistributionRoot;
+    }
+
+    public String getOpensearchVersion() {
+        return opensearchVersion;
     }
 
     /**
@@ -535,7 +549,8 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
             final StringBuilder b = new StringBuilder();
 
             if (!file.exists()) {
-                final File parent = file.getParentFile();
+                // getting the absolute path so we always have a parent dir
+                final File parent = file.getAbsoluteFile().getParentFile();
                 if (!parent.isDirectory()) {
                     throw new ValidationException("Parent path " + parent + " for Node ID file at " + path + " is not a directory");
                 } else {
@@ -714,10 +729,6 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
         return searchCacheSize;
     }
 
-    public List<Path> getPathRepo() {
-        return pathRepo;
-    }
-
     public List<String> getNodeRoles() {
         return nodeRoles;
     }
@@ -762,5 +773,9 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
 
     public Duration getIndexerJwtAuthTokenClockSkewTolerance() {
         return indexerJwtAuthTokeClockSkewTolerance;
+    }
+
+    public boolean getOpensearchBootstrapMemoryLock() {
+        return opensearchBootstrapMemoryLock;
     }
 }

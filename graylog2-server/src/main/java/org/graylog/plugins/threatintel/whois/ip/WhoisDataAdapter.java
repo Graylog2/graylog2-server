@@ -26,7 +26,6 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import com.google.inject.assistedinject.Assisted;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
@@ -121,7 +120,6 @@ public class WhoisDataAdapter extends LookupDataAdapter {
     }
 
     @AutoValue
-    @WithBeanGetter
     @JsonAutoDetect
     @JsonDeserialize(builder = Config.Builder.class)
     @JsonTypeName(NAME)

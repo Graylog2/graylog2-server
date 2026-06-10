@@ -20,23 +20,25 @@ import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Streams;
 import org.graylog.testing.completebackend.apis.Users;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.util.Map;
 
 import static org.hamcrest.core.StringContains.containsString;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class StartPageRecentActivityIT {
 
-    private final GraylogApis api;
+    private static GraylogApis api;
 
-    public StartPageRecentActivityIT(GraylogApis api) {
-        this.api = api;
+    @BeforeAll
+    static void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testCreateRecentActivity() {
         final String defaultIndexSetId = api.indices().defaultIndexSetId();
         var stream1Id = api.streams().createStream("Stream #1", defaultIndexSetId, Streams.StreamRule.exact("stream1", "target_stream", false));

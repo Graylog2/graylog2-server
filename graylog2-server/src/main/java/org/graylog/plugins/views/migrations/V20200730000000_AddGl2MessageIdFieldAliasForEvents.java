@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.Version;
@@ -112,7 +111,6 @@ public class V20200730000000_AddGl2MessageIdFieldAliasForEvents extends Migratio
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public static abstract class MigrationCompleted {
         @JsonProperty("modified_index_prefixes")
         public abstract Set<String> modifiedIndexPrefixes();

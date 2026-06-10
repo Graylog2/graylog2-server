@@ -41,6 +41,7 @@ import org.graylog2.bootstrap.preflight.PreflightCheck;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
 import org.graylog2.contentpacks.model.ModelType;
+import org.graylog2.jersey.HttpServerExtension;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.decorators.SearchResponseDecorator;
@@ -60,6 +61,7 @@ import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.plugin.security.PluginPermissions;
 import org.graylog2.plugin.validate.ClusterConfigValidator;
+import org.graylog2.shared.rest.resources.csp.CSPResources;
 import org.graylog2.streams.StreamDeletionGuard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -352,6 +354,10 @@ public abstract class Graylog2Module extends AbstractModule {
         return Multibinder.newSetBinder(binder(), new ExceptionMapperType());
     }
 
+    protected MapBinder<String, HttpServerExtension> httpServerExtensionBinder() {
+        return MapBinder.newMapBinder(binder(), new TypeLiteral<>() {}, new TypeLiteral<>() {});
+    }
+
     @Nonnull
     protected Multibinder<Class> jerseyAdditionalComponentsBinder() {
         return Multibinder.newSetBinder(binder(), Class.class, Names.named("additionalJerseyComponents"));
@@ -551,4 +557,11 @@ public abstract class Graylog2Module extends AbstractModule {
         return Set.of();
     }
 
+    protected Multibinder<CSPResources.ResourceProvider> cspResourceProviderBinder() {
+        return Multibinder.newSetBinder(binder(), CSPResources.ResourceProvider.class);
+    }
+
+    protected void addCspResourceProvider(Class<? extends CSPResources.ResourceProvider> providerClass) {
+        cspResourceProviderBinder().addBinding().to(providerClass);
+    }
 }

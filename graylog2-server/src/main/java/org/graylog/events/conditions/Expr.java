@@ -30,7 +30,7 @@ public class Expr {
     private static final String OPERATOR = "operator";
 
     @AutoValue
-    public static abstract class True implements Expression<Boolean> {
+    public static abstract class True implements BooleanExpression {
         static final String EXPR = "true";
 
         @JsonCreator
@@ -50,23 +50,23 @@ public class Expr {
     }
 
     @AutoValue
-    public static abstract class And implements Expression<Boolean> {
+    public static abstract class And implements BooleanExpression {
         static final String EXPR = "&&";
 
         @JsonProperty(LEFT)
-        public abstract Expression<Boolean> left();
+        public abstract BooleanExpression left();
 
         @JsonProperty(RIGHT)
-        public abstract Expression<Boolean> right();
+        public abstract BooleanExpression right();
 
         @JsonCreator
         public static And create(@JsonProperty(Expression.FIELD_EXPR) String expr,
-                                 @JsonProperty(LEFT) Expression<Boolean> left,
-                                 @JsonProperty(RIGHT) Expression<Boolean> right) {
+                                 @JsonProperty(LEFT) BooleanExpression left,
+                                 @JsonProperty(RIGHT) BooleanExpression right) {
             return new AutoValue_Expr_And(expr, left, right);
         }
 
-        public static And create(Expression<Boolean> left, Expression<Boolean> right) {
+        public static And create(BooleanExpression left, BooleanExpression right) {
             return create(EXPR, left, right);
         }
 
@@ -78,23 +78,23 @@ public class Expr {
     }
 
     @AutoValue
-    public static abstract class Or implements Expression<Boolean> {
+    public static abstract class Or implements BooleanExpression {
         static final String EXPR = "||";
 
         @JsonProperty(LEFT)
-        public abstract Expression<Boolean> left();
+        public abstract BooleanExpression left();
 
         @JsonProperty(RIGHT)
-        public abstract Expression<Boolean> right();
+        public abstract BooleanExpression right();
 
         @JsonCreator
         public static Or create(@JsonProperty(Expression.FIELD_EXPR) String expr,
-                                @JsonProperty(LEFT) Expression<Boolean> left,
-                                @JsonProperty(RIGHT) Expression<Boolean> right) {
+                                @JsonProperty(LEFT) BooleanExpression left,
+                                @JsonProperty(RIGHT) BooleanExpression right) {
             return new AutoValue_Expr_Or(expr, left, right);
         }
 
-        public static Or create(Expression<Boolean> left, Expression<Boolean> right) {
+        public static Or create(BooleanExpression left, BooleanExpression right) {
             return create(EXPR, left, right);
         }
 
@@ -106,19 +106,19 @@ public class Expr {
     }
 
     @AutoValue
-    public static abstract class Not implements Expression<Boolean> {
+    public static abstract class Not implements BooleanExpression {
         static final String EXPR = "!";
 
         @JsonProperty(LEFT)
-        public abstract Expression<Boolean> left();
+        public abstract BooleanExpression left();
 
         @JsonCreator
         public static Not create(@JsonProperty(Expression.FIELD_EXPR) String expr,
-                                 @JsonProperty(LEFT) Expression<Boolean> left) {
+                                 @JsonProperty(LEFT) BooleanExpression left) {
             return new AutoValue_Expr_Not(expr, left);
         }
 
-        public static Not create(Expression<Boolean> left) {
+        public static Not create(BooleanExpression left) {
             return create(EXPR, left);
         }
 
@@ -130,23 +130,23 @@ public class Expr {
     }
 
     @AutoValue
-    public static abstract class Equal implements Expression<Boolean> {
+    public static abstract class Equal implements BooleanExpression {
         static final String EXPR = "==";
 
         @JsonProperty(LEFT)
-        public abstract Expression<Double> left();
+        public abstract NumberExpression left();
 
         @JsonProperty(RIGHT)
-        public abstract Expression<Double> right();
+        public abstract NumberExpression right();
 
         @JsonCreator
         public static Equal create(@JsonProperty(Expression.FIELD_EXPR) String expr,
-                                   @JsonProperty(LEFT) Expression<Double> left,
-                                   @JsonProperty(RIGHT) Expression<Double> right) {
+                                   @JsonProperty(LEFT) NumberExpression left,
+                                   @JsonProperty(RIGHT) NumberExpression right) {
             return new AutoValue_Expr_Equal(expr, left, right);
         }
 
-        public static Equal create(Expression<Double> left, Expression<Double> right) {
+        public static Equal create(NumberExpression left, NumberExpression right) {
             return create(EXPR, left, right);
         }
 
@@ -158,23 +158,23 @@ public class Expr {
     }
 
     @AutoValue
-    public static abstract class Greater implements Expression<Boolean> {
+    public static abstract class Greater implements BooleanExpression {
         static final String EXPR = ">";
 
         @JsonProperty(LEFT)
-        public abstract Expression<Double> left();
+        public abstract NumberExpression left();
 
         @JsonProperty(RIGHT)
-        public abstract Expression<Double> right();
+        public abstract NumberExpression right();
 
         @JsonCreator
         public static Greater create(@JsonProperty(Expression.FIELD_EXPR) String expr,
-                                     @JsonProperty(LEFT) Expression<Double> left,
-                                     @JsonProperty(RIGHT) Expression<Double> right) {
+                                     @JsonProperty(LEFT) NumberExpression left,
+                                     @JsonProperty(RIGHT) NumberExpression right) {
             return new AutoValue_Expr_Greater(expr, left, right);
         }
 
-        public static Greater create(Expression<Double> left, Expression<Double> right) {
+        public static Greater create(NumberExpression left, NumberExpression right) {
             return create(EXPR, left, right);
         }
 
@@ -186,23 +186,23 @@ public class Expr {
     }
 
     @AutoValue
-    public static abstract class GreaterEqual implements Expression<Boolean> {
+    public static abstract class GreaterEqual implements BooleanExpression {
         static final String EXPR = ">=";
 
         @JsonProperty(LEFT)
-        public abstract Expression<Double> left();
+        public abstract NumberExpression left();
 
         @JsonProperty(RIGHT)
-        public abstract Expression<Double> right();
+        public abstract NumberExpression right();
 
         @JsonCreator
         public static GreaterEqual create(@JsonProperty(Expression.FIELD_EXPR) String expr,
-                                          @JsonProperty(LEFT) Expression<Double> left,
-                                          @JsonProperty(RIGHT) Expression<Double> right) {
+                                          @JsonProperty(LEFT) NumberExpression left,
+                                          @JsonProperty(RIGHT) NumberExpression right) {
             return new AutoValue_Expr_GreaterEqual(expr, left, right);
         }
 
-        public static GreaterEqual create(Expression<Double> left, Expression<Double> right) {
+        public static GreaterEqual create(NumberExpression left, NumberExpression right) {
             return create(EXPR, left, right);
         }
 
@@ -214,23 +214,23 @@ public class Expr {
     }
 
     @AutoValue
-    public static abstract class Lesser implements Expression<Boolean> {
+    public static abstract class Lesser implements BooleanExpression {
         static final String EXPR = "<";
 
         @JsonProperty(LEFT)
-        public abstract Expression<Double> left();
+        public abstract NumberExpression left();
 
         @JsonProperty(RIGHT)
-        public abstract Expression<Double> right();
+        public abstract NumberExpression right();
 
         @JsonCreator
         public static Lesser create(@JsonProperty(Expression.FIELD_EXPR) String expr,
-                                    @JsonProperty(LEFT) Expression<Double> left,
-                                    @JsonProperty(RIGHT) Expression<Double> right) {
+                                    @JsonProperty(LEFT) NumberExpression left,
+                                    @JsonProperty(RIGHT) NumberExpression right) {
             return new AutoValue_Expr_Lesser(expr, left, right);
         }
 
-        public static Lesser create(Expression<Double> left, Expression<Double> right) {
+        public static Lesser create(NumberExpression left, NumberExpression right) {
             return create(EXPR, left, right);
         }
 
@@ -242,23 +242,23 @@ public class Expr {
     }
 
     @AutoValue
-    public static abstract class LesserEqual implements Expression<Boolean> {
+    public static abstract class LesserEqual implements BooleanExpression {
         static final String EXPR = "<=";
 
         @JsonProperty(LEFT)
-        public abstract Expression<Double> left();
+        public abstract NumberExpression left();
 
         @JsonProperty(RIGHT)
-        public abstract Expression<Double> right();
+        public abstract NumberExpression right();
 
         @JsonCreator
         public static LesserEqual create(@JsonProperty(Expression.FIELD_EXPR) String expr,
-                                         @JsonProperty(LEFT) Expression<Double> left,
-                                         @JsonProperty(RIGHT) Expression<Double> right) {
+                                         @JsonProperty(LEFT) NumberExpression left,
+                                         @JsonProperty(RIGHT) NumberExpression right) {
             return new AutoValue_Expr_LesserEqual(expr, left, right);
         }
 
-        public static LesserEqual create(Expression<Double> left, Expression<Double> right) {
+        public static LesserEqual create(NumberExpression left, NumberExpression right) {
             return create(EXPR, left, right);
         }
 
@@ -270,7 +270,7 @@ public class Expr {
     }
 
     @AutoValue
-    public static abstract class NumberValue implements Expression<Double> {
+    public static abstract class NumberValue implements NumberExpression {
         static final String EXPR = "number";
 
         @JsonProperty(VALUE)
@@ -294,7 +294,7 @@ public class Expr {
     }
 
     @AutoValue
-    public static abstract class NumberReference implements Expression<Double> {
+    public static abstract class NumberReference implements NumberExpression {
         static final String EXPR = "number-ref";
 
         @JsonProperty(REF)
@@ -318,11 +318,11 @@ public class Expr {
     }
 
     @AutoValue
-    public static abstract class Group implements Expression<Boolean> {
+    public static abstract class Group implements BooleanExpression {
         static final String EXPR = "group";
 
         @JsonProperty(CHILD)
-        public abstract Expression<Boolean> child();
+        public abstract BooleanExpression child();
 
         /* This operator is not used for evaluating expressions, but to document which operator is used in the expressions belonging to this group. */
         @JsonProperty(OPERATOR)
@@ -330,12 +330,12 @@ public class Expr {
 
         @JsonCreator
         public static Group create(@JsonProperty(Expression.FIELD_EXPR) String expr,
-                                   @JsonProperty(CHILD) Expression<Boolean> child,
+                                   @JsonProperty(CHILD) BooleanExpression child,
                                    @JsonProperty(OPERATOR) String operator) {
             return new AutoValue_Expr_Group(expr, child, operator);
         }
 
-        public static Group create(Expression<Boolean> child, String operator) {
+        public static Group create(BooleanExpression child, String operator) {
             return create(EXPR, child, operator);
         }
 

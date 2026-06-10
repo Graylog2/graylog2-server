@@ -18,6 +18,7 @@ package org.graylog2.shared.rest.resources.csp;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,9 +26,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A Content Security Policy header consists of a list of policy directives, each of
@@ -47,19 +50,29 @@ import java.util.stream.Collectors;
 public class CSPResources {
     private static final Logger LOG = LoggerFactory.getLogger(CSPResources.class);
     private static final String DEFAULT_FILE = "/org/graylog2/security/csp.config";
+    private final Map<String, Set<ResourceProvider>> resourceProviders;
     private Table<String, String, Set<String>> cspTable;
 
-    public CSPResources() {
-        this(DEFAULT_FILE);
+    public interface ResourceProvider {
+        String type();
+
+        Set<String> resources();
     }
 
-    public CSPResources(String resourceName) {
+    @Inject
+    public CSPResources(Set<ResourceProvider> resourceProviders) {
+        this(DEFAULT_FILE, resourceProviders);
+    }
+
+    CSPResources(String resourceName, Set<ResourceProvider> resourceProviders) {
         try {
             cspTable = loadProperties(resourceName);
         } catch (Exception e) {
             LOG.warn("Could not load config resource {}: {}", resourceName, e.getMessage());
             cspTable = HashBasedTable.create();
         }
+
+        this.resourceProviders = resourceProviders.stream().collect(Collectors.groupingBy(ResourceProvider::type, Collectors.toSet()));
     }
 
     /**
@@ -69,10 +82,22 @@ public class CSPResources {
      * @return CSP string
      */
     public String cspString(String group) {
-        return cspTable.row(group).keySet().stream()
+        return cspTable.row(group).keySet()
+                .stream()
                 .sorted()
-                .map(key -> key + " "
-                        + cspTable.get(group, key).stream().sorted().collect(Collectors.joining(" ")))
+                .map(key -> {
+                    final var providerResources = resourceProviders.getOrDefault(key, Set.<ResourceProvider>of())
+                            .stream()
+                            .flatMap(provider -> provider.resources().stream());
+                    final var fileResources = cspTable.get(group, key)
+                            .stream();
+                    final var resources = Stream.concat(fileResources, providerResources)
+                            .sorted()
+                            .distinct()
+                            .collect(Collectors.joining(" "));
+
+                    return key + " " + resources;
+                })
                 .collect(Collectors.joining(";"));
     }
 

@@ -20,30 +20,28 @@ package org.graylog.events.rest;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.events.fields.providers.FieldValueProvider;
 import org.graylog.events.processor.EventProcessor;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog.plugins.views.search.rest.SeriesDescription;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
-
-import jakarta.inject.Inject;
-
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
 
 import java.util.Map;
 import java.util.Set;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
-
-@Api(value = "Events/EntityTypes", description = "Event entity types", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Events/EntityTypes", description = "Event entity types")
 @Path("/events/entity_types")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -66,7 +64,7 @@ public class AvailableEntityTypesResource extends RestResource implements Plugin
     }
 
     @GET
-    @ApiOperation("List all available entity types")
+    @Operation(summary = "List all available entity types")
     public AvailableEntityTypesSummary all() {
         return AvailableEntityTypesSummary.create(eventProcessorTypes, fieldValueProviderTypes, storageHandlerFactories, aggregationFunctions);
     }

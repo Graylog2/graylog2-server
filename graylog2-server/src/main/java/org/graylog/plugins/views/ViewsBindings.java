@@ -44,6 +44,8 @@ import org.graylog.plugins.views.search.db.InMemorySearchJobService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.db.SearchesCleanUpJob;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
+import org.graylog.plugins.views.search.elasticsearch.IndexLookupImpl;
 import org.graylog.plugins.views.search.engine.EngineBindings;
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
 import org.graylog.plugins.views.search.engine.SearchConfig;
@@ -92,6 +94,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.RangeBucket;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.TimeUnitInterval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
@@ -204,6 +207,7 @@ public class ViewsBindings extends ViewsModule {
         // pivot specs
         registerJacksonSubtype(Values.class);
         registerJacksonSubtype(Time.class);
+        registerJacksonSubtype(RangeBucket.class);
         registerPivotAggregationFunction(Average.NAME, "Average", Average.class);
         registerPivotAggregationFunction(Cardinality.NAME, "Cardinality", Cardinality.class);
         registerPivotAggregationFunction(Count.NAME, "Count", Count.class);
@@ -303,6 +307,8 @@ public class ViewsBindings extends ViewsModule {
         // The Set<StaticReferencedSearch> binder must be explicitly initialized to avoid an initialization error when
         // no values are bound.
         staticReferencedSearchBinder();
+
+        bind(IndexLookup.class).to(IndexLookupImpl.class);
     }
 
     private void registerExportBackendProvider() {

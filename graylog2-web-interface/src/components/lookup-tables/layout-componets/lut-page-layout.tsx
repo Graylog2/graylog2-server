@@ -17,15 +17,9 @@
 import * as React from 'react';
 
 import PageNavigation from 'components/common/PageNavigation';
-import Routes from 'routing/Routes';
 import { Row } from 'components/bootstrap';
 import { PageHeader, DocumentTitle } from 'components/common';
-
-const NAV_ITEMS = [
-  { description: 'Lookup Tables', path: Routes.SYSTEM.LOOKUPTABLES.OVERVIEW, exactPathMatch: true },
-  { description: 'Caches', path: Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW },
-  { description: 'Data Adapters', path: Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW },
-];
+import { PAGE_NAV_TITLE } from 'components/lookup-tables/bindings';
 
 type Props = {
   documentTitle?: string;
@@ -45,7 +39,7 @@ function LUTLayout({
   return (
     <DocumentTitle title={documentTitle}>
       <Row>
-        <PageNavigation items={NAV_ITEMS} />
+        <PageNavigation page={PAGE_NAV_TITLE} />
       </Row>
       <PageHeader title={pageTitle} actions={actions}>
         <span>{pageDescription}</span>

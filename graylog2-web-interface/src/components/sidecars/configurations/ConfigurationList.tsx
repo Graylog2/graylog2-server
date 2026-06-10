@@ -16,9 +16,8 @@
  */
 import React from 'react';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, DataTable, PaginatedList, SearchForm } from 'components/common';
 import { Col, Row, Button } from 'components/bootstrap';
-import { DataTable, PaginatedList, SearchForm } from 'components/common';
 import Routes from 'routing/Routes';
 
 import ConfigurationRow from './ConfigurationRow';
@@ -72,7 +71,7 @@ class ConfigurationList extends React.Component<Props> {
           <Col md={12}>
             <div className="pull-right">
               <LinkContainer to={Routes.SYSTEM.SIDECARS.NEW_CONFIGURATION}>
-                <Button onClick={this.openModal} bsStyle="success" bsSize="small">
+                <Button onClick={this.openModal} bsStyle="primary" bsSize="small">
                   Create Configuration
                 </Button>
               </LinkContainer>

@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
@@ -38,7 +37,6 @@ import static org.graylog2.lookup.dto.DataAdapterDto.FIELD_CUSTOM_ERROR_TTL_UNIT
 
 @AutoValue
 @JsonAutoDetect
-@WithBeanGetter
 @JsonDeserialize(builder = AutoValue_DataAdapterApi.Builder.class)
 public abstract class DataAdapterApi implements ScopedResponse {
 

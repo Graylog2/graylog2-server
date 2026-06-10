@@ -1,0 +1,7 @@
+type = "fixed"
+message = "Fixes back-end problems with sorting by percentile in pivots. Before this change, default sorting was used even if sorting by percentile was requested."
+
+issues = ["8863"]
+pulls = ["24524"]
+
+

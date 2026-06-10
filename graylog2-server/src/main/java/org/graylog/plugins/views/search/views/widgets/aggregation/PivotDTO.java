@@ -21,14 +21,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import java.util.Collections;
 import java.util.List;
 
 @AutoValue
 @JsonDeserialize(builder = PivotDTO.Builder.class)
-@WithBeanGetter
 public abstract class PivotDTO {
     private static final String FIELD_FIELD_NAME = "field";
     private static final String FIELD_FIELDS_NAME = "fields";

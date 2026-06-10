@@ -20,7 +20,7 @@ import { FieldArray, useFormikContext } from 'formik';
 import styled, { css } from 'styled-components';
 
 import { SortableList } from 'components/common';
-import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+import type { WidgetConfigFormValues, SortFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 
 import SortConfiguration from './SortConfiguration';
 import SortElement from './SortElement';
@@ -49,27 +49,40 @@ const SortsConfiguration = () => {
     [setValues, values],
   );
 
+  const customListItemRender = useCallback(
+    (props: {
+      item: SortFormValues;
+      dragHandle: React.ReactNode;
+      index: number;
+      className: string;
+      ref: React.Ref<HTMLDivElement>;
+    }) => {
+      const { item, index, dragHandle, className, ref } = props;
+
+      return (
+        <SortConfigurationContainer
+          key={`sort-${item.id}`}
+          dragHandle={dragHandle}
+          className={className}
+          onRemove={removeSort(index)}
+          elementTitle={SortElement.title}
+          ref={ref}>
+          <SortConfiguration index={index} />
+        </SortConfigurationContainer>
+      );
+    },
+    [removeSort],
+  );
+
   return (
     <FieldArray
       name="sort"
       validateOnChange={false}
       render={() => (
-        <SortableList
+        <SortableList<SortFormValues>
           items={sort}
           onMoveItem={(newSort) => setFieldValue('sort', newSort)}
-          customListItemRender={({ item, index, dragHandleProps, draggableProps, className, ref }) => (
-            <SortConfigurationContainer
-              key={`sort-${item.id}`}
-              dragHandleProps={dragHandleProps}
-              draggableProps={draggableProps}
-              className={className}
-              testIdPrefix={`sort-${index}`}
-              onRemove={removeSort(index)}
-              elementTitle={SortElement.title}
-              ref={ref}>
-              <SortConfiguration index={index} />
-            </SortConfigurationContainer>
-          )}
+          customListItemRender={customListItemRender}
         />
       )}
     />

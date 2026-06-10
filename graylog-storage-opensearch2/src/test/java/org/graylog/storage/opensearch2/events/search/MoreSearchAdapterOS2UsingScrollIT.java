@@ -25,16 +25,15 @@ import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.Scroll;
 import org.graylog.storage.opensearch2.ScrollResultOS2;
 import org.graylog.storage.opensearch2.SearchRequestFactory;
-import org.graylog.storage.opensearch2.SortOrderMapper;
 import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
+import org.graylog.testing.elasticsearch.SearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.results.ResultMessageFactory;
 import org.graylog2.indexer.results.TestResultMessageFactory;
-import org.junit.Rule;
 
 public class MoreSearchAdapterOS2UsingScrollIT extends MoreSearchAdapterIT {
 
-    @Rule
+    @SearchInstance
     public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
     private final ResultMessageFactory resultMessageFactory = new TestResultMessageFactory();
@@ -46,14 +45,13 @@ public class MoreSearchAdapterOS2UsingScrollIT extends MoreSearchAdapterIT {
 
     @Override
     protected MoreSearchAdapter createMoreSearchAdapter() {
-        final SortOrderMapper sortOrderMapper = new SortOrderMapper();
         final OpenSearchClient client = openSearchInstance.openSearchClient();
-        return new MoreSearchAdapterOS2(client, true, sortOrderMapper,
+        return new MoreSearchAdapterOS2(client, true,
                 new Scroll(client,
                         (initialResult, query, scroll, fields, limit) -> new ScrollResultOS2(
                                 resultMessageFactory, client, initialResult, query, scroll, fields, limit
                         ),
-                        new SearchRequestFactory(sortOrderMapper, false, true, new IgnoreSearchFilters())
+                        new SearchRequestFactory(false, true, new IgnoreSearchFilters())
                 ),
                 new OS2ResultMessageFactory(resultMessageFactory)
 

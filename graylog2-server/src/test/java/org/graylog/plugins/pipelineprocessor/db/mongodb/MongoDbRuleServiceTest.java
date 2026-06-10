@@ -81,10 +81,14 @@ class MongoDbRuleServiceTest {
     @Test
     void updateSystemRuleThrows() {
         final var rule = systemRule().toBuilder().id(new ObjectId().toHexString()).build();
-        assertThatThrownBy(() -> ruleService.save(rule))
+        // Saving System rule the first time works
+        ruleService.save(rule);
+        // Attempting to update it fails
+        final var updatedRule = rule.toBuilder().title("new title").build();
+        assertThatThrownBy(() -> ruleService.save(updatedRule))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Immutable entity cannot be modified");
-        verify(clusterEventBus, times(0)).post(any());
+        verify(clusterEventBus, times(1)).post(any());
     }
 
     @Test

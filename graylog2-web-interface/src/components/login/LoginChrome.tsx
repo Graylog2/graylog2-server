@@ -20,9 +20,10 @@ import styled, { css } from 'styled-components';
 import DOMPurify from 'dompurify';
 
 import LoginBox from 'components/login/LoginBox';
+import { Sanitize } from 'components/common';
 import PublicNotifications from 'components/common/PublicNotifications';
 import backgroundImage from 'images/auth/login-bg.svg';
-import { Logo } from 'components/perspectives/DefaultBrand';
+import { Logo } from 'components/navigation/NavigationBrand';
 import AppConfig from 'util/AppConfig';
 import useThemes from 'theme/hooks/useThemes';
 import useCustomLogo from 'brand-customization/useCustomLogo';
@@ -30,14 +31,13 @@ import useProductName from 'brand-customization/useProductName';
 
 const LogoContainer = styled.div`
   display: block;
-  height: 5rem;
   width: auto;
   margin: auto;
-  margin-bottom: 1.5rem;
 
   svg {
     width: 100%;
-    height: 75px;
+    min-height: 120px;
+    height: 8vh;
   }
 `;
 
@@ -96,21 +96,6 @@ const WelcomeMessage = styled.strong(
   `,
 );
 
-const Claim = styled.h1(
-  ({ theme }) => css`
-    color: #fcfcfc;
-    text-transform: uppercase;
-    font-size: ${theme.fonts.size.huge};
-    line-height: 1;
-    font-weight: 600;
-  `,
-);
-const Highlight = styled.span(
-  ({ theme }) => css`
-    color: ${theme.colors.brand.primary};
-  `,
-);
-
 const CustomLogo = styled.div`
   svg {
     width: 100%;
@@ -123,16 +108,13 @@ const CustomizableLogo = () => {
   const customLogo = useCustomLogo(colorScheme);
 
   return customLogo ? (
-    <CustomLogo dangerouslySetInnerHTML={{ __html: customLogo }} />
+    <CustomLogo>
+      <Sanitize html={customLogo} />
+    </CustomLogo>
   ) : (
-    <>
-      <LogoContainer>
-        <Logo color="#ffffff" />
-      </LogoContainer>
-      <Claim>
-        Data. Insights. <Highlight>Answers.</Highlight>
-      </Claim>
-    </>
+    <LogoContainer>
+      <Logo color="#03C3FF" />
+    </LogoContainer>
   );
 };
 

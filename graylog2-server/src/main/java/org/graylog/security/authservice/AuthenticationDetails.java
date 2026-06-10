@@ -17,16 +17,17 @@
 package org.graylog.security.authservice;
 
 import com.google.auto.value.AutoValue;
+import jakarta.annotation.Nullable;
+import org.graylog2.security.sessions.SessionAuthContext;
 
-import java.util.Collections;
-import java.util.Map;
+import java.util.Optional;
 
 @AutoValue
 public abstract class AuthenticationDetails {
 
     public abstract UserDetails userDetails();
 
-    public abstract Map<String, Object> sessionAttributes();
+    public abstract Optional<SessionAuthContext> sessionAuthContext();
 
     public static Builder builder() {
         return Builder.create();
@@ -38,13 +39,12 @@ public abstract class AuthenticationDetails {
     public abstract static class Builder {
 
         public static Builder create() {
-            return new AutoValue_AuthenticationDetails.Builder()
-                    .sessionAttributes(Collections.emptyMap());
+            return new AutoValue_AuthenticationDetails.Builder();
         }
 
         public abstract Builder userDetails(UserDetails userDetails);
 
-        public abstract Builder sessionAttributes(Map<String, Object> sessionData);
+        public abstract Builder sessionAuthContext(@Nullable SessionAuthContext authContext);
 
         public abstract AuthenticationDetails build();
     }

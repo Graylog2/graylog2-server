@@ -15,24 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled from 'styled-components';
 
 import { Modal } from 'components/bootstrap';
 import ModalSubmit from 'components/common/ModalSubmit';
 
-const StyledModal = styled(Modal)`
-  z-index: 1070;
-`;
-
 type Props = {
-  show?: boolean;
-  onConfirm: () => void;
-  onCancel?: () => void;
-  title: string | React.ReactNode;
-  children: React.ReactNode;
   btnConfirmDisabled?: boolean;
   btnConfirmText?: React.ReactNode;
+  children: React.ReactNode;
   hideCancelButton?: boolean;
+  isAsyncSubmit?: boolean;
+  isSubmitting?: boolean;
+  onCancel?: () => void;
+  onConfirm: () => void;
+  show?: boolean;
+  submitLoadingText?: string;
+  title: string | React.ReactNode;
 };
 
 /**
@@ -40,14 +38,17 @@ type Props = {
  * cancel or confirm.
  */
 const ConfirmDialog = ({
-  show = false,
-  title,
-  children,
-  onCancel = () => {},
-  onConfirm,
   btnConfirmDisabled = false,
   btnConfirmText = 'Confirm',
+  children,
   hideCancelButton = false,
+  isAsyncSubmit = undefined,
+  isSubmitting = undefined,
+  onCancel = () => {},
+  onConfirm,
+  show = false,
+  submitLoadingText = undefined,
+  title,
 }: Props) => {
   const onHide = hideCancelButton ? onConfirm : onCancel;
 
@@ -62,17 +63,20 @@ const ConfirmDialog = ({
   ) : (
     <ModalSubmit
       autoFocus
+      disabledSubmit={btnConfirmDisabled}
+      displayCancel
+      isAsyncSubmit={isAsyncSubmit}
+      isSubmitting={isSubmitting}
       onCancel={onCancel}
       onSubmit={onConfirm}
-      submitButtonType="button"
-      disabledSubmit={btnConfirmDisabled}
       submitButtonText={btnConfirmText}
-      displayCancel
+      submitButtonType="button"
+      submitLoadingText={submitLoadingText}
     />
   );
 
   return (
-    <StyledModal show={show} onHide={onHide}>
+    <Modal show={show} onHide={onHide} isConfirmDialog>
       <Modal.Header>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
@@ -80,7 +84,7 @@ const ConfirmDialog = ({
       <Modal.Body>{children}</Modal.Body>
 
       <Modal.Footer>{submit}</Modal.Footer>
-    </StyledModal>
+    </Modal>
   );
 };
 

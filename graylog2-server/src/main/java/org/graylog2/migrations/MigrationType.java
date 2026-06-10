@@ -25,5 +25,13 @@ public enum MigrationType {
      * Will run during a regular startup, after the preflight is either skipped or finished. This is the default
      * behaviour for most of our migrations.
      */
-    STANDARD
+    STANDARD,
+    /**
+     * Will run on all nodes in the cluster, regardless of their role.
+     *
+     * Warning: Executing this migration on follower nodes before the master
+     * may lead to inconsistent or invalid state. Only use this type when
+     * the migration is guaranteed to be safe in any node execution order.
+     */
+    ENFORCED_ON_ALL_NODES
 }

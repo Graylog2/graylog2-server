@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.inputs.WithInputConfiguration;
 
 import javax.annotation.Nullable;
@@ -28,23 +27,22 @@ import java.util.Map;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class InputCreateRequest implements WithInputConfiguration<InputCreateRequest> {
-    @JsonProperty
+    @JsonProperty("title")
     public abstract String title();
 
     @Override
-    @JsonProperty
+    @JsonProperty("type")
     public abstract String type();
 
-    @JsonProperty
+    @JsonProperty("global")
     public abstract boolean global();
 
     @Override
-    @JsonProperty
+    @JsonProperty("configuration")
     public abstract Map<String, Object> configuration();
 
-    @JsonProperty
+    @JsonProperty("node")
     @Nullable
     public abstract String node();
 
@@ -55,29 +53,40 @@ public abstract class InputCreateRequest implements WithInputConfiguration<Input
         return toBuilder().configuration(configuration).build();
     }
 
+    public static Builder builder() {
+        return new AutoValue_InputCreateRequest.Builder();
+    }
+
     @JsonCreator
     public static InputCreateRequest create(@JsonProperty("title") String title,
                                             @JsonProperty("type") String type,
                                             @JsonProperty("global") boolean global,
                                             @JsonProperty("configuration") Map<String, Object> configuration,
                                             @JsonProperty("node") String node) {
-        return new AutoValue_InputCreateRequest(title, type, global, configuration, node);
-    }
-
-    public static Builder builder() {
-        return new AutoValue_InputCreateRequest.Builder();
+        return builder()
+                .title(title)
+                .type(type)
+                .global(global)
+                .configuration(configuration)
+                .node(node)
+                .build();
     }
 
     @AutoValue.Builder
     public abstract static class Builder {
+        @JsonProperty("title")
         public abstract Builder title(String title);
 
+        @JsonProperty("type")
         public abstract Builder type(String type);
 
+        @JsonProperty("global")
         public abstract Builder global(boolean global);
 
+        @JsonProperty("configuration")
         public abstract Builder configuration(Map<String, Object> configuration);
 
+        @JsonProperty("node")
         public abstract Builder node(String node);
 
         public abstract InputCreateRequest build();

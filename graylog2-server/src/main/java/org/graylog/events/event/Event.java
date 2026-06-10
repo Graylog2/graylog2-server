@@ -99,6 +99,10 @@ public interface Event extends Indexable {
 
     void setGroupByFields(Map<String, String> fields);
 
+    Map<String, Double> getAggregationConditions();
+
+    void setAggregationConditions(Map<String, Double> fields);
+
     void setReplayInfo(EventReplayInfo replayInfo);
 
     EventReplayInfo getReplayInfo();
@@ -108,6 +112,14 @@ public interface Event extends Indexable {
     void setScore(String name, double riskScore);
 
     void addAssociatedAssets(Set<String> associatedAssets);
+
+    List<String> getTacticsTechniques();
+
+    void setTacticsTechniques(List<String> tacticsTechniques);
+
+    Set<String> getTags();
+
+    void setTags(Set<String> tags);
 
     EventDto toDto();
 
@@ -119,6 +131,7 @@ public interface Event extends Indexable {
         from.sourceStreams().forEach(event::addSourceStream);
         event.setFields(from.fields());
         event.setGroupByFields(from.groupByFields());
+        event.setAggregationConditions(from.aggregationConditions());
         event.setPriority(from.priority());
         from.scores().forEach(event::setScore);
 
@@ -126,6 +139,8 @@ public interface Event extends Indexable {
         from.timerangeEnd().ifPresent(event::setTimerangeEnd);
         from.originContext().ifPresent(event::setOriginContext);
         from.replayInfo().ifPresent(event::setReplayInfo);
+        event.setTacticsTechniques(from.tacticsTechniques());
+        event.setTags(from.tags());
 
         return event;
     }

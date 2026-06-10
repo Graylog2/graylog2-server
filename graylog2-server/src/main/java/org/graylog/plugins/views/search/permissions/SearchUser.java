@@ -24,6 +24,7 @@ import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewLike;
 import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewResolverDecoder;
+import org.graylog.security.HasPermissions;
 import org.graylog.security.HasUser;
 import org.graylog2.database.DbEntity;
 import org.graylog2.plugin.database.users.User;
@@ -37,7 +38,7 @@ import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
-public class SearchUser implements SearchPermissions, StreamPermissions, ViewPermissions, EntityPermissions, HasUser {
+public class SearchUser implements SearchPermissions, StreamPermissions, ViewPermissions, EntityPermissions, HasUser, HasPermissions {
     private static final Logger LOG = LoggerFactory.getLogger(SearchUser.class);
     private final User currentUser;
     private final Predicate<String> isPermitted;

@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix scrolling to newly created widgets by checking visibility of the correct elements."
+
+issues = ["25237"]
+pulls = ["25257"]

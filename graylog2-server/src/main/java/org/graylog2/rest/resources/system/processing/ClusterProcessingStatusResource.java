@@ -17,8 +17,8 @@
 package org.graylog2.rest.resources.system.processing;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.rest.RemoteInterfaceProvider;
@@ -40,7 +40,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
 @RequiresAuthentication
-@Api(value = "Cluster/Processing/Status")
+@Tag(name = "Cluster/Processing/Status")
 @Path("/cluster/processing/status")
 @Produces(MediaType.APPLICATION_JSON)
 public class ClusterProcessingStatusResource extends ProxiedResource {
@@ -54,7 +54,7 @@ public class ClusterProcessingStatusResource extends ProxiedResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get processing status from all nodes in the cluster")
+    @Operation(summary = "Get processing status from all nodes in the cluster")
     public Map<String, Optional<ProcessingStatusSummary>> getStatus() {
         return stripCallResult(requestOnAllNodes(RemoteSystemProcessingStatusResource.class, RemoteSystemProcessingStatusResource::getStatus));
     }
@@ -62,7 +62,7 @@ public class ClusterProcessingStatusResource extends ProxiedResource {
     @GET
     @Path("/persisted")
     @Timed
-    @ApiOperation(value = "Get persisted processing status from all nodes in the cluster")
+    @Operation(summary = "Get persisted processing status from all nodes in the cluster")
     public Map<String, Optional<ProcessingStatusSummary>> getPersistedStatus() {
         return stripCallResult(requestOnAllNodes(RemoteSystemProcessingStatusResource.class, RemoteSystemProcessingStatusResource::getPersistedStatus));
     }

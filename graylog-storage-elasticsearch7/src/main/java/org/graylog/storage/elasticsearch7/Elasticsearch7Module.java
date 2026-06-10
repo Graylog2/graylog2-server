@@ -35,14 +35,16 @@ import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.datanode.ProxyRequestAdapter;
-import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.datastream.DataStreamAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
+import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.searches.SearchesAdapter;
+import org.graylog2.indexer.security.IndexerAdminCert;
+import org.graylog2.indexer.security.SecurityAdapter;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.plugin.VersionAwareModule;
 import org.graylog2.storage.SearchVersion;
@@ -62,11 +64,12 @@ public class Elasticsearch7Module extends VersionAwareModule {
         bindForSupportedVersion(CountsAdapter.class).to(CountsAdapterES7.class);
         bindForSupportedVersion(ClusterAdapter.class).to(ClusterAdapterES7.class);
         bindForSupportedVersion(IndicesAdapter.class).to(IndicesAdapterES7.class);
+        bindForSupportedVersion(IndicesAdapter.class, IndexerAdminCert.class).to(IndicesAdapterES7.class);
         bindForSupportedVersion(DataStreamAdapter.class).to(DataStreamAdapterES7.class);
         if (useComposableIndexTemplates) {
-            bind(IndexTemplateAdapter.class).to(ComposableIndexTemplateAdapter.class);
+            bindForSupportedVersion(IndexTemplateAdapter.class).to(ComposableIndexTemplateAdapter.class);
         } else {
-            bind(IndexTemplateAdapter.class).to(LegacyIndexTemplateAdapter.class);
+            bindForSupportedVersion(IndexTemplateAdapter.class).to(LegacyIndexTemplateAdapter.class);
         }
 
         bindForSupportedVersion(IndexFieldTypePollerAdapter.class).to(IndexFieldTypePollerAdapterES7.class);
@@ -89,13 +92,18 @@ public class Elasticsearch7Module extends VersionAwareModule {
         bind(RestHighLevelClient.class).toProvider(RestHighLevelClientProvider.class);
         bind(CredentialsProvider.class).toProvider(ESCredentialsProvider.class);
 
-        bindForSupportedVersion(RemoteReindexingMigrationAdapter.class).to(UnsupportedRemoteReindexingMigrationAdapterES7.class);
         bindForSupportedVersion(DatanodeUpgradeServiceAdapter.class).to(DatanodeUpgradeServiceAdapterES7.class);
 
         bindForSupportedVersion(IndexerHostsAdapter.class).to(IndexerHostsAdapterES7.class);
+        bindForSupportedVersion(SecurityAdapter.class).to(SecurityAdapterES7.class);
     }
 
     private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass) {
         return bindForVersion(supportedVersion, interfaceClass);
+    }
+
+    private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass,
+                                                                Class<? extends java.lang.annotation.Annotation> qualifier) {
+        return bindForVersion(supportedVersion, interfaceClass, qualifier);
     }
 }

@@ -16,9 +16,8 @@
  */
 import * as React from 'react';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, IfPermitted } from 'components/common';
 import { Button, ButtonToolbar } from 'components/bootstrap';
-import { IfPermitted } from 'components/common';
 import Routes from 'routing/Routes';
 
 type EventNotificationActionLinksProps = {
@@ -29,12 +28,12 @@ const EventNotificationActionLinks = ({ notificationId }: EventNotificationActio
   <ButtonToolbar>
     <IfPermitted permissions={`eventnotifications:read:${notificationId}`}>
       <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.show(notificationId)}>
-        <Button bsStyle="success">View Details</Button>
+        <Button>View Details</Button>
       </LinkContainer>
     </IfPermitted>
     <IfPermitted permissions={`eventnotifications:edit:${notificationId}`}>
       <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.edit(notificationId)}>
-        <Button bsStyle="success">Edit Notification</Button>
+        <Button bsStyle="primary">Edit Notification</Button>
       </LinkContainer>
     </IfPermitted>
   </ButtonToolbar>

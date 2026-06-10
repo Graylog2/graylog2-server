@@ -29,13 +29,14 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.database.pagination.DefaultMongoPaginationHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
 
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -53,9 +54,8 @@ class MongoDbIndexToolsTest {
     private MongoCollection<Document> rawdb;
 
     @BeforeEach
-    void setUp(MongoDBTestService mongodb, ObjectMapper objectMapper) {
+    void setUp(MongoDBTestService mongodb, MongoCollections mongoCollections) {
         mongodb.mongoCollection(COLLECTION_NAME).drop();
-        final MongoCollections mongoCollections = new MongoCollections(new MongoJackObjectMapperProvider(objectMapper), mongodb.mongoConnection());
         this.rawdb = mongoCollections.nonEntityCollection(COLLECTION_NAME, Document.class);
         this.db = spy(this.rawdb);
         toTest = new MongoDbIndexTools(db);
@@ -85,11 +85,29 @@ class MongoDbIndexToolsTest {
 
     @Test
     void doesNotCreateCollationIndexIfProperOneExists() {
-        rawdb.createIndex(Indexes.ascending("summary"), new IndexOptions().collation(Collation.builder().locale("en").build()));
+        rawdb.createIndex(Indexes.ascending("summary"),
+                new IndexOptions().collation(DefaultMongoPaginationHelper.DEFAULT_COLLATION_WITH_CASE_INSENSITIVE_SORTING));
 
         toTest.prepareIndices("id", List.of("summary"), List.of("summary"));
         verify(db, never()).createIndex(any());
         verify(db, never()).createIndex(any(Bson.class), any(IndexOptions.class));
+    }
+
+    @Test
+    void replacesLegacyCollationIndexWithCanonicalOne() {
+        // Older deployments created collation indexes with just the locale, before the canonical
+        // pagination collation grew strength/numericOrdering. Such indexes don't get used by
+        // queries with the new collation, so they must be recreated.
+        rawdb.createIndex(Indexes.ascending("summary"),
+                new IndexOptions().collation(Collation.builder().locale("en").build()));
+
+        toTest.prepareIndices("id", List.of("summary"), List.of("summary"));
+        verify(db).dropIndex(Indexes.ascending("summary"));
+        verify(db).createIndex(eq(Indexes.ascending("summary")),
+                argThat(indexOptions -> indexOptions.getCollation() != null
+                        && indexOptions.getCollation().getLocale().equals("en")
+                        && indexOptions.getCollation().getStrength() == CollationStrength.SECONDARY
+                        && Boolean.TRUE.equals(indexOptions.getCollation().getNumericOrdering())));
     }
 
     @Test

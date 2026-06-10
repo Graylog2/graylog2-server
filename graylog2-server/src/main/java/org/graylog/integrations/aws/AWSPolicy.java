@@ -20,13 +20,11 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import java.util.List;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 // Define a JSON field order matching AWS examples. This improves readability.
 @JsonPropertyOrder({AWSPolicy.VERSION, AWSPolicy.STATEMENT})
 public abstract class AWSPolicy {

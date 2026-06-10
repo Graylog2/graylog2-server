@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -41,12 +42,13 @@ import org.graylog2.plugin.lookup.LookupResult;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.utilities.ReservedIpChecker;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
-
 import jakarta.validation.constraints.NotEmpty;
 
 import java.io.IOException;
@@ -62,6 +64,7 @@ public class GreyNoiseQuickIPDataAdapter extends LookupDataAdapter {
     private final EncryptedValueService encryptedValueService;
     private final Config config;
     private final OkHttpClient okHttpClient;
+    private final CustomizationConfig customizationConfig;
 
     private static final AtomicBoolean VALID_GREYNOISE_LICENSE = new AtomicBoolean(false);
 
@@ -71,11 +74,13 @@ public class GreyNoiseQuickIPDataAdapter extends LookupDataAdapter {
                                        @Assisted LookupDataAdapterConfiguration config,
                                        MetricRegistry metricRegistry,
                                        EncryptedValueService encryptedValueService,
-                                       OkHttpClient okHttpClient) {
+                                       OkHttpClient okHttpClient,
+                                       CustomizationConfig customizationConfig) {
         super(id, name, config, metricRegistry);
         this.config = (Config) config;
         this.encryptedValueService = encryptedValueService;
         this.okHttpClient = okHttpClient;
+        this.customizationConfig = customizationConfig;
     }
 
     @Override
@@ -134,7 +139,7 @@ public class GreyNoiseQuickIPDataAdapter extends LookupDataAdapter {
                 .method("GET", null)
                 .addHeader("Accept", "application/json")
                 .addHeader("key", encryptedValueService.decrypt(config.apiToken()))
-                .addHeader("User-Agent", "Graylog")
+                .addHeader("User-Agent", customizationConfig.productName())
                 .build();
         try (Response response = okHttpClient.newCall(request).execute()) {
             return parseResponse(response);
@@ -232,8 +237,25 @@ public class GreyNoiseQuickIPDataAdapter extends LookupDataAdapter {
         @NotEmpty
         public abstract EncryptedValue apiToken();
 
+        public abstract Builder toBuilder();
+
         public static Builder builder() {
             return new AutoValue_GreyNoiseQuickIPDataAdapter_Config.Builder();
+        }
+
+        @Override
+        @JsonIgnore
+        public LookupDataAdapterConfiguration prepareConfigUpdate(@Nonnull LookupDataAdapterConfiguration newConfig) {
+            final Config newGreyNoiseConfig = (Config) newConfig;
+            EncryptedValue newApiToken = newGreyNoiseConfig.apiToken();
+
+            if (newApiToken.isKeepValue()) {
+                newApiToken = apiToken();
+            } else if (newApiToken.isDeleteValue()) {
+                newApiToken = EncryptedValue.createUnset();
+            }
+
+            return newGreyNoiseConfig.toBuilder().apiToken(newApiToken).build();
         }
 
         @AutoValue.Builder

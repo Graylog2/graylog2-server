@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useLocation } from 'react-router-dom';
-import type { Location } from 'react-router-dom';
+// eslint-disable-next-line no-restricted-imports
+import { useLocation as useRouterLocation, type Location } from 'react-router-dom';
 
-const _useLocation = <T>(): Location<T> => useLocation();
-export default _useLocation;
+const useLocation = <T>(): Location<T> => useRouterLocation();
+export default useLocation;

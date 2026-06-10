@@ -22,15 +22,14 @@ import { Button, Row, Col, Input } from 'components/bootstrap';
 import { FormikFormGroup, ReadOnlyFormGroup } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import type User from 'logic/users/User';
-import type { PreferencesUpdateMap } from 'stores/users/PreferencesStore';
-import { PreferencesActions } from 'stores/users/PreferencesStore';
+import { saveUserPreferences, type PreferencesUpdateMap } from 'api/preferences';
 
 type Props = {
   user: User;
 };
 
 const PreferencesSection = ({ user }: Props) => {
-  const onSubmit = (data: PreferencesUpdateMap) => PreferencesActions.saveUserPreferences(user.username, data);
+  const onSubmit = (data: PreferencesUpdateMap) => saveUserPreferences(user.username, data);
 
   return (
     <SectionComponent title="Preferences">
@@ -101,7 +100,7 @@ const PreferencesSection = ({ user }: Props) => {
               <Col xs={12}>
                 <div className="pull-right">
                   <Button
-                    bsStyle="success"
+                    bsStyle="primary"
                     disabled={isSubmitting || !isValid}
                     title="Update Preferences"
                     type="submit">

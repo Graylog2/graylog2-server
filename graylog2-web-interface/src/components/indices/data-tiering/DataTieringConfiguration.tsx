@@ -40,14 +40,23 @@ const DATA_TIERING_HOT_WARM_DEFAULTS = {
 
 export const durationToRoundedDays = (duration: string) => Math.round(moment.duration(duration).asDays());
 
-const dataTieringFormValuesWithDefaults = (values: DataTieringFormValues, pluginStore): DataTieringFormValues => {
+const dataTieringFormValuesWithDefaults = (
+  values: DataTieringFormValues,
+  pluginStore,
+  isDataTieringImmutable: boolean,
+): DataTieringFormValues => {
   const dataTieringPlugin = pluginStore
     .exports('dataTiering')
     .find((plugin) => plugin.type === DATA_TIERING_TYPE.HOT_WARM);
   const dataTieringType = dataTieringPlugin?.type ?? DATA_TIERING_TYPE.HOT_ONLY;
 
   if (dataTieringType === DATA_TIERING_TYPE.HOT_WARM) {
-    const hotWarmDefaults = { ...DATA_TIERING_HOT_ONLY_DEFAULTS, ...DATA_TIERING_HOT_WARM_DEFAULTS, ...values };
+    const hotWarmDefaults = {
+      ...DATA_TIERING_HOT_ONLY_DEFAULTS,
+      ...DATA_TIERING_HOT_WARM_DEFAULTS,
+      ...values,
+      ...(values.type === DATA_TIERING_TYPE.HOT_ONLY && isDataTieringImmutable ? { index_hot_lifetime_min: null } : {}),
+    };
 
     return hotWarmDefaults;
   }
@@ -57,7 +66,11 @@ const dataTieringFormValuesWithDefaults = (values: DataTieringFormValues, plugin
   return hotOnlyDefaults;
 };
 
-export const prepareDataTieringInitialValues = (config: DataTieringConfig, pluginStore): DataTieringFormValues => {
+export const prepareDataTieringInitialValues = (
+  config: DataTieringConfig,
+  pluginStore,
+  isDataTieringImmutable: boolean,
+): DataTieringFormValues => {
   let formValues = { ...config };
 
   dayFields.forEach((field) => {
@@ -67,16 +80,24 @@ export const prepareDataTieringInitialValues = (config: DataTieringConfig, plugi
     }
   });
 
-  return dataTieringFormValuesWithDefaults(formValues as unknown as DataTieringFormValues, pluginStore);
+  return dataTieringFormValuesWithDefaults(
+    formValues as unknown as DataTieringFormValues,
+    pluginStore,
+    isDataTieringImmutable,
+  );
 };
 
-export const prepareDataTieringConfig = (formValues: DataTieringFormValues, pluginStore): DataTieringConfig => {
+export const prepareDataTieringConfig = (
+  formValues: DataTieringFormValues,
+  pluginStore,
+  isDataTieringImmutable: boolean,
+): DataTieringConfig => {
   const dataTieringPlugin = pluginStore
     .exports('dataTiering')
     .find((plugin) => plugin.type === DATA_TIERING_TYPE.HOT_WARM);
   const dataTieringType = dataTieringPlugin?.type ?? DATA_TIERING_TYPE.HOT_ONLY;
 
-  let config = dataTieringFormValuesWithDefaults(formValues, pluginStore);
+  let config = dataTieringFormValuesWithDefaults(formValues, pluginStore, isDataTieringImmutable);
 
   if (dataTieringType === DATA_TIERING_TYPE.HOT_ONLY) {
     hotWarmOnlyFormFields.forEach((field) => {
@@ -105,12 +126,19 @@ type FormValues<T extends string | undefined> = T extends undefined
 
 const DataTieringConfiguration = <ValuesPrefix extends string | undefined>({
   valuesPrefix = undefined,
+  hiddenFields = [],
+  immutableFields = [],
+  ignoreFieldRestrictions,
 }: {
   valuesPrefix?: ValuesPrefix;
+  hiddenFields?: string[];
+  immutableFields?: string[];
+  ignoreFieldRestrictions: boolean;
 }) => {
   const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => plugin.type === 'hot_warm');
 
   const { values } = useFormikContext<FormValues<ValuesPrefix>>();
+  const sectionDisabled: boolean = immutableFields.includes('data_tiering');
 
   const formValue = (field: keyof DataTieringFormValues) => {
     if (valuesPrefix) {
@@ -160,38 +188,59 @@ const DataTieringConfiguration = <ValuesPrefix extends string | undefined>({
 
   return (
     <>
-      <FormikInput
-        type="number"
-        id="data-tiering-index-lifetime-max"
-        label="Max. days in storage"
-        name={fieldName('index_lifetime_max')}
-        min={0}
-        help="After how many days your data should be deleted."
-        validate={validateMaxDaysInStorage}
-        required
-      />
-      <FormikInput
-        type="number"
-        id="data-tiering-index-lifetime-min"
-        label="Min. days in storage"
-        name={fieldName('index_lifetime_min')}
-        min={0}
-        max={formValue('index_lifetime_max')}
-        validate={validateMinDaysInStorage}
-        help="How many days at minimum your data should be stored."
-        required
-      />
+      {(!hiddenFields.includes('data_tiering.index_lifetime_max') || ignoreFieldRestrictions) && (
+        <FormikInput
+          type="number"
+          id="data-tiering-index-lifetime-max"
+          label="Max. days in storage"
+          name={fieldName('index_lifetime_max')}
+          min={0}
+          help="After how many days your data should be deleted."
+          validate={validateMaxDaysInStorage}
+          required
+          disabled={
+            (immutableFields.includes('data_tiering.index_lifetime_max') || sectionDisabled) && !ignoreFieldRestrictions
+          }
+        />
+      )}
+      {(!hiddenFields.includes('data_tiering.index_lifetime_min') || ignoreFieldRestrictions) && (
+        <FormikInput
+          type="number"
+          id="data-tiering-index-lifetime-min"
+          label="Min. days in storage"
+          name={fieldName('index_lifetime_min')}
+          min={0}
+          max={formValue('index_lifetime_max')}
+          validate={validateMinDaysInStorage}
+          help="How many days at minimum your data should be stored."
+          required
+          disabled={
+            (immutableFields.includes('data_tiering.index_lifetime_min') || sectionDisabled) && !ignoreFieldRestrictions
+          }
+        />
+      )}
 
       {dataTieringPlugin && (
         <>
-          <FormikInput
-            type="checkbox"
-            id="data_tiering-archive-before-deletion"
-            label="Archive before deletion"
-            name={fieldName('archive_before_deletion')}
-            help="Archive this index before it is deleted?"
+          {(!hiddenFields.includes('data_tiering.archive_before_deletion') || ignoreFieldRestrictions) && (
+            <FormikInput
+              type="checkbox"
+              id="data_tiering-archive-before-deletion"
+              label="Archive before deletion"
+              name={fieldName('archive_before_deletion')}
+              help="Archive this index before it is deleted?"
+              disabled={
+                (immutableFields.includes('data_tiering.archive_before_deletion') || sectionDisabled) &&
+                !ignoreFieldRestrictions
+              }
+            />
+          )}
+          <dataTieringPlugin.TiersConfigurationFields
+            valuesPrefix={valuesPrefix}
+            hiddenFields={hiddenFields}
+            immutableFields={immutableFields}
+            ignoreFieldRestrictions={ignoreFieldRestrictions}
           />
-          <dataTieringPlugin.TiersConfigurationFields valuesPrefix={valuesPrefix} />
         </>
       )}
     </>

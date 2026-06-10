@@ -17,6 +17,7 @@
 import React, { useCallback, useState } from 'react';
 
 import type { ActionComponentProps, ActionHandlerArguments } from 'views/components/actions/ActionHandler';
+import type { AdditionalViewsActionHandlerArguments } from 'views/types';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
 import { isFunction } from 'views/logic/aggregationbuilder/Series';
 import type User from 'logic/users/User';
@@ -24,7 +25,7 @@ import isReservedField from 'views/logic/IsReservedField';
 import useInitialSelection from 'views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection';
 import { isPermitted } from 'util/PermissionsMixin';
 
-const ChangeFieldType = ({ field, onClose }: ActionComponentProps) => {
+const ChangeFieldType = ({ field, onClose }: ActionComponentProps<AdditionalViewsActionHandlerArguments>) => {
   const [show, setShow] = useState(true);
   const handleOnClose = useCallback(() => {
     setShow(false);
@@ -33,15 +34,15 @@ const ChangeFieldType = ({ field, onClose }: ActionComponentProps) => {
 
   const { list, isLoading } = useInitialSelection();
 
-  return show ? (
+  return (
     <ChangeFieldTypeModal
       initialSelectedIndexSets={list}
       onClose={handleOnClose}
       initialData={{ fieldName: field }}
-      show
-      initialSelectionDataLoaded={!isLoading}
+      show={show}
+      isLoading={isLoading}
     />
-  ) : null;
+  );
 };
 
 const hasMappingPermission = (currentUser: User) => isPermitted(currentUser?.permissions, 'typemappings:edit');

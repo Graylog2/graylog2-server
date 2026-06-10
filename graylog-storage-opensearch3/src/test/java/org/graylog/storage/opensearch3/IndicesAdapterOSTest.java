@@ -1,0 +1,269 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+package org.graylog.storage.opensearch3;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.joschi.jadconfig.util.Duration;
+import org.graylog.storage.opensearch3.cluster.ClusterStateApi;
+import org.graylog.storage.opensearch3.stats.ClusterStatsApi;
+import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
+import org.graylog.storage.opensearch3.stats.StatsApi;
+import org.graylog.storage.opensearch3.testing.client.mock.ServerlessOpenSearchClient;
+import org.graylog2.indexer.indices.IndexTemplateAdapter;
+import org.graylog2.indexer.indices.OutdatedIndex;
+import org.graylog2.indexer.indices.stats.IndexStatistics;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.opensearch.client.opensearch._types.FlushStats;
+import org.opensearch.client.opensearch.indices.stats.IndexStats;
+import org.opensearch.client.opensearch.indices.stats.IndicesStats;
+import org.opensearch.client.transport.TransportOptions;
+import org.opensearch.client.transport.httpclient5.ApacheHttpClient5Options;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+
+@ExtendWith(MockitoExtension.class)
+class IndicesAdapterOSTest {
+
+    private IndicesAdapterOS toTest;
+
+    @Mock
+    private StatsApi statsApi;
+    @Mock
+    private ClusterStatsApi clusterStatsApi;
+    @Mock
+    private ClusterStateApi clusterStateApi;
+    @Mock
+    private IndexTemplateAdapter indexTemplateAdapter;
+    @Mock
+    private IndexStatisticsBuilder indexStatisticsBuilder;
+
+    @BeforeEach
+    void setUp() {
+        toTest = buildAdapter(ServerlessOpenSearchClient.builder().build());
+    }
+
+    @Test
+    void testIndicesStats() {
+        IndicesStats stats1 = mock(IndicesStats.class);
+        IndicesStats stats2 = mock(IndicesStats.class);
+        IndexStatistics builtStats1 = mock(IndexStatistics.class);
+        IndexStatistics builtStats2 = mock(IndexStatistics.class);
+        doReturn(builtStats1).when(indexStatisticsBuilder).build("index_1", stats1);
+        doReturn(builtStats2).when(indexStatisticsBuilder).build("index_2", stats2);
+
+        doReturn(Map.of("index_1", stats1, "index_2", stats2)).when(statsApi).indicesStatsWithShardLevel(List.of("index_1", "index_2"));
+        assertEquals(Set.of(builtStats1, builtStats2), toTest.indicesStats(List.of("index_1", "index_2")));
+
+        doReturn(Map.of()).when(statsApi).indicesStatsWithShardLevel(List.of("index_3333"));
+        assertEquals(Set.of(), toTest.indicesStats(List.of("index_3333")));
+    }
+
+    @Test
+    void testIndexStats() {
+        IndicesStats stats = mock(IndicesStats.class);
+        IndexStatistics builtStats = mock(IndexStatistics.class);
+        doReturn(builtStats).when(indexStatisticsBuilder).build("index_1", stats);
+
+        doReturn(stats).when(statsApi).indexStatsWithShardLevel("index_1");
+        assertEquals(Optional.of(builtStats), toTest.getIndexStats("index_1"));
+
+        doReturn(null).when(statsApi).indexStatsWithShardLevel("index_3333");
+        assertTrue(toTest.getIndexStats("index_3333").isEmpty());
+    }
+
+    @Test
+    void testStoreSizeInBytes() {
+        doReturn(Optional.of(42L)).when(statsApi).storeSizes("index_1");
+        doReturn(Optional.of(0L)).when(statsApi).storeSizes("index_2");
+
+        assertEquals(Optional.of(42L), toTest.storeSizeInBytes("index_1"));
+        assertEquals(Optional.of(0L), toTest.storeSizeInBytes("index_2"));
+        assertEquals(Optional.empty(), toTest.storeSizeInBytes("index_3333"));
+    }
+
+    @Test
+    void testGetIndexStatsAsJsonNode() {
+        final IndicesStats graylog13Stats = buildIndicesStats(
+                "P999CCTTFOhEGdspOYh9Q",
+                13L,
+                FlushStats.builder().total(333L).totalTimeInMillis(1000L).periodic(676L)
+        );
+        final IndicesStats graylog12Stats = buildIndicesStats(
+                "P999CCTTFOhEGdspOYh9V",
+                17L,
+                FlushStats.builder().total(1L).totalTimeInMillis(0L).periodic(1L)
+        );
+
+        final LinkedHashMap<String, IndicesStats> returnedMap = new LinkedHashMap<>();
+        returnedMap.put("graylog_13", graylog13Stats);
+        returnedMap.put("graylog_12", graylog12Stats);
+        doReturn(returnedMap)
+                .when(statsApi)
+                .indicesStatsWithDocsAndStore(List.of("graylog_13", "graylog_12"));
+
+
+        String expected = """
+                {
+                  "graylog_13": {
+                    "primaries": {
+                      "docs": {
+                        "count": 13
+                      },
+                      "flush": {
+                        "periodic": 676,
+                        "total": 333,
+                        "total_time_in_millis": 1000
+                      }
+                    },
+                    "total": {},
+                    "uuid": "P999CCTTFOhEGdspOYh9Q"
+                  },
+                  "graylog_12": {
+                    "primaries": {
+                      "docs": {
+                        "count": 17
+                      },
+                      "flush": {
+                        "periodic": 1,
+                        "total": 1,
+                        "total_time_in_millis": 0
+                      }
+                    },
+                    "total": {},
+                    "uuid": "P999CCTTFOhEGdspOYh9V"
+                  }
+                }
+                """.replaceAll("\\s+", "").trim();
+        final JsonNode returned = toTest.getIndexStats(List.of("graylog_13", "graylog_12"));
+
+        assertEquals(expected, returned.toString());
+    }
+
+
+    @Test
+    void testGetOutdatedIndicesFiltersOlderVersion() {
+        final IndicesAdapterOS adapter = buildAdapterWithSettingsResponse("""
+                {
+                  "current_index": {"settings": {"index.version.created_string": "2.5.0"}},
+                  "old_index":     {"settings": {"index.version.created_string": "1.3.0", "index.store.type": "local"}}
+                }
+                """);
+
+        assertThat(adapter.getOutdatedIndices(2)).containsExactly(
+                new OutdatedIndex("old_index", "1.3.0", false)
+        );
+    }
+
+    @Test
+    void testGetOutdatedIndicesAllCurrentMajorVersion() {
+        final IndicesAdapterOS adapter = buildAdapterWithSettingsResponse("""
+                {
+                  "index_a": {"settings": {"index.version.created_string": "2.5.0"}},
+                  "index_b": {"settings": {"index.version.created_string": "2.11.0"}}
+                }
+                """);
+
+        assertThat(adapter.getOutdatedIndices(2)).isEmpty();
+    }
+
+    @Test
+    void testGetOutdatedIndicesMissingVersionTreatedAsOutdated() {
+        final IndicesAdapterOS adapter = buildAdapterWithSettingsResponse("""
+                {
+                  "no_settings": {},
+                  "no_version":  {"settings": {"some.other.setting": "value"}},
+                  "current":     {"settings": {"index.version.created_string": "2.5.0"}}
+                }
+                """);
+
+        assertThat(adapter.getOutdatedIndices(2)).containsExactlyInAnyOrder(
+                new OutdatedIndex("no_settings", "", false),
+                new OutdatedIndex("no_version", "", false)
+        );
+    }
+
+    @Test
+    void testGetOutdatedIndicesShowsWarmIndex() {
+        final IndicesAdapterOS adapter = buildAdapterWithSettingsResponse("""
+                {
+                  "current_index": {"settings": {"index.version.created_string": "2.5.0"}},
+                  "old_index":     {"settings": {"index.version.created_string": "1.3.0", "index.store.type": "remote_snapshot"}}
+                }
+                """);
+
+        assertThat(adapter.getOutdatedIndices(2)).containsExactly(
+                new OutdatedIndex("old_index", "1.3.0", true)
+        );
+    }
+
+    @Test
+    void testOptimizeIndexSetsResponseTimeoutOnRequest() {
+        final Duration timeout = Duration.hours(1);
+        final AtomicReference<TransportOptions> capturedOptions = new AtomicReference<>();
+
+        final OfficialOpensearchClient client = ServerlessOpenSearchClient.builder()
+                .captureOptions(capturedOptions::set)
+                .stubResponse("POST", "/*/_forcemerge", "{\"_shards\":{\"total\":1,\"successful\":1,\"failed\":0}}")
+                .build();
+        buildAdapter(client).optimizeIndex("test_index", 1, timeout);
+
+        assertThat(capturedOptions.get()).isInstanceOf(ApacheHttpClient5Options.class);
+        final var httpOptions = (ApacheHttpClient5Options) capturedOptions.get();
+        assertThat(httpOptions.getRequestConfig().getResponseTimeout().toMilliseconds())
+                .isEqualTo(timeout.toMilliseconds());
+    }
+
+    private IndicesAdapterOS buildAdapterWithSettingsResponse(String settingsJson) {
+        final OfficialOpensearchClient client = ServerlessOpenSearchClient.builder()
+                .stubResponse("GET", "/_settings", settingsJson)
+                .build();
+        return buildAdapter(client);
+    }
+
+    private IndicesAdapterOS buildAdapter(OfficialOpensearchClient client) {
+        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+        return new IndicesAdapterOS(client, statsApi, clusterStatsApi, clusterStateApi, indexTemplateAdapter, indexStatisticsBuilder, objectMapper);
+    }
+
+    private IndicesStats buildIndicesStats(final String uuid, final long count, final FlushStats.Builder flushStatsBuilder) {
+        return IndicesStats.builder()
+                .uuid(uuid)
+                .primaries(IndexStats.builder()
+                        .docs(builder -> builder.count(count))
+                        .flush(flushStatsBuilder.build())
+                        .build())
+                .total(IndexStats.builder().build())
+                .build();
+    }
+}

@@ -18,10 +18,13 @@ import type { Attribute, Sort } from 'stores/PaginationTypes';
 
 export const SYSTEM_EVENT_DEFINITION_TYPE = 'system-notifications-v1';
 
-const getEventDefinitionTableElements = (pluggableAttributes?: {
-  attributeNames?: Array<string>;
-  attributes?: Array<Attribute>;
-}) => {
+const getEventDefinitionTableElements = (
+  pluggableAttributes?: {
+    attributeNames?: Array<string>;
+    attributes?: Array<Attribute>;
+  },
+  tacticsTechniquesAttribute?: Attribute,
+) => {
   const defaultLayout = {
     entityTableId: 'event_definitions',
     defaultPageSize: 20,
@@ -30,31 +33,42 @@ const getEventDefinitionTableElements = (pluggableAttributes?: {
       'title',
       'description',
       'priority',
+      'notifications',
       'scheduling',
       'status',
       'matched_at',
+      'tags',
+      ...(tacticsTechniquesAttribute ? [tacticsTechniquesAttribute.id] : []),
+      ...(pluggableAttributes?.attributeNames || []),
+    ],
+    defaultColumnOrder: [
+      'title',
+      'description',
+      'priority',
+      'notifications',
+      '_entity_source.source',
+      'matched_at',
+      'status',
+      'scheduling',
+      'tags',
+      ...(tacticsTechniquesAttribute ? [tacticsTechniquesAttribute.id] : []),
       ...(pluggableAttributes?.attributeNames || []),
     ],
   };
-  const columnOrder = [
-    'title',
-    'description',
-    'priority',
-    'matched_at',
-    'status',
-    'scheduling',
-    ...(pluggableAttributes?.attributeNames || []),
-  ];
 
-  const additionalAttributes = [
+  // `tags` is supplied via the fetchEventDefinitions response (so it shows up in the filter
+  // dropdown with its custom filter_component) and is NOT added here, otherwise
+  // PaginatedEntityTable would render a duplicate Tags column.
+  const additionalAttributes: Array<Attribute> = [
     { id: 'scheduling', title: 'Scheduling', sortable: false },
     { id: 'matched_at', title: 'Last Matched', sortable: true },
+    { id: 'notifications', title: 'Notifications', sortable: false },
+    ...(tacticsTechniquesAttribute ? [tacticsTechniquesAttribute] : []),
     ...(pluggableAttributes?.attributes || []),
   ];
 
   return {
     defaultLayout,
-    columnOrder,
     additionalAttributes,
   };
 };

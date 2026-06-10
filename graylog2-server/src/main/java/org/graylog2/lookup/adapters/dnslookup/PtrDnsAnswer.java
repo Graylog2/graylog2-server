@@ -21,13 +21,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 /**
  * Reverse (PTR) DNS lookup response from {@link DnsClient}.
  */
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 @JsonDeserialize(builder = PtrDnsAnswer.Builder.class)
 public abstract class PtrDnsAnswer implements DnsAnswer {

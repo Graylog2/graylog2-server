@@ -1,0 +1,45 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+package org.graylog2.telemetry.suppliers;
+
+import com.github.zafarkhaja.semver.Version;
+import org.assertj.core.api.Assertions;
+import org.graylog.testing.mongodb.MongoDBExtension;
+import org.graylog.testing.mongodb.MongoDBTestService;
+import org.graylog.testing.mongodb.MongoDBVersion;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+@ExtendWith(MongoDBExtension.class)
+public class MongoDBMetricsSupplierTest {
+
+    @Test
+    public void shouldReturnMongoDBMetrics(MongoDBTestService testService) {
+
+        final MongoDBMetricsSupplier supplier = new MongoDBMetricsSupplier(testService.mongoConnection());
+
+        Assertions.assertThat(supplier.get())
+                .isPresent()
+                .hasValueSatisfying(event -> {
+                    final MongoDBVersion expectedVersion = testService.version();
+                    final String actualVersion = (String) event.metrics().get("version");
+                    final Version parsedActual = Version.parse(actualVersion);
+                    Assertions.assertThat(parsedActual.satisfies(expectedVersion.version()))
+                            .isTrue();
+                });
+    }
+}

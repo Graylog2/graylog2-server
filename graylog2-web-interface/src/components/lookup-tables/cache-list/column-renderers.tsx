@@ -15,12 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 
+import Routes from 'routing/Routes';
 import NumberUtils from 'util/NumberUtils';
 import { MetricsMapper, MetricContainer, CounterRate } from 'components/metrics';
-import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
-import Cache from 'components/lookup-tables/Cache';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import type { CacheEntity } from 'components/lookup-tables/types';
 
@@ -44,13 +45,11 @@ const Title = styled.div`
 `;
 
 const TitleCol = ({ cache, children }: { cache: CacheEntity; children: string }) => {
-  const { setModal, setTitle, setEntity } = useModalContext();
+  const navigate = useNavigate();
 
-  const onClick = React.useCallback(() => {
-    setModal('CACHE');
-    setTitle(cache.name);
-    setEntity(<Cache cache={cache} />);
-  }, [cache, setModal, setTitle, setEntity]);
+  const onClick = useCallback(() => {
+    navigate(Routes.SYSTEM.LOOKUPTABLES.CACHES.show(cache.name));
+  }, [navigate, cache.name]);
 
   return (
     <TitleRow>
@@ -131,11 +130,11 @@ const columnRenderers: ColumnRenderers<CacheEntity> = {
       renderCell: (name: string) => <span>{name}</span>,
     },
     entries: {
-      staticWidth: 150,
+      staticWidth: 'matchHeader',
       renderCell: (_arg: unknown, cache: CacheEntity) => <EntriesCol cache={cache} />,
     },
     hit_rate: {
-      staticWidth: 150,
+      staticWidth: 'matchHeader',
       renderCell: (_arg: unknown, cache: CacheEntity) => <HitRateCol cache={cache} />,
     },
     throughput: {

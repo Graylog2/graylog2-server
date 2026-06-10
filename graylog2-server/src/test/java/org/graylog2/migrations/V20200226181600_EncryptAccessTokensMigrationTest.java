@@ -20,18 +20,20 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.security.AccessTokenCipher;
 import org.graylog2.security.AccessTokenImpl;
 import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.security.AccessTokenImpl.COLLECTION_NAME;
@@ -42,12 +44,10 @@ import static org.graylog2.security.AccessTokenImpl.TOKEN_TYPE;
 import static org.graylog2.security.AccessTokenImpl.USERNAME;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class V20200226181600_EncryptAccessTokensMigrationTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     public Configuration configuration;
@@ -55,12 +55,12 @@ public class V20200226181600_EncryptAccessTokensMigrationTest {
     private V20200226181600_EncryptAccessTokensMigration migration;
     private MongoCollection<Document> collection;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) throws Exception {
         when(configuration.getPasswordSecret()).thenReturn("Q53B8mmRGAB9f2Jwuo6CPzvU5gheJWq8vVPmU7E7JS8vBtxbAxVWHk5S0thQDu2Xu6jTELyNqiHNc6MMY7kYtziaIMEenImp");
 
-        migration = new V20200226181600_EncryptAccessTokensMigration(new AccessTokenCipher(configuration), mongodb.mongoConnection());
-        collection = mongodb.mongoConnection().getMongoDatabase().getCollection(COLLECTION_NAME);
+        migration = new V20200226181600_EncryptAccessTokensMigration(new AccessTokenCipher(configuration), mongoCollections.mongoConnection());
+        collection = mongoCollections.mongoConnection().getMongoDatabase().getCollection(COLLECTION_NAME);
     }
 
     @Test

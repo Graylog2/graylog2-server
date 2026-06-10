@@ -68,7 +68,7 @@ class ImportExtractors extends React.Component<
                   id="extractor-export-textarea"
                   rows={30}
                 />
-                <Button type="submit" bsStyle="success">
+                <Button type="submit" bsStyle="primary">
                   Add extractors to input
                 </Button>
               </form>

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useCallback } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import find from 'lodash/find';
 import isEmpty from 'lodash/isEmpty';
@@ -30,13 +30,10 @@ import {
 } from 'stores/sidecars/CollectorConfigurationsStore';
 import { CollectorsActions, CollectorsStore } from 'stores/sidecars/CollectorsStore';
 import { SidecarsActions } from 'stores/sidecars/SidecarsStore';
-import {
-  SidecarsAdministrationActions,
-  SidecarsAdministrationStore,
-} from 'stores/sidecars/SidecarsAdministrationStore';
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
 import { useStore } from 'stores/connect';
-import type { SidecarCollectorPairType, Configuration } from 'components/sidecars/types';
+import type { SidecarCollectorPairType, Configuration, Collector } from 'components/sidecars/types';
+import useSidecarsAdministration, { useSetSidecarAction } from 'hooks/useSidecarsAdministration';
 
 import CollectorsAdministration, { PAGE_SIZES } from './CollectorsAdministration';
 
@@ -49,118 +46,117 @@ const SEARCH_DEBOUNCE_THRESHOLD = 500;
 
 const CollectorsAdministrationContainer = ({ ...props }: Props) => {
   const collectors = useStore(CollectorsStore);
-  const sidecars = useStore(SidecarsAdministrationStore);
   const configurations = useStore(CollectorConfigurationsStore);
 
-  const reloadSidecars = useCallback(() => {
-    if (sidecars) {
-      SidecarsAdministrationActions.refreshList();
-    }
-  }, [sidecars]);
+  const { page: initialPage, pageSize: initialPageSize } = props.paginationQueryParameter;
+  const initialQuery = props.nodeId ? `node_id:${props.nodeId}` : '';
 
-  const loadData = useCallback(
-    (nodeId: string) => {
-      const { page, pageSize } = props.paginationQueryParameter;
-      const query = nodeId ? `node_id:${nodeId}` : '';
+  const [query, setQuery] = useState(initialQuery);
+  const [page, setPage] = useState(initialPage);
+  const [pageSize, setPageSize] = useState(initialPageSize);
+  const [filters, setFilters] = useState<{}>({});
 
-      CollectorsActions.all();
-      SidecarsAdministrationActions.list({ query, page, pageSize });
-      CollectorConfigurationsActions.all();
+  const { data: sidecars } = useSidecarsAdministration({ query, page, pageSize, filters });
+  const { mutateAsync: setAction } = useSetSidecarAction();
+
+  useEffect(() => {
+    CollectorsActions.all();
+    CollectorConfigurationsActions.all();
+  }, []);
+
+  const handlePageChange = useCallback((newPage: number, newPageSize: number) => {
+    setPage(newPage);
+    setPageSize(newPageSize);
+  }, []);
+
+  const handleFilter = useCallback(
+    (property: string, value: string) => {
+      const { resetPage } = props.paginationQueryParameter;
+
+      if (property) {
+        setFilters((prev) => {
+          const newFilters = cloneDeep(prev);
+          newFilters[property] = value;
+
+          return newFilters;
+        });
+      } else {
+        setFilters({});
+      }
+
+      resetPage();
+      setPage(1);
     },
     [props.paginationQueryParameter],
   );
 
-  useEffect(() => {
-    loadData(props.nodeId);
-  }, [loadData, props.nodeId]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleQueryChange = useCallback(
+    debounce((newQuery = '', callback = () => {}) => {
+      setQuery(newQuery);
+      setPage(1);
+      callback();
+    }, SEARCH_DEBOUNCE_THRESHOLD),
+    [],
+  );
 
-  useEffect(() => {
-    const interval = setInterval(reloadSidecars, 5000);
+  const handleConfigurationChange = useCallback(
+    (
+      selectedSidecars: SidecarCollectorPairType[],
+      selectedConfigurations: Configuration[],
+      doneCallback: () => void,
+    ) => {
+      SidecarsActions.assignConfigurations(selectedSidecars, selectedConfigurations).then((response) => {
+        doneCallback();
 
-    return () => clearInterval(interval);
-  }, [reloadSidecars]);
+        return response;
+      });
+    },
+    [],
+  );
 
-  const handlePageChange = (page: number, pageSize: number) => {
-    const { filters, query } = sidecars;
+  const handleProcessAction = useCallback(
+    (action: string, selectedCollectors: { [sidecarId: string]: string[] }, doneCallback: () => void) => {
+      setAction({ action, collectors: selectedCollectors }).then((response) => {
+        doneCallback();
 
-    SidecarsAdministrationActions.list({ query, filters, page, pageSize });
-  };
+        return response;
+      });
+    },
+    [setAction],
+  );
 
-  const handleFilter = (property: string, value: string) => {
-    const { resetPage, pageSize } = props.paginationQueryParameter;
-    const { filters, query } = sidecars;
-    let newFilters;
-
-    if (property) {
-      newFilters = cloneDeep(filters);
-      newFilters[property] = value;
-    } else {
-      newFilters = {};
+  const sidecarCollectors = useMemo(() => {
+    if (!collectors?.collectors || !sidecars?.sidecars || !configurations?.configurations) {
+      return null;
     }
 
-    resetPage();
+    const result: SidecarCollectorPairType[] = [];
 
-    SidecarsAdministrationActions.list({ query, filters: newFilters, pageSize, page: 1 });
-  };
+    sidecars.sidecars
+      .sort((s1, s2) => naturalSortIgnoreCase(s1.node_name, s2.node_name))
+      .forEach((sidecar) => {
+        const compatibleCollectorIds = sidecar.collectors;
 
-  const handleQueryChange = debounce((query = '', callback = () => {}) => {
-    const { pageSize } = props.paginationQueryParameter;
-    const { filters } = sidecars;
+        if (isEmpty(compatibleCollectorIds)) {
+          result.push({ collector: {} as Collector, sidecar: sidecar });
 
-    SidecarsAdministrationActions.list({ query, filters, pageSize, page: 1 }).finally(callback);
-  }, SEARCH_DEBOUNCE_THRESHOLD);
+          return;
+        }
 
-  const handleConfigurationChange = (
-    selectedSidecars: SidecarCollectorPairType[],
-    selectedConfigurations: Configuration[],
-    doneCallback: () => void,
-  ) => {
-    SidecarsActions.assignConfigurations(selectedSidecars, selectedConfigurations).then((response) => {
-      doneCallback();
-      const { query, filters } = sidecars;
-      const { page, pageSize } = props.paginationQueryParameter;
+        compatibleCollectorIds
+          .map((id) => find(collectors.collectors, { id: id }))
+          .forEach((compatibleCollector) => {
+            result.push({ collector: compatibleCollector, sidecar: sidecar });
+          });
+      });
 
-      SidecarsAdministrationActions.list({ query, filters, pageSize, page });
+    return result;
+  }, [collectors?.collectors, sidecars?.sidecars, configurations?.configurations]);
 
-      return response;
-    });
-  };
-
-  const handleProcessAction = (
-    action: string,
-    selectedCollectors: { [sidecarId: string]: string[] },
-    doneCallback: () => void,
-  ) => {
-    SidecarsAdministrationActions.setAction(action, selectedCollectors).then((response) => {
-      doneCallback();
-
-      return response;
-    });
-  };
-
-  if (!collectors?.collectors || !sidecars?.sidecars || !configurations?.configurations) {
+  if (!sidecarCollectors) {
     return <Spinner text="Loading collector list..." />;
   }
-
-  const sidecarCollectors = [];
-
-  sidecars.sidecars
-    .sort((s1, s2) => naturalSortIgnoreCase(s1.node_name, s2.node_name))
-    .forEach((sidecar) => {
-      const compatibleCollectorIds = sidecar.collectors;
-
-      if (isEmpty(compatibleCollectorIds)) {
-        sidecarCollectors.push({ collector: {}, sidecar: sidecar });
-
-        return;
-      }
-
-      compatibleCollectorIds
-        .map((id) => find(collectors.collectors, { id: id }))
-        .forEach((compatibleCollector) => {
-          sidecarCollectors.push({ collector: compatibleCollector, sidecar: sidecar });
-        });
-    });
 
   return (
     <CollectorsAdministration

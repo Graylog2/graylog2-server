@@ -32,6 +32,8 @@ import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.NonDeletableSystemScope;
+import org.graylog2.database.entities.source.EntitySource;
+import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.users.User;
 import org.joda.time.DateTime;
@@ -61,6 +63,7 @@ public class EventDefinitionHandler {
     private final DBJobDefinitionService jobDefinitionService;
     private final DBJobTriggerService jobTriggerService;
     private final ClusterEventBus clusterEventBus;
+    private final EntitySourceService entitySourceService;
 
     // Provider to avoid circular dependency
     private final Provider<EntitySharesService> entitySharesServiceProvider;
@@ -73,13 +76,15 @@ public class EventDefinitionHandler {
                                   DBJobTriggerService jobTriggerService,
                                   Provider<EntitySharesService> entitySharesServiceProvider,
                                   JobSchedulerClock clock,
-                                  ClusterEventBus clusterEventBus) {
+                                  ClusterEventBus clusterEventBus,
+                                  EntitySourceService entitySourceService) {
         this.eventDefinitionService = eventDefinitionService;
         this.jobDefinitionService = jobDefinitionService;
         this.jobTriggerService = jobTriggerService;
         this.entitySharesServiceProvider = entitySharesServiceProvider;
         this.clock = clock;
         this.clusterEventBus = clusterEventBus;
+        this.entitySourceService = entitySourceService;
     }
 
     /**
@@ -125,7 +130,12 @@ public class EventDefinitionHandler {
 
         EventDefinitionDto copyDto = createWithoutSchedule(copy, Optional.of(user));
         entitySharesServiceProvider.get().cloneEntityGrants(GRNTypes.EVENT_DEFINITION, eventDefinition.id(), copyDto.id(), user);
-
+        entitySourceService.create(EntitySource.builder()
+                .source(EntitySource.USER_DEFINED)
+                .entityId(copyDto.id())
+                .parentId(eventDefinition.id())
+                .entityType(EntitySource.EVENT_DEFINITION_TYPE)
+                .build());
         return copyDto;
     }
 
@@ -148,10 +158,20 @@ public class EventDefinitionHandler {
      * @return the updated event definition
      */
     public EventDefinitionDto update(EventDefinitionDto updatedEventDefinition, boolean schedule) {
+        return update(updatedEventDefinition, schedule, true);
+    }
+
+    /**
+     * Like {@link #update(EventDefinitionDto, boolean)}, but allows bypassing the scope mutability check.
+     * Only system-driven writes such as the Illuminate content-pack upgrade path should pass
+     * {@code checkMutability = false}: that path must rewrite the content of immutable Illuminate-scoped
+     * definitions in place to preserve their IDs.
+     */
+    public EventDefinitionDto update(EventDefinitionDto updatedEventDefinition, boolean schedule, boolean checkMutability) {
         // Grab the old record so we can revert to it if something goes wrong
         final Optional<EventDefinitionDto> oldEventDefinition = eventDefinitionService.get(updatedEventDefinition.id());
 
-        final EventDefinitionDto eventDefinition = updateEventDefinition(updatedEventDefinition);
+        final EventDefinitionDto eventDefinition = updateEventDefinition(updatedEventDefinition, checkMutability);
 
         try {
             if (schedule) {
@@ -167,7 +187,7 @@ public class EventDefinitionHandler {
             // Cleanup if anything goes wrong
             LOG.error("Reverting to old event definition <{}/{}> because of an error updating the job definition",
                     eventDefinition.id(), eventDefinition.title(), e);
-            oldEventDefinition.ifPresent(eventDefinitionService::save);
+            oldEventDefinition.ifPresent(dto -> eventDefinitionService.save(dto, checkMutability));
             throw e;
         }
 
@@ -206,7 +226,10 @@ public class EventDefinitionHandler {
      */
     public boolean delete(String eventDefinitionId) {
         return doDelete(eventDefinitionId,
-                () -> eventDefinitionService.deleteUnregister(eventDefinitionId) > 0);
+                () -> {
+                    entitySourceService.deleteByEntityId(eventDefinitionId);
+                    return eventDefinitionService.deleteUnregister(eventDefinitionId) > 0;
+                });
     }
 
     /**
@@ -296,8 +319,8 @@ public class EventDefinitionHandler {
                 .orElseThrow(() -> new IllegalArgumentException("Event definition <" + eventDefinitionId + "> doesn't exist"));
     }
 
-    private EventDefinitionDto updateEventDefinition(EventDefinitionDto updatedEventDefinition) {
-        final EventDefinitionDto eventDefinition = eventDefinitionService.save(updatedEventDefinition);
+    private EventDefinitionDto updateEventDefinition(EventDefinitionDto updatedEventDefinition, boolean checkMutability) {
+        final EventDefinitionDto eventDefinition = eventDefinitionService.save(updatedEventDefinition, checkMutability);
         LOG.debug("Updated event definition <{}/{}>", eventDefinition.id(), eventDefinition.title());
         return eventDefinition;
     }

@@ -19,7 +19,10 @@ package org.graylog.plugins.pipelineprocessor.db;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbRuleService;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
+import org.graylog2.database.DbEntity;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.ScopedEntity;
 import org.joda.time.DateTime;
@@ -29,7 +32,8 @@ import org.mongojack.ObjectId;
 import javax.annotation.Nullable;
 
 @AutoValue
-public abstract class RuleDao extends ScopedEntity {
+@DbEntity(collection = MongoDbRuleService.COLLECTION, readPermission = PipelineRestPermissions.PIPELINE_RULE_READ)
+public abstract class RuleDao implements ScopedEntity<RuleDao.Builder> {
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_SOURCE = "source";
@@ -65,7 +69,7 @@ public abstract class RuleDao extends ScopedEntity {
     public abstract String simulatorMessage();
 
     public static Builder builder() {
-        return new AutoValue_RuleDao.Builder();
+        return new AutoValue_RuleDao.Builder().scope(DefaultEntityScope.NAME);
     }
 
     public abstract Builder toBuilder();
@@ -94,10 +98,12 @@ public abstract class RuleDao extends ScopedEntity {
     }
 
     @AutoValue.Builder
-    public abstract static class Builder extends ScopedEntity.AbstractBuilder<Builder> {
+    public abstract static class Builder implements ScopedEntity.Builder<Builder> {
         public abstract RuleDao build();
 
         public abstract Builder id(String id);
+
+        public abstract Builder scope(String scope);
 
         public abstract Builder title(String title);
 

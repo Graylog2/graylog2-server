@@ -1,0 +1,11 @@
+type = "fixed"
+message = "Fix resource leaking in indices parser, referenced from datanode preflight check."
+
+details.user = """
+During the run of the OpensearchDataDirCompatibilityCheck preflight check, Datanode is parsing
+Opensearch indices to validate versions compatibility. The parser opened shards and state files but has not properly
+closed these resources, blocking their cleanup during index rotation/retention.
+"""
+
+issues = ["23870"]
+pulls = ["24933"]

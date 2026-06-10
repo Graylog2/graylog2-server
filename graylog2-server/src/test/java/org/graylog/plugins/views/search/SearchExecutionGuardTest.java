@@ -26,8 +26,8 @@ import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,7 +45,7 @@ public class SearchExecutionGuardTest {
     private SearchExecutionGuard sut;
     private Map<String, PluginMetaData> providedCapabilities;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         providedCapabilities = new HashMap<>();
         providedCapabilities.put("my only capability", mock(PluginMetaData.class));

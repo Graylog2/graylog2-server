@@ -15,10 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+import { SYSTEM_EVENT_DEFINITION_TYPE } from 'components/event-definitions/constants';
 
-// eslint-disable-next-line import/prefer-default-export
 export const eventDefinition: EventDefinition = {
   _scope: 'DEFAULT',
+  _entity_source: {
+    source: 'USER_DEFINED',
+    entity_type: 'event_definition',
+  },
   id: '66d719128a7ffa68df52fd7f',
   title: 'Issue 20294',
   description: '',
@@ -74,6 +78,7 @@ export const eventDefinition: EventDefinition = {
   },
   field_spec: {},
   key_spec: ['mightyalert', 'secondkey'],
+  tags: [],
   notification_settings: {
     grace_period_ms: 300000,
     backlog_size: 0,
@@ -87,6 +92,16 @@ export const eventDefinition: EventDefinition = {
   ],
   scheduler: null,
   state: 'ENABLED',
+  tactics_techniques: [],
   remediation_steps: '',
   event_procedure: '',
+  event_summary_template: null,
+};
+
+export const systemEventDefinition = {
+  ...eventDefinition,
+  config: {
+    ...eventDefinition.config,
+    type: SYSTEM_EVENT_DEFINITION_TYPE,
+  },
 };

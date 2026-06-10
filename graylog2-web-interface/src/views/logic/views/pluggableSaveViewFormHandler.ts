@@ -27,7 +27,6 @@ const executeDuplicationHandler = async (
 ): Promise<View> => {
   let updatedView = view.toBuilder().build();
 
-  // eslint-disable-next-line no-restricted-syntax
   for (const duplicationHandler of duplicationHandlers) {
     // eslint-disable-next-line no-await-in-loop,no-loop-func
     const viewWithPluginData = await duplicationHandler(updatedView, userPermissions).catch((e) => {

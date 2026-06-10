@@ -25,12 +25,10 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useUserDateTime from 'hooks/useUserDateTime';
 import { onInitializingTimerange } from 'views/components/TimerangeForForm';
 import type { TimeRange } from 'views/logic/queries/Query';
-import ToolsStore from 'stores/tools/ToolsStore';
+import { testNaturalDate } from 'api/tools';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 import { isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 import type { BsSize } from 'components/bootstrap/types';
 
 type PresetOption = {
@@ -61,9 +59,7 @@ const relativeStartTimeForTimeRange = (timeRange: TimeRange) => {
     case 'absolute':
       return moment().diff(timeRange.from, 'seconds');
     case 'keyword':
-      return ToolsStore.testNaturalDate(timeRange.keyword, timeRange.timezone).then(({ from }) =>
-        moment().diff(from, 'seconds'),
-      );
+      return testNaturalDate(timeRange.keyword, timeRange.timezone).then(({ from }) => moment().diff(from, 'seconds'));
     default:
       throw Error("Time range type doesn't not exist");
   }
@@ -143,7 +139,6 @@ const TimeRangePresetDropdown = ({
 }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const { formatTime } = useUserDateTime();
-  const location = useLocation();
   const { options, setOptions: setDropdownOptions } = usePresetOptions(disabled, limitDuration);
 
   const _onChange = useCallback(
@@ -153,13 +148,12 @@ const TimeRangePresetDropdown = ({
       }
 
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_TIMERANGE_PRESET_SELECTED, {
-        app_pathname: getPathnameWithoutId(location.pathname),
         app_section: 'search-bar',
         app_action_value: 'timerange-preset-selector',
         event_details: { timerange },
       });
     },
-    [formatTime, location.pathname, onChange, sendTelemetry],
+    [formatTime, onChange, sendTelemetry],
   );
 
   const onToggle = useCallback(

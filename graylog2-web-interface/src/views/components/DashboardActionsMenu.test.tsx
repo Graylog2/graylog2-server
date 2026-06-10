@@ -25,7 +25,6 @@ import type { LayoutState } from 'views/components/contexts/SearchPageLayoutCont
 import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
 import { SAVE_COPY, BLANK } from 'views/components/contexts/SearchPageLayoutContext';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import useCurrentUser from 'hooks/useCurrentUser';
 import TestStoreProvider from 'views/test/TestStoreProvider';
@@ -33,6 +32,7 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import OnSaveViewAction from 'views/logic/views/OnSaveViewAction';
 import HotkeysProvider from 'contexts/HotkeysProvider';
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
+import { createView } from 'views/api/views';
 
 import DashboardActionsMenu from './DashboardActionsMenu';
 
@@ -41,10 +41,8 @@ jest.mock('views/hooks/useSaveViewFormControls');
 jest.mock('hooks/useCurrentUser');
 jest.mock('logic/generateObjectId', () => jest.fn(() => 'new-dashboard-id'));
 
-jest.mock('views/stores/ViewManagementStore', () => ({
-  ViewManagementActions: {
-    create: jest.fn((v) => Promise.resolve(v)).mockName('create'),
-  },
+jest.mock('views/api/views', () => ({
+  createView: jest.fn((v) => Promise.resolve(v)).mockName('create'),
 }));
 
 jest.mock('stores/permissions/EntityShareStore', () => ({
@@ -93,13 +91,13 @@ describe('DashboardActionsMenu', () => {
       name: /create dashboard/i,
     });
 
-    userEvent.click(saveButton);
+    await userEvent.click(saveButton);
   };
 
   const openDashboardSaveForm = async () => {
     const saveAsMenuItem = await screen.findByRole('button', { name: /save as new dashboard/i });
 
-    userEvent.click(saveAsMenuItem);
+    await userEvent.click(saveAsMenuItem);
   };
 
   beforeEach(() => {
@@ -122,7 +120,7 @@ describe('DashboardActionsMenu', () => {
 
     const updatedDashboard = mockView.toBuilder().id('new-dashboard-id').build();
 
-    await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedDashboard, null));
+    await waitFor(() => expect(createView).toHaveBeenCalledWith(updatedDashboard, null, undefined));
   });
 
   it('should extend a dashboard with plugin data on duplication', async () => {
@@ -146,15 +144,15 @@ describe('DashboardActionsMenu', () => {
       .summary('This dashboard has been extended by a plugin')
       .build();
 
-    await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedDashboard, null));
+    await waitFor(() => expect(createView).toHaveBeenCalledWith(updatedDashboard, null, 'view-id'));
   });
 
   it('should open edit dashboard meta information modal', async () => {
     const { findByText } = render(<SUT />);
-    userEvent.click(await screen.findByRole('button', { name: /more actions/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /more actions/i }));
     const editMenuItem = await screen.findByText(/Edit metadata/i);
 
-    userEvent.click(editMenuItem);
+    await userEvent.click(editMenuItem);
 
     await findByText(/Editing dashboard/);
   });
@@ -162,7 +160,7 @@ describe('DashboardActionsMenu', () => {
   it('should open dashboard share modal', async () => {
     render(<SUT />);
     const openShareButton = await screen.findByRole('button', { name: /Share/i });
-    userEvent.click(openShareButton);
+    await userEvent.click(openShareButton);
 
     await screen.findByRole('button', { name: /update sharing/i });
   });
@@ -210,7 +208,7 @@ describe('DashboardActionsMenu', () => {
 
   it('should save view when pressing related keyboard shortcut', async () => {
     render(<SUT />);
-    userEvent.keyboard('{Meta>}s{/Meta}');
+    await userEvent.keyboard('{Meta>}s{/Meta}');
     await waitFor(() => expect(OnSaveViewAction).toHaveBeenCalledTimes(1));
   });
 });

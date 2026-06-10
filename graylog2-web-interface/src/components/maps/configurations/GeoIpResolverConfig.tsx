@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Field, Form, Formik } from 'formik';
 
 import { IfPermitted, Select, TimeUnitInput, ModalSubmit, InputOptionalInfo } from 'components/common';
@@ -23,32 +23,10 @@ import FormikInput from 'components/common/FormikInput';
 import { DocumentationLink } from 'components/support';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import GCSSetupInfo from 'components/gcs/GCSSetupInfo';
-
-export type GeoVendorType = 'MAXMIND' | 'IPINFO';
-export type TimeUnit = 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS';
-
-const CLOUD_STORAGE_OPTION = {
-  GCS: 'gcs',
-  S3: 's3',
-} as const;
-
-export type GeoIpConfigType = {
-  enabled: boolean;
-  enforce_graylog_schema: boolean;
-  db_vendor_type: GeoVendorType;
-  city_db_path: string;
-  asn_db_path: string;
-  refresh_interval_unit: TimeUnit;
-  refresh_interval: number;
-  pull_from_cloud?: (typeof CLOUD_STORAGE_OPTION)[keyof typeof CLOUD_STORAGE_OPTION];
-  gcs_project_id?: string;
-};
-
-export type OptionType = {
-  value: string;
-  label: string;
-};
+import type { GeoVendorType, GeoIpConfigType, OptionType } from 'components/maps/configurations/types';
+import { CLOUD_STORAGE_OPTION } from 'components/maps/configurations/types';
+import GCSGeoIpFormGroup from 'components/maps/configurations/GCSGeoIpFormGroup';
+import ABSGeoIpFormGroup from 'components/maps/configurations/ABSGeoIpFormGroup';
 
 type Props = {
   config?: GeoIpConfigType;
@@ -65,20 +43,18 @@ const defaultConfig: GeoIpConfigType = {
   refresh_interval: 10,
   pull_from_cloud: undefined,
   gcs_project_id: undefined,
+  azure_endpoint: undefined,
+  azure_account_key: undefined,
+  azure_account: undefined,
+  azure_container: undefined,
 };
 
 const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) => {
   const [showModal, setShowModal] = useState(false);
-  const [curConfig, setCurConfig] = useState(config);
 
   const sendTelemetry = useSendTelemetry();
 
-  useEffect(() => {
-    setCurConfig({ ...config });
-  }, [config]);
-
   const resetConfig = () => {
-    setCurConfig(config);
     setShowModal(false);
   };
 
@@ -87,8 +63,13 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
       app_pathname: 'configurations',
       app_section: 'geolocation-processor',
     });
+    const normalizedValues = {
+      ...values,
+      azure_endpoint:
+        values.azure_endpoint && values.azure_endpoint.trim() !== '' ? values.azure_endpoint.trim() : null,
+    };
 
-    return updateConfig(values).then((value: GeoIpConfigType) => {
+    return updateConfig(normalizedValues).then((value: GeoIpConfigType) => {
       if ('enabled' in value) {
         setShowModal(false);
       }
@@ -103,6 +84,7 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
   const cloudStorageOptions: OptionType[] = [
     { value: CLOUD_STORAGE_OPTION.S3, label: 'S3' },
     { value: CLOUD_STORAGE_OPTION.GCS, label: 'Google Cloud Storage' },
+    { value: CLOUD_STORAGE_OPTION.ABS, label: 'Azure Blob Storage' },
   ];
 
   const activeVendorType = (type: GeoVendorType) => availableVendorTypes().filter((t) => t.value === type)[0].label;
@@ -157,7 +139,7 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
         </Button>
       </IfPermitted>
       <Modal show={showModal} onHide={resetConfig}>
-        <Formik onSubmit={handleSubmit} initialValues={curConfig}>
+        <Formik onSubmit={handleSubmit} initialValues={config}>
           {({ values, setFieldValue, isSubmitting }) => (
             <Form>
               <Modal.Header>
@@ -255,22 +237,8 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
                   )}
                 </Field>
 
-                {values.pull_from_cloud === CLOUD_STORAGE_OPTION.GCS && (
-                  <>
-                    <GCSSetupInfo />
-                    <FormikInput
-                      id="gcs_project_id"
-                      type="text"
-                      disabled={!values.enabled}
-                      label={
-                        <>
-                          Googe Cloud Storage Project ID <InputOptionalInfo />
-                        </>
-                      }
-                      name="gcs_project_id"
-                    />
-                  </>
-                )}
+                {values.pull_from_cloud === CLOUD_STORAGE_OPTION.GCS && <GCSGeoIpFormGroup />}
+                {values.pull_from_cloud === CLOUD_STORAGE_OPTION.ABS && <ABSGeoIpFormGroup />}
               </Modal.Body>
               <Modal.Footer>
                 <ModalSubmit

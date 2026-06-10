@@ -22,7 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public interface SecurityAdapter {
-    record MappingResponse(String status, String message) {}
+    record MappingResponse(String status, String message) {
+        public static final MappingResponse OK_USER_ALREADY_IN_MAPPING = new MappingResponse("OK", "User already in mapping");
+    }
     @JsonIgnoreProperties(ignoreUnknown = true)
     record Mapping(@JsonProperty List<String> backendRoles, @JsonProperty List<String> hosts, @JsonProperty List<String> users) {}
 

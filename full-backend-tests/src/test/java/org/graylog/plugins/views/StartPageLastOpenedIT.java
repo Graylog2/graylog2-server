@@ -19,8 +19,8 @@ package org.graylog.plugins.views;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Users;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog2.shared.security.RestPermissions;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -30,9 +30,9 @@ import java.util.Map;
 
 import static org.hamcrest.core.StringContains.containsString;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class StartPageLastOpenedIT {
-    private final GraylogApis api;
+    private static GraylogApis api;
 
     private static final Users.User user = new Users.User(
             "john.doe2",
@@ -47,19 +47,16 @@ public class StartPageLastOpenedIT {
             List.of(RestPermissions.DASHBOARDS_CREATE)
     );
 
-    public StartPageLastOpenedIT(GraylogApis api) {
-        this.api = api;
-    }
-
     @BeforeAll
-    public void init() {
+    static void init(GraylogApis graylogApis) {
+        api = graylogApis;
         api.users().createUser(user);
     }
 
     //This test has to be the only test in this class.
     //Because of the memoization in Catalog, we cannot guarantee that after search/dashboard creation it will be immediately visible in the catalog.
     //Keeping this test independent prevents us from using unnecessary sleep of a few seconds.
-    @ContainerMatrixTest
+    @FullBackendTest
     void testCreateLastOpenedItem() {
         api.postWithResource("/views/search", user, "org/graylog/plugins/views/startpage-save-search-request.json", 201);
         api.postWithResource("/views", user, "org/graylog/plugins/views/startpage-views-request.json", 200);

@@ -21,14 +21,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.joschi.jadconfig.util.Size;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class JournalSummaryResponse {
 
     public static JournalSummaryResponse createDisabled() {
@@ -96,32 +94,32 @@ public abstract class JournalSummaryResponse {
     }
 
     // keep the fields in the same order as the auto value constructor params!
-    @JsonProperty
+    @JsonProperty("enabled")
     public abstract boolean enabled();
 
-    @JsonProperty
+    @JsonProperty("append_events_per_second")
     public abstract long appendEventsPerSecond();
 
-    @JsonProperty
+    @JsonProperty("read_events_per_second")
     public abstract long readEventsPerSecond();
 
-    @JsonProperty
+    @JsonProperty("uncommitted_journal_entries")
     public abstract long uncommittedJournalEntries();
 
-    @JsonProperty
+    @JsonProperty("journal_size")
     public abstract Size journalSize();
 
-    @JsonProperty
+    @JsonProperty("journal_size_limit")
     public abstract Size journalSizeLimit();
 
-    @JsonProperty
+    @JsonProperty("number_of_segments")
     public abstract int numberOfSegments();
 
-    @JsonProperty
+    @JsonProperty("oldest_segment")
     @Nullable
     public abstract DateTime oldestSegment();
 
-    @JsonProperty
+    @JsonProperty("journal_config")
     @Nullable
     public abstract KafkaJournalConfigurationSummary journalConfig();
 }

@@ -16,8 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
-import defaultTo from 'lodash/defaultTo';
-import get from 'lodash/get';
 
 import { defaultCompare } from 'logic/DefaultCompare';
 import { Select } from 'components/common';
@@ -76,6 +74,12 @@ const EventConditionForm = ({
   const sendTelemetry = useSendTelemetry();
 
   const eventDefinitionTypes = usePluginEntities('eventDefinitionTypes');
+  const filteredDefinitionTypes = eventDefinitionTypes.filter((type) => type.useCondition());
+
+  const currentConditionPlugin = useMemo(
+    () => eventDefinitionTypes.find((edt) => edt.type === eventDefinition.config.type),
+    [eventDefinitionTypes, eventDefinition.config.type],
+  );
 
   const getConditionPlugin = useCallback(
     (type: string) => {
@@ -83,22 +87,22 @@ const EventConditionForm = ({
         return undefined;
       }
 
-      return eventDefinitionTypes.find((eventDefinitionType) => eventDefinitionType.type === type);
+      return filteredDefinitionTypes.find((eventDefinitionType) => eventDefinitionType.type === type);
     },
-    [eventDefinitionTypes],
+    [filteredDefinitionTypes],
   );
 
   const sortedEventDefinitionTypes = useMemo(
     () =>
-      eventDefinitionTypes.sort((eventDefinitionType1, eventDefinitionType2) => {
+      filteredDefinitionTypes.sort((eventDefinitionType1, eventDefinitionType2) => {
         // Try to sort by given sort order and displayName if possible, otherwise do it by displayName
         const eventDefinitionType1Order = eventDefinitionType1.sortOrder;
         const eventDefinitionType2Order = eventDefinitionType2.sortOrder;
 
         if (eventDefinitionType1Order !== undefined || eventDefinitionType2Order !== undefined) {
           const sort =
-            defaultTo(eventDefinitionType1Order, Number.MAX_SAFE_INTEGER) -
-            defaultTo(eventDefinitionType2Order, Number.MAX_SAFE_INTEGER);
+            (eventDefinitionType1Order ?? Number.MAX_SAFE_INTEGER) -
+            (eventDefinitionType2Order ?? Number.MAX_SAFE_INTEGER);
 
           if (sort !== 0) {
             return sort;
@@ -107,13 +111,18 @@ const EventConditionForm = ({
 
         return defaultCompare(eventDefinitionType1.displayName, eventDefinitionType2.displayName);
       }),
-    [eventDefinitionTypes],
+    [filteredDefinitionTypes],
   );
 
-  const formattedEventDefinitionTypes = useMemo(
-    () => sortedEventDefinitionTypes.map((type) => ({ label: type.displayName, value: type.type })),
-    [sortedEventDefinitionTypes],
-  );
+  const formattedEventDefinitionTypes = useMemo(() => {
+    const options = sortedEventDefinitionTypes.map((type) => ({ label: type.displayName, value: type.type }));
+
+    if (currentConditionPlugin && !options.some((o) => o.value === currentConditionPlugin.type)) {
+      options.push({ label: currentConditionPlugin.displayName, value: currentConditionPlugin.type });
+    }
+
+    return options;
+  }, [sortedEventDefinitionTypes, currentConditionPlugin]);
 
   const handleEventDefinitionTypeChange = (nextType: string) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.TYPE_SELECTED, {
@@ -142,15 +151,11 @@ const EventConditionForm = ({
     [action, eventDefinition.config.type],
   );
 
-  const eventDefinitionType = useMemo(
-    () => getConditionPlugin(eventDefinition.config.type),
-    [eventDefinition.config.type, getConditionPlugin],
-  );
   const isSystemEventDefinition = eventDefinition.config.type === SYSTEM_EVENT_DEFINITION_TYPE;
   const canEditCondition = canEdit && !isSystemEventDefinition;
 
-  const eventDefinitionTypeComponent = eventDefinitionType?.formComponent
-    ? React.createElement(eventDefinitionType.formComponent, {
+  const eventDefinitionTypeComponent = currentConditionPlugin?.formComponent
+    ? React.createElement(currentConditionPlugin.formComponent, {
         action,
         entityTypes,
         currentUser,
@@ -186,29 +191,24 @@ const EventConditionForm = ({
                 disabled={disabledSelect || onlyFilters || isSigma}
                 required
               />
-              <HelpBlock>
-                {get(validation, 'errors.config[0]', 'Choose the type of Condition for this Event.')}
-              </HelpBlock>
+              <HelpBlock>{validation?.errors?.config?.[0] ?? 'Choose the type of Condition for this Event.'}</HelpBlock>
             </FormGroup>
           </>
         )}
       </Col>
 
       {canEditCondition && !disabledSelect && (
+        <Col md={5} lg={5} lgOffset={1}>
+          <HelpPanel className={styles.conditionTypesInfo} title="Available Conditions">
+            <ConditionTypeDescriptions eventDefinitionTypes={sortedEventDefinitionTypes} />
+          </HelpPanel>
+        </Col>
+      )}
+      <Clearfix />
+      {canEditCondition && eventDefinitionTypeComponent && (
         <>
-          <Col md={5} lg={5} lgOffset={1}>
-            <HelpPanel className={styles.conditionTypesInfo} title="Available Conditions">
-              <ConditionTypeDescriptions eventDefinitionTypes={sortedEventDefinitionTypes} />
-            </HelpPanel>
-          </Col>
-          <Clearfix />
-
-          {eventDefinitionTypeComponent && (
-            <>
-              <hr className={styles.hr} />
-              <Col md={12}>{eventDefinitionTypeComponent}</Col>
-            </>
-          )}
+          <hr className={styles.hr} />
+          <Col md={12}>{eventDefinitionTypeComponent}</Col>
         </>
       )}
     </Row>

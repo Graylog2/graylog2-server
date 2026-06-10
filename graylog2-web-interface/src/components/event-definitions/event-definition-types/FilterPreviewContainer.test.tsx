@@ -28,6 +28,10 @@ const eventDefinition: EventDefinition = {
   title: 'Sample Event Definition',
   description: 'Sample Event Definition',
   _scope: 'test',
+  _entity_source: {
+    source: 'USER_DEFINED',
+    entity_type: 'event_definition',
+  },
   priority: 1,
   alert: true,
   config: {
@@ -48,6 +52,7 @@ const eventDefinition: EventDefinition = {
   },
   field_spec: {},
   key_spec: [],
+  tags: [],
   notification_settings: {
     grace_period_ms: 300,
     backlog_size: 10,
@@ -56,8 +61,10 @@ const eventDefinition: EventDefinition = {
   storage: [],
   updated_at: null,
   state: 'ENABLED',
+  tactics_techniques: [],
   remediation_steps: '',
   event_procedure: '',
+  event_summary_template: null,
   matched_at: '',
   scheduler: {
     data: {

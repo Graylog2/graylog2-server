@@ -19,8 +19,8 @@ import React, { useState, useCallback, useMemo, useRef } from 'react';
 import useHistory from 'routing/useHistory';
 import { isPermitted } from 'util/PermissionsMixin';
 import AppConfig from 'util/AppConfig';
-import { DropdownButton, MenuItem, ButtonGroup } from 'components/bootstrap';
-import { Icon, ShareButton } from 'components/common';
+import { MenuItem, ButtonGroup } from 'components/bootstrap';
+import { ShareButton } from 'components/common';
 import ExportModal from 'views/components/export/ExportModal';
 import DebugOverlay from 'views/components/DebugOverlay';
 import onSaveNewDashboard from 'views/logic/views/OnSaveNewDashboard';
@@ -42,6 +42,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import SaveDashboardButton from 'views/components/searchbar/SaveDashboardButton';
 import SaveAsDashboardButton from 'views/components/searchbar/SaveAsDashboardButton';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import { MoreActionsMenu } from 'components/common/MoreActions';
 
 import DashboardPropertiesModal from './dashboard/DashboardPropertiesModal';
 import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration';
@@ -119,21 +120,19 @@ const DashboardActionsMenu = () => {
         app_action_value: 'dashboard-save-new',
       });
 
-      const isViewDuplication = !!view.id;
-
-      if (isViewDuplication) {
+      if (!isNewView) {
         const dashboardWithPluginData = await executePluggableDuplicationHandler(
           newDashboard,
           currentUser.permissions,
           pluggableSaveViewControls,
         );
 
-        return dispatch(onSaveNewDashboard(dashboardWithPluginData, history, entityShare));
+        return dispatch(onSaveNewDashboard(dashboardWithPluginData, history, entityShare, view.id));
       }
 
       return dispatch(onSaveNewDashboard(newDashboard, history, entityShare));
     },
-    [currentUser.permissions, dispatch, history, pluggableSaveViewControls, sendTelemetry, view.id],
+    [currentUser.permissions, dispatch, history, pluggableSaveViewControls, sendTelemetry, view.id, isNewView],
   );
 
   const _onUpdateView = useCallback(
@@ -173,13 +172,7 @@ const DashboardActionsMenu = () => {
         />
       )}
       {showDropDownButton && (
-        <DropdownButton
-          title={<Icon name="more_horiz" />}
-          id="query-tab-actions-dropdown"
-          pullRight
-          keepMounted
-          buttonTitle="More Actions"
-          noCaret>
+        <MoreActionsMenu id="query-tab-actions-dropdown" pullRight keepMounted solid>
           {dashboardActions.length > 0 && (
             <>
               {dashboardActions}
@@ -195,7 +188,7 @@ const DashboardActionsMenu = () => {
           {debugOverlay}
           <MenuItem divider />
           <BigDisplayModeConfiguration view={view} disabled={isNewView} />
-        </DropdownButton>
+        </MoreActionsMenu>
       )}
       {debugOpen && <DebugOverlay show onClose={() => setDebugOpen(false)} />}
       {saveNewDashboardOpen && (

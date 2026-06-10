@@ -19,46 +19,19 @@ import type Immutable from 'immutable';
 
 import type FetchError from 'logic/errors/FetchError';
 import type { DataTieringConfig } from 'components/indices/data-tiering';
+import type { Attribute } from 'stores/PaginationTypes';
 import type { QualifiedUrl } from 'routing/Routes';
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { Stream } from 'logic/streams/types';
-import type { ColumnRenderer } from 'components/common/EntityDataTable/types';
+import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 import type { StepType } from 'components/common/Wizard';
 import type { InputSetupWizardStep } from 'components/inputs/InputSetupWizard';
-
-interface PluginRoute {
-  path: string;
-  component: React.ComponentType;
-  parentComponent?: React.ComponentType | null;
-  permissions?: string | Array<string>;
-  requiredFeatureFlag?: string;
-}
-
-interface PluginNavigationDropdownItem {
-  description: string;
-  path: string;
-  permissions?: string | Array<string>;
-  requiredFeatureFlag?: string;
-}
+import type { TelemetryEventType } from 'logic/telemetry/TelemetryContext';
 
 type PluginNavigationLink = {
   path: QualifiedUrl<string>;
 };
-
-type PluginNavigationDropdown = {
-  children: Array<PluginNavigationDropdownItem>;
-};
-
-type PluginNavigation = {
-  description: string;
-  requiredFeatureFlag?: string;
-  perspective?: string;
-  BadgeComponent?: React.ComponentType<{ text: string }>;
-  position?: { last: true } | { after: string } | undefined;
-  permissions?: string | Array<string>;
-  useIsValidLicense?: () => boolean;
-} & (PluginNavigationLink | PluginNavigationDropdown);
 
 interface PluginNavigationItems {
   key: string;
@@ -146,7 +119,12 @@ interface LogoutHook {
 
 type DataTiering = {
   type: string;
-  TiersConfigurationFields: React.ComponentType<{ valuesPrefix?: string }>;
+  TiersConfigurationFields: React.ComponentType<{
+    valuesPrefix?: string;
+    hiddenFields?: string[];
+    immutableFields?: string[];
+    ignoreFieldRestrictions?: boolean;
+  }>;
   TiersSummary: React.ComponentType<{
     config: DataTieringConfig;
   }>;
@@ -170,8 +148,8 @@ type InputSetupWizard = {
 };
 
 type License = {
-  EnterpriseTrafficGraph: React.ComponentType;
-  LicenseGraphWithMetrics: React.ComponentType;
+  TrafficGraph: React.ComponentType;
+  TrafficGraphWithLicenseMetrics: React.ComponentType;
   EnterpriseProductLink: React.ComponentType<{
     children: React.ReactNode;
     href: string;
@@ -204,68 +182,240 @@ export type FieldValueProvider = {
   requiredFields: string[];
 };
 
-interface PluginDataLake {
-  StreamDataLake: React.ComponentType<{
-    permissions: Immutable.List<string>;
-  }>;
-  DataLakeStatus: React.ComponentType<{
-    dataLakeEnabled: boolean;
-  }>;
-  DataLakeJournal: React.ComponentType<{
-    nodeId: string;
-  }>;
-  DataLakeJobs: React.ComponentType<{
-    permissions: Immutable.List<string>;
-    streamId: string;
-  }>;
-  StreamIlluminateProcessingSection: React.ComponentType<{
-    stream: Stream;
-  }>;
-  StreamIndexSetDataLakeWarning: React.ComponentType<{ streamId: string; isArchivingEnabled: boolean }>;
-  fetchStreamDataLakeStatus: (streamId: string) => Promise<{
-    id: string;
-    archive_name: string;
-    enabled: boolean;
-    stream_id: string;
-    retention_time: number;
-  }>;
-  fetchStreamDataLake: (streamId: string) => Promise<{
-    id: string;
-    archive_config_id: string;
-    message_count: number;
-    archive_name: string;
-    timestamp_from: string;
-    timestamp_to: string;
-    restore_history: Array<{ id: string }>;
-  }>;
-  getStreamDataLakeTableElements: (permission: Immutable.List<string>) => {
-    attributeName: string;
-    attributes: Array<{ id: string; title: string }>;
-    columnRenderer: { data_lake: ColumnRenderer<Stream> };
-  };
-  DataLakeStreamDeleteWarning: React.ComponentType;
-}
+type CreatorTelemetryEvent = {
+  type: TelemetryEventType;
+  section: string;
+  actionValue: string;
+};
+
+type RouteGenerator = (id: string, type: string) => QualifiedUrl<string>;
+
+type EntityTypeRouteGenerator = { type: string; route: (id: string) => QualifiedUrl<string> };
+
+type IndexRetentionConfig = {
+  type: string;
+  displayName: string;
+  configComponent: React.ComponentType<IndexRetentionConfigComponentProps>;
+  summaryComponent: React.ComponentType<IndexRetentionSummaryComponentProps>;
+};
+
+type StreamsOverviewTableElement = {
+  attributeName: string;
+  attributes: Array<Attribute>;
+  columnRenderers: ColumnRenderersByAttribute<Stream>;
+  // Optional map of column id → backend metric fields. Plugins use this to plug their
+  // columns into the open-source `GET /streams/metrics` request (e.g. enterprise's
+  // `failure_count`). When the column is visible, the listed fields are added to the
+  // metrics request automatically.
+  metricFields?: Record<string, Array<string>>;
+};
 
 declare module 'graylog-web-plugin/plugin' {
+  type Id = string;
+  type Wildcard = '*';
+  type Permission =
+    | Wildcard
+    | {
+        [Entity in keyof EntityActions]:
+          | `${Entity}:${Wildcard}`
+          | `${Entity}:${EntityActions[Entity]}`
+          | `${Entity}:${EntityActions[Entity]}:${Id}`;
+      }[keyof EntityActions];
+  type Permissions = Permission | Array<Permission>;
+
+  interface EntityCreator {
+    id: string;
+    title: string;
+    path: QualifiedUrl<string>;
+    permissions?: Permissions;
+    telemetryEvent?: CreatorTelemetryEvent;
+  }
+
+  interface EntityActions {
+    alerts: 'create';
+    api_browser: 'read';
+    authentication: 'edit';
+    buffers: 'read';
+    // Do we need both of the following?
+    clusterconfig: 'read';
+    clusterconfigentry: 'read' | 'edit';
+    clusterconfiguration: 'read';
+    collector_fleets: 'read';
+    collectors_config: 'read';
+    contentpack: 'read';
+    dashboards: 'create' | 'edit' | 'read';
+    datanode: 'start';
+    decorators: 'create' | 'edit' | 'read';
+    eventdefinitions: 'create' | 'delete' | 'edit' | 'read';
+    eventnotifications: 'create' | 'delete' | 'edit' | 'read';
+    fieldnames: 'read';
+    grok_pattern: 'read';
+    indexercluster: 'read';
+    indexranges: 'rebuild';
+    indexset_templates: 'create' | 'edit' | 'read';
+    indexsets: 'create' | 'edit' | 'read';
+    indexsets_field_restrictions: 'edit';
+    indices: 'read' | 'changestate' | 'failures';
+    input_types: 'create';
+    inputs: 'create' | 'edit' | 'read' | 'terminate' | 'changestate';
+    journal: 'read';
+    jvmstats: 'read';
+    lbstatus: 'change';
+    licenseinfos: 'read';
+    licenses: 'read';
+    loggers: 'read';
+    loggersmessages: 'read';
+    lookuptables: 'read';
+    mappingprofiles: 'read';
+    metrics: 'read';
+    mongodb: 'enableprofiling';
+    messagecount: 'read';
+    messages: 'analyze' | 'read';
+    node: 'shutdown';
+    notifications: 'delete' | 'read';
+    outputs: 'create' | 'edit' | 'read' | 'terminate';
+    pipeline: 'create' | 'delete' | 'edit' | 'read';
+    pipeline_rule: 'create' | 'delete' | 'edit' | 'read';
+    pipeline_connection: 'edit' | 'read';
+    processbuffer: 'dump';
+    processing: 'changestate';
+    roles: 'delete' | 'edit' | 'read';
+    searches: 'relative';
+    sidecars: 'read';
+    stream_outputs: 'create' | 'delete' | 'read';
+    streams: 'create' | 'delete' | 'edit' | 'read' | 'changestate';
+    system: 'read';
+    systemjobs: 'read';
+    systemmessages: 'read';
+    team: 'edit';
+    threads: 'dump';
+    throughput: 'read';
+    typemappings: 'edit';
+    urlallowlist: 'read' | 'write';
+    users:
+      | 'create'
+      | 'edit'
+      | 'read'
+      | 'tokenlist'
+      | 'tokencreate'
+      | 'tokenremove'
+      | 'passwordchange'
+      | 'rolesedit'
+      | 'list';
+    view: 'edit' | 'read';
+  }
+
+  interface PluginDataLake {
+    StreamDataLake: React.ComponentType<{
+      permissions: Immutable.List<Permission>;
+    }>;
+    DataLakeStatus: React.ComponentType<{
+      dataLakeEnabled: boolean;
+    }>;
+    DataLakeJournal: React.ComponentType<{
+      nodeId: string;
+    }>;
+    DataLakeJobs: React.ComponentType<{
+      permissions: Immutable.List<Permission>;
+      streamId: string;
+    }>;
+    StreamIlluminateProcessingSection: React.ComponentType<{
+      stream: Stream;
+    }>;
+    StreamIndexSetDataLakeWarning: React.ComponentType<{ streamId: string; isArchivingEnabled: boolean }>;
+    fetchStreamDataLakeStatus: (streamId: string) => Promise<{
+      id: string;
+      archive_name: string;
+      enabled: boolean;
+      stream_id: string;
+      retention_time: number;
+    }>;
+    fetchStreamDataLake: (streamId: string) => Promise<{
+      id: string;
+      archive_config_id: string;
+      message_count: number;
+      archive_name: string;
+      timestamp_from: string;
+      timestamp_to: string;
+      restore_history: Array<{ id: string }>;
+    }>;
+    DataLakeStreamDeleteWarning: React.ComponentType;
+  }
+
+  type HelpMenuItem = {
+    description: string;
+    permissions?: Permission | Array<Permission>;
+  } & ({ externalLink?: string } | { path?: string } | { action?: (args: { showHotkeysModal: () => void }) => void });
+
+  interface PageNavigation {
+    description: string;
+    children: Array<{
+      description: string;
+      position?: PluginNavigation['position'];
+      permissions?: Permission | Array<Permission>;
+      useCondition?: () => boolean;
+      requiredFeatureFlag?: string;
+      path: QualifiedUrl<string>;
+      exactPathMatch?: boolean;
+      BadgeComponent?: React.ComponentType<{ text: string }>;
+    }>;
+  }
+
+  interface PluginRoute {
+    path: string;
+    component: React.ComponentType;
+    parentComponent?: React.ComponentType | null;
+    permissions?: Permission | Array<Permission>;
+    requiredFeatureFlag?: string;
+  }
+
+  interface PluginNavigationDropdownItem {
+    description: string;
+    path: QualifiedUrl<string>;
+    permissions?: Permission | Array<Permission>;
+    requiredFeatureFlag?: string;
+  }
+
+  type PluginNavigationDropdown = {
+    children: Array<PluginNavigationDropdownItem>;
+  };
+
+  type PluginNavigation = {
+    description: string;
+    requiredFeatureFlag?: string;
+    BadgeComponent?: React.ComponentType<{ text: string }>;
+    position?: { last: true } | { after: string } | undefined;
+    permissions?: Permission | Array<Permission>;
+    useCondition?: () => boolean;
+  } & (PluginNavigationLink | PluginNavigationDropdown);
+
   interface PluginExports {
     navigation?: Array<PluginNavigation>;
+    /**
+     * List of nav items. Define permissions if the item should only be displayed for users with specific permissions.
+     * By default, an item is active if the current URL starts with the item URL.
+     * If you only want to display an item as active only when its path matches exactly, set `exactPathMatch` to true.
+     */
+    pageNavigation?: Array<PageNavigation>;
     dataLake?: Array<PluginDataLake>;
+    // Use this for stream-overview-only columns. Use `components.shared.entityTableElements`
+    // when the extension should participate in the generic entity-table mechanism.
+    'components.streams.overview.tableElements'?: Array<StreamsOverviewTableElement>;
     dataTiering?: Array<DataTiering>;
     defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
     globalNotifications?: Array<GlobalNotification>;
+    helpMenu?: Array<HelpMenuItem>;
     fieldValueProviders?: Array<FieldValueProvider>;
     license?: Array<License>;
     inputSetupWizard?: Array<InputSetupWizard>;
     // Global context providers allow to fetch and process data once
     // and provide the result for all components in your plugin.
-    globalContextProviders?: Array<React.ComponentType<React.PropsWithChildrean<{}>>>;
+    globalContextProviders?: Array<React.ComponentType<React.PropsWithChildren<{}>>>;
     // Difference between page context providers and global context providers
-    // is that page context providers are rendered within the <App> giving it
-    // access to certain contexts like PerspectivesContext
-    pageContextProviders?: Array<React.ComponentType<React.PropsWithChildrean<{}>>>;
+    // is that page context providers are rendered within the <App>.
+    pageContextProviders?: Array<React.ComponentType<React.PropsWithChildren<{}>>>;
     routes?: Array<PluginRoute>;
-    entityRoutes?: Array<(id: string, type: string) => string>;
     pages?: PluginPages;
     pageFooter?: Array<PluginPageFooter>;
     cloud?: Array<PluginCloud>;
@@ -273,6 +423,20 @@ declare module 'graylog-web-plugin/plugin' {
     inputConfiguration?: Array<InputConfiguration>;
     loginProviderType?: Array<ProviderType>;
     'hooks.logout'?: Array<LogoutHook>;
+    entityRoutes?: Array<RouteGenerator>;
+    entityTypeRoute?: Array<EntityTypeRouteGenerator>;
+    entityCreators?: Array<EntityCreator>;
+    'users.details.segments'?: Array<{
+      value: string;
+      label: string;
+      component: React.ComponentType<{ user: User }>;
+      editPermissionRequired?: boolean;
+      useCondition?: () => boolean;
+    }>;
+    indexRetentionConfig?: Array<IndexRetentionConfig>;
+    inputsBadgeProviders?: Array<{
+      useCondition: () => { hasIssues: boolean; title: string };
+    }>;
   }
   interface PluginMetadata {
     name?: string;
@@ -286,12 +450,14 @@ declare module 'graylog-web-plugin/plugin' {
   }
 
   interface PluginManifest extends PluginRegistration {
+    // eslint-disable-next-line @typescript-eslint/no-misused-new
     new (json: {}, exports: PluginExports): PluginManifest;
   }
 
+  type WrapWithArray<T> = T extends Array<any> ? T : Array<T>;
   interface PluginStore {
     register: (manifest: PluginRegistration) => void;
-    exports: <T extends keyof PluginExports>(key: T) => PluginExports[T];
+    exports: <T extends keyof PluginExports>(key: T) => WrapWithArray<PluginExports[T]>;
     unregister: (manifest: PluginRegistration) => void;
     get: () => Array<PluginRegistration>;
   }

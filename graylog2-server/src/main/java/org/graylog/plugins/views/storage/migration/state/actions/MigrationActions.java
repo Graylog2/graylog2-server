@@ -28,22 +28,14 @@ public interface MigrationActions {
 
     boolean directoryCompatibilityCheckOk();
 
-    void reindexUpgradeSelected();
-
-    boolean isRemoteReindexingFinished();
-
     void stopMessageProcessing();
 
-    void startMessageProcessing();
-    boolean caDoesNotExist();
-    boolean renewalPolicyDoesNotExist();
-    boolean caAndRenewalPolicyExist();
+    boolean caExists();
+    boolean renewalPolicyExists();
 
     boolean compatibleDatanodesRunning();
 
     void provisionDataNodes();
-
-    void provisionAndStartDataNodes();
 
     boolean provisioningFinished();
 
@@ -55,21 +47,10 @@ public interface MigrationActions {
 
     void setPreflightFinished();
 
-    void startRemoteReindex();
-
-    void requestMigrationStatus();
-
     void calculateTrafficEstimate();
-
-    void verifyRemoteIndexerConnection();
 
     boolean isCompatibleInPlaceMigrationVersion();
 
-    void getElasticsearchHosts();
-
     void stopDatanodes();
 
-    void finishRemoteReindexMigration();
-
-    boolean isRemoteReindexMigrationEnabled();
 }

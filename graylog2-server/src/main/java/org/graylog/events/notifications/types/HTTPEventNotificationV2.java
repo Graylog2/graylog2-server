@@ -45,8 +45,8 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.bindings.providers.ParameterizedHttpClientProvider;
-import org.graylog2.system.urlwhitelist.UrlWhitelistNotificationService;
-import org.graylog2.system.urlwhitelist.UrlWhitelistService;
+import org.graylog2.system.urlallowlist.UrlAllowlistNotificationService;
+import org.graylog2.system.urlallowlist.UrlAllowlistService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,8 +103,8 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
 
     @Inject
     public HTTPEventNotificationV2(EventNotificationService notificationCallbackService, ObjectMapperProvider objectMapperProvider,
-                                   UrlWhitelistService whitelistService,
-                                   UrlWhitelistNotificationService urlWhitelistNotificationService,
+                                   UrlAllowlistService allowlistService,
+                                   UrlAllowlistNotificationService urlAllowlistNotificationService,
                                    EncryptedValueService encryptedValueService,
                                    EventsConfigurationProvider configurationProvider,
                                    Engine templateEngine,
@@ -112,7 +112,7 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
                                    NotificationService notificationService,
                                    NodeId nodeId,
                                    final ParameterizedHttpClientProvider parameterizedHttpClientProvider) {
-        super(whitelistService, urlWhitelistNotificationService, encryptedValueService, notificationService, nodeId);
+        super(allowlistService, urlAllowlistNotificationService, encryptedValueService, notificationService, nodeId);
         this.notificationCallbackService = notificationCallbackService;
         this.objectMapperProvider = objectMapperProvider;
         this.configurationProvider = configurationProvider;

@@ -16,7 +16,7 @@
  */
 package org.graylog2.lookup.adapters.dsvhttp;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.AbstractMap;
 import java.util.Map;

@@ -27,6 +27,9 @@ import { FormikFormGroup } from 'components/common';
 import type User from 'logic/users/User';
 import { isPermitted } from 'util/PermissionsMixin';
 import SectionComponent from 'components/common/Section/SectionComponent';
+import usePasswordComplexityConfig from 'components/users/usePasswordComplexityConfig';
+import type { PasswordComplexityConfigType } from 'stores/configurations/ConfigurationsStore';
+import usePasswordHelpText from 'components/users/usePasswordHelpText';
 
 import { validatePasswords } from '../UserCreate/PasswordFormGroup';
 
@@ -37,7 +40,11 @@ type Props = {
   user: User;
 };
 
-const _validate = (values) => {
+type PasswordGroupProps = {
+  passwordComplexityConfig: PasswordComplexityConfigType;
+};
+
+const createValidator = (passwordComplexityConfig: PasswordComplexityConfigType) => (values) => {
   let errors = {};
 
   const { password, password_repeat: passwordRepeat } = values;
@@ -49,7 +56,7 @@ const _validate = (values) => {
 
     errors = validateCloudPasswords(errors, password, passwordRepeat);
   } else {
-    errors = validatePasswords(errors, password, passwordRepeat);
+    errors = validatePasswords(errors, password, passwordRepeat, passwordComplexityConfig);
   }
 
   return errors;
@@ -62,7 +69,10 @@ const _onSubmit = (formData, userId) => {
   return UsersDomain.changePassword(userId, data);
 };
 
-const PasswordGroup = () => {
+const PasswordGroup = ({ passwordComplexityConfig }: PasswordGroupProps) => {
+  const minLength = passwordComplexityConfig.min_length;
+  const effectiveHelpText = usePasswordHelpText({ passwordComplexityConfig });
+
   if (isCloud && oktaUserForm) {
     const {
       fields: { password: CloudPasswordFormGroup },
@@ -77,9 +87,9 @@ const PasswordGroup = () => {
         label="New Password"
         name="password"
         type="password"
-        help="Passwords must be at least 6 characters long. We recommend using a strong password."
+        help={effectiveHelpText}
         maxLength={100}
-        minLength={6}
+        minLength={minLength}
         autoComplete="new-password"
         labelClassName="col-sm-3"
         wrapperClassName="col-sm-9"
@@ -89,7 +99,7 @@ const PasswordGroup = () => {
         label="Repeat Password"
         name="password_repeat"
         type="password"
-        minLength={6}
+        minLength={minLength}
         maxLength={100}
         autoComplete="new-password"
         required
@@ -106,6 +116,8 @@ const InvisibleInput = styled.input`
 
 const PasswordSection = ({ user: { id } }: Props) => {
   const currentUser = useCurrentUser();
+  const passwordComplexityConfig = usePasswordComplexityConfig();
+  const validate = createValidator(passwordComplexityConfig);
   let requiresOldPassword = true;
 
   if (isPermitted(currentUser?.permissions, 'users:passwordchange:*')) {
@@ -115,7 +127,7 @@ const PasswordSection = ({ user: { id } }: Props) => {
 
   return (
     <SectionComponent title="Password">
-      <Formik onSubmit={(formData) => _onSubmit(formData, id)} validate={_validate} initialValues={{}}>
+      <Formik onSubmit={(formData) => _onSubmit(formData, id)} validate={validate} initialValues={{}}>
         {({ isSubmitting, isValid }) => (
           <Form className="form form-horizontal">
             <InvisibleInput
@@ -137,11 +149,11 @@ const PasswordSection = ({ user: { id } }: Props) => {
                 wrapperClassName="col-sm-9"
               />
             )}
-            <PasswordGroup />
+            <PasswordGroup passwordComplexityConfig={passwordComplexityConfig} />
             <Row className="no-bm">
               <Col xs={12}>
                 <div className="pull-right">
-                  <Button bsStyle="success" disabled={isSubmitting || !isValid} title="Change Password" type="submit">
+                  <Button bsStyle="primary" disabled={isSubmitting || !isValid} title="Change Password" type="submit">
                     Change Password
                   </Button>
                 </div>

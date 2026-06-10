@@ -28,6 +28,12 @@ public interface PluggableEntityHandler {
      */
     void onCreate(GRN entity, Set<GRN> collections);
 
+    /**
+     * Returns a predicate that tests whether a given GRN should be excluded from handling by this Entity Handler.
+     *
+     * @return a predicate that returns {@code true} if the GRN should not be handled,
+     * or {@code false} if it can be handled
+     */
     Predicate<GRN> entityFilter();
 
     Stream<GRN> expand(GRN grn);

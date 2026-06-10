@@ -19,11 +19,9 @@ package org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearche
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 @AutoValue
 @JsonDeserialize(builder = ViewWidgetPosition.Builder.class)
-@WithBeanGetter
 public abstract class ViewWidgetPosition {
     @JsonProperty("col")
     abstract Position col();
@@ -37,7 +35,9 @@ public abstract class ViewWidgetPosition {
     @JsonProperty("width")
     abstract Position width();
 
-    public static Builder builder() { return new AutoValue_ViewWidgetPosition.Builder(); }
+    public static Builder builder() {
+        return new AutoValue_ViewWidgetPosition.Builder();
+    }
 
     @AutoValue.Builder
     public static abstract class Builder {

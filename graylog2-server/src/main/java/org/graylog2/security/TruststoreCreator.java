@@ -32,10 +32,14 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TruststoreCreator {
@@ -45,7 +49,7 @@ public class TruststoreCreator {
     private final KeyStore truststore;
 
     public TruststoreCreator(KeyStore truststore) {
-        this.truststore = truststore;
+        this.truststore = copyWithoutExpired(truststore);
     }
 
     public static TruststoreCreator newDefaultJvm() {
@@ -61,6 +65,43 @@ public class TruststoreCreator {
             return new TruststoreCreator(trustStore);
         } catch (KeyStoreException | CertificateException | IOException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static KeyStore copyWithoutExpired(KeyStore keyStore) {
+        try {
+            KeyStore cleanTruststore = KeyStore.getInstance(CertConstants.PKCS12);
+            cleanTruststore.load(null, null);
+
+            Enumeration<String> aliases = keyStore.aliases();
+            Set<String> invalidAliases = new HashSet<>();
+
+            while (aliases.hasMoreElements()) {
+                String alias = aliases.nextElement();
+                if (keyStore.isCertificateEntry(alias)) {
+                    Certificate certificate = keyStore.getCertificate(alias);
+                    if (isCertificateValid(certificate)) {
+                        cleanTruststore.setCertificateEntry(alias, certificate);
+                    } else {
+                        invalidAliases.add(alias);
+                    }
+                }
+            }
+            if (!invalidAliases.isEmpty()) {
+                LOG.warn("Truststore contains {} expired or not yet valid certificates, these were be filtered out: {}", invalidAliases.size(), invalidAliases);
+            }
+            return cleanTruststore;
+        } catch (KeyStoreException | CertificateException | IOException | NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static boolean isCertificateValid(Certificate certificate) {
+        try {
+            ((X509Certificate) certificate).checkValidity();
+            return true;
+        } catch (CertificateExpiredException | CertificateNotYetValidException e) {
+            return false;
         }
     }
 
@@ -99,14 +140,26 @@ public class TruststoreCreator {
     }
 
     public TruststoreCreator addCertificates(List<X509Certificate> trustedCertificates) {
-        trustedCertificates.forEach(cert -> {
-            try {
-                this.truststore.setCertificateEntry(generateAlias(this.truststore, cert), cert);
-            } catch (KeyStoreException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        trustedCertificates
+                .stream()
+                .filter(this::filterOutInvalidWithLogging)
+                .forEach(cert -> {
+                    try {
+                        this.truststore.setCertificateEntry(generateAlias(this.truststore, cert), cert);
+                    } catch (KeyStoreException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
         return this;
+    }
+
+    private boolean filterOutInvalidWithLogging(X509Certificate cert) {
+        if (isCertificateValid(cert)) {
+            return true;
+        } else {
+            LOG.warn("Certificate {} is not valid, won't be added to the keystore", cert.getSubjectX500Principal().getName());
+            return false;
+        }
     }
 
     /**
@@ -128,9 +181,8 @@ public class TruststoreCreator {
     }
 
     public FilesystemKeystoreInformation persist(final Path truststorePath, final char[] truststorePassword) throws IOException, GeneralSecurityException {
-
         try (final FileOutputStream fileOutputStream = new FileOutputStream(truststorePath.toFile())) {
-            this.truststore.store(fileOutputStream, truststorePassword);
+            getTruststore().store(fileOutputStream, truststorePassword);
         }
         return new FilesystemKeystoreInformation(truststorePath, truststorePassword);
     }

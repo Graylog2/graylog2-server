@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { Theme as SelectTheme, InputActionMeta, GroupBase, SelectInstance } from 'react-select';
+import type { Theme as SelectTheme, InputActionMeta, GroupBase, SelectInstance, ActionMeta } from 'react-select';
 import ReactSelect, { components as Components, createFilter } from 'react-select';
 import isEqual from 'lodash/isEqual';
+import { matchSorter } from 'match-sorter';
 import type { DefaultTheme } from 'styled-components';
 import { withTheme } from 'styled-components';
 import CreatableSelect from 'react-select/creatable';
@@ -79,6 +80,14 @@ const CustomSingleValue =
     </Components.SingleValue>
   );
 
+const CustomMultiValueLabel =
+  (valueRenderer: (option: Option) => React.ReactElement) =>
+  ({ data, ...props }: React.ComponentProps<typeof Components.MultiValueLabel>) => (
+    <Components.MultiValueLabel data={data} {...props}>
+      {valueRenderer(data)}
+    </Components.MultiValueLabel>
+  );
+
 const CustomInput = (inputProps: { [key: string]: any }) => (props) => <Components.Input {...props} {...inputProps} />;
 
 const dropdownIndicator = (base, state) => ({
@@ -96,17 +105,22 @@ const clearIndicator = (base) => ({
 
 const multiValue =
   ({ theme }) =>
-  (base) => ({
+  (base, state) => ({
     ...base,
-    border: `1px solid ${theme.colors.variant.lighter.info}`,
+    border: `1px solid ${state.option?.[state.data?.value]?.isFixed ? theme.colors.variant.lightest.default : theme.colors.variant.lighter.info}`,
+    background: state.option?.[state.data?.value]?.isFixed
+      ? theme.colors.input.background
+      : theme.colors.variant.lightest.info,
+    color: state.option?.[state.data?.value]?.isFixed ? theme.colors.input.colorDisabled : theme.colors.text.secondary,
   });
 
 const multiValueLabel =
   ({ theme }) =>
-  (base) => ({
+  (base, state) => ({
     ...base,
     padding: '2px 5px',
     fontSize: theme.fonts.size.small,
+    color: state.data?.isFixed ? theme.colors.text.secondary : theme.colors.text.primary,
   });
 
 const multiValueRemove =
@@ -221,6 +235,7 @@ const _styles = ({ size, theme }) => ({
 type ComponentsProp = {
   MultiValueLabel?: React.ComponentType<any>;
   SelectContainer?: React.ComponentType<any>;
+  MultiValueRemove?: React.ComponentType<any>;
 };
 
 export type Props<OptionValue> = {
@@ -248,7 +263,7 @@ export type Props<OptionValue> = {
   name?: string;
   openMenuOnFocus?: boolean;
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
-  onChange: (value: OptionValue) => void;
+  onChange: (value: OptionValue, actionMeta?: ActionMeta<Option>) => void;
   onReactSelectChange?: (option: Option | Option[]) => void;
   onMenuClose?: () => void;
   optionRenderer?: (option: Option, isSelected?: boolean) => React.ReactElement;
@@ -258,6 +273,7 @@ export type Props<OptionValue> = {
   // eslint-disable-next-line react/require-default-props
   ref?: SelectRef;
   size?: 'normal' | 'small';
+  styles?: any;
   theme: DefaultTheme;
   required?: boolean;
   value?: OptionValue;
@@ -278,6 +294,7 @@ type CustomComponents = {
 type State = {
   customComponents: CustomComponents;
   value: any;
+  inputValue: string;
 };
 
 const getCustomComponents = (
@@ -285,7 +302,7 @@ const getCustomComponents = (
   optionRenderer?: (option: Option) => React.ReactElement,
   valueRenderer?: (option: Option) => React.ReactElement,
   async?: boolean,
-): any => {
+) => {
   const customComponents: { [key: string]: any } = {};
 
   if (inputProps) {
@@ -298,6 +315,7 @@ const getCustomComponents = (
 
   if (valueRenderer) {
     customComponents.SingleValue = CustomSingleValue(valueRenderer);
+    customComponents.MultiValueLabel = CustomMultiValueLabel(valueRenderer);
   }
 
   customComponents.MenuList = async ? AsyncCustomMenuList : CustomMenuList;
@@ -334,6 +352,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     placeholder: undefined,
     required: false,
     size: 'normal',
+    styles: undefined,
     value: undefined,
     valueKey: 'value',
     valueRenderer: undefined,
@@ -353,6 +372,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     this.state = {
       customComponents: getCustomComponents(inputProps, optionRenderer, valueRenderer, async),
       value,
+      inputValue: '',
     };
   }
 
@@ -368,7 +388,9 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       optionRenderer !== nextProps.optionRenderer ||
       valueRenderer !== nextProps.valueRenderer
     ) {
-      this.setState({ customComponents: getCustomComponents(inputProps, optionRenderer, valueRenderer, async) });
+      this.setState({
+        customComponents: getCustomComponents(inputProps, optionRenderer, valueRenderer, async),
+      });
     }
   }
 
@@ -396,16 +418,23 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     return '';
   };
 
-  _onChange = (selectedOption: Option) => {
-    const value = this._extractOptionValue(selectedOption);
+  _onChange = (selectedOption: Option, actionMeta: ActionMeta<Option>) => {
+    let value = this._extractOptionValue(selectedOption);
+
+    if (['remove-value', 'pop-value'].includes(actionMeta.action)) {
+      const removed = actionMeta.removedValue;
+      if (removed?.isFixed) {
+        const fixed = (this.state.value || []).filter((o) => o.isFixed);
+        value = [...fixed, ...selectedOption.filter((o) => !o.isFixed)];
+      }
+    }
 
     if (this.props.persistSelection) {
       this.setState({ value: value });
     }
-
     const { onChange = () => {} } = this.props;
 
-    onChange(value);
+    onChange(value, actionMeta);
   };
 
   // Using ReactSelect.Creatable now needs to get values as objects or they are not display
@@ -415,6 +444,10 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
 
     if (value === undefined || value === null || (typeof value === 'string' && value === '')) {
       return [];
+    }
+
+    if (Array.isArray(value)) {
+      return value;
     }
 
     if ((allowCreate || async) && typeof value === 'string') {
@@ -467,12 +500,30 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
   createCustomFilter = () => {
     const { ignoreAccents } = this.props;
 
-    return createFilter({ ignoreAccents, stringify: (option: { label: unknown }) => String(option.label) });
+    return createFilter({
+      ignoreAccents,
+      stringify: (option: { label: unknown }) => String(option.label),
+    });
+  };
+
+  _onInputChange = (newValue: string, actionMeta: InputActionMeta) => {
+    this.setState({ inputValue: newValue });
+    const { onInputChange } = this.props;
+    if (onInputChange) onInputChange(newValue, actionMeta);
   };
 
   render() {
-    const { allowCreate = false, displayKey, components, valueKey, onReactSelectChange, size, theme } = this.props;
-    const { customComponents, value } = this.state;
+    const {
+      allowCreate = false,
+      displayKey,
+      components,
+      valueKey,
+      onReactSelectChange,
+      size,
+      theme,
+      ignoreAccents,
+    } = this.props;
+    const { customComponents, value, inputValue } = this.state;
 
     const formattedValue = this._formatInputValue(value);
 
@@ -488,13 +539,24 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       valueRenderer, // Do not pass down prop
       async,
       total,
-      onInputChange,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      onInputChange, // Do not pass down prop — routed through _onInputChange
       loadOptions,
       'aria-label': ariaLabel,
       placeholder,
+      styles,
+      options: rawOptions,
       ...rest
     } = this.props;
     const customFilter = this.createCustomFilter();
+
+    const sortedOptions =
+      !async && inputValue
+        ? matchSorter(rawOptions, inputValue, {
+            keys: [displayKey, 'label'],
+            keepDiacritics: !ignoreAccents,
+          })
+        : rawOptions;
 
     const mergedComponents = {
       ..._components,
@@ -508,8 +570,10 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       total: number;
     } = {
       ...rest,
+      options: sortedOptions,
       onChange: onReactSelectChange || this._onChange,
-      onInputChange,
+      onInputChange: this._onInputChange,
+      inputValue,
       'aria-label': ariaLabel ?? placeholder,
       placeholder,
       async,
@@ -518,12 +582,16 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       isClearable,
       loadOptions,
       getOptionLabel: (option: { label?: string }) => option[displayKey] || option.label,
-      getOptionValue: (option) => option[valueKey],
-      filterOption: customFilter,
+      getOptionValue: (option) => {
+        const v = option[valueKey];
+
+        return typeof v === 'object' && v !== null ? JSON.stringify(v) : String(v ?? '');
+      },
+      filterOption: async ? customFilter : null,
       components: mergedComponents,
       menuPortalTarget: document.body,
       isOptionDisabled: (option: { disabled?: boolean }) => !!option.disabled,
-      styles: _styles({ size, theme }),
+      styles: { ..._styles({ size, theme }), ...styles },
       theme: this._selectTheme,
       total,
       value: formattedValue,

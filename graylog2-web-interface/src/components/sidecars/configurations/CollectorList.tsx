@@ -16,9 +16,8 @@
  */
 import React from 'react';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, DataTable, PaginatedList, SearchForm } from 'components/common';
 import { Col, Row, Button } from 'components/bootstrap';
-import { DataTable, PaginatedList, SearchForm } from 'components/common';
 import Routes from 'routing/Routes';
 import type { Collector } from 'components/sidecars/types';
 
@@ -67,7 +66,7 @@ class CollectorList extends React.Component<CollectorListProps> {
           <Col md={12}>
             <div className="pull-right">
               <LinkContainer to={Routes.SYSTEM.SIDECARS.NEW_COLLECTOR}>
-                <Button bsStyle="success" bsSize="small">
+                <Button bsStyle="primary" bsSize="small">
                   Create Log Collector
                 </Button>
               </LinkContainer>

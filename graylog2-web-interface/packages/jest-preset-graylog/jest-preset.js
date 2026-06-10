@@ -42,12 +42,12 @@ module.exports = {
     '^@graylog/server-api(.*)$': '<rootDir>/target/api$1',
   },
   testEnvironment: 'jsdom',
-  testPathIgnorePatterns: ['.fixtures.[jt]s$'],
+  testPathIgnorePatterns: ['.fixtures.[jt]s$', '^<rootDir>/target/'],
   testTimeout: applyTimeoutMultiplier(5000),
   transform: {
     '^.+\\.[tj]sx?$': 'babel-jest',
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(@react-hook|uuid|@?react-leaflet|jest-preset-graylog|graylog-web-plugin|styled-components|p-debounce)/)',
+    'node_modules/(?!(@react-hook|uuid|@?react-leaflet|jest-preset-graylog|graylog-web-plugin|styled-components|p-debounce|marked)/)',
   ],
 };

@@ -84,7 +84,11 @@ const EventsTable = ({ events, config, onSortChange, setLoadingState }: Props) =
             </IfInteractive>
           </tr>
         </TableHead>
-        <tbody>{events?.map((event) => <EventsTableRow key={event.id} event={event} fields={config.fields} />)}</tbody>
+        <tbody>
+          {events?.map((event) => (
+            <EventsTableRow key={event.id} event={event} fields={config.fields} />
+          ))}
+        </tbody>
       </table>
     </TableWrapper>
   );

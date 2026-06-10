@@ -20,19 +20,17 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class SubstringTestRequest {
-    @JsonProperty
+    @JsonProperty("string")
     public abstract String string();
 
-    @JsonProperty
+    @JsonProperty("start")
     public abstract int start();
 
-    @JsonProperty
+    @JsonProperty("end")
     public abstract int end();
 
     @JsonCreator

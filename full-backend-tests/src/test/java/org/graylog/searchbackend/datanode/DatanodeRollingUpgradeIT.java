@@ -18,26 +18,32 @@ package org.graylog.searchbackend.datanode;
 
 import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
-import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApiResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.util.List;
 
 // TODO:fix the test
-//@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = SearchServer.DATANODE_DEV, additionalConfigurationParameters = {@ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"), @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_SELFSIGNED_STARTUP", value = "true"), @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = ""),})
+//@GraylogBackendConfiguration(
+//        serverLifecycle = Lifecycle.CLASS,
+//        env = {
+//                @GraylogBackendConfiguration.Env(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"),
+//                @GraylogBackendConfiguration.Env(key = "GRAYLOG_SELFSIGNED_STARTUP", value = "true"),
+//                @GraylogBackendConfiguration.Env(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = "")
+//        }
+//)
+//@EnabledIfSearchServer(distribution = SearchVersion.Distribution.DATANODE)
 public class DatanodeRollingUpgradeIT {
 
-    private final GraylogApis apis;
+    private static GraylogApis apis;
 
-    public DatanodeRollingUpgradeIT(GraylogApis apis) {
-        this.apis = apis;
+    @BeforeAll
+    static void beforeAll(GraylogApis graylogApis) {
+        apis = graylogApis;
     }
 
-   //@ContainerMatrixTest
+    //@FullBackendTest
     public void testClusterStatus() {
         final GraylogApiResponse response = getDatanodeClusterStatus();
 

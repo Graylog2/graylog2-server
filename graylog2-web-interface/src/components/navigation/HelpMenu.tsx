@@ -16,32 +16,49 @@
  */
 import * as React from 'react';
 
-import { NavDropdown } from 'components/bootstrap';
-import { Icon, IfPermitted } from 'components/common';
-import DocsHelper from 'util/DocsHelper';
-import Routes from 'routing/Routes';
+import usePluginEntities from 'hooks/usePluginEntities';
+import { NavDropdown, MenuItem } from 'components/bootstrap';
 import useHotkeysContext from 'hooks/useHotkeysContext';
-import Menu from 'components/bootstrap/Menu';
 import NavIcon from 'components/navigation/NavIcon';
-
-const HelpMenuLinkItem = ({ href, children = undefined }: React.PropsWithChildren<{ href: string }>) => (
-  <Menu.Item component="a" href={href} target="_blank" leftSection={<Icon name="open_in_new" />}>
-    {children}
-  </Menu.Item>
-);
+import usePermissions from 'hooks/usePermissions';
 
 const HelpMenu = () => {
   const { setShowHotkeysModal } = useHotkeysContext();
+  const menuItems = usePluginEntities('helpMenu');
+  const { isPermitted } = usePermissions();
+  const availableMenuItems = menuItems.filter((item) => isPermitted(item.permissions));
 
   return (
     <NavDropdown title={<NavIcon type="help" />} hoverTitle="Help" noCaret>
-      <HelpMenuLinkItem href={DocsHelper.versionedDocsHomePage()}>Documentation</HelpMenuLinkItem>
+      {availableMenuItems.map((item) => {
+        if ('externalLink' in item) {
+          return (
+            <MenuItem key={item.description} component="a" href={item.externalLink} target="_blank" icon="open_in_new">
+              {item.description}
+            </MenuItem>
+          );
+        }
 
-      <Menu.Item onClick={() => setShowHotkeysModal(true)}>Keyboard Shortcuts</Menu.Item>
+        if ('path' in item) {
+          return (
+            <MenuItem key={item.description} component="a" href={item.path}>
+              {item.description}
+            </MenuItem>
+          );
+        }
 
-      <IfPermitted permissions="api_browser:read">
-        <HelpMenuLinkItem href={Routes.global_api_browser()}>Cluster Global API browser</HelpMenuLinkItem>
-      </IfPermitted>
+        if ('action' in item) {
+          return (
+            <MenuItem
+              key={item.description}
+              onClick={() => item.action({ showHotkeysModal: () => setShowHotkeysModal(true) })}>
+              {item.description}
+            </MenuItem>
+          );
+        }
+
+        throw Error('Help menu item must have either external link, path, or action defined');
+      })}
     </NavDropdown>
   );
 };

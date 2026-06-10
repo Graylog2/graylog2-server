@@ -45,16 +45,20 @@ import org.graylog.events.notifications.types.HTTPEventNotificationConfig;
 import org.graylog.events.notifications.types.HTTPEventNotificationConfigV2;
 import org.graylog.events.notifications.types.HTTPEventNotificationV2;
 import org.graylog.events.periodicals.EventNotificationStatusCleanUp;
+import org.graylog.events.procedures.DefaultEventProcedureProvider;
+import org.graylog.events.procedures.EventProcedureProvider;
 import org.graylog.events.processor.DefaultEventResolver;
 import org.graylog.events.processor.EventProcessorEngine;
 import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.events.processor.EventProcessorExecutionMetrics;
 import org.graylog.events.processor.EventResolver;
+import org.graylog.events.processor.TacticsTechniquesValidator;
 import org.graylog.events.processor.aggregation.AggregationEventProcessor;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorParameters;
 import org.graylog.events.processor.aggregation.AggregationSearch;
 import org.graylog.events.processor.aggregation.PivotAggregationSearch;
+import org.graylog.events.processor.modifier.EventSummaryModifier;
 import org.graylog.events.processor.storage.EventStorageHandlerEngine;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
 import org.graylog.events.processor.systemnotification.SystemNotificationEventProcessor;
@@ -95,6 +99,9 @@ public class EventsModule extends PluginModule {
 
         OptionalBinder.newOptionalBinder(binder(), EventResolver.class)
                 .setDefault().to(DefaultEventResolver.class);
+
+        OptionalBinder.newOptionalBinder(binder(), TacticsTechniquesValidator.class)
+                .setDefault().to(TacticsTechniquesValidator.NoOp.class);
 
         addSystemRestResource(AvailableEntityTypesResource.class);
         addSystemRestResource(EventDefinitionsResource.class);
@@ -184,7 +191,11 @@ public class EventsModule extends PluginModule {
 
         serviceBinder().addBinding().to(NotificationSystemEventPublisher.class).in(Scopes.SINGLETON);
 
-        eventModifierBinder(); // Initialize event modifier binding to avoid errors when no modifiers are bound.
         eventQuerySearchTypeSupplierBinder(); // Initialize binder to avoid errors when no suppliers are bound.
+
+        OptionalBinder.newOptionalBinder(binder(), EventProcedureProvider.class)
+                .setDefault().to(DefaultEventProcedureProvider.class);
+
+        addEventModifier(EventSummaryModifier.class);
     }
 }

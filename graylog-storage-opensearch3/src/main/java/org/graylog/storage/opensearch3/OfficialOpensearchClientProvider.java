@@ -1,0 +1,238 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+package org.graylog.storage.opensearch3;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.joschi.jadconfig.util.Duration;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import org.apache.hc.client5.http.auth.CredentialsProvider;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.ssl.ClientTlsStrategyBuilder;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.HttpRequestInterceptor;
+import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
+import org.apache.hc.core5.reactor.ssl.TlsDetails;
+import org.apache.hc.core5.util.Timeout;
+import org.graylog.storage.opensearch3.client.CustomAsyncOpenSearchClient;
+import org.graylog.storage.opensearch3.client.CustomOpenSearchClient;
+import org.graylog.storage.opensearch3.sniffer.DiscoveredNode;
+import org.graylog2.configuration.ElasticsearchClientConfiguration;
+import org.graylog2.configuration.IndexerHosts;
+import org.graylog2.security.TrustManagerAndSocketFactoryProvider;
+import org.graylog2.security.jwt.IndexerJwtAuthToken;
+import org.opensearch.client.transport.OpenSearchTransport;
+import org.opensearch.client.transport.httpclient5.ApacheHttpClient5TransportBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.net.ssl.SSLContext;
+import java.net.URI;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+public class OfficialOpensearchClientProvider implements Provider<OfficialOpensearchClient> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OfficialOpensearchClientProvider.class);
+
+    private final Supplier<OfficialOpensearchClient> clientCache;
+    private final ObjectMapper objectMapper;
+    private final TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider;
+    private final IndexerJwtAuthToken indexerJwtAuthToken;
+    private final CredentialsProvider credentialsProvider;
+    private final ElasticsearchClientConfiguration clientConfiguration;
+    private final DynamicTransport dynamicTransport;
+
+    @Inject
+    public OfficialOpensearchClientProvider(
+            @IndexerHosts List<URI> hosts,
+            IndexerJwtAuthToken indexerJwtAuthToken,
+            CredentialsProvider credentialsProvider,
+            ElasticsearchClientConfiguration clientConfiguration,
+            ObjectMapper objectMapper,
+            TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider
+    ) {
+        this.indexerJwtAuthToken = indexerJwtAuthToken;
+        this.credentialsProvider = credentialsProvider;
+        this.clientConfiguration = clientConfiguration;
+        this.objectMapper = objectMapper;
+        this.trustManagerAndSocketFactoryProvider = trustManagerAndSocketFactoryProvider;
+        final OpenSearchTransport initialTransport = buildTransport(hosts);
+        this.dynamicTransport = new DynamicTransport(initialTransport, createDrainScheduler());
+        this.clientCache = Suppliers.memoize(() -> buildClientFromTransport(dynamicTransport));
+    }
+
+    @Override
+    public OfficialOpensearchClient get() {
+        return clientCache.get();
+    }
+
+    public DynamicTransport getDynamicTransport() {
+        return dynamicTransport;
+    }
+
+    /**
+     * Builds a new {@link OpenSearchTransport} targeting the given URIs. This can be used by the
+     * node discovery periodical to create a replacement transport for newly discovered nodes.
+     */
+    @Nonnull
+    public OpenSearchTransport buildTransport(List<URI> uris) {
+        return buildTransport(uris, TransportConfig.defaults());
+    }
+
+    /**
+     * Builds a new {@link OpenSearchTransport} with overrides for SSL context and auth.
+     * Used by callers that need a non-default authentication mechanism (e.g. client certificate
+     * authentication for OpenSearch security-plugin admin operations).
+     */
+    @Nonnull
+    public OpenSearchTransport buildTransport(List<URI> uris, TransportConfig config) {
+        final HttpHost[] hosts = uris.stream().map(uri -> new HttpHost(uri.getScheme(), uri.getHost(), uri.getPort())).toArray(HttpHost[]::new);
+
+        final ApacheHttpClient5TransportBuilder builder = ApacheHttpClient5TransportBuilder.builder(hosts);
+
+        builder.setRequestConfigCallback(requestConfigBuilder ->
+                requestConfigBuilder
+                        .setConnectionRequestTimeout(timeout(clientConfiguration.elasticsearchConnectTimeout()))
+                        .setResponseTimeout(timeout(clientConfiguration.elasticsearchSocketTimeout()))
+                        .setExpectContinueEnabled(clientConfiguration.useExpectContinue())
+                        .setAuthenticationEnabled(true)
+        );
+
+        builder.setChunkedEnabled(clientConfiguration.compressionEnabled());
+
+        builder.setHttpClientConfigCallback(httpClientBuilder -> {
+            final PoolingAsyncClientConnectionManagerBuilder connectionManagerBuilder = PoolingAsyncClientConnectionManagerBuilder.create()
+                    .setMaxConnPerRoute(clientConfiguration.elasticsearchMaxTotalConnectionsPerRoute())
+                    .setMaxConnTotal(clientConfiguration.elasticsearchMaxTotalConnections())
+                    .setDefaultConnectionConfig(
+                            ConnectionConfig.custom()
+                                    .setConnectTimeout(timeout(clientConfiguration.elasticsearchConnectTimeout()))
+                                    .setSocketTimeout(timeout(clientConfiguration.elasticsearchSocketTimeout()))
+                                    .build()
+                    );
+            tlsStrategy(config.sslContextOverride().orElse(null), trustManagerAndSocketFactoryProvider)
+                    .ifPresent(connectionManagerBuilder::setTlsStrategy);
+            httpClientBuilder.setConnectionManager(connectionManagerBuilder.build());
+
+            if (config.useCredentials()) {
+                httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+            }
+
+            if (config.useJwt() && indexerJwtAuthToken.isJwtAuthEnabled()) {
+                httpClientBuilder.addRequestInterceptorLast(jwtInterceptor(indexerJwtAuthToken));
+            }
+
+            if (clientConfiguration.muteDeprecationWarnings()) {
+                httpClientBuilder.addResponseInterceptorFirst(new OpenSearchFilterDeprecationWarningsInterceptor());
+            }
+
+            return httpClientBuilder;
+        });
+
+        return builder.build();
+    }
+
+    /**
+     * Per-call transport configuration. Defaults match the existing singleton client: default
+     * basic-auth credentials provider, JWT interceptor when enabled, trust-only TLS context.
+     */
+    public record TransportConfig(boolean useCredentials, boolean useJwt, Optional<SSLContext> sslContextOverride) {
+        public static TransportConfig defaults() {
+            return new TransportConfig(true, true, Optional.empty());
+        }
+
+        public static TransportConfig clientCertAuth(SSLContext sslContext) {
+            return new TransportConfig(false, false, Optional.of(sslContext));
+        }
+    }
+
+    /**
+     * Builds a new {@link OpenSearchTransport} targeting the given discovered nodes.
+     */
+    @Nonnull
+    public OpenSearchTransport buildTransportForNodes(List<DiscoveredNode> nodes) {
+        return buildTransport(nodes.stream().map(DiscoveredNode::toURI).toList());
+    }
+
+    /**
+     * Don't use this method directly if you don't need a client targeting specific opensearch host(s). Use the cached
+     * instance provided by this supplier {@link #get()} method or let the OfficialOpensearchClient inject directly.
+     * If you obtain an instance here, don't forget to close it after the task is finished.
+     */
+    @Nonnull
+    OfficialOpensearchClient buildClient(List<URI> uris) {
+        final OpenSearchTransport transport = buildTransport(uris);
+        return buildClientFromTransport(transport);
+    }
+
+    @Nonnull
+    private OfficialOpensearchClient buildClientFromTransport(OpenSearchTransport transport) {
+        return new OfficialOpensearchClient(new CustomOpenSearchClient(transport), new CustomAsyncOpenSearchClient(transport), objectMapper);
+    }
+
+    private static ScheduledExecutorService createDrainScheduler() {
+        return Executors.newSingleThreadScheduledExecutor(r -> {
+            final Thread t = new Thread(r, "opensearch-transport-drain");
+            t.setDaemon(true);
+            return t;
+        });
+    }
+
+    private static Optional<TlsStrategy> tlsStrategy(@Nullable SSLContext sslContextOverride,
+                                                     @Nullable TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider) {
+        final Optional<SSLContext> sslContext = sslContextOverride != null
+                ? Optional.of(sslContextOverride)
+                : Optional.ofNullable(trustManagerAndSocketFactoryProvider).map(TrustManagerAndSocketFactoryProvider::getSslContext);
+        return sslContext.map(ctx -> ClientTlsStrategyBuilder.create()
+                .setSslContext(ctx)
+                // See https://issues.apache.org/jira/browse/HTTPCLIENT-2219
+                .setTlsDetailsFactory(sslEngine -> new TlsDetails(sslEngine.getSession(), sslEngine.getApplicationProtocol()))
+                .build());
+    }
+
+    private static Timeout timeout(Duration duration) {
+        return Timeout.ofSeconds(duration.toSeconds());
+    }
+
+    private static HttpRequestInterceptor jwtInterceptor(IndexerJwtAuthToken indexerJwtAuthToken) {
+        return (request, entity, context) -> indexerJwtAuthToken.headerValue().ifPresent(value -> request.addHeader("Authorization", value));
+    }
+}

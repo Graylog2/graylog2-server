@@ -16,24 +16,49 @@
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
-import type { SearchParams } from 'stores/PaginationTypes';
-import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+import { qualifyUrl } from 'util/URLUtils';
+import fetch from 'logic/rest/FetchProvider';
+import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 import { EventDefinitionsStore } from 'stores/event-definitions/EventDefinitionsStore';
+import { EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
 import { defaultOnError } from 'util/conditional/onError';
+import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import EventDefinitionTagsFilter from 'components/event-definitions/EventDefinitionTagsFilter';
+import type { Attribute, SearchParams } from 'stores/PaginationTypes';
+import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
 
 type Options = {
   enabled: boolean;
 };
 
-export const fetchEventDefinitions = (searchParams: SearchParams): Promise<EventDefinitionResult> =>
-  EventDefinitionsStore.searchPaginated(searchParams.page, searchParams.pageSize, searchParams.query, {
+// The Tags column is registered as a frontend-only Attribute so we can attach a custom
+// filter_component (the autocomplete-backed EventDefinitionTagsFilter). The filter dropdown
+// reads only from the backend-returned attribute list, so we splice it in here.
+const TAGS_ATTRIBUTE: Attribute = {
+  id: 'tags',
+  title: 'Tags',
+  type: 'STRING',
+  sortable: false,
+  searchable: true,
+  filterable: true,
+  filter_component: EventDefinitionTagsFilter,
+};
+
+export const fetchEventDefinitions = (searchParams: SearchParams): Promise<EventDefinitionResult> => {
+  CurrentUserStore.update(CurrentUserStore.getInitialState().currentUser.username);
+
+  return EventDefinitionsStore.searchPaginated(searchParams.page, searchParams.pageSize, searchParams.query, {
     sort: searchParams?.sort.attributeId,
     order: searchParams?.sort.direction,
+    filters: FiltersForQueryParams(searchParams.filters),
   }).then(({ elements, pagination, attributes }) => ({
     list: elements,
     pagination,
-    attributes,
+    attributes: [...(attributes ?? []), TAGS_ATTRIBUTE],
   }));
+};
 
 export const fetchEventDefinition = (eventDefinitionId: string): Promise<any> =>
   EventDefinitionsStore.get(eventDefinitionId).then(({ event_definition, context, is_mutable }) => ({
@@ -90,3 +115,60 @@ const useEventDefinitions = (searchParams: SearchParams, { enabled }: Options = 
 };
 
 export default useEventDefinitions;
+
+export function useGetEntityTypes() {
+  const { data, isLoading } = useQuery({
+    queryKey: ['event-definitions', 'entity-types'],
+    queryFn: () =>
+      defaultOnError(
+        fetch('GET', qualifyUrl('/events/entity_types')),
+        'Loading event definition entity types failed with status',
+        'Could not load event definition entity types',
+      ),
+  });
+
+  return {
+    entityTypes: isLoading ? [] : data || [],
+    loadingEntityTypes: isLoading,
+  };
+}
+
+export function useGetListEventsClusterConfig(): {
+  eventsClusterConfig: { [key: string]: unknown };
+  loadingEventsClusterConfig: boolean;
+} {
+  const { data, isLoading } = useQuery<{}, Error>({
+    queryKey: ['event-definitions', 'list-events-cluster-config'],
+    queryFn: () =>
+      defaultOnError(
+        ConfigurationsActions.listEventsClusterConfig(),
+        'Loading event definition list events cluster config failed with status',
+        'Could not load event definition list events cluster config',
+      ),
+  });
+
+  return {
+    eventsClusterConfig: isLoading ? {} : data || {},
+    loadingEventsClusterConfig: isLoading,
+  };
+}
+
+export function useGetEventNotifications(): {
+  eventNotifications: { all: Array<EventNotification> };
+  loadingEventNotifications: boolean;
+} {
+  const { data, isLoading } = useQuery<{ notifications: Array<EventNotification> }, Error>({
+    queryKey: ['event-definitions', 'event-notifications'],
+    queryFn: () =>
+      defaultOnError(
+        EventNotificationsStore.listAll(),
+        'Loading event notifications failed with status',
+        'Could not load event notifications',
+      ),
+  });
+
+  return {
+    eventNotifications: { all: isLoading ? [] : data?.notifications || [] },
+    loadingEventNotifications: isLoading,
+  };
+}

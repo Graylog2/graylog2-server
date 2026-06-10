@@ -36,7 +36,6 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import org.apache.commons.lang3.StringUtils;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.lookup.AllowedAuxiliaryPathChecker;
 import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
@@ -180,12 +179,12 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     }
 
     private void setLookupRefFromCSV() throws IOException {
-        final InputStream inputStream = Files.newInputStream(Paths.get(config.path()));
-        final InputStreamReader fileReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
         final ImmutableMap.Builder<String, String> newLookupBuilder = ImmutableMap.builder();
         final CIDRPatriciaTrie cidrLookupTrie = new CIDRPatriciaTrie();
 
-        try (final CSVReader csvReader = new CSVReader(fileReader, config.separatorAsChar(), config.quotecharAsChar())) {
+        try (final CSVReader csvReader = new CSVReader(
+                new InputStreamReader(Files.newInputStream(Paths.get(config.path())), StandardCharsets.UTF_8),
+                config.separatorAsChar(), config.quotecharAsChar())) {
             int line = 0;
             int keyColumn = -1;
             int valueColumn = -1;
@@ -260,8 +259,6 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     }
 
     private void setMultiValueLookupRefFromCSV() throws IOException {
-        final InputStream inputStream = Files.newInputStream(Paths.get(config.path()));
-        final InputStreamReader fileReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
         final Map<Integer, String> multiValueColumns = new HashMap<>();
         final ImmutableMap.Builder<String, Map<Object, Object>> multiValueLookupBuilder = ImmutableMap.builder();
         final CIDRPatriciaTrie cidrLookupTrie = new CIDRPatriciaTrie();
@@ -270,7 +267,9 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
                 .filter(s -> !s.isEmpty())
                 .toList();
 
-        try (final CSVReader csvReader = new CSVReader(fileReader, config.separatorAsChar(), config.quotecharAsChar())) {
+        try (final CSVReader csvReader = new CSVReader(
+                new InputStreamReader(Files.newInputStream(Paths.get(config.path())), StandardCharsets.UTF_8),
+                config.separatorAsChar(), config.quotecharAsChar())) {
             int line = 0;
             int keyColumn = -1;
 
@@ -533,7 +532,6 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     }
 
     @AutoValue
-    @WithBeanGetter
     @JsonAutoDetect
     @JsonDeserialize(builder = AutoValue_CSVFileDataAdapter_Config.Builder.class)
     @JsonTypeName(NAME)

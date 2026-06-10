@@ -18,7 +18,7 @@ package org.graylog2.indexer.messages;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.plugin.Message;
 import org.graylog2.shared.messageq.Acknowledgeable;
 
@@ -54,4 +54,11 @@ public interface ImmutableMessage extends Indexable, Acknowledgeable {
     String getSource();
 
     ImmutableSet<String> getStreamIds();
+
+    /**
+     * Returns the input message size in bytes. This is the raw payload size at the transport
+     * layer, as recorded in {@link Message#FIELD_GL2_INPUT_MESSAGE_SIZE}.
+     * Falls back to {@link #getSize()} if no input message size was recorded.
+     */
+    long getInputMessageSize();
 }

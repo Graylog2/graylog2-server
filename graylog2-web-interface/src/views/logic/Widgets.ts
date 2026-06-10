@@ -18,6 +18,11 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { TIMESTAMP_FIELD, DEFAULT_MESSAGE_FIELDS } from 'views/Constants';
 import generateId from 'logic/generateId';
+import BarVisualizationConfig, {
+  DEFAULT_BARMODE,
+} from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
+import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import { DEFAULT_AXIS_KEY } from 'views/components/visualizations/Constants';
 
 import pivotForField from './searchtypes/aggregation/PivotGenerator';
 import AggregationWidget from './aggregationbuilder/AggregationWidget';
@@ -59,6 +64,12 @@ export const resultHistogram = (id: string = generateId()) =>
         .series([Series.forFunction('count()')])
         .sort([])
         .visualization('bar')
+        .visualizationConfig(
+          BarVisualizationConfig.create(DEFAULT_BARMODE, DEFAULT_AXIS_TYPE, {
+            [DEFAULT_AXIS_KEY]: { title: 'Count' },
+            xaxis: { title: 'Time Range' },
+          }),
+        )
         .rollup(true)
         .build(),
     )

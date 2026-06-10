@@ -18,6 +18,7 @@ package org.graylog2.bindings;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.cluster.nodes.DataNodeClusterService;
@@ -26,19 +27,27 @@ import org.graylog2.cluster.nodes.DataNodePaginatedService;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.nodes.ServerNodeClusterService;
 import org.graylog2.cluster.nodes.ServerNodeDto;
+import org.graylog2.cluster.nodes.ServerNodePaginatedService;
+import org.graylog2.cluster.nodes.mongodb.DefaultMongodbConnectionResolver;
+import org.graylog2.cluster.nodes.mongodb.MongodbConnectionResolver;
+import org.graylog2.cluster.nodes.mongodb.MongodbNode;
+import org.graylog2.cluster.nodes.mongodb.MongodbNodesProvider;
+import org.graylog2.cluster.nodes.mongodb.MongodbNodesService;
+import org.graylog2.cluster.nodes.mongodb.ReplicaSetMongodbNodes;
+import org.graylog2.cluster.nodes.mongodb.StandaloneNodeMongodbNodes;
 import org.graylog2.database.suggestions.EntitySuggestionService;
 import org.graylog2.database.suggestions.MongoEntitySuggestionService;
 import org.graylog2.indexer.IndexFailureService;
 import org.graylog2.indexer.IndexFailureServiceImpl;
-import org.graylog2.indexer.datanode.RemoteReindexMigrationService;
-import org.graylog2.indexer.datanode.RemoteReindexMigrationServiceImpl;
 import org.graylog2.indexer.datastream.DataStreamService;
 import org.graylog2.indexer.datastream.DataStreamServiceImpl;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.ranges.MongoIndexRangeService;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.InputServiceImpl;
+import org.graylog2.inputs.persistence.InputStateService;
 import org.graylog2.inputs.persistence.InputStatusService;
+import org.graylog2.inputs.persistence.MongoInputStateService;
 import org.graylog2.inputs.persistence.MongoInputStatusService;
 import org.graylog2.notifications.DeletedStreamNotificationListener;
 import org.graylog2.notifications.NotificationService;
@@ -49,8 +58,8 @@ import org.graylog2.rest.resources.system.contentpacks.titles.EntityTitleService
 import org.graylog2.rest.resources.system.contentpacks.titles.EntityTitleServiceImpl;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.AccessTokenServiceImpl;
-import org.graylog2.security.MongoDBSessionService;
-import org.graylog2.security.MongoDBSessionServiceImpl;
+import org.graylog2.security.sessions.MongoDbSessionService;
+import org.graylog2.security.sessions.SessionService;
 import org.graylog2.shared.tokenusage.TokenUsageService;
 import org.graylog2.shared.users.UserManagementService;
 import org.graylog2.shared.users.UserService;
@@ -59,6 +68,8 @@ import org.graylog2.system.activities.SystemMessageServiceImpl;
 import org.graylog2.tokenusage.TokenUsageServiceImpl;
 import org.graylog2.users.UserManagementServiceImpl;
 import org.graylog2.users.UserServiceImpl;
+
+import java.util.List;
 
 public class PersistenceServicesBindings extends AbstractModule {
     @Override
@@ -71,6 +82,13 @@ public class PersistenceServicesBindings extends AbstractModule {
         bind(new TypeLiteral<NodeService<ServerNodeDto>>() {}).to(ServerNodeClusterService.class);
         bind(new TypeLiteral<NodeService<DataNodeDto>>() {}).to(DataNodeClusterService.class);
         bind(DataNodePaginatedService.class).asEagerSingleton();
+
+        bind(MongodbConnectionResolver.class).to(DefaultMongodbConnectionResolver.class).asEagerSingleton();
+        Multibinder<MongodbNodesService> mongodbNodesServices = Multibinder.newSetBinder(binder(), MongodbNodesService.class);
+        mongodbNodesServices.addBinding().to(ReplicaSetMongodbNodes.class);
+        mongodbNodesServices.addBinding().to(StandaloneNodeMongodbNodes.class);
+
+        bind(ServerNodePaginatedService.class).asEagerSingleton();
         bind(IndexRangeService.class).to(MongoIndexRangeService.class).asEagerSingleton();
         bind(InputService.class).to(InputServiceImpl.class);
         bind(UserService.class).to(UserServiceImpl.class).asEagerSingleton();
@@ -78,12 +96,12 @@ public class PersistenceServicesBindings extends AbstractModule {
                 .setDefault().to(UserManagementServiceImpl.class);
         bind(AccessTokenService.class).to(AccessTokenServiceImpl.class).asEagerSingleton();
         bind(TokenUsageService.class).to(TokenUsageServiceImpl.class).asEagerSingleton();
-        bind(MongoDBSessionService.class).to(MongoDBSessionServiceImpl.class).asEagerSingleton();
+        bind(SessionService.class).to(MongoDbSessionService.class).asEagerSingleton();
         bind(InputStatusService.class).to(MongoInputStatusService.class).asEagerSingleton();
+        bind(InputStateService.class).to(MongoInputStateService.class).asEagerSingleton();
         bind(EntityListPreferencesService.class).to(EntityListPreferencesServiceImpl.class);
         bind(EntitySuggestionService.class).to(MongoEntitySuggestionService.class);
         bind(EntityTitleService.class).to(EntityTitleServiceImpl.class);
         bind(DataStreamService.class).to(DataStreamServiceImpl.class);
-        bind(RemoteReindexMigrationService.class).to(RemoteReindexMigrationServiceImpl.class);
     }
 }

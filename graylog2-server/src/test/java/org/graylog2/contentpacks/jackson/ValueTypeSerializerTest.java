@@ -19,7 +19,7 @@ package org.graylog2.contentpacks.jackson;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog2.contentpacks.model.entities.references.ValueType;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

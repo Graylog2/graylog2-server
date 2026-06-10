@@ -18,9 +18,8 @@
 import * as React from 'react';
 import { useState, useRef } from 'react';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, ModalSubmit } from 'components/common';
 import Routes from 'routing/Routes';
-import { ModalSubmit } from 'components/common';
 import ContentPackDownloadControl from 'components/content-packs/ContentPackDownloadControl';
 import ContentPackInstall from 'components/content-packs/ContentPackInstall';
 import {
@@ -79,14 +78,15 @@ const ContentPackVersionItem = ({
 
   return (
     <tr key={pack.id + pack.rev}>
-      {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+      {}
       <td>
         <input type="radio" value={pack.rev} onChange={onChange} checked={selectedVersion === pack.rev} />
       </td>
       <td>{pack.rev}</td>
       <td className="text-right">
         <ButtonToolbar className="pull-right">
-          <Button bsStyle="success" bsSize="small" onClick={() => handleDownload()}>
+          {}
+          <Button bsStyle="primary" bsSize="small" onClick={() => handleDownload()}>
             Download
           </Button>
           <DropdownButton id={`action-${pack.rev}`} title="Actions" bsSize="small">

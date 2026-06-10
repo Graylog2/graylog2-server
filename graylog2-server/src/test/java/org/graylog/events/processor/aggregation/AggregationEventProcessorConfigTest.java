@@ -22,8 +22,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog.events.TestEventProcessorConfig;
+import org.graylog.events.conditions.BooleanExpression;
 import org.graylog.events.conditions.Expr;
-import org.graylog.events.conditions.Expression;
 import org.graylog.events.fields.providers.TemplateFieldValueProvider;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.DBEventProcessorStateService;
@@ -42,8 +42,9 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.security.UserContext;
 import org.graylog.security.entities.EntityRegistrar;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
@@ -52,12 +53,13 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -67,12 +69,15 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.events.processor.aggregation.AggregationEventProcessorConfig.FIELD_SERIES;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class AggregationEventProcessorConfigTest {
     public static final EventDefinitionConfiguration EVENT_DEFINITION_CONFIGURATION = new EventDefinitionConfiguration();
     public static final int MAX_EVENT_LIMIT = EVENT_DEFINITION_CONFIGURATION.getMaxEventLimit();
@@ -80,11 +85,6 @@ public class AggregationEventProcessorConfigTest {
             .message("")
             .searchWithinMs(1)
             .executeEveryMs(1).build();
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private DBEventProcessorStateService stateService;
@@ -95,8 +95,8 @@ public class AggregationEventProcessorConfigTest {
     private DBEventDefinitionService dbService;
     private JobSchedulerTestClock clock;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    public void setUp(MongoDBTestService dbTestService) throws Exception {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(new NamedType(AggregationEventProcessorConfig.class, AggregationEventProcessorConfig.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(TemplateFieldValueProvider.Config.class, TemplateFieldValueProvider.Config.TYPE_NAME));
@@ -105,9 +105,11 @@ public class AggregationEventProcessorConfigTest {
         when(userContext.isPermitted(anyString())).thenReturn(true);
 
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-        final MongoCollections mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
-        this.dbService = new DBEventDefinitionService(mongoCollections, stateService,
-                mock(EntityRegistrar.class), null, new IgnoreSearchFilters());
+        this.dbService = new DBEventDefinitionService(new MongoCollections(mapperProvider, dbTestService.mongoConnection()),
+                stateService,
+                mock(EntityRegistrar.class),
+                null,
+                new IgnoreSearchFilters());
         this.clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
     }
 
@@ -156,7 +158,7 @@ public class AggregationEventProcessorConfigTest {
     }
 
     private AggregationConditions getConditions() {
-        final Expression<Boolean> expression = Expr.Greater.create(Expr.NumberReference.create("foo"),
+        final BooleanExpression expression = Expr.Greater.create(Expr.NumberReference.create("foo"),
                 Expr.NumberValue.create(42.0));
         return AggregationConditions.builder()
                 .expression(expression)

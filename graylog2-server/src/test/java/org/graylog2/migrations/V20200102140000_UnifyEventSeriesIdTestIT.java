@@ -21,26 +21,26 @@ import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class V20200102140000_UnifyEventSeriesIdTestIT {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private V20200102140000_UnifyEventSeriesId migration;
 
@@ -48,11 +48,11 @@ public class V20200102140000_UnifyEventSeriesIdTestIT {
     private ClusterConfigService clusterConfigService;
     private MongoCollection<Document> eventDefinitions;
 
-    @Before
-    public void setUp() throws Exception {
-        migration = new V20200102140000_UnifyEventSeriesId(clusterConfigService, mongodb.mongoConnection());
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) throws Exception {
+        migration = new V20200102140000_UnifyEventSeriesId(clusterConfigService, mongoCollections.connection());
 
-        this.eventDefinitions = mongodb.mongoConnection().getMongoDatabase().getCollection("event_definitions");
+        this.eventDefinitions = mongoCollections.connection().getMongoDatabase().getCollection("event_definitions");
     }
 
     @Test

@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.rest;
 
+import com.github.zafarkhaja.semver.Version;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -25,9 +26,9 @@ import org.graylog.datanode.Configuration;
 import org.graylog.datanode.DirectoryReadableValidator;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.filesystem.index.IndicesDirectoryParser;
+import org.graylog.datanode.filesystem.index.OpensearchUtils;
 import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
 import org.graylog.datanode.filesystem.index.dto.NodeInformation;
-import org.graylog.shaded.opensearch2.org.opensearch.Version;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,12 +55,12 @@ public class IndicesDirectoryController {
     @Path("compatibility")
     public CompatibilityResult status() {
         final java.nio.file.Path dataTargetDir = datanodeConfiguration.datanodeDirectories().getDataTargetDir();
-        final String opensearchVersion = datanodeConfiguration.opensearchDistributionProvider().get().version();
+        final String opensearchVersion = datanodeConfiguration.opensearchDistribution().version();
         final String hostname = configuration.getHostname();
         try {
             directoryReadableValidator.validate(dataTargetDir.toUri().toString(), dataTargetDir);
             final IndexerDirectoryInformation info = indicesDirectoryParser.parse(dataTargetDir);
-            final Version currentVersion = Version.fromString(opensearchVersion);
+            final Version currentVersion = Version.parse(opensearchVersion);
 
             final List<String> compatibilityWarnings = new ArrayList<>();
 
@@ -79,7 +80,6 @@ public class IndicesDirectoryController {
     }
 
     private static boolean isNodeCompatible(NodeInformation node, Version currentVersion) {
-        final Version nodeVersion = Version.fromString(node.nodeVersion());
-        return node.nodeVersion() == null || currentVersion.isCompatible(nodeVersion);
+        return node.nodeVersion() == null || OpensearchUtils.isCompatible(currentVersion, Version.parse(node.nodeVersion()));
     }
 }

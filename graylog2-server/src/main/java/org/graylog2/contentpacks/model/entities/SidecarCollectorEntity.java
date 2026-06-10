@@ -20,14 +20,12 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import javax.annotation.Nullable;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class SidecarCollectorEntity {
     @JsonProperty("name")
     public abstract ValueReference name();
@@ -54,12 +52,12 @@ public abstract class SidecarCollectorEntity {
 
     @JsonCreator
     public static SidecarCollectorEntity create(@JsonProperty("name") ValueReference name,
-                                         @JsonProperty("service_type") ValueReference serviceType,
-                                         @JsonProperty("node_operating_system") ValueReference nodeOperatingSystem,
-                                         @JsonProperty("executable_path") ValueReference executablePath,
-                                         @JsonProperty("execute_parameters") ValueReference executeParameters,
-                                         @JsonProperty("validation_parameters") ValueReference validationParameters,
-                                         @JsonProperty("default_template") ValueReference defaultTemplate) {
+                                                @JsonProperty("service_type") ValueReference serviceType,
+                                                @JsonProperty("node_operating_system") ValueReference nodeOperatingSystem,
+                                                @JsonProperty("executable_path") ValueReference executablePath,
+                                                @JsonProperty("execute_parameters") ValueReference executeParameters,
+                                                @JsonProperty("validation_parameters") ValueReference validationParameters,
+                                                @JsonProperty("default_template") ValueReference defaultTemplate) {
         return new AutoValue_SidecarCollectorEntity(name,
                 serviceType,
                 nodeOperatingSystem,

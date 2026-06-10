@@ -28,8 +28,8 @@ const urlPrefix = '/startpage';
 
 export const LAST_OPEN_QUERY_KEY = 'last_open_query_key';
 
-const fetchLastOpen = async ({ page }: RequestQuery): Promise<PaginatedLastOpened> => {
-  const url = PaginationURL(`${urlPrefix}/lastOpened`, page, 5, '');
+const fetchLastOpen = async ({ page, per_page = 5 }: RequestQuery): Promise<PaginatedLastOpened> => {
+  const url = PaginationURL(`${urlPrefix}/lastOpened`, page, per_page, '');
 
   return fetch('GET', qualifyUrl(url));
 };

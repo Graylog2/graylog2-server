@@ -24,32 +24,34 @@ import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.graylog2.security.encryption.EncryptedValueService;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class BeatsTransportTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private NioEventLoopGroup eventLoopGroup;
 
     @Mock
     private TLSProtocolsConfiguration tlsConfiguration;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         eventLoopGroup = new NioEventLoopGroup(1);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         eventLoopGroup.shutdownGracefully();
     }
@@ -65,7 +67,8 @@ public class BeatsTransportTest {
                 nettyTransportConfiguration,
                 new ThroughputCounter(eventLoopGroup),
                 new LocalMetricRegistry(),
-                tlsConfiguration
+                tlsConfiguration,
+                mock(EncryptedValueService.class)
         );
 
         final MessageInput input = mock(MessageInput.class);

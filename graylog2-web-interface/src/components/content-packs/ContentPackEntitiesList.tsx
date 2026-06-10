@@ -202,9 +202,9 @@ class ContentPackEntitiesList extends React.Component<
               Show
             </Button>
           </ButtonToolbar>
+          {!readOnly && applyModal}
+          {showModal}
         </td>
-        {!readOnly && applyModal}
-        {showModal}
       </tr>
     );
   };

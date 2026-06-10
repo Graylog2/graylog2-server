@@ -18,14 +18,14 @@ import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { DataTable, Spinner, PaginatedList, SearchForm, QueryHelper } from 'components/common';
-import { useStore } from 'stores/connect';
 import type { Stream } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
-import { PipelineConnectionsStore, PipelineConnectionsActions } from 'stores/pipelines/PipelineConnectionsStore';
+import usePipelineConnections from 'hooks/usePipelineConnections';
 import usePipelineMutations from 'hooks/usePipelineMutations';
 import usePipelinesPaginated from 'hooks/usePipelinesPaginated';
+import { useProcessingLoadContext } from 'components/pipelines/processing-load';
 
 import type { PipelineType } from './types';
 import PipelineListItem from './PipelineListItem';
@@ -59,7 +59,8 @@ const PipelineFilter = ({ query, onSearch }: { query: string; onSearch: (query: 
 );
 
 const ProcessingTimelineComponent = () => {
-  const { connections } = useStore(PipelineConnectionsStore);
+  const { metricsEnabled } = useProcessingLoadContext();
+  const { data: connections } = usePipelineConnections();
   const { page, pageSize: perPage, resetPage, setPagination } = usePaginationQueryParameter();
   const [query, setQuery] = useState('');
   const [streams, setStreams] = useState<Stream[] | undefined>();
@@ -72,7 +73,6 @@ const ProcessingTimelineComponent = () => {
   const { pipelines, total } = paginatedPipelinesData;
 
   useEffect(() => {
-    PipelineConnectionsActions.list();
     StreamsStore.listStreams().then(setStreams);
   }, []);
 
@@ -126,7 +126,14 @@ const ProcessingTimelineComponent = () => {
       onDeletePipeline={() => _deletePipeline(pipelineItem)}
     />
   );
-  const headers = ['Pipeline', 'Connected to Streams', 'Processing Timeline', 'Actions'];
+  const headers = [
+    'Pipeline',
+    'Connected to Streams',
+    'Processing Errors',
+    ...(metricsEnabled ? ['Pipeline Load (15m)'] : []),
+    'Processing Timeline',
+    'Actions',
+  ];
 
   return (
     <div>

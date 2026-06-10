@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import * as React from 'react';
-import { fireEvent, render, screen } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 
 import RuleBlockDisplay from './RuleBlockDisplay';
 import { actionsBlockDict, buildRuleBlock } from './fixtures';
@@ -95,11 +96,11 @@ describe('RuleBlockDisplay', () => {
       </RuleBuilderProvider>,
     );
 
-    fireEvent.mouseOver(screen.getByText(/\$output_5/i));
+    await userEvent.hover(screen.getByText(/\$output_5/i));
 
     const deleteButton = await screen.findByRole('button', { name: 'Delete' });
 
-    fireEvent.click(deleteButton);
+    await userEvent.click(deleteButton);
 
     expect(mockDelete).toHaveBeenCalled();
   });
@@ -120,11 +121,11 @@ describe('RuleBlockDisplay', () => {
       </RuleBuilderProvider>,
     );
 
-    fireEvent.mouseOver(screen.getByText(/\$output_5/i));
+    await userEvent.hover(screen.getByText(/\$output_5/i));
 
     const editButton = await screen.findByRole('button', { name: 'Edit' });
 
-    fireEvent.click(editButton);
+    await userEvent.click(editButton);
 
     expect(mockEdit).toHaveBeenCalled();
   });
@@ -148,7 +149,7 @@ describe('RuleBlockDisplay', () => {
 
     const negationButton = await screen.findByRole('button', { name: 'Not' });
 
-    fireEvent.click(negationButton);
+    await userEvent.click(negationButton);
 
     expect(mockNegate).toHaveBeenCalled();
   });

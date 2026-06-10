@@ -16,32 +16,44 @@
  */
 import { useMemo } from 'react';
 
-import type { DefaultLayout } from 'components/common/EntityDataTable/types';
+import type { DefaultLayout, ColumnPreferences, SlicingPreferences } from 'components/common/EntityDataTable/types';
 
 import useUserLayoutPreferences from './useUserLayoutPreferences';
 
-const useTableLayout = ({ entityTableId, defaultSort, defaultPageSize, defaultDisplayedAttributes }: DefaultLayout) => {
-  const { data: userLayoutPreferences = {}, isInitialLoading } = useUserLayoutPreferences(entityTableId);
+export type LayoutConfig = {
+  attributes: ColumnPreferences;
+  order: Array<string>;
+  pageSize: number;
+  slicing?: SlicingPreferences;
+  sort: DefaultLayout['defaultSort'];
+};
 
-  return useMemo(
-    () => ({
+const useTableLayout = ({
+  entityTableId,
+  layoutVariant,
+  defaultSort,
+  defaultSlicing,
+  defaultPageSize,
+}: DefaultLayout): {
+  isInitialLoading: boolean;
+  layoutConfig: LayoutConfig;
+} => {
+  const { data: userLayoutPreferences = {}, isInitialLoading } = useUserLayoutPreferences(entityTableId, layoutVariant);
+
+  return useMemo(() => {
+    const hasSlicingPreference = Object.prototype.hasOwnProperty.call(userLayoutPreferences, 'slicing');
+
+    return {
       layoutConfig: {
+        attributes: userLayoutPreferences?.attributes,
+        order: userLayoutPreferences.order,
         pageSize: userLayoutPreferences.perPage ?? defaultPageSize,
+        slicing: hasSlicingPreference ? (userLayoutPreferences.slicing ?? undefined) : defaultSlicing,
         sort: userLayoutPreferences.sort ?? defaultSort,
-        displayedAttributes: userLayoutPreferences?.displayedAttributes ?? defaultDisplayedAttributes,
       },
       isInitialLoading,
-    }),
-    [
-      defaultDisplayedAttributes,
-      defaultPageSize,
-      defaultSort,
-      isInitialLoading,
-      userLayoutPreferences?.displayedAttributes,
-      userLayoutPreferences.perPage,
-      userLayoutPreferences.sort,
-    ],
-  );
+    };
+  }, [defaultPageSize, defaultSlicing, defaultSort, isInitialLoading, userLayoutPreferences]);
 };
 
 export default useTableLayout;

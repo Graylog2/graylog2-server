@@ -16,6 +16,7 @@
  */
 import React, { useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import startCase from 'lodash/startCase';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
@@ -23,12 +24,12 @@ import type View from 'views/logic/views/View';
 import TitleCell from 'views/components/dashboard/DashboardsOverview/TitleCell';
 import FavoriteIcon from 'views/components/FavoriteIcon';
 import { createGRN } from 'logic/permissions/GRN';
-import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import { useTableFilterContext } from 'components/common/PaginatedEntityTable';
 import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 
 const DashboardFavoriteItem = ({ favorite, dashboardId }: { favorite: boolean; dashboardId: string }) => {
   const queryClient = useQueryClient();
-  const { searchParams } = useTableFetchContext();
+  const { searchParams } = useTableFilterContext();
 
   return (
     <FavoriteIcon
@@ -61,6 +62,15 @@ export const useColumnRenderers = (pluggableColumnRenderers?: ColumnRenderersByA
         title: {
           renderCell: (_title: string, dashboard: View) => (
             <TitleCell dashboard={dashboard} requirementsProvided={requirementsProvided} />
+          ),
+        },
+        '_entity_source.source': {
+          renderCell: (_title: string, dashboard: View) => (
+            <span>
+              {dashboard._value.entitySource
+                ? startCase(dashboard._value.entitySource.source.toString().toLowerCase())
+                : 'User Defined'}
+            </span>
           ),
         },
         favorite: {

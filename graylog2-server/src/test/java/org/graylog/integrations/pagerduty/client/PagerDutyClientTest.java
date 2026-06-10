@@ -26,25 +26,29 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import okio.Buffer;
 import org.graylog.integrations.pagerduty.dto.PagerDutyResponse;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class PagerDutyClientTest {
 
     // Code Under Test
@@ -90,28 +94,34 @@ public class PagerDutyClientTest {
         thenErrorResponseReturned();
     }
 
-    @Test(expected = PagerDutyClient.TemporaryPagerDutyClientException.class)
+    @Test
     public void enqueue_throwsTempPagerDutyClientException_whenServerError() throws Exception {
-        givenGoodMessagePayload();
-        givenApiCallFailsDueToServerError();
+        assertThrows(PagerDutyClient.TemporaryPagerDutyClientException.class, () -> {
+            givenGoodMessagePayload();
+            givenApiCallFailsDueToServerError();
 
-        whenEnqueueIsCalled();
+            whenEnqueueIsCalled();
+        });
     }
 
-    @Test(expected = PagerDutyClient.TemporaryPagerDutyClientException.class)
+    @Test
     public void enqueue_throwsTempPagerDutyClientException_whenTooManyAPICalls() throws Exception {
-        givenGoodMessagePayload();
-        givenApiCallFailsDueToTooManyCalls();
+        assertThrows(PagerDutyClient.TemporaryPagerDutyClientException.class, () -> {
+            givenGoodMessagePayload();
+            givenApiCallFailsDueToTooManyCalls();
 
-        whenEnqueueIsCalled();
+            whenEnqueueIsCalled();
+        });
     }
 
-    @Test(expected = PagerDutyClient.PermanentPagerDutyClientException.class)
+    @Test
     public void enqueue_throwsPermPagerDutyClientException_whenBadRequest() throws Exception {
-        givenGoodMessagePayload();
-        givenApiCallFailsDueToBadInput();
+        assertThrows(PagerDutyClient.PermanentPagerDutyClientException.class, () -> {
+            givenGoodMessagePayload();
+            givenApiCallFailsDueToBadInput();
 
-        whenEnqueueIsCalled();
+            whenEnqueueIsCalled();
+        });
     }
 
     // GIVENs

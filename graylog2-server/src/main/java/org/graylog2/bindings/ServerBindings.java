@@ -37,31 +37,32 @@ import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
 import org.graylog2.bindings.providers.DefaultStreamProvider;
 import org.graylog2.bindings.providers.HtmlSafeJmteEngineProvider;
 import org.graylog2.bindings.providers.JsonSafeEngineProvider;
+import org.graylog2.bindings.providers.LegacySystemJobFactoryProvider;
+import org.graylog2.bindings.providers.LegacySystemJobManagerProvider;
 import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
-import org.graylog2.bindings.providers.SystemJobFactoryProvider;
-import org.graylog2.bindings.providers.SystemJobManagerProvider;
 import org.graylog2.bootstrap.uncaughtexeptions.DefaultUncaughtExceptionHandlerCreator;
 import org.graylog2.buffers.processors.OutputBufferProcessor;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.cluster.leader.FakeLeaderElectionModule;
 import org.graylog2.cluster.leader.LeaderElectionModule;
 import org.graylog2.cluster.lock.LockServiceModule;
+import org.graylog2.database.filtering.ComputedFieldProvider;
+import org.graylog2.database.filtering.ComputedFieldRegistry;
 import org.graylog2.grok.GrokModule;
 import org.graylog2.grok.GrokPatternRegistry;
 import org.graylog2.indexer.fieldtypes.FieldTypesModule;
 import org.graylog2.indexer.healing.FixDeflectorByDeleteJob;
 import org.graylog2.indexer.healing.FixDeflectorByMoveJob;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
-import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
-import org.graylog2.indexer.indices.jobs.SetIndexReadOnlyAndCalculateRangeJob;
-import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
-import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.inputs.InputEventListener;
+import org.graylog2.inputs.InputRuntimeStatusProvider;
 import org.graylog2.inputs.InputStateListener;
 import org.graylog2.inputs.PersistedInputsImpl;
 import org.graylog2.lookup.LookupModule;
+import org.graylog2.metrics.entity.EntityMetricsModule;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterIdFactory;
+import org.graylog2.plugin.cluster.ClusterIdService;
 import org.graylog2.plugin.cluster.RandomUUIDClusterIdFactory;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.rest.ValidationFailureExceptionMapper;
@@ -76,6 +77,9 @@ import org.graylog2.rest.ScrollChunkWriter;
 import org.graylog2.rest.ValidationExceptionMapper;
 import org.graylog2.rest.models.system.indices.DataTieringStatusService;
 import org.graylog2.rest.models.system.indices.DefaultDataTieringStatusService;
+import org.graylog2.rest.models.users.requests.DashboardStartPage;
+import org.graylog2.rest.models.users.requests.SearchStartPage;
+import org.graylog2.rest.models.users.requests.StreamStartPage;
 import org.graylog2.rest.resources.entities.preferences.listeners.EntityListPreferencesCleanerOnUserDeletion;
 import org.graylog2.security.realm.AuthenticatingRealmModule;
 import org.graylog2.security.realm.AuthorizationOnlyRealmModule;
@@ -83,6 +87,7 @@ import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.inputs.PersistedInputs;
 import org.graylog2.shared.messageq.MessageQueueModule;
 import org.graylog2.shared.metrics.jersey2.MetricsDynamicBinding;
+import org.graylog2.shared.rest.exceptionmappers.ResultWindowLimitExceededExceptionMapper;
 import org.graylog2.shared.rest.resources.csp.CSPDynamicFeature;
 import org.graylog2.shared.rest.resources.csp.CSPEventListener;
 import org.graylog2.shared.rest.resources.csp.CSPService;
@@ -96,8 +101,8 @@ import org.graylog2.streams.StreamRouterEngine;
 import org.graylog2.system.activities.SystemMessageActivityWriter;
 import org.graylog2.system.debug.ClusterDebugEventListener;
 import org.graylog2.system.debug.LocalDebugEventListener;
-import org.graylog2.system.jobs.SystemJobFactory;
-import org.graylog2.system.jobs.SystemJobManager;
+import org.graylog2.system.jobs.LegacySystemJobFactory;
+import org.graylog2.system.jobs.LegacySystemJobManager;
 import org.graylog2.system.shutdown.GracefulShutdown;
 import org.graylog2.system.stats.ClusterStatsModule;
 import org.graylog2.system.traffic.OpenTrafficCounterCalculator;
@@ -135,6 +140,7 @@ public class ServerBindings extends Graylog2Module {
         bindProviders();
         bindFactoryModules();
         bindDynamicFeatures();
+        registerJacksonSubtypes();
         bindExceptionMappers();
         bindAdditionalJerseyComponents();
         if (!isMigrationCommand) {
@@ -165,13 +171,9 @@ public class ServerBindings extends Graylog2Module {
 
     private void bindFactoryModules() {
         // System Jobs
-        install(new FactoryModuleBuilder().build(RebuildIndexRangesJob.Factory.class));
-        install(new FactoryModuleBuilder().build(OptimizeIndexJob.Factory.class));
         install(new FactoryModuleBuilder().build(IndexSetCleanupJob.Factory.class));
-        install(new FactoryModuleBuilder().build(CreateNewSingleIndexRangeJob.Factory.class));
         install(new FactoryModuleBuilder().build(FixDeflectorByDeleteJob.Factory.class));
         install(new FactoryModuleBuilder().build(FixDeflectorByMoveJob.Factory.class));
-        install(new FactoryModuleBuilder().build(SetIndexReadOnlyAndCalculateRangeJob.Factory.class));
 
         install(new FactoryModuleBuilder().build(UserImpl.Factory.class));
 
@@ -186,18 +188,21 @@ public class ServerBindings extends Graylog2Module {
 
     private void bindSingletons() {
         bind(DefaultUncaughtExceptionHandlerCreator.class).asEagerSingleton();
-        bind(SystemJobManager.class).toProvider(SystemJobManagerProvider.class);
+        bind(LegacySystemJobManager.class).toProvider(LegacySystemJobManagerProvider.class);
         bind(DefaultSecurityManager.class).toProvider(DefaultSecurityManagerProvider.class).asEagerSingleton();
-        bind(SystemJobFactory.class).toProvider(SystemJobFactoryProvider.class);
+        bind(LegacySystemJobFactory.class).toProvider(LegacySystemJobFactoryProvider.class);
         bind(GracefulShutdown.class).in(Scopes.SINGLETON);
         bind(ClusterStatsModule.class).asEagerSingleton();
         bind(ClusterConfigService.class).to(ClusterConfigServiceImpl.class).asEagerSingleton();
+        bind(ClusterIdService.class).asEagerSingleton();
         bind(GrokPatternRegistry.class).in(Scopes.SINGLETON);
         bind(Engine.class).toProvider(DefaultJmteEngineProvider.class).asEagerSingleton();
         bind(Engine.class).annotatedWith(Names.named("HtmlSafe")).toProvider(HtmlSafeJmteEngineProvider.class).asEagerSingleton();
         bind(Engine.class).annotatedWith(Names.named("JsonSafe")).toProvider(JsonSafeEngineProvider.class).asEagerSingleton();
         bind(ErrorPageGenerator.class).to(GraylogErrorPageGenerator.class).asEagerSingleton();
         bind(Clock.class).toProvider(Clock::systemUTC).asEagerSingleton();
+
+        install(new EntityMetricsModule());
     }
 
     private void bindInterfaces() {
@@ -211,6 +216,7 @@ public class ServerBindings extends Graylog2Module {
         bind(RoleService.class).to(RoleServiceImpl.class).in(Scopes.SINGLETON);
         OptionalBinder.newOptionalBinder(binder(), ClusterIdFactory.class).setDefault().to(RandomUUIDClusterIdFactory.class);
 
+        cspResourceProviderBinder();
         bind(CSPService.class).to(CSPServiceImpl.class).asEagerSingleton();
         bind(CSPEventListener.class).asEagerSingleton();
 
@@ -220,6 +226,10 @@ public class ServerBindings extends Graylog2Module {
         OptionalBinder.newOptionalBinder(binder(), TrafficUpdater.class).setDefault().to(TrafficCounterService.class).asEagerSingleton();
 
         Multibinder.newSetBinder(binder(), PluggableEntityHandler.class);
+
+        bind(ComputedFieldRegistry.class).in(Scopes.SINGLETON);
+        final Multibinder<ComputedFieldProvider> computedFieldProviders = Multibinder.newSetBinder(binder(), ComputedFieldProvider.class);
+        computedFieldProviders.addBinding().to(InputRuntimeStatusProvider.class);
     }
 
     private void bindDynamicFeatures() {
@@ -230,6 +240,12 @@ public class ServerBindings extends Graylog2Module {
         dynamicFeatures.addBinding().toInstance(CSPDynamicFeature.class);
     }
 
+    private void registerJacksonSubtypes() {
+        registerJacksonSubtype(DashboardStartPage.class, DashboardStartPage.TYPE);
+        registerJacksonSubtype(SearchStartPage.class, SearchStartPage.TYPE);
+        registerJacksonSubtype(StreamStartPage.class, StreamStartPage.TYPE);
+    }
+
     private void bindExceptionMappers() {
         final Multibinder<Class<? extends ExceptionMapper>> exceptionMappers = jerseyExceptionMapperBinder();
         exceptionMappers.addBinding().toInstance(NotFoundExceptionMapper.class);
@@ -237,6 +253,7 @@ public class ServerBindings extends Graylog2Module {
         exceptionMappers.addBinding().toInstance(ValidationFailureExceptionMapper.class);
         exceptionMappers.addBinding().toInstance(ElasticsearchExceptionMapper.class);
         exceptionMappers.addBinding().toInstance(QueryParsingExceptionMapper.class);
+        exceptionMappers.addBinding().toInstance(ResultWindowLimitExceededExceptionMapper.class);
     }
 
     private void bindAdditionalJerseyComponents() {

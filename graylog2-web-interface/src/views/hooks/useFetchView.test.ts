@@ -20,10 +20,10 @@ import { List } from 'immutable';
 
 import type { ViewJson } from 'views/logic/views/View';
 import { asMock } from 'helpers/mocking';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import Search from 'views/logic/search/Search';
 import ViewDeserializer from 'views/logic/views/ViewDeserializer';
 import View from 'views/logic/views/View';
+import { getView } from 'views/api/views';
 
 import useFetchView from './useFetchView';
 
@@ -43,15 +43,8 @@ const viewJson: ViewJson = {
   favorite: false,
 };
 
-jest.mock('views/stores/ViewManagementStore', () => ({
-  ViewManagementActions: {
-    get: jest.fn(),
-    update: {
-      completed: {
-        listen: jest.fn(),
-      },
-    },
-  },
+jest.mock('views/api/views', () => ({
+  getView: jest.fn(),
 }));
 
 jest.mock('views/logic/views/ViewDeserializer');
@@ -62,7 +55,7 @@ jest.mock('actions/errors/ErrorsActions', () => ({
 
 describe('useFetchView', () => {
   beforeEach(() => {
-    asMock(ViewManagementActions.get).mockResolvedValue(viewJson);
+    asMock(getView).mockResolvedValue(viewJson);
     const search = Search.create().toBuilder().parameters([]).build();
 
     asMock(ViewDeserializer).mockImplementation(async (response: ViewJson) =>
@@ -73,31 +66,31 @@ describe('useFetchView', () => {
   it('fetches view', () => {
     renderHook(() => useFetchView('foo'));
 
-    expect(ViewManagementActions.get).toHaveBeenCalledWith('foo');
+    expect(getView).toHaveBeenCalledWith('foo');
   });
 
   it('does not fetch view twice', () => {
     const { rerender } = renderHook(() => useFetchView('foo'));
 
-    expect(ViewManagementActions.get).toHaveBeenCalledWith('foo');
+    expect(getView).toHaveBeenCalledWith('foo');
 
-    asMock(ViewManagementActions.get).mockClear();
+    asMock(getView).mockClear();
 
     rerender();
 
-    expect(ViewManagementActions.get).not.toHaveBeenCalled();
+    expect(getView).not.toHaveBeenCalled();
   });
 
   it('does fetch view twice when id changes', () => {
     const { rerender } = renderHook(({ id }) => useFetchView(id), { initialProps: { id: 'foo' } });
 
-    expect(ViewManagementActions.get).toHaveBeenCalledWith('foo');
+    expect(getView).toHaveBeenCalledWith('foo');
 
-    asMock(ViewManagementActions.get).mockClear();
+    asMock(getView).mockClear();
 
     rerender({ id: 'bar' });
 
-    expect(ViewManagementActions.get).toHaveBeenCalledWith('bar');
+    expect(getView).toHaveBeenCalledWith('bar');
   });
 
   it('passes loaded view to ViewDeserializer', async () => {

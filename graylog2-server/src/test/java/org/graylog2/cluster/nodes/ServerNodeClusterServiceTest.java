@@ -18,52 +18,56 @@ package org.graylog2.cluster.nodes;
 
 import com.mongodb.DBCollection;
 import org.assertj.core.api.Assertions;
-import org.bson.types.ObjectId;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.net.URI;
-import java.util.Map;
 
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.set;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class ServerNodeClusterServiceTest {
     public static final int STALE_LEADER_TIMEOUT_MS = 2000;
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private static final URI TRANSPORT_URI = URI.create("http://10.0.0.1:12900");
     private static final String LOCAL_CANONICAL_HOSTNAME = Tools.getLocalCanonicalHostname();
     private static final String NODE_ID = "28164cbe-4ad9-4c9c-a76e-088655aa7889";
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
+    private static final boolean IS_PROCESSING = true;
+    private static final Lifecycle LIFECYCLE = Lifecycle.RUNNING;
 
     @Mock
     private Configuration configuration;
     private final NodeId nodeId = new SimpleNodeId(NODE_ID);
 
     private ServerNodeClusterService nodeService;
+    private MongoCollections mongoCollections;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) throws Exception {
+        this.mongoCollections = mongoCollections;
         Mockito.when(configuration.getStaleLeaderTimeout()).thenReturn(STALE_LEADER_TIMEOUT_MS);
         this.nodeService =
-                new ServerNodeClusterService(mongodb.mongoConnection(), configuration);
+                new ServerNodeClusterService(mongoCollections, configuration);
     }
 
     @Test
@@ -78,6 +82,8 @@ public class ServerNodeClusterServiceTest {
                 .setLeader(true)
                 .setTransportAddress(TRANSPORT_URI.toString())
                 .setHostname(LOCAL_CANONICAL_HOSTNAME)
+                .setProcessing(IS_PROCESSING)
+                .setLifecycle(LIFECYCLE)
                 .build());
 
         final Node node = nodeService.byNodeId(nodeId);
@@ -102,10 +108,12 @@ public class ServerNodeClusterServiceTest {
                 .setLeader(true)
                 .setTransportAddress(TRANSPORT_URI.toString())
                 .setHostname(LOCAL_CANONICAL_HOSTNAME)
+                .setProcessing(IS_PROCESSING)
+                .setLifecycle(LIFECYCLE)
                 .build());
 
         @SuppressWarnings("deprecation")
-        final DBCollection collection = mongodb.mongoConnection().getDatabase().getCollection("nodes");
+        final DBCollection collection = mongoCollections.connection().getDatabase().getCollection("nodes");
 
         assertThat(collection.count())
                 .describedAs("There should only be one node")
@@ -127,42 +135,41 @@ public class ServerNodeClusterServiceTest {
                 .setLeader(true)
                 .setTransportAddress(TRANSPORT_URI.toString())
                 .setHostname(LOCAL_CANONICAL_HOSTNAME)
+                .setProcessing(IS_PROCESSING)
+                .setLifecycle(LIFECYCLE)
                 .build());
         assertThat(nodeService.allActive().keySet()).containsExactly(nodeId.getNodeId());
 
     }
 
     @Test
-    public void testLastSeenBackwardsCompatibility() throws NodeNotFoundException, ValidationException {
+    public void testLastSeenBackwardsCompatibility() throws NodeNotFoundException {
         nodeService.registerServer(ServerNodeDto.Builder.builder()
                 .setId(nodeId.getNodeId())
                 .setLeader(true)
                 .setTransportAddress(TRANSPORT_URI.toString())
                 .setHostname(LOCAL_CANONICAL_HOSTNAME)
+                .setProcessing(IS_PROCESSING)
+                .setLifecycle(LIFECYCLE)
                 .build());
 
-        final ServerNodeDto node = nodeService.byNodeId(nodeId);
+        // Older Graylog versions wrote last_seen as numeric epoch seconds rather than a BSON Date.
+        // Overwrite the field directly to simulate that on-disk shape.
+        final long staleEpochSeconds = (System.currentTimeMillis() - 2L * STALE_LEADER_TIMEOUT_MS) / 1000L;
+        mongoCollections.mongoConnection().getMongoDatabase()
+                .getCollection(ServerNodeDto.COLLECTION_NAME)
+                .updateOne(eq("node_id", nodeId.getNodeId()), set("last_seen", staleEpochSeconds));
 
-        final long lastSeenMs = System.currentTimeMillis() - 2 * STALE_LEADER_TIMEOUT_MS;
-
-        final Map<String, Object> fields = node.toEntityParameters();
-        fields.put("last_seen", (int) (lastSeenMs / 1000));
-        ServerNodeEntity nodeEntity = new ServerNodeEntity(new ObjectId(node.getObjectId()), fields);
-
-        nodeService.save(nodeEntity);
-
+        // byNodeId must deserialize the numeric value via LastSeenDeserializer.
         final Node nodeAfterUpdate = nodeService.byNodeId(nodeId);
-        final long lastSeenFromDb = nodeAfterUpdate.getLastSeen().toInstant().getMillis();
-        Assertions.assertThat(lastSeenMs - lastSeenFromDb).isLessThan(1000); // make sure that our lastSeen from int is the same valid date
+        Assertions.assertThat(nodeAfterUpdate.getLastSeen().getMillis())
+                .isEqualTo(staleEpochSeconds * 1000L);
 
-        final Map<String, ServerNodeDto> activeNodes = nodeService.allActive();
+        // The aggregation pipeline must coerce the numeric value to a Date and treat the node as stale.
+        Assertions.assertThat(nodeService.allActive()).isEmpty();
 
-        // the node is stale, should not be present here
-        Assertions.assertThat(activeNodes).isEmpty();
-
-        // this should drop the node with the int timestamp, as it's at least 2xstale_delay outdated.
+        // dropOutdated must remove the legacy-formatted node.
         nodeService.dropOutdated();
-
         Assertions.assertThatThrownBy(() -> nodeService.byNodeId(nodeId))
                 .isInstanceOf(NodeNotFoundException.class);
     }

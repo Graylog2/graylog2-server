@@ -14,26 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { DocumentTitle, PageHeader } from 'components/common';
-import { Col, Row } from 'components/bootstrap';
-import useClusterNodes from 'components/cluster-configuration/useClusterNodes';
-import ClusterConfigurationListView from 'components/cluster-configuration/ClusterConfigurationListView';
-import TableFetchContextProvider from 'components/common/PaginatedEntityTable/TableFetchContextProvider';
-import type { SearchParams } from 'stores/PaginationTypes';
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import IndexerClusterHealth from 'components/indexers/IndexerClusterHealth';
+import ClusterConfigurationNodes from 'components/cluster-configuration/ClusterConfigurationNodes';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { isPermitted } from 'util/PermissionsMixin';
+import Routes from 'routing/Routes';
 
 const ClusterConfigurationPage = () => {
-  const clusterNodes = useClusterNodes();
-  const searchParams: SearchParams = {
-    query: '',
-    page: 1,
-    pageSize: 0,
-    sort: { attributeId: 'hostname', direction: 'asc' },
-  };
+  const currentUser = useCurrentUser();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isPermitted(currentUser.permissions, 'clusterconfiguration:read')) {
+      navigate(Routes.NOTFOUND);
+    }
+  }, [currentUser.permissions, navigate]);
 
   return (
     <DocumentTitle title="Cluster Configuration">
@@ -50,20 +51,7 @@ const ClusterConfigurationPage = () => {
         <HideOnCloud>
           <IndexerClusterHealth minimal />
         </HideOnCloud>
-        <Row className="content">
-          <Col xs={6}>
-            <h2>Nodes</h2>
-          </Col>
-          <Col md={12}>
-            <TableFetchContextProvider
-              refetch={clusterNodes.refetchDatanodes}
-              searchParams={searchParams}
-              attributes={[]}
-              entityTableId="cluster-configuration">
-              <ClusterConfigurationListView clusterNodes={clusterNodes} />
-            </TableFetchContextProvider>
-          </Col>
-        </Row>
+        <ClusterConfigurationNodes />
       </div>
     </DocumentTitle>
   );

@@ -27,6 +27,8 @@ import { SEARCH_DEBOUNCE_THRESHOLD } from '../common/SearchForm';
 jest.mock('logic/generateId', () => jest.fn(() => 'dead-beef'));
 jest.useFakeTimers();
 
+const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+
 describe('<ContentPackSelection />', () => {
   it('renders with empty content pack', () => {
     const contentPack = ContentPack.builder().build();
@@ -48,7 +50,7 @@ describe('<ContentPackSelection />', () => {
       .v('1')
       .type({ name: 'spaceship', version: '1' })
       .id('beef123')
-      .data({ title: { value: 'breq', type: 'string' } })
+      .data({ title: { '@value': 'breq', '@type': 'string' } })
       .build();
 
     const entities = { spaceship: [entity] };
@@ -67,11 +69,16 @@ describe('<ContentPackSelection />', () => {
     const contentPack = ContentPack.builder().build();
     render(<ContentPackSelection contentPack={contentPack} onStateChange={changeFn} />);
 
-    await userEvent.paste(screen.getByLabelText(/name/i), 'name');
-    await userEvent.paste(screen.getByLabelText(/summary/i), 'summary');
-    await userEvent.paste(screen.getByLabelText(/description/i), 'descr');
-    await userEvent.paste(screen.getByLabelText(/vendor/i), 'vendor');
-    await userEvent.paste(screen.getByLabelText(/url/i), 'http://url');
+    await setupUser().click(screen.getByLabelText(/name/i));
+    await setupUser().paste('name');
+    await setupUser().click(screen.getByLabelText(/summary/i));
+    await setupUser().paste('summary');
+    await setupUser().click(screen.getByLabelText(/description/i));
+    await setupUser().paste('descr');
+    await setupUser().click(screen.getByLabelText(/vendor/i));
+    await setupUser().paste('vendor');
+    await setupUser().click(screen.getByLabelText(/url/i));
+    await setupUser().paste('http://url');
 
     expect(changeFn).toHaveBeenCalledTimes(5);
     expect(resultedState.contentPack.name).toBe('name');
@@ -107,7 +114,7 @@ describe('<ContentPackSelection />', () => {
     );
 
     const checkbox = screen.getByRole('checkbox');
-    await userEvent.click(checkbox);
+    await setupUser().click(checkbox);
 
     expect(changeFn).toHaveBeenCalledTimes(1);
   });
@@ -140,10 +147,8 @@ describe('<ContentPackSelection />', () => {
         />,
       );
 
-      await userEvent.click(await screen.findByText(/expand_circle_down/i));
-
-      const checkboxes = screen.getAllByRole('checkbox');
-      await userEvent.click(checkboxes[1]);
+      const checkboxes = screen.getAllByRole('checkbox', { hidden: true });
+      await setupUser().click(checkboxes[1]);
 
       expect(changeFn).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -157,23 +162,21 @@ describe('<ContentPackSelection />', () => {
       render(<ContentPackSelection contentPack={contentPack} entities={entities} />);
 
       const searchInput = await screen.findByPlaceholderText(/search/i);
-      await userEvent.type(searchInput, 'falcon');
+      await setupUser().type(searchInput, 'falcon');
 
       act(() => {
         jest.advanceTimersByTime(SEARCH_DEBOUNCE_THRESHOLD);
       });
 
-      await screen.findByRole('button', { name: /falcon/i });
+      await screen.findByRole('checkbox', { name: /falcon/i, hidden: true });
 
       expect(screen.queryByRole('button', { name: /breq/i })).not.toBeInTheDocument();
 
-      const resetButton = screen.getByRole('button', { name: /reset search/i });
-      await userEvent.click(resetButton);
+      const resetButton = screen.getByRole('button', { name: /reset search/i, hidden: true });
+      await setupUser().click(resetButton);
 
-      await userEvent.click(await screen.findByText(/expand_circle_down/i));
-
-      await screen.findByRole('button', { name: /falcon/i });
-      await screen.findByRole('button', { name: /breq/i });
+      await screen.findByRole('checkbox', { name: /falcon/i, hidden: true });
+      await screen.findByRole('checkbox', { name: /breq/i, hidden: true });
     });
 
     it('validates that all fields are filled out', async () => {
@@ -182,10 +185,10 @@ describe('<ContentPackSelection />', () => {
         const summaryInput = await screen.findByLabelText(/summary/i);
         const vendorInput = await screen.findByLabelText(/vendor/i);
 
-        await userEvent.click(nameInput);
-        await userEvent.click(summaryInput);
-        await userEvent.click(vendorInput);
-        await userEvent.click(await screen.findByLabelText(/description/i));
+        await setupUser().click(nameInput);
+        await setupUser().click(summaryInput);
+        await setupUser().click(vendorInput);
+        await setupUser().click(await screen.findByLabelText(/description/i));
       };
 
       const { rerender } = render(<ContentPackSelection contentPack={{}} entities={entities} />);
@@ -234,8 +237,8 @@ describe('<ContentPackSelection />', () => {
       render(<ContentPackSelection contentPack={{ ...contentPack, url }} entities={entities} />);
 
       const urlInput = await screen.findByLabelText(/url/i);
-      await userEvent.click(urlInput);
-      await userEvent.click(await screen.findByLabelText(/name/i));
+      await setupUser().click(urlInput);
+      await setupUser().click(await screen.findByLabelText(/name/i));
 
       if (hasError) {
         await screen.findByText('Must use a URL starting with http or https.');

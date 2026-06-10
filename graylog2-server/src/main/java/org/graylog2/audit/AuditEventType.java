@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -36,16 +35,15 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  *
  * The {@link #create(String)} method expects an event type string with the following format:
  *
- *     {@code namespace:object:action}
+ * {@code namespace:object:action}
  *
  * Examples:
  *
- *     {@code server:message_input:create}
- *     {@code pipeline-processor:configuration:update}
+ * {@code server:message_input:create}
+ * {@code pipeline-processor:configuration:update}
  */
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class AuditEventType {
     private static final String FIELD_NAMESPACE = "namespace";
     private static final String FIELD_OBJECT = "object";
@@ -77,7 +75,7 @@ public abstract class AuditEventType {
     /**
      * Creates {@link AuditEventType} from an audit event type string with the following format.
      *
-     *     {@code namespace:object:action}
+     * {@code namespace:object:action}
      *
      * See class documentation for details.
      *

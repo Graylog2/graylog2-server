@@ -18,17 +18,19 @@ package org.graylog.datanode.opensearch.configuration;
 
 import com.google.common.collect.ImmutableList;
 import jakarta.annotation.Nonnull;
+import org.apache.http.client.utils.URIBuilder;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.configuration.OpensearchConfigurationDir;
+import org.graylog.datanode.configuration.variants.OpensearchCertificates;
 import org.graylog.datanode.process.Environment;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
 import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreItem;
 import org.graylog.datanode.process.configuration.files.DatanodeConfigFile;
 import org.graylog.datanode.process.configuration.files.YamlConfigFile;
-import org.graylog.security.certutil.csr.KeystoreInformation;
-import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.security.KeyStore;
 import java.util.Collection;
@@ -77,12 +79,20 @@ public class OpensearchConfiguration {
                 .collect(Collectors.toList());
     }
 
-    public HttpHost getRestBaseUrl() {
-        return new HttpHost(hostname, httpPort, isHttpsEnabled() ? "https" : "http");
+    public URI getRestBaseUrl() {
+        try {
+            return new URIBuilder()
+                    .setHost(hostname)
+                    .setPort(httpPort)
+                    .setScheme(isHttpsEnabled() ? "https" : "http")
+                    .build();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Error creating OpenSearch URL", e);
+        }
     }
 
     public boolean isHttpsEnabled() {
-        return httpCertificate().isPresent();
+        return certificates().isPresent();
     }
 
     /**
@@ -109,17 +119,11 @@ public class OpensearchConfiguration {
                 .orElseThrow(() -> new IllegalArgumentException("This should not happen, truststore should always be present"));
     }
 
-    public Optional<KeystoreInformation> httpCertificate() {
+    public Optional<OpensearchCertificates> certificates() {
         return configurationParts.stream()
-                .map(DatanodeConfigurationPart::httpCertificate)
+                .map(DatanodeConfigurationPart::opensearchCertificates)
                 .filter(Objects::nonNull)
-                .findFirst();
-    }
-
-    public Optional<KeystoreInformation> transportCertificate() {
-        return configurationParts.stream()
-                .map(DatanodeConfigurationPart::transportCertificate)
-                .filter(Objects::nonNull)
+                .filter(OpensearchCertificates::hasCertificates)
                 .findFirst();
     }
 

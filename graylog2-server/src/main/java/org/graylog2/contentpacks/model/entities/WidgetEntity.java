@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.graph.MutableGraph;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
@@ -68,7 +67,6 @@ import static org.graylog2.contentpacks.facades.StreamReferenceFacade.resolveStr
 
 @AutoValue
 @JsonDeserialize(builder = WidgetEntity.Builder.class)
-@WithBeanGetter
 public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
     public static final String FIELD_ID = "id";
     public static final String FIELD_TYPE = "type";
@@ -248,11 +246,11 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
 
     private List<SortSpec> toSortSpec(AggregationConfigDTO config) {
         return config.sort().stream().map(sortConfig -> {
-           final PivotSortConfig pivotSortConfig = (PivotSortConfig) sortConfig;
-           final SortSpec.Direction dir = pivotSortConfig.direction().equals(SortConfigDTO.Direction.Ascending)
+            final PivotSortConfig pivotSortConfig = (PivotSortConfig) sortConfig;
+            final SortSpec.Direction dir = pivotSortConfig.direction().equals(SortConfigDTO.Direction.Ascending)
                     ? SortSpec.Direction.Ascending
                     : SortSpec.Direction.Descending;
-           return PivotSort.create(PivotSort.Type, pivotSortConfig.field(), dir);
+            return PivotSort.create(PivotSort.Type, pivotSortConfig.field(), dir);
         }).collect(Collectors.toList());
 
     }

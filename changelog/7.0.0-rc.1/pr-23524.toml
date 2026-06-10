@@ -1,0 +1,5 @@
+type = "f"
+message = 'Fix Lucene parser used in validation and allow number of possible results from lookup tables up to "opensearch_indices_query_bool_max_clause_count".'
+
+issues = ['Graylog2/graylog-plugin-enterprise#11765']
+pulls = ["23524"]

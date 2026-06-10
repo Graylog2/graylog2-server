@@ -103,7 +103,7 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
         final Set<ValueReference> connectedStreams = connectedStreams(pipelineDao.id(), entityDescriptorIds);
         final PipelineEntity pipelineEntity = PipelineEntity.create(
                 ValueReference.of(pipelineDao.title()),
-                ValueReference.of(pipelineDao.description()),
+                ValueReference.ofNullable(pipelineDao.description()),
                 ValueReference.of(pipelineDao.source()),
                 connectedStreams);
         final JsonNode data = objectMapper.convertValue(pipelineEntity, JsonNode.class);

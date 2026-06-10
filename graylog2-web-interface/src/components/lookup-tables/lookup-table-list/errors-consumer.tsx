@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { useEffect, useState } from 'react';
 
 import { useErrorsContext } from 'components/lookup-tables/contexts/ErrorsContext';
 import { useFetchErrors } from 'components/lookup-tables/hooks/useLookupTablesAPI';
@@ -28,11 +28,11 @@ const ErrorsConsumer = ({
   cacheNames?: Array<string>;
   adapterNames?: Array<string>;
 }) => {
-  const [fetchInterval, setFetchInterval] = React.useState<NodeJS.Timeout>();
+  const [fetchInterval, setFetchInterval] = useState<NodeJS.Timeout>();
   const { setErrors } = useErrorsContext();
   const { fetchErrors } = useFetchErrors();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (fetchInterval) clearInterval(fetchInterval);
 
     setFetchInterval(

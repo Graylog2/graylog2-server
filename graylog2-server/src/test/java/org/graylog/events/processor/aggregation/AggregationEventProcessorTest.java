@@ -16,6 +16,7 @@
  */
 package org.graylog.events.processor.aggregation;
 
+import com.floreysoft.jmte.Engine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -45,12 +46,13 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -70,11 +72,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class AggregationEventProcessorTest {
     public static final int SEARCH_WINDOW_MS = 30000;
     private static final String QUERY_STRING = "aQueryString";
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private AggregationSearch.Factory searchFactory;
@@ -98,8 +100,9 @@ public class AggregationEventProcessorTest {
     private PermittedStreams permittedStreams;
     private EventStreamService eventStreamService;
     private final MessageFactory messageFactory = new TestMessageFactory();
+    private final Engine templateEngine = new Engine();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         when(streamService.streamAllIds()).thenAnswer(inv -> java.util.stream.Stream.of(
                 "stream-1",

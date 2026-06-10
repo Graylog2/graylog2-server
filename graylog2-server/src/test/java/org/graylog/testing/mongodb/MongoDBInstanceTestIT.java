@@ -20,9 +20,11 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.MongoConnection;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.time.ZonedDateTime;
 import java.util.Date;
@@ -32,24 +34,25 @@ import java.util.stream.StreamSupport;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(MongoDBExtension.class)
 public class MongoDBInstanceTestIT {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private MongoCollection<Document> collection1;
     private MongoCollection<Document> collection2;
+    private MongoConnection mongoConnection;
 
-    @Before
-    public void setUp() throws Exception {
-        collection1 = mongodb.mongoConnection().getMongoDatabase().getCollection("test_1");
-        collection2 = mongodb.mongoConnection().getMongoDatabase().getCollection("test_2");
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) throws Exception {
+        mongoConnection = mongoCollections.mongoConnection();
+        collection1 = mongoConnection.getMongoDatabase().getCollection("test_1");
+        collection2 = mongoConnection.getMongoDatabase().getCollection("test_2");
     }
 
     @Test
     public void clientWorks() {
-        assertThat(mongodb.mongoConnection()).isNotNull();
-        assertThat(mongodb.mongoConnection().getMongoDatabase()).isNotNull();
-        assertThat(mongodb.mongoConnection().getMongoDatabase().getName()).isEqualTo("graylog");
+        assertThat(mongoConnection).isNotNull();
+        assertThat(mongoConnection.getMongoDatabase()).isNotNull();
+        assertThat(mongoConnection.getMongoDatabase().getName()).isEqualTo("graylog");
 
         final Document document = new Document("hello", "world");
 

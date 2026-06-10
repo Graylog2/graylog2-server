@@ -18,12 +18,35 @@
 import * as React from 'react';
 import { useEffect, useRef } from 'react';
 import type { SyntheticEvent } from 'react';
+import styled, { css } from 'styled-components';
 
-import Button from 'components/bootstrap/Button';
+import { Button } from 'components/bootstrap';
 import type { IconName } from 'components/common/Icon';
 import Icon from 'components/common/Icon';
 import Spinner from 'components/common/Spinner';
 import ModalButtonToolbar from 'components/common/ModalButtonToolbar';
+
+const Container = styled.div<{ $hasLeftCol: boolean }>(
+  ({ $hasLeftCol }) =>
+    $hasLeftCol &&
+    css`
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+    `,
+);
+
+const buttonTitle = (isSubmitting: boolean, submitText: React.ReactNode, submitLoadingText: string) => {
+  if (isSubmitting && typeof submitLoadingText === 'string') {
+    return submitLoadingText;
+  }
+
+  if (!isSubmitting && typeof submitText === 'string') {
+    return submitText;
+  }
+
+  return undefined;
+};
 
 type WithCancelProps = {
   displayCancel?: true;
@@ -82,8 +105,12 @@ const ModalSubmit = ({ ...props }: Props) => {
     submitIcon,
   } = props;
 
-  const title = typeof submitButtonText === 'string' ? submitButtonText : undefined;
   const submittingAsync = isWithAsyncSubmit(props) && props.isSubmitting;
+  const title = buttonTitle(
+    submittingAsync,
+    submitButtonText,
+    'submitLoadingText' in props ? props.submitLoadingText : undefined,
+  );
   const confirmRef = useRef<HTMLButtonElement>();
   useEffect(() => {
     if (autoFocus && !disabledSubmit && confirmRef.current) {
@@ -94,37 +121,39 @@ const ModalSubmit = ({ ...props }: Props) => {
   }, []);
 
   return (
-    <ModalButtonToolbar className={className}>
+    <Container $hasLeftCol={!!leftCol} className={className}>
       {leftCol}
-      {isWithCancelProps(props) && (
-        <Button
-          type="button"
-          bsSize={bsSize}
-          onClick={props.onCancel}
-          title="Cancel"
-          aria-label="Cancel"
-          disabled={props.disabledCancel || submittingAsync}>
-          Cancel
-        </Button>
-      )}
-      <Button
-        ref={confirmRef}
-        bsStyle="success"
-        bsSize={bsSize}
-        disabled={disabledSubmit || submittingAsync}
-        form={formId}
-        title={title}
-        aria-label={title}
-        type={submitButtonType}
-        onClick={onSubmit}>
-        {submitIcon && !submittingAsync && (
-          <>
-            <Icon name={submitIcon} />{' '}
-          </>
+      <ModalButtonToolbar>
+        {isWithCancelProps(props) && (
+          <Button
+            type="button"
+            bsSize={bsSize}
+            onClick={props.onCancel}
+            title="Cancel"
+            aria-label="Cancel"
+            disabled={props.disabledCancel || submittingAsync}>
+            Cancel
+          </Button>
         )}
-        {submittingAsync ? <Spinner text={props.submitLoadingText} delay={0} /> : submitButtonText}
-      </Button>
-    </ModalButtonToolbar>
+        <Button
+          ref={confirmRef}
+          bsStyle="primary"
+          bsSize={bsSize}
+          disabled={disabledSubmit || submittingAsync}
+          form={formId}
+          title={title}
+          aria-label={title}
+          type={submitButtonType}
+          onClick={onSubmit}>
+          {submitIcon && !submittingAsync && (
+            <>
+              <Icon name={submitIcon} />{' '}
+            </>
+          )}
+          {submittingAsync ? <Spinner text={props.submitLoadingText} delay={0} /> : submitButtonText}
+        </Button>
+      </ModalButtonToolbar>
+    </Container>
   );
 };
 

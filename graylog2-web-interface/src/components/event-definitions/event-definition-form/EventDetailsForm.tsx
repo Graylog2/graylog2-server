@@ -15,12 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo, useState } from 'react';
+import styled from 'styled-components';
 import upperFirst from 'lodash/upperFirst';
 import toNumber from 'lodash/toNumber';
 import toString from 'lodash/toString';
+import { useMantineTheme } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 
 import { Select } from 'components/common';
-import { MarkdownEditor, MarkdownPreview } from 'components/common/MarkdownEditor';
 import { Button, Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -31,9 +34,37 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
+import EventSummaryTemplateHelp from './EventSummaryTemplateHelp';
+
 import type { EventDefinition } from '../event-definitions-types';
 import { isSystemEventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
+
+const StyledRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: ${({ theme }) => theme.spacings.lg};
+
+  & .form-group {
+    width: 100%;
+  }
+`;
+
+const InputContainer = styled.div`
+  display: inline-block;
+  position: relative;
+  width: 100%;
+`;
+
+const InputFeedback = styled.div`
+  position: absolute;
+  right: 0;
+  top: 24px;
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+  padding-right: 3px;
+`;
 
 const priorityOptions = Object.entries(EventDefinitionPriorityEnum.properties)
   .map(([key, value]) => ({
@@ -55,18 +86,29 @@ type Props = {
 };
 
 const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, validation, onChange, canEdit }: Props) => {
+  const theme = useMantineTheme();
+  const ltXl = useMediaQuery(`(min-width: ${theme.breakpoints.xl}`);
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
-  const [showAddEventProcedureForm, setShowAddEventProcedureForm] = React.useState(false);
-  const pluggableEventProcedureForm = usePluginEntities('views.components.eventProcedureForm');
+  const [showAddEventProcedureForm, setShowAddEventProcedureForm] = useState<boolean>(false);
   const {
     data: { valid: validSecurityLicense },
   } = usePluggableLicenseCheck('/license/security');
 
+  const readOnly = useMemo(() => !canEdit || isSystemEventDefinition(eventDefinition), [canEdit, eventDefinition]);
+  const showEventProcedureSummary = useMemo(
+    () => !!eventDefinitionEventProcedure && !showAddEventProcedureForm && validSecurityLicense,
+    [eventDefinitionEventProcedure, showAddEventProcedureForm, validSecurityLicense],
+  );
+  const showAddNewEventProcedure = useMemo(
+    () => !eventDefinitionEventProcedure && !showAddEventProcedureForm && !readOnly && validSecurityLicense,
+    [eventDefinitionEventProcedure, showAddEventProcedureForm, readOnly, validSecurityLicense],
+  );
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name } = event.target;
 
-    onChange(name, FormsUtils.getValueFromInput(event.target));
+    onChange(name, String(FormsUtils.getValueFromInput(event.target)));
   };
 
   const handlePriorityChange = (nextPriority: string) => {
@@ -74,88 +116,28 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'event-definition-details',
       app_action_value: 'priority-select',
-      priority: priorityOptions[toNumber(nextPriority) - 1]?.label,
+      priority: priorityOptions.find((opt) => opt.value === nextPriority)?.label,
     });
 
     onChange('priority', toNumber(nextPriority));
   };
 
-  const readOnly = !canEdit || isSystemEventDefinition(eventDefinition) || eventDefinition.config.type === 'sigma-v1';
-  const hasEventProcedure = !!eventDefinitionEventProcedure;
-  const hasRemediationSteps = eventDefinition?.remediation_steps;
-
-  const renderEventProcedure = () => {
-    if (validSecurityLicense) {
-      return (
-        <>
-          {hasEventProcedure || hasRemediationSteps || showAddEventProcedureForm ? (
-            <>
-              {pluggableEventProcedureForm.map(({ component: PluggableEventProcedureForm }) => (
-                <PluggableEventProcedureForm
-                  eventProcedureID={eventDefinitionEventProcedure}
-                  remediationSteps={eventDefinition?.remediation_steps}
-                  onClose={() => setShowAddEventProcedureForm(false)}
-                  onSave={(eventProcedureId) => onChange('event_procedure', eventProcedureId)}
-                />
-              ))}
-            </>
-          ) : (
-            <>
-              <ControlLabel>Event Procedure Summary</ControlLabel>
-              <p>This Event Definition does not have any Event Procedures yet.</p>
-              <Button bsStyle="success" onClick={() => setShowAddEventProcedureForm(true)}>
-                Add Event Procedure
-              </Button>
-            </>
-          )}
-        </>
-      );
-    }
-
-    return (
-      <div style={{ width: '100%' }}>
-        <ControlLabel>
-          Remediation Steps <small className="text-muted">(Optional)</small>
-        </ControlLabel>
-        {readOnly ? (
-          <MarkdownPreview
-            show
-            withFullView
-            height={150}
-            value={eventDefinition.remediation_steps || 'No remediation steps given'}
-          />
-        ) : (
-          <MarkdownEditor
-            id="event-definition-remediation-steps"
-            readOnly={readOnly}
-            height={150}
-            value={eventDefinition.remediation_steps}
-            onChange={(newValue: string) =>
-              handleChange({
-                target: { name: 'remediation_steps', value: newValue },
-              } as React.ChangeEvent<HTMLInputElement>)
-            }
-          />
-        )}
-      </div>
-    );
-  };
+  const PluggableEventProcedureForm = usePluginEntities('views.components.eventProcedureForm')?.[0]?.component;
+  const PluggableEventProcedureSummary = usePluginEntities('views.components.eventProcedureSummary')?.[0]?.component;
 
   return (
     <Row>
-      <Col md={7} lg={12}>
+      <Col md={12} lg={6}>
         <h2 className={commonStyles.title}>Event Details</h2>
         <fieldset>
-          <div style={{ display: 'flex', flexDirection: 'row', gap: '2rem' }}>
+          <StyledRow>
             <Input
               id="event-definition-title"
               name="title"
               label="Title"
               type="text"
               bsStyle={validation.errors.title ? 'error' : null}
-              help={
-                validation?.errors?.title?.[0] ?? 'Title for this Event Definition, Events and Alerts created from it.'
-              }
+              help={validation?.errors?.title?.[0] ?? 'Title for this Event Definition.'}
               value={eventDefinition.title}
               onChange={handleChange}
               readOnly={readOnly}
@@ -174,7 +156,23 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
               />
               <HelpBlock>Choose the priority for Events created from this Definition.</HelpBlock>
             </FormGroup>
-          </div>
+          </StyledRow>
+
+          <InputContainer className="input-container">
+            <Input
+              id="event-definition-event-summary-template"
+              name="event_summary_template"
+              label="Event Summary Template"
+              type="text"
+              help="Template used to generate the Event and Alert summaries."
+              value={eventDefinition.event_summary_template}
+              onChange={handleChange}
+              readOnly={readOnly}
+            />
+            <InputFeedback>
+              <EventSummaryTemplateHelp />
+            </InputFeedback>
+          </InputContainer>
 
           <Input
             id="event-definition-description"
@@ -191,7 +189,42 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
             readOnly={readOnly}
             rows={2}
           />
-          {renderEventProcedure()}
+          {showAddEventProcedureForm && (
+            <PluggableEventProcedureForm
+              eventProcedureId={eventDefinitionEventProcedure}
+              remediationSteps={eventDefinition?.remediation_steps}
+              onClose={() => setShowAddEventProcedureForm(false)}
+              onSave={(eventProcedureId) => {
+                onChange('event_procedure', eventProcedureId);
+                setShowAddEventProcedureForm(false);
+              }}
+              onRemove={() => {
+                onChange('event_procedure', null);
+                setShowAddEventProcedureForm(false);
+              }}
+            />
+          )}
+          {showEventProcedureSummary && (
+            <Col>
+              <ControlLabel>Event Procedure Summary</ControlLabel>
+              <PluggableEventProcedureSummary
+                eventProcedureId={eventDefinitionEventProcedure}
+                canEdit={!readOnly}
+                onEdit={() => setShowAddEventProcedureForm(true)}
+                onRemove={() => onChange('event_procedure', null)}
+                row={ltXl}
+              />
+            </Col>
+          )}
+          {showAddNewEventProcedure && (
+            <>
+              <ControlLabel>Event Procedure Summary</ControlLabel>
+              <p>This Event Definition does not have any Event Procedures yet.</p>
+              <Button bsStyle="primary" onClick={() => setShowAddEventProcedureForm(true)}>
+                Add Event Procedure
+              </Button>
+            </>
+          )}
         </fieldset>
       </Col>
     </Row>

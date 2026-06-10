@@ -15,31 +15,48 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useRef } from 'react';
 import * as React from 'react';
 
-import StreamCountBadge from 'components/streams/StreamCountBadge';
 import type { Stream } from 'stores/streams/StreamsStore';
-import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
+import { CountBadge, Spinner } from 'components/common';
+import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
+import { useStreamMetricsFor } from 'components/streams/StreamsOverview/StreamMetricsContext';
+import { METRIC_COLUMN_IDS } from 'components/streams/StreamsOverview/metricColumns';
 
 type Props = {
   stream: Stream;
 };
 
+const SECTION_NAME = METRIC_COLUMN_IDS.pipelines;
+
 const PipelinesCell = ({ stream }: Props) => {
-  const buttonRef = useRef();
-  const { data } = usePipelinesConnectedStream(stream.id);
+  const { metrics, isInitialLoading, isError } = useStreamMetricsFor(stream.id);
+  const { toggleSection, expandedSections } = useExpandedSections();
 
   if (stream.is_default || !stream.is_editable) {
     return null;
   }
 
-  const pipelinesCount = data?.length || 0;
+  if (isInitialLoading && !metrics) {
+    return <Spinner size="xs" />;
+  }
+
+  if (isError || !metrics?.pipelines?.length) {
+    return null;
+  }
+
+  const count = metrics.pipelines.length;
+
+  const isOpen = expandedSections?.[stream.id]?.includes(SECTION_NAME) ?? false;
+  const title = `${isOpen ? 'Hide' : 'Show'} connected pipelines for ${stream.title}`;
 
   return (
-    <StreamCountBadge disabled={pipelinesCount === 0} ref={buttonRef} title="Connected pipelines">
-      {pipelinesCount}
-    </StreamCountBadge>
+    <CountBadge
+      count={count}
+      iconName={isOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
+      onClick={() => toggleSection(stream.id, SECTION_NAME)}
+      title={title}
+    />
   );
 };
 

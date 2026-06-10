@@ -16,18 +16,13 @@
  */
 import * as React from 'react';
 
-import Routes from 'routing/Routes';
 import PageNavigation from 'components/common/PageNavigation';
 import { Row } from 'components/bootstrap';
-
-const NAV_ITEMS = [
-  { description: 'Authentication Services', path: Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW },
-  { description: 'Authenticators', path: Routes.SYSTEM.AUTHENTICATION.AUTHENTICATORS.SHOW },
-];
+import { PAGE_NAV_TITLE } from 'components/authentication/bindings';
 
 const AuthenticationPageNavigation = () => (
   <Row>
-    <PageNavigation items={NAV_ITEMS} />
+    <PageNavigation page={PAGE_NAV_TITLE} />
   </Row>
 );
 

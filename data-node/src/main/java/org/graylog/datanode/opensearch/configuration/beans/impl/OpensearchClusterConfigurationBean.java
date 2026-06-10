@@ -31,6 +31,7 @@ import org.graylog2.cluster.nodes.NodeService;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class OpensearchClusterConfigurationBean implements DatanodeConfigurationBean<OpensearchConfigurationParams> {
@@ -74,16 +75,23 @@ public class OpensearchClusterConfigurationBean implements DatanodeConfiguration
         final List<String> discoverySeedHosts = localConfiguration.getOpensearchDiscoverySeedHosts();
         if (discoverySeedHosts != null && !discoverySeedHosts.isEmpty()) {
             properties.put("discovery.seed_hosts", String.join(",", discoverySeedHosts));
+        } else {
+            properties.put("discovery.seed_providers", "file");
         }
+        Set<String> seedHosts = resolveDiscoverySeedHosts();
 
-        properties.put("discovery.seed_providers", "file");
+        // set default number of replicas to 0 if only one node is known.
+        // this does not affect replicas for Graylog managed indices, but resolves some problems for system managed indices.
+        // (see http://github.com/opensearch-project/OpenSearch/issues/9438)
+        String replicas = (seedHosts == null || seedHosts.isEmpty() || seedHosts.size() == 1) ? "0" : "1";
+        properties.put("cluster.default_number_of_replicas", replicas);
 
         // TODO: why do we have this configured?
         properties.put("node.max_local_storage_nodes", "3");
 
         return DatanodeConfigurationPart.builder()
                 .properties(properties.build())
-                .withConfigFile(seedHostFile())
+                .withConfigFile(new TextConfigFile(UNICAST_HOSTS_FILE, String.join("\n", seedHosts)))
                 .build();
     }
 
@@ -110,11 +118,10 @@ public class OpensearchClusterConfigurationBean implements DatanodeConfiguration
         return roles != null && roles.contains(OpensearchNodeRole.CLUSTER_MANAGER);
     }
 
-    private TextConfigFile seedHostFile() {
-        final String data = nodeService.allActive().values().stream()
+    private Set<String> resolveDiscoverySeedHosts() {
+        return nodeService.allActive().values().stream()
                 .map(DataNodeDto::getClusterAddress)
                 .filter(Objects::nonNull)
-                .collect(Collectors.joining("\n"));
-        return new TextConfigFile(UNICAST_HOSTS_FILE, data);
+                .collect(Collectors.toSet());
     }
 }

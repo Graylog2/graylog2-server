@@ -24,7 +24,7 @@ import Popover from 'components/common/Popover';
 import { HoverForHelp, ModalButtonToolbar } from 'components/common';
 import { Alert, Button, Input } from 'components/bootstrap';
 import type { Unit } from 'views/components/visualizations/utils/unitConverters';
-import { mappedUnitsFromJSON as units } from 'views/components/visualizations/utils/unitConverters';
+import { mappedUnitsFromJSONForAggregation as units } from 'views/components/visualizations/utils/unitConverters';
 import type { FieldUnitsFormValues } from 'views/types';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 import getUnitTextLabel from 'views/components/visualizations/utils/getUnitTextLabel';
@@ -93,7 +93,7 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string; predefined
   const predefinedInfo = useMemo(() => {
     if (!predefinedUnit?.isDefined) return null;
 
-    const unitName = units[predefinedUnit.unitType].find(({ abbrev }) => abbrev === predefinedUnit?.abbrev).name;
+    const unitName = units[predefinedUnit?.unitType].find(({ abbrev }) => abbrev === predefinedUnit?.abbrev).name;
 
     return (
       <>
@@ -173,7 +173,7 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string; predefined
             <Button bsSize="xs" onClick={onClear}>
               Clear
             </Button>
-            <Button bsSize="xs" bsStyle="success" onClick={toggleShow}>
+            <Button bsSize="xs" bsStyle="primary" onClick={toggleShow}>
               OK
             </Button>
           </ModalButtonToolbar>

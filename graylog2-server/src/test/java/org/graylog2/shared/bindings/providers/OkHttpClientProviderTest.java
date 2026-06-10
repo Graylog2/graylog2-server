@@ -27,10 +27,10 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.io.IOException;
@@ -41,16 +41,16 @@ import java.net.URISyntaxException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Ignore
+@Disabled
 public class OkHttpClientProviderTest {
     private final MockWebServer server = new MockWebServer();
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         server.start();
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws IOException {
         server.close();
     }
@@ -86,7 +86,7 @@ public class OkHttpClientProviderTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void testSuccessfulProxyConnectionWithoutAuthentication() throws IOException, InterruptedException {
         server.enqueue(successfulMockResponse());
 
@@ -154,7 +154,7 @@ public class OkHttpClientProviderTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void testFailingProxyConnectionWithoutAuthentication() throws IOException, InterruptedException {
         server.enqueue(failedMockResponse());
 

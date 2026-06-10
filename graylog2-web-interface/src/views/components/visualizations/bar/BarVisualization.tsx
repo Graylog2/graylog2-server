@@ -24,13 +24,12 @@ import { DateType } from 'views/logic/aggregationbuilder/Pivot';
 import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 import useChartData from 'views/components/visualizations/useChartData';
 import useEvents from 'views/components/visualizations/useEvents';
-import useMapKeys from 'views/components/visualizations/useMapKeys';
-import { keySeparator, humanSeparator } from 'views/Constants';
 import type { ChartConfig } from 'views/components/visualizations/GenericPlot';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import useChartLayoutSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartLayoutSettingsWithCustomUnits';
 import useBarChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useBarChartDataSettingsWithCustomUnits';
+import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
 
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -51,7 +50,7 @@ const setChartColor = (chart: ChartConfig, colors: ColorMapper) => ({
   marker: { color: colors.get(chart.originalName ?? chart.name) },
 });
 
-const defineSingleDateBarWidth = (
+export const defineSingleDateBarWidth = (
   chartDataResult: ChartDefinition[],
   config: AggregationWidgetConfig,
   timeRangeFrom: string,
@@ -64,16 +63,21 @@ const defineSingleDateBarWidth = (
     return chartDataResult;
   }
 
-  return chartDataResult.map((data) => {
-    if (data?.x?.length === 1) {
-      // @ts-ignore
-      const timeRangeMS = new Date(timeRangeTo) - new Date(timeRangeFrom);
-      const widthXUnits = timeRangeMS * barWidth;
+  const distinctBarXValues = new Set(
+    chartDataResult.filter((data) => data?.type === 'bar').flatMap((data) => data?.x ?? []),
+  );
 
-      return {
-        ...data,
-        width: [Math.max(minXUnits, widthXUnits)],
-      };
+  if (distinctBarXValues.size !== 1) {
+    return chartDataResult;
+  }
+
+  const timeRangeMS = new Date(timeRangeTo).getTime() - new Date(timeRangeFrom).getTime();
+  const widthXUnits = timeRangeMS * barWidth;
+  const width = Math.max(minXUnits, widthXUnits);
+
+  return chartDataResult.map((data) => {
+    if (data?.type === 'bar' && data?.x?.length === 1) {
+      return { ...data, width: [width] };
     }
 
     return data;
@@ -90,22 +94,6 @@ const BarVisualization = makeVisualization(
       [visualizationConfig],
     );
 
-    const mapKeys = useMapKeys();
-    const rowPivotFields = useMemo(
-      () => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [],
-      [config?.rowPivots],
-    );
-    const _mapKeys = useCallback(
-      (labels: string[]) =>
-        labels.map((label) =>
-          label
-            .split(keySeparator)
-            .map((l, i) => mapKeys(l, rowPivotFields[i]))
-            .join(humanSeparator),
-        ),
-      [mapKeys, rowPivotFields],
-    );
-
     const getBarChartDataSettingsWithCustomUnits = useBarChartDataSettingsWithCustomUnits({
       config,
       barmode,
@@ -114,12 +102,11 @@ const BarVisualization = makeVisualization(
     const _seriesGenerator: Generator = useCallback(
       ({ type, name, labels, values, originalName, total, idx, fullPath }): ChartDefinition => {
         const opacity = visualizationConfig?.opacity ?? 1.0;
-        const mappedKeys = _mapKeys(labels);
 
         return {
           type,
           name,
-          x: mappedKeys,
+          x: labels,
           y: values,
           opacity,
           originalName,
@@ -130,11 +117,11 @@ const BarVisualization = makeVisualization(
             values,
             idx,
             total,
-            xAxisItemsLength: mappedKeys.length,
+            xAxisItemsLength: labels.length,
           }),
         };
       },
-      [visualizationConfig?.opacity, _mapKeys, getBarChartDataSettingsWithCustomUnits],
+      [visualizationConfig?.opacity, getBarChartDataSettingsWithCustomUnits],
     );
 
     const rows = useMemo(() => retrieveChartData(data), [data]);
@@ -147,8 +134,6 @@ const BarVisualization = makeVisualization(
 
     const { eventChartData, shapes } = useEvents(config, data.events);
 
-    // const layout = shapes ? { ..._layout, shapes } : _layout;
-
     const chartData = useMemo(() => {
       const chartDataResult = eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult;
 
@@ -158,30 +143,37 @@ const BarVisualization = makeVisualization(
     const getChartLayoutSettingsWithCustomUnits = useChartLayoutSettingsWithCustomUnits({ config, chartData, barmode });
 
     const layout = useMemo<Partial<Layout>>(() => {
-      const _layouts: Partial<Layout> = {};
+      const _layouts: Partial<Layout> = getChartLayoutSettingsWithCustomUnits();
 
       if (shapes) {
-        _layouts.shapes = shapes;
+        _layouts.shapes = [...(_layouts.shapes ?? []), ...shapes];
       }
 
       if (barmode) {
         _layouts.barmode = barmode;
       }
 
-      return { ..._layouts, ...getChartLayoutSettingsWithCustomUnits() };
+      return _layouts;
     }, [shapes, barmode, getChartLayoutSettingsWithCustomUnits]);
 
+    const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover('bar', config);
+
     return (
-      <XYPlot
-        config={config}
-        axisType={visualizationConfig.axisType}
-        chartData={chartData}
-        effectiveTimerange={effectiveTimerange}
-        setChartColor={setChartColor}
-        height={height}
-        width={width}
-        plotLayout={layout}
-      />
+      <>
+        <XYPlot
+          config={config}
+          axisType={visualizationConfig.axisType}
+          chartData={chartData}
+          effectiveTimerange={effectiveTimerange}
+          setChartColor={setChartColor}
+          height={height}
+          width={width}
+          plotLayout={layout}
+          onClickMarker={onChartClick}
+          onInitialized={initializeGraphDivRef}
+        />
+        {popover}
+      </>
     );
   },
   'bar',

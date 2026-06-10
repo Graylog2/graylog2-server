@@ -39,12 +39,14 @@ import org.bouncycastle.pkcs.PKCSException;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
 import org.graylog.security.certutil.csr.KeystoreInformation;
+import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApiResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.completebackend.conditions.EnabledIfSearchServer;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog2.security.TruststoreCreator;
+import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.api.BeforeAll;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -71,26 +73,24 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collections;
 
-@ContainerMatrixTestsConfiguration(searchVersions = SearchServer.DATANODE_DEV,
-                                   additionalConfigurationParameters = {
-                                           @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"),
-                                           @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_SELFSIGNED_STARTUP", value = "true"),
-                                           @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = ""),
-                                   })
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS,
+                             env = {
+                                     @GraylogBackendConfiguration.Env(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"),
+                                     @GraylogBackendConfiguration.Env(key = "GRAYLOG_SELFSIGNED_STARTUP", value = "true"),
+                                     @GraylogBackendConfiguration.Env(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = ""),
+                             })
+@EnabledIfSearchServer(distribution = SearchVersion.Distribution.DATANODE)
 public class ClientCertResourceIT {
 
+    private static GraylogApis api;
+
     @BeforeAll
-    static void beforeAll() {
+    static void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
         Security.addProvider(new BouncyCastleProvider());
     }
 
-    private final GraylogApis api;
-
-    public ClientCertResourceIT(GraylogApis api) {
-        this.api = api;
-    }
-
-    @ContainerMatrixTest
+    @FullBackendTest
     void generateClientCert() throws Exception {
 
         final String privateKeyPassword = RandomStringUtils.secure().nextAlphabetic(10);
@@ -120,10 +120,10 @@ public class ClientCertResourceIT {
         Assertions.assertThat(expires).isBetween(shouldExpire.minusDays(2), shouldExpire.plusDays(2));
 
         final SSLContext sslContext = createSslContext(
-                createKeystore(privateKey, certificate, caCertificate),
+                createKeystore(privateKey, certificate),
                 createTruststore(caCertificate));
 
-        final URL url = new URI("https://" + this.api.backend().searchServerInstance().getHttpHostAddress()).toURL();
+        final URL url = new URI("https://" + api.backend().searchServerInstance().getHttpHostAddress()).toURL();
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         if (connection instanceof HttpsURLConnection) {
@@ -154,7 +154,7 @@ public class ClientCertResourceIT {
         return TruststoreCreator.newEmpty().addCertificates(Collections.singletonList(caCertificate)).getTruststore();
     }
 
-    private static KeystoreInformation createKeystore(PrivateKey privateKey, X509Certificate certificate, X509Certificate caCertificate) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
+    private static KeystoreInformation createKeystore(PrivateKey privateKey, X509Certificate certificate) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
         KeyStore keystore = KeyStore.getInstance(CertConstants.PKCS12);
         keystore.load(null, null);
         final char[] password = "keystorepassword".toCharArray();

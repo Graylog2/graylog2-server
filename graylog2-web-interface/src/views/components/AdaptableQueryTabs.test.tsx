@@ -78,14 +78,15 @@ describe('AdaptableQueryTabs', () => {
   const mainTabRole = 'button';
   const dropdownTabRole = 'menuitem';
 
+  const findMoreDashboardPagesButton = () => screen.findByRole('button', { name: /more dashboard pages/i });
   const openMoreTabsDropdown = async () => {
-    await userEvent.click(await screen.findByRole('button', { name: /more dashboard pages/i }));
+    await userEvent.click(await findMoreDashboardPagesButton());
     await screen.findByRole('menu');
   };
 
   const closeMoreTabsDropdown = async () => {
-    userEvent.keyboard('{esc}');
-    await waitFor(() => expect(screen.getByRole('menu')).not.toBeVisible());
+    await userEvent.click(await findMoreDashboardPagesButton());
+    await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
   };
 
   const finishInitialRender = async () => {
@@ -94,6 +95,16 @@ describe('AdaptableQueryTabs', () => {
       hidden: true,
     });
   };
+
+  const findMainTab = (tabNr: number) =>
+    screen.queryByRole(mainTabRole, {
+      name: new RegExp(`tab ${tabNr}`, 'i'),
+    });
+
+  const findDropdownTab = (tabNr: number) =>
+    screen.queryByRole(dropdownTabRole, {
+      name: new RegExp(`tab ${tabNr}`, 'i'),
+    });
 
   useViewsPlugin();
 
@@ -116,34 +127,18 @@ describe('AdaptableQueryTabs', () => {
 
       // Displays main tabs
       mainTabs.forEach((tabNr) => {
-        expect(
-          screen.getByRole(mainTabRole, {
-            name: new RegExp(`tab ${tabNr}`, 'i'),
-          }),
-        ).toBeInTheDocument();
+        expect(findMainTab(tabNr)).toBeInTheDocument();
 
         // Does not display main tabs in dropdown
-        expect(
-          screen.queryByRole(dropdownTabRole, {
-            name: new RegExp(`tab ${tabNr}`, 'i'),
-          }),
-        ).not.toBeInTheDocument();
+        expect(findDropdownTab(tabNr)).not.toBeInTheDocument();
       });
 
       // Displays dropdown tabs
       dropdownTabs.forEach((tabNr) => {
-        expect(
-          screen.getByRole(dropdownTabRole, {
-            name: new RegExp(`tab ${tabNr}`, 'i'),
-          }),
-        ).toBeInTheDocument();
+        expect(findDropdownTab(tabNr)).toBeInTheDocument();
 
         // Does not display tabs in dropdown as main tabs
-        expect(
-          screen.queryByRole(mainTabRole, {
-            name: new RegExp(`tab ${tabNr}`, 'i'),
-          }),
-        ).not.toBeInTheDocument();
+        expect(findMainTab(tabNr)).not.toBeInTheDocument();
       });
 
       await closeMoreTabsDropdown();
@@ -162,18 +157,10 @@ describe('AdaptableQueryTabs', () => {
 
       // Displays main tabs
       mainTabs.forEach((tabNr) => {
-        expect(
-          screen.getByRole(mainTabRole, {
-            name: new RegExp(`tab ${tabNr}`, 'i'),
-          }),
-        ).toBeInTheDocument();
+        expect(findMainTab(tabNr)).toBeInTheDocument();
 
         // Does not display main tabs in dropdown
-        expect(
-          screen.queryByRole(dropdownTabRole, {
-            name: new RegExp(`tab ${tabNr}`, 'i'),
-          }),
-        ).not.toBeInTheDocument();
+        expect(findDropdownTab(tabNr)).not.toBeInTheDocument();
       });
 
       await closeMoreTabsDropdown();
@@ -194,11 +181,7 @@ describe('AdaptableQueryTabs', () => {
 
       // Displays main tabs
       mainTabs.forEach((tabNr) => {
-        expect(
-          screen.getByRole(mainTabRole, {
-            name: new RegExp(`tab ${tabNr}`, 'i'),
-          }),
-        ).toBeInTheDocument();
+        expect(findMainTab(tabNr)).toBeInTheDocument();
       });
     });
 
@@ -244,13 +227,13 @@ describe('AdaptableQueryTabs', () => {
   });
 
   it('selects main tab', async () => {
-    const onSelectStub = jest.fn((id: string) => Promise.resolve(id));
+    const onSelectStub = jest.fn(async (id: string) => id);
     render(<AdaptableQueryTabs {...DEFAULT_PROPS} onSelect={onSelectStub} />);
 
     const tab2 = await screen.findByRole(mainTabRole, {
       name: /Tab 2/i,
     });
-    userEvent.click(tab2);
+    await userEvent.click(tab2);
 
     await expect(onSelectStub).toHaveBeenCalledTimes(1);
 
@@ -258,26 +241,24 @@ describe('AdaptableQueryTabs', () => {
   });
 
   it('selects dropdown tab', async () => {
-    const onSelectStub = jest.fn((id: string) => Promise.resolve(id));
+    const onSelectStub = jest.fn(async (id: string) => id);
     render(<AdaptableQueryTabs {...DEFAULT_PROPS} onSelect={onSelectStub} />);
 
     await finishInitialRender();
     await openMoreTabsDropdown();
 
-    userEvent.click(await screen.findByRole(dropdownTabRole, { name: /tab 4/i }));
+    await userEvent.click(await screen.findByRole(dropdownTabRole, { name: /tab 4/i }));
 
     await expect(onSelectStub).toHaveBeenCalledTimes(1);
 
     expect(onSelectStub).toHaveBeenCalledWith('query-id-4');
-
-    await closeMoreTabsDropdown();
   });
 
   it('creates new tab', async () => {
-    const onSelectStub = jest.fn((id: string) => Promise.resolve(id));
+    const onSelectStub = jest.fn(async (id: string) => id);
     render(<AdaptableQueryTabs {...DEFAULT_PROPS} onSelect={onSelectStub} />);
 
-    userEvent.click(await screen.findByTitle('Create New Page'));
+    await userEvent.click(await screen.findByTitle('Create New Page'));
 
     await expect(onSelectStub).toHaveBeenCalledTimes(1);
 
@@ -287,8 +268,8 @@ describe('AdaptableQueryTabs', () => {
   it('should show copy page to dashboard modal', async () => {
     render(<AdaptableQueryTabs {...DEFAULT_PROPS} />);
 
-    userEvent.click((await screen.findAllByRole('button', { name: /page actions/i }))[0]);
-    userEvent.click(await screen.findByRole('menuitem', { name: /copy to dashboard/i, hidden: true }));
+    await userEvent.click((await screen.findAllByRole('button', { name: /page actions/i }))[0]);
+    await userEvent.click(await screen.findByRole('menuitem', { name: /copy to dashboard/i, hidden: true }));
 
     await screen.findByRole('button', {
       name: /copy page/i,

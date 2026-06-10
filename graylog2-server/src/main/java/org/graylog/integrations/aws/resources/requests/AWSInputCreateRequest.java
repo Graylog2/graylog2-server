@@ -20,14 +20,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 /**
  * This request is used to save a new Kinesis AWS input. Each type of AWS input will use it's own request
  * object due to typically very unique required fields for each.
  */
 @AutoValue
-@WithBeanGetter
 @JsonDeserialize(builder = AWSInputCreateRequest.Builder.class)
 public abstract class AWSInputCreateRequest implements AWSRequest {
 

@@ -16,6 +16,8 @@
  */
 package org.graylog2.users;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
@@ -52,7 +54,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -63,13 +64,23 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Strings.nullToEmpty;
+import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
 import static org.graylog2.shared.security.RestPermissions.USERS_READ;
+import static org.graylog2.users.UserImpl.ACCOUNT_STATUS;
 import static org.graylog2.users.UserImpl.COLLECTION_NAME;
+import static org.graylog2.users.UserImpl.EMAIL;
+import static org.graylog2.users.UserImpl.FIRST_NAME;
+import static org.graylog2.users.UserImpl.FULL_NAME;
+import static org.graylog2.users.UserImpl.LAST_NAME;
+import static org.graylog2.users.UserImpl.STARTPAGE;
+import static org.graylog2.users.UserImpl.TIMEZONE;
 import static org.graylog2.users.UserImpl.USERNAME;
 
 @DbEntity(collection = COLLECTION_NAME,
-          titleField = USERNAME,
-          readPermission = USERS_READ)
+          titleField = FULL_NAME,
+          readPermission = USERS_READ,
+          readableFields = {ID_FIELD, USERNAME, EMAIL, FIRST_NAME, LAST_NAME, FULL_NAME,
+                  TIMEZONE, ACCOUNT_STATUS, STARTPAGE})
 public class UserImpl extends PersistedImpl implements User {
 
     public static final String FULL_NAME_FORMAT = "%s %s";
@@ -77,6 +88,7 @@ public class UserImpl extends PersistedImpl implements User {
     private final PasswordAlgorithmFactory passwordAlgorithmFactory;
     private final Permissions permissions;
     protected final ClusterConfigService clusterConfigService;
+    private ObjectMapper objectMapper;
 
     public interface Factory {
         UserImpl create(final Map<String, Object> fields);
@@ -122,23 +134,27 @@ public class UserImpl extends PersistedImpl implements User {
     public UserImpl(PasswordAlgorithmFactory passwordAlgorithmFactory,
                     Permissions permissions,
                     ClusterConfigService clusterConfigService,
+                    ObjectMapper objectMapper,
                     @Assisted final Map<String, Object> fields) {
         super(fields);
         this.passwordAlgorithmFactory = passwordAlgorithmFactory;
         this.permissions = permissions;
         this.clusterConfigService = clusterConfigService;
+        this.objectMapper = objectMapper;
     }
 
     @AssistedInject
     public UserImpl(PasswordAlgorithmFactory passwordAlgorithmFactory,
                     Permissions permissions,
                     ClusterConfigService clusterConfigService,
+                    ObjectMapper objectMapper,
                     @Assisted final ObjectId id,
                     @Assisted final Map<String, Object> fields) {
         super(id, fields);
         this.passwordAlgorithmFactory = passwordAlgorithmFactory;
         this.permissions = permissions;
         this.clusterConfigService = clusterConfigService;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -247,7 +263,6 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
 
-
     @Override
     public Set<Permission> getObjectPermissions() {
         return getPermissions().stream().map(p -> {
@@ -284,15 +299,9 @@ public class UserImpl extends PersistedImpl implements User {
 
     @Override
     public Startpage getStartpage() {
-        if (fields.containsKey(STARTPAGE)) {
-            @SuppressWarnings("unchecked")
-            final Map<String, String> obj = (Map<String, String>) fields.get(STARTPAGE);
-            final String type = obj.get("type");
-            final String id = obj.get("id");
-
-            if (type != null && id != null) {
-                return Startpage.create(type, id);
-            }
+        final var rawStartpage = fields.get(STARTPAGE);
+        if (rawStartpage != null && rawStartpage instanceof Map dbObject && !dbObject.isEmpty()) {
+            return objectMapper.convertValue(fields.get(STARTPAGE), Startpage.class);
         }
 
         return null;
@@ -407,19 +416,13 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
     @Override
-    public void setStartpage(final String type, final String id) {
-        final Startpage nextStartpage = type != null && id != null ? Startpage.create(type, id) : null;
-        this.setStartpage(nextStartpage);
-    }
-
-    @Override
     public void setStartpage(Startpage startpage) {
-        final HashMap<String, String> startpageMap = new HashMap<>();
-        if (startpage != null) {
-            startpageMap.put("type", startpage.type());
-            startpageMap.put("id", startpage.id());
+        if (startpage == null) {
+            this.fields.remove(STARTPAGE);
+            return;
         }
-        this.fields.put(STARTPAGE, startpageMap);
+        Map<String, Object> map = objectMapper.convertValue(startpage, new TypeReference<>() {});
+        this.fields.put(STARTPAGE, map);
     }
 
     @Nullable
@@ -459,7 +462,7 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
     @Override
-    public boolean isServiceAccount()  {
+    public boolean isServiceAccount() {
         return Boolean.valueOf(String.valueOf(fields.get(SERVICE_ACCOUNT)));
     }
 
@@ -477,8 +480,9 @@ public class UserImpl extends PersistedImpl implements User {
         LocalAdminUser(PasswordAlgorithmFactory passwordAlgorithmFactory,
                        Configuration configuration,
                        ClusterConfigService clusterConfigService,
+                       ObjectMapper objectMapper,
                        @Assisted String adminRoleObjectId) {
-            super(passwordAlgorithmFactory, null, clusterConfigService, Collections.<String, Object>emptyMap());
+            super(passwordAlgorithmFactory, null, clusterConfigService, objectMapper, Collections.<String, Object>emptyMap());
             this.configuration = configuration;
             this.roles = ImmutableSet.of(adminRoleObjectId);
         }

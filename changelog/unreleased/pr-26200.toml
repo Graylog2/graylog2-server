@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix Sidecar config not being loaded from the Graylog server configuration file."
+
+pulls = ["26200"]

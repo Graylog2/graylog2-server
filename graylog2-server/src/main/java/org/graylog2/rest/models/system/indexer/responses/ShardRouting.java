@@ -20,13 +20,11 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class ShardRouting {
     @JsonProperty("id")
     public abstract int id();
@@ -64,7 +62,16 @@ public abstract class ShardRouting {
                                       @JsonProperty("node_name") @Nullable String nodeName,
                                       @JsonProperty("node_hostname") @Nullable String nodeHostname,
                                       @JsonProperty("relocating_to") @Nullable String relocatingTo) {
-        return new AutoValue_ShardRouting(id, state, active, primary, nodeId, nodeName, nodeHostname, relocatingTo);
+        return builder()
+                .id(id)
+                .state(state)
+                .active(active)
+                .primary(primary)
+                .nodeId(nodeId)
+                .nodeName(nodeName)
+                .nodeHostname(nodeHostname)
+                .relocatingTo(relocatingTo)
+                .build();
     }
 
     public static Builder builder() {

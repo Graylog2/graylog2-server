@@ -17,14 +17,14 @@
 package org.graylog2.indexer.counts;
 
 import com.google.common.collect.ImmutableMap;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.assertj.core.api.Assertions;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.elasticsearch.BulkIndexRequest;
-import org.graylog.testing.elasticsearch.ContainerMatrixElasticsearchBaseTest;
-import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog.testing.elasticsearch.SearchServerBaseTest;
 import org.graylog2.indexer.IndexNotFoundException;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
@@ -47,9 +47,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 // these tests only test the SearchServer, so there is only one MongoDB-version necessary (needed, to launch the tests)
-@ContainerMatrixTestsConfiguration
+@GraylogBackendConfiguration
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class CountsIT extends ContainerMatrixElasticsearchBaseTest {
+public class CountsIT extends SearchServerBaseTest {
     private static final String INDEX_NAME_1 = "index_set_1_counts_test_0";
     private static final String INDEX_NAME_2 = "index_set_2_counts_test_0";
     private static final String INDEX_NAME_3 = "index_set_3_counts_test_0";
@@ -62,10 +62,6 @@ public class CountsIT extends ContainerMatrixElasticsearchBaseTest {
     private IndexSetConfig indexSetConfig1;
     private IndexSetConfig indexSetConfig2;
     private IndexSetConfig indexSetConfig3;
-
-    public CountsIT(SearchServerInstance elasticsearch) {
-        super(elasticsearch);
-    }
 
     @BeforeAll
     public void setUp() {
@@ -145,7 +141,7 @@ public class CountsIT extends ContainerMatrixElasticsearchBaseTest {
         when(indexSet3.getManagedIndices()).thenReturn(new String[]{INDEX_NAME_3});
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     @Order(1)
     public void totalReturnsZeroWithEmptyIndex() {
         assertThat(counts.total()).isEqualTo(0L);
@@ -154,7 +150,7 @@ public class CountsIT extends ContainerMatrixElasticsearchBaseTest {
         assertThat(counts.total(indexSet3)).isEqualTo(0L);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     @Order(2)
     public void totalReturnsZeroWithNoIndices() {
         final BulkIndexRequest bulkIndexRequest = new BulkIndexRequest();
@@ -180,7 +176,7 @@ public class CountsIT extends ContainerMatrixElasticsearchBaseTest {
         assertThat(counts.total()).isEqualTo(0L);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     public void totalReturnsNumberOfMessages() {
         final BulkIndexRequest bulkIndexRequest = new BulkIndexRequest();
 
@@ -207,25 +203,20 @@ public class CountsIT extends ContainerMatrixElasticsearchBaseTest {
         assertThat(counts.total(indexSet2)).isEqualTo(count2);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     public void totalThrowsElasticsearchExceptionIfIndexDoesNotExist() {
         final IndexSet indexSet = mock(IndexSet.class);
         when(indexSet.getManagedIndices()).thenReturn(new String[]{"does_not_exist"});
 
-        try {
-            counts.total(indexSet);
-            fail("Expected IndexNotFoundException");
-        } catch (IndexNotFoundException e) {
-            final String expectedErrorDetail = "Index not found for query: does_not_exist. Try recalculating your index ranges.";
-            assertThat(e)
-                    .hasMessageStartingWith("Fetching message count failed for indices [does_not_exist]")
-                    .hasMessageEndingWith(expectedErrorDetail)
-                    .hasNoSuppressedExceptions();
-            assertThat(e.getErrorDetails()).containsExactly(expectedErrorDetail);
-        }
+        Assertions.assertThatThrownBy(() -> counts.total(indexSet))
+                .isInstanceOf(IndexNotFoundException.class)
+                .hasMessageStartingWith("Fetching message count failed for indices")
+                .hasMessageContaining("does_not_exist")
+                .hasMessageEndingWith("Try recalculating your index ranges.")
+                .hasNoSuppressedExceptions();
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     public void totalSucceedsWithListOfIndicesLargerThan4Kilobytes() {
         final int numberOfIndices = 100;
         final String[] indexNames = new String[numberOfIndices];

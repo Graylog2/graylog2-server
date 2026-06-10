@@ -17,13 +17,12 @@
 import * as React from 'react';
 import { useCallback, useContext, useLayoutEffect, useRef } from 'react';
 import flatten from 'lodash/flatten';
-import get from 'lodash/get';
 import isEqual from 'lodash/isEqual';
-import last from 'lodash/last';
 import styled, { css } from 'styled-components';
 import type { OrderedMap } from 'immutable';
 import Immutable from 'immutable';
 
+import { getPinnedCellClassName } from 'components/bootstrap/Table';
 import Field from 'views/components/Field';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import Value from 'views/components/Value';
@@ -34,7 +33,6 @@ import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { Icon } from 'components/common';
-import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 
 import FieldSortIcon from './FieldSortIcon';
@@ -62,7 +60,6 @@ const PinIcon = styled.button(
 );
 
 type HeaderFilterProps = {
-  activeQuery: string;
   borderedHeader: boolean;
   fields: FieldTypeMappingsList | Array<FieldTypeMapping>;
   field: string;
@@ -78,10 +75,10 @@ type HeaderFilterProps = {
   showPinIcon?: boolean;
   setLoadingState: (loading: boolean) => void;
   togglePin: (field: string) => void;
+  className?: string;
 };
 
 const HeaderField = ({
-  activeQuery,
   borderedHeader,
   fields,
   field,
@@ -97,6 +94,7 @@ const HeaderField = ({
   showPinIcon = false,
   togglePin,
   setLoadingState,
+  className = undefined,
 }: HeaderFilterProps) => {
   const type = fieldTypeFor(field, fields);
   const thRef = useRef(null);
@@ -105,7 +103,7 @@ const HeaderField = ({
     if (onSetColumnsWidth && thRef?.current?.offsetWidth) {
       onSetColumnsWidth({ field: `${prefix}${field}`, offsetWidth: thRef.current.offsetWidth });
     }
-  }, [onSetColumnsWidth, field, prefix, thRef?.current?.offsetWidth]);
+  }, [onSetColumnsWidth, field, prefix]);
 
   const _togglePin = useCallback(() => {
     togglePin(`${prefix}${field}`);
@@ -115,10 +113,11 @@ const HeaderField = ({
     <TableHeaderCell
       ref={thRef}
       key={`${prefix}${field}`}
+      className={className}
       colSpan={span}
       $isNumeric={type.isNumeric()}
       $borderedHeader={borderedHeader}>
-      <Field name={field} queryId={activeQuery} type={type}>
+      <Field name={field} type={type}>
         {title}
       </Field>
       {showPinIcon && (
@@ -166,6 +165,18 @@ const HeaderFieldForValue = ({
 
 const Spacer = ({ span }: { span: number }) => <th aria-label="spacer" colSpan={span} />;
 
+const RowNumberHeader = styled(TableHeaderCell)(
+  ({ theme }) => css`
+    && {
+      width: 20px;
+      min-width: 20px;
+      max-width: 200px;
+      white-space: nowrap;
+      color: ${theme.colors.text.secondary};
+    }
+  `,
+);
+
 type ColumnHeadersProps = {
   borderedHeader: boolean;
   fields: FieldTypeMappingsList | Array<FieldTypeMapping>;
@@ -186,18 +197,18 @@ const ColumnPivotFieldsHeaders = ({
   const headerRows = pivots.map((columnPivot, idx) => {
     const actualValues = values.map((key) => ({ path: key.slice(0, idx).join('-'), key: key[idx] || '', count: 1 }));
     const actualValuesWithoutDuplicates = actualValues.reduce((prev, cur) => {
-      const lastKey = get(last(prev), 'key');
-      const lastPath = get(last(prev), 'path');
+      const lastItem = prev?.at(-1);
+      const lastKey = lastItem?.key;
+      const lastPath = lastItem?.path;
 
       if (lastKey === cur.key && isEqual(lastPath, cur.path)) {
-        const lastItem = last(prev);
         const remainder = prev.slice(0, -1);
         const newLastItem = { ...lastItem, count: lastItem.count + 1 };
 
-        return [].concat(remainder, [newLastItem]);
+        return [...remainder, newLastItem];
       }
 
-      return [].concat(prev, [cur]);
+      return [...prev, cur];
     }, []);
 
     const type = fieldTypeFor(columnPivot, fields);
@@ -235,8 +246,10 @@ type Props = {
   sortConfigMap: OrderedMap<string, SortConfig>;
   onSetColumnsWidth?: (props: { field: string; offsetWidth: number }) => void;
   pinnedColumns?: Immutable.Set<string>;
+  pinnedColumnIndexes?: Set<number>;
   togglePin: (field: string) => void;
   setLoadingState: (loading: boolean) => void;
+  showRowNumbers?: boolean;
 };
 
 const Headers = ({
@@ -251,10 +264,11 @@ const Headers = ({
   sortConfigMap,
   onSetColumnsWidth = undefined,
   pinnedColumns = Immutable.Set(),
+  pinnedColumnIndexes = new Set(),
   togglePin,
   setLoadingState,
+  showRowNumbers = true,
 }: Props) => {
-  const activeQuery = useActiveQueryId();
   const rowFieldNames = rowPivots.flatMap((pivot) => pivot.fields);
   const columnFieldNames = columnPivots.flatMap((pivot) => pivot.fields);
   const interactive = useContext(InteractiveContext);
@@ -267,9 +281,9 @@ const Headers = ({
     sortable = false,
     sortType = undefined,
     showPinIcon = false,
+    className = undefined,
   }) => (
     <HeaderField
-      activeQuery={activeQuery}
       borderedHeader={borderedHeader}
       key={`${prefix}${field}`}
       fields={fields}
@@ -286,13 +300,21 @@ const Headers = ({
       showPinIcon={showPinIcon}
       togglePin={togglePin}
       setLoadingState={setLoadingState}
+      className={className}
     />
   );
 
-  const rowPivotFields = rowFieldNames.map((fieldName) =>
-    headerField({ field: fieldName, sortable: interactive, sortType: SortConfig.PIVOT_TYPE, showPinIcon: interactive }),
+  const lineNumberOffset = showRowNumbers ? 1 : 0;
+  const rowPivotFields = rowFieldNames.map((fieldName, index) =>
+    headerField({
+      field: fieldName,
+      sortable: interactive,
+      sortType: SortConfig.PIVOT_TYPE,
+      showPinIcon: interactive,
+      className: getPinnedCellClassName(pinnedColumnIndexes.has(index + lineNumberOffset), false),
+    }),
   );
-  const seriesFields = series.map((s) =>
+  const seriesFields = series.map((s, index) =>
     headerField({
       field: s.function,
       prefix: '',
@@ -301,6 +323,10 @@ const Headers = ({
       sortable: interactive,
       sortType: SortConfig.SERIES_TYPE,
       showPinIcon: false,
+      className: getPinnedCellClassName(
+        pinnedColumnIndexes.has(index + rowFieldNames.length + lineNumberOffset),
+        false,
+      ),
     }),
   );
   const columnPivotFields = flatten(
@@ -317,7 +343,7 @@ const Headers = ({
       ),
     ),
   );
-  const offset = rollup ? rowFieldNames.length + series.length : rowFieldNames.length;
+  const offset = (rollup ? rowFieldNames.length + series.length : rowFieldNames.length) + (showRowNumbers ? 1 : 0);
 
   return (
     <>
@@ -330,6 +356,7 @@ const Headers = ({
         offset={offset}
       />
       <tr className="pivot-header-row">
+        {showRowNumbers && <RowNumberHeader $isNumeric>#</RowNumberHeader>}
         {rowPivotFields}
         {rollup && seriesFields}
         {columnPivotFields}

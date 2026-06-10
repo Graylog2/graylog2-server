@@ -41,7 +41,7 @@ type BaseProps = {
   placeholder?: string;
   required?: boolean;
   type?: string;
-  validate?: (arg: string) => string | undefined | null;
+  validate?: (arg: string) => string | undefined | Promise<string | undefined>;
   wrapperClassName?: string;
   autoFocus?: boolean;
 };

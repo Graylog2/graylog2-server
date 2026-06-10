@@ -14,35 +14,30 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect } from 'react';
+import React from 'react';
 
-import { InputStatesStore } from 'stores/inputs/InputStatesStore';
-import { Link } from 'components/common/router';
-import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import { InputsList } from 'components/inputs';
+import { Row, Col } from 'components/bootstrap';
+import { Link, DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import useParams from 'routing/useParams';
 import { useStore } from 'stores/connect';
 import useProductName from 'brand-customization/useProductName';
+import { InputsOverview } from 'components/inputs/InputsOveriew';
+import useInputTypes from 'hooks/useInputTypes';
+import useInputTypesDescriptions from 'hooks/useInputTypesDescriptions';
 
 const NodeInputsPage = () => {
   const productName = useProductName();
   const { nodeId } = useParams();
+  const { data: inputTypes, isLoading: isLoadingInputTypes } = useInputTypes();
+  const { data: inputTypeDescriptions, isLoading: isLoadingInputTypesDescriptions } = useInputTypesDescriptions();
 
   const { nodes } = useStore(NodesStore);
   const node = nodes?.[nodeId];
 
-  useEffect(() => {
-    const interval = setInterval(InputStatesStore.list, 2000);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
-
-  if (!node) {
+  if (!node || isLoadingInputTypes || isLoadingInputTypesDescriptions) {
     return <Spinner />;
   }
 
@@ -63,7 +58,29 @@ const NodeInputsPage = () => {
             You can launch and terminate inputs on your cluster <Link to={Routes.SYSTEM.INPUTS}>here</Link>.
           </span>
         </PageHeader>
-        <InputsList node={node} />
+        <Row className="content">
+          <Col md={12}>
+            <h2>Local Inputs</h2>
+            <InputsOverview
+              node={node}
+              inputTypes={inputTypes}
+              inputTypeDescriptions={inputTypeDescriptions}
+              entityTableId="node-inputs"
+            />
+          </Col>
+        </Row>
+        <Row className="content">
+          <Col md={12}>
+            <h2>Global Inputs</h2>
+            <InputsOverview
+              global={true}
+              inputTypes={inputTypes}
+              inputTypeDescriptions={inputTypeDescriptions}
+              entityTableId="global-inputs"
+              withoutURLParams
+            />
+          </Col>
+        </Row>
       </div>
     </DocumentTitle>
   );

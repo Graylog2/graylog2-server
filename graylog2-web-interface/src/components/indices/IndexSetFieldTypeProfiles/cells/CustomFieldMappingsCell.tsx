@@ -15,15 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { styled } from 'styled-components';
 
 import type { CustomFieldMapping, IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
 import { CountBadge } from 'components/common';
-
-const StyledCountBadge = styled(CountBadge)`
-  cursor: pointer;
-`;
 
 const CustomFieldMappingsCell = ({
   customFieldTypes,
@@ -34,11 +29,7 @@ const CustomFieldMappingsCell = ({
 }) => {
   const { toggleSection } = useExpandedSections();
 
-  return (
-    <StyledCountBadge onClick={() => toggleSection(profile.id, 'customFieldMapping')}>
-      {customFieldTypes.length}
-    </StyledCountBadge>
-  );
+  return <CountBadge onClick={() => toggleSection(profile.id, 'customFieldMapping')} count={customFieldTypes.length} />;
 };
 
 export default CustomFieldMappingsCell;

@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.search.engine;
 
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.errors.SearchException;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
@@ -47,10 +46,10 @@ public interface SearchTypeHandler<S extends SearchType, Q, R> {
 
     void doGenerateQueryPart(Query query, S searchType, Q queryContext);
 
-    default SearchType.Result extractResult(SearchJob job, Query query, SearchType searchType, R queryResult, Q queryContext) {
+    default SearchType.Result extractResult(Query query, SearchType searchType, R queryResult, Q queryContext) {
         // see above for the reason for typecasting
         try {
-            return doExtractResultImpl(job, query, (S) searchType, queryResult, queryContext);
+            return doExtractResultImpl(query, (S) searchType, queryResult, queryContext);
         } catch (SearchException e) {
             throw e;
         } catch (Throwable t) {
@@ -58,5 +57,5 @@ public interface SearchTypeHandler<S extends SearchType, Q, R> {
         }
     }
 
-    SearchType.Result doExtractResultImpl(SearchJob job, Query query, S searchType, R queryResult, Q queryContext);
+    SearchType.Result doExtractResultImpl(Query query, S searchType, R queryResult, Q queryContext);
 }

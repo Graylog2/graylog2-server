@@ -17,7 +17,7 @@
 import React from 'react';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
-import type { WidgetComponentProps } from 'views/types';
+import type { WidgetComponentProps, AdditionalViewsActionHandlerArguments } from 'views/types';
 import Routes from 'routing/Routes';
 import App from 'routing/App';
 import { MessageListHandler } from 'views/logic/searchtypes/messages';
@@ -93,8 +93,6 @@ import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualiza
 import visualizationBindings from 'views/components/visualizations/bindings';
 import { AggregationWizard } from 'views/components/aggregationwizard';
 import { filterCloudValueActions } from 'util/conditional/filterValueActions';
-import CopyValueToClipboard from 'views/logic/valueactions/CopyValueToClipboard';
-import CopyFieldToClipboard from 'views/logic/fieldactions/CopyFieldToClipboard';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 import ViewHeader from 'views/components/views/ViewHeader';
 import ScatterVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/ScatterVisualizationConfig';
@@ -121,8 +119,16 @@ import AddTextWidget, { CreateTextWidget } from 'views/logic/creatoractions/AddT
 import TextWidget from 'views/logic/widgets/TextWidget';
 import TextVisualization from 'views/components/widgets/text/TextVisualization';
 import TextWidgetEdit from 'views/components/widgets/text/TextWidgetEdit';
+import hasMultipleValueForActions from 'views/components/visualizations/utils/hasMultipleValueForActions';
+import ReplaySearchSidebar from 'components/events/ReplaySearchSidebar/ReplaySearchSidebar';
+import {
+  CopyToClipboardFieldActionPlugin,
+  AddFavoriteFieldActionPlugin,
+  RemoveFavoriteFieldActionPlugin,
+} from 'views/actions/FieldActionPlugins';
+import { CopyToClipBoardValueActionPlugin } from 'views/actions/ValueActionPlugins';
 
-import type { ActionHandlerArguments } from './components/actions/ActionHandler';
+import type { ActionDefinition } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import AreaVisualization from './components/visualizations/area/AreaVisualization';
 import LineVisualizationConfig from './logic/aggregationbuilder/visualizations/LineVisualizationConfig';
@@ -159,9 +165,9 @@ const exports: PluginExports = {
   },
   routes: [
     { path: newDashboardsPath, component: NewDashboardPage, parentComponent: App },
-    { path: dashboardsTvPath, component: ShowDashboardInBigDisplayMode, parentComponent: null },
+    { path: dashboardsTvPath(), component: ShowDashboardInBigDisplayMode, parentComponent: null },
     { path: dashboardsPath, component: DashboardsPage },
-    { path: showDashboardsPath, component: ShowViewPage, parentComponent: App },
+    { path: showDashboardsPath(), component: ShowViewPage, parentComponent: App },
 
     { path: newSearchPath, component: NewSearchRedirectPage, parentComponent: null },
     { path: showSearchPath, component: ShowViewPage, parentComponent: App },
@@ -243,7 +249,7 @@ const exports: PluginExports = {
     },
     {
       type: 'TEXT',
-      displayName: 'Text (Markdown) Widget',
+      displayName: 'Text/Markdown',
       defaultHeight: 3,
       defaultWidth: 3,
       hasEditSubmitButton: false,
@@ -339,13 +345,7 @@ const exports: PluginExports = {
       isEnabled: ({ field, type }) => !isFunction(field) && !type.isDecorated(),
       resetFocus: false,
     },
-    {
-      type: 'copy-field-to-clipboard',
-      title: 'Copy field name to clipboard',
-      handler: CopyFieldToClipboard,
-      isEnabled: () => true,
-      resetFocus: false,
-    },
+    CopyToClipboardFieldActionPlugin,
     {
       type: 'change-field-type',
       title: 'Change field type',
@@ -354,6 +354,8 @@ const exports: PluginExports = {
       component: ChangeFieldType,
       help: ChangeFieldTypeHelp,
     },
+    AddFavoriteFieldActionPlugin,
+    RemoveFavoriteFieldActionPlugin,
   ],
   valueActions: filterCloudValueActions(
     [
@@ -361,14 +363,16 @@ const exports: PluginExports = {
         type: 'exclude',
         title: 'Exclude from results',
         thunk: ExcludeFromQueryHandler,
-        isEnabled: ({ field, type }: ActionHandlerArguments) => !isFunction(field) && !type.isDecorated(),
+        isEnabled: ({ field, type, contexts }) =>
+          (!isFunction(field) || hasMultipleValueForActions(contexts)) && !type.isDecorated(),
         resetFocus: false,
       },
       {
         type: 'add-to-query',
         title: 'Add to query',
         thunk: AddToQueryHandler,
-        isEnabled: ({ field, type }: ActionHandlerArguments) => !isFunction(field) && !type.isDecorated(),
+        isEnabled: ({ field, type, contexts }) =>
+          (!isFunction(field) || hasMultipleValueForActions(contexts)) && !type.isDecorated(),
         resetFocus: false,
       },
       {
@@ -377,7 +381,7 @@ const exports: PluginExports = {
         thunk: ShowDocumentsHandler,
         isEnabled: ShowDocumentsHandler.isEnabled,
         resetFocus: true,
-      },
+      } as ActionDefinition<AdditionalViewsActionHandlerArguments>,
       {
         type: 'create-extractor',
         title: 'Create extractor',
@@ -392,13 +396,7 @@ const exports: PluginExports = {
         isEnabled: HighlightValueHandler.isEnabled,
         resetFocus: false,
       },
-      {
-        type: 'copy-value-to-clipboard',
-        title: 'Copy value to clipboard',
-        handler: CopyValueToClipboard,
-        isEnabled: () => true,
-        resetFocus: false,
-      },
+      CopyToClipBoardValueActionPlugin,
       {
         type: 'create-event-definition-from-value',
         title: 'Create event definition',
@@ -433,7 +431,7 @@ const exports: PluginExports = {
       icon: () => <Icon name="report" type="regular" />,
     },
     {
-      title: 'Text (Markdown) Widget',
+      title: 'Text/Markdown',
       func: CreateTextWidget,
       icon: () => <Icon name="description" />,
     },
@@ -461,7 +459,7 @@ const exports: PluginExports = {
     },
     {
       type: 'generic',
-      title: 'Text (Markdown) Widget',
+      title: 'Text/Markdown',
       func: AddTextWidget,
     },
   ],
@@ -500,6 +498,7 @@ const exports: PluginExports = {
   ],
   'views.components.widgets.events.filterComponents': eventsFilterComponents,
   'views.components.widgets.events.attributes': eventsAttributes,
+  'sidebar.components': [{ key: 'replay-search-sidebar', component: ReplaySearchSidebar }],
   'views.reducers': viewsReducers,
   'views.elements.validationErrorExplanation': [WarmTierQueryValidation],
   'views.widgets.actions': [ExportMessageWidgetAction, ExportWidgetAction],

@@ -44,24 +44,28 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.web.customization.CustomizationConfig;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class TeamsEventNotificationV2Test {
 
     // Code under test
@@ -106,7 +110,7 @@ public class TeamsEventNotificationV2Test {
                           },
                           {
                             "title": "Timestamp",
-                            "value": "${event.timestamp_processing}"
+                            "value": "{{DATE(${event.timestamp_processing},SHORT)}} at {{TIME(${event.timestamp_processing})}}"
                           },
                           {
                             "title": "Message",
@@ -182,7 +186,7 @@ public class TeamsEventNotificationV2Test {
     private TeamsEventNotificationConfigV2 notificationConfig;
     private EventNotificationContext eventNotificationContext;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         getDummyTeamsNotificationConfig();
         eventNotificationContext = NotificationTestData.getDummyContext(getNotificationDto(), "unit_tests").toBuilder().build();
@@ -208,7 +212,6 @@ public class TeamsEventNotificationV2Test {
         TeamsEventNotificationConfigV2 config = TeamsEventNotificationConfigV2.builder()
                 .adaptiveCard(defaultTemplate)
                 .backlogSize(5)
-                .timeZone(DateTimeZone.UTC)
                 .webhookUrl("http://localhost:12345")
                 .build();
         String body = teamsEventNotification.generateBody(eventNotificationContext, config);
@@ -219,7 +222,7 @@ public class TeamsEventNotificationV2Test {
     @Test
     public void getCustomMessageModel() {
         List<MessageSummary> messageSummaries = generateMessageSummaries(50);
-        Map<String, Object> customMessageModel = teamsEventNotification.getCustomMessageModel(eventNotificationContext, notificationConfig.type(), messageSummaries, DateTimeZone.UTC);
+        Map<String, Object> customMessageModel = teamsEventNotification.getCustomMessageModel(eventNotificationContext, notificationConfig.type(), messageSummaries);
 
         assertThat(customMessageModel).isNotNull();
         assertThat(customMessageModel.get("event_definition_description")).isEqualTo("Event Definition Test Description");
@@ -230,27 +233,33 @@ public class TeamsEventNotificationV2Test {
         assertThat(customMessageModel.get("job_trigger_id")).isEqualTo("<unknown>");
     }
 
-    @Test(expected = EventNotificationException.class)
-    public void executeWithInvalidWebhookUrl() throws EventNotificationException {
-        givenGoodNotificationService();
-        givenTeamsClientThrowsPermException();
-        // When execute is called with an invalid webhook URL, we expect an event notification exception.
-        teamsEventNotification.execute(eventNotificationContext);
+    @Test
+    public void executeWithInvalidWebhookUrl() {
+        assertThrows(EventNotificationException.class, () -> {
+            givenGoodNotificationService();
+            givenTeamsClientThrowsPermException();
+            // When execute is called with an invalid webhook URL, we expect an event notification exception.
+            teamsEventNotification.execute(eventNotificationContext);
+        });
     }
 
-    @Test(expected = EventNotificationException.class)
-    public void executeWithNullEventTimerange() throws EventNotificationException {
-        EventNotificationContext yetAnotherContext = getEventNotificationContextToSimulateNullPointerException();
-        assertThat(yetAnotherContext.event().timerangeStart().isPresent()).isFalse();
-        assertThat(yetAnotherContext.event().timerangeEnd().isPresent()).isFalse();
-        assertThat(yetAnotherContext.notificationConfig().type()).isEqualTo(TeamsEventNotificationConfigV2.TYPE_NAME);
-        teamsEventNotification.execute(yetAnotherContext);
+    @Test
+    public void executeWithNullEventTimerange() {
+        assertThrows(EventNotificationException.class, () -> {
+            EventNotificationContext yetAnotherContext = getEventNotificationContextToSimulateNullPointerException();
+            assertThat(yetAnotherContext.event().timerangeStart().isPresent()).isFalse();
+            assertThat(yetAnotherContext.event().timerangeEnd().isPresent()).isFalse();
+            assertThat(yetAnotherContext.notificationConfig().type()).isEqualTo(TeamsEventNotificationConfigV2.TYPE_NAME);
+            teamsEventNotification.execute(yetAnotherContext);
+        });
     }
 
-    @Test(expected = PermanentEventNotificationException.class)
+    @Test
     public void buildCustomMessageWithInvalidTemplate() throws EventNotificationException {
-        notificationConfig = buildInvalidTemplate();
-        teamsEventNotification.generateBody(eventNotificationContext, notificationConfig);
+        assertThrows(PermanentEventNotificationException.class, () -> {
+            notificationConfig = buildInvalidTemplate();
+            teamsEventNotification.generateBody(eventNotificationContext, notificationConfig);
+        });
     }
 
     @Test
@@ -273,6 +282,34 @@ public class TeamsEventNotificationV2Test {
         // Global setting is at 50 and the message override is 0 then the backlog size = 50
         List<MessageSummary> messageSummaries = teamsEventNotification.getMessageBacklog(eventNotificationContext, config);
         assertThat(messageSummaries.size()).isEqualTo(50);
+    }
+
+    @Test
+    public void testDefaultAdaptiveCardTemplate() throws PermanentEventNotificationException {
+        TeamsEventNotificationConfigV2 config = TeamsEventNotificationConfigV2.builder()
+                .adaptiveCard(TeamsEventNotificationConfigV2.DEFAULT_ADAPTIVE_CARD)
+                .backlogSize(0)
+                .webhookUrl("http://localhost:12345")
+                .build();
+        String body = teamsEventNotification.generateBody(eventNotificationContext, config);
+        assertThat(body).contains("\"contentType\": \"application/vnd.microsoft.card.adaptive\"");
+        assertThat(body).contains("\"type\": \"AdaptiveCard\"");
+        assertThat(body).contains("\"version\": \"1.6\"");
+        assertThat(body).doesNotContain("${event_definition_title} triggered");
+        assertThat(body).doesNotContain("${event_definition_description}");
+    }
+
+    @Test
+    public void testTimestampFunctionsInPayload() throws PermanentEventNotificationException {
+        TeamsEventNotificationConfigV2 config = TeamsEventNotificationConfigV2.builder()
+                .adaptiveCard(defaultTemplate)
+                .backlogSize(0)
+                .webhookUrl("http://localhost:12345")
+                .build();
+        String body = teamsEventNotification.generateBody(eventNotificationContext, config);
+        assertThat(body).contains("{{DATE(");
+        assertThat(body).contains("{{TIME(");
+        assertThat(body).doesNotContain("${event.timestamp_processing}");
     }
 
     @Test

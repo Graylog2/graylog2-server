@@ -14,14 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
-import { useStore } from 'stores/connect';
-import InputStatesStore from 'stores/inputs/InputStatesStore';
-import { InputsStore, InputsActions } from 'stores/inputs/InputsStore';
-import { MetricsStore, MetricsActions } from 'stores/metrics/MetricsStore';
-import type { InputStateByNode, InputStates, InputState } from 'stores/inputs/InputStatesStore';
+import { fetchInput } from 'hooks/useInputs';
+import { useMetrics } from 'hooks/useMetrics';
+import useInputsStates from 'hooks/useInputsStates';
+import type { InputStateByNode, InputState } from 'hooks/useInputsStates';
 import type { Input } from 'components/messageloaders/Types';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -36,6 +35,7 @@ export type InputDiagnosisMetrics = {
   read_bytes_total: number;
   write_bytes_1sec: number;
   write_bytes_total: number;
+  failedStarts15mCount?: number;
   message_errors: {
     failures_indexing: number;
     failures_processing: number;
@@ -46,8 +46,9 @@ export type InputDiagnosisMetrics = {
 };
 
 export type InputNodeStateInfo = {
-  detailed_message: string;
+  detailed_message: string | null;
   node_id: string;
+  last_failed_at?: string | null;
 };
 
 export type InputNodeStates = {
@@ -96,11 +97,10 @@ const useInputDiagnosis = (
   inputNodeStates: InputNodeStates;
   inputMetrics: InputDiagnosisMetrics;
 } => {
-  const { input } = useStore(InputsStore);
-
-  useEffect(() => {
-    InputsActions.get(inputId);
-  }, [inputId]);
+  const { data: input } = useQuery({
+    queryKey: ['inputs', inputId],
+    queryFn: () => fetchInput(inputId),
+  });
 
   const { data: messageCountByStream } = useQuery({
     queryKey: ['input-diagnostics', inputId],
@@ -115,22 +115,25 @@ const useInputDiagnosis = (
     refetchInterval: 5000,
   });
 
-  const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
+  const { data: inputStates } = useInputsStates();
   const inputStateByNode = inputStates ? inputStates[inputId] || {} : ({} as InputStateByNode);
   const inputNodeStates = { total: Object.keys(inputStateByNode).length, states: {} };
 
-  Object.values(inputStateByNode).forEach(({ state, detailed_message, message_input: { node: node_id } }) => {
-    if (!inputNodeStates.states[state]) {
-      inputNodeStates.states[state] = [{ detailed_message, node_id }];
-    } else if (Array.isArray(inputNodeStates.states[state])) {
-      inputNodeStates.states[state].push({ detailed_message, node_id });
-    }
-  });
+  Object.values(inputStateByNode).forEach(
+    ({ state, detailed_message, last_failed_at, message_input: { node: node_id } }) => {
+      if (!inputNodeStates.states[state]) {
+        inputNodeStates.states[state] = [{ detailed_message, node_id, last_failed_at }];
+      } else if (Array.isArray(inputNodeStates.states[state])) {
+        inputNodeStates.states[state].push({ detailed_message, node_id, last_failed_at });
+      }
+    },
+  );
 
   const failures_indexing = `org.graylog2.inputs.${inputId}.failures.indexing`;
   const failures_processing = `org.graylog2.inputs.${inputId}.failures.processing`;
   const failures_inputs_codecs = `org.graylog2.inputs.${inputId}.failures.input`;
   const dropped_message_occurrence = `org.graylog2.inputs.${inputId}.dropped.message.occurrence`;
+  const failed_starts = `org.graylog2.inputs.Input.failed_starts.${inputId}`;
 
   const InputDiagnosisMetricNames = useMemo(
     () => [
@@ -148,20 +151,21 @@ const useInputDiagnosis = (
       failures_processing,
       failures_inputs_codecs,
       dropped_message_occurrence,
+      failed_starts,
     ],
-    [input, failures_indexing, failures_processing, failures_inputs_codecs, dropped_message_occurrence],
+    [input, failures_indexing, failures_processing, failures_inputs_codecs, dropped_message_occurrence, failed_starts],
   );
 
-  const { metrics: metricsByNode } = useStore(MetricsStore);
+  const { data: metricsByNode } = useMetrics(InputDiagnosisMetricNames);
 
   const aggregateMetrics = () => {
     const result = {};
 
-    if (!metricsByNode) return result;
+    if (!metricsByNode || Object.keys(metricsByNode).length === 0) return result;
 
     InputDiagnosisMetricNames.forEach((metricName) => {
       result[metricName] = Object.keys(metricsByNode).reduce((previous, nodeId) => {
-        if (!metricsByNode[nodeId][metricName]) {
+        if (!metricsByNode[nodeId]?.[metricName]) {
           return previous;
         }
 
@@ -179,14 +183,11 @@ const useInputDiagnosis = (
   };
 
   const aggregatedMetrics = aggregateMetrics();
+  const failedStarts15mCount = useMemo(() => {
+    const value = aggregatedMetrics[failed_starts];
 
-  useEffect(() => {
-    InputDiagnosisMetricNames.forEach((metricName) => MetricsActions.addGlobal(metricName));
-
-    return () => {
-      InputDiagnosisMetricNames.forEach((metricName) => MetricsActions.removeGlobal(metricName));
-    };
-  }, [InputDiagnosisMetricNames]);
+    return Number.isFinite(value) ? value : undefined;
+  }, [aggregatedMetrics, failed_starts]);
 
   return {
     input,
@@ -200,6 +201,7 @@ const useInputDiagnosis = (
       read_bytes_total: aggregatedMetrics[metricWithPrefix(input, 'read_bytes_total')],
       write_bytes_1sec: aggregatedMetrics[metricWithPrefix(input, 'write_bytes_1sec')],
       write_bytes_total: aggregatedMetrics[metricWithPrefix(input, 'write_bytes_total')],
+      failedStarts15mCount,
       message_errors: {
         failures_indexing: aggregatedMetrics[failures_indexing] || 0,
         failures_processing: aggregatedMetrics[failures_processing] || 0,

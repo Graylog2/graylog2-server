@@ -18,31 +18,62 @@ import { useMutation } from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import type { TableLayoutPreferences, TableLayoutPreferencesJSON } from 'components/common/EntityDataTable/types';
+import type {
+  SlicingPreferences,
+  SlicingPreferencesJSON,
+  TableLayoutPreferences,
+  TableLayoutPreferencesJSON,
+} from 'components/common/EntityDataTable/types';
 import UserNotification from 'util/UserNotification';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 
+const slicingToJSON = (slicing?: SlicingPreferences | null): SlicingPreferencesJSON | null | undefined => {
+  if (slicing === null) {
+    return null;
+  }
+
+  if (!slicing) {
+    return undefined;
+  }
+
+  return {
+    slice_column: slicing.sliceColumn,
+    sort_by: slicing.sortBy,
+    order: slicing.order,
+  };
+};
+
 const preferencesToJSON = <T>({
-  displayedAttributes,
+  attributes,
   sort,
   perPage,
+  slicing,
   customPreferences,
+  order,
 }: TableLayoutPreferences<T>): TableLayoutPreferencesJSON<T> => ({
-  displayed_attributes: displayedAttributes,
+  attributes,
   sort: sort ? { order: sort.direction, field: sort.attributeId } : undefined,
   per_page: perPage,
+  slicing: slicingToJSON(slicing),
   custom_preferences: customPreferences,
+  order,
 });
 
-const useUpdateUserLayoutPreferences = <T>(entityTableId: string) => {
-  const { data: userLayoutPreferences = {}, refetch } = useUserLayoutPreferences(entityTableId);
+const preferencesUrl = (entityTableId: string, layoutVariant?: string) => {
+  const params = layoutVariant ? `?layout_variant=${encodeURIComponent(layoutVariant)}` : '';
+
+  return qualifyUrl(`/entitylists/preferences/${entityTableId}${params}`);
+};
+
+const useUpdateUserLayoutPreferences = <T>(entityTableId: string, layoutVariant?: string) => {
+  const { data: userLayoutPreferences = {}, refetch } = useUserLayoutPreferences(entityTableId, layoutVariant);
   const mutationFn = (newPreferences: TableLayoutPreferences<T>) =>
     fetch(
       'POST',
-      qualifyUrl(`/entitylists/preferences/${entityTableId}`),
+      preferencesUrl(entityTableId, layoutVariant),
       preferencesToJSON({ ...userLayoutPreferences, ...newPreferences }),
     );
-  const { mutate } = useMutation({
+  const { mutateAsync } = useMutation({
     mutationFn,
     onError: (error) => {
       UserNotification.error(`Updating table layout preferences failed with error: ${error}`);
@@ -50,7 +81,7 @@ const useUpdateUserLayoutPreferences = <T>(entityTableId: string) => {
     onSuccess: () => refetch(),
   });
 
-  return { mutate };
+  return { mutateAsync };
 };
 
 export default useUpdateUserLayoutPreferences;

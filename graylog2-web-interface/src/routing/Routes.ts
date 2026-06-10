@@ -14,11 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import URI from 'urijs';
 
 import AppConfig from 'util/AppConfig';
-import { extendedSearchPath, viewsPath } from 'views/Constants';
+import {
+  extendedSearchPath,
+  viewsPath,
+  dashboardsTvPath,
+  showDashboardsPath,
+  newDashboardsPath,
+  dashboardsPath,
+} from 'views/Constants';
 import type { TimeRangeTypes } from 'views/logic/queries/Query';
 
 export const SECURITY_PATH = '/security';
@@ -49,7 +55,9 @@ const Routes = {
   STARTPAGE: '/',
   NOTFOUND: '/notfound',
   SEARCH: '/search',
+  SEARCH_SHOW: (id: string) => `/search/${id}`,
   STREAMS: '/streams',
+  STREAM_NEW: '/streams/new',
   ALERTS: {
     LIST: '/alerts',
     replay_search: (alertId: string) => `/alerts/${alertId}/replay-search`,
@@ -60,6 +68,10 @@ const Routes = {
       edit: (definitionId: string) => `/alerts/definitions/${definitionId}/edit`,
       show: (definitionId: string) => `/alerts/definitions/${definitionId}`,
       replay_search: (definitionId: string) => `/alerts/definitions/${definitionId}/replay-search`,
+      SIGMA: {
+        GIT_IMPORT: '/alerts/definitions/sigma/git-import',
+        FILE_IMPORT: '/alerts/definitions/sigma/file-import',
+      },
     },
     NOTIFICATIONS: {
       LIST: '/alerts/notifications',
@@ -69,7 +81,7 @@ const Routes = {
     },
   },
   SECURITY: {
-    OVERVIEW: `${SECURITY_PATH}/overview`,
+    OVERVIEW: `${SECURITY_PATH}`,
     USER_ACTIVITY: `${SECURITY_PATH}/user-activity`,
     HOST_ACTIVITY: `${SECURITY_PATH}/host-activity`,
     NETWORK_ACTIVITY: `${SECURITY_PATH}/network-activity`,
@@ -77,9 +89,14 @@ const Routes = {
     ACTIVITY: `${SECURITY_PATH}/activity`,
   },
   SOURCES: '/sources',
-  DASHBOARDS: '/dashboards',
+  DASHBOARDS: dashboardsPath,
+  DASHBOARD: {
+    NEW: newDashboardsPath,
+    SHOW: showDashboardsPath,
+    FULL_SCREEN: dashboardsTvPath,
+  },
   WELCOME: '/welcome',
-  GLOBAL_API_BROWSER_URL: '/api/api-browser/global/index.html',
+  API_BROWSER: '/api-browser',
   SYSTEM: {
     CLUSTER: {
       NODES: '/system/cluster',
@@ -136,6 +153,7 @@ const Routes = {
     THREADDUMP: (nodeId: string) => `/system/threaddump/${nodeId}`,
     OUTPUTS: '/system/outputs',
     OVERVIEW: '/system/overview',
+    HEALTH: '/system/health',
     PROCESSBUFFERDUMP: (nodeId: string) => `/system/processbufferdump/${nodeId}`,
     SYSTEMLOGS: (nodeId: string) => `/system/logs/recent/${nodeId}`,
     AUTHENTICATION: {
@@ -194,6 +212,7 @@ const Routes = {
       },
     },
     PIPELINES: {
+      CREATE: '/system/pipelines/new',
       OVERVIEW: '/system/pipelines',
       PIPELINE: (pipelineId: string) => `/system/pipelines/${pipelineId}`,
       RULES: '/system/pipelines/rules',
@@ -211,6 +230,16 @@ const Routes = {
       EDIT_CONFIGURATION: (configurationId: string) => `/system/sidecars/configuration/edit/${configurationId}`,
       NEW_COLLECTOR: '/system/sidecars/collector/new',
       EDIT_COLLECTOR: (collectorId: string) => `/system/sidecars/collector/edit/${collectorId}`,
+    },
+    COLLECTORS: {
+      OVERVIEW: '/system/collectors',
+      FLEETS: '/system/collectors/fleets',
+      FLEETS_NEW: '/system/collectors/fleets/new',
+      FLEET: (fleetId: string) => `/system/collectors/fleets/${fleetId}`,
+      INSTANCES: '/system/collectors/instances',
+      INSTANCE: (instanceId: string) => `/system/collectors/instances/${instanceId}`,
+      DEPLOYMENT: '/system/collectors/deployment',
+      SETTINGS: '/system/collectors/settings',
     },
   },
   VIEWS: {
@@ -296,8 +325,6 @@ const Routes = {
     Routes._common_search_url(`${Routes.STREAMS}/${streamId}/search`, query, timeRange, resolution),
   stream_alerts: (streamId: string) => `/alerts/?stream_id=${streamId}`,
 
-  legacy_stream_search: (streamId: string) => `/streams/${streamId}/messages`,
-
   dashboard_show: (dashboardId: string) => `/dashboards/${dashboardId}`,
 
   show_saved_search: (searchId: string) => `/search/${searchId}`,
@@ -333,7 +360,6 @@ const Routes = {
   edit_input_extractor: (nodeId: string, inputId: string, extractorId: string) =>
     `/system/inputs/${nodeId}/${inputId}/extractors/${extractorId}/edit`,
   filtered_metrics: (nodeId: string, filter: string) => `${Routes.SYSTEM.METRICS(nodeId)}?filter=${filter}`,
-  global_api_browser: () => Routes.GLOBAL_API_BROWSER_URL,
 } as const;
 
 const prefixUrlWithoutHostname = (url: string, prefix: string) => {
@@ -408,62 +434,9 @@ const qualifiedRoutes = qualifyUrls(Routes);
 
 const unqualified = Routes;
 
-/*
- * Global registry of plugin routes. Route names are generated automatically from the route path, by removing
- * any colons, replacing slashes with underscores, and making the string uppercase. Below there is an example of how
- * to access the routes.
- *
- * Plugin register example:
- * routes: [
- *           { path: '/system/pipelines', component: Foo },
- *           { path: '/system/pipelines/:pipelineId', component: Bar },
- * ]
- *
- * Using routes on plugin components:
- * <LinkContainer to={Routes.pluginRoutes('SYSTEM_PIPELINES')}>...</LinkContainer>
- * <LinkContainer to={Routes.pluginRoutes('SYSTEM_PIPELINES_PIPELINEID')(123)}>...</LinkContainer>
- *
- */
-const pluginRoute = (routeKey: string, throwError: boolean = true) => {
-  const pluginRoutes = {};
-
-  PluginStore.exports('routes').forEach((route) => {
-    const uri = new URI(route.path);
-    const segments = uri.segment();
-    const key = segments
-      .map((segment) => segment.replace(':', ''))
-      .join('_')
-      .toUpperCase();
-    const paramNames = segments.filter((segment) => segment.startsWith(':'));
-
-    if (paramNames.length > 0) {
-      pluginRoutes[key] = (...paramValues) => {
-        paramNames.forEach((param, idx) => {
-          const value = String(paramValues[idx]);
-
-          uri.segment(segments.indexOf(param), value);
-        });
-
-        return uri.pathname();
-      };
-
-      return;
-    }
-
-    pluginRoutes[key] = route.path;
-  });
-
-  const route = qualifyUrls(pluginRoutes)[routeKey];
-
-  if (!route && throwError) {
-    throw new Error(`Could not find plugin route '${routeKey}'.`);
-  }
-
-  return route;
+const defaultExport = {
+  ...qualifiedRoutes,
+  unqualified,
 };
-
-const getPluginRoute = (routeKey: string) => pluginRoute(routeKey, false);
-
-const defaultExport = Object.assign(qualifiedRoutes, { pluginRoute, getPluginRoute, unqualified });
 
 export default defaultExport;

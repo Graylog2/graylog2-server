@@ -21,13 +21,13 @@ import { DEFAULT_TIMERANGE } from 'views/Constants';
 import type { TimeRange, QueryId, FilterType } from 'views/logic/queries/Query';
 import Query, { createElasticsearchQueryString, newFiltersForQuery } from 'views/logic/queries/Query';
 import generateId from 'logic/generateId';
-import type { SearchFilter } from 'components/event-definitions/event-definitions-types';
+import type { SearchFilter } from 'views/types';
 import type { QueryString } from 'views/logic/queries/types';
 
 export default (
   streamId?: string | string[],
   streamCategory?: string | string[],
-  // eslint-disable-next-line default-param-last
+
   id: QueryId | undefined = generateId(),
   timeRange?: TimeRange,
   queryString?: QueryString,

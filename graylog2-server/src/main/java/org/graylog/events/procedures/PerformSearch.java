@@ -18,6 +18,7 @@ package org.graylog.events.procedures;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -26,6 +27,8 @@ import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
+import org.apache.http.client.utils.URIBuilder;
+import org.graylog.events.event.EventDto;
 
 import java.util.Collections;
 import java.util.Map;
@@ -92,6 +95,44 @@ public class PerformSearch extends Action {
         }
 
         public abstract Builder toBuilder();
+
+
+        @JsonIgnore
+        @Override
+        public URIBuilder getLink(EventDto event) {
+            final TemplateURI.Builder uriBuilder = new TemplateURI.Builder();
+            if (Boolean.TRUE.equals(useSavedSearch())) {
+                uriBuilder.setPath("views/" + savedSearch());
+                uriBuilder.setParameters(parameters());
+            } else {
+                uriBuilder.setPath("search");
+                uriBuilder.addParameter("q", query());
+            }
+            if (event != null && event.replayInfo().isPresent()
+                    && event.replayInfo().get().timerangeStart() != null
+                    && event.replayInfo().get().timerangeEnd() != null) {
+                uriBuilder.addParameter("rangetype", "absolute");
+                uriBuilder.addParameter("from", event.replayInfo().get().timerangeStart().toString());
+                uriBuilder.addParameter("to", event.replayInfo().get().timerangeEnd().toString());
+            }
+
+            return uriBuilder.build().getLinkPath();
+        }
+
+        @JsonIgnore
+        @Override
+        public String validate() {
+            if (Boolean.TRUE.equals(useSavedSearch())) {
+                if (savedSearch() == null || savedSearch().isEmpty()) {
+                    return "Saved search cannot be empty";
+                }
+            } else {
+                if (query() == null || query().isEmpty()) {
+                    return "Search query cannot be empty";
+                }
+            }
+            return null;
+        }
 
         @AutoValue.Builder
         public abstract static class Builder {

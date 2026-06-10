@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import jakarta.validation.constraints.NotNull;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.joda.time.Period;
 
@@ -30,7 +29,6 @@ import static org.graylog2.indexer.rotation.tso.IndexLifetimeConfig.FIELD_INDEX_
 
 
 @AutoValue
-@WithBeanGetter
 @JsonDeserialize(builder = HotOnlyDataTieringConfig.Builder.class)
 public abstract class HotOnlyDataTieringConfig implements DataTieringConfig {
 

@@ -30,14 +30,15 @@ import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.List;
@@ -45,9 +46,9 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class MessageFilterChainProcessorTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private ServerStatus serverStatus;
@@ -56,7 +57,7 @@ public class MessageFilterChainProcessorTest {
 
     private final MessageFactory messageFactory = new TestMessageFactory();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         Mockito.lenient().when(serverStatus.getDetailedMessageRecordingStrategy()).thenReturn(ServerStatus.MessageDetailRecordingStrategy.NEVER);
     }
@@ -73,9 +74,9 @@ public class MessageFilterChainProcessorTest {
                                                                                       serverStatus);
         final List<MessageFilter> filterRegistry = processor.getFilterRegistry();
 
-        Assert.assertEquals(filterRegistry.get(0), first);
-        Assert.assertEquals(filterRegistry.get(1), second);
-        Assert.assertEquals(filterRegistry.get(2), third);
+        Assertions.assertEquals(filterRegistry.get(0), first);
+        Assertions.assertEquals(filterRegistry.get(1), second);
+        Assertions.assertEquals(filterRegistry.get(2), third);
     }
 
     @Test
@@ -85,7 +86,7 @@ public class MessageFilterChainProcessorTest {
                                             Collections.emptySet(),
                                             acknowledger,
                                             serverStatus);
-            Assert.fail("A processor without message filters should fail on creation");
+            Assertions.fail("A processor without message filters should fail on creation");
         } catch (RuntimeException ignored) {}
     }
 
@@ -127,10 +128,10 @@ public class MessageFilterChainProcessorTest {
         final Messages messages1 = filterTest.process(filteredoutMessage);
         final Messages messages2 = filterTest.process(unfilteredMessage);
 
-        Assert.assertTrue(filteredoutMessage.getFilterOut());
-        Assert.assertFalse(unfilteredMessage.getFilterOut());
-        Assert.assertEquals(0, Iterables.size(messages1));
-        Assert.assertEquals(1, Iterables.size(messages2));
+        Assertions.assertTrue(filteredoutMessage.getFilterOut());
+        Assertions.assertFalse(unfilteredMessage.getFilterOut());
+        Assertions.assertEquals(0, Iterables.size(messages1));
+        Assertions.assertEquals(1, Iterables.size(messages2));
     }
 
     @Test

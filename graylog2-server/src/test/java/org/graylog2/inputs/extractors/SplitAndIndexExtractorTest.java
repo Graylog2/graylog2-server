@@ -22,14 +22,15 @@ import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.Extractor;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class SplitAndIndexExtractorTest extends AbstractExtractorTest {
     private final MessageFactory messageFactory = new TestMessageFactory();
@@ -184,34 +185,46 @@ public class SplitAndIndexExtractorTest extends AbstractExtractorTest {
         x.runExtractor(msg);
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void testDoesNotInitializeOnNullConfigMap() throws Exception {
-        new SplitAndIndexExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", null, "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        assertThrows(ConfigurationException.class, () -> {
+            new SplitAndIndexExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", null, "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        });
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void testDoesNotInitializeOnNullSplitChar() throws Exception {
-        new SplitAndIndexExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", config(null, 1), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        assertThrows(ConfigurationException.class, () -> {
+            new SplitAndIndexExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", config(null, 1), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        });
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void testDoesNotInitializeOnNullTargetIndex() throws Exception {
-        new SplitAndIndexExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", config("x", null), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        assertThrows(ConfigurationException.class, () -> {
+            new SplitAndIndexExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", config("x", null), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        });
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void testDoesNotInitializeOnNullNullNullNullSupernull() throws Exception {
-        new SplitAndIndexExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", config(null, null), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        assertThrows(ConfigurationException.class, () -> {
+            new SplitAndIndexExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", config(null, null), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        });
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void testDoesNotInitializeOnWrongSplitCharType() throws Exception {
-        new SplitAndIndexExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", config(1, 1), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        assertThrows(ConfigurationException.class, () -> {
+            new SplitAndIndexExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", config(1, 1), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        });
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void testDoesNotInitializeOnWrongTargetIndex() throws Exception {
-        new SplitAndIndexExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", config("x", "foo"), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        assertThrows(ConfigurationException.class, () -> {
+            new SplitAndIndexExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", config("x", "foo"), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        });
     }
 
     @Test

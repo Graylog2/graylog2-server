@@ -107,10 +107,12 @@ class FieldsList extends React.Component<
         <td>{providerFormatter(config.providers[0])}</td>
         <td className={styles.actions}>
           <ButtonToolbar>
-            <Button bsStyle="primary" bsSize="xsmall" onClick={this.handleRemoveClick(fieldName)}>
+            {}
+            <Button bsStyle="danger" bsSize="xsmall" onClick={this.handleRemoveClick(fieldName)}>
               Remove Field
             </Button>
-            <Button bsStyle="info" bsSize="xsmall" onClick={this.handleEditClick(fieldName)}>
+            {}
+            <Button bsStyle="primary" bsSize="xsmall" onClick={this.handleEditClick(fieldName)}>
               Edit
             </Button>
           </ButtonToolbar>
@@ -124,7 +126,7 @@ class FieldsList extends React.Component<
 
     const fieldNames = Object.keys(fields).sort(naturalSort);
     const addCustomFieldButton = (
-      <Button bsStyle="success" onClick={this.handleAddFieldClick}>
+      <Button bsStyle="primary" onClick={this.handleAddFieldClick}>
         Add custom field
       </Button>
     );

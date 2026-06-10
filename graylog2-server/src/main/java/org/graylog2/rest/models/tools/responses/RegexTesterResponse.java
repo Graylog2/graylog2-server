@@ -21,26 +21,24 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class RegexTesterResponse {
-    @JsonProperty
+    @JsonProperty("matched")
     public abstract boolean matched();
 
-    @JsonProperty
+    @JsonProperty("match")
     @Nullable
     public abstract Match match();
 
-    @JsonProperty
+    @JsonProperty("regex")
     public abstract String regex();
 
-    @JsonProperty
+    @JsonProperty("string")
     public abstract String string();
 
     @JsonCreator
@@ -53,16 +51,15 @@ public abstract class RegexTesterResponse {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public static abstract class Match {
-        @JsonProperty
+        @JsonProperty("match")
         @Nullable
         public abstract String match();
 
-        @JsonProperty
+        @JsonProperty("start")
         public abstract int start();
 
-        @JsonProperty
+        @JsonProperty("end")
         public abstract int end();
 
         @JsonCreator

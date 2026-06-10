@@ -19,9 +19,10 @@ package org.graylog.plugins.views.search.rest;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.DefaultValue;
@@ -38,13 +39,17 @@ import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryDTO;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.source.DBEntitySourceService;
+import org.graylog2.database.entities.source.EntitySource;
 import org.graylog2.database.filtering.DbQueryCreator;
+import org.graylog2.database.utils.SourcedMongoEntityUtils;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQueryField;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.List;
@@ -52,10 +57,12 @@ import java.util.Locale;
 import java.util.function.Predicate;
 
 import static java.util.Locale.ENGLISH;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+import static org.graylog2.database.entities.source.DBEntitySourceService.FILTER_OPTIONS;
+import static org.graylog2.database.utils.SourcedMongoEntityUtils.FILTERABLE_FIELD;
 
 @RequiresAuthentication
-@Api(value = "Dashboards", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Dashboards")
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/dashboards")
 public class DashboardsResource extends RestResource {
@@ -89,7 +96,14 @@ public class DashboardsResource extends RestResource {
             EntityAttribute.builder().id(ViewDTO.FIELD_DESCRIPTION).title("Description").searchable(true).build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_SUMMARY).title("Summary").searchable(true).build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_OWNER).title("Owner").build(),
-            EntityAttribute.builder().id(ViewDTO.FIELD_FAVORITE).title("Favorite").sortable(false).build()
+            EntityAttribute.builder().id(ViewDTO.FIELD_FAVORITE).title("Favorite").sortable(true).build(),
+            EntityAttribute.builder().id(FILTERABLE_FIELD).title("Source")
+                    .filterable(true)
+                    .sortable(false)
+                    .relatedCollection(DBEntitySourceService.COLLECTION_NAME)
+                    .relatedProperty(EntitySource.FIELD_ENTITY_ID)
+                    .filterOptions(FILTER_OPTIONS)
+                    .build()
     );
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
@@ -104,27 +118,35 @@ public class DashboardsResource extends RestResource {
     }
 
     @GET
-    @ApiOperation("Get a list of all dashboards")
+    @Operation(summary = "Get a list of all dashboards")
     @Timed
-    public PageListResponse<ViewSummaryDTO> views(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                  @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                  @ApiParam(name = "sort",
-                                                            value = "The field to sort the result on",
+    public PageListResponse<ViewSummaryDTO> views(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                  @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                  @Parameter(name = "sort",
+                                                            description = "The field to sort the result on",
                                                             required = true,
-                                                            allowableValues = "id,title,created_at,description,summary,owner") @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sortField,
-                                                  @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") SortOrder order,
-                                                  @ApiParam(name = "query") @QueryParam("query") String query,
-                                                  @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
-                                                  @ApiParam(name = "scope",
-                                                            value = "The scope of the permissions",
+                                                            schema = @Schema(allowableValues = {"id", "title", "created_at", "last_updated_at", "owner", "description", "summary", "favorite"}))
+                                                  @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sortField,
+                                                  @Parameter(name = "order", description = "The sort direction",
+                                                            schema = @Schema(allowableValues = {"asc", "desc"}))
+                                                  @DefaultValue("asc") @QueryParam("order") SortOrder order,
+                                                  @Parameter(name = "query") @QueryParam("query") String query,
+                                                  @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
+                                                  @Parameter(name = "scope",
+                                                            description = "The scope of the permissions",
                                                             required = true,
-                                                            allowableValues = "read,update") @DefaultValue("read") @QueryParam("scope") Scope scope,
+                                                            schema = @Schema(allowableValues = {"read", "update"}))
+                                                  @DefaultValue("read") @QueryParam("scope") Scope scope,
                                                   @Context SearchUser searchUser) {
 
-        final Predicate<ViewSummaryDTO> predicate = switch (scope) {
+        Predicate<ViewSummaryDTO> predicate = switch (scope) {
             case READ -> searchUser::canReadView;
             case UPDATE -> searchUser::canUpdateView;
         };
+
+        final SourcedMongoEntityUtils.FilterPredicate<ViewSummaryDTO> filterPredicate = SourcedMongoEntityUtils.handleEntitySourceFilter(filters, predicate);
+        filters = filterPredicate.filters();
+        predicate = filterPredicate.predicate();
 
         if (!ViewDTO.SORT_FIELDS.contains(sortField.toLowerCase(ENGLISH))) {
             sortField = ViewDTO.FIELD_TITLE;

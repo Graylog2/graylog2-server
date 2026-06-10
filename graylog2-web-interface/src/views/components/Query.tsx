@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
 
 import DocsHelper from 'util/DocsHelper';
 import { Jumbotron } from 'components/bootstrap';
@@ -26,22 +25,11 @@ import WidgetGrid from 'views/components/WidgetGrid';
 import useWidgets from 'views/hooks/useWidgets';
 import usePluggableUpsellWrapper from 'hooks/usePluggableUpsellWrapper';
 
-const StyledJumbotron = styled(Jumbotron)(
-  ({ theme }) => css`
-    .container-fluid & {
-      border: 1px solid ${theme.colors.gray[80]};
-      border-top-left-radius: 0;
-      border-top-right-radius: 0;
-      margin-bottom: 0;
-    }
-  `,
-);
-
 const NoWidgetsInfo = () => {
   const UpsellWrapper = usePluggableUpsellWrapper();
 
   return (
-    <StyledJumbotron>
+    <Jumbotron>
       <h2>
         <IfDashboard>This dashboard has no widgets yet</IfDashboard>
         <IfSearch>There are no widgets defined to visualize the search result</IfSearch>
@@ -89,7 +77,7 @@ const NoWidgetsInfo = () => {
         You can also have a look at the <DocumentationLink page={DocsHelper.PAGES.DASHBOARDS} text="documentation" />,
         to learn more about the widget creation.
       </p>
-    </StyledJumbotron>
+    </Jumbotron>
   );
 };
 

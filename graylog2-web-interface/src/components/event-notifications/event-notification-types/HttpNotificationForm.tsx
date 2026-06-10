@@ -16,10 +16,11 @@
  */
 import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
+// eslint-disable-next-line no-restricted-imports
 import get from 'lodash/get';
 import styled from 'styled-components';
 
-import { URLWhiteListInput } from 'components/common';
+import { URLAllowListInput } from 'components/common';
 import { Button, Checkbox, Col, ControlLabel, Input, Row } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
 import type { EventNotificationTypes } from 'components/event-notifications/types';
@@ -38,15 +39,6 @@ class HttpNotificationForm extends React.Component<
     [key: string]: any;
   }
 > {
-  static defaultConfig = {
-    url: '',
-    api_key_as_header: false,
-    api_key: '',
-    api_secret: { keep_value: true },
-    basic_auth: { keep_value: true },
-    skip_tls_verification: false,
-  };
-
   constructor(props) {
     super(props);
 
@@ -73,6 +65,15 @@ class HttpNotificationForm extends React.Component<
     this.setState({ api_secret: config.api_secret.is_set ? '******' : '' });
   }
 
+  static defaultConfig = {
+    url: '',
+    api_key_as_header: false,
+    api_key: '',
+    api_secret: { keep_value: true },
+    basic_auth: { keep_value: true },
+    skip_tls_verification: false,
+  };
+
   propagateChange = (key, value) => {
     const { config, onChange } = this.props;
     const nextConfig = cloneDeep(config);
@@ -90,7 +91,7 @@ class HttpNotificationForm extends React.Component<
 
   handleSecretInputChange = (event) => {
     const { name } = event.target;
-    const inputValue = FormsUtils.getValueFromInput(event.target);
+    const inputValue = String(FormsUtils.getValueFromInput(event.target));
     const value = inputValue.length === 0 ? { delete_value: true } : { set_value: inputValue };
 
     this.setState({ [name]: inputValue });
@@ -128,7 +129,7 @@ class HttpNotificationForm extends React.Component<
 
     return (
       <>
-        <URLWhiteListInput
+        <URLAllowListInput
           label="URL"
           onChange={this.handleChange}
           validationState={validation.errors.url ? 'error' : null}

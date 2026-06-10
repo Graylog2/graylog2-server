@@ -26,9 +26,9 @@ import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.LinkedHashMap;
 import java.util.concurrent.Callable;
@@ -41,7 +41,7 @@ public class NetFlowUdpTransportTest {
     private EventLoopGroupFactory eventLoopGroupFactory;
     private NetFlowUdpTransport transport;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         final NettyTransportConfiguration nettyTransportConfiguration = new NettyTransportConfiguration("nio", "jdk", 1);
         eventLoopGroupFactory = new EventLoopGroupFactory(nettyTransportConfiguration);
@@ -55,7 +55,7 @@ public class NetFlowUdpTransportTest {
         transport.setMessageAggregator(new NetflowV9CodecAggregator());
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         eventLoopGroup.shutdownGracefully();
     }

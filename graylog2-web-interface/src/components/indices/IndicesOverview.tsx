@@ -16,17 +16,17 @@
  */
 import React from 'react';
 
-import type { IndexSummary } from 'stores/indexers/IndexerOverviewStore';
-import { IndexSection } from 'components/indices';
+import type { IndexSummary } from 'hooks/useIndexerOverview';
+import IndexSection from 'components/indices/IndexSection';
 import type { IndexInfo } from 'stores/indices/IndicesStore';
 
 type Props = {
   indexDetails: Array<IndexInfo>;
   indices: Array<IndexSummary>;
-  indexSetId: string;
+  indexSetId?: string;
 };
 
-const IndicesOverview = ({ indexDetails, indices, indexSetId }: Props) => {
+const IndicesOverview = ({ indexDetails, indices, indexSetId = undefined }: Props) => {
   const indicesFilteredByTier = (
     indicesList: Array<IndexSummary>,
     tier: 'WARM' | 'HOT' | undefined,

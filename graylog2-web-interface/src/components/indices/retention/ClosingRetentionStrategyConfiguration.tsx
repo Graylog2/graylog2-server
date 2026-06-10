@@ -22,9 +22,13 @@ import { useIndexRetention } from 'components/indices/contexts/IndexRetentionCon
 
 type ClosingRetentionStrategyConfigurationProps = {
   updateConfig: (...args: any[]) => void;
+  disabled?: boolean;
 };
 
-const ClosingRetentionStrategyConfiguration = ({ updateConfig }: ClosingRetentionStrategyConfigurationProps) => {
+const ClosingRetentionStrategyConfiguration = ({
+  updateConfig,
+  disabled = false,
+}: ClosingRetentionStrategyConfigurationProps) => {
   const [maxNumberOfIndices, setMaxNumberOfIndices] = useIndexRetention().useMaxNumberOfIndices;
 
   const _onInputUpdate = (field) => (e) => {
@@ -32,13 +36,14 @@ const ClosingRetentionStrategyConfiguration = ({ updateConfig }: ClosingRetentio
     const value = getValueFromInput(e.target);
     update[field] = value;
 
-    setMaxNumberOfIndices(value);
+    setMaxNumberOfIndices(value as number);
     updateConfig(update);
   };
 
   return (
     <div>
       <Input
+        disabled={disabled}
         type="number"
         id="max-number-of-indices"
         label="Max number of indices"

@@ -30,11 +30,12 @@ const scTheme = SawmillSC(mantineTheme);
 
 type Props = {
   children: React.ReactNode;
+  env?: 'default' | 'test';
 };
 
-const DefaultProviders = ({ children }: Props) => (
+const DefaultProviders = ({ children, env = undefined }: Props) => (
   <CurrentUserContext.Provider value={defaultUser}>
-    <MantineProvider theme={mantineTheme}>
+    <MantineProvider theme={mantineTheme} env={env}>
       <ThemeProvider theme={{ ...scTheme, changeMode: () => {} }}>
         <UserDateTimeProvider tz={defaultTimezone}>{children}</UserDateTimeProvider>
       </ThemeProvider>

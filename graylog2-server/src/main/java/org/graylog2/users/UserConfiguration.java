@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.Version;
 import org.threeten.extra.PeriodDuration;
 
@@ -29,7 +28,6 @@ import java.time.temporal.ChronoUnit;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class UserConfiguration {
     private static final boolean IS_BEFORE_VERSION_6_2 = !Version.CURRENT_CLASSPATH.sameOrHigher(Version.from(6, 2, 0));
 

@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableList;
 import org.graylog2.rest.models.system.indexer.responses.IndexStats;
 import org.graylog2.rest.models.system.indexer.responses.ShardRouting;
 
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -44,13 +45,18 @@ public abstract class IndexStatistics {
         return new AutoValue_IndexStatistics(index, primaryShards, allShards, routing);
     }
 
+    @Deprecated //TODO: needs unit tests, but is also a candidate for removal when older storage modules get removed
     public static IndexStatistics create(String index, JsonNode indexStats) {
         final JsonNode primaries = indexStats.path("primaries");
         final JsonNode total = indexStats.path("total");
         final JsonNode shards = indexStats.path("shards");
 
 
-        return create(index, buildIndexStats(primaries), buildIndexStats(total), buildShardRoutings(shards));
+        return create(index, buildIndexStats(primaries),
+                buildIndexStats(total),
+                buildShardRoutings(shards).stream()
+                        .sorted(Comparator.comparing(ShardRouting::id).thenComparing(ShardRouting::nodeId))
+                        .toList());
     }
 
     private static IndexStats buildIndexStats(final JsonNode stats) {
@@ -60,7 +66,9 @@ public abstract class IndexStatistics {
 
         final JsonNode get = stats.path("get");
         final long getTotal = get.path("total").asLong();
-        final long getTotalTimeSeconds = get.path("total_time_in_millis").asLong() / 1000L;
+        //"total_time_in_millis" seems to be a mistake, even in OS 1.3 it used to be named "time_in_millis": https://docs.opensearch.org/1.3/api-reference/nodes-apis/nodes-stats/
+        //final long getTotalTimeSeconds = get.path("total_time_in_millis").asLong() / 1000L;
+        final long getTotalTimeSeconds = get.path("time_in_millis").asLong() / 1000L;
 
         final JsonNode indexing = stats.path("indexing");
         final long indexingTotal = indexing.path("index_total").asLong();

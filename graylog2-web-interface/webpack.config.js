@@ -19,10 +19,11 @@ const path = require('path');
 
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 
 const supportedBrowsers = require('./supportedBrowsers');
 const core = require('./webpack/core');
+const { bootstrapLessRule, lessRule } = require('./webpack/bootstrap-less');
 
 const ROOT_PATH = path.resolve(__dirname);
 const APP_PATH = path.resolve(ROOT_PATH, 'src');
@@ -30,57 +31,18 @@ const BUILD_PATH = path.resolve(ROOT_PATH, 'target/web/build');
 const TARGET = process.env.npm_lifecycle_event || 'build';
 process.env.BABEL_ENV = TARGET;
 
-// eslint-disable-next-line import/no-dynamic-require
-const BOOTSTRAPVARS = require(path.resolve(ROOT_PATH, 'public', 'stylesheets', 'bootstrap-config.json')).vars;
 const coreConfig = core.config(TARGET, APP_PATH, ROOT_PATH, ROOT_PATH, supportedBrowsers);
 
-const webpackConfig = merge.smart(coreConfig, {
+const webpackConfig = merge(coreConfig, {
   name: 'app',
   dependencies: ['vendor'],
   entry: {
     app: APP_PATH,
-    polyfill: [path.resolve(APP_PATH, 'polyfill.js')],
+    preload: [path.resolve(APP_PATH, 'preload.ts')],
+    polyfill: [path.resolve(APP_PATH, 'polyfill.ts')],
   },
   module: {
-    rules: [
-      {
-        test: /bootstrap\.less$/,
-        use: [
-          {
-            loader: 'style-loader',
-            options: {
-              // implementation to insert at the top of the head tag: https://github.com/webpack-contrib/style-loader#function
-              insert: function insertAtTop(element) {
-                const parent = document.querySelector('head');
-                // @ts-ignore
-                const lastInsertedElement = window._lastElementInsertedByStyleLoader;
-
-                if (!lastInsertedElement) {
-                  parent.insertBefore(element, parent.firstChild);
-                } else if (lastInsertedElement.nextSibling) {
-                  parent.insertBefore(element, lastInsertedElement.nextSibling);
-                } else {
-                  parent.appendChild(element);
-                }
-
-                // @ts-ignore
-                window._lastElementInsertedByStyleLoader = element;
-              },
-            },
-          },
-          'css-loader',
-          {
-            loader: 'less-loader',
-            options: {
-              lessOptions: {
-                modifyVars: BOOTSTRAPVARS,
-              },
-            },
-          },
-        ],
-      },
-      { test: /\.less$/, use: ['style-loader', 'css-loader', 'less-loader'], exclude: /bootstrap\.less$/ },
-    ],
+    rules: [bootstrapLessRule, lessRule],
   },
   plugins: [
     new HtmlWebpackPlugin({

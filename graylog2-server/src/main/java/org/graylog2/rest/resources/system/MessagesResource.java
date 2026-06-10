@@ -20,32 +20,30 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.plugin.Tools;
-import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.system.activities.SystemMessage;
-import org.graylog2.system.activities.SystemMessageService;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
-
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.plugin.Tools;
+import org.graylog2.shared.rest.PublicCloudAPI;
+import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.system.activities.SystemMessage;
+import org.graylog2.system.activities.SystemMessageService;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
-
 @RequiresAuthentication
-@Api(value = "System/Messages", description = "Internal Graylog messages", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "System/Messages", description = "Internal Graylog messages")
 @Path("/system/messages")
 public class MessagesResource extends RestResource {
     private final SystemMessageService systemMessageService;
@@ -57,10 +55,10 @@ public class MessagesResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get internal Graylog system messages")
+    @Operation(summary = "Get internal Graylog system messages")
     @RequiresPermissions(RestPermissions.SYSTEMMESSAGES_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Object> all(@ApiParam(name = "page", value = "Page") @QueryParam("page") int page) {
+    public Map<String, Object> all(@Parameter(name = "page", description = "Page") @QueryParam("page") int page) {
         final List<Map<String, Object>> messages = Lists.newArrayList();
         for (SystemMessage sm : systemMessageService.all(page(page))) {
             Map<String, Object> message = Maps.newHashMapWithExpectedSize(4);

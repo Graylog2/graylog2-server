@@ -1,0 +1,5 @@
+type = "a"
+message = "Add Inputs state dot badge to System and Inputs menu."
+
+issues = [""]
+pulls = ["23989"]

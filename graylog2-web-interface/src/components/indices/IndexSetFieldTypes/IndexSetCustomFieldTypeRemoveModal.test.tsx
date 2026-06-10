@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
-import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
@@ -34,17 +34,14 @@ const renderIndexSetCustomFieldTypeRemoveModal = () =>
     </TestStoreProvider>,
   );
 
-jest.mock('stores/indices/IndexSetsStore', () => ({
-  IndexSetsActions: {
-    list: jest.fn(),
-  },
-  IndexSetsStore: MockStore([
-    'getInitialState',
-    () => ({
-      indexSets: [{ id: '111', title: 'index set title' }],
-    }),
-  ]),
-}));
+jest.mock('components/indices/hooks/useIndexSetsList', () =>
+  jest.fn(() => ({
+    data: { indexSets: [{ id: '111', title: 'index set title' }], indexSetsCount: 1, indexSetStats: null },
+    refetch: jest.fn(),
+    isSuccess: true,
+    isInitialLoading: false,
+  })),
+);
 
 jest.mock('components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation', () => jest.fn());
 jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
@@ -62,6 +59,8 @@ describe('IndexSetFieldTypesList', () => {
       selectEntity: () => {},
       deselectEntity: () => {},
       toggleEntitySelect: () => {},
+      isSomeRowsSelected: true,
+      isAllRowsSelected: false,
     });
 
     asMock(useRemoveCustomFieldTypeMutation).mockReturnValue({
@@ -84,7 +83,7 @@ describe('IndexSetFieldTypesList', () => {
       const submit = await screen.findByRole('button', {
         name: /remove field type overrides/i,
       });
-      fireEvent.click(submit);
+      await userEvent.click(submit);
 
       expect(mockedRemoveCustomFieldTypeMutation).toHaveBeenCalledWith({
         fields: ['field'],
@@ -100,8 +99,8 @@ describe('IndexSetFieldTypesList', () => {
       const submit = await screen.findByRole('button', {
         name: /remove field type overrides/i,
       });
-      fireEvent.click(checkbox);
-      fireEvent.click(submit);
+      await userEvent.click(checkbox);
+      await userEvent.click(submit);
 
       expect(mockedRemoveCustomFieldTypeMutation).toHaveBeenCalledWith({
         fields: ['field'],

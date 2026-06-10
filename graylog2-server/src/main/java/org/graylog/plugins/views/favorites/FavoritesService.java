@@ -64,7 +64,17 @@ public class FavoritesService {
     }
 
     public PaginatedResponse<Favorite> findFavoritesFor(final SearchUser searchUser, final Optional<String> type, final int page, final int perPage) {
-        var items = this.findForUser(searchUser)
+        final var items = findFavoritesFor(searchUser, type);
+        var itemsToShow = items.stream()
+                .skip(perPage * Math.max(0L, page - 1))
+                .limit(perPage)
+                .toList();
+
+        return PaginatedResponse.create("favorites", new PaginatedList<>(itemsToShow, items.size(), page, perPage));
+    }
+
+    public List<Favorite> findFavoritesFor(final SearchUser searchUser, final Optional<String> type) {
+        return this.findForUser(searchUser)
                 .orElse(new FavoritesForUserDTO(searchUser.getUser().getId(), List.of()))
                 .items()
                 .stream().filter(i -> type.isEmpty() || i.type().equals(type.get()))
@@ -74,12 +84,7 @@ public class FavoritesService {
                 )
                 .flatMap(Optional::stream)
                 .toList();
-        var itemsToShow = items.stream()
-                .skip(perPage * Math.max(0L, page - 1))
-                .limit(perPage)
-                .toList();
 
-        return PaginatedResponse.create("favorites", new PaginatedList<>(itemsToShow, items.size(), page, perPage));
     }
 
     public void save(FavoritesForUserDTO favorite) {
@@ -117,7 +122,7 @@ public class FavoritesService {
         }
     }
 
-    Optional<FavoritesForUserDTO> findForUser(final SearchUser searchUser) {
+    public Optional<FavoritesForUserDTO> findForUser(final SearchUser searchUser) {
         return findForUser(searchUser.getUser().getId());
     }
 

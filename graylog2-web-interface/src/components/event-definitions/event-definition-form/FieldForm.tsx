@@ -40,7 +40,7 @@ import withLocation from 'routing/withLocation';
 
 import commonStyles from '../common/commonStyles.css';
 
-const requiredFields = ['fieldName', 'config.providers[0].type'];
+const requiredFields = ['fieldName'];
 
 const getProviderPlugin = (type) => {
   if (type === undefined) {
@@ -104,10 +104,14 @@ class FieldForm extends React.Component<
     }
 
     requiredFields.forEach((requiredField) => {
-      if (!this.state.requiredField) {
+      if (!this.state[requiredField]) {
         errors[requiredField] = 'Field cannot be empty.';
       }
     });
+
+    if (!config.providers[0]?.type) {
+      errors['config.providers[0].type'] = 'Field cannot be empty.';
+    }
 
     if (isKey && (!isNumber(keyPosition) || Number(keyPosition) < 1)) {
       errors.key_position = 'Field must be a positive number.';
@@ -239,11 +243,12 @@ class FieldForm extends React.Component<
   render() {
     const { fieldName: prevFieldName } = this.props;
     const { fieldName, isKey, keyPosition, config, validation } = this.state;
+    const isEditingField = !!prevFieldName;
 
     return (
       <Row>
         <Col md={7} lg={6}>
-          <h2 className={commonStyles.title}>{prevFieldName ? `Custom Field "${fieldName}"` : 'New Custom Field'}</h2>
+          <h2 className={commonStyles.title}>{isEditingField ? `Custom Field "${fieldName}"` : 'New Custom Field'}</h2>
 
           <Input
             id="field-name"
@@ -266,7 +271,14 @@ class FieldForm extends React.Component<
             </ControlLabel>
             <InputGroup>
               <InputGroup.Addon>
-                <input id="is-key" name="is-key" type="checkbox" onChange={this.toggleKey} checked={isKey} />
+                <input
+                  id="is-key"
+                  name="is-key"
+                  type="checkbox"
+                  aria-label="Use Field as Event Key"
+                  onChange={this.toggleKey}
+                  checked={isKey}
+                />
               </InputGroup.Addon>
               <FormControl
                 id="field-key"
@@ -310,8 +322,8 @@ class FieldForm extends React.Component<
 
         <Col md={12}>
           <ButtonToolbar>
-            <Button bsStyle="success" onClick={this.handleSubmit}>
-              Add custom field
+            <Button bsStyle="primary" onClick={this.handleSubmit}>
+              {isEditingField ? 'Update custom field' : 'Add custom field'}
             </Button>
             <Button onClick={this.handleCancel}>Cancel</Button>
           </ButtonToolbar>

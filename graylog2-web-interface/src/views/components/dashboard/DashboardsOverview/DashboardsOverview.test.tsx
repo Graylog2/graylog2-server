@@ -22,23 +22,14 @@ import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import { asMock } from 'helpers/mocking';
 import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 import DashboardsOverview from './DashboardsOverview';
 
-jest.mock('routing/Routes', () => ({ pluginRoute: () => () => '/route' }));
 jest.mock('components/common/PaginatedEntityTable/useFetchEntities');
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
-jest.mock('views/stores/ViewManagementStore', () => ({
-  ViewManagementActions: {
-    delete: jest.fn(),
-    update: {
-      completed: {
-        listen: () => jest.fn(),
-      },
-    },
-  },
+jest.mock('views/api/views', () => ({
+  deleteView: jest.fn(),
 }));
 
 jest.mock('routing/QueryParams', () => ({
@@ -96,11 +87,7 @@ const loadDashboardsResponse = (count = 1) => {
 };
 
 describe('DashboardsOverview', () => {
-  const SUT = () => (
-    <DefaultQueryParamProvider>
-      <DashboardsOverview />
-    </DefaultQueryParamProvider>
-  );
+  const SUT = () => <DashboardsOverview />;
 
   beforeEach(() => {
     asMock(useFetchEntities).mockReturnValue(loadDashboardsResponse(0));

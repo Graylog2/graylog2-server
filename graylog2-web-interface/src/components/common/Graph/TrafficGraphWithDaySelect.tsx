@@ -17,8 +17,8 @@
 import * as React from 'react';
 import reduce from 'lodash/reduce';
 import styled, { css } from 'styled-components';
+import { useMemo } from 'react';
 
-import NumberUtils from 'util/NumberUtils';
 import { Input } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import { formatTrafficData } from 'util/TrafficUtils';
@@ -30,6 +30,8 @@ import useLocation from 'routing/useLocation';
 import type { Traffic } from 'components/common/Graph/types';
 import { DAYS } from 'components/common/Graph/types';
 import useGraphDays from 'components/common/Graph/contexts/useGraphDays';
+import { getPrettifiedValue } from 'views/components/visualizations/utils/unitConverters';
+import formatValueWithUnitLabel from 'views/components/visualizations/utils/formatValueWithUnitLabel';
 
 const StyledH3 = styled.h3(
   ({ theme }) => css`
@@ -60,9 +62,15 @@ type Props = {
   traffic: Traffic;
   trafficLimit?: number;
   title?: string;
+  trafficType?: 'input-indexed' | 'output';
 };
 
-const TrafficGraphWithDaySelect = ({ traffic, trafficLimit = undefined, title = undefined }: Props) => {
+const TrafficGraphWithDaySelect = ({
+  traffic,
+  trafficLimit = undefined,
+  title = undefined,
+  trafficType = 'output',
+}: Props) => {
   const { graphDays, setGraphDays } = useGraphDays();
   const { graphWidth, graphContainerRef } = useGraphWidth();
   const { pathname } = useLocation();
@@ -75,30 +83,24 @@ const TrafficGraphWithDaySelect = ({ traffic, trafficLimit = undefined, title = 
 
     setGraphDays(newDays);
 
+    const appSection = trafficType === 'input-indexed' ? 'incoming-traffic' : 'outgoing-traffic';
+
     sendTelemetry(TELEMETRY_EVENT_TYPE.TRAFFIC_GRAPH_DAYS_CHANGED, {
       app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'outgoing-traffic',
+      app_section: appSection,
       app_action_value: 'trafficgraph-days-button',
       event_details: { value: newDays },
     });
   };
 
-  let sumOutput = null;
-  let trafficGraph = <Spinner />;
+  const bytesOut = useMemo(() => (traffic ? reduce(traffic, (result, value) => result + value) : null), [traffic]);
+  const unixTraffic = useMemo(() => (traffic ? formatTrafficData(traffic) : null), [traffic]);
 
-  if (traffic) {
-    const bytesOut = reduce(traffic, (result, value) => result + value);
+  const formattedTotalTraffic = useMemo(() => {
+    const prettified = getPrettifiedValue(bytesOut, { abbrev: 'b', unitType: 'binary_size' });
 
-    sumOutput = (
-      <small>
-        Last {graphDays} days: {NumberUtils.formatBytes(bytesOut)}
-      </small>
-    );
-
-    const unixTraffic = formatTrafficData(traffic);
-
-    trafficGraph = <TrafficGraph traffic={unixTraffic} trafficLimit={trafficLimit} width={graphWidth} />;
-  }
+    return formatValueWithUnitLabel(prettified?.value, prettified.unit.abbrev);
+  }, [bytesOut]);
 
   return (
     <>
@@ -120,9 +122,18 @@ const TrafficGraphWithDaySelect = ({ traffic, trafficLimit = undefined, title = 
       </Wrapper>
 
       <StyledH3 ref={graphContainerRef}>
-        {title ?? 'Outgoing traffic'} {sumOutput}
+        {title ?? (trafficType === 'input-indexed' ? 'Incoming traffic' : 'Outgoing traffic')}{' '}
+        {bytesOut && (
+          <small>
+            Last {graphDays} days: {formattedTotalTraffic}
+          </small>
+        )}
       </StyledH3>
-      {trafficGraph}
+      {unixTraffic ? (
+        <TrafficGraph trafficLimit={trafficLimit} traffic={unixTraffic} width={graphWidth} />
+      ) : (
+        <Spinner />
+      )}
     </>
   );
 };

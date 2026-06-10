@@ -19,16 +19,19 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
 import { defaultUser } from 'defaultMockValues';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
 import usePluginEntities from 'hooks/usePluginEntities';
-import mockAction from 'helpers/mocking/MockAction';
 import MockStore from 'helpers/mocking/StoreMock';
+import mockAction from 'helpers/mocking/MockAction';
 import mockComponent from 'helpers/mocking/MockComponent';
 import { simpleEventDefinition as mockEventDefinition } from 'fixtures/eventDefinition';
 import { adminUser } from 'fixtures/users';
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
+import { useGetEventDefinition } from 'components/event-definitions/hooks/useEventDefinitions';
+import useGetPermissionsByScope from 'hooks/useScopePermissions';
 
 import ViewEventDefinitionPage from './ViewEventDefinitionPage';
 
@@ -40,18 +43,12 @@ jest.mock('react-router-dom', () => ({
 }));
 
 jest.mock('hooks/useCurrentUser');
+jest.mock('components/event-definitions/hooks/useEventDefinitions');
+jest.mock('hooks/useScopePermissions');
 
 jest.mock('stores/event-definitions/EventDefinitionsStore', () => ({
   EventDefinitionsActions: {
-    get: mockAction(
-      jest.fn(() =>
-        Promise.resolve({
-          event_definition: mockEventDefinition,
-          context: { scheduler: { is_scheduled: true } },
-          is_mutable: true,
-        }),
-      ),
-    ),
+    copy: mockAction(jest.fn(() => Promise.resolve({ id: 'new-id' }))),
   },
 }));
 
@@ -70,12 +67,30 @@ jest.mock('hooks/usePluginEntities');
 describe('<ViewEventDefinitionPage />', () => {
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
+    asMock(useGetEventDefinition).mockReturnValue({
+      data: {
+        eventDefinition: mockEventDefinition,
+        context: { scheduler: { is_scheduled: true } },
+        is_mutable: true,
+      },
+      isFetching: false,
+    });
+    asMock(useGetPermissionsByScope).mockReturnValue({
+      loadingScopePermissions: false,
+      scopePermissions: { is_mutable: true, is_deletable: true },
+      checkPermissions: () => true,
+    });
     asMock(usePluginEntities).mockImplementation(
       (entityKey) =>
         ({
           'licenseCheck': [(_license: string) => ({ data: { valid: false } })],
           'eventProcedures': [],
-          'alerts.pageNavigation': [{ description: 'Event Definitions', path: Routes.ALERTS.DEFINITIONS.LIST }],
+          'pageNavigation': [
+            {
+              description: 'Alerts',
+              children: [{ description: 'Event Definitions', path: Routes.ALERTS.DEFINITIONS.LIST }],
+            },
+          ],
           'eventDefinitions.components.editSigmaModal': [],
         })[entityKey],
     );
@@ -84,14 +99,14 @@ describe('<ViewEventDefinitionPage />', () => {
   it('should display the event definition page', async () => {
     render(<ViewEventDefinitionPage />);
 
-    await screen.findByText(/View Event Definition/);
+    await screen.findByText(/View "Event Definition 1" Event Definition/);
   });
 
   it('should display event details when permitted', async () => {
     asMock(useCurrentUser).mockReturnValue(
       adminUser
         .toBuilder()
-        .permissions(Immutable.List([`eventdefinitions:read:${mockEventDefinition.id}`]))
+        .permissions(Immutable.List<Permission>([`eventdefinitions:read:${mockEventDefinition.id}`]))
         .build(),
     );
 
@@ -105,7 +120,7 @@ describe('<ViewEventDefinitionPage />', () => {
       adminUser
         .toBuilder()
         .permissions(
-          Immutable.List([
+          Immutable.List<Permission>([
             `eventdefinitions:read:${mockEventDefinition.id}`,
             `eventdefinitions:edit:${mockEventDefinition.id}`,
           ]),

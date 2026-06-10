@@ -21,9 +21,8 @@ import { Row, Col, Button, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import type { PipelineType } from 'components/pipelines/types';
 import { DEFAULT_PIPELINE } from 'components/pipelines/types';
-import { isPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
 import { FormSubmit } from 'components/common';
+import usePermissions from 'hooks/usePermissions';
 
 import BootstrapModalForm from '../bootstrap/BootstrapModalForm';
 
@@ -44,7 +43,7 @@ const PipelineForm = ({
   onCancel = () => {},
   disableEdit = false,
 }: Props) => {
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const [nextPipeline, setNextPipeline] = useState<PipelineType>(cloneDeep(pipeline));
   const [showModal, setShowModal] = useState<boolean>(false);
 
@@ -83,7 +82,6 @@ const PipelineForm = ({
         id="title"
         name="title"
         label="Title"
-        autoFocus
         required
         onChange={_onChange}
         help="Pipeline name."
@@ -105,10 +103,7 @@ const PipelineForm = ({
   if (modal) {
     return (
       <span>
-        <Button
-          disabled={!isPermitted(currentUser.permissions, 'pipeline:edit') || disableEdit}
-          onClick={_openModal}
-          bsStyle="success">
+        <Button disabled={!isPermitted('pipeline:edit') || disableEdit} onClick={_openModal} bsStyle="primary">
           {create ? 'Add new pipeline' : 'Edit pipeline details'}
         </Button>
         <BootstrapModalForm

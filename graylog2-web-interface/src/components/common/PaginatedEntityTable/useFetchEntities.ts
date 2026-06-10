@@ -16,9 +16,9 @@
  */
 
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { OrderedMap } from 'immutable';
 
-import type { SearchParams } from 'stores/PaginationTypes';
-import { type Attribute } from 'stores/PaginationTypes';
+import type { SearchParams, Attribute } from 'stores/PaginationTypes';
 import { defaultOnError } from 'util/conditional/onError';
 
 export type PaginatedResponse<T, M = unknown> = {
@@ -32,6 +32,20 @@ export type PaginatedResponse<T, M = unknown> = {
 
 export type FetchOptions = {
   refetchInterval?: number;
+};
+
+export const slicesToFilters = (searchParams: SearchParams) => {
+  const newSearchParams = { ...searchParams };
+
+  delete newSearchParams.slice;
+  delete newSearchParams.sliceCol;
+
+  if (searchParams.sliceCol && searchParams.slice) {
+    const filters = newSearchParams.filters ?? OrderedMap<string, Array<string>>();
+    newSearchParams.filters = filters.set(searchParams.sliceCol, [searchParams.slice]);
+  }
+
+  return newSearchParams;
 };
 
 const useFetchEntities = <T, M = unknown>({
@@ -52,13 +66,16 @@ const useFetchEntities = <T, M = unknown>({
   isInitialLoading: boolean;
   data: PaginatedResponse<T, M>;
   refetch: () => void;
+  isError?: boolean;
+  error?: Error | null;
 } => {
-  const { data, isInitialLoading, refetch } = useQuery({
+  const { data, isInitialLoading, refetch, isError, error } = useQuery({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: fetchKey,
 
     queryFn: () =>
       defaultOnError(
-        fetchEntities(searchParams),
+        fetchEntities(slicesToFilters(searchParams)),
         `Fetching ${humanName} failed with status`,
         `Could not retrieve ${humanName}`,
       ),
@@ -71,6 +88,8 @@ const useFetchEntities = <T, M = unknown>({
     data,
     isInitialLoading,
     refetch,
+    isError,
+    error,
   };
 };
 

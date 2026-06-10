@@ -27,7 +27,6 @@ import com.mongodb.client.result.UpdateResult;
 import jakarta.inject.Inject;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.sidecar.rest.models.Collector;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
 import org.graylog.plugins.sidecar.rest.models.ConfigurationVariable;
@@ -649,7 +648,6 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public static abstract class MigrationState {
 
         // Set of prior version CRCs

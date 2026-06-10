@@ -24,8 +24,6 @@ import useViewsDispatch from 'views/stores/useViewsDispatch';
 import useWidgetActions from 'views/components/widgets/useWidgetActions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 import type { ActionComponents } from 'views/components/actions/ActionHandler';
 import type { WidgetActionType, WidgetAction } from 'views/components/widgets/Types';
 import generateId from 'logic/generateId';
@@ -68,7 +66,6 @@ const ExtraDropdownWidgetActions = ({ widget, setComponents }: Props) => {
   const pluginWidgetActions = useWidgetActions();
   const dispatch = useViewsDispatch();
   const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
 
   const extraWidgetActions = useMemo(
     () =>
@@ -81,7 +78,6 @@ const ExtraDropdownWidgetActions = ({ widget, setComponents }: Props) => {
           const handler = createHandler(action, setComponents);
           const _onSelect = () => {
             sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.SEARCH_WIDGET_EXTRA_ACTION, {
-              app_pathname: getPathnameWithoutId(pathname),
               app_section: 'search-widget',
               app_action_value: action.type,
             });
@@ -96,7 +92,7 @@ const ExtraDropdownWidgetActions = ({ widget, setComponents }: Props) => {
             </MenuItem>
           );
         }),
-    [dispatch, pathname, pluginWidgetActions, sendTelemetry, setComponents, widget, widgetFocusContext],
+    [dispatch, pluginWidgetActions, sendTelemetry, setComponents, widget, widgetFocusContext],
   );
 
   return extraWidgetActions.length > 0 ? (

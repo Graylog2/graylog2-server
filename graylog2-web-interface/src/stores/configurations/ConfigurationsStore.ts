@@ -29,11 +29,12 @@ type ConfigurationsActionsType = {
   listMessageProcessorsConfig: (configType: any) => Promise<unknown>;
   listEventsClusterConfig: () => Promise<unknown>;
   listIndexSetsDefaultsClusterConfig: () => Promise<unknown>;
-  listWhiteListConfig: (configType: any) => Promise<unknown>;
+  listAllowListConfig: (configType: any) => Promise<unknown>;
   listPermissionsConfig: (configType: string) => Promise<unknown>;
   listUserConfig: (configType: string) => Promise<unknown>;
+  listPasswordComplexityConfig: (configType: string) => Promise<unknown>;
   update: (configType: any, config: any) => Promise<void>;
-  updateWhitelist: (configType: any, config: any) => Promise<void>;
+  updateAllowlist: (configType: any, config: any) => Promise<void>;
   updateIndexSetDefaults: (configType: any, config: any) => Promise<void>;
   updateMessageProcessorsConfig: (configType: any, config: any) => Promise<void>;
 };
@@ -44,11 +45,12 @@ export const ConfigurationsActions = singletonActions('core.Configuration', () =
     listMessageProcessorsConfig: { asyncResult: true },
     listEventsClusterConfig: { asyncResult: true },
     listIndexSetsDefaultsClusterConfig: { asyncResult: true },
-    listWhiteListConfig: { asyncResult: true },
+    listAllowListConfig: { asyncResult: true },
     listPermissionsConfig: { asyncResult: true },
     listUserConfig: { asyncResult: true },
+    listPasswordComplexityConfig: { asyncResult: true },
     update: { asyncResult: true },
-    updateWhitelist: { asyncResult: true },
+    updateAllowlist: { asyncResult: true },
     updateIndexSetDefaults: { asyncResult: true },
     updateMessageProcessorsConfig: { asyncResult: true },
   }),
@@ -62,13 +64,20 @@ export type Url = {
   type: string;
 };
 
-export type WhiteListConfig = {
+export type AllowListConfig = {
   entries: Array<Url>;
   disabled: boolean;
 };
 export type PermissionsConfigType = {
   allow_sharing_with_everyone: boolean;
   allow_sharing_with_users: boolean;
+};
+export type PasswordComplexityConfigType = {
+  min_length: number;
+  require_uppercase: boolean;
+  require_lowercase: boolean;
+  require_numbers: boolean;
+  require_special_chars: boolean;
 };
 export type UserConfigType = {
   enable_global_session_timeout: boolean;
@@ -150,15 +159,15 @@ export const ConfigurationsStore = singletonStore('core.Configuration', () =>
       ConfigurationsActions.listMessageProcessorsConfig.promise(promise);
     },
 
-    listWhiteListConfig(configType) {
-      const promise = fetch('GET', qualifyUrl('/system/urlwhitelist')).then((response) => {
+    listAllowListConfig(configType) {
+      const promise = fetch('GET', qualifyUrl('/system/urlallowlist')).then((response) => {
         this.configuration = { ...this.configuration, [configType]: response };
         this.propagateChanges();
 
         return response;
       });
 
-      ConfigurationsActions.listWhiteListConfig.promise(promise);
+      ConfigurationsActions.listAllowListConfig.promise(promise);
     },
 
     listPermissionsConfig(configType) {
@@ -197,6 +206,27 @@ export const ConfigurationsStore = singletonStore('core.Configuration', () =>
       });
 
       ConfigurationsActions.listUserConfig.promise(promise);
+    },
+
+    listPasswordComplexityConfig(configType) {
+      const promise = fetch('GET', this._url(`/${configType}`)).then((response: PasswordComplexityConfigType) => {
+        this.configuration = {
+          ...this.configuration,
+          [configType]: response || {
+            min_length: 6,
+            require_uppercase: false,
+            require_lowercase: false,
+            require_numbers: false,
+            require_special_chars: false,
+          },
+        };
+
+        this.propagateChanges();
+
+        return response;
+      });
+
+      ConfigurationsActions.listPasswordComplexityConfig.promise(promise);
     },
 
     listEventsClusterConfig() {
@@ -265,26 +295,26 @@ export const ConfigurationsStore = singletonStore('core.Configuration', () =>
       ConfigurationsActions.update.promise(promise);
     },
 
-    updateWhitelist(configType, config) {
-      const promise = fetch('PUT', qualifyUrl('/system/urlwhitelist'), config);
+    updateAllowlist(configType, config) {
+      const promise = fetch('PUT', qualifyUrl('/system/urlallowlist'), config);
 
       promise.then(
         () => {
           this.configuration = { ...this.configuration, [configType]: config };
           this.propagateChanges();
-          UserNotification.success('Url Whitelist Configuration updated successfully');
+          UserNotification.success('Url allowlist Configuration updated successfully');
 
           return config;
         },
         (error) => {
           UserNotification.error(
-            `Url Whitelist config update failed: ${error}`,
-            `Could not update Url Whitelist: ${configType}`,
+            `Url allowlist config update failed: ${error}`,
+            `Could not update Url allowlist: ${configType}`,
           );
         },
       );
 
-      ConfigurationsActions.updateWhitelist.promise(promise);
+      ConfigurationsActions.updateAllowlist.promise(promise);
     },
 
     updateMessageProcessorsConfig(configType, config) {

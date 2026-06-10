@@ -25,9 +25,15 @@ declare global {
 }
 
 export type BrandingResource = { enabled?: boolean; url?: string | undefined };
-export type BrandingResourceKey = 'stream_rule_matcher_code' | 'contact_support' | 'contact_us' | 'marketplace';
+export type BrandingResourceKey =
+  | 'stream_rule_matcher_code'
+  | 'contact_support'
+  | 'contact_us'
+  | 'marketplace'
+  | 'forwarder_download_url';
 
 export type BrandingResources = Record<BrandingResourceKey, BrandingResource>;
+type FeatureToggle = { enabled?: boolean };
 
 export type Branding = {
   product_name?: string;
@@ -49,12 +55,15 @@ export type Branding = {
     user_menu?: { icon: string };
     scratchpad?: { icon: string };
     help?: { icon: string };
+    search?: { icon: string };
   };
   help_url?: string;
+  help_pages?: { [key: string]: string };
   footer?: { enabled: boolean };
   resources?: BrandingResources;
   features?: {
-    ai_investigation_report?: { enabled?: boolean };
+    ai_investigation_report?: FeatureToggle;
+    widget_summary?: FeatureToggle;
   };
 };
 
@@ -68,6 +77,7 @@ export type AppConfigs = {
   telemetry: { api_key: string; host: string; enabled: boolean };
   contentStream: { refresh_interval: string; rss_url: string };
   branding: Branding | undefined;
+  globalInputsOnly: boolean;
 };
 
 declare global {
@@ -140,6 +150,10 @@ const AppConfig = {
 
   branding(): Branding | undefined {
     return appConfig()?.branding;
+  },
+
+  globalInputsOnly(): boolean {
+    return appConfig().globalInputsOnly;
   },
 };
 

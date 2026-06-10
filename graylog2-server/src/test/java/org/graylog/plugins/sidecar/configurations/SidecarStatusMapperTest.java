@@ -17,7 +17,7 @@
 package org.graylog.plugins.sidecar.configurations;
 
 import org.graylog.plugins.sidecar.mapper.SidecarStatusMapper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

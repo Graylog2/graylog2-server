@@ -217,6 +217,7 @@ const ApiRoutes = {
     references: (inputId: string) => ({ url: `/system/inputs/references/${inputId}` }),
   },
   InputStatesController: {
+    summary: () => ({ url: '/system/inputstates/summary' }),
     start: (inputId: string) => ({ url: `/system/inputstates/${inputId}` }),
     stop: (inputId: string) => ({ url: `/system/inputstates/${inputId}` }),
   },
@@ -251,15 +252,6 @@ const ApiRoutes = {
     multiple: (nodeId: string) => ({ url: `/cluster/${nodeId}/metrics/multiple` }),
     multipleAllNodes: () => ({ url: '/cluster/metrics/multiple' }),
     byNamespace: (nodeId: string, namespace: string) => ({ url: `/cluster/${nodeId}/metrics/namespace/${namespace}` }),
-  },
-  NotificationsApiController: {
-    delete: (type: string) => ({ url: `/system/notifications/${type}` }),
-    deleteWithKey: (type: string, key: string) => ({ url: `/system/notifications/${type}/${key}` }),
-    list: () => ({ url: '/system/notifications' }),
-    getHtmlMessage: (type: string) => ({ url: `/system/notification/message/html/${type.toLocaleUpperCase()}` }),
-    getHtmlMessageWithKey: (type: string, key: string) => ({
-      url: `/system/notification/message/html/${type.toLocaleUpperCase()}/${key}`,
-    }),
   },
   OutputsApiController: {
     index: () => ({ url: '/system/outputs' }),
@@ -306,6 +298,7 @@ const ApiRoutes = {
   },
   StreamOutputFilterRuleApiController: {
     get: (streamId: string) => ({ url: `/streams/${streamId}/destinations/filters` }),
+    countByStreams: () => ({ url: '/streams/destinations/filters/count' }),
     delete: (streamId: string, filterId: string) => ({ url: `/streams/${streamId}/destinations/filters/${filterId}` }),
     update: (streamId: string, filterId: string) => ({ url: `/streams/${streamId}/destinations/filters/${filterId}` }),
     create: (streamId: string) => ({ url: `/streams/${streamId}/destinations/filters` }),
@@ -343,8 +336,8 @@ const ApiRoutes = {
     substringTest: () => ({ url: '/tools/substring_tester' }),
     containsStringTest: () => ({ url: '/tools/contains_string_tester' }),
     lookupTableTest: () => ({ url: '/tools/lookup_table_tester' }),
-    urlWhitelistCheck: () => ({ url: '/system/urlwhitelist/check' }),
-    urlWhitelistGenerateRegex: () => ({ url: '/system/urlwhitelist/generate_regex' }),
+    urlAllowlistCheck: () => ({ url: '/system/urlallowlist/check' }),
+    urlAllowlistGenerateRegex: () => ({ url: '/system/urlallowlist/generate_regex' }),
   },
   TelemetryApiController: {
     info: () => ({ url: '/telemetry' }),

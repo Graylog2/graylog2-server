@@ -19,6 +19,7 @@ import type { EntityPermissionsMapper } from 'logic/permissions/EntityPermission
 const supportedTypes = new Set([
   'user',
   'team',
+  'team_users',
   'dashboard',
   'event_definition',
   'notification',
@@ -29,12 +30,14 @@ const supportedTypes = new Set([
   'output',
   'collection',
   'collection_entities',
+  'builtin-team',
 ]);
 
 const typePrefixCornerCasesMap = {
   event_definition: 'eventdefinitions:',
   notification: 'eventnotifications:',
   search: 'view:',
+  dashboard: 'view:',
 };
 
 const standardEntityPermissionsMapper: EntityPermissionsMapper = {

@@ -18,7 +18,6 @@
 // Please note, each project has its own collection of telemetry event types.
 // Only maintain event types related to core features in this file.
 
-// eslint-disable-next-line import/prefer-default-export
 export const TELEMETRY_EVENT_TYPE = {
   SEARCH_TIMERANGE_PRESET_SELECTED: 'Search TimeRange Preset Selected',
   SEARCH_TIMERANGE_PICKER_TOGGLED: 'Search TimeRange Picker Toggled',
@@ -46,6 +45,14 @@ export const TELEMETRY_EVENT_TYPE = {
     WIDGET_EDIT_CANCEL_CLICKED: 'Search Widget Edit Cancel Clicked',
     WIDGET_CONFIG_UPDATED: 'Search Widget Config Updated',
     EXPORT: 'Search Widget Exported',
+  },
+  FAVORITE_FIELDS: {
+    EDIT_OPEN: 'Favorite Fields Edit Open',
+    EDIT_CANCELED: 'Favorite Fields Edit Canceled',
+    EDIT_SAVED: 'Favorite Fields Edit Saved',
+    TOGGLED: 'Favorite Field Toggled',
+    REORDERED: 'Favorite Field Reordered',
+    NON_FAVORITE_SHOW_TOGGLED: 'Non Favorite Field Show Toggled',
   },
   SEARCH_WIDGET_CREATE: {
     AGGREGATION: 'Search Widget Aggregation Created',
@@ -116,6 +123,7 @@ export const TELEMETRY_EVENT_TYPE = {
   EVENTDEFINITION_DUPLICATED: 'EventDefinition Duplicated',
   EVENTDEFINITION_NEXT_CLICKED: 'EventDefinition Next Clicked',
   EVENTDEFINITION_PREVIOUS_CLICKED: 'EventDefinition Previous Clicked',
+  EVENTDEFINITION_REPLAY_SEARCH_CLICKED: 'EventDefinition Replay Search Clicked',
   EVENTDEFINITION_DETAILS: {
     STEP_CLICKED: 'EventDefinition Details Step Clicked',
     PRIORITY_CHANGED: 'EventDefinition Details Priority Changed',
@@ -188,10 +196,8 @@ export const TELEMETRY_EVENT_TYPE = {
     STREAM_ITEM_DATA_ROUTING_STREAM_INDEXSET_UPDATE_OPENED: 'Stream Item Data Routing Stream IndexSet Update Opened',
     STREAM_ITEM_DATA_ROUTING_INDEXER_FILTER_UPDATE_OPENED: 'Stream Item Data Routing Indexer Filter Update Opened',
     STREAM_ITEM_DATA_ROUTING_INDEXER_FILTER_CREATE_OPENED: 'Stream Item Data Routing Indexer Filter Create Opened',
-    STREAM_ITEM_DATA_ROUTING_DATA_WAREHOUSE_FILTER_CREATE_OPENED:
-      'Stream Item Data Routing Data Warehouse Filter Create Opened',
-    STREAM_ITEM_DATA_ROUTING_DATA_WAREHOUSE_FILTER_UPDATE_OPENED:
-      'Stream Item Data Routing Data Warehouse Filter Update Opened',
+    STREAM_ITEM_DATA_ROUTING_DATA_LAKE_FILTER_CREATE_OPENED: 'Stream Item Data Routing Data Lake Filter Create Opened',
+    STREAM_ITEM_DATA_ROUTING_DATA_LAKE_FILTER_UPDATE_OPENED: 'Stream Item Data Routing Data Lake Filter Update Opened',
     STREAM_ITEM_DATA_ROUTING_FILTER_DELETE_OPENED: 'Stream Item Data Routing Filter Delete Opened',
     STREAM_ITEM_DATA_ROUTING_INTAKE_OPENED: 'Stream Item Data Routing Intake Opened',
     STREAM_ITEM_DATA_ROUTING_PROCESSING_OPENED: 'Stream Item Data Routing Processing Opened',
@@ -246,12 +252,14 @@ export const TELEMETRY_EVENT_TYPE = {
     THREATINTEL_CONFIGURATION_UPDATED: 'Configurations Threat Intel Configuration Updated',
     PERMISSIONS_UPDATED: 'Configurations Permissions Updated',
     SEARCHES_UPDATED: 'Configurations Searches Updated',
-    URL_WHITE_LIST_UPDATED: 'Configurations Url White List Updated',
+    URL_ALLOW_LIST_UPDATED: 'Configurations Url Allow List Updated',
     USER_UPDATED: 'Configurations User Updated',
     CERTIFICATE_RENEWAL_UPDATED: 'Configurations Certificate Renewal Updated',
     CERTIFICATE_RENEWAL_POLICY_UPDATED: 'Configurations Certificate Renewal Policy Updated',
     DECORATORS_UPDATED: 'Configurations Decorators Updated',
     GEOLOCATION_CONFIGURATION_UPDATED: 'Configurations Geolocation Configuration Updated',
+    MARKDOWN_UPDATED: 'Configurations Markdown Updated',
+    PASSWORD_COMPLEXITY_UPDATED: 'Configurations Password Complexity Updated',
   },
   INPUTS: {
     INPUT_SELECTED: 'Inputs Input Selected',
@@ -343,7 +351,7 @@ export const TELEMETRY_EVENT_TYPE = {
     LOG_COLLECTOR_DELETED: 'Sidecar Log Collector Deleted',
   },
   TRAFFIC_GRAPH_DAYS_CHANGED: 'Traffic Graph Days Changed',
-  URLWHITELIST_CONFIGURATION_UPDATED: 'Urlwhitelist Configuration Updated',
+  URLALLOWLIST_CONFIGURATION_UPDATED: 'Urlallowlist Configuration Updated',
   CONTENT_PACK: {
     INSTALLED: 'Content Pack Installed',
     DOWNLOADED: 'Content Pack Downloaded',
@@ -401,30 +409,73 @@ export const TELEMETRY_EVENT_TYPE = {
       'Datanode Migration Inplace Journal Size Downtime Warning Next Clicked',
     INPLACE_STOP_MESSAGE_PROCESSING_NEXT_CLICKED: 'Datanode Migration Inplace Stop Message Processing Next Clicked',
     INPLACE_RESTART_GRAYLOG_NEXT_CLICKED: 'Datanode Migration Inplace Restart Graylog Next Clicked',
-    REMOTEREINDEX_WELCOME_NEXT_CLICKED: 'Datanode Migration RemoteReindex Welcome Next Clicked',
-    REMOTEREINDEX_MIGRATE_EXISTING_DATA_QUESTION_NEXT_CLICKED:
-      'Datanode Migration RemoteReindex Migrate Existing Data Question Next Clicked',
-    REMOTEREINDEX_MIGRATE_EXISTING_DATA_QUESTION_SKIP_CLICKED:
-      'Datanode Migration RemoteReindex Migrate Existing Data Question Skip Clicked',
-    REMOTEREINDEX_MIGRATE_EXISTING_DATA_CHECK_CONNECTION_CLICKED:
-      'Datanode Migration RemoteReindex Migrate Existing Data Check Connection Clicked',
-    REMOTEREINDEX_MIGRATE_EXISTING_DATA_START_CLICKED:
-      'Datanode Migration RemoteReindex Migrate Existing Data Start Clicked',
-    REMOTEREINDEX_RUNNING_LOGVIEW_CLICKED: 'Datanode Migration RemoteReindex Running Logview Clicked',
-    REMOTEREINDEX_RUNNING_RETRY_CLICKED: 'Datanode Migration RemoteReindex Running Retry Clicked',
-    REMOTEREINDEX_RUNNING_RETRY_CONFIRM_CLICKED: 'Datanode Migration RemoteReindex Running Retry Confirm Clicked',
-    REMOTEREINDEX_SHUTDOWN_OLD_CLUSTER_NEXT_CLICKED:
-      'Datanode Migration RemoteReindex Shutdown Old Cluster Next Clicked',
   },
   ALERTS_AND_EVENTS: {
     ACTION_RAN: 'Alerts And Events Action Ran',
   },
   ENTITY_DATA_TABLE: {
+    COLUMNS_RESET: 'Entity Data Table Columns Reset',
     COLUMNS_CHANGED: 'Entity Data Table Columns Changed',
+    COLUMN_ORDER_CHANGED: 'Entity Data Table Column Order Changed',
     SORT_CHANGED: 'Entity Data Table Sort Changed',
     PAGE_SIZE_CHANGED: 'Entity Data Table Page Size Changed',
     FILTER_CREATED: 'Entity Data Table Filter Created',
     FILTER_DELETED: 'Entity Data Table Filter Deleted',
     FILTER_CHANGED: 'Entity Data Table Filter Changed',
+    SLICE_COLUMN_SELECTED_HEADER: 'Entity Data Table Slice Column Selected (Header)',
+    SLICE_COLUMN_SELECTED_SECTION: 'Entity Data Table Slice Column Selected (Section)',
+    SLICE_REMOVED: 'Entity Data Table Slice Removed',
+    SLICE_VALUE_SELECTED: 'Entity Data Table Slice Value Selected',
+    SLICE_SEARCH_CHANGED: 'Entity Data Table Slice Search Changed',
+    SLICE_SORT_CHANGED: 'Entity Data Table Slice Sort Changed',
+    SLICE_EMPTY_VALUES_TOGGLED: 'Entity Data Table Slice Empty Values Toggled',
+  },
+  COLLECTORS: {
+    OVERVIEW: {
+      STAT_CARD_CLICKED: 'Collector Stat Card Clicked',
+      FLEET_CARD_CLICKED: 'Collector Overview Fleet Card Clicked',
+    },
+    FLEET: {
+      CREATE_OPENED: 'Fleet Create Opened',
+      CREATE_CANCELLED: 'Fleet Create Cancelled',
+      CREATED: 'Fleet Created',
+      UPDATED: 'Fleet Updated',
+      DELETED: 'Fleet Deleted',
+      TAB_SELECTED: 'Fleet Tab Selected',
+    },
+    SOURCE: {
+      CREATE_OPENED: 'Collector Source Create Opened',
+      CREATE_CANCELLED: 'Collector Source Create Cancelled',
+      CREATED: 'Collector Source Created',
+      UPDATED: 'Collector Source Updated',
+      DELETED: 'Collector Source Deleted',
+    },
+    INSTANCE: {
+      VIEW_LOGS_CLICKED: 'Collector Instance View Logs Clicked',
+      DETAILS_OPENED: 'Collector Instance Details Opened',
+      REASSIGNED: 'Collector Instance Reassigned',
+      DELETED: 'Collector Instance Deleted',
+      BULK_REASSIGNED: 'Collector Instances Bulk Reassigned',
+    },
+    ENROLLMENT_TOKEN: {
+      FLEET_SELECTED: 'Collector Deployment Fleet Selected',
+      EXPIRY_SELECTED: 'Collector Enrollment Token Expiry Selected',
+      GENERATED: 'Collector Enrollment Token Generated',
+      TOKEN_COPIED: 'Collector Enrollment Token Copied',
+      DELETED: 'Collector Enrollment Token Deleted',
+      BULK_DELETED: 'Collector Enrollment Tokens Bulk Deleted',
+    },
+    SETTINGS: {
+      UPDATED: 'Collector Settings Updated',
+      DIAGNOSTICS_OPENED: 'Collector Settings Diagnostics Opened',
+    },
+  },
+  RIGHT_SIDEBAR: {
+    OPENED: 'Right Sidebar Opened',
+    CLOSED: 'Right Sidebar Closed',
+    COLLAPSED: 'Right Sidebar Collapsed',
+    EXPANDED: 'Right Sidebar Expanded',
+    NAVIGATED_BACK: 'Right Sidebar Navigated Back',
+    NAVIGATED_FORWARD: 'Right Sidebar Navigated Forward',
   },
 } as const;

@@ -18,6 +18,7 @@ package org.graylog.events.processor;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.graylog.events.context.EventDefinitionContextService;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationHandler;
@@ -30,7 +31,21 @@ import org.joda.time.DateTime;
 import javax.annotation.Nullable;
 import java.util.Set;
 
-@DbEntity(readPermission = RestPermissions.EVENT_DEFINITIONS_READ, collection = DBEventDefinitionService.COLLECTION_NAME)
+import static org.graylog.events.processor.EventDefinitionDto.FIELD_ALERT;
+import static org.graylog.events.processor.EventDefinitionDto.FIELD_DESCRIPTION;
+import static org.graylog.events.processor.EventDefinitionDto.FIELD_MATCHED_AT;
+import static org.graylog.events.processor.EventDefinitionDto.FIELD_PRIORITY;
+import static org.graylog.events.processor.EventDefinitionDto.FIELD_STATE;
+import static org.graylog.events.processor.EventDefinitionDto.FIELD_TITLE;
+import static org.graylog.events.processor.EventDefinitionDto.FIELD_UPDATED_AT;
+import static org.graylog2.database.MongoEntity.FIELD_ID;
+import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
+
+@DbEntity(readPermission = RestPermissions.EVENT_DEFINITIONS_READ,
+          collection = DBEventDefinitionService.COLLECTION_NAME,
+          readableFields = {ID_FIELD, FIELD_ID, FIELD_TITLE, FIELD_DESCRIPTION, FIELD_UPDATED_AT, FIELD_MATCHED_AT,
+                  FIELD_PRIORITY, FIELD_ALERT, FIELD_STATE
+          })
 public interface EventDefinition {
     enum State {
         ENABLED,
@@ -70,6 +85,10 @@ public interface EventDefinition {
 
     ImmutableList<EventStorageHandler.Config> storage();
 
+    default ImmutableSet<String> tags() {
+        return ImmutableSet.of();
+    }
+
     EventDefinitionContextService.SchedulerCtx schedulerCtx();
 
     default Set<String> requiredPermissions() {
@@ -78,5 +97,14 @@ public interface EventDefinition {
 
     default String eventProcedureId() {
         return null;
+    }
+
+    @Nullable
+    default String eventSummaryTemplate() {
+        return null;
+    }
+
+    default ImmutableList<String> tacticsTechniques() {
+        return ImmutableList.of();
     }
 }

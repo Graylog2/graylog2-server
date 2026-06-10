@@ -29,6 +29,7 @@ const ClusterConfigurationPage = loadAsync(() => import('./ClusterConfigurationP
 const ConfigurationsPage = loadAsync(() => import('./ConfigurationsPage'));
 const ContentPacksPage = loadAsync(() => import('./ContentPacksPage'));
 const CreateEventDefinitionPage = loadAsync(() => import('./CreateEventDefinitionPage'));
+const SigmaEventDefinitionPage = loadAsync(() => import('./SigmaEventDefinitionPage'));
 const CreateEventNotificationPage = loadAsync(() => import('./CreateEventNotificationPage'));
 const CreateContentPackPage = loadAsync(() => import('pages/CreateContentPackPage'));
 const CreateExtractorsPage = loadAsync(() => import('./CreateExtractorsPage'));
@@ -69,11 +70,18 @@ const KeyboardShortcutsPage = loadAsync(() => import('./KeyboardShortcutsPage'))
 const LoadingPage = loadAsync(() => import(/* webpackChunkName: "LoadingPage" */ 'pages/LoadingPage'));
 const LoggersPage = loadAsync(() => import('./LoggersPage'));
 const LoginPage = loadAsync(() => import(/* webpackChunkName: "LoginPage" */ 'pages/LoginPage'));
+const LUTCacheDetailsPage = loadAsync(() => import('./LUTCacheDetailsPage'));
 const LUTCachesPage = loadAsync(() => import('./LUTCachesPage'));
+const LUTCachesFormPage = loadAsync(() => import('./LUTCachesFormPage'));
 const LUTDataAdaptersPage = loadAsync(() => import('./LUTDataAdaptersPage'));
+const LUTDataAdaptersFormPage = loadAsync(() => import('./LUTDataAdaptersFormPage'));
+const LUTDataAdapterDetailsPage = loadAsync(() => import('./LUTDataAdapterDetailsPage'));
 const LUTTablesPage = loadAsync(() => import('./LUTTablesPage'));
+const LUTFormPage = loadAsync(() => import('./LUTFormPage'));
+const LUTDetailsPage = loadAsync(() => import('./LUTDetailsPage'));
 const NodeInputsPage = loadAsync(() => import('./NodeInputsPage'));
 const NotFoundPage = loadAsync(() => import('./NotFoundPage'));
+const ApiBrowserPage = loadAsync(() => import('./ApiBrowserPage'));
 const PipelineDetailsPage = loadAsync(() => import('./PipelineDetailsPage'));
 const PipelinesOverviewPage = loadAsync(() => import('./PipelinesOverviewPage'));
 const RoleDetailsPage = loadAsync(() => import('./RoleDetailsPage'));
@@ -95,6 +103,12 @@ const SidecarNewConfigurationPage = loadAsync(() => import('pages/SidecarNewConf
 const SidecarFailureTrackingPage = loadAsync(() => import('pages/SidecarFailureTrackingPage'));
 const SidecarsPage = loadAsync(() => import('pages/SidecarsPage'));
 const SidecarStatusPage = loadAsync(() => import('pages/SidecarStatusPage'));
+const CollectorsOverviewPage = loadAsync(() => import('pages/CollectorsOverviewPage'));
+const CollectorsFleetsPage = loadAsync(() => import('pages/CollectorsFleetsPage'));
+const CollectorsFleetDetailPage = loadAsync(() => import('pages/CollectorsFleetDetailPage'));
+const CollectorsInstancesPage = loadAsync(() => import('pages/CollectorsInstancesPage'));
+const CollectorsDeploymentPage = loadAsync(() => import('pages/CollectorsDeploymentPage'));
+const CollectorsSettingsPage = loadAsync(() => import('pages/CollectorsSettingsPage'));
 const SimulatorPage = loadAsync(() => import('./SimulatorPage'));
 const StartPage = loadAsync(() => import('./StartPage'));
 const StreamEditPage = loadAsync(() => import('./StreamEditPage'));
@@ -102,6 +116,7 @@ const StreamOutputsPage = loadAsync(() => import('./StreamOutputsPage'));
 const StreamsPage = loadAsync(() => import('./StreamsPage'));
 const StreamDetailsPage = loadAsync(() => import('./StreamDetailsPage'));
 const SystemOutputsPage = loadAsync(() => import('./SystemOutputsPage'));
+const SystemNotificationsPage = loadAsync(() => import('./SystemNotificationsPage'));
 const SystemOverviewPage = loadAsync(() => import('./SystemOverviewPage'));
 const SystemLogsPage = loadAsync(() => import('./SystemLogsPage'));
 const ThreadDumpPage = loadAsync(() => import('./ThreadDumpPage'));
@@ -127,6 +142,7 @@ export {
   ConfigurationsPage,
   ContentPacksPage,
   CreateEventDefinitionPage,
+  SigmaEventDefinitionPage,
   CreateEventNotificationPage,
   CreateContentPackPage,
   CreateExtractorsPage,
@@ -167,11 +183,18 @@ export {
   LoadingPage,
   LoggersPage,
   LoginPage,
+  LUTCacheDetailsPage,
   LUTCachesPage,
+  LUTCachesFormPage,
   LUTDataAdaptersPage,
+  LUTDataAdaptersFormPage,
+  LUTDataAdapterDetailsPage,
   LUTTablesPage,
+  LUTFormPage,
+  LUTDetailsPage,
   NodeInputsPage,
   NotFoundPage,
+  ApiBrowserPage,
   PipelineDetailsPage,
   PipelinesOverviewPage,
   ProcessBufferDumpPage,
@@ -194,12 +217,19 @@ export {
   SidecarFailureTrackingPage,
   SidecarsPage,
   SidecarStatusPage,
+  CollectorsOverviewPage,
+  CollectorsFleetsPage,
+  CollectorsFleetDetailPage,
+  CollectorsInstancesPage,
+  CollectorsDeploymentPage,
+  CollectorsSettingsPage,
   SimulatorPage,
   StartPage,
   StreamEditPage,
   StreamDetailsPage,
   StreamOutputsPage,
   StreamsPage,
+  SystemNotificationsPage,
   SystemOutputsPage,
   SystemOverviewPage,
   SystemLogsPage,

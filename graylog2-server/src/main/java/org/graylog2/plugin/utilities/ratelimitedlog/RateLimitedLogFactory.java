@@ -27,6 +27,9 @@ public class RateLimitedLogFactory {
     private static final int DEFAULT_MAX_RATE = 5;
     private static final Duration DEFAULT_DURATION = Duration.ofSeconds(10);
 
+    protected static final int MAX_QUIET_RATE = 1;
+    protected static final Duration MAX_QUIET_DURATION = Duration.ofSeconds(60);
+
     public static RateLimitedLog createRateLimitedLog(final Logger logger,
                                                       final int maxRate,
                                                       final Duration duration) {
@@ -47,4 +50,11 @@ public class RateLimitedLogFactory {
         return createRateLimitedLog(LoggerFactory.getLogger(clazz), DEFAULT_MAX_RATE, DEFAULT_DURATION);
     }
 
+    /**
+     * @return Rate limited log that only prints once per 60 seconds. Use for frequently occurring code paths
+     * that you don't want to generate a lot of log noise.
+     */
+    public static RateLimitedLog createQuietDefaultRateLimitedLog(final Class<?> clazz) {
+        return createRateLimitedLog(LoggerFactory.getLogger(clazz), MAX_QUIET_RATE, MAX_QUIET_DURATION);
+    }
 }

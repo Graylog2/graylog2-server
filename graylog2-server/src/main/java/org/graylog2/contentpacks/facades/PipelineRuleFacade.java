@@ -67,7 +67,7 @@ public class PipelineRuleFacade implements EntityFacade<RuleDao> {
     Entity exportNativeEntity(RuleDao ruleDao, EntityDescriptorIds entityDescriptorIds) {
         final PipelineRuleEntity ruleEntity = PipelineRuleEntity.create(
                 ValueReference.of(ruleDao.title()),
-                ValueReference.of(ruleDao.description()),
+                ValueReference.ofNullable(ruleDao.description()),
                 ValueReference.of(ruleDao.source()));
         final JsonNode data = objectMapper.convertValue(ruleEntity, JsonNode.class);
         return EntityV1.builder()

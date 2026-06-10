@@ -17,16 +17,21 @@
 package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.documentation.Documentation;
+import com.github.joschi.jadconfig.documentation.DocumentationSection;
 import org.graylog2.configuration.converters.JavaDurationConverter;
 
 import java.net.URI;
 import java.time.Duration;
 import java.util.Map;
 
+@DocumentationSection(heading = "Content Streams", description = "RSS settings for content stream")
 public class ContentStreamConfiguration {
+    @Documentation("Content stream URL")
     @Parameter(value = "content_stream_rss_url")
     private URI contentStreamRssUri = URI.create("https://graylog.org/post/tag");
 
+    @Documentation("Refresh interval")
     @Parameter(value = "content_stream_refresh_interval",
                converter = JavaDurationConverter.class)
     private Duration contentStreamRefreshInterval = Duration.ofDays(7);

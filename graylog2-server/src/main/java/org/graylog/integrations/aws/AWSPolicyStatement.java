@@ -20,13 +20,11 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import java.util.List;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 @JsonPropertyOrder({AWSPolicyStatement.SID, AWSPolicyStatement.EFFECT, AWSPolicyStatement.ACTION, AWSPolicyStatement.RESOURCE})
 public abstract class AWSPolicyStatement {
 

@@ -18,9 +18,8 @@ package org.graylog2.streams;
 
 import io.restassured.response.ValidatableResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.utils.IndexSetUtils;
 import org.graylog.testing.utils.StreamUtils;
 import org.junit.jupiter.api.BeforeAll;
@@ -31,15 +30,11 @@ import java.util.List;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
-@ContainerMatrixTestsConfiguration
+@GraylogBackendConfiguration
 public class AssignStreamsToIndexSetIT {
     private static final String STREAMS_RESOURCE = "/streams";
 
-    private final GraylogApis api;
-
-    public AssignStreamsToIndexSetIT(GraylogApis api) {
-        this.api = api;
-    }
+    private static GraylogApis api;
 
     private String defaultIndexSetId;
     private String newIndexSetId;
@@ -48,7 +43,8 @@ public class AssignStreamsToIndexSetIT {
     private String stream3Id;
 
     @BeforeAll
-    void beforeAll() {
+    void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
         this.defaultIndexSetId = IndexSetUtils.defaultIndexSetId(api.requestSpecificationSupplier());
         this.stream1Id = StreamUtils.createStream(api.requestSpecificationSupplier(), "New Stream", defaultIndexSetId);
         this.stream2Id = StreamUtils.createStream(api.requestSpecificationSupplier(), "New Stream 2", defaultIndexSetId);
@@ -56,7 +52,7 @@ public class AssignStreamsToIndexSetIT {
         this.newIndexSetId = IndexSetUtils.createIndexSet(api.requestSpecificationSupplier(), "Test Indices", "Some test indices", "test");
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void assignStreamsToIndexSet() {
         assignToIndexSet(List.of(stream1Id, stream2Id, stream3Id), newIndexSetId)
                 .statusCode(200);
@@ -79,7 +75,7 @@ public class AssignStreamsToIndexSetIT {
                 .assertThat().body("index_set_id", equalTo(defaultIndexSetId));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void assignStreamsToMissingIndexSet() {
         assignToIndexSet(List.of(stream1Id, stream2Id, stream3Id), "doesnotexist")
                 .statusCode(404);
@@ -92,7 +88,7 @@ public class AssignStreamsToIndexSetIT {
                 .assertThat().body("index_set_id", equalTo(defaultIndexSetId));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void assignMissingStreamToIndexSet() {
         assignToIndexSet(List.of(stream1Id, stream2Id, stream3Id, "6389c6a9205a90634f992bce"), newIndexSetId)
                 .statusCode(404);

@@ -23,6 +23,7 @@ import Routes from 'routing/Routes';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 import withHistory from 'routing/withHistory';
 import type CancellablePromise from 'logic/rest/CancellablePromise';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 import EventNotificationForm from './EventNotificationForm';
 
@@ -53,6 +54,12 @@ class EventNotificationFormContainer extends React.Component<
     [key: string]: any;
   }
 > {
+  static scrollToFirstError() {
+    if (document.getElementsByClassName('has-error')[0] !== undefined) {
+      document.getElementsByClassName('has-error')[0].scrollIntoView(true);
+    }
+  }
+
   static defaultProps = {
     action: 'edit',
     notification: {
@@ -64,14 +71,6 @@ class EventNotificationFormContainer extends React.Component<
     formId: undefined,
     onSubmit: () => {},
   };
-
-  static scrollToFirstError() {
-    if (document.getElementsByClassName('has-error')[0] !== undefined) {
-      document.getElementsByClassName('has-error')[0].scrollIntoView(true);
-    }
-  }
-
-  private testPromise: CancellablePromise<void>;
 
   constructor(props) {
     super(props);
@@ -91,6 +90,8 @@ class EventNotificationFormContainer extends React.Component<
     }
   }
 
+  private testPromise: CancellablePromise<void>;
+
   handleChange = (key, value) => {
     const { notification } = this.state;
     const nextNotification = cloneDeep(notification);
@@ -107,6 +108,7 @@ class EventNotificationFormContainer extends React.Component<
   handleSubmit = () => {
     const { action, embedded, onSubmit, history } = this.props;
     const { notification } = this.state;
+    const currentUser = CurrentUserStore.getInitialState();
 
     this.setState({ isDirty: false });
 
@@ -115,21 +117,25 @@ class EventNotificationFormContainer extends React.Component<
     if (action === 'create') {
       promise = EventNotificationsActions.create(notification);
 
-      promise.then(
-        () => {
-          if (!embedded) {
-            history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
-          }
-        },
-        (errorResponse) => {
-          const { body } = errorResponse.additional;
+      promise
+        .then(() => {
+          CurrentUserStore.update(currentUser.currentUser.username);
+        })
+        .then(
+          () => {
+            if (!embedded) {
+              history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
+            }
+          },
+          (errorResponse) => {
+            const { body } = errorResponse.additional;
 
-          if (errorResponse.status === 400 && body && body.failed) {
-            this.setState({ validation: body });
-            EventNotificationFormContainer.scrollToFirstError();
-          }
-        },
-      );
+            if (errorResponse.status === 400 && body && body.failed) {
+              this.setState({ validation: body });
+              EventNotificationFormContainer.scrollToFirstError();
+            }
+          },
+        );
     } else {
       promise = EventNotificationsActions.update(notification.id, notification);
 

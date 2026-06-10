@@ -1,0 +1,5 @@
+type = "f"
+message = 'Place new widgets at bottom of grid.'
+
+issues = ["Graylog2/graylog-plugin-enterprise#4233"]
+pulls = ["23487"]

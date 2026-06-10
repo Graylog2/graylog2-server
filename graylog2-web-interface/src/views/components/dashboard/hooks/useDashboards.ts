@@ -23,6 +23,8 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
 import { defaultOnError } from 'util/conditional/onError';
+import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
+import type { SearchParamsForDashboards } from 'views/components/dashboard/SearchParamsForDashboards';
 
 const INITIAL_DATA = {
   pagination: { total: 0 },
@@ -44,15 +46,12 @@ type Options = {
   enabled?: boolean;
 };
 
-type SearchParamsForDashboards = SearchParams & {
-  scope: 'read' | 'update';
-};
-
 export const fetchDashboards = (searchParams: SearchParamsForDashboards) => {
   const url = PaginationURL(dashboardsUrl, searchParams.page, searchParams.pageSize, searchParams.query, {
     sort: searchParams.sort.attributeId,
     order: searchParams.sort.direction,
     scope: searchParams.scope,
+    filters: FiltersForQueryParams(searchParams.filters),
   });
 
   return fetch<PaginatedDashboardsResponse>('GET', qualifyUrl(url)).then(

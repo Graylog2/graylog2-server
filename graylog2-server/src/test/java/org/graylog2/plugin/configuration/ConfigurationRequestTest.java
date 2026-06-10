@@ -19,15 +19,15 @@ package org.graylog2.plugin.configuration;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.TextField;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConfigurationRequestTest {
     private ConfigurationRequest configurationRequest;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         configurationRequest = new ConfigurationRequest();
     }

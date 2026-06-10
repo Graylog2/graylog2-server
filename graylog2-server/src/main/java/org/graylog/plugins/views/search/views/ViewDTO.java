@@ -24,7 +24,6 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.MutableGraph;
 import jakarta.validation.constraints.NotBlank;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
@@ -32,7 +31,8 @@ import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.ViewStateEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.DbEntity;
-import org.graylog2.database.MongoEntity;
+import org.graylog2.database.entities.SourcedMongoEntity;
+import org.graylog2.database.entities.source.EntitySource;
 import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -48,16 +48,28 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.graylog.plugins.views.search.views.ViewDTO.FIELD_CREATED_AT;
+import static org.graylog.plugins.views.search.views.ViewDTO.FIELD_DESCRIPTION;
+import static org.graylog.plugins.views.search.views.ViewDTO.FIELD_LAST_UPDATED_AT;
+import static org.graylog.plugins.views.search.views.ViewDTO.FIELD_OWNER;
+import static org.graylog.plugins.views.search.views.ViewDTO.FIELD_SEARCH_ID;
+import static org.graylog.plugins.views.search.views.ViewDTO.FIELD_SUMMARY;
+import static org.graylog.plugins.views.search.views.ViewDTO.FIELD_TITLE;
+import static org.graylog.plugins.views.search.views.ViewDTO.FIELD_TYPE;
+import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
+
 @AutoValue
 @JsonDeserialize(builder = ViewDTO.Builder.class)
-@WithBeanGetter
 /* We do store both saved searches and dashboards in a single collection. Therefore we cannot use the `@DbEntity`-annotation
    on this collection if we just want to retrieve one of them. To enable this for dashboards, a view is created, matching
    only documents which have the corresponding type.
  */
-@DbEntity(collection = "dashboards", readPermission = RestPermissions.DASHBOARDS_READ)
-public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, ViewLike, MongoEntity {
+@DbEntity(collection = "dashboards", readPermission = RestPermissions.DASHBOARDS_READ,
+          readableFields = {ID_FIELD, FIELD_TITLE, FIELD_SUMMARY, FIELD_DESCRIPTION, FIELD_TYPE,
+                  FIELD_OWNER, FIELD_CREATED_AT, FIELD_LAST_UPDATED_AT, FIELD_SEARCH_ID})
+public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, ViewLike, SourcedMongoEntity<ViewDTO, ViewDTO.Builder> {
     public static final String COLLECTION_NAME = "views";
+
     public enum Type {
         SEARCH,
         DASHBOARD
@@ -77,7 +89,7 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
     public static final String FIELD_OWNER = "owner";
     public static final String FIELD_FAVORITE = "favorite";
 
-    public static final ImmutableSet<String> SORT_FIELDS = ImmutableSet.of(FIELD_ID, FIELD_TITLE, FIELD_CREATED_AT, FIELD_LAST_UPDATED_AT, FIELD_OWNER, FIELD_DESCRIPTION, FIELD_SUMMARY);
+    public static final ImmutableSet<String> SORT_FIELDS = ImmutableSet.of(FIELD_ID, FIELD_TITLE, FIELD_CREATED_AT, FIELD_LAST_UPDATED_AT, FIELD_OWNER, FIELD_DESCRIPTION, FIELD_SUMMARY, FIELD_FAVORITE);
     public static final ImmutableSet<String> STRING_SORT_FIELDS = ImmutableSet.of(FIELD_TITLE, FIELD_OWNER, FIELD_DESCRIPTION, FIELD_SUMMARY);
     public static final String SECONDARY_SORT = FIELD_TITLE;
 
@@ -183,11 +195,14 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
     }
 
     @AutoValue.Builder
-    public static abstract class Builder {
+    public static abstract class Builder implements SourcedMongoEntity.Builder<ViewDTO, Builder> {
         @ObjectId
         @Id
         @JsonProperty(FIELD_ID)
         public abstract Builder id(String id);
+
+        @JsonProperty(FIELD_ENTITY_SOURCE)
+        public abstract Builder entitySource(Optional<EntitySource> source);
 
         @JsonProperty(FIELD_TYPE)
         public abstract Builder type(Type type);

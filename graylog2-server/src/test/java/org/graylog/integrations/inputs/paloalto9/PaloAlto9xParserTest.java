@@ -21,12 +21,14 @@ import com.google.common.collect.ImmutableMap;
 import org.graylog.integrations.inputs.paloalto.PaloAltoMessageType;
 import org.graylog.integrations.inputs.paloalto.PaloAltoTypeParser;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.List;
 
@@ -40,10 +42,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class PaloAlto9xParserTest {
     private static final ImmutableList<String> TEST_FIELD_LIST = ImmutableList.of("Foo", "Bar", "Baz");
-    private static final ImmutableMap<String,Object> TEST_FIELD_MAP = ImmutableMap.of("field_one", "value_one",
+    private static final ImmutableMap<String, Object> TEST_FIELD_MAP = ImmutableMap.of("field_one", "value_one",
             "field_two", "value_two",
             "field_three", Long.valueOf(3L));
 
@@ -51,15 +54,24 @@ public class PaloAlto9xParserTest {
     PaloAlto9xParser cut;
 
     // Mock Objects
-    @Mock PaloAltoTypeParser mockConfigParser;
-    @Mock PaloAltoTypeParser mockCorrelationParser;
-    @Mock PaloAltoTypeParser mockGlobalProtectPre913Parser;
-    @Mock PaloAltoTypeParser mockGlobalProtect913Parser;
-    @Mock PaloAltoTypeParser mockHipParser;
-    @Mock PaloAltoTypeParser mockSystemParser;
-    @Mock PaloAltoTypeParser mockThreatParser;
-    @Mock PaloAltoTypeParser mockTrafficParser;
-    @Mock PaloAltoTypeParser mockUserIdParser;
+    @Mock
+    PaloAltoTypeParser mockConfigParser;
+    @Mock
+    PaloAltoTypeParser mockCorrelationParser;
+    @Mock
+    PaloAltoTypeParser mockGlobalProtectPre913Parser;
+    @Mock
+    PaloAltoTypeParser mockGlobalProtect913Parser;
+    @Mock
+    PaloAltoTypeParser mockHipParser;
+    @Mock
+    PaloAltoTypeParser mockSystemParser;
+    @Mock
+    PaloAltoTypeParser mockThreatParser;
+    @Mock
+    PaloAltoTypeParser mockTrafficParser;
+    @Mock
+    PaloAltoTypeParser mockUserIdParser;
 
     // Test Objects
     PaloAltoMessageType inputMessageType;
@@ -67,7 +79,7 @@ public class PaloAlto9xParserTest {
     ImmutableMap<String, Object> outputFields;
 
     // Set Up
-    @Before
+    @BeforeEach
     public void setUp() {
         cut = new PaloAlto9xParser(mockConfigParser,
                 mockCorrelationParser,

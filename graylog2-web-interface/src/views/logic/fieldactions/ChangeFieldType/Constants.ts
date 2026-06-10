@@ -17,10 +17,12 @@
 
 import type { Sort } from 'stores/PaginationTypes';
 
-export const ENTITY_TABLE_ID = 'field-type';
+export const COLUMN_ORDER = ['index_set_title', 'stream_titles', 'types'];
+
 export const DEFAULT_LAYOUT = {
-  pageSize: 20,
-  sort: { attributeId: 'index_set_title', direction: 'asc' } as Sort,
-  displayedColumns: ['index_set_title', 'stream_titles', 'types'],
-  columnsOrder: ['index_set_title', 'stream_titles', 'types'],
+  entityTableId: 'field-type',
+  defaultPageSize: 20,
+  defaultSort: { attributeId: 'index_set_title', direction: 'asc' } as Sort,
+  defaultDisplayedAttributes: ['index_set_title', 'stream_titles', 'types'],
+  defaultColumnOrder: ['index_set_title', 'stream_titles', 'types'],
 };

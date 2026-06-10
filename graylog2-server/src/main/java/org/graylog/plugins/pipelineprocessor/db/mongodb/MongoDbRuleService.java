@@ -53,7 +53,7 @@ import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory
 public class MongoDbRuleService implements RuleService {
     private static final RateLimitedLog log = createDefaultRateLimitedLog(MongoDbRuleService.class);
 
-    private static final String COLLECTION = "pipeline_processor_rules";
+    public static final String COLLECTION = "pipeline_processor_rules";
 
     private final MongoCollection<RuleDao> collection;
     private final ClusterEventBus clusterBus;

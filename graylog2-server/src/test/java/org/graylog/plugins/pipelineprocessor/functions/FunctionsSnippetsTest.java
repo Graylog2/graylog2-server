@@ -30,6 +30,7 @@ import org.graylog.plugins.pipelineprocessor.BaseParserTest;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.functions.arrays.ArrayContains;
 import org.graylog.plugins.pipelineprocessor.functions.arrays.ArrayRemove;
 import org.graylog.plugins.pipelineprocessor.functions.arrays.StringArrayAdd;
@@ -45,10 +46,12 @@ import org.graylog.plugins.pipelineprocessor.functions.conversion.IsLong;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsMap;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsNumber;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsString;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.ListConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.MapConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.dates.DateConversion;
+import org.graylog.plugins.pipelineprocessor.functions.dates.DateDiff;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FlexParseDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FormatDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.IsDate;
@@ -118,6 +121,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveMultipleFi
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveSingleField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveStringFieldsByValue;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RenameField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RenameFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetFields;
@@ -150,7 +154,6 @@ import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogLevelConvers
 import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogPriorityConversion;
 import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogPriorityToStringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.urls.IsUrl;
-import org.graylog.plugins.pipelineprocessor.functions.urls.URL;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlConversion;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlDecode;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlEncode;
@@ -179,6 +182,7 @@ import org.joda.time.Period;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
@@ -236,6 +240,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(LongConversion.NAME, new LongConversion());
         functions.put(StringConversion.NAME, new StringConversion());
         functions.put(MapConversion.NAME, new MapConversion());
+        functions.put(ListConversion.NAME, new ListConversion());
         functions.put(HexToDecimalConversion.NAME, new HexToDecimalConversion());
 
         // message related functions
@@ -243,6 +248,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(SetField.NAME, new SetField());
         functions.put(SetFields.NAME, new SetFields());
         functions.put(RenameField.NAME, new RenameField());
+        functions.put(RenameFields.NAME, new RenameFields());
         functions.put(RemoveField.NAME, new RemoveField());
         functions.put(RemoveSingleField.NAME, new RemoveSingleField());
         functions.put(RemoveMultipleFields.NAME, new RemoveMultipleFields());
@@ -316,6 +322,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(ParseDate.NAME, new ParseDate());
         functions.put(ParseUnixMilliseconds.NAME, new ParseUnixMilliseconds());
         functions.put(FormatDate.NAME, new FormatDate());
+        functions.put(DateDiff.NAME, new DateDiff());
 
         functions.put(Years.NAME, new Years());
         functions.put(Months.NAME, new Months());
@@ -572,6 +579,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(evaluatedMessage.getField("array")).isEqualTo(Arrays.asList(1, 2, 3));
         assertThat(evaluatedMessage.getField("store")).isInstanceOf(Map.class);
         assertThat(evaluatedMessage.getField("expensive")).isEqualTo(10);
+        assertThat(evaluatedMessage.getField("escaped")).isEqualTo("a \t +");
     }
 
     @Test
@@ -860,6 +868,33 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
+    void shouldNotCopyIdFieldWhenCloningMessage() {
+        final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
+        message.addField("foo", "bar");
+
+        final Message clonedMessage = spy(messageFactory.createMessage("test", "test", Tools.nowUTC()));
+        final MessageFactory messageFactoryMock = mock(MessageFactory.class);
+        when(messageFactoryMock.createMessage(anyString(), anyString(), any(DateTime.class))).thenReturn(clonedMessage);
+
+        final CloneMessage cloneMessageFunction = new CloneMessage(messageFactoryMock);
+        final EvaluationContext context = new EvaluationContext(message);
+        final FunctionArgs args = new FunctionArgs(cloneMessageFunction, Collections.emptyMap());
+
+        final Message evaluatedClone = cloneMessageFunction.evaluate(args, context);
+
+        assertThat(evaluatedClone).isSameAs(clonedMessage);
+
+        final ArgumentCaptor<Map<String, Object>> fieldsCaptor = ArgumentCaptor.forClass(Map.class);
+        verify(clonedMessage).addFields(fieldsCaptor.capture());
+        assertThat(fieldsCaptor.getValue()).doesNotContainKey(Message.FIELD_ID);
+
+        assertThat(clonedMessage.getFieldAs(String.class, "foo")).isEqualTo("bar");
+        assertThat(clonedMessage.getFieldAs(String.class, Message.FIELD_ID))
+                .isNotEqualTo(message.getFieldAs(String.class, Message.FIELD_ID));
+        assertThat(context.createdMessages()).contains(clonedMessage);
+    }
+
+    @Test
     void grok() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         final Message message = evaluateRule(rule);
@@ -1028,6 +1063,28 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
+    void renameFields() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+
+        final Message in = messageFactory.createMessage("bulk rename", "bulk-source", Tools.nowUTC());
+        in.addField("old_field_one", "value-1");
+        in.addField("old_field_two", 42);
+        in.addField("present", "value");
+        in.addField("unchanged_field", "still-here");
+
+        final Message message = evaluateRule(rule, in);
+
+        assertThat(message.hasField("old_field_one")).isFalse();
+        assertThat(message.hasField("old_field_two")).isFalse();
+        assertThat(message.getField("new_field_one")).isEqualTo("value-1");
+        assertThat(message.getField("new_field_two")).isEqualTo(42);
+        assertThat(message.getField("unchanged_field")).isEqualTo("still-here");
+        assertThat(message.hasField("present")).isFalse();
+        assertThat(message.getField("renamed")).isEqualTo("value");
+        assertThat(message.hasField("ignored_new_name")).isFalse();
+    }
+
+    @Test
     void normalizeFields() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
 
@@ -1149,6 +1206,11 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("map_6")).isEqualTo(Collections.emptyMap());
         assertThat(message.getField("map_default_null")).isNull();
         assertThat(message.getField("map_default_null_set_single_field")).isNull();
+
+        assertThat(message.getField("list_1")).isEqualTo(List.of("foo"));
+        assertThat(message.getField("list_2")).isEqualTo(Collections.emptyList());
+        assertThat(message.getField("list_3")).isEqualTo(Collections.emptyList());
+        assertThat(message.getField("list_default_null_set_single_field")).isNull();
     }
 
     @Test
@@ -1273,6 +1335,140 @@ public class FunctionsSnippetsTest extends BaseParserTest {
             assertThat(message.getFieldAs(DateTime.class, "long_time_ago")).matches(date -> date.plus(Period.years(10000)).equals(GRAYLOG_EPOCH));
 
             assertThat(message.getTimestamp()).isEqualTo(GRAYLOG_EPOCH.plusHours(1));
+        } finally {
+            DateTimeUtils.setCurrentMillisSystem();
+        }
+    }
+
+    @Test
+    void dateDiff() {
+        final InstantMillisProvider clock = new InstantMillisProvider(GRAYLOG_EPOCH);
+        DateTimeUtils.setCurrentMillisProvider(clock);
+        try {
+            final Rule rule = parser.parseRule(ruleForTest(), true);
+            final Message message = evaluateRule(rule);
+
+            assertThat(message).isNotNull();
+
+            // 2-day positive interval covers every numeric unit + direction + friendly
+            assertThat(message.getField("pos_millis")).isEqualTo(172_800_000L);
+            assertThat(message.getField("pos_seconds")).isEqualTo(172_800L);
+            assertThat(message.getField("pos_minutes")).isEqualTo(2_880L);
+            assertThat(message.getField("pos_hours")).isEqualTo(48L);
+            assertThat(message.getField("pos_days")).isEqualTo(2L);
+            assertThat(message.getField("pos_weeks")).isEqualTo(0L);
+            assertThat(message.getField("pos_direction")).isEqualTo("ahead");
+            assertThat(message.getField("pos_friendly")).isEqualTo("2 days");
+
+            // Swapping args gives a signed result + "behind" direction
+            assertThat(message.getField("neg_millis")).isEqualTo(-172_800_000L);
+            assertThat(message.getField("neg_direction")).isEqualTo("behind");
+
+            // absolute=true strips sign from numeric values but preserves direction
+            assertThat(message.getField("abs_millis")).isEqualTo(172_800_000L);
+            assertThat(message.getField("abs_direction")).isEqualTo("behind");
+
+            // Equal instants
+            assertThat(message.getField("eq_direction")).isEqualTo("equal");
+            assertThat(message.getField("eq_friendly")).isEqualTo("0 ms");
+
+            // Friendly behaviors: multi-component, sub-second remainder, suppression at ≥ 1 minute
+            assertThat(message.getField("mixed_friendly")).isEqualTo("1 week 1 day 3 hours 15 minutes");
+            assertThat(message.getField("sub_friendly")).isEqualTo("1 second 500 ms");
+            assertThat(message.getField("over_minute_friendly")).isEqualTo("1 minute");
+
+            // Half-away-from-zero rounding (1m30s sits exactly on the boundary → 2 minutes)
+            assertThat(message.getField("rnd_minutes")).isEqualTo(2L);
+
+            // Realistic flow via to_date($message.timestamp); clock pins it at GRAYLOG_EPOCH
+            assertThat(message.getField("session_minutes")).isEqualTo(30L);
+        } finally {
+            DateTimeUtils.setCurrentMillisSystem();
+        }
+    }
+
+    @Test
+    void dateDiffPrExamples() {
+        final InstantMillisProvider clock = new InstantMillisProvider(DateTime.parse("2025-05-27T14:00:00.000Z"));
+        DateTimeUtils.setCurrentMillisProvider(clock);
+        try {
+            // Example 1: VPN session duration
+            final String vpnRule =
+                    "rule \"vpn session duration\"\n" +
+                    "when\n" +
+                    "    has_field(\"acct_session_start\")\n" +
+                    "then\n" +
+                    "    let start_dt = parse_date(value: to_string($message.acct_session_start),\n" +
+                    "                              pattern: \"yyyy-MM-dd'T'HH:mm:ss.SSSZ\");\n" +
+                    "    let end_dt   = to_date($message.timestamp);\n" +
+                    "\n" +
+                    "    let session = date_diff(start_dt, end_dt);\n" +
+                    "    set_field(\"session_seconds\", session.seconds);\n" +
+                    "    set_field(\"session_minutes\", session.minutes);\n" +
+                    "    set_field(\"session_hours\",   session.hours);\n" +
+                    "end";
+            final Rule vpn = parser.parseRule(vpnRule, true);
+            final Message vpnMsg = evaluateRule(vpn, msg -> msg.addField("acct_session_start", "2025-05-27T13:42:10.000+0000"));
+            assertThat(vpnMsg).isNotNull();
+            // 17m 50s elapsed = 1070s; minutes rounds to 18 (half-away-from-zero), hours rounds to 0
+            assertThat(vpnMsg.getField("session_seconds")).isEqualTo(1070L);
+            assertThat(vpnMsg.getField("session_minutes")).isEqualTo(18L);
+            assertThat(vpnMsg.getField("session_hours")).isEqualTo(0L);
+
+            // Example 2: Account age at login
+            final String ageRule =
+                    "rule \"tag new account logins\"\n" +
+                    "when\n" +
+                    "    has_field(\"event_type\") && to_string($message.event_type) == \"user_login\"\n" +
+                    "then\n" +
+                    "    let created = parse_date(value: to_string($message.user_created),\n" +
+                    "                             pattern: \"MM/dd/yyyy\");\n" +
+                    "    let age = date_diff(left: created, right: now(), absolute: true);\n" +
+                    "\n" +
+                    "    set_field(\"account_age_days\", age.days);\n" +
+                    "    set_field(\"account_is_new\",   to_long(age.days) < 7);\n" +
+                    "end";
+            final Rule ageR = parser.parseRule(ageRule, true);
+            final Message ageMsgFresh = evaluateRule(ageR, msg -> {
+                msg.addField("event_type", "user_login");
+                // 05/25/2025 parses to midnight UTC; now is 2025-05-27T14:00Z = 62h elapsed,
+                // which rounds to 3 days (half-away-from-zero).
+                msg.addField("user_created", "05/25/2025");
+            });
+            assertThat(ageMsgFresh).isNotNull();
+            assertThat(ageMsgFresh.getField("account_age_days")).isEqualTo(3L);
+            assertThat(ageMsgFresh.getField("account_is_new")).isEqualTo(true);
+
+            final Message ageMsgOld = evaluateRule(ageR, msg -> {
+                msg.addField("event_type", "user_login");
+                msg.addField("user_created", "03/15/2024");
+            });
+            assertThat(ageMsgOld).isNotNull();
+            assertThat(ageMsgOld.getField("account_is_new")).isEqualTo(false);
+
+            // Example 3: HTTP request latency
+            final String latencyRule =
+                    "rule \"http latency\"\n" +
+                    "when\n" +
+                    "    has_field(\"request_received_at\") && has_field(\"response_sent_at\")\n" +
+                    "then\n" +
+                    "    let req = parse_date(value: to_string($message.request_received_at),\n" +
+                    "                         pattern: \"yyyy-MM-dd'T'HH:mm:ss.SSSZ\");\n" +
+                    "    let res = parse_date(value: to_string($message.response_sent_at),\n" +
+                    "                         pattern: \"yyyy-MM-dd'T'HH:mm:ss.SSSZ\");\n" +
+                    "\n" +
+                    "    let latency = date_diff(req, res);\n" +
+                    "    set_field(\"latency_ms\",      latency.millis);\n" +
+                    "    set_field(\"latency_seconds\", latency.seconds);\n" +
+                    "end";
+            final Rule lat = parser.parseRule(latencyRule, true);
+            final Message latMsg = evaluateRule(lat, msg -> {
+                msg.addField("request_received_at", "2025-05-27T13:59:59.750+0000");
+                msg.addField("response_sent_at",    "2025-05-27T14:00:00.123+0000");
+            });
+            assertThat(latMsg).isNotNull();
+            assertThat(latMsg.getField("latency_ms")).isEqualTo(373L);
+            assertThat(latMsg.getField("latency_seconds")).isEqualTo(0L);
         } finally {
             DateTimeUtils.setCurrentMillisSystem();
         }
@@ -1751,6 +1947,24 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("k4")).isEqualTo("v4");
         assertThat(message.getField("k_5")).isEqualTo("v_5");
         assertThat(message.getField("k_6")).isEqualTo("will be added with clean_fields param");
+    }
+
+    @Test
+    void setFieldsWithTimestamp() {
+        // Reproduces https://github.com/Graylog2/graylog2-server/issues/26025: key_value decodes a log line that
+        // contains a "timestamp" key in ISO-8601 format, and set_fields assigns it. This must not be counted as a
+        // processing failure, and the parsed timestamp must be used.
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = messageFactory.createMessage(
+                "device_name=\"SFW\" timestamp=\"2026-05-18T08:57:55+0200\" src_ip=\"192.168.0.222\"",
+                "test", Tools.nowUTC());
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("device_name")).isEqualTo("SFW");
+        assertThat(message.getField("src_ip")).isEqualTo("192.168.0.222");
+        // +0200 means the instant is 06:57:55 UTC; getTimestamp() triggers the lenient conversion
+        assertThat(message.getTimestamp()).isEqualTo(new DateTime(2026, 5, 18, 6, 57, 55, DateTimeZone.UTC));
+        assertThat(message.processingErrors()).isEmpty();
     }
 
     @Test

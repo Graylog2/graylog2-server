@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.resources.entities.EntityAttribute;
@@ -31,7 +30,6 @@ import java.util.List;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class PageListResponse<T> {
 
     public static final String ELEMENTS_FIELD_NAME = "elements";

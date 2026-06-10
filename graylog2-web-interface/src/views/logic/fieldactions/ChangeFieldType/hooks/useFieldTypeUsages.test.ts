@@ -78,7 +78,7 @@ const renderUseFieldTypeUsagesHook = () =>
   renderHook(() =>
     useFieldTypeUsages(
       { streams: ['001'], field: 'field' },
-      { page: 1, pageSize: 10, sort: { attributeId: 'index_set_title', direction: 'asc' } },
+      { page: 1, pageSize: 10, sort: { attributeId: 'index_set_title', direction: 'asc' }, query: undefined },
     ),
   );
 

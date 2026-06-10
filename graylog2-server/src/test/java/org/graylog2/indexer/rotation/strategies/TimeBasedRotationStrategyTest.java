@@ -19,7 +19,7 @@ package org.graylog2.indexer.rotation.strategies;
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.configuration.ElasticsearchConfiguration;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.rotation.common.IndexRotator;
@@ -30,23 +30,25 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Period;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.joda.time.Period.hours;
 import static org.joda.time.Period.minutes;
 import static org.joda.time.Period.seconds;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -56,13 +58,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class TimeBasedRotationStrategyTest {
     public static final String IGNORED = "ignored";
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
     private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
     @Mock
     private IndexSet indexSet;
@@ -76,7 +75,7 @@ public class TimeBasedRotationStrategyTest {
     private ElasticsearchConfiguration configuration = new ElasticsearchConfiguration();
     private TimeBasedRotationStrategy rotationStrategy;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         when(indexSetConfig.id()).thenReturn("index-set-id");
         when(indexSetConfig.title()).thenReturn("index-set-title");
@@ -86,7 +85,7 @@ public class TimeBasedRotationStrategyTest {
         rotationStrategy = new TimeBasedRotationStrategy(indices, configuration, new IndexRotator(indices, auditEventSender, nodeId));
     }
 
-    @After
+    @AfterEach
     public void resetTimeProvider() {
         DateTimeUtils.setCurrentMillisSystem();
     }
@@ -262,25 +261,25 @@ public class TimeBasedRotationStrategyTest {
     }
 
     @Test
-    public void shouldRotateThrowsNPEIfIndexSetConfigIsNull() throws Exception {
+    public void shouldRotateThrowsNPEIfIndexSetConfigIsNull() {
         when(indexSet.getConfig()).thenReturn(null);
         when(indexSet.getNewestIndex()).thenReturn(IGNORED);
 
-        expectedException.expect(NullPointerException.class);
-        expectedException.expectMessage("Index set configuration must not be null");
+        Throwable exception = assertThrows(NullPointerException.class, () ->
 
-        rotationStrategy.rotate(indexSet);
+            rotationStrategy.rotate(indexSet));
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Index set configuration must not be null"));
     }
 
     @Test
-    public void shouldRotateThrowsISEIfIndexIsNull() throws Exception {
+    public void shouldRotateThrowsISEIfIndexIsNull() {
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSet.getNewestIndex()).thenReturn(null);
 
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("Index name must not be null or empty");
+        Throwable exception = assertThrows(IllegalStateException.class, () ->
 
-        rotationStrategy.rotate(indexSet);
+            rotationStrategy.rotate(indexSet));
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Index name must not be null or empty"));
     }
 
     @Test
@@ -288,10 +287,10 @@ public class TimeBasedRotationStrategyTest {
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSet.getNewestIndex()).thenReturn("");
 
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("Index name must not be null or empty");
+        Throwable exception = assertThrows(IllegalStateException.class, () ->
 
-        rotationStrategy.rotate(indexSet);
+            rotationStrategy.rotate(indexSet));
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Index name must not be null or empty"));
     }
 
     @Test
@@ -300,10 +299,10 @@ public class TimeBasedRotationStrategyTest {
         when(indexSetConfig.id()).thenReturn(null);
         when(indexSet.getNewestIndex()).thenReturn(IGNORED);
 
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("Index set ID must not be null or empty");
+        Throwable exception = assertThrows(IllegalStateException.class, () ->
 
-        rotationStrategy.rotate(indexSet);
+            rotationStrategy.rotate(indexSet));
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Index set ID must not be null or empty"));
     }
 
     @Test
@@ -312,10 +311,10 @@ public class TimeBasedRotationStrategyTest {
         when(indexSetConfig.id()).thenReturn("");
         when(indexSet.getNewestIndex()).thenReturn(IGNORED);
 
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("Index set ID must not be null or empty");
+        Throwable exception = assertThrows(IllegalStateException.class, () ->
 
-        rotationStrategy.rotate(indexSet);
+            rotationStrategy.rotate(indexSet));
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Index set ID must not be null or empty"));
     }
 
     @Test
@@ -324,10 +323,10 @@ public class TimeBasedRotationStrategyTest {
         when(indexSet.getNewestIndex()).thenReturn(IGNORED);
         when(indexSetConfig.rotationStrategyConfig()).thenReturn(MessageCountRotationStrategyConfig.createDefault());
 
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("Invalid rotation strategy config");
+        Throwable exception = assertThrows(IllegalStateException.class, () ->
 
-        rotationStrategy.rotate(indexSet);
+            rotationStrategy.rotate(indexSet));
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Invalid rotation strategy config"));
     }
 
     @Test

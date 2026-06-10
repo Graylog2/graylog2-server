@@ -31,6 +31,7 @@ import { selectSearchTypesToSearch } from 'views/logic/slices/searchExecutionSel
 import useAppSelector from 'stores/useAppSelector';
 import useView from 'views/hooks/useView';
 import { setSearchTypesToSearch } from 'views/logic/slices/searchExecutionSlice';
+import { setNewWidget } from 'views/logic/slices/widgetsSlice';
 
 import type { FocusContextState } from './WidgetFocusContext';
 import WidgetFocusContext from './WidgetFocusContext';
@@ -171,6 +172,7 @@ const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React
     }),
     [params.editing, params.focusing, params.focusedId, params.page, activeQuery],
   );
+  const dispatch = useViewsDispatch();
 
   useSyncStateWithQueryParams({ focusedWidget, setFocusedWidget, widgetIds, focusUriParams });
 
@@ -197,7 +199,12 @@ const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React
     [updateFocusQueryParams],
   );
 
-  const unsetWidgetFocusing = useCallback(() => updateFocusQueryParams(undefined), [updateFocusQueryParams]);
+  const unsetWidgetFocusing = useCallback(() => {
+    if (focusUriParams.id) {
+      dispatch(setNewWidget(focusUriParams.id));
+    }
+    updateFocusQueryParams(undefined);
+  }, [dispatch, focusUriParams.id, updateFocusQueryParams]);
 
   const setWidgetEditing = useCallback(
     (widgetId: string) => {
@@ -210,15 +217,16 @@ const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React
     [focusUriParams.focusing, updateFocusQueryParams],
   );
 
-  const unsetWidgetEditing = useCallback(
-    () =>
-      updateFocusQueryParams({
-        id: focusUriParams.focusing && focusUriParams.id ? (focusUriParams.id as string) : undefined,
-        editing: false,
-        focusing: focusUriParams.focusing,
-      }),
-    [focusUriParams.focusing, focusUriParams.id, updateFocusQueryParams],
-  );
+  const unsetWidgetEditing = useCallback(() => {
+    if (!focusUriParams.focusing && focusUriParams.id) {
+      dispatch(setNewWidget(focusUriParams.id));
+    }
+    updateFocusQueryParams({
+      id: focusUriParams.focusing && focusUriParams.id ? (focusUriParams.id as string) : undefined,
+      editing: false,
+      focusing: focusUriParams.focusing,
+    });
+  }, [dispatch, focusUriParams.focusing, focusUriParams.id, updateFocusQueryParams]);
 
   const widgetFocusContextValue = useMemo(
     () => ({

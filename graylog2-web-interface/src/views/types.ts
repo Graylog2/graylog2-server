@@ -18,6 +18,7 @@
 import type React from 'react';
 import type * as Immutable from 'immutable';
 import type { FormikErrors } from 'formik';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import type { ExportPayload } from 'util/MessagesExportUtils';
 import type { IconName } from 'components/common/Icon';
@@ -39,6 +40,7 @@ import type {
   WidgetConfigFormValues,
 } from 'views/components/aggregationwizard';
 import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
+import type Query from 'views/logic/queries/Query';
 import type { TimeRange, NoTimeRangeOverride, AbsoluteTimeRange, QueryId } from 'views/logic/queries/Query';
 import type View from 'views/logic/views/View';
 import type User from 'logic/users/User';
@@ -47,7 +49,6 @@ import type { ValuePath } from 'views/logic/valueactions/ValueActionHandler';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import type { ValidationExplanations } from 'views/components/searchbar/queryvalidation/types';
-import type Query from 'views/logic/queries/Query';
 import type { CustomCommand, CustomCommandContext } from 'views/components/searchbar/queryinput/types';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type { ParameterBindings } from 'views/logic/search/SearchExecutionState';
@@ -64,6 +65,9 @@ import type { PluggableReducer } from 'store';
 import type { WidgetMapping } from 'views/logic/views/types';
 import type { ValueRendererProps } from 'views/components/messagelist/decoration/ValueRenderer';
 import type { EntityPermissionsMapper } from 'logic/permissions/EntityPermissionsMapper';
+import type { WidgetsState } from 'views/logic/slices/widgetsSlice';
+import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
+import type { DEFAULT_AXIS_KEY } from 'views/components/visualizations/Constants';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType
@@ -130,8 +134,9 @@ type BaseField = {
   title: string;
   name: string;
   helpComponent?: React.ComponentType;
+  inputHelp?: (formValues: VisualizationConfigFormValues, widgetConfigFormValues: WidgetConfigFormValues) => string;
   description?: string;
-  isShown?: (formValues: VisualizationConfigFormValues) => boolean;
+  isShown?: (formValues: VisualizationConfigFormValues, widgetConfigFormValues?: WidgetConfigFormValues) => boolean;
 };
 
 type BaseRequiredField = BaseField & {
@@ -157,7 +162,25 @@ export type NumericField = BaseRequiredField & {
   step?: string;
 };
 
-export type ConfigurationField = SelectField | BooleanField | NumericField | MultiSelectField;
+export type TextField = BaseField & {
+  type: 'text';
+};
+
+export type CustomField = BaseField & {
+  type: 'custom';
+  id: string;
+  component: React.ComponentType<CustomFieldComponentProps>;
+};
+
+export type CustomFieldComponentProps = {
+  field: CustomField;
+  name: string;
+  title: React.ReactElement;
+  id: string;
+  inputHelp?: string;
+};
+
+export type ConfigurationField = SelectField | BooleanField | NumericField | MultiSelectField | TextField | CustomField;
 
 export interface VisualizationCapabilities {
   'event-annotations': undefined;
@@ -217,7 +240,19 @@ export interface SystemConfiguration {
   displayName?: string;
   component: React.ComponentType<SystemConfigurationComponentProps>;
   useCondition?: () => boolean;
-  readPermission?: string; // the '?' should be removed once all plugins have a permission config set to enforce it for future plugins right from the beginning
+  readPermission?: Permission; // the '?' should be removed once all plugins have a permission config set to enforce it for future plugins right from the beginning
+}
+
+export interface CoreSystemConfiguration {
+  name: string;
+  SectionComponent: React.ComponentType;
+  permissions?: Array<Permission>;
+  showCaret?: boolean;
+  catchAll?: boolean;
+  props?: {
+    ConfigurationComponent: React.ComponentType;
+    title: string;
+  };
 }
 
 export type GenericResult = {
@@ -247,7 +282,14 @@ export interface ActionContexts {
   isLocalNode: boolean;
   parameters?: Immutable.Set<Parameter>;
   parameterBindings?: ParameterBindings;
+  fieldTypes?: FieldTypeMappingsList;
+  toggleFavoriteField?: (field: string) => void;
+  favoriteFields?: Array<string>;
 }
+
+export type AdditionalViewsActionHandlerArguments = {
+  queryId: QueryId;
+};
 
 export type SearchTypeResult = SearchTypeResultTypes[keyof SearchTypeResultTypes];
 export type SearchTypeResults = { [id: string]: SearchTypeResult };
@@ -319,16 +361,20 @@ type AssetInformationComponentProps = {
 };
 
 type EventProcedureFormProps = {
-  eventProcedureID: string | undefined;
-  remediationSteps: string;
-  onClose: () => void;
-  onSave: (eventProcedureId: string) => void;
+  eventProcedureId: string | undefined;
+  remediationSteps?: string;
+  onClose?: () => void;
+  onSave?: (eventProcedureId: string) => void;
+  onRemove?: (eventProcedureId: string) => void;
 };
 
 type EventProcedureSummaryProps = {
-  eventDefinitionEventProcedure: string | undefined;
+  eventProcedureId: string;
   eventId?: string;
-  event?: Event;
+  canEdit?: boolean;
+  onRemove?: () => void;
+  onEdit?: () => void;
+  row?: boolean;
 };
 
 type SearchAction = {
@@ -384,11 +430,20 @@ export type EventActionComponentProps<T = unknown> = {
   events: Array<Event>;
   modalRef: () => T;
   fromBulk?: boolean;
+  onEventCallback?: () => void;
 };
 
 type MessageActionComponentProps = {
   index: string;
   id: string;
+};
+
+export type MessageBulkActionsComponentProps<T = unknown> = {
+  modalRef: () => T;
+};
+
+export type MessageBulkActionsModalProps<T = unknown> = {
+  ref: React.LegacyRef<T>;
 };
 
 type SearchActionComponentProps = {
@@ -409,8 +464,10 @@ interface MessageRowOverrideProps {
 
 export interface CombinedSearchBarFormValues {
   timerange?: TimeRange | NoTimeRangeOverride;
-  streams?: Array<string>;
-  streamCategories?: Array<string>;
+  streamsAndCategories?: {
+    streams: Array<string>;
+    categories?: Array<string>;
+  };
   queryString?: string;
 }
 
@@ -458,9 +515,15 @@ export type SaveViewControls = {
   onDashboardDuplication?: (view: View, userPermissions: Immutable.List<string>) => Promise<View>;
 };
 
-export type CustomCommandContextProvider<T extends keyof CustomCommandContext> = {
+export type CustomCommandArgument<T> = {
+  values: T;
+  submitForm: () => void;
+  setFieldValue: <F extends keyof T>(field: F, newValue: T[F]) => void;
+};
+
+export type CustomCommandContextProvider<T extends keyof CustomCommandContext, S> = {
   key: T;
-  provider: () => CustomCommandContext[T];
+  provider: (formik: CustomCommandArgument<S>) => CustomCommandContext[T];
 };
 
 export type CurrentViewType = {
@@ -498,6 +561,7 @@ export interface RootState {
   searchExecution: SearchExecution;
   searchMetadata: SearchMetadataState;
   undoRedo: UndoRedoState;
+  widgets: WidgetsState;
 }
 
 export interface ExtraArguments {
@@ -519,7 +583,9 @@ export interface WidgetCreator {
   icon: React.ComponentType<{}>;
 }
 
-export type FieldUnitType = 'size' | 'time' | 'percent';
+export type FieldUnitType = 'size' | 'time' | 'percent' | 'binary_size';
+
+export type DefaultAxisKey = typeof DEFAULT_AXIS_KEY;
 
 export type FieldUnitsFormValues = Record<string, { abbrev: string; unitType: FieldUnitType }>;
 
@@ -562,20 +628,43 @@ type MarkdownAugmentation = {
   component: React.ComponentType<{ value: string }>;
 };
 
+export type EventReplaySideBarDetailsProps = {
+  alertId: string;
+  definitionId?: string;
+};
+
+export type EventDefinitionSideBarDetailsProps = {
+  definitionId: string;
+};
+
+export type EventReplaySideBarPlugin = {
+  component: React.ComponentType<EventReplaySideBarDetailsProps>;
+  eventDefinitionComponent?: React.ComponentType<EventDefinitionSideBarDetailsProps>;
+  key: string;
+  useCondition?: () => boolean;
+};
+
+export type SidebarComponentPlugin = {
+  key: string;
+  component: React.ComponentType<any>;
+};
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
+    'sidebar.components'?: Array<SidebarComponentPlugin>;
     creators?: Array<Creator>;
     enterpriseWidgets?: Array<WidgetExport>;
     useExternalActions?: Array<() => ExternalActionsHookData>;
-    fieldActions?: Array<ActionDefinition>;
+    fieldActions?: Array<ActionDefinition<AdditionalViewsActionHandlerArguments>>;
     fieldTypeValueRenderer?: Array<{
       type: string;
       render: (value: unknown, field: string, render: React.ComponentType<ValueRendererProps>) => React.ReactNode;
     }>;
     messageAugmentations?: Array<MessageAugmentation>;
     searchTypes?: Array<SearchType<any, any>>;
+    coreSystemConfigurations?: Array<CoreSystemConfiguration>;
     systemConfigurations?: Array<SystemConfiguration>;
-    valueActions?: Array<ActionDefinition>;
+    valueActions?: Array<ActionDefinition<AdditionalViewsActionHandlerArguments>>;
     'views.completers'?: Array<Completer>;
     'views.components.assetInformationActions'?: Array<AssetInformation>;
     'views.components.eventProcedureForm'?: Array<EventProcedureForm>;
@@ -583,6 +672,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.components.securityEventsPage'?: Array<SecurityEventsPage>;
     'views.components.dashboardActions'?: Array<DashboardAction<unknown>>;
     'views.components.eventActions'?: Array<EventAction<unknown>>;
+    'views.components.eventReplay.sideBarDetails'?: EventReplaySideBarPlugin;
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
     'views.components.widgets.messageTable.messageRowOverride'?: Array<React.ComponentType<MessageRowOverrideProps>>;
     'views.components.widgets.messageDetails.contextProviders'?: Array<
@@ -591,6 +681,12 @@ declare module 'graylog-web-plugin/plugin' {
     'views.components.widgets.messageTable.contextProviders'?: Array<React.ComponentType<React.PropsWithChildren<{}>>>;
     'views.components.widgets.messageTable.messageActions'?: Array<{
       component: React.ComponentType<MessageActionComponentProps>;
+      key: string;
+      useCondition: () => boolean;
+    }>;
+    'views.components.widgets.messageTable.messageBulkActions'?: Array<{
+      component: React.ComponentType<MessageBulkActionsComponentProps<unknown>>;
+      modal?: React.ComponentType<MessageBulkActionsModalProps<unknown>>;
       key: string;
       useCondition: () => boolean;
     }>;
@@ -627,7 +723,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.reducers'?: Array<ViewsReducer>;
     'views.requires.provided'?: Array<string>;
     'views.queryInput.commands'?: Array<CustomCommand>;
-    'views.queryInput.commandContextProviders'?: Array<CustomCommandContextProvider<any>>;
+    'views.queryInput.commandContextProviders'?: Array<CustomCommandContextProvider<any, any>>;
     visualizationTypes?: Array<VisualizationType<any>>;
     widgetCreators?: Array<WidgetCreator>;
     'licenseCheck'?: Array<LicenseCheck>;

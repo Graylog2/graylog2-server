@@ -45,7 +45,7 @@ class SearchRequestFactoryTest {
 
     @BeforeEach
     void setUp() {
-        this.searchRequestFactory = new SearchRequestFactory(new SortOrderMapper(), true, true,
+        this.searchRequestFactory = new SearchRequestFactory(true, true,
                 new TestSearchFilterMapper());
     }
 

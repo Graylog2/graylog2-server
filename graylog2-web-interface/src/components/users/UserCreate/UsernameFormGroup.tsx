@@ -14,12 +14,48 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import React from 'react';
+import { useFormikContext } from 'formik';
 
+import { Users } from '@graylog/server-api';
+
+import debounceWithPromise from 'views/logic/debounceWithPromise';
 import { FormikFormGroup } from 'components/common';
 
-const UsernameFormGroup = () => (
-  <FormikFormGroup label="Username" name="username" required help="Select a unique user name used to log in with." />
-);
+type UsernameData = {
+  username: string;
+  available: boolean;
+};
+
+const debounceTimeoutMs = 600;
+
+const validateUsername = async (value: string | undefined) => {
+  if (!value) {
+    return Promise.resolve('');
+  }
+
+  return Users.checkUsernameAvailability(value).then((response: UsernameData) => {
+    if (response.available) return '';
+
+    return 'Username is already taken';
+  });
+};
+
+const debouncedValidateUsername = debounceWithPromise(validateUsername, debounceTimeoutMs);
+
+const UsernameFormGroup = () => {
+  const { setFieldTouched } = useFormikContext();
+
+  return (
+    <FormikFormGroup
+      label="Username"
+      name="username"
+      required
+      help="Select a unique user name used to log in with."
+      validate={debouncedValidateUsername}
+      onChange={() => setFieldTouched('username')}
+    />
+  );
+};
 
 export default UsernameFormGroup;

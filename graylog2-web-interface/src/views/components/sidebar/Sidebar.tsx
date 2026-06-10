@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import chroma from 'chroma-js';
 import styled, { css } from 'styled-components';
 
@@ -24,9 +24,8 @@ import type { SearchPreferencesLayout } from 'views/components/contexts/SearchPa
 import SearchPagePreferencesContext from 'views/components/contexts/SearchPagePreferencesContext';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 import zIndices from 'theme/z-indices';
+import type { LayoutSidebarTitle } from 'views/components/contexts/SearchPageLayoutContext';
 
 import SidebarNavigation from './SidebarNavigation';
 import ContentColumn from './ContentColumn';
@@ -40,10 +39,12 @@ type Props = {
   children?: React.ReactElement;
   enableSidebarPinning?: boolean;
   forceSideBarPinned?: boolean;
+  initialSectionCollapsed?: boolean;
   results?: QueryResult;
-  searchPageLayout?: SearchPreferencesLayout;
+  searchPreferencesLayout?: SearchPreferencesLayout;
   sections?: Array<SidebarSection>;
-  title: string;
+  title: LayoutSidebarTitle;
+  contentColumnWidth?: number;
 };
 
 const Container = styled.div`
@@ -86,27 +87,27 @@ const _selectSidebarSection = (sectionKey, activeSectionKey, setActiveSectionKey
 };
 
 const Sidebar = ({
-  searchPageLayout = undefined,
+  searchPreferencesLayout = undefined,
   results = undefined,
   children = undefined,
   title,
   sections = sidebarSections,
   actions = sidebarActions,
   forceSideBarPinned = false,
+  initialSectionCollapsed = false,
   enableSidebarPinning = true,
+  contentColumnWidth = 275,
 }: Props) => {
   const sendTelemetry = useSendTelemetry();
-  const location = useLocation();
-  const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned || forceSideBarPinned;
+  const sidebarIsPinned = searchPreferencesLayout?.config.sidebar.isPinned || forceSideBarPinned;
   const initialSectionKey = sections[0].key;
   const [activeSectionKey, setActiveSectionKey] = useState<string | undefined>(
-    searchPageLayout?.config.sidebar.isPinned ? initialSectionKey : null,
+    sidebarIsPinned && !initialSectionCollapsed ? initialSectionKey : null,
   );
   const activeSection = sections.find((section) => section.key === activeSectionKey);
 
   const toggleSidebar = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_SIDEBAR_TOGGLE, {
-      app_pathname: getPathnameWithoutId(location.pathname),
       app_action_value: 'search_sidebar',
       initialSectionKey,
       activeSectionKey,
@@ -133,9 +134,10 @@ const Sidebar = ({
           closeSidebar={toggleSidebar}
           title={title}
           enableSidebarPinning={enableSidebarPinning}
-          searchPageLayout={searchPageLayout}
+          searchPreferencesLayout={searchPreferencesLayout}
           sectionTitle={activeSection.title}
-          forceSideBarPinned={forceSideBarPinned}>
+          forceSideBarPinned={forceSideBarPinned}
+          width={contentColumnWidth}>
           <SectionContent
             results={results}
             sidebarChildren={children}
@@ -149,14 +151,14 @@ const Sidebar = ({
   );
 };
 
-const SidebarWithContext = ({ children = undefined, ...props }: React.ComponentProps<typeof Sidebar>) => (
-  <SearchPagePreferencesContext.Consumer>
-    {(searchPageLayout) => (
-      <Sidebar {...props} searchPageLayout={searchPageLayout}>
-        {children}
-      </Sidebar>
-    )}
-  </SearchPagePreferencesContext.Consumer>
-);
+const SidebarWithContext = ({ children = undefined, ...props }: React.ComponentProps<typeof Sidebar>) => {
+  const searchPreferencesLayout = useContext(SearchPagePreferencesContext);
+
+  return (
+    <Sidebar {...props} searchPreferencesLayout={searchPreferencesLayout}>
+      {children}
+    </Sidebar>
+  );
+};
 
 export default SidebarWithContext;

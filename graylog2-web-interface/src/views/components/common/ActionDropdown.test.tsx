@@ -19,6 +19,7 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import { MenuItem } from 'components/bootstrap';
+import suppressConsole from 'helpers/suppressConsole';
 
 import ActionDropdown from './ActionDropdown';
 
@@ -43,7 +44,7 @@ describe('ActionDropdown', () => {
     const onClick = jest.fn((e) => e.persist());
 
     render(
-      <button type="button" onClick={onClick}>
+      <button type="button" aria-label="Wrapper" onClick={onClick}>
         <ActionDropdown element={<div className="my-trigger-element">Trigger!</div>}>
           <MenuItem>Foo</MenuItem>
         </ActionDropdown>
@@ -54,7 +55,10 @@ describe('ActionDropdown', () => {
 
     expect(screen.queryByText('Foo')).not.toBeInTheDocument();
 
-    await userEvent.click(triggerButton);
+    // Disabling HTML validation error for this line due to nesting buttons within each other
+    await suppressConsole(async () => {
+      await userEvent.click(triggerButton);
+    });
 
     await screen.findByRole('menuitem', { name: 'Foo' });
 
@@ -118,7 +122,7 @@ describe('ActionDropdown', () => {
     const onSelect = jest.fn();
 
     render(
-      <button type="button" onClick={onClick}>
+      <button type="button" aria-label="Wrapper" onClick={onClick}>
         <ActionDropdown element={<div>Trigger!</div>}>
           <MenuItem onSelect={onSelect}>Foo</MenuItem>
         </ActionDropdown>

@@ -22,6 +22,7 @@ import TelemetryContext from 'logic/telemetry/TelemetryContext';
 import useSendTelemetry from './useSendTelemetry';
 
 jest.mock('util/AppConfig');
+jest.mock('routing/useLocation', () => () => ({ pathname: '/foo' }));
 
 const contextValue = {
   sendTelemetry: jest.fn(),
@@ -32,19 +33,9 @@ const DummyTelemetryContext = ({ children = undefined }: React.PropsWithChildren
 );
 
 describe('useSendTelemetry', () => {
-  const setLocation = (pathname: string) =>
-    Object.defineProperty(window, 'location', {
-      value: {
-        pathname,
-      },
-      writable: true,
-    });
-
-  const oldLocation = window.location.pathname;
-
-  afterEach(() => {
-    window.location.pathname = oldLocation;
-  });
+  const setLocation = (pathname: string) => {
+    window.history.pushState({}, '', pathname);
+  };
 
   it('should return `sendTelemetry` that retrieves current route', () => {
     setLocation('/welcome');
@@ -58,6 +49,7 @@ describe('useSendTelemetry', () => {
 
     expect(contextValue.sendTelemetry).toHaveBeenCalledWith('$pageview', {
       app_path_pattern: undefined,
+      app_pathname: 'foo',
       app_section: 'welcome section',
     });
   });

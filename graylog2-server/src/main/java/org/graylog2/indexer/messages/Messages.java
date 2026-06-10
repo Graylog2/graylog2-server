@@ -123,7 +123,7 @@ public class Messages {
         }
 
         final List<IndexingRequest> indexingRequestList = messageList.stream()
-                .map(entry -> IndexingRequest.create(entry.indexSet(), entry.message()))
+                .map(entry -> IndexingRequest.create(entry.writeIndex(), entry.message()))
                 .collect(Collectors.toList());
 
         return bulkIndexRequests(indexingRequestList, isSystemTraffic, indexingListener);
@@ -237,10 +237,18 @@ public class Messages {
                 .mapToLong(Indexable::getSize)
                 .sum();
 
+        final long totalInputSizeOfIndexedMessages = requests.stream()
+                .map(IndexingSuccess::message)
+                .filter(ImmutableMessage.class::isInstance)
+                .map(ImmutableMessage.class::cast)
+                .mapToLong(ImmutableMessage::getInputMessageSize)
+                .sum();
+
         if (isSystemTraffic) {
             trafficAccounting.addSystemTraffic(totalSizeOfIndexedMessages);
         } else {
             trafficAccounting.addOutputTraffic(totalSizeOfIndexedMessages);
+            trafficAccounting.addIndexedInputTraffic(totalInputSizeOfIndexedMessages);
         }
     }
 

@@ -35,6 +35,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.health.ClusterHealthStatus;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
+import org.graylog2.indexer.indices.HealthStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +68,7 @@ public class DatanodeUpgradeServiceAdapterOS2 implements DatanodeUpgradeServiceA
         final String shardReplication = queryShardReplication();
         final ManagerNode managerNode = managerNode();
         return new ClusterState(
-                response.getStatus().name(),
+                HealthStatus.fromString(response.getStatus().name()),
                 response.getClusterName(),
                 response.getNumberOfNodes(),
                 response.getActiveShards(),
@@ -86,20 +87,20 @@ public class DatanodeUpgradeServiceAdapterOS2 implements DatanodeUpgradeServiceA
     }
 
     @Override
-    public void disableShardReplication() {
+    public FlushResponse disableShardReplication() {
         LOG.info("Disabling shard replication for opensearch cluster");
         final ClusterHealthStatus clusterHealthStatus = getClusterHealthResponse().getStatus();
         if (clusterHealthStatus == ClusterHealthStatus.GREEN) {
-            configureShardReplication(REPLICATION_PRIMARIES);
+            return configureShardReplication(REPLICATION_PRIMARIES);
         } else {
             throw new IllegalStateException("Can't disable shard replication, cluster is not in healthy state. Current state: " + clusterHealthStatus);
         }
     }
 
     @Override
-    public void enableShardReplication() {
+    public FlushResponse enableShardReplication() {
         LOG.info("Enabling shard replication for opensearch cluster");
-        configureShardReplication(REPLICATION_ALL);
+        return configureShardReplication(REPLICATION_ALL);
     }
 
     private String queryShardReplication() {
@@ -110,7 +111,7 @@ public class DatanodeUpgradeServiceAdapterOS2 implements DatanodeUpgradeServiceA
         });
     }
 
-    private void configureShardReplication(String primaries) {
+    private FlushResponse configureShardReplication(String primaries) {
         final ClusterUpdateSettingsRequest request = new ClusterUpdateSettingsRequest().persistentSettings(Settings.builder()
                 .put("cluster.routing.allocation.enable", primaries).build());
         final ClusterUpdateSettingsResponse result = client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.cluster().putSettings(request, requestOptions));
@@ -118,10 +119,10 @@ public class DatanodeUpgradeServiceAdapterOS2 implements DatanodeUpgradeServiceA
         if (!value.equals(primaries)) {
             throw new IllegalStateException("Failed to disable shard replication. Current cluster.routing.allocation.enable: " + value);
         }
+        return flush();
     }
 
-    @Override
-    public FlushResponse flush() {
+    private FlushResponse flush() {
         LOG.info("Flushing opensearch nodes, storing all in-memory operations to segments on disk");
         final Response response = client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.getLowLevelClient().performRequest(new Request("POST", "_flush")));
         try {

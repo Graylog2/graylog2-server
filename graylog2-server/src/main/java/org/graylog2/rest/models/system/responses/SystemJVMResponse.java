@@ -20,27 +20,31 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import java.util.Map;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 public abstract class SystemJVMResponse {
-    @JsonProperty
+    @JsonProperty("free_memory")
     public abstract Map<String, Long> freeMemory();
-    @JsonProperty
+
+    @JsonProperty("max_memory")
     public abstract Map<String, Long> maxMemory();
-    @JsonProperty
+
+    @JsonProperty("total_memory")
     public abstract Map<String, Long> totalMemory();
-    @JsonProperty
+
+    @JsonProperty("used_memory")
     public abstract Map<String, Long> usedMemory();
-    @JsonProperty
+
+    @JsonProperty("node_id")
     public abstract String nodeId();
-    @JsonProperty
+
+    @JsonProperty("pid")
     public abstract String pid();
-    @JsonProperty
+
+    @JsonProperty("info")
     public abstract String info();
 
     @JsonCreator

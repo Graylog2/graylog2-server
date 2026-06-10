@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.elasticsearch7.testing;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.rholder.retry.Retryer;
@@ -52,14 +51,9 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetInd
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetMappingsRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetMappingsResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.IndexTemplateMetadata;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutComposableIndexTemplateRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutIndexTemplateRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.health.ClusterHealthStatus;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.ComposableIndexTemplate;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.compress.CompressedXContent;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.settings.Settings;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.XContentType;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHit;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -67,12 +61,10 @@ import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.testing.elasticsearch.BulkIndexRequest;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.IndexState;
-import org.graylog2.indexer.indices.Template;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -199,77 +191,6 @@ public class ClientES7 implements Client {
         );
     }
 
-    private boolean composableTemplateExists(String templateName) {
-        var request = new GetComposableIndexTemplateRequest("*");
-        var result = client.execute((c, requestOptions) -> c.indices().getIndexTemplate(request, requestOptions));
-        return result.getIndexTemplates()
-                .keySet()
-                .stream()
-                .anyMatch(indexTemplate -> indexTemplate.equals(templateName));
-    }
-
-    private boolean legacyTemplateExists(String templateName) {
-        var request = new GetIndexTemplatesRequest("*");
-        var result = client.execute((c, requestOptions) -> c.indices().getIndexTemplate(request, requestOptions));
-        return result.getIndexTemplates()
-                .stream()
-                .anyMatch(indexTemplate -> indexTemplate.name().equals(templateName));
-    }
-
-    @Override
-    public boolean templateExists(String templateName) {
-        return featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE) ? composableTemplateExists(templateName) : legacyTemplateExists(templateName);
-    }
-
-    private void putComposableTemplate(String templateName, Template template) {
-        var serializedMapping = serialize(template.mappings());
-        var settings = Settings.builder().loadFromSource(serializeJson(template.settings()), XContentType.JSON).build();
-        var esTemplate = new org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.Template(settings, serializedMapping, null);
-        var indexTemplate = new ComposableIndexTemplate(template.indexPatterns(), esTemplate, null, template.order(), null, null);
-        var request = new PutComposableIndexTemplateRequest()
-                .name(templateName)
-                .indexTemplate(indexTemplate);
-        client.execute((c, requestOptions) -> c.indices().putIndexTemplate(request, requestOptions),
-                "Unable to put template " + templateName);
-    }
-
-    private void putLegacyTemplate(String templateName, Template template) {
-        var source = Map.of(
-                "index_patterns", template.indexPatterns(),
-                "mappings", template.mappings(),
-                "settings", template.settings(),
-                "order", template.order()
-        );
-        var request = new PutIndexTemplateRequest(templateName).source(source);
-        client.execute((c, requestOptions) -> c.indices().putTemplate(request, requestOptions),
-                "Unable to put template " + templateName);
-    }
-
-    @Override
-    public void putTemplate(String templateName, Template template) {
-        if (featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE)) {
-            putComposableTemplate(templateName, template);
-        } else {
-            putLegacyTemplate(templateName, template);
-        }
-    }
-
-    private String serializeJson(Object obj) {
-        try {
-            return objectMapper.writeValueAsString(obj);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private CompressedXContent serialize(Object obj) {
-        try {
-            return new CompressedXContent(serializeJson(obj));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private void deleteComposableTemplates(String... templates) {
         for (String template : templates) {
             var deleteIndexTemplateRequest = new DeleteComposableIndexTemplateRequest(template);
@@ -284,8 +205,7 @@ public class ClientES7 implements Client {
         }
     }
 
-    @Override
-    public void deleteTemplates(String... templates) {
+    private void deleteTemplates(String... templates) {
         if (featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE)) {
             deleteComposableTemplates(templates);
         } else {
@@ -409,7 +329,11 @@ public class ClientES7 implements Client {
     }
 
     @Override
-    public void updateMapping(String index, Map<String, Object> mapping) {
+    public void updateMappingMeta(String index, String key, Object value) {
+        updateMapping(index, Map.of("_meta", Map.of(key, value)));
+    }
+
+    private void updateMapping(String index, Map<String, Object> mapping) {
         final PutMappingRequest request = new PutMappingRequest(index)
                 .source(mapping);
 
@@ -418,13 +342,18 @@ public class ClientES7 implements Client {
     }
 
     @Override
-    public Map<String, Object> getMapping(String index) {
+    public <T> T getMappingMetaValue(String index, String key, Class<T> type) {
         final GetMappingsRequest request = new GetMappingsRequest().indices(index);
 
         final GetMappingsResponse result = client.execute((c, requestOptions) -> c.indices().getMapping(request, requestOptions),
                 "Couldn't read mapping of index " + index);
+        final Map<String, Object> indexMapping = result.mappings().get(index).getSourceAsMap();
 
-        return result.mappings().get(index).sourceAsMap();
+        //noinspection unchecked
+        return (T) Optional.ofNullable(indexMapping.get("_meta"))
+                .map(o -> (Map<String, Object>) o)
+                .map(meta -> meta.get(key))
+                .orElse(null);
     }
 
     private void waitForResult(Callable<Boolean> task) {

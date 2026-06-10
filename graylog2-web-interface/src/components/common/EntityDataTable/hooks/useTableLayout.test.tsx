@@ -38,11 +38,12 @@ jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 jest.mock('util/UserNotification', () => ({ error: jest.fn() }));
 jest.mock('./useUserLayoutPreferences');
 
-describe('useUserSearchFilterQuery hook', () => {
+describe('useTableLayout hook', () => {
   const defaultLayout = {
     defaultSort: { attributeId: 'description', direction: 'asc' } as const,
     defaultPageSize: 20,
     defaultDisplayedAttributes: ['title'],
+    defaultColumnOrder: ['title'],
   };
 
   afterEach(() => {
@@ -60,9 +61,11 @@ describe('useUserSearchFilterQuery hook', () => {
     );
 
     expect(result.current.layoutConfig).toEqual({
-      displayedAttributes: layoutPreferences.displayedAttributes,
+      attributes: layoutPreferences.attributes,
+      order: undefined,
       sort: layoutPreferences.sort,
       pageSize: layoutPreferences.perPage,
+      slicing: undefined,
     });
   });
 
@@ -79,9 +82,63 @@ describe('useUserSearchFilterQuery hook', () => {
     );
 
     expect(result.current.layoutConfig).toEqual({
-      displayedAttributes: defaultLayout.defaultDisplayedAttributes,
+      attributes: undefined,
+      order: undefined,
       sort: defaultLayout.defaultSort,
       pageSize: defaultLayout.defaultPageSize,
+      slicing: undefined,
+    });
+  });
+
+  it('should provide default slicing preferences when there are no user slicing preferences', async () => {
+    const defaultSlicing = { sliceColumn: 'status', sortBy: 'risk_score', order: 'desc' as const };
+
+    asMock(useUserLayoutPreferences).mockReturnValue({ data: undefined, isInitialLoading: false, refetch: () => {} });
+
+    const { result } = renderHook(
+      () =>
+        useTableLayout({
+          entityTableId: 'streams',
+          ...defaultLayout,
+          defaultSlicing,
+        }),
+      { wrapper },
+    );
+
+    expect(result.current.layoutConfig).toEqual({
+      attributes: undefined,
+      order: undefined,
+      sort: defaultLayout.defaultSort,
+      pageSize: defaultLayout.defaultPageSize,
+      slicing: defaultSlicing,
+    });
+  });
+
+  it('should allow user preferences to disable default slicing', async () => {
+    const defaultSlicing = { sliceColumn: 'status', sortBy: 'risk_score', order: 'desc' as const };
+
+    asMock(useUserLayoutPreferences).mockReturnValue({
+      data: { slicing: null },
+      isInitialLoading: false,
+      refetch: () => {},
+    });
+
+    const { result } = renderHook(
+      () =>
+        useTableLayout({
+          entityTableId: 'streams',
+          ...defaultLayout,
+          defaultSlicing,
+        }),
+      { wrapper },
+    );
+
+    expect(result.current.layoutConfig).toEqual({
+      attributes: undefined,
+      order: undefined,
+      sort: defaultLayout.defaultSort,
+      pageSize: defaultLayout.defaultPageSize,
+      slicing: undefined,
     });
   });
 
@@ -101,9 +158,37 @@ describe('useUserSearchFilterQuery hook', () => {
     );
 
     expect(result.current.layoutConfig).toEqual({
-      displayedAttributes: defaultLayout.defaultDisplayedAttributes,
+      attributes: undefined,
+      order: undefined,
       sort: defaultLayout.defaultSort,
       pageSize: layoutPreferences.perPage,
+      slicing: undefined,
+    });
+  });
+
+  it('should provide slicing preferences', async () => {
+    const slicing = { sliceColumn: 'status', sortBy: 'risk_score', order: 'desc' as const };
+
+    asMock(useUserLayoutPreferences).mockReturnValue({
+      data: { slicing },
+      isInitialLoading: false,
+      refetch: () => {},
+    });
+    const { result } = renderHook(
+      () =>
+        useTableLayout({
+          entityTableId: 'streams',
+          ...defaultLayout,
+        }),
+      { wrapper },
+    );
+
+    expect(result.current.layoutConfig).toEqual({
+      attributes: undefined,
+      order: undefined,
+      sort: defaultLayout.defaultSort,
+      pageSize: defaultLayout.defaultPageSize,
+      slicing,
     });
   });
 });

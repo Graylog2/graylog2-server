@@ -20,8 +20,7 @@ import com.google.common.collect.ImmutableList;
 import org.glassfish.grizzly.http.server.Request;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.utilities.IpSubnet;
-import org.junit.Test;
-
+import org.junit.jupiter.api.Test;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 

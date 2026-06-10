@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
-import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
@@ -33,7 +32,6 @@ import org.graylog.plugins.views.search.rest.scriptingapi.response.decorators.Fi
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
-import org.graylog2.shared.utilities.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +57,7 @@ public class MessagesTabularResponseCreator implements TabularResponseCreator {
 
     public TabularResponse mapToResponse(final MessagesRequestSpec messagesRequestSpec,
                                          final SearchJob searchJob,
-                                         final SearchUser searchUser, Subject subject) throws QueryFailedException {
+                                         final SearchUser searchUser) throws QueryFailedException {
         final SearchJobDTO searchJobDTO = SearchJobDTO.fromSearchJob(searchJob);
         final QueryResult queryResult = searchJobDTO.results().get(SearchRequestSpecToSearchMapper.QUERY_ID);
 

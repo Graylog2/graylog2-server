@@ -16,9 +16,10 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, screen, waitFor, waitForElementToBeRemoved } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { defaultUser } from 'defaultMockValues';
+import { useFormikContext } from 'formik';
 
 import { asMock } from 'helpers/mocking';
 import { adminUser } from 'fixtures/users';
@@ -26,7 +27,6 @@ import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import type { ViewLoaderContextType } from 'views/logic/ViewLoaderContext';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import type { NewViewLoaderContextType } from 'views/logic/NewViewLoaderContext';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import * as ViewsPermissions from 'views/Permissions';
@@ -44,9 +44,14 @@ import HotkeysProvider from 'contexts/HotkeysProvider';
 import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
 import { createEntityShareState } from 'fixtures/entityShareState';
 import { EntityShareStore } from 'stores/permissions/EntityShareStore';
+import { createView } from 'views/api/views';
 
 import SearchActionsMenu from './SearchActionsMenu';
 
+jest.mock('formik', () => ({
+  ...jest.requireActual('formik'),
+  useFormikContext: jest.fn(),
+}));
 jest.mock('views/hooks/useSaveViewFormControls');
 jest.mock('routing/useHistory');
 jest.mock('hooks/useCurrentUser');
@@ -64,10 +69,8 @@ jest.mock('stores/permissions/EntityShareStore', () => ({
   },
 }));
 
-jest.mock('views/stores/ViewManagementStore', () => ({
-  ViewManagementActions: {
-    create: jest.fn((v) => Promise.resolve(v)).mockName('create'),
-  },
+jest.mock('views/api/views', () => ({
+  createView: jest.fn((v) => Promise.resolve(v)).mockName('create'),
 }));
 
 jest.mock('views/hooks/useView');
@@ -84,7 +87,7 @@ jest.mock('views/logic/slices/viewSlice', () => {
 });
 
 describe('SearchActionsMenu', () => {
-  const createView = (id: string = undefined) =>
+  const _createView = (id: string = undefined) =>
     View.builder()
       .id(id)
       .title('title')
@@ -94,7 +97,7 @@ describe('SearchActionsMenu', () => {
       .owner('owningUser')
       .build();
 
-  const defaultView = createView();
+  const defaultView = _createView();
 
   type SimpleSearchActionsMenuProps = {
     loadNewView?: NewViewLoaderContextType;
@@ -130,6 +133,8 @@ describe('SearchActionsMenu', () => {
     asMock(useIsDirty).mockReturnValue(false);
     asMock(useIsNew).mockReturnValue(false);
     asMock(EntityShareStore.getInitialState).mockReturnValue({ state: createEntityShareState });
+    // @ts-expect-error context return type is not complete
+    asMock(useFormikContext).mockReturnValue({ dirty: false });
   });
 
   useViewsPlugin();
@@ -153,9 +158,9 @@ describe('SearchActionsMenu', () => {
       );
 
       render(<SimpleSearchActionsMenu />);
-      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
+      await userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
       const exportAsDashboardMenuItem = await screen.findByText('Export to dashboard');
-      userEvent.click(exportAsDashboardMenuItem);
+      await userEvent.click(exportAsDashboardMenuItem);
       await waitFor(() => expect(history.pushWithState).toHaveBeenCalledTimes(1));
 
       expect(history.pushWithState).toHaveBeenCalledWith('/dashboards/new', { view: defaultView });
@@ -165,7 +170,7 @@ describe('SearchActionsMenu', () => {
       asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().permissions(Immutable.List([])).build());
 
       render(<SimpleSearchActionsMenu />);
-      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
+      await userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
 
       await screen.findByText('Export');
 
@@ -174,10 +179,10 @@ describe('SearchActionsMenu', () => {
 
     it('should open file export modal', async () => {
       render(<SimpleSearchActionsMenu />);
-      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
+      await userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
 
       const exportMenuItem = await screen.findByText('Export');
-      userEvent.click(exportMenuItem);
+      await userEvent.click(exportMenuItem);
 
       await screen.findByText('Export all search results');
     });
@@ -190,11 +195,11 @@ describe('SearchActionsMenu', () => {
           .build(),
       );
 
-      asMock(useView).mockReturnValue(createView('some-id'));
+      asMock(useView).mockReturnValue(_createView('some-id'));
       render(<SimpleSearchActionsMenu />);
-      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
+      await userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
       const exportMenuItem = await screen.findByText('Edit metadata');
-      userEvent.click(exportMenuItem);
+      await userEvent.click(exportMenuItem);
 
       await screen.findByText('Editing saved search');
     });
@@ -204,11 +209,11 @@ describe('SearchActionsMenu', () => {
       const loadNewView = jest.fn(() => Promise.resolve());
 
       render(<SimpleSearchActionsMenu loadNewView={loadNewView} />);
-      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
+      await userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
 
       const resetSearch = await screen.findByText('Reset search');
 
-      userEvent.click(resetSearch);
+      await userEvent.click(resetSearch);
 
       await waitFor(() => {
         expect(loadNewView).toHaveBeenCalledTimes(1);
@@ -221,9 +226,9 @@ describe('SearchActionsMenu', () => {
 
       render(<SimpleSearchActionsMenu onLoadView={onLoadView} />);
 
-      userEvent.click(await screen.findByTitle('Save search'));
-      userEvent.type(await findTitleInput(), 'Test');
-      userEvent.click(await findCreateNewButton());
+      await userEvent.click(await screen.findByTitle('Save search'));
+      await userEvent.type(await findTitleInput(), 'Test');
+      await userEvent.click(await findCreateNewButton());
 
       await waitFor(() => expect(onLoadView).toHaveBeenCalledTimes(1));
     });
@@ -235,13 +240,13 @@ describe('SearchActionsMenu', () => {
 
       render(<SimpleSearchActionsMenu />);
 
-      userEvent.click(await screen.findByTitle('Saved search'));
-      userEvent.type(await findTitleInput(), ' and further title');
-      userEvent.click(await findCreateNewButton());
+      await userEvent.click(await screen.findByTitle('Saved search'));
+      await userEvent.type(await findTitleInput(), ' and further title');
+      await userEvent.click(await findCreateNewButton());
 
       const updatedView = defaultView.toBuilder().title('title and further title').id('new-search-id').build();
 
-      await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedView, null));
+      await waitFor(() => expect(createView).toHaveBeenCalledWith(updatedView, null, 'some-id-1'));
     });
 
     it('should extend a saved search with plugin data on duplication', async () => {
@@ -260,9 +265,9 @@ describe('SearchActionsMenu', () => {
 
       render(<SimpleSearchActionsMenu />);
 
-      userEvent.click(await screen.findByTitle('Saved search'));
-      userEvent.type(await findTitleInput(), ' and further title');
-      userEvent.click(await findCreateNewButton());
+      await userEvent.click(await screen.findByTitle('Saved search'));
+      await userEvent.type(await findTitleInput(), ' and further title');
+      await userEvent.click(await findCreateNewButton());
 
       const updatedView = defaultView
         .toBuilder()
@@ -271,16 +276,33 @@ describe('SearchActionsMenu', () => {
         .id('new-search-id')
         .build();
 
-      await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedView, null));
-      await waitForElementToBeRemoved(screen.queryByText('Pluggable component!'));
+      await waitFor(() => expect(createView).toHaveBeenCalledWith(updatedView, null, 'some-id-1'));
+
+      expect(screen.queryByText('Pluggable component!')).not.toBeInTheDocument();
     });
 
     it('should save search when pressing related keyboard shortcut', async () => {
-      asMock(useView).mockReturnValue(createView('some-id'));
+      asMock(useView).mockReturnValue(_createView('some-id'));
       render(<SimpleSearchActionsMenu />);
-      userEvent.keyboard('{Meta>}s{/Meta}');
+      await userEvent.keyboard('{Meta>}s{/Meta}');
 
       await waitFor(() => expect(OnSaveViewAction).toHaveBeenCalledTimes(1));
+    });
+
+    it('should preserve the original view title when saving via keyboard shortcut', async () => {
+      asMock(OnSaveViewAction).mockClear();
+      asMock(useView).mockReturnValue(_createView('some-id'));
+      asMock(useIsDirty).mockReturnValue(true);
+      render(<SimpleSearchActionsMenu />);
+      await userEvent.keyboard('{Meta>}s{/Meta}');
+
+      await waitFor(() => {
+        expect(OnSaveViewAction).toHaveBeenCalledTimes(1);
+
+        const savedView = asMock(OnSaveViewAction).mock.calls[0][0];
+
+        expect(savedView.title).toBe('title');
+      });
     });
 
     describe('has "Share" option', () => {

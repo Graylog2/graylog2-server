@@ -1,0 +1,5 @@
+type = "f"
+message = "Added missing Entity Collection Actions permissions"
+
+pulls = ["23808"]
+issues = ["graylog-plugin-enterprise#11966"]

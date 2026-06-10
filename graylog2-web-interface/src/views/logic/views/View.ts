@@ -21,9 +21,9 @@ import type Widget from 'views/logic/widgets/Widget';
 import defaultTitle from 'views/components/defaultTitle';
 import generateObjectId from 'logic/generateObjectId';
 
+import type { ViewStateJson } from './ViewState';
 import ViewState from './ViewState';
 import type { WidgetMapping } from './types';
-import type { ViewStateJson } from './ViewState';
 
 import type Search from '../search/Search';
 import type { SearchType as QuerySearchType } from '../queries/SearchType';
@@ -56,6 +56,13 @@ type InternalState = {
   requires: Requirements;
   favorite: boolean;
   lastUpdatedAt: Date;
+  entitySource?: EntitySource;
+};
+
+type EntitySource = {
+  source: string;
+  entityType: string;
+  parentId?: string;
 };
 
 export type ViewJson = {
@@ -72,6 +79,7 @@ export type ViewJson = {
   requires: Requirements;
   favorite: boolean;
   last_updated_at: string;
+  _entity_source?: string;
 };
 
 export default class View {
@@ -96,6 +104,7 @@ export default class View {
     requires: Requirements,
     favorite: boolean,
     lastUpdatedAt: Date,
+    entitySource: EntitySource,
   ) {
     this._value = {
       id,
@@ -111,6 +120,7 @@ export default class View {
       requires,
       favorite,
       lastUpdatedAt,
+      entitySource,
     };
   }
 
@@ -178,6 +188,10 @@ export default class View {
     return this._value.lastUpdatedAt;
   }
 
+  get entitySource(): EntitySource {
+    return this._value.entitySource;
+  }
+
   getSearchTypeByWidgetId(widgetId: string): QuerySearchType | undefined | null {
     const widgetMapping = this.state.map((state) => state.widgetMapping).flatten(true);
     const searchTypeId = widgetMapping.get(widgetId).first();
@@ -199,8 +213,22 @@ export default class View {
   }
 
   toBuilder(): Builder {
-    const { id, title, summary, description, search, properties, state, createdAt, owner, requires, type, favorite } =
-      this._value;
+    const {
+      id,
+      title,
+      summary,
+      description,
+      search,
+      properties,
+      state,
+      createdAt,
+      owner,
+      requires,
+      type,
+      favorite,
+      lastUpdatedAt,
+      entitySource,
+    } = this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(
@@ -217,6 +245,8 @@ export default class View {
         requires,
         type,
         favorite,
+        lastUpdatedAt,
+        entitySource,
       }),
     );
   }
@@ -252,10 +282,11 @@ export default class View {
       requires,
       favorite,
       last_updated_at,
+      _entity_source,
     } = value;
     const viewState: ViewStateMap = Immutable.Map(state).map(ViewState.fromJSON).toMap();
     const createdAtDate = new Date(created_at);
-    const lastUpdatedAtDate = new Date(last_updated_at);
+    const lastUpdatedAtDate = last_updated_at ? new Date(last_updated_at) : undefined;
 
     return View.create()
       .toBuilder()
@@ -271,6 +302,7 @@ export default class View {
       .requires(requires)
       .favorite(favorite)
       .lastUpdatedAt(lastUpdatedAtDate)
+      .entitySource(_entity_source)
       .build();
   }
 
@@ -337,6 +369,10 @@ class Builder {
     return new Builder(this.value.set('lastUpdatedAt', value));
   }
 
+  entitySource(value: string): Builder {
+    return new Builder(this.value.set('entitySource', value));
+  }
+
   owner(value: string): Builder {
     return new Builder(this.value.set('owner', value));
   }
@@ -364,6 +400,7 @@ class Builder {
       requires,
       favorite,
       lastUpdatedAt,
+      entitySource,
     } = this.value.toObject();
 
     return new View(
@@ -380,6 +417,7 @@ class Builder {
       requires,
       favorite,
       lastUpdatedAt,
+      entitySource,
     );
   }
 }

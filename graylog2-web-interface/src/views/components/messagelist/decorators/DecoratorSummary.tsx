@@ -17,7 +17,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { DropdownButton, MenuItem } from 'components/bootstrap';
+import { DropdownButton, MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import { ConfigurationForm, ConfigurationWell } from 'components/configurationforms';
 import type { Decorator } from 'views/logic/widgets/MessagesWidgetConfig';
 import type { DecoratorType } from 'views/components/messagelist/decorators/Types';
@@ -117,7 +117,7 @@ class DecoratorSummary extends React.Component<Props, State> {
         <DropdownButton id={`decorator-${decorator.id}-actions`} bsStyle="default" bsSize="xsmall" title="Actions">
           <MenuItem onSelect={this._handleEditClick}>Edit</MenuItem>
           <MenuItem divider />
-          <MenuItem onSelect={this._handleDeleteClick}>Delete</MenuItem>
+          <DeleteMenuItem onSelect={this._handleDeleteClick}>Delete</DeleteMenuItem>
         </DropdownButton>
       </SpacedActions>
     );

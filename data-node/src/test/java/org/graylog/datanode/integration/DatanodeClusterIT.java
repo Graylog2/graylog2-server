@@ -21,7 +21,6 @@ import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
 import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
-import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.restoperations.DatanodeOpensearchWait;
 import org.graylog.testing.restoperations.DatanodeRestApiWait;
@@ -31,7 +30,6 @@ import org.graylog.testing.restoperations.RestOperationParameters;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
@@ -50,7 +48,6 @@ import java.util.stream.Stream;
 import static org.graylog.datanode.testinfra.DatanodeContainerizedBackend.IMAGE_WORKING_DIR;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Disabled("see https://github.com/Graylog2/graylog2-server/issues/23270")
 public class DatanodeClusterIT {
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeClusterIT.class);
 
@@ -78,8 +75,7 @@ public class DatanodeClusterIT {
         final FilesystemKeystoreInformation httpNodeA = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeA);
 
         this.network = Network.newNetwork();
-        this.mongoDBTestService = MongoDBTestService.create(MongodbServer.DEFAULT_VERSION, network);
-        this.mongoDBTestService.start();
+        this.mongoDBTestService = MongoDBTestService.createStarted(network);
 
         nodeA = createDatanodeContainer(
                 network,
@@ -122,7 +118,7 @@ public class DatanodeClusterIT {
 
     @Test
     void testClusterFormation() throws ExecutionException, RetryException {
-        waitForNodesCount(2);
+        waitForGreenStatusAndNodesCount(2);
     }
 
     @Test
@@ -140,9 +136,27 @@ public class DatanodeClusterIT {
         );
 
         nodeC.start();
-        waitForNodesCount(3);
-        nodeC.stop();
-        waitForNodesCount(2);
+        waitForGreenStatusAndNodesCount(3);
+
+        final RestOperationParameters nodeCRestParameters = RestOperationParameters.builder()
+                .port(nodeC.getDatanodeRestPort())
+                .truststore(trustStore)
+                .jwtAuthToken(DatanodeContainerizedBackend.JWT_AUTH_TOKEN)
+                .build();
+
+        // Wait until nodeC is fully operational before triggering removal, so that the
+        // management API is reachable and the node is actually part of the cluster.
+        new DatanodeRestApiWait(nodeCRestParameters).waitForAvailableStatus();
+
+        // Use the datanode management API to decommission nodeC gracefully instead of
+        // hard-killing the container. A hard stop leaves shards unassigned and the cluster
+        // stays yellow/red while OpenSearch's delayed-allocation waits for the node to come
+        // back — that wait can exceed the retry budget and cause a spurious test failure.
+        // Graceful removal lets OpenSearch drain and reallocate shards before the node
+        // departs, so the cluster returns to green with 2 nodes within the normal timeout.
+        new DatanodeStatusChangeOperation(nodeCRestParameters).triggerNodeRemoval();
+
+        waitForGreenStatusAndNodesCount(2);
     }
 
     @Test
@@ -160,7 +174,7 @@ public class DatanodeClusterIT {
         );
 
         nodeC.start();
-        waitForNodesCount(3);
+        waitForGreenStatusAndNodesCount(3);
 
         OpensearchTestIndexCreation osIndexClient = new OpensearchTestIndexCreation(RestOperationParameters.builder()
                 .port(nodeA.getOpensearchRestPort())
@@ -192,7 +206,7 @@ public class DatanodeClusterIT {
 
 
         // check that primary shard node is gone and there are still a primary and a secondary
-        waitForNodesCount(replica.get(), 2);
+        waitForGreenStatusAndNodesCount(replica.get(), 2);
         osIndexClient = new OpensearchTestIndexCreation(RestOperationParameters.builder()
                 .port(replica.get().getOpensearchRestPort())
                 .truststore(trustStore)
@@ -244,18 +258,18 @@ public class DatanodeClusterIT {
     }
 
 
-    private void waitForNodesCount(final int countOfNodes) throws ExecutionException, RetryException {
-        waitForNodesCount(nodeA, countOfNodes);
+    private void waitForGreenStatusAndNodesCount(final int countOfNodes) throws ExecutionException, RetryException {
+        waitForGreenStatusAndNodesCount(nodeA, countOfNodes);
     }
 
-    private void waitForNodesCount(DatanodeContainerizedBackend node, final int countOfNodes) throws ExecutionException, RetryException {
+    private void waitForGreenStatusAndNodesCount(DatanodeContainerizedBackend node, final int countOfNodes) throws ExecutionException, RetryException {
         try {
             new DatanodeOpensearchWait(RestOperationParameters.builder()
                     .port(node.getOpensearchRestPort())
                     .truststore(trustStore)
                     .jwtAuthToken(DatanodeContainerizedBackend.JWT_AUTH_TOKEN)
                     .build())
-                    .waitForNodesCount(countOfNodes);
+                    .waitForGreenStatusAndNodesCount(countOfNodes);
 
         } catch (Exception retryException) {
             LOG.error("DataNode Container logs from node A follow:\n" + nodeA.getLogs());

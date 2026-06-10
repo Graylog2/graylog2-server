@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { type SyntheticEvent } from 'react';
+import type { SyntheticEvent } from 'react';
 
 import type { StepsType } from 'components/common/Wizard';
 import type { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
@@ -38,7 +38,7 @@ type FieldSpec = {
 type Notification = {
   type: string;
   notification_id: string;
-  notification_parameters: string;
+  notification_parameters: { type: string };
 };
 
 export type Scheduler = {
@@ -64,6 +64,7 @@ export type SearchFilter = {
   frontendId?: string;
   description?: string;
 };
+
 export type EventProcessorConfig = {
   type: string;
   query?: string;
@@ -71,7 +72,7 @@ export type EventProcessorConfig = {
   filters?: SearchFilter[];
   streams?: string[];
   stream_categories?: string[];
-  group_by: string[];
+  group_by?: string[];
   _is_scheduled?: boolean;
   series?: Array<{ field: string; id: string; type: string }>;
   conditions?: {
@@ -84,8 +85,10 @@ export type EventProcessorConfig = {
   cron_timezone?: string;
   event_limit?: number;
 };
+
 export type EventDefinition = {
   _scope: string;
+  _entity_source: any;
   id: string;
   title: string;
   description: string;
@@ -106,9 +109,12 @@ export type EventDefinition = {
     type: string;
     streams: number[] | string[];
   }>;
+  tags: string[];
   updated_at: string | null;
   matched_at: string;
   scheduler: Scheduler;
+  event_summary_template: string;
+  tactics_techniques?: string[];
 };
 
 export type EventDefinitionFormControlsProps = {
@@ -119,6 +125,8 @@ export type EventDefinitionFormControlsProps = {
   onOpenPrevPage: () => void;
   onSubmit: (event: SyntheticEvent) => void;
   steps: StepsType<string>;
+  isSubmitting?: boolean;
+  disabledSubmit?: boolean;
 };
 
 export const isSystemEventDefinition = (eventDefinition: EventDefinition) =>

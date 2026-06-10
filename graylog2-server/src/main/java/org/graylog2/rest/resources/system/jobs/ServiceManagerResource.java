@@ -19,8 +19,8 @@ package org.graylog2.rest.resources.system.jobs;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.shared.rest.resources.RestResource;
 
@@ -34,7 +34,7 @@ import jakarta.ws.rs.core.MediaType;
 import java.util.Map;
 
 @RequiresAuthentication
-@Api(value = "System/ServiceManager", description = "ServiceManager Status")
+@Tag(name = "System/ServiceManager", description = "ServiceManager Status")
 @Path("/system/serviceManager")
 public class ServiceManagerResource extends RestResource {
     private final ServiceManager serviceManager;
@@ -46,7 +46,7 @@ public class ServiceManagerResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "List current status of ServiceManager")
+    @Operation(summary = "List current status of ServiceManager")
     @Produces(MediaType.APPLICATION_JSON)
     public Map<Service, Long> list() {
         return serviceManager.startupTimes();

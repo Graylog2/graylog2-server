@@ -1,0 +1,5 @@
+type = "f"
+message = "Honor character literals in pipeline rules."
+
+pulls = ["24295"]
+issues = ["24247"]

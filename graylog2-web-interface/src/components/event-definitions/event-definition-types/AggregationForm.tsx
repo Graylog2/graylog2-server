@@ -20,13 +20,13 @@ import { useCallback, useMemo } from 'react';
 import { MultiSelect } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
 // TODO: This should be moved to a general place outside of `views`
-import { defaultCompare } from 'logic/DefaultCompare';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import { ALL_MESSAGES_TIMERANGE } from 'views/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { defaultCompare } from 'logic/DefaultCompare';
 
 import AggregationConditionsForm from './AggregationConditionsForm';
 
@@ -43,15 +43,16 @@ type Props = {
 const AggregationForm = ({ aggregationFunctions, eventDefinition, validation, onChange }: Props) => {
   const { data: allFieldTypes } = useFieldTypes(eventDefinition?.config?.streams ?? [], ALL_MESSAGES_TIMERANGE);
   // Memoize function to only format fields when they change. Use joined fieldNames as cache key.
-  const formattedFields = useMemo(
+  const formattedFields = useMemo(() => allFieldTypes ?? [], [allFieldTypes]);
+  const formattedFieldOptions = useMemo(
     () =>
-      (allFieldTypes ?? [])
+      formattedFields
         .sort((ftA, ftB) => defaultCompare(ftA.name, ftB.name))
         .map((fieldType) => ({
           label: `${fieldType.name} – ${fieldType.value.type.type}`,
           value: fieldType.name,
         })),
-    [allFieldTypes],
+    [formattedFields],
   );
 
   const { pathname } = useLocation();
@@ -98,7 +99,7 @@ const AggregationForm = ({ aggregationFunctions, eventDefinition, validation, on
             <MultiSelect
               id="group-by"
               onChange={handleGroupByChange}
-              options={formattedFields}
+              options={formattedFieldOptions}
               ignoreAccents={false}
               value={(eventDefinition.config.group_by ?? []).join(',')}
               allowCreate

@@ -46,8 +46,8 @@ import java.util.stream.Collectors;
 public abstract class ContentPackV1 implements ContentPack {
     static final String VERSION = "1";
     public static final String FIELD_NAME = "name";
-    static final String FIELD_SUMMARY = "summary";
-    static final String FIELD_DESCRIPTION = "description";
+    public static final String FIELD_SUMMARY = "summary";
+    public static final String FIELD_DESCRIPTION = "description";
     static final String FIELD_VENDOR = "vendor";
     static final String FIELD_URL = "url";
     static final String FIELD_PARAMETERS = "parameters";

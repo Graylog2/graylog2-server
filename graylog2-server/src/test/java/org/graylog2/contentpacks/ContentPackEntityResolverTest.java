@@ -29,6 +29,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.streams.FavoriteFieldsService;
 import org.graylog2.streams.OutputImpl;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamMock;
@@ -56,7 +57,8 @@ class ContentPackEntityResolverTest {
     void setUp() {
         this.streamService = mock(StreamService.class);
         final Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades = ImmutableMap.of(
-                ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, mock(StreamRuleService.class), mock(IndexSetService.class), mock(UserService.class))
+                ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, mock(StreamRuleService.class), mock(IndexSetService.class),
+                        mock(UserService.class), mock(FavoriteFieldsService.class))
         );
         this.contentPackEntityResolver = new ContentPackEntityResolver(entityFacades, streamService);
     }

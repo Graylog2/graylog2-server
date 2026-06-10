@@ -18,9 +18,13 @@ package org.graylog2.rest.resources.system.debug;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.eventbus.EventBus;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.events.ClusterEventBus;
@@ -44,7 +48,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 @RequiresAuthentication
-@Api(value = "System/Debug/Events", description = "For debugging local and cluster events.")
+@Tag(name = "System/Debug/Events", description = "For debugging local and cluster events.")
 @Path("/system/debug/events")
 @Produces(MediaType.APPLICATION_JSON)
 public class DebugEventsResource extends RestResource {
@@ -65,9 +69,9 @@ public class DebugEventsResource extends RestResource {
     @POST
     @Path("/cluster")
     @Consumes(MediaType.TEXT_PLAIN)
-    @ApiOperation(value = "Create and send a cluster debug event.")
+    @Operation(summary = "Create and send a cluster debug event.")
     @NoAuditEvent("only used to create a debug event")
-    public void generateClusterDebugEvent(@ApiParam(name = "text", defaultValue = "Cluster Test") @Nullable String text) {
+    public void generateClusterDebugEvent(@Parameter(name = "text") @Nullable String text) {
         clusterEventBus.post(DebugEvent.create(nodeId.getNodeId(), isNullOrEmpty(text) ? "Cluster Test" : text));
     }
 
@@ -75,16 +79,20 @@ public class DebugEventsResource extends RestResource {
     @POST
     @Path("/local")
     @Consumes(MediaType.TEXT_PLAIN)
-    @ApiOperation(value = "Create and send a local debug event.")
+    @Operation(summary = "Create and send a local debug event.")
     @NoAuditEvent("only used to create a debug event")
-    public void generateDebugEvent(@ApiParam(name = "text", defaultValue = "Local Test") @Nullable String text) {
+    public void generateDebugEvent(@Parameter(name = "text") @Nullable String text) {
         serverEventBus.post(DebugEvent.create(nodeId.getNodeId(), isNullOrEmpty(text) ? "Local Test" : text));
     }
 
     @Timed
     @GET
     @Path("/cluster")
-    @ApiOperation(value = "Show last received cluster debug event.", response = DebugEvent.class)
+    @Operation(summary = "Show last received cluster debug event.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Show last received cluster debug event. retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = DebugEvent.class)))
+    })
     public DebugEvent showLastClusterDebugEvent() {
         return DebugEventHolder.getClusterDebugEvent();
     }
@@ -92,7 +100,11 @@ public class DebugEventsResource extends RestResource {
     @Timed
     @GET
     @Path("/local")
-    @ApiOperation(value = "Show last received local debug event.", response = DebugEvent.class)
+    @Operation(summary = "Show last received local debug event.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Show last received local debug event. retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = DebugEvent.class)))
+    })
     public DebugEvent showLastDebugEvent() {
         return DebugEventHolder.getLocalDebugEvent();
     }

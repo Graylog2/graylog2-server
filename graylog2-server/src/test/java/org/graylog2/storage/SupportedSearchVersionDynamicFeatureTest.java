@@ -16,13 +16,13 @@
  */
 package org.graylog2.storage;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.FeatureContext;
@@ -34,9 +34,9 @@ import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class SupportedSearchVersionDynamicFeatureTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private ResourceInfo resourceInfo;
@@ -44,7 +44,7 @@ public class SupportedSearchVersionDynamicFeatureTest {
     private FeatureContext featureContext;
     private SupportedSearchVersionDynamicFeature supportedSearchVersionDynamicFeature;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         supportedSearchVersionDynamicFeature = new SupportedSearchVersionDynamicFeature();
     }

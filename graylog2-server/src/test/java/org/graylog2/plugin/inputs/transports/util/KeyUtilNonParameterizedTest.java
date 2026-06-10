@@ -19,8 +19,9 @@ package org.graylog2.plugin.inputs.transports.util;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCSException;
 import org.graylog.testing.ResourceUtil;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +35,10 @@ import java.security.Security;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class KeyUtilNonParameterizedTest {
-    @Before
+    @TempDir
+    Path tempDir;
+
+    @BeforeEach
     public void init() {
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
     }
@@ -71,14 +75,13 @@ public class KeyUtilNonParameterizedTest {
     public void testGeneratePKSC8PrivateKey() throws GeneralSecurityException, IOException, OperatorCreationException, PKCSException, URISyntaxException {
         final PrivateKey privateKey = fileToKey(resourceToFile("server.key.pem.pkcs8.unprotected"), null);
         final String tmpPassword = "dummypassword";
-        final Path tmpDir = Paths.get(System.getProperty("java.io.tmpdir"));
-        File pkcs8EncryptedKeyFile = KeyUtil.generatePKCS8FromPrivateKey(tmpDir, tmpPassword.toCharArray(), privateKey);
+        File pkcs8EncryptedKeyFile = KeyUtil.generatePKCS8FromPrivateKey(tempDir, tmpPassword.toCharArray(), privateKey);
         final PrivateKey retrievedKey = fileToKey(pkcs8EncryptedKeyFile, tmpPassword);
         assertThat(retrievedKey).hasToString(privateKey.toString());
     }
 
     private File resourceToFile(String fileName) throws URISyntaxException {
-        return ResourceUtil.resourceToTmpFile("org/graylog2/plugin/inputs/transports/util/" + fileName);
+        return ResourceUtil.resourceToTmpFile("org/graylog2/plugin/inputs/transports/util/" + fileName, tempDir);
     }
 
     private PrivateKey fileToKey(File keyFile, String password) throws URISyntaxException, IOException, OperatorCreationException, PKCSException {

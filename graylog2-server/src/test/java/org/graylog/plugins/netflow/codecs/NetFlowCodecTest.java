@@ -26,10 +26,9 @@ import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.journal.RawMessage;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -45,15 +44,15 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class NetFlowCodecTest {
-    @Rule
-    public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    public File temporaryFolder;
 
     private NetFlowCodec codec;
     private NetflowV9CodecAggregator codecAggregator;
     private final MessageFactory messageFactory = new TestMessageFactory();
     private final NetFlowFormatter netFlowFormatter = new NetFlowFormatter(messageFactory);
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         codecAggregator = new NetflowV9CodecAggregator();
         codec = new NetFlowCodec(Configuration.EMPTY_CONFIGURATION, codecAggregator, netFlowFormatter);
@@ -61,7 +60,7 @@ public class NetFlowCodecTest {
 
     @Test
     public void constructorFailsIfNetFlow9DefinitionsPathDoesNotExist() throws Exception {
-        final File definitionsFile = temporaryFolder.newFile();
+        final File definitionsFile = File.createTempFile("junit", null, temporaryFolder);
         assertThat(definitionsFile.delete()).isTrue();
 
         final ImmutableMap<String, Object> configMap = ImmutableMap.of(
@@ -93,7 +92,7 @@ public class NetFlowCodecTest {
 
     @Test
     public void constructorFailsIfNetFlow9DefinitionsPathIsInvalidYaml() throws Exception {
-        final File definitionsFile = temporaryFolder.newFile();
+        final File definitionsFile = File.createTempFile("junit", null, temporaryFolder);
         Files.write(definitionsFile.toPath(), "foo: %bar".getBytes(StandardCharsets.UTF_8));
 
         final ImmutableMap<String, Object> configMap = ImmutableMap.of(

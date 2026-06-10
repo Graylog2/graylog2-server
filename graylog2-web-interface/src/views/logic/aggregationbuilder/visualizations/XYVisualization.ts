@@ -15,13 +15,29 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { ArrayElement } from 'views/types';
+import type { DEFAULT_AXIS_KEY } from 'views/components/visualizations/Constants';
 
 export const axisTypes = ['linear', 'logarithmic'] as const;
 
 export type AxisType = ArrayElement<typeof axisTypes>;
 
+export type ChartAxisConfig = {
+  [DEFAULT_AXIS_KEY]?: { title?: string; color: string };
+  percent?: { title?: string; color?: string };
+  time?: { title?: string; color?: string };
+  size?: { title?: string; color?: string };
+  xaxis?: { title?: string; color?: string };
+};
+export type XYVisualizationConfigFormValues = {
+  showAxisLabels: boolean;
+  axisConfig: ChartAxisConfig;
+};
+
 export interface XYVisualization {
   axisType: AxisType;
+  axisConfig: ChartAxisConfig;
 }
 
 export const DEFAULT_AXIS_TYPE: AxisType = 'linear';
+
+export const DEFAULT_AXIS_CONFIG = {};

@@ -17,17 +17,15 @@
 import * as React from 'react';
 import { useEffect, useState, useCallback } from 'react';
 
-import type User from 'logic/users/User';
 import withParams from 'routing/withParams';
 import { Row, Col } from 'components/bootstrap';
-import { isPermitted } from 'util/PermissionsMixin';
 import DocsHelper from 'util/DocsHelper';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import { PageHeader, DocumentTitle, Spinner } from 'components/common';
 import TokenList from 'components/users/TokenList';
 import UsersPageNavigation from 'components/users/navigation/UsersPageNavigation';
 import UserActionLinks from 'components/users/navigation/UserActionLinks';
-import useCurrentUser from 'hooks/useCurrentUser';
+import useBasicUser from 'hooks/useBasicUser';
 
 type Props = {
   params: {
@@ -46,13 +44,9 @@ const PageTitle = ({ fullName }: { fullName: string | null | undefined }) => (
   </>
 );
 
-const _loadTokens = (loadedUser, currentUser, setTokens) => {
+const _loadTokens = (loadedUser, setTokens) => {
   if (loadedUser) {
-    if (isPermitted(currentUser?.permissions, [`users:tokenlist:${loadedUser.username}`])) {
-      UsersDomain.loadTokens(loadedUser.id).then(setTokens);
-    } else {
-      setTokens([]);
-    }
+    UsersDomain.loadTokens(loadedUser.id).then(setTokens);
   }
 };
 
@@ -73,23 +67,20 @@ const _createToken = (tokenName, userId, loadTokens, setCreatingToken, tokenTtl)
 };
 
 const UserEditPage = ({ params }: Props) => {
-  const currentUser = useCurrentUser();
-  const [loadedUser, setLoadedUser] = useState<User | undefined>();
   const [tokens, setTokens] = useState([]);
   const [creatingToken, setCreatingToken] = useState(false);
 
   const userId = params?.userId;
 
-  const loadTokens = useCallback(() => _loadTokens(loadedUser, currentUser, setTokens), [currentUser, loadedUser]);
+  const { data: loadedUser } = useBasicUser(userId, { enabled: !!userId });
+
+  const loadTokens = useCallback(() => _loadTokens(loadedUser, setTokens), [loadedUser]);
   const _handleTokenCreate = ({ tokenName, tokenTtl }: { tokenName: string; tokenTtl: string }) =>
     _createToken(tokenName, userId, loadTokens, setCreatingToken, tokenTtl);
 
   useEffect(() => {
     loadTokens();
   }, [loadTokens, loadedUser]);
-  useEffect(() => {
-    UsersDomain.load(userId).then(setLoadedUser);
-  }, [userId]);
 
   return (
     <DocumentTitle title={`Edit Tokens Of User ${loadedUser?.fullName ?? ''}`}>

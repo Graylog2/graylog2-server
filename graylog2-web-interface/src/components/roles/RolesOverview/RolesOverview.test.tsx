@@ -14,9 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
 
 import mockAction from 'helpers/mocking/MockAction';
 import { rolesList as mockRoles } from 'fixtures/roles';
@@ -54,12 +55,14 @@ jest.mock('stores/roles/AuthzRolesStore', () => ({
 }));
 
 describe('RolesOverview', () => {
+  const renderSUT = () => render(<RolesOverview />);
+
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('should display table header', async () => {
-    render(<RolesOverview />);
+    renderSUT();
     const headers = ['Name', 'Description', 'Actions'];
 
     // wait until list is displayed
@@ -71,17 +74,17 @@ describe('RolesOverview', () => {
   });
 
   it('should fetch and list roles with name and description', async () => {
-    render(<RolesOverview />);
+    renderSUT();
 
     await screen.findByText(mockRoles.first().name);
     await screen.findByText(mockRoles.first().description);
   });
 
   it('should allow searching for roles', async () => {
-    render(<RolesOverview />);
+    renderSUT();
 
     const searchInput = await screen.findByPlaceholderText('Enter search query...');
-    fireEvent.change(searchInput, { target: { value: 'name:manager' } });
+    await userEvent.type(searchInput, 'name:manager');
 
     await waitFor(() =>
       expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith({
@@ -93,10 +96,10 @@ describe('RolesOverview', () => {
   });
 
   it('should reset search', async () => {
-    render(<RolesOverview />);
+    renderSUT();
 
     const searchInput = await screen.findByPlaceholderText('Enter search query...');
-    fireEvent.change(searchInput, { target: { value: 'name:manager' } });
+    await userEvent.type(searchInput, 'name:manager');
 
     await waitFor(() =>
       expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith({
@@ -107,7 +110,7 @@ describe('RolesOverview', () => {
     );
 
     const resetSearchButton = await screen.findByRole('button', { name: 'Reset search' });
-    fireEvent.click(resetSearchButton);
+    await userEvent.click(resetSearchButton);
 
     await waitFor(() =>
       expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith({ page: 1, perPage: 10, query: '' }),

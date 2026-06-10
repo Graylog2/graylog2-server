@@ -17,11 +17,12 @@
 package org.graylog2.security.realm;
 
 import com.google.common.base.Joiner;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAccount;
-import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.graylog.security.authservice.AuthServiceAuthenticator;
 import org.graylog.security.authservice.AuthServiceCredentials;
@@ -37,9 +38,6 @@ import org.graylog2.utilities.IpSubnet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
 import java.net.UnknownHostException;
 import java.util.Optional;
 import java.util.Set;
@@ -51,7 +49,6 @@ public class HTTPHeaderAuthenticationRealm extends AuthenticatingRealm {
     private static final Joiner JOINER = Joiner.on(", ");
 
     public static final String NAME = "http-header-authentication";
-    public static final String SESSION_AUTH_HEADER = "http-header-auth-user";
 
     private final ClusterConfigService clusterConfigService;
     private final AuthServiceAuthenticator authServiceAuthenticator;
@@ -68,7 +65,7 @@ public class HTTPHeaderAuthenticationRealm extends AuthenticatingRealm {
         setAuthenticationTokenClass(PossibleTrustedHeaderToken.class);
         setCachingEnabled(false);
         // Credentials will be matched via the authentication service itself so we don't need Shiro to do it
-        setCredentialsMatcher(new AllowAllCredentialsMatcher());
+        setCredentialsMatcher(new ServiceValidatedCredentialsMatcher());
     }
 
     @Override
@@ -144,7 +141,7 @@ public class HTTPHeaderAuthenticationRealm extends AuthenticatingRealm {
     }
 
     private AuthenticationInfo toAuthenticationInfo(AuthServiceResult result) {
-        return new SimpleAccount(result.userProfileId(), null, NAME + "/" + result.backendType());
+        return new SimpleAccount(result.userProfileId(), ServiceValidatedCredentialsMatcher.AUTHENTICATED, NAME + "/" + result.backendType());
     }
 
     private HTTPHeaderAuthConfig loadConfig() {

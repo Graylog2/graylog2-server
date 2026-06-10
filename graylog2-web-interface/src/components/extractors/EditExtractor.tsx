@@ -19,7 +19,7 @@ import React from 'react';
 import { Col, ControlLabel, FormControl, FormGroup, Row, Button, Input } from 'components/bootstrap';
 import ExtractorUtils from 'util/ExtractorUtils';
 import { getValueFromInput } from 'util/FormsUtils';
-import ToolsStore from 'stores/tools/ToolsStore';
+import { testContainsString, testRegex } from 'api/tools';
 import { ExtractorsActions } from 'stores/extractors/ExtractorsStore';
 
 import EditExtractorConverters from './EditExtractorConverters';
@@ -56,8 +56,6 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
     exampleMessage: undefined,
   };
 
-  private targetField: Input;
-
   constructor(props) {
     super(props);
 
@@ -75,6 +73,8 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
       this._updateExampleMessage(nextProps.exampleMessage);
     }
   }
+
+  private targetField: Input;
 
   _updateExampleMessage = (nextExample) => {
     this.setState({ exampleMessage: nextExample });
@@ -134,7 +134,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
 
   _testCondition = () => {
     const { exampleMessage, updatedExtractor } = this.state;
-    const tester = updatedExtractor.condition_type === 'string' ? ToolsStore.testContainsString : ToolsStore.testRegex;
+    const tester = updatedExtractor.condition_type === 'string' ? testContainsString : testRegex;
     const promise = tester(updatedExtractor.condition_value, exampleMessage);
 
     promise.then((result) => this.setState({ conditionTestResult: result.matched }));
@@ -402,7 +402,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
 
                   <Row>
                     <Col mdOffset={2} md={10}>
-                      <Button type="submit" bsStyle="success">
+                      <Button type="submit" bsStyle="primary">
                         {action === 'create' ? 'Create extractor' : 'Update extractor'}
                       </Button>
                     </Col>

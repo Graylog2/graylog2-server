@@ -86,4 +86,5 @@ export type PaginatedFavoriteItems = {
 
 export type RequestQuery = {
   page: number;
+  per_page?: number;
 };

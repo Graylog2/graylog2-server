@@ -69,6 +69,10 @@ export const mockEventData = {
 
 export const mockEventDefinitionTwoAggregations: EventDefinition = {
   _scope: 'DEFAULT',
+  _entity_source: {
+    source: 'USER_DEFINED',
+    entity_type: 'event_definition',
+  },
   id: 'event-definition-id-1',
   title: 'Event Definition Title',
   description: 'Test description',
@@ -129,6 +133,7 @@ export const mockEventDefinitionTwoAggregations: EventDefinition = {
   },
   field_spec: {},
   key_spec: [],
+  tags: [],
   notification_settings: {
     grace_period_ms: 60000,
     backlog_size: 0,
@@ -147,8 +152,10 @@ export const mockEventDefinitionTwoAggregations: EventDefinition = {
     },
   ],
   state: 'ENABLED',
+  tactics_techniques: [],
   remediation_steps: '',
   event_procedure: '',
+  event_summary_template: null,
   matched_at: '',
   scheduler: {
     data: {

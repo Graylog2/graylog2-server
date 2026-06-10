@@ -90,7 +90,7 @@ class NotificationList extends React.Component<
         },
     );
     const addNotificationButton = (
-      <Button bsStyle="success" onClick={onAddNotificationClick}>
+      <Button bsStyle="primary" onClick={onAddNotificationClick}>
         Add notification
       </Button>
     );

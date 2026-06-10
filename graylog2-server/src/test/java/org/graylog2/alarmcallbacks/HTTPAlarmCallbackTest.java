@@ -39,16 +39,16 @@ import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.streams.StreamMock;
-import org.graylog2.system.urlwhitelist.UrlWhitelistService;
+import org.graylog2.system.urlallowlist.UrlAllowlistService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -57,35 +57,35 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class HTTPAlarmCallbackTest {
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule();
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     private OkHttpClient httpClient;
     private ObjectMapper objectMapper;
     private HTTPAlarmCallback alarmCallback;
-    private UrlWhitelistService whitelistService;
+    private UrlAllowlistService allowlistService;
 
     private MockWebServer server;
     private final MessageFactory messageFactory = new TestMessageFactory();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         httpClient = new OkHttpClient();
         objectMapper = new ObjectMapperProvider().get();
-        whitelistService = mock(UrlWhitelistService.class);
-        alarmCallback = new HTTPAlarmCallback(httpClient, objectMapper, whitelistService);
+        allowlistService = mock(UrlAllowlistService.class);
+        alarmCallback = new HTTPAlarmCallback(httpClient, objectMapper, allowlistService);
 
         server = new MockWebServer();
     }
 
-    @After
+    @AfterEach
     public void shutDown() throws IOException {
         if (server != null) {
             server.close();
@@ -103,7 +103,7 @@ public class HTTPAlarmCallbackTest {
 
     @Test
     public void callSucceedsIfRemoteRequestSucceeds() throws Exception {
-        when(whitelistService.isWhitelisted(anyString())).thenReturn(true);
+        when(allowlistService.isAllowlisted(anyString())).thenReturn(true);
 
         server.enqueue(new MockResponse(200, Headers.of(), ""));
         server.start();
@@ -156,7 +156,7 @@ public class HTTPAlarmCallbackTest {
 
     @Test
     public void callThrowsAlarmCallbackExceptionIfRemoteServerReturnsError() throws Exception {
-        when(whitelistService.isWhitelisted(anyString())).thenReturn(true);
+        when(allowlistService.isAllowlisted(anyString())).thenReturn(true);
 
         server.enqueue(new MockResponse(500, Headers.of(), ""));
         server.start();
@@ -182,15 +182,16 @@ public class HTTPAlarmCallbackTest {
                 Collections.emptyList()
         );
 
-        expectedException.expect(AlarmCallbackException.class);
-        expectedException.expectMessage("Expected successful HTTP response [2xx] but got [500].");
+        Throwable exception = assertThrows(AlarmCallbackException.class, () -> {
 
-        alarmCallback.call(stream, checkResult);
+            alarmCallback.call(stream, checkResult);
 
-        final RecordedRequest request = server.takeRequest();
-        assertThat(request.getUrl().encodedPath()).isEqualTo("/");
-        assertThat(request.getHeaders().get("Content-Type")).isEqualTo("application/json");
-        assertThat(request.getBodySize()).isPositive();
+            final RecordedRequest request = server.takeRequest();
+            assertThat(request.getUrl().encodedPath()).isEqualTo("/");
+            assertThat(request.getHeaders().get("Content-Type")).isEqualTo("application/json");
+            assertThat(request.getBodySize()).isPositive();
+        });
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Expected successful HTTP response [2xx] but got [500]."));
     }
 
     @Test
@@ -215,23 +216,23 @@ public class HTTPAlarmCallbackTest {
                 Collections.emptyList()
         );
 
-        expectedException.expect(AlarmCallbackException.class);
-        expectedException.expectMessage("Malformed URL: !FOOBAR");
+        Throwable exception = assertThrows(AlarmCallbackException.class, () ->
 
-        alarmCallback.call(stream, checkResult);
+            alarmCallback.call(stream, checkResult));
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Malformed URL: !FOOBAR"));
     }
 
     @Test
-    public void callThrowsAlarmCallbackExceptionIfURLIsNotWhitelisted() throws Exception {
-        final Configuration configuration = new Configuration(ImmutableMap.of("url", "http://not-whitelisted"));
+    public void callThrowsAlarmCallbackExceptionIfURLIsNotAllowlisted() throws Exception {
+        final Configuration configuration = new Configuration(ImmutableMap.of("url", "http://not-allowlisted"));
         alarmCallback.initialize(configuration);
 
         final Stream stream = new StreamMock(Collections.singletonMap("_id", "stream-id"));
 
-        expectedException.expect(AlarmCallbackException.class);
-        expectedException.expectMessage("URL <http://not-whitelisted> is not whitelisted.");
+        Throwable exception = assertThrows(AlarmCallbackException.class, () ->
 
-        alarmCallback.call(stream, null);
+            alarmCallback.call(stream, null));
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("URL <http://not-allowlisted> is not allowlisted."));
     }
 
     @Test
@@ -255,10 +256,10 @@ public class HTTPAlarmCallbackTest {
             }
         };
 
-        expectedException.expect(AlarmCallbackException.class);
-        expectedException.expectMessage("Unable to serialize alarm");
+        Throwable exception = assertThrows(AlarmCallbackException.class, () ->
 
-        alarmCallback.call(stream, checkResult);
+            alarmCallback.call(stream, checkResult));
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Unable to serialize alarm"));
     }
 
     @Test
@@ -277,7 +278,7 @@ public class HTTPAlarmCallbackTest {
 
     @Test
     public void checkConfigurationSucceedsWithValidConfiguration() throws Exception {
-        when(whitelistService.isWhitelisted(anyString())).thenReturn(true);
+        when(allowlistService.isAllowlisted(anyString())).thenReturn(true);
 
         final Map<String, Object> configMap = ImmutableMap.of("url", "http://example.com/");
         final Configuration configuration = new Configuration(configMap);
@@ -292,10 +293,10 @@ public class HTTPAlarmCallbackTest {
         final Configuration configuration = new Configuration(configMap);
         alarmCallback.initialize(configuration);
 
-        expectedException.expect(ConfigurationException.class);
-        expectedException.expectMessage("URL parameter is missing.");
+        Throwable exception = assertThrows(ConfigurationException.class, () ->
 
-        alarmCallback.checkConfiguration();
+            alarmCallback.checkConfiguration());
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("URL parameter is missing."));
     }
 
     @Test
@@ -304,10 +305,10 @@ public class HTTPAlarmCallbackTest {
         final Configuration configuration = new Configuration(configMap);
         alarmCallback.initialize(configuration);
 
-        expectedException.expect(ConfigurationException.class);
-        expectedException.expectMessage("URL parameter is missing.");
+        Throwable exception = assertThrows(ConfigurationException.class, () ->
 
-        alarmCallback.checkConfiguration();
+            alarmCallback.checkConfiguration());
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("URL parameter is missing."));
     }
 
     @Test
@@ -316,10 +317,10 @@ public class HTTPAlarmCallbackTest {
         final Configuration configuration = new Configuration(configMap);
         alarmCallback.initialize(configuration);
 
-        expectedException.expect(ConfigurationException.class);
-        expectedException.expectMessage("Malformed URL");
+        Throwable exception = assertThrows(ConfigurationException.class, () ->
 
-        alarmCallback.checkConfiguration();
+            alarmCallback.checkConfiguration());
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Malformed URL"));
     }
 
 }

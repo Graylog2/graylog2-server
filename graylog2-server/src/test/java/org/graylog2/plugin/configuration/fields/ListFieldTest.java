@@ -17,7 +17,7 @@
 package org.graylog2.plugin.configuration.fields;
 
 import com.google.common.collect.ImmutableList;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.HashMap;

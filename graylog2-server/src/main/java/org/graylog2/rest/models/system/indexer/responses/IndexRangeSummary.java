@@ -20,13 +20,11 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 public abstract class IndexRangeSummary {
     @JsonProperty("index_name")
@@ -38,7 +36,8 @@ public abstract class IndexRangeSummary {
     @JsonProperty("end")
     public abstract DateTime end();
 
-    @Nullable @JsonProperty("calculated_at")
+    @Nullable
+    @JsonProperty("calculated_at")
     public abstract DateTime calculatedAt();
 
     @JsonProperty("took_ms")

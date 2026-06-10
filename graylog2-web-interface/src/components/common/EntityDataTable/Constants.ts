@@ -16,8 +16,19 @@
  */
 
 export const CELL_PADDING = 5; // px
-export const BULK_SELECT_COLUMN_WIDTH = 20; // px
 export const DEFAULT_COL_MIN_WIDTH = 150; // px
 export const DEFAULT_COL_WIDTH = 1; // fraction, similar to CSS unit fr.
 export const MORE_ACTIONS_TITLE = 'More';
 export const MORE_ACTIONS_HOVER_TITLE = 'More actions';
+
+export const BULK_SELECT_COLUMN_WIDTH = 15 + CELL_PADDING * 2; // px
+export const BULK_SELECT_COL_ID = 'bulk-select';
+
+export const ACTIONS_COL_ID = 'actions';
+
+export const UTILITY_COLUMNS = new Set([BULK_SELECT_COL_ID, ACTIONS_COL_ID]);
+
+export const ATTRIBUTE_STATUS = {
+  show: 'show',
+  hide: 'hide',
+} as const;

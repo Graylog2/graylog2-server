@@ -29,7 +29,6 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
@@ -67,7 +66,7 @@ class UserPermissionsToGrantsMigrationTest {
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb,
-               MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
+               MongoCollections mongoCollections,
                GRNRegistry grnRegistry) {
 
         this.grnRegistry = grnRegistry;
@@ -75,7 +74,7 @@ class UserPermissionsToGrantsMigrationTest {
         //By default, only admins (having "*") are allowed to create tokens, thus 'false':
         this.userSelfEditPermissionCount = new Permissions(ImmutableSet.of()).userSelfEditPermissions("dummy", false).size();
 
-        this.dbGrantService = new DBGrantService(new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()));
+        this.dbGrantService = new DBGrantService(mongoCollections);
         this.userService = new TestUserService(mongodb.mongoConnection(), configService);
         migration = new UserPermissionsToGrantsMigration(userService, dbGrantService, grnRegistry, viewService, "admin");
     }

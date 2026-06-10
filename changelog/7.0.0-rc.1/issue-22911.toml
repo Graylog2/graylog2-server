@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix Content Pack creation for pipeline rules, pipelines and streams with null descriptions."
+
+issues = ["22911"]
+pulls = ["23616"]

@@ -19,19 +19,20 @@ import Immutable from 'immutable';
 
 import { Col, Row } from 'components/bootstrap';
 import StringUtils from 'util/StringUtils';
+import type { Stream } from 'logic/streams/types';
 
 import MessageDetail from './MessageDetail';
-
-const getImmutableProps = (props) => ({
-  streams: props.streams ? Immutable.Map(props.streams) : props.streams,
-});
 
 type MessageShowProps = Omit<React.ComponentProps<typeof MessageDetail>, 'renderForDisplay'> & {
   message: any;
   inputs?: any;
-  streams?: any;
+  streams?: Immutable.Map<string, Stream>;
   nodes?: any;
 };
+
+const getImmutableProps = (props: MessageShowProps) => ({
+  streams: props.streams ? Immutable.Map(props.streams) : props.streams,
+});
 
 class MessageShow extends React.Component<
   MessageShowProps,
@@ -45,7 +46,7 @@ class MessageShow extends React.Component<
     streams: undefined,
   };
 
-  constructor(props) {
+  constructor(props: MessageShowProps) {
     super(props);
 
     this.state = getImmutableProps(props);
@@ -59,7 +60,7 @@ class MessageShow extends React.Component<
     // No highlighting for the message details view.
     const { message } = this.props;
 
-    return StringUtils.stringify(message.fields[fieldName]);
+    return <>{StringUtils.stringify(message.fields[fieldName])}</>;
   };
 
   render() {

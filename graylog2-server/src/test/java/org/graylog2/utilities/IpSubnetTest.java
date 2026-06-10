@@ -16,19 +16,15 @@
  */
 package org.graylog2.utilities;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(Parameterized.class)
 public class IpSubnetTest {
-    @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
                 {"127.0.0.1/32", "127.0.0.1", "127.0.0.1", "127.0.0.1", true},
@@ -42,32 +38,13 @@ public class IpSubnetTest {
         });
     }
 
-    private final IpSubnet ipSubnet;
-    private final String ipAddress;
-    private final String networkAddress;
-    private final String broadcastAddress;
-    private final boolean isInSubnet;
-
-    public IpSubnetTest(String cidr, String ipAddress, String networkAddress, String broadcastAddress, boolean isInSubnet) throws UnknownHostException {
-        this.ipSubnet = new IpSubnet(cidr);
-        this.ipAddress = ipAddress;
-        this.networkAddress = networkAddress;
-        this.broadcastAddress = broadcastAddress;
-        this.isInSubnet = isInSubnet;
-    }
-
-    @Test
-    public void getNetworkAddress() {
+    @MethodSource("data")
+    @ParameterizedTest
+    public void getNetworkAddress(String cidr, String ipAddress, String networkAddress, String broadcastAddress, boolean isInSubnet) throws Exception {
+        final IpSubnet ipSubnet = new IpSubnet(cidr);
         assertThat(ipSubnet.getNetworkAddress()).isEqualTo(networkAddress);
-    }
-
-    @Test
-    public void getBroadcastAddress() {
         assertThat(ipSubnet.getBroadcastAddress()).isEqualTo(broadcastAddress);
-    }
-
-    @Test
-    public void contains() throws UnknownHostException {
         assertThat(ipSubnet.contains(ipAddress)).isEqualTo(isInSubnet);
     }
+
 }

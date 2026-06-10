@@ -31,6 +31,7 @@ export type TimeBasedSizeOptimizingStrategyConfig = {
 type Props = {
   config: TimeBasedSizeOptimizingStrategyConfig;
   updateConfig: (config: Omit<TimeBasedSizeOptimizingStrategyConfig, 'type'>) => void;
+  disabled?: boolean;
 };
 
 export const durationToRoundedDays = (duration: string) => Math.round(moment.duration(duration).asDays());
@@ -58,6 +59,7 @@ const durationToISOString = (days: number) => moment.duration(days, 'days').toIS
 const TimeBasedSizeOptimizingStrategyConfiguration = ({
   config: { index_lifetime_max, index_lifetime_min },
   updateConfig,
+  disabled = false,
 }: Props) => {
   const timeSizeOptimizingFixedLeeway = useTimeSizeOptimizingFixedLeeway();
   const [indexLifetimeRange, setIndexLifetimeRange] = useState(
@@ -116,6 +118,7 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({
   return (
     <div>
       <RangeInput
+        disabled={disabled}
         label="Lifetime in days"
         id="lifetime-range"
         value={timeSizeOptimizingFixedLeeway ? indexLifetimeRange[0] : indexLifetimeRange}

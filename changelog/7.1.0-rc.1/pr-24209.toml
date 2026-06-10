@@ -1,0 +1,5 @@
+type = "changed"
+message = "Updated the Event Definition condition type selector to only include types that are supported by the available license(s)."
+
+issues = ["graylog-plugin-enterprise#11798"]
+pulls = ["24209", "graylog-plugin-enterprise#12502"]

@@ -29,8 +29,8 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.bindings.providers.ParameterizedHttpClientProvider;
-import org.graylog2.system.urlwhitelist.UrlWhitelistNotificationService;
-import org.graylog2.system.urlwhitelist.UrlWhitelistService;
+import org.graylog2.system.urlallowlist.UrlAllowlistNotificationService;
+import org.graylog2.system.urlallowlist.UrlAllowlistService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,9 +49,9 @@ public class HTTPEventNotificationV2Test {
     @Mock
     private ObjectMapperProvider objectMapperProvider;
     @Mock
-    private UrlWhitelistService whitelistService;
+    private UrlAllowlistService allowlistService;
     @Mock
-    private UrlWhitelistNotificationService urlWhitelistNotificationService;
+    private UrlAllowlistNotificationService urlAllowlistNotificationService;
     @Mock
     private EncryptedValueService encryptedValueService;
     @Mock
@@ -68,7 +68,7 @@ public class HTTPEventNotificationV2Test {
     @BeforeEach
     void setUp() {
         notification = new HTTPEventNotificationV2(notificationCallbackService, objectMapperProvider,
-                whitelistService, urlWhitelistNotificationService, encryptedValueService, configurationProvider,
+                allowlistService, urlAllowlistNotificationService, encryptedValueService, configurationProvider,
                 new DefaultJmteEngineProvider().get(), new JsonSafeEngineProvider().get(), notificationService, nodeId,
                 parameterizedHttpClientProvider);
     }

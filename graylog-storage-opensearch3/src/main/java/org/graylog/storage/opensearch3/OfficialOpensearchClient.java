@@ -1,0 +1,312 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+package org.graylog.storage.opensearch3;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.joschi.jadconfig.util.Duration;
+import jakarta.annotation.Nonnull;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.core5.http.ContentTooLongException;
+import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
+import org.graylog2.indexer.BatchSizeTooLargeException;
+import org.graylog2.indexer.IndexNotFoundException;
+import org.graylog2.indexer.InvalidWriteTargetException;
+import org.graylog2.indexer.MapperParsingException;
+import org.graylog2.indexer.MasterNotDiscoveredException;
+import org.graylog2.indexer.ParentCircuitBreakingException;
+import org.graylog2.indexer.exceptions.ResultWindowLimitExceededException;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch.OpenSearchAsyncClient;
+import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch._types.ErrorCause;
+import org.opensearch.client.opensearch._types.OpenSearchException;
+import org.opensearch.client.opensearch.generic.Body;
+import org.opensearch.client.opensearch.generic.Request;
+import org.opensearch.client.opensearch.generic.Response;
+import org.opensearch.client.transport.TransportOptions;
+import org.opensearch.client.transport.httpclient5.ApacheHttpClient5Options;
+import org.opensearch.client.transport.httpclient5.ResponseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public final class OfficialOpensearchClient {
+
+    private static final Logger LOG = LoggerFactory.getLogger(OfficialOpensearchClient.class);
+    private static final Pattern invalidWriteTarget = Pattern.compile("no write index is defined for alias \\[(?<target>[\\w_]+)\\]");
+
+    private final OpenSearchClient sync;
+    private final OpenSearchAsyncClient async;
+    private final ObjectMapper objectMapper;
+
+    public OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncClient async, ObjectMapper objectMapper) {
+        this.sync = sync;
+        this.async = async;
+        this.objectMapper = objectMapper;
+    }
+
+    public <T> T execute(ThrowingSupplier<T> operation, String errorMessage) {
+        try {
+            return operation.get();
+        } catch (Throwable t) {
+            throw mapException(t, errorMessage);
+        }
+    }
+
+    public <T> T sync(ThrowingFunction<T> operation, String errorMessage) {
+        try {
+            return operation.apply(sync);
+        } catch (Throwable t) {
+            throw mapException(t, errorMessage);
+        }
+    }
+
+    public <T> CompletableFuture<T> executeAsync(ThrowingSupplier<CompletableFuture<T>> operation, String errorMessage) {
+        try {
+            return operation.get().exceptionally(ex -> {
+                throw mapException(ex, errorMessage);
+            });
+        } catch (Throwable t) {
+            throw mapException(t, errorMessage);
+        }
+    }
+
+    /**
+     * Executes an asynchronous request with a per-request HTTP response timeout, overriding the
+     * globally configured socket timeout. The Java-level get() acts as a safety net for the same
+     * duration. The request is not cancelled server-side if the timeout fires.
+     */
+    <T> T executeWithClientTimeout(ThrowingAsyncFunction<CompletableFuture<T>> operation, String errorMessage, Duration timeout) {
+        try {
+            final ApacheHttpClient5Options options = clientOptionsWithTimeout(timeout);
+            CompletableFuture<T> futureResponse = async(asyncClient -> operation.apply(asyncClient.withTransportOptions(options)), errorMessage);
+            return futureResponse.get(timeout.toMilliseconds(), TimeUnit.MILLISECONDS);
+        } catch (Throwable t) {
+            throw mapException(t, errorMessage);
+        }
+    }
+
+    @Nonnull
+    ApacheHttpClient5Options clientOptionsWithTimeout(Duration timeout) {
+        final ApacheHttpClient5Options baseApacheOptions = getApacheHttpClientOptions();
+        final RequestConfig baseRequestConfig = baseApacheOptions.getRequestConfig();
+
+        final RequestConfig requestConfig = (baseRequestConfig != null ? RequestConfig.copy(baseRequestConfig) : RequestConfig.custom())
+                .setResponseTimeout(timeout.toMilliseconds(), TimeUnit.MILLISECONDS)
+                .build();
+
+        return baseApacheOptions.toBuilder()
+                .setRequestConfig(requestConfig)
+                .build();
+    }
+
+    private ApacheHttpClient5Options getApacheHttpClientOptions() {
+        final var baseOptions = async._transport().options();
+        if (baseOptions instanceof ApacheHttpClient5Options o) {
+            return o;
+        }
+        final String optionsClassName = Optional.ofNullable(baseOptions).map(TransportOptions::getClass).map(Class::getName).orElse("null");
+        LOG.warn("Transport options are {} rather than ApacheHttpClient5Options; falling back to defaults. " +
+                        "Base request config settings (connectionRequestTimeout, expectContinueEnabled, " +
+                        "authenticationEnabled) will not be preserved on per-request overrides.",
+                optionsClassName);
+        return ApacheHttpClient5Options.DEFAULT;
+    }
+
+    public <T> CompletableFuture<T> async(ThrowingAsyncFunction<CompletableFuture<T>> operation, String errorMessage) {
+        try {
+            return operation.apply(async).exceptionally(ex -> {
+                throw mapException(ex, errorMessage);
+            });
+        } catch (Throwable t) {
+            throw mapException(t, errorMessage);
+        }
+    }
+
+    /**
+     * This shouldn't be used unless you have very specific needs and require JsonNode as a response from plain json API
+     */
+    public JsonNode performRequest(Request request, String errorMessage) {
+        String rawJson;
+        try (Response response = sync.generic().execute(request)) {
+            rawJson = response.getBody().map(Body::bodyAsString).orElse("");
+            return objectMapper.readTree(rawJson);
+        } catch (Exception e) {
+            throw mapException(e, errorMessage);
+        }
+    }
+
+    public void close() {
+        try {
+            sync()._transport().close();
+        } catch (IOException e) {
+            LOG.error("Error closing OpenSearch client", e);
+        }
+        try {
+            async()._transport().close();
+        } catch (IOException e) {
+            LOG.error("Error closing async OpenSearch client", e);
+        }
+    }
+
+    @FunctionalInterface
+    public interface ThrowingSupplier<T> {
+        T get() throws Exception;
+    }
+
+    @FunctionalInterface
+    public interface ThrowingFunction<T> {
+        T apply(OpenSearchClient syncClient) throws Exception;
+    }
+
+    @FunctionalInterface
+    public interface ThrowingAsyncFunction<T> {
+        T apply(OpenSearchAsyncClient syncClient) throws Exception;
+    }
+
+    public static RuntimeException mapException(Throwable t, String message) {
+        if (t instanceof OpenSearchException openSearchException) {
+            if (isIndexNotFoundException(openSearchException) || isIndexClosedException(openSearchException)) {
+                return Optional.ofNullable(openSearchException.response().error())
+                        .map(ErrorCause::metadata)
+                        .map(metadata -> {
+                            JsonData index = metadata.get("index");
+                            JsonData resourceId = metadata.getOrDefault("resource.id", index);
+                            return IndexNotFoundException.create(message + resourceId.toString(), index.toString());
+                        })
+                        .orElse(new IndexNotFoundException(t.getMessage()));
+            }
+            if (isMasterNotDiscoveredException(openSearchException)) {
+                return new MasterNotDiscoveredException();
+            }
+            if (isInvalidWriteTargetException(openSearchException)) {
+                final Matcher matcher = invalidWriteTarget.matcher(openSearchException.getMessage());
+                if (matcher.find()) {
+                    final String target = matcher.group("target");
+                    return InvalidWriteTargetException.create(target);
+                }
+            }
+            if (isBatchSizeTooLargeException(openSearchException)) {
+                return new BatchSizeTooLargeException(openSearchException.getMessage());
+            }
+            if (isMapperParsingExceptionException(openSearchException)) {
+                return new MapperParsingException(openSearchException.getMessage());
+            }
+            if (isParentCircuitBreakingException(openSearchException)) {
+                return new ParentCircuitBreakingException(openSearchException.getMessage());
+            }
+            if (isResultWindowLimitException(openSearchException)) {
+                final var resultWindowLimitFromError = Optional.ofNullable(openSearchException.error())
+                        .map(ErrorCause::causedBy)
+                        .map(ErrorCause::reason)
+                        .map(SearchTypeErrorParser::parseResultLimit)
+                        .map(ResultWindowLimitExceededException::new);
+                if (resultWindowLimitFromError.isPresent()) {
+                    return resultWindowLimitFromError.get();
+                }
+            }
+        } else if (t instanceof ResponseException responseException) {
+            if (responseException.status() == 429) {
+                return new BatchSizeTooLargeException(t.getMessage());
+            }
+        } else if (t instanceof IOException && t.getCause() instanceof ContentTooLongException) {
+            return new BatchSizeTooLargeException(t.getMessage());
+        }
+        return new RuntimeException(message, t);
+    }
+
+    private static boolean hasReason(OpenSearchException openSearchException, Predicate<String> predicate) {
+        return Optional.ofNullable(openSearchException.error())
+                .map(ErrorCause::reason)
+                .map(predicate::test)
+                .orElse(false);
+    }
+
+    private static boolean hasCausedByReason(OpenSearchException openSearchException, Predicate<String> predicate) {
+        return Optional.ofNullable(openSearchException.error())
+                .map(ErrorCause::causedBy)
+                .map(ErrorCause::reason)
+                .map(predicate::test)
+                .orElse(false);
+    }
+
+    private static boolean hasType(OpenSearchException openSearchException, String type) {
+        return openSearchException.error().type().contains(type);
+    }
+
+    private static boolean isInvalidWriteTargetException(OpenSearchException openSearchException) {
+        return hasReason(openSearchException, r -> r.startsWith("no write index is defined for alias"));
+    }
+
+    private static boolean isMasterNotDiscoveredException(OpenSearchException openSearchException) {
+        return hasType(openSearchException, "master_not_discovered_exception")
+                || (hasType(openSearchException, "cluster_block_exception") && hasReason(openSearchException, r -> r.contains("no master")));
+    }
+
+    private static boolean isIndexNotFoundException(OpenSearchException openSearchException) {
+        return hasType(openSearchException, "index_not_found_exception");
+    }
+
+    private static boolean isIndexClosedException(OpenSearchException openSearchException) {
+        return hasType(openSearchException, "index_closed_exception");
+    }
+
+    private static boolean isMapperParsingExceptionException(OpenSearchException openSearchException) {
+        return hasType(openSearchException, "mapper_parsing_exception");
+    }
+    private static boolean isSearchPhaseExecutionException(OpenSearchException openSearchException) {
+        return hasType(openSearchException, "search_phase_execution_exception");
+    }
+
+    private static boolean isBatchSizeTooLargeException(OpenSearchException openSearchException) {
+        return isSearchPhaseExecutionException(openSearchException) && hasCausedByReason(openSearchException, r -> r.contains("Batch size is too large"));
+    }
+
+    private static boolean isParentCircuitBreakingException(OpenSearchException openSearchException) {
+        return hasType(openSearchException, "circuit_breaking_exception") && hasReason(openSearchException, r -> r.contains("[parent] Data too large"));
+    }
+
+    private static boolean isResultWindowLimitException(OpenSearchException openSearchException) {
+        return isSearchPhaseExecutionException(openSearchException) && hasCausedByReason(openSearchException, r -> r.contains("Result window is too large"));
+    }
+
+    @Deprecated
+    public OpenSearchClient sync() {
+        return sync;
+    }
+
+    @Deprecated
+    public OpenSearchAsyncClient async() {
+        return async;
+    }
+
+    public OpenSearchClient syncWithoutErrorMapping() {
+        return sync;
+    }
+
+    public OpenSearchAsyncClient asyncWithoutErrorMapping() {
+        return async;
+    }
+}

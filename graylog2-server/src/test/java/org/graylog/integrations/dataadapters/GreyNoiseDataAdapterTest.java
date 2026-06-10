@@ -23,8 +23,8 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import org.assertj.core.api.Assertions;
 import org.graylog2.plugin.lookup.LookupResult;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -35,7 +35,7 @@ public class GreyNoiseDataAdapterTest {
     Response mockResponse;
     String stringResponse;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         stringResponse = "{\"ip\":\"192.168.1.1\",\"noise\":true,\"code\":\"0x01\"}";

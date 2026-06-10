@@ -18,8 +18,11 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import type * as Immutable from 'immutable';
 import flatten from 'lodash/flatten';
+// eslint-disable-next-line no-restricted-imports
 import get from 'lodash/get';
+import styled, { css } from 'styled-components';
 
+import { getPinnedCellClassName } from 'components/bootstrap/Table';
 import Value from 'views/components/Value';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import { AdditionalContext } from 'views/logic/ActionContext';
@@ -42,14 +45,18 @@ type Field = {
   source: string;
 };
 type Props = {
+  index: number;
   columnPivots: Array<string>;
   columnPivotValues: Array<Array<string>>;
   fields: Immutable.Set<Field>;
   item: { [key: string]: any };
   series: Array<Series>;
+  showRowNumbers: boolean;
   types: FieldTypeMappingsList;
   valuePath: ValuePath;
   units: UnitsConfig;
+  pinnedColumnIndexes: Set<number>;
+  striped?: boolean;
 };
 
 const _c = (field: string, value: any, path: ValuePath, source: string) => ({ field, value, path, source });
@@ -61,6 +68,7 @@ type ColumnProps = {
   valuePath: ValuePath;
   source: string | undefined | null;
   unit: FieldUnit;
+  className?: string;
 };
 
 const flattenValuePath = (valuePath: ValuePath) =>
@@ -69,11 +77,14 @@ const flattenValuePath = (valuePath: ValuePath) =>
     .map(([key, value]) => `${key}:${value}`)
     .join('-');
 
-const Column = ({ field, value, type, valuePath, source, unit }: ColumnProps) => {
+const Column = ({ field, value, type, valuePath, source, unit, className = undefined }: ColumnProps) => {
   const additionalContextValue = useMemo(() => ({ valuePath }), [valuePath]);
 
   return (
-    <TableDataCell $isNumeric={type.isNumeric()} data-testid={`value-cell-${flattenValuePath(valuePath)}-${field}`}>
+    <TableDataCell
+      $isNumeric={type.isNumeric()}
+      className={className}
+      data-testid={`value-cell-${flattenValuePath(valuePath)}-${field}`}>
       <AdditionalContext.Provider value={additionalContextValue}>
         <CustomHighlighting field={source ?? field} value={value}>
           {value !== null && value !== undefined ? (
@@ -97,9 +108,36 @@ const columnNameToField = (column: string, series: Series[] = []) => {
   return currentSeries ? currentSeries.function : column;
 };
 
-const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, valuePath, item, types, units }: Props) => {
+const LineNumber = styled.td(
+  ({ theme }) => css`
+    &&& {
+      width: 20px;
+      min-width: 20px;
+      max-width: 200px;
+      white-space: nowrap;
+      text-align: right;
+      color: ${theme.colors.text.secondary};
+    }
+  `,
+);
+
+const DataTableEntry = ({
+  index,
+  columnPivots,
+  fields,
+  series,
+  columnPivotValues,
+  valuePath,
+  item,
+  showRowNumbers,
+  types,
+  units,
+  pinnedColumnIndexes,
+  striped = false,
+}: Props) => {
   const classes = 'message-group';
   const activeQuery = useActiveQueryId();
+  const isStripedRow = striped && index % 2 !== 0;
 
   const fieldColumns = fields
     .toArray()
@@ -127,11 +165,14 @@ const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, value
 
   return (
     <tr className={`fields-row ${classes}`}>
+      {showRowNumbers && <LineNumber>{index}</LineNumber>}
       {columns.map(({ field, value, path, source }, idx) => {
         const key = `${activeQuery}-${field}=${value}-${idx}`;
         const nameForField = columnNameToField(field, series);
         const fieldNameForUnit = parseSeries(nameForField)?.field ?? nameForField;
         const unit = units.getFieldUnit(fieldNameForUnit);
+        const columnIndex = idx + (showRowNumbers ? 1 : 0);
+        const className = getPinnedCellClassName(pinnedColumnIndexes.has(columnIndex), isStripedRow);
 
         return (
           <Column
@@ -142,6 +183,7 @@ const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, value
             valuePath={path.slice()}
             source={source}
             unit={unit}
+            className={className}
           />
         );
       })}
