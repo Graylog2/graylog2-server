@@ -14,13 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.datanode;
+package org.graylog.storage.elasticsearch7;
 
+import org.graylog.plugins.datanode.DatanodeClusterAdminAdapter;
 import org.graylog.plugins.datanode.dto.ClusterState;
 import org.graylog.plugins.datanode.dto.FlushResponse;
 
-public interface DatanodeUpgradeServiceAdapter {
-    ClusterState getClusterState();
-    FlushResponse disableShardReplication();
-    FlushResponse enableShardReplication();
+public class DatanodeClusterAdminAdapterES7 implements DatanodeClusterAdminAdapter {
+    @Override
+    public ClusterState getClusterState() {
+        throw new UnsupportedOperationException("Not supported for elasticsearch.");
+    }
+
+    @Override
+    public FlushResponse disableShardReplication() {
+        throw new UnsupportedOperationException("Not supported for elasticsearch.");
+    }
+
+    @Override
+    public FlushResponse enableShardReplication() {
+        throw new UnsupportedOperationException("Not supported for elasticsearch.");
+    }
 }
