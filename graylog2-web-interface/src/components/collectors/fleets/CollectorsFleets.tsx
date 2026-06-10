@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useMemo, useCallback } from 'react';
 
 import useLocation from 'routing/useLocation';
 import { Button, ButtonToolbar } from 'components/bootstrap';
@@ -35,14 +35,12 @@ import { fetchPaginatedFleets, fleetsKeyFn, useCollectorsMutations } from '../ho
 import type { Fleet } from '../types';
 
 const CollectorsFleets = () => {
-  const [showFleetModal, setShowFleetModal] = useState(false);
   const { createFleet } = useCollectorsMutations();
   const { pathname } = useLocation();
   const history = useHistory();
 
-  useEffect(() => {
-    setShowFleetModal(pathname === Routes.SYSTEM.COLLECTORS.FLEETS_NEW);
-  }, [pathname]);
+  // The modal is fully URL-driven: /fleets/new shows it, closing navigates back to /fleets.
+  const showFleetModal = pathname === Routes.SYSTEM.COLLECTORS.FLEETS_NEW;
 
   const columnRenderers = useMemo(() => customColumnRenderers(), []);
 
