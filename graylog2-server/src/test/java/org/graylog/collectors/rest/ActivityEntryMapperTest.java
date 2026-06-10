@@ -27,6 +27,7 @@ import org.graylog.collectors.db.MarkerPayload;
 import org.graylog.collectors.db.MarkerType;
 import org.graylog.collectors.db.TransactionMarker;
 import org.graylog.collectors.rest.RecentActivityResponse.FleetReassignedDetails;
+import org.graylog.security.HasPermissions;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +40,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiPredicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -50,7 +50,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class ActivityEntryMapperTest {
 
-    private static final BiPredicate<String, String> ALLOW_ALL = (permission, id) -> true;
+    private static final HasPermissions ALLOW_ALL = (permission, id) -> true;
 
     @Mock
     private FleetService fleetService;
@@ -136,7 +136,7 @@ class ActivityEntryMapperTest {
 
     @Test
     void skipsTargetsAndDetailsTheUserMayNotSee() {
-        final BiPredicate<String, String> denyFleet2 = (permission, id) ->
+        final HasPermissions denyFleet2 = (permission, id) ->
                 !(CollectorsPermissions.FLEET_READ.equals(permission) && "fleet-2".equals(id));
 
         final var entries = mapper.toEntries(
@@ -154,7 +154,7 @@ class ActivityEntryMapperTest {
         when(alice.getId()).thenReturn("alice-id");
         when(userService.load("alice")).thenReturn(alice);
 
-        final BiPredicate<String, String> denyUsersRead = (permission, id) -> !permission.startsWith("users:");
+        final HasPermissions denyUsersRead = (permission, id) -> !permission.startsWith("users:");
 
         final var entries = mapper.toEntries(
                 List.of(marker(6L, TransactionMarker.TARGET_FLEET, Set.of("fleet-1"), MarkerType.CONFIG_CHANGED, null, "alice")),

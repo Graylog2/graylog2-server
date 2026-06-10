@@ -30,6 +30,7 @@ import org.graylog.collectors.db.TransactionMarker;
 import org.graylog.collectors.rest.RecentActivityResponse.ActivityDetails;
 import org.graylog.collectors.rest.RecentActivityResponse.FleetReassignedDetails;
 import org.graylog.collectors.rest.RecentActivityResponse.TargetInfo;
+import org.graylog.security.HasPermissions;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 
@@ -41,7 +42,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
 /**
@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
  * ({@link CollectorsActivityResource}) and the per-instance pending-changes view
  * ({@link CollectorInstancesResource}) so both render transaction history identically.
  * <p>
- * Permission checks are caller-supplied (a {@code (permission, id)} predicate, typically the resource's
+ * Permission checks are caller-supplied (a {@link HasPermissions}, typically the resource's
  * {@code this::isPermitted}) because visibility filtering must run against the requesting user's subject.
  */
 @Singleton
@@ -70,7 +70,7 @@ class ActivityEntryMapper {
     }
 
     List<RecentActivityResponse.ActivityEntry> toEntries(List<TransactionMarker> markers,
-                                                         BiPredicate<String, String> isPermitted) {
+                                                         HasPermissions isPermitted) {
         if (markers.isEmpty()) {
             return List.of();
         }
@@ -111,7 +111,7 @@ class ActivityEntryMapper {
             Map<String, String> fleetNames,
             Map<String, CollectorInstanceDTO> instances,
             Map<String, String> userDisplayNames,
-            BiPredicate<String, String> isPermitted) {
+            HasPermissions isPermitted) {
 
         // Resolve actor
         final RecentActivityResponse.ActorInfo actor;
@@ -130,7 +130,7 @@ class ActivityEntryMapper {
             if (TransactionMarker.TARGET_FLEET.equals(marker.target())) {
                 if (fleetNames.containsKey(targetId)) {
                     // skip the target if it's a fleet we have no permission to
-                    if (!isPermitted.test(CollectorsPermissions.FLEET_READ, targetId)) {
+                    if (!isPermitted.isPermitted(CollectorsPermissions.FLEET_READ, targetId)) {
                         continue;
                     }
                     id = targetId;
@@ -142,7 +142,7 @@ class ActivityEntryMapper {
             } else {
                 if (instances.containsKey(targetId)) {
                     // skip the target if the user cannot see the target's fleet
-                    if (!isPermitted.test(CollectorsPermissions.FLEET_READ, instances.get(targetId).fleetId())) {
+                    if (!isPermitted.isPermitted(CollectorsPermissions.FLEET_READ, instances.get(targetId).fleetId())) {
                         continue;
                     }
                     id = targetId;
@@ -179,11 +179,11 @@ class ActivityEntryMapper {
     @Nullable
     private static ActivityDetails resolveDetails(TransactionMarker marker,
                                                   Map<String, String> fleetNames,
-                                                  BiPredicate<String, String> isPermitted) {
+                                                  HasPermissions isPermitted) {
         if (marker.type() == MarkerType.FLEET_REASSIGNED
                 && marker.payload() instanceof FleetReassignedPayload(String newFleetId)) {
             if (fleetNames.containsKey(newFleetId)) {
-                if (isPermitted.test(CollectorsPermissions.FLEET_READ, newFleetId)) {
+                if (isPermitted.isPermitted(CollectorsPermissions.FLEET_READ, newFleetId)) {
                     return new FleetReassignedDetails(
                             new TargetInfo(newFleetId, fleetNames.get(newFleetId), TransactionMarker.TARGET_FLEET));
                 }
@@ -196,12 +196,12 @@ class ActivityEntryMapper {
     }
 
     private Map<String, String> resolveUserDisplayNames(Set<String> usernames,
-                                                        BiPredicate<String, String> isPermitted) {
+                                                        HasPermissions isPermitted) {
         final Map<String, String> result = new HashMap<>();
         for (final var username : usernames) {
             final var fullName = Optional.ofNullable(userService.load(username))
                     .or(() -> Optional.ofNullable(userService.loadById(username)))
-                    .map(user -> isPermitted.test(RestPermissions.USERS_READ, user.getId()) ? user.getFullName() : "Unknown")
+                    .map(user -> isPermitted.isPermitted(RestPermissions.USERS_READ, user.getId()) ? user.getFullName() : "Unknown")
                     .orElse(username);
             result.put(username, fullName);
         }
