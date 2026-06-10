@@ -28,35 +28,12 @@ export type OutdatedIndex = {
   system_index: boolean;
 };
 
-// TODO: REMOVE — local UI mock for OutdatedIndicesTable. Delete this block to restore real data.
-const USE_MOCK_OUTDATED_INDICES = true;
-const MOCK_VERSIONS = ['7.10.2', '6.8.23', '1.3.18'];
-const mockVersion = (i: number) => MOCK_VERSIONS[i % MOCK_VERSIONS.length];
-const MOCK_OUTDATED_INDICES: Array<OutdatedIndex> = [
-  ...Array.from({ length: 20 }, (_, i) => ({
-    index_name: `graylog_${i}`,
-    version: mockVersion(i),
-    warm_index: i % 4 === 0,
-    managed_index: true,
-    system_index: false,
-  })),
-  ...Array.from({ length: 21 }, (_, i) => ({
-    index_name: `.system_index_${i}`,
-    version: mockVersion(i),
-    warm_index: false,
-    managed_index: false,
-    system_index: true,
-  })),
-  ...Array.from({ length: 22 }, (_, i) => ({
-    index_name: `legacy_unknown_${i}`,
-    version: mockVersion(i),
-    warm_index: false,
-    managed_index: false,
-    system_index: false,
-  })),
-];
+type Options = {
+  mockData?: Array<OutdatedIndex>;
+};
 
-const useOutdatedIndices = () => {
+const useOutdatedIndices = ({ mockData }: Options = {}) => {
+  const useMockData = !!mockData;
   const {
     data = [],
     isError,
@@ -71,22 +48,13 @@ const useOutdatedIndices = () => {
         'Could not load outdated indices',
       ),
     retry: false,
-    enabled: !USE_MOCK_OUTDATED_INDICES,
+    enabled: !useMockData,
   });
 
-  if (USE_MOCK_OUTDATED_INDICES) {
-    return {
-      data: MOCK_OUTDATED_INDICES,
-      isError: false,
-      isLoading: false,
-      refetch,
-    };
-  }
-
   return {
-    data,
-    isError,
-    isLoading,
+    data: mockData ?? data,
+    isError: useMockData ? false : isError,
+    isLoading: useMockData ? false : isLoading,
     refetch,
   };
 };

@@ -20,13 +20,16 @@ import styled, { css } from 'styled-components';
 import { IndexerIndices } from '@graylog/server-api';
 
 import { Alert, Button, ButtonToolbar, Label, SegmentedControl, Table } from 'components/bootstrap';
+import type { StyleProps } from 'components/bootstrap/Button';
 import { ConfirmDialog, Spinner } from 'components/common';
 import useCanArchive from 'components/indices/hooks/useCanArchive';
 import useOutdatedIndices from 'components/indices/hooks/useOutdatedIndices';
 import type { OutdatedIndex } from 'components/indices/hooks/useOutdatedIndices';
 import fetch from 'logic/rest/FetchProvider';
-import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
+import UserNotification from 'util/UserNotification';
+
+import { outdatedIndicesMockOverride } from './mockOutdatedIndices';
 
 const Heading = styled.h4(
   ({ theme }) => css`
@@ -34,6 +37,10 @@ const Heading = styled.h4(
     margin-bottom: ${theme.spacings.sm};
   `,
 );
+
+const ActionsToolbar = styled(ButtonToolbar)`
+  justify-content: flex-end;
+`;
 
 const ScrollableTableWrapper = styled.div(
   ({ theme }) => css`
@@ -96,74 +103,123 @@ type ConfirmedAction = {
   index: OutdatedIndex;
 };
 
-const actionTitle = (action: IndexAction) => {
-  switch (action) {
-    case 'archive-delete':
-      return 'Archive and delete index';
-    case 'reindex-system-index':
-      return 'Reindex system index';
-    default:
-      return 'Delete index';
-  }
+type ActionDefinition = {
+  buttonLabel: string;
+  buttonStyle: StyleProps;
+  confirmTitle: string;
+  confirmText: string;
+  confirmationBody: (index: OutdatedIndex) => React.ReactNode;
+  run: (index: OutdatedIndex) => Promise<unknown>;
+  successMessage: (index: OutdatedIndex) => string;
 };
 
-const actionConfirmText = (action: IndexAction) => {
-  switch (action) {
-    case 'archive-delete':
-      return 'Archive and delete';
-    case 'reindex-system-index':
-      return 'Reindex system index';
-    default:
-      return 'Delete';
-  }
-};
+type IndexGroupId = 'graylog' | 'system' | 'foreign';
 
-const actionMessage = ({ action, index }: ConfirmedAction) => {
-  switch (action) {
-    case 'archive-delete':
-      return (
-        <p>
-          This will create an archive for <strong>{index.index_name}</strong> and delete the index afterwards.
-        </p>
-      );
-    case 'reindex-system-index':
-      return (
-        <p>
-          This will reindex <strong>{index.index_name}</strong> so it can be used with OpenSearch 3.
-        </p>
-      );
-    default:
-      return (
-        <p>
-          This will permanently delete <strong>{index.index_name}</strong>.
-        </p>
-      );
-  }
-};
-
-type IndicesGroup = {
+type IndexGroupDefinition = {
+  id: IndexGroupId;
   shortLabel: string;
   indexLabel: string;
+  matches: (index: OutdatedIndex) => boolean;
+};
+
+type IndicesGroup = Omit<IndexGroupDefinition, 'matches'> & {
   indices: Array<OutdatedIndex>;
 };
 
-const groupOutdatedIndices = (indices: Array<OutdatedIndex>): Array<IndicesGroup> => [
+const INDEX_GROUPS: Array<IndexGroupDefinition> = [
   {
+    id: 'graylog',
     shortLabel: 'Graylog',
     indexLabel: 'Graylog index',
-    indices: indices.filter((i) => i.managed_index && !i.system_index),
+    matches: (index) => index.managed_index && !index.system_index,
   },
   {
+    id: 'system',
     shortLabel: 'System',
     indexLabel: 'System index',
-    indices: indices.filter((i) => i.system_index),
+    matches: (index) => index.system_index,
   },
   {
+    id: 'foreign',
     shortLabel: 'Foreign',
     indexLabel: 'Foreign index',
-    indices: indices.filter((i) => !i.managed_index && !i.system_index),
+    matches: (index) => !index.managed_index && !index.system_index,
   },
 ];
+
+const DEFAULT_GROUP_ID = INDEX_GROUPS[0].id;
+
+const archiveAndDeleteIndex = (indexName: string) =>
+  fetch(
+    'POST',
+    qualifyUrl(
+      `/plugins/org.graylog.plugins.archive/cluster/archives/${encodeURIComponent(indexName)}?index_action=DELETE`,
+    ),
+  );
+
+const ACTION_DEFINITIONS: Record<IndexAction, ActionDefinition> = {
+  delete: {
+    buttonLabel: 'Delete',
+    buttonStyle: 'danger',
+    confirmTitle: 'Delete index',
+    confirmText: 'Delete',
+    confirmationBody: (index) => (
+      <p>
+        This will permanently delete <strong>{index.index_name}</strong>.
+      </p>
+    ),
+    run: (index) => IndexerIndices.remove(index.index_name),
+    successMessage: (index) => `Index "${index.index_name}" was deleted.`,
+  },
+  'archive-delete': {
+    buttonLabel: 'Archive and delete',
+    buttonStyle: 'warning',
+    confirmTitle: 'Archive and delete index',
+    confirmText: 'Archive and delete',
+    confirmationBody: (index) => (
+      <p>
+        This will create an archive for <strong>{index.index_name}</strong> and delete the index afterwards.
+      </p>
+    ),
+    run: (index) => archiveAndDeleteIndex(index.index_name),
+    successMessage: (index) => `Archive and delete job for "${index.index_name}" was started.`,
+  },
+  'reindex-system-index': {
+    buttonLabel: 'Reindex',
+    buttonStyle: 'primary',
+    confirmTitle: 'Reindex system index',
+    confirmText: 'Reindex system index',
+    confirmationBody: (index) => (
+      <p>
+        This will reindex <strong>{index.index_name}</strong> so it can be used with OpenSearch 3.
+      </p>
+    ),
+    run: (index) => IndexerIndices.reindex(index.index_name),
+    successMessage: (index) => `Index "${index.index_name}" was reindexed.`,
+  },
+};
+
+const groupOutdatedIndices = (indices: Array<OutdatedIndex>): Array<IndicesGroup> =>
+  INDEX_GROUPS.map(({ id, shortLabel, indexLabel, matches }) => ({
+    id,
+    shortLabel,
+    indexLabel,
+    indices: indices.filter(matches),
+  }));
+
+const getAvailableActions = (index: OutdatedIndex, canArchive: boolean): Array<IndexAction> => {
+  if (index.system_index) {
+    return ['reindex-system-index'];
+  }
+
+  return index.managed_index && canArchive ? ['archive-delete', 'delete'] : ['delete'];
+};
+
+const getFirstGroupWithIndices = (groups: Array<IndicesGroup>) =>
+  groups.find((group) => group.indices.length > 0)?.id ?? DEFAULT_GROUP_ID;
+
+const getSelectedGroup = (groups: Array<IndicesGroup>, selectedGroupId: string) =>
+  groups.find((group) => group.id === selectedGroupId) ?? groups[0];
 
 const OutdatedIndexActions = ({
   index,
@@ -174,25 +230,24 @@ const OutdatedIndexActions = ({
   onAction: (action: ConfirmedAction) => void;
   canArchive: boolean;
 }) => {
-  if (index.system_index) {
-    return (
-      <Button bsSize="xs" bsStyle="primary" onClick={() => onAction({ action: 'reindex-system-index', index })}>
-        Reindex
-      </Button>
-    );
-  }
+  const actions = getAvailableActions(index, canArchive);
 
   return (
-    <ButtonToolbar style={{ justifyContent: 'flex-end' }}>
-      {index.managed_index && canArchive && (
-        <Button bsSize="xs" bsStyle="warning" onClick={() => onAction({ action: 'archive-delete', index })}>
-          Archive and delete
-        </Button>
-      )}
-      <Button bsSize="xs" bsStyle="danger" onClick={() => onAction({ action: 'delete', index })}>
-        Delete
-      </Button>
-    </ButtonToolbar>
+    <ActionsToolbar>
+      {actions.map((action) => {
+        const actionDefinition = ACTION_DEFINITIONS[action];
+
+        return (
+          <Button
+            key={action}
+            bsSize="xs"
+            bsStyle={actionDefinition.buttonStyle}
+            onClick={() => onAction({ action, index })}>
+            {actionDefinition.buttonLabel}
+          </Button>
+        );
+      })}
+    </ActionsToolbar>
   );
 };
 
@@ -227,7 +282,7 @@ const IndicesGroupTable = ({
                 {index.warm_index && (
                   <>
                     &nbsp;
-                    <Label bsStyle="info" bsSize="xs">
+                    <Label bsStyle="gray" bsSize="xs">
                       warm
                     </Label>
                   </>
@@ -245,20 +300,52 @@ const IndicesGroupTable = ({
   );
 };
 
+const ActionConfirmDialog = ({
+  confirmedAction,
+  isSubmitting,
+  onCancel,
+  onConfirm,
+}: {
+  confirmedAction: ConfirmedAction;
+  isSubmitting: boolean;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) => {
+  const actionDefinition = ACTION_DEFINITIONS[confirmedAction.action];
+
+  return (
+    <ConfirmDialog
+      show
+      title={actionDefinition.confirmTitle}
+      btnConfirmText={actionDefinition.confirmText}
+      isAsyncSubmit
+      isSubmitting={isSubmitting}
+      onCancel={onCancel}
+      onConfirm={onConfirm}
+      submitLoadingText="Working...">
+      {actionDefinition.confirmationBody(confirmedAction.index)}
+    </ConfirmDialog>
+  );
+};
+
 const OutdatedIndicesTable = () => {
-  const { data: outdatedIndices, isError, isLoading, refetch } = useOutdatedIndices();
+  const { data: outdatedIndices, isError, isLoading, refetch } = useOutdatedIndices({
+    mockData: outdatedIndicesMockOverride,
+  });
   const canArchive = useCanArchive();
+  const isUsingMockData = !!outdatedIndicesMockOverride;
   const [confirmedAction, setConfirmedAction] = useState<ConfirmedAction | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedGroupId, setSelectedGroupId] = useState<string | undefined>();
+
   const indicesGroups = useMemo(() => groupOutdatedIndices(outdatedIndices), [outdatedIndices]);
-  const defaultGroupLabel =
-    indicesGroups.find((g) => g.indices.length > 0)?.shortLabel ?? indicesGroups[0].shortLabel;
-  const [selectedGroupLabel, setSelectedGroupLabel] = useState<string>(defaultGroupLabel);
+  const firstGroupWithIndices = useMemo(() => getFirstGroupWithIndices(indicesGroups), [indicesGroups]);
+  const activeGroupId = selectedGroupId ?? firstGroupWithIndices;
+  const selectedGroup = getSelectedGroup(indicesGroups, activeGroupId);
   const segments = useMemo(
-    () => indicesGroups.map((g) => ({ value: g.shortLabel, label: `${g.shortLabel} (${g.indices.length})` })),
+    () => indicesGroups.map((group) => ({ value: group.id, label: `${group.shortLabel} (${group.indices.length})` })),
     [indicesGroups],
   );
-  const selectedGroup = indicesGroups.find((g) => g.shortLabel === selectedGroupLabel) ?? indicesGroups[0];
 
   const closeConfirmDialog = () => setConfirmedAction(undefined);
 
@@ -267,36 +354,22 @@ const OutdatedIndicesTable = () => {
       return;
     }
 
+    const actionDefinition = ACTION_DEFINITIONS[confirmedAction.action];
+
     setIsSubmitting(true);
 
     try {
-      if (confirmedAction.action === 'delete') {
-        await IndexerIndices.remove(confirmedAction.index.index_name);
-        UserNotification.success(`Index "${confirmedAction.index.index_name}" was deleted.`);
+      if (isUsingMockData) {
+        UserNotification.success(`[Mock] ${actionDefinition.successMessage(confirmedAction.index)}`);
+      } else {
+        await actionDefinition.run(confirmedAction.index);
+        UserNotification.success(actionDefinition.successMessage(confirmedAction.index));
+        await refetch();
       }
 
-      if (confirmedAction.action === 'archive-delete') {
-        await fetch(
-          'POST',
-          qualifyUrl(
-            `/plugins/org.graylog.plugins.archive/cluster/archives/${confirmedAction.index.index_name}?index_action=DELETE`,
-          ),
-        );
-        UserNotification.success(`Archive and delete job for "${confirmedAction.index.index_name}" was started.`);
-      }
-
-      if (confirmedAction.action === 'reindex-system-index') {
-        await IndexerIndices.reindex(confirmedAction.index.index_name);
-        UserNotification.success(`Index "${confirmedAction.index.index_name}" was reindexed.`);
-      }
-
-      await refetch();
       closeConfirmDialog();
     } catch (errorThrown) {
-      UserNotification.error(
-        String(errorThrown),
-        `Could not ${actionConfirmText(confirmedAction.action).toLowerCase()}.`,
-      );
+      UserNotification.error(String(errorThrown), `Could not ${actionDefinition.confirmText.toLowerCase()}.`);
     } finally {
       setIsSubmitting(false);
     }
@@ -317,21 +390,22 @@ const OutdatedIndicesTable = () => {
   return (
     <>
       <Heading>Outdated indices</Heading>
-      <SegmentedControl data={segments} value={selectedGroupLabel} onChange={setSelectedGroupLabel} />
+      <SegmentedControl
+        data={segments}
+        value={activeGroupId}
+        onChange={setSelectedGroupId}
+        color="warning"
+        autoContrast
+      />
       <IndicesGroupTable group={selectedGroup} onAction={setConfirmedAction} canArchive={canArchive} />
 
       {confirmedAction && (
-        <ConfirmDialog
-          show
-          title={actionTitle(confirmedAction.action)}
-          btnConfirmText={actionConfirmText(confirmedAction.action)}
-          isAsyncSubmit
+        <ActionConfirmDialog
+          confirmedAction={confirmedAction}
           isSubmitting={isSubmitting}
           onCancel={closeConfirmDialog}
           onConfirm={handleConfirm}
-          submitLoadingText="Working...">
-          {actionMessage(confirmedAction)}
-        </ConfirmDialog>
+        />
       )}
     </>
   );

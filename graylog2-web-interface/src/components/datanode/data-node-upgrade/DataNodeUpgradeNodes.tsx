@@ -48,7 +48,8 @@ const NodeIdentityCell = ({ node }: { node: DataNodeInformation }) => (
 );
 
 const DataNodeUpgradeNodes = ({ outdatedNodes, upToDateNodes, upgradedListRef, onStartNodeUpgrade }: Props) => (
-  <Col xs={12}>
+  <>
+    <br />
     <Row>
       <Col sm={6}>
         <h3>Outdated Nodes</h3>
@@ -107,7 +108,7 @@ const DataNodeUpgradeNodes = ({ outdatedNodes, upToDateNodes, upgradedListRef, o
         </Table>
       </Col>
     </Row>
-  </Col>
+  </>
 );
 
 export default DataNodeUpgradeNodes;

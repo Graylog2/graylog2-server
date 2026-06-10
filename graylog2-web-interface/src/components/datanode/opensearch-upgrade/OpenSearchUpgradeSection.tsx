@@ -15,16 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
 import styled, { css } from 'styled-components';
-
-import { SystemClusterStats } from '@graylog/server-api';
 
 import { Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import useOutdatedIndices from 'components/indices/hooks/useOutdatedIndices';
-import { defaultOnError } from 'util/conditional/onError';
 
+import useOpenSearchClusterStats, { TARGET_OPENSEARCH_VERSION } from './hooks/useOpenSearchClusterStats';
+import { outdatedIndicesMockOverride } from './mockOutdatedIndices';
 import OutdatedIndicesTable from './OutdatedIndicesTable';
 
 const Section = styled.div(
@@ -51,36 +49,17 @@ const InfoList = styled.dl(
       clear: left;
       float: left;
       margin-bottom: ${theme.spacings.sm};
-      width: 180px;
+      width: 240px;
     }
 
     > dd {
       margin-bottom: ${theme.spacings.sm};
-      margin-left: 180px;
+      margin-left: 240px;
     }
   `,
 );
 
-const TARGET_OPENSEARCH_VERSION = '3.5.0';
 const MIN_NODES_FOR_ROLLING_UPGRADE = 3;
-
-const useOpenSearchClusterStats = () => {
-  const { data, isInitialLoading } = useQuery({
-    queryKey: ['opensearch-upgrade', 'cluster-stats'],
-    queryFn: () =>
-      defaultOnError(
-        SystemClusterStats.elasticsearchStats(),
-        'Loading OpenSearch cluster stats failed',
-        'Could not load OpenSearch cluster stats',
-      ),
-  });
-
-  return {
-    currentVersion: data?.cluster_version,
-    numberOfDataNodes: data?.cluster_health?.number_of_data_nodes ?? 0,
-    isLoading: isInitialLoading,
-  };
-};
 
 const OpenSearchUpgradeInfo = ({
   currentVersion,
@@ -90,49 +69,47 @@ const OpenSearchUpgradeInfo = ({
   isLoading: boolean;
 }) => (
   <InfoList>
-    <dt>Current OpenSearch:</dt>
+    <dt>Current OpenSearch version:</dt>
     <dd>{isLoading ? <Spinner text="Loading..." /> : currentVersion || 'Unknown'}</dd>
-    <dt>Target OpenSearch:</dt>
+    <dt>Target OpenSearch version:</dt>
     <dd>{TARGET_OPENSEARCH_VERSION}</dd>
   </InfoList>
 );
 
 const OpenSearchUpgradeSection = () => {
   const { currentVersion, numberOfDataNodes, isLoading } = useOpenSearchClusterStats();
-  const { data: outdatedIndices } = useOutdatedIndices();
+  const { data: outdatedIndices } = useOutdatedIndices({ mockData: outdatedIndicesMockOverride });
   const isRollingUpgradePossible = numberOfDataNodes >= MIN_NODES_FOR_ROLLING_UPGRADE;
   const hasOutdatedIndices = outdatedIndices.length > 0;
 
   return (
-    <Col xs={12}>
-      <Section>
-        <h3>OpenSearch Upgrade</h3>
-        <OpenSearchUpgradeInfo currentVersion={currentVersion} isLoading={isLoading} />
+    <Section>
+      <h1>Upgrade OpenSearch</h1>
+      <OpenSearchUpgradeInfo currentVersion={currentVersion} isLoading={isLoading} />
 
-        <Row>
-          <Col xs={12}>
-            <OutdatedIndicesTable />
-          </Col>
-        </Row>
+      <Row>
+        <Col xs={12}>
+          <OutdatedIndicesTable />
+        </Col>
+      </Row>
 
-        <Row>
-          <Col xs={12}>
-            <ButtonToolbar>
-              {isRollingUpgradePossible ? (
-                <Button bsStyle="primary" onClick={() => {}} disabled={hasOutdatedIndices} type="button">
-                  Start OpenSearch Rolling Upgrade
-                </Button>
-              ) : (
-                <Button bsStyle="default" onClick={() => {}} disabled={hasOutdatedIndices} type="button">
-                  Apply OpenSearch upgrade on next restart
-                </Button>
-              )}
-            </ButtonToolbar>
-            {hasOutdatedIndices && <DisabledHint>Resolve all outdated indices first.</DisabledHint>}
-          </Col>
-        </Row>
-      </Section>
-    </Col>
+      <Row>
+        <Col xs={12}>
+          <ButtonToolbar>
+            {isRollingUpgradePossible ? (
+              <Button bsStyle="primary" onClick={() => {}} disabled={hasOutdatedIndices} type="button">
+                Start OpenSearch Rolling Upgrade
+              </Button>
+            ) : (
+              <Button bsStyle="default" onClick={() => {}} disabled={hasOutdatedIndices} type="button">
+                Apply OpenSearch upgrade on next restart
+              </Button>
+            )}
+          </ButtonToolbar>
+          {hasOutdatedIndices && <DisabledHint>Resolve all outdated indices first.</DisabledHint>}
+        </Col>
+      </Row>
+    </Section>
   );
 };
 

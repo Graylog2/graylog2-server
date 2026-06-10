@@ -17,7 +17,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Button, Col, Label } from 'components/bootstrap';
+import { Button, Label } from 'components/bootstrap';
 import HelpPopoverButton from 'components/common/HelpPopoverButton';
 import { startShardReplication, stopShardReplication } from 'components/datanode/hooks/useDataNodeUpgradeStatus';
 import type { DatanodeUpgradeStatus } from 'components/datanode/hooks/useDataNodeUpgradeStatus';
@@ -121,7 +121,7 @@ type Props = {
 };
 
 const ClusterHealthInfo = ({ data, numberOfNodes, showShardReplication }: Props) => (
-  <Col xs={12}>
+  <>
     <h3>
       <Label bsStyle={getClusterHealthStyle(data?.cluster_state?.status)} bsSize="xs">
         {data?.cluster_state?.cluster_name}: {data?.cluster_state?.status}
@@ -168,8 +168,7 @@ const ClusterHealthInfo = ({ data, numberOfNodes, showShardReplication }: Props)
         {data?.cluster_state?.unassigned_shards || 0} unassigned
       </dd>
     </StyledHorizontalDl>
-    <br />
-  </Col>
+  </>
 );
 
 export default ClusterHealthInfo;
