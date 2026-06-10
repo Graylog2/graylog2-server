@@ -40,7 +40,6 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog.collectors.db.FleetReassignedPayload;
 import org.bson.conversions.Bson;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorsConfigService;
@@ -51,6 +50,7 @@ import org.graylog.collectors.SourceService;
 import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.FleetDTO;
+import org.graylog.collectors.db.FleetReassignedPayload;
 import org.graylog.collectors.db.MarkerType;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
@@ -117,6 +117,7 @@ public class CollectorInstancesResource extends RestResource {
                     })
                     .sortSpec(AttributeSortSpec.field(FIELD_LAST_SEEN))
                     .build(),
+            EntityAttribute.builder().id("has_pending_changes").title("Sync").sortable(false).build(),
             // Workaround: type(OBJECT_ID) is needed so the frontend sends identifier_type=OBJECT_ID
             // to the entity title service (POST /system/catalog/entities/titles), which converts the
             // string fleet_id to an ObjectId for the _id lookup in the fleets collection.
@@ -231,7 +232,9 @@ public class CollectorInstancesResource extends RestResource {
                 resolvedSort,
                 page,
                 perPage,
-                dto ->  isPermitted(CollectorsPermissions.FLEET_READ, dto.fleetId()));
+                dto -> isPermitted(CollectorsPermissions.FLEET_READ, dto.fleetId()));
+
+        final var instanceUidsWithPendingChanges = txnLogService.instanceUidsWithPendingChanges(list);
 
         return PageListResponse.create(
                 query,
@@ -239,20 +242,23 @@ public class CollectorInstancesResource extends RestResource {
                 list.pagination().total(),
                 sort,
                 order,
-                list.stream().map(dto -> new CollectorInstanceResponse(
-                        dto.lastSeen().isBefore(offlineCutoff) ? "offline" : "online",
-                        dto.instanceUid(),
-                        dto.fleetId(),
-                        dto.capabilities(),
-                        dto.enrolledAt(),
-                        dto.lastSeen(),
-                        dto.activeCertificateFingerprint(),
-                        dto.activeCertificateExpiresAt(),
-                        dto.nextCertificateFingerprint().orElse(null),
-                        dto.nextCertificateExpiresAt().orElse(null),
-                        attributesToMap(dto.identifyingAttributes()),
-                        attributesToMap(dto.nonIdentifyingAttributes())
-                )).toList(),
+                list.stream().map(dto -> {
+                    return new CollectorInstanceResponse(
+                            dto.lastSeen().isBefore(offlineCutoff) ? "offline" : "online",
+                            dto.instanceUid(),
+                            dto.fleetId(),
+                            dto.capabilities(),
+                            dto.enrolledAt(),
+                            dto.lastSeen(),
+                            dto.activeCertificateFingerprint(),
+                            dto.activeCertificateExpiresAt(),
+                            dto.nextCertificateFingerprint().orElse(null),
+                            dto.nextCertificateExpiresAt().orElse(null),
+                            attributesToMap(dto.identifyingAttributes()),
+                            attributesToMap(dto.nonIdentifyingAttributes()),
+                            instanceUidsWithPendingChanges.contains(dto.instanceUid())
+                    );
+                }).toList(),
                 ATTRIBUTES,
                 DEFAULTS);
     }
@@ -312,7 +318,6 @@ public class CollectorInstancesResource extends RestResource {
                 .map(CollectorInstanceDTO::instanceUid)
                 .collect(Collectors.toSet());
 
-        // TODO: Show pending configuration changes per collector instance (#25341)
         txnLogService.appendCollectorMarker(
                 permittedInstanceUids,
                 MarkerType.FLEET_REASSIGNED,

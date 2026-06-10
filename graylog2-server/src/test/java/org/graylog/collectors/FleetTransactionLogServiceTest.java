@@ -19,6 +19,7 @@ package org.graylog.collectors;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
+import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.FleetReassignedPayload;
 import org.graylog.collectors.db.MarkerType;
 import org.graylog.collectors.db.TransactionMarker;
@@ -32,8 +33,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -223,5 +226,99 @@ class FleetTransactionLogServiceTest {
 
         assertThat(markers).hasSize(1);
         assertThat(markers.getFirst().type()).isEqualTo(MarkerType.CONFIG_CHANGED);
+    }
+
+    // --- instanceUidsWithPendingChanges tests ---
+
+    @Test
+    void instanceUidsWithPendingChangesCoversFleetAndCollectorScopes() {
+        service.appendFleetMarker("fleet-1", MarkerType.CONFIG_CHANGED);              // seq 1
+        service.appendCollectorMarker(Set.of("uid-C"), MarkerType.RESTART, null);     // seq 2
+
+        var result = service.instanceUidsWithPendingChanges(List.of(
+                instance("uid-A", "fleet-1", 0L),    // pending via its fleet's marker
+                instance("uid-B", "fleet-2", 0L),    // nothing targets fleet-2 or uid-B
+                instance("uid-C", "fleet-2", 0L)));  // pending via its own marker
+
+        assertThat(result).containsExactlyInAnyOrder("uid-A", "uid-C");
+    }
+
+    @Test
+    void instanceUidsWithPendingChangesHonorsEachInstancesOwnCursor() {
+        service.appendFleetMarker("fleet-1", MarkerType.CONFIG_CHANGED);              // seq 1
+        long s2 = service.appendFleetMarker("fleet-1", MarkerType.CONFIG_CHANGED);    // seq 2
+
+        // same fleet, different applied cursors: only the lagging instance is pending
+        var result = service.instanceUidsWithPendingChanges(List.of(
+                instance("uid-A", "fleet-1", 0L),
+                instance("uid-B", "fleet-1", s2)));
+
+        assertThat(result).containsExactly("uid-A");
+    }
+
+    @Test
+    void instanceUidsWithPendingChangesTreatsMarkerAtCursorAsApplied() {
+        long s1 = service.appendFleetMarker("fleet-1", MarkerType.CONFIG_CHANGED);
+
+        var result = service.instanceUidsWithPendingChanges(List.of(instance("uid-A", "fleet-1", s1)));
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void instanceUidsWithPendingChangesUnwindsBulkCollectorMarkers() {
+        service.appendCollectorMarker(Set.of("uid-A", "uid-B"), MarkerType.RESTART, null);
+
+        var result = service.instanceUidsWithPendingChanges(List.of(
+                instance("uid-A", "fleet-1", 0L),
+                instance("uid-B", "fleet-1", 0L),
+                instance("uid-C", "fleet-1", 0L)));
+
+        assertThat(result).containsExactlyInAnyOrder("uid-A", "uid-B");
+    }
+
+    @Test
+    void instanceUidsWithPendingChangesIgnoresForeignIdsFromBulkFleetMarkers() {
+        // bulk marker also targets fleet-2, which no given instance belongs to
+        service.appendFleetMarker(Set.of("fleet-1", "fleet-2"), MarkerType.CONFIG_CHANGED);
+
+        var result = service.instanceUidsWithPendingChanges(List.of(instance("uid-A", "fleet-1", 0L)));
+
+        assertThat(result).containsExactly("uid-A");
+    }
+
+    @Test
+    void instanceUidsWithPendingChangesChunksLargeInputs() {
+        service.appendFleetMarker("fleet-1", MarkerType.CONFIG_CHANGED);
+
+        var instances = IntStream.range(0, FleetTransactionLogService.MAX_SEQ_SCAN_BATCH_SIZE + 50)
+                .mapToObj(n -> instance("uid-" + n, "fleet-1", 0L))
+                .toList();
+
+        var result = service.instanceUidsWithPendingChanges(instances);
+
+        assertThat(result).hasSize(instances.size());
+    }
+
+    @Test
+    void instanceUidsWithPendingChangesReturnsEmptySetForEmptyInput() {
+        assertThat(service.instanceUidsWithPendingChanges(List.of())).isEmpty();
+    }
+
+    private static CollectorInstanceDTO instance(String uid, String fleetId, long lastProcessedTxnSeq) {
+        return CollectorInstanceDTO.builder()
+                .instanceUid(uid)
+                .fleetId(fleetId)
+                .lastProcessedTxnSeq(lastProcessedTxnSeq)
+                .lastSeen(Instant.EPOCH)
+                .enrolledAt(Instant.EPOCH)
+                .messageSeqNum(0L)
+                .capabilities(0L)
+                .activeCertificateFingerprint("fp-" + uid)
+                .activeCertificatePem("pem")
+                .activeCertificateExpiresAt(Instant.EPOCH)
+                .issuingCaId("ca-1")
+                .enrollmentTokenId("token-1")
+                .build();
     }
 }

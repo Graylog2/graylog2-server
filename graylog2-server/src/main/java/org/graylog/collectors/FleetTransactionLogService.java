@@ -16,8 +16,11 @@
  */
 package org.graylog.collectors;
 
+import com.google.common.collect.Lists;
 import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Accumulators;
+import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Sorts;
@@ -27,8 +30,10 @@ import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog.collectors.db.CoalescedActions;
+import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.FleetReassignedPayload;
 import org.graylog.collectors.db.MarkerPayload;
 import org.graylog.collectors.db.MarkerType;
@@ -39,7 +44,10 @@ import org.graylog2.plugin.system.NodeId;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.graylog.collectors.db.TransactionMarker.FIELD_CREATED_AT;
@@ -63,6 +71,8 @@ public class FleetTransactionLogService {
      * The maximum number of bulk action targets we allow for a transaction log entry.
      */
     public static final int MAX_BULK_TARGET_SIZE = 100;
+
+    static final int MAX_SEQ_SCAN_BATCH_SIZE = 1000;
 
     private final MongoCollection<TransactionMarker> collection;
     private final MongoSequenceService sequenceService;
@@ -162,6 +172,76 @@ public class FleetTransactionLogService {
         return collection.find(filter)
                 .sort(Sorts.ascending(FIELD_ID))
                 .into(new ArrayList<>());
+    }
+
+    /**
+     * Returns the uids of the given collector instances that have pending changes — i.e. at least one
+     * transaction-log marker, targeting the instance directly (collector-scoped) or its current fleet
+     * (fleet-scoped), that is newer than the instance's last applied marker
+     * ({@link CollectorInstanceDTO#lastProcessedTxnSeq()}).
+     */
+    public Set<String> instanceUidsWithPendingChanges(List<CollectorInstanceDTO> instances) {
+
+        final Set<String> result = new HashSet<>();
+
+        for (final var batch : Lists.partition(instances, MAX_SEQ_SCAN_BATCH_SIZE)) {
+
+            final Set<String> instanceUuids = new HashSet<>();
+            final Set<String> fleetIds = new HashSet<>();
+            long lowestSeq = Long.MAX_VALUE;
+            for (final var instance : batch) {
+                if (instance.lastProcessedTxnSeq() < lowestSeq) {
+                    lowestSeq = instance.lastProcessedTxnSeq();
+                }
+                instanceUuids.add(instance.instanceUid());
+                fleetIds.add(instance.fleetId());
+            }
+
+            final var pipeline = List.of(
+                    Aggregates.match(
+                            Filters.and(
+                                    Filters.gt(FIELD_ID, lowestSeq),
+                                    Filters.or(
+                                            Filters.and(
+                                                    Filters.eq(FIELD_TARGET, TARGET_FLEET),
+                                                    Filters.in(FIELD_TARGET_ID, fleetIds)
+                                            ),
+                                            Filters.and(
+                                                    Filters.eq(FIELD_TARGET, TARGET_COLLECTOR),
+                                                    Filters.in(FIELD_TARGET_ID, instanceUuids)
+                                            )
+                                    )
+                            )
+                    ),
+                    Aggregates.unwind("$" + FIELD_TARGET_ID),
+                    Aggregates.group(
+                            new Document(FIELD_TARGET, "$" + FIELD_TARGET).append(FIELD_TARGET_ID, "$" + FIELD_TARGET_ID),
+                            Accumulators.max("maxSeq", "$" + FIELD_ID)
+                    )
+            );
+
+            final Map<String, Long> maxByFleetId = new HashMap<>();
+            final Map<String, Long> maxByInstanceUid = new HashMap<>();
+            collection.aggregate(pipeline, Document.class).forEach(doc -> {
+                final var key = doc.get(FIELD_ID, Document.class);
+                if (TARGET_FLEET.equals(key.getString(FIELD_TARGET))) {
+                    maxByFleetId.put(key.getString(FIELD_TARGET_ID), doc.getLong("maxSeq"));
+                } else if (TARGET_COLLECTOR.equals(key.getString(FIELD_TARGET))) {
+                    maxByInstanceUid.put(key.getString(FIELD_TARGET_ID), doc.getLong("maxSeq"));
+                }
+            });
+
+            batch.forEach(instance -> {
+                final var maxSeq = Math.max(
+                        maxByFleetId.getOrDefault(instance.fleetId(), 0L),
+                        maxByInstanceUid.getOrDefault(instance.instanceUid(), 0L));
+                if (maxSeq > instance.lastProcessedTxnSeq()) {
+                    result.add(instance.instanceUid());
+                }
+            });
+        }
+
+        return result;
     }
 
     @Nullable
