@@ -23,6 +23,10 @@ module.exports = {
     'declaration-empty-line-before': null,
     'function-name-case': null,
     'media-query-no-invalid': null,
+    // `postcss-styled-syntax` does not treat a styled-component template root as a
+    // scoping root, so idiomatic root-level `&` selectors (e.g. `&::before`,
+    // `&.content`) are flagged as false positives. Disable for styled-components.
+    'nesting-selector-no-missing-scoping-root': null,
     'no-descending-specificity': null,
     'no-empty-source': null,
     'property-no-vendor-prefix': [true, {
