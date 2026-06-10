@@ -32,6 +32,7 @@ import LogPreviewSection from './LogPreviewSection';
 import StatCard from '../../common/StatCard';
 import collectorReceivedMessagesUrl from '../../common/collectorReceivedMessagesUrl';
 import collectorSystemLogsUrl from '../../common/collectorSystemLogsUrl';
+import { COLLECTOR_INSTANCE_UID_FIELD } from '../../common/fields';
 
 type Props = {
   platformId?: PlatformId;
@@ -134,7 +135,7 @@ const LogPreviewsWrapper = styled.div(
 
 const ConnectionSuccess = ({ platformId = undefined, instance, fleetName }: Props) => {
   const history = useHistory();
-  const platform = platformId ? PLATFORMS.find((p) => p.id === platformId) : undefined;
+  const platform = PLATFORMS.find((p) => p.id === platformId);
   const { selfLogs, sourceLogs, selfLogsError, sourceLogsError, isLoading } = useCollectorLogPreview(
     instance.instance_uid,
   );
@@ -167,7 +168,7 @@ const ConnectionSuccess = ({ platformId = undefined, instance, fleetName }: Prop
       <LogPreviewsWrapper>
         <LogPreviewSection
           title="Your log sources"
-          searchUrl={collectorReceivedMessagesUrl('collector_instance_uid', instance.instance_uid)}
+          searchUrl={collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid)}
           preview={sourceLogs}
           isLoading={isLoading}
           error={sourceLogsError}

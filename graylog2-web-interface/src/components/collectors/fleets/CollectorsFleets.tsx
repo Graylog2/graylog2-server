@@ -30,6 +30,7 @@ import customColumnRenderers from './ColumnRenderers';
 import { DEFAULT_LAYOUT } from './Constants';
 
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
+import { COLLECTOR_FLEET_ID_FIELD } from '../common/fields';
 import { fetchPaginatedFleets, fleetsKeyFn, useCollectorsMutations } from '../hooks';
 import type { Fleet } from '../types';
 
@@ -50,7 +51,7 @@ const CollectorsFleets = () => {
   const fleetActions = useCallback(
     (fleet: Fleet) => (
       <ButtonToolbar>
-        <LinkContainer to={collectorReceivedMessagesUrl('collector_fleet_id', fleet.id)}>
+        <LinkContainer to={collectorReceivedMessagesUrl(COLLECTOR_FLEET_ID_FIELD, fleet.id)}>
           <Button bsSize="xsmall">Received messages</Button>
         </LinkContainer>
       </ButtonToolbar>

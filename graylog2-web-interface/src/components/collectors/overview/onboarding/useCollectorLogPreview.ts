@@ -16,7 +16,12 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import { COLLECTOR_SYSTEM_LOGS_STREAM_ID } from 'components/collectors/common/collectorSystemLogsUrl';
+import {
+  COLLECTOR_INSTANCE_UID_FIELD,
+  COLLECTOR_LOG_RECEIVER_TYPE,
+  COLLECTOR_RECEIVER_TYPE_FIELD,
+  COLLECTOR_SYSTEM_LOGS_STREAM_ID,
+} from 'components/collectors/common/fields';
 import generateId from 'logic/generateId';
 import Query, { createElasticsearchQueryString, filtersForQuery } from 'views/logic/queries/Query';
 import type { RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
@@ -27,6 +32,10 @@ import { startJob, executeJobResult } from 'views/logic/slices/executeJobResult'
 import MessageSortConfig from 'views/logic/searchtypes/messages/MessageSortConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import type { MessagesSearchType } from 'views/logic/queries/SearchType';
+
+// Deliberately outside the 'collectors' prefix: useCollectorsMutations invalidates
+// ['collectors'] wholesale on every mutation, which would re-create the backend search.
+export const ONBOARDING_KEY_PREFIX = ['collector-onboarding'];
 
 const REFRESH_INTERVAL_MS = 5000;
 const PREVIEW_RANGE_SECONDS = 900; // last 15 minutes
@@ -82,7 +91,7 @@ const buildPreviewSearch = (instanceUid: string): PreviewSearch => {
   // Self-logs live in the dedicated (system-scoped) collector logs stream.
   const selfLogsQuery = Query.builder()
     .id(ids.selfQueryId)
-    .query(createElasticsearchQueryString(`collector_instance_uid:"${instanceUid}"`))
+    .query(createElasticsearchQueryString(`${COLLECTOR_INSTANCE_UID_FIELD}:"${instanceUid}"`))
     .timerange(previewTimerange)
     .filter(filtersForQuery([COLLECTOR_SYSTEM_LOGS_STREAM_ID]))
     .searchTypes([messagesSearchType(ids.selfSearchTypeId)])
@@ -94,7 +103,7 @@ const buildPreviewSearch = (instanceUid: string): PreviewSearch => {
     .id(ids.sourceQueryId)
     .query(
       createElasticsearchQueryString(
-        `collector_instance_uid:"${instanceUid}" AND NOT collector_receiver_type:"collector_log"`,
+        `${COLLECTOR_INSTANCE_UID_FIELD}:"${instanceUid}" AND NOT ${COLLECTOR_RECEIVER_TYPE_FIELD}:"${COLLECTOR_LOG_RECEIVER_TYPE}"`,
       ),
     )
     .timerange(previewTimerange)
@@ -120,9 +129,7 @@ const toPreview = (searchTypeResult: RawMessagesResult | undefined): LogPreview 
 
 const useCollectorLogPreview = (instanceUid: string) => {
   const { data: created, error: createError } = useQuery<PreviewSearch>({
-    // Use a prefix outside 'collectors' to avoid being invalidated by useCollectorsMutations,
-    // which calls queryClient.invalidateQueries({ queryKey: ['collectors'] }) on every mutation.
-    queryKey: ['collector-onboarding', 'preview-search', instanceUid],
+    queryKey: [...ONBOARDING_KEY_PREFIX, 'preview-search', instanceUid],
     queryFn: async () => {
       const { search, ids } = buildPreviewSearch(instanceUid);
       const saved = await createSearch(search);
@@ -138,7 +145,7 @@ const useCollectorLogPreview = (instanceUid: string) => {
     isLoading,
   } = useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps -- created.search.id uniquely identifies the search; including the full object would cause spurious re-runs
-    queryKey: ['collector-onboarding', 'preview-results', created?.search?.id],
+    queryKey: [...ONBOARDING_KEY_PREFIX, 'preview-results', created?.search?.id],
     enabled: !!created,
     refetchInterval: REFRESH_INTERVAL_MS,
     queryFn: async () => {
@@ -171,12 +178,14 @@ const useCollectorLogPreview = (instanceUid: string) => {
   });
 
   const generalError = (createError ?? executeError ?? null) as Error | null;
+  const paneError = (description: string | undefined) =>
+    generalError ?? (description ? new Error(description) : null);
 
   return {
     selfLogs: results?.selfLogs,
     sourceLogs: results?.sourceLogs,
-    selfLogsError: generalError ?? (results?.selfLogsError ? new Error(results.selfLogsError) : null),
-    sourceLogsError: generalError ?? (results?.sourceLogsError ? new Error(results.sourceLogsError) : null),
+    selfLogsError: paneError(results?.selfLogsError),
+    sourceLogsError: paneError(results?.sourceLogsError),
     isLoading: !createError && (!created || isLoading),
   };
 };

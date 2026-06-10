@@ -95,8 +95,10 @@ export const useInstance = (instanceUid: string | undefined) =>
     queryKey: [...INSTANCES_KEY_PREFIX, 'single', instanceUid],
     queryFn: () =>
       defaultOnError(
-        // There is no single-instance GET endpoint (only DELETE), so fetch the list and match.
-        Collectors.findInstances(1, 0, undefined, undefined).then((response) => {
+        // There is no single-instance GET endpoint (only DELETE). The query param narrows
+        // server-side (instance_uid is searchable, but matched as substring), so the exact
+        // match still happens client-side.
+        Collectors.findInstances(1, 10, `instance_uid:${instanceUid}`, undefined).then((response) => {
           const match = response.elements.find((element) => element.instance_uid === instanceUid);
 
           return match ? toView(match) : null;

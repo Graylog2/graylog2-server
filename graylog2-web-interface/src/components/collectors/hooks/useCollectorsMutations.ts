@@ -53,6 +53,9 @@ const onMutationSuccess = (message: string, invalidate: () => Promise<void>) => 
 const useCollectorsMutations = () => {
   const queryClient = useQueryClient();
 
+  // Contract: every query keyed under ['collectors'] is refetched after ANY collector mutation.
+  // Session-scoped state that must not be (e.g. the onboarding log preview's created search)
+  // lives under ONBOARDING_KEY_PREFIX instead — see useCollectorLogPreview.
   const invalidateCollectorsQueries = () => queryClient.invalidateQueries({ queryKey: ['collectors'] });
 
   const onSuccess = (message: string) => onMutationSuccess(message, invalidateCollectorsQueries);

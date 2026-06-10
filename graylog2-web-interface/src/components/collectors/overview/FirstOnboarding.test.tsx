@@ -41,10 +41,11 @@ jest.mock('routing/useHistory', () => () => ({
 }));
 
 const mockInvalidateQueries = jest.fn();
+const mockSetQueryData = jest.fn();
 
 jest.mock('@tanstack/react-query', () => ({
   ...jest.requireActual('@tanstack/react-query'),
-  useQueryClient: () => ({ invalidateQueries: mockInvalidateQueries }),
+  useQueryClient: () => ({ invalidateQueries: mockInvalidateQueries, setQueryData: mockSetQueryData }),
 }));
 
 // WaitingForConnection polls the backend — stub it out with a button to trigger onConnected.
@@ -354,9 +355,14 @@ describe('FirstOnboarding', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /simulate connection/i }));
 
+    expect(mockSetQueryData).toHaveBeenCalledWith(
+      ['collectors', 'instances', 'single', 'uid-web-prod-01'],
+      expect.objectContaining({ instance_uid: 'uid-web-prod-01' }),
+    );
     expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['collectors'] });
     expect(mockPushWithState).toHaveBeenCalledWith('/system/collectors/onboarding/uid-web-prod-01', {
       platformId: 'linux',
+      fleetName: 'Default Fleet',
     });
   });
 

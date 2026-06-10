@@ -56,12 +56,11 @@ jest.mock(
     },
 );
 
-const mockUseParams = jest.fn();
 const mockUseLocation = jest.fn();
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useParams: () => mockUseParams(),
+  useParams: () => ({ instanceUid: 'uid-42' }),
 }));
 
 jest.mock('routing/useLocation', () => ({
@@ -79,14 +78,19 @@ const instance = {
 } as CollectorInstanceView;
 
 describe('CollectorsOnboardingInstancePage', () => {
+  const mockInstanceLookup = (overrides: { data?: CollectorInstanceView | null; isLoading?: boolean; error?: Error | null } = {}) =>
+    asMock(useInstance).mockReturnValue({
+      data: instance,
+      isLoading: false,
+      error: null,
+      ...overrides,
+    } as ReturnType<typeof useInstance>);
+
   beforeEach(() => {
     jest.clearAllMocks();
 
-    mockUseParams.mockReturnValue({ instanceUid: 'uid-42' });
     mockUseLocation.mockReturnValue({ state: null });
-    asMock(useInstance).mockReturnValue({ data: instance, isLoading: false, error: null } as ReturnType<
-      typeof useInstance
-    >);
+    mockInstanceLookup();
     asMock(useFleet).mockReturnValue({ data: { id: 'fleet-1', name: 'Default Fleet' } } as ReturnType<typeof useFleet>);
   });
 
@@ -107,10 +111,17 @@ describe('CollectorsOnboardingInstancePage', () => {
     expect(screen.getByTestId('platform-id')).toHaveTextContent('linux');
   });
 
+  it('falls back to the fleet name from location state while the fleet loads', () => {
+    mockUseLocation.mockReturnValue({ state: { fleetName: 'Fresh Fleet' } });
+    asMock(useFleet).mockReturnValue({ data: undefined } as ReturnType<typeof useFleet>);
+
+    render(<CollectorsOnboardingInstancePage />);
+
+    expect(screen.getByText('Fresh Fleet')).toBeInTheDocument();
+  });
+
   it('shows a spinner while loading', () => {
-    asMock(useInstance).mockReturnValue({ data: undefined, isLoading: true, error: null } as ReturnType<
-      typeof useInstance
-    >);
+    mockInstanceLookup({ data: undefined, isLoading: true });
 
     render(<CollectorsOnboardingInstancePage />);
 
@@ -118,9 +129,7 @@ describe('CollectorsOnboardingInstancePage', () => {
   });
 
   it('shows a not-found message with a link to instances for an unknown uid', () => {
-    asMock(useInstance).mockReturnValue({ data: null, isLoading: false, error: null } as ReturnType<
-      typeof useInstance
-    >);
+    mockInstanceLookup({ data: null });
 
     render(<CollectorsOnboardingInstancePage />);
 
@@ -132,11 +141,7 @@ describe('CollectorsOnboardingInstancePage', () => {
   });
 
   it('surfaces a fetch error', () => {
-    asMock(useInstance).mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: new Error('boom'),
-    } as ReturnType<typeof useInstance>);
+    mockInstanceLookup({ data: undefined, error: new Error('boom') });
 
     render(<CollectorsOnboardingInstancePage />);
 

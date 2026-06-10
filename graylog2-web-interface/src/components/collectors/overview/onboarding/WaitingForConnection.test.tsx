@@ -45,20 +45,23 @@ const instance = (id: string, enrolledAt: string): CollectorInstanceView =>
 describe('WaitingForConnection', () => {
   const onConnected = jest.fn();
 
+  const mockInstances = (data: CollectorInstanceView[] | undefined, error: Error | null = null) =>
+    asMock(useInstances).mockReturnValue({ data, error } as ReturnType<typeof useInstances>);
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it('shows the waiting status', () => {
-    asMock(useInstances).mockReturnValue({ data: [] } as ReturnType<typeof useInstances>);
+    mockInstances([]);
 
     render(<WaitingForConnection fleetId="fleet-1" onConnected={onConnected} />);
 
     expect(screen.getByText(/waiting for connection/i)).toBeInTheDocument();
   });
 
-  it('polls instances for the selected fleet', () => {
-    asMock(useInstances).mockReturnValue({ data: [] } as ReturnType<typeof useInstances>);
+  it('polls instances for the selected fleet silently (no toast on transient failures)', () => {
+    mockInstances([]);
 
     render(<WaitingForConnection fleetId="fleet-1" onConnected={onConnected} />);
 
@@ -66,7 +69,7 @@ describe('WaitingForConnection', () => {
   });
 
   it('shows an inline notice when polling fails, and keeps waiting', () => {
-    asMock(useInstances).mockReturnValue({ data: undefined, error: new Error('nope') } as ReturnType<typeof useInstances>);
+    mockInstances(undefined, new Error('nope'));
 
     render(<WaitingForConnection fleetId="fleet-1" onConnected={onConnected} />);
 
@@ -75,18 +78,8 @@ describe('WaitingForConnection', () => {
     expect(onConnected).not.toHaveBeenCalled();
   });
 
-  it('polls silently (no toast on transient failures)', () => {
-    asMock(useInstances).mockReturnValue({ data: [] } as ReturnType<typeof useInstances>);
-
-    render(<WaitingForConnection fleetId="fleet-1" onConnected={onConnected} />);
-
-    expect(useInstances).toHaveBeenCalledWith('fleet-1', { refetchInterval: 3000, silent: true });
-  });
-
   it('does not fire for instances that existed before onboarding', () => {
-    asMock(useInstances).mockReturnValue({
-      data: [instance('pre-existing', '2026-06-10T10:00:00Z')],
-    } as ReturnType<typeof useInstances>);
+    mockInstances([instance('pre-existing', '2026-06-10T10:00:00Z')]);
 
     render(<WaitingForConnection fleetId="fleet-1" onConnected={onConnected} />);
 
@@ -94,15 +87,11 @@ describe('WaitingForConnection', () => {
   });
 
   it('fires once a new instance appears after the baseline poll', () => {
-    asMock(useInstances).mockReturnValue({
-      data: [instance('pre-existing', '2026-06-10T10:00:00Z')],
-    } as ReturnType<typeof useInstances>);
+    mockInstances([instance('pre-existing', '2026-06-10T10:00:00Z')]);
 
     const { rerender } = render(<WaitingForConnection fleetId="fleet-1" onConnected={onConnected} />);
 
-    asMock(useInstances).mockReturnValue({
-      data: [instance('pre-existing', '2026-06-10T10:00:00Z'), instance('fresh', '2026-06-10T12:00:00Z')],
-    } as ReturnType<typeof useInstances>);
+    mockInstances([instance('pre-existing', '2026-06-10T10:00:00Z'), instance('fresh', '2026-06-10T12:00:00Z')]);
 
     rerender(<WaitingForConnection fleetId="fleet-1" onConnected={onConnected} />);
 
@@ -111,13 +100,11 @@ describe('WaitingForConnection', () => {
   });
 
   it('picks the earliest enrolled instance when several appear', () => {
-    asMock(useInstances).mockReturnValue({ data: [] } as ReturnType<typeof useInstances>);
+    mockInstances([]);
 
     const { rerender } = render(<WaitingForConnection fleetId="fleet-1" onConnected={onConnected} />);
 
-    asMock(useInstances).mockReturnValue({
-      data: [instance('later', '2026-06-10T12:05:00Z'), instance('earlier', '2026-06-10T12:01:00Z')],
-    } as ReturnType<typeof useInstances>);
+    mockInstances([instance('later', '2026-06-10T12:05:00Z'), instance('earlier', '2026-06-10T12:01:00Z')]);
 
     rerender(<WaitingForConnection fleetId="fleet-1" onConnected={onConnected} />);
 
@@ -126,19 +113,15 @@ describe('WaitingForConnection', () => {
   });
 
   it('fires at most once', () => {
-    asMock(useInstances).mockReturnValue({ data: [] } as ReturnType<typeof useInstances>);
+    mockInstances([]);
 
     const { rerender } = render(<WaitingForConnection fleetId="fleet-1" onConnected={onConnected} />);
 
-    asMock(useInstances).mockReturnValue({
-      data: [instance('a', '2026-06-10T12:00:00Z')],
-    } as ReturnType<typeof useInstances>);
+    mockInstances([instance('a', '2026-06-10T12:00:00Z')]);
 
     rerender(<WaitingForConnection fleetId="fleet-1" onConnected={onConnected} />);
 
-    asMock(useInstances).mockReturnValue({
-      data: [instance('a', '2026-06-10T12:00:00Z'), instance('b', '2026-06-10T12:01:00Z')],
-    } as ReturnType<typeof useInstances>);
+    mockInstances([instance('a', '2026-06-10T12:00:00Z'), instance('b', '2026-06-10T12:01:00Z')]);
 
     rerender(<WaitingForConnection fleetId="fleet-1" onConnected={onConnected} />);
 

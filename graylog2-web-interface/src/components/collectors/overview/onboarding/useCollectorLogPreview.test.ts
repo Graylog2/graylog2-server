@@ -45,19 +45,43 @@ describe('useCollectorLogPreview', () => {
     asMock(startJob).mockResolvedValue({ asyncSearchId: 'job-1', nodeId: 'node-1' });
   });
 
+  const asExecutionResult = (result: unknown) => result as Awaited<ReturnType<typeof executeJobResult>>;
+
+  const splitQueries = (search: Search) => {
+    const queries = search.queries.toArray();
+
+    return {
+      sourceQuery: queries.find((q) => q.query.query_string.includes('NOT collector_receiver_type')),
+      selfQuery: queries.find((q) => !q.query.query_string.includes('NOT collector_receiver_type')),
+    };
+  };
+
+  // Lets executeJobResult mocks reference the search that createSearch received.
+  const captureCreatedSearch = () => {
+    let createdSearch: Search;
+
+    asMock(createSearch).mockImplementation(async (search: Search) => {
+      createdSearch = search;
+
+      return search;
+    });
+
+    return () => createdSearch;
+  };
+
   const mockEmptyResults = () => {
-    asMock(executeJobResult).mockResolvedValue({
-      result: {
-        errors: [],
-        forId: () => undefined,
-      },
-    } as unknown as ReturnType<typeof executeJobResult> extends Promise<infer T> ? T : never);
+    asMock(executeJobResult).mockResolvedValue(
+      asExecutionResult({
+        result: {
+          errors: [],
+          forId: () => undefined,
+        },
+      }),
+    );
   };
 
   const makeResultsMock = (createdSearch: Search) => {
-    const queries = createdSearch.queries.toArray();
-    const sourceQuery = queries.find((q) => q.query.query_string.includes('NOT collector_receiver_type'));
-    const selfQuery = queries.find((q) => !q.query.query_string.includes('NOT collector_receiver_type'));
+    const { sourceQuery, selfQuery } = splitQueries(createdSearch);
 
     return {
       result: {
@@ -94,15 +118,9 @@ describe('useCollectorLogPreview', () => {
   };
 
   it('creates the search once and maps both result sets', async () => {
-    let createdSearch: Search;
+    const getCreatedSearch = captureCreatedSearch();
 
-    asMock(createSearch).mockImplementation(async (search: Search) => {
-      createdSearch = search;
-
-      return search;
-    });
-
-    asMock(executeJobResult).mockImplementation(async () => makeResultsMock(createdSearch) as unknown as Awaited<ReturnType<typeof executeJobResult>>);
+    asMock(executeJobResult).mockImplementation(async () => asExecutionResult(makeResultsMock(getCreatedSearch())));
 
     const { result } = renderHook(() => useCollectorLogPreview('uid-42'));
 
@@ -179,12 +197,14 @@ describe('useCollectorLogPreview', () => {
   });
 
   it('surfaces search errors', async () => {
-    asMock(executeJobResult).mockResolvedValue({
-      result: {
-        errors: [{ description: 'boom' }],
-        forId: () => undefined,
-      },
-    } as unknown as ReturnType<typeof executeJobResult> extends Promise<infer T> ? T : never);
+    asMock(executeJobResult).mockResolvedValue(
+      asExecutionResult({
+        result: {
+          errors: [{ description: 'boom' }],
+          forId: () => undefined,
+        },
+      }),
+    );
 
     const { result } = renderHook(() => useCollectorLogPreview('uid-42'), {
       queryClientOptions: { defaultOptions: { queries: { retry: false } } },
@@ -223,15 +243,9 @@ describe('useCollectorLogPreview', () => {
     jest.useFakeTimers();
 
     try {
-      let createdSearch: Search;
+      const getCreatedSearch = captureCreatedSearch();
 
-      asMock(createSearch).mockImplementation(async (search: Search) => {
-        createdSearch = search;
-
-        return search;
-      });
-
-      asMock(executeJobResult).mockImplementation(async () => makeResultsMock(createdSearch) as unknown as Awaited<ReturnType<typeof executeJobResult>>);
+      asMock(executeJobResult).mockImplementation(async () => asExecutionResult(makeResultsMock(getCreatedSearch())));
 
       const { result } = renderHook(() => useCollectorLogPreview('uid-42'), {
         queryClientOptions: { defaultOptions: { queries: { retry: false } } },
@@ -257,20 +271,12 @@ describe('useCollectorLogPreview', () => {
   });
 
   it('per-query error keeps the healthy pane', async () => {
-    let createdSearch: Search;
-
-    asMock(createSearch).mockImplementation(async (search: Search) => {
-      createdSearch = search;
-
-      return search;
-    });
+    const getCreatedSearch = captureCreatedSearch();
 
     asMock(executeJobResult).mockImplementation(async () => {
-      const queries = createdSearch.queries.toArray();
-      const sourceQuery = queries.find((q) => q.query.query_string.includes('NOT collector_receiver_type'));
-      const selfQuery = queries.find((q) => !q.query.query_string.includes('NOT collector_receiver_type'));
+      const { sourceQuery, selfQuery } = splitQueries(getCreatedSearch());
 
-      return {
+      return asExecutionResult({
         result: {
           errors: [{ queryId: selfQuery.id, description: 'denied' }],
           forId: (queryId: string) => {
@@ -289,7 +295,7 @@ describe('useCollectorLogPreview', () => {
             return undefined;
           },
         },
-      } as unknown as Awaited<ReturnType<typeof executeJobResult>>;
+      });
     });
 
     const { result } = renderHook(() => useCollectorLogPreview('uid-42'));

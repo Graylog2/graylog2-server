@@ -34,6 +34,9 @@ import type { PlatformId } from './onboarding/platforms';
 import DEFAULT_SOURCES from './onboarding/defaultSources';
 
 import { useCollectorsConfig, useCollectorsMutations, useFleets } from '../hooks';
+// Imported from the concrete module (not the hooks index) so tests that automock the index
+// still see the real cache key.
+import { INSTANCES_KEY_PREFIX } from '../hooks/useInstanceQueries';
 import type { Fleet, CollectorInstanceView } from '../types';
 
 // 'setup' = still collecting platform/fleet; 'waiting' = command box is live.
@@ -171,13 +174,16 @@ const FirstOnboarding = () => {
 
   const handleConnected = useCallback(
     (instance: CollectorInstanceView) => {
+      // Seed the destination page's lookup so it renders without a refetch round trip.
+      queryClient.setQueryData([...INSTANCES_KEY_PREFIX, 'single', instance.instance_uid], instance);
       // The overview's cached stats still say zero instances; refresh so Back shows the real overview.
       queryClient.invalidateQueries({ queryKey: ['collectors'] });
       history.pushWithState(Routes.SYSTEM.COLLECTORS.ONBOARDING_INSTANCE(instance.instance_uid), {
         platformId: selectedPlatform,
+        fleetName: resolvedFleet?.name,
       });
     },
-    [queryClient, history, selectedPlatform],
+    [queryClient, history, selectedPlatform, resolvedFleet?.name],
   );
 
   if (isConfigLoading || isFleetsLoading) return <Spinner />;

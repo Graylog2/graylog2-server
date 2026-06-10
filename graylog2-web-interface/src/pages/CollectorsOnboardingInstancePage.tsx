@@ -27,12 +27,14 @@ import ConnectionSuccess from 'components/collectors/overview/onboarding/Connect
 import type { PlatformId } from 'components/collectors/overview/onboarding/platforms';
 import Routes from 'routing/Routes';
 import useLocation from 'routing/useLocation';
+import { extractErrorMessage } from 'util/extractErrorMessage';
 
 const CollectorsOnboardingInstancePage = () => {
   const { instanceUid } = useParams<{ instanceUid: string }>();
-  const location = useLocation<{ platformId?: PlatformId } | null>();
+  const location = useLocation<{ platformId?: PlatformId; fleetName?: string } | null>();
   // Set by the onboarding wizard's history push; absent on direct visits.
   const platformId = location.state?.platformId;
+  const stateFleetName = location.state?.fleetName;
 
   const { data: instance, isLoading, error } = useInstance(instanceUid);
   const { data: fleet } = useFleet(instance?.fleet_id ?? '');
@@ -41,7 +43,7 @@ const CollectorsOnboardingInstancePage = () => {
     if (isLoading) return <Spinner />;
 
     if (error) {
-      return <Alert bsStyle="danger">Could not load collector instance: {(error as Error).message}</Alert>;
+      return <Alert bsStyle="danger">Could not load collector instance: {extractErrorMessage(error)}</Alert>;
     }
 
     if (!instance) {
@@ -53,7 +55,7 @@ const CollectorsOnboardingInstancePage = () => {
       );
     }
 
-    return <ConnectionSuccess platformId={platformId} instance={instance} fleetName={fleet?.name} />;
+    return <ConnectionSuccess platformId={platformId} instance={instance} fleetName={fleet?.name ?? stateFleetName} />;
   };
 
   return (

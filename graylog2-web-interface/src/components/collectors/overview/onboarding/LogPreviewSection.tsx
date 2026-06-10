@@ -18,8 +18,8 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import { Alert, Label } from 'components/bootstrap';
-import { Link, Spinner, Timestamp } from 'components/common';
-import Section from 'components/common/Section';
+import { Link, Section, Spinner, Timestamp } from 'components/common';
+import StringUtils from 'util/StringUtils';
 
 import PulsingDot from './PulsingDot';
 import type { LogPreview } from './useCollectorLogPreview';
@@ -81,7 +81,7 @@ const PreviewBody = ({ preview, isLoading, error }: Pick<Props, 'preview' | 'isL
   if (error) {
     return (
       <div aria-live="polite">
-        <Alert bsStyle="warning">Log preview unavailable &mdash; {error.message.slice(0, 120)}</Alert>
+        <Alert bsStyle="warning">Log preview unavailable &mdash; {StringUtils.truncateWithEllipses(error.message, 120)}</Alert>
       </div>
     );
   }
