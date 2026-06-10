@@ -2,7 +2,36 @@ import { Canvas, Meta, Unstyled } from '@storybook/addon-docs/blocks';
 import { Alert } from 'components/bootstrap';
 import * as CreatingAnEntityStories from './CreatingAnEntity.stories';
 import Mermaid from './Mermaid';
-import { DIAGRAM } from './CreatingAnEntity.constants';
+
+const DIAGRAM = `flowchart TD
+  A(["User's current view"])
+  A --> B{{"\`Should users remain
+in their current workflow?\`"}}
+B -->|Yes| MODAL
+B -->|No| PAGE
+
+subgraph Surface["Surface"]
+MODAL(["\`**Modal**
+Current context preserved\`"])
+PAGE(["\`**Page**
+Dedicated creation experience\`"])
+end
+
+subgraph Method["Method"]
+MW(["\`**Form or Wizard**
+Single-step or guided workflow\`"])
+FW(["\`**Form or Wizard**
+Single-step or guided workflow\`"])
+end
+
+MODAL --> MW
+PAGE --> FW
+
+MW --> RC(["\`**Return to current workflow**
+Modal closes, toast shown\`"])
+FW --> NC(["\`**Navigate to entity**
+Details page, toast shown\`"])
+`;
 
 <Meta of={CreatingAnEntityStories} />
 
