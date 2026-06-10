@@ -21,4 +21,5 @@
 const asyncFn = () => Promise.resolve({});
 const namespace = new Proxy({}, { get: () => asyncFn });
 
+// eslint-disable-next-line no-undef
 module.exports = new Proxy({}, { get: () => namespace });
