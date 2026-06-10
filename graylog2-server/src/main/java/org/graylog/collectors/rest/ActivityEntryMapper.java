@@ -69,8 +69,7 @@ class ActivityEntryMapper {
         this.userService = userService;
     }
 
-    List<RecentActivityResponse.ActivityEntry> toEntries(List<TransactionMarker> markers,
-                                                         HasPermissions isPermitted) {
+    List<RecentActivityResponse.ActivityEntry> toEntries(List<TransactionMarker> markers, HasPermissions permissions) {
         if (markers.isEmpty()) {
             return List.of();
         }
@@ -97,11 +96,11 @@ class ActivityEntryMapper {
                 .map(TransactionMarker::createdByUser)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
-        final Map<String, String> userDisplayNames = resolveUserDisplayNames(usernames, isPermitted);
+        final Map<String, String> userDisplayNames = resolveUserDisplayNames(usernames, permissions);
 
         final List<RecentActivityResponse.ActivityEntry> entries = new ArrayList<>();
         for (final var marker : markers) {
-            entries.add(toActivityEntry(marker, fleetNames, instances, userDisplayNames, isPermitted));
+            entries.add(toActivityEntry(marker, fleetNames, instances, userDisplayNames, permissions));
         }
         return entries;
     }
@@ -111,7 +110,7 @@ class ActivityEntryMapper {
             Map<String, String> fleetNames,
             Map<String, CollectorInstanceDTO> instances,
             Map<String, String> userDisplayNames,
-            HasPermissions isPermitted) {
+            HasPermissions permissions) {
 
         // Resolve actor
         final RecentActivityResponse.ActorInfo actor;
@@ -130,7 +129,7 @@ class ActivityEntryMapper {
             if (TransactionMarker.TARGET_FLEET.equals(marker.target())) {
                 if (fleetNames.containsKey(targetId)) {
                     // skip the target if it's a fleet we have no permission to
-                    if (!isPermitted.isPermitted(CollectorsPermissions.FLEET_READ, targetId)) {
+                    if (!permissions.isPermitted(CollectorsPermissions.FLEET_READ, targetId)) {
                         continue;
                     }
                     id = targetId;
@@ -142,7 +141,7 @@ class ActivityEntryMapper {
             } else {
                 if (instances.containsKey(targetId)) {
                     // skip the target if the user cannot see the target's fleet
-                    if (!isPermitted.isPermitted(CollectorsPermissions.FLEET_READ, instances.get(targetId).fleetId())) {
+                    if (!permissions.isPermitted(CollectorsPermissions.FLEET_READ, instances.get(targetId).fleetId())) {
                         continue;
                     }
                     id = targetId;
@@ -161,7 +160,7 @@ class ActivityEntryMapper {
                 marker.type().name(),
                 actor,
                 targets,
-                resolveDetails(marker, fleetNames, isPermitted));
+                resolveDetails(marker, fleetNames, permissions));
     }
 
     private static String resolveInstanceHostname(Map<String, CollectorInstanceDTO> instances, String instanceUid) {
@@ -179,11 +178,11 @@ class ActivityEntryMapper {
     @Nullable
     private static ActivityDetails resolveDetails(TransactionMarker marker,
                                                   Map<String, String> fleetNames,
-                                                  HasPermissions isPermitted) {
+                                                  HasPermissions permissions) {
         if (marker.type() == MarkerType.FLEET_REASSIGNED
                 && marker.payload() instanceof FleetReassignedPayload(String newFleetId)) {
             if (fleetNames.containsKey(newFleetId)) {
-                if (isPermitted.isPermitted(CollectorsPermissions.FLEET_READ, newFleetId)) {
+                if (permissions.isPermitted(CollectorsPermissions.FLEET_READ, newFleetId)) {
                     return new FleetReassignedDetails(
                             new TargetInfo(newFleetId, fleetNames.get(newFleetId), TransactionMarker.TARGET_FLEET));
                 }
@@ -196,12 +195,12 @@ class ActivityEntryMapper {
     }
 
     private Map<String, String> resolveUserDisplayNames(Set<String> usernames,
-                                                        HasPermissions isPermitted) {
+                                                        HasPermissions permissions) {
         final Map<String, String> result = new HashMap<>();
         for (final var username : usernames) {
             final var fullName = Optional.ofNullable(userService.load(username))
                     .or(() -> Optional.ofNullable(userService.loadById(username)))
-                    .map(user -> isPermitted.isPermitted(RestPermissions.USERS_READ, user.getId()) ? user.getFullName() : "Unknown")
+                    .map(user -> permissions.isPermitted(RestPermissions.USERS_READ, user.getId()) ? user.getFullName() : "Unknown")
                     .orElse(username);
             result.put(username, fullName);
         }
