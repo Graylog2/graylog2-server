@@ -20,6 +20,7 @@ import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
 import selectEvent from 'helpers/selectEvent';
+import type { CollectorInstanceView } from 'components/collectors/types';
 
 import FirstOnboarding from './FirstOnboarding';
 
@@ -55,7 +56,7 @@ jest.mock('./onboarding/WaitingForConnection', () => {
     status: 'online' as const,
   };
 
-  return function WaitingForConnectionStub({ onConnected }: { onConnected: (instance: typeof mockInstance) => void }) {
+  return function WaitingForConnectionStub({ onConnected }: { onConnected: (instance: CollectorInstanceView) => void }) {
     return (
       <div>
         <span>Waiting for connection...</span>
