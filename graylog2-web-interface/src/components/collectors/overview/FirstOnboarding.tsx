@@ -221,7 +221,13 @@ const FirstOnboarding = () => {
             </>
           )}
 
-          {phase === 'connected' && connectedInstance && <ConnectionSuccess platformId={selectedPlatform} />}
+          {phase === 'connected' && connectedInstance && (
+            <ConnectionSuccess
+              platformId={selectedPlatform}
+              instance={connectedInstance}
+              fleetName={resolvedFleet?.name}
+            />
+          )}
         </BodyContainer>
       )}
     </div>

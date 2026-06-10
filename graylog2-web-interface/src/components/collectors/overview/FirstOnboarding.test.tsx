@@ -34,6 +34,51 @@ jest.mock('util/copyToClipboard', () => jest.fn(() => Promise.resolve()));
 jest.mock('components/common/Tooltip', () => ({ children }: { children: React.ReactNode }) => <>{children}</>);
 jest.mock('routing/useHistory', () => () => ({ push: jest.fn() }));
 
+// WaitingForConnection polls the backend — stub it out with a button to trigger onConnected.
+jest.mock('./onboarding/WaitingForConnection', () => {
+  const mockInstance = {
+    id: 'inst-1',
+    instance_uid: 'uid-web-prod-01',
+    fleet_id: 'fleet-1',
+    capabilities: 0,
+    enrolled_at: '2026-06-10T12:00:00Z',
+    last_seen: '2026-06-10T12:00:00Z',
+    active_certificate_fingerprint: '',
+    active_certificate_expires_at: '',
+    next_certificate_fingerprint: null,
+    next_certificate_expires_at: null,
+    identifying_attributes: {},
+    non_identifying_attributes: {},
+    hostname: 'web-prod-01',
+    os: 'linux',
+    version: '1.2.3',
+    status: 'online' as const,
+  };
+
+  return function WaitingForConnectionStub({ onConnected }: { onConnected: (instance: typeof mockInstance) => void }) {
+    return (
+      <div>
+        <span>Waiting for connection...</span>
+        <button type="button" onClick={() => onConnected(mockInstance)}>
+          Simulate connection
+        </button>
+      </div>
+    );
+  };
+});
+
+// ConnectionSuccess uses several backend hooks — stub it to just show the success text and instance hostname.
+jest.mock('./onboarding/ConnectionSuccess', () => function ConnectionSuccessStub(
+  { instance }: { instance: { hostname: string | null; instance_uid: string } },
+) {
+  return (
+    <div>
+      <span>Collector connected</span>
+      <span>{instance.hostname ?? instance.instance_uid}</span>
+    </div>
+  );
+});
+
 const mockConfig = {
   http: { hostname: 'graylog.example', port: 4317 },
   ca_cert_id: null,
