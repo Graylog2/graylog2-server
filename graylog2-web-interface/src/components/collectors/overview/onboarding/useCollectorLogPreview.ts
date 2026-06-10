@@ -110,7 +110,9 @@ const toPreview = (searchTypeResult: RawMessagesResult | undefined): LogPreview 
 
 const useCollectorLogPreview = (instanceUid: string) => {
   const { data: created, error: createError } = useQuery<PreviewSearch>({
-    queryKey: ['collectors', 'onboarding', 'preview-search', instanceUid],
+    // Use a prefix outside 'collectors' to avoid being invalidated by useCollectorsMutations,
+    // which calls queryClient.invalidateQueries({ queryKey: ['collectors'] }) on every mutation.
+    queryKey: ['collector-onboarding', 'preview-search', instanceUid],
     queryFn: async () => {
       const { search, ids } = buildPreviewSearch(instanceUid);
       const saved = await createSearch(search);
@@ -126,7 +128,7 @@ const useCollectorLogPreview = (instanceUid: string) => {
     isLoading,
   } = useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps -- created.search.id uniquely identifies the search; including the full object would cause spurious re-runs
-    queryKey: ['collectors', 'onboarding', 'preview-results', created?.search?.id],
+    queryKey: ['collector-onboarding', 'preview-results', created?.search?.id],
     enabled: !!created,
     refetchInterval: REFRESH_INTERVAL_MS,
     queryFn: async () => {
@@ -136,9 +138,14 @@ const useCollectorLogPreview = (instanceUid: string) => {
       const jobIds = await startJob(search, [], SearchExecutionState.empty(), []);
       const { result } = await executeJobResult({ jobIds });
 
-      if (result.errors?.length > 0) {
-        throw new Error(result.errors[0].description ?? 'Search failed');
+      const errors = result.errors ?? [];
+
+      // Errors without query attribution mean the whole execution failed.
+      if (errors.length > 0 && errors.every((e) => !e.queryId)) {
+        throw new Error(errors[0].description ?? 'Search failed');
       }
+
+      const errorForQuery = (queryId: string) => errors.find((e) => e.queryId === queryId)?.description;
 
       return {
         selfLogs: toPreview(
@@ -147,15 +154,20 @@ const useCollectorLogPreview = (instanceUid: string) => {
         sourceLogs: toPreview(
           result.forId(ids.sourceQueryId)?.searchTypes?.[ids.sourceSearchTypeId] as RawMessagesResult | undefined,
         ),
+        selfLogsError: errorForQuery(ids.selfQueryId),
+        sourceLogsError: errorForQuery(ids.sourceQueryId),
       };
     },
   });
 
+  const generalError = (createError ?? executeError ?? null) as Error | null;
+
   return {
     selfLogs: results?.selfLogs,
     sourceLogs: results?.sourceLogs,
-    isLoading: !created || isLoading,
-    error: (createError ?? executeError ?? null) as Error | null,
+    selfLogsError: generalError ?? (results?.selfLogsError ? new Error(results.selfLogsError) : null),
+    sourceLogsError: generalError ?? (results?.sourceLogsError ? new Error(results.sourceLogsError) : null),
+    isLoading: !createError && (!created || isLoading),
   };
 };
 

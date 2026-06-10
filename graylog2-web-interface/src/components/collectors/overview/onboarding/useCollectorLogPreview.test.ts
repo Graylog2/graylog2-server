@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
+import { act, renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 
 import asMock from 'helpers/mocking/AsMock';
 import createSearch from 'views/logic/slices/createSearch';
@@ -52,6 +52,45 @@ describe('useCollectorLogPreview', () => {
     } as unknown as ReturnType<typeof executeJobResult> extends Promise<infer T> ? T : never);
   };
 
+  const makeResultsMock = (createdSearch: Search) => {
+    const queries = createdSearch.queries.toArray();
+    const sourceQuery = queries.find((q) => q.query.query_string.includes('NOT collector_receiver_type'));
+    const selfQuery = queries.find((q) => !q.query.query_string.includes('NOT collector_receiver_type'));
+
+    return {
+      result: {
+        errors: [],
+        forId: (queryId: string) => {
+          if (queryId === sourceQuery.id) {
+            return {
+              searchTypes: {
+                [sourceQuery.searchTypes[0].id]: {
+                  type: 'messages',
+                  messages: [resultMessage('m1', '2026-06-10T12:00:00.000Z', 'a source log line')],
+                  total: 42,
+                },
+              },
+            };
+          }
+
+          if (queryId === selfQuery.id) {
+            return {
+              searchTypes: {
+                [selfQuery.searchTypes[0].id]: {
+                  type: 'messages',
+                  messages: [resultMessage('m2', '2026-06-10T11:59:00.000Z', 'collector started')],
+                  total: 7,
+                },
+              },
+            };
+          }
+
+          return undefined;
+        },
+      },
+    };
+  };
+
   it('creates the search once and maps both result sets', async () => {
     let createdSearch: Search;
 
@@ -61,44 +100,7 @@ describe('useCollectorLogPreview', () => {
       return search;
     });
 
-    asMock(executeJobResult).mockImplementation(async () => {
-      const queries = createdSearch.queries.toArray();
-      const sourceQuery = queries.find((q) => q.query.query_string.includes('NOT collector_receiver_type'));
-      const selfQuery = queries.find((q) => !q.query.query_string.includes('NOT collector_receiver_type'));
-
-      return {
-        result: {
-          errors: [],
-          forId: (queryId: string) => {
-            if (queryId === sourceQuery.id) {
-              return {
-                searchTypes: {
-                  [sourceQuery.searchTypes[0].id]: {
-                    type: 'messages',
-                    messages: [resultMessage('m1', '2026-06-10T12:00:00.000Z', 'a source log line')],
-                    total: 42,
-                  },
-                },
-              };
-            }
-
-            if (queryId === selfQuery.id) {
-              return {
-                searchTypes: {
-                  [selfQuery.searchTypes[0].id]: {
-                    type: 'messages',
-                    messages: [resultMessage('m2', '2026-06-10T11:59:00.000Z', 'collector started')],
-                    total: 7,
-                  },
-                },
-              };
-            }
-
-            return undefined;
-          },
-        },
-      };
-    });
+    asMock(executeJobResult).mockImplementation(async () => makeResultsMock(createdSearch));
 
     const { result } = renderHook(() => useCollectorLogPreview('uid-42'));
 
@@ -186,8 +188,114 @@ describe('useCollectorLogPreview', () => {
       queryClientOptions: { defaultOptions: { queries: { retry: false } } },
     });
 
-    await waitFor(() => expect(result.current.error).not.toBeNull());
+    await waitFor(() => expect(result.current.sourceLogsError).not.toBeNull());
 
-    expect(result.current.error.message).toBe('boom');
+    expect(result.current.sourceLogsError.message).toBe('boom');
+    expect(result.current.selfLogsError).not.toBeNull();
+    expect(result.current.selfLogsError.message).toBe('boom');
+  });
+
+  it('re-executes without recreating the search on the refresh interval', async () => {
+    jest.useFakeTimers();
+
+    try {
+      mockEmptyResults();
+
+      renderHook(() => useCollectorLogPreview('uid-42'));
+
+      await waitFor(() => expect(startJob).toHaveBeenCalledTimes(1));
+
+      await act(async () => {
+        jest.advanceTimersByTime(5000);
+      });
+
+      await waitFor(() => expect(startJob).toHaveBeenCalledTimes(2));
+
+      expect(createSearch).toHaveBeenCalledTimes(1);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('keeps last good data when a later execution fails', async () => {
+    jest.useFakeTimers();
+
+    try {
+      let createdSearch: Search;
+
+      asMock(createSearch).mockImplementation(async (search: Search) => {
+        createdSearch = search;
+
+        return search;
+      });
+
+      asMock(executeJobResult).mockImplementation(async () => makeResultsMock(createdSearch));
+
+      const { result } = renderHook(() => useCollectorLogPreview('uid-42'), {
+        queryClientOptions: { defaultOptions: { queries: { retry: false } } },
+      });
+
+      await waitFor(() => expect(result.current.sourceLogs).toBeDefined());
+
+      expect(result.current.sourceLogs.messages).toHaveLength(1);
+
+      asMock(executeJobResult).mockRejectedValue(new Error('tick failed'));
+
+      await act(async () => {
+        jest.advanceTimersByTime(5000);
+      });
+
+      await waitFor(() => expect(result.current.sourceLogsError).not.toBeNull());
+
+      expect(result.current.sourceLogs.messages).toHaveLength(1);
+      expect(result.current.sourceLogsError).not.toBeNull();
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('per-query error keeps the healthy pane', async () => {
+    let createdSearch: Search;
+
+    asMock(createSearch).mockImplementation(async (search: Search) => {
+      createdSearch = search;
+
+      return search;
+    });
+
+    asMock(executeJobResult).mockImplementation(async () => {
+      const queries = createdSearch.queries.toArray();
+      const sourceQuery = queries.find((q) => q.query.query_string.includes('NOT collector_receiver_type'));
+      const selfQuery = queries.find((q) => !q.query.query_string.includes('NOT collector_receiver_type'));
+
+      return {
+        result: {
+          errors: [{ queryId: selfQuery.id, description: 'denied' }],
+          forId: (queryId: string) => {
+            if (queryId === sourceQuery.id) {
+              return {
+                searchTypes: {
+                  [sourceQuery.searchTypes[0].id]: {
+                    type: 'messages',
+                    messages: [resultMessage('m1', '2026-06-10T12:00:00.000Z', 'a source log line')],
+                    total: 42,
+                  },
+                },
+              };
+            }
+
+            return undefined;
+          },
+        },
+      };
+    });
+
+    const { result } = renderHook(() => useCollectorLogPreview('uid-42'));
+
+    await waitFor(() => expect(result.current.sourceLogs).toBeDefined());
+
+    expect(result.current.selfLogsError.message).toBe('denied');
+    expect(result.current.sourceLogs.messages).toHaveLength(1);
+    expect(result.current.sourceLogsError).toBeNull();
   });
 });
