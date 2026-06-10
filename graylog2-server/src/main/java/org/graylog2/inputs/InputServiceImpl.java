@@ -73,6 +73,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
@@ -462,6 +463,10 @@ public class InputServiceImpl implements InputService {
             list.stream()
                     .map(this::toDocument)
                     .map(this::getExtractorFromDoc)
+                    // getExtractorFromDoc() returns null for extractors that cannot be built from persisted data.
+                    // Skip those instead of adding null (which an ImmutableList rejects) so a single broken extractor
+                    // does not break listing of all extractors for the input (see issue #26122).
+                    .filter(Objects::nonNull)
                     .forEach(listBuilder::add);
         }
         return listBuilder.build();

@@ -333,6 +333,48 @@ public class InputServiceImplTest {
 
     @Test
     @MongoDBFixtures("InputServiceImplTest.json")
+    public void getExtractorsSkipsExtractorsThatCannotBeBuilt() throws Exception {
+        // An extractor that can no longer be built from its persisted data (e.g. a lookup table extractor whose
+        // lookup table was deleted) must be skipped instead of breaking listing of all extractors for the input.
+        // See issue #26122.
+        final Input input = inputService.find("54e3deadbeefdeadbeef0001");
+
+        final String extractorId = new ObjectId().toHexString();
+        final Extractor extractor = Mockito.mock(Extractor.class);
+        final Map<String, Object> persistedFields = new HashMap<>();
+        persistedFields.put(Extractor.FIELD_ID, extractorId);
+        persistedFields.put(Extractor.FIELD_TITLE, "broken extractor");
+        persistedFields.put(Extractor.FIELD_ORDER, 0);
+        persistedFields.put(Extractor.FIELD_CURSOR_STRATEGY, Extractor.CursorStrategy.COPY.name());
+        persistedFields.put(Extractor.FIELD_TYPE, Extractor.Type.LOOKUP_TABLE.name());
+        persistedFields.put(Extractor.FIELD_SOURCE_FIELD, "message");
+        persistedFields.put(Extractor.FIELD_TARGET_FIELD, "message");
+        persistedFields.put(Extractor.FIELD_EXTRACTOR_CONFIG, Map.of());
+        persistedFields.put(Extractor.FIELD_CREATOR_USER_ID, "user-x");
+        persistedFields.put(Extractor.FIELD_CONVERTERS, List.of());
+        persistedFields.put(Extractor.FIELD_CONDITION_TYPE, Extractor.ConditionType.STRING.name());
+        when(extractor.getPersistedFields()).thenReturn(persistedFields);
+
+        // Fields read by InputServiceImpl#addExtractor / #validateExtractor when persisting.
+        when(extractor.getId()).thenReturn(extractorId);
+        when(extractor.getTitle()).thenReturn("broken extractor");
+        when(extractor.getType()).thenReturn(Extractor.Type.LOOKUP_TABLE);
+        when(extractor.getCursorStrategy()).thenReturn(Extractor.CursorStrategy.COPY);
+        when(extractor.getSourceField()).thenReturn("message");
+        when(extractor.getCreatorUserId()).thenReturn("user-x");
+        when(extractor.getExtractorConfig()).thenReturn(Map.of());
+
+        inputService.addExtractor(input, extractor);
+
+        // The factory returns null when the extractor cannot be built from the persisted document.
+        when(extractorFactory.factory(any(), any(), anyLong(), any(), any(), any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(null);
+
+        assertThat(inputService.getExtractors(input.getId())).isEmpty();
+    }
+
+    @Test
+    @MongoDBFixtures("InputServiceImplTest.json")
     public void testDeleteExtractor() throws Exception {
         Input input = inputService.find("54e3deadbeefdeadbeef0002");
         Extractor extractor = Mockito.mock(Extractor.class);
