@@ -35,8 +35,6 @@ import type { MiddleSectionProps } from 'components/common/PaginatedEntityTable/
 import useUserDateTime from 'hooks/useUserDateTime';
 import { toUTCFromTz } from 'util/DateTime';
 import type { UserDateTimeContextType } from 'contexts/UserDateTimeContext';
-import type { TimeRange } from 'views/logic/queries/Query';
-import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 import useOnRefresh from 'components/common/PaginatedEntityTable/useOnRefresh';
 
 const config = AggregationWidgetConfig.builder()
@@ -112,19 +110,25 @@ const layout: Partial<PlotLayout> = {
   legend: { y: yLegendPosition(height) },
 };
 
-const prepareTimeRangeForGraph = (timerange: TimeRange, formatTime: FormatTime) => {
-  if (isTypeRelativeWithStartOnly(timerange)) {
-    const from = moment().subtract(timerange.range, 'seconds');
-    const to = moment();
+type Bucket = {
+  count: number;
+  start_date: string;
+}
 
-    return [formatTime(from, 'internal'), formatTime(to, 'internal')];
-  }
+const prepareTimeRangeForGraph = ({alerts, events }: { events: Array<Bucket>, alerts: Array<Bucket> }, formatTime: FormatTime) => {
+  const from = [alerts[0], events[0]].reduce((min, item) =>
+    moment(item.start_date).isBefore(moment(min.start_date)) ? item : min
+  ).start_date;
+  const to = [alerts[alerts.length - 1], events[events.length - 1]].reduce((max, item) =>
+    moment(item.start_date).isAfter(moment(max.start_date)) ? item : max
+  ).start_date;
 
-  return [formatTime(timerange.from, 'internal'), formatTime(timerange.to, 'internal')];
+
+  return [formatTime(from, 'internal'), formatTime(to, 'internal')];
 };
 
 const EventsGraph = ({
-  data: { results, timerange },
+  data: { results },
   alerts,
   onZoom,
   formatTime,
@@ -147,10 +151,10 @@ const EventsGraph = ({
       ...layout,
       xaxis: {
         ...layout.xaxis,
-        range: prepareTimeRangeForGraph(timerange, formatTime),
+        range: prepareTimeRangeForGraph(results.buckets, formatTime),
       },
     }),
-    [timerange, formatTime],
+    [results.buckets, formatTime],
   );
 
   return (
