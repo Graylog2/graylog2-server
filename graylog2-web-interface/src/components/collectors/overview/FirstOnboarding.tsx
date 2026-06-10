@@ -17,17 +17,18 @@
 import * as React from 'react';
 import { useState, useCallback, useRef } from 'react';
 import styled, { css } from 'styled-components';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { Spinner } from 'components/common';
 import { getMajorAndMinorVersion } from 'util/Version';
+import useHistory from 'routing/useHistory';
+import Routes from 'routing/Routes';
 
 import PlatformPicker from './onboarding/PlatformPicker';
 import InstallCommand from './onboarding/InstallCommand';
 import WaitingForConnection from './onboarding/WaitingForConnection';
-import ConnectionSuccess from './onboarding/ConnectionSuccess';
 import FleetChoice from './onboarding/FleetChoice';
 import type { FleetChoiceValue } from './onboarding/FleetChoice';
-import OnboardingSummary from './onboarding/OnboardingSummary';
 import PLATFORMS from './onboarding/platforms';
 import type { PlatformId } from './onboarding/platforms';
 import DEFAULT_SOURCES from './onboarding/defaultSources';
@@ -35,8 +36,8 @@ import DEFAULT_SOURCES from './onboarding/defaultSources';
 import { useCollectorsConfig, useCollectorsMutations, useFleets } from '../hooks';
 import type { Fleet, CollectorInstanceView } from '../types';
 
-// 'setup' = still collecting platform/fleet; 'waiting'/'connected' = command box is live.
-type Phase = 'setup' | 'waiting' | 'connected';
+// 'setup' = still collecting platform/fleet; 'waiting' = command box is live.
+type Phase = 'setup' | 'waiting';
 
 // The platform picker (700px) and fleet selector (400px) own their own centered widths.
 // The install/connected body gets a wider column so the command, stat cards, and asset grid have room.
@@ -61,10 +62,12 @@ const FirstOnboarding = () => {
   const [fleetChoice, setFleetChoice] = useState<FleetChoiceValue | null>(null);
   // The fleet the collector will enroll into, once resolved (looked up or freshly created).
   const [resolvedFleet, setResolvedFleet] = useState<Fleet | null>(null);
-  const [connectedInstance, setConnectedInstance] = useState<CollectorInstanceView | null>(null);
 
   // The enrollment token is minted once and reused while switching platforms.
   const tokenRef = useRef<string | null>(null);
+
+  const queryClient = useQueryClient();
+  const history = useHistory();
 
   const { data: config, isLoading: isConfigLoading } = useCollectorsConfig();
   const { data: fleets, isLoading: isFleetsLoading } = useFleets();
@@ -162,15 +165,20 @@ const FirstOnboarding = () => {
   const handleChangeFleet = useCallback(() => {
     setFleetChoice(null);
     setResolvedFleet(null);
-    setConnectedInstance(null);
     tokenRef.current = null;
     setPhase('setup');
   }, []);
 
-  const handleConnected = useCallback((instance: CollectorInstanceView) => {
-    setConnectedInstance(instance);
-    setPhase('connected');
-  }, []);
+  const handleConnected = useCallback(
+    (instance: CollectorInstanceView) => {
+      // The overview's cached stats still say zero instances; refresh so Back shows the real overview.
+      queryClient.invalidateQueries({ queryKey: ['collectors'] });
+      history.pushWithState(Routes.SYSTEM.COLLECTORS.ONBOARDING_INSTANCE(instance.instance_uid), {
+        platformId: selectedPlatform,
+      });
+    },
+    [queryClient, history, selectedPlatform],
+  );
 
   if (isConfigLoading || isFleetsLoading) return <Spinner />;
 
@@ -181,53 +189,34 @@ const FirstOnboarding = () => {
 
   return (
     <div>
-      {phase === 'connected' && selectedPlatform ? (
-        // Connected: the OS grid and fleet picker are pointless now — show a read-only recap.
-        <OnboardingSummary platformId={selectedPlatform} fleetName={resolvedFleet?.name} />
-      ) : (
-        <>
-          {/* 1. Always: pick the operating system. */}
-          <PlatformPicker
-            onSelect={handlePlatformSelect}
-            selectedPlatform={selectedPlatform}
-            disabled={isBusy}
-          />
+      {/* 1. Always: pick the operating system. */}
+      <PlatformPicker
+        onSelect={handlePlatformSelect}
+        selectedPlatform={selectedPlatform}
+        disabled={isBusy}
+      />
 
-          {/* 2. Only when a platform is picked and at least one fleet exists.
-                Shows the choice controls until a fleet is resolved, then its details. */}
-          {selectedPlatform && showFleetChoice && (
-            <FleetChoice
-              fleets={fleets!}
-              selectedFleet={resolvedFleet}
-              onSelect={handleFleetChoice}
-              onChange={handleChangeFleet}
-              disabled={isBusy}
-            />
-          )}
-        </>
+      {/* 2. Only when a platform is picked and at least one fleet exists.
+            Shows the choice controls until a fleet is resolved, then its details. */}
+      {selectedPlatform && showFleetChoice && (
+        <FleetChoice
+          fleets={fleets!}
+          selectedFleet={resolvedFleet}
+          onSelect={handleFleetChoice}
+          onChange={handleChangeFleet}
+          disabled={isBusy}
+        />
       )}
 
       {/* 3. The command box, once the preconditions are satisfied. */}
-      {phase !== 'setup' && selectedPlatform && (
+      {phase === 'waiting' && selectedPlatform && (
         <BodyContainer>
-          {phase === 'waiting' && (
-            <>
-              <InstallCommand
-                command={installCommand}
-                platformLabel={PLATFORMS.find((p) => p.id === selectedPlatform)?.label ?? ''}
-                tokenDuration='P1D'
-              />
-              <WaitingForConnection key={resolvedFleet?.id} fleetId={resolvedFleet?.id} onConnected={handleConnected} />
-            </>
-          )}
-
-          {phase === 'connected' && connectedInstance && (
-            <ConnectionSuccess
-              platformId={selectedPlatform}
-              instance={connectedInstance}
-              fleetName={resolvedFleet?.name}
-            />
-          )}
+          <InstallCommand
+            command={installCommand}
+            platformLabel={PLATFORMS.find((p) => p.id === selectedPlatform)?.label ?? ''}
+            tokenDuration='P1D'
+          />
+          <WaitingForConnection key={resolvedFleet?.id} fleetId={resolvedFleet?.id} onConnected={handleConnected} />
         </BodyContainer>
       )}
     </div>

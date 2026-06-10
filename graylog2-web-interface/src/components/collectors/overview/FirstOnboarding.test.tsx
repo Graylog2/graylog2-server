@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
@@ -33,7 +33,19 @@ jest.mock('util/Version', () => ({
 }));
 jest.mock('util/copyToClipboard', () => jest.fn(() => Promise.resolve()));
 jest.mock('components/common/Tooltip', () => ({ children }: { children: React.ReactNode }) => <>{children}</>);
-jest.mock('routing/useHistory', () => () => ({ push: jest.fn() }));
+const mockPushWithState = jest.fn();
+
+jest.mock('routing/useHistory', () => () => ({
+  push: jest.fn(),
+  pushWithState: mockPushWithState,
+}));
+
+const mockInvalidateQueries = jest.fn();
+
+jest.mock('@tanstack/react-query', () => ({
+  ...jest.requireActual('@tanstack/react-query'),
+  useQueryClient: () => ({ invalidateQueries: mockInvalidateQueries }),
+}));
 
 // WaitingForConnection polls the backend — stub it out with a button to trigger onConnected.
 jest.mock('./onboarding/WaitingForConnection', () => {
@@ -68,17 +80,6 @@ jest.mock('./onboarding/WaitingForConnection', () => {
   };
 });
 
-// ConnectionSuccess uses several backend hooks — stub it to just show the success text and instance hostname.
-jest.mock('./onboarding/ConnectionSuccess', () => function ConnectionSuccessStub(
-  { instance }: { instance: { hostname: string | null; instance_uid: string } },
-) {
-  return (
-    <div>
-      <span>Collector connected</span>
-      <span>{instance.hostname ?? instance.instance_uid}</span>
-    </div>
-  );
-});
 
 const mockConfig = {
   http: { hostname: 'graylog.example', port: 4317 },
@@ -342,7 +343,7 @@ describe('FirstOnboarding', () => {
     expect(createEnrollmentToken).toHaveBeenCalledTimes(1);
   });
 
-  it('transitions to connected phase after simulating connection', async () => {
+  it('navigates to the instance result page once the collector connects', async () => {
     render(<FirstOnboarding />);
 
     await userEvent.click(screen.getByRole('button', { name: /linux/i }));
@@ -353,40 +354,10 @@ describe('FirstOnboarding', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /simulate connection/i }));
 
-    expect(screen.getByText(/collector connected/i)).toBeInTheDocument();
-    // web-prod-01 appears twice: as the connection hostname and as an auto-detected host asset
-    expect(screen.getAllByText(/web-prod-01/i).length).toBeGreaterThan(0);
-  });
-
-  it('collapses to a compact, non-interactive summary once connected', async () => {
-    asMock(useFleets).mockReturnValue({ data: multipleFleets, isLoading: false });
-
-    render(<FirstOnboarding />);
-
-    await userEvent.click(screen.getByRole('button', { name: /linux/i }));
-    await screen.findByRole('button', { name: /create new fleet/i });
-    await selectEvent.chooseOption('Select existing fleet', 'Staging');
-
-    await waitFor(() => {
-      expect(screen.getByText(/run this on linux/i)).toBeInTheDocument();
+    expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['collectors'] });
+    expect(mockPushWithState).toHaveBeenCalledWith('/system/collectors/onboarding/uid-web-prod-01', {
+      platformId: 'linux',
     });
-
-    // While waiting, the fleet box is still editable.
-    expect(screen.getByRole('button', { name: /change fleet/i })).toBeInTheDocument();
-
-    await userEvent.click(screen.getByRole('button', { name: /simulate connection/i }));
-
-    expect(screen.getByText(/collector connected/i)).toBeInTheDocument();
-
-    // The OS grid and the editable fleet box collapse — nothing left to change.
-    expect(screen.queryByText(/get started with collectors/i)).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /change fleet/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole('combobox', { name: /select existing fleet/i })).not.toBeInTheDocument();
-
-    // A compact read-only summary shows the platform and fleet name.
-    const summary = screen.getByTestId('onboarding-summary');
-    expect(within(summary).getByText('Linux')).toBeInTheDocument();
-    expect(within(summary).getByText('Staging')).toBeInTheDocument();
   });
 
   it('shows spinner while config or fleets are loading', async () => {
