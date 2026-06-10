@@ -38,6 +38,7 @@ const baseInstance: CollectorInstanceView = {
   os: 'linux',
   version: '1.2.0',
   status: 'online',
+  has_pending_changes: false,
 };
 
 const fleetNames: Record<string, string> = {
@@ -90,6 +91,21 @@ describe('Instance ColumnRenderers', () => {
       render(<>{renderers.attributes.os.renderCell(null, noOs, {})}</>);
 
       await screen.findByTitle('Unknown');
+    });
+  });
+
+  describe('has_pending_changes', () => {
+    it('renders a sync-pending icon when the instance has pending changes', async () => {
+      const pending = { ...baseInstance, has_pending_changes: true };
+      render(<>{renderers.attributes.has_pending_changes.renderCell(true, pending, {})}</>);
+
+      await screen.findByTitle(/sync pending/i);
+    });
+
+    it('renders an in-sync icon when the instance has no pending changes', async () => {
+      render(<>{renderers.attributes.has_pending_changes.renderCell(false, baseInstance, {})}</>);
+
+      await screen.findByTitle(/in sync/i);
     });
   });
 

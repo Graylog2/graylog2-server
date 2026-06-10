@@ -42,6 +42,7 @@ export type CollectorInstanceView = {
   os: string | null;
   version: string | null;
   status: 'online' | 'offline';
+  has_pending_changes: boolean;
 };
 
 export type SourceType = 'file' | 'journald' | 'windows_event_log';
