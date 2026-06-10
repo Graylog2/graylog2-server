@@ -49,11 +49,14 @@ class DataNodeMetadataServiceImplTest {
 
     @BeforeEach
     void setUp(MongoCollections mongoCollections) {
+        this.service = new DataNodeMetadataServiceImpl(mongoCollections, dataNodeClusterService, datanodeUpgradeService);
+    }
+
+    private void stubVersionsOverviewDependencies() {
         when(dataNodeClusterService.byNodeIds(anySet())).thenReturn(Map.of());
         when(datanodeUpgradeService.status()).thenReturn(datanodeUpgradeStatus);
         when(datanodeUpgradeStatus.upToDateNodes()).thenReturn(List.of());
         when(datanodeUpgradeStatus.outdatedNodes()).thenReturn(List.of());
-        this.service = new DataNodeMetadataServiceImpl(mongoCollections, dataNodeClusterService, datanodeUpgradeService);
     }
 
     @Test
@@ -130,6 +133,7 @@ class DataNodeMetadataServiceImplTest {
 
     @Test
     void versionsOverviewIsEmptyWhenNoNodesRegistered() {
+        stubVersionsOverviewDependencies();
         final OpensearchVersionsOverview overview = service.getVersionsOverview();
         assertThat(overview.nodes()).isEmpty();
         assertThat(overview.upgradeAvailable()).isFalse();
@@ -139,6 +143,7 @@ class DataNodeMetadataServiceImplTest {
 
     @Test
     void versionsOverviewClassifiesUpToDateNodes() {
+        stubVersionsOverviewDependencies();
         final String otherNodeId = "other-node-0000-0000-0000-000000000000";
         service.setOpensearchVersion(NODE_ID, "2.19.5");
         service.setOpensearchVersion(otherNodeId, "2.19.5");
@@ -153,6 +158,7 @@ class DataNodeMetadataServiceImplTest {
 
     @Test
     void versionsOverviewClassifiesUpgradeableNodes() {
+        stubVersionsOverviewDependencies();
         final String otherNodeId = "other-node-0000-0000-0000-000000000000";
         service.setOpensearchVersion(NODE_ID, "2.19.5");
         service.setLatestAvailableOpensearchVersion(NODE_ID, "3.5.0");
