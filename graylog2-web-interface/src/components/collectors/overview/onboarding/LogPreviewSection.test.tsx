@@ -97,6 +97,22 @@ describe('LogPreviewSection', () => {
     expect(screen.getByText(/sshd\[412\]/)).toBeInTheDocument();
   });
 
+  it('shows a placeholder count while the collapsible section is loading', () => {
+    render(
+      <LogPreviewSection
+        title="Collector logs"
+        searchUrl="/search?q=x"
+        preview={undefined}
+        isLoading
+        error={null}
+        collapsible
+      />,
+    );
+
+    expect(screen.getByText('—')).toBeInTheDocument();
+    expect(screen.queryByText('0')).not.toBeInTheDocument();
+  });
+
   it('renders a message count in the header when collapsible', () => {
     render(
       <LogPreviewSection

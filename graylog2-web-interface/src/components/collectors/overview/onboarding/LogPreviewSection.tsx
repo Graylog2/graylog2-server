@@ -67,7 +67,7 @@ const PreviewBody = ({ preview, isLoading, error }: Pick<Props, 'preview' | 'isL
     return (
       <>
         {preview.messages.map((message) => (
-          <MessageRow key={message.id}>
+          <MessageRow key={message.id} title={message.text}>
             <RowTimestamp>
               <Timestamp dateTime={message.timestamp} />
             </RowTimestamp>
@@ -79,7 +79,7 @@ const PreviewBody = ({ preview, isLoading, error }: Pick<Props, 'preview' | 'isL
   }
 
   if (error) {
-    return <Alert bsStyle="warning">Log preview unavailable: {error.message}</Alert>;
+    return <Alert bsStyle="warning">Log preview unavailable &mdash; {error.message.slice(0, 120)}</Alert>;
   }
 
   if (isLoading) {
@@ -99,9 +99,11 @@ const LogPreviewSection = ({ title, searchUrl, preview, isLoading, error, collap
     title={title}
     collapsible={collapsible}
     defaultClosed={collapsible}
-    headerLeftSection={collapsible ? <Label bsStyle="default">{preview?.total ?? 0}</Label> : undefined}
+    headerLeftSection={collapsible ? <Label bsStyle="default">{preview ? preview.total : '—'}</Label> : undefined}
     actions={<Link to={searchUrl}>Open in search</Link>}>
-    <PreviewBody preview={preview} isLoading={isLoading} error={error} />
+    <div aria-live="polite">
+      <PreviewBody preview={preview} isLoading={isLoading} error={error} />
+    </div>
   </Section>
 );
 
