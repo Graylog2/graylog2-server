@@ -73,17 +73,19 @@ export const fetchPaginatedInstances = async (
     'Could not load instances',
   );
 
-export const useInstances = (fleetId?: string, options: { refetchInterval?: number } = {}) =>
+export const useInstances = (fleetId?: string, options: { refetchInterval?: number; silent?: boolean } = {}) =>
   useQuery<CollectorInstanceView[]>({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- silent only affects the error-reporting wrapper, not the cached data; callers deliberately share one cache entry regardless of the flag
     queryKey: [...INSTANCES_KEY_PREFIX, { fleetId }],
     queryFn: () => {
       const filters = fleetId ? [`fleet_id:${fleetId}`] : undefined;
-
-      return defaultOnError(
-        Collectors.findInstances(1, 0, undefined, filters).then((response) => response.elements.map(toView)),
-        'Loading Collector instances failed with status',
-        'Could not load Collector instances',
+      const promise = Collectors.findInstances(1, 0, undefined, filters).then((response) =>
+        response.elements.map(toView),
       );
+
+      return options.silent
+        ? promise
+        : defaultOnError(promise, 'Loading Collector instances failed with status', 'Could not load Collector instances');
     },
     refetchInterval: options.refetchInterval,
   });

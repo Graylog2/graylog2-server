@@ -62,7 +62,25 @@ describe('WaitingForConnection', () => {
 
     render(<WaitingForConnection fleetId="fleet-1" onConnected={onConnected} />);
 
-    expect(useInstances).toHaveBeenCalledWith('fleet-1', { refetchInterval: 3000 });
+    expect(useInstances).toHaveBeenCalledWith('fleet-1', { refetchInterval: 3000, silent: true });
+  });
+
+  it('shows an inline notice when polling fails, and keeps waiting', () => {
+    asMock(useInstances).mockReturnValue({ data: undefined, error: new Error('nope') } as ReturnType<typeof useInstances>);
+
+    render(<WaitingForConnection fleetId="fleet-1" onConnected={onConnected} />);
+
+    expect(screen.getByText(/having trouble reaching the server/i)).toBeInTheDocument();
+    expect(screen.getByText(/waiting for connection/i)).toBeInTheDocument();
+    expect(onConnected).not.toHaveBeenCalled();
+  });
+
+  it('polls silently (no toast on transient failures)', () => {
+    asMock(useInstances).mockReturnValue({ data: [] } as ReturnType<typeof useInstances>);
+
+    render(<WaitingForConnection fleetId="fleet-1" onConnected={onConnected} />);
+
+    expect(useInstances).toHaveBeenCalledWith('fleet-1', { refetchInterval: 3000, silent: true });
   });
 
   it('does not fire for instances that existed before onboarding', () => {

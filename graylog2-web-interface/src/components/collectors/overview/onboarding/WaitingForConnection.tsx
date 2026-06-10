@@ -57,7 +57,7 @@ const StatusText = styled.span(
 
 const WaitingForConnection = ({ fleetId, onConnected }: Props) => {
   const [elapsed, setElapsed] = useState(0);
-  const { data: instances } = useInstances(fleetId, { refetchInterval: POLL_INTERVAL_MS });
+  const { data: instances, error } = useInstances(fleetId, { refetchInterval: POLL_INTERVAL_MS, silent: true });
   // Instances that already existed when this step mounted. Anything beyond these is "ours".
   // Diffing ids instead of comparing enrolled_at against browser time avoids clock-skew bugs.
   const baseline = useRef<Set<string> | null>(null);
@@ -98,6 +98,9 @@ const WaitingForConnection = ({ fleetId, onConnected }: Props) => {
         <PulsingDot />
         <StatusText>Waiting for connection... {elapsed}s</StatusText>
       </StatusRow>
+      {Boolean(error) && (
+        <StatusText role="status">Having trouble reaching the server &mdash; retrying automatically</StatusText>
+      )}
     </Container>
   );
 };

@@ -79,7 +79,11 @@ const PreviewBody = ({ preview, isLoading, error }: Pick<Props, 'preview' | 'isL
   }
 
   if (error) {
-    return <Alert bsStyle="warning">Log preview unavailable &mdash; {error.message.slice(0, 120)}</Alert>;
+    return (
+      <div aria-live="polite">
+        <Alert bsStyle="warning">Log preview unavailable &mdash; {error.message.slice(0, 120)}</Alert>
+      </div>
+    );
   }
 
   if (isLoading) {
@@ -87,7 +91,7 @@ const PreviewBody = ({ preview, isLoading, error }: Pick<Props, 'preview' | 'isL
   }
 
   return (
-    <EmptyState>
+    <EmptyState aria-live="polite">
       <PulsingDot />
       No messages yet &mdash; checking every few seconds
     </EmptyState>
@@ -101,9 +105,7 @@ const LogPreviewSection = ({ title, searchUrl, preview, isLoading, error, collap
     defaultClosed={collapsible}
     headerLeftSection={collapsible ? <Label bsStyle="default">{preview ? preview.total : '—'}</Label> : undefined}
     actions={<Link to={searchUrl}>Open in search</Link>}>
-    <div aria-live="polite">
-      <PreviewBody preview={preview} isLoading={isLoading} error={error} />
-    </div>
+    <PreviewBody preview={preview} isLoading={isLoading} error={error} />
   </Section>
 );
 
