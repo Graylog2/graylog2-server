@@ -172,6 +172,17 @@ public class InputServiceImplTest {
     }
 
     @Test
+    @MongoDBFixtures("inputCountByType.json")
+    public void totalCountByTypeReturnsCountsGroupedByType() {
+        final Map<String, Long> counts = inputService.totalCountByType();
+
+        assertThat(counts).isEqualTo(Map.of(
+                "org.graylog2.inputs.gelf.tcp.GELFTCPInput", 2L,
+                "org.graylog2.inputs.raw.tcp.RawTCPInput", 1L
+        ));
+    }
+
+    @Test
     public void handlesEncryptedValue() throws ValidationException, NotFoundException {
 
         // Setup required to detect fields that need conversion from Map to EncryptedValue when reading
