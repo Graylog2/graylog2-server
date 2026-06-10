@@ -73,7 +73,7 @@ export const fetchPaginatedInstances = async (
     'Could not load instances',
   );
 
-export const useInstances = (fleetId?: string) =>
+export const useInstances = (fleetId?: string, options: { refetchInterval?: number } = {}) =>
   useQuery<CollectorInstanceView[]>({
     queryKey: [...INSTANCES_KEY_PREFIX, { fleetId }],
     queryFn: () => {
@@ -85,4 +85,5 @@ export const useInstances = (fleetId?: string) =>
         'Could not load Collector instances',
       );
     },
+    refetchInterval: options.refetchInterval,
   });

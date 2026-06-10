@@ -33,7 +33,7 @@ import type { PlatformId } from './onboarding/platforms';
 import DEFAULT_SOURCES from './onboarding/defaultSources';
 
 import { useCollectorsConfig, useCollectorsMutations, useFleets } from '../hooks';
-import type { Fleet } from '../types';
+import type { Fleet, CollectorInstanceView } from '../types';
 
 // 'setup' = still collecting platform/fleet; 'waiting'/'connected' = command box is live.
 type Phase = 'setup' | 'waiting' | 'connected';
@@ -61,6 +61,7 @@ const FirstOnboarding = () => {
   const [fleetChoice, setFleetChoice] = useState<FleetChoiceValue | null>(null);
   // The fleet the collector will enroll into, once resolved (looked up or freshly created).
   const [resolvedFleet, setResolvedFleet] = useState<Fleet | null>(null);
+  const [connectedInstance, setConnectedInstance] = useState<CollectorInstanceView | null>(null);
 
   // The enrollment token is minted once and reused while switching platforms.
   const tokenRef = useRef<string | null>(null);
@@ -161,11 +162,13 @@ const FirstOnboarding = () => {
   const handleChangeFleet = useCallback(() => {
     setFleetChoice(null);
     setResolvedFleet(null);
+    setConnectedInstance(null);
     tokenRef.current = null;
     setPhase('setup');
   }, []);
 
-  const handleSimulateConnection = useCallback(() => {
+  const handleConnected = useCallback((instance: CollectorInstanceView) => {
+    setConnectedInstance(instance);
     setPhase('connected');
   }, []);
 
@@ -214,11 +217,11 @@ const FirstOnboarding = () => {
                 platformLabel={PLATFORMS.find((p) => p.id === selectedPlatform)?.label ?? ''}
                 tokenDuration='P1D'
               />
-              <WaitingForConnection onSimulateConnection={handleSimulateConnection} />
+              <WaitingForConnection fleetId={resolvedFleet?.id} onConnected={handleConnected} />
             </>
           )}
 
-          {phase === 'connected' && <ConnectionSuccess platformId={selectedPlatform} />}
+          {phase === 'connected' && connectedInstance && <ConnectionSuccess platformId={selectedPlatform} />}
         </BodyContainer>
       )}
     </div>

@@ -15,15 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styled, { css } from 'styled-components';
 
-import { Button } from 'components/bootstrap';
+import { useInstances } from 'components/collectors/hooks/useInstanceQueries';
+import type { CollectorInstanceView } from 'components/collectors/types';
 
 import PulsingDot from './PulsingDot';
 
+const POLL_INTERVAL_MS = 3000;
+
 type Props = {
-  onSimulateConnection: () => void;
+  fleetId: string | undefined;
+  onConnected: (instance: CollectorInstanceView) => void;
 };
 
 const Container = styled.div(
@@ -51,8 +55,13 @@ const StatusText = styled.span(
   `,
 );
 
-const WaitingForConnection = ({ onSimulateConnection }: Props) => {
+const WaitingForConnection = ({ fleetId, onConnected }: Props) => {
   const [elapsed, setElapsed] = useState(0);
+  const { data: instances } = useInstances(fleetId, { refetchInterval: POLL_INTERVAL_MS });
+  // Instances that already existed when this step mounted. Anything beyond these is "ours".
+  // Diffing ids instead of comparing enrolled_at against browser time avoids clock-skew bugs.
+  const baseline = useRef<Set<string> | null>(null);
+  const fired = useRef(false);
 
   useEffect(() => {
     const interval = setInterval(() => setElapsed((s) => s + 1), 1000);
@@ -60,15 +69,35 @@ const WaitingForConnection = ({ onSimulateConnection }: Props) => {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    if (!instances) return;
+
+    const known = baseline.current;
+
+    if (known === null) {
+      baseline.current = new Set(instances.map((i) => i.id));
+
+      return;
+    }
+
+    if (fired.current) return;
+
+    const fresh = instances
+      .filter((i) => !known.has(i.id))
+      .sort((a, b) => (a.enrolled_at ?? '').localeCompare(b.enrolled_at ?? ''));
+
+    if (fresh.length > 0) {
+      fired.current = true;
+      onConnected(fresh[0]);
+    }
+  }, [instances, onConnected]);
+
   return (
     <Container>
       <StatusRow>
         <PulsingDot />
         <StatusText>Waiting for connection... {elapsed}s</StatusText>
       </StatusRow>
-      <Button bsStyle="primary" bsSize="sm" onClick={onSimulateConnection}>
-        Simulate connection
-      </Button>
     </Container>
   );
 };
