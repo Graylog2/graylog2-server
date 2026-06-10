@@ -7,8 +7,8 @@ export const DIAGRAM = `flowchart TD
   A(["User's current view"])
   A --> B{{"\`Should users remain
 in their current workflow?\`"}}
-  B -->|Yes| MODAL
-  B -->|No| PAGE
+B -->|Yes| MODAL
+B -->|No| PAGE
 
 subgraph Surface["Surface"]
 MODAL(["\`**Modal**
