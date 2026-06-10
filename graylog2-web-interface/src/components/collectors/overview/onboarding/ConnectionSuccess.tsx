@@ -34,7 +34,7 @@ import collectorReceivedMessagesUrl from '../../common/collectorReceivedMessages
 import collectorSystemLogsUrl from '../../common/collectorSystemLogsUrl';
 
 type Props = {
-  platformId: PlatformId;
+  platformId?: PlatformId;
   instance: CollectorInstanceView;
   fleetName: string | undefined;
 };
@@ -132,9 +132,9 @@ const LogPreviewsWrapper = styled.div(
   `,
 );
 
-const ConnectionSuccess = ({ platformId, instance, fleetName }: Props) => {
+const ConnectionSuccess = ({ platformId = undefined, instance, fleetName }: Props) => {
   const history = useHistory();
-  const platform = PLATFORMS.find((p) => p.id === platformId);
+  const platform = platformId ? PLATFORMS.find((p) => p.id === platformId) : undefined;
   const { selfLogs, sourceLogs, selfLogsError, sourceLogsError, isLoading } = useCollectorLogPreview(
     instance.instance_uid,
   );
@@ -154,7 +154,7 @@ const ConnectionSuccess = ({ platformId, instance, fleetName }: Props) => {
 
       <SummaryRow>
         {fleetName && <Label>{fleetName}</Label>}
-        <Label>{platform?.label}</Label>
+        {platform && <Label>{platform.label}</Label>}
         <Label>{sources?.length ?? 0} sources</Label>
       </SummaryRow>
 

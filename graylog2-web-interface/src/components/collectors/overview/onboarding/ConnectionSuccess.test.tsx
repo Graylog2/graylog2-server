@@ -108,4 +108,11 @@ describe('ConnectionSuccess', () => {
 
     expect(screen.getByText('uid-42')).toBeInTheDocument();
   });
+
+  it('omits the platform chip when platformId is not known', () => {
+    render(<ConnectionSuccess instance={instance} fleetName="Default Fleet" />);
+
+    expect(screen.queryByText('Linux')).not.toBeInTheDocument();
+    expect(screen.getByText('web-prod-01')).toBeInTheDocument();
+  });
 });
