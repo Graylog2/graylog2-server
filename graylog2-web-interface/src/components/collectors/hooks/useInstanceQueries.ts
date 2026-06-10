@@ -89,3 +89,20 @@ export const useInstances = (fleetId?: string, options: { refetchInterval?: numb
     },
     refetchInterval: options.refetchInterval,
   });
+
+export const useInstance = (instanceUid: string | undefined) =>
+  useQuery<CollectorInstanceView | null>({
+    queryKey: [...INSTANCES_KEY_PREFIX, 'single', instanceUid],
+    queryFn: () =>
+      defaultOnError(
+        // There is no single-instance GET endpoint (only DELETE), so fetch the list and match.
+        Collectors.findInstances(1, 0, undefined, undefined).then((response) => {
+          const match = response.elements.find((element) => element.instance_uid === instanceUid);
+
+          return match ? toView(match) : null;
+        }),
+        'Loading Collector instance failed with status',
+        'Could not load Collector instance',
+      ),
+    enabled: !!instanceUid,
+  });
