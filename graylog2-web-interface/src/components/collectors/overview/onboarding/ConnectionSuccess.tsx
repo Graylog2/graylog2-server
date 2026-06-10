@@ -21,27 +21,29 @@ import { Alert, Label } from 'components/bootstrap';
 import { AccessibleCard } from 'components/common';
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
+import type { CollectorInstanceView } from 'components/collectors/types';
+import { useSources } from 'components/collectors/hooks/useSourceQueries';
 
 import type { PlatformId } from './platforms';
 import PLATFORMS from './platforms';
+import useCollectorLogPreview from './useCollectorLogPreview';
+import LogPreviewSection from './LogPreviewSection';
 
 import StatCard from '../../common/StatCard';
+import collectorReceivedMessagesUrl from '../../common/collectorReceivedMessagesUrl';
+import collectorSystemLogsUrl from '../../common/collectorSystemLogsUrl';
 
 type Props = {
   platformId: PlatformId;
+  instance: CollectorInstanceView;
+  fleetName: string | undefined;
 };
 
-const MOCK_CONNECTION = {
-  hostname: 'web-prod-01',
-  version: 'v1.0.0',
-  fleetName: 'Default Fleet',
-  sources: ['syslog', 'auth.log'],
-  assets: [
-    { type: 'host', name: 'web-prod-01' },
-    { type: 'user', name: 'root' },
-  ],
-  messageCount: 142,
-};
+// Asset auto-detection has no backend yet — intentionally stays mocked until that feature ships.
+const MOCK_ASSETS = [
+  { type: 'host', name: 'example-host' },
+  { type: 'user', name: 'root' },
+];
 
 const SummaryRow = styled.div(
   ({ theme }) => css`
@@ -124,32 +126,66 @@ const NextCard = styled(AccessibleCard)(
   `,
 );
 
-const ConnectionSuccess = ({ platformId }: Props) => {
+const LogPreviewsWrapper = styled.div(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.lg};
+  `,
+);
+
+const ConnectionSuccess = ({ platformId, instance, fleetName }: Props) => {
   const history = useHistory();
   const platform = PLATFORMS.find((p) => p.id === platformId);
+  const { selfLogs, sourceLogs, selfLogsError, sourceLogsError, isLoading } = useCollectorLogPreview(
+    instance.instance_uid,
+  );
+  const { data: sources } = useSources(instance.fleet_id);
 
   return (
     <div>
       <Alert bsStyle="success">
-        Collector connected &mdash; <strong>{MOCK_CONNECTION.hostname}</strong> running{' '}
-        <strong>{MOCK_CONNECTION.version}</strong>
+        Collector connected &mdash; <strong>{instance.hostname ?? instance.instance_uid}</strong>
+        {instance.version && (
+          <>
+            {' '}
+            running <strong>v{instance.version}</strong>
+          </>
+        )}
       </Alert>
 
       <SummaryRow>
-        <Label>{MOCK_CONNECTION.fleetName}</Label>
+        {fleetName && <Label>{fleetName}</Label>}
         <Label>{platform?.label}</Label>
-        <Label>{MOCK_CONNECTION.sources.length} sources</Label>
+        <Label>{sources?.length ?? 0} sources</Label>
       </SummaryRow>
 
       <StatsRow>
-        <StatCard value={1} label="Online" variant="success" />
-        <StatCard value={MOCK_CONNECTION.messageCount} label="Messages" />
-        <StatCard value={MOCK_CONNECTION.sources.length} label="Sources" />
+        <StatCard value={instance.status === 'online' ? 1 : 0} label="Online" variant="success" />
+        <StatCard value={sourceLogs?.total ?? 0} label="Messages" />
+        <StatCard value={sources?.length ?? 0} label="Sources" />
       </StatsRow>
+
+      <LogPreviewsWrapper>
+        <LogPreviewSection
+          title="Your log sources"
+          searchUrl={collectorReceivedMessagesUrl('collector_instance_uid', instance.instance_uid)}
+          preview={sourceLogs}
+          isLoading={isLoading}
+          error={sourceLogsError}
+        />
+
+        <LogPreviewSection
+          title="Collector logs"
+          searchUrl={collectorSystemLogsUrl(instance.instance_uid)}
+          preview={selfLogs}
+          isLoading={isLoading}
+          error={selfLogsError}
+          collapsible
+        />
+      </LogPreviewsWrapper>
 
       <SectionTitle>Auto-detected assets</SectionTitle>
       <AssetsGrid>
-        {MOCK_CONNECTION.assets.map((asset) => (
+        {MOCK_ASSETS.map((asset) => (
           <AssetCard key={`${asset.type}-${asset.name}`}>
             <AssetType>{asset.type}</AssetType>
             <AssetName>{asset.name}</AssetName>
