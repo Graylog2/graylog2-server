@@ -38,10 +38,12 @@ public class GreyNoiseDataAdapterTest {
     @BeforeEach
     public void setUp() throws Exception {
 
-        stringResponse = "{\"ip\":\"192.168.1.1\",\"noise\":true,\"code\":\"0x01\"}";
+        stringResponse = "{\"ip\":\"192.168.1.1\","
+                + "\"business_service_intelligence\":{\"found\":true,\"trust_level\":\"1\"},"
+                + "\"internet_scanner_intelligence\":{\"found\":true,\"classification\":\"malicious\"}}";
 
         mockRequest = new Request.Builder()
-                .url("https://api.greynoise.io/v2/noise/quick/")
+                .url("https://api.greynoise.io/v3/ip/")
                 .build();
     }
 
@@ -65,9 +67,11 @@ public class GreyNoiseDataAdapterTest {
         Assertions.assertThat(result.hasError()).isFalse();
         Assertions.assertThat(result.singleValue()).isEqualTo(null);
         Assertions.assertThat(result.multiValue()).isNotNull();
-        Assertions.assertThat(result.multiValue().containsValue("192.168.1.1")).isTrue();
-        Assertions.assertThat(result.multiValue().containsValue("0x01")).isTrue();
-        Assertions.assertThat(result.multiValue().containsValue(true)).isTrue();
+        Assertions.assertThat(result.multiValue().get("ip")).isEqualTo("192.168.1.1");
+        Assertions.assertThat(result.multiValue().get("noise")).isEqualTo(true);
+        Assertions.assertThat(result.multiValue().get("riot")).isEqualTo(true);
+        Assertions.assertThat(result.multiValue().get("classification")).isEqualTo("malicious");
+        Assertions.assertThat(result.multiValue().get("trust_level")).isEqualTo("1");
     }
 
 }
