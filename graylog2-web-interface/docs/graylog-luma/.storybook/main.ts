@@ -42,11 +42,7 @@ const config: StorybookConfig = {
     ...sbConfig,
     module: {
       ...sbConfig.module,
-      rules: [
-        ...(sbConfig.module?.rules ?? []),
-        bootstrapLessRule,
-        lessRule,
-      ],
+      rules: [...(sbConfig.module?.rules ?? []), bootstrapLessRule, lessRule],
     },
     resolve: {
       ...sbConfig.resolve,

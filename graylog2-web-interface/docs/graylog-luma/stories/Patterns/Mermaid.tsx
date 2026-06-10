@@ -68,7 +68,11 @@ const Mermaid = ({ chart }: Props) => {
     });
   }, [chart, theme]);
 
-  return <Unstyled><Container ref={containerRef} /></Unstyled>;
+  return (
+    <Unstyled>
+      <Container ref={containerRef} />
+    </Unstyled>
+  );
 };
 
 export default Mermaid;
