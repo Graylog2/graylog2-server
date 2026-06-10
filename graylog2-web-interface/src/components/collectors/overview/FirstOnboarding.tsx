@@ -217,7 +217,7 @@ const FirstOnboarding = () => {
                 platformLabel={PLATFORMS.find((p) => p.id === selectedPlatform)?.label ?? ''}
                 tokenDuration='P1D'
               />
-              <WaitingForConnection fleetId={resolvedFleet?.id} onConnected={handleConnected} />
+              <WaitingForConnection key={resolvedFleet?.id} fleetId={resolvedFleet?.id} onConnected={handleConnected} />
             </>
           )}
 
