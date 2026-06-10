@@ -28,10 +28,10 @@ import Spinner from 'components/common/Spinner';
 import 'moment-duration-format';
 import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
-import BetaBadge from 'components/common/BetaBadge';
 
 type McpConfigState = {
   enable_remote_access: boolean;
+  enable_output_schema: boolean;
 };
 
 const McpConfig = () => {
@@ -56,6 +56,10 @@ const McpConfig = () => {
     setModalConfig({ ...modalConfig, enable_remote_access: !modalConfig.enable_remote_access });
   };
 
+  const onModalClickEnableOutputSchema = () => {
+    setModalConfig({ ...modalConfig, enable_output_schema: !modalConfig.enable_output_schema });
+  };
+
   const onModalCancel = () => {
     setShowConfigModal(false);
     setModalConfig(viewConfig);
@@ -73,18 +77,21 @@ const McpConfig = () => {
 
   return (
     <div>
-      <h2>
-        MCP Server Configuration <BetaBadge />
-      </h2>
+      <h2>MCP Server Configuration</h2>
+      <br />
+      <p>Activate MCP (Model Context Protocol) to enable LLM-powered communication and automation with your cluster.</p>
       <p>
-        Activate MCP (Model Context Protocol) to enable LLM-powered communication and automation with your cluster. See
-        the{' '}
+        See the{' '}
         <DocumentationLink text="MCP connection documentation" page={DocsHelper.PAGES.MCP_SERVER} displayIcon={false} />{' '}
         for client setup instructions.
       </p>
+      <hr />
       <dl className="deflist">
         <dt>Remote MCP access</dt>
         <dd>{viewConfig.enable_remote_access ? 'Enabled' : 'Disabled'}</dd>
+        <br />
+        <dt>Output schema</dt>
+        <dd>{viewConfig.enable_output_schema ? 'Enabled' : 'Disabled'}</dd>
       </dl>
 
       <IfPermitted permissions="clusterconfigentry:edit">
@@ -109,6 +116,15 @@ const McpConfig = () => {
               name="enabled"
               checked={modalConfig.enable_remote_access}
               onChange={onModalClickEnableRemoteAccess}
+            />
+            <Input
+              id="enable-output-schema-checkbox"
+              disabled={!modalConfig.enable_remote_access}
+              type="checkbox"
+              label="Enable Output Schema generation"
+              name="output-schema-enabled"
+              checked={modalConfig.enable_output_schema}
+              onChange={onModalClickEnableOutputSchema}
             />
           </fieldset>
         </BootstrapModalForm>

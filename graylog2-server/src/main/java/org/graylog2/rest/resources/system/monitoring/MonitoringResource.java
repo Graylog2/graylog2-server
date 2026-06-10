@@ -17,8 +17,12 @@
 package org.graylog2.rest.resources.system.monitoring;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -37,6 +41,7 @@ import org.graylog.plugins.views.search.engine.monitoring.data.histogram.creatio
 import org.graylog.plugins.views.search.engine.monitoring.data.histogram.creation.ValueComputation;
 import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.rest.MoreMediaTypes;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.Period;
@@ -46,10 +51,9 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
-
 @RequiresAuthentication
-@Api(value = "System/Monitoring", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "System/Monitoring")
 @Path("/system/monitoring")
 public class MonitoringResource extends RestResource {
 
@@ -78,7 +82,16 @@ public class MonitoringResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get timerange-based histogram of queries durations and percentage in recent query population")
+    @Operation(summary = "Get timerange-based histogram of queries durations and percentage in recent query population")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success",
+                    content = {
+                            @Content(mediaType = MediaType.APPLICATION_JSON,
+                                    schema = @Schema(implementation = Histogram.class)),
+                            @Content(mediaType = MoreMediaTypes.TEXT_CSV,
+                                    schema = @Schema(hidden = true))
+                    })
+    })
     @Path("query_duration_histogram")
     @Produces({MediaType.APPLICATION_JSON, MoreMediaTypes.TEXT_CSV})
     @RequiresPermissions({RestPermissions.MONITORING_READ})

@@ -18,6 +18,7 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.eventbus.EventBus;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -41,7 +42,7 @@ import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.ImmutableSystemScope;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.indexer.MongoIndexSet;
+import org.graylog2.indexer.indexset.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.Tools;
@@ -61,6 +62,7 @@ import org.graylog2.streams.StreamMock;
 import org.graylog2.streams.StreamRuleImpl;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamRuleServiceImpl;
+import org.graylog2.streams.StreamCache;
 import org.graylog2.streams.StreamService;
 import org.graylog2.streams.StreamServiceImpl;
 import org.graylog2.streams.matchers.StreamRuleMock;
@@ -121,7 +123,8 @@ public class StreamCatalogTest {
                 entityRegistrar,
                 clusterEventBus,
                 Set.of(),
-                new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())));
+                new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())),
+                new StreamCache(mongoCollections, new EventBus()));
         when(outputService.load("5adf239e4b900a0fdb4e5197")).thenReturn(
                 OutputImpl.create("5adf239e4b900a0fdb4e5197", "Title", "Type", "admin", Collections.emptyMap(), new Date(1524654085L), null)
         );

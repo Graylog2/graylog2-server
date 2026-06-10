@@ -28,7 +28,6 @@ import org.joda.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -44,8 +43,9 @@ import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -133,13 +133,8 @@ public class SearchesCleanUpJobTest {
         this.searchesCleanUpJob.doRun();
 
         // Verify that search ids for standard views and resolved views are passed in as neverDeleteIds.
-        final ArgumentCaptor<HashSet<String>> searchIdsCaptor = ArgumentCaptor.forClass((Class) Set.class);
-        verify(searchDbService, times(1)).getExpiredSearches(searchIdsCaptor.capture(), any());
-        assertThat(searchIdsCaptor.getValue().contains(IN_USE_SEARCH_ID)).isTrue();
-        assertThat(searchIdsCaptor.getValue().contains(IN_USE_RESOLVER_SEARCH_ID)).isTrue();
-        assertThat(searchIdsCaptor.getValue().contains(IN_USE_STATIC_SEARCH_ID)).isTrue();
-
-        verify(searchDbService, never()).delete(any());
+        verify(searchDbService).getExpiredSearches(eq(Set.of(IN_USE_SEARCH_ID, IN_USE_RESOLVER_SEARCH_ID, IN_USE_STATIC_SEARCH_ID)), any());
+        verify(searchDbService, never()).delete(anyString());
     }
 
     @Test
@@ -170,9 +165,8 @@ public class SearchesCleanUpJobTest {
 
         this.searchesCleanUpJob.doRun();
 
-        final ArgumentCaptor<String> deletedSearchId = ArgumentCaptor.forClass(String.class);
-        verify(searchDbService, times(1)).delete(deletedSearchId.capture());
-        assertThat(deletedSearchId.getValue()).isEqualTo("This search is expired and should be deleted");
+        verify(searchDbService, times(1)).delete(anyString());
+        verify(searchDbService).delete("This search is expired and should be deleted");
     }
 
     @Test
@@ -189,9 +183,8 @@ public class SearchesCleanUpJobTest {
 
         this.searchesCleanUpJob.doRun();
 
-        final ArgumentCaptor<String> deletedSearchId = ArgumentCaptor.forClass(String.class);
-        verify(searchDbService, times(1)).delete(deletedSearchId.capture());
-        assertThat(deletedSearchId.getValue()).isEqualTo("This search is expired and should be deleted");
+        verify(searchDbService, times(1)).delete(anyString());
+        verify(searchDbService).delete("This search is expired and should be deleted");
     }
 
     @Test
@@ -202,9 +195,8 @@ public class SearchesCleanUpJobTest {
 
         this.searchesCleanUpJob.doRun();
 
-        final ArgumentCaptor<String> deletedSearchId = ArgumentCaptor.forClass(String.class);
-        verify(searchDbService, times(1)).delete(deletedSearchId.capture());
-        assertThat(deletedSearchId.getValue()).isEqualTo("This search is expired and should be deleted");
+        verify(searchDbService, times(1)).delete(anyString());
+        verify(searchDbService).delete("This search is expired and should be deleted");
     }
 
     private HashMap<String, ViewResolver> testViewResolvers() {

@@ -16,7 +16,9 @@
  */
 package org.graylog.mcp.server;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.modelcontextprotocol.spec.McpError;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.ProtocolVersions;
 import org.glassfish.jersey.uri.UriTemplate;
@@ -65,6 +67,7 @@ class McpServiceTest {
     private User user;
 
     private ObjectMapper objectMapper;
+    private ObjectMapper protocolObjectMapper;
     private McpService mcpService;
     private Map<String, Tool<?, ?>> tools;
     private Map<GRNType, ResourceProvider> resourceProviders;
@@ -72,6 +75,8 @@ class McpServiceTest {
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
+        protocolObjectMapper = new ObjectMapper()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         tools = new HashMap<>();
         resourceProviders = new HashMap<>();
 
@@ -80,6 +85,7 @@ class McpServiceTest {
 
         mcpService = new McpService(
                 objectMapper,
+                protocolObjectMapper,
                 auditEventSender,
                 new CustomizationConfig(null),
                 GRNRegistry.createWithBuiltinTypes(),
@@ -122,6 +128,31 @@ class McpServiceTest {
     }
 
     @Test
+    void testInitializeToleratesUnknownCapabilityFields() throws Exception {
+        // Regression test for https://github.com/Graylog2/graylog2-server/issues/25956
+        // Newer MCP clients may send forward-compatible fields (e.g. capabilities.sampling.tools)
+        // that the SDK's Sampling record doesn't declare.
+        var params = Map.of(
+                "protocolVersion", ProtocolVersions.MCP_2025_06_18,
+                "capabilities", Map.of("sampling", Map.of("tools", Map.of())),
+                "clientInfo", Map.of("name", "TestClient", "version", "1.0.0")
+        );
+        var request = new McpSchema.JSONRPCRequest(
+                "2.0",
+                McpSchema.METHOD_INITIALIZE,
+                "1",
+                params
+        );
+
+        Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, "session123");
+
+        assertThat(result).isPresent();
+        assertThat(result.get()).isInstanceOf(McpSchema.InitializeResult.class);
+        McpSchema.InitializeResult initResult = (McpSchema.InitializeResult) result.get();
+        assertThat(initResult.protocolVersion()).isEqualTo(ProtocolVersions.MCP_2025_06_18);
+    }
+
+    @Test
     void testInitializeWithInvalidProtocolVersion() {
         // Given
         var initParams = new McpSchema.InitializeRequest(
@@ -136,10 +167,22 @@ class McpServiceTest {
                 objectMapper.convertValue(initParams, Map.class)
         );
 
-        // When/Then
-        assertThatThrownBy(() -> mcpService.handle(permissionHelper, request, "session123"))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Invalid protocol version");
+        // When
+        Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, "session123");
+
+        // Then
+        assertThat(result).isPresent();
+        assertThat(result.get()).isInstanceOf(McpSchema.InitializeResult.class);
+
+        McpSchema.InitializeResult initResult = (McpSchema.InitializeResult) result.get();
+        assertThat(initResult.protocolVersion()).isEqualTo(McpService.ALL_SUPPORTED_MCP_VERSIONS.getFirst());
+        assertThat(initResult.serverInfo().name()).isEqualTo("Graylog");
+        assertThat(initResult.capabilities()).isNotNull();
+        assertThat(initResult.capabilities().prompts()).isNotNull();
+        assertThat(initResult.capabilities().resources()).isNotNull();
+        assertThat(initResult.capabilities().tools()).isNotNull();
+
+        verify(auditEventSender).success(any(AuditActor.class), any(AuditEventType.class), anyMap());
     }
 
     @Test
@@ -247,7 +290,7 @@ class McpServiceTest {
 
         // When/Then
         assertThatThrownBy(() -> mcpService.handle(permissionHelper, request, "session123"))
-                .isInstanceOf(McpException.class)
+                .isInstanceOf(McpError.class)
                 .hasMessageContaining("Failed to read resource");
     }
 
@@ -295,7 +338,6 @@ class McpServiceTest {
         when(mockTool.title()).thenReturn("Test Tool");
         when(mockTool.description()).thenReturn("A test tool");
         when(mockTool.inputSchema()).thenReturn(Optional.empty());
-        when(mockTool.outputSchema()).thenReturn(Optional.empty());
 
         tools.put("test_tool", mockTool);
 
@@ -466,8 +508,8 @@ class McpServiceTest {
 
         // When/Then
         assertThatThrownBy(() -> mcpService.handle(permissionHelper, request, "session123"))
-                .isInstanceOf(McpException.class)
-                .hasMessageContaining("Unknown prompt name");
+                .isInstanceOf(McpError.class)
+                .hasMessageContaining("Unsupported method");
     }
 
     @Test
@@ -482,7 +524,7 @@ class McpServiceTest {
 
         // When/Then
         assertThatThrownBy(() -> mcpService.handle(permissionHelper, request, "session123"))
-                .isInstanceOf(McpException.class)
-                .hasMessageContaining("Unsupported request method");
+                .isInstanceOf(McpError.class)
+                .hasMessageContaining("Unsupported method");
     }
 }

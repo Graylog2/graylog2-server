@@ -17,6 +17,7 @@
 package org.graylog.storage.elasticsearch7.views.searchtypes.pivots.buckets;
 
 import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.engine.PivotAggsContext;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
@@ -27,7 +28,6 @@ import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.AutoDateHistogramAggregationBuilder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
-import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.AggTypes;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.buckets.ESTimeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -70,8 +70,8 @@ class ESTimeHandlerTest {
         this.esTimeHandler = new ESTimeHandler();
         when(time.interval()).thenReturn(interval);
         when(time.fields()).thenReturn(Collections.singletonList("foobar"));
-        final AggTypes aggTypes = mock(AggTypes.class);
-        when(queryContext.contextMap().get(any())).thenReturn(aggTypes);
+        final PivotAggsContext pivotAggsContext = mock(PivotAggsContext.class);
+        when(queryContext.contextMap().get(any())).thenReturn(pivotAggsContext);
         when(queryContext.timezone()).thenReturn(DateTimeZone.UTC);
         when(query.effectiveTimeRange(any())).thenCallRealMethod();
     }

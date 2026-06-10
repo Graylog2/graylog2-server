@@ -68,6 +68,7 @@ type Props = React.PropsWithChildren<{
   defaultClosed?: boolean;
   disableCollapseButton?: boolean;
   collapseButtonPosition?: 'left' | 'right';
+  className?: string;
 }>;
 
 /**
@@ -85,6 +86,7 @@ const Section = ({
   disableCollapseButton = false,
   collapseButtonPosition = 'left',
   children = null,
+  className = undefined,
 }: Props) => {
   const [opened, { toggle }] = useDisclosure(!defaultClosed);
 
@@ -95,26 +97,25 @@ const Section = ({
 
   const onHeaderClick = () => !disableCollapseButton && onToggle();
 
-  const collapseButton =
-    collapsible && (
-      <IconButton
-        data-testid="collapseButton"
-        title={`Toggle ${title.toLowerCase()} section`}
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          if (!disableCollapseButton) {
-            onToggle();
-          }
-        }}
-        disabled={disableCollapseButton}
-        name={opened ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
-        size="lg"
-      />
-    );
+  const collapseButton = collapsible && (
+    <IconButton
+      data-testid="collapseButton"
+      title={`Toggle ${title.toLowerCase()} section`}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!disableCollapseButton) {
+          onToggle();
+        }
+      }}
+      disabled={disableCollapseButton}
+      name={opened ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
+      size="lg"
+    />
+  );
 
   return (
-    <Container $opened={opened} $collapsible={collapsible}>
+    <Container $opened={opened} $collapsible={collapsible} className={className}>
       <Header $opened={opened} $collapsible={collapsible} onClick={onHeaderClick}>
         <FlexWrapper>
           {collapseButtonPosition === 'left' && collapseButton}

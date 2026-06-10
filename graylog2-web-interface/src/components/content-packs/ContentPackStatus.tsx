@@ -18,7 +18,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import Badge from 'components/bootstrap/Badge';
-import { Link } from 'components/common/router';
+import { Link } from 'components/common';
 import Routes from 'routing/Routes';
 
 const StatusBadge = styled(Badge)<{ status: string }>(({ status, theme }) => {

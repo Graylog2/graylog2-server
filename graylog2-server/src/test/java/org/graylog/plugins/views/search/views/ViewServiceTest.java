@@ -18,14 +18,22 @@ package org.graylog.plugins.views.search.views;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.eventbus.EventBus;
+import org.graylog.grn.GRN;
+import org.graylog.grn.GRNRegistry;
+import org.graylog.grn.GRNTypes;
+import org.graylog.plugins.views.favorites.FavoritesForUserDTO;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
+import org.graylog.plugins.views.search.rest.TestUser;
 import org.graylog.security.entities.EntityRegistrar;
+import org.graylog.testing.GRNExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.entities.source.EntitySourceService;
@@ -43,6 +51,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,15 +60,19 @@ import static org.mockito.Mockito.mock;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
+@ExtendWith(GRNExtension.class)
 public class ViewServiceTest {
     private ViewService dbService;
+    private MongoCollection<FavoritesForUserDTO> favoritesCollection;
+    private GRNRegistry grnRegistry;
 
     private SearchUser searchUser;
     private MongoDBTestService mongodb;
 
     @BeforeEach
-    public void setUp(MongoDBTestService mongodb, MongoJackObjectMapperProvider mongoJackObjectMapperProvider, MongoCollections mongoCollections) throws Exception {
+    public void setUp(MongoDBTestService mongodb, MongoJackObjectMapperProvider mongoJackObjectMapperProvider, MongoCollections mongoCollections, GRNRegistry grnRegistry) throws Exception {
         this.mongodb = mongodb;
+        this.grnRegistry = grnRegistry;
         ClusterConfigServiceImpl clusterConfigService = new ClusterConfigServiceImpl(
                 mongoJackObjectMapperProvider,
                 mongodb.mongoConnection(),
@@ -75,7 +88,16 @@ public class ViewServiceTest {
                 mock(ViewSummaryService.class),
                 mock(EntitySourceService.class),
                 mongoCollections);
-        this.searchUser = TestSearchUser.builder().build();
+
+        // Set up favorites collection using MongoCollections to ensure proper serialization
+        this.favoritesCollection = mongoCollections.collection("favorites", FavoritesForUserDTO.class);
+
+        // Create a test user with a specific ID for favorites testing
+        final org.graylog2.plugin.database.users.User testUser = TestUser.builder()
+                .withId("637748db06e1d74da0a54330")
+                .withUsername("test")
+                .build();
+        this.searchUser = TestSearchUser.builder().withUser(testUser).build();
     }
 
     @AfterEach
@@ -314,5 +336,63 @@ public class ViewServiceTest {
 
         assertThatThrownBy(() -> dbService.saveDefault(ViewDTO.builder().title("err").searchId("abc123").state(Collections.emptyMap()).build()))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void searchPaginatedSortedByFavorite() {
+        // Create several views
+        final ViewDTO view1 = dbService.save(ViewDTO.builder().title("View Alpha").searchId("abc123").state(Collections.emptyMap()).build());
+        final ViewDTO view2 = dbService.save(ViewDTO.builder().title("View Beta").searchId("abc123").state(Collections.emptyMap()).build());
+        final ViewDTO view3 = dbService.save(ViewDTO.builder().title("View Gamma").searchId("abc123").state(Collections.emptyMap()).build());
+        final ViewDTO view4 = dbService.save(ViewDTO.builder().title("View Delta").searchId("abc123").state(Collections.emptyMap()).build());
+
+        // Mark view2 and view4 as favorites using MongoCollection with FavoritesForUserDTO
+        // This uses the same data structure as FavoritesService to avoid storage format drift
+        final GRN grn2 = grnRegistry.newGRN(GRNTypes.SEARCH, view2.id());
+        final GRN grn4 = grnRegistry.newGRN(GRNTypes.SEARCH, view4.id());
+        final FavoritesForUserDTO favorites = new FavoritesForUserDTO(searchUser.getUser().getId(), List.of(grn2, grn4));
+        favoritesCollection.insertOne(favorites);
+
+        final SearchQueryParser queryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, ImmutableMap.of());
+
+        // Test sorting by favorite DESCENDING (favorites first)
+        PaginatedList<ViewDTO> result = dbService.searchPaginated(
+                searchUser,
+                queryParser.parse(""),
+                view -> true,
+                SortOrder.DESCENDING,
+                ViewDTO.FIELD_FAVORITE,
+                1,
+                10
+        );
+
+        assertThat(result)
+                .hasSize(4)
+                .extracting(ViewDTO::favorite)
+                .containsExactly(true, true, false, false);
+
+        // Verify the specific views (favorites should be view2 and view4)
+        assertThat(result.stream().filter(ViewDTO::favorite).map(ViewDTO::id))
+                .containsExactlyInAnyOrder(view2.id(), view4.id());
+
+        // Test sorting by favorite ASCENDING (non-favorites first)
+        result = dbService.searchPaginated(
+                searchUser,
+                queryParser.parse(""),
+                view -> true,
+                SortOrder.ASCENDING,
+                ViewDTO.FIELD_FAVORITE,
+                1,
+                10
+        );
+
+        assertThat(result)
+                .hasSize(4)
+                .extracting(ViewDTO::favorite)
+                .containsExactly(false, false, true, true);
+
+        // Verify non-favorites are first (view1 and view3)
+        assertThat(result.stream().filter(v -> !v.favorite()).map(ViewDTO::id))
+                .containsExactlyInAnyOrder(view1.id(), view3.id());
     }
 }

@@ -68,6 +68,10 @@ const Routes = {
       edit: (definitionId: string) => `/alerts/definitions/${definitionId}/edit`,
       show: (definitionId: string) => `/alerts/definitions/${definitionId}`,
       replay_search: (definitionId: string) => `/alerts/definitions/${definitionId}/replay-search`,
+      SIGMA: {
+        GIT_IMPORT: '/alerts/definitions/sigma/git-import',
+        FILE_IMPORT: '/alerts/definitions/sigma/file-import',
+      },
     },
     NOTIFICATIONS: {
       LIST: '/alerts/notifications',
@@ -92,7 +96,7 @@ const Routes = {
     FULL_SCREEN: dashboardsTvPath,
   },
   WELCOME: '/welcome',
-  GLOBAL_API_BROWSER_URL: '/api/api-browser/global/index.html',
+  API_BROWSER: '/api-browser',
   SYSTEM: {
     CLUSTER: {
       NODES: '/system/cluster',
@@ -149,6 +153,7 @@ const Routes = {
     THREADDUMP: (nodeId: string) => `/system/threaddump/${nodeId}`,
     OUTPUTS: '/system/outputs',
     OVERVIEW: '/system/overview',
+    HEALTH: '/system/health',
     PROCESSBUFFERDUMP: (nodeId: string) => `/system/processbufferdump/${nodeId}`,
     SYSTEMLOGS: (nodeId: string) => `/system/logs/recent/${nodeId}`,
     AUTHENTICATION: {
@@ -225,6 +230,16 @@ const Routes = {
       EDIT_CONFIGURATION: (configurationId: string) => `/system/sidecars/configuration/edit/${configurationId}`,
       NEW_COLLECTOR: '/system/sidecars/collector/new',
       EDIT_COLLECTOR: (collectorId: string) => `/system/sidecars/collector/edit/${collectorId}`,
+    },
+    COLLECTORS: {
+      OVERVIEW: '/system/collectors',
+      FLEETS: '/system/collectors/fleets',
+      FLEETS_NEW: '/system/collectors/fleets/new',
+      FLEET: (fleetId: string) => `/system/collectors/fleets/${fleetId}`,
+      INSTANCES: '/system/collectors/instances',
+      INSTANCE: (instanceId: string) => `/system/collectors/instances/${instanceId}`,
+      DEPLOYMENT: '/system/collectors/deployment',
+      SETTINGS: '/system/collectors/settings',
     },
   },
   VIEWS: {
@@ -345,7 +360,6 @@ const Routes = {
   edit_input_extractor: (nodeId: string, inputId: string, extractorId: string) =>
     `/system/inputs/${nodeId}/${inputId}/extractors/${extractorId}/edit`,
   filtered_metrics: (nodeId: string, filter: string) => `${Routes.SYSTEM.METRICS(nodeId)}?filter=${filter}`,
-  global_api_browser: () => Routes.GLOBAL_API_BROWSER_URL,
 } as const;
 
 const prefixUrlWithoutHostname = (url: string, prefix: string) => {

@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix user losing timezone when role or start page is updated."
+
+issues = ["22769"]
+pulls = ["24699"]

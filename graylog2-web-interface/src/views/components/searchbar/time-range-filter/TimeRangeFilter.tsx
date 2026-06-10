@@ -17,19 +17,20 @@
 import * as React from 'react';
 import { useContext, useRef, useState } from 'react';
 import styled from 'styled-components';
+import type { FormikErrors } from 'formik';
 
 import type { TimeRange, NoTimeRangeOverride, AbsoluteTimeRange } from 'views/logic/queries/Query';
 import { SEARCH_BAR_GAP } from 'views/components/searchbar/SearchBarLayout';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import TimeRangeFilterSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
-import type { SupportedTimeRangeType } from 'views/components/searchbar/time-range-filter/time-range-picker/TimeRangePicker';
-import TimeRangePicker from 'views/components/searchbar/time-range-filter/time-range-picker/index';
+import type { SupportedTimeRangeType } from 'views/components/time-range-picker/types';
+import TimeRangePicker from 'views/components/time-range-picker/index';
 import { NO_TIMERANGE_OVERRIDE } from 'views/Constants';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import MoveRange from 'views/components/searchbar/time-range-filter/MoveRange';
+import TimeRangeDisplay from 'views/components/time-range-picker/TimeRangeDisplay';
 
 import TimeRangeFilterButtons from './TimeRangeFilterButtons';
-import TimeRangeDisplay from './TimeRangeDisplay';
 
 const FlexContainer = styled.div`
   display: flex;
@@ -52,7 +53,7 @@ type Props = {
   hasErrorOnMount?: boolean;
   limitDuration: number;
   noOverride?: boolean;
-  onChange: (timeRange: TimeRange | NoTimeRangeOverride) => void;
+  onChange: (timeRange: TimeRange | NoTimeRangeOverride) => void | Promise<void | FormikErrors<any>>;
   position?: 'bottom' | 'bottom-start' | 'right';
   showPresetDropdown?: boolean;
   validTypes?: Array<SupportedTimeRangeType>;

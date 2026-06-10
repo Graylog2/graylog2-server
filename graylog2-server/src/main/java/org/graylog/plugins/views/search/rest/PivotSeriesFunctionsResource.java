@@ -16,23 +16,21 @@
  */
 package org.graylog.plugins.views.search.rest;
 
-import io.swagger.annotations.Api;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.plugin.rest.PluginRestResource;
-import org.graylog2.shared.rest.resources.RestResource;
-
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
-
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.shared.rest.PublicCloudAPI;
+import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.Map;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
-
-@Api(value = "Search/Functions", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Search/Functions")
 @Path("/views/functions")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication

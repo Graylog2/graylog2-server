@@ -24,9 +24,10 @@ import { Spinner } from 'components/common';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import ErrorsActions from 'actions/errors/ErrorsActions';
-import ReplaySearch from 'components/events/ReplaySearch';
+import EventReplaySearch from 'components/events/EventReplaySearch';
+import type FetchError from 'logic/errors/FetchError';
 
-export const onErrorHandler = (error) => {
+export const onErrorHandler = (error: FetchError) => {
   if (error.status === 404) {
     ErrorsActions.report(createFromFetchError(error));
   }
@@ -34,13 +35,17 @@ export const onErrorHandler = (error) => {
 
 const EventReplaySearchPage = () => {
   const [isNotificationLoaded, setIsNotificationLoaded] = useState(false);
-  const { alertId, definitionId } = useParams<{ alertId?: string; definitionId?: string }>();
+  const { alertId } = useParams<{ alertId?: string }>();
   const {
     data: eventData,
     isLoading: eventIsLoading,
     isFetched: eventIsFetched,
   } = useEventById(alertId, { onErrorHandler });
-  const { isLoading: EDIsLoading, isFetched: EDIsFetched } = useEventDefinition(eventData?.event_definition_id);
+  const {
+    isLoading: EDIsLoading,
+    isFetched: EDIsFetched,
+    data: eventDefinitionMappedData,
+  } = useEventDefinition(eventData?.event_definition_id);
 
   useEffect(() => {
     EventNotificationsActions.listAll().then(() => setIsNotificationLoaded(true));
@@ -48,7 +53,11 @@ const EventReplaySearchPage = () => {
 
   const isLoading = eventIsLoading || EDIsLoading || !eventIsFetched || !EDIsFetched || !isNotificationLoaded;
 
-  return isLoading ? <Spinner /> : <ReplaySearch alertId={alertId} definitionId={definitionId} />;
+  return isLoading ? (
+    <Spinner />
+  ) : (
+    <EventReplaySearch eventData={eventData} eventDefinitionMappedData={eventDefinitionMappedData} />
+  );
 };
 
 export default EventReplaySearchPage;

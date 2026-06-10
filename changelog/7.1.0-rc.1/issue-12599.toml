@@ -1,0 +1,5 @@
+type = "added"
+message = "Added support for JSON arrays when bulk receiving is enabled on the GELF HTTP and Raw HTTP inputs"
+
+pulls = ["24514"]
+issues = ["graylog-plugin-enterprise#12599"]

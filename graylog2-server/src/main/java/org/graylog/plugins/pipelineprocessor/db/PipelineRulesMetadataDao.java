@@ -16,12 +16,15 @@
  */
 package org.graylog.plugins.pipelineprocessor.db;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog2.database.BuildableMongoEntity;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @JsonDeserialize(builder = AutoValue_PipelineRulesMetadataDao.Builder.class)
@@ -29,10 +32,13 @@ import java.util.Set;
 public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<PipelineRulesMetadataDao, PipelineRulesMetadataDao.Builder> {
     public static final String FIELD_PIPELINE_ID = "pipeline_id";
     public static final String FIELD_RULES = "rules";
-    private static final String FIELD_STREAMS = "streams";
+    public static final String FIELD_STREAMS = "streams";
     private static final String FIELD_FUNCTIONS = "functions";
     private static final String FIELD_DEPRECATED_FUNCTIONS = "deprecated_functions";
     public static final String FIELD_HAS_INPUT_REFERENCES = "has_input_references";
+    public static final String FIELD_PIPELINE_TITLE = "pipeline_title";
+    public static final String FIELD_RULE_TITLES = "rule_titles";
+    public static final String FIELD_CONNECTED_STREAM_TITLES = "connected_stream_titles";
 
     @JsonProperty(FIELD_PIPELINE_ID)
     public abstract String pipelineId();
@@ -52,6 +58,20 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
     @JsonProperty(FIELD_HAS_INPUT_REFERENCES)
     public abstract Boolean hasInputReferences();
 
+    @JsonProperty(FIELD_PIPELINE_TITLE)
+    public abstract String pipelineTitle();
+
+    @JsonProperty(FIELD_RULE_TITLES)
+    public abstract Map<String, String> ruleTitlesById();
+
+    @JsonProperty(FIELD_CONNECTED_STREAM_TITLES)
+    public abstract Map<String, String> connectedStreamTitlesById();
+
+    @JsonIgnore
+    public boolean hasDeprecatedFunctions() {
+        return deprecatedFunctions() != null && !deprecatedFunctions().isEmpty();
+    }
+
     public static Builder builder() {
         return new AutoValue_PipelineRulesMetadataDao.Builder()
                 .pipelineId("")
@@ -59,7 +79,10 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
                 .streams(new HashSet<>())
                 .functions(new HashSet<>())
                 .deprecatedFunctions(new HashSet<>())
-                .hasInputReferences(false);
+                .hasInputReferences(false)
+                .pipelineTitle("")
+                .ruleTitlesById(new HashMap<>())
+                .connectedStreamTitlesById(new HashMap<>());
     }
 
     @AutoValue.Builder
@@ -82,5 +105,14 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
 
         @JsonProperty(FIELD_HAS_INPUT_REFERENCES)
         public abstract Builder hasInputReferences(Boolean hasInputReferences);
+
+        @JsonProperty(FIELD_PIPELINE_TITLE)
+        public abstract Builder pipelineTitle(String pipelineTitle);
+
+        @JsonProperty(FIELD_RULE_TITLES)
+        public abstract Builder ruleTitlesById(Map<String, String> ruleTitlesById);
+
+        @JsonProperty(FIELD_CONNECTED_STREAM_TITLES)
+        public abstract Builder connectedStreamTitlesById(Map<String, String> connectedStreamTitlesById);
     }
 }

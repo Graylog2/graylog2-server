@@ -21,5 +21,4 @@ const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-s
 
 const DEFAULT_THEME_MODE: ColorScheme = prefersDarkMode ? COLOR_SCHEME_DARK : COLOR_SCHEME_LIGHT;
 
-// eslint-disable-next-line import/prefer-default-export
 export { DEFAULT_THEME_MODE };

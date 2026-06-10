@@ -17,9 +17,9 @@
 package org.graylog2.rest.resources.datanodes;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.ws.rs.DELETE;
@@ -47,17 +47,22 @@ import java.util.function.Predicate;
 import static org.graylog2.audit.AuditEventTypes.DATANODE_API_REQUEST;
 
 @RequiresAuthentication
-@Api(value = "DataNodes/REST/API", description = "Proxy direct access to Data Node's API")
+@Tag(name = "DataNodes/REST/API", description = "Proxy direct access to Data Node's API")
 @Path("/datanodes/{hostname}/rest/{path: .*}")
 @Produces(MediaType.APPLICATION_JSON)
 @Timed
 @RequiresPermissions(RestPermissions.DATANODE_REST_PROXY)
 public class DataNodeRestApiProxyResource extends RestResource {
     private static final List<Predicate<ProxyRequestAdapter.ProxyRequest>> allowList = List.of(
-            request -> request.path().startsWith("indices-directory") && "GET".equals(request.method()),
-            request -> request.path().startsWith("logs") && "GET".equals(request.method()),
-            request -> request.path().startsWith("connection-check") && "POST".equals(request.method())
+            request -> isAllowed(request, "indices-directory", "GET", RestPermissions.DATANODE_MIGRATION),
+            request -> isAllowed(request, "logs", "GET", RestPermissions.CLUSTER_CONFIGURATION_READ),
+            request -> isAllowed(request, "metrics", "GET", RestPermissions.CLUSTER_CONFIGURATION_READ),
+            request -> isAllowed(request, "metrics", "POST", RestPermissions.CLUSTER_CONFIGURATION_READ)
     );
+
+    private static boolean isAllowed(ProxyRequestAdapter.ProxyRequest request, String path, String method, String permission) {
+        return request.path().startsWith(path) && method.equals(request.method()) && (request.subject() != null && request.subject().isPermitted(permission));
+    }
 
     private final DatanodeRestApiProxy proxyRequestAdapter;
     private final boolean enableAllowlist;
@@ -71,51 +76,51 @@ public class DataNodeRestApiProxyResource extends RestResource {
 
 
     @GET
-    @ApiOperation(value = "GET request to Data Node's API")
+    @Operation(summary = "GET request to Data Node's API")
     @AuditEvent(type = DATANODE_API_REQUEST, captureRequestEntity = false, captureResponseEntity = false)
-    public Response requestGet(@ApiParam(name = "path", required = true)
+    public Response requestGet(@Parameter(name = "path", required = true)
                                @PathParam("path") String path,
-                               @ApiParam(name = "hostname", required = true)
+                               @Parameter(name = "hostname", required = true)
                                @PathParam("hostname") String hostname,
                                @Context ContainerRequestContext requestContext) throws IOException {
         return request(requestContext, path, hostname);
     }
 
     @POST
-    @ApiOperation(value = "POST request to Data Node's API")
+    @Operation(summary = "POST request to Data Node's API")
     @AuditEvent(type = DATANODE_API_REQUEST, captureRequestEntity = false, captureResponseEntity = false)
-    public Response requestPost(@ApiParam(name = "path", required = true)
+    public Response requestPost(@Parameter(name = "path", required = true)
                                 @PathParam("path") String path,
-                                @ApiParam(name = "hostname", required = true)
+                                @Parameter(name = "hostname", required = true)
                                 @PathParam("hostname") String hostname,
                                 @Context ContainerRequestContext requestContext) throws IOException {
         return request(requestContext, path, hostname);
     }
 
     @PUT
-    @ApiOperation(value = "PUT request to Data Node's API")
+    @Operation(summary = "PUT request to Data Node's API")
     @AuditEvent(type = DATANODE_API_REQUEST, captureRequestEntity = false, captureResponseEntity = false)
-    public Response requestPut(@ApiParam(name = "path", required = true)
+    public Response requestPut(@Parameter(name = "path", required = true)
                                @PathParam("path") String path,
-                               @ApiParam(name = "hostname", required = true)
+                               @Parameter(name = "hostname", required = true)
                                @PathParam("hostname") String hostname,
                                @Context ContainerRequestContext requestContext) throws IOException {
         return request(requestContext, path, hostname);
     }
 
     @DELETE
-    @ApiOperation(value = "DELETE request to Data Node's API")
+    @Operation(summary = "DELETE request to Data Node's API")
     @AuditEvent(type = DATANODE_API_REQUEST, captureRequestEntity = false, captureResponseEntity = false)
-    public Response requestDelete(@ApiParam(name = "path", required = true)
+    public Response requestDelete(@Parameter(name = "path", required = true)
                                   @PathParam("path") String path,
-                                  @ApiParam(name = "hostname", required = true)
+                                  @Parameter(name = "hostname", required = true)
                                   @PathParam("hostname") String hostname,
                                   @Context ContainerRequestContext requestContext) throws IOException {
         return request(requestContext, path, hostname);
     }
 
     private Response request(ContainerRequestContext context, String path, String hostname) throws IOException {
-        final var request = new ProxyRequestAdapter.ProxyRequest(context.getMethod(), path, context.getEntityStream(), hostname, context.getUriInfo().getQueryParameters());
+        final var request = new ProxyRequestAdapter.ProxyRequest(context.getMethod(), path, context.getEntityStream(), hostname, context.getUriInfo().getQueryParameters(), getSubject());
         if (enableAllowlist && allowList.stream().noneMatch(condition -> condition.test(request))) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("This request is not allowed.")

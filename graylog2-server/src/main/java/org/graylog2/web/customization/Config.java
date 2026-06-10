@@ -53,7 +53,8 @@ public record Config(
     public record Resources(@JsonProperty("stream_rule_matcher_code") Optional<ResourceItem> streamRuleMatcherCode,
                             @JsonProperty("contact_support") Optional<ResourceItem> contactSupport,
                             @JsonProperty("contact_us") Optional<ResourceItem> contactUs,
-                            Optional<ResourceItem> marketplace
+                            Optional<ResourceItem> marketplace,
+                            @JsonProperty("forwarder_download_url") Optional<ResourceItem> forwarderDownloadUrl
                             ) {
         public record ResourceItem(Optional<Boolean> enabled, Optional<String> url) {}
     }
@@ -84,5 +85,9 @@ public record Config(
     public static Config forProductName(String productName) {
         return new Config(Optional.of(productName), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+    }
+
+    public Config withWelcome(Welcome welcome) {
+        return new Config(productName, favicon, logo, helpUrl, helpPages, login, Optional.of(welcome), navigation, footer, resources, features);
     }
 }

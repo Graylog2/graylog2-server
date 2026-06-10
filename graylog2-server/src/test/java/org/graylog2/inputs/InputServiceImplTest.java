@@ -16,46 +16,61 @@
  */
 package org.graylog2.inputs;
 
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableSet;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBExtension;
+import org.graylog2.ConfigurationException;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.converters.ConverterFactory;
+import org.graylog2.inputs.extractors.CopyInputExtractor;
 import org.graylog2.inputs.extractors.ExtractorFactory;
+import org.graylog2.inputs.extractors.RegexExtractor;
+import org.graylog2.plugin.IOState;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.inputs.MessageInputFactory;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.graylog2.plugin.inputs.MessageInput.FIELD_CONFIGURATION;
-import static org.graylog2.plugin.inputs.MessageInput.FIELD_CREATED_AT;
-import static org.graylog2.plugin.inputs.MessageInput.FIELD_CREATOR_USER_ID;
-import static org.graylog2.plugin.inputs.MessageInput.FIELD_TITLE;
-import static org.graylog2.plugin.inputs.MessageInput.FIELD_TYPE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -63,7 +78,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class InputServiceImplTest {
-
 
     @Mock
     private ExtractorFactory extractorFactory;
@@ -85,7 +99,7 @@ public class InputServiceImplTest {
         clusterEventBus = new ClusterEventBus("inputs-test", Executors.newSingleThreadExecutor());
         encryptedValueService = new EncryptedValueService(UUID.randomUUID().toString());
         inputService = new InputServiceImpl(
-                mongoCollections.mongoConnection(),
+                mongoCollections,
                 extractorFactory,
                 converterFactory,
                 messageInputFactory,
@@ -174,25 +188,27 @@ public class InputServiceImplTest {
 
         final EncryptedValue secret = encryptedValueService.encrypt("secret");
         final EncryptedValue secret2 = encryptedValueService.encrypt("secret2");
-        final String id = inputService.save(new InputImpl(Map.of(
-                FIELD_TYPE, "test type",
-                FIELD_TITLE, "test title",
-                FIELD_CREATED_AT, new Date(),
-                FIELD_CREATOR_USER_ID, "test creator",
-                FIELD_CONFIGURATION, Map.of(
+        final InputImpl newInput = InputImpl.builder()
+                .setTitle("test title")
+                .setType("test type")
+                .setCreatorUserId("test creator")
+                .setCreatedAt(new DateTime(DateTimeZone.UTC))
+                .setConfiguration(Map.of(
                         "encrypted", secret,
                         "encrypted2", secret2
-                )
-        )));
+                ))
+                .build();
+        final String id = inputService.save(newInput);
 
         assertThat(id).isNotBlank();
 
         assertThat(inputService.find(id)).satisfies(input -> {
-            assertThat(input.getConfiguration()).hasEntrySatisfying("encrypted", value -> {
+            Map<String, Object> configuration = input.getConfiguration();
+            assertThat(configuration).hasEntrySatisfying("encrypted", value -> {
                 assertThat(value).isInstanceOf(EncryptedValue.class);
                 assertThat(value).isEqualTo(secret);
             });
-            assertThat(input.getConfiguration()).hasEntrySatisfying("encrypted2", value -> {
+            assertThat(configuration).hasEntrySatisfying("encrypted2", value -> {
                 assertThat(value).isInstanceOf(EncryptedValue.class);
                 assertThat(value).isEqualTo(secret2);
             });
@@ -205,4 +221,374 @@ public class InputServiceImplTest {
                 }));
     }
 
+    @Test
+    @MongoDBFixtures("InputServiceImplTest.json")
+    public void findByTitle() {
+        String rawTcp = "Raw TCP";
+        List<String> idsByTitle = inputService.findIdsByTitle(rawTcp);
+        assertThat(idsByTitle).hasSize(1);
+    }
+
+    @Test
+    public void createInput() {
+        Map<String, Object> localFields = Map.of(
+                MessageInput.FIELD_TYPE, "test type",
+                MessageInput.FIELD_TITLE, "test title",
+                MessageInput.FIELD_CREATOR_USER_ID, "creator-1",
+                MessageInput.FIELD_DESIRED_STATE, IOState.Type.RUNNING.name(),
+                MessageInput.FIELD_CONTENT_PACK, "content-pack-1",
+                MessageInput.FIELD_CONFIGURATION, Map.of("foo", "bar"),
+                MessageInput.FIELD_GLOBAL, false,
+                MessageInput.FIELD_NODE_ID, "node-123",
+                MessageInput.FIELD_STATIC_FIELDS, List.of(
+                        Map.of(InputImpl.FIELD_STATIC_FIELD_KEY, "static_key",
+                                InputImpl.FIELD_STATIC_FIELD_VALUE, "static_value")
+                )
+        );
+
+        Input result = inputService.create(localFields);
+        assertThat(result.getId()).isNull();
+        assertThat(result.getType()).isEqualTo("test type");
+        assertThat(result.getTitle()).isEqualTo("test title");
+        assertThat(result.getCreatorUserId()).isEqualTo("creator-1");
+        assertThat(result.getDesiredState()).isEqualTo(IOState.Type.RUNNING);
+        assertThat(result.getContentPack()).isEqualTo("content-pack-1");
+        assertThat(result.getConfiguration()).containsEntry("foo", "bar");
+        assertThat(result.isGlobal()).isFalse();
+        assertThat(result.getNodeId()).isEqualTo("node-123");
+        assertThat(result.getCreatedAt()).isNotNull();
+        assertThat(result.getStaticFields()).containsEntry("static_key", "static_value");
+
+    }
+
+    @Test
+    public void inputWithOutDesiredStateDefaultsToRunning() {
+        Map<String, Object> localFields = Map.of(
+                MessageInput.FIELD_TYPE, "test type",
+                MessageInput.FIELD_TITLE, "test title",
+                MessageInput.FIELD_CREATOR_USER_ID, "creator-1",
+                MessageInput.FIELD_CONFIGURATION, Map.of("foo", "bar")
+        );
+
+        Input result = inputService.create(localFields);
+        assertThat(result.getDesiredState()).isEqualTo(IOState.Type.RUNNING);
+    }
+
+    @Test
+    public void saveInput() throws Exception {
+        InputImpl newInput = createTestInput();
+
+        String id = inputService.save(newInput);
+        Input savedInput = inputService.find(id);
+
+        assertEquals(newInput.getTitle(), savedInput.getTitle());
+        assertEquals(newInput.getType(), savedInput.getType());
+        assertEquals(newInput.getCreatorUserId(), savedInput.getCreatorUserId());
+        assertEquals(newInput.getDesiredState(), savedInput.getDesiredState());
+        assertEquals(newInput.isGlobal(), savedInput.isGlobal());
+    }
+
+    @Test
+    @MongoDBFixtures("InputServiceImplTest.json")
+    public void testExtractor() throws Exception {
+        Input input = inputService.find("54e3deadbeefdeadbeef0001");
+
+        String extractorId = new ObjectId().toHexString();
+        Extractor extractor = Mockito.mock(Extractor.class);
+        Map<String, Object> persistedFields = new HashMap<>();
+        persistedFields.put(Extractor.FIELD_ID, extractorId);
+        String extractorTitle = "extractor title";
+        persistedFields.put(Extractor.FIELD_TITLE, extractorTitle);
+        persistedFields.put(Extractor.FIELD_ORDER, 0);
+        persistedFields.put(Extractor.FIELD_CURSOR_STRATEGY, Extractor.CursorStrategy.COPY.name());
+        persistedFields.put(Extractor.FIELD_TYPE, Extractor.Type.GROK.name());
+        persistedFields.put(Extractor.FIELD_SOURCE_FIELD, "message");
+        persistedFields.put(Extractor.FIELD_TARGET_FIELD, "message");
+        persistedFields.put(Extractor.FIELD_EXTRACTOR_CONFIG, Map.of());
+        persistedFields.put(Extractor.FIELD_CREATOR_USER_ID, "user-x");
+        persistedFields.put(Extractor.FIELD_CONVERTERS, List.of());
+        persistedFields.put(Extractor.FIELD_CONDITION_TYPE, Extractor.ConditionType.STRING.name());
+
+
+        when(extractor.getId()).thenReturn(extractorId);
+        when(extractor.getTitle()).thenReturn(extractorTitle);
+        when(extractor.getType()).thenReturn(Extractor.Type.GROK);
+        when(extractor.getCursorStrategy()).thenReturn(Extractor.CursorStrategy.COPY);
+        when(extractor.getSourceField()).thenReturn("message");
+        when(extractor.getTargetField()).thenReturn("message");
+        when(extractor.getCreatorUserId()).thenReturn("user-x");
+        when(extractor.getExtractorConfig()).thenReturn(Map.of());
+        when(extractor.getConditionType()).thenReturn(Extractor.ConditionType.STRING);
+        when(extractor.getConditionValue()).thenReturn("");
+        when(extractor.getPersistedFields()).thenReturn(persistedFields);
+        when(extractorFactory.factory(any(), any(), anyLong(), any(), any(), any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(extractor);
+
+        inputService.addExtractor(input, extractor);
+
+        assertThat(inputService.getExtractors(input.getId())).hasSize(1);
+        Extractor extractorResult = inputService.getExtractor(input, extractorId);
+        assertThat(extractorResult.getTitle()).isEqualTo(extractorTitle);
+    }
+
+    @Test
+    @MongoDBFixtures("InputServiceImplTest.json")
+    public void testDeleteExtractor() throws Exception {
+        Input input = inputService.find("54e3deadbeefdeadbeef0002");
+        Extractor extractor = Mockito.mock(Extractor.class);
+        when(extractorFactory.factory(any(), any(), anyLong(), any(), any(), any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(extractor);
+        assertThat(inputService.getExtractors(input.getId())).hasSize(1);
+        inputService.removeExtractor(input, "4ec88750-c522-11f0-bdff-9eee7e74cea5");
+        assertThat(inputService.getExtractors(input.getId())).hasSize(0);
+    }
+
+    @Test
+    @MongoDBFixtures("InputServiceImplTest.json")
+    public void testPaginated() {
+        PaginatedList<Input> paginated = inputService.paginated(Filters.empty(), input -> true, SortOrder.ASCENDING, InputImpl.FIELD_TITLE, 1, 2);
+
+        assertThat(paginated).isNotNull();
+        assertThat(paginated.pagination().total()).isEqualTo(3);
+        assertThat((long) paginated.size()).isEqualTo(2);
+    }
+
+    @Test
+    @MongoDBFixtures("InputServiceImplTest.json")
+    void testStaticFields() {
+        assertThat(inputService.getStaticFields("54e3deadbeefdeadbeef0002")).isEmpty();
+        List<Map.Entry<String, String>> staticFields = inputService.getStaticFields("54e3deadbeefdeadbeef0003");
+        assertThat(staticFields).isNotNull().hasSize(1).isEqualTo(List.of(Map.entry("static_field", "foo")));
+    }
+
+    @Test
+    @MongoDBFixtures("InputServiceImplTest.json")
+    void testAddStaticFieldWithDuplicateKeyReplacesValue() throws Exception {
+        final String inputId = "54e3deadbeefdeadbeef0003";
+        final Input input = inputService.find(inputId);
+
+        // Add a static field with the same key but different value
+        inputService.addStaticField(input, "static_field", "bar");
+
+        // Should have exactly one entry with the new value, not a duplicate
+        final List<Map.Entry<String, String>> fields = inputService.getStaticFields(inputId);
+        assertThat(fields).hasSize(1).isEqualTo(List.of(Map.entry("static_field", "bar")));
+    }
+
+    @Test
+    @MongoDBFixtures("InputServiceImplTest.json")
+    void testAddStaticFieldWithNewKey() throws Exception {
+        final String inputId = "54e3deadbeefdeadbeef0003";
+        final Input input = inputService.find(inputId);
+
+        // Add a new static field with a different key
+        inputService.addStaticField(input, "new_field", "new_value");
+
+        // Should now have two static fields: the original and the new one
+        final List<Map.Entry<String, String>> fields = inputService.getStaticFields(inputId);
+        assertThat(fields).hasSize(2)
+                .contains(Map.entry("static_field", "foo"))
+                .contains(Map.entry("new_field", "new_value"));
+    }
+
+    @Test
+    public void findIdsByDesiredState() throws Exception {
+        InputImpl stoppedInput = InputImpl.builder()
+                .setTitle("stopped input")
+                .setType("prototype")
+                .setCreatorUserId("admin")
+                .setCreatedAt(Tools.nowUTC())
+                .setConfiguration(Map.of("k", "v"))
+                .setPersistedDesiredState(IOState.Type.STOPPED)
+                .setGlobal(true)
+                .build();
+        String stoppedId = inputService.save(stoppedInput);
+
+        InputImpl runningInput = InputImpl.builder()
+                .setTitle("running input")
+                .setType("prototype")
+                .setCreatorUserId("admin")
+                .setCreatedAt(Tools.nowUTC())
+                .setConfiguration(Map.of("k", "v"))
+                .setPersistedDesiredState(IOState.Type.RUNNING)
+                .setGlobal(true)
+                .build();
+        String runningInputId = inputService.save(runningInput);
+
+        Set<String> stoppedIds = inputService.findIdsByDesiredState(IOState.Type.STOPPED);
+        assertThat(stoppedIds).containsExactly(stoppedId);
+
+        Set<String> runningIds = inputService.findIdsByDesiredState(IOState.Type.RUNNING);
+        assertThat(runningIds).containsExactly(runningInputId);
+    }
+
+    /**
+     * Guards against unintended serialization to the {@code inputs} collection.
+     * <p>
+     * {@link InputImpl} retains a {@code getFields()} Map view for back-compat with the legacy
+     * {@link org.graylog2.database.PersistedImpl}-style representation that the input update flow still
+     * relies on. Any unannotated getter on {@link Input} or {@link InputImpl} will be picked up by
+     * Jackson/mongojack and persisted — assert here that the on-disk top-level key set matches an
+     * explicit allowlist.
+     * <p>
+     * When intentionally adding a new field to the input document, update the allowlist below.
+     */
+    @Test
+    public void persistedDocumentContainsOnlyExpectedFields(MongoCollections mongoCollections) throws Exception {
+        final InputImpl input = InputImpl.builder()
+                .setTitle("contract test input")
+                .setType("test type")
+                .setCreatorUserId("admin")
+                .setCreatedAt(Tools.nowUTC())
+                .setConfiguration(Map.of("k", "v"))
+                .setPersistedDesiredState(IOState.Type.RUNNING)
+                .setGlobal(true)
+                .setContentPack("content-pack-1")
+                .setNodeId("node-123")
+                .setEmbeddedStaticFields(List.of(
+                        Map.of(InputImpl.FIELD_STATIC_FIELD_KEY, "static_key",
+                                InputImpl.FIELD_STATIC_FIELD_VALUE, "static_value")))
+                .setEmbeddedExtractors(List.of(createCopyInputExtractor().getPersistedFields()))
+                .build();
+
+        final String id = inputService.save(input);
+
+        final MongoCollection<Document> rawCollection =
+                mongoCollections.nonEntityCollection(InputServiceImpl.COLLECTION_NAME, Document.class);
+        final Document doc = rawCollection.find(Filters.eq(InputImpl.FIELD_ID, new ObjectId(id))).first();
+
+        assertThat(doc).isNotNull();
+        assertThat(doc.keySet()).containsExactlyInAnyOrder(
+                InputImpl.FIELD_ID,
+                InputImpl.FIELD_TITLE,
+                InputImpl.FIELD_TYPE,
+                InputImpl.FIELD_CREATOR_USER_ID,
+                InputImpl.FIELD_CREATED_AT,
+                InputImpl.FIELD_GLOBAL,
+                InputImpl.FIELD_CONFIGURATION,
+                InputImpl.EMBEDDED_STATIC_FIELDS,
+                InputImpl.EMBEDDED_EXTRACTORS,
+                InputImpl.FIELD_DESIRED_STATE,
+                InputImpl.FIELD_CONTENT_PACK,
+                InputImpl.FIELD_NODE_ID
+        );
+    }
+
+    /**
+     * Regression test for <a href="https://github.com/Graylog2/graylog2-server/issues/26009">#26009</a>:
+     * persisting the desired state when starting or stopping an input must not delete its extractors.
+     */
+    @Test
+    void persistDesiredStateKeepsExtractors() throws Exception {
+        final Input input = inputService.find(inputService.save(createTestInput()));
+        inputService.addExtractor(input, createCopyInputExtractor());
+
+        inputService.persistDesiredState(input, IOState.Type.STOPPED);
+
+        assertThat(inputService.extractorCountByInputId(List.of(input.getId())))
+                .containsEntry(input.getId(), 1);
+        assertThat(inputService.find(input.getId()).getDesiredState()).isEqualTo(IOState.Type.STOPPED);
+    }
+
+    /**
+     * Regression test for <a href="https://github.com/Graylog2/graylog2-server/issues/26009">#26009</a>:
+     * saving an input that was loaded from the database must round-trip the embedded extractors.
+     */
+    @Test
+    void saveKeepsExtractors() throws Exception {
+        final Input input = inputService.find(inputService.save(createTestInput()));
+        inputService.addExtractor(input, createCopyInputExtractor());
+
+        inputService.save(inputService.find(input.getId()));
+
+        assertThat(inputService.extractorCountByInputId(List.of(input.getId())))
+                .containsEntry(input.getId(), 1);
+    }
+
+    /**
+     * Regression test for <a href="https://github.com/Graylog2/graylog2-server/issues/26009">#26009</a>:
+     * the input update flow in {@code InputsResource} merges via the {@code getFields()} Map view and
+     * re-creates the input from the merged map. Extractors must survive this round-trip, too.
+     */
+    @Test
+    void updateViaFieldsMapKeepsExtractors() throws Exception {
+        final Input input = inputService.find(inputService.save(createTestInput()));
+        inputService.addExtractor(input, createCopyInputExtractor());
+
+        final Input reloaded = inputService.find(input.getId());
+        final Map<String, Object> mergedFields = new HashMap<>(reloaded.getFields());
+        mergedFields.put(MessageInput.FIELD_TITLE, "updated title");
+        inputService.update(inputService.create(reloaded.getId(), mergedFields));
+
+        assertThat(inputService.extractorCountByInputId(List.of(input.getId())))
+                .containsEntry(input.getId(), 1);
+        assertThat(inputService.find(input.getId()).getTitle()).isEqualTo("updated title");
+    }
+
+    @Test
+    void totalExtractorCountByTypeCountsExtractorsAcrossInputs() throws Exception {
+        final Input input1 = inputService.find(inputService.save(createTestInput()));
+        inputService.addExtractor(input1, createCopyInputExtractor());
+        inputService.addExtractor(input1, createCopyInputExtractor());
+        inputService.addExtractor(input1, createRegexExtractor());
+
+        final Input input2 = inputService.find(inputService.save(createTestInput()));
+        inputService.addExtractor(input2, createCopyInputExtractor());
+
+        final Map<Extractor.Type, Long> result = inputService.totalExtractorCountByType();
+        assertThat(result)
+                .containsEntry(Extractor.Type.COPY_INPUT, 3L)
+                .containsEntry(Extractor.Type.REGEX, 1L);
+    }
+
+    @Test
+    void extractorCountByInputId_returnsCounts() throws Exception {
+        final Input input1 = inputService.find(inputService.save(createTestInput()));
+        inputService.addExtractor(input1, createCopyInputExtractor());
+        inputService.addExtractor(input1, createCopyInputExtractor());
+        inputService.addExtractor(input1, createRegexExtractor());
+
+        final Input input2 = inputService.find(inputService.save(createTestInput()));
+        inputService.addExtractor(input2, createCopyInputExtractor());
+
+        final Input input3 = inputService.find(inputService.save(createTestInput()));
+
+        final Map<String, Integer> result = inputService.extractorCountByInputId(
+                List.of(input1.getId(), input2.getId(), input3.getId()));
+
+        assertThat(result)
+                .containsEntry(input1.getId(), 3)
+                .containsEntry(input2.getId(), 1)
+                .containsEntry(input3.getId(), 0);
+    }
+
+    @Test
+    void extractorCountByInputId_returnsEmptyForNoInputs() {
+        final Map<String, Integer> result = inputService.extractorCountByInputId(List.of());
+        assertThat(result).isEmpty();
+    }
+
+    private static CopyInputExtractor createCopyInputExtractor() throws Extractor.ReservedFieldException {
+        return new CopyInputExtractor(new MetricRegistry(), new ObjectId().toHexString(), "copy extractor",
+                0, Extractor.CursorStrategy.COPY, "message", "target", Map.of(), "admin",
+                List.of(), Extractor.ConditionType.NONE, "");
+    }
+
+    private static RegexExtractor createRegexExtractor() throws Extractor.ReservedFieldException, ConfigurationException {
+        return new RegexExtractor(new MetricRegistry(), new ObjectId().toHexString(), "regex extractor",
+                0, Extractor.CursorStrategy.COPY, "message", "target", Map.of("regex_value", ".*"), "admin",
+                List.of(), Extractor.ConditionType.NONE, "");
+    }
+
+    private InputImpl createTestInput() {
+        return InputImpl.builder()
+                .setTitle("input title")
+                .setType("prototype")
+                .setCreatorUserId("admin")
+                .setCreatedAt(Tools.nowUTC())
+                .setConfiguration(Map.of("k", "v"))
+                .setPersistedDesiredState(IOState.Type.RUNNING)
+                .setGlobal(true)
+                .build();
+    }
 }

@@ -16,13 +16,12 @@
  */
 package org.graylog2.cluster.nodes;
 
-import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
-import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import org.assertj.core.api.Assertions;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.Configuration;
+import org.graylog2.configuration.ConfigurationHelper;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.lifecycles.Lifecycle;
@@ -32,10 +31,10 @@ import org.graylog2.search.SearchQueryParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 
+import java.nio.file.Path;
 import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 
 @ExtendWith(MongoDBExtension.class)
@@ -46,10 +45,15 @@ class ServerNodePaginatedServiceIT {
     private ServerNodePaginatedService serverNodePaginatedService;
     private SearchQueryParser queryParser;
 
+    @TempDir
+    private Path tempDir;
+
     @BeforeEach
     void setUp(MongoCollections mongoCollections) throws ValidationException, RepositoryException {
-        final Configuration configuration = configuration(Collections.singletonMap("stale_leader_timeout", String.valueOf(STALE_LEADER_TIMEOUT_MS)));
-        final ServerNodeClusterService serverNodeService = new ServerNodeClusterService(mongoCollections.mongoConnection(), configuration);
+
+        final Configuration configuration = ConfigurationHelper.initConfig(new Configuration(), Collections.singletonMap("stale_leader_timeout", String.valueOf(STALE_LEADER_TIMEOUT_MS)), tempDir);
+
+        final ServerNodeClusterService serverNodeService = new ServerNodeClusterService(mongoCollections, configuration);
         serverNodeService.registerServer(node("my-hostname", true, "5ca1ab1e-0000-4000-a000-100000000000"));
         serverNodeService.registerServer(node("aaa-hostname", false, "5ca1ab1e-0000-4000-a000-200000000000"));
         serverNodeService.registerServer(node("zzz-hostname", false, "5ca1ab1e-0000-4000-a000-300000000000"));
@@ -57,7 +61,14 @@ class ServerNodePaginatedServiceIT {
         queryParser = new SearchQueryParser("hostname", ClusterResource.SERVER_NODE_ENTITY_SEARCH_MAPPINGS);
     }
 
-    private static NodeDto node(String hostname, boolean leader, String nodeID) {
+    private static ServerNodeDto node(String hostname, boolean leader, String nodeID) {
+        final String version = switch (hostname) {
+            case "aaa-hostname" -> "6.1.0";
+            case "my-hostname" -> "6.2.0";
+            case "zzz-hostname" -> "6.3.0";
+            default -> "6.0.0";
+        };
+
         return ServerNodeDto.Builder.builder()
                 .setHostname(hostname)
                 .setId(nodeID)
@@ -65,6 +76,7 @@ class ServerNodePaginatedServiceIT {
                 .setTransportAddress("http://" + hostname + ":8999")
                 .setProcessing(true)
                 .setLifecycle(Lifecycle.RUNNING)
+                .setVersion(version)
                 .build();
     }
 
@@ -86,18 +98,16 @@ class ServerNodePaginatedServiceIT {
                 .containsExactly("aaa-hostname", "my-hostname", "zzz-hostname");
     }
 
+    @Test
+    void testSortingByVersion() {
+        Assertions.assertThat(resultsWithSorting(ServerNodeDto.FIELD_VERSION, SortOrder.DESCENDING, "").delegate())
+                .hasSize(3)
+                .extracting(ServerNodeDto::getVersion)
+                .containsExactly("6.3.0", "6.2.0", "6.1.0");
+    }
+
     private PaginatedList<ServerNodeDto> resultsWithSorting(String field, SortOrder order, String query) {
         return serverNodePaginatedService.searchPaginated(queryParser.parse(query), order.toBsonSort(field), 1, 10);
     }
 
-    private Configuration configuration(Map<String, String> properties) throws RepositoryException, ValidationException {
-        final Configuration configuration = new Configuration();
-        final InMemoryRepository mandatoryProps = new InMemoryRepository(Map.of(
-                "password_secret", "thisisverysecretpassword",
-                "root_password_sha2", "aaaaa",
-                "data_dir", "/tmp"
-        ));
-        new JadConfig(List.of(mandatoryProps, new InMemoryRepository(properties)), configuration).process();
-        return configuration;
-    }
 }

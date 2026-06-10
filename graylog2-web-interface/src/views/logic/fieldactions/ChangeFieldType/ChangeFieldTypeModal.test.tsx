@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import selectEvent from 'helpers/selectEvent';
-import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import useFieldTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
 import { fetchFieldTypeUsages } from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
@@ -120,20 +120,7 @@ jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
 jest.mock('components/indices/hooks/useIndexSetsList');
 
-jest.mock('stores/indices/IndexSetsStore', () => ({
-  IndexSetsActions: {
-    list: jest.fn(),
-  },
-  IndexSetsStore: MockStore([
-    'getInitialState',
-    () => ({
-      indexSets: [
-        { id: 'id-1', title: 'Index Title 1' },
-        { id: 'id-2', title: 'Index Title 2' },
-      ],
-    }),
-  ]),
-}));
+// IndexSetsStore mock removed - components now use useIndexSetsList hook
 
 describe('ChangeFieldTypeModal', () => {
   const putFieldTypeMutationMock = jest.fn(() => Promise.resolve());
@@ -214,8 +201,8 @@ describe('ChangeFieldTypeModal', () => {
     const submit = await screen.findByTitle(/change field type/i);
 
     const rowCheckboxes = await screen.findAllByTitle(/deselect entity/i);
-    fireEvent.click(rowCheckboxes[1]);
-    fireEvent.click(submit);
+    await userEvent.click(rowCheckboxes[1]);
+    await userEvent.click(submit);
 
     await waitFor(() =>
       expect(putFieldTypeMutationMock).toHaveBeenCalledWith({
@@ -234,7 +221,7 @@ describe('ChangeFieldTypeModal', () => {
 
     const submit = await screen.findByTitle(/change field type/i);
 
-    fireEvent.click(submit);
+    await userEvent.click(submit);
 
     await waitFor(() =>
       expect(putFieldTypeMutationMock).toHaveBeenCalledWith({

@@ -24,8 +24,6 @@ import sortNavigationItems from 'components/navigation/util/sortNavigationItems'
 import usePluginEntities from 'hooks/usePluginEntities';
 import mergeNavigationItems from 'components/navigation/util/mergeNavigationItems';
 import AppConfig from 'util/AppConfig';
-import { DEFAULT_PERSPECTIVE } from 'components/perspectives/contexts/PerspectivesProvider';
-import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
 import NavTabs from 'components/common/NavTabs';
 
 type PageNavItem = {
@@ -35,25 +33,19 @@ type PageNavItem = {
   exactPathMatch?: boolean;
   useCondition?: () => boolean;
   position?: PluginNavigation['position'];
+  BadgeComponent?: React.ComponentType<{ text: string }>;
 };
 
-const matchesPerspective = (activePerspective: string, itemPerspective: string) =>
-  activePerspective === DEFAULT_PERSPECTIVE ? !itemPerspective : itemPerspective === activePerspective;
-
 const usePageNavigationItems = (page: string, items: Array<PageNavItem>) => {
-  const { activePerspective } = useActivePerspective();
   const allPageNavigationItems = usePluginEntities('pageNavigation');
 
   return useMemo(() => {
     if (items) {
       return items;
     }
-    const perspectiveNavItems = allPageNavigationItems.filter((group) =>
-      matchesPerspective(activePerspective.id, group.perspective),
-    );
 
-    return mergeNavigationItems(perspectiveNavItems).find((item) => item.description === page)?.children ?? [];
-  }, [items, allPageNavigationItems, activePerspective.id, page]);
+    return mergeNavigationItems(allPageNavigationItems).find((item) => item.description === page)?.children ?? [];
+  }, [items, allPageNavigationItems, page]);
 };
 
 // Please provide items by via the plugin system instead of the items prop where possible.

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo } from 'react';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
 
@@ -77,10 +78,10 @@ function CacheForm({ type, saved, title, onCancel, create = false, cache = INIT_
   const { updateCache, updatingCache } = useUpdateCache();
 
   const cachePlugins = usePluginEntities('lookupTableCaches');
-  const plugin = React.useMemo(() => cachePlugins.find((p) => p.type === type), [cachePlugins, type]);
+  const plugin = useMemo(() => cachePlugins.find((p) => p.type === type), [cachePlugins, type]);
 
-  const DocComponent = React.useMemo(() => plugin?.documentationComponent, [plugin]);
-  const pluginDisplayName = React.useMemo(() => plugin?.displayName || type, [plugin, type]);
+  const DocComponent = useMemo(() => plugin?.documentationComponent, [plugin]);
+  const pluginDisplayName = useMemo(() => plugin?.displayName || type, [plugin, type]);
 
   const handleSubmit = async (values: LookupTableCache) => {
     const promise = create ? createCache(values) : updateCache(values);
@@ -98,7 +99,7 @@ function CacheForm({ type, saved, title, onCancel, create = false, cache = INIT_
     });
   };
 
-  const canModify = React.useMemo(
+  const canModify = useMemo(
     () => create || (!loadingScopePermissions && scopePermissions?.is_mutable),
     [create, loadingScopePermissions, scopePermissions?.is_mutable],
   );

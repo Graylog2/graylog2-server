@@ -29,6 +29,7 @@ import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.diagnosis.InputDiagnosticService;
+import org.graylog2.inputs.diagnosis.InputRoutingRulesService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
@@ -49,6 +50,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import org.graylog2.database.filtering.ComputedFieldRegistry;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -204,9 +208,10 @@ class InputsResourceTest {
                                   PipelineService pipelineService,
                                   MessageInputFactory messageInputFactory,
                                   Configuration config) {
-            super(inputService, mock(InputDiagnosticService.class), streamService, streamRuleService,
+            super(inputService, mock(InputDiagnosticService.class), mock(InputRoutingRulesService.class),
+                    streamService, streamRuleService,
                     pipelineService, messageInputFactory, config, mock(MongoDbInputsMetadataService.class),
-                    mock(ClusterEventBus.class));
+                    mock(ClusterEventBus.class), new ComputedFieldRegistry(Set.of()));
             configuration = mock(HttpConfiguration.class);
 
             this.user = mock(User.class);

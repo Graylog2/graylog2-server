@@ -17,17 +17,17 @@
 package org.graylog2.database.dbcatalog;
 
 
-import org.graylog2.cluster.nodes.ServerNodeEntity;
+import org.graylog2.cluster.nodes.ServerNodeDto;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.users.UserImpl;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.database.DbEntity.NOBODY_ALLOWED;
 import static org.graylog2.shared.security.RestPermissions.INDEXSETS_READ;
 import static org.graylog2.shared.security.RestPermissions.USERS_READ;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DbEntitiesCatalogProviderTest {
     @Test
@@ -35,19 +35,27 @@ class DbEntitiesCatalogProviderTest {
         DbEntitiesCatalogProvider provider = new DbEntitiesCatalogProvider(Set.of(IndexSetConfig.class));
         final DbEntitiesCatalog dbEntitiesCatalog = provider.get();
 
-        final DbEntityCatalogEntry entryByCollectionName = dbEntitiesCatalog.getByCollectionName("index_sets").get();
+        final DbEntityCatalogEntry entry = dbEntitiesCatalog.getByCollectionName("index_sets").get();
 
-        assertEquals(new DbEntityCatalogEntry("index_sets", "title", IndexSetConfig.class, INDEXSETS_READ), entryByCollectionName);
+        assertThat(entry.collection()).isEqualTo("index_sets");
+        assertThat(entry.titleField()).isEqualTo("title");
+        assertThat(entry.modelClass()).isEqualTo(IndexSetConfig.class);
+        assertThat(entry.readPermission()).isEqualTo(INDEXSETS_READ);
+        assertThat(entry.readableFields()).isNotEmpty();
     }
 
     @Test
     void testHandlesEntitiesWithDefaultReadPermissionFieldProperly() {
-        DbEntitiesCatalogProvider provider = new DbEntitiesCatalogProvider(Set.of(ServerNodeEntity.class));
+        DbEntitiesCatalogProvider provider = new DbEntitiesCatalogProvider(Set.of(ServerNodeDto.class));
         final DbEntitiesCatalog dbEntitiesCatalog = provider.get();
 
-        final DbEntityCatalogEntry entryByCollectionName = dbEntitiesCatalog.getByCollectionName("nodes").get();
+        final DbEntityCatalogEntry entry = dbEntitiesCatalog.getByCollectionName("nodes").get();
 
-        assertEquals(new DbEntityCatalogEntry("nodes", "node_id", ServerNodeEntity.class, NOBODY_ALLOWED), entryByCollectionName);
+        assertThat(entry.collection()).isEqualTo("nodes");
+        assertThat(entry.titleField()).isEqualTo("node_id");
+        assertThat(entry.modelClass()).isEqualTo(ServerNodeDto.class);
+        assertThat(entry.readPermission()).isEqualTo(NOBODY_ALLOWED);
+        assertThat(entry.readableFields()).isNotEmpty();
     }
 
     @Test
@@ -55,8 +63,12 @@ class DbEntitiesCatalogProviderTest {
         DbEntitiesCatalogProvider provider = new DbEntitiesCatalogProvider(Set.of(UserImpl.class));
         final DbEntitiesCatalog dbEntitiesCatalog = provider.get();
 
-        final DbEntityCatalogEntry entryByCollectionName = dbEntitiesCatalog.getByCollectionName(UserImpl.COLLECTION_NAME).get();
+        final DbEntityCatalogEntry entry = dbEntitiesCatalog.getByCollectionName(UserImpl.COLLECTION_NAME).get();
 
-        assertEquals(new DbEntityCatalogEntry(UserImpl.COLLECTION_NAME, UserImpl.USERNAME, UserImpl.class, USERS_READ), entryByCollectionName);
+        assertThat(entry.collection()).isEqualTo(UserImpl.COLLECTION_NAME);
+        assertThat(entry.titleField()).isEqualTo(UserImpl.FULL_NAME);
+        assertThat(entry.modelClass()).isEqualTo(UserImpl.class);
+        assertThat(entry.readPermission()).isEqualTo(USERS_READ);
+        assertThat(entry.readableFields()).isNotEmpty();
     }
 }

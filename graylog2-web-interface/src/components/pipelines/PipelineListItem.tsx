@@ -17,21 +17,28 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { isPermitted } from 'util/PermissionsMixin';
-import { Link, LinkContainer } from 'components/common/router';
+import { Link, LinkContainer, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import { CounterRate, MetricContainer } from 'components/metrics';
 import PipelineConnectionsList from 'components/pipelines/PipelineConnectionsList';
 import { Button, Label } from 'components/bootstrap';
 import type { PipelineType } from 'components/pipelines/types';
-import type { PipelineConnectionsType } from 'stores/pipelines/PipelineConnectionsStore';
+import type { PipelineConnectionsType } from 'hooks/usePipelineConnections';
 import type { Stream } from 'logic/streams/types';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
-import useCurrentUser from 'hooks/useCurrentUser';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
+import RuleDeprecationInfo from 'components/rules/RuleDeprecationInfo';
+import usePermissions from 'hooks/usePermissions';
+import {
+  PipelineLoadCell,
+  getPipelineLoadPercent,
+  useProcessingLoadContext,
+  type ProcessingLoadResponse,
+} from 'components/pipelines/processing-load';
+
+import PipelineProcessingErrors from './PipelineProcessingErrors';
 
 import ButtonToolbar from '../bootstrap/ButtonToolbar';
-import { Spinner } from '../common';
 
 type Props = {
   pipeline: PipelineType;
@@ -39,6 +46,9 @@ type Props = {
   connections: Array<PipelineConnectionsType>;
   streams: Array<Stream>;
   onDeletePipeline: () => void;
+  showLoadColumn?: boolean;
+  processingLoad?: ProcessingLoadResponse;
+  processingLoadError?: boolean;
 };
 const PipelineNameTD = styled.td`
   max-width: 300px;
@@ -78,8 +88,25 @@ const DefaultLabel = styled(Label)(
 const getStagesWithoutDuplicates = (pipelineStages: Array<number>, usedStagesAcc: Array<number> = []) =>
   Array.from(new Set([...usedStagesAcc, ...pipelineStages]));
 
-const PipelineListItem = ({ pipeline, pipelines, connections, streams, onDeletePipeline }: Props) => {
-  const currentUser = useCurrentUser();
+const PipelineListItem = ({
+  pipeline,
+  pipelines,
+  connections,
+  streams,
+  onDeletePipeline,
+  showLoadColumn: showLoadColumnProp = undefined,
+  processingLoad: processingLoadProp = undefined,
+  processingLoadError: processingLoadErrorProp = undefined,
+}: Props) => {
+  const {
+    metricsEnabled,
+    processingLoad: processingLoadContext,
+    processingLoadError: processingLoadErrorContext,
+  } = useProcessingLoadContext();
+  const showLoadColumn = showLoadColumnProp ?? metricsEnabled;
+  const processingLoad = processingLoadProp ?? processingLoadContext;
+  const processingLoadError = processingLoadErrorProp ?? processingLoadErrorContext;
+  const { isPermitted } = usePermissions();
   const { loadingScopePermissions, scopePermissions } = useGetPermissionsByScope(pipeline);
   const { id, title, description, stages } = pipeline;
   const isManaged = scopePermissions && !scopePermissions?.is_mutable;
@@ -124,6 +151,7 @@ const PipelineListItem = ({ pipeline, pipelines, connections, streams, onDeleteP
             Managed by Application
           </DefaultLabel>
         )}
+        <RuleDeprecationInfo pipelineId={pipeline.id} showFor="pipeline" />
         <br />
         {description}
         <br />
@@ -140,16 +168,28 @@ const PipelineListItem = ({ pipeline, pipelines, connections, streams, onDeleteP
           noConnectionsMessage={<em>Not connected</em>}
         />
       </StreamListTD>
+      <td>
+        <PipelineProcessingErrors pipeline={pipeline} />
+      </td>
+      {showLoadColumn && (
+        <td>
+          <PipelineLoadCell
+            loadPercent={getPipelineLoadPercent(processingLoad, pipeline.id)}
+            error={processingLoadError}
+          />
+        </td>
+      )}
       <td>{_formatStages()}</td>
       <td>
         <ButtonToolbar>
-          <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(id)}>
-            <Button disabled={!isPermitted(currentUser.permissions, 'pipeline:edit')} bsSize="xsmall">
+          <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(id)} aria-label="Edit Pipeline">
+            <Button disabled={!isPermitted('pipeline:edit')} bsSize="xsmall">
               Edit
             </Button>
           </LinkContainer>
           <Button
-            disabled={!isPermitted(currentUser.permissions, 'pipeline:delete') || isNotDeletable}
+            aria-label="Delete Pipeline"
+            disabled={!isPermitted('pipeline:delete') || isNotDeletable}
             bsStyle="danger"
             bsSize="xsmall"
             onClick={() => onDeletePipeline()}>

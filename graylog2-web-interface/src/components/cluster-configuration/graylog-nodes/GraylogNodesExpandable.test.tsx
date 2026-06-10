@@ -17,77 +17,34 @@
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
+import type { PaginatedEntityTableProps } from 'components/common/PaginatedEntityTable/PaginatedEntityTable';
+import asMock from 'helpers/mocking/AsMock';
+
 import GraylogNodesExpandable from './GraylogNodesExpandable';
-import useClusterGraylogNodes from './useClusterGraylogNodes';
-import useClusterGraylogNodesTableLayout from './useClusterGraylogNodesTableLayout';
 
-jest.mock('./useClusterGraylogNodes');
-jest.mock('./useClusterGraylogNodesTableLayout');
-
-const defaultLayout = {
-  defaultDisplayedColumns: ['hostname'],
-  defaultColumnOrder: ['hostname'],
-  layoutPreferences: {
-    attributes: undefined,
-    order: undefined,
-    pageSize: 0,
-    sort: { attributeId: 'hostname', direction: 'asc' },
-  },
-  searchParams: { sort: { attributeId: 'hostname', direction: 'asc' }, query: '' },
-  isLoadingLayout: false,
-  handleLayoutPreferencesChange: jest.fn(),
-  handleSortChange: jest.fn(),
-};
+jest.mock('components/common/PaginatedEntityTable', () => ({
+  __esModule: true,
+  default: jest.fn(({ humanName }) => <div>Paginated {humanName}</div>),
+  useTableFetchContext: jest.fn(),
+}));
+jest.mock('brand-customization/useProductName', () => jest.fn(() => 'Graylog'));
 
 describe('<GraylogNodesExpandable />', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('shows empty state when no graylog nodes are returned', () => {
-    (useClusterGraylogNodesTableLayout as jest.Mock).mockReturnValue(defaultLayout);
-    (useClusterGraylogNodes as jest.Mock).mockReturnValue({
-      nodes: [],
-      total: 0,
-      refetch: jest.fn(),
-      isLoading: false,
-      setPollingEnabled: jest.fn(),
-      pollingEnabled: true,
-    });
+  it('renders paginated graylog nodes table', () => {
+    const { default: MockPaginatedEntityTable } = jest.requireMock('components/common/PaginatedEntityTable');
+    const mockPaginatedEntityTable = asMock(MockPaginatedEntityTable);
 
-    render(<GraylogNodesExpandable />);
+    render(<GraylogNodesExpandable searchQuery="foo" refetchInterval={10000} />);
 
-    expect(screen.getByText('No Graylog Nodes found.')).toBeInTheDocument();
-    expect(screen.queryByRole('table')).not.toBeInTheDocument();
-  });
-
-  it('renders entity table with provided nodes', () => {
-    (useClusterGraylogNodesTableLayout as jest.Mock).mockReturnValue(defaultLayout);
-    const nodes = [
-      {
-        id: 'graylog-1',
-        node_id: 'graylog-1',
-        hostname: 'host-1',
-        short_node_id: 'g1',
-        lifecycle: 'running',
-        is_processing: true,
-        lb_status: 'ALIVE',
-        metrics: {},
-      },
-    ];
-
-    (useClusterGraylogNodes as jest.Mock).mockReturnValue({
-      nodes,
-      total: nodes.length,
-      refetch: jest.fn(),
-      isLoading: false,
-      setPollingEnabled: jest.fn(),
-      pollingEnabled: true,
-    });
-
-    render(<GraylogNodesExpandable />);
-
-    expect(screen.getByRole('table')).toBeInTheDocument();
-    expect(screen.getByText(/host-1/i)).toBeInTheDocument();
+    expect(screen.getByText('Paginated Graylog Nodes')).toBeInTheDocument();
+    expect(mockPaginatedEntityTable).toHaveBeenCalledTimes(1);
+    const callProps = mockPaginatedEntityTable.mock.calls[0][0] as PaginatedEntityTableProps<any, any>;
+    expect(callProps.humanName).toBe('Graylog Nodes');
+    expect(callProps.externalSearch.query).toBe('foo');
+    expect(callProps.fetchOptions.refetchInterval).toBe(10000);
   });
 });

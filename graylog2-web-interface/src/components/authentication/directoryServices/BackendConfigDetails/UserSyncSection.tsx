@@ -49,7 +49,7 @@ const UserSyncSection = ({ authenticationBackend, roles, excludedFields = {} }: 
     userUniqueIdAttribute,
     emailAttributes,
   } = authenticationBackend.config;
-  const { defaultRoles = Immutable.List() } = authenticationBackend;
+  const { defaultRoles = Immutable.List(), defaultUserTimezone } = authenticationBackend;
 
   return (
     <SectionComponent
@@ -66,6 +66,7 @@ const UserSyncSection = ({ authenticationBackend, roles, excludedFields = {} }: 
         <ReadOnlyFormGroup label="ID Attribute" value={userUniqueIdAttribute} />
       )}
       <ReadOnlyFormGroup label="Default Roles" value={rolesList(defaultRoles, roles)} />
+      <ReadOnlyFormGroup label="Default User Time Zone" value={defaultUserTimezone || "Browser's time zone"} />
     </SectionComponent>
   );
 };

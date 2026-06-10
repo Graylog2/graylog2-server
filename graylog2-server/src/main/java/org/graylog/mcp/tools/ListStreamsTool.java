@@ -22,11 +22,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog.mcp.server.Tool;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 import org.graylog2.web.customization.CustomizationConfig;
 
 import java.util.Map;
+import java.util.Objects;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -37,17 +39,21 @@ public class ListStreamsTool extends Tool<ListStreamsTool.Parameters, String> {
     private final StreamService streamService;
 
     @Inject
-    public ListStreamsTool(ObjectMapper objectMapper,
-                           CustomizationConfig customizationConfig,
-                           SchemaGeneratorProvider schemaGeneratorProvider,
-                           StreamService streamService) {
-        super(objectMapper,
-                schemaGeneratorProvider,
+    public ListStreamsTool(StreamService streamService,
+                           final CustomizationConfig customizationConfig,
+                           final ObjectMapper objectMapper,
+                           final ClusterConfigService clusterConfigService,
+                           final SchemaGeneratorProvider schemaGeneratorProvider) {
+        super(
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
                 f("List all %s Streams", customizationConfig.productName()),
-                f("List all available streams in the %s instance.", customizationConfig.productName()));
+                f("List all available streams in the %s instance.", customizationConfig.productName()),
+                objectMapper,
+                clusterConfigService,
+                schemaGeneratorProvider
+        );
         this.streamService = streamService;
     }
 
@@ -59,7 +65,7 @@ public class ListStreamsTool extends Tool<ListStreamsTool.Parameters, String> {
                             .map(stream -> Map.of(
                                     "id", stream.getId(),
                                     "title", stream.getTitle(),
-                                    "description", stream.getDescription(),
+                                    "description", Objects.requireNonNullElse(stream.getDescription(), ""),
                                     "disabled", stream.getDisabled(),
                                     "matching_type", stream.getMatchingType(),
                                     "created_at", stream.getCreatedAt(),

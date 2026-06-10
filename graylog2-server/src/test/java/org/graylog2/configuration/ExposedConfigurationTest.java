@@ -21,8 +21,10 @@ import com.jayway.jsonpath.JsonPath;
 import org.graylog2.Configuration;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.net.URI;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,9 +32,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ExposedConfigurationTest {
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
+    @TempDir
+    private Path tempDir;
+
     @Test
     public void testCreateWithConfiguration() throws Exception {
-        final Configuration configuration = ConfigurationHelper.initConfig(new Configuration());
+        final Configuration configuration = ConfigurationHelper.initConfig(new Configuration(), tempDir);
         final ExposedConfiguration c = ExposedConfiguration.create(configuration);
 
         assertThat(c.inputBufferProcessors()).isEqualTo(configuration.getInputbufferProcessors());
@@ -60,7 +65,7 @@ public class ExposedConfigurationTest {
 
     @Test
     public void testSerialization() throws Exception {
-        final Configuration configuration = ConfigurationHelper.initConfig(new Configuration());
+        final Configuration configuration = ConfigurationHelper.initConfig(new Configuration(), tempDir);
         final ExposedConfiguration c = ExposedConfiguration.create(configuration);
 
         final String json = objectMapper.writeValueAsString(c);

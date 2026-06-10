@@ -170,6 +170,7 @@ public class AggregationSearchUtils {
             // Examples:
             //   aggregation_value_count_source=42
             //   aggregation_value_card_anonid=23
+            final Map<String, Double> aggregationConditions = new HashMap<>();
             for (AggregationSeriesValue seriesValue : keyResult.seriesValues()) {
                 final String function = seriesValue.series().type().toLowerCase(Locale.ROOT);
                 final Optional<String> field = fieldFromSeries(seriesValue.series());
@@ -178,14 +179,13 @@ public class AggregationSearchUtils {
                         .orElseGet(() -> String.format(Locale.ROOT, "aggregation_value_%s", function));
 
                 fields.put(fieldName, seriesValue.value());
+                aggregationConditions.put(fieldName.replace("aggregation_value_", ""), seriesValue.value());
             }
 
             // This is the concatenated key value
             fields.put("aggregation_key", keyString);
 
-            // TODO: Can we find a useful source value?
-            final Message message = messageFactory.createMessage(eventMessage, "", result.effectiveTimerange().to());
-            message.addFields(fields);
+            event.setAggregationConditions(aggregationConditions);
 
             // Ask any event query modifier for its state and collect it into the event modifier state
             final Map<String, Object> eventModifierState = eventQueryModifiers.stream()
@@ -196,6 +196,10 @@ public class AggregationSearchUtils {
             eventDecorator.accept(event);
 
             LOG.debug("Creating event {}/{} - {} {} ({})", eventDefinition.title(), eventDefinition.id(), keyResult.key(), seriesString(keyResult), fields);
+
+            // TODO: Can we find a useful source value?
+            final Message message = messageFactory.createMessage(event.getMessage(), "", result.effectiveTimerange().to());
+            message.addFields(fields);
 
             eventsWithContext.add(EventWithContext.builder()
                     .event(event)

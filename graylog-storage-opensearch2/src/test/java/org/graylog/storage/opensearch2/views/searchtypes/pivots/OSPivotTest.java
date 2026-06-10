@@ -18,30 +18,24 @@ package org.graylog.storage.opensearch2.views.searchtypes.pivots;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
-import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.shaded.opensearch2.org.apache.lucene.search.TotalHits;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
 import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHits;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregations;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Max;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Min;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.EffectiveTimeRangeExtractor;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.OSTimeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.graylog2.storage.SearchVersion;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -56,8 +50,6 @@ import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -67,16 +59,11 @@ import static org.mockito.Mockito.when;
 @MockitoSettings(strictness = Strictness.WARN)
 public class OSPivotTest {
     @Mock
-    private SearchJob job;
-    @Mock
     private Query query;
     @Mock
     private Pivot pivot;
-
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private SearchResponse queryResult;
-    @Mock
-    private Aggregations aggregations;
     @Mock
     private OSGeneratedQueryContext queryContext;
 
@@ -119,7 +106,7 @@ public class OSPivotTest {
         when(queryResult.getAggregations()).thenReturn(mockMetricAggregation);
         when(query.effectiveTimeRange(pivot)).thenReturn(RelativeRange.create(300));
 
-        final SearchType.Result result = this.esPivot.doExtractResult(job, query, pivot, queryResult, aggregations, queryContext);
+        final SearchType.Result result = this.esPivot.doExtractResult(query, pivot, queryResult, queryContext);
 
         final PivotResult pivotResult = (PivotResult)result;
 
@@ -140,7 +127,7 @@ public class OSPivotTest {
         when(queryResult.getAggregations()).thenReturn(mockMetricAggregation);
         when(query.effectiveTimeRange(pivot)).thenReturn(RelativeRange.create(300));
 
-        final SearchType.Result result = esPivot.doExtractResult(null, query, pivot, queryResult, null, null);
+        final SearchType.Result result = esPivot.doExtractResult(query, pivot, queryResult, null);
 
         assertThat(result.name()).contains("customPivot");
     }
@@ -154,7 +141,7 @@ public class OSPivotTest {
         when(queryResult.getAggregations()).thenReturn(mockMetricAggregation);
         when(query.effectiveTimeRange(pivot)).thenReturn(RelativeRange.create(300));
 
-        final SearchType.Result result = this.esPivot.doExtractResult(job, query, pivot, queryResult, aggregations, queryContext);
+        final SearchType.Result result = this.esPivot.doExtractResult(query, pivot, queryResult, queryContext);
 
         final PivotResult pivotResult = (PivotResult) result;
 
@@ -176,7 +163,7 @@ public class OSPivotTest {
         when(queryResult.getAggregations()).thenReturn(mockMetricAggregation);
         when(query.effectiveTimeRange(pivot)).thenReturn(RelativeRange.create(0));
 
-        final SearchType.Result result = this.esPivot.doExtractResult(job, query, pivot, queryResult, aggregations, queryContext);
+        final SearchType.Result result = this.esPivot.doExtractResult(query, pivot, queryResult, queryContext);
 
         final PivotResult pivotResult = (PivotResult) result;
 
@@ -192,7 +179,7 @@ public class OSPivotTest {
         returnDocumentCount(queryResult, 0);
         final TimeRange pivotRange = AbsoluteRange.create(DateTime.parse("1970-01-01T00:00:00.000Z"), DateTime.parse("2020-01-09T15:44:25.408Z"));
         when(query.effectiveTimeRange(pivot)).thenReturn(pivotRange);
-        final SearchType.Result result = this.esPivot.doExtractResult(job, query, pivot, queryResult, aggregations, queryContext);
+        final SearchType.Result result = this.esPivot.doExtractResult(query, pivot, queryResult, queryContext);
         final PivotResult pivotResult = (PivotResult) result;
         assertThat(pivotResult.effectiveTimerange()).isEqualTo(AbsoluteRange.create(
                 DateTime.parse("1970-01-01T00:00:00.000Z"),

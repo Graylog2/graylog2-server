@@ -14,37 +14,34 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
-import { LinkContainer } from 'components/common/router';
+import { SystemCatalog } from '@graylog/server-api';
+
+import { LinkContainer, DocumentTitle, PageHeader } from 'components/common';
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
-import { DocumentTitle, PageHeader } from 'components/common';
 import ContentPackEdit from 'components/content-packs/ContentPackEdit';
 import ContentPack from 'logic/content-packs/ContentPack';
 import Entity from 'logic/content-packs/Entity';
-import { CatalogStore, CatalogActions } from 'stores/content-packs/CatalogStore';
-import { ContentPacksActions } from 'stores/content-packs/ContentPacksStore';
+import EntityIndex from 'logic/content-packs/EntityIndex';
+import { createContentPack } from 'hooks/useContentPackMutations';
 import useHistory from 'routing/useHistory';
-import { useStore } from 'stores/connect';
 import useProductName from 'brand-customization/useProductName';
 import MarketplaceLink from 'components/support/MarketplaceLink';
+import useEntityIndex from 'components/content-packs/hooks/useEntityIndex';
 
 const CreateContentPackPage = () => {
   const productName = useProductName();
   const history = useHistory();
-  const { entityIndex } = useStore(CatalogStore);
+  const { entityIndex } = useEntityIndex();
   const [contentPackState, setContentPackState] = useState({
     contentPack: ContentPack.builder().build(),
     appliedParameter: {},
     selectedEntities: {},
     fetchedEntities: undefined,
   });
-
-  useEffect(() => {
-    CatalogActions.showEntityIndex();
-  }, []);
 
   const _onStateChanged = (newState: {
     contentPack: ContentPack;
@@ -62,7 +59,7 @@ const CreateContentPackPage = () => {
   const _onSave = () => {
     const { contentPack } = contentPackState;
 
-    ContentPacksActions.create(contentPack.toJSON()).then(
+    createContentPack(contentPack.toJSON()).then(
       () => {
         UserNotification.success('Content pack imported successfully', 'Success!');
         history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
@@ -85,14 +82,18 @@ const CreateContentPackPage = () => {
 
   const _getEntities = (selectedEntities) => {
     const { contentPack } = contentPackState;
+    const payload = Object.keys(selectedEntities)
+      .reduce((acc, entityType) => acc.concat(selectedEntities[entityType]), [])
+      .filter((e) => e instanceof EntityIndex)
+      .map((entity) => entity.toJSON());
 
-    CatalogActions.getSelectedEntities(selectedEntities).then((result) => {
+    SystemCatalog.resolveEntities({ entities: payload as any }).then((result: any) => {
       const newContentPack = contentPack
         .toBuilder()
         /* Mark entities from server */
-        .entities(result.entities.map((e) => Entity.fromJSON(e, true, contentPack.parameters)))
+        .entities(result.entities.map((e: any) => Entity.fromJSON(e, true, contentPack.parameters)))
         .build();
-      const fetchedEntities = result.entities.map((e) => Entity.fromJSON(e, false, contentPack.parameters));
+      const fetchedEntities = result.entities.map((e: any) => Entity.fromJSON(e, false, contentPack.parameters));
 
       setContentPackState((cur) => ({ ...cur, contentPack: newContentPack, fetchedEntities }));
     });

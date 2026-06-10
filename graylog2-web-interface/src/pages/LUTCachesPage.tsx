@@ -21,7 +21,6 @@ import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
 import { CachesOverview } from 'components/lookup-tables';
 import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
-import LUTModals from 'components/lookup-tables/LUTModals';
 
 function LUTCachesPage() {
   const navigate = useNavigate();
@@ -37,7 +36,6 @@ function LUTCachesPage() {
         </Button>
       }>
       <CachesOverview />
-      <LUTModals />
     </LUTPageLayout>
   );
 }

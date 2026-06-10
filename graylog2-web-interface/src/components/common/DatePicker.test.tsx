@@ -29,6 +29,6 @@ describe('DatePicker', () => {
   it('should highlight selected day', async () => {
     render(<DatePicker date="2023-10-19" onChange={() => {}} />);
 
-    expect(await screen.findByText('19')).toHaveAttribute('aria-selected', 'true');
+    expect(await screen.findByRole('gridcell', { name: '19' })).toHaveAttribute('aria-selected', 'true');
   });
 });

@@ -24,7 +24,7 @@ import useHotkeysContext from 'hooks/useHotkeysContext';
 import type { ScopeName, HotkeyCollection } from 'contexts/HotkeysContext';
 import SectionGrid from 'components/common/Section/SectionGrid';
 import HotkeyCollectionSection from 'components/hotkeys/HotkeyCollectionSection';
-import { Link } from 'components/common/router';
+import { Link } from 'components/common';
 import Routes from 'routing/Routes';
 
 const Content = styled.div`

@@ -33,9 +33,15 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
+import org.graylog.plugins.pipelineprocessor.db.RoutingRuleDao;
+import org.graylog.plugins.pipelineprocessor.functions.FromInput;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.InputService;
+import org.graylog2.plugin.streams.Stream;
+import org.graylog2.rest.resources.streams.responses.StreamReference;
+import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,8 +53,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.graylog.plugins.pipelineprocessor.functions.FromInput.ID_ARG;
-import static org.graylog.plugins.pipelineprocessor.functions.FromInput.NAME_ARG;
 import static org.graylog2.plugin.Message.FIELD_GL2_FORWARDER_INPUT;
 import static org.graylog2.plugin.Message.FIELD_GL2_SOURCE_INPUT;
 
@@ -67,30 +71,33 @@ public class PipelineAnalyzer {
     private final PipelineStreamConnectionsService connectionsService;
     private final InputService inputService;
     private final PipelineMetricRegistry pipelineMetricRegistry;
+    private final StreamService streamService;
 
     @Inject
     public PipelineAnalyzer(
             PipelineStreamConnectionsService connectionsService,
             InputService inputService,
-            MetricRegistry metricRegistry
+            MetricRegistry metricRegistry,
+            StreamService streamService
     ) {
         this.connectionsService = connectionsService;
         this.inputService = inputService;
         this.pipelineMetricRegistry = PipelineMetricRegistry.create(metricRegistry, Pipeline.class.getName(), Rule.class.getName());
+        this.streamService = streamService;
     }
 
     public Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> analyzePipelines(
             PipelineResolver resolver,
-            List<PipelineRulesMetadataDao> ruleRecords) {
+            List<PipelineRulesMetadataDao> ruleRecords,
+            List<RoutingRuleDao> routingRuleRecords) {
         final ImmutableMap<String, Pipeline> pipelines = resolver.resolvePipelines(pipelineMetricRegistry);
-        final ImmutableMap<String, Pipeline> functions = resolver.resolveFunctions(pipelines.values(), pipelineMetricRegistry);
-        return analyzePipelines(pipelines, functions, ruleRecords);
+        return analyzePipelines(pipelines, ruleRecords, routingRuleRecords);
     }
 
     public Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> analyzePipelines(
             ImmutableMap<String, Pipeline> pipelines,
-            ImmutableMap<String, Pipeline> functions,
-            List<PipelineRulesMetadataDao> ruleRecords) {
+            List<PipelineRulesMetadataDao> ruleRecords,
+            List<RoutingRuleDao> routingRuleRecords) {
         final Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions = new HashMap<>();
 
         pipelines.values().forEach(pipeline -> {
@@ -98,6 +105,7 @@ public class PipelineAnalyzer {
             Set<String> ruleSet = new HashSet<>();
             Set<String> functionSet = new HashSet<>();
             Set<String> deprecatedFunctionSet = new HashSet<>();
+            Map<String, Set<String>> routingRulesMap = new HashMap<>();
             boolean hasInputReferences = false;
 
             Set<String> connectedStreams = connectionsService.loadByPipelineId(pipeline.id())
@@ -105,26 +113,57 @@ public class PipelineAnalyzer {
                     .map(PipelineConnections::streamId)
                     .collect(Collectors.toSet());
 
-            Set<Stage> stages = functions.get(pipeline.id()).stages();
+            final Map<String, String> connectedStreamTitles = new HashMap<>();
+            for (final String streamId : connectedStreams) {
+                final String title = streamService.streamTitleFromCache(streamId);
+                if (title != null) {
+                    connectedStreamTitles.put(streamId, title);
+                }
+            }
+
+            final Map<String, String> ruleTitles = new HashMap<>();
+
+            Set<Stage> stages = pipeline.stages();
             if (stages != null) {
                 for (Stage stage : stages) {
-                    List<Rule> rules = stage.getRules();
-                    if (rules == null) continue;
-                    for (Rule rule : rules) {
-                        if (rule == null) continue;
+                    List<Rule> stageRules = stage.getRules();
+                    if (stageRules == null) continue;
+                    for (Rule rule : stageRules) {
+                        if (rule == null || rule.id() == null) continue;
                         ruleSet.add(rule.id());
-                        boolean ruleHasReferences = analyzeRule(pipeline, connectedStreams, rule, functionSet, deprecatedFunctionSet, inputMentions);
+                        ruleTitles.put(rule.id(), rule.name());
+                        boolean ruleHasReferences = analyzeRule(
+                                pipeline, connectedStreams, rule, functionSet, deprecatedFunctionSet, routingRulesMap, inputMentions);
                         hasInputReferences = hasInputReferences || ruleHasReferences;
                     }
                 }
             }
             ruleRecords.add(rulesBuilder
+                    .pipelineTitle(pipeline.name())
                     .rules(ruleSet)
                     .streams(connectedStreams)
                     .functions(functionSet)
                     .deprecatedFunctions(deprecatedFunctionSet)
+                    .ruleTitlesById(ruleTitles)
+                    .connectedStreamTitlesById(connectedStreamTitles)
                     .hasInputReferences(hasInputReferences)
                     .build());
+
+            // Build one RoutingRuleDao per rule that has routing targets
+            final List<StreamReference> connectedStreamRefs = connectedStreamTitles.entrySet().stream()
+                    .map(e -> new StreamReference(e.getKey(), e.getValue()))
+                    .toList();
+            for (final var entry : routingRulesMap.entrySet()) {
+                final String ruleId = entry.getKey();
+                routingRuleRecords.add(RoutingRuleDao.builder()
+                        .pipelineId(pipeline.id())
+                        .pipelineTitle(pipeline.name())
+                        .ruleId(ruleId)
+                        .ruleTitle(ruleTitles.getOrDefault(ruleId, "Unknown"))
+                        .routedStreamIds(List.copyOf(entry.getValue()))
+                        .connectedStreams(connectedStreamRefs)
+                        .build());
+            }
         });
         return inputMentions;
     }
@@ -136,17 +175,26 @@ public class PipelineAnalyzer {
      * @param connectedStreams       the streams connected to the pipeline
      * @param rule                   the rule to analyze
      * @param functions              return set of functions used in the rule
-     * @param deprecatedFunctionList return set of deprecated functions used in the rule
+     * @param deprecatedFunctions    return set of deprecated functions used in the rule
+     * @param routingRulesMap        return routing rules in the rule
      * @param inputMentions          map to collect input mentions
      * @return true if the rule references any inputs, false otherwise
      */
     private boolean analyzeRule(Pipeline pipeline, Set<String> connectedStreams, Rule rule,
-                             Set<String> functions, Set<String> deprecatedFunctionList,
-                             Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions) {
+                                Set<String> functions, Set<String> deprecatedFunctions,
+                                Map<String, Set<String>> routingRulesMap,
+                                Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions) {
         MetaDataListener ruleListener = new MetaDataListener(pipeline, connectedStreams, rule, inputMentions);
-        new RuleAstWalker().walk(ruleListener, rule);
+        try {
+            new RuleAstWalker().walk(ruleListener, rule);
+        } catch (Exception e) {
+            LOG.warn("Pipeline metadata analysis failed for rule [{}] in pipeline [{}], likely due to invalid rule syntax. Skipping rule...",
+                    rule.name(), pipeline.name(), e);
+            return false;
+        }
         functions.addAll(ruleListener.getFunctions());
-        deprecatedFunctionList.addAll(ruleListener.getDeprecatedFunctions());
+        deprecatedFunctions.addAll(ruleListener.getDeprecatedFunctions());
+        routingRulesMap.putAll(ruleListener.getRoutingRules());
         return ruleListener.hasInputReference();
     }
 
@@ -158,21 +206,10 @@ public class PipelineAnalyzer {
         }
     }
 
-    protected String getInputId(String inputName) {
-        final List<String> inputIds = inputService.findIdsByTitle(inputName);
-        if (inputIds.isEmpty()) {
-            LOG.warn("Could not find input with name '{}'", inputName);
-            return null;
-        }
-        if (inputIds.size() > 1) {
-            LOG.warn("Multiple inputs found with name '{}', using the first one with id '{}'", inputName, inputIds.getFirst());
-        }
-        return inputIds.getFirst();
-    }
-
     class MetaDataListener extends RuleAstBaseListener {
         private final Set<String> functions = new HashSet<>();
         private final Set<String> deprecatedFunctions = new HashSet<>();
+        private final Map<String, Set<String>> routingRulesMap = new HashMap<>();
         private boolean hasInputReference = false;
         private final Pipeline pipeline;
         private final Set<String> connectedStreams;
@@ -211,6 +248,7 @@ public class PipelineAnalyzer {
         public void enterFunctionCall(FunctionExpression expr) {
             final FunctionDescriptor<?> descriptor = expr.getFunction().descriptor();
             analyzeFunctions(descriptor);
+            analyzeRouting(descriptor, expr.getArgs());
             analyzeInputs(descriptor, expr.getArgs());
         }
 
@@ -221,18 +259,52 @@ public class PipelineAnalyzer {
             }
         }
 
+        private void analyzeRouting(FunctionDescriptor<?> descriptor, FunctionArgs args) {
+            if (descriptor.name().equals(RouteToStream.NAME)) {
+                if (args.getPreComputedValue(RouteToStream.ID_ARG) != null) {
+                    String streamId = args.getPreComputedValue(RouteToStream.ID_ARG).toString();
+                    String streamTitle = streamService.streamTitleFromCache(streamId);
+                    if (streamTitle != null) {
+                        addToRoutingRules(rule.id(), streamId);
+                    } else {
+                        LOG.warn("Could not find stream with id '{}'", streamId);
+                    }
+                } else if (args.getPreComputedValue(RouteToStream.NAME_ARG) != null) {
+                    String title = args.getPreComputedValue(RouteToStream.NAME_ARG).toString();
+                    List<Stream> streams = streamService.loadAllByTitle(title);
+                    if (streams.isEmpty()) {
+                        LOG.warn("Could not find stream with title '{}'", title);
+                    } else {
+                        streams.forEach(stream -> addToRoutingRules(rule.id(), stream.getId()));
+                    }
+                }
+            }
+        }
+
         private void analyzeInputs(FunctionDescriptor<?> descriptor, FunctionArgs args) {
             if (REFERENCING_FUNCTIONS.contains(descriptor.name())) {
                 String inputId = null;
-                if (args.getPreComputedValue(ID_ARG) != null) {
-                    inputId = args.getPreComputedValue(ID_ARG).toString();
-                } else if (args.getPreComputedValue(NAME_ARG) != null) {
-                    inputId = getInputId(args.getPreComputedValue(NAME_ARG).toString());
+                if (args.getPreComputedValue(FromInput.ID_ARG) != null) {
+                    inputId = args.getPreComputedValue(FromInput.ID_ARG).toString();
+                } else if (args.getPreComputedValue(FromInput.NAME_ARG) != null) {
+                    inputId = getInputId(args.getPreComputedValue(FromInput.NAME_ARG).toString());
                 }
                 if (inputId != null) {
                     createOrUpdateMention(inputId);
                 }
             }
+        }
+
+        private String getInputId(String inputName) {
+            final List<String> inputIds = inputService.findIdsByTitle(inputName);
+            if (inputIds.isEmpty()) {
+                LOG.warn("Could not find input with name '{}'", inputName);
+                return null;
+            }
+            if (inputIds.size() > 1) {
+                LOG.warn("Multiple inputs found with name '{}', using the first one with id '{}'", inputName, inputIds.getFirst());
+            }
+            return inputIds.getFirst();
         }
 
         private void createOrUpdateMention(String inputId) {
@@ -264,6 +336,15 @@ public class PipelineAnalyzer {
 
         public Set<String> getDeprecatedFunctions() {
             return deprecatedFunctions;
+        }
+
+        public Map<String, Set<String>> getRoutingRules() {
+            return routingRulesMap;
+        }
+
+        private void addToRoutingRules(String ruleId, String streamId) {
+            routingRulesMap.putIfAbsent(ruleId, new HashSet<>());
+            routingRulesMap.get(ruleId).add(streamId);
         }
 
         public boolean hasInputReference() {

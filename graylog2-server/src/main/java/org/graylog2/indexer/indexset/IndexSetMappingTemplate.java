@@ -17,7 +17,7 @@
 package org.graylog2.indexer.indexset;
 
 /**
- * Part of {@link IndexSetConfig} and {@link org.graylog2.indexer.IndexSet} needed by index template building.
+ * Part of {@link IndexSetConfig} and {@link IndexSet} needed by index template building.
  */
 public record IndexSetMappingTemplate(String indexAnalyzer,
                                       String indexWildcard,

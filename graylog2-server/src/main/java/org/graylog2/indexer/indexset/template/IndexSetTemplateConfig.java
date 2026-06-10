@@ -20,16 +20,18 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog2.indexer.indexset.fields.BaseIndexSetFields;
 import org.graylog2.indexer.indexset.fields.FieldRestrictionsField;
 import org.graylog2.indexer.indexset.fields.IndexAnalyzerField;
+import org.graylog2.indexer.indexset.fields.RotationAndRetentionFields;
+import org.graylog2.indexer.indexset.fields.ShardsAndReplicasField;
 import org.graylog2.indexer.indexset.fields.UseLegacyRotationField;
 
 @JsonAutoDetect
 @AutoValue
 @JsonDeserialize(builder = IndexSetTemplateConfig.Builder.class)
 public abstract class IndexSetTemplateConfig implements
-        BaseIndexSetFields,
+        ShardsAndReplicasField,
+        RotationAndRetentionFields,
         IndexAnalyzerField,
         UseLegacyRotationField,
         FieldRestrictionsField {
@@ -42,7 +44,8 @@ public abstract class IndexSetTemplateConfig implements
 
     @AutoValue.Builder
     public abstract static class Builder implements
-            BaseIndexSetFieldsBuilder<Builder>,
+            ShardsAndReplicasFieldBuilder<Builder>,
+            RotationAndRetentionFieldsBuilder<Builder>,
             IndexAnalyzerFieldBuilder<Builder>,
             UseLegacyRotationFieldBuilder<Builder>,
             FieldRestrictionsFieldBuilder<Builder> {

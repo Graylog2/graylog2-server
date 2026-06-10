@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix bright flashes on page reload when using the dark-mode theme."
+
+pulls = ["25766"]

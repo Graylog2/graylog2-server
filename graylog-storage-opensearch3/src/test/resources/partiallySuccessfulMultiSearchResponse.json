@@ -21,7 +21,10 @@
         ]
       },
       "hits": {
-        "total": 2499,
+        "total": {
+          "value": 2499,
+          "relation": "eq"
+        },
         "max_score": 0,
         "hits": []
       },
@@ -37,7 +40,10 @@
         "failed": 0
       },
       "hits": {
-        "total": 2499,
+        "total": {
+          "value": 2499,
+          "relation": "eq"
+        },
         "max_score": 0,
         "hits": []
       },

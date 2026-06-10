@@ -1,0 +1,220 @@
+{
+  "documents": [
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_0",
+            "indexType": "message",
+            "indexId": "01AAAAAAAAF0000000000001"
+          }
+        },
+        {
+          "data": {
+            "id": "01AAAAAAAAF0000000000001",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "def-filter-001",
+            "origin_context": null,
+            "timestamp": "2025-01-15 21:00:00.000",
+            "timestamp_processing": "2025-01-15 21:00:05.000",
+            "timerange_start": "2025-01-15 20:00:00.000",
+            "timerange_end": "2025-01-15 21:00:00.000",
+            "streams": ["000000000000000000000002"],
+            "source_streams": ["stream-001"],
+            "message": "Test filter event 1",
+            "source": "test-host",
+            "key_tuple": ["filter-key-a"],
+            "key": "filter-key-a",
+            "priority": 1,
+            "scores": {"raw_risk": 1.0, "normalized_risk": 1.0},
+            "associated_assets": [],
+            "alert": true,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": null
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_0",
+            "indexType": "message",
+            "indexId": "01AAAAAAAAF0000000000002"
+          }
+        },
+        {
+          "data": {
+            "id": "01AAAAAAAAF0000000000002",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "def-filter-001",
+            "origin_context": null,
+            "timestamp": "2025-01-15 21:30:00.000",
+            "timestamp_processing": "2025-01-15 21:30:05.000",
+            "timerange_start": "2025-01-15 20:30:00.000",
+            "timerange_end": "2025-01-15 21:30:00.000",
+            "streams": ["000000000000000000000002"],
+            "source_streams": ["stream-001"],
+            "message": "Test filter event 2",
+            "source": "test-host",
+            "key_tuple": ["filter-key-a"],
+            "key": "filter-key-a",
+            "priority": 1,
+            "scores": {"raw_risk": 1.0, "normalized_risk": 1.0},
+            "associated_assets": [],
+            "alert": true,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": null
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_0",
+            "indexType": "message",
+            "indexId": "01AAAAAAAAF0000000000003"
+          }
+        },
+        {
+          "data": {
+            "id": "01AAAAAAAAF0000000000003",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "def-filter-001",
+            "origin_context": null,
+            "timestamp": "2025-01-15 22:00:00.000",
+            "timestamp_processing": "2025-01-15 22:00:05.000",
+            "timerange_start": "2025-01-15 21:00:00.000",
+            "timerange_end": "2025-01-15 22:00:00.000",
+            "streams": ["000000000000000000000002"],
+            "source_streams": ["stream-001"],
+            "message": "Test filter event 3",
+            "source": "test-host",
+            "key_tuple": ["filter-key-b"],
+            "key": "filter-key-b",
+            "priority": 2,
+            "scores": {"raw_risk": 2.0, "normalized_risk": 2.0},
+            "associated_assets": [],
+            "alert": false,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": null
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_0",
+            "indexType": "message",
+            "indexId": "01AAAAAAAAF0000000000004"
+          }
+        },
+        {
+          "data": {
+            "id": "01AAAAAAAAF0000000000004",
+            "event_definition_type": "sigma-v1",
+            "event_definition_id": "def-filter-002",
+            "origin_context": null,
+            "timestamp": "2025-01-15 22:30:00.000",
+            "timestamp_processing": "2025-01-15 22:30:05.000",
+            "timerange_start": "2025-01-15 21:30:00.000",
+            "timerange_end": "2025-01-15 22:30:00.000",
+            "streams": ["000000000000000000000002"],
+            "source_streams": ["stream-001"],
+            "message": "Test filter event 4",
+            "source": "test-host",
+            "key_tuple": ["filter-key-a"],
+            "key": "filter-key-a",
+            "priority": 3,
+            "scores": {"raw_risk": 3.0, "normalized_risk": 3.0},
+            "associated_assets": [],
+            "alert": true,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": null
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_0",
+            "indexType": "message",
+            "indexId": "01AAAAAAAAF0000000000005"
+          }
+        },
+        {
+          "data": {
+            "id": "01AAAAAAAAF0000000000005",
+            "event_definition_type": "sigma-v1",
+            "event_definition_id": "def-filter-002",
+            "origin_context": null,
+            "timestamp": "2025-01-15 23:00:00.000",
+            "timestamp_processing": "2025-01-15 23:00:05.000",
+            "timerange_start": "2025-01-15 22:00:00.000",
+            "timerange_end": "2025-01-15 23:00:00.000",
+            "streams": ["000000000000000000000002"],
+            "source_streams": ["stream-001"],
+            "message": "Test filter event 5",
+            "source": "test-host",
+            "key_tuple": ["filter-key-b"],
+            "key": "filter-key-b",
+            "priority": 3,
+            "scores": {"raw_risk": 3.0, "normalized_risk": 3.0},
+            "associated_assets": [],
+            "alert": false,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": null
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_0",
+            "indexType": "message",
+            "indexId": "01AAAAAAAAF0000000000006"
+          }
+        },
+        {
+          "data": {
+            "id": "01AAAAAAAAF0000000000006",
+            "event_definition_type": "sigma-v1",
+            "event_definition_id": "def-filter-002",
+            "origin_context": null,
+            "timestamp": "2025-01-15 23:30:00.000",
+            "timestamp_processing": "2025-01-15 23:30:05.000",
+            "timerange_start": "2025-01-15 22:30:00.000",
+            "timerange_end": "2025-01-15 23:30:00.000",
+            "streams": ["000000000000000000000002"],
+            "source_streams": ["stream-001"],
+            "message": "Test filter event 6",
+            "source": "test-host",
+            "key_tuple": ["filter-key-b"],
+            "key": "filter-key-b",
+            "priority": 4,
+            "scores": {"raw_risk": 4.0, "normalized_risk": 4.0},
+            "associated_assets": [],
+            "alert": true,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": null
+          }
+        }
+      ]
+    }
+  ]
+}

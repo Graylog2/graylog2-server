@@ -16,8 +16,7 @@
  */
 import * as React from 'react';
 
-import { IfPermitted } from 'components/common';
-import { LinkContainer } from 'components/common/router';
+import { IfPermitted, LinkContainer } from 'components/common';
 import type User from 'logic/users/User';
 import Routes from 'routing/Routes';
 import { ButtonToolbar, Button } from 'components/bootstrap';

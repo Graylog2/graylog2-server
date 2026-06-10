@@ -16,38 +16,37 @@
  */
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
-import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentile;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Percentiles;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.PercentilesAggregationBuilder;
-import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
-import org.graylog.storage.opensearch3.views.searchtypes.OSSearchTypeHandler;
-import org.graylog.storage.opensearch3.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
+import org.graylog.storage.opensearch3.OSSerializationUtils;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
+import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 
-import javax.annotation.Nonnull;
-import java.util.List;
-import java.util.stream.Stream;
+import java.util.Map;
+import java.util.Optional;
 
-public class OSPercentilesHandler extends OSPivotSeriesSpecHandler<Percentile, Percentiles> {
-    @Nonnull
+public class OSPercentilesHandler extends OSBasicSeriesSpecHandler<Percentile> {
+
     @Override
-    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Percentile percentileSpec, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
-        final PercentilesAggregationBuilder percentiles = AggregationBuilders.percentiles(name).field(percentileSpec.field()).percentiles(percentileSpec.percentile());
-        record(queryContext, pivot, percentileSpec, name, Percentiles.class);
-        return List.of(SeriesAggregationBuilder.metric(percentiles));
+    protected SeriesAggregationBuilder createAggregationBuilder(final String name, final Percentile percentileSpec) {
+        return SeriesAggregationBuilder.metric(new MutableNamedAggregationBuilder(name,
+                Aggregation.builder().percentiles(p -> p
+                        .field(percentileSpec.field())
+                        .percents(percentileSpec.percentile()))));
     }
 
     @Override
-    public Stream<Value> doHandleResult(Pivot pivot,
-                                        Percentile pivotSpec,
-                                        SearchResponse searchResult,
-                                        Percentiles percentilesAggregation,
-                                        OSSearchTypeHandler<Pivot> searchTypeHandler,
-                                        OSGeneratedQueryContext queryContext) {
-        Double percentile = percentilesAggregation.percentile(pivotSpec.percentile());
-        return Stream.of(OSPivotSeriesSpecHandler.Value.create(pivotSpec.id(), Percentile.NAME, percentile));
+    protected Object getValueFromAggregationResult(final Aggregate agg, final Percentile percentileSpec) {
+        return Optional.ofNullable(agg)
+                .filter(Aggregate::isTdigestPercentiles)
+                .map(Aggregate::tdigestPercentiles)
+                .flatMap(v -> v.values().keyed().entrySet()
+                        .stream()
+                        .filter(e -> Double.parseDouble(e.getKey()) == percentileSpec.percentile())
+                        .findFirst()
+                        .map(Map.Entry::getValue)
+                        .map(OSSerializationUtils::toObject)
+                );
     }
 }

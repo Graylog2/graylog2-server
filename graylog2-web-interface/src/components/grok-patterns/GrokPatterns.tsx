@@ -22,10 +22,14 @@ import { Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
 import EditPatternModal from 'components/grok-patterns/EditPatternModal';
 import BulkLoadPatternModal from 'components/grok-patterns/BulkLoadPatternModal';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
-import { GrokPatternsStore } from 'stores/grok-patterns/GrokPatternsStore';
+import {
+  searchGrokPatternsPaginated,
+  testGrokPattern,
+  saveGrokPattern,
+  deleteGrokPattern,
+} from 'hooks/useGrokPatterns';
 import withTelemetry from 'logic/telemetry/withTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import type CancellablePromise from 'logic/rest/CancellablePromise';
 
 import GrokPatternQueryHelper from './GrokPatternQueryHelper';
 
@@ -39,8 +43,8 @@ const GrokPatternsList = styled(DataTable)`
   }
 `;
 
-const testPattern = (pattern, callback, errCallback) => {
-  GrokPatternsStore.testPattern(pattern, callback, errCallback);
+const _testPattern = (pattern, callback, errCallback) => {
+  testGrokPattern(pattern, callback, errCallback);
 };
 
 const _headerCellFormatter = (header) => {
@@ -75,8 +79,6 @@ class GrokPatterns extends React.Component<
     sendTelemetry: () => {},
   };
 
-  private loadPromise: CancellablePromise<unknown>;
-
   constructor(props) {
     super(props);
 
@@ -95,10 +97,10 @@ class GrokPatterns extends React.Component<
   }
 
   componentWillUnmount() {
-    if (this.loadPromise) {
-      this.loadPromise.cancel();
-    }
+    this._unmounted = true;
   }
+
+  private _unmounted = false;
 
   loadData = (
     callback?,
@@ -109,15 +111,13 @@ class GrokPatterns extends React.Component<
       pagination: { query },
     } = this.state;
 
-    this.loadPromise = GrokPatternsStore.searchPaginated(page, perPage, query).then(({ patterns, pagination }) => {
+    searchGrokPatternsPaginated(page, perPage, query).then((result) => {
       if (callback) {
         callback();
       }
 
-      if (!this.loadPromise?.isCancelled()) {
-        this.loadPromise = undefined;
-
-        this.setState({ patterns, pagination });
+      if (!this._unmounted && result) {
+        this.setState({ patterns: result.patterns, pagination: result.pagination });
       }
     });
   };
@@ -130,7 +130,7 @@ class GrokPatterns extends React.Component<
   };
 
   savePattern = (pattern, callback) => {
-    GrokPatternsStore.savePattern(pattern, () => {
+    saveGrokPattern(pattern, () => {
       callback();
       this.loadData();
     });
@@ -161,7 +161,7 @@ class GrokPatterns extends React.Component<
         `Really delete the grok pattern ${pattern.name}?\nIt will be removed from the system and unavailable for any extractor. If it is still in use by extractors those will fail to work.`,
       )
     ) {
-      GrokPatternsStore.deletePattern(pattern, () => {
+      deleteGrokPattern(pattern, () => {
         this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.GROK_PATTERN.DELETED, {
           app_pathname: 'grokpatterns',
           app_section: 'grokpatterns',
@@ -187,7 +187,7 @@ class GrokPatterns extends React.Component<
                 id={pattern.id}
                 name={pattern.name}
                 pattern={pattern.pattern}
-                testPattern={testPattern}
+                testPattern={_testPattern}
                 patterns={patterns}
                 create={false}
                 reload={this.loadData}
@@ -228,7 +228,7 @@ class GrokPatterns extends React.Component<
                   pattern=""
                   patterns={patterns}
                   create
-                  testPattern={testPattern}
+                  testPattern={_testPattern}
                   reload={this.loadData}
                   savePattern={this.savePattern}
                   validPatternName={this.validPatternName}

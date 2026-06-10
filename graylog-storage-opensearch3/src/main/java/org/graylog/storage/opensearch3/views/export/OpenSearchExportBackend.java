@@ -34,6 +34,7 @@ import org.graylog2.database.filtering.AttributeFilter;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.plugin.Message;
 import org.joda.time.DateTimeZone;
+import org.opensearch.client.opensearch._types.ExpandWildcard;
 import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.SortOrder;
 import org.opensearch.client.opensearch._types.mapping.FieldType;
@@ -126,7 +127,7 @@ public class OpenSearchExportBackend implements ExportBackend {
             final SearchResponse<Map> result = opensearchClient.sync(c -> c.search(searchRequest, Map.class), "failed to serarch");
             if (result.shards().failed() > 0) {
                 final List<String> errors = result.shards().failures().stream()
-                        .map(e -> e.reason().reason())
+                        .map(e -> e.index() + ": " + e.reason().reason())
                         .distinct()
                         .toList();
                 throw new ElasticsearchException("Unable to perform export query: ", errors);
@@ -141,6 +142,10 @@ public class OpenSearchExportBackend implements ExportBackend {
         return SearchRequest.of(builder -> {
 
             getIndices(command).ifPresent(builder::index);
+
+            builder.ignoreUnavailable(true);
+            builder.allowNoIndices(false);
+            builder.expandWildcards(ExpandWildcard.Open);
 
             builder.size(command.chunkSize())
                     .query(query(command))
@@ -159,7 +164,8 @@ public class OpenSearchExportBackend implements ExportBackend {
 
     @Nonnull
     private Optional<List<String>> getIndices(ExportMessagesCommand command) {
-        return Optional.of(indexLookup.indexNamesForStreamsInTimeRange(command.streams(), command.timeRange()))
+        final Set<String> indexNames = indexLookup.indexNamesForStreamsInTimeRange(command.streams(), command.timeRange());
+        return Optional.of(indexNames)
                 .filter(set -> !set.isEmpty())
                 .map(LinkedList::new);
     }

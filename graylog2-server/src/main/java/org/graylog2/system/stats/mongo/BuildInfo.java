@@ -36,6 +36,7 @@ public abstract class BuildInfo {
     public abstract String gitVersion();
 
     @JsonProperty("sys_info")
+    @Nullable
     public abstract String sysInfo();
 
     @JsonProperty("loader_flags")

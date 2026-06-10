@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { SyntheticEvent } from 'react';
 import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import styled from 'styled-components';
@@ -54,20 +53,6 @@ const shouldPopulateTemplate = (currentType: string, currentBody: string): boole
 };
 
 class HttpNotificationFormV2 extends React.Component<Props, any> {
-  static defaultConfig = {
-    url: '',
-    api_key_as_header: false,
-    api_key: '',
-    api_secret: { keep_value: true },
-    basic_auth: { keep_value: true },
-    skip_tls_verification: false,
-    method: 'POST',
-    time_zone: 'UTC',
-    body_template: DEFAULT_JSON_TEMPLATE,
-    content_type: 'JSON',
-    headers: '',
-  };
-
   constructor(props: Props) {
     super(props);
 
@@ -94,6 +79,20 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
     this.setState({ api_secret: config.api_secret.is_set ? '******' : '' });
   }
 
+  static defaultConfig = {
+    url: '',
+    api_key_as_header: false,
+    api_key: '',
+    api_secret: { keep_value: true },
+    basic_auth: { keep_value: true },
+    skip_tls_verification: false,
+    method: 'POST',
+    time_zone: 'UTC',
+    body_template: DEFAULT_JSON_TEMPLATE,
+    content_type: 'JSON',
+    headers: '',
+  };
+
   propagateChange = (key: string, value: any) => {
     const { config, onChange } = this.props;
     const nextConfig = cloneDeep(config);
@@ -109,9 +108,8 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
     this.propagateChange(name, inputValue);
   };
 
-  handleUrlChange = (event: SyntheticEvent<EventTarget>) => {
-    const target = event.target as HTMLInputElement;
-    this.propagateChange('url', target.value);
+  handleUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.propagateChange('url', event.target.value);
   };
 
   handleTimeZoneChange = (nextValue: string) => {
@@ -156,9 +154,9 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
     onChange(nextConfig);
   };
 
-  handleSecretInputChange = (event: { target: { name: string } }) => {
+  handleSecretInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name } = event.target;
-    const inputValue = FormsUtils.getValueFromInput(event.target);
+    const inputValue = String(FormsUtils.getValueFromInput(event.target));
     const value = inputValue.length === 0 ? { delete_value: true } : { set_value: inputValue };
 
     this.setState({ [name]: inputValue });

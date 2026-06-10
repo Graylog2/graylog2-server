@@ -28,6 +28,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.HashMap;
 
@@ -35,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -64,7 +66,7 @@ public class ProvisionerServiceTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        provisionerService = new ProvisionerService(userService, DateTimeZone.UTC, new HashMap<>());
+        provisionerService = new ProvisionerService(userService, new HashMap<>());
     }
 
     @Test
@@ -90,6 +92,7 @@ public class ProvisionerServiceTest {
         provisionerService.provision(userDetails);
         verify(userService, times(1)).save(isA(User.class));
         verify(user, times(1)).setFirstLastFullNames(eq(FIRST_NAME), eq(LAST_NAME));
+        verify(user, times(1)).setTimeZone((DateTimeZone) isNull());
     }
 
     @Test
@@ -114,5 +117,29 @@ public class ProvisionerServiceTest {
         provisionerService.provision(userDetails);
         verify(userService, times(1)).save(isA(User.class));
         verify(user, times(1)).setFullName(FULL_NAME);
+        verify(user, times(1)).setTimeZone((DateTimeZone) isNull());
+    }
+
+    @Test
+    public void testTimezoneSetWhenProvided() throws ValidationException {
+        when(authServiceBackend.backendId()).thenReturn(BACKEND_ID);
+        when(authServiceBackend.backendType()).thenReturn(BACKEND_TYPE);
+        final UserDetails.Builder detailsBuilder = provisionerService.newDetails(authServiceBackend);
+        detailsBuilder
+                .firstName(FIRST_NAME)
+                .lastName(LAST_NAME)
+                .base64AuthServiceUid("id")
+                .username(USERNAME)
+                .accountIsEnabled(true)
+                .email(EMAIL)
+                .timezone(ZoneId.of("America/New_York"))
+                .defaultRoles(Collections.emptySet());
+        final UserDetails userDetails = detailsBuilder.build();
+        final User user = mock(User.class);
+        when(userService.create()).thenReturn(user);
+        when(userService.save(isA(User.class))).thenReturn(USER_ID);
+        provisionerService.provision(userDetails);
+        verify(userService, times(1)).save(isA(User.class));
+        verify(user, times(1)).setTimeZone(eq(DateTimeZone.forID("America/New_York")));
     }
 }

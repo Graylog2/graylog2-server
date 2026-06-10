@@ -17,9 +17,9 @@
 package org.graylog2.plugin.quickjump.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.POST;
@@ -32,13 +32,14 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.quickjump.QuickJumpService;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.shared.rest.PublicCloudAPI;
 
 import java.io.IOException;
 
 import static org.graylog2.plugin.quickjump.QuickJumpConstants.DEFAULT_LIMIT;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "QuickJump", description = "Quick Jump Functionality", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "QuickJump", description = "Quick Jump Functionality")
 @Path("/quickjump")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
@@ -51,10 +52,10 @@ public class QuickJumpResource implements PluginRestResource {
     }
 
     @POST
-    @ApiOperation(value = "Returns results for existing entities based on supplied query")
+    @Operation(summary = "Returns results for existing entities based on supplied query")
     @NoAuditEvent("Not changing any data")
     @Timed
-    public QuickJumpResponse search(@ApiParam(name = "JSON Body") @Valid QuickJumpRequest request,
+    public QuickJumpResponse search(@Parameter(name = "JSON Body") @Valid QuickJumpRequest request,
                                     @Context SearchUser userContext) throws IOException {
         return quickJumpService.search(request.query(), request.limit().orElse(DEFAULT_LIMIT), userContext);
     }

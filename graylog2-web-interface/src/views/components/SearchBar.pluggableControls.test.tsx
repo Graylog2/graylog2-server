@@ -124,7 +124,11 @@ describe('SearchBar pluggable controls', () => {
   usePlugin(testPlugin);
 
   beforeEach(() => {
-    asMock(useSearchConfiguration).mockReturnValue({ config: mockSearchesClusterConfig, refresh: () => {} });
+    asMock(useSearchConfiguration).mockReturnValue({
+      config: mockSearchesClusterConfig,
+      refresh: () => {},
+      isInitialLoading: false,
+    });
   });
 
   it('should render and have initial values', async () => {
@@ -141,21 +145,23 @@ describe('SearchBar pluggable controls', () => {
       render(<SearchBar />);
 
       const pluggableFormField = await screen.findByLabelText('Pluggable Control');
-      userEvent.type(pluggableFormField, '2');
+      await userEvent.type(pluggableFormField, '2');
 
       const searchButton = screen.getByRole('button', {
         name: /perform search \(changes were made after last search execution\)/i,
       });
       await waitFor(() => expect(searchButton).not.toHaveClass('disabled'));
-      userEvent.click(searchButton);
+      await userEvent.click(searchButton);
 
       await waitFor(() =>
         expect(mockOnSubmitFromPlugin).toHaveBeenCalledWith(
           {
             pluggableControl: 'Initial Value2',
             queryString: '*',
-            streams: [],
-            streamCategories: [],
+            'streamsAndCategories': {
+              'categories': [],
+              'streams': [],
+            },
             timerange: { from: 300, type: 'relative' },
           },
           expect.any(Function),
@@ -174,8 +180,10 @@ describe('SearchBar pluggable controls', () => {
         {
           pluggableControl: 'Initial Value',
           queryString: '*',
-          streams: [],
-          streamCategories: [],
+          'streamsAndCategories': {
+            'categories': [],
+            'streams': [],
+          },
           timerange: { from: 300, type: 'relative' },
         },
         {

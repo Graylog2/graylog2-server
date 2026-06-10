@@ -18,7 +18,6 @@ package org.graylog2.indexer.messages;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.failure.FailureSubmissionService;
-import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
@@ -89,11 +88,10 @@ public class MessagesTest {
     @Test
     public void bulkIndexingShouldAccountMessageSizes() throws IOException {
         when(messagesAdapter.bulkIndex(any())).thenReturn(IndexingResults.empty());
-        final IndexSet indexSet = mock(IndexSet.class);
         final List<MessageWithIndex> messageList = List.of(
-                new MessageWithIndex(wrap(messageWithSize(17)), indexSet),
-                new MessageWithIndex(wrap(messageWithSize(23)), indexSet),
-                new MessageWithIndex(wrap(messageWithSize(42)), indexSet)
+                new MessageWithIndex(wrap(messageWithSize(17)), ""),
+                new MessageWithIndex(wrap(messageWithSize(23)), ""),
+                new MessageWithIndex(wrap(messageWithSize(42)), "")
         );
         when(messagesAdapter.bulkIndex(any())).thenReturn(IndexingResults.create(createSuccessFromMessages(messageList), List.of()));
 
@@ -101,38 +99,52 @@ public class MessagesTest {
 
         verify(trafficAccounting, times(1)).addOutputTraffic(82);
         verify(trafficAccounting, never()).addSystemTraffic(anyLong());
+        verify(trafficAccounting, times(1)).addIndexedInputTraffic(82);
     }
 
     @Test
     public void bulkIndexingShouldAccountMessageSizesForSystemTrafficSeparately() throws IOException {
-        final IndexSet indexSet = mock(IndexSet.class);
         final List<MessageWithIndex> messageList = List.of(
-                new MessageWithIndex(wrap(messageWithSize(17)), indexSet),
-                new MessageWithIndex(wrap(messageWithSize(23)), indexSet),
-                new MessageWithIndex(wrap(messageWithSize(42)), indexSet)
+                new MessageWithIndex(wrap(messageWithSize(17)), ""),
+                new MessageWithIndex(wrap(messageWithSize(23)), ""),
+                new MessageWithIndex(wrap(messageWithSize(42)), "")
         );
         when(messagesAdapter.bulkIndex(any())).thenReturn(IndexingResults.create(createSuccessFromMessages(messageList), List.of()));
 
         messages.bulkIndex(messageList, true);
 
         verify(trafficAccounting, never()).addOutputTraffic(anyLong());
+        verify(trafficAccounting, never()).addIndexedInputTraffic(anyLong());
         verify(trafficAccounting, times(1)).addSystemTraffic(82);
+    }
+
+    @Test
+    public void bulkIndexingShouldAccountIndexedInputTraffic() throws IOException {
+        final List<MessageWithIndex> messageList = List.of(
+                new MessageWithIndex(wrap(messageWithInputSize(17, 100)), ""),
+                new MessageWithIndex(wrap(messageWithInputSize(23, 200)), ""),
+                new MessageWithIndex(wrap(messageWithInputSize(42, 300)), "")
+        );
+        when(messagesAdapter.bulkIndex(any())).thenReturn(IndexingResults.create(createSuccessFromMessages(messageList), List.of()));
+
+        messages.bulkIndex(messageList);
+
+        verify(trafficAccounting, times(1)).addIndexedInputTraffic(600);
     }
 
     @Test
     public void bulkIndexRequests_allNonIndexBlockErrorsPropagatedToTheFailureSubmissionService() throws Exception {
         // given
         final DateTime ts = Tools.nowUTC();
-        final IndexSet indexSet = mock(IndexSet.class);
         final Message message1 = mock(Message.class);
         final Message message2 = message("msg-2", ts);
         final Message message3 = message("msg-3", ts);
         final Message message4 = message("msg-4", ts);
 
         final List<IndexingRequest> indexingRequest = ImmutableList.of(
-                IndexingRequest.create(indexSet, message1),
-                IndexingRequest.create(indexSet, message2),
-                IndexingRequest.create(indexSet, message3));
+                IndexingRequest.create("", message1),
+                IndexingRequest.create("", message2),
+                IndexingRequest.create("", message3));
 
         when(messagesAdapter.bulkIndex(indexingRequest)).thenReturn(
                 IndexingResults.create(List.of(),
@@ -177,13 +189,12 @@ public class MessagesTest {
     public void bulkIndexRequests_nothingPropagatedToFailureSubmissionServiceWhenThereAreNoIndexingErrors() throws Exception {
         // given
         final DateTime ts = Tools.nowUTC();
-        final IndexSet indexSet = mock(IndexSet.class);
         final Message message1 = message("msg-1", ts);
         final Message message2 = message("msg-2", ts);
 
         final List<IndexingRequest> indexingRequest = ImmutableList.of(
-                IndexingRequest.create(indexSet, message1),
-                IndexingRequest.create(indexSet, message2));
+                IndexingRequest.create("", message1),
+                IndexingRequest.create("", message2));
 
         when(messagesAdapter.bulkIndex(indexingRequest)).thenReturn(IndexingResults.empty());
 
@@ -212,6 +223,13 @@ public class MessagesTest {
         final Message message = mock(Message.class);
         when(message.getSize()).thenReturn(size);
 
+        return message;
+    }
+
+    private Message messageWithInputSize(long size, long inputSize) {
+        final Message message = mock(Message.class);
+        when(message.getSize()).thenReturn(size);
+        when(message.getField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE)).thenReturn(inputSize);
         return message;
     }
 }

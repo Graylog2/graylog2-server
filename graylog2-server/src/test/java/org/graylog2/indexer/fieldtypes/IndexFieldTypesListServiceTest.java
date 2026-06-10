@@ -18,7 +18,7 @@ package org.graylog2.indexer.fieldtypes;
 
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.database.filtering.inmemory.InMemoryFilterExpressionParser;
-import org.graylog2.indexer.MongoIndexSet;
+import org.graylog2.indexer.indexset.MongoIndexSet;
 import org.graylog2.indexer.fieldtypes.utils.FieldTypeDTOsMerger;
 import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.CustomFieldMappings;

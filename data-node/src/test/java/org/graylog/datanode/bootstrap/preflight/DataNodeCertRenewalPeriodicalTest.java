@@ -42,6 +42,7 @@ import java.util.function.Supplier;
 
 class DataNodeCertRenewalPeriodicalTest {
 
+    private static final CertificateGenerator CERTIFICATE_GENERATOR = new CertificateGenerator(1024);
 
     private Path tempDir;
 
@@ -119,7 +120,7 @@ class DataNodeCertRenewalPeriodicalTest {
         Assertions.assertThat(csr.getSubject().toString()).isEqualTo("CN=my-hostname");
 
         final CsrSigner signer = new CsrSigner();
-        final KeyPair ca = CertificateGenerator.generate(CertRequest.selfSigned("Graylog CA").isCA(true).validity(Duration.ofDays(365)));
+        final KeyPair ca = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("Graylog CA").isCA(true).validity(Duration.ofDays(365)));
         final X509Certificate datanodeCert = signer.sign(ca.privateKey(), ca.certificate(), csr, (int) certValidity.toDays());
         final CertificateChain certChain = new CertificateChain(datanodeCert, List.of(ca.certificate()));
 

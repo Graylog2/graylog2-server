@@ -17,6 +17,7 @@
 package org.graylog2.bootstrap.preflight.web.resources;
 
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -49,7 +50,16 @@ public class CertificateRenewalPolicyResource {
     @POST
     @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     @NoAuditEvent("No Auditing during preflight")
-    public void set(@NotNull RenewalPolicy renewalPolicy) {
-        this.clusterConfigService.write(renewalPolicy);
+    public void set(@NotNull @Valid RenewalPolicy renewalPolicy) {
+        this.clusterConfigService.write(validatePolicy(renewalPolicy));
+    }
+
+    private RenewalPolicy validatePolicy(@NotNull @Valid RenewalPolicy renewalPolicy) {
+        try {
+            renewalPolicy.parsedCertificateLifetime();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid certificate lifetime value: " + renewalPolicy.certificateLifetime(), e);
+        }
+        return renewalPolicy;
     }
 }

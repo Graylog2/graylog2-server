@@ -15,16 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import URI from 'urijs';
 
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
-import { LinkContainer } from 'components/common/router';
-import { DropdownSubmenu, ExternalLinkButton, IfPermitted } from 'components/common';
+import { LinkContainer, DropdownSubmenu, IfPermitted } from 'components/common';
 import { Button, DropdownButton, MenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import HideOnCloud from 'util/conditional/HideOnCloud';
-import { SystemLoadBalancerStore } from 'stores/load-balancer/SystemLoadBalancerStore';
-import { SystemProcessingStore } from 'stores/system-processing/SystemProcessingStore';
+import { overrideLoadBalancerStatus } from 'api/system-load-balancer';
+import { pauseProcessing, resumeProcessing } from 'api/system-processing';
 
 type NodesActionsProps = {
   node: any;
@@ -47,9 +45,9 @@ class NodesActions extends React.Component<
       )
     ) {
       if (systemOverview.is_processing) {
-        SystemProcessingStore.pause(node.node_id);
+        pauseProcessing(node.node_id);
       } else {
-        SystemProcessingStore.resume(node.node_id);
+        resumeProcessing(node.node_id);
       }
     }
   };
@@ -58,13 +56,12 @@ class NodesActions extends React.Component<
     // eslint-disable-next-line no-alert
     if (window.confirm(`You are about to change the load balancer status for this node to ${status}. Are you sure?`)) {
       const { node } = this.props;
-      SystemLoadBalancerStore.override(node.node_id, status);
+      overrideLoadBalancerStatus(node.node_id, status);
     }
   };
 
   render() {
     const { systemOverview, node } = this.props;
-    const apiBrowserURI = new URI(`${node.transport_address}/api-browser/`).normalizePathname().toString();
 
     return (
       <ButtonToolbar>
@@ -75,8 +72,6 @@ class NodesActions extends React.Component<
         <LinkContainer to={Routes.SYSTEM.METRICS(node.node_id)}>
           <Button>Metrics</Button>
         </LinkContainer>
-
-        <ExternalLinkButton href={apiBrowserURI}>API browser</ExternalLinkButton>
 
         <DropdownButton title="More actions" id={`more-actions-dropdown-${node.node_id}`} pullRight>
           <IfPermitted permissions="processing:changestate">

@@ -111,11 +111,11 @@ public class CertutilHttp implements CliCommand {
             final Path caKeystorePath = Path.of(caKeystoreFilename);
             console.printLine("Using certificate authority " + caKeystorePath.toAbsolutePath());
 
-            try {
+            try (FileInputStream fis = new FileInputStream(caKeystoreFilename)) {
 
                 char[] password = console.readPassword(PROMPT_ENTER_CA_PASSWORD);
                 KeyStore caKeystore = KeyStore.getInstance("PKCS12");
-                caKeystore.load(new FileInputStream(caKeystoreFilename), password);
+                caKeystore.load(fis, password);
 
                 final PrivateKey caPrivateKey = (PrivateKey) caKeystore.getKey(CA_KEY_ALIAS, password);
                 final X509Certificate caCertificate = (X509Certificate) caKeystore.getCertificate(CA_KEY_ALIAS);
@@ -169,10 +169,9 @@ public class CertutilHttp implements CliCommand {
     }
 
     private static void writePem(Path path, Object object) throws IOException {
-        FileWriter writer = new FileWriter(path.toFile(), StandardCharsets.UTF_8);
-        JcaPEMWriter pemWriter = new JcaPEMWriter(writer);
-        pemWriter.writeObject(object);
-        pemWriter.flush();
-        pemWriter.close();
+        try (JcaPEMWriter pemWriter = new JcaPEMWriter(new FileWriter(path.toFile(), StandardCharsets.UTF_8))) {
+            pemWriter.writeObject(object);
+            pemWriter.flush();
+        }
     }
 }

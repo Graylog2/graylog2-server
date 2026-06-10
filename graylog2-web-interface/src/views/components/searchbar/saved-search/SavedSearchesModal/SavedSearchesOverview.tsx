@@ -53,13 +53,12 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
 
   return (
     <PaginatedEntityTable<View>
-      actionsCellWidth={120}
       additionalAttributes={pluggableAttributes.attributes}
       bulkSelection={{ actions: <BulkActions /> }}
       columnRenderers={customColumnRenderers}
       entityActions={renderSavedSearchActions}
       entityAttributesAreCamelCase
-      expandedSectionsRenderer={pluggableExpandedSections}
+      expandedSectionRenderers={pluggableExpandedSections}
       fetchEntities={fetchSavedSearches}
       focusSearchAfterMount
       humanName="Saved Searches"

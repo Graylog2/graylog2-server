@@ -41,6 +41,7 @@ import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion
 import org.graylog.plugins.pipelineprocessor.functions.conversion.MapConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.dates.DateConversion;
+import org.graylog.plugins.pipelineprocessor.functions.dates.DateDiff;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FlexParseDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FormatDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.IsDate;
@@ -115,6 +116,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveMultipleFi
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveSingleField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveStringFieldsByValue;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RenameField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RenameFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetFields;
@@ -187,6 +189,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(SetField.NAME, SetField.class);
         addMessageProcessorFunction(SetFields.NAME, SetFields.class);
         addMessageProcessorFunction(RenameField.NAME, RenameField.class);
+        addMessageProcessorFunction(RenameFields.NAME, RenameFields.class);
         addMessageProcessorFunction(RemoveField.NAME, RemoveField.class);
         addMessageProcessorFunction(RemoveSingleField.NAME, RemoveSingleField.class);
         addMessageProcessorFunction(RemoveMultipleFields.NAME, RemoveMultipleFields.class);
@@ -244,6 +247,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(ParseUnixMilliseconds.NAME, ParseUnixMilliseconds.class);
         addMessageProcessorFunction(FlexParseDate.NAME, FlexParseDate.class);
         addMessageProcessorFunction(FormatDate.NAME, FormatDate.class);
+        addMessageProcessorFunction(DateDiff.NAME, DateDiff.class);
         addMessageProcessorFunction(Years.NAME, Years.class);
         addMessageProcessorFunction(Months.NAME, Months.class);
         addMessageProcessorFunction(Weeks.NAME, Weeks.class);

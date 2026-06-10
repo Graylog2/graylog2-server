@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import selectEvent from 'helpers/selectEvent';
 import asMock from 'helpers/mocking/AsMock';
@@ -55,6 +56,8 @@ const SUT = ({ ...props }) => (
   />
 );
 
+const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+
 describe('EntityCreateShareFormGroup', () => {
   beforeEach(() => {
     asMock(EntityShareStore.getInitialState).mockReturnValue({ state: createEntityShareState });
@@ -92,7 +95,7 @@ describe('EntityCreateShareFormGroup', () => {
       name: /add collaborator/i,
     });
 
-    fireEvent.click(addCollaborator);
+    await setupUser().click(addCollaborator);
 
     await waitFor(() => {
       expect(EntityShareActions.prepare).toHaveBeenCalledWith('stream', '', null, {

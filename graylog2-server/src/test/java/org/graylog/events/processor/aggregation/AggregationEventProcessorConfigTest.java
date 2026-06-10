@@ -22,8 +22,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog.events.TestEventProcessorConfig;
+import org.graylog.events.conditions.BooleanExpression;
 import org.graylog.events.conditions.Expr;
-import org.graylog.events.conditions.Expression;
 import org.graylog.events.fields.providers.TemplateFieldValueProvider;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.DBEventProcessorStateService;
@@ -158,7 +158,7 @@ public class AggregationEventProcessorConfigTest {
     }
 
     private AggregationConditions getConditions() {
-        final Expression<Boolean> expression = Expr.Greater.create(Expr.NumberReference.create("foo"),
+        final BooleanExpression expression = Expr.Greater.create(Expr.NumberReference.create("foo"),
                 Expr.NumberValue.create(42.0));
         return AggregationConditions.builder()
                 .expression(expression)

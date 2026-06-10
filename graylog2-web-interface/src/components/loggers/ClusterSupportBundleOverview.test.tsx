@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { fireEvent, render, screen } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
 import useClusterSupportBundle from 'hooks/useClusterSupportBundle';
@@ -46,7 +47,7 @@ describe('ClusterSupportBundleOverview', () => {
 
     const createButton = screen.getByRole('button', { name: /Create Support Bundle/i });
 
-    fireEvent.click(createButton);
+    await userEvent.click(createButton);
 
     expect(onCreate).toHaveBeenCalled();
   });
@@ -56,13 +57,13 @@ describe('ClusterSupportBundleOverview', () => {
 
     const deleteButton = screen.getByRole('button', { name: /Delete/i });
 
-    fireEvent.click(deleteButton);
+    await userEvent.click(deleteButton);
 
     const confirmButton = await screen.findByRole('button', { name: /Confirm/i });
 
     expect(confirmButton).toBeInTheDocument();
 
-    fireEvent.click(confirmButton);
+    await userEvent.click(confirmButton);
 
     expect(onDelete).toHaveBeenCalledWith(file_name);
   });
@@ -72,7 +73,7 @@ describe('ClusterSupportBundleOverview', () => {
 
     const downloadButton = screen.getByRole('button', { name: /Download/i });
 
-    fireEvent.click(downloadButton);
+    await userEvent.click(downloadButton);
 
     expect(onDownload).toHaveBeenCalledWith(file_name);
   });

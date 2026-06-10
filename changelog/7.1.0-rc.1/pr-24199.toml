@@ -1,0 +1,5 @@
+type = "a" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Add aggregation key/values to event for notifications."
+
+issues = ["23500"]
+pulls = ["24199"]

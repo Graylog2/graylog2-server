@@ -21,6 +21,9 @@ import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import PluggableCommands from './PluggableCommands';
 
+jest.mock('formik', () => ({
+  useFormikContext: () => ({}),
+}));
 describe('PluggableCommands', () => {
   const plugin: PluginExports = {
     'views.queryInput.commands': [

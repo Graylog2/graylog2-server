@@ -17,9 +17,15 @@
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -27,24 +33,16 @@ import org.graylog2.messageprocessors.MessageProcessorsConfig;
 import org.graylog2.messageprocessors.MessageProcessorsConfigWithDescriptors;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-
-import jakarta.inject.Inject;
-
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
-
 @RequiresAuthentication
-@Api(value = "System/MessageProcessors", description = "Manage message processors", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "System/MessageProcessors", description = "Manage message processors")
 @Path("/system/messageprocessors")
 @Produces(MediaType.APPLICATION_JSON)
 public class MessageProcessorsResource extends RestResource {
@@ -65,7 +63,7 @@ public class MessageProcessorsResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get message processor configuration")
+    @Operation(summary = "Get message processor configuration")
     @Path("config")
     public MessageProcessorsConfigWithDescriptors config() {
         checkPermission(RestPermissions.CLUSTER_CONFIG_ENTRY_READ);
@@ -77,10 +75,10 @@ public class MessageProcessorsResource extends RestResource {
 
     @PUT
     @Timed
-    @ApiOperation(value = "Update message processor configuration")
+    @Operation(summary = "Update message processor configuration")
     @Path("config")
     @AuditEvent(type = AuditEventTypes.MESSAGE_PROCESSOR_CONFIGURATION_UPDATE)
-    public MessageProcessorsConfigWithDescriptors updateConfig(@ApiParam(name = "config", required = true) final MessageProcessorsConfigWithDescriptors configWithDescriptors) {
+    public MessageProcessorsConfigWithDescriptors updateConfig(@Parameter(name = "config", required = true) final MessageProcessorsConfigWithDescriptors configWithDescriptors) {
         checkPermission(RestPermissions.CLUSTER_CONFIG_ENTRY_EDIT);
         final MessageProcessorsConfig config = configWithDescriptors.toConfig();
 

@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { screen, render, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { screen, render } from 'wrappedTestingLibrary';
 
 import { passwordTextField, requiredTextField, textAreaField, textField } from 'fixtures/configurationforms';
 
@@ -71,13 +72,14 @@ describe('<TextField>', () => {
   it('should call onChange when value changes', async () => {
     const updateFunction = jest.fn();
 
-    render(<SUT onChange={updateFunction} value={textField.default_value} />);
+    render(<SUT onChange={updateFunction} value="" />);
 
     const formField = screen.getByLabelText(textField.human_name, { exact: false });
 
-    fireEvent.change(formField, { target: { value: 'new value' } });
+    await userEvent.click(formField);
+    await userEvent.paste('new value');
 
-    await waitFor(() => expect(updateFunction).toHaveBeenCalledWith('example_text_field', 'new value'));
+    expect(updateFunction).toHaveBeenLastCalledWith('example_text_field', 'new value');
   });
 
   it('should render a password field', () => {

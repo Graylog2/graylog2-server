@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -33,7 +34,7 @@ function AdapterTypeSelect({ adapterConfigType, onAdapterChange }: Props) {
   const plugins = usePluginEntities('lookupTableAdapters');
   const adapterPlugins = Object.fromEntries(plugins.map((p) => [p.type, p]));
 
-  const sortedAdapters = React.useMemo(() => {
+  const sortedAdapters = useMemo(() => {
     if (!fetchingDataAdapterTypes) {
       return Object.keys(types)
         .map((key) => {
@@ -63,28 +64,16 @@ function AdapterTypeSelect({ adapterConfigType, onAdapterChange }: Props) {
     return [];
   }, [types, fetchingDataAdapterTypes, adapterPlugins]);
 
-  const _getCorrectUserpasswd = (config: LookupTableAdapter['config']) => {
-    if (config.user_passwd.is_set) return { is_set: true, keep_value: true };
-
-    return { set_value: '' };
-  };
-
-  const handleTypeSelect = React.useCallback(
+  const handleTypeSelect = useCallback(
     (adapterType: string) => {
       const defaultConfig = { ...types[adapterType].default_config };
-      const isLDAP = defaultConfig.type === 'LDAP';
-
-      const configWithPassword = {
-        ...defaultConfig,
-        ...(isLDAP ? { user_passwd: _getCorrectUserpasswd(defaultConfig) } : {}),
-      };
 
       onAdapterChange({
         id: null,
         title: '',
         name: '',
         description: '',
-        config: configWithPassword,
+        config: defaultConfig,
       });
     },
     [onAdapterChange, types],

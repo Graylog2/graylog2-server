@@ -17,7 +17,6 @@
 package org.graylog2.inputs.routing;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.eventbus.EventBus;
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
@@ -31,6 +30,7 @@ import org.graylog.plugins.pipelineprocessor.rest.PipelineSource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineUtils;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.Input;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.InputRoutingService;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.streams.Stream;
@@ -67,7 +67,7 @@ class InputRoutingServiceTest {
     final RuleService ruleService = mock(RuleService.class);
     final PipelineService pipelineService = mock(PipelineService.class);
     final PipelineRuleParser pipelineRuleParser = mock(PipelineRuleParser.class);
-    final EventBus eventBus = mock(EventBus.class);
+    final ClusterEventBus clusterEventBus = new ClusterEventBus();
     final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     InputRoutingService inputRoutingService;
@@ -82,7 +82,7 @@ class InputRoutingServiceTest {
     @BeforeEach
     void setUp() {
         inputRoutingService = new InputRoutingService(
-                ruleService, inputService, streamService, pipelineService, pipelineRuleParser, eventBus);
+                ruleService, inputService, streamService, pipelineService, pipelineRuleParser, clusterEventBus);
     }
 
     @Test

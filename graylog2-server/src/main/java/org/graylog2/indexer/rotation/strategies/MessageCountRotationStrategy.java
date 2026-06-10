@@ -17,7 +17,7 @@
 package org.graylog2.indexer.rotation.strategies;
 
 import org.graylog2.indexer.IndexNotFoundException;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.rotation.common.IndexRotator;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;

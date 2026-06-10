@@ -18,8 +18,8 @@ package org.graylog2.shared.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.plugin.Capabilities;
 import org.graylog2.plugin.PluginMetaData;
@@ -37,7 +37,7 @@ import jakarta.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.Set;
 
-@Api(value = "System/Plugins", description = "Plugin information")
+@Tag(name = "System/Plugins", description = "Plugin information")
 @Path("/system/plugins")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
@@ -51,7 +51,7 @@ public class SystemPluginResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "List all installed plugins on this node.")
+    @Operation(summary = "List all installed plugins on this node.")
     public PluginList list() {
         final List<PluginMetaDataValue> pluginMetaDataValues = Lists.newArrayList();
 

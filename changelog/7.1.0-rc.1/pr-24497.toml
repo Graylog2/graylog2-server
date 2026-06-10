@@ -1,0 +1,5 @@
+type = "a"
+message = "Add new system job scheduler to replace the legacy system job infrastructure."
+
+issues = ["architecture#61"]
+pulls = ["24497", "graylog-plugin-enterprise#12727"]

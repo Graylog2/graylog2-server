@@ -23,6 +23,8 @@ import type { Api, Route, Operation, Parameter, Type, EnumType, TypeLiteral, Mod
 
 const REQUEST_FUNCTION_NAME = '__request__';
 const REQUEST_FUNCTION_IMPORT = 'routing/request';
+const requestOptionsParameterName = 'requestOptions';
+const requestOptionsTypeName = 'RequestOptions';
 const readonlyModifier = ts.factory.createModifier(ts.SyntaxKind.ReadonlyKeyword);
 
 const emitString = (s: string) => ts.factory.createStringLiteral(s, true);
@@ -268,6 +270,7 @@ const emitBlock = (
           body,
           queryParameters,
           headers,
+          ts.factory.createIdentifier(requestOptionsParameterName),
         ]),
       ),
     ],
@@ -373,6 +376,15 @@ const bannedFunctionNames = {
 const unbanFunctionname = (nickname: string): string =>
   Object.keys(bannedFunctionNames).includes(nickname) ? bannedFunctionNames[nickname] : nickname;
 
+const requestOptionsParameter = ts.factory.createParameterDeclaration(
+  undefined,
+  undefined,
+  ts.factory.createIdentifier(requestOptionsParameterName),
+  ts.factory.createToken(ts.SyntaxKind.QuestionToken),
+  ts.factory.createTypeReferenceNode(ts.factory.createIdentifier(requestOptionsTypeName), undefined),
+  undefined,
+);
+
 const emitRoute = (
   { nickname, parameters: rawParameters = [], method, type, path: operationPath, summary, produces }: Operation,
   path: string,
@@ -416,7 +428,7 @@ const emitRoute = (
         undefined,
         ts.factory.createIdentifier(functionName),
         undefined,
-        parameters.sort(sortByOptionality).map(emitFunctionParameter),
+        [...parameters.sort(sortByOptionality).map(emitFunctionParameter), requestOptionsParameter],
         emitPromiseResultType(emitType(type)),
         emitBlock(
           method,
@@ -458,11 +470,25 @@ const emitApiObject = (routes: Array<Route>) => {
   return result.flatMap(({ nodes }) => nodes);
 };
 
-const importDeclaration = ts.factory.createImportDeclaration(
-  undefined,
-  ts.factory.createImportClause(false, ts.factory.createIdentifier(REQUEST_FUNCTION_NAME), undefined),
-  emitString(REQUEST_FUNCTION_IMPORT),
-);
+const importDeclarations = [
+  ts.factory.createImportDeclaration(
+    undefined,
+    ts.factory.createImportClause(false, ts.factory.createIdentifier(REQUEST_FUNCTION_NAME), undefined),
+    emitString(REQUEST_FUNCTION_IMPORT),
+  ),
+  ts.factory.createImportDeclaration(
+    undefined,
+    ts.factory.createImportClause(
+      ts.SyntaxKind.TypeKeyword,
+      undefined,
+      ts.factory.createNamedImports([
+        ts.factory.createImportSpecifier(false, undefined, ts.factory.createIdentifier(requestOptionsTypeName)),
+      ]),
+    ),
+    emitString(REQUEST_FUNCTION_IMPORT),
+    undefined,
+  ),
+];
 
 const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
 
@@ -532,17 +558,25 @@ function emitApi({ name, models, routes }: Api) {
     .map(emitModel);
 
   const apiObject = emitApiObject(routes);
-  const rootNode = ts.factory.createNodeArray([importDeclaration, ...emittedModels, ...apiObject]);
+  const nodes = routes.length > 0 ? [...importDeclarations, ...emittedModels, ...apiObject] : [...emittedModels];
+  if (routes.length > 0 || Object.keys(models).length > 0) {
+    const rootNode = ts.factory.createNodeArray(nodes);
 
-  const filename = `${name}.ts`;
-  const file = ts.createSourceFile(filename, '', ts.ScriptTarget.ESNext, false, ts.ScriptKind.TS);
+    const filename = `${name}.ts`;
+    const file = ts.createSourceFile(filename, '', ts.ScriptTarget.ESNext, false, ts.ScriptKind.TS);
 
-  return printer.printList(ts.ListFormat.MultiLine, rootNode, file);
+    return printer.printList(ts.ListFormat.MultiLine, rootNode, file);
+  }
+
+  return null;
 }
 
 export default function emit(apis: Array<Api>) {
-  const emittedApis = Object.fromEntries(apis.map((api) => [api.name, emitApi(api)]));
-  const summary = emitSummary(apis);
+  const emittedApis: { [key: string]: string } = Object.fromEntries(
+    apis.map((api) => [api.name, emitApi(api)]).filter(([, file]) => !!file),
+  );
+  const filteredApis = apis.filter((api) => emittedApis[api.name]);
+  const summary = emitSummary(filteredApis);
 
   return [emittedApis, summary] as const;
 }

@@ -17,19 +17,11 @@
 package org.graylog2.rest.resources.cluster;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.cluster.NodeService;
-import org.graylog2.rest.RemoteInterfaceProvider;
-import org.graylog2.shared.rest.resources.ProxiedResource;
-import org.graylog2.shared.rest.resources.system.RemoteDeflectorResource;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -37,14 +29,20 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.cluster.NodeService;
+import org.graylog2.rest.RemoteInterfaceProvider;
+import org.graylog2.shared.rest.PublicCloudAPI;
+import org.graylog2.shared.rest.resources.ProxiedResource;
+import org.graylog2.shared.rest.resources.system.RemoteDeflectorResource;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
-
 @RequiresAuthentication
-@Api(value = "Cluster/Deflector", description = "Cluster-wide deflector handling", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Cluster/Deflector", description = "Cluster-wide deflector handling")
 @Path("/cluster/deflector")
 @Produces(MediaType.APPLICATION_JSON)
 public class ClusterDeflectorResource extends ProxiedResource {
@@ -58,7 +56,7 @@ public class ClusterDeflectorResource extends ProxiedResource {
 
     @POST
     @Timed
-    @ApiOperation(value = "Finds leader node and triggers deflector cycle")
+    @Operation(summary = "Finds leader node and triggers deflector cycle")
     @Path("/cycle")
     @NoAuditEvent("this is a proxy resource, the event will be triggered on the individual nodes")
     public void cycle() throws IOException {
@@ -67,10 +65,10 @@ public class ClusterDeflectorResource extends ProxiedResource {
 
     @POST
     @Timed
-    @ApiOperation(value = "Finds leader node and triggers deflector cycle")
+    @Operation(summary = "Finds leader node and triggers deflector cycle")
     @Path("/{indexSetId}/cycle")
     @NoAuditEvent("this is a proxy resource, the event will be triggered on the individual nodes")
-    public void cycle(@ApiParam(name = "indexSetId") @PathParam("indexSetId") String indexSetId) throws IOException {
+    public void cycle(@Parameter(name = "indexSetId") @PathParam("indexSetId") String indexSetId) throws IOException {
         requestOnLeader(c -> c.cycleIndexSet(indexSetId), RemoteDeflectorResource.class);
     }
 }

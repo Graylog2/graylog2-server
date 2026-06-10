@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import useMetaDataContext from 'components/common/EntityDataTable/hooks/useMetaDataContext';
@@ -23,6 +24,7 @@ import useNonDisplayedAttributes from 'components/events/events/hooks/useNonDisp
 import type { DefaultLayout } from 'components/common/EntityDataTable/types';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
+import TagsDetailRow from 'components/events/TagsDetailRow';
 
 const noDetails = <em>No further details</em>;
 
@@ -31,13 +33,31 @@ type Props = {
   event: Event;
 };
 
+const TacticsTechniquesPluginRow = ({ event }: { event: Event }) => {
+  const plugin = PluginStore.exports('events.components.tacticsTechniquesDetailRow')[0];
+  const enabled = plugin?.useCondition?.() ?? !!plugin;
+  if (!plugin || !enabled) return null;
+  const Row = plugin.component;
+
+  return <Row entity={event} />;
+};
+
 const GeneralEventDetails = ({ defaultLayout, event }: Props) => {
   const { meta } = useMetaDataContext<EventsAdditionalData>();
   const nonDisplayedAttributes = useNonDisplayedAttributes(defaultLayout);
+  const hasTags = !!event.tags?.length;
 
-  if (!nonDisplayedAttributes.length) return noDetails;
+  if (!nonDisplayedAttributes.length && !hasTags) return noDetails;
 
-  return <GeneralEventDetailsTable attributesList={nonDisplayedAttributes} event={event} meta={meta} />;
+  return (
+    <>
+      {nonDisplayedAttributes.length ? (
+        <GeneralEventDetailsTable attributesList={nonDisplayedAttributes} event={event} meta={meta} />
+      ) : null}
+      <TagsDetailRow tags={event.tags} />
+      <TacticsTechniquesPluginRow event={event} />
+    </>
+  );
 };
 
 const ExpandedSection = ({ defaultLayout, event }: Props) => {

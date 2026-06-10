@@ -67,8 +67,6 @@ class SelectableList extends React.Component<
     [key: string]: any;
   }
 > {
-  private select: SelectInstance<unknown, boolean>;
-
   static defaultProps = {
     autoFocus: undefined,
     displayKey: 'label',
@@ -84,6 +82,8 @@ class SelectableList extends React.Component<
       this.select.clearValue();
     }
   }
+
+  private select: SelectInstance<unknown, boolean>;
 
   _getOptionId = (option) => (typeof option === 'string' ? option : option[this.props.idKey]);
 

@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { fireEvent, render, screen, within } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import Pagination from './Pagination';
 
@@ -26,12 +27,10 @@ describe('<Pagination />', () => {
 
     render(<Pagination currentPage={currentPage} totalPages={totalPages} />);
 
-    const activePage = await screen.findByTitle('Active page');
-
     await screen.findByTestId('graylog-pagination');
     await screen.findByRole('button', { name: /open page 5/i });
 
-    expect(within(activePage).getByText(1)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /open page 1/i, current: 'page' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /open page 6/i })).not.toBeInTheDocument();
   });
 
@@ -41,53 +40,53 @@ describe('<Pagination />', () => {
 
     render(<Pagination currentPage={currentPage} totalPages={totalPages} />);
 
-    expect(screen.queryByTitle('Active page')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('graylog-pagination')).not.toBeInTheDocument();
   });
 
-  it('should return proper page to `onChange`', () => {
+  it('should return proper page to `onChange`', async () => {
     const currentPage = 2;
     const totalPages = 10;
     const onChangeSpy = jest.fn();
 
     render(<Pagination currentPage={currentPage} totalPages={totalPages} onChange={onChangeSpy} />);
 
-    fireEvent.click(screen.getByLabelText('Open next page'));
+    await userEvent.click(screen.getByLabelText('Open next page'));
 
     expect(onChangeSpy).toHaveBeenLastCalledWith(currentPage + 1);
   });
 
-  it('should return previous page to `onChange`', () => {
+  it('should return previous page to `onChange`', async () => {
     const currentPage = 2;
     const totalPages = 10;
     const onChangeSpy = jest.fn();
 
     render(<Pagination currentPage={currentPage} totalPages={totalPages} onChange={onChangeSpy} />);
 
-    fireEvent.click(screen.getByLabelText('Open previous page'));
+    await userEvent.click(screen.getByLabelText('Open previous page'));
 
     expect(onChangeSpy).toHaveBeenLastCalledWith(currentPage - 1);
   });
 
-  it('should return last page to `onChange`', () => {
+  it('should return last page to `onChange`', async () => {
     const currentPage = 2;
     const totalPages = 10;
     const onChangeSpy = jest.fn();
 
     render(<Pagination currentPage={currentPage} totalPages={totalPages} onChange={onChangeSpy} />);
 
-    fireEvent.click(screen.getByLabelText('Open last page'));
+    await userEvent.click(screen.getByLabelText('Open last page'));
 
     expect(onChangeSpy).toHaveBeenLastCalledWith(totalPages);
   });
 
-  it('should return first page to `onChange`', () => {
+  it('should return first page to `onChange`', async () => {
     const currentPage = 2;
     const totalPages = 10;
     const onChangeSpy = jest.fn();
 
     render(<Pagination currentPage={currentPage} totalPages={totalPages} onChange={onChangeSpy} />);
 
-    fireEvent.click(screen.getByLabelText('Open first page'));
+    await userEvent.click(screen.getByLabelText('Open first page'));
 
     expect(onChangeSpy).toHaveBeenLastCalledWith(1);
   });

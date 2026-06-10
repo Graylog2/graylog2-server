@@ -16,23 +16,16 @@
  */
 package org.graylog.testing.mongodb;
 
-import com.google.auto.value.AutoValue;
-
 import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 
-@AutoValue
-public abstract class MongoDBVersion {
+public record MongoDBVersion(String version) {
     public static final MongoDBVersion DEFAULT = of("7.0");
 
-    public abstract String version();
+    public MongoDBVersion {
+        requireNonBlank(version, "version can't be blank");
+    }
 
-    public static MongoDBVersion of(String version) {
-        final var value = requireNonBlank(version, "version can't be blank");
-
-        if (version.matches("^(\\d+)\\.(\\d+)$")) {
-            return new AutoValue_MongoDBVersion(value);
-        }
-
-        throw new IllegalArgumentException("MongoDB version must be in the format 'X.Y' where X and Y are integers (e.g., '7.0')");
+    public static MongoDBVersion of(final String version) {
+        return new MongoDBVersion(version);
     }
 }

@@ -1,0 +1,4 @@
+type = "a"
+message = "Add new Full Message JSON field to the AWS Cloud Trail input to support custom pipeline parsing"
+
+pulls = ["24786"]

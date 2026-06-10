@@ -17,7 +17,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import type { Output } from 'stores/outputs/OutputsStore';
+import type { Output } from 'hooks/useOutputs';
 import type { ConfigurationFormData } from 'components/configurationforms';
 import type { AvailableOutputRequestedConfiguration } from 'components/streams/useAvailableOutputTypes';
 import EditOutputButton from 'components/streams/StreamDetails/routing-destination/EditOutputButton';

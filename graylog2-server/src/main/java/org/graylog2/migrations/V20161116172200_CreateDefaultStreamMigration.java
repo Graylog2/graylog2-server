@@ -18,8 +18,8 @@ package org.graylog2.migrations;
 
 import jakarta.inject.Inject;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamImpl;

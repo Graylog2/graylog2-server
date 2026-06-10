@@ -16,11 +16,11 @@
  */
 import React from 'react';
 
-import type { GraylogNode } from '../useClusterGraylogNodes';
+import type { ClusterGraylogNode } from '../fetchClusterGraylogNodes';
 import { MetricsColumn, MetricsRow, StyledLabel } from '../../shared-components/NodeMetricsLayout';
 
 type Props = {
-  node: GraylogNode;
+  node: ClusterGraylogNode;
 };
 
 const LoadBalancerStatusCell = ({ node }: Props) => {
@@ -33,7 +33,10 @@ const LoadBalancerStatusCell = ({ node }: Props) => {
   return (
     <MetricsColumn>
       <MetricsRow>
-        <StyledLabel bsStyle={status === 'ALIVE' ? 'success' : 'warning'} bsSize="xs" aria-label={`Load balancer ${status}`}>
+        <StyledLabel
+          bsStyle={status === 'ALIVE' ? 'success' : 'warning'}
+          bsSize="xs"
+          aria-label={`Load balancer ${status}`}>
           {status}
         </StyledLabel>
       </MetricsRow>

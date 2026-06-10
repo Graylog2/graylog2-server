@@ -14,34 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useState } from 'react';
-import styled, { css } from 'styled-components';
+import React, { useMemo } from 'react';
 import { useFormikContext } from 'formik';
 
-import Popover from 'components/common/Popover';
-import ColorPicker from 'components/common/ColorPicker';
-import { colors as defaultColors } from 'views/components/visualizations/Colors';
 import { Col } from 'components/bootstrap';
 import { FormikInput, IconButton } from 'components/common';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
 import { mappedUnitsFromJSON } from 'views/components/visualizations/utils/unitConverters';
-
-const ColorHintWrapper = styled.div`
-  width: 25px;
-  height: 25px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const ColorHint = styled.div(
-  ({ color, theme }) => css`
-    cursor: pointer;
-    background-color: ${color};
-    width: ${theme.spacings.md};
-    height: ${theme.spacings.md};
-  `,
-);
+import ColorConfigurationPopover from 'views/components/aggregationwizard/ColorConfigurationPopover';
 
 type Props = { metricIndex: number; thresholdIndex: number; onRemove: () => void };
 
@@ -51,11 +31,8 @@ const ThresholdFormItem = ({ metricIndex, thresholdIndex, onRemove }: Props) => 
     setFieldValue,
   } = useFormikContext<WidgetConfigFormValues>();
 
-  const [showPopover, setShowPopover] = useState(false);
-  const togglePopover = () => setShowPopover((show) => !show);
-
-  const _onColorSelect = (color: string) =>
-    setFieldValue(`metrics.${metricIndex}.thresholds.${thresholdIndex}.color`, color).then(togglePopover);
+  const onColorSelect = (color: string) =>
+    setFieldValue(`metrics.${metricIndex}.thresholds.${thresholdIndex}.color`, color);
 
   const curColor = useMemo(
     () => metrics?.[metricIndex]?.thresholds?.[thresholdIndex]?.color,
@@ -102,16 +79,11 @@ const ThresholdFormItem = ({ metricIndex, thresholdIndex, onRemove }: Props) => 
         />
       </Col>
       <Col sm={1}>
-        <Popover position="top" withArrow opened={showPopover}>
-          <Popover.Target>
-            <ColorHintWrapper>
-              <ColorHint aria-label="Color Hint" onClick={togglePopover} color={curColor} />
-            </ColorHintWrapper>
-          </Popover.Target>
-          <Popover.Dropdown title="Color configuration for threshold">
-            <ColorPicker color={curColor} colors={defaultColors} onChange={_onColorSelect} />
-          </Popover.Dropdown>
-        </Popover>
+        <ColorConfigurationPopover
+          onColorSelect={onColorSelect}
+          curColor={curColor}
+          title="Color configuration for threshold"
+        />
       </Col>
     </>
   );

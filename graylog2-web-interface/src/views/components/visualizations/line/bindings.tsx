@@ -18,14 +18,21 @@ import type { VisualizationType } from 'views/types';
 import LineVisualization from 'views/components/visualizations/line/LineVisualization';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 import { hasAtLeastOneMetric } from 'views/components/visualizations/validations';
-import type { AxisType } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
-import { DEFAULT_AXIS_TYPE, axisTypes } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import type { AxisType, ChartAxisConfig } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import {
+  DEFAULT_AXIS_CONFIG,
+  DEFAULT_AXIS_TYPE,
+  axisTypes,
+} from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import type { InterpolationType } from 'views/Constants';
 import { DEFAULT_INTERPOLATION, interpolationTypes } from 'views/Constants';
+import xyAxisConfigFields, { fromAxisConfig } from 'views/components/visualizations/xyAxisConfigFields';
 
 type LineVisualizationConfigFormValues = {
   interpolation: InterpolationType;
   axisType: AxisType;
+  axisConfig: ChartAxisConfig;
+  showAxisLabels: boolean;
 };
 
 const validate = hasAtLeastOneMetric('Line chart');
@@ -39,13 +46,22 @@ const lineChart: VisualizationType<
   displayName: 'Line Chart',
   component: LineVisualization,
   config: {
-    createConfig: () => ({ interpolation: DEFAULT_INTERPOLATION, axisType: DEFAULT_AXIS_TYPE }),
+    createConfig: () => ({
+      interpolation: DEFAULT_INTERPOLATION,
+      axisType: DEFAULT_AXIS_TYPE,
+      axisConfig: DEFAULT_AXIS_CONFIG,
+    }),
     fromConfig: (config: LineVisualizationConfig | undefined) => ({
       interpolation: config?.interpolation ?? DEFAULT_INTERPOLATION,
       axisType: config?.axisType ?? DEFAULT_AXIS_TYPE,
+      ...fromAxisConfig(config),
     }),
     toConfig: (formValues: LineVisualizationConfigFormValues) =>
-      LineVisualizationConfig.create(formValues.interpolation, formValues.axisType),
+      LineVisualizationConfig.create(
+        formValues.interpolation,
+        formValues.axisType,
+        formValues.showAxisLabels ? formValues.axisConfig : DEFAULT_AXIS_CONFIG,
+      ),
     fields: [
       {
         name: 'interpolation',
@@ -61,6 +77,7 @@ const lineChart: VisualizationType<
         options: axisTypes,
         required: true,
       },
+      ...xyAxisConfigFields,
     ],
   },
   capabilities: ['event-annotations'],

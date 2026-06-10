@@ -19,10 +19,9 @@ import React, { useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import type { DefaultTheme } from 'styled-components';
 
-import { Link } from 'components/common/router';
+import { Link, RelativeTime } from 'components/common';
 import { ListGroupItem, Label } from 'components/bootstrap';
 import getTitleForEntityType from 'util/getTitleForEntityType';
-import { RelativeTime } from 'components/common';
 import { getValuesFromGRN } from 'logic/permissions/GRN';
 import useHasEntityPermissionByGRN from 'hooks/useHasEntityPermissionByGRN';
 import useShowRouteFromGRN from 'routing/hooks/useShowRouteFromGRN';

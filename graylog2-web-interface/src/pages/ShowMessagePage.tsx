@@ -19,15 +19,15 @@ import * as Immutable from 'immutable';
 import styled from 'styled-components';
 
 import useMessage from 'views/hooks/useMessage';
+import MessageDetail from 'components/common/message/details/MessageDetail';
 import DocumentTitle from 'components/common/DocumentTitle';
 import Spinner from 'components/common/Spinner';
 import { Col, Row } from 'components/bootstrap';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
-import MessageDetail from 'views/components/messagelist/MessageDetail';
 import withParams from 'routing/withParams';
 import type { Input } from 'components/messageloaders/Types';
 import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
-import { InputsActions } from 'stores/inputs/InputsStore';
+import { fetchInput } from 'hooks/useInputs';
 import { NodesActions } from 'stores/nodes/NodesStore';
 import { isLocalNode } from 'views/hooks/useIsLocalNode';
 import ViewsStoreProvider from 'views/stores/ViewsStoreProvider';
@@ -53,7 +53,7 @@ const useInputs = (sourceInputId: string | undefined, gl2SourceNode: string | un
   useEffect(() => {
     const fetchInputs = async () => {
       if (sourceInputId && (await isLocalNode(gl2SourceNode))) {
-        const input = await InputsActions.get(sourceInputId);
+        const input = await fetchInput(sourceInputId);
 
         if (input) {
           const newInputs = Immutable.Map({ [input.id]: input });
@@ -86,7 +86,6 @@ const ShowMessagePage = ({ message, messageId, index }: ShowMessagePageProps) =>
     () => Immutable.Map(Object.fromEntries(streams.map((stream) => [stream.id, stream]))),
     [streams],
   );
-  const streamsList = useMemo(() => Immutable.List(streams), [streams]);
   const inputs = useInputs(message?.source_input_id, message?.fields.gl2_source_node);
 
   useEffect(() => {
@@ -115,7 +114,6 @@ const ShowMessagePage = ({ message, messageId, index }: ShowMessagePageProps) =>
                         <MessageDetail
                           fields={all}
                           streams={streamsMap}
-                          allStreams={streamsList}
                           disableSurroundingSearch
                           inputs={inputs}
                           message={message}

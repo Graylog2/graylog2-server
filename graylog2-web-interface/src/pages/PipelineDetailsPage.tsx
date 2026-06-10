@@ -23,13 +23,17 @@ import Pipeline from 'components/pipelines/Pipeline';
 import NewPipeline from 'components/pipelines/NewPipeline';
 import SourceGenerator from 'logic/pipelines/SourceGenerator';
 import { StreamsStore } from 'stores/streams/StreamsStore';
-import { PipelineConnectionsStore, PipelineConnectionsActions } from 'stores/pipelines/PipelineConnectionsStore';
 import DocsHelper from 'util/DocsHelper';
-import { useStore } from 'stores/connect';
 import useParams from 'routing/useParams';
 import { RulesActions } from 'stores/rules/RulesStore';
 import usePipeline from 'hooks/usePipeline';
 import usePipelineMutations from 'hooks/usePipelineMutations';
+import usePipelineConnections, { usePipelineConnectionMutation } from 'hooks/usePipelineConnections';
+import {
+  EnableDebugMetricsButton,
+  ProcessingLoadDebugMetricsBanner,
+  ProcessingLoadProvider,
+} from 'components/pipelines/processing-load';
 
 import PipelinesPageNavigation from '../components/pipelines/PipelinesPageNavigation';
 
@@ -37,19 +41,19 @@ const _isNewPipeline = (pipelineId: string) => pipelineId === 'new';
 
 const PipelineDetailsPage = () => {
   const params = useParams<{ pipelineId: string }>();
+  const isNewPipeline = _isNewPipeline(params.pipelineId);
   const { data: pipeline } = usePipeline(params?.pipelineId, {
-    enabled: !_isNewPipeline(params.pipelineId) && !!params?.pipelineId,
+    enabled: !isNewPipeline && !!params?.pipelineId,
   });
 
   const { createPipeline, updatePipeline } = usePipelineMutations();
-  const connections = useStore(PipelineConnectionsStore, (state) =>
-    state.connections?.filter((c) => c.pipeline_ids && c.pipeline_ids.includes(params.pipelineId)),
-  );
+  const { data: allConnections } = usePipelineConnections();
+  const connections = allConnections?.filter((c) => c.pipeline_ids && c.pipeline_ids.includes(params.pipelineId));
+  const { connectToPipeline } = usePipelineConnectionMutation();
   const [streams, setStreams] = useState();
 
   useEffect(() => {
     RulesActions.list();
-    PipelineConnectionsActions.list();
 
     StreamsStore.listStreams().then((_streams) => {
       const filteredStreams = _streams.filter((s) => s.is_editable);
@@ -59,8 +63,7 @@ const PipelineDetailsPage = () => {
   }, []);
 
   const _onConnectionsChange = (updatedConnections, callback) => {
-    PipelineConnectionsActions.connectToPipeline(updatedConnections);
-    callback();
+    connectToPipeline(updatedConnections).then(() => callback());
   };
 
   const _onStagesChange = (newStages, callback) => {
@@ -94,13 +97,13 @@ const PipelineDetailsPage = () => {
     }
   };
 
-  const _isLoading = !_isNewPipeline(params.pipelineId) && (!pipeline || !connections || !streams);
+  const _isLoading = !isNewPipeline && (!pipeline || !connections || !streams);
 
   if (_isLoading) {
     return <Spinner />;
   }
 
-  const title = _isNewPipeline(params.pipelineId) ? (
+  const title = isNewPipeline ? (
     'New pipeline'
   ) : (
     <span>
@@ -108,7 +111,7 @@ const PipelineDetailsPage = () => {
     </span>
   );
 
-  const content = _isNewPipeline(params.pipelineId) ? (
+  const content = isNewPipeline ? (
     <NewPipeline onChange={_savePipeline} />
   ) : (
     <Pipeline
@@ -121,7 +124,7 @@ const PipelineDetailsPage = () => {
     />
   );
 
-  const pageTitle = _isNewPipeline(params.pipelineId) ? 'New pipeline' : `Pipeline ${pipeline.title}`;
+  const pageTitle = isNewPipeline ? 'New pipeline' : `Pipeline ${pipeline.title}`;
 
   return (
     <DocumentTitle title={pageTitle}>
@@ -129,6 +132,7 @@ const PipelineDetailsPage = () => {
         <PipelinesPageNavigation />
         <PageHeader
           title={title}
+          actions={<EnableDebugMetricsButton />}
           documentationLink={{
             title: 'Pipelines documentation',
             path: DocsHelper.PAGES.PIPELINES,
@@ -143,7 +147,16 @@ const PipelineDetailsPage = () => {
         </PageHeader>
 
         <Row className="content">
-          <Col md={12}>{content}</Col>
+          <Col md={12}>
+            {isNewPipeline ? (
+              content
+            ) : (
+              <ProcessingLoadProvider>
+                <ProcessingLoadDebugMetricsBanner />
+                {content}
+              </ProcessingLoadProvider>
+            )}
+          </Col>
         </Row>
       </div>
     </DocumentTitle>

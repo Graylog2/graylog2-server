@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import * as React from 'react';
 import { useContext } from 'react';
-import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import userEvent from '@testing-library/user-event';
 
 import selectEvent from 'helpers/selectEvent';
 import AggregationWizard from 'views/components/aggregationwizard/AggregationWizard';
@@ -152,7 +152,7 @@ describe('AggregationWizard/Visualizations', () => {
 
     await selectEvent.chooseOption('Select visualization type', 'Without Config');
 
-    userEvent.click(await findWidgetConfigSubmitButton());
+    await userEvent.click(await findWidgetConfigSubmitButton());
 
     await waitFor(() =>
       expect(onChange).toHaveBeenCalledWith(
@@ -173,7 +173,8 @@ describe('AggregationWizard/Visualizations', () => {
 
     const factorInput = await screen.findByRole('spinbutton', { name: 'Important Factor' });
 
-    fireEvent.change(factorInput, { target: { value: '10' } });
+    await userEvent.clear(factorInput);
+    await userEvent.type(factorInput, '10');
 
     await waitFor(async () => {
       expect(await findWidgetConfigSubmitButton()).not.toBeDisabled();
@@ -193,7 +194,7 @@ describe('AggregationWizard/Visualizations', () => {
       expect(submitButton).not.toBeDisabled();
     });
 
-    userEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() =>
       expect(onChange).toHaveBeenCalledWith(
@@ -230,9 +231,9 @@ describe('AggregationWizard/Visualizations', () => {
     );
 
     const updateViewportButton = await screen.findByRole('button', { name: 'Change Viewport' });
-    userEvent.click(updateViewportButton);
+    await userEvent.click(updateViewportButton);
     const submitButton = await findWidgetConfigSubmitButton();
-    userEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() =>
       expect(onChange).toHaveBeenCalledWith(

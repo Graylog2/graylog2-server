@@ -63,8 +63,20 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
             "Timerange Start:      ${event.timerange_start}\n" +
             "Timerange End:        ${event.timerange_end}\n" +
             "Source Streams:       ${event.source_streams}\n" +
+            "${if event.fields}\n" +
             "Fields:\n" +
             "${foreach event.fields field}  ${field.key}: ${field.value}\n" +
+            "${end}\n" +
+            "${end}\n" +
+            "${if event.group_by_fields}\n" +
+            "Group By Fields:\n" +
+            "${foreach event.group_by_fields field}  ${field.key}: ${field.value}\n" +
+            "${end}\n" +
+            "${end}\n" +
+            "${if event.aggregation_conditions}\n" +
+            "Aggregation Conditions:\n" +
+            "${foreach event.aggregation_conditions condition}  ${condition.key}: ${condition.value}\n" +
+            "${end}\n" +
             "${end}\n" +
             "${if backlog}\n" +
             "--- [Backlog] ------------------------------------\n" +

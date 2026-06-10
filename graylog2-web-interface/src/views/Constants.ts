@@ -20,11 +20,11 @@ import type { TimeRange, RelativeTimeRangeWithEnd, RelativeTimeRange } from 'vie
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import type { ArrayElement } from 'views/types';
 import type { AutoTimeConfig } from 'views/logic/aggregationbuilder/Pivot';
+import type { StreamsAndCategoriesSelection } from 'views/components/common/StreamsAndCategoriesFilter';
 
 export type SearchBarFormValues = {
   timerange: TimeRange;
-  streams: Array<string>;
-  streamCategories: Array<string>;
+  streamsAndCategories: StreamsAndCategoriesSelection;
   queryString: string;
 };
 
@@ -48,6 +48,7 @@ export const FILTERED_FIELDS = [
 
   // Our reserved fields.
   'gl2_accounted_message_size',
+  'gl2_input_message_size',
   'gl2_processing_error',
   'gl2_processing_duration_ms',
   'gl2_processing_timestamp',
@@ -169,3 +170,5 @@ export const keySeparator = '\u2E31';
 export const humanSeparator = '-';
 export const thresholdsSupportedVisualizations = ['bar', 'area', 'line', 'scatter'];
 export const multipleValuesActionsSupportedVisualizations = ['bar', 'area', 'line', 'scatter'];
+export const QUERY_TIME_RANGE_LIMIT_ERROR_TYPE = 'query_time_range_limit';
+export const SEARCH_TYPE_RANGE_LIMIT_ERROR_TYPE = 'search_type_time_range_limit';

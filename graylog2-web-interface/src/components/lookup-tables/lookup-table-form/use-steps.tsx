@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 
 import LookupTableFormFields from './lookup-table-form-fields';
@@ -30,7 +31,7 @@ const CenteredDiv = styled.div`
 function useSteps(
   activeStepKey: string = 'lookup-table',
 ): [Array<any>, { activeStep: string; setActiveStep: (newStep: string) => void }] {
-  const [activeStep, setActiveStep] = React.useState(activeStepKey);
+  const [activeStep, setActiveStep] = useState(activeStepKey);
 
   const steps = [
     {

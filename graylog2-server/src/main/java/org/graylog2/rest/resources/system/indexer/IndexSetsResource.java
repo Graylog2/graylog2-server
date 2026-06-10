@@ -17,12 +17,13 @@
 package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.eventbus.EventBus;
 import com.mongodb.MongoException;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -47,16 +48,17 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.datatiering.DataTieringConfig;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
-import org.graylog2.indexer.IndexSetStatsCreator;
-import org.graylog2.indexer.IndexSetValidator;
-import org.graylog2.indexer.IndexSetValidator.Violation;
 import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indexset.IndexSetStatsCreator;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indexset.restrictions.IndexSetRestrictionsService;
+import org.graylog2.indexer.indexset.validation.IndexSetValidator;
+import org.graylog2.indexer.indexset.validation.IndexSetValidator.Violation;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.system.indices.DataTieringStatusService;
@@ -68,7 +70,7 @@ import org.graylog2.rest.resources.system.indexer.responses.IndexSetsResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
-import org.graylog2.system.jobs.SystemJobManager;
+import org.graylog2.system.jobs.LegacySystemJobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +86,7 @@ import java.util.stream.Stream;
 import static java.util.Objects.requireNonNull;
 
 @RequiresAuthentication
-@Api(value = "System/IndexSets", description = "Index sets")
+@Tag(name = "System/IndexSets", description = "Index sets")
 @Path("/system/indices/index_sets")
 @Produces(MediaType.APPLICATION_JSON)
 public class IndexSetsResource extends RestResource {
@@ -97,10 +99,11 @@ public class IndexSetsResource extends RestResource {
     private final IndexSetCleanupJob.Factory indexSetCleanupJobFactory;
     private final IndexSetStatsCreator indexSetStatsCreator;
     private final ClusterConfigService clusterConfigService;
-    private final SystemJobManager systemJobManager;
+    private final LegacySystemJobManager systemJobManager;
     private final DataTieringStatusService tieringStatusService;
     private final Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories;
     private final IndexSetRestrictionsService indexSetRestrictionsService;
+    private final EventBus eventBus;
 
     @Inject
     public IndexSetsResource(final Indices indices,
@@ -110,9 +113,10 @@ public class IndexSetsResource extends RestResource {
                              final IndexSetCleanupJob.Factory indexSetCleanupJobFactory,
                              final IndexSetStatsCreator indexSetStatsCreator,
                              final ClusterConfigService clusterConfigService,
-                             final SystemJobManager systemJobManager,
+                             final LegacySystemJobManager systemJobManager,
                              final DataTieringStatusService tieringStatusService,
-                             final Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories, IndexSetRestrictionsService indexSetRestrictionsService) {
+                             final Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories, IndexSetRestrictionsService indexSetRestrictionsService,
+                             final EventBus eventBus) {
         this.indices = requireNonNull(indices);
         this.indexSetService = requireNonNull(indexSetService);
         this.indexSetRegistry = indexSetRegistry;
@@ -124,21 +128,23 @@ public class IndexSetsResource extends RestResource {
         this.tieringStatusService = tieringStatusService;
         this.openIndexSetFilterFactories = openIndexSetFilterFactories;
         this.indexSetRestrictionsService = indexSetRestrictionsService;
+        this.eventBus = eventBus;
     }
 
     @GET
     @Timed
-    @ApiOperation(value = "Get a list of all index sets")
+    @Operation(summary = "Get a list of all index sets")
     @ApiResponses(value = {
-            @ApiResponse(code = 403, message = "Unauthorized"),
+            @ApiResponse(responseCode = "200", description = "Returns index sets", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "403", description = "Unauthorized"),
     })
-    public IndexSetsResponse list(@ApiParam(name = "skip", value = "The number of elements to skip (offset).", required = true)
+    public IndexSetsResponse list(@Parameter(name = "skip", description = "The number of elements to skip (offset).", required = true)
                                   @QueryParam("skip") @DefaultValue("0") int skip,
-                                  @ApiParam(name = "limit", value = "The maximum number of elements to return.", required = true)
+                                  @Parameter(name = "limit", description = "The maximum number of elements to return.", required = true)
                                   @QueryParam("limit") @DefaultValue("0") int limit,
-                                  @ApiParam(name = "stats", value = "Include index set stats.")
+                                  @Parameter(name = "stats", description = "Include index set stats.")
                                   @QueryParam("stats") @DefaultValue("false") boolean computeStats,
-                                  @ApiParam(name = "only_open", value = "Include only graylog open indices.")
+                                  @Parameter(name = "only_open", description = "Include only graylog open indices.")
                                   @QueryParam("only_open") @DefaultValue("false") boolean onlyOpen) {
 
         final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
@@ -156,17 +162,18 @@ public class IndexSetsResource extends RestResource {
     @GET
     @Path("search")
     @Timed
-    @ApiOperation(value = "Get a list of all index sets")
+    @Operation(summary = "Get a list of all index sets")
     @ApiResponses(value = {
-            @ApiResponse(code = 403, message = "Unauthorized"),
+            @ApiResponse(responseCode = "200", description = "Returns index sets", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "403", description = "Unauthorized"),
     })
-    public IndexSetsResponse search(@ApiParam(name = "searchTitle", value = "The number of elements to skip (offset).")
+    public IndexSetsResponse search(@Parameter(name = "searchTitle", description = "The number of elements to skip (offset).")
                                     @QueryParam("searchTitle") String searchTitle,
-                                    @ApiParam(name = "skip", value = "The number of elements to skip (offset).", required = true)
+                                    @Parameter(name = "skip", description = "The number of elements to skip (offset).", required = true)
                                     @QueryParam("skip") @DefaultValue("0") int skip,
-                                    @ApiParam(name = "limit", value = "The maximum number of elements to return.", required = true)
+                                    @Parameter(name = "limit", description = "The maximum number of elements to return.", required = true)
                                     @QueryParam("limit") @DefaultValue("0") int limit,
-                                    @ApiParam(name = "stats", value = "Include index set stats.")
+                                    @Parameter(name = "stats", description = "Include index set stats.")
                                     @QueryParam("stats") @DefaultValue("false") boolean computeStats) {
         final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
         List<IndexSetConfig> allowedConfigurations = indexSetService.searchByTitle(searchTitle).stream()
@@ -204,9 +211,10 @@ public class IndexSetsResource extends RestResource {
     @GET
     @Path("stats")
     @Timed
-    @ApiOperation(value = "Get stats of all index sets")
+    @Operation(summary = "Get stats of all index sets")
     @ApiResponses(value = {
-            @ApiResponse(code = 403, message = "Unauthorized"),
+            @ApiResponse(responseCode = "200", description = "Returns global stats", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "403", description = "Unauthorized"),
     })
     public IndexSetStats globalStats() {
         checkPermission(RestPermissions.INDEXSETS_READ);
@@ -216,12 +224,13 @@ public class IndexSetsResource extends RestResource {
     @GET
     @Path("{id}")
     @Timed
-    @ApiOperation(value = "Get index set")
+    @Operation(summary = "Get index set")
     @ApiResponses(value = {
-            @ApiResponse(code = 403, message = "Unauthorized"),
-            @ApiResponse(code = 404, message = "Index set not found"),
+            @ApiResponse(responseCode = "200", description = "Returns the index set", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "403", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Index set not found"),
     })
-    public IndexSetResponse get(@ApiParam(name = "id", required = true)
+    public IndexSetResponse get(@Parameter(name = "id", required = true)
                                 @PathParam("id") String id) {
         checkPermission(RestPermissions.INDEXSETS_READ, id);
         final IndexSet indexSet = indexSetRegistry.get(id).orElseThrow(() -> new NotFoundException("Couldn't find index set with ID <" + id + ">"));
@@ -237,12 +246,13 @@ public class IndexSetsResource extends RestResource {
     @GET
     @Path("{id}/stats")
     @Timed
-    @ApiOperation(value = "Get index set statistics")
+    @Operation(summary = "Get index set statistics")
     @ApiResponses(value = {
-            @ApiResponse(code = 403, message = "Unauthorized"),
-            @ApiResponse(code = 404, message = "Index set not found"),
+            @ApiResponse(responseCode = "200", description = "Returns statistics", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "403", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Index set not found"),
     })
-    public IndexSetStats indexSetStatistics(@ApiParam(name = "id", required = true)
+    public IndexSetStats indexSetStatistics(@Parameter(name = "id", required = true)
                                             @PathParam("id") String id) {
         checkPermission(RestPermissions.INDEXSETS_READ, id);
         return indexSetRegistry.get(id)
@@ -252,14 +262,15 @@ public class IndexSetsResource extends RestResource {
 
     @POST
     @Timed
-    @ApiOperation(value = "Create index set")
+    @Operation(summary = "Create index set")
     @RequiresPermissions(RestPermissions.INDEXSETS_CREATE)
     @Consumes(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.INDEX_SET_CREATE)
     @ApiResponses(value = {
-            @ApiResponse(code = 403, message = "Unauthorized"),
+            @ApiResponse(responseCode = "200", description = "Returns created index set", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "403", description = "Unauthorized"),
     })
-    public IndexSetResponse save(@ApiParam(name = "Index set configuration", required = true)
+    public IndexSetResponse save(@Parameter(name = "Index set configuration", required = true)
                                  @Valid @NotNull IndexSetCreationRequest indexSet) {
         try {
             checkDataTieringNotNull(indexSet.useLegacyRotation(), indexSet.dataTieringConfig());
@@ -284,15 +295,16 @@ public class IndexSetsResource extends RestResource {
     @PUT
     @Path("{id}")
     @Timed
-    @ApiOperation(value = "Update index set")
+    @Operation(summary = "Update index set")
     @AuditEvent(type = AuditEventTypes.INDEX_SET_UPDATE)
     @ApiResponses(value = {
-            @ApiResponse(code = 403, message = "Unauthorized"),
-            @ApiResponse(code = 409, message = "Mismatch of IDs in URI path and payload"),
+            @ApiResponse(responseCode = "200", description = "Returns updated index set", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "403", description = "Unauthorized"),
+            @ApiResponse(responseCode = "409", description = "Mismatch of IDs in URI path and payload"),
     })
-    public IndexSetResponse update(@ApiParam(name = "id", required = true)
+    public IndexSetResponse update(@Parameter(name = "id", required = true)
                                    @PathParam("id") String id,
-                                   @ApiParam(name = "Index set configuration", required = true)
+                                   @Parameter(name = "Index set configuration", required = true)
                                    @Valid @NotNull IndexSetUpdateRequest updateRequest) {
         checkPermission(RestPermissions.INDEXSETS_EDIT, id);
 
@@ -331,12 +343,13 @@ public class IndexSetsResource extends RestResource {
     @PUT
     @Path("{id}/default")
     @Timed
-    @ApiOperation(value = "Set default index set")
+    @Operation(summary = "Set default index set")
     @AuditEvent(type = AuditEventTypes.INDEX_SET_UPDATE)
     @ApiResponses(value = {
-            @ApiResponse(code = 403, message = "Unauthorized"),
+            @ApiResponse(responseCode = "200", description = "Returns default index set", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "403", description = "Unauthorized"),
     })
-    public IndexSetResponse setDefault(@ApiParam(name = "id", required = true)
+    public IndexSetResponse setDefault(@Parameter(name = "id", required = true)
                                        @PathParam("id") String id) {
         checkPermission(RestPermissions.INDEXSETS_EDIT, id);
 
@@ -357,15 +370,16 @@ public class IndexSetsResource extends RestResource {
     @DELETE
     @Path("{id}")
     @Timed
-    @ApiOperation(value = "Delete index set")
+    @Operation(summary = "Delete index set")
     @AuditEvent(type = AuditEventTypes.INDEX_SET_DELETE)
     @ApiResponses(value = {
-            @ApiResponse(code = 403, message = "Unauthorized"),
-            @ApiResponse(code = 404, message = "Index set not found"),
+            @ApiResponse(responseCode = "204", description = "Success"),
+            @ApiResponse(responseCode = "403", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Index set not found"),
     })
-    public void delete(@ApiParam(name = "id", required = true)
+    public void delete(@Parameter(name = "id", required = true)
                        @PathParam("id") String id,
-                       @ApiParam(name = "delete_indices")
+                       @Parameter(name = "delete_indices")
                        @QueryParam("delete_indices") @DefaultValue("true") boolean deleteIndices) {
         checkPermission(RestPermissions.INDEXSETS_DELETE, id);
 
@@ -384,6 +398,13 @@ public class IndexSetsResource extends RestResource {
                     systemJobManager.submit(indexSetCleanupJobFactory.create(indexSet));
                 } catch (SystemJobConcurrencyException e) {
                     LOG.error("Error running system job", e);
+                }
+            } else {
+                final String[] managedIndices = indexSet.getManagedIndices();
+                if (managedIndices != null) {
+                    for (String indexName : managedIndices) {
+                        eventBus.post(IndicesDeletedEvent.create(indexName));
+                    }
                 }
             }
         }

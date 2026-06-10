@@ -18,9 +18,9 @@ package org.graylog2.rest.resources.streams.favoritefields;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -35,6 +35,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.FavoriteFieldsService;
@@ -43,10 +44,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
-
 @RequiresAuthentication
-@Api(value = "FavoriteFields", description = "Retrieve/set favorite fields per stream", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "FavoriteFields", description = "Retrieve/set favorite fields per stream")
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/favorite_fields")
 public class FavoriteFieldsResource extends RestResource {
@@ -61,11 +61,11 @@ public class FavoriteFieldsResource extends RestResource {
 
     @POST
     @Timed
-    @ApiOperation(value = "Set favorite fields for a list of streams")
+    @Operation(summary = "Set favorite fields for a list of streams")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.FAVORITE_FIELDS_UPDATE)
-    public void set(@ApiParam(name = "JSON body", required = true) final SetFavoriteFieldsRequest request) throws ValidationException {
+    public void set(@RequestBody(required = true) final SetFavoriteFieldsRequest request) throws ValidationException {
         request.fields().keySet().forEach(streamId -> checkPermission(RestPermissions.STREAMS_EDIT, streamId));
 
         request.fields().forEach(favoriteFieldsService::set);
@@ -76,12 +76,12 @@ public class FavoriteFieldsResource extends RestResource {
 
     @PATCH
     @Timed
-    @ApiOperation(value = "Add favorite field for a list of streams")
+    @Operation(summary = "Add favorite field for a list of streams")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.FAVORITE_FIELDS_UPDATE)
     @Path("/add")
-    public void add(@ApiParam(name = "JSON body", required = true) @Valid final FavoriteFieldRequest request) throws ValidationException {
+    public void add(@RequestBody(required = true) @Valid final FavoriteFieldRequest request) throws ValidationException {
         request.streamIds().forEach(streamId -> checkPermission(RestPermissions.STREAMS_EDIT, streamId));
 
         request.streamIds().forEach(streamId -> favoriteFieldsService.add(streamId, request.field()));
@@ -89,12 +89,12 @@ public class FavoriteFieldsResource extends RestResource {
 
     @PATCH
     @Timed
-    @ApiOperation(value = "Remove favorite field from a list of streams")
+    @Operation(summary = "Remove favorite field from a list of streams")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.FAVORITE_FIELDS_UPDATE)
     @Path("/remove")
-    public void remove(@ApiParam(name = "JSON body", required = true) @Valid final FavoriteFieldRequest request) throws ValidationException {
+    public void remove(@RequestBody(required = true) @Valid final FavoriteFieldRequest request) throws ValidationException {
         request.streamIds().forEach(streamId -> checkPermission(RestPermissions.STREAMS_EDIT, streamId));
 
         request.streamIds().forEach(streamId -> favoriteFieldsService.remove(streamId, request.field()));

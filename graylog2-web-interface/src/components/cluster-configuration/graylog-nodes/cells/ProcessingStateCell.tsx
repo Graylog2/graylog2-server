@@ -16,11 +16,11 @@
  */
 import React from 'react';
 
-import type { GraylogNode } from '../useClusterGraylogNodes';
+import type { ClusterGraylogNode } from '../fetchClusterGraylogNodes';
 import { MetricsColumn, MetricsRow, StyledLabel } from '../../shared-components/NodeMetricsLayout';
 
 type Props = {
-  node: GraylogNode;
+  node: ClusterGraylogNode;
 };
 
 const ProcessingStateCell = ({ node }: Props) => {
@@ -33,7 +33,10 @@ const ProcessingStateCell = ({ node }: Props) => {
   return (
     <MetricsColumn>
       <MetricsRow>
-        <StyledLabel bsStyle={node.is_processing ? 'success' : 'warning'} bsSize="xs" aria-label={`Message processing ${status}`}>
+        <StyledLabel
+          bsStyle={node.is_processing ? 'success' : 'warning'}
+          bsSize="xs"
+          aria-label={`Message processing ${status}`}>
           {status}
         </StyledLabel>
       </MetricsRow>

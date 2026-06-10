@@ -21,6 +21,7 @@ const { merge } = require('webpack-merge');
 const { EsbuildPlugin } = require('esbuild-loader');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const { CycloneDxWebpackPlugin } = require('@cyclonedx/webpack-plugin');
+const { defineReactCompilerLoaderOption, reactCompilerLoader } = require('react-compiler-webpack');
 
 const UniqueChunkIdPlugin = require('./UniqueChunkIdPlugin');
 
@@ -65,15 +66,24 @@ const sortChunks = (c1, c2) => {
   return 0;
 };
 
+const esbuildLoader = (supportedBrowsers) => ({
+  loader: 'esbuild-loader',
+  options: {
+    target: supportedBrowsers,
+  },
+});
+
+const reactCompiler = {
+  loader: reactCompilerLoader,
+  options: defineReactCompilerLoaderOption({
+    target: '18',
+  }),
+};
+
 const rules = (target, supportedBrowsers) => [
   {
     test: /\.[jt]s(x)?$/,
-    use: {
-      loader: 'esbuild-loader',
-      options: {
-        target: supportedBrowsers,
-      },
-    },
+    use: [reactCompiler, esbuildLoader(supportedBrowsers)],
     exclude: /node_modules\/(?!(@react-hook|uuid|@?react-leaflet|graylog-web-plugin))|\.node_cache/,
   },
   {

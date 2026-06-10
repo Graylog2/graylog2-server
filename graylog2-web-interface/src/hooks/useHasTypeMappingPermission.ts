@@ -14,13 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 
 const useHasTypeMappingPermission = () => {
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
 
-  return isPermitted(currentUser.permissions, 'typemappings:edit');
+  return isPermitted('typemappings:edit');
 };
 
 export default useHasTypeMappingPermission;

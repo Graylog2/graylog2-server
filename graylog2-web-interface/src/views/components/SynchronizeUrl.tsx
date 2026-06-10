@@ -16,21 +16,49 @@
  */
 import { useEffect } from 'react';
 
-import { useSyncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters';
+import useSyncWithQueryParameters from 'views/hooks/useSyncWithQueryParameters';
 import bindSearchParamsFromQuery from 'views/hooks/BindSearchParamsFromQuery';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import type { RootState } from 'views/types';
 import { selectView } from 'views/logic/slices/viewSelectors';
-import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { selectSearchExecutionState } from 'views/logic/slices/searchExecutionSelectors';
 import useLocation from 'routing/useLocation';
 import useQuery from 'routing/useQuery';
+import { updateView, executeActiveQuery } from 'views/logic/slices/viewSlice';
+import { updateGlobalOverride } from 'views/logic/slices/searchExecutionSlice';
+import GlobalOverride from 'views/logic/search/GlobalOverride';
 
 const bindSearchParamsFromQueryThunk =
-  (query: { [key: string]: unknown }) => (_dispatch: ViewsDispatch, getState: () => RootState) => {
+  (query: { [key: string]: unknown }) => async (dispatch: ViewsDispatch, getState: () => RootState) => {
     const view = selectView(getState());
     const executionState = selectSearchExecutionState(getState());
-    bindSearchParamsFromQuery({ view, query, retry: () => Promise.resolve(), executionState });
+
+    const result = await bindSearchParamsFromQuery({ view, query, retry: () => Promise.resolve(), executionState });
+
+    if (!result) {
+      return Promise.resolve();
+    }
+
+    const [newView, newExecutionState] = result;
+
+    const viewChanged = newView !== view;
+    const executionStateChanged = newExecutionState !== executionState;
+
+    if (!viewChanged && !executionStateChanged) {
+      return Promise.resolve();
+    }
+
+    if (executionStateChanged) {
+      await dispatch(updateGlobalOverride(newExecutionState.globalOverride ?? GlobalOverride.empty()));
+    }
+
+    if (viewChanged) {
+      // Update view, but don't create new search because this already happened in bindSearchParamsFromQuery
+      await dispatch(updateView(newView));
+    }
+
+    return dispatch(executeActiveQuery());
   };
 
 const useBindSearchParamsFromQuery = (query: { [key: string]: unknown }) => {

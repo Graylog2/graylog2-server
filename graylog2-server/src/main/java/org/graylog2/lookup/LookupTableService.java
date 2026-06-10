@@ -180,7 +180,7 @@ public class LookupTableService extends AbstractIdleService {
         private final DataAdapterDto dto;
         private final LookupDataAdapter adapter;
         private final CountDownLatch latch;
-        private final Consumer<LookupDataAdapter> replacedAdapterConsumer;
+        private Consumer<LookupDataAdapter> replacedAdapterConsumer;
 
         public DataAdapterListener(DataAdapterDto dto, LookupDataAdapter adapter, CountDownLatch latch) {
             this(dto, adapter, latch, replacedAdapter -> {
@@ -207,6 +207,7 @@ public class LookupTableService extends AbstractIdleService {
                 }
             } finally {
                 latch.countDown();
+                cleanup();
             }
         }
 
@@ -216,15 +217,31 @@ public class LookupTableService extends AbstractIdleService {
                 LOG.warn("Unable to start data adapter {}: {}", dto.name(), getRootCauseMessage(failure));
             } finally {
                 latch.countDown();
+                cleanup();
             }
+        }
+
+        private void cleanup() {
+            // Whenever the service this listener is listening to terminates (regardless of failing or succeeding), we
+            // need to clean up the reference to the Consumer for the previous adapter. Otherwise, we would always keep it
+            // from being garbage-collected, resulting is a chain of all Data-Adapters of this type ever started on this
+            // instance. See https://github.com/Graylog2/graylog2-server/issues/25077 for details
+            LOG.debug("Cleaning up data adapter listener {}.", dto.name());
+
+            this.replacedAdapterConsumer = null;
+        }
+
+        @VisibleForTesting
+        boolean isReplacedAdapterConsumerSet() {
+            return replacedAdapterConsumer != null;
         }
     }
 
-    private class CacheListener extends Service.Listener {
+    protected class CacheListener extends Service.Listener {
         private final CacheDto dto;
         private final LookupCache cache;
         private final CountDownLatch latch;
-        private final Consumer<LookupCache> replacedCacheConsumer;
+        private Consumer<LookupCache> replacedCacheConsumer;
 
         public CacheListener(CacheDto dto, LookupCache cache, CountDownLatch latch) {
             this(dto, cache, latch, replacedCache -> {
@@ -251,6 +268,7 @@ public class LookupTableService extends AbstractIdleService {
                 }
             } finally {
                 latch.countDown();
+                cleanup();
             }
         }
 
@@ -260,7 +278,22 @@ public class LookupTableService extends AbstractIdleService {
                 LOG.warn("Unable to start cache {}: {}", dto.name(), getRootCauseMessage(failure));
             } finally {
                 latch.countDown();
+                cleanup();
             }
+        }
+
+        private void cleanup() {
+            // Whenever the service this listener is listening to terminates (regardless of failing or succeeding), we
+            // need to clean up the reference to the Consumer for the previous cache. Otherwise, we would always keep it
+            // from being garbage-collected, resulting is a chain of all Caches of this type ever started on this
+            // instance. See https://github.com/Graylog2/graylog2-server/issues/25077 for details.
+            LOG.debug("Cleaning up cache listener {}", dto.name());
+            this.replacedCacheConsumer = null;
+        }
+
+        @VisibleForTesting
+        boolean isReplacedCacheConsumerSet() {
+            return replacedCacheConsumer != null;
         }
     }
 

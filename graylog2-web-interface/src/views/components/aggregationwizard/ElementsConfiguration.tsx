@@ -84,6 +84,8 @@ const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChang
             const { component: ConfigurationSection, isEmpty } = aggregationElement;
             const empty = isEmpty(elementFormValues);
 
+            if (!ConfigurationSection) return null;
+
             return (
               <ElementConfigurationSection
                 allowCreate={aggregationElement.allowCreate(values)}

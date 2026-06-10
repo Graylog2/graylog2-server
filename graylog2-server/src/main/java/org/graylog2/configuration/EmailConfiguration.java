@@ -20,6 +20,8 @@ import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.Validator;
 import com.github.joschi.jadconfig.ValidatorMethod;
+import com.github.joschi.jadconfig.documentation.Documentation;
+import com.github.joschi.jadconfig.documentation.DocumentationSection;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.google.common.base.Strings;
 import org.graylog2.configuration.converters.JavaDurationConverter;
@@ -27,42 +29,68 @@ import org.graylog2.configuration.converters.JavaDurationConverter;
 import java.net.URI;
 import java.time.Duration;
 
+@DocumentationSection(heading = "Email transport", description = "")
 public class EmailConfiguration {
+    @Documentation("tbd")
     @Parameter(value = "transport_email_enabled")
     private boolean enabled = false;
 
+    @Documentation("tbd")
     @Parameter(value = "transport_email_hostname")
     private String hostname;
 
+    @Documentation("tbd")
     @Parameter(value = "transport_email_port", validator = InetPortValidator.class)
     private int port = 25;
 
+    @Documentation("tbd")
     @Parameter(value = "transport_email_use_auth")
     private boolean useAuth = false;
 
+    @Documentation("""
+            Encryption settings
+
+            ATTENTION:
+               Using SMTP with STARTTLS *and* SMTPS at the same time is *not* possible.
+
+            Use SMTP with STARTTLS, see https://en.wikipedia.org/wiki/Opportunistic_TLS
+            """)
     @Parameter(value = "transport_email_use_tls")
     private boolean useTls = true;
 
+    @Documentation("""
+            Use SMTP over SSL (SMTPS), see https://en.wikipedia.org/wiki/SMTPS
+            This is deprecated on most SMTP services!
+            """)
     @Parameter(value = "transport_email_use_ssl")
     private boolean useSsl = false;
 
+    @Documentation("tbd")
     @Parameter(value = "transport_email_auth_username")
     private String username;
 
+    @Documentation("tbd")
     @Parameter(value = "transport_email_auth_password")
     private String password;
 
+    @Documentation("tbd")
     @Parameter(value = "transport_email_from_email")
     private String fromEmail;
 
+    @Documentation("""
+            Specify and uncomment this if you want to include links to the stream in your stream alert mails.
+            This should define the fully qualified base url to your web interface exactly the same way as it is accessed by your users.
+            """)
     @Parameter(value = "transport_email_web_interface_url")
     private URI webInterfaceUri;
 
+    @Documentation("tbd")
     @Parameter(value = "transport_email_socket_connection_timeout",
                converter = JavaDurationConverter.class,
                validators = MillisecondDurationValidator.class)
     private Duration socketConnectionTimeout = Duration.ofSeconds(10);
 
+    @Documentation("tbd")
     @Parameter(value = "transport_email_socket_timeout",
                converter = JavaDurationConverter.class,
                validators = MillisecondDurationValidator.class)

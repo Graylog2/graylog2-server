@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import PlotLegend from 'views/components/visualizations/PlotLegend';
 import ColorMapper from 'views/components/visualizations/ColorMapper';
@@ -25,12 +26,13 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import Series from 'views/logic/aggregationbuilder/Series';
 import { keySeparator } from 'views/Constants';
 import useExternalValueActions from 'views/hooks/useExternalValueActions';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import asMock from 'helpers/mocking/AsMock';
 
 import ChartColorContext from './ChartColorContext';
 
 jest.mock('views/logic/queries/useCurrentQueryId', () => () => 'active-query-id');
-jest.mock('views/stores/useViewsDispatch');
 jest.mock('views/hooks/useExternalValueActions');
 
 const colors = ColorMapper.create();
@@ -51,23 +53,27 @@ const SUT = ({
   plotConfig?: AggregationWidgetConfig;
   neverHide?: boolean;
 }) => (
-  <WidgetFocusContext.Provider
-    value={{
-      focusedWidget: undefined,
-      setWidgetFocusing: jest.fn(),
-      unsetWidgetFocusing: jest.fn(),
-      unsetWidgetEditing: jest.fn(),
-      setWidgetEditing: jest.fn(),
-    }}>
-    <ChartColorContext.Provider value={{ colors, setColor }}>
-      <PlotLegend config={plotConfig} chartData={chartDataProp} height={480} width={640} neverHide={neverHide}>
-        <div>Plot</div>
-      </PlotLegend>
-    </ChartColorContext.Provider>
-  </WidgetFocusContext.Provider>
+  <TestStoreProvider>
+    <WidgetFocusContext.Provider
+      value={{
+        focusedWidget: undefined,
+        setWidgetFocusing: jest.fn(),
+        unsetWidgetFocusing: jest.fn(),
+        unsetWidgetEditing: jest.fn(),
+        setWidgetEditing: jest.fn(),
+      }}>
+      <ChartColorContext.Provider value={{ colors, setColor }}>
+        <PlotLegend config={plotConfig} chartData={chartDataProp} height={480} width={640} neverHide={neverHide}>
+          <div>Plot</div>
+        </PlotLegend>
+      </ChartColorContext.Provider>
+    </WidgetFocusContext.Provider>
+  </TestStoreProvider>
 );
 
 describe('PlotLegend', () => {
+  useViewsPlugin();
+
   beforeEach(() => {
     asMock(useExternalValueActions).mockReturnValue({
       isLoading: false,
@@ -91,11 +97,11 @@ describe('PlotLegend', () => {
   it('should set a color when clicking on the color hint', async () => {
     render(<SUT />);
     const colorHints = await screen.findAllByLabelText('Color Hint');
-    fireEvent.click(colorHints[0]);
+    await userEvent.click(colorHints[0]);
 
     await screen.findByRole('heading', { name: /Configuration for name1/i });
     const color = screen.getByTitle('#b71c1c');
-    fireEvent.click(color);
+    await userEvent.click(color);
 
     await waitFor(() => expect(setColor).toHaveBeenCalledWith('name1', '#b71c1c'));
   });
@@ -104,7 +110,7 @@ describe('PlotLegend', () => {
     render(<SUT />);
 
     const value = await screen.findByText('name1');
-    fireEvent.click(value);
+    await userEvent.click(value);
 
     await screen.findByText('Actions');
   });
@@ -129,7 +135,7 @@ describe('PlotLegend', () => {
     render(<SUT chartDataProp={[{ name: `name1${keySeparator}count` }]} />);
 
     const value = await screen.findByText('count');
-    fireEvent.click(value);
+    await userEvent.click(value);
 
     expect(screen.queryByText('Actions')).not.toBeInTheDocument();
   });

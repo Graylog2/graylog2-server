@@ -19,12 +19,11 @@ import { useState, useEffect } from 'react';
 
 import AuthenticationPageNavigation from 'components/authentication/AuthenticationPageNavigation';
 import withParams from 'routing/withParams';
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, Spinner, PageHeader, DocumentTitle } from 'components/common';
 import 'components/authentication/bindings'; // Bind all authentication plugins
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
-import { Spinner, PageHeader, DocumentTitle } from 'components/common';
 import BackendDetails from 'components/authentication/BackendDetails';
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 
 import { IfPermitted, MultiSelect, SourceCodeEditor, TimezoneSelect } from 'components/common';
@@ -70,12 +70,12 @@ const EmailTemplatesRunner = ({
   );
 
   const entities = usePluginEntities('customization.emailTemplates');
-  const providingEntity = React.useMemo(
+  const providingEntity = useMemo(
     () => (entities ?? []).find((e: any) => typeof e?.hooks?.useEmailTemplate === 'function'),
     [entities],
   );
 
-  const noopUseEmailTemplate = React.useCallback(() => ({ templateConfig: undefined }), []);
+  const noopUseEmailTemplate = useCallback(() => ({ templateConfig: undefined }), []);
   const useEmailTemplateHook = (providingEntity?.hooks?.useEmailTemplate ?? noopUseEmailTemplate) as () => {
     templateConfig?: {
       override_defaults?: boolean;
@@ -94,9 +94,9 @@ const EmailTemplatesRunner = ({
       ? `${key}|${templateConfig.override_defaults ? '1' : '0'}|${templateConfig.text_body ?? ''}|${templateConfig.html_body ?? ''}`
       : `${key}|no-license-or-config`;
 
-  const lastSigRef = React.useRef<string>('init');
+  const lastSigRef = useRef<string>('init');
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!validCustomizationLicense || !templateConfig) return;
 
     if (lastSigRef.current === sig) return;
@@ -108,25 +108,53 @@ const EmailTemplatesRunner = ({
 
     if (override_defaults === true) {
       const nextCfg = { ...config };
+      const trimmedBody = (config.body_template ?? '').trim();
+      const trimmedHtml = (config.html_body_template ?? '').trim();
 
-      if (typeof text_body === 'string' && text_body !== config.body_template) {
+      const shouldOverrideBody =
+        typeof text_body === 'string' &&
+        (trimmedBody === '' || (config.body_template ?? '') === DEFAULT_BODY_TEMPLATE) &&
+        text_body !== config.body_template;
+      const shouldOverrideHtml =
+        typeof html_body === 'string' &&
+        (trimmedHtml === '' || (config.html_body_template ?? '') === DEFAULT_HTML_BODY_TEMPLATE) &&
+        html_body !== config.html_body_template;
+
+      if (shouldOverrideBody) {
         nextCfg.body_template = text_body;
         changed = true;
       }
-      if (typeof html_body === 'string' && html_body !== config.html_body_template) {
+      if (shouldOverrideHtml) {
         nextCfg.html_body_template = html_body;
         changed = true;
       }
 
       if (changed) next = nextCfg;
     } else {
+      const trimmedBody = (config.body_template ?? '').trim();
+      const trimmedHtml = (config.html_body_template ?? '').trim();
+      const hasCustomBody =
+        trimmedBody !== '' &&
+        (config.body_template ?? '') !== DEFAULT_BODY_TEMPLATE &&
+        trimmedBody !== DEFAULT_BODY_TEMPLATE;
+      const hasCustomHtml =
+        trimmedHtml !== '' &&
+        (config.html_body_template ?? '') !== DEFAULT_HTML_BODY_TEMPLATE &&
+        trimmedHtml !== DEFAULT_HTML_BODY_TEMPLATE;
+
+      if (hasCustomBody || hasCustomHtml) {
+        lastSigRef.current = sig;
+
+        return;
+      }
+
       const nextCfg = { ...config };
 
-      if ((config.body_template ?? '') !== DEFAULT_BODY_TEMPLATE) {
+      if (trimmedBody === '') {
         nextCfg.body_template = DEFAULT_BODY_TEMPLATE;
         changed = true;
       }
-      if ((config.html_body_template ?? '') !== DEFAULT_HTML_BODY_TEMPLATE) {
+      if (trimmedHtml === '') {
         nextCfg.html_body_template = DEFAULT_HTML_BODY_TEMPLATE;
         changed = true;
       }

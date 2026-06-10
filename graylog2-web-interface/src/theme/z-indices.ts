@@ -23,7 +23,9 @@ const zIndices = {
   sidebarOverlay: sidebar - 1,
   modalOverlay: modalBase,
   modalBody: modalBase + 10,
-  notifications: modalBase + 11,
-  dropdownMenu: modalBase + 11,
+  confirmModalOverlay: modalBase + 11,
+  confirmModalBody: modalBase + 12,
+  notifications: modalBase + 13,
+  dropdownMenu: modalBase + 13,
 } as const;
 export default zIndices;

@@ -17,7 +17,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { Link } from 'components/common/router';
+import { Link } from 'components/common';
 import RelativeTime from 'components/common/RelativeTime';
 import Routes from 'routing/Routes';
 import StatusIndicator from 'components/sidecars/common/StatusIndicator';

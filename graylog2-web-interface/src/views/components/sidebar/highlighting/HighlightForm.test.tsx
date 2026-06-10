@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import HighlightForm from 'views/components/sidebar/highlighting/HighlightForm';
@@ -49,7 +49,7 @@ describe('HighlightForm', () => {
 
   const triggerSaveButtonClick = async () => {
     const elem = await screen.findByText('Update rule');
-    fireEvent.click(elem);
+    await userEvent.click(elem);
   };
 
   useViewsPlugin();
@@ -75,7 +75,7 @@ describe('HighlightForm', () => {
     const { findByText } = render(<SUT onClose={onClose} />);
     const elem = await findByText('Cancel');
 
-    fireEvent.click(elem);
+    await userEvent.click(elem);
 
     expect(onClose).toHaveBeenCalledTimes(1);
   });
@@ -93,7 +93,7 @@ describe('HighlightForm', () => {
     const onSubmit = jest.fn(() => Promise.resolve());
     render(<SUT rule={rule} onSubmit={onSubmit} />);
 
-    userEvent.click(screen.getByLabelText('Static Color'));
+    await userEvent.click(screen.getByLabelText('Static Color'));
 
     await triggerSaveButtonClick();
 
@@ -111,11 +111,11 @@ describe('HighlightForm', () => {
     const onSubmit = jest.fn(() => Promise.resolve());
     render(<SUT rule={rule} onSubmit={onSubmit} />);
 
-    userEvent.click(screen.getByLabelText('Gradient'));
+    await userEvent.click(screen.getByLabelText('Gradient'));
 
     const highestValue = await screen.findByLabelText('Specify highest value');
-    userEvent.clear(highestValue);
-    userEvent.type(highestValue, '100');
+    await userEvent.clear(highestValue);
+    await userEvent.type(highestValue, '100');
 
     await triggerSaveButtonClick();
 

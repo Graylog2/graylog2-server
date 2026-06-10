@@ -14,5 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line import/prefer-default-export
+
 export const NOTIFICATIONS_QUERY_KEY = ['system', 'notifications'] as const;
+
+export const BADGE_COUNT_KEY = 'badge-count' as const;
+export const TABLE_KEY = 'table' as const;

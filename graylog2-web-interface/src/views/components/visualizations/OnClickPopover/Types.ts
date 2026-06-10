@@ -19,6 +19,7 @@ import type { PlotData, PlotMouseEvent, Datum, Color } from 'plotly.js';
 import type React from 'react';
 
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type { ValuePath } from 'views/logic/valueactions/ValueActionHandler';
 
 export type ValueGroupItem = { field: string; value: Datum; text: string; traceColor: string | number };
 
@@ -40,7 +41,7 @@ export type Rel = { x: number; y: number };
 export type FieldData = {
   field: string;
   value: Datum;
-  contexts: { valuePath: Array<{ [key: string]: Datum }> } | null;
+  contexts: { valuePath: ValuePath } | null;
 };
 
 export type OnClickPopoverDropdownProps = {

@@ -23,12 +23,16 @@ import SelectEntitiesContext from './SelectEntitiesContext';
 import type { EntityBase } from '../types';
 
 type Props<Entity extends EntityBase> = React.PropsWithChildren<{
+  isAllRowsSelected: boolean;
+  isSomeRowsSelected: boolean;
   selectedEntities: Array<Entity['id']>;
   table: Table<Entity>;
 }>;
 
 const SelectedEntitiesProvider = <Entity extends EntityBase>({
   children = undefined,
+  isAllRowsSelected,
+  isSomeRowsSelected,
   selectedEntities,
   table,
 }: Props<Entity>) => {
@@ -56,8 +60,10 @@ const SelectedEntitiesProvider = <Entity extends EntityBase>({
       deselectEntity,
       selectEntity,
       toggleEntitySelect,
+      isAllRowsSelected,
+      isSomeRowsSelected,
     }),
-    [selectedEntities, deselectEntity, selectEntity, toggleEntitySelect, table],
+    [selectedEntities, deselectEntity, selectEntity, toggleEntitySelect, table, isAllRowsSelected, isSomeRowsSelected],
   );
 
   return <SelectEntitiesContext.Provider value={contextValue}>{children}</SelectEntitiesContext.Provider>;

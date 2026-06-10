@@ -15,19 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, DocumentTitle, PageHeader } from 'components/common';
 import { Row, Col, Button, ButtonToolbar, BootstrapModalConfirm } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
 import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';
-import { DocumentTitle, PageHeader } from 'components/common';
 import ContentPackDetails from 'components/content-packs/ContentPackDetails';
 import ContentPackVersions from 'components/content-packs/ContentPackVersions';
 import ContentPackInstallations from 'components/content-packs/ContentPackInstallations';
 import ContentPackInstallEntityList from 'components/content-packs/ContentPackInstallEntityList';
-import { ContentPacksActions } from 'stores/content-packs/ContentPacksStore';
+import {
+  deleteContentPackRev,
+  installContentPack,
+  uninstallContentPack,
+  fetchUninstallDetails,
+} from 'hooks/useContentPackMutations';
 import useHistory from 'routing/useHistory';
 import useParams from 'routing/useParams';
 import useContentPackRevisions from 'components/content-packs/hooks/useContentPackRevisions';
@@ -41,20 +45,15 @@ import ShowContentPackStyle from './ShowContentPackPage.css';
 const ShowContentPackPage = () => {
   const history = useHistory();
   const params = useParams<{ contentPackId: string }>();
-  const onFetchError = useCallback(
-    (error: FetchError) => {
-      if (error.status === 404) {
-        UserNotification.error(
-          `Cannot find Content Pack with the id ${params.contentPackId} and may have been deleted.`,
-        );
-      } else {
-        UserNotification.error('An internal server error occurred. Please check your logfiles for more information');
-      }
+  const onFetchError = (error: FetchError) => {
+    if (error.status === 404) {
+      UserNotification.error(`Cannot find Content Pack with the id ${params.contentPackId} and may have been deleted.`);
+    } else {
+      UserNotification.error('An internal server error occurred. Please check your logfiles for more information');
+    }
 
-      history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
-    },
-    [history, params?.contentPackId],
-  );
+    history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
+  };
 
   const [showModal, setShowModal] = useState(false);
   const [selectedVersion, setSelectedVersion] = useState(undefined);
@@ -79,7 +78,7 @@ const ShowContentPackPage = () => {
   const _deleteContentPackRev = (contentPackId: string, revision?: number) => {
     /* eslint-disable-next-line no-alert */
     if (window.confirm('You are about to delete this content pack revision, are you sure?')) {
-      ContentPacksActions.deleteRev(contentPackId, revision).then(
+      deleteContentPackRev(contentPackId, revision).then(
         () => {
           UserNotification.success('Content pack revision deleted successfully.', 'Success');
 
@@ -99,7 +98,7 @@ const ShowContentPackPage = () => {
   };
 
   const _onUninstallContentPackRev = (contentPackId: string, installId: string) => {
-    ContentPacksActions.uninstallDetails(contentPackId, installId).then((result: { entities: unknown }) => {
+    fetchUninstallDetails(contentPackId, installId).then((result: { entities: unknown }) => {
       setUninstallEntities(result.entities);
     });
 
@@ -116,7 +115,7 @@ const ShowContentPackPage = () => {
   };
 
   const _uninstallContentPackRev = () => {
-    ContentPacksActions.uninstall(uninstallContentPackId, uninstallInstallId).then(
+    uninstallContentPack(uninstallContentPackId, uninstallInstallId).then(
       () => {
         UserNotification.success('Content Pack uninstalled successfully.', 'Success');
         refetchInstallations();
@@ -134,7 +133,7 @@ const ShowContentPackPage = () => {
     parameters: {},
     shareRequest: EntitySharePayload,
   ) => {
-    ContentPacksActions.install(contentPackId, contentPackRev, parameters, shareRequest).then(
+    installContentPack(contentPackId, contentPackRev, parameters, shareRequest).then(
       () => {
         UserNotification.success('Content Pack installed successfully.', 'Success');
         refetchInstallations();

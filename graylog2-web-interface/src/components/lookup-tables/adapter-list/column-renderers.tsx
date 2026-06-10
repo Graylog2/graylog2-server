@@ -15,11 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 
+import Routes from 'routing/Routes';
 import { MetricContainer, CounterRate } from 'components/metrics';
-import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
-import DataAdapter from 'components/lookup-tables/DataAdapter';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import ErrorPopover from 'components/lookup-tables/ErrorPopover';
 import { useErrorsContext } from 'components/lookup-tables/contexts/ErrorsContext';
@@ -47,13 +48,11 @@ const Title = styled.div`
 const TitleCol = ({ adapter, children }: { adapter: DataAdapterEntity; children: string }) => {
   const { errors } = useErrorsContext();
   const adapterErrorText = errors?.adapterErrors[adapter.name];
-  const { setModal, setTitle, setEntity } = useModalContext();
+  const navigate = useNavigate();
 
-  const onClick = React.useCallback(() => {
-    setModal('DATA-ADAPTER');
-    setTitle(adapter.name);
-    setEntity(<DataAdapter dataAdapter={adapter} />);
-  }, [adapter, setModal, setTitle, setEntity]);
+  const onClick = useCallback(() => {
+    navigate(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(adapter?.name));
+  }, [navigate, adapter?.name]);
 
   return (
     <TitleRow>
