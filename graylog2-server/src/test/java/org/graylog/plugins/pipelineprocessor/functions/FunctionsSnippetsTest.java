@@ -1950,6 +1950,24 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
+    void setFieldsWithTimestamp() {
+        // Reproduces https://github.com/Graylog2/graylog2-server/issues/26025: key_value decodes a log line that
+        // contains a "timestamp" key in ISO-8601 format, and set_fields assigns it. This must not be counted as a
+        // processing failure, and the parsed timestamp must be used.
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = messageFactory.createMessage(
+                "device_name=\"SFW\" timestamp=\"2026-05-18T08:57:55+0200\" src_ip=\"192.168.0.222\"",
+                "test", Tools.nowUTC());
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("device_name")).isEqualTo("SFW");
+        assertThat(message.getField("src_ip")).isEqualTo("192.168.0.222");
+        // +0200 means the instant is 06:57:55 UTC; getTimestamp() triggers the lenient conversion
+        assertThat(message.getTimestamp()).isEqualTo(new DateTime(2026, 5, 18, 6, 57, 55, DateTimeZone.UTC));
+        assertThat(message.processingErrors()).isEmpty();
+    }
+
+    @Test
     void arrayContains() throws IOException {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         final Message message = messageFactory.createMessage("message", "source", DateTime.now(DateTimeZone.UTC));
