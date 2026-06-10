@@ -29,12 +29,7 @@ type ContentProps = {
   children: React.ReactNode;
 };
 
-const CreateModalContent = ({
-  entityName,
-  onCancel,
-  submitError,
-  children,
-}: ContentProps) => {
+const CreateModalContent = ({ entityName, onCancel, submitError, children }: ContentProps) => {
   const { isSubmitting, isValidating, isValid } = useFormikContext();
   const entityNameLower = entityName.toLowerCase();
 
@@ -101,15 +96,8 @@ const CreateModal = <TValues extends object>({
 
   return (
     <BootstrapModalWrapper showModal={show} onHide={onClose}>
-      <Formik<TValues>
-        initialValues={initialValues}
-        onSubmit={handleSubmit}
-        validate={validate}
-        validateOnBlur={false}>
-        <CreateModalContent
-          entityName={entityName}
-          onCancel={onClose}
-          submitError={submitError}>
+      <Formik<TValues> initialValues={initialValues} onSubmit={handleSubmit} validate={validate} validateOnBlur={false}>
+        <CreateModalContent entityName={entityName} onCancel={onClose} submitError={submitError}>
           {children}
         </CreateModalContent>
       </Formik>
