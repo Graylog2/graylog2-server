@@ -170,6 +170,7 @@ public class CollectorInstancesResource extends RestResource {
     private final CollectorsConfigService collectorsConfigService;
     private final DbQueryCreator dbQueryCreator;
     private final AuditEventSender auditEventSender;
+    private final ActivityEntryMapper activityEntryMapper;
 
     @Inject
     public CollectorInstancesResource(CollectorInstanceService collectorInstanceService,
@@ -178,7 +179,8 @@ public class CollectorInstancesResource extends RestResource {
                                       ComputedFieldRegistry computedFieldRegistry,
                                       FleetTransactionLogService txnLogService,
                                       CollectorsConfigService collectorsConfigService,
-                                      AuditEventSender auditEventSender) {
+                                      AuditEventSender auditEventSender,
+                                      ActivityEntryMapper activityEntryMapper) {
         this.collectorInstanceService = collectorInstanceService;
         this.fleetService = fleetService;
         this.sourceService = sourceService;
@@ -186,6 +188,7 @@ public class CollectorInstancesResource extends RestResource {
         this.dbQueryCreator = new DbQueryCreator("hostname", ATTRIBUTES, computedFieldRegistry);
         this.collectorsConfigService = collectorsConfigService;
         this.auditEventSender = auditEventSender;
+        this.activityEntryMapper = activityEntryMapper;
     }
 
     @GET
@@ -286,6 +289,27 @@ public class CollectorInstancesResource extends RestResource {
                 "fleetId", dto.fleetId()
         ));
         return Response.noContent().build();
+    }
+
+    @GET
+    @Path("/instances/{instanceUid}/pending_changes")
+    @Timed
+    @Operation(summary = "Get pending changes that a collector has not applied yet")
+    public PendingChangesResponse instancePendingChanges(
+            @Parameter(name = "instanceUid", required = true) @PathParam("instanceUid") String instanceUid) {
+        final var collector = collectorInstanceService.findByInstanceUid(instanceUid).orElseThrow(() ->
+                new NotFoundException(f("Collector instance <%s> not found", instanceUid)));
+
+        checkPermission(CollectorsPermissions.FLEET_READ, collector.fleetId());
+
+        final var markers = txnLogService.getUnprocessedMarkers(collector.fleetId(), collector.instanceUid(),
+                collector.lastProcessedTxnSeq());
+        final var coalesced = txnLogService.coalesce(markers);
+        final var activities = activityEntryMapper.toEntries(
+                markers.stream().filter(marker -> marker.type() != MarkerType.UNKNOWN).toList(),
+                this::isPermitted);
+
+        return new PendingChangesResponse(PendingChangesResponse.CoalescedActionsView.from(coalesced), activities);
     }
 
     @POST
