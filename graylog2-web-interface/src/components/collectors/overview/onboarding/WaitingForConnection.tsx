@@ -16,18 +16,15 @@
  */
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import styled, { css, keyframes } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Button } from 'components/bootstrap';
+
+import PulsingDot from './PulsingDot';
 
 type Props = {
   onSimulateConnection: () => void;
 };
-
-const pulse = keyframes`
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.6); opacity: 0.5; }
-`;
 
 const Container = styled.div(
   ({ theme }) => css`
@@ -44,17 +41,6 @@ const StatusRow = styled.div(
     display: flex;
     align-items: center;
     gap: ${theme.spacings.sm};
-  `,
-);
-
-const PulsingDot = styled.span(
-  ({ theme }) => css`
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background-color: ${theme.colors.variant.info};
-    animation: ${pulse} 1.4s ease-in-out infinite;
   `,
 );
 
