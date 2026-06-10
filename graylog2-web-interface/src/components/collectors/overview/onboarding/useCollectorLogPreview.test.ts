@@ -20,6 +20,8 @@ import asMock from 'helpers/mocking/AsMock';
 import createSearch from 'views/logic/slices/createSearch';
 import { startJob, executeJobResult } from 'views/logic/slices/executeJobResult';
 import type Search from 'views/logic/search/Search';
+import MessageSortConfig from 'views/logic/searchtypes/messages/MessageSortConfig';
+import Direction from 'views/logic/aggregationbuilder/Direction';
 
 import useCollectorLogPreview from './useCollectorLogPreview';
 
@@ -100,7 +102,7 @@ describe('useCollectorLogPreview', () => {
       return search;
     });
 
-    asMock(executeJobResult).mockImplementation(async () => makeResultsMock(createdSearch));
+    asMock(executeJobResult).mockImplementation(async () => makeResultsMock(createdSearch) as unknown as Awaited<ReturnType<typeof executeJobResult>>);
 
     const { result } = renderHook(() => useCollectorLogPreview('uid-42'));
 
@@ -157,7 +159,7 @@ describe('useCollectorLogPreview', () => {
           type: 'messages',
           limit: 10,
           offset: 0,
-          sort: [{ field: 'timestamp', order: 'DESC' }],
+          sort: [new MessageSortConfig('timestamp', Direction.Descending)],
         }),
       );
     });
@@ -229,7 +231,7 @@ describe('useCollectorLogPreview', () => {
         return search;
       });
 
-      asMock(executeJobResult).mockImplementation(async () => makeResultsMock(createdSearch));
+      asMock(executeJobResult).mockImplementation(async () => makeResultsMock(createdSearch) as unknown as Awaited<ReturnType<typeof executeJobResult>>);
 
       const { result } = renderHook(() => useCollectorLogPreview('uid-42'), {
         queryClientOptions: { defaultOptions: { queries: { retry: false } } },
@@ -287,7 +289,7 @@ describe('useCollectorLogPreview', () => {
             return undefined;
           },
         },
-      };
+      } as unknown as Awaited<ReturnType<typeof executeJobResult>>;
     });
 
     const { result } = renderHook(() => useCollectorLogPreview('uid-42'));

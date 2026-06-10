@@ -24,6 +24,9 @@ import Search from 'views/logic/search/Search';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import createSearch from 'views/logic/slices/createSearch';
 import { startJob, executeJobResult } from 'views/logic/slices/executeJobResult';
+import MessageSortConfig from 'views/logic/searchtypes/messages/MessageSortConfig';
+import Direction from 'views/logic/aggregationbuilder/Direction';
+import type { MessagesSearchType } from 'views/logic/queries/SearchType';
 
 const REFRESH_INTERVAL_MS = 5000;
 const PREVIEW_RANGE_SECONDS = 900; // last 15 minutes
@@ -50,13 +53,20 @@ type PreviewSearch = {
   };
 };
 
-const messagesSearchType = (id: string) => ({
+const messagesSearchType = (id: string): MessagesSearchType => ({
   id,
   type: 'messages',
   limit: PREVIEW_MESSAGE_LIMIT,
   offset: 0,
-  sort: [{ field: 'timestamp', order: 'DESC' }],
+  sort: [new MessageSortConfig('timestamp', Direction.Descending)],
   decorators: [],
+  filter: undefined,
+  filters: undefined,
+  name: undefined,
+  query: undefined,
+  timerange: undefined,
+  streams: [],
+  stream_categories: [],
 });
 
 const previewTimerange: RelativeTimeRangeWithEnd = { type: 'relative', from: PREVIEW_RANGE_SECONDS };
