@@ -24,6 +24,7 @@ import org.graylog2.datanode.DataNodeInformation;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 public record OpensearchVersionsOverview(@JsonProperty("nodes") List<NodeVersionStatus> nodes) {
@@ -77,18 +78,31 @@ public record OpensearchVersionsOverview(@JsonProperty("nodes") List<NodeVersion
     public Optional<String> highestAvailableVersion() {
         return nodes.stream()
                 .map(NodeVersionStatus::availableVersion)
-                .filter(v -> v != null)
+                .filter(Objects::nonNull)
                 .max(Comparator.comparing(Version::parse));
     }
 
-    public static OpensearchVersionsOverview of(List<DataNodeMetadata> nodes, Map<String, DataNodeInformation> datanodes) {
+    public OpensearchVersionsOverview withDatanodeDetails(Map<String, DataNodeInformation> datanodes) {
+        final List<NodeVersionStatus> enriched = nodes.stream()
+                .map(n -> new NodeVersionStatus(
+                        n.nodeId(),
+                        n.currentVersion(),
+                        n.availableVersion(),
+                        n.upgradeable(),
+                        Optional.ofNullable(datanodes.get(n.nodeId())).map(DatanodeDetails::of).orElse(null)
+                ))
+                .toList();
+        return new OpensearchVersionsOverview(enriched);
+    }
+
+    public static OpensearchVersionsOverview of(List<DataNodeMetadata> nodes) {
         final List<NodeVersionStatus> statuses = nodes.stream()
                 .map(n -> new NodeVersionStatus(
                         n.nodeId(),
                         n.currentOpensearchVersion(),
                         n.latestAvailableOpensearchVersion(),
                         n.latestAvailableOpensearchVersion() != null,
-                        Optional.ofNullable(datanodes.get(n.nodeId())).map(DatanodeDetails::of).orElse(null)
+                        null
                 ))
                 .sorted(Comparator.comparing(NodeVersionStatus::currentVersion, Comparator.comparing(Version::parse)))
                 .toList();
