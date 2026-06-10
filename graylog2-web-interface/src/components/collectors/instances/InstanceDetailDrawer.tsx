@@ -22,9 +22,11 @@ import Drawer from 'components/common/Drawer';
 import { Link, RelativeTime } from 'components/common';
 import Routes from 'routing/Routes';
 
+import ActivityEntryList from '../common/ActivityEntryList';
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
 import collectorSystemLogsUrl from '../common/collectorSystemLogsUrl';
-import type { CollectorInstanceView, Source } from '../types';
+import { useInstancePendingChanges } from '../hooks';
+import type { ActivityEntry, CoalescedActions, CollectorInstanceView, Source } from '../types';
 
 type Props = {
   instance: CollectorInstanceView;
@@ -86,8 +88,40 @@ const SourceList = styled.div`
   gap: ${({ theme }) => theme.spacings.xs};
 `;
 
+const CoalescedLabels = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    flex-wrap: wrap;
+    gap: ${theme.spacings.xs};
+    margin-bottom: ${theme.spacings.sm};
+  `,
+);
+
+// The net effect the collector will apply, as short summary chips. The reassign destination name
+// comes resolved from the corresponding activity entry (the coalesced view only carries the id).
+const coalescedSummary = (coalesced: CoalescedActions, activities: ActivityEntry[]): string[] => {
+  const summary: string[] = [];
+
+  if (coalesced.reassign_target_fleet_id) {
+    const destination = activities
+      .map((entry) => (entry.type === 'FLEET_REASSIGNED' ? entry.details?.destination_fleet?.name : null))
+      .filter(Boolean)
+      .pop();
+    summary.push(destination ? `Reassign to ${destination}` : 'Reassign');
+  }
+
+  if (coalesced.recompute_config) summary.push('Configuration update');
+  if (coalesced.recompute_ingest_config) summary.push('Ingest configuration update');
+  if (coalesced.restart) summary.push('Restart');
+  if (coalesced.run_discovery) summary.push('Discovery run');
+
+  return summary;
+};
+
 const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) => {
   const osDescription = (instance.non_identifying_attributes?.['os.description'] as string) ?? null;
+  const { data: pendingChanges } = useInstancePendingChanges(instance.instance_uid);
+  const hasPendingChanges = (pendingChanges?.activities?.length ?? 0) > 0;
 
   return (
     <Drawer title={instance.hostname || instance.instance_uid} onClose={onClose} size="md">
@@ -136,6 +170,21 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
           </Link>
         </DetailRow>
       </Section>
+
+      {hasPendingChanges && (
+        <Section>
+          <SectionTitle>Pending changes</SectionTitle>
+          <CoalescedLabels>
+            {coalescedSummary(pendingChanges.coalesced, pendingChanges.activities).map((summary) => (
+              <Label key={summary} bsStyle="warning">
+                {summary}
+              </Label>
+            ))}
+          </CoalescedLabels>
+          <EmptyText>Queued changes apply at the collector&apos;s next check-in.</EmptyText>
+          <ActivityEntryList entries={pendingChanges.activities} />
+        </Section>
+      )}
 
       <Section>
         <SectionTitle>Attributes</SectionTitle>

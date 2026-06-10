@@ -17,9 +17,14 @@
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
+import asMock from 'helpers/mocking/AsMock';
+
 import InstanceDetailDrawer from './InstanceDetailDrawer';
 
-import type { CollectorInstanceView, Source } from '../types';
+import useInstancePendingChanges from '../hooks/useInstancePendingChanges';
+import type { CollectorInstanceView, PendingChangesResponse, Source } from '../types';
+
+jest.mock('../hooks/useInstancePendingChanges');
 
 const mockInstance: CollectorInstanceView = {
   id: 'inst-1',
@@ -53,7 +58,31 @@ const mockSources: Source[] = [
   },
 ];
 
+const pendingChanges: PendingChangesResponse = {
+  coalesced: {
+    recompute_config: true,
+    recompute_ingest_config: false,
+    reassign_target_fleet_id: 'fleet-2',
+    restart: false,
+    run_discovery: false,
+  },
+  activities: [
+    {
+      seq: 42,
+      timestamp: '2026-06-10T12:00:00Z',
+      type: 'FLEET_REASSIGNED',
+      actor: { username: 'alice', full_name: 'Alice Admin' },
+      targets: [{ id: 'uid-1', name: 'prod-web-01', type: 'collector' }],
+      details: { destination_fleet: { id: 'fleet-2', name: 'Staging', type: 'fleet' } },
+    },
+  ],
+};
+
 describe('InstanceDetailDrawer', () => {
+  beforeEach(() => {
+    asMock(useInstancePendingChanges).mockReturnValue({ data: undefined, isLoading: true });
+  });
+
   it('renders instance hostname as title', async () => {
     render(
       <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
@@ -86,5 +115,42 @@ describe('InstanceDetailDrawer', () => {
     const link = await screen.findByRole('link', { name: /^received messages$/i });
     expect(link).toHaveAttribute('href', expect.stringContaining('collector_instance_uid'));
     expect(link).toHaveAttribute('href', expect.stringContaining('uid-1'));
+  });
+
+  it('renders pending changes with coalesced summary and activity entries', async () => {
+    asMock(useInstancePendingChanges).mockReturnValue({ data: pendingChanges, isLoading: false });
+
+    render(
+      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+    );
+
+    await screen.findByText('Pending changes');
+    await screen.findByText('Reassign to Staging');
+    await screen.findByText('Configuration update');
+    await screen.findByText(/reassigned/i);
+    await screen.findByText('by Alice Admin');
+  });
+
+  it('hides the pending changes section when the instance is caught up', async () => {
+    asMock(useInstancePendingChanges).mockReturnValue({
+      data: {
+        coalesced: {
+          recompute_config: false,
+          recompute_ingest_config: false,
+          reassign_target_fleet_id: null,
+          restart: false,
+          run_discovery: false,
+        },
+        activities: [],
+      },
+      isLoading: false,
+    });
+
+    render(
+      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+    );
+
+    await screen.findByRole('dialog', { name: /prod-web-01/i });
+    expect(screen.queryByText('Pending changes')).not.toBeInTheDocument();
   });
 });
