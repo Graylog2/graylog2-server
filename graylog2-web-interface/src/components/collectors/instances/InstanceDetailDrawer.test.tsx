@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
 
@@ -117,17 +118,22 @@ describe('InstanceDetailDrawer', () => {
     expect(link).toHaveAttribute('href', expect.stringContaining('uid-1'));
   });
 
-  it('renders pending changes with coalesced summary and activity entries', async () => {
+  it('renders pending changes as the effects the collector will apply', async () => {
     asMock(useInstancePendingChanges).mockReturnValue({ data: pendingChanges, isLoading: false });
 
     render(
       <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
     );
 
-    await screen.findByText('Pending changes');
-    await screen.findByText('Reassign to Staging');
-    await screen.findByText('Configuration update');
-    await screen.findByText(/reassigned/i);
+    await screen.findByText('Synchronization');
+    await screen.findByText('Sync pending');
+    await screen.findByText(/reassign to fleet/i);
+    await screen.findByRole('link', { name: 'Staging' });
+    await screen.findByText(/reload configuration/i);
+
+    // The queued transactions are collapsed by default and expand on demand.
+    expect(screen.queryByText('by Alice Admin')).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: /show queued transactions \(1\)/i }));
     await screen.findByText('by Alice Admin');
   });
 
@@ -151,6 +157,9 @@ describe('InstanceDetailDrawer', () => {
     );
 
     await screen.findByRole('dialog', { name: /prod-web-01/i });
-    expect(screen.queryByText('Pending changes')).not.toBeInTheDocument();
+    // "In sync" appears in the top detail row and in the Synchronization section
+    expect(await screen.findAllByText('In sync')).toHaveLength(2);
+    await screen.findByText(/applied all queued actions/i);
+    expect(screen.queryByText(/queued until the collector synchronizes/i)).not.toBeInTheDocument();
   });
 });

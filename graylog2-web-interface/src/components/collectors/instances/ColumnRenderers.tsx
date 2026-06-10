@@ -15,26 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
 
 import { Label } from 'components/bootstrap';
-import { Icon, Link, RelativeTime } from 'components/common';
+import { Link, RelativeTime } from 'components/common';
 import Routes from 'routing/Routes';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 
+import SyncStateIndicator from '../common/SyncStateIndicator';
 import type { CollectorInstanceView } from '../types';
-
-const SyncPendingIcon = styled(Icon)(
-  ({ theme }) => css`
-    color: ${theme.colors.variant.warning};
-  `,
-);
-
-const InSyncIcon = styled(Icon)(
-  ({ theme }) => css`
-    color: ${theme.colors.variant.default};
-  `,
-);
 
 const OsIcon = ({ os }: { os: string | null }) => {
   if (os === 'linux') return <span title="Linux">Linux</span>;
@@ -63,16 +51,9 @@ const customColumnRenderers = ({ fleetNames }: Props): ColumnRenderers<Collector
       staticWidth: 100,
     },
     has_pending_changes: {
-      renderCell: (_hasPendingChanges: boolean, instance: CollectorInstanceView) =>
-        instance.has_pending_changes ? (
-          <span title="Sync pending — changes will apply at the collector's next check-in">
-            <SyncPendingIcon name="update" />
-          </span>
-        ) : (
-          <span title="In sync — all changes applied">
-            <InSyncIcon name="check_circle" />
-          </span>
-        ),
+      renderCell: (_hasPendingChanges: boolean, instance: CollectorInstanceView) => (
+        <SyncStateIndicator pending={instance.has_pending_changes} />
+      ),
       staticWidth: 60,
     },
     hostname: {

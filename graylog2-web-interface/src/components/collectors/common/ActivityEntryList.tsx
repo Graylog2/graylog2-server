@@ -22,27 +22,9 @@ import type { IconName } from 'components/common/Icon/types';
 import Routes from 'routing/Routes';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 
+import { DividedIconRow, IconRowList } from './IconRowList';
+
 import type { ActivityEntry, TargetInfo } from '../types';
-
-const ActivityList = styled.ul`
-  list-style: none;
-  margin: 0;
-  padding: 0;
-`;
-
-const ActivityRow = styled.li(
-  ({ theme }) => css`
-    display: flex;
-    align-items: baseline;
-    gap: ${theme.spacings.sm};
-    padding: ${theme.spacings.xs} 0;
-    border-bottom: 1px solid ${theme.colors.gray[90]};
-
-    &:last-child {
-      border-bottom: none;
-    }
-  `,
-);
 
 const Description = styled.span`
   flex: 1;
@@ -149,9 +131,9 @@ type Props = {
  * shared `ActivityEntryMapper` on the backend.
  */
 const ActivityEntryList = ({ entries }: Props) => (
-  <ActivityList>
+  <IconRowList>
     {entries.map((entry) => (
-      <ActivityRow key={entry.seq}>
+      <DividedIconRow key={entry.seq}>
         <Icon name={ICON_MAP[entry.type] ?? 'info'} />
         <Description>{renderDescription(entry)}</Description>
         <MutedText>{entry.actor ? `by ${entry.actor.full_name}` : 'by System'}</MutedText>
@@ -160,9 +142,9 @@ const ActivityEntryList = ({ entries }: Props) => (
             <RelativeTime dateTime={entry.timestamp} />
           </MutedText>
         )}
-      </ActivityRow>
+      </DividedIconRow>
     ))}
-  </ActivityList>
+  </IconRowList>
 );
 
 export default ActivityEntryList;
