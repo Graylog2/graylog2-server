@@ -15,19 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import styled, { useTheme } from 'styled-components';
 
-import {
-  COL_WIDTH_SIZE,
-  COL_WIDTH_VARIABLE,
-  FoundationTable,
-  H1,
-  PxLabel,
-  SectionDescription,
-  StoryContainer,
-  Token,
-} from './shared';
+import { COL_WIDTH_SIZE, COL_WIDTH_VARIABLE, FoundationTable, PxLabel, StoryContainer, Token } from './shared';
 
 // ─── Spacings ──────────────────────────────────────────────────────────────
 
@@ -89,7 +79,7 @@ const SPACINGS: SpacingEntry[] = [
   },
 ];
 
-const SpacingsDoc = () => {
+export const SpacingsDoc = () => {
   const theme = useTheme();
 
   const columns = [
@@ -120,34 +110,7 @@ const SpacingsDoc = () => {
 
   return (
     <StoryContainer>
-      <H1>Spacings</H1>
-      <SectionDescription>
-        Spacing tokens are for <strong>component authors</strong> building new reusable components. When importing an
-        existing components, their internal spacing is already built in and you do not need to apply these manually.
-      </SectionDescription>
       <FoundationTable columns={columns} rows={SPACINGS} keyBy={(row) => row.key} />
     </StoryContainer>
   );
-};
-
-// ─── Meta & Story ──────────────────────────────────────────────────────────
-
-const meta: Meta = {
-  title: 'Foundation/Spacings',
-  parameters: {
-    layout: 'padded',
-    docs: {
-      description: {
-        component:
-          'Spacing tokens from `theme.spacings`. Values follow a Fibonacci-based scale — use the token name, never hardcode `px` values. These tokens will be consolidated in a future design system update.',
-      },
-    },
-  },
-};
-
-export default meta;
-type Story = StoryObj<typeof meta>;
-
-export const Spacings: Story = {
-  render: SpacingsDoc,
 };
