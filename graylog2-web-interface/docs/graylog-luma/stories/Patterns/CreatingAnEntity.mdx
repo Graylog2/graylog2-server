@@ -1,4 +1,4 @@
-{/\*
+{/*
 
 - Copyright (C) 2020 Graylog, Inc.
 -
@@ -14,42 +14,13 @@
 - You should have received a copy of the Server Side Public License
 - along with this program. If not, see
 - <http://www.mongodb.com/licensing/server-side-public-license>.
-  \*/}
+*/}
 
 import { Canvas, Meta, Unstyled } from '@storybook/addon-docs/blocks';
 import { Alert } from 'components/bootstrap';
 import * as CreatingAnEntityStories from './CreatingAnEntity.stories';
 import Mermaid from './Mermaid';
-
-export const DIAGRAM = `flowchart TD
-  A(["User's current view"])
-  A --> B{{"\`Should users remain
-in their current workflow?\`"}}
-  B -->|Yes| MODAL
-  B -->|No| PAGE
-
-subgraph Surface["Surface"]
-MODAL(["\`**Modal**
-Current context preserved\`"])
-PAGE(["\`**Page**
-Dedicated creation experience\`"])
-end
-
-subgraph Method["Method"]
-MW(["\`**Form or Wizard**
-Single-step or guided workflow\`"])
-FW(["\`**Form or Wizard**
-Single-step or guided workflow\`"])
-end
-
-MODAL --> MW
-PAGE --> FW
-
-MW --> RC(["\`**Return to current workflow**
-Modal closes, toast shown\`"])
-FW --> NC(["\`**Navigate to entity**
-Details page, toast shown\`"])
-`;
+import { DIAGRAM } from './CreatingAnEntity.constants';
 
 <Meta of={CreatingAnEntityStories} />
 

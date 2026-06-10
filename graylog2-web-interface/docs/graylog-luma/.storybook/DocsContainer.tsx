@@ -33,6 +33,10 @@ const DocsOverride = createGlobalStyle(
       font-size: 1rem;
     }
 
+    h2 {
+      border-bottom: none;
+    }
+
     .docs-story {
       background-color: ${theme.colors.global.background};
     }
