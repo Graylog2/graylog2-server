@@ -165,7 +165,7 @@
         <mongodb-driver.version>5.6.1</mongodb-driver.version>
         <mongojack.version>5.0.3</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.2.13.Final</netty.version>
+        <netty.version>4.2.15.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.77.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>5.2.1</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
