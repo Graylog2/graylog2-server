@@ -71,6 +71,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -335,18 +336,39 @@ public class InputServiceImplTest {
     @MongoDBFixtures("InputServiceImplTest.json")
     public void getExtractorsSkipsExtractorsThatCannotBeBuilt() throws Exception {
         // An extractor that can no longer be built from its persisted data (e.g. a lookup table extractor whose
-        // lookup table was deleted) must be skipped instead of breaking listing of all extractors for the input.
-        // See issue #26122.
+        // lookup table was deleted) must be skipped, while the remaining valid extractors are still listed. A single
+        // broken extractor must not break listing for the whole input. See issue #26122.
         final Input input = inputService.find("54e3deadbeefdeadbeef0001");
 
-        final String extractorId = new ObjectId().toHexString();
+        final String brokenId = new ObjectId().toHexString();
+        final String validId = new ObjectId().toHexString();
+        final Extractor brokenExtractor = mockPersistableExtractor(brokenId, "broken extractor", Extractor.Type.LOOKUP_TABLE);
+        final Extractor validExtractor = mockPersistableExtractor(validId, "valid extractor", Extractor.Type.GROK);
+
+        inputService.addExtractor(input, brokenExtractor);
+        inputService.addExtractor(input, validExtractor);
+
+        // The factory returns null for the extractor that cannot be built from its persisted document, and a real
+        // extractor for the valid one. Discriminating on the id proves the broken one is dropped while the valid one
+        // survives - not that the whole list is dropped.
+        when(extractorFactory.factory(eq(brokenId), any(), anyLong(), any(), any(), any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(null);
+        when(extractorFactory.factory(eq(validId), any(), anyLong(), any(), any(), any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(validExtractor);
+
+        assertThat(inputService.getExtractors(input.getId())).containsExactly(validExtractor);
+    }
+
+    // Builds a mock Extractor with the persisted fields and getters that InputServiceImpl#addExtractor /
+    // #validateExtractor read when persisting it to MongoDB.
+    private Extractor mockPersistableExtractor(String id, String title, Extractor.Type type) {
         final Extractor extractor = Mockito.mock(Extractor.class);
         final Map<String, Object> persistedFields = new HashMap<>();
-        persistedFields.put(Extractor.FIELD_ID, extractorId);
-        persistedFields.put(Extractor.FIELD_TITLE, "broken extractor");
+        persistedFields.put(Extractor.FIELD_ID, id);
+        persistedFields.put(Extractor.FIELD_TITLE, title);
         persistedFields.put(Extractor.FIELD_ORDER, 0);
         persistedFields.put(Extractor.FIELD_CURSOR_STRATEGY, Extractor.CursorStrategy.COPY.name());
-        persistedFields.put(Extractor.FIELD_TYPE, Extractor.Type.LOOKUP_TABLE.name());
+        persistedFields.put(Extractor.FIELD_TYPE, type.name());
         persistedFields.put(Extractor.FIELD_SOURCE_FIELD, "message");
         persistedFields.put(Extractor.FIELD_TARGET_FIELD, "message");
         persistedFields.put(Extractor.FIELD_EXTRACTOR_CONFIG, Map.of());
@@ -355,22 +377,14 @@ public class InputServiceImplTest {
         persistedFields.put(Extractor.FIELD_CONDITION_TYPE, Extractor.ConditionType.STRING.name());
         when(extractor.getPersistedFields()).thenReturn(persistedFields);
 
-        // Fields read by InputServiceImpl#addExtractor / #validateExtractor when persisting.
-        when(extractor.getId()).thenReturn(extractorId);
-        when(extractor.getTitle()).thenReturn("broken extractor");
-        when(extractor.getType()).thenReturn(Extractor.Type.LOOKUP_TABLE);
+        when(extractor.getId()).thenReturn(id);
+        when(extractor.getTitle()).thenReturn(title);
+        when(extractor.getType()).thenReturn(type);
         when(extractor.getCursorStrategy()).thenReturn(Extractor.CursorStrategy.COPY);
         when(extractor.getSourceField()).thenReturn("message");
         when(extractor.getCreatorUserId()).thenReturn("user-x");
         when(extractor.getExtractorConfig()).thenReturn(Map.of());
-
-        inputService.addExtractor(input, extractor);
-
-        // The factory returns null when the extractor cannot be built from the persisted document.
-        when(extractorFactory.factory(any(), any(), anyLong(), any(), any(), any(), any(), any(), any(), any(), any(), any()))
-                .thenReturn(null);
-
-        assertThat(inputService.getExtractors(input.getId())).isEmpty();
+        return extractor;
     }
 
     @Test
