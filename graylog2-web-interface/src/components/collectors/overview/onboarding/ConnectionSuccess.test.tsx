@@ -100,4 +100,12 @@ describe('ConnectionSuccess', () => {
     expect(screen.getByRole('heading', { name: /collector logs/i })).toBeInTheDocument();
     expect(screen.getByTestId('collapseButton')).toBeInTheDocument();
   });
+
+  it('falls back to the instance uid when hostname is missing', () => {
+    render(
+      <ConnectionSuccess platformId="linux" instance={{ ...instance, hostname: null }} fleetName="Default Fleet" />,
+    );
+
+    expect(screen.getByText('uid-42')).toBeInTheDocument();
+  });
 });

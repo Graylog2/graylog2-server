@@ -160,7 +160,7 @@ const ConnectionSuccess = ({ platformId, instance, fleetName }: Props) => {
 
       <StatsRow>
         <StatCard value={instance.status === 'online' ? 1 : 0} label="Online" variant="success" />
-        <StatCard value={sourceLogs?.total ?? 0} label="Messages" />
+        <StatCard value={sourceLogs?.total ?? 0} label="Messages (15 min)" />
         <StatCard value={sources?.length ?? 0} label="Sources" />
       </StatsRow>
 
