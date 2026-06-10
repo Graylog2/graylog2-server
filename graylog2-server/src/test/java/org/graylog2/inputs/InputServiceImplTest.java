@@ -348,11 +348,13 @@ public class InputServiceImplTest {
         inputService.addExtractor(input, brokenExtractor);
         inputService.addExtractor(input, validExtractor);
 
-        // The factory returns null for the extractor that cannot be built from its persisted document, and a real
-        // extractor for the valid one. Discriminating on the id proves the broken one is dropped while the valid one
-        // survives - not that the whole list is dropped.
+        // The factory throws for the extractor that cannot be built from its persisted document (this is what the
+        // real factory does, e.g. LookupTableExtractor's constructor throwing ConfigurationException when its lookup
+        // table is gone), and returns a real extractor for the valid one. This exercises getExtractorFromDoc()'s
+        // try/catch, which is what turns a build failure into the skipped null. Discriminating on the id proves the
+        // broken one is dropped while the valid one survives - not that the whole list is dropped.
         when(extractorFactory.factory(eq(brokenId), any(), anyLong(), any(), any(), any(), any(), any(), any(), any(), any(), any()))
-                .thenReturn(null);
+                .thenThrow(new ConfigurationException("lookup table no longer exists"));
         when(extractorFactory.factory(eq(validId), any(), anyLong(), any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(validExtractor);
 

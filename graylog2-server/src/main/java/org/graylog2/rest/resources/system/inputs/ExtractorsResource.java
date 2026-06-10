@@ -403,7 +403,17 @@ public class ExtractorsResource extends RestResource {
         }
         final Map<String, Object> config = cer.extractorConfig();
         final Object lookupTableName = config == null ? null : config.get(LookupTableExtractor.CONFIG_LUT_NAME);
-        if (lookupTableName instanceof String name && !lookupTableService.hasTable(name)) {
+        // Validate the reference fully here so every bad value yields a deterministic 400. We deliberately do not lean
+        // on the LookupTableExtractor constructor to reject bad input: issue #26122 loosened that constructor, and a
+        // non-string value would slip past it into an uncaught ClassCastException (HTTP 500) anyway.
+        if (lookupTableName != null && !(lookupTableName instanceof String)) {
+            throw new BadRequestException("Configured lookup table name must be a string");
+        }
+        final String name = (String) lookupTableName;
+        if (name == null || name.isEmpty()) {
+            throw new BadRequestException("Missing lookup table extractor configuration field: " + LookupTableExtractor.CONFIG_LUT_NAME);
+        }
+        if (!lookupTableService.hasTable(name)) {
             throw new BadRequestException("Configured lookup table <" + name + "> doesn't exist");
         }
     }
