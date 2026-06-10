@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useState, useLayoutEffect, useMemo } from 'react';
+import { useState, useLayoutEffect, useMemo, useRef } from 'react';
+import isEqual from 'lodash/isEqual';
 
 import {
   DEFAULT_COL_MIN_WIDTH,
@@ -135,6 +136,7 @@ const useColumnWidths = <Entity extends EntityBase>({
   headerMinWidths: { [colId: string]: number };
 }) => {
   const [columnWidths, setColumnWidths] = useState({});
+  const prevColumnWidthsRef = useRef<Record<string, number>>({});
   const staticColumnWidths = useMemo(
     () =>
       calculateStaticColumnWidths({
@@ -161,18 +163,20 @@ const useColumnWidths = <Entity extends EntityBase>({
       staticColumnWidths,
     });
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setColumnWidths(
-      calculateColumnWidths({
-        actionsColMinWidth,
-        assignableWidth,
-        attributeColumnIds: columnIds,
-        attributeColumnRenderers: columnRenderersByAttribute,
-        bulkSelectColWidth,
-        staticColumnWidths,
-        headerMinWidths,
-      }),
-    );
+    const newColumnWidths = calculateColumnWidths({
+      actionsColMinWidth,
+      assignableWidth,
+      attributeColumnIds: columnIds,
+      attributeColumnRenderers: columnRenderersByAttribute,
+      bulkSelectColWidth,
+      staticColumnWidths,
+      headerMinWidths,
+    });
+
+    if (!isEqual(prevColumnWidthsRef.current, newColumnWidths)) {
+      prevColumnWidthsRef.current = newColumnWidths;
+      setColumnWidths(newColumnWidths);
+    }
   }, [
     actionsColMinWidth,
     bulkSelectColWidth,

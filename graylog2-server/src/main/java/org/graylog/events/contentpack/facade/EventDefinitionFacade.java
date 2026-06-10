@@ -27,6 +27,7 @@ import com.google.common.graph.MutableGraph;
 import jakarta.inject.Inject;
 import org.graylog.events.contentpack.entities.EventDefinitionEntity;
 import org.graylog.events.processor.DBEventDefinitionService;
+import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
 import org.graylog.events.processor.EventProcessorExecutionJob;
@@ -37,6 +38,7 @@ import org.graylog.security.GrantDTO;
 import org.graylog.security.shares.EntityGrantLookup;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.facades.EntityFacade;
+import org.graylog2.contentpacks.facades.UpdatableEntityFacade;
 import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -62,7 +64,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
+public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto>, UpdatableEntityFacade<EventDefinitionDto> {
     private static final Logger LOG = LoggerFactory.getLogger(EventDefinitionFacade.class);
 
     private final ObjectMapper objectMapper;
@@ -162,6 +164,27 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
 
         return eventDefinition.map(eventDefinitionDto ->
                 NativeEntity.create(nativeEntityDescriptor, eventDefinitionDto));
+    }
+
+    @Override
+    public void updateNativeEntity(Entity entity, NativeEntity<EventDefinitionDto> existingEntity,
+                                   Map<String, ValueReference> parameters,
+                                   Map<EntityDescriptor, Object> nativeEntities, String username) {
+        if (!(entity instanceof EntityV1 entityV1)) {
+            return;
+        }
+        final EventDefinitionDto existing = existingEntity.entity();
+        final EventDefinitionEntity eventDefinitionEntity = objectMapper.convertValue(entityV1.data(),
+                EventDefinitionEntity.class);
+        // Seed with the existing entity so fields the pack doesn't carry (id, state, ...) keep their
+        // stored values; guard scope since the mutability bypass below would otherwise let the pack change it.
+        final EventDefinitionDto updated = eventDefinitionEntity
+                .toNativeEntity(parameters, nativeEntities, existing.toBuilder())
+                .toBuilder().scope(existing.scope()).build();
+        // Scheduling follows the user's enabled/disabled choice, not the pack's is_scheduled flag.
+        final boolean schedule = existing.state() == EventDefinition.State.ENABLED;
+        // checkMutability = false: installer-driven write, must rewrite immutable Illuminate content in place.
+        eventDefinitionHandler.update(updated, schedule, false);
     }
 
     @Override

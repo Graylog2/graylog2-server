@@ -53,6 +53,7 @@ import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.searches.SearchesAdapter;
+import org.graylog2.indexer.security.IndexerAdminCert;
 import org.graylog2.indexer.security.SecurityAdapter;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.plugin.VersionAwareModule;
@@ -104,6 +105,9 @@ public class OpenSearch3Module extends VersionAwareModule {
         bind(OfficialOpensearchClientProvider.class).asEagerSingleton();
         bind(OfficialOpensearchClient.class).toProvider(OfficialOpensearchClientProvider.class);
         bind(CredentialsProvider.class).toProvider(OpensearchCredentialsProvider.class);
+        bind(AdminOpensearchClientProvider.class);
+        bindForSupportedVersion(IndicesAdapter.class, IndexerAdminCert.class)
+                .toProvider(AdminIndicesAdapterProvider.class);
         bindForSupportedVersion(DatanodeUpgradeServiceAdapter.class).to(DatanodeUpgradeServiceAdapterOS.class);
 
         Multibinder<NodesSniffer> nodeSniffers = Multibinder.newSetBinder(binder(), NodesSniffer.class);
@@ -124,5 +128,10 @@ public class OpenSearch3Module extends VersionAwareModule {
 
     private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass) {
         return bindForVersion(supportedVersion, interfaceClass);
+    }
+
+    private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass,
+                                                                Class<? extends java.lang.annotation.Annotation> qualifier) {
+        return bindForVersion(supportedVersion, interfaceClass, qualifier);
     }
 }
