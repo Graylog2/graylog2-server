@@ -51,6 +51,6 @@ class InMemoryDataNodeMetadataService implements DataNodeMetadataService {
 
     @Override
     public OpensearchVersionsOverview getVersionsOverview() {
-        return OpensearchVersionsOverview.of(new ArrayList<>(store.values()), Map.of());
+        return OpensearchVersionsOverview.of(new ArrayList<>(store.values()));
     }
 }
