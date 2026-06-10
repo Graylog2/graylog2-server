@@ -77,7 +77,7 @@ const HiddenLabel = styled.label`
   width: 1px;
   height: 1px;
   overflow: hidden;
-  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
 `;
 
 // The locked-in fleet: details on the left, a "Change fleet" escape hatch on the right.
