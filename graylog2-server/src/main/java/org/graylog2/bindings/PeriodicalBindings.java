@@ -20,6 +20,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog.scheduler.periodicals.ScheduleTriggerCleanUp;
 import org.graylog2.bootstrap.preflight.GraylogCertificateProvisioningPeriodical;
+import org.graylog2.datanode.restart.RollingRestartPeriodical;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerPeriodical;
 import org.graylog2.inputs.diagnosis.InputDiagnosisMetricsPeriodical;
 import org.graylog2.periodical.ClusterHealthCheckThread;
@@ -67,6 +68,7 @@ public class PeriodicalBindings extends AbstractModule {
         periodicalBinder.addBinding().to(TelemetryClusterInfoPeriodical.class);
         periodicalBinder.addBinding().to(GraylogCertificateProvisioningPeriodical.class);
         periodicalBinder.addBinding().to(DataNodeHousekeepingPeriodical.class);
+        periodicalBinder.addBinding().to(RollingRestartPeriodical.class);
         periodicalBinder.addBinding().to(InputDiagnosisMetricsPeriodical.class);
         periodicalBinder.addBinding().to(ExpiredTokenCleaner.class);
         periodicalBinder.addBinding().to(OrphanedTokenCleaner.class);
