@@ -133,6 +133,7 @@ class OpAmpServiceHandleEnrollmentTest {
         verify(collectorInstanceService).enroll(eq(instanceUuid.toString()), eq("new-fleet-id"), any(IssuedCertificate.class), eq("new-token-id"));
         verify(collectorInstanceService, never()).reEnroll(any(), any(), any(), any());
         verify(enrollmentTokenService).incrementUsage("new-token-id");
+        verify(enrollmentTokenService, never()).markUsed(any());
     }
 
     @Test
@@ -155,6 +156,7 @@ class OpAmpServiceHandleEnrollmentTest {
                 any(IssuedCertificate.class), eq("new-token-id"));
         verify(collectorInstanceService, never()).enroll(any(), any(), any(), any());
         verify(enrollmentTokenService).incrementUsage("new-token-id");
+        verify(enrollmentTokenService, never()).markUsed(any());
     }
 
     @Test
@@ -174,6 +176,9 @@ class OpAmpServiceHandleEnrollmentTest {
         verify(collectorInstanceService).reEnroll(eq(existing.id()), eq(existing.activeCertificateFingerprint()),
                 any(IssuedCertificate.class), eq("same-token-id"));
         verify(enrollmentTokenService, never()).incrementUsage(any());
+        // The skipped increment must not freeze the token's last_used_at — it would look dormant
+        // to operators even though a collector still relies on it for recovery.
+        verify(enrollmentTokenService).markUsed("same-token-id");
     }
 
     @Test
@@ -195,6 +200,7 @@ class OpAmpServiceHandleEnrollmentTest {
         verify(collectorInstanceService, never()).enroll(any(), any(), any(), any());
         verify(collectorInstanceService, never()).reEnroll(any(), any(), any(), any());
         verify(enrollmentTokenService, never()).incrementUsage(any());
+        verify(enrollmentTokenService, never()).markUsed(any());
     }
 
     @Test
@@ -211,6 +217,7 @@ class OpAmpServiceHandleEnrollmentTest {
         verify(collectorInstanceService, never()).enroll(any(), any(), any(), any());
         verify(collectorInstanceService, never()).reEnroll(any(), any(), any(), any());
         verify(enrollmentTokenService, never()).incrementUsage(any());
+        verify(enrollmentTokenService, never()).markUsed(any());
     }
 
     // --- helpers ---

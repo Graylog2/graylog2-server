@@ -224,7 +224,8 @@ public class OpAmpService {
      * without changing any state. On match, the CSR is signed and the existing record is re-issued
      * via {@link CollectorInstanceService#reEnroll}. The token usage counter is incremented only
      * when the incoming token id differs from the stored token id, suppressing double-counts on
-     * phantom-write retries by the same token.
+     * phantom-write retries by the same token; in that case only the token's {@code last_used_at}
+     * timestamp is updated.
      * <p>
      * Re-enrollment is the intended recovery path for a collector that lost its certificate but
      * retained its private key — including the phantom-write scenario that motivated this design.
@@ -280,9 +281,13 @@ public class OpAmpService {
                         instance.activeCertificateFingerprint(), issuedCert, auth.token().id());
                 LOG.info("Re-enrolled existing collector {}. Current fleet: {}", enrolled.instanceUid(),
                         enrolled.fleetId());
-                // Don't count token usage for consecutive enrollments of the same collector
+                // Don't count token usage for consecutive enrollments of the same collector, but
+                // still bump last_used_at so the token doesn't look dormant while a collector
+                // depends on it for recovery.
                 if (!Objects.equals(auth.token().id(), instance.enrollmentTokenId())) {
                     enrollmentTokenService.incrementUsage(auth.token().id());
+                } else {
+                    enrollmentTokenService.markUsed(auth.token().id());
                 }
             }, () -> {
                 final var enrolled = collectorInstanceService.enroll(instanceUid, auth.token().fleetId(), issuedCert,
