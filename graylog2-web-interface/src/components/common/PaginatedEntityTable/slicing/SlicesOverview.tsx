@@ -142,14 +142,12 @@ const SlicesOverview = ({
   const [nonEmptyPage, setNonEmptyPage] = useState(1);
   const [emptyPage, setEmptyPage] = useState(1);
   const preferredSortMode = slicingPreferences?.sortBy;
-  const initialSortMode =
+  const sortMode =
     preferredSortMode && sortOptions.some((option) => option.value === preferredSortMode)
       ? preferredSortMode
       : (defaultSliceSort?.mode ?? ALPHABETICAL_SORT);
-  const [sortMode, setSortMode] = useState<SortMode>(initialSortMode);
-  const [sortDirection, setSortDirection] = useState<SortDirection>(
-    slicingPreferences?.order ?? defaultSortDirectionForMode(initialSortMode, defaultSliceSort),
-  );
+  const sortDirection = slicingPreferences?.order ?? defaultSortDirectionForMode(sortMode, defaultSliceSort);
+
   const sendTelemetry = useSendTelemetry();
   const { isLoading, refetchSlices, hasEmptySlices, emptySliceCount, visibleNonEmptySlices, visibleEmptySlices } =
     useSlices({
@@ -174,8 +172,6 @@ const SlicesOverview = ({
   const onSortModeUpdate = (mode: SortMode) => {
     const direction = defaultSortDirectionForMode(mode, defaultSliceSort);
 
-    setSortMode(mode);
-    setSortDirection(direction);
     setNonEmptyPage(1);
     setEmptyPage(1);
 
@@ -184,7 +180,6 @@ const SlicesOverview = ({
     }
   };
   const onSortDirectionUpdate = (direction: SortDirection) => {
-    setSortDirection(direction);
     setNonEmptyPage(1);
     setEmptyPage(1);
 
