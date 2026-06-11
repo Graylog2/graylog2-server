@@ -16,6 +16,7 @@
  */
 package org.graylog.mcp.server;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.modelcontextprotocol.spec.McpError;
 import io.modelcontextprotocol.spec.McpSchema;
@@ -66,6 +67,7 @@ class McpServiceTest {
     private User user;
 
     private ObjectMapper objectMapper;
+    private ObjectMapper protocolObjectMapper;
     private McpService mcpService;
     private Map<String, Tool<?, ?>> tools;
     private Map<GRNType, ResourceProvider> resourceProviders;
@@ -73,6 +75,8 @@ class McpServiceTest {
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
+        protocolObjectMapper = new ObjectMapper()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         tools = new HashMap<>();
         resourceProviders = new HashMap<>();
 
@@ -81,6 +85,7 @@ class McpServiceTest {
 
         mcpService = new McpService(
                 objectMapper,
+                protocolObjectMapper,
                 auditEventSender,
                 new CustomizationConfig(null),
                 GRNRegistry.createWithBuiltinTypes(),
@@ -120,6 +125,31 @@ class McpServiceTest {
         assertThat(initResult.capabilities().tools()).isNotNull();
 
         verify(auditEventSender).success(any(AuditActor.class), any(AuditEventType.class), anyMap());
+    }
+
+    @Test
+    void testInitializeToleratesUnknownCapabilityFields() throws Exception {
+        // Regression test for https://github.com/Graylog2/graylog2-server/issues/25956
+        // Newer MCP clients may send forward-compatible fields (e.g. capabilities.sampling.tools)
+        // that the SDK's Sampling record doesn't declare.
+        var params = Map.of(
+                "protocolVersion", ProtocolVersions.MCP_2025_06_18,
+                "capabilities", Map.of("sampling", Map.of("tools", Map.of())),
+                "clientInfo", Map.of("name", "TestClient", "version", "1.0.0")
+        );
+        var request = new McpSchema.JSONRPCRequest(
+                "2.0",
+                McpSchema.METHOD_INITIALIZE,
+                "1",
+                params
+        );
+
+        Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, "session123");
+
+        assertThat(result).isPresent();
+        assertThat(result.get()).isInstanceOf(McpSchema.InitializeResult.class);
+        McpSchema.InitializeResult initResult = (McpSchema.InitializeResult) result.get();
+        assertThat(initResult.protocolVersion()).isEqualTo(ProtocolVersions.MCP_2025_06_18);
     }
 
     @Test
