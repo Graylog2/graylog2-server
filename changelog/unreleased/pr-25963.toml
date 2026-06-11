@@ -1,0 +1,4 @@
+type = "c"
+message = "Update Log4j to 2.26.0."
+
+pulls = ["25963"]
