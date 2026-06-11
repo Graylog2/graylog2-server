@@ -100,11 +100,15 @@ public record OpensearchVersionsOverview(@JsonProperty("nodes") List<NodeVersion
                 .map(n -> {
                     final String current = n.currentOpensearchVersion();
                     final String available = n.latestAvailableOpensearchVersion();
-                    final boolean upgradeable = available != null && Version.parse(available).isHigherThan(Version.parse(current));
+                    final boolean upgradeable = canBeUpgraded(current, available);
                     return new NodeVersionStatus(n.nodeId(), current, available, upgradeable, null);
                 })
                 .sorted(Comparator.comparing(NodeVersionStatus::currentVersion, Comparator.comparing(Version::parse)))
                 .toList();
         return new OpensearchVersionsOverview(statuses);
+    }
+
+    private static boolean canBeUpgraded(String currentVersion, String availableVersion) {
+        return availableVersion != null && Version.parse(availableVersion).isHigherThan(Version.parse(currentVersion));
     }
 }
