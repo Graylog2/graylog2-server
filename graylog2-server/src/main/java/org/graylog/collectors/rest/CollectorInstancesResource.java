@@ -245,23 +245,21 @@ public class CollectorInstancesResource extends RestResource {
                 list.pagination().total(),
                 sort,
                 order,
-                list.stream().map(dto -> {
-                    return new CollectorInstanceResponse(
-                            dto.lastSeen().isBefore(offlineCutoff) ? "offline" : "online",
-                            dto.instanceUid(),
-                            dto.fleetId(),
-                            dto.capabilities(),
-                            dto.enrolledAt(),
-                            dto.lastSeen(),
-                            dto.activeCertificateFingerprint(),
-                            dto.activeCertificateExpiresAt(),
-                            dto.nextCertificateFingerprint().orElse(null),
-                            dto.nextCertificateExpiresAt().orElse(null),
-                            attributesToMap(dto.identifyingAttributes()),
-                            attributesToMap(dto.nonIdentifyingAttributes()),
-                            instanceUidsWithPendingChanges.contains(dto.instanceUid())
-                    );
-                }).toList(),
+                list.stream().map(dto -> new CollectorInstanceResponse(
+                        dto.lastSeen().isBefore(offlineCutoff) ? "offline" : "online",
+                        dto.instanceUid(),
+                        dto.fleetId(),
+                        dto.capabilities(),
+                        dto.enrolledAt(),
+                        dto.lastSeen(),
+                        dto.activeCertificateFingerprint(),
+                        dto.activeCertificateExpiresAt(),
+                        dto.nextCertificateFingerprint().orElse(null),
+                        dto.nextCertificateExpiresAt().orElse(null),
+                        attributesToMap(dto.identifyingAttributes()),
+                        attributesToMap(dto.nonIdentifyingAttributes()),
+                        instanceUidsWithPendingChanges.contains(dto.instanceUid())
+                )).toList(),
                 ATTRIBUTES,
                 DEFAULTS);
     }
