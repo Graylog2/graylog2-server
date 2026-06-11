@@ -91,7 +91,8 @@ public class DatanodeUpgradeResource {
         final var upgradeStatus = upgradeService.status();
         final Map<String, DataNodeInformation> informationByHostname = Stream
                 .concat(upgradeStatus.upToDateNodes().stream(), upgradeStatus.outdatedNodes().stream())
-                .collect(Collectors.toMap(DataNodeInformation::hostname, i -> i));
+                .filter(i -> i.hostname() != null)
+                .collect(Collectors.toMap(DataNodeInformation::hostname, i -> i, (a, b) -> a));
         return datanodeDtos.entrySet().stream()
                 .filter(e -> e.getValue().getHostname() != null)
                 .filter(e -> informationByHostname.containsKey(e.getValue().getHostname()))
