@@ -28,11 +28,13 @@ import type { StepType } from 'components/common/Wizard';
 import FieldsForm from './FieldsForm';
 import ShareForm from './ShareForm';
 import NotificationsForm from './NotificationsForm';
+import EventDefinitionSummary from './EventDefinitionSummary';
 
 const COMMON_STEP_KEYS = {
   FIELDS: 'fields',
   NOTIFICATIONS: 'notifications',
   SHARE: 'Share',
+  SUMMARY: 'summary',
 };
 
 export const COMMON_STEP_TELEMETRY_KEYS = [
@@ -102,6 +104,7 @@ type Args = {
   notificationDefaults?: { default_backlog_size: number };
   hideFieldsStep?: boolean;
   canEdit?: boolean;
+  summaryComponent?: React.ReactElement;
 };
 
 function useEventDefinitionSteps({
@@ -111,6 +114,7 @@ function useEventDefinitionSteps({
   notificationDefaults = { default_backlog_size: 0 },
   hideFieldsStep = false,
   canEdit = false,
+  summaryComponent = undefined,
 }: Args): Array<StepType<string>> {
   const isNew = commonStepProps.action === 'create';
   const conditionPlugin = getConditionPlugin(commonStepProps?.eventDefinition?.config?.type);
@@ -141,6 +145,20 @@ function useEventDefinitionSteps({
       title: 'Share',
       component: <ShareForm {...resolvedCommonStepProps} />,
       hidden: !isNew,
+    },
+    {
+      key: COMMON_STEP_KEYS.SUMMARY,
+      title: 'Summary',
+      component: summaryComponent ? (
+        summaryComponent
+      ) : (
+        <EventDefinitionSummary
+          eventDefinition={commonStepProps.eventDefinition}
+          currentUser={commonStepProps.currentUser}
+          notifications={notifications}
+          validation={commonStepProps.validation}
+        />
+      ),
     },
   ].filter((step) => !step.hidden);
 }
