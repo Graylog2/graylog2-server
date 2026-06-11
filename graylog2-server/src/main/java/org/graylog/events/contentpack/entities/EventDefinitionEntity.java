@@ -177,6 +177,16 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
 
     @Override
     public EventDefinitionDto toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
+        return toNativeEntity(parameters, nativeEntities, EventDefinitionDto.builder());
+    }
+
+    /**
+     * Applies the content-pack fields onto the given builder. Pass {@code existing.toBuilder()} on the
+     * upgrade path so fields the pack doesn't carry (e.g. {@code id}, {@code state}) keep their stored values.
+     */
+    public EventDefinitionDto toNativeEntity(Map<String, ValueReference> parameters,
+                                             Map<EntityDescriptor, Object> nativeEntities,
+                                             EventDefinitionDto.Builder builder) {
         final ImmutableList<EventNotificationHandler.Config> notificationList = ImmutableList.copyOf(
                 notifications().stream()
                         .map(notification -> notification.toNativeEntity(parameters, nativeEntities))
@@ -195,7 +205,7 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
                 throw new MissingNativeEntityException(procedureDescriptor);
             }
         }
-        return EventDefinitionDto.builder()
+        return builder
                 .scope(scope() != null ? scope().asString(parameters) : DefaultEntityScope.NAME)
                 .title(title().asString(parameters))
                 .updatedAt(updatedAt())
