@@ -216,25 +216,32 @@ public class CollectorInstanceService {
     /**
      * Atomically re-issues a collector's active certificate on an existing record.
      * <p>
-     * Identified by Mongo {@code _id}, not {@code instance_uid} — callers must pass the id they
-     * observed when they verified the re-enrollment request (typically via
-     * {@link #findByInstanceUid}). This ensures the update only lands on the exact record the
-     * caller validated. If that record has since been deleted or replaced, the update matches
-     * nothing and this method throws.
+     * The update is a compare-and-swap: it only matches the record with the given Mongo
+     * {@code _id} <em>and</em> the given active certificate fingerprint. Callers must pass the id
+     * and fingerprint they observed when they verified the re-enrollment request (typically via
+     * {@link #findByInstanceUid}). This ensures the update only lands on the exact state the
+     * caller validated. If the record has since been deleted, replaced, or had its active
+     * certificate changed (e.g. by a concurrent renewal activation), the update matches nothing
+     * and this method throws.
      * <p>
      * The caller (typically {@code OpAmpService.handleEnrollment}) is responsible for enforcing
      * proof-of-possession (matching the CSR public key against the stored active certificate's
      * public key) before calling this method. This service method performs no such check — it
-     * only enforces the identity-by-{@code _id} race guard.
+     * only enforces the compare-and-swap race guard.
      *
-     * @param id                the Mongo {@code _id} of the record to update
-     * @param issuedCert        the freshly signed agent certificate
-     * @param enrollmentTokenId the id of the enrollment token that authorized this re-enrollment
+     * @param id                        the Mongo {@code _id} of the record to update
+     * @param expectedActiveFingerprint the active certificate fingerprint the caller observed when
+     *                                  it verified proof-of-possession
+     * @param issuedCert                the freshly signed agent certificate
+     * @param enrollmentTokenId         the id of the enrollment token that authorized this
+     *                                  re-enrollment
      * @return the updated DTO (post-update state)
-     * @throws IllegalStateException if no record with the given {@code _id} is found — the target
-     *                               was concurrently deleted or replaced
+     * @throws IllegalStateException if no record with the given {@code _id} and active certificate
+     *                               fingerprint is found — the target was concurrently deleted,
+     *                               replaced, or modified
      */
     public CollectorInstanceDTO reEnroll(String id,
+                                         String expectedActiveFingerprint,
                                          IssuedCertificate issuedCert,
                                          String enrollmentTokenId) {
 
@@ -250,13 +257,14 @@ public class CollectorInstanceService {
                 set(FIELD_ENROLLMENT_TOKEN_ID, enrollmentTokenId)
         );
 
-        final var updated = collection.findOneAndUpdate(MongoUtils.idEq(id),
+        final var updated = collection.findOneAndUpdate(
+                Filters.and(MongoUtils.idEq(id), Filters.eq(FIELD_ACTIVE_CERTIFICATE_FINGERPRINT, expectedActiveFingerprint)),
                 updates,
                 new FindOneAndUpdateOptions().upsert(false).returnDocument(ReturnDocument.AFTER)
         );
 
         if (updated == null) {
-            throw new IllegalStateException(f("Cannot re-enroll. Collector instance with id %s doesn't exist.", id));
+            throw new IllegalStateException(f("Cannot re-enroll. Collector instance with id %s doesn't exist or its active certificate changed concurrently.", id));
         }
 
         return updated;

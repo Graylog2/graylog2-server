@@ -276,7 +276,8 @@ public class OpAmpService {
                                     "Current assignment to fleet {} will be kept.", auth.token().fleetId(),
                             instance.instanceUid(), instance.fleetId());
                 }
-                final var enrolled = collectorInstanceService.reEnroll(instance.id(), issuedCert, auth.token().id());
+                final var enrolled = collectorInstanceService.reEnroll(instance.id(),
+                        instance.activeCertificateFingerprint(), issuedCert, auth.token().id());
                 LOG.info("Re-enrolled existing collector {}. Current fleet: {}", enrolled.instanceUid(),
                         enrolled.fleetId());
                 // Don't count token usage for consecutive enrollments of the same collector
