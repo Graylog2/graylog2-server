@@ -16,14 +16,20 @@
  */
 package org.graylog.security.pki;
 
+import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.KeyUsage;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.graylog.testing.TestClocks;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -137,18 +143,28 @@ class PemUtilsTest {
     }
 
     @Test
-    void parseCsrRejectsTamperedSignature() throws Exception {
-        final KeyPair keyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
-        final byte[] csrPem = builder.createCsr(keyPair, "test-agent");
-        final String original = new String(csrPem, StandardCharsets.UTF_8);
+    void parseCsrRejectsSignatureFromMismatchedKey() throws Exception {
+        final KeyPair signingKey = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+        final KeyPair claimedKey = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
 
-        // Flip a bit in the middle of the base64 body to corrupt the signature without breaking the PEM framing.
-        final int midBody = original.indexOf("-----END") / 2;
-        final char replacement = original.charAt(midBody) == 'A' ? 'B' : 'A';
-        final String tampered = original.substring(0, midBody) + replacement + original.substring(midBody + 1);
+        // CSR claims claimedKey's public key but is signed with signingKey's private key.
+        // This is the forgery the self-signature check exists to reject: a requester
+        // asserting a public key it doesn't hold the private key for.
+        final var csrBuilder = new JcaPKCS10CertificationRequestBuilder(
+                new X500Name("CN=forged-agent"), claimedKey.getPublic());
+        final ContentSigner signer = new JcaContentSignerBuilder("Ed25519")
+                .setProvider("BC")
+                .build(signingKey.getPrivate());
+        final PKCS10CertificationRequest forged = csrBuilder.build(signer);
 
-        assertThatThrownBy(() -> PemUtils.parseCsr(tampered))
-                .isInstanceOf(CertificateException.class);
+        final StringWriter pem = new StringWriter();
+        try (JcaPEMWriter writer = new JcaPEMWriter(pem)) {
+            writer.writeObject(forged);
+        }
+
+        assertThatThrownBy(() -> PemUtils.parseCsr(pem.toString()))
+                .isInstanceOf(CertificateException.class)
+                .hasMessageContaining("signature is invalid");
     }
 
     // extractPublicKeyFromCsr tests
