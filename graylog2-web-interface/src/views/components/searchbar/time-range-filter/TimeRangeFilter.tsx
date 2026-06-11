@@ -23,7 +23,7 @@ import type { TimeRange, NoTimeRangeOverride, AbsoluteTimeRange } from 'views/lo
 import { SEARCH_BAR_GAP } from 'views/components/searchbar/SearchBarLayout';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import TimeRangeFilterSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
-import type { SupportedTimeRangeType } from 'views/components/time-range-picker/TimeRangePicker';
+import type { SupportedTimeRangeType } from 'views/components/time-range-picker/types';
 import TimeRangePicker from 'views/components/time-range-picker/index';
 import { NO_TIMERANGE_OVERRIDE } from 'views/Constants';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';

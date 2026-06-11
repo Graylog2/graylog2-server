@@ -16,6 +16,8 @@
  */
 import type { Attribute, Sort } from 'stores/PaginationTypes';
 
+import { METRIC_COLUMN_IDS, METRIC_COLUMN_TITLES } from './metricColumns';
+
 const getStreamTableElements = (
   isPipelineColumnPermitted: boolean,
   extensionAttributes?: {
@@ -43,13 +45,17 @@ const getStreamTableElements = (
       'title',
       'index_set_title',
       'rules',
-      ...(isPipelineColumnPermitted ? ['pipelines'] : []),
       'outputs',
       'archiving',
       ...(extensionAttributes?.attributeNames || []),
       'destination_filters',
       'disabled',
       'throughput',
+      METRIC_COLUMN_IDS.messageCount,
+      METRIC_COLUMN_IDS.avgProcessingTime,
+      METRIC_COLUMN_IDS.maxProcessingTime,
+      METRIC_COLUMN_IDS.associatedInputs,
+      ...(isPipelineColumnPermitted ? ['pipelines', METRIC_COLUMN_IDS.routingPipelines] : []),
       'created_at',
     ],
   };
@@ -63,6 +69,13 @@ const getStreamTableElements = (
     { id: 'archiving', title: 'Archiving' },
     ...(extensionAttributes?.attributes || []),
     { id: 'destination_filters', title: 'Filter Rules' },
+    { id: METRIC_COLUMN_IDS.messageCount, title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.messageCount] },
+    { id: METRIC_COLUMN_IDS.avgProcessingTime, title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.avgProcessingTime] },
+    { id: METRIC_COLUMN_IDS.maxProcessingTime, title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.maxProcessingTime] },
+    { id: METRIC_COLUMN_IDS.associatedInputs, title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.associatedInputs] },
+    ...(isPipelineColumnPermitted
+      ? [{ id: METRIC_COLUMN_IDS.routingPipelines, title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.routingPipelines] }]
+      : []),
   ];
 
   return {
