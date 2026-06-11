@@ -39,7 +39,6 @@ public interface OpensearchProcess extends ManagableProcess<OpensearchConfigurat
     String getDatanodeRestApiUrl();
 
     List<String> getOpensearchRoles();
-    String getOpensearchVersion();
 
     void remove();
 
