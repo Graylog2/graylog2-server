@@ -33,7 +33,7 @@ public interface MessageFactory {
 
     /**
      * Returns a new {@link Message} that is excluded from license/traffic accounting:
-     * {@link Message#isExcludedFromTrafficAccounting()} is {@code true}, so it counts against neither
+     * {@link Message#isAccounted()} is {@code false}, so it counts against neither
      * output-based nor input-based license traffic. Its size fields stay factual and the message is
      * otherwise indexed and processed normally.
      * <p>
@@ -58,7 +58,7 @@ public interface MessageFactory {
 
     /**
      * Like {@link #createMessage(Map)}, but the returned message is excluded from license/traffic
-     * accounting ({@link Message#isExcludedFromTrafficAccounting()} is {@code true}). See
+     * accounting ({@link Message#isAccounted()} is {@code false}). See
      * {@link #createUnaccountedMessage(String, String, DateTime)} for when this is appropriate.
      *
      * @param fields the map of fields
@@ -77,7 +77,7 @@ public interface MessageFactory {
 
     /**
      * Like {@link #createMessage(String, Map)}, but the returned message is excluded from license/traffic
-     * accounting ({@link Message#isExcludedFromTrafficAccounting()} is {@code true}). See
+     * accounting ({@link Message#isAccounted()} is {@code false}). See
      * {@link #createUnaccountedMessage(String, String, DateTime)} for when this is appropriate.
      *
      * @param id        the message ID

@@ -32,7 +32,7 @@ public class TestMessageFactory implements MessageFactory {
 
     @Override
     public Message createUnaccountedMessage(String message, String source, DateTime timestamp) {
-        return new Message(message, source, timestamp, true);
+        return new Message(message, source, timestamp, false);
     }
 
     @Override
@@ -42,7 +42,7 @@ public class TestMessageFactory implements MessageFactory {
 
     @Override
     public Message createUnaccountedMessage(Map<String, Object> fields) {
-        return new Message(fields, true);
+        return new Message(fields, false);
     }
 
     @Override
@@ -52,6 +52,6 @@ public class TestMessageFactory implements MessageFactory {
 
     @Override
     public Message createUnaccountedMessage(String id, Map<String, Object> newFields) {
-        return new Message(id, newFields, true);
+        return new Message(id, newFields, false);
     }
 }

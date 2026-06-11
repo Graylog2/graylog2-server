@@ -228,7 +228,7 @@ public class SerializationMemoizingMessage implements ImmutableMessage {
     }
 
     @Override
-    public boolean isExcludedFromTrafficAccounting() {
-        return delegate.isExcludedFromTrafficAccounting();
+    public boolean isAccounted() {
+        return delegate.isAccounted();
     }
 }

@@ -234,13 +234,13 @@ public class Messages {
     private void accountTotalMessageSizes(List<IndexingSuccess> requests, boolean isSystemTraffic) {
         final long totalSizeOfIndexedMessages = requests.stream()
                 .map(IndexingSuccess::message)
-                .filter(message -> !message.isExcludedFromTrafficAccounting())
+                .filter(Indexable::isAccounted)
                 .mapToLong(Indexable::getSize)
                 .sum();
 
         final long totalInputSizeOfIndexedMessages = requests.stream()
                 .map(IndexingSuccess::message)
-                .filter(message -> !message.isExcludedFromTrafficAccounting())
+                .filter(Indexable::isAccounted)
                 .mapToLong(Indexable::getInputMessageSize)
                 .sum();
 

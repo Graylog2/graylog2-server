@@ -504,17 +504,17 @@ public class MessageTest {
     @Test
     public void messagesAreAccountedByDefaultButCanBeCreatedExcluded() {
         final Message accounted = new Message("1234567890", "12345", Tools.nowUTC());
-        assertThat(accounted.isExcludedFromTrafficAccounting()).isFalse();
+        assertThat(accounted.isAccounted()).isTrue();
 
-        final Message excluded = new Message("1234567890", "12345", Tools.nowUTC(), true);
-        assertThat(excluded.isExcludedFromTrafficAccounting()).isTrue();
+        final Message excluded = new Message("1234567890", "12345", Tools.nowUTC(), false);
+        assertThat(excluded.isAccounted()).isFalse();
     }
 
     @Test
     public void excludedMessageKeepsFactualSize() {
         // Exclusion from accounting must not zero the reported size; it stays factual.
         final Message accounted = new Message("1234567890", "12345", Tools.nowUTC());
-        final Message excluded = new Message("1234567890", "12345", Tools.nowUTC(), true);
+        final Message excluded = new Message("1234567890", "12345", Tools.nowUTC(), false);
 
         assertThat(excluded.getSize()).isEqualTo(accounted.getSize());
         assertThat(excluded.getSize()).isGreaterThan(0L);

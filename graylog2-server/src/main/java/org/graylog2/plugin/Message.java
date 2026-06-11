@@ -363,7 +363,9 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
     private List<ProcessingError> processingErrors;
 
-    private final boolean excludedFromTrafficAccounting;
+    // Indicates if a message is supposed to be accounted for license usage. Except for some special cases, this will
+    // usually be true.
+    private final boolean accounted;
 
     private static final IdentityHashMap<Class<?>, Integer> classSizes = Maps.newIdentityHashMap();
 
@@ -398,8 +400,8 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     }
 
     // Intentionally package-private to enforce MessageFactory usage.
-    Message(final String message, final String source, final DateTime timestamp, boolean excludedFromTrafficAccounting) {
-        this.excludedFromTrafficAccounting = excludedFromTrafficAccounting;
+    Message(final String message, final String source, final DateTime timestamp, boolean accounted) {
+        this.accounted = accounted;
         fields.put(FIELD_ID, new UUID().toString());
         addRequiredField(FIELD_MESSAGE, message);
         addRequiredField(FIELD_SOURCE, source);
@@ -408,21 +410,21 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
     // Intentionally package-private to enforce MessageFactory usage.
     Message(final String message, final String source, final DateTime timestamp) {
-        this(message, source, timestamp, false);
+        this(message, source, timestamp, true);
     }
 
-    Message(final Map<String, Object> fields, boolean excludedFromTrafficAccounting) {
-        this((String) fields.get(FIELD_ID), Maps.filterKeys(fields, not(equalTo(FIELD_ID))), excludedFromTrafficAccounting);
+    Message(final Map<String, Object> fields, boolean accounted) {
+        this((String) fields.get(FIELD_ID), Maps.filterKeys(fields, not(equalTo(FIELD_ID))), accounted);
     }
 
     // Intentionally package-private to enforce MessageFactory usage.
     Message(final Map<String, Object> fields) {
-        this(fields, false);
+        this(fields, true);
     }
 
     // Intentionally package-private to enforce MessageFactory usage.
-    Message(String id, Map<String, Object> newFields, boolean excludedFromTrafficAccounting) {
-        this.excludedFromTrafficAccounting = excludedFromTrafficAccounting;
+    Message(String id, Map<String, Object> newFields, boolean accounted) {
+        this.accounted = accounted;
         Preconditions.checkArgument(id != null, "message id cannot be null");
         fields.put(FIELD_ID, id);
         addFields(newFields);
@@ -430,7 +432,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
     // Intentionally package-private to enforce MessageFactory usage.
     Message(String id, Map<String, Object> newFields) {
-        this(id, newFields, false);
+        this(id, newFields, true);
     }
 
     public boolean isComplete() {
@@ -730,7 +732,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
      * <p>
      * Returns the accumulated size of all message fields. The value stays factual even for messages
      * excluded from accounting (it is also stored as {@link #FIELD_GL2_ACCOUNTED_MESSAGE_SIZE});
-     * exclusion is signaled via {@link #isExcludedFromTrafficAccounting()}, which removes the message
+     * exclusion is signaled via {@link #isAccounted()}, which removes the message
      * from the traffic counters, rather than by zeroing this value.
      */
     @Override
@@ -745,7 +747,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
      * layer from the original transport payload). When no input size was recorded — e.g. for messages
      * created in-process rather than decoded from an input — it falls back to {@link #getSize()} so the
      * message is still accounted under input-based licensing rather than escaping it. Note that
-     * exclusion from accounting is signalled via {@link #isExcludedFromTrafficAccounting()}, not by
+     * exclusion from accounting is signaled via {@link #isAccounted()}, not by
      * returning {@code 0} here.
      */
     @Override
@@ -764,8 +766,8 @@ public class Message implements Messages, Indexable, Acknowledgeable {
      */
     @Override
     @JsonIgnore
-    public boolean isExcludedFromTrafficAccounting() {
-        return excludedFromTrafficAccounting;
+    public boolean isAccounted() {
+        return accounted;
     }
 
     public static boolean validKey(final String key) {

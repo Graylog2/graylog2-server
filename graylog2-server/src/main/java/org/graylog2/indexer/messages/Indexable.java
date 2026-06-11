@@ -48,7 +48,7 @@ public interface Indexable {
      * <p>
      * Internally generated indexables that carry no billable payload may simply return {@code 0}. To
      * exclude an otherwise normally sized indexable from accounting, prefer
-     * {@link #isExcludedFromTrafficAccounting()} so that the stored size remains truthful.
+     * {@link #isAccounted()} so that the stored size remains truthful.
      */
     long getSize();
 
@@ -62,7 +62,7 @@ public interface Indexable {
      * associated input message (for example, internally generated indexables);
      * {@link org.graylog2.plugin.Message} overrides this to report the size recorded at decode time.
      * Whether the value is counted at all is governed separately by
-     * {@link #isExcludedFromTrafficAccounting()}.
+     * {@link #isAccounted()}.
      */
     default long getInputMessageSize() {
         return 0L;
@@ -99,14 +99,14 @@ public interface Indexable {
     }
 
     /**
-     * Whether this indexable must be excluded from license/traffic accounting.
+     * Whether this indexable must be included in license/traffic accounting.
      * <p>
-     * When {@code true}, the indexable is skipped while computing <em>both</em> the output- and
+     * When {@code false}, the indexable is skipped while computing <em>both</em> the output- and
      * input-traffic counters, so it counts against neither output-based nor input-based license
      * traffic. This affects accounting only — the document is still indexed normally. Defaults to
-     * {@code false}.
+     * {@code true}.
      */
-    default boolean isExcludedFromTrafficAccounting() {
-        return false;
+    default boolean isAccounted() {
+        return true;
     }
 }

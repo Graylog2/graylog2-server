@@ -107,11 +107,11 @@ class CollectorIngestCodecTest {
 
         final var collectorLog = codec.decodeSafe(rawMessageForReceiverType(CollectorLogRecordProcessor.RECEIVER_TYPE));
         assertThat(collectorLog).isPresent();
-        assertThat(collectorLog.get().isExcludedFromTrafficAccounting()).isTrue();
+        assertThat(collectorLog.get().isAccounted()).isFalse();
 
         final var customerLog = codec.decodeSafe(rawMessageForReceiverType("file_log"));
         assertThat(customerLog).isPresent();
-        assertThat(customerLog.get().isExcludedFromTrafficAccounting()).isFalse();
+        assertThat(customerLog.get().isAccounted()).isTrue();
     }
 
     private RawMessage rawMessageForReceiverType(String receiverType) {
