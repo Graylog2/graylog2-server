@@ -86,25 +86,6 @@ export const StoryContainer = styled.div`
   padding-bottom: ${({ theme }) => theme.spacings.xs};
 `;
 
-export const SectionDescription = styled.p`
-  line-height: 1.6;
-  margin-bottom: ${({ theme }) => theme.spacings.lg};
-`;
-
-// ─── Story Headings ───────────────────────────────────────────────────────
-
-export const H1 = styled.h1`
-  margin: 0 0 ${({ theme }) => theme.spacings.md};
-`;
-
-export const H2 = styled.h2`
-  margin: 0 0 ${({ theme }) => theme.spacings.md};
-`;
-
-export const H3 = styled.h3`
-  margin: 0 0 ${({ theme }) => theme.spacings.sm};
-`;
-
 // ─── Foundation Table ──────────────────────────────────────────────────────
 
 const StyledTable = styled.table`
