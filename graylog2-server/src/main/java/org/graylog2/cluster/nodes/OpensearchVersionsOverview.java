@@ -97,13 +97,12 @@ public record OpensearchVersionsOverview(@JsonProperty("nodes") List<NodeVersion
 
     public static OpensearchVersionsOverview of(List<DataNodeMetadata> nodes) {
         final List<NodeVersionStatus> statuses = nodes.stream()
-                .map(n -> new NodeVersionStatus(
-                        n.nodeId(),
-                        n.currentOpensearchVersion(),
-                        n.latestAvailableOpensearchVersion(),
-                        n.latestAvailableOpensearchVersion() != null,
-                        null
-                ))
+                .map(n -> {
+                    final String current = n.currentOpensearchVersion();
+                    final String available = n.latestAvailableOpensearchVersion();
+                    final boolean upgradeable = available != null && Version.parse(available).isHigherThan(Version.parse(current));
+                    return new NodeVersionStatus(n.nodeId(), current, available, upgradeable, null);
+                })
                 .sorted(Comparator.comparing(NodeVersionStatus::currentVersion, Comparator.comparing(Version::parse)))
                 .toList();
         return new OpensearchVersionsOverview(statuses);
