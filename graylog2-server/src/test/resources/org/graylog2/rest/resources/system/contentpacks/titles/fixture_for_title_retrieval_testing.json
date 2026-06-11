@@ -52,5 +52,14 @@
       "is_leader": true,
       "node_id": "Node Id 2"
     }
+  ],
+  "users" : [
+    {
+      "_id": {"$oid": "01020302e16f9a1d1f6b0751"},
+      "username": "jane",
+      "full_name": "Jane Doe",
+      "email": "jane@example.com",
+      "password": "deadbeefsecrethash"
+    }
   ]
 }
