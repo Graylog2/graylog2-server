@@ -105,6 +105,47 @@ describe('NetworkGraphVisualization', () => {
     expect(nodeTrace.marker.color).toEqual([2, 2, 1, 1]);
   });
 
+  it('makes the graph zoomable and pannable', () => {
+    const config = AggregationWidgetConfig.builder()
+      .rowPivots([Pivot.createValues(['source']), Pivot.createValues(['target'])])
+      .series([Series.forFunction('count()')])
+      .visualization('network')
+      .build();
+
+    render(<WrappedNetwork {...baseProps} config={config} data={fixtures.twoRowPivots} />);
+
+    const { calls } = asMock(GenericPlot).mock;
+    const props = calls[calls.length - 1][0];
+
+    expect(props.config).toEqual({ scrollZoom: true, doubleClick: 'reset' });
+    expect(props.layout.dragmode).toBe('pan');
+    expect(props.layout.xaxis.fixedrange).toBe(false);
+    expect(props.layout.yaxis.fixedrange).toBe(false);
+  });
+
+  it('reserves padding around the nodes for the initial/reset view', () => {
+    const config = AggregationWidgetConfig.builder()
+      .rowPivots([Pivot.createValues(['source']), Pivot.createValues(['target'])])
+      .series([Series.forFunction('count()')])
+      .visualization('network')
+      .build();
+
+    render(<WrappedNetwork {...baseProps} config={config} data={fixtures.twoRowPivots} />);
+
+    const { calls } = asMock(GenericPlot).mock;
+    const props = calls[calls.length - 1][0];
+    const nodeTrace = props.chartData[1];
+    const [xLo, xHi] = props.layout.xaxis.range;
+    const [yLo, yHi] = props.layout.yaxis.range;
+
+    // The initial range is an explicit padded range (so double-click reset restores it) that fully
+    // contains every node with room to spare for the labels.
+    expect(xLo).toBeLessThan(Math.min(...nodeTrace.x));
+    expect(xHi).toBeGreaterThan(Math.max(...nodeTrace.x));
+    expect(yLo).toBeLessThan(Math.min(...nodeTrace.y));
+    expect(yHi).toBeGreaterThan(Math.max(...nodeTrace.y));
+  });
+
   it('unifies same value across stages into a single node', () => {
     const config = AggregationWidgetConfig.builder()
       .rowPivots([Pivot.createValues(['source']), Pivot.createValues(['target'])])

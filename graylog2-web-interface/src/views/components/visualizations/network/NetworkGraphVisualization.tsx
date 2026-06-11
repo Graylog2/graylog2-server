@@ -169,15 +169,53 @@ type NodeTrace = {
   showlegend: false;
 };
 
-const buildLayout = (width: number, height: number) => ({
-  margin: { t: 20, b: 70, l: 20, r: 20 },
-  xaxis: { visible: false, zeroline: false, showgrid: false, fixedrange: true, autorange: true as const },
-  yaxis: { visible: false, zeroline: false, showgrid: false, fixedrange: true, autorange: true as const },
-  showlegend: false,
-  hovermode: 'closest' as const,
-  width,
-  height,
-});
+// Wheel zooms toward the cursor; double-click resets to the initial view. Drag pans (see `dragmode`).
+// Zoom only takes effect in interactive contexts — elsewhere GenericPlot forces `fixedrange: true`.
+const PLOT_CONFIG = { scrollZoom: true, doubleClick: 'reset' } as const;
+
+// Fraction of the node span reserved on each side of the initial/reset view so the outward-pointing
+// labels aren't clipped at the canvas edge. Users can still zoom and pan past it.
+const RANGE_PADDING = 0.2;
+
+type NodePositions = { xs: Array<number>; ys: Array<number> };
+
+const paddedRange = (values: ReadonlyArray<number>): [number, number] => {
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const span = max - min || 1;
+  const pad = span * RANGE_PADDING;
+
+  return [min - pad, max + pad];
+};
+
+const buildLayout = (width: number, height: number, positions: NodePositions | null) => {
+  const base = {
+    margin: { t: 20, b: 70, l: 20, r: 20 },
+    dragmode: 'pan' as const,
+    xaxis: { visible: false, zeroline: false, showgrid: false, fixedrange: false },
+    yaxis: { visible: false, zeroline: false, showgrid: false, fixedrange: false },
+    showlegend: false,
+    hovermode: 'closest' as const,
+    width,
+    height,
+  };
+
+  if (!positions) {
+    return {
+      ...base,
+      xaxis: { ...base.xaxis, autorange: true as const },
+      yaxis: { ...base.yaxis, autorange: true as const },
+    };
+  }
+
+  // Explicit padded ranges (rather than autorange) so the reserved margin survives a double-click
+  // reset, which restores the range the chart was first rendered with.
+  return {
+    ...base,
+    xaxis: { ...base.xaxis, range: paddedRange(positions.xs) },
+    yaxis: { ...base.yaxis, range: paddedRange(positions.ys) },
+  };
+};
 
 const NetworkGraphVisualization = makeVisualization(
   ({ config, data, height, width }: VisualizationComponentProps) => {
@@ -188,7 +226,7 @@ const NetworkGraphVisualization = makeVisualization(
     const visualizationConfig = (config.visualizationConfig ??
       NetworkVisualizationConfig.empty()) as NetworkVisualizationConfig;
 
-    const traces = useMemo<[EdgeTrace, NodeTrace] | null>(() => {
+    const plot = useMemo<{ traces: [EdgeTrace, NodeTrace]; xs: Array<number>; ys: Array<number> } | null>(() => {
       const rowFields = config.rowPivots.flatMap((pivot) => pivot.fields);
       const columnFields = config.columnPivots.flatMap((pivot) => pivot.fields);
       const allFields = [...rowFields, ...columnFields];
@@ -287,17 +325,18 @@ const NetworkGraphVisualization = makeVisualization(
         showlegend: false,
       };
 
-      return [edgeTrace, nodeTrace];
+      return { traces: [edgeTrace, nodeTrace], xs, ys };
     }, [config, mapKeys, rows, theme, visualizationConfig]);
 
-    const layout = useMemo(() => buildLayout(width, height), [width, height]);
+    const layout = useMemo(() => buildLayout(width, height, plot), [width, height, plot]);
 
     return (
       <Container $height={height} $width={width}>
-        {traces ? (
+        {plot ? (
           <GenericPlot
-            chartData={traces}
+            chartData={plot.traces}
             layout={layout}
+            config={PLOT_CONFIG}
             onClickMarker={onChartClick}
             onInitialized={initializeGraphDivRef}
           />
