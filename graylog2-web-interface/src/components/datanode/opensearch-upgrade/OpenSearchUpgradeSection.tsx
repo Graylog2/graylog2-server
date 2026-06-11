@@ -21,7 +21,7 @@ import { Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import useOutdatedIndices from 'components/indices/hooks/useOutdatedIndices';
 
-import useOpenSearchClusterStats, { TARGET_OPENSEARCH_VERSION } from './hooks/useOpenSearchClusterStats';
+import useOpenSearchClusterStats from './hooks/useOpenSearchClusterStats';
 import { outdatedIndicesMockOverride } from './mockOutdatedIndices';
 import OutdatedIndicesTable from './OutdatedIndicesTable';
 
@@ -63,21 +63,23 @@ const MIN_NODES_FOR_ROLLING_UPGRADE = 3;
 
 const OpenSearchUpgradeInfo = ({
   currentVersion,
+  targetVersion,
   isLoading,
 }: {
   currentVersion: string | undefined;
+  targetVersion: string | undefined;
   isLoading: boolean;
 }) => (
   <InfoList>
     <dt>Current OpenSearch version:</dt>
     <dd>{isLoading ? <Spinner text="Loading..." /> : currentVersion || 'Unknown'}</dd>
     <dt>Target OpenSearch version:</dt>
-    <dd>{TARGET_OPENSEARCH_VERSION}</dd>
+    <dd>{isLoading ? <Spinner text="Loading..." /> : targetVersion || 'Unknown'}</dd>
   </InfoList>
 );
 
 const OpenSearchUpgradeSection = () => {
-  const { currentVersion, numberOfDataNodes, isLoading } = useOpenSearchClusterStats();
+  const { currentVersion, targetVersion, numberOfDataNodes, isLoading } = useOpenSearchClusterStats();
   const { data: outdatedIndices } = useOutdatedIndices({ mockData: outdatedIndicesMockOverride });
   const isRollingUpgradePossible = numberOfDataNodes >= MIN_NODES_FOR_ROLLING_UPGRADE;
   const hasOutdatedIndices = outdatedIndices.length > 0;
@@ -85,7 +87,7 @@ const OpenSearchUpgradeSection = () => {
   return (
     <Section>
       <h1>Upgrade OpenSearch</h1>
-      <OpenSearchUpgradeInfo currentVersion={currentVersion} isLoading={isLoading} />
+      <OpenSearchUpgradeInfo currentVersion={currentVersion} targetVersion={targetVersion} isLoading={isLoading} />
 
       <Row>
         <Col xs={12}>

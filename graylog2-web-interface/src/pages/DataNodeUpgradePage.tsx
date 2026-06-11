@@ -29,9 +29,7 @@ import type { DataNodeInformation } from 'components/datanode/hooks/useDataNodeU
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 import DocumentationLink from 'components/support/DocumentationLink';
 import OpenSearchUpgradeSection from 'components/datanode/opensearch-upgrade/OpenSearchUpgradeSection';
-import useOpenSearchClusterStats, {
-  isOpenSearchVersionUpToDate,
-} from 'components/datanode/opensearch-upgrade/hooks/useOpenSearchClusterStats';
+import useOpenSearchClusterStats from 'components/datanode/opensearch-upgrade/hooks/useOpenSearchClusterStats';
 import DataNodeUpgradeNodes from 'components/datanode/data-node-upgrade/DataNodeUpgradeNodes';
 import UpgradeMethodSelector, {
   type DataNodeUpgradeMethodType,
@@ -72,30 +70,25 @@ const openSearchStatusLine = ({
 };
 
 const UpgradeStatusAlert = ({
-  currentOpenSearchVersion,
+  isOpenSearchUpToDate,
   isLoadingOpenSearchVersion,
 }: {
-  currentOpenSearchVersion: string | undefined;
+  isOpenSearchUpToDate: boolean;
   isLoadingOpenSearchVersion: boolean;
-}) => {
-  const isOpenSearchUpToDate = isOpenSearchVersionUpToDate(currentOpenSearchVersion);
-
-  return (
-    <Alert bsStyle={isOpenSearchUpToDate ? 'success' : 'warning'} noIcon>
-      <p>
-        <Icon name="check_circle" bsStyle="success" /> All your Data Nodes are up to date.
-      </p>
-      {openSearchStatusLine({ isLoadingOpenSearchVersion, isOpenSearchUpToDate })}
-    </Alert>
-  );
-};
+}) => (
+  <Alert bsStyle={isOpenSearchUpToDate ? 'success' : 'warning'} noIcon>
+    <p>
+      <Icon name="check_circle" bsStyle="success" /> All your Data Nodes are up to date.
+    </p>
+    {openSearchStatusLine({ isLoadingOpenSearchVersion, isOpenSearchUpToDate })}
+  </Alert>
+);
 
 const DataNodeUpgradePage = () => {
   const upgradeListRef = useRef<HTMLTableSectionElement>(null);
 
   const { data, isInitialLoading } = useDataNodeUpgradeStatus();
-  const { currentVersion: currentOpenSearchVersion, isLoading: isLoadingOpenSearchVersion } =
-    useOpenSearchClusterStats();
+  const { isUpToDate: isOpenSearchUpToDate, isLoading: isLoadingOpenSearchVersion } = useOpenSearchClusterStats();
   const [upgradeMethod, setUpgradeMethod] = useState<DataNodeUpgradeMethodType>('cluster-restart');
   const [openUpgradeConfirmDialog, setOpenUpgradeConfirmDialog] = useState<boolean>(false);
 
@@ -172,7 +165,7 @@ const DataNodeUpgradePage = () => {
                   </Alert>
                 )}
               </>
-            )} 
+            )}
             <h1>Upgrade Data Node</h1>
             <br />
             <ClusterHealthInfo
@@ -190,7 +183,7 @@ const DataNodeUpgradePage = () => {
             )}
             {!data?.outdated_nodes?.length && data?.up_to_date_nodes?.length > 0 && (
               <UpgradeStatusAlert
-                currentOpenSearchVersion={currentOpenSearchVersion}
+                isOpenSearchUpToDate={isOpenSearchUpToDate}
                 isLoadingOpenSearchVersion={isLoadingOpenSearchVersion}
               />
             )}

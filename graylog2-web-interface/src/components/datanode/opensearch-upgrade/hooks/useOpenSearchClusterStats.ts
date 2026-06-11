@@ -16,47 +16,26 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import { SystemClusterStats } from '@graylog/server-api';
+import { DatanodeUpgrade } from '@graylog/server-api';
 
 import { defaultOnError } from 'util/conditional/onError';
 
-export const TARGET_OPENSEARCH_VERSION = '3.5.0';
-
-const versionParts = (version: string) => version.split(/[+-]/)[0].split('.').map((part) => Number.parseInt(part, 10));
-
-export const isOpenSearchVersionUpToDate = (currentVersion: string | undefined) => {
-  if (!currentVersion) {
-    return false;
-  }
-
-  const [currentMajor = 0, currentMinor = 0, currentPatch = 0] = versionParts(currentVersion);
-  const [targetMajor = 0, targetMinor = 0, targetPatch = 0] = versionParts(TARGET_OPENSEARCH_VERSION);
-
-  if (currentMajor !== targetMajor) {
-    return currentMajor > targetMajor;
-  }
-
-  if (currentMinor !== targetMinor) {
-    return currentMinor > targetMinor;
-  }
-
-  return currentPatch >= targetPatch;
-};
-
 const useOpenSearchClusterStats = () => {
   const { data, isInitialLoading } = useQuery({
-    queryKey: ['opensearch-upgrade', 'cluster-stats'],
+    queryKey: ['opensearch-upgrade', 'versions-overview'],
     queryFn: () =>
       defaultOnError(
-        SystemClusterStats.elasticsearchStats(),
-        'Loading OpenSearch cluster stats failed',
-        'Could not load OpenSearch cluster stats',
+        DatanodeUpgrade.opensearchVersions(),
+        'Loading OpenSearch versions overview failed',
+        'Could not load OpenSearch versions overview',
       ),
   });
 
   return {
-    currentVersion: data?.cluster_version,
-    numberOfDataNodes: data?.cluster_health?.number_of_data_nodes ?? 0,
+    currentVersion: data?.lowest_current_version,
+    targetVersion: data?.highest_available_version,
+    numberOfDataNodes: data?.nodes.length ?? 0,
+    isUpToDate: data ? !data.upgrade_available && data.up_to_date_count === data.nodes.length : false,
     isLoading: isInitialLoading,
   };
 };
