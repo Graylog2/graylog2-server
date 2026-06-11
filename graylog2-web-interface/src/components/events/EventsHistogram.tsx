@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
-import moment from 'moment';
 
 import { Alert } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
@@ -110,29 +109,18 @@ const layout: Partial<PlotLayout> = {
   legend: { y: yLegendPosition(height) },
 };
 
-type Bucket = {
-  count: number;
-  start_date: string;
-}
-
-const prepareTimeRangeForGraph = ({alerts, events }: { events: Array<Bucket>, alerts: Array<Bucket> }, formatTime: FormatTime) => {
-  const from = [alerts[0], events[0]].reduce((min, item) =>
-    moment(item.start_date).isBefore(moment(min.start_date)) ? item : min
-  ).start_date;
-  const to = [alerts[alerts.length - 1], events[events.length - 1]].reduce((max, item) =>
-    moment(item.start_date).isAfter(moment(max.start_date)) ? item : max
-  ).start_date;
-
-
-  return [formatTime(from, 'internal'), formatTime(to, 'internal')];
-};
+const prepareTimeRangeForGraph = (timerange: {
+  from: string;
+  to: string;
+  type: string;
+}, formatTime: FormatTime) => [formatTime(timerange.from, 'internal'), formatTime(timerange.to, 'internal')];
 
 const EventsGraph = ({
-  data: { results },
-  alerts,
-  onZoom,
-  formatTime,
-}: {
+                       data: { results, timerange },
+                       alerts,
+                       onZoom,
+                       formatTime,
+                     }: {
   data: Awaited<ResultPromise>;
   alerts: 'include' | 'exclude' | 'only';
   onZoom: (from: string, to: string) => void;
@@ -151,10 +139,10 @@ const EventsGraph = ({
       ...layout,
       xaxis: {
         ...layout.xaxis,
-        range: prepareTimeRangeForGraph(results.buckets, formatTime),
+        range: prepareTimeRangeForGraph(timerange, formatTime),
       },
     }),
-    [results.buckets, formatTime],
+    [timerange, formatTime],
   );
 
   return (
@@ -181,7 +169,7 @@ type Props = MiddleSectionProps & {
 };
 const EventsHistogram = ({ searchParams, setFilters, eventsHistogramFetcher = fetchEventsHistogram }: Props) => {
   const { userTimezone, formatTime } = useUserDateTime();
-  const { data, isInitialLoading, refetch, isError, error } = useQuery({
+  const { data, isLoading, refetch, isError, error } = useQuery({
     queryKey: ['events', 'histogram', searchParams],
     queryFn: () => eventsHistogramFetcher(searchParams),
     placeholderData: keepPreviousData,
@@ -199,7 +187,7 @@ const EventsHistogram = ({ searchParams, setFilters, eventsHistogramFetcher = fe
     [formatTime, searchParams.filters, setFilters, userTimezone],
   );
 
-  if (isInitialLoading) {
+  if (isLoading) {
     return <Spinner />;
   }
 
