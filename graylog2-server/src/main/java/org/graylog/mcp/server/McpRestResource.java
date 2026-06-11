@@ -64,7 +64,7 @@ public class McpRestResource extends RestResource {
     private static final String HEADER_MCP_SESSION_ID = "Mcp-Session-Id";
     private static final String HEADER_MCP_PROTOCOL_VERSION = "MCP-Protocol-Version";
 
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper protocolObjectMapper;
 
     private final McpService mcpService;
 
@@ -73,10 +73,10 @@ public class McpRestResource extends RestResource {
     private final ClusterConfigService clusterConfig;
 
     @Inject
-    public McpRestResource(final ClusterConfigService clusterConfig, final McpService mcpService, final ObjectMapper objectMapper, final SecurityContext securityContext) {
+    public McpRestResource(final ClusterConfigService clusterConfig, final McpService mcpService, @McpProtocolObjectMapper final ObjectMapper protocolObjectMapper, final SecurityContext securityContext) {
         this.clusterConfig = clusterConfig;
         this.mcpService = mcpService;
-        this.objectMapper = objectMapper;
+        this.protocolObjectMapper = protocolObjectMapper;
         this.securityContext = securityContext;
     }
 
@@ -116,7 +116,7 @@ public class McpRestResource extends RestResource {
             // Simple one-shot JSON reply
             Object id = null;
             try {
-                final McpSchema.JSONRPCRequest request = objectMapper.convertValue(payload, McpSchema.JSONRPCRequest.class);
+                final McpSchema.JSONRPCRequest request = protocolObjectMapper.convertValue(payload, McpSchema.JSONRPCRequest.class);
                 LOG.trace("Received JSON-RPC request {}", request);
                 id = request.id();
 
@@ -140,7 +140,7 @@ public class McpRestResource extends RestResource {
                 final Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, sessionId, protocolVersionHeader);
 
                 if (result.isPresent() && LOG.isTraceEnabled()) {
-                    LOG.trace("Successfully handled JSON-RPC request: {}", objectMapper.writeValueAsString(result));
+                    LOG.trace("Successfully handled JSON-RPC request: {}", protocolObjectMapper.writeValueAsString(result));
                 }
                 return Response.ok(new McpSchema.JSONRPCResponse("2.0", id, result.orElse(null), null))
                         .header(HEADER_MCP_SESSION_ID, sessionId)
