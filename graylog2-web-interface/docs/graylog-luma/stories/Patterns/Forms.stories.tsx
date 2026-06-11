@@ -270,6 +270,11 @@ const FormExample: React.FC = () => {
 
 export const FormPatternExample: StoryObj = {
   tags: ['!dev'],
+  parameters: {
+    docs: {
+      source: { type: 'dynamic' },
+    },
+  },
   render: () => <FormExample />,
 };
 

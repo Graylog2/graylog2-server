@@ -49,6 +49,11 @@ const FormFields = () => (
 
 export const CurrentContextModal: StoryObj = {
   tags: ['!dev'],
+  parameters: {
+    docs: {
+      source: { type: 'dynamic' },
+    },
+  },
   render: () => {
     const [show, setShow] = useState(false);
 
@@ -79,6 +84,11 @@ export const NewContextPage: StoryObj = {
       </MemoryRouter>
     ),
   ],
+  parameters: {
+    docs: {
+      source: { type: 'dynamic' },
+    },
+  },
   render: () => (
     <CreatePage<StoryValues>
       entityName="Stream"
