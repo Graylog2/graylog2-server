@@ -192,7 +192,7 @@ const StageRules = ({
   return (
     <DataTable
       id={`stage-rules-${pipeline.id}-${stage.stage}`}
-      className="table-hover"
+      hover
       headers={headers}
       headerCellFormatter={headerCellFormatter}
       rows={rules}
