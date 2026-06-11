@@ -49,9 +49,9 @@ public class RollingRestartService {
     }
 
     public RollingRestartJob start(String triggeredBy, boolean force) {
-        final List<String> failures = preflight(force);
+        final List<String> failures = checkPreconditions(force);
         if (!failures.isEmpty()) {
-            throw new PreflightFailedException(failures);
+            throw new RollingRestartPreconditionsException(failures);
         }
 
         final List<RollingRestartNodeEntry> nodes = actions.liveDataNodes().stream()
@@ -79,7 +79,7 @@ public class RollingRestartService {
         return saved;
     }
 
-    private List<String> preflight(boolean force) {
+    private List<String> checkPreconditions(boolean force) {
         final List<String> failures = new ArrayList<>();
         if (jobService.findActive().isPresent()) {
             failures.add("Another rolling restart job is already active or paused");

@@ -18,10 +18,10 @@ package org.graylog2.datanode.restart;
 
 import java.util.List;
 
-public class PreflightFailedException extends RuntimeException {
+public class RollingRestartPreconditionsException extends RuntimeException {
     private final List<String> failedChecks;
 
-    public PreflightFailedException(List<String> failedChecks) {
+    public RollingRestartPreconditionsException(List<String> failedChecks) {
         super("Rolling restart preflight failed: " + String.join("; ", failedChecks));
         this.failedChecks = List.copyOf(failedChecks);
     }

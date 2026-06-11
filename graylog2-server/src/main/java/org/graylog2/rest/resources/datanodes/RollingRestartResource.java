@@ -32,8 +32,8 @@ import jakarta.ws.rs.core.Response;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.datanode.restart.PreflightFailedException;
 import org.graylog2.datanode.restart.RollingRestartJob;
+import org.graylog2.datanode.restart.RollingRestartPreconditionsException;
 import org.graylog2.datanode.restart.RollingRestartService;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
@@ -61,7 +61,7 @@ public class RollingRestartResource extends RestResource {
             final String triggeredBy = String.valueOf(SecurityUtils.getSubject().getPrincipal());
             final RollingRestartJob job = service.start(triggeredBy, request != null && request.force());
             return Response.status(Response.Status.CREATED).entity(job).build();
-        } catch (PreflightFailedException e) {
+        } catch (RollingRestartPreconditionsException e) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(Map.of("failed_checks", e.getFailedChecks()))
                     .build();
