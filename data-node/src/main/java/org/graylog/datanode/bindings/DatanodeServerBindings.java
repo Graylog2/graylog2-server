@@ -18,14 +18,10 @@ package org.graylog.datanode.bindings;
 
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.OptionalBinder;
-import org.graylog.datanode.configuration.OpensearchVersionSelector;
-import org.graylog.datanode.configuration.OpensearchVersionSelectorImpl;
 import org.graylog.datanode.shared.system.activities.DataNodeActivityWriter;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.cluster.nodes.DataNodeClusterService;
 import org.graylog2.cluster.nodes.DataNodeDto;
-import org.graylog2.cluster.nodes.DataNodeMetadataService;
-import org.graylog2.cluster.nodes.DataNodeMetadataServiceImpl;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterIdFactory;
