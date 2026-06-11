@@ -42,11 +42,7 @@ const config: StorybookConfig = {
     ...sbConfig,
     module: {
       ...sbConfig.module,
-      rules: [
-        ...(sbConfig.module?.rules ?? []),
-        bootstrapLessRule,
-        lessRule,
-      ],
+      rules: [...(sbConfig.module?.rules ?? []), bootstrapLessRule, lessRule],
     },
     resolve: {
       ...sbConfig.resolve,
@@ -58,7 +54,7 @@ const config: StorybookConfig = {
       ],
       alias: {
         ...(sbConfig.resolve?.alias ?? {}),
-        '@graylog/server-api': path.resolve(webInterfaceRoot, 'target/api'),
+        '@graylog/server-api': path.resolve(__dirname, 'server-api-mock.js'),
       },
     },
   }),
