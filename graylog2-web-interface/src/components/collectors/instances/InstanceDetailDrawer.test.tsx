@@ -137,6 +137,25 @@ describe('InstanceDetailDrawer', () => {
     await screen.findByText('by Alice Admin');
   });
 
+  it('shows a spinner while pending details are loading', async () => {
+    asMock(useInstancePendingChanges).mockReturnValue({ data: undefined, isLoading: true });
+    const pendingInstance = { ...mockInstance, has_pending_changes: true };
+
+    render(
+      <InstanceDetailDrawer
+        instance={pendingInstance}
+        sources={mockSources}
+        fleetName="production"
+        onClose={jest.fn()}
+      />,
+    );
+
+    await screen.findByText('Synchronization');
+    await screen.findByText(/loading/i);
+    expect(screen.queryByText(/queued until the collector synchronizes/i)).not.toBeInTheDocument();
+    expect(screen.queryByText('In sync')).not.toBeInTheDocument();
+  });
+
   it('hides the pending changes section when the instance is caught up', async () => {
     asMock(useInstancePendingChanges).mockReturnValue({
       data: {

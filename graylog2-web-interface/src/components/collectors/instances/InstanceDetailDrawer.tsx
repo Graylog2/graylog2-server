@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 
 import { Button, Label, Table } from 'components/bootstrap';
 import Drawer from 'components/common/Drawer';
-import { Icon, Link, RelativeTime } from 'components/common';
+import { Icon, Link, RelativeTime, Spinner } from 'components/common';
 import type { IconName } from 'components/common/Icon/types';
 import Routes from 'routing/Routes';
 
@@ -247,6 +247,7 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
 
       <Section>
         <SectionTitle>Synchronization</SectionTitle>
+        {hasPendingChanges && !pendingChanges && <Spinner />}
         {hasPendingChanges && pendingChanges && (
           <>
             <span>The following actions are queued until the collector synchronizes:</span>
@@ -258,7 +259,7 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
                 </IconRow>
               ))}
             </EffectList>
-            <TransactionsToggle bsStyle="link" bsSize="xsmall" onClick={() => setShowTransactions(!showTransactions)}>
+            <TransactionsToggle bsStyle="link" bsSize="xsmall" onClick={() => setShowTransactions((show) => !show)}>
               {showTransactions
                 ? 'Hide queued transactions'
                 : `Show queued transactions (${pendingChanges.activities.length})`}
