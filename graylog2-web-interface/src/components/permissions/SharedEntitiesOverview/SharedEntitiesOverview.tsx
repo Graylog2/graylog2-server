@@ -96,7 +96,7 @@ const SharedEntitiesOverview = ({ entityType, searchPaginated, setLoading }: Pro
         onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}
         useQueryParameter={false}>
         <DataTable
-          className="table-hover"
+          hover
           customFilter={<SharedEntitiesFilter onSearch={_handleSearch} onFilter={_handleFilter} />}
           dataRowFormatter={(sharedEntity) => _sharedEntityOverviewItem(sharedEntity, context)}
           filterKeys={[]}
