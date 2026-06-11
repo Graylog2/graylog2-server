@@ -21,7 +21,9 @@ import { defaultUser } from 'defaultMockValues';
 
 import { asMock } from 'helpers/mocking';
 import type { SearchParams } from 'stores/PaginationTypes';
-import TableFetchContext, { type ContextValue } from 'components/common/PaginatedEntityTable/TableFetchContext';
+import TableFilterContext, {
+  type TableFilterContextValue,
+} from 'components/common/PaginatedEntityTable/TableFilterContext';
 import type { ColumnSchema } from 'components/common/EntityDataTable/types';
 import useCurrentUser from 'hooks/useCurrentUser';
 
@@ -64,15 +66,22 @@ describe('Slicing', () => {
       filters: undefined,
       ...contextOverrides.searchParams,
     };
-    const contextValue: ContextValue = {
+    const contextValue: TableFilterContextValue = {
       searchParams,
-      refetch: jest.fn(),
-      attributes: [],
-      entityTableId: 'test-entity-table',
+      setQuery: jest.fn(),
+      onChangeFilters: jest.fn(),
+      onChangeSlicingFilter: jest.fn(),
+      paginationState: {
+        page: searchParams.page,
+        pageSize: searchParams.pageSize,
+        resetPage: jest.fn(),
+        setPagination: jest.fn(),
+      },
+      resetFilters: jest.fn(),
     };
 
     return (
-      <TableFetchContext.Provider value={contextValue}>
+      <TableFilterContext.Provider value={contextValue}>
         <Slicing
           appSection="test-app-section"
           columnSchemas={columnSchemas}
@@ -80,7 +89,7 @@ describe('Slicing', () => {
           fetchSlices={() => Promise.resolve({ slices: [] })}
           {...props}
         />
-      </TableFetchContext.Provider>
+      </TableFilterContext.Provider>
     );
   };
 

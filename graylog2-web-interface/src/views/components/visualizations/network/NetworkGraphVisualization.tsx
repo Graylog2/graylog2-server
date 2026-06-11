@@ -28,6 +28,7 @@ import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlot
 import NetworkVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NetworkVisualizationConfig';
 
 import buildGraph from './buildGraph';
+import networkOnClickPopover from './networkOnClickPopover';
 
 import GenericPlot from '../GenericPlot';
 
@@ -183,7 +184,7 @@ const NetworkGraphVisualization = makeVisualization(
     const rows = retrieveChartData(data);
     const mapKeys = useMapKeys();
     const theme = useTheme();
-    const { onChartClick, initializeGraphDivRef, popover } = usePlotOnClickPopover('network', config);
+    const { onChartClick, initializeGraphDivRef, popover } = usePlotOnClickPopover({ ...networkOnClickPopover, config });
     const visualizationConfig = (config.visualizationConfig ??
       NetworkVisualizationConfig.empty()) as NetworkVisualizationConfig;
 

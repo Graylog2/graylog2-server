@@ -16,387 +16,19 @@
  */
 import * as React from 'react';
 import { useRef, useState } from 'react';
-import type { PlotMouseEvent, PlotlyHTMLElement, PlotData } from 'plotly.js';
-import minBy from 'lodash/minBy';
+import type { PlotMouseEvent, PlotlyHTMLElement } from 'plotly.js';
 import { useFloating } from '@floating-ui/react';
-import uniqBy from 'lodash/uniqBy';
 
-import type { Rel, ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
+import type { Rel } from 'views/components/visualizations/OnClickPopover/Types';
 import type { OnClickMarkerEvent } from 'views/components/visualizations/GenericPlot';
 import OnClickPopoverWrapper from 'views/components/visualizations/OnClickPopover/OnClickPopoverWrapper';
-import CartesianOnClickPopoverDropdown from 'views/components/visualizations/OnClickPopover/CartesianOnClickPopoverDropdown';
-import HeatmapOnClickPopover from 'views/components/visualizations/OnClickPopover/HeatmapOnClickPopover';
-import PieOnClickPopoverDropdown from 'views/components/visualizations/OnClickPopover/PieOnClickPopoverDropdown';
-import SankeyOnClickPopover from 'views/components/visualizations/OnClickPopover/SankeyOnClickPopover';
+import type { Anchor, BuildAnchor, RenderPopover } from 'views/components/visualizations/OnClickPopover/anchors';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import { CANDIDATE_PICK_RADIUS } from 'views/components/visualizations/Constants';
-import DropdownSwitcher from 'views/components/visualizations/OnClickPopover/DropdownSwitcher';
 
-const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
-
-/** ---------- DOM getters ---------- */
-const getBarElement = (
-  graphDiv: HTMLElement,
-  pt: ClickPoint,
-  curveNumberRenderIndexMapper: Record<number, number>,
-): Element | null => {
-  const { curveNumber, pointIndex } = pt;
-  const traceIndex = curveNumberRenderIndexMapper[curveNumber];
-  const trace = graphDiv.querySelectorAll('.cartesianlayer .trace')[traceIndex] as HTMLElement | undefined;
-
-  if (!trace) return null;
-  const point = trace.querySelectorAll('.point')[pointIndex!] as HTMLElement | undefined;
-
-  return point?.querySelector('rect') ?? point?.querySelector('path') ?? null;
-};
-
-const listSubplotOrder = (gd: HTMLElement): string[] => {
-  const subplots = gd.querySelectorAll<SVGGElement>('.cartesianlayer g.subplot');
-
-  return Array.from(subplots).map((node) => {
-    // Each subplot node has classes like "subplot xy" or "subplot x2y3"
-    // We want the specific id class (not the generic "subplot")
-    const idClass = Array.from(node.classList).find((cls) => cls !== 'subplot');
-
-    return idClass ?? '';
-  });
-};
-
-const createBarElementGetter = (gd: PlotlyHTMLElement & { _fullData: Array<any> }) => {
-  const fullData = gd._fullData;
-  const curveNumberGroupedBySubPlot: Record<string, number[]> = {};
-
-  fullData.forEach(({ xaxis, yaxis }, curveNumber) => {
-    const subplot = `${xaxis ?? 'x'}${yaxis ?? 'y'}`;
-    (curveNumberGroupedBySubPlot[subplot] ||= []).push(curveNumber);
-  });
-  const subPlotDOMOrder = listSubplotOrder(gd);
-
-  const curveNumberRenderIndexArray = subPlotDOMOrder.flatMap((subPlotId) => curveNumberGroupedBySubPlot[subPlotId]);
-  const curveNumberRenderIndexMapper = Object.fromEntries(curveNumberRenderIndexArray.map((v, i) => [v, i]));
-
-  return (graphDiv: HTMLElement, pt: ClickPoint) => getBarElement(graphDiv, pt, curveNumberRenderIndexMapper);
-};
-
-const getScatterMarkerElement = (graphDiv: HTMLElement, pt: ClickPoint): Element | null => {
-  const {
-    fullData: { uid },
-    pointIndex,
-  } = pt;
-
-  const trace = graphDiv.querySelector(`.scatterlayer .trace.trace${uid}`) as HTMLElement | undefined;
-  if (!trace) return null;
-
-  return trace.querySelectorAll('.points .point')[pointIndex] ?? null;
-};
-
-const getPieSliceElement = (_: HTMLElement, __: ClickPoint, targetEl: Element): Element | null => targetEl;
-
-/** ---------- math helpers ---------- */
-type Px = { x: number; y: number };
-/**
- * Project a point P onto the line AB and return the parametric "t"
- * - If t < 0 → closest before A
- * - If t > 1 → closest after B
- * - If 0 <= t <= 1 → closest lies within segment AB
- */
-const projectT = (P: Px, A: Px, B: Px) => {
-  // Vector AB
-  const vx = B.x - A.x;
-  const vy = B.y - A.y;
-
-  // Vector AP
-  const wx = P.x - A.x;
-  const wy = P.y - A.y;
-
-  // Length squared of AB (avoid division by 0)
-  const len2 = vx * vx + vy * vy || 1;
-
-  // Dot product projection formula
-  return (wx * vx + wy * vy) / len2;
-};
-const distToRect = (rect: DOMRect, { x, y }: Px) => {
-  let dx = 0;
-  if (x < rect.left) dx = rect.left - x;
-  else if (x > rect.right) dx = x - rect.right;
-  let dy = 0;
-  if (y < rect.top) dy = rect.top - y;
-  else if (y > rect.bottom) dy = y - rect.bottom;
-
-  return Math.hypot(dx, dy);
-};
-
-/**
- * Convert a data-space coordinate (xVal, yVal) to **page pixel coordinates**
- * so we can compare against mouse clicks.
- */
-const dataToPagePx = (
-  gd: PlotlyHTMLElementWithInternals,
-  pt: ClickPoint,
-  xVal: any,
-  yVal: any,
-): { x: number; y: number } => {
-  const fl = gd._fullLayout;
-
-  // Get the axis objects (may be stored differently depending on pt)
-  const xa = (pt as any).xaxis?.l2p ? (pt as any).xaxis : fl[(pt as any).xaxis?._name ?? 'xaxis'];
-  const ya = (pt as any).yaxis?.l2p ? (pt as any).yaxis : fl[(pt as any).yaxis?._name ?? 'yaxis'];
-
-  if (!xa?.l2p || !xa?.d2l || !ya?.l2p || !ya?.d2l) return null;
-
-  // Convert data value → linearized → pixel coordinate within plot
-  const gx = xa.l2p(xa.d2l(xVal));
-  const gy = ya.l2p(ya.d2l(yVal));
-  if (!Number.isFinite(gx) || !Number.isFinite(gy)) return null;
-
-  // Add graph container offsets (_size.l/t are margins inside the SVG)
-  const rect = (gd as HTMLElement).getBoundingClientRect();
-
-  return { x: rect.left + fl._size.l + gx, y: rect.top + fl._size.t + gy };
-};
-
-/** ---------- Anchors ---------- */
-type ElementAnchor = { el: Element; rel: Rel; pt: ClickPoint; pointsInRadius?: Array<ClickPoint> };
-type Anchor = ElementAnchor;
-
-/** ---------- nearest element anchor ---------- */
-const pickNearestElementAnchor = (
-  e: PlotMouseEvent,
-  candidates: { pt: ClickPoint; el: Element; rect: DOMRect }[],
-): ElementAnchor | null => {
-  const { clientX, clientY } = e.event as MouseEvent;
-  if (!candidates.length) return null;
-  const inside = candidates.find(
-    ({ rect }) => clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom,
-  );
-
-  const candidatesWithDistances = candidates.map((candidate) => {
-    const rect = candidate.rect as DOMRect;
-    const d = distToRect(rect, { x: clientX, y: clientY });
-
-    return { d, candidate };
-  });
-
-  const pointsInRadius = candidatesWithDistances
-    .filter(({ d }) => d < CANDIDATE_PICK_RADIUS)
-    .sort((a, b) => a.d - b.d)
-    .map(({ candidate }) => candidate.pt);
-
-  const closest = inside ?? minBy(candidatesWithDistances, 'd').candidate;
-  if (!closest) return null;
-  const { el, rect, pt } = closest;
-  const rel: Rel = {
-    x: clamp01((clientX - rect.left) / Math.max(rect.width, 1)),
-    y: clamp01((clientY - rect.top) / Math.max(rect.height, 1)),
-  };
-
-  return { el, rel, pt, pointsInRadius };
-};
-
-/** ---------- bar/pie anchors ---------- */
-const makeElementAnchor = (
-  e: PlotMouseEvent,
-  gd: PlotlyHTMLElement,
-  chartType: 'bar' | 'pie' | 'heatmap',
-): ElementAnchor | null => {
-  const getEl =
-    chartType === 'bar'
-      ? createBarElementGetter(gd as PlotlyHTMLElement & { _fullData: Array<any> })
-      : (graphDiv: HTMLElement, pt: ClickPoint, targetEl: Element) => getPieSliceElement(graphDiv, pt, targetEl);
-  const graphDiv = gd as unknown as HTMLElement;
-  const targetEl = (e.event?.target as Element) || graphDiv;
-  const candidates = e.points
-    .map((pt: ClickPoint) => {
-      const el = getEl(graphDiv, pt, targetEl);
-
-      return el ? { pt, el, rect: el.getBoundingClientRect() } : null;
-    })
-    .filter((candidate) => !!candidate);
-
-  return pickNearestElementAnchor(e, candidates);
-};
-
-/**
- * Given a click and a scatter point, return candidate "nearest line segment" anchors.
- * Each candidate has:
- *  - el: the line path element (so popover can stick to it)
- *  - pt: the Plotly point datum
- *  - d: distance from click to the projected point on the segment
- *  - px, py: projected point coordinates in page pixels
- *  - valuePx, valuePy: value point coordinates in page pixels
- */
-
-interface PlotlyHTMLElementWithInternals extends PlotlyHTMLElement {
-  _fullData?: any[];
-  _fullLayout?: any;
-}
-
-function pickNearestLinesElementForTrace(gd: PlotlyHTMLElement, pt: ClickPoint, click: Px): Element | null {
-  const uid = pt.fullData?.uid;
-  if (!uid) return null;
-
-  const trace = gd.querySelector<HTMLElement>(`.scatterlayer .trace.trace${uid}`);
-  if (!trace) return null;
-
-  const linesGroups = Array.from(trace.querySelectorAll<SVGGElement>('.lines path.js-line'));
-  if (!linesGroups.length) return null;
-
-  const candidates = linesGroups.map((line) => {
-    const r = line.getBoundingClientRect();
-    const { x, y } = click;
-
-    return { el: line, d: distToRect(r, { x, y }) };
-  });
-
-  const best: { el: SVGGElement; d: number } = minBy(candidates, 'd');
-
-  return best?.el;
-}
-
-const getScatterLineElements = (gd: PlotlyHTMLElement, click: Px, pt: ClickPoint) => {
-  // Get the full data for this trace (array of x/y values)
-  const fd: PlotData = pt.data ?? (gd as PlotlyHTMLElementWithInternals)._fullData?.[pt.curveNumber];
-  const xs = fd?.x ?? [];
-  const ys = fd?.y ?? [];
-
-  // Current index in the data array
-  const i: number = pt.pointIndex ?? pt.pointNumber ?? 0;
-
-  // Build candidate segments: one before (i-1 → i), one after (i → i+1)
-  const segs = [i > 0 ? [i - 1, i] : null, i < xs.length - 1 ? [i, i + 1] : null].filter((seg) => !!seg);
-
-  return segs.map(([i0, i1]) => {
-    // Convert endpoints from data space → page pixels
-    const A = dataToPagePx(gd, pt, xs[i0], ys[i0]);
-    const B = dataToPagePx(gd, pt, xs[i1], ys[i1]);
-    if (!A || !B) return null;
-
-    // Project the click point onto the line segment A→B
-    // projectT gives the "t" position on the infinite line
-    // clamp01 ensures it's within the segment [0,1]
-    const t = clamp01(projectT(click, A, B));
-    const px = A.x + t * (B.x - A.x);
-    const py = A.y + t * (B.y - A.y);
-
-    // Distance from click to this projected point
-    const d = Math.hypot(click.x - px, click.y - py);
-    // Find the actual <path> element for the line
-    const el = pickNearestLinesElementForTrace(gd, pt, click);
-    // The actual data point's pixel coordinates
-    const { x: valuePx, y: valuePy } = dataToPagePx(gd, pt, xs[i], ys[i]);
-
-    return { el, pt, d, px, py, valuePx, valuePy };
-  });
-};
-
-/** ---------- sankey anchor ---------- */
-const isSankeyLinkPoint = (pt: ClickPoint): boolean => {
-  const p = pt as unknown as { source?: unknown; target?: unknown };
-
-  return (
-    !!p.source &&
-    !!p.target &&
-    typeof p.source === 'object' &&
-    typeof p.target === 'object' &&
-    !Array.isArray(p.source) &&
-    !Array.isArray(p.target)
-  );
-};
-
-const getSankeyAnchorElement = (gd: HTMLElement, pt: ClickPoint): Element | null => {
-  const idx = (pt as unknown as { index?: number; pointNumber?: number }).index ?? (pt as ClickPoint).pointNumber;
-
-  if (typeof idx !== 'number') return null;
-
-  const selector = isSankeyLinkPoint(pt) ? '.sankey-link' : '.sankey-node';
-  const elements = gd.querySelectorAll(selector);
-
-  return (elements[idx] as Element | undefined) ?? null;
-};
-
-const sankeyAnchorKey = (anchor: ElementAnchor): string => {
-  const pt = anchor.pt as unknown as {
-    pointNumber?: number;
-    index?: number;
-    curveNumber?: number;
-    source?: unknown;
-    target?: unknown;
-    customdata?: { source?: unknown; target?: unknown };
-  };
-  const isLink =
-    isSankeyLinkPoint(anchor.pt) ||
-    !!(pt.customdata && typeof pt.customdata === 'object' && pt.customdata.source && pt.customdata.target);
-  const curve = pt.curveNumber ?? 0;
-  const idx = pt.pointNumber ?? pt.index ?? 0;
-
-  return `${curve}-${isLink ? 'l' : 'n'}-${idx}`;
-};
-
-const makeSankeyAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): ElementAnchor | null => {
-  const graphDiv = gd as unknown as HTMLElement;
-  const pt = e.points?.[0] as ClickPoint | undefined;
-
-  if (!pt) return null;
-
-  const el = getSankeyAnchorElement(graphDiv, pt) ?? graphDiv;
-
-  return { el, pt, rel: { x: 0.5, y: 0.5 } };
-};
-
-const makeScatterAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): Anchor | null => {
-  const graphDiv = gd;
-  const markerCandidates = e.points
-    .map((pt: ClickPoint) => {
-      const el = getScatterMarkerElement(graphDiv, pt as ClickPoint);
-
-      return el ? { pt, el, rect: el.getBoundingClientRect() } : null;
-    })
-    .filter((candidate) => !!candidate);
-
-  const bestMarker = pickNearestElementAnchor(e, markerCandidates);
-  if (bestMarker) return bestMarker;
-  const { clientX, clientY } = e.event as MouseEvent;
-  const click: Px = { x: clientX, y: clientY };
-  const lineCandidates = e.points
-    .flatMap((pt: ClickPoint) => getScatterLineElements(graphDiv, click, pt))
-    .filter((candidate) => !!candidate);
-  const best = minBy(lineCandidates, 'd');
-  // we need unique pt because in this case one pt can have several related lines
-  const pointsInRadius = uniqBy(
-    lineCandidates
-      .filter(({ d }) => d < CANDIDATE_PICK_RADIUS)
-      .sort((a, b) => a.d - b.d)
-      .map(({ pt }) => pt),
-    'pointIndex',
-  );
-
-  if (!best) return null;
-  const { el, pt, valuePx, valuePy } = best;
-  if (!el) return null;
-  const rect = el.getBoundingClientRect();
-  const rel: Rel = {
-    x: clamp01((valuePx - rect.left) / Math.max(rect.width, 1)),
-    y: clamp01((valuePy - rect.top) / Math.max(rect.height, 1)),
-  };
-
-  return { rel, el, pt, pointsInRadius };
-};
-
-type ChartType = 'bar' | 'scatter' | 'pie' | 'heatmap' | 'sankey' | 'network';
-
-// Visualizations that route their click popover through SankeyOnClickPopover (which
-// can render both node + edge interactions inside a single, never-unmounted dropdown).
-const usesSankeyPopover = (chartType: ChartType) => chartType === 'sankey' || chartType === 'network';
-
-const popoverComponent = (chartType: ChartType) => {
-  switch (chartType) {
-    case 'heatmap':
-      return HeatmapOnClickPopover;
-    case 'pie':
-      return PieOnClickPopoverDropdown;
-    default:
-      return CartesianOnClickPopoverDropdown;
-  }
+type OnClickPopoverInput = {
+  buildAnchor: BuildAnchor;
+  renderPopover: RenderPopover;
+  config: AggregationWidgetConfig;
 };
 
 const alignByRelativeCoords = (rel: Rel = { x: 0, y: 0 }) => ({
@@ -409,7 +41,7 @@ const alignByRelativeCoords = (rel: Rel = { x: 0, y: 0 }) => ({
 });
 
 /** ---------- hook ---------- */
-const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetConfig) => {
+const usePlotOnClickPopover = ({ buildAnchor, renderPopover, config }: OnClickPopoverInput) => {
   const gdRef = useRef<PlotlyHTMLElement | null>(null);
   const [anchor, setAnchor] = useState<Anchor | null>(null);
   const { refs, floatingStyles } = useFloating({
@@ -430,13 +62,9 @@ const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetCo
   const onChartClick = (_: OnClickMarkerEvent, e: PlotMouseEvent) => {
     const targetEl = e.event?.target;
     const targetElForClosest = targetEl instanceof Element ? targetEl : null;
-    const gd =
-      gdRef.current ?? (targetElForClosest?.closest('.js-plotly-plot') as PlotlyHTMLElement | null);
+    const gd = gdRef.current ?? targetElForClosest?.closest('.js-plotly-plot');
     if (!gd) return;
-    let a: Anchor | null;
-    if (chartType === 'scatter' || chartType === 'network') a = makeScatterAnchor(e, gd);
-    else if (chartType === 'sankey') a = makeSankeyAnchor(e, gd);
-    else a = makeElementAnchor(e, gd, chartType);
+    const a = buildAnchor(e, gd);
     if (!a) return;
     setAnchor((prev) => {
       // Avoid recreating the anchor for the same element — a new object reference
@@ -454,31 +82,14 @@ const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetCo
 
   const isPopoverOpen = !!anchor;
 
-  const PopoverComponent = popoverComponent(chartType);
-
   const popover = (
     <OnClickPopoverWrapper
       isPopoverOpen={isPopoverOpen}
       onPopoverChange={onPopoverChange}
+      // eslint-disable-next-line react-hooks/refs
       ref={refs.setFloating}
       style={floatingStyles}>
-      {usesSankeyPopover(chartType) && anchor ? (
-        <SankeyOnClickPopover
-          // Remount per anchor so internal selection state resets when the user clicks a different element.
-          key={sankeyAnchorKey(anchor)}
-          clickPoint={anchor.pt}
-          config={config}
-          onPopoverClose={onPopoverClose}
-        />
-      ) : (
-        <DropdownSwitcher
-          component={PopoverComponent}
-          clickPoint={anchor?.pt}
-          config={config}
-          clickPointsInRadius={anchor?.pointsInRadius}
-          onPopoverClose={onPopoverClose}
-        />
-      )}
+      {anchor ? renderPopover({ anchor, config, onPopoverClose }) : null}
     </OnClickPopoverWrapper>
   );
 

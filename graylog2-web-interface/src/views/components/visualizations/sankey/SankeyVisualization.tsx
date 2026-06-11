@@ -27,6 +27,9 @@ import type { LeafPath } from 'views/components/visualizations/utils/extractLeaf
 import extractLeafPaths from 'views/components/visualizations/utils/extractLeafPaths';
 
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
+import sankeyOnClickPopover from 'views/components/visualizations/sankey/sankeyOnClickPopover';
+
+import { SANKEY_VISUALIZATION_TYPE } from './Constants';
 
 import GenericPlot from '../GenericPlot';
 
@@ -53,7 +56,7 @@ const EmptyState = styled.div(
 export type NodeCustomData = { field: string; value: Key };
 
 export type SankeyTrace = {
-  type: 'sankey';
+  type: typeof SANKEY_VISUALIZATION_TYPE;
   orientation: 'h';
   arrangement: 'fixed';
   node: { label: Array<string>; customdata: Array<NodeCustomData>; pad: number; thickness: number };
@@ -118,7 +121,7 @@ const buildSankeyTrace = (
   });
 
   return {
-    type: 'sankey',
+    type: SANKEY_VISUALIZATION_TYPE,
     orientation: 'h',
     arrangement: 'fixed',
     node: { label: labels, customdata, pad: 15, thickness: 18 },
@@ -132,7 +135,7 @@ const SankeyVisualization = makeVisualization(({ config, data, height, width }: 
   const rows = retrieveChartData(data);
   const mapKeys = useMapKeys();
   const theme = useTheme();
-  const { onChartClick, initializeGraphDivRef, popover } = usePlotOnClickPopover('sankey', config);
+  const { onChartClick, initializeGraphDivRef, popover } = usePlotOnClickPopover({ ...sankeyOnClickPopover, config });
 
   // Translucent so overlapping flows stay distinguishable; based on the theme's text color
   // so the links remain visible in both light and dark themes (plotly's default is too faint).
@@ -174,7 +177,7 @@ const SankeyVisualization = makeVisualization(({ config, data, height, width }: 
       {popover}
     </Container>
   );
-}, 'sankey');
+}, SANKEY_VISUALIZATION_TYPE);
 
 SankeyVisualization.displayName = 'SankeyVisualization';
 
