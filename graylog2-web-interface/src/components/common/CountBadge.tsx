@@ -37,7 +37,7 @@ type Props = {
   onClick?: () => void;
   className?: string;
   title?: string;
-  count: number;
+  count: React.ReactNode;
   iconName?: React.ComponentProps<typeof Icon>['name'];
 };
 
