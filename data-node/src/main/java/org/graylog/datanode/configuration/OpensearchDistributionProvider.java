@@ -114,7 +114,7 @@ public class OpensearchDistributionProvider implements Provider<OpensearchDistri
                     .map(OpensearchDistribution::version)
                     .sorted()
                     .collect(Collectors.joining(", "));
-            throw new IllegalArgumentException(e.getMessage() + ". Available distributions: " + availableVersions, e.getCause());
+            throw new IllegalArgumentException(e.getMessage() + ". Available distributions: " + availableVersions, e);
         }
 
         final List<OpensearchDistribution> otherCandidates = candidates.stream().filter(c -> !c.equals(selected)).toList();
