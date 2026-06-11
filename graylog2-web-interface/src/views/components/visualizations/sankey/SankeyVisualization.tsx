@@ -24,6 +24,7 @@ import { makeVisualization, retrieveChartData } from 'views/components/aggregati
 import type { Key, Row } from 'views/logic/searchtypes/pivot/PivotHandler';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
+import sankeyOnClickPopover from 'views/components/visualizations/sankey/sankeyOnClickPopover';
 
 import { SANKEY_VISUALIZATION_TYPE } from './Constants';
 
@@ -183,7 +184,7 @@ const SankeyVisualization = makeVisualization(({ config, data, height, width }: 
   const rows = retrieveChartData(data);
   const mapKeys = useMapKeys();
   const theme = useTheme();
-  const { onChartClick, initializeGraphDivRef, popover } = usePlotOnClickPopover(SANKEY_VISUALIZATION_TYPE, config);
+  const { onChartClick, initializeGraphDivRef, popover } = usePlotOnClickPopover({ ...sankeyOnClickPopover, config });
 
   // Translucent so overlapping flows stay distinguishable; based on the theme's text color
   // so the links remain visible in both light and dark themes (plotly's default is too faint).
