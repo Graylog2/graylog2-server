@@ -59,7 +59,7 @@ public class OpensearchVersionTracer implements StateMachineTracer<OpensearchSta
 
             final Version currentVersion = Version.parse(opensearchVersion);
 
-            if (isCurrentNewerThanPeristed(currentVersion)) {
+            if (isCurrentNewerThanPersisted(currentVersion)) {
                 metadataService.setOpensearchVersion(nodeId.getNodeId(), opensearchVersion);
                 LOG.info("Persisting confirmed opensearch version in data node metadata {}", opensearchVersion);
             }
@@ -75,8 +75,7 @@ public class OpensearchVersionTracer implements StateMachineTracer<OpensearchSta
         }
     }
 
-    @Nonnull
-    private Boolean isCurrentNewerThanPeristed(Version currentVersion) {
+    private boolean isCurrentNewerThanPersisted(Version currentVersion) {
         return metadataService.findByNodeId(nodeId.getNodeId())
                 .map(m -> currentVersion.isHigherThan(Version.parse(m.currentOpensearchVersion())))
                 .orElse(true);
