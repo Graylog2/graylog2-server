@@ -83,7 +83,7 @@ export const PxLabel = styled.span`
 `;
 
 export const StoryContainer = styled.div`
-  padding-bottom: ${({ theme }) => theme.spacings.xl};
+  padding-bottom: ${({ theme }) => theme.spacings.xs};
 `;
 
 export const SectionDescription = styled.p`
