@@ -24,17 +24,6 @@ import { Button, Col, Row } from 'components/bootstrap';
 import FormikInput from 'components/common/FormikInput';
 import FormSubmit from 'components/common/FormSubmit';
 
-// ── Layout helpers ────────────────────────────────────────────────────────────
-
-const SectionLabel = styled.h3`
-  font-weight: 600;
-  margin: 24px 0 4px;
-`;
-
-const Divider = styled.hr`
-  margin: 4px 0 16px;
-`;
-
 // Two equal-width fields side by side (e.g. hostname / port, start / end date).
 const FieldRow = styled.div`
   display: flex;
@@ -176,8 +165,8 @@ const FormExample: React.FC = () => {
           <Form noValidate>
             <h2>Create Input</h2>
             {/* ── Group 1: Identity ─────────────────────────────── */}
-            <SectionLabel style={{ marginTop: 0 }}>Identity</SectionLabel>
-            <Divider />
+            <h3 style={{ marginTop: 0 }}>Identity</h3>
+            <hr />
 
             {/* Required before optional within the group */}
             <FormikInput
@@ -203,8 +192,8 @@ const FormExample: React.FC = () => {
             />
 
             {/* ── Group 2: Connection ───────────────────────────── */}
-            <SectionLabel>Connection</SectionLabel>
-            <Divider />
+            <h3>Connection</h3>
+            <hr />
 
             {/* Paired fields: semantically one unit, equal width */}
             <FieldRow>
@@ -252,8 +241,8 @@ const FormExample: React.FC = () => {
             <FormikInput id="password" name="password" type="password" label="Password" />
 
             {/* ── Group 3: Output ───────────────────────────────── */}
-            <SectionLabel>Output</SectionLabel>
-            <Divider />
+            <h3>Output</h3>
+            <hr />
 
             <FormikInput
               id="indexSet"
