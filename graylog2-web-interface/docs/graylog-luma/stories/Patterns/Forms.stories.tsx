@@ -23,35 +23,20 @@ import type { FormikHelpers } from 'formik';
 import { Button, Col, Row } from 'components/bootstrap';
 import FormikInput from 'components/common/FormikInput';
 import FormSubmit from 'components/common/FormSubmit';
-
-// Two equal-width fields side by side (e.g. hostname / port, start / end date).
-const FieldRow = styled.div`
-  display: flex;
-  gap: 16px;
-
-  & > * {
-    flex: 1;
-    min-width: 0;
-  }
-`;
+import RequiredMarker from 'components/common/RequiredMarker';
 
 const AdvancedToggle = styled.button`
   background: none;
   border: none;
-  padding: 4px 0;
+  padding: ${({ theme }) => theme.spacings.xxs} 0;
+  margin-bottom: ${({ theme }) => theme.spacings.md};
   cursor: pointer;
   font-size: inherit;
   color: inherit;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: ${({ theme }) => theme.spacings.xs};
 `;
-
-// ── Required label marker ─────────────────────────────────────────────────────
-
-// Visually marks required fields. aria-hidden so screen readers don't announce
-// the asterisk — the input's `required` attribute already does that.
-const Req = () => <span aria-hidden="true"> *</span>;
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -163,7 +148,6 @@ const FormExample: React.FC = () => {
       <Row className="content">
         <Col md={8}>
           <Form noValidate>
-            <h2>Create Input</h2>
             {/* ── Group 1: Identity ─────────────────────────────── */}
             <h3 style={{ marginTop: 0 }}>Identity</h3>
             <hr />
@@ -175,7 +159,7 @@ const FormExample: React.FC = () => {
               label={
                 <>
                   Name
-                  <Req />
+                  <RequiredMarker />
                 </>
               }
               required
@@ -196,34 +180,38 @@ const FormExample: React.FC = () => {
             <hr />
 
             {/* Paired fields: semantically one unit, equal width */}
-            <FieldRow>
-              <FormikInput
-                id="hostname"
-                name="hostname"
-                label={
-                  <>
-                    Hostname
-                    <Req />
-                  </>
-                }
-                required
-                validate={requiredValidator('Hostname')}
-                placeholder="e.g. 192.168.1.1"
-              />
-              <FormikInput
-                id="port"
-                name="port"
-                label={
-                  <>
-                    Port
-                    <Req />
-                  </>
-                }
-                required
-                validate={portValidator}
-                placeholder="e.g. 5140"
-              />
-            </FieldRow>
+            <Row>
+              <Col sm={6}>
+                <FormikInput
+                  id="hostname"
+                  name="hostname"
+                  label={
+                    <>
+                      Hostname
+                      <RequiredMarker />
+                    </>
+                  }
+                  required
+                  validate={requiredValidator('Hostname')}
+                  placeholder="e.g. 192.168.1.1"
+                />
+              </Col>
+              <Col sm={6}>
+                <FormikInput
+                  id="port"
+                  name="port"
+                  label={
+                    <>
+                      Port
+                      <RequiredMarker />
+                    </>
+                  }
+                  required
+                  validate={portValidator}
+                  placeholder="e.g. 5140"
+                />
+              </Col>
+            </Row>
 
             {/* Required before optional within the group */}
             <FormikInput
@@ -232,7 +220,7 @@ const FormExample: React.FC = () => {
               label={
                 <>
                   Username
-                  <Req />
+                  <RequiredMarker />
                 </>
               }
               required
@@ -250,7 +238,7 @@ const FormExample: React.FC = () => {
               label={
                 <>
                   Index set
-                  <Req />
+                  <RequiredMarker />
                 </>
               }
               required

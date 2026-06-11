@@ -114,6 +114,7 @@ export { default as QueryHelper } from './QueryHelper';
 export { default as ReactGridContainer } from './ReactGridContainer';
 export { default as ReadOnlyFormGroup } from './ReadOnlyFormGroup';
 export { default as RelativeTime } from './RelativeTime';
+export { default as RequiredMarker } from './RequiredMarker';
 export { default as RestrictedAccessTooltip } from './RestrictedAccessTooltip';
 export { default as RingProgress } from './RingProgress';
 export { default as Sanitize } from './Sanitize';
