@@ -170,11 +170,6 @@ const FormExample: React.FC = () => {
   }
 
   return (
-    // Default Formik settings: validateOnChange + validateOnBlur both true.
-    // FormikInput uses validateOnChange from context to decide when to show errors:
-    //   - before submit: only after the field is blurred (touched)
-    //   - after a failed submit: Formik marks all fields as touched, so errors
-    //     appear immediately and clear on-input as the user types corrections.
     <Formik initialValues={INITIAL} onSubmit={handleSubmit}>
       <Row className="content">
         <Col md={8}>

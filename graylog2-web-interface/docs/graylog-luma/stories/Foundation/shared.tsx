@@ -98,11 +98,11 @@ export const H1 = styled.h1`
 `;
 
 export const H2 = styled.h2`
-  margin: 0 0 ${({ theme }) => theme.spacings.sm};
+  margin: 0 0 ${({ theme }) => theme.spacings.md};
 `;
 
 export const H3 = styled.h3`
-  margin: 0 0 ${({ theme }) => theme.spacings.xs};
+  margin: 0 0 ${({ theme }) => theme.spacings.sm};
 `;
 
 // ─── Foundation Table ──────────────────────────────────────────────────────
@@ -121,7 +121,7 @@ const Th = styled.th<{ $width?: string }>`
   text-transform: uppercase;
   letter-spacing: 0.07em;
   color: ${({ theme }) => theme.colors.text.secondary};
-  border-bottom: 2px solid rgba(128, 128, 128, 0.2);
+  border-bottom: 1px solid rgba(128, 128, 128, 0.2);
   ${({ $width }) => $width && `width: ${$width};`}
 `;
 

@@ -1,5 +1,6 @@
 import { Canvas, Meta, Unstyled } from '@storybook/addon-docs/blocks';
 import { Alert } from 'components/bootstrap';
+import { FoundationTable } from '../Foundation/shared';
 import * as FormsStories from './Forms.stories';
 
 <Meta of={FormsStories} />
@@ -14,7 +15,7 @@ Forms live inside containers and are composed of fields. Both levels have rules.
 
 <Unstyled>
   <Alert bsStyle="info">
-    {<><strong>Column Layout Rule:</strong> Single column always. Two columns are never used to save space or reduce perceived length.</>}
+    {<><strong>Column Layout Rule:</strong> Forms are always laid out in a single column.</>}
   </Alert>
 </Unstyled>
 
@@ -22,7 +23,9 @@ Forms live inside containers and are composed of fields. Both levels have rules.
 
 ### Two Columns Valid Case
 
-- Fields that are semantically one unit: first / last name, key / value, start / end date
+A single row may use two columns when the fields are semantically one unit.
+
+- Examples: first / last name, key / value, start / end date
 - Both fields in the pair must be equal width
 
 {/* TODO: Add a Canvas example here showing a paired-field row (e.g. key / value inputs at equal width) once FormsStories.PairedFields is implemented. */}
@@ -36,10 +39,20 @@ Forms live inside containers and are composed of fields. Both levels have rules.
 
 ### Layout Reference
 
-| Column layout | Single column always. Two columns for paired fields only. |
-| ------------- | --------------------------------------------------------- |
-| Field spacing | Spacing **md** (16px)                                     |
-| Group spacing | Spacing **lg** (24px)                                     |
+<Unstyled>
+  <FoundationTable
+    columns={[
+      { header: 'Property', render: (row) => row.property },
+      { header: 'Value', render: (row) => row.value },
+    ]}
+    rows={[
+      { property: 'Column layout', value: 'Single column always. Two columns for paired fields only.' },
+      { property: 'Field spacing', value: <>Spacing <strong>md</strong> (16px)</> },
+      { property: 'Group spacing', value: <>Spacing <strong>lg</strong> (24px)</> },
+    ]}
+    keyBy={(row) => row.property}
+  />
+</Unstyled>
 
 ## Required
 
