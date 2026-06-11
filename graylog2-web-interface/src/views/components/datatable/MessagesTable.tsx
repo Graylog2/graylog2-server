@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 import { Table } from 'components/bootstrap';
@@ -23,8 +24,10 @@ const MessagesContainer = styled.div`
   width: 100%;
 `;
 
-const StyledTable = styled(Table)<{ $stickyHeader: boolean }>(
-  ({ theme, $stickyHeader }) => css`
+const StyledTable = styled(Table as React.ComponentType<React.ComponentProps<typeof Table>>)<{
+  $stickyHeader: boolean;
+}>(
+  ({ theme, $stickyHeader }: { theme: DefaultTheme; $stickyHeader: boolean }) => css`
     position: relative;
     font-size: ${theme.fonts.size.small};
     margin: 0;
@@ -46,16 +49,7 @@ const StyledTable = styled(Table)<{ $stickyHeader: boolean }>(
     }
 
     > tbody td {
-      background-color: ${theme.colors.global.contentBackground};
       color: ${theme.utils.contrastingColor(theme.colors.global.contentBackground)};
-    }
-
-    &.table-striped > tbody > tr:nth-of-type(odd) > td {
-      background-color: ${theme.colors.global.contentBackground};
-    }
-
-    &.table-striped > tbody > tr:nth-of-type(even) > td {
-      background-color: ${theme.colors.table.row.background};
     }
 
     tr {
