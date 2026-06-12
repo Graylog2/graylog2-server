@@ -19,7 +19,7 @@ import * as Immutable from 'immutable';
 
 import { Link, IfPermitted, CountBadge } from 'components/common';
 import Routes from 'routing/Routes';
-import type { UserContext } from 'actions/roles/AuthzRolesActions';
+import type { UserContext } from 'hooks/useAuthzRoles';
 
 type Props = {
   users: Immutable.Set<UserContext> | undefined;

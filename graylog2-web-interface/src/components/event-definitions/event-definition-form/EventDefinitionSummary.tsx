@@ -140,7 +140,7 @@ const EventDefinitionSummary = ({
         </Row>
         <Row>
           <Col md={5}>
-            <ShareDetails shareState={eventDefinition.share_request} />
+            <ShareDetails shareState={eventDefinition.share_request} entityId={eventDefinition.id} />
           </Col>
         </Row>
       </Col>
