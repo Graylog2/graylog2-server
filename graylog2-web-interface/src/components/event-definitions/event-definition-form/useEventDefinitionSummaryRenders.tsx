@@ -243,9 +243,11 @@ export function renderNotifications(
   const effectiveDefinitionNotifications = definitionNotifications.filter((n) =>
     isPermitted(currentUser.permissions, `eventnotifications:read:${n.notification_id}`),
   );
+
   const notificationsWithMissingPermissions = definitionNotifications.filter(
     (n) => !effectiveDefinitionNotifications.map((nObj) => nObj.notification_id).includes(n.notification_id),
   );
+
   const warning =
     notificationsWithMissingPermissions.length > 0 ? (
       <Alert bsStyle="warning">
@@ -258,7 +260,7 @@ export function renderNotifications(
   return (
     <>
       <h3 className={commonStyles.title}>Notifications</h3>
-      <p>{warning}</p>
+      <span>{warning}</span>
       {effectiveDefinitionNotifications.length === 0 && notificationsWithMissingPermissions.length <= 0 ? (
         <p>This Event is not configured to trigger any Notifications.</p>
       ) : (
