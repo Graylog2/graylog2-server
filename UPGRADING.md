@@ -18,3 +18,9 @@ After upgrading:
   matched only `test` now also matches `Test` and `TEST`. API clients relying on exact-case matching
   via paginated endpoints will see additional results.
 
+## Java API Changes
+
+| File/method                                                               | Description |
+|---------------------------------------------------------------------------|-------------|
+| `org.graylog2.contentpacks.facades.EntityWithExcerptFacade#resolveGrants` | removed     |
+

@@ -20,11 +20,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import com.mongodb.client.FindIterable;
-import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
-import com.mongodb.client.model.Sorts;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
 import jakarta.annotation.Nonnull;
@@ -643,23 +641,7 @@ public class InputServiceImpl implements InputService {
 
     @Override
     public Map<String, Long> totalCountByType() {
-        final Map<String, Long> inputCountByType = new HashMap<>();
-
-        final List<Bson> pipeline = List.of(
-                Aggregates.group("$" + MessageInput.FIELD_TYPE, Accumulators.sum("count", 1)),
-                Aggregates.sort(Sorts.ascending(MessageInput.FIELD_TYPE))
-        );
-
-        collection.aggregate(pipeline, Document.class)
-                .forEach(doc -> {
-                    final String type = doc.getString(MessageInput.FIELD_TYPE);
-                    if (type != null) {
-                        final long count = doc.get("count", Long.class);
-                        inputCountByType.put(type, count);
-                    }
-                });
-
-        return inputCountByType;
+        return mongoUtils.countByField(MessageInput.FIELD_TYPE);
     }
 
     @Override

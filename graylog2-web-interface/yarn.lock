@@ -2251,15 +2251,15 @@
   resolved "https://registry.yarnpkg.com/@graylog/oxfmt-config/-/oxfmt-config-1.0.1.tgz#badad4da2d6e28481cadadb666bf077b390efe36"
   integrity sha512-eugOB7/tjA4FOo0Z/8SoKRHtD10xJl7IDQR7NkE77n9yC1MLsdc0WMAv3EVXfgWUq5701r4PWIgm2HUE/grBrw==
 
-"@graylog/sawmill@4.0.6":
-  version "4.0.6"
-  resolved "https://registry.yarnpkg.com/@graylog/sawmill/-/sawmill-4.0.6.tgz#61cfbce29e68f9477756bbf30217c34d5e86860a"
-  integrity sha512-qjHHPrvXVdYw/F1a4fLgJpIG5i7BGF1J6TYKY9kK7GyiQbnQbBOpoBdxVrtp4/ICPXWBsqLQR7BEqYmt5jkJ4g==
+"@graylog/sawmill@4.0.7":
+  version "4.0.7"
+  resolved "https://registry.npmjs.org/@graylog/sawmill/-/sawmill-4.0.7.tgz#c7c48936ef6b520f513e0f0bbcea0069254dc9bd"
+  integrity sha512-cPnllgz9G5KPj0rJT4op1VbLo7U/RN3vUIaYBHItlrGcriHAEcnzhZx1tRBn5s9D+dZVpskqOWJBkvyWEz7z2w==
   dependencies:
     "@openfonts/dm-sans_latin" "^1.0.2"
     "@openfonts/source-sans-pro_latin" "^1.44.2"
     "@openfonts/ubuntu-mono_latin" "^1.44.1"
-    chroma-js "^2.1.2"
+    chroma-js "^3.2.0"
     lodash "^4.17.21"
 
 "@humanfs/core@^0.19.1":
@@ -3567,15 +3567,15 @@
   dependencies:
     "@typescript-eslint/utils" "^8.18.1"
 
-"@tanstack/query-core@5.100.14":
-  version "5.100.14"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.100.14.tgz#6bf11c9a6a33dbbbba21f05d880b93930d80000c"
-  integrity sha512-5X41dGpxgeaHISCRW2oYwcSycZeULZzAunaudXT9ov1KOTj9xwt0CH6hbwqP1/z74ZWF7rYFnDpyYH07XFcZew==
-
 "@tanstack/query-core@5.100.9":
   version "5.100.9"
   resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.100.9.tgz#dcf44ef25cf42a4da229bcab1d8d33e80a740a99"
   integrity sha512-SJSFw1S8+kQ0+knv/XGfrbocWoAlT7vDKsSImtLx3ZPQmEcR46hkDjLSvynSy25N8Ms4tIEini1FuBd5k7IscQ==
+
+"@tanstack/query-core@5.101.0":
+  version "5.101.0"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.101.0.tgz#45391ce143c270b7e7a55bd1a6696918f20782d1"
+  integrity sha512-cQetA74EB+seWySv1TTKr828TnP0u39m6LykwDXIo84SNortpDkp30TMEjkqtYCNP9c40uT/iwl6MLiufEt0Ow==
 
 "@tanstack/query-persist-client-core@5.100.9":
   version "5.100.9"
@@ -3599,12 +3599,12 @@
   dependencies:
     "@tanstack/query-persist-client-core" "5.100.9"
 
-"@tanstack/react-query@5.100.14":
-  version "5.100.14"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-5.100.14.tgz#799fe305421fd84bf2f6df40930c859c945b42ab"
-  integrity sha512-oOr6aRdSFEwWhzxEkD/9ZcItM3+LjBSkeVmadWKwUssAHTsqd/7bOjWrX4AbvEkoEhgAxzN0Xk6H/aYzXiYBAw==
+"@tanstack/react-query@5.101.0":
+  version "5.101.0"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-5.101.0.tgz#2dd56c5b96ec816d6b6ec9cee5c80ed298974733"
+  integrity sha512-rLlJXSpkqfizLWgkR5+eLeIk0MvTx/meEIR7LRjxic+qxiQP8zVjq7BqQkiCMNLQBlLfuOLqqr6KO5GtrDlmSg==
   dependencies:
-    "@tanstack/query-core" "5.100.14"
+    "@tanstack/query-core" "5.101.0"
 
 "@tanstack/react-table@^8.21.3":
   version "8.21.3"
@@ -3787,10 +3787,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/chroma-js@^2.1.3":
-  version "2.4.4"
-  resolved "https://registry.yarnpkg.com/@types/chroma-js/-/chroma-js-2.4.4.tgz#254dddff54568ff8e5d0dcdb071871a458fdfd31"
-  integrity sha512-/DTccpHTaKomqussrn+ciEvfW4k6NAHzNzs/sts1TCqg333qNxOhy8TNIoQCmbGG3Tl8KdEhkGAssb1n3mTXiQ==
+"@types/chroma-js@^3.1.2":
+  version "3.1.2"
+  resolved "https://registry.npmjs.org/@types/chroma-js/-/chroma-js-3.1.2.tgz#29dd767ae46124c9d0cd3370bedad7364adcfd10"
+  integrity sha512-YBTQqArPN8A0niHXCwrO1z5x++a+6l0mLBykncUpr23oIPW7L4h39s6gokdK/bDrPmSh8+TjMmrhBPnyiaWPmQ==
 
 "@types/color-name@^1.1.1":
   version "1.1.1"
@@ -6092,10 +6092,10 @@ chownr@^3.0.0:
   resolved "https://registry.yarnpkg.com/chownr/-/chownr-3.0.0.tgz#9855e64ecd240a9cc4267ce8a4aa5d24a1da15e4"
   integrity sha512-+IxzY9BZOQd/XuYPRmrvEVjF/nqj5kgT4kEq7VofrDoM1MxoRjEWkrCC3EtLi59TVawxTAn+orJwFQcrqEN1+g==
 
-chroma-js@^2.0.3, chroma-js@^2.1.2:
-  version "2.6.0"
-  resolved "https://registry.yarnpkg.com/chroma-js/-/chroma-js-2.6.0.tgz#578743dd359698a75067a19fa5571dec54d0b70b"
-  integrity sha512-BLHvCB9s8Z1EV4ethr6xnkl/P2YRFOGqfgvuMG/MyCbZPrTA+NeiByY6XvgF0zP4/2deU2CXnWyMa3zu1LqQ3A==
+chroma-js@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.npmjs.org/chroma-js/-/chroma-js-3.2.0.tgz#4e9e665290b9bbfece524fccf759d5120e351ff2"
+  integrity sha512-os/OippSlX1RlWWr+QDPcGUZs0uoqr32urfxESG9U93lhUfbnlyckte84Q8P1UQY/qth983AS1JONKmLS4T0nw==
 
 chrome-trace-event@^1.0.2:
   version "1.0.2"
@@ -8130,7 +8130,7 @@ escodegen@^2.1.0:
     eslint "9.39.2"
     eslint-import-resolver-webpack "0.13.11"
     eslint-plugin-compat "7.0.2"
-    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-d1ba5c3d-3e28-43bd-b12e-7da1c3c78e56-1780926031127/node_modules/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:../../../../../../code/.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-ae43e943-fb44-4e44-946d-fc3f6c2e4b8e-1781247299598/node_modules/eslint-plugin-graylog"
     eslint-plugin-import "2.32.0"
     eslint-plugin-jest "29.15.2"
     eslint-plugin-jest-dom "5.5.0"
@@ -9738,16 +9738,16 @@ graphemer@^1.4.0:
 "graylog-web-plugin@file:packages/graylog-web-plugin":
   version "7.2.0-SNAPSHOT"
   dependencies:
-    "@graylog/sawmill" "4.0.6"
+    "@graylog/sawmill" "4.0.7"
     "@reduxjs/toolkit" "^2.5.1"
-    "@tanstack/react-query" "5.100.14"
+    "@tanstack/react-query" "5.101.0"
     "@types/react" "18.3.13"
-    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-7.2.0-SNAPSHOT-d1db41b6-3a7f-4431-a515-26cbd5756a8a-1780926030927/node_modules/babel-preset-graylog"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-7.2.0-SNAPSHOT-d1db41b6-3a7f-4431-a515-26cbd5756a8a-1780926030927/node_modules/eslint-config-graylog"
+    babel-preset-graylog "file:../../../../../../code/.cache/yarn/v6/npm-graylog-web-plugin-7.2.0-SNAPSHOT-93630f31-2b54-464e-9155-5e275d5f633f-1781247299435/node_modules/babel-preset-graylog"
+    eslint-config-graylog "file:../../../../../../code/.cache/yarn/v6/npm-graylog-web-plugin-7.2.0-SNAPSHOT-93630f31-2b54-464e-9155-5e275d5f633f-1781247299435/node_modules/eslint-config-graylog"
     formik "2.4.9"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-7.2.0-SNAPSHOT-d1db41b6-3a7f-4431-a515-26cbd5756a8a-1780926030927/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../../../code/.cache/yarn/v6/npm-graylog-web-plugin-7.2.0-SNAPSHOT-93630f31-2b54-464e-9155-5e275d5f633f-1781247299435/node_modules/jest-preset-graylog"
     moment "2.30.1"
     moment-timezone "0.6.2"
     react "18.3.1"
@@ -16318,9 +16318,9 @@ tldts@^6.1.32:
     tldts-core "^6.1.86"
 
 tmp@^0.2.4:
-  version "0.2.5"
-  resolved "https://registry.yarnpkg.com/tmp/-/tmp-0.2.5.tgz#b06bcd23f0f3c8357b426891726d16015abfd8f8"
-  integrity sha512-voyz6MApa1rQGUxT3E+BK7/ROe8itEx7vD8/HEvt4xwXucvQ5G5oeEiHkmHZJuBO21RpOf+YYm9MOivj709jow==
+  version "0.2.7"
+  resolved "https://registry.yarnpkg.com/tmp/-/tmp-0.2.7.tgz#26f4db11d1601ce8012dcb8a798ece1c06a99059"
+  integrity sha512-e0votIpp4Uo2AJYSzVHV6xCcawuiez3DzqDAbrTc3YxBkplN6e+dM13ZeIcZnDg/QpSuU2zfZ3rzwY8ukEnaXw==
 
 tmpl@1.0.5:
   version "1.0.5"
