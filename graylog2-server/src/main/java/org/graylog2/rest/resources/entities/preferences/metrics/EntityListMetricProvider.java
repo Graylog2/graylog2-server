@@ -18,6 +18,7 @@ package org.graylog2.rest.resources.entities.preferences.metrics;
 
 import org.apache.shiro.subject.Subject;
 import org.bson.conversions.Bson;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.resources.entities.preferences.model.MetricValue;
 
@@ -26,8 +27,8 @@ import static com.mongodb.client.model.Filters.gte;
 import static com.mongodb.client.model.Filters.lte;
 
 public interface EntityListMetricProvider {
-    
-    MetricValue compute(TimeRange timeRange, Subject subject);
+
+    MetricValue compute(TimeRange timeRange, Subject subject, SearchUser searchUser);
 
     default Bson timeRangeFilter(final TimeRange timeRange, final String timestampField) {
         return and(gte(timestampField, timeRange.getFrom()),

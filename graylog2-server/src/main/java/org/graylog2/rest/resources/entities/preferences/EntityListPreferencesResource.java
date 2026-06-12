@@ -40,6 +40,7 @@ import jakarta.ws.rs.core.Response;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.subject.Subject;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.security.UserContext;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
@@ -153,7 +154,7 @@ public class EntityListPreferencesResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @NoAuditEvent("Audit logs are not stored for entity list preferences")
     public List<PredefinedLayoutVariant> listPredefined(@Parameter(name = "entity_list_id", required = true) @PathParam("entity_list_id") @NotEmpty String entityListId,
-                                                        @RequestBody(required = true) TimeRange timeRange) {
+                                                        @RequestBody(required = true) TimeRange timeRange, @Context SearchUser searchUser) {
         final Subject subject = SecurityUtils.getSubject();
         return entityListPreferencesService
                 .getPredefinedForEntityList(entityListId)
@@ -166,8 +167,8 @@ public class EntityListPreferencesResource {
                         pref.preferences().metrics()
                                 .stream()
                                 .map(metricName -> metricProviders
-                                        .getOrDefault(metricName, (tr, sub) -> new MetricValue(0L, "", metricName))
-                                        .compute(timeRange, subject))
+                                        .getOrDefault(metricName, (tr, sub, user) -> new MetricValue(0L, "", metricName))
+                                        .compute(timeRange, subject, searchUser))
                                 .toList())
                 )
                 .toList();
