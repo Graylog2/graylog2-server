@@ -16,14 +16,18 @@
  */
 package org.graylog.collectors.cloud;
 
+import com.github.rholder.retry.Attempt;
+import com.github.rholder.retry.RetryListener;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.google.common.util.concurrent.AbstractExecutionThreadService;
-import com.google.common.util.concurrent.Uninterruptibles;
+import com.google.common.util.concurrent.AbstractIdleService;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.input.CollectorIngestHttpInput;
@@ -36,35 +40,45 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.slf4j.Logger;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static org.graylog.collectors.CollectorIngestInputService.getHttpIngestInputConfig;
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class CloudCollectorIngestService extends AbstractExecutionThreadService {
+public class CloudCollectorIngestService extends AbstractIdleService {
     private static final Logger LOG = getLogger(CloudCollectorIngestService.class);
 
     private final InputBuffer inputBuffer;
     private final EventBus eventBus;
     private final CollectorsConfigService collectorsConfigService;
     private final CollectorIngestHttpInput.Factory httpInputFactory;
-    private final Semaphore configChanged = new Semaphore(0);
+    private final int shutdownTimeoutMs;
+    private final ExecutorService executorService;
 
-    private volatile Thread executionThread;
-    private CollectorIngestHttpInput input;
-    private final CountDownLatch shutdownLatch = new CountDownLatch(1);
+    private volatile boolean shuttingDown = false;
+    private volatile CollectorIngestHttpInput input;
 
     @Inject
     public CloudCollectorIngestService(InputBuffer inputBuffer,
                                        EventBus eventBus,
                                        CollectorsConfigService collectorsConfigService,
-                                       CollectorIngestHttpInput.Factory httpInputFactory) {
+                                       CollectorIngestHttpInput.Factory httpInputFactory,
+                                       @Named("shutdown_timeout") int shutdownTimeoutMs) {
         this.inputBuffer = inputBuffer;
         this.eventBus = eventBus;
         this.collectorsConfigService = collectorsConfigService;
         this.httpInputFactory = httpInputFactory;
+        this.shutdownTimeoutMs = shutdownTimeoutMs;
+
+        // Executor that runs a single thread and doesn't keep its core thread around.
+        final var threadPoolExecutor = new ThreadPoolExecutor(1, 1, 30, TimeUnit.SECONDS,
+                new LinkedBlockingQueue<>(),
+                new ThreadFactoryBuilder().setNameFormat("collector-ingest-launcher-%d").build());
+        threadPoolExecutor.allowCoreThreadTimeOut(true);
+        this.executorService = threadPoolExecutor;
     }
 
     @Subscribe
@@ -72,93 +86,93 @@ public class CloudCollectorIngestService extends AbstractExecutionThreadService 
         // At the moment we only care about the initial config being present, which means the collectors features
         // was enabled. If we need to react to actual changes, the code below needs to be adjusted.
         if (CollectorsConfig.class.getCanonicalName().equals(event.type())) {
-            configChanged.release();
+            if (!shuttingDown) {
+                launch();
+            }
         }
     }
 
     @Override
     protected void startUp() throws Exception {
-        this.executionThread = Thread.currentThread();
         eventBus.register(this);
+        launch();
     }
 
-    @Override
-    protected void run() throws Exception {
-        final var config = waitForCollectorConfig();
-        if (config == null) {
-            return; // shutdown requested before config became available
+    private void launch() {
+        if (this.input == null) {
+            executorService.submit(this::reconcileIngestState);
+        }
+    }
+
+    private void reconcileIngestState() {
+        if (shuttingDown) {
+            return;
         }
 
+        if (input != null) {
+            return;
+        }
+
+        final var config = collectorsConfigService.get();
+        if (config.isEmpty()) {
+            return;
+        }
+
+        //noinspection UnstableApiUsage
         final var retryer = RetryerBuilder.<Void>newBuilder()
                 .retryIfException(t -> t instanceof MisfireException)
                 .withStopStrategy(StopStrategies.neverStop())
                 .withWaitStrategy(WaitStrategies.exponentialWait(1, TimeUnit.MINUTES))
+                .withRetryListener(new RetryListener() {
+                    @Override
+                    public <V> void onRetry(Attempt<V> attempt) {
+                        // Only log attempts that will actually be retried (MisfireException); other exceptions
+                        // abort the retryer and are logged by the caller.
+                        if (attempt.hasException() && attempt.getExceptionCause() instanceof MisfireException) {
+                            LOG.warn("Launching Collector Ingest failed (attempt #{}), retrying.",
+                                    attempt.getAttemptNumber(), attempt.getExceptionCause());
+                        }
+                    }
+                })
                 .build();
 
         try {
             retryer.call(() -> {
-                launchInput(config);
-                LOG.info("Collector Ingest on [{}:{}] launched successfully.", config.http().hostname(),
-                        config.http().port());
+                final var collectorsConfig = config.get();
+                this.input = launchInput(collectorsConfig);
+                LOG.info("Collector Ingest on [{}:{}] launched successfully.", collectorsConfig.http().hostname(),
+                        collectorsConfig.http().port());
                 return null;
             });
         } catch (Exception e) {
-            if (!isRunning()) {
+            if (shuttingDown) {
                 return; // shutdown requested
             }
-            throw new RuntimeException("Failed to launch Collector Ingest Input", e);
-        }
-
-        Uninterruptibles.awaitUninterruptibly(shutdownLatch);
-    }
-
-    @Override
-    protected void triggerShutdown() {
-        shutdownLatch.countDown();
-        if (executionThread != null) {
-            executionThread.interrupt();
+            LOG.error("Ultimately failed to launch Collector Ingest", e);
         }
     }
 
     @Override
     protected void shutDown() throws Exception {
+        this.shuttingDown = true;
+        eventBus.unregister(this);
+        executorService.shutdownNow();
+        if (!executorService.awaitTermination(shutdownTimeoutMs, TimeUnit.MILLISECONDS)) {
+            LOG.warn("Timed out after {} ms waiting for executor to shut down.", shutdownTimeoutMs);
+        }
         if (input != null) {
             input.stop();
         }
-        try {
-            eventBus.unregister(this);
-        } catch (Exception e) {
-            // Ignore. We might have already unregistered after receiving the initial config.
-        }
     }
 
-    private CollectorsConfig waitForCollectorConfig() {
-        while (isRunning()) {
-            final var config = collectorsConfigService.get();
-            if (config.isPresent()) {
-                eventBus.unregister(this);
-                return config.get();
-            }
-            try {
-                configChanged.acquire();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                return null; // shutting down
-            }
-            configChanged.drainPermits();
-        }
-        return null;
-    }
-
-    private void launchInput(CollectorsConfig collectorsConfig) throws MisfireException {
+    private CollectorIngestHttpInput launchInput(CollectorsConfig collectorsConfig) throws MisfireException {
         final var input = createInput(collectorsConfig);
         // A failure recorder that won't propagate state to the global event bus, because it has its own private copy
         final var sideEffectFreeFailureRecorder = new InputFailureRecorder(new IOState<>(new EventBus(), input));
 
         input.initialize();
         input.launch(inputBuffer, sideEffectFreeFailureRecorder);
-
-        this.input = input;
+        return input;
     }
 
     private CollectorIngestHttpInput createInput(CollectorsConfig collectorsConfig) {
@@ -168,5 +182,14 @@ public class CloudCollectorIngestService extends AbstractExecutionThreadService 
         input.setPersistId(ReservedInputIds.EPHEMERAL_COLLECTOR_INGEST);
         input.setTitle("Managed Collector Ingest");
         return input;
+    }
+
+    /**
+     * Blocks until every launch attempt submitted so far has completed. Relies on the launcher executor being
+     * single-threaded: the barrier task can only run after all previously submitted tasks have finished.
+     */
+    @VisibleForTesting
+    void awaitIdle(long timeout, TimeUnit unit) throws Exception {
+        executorService.submit(() -> {}).get(timeout, unit);
     }
 }
