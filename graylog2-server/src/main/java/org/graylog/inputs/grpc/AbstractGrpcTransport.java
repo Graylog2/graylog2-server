@@ -112,11 +112,10 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
             serverBuilder.intercept(new BearerTokenAuthInterceptor(token));
         }
 
-        if (!insecure) {
-            serverBuilder.sslContext(getSslContext());
-        }
-
         try {
+            if (!insecure) {
+                serverBuilder.sslContext(getSslContext());
+            }
             this.server = serverBuilder.build().start();
         } catch (Exception e) {
             throw new MisfireException("Failed to start gRPC server", e);
@@ -169,7 +168,7 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
             }
             return contextBuilder.build();
         } catch (SSLException e) {
-            throw new RuntimeException(f("Failed setting up TLS for gRPC server: {}.", e.getLocalizedMessage()), e);
+            throw new RuntimeException(f("Failed setting up TLS for gRPC server: %s.", e.getLocalizedMessage()), e);
         }
     }
 
