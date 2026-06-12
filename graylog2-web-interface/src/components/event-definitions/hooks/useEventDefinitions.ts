@@ -25,6 +25,7 @@ import { defaultOnError } from 'util/conditional/onError';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import EventDefinitionTagsFilter from 'components/event-definitions/EventDefinitionTagsFilter';
+import EventDefinitionTypeFilter from 'components/event-definitions/EventDefinitionTypeFilter';
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
@@ -56,7 +57,14 @@ export const fetchEventDefinitions = (searchParams: SearchParams): Promise<Event
   }).then(({ elements, pagination, attributes }) => ({
     list: elements,
     pagination,
-    attributes: [...(attributes ?? []), TAGS_ATTRIBUTE],
+    // The backend marks `type` (config.type) filterable; attach the custom filter_component
+    // here so the dropdown lists plugin-provided type display names instead of a text input.
+    attributes: [
+      ...(attributes ?? []).map((attribute) =>
+        attribute.id === 'type' ? { ...attribute, filter_component: EventDefinitionTypeFilter } : attribute,
+      ),
+      TAGS_ATTRIBUTE,
+    ],
   }));
 };
 
