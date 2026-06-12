@@ -20,7 +20,7 @@ import { OrderedMap } from 'immutable';
 import type * as Immutable from 'immutable';
 
 import useAppendTagFilter from 'components/events/useAppendTagFilter';
-import TableFetchContext from 'components/common/PaginatedEntityTable/TableFetchContext';
+import TableFilterContext from 'components/common/PaginatedEntityTable/TableFilterContext';
 
 const mockSetUrlFilters = jest.fn();
 
@@ -50,7 +50,7 @@ describe('useAppendTagFilter', () => {
 
   it('reads existing filters from the table context when present', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <TableFetchContext.Provider
+      <TableFilterContext.Provider
         value={{
           searchParams: {
             page: 1,
@@ -59,12 +59,19 @@ describe('useAppendTagFilter', () => {
             sort: { attributeId: 'timestamp', direction: 'desc' },
             filters: OrderedMap<string, Array<string>>({ priority: ['critical'], tags: ['exfil'] }),
           },
-          refetch: () => {},
-          attributes: [],
-          entityTableId: 'events',
+          setQuery: jest.fn(),
+          onChangeFilters: jest.fn(),
+          onChangeSlicingFilter: jest.fn(),
+          paginationState: {
+            page: 1,
+            pageSize: 10,
+            resetPage: jest.fn(),
+            setPagination: jest.fn(),
+          },
+          resetFilters: jest.fn(),
         }}>
         {children}
-      </TableFetchContext.Provider>
+      </TableFilterContext.Provider>
     );
 
     const { result } = renderHook(() => useAppendTagFilter(), { wrapper });
@@ -79,7 +86,7 @@ describe('useAppendTagFilter', () => {
 
   it('does not append if the tag is already in the filter list', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <TableFetchContext.Provider
+      <TableFilterContext.Provider
         value={{
           searchParams: {
             page: 1,
@@ -88,12 +95,19 @@ describe('useAppendTagFilter', () => {
             sort: { attributeId: 'timestamp', direction: 'desc' },
             filters: OrderedMap<string, Array<string>>({ tags: ['phishing'] }),
           },
-          refetch: () => {},
-          attributes: [],
-          entityTableId: 'events',
+          setQuery: jest.fn(),
+          onChangeFilters: jest.fn(),
+          onChangeSlicingFilter: jest.fn(),
+          paginationState: {
+            page: 1,
+            pageSize: 10,
+            resetPage: jest.fn(),
+            setPagination: jest.fn(),
+          },
+          resetFilters: jest.fn(),
         }}>
         {children}
-      </TableFetchContext.Provider>
+      </TableFilterContext.Provider>
     );
 
     const { result } = renderHook(() => useAppendTagFilter(), { wrapper });

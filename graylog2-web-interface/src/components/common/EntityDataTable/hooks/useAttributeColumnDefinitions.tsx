@@ -73,10 +73,11 @@ const useSortableCol = (colId: string, disabled: boolean) => {
   const cssTransform = CSS.Translate.toString(transform);
 
   useLayoutEffect(() => {
-    setColumnTransform((cur) => ({
-      ...cur,
-      [colId]: cssTransform,
-    }));
+    setColumnTransform((cur) => {
+      if (cur[colId] === cssTransform) return cur;
+
+      return { ...cur, [colId]: cssTransform };
+    });
   }, [colId, setColumnTransform, cssTransform]);
 
   return {

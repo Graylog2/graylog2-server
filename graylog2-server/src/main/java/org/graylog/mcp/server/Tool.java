@@ -143,6 +143,7 @@ public abstract class Tool<P, O> {
      * Calls the tool implementation with the raw parameter map.
      * Internally this will get converted into the actual parameter type for type safety.
      *
+     * @param permissionHelper provides permission checks and user identity for the calling user
      * @param parameterMap raw parameter map
      * @return the return value of the tool call
      */
@@ -151,5 +152,12 @@ public abstract class Tool<P, O> {
         return apply(permissionHelper, p);
     }
 
-    protected abstract O apply(PermissionHelper permissionHelper, P parameters);
+    /**
+     * Executes the tool logic with typed parameters and the caller's permission context.
+     *
+     * @param permissionHelper provides permission checks and user identity for the calling user
+     * @param parameters the deserialized, tool-specific parameter object
+     * @return the tool's result, typically a JSON string or structured response object
+     */
+    public abstract O apply(PermissionHelper permissionHelper, P parameters);
 }

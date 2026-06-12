@@ -19,10 +19,10 @@ import { StreamSearchPage } from 'views/pages';
 import bindings from './bindings';
 
 jest.mock('util/AppConfig', () => ({
+  ...jest.requireActual('util/AppConfig'),
   gl2ServerUrl: () => 'http://localhost:9000/api/',
   gl2AppPathPrefix: jest.fn(() => '/gl2/'),
-  isFeatureEnabled: () => false,
-  isCloud: jest.fn(() => false),
+  __esModule: true,
 }));
 
 describe('bindings.routes', () => {

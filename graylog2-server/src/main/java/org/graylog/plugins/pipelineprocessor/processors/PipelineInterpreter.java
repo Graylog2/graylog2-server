@@ -82,17 +82,20 @@ public class PipelineInterpreter implements MessageProcessor {
     private final Timer executionTime;
     private final MetricRegistry metricRegistry;
     private final PipelineInterpreterStateUpdater stateUpdater;
+    private final int ruleMetricsSampleRate;
 
     @Inject
     public PipelineInterpreter(MessageQueueAcknowledger messageQueueAcknowledger,
                                MetricRegistry metricRegistry,
-                               PipelineInterpreterStateUpdater stateUpdater) {
+                               PipelineInterpreterStateUpdater stateUpdater,
+                               @Named("rule_metrics_sample_rate") int ruleMetricsSampleRate) {
 
         this.messageQueueAcknowledger = messageQueueAcknowledger;
         this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
         this.executionTime = metricRegistry.timer(name(PipelineInterpreter.class, "executionTime"));
         this.metricRegistry = metricRegistry;
         this.stateUpdater = stateUpdater;
+        this.ruleMetricsSampleRate = ruleMetricsSampleRate;
     }
 
     /**
@@ -104,7 +107,7 @@ public class PipelineInterpreter implements MessageProcessor {
         try (Timer.Context ignored = executionTime.time()) {
             final State latestState = stateUpdater.getLatestState();
             if (latestState.enableRuleMetrics()) {
-                return process(messages, new RuleMetricsListener(metricRegistry), latestState);
+                return process(messages, new RuleMetricsListener(metricRegistry, ruleMetricsSampleRate), latestState);
             }
             return process(messages, new NoopInterpreterListener(), latestState);
         }

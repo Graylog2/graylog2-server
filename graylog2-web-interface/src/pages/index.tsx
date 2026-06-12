@@ -29,6 +29,7 @@ const ClusterConfigurationPage = loadAsync(() => import('./ClusterConfigurationP
 const ConfigurationsPage = loadAsync(() => import('./ConfigurationsPage'));
 const ContentPacksPage = loadAsync(() => import('./ContentPacksPage'));
 const CreateEventDefinitionPage = loadAsync(() => import('./CreateEventDefinitionPage'));
+const SigmaEventDefinitionPage = loadAsync(() => import('./SigmaEventDefinitionPage'));
 const CreateEventNotificationPage = loadAsync(() => import('./CreateEventNotificationPage'));
 const CreateContentPackPage = loadAsync(() => import('pages/CreateContentPackPage'));
 const CreateExtractorsPage = loadAsync(() => import('./CreateExtractorsPage'));
@@ -115,6 +116,7 @@ const StreamOutputsPage = loadAsync(() => import('./StreamOutputsPage'));
 const StreamsPage = loadAsync(() => import('./StreamsPage'));
 const StreamDetailsPage = loadAsync(() => import('./StreamDetailsPage'));
 const SystemOutputsPage = loadAsync(() => import('./SystemOutputsPage'));
+const SystemNotificationsPage = loadAsync(() => import('./SystemNotificationsPage'));
 const SystemOverviewPage = loadAsync(() => import('./SystemOverviewPage'));
 const SystemLogsPage = loadAsync(() => import('./SystemLogsPage'));
 const ThreadDumpPage = loadAsync(() => import('./ThreadDumpPage'));
@@ -140,6 +142,7 @@ export {
   ConfigurationsPage,
   ContentPacksPage,
   CreateEventDefinitionPage,
+  SigmaEventDefinitionPage,
   CreateEventNotificationPage,
   CreateContentPackPage,
   CreateExtractorsPage,
@@ -226,6 +229,7 @@ export {
   StreamDetailsPage,
   StreamOutputsPage,
   StreamsPage,
+  SystemNotificationsPage,
   SystemOutputsPage,
   SystemOverviewPage,
   SystemLogsPage,

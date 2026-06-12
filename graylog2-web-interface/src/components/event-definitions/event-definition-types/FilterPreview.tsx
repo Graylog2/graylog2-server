@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import * as Immutable from 'immutable';
-import debounce from 'lodash/debounce';
+import { useQuery } from '@tanstack/react-query';
 
 import { Table } from 'components/bootstrap';
 import { Spinner } from 'components/common';
@@ -25,7 +25,6 @@ import HelpPanel from 'components/event-definitions/common/HelpPanel';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import useCurrentUser from 'hooks/useCurrentUser';
 import generateId from 'logic/generateId';
-import type { SearchExecutionResult } from 'views/types';
 import useSearchExecutors from 'views/components/contexts/useSearchExecutors';
 import Search from 'views/logic/search/Search';
 import createSearch from 'views/logic/slices/createSearch';
@@ -36,6 +35,7 @@ import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 import type User from 'logic/users/User';
 import { isPermitted } from 'util/PermissionsMixin';
 import FilterPreviewResults from 'components/event-definitions/event-definition-types/FilterPreviewResults';
+import useDebouncedValue from 'hooks/useDebouncedValue';
 
 type FilterPreviewProps = {
   config: EventDefinition['config'];
@@ -138,44 +138,39 @@ const useExecutePreview = (config: EventDefinition['config']) => {
   const currentUser = useCurrentUser();
   const queryId = useMemo(() => generateId(), []);
   const searchTypeId = useMemo(() => generateId(), []);
-  const [results, setResults] = useState<SearchExecutionResult>();
   const { startJob, executeJobResult } = useSearchExecutors();
-  const executeSearch = useMemo(
-    () =>
-      debounce(
-        (search: Search) =>
-          createSearch(search)
-            .then((createdSearch) => startJob(createdSearch, [searchTypeId], SearchExecutionState.empty()))
-            .then((jobIds) => executeJobResult({ jobIds }))
-            .then((result) => setResults(result)),
-        250,
-      ),
-    [executeJobResult, searchTypeId, startJob],
-  );
-
-  const hasEmbryonicParams = config?.query_parameters?.some(
+  const permitted = isPermittedToSeePreview(currentUser, config);
+  const [debouncedConfig] = useDebouncedValue(config, 250);
+  const hasEmbryonicParams = debouncedConfig?.query_parameters?.some(
     (param: LookupTableParameterJsonEmbryonic) => param.embryonic,
   );
 
-  useEffect(() => {
-    if (isPermittedToSeePreview(currentUser, config) && !hasEmbryonicParams) {
-      const search = constructSearch(config, searchTypeId, queryId);
-      executeSearch(search);
-    }
-  }, [config, currentUser, executeSearch, hasEmbryonicParams, queryId, searchTypeId]);
+  const { data, isFetching } = useQuery({
+    queryKey: ['filter-preview', debouncedConfig, searchTypeId, queryId],
+    queryFn: async () => {
+      const search = constructSearch(debouncedConfig, searchTypeId, queryId);
+      const createdSearch = await createSearch(search);
+      const jobIds = await startJob(createdSearch, [searchTypeId], SearchExecutionState.empty());
+      const result = await executeJobResult({ jobIds });
+
+      return result;
+    },
+    enabled: permitted && !hasEmbryonicParams,
+    retry: false,
+  });
 
   return {
-    errors: results?.result?.errors,
-    result: results?.result?.forId(queryId)?.searchTypes?.[searchTypeId],
+    isFetching,
+    errors: data?.result?.errors,
+    result: data?.result?.forId(queryId)?.searchTypes?.[searchTypeId],
   };
 };
 
 const FilterPreview = ({ config }: FilterPreviewProps) => {
   const currentUser = useCurrentUser();
   const displayPreview = isPermittedToSeePreview(currentUser, config);
-  const results = useExecutePreview(config);
-  const { result: searchResult = {}, errors = [] } = results ?? {};
-  const isFetchingData = !results?.result;
+  const { isFetching, result: searchResult = {}, errors = [] } = useExecutePreview(config);
+  const isFetchingData = isFetching || !searchResult;
   const hasError = errors?.length > 0;
 
   return (
