@@ -18,31 +18,33 @@ import React, { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import { MemoryRouter } from 'react-router-dom';
 
-import { Button, Input } from 'components/bootstrap';
-import { CreateModal, CreatePage } from 'components/common';
+import { Button } from 'components/bootstrap';
+import { CreateModal, CreatePage, FormikInput, RequiredMarker } from 'components/common';
 
 type StoryValues = { title: string; description: string };
 
+const validate = (values: StoryValues) => {
+  const errors: Partial<StoryValues> = {};
+
+  if (!values.title.trim()) errors.title = 'Title is required.';
+
+  return errors;
+};
+
 const FormFields = () => (
   <>
-    <Input
-      type="text"
+    <FormikInput
       id="title"
       name="title"
-      label="Title"
-      placeholder="e.g. Production errors"
-      labelClassName="col-sm-3"
-      wrapperClassName="col-sm-9"
+      label={<>Title<RequiredMarker /></>}
       required
+      placeholder="e.g. Production errors"
     />
-    <Input
-      type="text"
+    <FormikInput
       id="description"
       name="description"
       label="Description"
       placeholder="What does this stream collect?"
-      labelClassName="col-sm-3"
-      wrapperClassName="col-sm-9"
     />
   </>
 );
@@ -65,6 +67,7 @@ export const CurrentContextModal: StoryObj = {
           show={show}
           onClose={() => setShow(false)}
           initialValues={{ title: '', description: '' }}
+          validate={validate}
           onSubmit={async () => {}}>
           <FormFields />
         </CreateModal>
@@ -95,6 +98,7 @@ export const NewContextPage: StoryObj = {
       overviewRoute="/streams"
       detailsRoute={(id) => `/streams/${id}`}
       initialValues={{ title: '', description: '' }}
+      validate={validate}
       onSubmit={async () => ({ id: 'new-stream-id' })}
       description="Streams route incoming messages into categories. Route a message into a stream by applying matching rules.">
       <FormFields />
