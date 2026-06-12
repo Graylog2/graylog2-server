@@ -36,11 +36,9 @@ import OriginalAreaVisualization from '../AreaVisualization';
 jest.mock('../../GenericPlot', () => jest.fn(mockComponent('GenericPlot')));
 
 jest.mock('util/AppConfig', () => ({
-  gl2AppPathPrefix: jest.fn(() => ''),
+  ...jest.requireActual('util/AppConfig'),
   rootTimeZone: jest.fn(() => 'America/Chicago'),
-  gl2ServerUrl: jest.fn(() => undefined),
-  isCloud: jest.fn(() => false),
-  isFeatureEnabled: () => true,
+  __esModule: true,
 }));
 
 const AreaVisualization = ({ ...props }: React.ComponentProps<typeof OriginalAreaVisualization>) => (
