@@ -38,7 +38,6 @@ import useEventDefinitionSteps, { INITIAL_EVENT_DEFINITION } from './useEventDef
 import EventDetailsForm from './EventDetailsForm';
 import EventConditionForm from './EventConditionForm';
 import EventDefinitionForm, { getStepKeys } from './EventDefinitionForm';
-import EventDefinitionSummary from './EventDefinitionSummary';
 
 import useEventDefinitionMutations from '../hooks/useEventDefinitionMutations';
 import {
@@ -182,19 +181,6 @@ const EventDefinitionFormContainer = ({
     notifications: eventNotifications.all,
     notificationDefaults: defaults,
     canEdit,
-  });
-
-  steps.push({
-    key: STEP_KEYS.SUMMARY,
-    title: 'Summary',
-    component: (
-      <EventDefinitionSummary
-        eventDefinition={commonStepProps.eventDefinition}
-        currentUser={commonStepProps.currentUser}
-        notifications={eventNotifications?.all}
-        validation={commonStepProps.validation}
-      />
-    ),
   });
 
   const handleSubmitSuccessResponse = () => {
