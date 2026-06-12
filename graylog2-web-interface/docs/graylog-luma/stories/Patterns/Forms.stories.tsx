@@ -14,28 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState } from 'react';
+import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import styled from 'styled-components';
 import { Formik, Form } from 'formik';
 
 import { Col, Row } from 'components/bootstrap';
+import Collapsible from 'components/common/Collapsible';
 import FormikInput from 'components/common/FormikInput';
 import FormSubmit from 'components/common/FormSubmit';
 import RequiredMarker from 'components/common/RequiredMarker';
-
-const AdvancedToggle = styled.button`
-  background: none;
-  border: none;
-  padding: ${({ theme }) => theme.spacings.xxs} 0;
-  margin-bottom: ${({ theme }) => theme.spacings.md};
-  cursor: pointer;
-  font-size: inherit;
-  color: inherit;
-  display: flex;
-  align-items: center;
-  gap: ${({ theme }) => theme.spacings.xs};
-`;
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -94,11 +81,8 @@ export const FormPatternExample: StoryObj = {
       source: { type: 'dynamic' },
     },
   },
-  render: () => {
-    const [showAdvanced, setShowAdvanced] = useState(false);
-
-    return (
-      <Formik
+  render: () => (
+    <Formik
         initialValues={INITIAL}
         // eslint-disable-next-line no-alert
         onSubmit={(values) => window.alert(`Input "${values.name}" created.`)}>
@@ -177,24 +161,17 @@ export const FormPatternExample: StoryObj = {
               />
 
               {/* ── Advanced options (hidden by default) ──────────── */}
-              <AdvancedToggle type="button" onClick={() => setShowAdvanced((v) => !v)} aria-expanded={showAdvanced}>
-                {showAdvanced ? '▾' : '▸'} Advanced options
-              </AdvancedToggle>
-
-              {showAdvanced && (
-                <>
-                  <FormikInput id="timeout" name="timeout" label="Connection timeout (ms)" placeholder="e.g. 5000" />
-                  <FormikInput id="batchSize" name="batchSize" label="Max batch size" placeholder="e.g. 1000" />
-                </>
-              )}
+              <Collapsible label="Advanced options">
+                <FormikInput id="timeout" name="timeout" label="Connection timeout (ms)" placeholder="e.g. 5000" />
+                <FormikInput id="batchSize" name="batchSize" label="Max batch size" placeholder="e.g. 1000" />
+              </Collapsible>
 
               <FormSubmit submitButtonText="Create Input" displayCancel={false} />
             </Form>
           </Col>
         </Row>
       </Formik>
-    );
-  },
+  ),
 };
 
 // TODO: Replace these focused stubs with real interactive examples.
