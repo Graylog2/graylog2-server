@@ -21,9 +21,11 @@ import { Label, Table } from 'components/bootstrap';
 import Drawer from 'components/common/Drawer';
 import { Link, RelativeTime } from 'components/common';
 import Routes from 'routing/Routes';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
 import collectorSystemLogsUrl from '../common/collectorSystemLogsUrl';
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import type { CollectorInstanceView, Source } from '../types';
 
 type Props = {
@@ -88,6 +90,7 @@ const SourceList = styled.div`
 
 const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) => {
   const osDescription = (instance.non_identifying_attributes?.['os.description'] as string) ?? null;
+  const sendTelemetry = useSendCollectorsTelemetry();
 
   return (
     <Drawer title={instance.hostname || instance.instance_uid} onClose={onClose} size="md">
@@ -131,7 +134,15 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
 
         <DetailRow>
           <Title>Messages:</Title>
-          <Link to={collectorReceivedMessagesUrl('collector_instance_uid', instance.instance_uid)}>
+          <Link
+            to={collectorReceivedMessagesUrl('collector_instance_uid', instance.instance_uid)}
+            onClick={() =>
+              sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.SHOW_RECEIVED_MESSAGES_CLICKED, {
+                app_action_value: 'instance-show-received-messages',
+                instance_id: instance.instance_uid,
+                fleet_id: instance.fleet_id,
+              })
+            }>
             Received messages
           </Link>
         </DetailRow>

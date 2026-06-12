@@ -56,14 +56,24 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
     <>
       <ButtonToolbar>
         <LinkContainer to={collectorReceivedMessagesUrl('collector_instance_uid', instance.instance_uid)}>
-          <Button bsSize="xsmall">Received messages</Button>
+          <Button
+            bsSize="xsmall"
+            onClick={() =>
+              sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.SHOW_RECEIVED_MESSAGES_CLICKED, {
+                app_action_value: 'instance-show-received-messages',
+                instance_id: instance.instance_uid,
+                fleet_id: instance.fleet_id,
+              })
+            }>
+            Received messages
+          </Button>
         </LinkContainer>
         <LinkContainer to={collectorSystemLogsUrl(instance.instance_uid)}>
           <Button
             bsSize="xsmall"
             onClick={() =>
-              sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.VIEW_LOGS_CLICKED, {
-                app_action_value: 'instance-view-logs',
+              sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.VIEW_SYSTEM_LOGS_CLICKED, {
+                app_action_value: 'instance-view-system-logs',
                 instance_id: instance.instance_uid,
                 fleet_id: instance.fleet_id,
               })

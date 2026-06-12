@@ -27,8 +27,10 @@ import {
   useCollectorsMutations,
   useDefaultInstanceFilters,
 } from 'components/collectors/hooks';
+import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 
 import FleetDetail, { sourceActionsFactory } from './FleetDetail';
+import type { Source } from '../types';
 
 jest.mock('components/collectors/hooks/useSendCollectorsTelemetry');
 jest.mock('components/collectors/hooks', () => ({
@@ -42,7 +44,8 @@ jest.mock('components/collectors/hooks', () => ({
 }));
 jest.mock('routing/useHistory', () => () => ({ push: jest.fn(), replace: jest.fn() }));
 jest.mock('routing/useQuery', () => () => ({}));
-jest.mock('components/common/PaginatedEntityTable', () => () => null);
+// Use jest.fn() so individual tests can override via mockImplementationOnce to expose entityActions
+jest.mock('components/common/PaginatedEntityTable', () => jest.fn(() => null));
 jest.mock('components/collectors/instances', () => ({ InstanceDetailDrawer: () => null }));
 
 describe('FleetDetail telemetry', () => {
@@ -100,6 +103,54 @@ describe('FleetDetail telemetry', () => {
       expect.objectContaining({ fleet_id: 'f-1', tab: 'instances' }),
     );
   });
+
+  it('emits FLEET.SHOW_RECEIVED_MESSAGES_CLICKED when fleet Received messages button is clicked', async () => {
+    render(<FleetDetail fleetId="f-1" />);
+    // Sources tab is the default; the fleet-level button is the only "Received messages" link rendered
+    await userEvent.click(screen.getByRole('link', { name: /received messages/i }));
+
+    expect(sendTelemetry).toHaveBeenCalledWith(
+      'Fleet Show Received Messages Clicked',
+      expect.objectContaining({ fleet_id: 'f-1', app_action_value: 'fleet-show-received-messages' }),
+    );
+  });
+
+  it('emits SOURCE.SHOW_RECEIVED_MESSAGES_CLICKED when a source row Received messages is clicked', async () => {
+    const testSource = {
+      id: 'src-1',
+      fleet_id: 'f-1',
+      name: 'app-logs',
+      description: '',
+      enabled: true,
+      type: 'file' as const,
+      config: { paths: ['/var/log/app.log'], read_mode: 'end' as const },
+    };
+
+    // Render the source entityActions so the per-source button is visible
+    asMock(PaginatedEntityTable).mockImplementationOnce(
+      ({ entityActions }: { entityActions?: (entity: Source) => React.ReactNode }) =>
+        entityActions ? <>{entityActions(testSource)}</> : null,
+    );
+
+    render(<FleetDetail fleetId="f-1" />);
+
+    // Two "Received messages" links are now visible: the fleet-level one and the source-level one.
+    // Distinguish by href: the source link contains 'collector_source_id'.
+    const links = screen.getAllByRole('link', { name: /received messages/i });
+    const sourceLink = links.find((l) => l.getAttribute('href')?.includes('collector_source_id'));
+    if (!sourceLink) throw new Error('Source received messages link not found');
+    await userEvent.click(sourceLink);
+
+    expect(sendTelemetry).toHaveBeenCalledWith(
+      'Collector Source Show Received Messages Clicked',
+      expect.objectContaining({
+        fleet_id: 'f-1',
+        source_id: 'src-1',
+        source_type: 'file',
+        app_action_value: 'source-show-received-messages',
+      }),
+    );
+  });
 });
 
 describe('sourceActionsFactory', () => {
@@ -114,11 +165,31 @@ describe('sourceActionsFactory', () => {
       config: { paths: ['/var/log/app.log'], read_mode: 'end' as const },
     };
 
-    const actions = sourceActionsFactory({ onEdit: jest.fn(), onDelete: jest.fn() });
+    const actions = sourceActionsFactory({ onEdit: jest.fn(), onDelete: jest.fn(), onShowMessages: jest.fn() });
     render(<>{actions(source)}</>);
 
     const link = await screen.findByRole('link', { name: /received messages/i });
     expect(link).toHaveAttribute('href', expect.stringContaining('collector_source_id'));
     expect(link).toHaveAttribute('href', expect.stringContaining('src-1'));
+  });
+
+  it('invokes onShowMessages with the source when Received messages is clicked', async () => {
+    const source = {
+      id: 'src-1',
+      fleet_id: 'f-1',
+      name: 'app-logs',
+      description: '',
+      enabled: true,
+      type: 'file' as const,
+      config: { paths: ['/var/log/app.log'], read_mode: 'end' as const },
+    };
+    const onShowMessages = jest.fn();
+
+    const actions = sourceActionsFactory({ onEdit: jest.fn(), onDelete: jest.fn(), onShowMessages });
+    render(<>{actions(source)}</>);
+
+    await userEvent.click(await screen.findByRole('link', { name: /received messages/i }));
+
+    expect(onShowMessages).toHaveBeenCalledWith(source);
   });
 });

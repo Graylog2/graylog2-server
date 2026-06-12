@@ -99,14 +99,17 @@ const SEGMENTS = [
 type SourceActionsHandlers = {
   onEdit: (source: Source) => void;
   onDelete: (source: Source) => void;
+  onShowMessages: (source: Source) => void;
 };
 
 export const sourceActionsFactory =
-  ({ onEdit, onDelete }: SourceActionsHandlers) =>
+  ({ onEdit, onDelete, onShowMessages }: SourceActionsHandlers) =>
   (source: Source) => (
     <ButtonToolbar>
       <LinkContainer to={collectorReceivedMessagesUrl('collector_source_id', source.id)}>
-        <Button bsSize="xsmall">Received messages</Button>
+        <Button bsSize="xsmall" onClick={() => onShowMessages(source)}>
+          Received messages
+        </Button>
       </LinkContainer>
       <Button bsSize="xsmall" onClick={() => onEdit(source)}>
         Edit
@@ -211,8 +214,19 @@ const FleetDetail = ({ fleetId }: Props) => {
   }, [deletingSource, deleteSource, fleetId, sendTelemetry]);
 
   const sourceActions = useMemo(
-    () => sourceActionsFactory({ onEdit: setEditingSource, onDelete: setDeletingSource }),
-    [],
+    () =>
+      sourceActionsFactory({
+        onEdit: setEditingSource,
+        onDelete: setDeletingSource,
+        onShowMessages: (source: Source) =>
+          sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SOURCE.SHOW_RECEIVED_MESSAGES_CLICKED, {
+            app_action_value: 'source-show-received-messages',
+            fleet_id: fleetId,
+            source_id: source.id,
+            source_type: source.type,
+          }),
+      }),
+    [fleetId, sendTelemetry],
   );
 
   const getSourcesForInstance = (instance: CollectorInstanceView) =>
@@ -334,7 +348,15 @@ const FleetDetail = ({ fleetId }: Props) => {
           <p>Sources are automatically pushed to all Collectors in this fleet. Changes take effect within seconds.</p>
           <ActionsRow>
             <LinkContainer to={collectorReceivedMessagesUrl('collector_fleet_id', fleet.id)}>
-              <Button>Received messages</Button>
+              <Button
+                onClick={() =>
+                  sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.FLEET.SHOW_RECEIVED_MESSAGES_CLICKED, {
+                    app_action_value: 'fleet-show-received-messages',
+                    fleet_id: fleet.id,
+                  })
+                }>
+                Received messages
+              </Button>
             </LinkContainer>
             <Button bsStyle="primary" onClick={() => setShowSourceModal(true)}>
               Add Source
