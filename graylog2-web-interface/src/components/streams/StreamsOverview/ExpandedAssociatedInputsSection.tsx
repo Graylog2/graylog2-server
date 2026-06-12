@@ -17,11 +17,11 @@
 import * as React from 'react';
 
 import type { Stream } from 'stores/streams/StreamsStore';
-import useEntityTitles from 'hooks/useEntityTitles';
+import useInputDetails from 'hooks/useInputDetails';
 import { Link, Spinner } from 'components/common';
 import { ListGroup, ListGroupItem } from 'components/bootstrap';
 import { useStreamMetricsFor } from 'components/streams/StreamsOverview/StreamMetricsContext';
-import Routes from 'routing/Routes';
+import { useInputTitleLinkBuilder } from 'components/streams/StreamsOverview/inputTitleLinks';
 
 type Props = {
   stream: Stream;
@@ -29,12 +29,16 @@ type Props = {
 
 const ExpandedAssociatedInputsSection = ({ stream }: Props) => {
   const { metrics, isInitialLoading, isError } = useStreamMetricsFor(stream.id);
-  const inputIds = metrics?.associated_inputs;
+  const typedInputs = metrics?.associated_inputs;
 
-  const titleEntities = (inputIds ?? []).map((id) => ({ id, type: 'inputs' }));
-  const { titlesById, isInitialLoading: areTitlesLoading } = useEntityTitles(titleEntities);
+  const {
+    resolvedById,
+    isFetching: areDetailsFetching,
+    isError: isDetailsError,
+  } = useInputDetails(typedInputs ?? []);
+  const buildLink = useInputTitleLinkBuilder();
 
-  if (isInitialLoading && !inputIds) {
+  if (isInitialLoading && !typedInputs) {
     return <Spinner />;
   }
 
@@ -42,21 +46,26 @@ const ExpandedAssociatedInputsSection = ({ stream }: Props) => {
     return <p>Could not load associated inputs.</p>;
   }
 
-  if (!inputIds || inputIds.length === 0) {
+  if (!typedInputs || typedInputs.length === 0) {
     return <p>No inputs have sent messages to this stream in the last 24 hours.</p>;
   }
 
   return (
     <ListGroup componentClass="ul">
-      {inputIds.map((inputId) => {
-        const title = titlesById[inputId];
-        const label = title ?? (areTitlesLoading ? inputId : `${inputId} (deleted)`);
+      {typedInputs.map(({ id: inputId }) => {
+        // Three cases when a title is missing:
+        //   - a details request is in flight (initial or background refetch) → still loading,
+        //     show the bare ID; the label fills in once the request settles
+        //   - the details request errored → we don't know if the input is deleted, show bare ID
+        //   - the details request settled with no entry for this ID → the input has been deleted
+        //     since the cached associated_inputs entry was computed (cache TTL is hours); show
+        //     "(deleted)" so the user knows it isn't expected to load
+        const resolved = resolvedById[inputId];
+        const label =
+          resolved?.title ?? (areDetailsFetching || isDetailsError ? inputId : `${inputId} (deleted)`);
+        const path = resolved ? buildLink(resolved) : null;
 
-        return (
-          <ListGroupItem key={inputId}>
-            {title ? <Link to={Routes.SYSTEM.INPUT_DIAGNOSIS(inputId)}>{label}</Link> : label}
-          </ListGroupItem>
-        );
+        return <ListGroupItem key={inputId}>{path ? <Link to={path}>{label}</Link> : label}</ListGroupItem>;
       })}
     </ListGroup>
   );
