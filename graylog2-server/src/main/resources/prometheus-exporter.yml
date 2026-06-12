@@ -1323,6 +1323,9 @@ metric_mappings:
   - metric_name: "data_lake_journal_writer_written_failed_write_attempts"
     match_pattern: "org.graylog.plugins.datalake.output.DataLakeJournalWriter.failed-write-attempts"
 
+  - metric_name: "data_lake_iceberg_writer_dropped_due_to_deletion"
+    match_pattern: "org.graylog.plugins.datalake.iceberg.IcebergWriter.dropped-due-to-deletion"
+
   - metric_name: "data_lake_journal_last_flush_time"
     match_pattern: "org.graylog.plugins.datalake.output.journal.lastFlushTime"
 
