@@ -201,11 +201,6 @@ export default [
               name: 'lodash/max',
               message: 'Please use `Math.max` instead.',
             },
-            {
-              name: '@mantine/hooks',
-              importNames: ['useDisclosure'],
-              message: 'Please use `util/hooks/useDisclosure` instead.',
-            },
           ],
         },
       ],
