@@ -55,7 +55,6 @@ import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.security.entities.EntityRegistrar;
-import org.graylog.security.shares.EntityGrantLookup;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
@@ -143,8 +142,6 @@ public class EventDefinitionFacadeTest {
     @Mock
     private EntityRegistrar entityRegistrar;
     @Mock
-    private EntityGrantLookup grantLookup;
-    @Mock
     private EventProcessorConfig mockEventProcessorConfig;
     @Mock
     private ClusterEventBus clusterEventBus;
@@ -185,8 +182,7 @@ public class EventDefinitionFacadeTest {
                 pluginMetaData,
                 jobDefinitionService,
                 eventDefinitionService,
-                userService,
-                grantLookup);
+                userService);
     }
 
     @Test
@@ -361,7 +357,7 @@ public class EventDefinitionFacadeTest {
     @Test
     public void listExcerptsExcludesNonContentPackExportableEventDefinitions() {
         EventDefinitionFacade testFacade = new EventDefinitionFacade(
-                objectMapper, eventDefinitionHandler, new HashSet<>(), jobDefinitionService, mockEventDefinitionService, userService, grantLookup);
+                objectMapper, eventDefinitionHandler, new HashSet<>(), jobDefinitionService, mockEventDefinitionService, userService);
         EventDefinitionDto dto = validEventDefinitionDto(mockEventProcessorConfig);
 
         when(mockEventProcessorConfig.isContentPackExportable()).thenReturn(false);

@@ -128,6 +128,8 @@ export { default as ShareButton } from './ShareButton';
 export { default as ShareMenuItem } from './ShareMenuItem';
 export { default as SortableList } from './SortableList';
 export { default as Stack } from './Stack';
+export { default as CreateModal } from './CreateModal';
+export { default as CreatePage } from './CreatePage';
 export { default as Spinner } from './Spinner';
 export { default as Spoiler } from './Spoiler';
 export { default as StatusIcon } from './StatusIcon';
