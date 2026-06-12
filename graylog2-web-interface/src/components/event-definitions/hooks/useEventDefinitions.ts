@@ -345,7 +345,7 @@ export const keyFn = (searchParams: SearchParams) => [
   searchParams,
 ];
 
-export const useEventDefinition = (eventDefinitionId: string) => {
+export const useEventDefinitionWithContext = (eventDefinitionId: string) => {
   const { data, isFetching } = useQuery({
     queryKey: [...EVENT_DEFINITIONS_QUERY_KEY, eventDefinitionId],
 
@@ -398,7 +398,9 @@ export default useEventDefinitions;
 
 export function useGetEntityTypes() {
   const { data, isLoading } = useQuery({
-    queryKey: [...EVENT_DEFINITIONS_QUERY_KEY, 'entity-types'],
+    // Deliberately not under EVENT_DEFINITIONS_QUERY_KEY: this is not event definition
+    // entity data, so it should not be refetched on event definition mutations.
+    queryKey: ['event-definition-entity-types'],
     queryFn: () =>
       defaultOnError(
         fetch('GET', qualifyUrl('/events/entity_types')),
@@ -418,7 +420,9 @@ export function useGetListEventsClusterConfig(): {
   loadingEventsClusterConfig: boolean;
 } {
   const { data, isLoading } = useQuery<{}, Error>({
-    queryKey: [...EVENT_DEFINITIONS_QUERY_KEY, 'list-events-cluster-config'],
+    // Deliberately not under EVENT_DEFINITIONS_QUERY_KEY: this is cluster configuration,
+    // not event definition entity data, so it should not be refetched on event definition mutations.
+    queryKey: ['events-cluster-config'],
     queryFn: () =>
       defaultOnError(
         ConfigurationsActions.listEventsClusterConfig(),
@@ -438,7 +442,9 @@ export function useGetEventNotifications(): {
   loadingEventNotifications: boolean;
 } {
   const { data, isLoading } = useQuery<{ notifications: Array<EventNotification> }, Error>({
-    queryKey: [...EVENT_DEFINITIONS_QUERY_KEY, 'event-notifications'],
+    // Deliberately not under EVENT_DEFINITIONS_QUERY_KEY: these are event notifications,
+    // not event definition entity data, so they should not be refetched on event definition mutations.
+    queryKey: ['event-notifications-list'],
     queryFn: () =>
       defaultOnError(
         EventNotificationsStore.listAll(),

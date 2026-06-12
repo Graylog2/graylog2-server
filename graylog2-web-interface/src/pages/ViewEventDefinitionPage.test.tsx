@@ -30,7 +30,7 @@ import { simpleEventDefinition as mockEventDefinition } from 'fixtures/eventDefi
 import { adminUser } from 'fixtures/users';
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
-import { useEventDefinition } from 'components/event-definitions/hooks/useEventDefinitions';
+import { useEventDefinitionWithContext } from 'components/event-definitions/hooks/useEventDefinitions';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
 
 import ViewEventDefinitionPage from './ViewEventDefinitionPage';
@@ -47,7 +47,7 @@ jest.mock('hooks/useScopePermissions');
 
 jest.mock('components/event-definitions/hooks/useEventDefinitions', () => ({
   ...jest.requireActual('components/event-definitions/hooks/useEventDefinitions'),
-  useEventDefinition: jest.fn(),
+  useEventDefinitionWithContext: jest.fn(),
   copyEventDefinition: jest.fn(() => Promise.resolve({ id: 'new-id', title: 'New copy' })),
 }));
 
@@ -66,7 +66,7 @@ jest.mock('hooks/usePluginEntities');
 describe('<ViewEventDefinitionPage />', () => {
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
-    asMock(useEventDefinition).mockReturnValue({
+    asMock(useEventDefinitionWithContext).mockReturnValue({
       data: {
         eventDefinition: mockEventDefinition,
         context: { scheduler: { is_scheduled: true } },

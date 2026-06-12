@@ -35,7 +35,7 @@ import { isSystemEventDefinition, isSigmaEventDefinition } from 'components/even
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import usePluginEntities from 'hooks/usePluginEntities';
 import {
-  useEventDefinition,
+  useEventDefinitionWithContext,
   copyEventDefinition,
   EVENT_DEFINITIONS_QUERY_KEY,
 } from 'components/event-definitions/hooks/useEventDefinitions';
@@ -64,7 +64,7 @@ const ViewEventDefinitionPage = () => {
     : null;
 
   const queryClient = useQueryClient();
-  const { data, isFetching } = useEventDefinition(params.definitionId);
+  const { data, isFetching } = useEventDefinitionWithContext(params.definitionId);
 
   const eventDefinition = useMemo(() => {
     if (!data?.eventDefinition) return null;
