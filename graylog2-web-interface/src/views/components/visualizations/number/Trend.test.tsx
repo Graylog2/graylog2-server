@@ -19,12 +19,8 @@ import { render, screen, within } from 'wrappedTestingLibrary';
 
 import Trend from './Trend';
 
-const renderTrend = ({
-  current = 42,
-  previous = 42,
-  trendPreference = 'NEUTRAL',
-}: Partial<React.ComponentProps<typeof Trend>> = {}) =>
-  render(<Trend current={current} previous={previous} trendPreference={trendPreference} />);
+const renderTrend = ({ current = 42, previous = 42 }: Partial<React.ComponentProps<typeof Trend>> = {}) =>
+  render(<Trend current={current} previous={previous} />);
 
 const findTrend = async () => {
   const trend = await screen.findByTestId('trend-value');

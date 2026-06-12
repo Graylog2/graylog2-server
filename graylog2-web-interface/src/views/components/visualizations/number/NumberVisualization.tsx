@@ -156,13 +156,7 @@ const NumberVisualization = ({ config, fields, data, height: heightProp }: Visua
         <TrendBox>
           {({ height, width }) => (
             <AutoFontSizer height={height} width={width} target={targetRef}>
-              <Trend
-                ref={targetRef}
-                current={value}
-                previous={previousValue}
-                trendPreference={visualizationConfig.trendPreference}
-                unit={unit}
-              />
+              <Trend ref={targetRef} current={value} previous={previousValue} unit={unit} />
             </AutoFontSizer>
           )}
         </TrendBox>
