@@ -23,7 +23,7 @@ import { OrderedSet } from 'immutable';
 import UserNotification from 'util/UserNotification';
 import type { QueryId } from 'views/logic/queries/Query';
 import type QueryTitleEditModal from 'views/components/queries/QueryTitleEditModal';
-import { Nav, NavItem, MenuItem } from 'components/bootstrap';
+import { Nav, NavItem, MenuItem, Button } from 'components/bootstrap';
 import { Icon, IconButton } from 'components/common';
 import QueryTitle from 'views/components/queries/QueryTitle';
 import AdaptableQueryTabsConfiguration from 'views/components/AdaptableQueryTabsConfiguration';
@@ -106,6 +106,11 @@ const StyledQueryNav = styled(Nav)(
         }
       }
 
+      > li.${MORE_TABS_LI_CLASS} > button,
+      > li.${NEW_TAB_BUTTON_CLASS} > button {
+        padding: 10px 15px;
+      }
+
       > li.active {
         display: flex;
         flex-direction: column;
@@ -128,10 +133,6 @@ const StyledQueryNav = styled(Nav)(
           }
         }
       }
-
-      > li.${MORE_TABS_BUTTON_CLASS}, > li.${MORE_TABS_BUTTON_CLASS} a {
-        cursor: pointer;
-      }
     }
   `,
 );
@@ -142,13 +143,21 @@ const QueryTab = styled(NavItem)`
   }
 `;
 
+const NewTabLi = ({ onClick }: { onClick: () => void }) => (
+  <li className={NEW_TAB_BUTTON_CLASS}>
+    <Button title="Create New Page" onClick={onClick} bsStyle="transparent">
+      <Icon name="add" />
+    </Button>
+  </li>
+);
+
 const MoreTabsLi = ({ menuItems }: { menuItems: OrderedSet<React.ReactNode> }) => (
   <li className={MORE_TABS_LI_CLASS}>
     <MoreActionsMenu
       className={MORE_TABS_BUTTON_CLASS}
       id="query-tabs-more"
       aria-label="More Dashboard Pages"
-      bsStyle="link"
+      bsStyle="transparent"
       keepMounted
       pullRight>
       {menuItems.toArray()}
@@ -399,10 +408,7 @@ const AdaptableQueryTabs = ({
 
         {currentTabs.lockedItems.toArray()}
 
-        <QueryTab
-          key="new"
-          eventKey="new"
-          title="Create New Page"
+        <NewTabLi
           onClick={() => {
             sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_CREATE_PAGE, {
               app_pathname: 'dashboard',
@@ -412,9 +418,7 @@ const AdaptableQueryTabs = ({
 
             onSelect('new');
           }}
-          className={NEW_TAB_BUTTON_CLASS}>
-          <Icon name="add" />
-        </QueryTab>
+        />
       </StyledQueryNav>
       <IconButton
         title="Open pages configuration"
