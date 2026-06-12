@@ -19,6 +19,7 @@ package org.graylog2.shared.rest.documentation.openapi;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
 import com.google.inject.assistedinject.Assisted;
+import io.swagger.v3.core.util.ReflectionUtils;
 import io.swagger.v3.jaxrs2.Reader;
 import io.swagger.v3.oas.integration.api.OpenAPIConfiguration;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -170,7 +171,7 @@ public class CustomReader extends Reader {
             return null;
         }
 
-        final var annotation = method.getAnnotation(io.swagger.v3.oas.annotations.Operation.class);
+        final var annotation = ReflectionUtils.getAnnotation(method, io.swagger.v3.oas.annotations.Operation.class);
         if (annotation != null && !annotation.operationId().isEmpty()) {
             op.setOperationId(annotation.operationId());
         } else {
