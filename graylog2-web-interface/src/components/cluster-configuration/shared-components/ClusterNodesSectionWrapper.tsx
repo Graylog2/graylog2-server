@@ -53,6 +53,7 @@ const TableWrapper = styled.div.withConfig({
       div#scroll-container {
         max-height: ${maxHeight};
         overflow-y: auto;
+        scrollbar-gutter: stable;
       }
 
       div#scroll-container table thead {
