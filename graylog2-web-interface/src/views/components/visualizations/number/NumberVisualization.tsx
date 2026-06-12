@@ -124,7 +124,7 @@ const NumberVisualization = ({ config, fields, data, height: heightProp }: Visua
     <ContainerComponent $height={heightProp}>
       <NumberBox resizeDelay={20}>
         {({ height, width }) => (
-          <AutoFontSizer height={height} width={width} center>
+          <AutoFontSizer height={height} width={width} alignment="center">
             <CustomHighlighting field={field} value={value}>
               <Value
                 field={field}
