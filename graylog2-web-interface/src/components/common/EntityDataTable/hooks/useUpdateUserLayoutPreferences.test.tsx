@@ -71,6 +71,22 @@ describe('useUserSearchFilterQuery hook', () => {
     );
   });
 
+  it('should update null slicing preferences', async () => {
+    const { result } = renderHook(() => useUpdateUserLayoutPreferences('streams'), { wrapper });
+
+    result.current.mutateAsync({
+      ...layoutPreferences,
+      slicing: null,
+    });
+
+    await waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/entitylists/preferences/streams'), {
+        ...layoutPreferencesJSON,
+        slicing: null,
+      }),
+    );
+  });
+
   it('should update user layout preferences for a layout variant', async () => {
     const { result } = renderHook(() => useUpdateUserLayoutPreferences('streams', 'security-events'), { wrapper });
 
