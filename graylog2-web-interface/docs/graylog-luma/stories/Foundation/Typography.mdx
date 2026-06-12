@@ -1,4 +1,5 @@
 import { Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { Alert } from 'components/bootstrap';
 import { FontFamiliesDoc, TypeScaleGroupDoc, TextColorsDoc } from './Typography';
 
 <Meta title="Foundation/Typography" />
@@ -6,6 +7,16 @@ import { FontFamiliesDoc, TypeScaleGroupDoc, TextColorsDoc } from './Typography'
 # Typography
 
 Typography in our design system ensures clarity, consistency, and accessibility across all user interfaces. We use a dual-typeface approach to distinguish between general interface content and technical or system-specific elements.
+
+<Unstyled>
+  <Alert bsStyle="warning">
+    {'Typography tokens are for '}
+    <strong>component authors</strong>
+    {' building new reusable components in '}
+    <code>components/common</code>
+    {'. When using an existing component, its internal typography is already applied. Do not set typography tokens manually outside of reusable components.'}
+  </Alert>
+</Unstyled>
 
 ## Font Families
 
