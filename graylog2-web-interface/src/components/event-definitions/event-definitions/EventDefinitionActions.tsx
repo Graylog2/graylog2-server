@@ -17,12 +17,19 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 
 import Routes from 'routing/Routes';
 import { LinkContainer, IfPermitted, ShareButton, ConfirmDialog } from 'components/common';
 import { ButtonToolbar, MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
-import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
+import {
+  copyEventDefinition,
+  deleteEventDefinition,
+  enableEventDefinition,
+  disableEventDefinition,
+  EVENT_DEFINITIONS_QUERY_KEY,
+} from 'components/event-definitions/hooks/useEventDefinitions';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import UserNotification from 'util/UserNotification';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -31,7 +38,6 @@ import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import { MoreActions } from 'components/common/EntityDataTable';
-import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 import usePluggableEntitySharedActions from 'hooks/usePluggableEntitySharedActions';
 
 import type { EventDefinition } from '../event-definitions-types';
@@ -72,7 +78,7 @@ const DIALOG_TEXT = {
 };
 
 const EventDefinitionActions = ({ eventDefinition }: Props) => {
-  const { refetch: refetchEventDefinitions } = useTableFetchContext();
+  const queryClient = useQueryClient();
   const { deselectEntity } = useSelectedEntities();
   const { scopePermissions } = useGetPermissionsByScope(eventDefinition);
   const [currentDefinition, setCurrentDefinition] = useState(null);
@@ -162,19 +168,23 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
 
   const handleClearState = () => {
     updateState({ show: false, type: null, definition: null });
-    refetchEventDefinitions();
+    queryClient.invalidateQueries({ queryKey: EVENT_DEFINITIONS_QUERY_KEY });
   };
 
   const handleConfirm = () => {
     switch (dialogType) {
       case 'copy':
-        EventDefinitionsActions.copy(currentDefinition).finally(() => {
-          handleClearState();
-        });
+        copyEventDefinition(currentDefinition)
+          .catch(() => {
+            // Error feedback is handled by `copyEventDefinition` itself.
+          })
+          .finally(() => {
+            handleClearState();
+          });
 
         break;
       case 'delete':
-        EventDefinitionsActions.delete(currentDefinition)
+        deleteEventDefinition(currentDefinition)
           .then(
             () => {
               deselectEntity(currentDefinition.id);
@@ -199,15 +209,23 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
 
         break;
       case 'enable':
-        EventDefinitionsActions.enable(currentDefinition).finally(() => {
-          handleClearState();
-        });
+        enableEventDefinition(currentDefinition)
+          .catch(() => {
+            // Error feedback is handled by `enableEventDefinition` itself.
+          })
+          .finally(() => {
+            handleClearState();
+          });
 
         break;
       case 'disable':
-        EventDefinitionsActions.disable(currentDefinition).finally(() => {
-          handleClearState();
-        });
+        disableEventDefinition(currentDefinition)
+          .catch(() => {
+            // Error feedback is handled by `disableEventDefinition` itself.
+          })
+          .finally(() => {
+            handleClearState();
+          });
 
         break;
       default:

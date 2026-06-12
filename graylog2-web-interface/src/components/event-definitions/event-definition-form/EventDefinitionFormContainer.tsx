@@ -17,10 +17,10 @@
 import React, { useCallback, useState } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import cloneDeep from 'lodash/cloneDeep';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { ConfirmLeaveDialog, Spinner } from 'components/common';
-import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import type {
   EventDefinition,
@@ -42,9 +42,11 @@ import EventDefinitionSummary from './EventDefinitionSummary';
 
 import useEventDefinitionMutations from '../hooks/useEventDefinitionMutations';
 import {
+  updateEventDefinition,
   useGetEntityTypes,
   useGetListEventsClusterConfig,
   useGetEventNotifications,
+  EVENT_DEFINITIONS_QUERY_KEY,
 } from '../hooks/useEventDefinitions';
 
 const STEP_KEYS = {
@@ -108,6 +110,7 @@ const EventDefinitionFormContainer = ({
 
   const [validation, setValidation] = useState({ errors: {} });
   const [isDirty, setIsDirty] = useState(false);
+  const queryClient = useQueryClient();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(eventDefinition);
   const { createEventDefinition } = useEventDefinitionMutations();
   const { entityTypes, loadingEntityTypes } = useGetEntityTypes();
@@ -199,6 +202,7 @@ const EventDefinitionFormContainer = ({
 
   const handleSubmitSuccessResponse = () => {
     setIsDirty(false);
+    queryClient.invalidateQueries({ queryKey: EVENT_DEFINITIONS_QUERY_KEY });
     CurrentUserStore.update(currentUser.username);
 
     onSubmit();
@@ -265,7 +269,7 @@ const EventDefinitionFormContainer = ({
         ...tacticsTechniquesTelemetry,
       });
 
-      EventDefinitionsActions.update(eventDefinition.id, eventDefinition).then(
+      updateEventDefinition(eventDefinition.id, eventDefinition).then(
         handleSubmitSuccessResponse,
         handleSubmitFailureResponse,
       );

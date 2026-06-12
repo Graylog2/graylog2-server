@@ -30,7 +30,7 @@ import { simpleEventDefinition as mockEventDefinition } from 'fixtures/eventDefi
 import { adminUser } from 'fixtures/users';
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
-import { useGetEventDefinition } from 'components/event-definitions/hooks/useEventDefinitions';
+import { useEventDefinition } from 'components/event-definitions/hooks/useEventDefinitions';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
 
 import ViewEventDefinitionPage from './ViewEventDefinitionPage';
@@ -43,13 +43,12 @@ jest.mock('react-router-dom', () => ({
 }));
 
 jest.mock('hooks/useCurrentUser');
-jest.mock('components/event-definitions/hooks/useEventDefinitions');
 jest.mock('hooks/useScopePermissions');
 
-jest.mock('stores/event-definitions/EventDefinitionsStore', () => ({
-  EventDefinitionsActions: {
-    copy: mockAction(jest.fn(() => Promise.resolve({ id: 'new-id' }))),
-  },
+jest.mock('components/event-definitions/hooks/useEventDefinitions', () => ({
+  ...jest.requireActual('components/event-definitions/hooks/useEventDefinitions'),
+  useEventDefinition: jest.fn(),
+  copyEventDefinition: jest.fn(() => Promise.resolve({ id: 'new-id', title: 'New copy' })),
 }));
 
 jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
@@ -67,7 +66,7 @@ jest.mock('hooks/usePluginEntities');
 describe('<ViewEventDefinitionPage />', () => {
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
-    asMock(useGetEventDefinition).mockReturnValue({
+    asMock(useEventDefinition).mockReturnValue({
       data: {
         eventDefinition: mockEventDefinition,
         context: { scheduler: { is_scheduled: true } },
