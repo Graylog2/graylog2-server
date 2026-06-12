@@ -92,7 +92,7 @@ class CollectorsInitializerTest {
         enrollmentTokenService = new EnrollmentTokenService(clusterIdService, clock, encryptedValueService, collectorsConfigService, mongoCollections);
         logsDestinationService = mock(CollectorLogsDestinationService.class);
 
-        initializer = new CollectorsInitializer(caService, logsDestinationService, enrollmentTokenService, collectorsConfigService);
+        initializer = new CollectorsInitializer(caService, logsDestinationService, enrollmentTokenService);
     }
 
     @Test

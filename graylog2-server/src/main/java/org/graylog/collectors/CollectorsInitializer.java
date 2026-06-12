@@ -23,17 +23,14 @@ public class CollectorsInitializer {
     private final CollectorCaService caService;
     private final CollectorLogsDestinationService logsDestinationService;
     private final EnrollmentTokenService enrollmentTokenService;
-    private final CollectorsConfigService configService;
 
     @Inject
     public CollectorsInitializer(CollectorCaService caService,
                                  CollectorLogsDestinationService logsDestinationService,
-                                 EnrollmentTokenService enrollmentTokenService,
-                                 CollectorsConfigService configService) {
+                                 EnrollmentTokenService enrollmentTokenService) {
         this.caService = caService;
         this.logsDestinationService = logsDestinationService;
         this.enrollmentTokenService = enrollmentTokenService;
-        this.configService = configService;
     }
 
     public CollectorsConfig initialize(CollectorsConfig config) {
