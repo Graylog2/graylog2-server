@@ -34,7 +34,7 @@ const mapFontSize: Record<SupportedMantineSize, 'tiny' | 'small' | 'body'> = {
   lg: 'body',
 };
 
-const StyledBadge = styled(MantineBadge)<{ color: ColorVariant; size: SupportedMantineSize }>(
+const StyledBadge = styled(MantineBadge)<{ color: string; size: SupportedMantineSize }>(
   ({ theme, color, size }) => css`
     text-transform: none;
     background-color: ${color};

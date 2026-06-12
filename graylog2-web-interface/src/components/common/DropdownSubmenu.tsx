@@ -42,11 +42,7 @@ const Caret = styled.span(
   `,
 );
 
-type StyledSubmenuProps = React.PropsWithChildren<{
-  $left: boolean;
-  as: string;
-}>;
-const StyledSubmenu: React.ComponentType<StyledSubmenuProps> = styled(Dropdown)<{ $left: boolean }>(
+const StyledSubmenu = styled(Dropdown)<{ $left: boolean }>(
   ({ $left, theme }) => css`
     position: relative;
     display: flex;

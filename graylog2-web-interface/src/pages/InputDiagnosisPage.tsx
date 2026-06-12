@@ -53,7 +53,11 @@ const Header = styled.div(
   `,
 );
 
-const StyledSegmentedControl = styled(SegmentedControl)(
+// Annotate as the generic Mantine signature so the value-type generic on JSX
+// (e.g. `<StyledSegmentedControl<DiagnosisTab>>`) still narrows value/onChange.
+// styled-components 6.4.2's polymorphic call signature replaces the first generic
+// slot with `AsTarget`, which would otherwise drop SegmentedControl's value type.
+const StyledSegmentedControl: typeof SegmentedControl = styled(SegmentedControl)(
   ({ theme }) => css`
     background-color: ${theme.colors.section.filled.background};
     border: 1px solid ${theme.colors.section.filled.border};
