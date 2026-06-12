@@ -27,6 +27,8 @@ import org.graylog2.database.MongoConnection;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.mongodb.MongoDBContainer;
@@ -42,6 +44,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 @Testcontainers
 class MongodbClusterCommandIT {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MongodbClusterCommandIT.class);
 
     private static final String ADMIN_USER = "admin";
     private static final String ADMIN_PASSWORD = "adminpass";
@@ -61,19 +65,22 @@ class MongodbClusterCommandIT {
     @BeforeAll
     static void setup() {
         String host = mongoContainer.getHost();
-        int port = mongoContainer.getFirstMappedPort();
+        int port = mongoContainer.getMappedPort(27017);
 
         String adminUri = String.format(Locale.ROOT, "mongodb://%s:%s@%s:%d/admin", ADMIN_USER, ADMIN_PASSWORD, host, port);
         adminClient = new MongoClient(adminUri);
-
-        // Create a restricted user with read/write but NO profiling permissions
-        adminClient.getDatabase(TEST_DATABASE).runCommand(new Document()
-                .append("createUser", RESTRICTED_USER)
-                .append("pwd", RESTRICTED_PASSWORD)
-                .append("roles", Collections.singletonList(
-                        new Document("role", "readWrite").append("db", TEST_DATABASE)
-                ))
-        );
+        try {
+            // Create a restricted user with read/write but NO profiling permissions
+            adminClient.getDatabase(TEST_DATABASE).runCommand(new Document()
+                    .append("createUser", RESTRICTED_USER)
+                    .append("pwd", RESTRICTED_PASSWORD)
+                    .append("roles", Collections.singletonList(
+                            new Document("role", "readWrite").append("db", TEST_DATABASE)
+                    )));
+        } catch (Exception e) {
+            LOG.error("Failed to create user in Mongodb", e);
+            LOG.error("Mongodb logs:" + mongoContainer.getLogs());
+        }
 
         String restrictedUri = String.format(Locale.ROOT, "mongodb://%s:%s@%s:%d/%s",
                 RESTRICTED_USER, RESTRICTED_PASSWORD, host, port, TEST_DATABASE);
