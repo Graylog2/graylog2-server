@@ -80,7 +80,7 @@ public class CustomizationConfigIT {
     }
 
     void importFixture(String name) {
-        apis.backend().dropCollection("cluster_config");
-        apis.backend().importMongoDBFixture(name, CustomizationConfigIT.class);
+        apis.backend().dataBaseInstance().dropCollection("cluster_config");
+        apis.backend().dataBaseInstance().importFixture(name, CustomizationConfigIT.class);
     }
 }
