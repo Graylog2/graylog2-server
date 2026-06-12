@@ -54,7 +54,7 @@ jest.mock('@graylog/server-api', () => ({
 
 jest.mock('hooks/useAuthzRoles', () => ({
   AUTHZ_ROLES_QUERY_KEY: ['authz', 'roles'],
-    loadRolesPaginated: jest.fn(() => Promise.resolve(mockLoadRolesPromise)),
+  loadRolesPaginated: jest.fn(() => Promise.resolve(mockLoadRolesPromise)),
 }));
 
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
