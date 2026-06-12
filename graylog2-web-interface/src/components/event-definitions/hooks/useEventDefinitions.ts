@@ -55,6 +55,17 @@ export type EventDefinitionSearchResponse = {
   };
 };
 
+export type EventDefinitionListResponse = {
+  event_definitions: Array<EventDefinition>;
+  context: Record<string, unknown>;
+  query?: string;
+  count?: number;
+  page?: number;
+  per_page?: number;
+  total?: number;
+  grand_total?: number;
+};
+
 export type EventDefinitionContext = {
   scheduler: {
     is_scheduled: boolean;
@@ -152,6 +163,12 @@ export const fetchEventDefinitions = (searchParams: SearchParams): Promise<Event
     };
   });
 };
+
+// Port of the old EventDefinitionsStore `listAll` action: fetches all event definitions
+// (unpaginated) together with their scheduler context. Does not notify on failure,
+// matching the old store's behavior.
+export const fetchAllEventDefinitions = (): Promise<EventDefinitionListResponse> =>
+  fetch<EventDefinitionListResponse>('GET', eventDefinitionsUrl({ query: { per_page: 0 } }));
 
 export const getEventDefinition = (
   eventDefinitionId: string,
@@ -346,6 +363,14 @@ export const useEventDefinition = (eventDefinitionId: string) => {
     isFetching,
   };
 };
+
+// Replacement for the old `EventDefinitionsActions.listAll` / `eventDefinitions.all` store state:
+// consumers can read `{ all: data?.event_definitions, context: data?.context }`.
+export const useAllEventDefinitions = () =>
+  useQuery({
+    queryKey: [...EVENT_DEFINITIONS_QUERY_KEY, 'all'],
+    queryFn: fetchAllEventDefinitions,
+  });
 
 const useEventDefinitions = (searchParams: SearchParams, { enabled }: Options = { enabled: true }) => {
   const { data, refetch, isInitialLoading } = useQuery({

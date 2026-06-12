@@ -30,6 +30,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import { EVENT_DEFINITIONS_QUERY_KEY } from 'components/event-definitions/hooks/useEventDefinitions';
 
 const ACTION_TYPES = {
   DELETE: 'delete',
@@ -67,7 +68,7 @@ const BulkActions = () => {
   const refetchEventDefinitions = useCallback(
     () =>
       queryClient.invalidateQueries({
-        queryKey: ['eventDefinition', 'overview'],
+        queryKey: EVENT_DEFINITIONS_QUERY_KEY,
       }),
     [queryClient],
   );
