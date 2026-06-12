@@ -16,8 +16,8 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+import { IndexerIndices } from '@graylog/server-api';
+
 import { defaultOnError } from 'util/conditional/onError';
 
 export type OutdatedIndex = {
@@ -28,26 +28,34 @@ export type OutdatedIndex = {
   system_index: boolean;
 };
 
-const OUTDATED_INDICES_URL = qualifyUrl('/system/indexer/indices/outdated');
+type Options = {
+  mockData?: Array<OutdatedIndex>;
+};
 
-const fetchOutdatedIndices = (): Promise<Array<OutdatedIndex>> => fetch('GET', OUTDATED_INDICES_URL);
-
-const useOutdatedIndices = () => {
+const useOutdatedIndices = ({ mockData }: Options = {}) => {
+  const useMockData = !!mockData;
   const {
     data = [],
     isError,
     isLoading,
+    refetch,
   } = useQuery({
     queryKey: ['outdatedIndices'],
     queryFn: () =>
-      defaultOnError(fetchOutdatedIndices(), 'Loading outdated indices failed', 'Could not load outdated indices'),
+      defaultOnError(
+        IndexerIndices.getOutdatedIndices() as Promise<Array<OutdatedIndex>>,
+        'Loading outdated indices failed',
+        'Could not load outdated indices',
+      ),
     retry: false,
+    enabled: !useMockData,
   });
 
   return {
-    data,
-    isError,
-    isLoading,
+    data: mockData ?? data,
+    isError: useMockData ? false : isError,
+    isLoading: useMockData ? false : isLoading,
+    refetch,
   };
 };
 
