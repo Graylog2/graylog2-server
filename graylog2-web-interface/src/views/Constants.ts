@@ -169,6 +169,6 @@ export const VISUALIZATION_TABLE_HEADER_HEIGHT = 28;
 export const keySeparator = '\u2E31';
 export const humanSeparator = '-';
 export const thresholdsSupportedVisualizations = ['bar', 'area', 'line', 'scatter'];
-export const multipleValuesActionsSupportedVisualizations = ['bar', 'area', 'line', 'scatter'];
+export const multipleValuesActionsSupportedVisualizations = ['bar', 'area', 'line', 'scatter', 'sankey', 'network'];
 export const QUERY_TIME_RANGE_LIMIT_ERROR_TYPE = 'query_time_range_limit';
 export const SEARCH_TYPE_RANGE_LIMIT_ERROR_TYPE = 'search_type_time_range_limit';
