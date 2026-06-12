@@ -63,14 +63,21 @@ export function useEventProcedureSummaryComponents({
 
   if (validSecurityLicense) {
     label = 'Event Procedure Summary';
+
     if (eventProcedureId) {
-      Component = pluggableEventProcedureSummary.map(({ component: PluggableEventProcedureSummary, key }) => (
-        <PluggableEventProcedureSummary eventProcedureId={eventProcedureId} key={key} />
-      ))[0];
+      const first = pluggableEventProcedureSummary?.[0];
+      const PluggableEventProcedureSummary = first?.component;
+
+      Component = PluggableEventProcedureSummary ? (
+        <PluggableEventProcedureSummary eventProcedureId={eventProcedureId} key={first?.key} />
+      ) : (
+        <p>Event Procedure Summary component is not available.</p>
+      );
     } else {
       Component = <p>This Event does not have any Event Procedures.</p>;
     }
-  } else if (remediationSteps) {
+  } else {
+    label = 'Remediation Steps';
     Component = (
       <MarkdownPreview
         show
@@ -80,7 +87,6 @@ export function useEventProcedureSummaryComponents({
         value={remediationSteps || 'No remediation steps given'}
       />
     );
-    label = 'Remediation Steps';
   }
 
   return {
