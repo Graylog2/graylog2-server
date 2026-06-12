@@ -73,16 +73,38 @@ export const fetchPaginatedInstances = async (
     'Could not load instances',
   );
 
-export const useInstances = (fleetId?: string) =>
+export const useInstances = (fleetId?: string, options: { refetchInterval?: number; silent?: boolean } = {}) =>
   useQuery<CollectorInstanceView[]>({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- silent only affects the error-reporting wrapper, not the cached data; callers deliberately share one cache entry regardless of the flag
     queryKey: [...INSTANCES_KEY_PREFIX, { fleetId }],
     queryFn: () => {
       const filters = fleetId ? [`fleet_id:${fleetId}`] : undefined;
-
-      return defaultOnError(
-        Collectors.findInstances(1, 0, undefined, filters).then((response) => response.elements.map(toView)),
-        'Loading Collector instances failed with status',
-        'Could not load Collector instances',
+      const promise = Collectors.findInstances(1, 0, undefined, filters).then((response) =>
+        response.elements.map(toView),
       );
+
+      return options.silent
+        ? promise
+        : defaultOnError(promise, 'Loading Collector instances failed with status', 'Could not load Collector instances');
     },
+    refetchInterval: options.refetchInterval,
+  });
+
+export const useInstance = (instanceUid: string | undefined) =>
+  useQuery<CollectorInstanceView | null>({
+    queryKey: [...INSTANCES_KEY_PREFIX, 'single', instanceUid],
+    queryFn: () =>
+      defaultOnError(
+        // There is no single-instance GET endpoint (only DELETE). The query param narrows
+        // server-side (instance_uid is searchable, but matched as substring), so the exact
+        // match still happens client-side.
+        Collectors.findInstances(1, 10, `instance_uid:${instanceUid}`, undefined).then((response) => {
+          const match = response.elements.find((element) => element.instance_uid === instanceUid);
+
+          return match ? toView(match) : null;
+        }),
+        'Loading Collector instance failed with status',
+        'Could not load Collector instance',
+      ),
+    enabled: !!instanceUid,
   });

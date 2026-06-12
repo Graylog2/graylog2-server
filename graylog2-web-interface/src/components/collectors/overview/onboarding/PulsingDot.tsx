@@ -14,13 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import Routes from 'routing/Routes';
+import styled, { css, keyframes } from 'styled-components';
 
-import { COLLECTOR_INSTANCE_UID_FIELD, COLLECTOR_SYSTEM_LOGS_STREAM_ID } from './fields';
+const pulse = keyframes`
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.6); opacity: 0.5; }
+`;
 
-const collectorSystemLogsUrl = (instanceUid: string): string =>
-  Routes.search_with_query(`${COLLECTOR_INSTANCE_UID_FIELD}:"${instanceUid}"`, 'relative', { relative: 3600 }, [
-    COLLECTOR_SYSTEM_LOGS_STREAM_ID,
-  ]);
+const PulsingDot = styled.span(
+  ({ theme }) => css`
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: ${theme.colors.variant.info};
+    animation: ${pulse} 1.4s ease-in-out infinite;
+  `,
+);
 
-export default collectorSystemLogsUrl;
+export default PulsingDot;

@@ -15,24 +15,26 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
-import styled, { css } from 'styled-components';
+import {useState} from 'react';
+import styled, {css} from 'styled-components';
 
-import { Alert, Input } from 'components/bootstrap';
-import { Spinner } from 'components/common';
+import {Alert, Input} from 'components/bootstrap';
+import {Spinner} from 'components/common';
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
-import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import {TELEMETRY_EVENT_TYPE} from 'logic/telemetry/Constants';
+import type {CollectorStats} from 'components/collectors/types';
 
 import FleetCardsGrid from './FleetCardsGrid';
 import RecentActivity from './RecentActivity';
+import FirstOnboarding from './FirstOnboarding';
 
-import { useCollectorStats, useFleetsBulkStats } from '../hooks';
+import {useCollectorStats, useFleetsBulkStats} from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
-import StatCard, { type Variant as StatCardVariant } from '../common/StatCard';
+import StatCard, {type Variant as StatCardVariant} from '../common/StatCard';
 
 const StatsRow = styled.div(
-  ({ theme }) => css`
+  ({theme}) => css`
     display: flex;
     margin-bottom: ${theme.spacings.lg};
     gap: ${theme.spacings.md};
@@ -41,7 +43,7 @@ const StatsRow = styled.div(
 );
 
 const SectionHeader = styled.div(
-  ({ theme }) => css`
+  ({theme}) => css`
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -50,14 +52,13 @@ const SectionHeader = styled.div(
 );
 
 const SectionTitle = styled.h3(
-  ({ theme }) => css`
+  ({theme}) => css`
     margin: 0;
     font-size: ${theme.fonts.size.h3};
   `,
 );
 
-const StatsSection = () => {
-  const { data: stats, isLoading, isError } = useCollectorStats();
+const StatsSection = ({stats}: { stats: CollectorStats }) => {
   const history = useHistory();
   const sendTelemetry = useSendCollectorsTelemetry();
 
@@ -84,10 +85,6 @@ const StatsSection = () => {
       ...snapshot,
     });
   };
-
-  if (isLoading) return <Spinner />;
-
-  if (isError) return <Alert bsStyle="danger">Could not load Collector stats.</Alert>;
 
   return (
     <StatsRow>
@@ -138,8 +135,8 @@ const StatsSection = () => {
   );
 };
 
-const FleetsSection = ({ filter }: { filter: string }) => {
-  const { data: bulkStats, isLoading, isError } = useFleetsBulkStats();
+const FleetsSection = ({filter}: { filter: string }) => {
+  const {data: bulkStats, isLoading, isError} = useFleetsBulkStats();
 
   if (isLoading) return <Spinner />;
 
@@ -150,10 +147,17 @@ const FleetsSection = ({ filter }: { filter: string }) => {
 
 const CollectorsOverview = () => {
   const [filter, setFilter] = useState('');
+  const {data: stats, isLoading, isError} = useCollectorStats();
+
+  if (isLoading) return <Spinner />;
+
+  if (isError) return <Alert bsStyle="danger">Could not load Collector stats.</Alert>;
+
+  if (stats.total_instances == 0) return <FirstOnboarding />;
 
   return (
     <div>
-      <StatsSection />
+      <StatsSection stats={stats} />
 
       <SectionHeader>
         <SectionTitle>Fleets</SectionTitle>
@@ -162,7 +166,7 @@ const CollectorsOverview = () => {
           placeholder="Filter fleets..."
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          style={{ width: 200, marginBottom: 0 }}
+          style={{width: 200, marginBottom: 0}}
         />
       </SectionHeader>
 
