@@ -41,6 +41,7 @@ import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreterState
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreterStateUpdater;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineResolver;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
+import org.graylog.scheduler.system.SystemJobManager;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.Messages;
@@ -56,7 +57,6 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -145,7 +145,7 @@ class MessageCreationLoopPreventionTest extends BaseParserTest {
         final PipelineInterpreterStateUpdater stateUpdater = new PipelineInterpreterStateUpdater(
                 stateBuilder,
                 metricRegistry,
-                Executors.newScheduledThreadPool(1),
+                mock(SystemJobManager.class),
                 eventBus
         );
         this.pipelineInterpreter = new PipelineInterpreter(

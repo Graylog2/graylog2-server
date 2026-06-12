@@ -58,6 +58,7 @@ import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog.scheduler.system.SystemJobManager;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.graylog2.streams.StreamService;
@@ -518,7 +519,7 @@ public class PipelineInterpreterTest {
         final PipelineInterpreterStateUpdater stateUpdater = new PipelineInterpreterStateUpdater(
                 stateBuilder,
                 metricRegistry,
-                Executors.newScheduledThreadPool(1),
+                mock(SystemJobManager.class),
                 eventBus
         );
 
@@ -577,7 +578,7 @@ public class PipelineInterpreterTest {
         final PipelineInterpreterStateUpdater stateUpdater = new PipelineInterpreterStateUpdater(
                 stateBuilder,
                 metricRegistry,
-                Executors.newScheduledThreadPool(1),
+                mock(SystemJobManager.class),
                 mock(EventBus.class)
         );
         return new PipelineInterpreter(
@@ -638,7 +639,7 @@ public class PipelineInterpreterTest {
         final PipelineInterpreterStateUpdater stateUpdater = new PipelineInterpreterStateUpdater(
                 stateBuilder,
                 metricRegistry,
-                Executors.newScheduledThreadPool(1),
+                mock(SystemJobManager.class),
                 mock(EventBus.class)
         );
         final PipelineInterpreter interpreter = new PipelineInterpreter(

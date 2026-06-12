@@ -25,6 +25,7 @@ import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbRuleService;
 import org.graylog.plugins.pipelineprocessor.functions.ProcessorFunctionsModule;
 import org.graylog.plugins.pipelineprocessor.periodical.LegacyDefaultStreamMigration;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
+import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreterStateReloadJob;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineMetadataClusterEventHandler;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineMetadataUpdateJob;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineResolver;
@@ -68,6 +69,11 @@ public class PipelineProcessorModule extends PluginModule {
                 PipelineMetadataUpdateJob.class,
                 PipelineMetadataUpdateJob.Factory.class,
                 PipelineMetadataUpdateJob.Config.class);
+
+        addSystemSchedulerJob(PipelineInterpreterStateReloadJob.TYPE_NAME,
+                PipelineInterpreterStateReloadJob.class,
+                PipelineInterpreterStateReloadJob.Factory.class,
+                PipelineInterpreterStateReloadJob.Config.class);
 
         addAuditEventTypes(PipelineProcessorAuditEventTypes.class);
 
