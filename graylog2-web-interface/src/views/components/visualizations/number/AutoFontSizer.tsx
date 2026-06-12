@@ -98,6 +98,8 @@ const useAutoFontSize = (target, _container, height, width) => {
     const newFontSize = Math.floor(fontSize * multiplier);
 
     if (newFontSize !== fontSize && isValidFontSize(newFontSize)) {
+      // The font size is measured and iteratively adjusted after render, which requires setting state in the effect.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFontSize(newFontSize);
     }
   }, [target, _container, fontSize, height, width]);
