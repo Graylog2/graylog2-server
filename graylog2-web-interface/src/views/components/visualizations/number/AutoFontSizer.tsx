@@ -31,9 +31,7 @@ type Alignment = 'center' | 'bottom-right';
 const FontSize = styled.div<{ fontSize: number; $alignment: Alignment | undefined }>`
   height: 100%;
   width: 100%;
-  font-size: ${(props) => css`
-    ${props.fontSize}px
-  `};
+  font-size: ${(props) => props.fontSize}px;
   ${(props) =>
     props.$alignment === 'center'
       ? css`
