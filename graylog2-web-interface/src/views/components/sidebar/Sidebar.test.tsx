@@ -33,11 +33,9 @@ import GlobalOverride from 'views/logic/search/GlobalOverride';
 import Sidebar from './Sidebar';
 
 jest.mock('util/AppConfig', () => ({
-  gl2AppPathPrefix: jest.fn(() => ''),
+  ...jest.requireActual('util/AppConfig'),
   rootTimeZone: jest.fn(() => 'America/Chicago'),
-  gl2ServerUrl: jest.fn(() => undefined),
-  isCloud: jest.fn(() => false),
-  isFeatureEnabled: jest.fn(() => false),
+  __esModule: true,
 }));
 
 jest.mock('hooks/useHotkey', () => jest.fn());
