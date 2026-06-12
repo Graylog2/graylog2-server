@@ -27,7 +27,7 @@ import {
   RelativeTime,
 } from 'components/common';
 import { Button, Panel, Table } from 'components/bootstrap';
-import type { Token, TokenSummary } from 'stores/users/UsersStore';
+import type { Token, TokenSummary } from 'hooks/useUsers';
 import { sortByDate } from 'util/SortUtils';
 import { Headline } from 'components/common/Section/SectionComponent';
 import useCurrentUser from 'hooks/useCurrentUser';

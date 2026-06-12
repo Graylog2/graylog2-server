@@ -19,7 +19,7 @@ import { useState, useEffect } from 'react';
 import type * as Immutable from 'immutable';
 
 import type Role from 'logic/roles/Role';
-import type { PaginatedUsers } from 'stores/users/UsersStore';
+import type { PaginatedUsers } from 'hooks/useUsers';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { DataTable, PaginatedList, Spinner, NoSearchResult } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';

@@ -22,7 +22,7 @@ import type { AuthenticationBackendJSON } from 'logic/authentication/Authenticat
 import { qualifyUrl } from 'util/URLUtils';
 import fetch, { Builder } from 'logic/rest/FetchProvider';
 import PaginationURL from 'util/PaginationURL';
-import type { PaginatedUsers } from 'stores/users/UsersStore';
+import type { PaginatedUsers } from 'hooks/useUsers';
 import type { PaginatedResponseType, Pagination, PaginatedList } from 'stores/PaginationTypes';
 import ApiRoutes from 'routing/ApiRoutes';
 import type { UserOverviewJSON } from 'logic/users/UserOverview';

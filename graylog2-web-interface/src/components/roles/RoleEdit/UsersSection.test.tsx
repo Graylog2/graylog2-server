@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import userEvent from '@testing-library/user-event';
-import { addMembersToRole, loadUsersForRole, removeMemberFromRole } from 'hooks/useAuthzRoles';
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
 
+import { addMembersToRole, loadUsersForRole, removeMemberFromRole } from 'hooks/useAuthzRoles';
 import selectEvent from 'helpers/selectEvent';
 import { alertsManager as exampleRole } from 'fixtures/roles';
 import { alice, bob, charlie } from 'fixtures/userOverviews';
@@ -52,10 +52,9 @@ const mockLoadUsersPromise = Promise.resolve({
   },
 });
 
-jest.mock('stores/users/UsersStore', () => ({
-  UsersActions: {
-    loadUsersPaginated: jest.fn(() => mockLoadUsersPromise),
-  },
+jest.mock('hooks/useUsers', () => ({
+  USERS_QUERY_KEY: ['users'],
+  loadUsersPaginated: jest.fn(() => mockLoadUsersPromise),
 }));
 
 describe('UsersSection', () => {
