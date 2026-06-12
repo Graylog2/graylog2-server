@@ -26,6 +26,7 @@ import HeaderElements from 'views/components/HeaderElements';
 import QueryBarElements from 'views/components/QueryBarElements';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
+import ViewUpdateBanner from 'views/components/dashboard/ViewUpdateBanner';
 import QueryBar from 'views/components/QueryBar';
 import { FieldsOverview } from 'views/components/sidebar';
 import DashboardSearchBar from 'views/components/DashboardSearchBar';
@@ -212,6 +213,7 @@ const Search = ({ forceSideBarPinned = false }: Props) => {
                                     <IfInteractive>
                                       <HeaderElements />
                                       {InfoBar && <InfoBar />}
+                                      <ViewUpdateBanner />
                                       <IfDashboard>
                                         {!editingWidget && <DashboardSearchBar scrollContainer={scrollContainer} />}
                                       </IfDashboard>

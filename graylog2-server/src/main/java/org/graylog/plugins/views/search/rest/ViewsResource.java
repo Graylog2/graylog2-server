@@ -397,6 +397,14 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         final ViewDTO updatedDTO = dto.toBuilder().id(id).build();
         validateDto(updatedDTO, searchUser);
 
+        // When search_id changes, tag the old search with this view ID so
+        // in-flight executions by other users still pass the permission check.
+        dbService.get(id).ifPresent(existing -> {
+            if (!existing.searchId().equals(updatedDTO.searchId())) {
+                searchDomain.setAssociatedView(existing.searchId(), id);
+            }
+        });
+
         var result = dbService.update(updatedDTO);
         recentActivityService.update(result.id(), result.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, searchUser);
         updateViewSharing(createEntityRequest, searchUser, result);

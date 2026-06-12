@@ -75,6 +75,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -440,6 +441,39 @@ public class ViewsResourceTest {
                 .hasMessageContaining("Failed to resolve view:test-resolver__invalid-view-id");
     }
 
+    @Test
+    public void callsSetAssociatedViewWhenSearchIdChanges() {
+        final String oldSearchId = "old-search-id";
+        final String newSearchId = "new-search-id";
+        final ViewDTO existingView = ViewDTO.builder()
+                .id(VIEW_ID).searchId(oldSearchId).title("test")
+                .state(Collections.emptyMap()).build();
+        final Search oldSearch = Search.builder().id(oldSearchId).queries(ImmutableSet.of()).build();
+        final Search newSearch = Search.builder().id(newSearchId).queries(ImmutableSet.of()).build();
+        final ViewService viewService = mockViewService(existingView);
+        when(viewService.update(any())).thenReturn(existingView.toBuilder().searchId(newSearchId).build());
+        final SearchDomain searchDomain = mock(SearchDomain.class);
+
+        final ViewDTO updatedViewDto = existingView.toBuilder().searchId(newSearchId).build();
+        createViewsResource(viewService, searchDomain, oldSearch, newSearch)
+                .update(VIEW_ID, CreateEntityRequest.create(updatedViewDto, null), SEARCH_USER);
+
+        verify(searchDomain).setAssociatedView(oldSearchId, VIEW_ID);
+    }
+
+    @Test
+    public void doesNotCallSetAssociatedViewWhenSearchIdUnchanged() {
+        final ViewDTO existingView = TEST_DASHBOARD_VIEW; // searchId = SEARCH_ID
+        final ViewService viewService = mockViewService(existingView);
+        when(viewService.update(any())).thenReturn(existingView);
+        final SearchDomain searchDomain = mock(SearchDomain.class);
+
+        createViewsResource(viewService, searchDomain, SEARCH)
+                .update(VIEW_ID, CreateEntityRequest.create(existingView, null), SEARCH_USER);
+
+        verify(searchDomain, never()).setAssociatedView(any(), any());
+    }
+
     private ViewsResource createViewsResource(final ViewService viewService, final StartPageService startPageService, final RecentActivityService recentActivityService, final ClusterEventBus clusterEventBus, ReferencedSearchFiltersHelper referencedSearchFiltersHelper, SearchFilterVisibilityChecker searchFilterVisibilityChecker, final Map<String, ViewResolver> viewResolvers, Search... existingSearches) {
 
         final SearchDomain searchDomain = mock(SearchDomain.class);
@@ -459,6 +493,22 @@ public class ViewsResourceTest {
             protected User getCurrentUser() {
                 return mock(User.class);
             }
+        };
+    }
+
+    private ViewsResource createViewsResource(final ViewService viewService,
+                                               final SearchDomain searchDomain,
+                                               Search... existingSearches) {
+        for (Search search : existingSearches) {
+            when(searchDomain.getForUser(eq(search.id()), eq(SEARCH_USER))).thenReturn(Optional.of(search));
+        }
+        return new ViewsResource(viewService, mock(StartPageService.class),
+                mock(RecentActivityService.class), mock(ClusterEventBus.class), searchDomain,
+                EMPTY_VIEW_RESOLVERS, EMPTY_SEARCH_FILTER_VISIBILITY_CHECKER,
+                new ReferencedSearchFiltersHelper(), mock(AuditEventSender.class),
+                mock(ObjectMapper.class), mock(EntitySharesService.class), mock(EntitySourceService.class)) {
+            @Override protected Subject getSubject() { return mock(Subject.class); }
+            @Override protected User getCurrentUser() { return mock(User.class); }
         };
     }
 

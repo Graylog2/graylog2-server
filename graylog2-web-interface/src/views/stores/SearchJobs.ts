@@ -53,11 +53,13 @@ export type SearchJobType = {
 export type JobIdsJson = {
   id: string;
   executing_node: string;
+  view_last_updated_at?: string;
 };
 
 export type JobIds = {
   asyncSearchId: string;
   nodeId: string;
+  viewLastUpdatedAt?: string;
 };
 
 export function runStartJob(search: Search, executionState: SearchExecutionState): Promise<JobIdsJson> {

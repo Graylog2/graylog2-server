@@ -59,7 +59,7 @@ export type StartJobType = (
 export const startJob: StartJobType = async (search, searchTypesToSearch, executionStateParam, keepQueries = []) => {
   const executionState = buildSearchExecutionState(searchTypesToSearch, executionStateParam, keepQueries);
 
-  return runStartJob(search, executionState).then((res) => ({ asyncSearchId: res.id, nodeId: res.executing_node }));
+  return runStartJob(search, executionState).then((res) => ({ asyncSearchId: res.id, nodeId: res.executing_node, viewLastUpdatedAt: res.view_last_updated_at }));
 };
 
 const getDelayTime = (depth: number = 1): number => {

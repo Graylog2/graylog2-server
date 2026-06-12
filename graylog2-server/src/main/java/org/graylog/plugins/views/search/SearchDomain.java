@@ -80,7 +80,18 @@ public class SearchDomain {
             throw new PermissionException("Unable to update search with id <" + search.id() + ">, already exists and user is not permitted to overwrite it.");
         }
 
-        return dbService.save(search.withOwner(searchUser.username()));
+        // Strip any user-supplied viewId — this field is managed exclusively by the system
+        return dbService.save(search
+                .withOwner(searchUser.username())
+                .toBuilder()
+                .viewId(Optional.empty())
+                .build());
+    }
+
+    public void setAssociatedView(String searchId, String viewId) {
+        dbService.get(searchId).ifPresent(search ->
+            dbService.save(search.withViewId(viewId))
+        );
     }
 
     private boolean hasReadPermissionFor(SearchPermissions searchPermissions, Predicate<ViewDTO> viewReadPermission, Search search) {
@@ -93,10 +104,16 @@ public class SearchDomain {
         views.addAll(viewService.forSearch(search.id()));
         views.addAll(viewResolvers.values().stream()
                 .flatMap(viewResolver -> viewResolver.getBySearchId(search.id()).stream()).collect(Collectors.toSet()));
-        if (views.isEmpty()) {
-            return false;
+
+        if (!views.isEmpty()) {
+            return views.stream().anyMatch(viewReadPermission);
         }
 
-        return views.stream().anyMatch(viewReadPermission);
+        // Fallback: search was previously associated with a view (now uses a newer search object).
+        // Allow if the user can still read that view.
+        return search.viewId()
+                .flatMap(vid -> viewService.get(vid))
+                .map(viewReadPermission::test)
+                .orElse(false);
     }
 }

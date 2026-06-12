@@ -184,6 +184,77 @@ public class SearchDomainTest {
     }
 
     @Test
+    public void loadsSearchIfSearchIsPermittedViaAssociatedView() {
+        final String viewId = "some-view-id";
+        final Search search = Search.builder()
+                .id(UUID.randomUUID().toString())
+                .owner("someone else")
+                .viewId(Optional.of(viewId))
+                .build();
+        allSearchesInDb.add(search);
+        when(dbService.get(search.id())).thenReturn(Optional.of(search));
+        final SearchUser searchUser = mock(SearchUser.class);
+        final ViewDTO viewDTO = mock(ViewDTO.class);
+        when(viewService.forSearch(anyString())).thenReturn(ImmutableList.of());
+        when(viewService.get(viewId)).thenReturn(Optional.of(viewDTO));
+        when(searchUser.canReadView(viewDTO)).thenReturn(true);
+
+        final Optional<Search> result = sut.getForUser(search.id(), searchUser);
+
+        assertThat(result).isEqualTo(Optional.of(search));
+    }
+
+    @Test
+    public void throwsPermissionExceptionIfAssociatedViewNotReadableByUser() {
+        final String viewId = "some-view-id";
+        final Search search = Search.builder()
+                .id(UUID.randomUUID().toString())
+                .owner("someone else")
+                .viewId(Optional.of(viewId))
+                .build();
+        allSearchesInDb.add(search);
+        when(dbService.get(search.id())).thenReturn(Optional.of(search));
+        final SearchUser searchUser = mock(SearchUser.class);
+        final ViewDTO viewDTO = mock(ViewDTO.class);
+        when(viewService.forSearch(anyString())).thenReturn(ImmutableList.of());
+        when(viewService.get(viewId)).thenReturn(Optional.of(viewDTO));
+        when(searchUser.canReadView(viewDTO)).thenReturn(false);
+
+        assertThatExceptionOfType(PermissionException.class)
+                .isThrownBy(() -> sut.getForUser(search.id(), searchUser));
+    }
+
+    @Test
+    public void saveForUserStripsUserSuppliedViewId() {
+        final Search search = Search.builder()
+                .id(UUID.randomUUID().toString())
+                .owner(null)
+                .viewId(Optional.of("attacker-supplied-view"))
+                .build();
+        when(dbService.get(search.id())).thenReturn(Optional.of(search));
+        final SearchUser searchUser = mock(SearchUser.class);
+        when(searchUser.username()).thenReturn("alice");
+        when(searchUser.isAdmin()).thenReturn(true);
+
+        sut.saveForUser(search, searchUser);
+
+        final ArgumentCaptor<Search> savedCaptor = ArgumentCaptor.forClass(Search.class);
+        verify(dbService, times(1)).save(savedCaptor.capture());
+        assertThat(savedCaptor.getValue().viewId()).isEmpty();
+    }
+
+    @Test
+    public void setAssociatedViewPersistsViewIdOnSearch() {
+        final Search search = mockSearchWithOwner("alice");
+
+        sut.setAssociatedView(search.id(), "view-123");
+
+        final ArgumentCaptor<Search> savedCaptor = ArgumentCaptor.forClass(Search.class);
+        verify(dbService, times(1)).save(savedCaptor.capture());
+        assertThat(savedCaptor.getValue().viewId()).contains("view-123");
+    }
+
+    @Test
     public void guardExceptionOnPostLeadsTo403() {
         final Search search = mockSearchWithOwner("someone");
         final SearchUser searchUser = mock(SearchUser.class);

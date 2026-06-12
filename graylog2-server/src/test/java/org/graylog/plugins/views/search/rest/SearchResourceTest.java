@@ -24,19 +24,26 @@ import org.assertj.core.api.Assertions;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
+import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.SearchExecutor;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog2.plugin.database.users.User;
+import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,8 +68,20 @@ public class SearchResourceTest {
     @Mock
     private ClusterConfigService clusterConfigService;
 
+    @Mock
+    private ViewService viewService;
+
     private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
 
+
+    private SearchResource makeResource(SearchDomain searchDomain) {
+        return new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus, clusterConfigService, viewService) {
+            @Override
+            protected User getCurrentUser() {
+                return mock(User.class);
+            }
+        };
+    }
 
     @Test
     public void testBuilderGeneratesSearchId() {
@@ -86,7 +105,7 @@ public class SearchResourceTest {
                 .build();
 
         final SearchDomain searchDomain = mockSearchDomain(Optional.of(search));
-        final SearchResource resource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus, clusterConfigService);
+        final SearchResource resource = makeResource(searchDomain);
         final SearchDTO returnedSearch = resource.getSearch(search.id(), searchUser);
 
         assertThat(returnedSearch.id()).isEqualTo(search.id());
@@ -95,7 +114,7 @@ public class SearchResourceTest {
     @Test
     public void getSearchThrowsNotFoundIfSearchDoesntExist() {
         final SearchDomain searchDomain = mockSearchDomain(Optional.empty());
-        final SearchResource resource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus, clusterConfigService);
+        final SearchResource resource = makeResource(searchDomain);
         assertThatExceptionOfType(NotFoundException.class)
                 .isThrownBy(() -> resource.getSearch("god", searchUser))
                 .withMessageContaining("god");
@@ -108,10 +127,54 @@ public class SearchResourceTest {
         final SearchDomain searchDomain = mock(SearchDomain.class);
         when(searchDomain.saveForUser(any(), any())).thenReturn(search.toSearch());
 
-        final SearchResource resource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus, clusterConfigService);
+        final SearchResource resource = makeResource(searchDomain);
         final Response response = resource.createSearch(search, searchUser);
 
         Assertions.assertThat(response.getStatus()).isEqualTo(Response.Status.CREATED.getStatusCode());
+    }
+
+    @Test
+    public void executeQuerySetsViewLastUpdatedAtFromSearchViewId() {
+        final String viewId = "view-123";
+        final DateTime updatedAt = DateTime.now(DateTimeZone.UTC);
+        final Search search = Search.builder().id("search-id").viewId(Optional.of(viewId)).build();
+        final SearchJob job = new SearchJob("job-id", search, "owner", "node-1");
+        when(searchExecutor.executeAsync(eq("search-id"), any(), any())).thenReturn(job);
+        final ViewDTO view = mock(ViewDTO.class);
+        when(view.lastUpdatedAt()).thenReturn(updatedAt);
+        when(viewService.get(viewId)).thenReturn(Optional.of(view));
+
+        final Response response = makeResource(mock(SearchDomain.class)).executeQuery("search-id", null, searchUser);
+        final SearchJob returned = (SearchJob) response.getEntity();
+
+        assertThat(returned.getViewLastUpdatedAt()).isEqualTo(updatedAt);
+    }
+
+    @Test
+    public void executeQuerySetsViewLastUpdatedAtViaForSearchFallback() {
+        final DateTime updatedAt = DateTime.now(DateTimeZone.UTC);
+        final Search search = Search.builder().id("search-id").build();
+        final SearchJob job = new SearchJob("job-id", search, "owner", "node-1");
+        when(searchExecutor.executeAsync(eq("search-id"), any(), any())).thenReturn(job);
+        final ViewDTO view = mock(ViewDTO.class);
+        when(view.lastUpdatedAt()).thenReturn(updatedAt);
+        when(viewService.forSearch("search-id")).thenReturn(List.of(view));
+
+        final Response response = makeResource(mock(SearchDomain.class)).executeQuery("search-id", null, searchUser);
+
+        assertThat(((SearchJob) response.getEntity()).getViewLastUpdatedAt()).isEqualTo(updatedAt);
+    }
+
+    @Test
+    public void executeQueryLeavesViewLastUpdatedAtNullWhenNoViewFound() {
+        final Search search = Search.builder().id("search-id").build();
+        final SearchJob job = new SearchJob("job-id", search, "owner", "node-1");
+        when(searchExecutor.executeAsync(eq("search-id"), any(), any())).thenReturn(job);
+        when(viewService.forSearch(any())).thenReturn(List.of());
+
+        final Response response = makeResource(mock(SearchDomain.class)).executeQuery("search-id", null, searchUser);
+
+        assertThat(((SearchJob) response.getEntity()).getViewLastUpdatedAt()).isNull();
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")

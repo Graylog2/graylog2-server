@@ -32,7 +32,7 @@ import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { SearchParser } from 'views/logic/slices/searchMetadataSlice';
 import { parseSearch } from 'views/logic/slices/searchMetadataSlice';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
-import { selectParameters } from 'views/logic/slices/viewSelectors';
+import { selectParameters, selectView } from 'views/logic/slices/viewSelectors';
 import {
   selectGlobalOverride,
   selectSearchTypesToSearch,
@@ -56,6 +56,7 @@ const initialState = {
   isLoading: false,
   result: undefined,
   jobIds: null,
+  serverViewLastUpdatedAt: undefined as string | undefined,
 };
 
 const searchExecutionSlice = createSlice({
@@ -120,6 +121,10 @@ const searchExecutionSlice = createSlice({
       ...state,
       jobIds: action.payload,
     }),
+    setServerViewLastUpdatedAt: (state, action: PayloadAction<string | undefined>) => ({
+      ...state,
+      serverViewLastUpdatedAt: action.payload,
+    }),
   },
 });
 
@@ -133,6 +138,7 @@ export const {
   setParameterValues,
   setParameterBindings,
   setJobIds,
+  setServerViewLastUpdatedAt,
 } = searchExecutionSlice.actions;
 
 export const searchExecutionSliceReducer = searchExecutionSlice.reducer;
@@ -225,7 +231,7 @@ export const executeWithExecutionState =
     perPage?: number;
     stopPolling?: (progress: number) => boolean;
   }) =>
-  async (dispatch: ViewsDispatch) => {
+  (dispatch: ViewsDispatch, getState: () => RootState) => {
     dispatch(loading());
 
     return dispatch(parseSearch(search, searchExecutors.parse))
@@ -234,9 +240,16 @@ export const executeWithExecutionState =
 
         return searchExecutors.startJob(search, searchTypesToSearch, executionState, [activeQuery]);
       })
-      .then((jobIds: JobIds) =>
-        dispatch(executeSearchJob({ searchExecutors, jobIds, widgetMapping, page, perPage, stopPolling })),
-      )
+      .then((jobIds: JobIds) => {
+        if (jobIds?.viewLastUpdatedAt) {
+          const view = selectView(getState());
+          if (view?.lastUpdatedAt && new Date(jobIds.viewLastUpdatedAt) > view.lastUpdatedAt) {
+            dispatch(setServerViewLastUpdatedAt(jobIds.viewLastUpdatedAt));
+          }
+        }
+
+        return dispatch(executeSearchJob({ searchExecutors, jobIds, widgetMapping, page, perPage, stopPolling }));
+      })
       .catch((error) => {
         dispatch(cancelExecutedJob());
         dispatch(stopLoading());
