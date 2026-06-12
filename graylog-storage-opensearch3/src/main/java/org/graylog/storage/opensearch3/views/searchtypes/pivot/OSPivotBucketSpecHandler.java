@@ -26,6 +26,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentile;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
+import org.graylog2.indexer.fieldtypes.FieldTypeMapper;
 import org.opensearch.client.opensearch._types.SortOrder;
 import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 
@@ -117,7 +118,7 @@ public abstract class OSPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
     }
 
     private boolean isNumericFieldType(String fieldType) {
-        return fieldType.equals("long") || fieldType.equals("double") || fieldType.equals("float");
+        return FieldTypeMapper.isNumericType(fieldType);
     }
 
     public abstract Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpecs, PivotBucket previousBucket);
