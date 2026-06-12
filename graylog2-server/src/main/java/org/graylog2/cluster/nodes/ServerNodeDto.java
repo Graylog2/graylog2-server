@@ -71,6 +71,14 @@ public abstract class ServerNodeDto extends NodeDto {
     public abstract Builder toBuilder();
 
     @Override
+    public ServerNodeDto offline() {
+        return toBuilder()
+                .setOnline(false)
+                .setLeader(false)
+                .build();
+    }
+
+    @Override
     public Map<String, Object> toEntityParameters() {
         final Map<String, Object> entityParameters = super.toEntityParameters();
         entityParameters.put(FIELD_IS_PROCESSING, isProcessing());
@@ -99,7 +107,8 @@ public abstract class ServerNodeDto extends NodeDto {
         @JsonCreator
         public static Builder builder() {
             return new AutoValue_ServerNodeDto.Builder()
-                    .setProcessing(false);
+                    .setProcessing(false)
+                    .setOnline(true);
         }
 
         public abstract ServerNodeDto build();

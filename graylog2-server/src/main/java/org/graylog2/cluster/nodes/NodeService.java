@@ -21,17 +21,34 @@ import org.graylog2.plugin.system.NodeId;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
 public interface NodeService<T extends NodeDto> {
     boolean registerServer(T dto);
 
+    /**
+     * Returns the node identified by {@code nodeId} if it is currently online.
+     * Offline (historical) rows are filtered out; use {@link #byNodeIdAnyState(String)} to include them.
+     */
     T byNodeId(String nodeId) throws NodeNotFoundException;
 
     T byNodeId(NodeId nodeId) throws NodeNotFoundException;
 
+    /**
+     * Returns the node identified by {@code nodeId} regardless of online state.
+     * Used for inventory/history queries (e.g. upgrade tracking).
+     */
+    Optional<T> byNodeIdAnyState(String nodeId);
+
     Map<String, T> byNodeIds(Collection<String> nodeIds);
 
     Map<String, T> allActive();
+
+    /**
+     * Returns every known node, including offline ones. Useful for inventory queries
+     * (e.g. "which nodes haven't been upgraded yet").
+     */
+    Map<String, T> allKnown();
 
     void dropOutdated();
 

@@ -31,7 +31,7 @@ public class TestShutdownService extends GracefulShutdownService {
     }
 
     @Override
-    protected void shutDown() {
+    public void shutDown() {
         shutdownHookSet.forEach(h -> {
             try {
                 h.doGracefulShutdown();
