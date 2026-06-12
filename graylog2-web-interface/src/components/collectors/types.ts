@@ -42,6 +42,7 @@ export type CollectorInstanceView = {
   os: string | null;
   version: string | null;
   status: 'online' | 'offline';
+  has_pending_changes: boolean;
 };
 
 export type SourceType = 'file' | 'journald' | 'windows_event_log';
@@ -191,5 +192,18 @@ export type FleetReassignedActivityEntry = ActivityEntryBase & {
 export type ActivityEntry = SimpleActivityEntry | FleetReassignedActivityEntry;
 
 export type RecentActivityResponse = {
+  activities: ActivityEntry[];
+};
+
+export type CoalescedActions = {
+  recompute_config: boolean;
+  recompute_ingest_config: boolean;
+  reassign_target_fleet_id: string | null;
+  restart: boolean;
+  run_discovery: boolean;
+};
+
+export type PendingChangesResponse = {
+  coalesced: CoalescedActions;
   activities: ActivityEntry[];
 };

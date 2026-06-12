@@ -15,16 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import { Label, Table } from 'components/bootstrap';
+import { Button, Label, Table } from 'components/bootstrap';
 import Drawer from 'components/common/Drawer';
-import { Link, RelativeTime } from 'components/common';
+import { Icon, Link, RelativeTime, Spinner } from 'components/common';
+import type { IconName } from 'components/common/Icon/types';
 import Routes from 'routing/Routes';
 
+import ActivityEntryList from '../common/ActivityEntryList';
+import { IconRow, IconRowList } from '../common/IconRowList';
+import SyncStateIndicator from '../common/SyncStateIndicator';
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
 import collectorSystemLogsUrl from '../common/collectorSystemLogsUrl';
-import type { CollectorInstanceView, Source } from '../types';
+import { useInstancePendingChanges } from '../hooks';
+import type { ActivityEntry, CoalescedActions, CollectorInstanceView, Source } from '../types';
 
 type Props = {
   instance: CollectorInstanceView;
@@ -86,8 +92,66 @@ const SourceList = styled.div`
   gap: ${({ theme }) => theme.spacings.xs};
 `;
 
+const EffectList = styled(IconRowList)(
+  ({ theme }) => css`
+    margin-top: ${theme.spacings.xs};
+  `,
+);
+
+const TransactionsToggle = styled(Button)`
+  padding-left: 0;
+`;
+
+type PendingEffect = { key: string; icon: IconName; description: React.ReactNode };
+
+// The net effect still awaiting the collector, as imperative one-liners. The
+// reassign destination comes resolved from the corresponding activity entry (the coalesced view
+// only carries the fleet id).
+const pendingEffects = (coalesced: CoalescedActions, activities: ActivityEntry[]): PendingEffect[] => {
+  const effects: PendingEffect[] = [];
+
+  if (coalesced.reassign_target_fleet_id) {
+    const destination = activities
+      .map((entry) => (entry.type === 'FLEET_REASSIGNED' ? entry.details?.destination_fleet : null))
+      .filter(Boolean)
+      .pop();
+    effects.push({
+      key: 'reassign',
+      icon: 'shuffle',
+      description: destination?.id ? (
+        <>
+          Reassign to fleet <Link to={Routes.SYSTEM.COLLECTORS.FLEET(destination.id)}>{destination.name}</Link>
+        </>
+      ) : (
+        'Reassign to another fleet'
+      ),
+    });
+  }
+
+  if (coalesced.recompute_config) {
+    effects.push({ key: 'config', icon: 'settings', description: 'Reload configuration' });
+  }
+  if (coalesced.recompute_ingest_config) {
+    effects.push({ key: 'ingest-config', icon: 'settings', description: 'Reload ingest configuration' });
+  }
+  if (coalesced.restart) {
+    effects.push({ key: 'restart', icon: 'refresh', description: 'Restart' });
+  }
+  if (coalesced.run_discovery) {
+    effects.push({ key: 'discovery', icon: 'search', description: 'Run source discovery' });
+  }
+
+  return effects;
+};
+
 const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) => {
   const osDescription = (instance.non_identifying_attributes?.['os.description'] as string) ?? null;
+  const { data: pendingChanges } = useInstancePendingChanges(instance.instance_uid);
+  // Until the pending-changes detail has loaded, fall back to the flag from the table row.
+  const hasPendingChanges = pendingChanges
+    ? pendingChanges.activities.length > 0
+    : instance.has_pending_changes;
+  const [showTransactions, setShowTransactions] = useState(false);
 
   return (
     <Drawer title={instance.hostname || instance.instance_uid} onClose={onClose} size="md">
@@ -97,6 +161,11 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
           <Label bsStyle={instance.status === 'online' ? 'success' : 'default'}>
             {instance.status === 'online' ? 'Online' : 'Offline'}
           </Label>
+        </DetailRow>
+
+        <DetailRow>
+          <Title>Sync:</Title>
+          <SyncStateIndicator pending={hasPendingChanges} withLabel />
         </DetailRow>
 
         <DetailRow>
@@ -173,6 +242,37 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
               </SourceItem>
             ))}
           </SourceList>
+        )}
+      </Section>
+
+      <Section>
+        <SectionTitle>Synchronization</SectionTitle>
+        {hasPendingChanges && !pendingChanges && <Spinner />}
+        {hasPendingChanges && pendingChanges && (
+          <>
+            <span>The following actions are queued until the collector synchronizes:</span>
+            <EffectList>
+              {pendingEffects(pendingChanges.coalesced, pendingChanges.activities).map((effect) => (
+                <IconRow key={effect.key}>
+                  <Icon name={effect.icon} />
+                  <span>{effect.description}</span>
+                </IconRow>
+              ))}
+            </EffectList>
+            <TransactionsToggle bsStyle="link" bsSize="xsmall" onClick={() => setShowTransactions((show) => !show)}>
+              {showTransactions
+                ? 'Hide queued transactions'
+                : `Show queued transactions (${pendingChanges.activities.length})`}
+            </TransactionsToggle>
+            {showTransactions && <ActivityEntryList entries={pendingChanges.activities} />}
+          </>
+        )}
+        {!hasPendingChanges && (
+          <>
+            <SyncStateIndicator pending={false} withLabel />
+            <br />
+            <EmptyText>The collector has applied all queued actions.</EmptyText>
+          </>
         )}
       </Section>
     </Drawer>

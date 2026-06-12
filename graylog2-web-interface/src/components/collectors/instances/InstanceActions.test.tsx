@@ -54,6 +54,7 @@ const mockInstance: CollectorInstanceView = {
   os: 'linux',
   version: '1.2.0',
   status: 'online',
+  has_pending_changes: false,
 };
 
 const deleteInstanceMock = jest.fn(() => Promise.resolve());

@@ -44,3 +44,4 @@ export { default as useCollectorInputMutations } from './useCollectorInputMutati
 export { default as useDefaultInstanceFilters } from './useDefaultInstanceFilters';
 
 export { useRecentActivity, ACTIVITY_KEY } from './useActivityQueries';
+export { default as useInstancePendingChanges } from './useInstancePendingChanges';

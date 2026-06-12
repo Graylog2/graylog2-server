@@ -28,6 +28,10 @@ import { InstanceDetailDrawer } from './index';
 import type { CollectorInstanceView } from '../types';
 import { fetchPaginatedInstances, instancesKeyFn, useFleets, useSources, useDefaultInstanceFilters } from '../hooks';
 
+// Matches the default collector heartbeat interval, so the "Pending" badge (and status/last_seen)
+// clear on their own once a collector has applied its changes.
+const REFETCH_INTERVAL_MS = 30_000;
+
 const CollectorsInstances = () => {
   const [selectedInstance, setSelectedInstance] = useState<CollectorInstanceView | null>(null);
   const { data: fleets } = useFleets();
@@ -50,6 +54,7 @@ const CollectorsInstances = () => {
         entityActions={entityActions}
         tableLayout={DEFAULT_LAYOUT}
         fetchEntities={fetchPaginatedInstances}
+        fetchOptions={{ refetchInterval: REFETCH_INTERVAL_MS }}
         keyFn={instancesKeyFn}
         entityAttributesAreCamelCase={false}
         columnRenderers={columnRenderers}

@@ -16,10 +16,16 @@
  */
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
+
+import asMock from 'helpers/mocking/AsMock';
 
 import InstanceDetailDrawer from './InstanceDetailDrawer';
 
-import type { CollectorInstanceView, Source } from '../types';
+import useInstancePendingChanges from '../hooks/useInstancePendingChanges';
+import type { CollectorInstanceView, PendingChangesResponse, Source } from '../types';
+
+jest.mock('../hooks/useInstancePendingChanges');
 
 const mockInstance: CollectorInstanceView = {
   id: 'inst-1',
@@ -38,6 +44,7 @@ const mockInstance: CollectorInstanceView = {
   os: 'linux',
   version: '1.2.0',
   status: 'online',
+  has_pending_changes: false,
 };
 
 const mockSources: Source[] = [
@@ -52,7 +59,31 @@ const mockSources: Source[] = [
   },
 ];
 
+const pendingChanges: PendingChangesResponse = {
+  coalesced: {
+    recompute_config: true,
+    recompute_ingest_config: false,
+    reassign_target_fleet_id: 'fleet-2',
+    restart: false,
+    run_discovery: false,
+  },
+  activities: [
+    {
+      seq: 42,
+      timestamp: '2026-06-10T12:00:00Z',
+      type: 'FLEET_REASSIGNED',
+      actor: { username: 'alice', full_name: 'Alice Admin' },
+      targets: [{ id: 'uid-1', name: 'prod-web-01', type: 'collector' }],
+      details: { destination_fleet: { id: 'fleet-2', name: 'Staging', type: 'fleet' } },
+    },
+  ],
+};
+
 describe('InstanceDetailDrawer', () => {
+  beforeEach(() => {
+    asMock(useInstancePendingChanges).mockReturnValue({ data: undefined, isLoading: true });
+  });
+
   it('renders instance hostname as title', async () => {
     render(
       <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
@@ -85,5 +116,69 @@ describe('InstanceDetailDrawer', () => {
     const link = await screen.findByRole('link', { name: /^received messages$/i });
     expect(link).toHaveAttribute('href', expect.stringContaining('collector_instance_uid'));
     expect(link).toHaveAttribute('href', expect.stringContaining('uid-1'));
+  });
+
+  it('renders pending changes as the effects the collector will apply', async () => {
+    asMock(useInstancePendingChanges).mockReturnValue({ data: pendingChanges, isLoading: false });
+
+    render(
+      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+    );
+
+    await screen.findByText('Synchronization');
+    await screen.findByText('Sync pending');
+    await screen.findByText(/reassign to fleet/i);
+    await screen.findByRole('link', { name: 'Staging' });
+    await screen.findByText(/reload configuration/i);
+
+    // The queued transactions are collapsed by default and expand on demand.
+    expect(screen.queryByText('by Alice Admin')).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: /show queued transactions \(1\)/i }));
+    await screen.findByText('by Alice Admin');
+  });
+
+  it('shows a spinner while pending details are loading', async () => {
+    asMock(useInstancePendingChanges).mockReturnValue({ data: undefined, isLoading: true });
+    const pendingInstance = { ...mockInstance, has_pending_changes: true };
+
+    render(
+      <InstanceDetailDrawer
+        instance={pendingInstance}
+        sources={mockSources}
+        fleetName="production"
+        onClose={jest.fn()}
+      />,
+    );
+
+    await screen.findByText('Synchronization');
+    await screen.findByText(/loading/i);
+    expect(screen.queryByText(/queued until the collector synchronizes/i)).not.toBeInTheDocument();
+    expect(screen.queryByText('In sync')).not.toBeInTheDocument();
+  });
+
+  it('hides the pending changes section when the instance is caught up', async () => {
+    asMock(useInstancePendingChanges).mockReturnValue({
+      data: {
+        coalesced: {
+          recompute_config: false,
+          recompute_ingest_config: false,
+          reassign_target_fleet_id: null,
+          restart: false,
+          run_discovery: false,
+        },
+        activities: [],
+      },
+      isLoading: false,
+    });
+
+    render(
+      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+    );
+
+    await screen.findByRole('dialog', { name: /prod-web-01/i });
+    // "In sync" appears in the top detail row and in the Synchronization section
+    expect(await screen.findAllByText('In sync')).toHaveLength(2);
+    await screen.findByText(/applied all queued actions/i);
+    expect(screen.queryByText(/queued until the collector synchronizes/i)).not.toBeInTheDocument();
   });
 });
