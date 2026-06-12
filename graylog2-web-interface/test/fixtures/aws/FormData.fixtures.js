@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line import/prefer-default-export
 import { AWS_AUTH_TYPES, DEFAULT_KINESIS_LOG_TYPE } from 'integrations/aws/common/constants';
 
 export const exampleFormDataWithKeySecretAuth = {
   awsAuthenticationType: { value: AWS_AUTH_TYPES.keysecret },
   awsCloudWatchAddFlowLogPrefix: { value: true },
   awsAssumeRoleARN: { value: '' },
+  awsExternalId: { value: '' },
   awsAccessKey: { value: 'mykey' },
   awsCloudWatchAwsRegion: { value: 'us-east-1' },
   awsCloudWatchBatchSize: { value: 10000 },
@@ -40,6 +40,7 @@ export const exampleFormDataWithAutomaticAuth = {
   awsAuthenticationType: { value: AWS_AUTH_TYPES.automatic },
   awsCloudWatchAddFlowLogPrefix: { value: true },
   awsAssumeRoleARN: { value: '' },
+  awsExternalId: { value: '' },
   awsCloudWatchAwsRegion: { value: 'us-east-1' },
   awsCloudWatchBatchSize: { value: 10000 },
   awsEndpointCloudWatch: { value: undefined },

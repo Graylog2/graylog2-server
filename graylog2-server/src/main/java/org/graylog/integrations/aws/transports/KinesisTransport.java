@@ -121,6 +121,7 @@ public class KinesisTransport extends ThrottleableTransport2 {
         final String key = configuration.getString(CK_ACCESS_KEY);
         final EncryptedValue secret = configuration.getEncryptedValue(CK_SECRET_KEY);
         final String assumeRoleArn = configuration.getString(AWSInput.CK_ASSUME_ROLE_ARN);
+        final String externalId = configuration.getString(AWSInput.CK_EXTERNAL_ID);
 
         final String dynamodbEndpoint = configuration.getString(AWSInput.CK_DYNAMODB_ENDPOINT);
         final String cloudwatchEndpoint = configuration.getString(AWSInput.CK_CLOUDWATCH_ENDPOINT);
@@ -138,6 +139,7 @@ public class KinesisTransport extends ThrottleableTransport2 {
                 .awsAccessKeyId(key)
                 .awsSecretAccessKey(secret)
                 .assumeRoleArn(assumeRoleArn)
+                .externalId(externalId)
                 .cloudwatchEndpoint(cloudwatchEndpoint)
                 .dynamodbEndpoint(dynamodbEndpoint)
                 .iamEndpoint(iamEndpoint)
