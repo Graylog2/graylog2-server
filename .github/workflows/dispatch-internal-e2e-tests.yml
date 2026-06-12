@@ -1,0 +1,35 @@
+name: Notify Graylog Internal to run E2E Tests
+
+on:
+  pull_request:
+    types: [labeled, unlabeled]
+  issue_comment:
+    types: [created]
+
+jobs:
+  notifyInternal:
+    name: Notify Internal
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check if label or comment triggers the action
+        id: check
+        run: |
+          echo "should_trigger=false" >> $GITHUB_OUTPUT
+          if [[ "${{ github.event.pull_request.labels.*.name }}" == *"e2e-tests"* ]]; then
+            echo "should_trigger=true" >> $GITHUB_OUTPUT
+          fi
+          if [[ "${{ github.event.comment.body }}" == "e2e-tests" ]]; then
+            echo "should_trigger=true" >> $GITHUB_OUTPUT
+
+      - name: Dispatch e2e trigger to graylog-project-internal
+        run: >
+          gh workflow run -R Graylog2/graylog-project-internal trigger-build-for-e2e-test.yml --ref master
+          -f caller_repo=${{ github.repository }}
+          -f caller_pr_nr=${{ github.event.number }}
+          -f caller_base_branch=${{ github.base_ref || github.ref_name }}
+          -f caller_head_branch=${{ github.head_ref }}
+          -f head_sha=${{ github.event.pull_request.head.sha }}
+          -f initial_actor="${{ github.actor }}/${{ github.triggering_actor }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_GRAYLOG_PROJECT_INTERNAL_WORKFLOW_RW }}
