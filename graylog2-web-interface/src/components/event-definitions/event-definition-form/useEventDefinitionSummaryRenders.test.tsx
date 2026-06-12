@@ -64,11 +64,12 @@ describe('useEventProcedureSummaryComponents', () => {
     asMock(usePluginEntities).mockReturnValue([]);
   });
 
-  it('returns null label and null Component when no security license and no remediationSteps', () => {
+  it('returns Remediation Steps label and "No remediation steps given" message when no security license and no remediationSteps', () => {
     const { result } = renderHook(() => useEventProcedureSummaryComponents({}));
 
-    expect(result.current.label).toBeNull();
-    expect(result.current.Component).toBeNull();
+    expect(result.current.label).toBe('Remediation Steps');
+    render(<>{result.current.Component}</>);
+    expect(screen.getByTestId('markdown-preview')).toHaveTextContent('No remediation steps given');
   });
 
   it('returns Remediation Steps label and MarkdownPreview when no security license but remediationSteps given', () => {
