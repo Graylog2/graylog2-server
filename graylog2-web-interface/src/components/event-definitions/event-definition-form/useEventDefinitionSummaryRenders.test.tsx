@@ -20,8 +20,8 @@ import { render, screen } from 'wrappedTestingLibrary';
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import { defaultUser } from 'defaultMockValues';
-import { alice } from 'fixtures/users';
 
+import { alice } from 'fixtures/users';
 import { asMock } from 'helpers/mocking';
 import usePluginEntities from 'hooks/usePluginEntities';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
@@ -106,9 +106,7 @@ describe('useEventProcedureSummaryComponents', () => {
       return [];
     });
 
-    const { result } = renderHook(() =>
-      useEventProcedureSummaryComponents({ eventProcedureId: 'proc-123' }),
-    );
+    const { result } = renderHook(() => useEventProcedureSummaryComponents({ eventProcedureId: 'proc-123' }));
 
     expect(result.current.label).toBe('Event Procedure Summary');
     render(<>{result.current.Component}</>);
@@ -182,7 +180,10 @@ describe('renderField', () => {
       { type: 'template-v1', displayName: 'Template', summaryComponent: undefined },
     ]);
 
-    const config = { data_type: 'string', providers: [{ type: 'template-v1', template: '', require_values: false, table_name: '', key_field: '' }] };
+    const config = {
+      data_type: 'string',
+      providers: [{ type: 'template-v1', template: '', require_values: false, table_name: '', key_field: '' }],
+    };
     render(<>{renderField('my_field', config as any, [], defaultUser)}</>);
 
     expect(screen.getByText(/does not provide a summary/i)).toBeInTheDocument();
@@ -190,9 +191,14 @@ describe('renderField', () => {
 
   it('renders the provider summaryComponent when available', () => {
     const ProviderSummary = () => <div>Provider Summary</div>;
-    asMock(PluginStore.exports).mockReturnValue([{ type: 'template-v1', summaryComponent: ProviderSummary }]);
+    asMock(PluginStore.exports).mockReturnValue([
+      { type: 'template-v1', displayName: 'Template', summaryComponent: ProviderSummary },
+    ]);
 
-    const config = { data_type: 'string', providers: [{ type: 'template-v1', template: '', require_values: false, table_name: '', key_field: '' }] };
+    const config = {
+      data_type: 'string',
+      providers: [{ type: 'template-v1', template: '', require_values: false, table_name: '', key_field: '' }],
+    };
     render(<>{renderField('my_field', config as any, [], defaultUser)}</>);
 
     expect(screen.getByText('Provider Summary')).toBeInTheDocument();
@@ -268,7 +274,11 @@ describe('renderNotifications', () => {
       { type: 'email-notification-v1', displayName: 'Email', summaryComponent: undefined },
     ]);
 
-    render(<>{renderNotifications([definitionNotification], notificationSettings as any, [notification as any], defaultUser)}</>);
+    render(
+      <>
+        {renderNotifications([definitionNotification], notificationSettings as any, [notification as any], defaultUser)}
+      </>,
+    );
 
     expect(screen.getByText(/does not provide a summary/i)).toBeInTheDocument();
   });
@@ -279,7 +289,11 @@ describe('renderNotifications', () => {
       { type: 'email-notification-v1', displayName: 'Email', summaryComponent: NotificationSummary },
     ]);
 
-    render(<>{renderNotifications([definitionNotification], notificationSettings as any, [notification as any], defaultUser)}</>);
+    render(
+      <>
+        {renderNotifications([definitionNotification], notificationSettings as any, [notification as any], defaultUser)}
+      </>,
+    );
 
     expect(screen.getByText('Notification Summary')).toBeInTheDocument();
   });
