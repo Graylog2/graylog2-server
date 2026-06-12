@@ -50,27 +50,30 @@ const INITIAL: FormValues = {
   batchSize: '',
 };
 
-// ── Sync field validators ─────────────────────────────────────────────────────
+// ── Form validation ───────────────────────────────────────────────────────────
+const validate = (values: FormValues) => {
+  const errors: Partial<FormValues> = {};
 
-const requiredValidator = (label: string) => (value: string) => (value.trim() ? undefined : `${label} is required.`);
+  if (!values.name.trim()) {
+    errors.name = 'Name is required. Enter a name for this input.';
+  } else if (values.name.length > 100) {
+    errors.name = 'Name must be 100 characters or fewer.';
+  }
 
-const nameValidator = (value: string) => {
-  if (!value.trim()) return 'Name is required. Enter a name for this input.';
-  if (value.length > 100) return 'Name must be 100 characters or fewer.';
+  if (!values.hostname.trim()) errors.hostname = 'Hostname is required.';
 
-  return undefined;
+  if (!values.port.trim()) {
+    errors.port = 'Port is required.';
+  } else if (!/^\d+$/.test(values.port) || Number(values.port) < 1 || Number(values.port) > 65535) {
+    errors.port = 'Port must be a number between 1 and 65535.';
+  }
+
+  if (!values.username.trim()) errors.username = 'Username is required.';
+
+  if (!values.indexSet.trim()) errors.indexSet = 'Index set is required. Specify which index set to write to.';
+
+  return errors;
 };
-
-const portValidator = (value: string) => {
-  if (!value.trim()) return 'Port is required.';
-  if (!/^\d+$/.test(value) || Number(value) < 1 || Number(value) > 65535)
-    return 'Port must be a number between 1 and 65535.';
-
-  return undefined;
-};
-
-const indexSetValidator = (value: string) =>
-  value.trim() ? undefined : 'Index set is required. Specify which index set to write to.';
 
 // ── Stories ───────────────────────────────────────────────────────────────────
 
@@ -81,103 +84,118 @@ export const FormPatternExample: StoryObj = {
       source: { type: 'dynamic' },
     },
   },
+
   render: () => (
     <Formik
-        initialValues={INITIAL}
-        // eslint-disable-next-line no-alert
-        onSubmit={(values) => window.alert(`Input "${values.name}" created.`)}>
-        <Row className="content">
-          <Col md={8}>
-            <Form noValidate>
-              <h2>Create Input</h2>
+      initialValues={INITIAL}
+      validate={validate}
+      // eslint-disable-next-line no-alert
+      onSubmit={(values) => window.alert(`Input "${values.name}" created.`)}>
+      <Row className="content">
+        <Col md={8}>
+          <Form noValidate>
+            {/* ── Group 1: Identity ─────────────────────────────── */}
+            <h3 style={{ marginTop: 0 }}>Identity</h3>
+            <hr />
 
-              {/* ── Group 1: Identity ─────────────────────────────── */}
-              <h3 style={{ marginTop: 0 }}>Identity</h3>
-              <hr />
+            <FormikInput
+              id="name"
+              name="name"
+              label={
+                <>
+                  Name
+                  <RequiredMarker />
+                </>
+              }
+              required
+              placeholder="e.g. production-syslog"
+            />
+            <FormikInput
+              id="description"
+              name="description"
+              label="Description"
+              placeholder="What does this input collect?"
+            />
 
-              <FormikInput
-                id="name"
-                name="name"
-                label={<>Name<RequiredMarker /></>}
-                required
-                validate={nameValidator}
-                placeholder="e.g. production-syslog"
-              />
-              <FormikInput
-                id="description"
-                name="description"
-                label="Description"
-                placeholder="What does this input collect?"
-              />
+            {/* ── Group 2: Connection ───────────────────────────── */}
+            <h3>Connection</h3>
+            <hr />
 
-              {/* ── Group 2: Connection ───────────────────────────── */}
-              <h3>Connection</h3>
-              <hr />
+            {/* Paired fields: semantically one unit, equal width */}
+            <Row>
+              <Col sm={6}>
+                <FormikInput
+                  id="hostname"
+                  name="hostname"
+                  label={
+                    <>
+                      Hostname
+                      <RequiredMarker />
+                    </>
+                  }
+                  required
+                  placeholder="e.g. 192.168.1.1"
+                />
+              </Col>
+              <Col sm={6}>
+                <FormikInput
+                  id="port"
+                  name="port"
+                  label={
+                    <>
+                      Port
+                      <RequiredMarker />
+                    </>
+                  }
+                  required
+                  placeholder="e.g. 5140"
+                />
+              </Col>
+            </Row>
 
-              {/* Paired fields: semantically one unit, equal width */}
-              <Row>
-                <Col sm={6}>
-                  <FormikInput
-                    id="hostname"
-                    name="hostname"
-                    label={<>Hostname<RequiredMarker /></>}
-                    required
-                    validate={requiredValidator('Hostname')}
-                    placeholder="e.g. 192.168.1.1"
-                  />
-                </Col>
-                <Col sm={6}>
-                  <FormikInput
-                    id="port"
-                    name="port"
-                    label={<>Port<RequiredMarker /></>}
-                    required
-                    validate={portValidator}
-                    placeholder="e.g. 5140"
-                  />
-                </Col>
-              </Row>
+            <FormikInput
+              id="username"
+              name="username"
+              label={
+                <>
+                  Username
+                  <RequiredMarker />
+                </>
+              }
+              required
+            />
+            <FormikInput id="password" name="password" type="password" label="Password" />
 
-              <FormikInput
-                id="username"
-                name="username"
-                label={<>Username<RequiredMarker /></>}
-                required
-                validate={requiredValidator('Username')}
-              />
-              <FormikInput id="password" name="password" type="password" label="Password" />
+            {/* ── Group 3: Output ───────────────────────────────── */}
+            <h3>Output</h3>
+            <hr />
 
-              {/* ── Group 3: Output ───────────────────────────────── */}
-              <h3>Output</h3>
-              <hr />
+            <FormikInput
+              id="indexSet"
+              name="indexSet"
+              label={
+                <>
+                  Index set
+                  <RequiredMarker />
+                </>
+              }
+              required
+              placeholder="e.g. graylog"
+            />
 
-              <FormikInput
-                id="indexSet"
-                name="indexSet"
-                label={<>Index set<RequiredMarker /></>}
-                required
-                validate={indexSetValidator}
-                placeholder="e.g. graylog"
-              />
+            {/* ── Advanced options (hidden by default) ──────────── */}
+            <Collapsible label="Advanced options">
+              <FormikInput id="timeout" name="timeout" label="Connection timeout (ms)" placeholder="e.g. 5000" />
+              <FormikInput id="batchSize" name="batchSize" label="Max batch size" placeholder="e.g. 1000" />
+            </Collapsible>
 
-              {/* ── Advanced options (hidden by default) ──────────── */}
-              <Collapsible label="Advanced options">
-                <FormikInput id="timeout" name="timeout" label="Connection timeout (ms)" placeholder="e.g. 5000" />
-                <FormikInput id="batchSize" name="batchSize" label="Max batch size" placeholder="e.g. 1000" />
-              </Collapsible>
-
-              <FormSubmit submitButtonText="Create Input" displayCancel={false} />
-            </Form>
-          </Col>
-        </Row>
-      </Formik>
+            <FormSubmit submitButtonText="Create Input" displayCancel={false} />
+          </Form>
+        </Col>
+      </Row>
+    </Formik>
   ),
 };
-
-// TODO: Replace these focused stubs with real interactive examples.
-//   - PairedFields    — isolated paired-field row (e.g. key / value at equal width)
-//   - RequiredFields  — small form highlighting the asterisk (*) convention
-//   - FieldValidation — single field cycling untouched → blur error → on-input recovery
 
 export const PairedFields: StoryObj = {
   tags: ['!dev'],

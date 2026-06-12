@@ -24,8 +24,6 @@ const Marker = styled.span(
   `,
 );
 
-const RequiredMarker = () => (
-  <Marker aria-hidden="true">*</Marker>
-);
+const RequiredMarker = () => <Marker aria-hidden="true">*</Marker>;
 
 export default RequiredMarker;

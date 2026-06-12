@@ -275,7 +275,6 @@ export const TypeScaleGroupDoc = ({ label }: { label: string }) => {
   );
 };
 
-
 // ─── Text Colors ───────────────────────────────────────────────────────────
 
 const Swatch = styled.div<{ $color: string; $labelColor: string }>`

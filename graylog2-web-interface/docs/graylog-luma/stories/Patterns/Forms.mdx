@@ -15,7 +15,11 @@ Forms live inside containers and are composed of fields. Both levels have rules.
 
 <Unstyled>
   <Alert bsStyle="info">
-    {<><strong>Column Layout Rule:</strong> Forms are always laid out in a single column.</>}
+    {
+      <>
+        <strong>Column Layout Rule:</strong> Forms are always laid out in a single column.
+      </>
+    }
   </Alert>
 </Unstyled>
 
@@ -47,8 +51,22 @@ A single row may use two columns when the fields are semantically one unit.
     ]}
     rows={[
       { property: 'Column layout', value: 'Single column always. Two columns for paired fields only.' },
-      { property: 'Field spacing', value: <>Spacing <strong>md</strong> (16px)</> },
-      { property: 'Group spacing', value: <>Spacing <strong>lg</strong> (24px)</> },
+      {
+        property: 'Field spacing',
+        value: (
+          <>
+            Spacing <strong>md</strong> (16px)
+          </>
+        ),
+      },
+      {
+        property: 'Group spacing',
+        value: (
+          <>
+            Spacing <strong>lg</strong> (24px)
+          </>
+        ),
+      },
     ]}
     keyBy={(row) => row.property}
   />
@@ -60,7 +78,12 @@ A single consistent convention across all Graylog forms.
 
 <Unstyled>
   <Alert bsStyle="info">
-    {<><strong>Rule:</strong> Mark required fields with *. Leave optional fields unmarked. Never display the word "optional".</>}
+    {
+      <>
+        <strong>Rule:</strong> Mark required fields with *. Leave optional fields unmarked. Never display the word
+        "optional".
+      </>
+    }
   </Alert>
 </Unstyled>
 
