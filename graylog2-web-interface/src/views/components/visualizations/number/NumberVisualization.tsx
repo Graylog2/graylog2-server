@@ -37,22 +37,20 @@ import Trend from './Trend';
 import trendDirection, { trendBackground } from './trendDirection';
 import type { TrendDirection } from './trendDirection';
 
-const Container = styled.div<{ $height: number; $trend: TrendDirection | undefined }>(
-  ({ theme, $height, $trend }) => {
-    const bgColor = trendBackground(theme, $trend);
+const Container = styled.div<{ $height: number; $trend: TrendDirection | undefined }>(({ theme, $height, $trend }) => {
+  const bgColor = trendBackground(theme, $trend);
 
-    return css`
-      height: ${$height}px;
-      width: 100%;
-      ${$trend &&
-      css`
-        background-color: ${bgColor} !important; /* Needed for report generation */
-        color: ${theme.utils.contrastingColor(bgColor)} !important; /* Needed for report generation */
-        color-adjust: exact !important; /* Needed for report generation */
-      `}
-    `;
-  },
-);
+  return css`
+    height: ${$height}px;
+    width: 100%;
+    ${$trend &&
+    css`
+      background-color: ${bgColor} !important; /* Needed for report generation */
+      color: ${theme.utils.contrastingColor(bgColor)} !important; /* Needed for report generation */
+      color-adjust: exact !important; /* Needed for report generation */
+    `}
+  `;
+});
 
 const GridContainer = styled(Container)`
   display: grid;
