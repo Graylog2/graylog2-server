@@ -30,6 +30,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggrega
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.BucketOrder;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
+import org.graylog2.indexer.fieldtypes.FieldTypeMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,7 +100,7 @@ public abstract class OSPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
     }
 
     private boolean isNumericFieldType(String fieldType) {
-        return fieldType.equals("long") || fieldType.equals("double") || fieldType.equals("float");
+        return FieldTypeMapper.isNumericType(fieldType);
     }
 
     public abstract Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpecs, PivotBucket previousBucket);

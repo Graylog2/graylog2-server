@@ -30,6 +30,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.A
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.BucketOrder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
+import org.graylog2.indexer.fieldtypes.FieldTypeMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -100,7 +101,7 @@ public abstract class ESPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
     }
 
     private boolean isNumericFieldType(String fieldType) {
-        return fieldType.equals("long") || fieldType.equals("double") || fieldType.equals("float");
+        return FieldTypeMapper.isNumericType(fieldType);
     }
 
     public abstract Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpec, PivotBucket initialBucket);
