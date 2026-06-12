@@ -50,6 +50,7 @@ const UserEditPage = ({ params }: Props) => {
   const { data: loadedUser } = useQuery({
     queryKey: [...USERS_QUERY_KEY, userId],
     queryFn: () => UsersDomain.load(userId),
+    retry: false,
   });
 
   const fullName = loadedUser?.fullName ?? '';

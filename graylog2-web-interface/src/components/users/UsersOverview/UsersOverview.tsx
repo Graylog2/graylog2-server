@@ -90,9 +90,10 @@ const UsersOverview = () => {
   const [query, setQuery] = useState('');
 
   const { data: paginatedUsers, isFetching } = useQuery({
-    queryKey: [...USERS_QUERY_KEY, 'paginated', { page, perPage, query }],
+    queryKey: [...USERS_QUERY_KEY, 'overview-paginated', { page, perPage, query }],
     queryFn: () => UsersDomain.loadUsersPaginated({ page, perPage, query }),
     placeholderData: keepPreviousData,
+    retry: false,
   });
 
   const { list: users, adminUser, pagination: { total = 0 } = {} } = paginatedUsers || {};
