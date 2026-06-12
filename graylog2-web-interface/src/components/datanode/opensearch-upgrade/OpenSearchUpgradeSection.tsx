@@ -86,7 +86,7 @@ const OpenSearchUpgradeSection = () => {
 
   return (
     <Section>
-      <h1>Upgrade OpenSearch</h1>
+      <h1>Upgrade Data Node&apos;s embedded OpenSearch</h1>
       <OpenSearchUpgradeInfo currentVersion={currentVersion} targetVersion={targetVersion} isLoading={isLoading} />
 
       <Row>
