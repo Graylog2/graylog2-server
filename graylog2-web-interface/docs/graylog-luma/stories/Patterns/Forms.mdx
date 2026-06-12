@@ -43,37 +43,6 @@ A single row may use two columns when the fields are semantically one unit.
 - Required fields before optional within each group
 - If a form has fields that most users will never need to fill out, those fields should be hidden by default behind a collapsible section labeled "Advanced options" rather than shown in the main form body
 
-### Layout Reference
-
-<Unstyled>
-  <FoundationTable
-    columns={[
-      { header: 'Property', render: (row) => row.property },
-      { header: 'Value', render: (row) => row.value },
-    ]}
-    rows={[
-      { property: 'Column layout', value: 'Single column always. Two columns for paired fields only.' },
-      {
-        property: 'Field spacing',
-        value: (
-          <>
-            Spacing <strong>md</strong> (16px)
-          </>
-        ),
-      },
-      {
-        property: 'Group spacing',
-        value: (
-          <>
-            Spacing <strong>lg</strong> (24px)
-          </>
-        ),
-      },
-    ]}
-    keyBy={(row) => row.property}
-  />
-</Unstyled>
-
 ## Required
 
 A single consistent convention across all Graylog forms.
