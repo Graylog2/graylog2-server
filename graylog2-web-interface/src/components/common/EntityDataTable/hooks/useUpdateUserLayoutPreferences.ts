@@ -40,6 +40,7 @@ const slicingToJSON = (slicing?: SlicingPreferences | null): SlicingPreferencesJ
     slice_column: slicing.sliceColumn,
     sort_by: slicing.sortBy,
     order: slicing.order,
+    ...(slicing.readOnly !== undefined ? { read_only: slicing.readOnly } : {}),
   };
 };
 
