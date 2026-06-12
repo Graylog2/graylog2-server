@@ -435,7 +435,7 @@ const AppRouter = () => {
 
   return (
     <RouterErrorBoundary>
-      <RouterProvider router={router} />
+      <RouterProvider router={router} future={{ v7_startTransition: true }} />
     </RouterErrorBoundary>
   );
 };

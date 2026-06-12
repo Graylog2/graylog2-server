@@ -30,7 +30,9 @@ jest.mock('routing/QueryParams', () => ({
 }));
 
 describe('useUrlQueryFilters', () => {
-  const wrapper = ({ children }: { children: React.ReactNode }) => <MemoryRouter>{children}</MemoryRouter>;
+  const wrapper = ({ children }: { children: React.ReactNode }) => (
+    <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>{children}</MemoryRouter>
+  );
 
   beforeEach(() => {
     asMock(useQueryParam).mockReturnValue([['index_set_id=index_set_id_1', 'index_set_id=index_set_id_2'], () => {}]);
