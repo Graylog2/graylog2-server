@@ -34,10 +34,9 @@ const mockLoadRolesPaginatedResponse = {
   },
 };
 
-jest.mock('stores/roles/AuthzRolesStore', () => ({
-  AuthzRolesActions: {
+jest.mock('hooks/useAuthzRoles', () => ({
+  AUTHZ_ROLES_QUERY_KEY: ['authz', 'roles'],
     loadRolesPaginated: jest.fn(() => Promise.resolve(mockLoadRolesPaginatedResponse)),
-  },
 }));
 
 describe('RolesSelector', () => {

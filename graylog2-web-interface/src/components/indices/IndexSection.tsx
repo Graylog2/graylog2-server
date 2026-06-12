@@ -17,7 +17,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import type { IndexInfo } from 'stores/indices/IndicesStore';
+import type { IndexInfo } from 'hooks/useIndices';
 import { Row, Col } from 'components/bootstrap';
 import type { IndexSummary as IndexSummaryType } from 'hooks/useIndexerOverview';
 import ClosedIndexDetails from 'components/indices/ClosedIndexDetails';
