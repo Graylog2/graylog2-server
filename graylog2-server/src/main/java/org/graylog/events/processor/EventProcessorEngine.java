@@ -25,6 +25,7 @@ import org.graylog.events.event.EventWithContext;
 import org.graylog.events.fields.EventFieldSpecEngine;
 import org.graylog.events.fields.FieldValue;
 import org.graylog.events.notifications.EventNotificationHandler;
+import org.graylog.events.processor.exclusion.EventExclusionFilter;
 import org.graylog.events.processor.modifier.EventModifier;
 import org.graylog.events.processor.modifier.EventModifierException;
 import org.graylog.events.processor.storage.EventStorageHandlerEngine;
@@ -51,6 +52,7 @@ public class EventProcessorEngine {
     private final EventProcessorExecutionMetrics metrics;
     private final EventDefinitionHandler eventDefinitionHandler;
     private final Set<EventModifier> eventModifiers;
+    private final EventExclusionFilter exclusionFilter;
 
     @Inject
     public EventProcessorEngine(Map<String, EventProcessor.Factory> eventProcessorFactories,
@@ -61,7 +63,8 @@ public class EventProcessorEngine {
                                 Provider<EventProcessorEventFactory> eventFactoryProvider,
                                 EventProcessorExecutionMetrics metrics,
                                 EventDefinitionHandler eventDefinitionHandler,
-                                Set<EventModifier> eventModifiers) {
+                                Set<EventModifier> eventModifiers,
+                                EventExclusionFilter exclusionFilter) {
         this.dbService = dbService;
         this.eventProcessorFactories = eventProcessorFactories;
         this.fieldSpecEngine = fieldSpecEngine;
@@ -71,6 +74,7 @@ public class EventProcessorEngine {
         this.metrics = metrics;
         this.eventDefinitionHandler = eventDefinitionHandler;
         this.eventModifiers = eventModifiers;
+        this.exclusionFilter = exclusionFilter;
     }
 
     private EventDefinition getEventDefinition(String id) throws EventProcessorException {
@@ -159,8 +163,13 @@ public class EventProcessorEngine {
                 }
             }
 
+            // Apply exclusion rules before notification dispatch. Excluded events are tagged with
+            // the matching rule id and persisted through the storage handler below, but they will
+            // not trigger notifications.
+            final List<EventWithContext> notExcluded = exclusionFilter.filter(eventDefinition, eventsWithContext);
+
             // First process notifications - those might modify the events
-            notificationHandler.handleEvents(eventDefinition, eventsWithContext);
+            notificationHandler.handleEvents(eventDefinition, notExcluded);
 
             // After that process storage which persist the events into a storage system
             try {

@@ -16,6 +16,7 @@
  */
 package org.graylog.events.processor;
 
+import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
@@ -30,6 +31,7 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog.events.notifications.EventNotificationConfig;
+import org.graylog.events.processor.exclusion.ExclusionRule;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFiltersReFetcher;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.security.entities.EntityRegistrar;
@@ -56,6 +58,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -140,10 +143,11 @@ public class DBEventDefinitionService {
      * definitions in place (to preserve their IDs). Never pass {@code false} for user-initiated API requests.</p>
      */
     public EventDefinitionDto save(final EventDefinitionDto entity, final boolean checkMutability) {
-        EventDefinitionDto enrichedWithUpdateDate = entity
+        final EventDefinitionDto normalized = normalizeExclusionIds(entity);
+        EventDefinitionDto enrichedWithUpdateDate = normalized
                 .toBuilder()
                 .updatedAt(DateTime.now(DateTimeZone.UTC))
-                .eventSummaryTemplate(StringUtils.trimToNull(entity.eventSummaryTemplate()))
+                .eventSummaryTemplate(StringUtils.trimToNull(normalized.eventSummaryTemplate()))
                 .build();
         if (enrichedWithUpdateDate.id() == null) {
             final String id = scopedEntityMongoUtils.create(enrichedWithUpdateDate);
@@ -154,6 +158,28 @@ public class DBEventDefinitionService {
             scopedEntityMongoUtils.forceUpdate(enrichedWithUpdateDate);
         }
         return getEventDefinitionWithRefetchedFilters(enrichedWithUpdateDate);
+    }
+
+    /**
+     * Mints UUIDs for any exclusion rules that arrive without an id (e.g. freshly added by the
+     * frontend or an LLM suggestion). Consumers reading event definitions back from MongoDB can
+     * therefore assume every exclusion rule has a stable id.
+     */
+    static EventDefinitionDto normalizeExclusionIds(EventDefinitionDto dto) {
+        if (dto.exclusions().isEmpty()) {
+            return dto;
+        }
+        boolean changed = false;
+        final ImmutableList.Builder<ExclusionRule> builder = ImmutableList.builder();
+        for (ExclusionRule rule : dto.exclusions()) {
+            if (rule.id() == null || rule.id().isBlank()) {
+                builder.add(rule.toBuilder().id(UUID.randomUUID().toString()).build());
+                changed = true;
+            } else {
+                builder.add(rule);
+            }
+        }
+        return changed ? dto.toBuilder().exclusions(builder.build()).build() : dto;
     }
 
     public Optional<EventDefinitionDto> get(String id) {

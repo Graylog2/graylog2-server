@@ -20,8 +20,7 @@ import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { QuickJump } from '@graylog/server-api';
 
 import { defaultOnError } from 'util/conditional/onError';
-import { getEntityRoute, usePluginEntityTypeGenerators } from 'routing/hooks/useShowRouteForEntity';
-import usePluginEntities from 'hooks/usePluginEntities';
+import { useGetEntityRoute } from 'routing/hooks/useShowRouteForEntity';
 import useNavItems from 'components/quick-jump/hooks/useNavItems';
 import { PAGE_WEIGHT, BASE_SCORE } from 'components/quick-jump/Constants';
 import type { SearchResultItem } from 'components/quick-jump/Types';
@@ -66,16 +65,15 @@ const scoreResults = (items: Array<SearchResultItem>, query: string, weight = 1.
 type ItemResultType = Awaited<ReturnType<typeof QuickJump.search>>['results'][number];
 
 const useEntityResultMapper = () => {
-  const pluginEntityRoutesResolver = usePluginEntities('entityRoutes');
-  const entityTypeGenerators = usePluginEntityTypeGenerators();
+  const getEntityRoute = useGetEntityRoute();
 
   return useCallback(
     (item: ItemResultType): SearchResultItem => ({
       ...item,
       key: item.id,
-      link: getEntityRoute(item.id, item.type, pluginEntityRoutesResolver, entityTypeGenerators),
+      link: getEntityRoute(item.id, item.type),
     }),
-    [entityTypeGenerators, pluginEntityRoutesResolver],
+    [getEntityRoute],
   );
 };
 

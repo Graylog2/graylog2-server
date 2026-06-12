@@ -67,6 +67,7 @@ public class EventImpl implements Event {
     private final Set<String> associatedAssets = new HashSet<>();
     private final Set<String> tags = new HashSet<>();
     private EventReplayInfo replayInfo;
+    private String excludedByRuleId;
     private List<String> tacticsTechniques = ImmutableList.of();
 
     EventImpl(String eventId,
@@ -268,6 +269,21 @@ public class EventImpl implements Event {
     }
 
     @Override
+    public Set<String> getAssociatedAssets() {
+        return ImmutableSet.copyOf(associatedAssets);
+    }
+
+    @Override
+    public String getExcludedByRuleId() {
+        return excludedByRuleId;
+    }
+
+    @Override
+    public void setExcludedByRuleId(String ruleId) {
+        this.excludedByRuleId = ruleId;
+    }
+
+    @Override
     public Set<String> getTags() {
         // unmodifiableSet wraps without copying; setTags is called at most once during
         // construction so callers don't need a snapshot, just a mutation guard.
@@ -386,6 +402,7 @@ public class EventImpl implements Event {
                 .groupByFields(ImmutableMap.copyOf(groupByFields))
                 .aggregationConditions(ImmutableMap.copyOf(aggregationConditions))
                 .replayInfo(getReplayInfo())
+                .excludedByRuleId(excludedByRuleId)
                 .tacticsTechniques(getTacticsTechniques())
                 .build();
     }

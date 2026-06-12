@@ -30,6 +30,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import type { EventDefinitionType } from 'components/event-definitions/types';
 
 import styles from './EventConditionForm.css';
+import ExclusionRulesSection from './exclusions/ExclusionRulesSection';
 
 import type { EventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
@@ -209,6 +210,11 @@ const EventConditionForm = ({
         <>
           <hr className={styles.hr} />
           <Col md={12}>{eventDefinitionTypeComponent}</Col>
+          <Col md={12}>
+            <ExclusionRulesSection
+              exclusions={eventDefinition.exclusions ?? []}
+              onChange={(next) => onChange('exclusions', next as unknown as EventDefinition['config'])} />
+          </Col>
         </>
       )}
     </Row>

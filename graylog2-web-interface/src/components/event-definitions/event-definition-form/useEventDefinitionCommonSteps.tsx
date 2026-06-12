@@ -57,6 +57,7 @@ export const INITIAL_EVENT_DEFINITION: EventDefinition = {
   },
   notifications: [],
   tags: [],
+  exclusions: [],
   alert: false,
   tactics_techniques: [],
 };

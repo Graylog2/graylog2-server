@@ -113,6 +113,12 @@ public interface Event extends Indexable {
 
     void addAssociatedAssets(Set<String> associatedAssets);
 
+    Set<String> getAssociatedAssets();
+
+    String getExcludedByRuleId();
+
+    void setExcludedByRuleId(String ruleId);
+
     List<String> getTacticsTechniques();
 
     void setTacticsTechniques(List<String> tacticsTechniques);
