@@ -17,6 +17,7 @@
 package org.graylog.integrations.aws;
 
 import com.google.common.base.Preconditions;
+import jakarta.ws.rs.BadRequestException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,6 +98,10 @@ public class AWSAuthFactory {
                                          @Nullable ApacheHttpClient.Builder stsHttpClientBuilder) {
         AwsCredentialsProvider awsCredentials = requireKeySecret ? getKeySecretCredentialsProvider(accessKey, secretKey) :
                 getAwsCredentialsProvider(accessKey, secretKey);
+
+        if (StringUtils.isNotBlank(externalId) && StringUtils.isBlank(assumeRoleArn)) {
+            throw new BadRequestException("External ID can only be used when an Assume Role ARN is provided.");
+        }
 
         // Apply the Assume Role ARN Authorization if specified. All AWSCredentialsProviders support this.
         if (!isNullOrEmpty(assumeRoleArn) && !isNullOrEmpty(stsRegion)) {

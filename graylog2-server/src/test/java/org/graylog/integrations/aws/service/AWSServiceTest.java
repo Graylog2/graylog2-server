@@ -16,6 +16,7 @@
  */
 package org.graylog.integrations.aws.service;
 
+import jakarta.ws.rs.BadRequestException;
 import org.graylog.integrations.aws.AWSMessageType;
 import org.graylog.integrations.aws.codecs.AWSCodec;
 import org.graylog.integrations.aws.inputs.AWSInput;
@@ -45,6 +46,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
@@ -86,7 +88,7 @@ public class AWSServiceTest {
         when(user.getName()).thenReturn("a-user-name");
         when(messageInputFactory.create(isA(InputCreateRequest.class), isA(String.class), isA(String.class), anyBoolean())).thenReturn(messageInput);
         when(inputService.create(isA(HashMap.class))).thenReturn(mock(Input.class));
-        
+
         AWSInputCreateRequest request =
                 AWSInputCreateRequest.builder().region(Region.US_EAST_1.id())
                         .awsAccessKeyId("a-key")
@@ -160,6 +162,27 @@ public class AWSServiceTest {
         InputCreateRequest input = argumentCaptor.getValue();
         assertEquals("arn:aws:iam::123456789012:role/test-role", input.configuration().get(AWSInput.CK_ASSUME_ROLE_ARN));
         assertEquals("test-external-id", input.configuration().get(AWSInput.CK_EXTERNAL_ID));
+    }
+
+    @Test
+    public void testSaveInput_externalIdWithoutArn_throws_BadRequestException() {
+        AWSInputCreateRequest request =
+                AWSInputCreateRequest.builder().region(Region.US_EAST_1.id())
+                        .awsAccessKeyId("a-key")
+                        .awsSecretAccessKey(encryptedValue)
+                        .name("AWS Input")
+                        .awsMessageType(AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS.toString())
+                        .streamName("a-stream")
+                        .batchSize(10000)
+                        .addFlowLogPrefix(true)
+                        .throttlingAllowed(true)
+                        .streamArn("test-arn")
+                        .overrideSource("test-source")
+                        .assumeRoleArn("") // Blank ARN
+                        .externalId("test-external-id") // But external ID is present
+                        .build();
+
+        assertThrows(BadRequestException.class, () -> awsService.saveInput(request, user));
     }
 
     @Test

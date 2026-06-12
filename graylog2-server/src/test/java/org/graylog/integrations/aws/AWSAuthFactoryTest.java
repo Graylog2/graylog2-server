@@ -19,6 +19,7 @@ package org.graylog.integrations.aws;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
@@ -27,6 +28,7 @@ import software.amazon.awssdk.http.apache.ApacheHttpClient;
 import software.amazon.awssdk.services.sts.StsClient;
 import software.amazon.awssdk.services.sts.StsClientBuilder;
 import software.amazon.awssdk.services.sts.auth.StsAssumeRoleCredentialsProvider;
+import software.amazon.awssdk.services.sts.model.AssumeRoleRequest;
 import software.amazon.awssdk.services.sts.model.GetCallerIdentityRequest;
 import software.amazon.awssdk.services.sts.model.GetCallerIdentityResponse;
 
@@ -121,61 +123,87 @@ public class AWSAuthFactoryTest {
     }
 
     @Test
-    public void testAssumeRoleWithExternalId_returnsCredentialsProvider() {
+    public void testAssumeRoleWithExternalId_externalIdPresentInAssumeRoleRequest() {
         StsClient mockStsClient = buildMockStsClient();
-        StsClientBuilder mockBuilder = mock(StsClientBuilder.class);
-        when(mockBuilder.region(any())).thenReturn(mockBuilder);
-        when(mockBuilder.credentialsProvider(any())).thenReturn(mockBuilder);
-        when(mockBuilder.build()).thenReturn(mockStsClient);
+        StsClientBuilder mockStsClientBuilder = mock(StsClientBuilder.class);
+        when(mockStsClientBuilder.region(any())).thenReturn(mockStsClientBuilder);
+        when(mockStsClientBuilder.credentialsProvider(any())).thenReturn(mockStsClientBuilder);
+        when(mockStsClientBuilder.build()).thenReturn(mockStsClient);
 
-        try (MockedStatic<StsClient> mockedStatic = mockStatic(StsClient.class)) {
-            mockedStatic.when(StsClient::builder).thenReturn(mockBuilder);
+        // Capture the AssumeRoleRequest passed to refreshRequest()
+        StsAssumeRoleCredentialsProvider mockProvider = mock(StsAssumeRoleCredentialsProvider.class);
+        StsAssumeRoleCredentialsProvider.Builder mockProviderBuilder = mock(StsAssumeRoleCredentialsProvider.Builder.class);
+        ArgumentCaptor<AssumeRoleRequest> requestCaptor = ArgumentCaptor.forClass(AssumeRoleRequest.class);
+        when(mockProviderBuilder.refreshRequest(requestCaptor.capture())).thenReturn(mockProviderBuilder);
+        when(mockProviderBuilder.stsClient(any())).thenReturn(mockProviderBuilder);
+        when(mockProviderBuilder.build()).thenReturn(mockProvider);
 
-            final AwsCredentialsProvider result = awsAuthFactory.create(
+        try (MockedStatic<StsClient> mockedStsClient = mockStatic(StsClient.class);
+             MockedStatic<StsAssumeRoleCredentialsProvider> mockedProvider = mockStatic(StsAssumeRoleCredentialsProvider.class)) {
+            mockedStsClient.when(StsClient::builder).thenReturn(mockStsClientBuilder);
+            mockedProvider.when(StsAssumeRoleCredentialsProvider::builder).thenReturn(mockProviderBuilder);
+
+            awsAuthFactory.create(
                     false, "us-east-1", "key", "secret", "arn:aws:iam::123456789012:role/TestRole", "my-external-id", (ApacheHttpClient.Builder) null);
 
-            assertThat(result).isNotNull();
-            assertThat(result).isExactlyInstanceOf(StsAssumeRoleCredentialsProvider.class);
+            assertThat(requestCaptor.getValue()).isNotNull();
+            assertThat(requestCaptor.getValue().externalId()).isEqualTo("my-external-id");
         }
     }
 
     @Test
-    public void testAssumeRoleWithoutExternalId_returnsCredentialsProvider() {
+    public void testAssumeRoleWithoutExternalId_noExternalIdInAssumeRoleRequest() {
         StsClient mockStsClient = buildMockStsClient();
-        StsClientBuilder mockBuilder = mock(StsClientBuilder.class);
-        when(mockBuilder.region(any())).thenReturn(mockBuilder);
-        when(mockBuilder.credentialsProvider(any())).thenReturn(mockBuilder);
-        when(mockBuilder.build()).thenReturn(mockStsClient);
+        StsClientBuilder mockStsClientBuilder = mock(StsClientBuilder.class);
+        when(mockStsClientBuilder.region(any())).thenReturn(mockStsClientBuilder);
+        when(mockStsClientBuilder.credentialsProvider(any())).thenReturn(mockStsClientBuilder);
+        when(mockStsClientBuilder.build()).thenReturn(mockStsClient);
 
-        try (MockedStatic<StsClient> mockedStatic = mockStatic(StsClient.class)) {
-            mockedStatic.when(StsClient::builder).thenReturn(mockBuilder);
+        StsAssumeRoleCredentialsProvider mockProvider = mock(StsAssumeRoleCredentialsProvider.class);
+        StsAssumeRoleCredentialsProvider.Builder mockProviderBuilder = mock(StsAssumeRoleCredentialsProvider.Builder.class);
+        ArgumentCaptor<AssumeRoleRequest> requestCaptor = ArgumentCaptor.forClass(AssumeRoleRequest.class);
+        when(mockProviderBuilder.refreshRequest(requestCaptor.capture())).thenReturn(mockProviderBuilder);
+        when(mockProviderBuilder.stsClient(any())).thenReturn(mockProviderBuilder);
+        when(mockProviderBuilder.build()).thenReturn(mockProvider);
 
-            final AwsCredentialsProvider result = awsAuthFactory.create(
+        try (MockedStatic<StsClient> mockedStsClient = mockStatic(StsClient.class);
+             MockedStatic<StsAssumeRoleCredentialsProvider> mockedProvider = mockStatic(StsAssumeRoleCredentialsProvider.class)) {
+            mockedStsClient.when(StsClient::builder).thenReturn(mockStsClientBuilder);
+            mockedProvider.when(StsAssumeRoleCredentialsProvider::builder).thenReturn(mockProviderBuilder);
+
+            awsAuthFactory.create(
                     false, "us-east-1", "key", "secret", "arn:aws:iam::123456789012:role/TestRole", (String) null, (ApacheHttpClient.Builder) null);
 
-            assertThat(result).isNotNull();
-            assertThat(result).isExactlyInstanceOf(StsAssumeRoleCredentialsProvider.class);
+            assertThat(requestCaptor.getValue()).isNotNull();
+            // No external ID – the field should be absent from the request
+            assertThat(requestCaptor.getValue().externalId()).isNull();
         }
     }
 
     @Test
     public void testAssumeRoleWithEmptyExternalId_treatedAsAbsent() {
         StsClient mockStsClient = buildMockStsClient();
-        StsClientBuilder mockBuilder = mock(StsClientBuilder.class);
-        when(mockBuilder.region(any())).thenReturn(mockBuilder);
-        when(mockBuilder.credentialsProvider(any())).thenReturn(mockBuilder);
-        when(mockBuilder.build()).thenReturn(mockStsClient);
+        StsClientBuilder mockStsClientBuilder = mock(StsClientBuilder.class);
+        when(mockStsClientBuilder.region(any())).thenReturn(mockStsClientBuilder);
+        when(mockStsClientBuilder.credentialsProvider(any())).thenReturn(mockStsClientBuilder);
+        when(mockStsClientBuilder.build()).thenReturn(mockStsClient);
 
-        try (MockedStatic<StsClient> mockedStatic = mockStatic(StsClient.class)) {
-            mockedStatic.when(StsClient::builder).thenReturn(mockBuilder);
+        StsAssumeRoleCredentialsProvider mockProvider = mock(StsAssumeRoleCredentialsProvider.class);
+        StsAssumeRoleCredentialsProvider.Builder mockProviderBuilder = mock(StsAssumeRoleCredentialsProvider.Builder.class);
+        ArgumentCaptor<AssumeRoleRequest> requestCaptor = ArgumentCaptor.forClass(AssumeRoleRequest.class);
+        when(mockProviderBuilder.refreshRequest(requestCaptor.capture())).thenReturn(mockProviderBuilder);
+        when(mockProviderBuilder.stsClient(any())).thenReturn(mockProviderBuilder);
+        when(mockProviderBuilder.build()).thenReturn(mockProvider);
 
-            final AwsCredentialsProvider withNull = awsAuthFactory.create(
+        try (MockedStatic<StsClient> mockedStsClient = mockStatic(StsClient.class);
+             MockedStatic<StsAssumeRoleCredentialsProvider> mockedProvider = mockStatic(StsAssumeRoleCredentialsProvider.class)) {
+            mockedStsClient.when(StsClient::builder).thenReturn(mockStsClientBuilder);
+            mockedProvider.when(StsAssumeRoleCredentialsProvider::builder).thenReturn(mockProviderBuilder);
+
+            // Null and empty external IDs must be treated identically (neither sets externalId on the request)
+            awsAuthFactory.create(
                     false, "us-east-1", "key", "secret", "arn:aws:iam::123456789012:role/TestRole", (String) null, (ApacheHttpClient.Builder) null);
-            final AwsCredentialsProvider withEmpty = awsAuthFactory.create(
-                    false, "us-east-1", "key", "secret", "arn:aws:iam::123456789012:role/TestRole", "", (ApacheHttpClient.Builder) null);
-
-            assertThat(withNull).isExactlyInstanceOf(StsAssumeRoleCredentialsProvider.class);
-            assertThat(withEmpty).isExactlyInstanceOf(StsAssumeRoleCredentialsProvider.class);
+            assertThat(requestCaptor.getValue().externalId()).isNull();
         }
     }
 

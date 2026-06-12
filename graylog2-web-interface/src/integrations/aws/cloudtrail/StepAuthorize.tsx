@@ -53,7 +53,7 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
 
   const handleSubmit = () => {
     // Validate that External ID is only used with Assume Role ARN
-     const externalIdError = validateExternalIdRequiresArn(
+    const externalIdError = validateExternalIdRequiresArn(
       formData?.awsAssumeRoleARN?.value,
       formData?.awsExternalId?.value,
     );
@@ -65,7 +65,7 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
       });
 
       return;
-    } 
+    }
 
     setLoading(true);
 
