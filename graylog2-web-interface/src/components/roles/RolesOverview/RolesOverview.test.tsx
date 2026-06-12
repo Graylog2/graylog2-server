@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import userEvent from '@testing-library/user-event';
-import { loadRolesPaginated } from 'hooks/useAuthzRoles';
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
 
+import { loadRolesPaginated } from 'hooks/useAuthzRoles';
 import { rolesList as mockRoles } from 'fixtures/roles';
 
 import RolesOverview from './RolesOverview';
@@ -45,8 +45,8 @@ const mockLoadRolesPaginatedPromise = Promise.resolve(loadRolesPaginatedResponse
 
 jest.mock('hooks/useAuthzRoles', () => ({
   AUTHZ_ROLES_QUERY_KEY: ['authz', 'roles'],
-    deleteRole: jest.fn(() => Promise.resolve()),
-    loadRolesPaginated: jest.fn(() => mockLoadRolesPaginatedPromise),
+  deleteRole: jest.fn(() => Promise.resolve()),
+  loadRolesPaginated: jest.fn(() => mockLoadRolesPaginatedPromise),
 }));
 
 describe('RolesOverview', () => {
@@ -107,8 +107,6 @@ describe('RolesOverview', () => {
     const resetSearchButton = await screen.findByRole('button', { name: 'Reset search' });
     await userEvent.click(resetSearchButton);
 
-    await waitFor(() =>
-      expect(loadRolesPaginated).toHaveBeenCalledWith({ page: 1, perPage: 10, query: '' }),
-    );
+    await waitFor(() => expect(loadRolesPaginated).toHaveBeenCalledWith({ page: 1, perPage: 10, query: '' }));
   });
 });

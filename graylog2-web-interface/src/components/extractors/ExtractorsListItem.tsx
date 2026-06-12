@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useState } from 'react';
 import numeral from 'numeral';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -147,7 +147,7 @@ type ExtractorsListItemProps = {
 };
 
 const ExtractorsListItem = ({ extractor, inputId, nodeId }: ExtractorsListItemProps) => {
-  const [showDetails, setShowDetails] = React.useState(false);
+  const [showDetails, setShowDetails] = useState(false);
   const queryClient = useQueryClient();
 
   const _toggleDetails = () => setShowDetails((prev) => !prev);
@@ -155,9 +155,7 @@ const ExtractorsListItem = ({ extractor, inputId, nodeId }: ExtractorsListItemPr
   const _deleteExtractor = () => {
     // eslint-disable-next-line no-alert
     if (window.confirm(`Really remove extractor "${extractor.title}?"`)) {
-      deleteExtractor(inputId, extractor).then(() =>
-        queryClient.invalidateQueries({ queryKey: EXTRACTORS_QUERY_KEY }),
-      );
+      deleteExtractor(inputId, extractor).then(() => queryClient.invalidateQueries({ queryKey: EXTRACTORS_QUERY_KEY }));
     }
   };
 

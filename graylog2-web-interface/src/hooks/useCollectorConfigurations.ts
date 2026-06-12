@@ -130,10 +130,7 @@ export const renderConfigurationPreview = (template: string): Promise<{ preview:
   const promise = fetch('POST', URLUtils.qualifyUrl(`${SOURCE_URL}/configurations/render/preview`), { template });
 
   promise.catch((error) => {
-    UserNotification.error(
-      `Fetching configuration preview failed with status: ${error}`,
-      'Could not retrieve preview',
-    );
+    UserNotification.error(`Fetching configuration preview failed with status: ${error}`, 'Could not retrieve preview');
   });
 
   return promise;

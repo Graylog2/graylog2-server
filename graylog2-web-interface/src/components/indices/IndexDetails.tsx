@@ -42,10 +42,7 @@ type Props = {
 const IndexDetails = ({ index, indexName, indexRange = undefined, indexSetId = undefined, isDeflector }: Props) => {
   const queryClient = useQueryClient();
 
-  const _invalidate = useCallback(
-    () => queryClient.invalidateQueries({ queryKey: INDICES_QUERY_KEY }),
-    [queryClient],
-  );
+  const _invalidate = useCallback(() => queryClient.invalidateQueries({ queryKey: INDICES_QUERY_KEY }), [queryClient]);
 
   const _onRecalculateIndex = useCallback(() => {
     // eslint-disable-next-line no-alert
