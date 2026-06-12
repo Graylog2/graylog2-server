@@ -16,9 +16,19 @@
  */
 package org.graylog2.shared.rest.documentation.openapi;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.integration.SwaggerConfiguration;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.QueryParam;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -125,5 +135,110 @@ class CustomReaderOperationIdTest {
         // The param order from the JAX-RS method is preserved, not sorted
         assertThat(CustomReader.paramSuffix(List.of("zebra", "alpha")))
                 .isEqualTo("ByZebraAndAlpha");
+    }
+
+    @Test
+    void derivesOperationIdFromDeclaringClassMethodAndParams() throws Exception {
+        final var method = WidgetResource.class.getMethod("getWidget", String.class);
+        assertThat(CustomReader.operationId(method))
+                .isEqualTo("Widget_getWidgetByWidgetId");
+    }
+
+    @Test
+    void readAssignsDerivedOperationIds() {
+        // End-to-end through Reader.read()/parseMethod, not just the static helpers
+        final var reader = new CustomReader(Map.of(), new SwaggerConfiguration());
+        final var openAPI = reader.read(Set.of(WidgetResource.class), Map.of());
+
+        assertThat(openAPI.getPaths().get("/widgets/{widgetId}")).isNotNull();
+        assertThat(openAPI.getPaths().get("/widgets/{widgetId}").getGet().getOperationId())
+                .isEqualTo("Widget_getWidgetByWidgetId");
+    }
+
+    @Test
+    void extractsJaxRsParamNamesInDeclarationOrderIgnoringBodyParams() throws Exception {
+        final var method = WidgetResource.class.getMethod(
+                "searchWidgets", String.class, String.class, int.class, String.class);
+        // The body parameter contributes no name, the others keep declaration order
+        assertThat(CustomReader.extractParamNames(method))
+                .containsExactly("widgetId", "page", "X-Request-Id");
+    }
+
+    @Test
+    void explicitOperationIdAnnotationWinsOverDerivedId() {
+        final var reader = new CustomReader(Map.of(), new SwaggerConfiguration());
+        final var openAPI = reader.read(Set.of(WidgetResource.class), Map.of());
+
+        assertThat(openAPI.getPaths().get("/widgets")).isNotNull();
+        assertThat(openAPI.getPaths().get("/widgets").getPost().getOperationId())
+                .isEqualTo("legacyCreateWidget");
+    }
+
+    @Test
+    void explicitOperationIdInheritedFromSuperclassMethodWins() {
+        // The @Operation annotation lives on the abstract base method, not on the override.
+        // It must still win over the derived id — this requires the ReflectionUtils-based
+        // annotation lookup; a plain method.getAnnotation() would miss it.
+        final var reader = new CustomReader(Map.of(), new SwaggerConfiguration());
+        final var openAPI = reader.read(Set.of(AnnotatedWidgetResource.class), Map.of());
+
+        assertThat(openAPI.getPaths().get("/annotated-widgets")).isNotNull();
+        assertThat(openAPI.getPaths().get("/annotated-widgets").getGet().getOperationId())
+                .isEqualTo("annotatedListWidgets");
+    }
+
+    @Path("/widgets")
+    @SuppressWarnings("unused")
+    public static class WidgetResource {
+        @GET
+        @Path("/{widgetId}")
+        public String getWidget(@PathParam("widgetId") String widgetId) {
+            return "";
+        }
+
+        @POST
+        @Operation(operationId = "legacyCreateWidget")
+        public String createWidget(String body) {
+            return "";
+        }
+
+        // No HTTP verb annotation, so this is invisible to the Reader; it only serves
+        // the extractParamNames() test.
+        public String searchWidgets(@PathParam("widgetId") String widgetId,
+                                    String body,
+                                    @QueryParam("page") int page,
+                                    @HeaderParam("X-Request-Id") String requestId) {
+            return "";
+        }
+    }
+
+    public abstract static class AbstractWidgetResource {
+        @GET
+        @SuppressWarnings("unused")
+        public String listWidgets(@QueryParam("page") int page) {
+            return "";
+        }
+    }
+
+    public abstract static class AbstractAnnotatedWidgetResource {
+        @Operation(operationId = "annotatedListWidgets")
+        public abstract String listAnnotated();
+    }
+
+    @Path("/annotated-widgets")
+    public static class AnnotatedWidgetResource extends AbstractAnnotatedWidgetResource {
+        @GET
+        @Override
+        public String listAnnotated() {
+            return "";
+        }
+    }
+
+    @Path("/foo-widgets")
+    public static class FooWidgetResource extends AbstractWidgetResource {
+    }
+
+    @Path("/bar-widgets")
+    public static class BarWidgetResource extends AbstractWidgetResource {
     }
 }

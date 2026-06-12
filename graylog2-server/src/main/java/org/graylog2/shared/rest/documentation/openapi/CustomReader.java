@@ -209,6 +209,12 @@ public class CustomReader extends Reader {
      * ({@link PathParam}, {@link QueryParam}, {@link HeaderParam}, {@link CookieParam},
      * {@link FormParam}, {@link MatrixParam}). Body parameters and {@code @Context}
      * injections are ignored. {@code @BeanParam} composites are not recursed into.
+     * <p>
+     * The class part is taken from {@code method.getDeclaringClass()}. Handler methods
+     * inherited from a shared base class therefore derive the <em>same</em> id in every
+     * subclass that exposes them — a collision. We accept this because no production
+     * resource currently inherits handlers, and the spec validation will tell us;
+     * the fix is an explicit {@code @Operation(operationId = "...")} on the affected methods.
      */
     static String operationId(Method method) {
         final var declaringClass = method.getDeclaringClass();
