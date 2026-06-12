@@ -36,16 +36,16 @@ const FormFields = () => (
     <FormikInput
       id="title"
       name="title"
-      label={<>Title<RequiredMarker /></>}
+      label={
+        <>
+          Title
+          <RequiredMarker />
+        </>
+      }
       required
       placeholder="e.g. Production errors"
     />
-    <FormikInput
-      id="description"
-      name="description"
-      label="Description"
-      placeholder="What does this stream collect?"
-    />
+    <FormikInput id="description" name="description" label="Description" placeholder="What does this stream collect?" />
   </>
 );
 
