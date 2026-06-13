@@ -33,7 +33,7 @@ yarn build
 yarn test
 
 # Run a specific test
-yarn test --testPathPattern=<pattern>
+yarn test --testPathPatterns=<pattern>
 
 # Type check
 yarn tsc
@@ -56,6 +56,8 @@ yarn format
 # Pre-PR verification (run before considering work complete)
 yarn tsc && yarn lint:changes && yarn test
 ```
+
+Depending on the scope of the operation, the output might be too verbose. You might want to redirect the output to a tmp file and then grep it. No need to do this for smaller scopes.
 
 ## Project Structure
 
