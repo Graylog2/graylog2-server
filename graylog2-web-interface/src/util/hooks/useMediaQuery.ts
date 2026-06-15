@@ -15,6 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // eslint-disable-next-line no-restricted-imports
-import { useClickOutside } from '@mantine/hooks';
+import { useMediaQuery } from '@mantine/hooks';
 
-export default useClickOutside;
+export default useMediaQuery;
