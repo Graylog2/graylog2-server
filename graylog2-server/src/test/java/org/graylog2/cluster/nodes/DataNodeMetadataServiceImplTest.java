@@ -38,15 +38,15 @@ class DataNodeMetadataServiceImplTest {
 
     @Test
     void storesVersionWhenNoRecordExists() {
-        service.setOpensearchVersion(NODE_ID, "2.19.5");
+        service.setOpensearchVersions(NODE_ID, "2.19.5", null);
 
         assertThat(storedVersion(NODE_ID)).isEqualTo("2.19.5");
     }
 
     @Test
     void overwritesExistingVersion() {
-        service.setOpensearchVersion(NODE_ID, "2.19.5");
-        service.setOpensearchVersion(NODE_ID, "2.18.0");
+        service.setOpensearchVersions(NODE_ID, "2.19.5", null);
+        service.setOpensearchVersions(NODE_ID, "2.18.0", null);
 
         assertThat(storedVersion(NODE_ID)).isEqualTo("2.18.0");
     }
@@ -55,8 +55,8 @@ class DataNodeMetadataServiceImplTest {
     void storesVersionsForDifferentNodesIndependently() {
         final String otherNodeId = "other-node-0000-0000-0000-000000000000";
 
-        service.setOpensearchVersion(NODE_ID, "2.19.5");
-        service.setOpensearchVersion(otherNodeId, "2.18.0");
+        service.setOpensearchVersions(NODE_ID, "2.19.5", null);
+        service.setOpensearchVersions(otherNodeId, "2.18.0", null);
 
         assertThat(storedVersion(NODE_ID)).isEqualTo("2.19.5");
         assertThat(storedVersion(otherNodeId)).isEqualTo("2.18.0");
@@ -69,7 +69,7 @@ class DataNodeMetadataServiceImplTest {
 
     @Test
     void findByNodeIdReturnsMetadataWithCorrectFields() {
-        service.setOpensearchVersion(NODE_ID, "2.19.5");
+        service.setOpensearchVersions(NODE_ID, "2.19.5", null);
 
         assertThat(service.findByNodeId(NODE_ID)).hasValueSatisfying(metadata -> {
             assertThat(metadata.nodeId()).isEqualTo(NODE_ID);
@@ -79,8 +79,7 @@ class DataNodeMetadataServiceImplTest {
 
     @Test
     void storesLatestAvailableVersion() {
-        service.setOpensearchVersion(NODE_ID, "2.18.0");
-        service.setLatestAvailableOpensearchVersion(NODE_ID, "2.19.5");
+        service.setOpensearchVersions(NODE_ID, "2.18.0", "2.19.5");
 
         assertThat(service.findByNodeId(NODE_ID)).hasValueSatisfying(metadata -> {
             assertThat(metadata.currentOpensearchVersion()).isEqualTo("2.18.0");
@@ -89,23 +88,14 @@ class DataNodeMetadataServiceImplTest {
     }
 
     @Test
-    void settingOpensearchVersionDoesNotClearLatestAvailableVersion() {
-        service.setOpensearchVersion(NODE_ID, "2.18.0");
-        service.setLatestAvailableOpensearchVersion(NODE_ID, "2.19.5");
-        service.setOpensearchVersion(NODE_ID, "2.19.5");
+    void settingVersionWithNullLatestAvailableDoesNotClearExistingLatestAvailable() {
+        service.setOpensearchVersions(NODE_ID, "2.18.0", "2.19.5");
+        service.setOpensearchVersions(NODE_ID, "2.19.5", null);
 
         assertThat(service.findByNodeId(NODE_ID)).hasValueSatisfying(metadata -> {
             assertThat(metadata.currentOpensearchVersion()).isEqualTo("2.19.5");
             assertThat(metadata.latestAvailableOpensearchVersion()).isEqualTo("2.19.5");
         });
-    }
-
-    @Test
-    void settingLatestAvailableVersionDoesNotClearOpensearchVersion() {
-        service.setOpensearchVersion(NODE_ID, "2.18.0");
-        service.setLatestAvailableOpensearchVersion(NODE_ID, "2.19.5");
-
-        assertThat(storedVersion(NODE_ID)).isEqualTo("2.18.0");
     }
 
     @Test
@@ -120,8 +110,8 @@ class DataNodeMetadataServiceImplTest {
     @Test
     void versionsOverviewClassifiesUpToDateNodes() {
         final String otherNodeId = "other-node-0000-0000-0000-000000000000";
-        service.setOpensearchVersion(NODE_ID, "2.19.5");
-        service.setOpensearchVersion(otherNodeId, "2.19.5");
+        service.setOpensearchVersions(NODE_ID, "2.19.5", null);
+        service.setOpensearchVersions(otherNodeId, "2.19.5", null);
 
         final OpensearchVersionsOverview overview = service.getVersionsOverview();
         assertThat(overview.upgradeAvailable()).isFalse();
@@ -134,9 +124,8 @@ class DataNodeMetadataServiceImplTest {
     @Test
     void versionsOverviewClassifiesUpgradeableNodes() {
         final String otherNodeId = "other-node-0000-0000-0000-000000000000";
-        service.setOpensearchVersion(NODE_ID, "2.19.5");
-        service.setLatestAvailableOpensearchVersion(NODE_ID, "3.5.0");
-        service.setOpensearchVersion(otherNodeId, "2.19.5");
+        service.setOpensearchVersions(NODE_ID, "2.19.5", "3.5.0");
+        service.setOpensearchVersions(otherNodeId, "2.19.5", null);
 
         final OpensearchVersionsOverview overview = service.getVersionsOverview();
         assertThat(overview.upgradeAvailable()).isTrue();
