@@ -117,7 +117,7 @@ class OpenAPIContextFactoryTest {
             // Verify the schema contains our test endpoint
             final var postOperation = generatedDescription.getPaths().get("/plugins/my.plugin.id/test").getPost();
             assertThat(postOperation).isNotNull();
-            assertThat(postOperation.getOperationId()).isEqualTo("createTest");
+            assertThat(postOperation.getOperationId()).isEqualTo("Test_createTest");
 
             // Verify that OptionalInt/OptionalLong/OptionalDouble are treated the same as Optional<Integer>/Optional<Long>/Optional<Double>
             final var responseSchema = generatedDescription.getComponents().getSchemas()
