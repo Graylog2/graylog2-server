@@ -26,7 +26,6 @@ import { OrderedMap } from 'immutable';
 import type * as Immutable from 'immutable';
 import type { Permission } from 'graylog-web-plugin/plugin';
 import { useQuery } from '@tanstack/react-query';
-import { Formik } from 'formik';
 
 import { describeExpression } from 'util/CronUtils';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -62,8 +61,7 @@ import type { QueryString } from 'views/logic/queries/types';
 import type { StreamsAndCategoriesSelection } from 'views/components/common/StreamsAndCategoriesFilter';
 import StreamsAndCategoriesFilter from 'views/components/common/StreamsAndCategoriesFilter';
 import ViewsQueryInput from 'views/components/searchbar/ViewsQueryInput';
-import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
-import WarmTierQueryValidation from 'views/components/searchbar/queryvalidation/WarmTierQueryValidation';
+import QueryValidationDisplay from 'views/components/searchbar/queryvalidation/QueryValidationDisplay';
 
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
@@ -539,9 +537,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
             error={validationState?.status === 'ERROR' ? validationState : undefined}
             warning={validationState?.status === 'WARNING' ? validationState : undefined}
           />
-          <Formik initialValues={{ queryString: currentConfig.query ?? '' }} onSubmit={() => {}}>
-            <QueryValidation validationExplanations={[WarmTierQueryValidation]} />
-          </Formik>
+          <QueryValidationDisplay />
           <HelpBlock>
             Search query that Messages should match. You can use the same syntax as in the Search page, including
             declaring Query Parameters from Lookup Tables by using the <code>$newParameter$</code> syntax.
