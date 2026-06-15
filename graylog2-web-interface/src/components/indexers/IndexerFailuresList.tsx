@@ -35,7 +35,7 @@ const IndexerFailuresList = ({ failures }: Props) => {
 
   return (
     <div className="scrollable-table">
-      <Table className="indexer-failures" striped hover condensed>
+      <Table className="indexer-failures" condensed>
         <thead>
           <tr>
             <th style={{ width: 200 }}>Timestamp</th>

@@ -20,8 +20,8 @@ import styled, { css } from 'styled-components';
 import capitalize from 'lodash/capitalize';
 
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
-import { useStore } from 'stores/connect';
-import EntityShareStore from 'stores/permissions/EntityShareStore';
+import useEntityShareState from 'hooks/useEntityShareState';
+import { createGRN } from 'logic/permissions/GRN';
 import type { SelectedGrantees } from 'logic/permissions/EntityShareState';
 import { DEFAULT_PAGE_SIZES } from 'hooks/usePaginationQueryParameter';
 import {
@@ -35,6 +35,7 @@ import { Alert } from 'components/bootstrap';
 
 type Props = {
   shareState?: EntitySharePayload;
+  entityId?: string;
 };
 const List = styled.div(
   ({ theme }) => `
@@ -79,8 +80,9 @@ const getPaginatedGrantees = (selectedGrantees: SelectedGrantees, pageSize: numb
   return selectedGrantees.slice(begin, end);
 };
 
-const ShareDetails = ({ shareState = null }: Props) => {
-  const { state: entityShareState } = useStore(EntityShareStore);
+const ShareDetails = ({ shareState = null, entityId = undefined }: Props) => {
+  const entityGRN = entityId ? createGRN('event_definition', entityId) : null;
+  const { data: entityShareState } = useEntityShareState(entityGRN);
 
   const initialPageSize = DEFAULT_PAGE_SIZES[0];
   const [pageSize, setPageSize] = useState(initialPageSize);
@@ -92,6 +94,11 @@ const ShareDetails = ({ shareState = null }: Props) => {
 
   const activeShares = entityShareState?.activeShares;
   const selectedGrantees = entityShareState?.selectedGrantees;
+
+  if (!selectedGrantees) {
+    return null;
+  }
+
   const paginatedGrantees = getPaginatedGrantees(selectedGrantees, pageSize, currentPage);
   const totalGrantees = selectedGrantees.size;
   const totalPages = Math.ceil(totalGrantees / pageSize);
