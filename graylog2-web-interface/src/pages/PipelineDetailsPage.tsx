@@ -25,7 +25,6 @@ import SourceGenerator from 'logic/pipelines/SourceGenerator';
 import { StreamsStore } from 'stores/streams/StreamsStore';
 import DocsHelper from 'util/DocsHelper';
 import useParams from 'routing/useParams';
-import { RulesActions } from 'stores/rules/RulesStore';
 import usePipeline from 'hooks/usePipeline';
 import usePipelineMutations from 'hooks/usePipelineMutations';
 import usePipelineConnections, { usePipelineConnectionMutation } from 'hooks/usePipelineConnections';
@@ -53,8 +52,6 @@ const PipelineDetailsPage = () => {
   const [streams, setStreams] = useState();
 
   useEffect(() => {
-    RulesActions.list();
-
     StreamsStore.listStreams().then((_streams) => {
       const filteredStreams = _streams.filter((s) => s.is_editable);
 

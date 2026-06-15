@@ -15,9 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { createContext, useEffect, useRef, useCallback, useState, useMemo } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import type { QueryClient } from '@tanstack/react-query';
 
-import type { RuleType } from 'stores/rules/RulesStore';
-import { RulesActions } from 'stores/rules/RulesStore';
+import type { RuleType } from 'components/rules/hooks/useRules';
+import {
+  parseRule,
+  simulateRule as simulateRuleRequest,
+  saveRule,
+  updateRule,
+  RULES_QUERY_KEY,
+} from 'components/rules/hooks/useRules';
 import { getSavedRuleSourceCode, removeSavedRuleSourceCode } from 'hooks/useRuleBuilder';
 
 import { jsonifyText } from './rule-builder/helpers';
@@ -47,18 +55,18 @@ const getMessageToSimulate = (rawMessage: string, messageType: SimulationFieldTy
 
 const savePipelineRule = (
   nextRule: RuleType,
+  queryClient: QueryClient,
   callback: (rule: RuleType) => void = () => {},
   onError: (error: object) => void = () => {},
 ) => {
-  let promise;
+  const promise = nextRule?.id ? updateRule(nextRule) : saveRule(nextRule);
 
-  if (nextRule?.id) {
-    promise = RulesActions.update(nextRule);
-  } else {
-    promise = RulesActions.save(nextRule);
-  }
-
-  promise.then(callback).catch(onError);
+  promise
+    .then((response) => {
+      queryClient.invalidateQueries({ queryKey: RULES_QUERY_KEY });
+      callback(response);
+    })
+    .catch(onError);
 };
 
 type Props = {
@@ -68,6 +76,7 @@ type Props = {
 };
 
 export const PipelineRulesProvider = ({ children, usedInPipelines = [], rule = undefined }: Props) => {
+  const queryClient = useQueryClient();
   const ruleSourceRef = useRef(undefined);
   const [, setAceLoaded] = useState(false);
   const [ruleSource, setRuleSource] = useState(rule?.source);
@@ -109,7 +118,11 @@ export const PipelineRulesProvider = ({ children, usedInPipelines = [], rule = u
         description,
       };
 
-      RulesActions.parse(nextRule, callback);
+      parseRule(nextRule)
+        .then(callback)
+        .catch(() => {
+          /* non-parse errors are intentionally ignored, matching the old store behavior */
+        });
     },
     [rule, description, rawMessageToSimulate],
   );
@@ -122,7 +135,11 @@ export const PipelineRulesProvider = ({ children, usedInPipelines = [], rule = u
       callback: React.Dispatch<any> | (() => void) = setRuleSimulationResult,
     ) => {
       const messageToSimulate = getMessageToSimulate(messageString, simulationType);
-      RulesActions.simulate(messageToSimulate, _rule, callback);
+      simulateRuleRequest(messageToSimulate, _rule)
+        .then(callback)
+        .catch(() => {
+          /* simulation errors are intentionally ignored, matching the old store behavior */
+        });
     },
     [rawMessageToSimulate, setRuleSimulationResult],
   );
@@ -142,14 +159,18 @@ export const PipelineRulesProvider = ({ children, usedInPipelines = [], rule = u
         description,
       };
 
-      RulesActions.parse(savedRule, () => callback(savedRule));
+      parseRule(savedRule)
+        .then(() => callback(savedRule))
+        .catch(() => {
+          /* non-parse errors are intentionally ignored, matching the old store behavior */
+        });
     };
 
     const handleSavePipelineRule = (
       callback: (rule: RuleType) => void = () => {},
       onError: (error: object) => void = () => {},
     ) => {
-      validateBeforeSave((nextRule) => savePipelineRule(nextRule, callback, onError));
+      validateBeforeSave((nextRule) => savePipelineRule(nextRule, queryClient, callback, onError));
     };
 
     const onChangeSource = (source: string) => {
@@ -193,6 +214,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines = [], rule = u
   }, [
     description,
     createAnnotations,
+    queryClient,
     rule,
     ruleSource,
     usedInPipelines,

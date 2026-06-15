@@ -16,14 +16,13 @@
  */
 import React, { useCallback, useMemo, useState } from 'react';
 
-import { useStore } from 'stores/connect';
 import { Link, SelectableList } from 'components/common';
 import { Button, ControlLabel, FormGroup, BootstrapModalForm, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import NumberUtils from 'util/NumberUtils';
 import Routes from 'routing/Routes';
 import type { PipelineType, StageType } from 'components/pipelines/types';
-import { RulesStore } from 'stores/rules/RulesStore';
+import { useRules } from 'components/rules/hooks/useRules';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 
@@ -55,7 +54,7 @@ const StageForm = ({
   );
 
   const [nextStage, setNextStage] = useState<StageType>({ ...stage, stage: _initialStageNumber });
-  const { rules } = useStore(RulesStore);
+  const { data: rules } = useRules();
 
   const openModal = () => {
     setShowModal(true);

@@ -17,7 +17,7 @@
 import React from 'react';
 
 import { DataTable } from 'components/common';
-import type { RuleType, RulesContext } from 'stores/rules/RulesStore';
+import type { RuleType, RulesContext } from 'components/rules/hooks/useRules';
 import { useProcessingLoadContext, type ProcessingLoadResponse } from 'components/pipelines/processing-load';
 
 import RuleListEntry from './RuleListEntry';

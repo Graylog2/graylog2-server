@@ -19,7 +19,7 @@ import styled, { css } from 'styled-components';
 
 import { Button, ControlLabel, FormGroup, Input, ButtonGroup } from 'components/bootstrap';
 import MessageShow from 'components/search/MessageShow';
-import type { RuleType } from 'stores/rules/RulesStore';
+import type { RuleType } from 'components/rules/hooks/useRules';
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { getPathnameWithoutId } from 'util/URLUtils';

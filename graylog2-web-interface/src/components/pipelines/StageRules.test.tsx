@@ -20,7 +20,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import StageRules from 'components/pipelines/StageRules';
 import type { PipelineType, StageType } from 'components/pipelines/types';
-import type { RuleType } from 'stores/rules/RulesStore';
+import type { RuleType } from 'components/rules/hooks/useRules';
 
 jest.mock('components/metrics', () => ({
   MetricContainer: ({ children, name }: { children: React.ReactNode; name: string }) => (
