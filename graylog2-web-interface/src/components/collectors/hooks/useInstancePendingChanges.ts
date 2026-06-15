@@ -20,6 +20,8 @@ import { Collectors } from '@graylog/server-api';
 
 import { defaultOnError } from 'util/conditional/onError';
 
+import useCollectorRefetchInterval from './useCollectorRefetchInterval';
+
 import type { PendingChangesResponse } from '../types';
 
 export const pendingChangesKey = (instanceUid: string) => [
@@ -35,6 +37,10 @@ const fetchPendingChanges = (instanceUid: string): Promise<PendingChangesRespons
 const useInstancePendingChanges = (
   instanceUid: string,
 ): { data: PendingChangesResponse | undefined; isLoading: boolean; isError: boolean } => {
+  // Same cadence as the instances table, so an open drawer clears on its own
+  // once the collector has applied its changes.
+  const refetchInterval = useCollectorRefetchInterval();
+
   const { data, isLoading, isError } = useQuery<PendingChangesResponse>({
     queryKey: pendingChangesKey(instanceUid),
     queryFn: () =>
@@ -43,9 +49,7 @@ const useInstancePendingChanges = (
         'Loading pending changes failed with status',
         'Could not load pending changes',
       ),
-    // Same cadence as the instances table, so an open drawer clears on its own
-    // once the collector has applied its changes.
-    refetchInterval: 30000,
+    refetchInterval,
   });
 
   return { data, isLoading, isError };

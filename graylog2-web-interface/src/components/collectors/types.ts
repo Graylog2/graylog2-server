@@ -125,6 +125,7 @@ export type CollectorsConfig = {
   token_signing_key: TokenSigningKey | null;
   otlp_server_cert_id: string | null;
   http: IngestEndpointConfig;
+  collector_heartbeat_interval: string;
   collector_offline_threshold: string;
   collector_default_visibility_threshold: string;
   collector_expiration_threshold: string;

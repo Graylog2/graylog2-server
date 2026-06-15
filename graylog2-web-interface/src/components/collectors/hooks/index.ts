@@ -45,3 +45,4 @@ export { default as useDefaultInstanceFilters } from './useDefaultInstanceFilter
 
 export { useRecentActivity, ACTIVITY_KEY } from './useActivityQueries';
 export { default as useInstancePendingChanges } from './useInstancePendingChanges';
+export { default as useCollectorRefetchInterval } from './useCollectorRefetchInterval';
