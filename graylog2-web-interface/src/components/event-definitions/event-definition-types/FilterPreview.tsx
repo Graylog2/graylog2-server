@@ -72,7 +72,7 @@ const SearchResult = ({
   }
 
   return (
-    <Table striped condensed bordered>
+    <Table condensed bordered>
       <thead>
         <tr>
           <th>Timestamp</th>
