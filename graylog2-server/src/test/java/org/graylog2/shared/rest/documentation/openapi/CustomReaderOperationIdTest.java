@@ -24,6 +24,7 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.QueryParam;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -197,6 +198,7 @@ class CustomReaderOperationIdTest {
         }
 
         @POST
+        @NoAuditEvent("Test")
         @Operation(operationId = "legacyCreateWidget")
         public String createWidget(String body) {
             return "";
