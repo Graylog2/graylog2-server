@@ -23,7 +23,6 @@ import {
   COL_WIDTH_STYLE,
   COL_WIDTH_VARIABLE,
   FoundationTable,
-  H3,
   PxLabel,
   StoryContainer,
   Token,
@@ -93,21 +92,6 @@ export const FontFamiliesDoc = () => {
 };
 
 // ─── Type Scale ────────────────────────────────────────────────────────────
-
-const ScaleGroup = styled.section`
-  margin-bottom: ${({ theme }) => theme.spacings.xl};
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-
-const GroupNote = styled.p`
-  font-size: ${({ theme }) => theme.fonts.size.body};
-  color: ${({ theme }) => theme.colors.text.primary};
-  margin: 0 0 ${({ theme }) => theme.spacings.md};
-  line-height: 1.5;
-`;
 
 type FontSizeKey =
   | 'h1'
@@ -233,9 +217,12 @@ const TYPE_SCALE_GROUPS: Array<ScaleGroupEntry> = [
   },
 ];
 
-export const TypeScaleDoc = () => {
+export const TypeScaleGroupDoc = ({ label }: { label: string }) => {
   const theme = useTheme();
   const remToPx = (rem: string): string => `${Math.round(parseFloat(rem) * parseFloat(theme.fonts.size.root))}px`;
+  const group = TYPE_SCALE_GROUPS.find((g) => g.label === label);
+
+  if (!group) return null;
 
   const columns = [
     {
@@ -283,17 +270,7 @@ export const TypeScaleDoc = () => {
 
   return (
     <StoryContainer>
-      {TYPE_SCALE_GROUPS.map((group) => (
-        <ScaleGroup key={group.label}>
-          <H3>{group.label}</H3>
-          <GroupNote>{group.note}</GroupNote>
-          <FoundationTable
-            columns={columns}
-            rows={group.items}
-            keyBy={(row) => `${row.key}-${row.family ?? 'default'}`}
-          />
-        </ScaleGroup>
-      ))}
+      <FoundationTable columns={columns} rows={group.items} keyBy={(row) => `${row.key}-${row.family ?? 'default'}`} />
     </StoryContainer>
   );
 };

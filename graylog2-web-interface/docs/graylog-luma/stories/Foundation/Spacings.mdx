@@ -1,11 +1,22 @@
 import { Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { Alert } from 'components/bootstrap';
 import { SpacingsDoc } from './Spacings';
 
 <Meta title="Foundation/Spacings" />
 
 # Spacings
 
-Spacing tokens are for **component authors** building new reusable components. When importing an existing component, their internal spacing is already built in and you do not need to apply these manually.
+<Unstyled>
+  <Alert bsStyle="warning">
+    {'Spacing theme tokens are for '}
+    <strong>component authors</strong>
+    {' building new reusable components in '}
+    <code>components/common</code>
+    {
+      '. When using an existing component, its internal spacing is already built in. Do not apply spacing tokens manually outside of reusable components.'
+    }
+  </Alert>
+</Unstyled>
 
 <Unstyled>
   <SpacingsDoc />

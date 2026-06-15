@@ -135,18 +135,106 @@ class CollectorInstanceServiceTest {
         // fleet-b: 1 instance (1 online)
         enrollWithFleetAndLastSeen("uid-b1", fleetB, recentlySeen);
 
-        final Map<String, long[]> grouped = collectorInstanceService.countByFleetGrouped(onlineThreshold);
+        final var grouped = collectorInstanceService.countByFleetGrouped(onlineThreshold);
 
         assertThat(grouped).containsKey(fleetA);
-        assertThat(grouped.get(fleetA)[0]).isEqualTo(3L); // total
-        assertThat(grouped.get(fleetA)[1]).isEqualTo(2L); // online
+        assertThat(grouped.get(fleetA).total()).isEqualTo(3L);
+        assertThat(grouped.get(fleetA).online()).isEqualTo(2L);
+        assertThat(grouped.get(fleetA).offline()).isEqualTo(1L);
 
         assertThat(grouped).containsKey(fleetB);
-        assertThat(grouped.get(fleetB)[0]).isEqualTo(1L); // total
-        assertThat(grouped.get(fleetB)[1]).isEqualTo(1L); // online
+        assertThat(grouped.get(fleetB).total()).isEqualTo(1L);
+        assertThat(grouped.get(fleetB).online()).isEqualTo(1L);
+        assertThat(grouped.get(fleetB).offline()).isZero();
 
         // absent fleet should not be in the map
         assertThat(grouped).doesNotContainKey("507f1f77bcf86cd799439099");
+    }
+
+    @Test
+    void countAcrossAllFleetsReturnsZeroForEmptyCollection() {
+        final var stats = collectorInstanceService.countAcrossAllFleets(Instant.now().minusSeconds(60));
+
+        assertThat(stats.total()).isZero();
+        assertThat(stats.online()).isZero();
+    }
+
+    @Test
+    void countAcrossAllFleetsSumsAcrossFleetsAndStatuses() throws Exception {
+        final Instant now = Instant.now();
+        final Instant recentlySeen = now.minusSeconds(30);
+        final Instant longAgo = now.minusSeconds(600);
+        final Instant onlineThreshold = now.minusSeconds(60);
+
+        final String fleetA = "507f1f77bcf86cd799439012";
+        final String fleetB = "507f1f77bcf86cd799439013";
+
+        // fleet-a: 3 instances, 2 online + 1 offline
+        enrollWithFleetAndLastSeen("uid-a1", fleetA, recentlySeen);
+        enrollWithFleetAndLastSeen("uid-a2", fleetA, recentlySeen);
+        enrollWithFleetAndLastSeen("uid-a3", fleetA, longAgo);
+
+        // fleet-b: 2 instances, 1 online + 1 offline
+        enrollWithFleetAndLastSeen("uid-b1", fleetB, recentlySeen);
+        enrollWithFleetAndLastSeen("uid-b2", fleetB, longAgo);
+
+        final var stats = collectorInstanceService.countAcrossAllFleets(onlineThreshold);
+
+        assertThat(stats.total()).isEqualTo(5L);
+        assertThat(stats.online()).isEqualTo(3L);
+        assertThat(stats.offline()).isEqualTo(2L);
+    }
+
+    @Test
+    void countAcrossAllFleetsTreatsInstanceAtThresholdAsOnline() throws Exception {
+        final Instant onlineThreshold = Instant.now().minusSeconds(60);
+
+        enrollWithFleetAndLastSeen("uid-at-threshold", "507f1f77bcf86cd799439012", onlineThreshold);
+        enrollWithFleetAndLastSeen("uid-just-below", "507f1f77bcf86cd799439012", onlineThreshold.minusMillis(1));
+
+        final var stats = collectorInstanceService.countAcrossAllFleets(onlineThreshold);
+
+        assertThat(stats.total()).isEqualTo(2L);
+        assertThat(stats.online()).isEqualTo(1L);
+    }
+
+    @Test
+    void countByFleetReturnsZeroForUnknownFleet() throws Exception {
+        // Populate the collection so we can be sure the zero result is fleet-scoped,
+        // not just an empty-collection fallback.
+        enrollWithFleetAndLastSeen("uid-other", "507f1f77bcf86cd799439012", Instant.now());
+
+        final var stats = collectorInstanceService.countByFleet(
+                "507f1f77bcf86cd799439099", Instant.now().minusSeconds(60));
+
+        assertThat(stats.total()).isZero();
+        assertThat(stats.online()).isZero();
+        assertThat(stats.offline()).isZero();
+    }
+
+    @Test
+    void countByFleetIsolatesToRequestedFleet() throws Exception {
+        final Instant now = Instant.now();
+        final Instant recentlySeen = now.minusSeconds(30);
+        final Instant longAgo = now.minusSeconds(600);
+        final Instant onlineThreshold = now.minusSeconds(60);
+
+        final String fleetA = "507f1f77bcf86cd799439012";
+        final String fleetB = "507f1f77bcf86cd799439013";
+
+        // fleet-a: 2 online + 1 offline
+        enrollWithFleetAndLastSeen("uid-a1", fleetA, recentlySeen);
+        enrollWithFleetAndLastSeen("uid-a2", fleetA, recentlySeen);
+        enrollWithFleetAndLastSeen("uid-a3", fleetA, longAgo);
+        // fleet-b: noise that must NOT be counted in fleet-a's totals
+        enrollWithFleetAndLastSeen("uid-b1", fleetB, recentlySeen);
+        enrollWithFleetAndLastSeen("uid-b2", fleetB, longAgo);
+
+        final var stats = collectorInstanceService.countByFleet(fleetA, onlineThreshold);
+
+        assertThat(stats.total()).isEqualTo(3L);
+        assertThat(stats.online()).isEqualTo(2L);
+        assertThat(stats.offline()).isEqualTo(1L);
     }
 
     @Test
