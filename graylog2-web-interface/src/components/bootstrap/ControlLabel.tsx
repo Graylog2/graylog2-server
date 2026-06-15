@@ -15,10 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import styled, { css } from 'styled-components';
-// eslint-disable-next-line no-restricted-imports
-import { ControlLabel as BootstrapControlLabel } from 'react-bootstrap';
 
-const ControlLabel = styled(BootstrapControlLabel)(
+const ControlLabel = styled.label(
   ({ theme }) => css`
     color: ${theme.colors.text.primary};
     font-weight: bold;
