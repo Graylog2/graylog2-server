@@ -17,7 +17,6 @@
 package org.graylog.collectors.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.annotation.Nullable;
 import org.graylog.collectors.db.CoalescedActions;
 
 import java.util.List;
@@ -47,15 +46,19 @@ public record PendingChangesResponse(
     public record CoalescedActionsView(
             @JsonProperty("recompute_config") boolean recomputeConfig,
             @JsonProperty("recompute_ingest_config") boolean recomputeIngestConfig,
-            @JsonProperty("reassign_target_fleet_id") @Nullable String reassignTargetFleetId,
+            @JsonProperty("reassign") boolean reassign,
             @JsonProperty("restart") boolean restart,
             @JsonProperty("run_discovery") boolean runDiscovery) {
 
         static CoalescedActionsView from(CoalescedActions actions) {
+            // We only expose whether a reassignment is pending, not its target fleet id. Exposing the id
+            // would require a per-user permission check (see ActivityEntryMapper#resolveDetails); the
+            // boolean leaks nothing, and the (permission-filtered) destination is available in the
+            // activity entries.
             return new CoalescedActionsView(
                     actions.recomputeConfig(),
                     actions.recomputeIngestConfig(),
-                    actions.newFleetId(),
+                    actions.newFleetId() != null,
                     actions.restart(),
                     actions.runDiscovery());
         }

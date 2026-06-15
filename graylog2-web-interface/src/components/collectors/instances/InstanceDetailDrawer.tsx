@@ -30,7 +30,7 @@ import SyncStateIndicator from '../common/SyncStateIndicator';
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
 import collectorSystemLogsUrl from '../common/collectorSystemLogsUrl';
 import { useInstancePendingChanges } from '../hooks';
-import type { ActivityEntry, CoalescedActions, CollectorInstanceView, Source } from '../types';
+import type { CoalescedActions, CollectorInstanceView, Source } from '../types';
 
 type Props = {
   instance: CollectorInstanceView;
@@ -104,28 +104,12 @@ const TransactionsToggle = styled(Button)`
 
 type PendingEffect = { key: string; icon: IconName; description: React.ReactNode };
 
-// The net effect still awaiting the collector, as imperative one-liners. The
-// reassign destination comes resolved from the corresponding activity entry (the coalesced view
-// only carries the fleet id).
-const pendingEffects = (coalesced: CoalescedActions, activities: ActivityEntry[]): PendingEffect[] => {
+// The net effect still awaiting the collector, as imperative one-liners.
+const pendingEffects = (coalesced: CoalescedActions): PendingEffect[] => {
   const effects: PendingEffect[] = [];
 
-  if (coalesced.reassign_target_fleet_id) {
-    const destination = activities
-      .map((entry) => (entry.type === 'FLEET_REASSIGNED' ? entry.details?.destination_fleet : null))
-      .filter(Boolean)
-      .pop();
-    effects.push({
-      key: 'reassign',
-      icon: 'shuffle',
-      description: destination?.id ? (
-        <>
-          Reassign to fleet <Link to={Routes.SYSTEM.COLLECTORS.FLEET(destination.id)}>{destination.name}</Link>
-        </>
-      ) : (
-        'Reassign to another fleet'
-      ),
-    });
+  if (coalesced.reassign) {
+    effects.push({ key: 'reassign', icon: 'shuffle', description: 'Reassign to another fleet' });
   }
 
   if (coalesced.recompute_config) {
@@ -252,7 +236,7 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
           <>
             <span>The following actions are queued until the collector synchronizes:</span>
             <EffectList>
-              {pendingEffects(pendingChanges.coalesced, pendingChanges.activities).map((effect) => (
+              {pendingEffects(pendingChanges.coalesced).map((effect) => (
                 <IconRow key={effect.key}>
                   <Icon name={effect.icon} />
                   <span>{effect.description}</span>

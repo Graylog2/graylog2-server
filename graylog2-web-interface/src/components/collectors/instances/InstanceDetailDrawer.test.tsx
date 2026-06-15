@@ -63,7 +63,7 @@ const pendingChanges: PendingChangesResponse = {
   coalesced: {
     recompute_config: true,
     recompute_ingest_config: false,
-    reassign_target_fleet_id: 'fleet-2',
+    reassign: true,
     restart: false,
     run_discovery: false,
   },
@@ -127,14 +127,17 @@ describe('InstanceDetailDrawer', () => {
 
     await screen.findByText('Synchronization');
     await screen.findByText('Sync pending');
-    await screen.findByText(/reassign to fleet/i);
-    await screen.findByRole('link', { name: 'Staging' });
+    // The effects summary only states that a reassignment is pending, not the destination fleet.
+    await screen.findByText(/reassign to another fleet/i);
     await screen.findByText(/reload configuration/i);
+    expect(screen.queryByRole('link', { name: 'Staging' })).not.toBeInTheDocument();
 
-    // The queued transactions are collapsed by default and expand on demand.
+    // The queued transactions are collapsed by default and expand on demand. The (permission-filtered)
+    // destination fleet is shown there.
     expect(screen.queryByText('by Alice Admin')).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: /show queued transactions \(1\)/i }));
     await screen.findByText('by Alice Admin');
+    await screen.findByRole('link', { name: 'Staging' });
   });
 
   it('shows a spinner while pending details are loading', async () => {
@@ -162,7 +165,7 @@ describe('InstanceDetailDrawer', () => {
         coalesced: {
           recompute_config: false,
           recompute_ingest_config: false,
-          reassign_target_fleet_id: null,
+          reassign: false,
           restart: false,
           run_discovery: false,
         },

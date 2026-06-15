@@ -46,8 +46,8 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -109,13 +109,14 @@ class CollectorInstancesResourceTest {
 
         final var response = resource.instancePendingChanges("uid-1");
 
-        assertThat(response.coalesced().reassignTargetFleetId()).isEqualTo("fleet-X");
+        assertThat(response.coalesced().reassign()).isTrue();
         assertThat(response.coalesced().recomputeConfig()).isTrue();
         assertThat(response.coalesced().restart()).isFalse();
         assertThat(response.activities()).isEqualTo(mappedEntries);
 
         // The mapper must only see known marker types — UNKNOWN is filtered out
-        @SuppressWarnings("unchecked") final ArgumentCaptor<List<TransactionMarker>> captor =
+        @SuppressWarnings("unchecked")
+        final ArgumentCaptor<List<TransactionMarker>> captor =
                 ArgumentCaptor.forClass(List.class);
         verify(activityEntryMapper).toEntries(captor.capture(), any());
         assertThat(captor.getValue()).containsExactly(reassign);
@@ -134,7 +135,7 @@ class CollectorInstancesResourceTest {
         assertThat(response.activities()).isEmpty();
         assertThat(response.coalesced().recomputeConfig()).isFalse();
         assertThat(response.coalesced().recomputeIngestConfig()).isFalse();
-        assertThat(response.coalesced().reassignTargetFleetId()).isNull();
+        assertThat(response.coalesced().reassign()).isFalse();
         assertThat(response.coalesced().restart()).isFalse();
         assertThat(response.coalesced().runDiscovery()).isFalse();
     }

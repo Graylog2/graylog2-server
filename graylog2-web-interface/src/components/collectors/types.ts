@@ -198,7 +198,7 @@ export type RecentActivityResponse = {
 export type CoalescedActions = {
   recompute_config: boolean;
   recompute_ingest_config: boolean;
-  reassign_target_fleet_id: string | null;
+  reassign: boolean;
   restart: boolean;
   run_discovery: boolean;
 };
