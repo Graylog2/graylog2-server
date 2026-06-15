@@ -23,9 +23,9 @@ import selectEvent from 'helpers/selectEvent';
 import { asMock } from 'helpers/mocking';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import { createEntityShareState, everyone, viewer } from 'fixtures/entityShareState';
+import useEntityShareState from 'hooks/useEntityShareState';
 
 import OriginalSavedSearchForm from './SavedSearchForm';
-import useEntityShareState from 'hooks/useEntityShareState';
 
 jest.mock('formik', () => ({
   ...jest.requireActual('formik'),
@@ -35,7 +35,12 @@ jest.mock('views/hooks/useSaveViewFormControls');
 jest.mock('api/entity-share', () => ({
   prepareEntityShare: jest.fn(() => Promise.resolve()),
   updateEntityShare: jest.fn(() => Promise.resolve()),
-  loadUserSharesPaginated: jest.fn(() => Promise.resolve({ list: require('immutable').List(), pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 } })),
+  loadUserSharesPaginated: jest.fn(() =>
+    Promise.resolve({
+      list: require('immutable').List(),
+      pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
+    }),
+  ),
 }));
 jest.mock('hooks/useEntityShareState', () => {
   const mockSetEntityShareState = jest.fn();

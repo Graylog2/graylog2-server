@@ -62,8 +62,8 @@ export const prepareEntityShare = (
     ? ApiRoutes.EntityShareController.prepare(entityGRN).url
     : ApiRoutes.EntityShareController.prepareEntityCreate().url;
 
-  return fetch('POST', qualifyUrl(url), JSON.stringify(payload)).then(
-    (response: EntityShareStateJson) => EntityShareState.fromJSON(response),
+  return fetch('POST', qualifyUrl(url), JSON.stringify(payload)).then((response: EntityShareStateJson) =>
+    EntityShareState.fromJSON(response),
   );
 };
 

@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix Geo-Location Processor configuration failing to save when cloud storage is set to S3 or GCS."
+
+issues = ["14449"]
+pulls = ["26329"]

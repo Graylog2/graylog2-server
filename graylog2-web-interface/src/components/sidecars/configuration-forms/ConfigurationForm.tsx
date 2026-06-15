@@ -24,11 +24,7 @@ import { ColorPickerPopover, FormSubmit, InputDescription, Select, SourceCodeEdi
 import { Button, Col, ControlLabel, FormControl, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
-import {
-  createConfiguration,
-  updateConfiguration,
-  validateConfiguration,
-} from 'hooks/useCollectorConfigurations';
+import { createConfiguration, updateConfiguration, validateConfiguration } from 'hooks/useCollectorConfigurations';
 import { fetchCollector, useCollectorsAll } from 'hooks/useCollectors';
 import ConfigurationHelper from 'components/sidecars/configuration-forms/ConfigurationHelper';
 import useHistory from 'routing/useHistory';

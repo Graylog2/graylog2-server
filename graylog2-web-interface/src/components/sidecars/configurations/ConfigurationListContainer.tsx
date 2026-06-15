@@ -45,7 +45,8 @@ const ConfigurationListContainer = () => {
   const invalidateConfigurations = () =>
     queryClient.invalidateQueries({ queryKey: COLLECTOR_CONFIGURATIONS_QUERY_KEY });
 
-  const handleDelete = (configuration: Configuration) => deleteConfiguration(configuration).then(invalidateConfigurations);
+  const handleDelete = (configuration: Configuration) =>
+    deleteConfiguration(configuration).then(invalidateConfigurations);
 
   const handlePageChange = (newPage: number, newPageSize: number) => {
     setPage(newPage);

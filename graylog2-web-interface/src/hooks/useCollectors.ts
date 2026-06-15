@@ -164,9 +164,7 @@ export const copyCollector = (collectorId: string, name: string): Promise<unknow
   return promise;
 };
 
-export const validateCollector = (
-  collector: Collector,
-): Promise<{ errors: { name: string[] }; failed: boolean }> => {
+export const validateCollector = (collector: Collector): Promise<{ errors: { name: string[] }; failed: boolean }> => {
   const payload: Partial<Collector> = {
     id: ' ',
     service_type: 'exec',

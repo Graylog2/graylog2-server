@@ -37,9 +37,9 @@ const mockLoadUsersForRolePromise = Promise.resolve({
 
 jest.mock('hooks/useAuthzRoles', () => ({
   AUTHZ_ROLES_QUERY_KEY: ['authz', 'roles'],
-    removeMemberFromRole: jest.fn(() => Promise.resolve()),
-    addMembersToRole: jest.fn(() => Promise.resolve()),
-    loadUsersForRole: jest.fn(() => mockLoadUsersForRolePromise),
+  removeMemberFromRole: jest.fn(() => Promise.resolve()),
+  addMembersToRole: jest.fn(() => Promise.resolve()),
+  loadUsersForRole: jest.fn(() => mockLoadUsersForRolePromise),
 }));
 
 // mock loadUsersPaginated

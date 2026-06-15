@@ -101,7 +101,7 @@ const Table = <Entity extends EntityBase>({
   const isRowExpanded = (rowId: string) => !!expandedSections?.[rowId];
 
   return (
-    <StyledTable striped condensed>
+    <StyledTable condensed>
       <TableHead headerGroups={headerGroups} />
       {rows.map((row) => {
         const visibleCells = row.getVisibleCells();
