@@ -15,18 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import DOMPurify, { type Config } from 'dompurify';
+import styled, { css } from 'styled-components';
 
-type Props = {
-  html: string | null | undefined;
-  config?: Config;
-} & Omit<React.HTMLAttributes<HTMLSpanElement>, 'dangerouslySetInnerHTML' | 'children'>;
+const Marker = styled.span(
+  ({ theme }) => css`
+    color: ${theme.colors.variant.danger};
+    margin-left: ${theme.spacings.xxs};
+  `,
+);
 
-const Sanitize = ({ html, config = undefined, ...rest }: Props) => {
-  const sanitized = DOMPurify.sanitize(html ?? '', config ?? {});
+const RequiredMarker = () => <Marker aria-hidden="true">*</Marker>;
 
-  // eslint-disable-next-line react/no-danger
-  return <span {...rest} dangerouslySetInnerHTML={{ __html: sanitized }} />;
-};
-
-export default Sanitize;
+export default RequiredMarker;
