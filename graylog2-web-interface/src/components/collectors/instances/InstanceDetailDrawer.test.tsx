@@ -81,7 +81,7 @@ const pendingChanges: PendingChangesResponse = {
 
 describe('InstanceDetailDrawer', () => {
   beforeEach(() => {
-    asMock(useInstancePendingChanges).mockReturnValue({ data: undefined, isLoading: true });
+    asMock(useInstancePendingChanges).mockReturnValue({ data: undefined, isLoading: true, isError: false });
   });
 
   it('renders instance hostname as title', async () => {
@@ -119,7 +119,7 @@ describe('InstanceDetailDrawer', () => {
   });
 
   it('renders pending changes as the effects the collector will apply', async () => {
-    asMock(useInstancePendingChanges).mockReturnValue({ data: pendingChanges, isLoading: false });
+    asMock(useInstancePendingChanges).mockReturnValue({ data: pendingChanges, isLoading: false, isError: false });
 
     render(
       <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
@@ -141,7 +141,7 @@ describe('InstanceDetailDrawer', () => {
   });
 
   it('shows a spinner while pending details are loading', async () => {
-    asMock(useInstancePendingChanges).mockReturnValue({ data: undefined, isLoading: true });
+    asMock(useInstancePendingChanges).mockReturnValue({ data: undefined, isLoading: true, isError: false });
     const pendingInstance = { ...mockInstance, has_pending_changes: true };
 
     render(
@@ -172,6 +172,7 @@ describe('InstanceDetailDrawer', () => {
         activities: [],
       },
       isLoading: false,
+      isError: false,
     });
 
     render(
@@ -183,5 +184,22 @@ describe('InstanceDetailDrawer', () => {
     expect(await screen.findAllByText('In sync')).toHaveLength(2);
     await screen.findByText(/applied all queued actions/i);
     expect(screen.queryByText(/queued until the collector synchronizes/i)).not.toBeInTheDocument();
+  });
+
+  it('shows an error message instead of spinning forever when pending changes fail to load', async () => {
+    asMock(useInstancePendingChanges).mockReturnValue({ data: undefined, isLoading: false, isError: true });
+    const pendingInstance = { ...mockInstance, has_pending_changes: true };
+
+    render(
+      <InstanceDetailDrawer
+        instance={pendingInstance}
+        sources={mockSources}
+        fleetName="production"
+        onClose={jest.fn()}
+      />,
+    );
+
+    await screen.findByText(/could not load pending changes/i);
+    expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
   });
 });

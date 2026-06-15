@@ -34,8 +34,8 @@ const fetchPendingChanges = (instanceUid: string): Promise<PendingChangesRespons
 
 const useInstancePendingChanges = (
   instanceUid: string,
-): { data: PendingChangesResponse | undefined; isLoading: boolean } =>
-  useQuery<PendingChangesResponse>({
+): { data: PendingChangesResponse | undefined; isLoading: boolean; isError: boolean } => {
+  const { data, isLoading, isError } = useQuery<PendingChangesResponse>({
     queryKey: pendingChangesKey(instanceUid),
     queryFn: () =>
       defaultOnError(
@@ -47,5 +47,8 @@ const useInstancePendingChanges = (
     // once the collector has applied its changes.
     refetchInterval: 30000,
   });
+
+  return { data, isLoading, isError };
+};
 
 export default useInstancePendingChanges;

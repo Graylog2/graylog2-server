@@ -130,7 +130,7 @@ const pendingEffects = (coalesced: CoalescedActions): PendingEffect[] => {
 
 const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) => {
   const osDescription = (instance.non_identifying_attributes?.['os.description'] as string) ?? null;
-  const { data: pendingChanges } = useInstancePendingChanges(instance.instance_uid);
+  const { data: pendingChanges, isError: pendingChangesError } = useInstancePendingChanges(instance.instance_uid);
   // Until the pending-changes detail has loaded, fall back to the flag from the table row.
   const hasPendingChanges = pendingChanges
     ? pendingChanges.activities.length > 0
@@ -231,8 +231,9 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
 
       <Section>
         <SectionTitle>Synchronization</SectionTitle>
-        {hasPendingChanges && !pendingChanges && <Spinner />}
-        {hasPendingChanges && pendingChanges && (
+        {pendingChangesError && <EmptyText>Could not load pending changes. Please try again later.</EmptyText>}
+        {!pendingChangesError && hasPendingChanges && !pendingChanges && <Spinner />}
+        {!pendingChangesError && hasPendingChanges && pendingChanges && (
           <>
             <span>The following actions are queued until the collector synchronizes:</span>
             <EffectList>
@@ -251,7 +252,7 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
             {showTransactions && <ActivityEntryList entries={pendingChanges.activities} />}
           </>
         )}
-        {!hasPendingChanges && (
+        {!pendingChangesError && !hasPendingChanges && (
           <>
             <SyncStateIndicator pending={false} withLabel />
             <br />
