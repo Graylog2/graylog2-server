@@ -48,21 +48,31 @@ const StyledBadge = styled(MantineBadge)<{ color: ColorVariant; size: SupportedM
 );
 
 type Props = React.PropsWithChildren<{
+  'aria-label'?: string;
+  bsSize?: BsSize;
   bsStyle?: ColorVariant;
   className?: string;
   'data-testid'?: string;
   onClick?: () => void;
+  onMouseEnter?: React.MouseEventHandler<HTMLDivElement>;
+  onMouseLeave?: React.MouseEventHandler<HTMLDivElement>;
+  role?: string;
+  style?: React.CSSProperties;
   title?: string;
-  bsSize?: BsSize;
 }>;
 
 const Badge = (
   {
+    'aria-label': ariaLabel = undefined,
     bsStyle = 'default',
     className = undefined,
     children = undefined,
     'data-testid': dataTestid,
     onClick = undefined,
+    onMouseEnter = undefined,
+    onMouseLeave = undefined,
+    role = undefined,
+    style = undefined,
     title = undefined,
     bsSize = 'md',
   }: Props,
@@ -74,13 +84,18 @@ const Badge = (
 
   return (
     <StyledBadge
+      aria-label={ariaLabel}
       color={color}
       className={className}
       title={title}
       data-testid={dataTestid}
       ref={ref}
+      role={role}
+      style={style}
       variant="filled"
       onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       size={size}>
       {children}
     </StyledBadge>
