@@ -152,6 +152,13 @@ const mockEventNotifications = [
 jest.mock('components/event-notifications/hooks/useEventNotifications', () => ({
   ...jest.requireActual('components/event-notifications/hooks/useEventNotifications'),
   fetchAllEventNotifications: jest.fn(() => Promise.resolve({ notifications: mockEventNotifications })),
+  // The container reads notifications through useEventNotifications(). The hook's queryFn closes
+  // over the module-local fetchAllEventNotifications, so overriding the export above is not enough
+  // to feed it mock data; mock the hook directly with the react-query result shape it returns.
+  useEventNotifications: jest.fn(() => ({
+    data: { notifications: mockEventNotifications },
+    isLoading: false,
+  })),
 }));
 
 jest.mock('stores/configurations/ConfigurationsStore', () => ({

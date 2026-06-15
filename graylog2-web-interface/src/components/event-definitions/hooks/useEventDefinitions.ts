@@ -26,14 +26,12 @@ import PaginationURL from 'util/PaginationURL';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
-import { fetchAllEventNotifications } from 'components/event-notifications/hooks/useEventNotifications';
 import { defaultOnError } from 'util/conditional/onError';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import EventDefinitionTagsFilter from 'components/event-definitions/EventDefinitionTagsFilter';
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
-import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 
 type Options = {
   enabled: boolean;
@@ -434,27 +432,5 @@ export function useGetListEventsClusterConfig(): {
   return {
     eventsClusterConfig: isLoading ? {} : data || {},
     loadingEventsClusterConfig: isLoading,
-  };
-}
-
-export function useGetEventNotifications(): {
-  eventNotifications: { all: Array<EventNotification> };
-  loadingEventNotifications: boolean;
-} {
-  const { data, isLoading } = useQuery<{ notifications: Array<EventNotification> }, Error>({
-    // Deliberately not under EVENT_DEFINITIONS_QUERY_KEY: these are event notifications,
-    // not event definition entity data, so they should not be refetched on event definition mutations.
-    queryKey: ['event-notifications-list'],
-    queryFn: () =>
-      defaultOnError(
-        fetchAllEventNotifications(),
-        'Loading event notifications failed with status',
-        'Could not load event notifications',
-      ),
-  });
-
-  return {
-    eventNotifications: { all: isLoading ? [] : data?.notifications || [] },
-    loadingEventNotifications: isLoading,
   };
 }

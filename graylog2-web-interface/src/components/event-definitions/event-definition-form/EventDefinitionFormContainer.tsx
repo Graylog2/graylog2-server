@@ -33,6 +33,7 @@ import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useScopePermissions from 'hooks/useScopePermissions';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import { useEventNotifications } from 'components/event-notifications/hooks/useEventNotifications';
 
 import useEventDefinitionSteps, { INITIAL_EVENT_DEFINITION } from './useEventDefinitionCommonSteps';
 import EventDetailsForm from './EventDetailsForm';
@@ -45,7 +46,6 @@ import {
   updateEventDefinition,
   useGetEntityTypes,
   useGetListEventsClusterConfig,
-  useGetEventNotifications,
   EVENT_DEFINITIONS_QUERY_KEY,
 } from '../hooks/useEventDefinitions';
 
@@ -115,7 +115,8 @@ const EventDefinitionFormContainer = ({
   const { createEventDefinition } = useEventDefinitionMutations();
   const { entityTypes, loadingEntityTypes } = useGetEntityTypes();
   const { eventsClusterConfig, loadingEventsClusterConfig } = useGetListEventsClusterConfig();
-  const { eventNotifications, loadingEventNotifications } = useGetEventNotifications();
+  const { data: eventNotificationsData, isLoading: loadingEventNotifications } = useEventNotifications();
+  const notifications = eventNotificationsData?.notifications ?? [];
   const currentUser = useCurrentUser();
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
@@ -182,7 +183,7 @@ const EventDefinitionFormContainer = ({
   const steps = useEventDefinitionSteps({
     viewSteps,
     commonStepProps,
-    notifications: eventNotifications.all,
+    notifications,
     notificationDefaults: defaults,
     canEdit,
   });
@@ -194,7 +195,7 @@ const EventDefinitionFormContainer = ({
       <EventDefinitionSummary
         eventDefinition={commonStepProps.eventDefinition}
         currentUser={commonStepProps.currentUser}
-        notifications={eventNotifications?.all}
+        notifications={notifications}
         validation={commonStepProps.validation}
       />
     ),
