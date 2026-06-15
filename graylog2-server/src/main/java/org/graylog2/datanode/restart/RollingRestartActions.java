@@ -28,6 +28,8 @@ import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.rest.resources.datanodes.DatanodeRestApiProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import retrofit2.Call;
+import retrofit2.http.POST;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -117,5 +119,13 @@ public class RollingRestartActions {
 
     public List<DataNodeDto> liveDataNodes() {
         return new ArrayList<>(nodeService.allActive().values());
+    }
+
+    interface DataNodeManagementClient {
+        @POST("management/start")
+        Call<Void> start();
+
+        @POST("management/stop")
+        Call<Void> stop();
     }
 }

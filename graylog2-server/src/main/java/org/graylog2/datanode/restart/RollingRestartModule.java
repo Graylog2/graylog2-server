@@ -16,14 +16,18 @@
  */
 package org.graylog2.datanode.restart;
 
-public enum RollingRestartJobStatus {
-    ACTIVE,
-    PAUSED,
-    COMPLETED,
-    FAILED,
-    ABORTED;
+import org.graylog2.plugin.PluginModule;
+import org.graylog2.rest.resources.datanodes.RollingRestartResource;
 
-    public boolean isTerminal() {
-        return this == COMPLETED || this == FAILED || this == ABORTED;
+public class RollingRestartModule extends PluginModule {
+    @Override
+    protected void configure() {
+        addSchedulerJob(
+                RollingRestartExecutionJob.TYPE_NAME,
+                RollingRestartExecutionJob.class,
+                RollingRestartExecutionJob.Factory.class,
+                RollingRestartExecutionJob.Config.class,
+                RollingRestartExecutionJob.Data.class);
+        addSystemRestResource(RollingRestartResource.class);
     }
 }
