@@ -38,10 +38,11 @@ const Toggle = styled.button`
   gap: ${({ theme }) => theme.spacings.xs};
 `;
 
-type Props = React.PropsWithChildren<{
+type Props = {
   label: string;
   defaultOpen?: boolean;
-}>;
+  children: React.ReactNode;
+};
 
 const Collapsible = ({ label, children, defaultOpen = false }: Props) => {
   const [opened, { toggle }] = useDisclosure(defaultOpen);

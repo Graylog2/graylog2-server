@@ -49,6 +49,25 @@ const FormFields = () => (
   </>
 );
 
+const CurrentContextModalStory = () => {
+  const [show, setShow] = useState(false);
+
+  return (
+    <>
+      <Button onClick={() => setShow(true)}>Create Stream</Button>
+      <CreateModal<StoryValues>
+        entityName="Stream"
+        show={show}
+        onClose={() => setShow(false)}
+        initialValues={{ title: '', description: '' }}
+        validate={validate}
+        onSubmit={async () => {}}>
+        <FormFields />
+      </CreateModal>
+    </>
+  );
+};
+
 export const CurrentContextModal: StoryObj = {
   tags: ['!dev'],
   parameters: {
@@ -56,24 +75,7 @@ export const CurrentContextModal: StoryObj = {
       source: { type: 'dynamic' },
     },
   },
-  render: () => {
-    const [show, setShow] = useState(false);
-
-    return (
-      <>
-        <Button onClick={() => setShow(true)}>Create Stream</Button>
-        <CreateModal<StoryValues>
-          entityName="Stream"
-          show={show}
-          onClose={() => setShow(false)}
-          initialValues={{ title: '', description: '' }}
-          validate={validate}
-          onSubmit={async () => {}}>
-          <FormFields />
-        </CreateModal>
-      </>
-    );
-  },
+  render: CurrentContextModalStory,
 };
 
 export const NewContextPage: StoryObj = {
