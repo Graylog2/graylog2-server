@@ -73,8 +73,10 @@ const additionalTargetText = (targets: TargetInfo[]) => {
   );
 };
 
-const renderDescription = (entry: ActivityEntry) => {
-  const sortedTargets = entry.targets.toSorted((a, b) => naturalSortIgnoreCase(a.name, b.name));
+const byName = (a: TargetInfo, b: TargetInfo) => naturalSortIgnoreCase(a.name, b.name);
+
+const renderDescription = (entry: ActivityEntry, compareTargets: (a: TargetInfo, b: TargetInfo) => number) => {
+  const sortedTargets = entry.targets.toSorted(compareTargets);
   const target = sortedTargets[0];
 
   if (!target) {
@@ -113,7 +115,8 @@ const renderDescription = (entry: ActivityEntry) => {
     case 'FLEET_REASSIGNED': {
       return (
         <span>
-          Collector {targetLink(target)} reassigned
+          Collector {targetLink(target)}
+          {additionalTargetText(sortedTargets)} reassigned
           {entry.details && <> to fleet {targetLink(entry.details.destination_fleet)}</>}
         </span>
       );
@@ -123,6 +126,9 @@ const renderDescription = (entry: ActivityEntry) => {
 
 type Props = {
   entries: ActivityEntry[];
+  // How to order an entry's targets, deciding which one leads the description. Defaults to
+  // alphabetical by name; the per-instance drawer overrides it to float the viewed collector first.
+  compareTargets?: (a: TargetInfo, b: TargetInfo) => number;
 };
 
 /**
@@ -130,12 +136,12 @@ type Props = {
  * overview's Recent Activity feed and the instance drawer's Pending Changes section, mirroring the
  * shared `ActivityEntryMapper` on the backend.
  */
-const ActivityEntryList = ({ entries }: Props) => (
+const ActivityEntryList = ({ entries, compareTargets = byName }: Props) => (
   <IconRowList>
     {entries.map((entry) => (
       <DividedIconRow key={entry.seq}>
         <Icon name={ICON_MAP[entry.type] ?? 'info'} />
-        <Description>{renderDescription(entry)}</Description>
+        <Description>{renderDescription(entry, compareTargets)}</Description>
         <MutedText>{entry.actor ? `by ${entry.actor.full_name}` : 'by System'}</MutedText>
         {entry.timestamp && (
           <MutedText>

@@ -202,4 +202,44 @@ describe('InstanceDetailDrawer', () => {
     await screen.findByText(/could not load pending changes/i);
     expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
   });
+
+  it('leads a bulk reassignment with the instance being viewed', async () => {
+    asMock(useInstancePendingChanges).mockReturnValue({
+      data: {
+        coalesced: {
+          recompute_config: false,
+          recompute_ingest_config: false,
+          reassign: true,
+          restart: false,
+          run_discovery: false,
+        },
+        activities: [
+          {
+            seq: 7,
+            timestamp: '2026-06-10T12:00:00Z',
+            type: 'FLEET_REASSIGNED',
+            actor: null,
+            // Bulk marker: 'aaa-other-host' sorts first alphabetically, but we are viewing uid-1.
+            targets: [
+              { id: 'uid-0', name: 'aaa-other-host', type: 'collector' },
+              { id: 'uid-1', name: 'prod-web-01', type: 'collector' },
+            ],
+            details: { destination_fleet: { id: 'fleet-2', name: 'Staging', type: 'fleet' } },
+          },
+        ],
+      },
+      isLoading: false,
+      isError: false,
+    });
+
+    render(
+      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+    );
+
+    await userEvent.click(await screen.findByRole('button', { name: /show queued transactions \(1\)/i }));
+    // The viewed instance leads the entry; the other batch member is folded into the count.
+    expect(await screen.findByRole('link', { name: 'prod-web-01' })).toBeInTheDocument();
+    await screen.findByText(/and 1 other collector/i);
+    expect(screen.queryByRole('link', { name: 'aaa-other-host' })).not.toBeInTheDocument();
+  });
 });

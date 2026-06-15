@@ -23,6 +23,7 @@ import Drawer from 'components/common/Drawer';
 import { Icon, Link, RelativeTime, Spinner } from 'components/common';
 import type { IconName } from 'components/common/Icon/types';
 import Routes from 'routing/Routes';
+import { naturalSortIgnoreCase } from 'util/SortUtils';
 
 import ActivityEntryList from '../common/ActivityEntryList';
 import { IconRow, IconRowList } from '../common/IconRowList';
@@ -30,7 +31,7 @@ import SyncStateIndicator from '../common/SyncStateIndicator';
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
 import collectorSystemLogsUrl from '../common/collectorSystemLogsUrl';
 import { useInstancePendingChanges } from '../hooks';
-import type { CoalescedActions, CollectorInstanceView, Source } from '../types';
+import type { CoalescedActions, CollectorInstanceView, Source, TargetInfo } from '../types';
 
 type Props = {
   instance: CollectorInstanceView;
@@ -136,6 +137,16 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
     ? pendingChanges.activities.length > 0
     : instance.has_pending_changes;
   const [showTransactions, setShowTransactions] = useState(false);
+
+  // In this per-instance view a bulk reassignment lists every collector in the batch. Float the
+  // collector we're viewing to the front so it leads the description instead of an arbitrary one.
+  // Only collector targets are matched against the instance uid; fleet targets just sort by name.
+  const compareTargets = (a: TargetInfo, b: TargetInfo) => {
+    if (a.type === 'collector' && a.id === instance.instance_uid) return -1;
+    if (b.type === 'collector' && b.id === instance.instance_uid) return 1;
+
+    return naturalSortIgnoreCase(a.name, b.name);
+  };
 
   return (
     <Drawer title={instance.hostname || instance.instance_uid} onClose={onClose} size="md">
@@ -249,7 +260,9 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
                 ? 'Hide queued transactions'
                 : `Show queued transactions (${pendingChanges.activities.length})`}
             </TransactionsToggle>
-            {showTransactions && <ActivityEntryList entries={pendingChanges.activities} />}
+            {showTransactions && (
+              <ActivityEntryList entries={pendingChanges.activities} compareTargets={compareTargets} />
+            )}
           </>
         )}
         {!pendingChangesError && !hasPendingChanges && (
