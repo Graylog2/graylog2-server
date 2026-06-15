@@ -155,6 +155,14 @@ const QueryTab = styled(NavItem)`
   }
 `;
 
+const NewTabLi = ({ onClick }: { onClick: () => void }) => (
+  <li className={NEW_TAB_BUTTON_CLASS}>
+    <Button bsStyle="transparent" title="Create New Page" onClick={onClick}>
+      <Icon name="add" />
+    </Button>
+  </li>
+);
+
 const MoreTabsLi = ({ menuItems }: { menuItems: OrderedSet<React.ReactNode> }) => (
   <li className={MORE_TABS_LI_CLASS}>
     <MoreActionsMenu
@@ -411,22 +419,17 @@ const AdaptableQueryTabs = ({
 
         {currentTabs.lockedItems.toArray()}
 
-        <li className={NEW_TAB_BUTTON_CLASS}>
-          <Button
-            bsStyle="transparent"
-            title="Create New Page"
-            onClick={() => {
-              sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_CREATE_PAGE, {
-                app_pathname: 'dashboard',
-                app_section: 'dashboard',
-                app_action_value: 'dashboard-create-page-button',
-              });
+        <NewTabLi
+          onClick={() => {
+            sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_CREATE_PAGE, {
+              app_pathname: 'dashboard',
+              app_section: 'dashboard',
+              app_action_value: 'dashboard-create-page-button',
+            });
 
-              onSelect('new');
-            }}>
-            <Icon name="add" />
-          </Button>
-        </li>
+            onSelect('new');
+          }}
+        />
       </StyledQueryNav>
       <Button
         bsStyle="transparent"
