@@ -85,7 +85,7 @@ public class EntityListPreferencesServiceImpl implements EntityListPreferencesSe
             throw new ValidationException("Preferences ID cannot be null");
         }
 
-        //so that predefined layout is never removed
+        // So that predefined layout is never removed...
         if (null == preferencesId.userId() || preferencesId.userId().isEmpty()) {
             throw new ValidationException("User ID has to be specified for preferences removal");
         }

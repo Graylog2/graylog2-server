@@ -147,13 +147,14 @@ public class EntityListPreferencesResource {
     @Timed
     @Operation(summary = "Delete preferences for user's entity list")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Get preferences for user's entity list deleted successfully",
-                         content = @Content(schema = @Schema(implementation = EntityListPreferences.class))),
+            @ApiResponse(responseCode = "204", description = "Preferences for user's entity list deleted successfully."),
+            @ApiResponse(responseCode = "400", description = "Wrong parameters for preferences deletion."),
             @ApiResponse(responseCode = "404", description = "Preferences not found.")
     })
+    @NoAuditEvent("Audit logs are not stored for entity list preferences")
     public Response delete(@Parameter(name = "entity_list_id", required = true) @PathParam("entity_list_id") @NotEmpty String entityListId,
                            @QueryParam("layout_variant") String layoutVariant,
-                           @Context UserContext userContext) throws NotFoundException, ValidationException {
+                           @Context UserContext userContext) throws ValidationException {
         final String currentUserId = userContext.getUserId();
         final StoredEntityListPreferencesId complexIdOfUsersPreferences = StoredEntityListPreferencesId.builder()
                 .userId(currentUserId)
@@ -162,7 +163,7 @@ public class EntityListPreferencesResource {
                 .build();
         final boolean successful = entityListPreferencesService.delete(complexIdOfUsersPreferences);
         if (successful) {
-            return Response.ok().build();
+            return Response.status(Response.Status.NO_CONTENT).build();
         } else {
             return Response.status(Response.Status.NOT_FOUND).build();
         }

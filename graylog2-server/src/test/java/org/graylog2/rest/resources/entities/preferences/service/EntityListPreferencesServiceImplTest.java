@@ -199,12 +199,10 @@ public class EntityListPreferencesServiceImplTest {
                 )
                 .build();
 
-        //save
         boolean saved = toTest.save(existingPreference);
         assertThat(saved).isTrue();
         assertNotNull(toTest.get(existingId));
 
-        //remove
         assertTrue(toTest.delete(existingId));
         assertNull(toTest.get(existingId));
 
