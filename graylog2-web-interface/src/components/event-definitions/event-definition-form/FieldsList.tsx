@@ -144,8 +144,6 @@ class FieldsList extends React.Component<
       <>
         <DataTable
           id="event-definition-fields"
-          striped
-          hover
           headers={HEADERS}
           rows={fieldNames}
           dataRowFormatter={this.fieldFormatter}

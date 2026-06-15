@@ -74,7 +74,7 @@ const CompatibilityStatus = ({ hostname, opensearchVersion, nodeInfo }: Props) =
             <AccordionItem
               key={`${node.node_version}${node.indices.length}`}
               name={`Node: ${hostname}, Version: ${node.node_version}, ${node.indices.length} indices`}>
-              <Table striped bordered condensed>
+              <Table bordered condensed>
                 <thead>
                   <tr>
                     <th>Indices</th>

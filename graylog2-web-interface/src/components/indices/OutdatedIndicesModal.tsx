@@ -45,7 +45,7 @@ const OutdatedIndicesModal = ({ show, onClose }: Props) => {
               were created with an outdated, previous major version of OpenSearch. These indices may need to be
               re-indexed for compatibility with future OpenSearch major versions.
             </Alert>
-            <Table striped hover condensed>
+            <Table condensed>
               <thead>
                 <tr>
                   <th>Index</th>
