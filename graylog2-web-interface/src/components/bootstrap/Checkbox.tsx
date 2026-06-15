@@ -17,17 +17,36 @@
 import * as React from 'react';
 import { useEffect, useRef } from 'react';
 
-type Props = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type'> & {
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  indeterminate?: boolean;
-  inline?: boolean;
+type Props = {
+  checked?: boolean;
   children?: React.ReactNode;
   className?: string;
+  disabled?: boolean;
+  id?: string;
+  indeterminate?: boolean;
+  inline?: boolean;
+  name?: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onClick?: React.MouseEventHandler<HTMLInputElement>;
+  readOnly?: boolean;
   title?: string;
 };
 
 const Checkbox = (
-  { onChange, indeterminate = false, inline = false, children = undefined, className = undefined, title = undefined, ...props }: Props,
+  {
+    checked = undefined,
+    children = undefined,
+    className = undefined,
+    disabled = undefined,
+    id = undefined,
+    indeterminate = false,
+    inline = false,
+    name = undefined,
+    onChange,
+    onClick = undefined,
+    readOnly = undefined,
+    title = undefined,
+  }: Props,
   forwardedRef: React.MutableRefObject<HTMLInputElement>,
 ) => {
   const internalRef = useRef<HTMLInputElement>(null);
@@ -40,12 +59,18 @@ const Checkbox = (
   }, [checkboxRef, indeterminate]);
 
   const label = (
-    <label className={inline ? `checkbox-inline ${className ?? ''}` : undefined} title={title}>
+    <label className={inline ? `checkbox-inline ${className ?? ''}` : undefined} title={title} htmlFor={id}>
+      {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
       <input
         type="checkbox"
         ref={checkboxRef}
+        id={id}
+        name={name}
+        checked={checked}
+        disabled={disabled}
+        readOnly={readOnly}
+        onClick={onClick}
         onChange={onChange}
-        {...props}
       />
       {children}
     </label>
