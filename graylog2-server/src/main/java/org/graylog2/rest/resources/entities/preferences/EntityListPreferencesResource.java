@@ -17,6 +17,9 @@
 package org.graylog2.rest.resources.entities.preferences;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -66,12 +69,15 @@ public class EntityListPreferencesResource {
 
     private final EntityListPreferencesService entityListPreferencesService;
     private final Map<String, EntityListMetricProvider> metricProviders;
+    private final ObjectMapper objectMapper;
 
     @Inject
     public EntityListPreferencesResource(final EntityListPreferencesService entityListPreferencesService,
-                                         final Map<String, EntityListMetricProvider> metricProviders) {
+                                         final Map<String, EntityListMetricProvider> metricProviders,
+                                         final ObjectMapper objectMapper) {
         this.entityListPreferencesService = entityListPreferencesService;
         this.metricProviders = metricProviders;
+        this.objectMapper = objectMapper;
     }
 
     @POST
@@ -80,21 +86,36 @@ public class EntityListPreferencesResource {
     @Operation(summary = "Create or update user preferences for certain entity list")
     @Consumes(MediaType.APPLICATION_JSON)
     @NoAuditEvent("Audit logs are not stored for entity list preferences")
-    public Response create(@RequestBody(required = true) EntityListPreferences entityListPreferences,
+    public Response create(@RequestBody(required = true, content = @Content(schema = @Schema(implementation = EntityListPreferences.class))) JsonNode entityListPreferences,
                            @Parameter(name = "entity_list_id", required = true) @PathParam("entity_list_id") @NotEmpty String entityListId,
                            @QueryParam("layout_variant") String layoutVariant,
                            @Context UserContext userContext) throws ValidationException {
 
         final String currentUserId = userContext.getUserId();
+        final String resolvedLayoutVariant = obtainLayoutVariant(layoutVariant);
         final StoredEntityListPreferencesId complexId = StoredEntityListPreferencesId.builder()
                 .userId(currentUserId)
                 .entityListId(entityListId)
-                .layoutVariant(obtainLayoutVariant(layoutVariant))
+                .layoutVariant(resolvedLayoutVariant)
                 .build();
+        final StoredEntityListPreferencesId complexFallBackId = StoredEntityListPreferencesId.builder()
+                .userId(null)
+                .entityListId(entityListId)
+                .layoutVariant(resolvedLayoutVariant)
+                .build();
+
+        final StoredEntityListPreferences existingUserPreferences = entityListPreferencesService.get(complexId);
+        final StoredEntityListPreferences fallBackPreferences = entityListPreferencesService.get(complexFallBackId);
+
+        final EntityListPreferences basePreferences =
+                resolveBasePreferences(existingUserPreferences, fallBackPreferences);
+
+        final EntityListPreferences mergedPreferences = mergePreferences(basePreferences, entityListPreferences);
         final StoredEntityListPreferences storedPreferences = StoredEntityListPreferences.builder()
                 .preferencesId(complexId)
-                .preferences(entityListPreferences)
+                .preferences(mergedPreferences)
                 .build();
+
         final boolean successful = entityListPreferencesService.save(storedPreferences);
         if (successful) {
             return Response.ok().build();
@@ -176,5 +197,31 @@ public class EntityListPreferencesResource {
 
     private String obtainLayoutVariant(final String layoutVariant) {
         return layoutVariant == null || layoutVariant.isBlank() ? StoredEntityListPreferencesId.GENERAL_LAYOUT_VARIANT : layoutVariant;
+    }
+
+    private EntityListPreferences mergePreferences(final EntityListPreferences basePreferences,
+                                                   final JsonNode preferencesPatch) {
+        final ObjectNode merged = basePreferences == null
+                ? objectMapper.createObjectNode()
+                : objectMapper.valueToTree(basePreferences);
+
+        preferencesPatch.properties().forEach(entry -> merged.set(entry.getKey(), entry.getValue()));
+
+        return objectMapper.convertValue(merged, EntityListPreferences.class);
+    }
+
+    private EntityListPreferences resolveBasePreferences(
+            StoredEntityListPreferences existingUserPreferences,
+            StoredEntityListPreferences fallBackPreferences
+    ) {
+        if (existingUserPreferences != null) {
+            return existingUserPreferences.preferences();
+        }
+
+        if (fallBackPreferences != null) {
+            return fallBackPreferences.preferences();
+        }
+
+        return null;
     }
 }
