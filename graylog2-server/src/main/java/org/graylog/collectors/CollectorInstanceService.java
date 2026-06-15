@@ -285,26 +285,7 @@ public class CollectorInstanceService {
                 .page(page, selector);
     }
 
-    public long count() {
-        return collection.countDocuments();
-    }
-
-    public long countOnline(Instant onlineThreshold) {
-        return collection.countDocuments(Filters.gte(FIELD_LAST_SEEN, Date.from(onlineThreshold)));
-    }
-
-    public long countByFleet(String fleetId) {
-        return collection.countDocuments(Filters.eq(CollectorInstanceDTO.FIELD_FLEET_ID, fleetId));
-    }
-
-    public long countOnlineByFleet(String fleetId, Instant onlineThreshold) {
-        return collection.countDocuments(Filters.and(
-                Filters.eq(CollectorInstanceDTO.FIELD_FLEET_ID, fleetId),
-                Filters.gte(FIELD_LAST_SEEN, Date.from(onlineThreshold))
-        ));
-    }
-
-    public Map<String, long[]> countByFleetGrouped(Instant onlineThreshold) {
+    public Map<String, InstanceCount> countByFleetGrouped(Instant onlineThreshold) {
         final var pipeline = List.of(
                 Aggregates.group("$" + FIELD_FLEET_ID,
                         Accumulators.sum("total", 1L),
@@ -317,17 +298,26 @@ public class CollectorInstanceService {
                         )
                 )
         );
-        final Map<String, long[]> result = new HashMap<>();
+        final Map<String, InstanceCount> result = new HashMap<>();
         collection.aggregate(pipeline, Document.class).forEach(doc -> {
             final String fleetId = doc.getString("_id");
             if (fleetId != null) {
-                result.put(fleetId, new long[]{
+                result.put(fleetId, new InstanceCount(
                         ((Number) doc.get("total")).longValue(),
-                        ((Number) doc.get("online")).longValue()
-                });
+                        ((Number) doc.get("online")).longValue()));
             }
         });
         return result;
+    }
+
+    public InstanceCount countAcrossAllFleets(Instant onlineThreshold) {
+        return countByFleetGrouped(onlineThreshold).values().stream()
+                .reduce(new InstanceCount(0L, 0L), (a, b) ->
+                        new InstanceCount(a.total() + b.total(), a.online() + b.online()));
+    }
+
+    public InstanceCount countByFleet(String fleetId, Instant onlineThreshold) {
+        return countByFleetGrouped(onlineThreshold).getOrDefault(fleetId, new InstanceCount(0L, 0L));
     }
 
     public Map<String, CollectorInstanceDTO> findByInstanceUids(Set<String> instanceUids) {
@@ -373,6 +363,12 @@ public class CollectorInstanceService {
                 return CollectorOSType.UNKNOWN;
             }
             return extractOSType(nonIdentifyingAttributes.stream());
+        }
+    }
+
+    public record InstanceCount(long total, long online) {
+        public long offline() {
+            return total() - online();
         }
     }
 }

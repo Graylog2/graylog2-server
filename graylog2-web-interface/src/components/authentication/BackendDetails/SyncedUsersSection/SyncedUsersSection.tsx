@@ -85,7 +85,6 @@ const SyncedUsersSection = ({ roles, authenticationBackend }: Props) => {
         onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}
         useQueryParameter={false}>
         <DataTable
-          hover
           customFilter={
             <SyncedUsersFilter
               onSearch={(newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })}

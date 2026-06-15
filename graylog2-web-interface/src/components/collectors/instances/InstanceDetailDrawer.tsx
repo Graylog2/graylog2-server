@@ -140,7 +140,7 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
 
       <Section>
         <SectionTitle>Attributes</SectionTitle>
-        <Table striped>
+        <Table>
           <tbody>
             {Object.entries(instance.identifying_attributes).map(([key, value]) => (
               <tr key={key}>
