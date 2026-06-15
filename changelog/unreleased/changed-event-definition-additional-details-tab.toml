@@ -1,0 +1,2 @@
+type = "changed"
+message = "Renamed the \"Fields\" tab on the Event Definition wizard to \"Additional Details\"."

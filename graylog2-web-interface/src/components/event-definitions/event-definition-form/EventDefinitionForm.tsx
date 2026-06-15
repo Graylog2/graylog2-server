@@ -35,7 +35,7 @@ const WizardContainer = styled.div`
 const STEP_KEYS = {
   EVENT_DETAILS: 'event-details',
   CONDITION: 'condition',
-  FIELDS: 'fields',
+  ADDITIONAL_DETAILS: 'additional-details',
   NOTIFICATIONS: 'notifications',
   SHARE: 'Share',
   SUMMARY: 'summary',
@@ -44,7 +44,7 @@ const STEP_KEYS = {
 export const getStepKeys = (isNew: boolean, hideFieldsStep = false) => [
   STEP_KEYS.EVENT_DETAILS,
   STEP_KEYS.CONDITION,
-  ...(hideFieldsStep ? [] : [STEP_KEYS.FIELDS]),
+  ...(hideFieldsStep ? [] : [STEP_KEYS.ADDITIONAL_DETAILS]),
   STEP_KEYS.NOTIFICATIONS,
   ...(isNew ? [STEP_KEYS.SHARE] : []),
   STEP_KEYS.SUMMARY,
