@@ -19,14 +19,13 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 
-import { useStore } from 'stores/connect';
 import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import { DocumentTitle, IfPermitted, PageHeader, Spinner, ConfirmDialog } from 'components/common';
 import useCurrentUser from 'hooks/useCurrentUser';
 import EventDefinitionSummary from 'components/event-definitions/event-definition-form/EventDefinitionSummary';
-import { EventNotificationsActions, EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
+import { useEventNotifications } from 'components/event-notifications/hooks/useEventNotifications';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -49,7 +48,8 @@ const ViewEventDefinitionPage = () => {
   const params = useParams<{ definitionId?: string }>();
   const currentUser = useCurrentUser();
   const [showDialog, setShowDialog] = useState(false);
-  const { all: notifications } = useStore(EventNotificationsStore);
+  const { data: notificationsData } = useEventNotifications();
+  const notifications = notificationsData?.notifications;
   const history = useHistory();
   const sendTelemetry = useSendTelemetry();
   const navigate = useNavigate();
@@ -79,10 +79,6 @@ const ViewEventDefinitionPage = () => {
   }, [data]);
 
   const { scopePermissions } = useGetPermissionsByScope(eventDefinition);
-
-  useEffect(() => {
-    EventNotificationsActions.listAll();
-  }, []);
 
   useEffect(() => {
     if (!isFetching && !eventDefinition) {

@@ -17,8 +17,8 @@
 import { useState } from 'react';
 
 import useProductName from 'brand-customization/useProductName';
-import type { EventNotification, TestResults } from 'stores/event-notifications/EventNotificationsStore';
-import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
+import type { EventNotification, TestResults } from 'components/event-notifications/hooks/useEventNotifications';
+import { testPersistedEventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 
 type UseNotificationTestType = {
   isLoadingTest: boolean;
@@ -34,7 +34,7 @@ const useNotificationTest = (): UseNotificationTestType => {
     setTestResults({ [notification.id]: { isLoading: true, id: notification.id } });
     let result = { isLoading: false, id: null, error: null, message: null };
 
-    EventNotificationsActions.testPersisted(notification).then(
+    testPersistedEventNotification(notification).then(
       (response) => {
         result = {
           ...result,

@@ -26,14 +26,14 @@ import PaginationURL from 'util/PaginationURL';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
-import { EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
+import { fetchAllEventNotifications } from 'components/event-notifications/hooks/useEventNotifications';
 import { defaultOnError } from 'util/conditional/onError';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import EventDefinitionTagsFilter from 'components/event-definitions/EventDefinitionTagsFilter';
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
-import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
+import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 
 type Options = {
   enabled: boolean;
@@ -447,7 +447,7 @@ export function useGetEventNotifications(): {
     queryKey: ['event-notifications-list'],
     queryFn: () =>
       defaultOnError(
-        EventNotificationsStore.listAll(),
+        fetchAllEventNotifications(),
         'Loading event notifications failed with status',
         'Could not load event notifications',
       ),

@@ -23,8 +23,6 @@ import type { Permission } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
 import usePluginEntities from 'hooks/usePluginEntities';
-import MockStore from 'helpers/mocking/StoreMock';
-import mockAction from 'helpers/mocking/MockAction';
 import mockComponent from 'helpers/mocking/MockComponent';
 import { simpleEventDefinition as mockEventDefinition } from 'fixtures/eventDefinition';
 import { adminUser } from 'fixtures/users';
@@ -51,11 +49,9 @@ jest.mock('components/event-definitions/hooks/useEventDefinitions', () => ({
   copyEventDefinition: jest.fn(() => Promise.resolve({ id: 'new-id', title: 'New copy' })),
 }));
 
-jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
-  EventNotificationsActions: {
-    listAll: mockAction(),
-  },
-  EventNotificationsStore: MockStore(['getInitialState', () => ({ all: [] })]),
+jest.mock('components/event-notifications/hooks/useEventNotifications', () => ({
+  ...jest.requireActual('components/event-notifications/hooks/useEventNotifications'),
+  useEventNotifications: jest.fn(() => ({ data: { notifications: [] }, isFetched: true })),
 }));
 
 jest.mock('components/event-definitions/event-definition-form/EventDefinitionSummary', () =>

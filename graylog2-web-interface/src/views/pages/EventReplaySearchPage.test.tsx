@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
 
-import MockStore from 'helpers/mocking/StoreMock';
 import asMock from 'helpers/mocking/AsMock';
 import SearchComponent from 'views/components/Search';
 import StreamsContext from 'contexts/StreamsContext';
@@ -54,11 +53,9 @@ jest.mock('hooks/useEventById');
 jest.mock('hooks/useEventDefinition');
 jest.mock('components/event-definitions/replay-search/hooks/useAlertAndEventDefinitionData');
 
-jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
-  EventNotificationsActions: {
-    listAll: jest.fn(async () => Promise.resolve()),
-  },
-  EventNotificationsStore: MockStore(['getInitialState', () => ({ all: [] })]),
+jest.mock('components/event-notifications/hooks/useEventNotifications', () => ({
+  ...jest.requireActual('components/event-notifications/hooks/useEventNotifications'),
+  useEventNotifications: jest.fn(() => ({ data: { notifications: [] }, isFetched: true })),
 }));
 
 jest.mock('views/logic/Widgets', () => ({

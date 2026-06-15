@@ -22,7 +22,7 @@ import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnu
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
-import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
+import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 import type { StepType } from 'components/common/Wizard';
 
 import FieldsForm from './FieldsForm';

@@ -149,25 +149,9 @@ const mockEventNotifications = [
   },
 ];
 
-jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
-  EventNotificationsActions: { listAll: jest.fn() },
-  EventNotificationsStore: {
-    listen: () => jest.fn(),
-    listAll: jest.fn(() => Promise.resolve({ notifications: mockEventNotifications })),
-    getInitialState: () => ({
-      all: mockEventNotifications,
-      allLegacyTypes: [],
-      notifications: mockEventNotifications,
-      query: '',
-      pagination: {
-        count: 1,
-        page: 1,
-        pageSize: 10,
-        total: 1,
-        grandTotal: 1,
-      },
-    }),
-  },
+jest.mock('components/event-notifications/hooks/useEventNotifications', () => ({
+  ...jest.requireActual('components/event-notifications/hooks/useEventNotifications'),
+  fetchAllEventNotifications: jest.fn(() => Promise.resolve({ notifications: mockEventNotifications })),
 }));
 
 jest.mock('stores/configurations/ConfigurationsStore', () => ({

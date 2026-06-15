@@ -17,12 +17,11 @@
 import * as React from 'react';
 import { useState } from 'react';
 
-import UserNotification from 'util/UserNotification';
 import { ConfirmDialog, IfPermitted, ShareButton, LinkContainer } from 'components/common';
 import Routes from 'routing/Routes';
 import { MenuItem, ButtonToolbar, DeleteMenuItem } from 'components/bootstrap';
-import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
-import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
+import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
+import { deleteEventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -66,23 +65,13 @@ const EventNotificationActions = ({ isTestLoading, notification, onTest }: Props
   };
 
   const handleDelete = () => {
-    EventNotificationsActions.delete(notification)
-      .then(
-        () => {
-          deselectEntity(notification.id);
-
-          UserNotification.success(
-            'Event Notification deleted successfully',
-            `Event Notification "${notification.title}" was deleted successfully.`,
-          );
-        },
-        (error) => {
-          UserNotification.error(
-            `Deleting Event Notification "${notification.title}" failed with status: ${error}`,
-            'Could not delete Event Notification',
-          );
-        },
-      )
+    deleteEventNotification(notification)
+      .then(() => {
+        deselectEntity(notification.id);
+      })
+      .catch(() => {
+        /* feedback handled in deleteEventNotification */
+      })
       .finally(() => {
         handleClearState();
       });
