@@ -36,7 +36,7 @@ yarn test
 yarn test --testPathPattern=<pattern>
 
 # Type check
-yarn tsc
+yarn tsgo
 
 # Lint changed files (requires committed changes)
 yarn lint:changes
@@ -54,7 +54,7 @@ yarn lint:styles:path <file>
 yarn format
 
 # Pre-PR verification (run before considering work complete)
-yarn tsc && yarn lint:changes && yarn test
+yarn tsgo && yarn lint:changes && yarn test
 ```
 
 ## Project Structure
