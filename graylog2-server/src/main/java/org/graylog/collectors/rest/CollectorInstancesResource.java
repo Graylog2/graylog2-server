@@ -199,13 +199,12 @@ public class CollectorInstancesResource extends RestResource {
         // TODO for a permission check we would need to know which fleets are granted to the user
         // since we haven't implemented that yet, we can't add them as filters to the count queries, as a consequence
         // the counts would be wrong in case someone had explicit grants
-        final long totalInstances = collectorInstanceService.count();
-        final long onlineInstances = collectorInstanceService.countOnline(
+        final var instanceCount = collectorInstanceService.countAcrossAllFleets(
                 Instant.now().minus(getOfflineThreshold()));
         return new CollectorStatsResponse(
-                totalInstances,
-                onlineInstances,
-                totalInstances - onlineInstances,
+                instanceCount.total(),
+                instanceCount.online(),
+                instanceCount.offline(),
                 fleetService.count(),
                 sourceService.count());
     }
