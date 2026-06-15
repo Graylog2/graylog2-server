@@ -31,8 +31,8 @@ import Routes from 'routing/Routes';
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import Wizard from 'components/common/Wizard';
 import type FetchError from 'logic/errors/FetchError';
-import type { LoadResponse as LoadBackendResponse } from 'stores/authentication/AuthenticationStore';
-import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
+import type { LoadResponse as LoadBackendResponse } from 'hooks/useAuthentication';
+import type { PaginatedRoles } from 'hooks/useAuthzRoles';
 import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
 
