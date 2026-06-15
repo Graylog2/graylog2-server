@@ -67,7 +67,7 @@ public class OpensearchVersionTracer implements StateMachineTracer<OpensearchSta
                     .filter(candidate -> Version.parse(candidate.version()).isHigherThan(currentVersion))
                     .max(Comparator.comparing(d -> Version.parse(d.version())))
                     .ifPresent(candidate -> {
-                        LOG.warn("You are running outdated Opensearch version. Perform index migration to activate latest version {}", candidate.version());
+                        LOG.warn("You are running outdated Opensearch version. Please go to the data node upgrade page in Graylog to update to {}", candidate.version());
                         metadataService.setLatestAvailableOpensearchVersion(nodeId.getNodeId(), candidate.version());
                     });
 
