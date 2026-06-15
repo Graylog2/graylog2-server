@@ -140,7 +140,6 @@ const ProcessingTimelineComponent = () => {
       <StyledPaginatedList totalItems={total}>
         <DataTable
           id="processing-timeline"
-          hover
           headers={headers}
           headerCellFormatter={_headerCellFormatter}
           rows={pipelines}

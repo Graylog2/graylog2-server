@@ -81,7 +81,7 @@ const StageRules = ({
     'Description',
     'Throughput',
     'Errors',
-    ...(showLoadColumn ? ['Pipeline Load (15m)'] : []),
+    ...(showLoadColumn ? ['Rule Load (15m)'] : []),
     ...(canRemoveRoutingRules ? ['Actions'] : []),
   ];
 
@@ -192,7 +192,6 @@ const StageRules = ({
   return (
     <DataTable
       id={`stage-rules-${pipeline.id}-${stage.stage}`}
-      hover
       headers={headers}
       headerCellFormatter={headerCellFormatter}
       rows={rules}
