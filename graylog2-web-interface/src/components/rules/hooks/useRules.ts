@@ -24,7 +24,7 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import type { Pagination, PaginatedListJSON, ListPagination } from 'stores/PaginationTypes';
 import type FetchError from 'logic/errors/FetchError';
-import type { RuleBuilderType } from 'components/rules/rule-builder/types';
+import type { RuleBuilderType, BlockDict } from 'components/rules/rule-builder/types';
 
 export type RuleType = {
   id?: string;
@@ -268,10 +268,10 @@ export const fetchMultipleRules = (ruleNames: Array<string>): Promise<unknown> =
   return fetch('POST', url, { rules: ruleNames });
 };
 
-export const fetchRuleFunctionDescriptors = (): Promise<Array<unknown>> => {
+export const fetchRuleFunctionDescriptors = (): Promise<Array<BlockDict>> => {
   const url = qualifyUrl(ApiRoutes.RulesController.functions().url);
 
-  return fetch('GET', url).then((functions: Array<{ name: string }>) =>
+  return fetch('GET', url).then((functions: Array<BlockDict>) =>
     functions ? [...functions].sort((fn1, fn2) => naturalSort(fn1.name, fn2.name)) : functions,
   );
 };

@@ -45,7 +45,7 @@ type Props = {
 };
 
 const RuleHelper = ({ paginationQueryParameter, hideExampleTab = false }: Props) => {
-  const { data: functionDescriptors } = useRuleFunctionDescriptors() as { data: Array<BlockDict> | undefined };
+  const { data: functionDescriptors } = useRuleFunctionDescriptors();
   const [expanded, setExpanded] = useState<{ [key: string]: boolean }>({});
   const [currentPage, setCurrentPage] = useState<number>(paginationQueryParameter.page);
   const [pageSize, setPageSize] = useState<number>(10);
