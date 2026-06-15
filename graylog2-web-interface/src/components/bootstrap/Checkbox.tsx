@@ -30,6 +30,7 @@ type Props = {
   onClick?: React.MouseEventHandler<HTMLInputElement>;
   readOnly?: boolean;
   title?: string;
+  value?: string;
 };
 
 const Checkbox = (
@@ -46,6 +47,7 @@ const Checkbox = (
     onClick = undefined,
     readOnly = undefined,
     title = undefined,
+    value = undefined,
   }: Props,
   forwardedRef: React.MutableRefObject<HTMLInputElement>,
 ) => {
@@ -69,6 +71,7 @@ const Checkbox = (
         checked={checked}
         disabled={disabled}
         readOnly={readOnly}
+        value={value}
         onClick={onClick}
         onChange={onChange}
       />
