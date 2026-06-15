@@ -24,7 +24,7 @@ import UserNotification from 'util/UserNotification';
 import type { QueryId } from 'views/logic/queries/Query';
 import type QueryTitleEditModal from 'views/components/queries/QueryTitleEditModal';
 import { Nav, NavItem, MenuItem, Button } from 'components/bootstrap';
-import { Icon, IconButton } from 'components/common';
+import { Icon } from 'components/common';
 import QueryTitle from 'views/components/queries/QueryTitle';
 import AdaptableQueryTabsConfiguration from 'views/components/AdaptableQueryTabsConfiguration';
 import CopyToDashboardForm from 'views/components/widgets/CopyToDashboardForm';
@@ -76,10 +76,22 @@ const MORE_TABS_BUTTON_CLASS = 'query-tabs-more';
 const MORE_TABS_LI_CLASS = 'query-tabs-more-li';
 const NEW_TAB_BUTTON_CLASS = 'query-tab-create';
 
+const tabButtonStyles = css`
+  height: 100%;
+  width: auto;
+  padding: 10px 15px;
+  // same color as IconButton
+  color: ${({ theme }) => theme.colors.gray[60]};
+`;
+
 const Container = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  .query-config-btn {
+    ${tabButtonStyles}
+  }
 `;
 
 const StyledQueryNav = styled(Nav)(
@@ -108,7 +120,7 @@ const StyledQueryNav = styled(Nav)(
 
       > li.${MORE_TABS_LI_CLASS} > button,
       > li.${NEW_TAB_BUTTON_CLASS} > button {
-        padding: 10px 15px;
+        ${tabButtonStyles}
       }
 
       > li.active {
@@ -145,7 +157,7 @@ const QueryTab = styled(NavItem)`
 
 const NewTabLi = ({ onClick }: { onClick: () => void }) => (
   <li className={NEW_TAB_BUTTON_CLASS}>
-    <Button title="Create New Page" onClick={onClick} bsStyle="transparent">
+    <Button bsStyle="transparent" title="Create New Page" onClick={onClick}>
       <Icon name="add" />
     </Button>
   </li>
@@ -157,7 +169,6 @@ const MoreTabsLi = ({ menuItems }: { menuItems: OrderedSet<React.ReactNode> }) =
       className={MORE_TABS_BUTTON_CLASS}
       id="query-tabs-more"
       aria-label="More Dashboard Pages"
-      bsStyle="transparent"
       keepMounted
       pullRight>
       {menuItems.toArray()}
@@ -420,9 +431,9 @@ const AdaptableQueryTabs = ({
           }}
         />
       </StyledQueryNav>
-      <IconButton
+      <Button
+        bsStyle="transparent"
         title="Open pages configuration"
-        name="settings"
         ref={queriesConfigBtn}
         className="query-config-btn"
         onClick={() => {
@@ -433,8 +444,9 @@ const AdaptableQueryTabs = ({
           });
 
           setShowConfigurationModal(true);
-        }}
-      />
+        }}>
+        <Icon name="settings" />
+      </Button>
       {showConfigurationModal && (
         <AdaptableQueryTabsConfiguration
           show={showConfigurationModal}
