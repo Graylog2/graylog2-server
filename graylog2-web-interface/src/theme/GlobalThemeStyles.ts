@@ -51,6 +51,7 @@ const GlobalThemeStyles = createGlobalStyle(
     }
 
     hr {
+      margin: ${theme.spacings.xxs} 0 ${theme.spacings.sm};
       border-top: 1px solid ${theme.colors.global.background};
     }
 
