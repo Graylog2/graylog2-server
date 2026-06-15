@@ -15,18 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-// eslint-disable-next-line no-restricted-imports
-import { Checkbox as BootstrapCheckbox } from 'react-bootstrap';
 import { useEffect, useRef } from 'react';
 
-type BootstrapCheckboxProps = React.ComponentProps<typeof BootstrapCheckbox>;
-
-type Props = Omit<BootstrapCheckboxProps, 'onChange' | 'inputRef'> & {
+type Props = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type'> & {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   indeterminate?: boolean;
+  inline?: boolean;
+  children?: React.ReactNode;
+  className?: string;
+  title?: string;
 };
+
 const Checkbox = (
-  { onChange, indeterminate = false, ...props }: Props,
+  { onChange, indeterminate = false, inline = false, children = undefined, className = undefined, title = undefined, ...props }: Props,
   forwardedRef: React.MutableRefObject<HTMLInputElement>,
 ) => {
   const internalRef = useRef<HTMLInputElement>(null);
@@ -38,15 +39,19 @@ const Checkbox = (
     }
   }, [checkboxRef, indeterminate]);
 
-  return (
-    <BootstrapCheckbox
-      onChange={onChange as unknown as BootstrapCheckboxProps['onChange']}
-      inputRef={(ref) => {
-        checkboxRef.current = ref;
-      }}
-      {...props}
-    />
+  const label = (
+    <label className={inline ? `checkbox-inline ${className ?? ''}` : undefined} title={title}>
+      <input
+        type="checkbox"
+        ref={checkboxRef}
+        onChange={onChange}
+        {...props}
+      />
+      {children}
+    </label>
   );
+
+  return inline ? label : <div className={`checkbox ${className ?? ''}`}>{label}</div>;
 };
 
 export default React.forwardRef(Checkbox);
