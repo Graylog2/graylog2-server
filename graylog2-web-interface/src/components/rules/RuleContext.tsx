@@ -86,6 +86,9 @@ export const PipelineRulesProvider = ({ children, usedInPipelines = [], rule = u
 
   useEffect(() => {
     const savedSourceCode = getSavedRuleSourceCode();
+    // This effect reads and clears persisted draft source from local storage, so the state
+    // update cannot be expressed as a render-time derivation.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setRuleSource(savedSourceCode || rule?.source);
     setDescription(rule?.description);
     removeSavedRuleSourceCode();
