@@ -22,11 +22,11 @@ import type { HistoryFunction } from 'routing/useHistory';
 import { setIsDirty, setIsNew } from 'views/logic/slices/viewSlice';
 import { createEntityShareState } from 'fixtures/entityShareState';
 import { createView } from 'views/api/views';
+import useEntityShareState from 'hooks/useEntityShareState';
 
 import View from './View';
 import OriginalOnSaveNewDashboard from './OnSaveNewDashboard';
 import { loadDashboard } from './Actions';
-import useEntityShareState from 'hooks/useEntityShareState';
 
 jest.mock('views/api/views', () => ({
   createView: jest.fn((v) => Promise.resolve(v)).mockName('create'),
@@ -34,7 +34,12 @@ jest.mock('views/api/views', () => ({
 jest.mock('api/entity-share', () => ({
   prepareEntityShare: jest.fn(() => Promise.resolve()),
   updateEntityShare: jest.fn(() => Promise.resolve()),
-  loadUserSharesPaginated: jest.fn(() => Promise.resolve({ list: require('immutable').List(), pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 } })),
+  loadUserSharesPaginated: jest.fn(() =>
+    Promise.resolve({
+      list: require('immutable').List(),
+      pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
+    }),
+  ),
 }));
 jest.mock('hooks/useEntityShareState', () => {
   const mockSetEntityShareState = jest.fn();

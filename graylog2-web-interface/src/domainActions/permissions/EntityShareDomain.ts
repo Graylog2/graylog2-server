@@ -23,12 +23,8 @@ import type { EntitySharePayload } from 'actions/permissions/EntityShareActions'
 import notifyingAction from '../notifyingAction';
 
 const prepare = notifyingAction({
-  action: (
-    _entityType: string,
-    _entityTitle: string,
-    entityGRN: GRN | null,
-    payload?: Optional<EntitySharePayload>,
-  ) => prepareEntityShare(entityGRN, payload),
+  action: (_entityType: string, _entityTitle: string, entityGRN: GRN | null, payload?: Optional<EntitySharePayload>) =>
+    prepareEntityShare(entityGRN, payload),
   error: (error, entityType, entityName) => ({
     message: `Preparing shares for ${entityType} "${entityName}" failed with status: ${error}`,
   }),
