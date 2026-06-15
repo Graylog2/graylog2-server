@@ -45,7 +45,7 @@ const CommonFieldValueProviderSummary = ({ fieldName, config, keys, children }: 
           {displayDetails ? 'Less details' : 'More details'}
         </Button>
         {displayDetails && (
-          <Table condensed hover className={styles.fixedTable}>
+          <Table condensed className={styles.fixedTable}>
             <tbody>
               <tr>
                 <td>Is Key?</td>
