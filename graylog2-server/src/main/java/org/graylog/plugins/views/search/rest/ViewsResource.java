@@ -68,6 +68,7 @@ import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog.plugins.views.startpage.StartPageService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
+import org.graylog.security.rest.RestResourceWithOwnerCheck;
 import org.graylog.security.shares.CreateEntityRequest;
 import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.audit.AuditEventSender;
@@ -108,7 +109,7 @@ import static java.util.Locale.ENGLISH;
 @Path("/views")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
-public class ViewsResource extends RestResource implements PluginRestResource {
+public class ViewsResource extends RestResourceWithOwnerCheck implements PluginRestResource {
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put("id", SearchQueryField.create(ViewDTO.FIELD_ID))
             .put("title", SearchQueryField.create(ViewDTO.FIELD_TITLE))
@@ -396,6 +397,9 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         final ViewDTO dto = createEntityRequest.entity();
         final ViewDTO updatedDTO = dto.toBuilder().id(id).build();
         validateDto(updatedDTO, searchUser);
+
+        final var grnType = dto.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH;
+        createEntityRequest.shareRequest().ifPresent(request -> checkOwnership(grnType.toGRN(dto.id())));
 
         var result = dbService.update(updatedDTO);
         recentActivityService.update(result.id(), result.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, searchUser);
