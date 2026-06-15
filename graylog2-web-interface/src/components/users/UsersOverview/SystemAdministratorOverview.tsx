@@ -40,7 +40,6 @@ const SystemAdministratorOverview = ({ adminUser, dataRowFormatter, headers, hea
         </p>
         <DataTable
           id="users-overview"
-          hover
           headers={headers}
           headerCellFormatter={headerCellFormatter}
           sortByKey="fullName"
