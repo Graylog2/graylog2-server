@@ -74,6 +74,7 @@ const config: CollectorsConfig = {
     hostname: 'otlp.example.com',
     port: 14401,
   },
+  collector_heartbeat_interval: 'PT30S',
   collector_offline_threshold: 'PT5M',
   collector_default_visibility_threshold: 'P1D',
   collector_expiration_threshold: 'P7D',
