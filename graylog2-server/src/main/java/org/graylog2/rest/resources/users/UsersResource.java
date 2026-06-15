@@ -201,7 +201,7 @@ public class UsersResource extends RestResource {
     @Deprecated
     @Path("{username}")
     @Operation(summary = "Get user details", description = "The user's permissions are only included if a user asks for his " +
-            "own account or for users with the necessary permissions to edit permissions.")
+            "own account or for users with the necessary permissions to edit permissions.", operationId = "getUser")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Returns the user", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "The user could not be found.")
