@@ -68,7 +68,7 @@ class EventNotificationFormContainer extends React.Component<
     }
   }
 
-  static defaultProps = {
+  static defaultProps: Partial<EventNotificationFormContainerProps> = {
     action: 'edit',
     notification: {
       title: '',
@@ -80,7 +80,7 @@ class EventNotificationFormContainer extends React.Component<
     onSubmit: () => {},
   };
 
-  constructor(props) {
+  constructor(props: EventNotificationFormContainerProps) {
     super(props);
 
     this.state = {
@@ -100,7 +100,7 @@ class EventNotificationFormContainer extends React.Component<
 
   private testPromise: CancellablePromise<unknown>;
 
-  handleChange = (key, value) => {
+  handleChange = (key: string, value: unknown) => {
     const { notification } = this.state;
     const nextNotification = cloneDeep(notification);
 

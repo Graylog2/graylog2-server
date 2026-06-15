@@ -202,10 +202,16 @@ export const deleteRule = (rule: RuleType): Promise<void> => {
   );
 };
 
+export type RuleParseError = {
+  line: number;
+  position_in_line: number;
+  reason: string;
+};
+
 // Promise-returning replacement for the old callback-based `RulesActions.parse`.
 // Resolves with `[]` on a successful parse (no errors), or with the returned parse
 // errors on a 400. Other errors reject.
-export const parseRule = (ruleSource: RuleType): Promise<Array<unknown>> => {
+export const parseRule = (ruleSource: RuleType): Promise<Array<RuleParseError>> => {
   const url = qualifyUrl(ApiRoutes.RulesController.parse().url);
   const rule = {
     title: ruleSource.title,
@@ -214,8 +220,8 @@ export const parseRule = (ruleSource: RuleType): Promise<Array<unknown>> => {
   };
 
   return fetch('POST', url, rule).then(
-    () => [],
-    (error: { status?: number; additional?: { body?: Array<unknown> } }) => {
+    (): Array<RuleParseError> => [],
+    (error: { status?: number; additional?: { body?: Array<RuleParseError> } }) => {
       // a Bad Request indicates a parse error, return all the returned errors so the
       // caller can set them in the editor
       if (error.status === 400) {
@@ -230,13 +236,27 @@ export const parseRule = (ruleSource: RuleType): Promise<Array<unknown>> => {
 // Promise-returning replacement for the old callback-based `RulesActions.simulate`.
 // Resolves with the simulation result. Rejects on error so callers can decide whether to
 // handle it; the old store passed an empty error callback, so callers swallow the rejection.
+type SimulateRuleRequest = {
+  message: string;
+  rule_source?: {
+    title: string;
+    description: string;
+    source: string;
+  };
+  rule_builder_dto?: {
+    title: string;
+    description: string;
+    rule_builder: RuleBuilderType;
+  };
+};
+
 export const simulateRule = (message: string, ruleToSimulate: RuleType): Promise<unknown> => {
   const url = qualifyUrl(
     ruleToSimulate?.rule_builder
       ? ApiRoutes.RuleBuilderController.simulate().url
       : ApiRoutes.RulesController.simulate().url,
   );
-  const rule = {
+  const rule: SimulateRuleRequest = {
     message,
     rule_source: undefined,
     rule_builder_dto: undefined,

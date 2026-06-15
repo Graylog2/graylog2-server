@@ -37,6 +37,7 @@ import {
 import useParams from 'routing/useParams';
 import type { Stream } from 'logic/streams/types';
 import RightSidebarProvider from 'contexts/RightSidebarProvider';
+import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 
 jest.mock('logic/telemetry/useSendTelemetry');
 
@@ -55,7 +56,7 @@ jest.mock('components/event-definitions/replay-search/hooks/useAlertAndEventDefi
 
 jest.mock('components/event-notifications/hooks/useEventNotifications', () => ({
   ...jest.requireActual('components/event-notifications/hooks/useEventNotifications'),
-  useEventNotifications: jest.fn(() => ({ data: { notifications: [] }, isFetched: true })),
+  useEventNotifications: jest.fn(() => ({ data: { notifications: [] as Array<EventNotification> }, isFetched: true })),
 }));
 
 jest.mock('views/logic/Widgets', () => ({

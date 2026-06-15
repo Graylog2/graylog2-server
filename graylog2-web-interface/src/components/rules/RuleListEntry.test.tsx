@@ -68,7 +68,7 @@ const SUT = ({ rule, ...props }: SUTProps) => (
 );
 
 describe('Rule', () => {
-  let oldConfirm;
+  let oldConfirm: typeof window.confirm;
 
   beforeEach(() => {
     oldConfirm = window.confirm;

@@ -36,7 +36,9 @@ const ACTION_TYPES = {
   DELETE: 'delete',
   DISABLE: 'disable',
   ENABLE: 'enable',
-};
+} as const;
+
+type ActionType = (typeof ACTION_TYPES)[keyof typeof ACTION_TYPES];
 const getDescriptor = (count: number) => StringUtils.pluralize(count, 'event definition', 'event definitions');
 
 const ACTION_TEXT = {
@@ -61,7 +63,7 @@ const BulkActions = () => {
   const queryClient = useQueryClient();
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const [showDialog, setShowDialog] = useState(false);
-  const [actionType, setActionType] = useState(null);
+  const [actionType, setActionType] = useState<ActionType | null>(null);
   const selectedItemsAmount = selectedEntities?.length;
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
@@ -73,12 +75,12 @@ const BulkActions = () => {
     [queryClient],
   );
 
-  const updateState = ({ show, type }) => {
+  const updateState = ({ show, type }: { show: boolean; type: ActionType | null }) => {
     setShowDialog(show);
     setActionType(type);
   };
 
-  const handleAction = (action) => {
+  const handleAction = (action: ActionType) => {
     switch (action) {
       case ACTION_TYPES.DELETE:
         sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.BULK_ACTION_DELETE_CLICKED, {
@@ -122,7 +124,7 @@ const BulkActions = () => {
 
   const onAction = useCallback(() => {
     fetch('POST', qualifyUrl(ACTION_TEXT[actionType].bulkActionUrl), { entity_ids: selectedEntities })
-      .then(({ failures }) => {
+      .then(({ failures }: { failures: Array<{ entity_id: string }> }) => {
         if (failures?.length) {
           const notUpdatedDefinitionIds = failures.map(({ entity_id }) => entity_id);
           setSelectedEntities(notUpdatedDefinitionIds);

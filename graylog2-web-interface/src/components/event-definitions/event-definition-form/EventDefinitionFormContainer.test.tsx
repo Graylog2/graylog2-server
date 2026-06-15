@@ -31,6 +31,7 @@ import useEventDefinitionConfigFromLocalStorage from 'components/event-definitio
 import { SYSTEM_EVENT_DEFINITION_TYPE as mockSYSTEM_EVENT_DEFINITION_TYPE } from 'components/event-definitions/constants';
 import type { PermissionsByScopeReturnType } from 'hooks/useScopePermissions';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
+import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 import fetch from 'logic/rest/FetchProvider';
 
 import EventDefinitionFormContainer from './EventDefinitionFormContainer';
@@ -121,7 +122,7 @@ const mockEntityTypes = {
   storage_handler_types: ['persist-to-streams-v1'],
 };
 
-const mockEventNotifications = [
+const mockEventNotifications: Array<EventNotification> = [
   {
     id: 'mock-notification-id',
     title: 'mock-notification-title',

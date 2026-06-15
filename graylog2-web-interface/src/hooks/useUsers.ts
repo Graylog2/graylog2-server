@@ -156,7 +156,7 @@ export const deleteUserToken = (userId: string, tokenId: string): Promise<void> 
 export const loadUsers = (query: Query = {}): Promise<Immutable.List<User>> => {
   const url = usersUrl({ url: ApiRoutes.UsersApiController.list().url, query });
 
-  return fetch('GET', url).then(({ users }) =>
+  return fetch('GET', url).then(({ users }: { users: Array<UserOverviewJSON> }) =>
     Immutable.List<User>(users.map((user) => UserOverview.fromJSON(user))),
   );
 };

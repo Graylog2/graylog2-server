@@ -18,7 +18,8 @@ import React, { createContext, useEffect, useRef, useCallback, useState, useMemo
 import { useQueryClient } from '@tanstack/react-query';
 import type { QueryClient } from '@tanstack/react-query';
 
-import type { RuleType } from 'components/rules/hooks/useRules';
+import type { RuleType, RuleParseError } from 'components/rules/hooks/useRules';
+import type { PipelineType } from 'components/pipelines/types';
 import {
   parseRule,
   simulateRule as simulateRuleRequest,
@@ -30,7 +31,7 @@ import { getSavedRuleSourceCode, removeSavedRuleSourceCode } from 'hooks/useRule
 
 import { jsonifyText } from './rule-builder/helpers';
 
-let VALIDATE_TIMEOUT;
+let VALIDATE_TIMEOUT: ReturnType<typeof setTimeout> | null;
 
 export const DEFAULT_SIMULATOR_JSON_MESSAGE = 'message: test\nsource: unknown\n';
 
@@ -71,7 +72,7 @@ const savePipelineRule = (
 
 type Props = {
   children: React.ReactNode;
-  usedInPipelines?: Array<string>;
+  usedInPipelines?: Array<PipelineType>;
   rule?: RuleType;
 };
 
@@ -113,7 +114,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines = [], rule = u
   );
 
   const validateNewRule = useCallback(
-    (callback) => {
+    (callback: (errors: Array<RuleParseError>) => void) => {
       const nextRule = {
         ...rule,
         source: ruleSourceRef?.current?.editor?.getSession().getValue(),
@@ -185,7 +186,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines = [], rule = u
       }
 
       VALIDATE_TIMEOUT = setTimeout(() => {
-        validateNewRule((errors) => {
+        validateNewRule((errors: Array<RuleParseError>) => {
           const nextErrors = errors || [];
 
           createAnnotations(nextErrors);

@@ -44,7 +44,7 @@ class EditEventDefinitionPage extends React.Component<
     [key: string]: any;
   }
 > {
-  constructor(props) {
+  constructor(props: EditEventDefinitionPageProps) {
     super(props);
 
     this.state = {

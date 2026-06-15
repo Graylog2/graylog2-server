@@ -58,7 +58,7 @@ const StyledPaginatedList = styled(PaginatedList)`
   }
 `;
 
-const _headerCellFormatter = (header) => {
+const _headerCellFormatter = (header: string) => {
   switch (header.toLowerCase()) {
     case 'client address':
       return <ClientAddressHead title={header} />;

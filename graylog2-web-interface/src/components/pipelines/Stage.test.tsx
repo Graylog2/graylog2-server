@@ -26,6 +26,7 @@ import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { PIPELINE_QUERY_KEY } from 'hooks/usePipeline';
 import { useRules, deleteRule } from 'components/rules/hooks/useRules';
+import type { RuleType } from 'components/rules/hooks/useRules';
 
 import Stage from './Stage';
 
@@ -99,7 +100,7 @@ jest.mock('components/common', () => ({
 jest.mock('./StageRules', () => {
   const INPUT_SETUP_WIZARD_ROUTING_RULE_DESCRIPTION = 'Input setup wizard routing rule';
 
-  const wizardRule = {
+  const wizardRule: RuleType = {
     id: 'wizard-rule-id',
     title: 'Wizard Rule',
     description: INPUT_SETUP_WIZARD_ROUTING_RULE_DESCRIPTION,
@@ -109,7 +110,7 @@ jest.mock('./StageRules', () => {
     rule_builder: undefined,
   };
 
-  const manualRule = {
+  const manualRule: RuleType = {
     id: 'manual-rule-id',
     title: 'Manual Rule',
     description: 'Manual rule',

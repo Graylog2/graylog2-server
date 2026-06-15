@@ -77,7 +77,7 @@ const TokenList = ({ creatingToken = false, onCreate, user, onDelete = () => {},
       .sort((token1, token2) => sortByDate(token1.last_access, token2.last_access, 'desc'));
   }, [query, tokens]);
 
-  const handleTokenCreation = async ({ tokenName, tokenTtl }) => {
+  const handleTokenCreation = async ({ tokenName, tokenTtl }: { tokenName: string; tokenTtl: string }) => {
     const token = await onCreate({ tokenName, tokenTtl });
     setCreatedToken(token);
   };

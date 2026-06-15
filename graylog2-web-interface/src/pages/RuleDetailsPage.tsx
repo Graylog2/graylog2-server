@@ -24,11 +24,12 @@ import useQuery from 'routing/useQuery';
 import { PipelineRulesProvider } from 'components/rules/RuleContext';
 import { useRule } from 'components/rules/hooks/useRules';
 import usePipelines from 'hooks/usePipelines';
+import type { PipelineType, StageType } from 'components/pipelines/types';
 
 import useHistory from '../routing/useHistory';
 
-function filterPipelines(pipelines = [], title = '') {
-  return pipelines.filter((pipeline) => pipeline.stages.some((stage) => stage.rules.indexOf(title) !== -1));
+function filterPipelines(pipelines: Array<PipelineType> = [], title = '') {
+  return pipelines.filter((pipeline) => pipeline.stages.some((stage: StageType) => stage.rules.indexOf(title) !== -1));
 }
 
 const RuleDetailsPage = () => {

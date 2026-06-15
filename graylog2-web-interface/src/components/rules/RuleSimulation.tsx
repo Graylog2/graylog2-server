@@ -238,7 +238,7 @@ const RuleSimulation = ({ rule: currentRule = undefined, onSaveMessage = () => {
                 {ruleSimulationResult?.simulator_action_variables?.length > 0 && (
                   <OutputContainer data-testid="actions-output">
                     <label htmlFor="simulation_actions_output">Actions Output</label>
-                    {ruleSimulationResult?.simulator_action_variables?.map((actionOutputKeyValue) => {
+                    {ruleSimulationResult?.simulator_action_variables?.map((actionOutputKeyValue: Record<string, unknown>) => {
                       const keyValue = Object.entries(actionOutputKeyValue)[0];
 
                       return (

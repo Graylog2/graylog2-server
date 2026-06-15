@@ -216,17 +216,19 @@ export const loadAuthBackendUsersPaginated = (
     query,
   );
 
-  return fetch('GET', qualifyUrl(url)).then((response: PaginatedUsersResponse) => ({
-    list: Immutable.List<UserOverview>(response.users.map((user) => UserOverview.fromJSON(user))),
-    pagination: {
-      page: response.page,
-      perPage: response.per_page,
-      query: response.query,
-      count: response.count,
-      total: response.total,
-    },
-    adminUser: undefined,
-  }));
+  return fetch('GET', qualifyUrl(url)).then(
+    (response: PaginatedUsersResponse): PaginatedUsers => ({
+      list: Immutable.List<UserOverview>(response.users.map((user) => UserOverview.fromJSON(user))),
+      pagination: {
+        page: response.page,
+        perPage: response.per_page,
+        query: response.query,
+        count: response.count,
+        total: response.total,
+      },
+      adminUser: undefined,
+    }),
+  );
 };
 
 export const loadActiveAuthBackendType = (): Promise<string | undefined> => {

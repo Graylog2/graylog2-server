@@ -56,24 +56,26 @@ const DIALOG_TYPES = {
   DELETE: 'delete',
   DISABLE: 'disable',
   ENABLE: 'enable',
-};
+} as const;
+
+type DialogType = (typeof DIALOG_TYPES)[keyof typeof DIALOG_TYPES];
 
 const DIALOG_TEXT = {
   [DIALOG_TYPES.COPY]: {
     dialogTitle: 'Copy Event Definition',
-    dialogBody: (definitionTitle) => `Are you sure you want to create a copy of "${definitionTitle}"?`,
+    dialogBody: (definitionTitle: string) => `Are you sure you want to create a copy of "${definitionTitle}"?`,
   },
   [DIALOG_TYPES.DELETE]: {
     dialogTitle: 'Delete Event Definition',
-    dialogBody: (definitionTitle) => `Are you sure you want to delete "${definitionTitle}"?`,
+    dialogBody: (definitionTitle: string) => `Are you sure you want to delete "${definitionTitle}"?`,
   },
   [DIALOG_TYPES.DISABLE]: {
     dialogTitle: 'Disable Event Definition',
-    dialogBody: (definitionTitle) => `Are you sure you want to disable "${definitionTitle}"?`,
+    dialogBody: (definitionTitle: string) => `Are you sure you want to disable "${definitionTitle}"?`,
   },
   [DIALOG_TYPES.ENABLE]: {
     dialogTitle: 'Enable Event Definition',
-    dialogBody: (definitionTitle) => `Are you sure you want to enable "${definitionTitle}"?`,
+    dialogBody: (definitionTitle: string) => `Are you sure you want to enable "${definitionTitle}"?`,
   },
 };
 
@@ -81,9 +83,9 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
   const queryClient = useQueryClient();
   const { deselectEntity } = useSelectedEntities();
   const { scopePermissions } = useGetPermissionsByScope(eventDefinition);
-  const [currentDefinition, setCurrentDefinition] = useState(null);
+  const [currentDefinition, setCurrentDefinition] = useState<EventDefinition | null>(null);
   const [showDialog, setShowDialog] = useState(false);
-  const [dialogType, setDialogType] = useState(null);
+  const [dialogType, setDialogType] = useState<DialogType | null>(null);
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
@@ -102,14 +104,22 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
     return undefined;
   };
 
-  const updateState = ({ show, type, definition }) => {
+  const updateState = ({
+    show,
+    type,
+    definition,
+  }: {
+    show: boolean;
+    type: DialogType | null;
+    definition: EventDefinition | null;
+  }) => {
     setShowDialog(show);
     setDialogType(type);
 
     setCurrentDefinition(definition);
   };
 
-  const handleAction = (action, definition) => {
+  const handleAction = (action: DialogType, definition: EventDefinition) => {
     switch (action) {
       case DIALOG_TYPES.COPY:
         sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.ROW_ACTION_COPY_CLICKED, {

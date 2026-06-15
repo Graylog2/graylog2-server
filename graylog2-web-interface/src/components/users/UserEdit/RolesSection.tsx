@@ -77,7 +77,8 @@ const RolesSection = ({ user, onSubmit }: Props) => {
     return onRolesUpdate({ roles: newUserRoles });
   };
 
-  const ensureReaderOrAdminRole = (newRoles) => newRoles.includes('Reader') || newRoles.includes('Admin');
+  const ensureReaderOrAdminRole = (newRoles: Array<string>) =>
+    newRoles.includes('Reader') || newRoles.includes('Admin');
 
   const onDeleteRole = (role: DescriptiveItem) => {
     const newUserRoles = Immutable.Set(user.roles.toJS()).remove(role.name).toJS();

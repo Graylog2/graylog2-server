@@ -30,6 +30,7 @@ import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { useEventDefinitionWithContext } from 'components/event-definitions/hooks/useEventDefinitions';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
+import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 
 import ViewEventDefinitionPage from './ViewEventDefinitionPage';
 
@@ -51,7 +52,7 @@ jest.mock('components/event-definitions/hooks/useEventDefinitions', () => ({
 
 jest.mock('components/event-notifications/hooks/useEventNotifications', () => ({
   ...jest.requireActual('components/event-notifications/hooks/useEventNotifications'),
-  useEventNotifications: jest.fn(() => ({ data: { notifications: [] }, isFetched: true })),
+  useEventNotifications: jest.fn(() => ({ data: { notifications: [] as Array<EventNotification> }, isFetched: true })),
 }));
 
 jest.mock('components/event-definitions/event-definition-form/EventDefinitionSummary', () =>

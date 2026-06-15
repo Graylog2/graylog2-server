@@ -63,7 +63,7 @@ const RuleList = ({
     'Actions',
   ];
 
-  const ruleInfoFormatter = (rule) => (
+  const ruleInfoFormatter = (rule: RuleType) => (
     <RuleListEntry
       key={rule.id}
       rule={rule}
