@@ -69,7 +69,7 @@ const MessagesPerStreamSection = ({ input }: Props) => {
   const sortedEntries = Object.entries(messagesPerStream).sort(([, a], [, b]) => b - a);
 
   return (
-    <Table bordered condensed striped hover>
+    <Table bordered condensed>
       <colgroup>
         <StreamColumn />
         <MessagesColumn />
