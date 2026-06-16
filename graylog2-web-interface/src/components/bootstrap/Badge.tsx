@@ -76,7 +76,7 @@ const Badge = (
     title = undefined,
     bsSize = 'md',
   }: Props,
-  ref: React.ForwardedRef<HTMLDivElement>,
+  ref: React.ForwardedRef<HTMLSpanElement>,
 ) => {
   const theme = useTheme();
   const color = mapStyle(bsStyle, theme);
@@ -87,6 +87,7 @@ const Badge = (
       aria-label={ariaLabel}
       color={color}
       className={className}
+      component="span"
       title={title}
       data-testid={dataTestid}
       ref={ref}
