@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
 
@@ -78,7 +78,7 @@ const BackendsOverview = () => {
   const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles | undefined>();
   const [query, setQuery] = useState('');
 
-  React.useEffect(() => {
+  useEffect(() => {
     _loadRoles().then(setPaginatedRoles);
   }, []);
 
@@ -112,7 +112,6 @@ const BackendsOverview = () => {
         </p>
         <PaginatedList totalItems={paginatedBackends.pagination.total}>
           <DataTable
-            hover
             customFilter={<BackendsFilter onSearch={onSearch} />}
             dataRowFormatter={(authBackend) => _backendsOverviewItem(authBackend, context, paginatedRoles)}
             filterKeys={[]}

@@ -87,10 +87,7 @@ const _responseToPaginatedUserList = ({
   },
 });
 
-const encodeApiUrl = (
-  apiRoute: (...args: Array<string>) => { url: string },
-  uriParams: Array<string> = [],
-): string => {
+const encodeApiUrl = (apiRoute: (...args: Array<string>) => { url: string }, uriParams: Array<string> = []): string => {
   const encodedUriParams = uriParams.map((param) => encodeURIComponent(param));
 
   return apiRoute(...encodedUriParams).url;
@@ -120,10 +117,7 @@ export const removeMemberFromRole = (roleId: string, username: string): Promise<
   return fetch('DELETE', qualifyUrl(url));
 };
 
-export const loadUsersForRole = (
-  roleId: string,
-  { page, perPage, query }: Pagination,
-): Promise<PaginatedUsers> => {
+export const loadUsersForRole = (roleId: string, { page, perPage, query }: Pagination): Promise<PaginatedUsers> => {
   const apiUrl = encodeApiUrl(ApiRoutes.AuthzRolesController.loadUsersForRole, [roleId]);
   const url = PaginationURL(apiUrl, page, perPage, query);
 

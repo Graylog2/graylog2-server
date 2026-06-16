@@ -63,7 +63,7 @@ const StreamRules = ({ stream }: Props) => {
           </IfPermitted>
         }>
         <MatchingTypeSwitcher stream={stream} onChange={handleMatchingTypeSwitched} />
-        <Table condensed striped hover>
+        <Table condensed>
           <thead>
             <tr>
               <th colSpan={2}>Rule</th>
