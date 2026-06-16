@@ -26,6 +26,8 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import Series from 'views/logic/aggregationbuilder/Series';
 import type { ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
 import SankeyOnClickPopover from 'views/components/visualizations/OnClickPopover/SankeyOnClickPopover';
+import { ActionContext } from 'views/logic/ActionContext';
+import type { ActionContexts } from 'views/types';
 
 // The action menu itself is a separate, independently tested component. Mock it so these tests
 // focus on how SankeyOnClickPopover turns a clicked node/link into selectable values.
@@ -36,14 +38,19 @@ jest.mock('views/components/actions/ActionDropdown', () => ({
 
 const fieldTypes: FieldTypes = { all: Immutable.List(), currentQuery: Immutable.List() };
 
+// `hasMultipleValueForActions` reads the visualization from the surrounding widget context.
+const actionContext = { widget: { config: { visualization: 'sankey' } } } as unknown as ActionContexts;
+
 const Wrapper = ({ children }: { children: React.ReactNode }) => (
   <FieldTypesContext.Provider value={fieldTypes}>
-    <Popover opened withinPortal={false}>
-      <Popover.Target>
-        <button type="button">target</button>
-      </Popover.Target>
-      {children}
-    </Popover>
+    <ActionContext.Provider value={actionContext}>
+      <Popover opened withinPortal={false}>
+        <Popover.Target>
+          <button type="button">target</button>
+        </Popover.Target>
+        {children}
+      </Popover>
+    </ActionContext.Provider>
   </FieldTypesContext.Provider>
 );
 
@@ -97,6 +104,21 @@ describe('SankeyOnClickPopover', () => {
 
       // Multiple selectable values, so it does not jump straight to the action menu.
       expect(screen.queryByTestId('action-dropdown')).not.toBeInTheDocument();
+    });
+
+    it('shows the combined grouping values, not the metric, after selecting the combined groupings', async () => {
+      renderPopover(linkClickPoint);
+
+      await userEvent.click(await screen.findByText('index.html-GET'));
+
+      expect(await screen.findByTestId('action-dropdown')).toBeInTheDocument();
+
+      // The title shows the combined grouping values...
+      expect(screen.getByText('index.html-GET')).toBeInTheDocument();
+
+      // ...not the metric and its value.
+      expect(screen.queryByText('count()')).not.toBeInTheDocument();
+      expect(screen.queryByText('408')).not.toBeInTheDocument();
     });
 
     it('shows resolved node labels rather than raw ids in the groupings dialog', async () => {
