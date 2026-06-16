@@ -730,25 +730,22 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     /**
      * {@inheritDoc}
      * <p>
-     * Returns the accumulated size of all message fields. The value stays factual even for messages
-     * excluded from accounting (it is also stored as {@link #FIELD_GL2_ACCOUNTED_MESSAGE_SIZE});
-     * exclusion is signaled via {@link #isAccounted()}, which removes the message
-     * from the traffic counters, rather than by zeroing this value.
+     * Returns the accumulated size of all message fields when the message is accounted, and {@code 0}
+     * when it is not (see {@link #isAccounted()}). Since this value is also stored as
+     * {@link #FIELD_GL2_ACCOUNTED_MESSAGE_SIZE}, an unaccounted message records an accounted size of
+     * {@code 0}.
      */
     @Override
     public long getSize() {
-        return sizeCounter.getCount();
+        return isAccounted() ? sizeCounter.getCount() : 0L;
     }
 
     /**
      * {@inheritDoc}
      * <p>
      * Returns the raw input size recorded in {@link #FIELD_GL2_INPUT_MESSAGE_SIZE} (set by the decoding
-     * layer from the original transport payload). When no input size was recorded — e.g. for messages
-     * created in-process rather than decoded from an input — it falls back to {@link #getSize()} so the
-     * message is still accounted under input-based licensing rather than escaping it. Note that
-     * exclusion from accounting is signaled via {@link #isAccounted()}, not by
-     * returning {@code 0} here.
+     * layer from the original transport payload), falling back to {@link #getSize()} when no input size
+     * was recorded — e.g. for messages created in-process rather than decoded from an input.
      */
     @Override
     @JsonIgnore

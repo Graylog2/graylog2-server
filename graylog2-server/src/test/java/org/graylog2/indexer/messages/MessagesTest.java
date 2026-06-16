@@ -146,14 +146,16 @@ public class MessagesTest {
 
     @Test
     public void bulkIndexingShouldNotAccountMessagesExcludedFromTrafficAccounting() throws IOException {
-        final var listOfMessages = List.of(
-                accountedMessage(100),
-                unaccountedMessage(200), // excluded
-                accountedMessage(300));
+        final var accounted1 = accountedMessage(100);
+        final var unaccounted = unaccountedMessage(200);
+        final var accounted2 = accountedMessage(300);
+        final var listOfMessages = List.of(accounted1, unaccounted, accounted2);
 
-        // getSize() is derived from the message content, so we pin it here as a fixture for the
-        // output-traffic assertions below.
-        assertThat(listOfMessages).allMatch(m -> m.getSize() == 48);
+        // getSize() is derived from the message content: accounted messages report their real size,
+        // while an unaccounted message reports 0. We pin these as a fixture for the assertions below.
+        assertThat(accounted1.getSize()).isEqualTo(48);
+        assertThat(accounted2.getSize()).isEqualTo(48);
+        assertThat(unaccounted.getSize()).isZero();
 
         final var listOfImmutableMessages = listOfMessages.stream()
                 .map(ImmutableMessage::wrap).toList();

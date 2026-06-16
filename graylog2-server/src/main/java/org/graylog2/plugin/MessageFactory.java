@@ -33,9 +33,10 @@ public interface MessageFactory {
 
     /**
      * Returns a new {@link Message} that is excluded from license/traffic accounting:
-     * {@link Message#isAccounted()} is {@code false}, so it counts against neither
-     * output-based nor input-based license traffic. Its size fields stay factual and the message is
-     * otherwise indexed and processed normally.
+     * {@link Message#isAccounted()} is {@code false}, so it counts against neither output-based nor
+     * input-based license traffic, and its accounted size ({@link Message#getSize()}, stored as
+     * {@code gl2_accounted_message_size}) is {@code 0}. The message is otherwise indexed and processed
+     * normally.
      * <p>
      * Use this only for messages that are genuinely outside the user's control and must not consume
      * licensed quota (e.g. Graylog Collector self-logs). The exclusion is fixed at construction and

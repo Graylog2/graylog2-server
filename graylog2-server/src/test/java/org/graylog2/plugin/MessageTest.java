@@ -511,13 +511,14 @@ public class MessageTest {
     }
 
     @Test
-    public void excludedMessageKeepsFactualSize() {
-        // Exclusion from accounting must not zero the reported size; it stays factual.
+    public void unaccountedMessageReportsZeroSize() {
+        // getSize() (also stored as gl2_accounted_message_size) is 0 for an unaccounted message,
+        // while an accounted message reports its real field size.
         final Message accounted = new Message("1234567890", "12345", Tools.nowUTC());
-        final Message excluded = new Message("1234567890", "12345", Tools.nowUTC(), false);
+        final Message unaccounted = new Message("1234567890", "12345", Tools.nowUTC(), false);
 
-        assertThat(excluded.getSize()).isEqualTo(accounted.getSize());
-        assertThat(excluded.getSize()).isGreaterThan(0L);
+        assertThat(accounted.getSize()).isGreaterThan(0L);
+        assertThat(unaccounted.getSize()).isZero();
     }
 
     @Test

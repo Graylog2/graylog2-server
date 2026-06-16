@@ -46,9 +46,7 @@ public interface Indexable {
      * {@link org.graylog2.plugin.Message#FIELD_GL2_ACCOUNTED_MESSAGE_SIZE}, the figure used for
      * output-based license accounting.
      * <p>
-     * Internally generated indexables that carry no billable payload may simply return {@code 0}. To
-     * exclude an otherwise normally sized indexable from accounting, prefer
-     * {@link #isAccounted()} so that the stored size remains truthful.
+     * Whether the value is counted at all is governed separately by {@link #isAccounted()}.
      */
     long getSize();
 
@@ -61,8 +59,8 @@ public interface Indexable {
      * input-based license accounting. The default of {@code 0} reflects that a generic indexable has no
      * associated input message (for example, internally generated indexables);
      * {@link org.graylog2.plugin.Message} overrides this to report the size recorded at decode time.
-     * Whether the value is counted at all is governed separately by
-     * {@link #isAccounted()}.
+     * <p>
+     * Whether the value is counted at all is governed separately by {@link #isAccounted()}.
      */
     default long getInputMessageSize() {
         return 0L;
@@ -99,11 +97,10 @@ public interface Indexable {
     }
 
     /**
-     * Whether this indexable must be included in license/traffic accounting.
+     * Whether this indexable is counted in license/traffic accounting.
      * <p>
-     * When {@code false}, the indexable is skipped while computing <em>both</em> the output- and
-     * input-traffic counters, so it counts against neither output-based nor input-based license
-     * traffic. This affects accounting only — the document is still indexed normally. Defaults to
+     * When {@code false}, the indexable is excluded from <em>both</em> the output- and input-traffic
+     * counters, so it counts against neither output-based nor input-based license traffic. Defaults to
      * {@code true}.
      */
     default boolean isAccounted() {
