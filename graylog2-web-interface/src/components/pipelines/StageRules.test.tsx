@@ -263,7 +263,7 @@ describe('StageRules', () => {
     expect(screen.queryByRole('button', { name: /Remove .* Rule/ })).not.toBeInTheDocument();
   });
 
-  describe('Pipeline Load column', () => {
+  describe('Rule Load column', () => {
     const baseProcessingLoad = {
       available: true,
       total_cost_microseconds_per_second: 100,
@@ -292,7 +292,7 @@ describe('StageRules', () => {
         <StageRules pipeline={mockPipeline} stage={mockStage} rules={mockRules} processingLoad={baseProcessingLoad} />,
       );
 
-      expect(screen.queryByText('Pipeline Load (15m)')).not.toBeInTheDocument();
+      expect(screen.queryByText('Rule Load (15m)')).not.toBeInTheDocument();
       expect(screen.queryByText('60.42%')).not.toBeInTheDocument();
     });
 
@@ -307,7 +307,7 @@ describe('StageRules', () => {
         />,
       );
 
-      expect(screen.getByText('Pipeline Load (15m)')).toBeInTheDocument();
+      expect(screen.getByText('Rule Load (15m)')).toBeInTheDocument();
       expect(screen.getByText('60.42%')).toBeInTheDocument();
       expect(screen.getByText('0.00%')).toBeInTheDocument();
     });

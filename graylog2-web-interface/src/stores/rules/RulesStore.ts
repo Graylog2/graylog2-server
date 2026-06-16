@@ -127,11 +127,11 @@ export const RulesStore = singletonStore('core.Rules', () =>
         if (doesRuleExist) {
           this.rules = this.rules.map((r) => (r.id === rule.id ? rule : r));
         } else {
-          this.rules.push(rule);
+          this.rules = [...this.rules, rule];
         }
       }
 
-      this.trigger({ rules: this.rules, functionDescriptors: this.functionDescriptors });
+      this.trigger(this.getInitialState());
     },
 
     _updateFunctionDescriptors(functions) {
@@ -139,7 +139,7 @@ export const RulesStore = singletonStore('core.Rules', () =>
         this.functionDescriptors = functions.sort((fn1, fn2) => naturalSort(fn1.name, fn2.name));
       }
 
-      this.trigger({ rules: this.rules, functionDescriptors: this.functionDescriptors });
+      this.trigger(this.getInitialState());
     },
 
     list() {
@@ -154,7 +154,7 @@ export const RulesStore = singletonStore('core.Rules', () =>
 
       return fetch('GET', url).then((response) => {
         this.rules = response;
-        this.trigger({ rules: response, functionDescriptors: this.functionDescriptors });
+        this.trigger(this.getInitialState());
       }, failCallback);
     },
 
@@ -270,7 +270,7 @@ export const RulesStore = singletonStore('core.Rules', () =>
 
       const promise = fetch('DELETE', url).then(() => {
         this.rules = this.rules?.filter((el) => el.id !== rule.id);
-        this.trigger({ rules: this.rules, functionDescriptors: this.functionDescriptors });
+        this.trigger(this.getInitialState());
         UserNotification.success(`Rule "${rule.title}" was deleted successfully`);
       }, failCallback);
 

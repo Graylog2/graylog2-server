@@ -119,7 +119,7 @@ const TokenList = ({ creatingToken = false, onCreate, user, onDelete = () => {},
       {effectiveTokens.length === 0 ? (
         <NoEntitiesExist>{query === '' ? 'No tokens to display.' : 'No tokens match the filter.'}</NoEntitiesExist>
       ) : (
-        <Table striped bordered condensed>
+        <Table bordered condensed>
           <thead>
             <tr>
               <th>Token Name</th>
