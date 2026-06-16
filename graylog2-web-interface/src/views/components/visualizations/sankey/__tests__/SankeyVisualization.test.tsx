@@ -36,6 +36,13 @@ import SankeyVisualization from '../SankeyVisualization';
 
 jest.mock('../../GenericPlot', () => jest.fn(mockComponent('GenericPlot')));
 
+// Resolve the two distinct ids used by the `sameNameDifferentIds` fixture to a shared name,
+// leaving every other key untouched so the remaining tests keep their identity mapping.
+jest.mock('views/components/visualizations/useMapKeys', () => ({
+  __esModule: true,
+  default: () => (key: string) => (key === 'id-1' || key === 'id-2' ? 'Shared name' : key),
+}));
+
 const effectiveTimerange: AbsoluteTimeRange = {
   type: 'absolute',
   from: '2022-04-27T12:15:59.633Z',
@@ -158,6 +165,28 @@ describe('SankeyVisualization', () => {
     expect(trace.link.source).toEqual([0, 2]);
     expect(trace.link.target).toEqual([1, 1]);
     expect(trace.link.value).toEqual([4, 2]);
+  });
+
+  it('keeps distinct ids that resolve to the same name as separate nodes', () => {
+    const config = AggregationWidgetConfig.builder()
+      .rowPivots([Pivot.createValues(['stream']), Pivot.createValues(['b'])])
+      .series([Series.forFunction('count()')])
+      .visualization('sankey')
+      .build();
+
+    render(<WrappedSankey {...baseProps} config={config} data={fixtures.sameNameDifferentIds} />);
+
+    const trace = lastTrace();
+
+    expect(trace.node.label).toEqual(['Shared name', 'b1', 'Shared name']);
+    expect(trace.node.customdata).toEqual([
+      { field: 'stream', value: 'id-1' },
+      { field: 'b', value: 'b1' },
+      { field: 'stream', value: 'id-2' },
+    ]);
+    expect(trace.link.source).toEqual([0, 2]);
+    expect(trace.link.target).toEqual([1, 1]);
+    expect(trace.link.value).toEqual([5, 3]);
   });
 
   it('drops links with null, zero, or negative metric values', () => {

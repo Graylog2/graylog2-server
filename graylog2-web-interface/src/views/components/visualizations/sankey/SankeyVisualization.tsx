@@ -125,7 +125,9 @@ const buildSankeyTrace = (
   const customdata: Array<NodeCustomData> = [];
 
   const indexOf = (stage: number, label: string, originalValue: Key): number => {
-    const k = `${stage}${STAGE_SEPARATOR}${label}`;
+    // Key by the original value (e.g. a stream/input/node id) rather than the resolved
+    // label, so distinct ids that happen to resolve to the same name stay separate nodes.
+    const k = `${stage}${STAGE_SEPARATOR}${String(originalValue)}`;
     const existing = nodeIndex.get(k);
 
     if (existing !== undefined) return existing;
