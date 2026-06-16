@@ -128,7 +128,7 @@ const InputStaticFields = ({ input }: InputStaticFieldsProps) => {
           </IfPermitted>
         </StyledSpan>
       </SectionGrid>
-      <StyledTable condensed striped hover>
+      <StyledTable condensed>
         <tbody>{formatStaticFields(input.static_fields)}</tbody>
       </StyledTable>
       {showConfirmDelete && (

@@ -14,100 +14,62 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 import SidecarStatus from 'components/sidecars/sidecars/SidecarStatus';
-import withParams from 'routing/withParams';
-import { CollectorsActions } from 'stores/sidecars/CollectorsStore';
-import { SidecarsActions } from 'stores/sidecars/SidecarsStore';
+import { useCollectorsAll } from 'hooks/useCollectors';
+import { fetchSidecar } from 'hooks/useSidecars';
 import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
-import withHistory from 'routing/withHistory';
+import useParams from 'routing/useParams';
+import useHistory from 'routing/useHistory';
 
-type SidecarStatusPageProps = {
-  params: any;
-  history: any;
-};
+const SidecarStatusPage = () => {
+  const { sidecarId } = useParams<{ sidecarId: string }>();
+  const history = useHistory();
+  const { data: collectors } = useCollectorsAll();
+  const { data: sidecar, error } = useQuery({
+    queryKey: ['sidecars', 'detail', sidecarId],
+    queryFn: () => fetchSidecar(sidecarId),
+    refetchInterval: 5000,
+  });
 
-class SidecarStatusPage extends React.Component<
-  SidecarStatusPageProps,
-  {
-    [key: string]: any;
-  }
-> {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      sidecar: undefined,
-    };
-  }
-
-  componentDidMount() {
-    const reloadSidecar = () => this.reloadSidecar(this.props.history);
-    reloadSidecar();
-    this.reloadCollectors();
-    this.interval = setInterval(reloadSidecar, 5000);
-  }
-
-  componentWillUnmount() {
-    if (this.interval) {
-      clearInterval(this.interval);
+  useEffect(() => {
+    if (error && (error as { status?: number }).status === 404) {
+      history.push(Routes.SYSTEM.SIDECARS.OVERVIEW);
     }
-  }
+  }, [error, history]);
 
-  private interval: NodeJS.Timeout;
-
-  reloadSidecar = (history) => {
-    SidecarsActions.getSidecar(this.props.params.sidecarId).then(
-      (sidecar) => this.setState({ sidecar }),
-      (error) => {
-        if (error.status === 404) {
-          history.push(Routes.SYSTEM.SIDECARS.OVERVIEW);
-        }
-      },
-    );
-  };
-
-  reloadCollectors = () => {
-    CollectorsActions.all().then((response) => this.setState({ collectors: response.collectors }));
-  };
-
-  render() {
-    const { sidecar } = this.state;
-    const { collectors } = this.state;
-    const isLoading = !sidecar || !collectors;
-
-    if (isLoading) {
-      return (
-        <DocumentTitle title="Sidecar status">
-          <Spinner />
-        </DocumentTitle>
-      );
-    }
-
+  if (!sidecar || !collectors) {
     return (
-      <DocumentTitle title={`Sidecar ${sidecar.node_name} status`}>
-        <SidecarsPageNavigation />
-        <PageHeader
-          title={
-            <span>
-              Sidecar <em>{sidecar.node_name} status</em>
-            </span>
-          }
-          documentationLink={{
-            title: 'Sidecars documentation',
-            path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
-          }}>
-          <span>A status overview of the Sidecar.</span>
-        </PageHeader>
-
-        <SidecarStatus sidecar={sidecar} collectors={collectors} />
+      <DocumentTitle title="Sidecar status">
+        <Spinner />
       </DocumentTitle>
     );
   }
-}
 
-export default withHistory(withParams<SidecarStatusPageProps>(SidecarStatusPage));
+  return (
+    <DocumentTitle title={`Sidecar ${sidecar.node_name} status`}>
+      <SidecarsPageNavigation />
+      <PageHeader
+        title={
+          <span>
+            Sidecar <em>{sidecar.node_name} status</em>
+          </span>
+        }
+        documentationLink={{
+          title: 'Sidecars documentation',
+          path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
+        }}>
+        <span>A status overview of the Sidecar.</span>
+      </PageHeader>
+
+      <SidecarStatus sidecar={sidecar} collectors={collectors} />
+    </DocumentTitle>
+  );
+};
+
+export default SidecarStatusPage;

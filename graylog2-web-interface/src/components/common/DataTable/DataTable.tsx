@@ -37,6 +37,12 @@ type DataTableProps = {
   children?: React.ReactNode;
   /** Adds a custom class to the table element. */
   className?: string;
+  /** Enables striped row styling. */
+  striped?: boolean;
+  /** Enables hover row highlighting. */
+  hover?: boolean;
+  /** Enables condensed cell padding. */
+  condensed?: boolean;
   /** Overrides the default filter. */
   customFilter?: React.ReactNode;
   /** Adds a custom class to the row element. */
@@ -94,6 +100,9 @@ class DataTable extends React.Component<
     customFilter: undefined,
     children: undefined,
     className: '',
+    striped: undefined,
+    hover: undefined,
+    condensed: undefined,
     filterKeys: [],
     filterLabel: 'Filter',
     noDataText: 'No data available.',
@@ -175,6 +184,9 @@ class DataTable extends React.Component<
       children,
       noDataText,
       className,
+      striped,
+      hover,
+      condensed,
       rowClassName,
       useResponsiveTable,
       rows,
@@ -189,7 +201,7 @@ class DataTable extends React.Component<
       data = <p>Filter does not match any data.</p>;
     } else {
       data = (
-        <Table className={className}>
+        <Table className={className} striped={striped} hover={hover} condensed={condensed}>
           <thead>{this.getFormattedHeaders()}</thead>
           <tbody>{this.getFormattedDataRows()}</tbody>
         </Table>
