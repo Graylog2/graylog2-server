@@ -7,8 +7,8 @@ export const DIAGRAM = `flowchart TD
   A(["User's current view"])
   A --> B{{"\`Should users remain
 in their current workflow?\`"}}
-  B -->|Yes| MODAL
-  B -->|No| PAGE
+B -->|Yes| MODAL
+B -->|No| PAGE
 
 subgraph Surface["Surface"]
 MODAL(["\`**Modal**
@@ -19,9 +19,8 @@ end
 
 subgraph Method["Method"]
 MW(["\`**Form or Wizard**
-Single-step or guided workflow\`"])
-FW(["\`**Form or Wizard**
-Single-step or guided workflow\`"])
+Never take users into a secondary context\`"])
+FW(["\`**Form or Wizard**\`"])
 end
 
 MODAL --> MW
@@ -41,8 +40,12 @@ Entity creation is a foundational interaction in Graylog. This guide helps you d
 
 <Unstyled>
   <Alert bsStyle="info">
-    <strong>Design principle:</strong> Entity creation is organized around two decisions: choose the appropriate
-    surface, then choose the appropriate method.
+    {
+      <>
+        <strong>Design principle:</strong> Entity creation is organized around two decisions: choose the appropriate
+        surface, then choose the appropriate method.
+      </>
+    }
   </Alert>
 </Unstyled>
 
@@ -86,9 +89,13 @@ Use a Page when creation benefits from a dedicated experience with its own focus
 
 <Unstyled>
   <Alert bsStyle="info">
-    If it is unclear whether creation belongs in the current context or a dedicated one, involve Product and Design
-    before implementation. Context decisions affect navigation, workflow continuity, and long-term consistency across
-    the product.
+    {
+      <>
+        If it is unclear whether creation belongs in the current context or a dedicated one, involve Product and Design
+        before implementation. Context decisions affect navigation, workflow continuity, and long-term consistency
+        across the product.
+      </>
+    }
   </Alert>
 </Unstyled>
 

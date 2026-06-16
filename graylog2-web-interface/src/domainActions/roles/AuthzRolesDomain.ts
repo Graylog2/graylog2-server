@@ -14,12 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
+import {
+  loadRole,
+  deleteRole,
+  addMembersToRole,
+  removeMemberFromRole,
+  loadUsersForRole,
+  loadRolesForUser,
+  loadRolesPaginated,
+} from 'hooks/useAuthzRoles';
 
 import notifyingAction from '../notifyingAction';
 
 const load = notifyingAction({
-  action: AuthzRolesActions.load,
+  action: loadRole,
   error: (error, roleId) => ({
     message: `Loading role with id "${roleId}" failed with status: ${error}`,
   }),
@@ -27,7 +35,7 @@ const load = notifyingAction({
 });
 
 const deleteAction = notifyingAction({
-  action: AuthzRolesActions.delete,
+  action: (roleId: string, _roleName: string) => deleteRole(roleId),
   success: (_roleId, roleName) => ({
     message: `Role "${roleName}" was deleted successfully`,
   }),
@@ -37,7 +45,7 @@ const deleteAction = notifyingAction({
 });
 
 const addMembers = notifyingAction({
-  action: AuthzRolesActions.addMembers,
+  action: addMembersToRole,
   success: (_roleId, usernames) => ({
     message: `Users:"${usernames.join(', ')}" were assigned successfully`,
   }),
@@ -47,7 +55,7 @@ const addMembers = notifyingAction({
 });
 
 const removeMember = notifyingAction({
-  action: AuthzRolesActions.removeMember,
+  action: removeMemberFromRole,
   success: (_roleId, username) => ({
     message: `User "${username}" was unassigned successfully`,
   }),
@@ -56,22 +64,22 @@ const removeMember = notifyingAction({
   }),
 });
 
-const loadUsersForRole = notifyingAction({
-  action: AuthzRolesActions.loadUsersForRole,
+const loadUsersForRoleAction = notifyingAction({
+  action: (roleId: string, _roleName: string, pagination) => loadUsersForRole(roleId, pagination),
   error: (error, _roleId, roleName) => ({
     message: `Loading users for role "${roleName}" failed with status: ${error}`,
   }),
 });
 
-const loadRolesForUser = notifyingAction({
-  action: AuthzRolesActions.loadRolesForUser,
+const loadRolesForUserAction = notifyingAction({
+  action: loadRolesForUser,
   error: (error, username) => ({
     message: `Loading roles for user "${username}" failed with status: ${error}`,
   }),
 });
 
-const loadRolesPaginated = notifyingAction({
-  action: AuthzRolesActions.loadRolesPaginated,
+const loadRolesPaginatedAction = notifyingAction({
+  action: loadRolesPaginated,
   error: (error) => ({
     message: `Loading roles failed with status: ${error}`,
   }),
@@ -82,7 +90,7 @@ export default {
   delete: deleteAction,
   addMembers,
   removeMember,
-  loadUsersForRole,
-  loadRolesForUser,
-  loadRolesPaginated,
+  loadUsersForRole: loadUsersForRoleAction,
+  loadRolesForUser: loadRolesForUserAction,
+  loadRolesPaginated: loadRolesPaginatedAction,
 };
