@@ -26,6 +26,7 @@ import { OrderedMap } from 'immutable';
 import type * as Immutable from 'immutable';
 import type { Permission } from 'graylog-web-plugin/plugin';
 import { useQuery } from '@tanstack/react-query';
+import styled from 'styled-components';
 
 import { describeExpression } from 'util/CronUtils';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -73,6 +74,11 @@ export type LookupTableParameterJsonEmbryonic = Partial<LookupTableParameterJson
 };
 const LOOKUP_PERMISSIONS: Permission[] = ['lookuptables:read'];
 const STREAM_PERMISSIONS: Permission[] = ['streams:read'];
+
+const InputRow = styled.div`
+  display: flex;
+  align-items: center;
+`;
 
 const buildNewParameter = (name: string): LookupTableParameterJsonEmbryonic => ({
   name: name,
@@ -524,20 +530,22 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
       {onlyFilters || (
         <FormGroup controlId="query-string">
           <ControlLabel>Search Query</ControlLabel>
-          <ViewsQueryInput
-            inputId="filter-query"
-            name="query"
-            value={currentConfig.query ?? ''}
-            onChange={handleQueryChange}
-            isValidating={false}
-            validate={() => Promise.resolve({})}
-            onExecute={() => {}}
-            streams={eventDefinition.config.streams}
-            timeRange={toTimeRange(eventDefinition.config.search_within_ms)}
-            error={validationState?.status === 'ERROR' ? validationState : undefined}
-            warning={validationState?.status === 'WARNING' ? validationState : undefined}
-          />
-          <QueryValidationDisplay />
+          <InputRow>
+            <ViewsQueryInput
+              inputId="filter-query"
+              name="query"
+              value={currentConfig.query ?? ''}
+              onChange={handleQueryChange}
+              isValidating={false}
+              validate={() => Promise.resolve({})}
+              onExecute={() => {}}
+              streams={eventDefinition.config.streams}
+              timeRange={toTimeRange(eventDefinition.config.search_within_ms)}
+              error={validationState?.status === 'ERROR' ? validationState : undefined}
+              warning={validationState?.status === 'WARNING' ? validationState : undefined}
+            />
+            <QueryValidationDisplay />
+          </InputRow>
           <HelpBlock>
             Search query that Messages should match. You can use the same syntax as in the Search page, including
             declaring Query Parameters from Lookup Tables by using the <code>$newParameter$</code> syntax.
