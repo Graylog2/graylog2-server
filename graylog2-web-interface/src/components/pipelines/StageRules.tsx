@@ -81,7 +81,7 @@ const StageRules = ({
     'Description',
     'Throughput',
     'Errors',
-    ...(showLoadColumn ? ['Pipeline Load (15m)'] : []),
+    ...(showLoadColumn ? ['Rule Load (15m)'] : []),
     ...(canRemoveRoutingRules ? ['Actions'] : []),
   ];
 
