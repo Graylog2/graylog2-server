@@ -35,11 +35,8 @@ jest.mock('hooks/useStreamRuleMutations', () => () => ({
   removeStreamRule: jest.fn(),
 }));
 
-jest.mock('stores/streams/StreamsStore', () => ({
-  __esModule: true,
-  default: {
-    resume: (...args) => mockResumeStream(...args),
-  },
+jest.mock('hooks/useStreamMutations', () => () => ({
+  resumeStream: (...args) => mockResumeStream(...args),
 }));
 
 jest.mock(
@@ -107,7 +104,7 @@ const TestComponent = ({ streamIsPaused }: TestComponentProps) => {
 describe('useCreateStreamRule', () => {
   beforeEach(() => {
     mockCreateStreamRule.mockImplementation(() => Promise.resolve());
-    mockResumeStream.mockImplementation((_streamId, callback) => Promise.resolve().then(() => callback()));
+    mockResumeStream.mockImplementation(() => Promise.resolve());
   });
 
   afterEach(() => {
@@ -142,11 +139,7 @@ describe('useCreateStreamRule', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /start-stream/i }));
 
-    await waitFor(() => expect(mockResumeStream).toHaveBeenCalledWith('stream-id', expect.any(Function)));
-    await waitFor(() => expect(mockInvalidateQueries).toHaveBeenCalledTimes(2));
-    expect(mockInvalidateQueries).toHaveBeenLastCalledWith({
-      queryKey: ['stream', 'stream-id'],
-    });
+    await waitFor(() => expect(mockResumeStream).toHaveBeenCalledWith('stream-id'));
     await waitFor(() => expect(screen.queryByText('start-dialog-open')).not.toBeInTheDocument());
   });
 });

@@ -14,14 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import React, { useState } from 'react';
 
 import QueryHelper from 'components/common/QueryHelper';
 import type { Stream } from 'logic/streams/types';
-import StreamsStore from 'stores/streams/StreamsStore';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import { keyFn, fetchStreams, KEY_PREFIX } from 'components/streams/hooks/useStreams';
+import { keyFn, fetchStreams } from 'components/streams/hooks/useStreams';
 import getStreamTableElements from 'components/streams/StreamsOverview/Constants';
 import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
 import useTableElements from 'components/streams/StreamsOverview/hooks/useTableComponents';
@@ -38,16 +36,6 @@ import useStreamsOverviewExtensions from './hooks/useStreamsOverviewExtensions';
 import { StreamMetricsProvider } from './StreamMetricsContext';
 import { backendFieldsForVisibleColumns } from './metricColumns';
 
-const useRefetchStreamsOnStoreChange = (refetchStreams: () => void) => {
-  useEffect(() => {
-    StreamsStore.onChange(() => refetchStreams());
-
-    return () => {
-      StreamsStore.unregister(() => refetchStreams());
-    };
-  }, [refetchStreams]);
-};
-
 const streamIdsEqual = (first: Array<string>, second: Array<string>) =>
   first.length === second.length && first.every((id, index) => id === second[index]);
 
@@ -56,7 +44,6 @@ type Props = {
 };
 
 const StreamsOverview = ({ indexSets }: Props) => {
-  const queryClient = useQueryClient();
   const { isPipelineColumnPermitted } = usePipelineColumn();
   const {
     columnRenderers: extensionColumnRenderers,
@@ -66,7 +53,6 @@ const StreamsOverview = ({ indexSets }: Props) => {
   } = useStreamsOverviewExtensions();
 
   const { entityActions, expandedSections, bulkActions } = useTableElements({ indexSets, pluggableExpandedSections });
-  useRefetchStreamsOnStoreChange(() => queryClient.invalidateQueries({ queryKey: KEY_PREFIX }));
 
   const columnRenderers = CustomColumnRenderers(indexSets, isPipelineColumnPermitted, extensionColumnRenderers);
   const { additionalAttributes, defaultLayout } = getStreamTableElements(

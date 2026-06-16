@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { LinkContainer, Icon } from 'components/common';
@@ -26,7 +26,7 @@ import StreamRuleList from 'components/streamrules/StreamRuleList';
 import StreamRuleModal from 'components/streamrules/StreamRuleModal';
 import Spinner from 'components/common/Spinner';
 import type { MatchData } from 'logic/streams/types';
-import StreamsStore from 'stores/streams/StreamsStore';
+import { testMatch } from 'api/streams';
 import useCreateStreamRule from 'components/streamrules/hooks/useCreateStreamRule';
 import StartStreamAfterRuleCreateDialog from 'components/streamrules/StartStreamAfterRuleCreateDialog';
 
@@ -68,22 +68,16 @@ const StreamRulesEditor = ({ streamId, messageId = '', index = '' }: Props) => {
       streamIsPaused: stream?.disabled ?? false,
     });
 
-  useEffect(() => {
-    const refetchStreams = () => refetch();
-    StreamsStore.onChange(refetchStreams);
-
-    return () => {
-      StreamsStore.unregister(refetchStreams);
-    };
-  }, [refetch]);
-
   const onMessageLoaded = (newMessage) => {
     setMessage(newMessage);
 
     if (message !== undefined) {
-      StreamsStore.testMatch(streamId, { message: message.fields }, (resultData) => {
-        setMatchData(resultData);
-      });
+      // The api fn handles the error toast on rejection.
+      testMatch(streamId, { message: message.fields as { [field: string]: unknown } })
+        .then((resultData) => {
+          setMatchData(resultData);
+        })
+        .catch(() => {});
     } else {
       setMatchData(undefined);
     }
