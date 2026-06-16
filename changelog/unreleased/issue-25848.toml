@@ -1,0 +1,5 @@
+type = "a"
+message = "Show a banner when a dashboard was updated by another user, allowing the viewer to reload and see the latest changes."
+
+issues = ["25848"]
+pulls = ["25859"]

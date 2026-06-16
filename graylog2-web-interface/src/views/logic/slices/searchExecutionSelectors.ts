@@ -36,3 +36,7 @@ export const selectParameterBindings = createSelector(
   selectSearchExecutionState,
   (executionState) => executionState.parameterBindings,
 );
+export const selectServerViewLastUpdatedAt = createSelector(
+  selectSearchExecutionRoot,
+  (state) => state.serverViewLastUpdatedAt,
+);

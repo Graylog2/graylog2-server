@@ -549,6 +549,7 @@ export interface SearchExecution {
   isLoading: boolean;
   searchTypesToSearch: Array<string>;
   jobIds?: JobIds | null;
+  serverViewLastUpdatedAt?: string;
 }
 
 export interface SearchMetadataState {
