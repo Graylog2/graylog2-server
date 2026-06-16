@@ -29,6 +29,7 @@ module.exports = {
     require.resolve('./lib/setup-files/console-warnings-fail-tests.js'),
     require.resolve('./lib/setup-files/mock-crypto-getrandomvalues.js'),
     require.resolve('./lib/setup-files/mock-styled-components.js'),
+    require.resolve('./lib/setup-files/mock-AppConfig.js'),
     'jest-canvas-mock',
   ],
   moduleDirectories: ['src', 'test', 'node_modules'],

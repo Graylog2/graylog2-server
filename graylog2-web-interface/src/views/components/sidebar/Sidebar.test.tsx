@@ -21,6 +21,7 @@ import userEvent from '@testing-library/user-event';
 import View from 'views/logic/views/View';
 import QueryResult from 'views/logic/QueryResult';
 import { asMock } from 'helpers/mocking';
+import AppConfig from 'util/AppConfig';
 import useViewType from 'views/hooks/useViewType';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useViewTitle from 'views/hooks/useViewTitle';
@@ -31,12 +32,6 @@ import useGlobalOverride from 'views/hooks/useGlobalOverride';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 
 import Sidebar from './Sidebar';
-
-jest.mock('util/AppConfig', () => ({
-  ...jest.requireActual('util/AppConfig'),
-  rootTimeZone: jest.fn(() => 'America/Chicago'),
-  __esModule: true,
-}));
 
 jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('views/hooks/useViewType');
@@ -90,6 +85,7 @@ describe('<Sidebar />', () => {
   useViewsPlugin();
 
   beforeEach(() => {
+    asMock(AppConfig.rootTimeZone).mockReturnValue('America/Chicago');
     asMock(useViewType).mockReturnValue(View.Type.Search);
     asMock(useActiveQueryId).mockReturnValue(queryId);
     asMock(useViewMetadata).mockReturnValue(viewMetaData);

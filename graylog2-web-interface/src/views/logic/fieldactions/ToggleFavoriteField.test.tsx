@@ -18,9 +18,6 @@ import type { ActionHandlerArguments } from 'views/components/actions/ActionHand
 
 import ToggleFavoriteField from './ToggleFavoriteField';
 
-jest.mock('util/AppConfig', () => ({
-  isFeatureEnabled: () => true,
-}));
 type ActionContexts = Partial<ActionHandlerArguments>['contexts'];
 
 describe('ToggleFavoriteField', () => {

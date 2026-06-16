@@ -43,14 +43,6 @@ jest.mock('pages/StartPage', () => () => <>This is the start page</>);
 jest.mock('hooks/usePluginEntities');
 jest.mock('contexts/GlobalContextProviders', () => jest.fn(({ children }: React.PropsWithChildren<{}>) => children));
 
-jest.mock('util/AppConfig', () => ({
-  gl2AppPathPrefix: jest.fn(() => ''),
-  gl2ServerUrl: jest.fn(() => undefined),
-  gl2DevMode: jest.fn(() => false),
-  isFeatureEnabled: jest.fn(() => true),
-  isCloud: jest.fn(() => false),
-}));
-
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   createBrowserRouter: jest.fn(),
@@ -86,7 +78,7 @@ const mockRoutes = (routes: PluginExports['routes']) => {
 
 describe('AppRouter', () => {
   beforeEach(() => {
-    AppConfig.isFeatureEnabled = jest.fn(() => false);
+    asMock(AppConfig.isFeatureEnabled).mockImplementation(() => false);
     asMock(usePluginEntities).mockReturnValue([]);
     asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) => createMemoryRouter(routes));
   });

@@ -35,12 +35,6 @@ import OriginalAreaVisualization from '../AreaVisualization';
 
 jest.mock('../../GenericPlot', () => jest.fn(mockComponent('GenericPlot')));
 
-jest.mock('util/AppConfig', () => ({
-  ...jest.requireActual('util/AppConfig'),
-  rootTimeZone: jest.fn(() => 'America/Chicago'),
-  __esModule: true,
-}));
-
 const AreaVisualization = ({ ...props }: React.ComponentProps<typeof OriginalAreaVisualization>) => (
   <TestStoreProvider>
     <TestFieldTypesContextProvider>
@@ -54,7 +48,8 @@ describe('AreaVisualization', () => {
 
   beforeEach(() => {
     asMock(GenericPlot).mockClear();
-    AppConfig.isFeatureEnabled = jest.fn(() => false);
+    asMock(AppConfig.rootTimeZone).mockReturnValue('America/Chicago');
+    asMock(AppConfig.isFeatureEnabled).mockImplementation(() => false);
   });
 
   it('generates correct props for plot component', () => {
