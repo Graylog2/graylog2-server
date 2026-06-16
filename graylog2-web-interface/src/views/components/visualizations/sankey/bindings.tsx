@@ -26,6 +26,10 @@ const validate = (formValues: WidgetConfigFormValues) => {
     return { type: 'Sankey requires at least two grouping fields.' };
   }
 
+  if ((formValues.metrics?.length ?? 0) > 1) {
+    return { type: 'Sankey supports only a single metric.' };
+  }
+
   return {};
 };
 
