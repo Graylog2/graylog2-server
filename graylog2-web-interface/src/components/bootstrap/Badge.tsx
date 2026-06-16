@@ -34,11 +34,12 @@ const mapFontSize: Record<SupportedMantineSize, 'tiny' | 'small' | 'body'> = {
   lg: 'body',
 };
 
-const StyledBadge = styled(MantineBadge)<{ color: ColorVariant; size: SupportedMantineSize }>(
-  ({ theme, color, size }) => css`
+const StyledBadge = styled(MantineBadge)<{ color: ColorVariant; size: SupportedMantineSize; $clickable?: boolean }>(
+  ({ theme, color, size, $clickable }) => css`
     text-transform: none;
     background-color: ${color};
     color: ${theme.utils.contrastingColor(color)};
+    cursor: ${$clickable ? 'pointer' : 'default'};
 
     .mantine-Badge-label {
       font-size: ${theme.fonts.size[mapFontSize[size]]};
@@ -54,8 +55,8 @@ type Props = React.PropsWithChildren<{
   className?: string;
   'data-testid'?: string;
   onClick?: () => void;
-  onMouseEnter?: React.MouseEventHandler<HTMLDivElement>;
-  onMouseLeave?: React.MouseEventHandler<HTMLDivElement>;
+  onMouseEnter?: React.MouseEventHandler<HTMLElement>;
+  onMouseLeave?: React.MouseEventHandler<HTMLElement>;
   role?: string;
   style?: React.CSSProperties;
   title?: string;
@@ -76,28 +77,41 @@ const Badge = (
     title = undefined,
     bsSize = 'md',
   }: Props,
-  ref: React.ForwardedRef<HTMLSpanElement>,
+  ref: React.ForwardedRef<HTMLElement>,
 ) => {
   const theme = useTheme();
   const color = mapStyle(bsStyle, theme);
   const size = sizeForMantine(bsSize);
 
+  const sharedProps = {
+    'aria-label': ariaLabel,
+    color,
+    className,
+    title,
+    'data-testid': dataTestid,
+    role,
+    style,
+    variant: 'filled' as const,
+    onMouseEnter,
+    onMouseLeave,
+    size,
+  };
+
+  if (onClick) {
+    return (
+      <StyledBadge
+        {...sharedProps}
+        $clickable
+        component="button"
+        ref={ref as React.Ref<HTMLButtonElement>}
+        onClick={onClick}>
+        {children}
+      </StyledBadge>
+    );
+  }
+
   return (
-    <StyledBadge
-      aria-label={ariaLabel}
-      color={color}
-      className={className}
-      component="span"
-      title={title}
-      data-testid={dataTestid}
-      ref={ref}
-      role={role}
-      style={style}
-      variant="filled"
-      onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      size={size}>
+    <StyledBadge {...sharedProps} component="span" ref={ref as React.Ref<HTMLSpanElement>}>
       {children}
     </StyledBadge>
   );
