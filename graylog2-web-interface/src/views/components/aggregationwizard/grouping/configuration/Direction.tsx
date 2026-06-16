@@ -19,7 +19,6 @@ import styled from 'styled-components';
 import { Field } from 'formik';
 
 import { Input } from 'components/bootstrap';
-import Field from 'views/components/Field';
 
 const DirectionOptions = styled.div`
   display: flex;
