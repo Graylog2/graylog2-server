@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.graylog2.audit.AuditEventTypes.DATANODE_ABORT_RESTART;
+import static org.graylog2.audit.AuditEventTypes.DATANODE_RESUME_RESTART;
 import static org.graylog2.audit.AuditEventTypes.DATANODE_TRIGGER_RESTART;
 
 @RequiresAuthentication
@@ -111,6 +112,7 @@ public class RollingRestartResource extends RestResource {
     @Path("/resume")
     @Operation(summary = "Resume a rolling restart operation")
     @RequiresPermissions(RestPermissions.DATANODE_RESTART)
+    @AuditEvent(type = DATANODE_RESUME_RESTART)
     public JobTriggerDto resume() {
         try {
             return handler.resume();
