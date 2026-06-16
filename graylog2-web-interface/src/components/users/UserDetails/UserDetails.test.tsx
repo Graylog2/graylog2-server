@@ -31,14 +31,19 @@ const mockAuthzRolesPromise = Promise.resolve({
 
 jest.mock('hooks/useAuthzRoles', () => ({
   AUTHZ_ROLES_QUERY_KEY: ['authz', 'roles'],
-    loadRolesForUser: jest.fn(() => mockAuthzRolesPromise),
-    loadRolesPaginated: jest.fn(() => mockAuthzRolesPromise),
+  loadRolesForUser: jest.fn(() => mockAuthzRolesPromise),
+  loadRolesPaginated: jest.fn(() => mockAuthzRolesPromise),
 }));
 
 jest.mock('api/entity-share', () => ({
   prepareEntityShare: jest.fn(() => Promise.resolve()),
   updateEntityShare: jest.fn(() => Promise.resolve()),
-  loadUserSharesPaginated: jest.fn(() => Promise.resolve({ list: require('immutable').List(), pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 } })),
+  loadUserSharesPaginated: jest.fn(() =>
+    Promise.resolve({
+      list: require('immutable').List(),
+      pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
+    }),
+  ),
 }));
 jest.mock('hooks/useEntityShareState', () => {
   const mockSetEntityShareState = jest.fn();

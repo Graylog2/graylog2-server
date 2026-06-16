@@ -34,7 +34,7 @@ const mockLoadUsersPromise = Promise.resolve({
 
 jest.mock('hooks/useAuthzRoles', () => ({
   AUTHZ_ROLES_QUERY_KEY: ['authz', 'roles'],
-    loadUsersForRole: jest.fn(() => mockLoadUsersPromise),
+  loadUsersForRole: jest.fn(() => mockLoadUsersPromise),
 }));
 
 jest.useFakeTimers();

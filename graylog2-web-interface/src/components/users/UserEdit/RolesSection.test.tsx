@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import userEvent from '@testing-library/user-event';
-import { loadRolesForUser } from 'hooks/useAuthzRoles';
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, waitFor, screen, act } from 'wrappedTestingLibrary';
 
+import { loadRolesForUser } from 'hooks/useAuthzRoles';
 import selectEvent from 'helpers/selectEvent';
 import { alice } from 'fixtures/users';
 import { manager as assignedRole1, reader as assignedRole2, viewsManager as notAssignedRole } from 'fixtures/roles';
@@ -41,8 +41,8 @@ const mockLoadRolesPromise = Promise.resolve({
 
 jest.mock('hooks/useAuthzRoles', () => ({
   AUTHZ_ROLES_QUERY_KEY: ['authz', 'roles'],
-    loadRolesForUser: jest.fn(() => mockRolesForUserPromise),
-    loadRolesPaginated: jest.fn(() => mockLoadRolesPromise),
+  loadRolesForUser: jest.fn(() => mockRolesForUserPromise),
+  loadRolesPaginated: jest.fn(() => mockLoadRolesPromise),
 }));
 
 describe('<RolesSection />', () => {

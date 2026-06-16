@@ -15,12 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import * as Immutable from 'immutable';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import { act } from 'react';
 import userEvent from '@testing-library/user-event';
 
+import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import selectEvent from 'helpers/selectEvent';
 import asMock from 'helpers/mocking/AsMock';
 import mockEntityShareState, {
@@ -35,9 +35,9 @@ import mockEntityShareState, {
 } from 'fixtures/entityShareState';
 import ActiveShare from 'logic/permissions/ActiveShare';
 import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
+import useEntityShareState, { useSetEntityShareState } from 'hooks/useEntityShareState';
 
 import EntityShareModal from './EntityShareModal';
-import useEntityShareState, { useSetEntityShareState } from 'hooks/useEntityShareState';
 
 const mockEmptyResult = { data: undefined };
 const mockFailedResult = { data: failedEntityShareState };
@@ -47,7 +47,12 @@ jest.mock('domainActions/permissions/EntityShareDomain', () => ({
   default: {
     prepare: jest.fn(() => Promise.resolve()),
     update: jest.fn(() => Promise.resolve()),
-    loadUserSharesPaginated: jest.fn(() => Promise.resolve({ list: require('immutable').List(), pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 } })),
+    loadUserSharesPaginated: jest.fn(() =>
+      Promise.resolve({
+        list: require('immutable').List(),
+        pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
+      }),
+    ),
   },
 }));
 jest.mock('hooks/useEntityShareState', () => {
@@ -208,9 +213,7 @@ describe('EntityShareModal', () => {
       it('writes the response from prepare back into the entity share cache', async () => {
         const updatedShareState = mockEntityShareState
           .toBuilder()
-          .selectedGranteeCapabilities(
-            mockEntityShareState.selectedGranteeCapabilities.merge({ [john.id]: viewer.id }),
-          )
+          .selectedGranteeCapabilities(mockEntityShareState.selectedGranteeCapabilities.merge({ [john.id]: viewer.id }))
           .build();
         // First call (from initial useEffect in EntityShareModal) returns the initial state;
         // second call (from _handleSelection after clicking Add Collaborator) returns the updated state.
