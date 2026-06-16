@@ -186,9 +186,10 @@ const SankeyVisualization = makeVisualization(({ config, data, height, width }: 
   const theme = useTheme();
   const { onChartClick, initializeGraphDivRef, popover } = usePlotOnClickPopover({ ...sankeyOnClickPopover, config });
 
-  // Translucent so overlapping flows stay distinguishable; based on the theme's text color
-  // so the links remain visible in both light and dark themes (plotly's default is too faint).
-  const linkColor = chroma(theme.colors.text.secondary).alpha(0.3).css();
+  // Translucent so overlapping flows stay distinguishable. The gray scale is ordered by
+  // contrast (lower index = more contrast), so a value toward the background end keeps the
+  // links subtle in both themes — a lighter gray in light mode, a darker gray in dark mode.
+  const linkColor = chroma(theme.colors.gray[70]).alpha(0.3).css();
 
   const trace = useMemo<SankeyTrace | null>(() => {
     const rowFields = config.rowPivots.flatMap((pivot) => pivot.fields);
