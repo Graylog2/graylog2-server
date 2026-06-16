@@ -30,12 +30,12 @@ import { SANKEY_VISUALIZATION_TYPE } from './Constants';
 
 import GenericPlot from '../GenericPlot';
 
-const Container = styled.div<{ $height: number; $width: number }>(
-  ({ $height, $width }) => css`
-    height: ${$height ? `${$height}px` : '100%'};
-    width: ${$width ? `${$width}px` : '100%'};
-  `,
-);
+// Fill the parent fluidly (rather than pinning to the height/width props) so the chart tracks
+// container resizes via CSS in both view and edit mode; plotly's `responsive` handles the redraw.
+const Container = styled.div`
+  height: 100%;
+  width: 100%;
+`;
 
 const EmptyState = styled.div(
   ({ theme }) => css`
@@ -182,7 +182,7 @@ const buildSankeyTrace = (
 
 const layout = { margin: { t: 20, b: 20, l: 20, r: 20 } };
 
-const SankeyVisualization = makeVisualization(({ config, data, height, width }: VisualizationComponentProps) => {
+const SankeyVisualization = makeVisualization(({ config, data }: VisualizationComponentProps) => {
   const rows = retrieveChartData(data);
   const mapKeys = useMapKeys();
   const theme = useTheme();
@@ -215,7 +215,7 @@ const SankeyVisualization = makeVisualization(({ config, data, height, width }: 
   }, [config, mapKeys, rows, linkColor]);
 
   return (
-    <Container $height={height} $width={width}>
+    <Container>
       {trace ? (
         <GenericPlot
           chartData={[trace]}
