@@ -215,7 +215,7 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
             events.add(new MoreSearch.Histogram.Bucket(dateTime, eventCount));
         });
 
-        return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(events, alerts));
+        return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(events, alerts), timerange);
     }
 
     private QueryBuilder createQuery(String queryString, TimeRange timerange, Set<String> eventStreams, String filterString,

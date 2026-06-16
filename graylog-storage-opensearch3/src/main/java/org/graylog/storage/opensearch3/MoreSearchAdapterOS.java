@@ -281,7 +281,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
             events.add(new MoreSearch.Histogram.Bucket(dateTime, eventCount));
         });
 
-        return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(events, alerts));
+        return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(events, alerts), timerange);
     }
 
     static Query buildExtraFilter(String field, String value) {
