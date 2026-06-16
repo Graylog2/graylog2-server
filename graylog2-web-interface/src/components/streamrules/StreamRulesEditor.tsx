@@ -25,7 +25,7 @@ import MatchingTypeSwitcher from 'components/streams/MatchingTypeSwitcher';
 import StreamRuleList from 'components/streamrules/StreamRuleList';
 import StreamRuleModal from 'components/streamrules/StreamRuleModal';
 import Spinner from 'components/common/Spinner';
-import type { MatchData } from 'stores/streams/StreamsStore';
+import type { MatchData } from 'logic/streams/types';
 import StreamsStore from 'stores/streams/StreamsStore';
 import useCreateStreamRule from 'components/streamrules/hooks/useCreateStreamRule';
 import StartStreamAfterRuleCreateDialog from 'components/streamrules/StartStreamAfterRuleCreateDialog';

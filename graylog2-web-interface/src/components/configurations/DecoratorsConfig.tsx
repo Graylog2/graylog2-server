@@ -23,7 +23,7 @@ import { SearchDecorators } from '@graylog/server-api';
 import { Button } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';
 import Spinner from 'components/common/Spinner';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import { StreamsActions } from 'stores/streams/StreamsStore';
 import UserNotification from 'util/UserNotification';
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';

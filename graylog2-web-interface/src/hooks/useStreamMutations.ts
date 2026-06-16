@@ -18,25 +18,13 @@ import { useMutation } from '@tanstack/react-query';
 
 import { Streams } from '@graylog/server-api';
 
-import type { Stream as OriginalStream } from 'logic/streams/types';
+import type { Stream as OriginalStream, StreamConfiguration } from 'logic/streams/types';
 import UserNotification from 'util/UserNotification';
 import type { EntityShare } from 'actions/permissions/EntityShareActions';
 
 export type Stream = OriginalStream;
 
-export type StreamConfiguration = Pick<
-  Stream,
-  | 'index_set_id'
-  | 'title'
-  | 'matching_type'
-  | 'remove_matches_from_default_stream'
-  | 'description'
-  | 'rules'
-  | 'content_pack'
-> &
-  EntityShare;
-
-const createStream = async (stream: StreamConfiguration): Promise<{ stream_id: string }> => {
+const createStream = async (stream: StreamConfiguration & EntityShare): Promise<{ stream_id: string }> => {
   const { share_request, ...rest } = stream;
 
   return Streams.create({

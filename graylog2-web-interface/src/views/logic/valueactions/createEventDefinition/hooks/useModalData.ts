@@ -18,7 +18,7 @@
 import { useMemo } from 'react';
 
 import type { ModalData } from 'views/logic/valueactions/createEventDefinition/types';
-import type { Stream } from 'views/stores/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import { useStore } from 'stores/connect';
 

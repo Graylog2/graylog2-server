@@ -23,7 +23,7 @@ import Pipeline from 'components/pipelines/Pipeline';
 import NewPipeline from 'components/pipelines/NewPipeline';
 import SourceGenerator from 'logic/pipelines/SourceGenerator';
 import { StreamsStore } from 'stores/streams/StreamsStore';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import type { PipelineType, StageType } from 'components/pipelines/types';
 import DocsHelper from 'util/DocsHelper';
 import useParams from 'routing/useParams';

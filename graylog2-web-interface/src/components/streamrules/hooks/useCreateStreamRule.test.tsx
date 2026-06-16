@@ -19,7 +19,7 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import type { StreamRule } from 'stores/streams/StreamsStore';
+import type { StreamRule } from 'logic/streams/types';
 
 import useCreateStreamRule from './useCreateStreamRule';
 

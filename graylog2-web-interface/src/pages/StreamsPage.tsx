@@ -23,7 +23,7 @@ import PageHeader from 'components/common/PageHeader';
 import { DocumentTitle, Spinner } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';

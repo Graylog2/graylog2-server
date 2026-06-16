@@ -21,7 +21,7 @@ import styled from 'styled-components';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
 import { useStore } from 'stores/connect';
-import type { Stream } from 'views/stores/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';

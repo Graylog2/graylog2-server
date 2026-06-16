@@ -26,72 +26,18 @@ import StreamsActions from 'actions/streams/StreamsActions';
 import { singletonStore } from 'logic/singleton';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import type { Attributes } from 'stores/PaginationTypes';
-import type { Stream as OriginalStream, StreamRule as OriginalStreamRule } from 'logic/streams/types';
+import type {
+  Stream as OriginalStream,
+  StreamRule as OriginalStreamRule,
+  StreamRuleType,
+  StreamConfiguration,
+  StreamResponse,
+  MatchData,
+} from 'logic/streams/types';
 
 export type Stream = OriginalStream;
-
-export type StreamRuleType = {
-  id: number;
-  short_desc: string;
-  long_desc: string;
-  name: string;
-};
-
 export type StreamRule = OriginalStreamRule;
-
-type OutputSummary = {
-  id: string;
-  title: string;
-  type: string;
-  creator_user_id: string;
-  created_at: string;
-  configuration: { [key: string]: string };
-};
-
-type AlertConditionSummary = {
-  id: string;
-  type: string;
-  creator_user_id: string;
-  created_at: string;
-  parameters: { [key: string]: any };
-  in_grace: boolean | null | undefined;
-  title: string | null | undefined;
-};
-
-export type StreamConfiguration = Pick<
-  Stream,
-  | 'index_set_id'
-  | 'title'
-  | 'matching_type'
-  | 'remove_matches_from_default_stream'
-  | 'description'
-  | 'rules'
-  | 'content_pack'
->;
-
-type AlertReceiver = {
-  emails: string[];
-  users: string[];
-};
-
-export type StreamResponse = {
-  id: string;
-  creator_user_id: string;
-  outputs: OutputSummary[];
-  matching_type: string;
-  description: string;
-  created_at: string;
-  disabled: boolean;
-  rules: StreamRule[];
-  alert_conditions: AlertConditionSummary[];
-  alert_receivers: AlertReceiver;
-  title: string;
-  is_default: boolean | null | undefined;
-  is_editable: boolean;
-  remove_matches_from_default_stream: boolean;
-  index_set_id: string;
-  categories: string[];
-};
+export type { StreamRuleType, StreamConfiguration, StreamResponse, MatchData };
 
 type TestMatchResponse = {
   matches: boolean;
@@ -117,11 +63,6 @@ type PaginatedResponse = {
   query: string;
   attributes: Attributes;
   elements: Array<Stream>;
-};
-
-export type MatchData = {
-  matches: boolean;
-  rules: { [id: string]: false };
 };
 
 const StreamsStore = singletonStore('Streams', () =>

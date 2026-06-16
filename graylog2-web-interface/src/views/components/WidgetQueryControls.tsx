@@ -23,7 +23,7 @@ import isEmpty from 'lodash/isEmpty';
 import { useIsFetching } from '@tanstack/react-query';
 
 import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
-import type { Stream } from 'views/stores/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import connect from 'stores/connect';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';

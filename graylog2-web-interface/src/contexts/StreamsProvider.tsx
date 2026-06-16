@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useEffect } from 'react';
 
 import connect from 'stores/connect';
-import type { Stream } from 'views/stores/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import { StreamsActions, StreamsStore } from 'views/stores/StreamsStore';
 
 import StreamsContext from './StreamsContext';

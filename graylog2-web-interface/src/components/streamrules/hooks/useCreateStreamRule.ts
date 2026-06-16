@@ -18,7 +18,7 @@ import { useCallback, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
 import StreamsStore from 'stores/streams/StreamsStore';
-import type { StreamRule } from 'stores/streams/StreamsStore';
+import type { StreamRule } from 'logic/streams/types';
 import UserNotification from 'util/UserNotification';
 import useStreamRuleMutations from 'hooks/useStreamRuleMutations';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';

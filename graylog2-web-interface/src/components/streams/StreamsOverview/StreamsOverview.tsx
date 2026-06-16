@@ -18,7 +18,7 @@ import React, { useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
 import QueryHelper from 'components/common/QueryHelper';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import StreamsStore from 'stores/streams/StreamsStore';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { keyFn, fetchStreams, KEY_PREFIX } from 'components/streams/hooks/useStreams';

@@ -21,7 +21,8 @@ import { Input } from 'components/bootstrap';
 import ConfirmDialog from 'components/common/ConfirmDialog';
 import UserNotification from 'util/UserNotification';
 import useCurrentUser from 'hooks/useCurrentUser';
-import StreamsStore, { type Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
+import StreamsStore from 'stores/streams/StreamsStore';
 import { isPermitted } from 'util/PermissionsMixin';
 
 const StreamRuleConnector = styled.div(

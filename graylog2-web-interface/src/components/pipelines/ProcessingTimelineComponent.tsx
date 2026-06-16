@@ -18,7 +18,7 @@ import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { DataTable, Spinner, PaginatedList, SearchForm, QueryHelper } from 'components/common';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';

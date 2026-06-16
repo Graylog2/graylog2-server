@@ -23,7 +23,7 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import { Icon } from 'components/common';
 import { Label } from 'components/bootstrap';
 import { StreamsStore } from 'stores/streams/StreamsStore';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 

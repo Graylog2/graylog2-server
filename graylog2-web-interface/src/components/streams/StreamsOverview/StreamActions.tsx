@@ -19,7 +19,7 @@ import { useState, useCallback } from 'react';
 
 import { ShareButton, IfPermitted, HoverForHelp, LinkContainer } from 'components/common';
 import { Button, ButtonToolbar, MenuItem, DeleteMenuItem } from 'components/bootstrap';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import StreamsStore from 'stores/streams/StreamsStore';
 import Routes from 'routing/Routes';
 import { setStartpage } from 'api/startpage';

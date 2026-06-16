@@ -22,7 +22,8 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import { Button, Modal } from 'components/bootstrap';
 import useCurrentUser from 'hooks/useCurrentUser';
-import { StreamsStore, type Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
+import { StreamsStore } from 'stores/streams/StreamsStore';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { Icon, ModalSubmit } from 'components/common';
 import UserNotification from 'util/UserNotification';

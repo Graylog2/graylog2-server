@@ -20,7 +20,7 @@ import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import ProcessorSimulator from 'components/simulator/ProcessorSimulator';
 import DocsHelper from 'util/DocsHelper';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import StreamsStore from 'stores/streams/StreamsStore';
 import PipelinesPageNavigation from 'components/pipelines/PipelinesPageNavigation';
 

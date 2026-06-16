@@ -17,7 +17,7 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import type { SearchParams, Attribute } from 'stores/PaginationTypes';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import StreamsStore from 'stores/streams/StreamsStore';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
 import { defaultOnError } from 'util/conditional/onError';
