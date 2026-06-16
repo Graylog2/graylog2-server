@@ -142,7 +142,7 @@ const FleetsSection = ({filter}: { filter: string }) => {
 
   if (isError) return <Alert bsStyle="danger">Could not load fleet stats.</Alert>;
 
-  return <FleetCardsGrid fleets={bulkStats?.fleets || []} filter={filter} />;
+  return <FleetCardsGrid fleets={bulkStats?.fleets ?? []} filter={filter} />;
 };
 
 const CollectorsOverview = () => {
@@ -153,7 +153,7 @@ const CollectorsOverview = () => {
 
   if (isError) return <Alert bsStyle="danger">Could not load Collector stats.</Alert>;
 
-  if (stats.total_instances == 0) return <FirstOnboarding />;
+  if (stats.total_instances === 0) return <FirstOnboarding />;
 
   return (
     <div>
