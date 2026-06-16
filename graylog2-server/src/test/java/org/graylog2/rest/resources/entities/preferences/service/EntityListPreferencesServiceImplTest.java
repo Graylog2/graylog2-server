@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.entities.preferences.service;
 import com.google.common.base.Functions;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.rest.resources.entities.preferences.model.EntityListPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.SlicingPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.SortPreferences;
@@ -36,6 +37,10 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.rest.resources.entities.preferences.model.SortOrder.ASC;
 import static org.graylog2.rest.resources.entities.preferences.model.SortOrder.DESC;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MongoDBExtension.class)
 public class EntityListPreferencesServiceImplTest {
@@ -171,6 +176,48 @@ public class EntityListPreferencesServiceImplTest {
         final List<StoredEntityListPreferences> predefined = toTest.getPredefinedForEntityList("list");
 
         assertThat(predefined).isNotNull().containsExactlyInAnyOrder(predefinedLayout1, predefinedLayout2);
+    }
+
+    @Test
+    public void removesPreferencesCorrectly() throws ValidationException {
+        final StoredEntityListPreferences existingPreference = StoredEntityListPreferences.builder()
+                .preferencesId(existingId)
+                .preferences(
+                        new EntityListPreferences(
+                                "My List",
+                                Map.of("title", new EntityListPreferences.Attribute(EntityListPreferences.DisplayStatus.show, Optional.of(13))),
+                                List.of(),
+                                42,
+                                new SortPreferences("title", ASC),
+                                new SlicingPreferences("status", "Alphabetical", ASC),
+                                Map.of(),
+                                0,
+                                List.of(),
+                                List.of()
+
+                        )
+                )
+                .build();
+
+        boolean saved = toTest.save(existingPreference);
+        assertThat(saved).isTrue();
+        assertNotNull(toTest.get(existingId));
+
+        assertTrue(toTest.delete(existingId));
+        assertNull(toTest.get(existingId));
+
+    }
+
+    @Test
+    public void refusesToRemovePreferencesWhenGivenIncorrectID() throws ValidationException {
+        assertThrows(ValidationException.class, () -> toTest.delete(null));
+        assertThrows(ValidationException.class, () -> toTest.delete(StoredEntityListPreferencesId.builder()
+                .entityListId("blahblah")
+                .layoutVariant("my secret layout")
+                .userId(null) //user should not be null!
+                .build()));
+
+
     }
 
     private static EntityListPreferences createSimplifiedPreferencesForTest(final List<String> attributes, final SortPreferences sort) {
