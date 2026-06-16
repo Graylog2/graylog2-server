@@ -187,7 +187,8 @@ class CloudCollectorIngestServiceTest {
     // Deterministic barrier replacing timeout()/after() waits: returns once every launch attempt submitted so far
     // has completed.
     private void awaitIdle() throws Exception {
-        service.awaitIdle(AWAIT_MS, TimeUnit.MILLISECONDS);
+        //noinspection resource
+        service.executorService().submit(() -> {}).get(AWAIT_MS, TimeUnit.MILLISECONDS);
     }
 
     private static CollectorsConfig config() {

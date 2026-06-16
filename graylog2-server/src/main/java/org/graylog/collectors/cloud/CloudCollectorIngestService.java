@@ -184,12 +184,8 @@ public class CloudCollectorIngestService extends AbstractIdleService {
         return input;
     }
 
-    /**
-     * Blocks until every launch attempt submitted so far has completed. Relies on the launcher executor being
-     * single-threaded: the barrier task can only run after all previously submitted tasks have finished.
-     */
     @VisibleForTesting
-    void awaitIdle(long timeout, TimeUnit unit) throws Exception {
-        executorService.submit(() -> {}).get(timeout, unit);
+    ExecutorService executorService() {
+        return executorService;
     }
 }
