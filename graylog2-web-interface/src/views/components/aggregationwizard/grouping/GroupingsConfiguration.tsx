@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
 import { useFormikContext, FieldArray, Field } from 'formik';
 import styled, { css } from 'styled-components';
 import isString from 'lodash/isString';
@@ -54,10 +53,8 @@ type GroupingsItemProps = Omit<
   React.ComponentProps<typeof ElementConfigurationContainer>,
   'testIdPrefix' | 'onRemove' | 'elementTitle' | 'children'
 > & {
-  /* eslint-disable react/no-unused-prop-types */
   item: { id: string };
   index: number;
-  /* eslint-enable react/no-unused-prop-types */
 };
 
 const SettingsSeparator = styled.hr(
@@ -69,38 +66,33 @@ const SettingsSeparator = styled.hr(
   `,
 );
 
+const GroupingsItem = ({ item, index, dragHandle, className, ref }: GroupingsItemProps) => {
+  const { values, setValues } = useFormikContext<WidgetConfigFormValues>();
+  const removeGrouping = () => {
+    setValues(GroupingElement.onRemove(index, values));
+  };
+
+  return (
+    <ElementConfigurationContainer
+      key={`grouping-${item.id}`}
+      dragHandle={dragHandle}
+      className={className}
+      onRemove={removeGrouping}
+      elementTitle={GroupingElement.title}
+      ref={ref}>
+      <GroupingConfiguration index={index} />
+    </ElementConfigurationContainer>
+  );
+};
 const GroupingsConfiguration = () => {
   const {
     values: { groupBy },
-    values,
     errors,
-    setValues,
     setFieldValue,
   } = useFormikContext<WidgetConfigFormValues>();
   const disableColumnRollup = !groupBy?.groupings?.find(({ direction }) => direction === 'column');
-  const removeGrouping = useCallback(
-    (index: number) => () => {
-      setValues(GroupingElement.onRemove(index, values));
-    },
-    [setValues, values],
-  );
 
   const isEmpty = (groupBy?.groupings ?? []).length === 0;
-
-  const GroupingsItem = useCallback(
-    ({ item, index, dragHandle, className, ref }: GroupingsItemProps) => (
-      <ElementConfigurationContainer
-        key={`grouping-${item.id}`}
-        dragHandle={dragHandle}
-        className={className}
-        onRemove={removeGrouping(index)}
-        elementTitle={GroupingElement.title}
-        ref={ref}>
-        <GroupingConfiguration index={index} />
-      </ElementConfigurationContainer>
-    ),
-    [removeGrouping],
-  );
 
   const hasGroupByError = isString(errors?.groupBy);
 

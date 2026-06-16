@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { Row, Col } from 'components/bootstrap';
@@ -46,10 +46,7 @@ const StreamsPage = () => {
   const { createStream } = useStreamMutations();
   const queryClient = useQueryClient();
   const { pathname } = useLocation();
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  useEffect(() => {
-    setShowCreateModal(pathname === Routes.STREAM_NEW);
-  }, [pathname]);
+  const showCreateModal = pathname === Routes.STREAM_NEW;
   const history = useHistory();
   const closeCreateModal = useCallback(() => history.push(Routes.STREAMS), [history]);
 
