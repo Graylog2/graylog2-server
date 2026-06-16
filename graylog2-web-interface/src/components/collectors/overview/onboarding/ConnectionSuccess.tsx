@@ -200,7 +200,7 @@ const ConnectionSuccess = ({ platformId = undefined, instance, fleetName }: Prop
           <h4>Manage Fleets</h4>
           <p>Group collectors by environment or team.</p>
         </NextCard>
-        <NextCard onClick={() => history.push(Routes.SYSTEM.COLLECTORS.FLEETS)}>
+        <NextCard onClick={() => history.push(Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id))}>
           <h4>Configure Sources</h4>
           <p>Add file paths, journald, or Windows Event Log sources.</p>
         </NextCard>
