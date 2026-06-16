@@ -19,6 +19,7 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import DefaultProviders from 'DefaultProviders';
+import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
 import userEvent from '@testing-library/user-event';
 
 import Routes from 'routing/Routes';
@@ -48,10 +49,16 @@ const Wrapper = () => (
   <RouterProvider router={createMemoryRouter(routes, { initialEntries: ['/loggedin'], initialIndex: 0 })} />
 );
 
+const Providers = ({ children }: { children: React.ReactNode }) => (
+  <DefaultQueryClientProvider>
+    <DefaultProviders>{children}</DefaultProviders>
+  </DefaultQueryClientProvider>
+);
+
 describe('useLogout', () => {
   describe('with no logout hooks', () => {
     it('works when no logout hooks are defined', async () => {
-      render(<Wrapper />, { wrapper: DefaultProviders });
+      render(<Wrapper />, { wrapper: Providers });
       await screen.findByText('Logged in');
 
       const logoutButton = await screen.findByRole('button', { name: 'logout' });
@@ -66,7 +73,7 @@ describe('useLogout', () => {
     usePluginExports({ 'hooks.logout': [logoutHook] });
 
     it('executes logout hook if defined', async () => {
-      render(<Wrapper />, { wrapper: DefaultProviders });
+      render(<Wrapper />, { wrapper: Providers });
       await screen.findByText('Logged in');
 
       const logoutButton = await screen.findByRole('button', { name: 'logout' });
@@ -86,7 +93,7 @@ describe('useLogout', () => {
     usePluginExports({ 'hooks.logout': [faultyLogoutHook, logoutHook] });
 
     it('continues other hooks and logging out if one hook is faulty', async () => {
-      render(<Wrapper />, { wrapper: DefaultProviders });
+      render(<Wrapper />, { wrapper: Providers });
       await screen.findByText('Logged in');
 
       const logoutButton = await screen.findByRole('button', { name: 'logout' });
