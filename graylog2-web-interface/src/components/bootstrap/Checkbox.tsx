@@ -21,6 +21,7 @@ type Props = {
   checked?: boolean;
   children?: React.ReactNode;
   className?: string;
+  defaultChecked?: boolean;
   disabled?: boolean;
   id?: string;
   indeterminate?: boolean;
@@ -48,6 +49,7 @@ const Checkbox = (
     readOnly = undefined,
     title = undefined,
     value = undefined,
+    defaultChecked = undefined,
   }: Props,
   forwardedRef: React.MutableRefObject<HTMLInputElement>,
 ) => {
@@ -67,6 +69,7 @@ const Checkbox = (
         type="checkbox"
         ref={checkboxRef}
         id={id}
+        defaultChecked={defaultChecked}
         name={name}
         checked={checked}
         disabled={disabled}
