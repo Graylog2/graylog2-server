@@ -35,6 +35,8 @@ import TypeSpecificValue from 'views/components/TypeSpecificValue';
 import useFieldActions from 'views/components/actions/useFieldActions';
 import useQueryFieldTypes from 'views/hooks/useQueryFieldTypes';
 import useOverflowingComponents from 'views/hooks/useOverflowingComponents';
+import hasMultipleValueForActions from 'views/components/visualizations/utils/hasMultipleValueForActions';
+import { humanSeparator } from 'views/Constants';
 
 type NodeCustomData = { field: string; value: unknown };
 
@@ -118,10 +120,34 @@ const SankeyActions = ({
     ...additionalHandlerArgs,
   };
 
+  // When the combined groupings were selected, the action targets a value path rather than a
+  // single field/value, so show the combined grouping values instead of the metric.
+  const showMultipleValueHeader = hasMultipleValueForActions(actionContext);
+
   return (
     <>
       <PopoverTitle onBackClick={onBack ?? false}>
-        {selected.field} = <TypeSpecificValue field={selected.field} value={selected.value} type={type} truncate />
+        {showMultipleValueHeader ? (
+          actionContext.valuePath.map((entry, index) => {
+            const [entryField, entryValue] = Object.entries(entry)[0];
+
+            return (
+              <React.Fragment key={`${entryField}-${String(entryValue)}`}>
+                {index > 0 && humanSeparator}
+                <TypeSpecificValue
+                  field={entryField}
+                  value={entryValue}
+                  type={fieldTypeFor(entryField, actionContext.fieldTypes)}
+                  truncate
+                />
+              </React.Fragment>
+            );
+          })
+        ) : (
+          <>
+            {selected.field} = <TypeSpecificValue field={selected.field} value={selected.value} type={type} truncate />
+          </>
+        )}
       </PopoverTitle>
       <Menu opened>
         <ActionDropdown
@@ -166,7 +192,7 @@ const SankeyOnClickPopover = ({ clickPoint, config, onPopoverClose }: Props) => 
               {
                 field: srcCustom.field,
                 value: srcCustom.value as Datum,
-                text: String(srcCustom.value),
+                text: srcLabel || String(srcCustom.value),
                 traceColor: null,
               },
             ]
@@ -176,7 +202,7 @@ const SankeyOnClickPopover = ({ clickPoint, config, onPopoverClose }: Props) => 
               {
                 field: tgtCustom.field,
                 value: tgtCustom.value as Datum,
-                text: String(tgtCustom.value),
+                text: tgtLabel || String(tgtCustom.value),
                 traceColor: null,
               },
             ]
@@ -198,7 +224,7 @@ const SankeyOnClickPopover = ({ clickPoint, config, onPopoverClose }: Props) => 
         {
           field: node.field,
           value: node.value as Datum,
-          text: String(node.value),
+          text: pt.label ?? String(node.value),
           traceColor: null,
         },
       ],

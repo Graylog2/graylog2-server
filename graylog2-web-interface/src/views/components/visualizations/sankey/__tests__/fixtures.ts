@@ -129,6 +129,22 @@ export const twoRowPivotsNoMetric: Fixture = {
   ],
 };
 
+// Two distinct ids in the first stage (e.g. two streams) that resolve to the same display name.
+export const sameNameDifferentIds: Fixture = {
+  chart: [
+    {
+      key: ['id-1', 'b1'],
+      values: [{ key: ['count()'], value: 5, rollup: true, source: 'row-leaf' }],
+      source: 'leaf',
+    },
+    {
+      key: ['id-2', 'b1'],
+      values: [{ key: ['count()'], value: 3, rollup: true, source: 'row-leaf' }],
+      source: 'leaf',
+    },
+  ],
+};
+
 export const droppableValues: Fixture = {
   chart: [
     {

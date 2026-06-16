@@ -26,6 +26,8 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import Series from 'views/logic/aggregationbuilder/Series';
 import type { ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
 import SankeyOnClickPopover from 'views/components/visualizations/OnClickPopover/SankeyOnClickPopover';
+import { ActionContext } from 'views/logic/ActionContext';
+import type { ActionContexts } from 'views/types';
 
 // The action menu itself is a separate, independently tested component. Mock it so these tests
 // focus on how SankeyOnClickPopover turns a clicked node/link into selectable values.
@@ -36,14 +38,19 @@ jest.mock('views/components/actions/ActionDropdown', () => ({
 
 const fieldTypes: FieldTypes = { all: Immutable.List(), currentQuery: Immutable.List() };
 
+// `hasMultipleValueForActions` reads the visualization from the surrounding widget context.
+const actionContext = { widget: { config: { visualization: 'sankey' } } } as unknown as ActionContexts;
+
 const Wrapper = ({ children }: { children: React.ReactNode }) => (
   <FieldTypesContext.Provider value={fieldTypes}>
-    <Popover opened withinPortal={false}>
-      <Popover.Target>
-        <button type="button">target</button>
-      </Popover.Target>
-      {children}
-    </Popover>
+    <ActionContext.Provider value={actionContext}>
+      <Popover opened withinPortal={false}>
+        <Popover.Target>
+          <button type="button">target</button>
+        </Popover.Target>
+        {children}
+      </Popover>
+    </ActionContext.Provider>
   </FieldTypesContext.Provider>
 );
 
@@ -63,6 +70,13 @@ const linkClickPoint = {
 const nodeClickPoint = {
   customdata: { field: 'action', value: 'GET' },
   label: 'GET',
+} as unknown as ClickPoint;
+
+// Advanced field types resolve an id to a name (the node label), so the label differs from the raw value.
+const linkClickPointWithResolvedIds = {
+  source: { label: 'Stream A', customdata: { field: 'streams', value: 'id-1' } },
+  target: { label: 'Stream B', customdata: { field: 'streams', value: 'id-2' } },
+  value: 408,
 } as unknown as ClickPoint;
 
 const renderPopover = (clickPoint: ClickPoint, onPopoverClose = jest.fn()) => {
@@ -90,6 +104,34 @@ describe('SankeyOnClickPopover', () => {
 
       // Multiple selectable values, so it does not jump straight to the action menu.
       expect(screen.queryByTestId('action-dropdown')).not.toBeInTheDocument();
+    });
+
+    it('shows the combined grouping values, not the metric, after selecting the combined groupings', async () => {
+      renderPopover(linkClickPoint);
+
+      await userEvent.click(await screen.findByText('index.html-GET'));
+
+      expect(await screen.findByTestId('action-dropdown')).toBeInTheDocument();
+
+      // The title shows the combined grouping values...
+      expect(screen.getByText('index.html-GET')).toBeInTheDocument();
+
+      // ...not the metric and its value.
+      expect(screen.queryByText('count()')).not.toBeInTheDocument();
+      expect(screen.queryByText('408')).not.toBeInTheDocument();
+    });
+
+    it('shows resolved node labels rather than raw ids in the groupings dialog', async () => {
+      renderPopover(linkClickPointWithResolvedIds);
+
+      // Individual grouping rows show the resolved names.
+      expect(await screen.findByText('Stream A')).toBeInTheDocument();
+      expect(screen.getByText('Stream B')).toBeInTheDocument();
+
+      // The combined "apply all groupings" row also shows the resolved names, not the raw ids.
+      expect(screen.getByText('Stream B-Stream A')).toBeInTheDocument();
+      expect(screen.queryByText(/id-1/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/id-2/)).not.toBeInTheDocument();
     });
 
     it('shows the action menu after selecting a value and returns on back', async () => {

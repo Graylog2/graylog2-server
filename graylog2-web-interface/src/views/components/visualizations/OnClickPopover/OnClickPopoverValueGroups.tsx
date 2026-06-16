@@ -85,7 +85,10 @@ const GroupingActions = ({
   setFieldData,
   metricValue = undefined,
 }: GroupingActionsProps) => {
-  const valuePath = [...columnPivotValues, ...rowPivotValues].map(({ value, field }) => ({ [field]: value }));
+  const groupings = [...columnPivotValues, ...rowPivotValues];
+  const valuePath = groupings.map(({ value, field }) => ({ [field]: value }));
+  // Display the resolved labels (`text`) rather than the raw values, which may be ids.
+  const displayValue = groupings.map(({ text }) => text).join(humanSeparator);
 
   return (
     <ListGroupItem
@@ -96,11 +99,7 @@ const GroupingActions = ({
           contexts: { valuePath },
         })
       }>
-      <ValueRenderer
-        field=""
-        value={valuePath.map((o) => Object.values(o)[0]).join(humanSeparator)}
-        traceColor={metricValue?.traceColor ?? null}
-      />
+      <ValueRenderer field="" value={displayValue} traceColor={metricValue?.traceColor ?? null} />
     </ListGroupItem>
   );
 };
