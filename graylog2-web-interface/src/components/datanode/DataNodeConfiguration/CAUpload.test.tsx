@@ -27,7 +27,6 @@ import CAUpload from './CAUpload';
 
 jest.mock('logic/rest/FetchProvider', () => ({ fetchMultiPartFormData: jest.fn() }));
 jest.mock('stores/sessions/SessionStore', () => ({ SessionStore: MockStore(['isLoggedIn', jest.fn()]) }));
-jest.mock('stores/system/SystemStore', () => ({ SystemStore: MockStore() }));
 
 jest.mock('util/UserNotification', () => ({
   error: jest.fn(),

@@ -25,6 +25,7 @@ import com.github.joschi.jadconfig.converters.IntegerConverter;
 import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.converters.StringSetConverter;
 import com.github.joschi.jadconfig.util.Duration;
+import com.github.joschi.jadconfig.util.Size;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
@@ -90,6 +91,10 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     @Documentation("Directory where Datanode will search for an opensearch distribution.")
     @Parameter(value = "opensearch_location")
     private String opensearchDistributionRoot = "dist";
+
+    @Documentation("OpenSearch version to use (e.g. '2.19.5' or '3.5.0'). When not set, the oldest available version found in the distribution directory is used.")
+    @Parameter(value = "opensearch_version")
+    private String opensearchVersion = null;
 
     @Documentation("""
             Data directory of the embedded opensearch. Contains indices of the opensearch.
@@ -372,7 +377,15 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
         return opensearchAuditLog;
     }
 
-     /**
+    @Documentation("""
+            This parameter defines the maximum size in bytes of cluster events. When it is exceeded, oldest events will
+            be overwritten. This should be as small as possible (for performance), but large enough to hold events long
+            enough for all nodes to process them.
+            """)
+    @Parameter(value = "max_events_collection_size")
+    private Size maxEventsCollectionSize = Size.megabytes(100);
+
+    /**
      * The insecure flag causes problems on many places. We should replace it with autosecurity option, that would
      * configure all the CA and certs automatically.
      */
@@ -395,6 +408,10 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
 
     public String getOpensearchDistributionRoot() {
         return opensearchDistributionRoot;
+    }
+
+    public String getOpensearchVersion() {
+        return opensearchVersion;
     }
 
     /**

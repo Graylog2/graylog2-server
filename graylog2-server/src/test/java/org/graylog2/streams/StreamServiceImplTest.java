@@ -17,6 +17,9 @@
 package org.graylog2.streams;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.eventbus.EventBus;
+import com.mongodb.client.model.Filters;
+import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog.security.entities.EntityRegistrar;
 import org.graylog.testing.mongodb.MongoDBExtension;
@@ -27,14 +30,13 @@ import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.ImmutableSystemScope;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.indexer.indexset.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indexset.MongoIndexSet;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.streams.requests.UpdateStreamRequest;
 import org.graylog2.streams.events.StreamsChangedEvent;
-import com.google.common.eventbus.EventBus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -74,11 +76,19 @@ public class StreamServiceImplTest {
     ClusterEventBus eventBus;
 
     private StreamService streamService;
+    private MongoCollections mongoCollections;
+    private EventBus localEventBus;
+    private StreamCache streamCache;
 
     @BeforeEach
     public void setUp(MongoCollections mongoCollections) throws Exception {
+        this.mongoCollections = mongoCollections;
+        this.localEventBus = new EventBus();
+        this.streamCache = new StreamCache(mongoCollections, localEventBus);
         this.streamService = new StreamServiceImpl(mongoCollections, streamRuleService,
-                outputService, indexSetService, factory, entityRegistrar, eventBus, Set.of(), new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())), new EventBus());
+                outputService, indexSetService, factory, entityRegistrar, eventBus, Set.of(),
+                new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())),
+                streamCache);
     }
 
     @Test
@@ -173,5 +183,27 @@ public class StreamServiceImplTest {
                 "illuminate_streams", 2L,
                 "user_streams", 1L
         ));
+    }
+
+    @Test
+    @MongoDBFixtures("systemAndDefaultStreams.json")
+    public void systemStreamIdsCacheIsInvalidatedOnStreamChange() {
+        final String systemStreamId = "aaaaaaaaaaaaaaaaaaaaaaaa";
+
+        // First call lazily computes and caches the system stream IDs
+        assertThat(streamService.getSystemStreamIds(false)).containsExactly(systemStreamId);
+
+        // Delete the system stream directly in MongoDB, bypassing StreamService
+        mongoCollections.nonEntityCollection("streams", Document.class)
+                .deleteOne(Filters.eq("_id", new ObjectId(systemStreamId)));
+
+        // Cached value is still returned (stale)
+        assertThat(streamService.getSystemStreamIds(false)).containsExactly(systemStreamId);
+
+        // Simulate a stream change event, which invalidates the cache
+        localEventBus.post(StreamsChangedEvent.create(systemStreamId));
+
+        // Cache is invalidated; next call recomputes from DB
+        assertThat(streamService.getSystemStreamIds(false)).isEmpty();
     }
 }

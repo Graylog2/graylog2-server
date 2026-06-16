@@ -16,12 +16,14 @@
  */
 package org.graylog2.indexer.indexset.profile;
 
+import jakarta.ws.rs.BadRequestException;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.events.ClusterEventBus;
+import org.graylog2.indexer.fieldtypes.mapping.CustomMappingValidation;
 import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -46,6 +48,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -72,7 +75,8 @@ public class IndexFieldTypeProfileServiceTest {
         toTest = new IndexFieldTypeProfileService(
                 mongoCollections,
                 indexFieldTypeProfileUsagesService,
-                mongoIndexSetService);
+                mongoIndexSetService,
+                new CustomMappingValidation());
     }
 
     @Test
@@ -219,6 +223,23 @@ public class IndexFieldTypeProfileServiceTest {
     public void testUpdateWithIncorrectProfileIdDoesNothing() {
         final boolean result = toTest.update("hmm", new IndexFieldTypeProfile(null, "Hmm", "Hmm", new CustomFieldMappings(List.of())));
         assertFalse(result);
+    }
+
+    @Test
+    public void testSaveThrowsWhenProfileIsInvalid() {
+        final IndexFieldTypeProfile profile = new IndexFieldTypeProfile(null, "profile", "profile",
+                new CustomFieldMappings(List.of(new CustomFieldMapping("field", "wrong_type_that_causes_exception"))));
+
+        assertThrows(BadRequestException.class, () -> toTest.save(profile));
+    }
+
+    @Test
+    public void testUpdateThrowsWhenProfileIsInvalid() {
+        final String profileId = "123400000000000000000001";
+        final IndexFieldTypeProfile profile = new IndexFieldTypeProfile(profileId, "profile", "profile",
+                new CustomFieldMappings(List.of(new CustomFieldMapping("field", "wrong_type_that_causes_exception"))));
+
+        assertThrows(BadRequestException.class, () -> toTest.update(profileId, profile));
     }
 
     @Test

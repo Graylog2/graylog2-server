@@ -18,12 +18,14 @@ package org.graylog.storage.opensearch3;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.joschi.jadconfig.util.Duration;
 import org.graylog.storage.opensearch3.cluster.ClusterStateApi;
 import org.graylog.storage.opensearch3.stats.ClusterStatsApi;
 import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
 import org.graylog.storage.opensearch3.stats.StatsApi;
 import org.graylog.storage.opensearch3.testing.client.mock.ServerlessOpenSearchClient;
 import org.graylog2.indexer.indices.IndexTemplateAdapter;
+import org.graylog2.indexer.indices.OutdatedIndex;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,12 +36,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opensearch.client.opensearch._types.FlushStats;
 import org.opensearch.client.opensearch.indices.stats.IndexStats;
 import org.opensearch.client.opensearch.indices.stats.IndicesStats;
+import org.opensearch.client.transport.TransportOptions;
+import org.opensearch.client.transport.httpclient5.ApacheHttpClient5Options;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -171,11 +176,13 @@ class IndicesAdapterOSTest {
         final IndicesAdapterOS adapter = buildAdapterWithSettingsResponse("""
                 {
                   "current_index": {"settings": {"index.version.created_string": "2.5.0"}},
-                  "old_index":     {"settings": {"index.version.created_string": "1.3.0"}}
+                  "old_index":     {"settings": {"index.version.created_string": "1.3.0", "index.store.type": "local"}}
                 }
                 """);
 
-        assertThat(adapter.getOutdatedIndices(2)).containsExactly("old_index");
+        assertThat(adapter.getOutdatedIndices(2)).containsExactly(
+                new OutdatedIndex("old_index", "1.3.0", false)
+        );
     }
 
     @Test
@@ -200,7 +207,41 @@ class IndicesAdapterOSTest {
                 }
                 """);
 
-        assertThat(adapter.getOutdatedIndices(2)).containsExactlyInAnyOrder("no_settings", "no_version");
+        assertThat(adapter.getOutdatedIndices(2)).containsExactlyInAnyOrder(
+                new OutdatedIndex("no_settings", "", false),
+                new OutdatedIndex("no_version", "", false)
+        );
+    }
+
+    @Test
+    void testGetOutdatedIndicesShowsWarmIndex() {
+        final IndicesAdapterOS adapter = buildAdapterWithSettingsResponse("""
+                {
+                  "current_index": {"settings": {"index.version.created_string": "2.5.0"}},
+                  "old_index":     {"settings": {"index.version.created_string": "1.3.0", "index.store.type": "remote_snapshot"}}
+                }
+                """);
+
+        assertThat(adapter.getOutdatedIndices(2)).containsExactly(
+                new OutdatedIndex("old_index", "1.3.0", true)
+        );
+    }
+
+    @Test
+    void testOptimizeIndexSetsResponseTimeoutOnRequest() {
+        final Duration timeout = Duration.hours(1);
+        final AtomicReference<TransportOptions> capturedOptions = new AtomicReference<>();
+
+        final OfficialOpensearchClient client = ServerlessOpenSearchClient.builder()
+                .captureOptions(capturedOptions::set)
+                .stubResponse("POST", "/*/_forcemerge", "{\"_shards\":{\"total\":1,\"successful\":1,\"failed\":0}}")
+                .build();
+        buildAdapter(client).optimizeIndex("test_index", 1, timeout);
+
+        assertThat(capturedOptions.get()).isInstanceOf(ApacheHttpClient5Options.class);
+        final var httpOptions = (ApacheHttpClient5Options) capturedOptions.get();
+        assertThat(httpOptions.getRequestConfig().getResponseTimeout().toMilliseconds())
+                .isEqualTo(timeout.toMilliseconds());
     }
 
     private IndicesAdapterOS buildAdapterWithSettingsResponse(String settingsJson) {

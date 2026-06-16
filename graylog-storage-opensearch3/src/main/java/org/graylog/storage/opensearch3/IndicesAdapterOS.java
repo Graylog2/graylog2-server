@@ -39,6 +39,7 @@ import org.graylog2.indexer.indices.IndexStatus;
 import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.IndicesAdapter;
+import org.graylog2.indexer.indices.OutdatedIndex;
 import org.graylog2.indexer.indices.ShardsInfo;
 import org.graylog2.indexer.indices.Template;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
@@ -152,13 +153,13 @@ public class IndicesAdapterOS implements IndicesAdapter {
     }
 
     @Override
-    public void move(String source, String target, Consumer<IndexMoveResult> resultCallback) {
+    public void reindex(String source, String target, Consumer<IndexMoveResult> resultCallback) {
         ReindexResponse result = c.execute(() -> openSearchClient.reindex(
                         org.opensearch.client.opensearch.core.ReindexRequest.builder()
                                 .source(Source.builder().index(source).build())
                                 .dest(Destination.builder().index(target).build())
                                 .build()),
-                "Error moving index " + source + " to " + target);
+                "Error reindexing index " + source + " to " + target);
 
         final IndexMoveResult indexMoveResult = IndexMoveResult.create(
                 Math.toIntExact(getIfNull(result.total(), 0L)),
@@ -627,15 +628,17 @@ public class IndicesAdapterOS implements IndicesAdapter {
 
     @Override
     public void optimizeIndex(String index, int maxNumSegments, Duration timeout) {
-        ForcemergeRequest request = ForcemergeRequest.of(b -> b
+        final ForcemergeRequest request = ForcemergeRequest.of(b -> b
                 .index(index)
                 .maxNumSegments(Integer.toUnsignedLong(maxNumSegments))
                 .flush(true)
         );
 
-        String errorMessage = "Force merge of index " + index + " did not complete in " + timeout.toString() + ", not waiting for completion any longer.";
-        c.executeWithClientTimeout((asyncClient) -> asyncClient.indices().forcemerge(request), errorMessage, timeout);
-
+        final String errorMessage = "Force merge of index " + index + " did not complete in " + timeout + ", not waiting for completion any longer.";
+        c.executeWithClientTimeout(
+                (asyncClient) -> asyncClient.indices().forcemerge(request),
+                errorMessage,
+                timeout);
     }
 
     @Override
@@ -780,7 +783,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
     }
 
     @Override
-    public Set<String> getOutdatedIndices(int currentMajorVersion) {
+    public Set<OutdatedIndex> getOutdatedIndices(int currentMajorVersion) {
         return c.execute(() -> {
             GetIndicesSettingsResponse result = indicesClient.getSettings(b -> b
                     .ignoreUnavailable(true)
@@ -790,18 +793,28 @@ public class IndicesAdapterOS implements IndicesAdapter {
                     .human(true)
             );
             return result.result().keySet().stream()
-                    .filter(index ->
-                            Optional.ofNullable(toIndexSettings(result, index))
+                    .map(index -> new TempIndexSettings(index, Optional.ofNullable(toIndexSettings(result, index))))
+                    .filter(indexSettings ->
+                            indexSettings.settings()
                                     .map(settings -> settings.get("index.version.created_string"))
                                     .map(Object::toString)
                                     // checking for version mismatch is enough as a higher version index won't work anyway
                                     // or would be expected if created with e.g. Elastic 7.x
                                     .map(version -> !version.startsWith(currentMajorVersion + "."))
                                     .orElseGet(() -> {
-                                        LOG.error("Could not resolve version from settings for index " + index);
+                                        LOG.error("Could not resolve version from settings for index " + indexSettings.index());
                                         return true;
                                     })
+                    ).map(
+                            indexSettings -> new OutdatedIndex(
+                                    indexSettings.index(),
+                                    indexSettings.settings().map(settings -> settings.get("index.version.created_string")).map(Object::toString).orElse(""),
+                                    indexSettings.settings().map(settings -> settings.get("index.store.type")).map(type -> "remote_snapshot".equals(type)).orElse(false)
+                            )
                     ).collect(Collectors.toSet());
         }, "Couldn't read settings for indices");
     }
+
+    record TempIndexSettings(String index, Optional<Map<String, Object>> settings) {}
+
 }

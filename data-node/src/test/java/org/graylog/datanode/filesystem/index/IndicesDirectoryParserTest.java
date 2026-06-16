@@ -17,17 +17,20 @@
 package org.graylog.datanode.filesystem.index;
 
 import org.assertj.core.api.Assertions;
-import org.graylog.datanode.filesystem.index.indexreader.ShardStatsParserImpl;
-import org.graylog.datanode.filesystem.index.statefile.StateFileParserImpl;
 import org.graylog.datanode.filesystem.index.dto.IndexInformation;
 import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
+import org.graylog.datanode.filesystem.index.indexreader.ShardStatsParserImpl;
+import org.graylog.datanode.filesystem.index.statefile.StateFileParserImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 class IndicesDirectoryParserTest {
 
@@ -70,58 +73,16 @@ class IndicesDirectoryParserTest {
     @Test
     void testOpensearch1() throws URISyntaxException {
         final URI uri = getClass().getResource("/indices/opensearch1").toURI();
-        final IndexerDirectoryInformation result = parser.parse(Path.of(uri));
-        Assertions.assertThat(result.nodes())
-                .hasSize(1)
-                .allSatisfy(node -> {
-                    Assertions.assertThat(node.nodeVersion()).isEqualTo("1.3.0");
-                    Assertions.assertThat(node.indices())
-                            .hasSize(1)
-                            .extracting(IndexInformation::indexName)
-                            .contains("graylog_0");
-
-                    final IndexInformation graylog_0 = node.indices().stream().filter(i -> i.indexName().equals("graylog_0")).findFirst().orElseThrow(() -> new RuntimeException("Failed to detect graylog_0 index"));
-
-                    Assertions.assertThat(graylog_0.indexVersionCreated()).isEqualTo("1.3.0");
-
-                    Assertions.assertThat(graylog_0.shards())
-                            .hasSize(1)
-                            .allSatisfy(shard -> {
-                                Assertions.assertThat(shard.documentsCount()).isEqualTo(1);
-                                Assertions.assertThat(shard.name()).isEqualTo("S0");
-                                Assertions.assertThat(shard.primary()).isEqualTo(true);
-                                Assertions.assertThat(shard.minLuceneVersion()).isEqualTo("8.10.1");
-                            });
-                });
+        Assertions.assertThatThrownBy(() -> parser.parse(Path.of(uri)))
+                        .isInstanceOf(IncompatibleIndexVersionException.class);
     }
 
 
     @Test
     void testElasticsearch7() throws URISyntaxException {
         final URI uri = getClass().getResource("/indices/elasticsearch7").toURI();
-        final IndexerDirectoryInformation result = parser.parse(Path.of(uri));
-        Assertions.assertThat(result.nodes())
-                .hasSize(1)
-                .allSatisfy(node -> {
-                    Assertions.assertThat(node.nodeVersion()).isEqualTo("7.10.0");
-                    Assertions.assertThat(node.indices())
-                            .hasSize(1)
-                            .extracting(IndexInformation::indexName)
-                            .contains("graylog_0");
-
-                    final IndexInformation graylog_0 = node.indices().stream().filter(i -> i.indexName().equals("graylog_0")).findFirst().orElseThrow(() -> new RuntimeException("Failed to detect graylog_0 index"));
-
-                    Assertions.assertThat(graylog_0.indexVersionCreated()).isEqualTo("7.10.0");
-
-                    Assertions.assertThat(graylog_0.shards())
-                            .hasSize(1)
-                            .allSatisfy(shard -> {
-                                Assertions.assertThat(shard.documentsCount()).isEqualTo(1);
-                                Assertions.assertThat(shard.name()).isEqualTo("S0");
-                                Assertions.assertThat(shard.primary()).isEqualTo(true);
-                                Assertions.assertThat(shard.minLuceneVersion()).isEqualTo("8.7.0");
-                            });
-                });
+        Assertions.assertThatThrownBy(() -> parser.parse(Path.of(uri)))
+                        .isInstanceOf(IncompatibleIndexVersionException.class);
     }
 
     @Test
@@ -137,6 +98,65 @@ class IndicesDirectoryParserTest {
         final IndexerDirectoryInformation result = parser.parse(tempDir);
         Assertions.assertThat(result).isNotNull();
         Assertions.assertThat(result.nodes()).isEmpty();
+    }
 
+    @Test
+    void testNonExistentPath() {
+        Assertions.assertThatThrownBy(() -> parser.parse(Path.of("/nonexistent/does/not/exist")))
+                .isInstanceOf(IndexerInformationParserException.class);
+    }
+
+    @Test
+    void testPathIsNotDirectory(@TempDir Path tempDir) throws IOException {
+        final Path file = Files.createFile(tempDir.resolve("file.dat"));
+        Assertions.assertThatThrownBy(() -> parser.parse(file))
+                .isInstanceOf(IndexerInformationParserException.class);
+    }
+
+    @Test
+    void testNodesDirectoryExistsButEmpty(@TempDir Path tempDir) throws IOException {
+        Files.createDirectory(tempDir.resolve("nodes"));
+        final IndexerDirectoryInformation result = parser.parse(tempDir);
+        Assertions.assertThat(result.nodes()).isEmpty();
+    }
+
+    @Test
+    void testOpensearch2IndicesAreSortedAlphabetically() throws URISyntaxException {
+        final URI uri = getClass().getResource("/indices/opensearch2").toURI();
+        final List<String> indexNames = parser.parse(Path.of(uri)).nodes().getFirst().indices().stream()
+                .map(IndexInformation::indexName)
+                .toList();
+        Assertions.assertThat(indexNames).isSorted();
+    }
+
+    @Test
+    void testOpensearch2AllIndicesHaveOneShard() throws URISyntaxException {
+        final URI uri = getClass().getResource("/indices/opensearch2").toURI();
+        Assertions.assertThat(parser.parse(Path.of(uri)).nodes().getFirst().indices())
+                .hasSize(6)
+                .allSatisfy(index -> Assertions.assertThat(index.shards()).hasSize(1));
+    }
+
+    @Test
+    void testOpensearch2SecurityAuditlogHasMultipleDocuments() throws URISyntaxException {
+        final URI uri = getClass().getResource("/indices/opensearch2").toURI();
+        final IndexInformation auditlog = parser.parse(Path.of(uri)).nodes().getFirst().indices().stream()
+                .filter(i -> "security-auditlog-2023.11.24".equals(i.indexName()))
+                .findFirst()
+                .orElseThrow();
+        // lmXxSRU5RkGiY4rPrDBAjQ has four separate segments (_5/_6/_7/_8), each with documents
+        Assertions.assertThat(auditlog.shards().getFirst().documentsCount()).isGreaterThan(1);
+    }
+
+    @Test
+    void testOpensearch2GraylogIndexHasCreationDate() throws URISyntaxException {
+        final URI uri = getClass().getResource("/indices/opensearch2").toURI();
+        final IndexInformation graylog = parser.parse(Path.of(uri)).nodes().getFirst().indices().stream()
+                .filter(i -> "graylog_0".equals(i.indexName()))
+                .findFirst()
+                .orElseThrow();
+        Assertions.assertThat(graylog.creationDate())
+                .isNotNull()
+                .matches("\\d{4}-\\d{2}-\\d{2}");
     }
 }

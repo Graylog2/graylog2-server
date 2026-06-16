@@ -64,6 +64,7 @@ export type SearchFilter = {
   frontendId?: string;
   description?: string;
 };
+
 export type EventProcessorConfig = {
   type: string;
   query?: string;
@@ -84,6 +85,7 @@ export type EventProcessorConfig = {
   cron_timezone?: string;
   event_limit?: number;
 };
+
 export type EventDefinition = {
   _scope: string;
   _entity_source: any;
@@ -107,10 +109,12 @@ export type EventDefinition = {
     type: string;
     streams: number[] | string[];
   }>;
+  tags: string[];
   updated_at: string | null;
   matched_at: string;
   scheduler: Scheduler;
   event_summary_template: string;
+  tactics_techniques?: string[];
 };
 
 export type EventDefinitionFormControlsProps = {
@@ -121,6 +125,8 @@ export type EventDefinitionFormControlsProps = {
   onOpenPrevPage: () => void;
   onSubmit: (event: SyntheticEvent) => void;
   steps: StepsType<string>;
+  isSubmitting?: boolean;
+  disabledSubmit?: boolean;
 };
 
 export const isSystemEventDefinition = (eventDefinition: EventDefinition) =>

@@ -129,7 +129,6 @@ public class ViewFacadeTest {
     private final String newStreamId = "5def958063303ae5f68ebeaf";
     private final String streamId = "5cdab2293d27467fbe9e8a72"; /* stored in database */
     private UserService userService;
-    private EntityRegistrar entityRegistrar;
 
     @BeforeEach
     public void setUp(MongoDBTestService dbTestService) {
@@ -153,9 +152,8 @@ public class ViewFacadeTest {
         viewService = new TestViewService(null, mongoCollections);
         viewSummaryService = new TestViewSummaryService(mongoCollections);
         userService = mock(UserService.class);
-        entityRegistrar = mock(EntityRegistrar.class);
 
-        facade = new SearchFacade(objectMapper, searchDbService, viewService, viewSummaryService, userService, entityRegistrar);
+        facade = new SearchFacade(objectMapper, searchDbService, viewService, viewSummaryService, userService);
     }
 
     @Test
