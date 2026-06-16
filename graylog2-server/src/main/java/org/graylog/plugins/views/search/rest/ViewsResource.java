@@ -49,6 +49,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.Query;
@@ -92,7 +93,6 @@ import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.PublicCloudAPI;
-import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
 import java.util.Collection;
@@ -279,7 +279,7 @@ public class ViewsResource extends RestResourceWithOwnerCheck implements PluginR
 
         final User user = userContext.getUser();
         var result = dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).build(), user);
-        recentActivityService.create(result.id(), result.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, searchUser);
+        recentActivityService.create(result.id(), toGRNType(dto), searchUser);
         updateViewSharing(createEntityRequest, searchUser, result);
 
         return result;
@@ -287,9 +287,12 @@ public class ViewsResource extends RestResourceWithOwnerCheck implements PluginR
 
     private void updateViewSharing(CreateEntityRequest<ViewDTO> createEntityRequest, SearchUser searchUser, ViewDTO dto) {
         createEntityRequest.shareRequest().ifPresent(shareRequest -> {
-            final var grnType = dto.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH;
-            entitySharesService.updateEntityShares(grnType, dto.id(), shareRequest, searchUser.getUser());
+            entitySharesService.updateEntityShares(toGRNType(dto), dto.id(), shareRequest, searchUser.getUser());
         });
+    }
+
+    private GRNType toGRNType(ViewDTO dto) {
+        return dto.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH;
     }
 
     private void validateIntegrity(ViewDTO dto, SearchUser searchUser, boolean newCreation) {
@@ -398,11 +401,11 @@ public class ViewsResource extends RestResourceWithOwnerCheck implements PluginR
         final ViewDTO updatedDTO = dto.toBuilder().id(id).build();
         validateDto(updatedDTO, searchUser);
 
-        final var grnType = dto.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH;
+        final var grnType = toGRNType(dto);
         createEntityRequest.shareRequest().ifPresent(request -> checkOwnership(grnType.toGRN(dto.id())));
 
         var result = dbService.update(updatedDTO);
-        recentActivityService.update(result.id(), result.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, searchUser);
+        recentActivityService.update(result.id(), grnType, searchUser);
         updateViewSharing(createEntityRequest, searchUser, result);
 
         return result;
@@ -438,7 +441,7 @@ public class ViewsResource extends RestResourceWithOwnerCheck implements PluginR
 
         dbService.delete(id);
         triggerDeletedEvent(view);
-        recentActivityService.delete(view.id(), view.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, view.title(), searchUser);
+        recentActivityService.delete(view.id(), toGRNType(view), view.title(), searchUser);
         return view;
     }
 
