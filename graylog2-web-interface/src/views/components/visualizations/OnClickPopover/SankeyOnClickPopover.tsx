@@ -136,7 +136,7 @@ const SankeyOnClickPopover = ({ clickPoint, config, onPopoverClose }: Props) => 
               {
                 field: srcCustom.field,
                 value: srcCustom.value as Datum,
-                text: String(srcCustom.value),
+                text: srcLabel || String(srcCustom.value),
                 traceColor: null,
               },
             ]
@@ -146,7 +146,7 @@ const SankeyOnClickPopover = ({ clickPoint, config, onPopoverClose }: Props) => 
               {
                 field: tgtCustom.field,
                 value: tgtCustom.value as Datum,
-                text: String(tgtCustom.value),
+                text: tgtLabel || String(tgtCustom.value),
                 traceColor: null,
               },
             ]
@@ -168,7 +168,7 @@ const SankeyOnClickPopover = ({ clickPoint, config, onPopoverClose }: Props) => 
         {
           field: nodeCustom.field,
           value: nodeCustom.value as Datum,
-          text: String(nodeCustom.value),
+          text: pt.label ?? String(nodeCustom.value),
           traceColor: null,
         },
       ],

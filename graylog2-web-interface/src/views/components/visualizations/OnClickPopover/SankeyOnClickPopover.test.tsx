@@ -65,6 +65,13 @@ const nodeClickPoint = {
   label: 'GET',
 } as unknown as ClickPoint;
 
+// Advanced field types resolve an id to a name (the node label), so the label differs from the raw value.
+const linkClickPointWithResolvedIds = {
+  source: { label: 'Stream A', customdata: { field: 'streams', value: 'id-1' } },
+  target: { label: 'Stream B', customdata: { field: 'streams', value: 'id-2' } },
+  value: 408,
+} as unknown as ClickPoint;
+
 const renderPopover = (clickPoint: ClickPoint, onPopoverClose = jest.fn()) => {
   render(
     <Wrapper>
@@ -90,6 +97,19 @@ describe('SankeyOnClickPopover', () => {
 
       // Multiple selectable values, so it does not jump straight to the action menu.
       expect(screen.queryByTestId('action-dropdown')).not.toBeInTheDocument();
+    });
+
+    it('shows resolved node labels rather than raw ids in the groupings dialog', async () => {
+      renderPopover(linkClickPointWithResolvedIds);
+
+      // Individual grouping rows show the resolved names.
+      expect(await screen.findByText('Stream A')).toBeInTheDocument();
+      expect(screen.getByText('Stream B')).toBeInTheDocument();
+
+      // The combined "apply all groupings" row also shows the resolved names, not the raw ids.
+      expect(screen.getByText('Stream B-Stream A')).toBeInTheDocument();
+      expect(screen.queryByText(/id-1/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/id-2/)).not.toBeInTheDocument();
     });
 
     it('shows the action menu after selecting a value and returns on back', async () => {
