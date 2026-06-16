@@ -32,6 +32,8 @@ type Props = {
   readOnly?: boolean;
   title?: string;
   value?: string;
+  'aria-describedby'?: string;
+  'aria-labelledby'?: string;
 };
 
 const Checkbox = (
@@ -50,6 +52,8 @@ const Checkbox = (
     title = undefined,
     value = undefined,
     defaultChecked = undefined,
+    'aria-describedby': ariaDescribedBy = undefined,
+    'aria-labelledby': ariaLabelledBy = undefined,
   }: Props,
   forwardedRef: React.MutableRefObject<HTMLInputElement>,
 ) => {
@@ -75,6 +79,8 @@ const Checkbox = (
         disabled={disabled}
         readOnly={readOnly}
         value={value}
+        aria-describedby={ariaDescribedBy}
+        aria-labelledby={ariaLabelledBy}
         onClick={onClick}
         onChange={onChange}
       />
