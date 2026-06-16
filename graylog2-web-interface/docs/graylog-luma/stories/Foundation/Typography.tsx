@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import styled, { useTheme } from 'styled-components';
 import type { DefaultTheme } from 'styled-components';
 
@@ -24,11 +23,7 @@ import {
   COL_WIDTH_STYLE,
   COL_WIDTH_VARIABLE,
   FoundationTable,
-  H1,
-  H2,
-  H3,
   PxLabel,
-  SectionDescription,
   StoryContainer,
   Token,
 } from './shared';
@@ -62,7 +57,7 @@ const FONT_FAMILIES: Array<FamilyEntry> = [
   },
 ];
 
-const FontFamiliesDoc = () => {
+export const FontFamiliesDoc = () => {
   const theme = useTheme();
   const families = theme.fonts.family as Record<string, string>;
 
@@ -91,28 +86,12 @@ const FontFamiliesDoc = () => {
 
   return (
     <StoryContainer>
-      <H2>Font Families</H2>
       <FoundationTable columns={columns} rows={FONT_FAMILIES} keyBy={(row) => row.key} />
     </StoryContainer>
   );
 };
 
 // ─── Type Scale ────────────────────────────────────────────────────────────
-
-const ScaleGroup = styled.section`
-  margin-bottom: ${({ theme }) => theme.spacings.xl};
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-
-const GroupNote = styled.p`
-  font-size: ${({ theme }) => theme.fonts.size.body};
-  color: ${({ theme }) => theme.colors.text.primary};
-  margin: 0 0 ${({ theme }) => theme.spacings.md};
-  line-height: 1.5;
-`;
 
 type FontSizeKey =
   | 'h1'
@@ -238,9 +217,12 @@ const TYPE_SCALE_GROUPS: Array<ScaleGroupEntry> = [
   },
 ];
 
-const TypeScaleDoc = () => {
+export const TypeScaleGroupDoc = ({ label }: { label: string }) => {
   const theme = useTheme();
   const remToPx = (rem: string): string => `${Math.round(parseFloat(rem) * parseFloat(theme.fonts.size.root))}px`;
+  const group = TYPE_SCALE_GROUPS.find((g) => g.label === label);
+
+  if (!group) return null;
 
   const columns = [
     {
@@ -288,18 +270,7 @@ const TypeScaleDoc = () => {
 
   return (
     <StoryContainer>
-      <H2>Type Scale</H2>
-      {TYPE_SCALE_GROUPS.map((group) => (
-        <ScaleGroup key={group.label}>
-          <H3>{group.label}</H3>
-          <GroupNote>{group.note}</GroupNote>
-          <FoundationTable
-            columns={columns}
-            rows={group.items}
-            keyBy={(row) => `${row.key}-${row.family ?? 'default'}`}
-          />
-        </ScaleGroup>
-      ))}
+      <FoundationTable columns={columns} rows={group.items} keyBy={(row) => `${row.key}-${row.family ?? 'default'}`} />
     </StoryContainer>
   );
 };
@@ -349,7 +320,7 @@ const TEXT_COLORS: Array<ColorEntry> = [
   },
 ];
 
-const TextColorsDoc = () => {
+export const TextColorsDoc = () => {
   const theme = useTheme();
 
   const columns = [
@@ -379,51 +350,7 @@ const TextColorsDoc = () => {
 
   return (
     <StoryContainer>
-      <H2>Text Colors</H2>
-      <SectionDescription>
-        Our text color palette is designed to provide optimal contrast for light and dark themes. We aim to ensure that
-        information is easy to read and does not strain readers&apos; eyes while they browse their data. These standards
-        also help us meet our customers&apos; accessibility requirements.
-      </SectionDescription>
       <FoundationTable columns={columns} rows={TEXT_COLORS} keyBy={(row) => row.token} />
     </StoryContainer>
   );
-};
-
-// ─── Meta & Stories ────────────────────────────────────────────────────────
-
-const meta: Meta = {
-  title: 'Foundation/Typography',
-  parameters: {
-    layout: 'padded',
-    docs: {
-      description: {
-        component:
-          'Typography tokens from `theme.fonts` and `theme.colors.text`. Always use these tokens — never hardcode font families, sizes, or colors. Toggle light/dark mode in the toolbar to preview both themes.',
-      },
-    },
-  },
-};
-
-export default meta;
-type Story = StoryObj<typeof meta>;
-
-const TypographyDoc = () => (
-  <>
-    <StoryContainer>
-      <H1>Typography</H1>
-      <p style={{ lineHeight: 1.6 }}>
-        Typography in our design system ensures clarity, consistency, and accessibility across all user interfaces. We
-        use a dual-typeface approach to distinguish between general interface content and technical or system-specific
-        elements.
-      </p>
-    </StoryContainer>
-    <FontFamiliesDoc />
-    <TypeScaleDoc />
-    <TextColorsDoc />
-  </>
-);
-
-export const Typography: Story = {
-  render: TypographyDoc,
 };

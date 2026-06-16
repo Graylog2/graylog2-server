@@ -111,6 +111,23 @@ describe('ReplaySearchButton', () => {
     });
   });
 
+  describe('new tab behaviour', () => {
+    it('opens the replayed search in the same tab by default', async () => {
+      render(<ReplaySearchButton />);
+      const button = await findReplayButton();
+
+      expect(button.target).not.toBe('_blank');
+    });
+
+    it('opens the replayed search in a new tab when newTab is set', async () => {
+      render(<ReplaySearchButton newTab />);
+      const button = await findReplayButton();
+
+      expect(button.target).toBe('_blank');
+      expect(button.rel).toBe('noopener noreferrer');
+    });
+  });
+
   describe('on click', () => {
     it('persists search filters to local storage so the replayed search can consume them', async () => {
       const filters = Immutable.List([filter('source:my-host'), filter('level:ERROR')]);
