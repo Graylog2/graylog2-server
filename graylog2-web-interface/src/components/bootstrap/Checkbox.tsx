@@ -68,7 +68,6 @@ const Checkbox = (
 
   const label = (
     <label className={inline ? `checkbox-inline ${className ?? ''}` : undefined} title={title} htmlFor={id}>
-      {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
       <input
         type="checkbox"
         ref={checkboxRef}
