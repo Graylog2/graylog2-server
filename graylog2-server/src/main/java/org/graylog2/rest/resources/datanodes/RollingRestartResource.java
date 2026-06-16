@@ -33,6 +33,7 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.scheduler.JobTriggerDto;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.datanode.restart.RollingRestartJobHandler;
 import org.graylog2.datanode.restart.RollingRestartPreconditionsException;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -40,6 +41,9 @@ import org.graylog2.shared.security.RestPermissions;
 
 import java.util.List;
 import java.util.Map;
+
+import static org.graylog2.audit.AuditEventTypes.DATANODE_ABORT_RESTART;
+import static org.graylog2.audit.AuditEventTypes.DATANODE_TRIGGER_RESTART;
 
 @RequiresAuthentication
 @Tag(name = "DataNode/Rolling Restart", description = "Endpoint for rolling restart of embedded OpenSearch instances in a data node cluster")
@@ -57,6 +61,7 @@ public class RollingRestartResource extends RestResource {
     @POST
     @Operation(summary = "Trigger rolling restart of embedded OpenSearch")
     @RequiresPermissions(RestPermissions.DATANODE_RESTART)
+    @AuditEvent(type = DATANODE_TRIGGER_RESTART)
     public Response start(StartRequest request) {
         try {
             final String triggeredBy = String.valueOf(SecurityUtils.getSubject().getPrincipal());
@@ -93,6 +98,7 @@ public class RollingRestartResource extends RestResource {
     @Path("/abort")
     @Operation(summary = "Abort a rolling restart operation")
     @RequiresPermissions(RestPermissions.DATANODE_RESTART)
+    @AuditEvent(type = DATANODE_ABORT_RESTART)
     public JobTriggerDto abort() {
         try {
             return handler.abort();

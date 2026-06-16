@@ -60,6 +60,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String DATANODE_START = PREFIX + "data_node:start";
     public static final String DATANODE_START_REPLICATION = PREFIX + "data_node:start_replication";
     public static final String DATANODE_STOP_REPLICATION = PREFIX + "data_node:stop_replication";
+    public static final String DATANODE_TRIGGER_RESTART = PREFIX + "data_node:trigger_restart";
+    public static final String DATANODE_ABORT_RESTART = PREFIX + "data_node:abort_restart";
     public static final String ES_INDEX_CLOSE = PREFIX + "es_index:close";
     public static final String ES_INDEX_CREATE = PREFIX + "es_index:create";
     public static final String ES_INDEX_DELETE = PREFIX + "es_index:delete";
