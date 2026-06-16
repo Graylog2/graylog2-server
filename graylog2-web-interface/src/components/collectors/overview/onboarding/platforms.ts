@@ -23,12 +23,11 @@ type BrandIconRef = { type: 'brand'; name: 'apple' | 'linux' | 'windows' };
 type MaterialIconRef = { type: 'material'; name: IconName };
 export type PlatformIcon = BrandIconRef | MaterialIconRef;
 
-export type Platform = {
+type Platform = {
   id: PlatformId;
   label: string;
   icon: PlatformIcon;
   commandTemplate: (host: string, port: number, token: string) => string;
-  sourceTypes: string[];
 };
 
 const PLATFORMS: Platform[] = [
@@ -38,7 +37,6 @@ const PLATFORMS: Platform[] = [
     icon: { type: 'brand', name: 'linux' },
     commandTemplate: (host, port, token) =>
       `curl -fsSL https://${host}:${port}/collectors/install | ENROLLMENT_TOKEN=${token} bash`,
-    sourceTypes: ['syslog', 'auth.log', 'journald'],
   },
   {
     id: 'windows',
@@ -46,7 +44,6 @@ const PLATFORMS: Platform[] = [
     icon: { type: 'brand', name: 'windows' },
     commandTemplate: (host, port, token) =>
       `Invoke-WebRequest -Uri https://${host}:${port}/collectors/install/windows -OutFile install.ps1; .\\install.ps1 -Token ${token}`,
-    sourceTypes: ['Windows Event Log', 'IIS'],
   },
   {
     id: 'macos',
@@ -54,7 +51,6 @@ const PLATFORMS: Platform[] = [
     icon: { type: 'brand', name: 'apple' },
     commandTemplate: (host, port, token) =>
       `curl -fsSL https://${host}:${port}/collectors/install | ENROLLMENT_TOKEN=${token} bash`,
-    sourceTypes: ['syslog', 'unified log'],
   },
   {
     id: 'kubernetes',
@@ -62,7 +58,6 @@ const PLATFORMS: Platform[] = [
     icon: { type: 'material', name: 'cloud' },
     commandTemplate: (host, port, token) =>
       `helm install graylog-collector oci://${host}:${port}/collectors/charts/collector --set enrollmentToken=${token}`,
-    sourceTypes: ['container logs', 'pod metadata'],
   },
   {
     id: 'docker',
@@ -70,7 +65,6 @@ const PLATFORMS: Platform[] = [
     icon: { type: 'material', name: 'deployed_code' },
     commandTemplate: (host, port, token) =>
       `docker run -d -e ENROLLMENT_TOKEN=${token} ${host}:${port}/collectors/collector:latest`,
-    sourceTypes: ['container stdout', 'container stderr'],
   },
 ];
 

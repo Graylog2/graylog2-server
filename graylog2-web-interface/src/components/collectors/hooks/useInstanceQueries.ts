@@ -22,9 +22,11 @@ import type { SearchParams } from 'stores/PaginationTypes';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
 import { defaultOnError } from 'util/conditional/onError';
 import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
+import type { RequestOptions } from 'routing/request';
 
 import type { CollectorInstanceView } from '../types';
 
+const NO_SESSION_EXT: RequestOptions = { requestShouldExtendSession: false };
 export const INSTANCES_KEY_PREFIX = ['collectors', 'instances'];
 export const instancesKeyFn = (searchParams: SearchParams) => [...INSTANCES_KEY_PREFIX, 'paginated', searchParams];
 
@@ -79,7 +81,7 @@ export const useInstances = (fleetId?: string, options: { refetchInterval?: numb
     queryKey: [...INSTANCES_KEY_PREFIX, { fleetId }],
     queryFn: () => {
       const filters = fleetId ? [`fleet_id:${fleetId}`] : undefined;
-      const promise = Collectors.findInstances(1, 0, undefined, filters).then((response) =>
+      const promise = Collectors.findInstances(1, 0, undefined, filters, undefined, undefined, NO_SESSION_EXT).then((response) =>
         response.elements.map(toView),
       );
 
@@ -95,14 +97,7 @@ export const useInstance = (instanceUid: string | undefined) =>
     queryKey: [...INSTANCES_KEY_PREFIX, 'single', instanceUid],
     queryFn: () =>
       defaultOnError(
-        // There is no single-instance GET endpoint (only DELETE). The query param narrows
-        // server-side (instance_uid is searchable, but matched as substring), so the exact
-        // match still happens client-side.
-        Collectors.findInstances(1, 10, `instance_uid:${instanceUid}`, undefined).then((response) => {
-          const match = response.elements.find((element) => element.instance_uid === instanceUid);
-
-          return match ? toView(match) : null;
-        }),
+        Collectors.getInstance(instanceUid).then((response) => toView(response)),
         'Loading Collector instance failed with status',
         'Could not load Collector instance',
       ),

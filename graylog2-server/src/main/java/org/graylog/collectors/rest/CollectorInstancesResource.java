@@ -71,6 +71,7 @@ import org.graylog2.search.AttributeFieldSorts;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -238,22 +239,29 @@ public class CollectorInstancesResource extends RestResource {
                 list.pagination().total(),
                 sort,
                 order,
-                list.stream().map(dto -> new CollectorInstanceResponse(
-                        dto.lastSeen().isBefore(offlineCutoff) ? "offline" : "online",
-                        dto.instanceUid(),
-                        dto.fleetId(),
-                        dto.capabilities(),
-                        dto.enrolledAt(),
-                        dto.lastSeen(),
-                        dto.activeCertificateFingerprint(),
-                        dto.activeCertificateExpiresAt(),
-                        dto.nextCertificateFingerprint().orElse(null),
-                        dto.nextCertificateExpiresAt().orElse(null),
-                        attributesToMap(dto.identifyingAttributes()),
-                        attributesToMap(dto.nonIdentifyingAttributes())
-                )).toList(),
+                list.stream().map(dto -> toResponse(dto, offlineCutoff)).toList(),
                 ATTRIBUTES,
                 DEFAULTS);
+    }
+
+    @GET
+    @Path("/instances/{instanceUid}")
+    @Timed
+    @Operation(summary = "Get a collector instance")
+    public CollectorInstanceResponse getInstance(
+            @Parameter(name = "instanceUid", required = true) @PathParam("instanceUid") String instanceUid) {
+        final Optional<CollectorInstanceDTO> collector = collectorInstanceService.findByInstanceUid(instanceUid);
+        if (collector.isEmpty()) {
+            throw new NotFoundException(f("Collector instance <%s> not found", instanceUid));
+        }
+        final CollectorInstanceDTO dto = collector.get();
+        // we scope instance read on the entire fleet, there's no sharing that makes sense per instance.
+        checkPermission(CollectorsPermissions.FLEET_READ, dto.fleetId());
+
+        final Duration offlineThreshold = getOfflineThreshold();
+        final Instant offlineCutoff = Instant.now().minus(offlineThreshold);
+
+        return toResponse(dto, offlineCutoff);
     }
 
     @DELETE
@@ -325,6 +333,23 @@ public class CollectorInstancesResource extends RestResource {
                         "targetFleetId", targetFleetId
                 )));
         return Response.noContent().build();
+    }
+
+    private static @NonNull CollectorInstanceResponse toResponse(CollectorInstanceDTO dto, Instant offlineCutoff) {
+        return new CollectorInstanceResponse(
+                dto.lastSeen().isBefore(offlineCutoff) ? "offline" : "online",
+                dto.instanceUid(),
+                dto.fleetId(),
+                dto.capabilities(),
+                dto.enrolledAt(),
+                dto.lastSeen(),
+                dto.activeCertificateFingerprint(),
+                dto.activeCertificateExpiresAt(),
+                dto.nextCertificateFingerprint().orElse(null),
+                dto.nextCertificateExpiresAt().orElse(null),
+                attributesToMap(dto.identifyingAttributes()),
+                attributesToMap(dto.nonIdentifyingAttributes())
+        );
     }
 
     private Duration getOfflineThreshold() {
