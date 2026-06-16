@@ -128,6 +128,34 @@ describe('AddToQueryHandler', () => {
     expect(updateQueryString).toHaveBeenCalledWith('anotherQueryId', 'foo:23 AND bar:43 AND baz:44');
   });
 
+  it('combines multiple grouping values with OR when the value path operator is OR', async () => {
+    const query = createQuery('anotherQueryId', 'foo:23');
+    const view = createViewWithQuery(query);
+    const state = { ...mockRootState, view: { view } } as RootState;
+    const dispatch = mockDispatch(state);
+
+    const widget = AggregationWidget.builder()
+      .id('widget1')
+      .config(AggregationWidgetConfig.builder().visualization('network').build())
+      .build();
+
+    await dispatch(
+      AddToQueryHandler({
+        queryId: 'anotherQueryId',
+        field: 'source',
+        value: 'a',
+        type: new FieldType('keyword', [], []),
+        contexts: {
+          widget,
+          valuePath: [{ source: 'a' }, { target: 'a' }],
+          valuePathOperator: 'OR',
+        },
+      }),
+    );
+
+    expect(updateQueryString).toHaveBeenCalledWith('anotherQueryId', 'foo:23 AND (source:a OR target:a)');
+  });
+
   it('appends NOT _exists_ fragment for proper field in case of missing bucket in input', async () => {
     const query = createQuery('anotherQueryId', 'foo:23');
     const view = createViewWithQuery(query);

@@ -17,6 +17,7 @@
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import type { Datum } from 'plotly.js';
+import uniq from 'lodash/uniq';
 
 import Popover from 'components/common/Popover';
 import { Menu } from 'components/bootstrap';
@@ -120,35 +121,43 @@ const SankeyActions = ({
     ...additionalHandlerArgs,
   };
 
-  // When the combined groupings were selected, the action targets a value path rather than a
-  // single field/value, so show the combined grouping values instead of the metric.
-  const showMultipleValueHeader = hasMultipleValueForActions(actionContext);
+  // An OR value path targets a single value across several groupings, so show that value once. The
+  // combined (AND) value path of an edge instead lists each grouping value. Otherwise it's a single
+  // field/value.
+  const isOrCombination = actionContext.valuePathOperator === 'OR';
+  const showCombinedHeader = hasMultipleValueForActions(actionContext) && !isOrCombination;
+
+  let headerContent: React.ReactNode;
+
+  if (showCombinedHeader) {
+    headerContent = actionContext.valuePath.map((entry, index) => {
+      const [entryField, entryValue] = Object.entries(entry)[0];
+
+      return (
+        <React.Fragment key={`${entryField}-${String(entryValue)}`}>
+          {index > 0 && humanSeparator}
+          <TypeSpecificValue
+            field={entryField}
+            value={entryValue}
+            type={fieldTypeFor(entryField, actionContext.fieldTypes)}
+            truncate
+          />
+        </React.Fragment>
+      );
+    });
+  } else if (isOrCombination) {
+    headerContent = <TypeSpecificValue field={selected.field} value={selected.value} type={type} truncate />;
+  } else {
+    headerContent = (
+      <>
+        {selected.field} = <TypeSpecificValue field={selected.field} value={selected.value} type={type} truncate />
+      </>
+    );
+  }
 
   return (
     <>
-      <PopoverTitle onBackClick={onBack ?? false}>
-        {showMultipleValueHeader ? (
-          actionContext.valuePath.map((entry, index) => {
-            const [entryField, entryValue] = Object.entries(entry)[0];
-
-            return (
-              <React.Fragment key={`${entryField}-${String(entryValue)}`}>
-                {index > 0 && humanSeparator}
-                <TypeSpecificValue
-                  field={entryField}
-                  value={entryValue}
-                  type={fieldTypeFor(entryField, actionContext.fieldTypes)}
-                  truncate
-                />
-              </React.Fragment>
-            );
-          })
-        ) : (
-          <>
-            {selected.field} = <TypeSpecificValue field={selected.field} value={selected.value} type={type} truncate />
-          </>
-        )}
-      </PopoverTitle>
+      <PopoverTitle onBackClick={onBack ?? false}>{headerContent}</PopoverTitle>
       <Menu opened>
         <ActionDropdown
           handlerArgs={handlerArgs}
@@ -171,7 +180,7 @@ const collectGroupItems = (valueGroups: ValueGroups) => [
 const SankeyOnClickPopover = ({ clickPoint, config, onPopoverClose }: Props) => {
   const pt = clickPoint as unknown as SankeyClickPoint | undefined;
 
-  const valueGroups = useMemo<ValueGroups & { title: string }>(() => {
+  const valueGroups = useMemo<ValueGroups & { title: string; nodeSelection?: FieldData | null }>(() => {
     if (!pt) return { title: '' };
 
     const link = linkContext(pt);
@@ -218,6 +227,13 @@ const SankeyOnClickPopover = ({ clickPoint, config, onPopoverClose }: Props) => 
 
     if (!node) return { title: pt.label ?? '' };
 
+    // For the network graph a node value can occur in any of the configured groupings, so clicking
+    // it should query that value across all of them, OR'd together (e.g. `source:V OR target:V`).
+    const groupingFields = uniq(
+      [...(config?.rowPivots ?? []), ...(config?.columnPivots ?? [])].flatMap((pivot) => pivot.fields),
+    );
+    const queryAcrossGroupings = config?.visualization === 'network' && groupingFields.length > 1;
+
     return {
       title: pt.label ?? String(node.value),
       rowPivotValues: [
@@ -230,6 +246,16 @@ const SankeyOnClickPopover = ({ clickPoint, config, onPopoverClose }: Props) => 
       ],
       columnPivotValues: [],
       metricValue: undefined,
+      nodeSelection: queryAcrossGroupings
+        ? {
+            field: node.field,
+            value: node.value as Datum,
+            contexts: {
+              valuePath: groupingFields.map((groupingField) => ({ [groupingField]: node.value })),
+              valuePathOperator: 'OR',
+            },
+          }
+        : null,
     };
   }, [pt, config]);
 
@@ -239,14 +265,20 @@ const SankeyOnClickPopover = ({ clickPoint, config, onPopoverClose }: Props) => 
   // Component is remounted (via `key` on the caller) whenever the chart click changes,
   // so internal state always starts fresh. When there's only one selectable item, jump
   // straight to the action menu instead of asking the user to pick from a single option.
-  const [selected, setSelected] = useState<FieldData | null>(() =>
-    skipValueSelection ? { field: items[0].field, value: items[0].value, contexts: null } : null,
-  );
+  const [selected, setSelected] = useState<FieldData | null>(() => {
+    if (!skipValueSelection) return null;
+
+    return valueGroups.nodeSelection ?? { field: items[0].field, value: items[0].value, contexts: null };
+  });
 
   const types = useQueryFieldTypes();
   const additionalContextValue = useMemo(
-    () => ({ valuePath: selected?.contexts?.valuePath, fieldTypes: types }),
-    [selected?.contexts?.valuePath, types],
+    () => ({
+      valuePath: selected?.contexts?.valuePath,
+      valuePathOperator: selected?.contexts?.valuePathOperator,
+      fieldTypes: types,
+    }),
+    [selected?.contexts?.valuePath, selected?.contexts?.valuePathOperator, types],
   );
 
   const onActionRun = useCallback(() => {
