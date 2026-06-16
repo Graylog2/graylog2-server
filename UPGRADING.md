@@ -18,6 +18,15 @@ After upgrading:
   matched only `test` now also matches `Test` and `TEST`. API clients relying on exact-case matching
   via paginated endpoints will see additional results.
 
+### `gl2_accounted_message_size` can now be `0` for restored Data Lake messages
+
+When messages are restored from the Data Lake, those that do not count against your license traffic
+now have their `gl2_accounted_message_size` field set to `0`. Previously the field always held the
+message's accounted size, regardless of whether the restore counted against the license.
+
+This field is informational and is not used to compute license usage, so your license consumption is
+unaffected by the change.
+
 ## Java API Changes
 
 | File/method                                                               | Description |
