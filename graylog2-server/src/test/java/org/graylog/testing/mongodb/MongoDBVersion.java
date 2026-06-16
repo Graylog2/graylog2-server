@@ -19,7 +19,7 @@ package org.graylog.testing.mongodb;
 import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 
 public record MongoDBVersion(String version) {
-    public static final MongoDBVersion DEFAULT = of("7.0");
+    public static final MongoDBVersion DEFAULT = of("8.3");
 
     public MongoDBVersion {
         requireNonBlank(version, "version can't be blank");
