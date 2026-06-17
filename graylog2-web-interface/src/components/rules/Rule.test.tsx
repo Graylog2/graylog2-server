@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
-import type { RuleType } from 'stores/rules/RulesStore';
-import { asMock, StoreMock as MockStore } from 'helpers/mocking';
+import type { RuleType } from 'components/rules/hooks/useRules';
+import { asMock } from 'helpers/mocking';
 import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
 import mockComponent from 'helpers/mocking/MockComponent';
 import type { ScopeParams } from 'hooks/useScopePermissions';
@@ -27,7 +27,6 @@ import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import Rule from './Rule';
 import { PipelineRulesContext } from './RuleContext';
 
-jest.mock('stores/rules/RulesStore', () => ({ RulesStore: MockStore() }));
 jest.mock('./rule-helper/RuleHelper', () => mockComponent('RuleHelper'));
 jest.mock('./RuleForm', () => mockComponent('RuleForm'));
 jest.mock('./rule-builder/RuleBuilder', () => mockComponent('RuleBuilder'));

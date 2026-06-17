@@ -22,7 +22,7 @@ import { Col, Row } from 'components/bootstrap';
 import { TagList } from 'components/common';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import type User from 'logic/users/User';
-import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
+import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 import EventDefinitionValidationSummary from './EventDefinitionValidationSummary';
@@ -87,7 +87,13 @@ const EventDefinitionSummary = ({
         <dt>Description</dt>
         <dd>{eventDefinition.description || 'No description given'}</dd>
         <dt>Priority</dt>
-        <dd>{upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</dd>
+        <dd>
+          {upperFirst(
+            EventDefinitionPriorityEnum.properties[
+              eventDefinition.priority as keyof typeof EventDefinitionPriorityEnum.properties
+            ].name,
+          )}
+        </dd>
         <dt>Tags</dt>
         <dd>
           <TagList tags={eventDefinition.tags} emptyFallback={<em>No tags</em>} />

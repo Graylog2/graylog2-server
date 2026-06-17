@@ -31,7 +31,7 @@ const ExpandedPipelinesSection = ({ stream }: Props) => {
   const { metrics, isInitialLoading, isError } = useStreamMetricsFor(stream.id);
   const pipelineIds = metrics?.pipelines;
 
-  const titleEntities = (pipelineIds ?? []).map((id) => ({ id, type: 'pipelines' }));
+  const titleEntities = (pipelineIds ?? []).map((id) => ({ id, type: 'pipeline_processor_pipelines' }));
   const { titlesById, isInitialLoading: areTitlesLoading } = useEntityTitles(titleEntities);
 
   if (isInitialLoading && !pipelineIds) {
