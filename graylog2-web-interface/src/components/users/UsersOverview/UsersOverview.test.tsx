@@ -141,9 +141,7 @@ describe('UsersOverview', () => {
     );
 
     it('not be able to delete a "read only" user', async () => {
-      asMock(loadUsersPaginated).mockReturnValueOnce(
-        Promise.resolve({ ...paginatedUsers, list: readOnlyUsersList }),
-      );
+      asMock(loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...paginatedUsers, list: readOnlyUsersList }));
       renderSUT();
 
       await waitFor(() => expect(screen.queryByTitle(`Delete user ${readOnlyUser.fullName}`)).not.toBeInTheDocument());
@@ -169,18 +167,14 @@ describe('UsersOverview', () => {
     );
 
     it('not see edit link for a "read only" user', async () => {
-      asMock(loadUsersPaginated).mockReturnValueOnce(
-        Promise.resolve({ ...paginatedUsers, list: readOnlyUsersList }),
-      );
+      asMock(loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...paginatedUsers, list: readOnlyUsersList }));
       renderSUT();
 
       await waitFor(() => expect(screen.queryByTitle(`Edit user ${readOnlyUser.fullName}`)).not.toBeInTheDocument());
     });
 
     it('see edit tokens link for a "read only" user', async () => {
-      asMock(loadUsersPaginated).mockReturnValueOnce(
-        Promise.resolve({ ...paginatedUsers, list: readOnlyUsersList }),
-      );
+      asMock(loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...paginatedUsers, list: readOnlyUsersList }));
       renderSUT();
 
       await screen.findByTitle(`Edit tokens of user ${readOnlyUser.fullName}`);

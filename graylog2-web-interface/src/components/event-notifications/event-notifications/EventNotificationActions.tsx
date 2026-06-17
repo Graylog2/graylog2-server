@@ -22,7 +22,10 @@ import { ConfirmDialog, IfPermitted, ShareButton, LinkContainer } from 'componen
 import Routes from 'routing/Routes';
 import { MenuItem, ButtonToolbar, DeleteMenuItem } from 'components/bootstrap';
 import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
-import { deleteEventNotification, EVENT_NOTIFICATIONS_QUERY_KEY } from 'components/event-notifications/hooks/useEventNotifications';
+import {
+  deleteEventNotification,
+  EVENT_NOTIFICATIONS_QUERY_KEY,
+} from 'components/event-notifications/hooks/useEventNotifications';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
