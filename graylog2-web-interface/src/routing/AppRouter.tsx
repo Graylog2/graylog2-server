@@ -370,7 +370,7 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.AUTHZROLES.edit(':roleId'), element: <RoleEditPage /> },
 
             { path: RoutePaths.SYSTEM.OVERVIEW, element: <SystemOverviewPage /> },
-            { path: RoutePaths.SYSTEM.HEALTH, element: <SystemNotificationsPage /> },
+            { path: RoutePaths.SYSTEM.NOTIFICATIONS, element: <SystemNotificationsPage /> },
             { path: RoutePaths.SYSTEM.PROCESSBUFFERDUMP(':nodeId'), element: <ProcessBufferDumpPage /> },
             { path: RoutePaths.SYSTEM.THREADDUMP(':nodeId'), element: <ThreadDumpPage /> },
             { path: RoutePaths.SYSTEM.SYSTEMLOGS(':nodeId'), element: <SystemLogsPage /> },

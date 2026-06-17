@@ -109,18 +109,21 @@ const layout: Partial<PlotLayout> = {
   legend: { y: yLegendPosition(height) },
 };
 
-const prepareTimeRangeForGraph = (timerange: {
-  from: string;
-  to: string;
-  type: string;
-}, formatTime: FormatTime) => [formatTime(timerange.from, 'internal'), formatTime(timerange.to, 'internal')];
+const prepareTimeRangeForGraph = (
+  timerange: {
+    from: string;
+    to: string;
+    type: string;
+  },
+  formatTime: FormatTime,
+) => [formatTime(timerange.from, 'internal'), formatTime(timerange.to, 'internal')];
 
 const EventsGraph = ({
-                       data: { results, timerange },
-                       alerts,
-                       onZoom,
-                       formatTime,
-                     }: {
+  data: { results, timerange },
+  alerts,
+  onZoom,
+  formatTime,
+}: {
   data: Awaited<ResultPromise>;
   alerts: 'include' | 'exclude' | 'only';
   onZoom: (from: string, to: string) => void;
