@@ -20,7 +20,8 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import StageRules from 'components/pipelines/StageRules';
 import type { PipelineType, StageType } from 'components/pipelines/types';
-import type { RuleType } from 'stores/rules/RulesStore';
+import type { RuleType } from 'components/rules/hooks/useRules';
+import type { ProcessingLoadResponse } from 'components/pipelines/processing-load';
 
 jest.mock('components/metrics', () => ({
   MetricContainer: ({ children, name }: { children: React.ReactNode; name: string }) => (
@@ -264,7 +265,7 @@ describe('StageRules', () => {
   });
 
   describe('Rule Load column', () => {
-    const baseProcessingLoad = {
+    const baseProcessingLoad: ProcessingLoadResponse = {
       available: true,
       total_cost_microseconds_per_second: 100,
       pipelines: [],

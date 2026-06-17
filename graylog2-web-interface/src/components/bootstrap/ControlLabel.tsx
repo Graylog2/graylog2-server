@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, CSSProperties } from 'react';
+import { useContext } from 'react';
 import styled, { css } from 'styled-components';
+import type { CSSProperties } from 'react';
 
 import { FormGroupControlIdContext } from './FormGroup';
 

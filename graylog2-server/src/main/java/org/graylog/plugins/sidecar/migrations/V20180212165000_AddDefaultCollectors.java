@@ -27,6 +27,7 @@ import com.mongodb.client.result.UpdateResult;
 import jakarta.inject.Inject;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.graylog.plugins.sidecar.common.SidecarPluginConfiguration;
 import org.graylog.plugins.sidecar.rest.models.Collector;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
 import org.graylog.plugins.sidecar.rest.models.ConfigurationVariable;
@@ -67,6 +68,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
     public static final String OS_DARWIN = "darwin";
     public static final String OS_WINDOWS = "windows";
     private static final Logger LOG = LoggerFactory.getLogger(V20180212165000_AddDefaultCollectors.class);
+    // Default host variable referenced by the templates below; sidecar_host_variable can override it.
+    private static final String DEFAULT_HOST_VARIABLE = "graylog_host";
     private final CollectorService collectorService;
     private final ConfigurationVariableService configurationVariableService;
     private final MongoCollection<Document> collection;
@@ -74,6 +77,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
     private final ConfigurationService configurationService;
 
     private final ClusterConfigService clusterConfigService;
+    private final SidecarPluginConfiguration pluginConfiguration;
     private MigrationState migrationState;
     private MigrationState updatedMigrationState;
 
@@ -83,13 +87,15 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                                                 ConfigurationVariableService configurationVariableService,
                                                 ConfigurationService configurationService,
                                                 MongoConnection mongoConnection,
-                                                ClusterConfigService clusterConfigService) {
+                                                ClusterConfigService clusterConfigService,
+                                                SidecarPluginConfiguration pluginConfiguration) {
         this.httpExternalUri = httpConfiguration.getHttpExternalUri();
         this.collectorService = collectorService;
         this.configurationVariableService = configurationVariableService;
         this.configurationService = configurationService;
         this.collection = mongoConnection.getMongoDatabase().getCollection(CollectorService.COLLECTION_NAME);
         this.clusterConfigService = clusterConfigService;
+        this.pluginConfiguration = pluginConfiguration;
     }
 
     @Override
@@ -103,7 +109,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
         updatedMigrationState = migrationState;
 
         removeConfigPath();
-        ensureConfigurationVariable("graylog_host", "Graylog Host.", httpExternalUri.getHost());
+        ensureConfigurationVariable(pluginConfiguration.getHostVariable(), "Server Host", httpExternalUri.getHost());
 
         ensureFilebeatCollectorsAndConfig();
         ensureAuditbeatCollectorsAndConfig();
@@ -115,15 +121,22 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
         }
     }
 
+    // Double backslashes so a Windows path is a valid FreeMarker string literal (e.g. ${sidecar.spoolDir!"<path>"}).
+    private static String freemarkerEscape(String path) {
+        return path.replace("\\", "\\\\");
+    }
+
     private void ensureFilebeatCollectorsAndConfig() {
+        final var linuxSpoolDir = pluginConfiguration.getSpoolDir() + "/collectors/filebeat";
+        final var winInstallDir = freemarkerEscape(pluginConfiguration.getWindowsInstallDir());
 
         final var commonConfig = f("""
                 %s
                 output.logstash:
                    hosts: ["${user.graylog_host}:5044"]
                 path:
-                   data: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/data
-                   logs: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/log
+                   data: ${sidecar.spoolDir!\"%s\"}/data
+                   logs: ${sidecar.spoolDir!\"%s\"}/log
 
                 filebeat.inputs:
 
@@ -153,7 +166,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         overwrite_keys: true
                   fields:
                     event_source_product: zeek
-                """, BEATS_PREAMBEL);
+                """, BEATS_PREAMBEL, linuxSpoolDir, linuxSpoolDir);
 
         String apacheConfigType = """
 
@@ -170,7 +183,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 "filebeat",
                 "exec",
                 OS_LINUX,
-                "/usr/lib/graylog-sidecar/filebeat",
+                pluginConfiguration.getCollectorBinaryDir() + "/filebeat",
                 "-c  %s",
                 "test config -c %s",
                 commonConfig + f(apacheConfigType, """
@@ -212,7 +225,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 "filebeat",
                 "svc",
                 OS_WINDOWS,
-                "C:\\Program Files\\Graylog\\sidecar\\filebeat.exe",
+                pluginConfiguration.getWindowsInstallDir() + "\\filebeat.exe",
                 "-c \"%s\"",
                 "test config -c \"%s\"",
                 f("""
@@ -220,8 +233,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                                 output.logstash:
                                    hosts: ["${user.graylog_host}:5044"]
                                 path:
-                                   data: ${sidecar.spoolDir!\"C:\\\\Program Files\\\\Graylog\\\\sidecar\\\\cache\\\\filebeat\"}\\data
-                                   logs: ${sidecar.spoolDir!\"C:\\\\Program Files\\\\Graylog\\\\sidecar\"}\\logs
+                                   data: ${sidecar.spoolDir!\"%s\"}\\data
+                                   logs: ${sidecar.spoolDir!\"%s\"}\\logs
                                 tags:
                                 - windows
                                 filebeat.inputs:
@@ -230,15 +243,16 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                                   paths:
                                   - C:\\logs\\log.log
                                 """,
-                        BEATS_PREAMBEL));
+                        BEATS_PREAMBEL, winInstallDir + "\\\\cache\\\\filebeat", winInstallDir));
     }
 
     private void ensureAuditbeatCollectorsAndConfig() {
+        final var auditbeatSpoolDir = pluginConfiguration.getSpoolDir() + "/collectors/auditbeat";
         ensureCollector(
                 "auditbeat",
                 "exec",
                 OS_LINUX,
-                "/usr/lib/graylog-sidecar/auditbeat",
+                pluginConfiguration.getCollectorBinaryDir() + "/auditbeat",
                 "-c  %s",
                 "test config -c %s",
                 f("""
@@ -246,8 +260,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                                 output.logstash:
                                    hosts: ["${user.graylog_host}:5044"]
                                 path:
-                                   data: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/auditbeat\"}/data
-                                   logs: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/auditbeat\"}/log
+                                   data: ${sidecar.spoolDir!\"%s\"}/data
+                                   logs: ${sidecar.spoolDir!\"%s\"}/log
                                 fields:
                                   event_source_product: linux_auditbeat
 
@@ -304,7 +318,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                                   - /sbin
                                   - /usr/sbin
                                   - /etc
-                                  - /etc/graylog/server
+                                  - %s
                                   exclude_files:
                                   - '(?i)\\.sw[nop]$'
                                   - '~$'
@@ -315,16 +329,17 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                                   max_file_size: 100 MiB
                                   hash_types: [sha256]
                                   recursive: false""",
-                        BEATS_PREAMBEL)
+                        BEATS_PREAMBEL, auditbeatSpoolDir, auditbeatSpoolDir, pluginConfiguration.getServerConfigDir())
         ).ifPresent(collector -> ensureDefaultConfiguration("auditbeat-linux-default", collector));
     }
 
     private void ensureWinlogbeatCollectorsAndConfig() {
+        final var winInstallDir = freemarkerEscape(pluginConfiguration.getWindowsInstallDir());
         ensureCollector(
                 "winlogbeat",
                 "svc",
                 OS_WINDOWS,
-                "C:\\Program Files\\Graylog\\sidecar\\winlogbeat.exe",
+                pluginConfiguration.getWindowsInstallDir() + "\\winlogbeat.exe",
                 "-c \"%s\"",
                 "test config -c \"%s\"",
                 f("""
@@ -332,8 +347,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                                 output.logstash:
                                    hosts: ["${user.graylog_host}:5044"]
                                 path:
-                                  data: ${sidecar.spoolDir!\"C:\\\\Program Files\\\\Graylog\\\\sidecar\\\\cache\\\\winlogbeat\"}\\data
-                                  logs: ${sidecar.spoolDir!\"C:\\\\Program Files\\\\Graylog\\\\sidecar\"}\\logs
+                                  data: ${sidecar.spoolDir!\"%s\"}\\data
+                                  logs: ${sidecar.spoolDir!\"%s\"}\\logs
                                 tags:
                                  - windows
                                 winlogbeat:
@@ -359,7 +374,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                                      ignore_older: 96h
                                    - name: windows PowerShell
                                      ignore_older: 96h""",
-                        BEATS_PREAMBEL
+                        BEATS_PREAMBEL, winInstallDir + "\\\\cache\\\\winlogbeat", winInstallDir
                 )
         ).ifPresent(collector -> ensureDefaultConfiguration("winlogbeat-default", collector));
     }
@@ -543,7 +558,13 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                                                 String validationCommand,
                                                 String defaultTemplate) {
 
-        this.updatedMigrationState = updatedMigrationState.withNewDefaultTemplate(collectorName, nodeOperatingSystem, defaultTemplate);
+        // Resolve the host variable (no-op for the default) before withNewDefaultTemplate() records the template's checksum.
+        final String resolvedTemplate = defaultTemplate.replace(
+                ConfigurationVariable.reference(DEFAULT_HOST_VARIABLE),
+                ConfigurationVariable.reference(pluginConfiguration.getHostVariable())
+        );
+
+        this.updatedMigrationState = updatedMigrationState.withNewDefaultTemplate(collectorName, nodeOperatingSystem, resolvedTemplate);
 
         Collector collector = null;
         try {
@@ -553,13 +574,13 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 LOG.debug(msg, collectorName, nodeOperatingSystem);
                 throw new IllegalArgumentException();
             }
-            if (!defaultTemplate.equals(collector.defaultTemplate()) &&
+            if (!resolvedTemplate.equals(collector.defaultTemplate()) &&
                     migrationState.isKnownDefaultTemplate(collectorName, nodeOperatingSystem, collector.defaultTemplate())) {
                 LOG.info("{} collector default template on {} is unchanged, updating it.", collectorName, nodeOperatingSystem);
                 try {
                     return Optional.of(collectorService.save(
                             collector.toBuilder()
-                                    .defaultTemplate(defaultTemplate)
+                                    .defaultTemplate(resolvedTemplate)
                                     .build()));
                 } catch (Exception e) {
                     LOG.error("Can't save collector '{}'!", collectorName, e);
@@ -576,7 +597,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         executablePath,
                         executeParameters,
                         validationCommand,
-                        defaultTemplate
+                        resolvedTemplate
                 )));
             } catch (Exception e) {
                 LOG.error("Can't save collector '{}'!", collectorName, e);

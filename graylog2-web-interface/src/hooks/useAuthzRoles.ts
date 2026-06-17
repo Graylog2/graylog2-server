@@ -18,7 +18,7 @@ import type * as Immutable from 'immutable';
 import * as ImmutableLib from 'immutable';
 import { useQuery } from '@tanstack/react-query';
 
-import type { PaginatedUsersResponse } from 'stores/users/UsersStore';
+import type { PaginatedUsersResponse } from 'hooks/useUsers';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import { qualifyUrl } from 'util/URLUtils';
