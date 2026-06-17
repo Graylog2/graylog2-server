@@ -66,7 +66,7 @@ describe('PieVisualization', () => {
   useViewsPlugin();
 
   beforeEach(() => {
-    AppConfig.isFeatureEnabled = jest.fn(() => false);
+    asMock(AppConfig.isFeatureEnabled).mockReturnValue(false);
 
     asMock(useExternalValueActions).mockReturnValue({
       isLoading: false,

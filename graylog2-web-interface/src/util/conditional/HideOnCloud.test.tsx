@@ -25,7 +25,7 @@ import HideOnCloud from './HideOnCloud';
 
 describe('HideOnCloud', () => {
   beforeEach(() => {
-    asMock(AppConfig.isCloud).mockImplementation(() => false);
+    asMock(AppConfig.isCloud).mockReturnValue(false);
   });
 
   it('does not display children on cloud', () => {

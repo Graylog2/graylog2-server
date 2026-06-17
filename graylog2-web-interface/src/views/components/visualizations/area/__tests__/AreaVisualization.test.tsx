@@ -49,7 +49,7 @@ describe('AreaVisualization', () => {
   beforeEach(() => {
     asMock(GenericPlot).mockClear();
     asMock(AppConfig.rootTimeZone).mockReturnValue('America/Chicago');
-    asMock(AppConfig.isFeatureEnabled).mockImplementation(() => false);
+    asMock(AppConfig.isFeatureEnabled).mockReturnValue(false);
   });
 
   it('generates correct props for plot component', () => {

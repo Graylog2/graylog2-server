@@ -17,7 +17,7 @@
 const mockAppConfig = {
   contentStream: jest.fn(),
   features: undefined,
-  gl2ServerUrl: jest.fn(() => 'http://localhost:9000/api'),
+  gl2ServerUrl: jest.fn(() => 'http://localhost:9000/api/'),
   gl2AppPathPrefix: jest.fn(() => '/'),
   gl2DevMode: jest.fn(() => false),
   isFeatureEnabled: jest.fn(() => true),

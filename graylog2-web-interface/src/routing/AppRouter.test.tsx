@@ -78,7 +78,7 @@ const mockRoutes = (routes: PluginExports['routes']) => {
 
 describe('AppRouter', () => {
   beforeEach(() => {
-    asMock(AppConfig.isFeatureEnabled).mockImplementation(() => false);
+    asMock(AppConfig.isFeatureEnabled).mockReturnValue(false);
     asMock(usePluginEntities).mockReturnValue([]);
     asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) => createMemoryRouter(routes));
   });
