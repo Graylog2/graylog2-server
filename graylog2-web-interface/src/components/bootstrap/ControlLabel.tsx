@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
+import { useContext, CSSProperties } from 'react';
 import styled, { css } from 'styled-components';
 
 import { FormGroupControlIdContext } from './FormGroup';
@@ -33,13 +33,14 @@ type Props = {
   children: React.ReactNode;
   className?: string;
   htmlFor?: string;
+  style?: CSSProperties;
 };
 
-const ControlLabel = ({ children, className = undefined, htmlFor = undefined }: Props) => {
+const ControlLabel = ({ children, className = undefined, htmlFor = undefined, style = undefined }: Props) => {
   const controlId = useContext(FormGroupControlIdContext);
 
   return (
-    <StyledLabel htmlFor={htmlFor ?? controlId} className={className}>
+    <StyledLabel htmlFor={htmlFor ?? controlId} className={className} style={style}>
       {children}
     </StyledLabel>
   );
