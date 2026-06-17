@@ -128,7 +128,7 @@
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.49.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
-        <gcs.version>2.68.0</gcs.version>
+        <gcs.version>2.69.0</gcs.version>
         <azure-blob-storage.version>12.34.0</azure-blob-storage.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>5.1.0</geoip2.version>
@@ -170,9 +170,9 @@
         <natty.version>0.13</natty.version>
         <netty.version>4.2.15.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.78.Final</netty-tcnative-boringssl-static.version>
-        <okhttp.version>5.3.2</okhttp.version>
+        <okhttp.version>5.4.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
-        <opentelemetry.version>1.62.0</opentelemetry.version>
+        <opentelemetry.version>1.63.0</opentelemetry.version>
         <opentelemetry-instrumentation.version>2.28.1</opentelemetry-instrumentation.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.18</pkts.version>
@@ -184,7 +184,7 @@
         <shiro.version>2.2.0</shiro.version>
         <snakeyaml.version>2.6</snakeyaml.version>
         <snappy-java.version>1.1.10.8</snappy-java.version>
-        <oshi.version>7.2.1</oshi.version>
+        <oshi.version>7.3.0</oshi.version>
         <siv-mode.version>1.6.1</siv-mode.version>
         <slf4j.version>2.0.18</slf4j.version>
         <streamex.version>0.8.4</streamex.version>
@@ -712,7 +712,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.9.8.3</version>
+                    <version>4.10.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>
@@ -774,7 +774,7 @@
                         <dependency>
                             <groupId>org.openrewrite</groupId>
                             <artifactId>rewrite-java</artifactId>
-                            <version>8.84.0</version>
+                            <version>8.84.6</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>

@@ -45,6 +45,7 @@ import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.collectors.CollectorInstanceService;
+import org.graylog.collectors.CollectorInstanceService.InstanceCount;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.CollectorsPermissions;
 import org.graylog.collectors.FleetService;
@@ -161,13 +162,13 @@ public class FleetResource extends RestResource {
         final List<BulkFleetStatsResponse.FleetStatsSummary> summaries = fleets.stream()
                 .sorted(Comparator.comparing(FleetDTO::name))
                 .map(fleet -> {
-                    final long[] counts = instanceCounts.getOrDefault(fleet.id(), new long[]{0, 0});
+                    final var count = instanceCounts.getOrDefault(fleet.id(), new InstanceCount(0L, 0L));
                     return new BulkFleetStatsResponse.FleetStatsSummary(
                             fleet.id(),
                             fleet.name(),
-                            counts[0],
-                            counts[1],
-                            counts[0] - counts[1],
+                            count.total(),
+                            count.online(),
+                            count.offline(),
                             sourceCountByFleet.getOrDefault(fleet.id(), 0L));
                 })
                 .toList();
@@ -184,12 +185,9 @@ public class FleetResource extends RestResource {
         if (fleetService.get(fleetId).isEmpty()) {
             throw new NotFoundException("Fleet " + fleetId + " not found");
         }
-        final long totalInstances = instanceService.countByFleet(fleetId);
-        final long onlineInstances = instanceService.countOnlineByFleet(fleetId,
-                Instant.now().minus(getOfflineThreshold()));
+        final var instances = instanceService.countByFleet(fleetId, Instant.now().minus(getOfflineThreshold()));
         final long totalSources = sourceService.countByFleet(fleetId);
-        return new FleetStatsResponse(totalInstances, onlineInstances,
-                totalInstances - onlineInstances, totalSources);
+        return new FleetStatsResponse(instances.total(), instances.online(), instances.offline(), totalSources);
     }
 
     @POST

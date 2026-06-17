@@ -25,7 +25,7 @@ import { ErrorAlert } from 'components/common';
 import type User from 'logic/users/User';
 import type { DescriptiveItem } from 'components/common/PaginatedItemOverview';
 import PaginatedItemOverview, { DEFAULT_PAGINATION } from 'components/common/PaginatedItemOverview';
-import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
+import type { PaginatedRoles } from 'hooks/useAuthzRoles';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import RolesSelector from 'components/permissions/RolesSelector';
 import RolesQueryHelper from 'components/roles/RolesQueryHelper';

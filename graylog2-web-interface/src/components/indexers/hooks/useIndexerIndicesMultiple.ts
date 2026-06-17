@@ -19,7 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 import { IndexerIndices } from '@graylog/server-api';
 
 import { defaultOnError } from 'util/conditional/onError';
-import type { IndexInfo } from 'stores/indices/IndicesStore';
+import type { IndexInfo } from 'hooks/useIndices';
 
 type MultipleIndices = Array<IndexInfo>;
 
