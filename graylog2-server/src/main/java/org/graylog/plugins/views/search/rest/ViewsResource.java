@@ -367,7 +367,7 @@ public class ViewsResource extends RestResourceWithOwnerCheck implements PluginR
         validateDto(updatedDTO, searchUser);
 
         final var grnType = toGRNType(dto);
-        createEntityRequest.shareRequest().ifPresent(request -> checkOwnership(grnType.toGRN(dto.id())));
+        unwrappedCreateEntityRequest.getShareRequest().ifPresent(request -> checkOwnership(grnType.toGRN(dto.id())));
 
         var result = dbService.update(updatedDTO);
         recentActivityService.update(result.id(), grnType, searchUser);
