@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableSet;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.NotFoundException;
+import org.apache.shiro.authz.Permission;
 import org.apache.shiro.subject.Subject;
 import org.assertj.core.api.Assertions;
 import org.graylog.plugins.views.search.Query;
@@ -46,6 +47,7 @@ import org.graylog.plugins.views.startpage.StartPageService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
 import org.graylog.security.shares.CreateEntityRequest;
+import org.graylog.security.shares.EntityShareRequest;
 import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
@@ -258,6 +260,57 @@ public class ViewsResourceTest {
     }
 
     @Test
+    public void throwsExceptionWhenUpdatingSharingOfViewUserDoesNotOwn() {
+        final ViewService viewService = mockViewService(TEST_DASHBOARD_VIEW);
+
+        // the default mock Subject is not permitted to own the entity
+        final ViewsResource viewsResource = createViewsResource(
+                viewService,
+                mock(StartPageService.class),
+                mock(RecentActivityService.class),
+                mock(ClusterEventBus.class),
+                new ReferencedSearchFiltersHelper(),
+                EMPTY_SEARCH_FILTER_VISIBILITY_CHECKER,
+                EMPTY_VIEW_RESOLVERS,
+                SEARCH
+        );
+
+        final CreateEntityRequest<ViewDTO> request = CreateEntityRequest.create(TEST_DASHBOARD_VIEW, EntityShareRequest.create(ImmutableMap.of()));
+
+        assertThatThrownBy(() -> viewsResource.update(VIEW_ID, request, SEARCH_USER))
+                .isInstanceOf(ForbiddenException.class)
+                .hasMessageContaining("Not authorized to access entity");
+
+        verify(viewService, times(0)).update(any());
+    }
+
+    @Test
+    public void updatesSharingWhenUserOwnsView() {
+        final ViewService viewService = mockViewService(TEST_DASHBOARD_VIEW);
+        when(viewService.update(any())).thenReturn(TEST_DASHBOARD_VIEW);
+
+        final Subject owner = mock(Subject.class);
+        when(owner.isPermitted(any(Permission.class))).thenReturn(true);
+
+        final ViewsResource viewsResource = createViewsResource(
+                owner,
+                viewService,
+                mock(StartPageService.class),
+                mock(RecentActivityService.class),
+                mock(ClusterEventBus.class),
+                new ReferencedSearchFiltersHelper(),
+                EMPTY_SEARCH_FILTER_VISIBILITY_CHECKER,
+                EMPTY_VIEW_RESOLVERS,
+                SEARCH
+        );
+
+        final CreateEntityRequest<ViewDTO> request = CreateEntityRequest.create(TEST_DASHBOARD_VIEW, EntityShareRequest.create(ImmutableMap.of()));
+
+        viewsResource.update(VIEW_ID, request, SEARCH_USER);
+        verify(viewService).update(TEST_DASHBOARD_VIEW);
+    }
+
+    @Test
     void testVerifyIntegrity() {
         final ViewsResource viewsResource = createViewsResource(
                 mock(ViewService.class),
@@ -441,6 +494,10 @@ public class ViewsResourceTest {
     }
 
     private ViewsResource createViewsResource(final ViewService viewService, final StartPageService startPageService, final RecentActivityService recentActivityService, final ClusterEventBus clusterEventBus, ReferencedSearchFiltersHelper referencedSearchFiltersHelper, SearchFilterVisibilityChecker searchFilterVisibilityChecker, final Map<String, ViewResolver> viewResolvers, Search... existingSearches) {
+        return createViewsResource(mock(Subject.class), viewService, startPageService, recentActivityService, clusterEventBus, referencedSearchFiltersHelper, searchFilterVisibilityChecker, viewResolvers, existingSearches);
+    }
+
+    private ViewsResource createViewsResource(final Subject subject, final ViewService viewService, final StartPageService startPageService, final RecentActivityService recentActivityService, final ClusterEventBus clusterEventBus, ReferencedSearchFiltersHelper referencedSearchFiltersHelper, SearchFilterVisibilityChecker searchFilterVisibilityChecker, final Map<String, ViewResolver> viewResolvers, Search... existingSearches) {
 
         final SearchDomain searchDomain = mock(SearchDomain.class);
         for (Search search : existingSearches) {
@@ -452,7 +509,7 @@ public class ViewsResourceTest {
                 mock(AuditEventSender.class), mock(ObjectMapper.class), mock(EntitySharesService.class), mock(EntitySourceService.class)) {
             @Override
             protected Subject getSubject() {
-                return mock(Subject.class);
+                return subject;
             }
 
             @Override
