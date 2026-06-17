@@ -17,64 +17,29 @@
 import * as React from 'react';
 import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
-// eslint-disable-next-line no-restricted-imports
-import { ListGroupItem as BootstrapListGroupItem } from 'react-bootstrap';
+import { List } from '@mantine/core';
 
-const RefContainer = styled.span(
-  ({ theme }) => css`
-    display: block;
+type StyledProps = {
+  $active?: boolean;
+  $disabled?: boolean;
+  $bsStyle?: string;
+  $isInteractive?: boolean;
+};
+
+const StyledListItem = styled(List.Item)<StyledProps>(
+  ({ theme, $active, $disabled, $bsStyle, $isInteractive }) => css`
+    background-color: ${theme.colors.global.contentBackground};
+    border: 0;
+    padding: 5px 10px;
+
+    .mantine-List-itemWrapper,
+    .mantine-List-itemLabel {
+      display: contents;
+    }
 
     &:not(:last-child) {
       border-bottom: 1px solid ${theme.colors.table.row.divider};
     }
-  `,
-);
-
-const variantStyles = css<{ bsStyle: string }>(({ bsStyle, theme }) => {
-  if (!bsStyle) {
-    return undefined;
-  }
-
-  const backgroundColor = theme.colors.variant.lighter[bsStyle];
-  const textColor = theme.utils.readableColor(backgroundColor);
-
-  return css`
-    &.list-group-item-${bsStyle} {
-      color: ${textColor};
-      background-color: ${backgroundColor};
-
-      a&,
-      button& {
-        color: ${textColor};
-
-        .list-group-item-heading {
-          color: inherit;
-          font-weight: bold;
-        }
-
-        &:hover,
-        &:focus {
-          color: ${textColor};
-          background-color: ${theme.colors.variant.light[bsStyle]};
-        }
-
-        &.active,
-        &.active:hover,
-        &.active:focus {
-          color: ${theme.utils.readableColor(theme.colors.variant.light[bsStyle])};
-          background-color: ${theme.colors.variant.light[bsStyle]};
-          border-color: ${theme.colors.variant.light[bsStyle]};
-        }
-      }
-    }
-  `;
-});
-
-const StyledListGroupItem = styled(BootstrapListGroupItem)(
-  ({ theme }) => css`
-    background-color: ${theme.colors.global.contentBackground};
-    border: 0;
-    padding: 5px 10px;
 
     .list-group-item-heading {
       font-size: ${theme.fonts.size.h5};
@@ -84,16 +49,17 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(
       margin-bottom: 5px;
     }
 
-    a&,
-    button& {
+    ${$isInteractive &&
+    css`
+      cursor: pointer;
       color: ${theme.colors.text.primary};
 
       .list-group-item-heading {
         color: ${theme.colors.variant.darkest.default};
       }
 
-      &:hover:not(.disabled, .active),
-      &:focus:not(.disabled, .active) {
+      &:hover:not([disabled]),
+      &:focus:not([disabled]) {
         color: inherit;
         background-color: ${theme.utils.colorLevel(theme.colors.global.contentBackground, 10)};
 
@@ -101,11 +67,11 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(
           color: ${theme.utils.readableColor(theme.colors.variant.lightest.default)};
         }
       }
-    }
+    `}
 
-    &.disabled,
-    &.disabled:hover,
-    &.disabled:focus {
+    ${$disabled &&
+    css`
+      pointer-events: none;
       color: ${theme.colors.text.disabled};
       background-color: ${theme.colors.variant.lightest.default};
 
@@ -116,11 +82,10 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(
       .list-group-item-text {
         color: ${theme.colors.variant.default};
       }
-    }
+    `}
 
-    &.active,
-    &.active:hover,
-    &.active:focus {
+    ${$active &&
+    css`
       color: ${theme.colors.variant.darker.default};
       background-color: ${theme.colors.variant.lightest.info};
       border-color: ${theme.colors.variant.lightest.info};
@@ -135,9 +100,29 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(
       .list-group-item-text {
         color: ${theme.colors.variant.light.primary};
       }
-    }
+    `}
 
-    ${variantStyles}
+    ${$bsStyle &&
+    css`
+      color: ${theme.utils.readableColor(theme.colors.variant.lighter[$bsStyle])};
+      background-color: ${theme.colors.variant.lighter[$bsStyle]};
+
+      ${$isInteractive &&
+      css`
+        &:hover,
+        &:focus {
+          color: ${theme.utils.readableColor(theme.colors.variant.lighter[$bsStyle])};
+          background-color: ${theme.colors.variant.light[$bsStyle]};
+        }
+
+        ${$active &&
+        css`
+          color: ${theme.utils.readableColor(theme.colors.variant.light[$bsStyle])};
+          background-color: ${theme.colors.variant.light[$bsStyle]};
+          border-color: ${theme.colors.variant.light[$bsStyle]};
+        `}
+      `}
+    `}
   `,
 );
 
@@ -146,22 +131,47 @@ type Props = React.PropsWithChildren<{
   active?: boolean;
   bsStyle?: string;
   className?: string;
-  containerProps?: object;
   disabled?: boolean;
   header?: React.ReactNode;
-  href?: string;
   onClick?: () => void;
-  onKeyDown?: React.ComponentProps<typeof StyledListGroupItem>['onKeyDown'];
+  onKeyDown?: React.KeyboardEventHandler;
   role?: 'listitem';
 }>;
 
 const ListGroupItem = (
-  { containerProps = {}, role = undefined, ...rest }: Props,
-  ref: React.ForwardedRef<HTMLElement>,
-) => (
-  <RefContainer ref={ref} role={role} {...containerProps}>
-    <StyledListGroupItem {...rest} />
-  </RefContainer>
-);
+  {
+    active = undefined,
+    bsStyle = undefined,
+    children = undefined,
+    className = undefined,
+    disabled = undefined,
+    header = undefined,
+    id = undefined,
+    onClick = undefined,
+    onKeyDown = undefined,
+    role = undefined,
+  }: Props,
+  ref: React.ForwardedRef<HTMLLIElement>,
+) => {
+  const isInteractive = !!onClick;
+
+  return (
+    <StyledListItem
+      ref={ref}
+      id={id}
+      className={className}
+      role={role}
+      $active={active}
+      $disabled={disabled}
+      $bsStyle={bsStyle}
+      $isInteractive={isInteractive}
+      onClick={!disabled ? onClick : undefined}
+      onKeyDown={onKeyDown}
+    >
+      {header && <div className="list-group-item-heading">{header}</div>}
+      {header ? <p className="list-group-item-text">{children}</p> : children}
+    </StyledListItem>
+  );
+};
 
 export default forwardRef(ListGroupItem);

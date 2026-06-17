@@ -15,21 +15,33 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-// eslint-disable-next-line no-restricted-imports
-import { ListGroup as BootstrapListGroup } from 'react-bootstrap';
+import { List } from '@mantine/core';
 
 type Props = React.PropsWithChildren<{
+  bsClass?: string;
   className?: string;
-  componentClass?: React.ElementType | undefined;
-  bsClass?: React.ComponentProps<typeof BootstrapListGroup>['bsClass'];
+  componentClass?: React.ElementType;
   role?: 'list';
-  style?: React.ComponentProps<typeof BootstrapListGroup>['style'];
+  style?: React.CSSProperties;
 }>;
 
-const ListGroup = ({ className = undefined, children = undefined, role = undefined, ...props }: Props) => (
-  <BootstrapListGroup bsClass={className} role={role} {...props}>
+const ListGroup = ({
+  bsClass = undefined,
+  children = undefined,
+  className = undefined,
+  componentClass = undefined,
+  role = undefined,
+  style = undefined,
+}: Props) => (
+  <List
+    component={componentClass}
+    className={[className, bsClass].filter(Boolean).join(' ') || undefined}
+    listStyleType="none"
+    role={role}
+    style={{ padding: 0, margin: 0, ...style }}
+  >
     {children}
-  </BootstrapListGroup>
+  </List>
 );
 
 /** @component */
