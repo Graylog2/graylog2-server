@@ -28,7 +28,7 @@ import { Alert } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
 import { MarkdownPreview } from 'components/common/MarkdownEditor';
 import type User from 'logic/users/User';
-import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
+import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 
 import commonStyles from '../common/commonStyles.css';
 import type { EventDefinition } from '../event-definitions-types';
