@@ -21,7 +21,6 @@ import userEvent from '@testing-library/user-event';
 import View from 'views/logic/views/View';
 import QueryResult from 'views/logic/QueryResult';
 import { asMock } from 'helpers/mocking';
-import AppConfig from 'util/AppConfig';
 import useViewType from 'views/hooks/useViewType';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useViewTitle from 'views/hooks/useViewTitle';

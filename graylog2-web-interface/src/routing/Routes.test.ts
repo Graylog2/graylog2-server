@@ -17,7 +17,6 @@
 import URI from 'urijs';
 
 import AppConfig from 'util/AppConfig';
-import type { AppConfigs } from 'util/AppConfig';
 import { asMock } from 'helpers/mocking';
 
 let Routes;
