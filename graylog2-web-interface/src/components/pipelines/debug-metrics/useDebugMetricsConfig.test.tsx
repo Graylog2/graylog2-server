@@ -16,11 +16,12 @@
  */
 import { renderHook, act } from 'wrappedTestingLibrary/hooks';
 import { waitFor } from 'wrappedTestingLibrary';
+import { useQueryClient } from '@tanstack/react-query';
 
 import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
-import { RulesActions } from 'stores/rules/RulesStore';
-import type { RuleType } from 'stores/rules/RulesStore';
+import { deleteRule, RULES_QUERY_KEY } from 'components/rules/hooks/useRules';
+import type { RuleType } from 'components/rules/hooks/useRules';
 
 import useDebugMetricsConfig from './useDebugMetricsConfig';
 
@@ -32,19 +33,28 @@ describe('useDebugMetricsConfig', () => {
     jest.resetAllMocks();
   });
 
+  // Regression test for the original RulesStore bug (#26302): deleting a rule must not
+  // clobber the metrics config. The Reflux store triggered a partial state without
+  // `metricsConfig`; the react-query migration keeps the metrics config in its own
+  // query key (`rule-metrics-config`), so invalidating the rules query on delete leaves
+  // it untouched. This guards against a future regression that re-couples the two caches.
   it('keeps metricsEnabled when a rule is deleted', async () => {
     asMock(fetch).mockImplementation((method) =>
       method === 'GET' ? Promise.resolve({ metrics_enabled: true }) : Promise.resolve(undefined),
     );
 
-    const { result } = renderHook(() => useDebugMetricsConfig());
+    const { result } = renderHook(() => ({
+      config: useDebugMetricsConfig(),
+      queryClient: useQueryClient(),
+    }));
 
-    await waitFor(() => expect(result.current.metricsEnabled).toBe(true));
+    await waitFor(() => expect(result.current.config.metricsEnabled).toBe(true));
 
     await act(async () => {
-      await RulesActions.delete({ id: 'rule-1', title: 'test rule' } as RuleType);
+      await deleteRule({ id: 'rule-1', title: 'test rule' } as RuleType);
+      await result.current.queryClient.invalidateQueries({ queryKey: RULES_QUERY_KEY });
     });
 
-    expect(result.current.metricsEnabled).toBe(true);
+    expect(result.current.config.metricsEnabled).toBe(true);
   });
 });
