@@ -41,6 +41,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import static io.restassured.RestAssured.given;
+import static java.time.Duration.ofSeconds;
+import static org.awaitility.Awaitility.waitAtMost;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.equalTo;
@@ -81,6 +83,15 @@ public class SupportBundleResourceIT {
                 "bundle.noaccess@graylog", false, 300_000, "UTC",
                 List.of(), List.of());
         api.users().createUser(unprivilegedUser);
+
+        waitAtMost(ofSeconds(120)).pollInterval(ofSeconds(1)).until(() -> {
+            final List<String> statuses = given()
+                    .spec(api.requestSpecification())
+                    .get("/system/cluster/datanodes")
+                    .jsonPath()
+                    .getList("elements.datanode_status");
+            return statuses != null && statuses.contains("AVAILABLE");
+        });
     }
 
     @AfterAll
