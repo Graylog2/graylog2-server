@@ -23,7 +23,8 @@ import Errors from 'components/rules/rule-builder/Errors';
 import { ConfirmDialog } from 'components/common';
 import type { BlockType, RuleBlock } from 'components/rules/rule-builder/types';
 import RuleBuilderBlock from 'components/rules/rule-builder/RuleBuilderBlock';
-import { Panel, Radio } from 'components/bootstrap';
+import { Panel } from 'components/bootstrap';
+import { Radio } from 'components/common';
 import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
 import useStreamOutputRuleBuilder, { fetchValidateRule } from 'components/streams/hooks/useStreamOutputRuleBuilder';
 import generateObjectId from 'logic/generateObjectId';
@@ -53,10 +54,8 @@ const StyledPanelHeading = styled(Panel.Heading)(
 const WhenOperator = styled.div(
   ({ theme }) => css`
     display: flex;
-
-    .radio {
-      margin: 0 ${theme.spacings.xs};
-    }
+    gap: ${theme.spacings.xs};
+    align-items: center;
   `,
 );
 
