@@ -34,7 +34,7 @@ const INITIAL_DATA = {};
 
 const filtersFromJson = (filters: TableLayoutDefaultFiltersJSON): UrlQueryFilters => filters.reduce<UrlQueryFilters>((queryFilters, jsonFilter) => {
     const [key, stringValues] = jsonFilter.split(TABLE_LAYOUT_DEFAULT_FILTERS_KEY_SPLITTER);
-    if (queryFilters[key]) {
+    if (queryFilters.get(key)) {
       return queryFilters.set(key, queryFilters[key].push(stringValues));
       }
 
