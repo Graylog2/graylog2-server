@@ -28,6 +28,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -139,6 +140,34 @@ public class EntityListPreferencesResource {
         } else {
             return usersPreferences.preferences();
         }
+    }
+
+    @DELETE
+    @Path("/{entity_list_id}")
+    @Timed
+    @Operation(summary = "Delete preferences for user's entity list")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Preferences for user's entity list deleted successfully."),
+            @ApiResponse(responseCode = "400", description = "Wrong parameters for preferences deletion."),
+            @ApiResponse(responseCode = "404", description = "Preferences not found.")
+    })
+    @NoAuditEvent("Audit logs are not stored for entity list preferences")
+    public Response delete(@Parameter(name = "entity_list_id", required = true) @PathParam("entity_list_id") @NotEmpty String entityListId,
+                           @QueryParam("layout_variant") String layoutVariant,
+                           @Context UserContext userContext) throws ValidationException {
+        final String currentUserId = userContext.getUserId();
+        final StoredEntityListPreferencesId complexIdOfUsersPreferences = StoredEntityListPreferencesId.builder()
+                .userId(currentUserId)
+                .entityListId(entityListId)
+                .layoutVariant(obtainLayoutVariant(layoutVariant))
+                .build();
+        final boolean successful = entityListPreferencesService.delete(complexIdOfUsersPreferences);
+        if (successful) {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
     }
 
     @POST
