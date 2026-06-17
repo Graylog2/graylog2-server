@@ -68,7 +68,7 @@ const ExtractorsSection = ({ input }: Props) => {
   }
 
   return (
-    <Table bordered condensed striped hover>
+    <Table bordered condensed>
       <thead>
         <tr>
           <th>Title</th>

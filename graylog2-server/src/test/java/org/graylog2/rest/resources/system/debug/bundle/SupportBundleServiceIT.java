@@ -20,6 +20,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.ws.rs.core.HttpHeaders;
 import org.apache.shiro.subject.Subject;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineLoad;
+import org.graylog.plugins.pipelineprocessor.rest.ProcessingLoadResponse;
+import org.graylog.plugins.pipelineprocessor.rest.ProcessingLoadBuilder;
+import org.graylog.plugins.pipelineprocessor.rest.RuleLoad;
+import org.graylog.plugins.pipelineprocessor.rest.StageRuleLoad;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.TestNodeService;
@@ -35,12 +40,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Stream;
@@ -49,6 +54,7 @@ import java.util.zip.ZipFile;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.graylog2.shared.utilities.StringUtils.f;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -67,6 +73,7 @@ class SupportBundleServiceIT {
     private VersionProbeFactory versionProbeFactory;
     private ClusterAdapter searchDbClusterAdapter;
     private DatanodeRestApiProxy datanodeProxy;
+    private ProcessingLoadBuilder processingLoadBuilder;
 
     @BeforeEach
     void setUp() {
@@ -79,6 +86,7 @@ class SupportBundleServiceIT {
         versionProbeFactory = mock(VersionProbeFactory.class);
         searchDbClusterAdapter = mock(ClusterAdapter.class);
         datanodeProxy = mock(DatanodeRestApiProxy.class);
+        processingLoadBuilder = mock(ProcessingLoadBuilder.class);
     }
 
     @AfterEach
@@ -101,25 +109,17 @@ class SupportBundleServiceIT {
         assertThatNoException().isThrownBy(
                 () -> service.buildBundle(mock(HttpHeaders.class), mock(Subject.class)));
 
-        // A zip file must have been written to the bundle dir.
-        final Path bundleDir = tempDir.resolve("support-bundle");
-        try (final Stream<Path> files = Files.list(bundleDir)) {
-            final Optional<Path> zipFile = files.filter(p -> p.getFileName().toString().endsWith(".zip")).findFirst();
-            assertThat(zipFile).as("bundle zip file").isPresent();
+        // The zip must contain errors.json with the collected error.
+        try (final ZipFile zip = openBundleZip()) {
+            final var errorsEntry = zip.getEntry("errors.json");
+            assertThat(errorsEntry).as("errors.json entry in bundle zip").isNotNull();
 
-            // The zip must contain errors.json with the collected error.
-            try (final ZipFile zip = new ZipFile(zipFile.get().toFile())) {
-                final var errorsEntry = zip.getEntry("errors.json");
-                assertThat(errorsEntry).as("errors.json entry in bundle zip").isNotNull();
-
-                final String content = new String(
-                        zip.getInputStream(errorsEntry).readAllBytes(), StandardCharsets.UTF_8);
-                assertThat(content)
-                        .contains("cluster/datanode-info")
-                        .contains("Simulated datanode service failure");
-            }
+            final String content = new String(
+                    zip.getInputStream(errorsEntry).readAllBytes(), StandardCharsets.UTF_8);
+            assertThat(content)
+                    .contains("cluster/datanode-info")
+                    .contains("Simulated datanode service failure");
         }
-
     }
 
     @Test
@@ -141,30 +141,106 @@ class SupportBundleServiceIT {
         final SupportBundleService service = new SupportBundleService(
                 executor, nodeServiceWithNode, datanodeService, remoteInterfaceProvider,
                 tempDir, objectMapperProvider, clusterStatsService, versionProbeFactory,
-                List.of(), searchDbClusterAdapter, datanodeProxy);
+                List.of(), searchDbClusterAdapter, datanodeProxy, processingLoadBuilder);
 
         assertThatNoException().isThrownBy(
                 () -> service.buildBundle(mock(HttpHeaders.class), mock(Subject.class)));
 
+        try (final ZipFile zip = openBundleZip()) {
+            final var errorsEntry = zip.getEntry("errors.json");
+            assertThat(errorsEntry).as("errors.json entry in bundle zip").isNotNull();
+
+            final String content = new String(
+                    zip.getInputStream(errorsEntry).readAllBytes(), StandardCharsets.UTF_8);
+            assertThat(content)
+                    .contains(f("node/%s/system-overview", failingNodeId))
+                    .contains(f("node/%s/jvm", failingNodeId))
+                    .contains(f("node/%s/process-buffer-dump", failingNodeId))
+                    .contains(f("node/%s/installed-plugins", failingNodeId));
+        }
+    }
+
+    @Test
+    void buildBundleOmitsProcessingLoadSnapshotWhenDebugMetricsOff() throws Exception {
+        when(datanodeService.allActive()).thenReturn(Map.of());
+        when(processingLoadBuilder.metricsEnabled()).thenReturn(false);
+
+        final SupportBundleService service = buildService();
+        assertThatNoException().isThrownBy(
+                () -> service.buildBundle(mock(HttpHeaders.class), mock(Subject.class)));
+
+        try (final ZipFile zip = openBundleZip()) {
+            assertThat(zip.getEntry("pipeline-processing-load.json"))
+                    .as("processing-load snapshot must be absent when debug metrics is off")
+                    .isNull();
+        }
+    }
+
+    @Test
+    void buildBundleOmitsProcessingLoadSnapshotWhenMetricsOnButUnavailable() throws Exception {
+        when(datanodeService.allActive()).thenReturn(Map.of());
+        when(processingLoadBuilder.metricsEnabled()).thenReturn(true);
+        when(processingLoadBuilder.buildUnfiltered(any())).thenReturn(ProcessingLoadResponse.create(
+                false, 0.0d, List.of(), List.of(), List.of()));
+
+        final SupportBundleService service = buildService();
+        assertThatNoException().isThrownBy(
+                () -> service.buildBundle(mock(HttpHeaders.class), mock(Subject.class)));
+
+        try (final ZipFile zip = openBundleZip()) {
+            assertThat(zip.getEntry("pipeline-processing-load.json"))
+                    .as("processing-load snapshot must be absent when no usable data is available")
+                    .isNull();
+
+            final var errorsEntry = zip.getEntry("errors.json");
+            assertThat(errorsEntry).as("errors.json breadcrumb entry").isNotNull();
+            final String content = new String(
+                    zip.getInputStream(errorsEntry).readAllBytes(), StandardCharsets.UTF_8);
+            assertThat(content)
+                    .contains("cluster/processing-load")
+                    .contains("Snapshot omitted");
+        }
+    }
+
+    @Test
+    void buildBundleIncludesProcessingLoadSnapshotWhenDebugMetricsOn() throws Exception {
+        when(datanodeService.allActive()).thenReturn(Map.of());
+        when(processingLoadBuilder.metricsEnabled()).thenReturn(true);
+
+        final ProcessingLoadResponse snapshot = ProcessingLoadResponse.create(
+                true,
+                170_000.0d,
+                List.of(StageRuleLoad.create("rule-A", "pipe-1", 0, 29.41d, 100.0d)),
+                List.of(PipelineLoad.create("pipe-1", 100.0d)),
+                List.of(RuleLoad.create("rule-A", 29.41d))
+        );
+        when(processingLoadBuilder.buildUnfiltered(any())).thenReturn(snapshot);
+
+        final SupportBundleService service = buildService();
+        assertThatNoException().isThrownBy(
+                () -> service.buildBundle(mock(HttpHeaders.class), mock(Subject.class)));
+
+        try (final ZipFile zip = openBundleZip()) {
+            final var snapshotEntry = zip.getEntry("pipeline-processing-load.json");
+            assertThat(snapshotEntry).as("pipeline-processing-load.json entry").isNotNull();
+
+            final String content = new String(
+                    zip.getInputStream(snapshotEntry).readAllBytes(), StandardCharsets.UTF_8);
+            assertThat(content)
+                    .contains("\"available\" : true")
+                    .contains("rule-A")
+                    .contains("pipe-1")
+                    .contains("170000");
+        }
+    }
+
+    private ZipFile openBundleZip() throws IOException {
         final Path bundleDir = tempDir.resolve("support-bundle");
         try (final Stream<Path> files = Files.list(bundleDir)) {
-            final Optional<Path> zipFile = files
-                    .filter(p -> p.getFileName().toString().endsWith(".zip"))
-                    .findFirst();
-            assertThat(zipFile).as("bundle zip file").isPresent();
-
-            try (final ZipFile zip = new ZipFile(zipFile.get().toFile())) {
-                final var errorsEntry = zip.getEntry("errors.json");
-                assertThat(errorsEntry).as("errors.json entry in bundle zip").isNotNull();
-
-                final String content = new String(
-                        zip.getInputStream(errorsEntry).readAllBytes(), StandardCharsets.UTF_8);
-                assertThat(content)
-                        .contains(f("node/%s/system-overview", failingNodeId))
-                        .contains(f("node/%s/jvm", failingNodeId))
-                        .contains(f("node/%s/process-buffer-dump", failingNodeId))
-                        .contains(f("node/%s/installed-plugins", failingNodeId));
-            }
+            final Path zipFile = files.filter(p -> p.getFileName().toString().endsWith(".zip"))
+                    .findFirst()
+                    .orElseThrow(() -> new AssertionError("no bundle zip file was written"));
+            return new ZipFile(zipFile.toFile());
         }
     }
 
@@ -173,6 +249,6 @@ class SupportBundleServiceIT {
         return new SupportBundleService(
                 executor, nodeService, datanodeService, remoteInterfaceProvider,
                 tempDir, objectMapperProvider, clusterStatsService, versionProbeFactory,
-                List.of(), searchDbClusterAdapter, datanodeProxy);
+                List.of(), searchDbClusterAdapter, datanodeProxy, processingLoadBuilder);
     }
 }
