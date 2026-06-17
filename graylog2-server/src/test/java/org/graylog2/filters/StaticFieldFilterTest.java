@@ -90,6 +90,28 @@ public class StaticFieldFilterTest {
     }
 
     @Test
+    public void appliesStaticFieldsForForwarderInput() throws Exception {
+        final String forwarderInputId = "forwarder-input-id";
+
+        // A forwarded message carries the remote input's ID in sourceInputId, but the local
+        // Forwarder input's ID is available in the gl2_forwarder_input field.
+        Message msg = messageFactory.createMessage("hello", "junit", Tools.nowUTC());
+        msg.setSourceInputId("remote-input-id");
+        msg.addField(Message.FIELD_GL2_FORWARDER_INPUT, forwarderInputId);
+
+        when(input.getId()).thenReturn(forwarderInputId);
+        when(inputService.all()).thenReturn(Collections.singletonList(input));
+        when(inputService.getStaticFields(eq(forwarderInputId)))
+                .thenReturn(Collections.singletonList(Maps.immutableEntry("foo", "bar")));
+
+        final StaticFieldFilter filter = new StaticFieldFilter(inputService, new EventBus(), scheduler);
+        filter.lifecycleChanged(Lifecycle.STARTING);
+        filter.filter(msg);
+
+        assertEquals("bar", msg.getField("foo"));
+    }
+
+    @Test
     public void testFilterIsNotOverwritingExistingKeys() {
         Message msg = messageFactory.createMessage("hello", "junit", Tools.nowUTC());
         msg.addField("foo", "IWILLSURVIVE");

@@ -43,3 +43,8 @@ declare module '*.svg' {
 declare module '*.png' {
   export default string;
 }
+
+declare module 'jest-preset-graylog/lib/timeouts' {
+  export const timeoutMultiplier: () => number;
+  export const applyTimeoutMultiplier: (x: number) => number;
+}
