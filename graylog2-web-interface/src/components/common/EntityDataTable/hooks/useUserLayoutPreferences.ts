@@ -26,17 +26,16 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import { defaultOnError } from 'util/conditional/onError';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
-import {
-  TABLE_LAYOUT_DEFAULT_FILTERS_KEY_SPLITTER,
-} from 'components/common/EntityDataTable/Constants';
+import { TABLE_LAYOUT_DEFAULT_FILTERS_KEY_SPLITTER } from 'components/common/EntityDataTable/Constants';
 
 const INITIAL_DATA = {};
 
-const filtersFromJson = (filters: TableLayoutDefaultFiltersJSON): UrlQueryFilters => filters.reduce<UrlQueryFilters>((queryFilters, jsonFilter) => {
+const filtersFromJson = (filters: TableLayoutDefaultFiltersJSON): UrlQueryFilters =>
+  filters.reduce<UrlQueryFilters>((queryFilters, jsonFilter) => {
     const [key, stringValues] = jsonFilter.split(TABLE_LAYOUT_DEFAULT_FILTERS_KEY_SPLITTER);
     if (queryFilters.get(key)) {
       return queryFilters.set(key, queryFilters[key].push(stringValues));
-      }
+    }
 
     return queryFilters.set(key, [stringValues]);
   }, Immutable.OrderedMap({}));
@@ -45,8 +44,7 @@ const preferencesFromJSON = (preferences: TableLayoutPreferencesJSON): TableLayo
   const { attributes, sort, per_page, slicing, custom_preferences, order, filters } = preferences;
   const hasSlicingPreference = Object.prototype.hasOwnProperty.call(preferences, 'slicing');
 
-
-  const defaultFilters =  filters ? filtersFromJson(filters) : undefined;
+  const defaultFilters = filters ? filtersFromJson(filters) : undefined;
 
   const result: TableLayoutPreferences = {
     attributes,
