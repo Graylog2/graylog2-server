@@ -31,10 +31,15 @@ type Props = {
 
 const comparator = new InputStateComparator();
 
-const getLabelClassForState = (sortedStates, input: InputSummary, nodes: { [nodeId: string]: NodeInfo }) => {
+const getLabelClassForState = (
+  sortedStates,
+  input: InputSummary,
+  nodes: { [nodeId: string]: NodeInfo },
+  isOnlyOnePerCluster: boolean,
+) => {
   const nodesWithKnownState = sortedStates.reduce((numberOfNodes, state) => numberOfNodes + state.count, 0);
 
-  if (input.global && nodesWithKnownState !== Object.keys(nodes).length) {
+  if (input.global && !isOnlyOnePerCluster && nodesWithKnownState !== Object.keys(nodes).length) {
     return 'warning';
   }
 
@@ -86,6 +91,10 @@ const InputStateBadge = ({ input, inputStates = undefined }: Props) => {
       count: sortedInputStates[state].length,
     }));
 
+  const isOnlyOnePerCluster = Object.values(inputStates[inputId] ?? {}).some(
+    (nodeState) => nodeState.only_one_per_cluster,
+  );
+
   if (sorted.length > 0) {
     const popOverText = sorted.map((state) =>
       sortedInputStates[state.state].map((node) => (
@@ -103,7 +112,10 @@ const InputStateBadge = ({ input, inputStates = undefined }: Props) => {
         overlay={popOverText}
         rootClose
         title={`Input States for ${input.title}`}>
-        <Label bsStyle={getLabelClassForState(sorted, input, nodes)} bsSize="xsmall" style={{ cursor: 'pointer' }}>
+        <Label
+          bsStyle={getLabelClassForState(sorted, input, nodes, isOnlyOnePerCluster)}
+          bsSize="xsmall"
+          style={{ cursor: 'pointer' }}>
           {getTextForState(sorted, input)}
         </Label>
       </OverlayTrigger>

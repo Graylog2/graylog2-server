@@ -38,7 +38,7 @@ const scaleForGradient = (gradient: string): chroma.Scale => {
     case 'Rainbow':
       return plotlyScaleToChroma(scales[gradient]);
     default:
-      return chroma.scale(gradient);
+      return chroma.scale(gradient as chroma.BrewerPaletteName);
   }
 };
 

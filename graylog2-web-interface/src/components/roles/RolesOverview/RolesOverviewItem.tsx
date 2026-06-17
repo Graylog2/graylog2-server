@@ -21,7 +21,7 @@ import styled from 'styled-components';
 import { Link, TextOverflowEllipsis } from 'components/common';
 import Routes from 'routing/Routes';
 import type Role from 'logic/roles/Role';
-import type { UserContext } from 'actions/roles/AuthzRolesActions';
+import type { UserContext } from 'hooks/useAuthzRoles';
 
 import ActionsCell from './ActionsCell';
 import UsersCell from './UsersCell';
@@ -33,9 +33,10 @@ const DescriptionCell = styled.td`
 type Props = {
   role: Role;
   users: UserContext[];
+  onDeleted?: () => void;
 };
 
-const RolesOverviewItem = ({ role: { id, name, description, readOnly }, users }: Props) => (
+const RolesOverviewItem = ({ role: { id, name, description, readOnly }, users, onDeleted }: Props) => (
   <tr key={id}>
     <td className="limited">
       <Link to={Routes.SYSTEM.AUTHZROLES.show(id)}>{name}</Link>
@@ -44,7 +45,7 @@ const RolesOverviewItem = ({ role: { id, name, description, readOnly }, users }:
       <TextOverflowEllipsis>{description}</TextOverflowEllipsis>
     </DescriptionCell>
     <UsersCell users={Immutable.Set(users)} />
-    <ActionsCell roleId={id} roleName={name} readOnly={readOnly} />
+    <ActionsCell roleId={id} roleName={name} readOnly={readOnly} onDeleted={onDeleted} />
   </tr>
 );
 
