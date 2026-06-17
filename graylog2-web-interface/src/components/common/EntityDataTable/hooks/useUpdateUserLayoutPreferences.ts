@@ -39,11 +39,13 @@ const slicingToJSON = (slicing?: SlicingPreferences | null): SlicingPreferencesJ
     return undefined;
   }
 
+  const slicingPreferences = (slicing.readOnly !== undefined ? { read_only: slicing.readOnly } : {})
+
   return {
     slice_column: slicing.sliceColumn,
     sort_by: slicing.sortBy,
     order: slicing.order,
-    ...(slicing.readOnly !== undefined ? { read_only: slicing.readOnly } : {}),
+    ...slicingPreferences,
   };
 };
 
