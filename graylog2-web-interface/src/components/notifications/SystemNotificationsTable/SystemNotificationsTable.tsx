@@ -34,6 +34,8 @@ const StyledHeading = styled.h2(
   `,
 );
 
+const EXTERNAL_SEARCH = { query: '' };
+
 const TABLE_LAYOUT = {
   entityTableId: 'system-notifications',
   defaultPageSize: 20,
@@ -61,6 +63,7 @@ const SystemNotificationsTable = () => (
         columnRenderers={customColumnRenderers}
         entityActions={renderActions}
         expandedSectionRenderers={expandedSections}
+        externalSearch={EXTERNAL_SEARCH}
         bulkSelection={bulkSelection}
         fetchOptions={{ refetchInterval: REFETCH_INTERVAL }}
       />
