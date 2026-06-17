@@ -18,8 +18,10 @@ package org.graylog.collectors.config.exporter;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
+import org.graylog.collectors.config.GoDurationSerializer;
 import org.graylog.collectors.config.extension.FileStorageExtensionConfig;
 
 import java.time.Duration;
@@ -70,10 +72,10 @@ public abstract class ExporterSendingQueue {
                 .numConsumers(10)
                 .waitForResult(false)
                 .blockOnOverflow(false)
-                .sizer(Sizer.REQUESTS)
-                .queueSize(1000)
+                .sizer(Sizer.BYTES)
+                .queueSize(64 * 1024 * 1024)
                 .storage(FileStorageExtensionConfig.defaultInstance().name())
-                .batch(null);
+                .batch(Batch.createDefault());
     }
 
     public abstract Builder toBuilder();
@@ -106,6 +108,7 @@ public abstract class ExporterSendingQueue {
     @AutoValue
     public abstract static class Batch {
         @JsonProperty("flush_timeout")
+        @JsonSerialize(using = GoDurationSerializer.class)
         public abstract Duration flushTimeout();
 
         // Should be less than or equal to the sending_queue.queue_size if sending_queue.batch.sizer matches sending_queue.sizer.
@@ -118,12 +121,17 @@ public abstract class ExporterSendingQueue {
         @JsonProperty("sizer")
         public abstract Optional<Sizer> sizer();
 
+        public static Batch createDefault() {
+            return builder().build();
+        }
+
         public static Builder builder() {
             return new AutoValue_ExporterSendingQueue_Batch.Builder()
+                    // TODO: Make the sending queue batch settings configurable
                     .flushTimeout(Duration.ofMillis(200))
-                    .minSize(8192)
-                    .maxSize(0)
-                    .sizer(null);
+                    .minSize(1024 * 1024)
+                    .maxSize(3 * 1024 * 1024) // Default for CollectorIngestHttpInput is 4 MB
+                    .sizer(Sizer.BYTES);
         }
 
         @AutoValue.Builder

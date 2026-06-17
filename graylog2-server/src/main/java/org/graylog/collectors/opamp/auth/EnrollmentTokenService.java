@@ -17,6 +17,8 @@
 package org.graylog.collectors.opamp.auth;
 
 import com.google.errorprone.annotations.MustBeClosed;
+import com.mongodb.client.model.Accumulators;
+import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.IndexModel;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
@@ -28,6 +30,7 @@ import io.jsonwebtoken.Jwts;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog.collectors.CollectorsConfig;
@@ -141,9 +144,10 @@ public class EnrollmentTokenService {
      *
      * @param request the token creation request
      * @param creator the user who created the token
-     * @return the created token and its expiration time
+     * @return the created token, fleet ID, and its expiration time
      */
     public EnrollmentTokenResponse createToken(CreateEnrollmentTokenRequest request, EnrollmentTokenCreator creator) {
+        // TODO: Validate that request.fleetId is a valid fleet
         final var tokenSigningKey = getTokenSigningKey();
         final Instant now = Instant.now(clock);
         final @Nullable Instant expiresAt = request.expiresIn() != null ? now.plus(request.expiresIn()) : null;
@@ -161,7 +165,7 @@ public class EnrollmentTokenService {
                 .expiresAt(expiresAt)
                 .build());
 
-        return new EnrollmentTokenResponse(MongoUtils.insertedIdAsString(insertOneResult), token, expiresAt);
+        return new EnrollmentTokenResponse(MongoUtils.insertedIdAsString(insertOneResult), token, request.fleetId(), expiresAt);
     }
 
     /**
@@ -295,6 +299,39 @@ public class EnrollmentTokenService {
                 .map(CollectorsConfig::tokenSigningKey)
                 .orElseThrow(() -> new IllegalStateException("Token signing key not found"));
     }
+
+    /**
+     * Returns enrollment token stats: total token count, aggregate usage count, and expired token count.
+     */
+    public EnrollmentTokenStats getStats() {
+        final var expiredCond = new Document("$cond", List.of(
+                new Document("$and", List.of(
+                        new Document("$eq", List.of(new Document("$type", "$" + EnrollmentTokenDTO.FIELD_EXPIRES_AT), "date")),
+                        new Document("$lt", List.of("$" + EnrollmentTokenDTO.FIELD_EXPIRES_AT, Date.from(Instant.now(clock))))
+                )),
+                1L,
+                0L
+        ));
+
+        final var pipeline = List.of(
+                Aggregates.group(null,
+                        Accumulators.sum("count", 1L),
+                        Accumulators.sum("total_usage", "$" + EnrollmentTokenDTO.FIELD_USAGE_COUNT),
+                        Accumulators.sum("expired", expiredCond)
+                )
+        );
+        final Document result = tokenCollection.aggregate(pipeline, Document.class).first();
+        if (result == null) {
+            return new EnrollmentTokenStats(0, 0, 0);
+        }
+        return new EnrollmentTokenStats(
+                ((Number) result.get("count")).longValue(),
+                ((Number) result.get("total_usage")).longValue(),
+                ((Number) result.get("expired")).longValue()
+        );
+    }
+
+    public record EnrollmentTokenStats(long count, long totalUsage, long expired) {}
 
     @MustBeClosed
     public Stream<EnrollmentTokenDTO> findByIds(List<String> ids) {

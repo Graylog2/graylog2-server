@@ -21,15 +21,24 @@ import { LinkContainer, Link, RelativeTime, OverlayTrigger, CountBadge, Spinner 
 import { MetricContainer, CounterRate } from 'components/metrics';
 import { Button, ButtonToolbar, Label } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import type { RuleType, PipelineSummary } from 'stores/rules/RulesStore';
+import type { RuleType, PipelineSummary } from 'components/rules/hooks/useRules';
 import StringUtils from 'util/StringUtils';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import RuleDeprecationInfo from 'components/rules/RuleDeprecationInfo';
+import {
+  PipelineLoadCell,
+  getRuleLoadPercent,
+  useProcessingLoadContext,
+  type ProcessingLoadResponse,
+} from 'components/pipelines/processing-load';
 
 type Props = {
   rule: RuleType;
   usingPipelines: Array<PipelineSummary>;
   onDelete: (rule: RuleType) => () => void;
+  showLoadColumn?: boolean;
+  processingLoad?: ProcessingLoadResponse;
+  processingLoadError?: boolean;
 };
 const STRING_SIZE_LIMIT = 30;
 
@@ -51,7 +60,22 @@ const DefaultLabel = styled(Label)(
   `,
 );
 
-const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
+const RuleListEntry = ({
+  rule,
+  onDelete,
+  usingPipelines,
+  showLoadColumn: showLoadColumnProp = undefined,
+  processingLoad: processingLoadProp = undefined,
+  processingLoadError: processingLoadErrorProp = undefined,
+}: Props) => {
+  const {
+    metricsEnabled,
+    processingLoad: processingLoadContext,
+    processingLoadError: processingLoadErrorContext,
+  } = useProcessingLoadContext();
+  const showLoadColumn = showLoadColumnProp ?? metricsEnabled;
+  const processingLoad = processingLoadProp ?? processingLoadContext;
+  const processingLoadError = processingLoadErrorProp ?? processingLoadErrorContext;
   const { loadingScopePermissions, scopePermissions } = useGetPermissionsByScope(rule);
   const { id, title, description, created_at, modified_at } = rule;
 
@@ -116,6 +140,11 @@ const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
           <CounterRate showTotal suffix="errors/s" hideOnMissing />
         </MetricContainer>
       </td>
+      {showLoadColumn && (
+        <td>
+          <PipelineLoadCell loadPercent={getRuleLoadPercent(processingLoad, id)} error={processingLoadError} />
+        </td>
+      )}
       <LimitedTd>
         <CountBadge count={pipelinesLength} /> {_showPipelines(usingPipelines)}
       </LimitedTd>

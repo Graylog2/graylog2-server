@@ -123,7 +123,8 @@ public class CloudTrailInput extends MessageInput {
                     "",
                     "Secret key of an AWS user with sufficient permissions. (See documentation)",
                     ConfigurationField.Optional.OPTIONAL,
-                    true
+                    true,
+                    TextField.Attribute.IS_PASSWORD
             ));
             r.addField(new DropdownField(
                     CK_AWS_SQS_REGION,
@@ -152,7 +153,7 @@ public class CloudTrailInput extends MessageInput {
                     CK_POLLING_INTERVAL,
                     "Polling interval",
                     1,
-                    "Determines how often Graylog will check for SQS notifications. The smallest allowable interval is 1 minute.",
+                    "Determines how often to check for SQS notifications. The smallest allowable interval is 1 minute.",
                     ConfigurationField.Optional.OPTIONAL));
             r.addField(new TextField(
                     CK_ASSUME_ROLE_ARN,

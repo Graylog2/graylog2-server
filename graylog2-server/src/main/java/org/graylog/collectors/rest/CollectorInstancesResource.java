@@ -40,7 +40,6 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog.collectors.db.FleetReassignedPayload;
 import org.bson.conversions.Bson;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorsConfigService;
@@ -51,6 +50,7 @@ import org.graylog.collectors.SourceService;
 import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.FleetDTO;
+import org.graylog.collectors.db.FleetReassignedPayload;
 import org.graylog.collectors.db.MarkerType;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
@@ -182,7 +182,7 @@ public class CollectorInstancesResource extends RestResource {
         this.fleetService = fleetService;
         this.sourceService = sourceService;
         this.txnLogService = txnLogService;
-        this.dbQueryCreator = new DbQueryCreator(CollectorInstanceDTO.FIELD_INSTANCE_UID, ATTRIBUTES, computedFieldRegistry);
+        this.dbQueryCreator = new DbQueryCreator("hostname", ATTRIBUTES, computedFieldRegistry);
         this.collectorsConfigService = collectorsConfigService;
         this.auditEventSender = auditEventSender;
     }
@@ -195,13 +195,12 @@ public class CollectorInstancesResource extends RestResource {
         // TODO for a permission check we would need to know which fleets are granted to the user
         // since we haven't implemented that yet, we can't add them as filters to the count queries, as a consequence
         // the counts would be wrong in case someone had explicit grants
-        final long totalInstances = collectorInstanceService.count();
-        final long onlineInstances = collectorInstanceService.countOnline(
+        final var instanceCount = collectorInstanceService.countAcrossAllFleets(
                 Instant.now().minus(getOfflineThreshold()));
         return new CollectorStatsResponse(
-                totalInstances,
-                onlineInstances,
-                totalInstances - onlineInstances,
+                instanceCount.total(),
+                instanceCount.online(),
+                instanceCount.offline(),
                 fleetService.count(),
                 sourceService.count());
     }
@@ -231,7 +230,7 @@ public class CollectorInstancesResource extends RestResource {
                 resolvedSort,
                 page,
                 perPage,
-                dto ->  isPermitted(CollectorsPermissions.FLEET_READ, dto.fleetId()));
+                dto -> isPermitted(CollectorsPermissions.FLEET_READ, dto.fleetId()));
 
         return PageListResponse.create(
                 query,

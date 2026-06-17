@@ -19,7 +19,7 @@ import styled, { css } from 'styled-components';
 
 import { Button, ControlLabel, FormGroup, Input, ButtonGroup } from 'components/bootstrap';
 import MessageShow from 'components/search/MessageShow';
-import type { RuleType } from 'stores/rules/RulesStore';
+import type { RuleType } from 'components/rules/hooks/useRules';
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -238,18 +238,20 @@ const RuleSimulation = ({ rule: currentRule = undefined, onSaveMessage = () => {
                 {ruleSimulationResult?.simulator_action_variables?.length > 0 && (
                   <OutputContainer data-testid="actions-output">
                     <label htmlFor="simulation_actions_output">Actions Output</label>
-                    {ruleSimulationResult?.simulator_action_variables?.map((actionOutputKeyValue) => {
-                      const keyValue = Object.entries(actionOutputKeyValue)[0];
+                    {ruleSimulationResult?.simulator_action_variables?.map(
+                      (actionOutputKeyValue: Record<string, unknown>) => {
+                        const keyValue = Object.entries(actionOutputKeyValue)[0];
 
-                      return (
-                        <OutputText
-                          key={keyValue[0]}
-                          $highlighted={highlightedOutput === keyValue[0]}
-                          title={JSON.stringify(keyValue[1])}>
-                          <ActionOutputIndex>${keyValue[0]}</ActionOutputIndex>: {JSON.stringify(keyValue[1])}
-                        </OutputText>
-                      );
-                    })}
+                        return (
+                          <OutputText
+                            key={keyValue[0]}
+                            $highlighted={highlightedOutput === keyValue[0]}
+                            title={JSON.stringify(keyValue[1])}>
+                            <ActionOutputIndex>${keyValue[0]}</ActionOutputIndex>: {JSON.stringify(keyValue[1])}
+                          </OutputText>
+                        );
+                      },
+                    )}
                   </OutputContainer>
                 )}
               </>

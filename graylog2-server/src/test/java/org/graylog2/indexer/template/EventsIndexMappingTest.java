@@ -108,6 +108,7 @@ public class EventsIndexMappingTest {
         at.jsonPathAsBoolean("$.properties.fields.dynamic").isTrue();
         at.jsonPathAsString("$.properties.triggered_jobs.type").isEqualTo("keyword");
         at.jsonPathAsString("$.properties.associated_assets.type").isEqualTo("keyword");
+        at.jsonPathAsString("$.properties.tags.type").isEqualTo("keyword");
         at.jsonPathAsString("$.properties.scores.type").isEqualTo("object");
     }
 }

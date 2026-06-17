@@ -464,8 +464,10 @@ interface MessageRowOverrideProps {
 
 export interface CombinedSearchBarFormValues {
   timerange?: TimeRange | NoTimeRangeOverride;
-  streams?: Array<string>;
-  streamCategories?: Array<string>;
+  streamsAndCategories?: {
+    streams: Array<string>;
+    categories?: Array<string>;
+  };
   queryString?: string;
 }
 
@@ -631,8 +633,13 @@ export type EventReplaySideBarDetailsProps = {
   definitionId?: string;
 };
 
+export type EventDefinitionSideBarDetailsProps = {
+  definitionId: string;
+};
+
 export type EventReplaySideBarPlugin = {
   component: React.ComponentType<EventReplaySideBarDetailsProps>;
+  eventDefinitionComponent?: React.ComponentType<EventDefinitionSideBarDetailsProps>;
   key: string;
   useCondition?: () => boolean;
 };

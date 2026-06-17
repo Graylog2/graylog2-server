@@ -210,9 +210,9 @@ const SearchActionsMenu = () => {
 
   useHotkey({
     actionKey: 'save',
-    callback: () => (loaded ? saveSearch(title) : openFormModal()),
+    callback: () => (loaded ? saveSearch(currentTitle) : openFormModal()),
     scope: 'search',
-    dependencies: [loaded, saveSearch, title],
+    dependencies: [loaded, saveSearch, currentTitle],
   });
 
   useHotkey({
@@ -252,7 +252,7 @@ const SearchActionsMenu = () => {
         bsStyle="default"
         disabledInfo={isNew && 'Only saved searches can be shared.'}
       />
-      <MoreActionsMenu aria-label="Open search actions dropdown" id="search-actions-dropdown" pullRight solid>
+      <MoreActionsMenu aria-label="Open search actions dropdown" id="search-actions-dropdown" pullRight>
         <MenuItem onSelect={toggleMetadataEdit} disabled={!isAllowedToEdit} icon="edit">
           Edit metadata
         </MenuItem>

@@ -1,0 +1,252 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import React, { useCallback, useContext, useMemo, useState } from 'react';
+import styled, { css } from 'styled-components';
+import type { Datum } from 'plotly.js';
+
+import Popover from 'components/common/Popover';
+import { Menu } from 'components/bootstrap';
+import OnClickPopoverValueGroups from 'views/components/visualizations/OnClickPopover/OnClickPopoverValueGroups';
+import PopoverTitle from 'views/components/visualizations/OnClickPopover/PopoverTitle';
+import type { ClickPoint, FieldData, ValueGroups } from 'views/components/visualizations/OnClickPopover/Types';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import { ActionContext, AdditionalContext } from 'views/logic/ActionContext';
+import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
+import ActionDropdown from 'views/components/actions/ActionDropdown';
+import TypeSpecificValue from 'views/components/TypeSpecificValue';
+import useFieldActions from 'views/components/actions/useFieldActions';
+import useQueryFieldTypes from 'views/hooks/useQueryFieldTypes';
+import useOverflowingComponents from 'views/hooks/useOverflowingComponents';
+import hasMultipleValueForActions from 'views/components/visualizations/utils/hasMultipleValueForActions';
+import { humanSeparator } from 'views/Constants';
+
+type NodeCustomData = { field: string; value: unknown };
+
+type SankeyNodePoint = {
+  customdata?: NodeCustomData;
+  label?: string;
+};
+
+type SankeyClickPoint = {
+  customdata?: NodeCustomData;
+  index?: number;
+  label?: string;
+  value?: number;
+  source?: SankeyNodePoint;
+  target?: SankeyNodePoint;
+};
+
+const DivContainer = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacings.xxs};
+  `,
+);
+
+const isSankeyLink = (pt: SankeyClickPoint): boolean =>
+  !!pt.source && !!pt.target && typeof pt.source === 'object' && typeof pt.target === 'object';
+
+type Props = {
+  clickPoint: ClickPoint;
+  config: AggregationWidgetConfig;
+  onPopoverClose: () => void;
+};
+
+const SankeyActions = ({
+  selected,
+  onBack = undefined,
+  onActionRun,
+}: {
+  selected: FieldData;
+  onBack?: () => void;
+  onActionRun: () => void;
+}) => {
+  const actionContext = useContext(ActionContext);
+  const { additionalHandlerArgs } = useFieldActions();
+  const { overflowingComponents, setOverflowingComponents } = useOverflowingComponents();
+  const type = fieldTypeFor(selected.field, actionContext.fieldTypes);
+  const handlerArgs = {
+    field: selected.field,
+    type,
+    value: selected.value,
+    contexts: actionContext,
+    ...additionalHandlerArgs,
+  };
+
+  // When the combined groupings were selected, the action targets a value path rather than a
+  // single field/value, so show the combined grouping values instead of the metric.
+  const showMultipleValueHeader = hasMultipleValueForActions(actionContext);
+
+  return (
+    <>
+      <PopoverTitle onBackClick={onBack ?? false}>
+        {showMultipleValueHeader ? (
+          actionContext.valuePath.map((entry, index) => {
+            const [entryField, entryValue] = Object.entries(entry)[0];
+
+            return (
+              <React.Fragment key={`${entryField}-${String(entryValue)}`}>
+                {index > 0 && humanSeparator}
+                <TypeSpecificValue
+                  field={entryField}
+                  value={entryValue}
+                  type={fieldTypeFor(entryField, actionContext.fieldTypes)}
+                  truncate
+                />
+              </React.Fragment>
+            );
+          })
+        ) : (
+          <>
+            {selected.field} = <TypeSpecificValue field={selected.field} value={selected.value} type={type} truncate />
+          </>
+        )}
+      </PopoverTitle>
+      <Menu opened>
+        <ActionDropdown
+          handlerArgs={handlerArgs}
+          type="value"
+          onMenuToggle={onActionRun}
+          overflowingComponents={overflowingComponents}
+          setOverflowingComponents={setOverflowingComponents}
+        />
+      </Menu>
+    </>
+  );
+};
+
+const collectGroupItems = (valueGroups: ValueGroups) => [
+  ...(valueGroups.rowPivotValues ?? []),
+  ...(valueGroups.columnPivotValues ?? []),
+  ...(valueGroups.metricValue ? [valueGroups.metricValue] : []),
+];
+
+const SankeyOnClickPopover = ({ clickPoint, config, onPopoverClose }: Props) => {
+  const pt = clickPoint as unknown as SankeyClickPoint | undefined;
+
+  const valueGroups = useMemo<ValueGroups & { title: string }>(() => {
+    if (!pt) return { title: '' };
+
+    if (isSankeyLink(pt)) {
+      const srcLabel = pt.source?.label ?? '';
+      const tgtLabel = pt.target?.label ?? '';
+      const linkTitle = srcLabel && tgtLabel ? `${srcLabel} → ${tgtLabel}` : 'Connection';
+      const srcCustom = pt.source?.customdata;
+      const tgtCustom = pt.target?.customdata;
+      const linkValue = pt.value;
+      const metric = config?.series?.[0];
+
+      return {
+        title: linkTitle,
+        rowPivotValues: srcCustom
+          ? [
+              {
+                field: srcCustom.field,
+                value: srcCustom.value as Datum,
+                text: srcLabel || String(srcCustom.value),
+                traceColor: null,
+              },
+            ]
+          : [],
+        columnPivotValues: tgtCustom
+          ? [
+              {
+                field: tgtCustom.field,
+                value: tgtCustom.value as Datum,
+                text: tgtLabel || String(tgtCustom.value),
+                traceColor: null,
+              },
+            ]
+          : [],
+        metricValue:
+          metric && linkValue !== undefined
+            ? { field: metric.effectiveName, value: linkValue, text: String(linkValue), traceColor: null }
+            : undefined,
+      };
+    }
+
+    const nodeCustom = pt.customdata;
+
+    if (!nodeCustom) return { title: pt.label ?? '' };
+
+    return {
+      title: pt.label ?? String(nodeCustom.value),
+      rowPivotValues: [
+        {
+          field: nodeCustom.field,
+          value: nodeCustom.value as Datum,
+          text: pt.label ?? String(nodeCustom.value),
+          traceColor: null,
+        },
+      ],
+      columnPivotValues: [],
+      metricValue: undefined,
+    };
+  }, [pt, config]);
+
+  const items = useMemo(() => collectGroupItems(valueGroups), [valueGroups]);
+  const skipValueSelection = items.length === 1;
+
+  // Component is remounted (via `key` on the caller) whenever the chart click changes,
+  // so internal state always starts fresh. When there's only one selectable item, jump
+  // straight to the action menu instead of asking the user to pick from a single option.
+  const [selected, setSelected] = useState<FieldData | null>(() =>
+    skipValueSelection ? { field: items[0].field, value: items[0].value, contexts: null } : null,
+  );
+
+  const types = useQueryFieldTypes();
+  const additionalContextValue = useMemo(
+    () => ({ valuePath: selected?.contexts?.valuePath, fieldTypes: types }),
+    [selected?.contexts?.valuePath, types],
+  );
+
+  const onActionRun = useCallback(() => {
+    onPopoverClose();
+    setSelected(null);
+  }, [onPopoverClose]);
+
+  const onBack = useCallback(() => setSelected(null), []);
+
+  if (!pt) return null;
+
+  return (
+    <Popover.Dropdown title={selected ? null : valueGroups.title}>
+      <DivContainer>
+        {selected ? (
+          <AdditionalContext.Provider value={additionalContextValue}>
+            <SankeyActions
+              selected={selected}
+              onBack={skipValueSelection ? undefined : onBack}
+              onActionRun={onActionRun}
+            />
+          </AdditionalContext.Provider>
+        ) : (
+          <OnClickPopoverValueGroups
+            columnPivotValues={valueGroups.columnPivotValues}
+            metricValue={valueGroups.metricValue}
+            rowPivotValues={valueGroups.rowPivotValues}
+            setFieldData={setSelected}
+            config={config}
+          />
+        )}
+      </DivContainer>
+    </Popover.Dropdown>
+  );
+};
+
+export default SankeyOnClickPopover;

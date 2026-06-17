@@ -23,30 +23,52 @@ import { defaultOnError } from 'util/conditional/onError';
 
 const INITIAL_DATA = {};
 
-const preferencesFromJSON = ({
-  attributes,
-  sort,
-  per_page,
-  custom_preferences,
-  order,
-}: TableLayoutPreferencesJSON): TableLayoutPreferences => ({
-  attributes,
-  sort: sort ? { attributeId: sort.field, direction: sort.order } : undefined,
-  perPage: per_page,
-  customPreferences: custom_preferences,
-  order,
-});
-const fetchUserLayoutPreferences = (entityId: string) =>
-  fetch('GET', qualifyUrl(`/entitylists/preferences/${entityId}`)).then((res) => preferencesFromJSON(res ?? {}));
+const preferencesFromJSON = (preferences: TableLayoutPreferencesJSON): TableLayoutPreferences => {
+  const { attributes, sort, per_page, slicing, custom_preferences, order } = preferences;
+  const hasSlicingPreference = Object.prototype.hasOwnProperty.call(preferences, 'slicing');
+
+  const result: TableLayoutPreferences = {
+    attributes,
+    sort: sort ? { attributeId: sort.field, direction: sort.order } : undefined,
+    perPage: per_page,
+    customPreferences: custom_preferences,
+    order,
+  };
+
+  if (hasSlicingPreference) {
+    result.slicing = slicing
+      ? {
+          sliceColumn: slicing.slice_column,
+          sortBy: slicing.sort_by,
+          order: slicing.order,
+        }
+      : null;
+  }
+
+  return result;
+};
+const preferencesUrl = (entityId: string, layoutVariant?: string) => {
+  const params = layoutVariant ? `?layout_variant=${encodeURIComponent(layoutVariant)}` : '';
+
+  return qualifyUrl(`/entitylists/preferences/${entityId}${params}`);
+};
+
+const fetchUserLayoutPreferences = (entityId: string, layoutVariant?: string) =>
+  fetch('GET', preferencesUrl(entityId, layoutVariant)).then((res) => preferencesFromJSON(res ?? {}));
 
 const useUserLayoutPreferences = <T>(
   entityId: string,
+  layoutVariant?: string,
 ): { data: TableLayoutPreferences<T>; isInitialLoading: boolean; refetch: () => void } => {
-  const { data, isInitialLoading, refetch } = useQuery({
-    queryKey: ['table-layout', entityId],
+  const {
+    data,
+    isLoading: isInitialLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ['table-layout', entityId, layoutVariant],
     queryFn: () =>
       defaultOnError(
-        fetchUserLayoutPreferences(entityId),
+        fetchUserLayoutPreferences(entityId, layoutVariant),
         `Loading layout preferences for "${entityId}" overview failed with`,
       ),
     placeholderData: keepPreviousData,

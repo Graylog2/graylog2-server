@@ -20,7 +20,7 @@ import styled from 'styled-components';
 
 import { Row, Col, Button } from 'components/bootstrap';
 import { DocumentTitle, Icon, PageHeader, Spinner, Timestamp } from 'components/common';
-import { ClusterOverviewStore } from 'stores/cluster/ClusterOverviewStore';
+import { fetchSystemLogs } from 'hooks/useClusterOverview';
 import type { NodesStoreState } from 'stores/nodes/NodesStore';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import Routes from 'routing/Routes';
@@ -48,7 +48,7 @@ const SystemLogsPage = () => {
   const fetchLogs = useCallback(() => {
     setIsReloadingResults(true);
 
-    ClusterOverviewStore.systemLogs(nodeId, DEFAULT_LIMIT).then((logs) => {
+    fetchSystemLogs(nodeId, DEFAULT_LIMIT).then((logs) => {
       setSysLogs(logs);
       setTaken(new Date());
     });
