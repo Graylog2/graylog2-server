@@ -21,7 +21,7 @@ import { LinkContainer, Link, RelativeTime, OverlayTrigger, CountBadge, Spinner 
 import { MetricContainer, CounterRate } from 'components/metrics';
 import { Button, ButtonToolbar, Label } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import type { RuleType, PipelineSummary } from 'stores/rules/RulesStore';
+import type { RuleType, PipelineSummary } from 'components/rules/hooks/useRules';
 import StringUtils from 'util/StringUtils';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import RuleDeprecationInfo from 'components/rules/RuleDeprecationInfo';

@@ -1,0 +1,4 @@
+type = "a"
+message = "Add Sankey visualization for pivot configurations with multiple grouping fields."
+issues = ["Graylog2/graylog-plugin-enterprise#7230"]
+pulls = ["26153"]
