@@ -32,11 +32,10 @@ import { IndexerClusterHealthSummary } from 'components/indexers';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 import useParams from 'routing/useParams';
-import { useStore } from 'stores/connect';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { fetchIndexSet } from 'stores/indices/IndexSetsStore';
 import useIndexerOverview from 'hooks/useIndexerOverview';
-import { IndicesActions, IndicesStore } from 'stores/indices/IndicesStore';
+import { useIndices } from 'hooks/useIndices';
 
 const REFRESH_INTERVAL = 2000;
 
@@ -73,14 +72,13 @@ const IndexSetPage = () => {
   const { indexSetId } = useParams<{ indexSetId?: string }>();
   const [indexSet, setIndexSet] = useState<IndexSet | undefined>(undefined);
   const { data: indexerOverview, error: indexerOverviewError, refetch } = useIndexerOverview(indexSetId);
-  const { indices: indexDetailsIndices, closedIndices: indexDetailsClosedIndices } = useStore(IndicesStore) ?? {};
+  const { data: indicesData } = useIndices(indexSetId);
+  const { indices: indexDetailsIndices, closedIndices: indexDetailsClosedIndices } = indicesData ?? {};
 
   useEffect(() => {
     fetchIndexSet(indexSetId).then((response) => setIndexSet(response));
-    IndicesActions.list(indexSetId);
 
     const timerId = setInterval(() => {
-      IndicesActions.multiple();
       refetch();
     }, REFRESH_INTERVAL);
 

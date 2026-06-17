@@ -141,7 +141,6 @@ const UsersOverview = () => {
           <StyledPaginatedList totalItems={total}>
             <DataTable
               id="users-overview"
-              hover
               rowClassName="no-bm"
               headers={TABLE_HEADERS}
               headerCellFormatter={_headerCellFormatter}
