@@ -33,6 +33,7 @@ import org.graylog2.streams.StreamService;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -50,22 +51,21 @@ public class SimpleSearchRequestSpecToSearchMapper implements SearchRequestSpecT
         this.streamCategoryMapper = streamService::mapCategoriesToIds;
     }
 
+    @Override
     public Search mapToSearch(MessagesRequestSpec messagesRequestSpec, SearchUser searchUser) {
         return mapToSearch(messagesRequestSpec, searchUser, messageListCreator);
     }
 
+    @Override
     public Search mapToSearch(AggregationRequestSpec aggregationRequestSpec, SearchUser searchUser) {
         return mapToSearch(aggregationRequestSpec, searchUser, pivotCreator);
     }
 
-    protected String getQueryString(final SearchRequestSpec searchRequestSpec) {
-        return searchRequestSpec.queryString();
-    }
+    private <T extends SearchRequestSpec> Search mapToSearch(final T searchRequestSpec, final SearchUser searchUser, BiFunction<T, SearchUser, ? extends SearchType> searchTypeCreator) {
 
-    private <T extends SearchRequestSpec> Search mapToSearch(final T searchRequestSpec, final SearchUser searchUser, Function<T, ? extends SearchType> searchTypeCreator) {
         Query query = Query.builder()
                 .id(QUERY_ID)
-                .searchTypes(Set.of(searchTypeCreator.apply(searchRequestSpec)))
+                .searchTypes(Set.of(searchTypeCreator.apply(searchRequestSpec, searchUser)))
                 .query(ElasticsearchQueryString.ofNullable(getQueryString(searchRequestSpec)))
                 .timerange(getTimerange(searchRequestSpec))
                 .build();
@@ -86,5 +86,9 @@ public class SimpleSearchRequestSpecToSearchMapper implements SearchRequestSpecT
 
     private TimeRange getTimerange(SearchRequestSpec searchRequestSpec) {
         return searchRequestSpec.timerange() != null ? searchRequestSpec.timerange() : RelativeRange.allTime();
+    }
+
+    protected String getQueryString(final SearchRequestSpec searchRequestSpec) {
+        return searchRequestSpec.queryString();
     }
 }
