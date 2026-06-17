@@ -87,7 +87,7 @@ describe('MainNavbar', () => {
     };
 
     beforeEach(() => {
-      asMock(AppConfig.gl2AppPathPrefix).mockReturnValue('');
+      asMock(AppConfig.gl2AppPathPrefix).mockReturnValue('/');
       asMock(AppConfig.isFeatureEnabled).mockReturnValue(false);
       PluginStore.register(plugin);
     });

@@ -85,7 +85,6 @@ describe('<Sidebar />', () => {
   useViewsPlugin();
 
   beforeEach(() => {
-    asMock(AppConfig.rootTimeZone).mockReturnValue('America/Chicago');
     asMock(useViewType).mockReturnValue(View.Type.Search);
     asMock(useActiveQueryId).mockReturnValue(queryId);
     asMock(useViewMetadata).mockReturnValue(viewMetaData);
