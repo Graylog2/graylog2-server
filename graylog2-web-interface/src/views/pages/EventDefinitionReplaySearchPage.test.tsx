@@ -46,14 +46,11 @@ jest.mock('views/logic/views/UseProcessHooksForView');
 jest.mock('views/hooks/useCreateSearch');
 
 jest.mock('hooks/useEventDefinition');
-jest.mock(
-  'hooks/useRightSidebar',
-  () => (): { openSidebar: () => void; closeSidebar: () => void; sidebar: null } => ({
-    openSidebar: jest.fn(),
-    closeSidebar: jest.fn(),
-    sidebar: null,
-  }),
-);
+jest.mock('hooks/useRightSidebar', () => (): { openSidebar: () => void; closeSidebar: () => void; sidebar: null } => ({
+  openSidebar: jest.fn(),
+  closeSidebar: jest.fn(),
+  sidebar: null,
+}));
 jest.mock('components/event-definitions/replay-search/hooks/useAlertAndEventDefinitionData');
 
 jest.mock('components/event-notifications/hooks/useEventNotifications', () => ({
