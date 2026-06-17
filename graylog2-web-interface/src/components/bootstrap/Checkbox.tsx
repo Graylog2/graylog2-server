@@ -34,6 +34,7 @@ type Props = {
   value?: string;
   'aria-describedby'?: string;
   'aria-labelledby'?: string;
+  'aria-label'?: string;
 };
 
 const Checkbox = (
@@ -54,6 +55,7 @@ const Checkbox = (
     defaultChecked = undefined,
     'aria-describedby': ariaDescribedBy = undefined,
     'aria-labelledby': ariaLabelledBy = undefined,
+    'aria-label': ariaLabel = undefined,
   }: Props,
   forwardedRef: React.MutableRefObject<HTMLInputElement>,
 ) => {
@@ -80,6 +82,7 @@ const Checkbox = (
         value={value}
         aria-describedby={ariaDescribedBy}
         aria-labelledby={ariaLabelledBy}
+        aria-label={ariaLabel}
         onClick={onClick}
         onChange={onChange}
       />
