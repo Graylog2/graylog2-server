@@ -31,7 +31,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import type User from 'logic/users/User';
-import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
+import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 import EventDefinitionValidationSummary from './EventDefinitionValidationSummary';
@@ -89,7 +89,13 @@ const EventDefinitionSummary = ({
         <dt>Description</dt>
         <dd>{eventDefinition.description || 'No description given'}</dd>
         <dt>Priority</dt>
-        <dd>{upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</dd>
+        <dd>
+          {upperFirst(
+            EventDefinitionPriorityEnum.properties[
+              eventDefinition.priority as keyof typeof EventDefinitionPriorityEnum.properties
+            ].name,
+          )}
+        </dd>
         <dt>Tags</dt>
         <dd>
           <TagList tags={eventDefinition.tags} emptyFallback={<em>No tags</em>} />
@@ -255,7 +261,7 @@ const EventDefinitionSummary = ({
     return <React.Fragment key={definitionNotification.notification_id}>{content}</React.Fragment>;
   };
 
-  const renderNotificationSettings = (notificationSettings) => {
+  const renderNotificationSettings = (notificationSettings: EventDefinition['notification_settings']) => {
     const formattedDuration = moment
       .duration(notificationSettings.grace_period_ms)
       .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all' });
