@@ -34,12 +34,11 @@ const mapFontSize: Record<SupportedMantineSize, 'tiny' | 'small' | 'body'> = {
   lg: 'body',
 };
 
-const StyledBadge = styled(MantineBadge)<{ color: ColorVariant; size: SupportedMantineSize; $clickable?: boolean }>(
-  ({ theme, color, size, $clickable }) => css`
+const StyledBadge = styled(MantineBadge)<{ color: ColorVariant; size: SupportedMantineSize }>(
+  ({ theme, color, size }) => css`
     text-transform: none;
     background-color: ${color};
     color: ${theme.utils.contrastingColor(color)};
-    cursor: ${$clickable ? 'pointer' : 'default'};
 
     .mantine-Badge-label {
       font-size: ${theme.fonts.size[mapFontSize[size]]};
@@ -101,7 +100,7 @@ const Badge = (
     return (
       <StyledBadge
         {...sharedProps}
-        $clickable
+        style={{ cursor: 'pointer', ...style }}
         component="button"
         ref={ref as React.Ref<HTMLButtonElement>}
         onClick={onClick}>
