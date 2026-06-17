@@ -23,9 +23,12 @@ import type {
   SlicingPreferencesJSON,
   TableLayoutPreferences,
   TableLayoutPreferencesJSON,
+  TableLayoutDefaultFiltersJSON,
 } from 'components/common/EntityDataTable/types';
 import UserNotification from 'util/UserNotification';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
+import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
+import { TABLE_LAYOUT_DEFAULT_FILTERS_KEY_SPLITTER } from 'components/common/EntityDataTable/Constants';
 
 const slicingToJSON = (slicing?: SlicingPreferences | null): SlicingPreferencesJSON | null | undefined => {
   if (slicing === null) {
@@ -44,6 +47,13 @@ const slicingToJSON = (slicing?: SlicingPreferences | null): SlicingPreferencesJ
   };
 };
 
+const defaultFiltersToJson = (filters: UrlQueryFilters): TableLayoutDefaultFiltersJSON =>
+  Object.entries(filters.toJS()).reduce((res, [key, values]: [string, Array<string>]) => {
+    const mappedValues = values.map((val) => `${key}${TABLE_LAYOUT_DEFAULT_FILTERS_KEY_SPLITTER}${val}`);
+
+    return res.concat(mappedValues);
+  }, []);
+
 const preferencesToJSON = <T>({
   attributes,
   sort,
@@ -51,12 +61,14 @@ const preferencesToJSON = <T>({
   slicing,
   customPreferences,
   order,
+  defaultFilters,
 }: TableLayoutPreferences<T>): TableLayoutPreferencesJSON<T> => ({
   attributes,
   sort: sort ? { order: sort.direction, field: sort.attributeId } : undefined,
   per_page: perPage,
   slicing: slicingToJSON(slicing),
   custom_preferences: customPreferences,
+  filters: defaultFilters ? defaultFiltersToJson(defaultFilters) : undefined,
   order,
 });
 
