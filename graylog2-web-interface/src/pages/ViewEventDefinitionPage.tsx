@@ -19,15 +19,13 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 
-import { useStore } from 'stores/connect';
 import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import { DocumentTitle, IfPermitted, PageHeader, Spinner, ConfirmDialog } from 'components/common';
 import useCurrentUser from 'hooks/useCurrentUser';
 import EventDefinitionSummary from 'components/event-definitions/event-definition-form/EventDefinitionSummary';
-import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
-import { EventNotificationsActions, EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
+import { useEventNotifications } from 'components/event-notifications/hooks/useEventNotifications';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -35,7 +33,11 @@ import type { EventDefinition } from 'components/event-definitions/event-definit
 import { isSystemEventDefinition, isSigmaEventDefinition } from 'components/event-definitions/event-definitions-types';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import usePluginEntities from 'hooks/usePluginEntities';
-import { useGetEventDefinition } from 'components/event-definitions/hooks/useEventDefinitions';
+import {
+  useEventDefinitionWithContext,
+  copyEventDefinition,
+  EVENT_DEFINITIONS_QUERY_KEY,
+} from 'components/event-definitions/hooks/useEventDefinitions';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
 
 type SigmaEventDefinitionConfig = EventDefinition['config'] & {
@@ -46,7 +48,8 @@ const ViewEventDefinitionPage = () => {
   const params = useParams<{ definitionId?: string }>();
   const currentUser = useCurrentUser();
   const [showDialog, setShowDialog] = useState(false);
-  const { all: notifications } = useStore(EventNotificationsStore);
+  const { data: notificationsData } = useEventNotifications();
+  const notifications = notificationsData?.notifications;
   const history = useHistory();
   const sendTelemetry = useSendTelemetry();
   const navigate = useNavigate();
@@ -61,7 +64,7 @@ const ViewEventDefinitionPage = () => {
     : null;
 
   const queryClient = useQueryClient();
-  const { data, isFetching } = useGetEventDefinition(params.definitionId);
+  const { data, isFetching } = useEventDefinitionWithContext(params.definitionId);
 
   const eventDefinition = useMemo(() => {
     if (!data?.eventDefinition) return null;
@@ -78,10 +81,6 @@ const ViewEventDefinitionPage = () => {
   const { scopePermissions } = useGetPermissionsByScope(eventDefinition);
 
   useEffect(() => {
-    EventNotificationsActions.listAll();
-  }, []);
-
-  useEffect(() => {
     if (!isFetching && !eventDefinition) {
       history.push(Routes.ALERTS.DEFINITIONS.LIST);
     }
@@ -92,15 +91,21 @@ const ViewEventDefinitionPage = () => {
       app_pathname: 'event-definition',
     });
 
-    EventDefinitionsActions.copy(eventDefinition).then((duplicatedEvent: any) => {
-      navigate(Routes.ALERTS.DEFINITIONS.edit(duplicatedEvent.id));
-    });
+    copyEventDefinition(eventDefinition).then(
+      (duplicatedEvent) => {
+        queryClient.invalidateQueries({ queryKey: EVENT_DEFINITIONS_QUERY_KEY });
+        navigate(Routes.ALERTS.DEFINITIONS.edit(duplicatedEvent.id));
+      },
+      () => {
+        // Error feedback is handled by `copyEventDefinition` itself.
+      },
+    );
   };
 
   const onEditEventDefinition = () => navigate(Routes.ALERTS.DEFINITIONS.edit(params.definitionId));
 
   const onSigmaModalClose = () => {
-    queryClient.invalidateQueries({ queryKey: ['get-event-definition', params.definitionId] });
+    queryClient.invalidateQueries({ queryKey: [...EVENT_DEFINITIONS_QUERY_KEY, params.definitionId] });
     setShowSigmaModal(false);
   };
 

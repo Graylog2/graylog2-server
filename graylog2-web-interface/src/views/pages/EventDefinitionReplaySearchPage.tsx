@@ -15,12 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 import useParams from 'routing/useParams';
 import useEventDefinition from 'hooks/useEventDefinition';
 import { Spinner } from 'components/common';
-import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
+import { useEventNotifications } from 'components/event-notifications/hooks/useEventNotifications';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import EventDefinitionReplaySearch from 'components/event-definitions/replay-search/EventDefinitionReplaySearch';
@@ -33,13 +33,9 @@ export const onErrorHandler = (error: FetchError) => {
 };
 
 const EventDefinitionReplaySearchPage = () => {
-  const [isNotificationLoaded, setIsNotificationLoaded] = useState(false);
   const { definitionId } = useParams<{ alertId?: string; definitionId?: string }>();
   const { isLoading: EDIsLoading, isFetched: EDIsFetched, data } = useEventDefinition(definitionId, { onErrorHandler });
-
-  useEffect(() => {
-    EventNotificationsActions.listAll().then(() => setIsNotificationLoaded(true));
-  }, [setIsNotificationLoaded]);
+  const { isFetched: isNotificationLoaded } = useEventNotifications();
 
   const isLoading = EDIsLoading || !EDIsFetched || !isNotificationLoaded;
 
