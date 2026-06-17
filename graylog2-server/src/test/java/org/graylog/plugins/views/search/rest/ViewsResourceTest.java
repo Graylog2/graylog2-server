@@ -274,7 +274,7 @@ public class ViewsResourceTest {
                 SEARCH
         );
 
-        final CreateEntityRequest<ViewDTO> request = CreateEntityRequest.create(TEST_DASHBOARD_VIEW, EntityShareRequest.create(ImmutableMap.of()));
+        final var request = new UnwrappedCreateEntityRequest<>(TEST_DASHBOARD_VIEW, EntityShareRequest.create(ImmutableMap.of()));
 
         assertThatThrownBy(() -> viewsResource.update(VIEW_ID, request, SEARCH_USER))
                 .isInstanceOf(ForbiddenException.class)
@@ -303,7 +303,7 @@ public class ViewsResourceTest {
                 SEARCH
         );
 
-        final CreateEntityRequest<ViewDTO> request = CreateEntityRequest.create(TEST_DASHBOARD_VIEW, EntityShareRequest.create(ImmutableMap.of()));
+        final var request = new UnwrappedCreateEntityRequest<>(TEST_DASHBOARD_VIEW, EntityShareRequest.create(ImmutableMap.of()));
 
         viewsResource.update(VIEW_ID, request, SEARCH_USER);
         verify(viewService).update(TEST_DASHBOARD_VIEW);
