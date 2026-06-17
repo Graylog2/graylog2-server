@@ -78,7 +78,6 @@ const RuleList = ({
   return (
     <DataTable
       id="rule-list"
-      className="table-hover"
       headers={headers}
       headerCellFormatter={headerCellFormatter}
       sortByKey="title"

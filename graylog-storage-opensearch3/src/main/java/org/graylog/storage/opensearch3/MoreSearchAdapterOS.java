@@ -283,7 +283,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
                 events.add(new MoreSearch.Histogram.Bucket(dateTime, eventCount));
             });
 
-            return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(events, alerts));
+            return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(events, alerts), timerange);
         } catch (final OpenSearchException ose) {
             // filter exception cause for invalid queries, suppress exception if it's a parse error
             if(ose.getCause() != null) {

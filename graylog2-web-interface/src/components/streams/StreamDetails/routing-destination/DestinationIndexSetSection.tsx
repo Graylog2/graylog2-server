@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import { ARCHIVE_RETENTION_STRATEGY } from 'stores/indices/IndicesStore';
+import { ARCHIVE_RETENTION_STRATEGY } from 'hooks/useIndices';
 import { Icon, Section, Spinner, LinkContainer } from 'components/common';
 import { Table, Button, Alert } from 'components/bootstrap';
 import Routes from 'routing/Routes';
