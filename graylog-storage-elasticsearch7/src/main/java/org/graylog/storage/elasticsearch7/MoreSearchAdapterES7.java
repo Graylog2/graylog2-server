@@ -223,7 +223,7 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
             if(ese.getCause() != null) {
                 for(var suppressedCause : ese.getCause().getSuppressed()) {
                     if(suppressedCause.getMessage().contains("reason=Failed to parse query")) {
-                        return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(Collections.emptyList(), Collections.emptyList()));
+                        return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(Collections.emptyList(), Collections.emptyList()), timerange);
                     }
                 }
             }

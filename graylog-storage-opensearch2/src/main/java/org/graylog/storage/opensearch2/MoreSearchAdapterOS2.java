@@ -225,7 +225,7 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
             if(ose.getCause() != null) {
                 for(var suppressedCause : ose.getCause().getSuppressed()) {
                     if(suppressedCause.getMessage().contains("reason=Failed to parse query")) {
-                        return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(Collections.emptyList(), Collections.emptyList()));
+                        return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(Collections.emptyList(), Collections.emptyList()), timerange);
                     }
                 }
             }
