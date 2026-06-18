@@ -59,7 +59,14 @@ export type SankeyTrace = {
   orientation: 'h';
   arrangement: 'fixed';
   node: { label: Array<string>; customdata: Array<NodeCustomData>; pad: number; thickness: number };
-  link: { source: Array<number>; target: Array<number>; value: Array<number>; label: Array<string>; color: string };
+  link: {
+    source: Array<number>;
+    target: Array<number>;
+    value: Array<number>;
+    label: Array<string>;
+    color: string;
+    hovercolor: string;
+  };
 };
 
 const STAGE_SEPARATOR = ' ';
@@ -119,6 +126,7 @@ const buildSankeyTrace = (
   displayKeys: Array<Array<string>>,
   allFields: Array<string>,
   linkColor: string,
+  linkHoverColor: string,
 ): SankeyTrace => {
   const nodeIndex = new Map<string, number>();
   const labels: Array<string> = [];
@@ -176,7 +184,7 @@ const buildSankeyTrace = (
     orientation: 'h',
     arrangement: 'fixed',
     node: { label: labels, customdata, pad: 15, thickness: 18 },
-    link: { source, target, value, label, color: linkColor },
+    link: { source, target, value, label, color: linkColor, hovercolor: linkHoverColor },
   };
 };
 
@@ -192,6 +200,10 @@ const SankeyVisualization = makeVisualization(({ config, data }: VisualizationCo
   // contrast (lower index = more contrast), so a value toward the background end keeps the
   // links subtle in both themes — a lighter gray in light mode, a darker gray in dark mode.
   const linkColor = chroma(theme.colors.gray[70]).alpha(0.3).css();
+
+  // On hover, jump to a higher-contrast gray that is nearly opaque so the hovered flow clearly
+  // stands out from the faint resting links (plotly's default only nudges the opacity slightly).
+  const linkHoverColor = chroma(theme.colors.gray[40]).alpha(0.85).css();
 
   const trace = useMemo<SankeyTrace | null>(() => {
     const rowFields = config.rowPivots.flatMap((pivot) => pivot.fields);
@@ -211,8 +223,8 @@ const SankeyVisualization = makeVisualization(({ config, data }: VisualizationCo
 
     const displayKeys = paths.map((path) => path.keys.map((k, i) => String(mapKeys(k, allFields[i]) ?? k)));
 
-    return buildSankeyTrace(paths, displayKeys, allFields, linkColor);
-  }, [config, mapKeys, rows, linkColor]);
+    return buildSankeyTrace(paths, displayKeys, allFields, linkColor, linkHoverColor);
+  }, [config, mapKeys, rows, linkColor, linkHoverColor]);
 
   return (
     <Container>
