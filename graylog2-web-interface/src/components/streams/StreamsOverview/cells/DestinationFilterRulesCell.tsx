@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useRef } from 'react';
 
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import { CountBadge } from 'components/common';
 import useStreamDestinationFilterRuleCount from 'components/streams/hooks/useStreamDestinationFilterRuleCount';
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';

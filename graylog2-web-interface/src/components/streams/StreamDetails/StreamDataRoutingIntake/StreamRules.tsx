@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import { Alert, Table } from 'components/bootstrap';
 import DetailsStreamRule from 'components/streamrules/DetailsStreamRule';
 import { IfPermitted, Section } from 'components/common';

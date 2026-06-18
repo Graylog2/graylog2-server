@@ -19,7 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import type FetchError from 'logic/errors/FetchError';
 import { defaultOnError } from 'util/conditional/onError';
 

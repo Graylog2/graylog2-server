@@ -139,7 +139,7 @@ public abstract class AbstractNodeService<DTO extends NodeDto> implements NodeSe
                 addLastSeenFieldAsDate,
                 new BasicDBObject("$match", Map.of("$expr", Map.of("$lt", List.of("$last_seen_date", Map.of("$subtract", List.of("$$NOW", this.pingTimeout))))))
         ))) {
-            var outdatedIds = stream.map(DTO::id).toList();
+            var outdatedIds = stream.map(NodeDto::id).toList();
 
             if (!outdatedIds.isEmpty()) {
                 db.deleteMany(MongoUtils.stringIdsIn(outdatedIds));
