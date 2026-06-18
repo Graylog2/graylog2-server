@@ -61,7 +61,10 @@ const PipelineDetailsPage = () => {
     });
   }, []);
 
-  const _onConnectionsChange = (updatedConnections: { pipeline: string; streams: Array<string> }, callback: () => void) => {
+  const _onConnectionsChange = (
+    updatedConnections: { pipeline: string; streams: Array<string> },
+    callback: () => void,
+  ) => {
     connectToPipeline(updatedConnections).then(() => callback());
   };
 

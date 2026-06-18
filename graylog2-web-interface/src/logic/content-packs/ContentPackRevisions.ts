@@ -17,9 +17,9 @@
 import ContentPack from 'logic/content-packs/ContentPack';
 
 export default class ContentPackRevisions {
-  private _value = {};
+  private _value: { [revision: number]: ContentPack } = {};
 
-  constructor(contentPackRevision) {
+  constructor(contentPackRevision: { [revision: string]: any }) {
     this._value = Object.fromEntries(
       Object.keys(contentPackRevision).map((rev) => [
         parseInt(rev, 10),
@@ -44,14 +44,14 @@ export default class ContentPackRevisions {
     return Object.values(this._value);
   }
 
-  createNewVersionFromRev(rev) {
+  createNewVersionFromRev(rev: string) {
     return this.contentPack(parseInt(rev, 10))
       .toBuilder()
       .rev(this.latestRevision + 1)
       .build();
   }
 
-  contentPack(revision) {
+  contentPack(revision: number) {
     return this._value[revision];
   }
 }

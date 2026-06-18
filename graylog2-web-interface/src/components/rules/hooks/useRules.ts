@@ -302,7 +302,10 @@ export const fetchRuleMetricsConfig = (): Promise<MetricsConfigType> => {
   return fetch('GET', url).then(
     (response: MetricsConfigType) => response,
     (error: Error) => {
-      UserNotification.error(`Couldn't load rule metrics config: ${error.message}`, "Couldn't load rule metrics config");
+      UserNotification.error(
+        `Couldn't load rule metrics config: ${error.message}`,
+        "Couldn't load rule metrics config",
+      );
 
       throw error;
     },
