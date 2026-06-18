@@ -73,6 +73,14 @@
         <opensearch.latest.mac.jdk.sha512.aarch64>f15a4ae987c1da6e9d12afafde3a95c5ac8c0f35617b6b49e9de1ba0d8eb886d6c1b3f6492dfa0de44996e5a5cde41e6240e05568ec563498a7471c8bd94c044</opensearch.latest.mac.jdk.sha512.aarch64>
 
         <!--
+            OpenSearch ships with its own bundled log4j JARs. To replace them with a patched version,
+            set opensearch.log4j.bundled.version to the log4j version currently bundled in OpenSearch
+            and opensearch.log4j.replacement.version to the newer version that should replace it.
+        -->
+        <opensearch.log4j.bundled.version>2.25.3</opensearch.log4j.bundled.version>
+        <opensearch.log4j.replacement.version>2.25.4</opensearch.log4j.replacement.version>
+
+        <!--
            We don't need to sign anything in this module. This fixes a release build error related to setting
            the <outputDirectory> to a different path: https://issues.apache.org/jira/browse/MGPG-44
         -->
@@ -847,8 +855,10 @@
                             <arguments>
                                 <argument>${project.build.directory}/opensearch</argument>
                                 <argument>${project.build.directory}/log4j-replacement</argument>
-                                <argument>2.25.3</argument>
-                                <argument>2.25.4</argument>
+                                <!-- version currently bundled in OpenSearch, to be replaced -->
+                                <argument>${opensearch.log4j.bundled.version}</argument>
+                                <!-- patched version that replaces the bundled one -->
+                                <argument>${opensearch.log4j.replacement.version}</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -914,27 +924,27 @@
                                 <artifactItem>
                                     <groupId>org.apache.logging.log4j</groupId>
                                     <artifactId>log4j-api</artifactId>
-                                    <version>2.25.4</version>
+                                    <version>${opensearch.log4j.replacement.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.logging.log4j</groupId>
                                     <artifactId>log4j-core</artifactId>
-                                    <version>2.25.4</version>
+                                    <version>${opensearch.log4j.replacement.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.logging.log4j</groupId>
                                     <artifactId>log4j-slf4j2-impl</artifactId>
-                                    <version>2.25.4</version>
+                                    <version>${opensearch.log4j.replacement.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.logging.log4j</groupId>
                                     <artifactId>log4j-jul</artifactId>
-                                    <version>2.25.4</version>
+                                    <version>${opensearch.log4j.replacement.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.logging.log4j</groupId>
                                     <artifactId>log4j-1.2-api</artifactId>
-                                    <version>2.25.4</version>
+                                    <version>${opensearch.log4j.replacement.version}</version>
                                 </artifactItem>
                             </artifactItems>
                             <outputDirectory>${project.build.directory}/log4j-replacement</outputDirectory>
