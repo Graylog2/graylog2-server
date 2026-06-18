@@ -1203,6 +1203,7 @@
                             -Xep:ExposedPrivateType:ERROR
                             -Xep:ListRemoveAmbiguous:ERROR
                             -Xep:RecordComponentAccessorAnnotationConflict:ERROR
+                            -Xep:RecordComponentOverride:ERROR
                             -Xep:ThrowableEqualsHashCode:ERROR
                         </arg>
                     </compilerArgs>
