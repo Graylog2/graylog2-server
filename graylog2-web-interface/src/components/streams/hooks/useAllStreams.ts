@@ -14,11 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { useQuery } from '@tanstack/react-query';
 
-import { singleton } from 'logic/singleton';
 import type { Stream } from 'logic/streams/types';
+import { fetchStreams } from 'api/streams';
 
-const StreamsContext = React.createContext<Array<Stream> | undefined>(undefined);
+export const STREAMS_QUERY_KEY = ['streams', 'all'];
 
-export default singleton('contexts.StreamsContext', () => StreamsContext);
+const useAllStreams = (): {
+  data: Array<Stream> | undefined;
+  isLoading: boolean;
+  refetch: () => void;
+} => {
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: STREAMS_QUERY_KEY,
+    queryFn: fetchStreams,
+  });
+
+  return {
+    data,
+    isLoading,
+    refetch,
+  };
+};
+
+export default useAllStreams;
