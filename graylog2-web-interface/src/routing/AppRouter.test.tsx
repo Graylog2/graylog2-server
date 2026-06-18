@@ -22,6 +22,7 @@ import type { RouteObject } from 'react-router-dom';
 import { createBrowserRouter, createMemoryRouter } from 'react-router-dom';
 import { defaultUser } from 'defaultMockValues';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
+import { dataRouterFuture } from 'reactRouterFutureFlags';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import mockComponent from 'helpers/mocking/MockComponent';
@@ -63,14 +64,6 @@ const AppRouterWithContext = () => (
     </DefaultQueryClientProvider>
   </HotkeysProvider>
 );
-
-const dataRouterFuture = {
-  v7_relativeSplatPath: true,
-  v7_fetcherPersist: true,
-  v7_normalizeFormMethod: true,
-  v7_partialHydration: true,
-  v7_skipActionErrorRevalidation: true,
-} as const;
 
 const setInitialPath = (path: string) => {
   asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) =>

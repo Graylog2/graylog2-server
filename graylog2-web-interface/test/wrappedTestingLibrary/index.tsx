@@ -25,20 +25,13 @@ import DefaultProviders from 'DefaultProviders';
 
 import PreflightWrappingContainer from '../PreflightWrappingContainer';
 import WrappingContainer from '../WrappingContainer';
+import { dataRouterFuture } from '../reactRouterFutureFlags';
 
 export const renderWithWrapper = (Component: React.ReactElement<any>, options?: RenderOptions) =>
   render(Component, {
     wrapper: WrappingContainer,
     ...options,
   });
-
-const dataRouterFuture = {
-  v7_relativeSplatPath: true,
-  v7_fetcherPersist: true,
-  v7_normalizeFormMethod: true,
-  v7_partialHydration: true,
-  v7_skipActionErrorRevalidation: true,
-} as const;
 
 export const renderWithDataRouter = (element: React.ReactElement<any>, options?: RenderOptions) =>
   render(

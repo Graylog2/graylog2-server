@@ -24,6 +24,7 @@ import type { QueryClientConfig } from '@tanstack/react-query';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 
 import DefaultQueryClientProvider from '../DefaultQueryClientProvider';
+import { dataRouterFuture } from '../reactRouterFutureFlags';
 
 const renderHookWithWrapper = <TProps, TResult>(
   callback: (props: TProps) => TResult,
@@ -42,14 +43,6 @@ const renderHookWithWrapper = <TProps, TResult>(
       );
     },
   });
-
-const dataRouterFuture = {
-  v7_relativeSplatPath: true,
-  v7_fetcherPersist: true,
-  v7_normalizeFormMethod: true,
-  v7_partialHydration: true,
-  v7_skipActionErrorRevalidation: true,
-} as const;
 
 const renderHookWithDataRouter = <TProps, TResult>(
   callback: (props: TProps) => TResult,
