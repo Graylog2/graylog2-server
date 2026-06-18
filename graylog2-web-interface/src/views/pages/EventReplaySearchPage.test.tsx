@@ -39,10 +39,10 @@ import type { Stream } from 'logic/streams/types';
 import RightSidebarProvider from 'contexts/RightSidebarProvider';
 import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 
-jest.mock('logic/telemetry/useSendTelemetry');
+jest.mock('logic/telemetry/useSendTelemetry', () => () => jest.fn());
 
 const mockView = createSearch();
-
+jest.mock('util/AppConfig', () => jest.requireActual('util/AppConfig'));
 jest.mock('views/components/Search');
 jest.mock('routing/useParams');
 
