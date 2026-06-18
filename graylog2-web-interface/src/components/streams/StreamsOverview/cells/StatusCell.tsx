@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { useCallback } from 'react';
 
 import { isAnyPermitted } from 'util/PermissionsMixin';
@@ -27,18 +27,18 @@ import type { Stream } from 'stores/streams/StreamsStore';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
-const StatusLabel = styled(Label)<{ $clickable: boolean }>(
-  ({ $clickable }) => css`
-    cursor: ${$clickable ? 'pointer' : 'default'};
-    display: inline-flex;
-    justify-content: center;
-    gap: 4px;
-  `,
-);
+const StatusLabel = styled(Label)``;
+
+const InnerContainer = styled.span`
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+`;
 
 const Spacer = styled.div`
   border-left: 1px solid currentColor;
-  height: 1em;
+  height: 0.8em;
 `;
 
 const _title = (disabled: boolean, disabledChange: boolean, description: string) => {
@@ -88,16 +88,16 @@ const StatusCell = ({ stream }: Props) => {
       bsStyle={stream.disabled ? 'warning' : 'success'}
       onClick={disableChange ? undefined : toggleStreamStatus}
       title={title}
-      aria-label={title}
-      role="button"
-      $clickable={!disableChange}>
-      {stream.disabled ? 'Paused' : 'Running'}
-      {!disableChange && (
-        <>
-          <Spacer />
-          <Icon name={stream.disabled ? 'play_arrow' : 'pause'} />
-        </>
-      )}
+      aria-label={title}>
+      <InnerContainer>
+        {stream.disabled ? 'Paused' : 'Running'}
+        {!disableChange && (
+          <>
+            <Spacer />
+            <Icon name={stream.disabled ? 'play_arrow' : 'pause'} size="xs" />
+          </>
+        )}
+      </InnerContainer>
     </StatusLabel>
   );
 };

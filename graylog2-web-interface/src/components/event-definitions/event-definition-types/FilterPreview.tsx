@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useContext} from 'react';
+import { useMemo, useContext } from 'react';
 import * as Immutable from 'immutable';
 import { useQuery } from '@tanstack/react-query';
 
@@ -37,7 +37,7 @@ import { isPermitted } from 'util/PermissionsMixin';
 import FilterPreviewResults from 'components/event-definitions/event-definition-types/FilterPreviewResults';
 import useDebouncedValue from 'hooks/useDebouncedValue';
 import StreamsContext from 'contexts/StreamsContext';
-import type {Stream} from 'views/stores/StreamsStore';
+import type { Stream } from 'views/stores/StreamsStore';
 
 type FilterPreviewProps = {
   config: EventDefinition['config'];
@@ -88,8 +88,18 @@ const SearchResult = ({
   );
 };
 
-const constructSearch = (config: EventDefinition['config'], searchTypeId: string, queryId: string, streams: Stream[]) => {
-  const combinedStreamsAndCategories = new Set([...config?.streams || [], ...config?.stream_categories?.flatMap(category => streams.filter(s => s.categories.includes(category)).map(s => s.id)) || []]);
+const constructSearch = (
+  config: EventDefinition['config'],
+  searchTypeId: string,
+  queryId: string,
+  streams: Stream[],
+) => {
+  const combinedStreamsAndCategories = new Set([
+    ...(config?.streams || []),
+    ...(config?.stream_categories?.flatMap((category) =>
+      streams.filter((s) => s.categories.includes(category)).map((s) => s.id),
+    ) || []),
+  ]);
   const formattedStreams = [...combinedStreamsAndCategories].map((stream) => ({ type: 'stream', id: stream })) || [];
 
   const queryBuilder = Query.builder()
