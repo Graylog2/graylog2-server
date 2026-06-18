@@ -30,11 +30,16 @@ const StyledListItem = styled(List.Item)<StyledProps>(
   ({ theme, $active, $disabled, $bsStyle, $isInteractive }) => css`
     background-color: ${theme.colors.global.contentBackground};
     border: 0;
+    line-height: 1.25;
     padding: 5px 10px;
+
+    .mantine-List-itemWrapper {
+      display: flex;
+    }
 
     .mantine-List-itemWrapper,
     .mantine-List-itemLabel {
-      display: contents;
+      width: 100%;
     }
 
     &:not(:last-child) {
@@ -166,8 +171,7 @@ const ListGroupItem = (
       $bsStyle={bsStyle}
       $isInteractive={isInteractive}
       onClick={!disabled ? onClick : undefined}
-      onKeyDown={onKeyDown}
-    >
+      onKeyDown={onKeyDown}>
       {header && <div className="list-group-item-heading">{header}</div>}
       {header ? <p className="list-group-item-text">{children}</p> : children}
     </StyledListItem>

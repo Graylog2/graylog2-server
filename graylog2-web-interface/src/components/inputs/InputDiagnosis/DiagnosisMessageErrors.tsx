@@ -43,8 +43,7 @@ const StyledListGroup = styled(ListGroup)(
   `,
 );
 
-const StyledListGroupItem = styled(ListGroupItem)`
-  background-color: transparent;
+const ListItemContent = styled.div`
   display: flex;
 `;
 
@@ -102,30 +101,36 @@ const DiagnosisMessageErrors = ({ messageErrors, inputId }: Props) => {
         Cluster. Click on a category to view the associated messages.
       </StyledP>
       <StyledListGroup>
-        <StyledListGroupItem>
-          <StyledTitle>
-            <LinkCompoment failureType="input" inputId={inputId}>
-              Message Error at Input:
-            </LinkCompoment>
-          </StyledTitle>
-          {messageErrors.failures_inputs_codecs}
-        </StyledListGroupItem>
-        <StyledListGroupItem>
-          <StyledTitle>
-            <LinkCompoment failureType="processing" inputId={inputId}>
-              Message failed to process:
-            </LinkCompoment>
-          </StyledTitle>
-          {messageErrors.failures_processing}
-        </StyledListGroupItem>
-        <StyledListGroupItem>
-          <StyledTitle>
-            <LinkCompoment failureType="indexing" inputId={inputId}>
-              Message failed to index:
-            </LinkCompoment>
-          </StyledTitle>
-          {messageErrors.failures_indexing}
-        </StyledListGroupItem>
+        <ListGroupItem>
+          <ListItemContent>
+            <StyledTitle>
+              <LinkCompoment failureType="input" inputId={inputId}>
+                Message Error at Input:
+              </LinkCompoment>
+            </StyledTitle>
+            {messageErrors.failures_inputs_codecs}
+          </ListItemContent>
+        </ListGroupItem>
+        <ListGroupItem>
+          <ListItemContent>
+            <StyledTitle>
+              <LinkCompoment failureType="processing" inputId={inputId}>
+                Message failed to process:
+              </LinkCompoment>
+            </StyledTitle>
+            {messageErrors.failures_processing}
+          </ListItemContent>
+        </ListGroupItem>
+        <ListGroupItem>
+          <ListItemContent>
+            <StyledTitle>
+              <LinkCompoment failureType="indexing" inputId={inputId}>
+                Message failed to index:
+              </LinkCompoment>
+            </StyledTitle>
+            {messageErrors.failures_indexing}
+          </ListItemContent>
+        </ListGroupItem>
       </StyledListGroup>
     </Section>
   );

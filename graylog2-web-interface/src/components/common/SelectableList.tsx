@@ -21,7 +21,7 @@ import type { SelectInstance } from 'react-select';
 import Select from 'components/common/Select';
 import { Button, ListGroup, ListGroupItem } from 'components/bootstrap';
 
-const StyledListGroupItem = styled(ListGroupItem)`
+const ListItemContent = styled.div`
   display: flex;
   justify-content: space-between;
 `;
@@ -117,12 +117,14 @@ class SelectableList extends React.Component<
 
   render() {
     const formattedOptions = this.props.selectedOptions.map((option, idx) => (
-      <StyledListGroupItem key={`${this._getOptionId(option)}-${idx}`}>
-        <div>{this._getOptionDisplayValue(option)}</div>
-        <Button bsStyle="danger" bsSize="xsmall" onClick={this._onRemoveOption(idx)}>
-          Remove
-        </Button>
-      </StyledListGroupItem>
+      <ListGroupItem key={`${this._getOptionId(option)}-${idx}`}>
+        <ListItemContent>
+          <div>{this._getOptionDisplayValue(option)}</div>
+          <Button bsStyle="danger" bsSize="xsmall" onClick={this._onRemoveOption(idx)}>
+            Remove
+          </Button>
+        </ListItemContent>
+      </ListGroupItem>
     ));
 
     return (

@@ -30,7 +30,6 @@ const StyledListGroupItem = styled(ListGroupItem)<{ $active?: boolean }>(({ them
   const highlightColor = theme.utils.opacify(theme.utils.colorLevel(theme.colors.global.contentBackground, 10), 0.5);
 
   return css`
-    display: flex;
     position: relative;
     cursor: pointer;
     transition: background-color 0.15s ease-in-out;
@@ -39,11 +38,6 @@ const StyledListGroupItem = styled(ListGroupItem)<{ $active?: boolean }>(({ them
     css`
       background-color: ${highlightColor};
 
-      & > .list-group-item {
-        background-color: ${highlightColor};
-        color: ${theme.colors.text.primary};
-      }
-
       a {
         color: inherit;
         text-decoration: none;
@@ -51,6 +45,10 @@ const StyledListGroupItem = styled(ListGroupItem)<{ $active?: boolean }>(({ them
     `}
   `;
 });
+
+const ListItemContent = styled.div`
+  display: flex;
+`;
 
 const FullWidthCol = styled.div`
   flex: 1;
@@ -132,19 +130,21 @@ const SearchResultEntry = ({ item, itemProps, isActive, lastOpened, favorite }: 
 
   return (
     <StyledListGroupItem $active={isActive} {...itemProps}>
-      <TypeColorIndicator $color={typeColor} />
-      <FullWidthCol>
-        <HeaderRow>
-          <EntityType>{StringUtils.toTitleCase(item.type, '_')}</EntityType>
-          {lastOpened ? <RecentBadge>Recent</RecentBadge> : null}
-        </HeaderRow>
+      <ListItemContent>
+        <TypeColorIndicator $color={typeColor} />
+        <FullWidthCol>
+          <HeaderRow>
+            <EntityType>{StringUtils.toTitleCase(item.type, '_')}</EntityType>
+            {lastOpened ? <RecentBadge>Recent</RecentBadge> : null}
+          </HeaderRow>
 
-        <div>
-          {item.title}
-          {item.type === LINK_TYPE && <ExternalIcon name="open_in_new" />}
-          {favorite ? <FavIcon name="star" type="solid" size="xs" /> : null}
-        </div>
-      </FullWidthCol>
+          <div>
+            {item.title}
+            {item.type === LINK_TYPE && <ExternalIcon name="open_in_new" />}
+            {favorite ? <FavIcon name="star" type="solid" size="xs" /> : null}
+          </div>
+        </FullWidthCol>
+      </ListItemContent>
     </StyledListGroupItem>
   );
 };

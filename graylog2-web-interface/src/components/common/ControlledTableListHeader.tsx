@@ -21,10 +21,13 @@ import { ListGroupItem } from 'components/bootstrap';
 
 const StyledListGroupItem = styled(ListGroupItem)(
   ({ theme }) => css`
-    background-color: ${theme.colors.variant.lightest.default};
+    && {
+      background-color: ${theme.colors.variant.lightest.default};
+      padding: 0 15px;
+    }
+
     font-size: ${theme.fonts.size.body};
     color: ${theme.utils.contrastingColor(theme.colors.variant.lightest.default)};
-    padding: 0 15px;
 
     .form-group {
       margin: 0;
