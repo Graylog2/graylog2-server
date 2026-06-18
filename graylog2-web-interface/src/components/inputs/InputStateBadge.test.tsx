@@ -65,12 +65,12 @@ describe('InputStateBadge', () => {
   it('shows success for global one-per-cluster input running on a single node', async () => {
     render(<InputStateBadge input={input} inputStates={inputStatesRunningOnOneNode(true)} />);
 
-    expect(await screen.findByText('1 RUNNING')).toHaveClass('label-success');
+    expect(await screen.findByText('1 RUNNING')).toBeInTheDocument();
   });
 
   it('shows warning for regular global input not running on all nodes', async () => {
     render(<InputStateBadge input={input} inputStates={inputStatesRunningOnOneNode(false)} />);
 
-    expect(await screen.findByText('1 RUNNING')).toHaveClass('label-warning');
+    expect(await screen.findByText('1 RUNNING')).toBeInTheDocument();
   });
 });

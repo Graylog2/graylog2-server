@@ -114,7 +114,7 @@ export class Builder {
     this.errorHandler = undefined;
   }
 
-  setHeader(header, value) {
+  setHeader(header: string, value: string | number | boolean | string[]) {
     this.options = {
       ...this.options,
       [header]: value,
@@ -143,7 +143,7 @@ export class Builder {
     return this;
   }
 
-  formData(body, acceptedMimeType = 'application/json') {
+  formData(body: any, acceptedMimeType = 'application/json') {
     this.body = { body };
 
     this.accept = acceptedMimeType;
@@ -154,7 +154,7 @@ export class Builder {
     return this;
   }
 
-  file(body, mimeType) {
+  file(body: any, mimeType: string) {
     this.body = { body: maybeStringify(body), mimeType: 'application/json' };
     this.accept = mimeType;
 
@@ -173,7 +173,7 @@ export class Builder {
     return this;
   }
 
-  blobFile(body, mimeType) {
+  blobFile(body: any, mimeType: string) {
     this.body = { body: maybeStringify(body), mimeType: 'application/json' };
     this.accept = mimeType;
 
@@ -192,7 +192,7 @@ export class Builder {
     return this;
   }
 
-  plaintext(body) {
+  plaintext(body: any) {
     this.body = { body, mimeType: 'text/plain' };
     this.accept = 'application/json';
 
@@ -203,7 +203,7 @@ export class Builder {
     return this;
   }
 
-  streamingplaintext(body) {
+  streamingplaintext(body: any) {
     this.body = { body, mimeType: 'text/plain' };
     this.accept = 'text/plain';
 
@@ -308,13 +308,13 @@ export function fetchPeriodically<T = unknown>(method: Method, url: string, body
   return queuePromiseIfNotLoggedin(promise)();
 }
 
-export function fetchFile(method, url, body, mimeType = 'text/csv') {
+export function fetchFile(method: Method, url: string, body?: any, mimeType = 'text/csv') {
   const promise = () => new Builder(method, url).file(body, mimeType).build();
 
   return queuePromiseIfNotLoggedin(promise)();
 }
 
-export function fetchBlobFile(method, url, body, mimeType = 'text/csv') {
+export function fetchBlobFile(method: Method, url: string, body?: any, mimeType = 'text/csv') {
   const promise = () => new Builder(method, url).blobFile(body, mimeType).build();
 
   return queuePromiseIfNotLoggedin(promise)();

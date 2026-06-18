@@ -18,7 +18,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { StreamRules } from '@graylog/server-api';
 
-import type { StreamRule } from 'stores/streams/StreamsStore';
+import type { StreamRule } from 'logic/streams/types';
 import UserNotification from 'util/UserNotification';
 
 type StreamRuleData = Pick<StreamRule, 'field' | 'type' | 'value' | 'inverted' | 'description'>;

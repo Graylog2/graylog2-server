@@ -14,18 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { StreamSearchPage } from 'views/pages';
+import { useQuery } from '@tanstack/react-query';
 
-import bindings from './bindings';
+import type { Stream } from 'logic/streams/types';
+import { fetchStreams } from 'api/streams';
 
-describe('bindings.routes', () => {
-  it('Stream search route must be unqualified', () => {
-    const streamSearchPageRoute = bindings.routes.find(({ component }) => component === StreamSearchPage);
+export const STREAMS_QUERY_KEY = ['streams', 'all'];
 
-    if (!streamSearchPageRoute) {
-      throw new Error('Stream search page route was not registered.');
-    }
-
-    expect(streamSearchPageRoute.path).toEqual('/streams/:streamId/search');
+const useAllStreams = (): {
+  data: Array<Stream> | undefined;
+  isLoading: boolean;
+  refetch: () => void;
+} => {
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: STREAMS_QUERY_KEY,
+    queryFn: fetchStreams,
   });
-});
+
+  return {
+    data,
+    isLoading,
+    refetch,
+  };
+};
+
+export default useAllStreams;
