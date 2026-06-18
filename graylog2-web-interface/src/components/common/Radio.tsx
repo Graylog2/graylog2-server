@@ -31,6 +31,10 @@ const StyledLabel = styled.label`
   font-weight: normal;
   cursor: pointer;
   margin-bottom: 0;
+
+  input[type="radio"] { 
+    margin-top: 1px;
+  }
 `;
 
 type Props = React.PropsWithChildren<{
