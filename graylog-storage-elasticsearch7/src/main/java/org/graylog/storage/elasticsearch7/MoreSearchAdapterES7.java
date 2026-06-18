@@ -417,7 +417,8 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
         final Map<String, Double> result = new HashMap<>();
         outerTerms.getBuckets().forEach(bucket -> {
             final var metric = (NumericMetricsAggregation.SingleValue) bucket.getAggregations().get(METRIC_AGGREGATION_NAME);
-            result.put(bucket.getKeyAsString(), metric.value());
+            final double value = metric.value();
+            result.put(bucket.getKeyAsString(), Double.isFinite(value) ? value : 0.0);
         });
         return result;
     }

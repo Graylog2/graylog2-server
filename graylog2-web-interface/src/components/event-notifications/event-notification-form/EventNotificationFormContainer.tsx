@@ -17,10 +17,17 @@
 import React from 'react';
 import clone from 'lodash/clone';
 import cloneDeep from 'lodash/cloneDeep';
+import type { QueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { ConfirmLeaveDialog } from 'components/common';
 import Routes from 'routing/Routes';
-import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
+import {
+  createEventNotification,
+  updateEventNotification,
+  testEventNotification,
+  EVENT_NOTIFICATIONS_QUERY_KEY,
+} from 'components/event-notifications/hooks/useEventNotifications';
 import withHistory from 'routing/withHistory';
 import type CancellablePromise from 'logic/rest/CancellablePromise';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
@@ -46,6 +53,7 @@ type EventNotificationFormContainerProps = {
   formId?: string;
   onSubmit?: (...args: any[]) => void;
   history: any;
+  queryClient: QueryClient;
 };
 
 class EventNotificationFormContainer extends React.Component<
@@ -60,7 +68,7 @@ class EventNotificationFormContainer extends React.Component<
     }
   }
 
-  static defaultProps = {
+  static defaultProps: Partial<EventNotificationFormContainerProps> = {
     action: 'edit',
     notification: {
       title: '',
@@ -72,7 +80,7 @@ class EventNotificationFormContainer extends React.Component<
     onSubmit: () => {},
   };
 
-  constructor(props) {
+  constructor(props: EventNotificationFormContainerProps) {
     super(props);
 
     this.state = {
@@ -90,9 +98,9 @@ class EventNotificationFormContainer extends React.Component<
     }
   }
 
-  private testPromise: CancellablePromise<void>;
+  private testPromise: CancellablePromise<unknown>;
 
-  handleChange = (key, value) => {
+  handleChange = (key: string, value: unknown) => {
     const { notification } = this.state;
     const nextNotification = cloneDeep(notification);
 
@@ -106,7 +114,7 @@ class EventNotificationFormContainer extends React.Component<
   };
 
   handleSubmit = () => {
-    const { action, embedded, onSubmit, history } = this.props;
+    const { action, embedded, onSubmit, history, queryClient } = this.props;
     const { notification } = this.state;
     const currentUser = CurrentUserStore.getInitialState();
 
@@ -115,11 +123,14 @@ class EventNotificationFormContainer extends React.Component<
     let promise;
 
     if (action === 'create') {
-      promise = EventNotificationsActions.create(notification);
+      promise = createEventNotification(notification);
 
       promise
-        .then(() => {
+        .then((response) => {
+          queryClient.invalidateQueries({ queryKey: EVENT_NOTIFICATIONS_QUERY_KEY });
           CurrentUserStore.update(currentUser.currentUser.username);
+
+          return response;
         })
         .then(
           () => {
@@ -137,10 +148,12 @@ class EventNotificationFormContainer extends React.Component<
           },
         );
     } else {
-      promise = EventNotificationsActions.update(notification.id, notification);
+      promise = updateEventNotification(notification.id, notification);
 
       promise.then(
         () => {
+          queryClient.invalidateQueries({ queryKey: EVENT_NOTIFICATIONS_QUERY_KEY });
+
           if (!embedded) {
             history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
           }
@@ -165,7 +178,7 @@ class EventNotificationFormContainer extends React.Component<
     this.setState({ testResult: { isLoading: true }, validation: initialValidation });
     const testResult: TestResult = clone(initialTestResult);
 
-    this.testPromise = EventNotificationsActions.test(notification);
+    this.testPromise = testEventNotification(notification);
 
     this.testPromise
       .then(
@@ -219,4 +232,14 @@ class EventNotificationFormContainer extends React.Component<
   }
 }
 
-export default withHistory(EventNotificationFormContainer);
+const EventNotificationFormContainerWithHistory = withHistory(EventNotificationFormContainer);
+
+const EventNotificationFormContainerWithQueryClient = (
+  props: Omit<EventNotificationFormContainerProps, 'history' | 'queryClient'>,
+) => {
+  const queryClient = useQueryClient();
+
+  return <EventNotificationFormContainerWithHistory {...props} queryClient={queryClient} />;
+};
+
+export default EventNotificationFormContainerWithQueryClient;

@@ -16,7 +16,7 @@
  */
 import asMock from 'helpers/mocking/AsMock';
 import { userList as userOverviewList, admin } from 'fixtures/userOverviews';
-import { UsersActions } from 'stores/users/UsersStore';
+import { loadUsers, loadUsersPaginated } from 'hooks/useUsers';
 import fetch from 'logic/rest/FetchProvider';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn());
@@ -37,7 +37,7 @@ const paginationJSON = {
   count: pagination.count,
 };
 
-describe('UsersStore', () => {
+describe('useUsers', () => {
   afterEach(() => {
     jest.resetAllMocks();
   });
@@ -47,7 +47,7 @@ describe('UsersStore', () => {
       const jsonList = userOverviewList.map((u) => u.toJSON()).toArray();
       asMock(fetch).mockReturnValueOnce(Promise.resolve({ users: jsonList }));
 
-      const result = await UsersActions.loadUsers();
+      const result = await loadUsers();
 
       expect(result).toStrictEqual(userOverviewList);
     });
@@ -67,7 +67,7 @@ describe('UsersStore', () => {
         }),
       );
 
-      const result = await UsersActions.loadUsersPaginated(pagination);
+      const result = await loadUsersPaginated(pagination);
 
       expect(result).toStrictEqual({ list: userOverviewList, adminUser: admin, pagination });
     });
@@ -85,7 +85,7 @@ describe('UsersStore', () => {
         }),
       );
 
-      const result = await UsersActions.loadUsersPaginated(pagination);
+      const result = await loadUsersPaginated(pagination);
 
       expect(result).toStrictEqual({ list: userOverviewList, adminUser: undefined, pagination });
     });
