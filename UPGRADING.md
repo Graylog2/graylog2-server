@@ -87,10 +87,6 @@ names of data lake related metrics change accordingly.
 - Only admins are allowed to create a new API token. Existing tokens are not affected by this change. Also, new tokens
   will expire after 30 days by default.
 
-## Java API Changes
-
-- tbd
-
 ## General REST API Changes
 
 - In Graylog 7.0, an issue was fixed that previously allowed additional unknown JSON properties to be accepted
