@@ -37,7 +37,6 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClientBuilder;
 import software.amazon.awssdk.services.kinesis.KinesisAsyncClient;
 import software.amazon.awssdk.services.kinesis.KinesisAsyncClientBuilder;
 import software.amazon.kinesis.common.ConfigsBuilder;
-import software.amazon.kinesis.common.KinesisClientUtil;
 import software.amazon.kinesis.coordinator.NoOpWorkerStateChangeListener;
 import software.amazon.kinesis.coordinator.Scheduler;
 import software.amazon.kinesis.coordinator.WorkerStateChangeListener;
@@ -107,21 +106,27 @@ public class KinesisConsumer implements Runnable {
     public void run() {
 
         LOG.debug("Starting the Kinesis Consumer.");
-        AwsCredentialsProvider credentialsProvider = awsClientBuilderUtil.createCredentialsProvider(request);
+        AwsCredentialsProvider credentialsProvider = awsClientBuilderUtil.createCredentialsProviderWithStsProxy(request);
 
         final Region region = Region.of(request.region());
 
         final DynamoDbAsyncClientBuilder dynamoDbClientBuilder = DynamoDbAsyncClient.builder();
         awsClientBuilderUtil.initializeBuilder(dynamoDbClientBuilder, request.dynamodbEndpoint(), region, credentialsProvider);
+        dynamoDbClientBuilder.httpClientBuilder(awsClientBuilderUtil.asyncHttpClientBuilder());
         final DynamoDbAsyncClient dynamoClient = dynamoDbClientBuilder.build();
 
         final CloudWatchAsyncClientBuilder cloudwatchClientBuilder = CloudWatchAsyncClient.builder();
         awsClientBuilderUtil.initializeBuilder(cloudwatchClientBuilder, request.cloudwatchEndpoint(), region, credentialsProvider);
+        cloudwatchClientBuilder.httpClientBuilder(awsClientBuilderUtil.asyncHttpClientBuilder());
         final CloudWatchAsyncClient cloudWatchClient = cloudwatchClientBuilder.build();
 
+        // The Kinesis Client Library normally configures the async client through
+        // KinesisClientUtil.createKinesisAsyncClient(), but that installs its own HTTP client builder and would discard
+        // our proxy configuration. We therefore apply the proxy-aware, HTTP/2-enabled builder ourselves.
         final KinesisAsyncClientBuilder kinesisAsyncClientBuilder = KinesisAsyncClient.builder();
         awsClientBuilderUtil.initializeBuilder(kinesisAsyncClientBuilder, request.kinesisEndpoint(), region, credentialsProvider);
-        final KinesisAsyncClient kinesisAsyncClient = KinesisClientUtil.createKinesisAsyncClient(kinesisAsyncClientBuilder);
+        kinesisAsyncClientBuilder.httpClientBuilder(awsClientBuilderUtil.kinesisAsyncHttpClientBuilder());
+        final KinesisAsyncClient kinesisAsyncClient = kinesisAsyncClientBuilder.build();
 
         final String workerId = String.format(Locale.ENGLISH, "graylog-node-%s", nodeId.anonymize());
         LOG.debug("Using workerId [{}].", workerId);
