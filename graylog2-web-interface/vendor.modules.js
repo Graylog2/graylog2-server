@@ -30,7 +30,6 @@ module.exports = [
   'react-dom',
   'react-redux',
   'react-router',
-  'react-router-bootstrap',
   'redux',
   'reflux',
   'reflux-core',
