@@ -72,7 +72,10 @@ const ScatterVisualization = makeVisualization(
 
       return _layouts;
     }, [shapes, getChartLayoutSettingsWithCustomUnits]);
-    const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover({ ...scatterOnClickPopover, config });
+    const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover({
+      ...scatterOnClickPopover,
+      config,
+    });
 
     return (
       <>
