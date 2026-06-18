@@ -837,6 +837,22 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>replace-log4j-in-opensearch</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>org.graylog.datanode.build.ReplaceLog4jJars</mainClass>
+                            <arguments>
+                                <argument>${project.build.directory}/opensearch</argument>
+                                <argument>${project.build.directory}/log4j-patch</argument>
+                                <argument>2.25.3</argument>
+                                <argument>2.25.4</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>generate-csv-docs</id>
                         <phase>prepare-package</phase>
                         <goals>
@@ -885,6 +901,43 @@
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>stage-log4j-patch-jars</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.apache.logging.log4j</groupId>
+                                    <artifactId>log4j-api</artifactId>
+                                    <version>2.25.4</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.logging.log4j</groupId>
+                                    <artifactId>log4j-core</artifactId>
+                                    <version>2.25.4</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.logging.log4j</groupId>
+                                    <artifactId>log4j-slf4j2-impl</artifactId>
+                                    <version>2.25.4</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.logging.log4j</groupId>
+                                    <artifactId>log4j-jul</artifactId>
+                                    <version>2.25.4</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.logging.log4j</groupId>
+                                    <artifactId>log4j-1.2-api</artifactId>
+                                    <version>2.25.4</version>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${project.build.directory}/log4j-patch</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
