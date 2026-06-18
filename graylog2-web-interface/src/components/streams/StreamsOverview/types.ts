@@ -14,17 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import usePluginEntities from 'hooks/usePluginEntities';
 import type { ResolvedInput } from 'hooks/useInputDetails';
 
-import './types';
+export type InputTitleLink<T extends ResolvedInput = ResolvedInput> = T extends ResolvedInput
+  ? { type: T['type']; buildPath: (resolved: T) => string | null }
+  : never;
 
-export const useInputTitleLinkBuilder = (): ((resolved: ResolvedInput) => string | null) => {
-  const builders = usePluginEntities('inputTitleLinks');
-
-  return (resolved: ResolvedInput) => {
-    const builder = builders.find((b) => b.type === resolved.type);
-
-    return builder ? (builder.buildPath as (r: ResolvedInput) => string | null)(resolved) : null;
-  };
-};
+declare module 'graylog-web-plugin/plugin' {
+  interface PluginExports {
+    inputTitleLinks?: Array<InputTitleLink>;
+  }
+}

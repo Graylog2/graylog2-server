@@ -21,6 +21,8 @@ import useEntityTitles from 'hooks/useEntityTitles';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { defaultOnError } from 'util/conditional/onError';
 
+import './types';
+
 /**
  * Map of input-type discriminator → the extra fields that variant carries.
  *
@@ -45,12 +47,6 @@ export type InputDetailsFetcher = {
   type: string;
   fetchDetails: (ids: Array<string>) => Promise<Array<ResolvedInput>>;
 };
-
-declare module 'graylog-web-plugin/plugin' {
-  interface PluginExports {
-    inputDetailsFetchers?: Array<InputDetailsFetcher>;
-  }
-}
 
 export type TypedInput = { id: string; type: string };
 
