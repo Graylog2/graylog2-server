@@ -1199,6 +1199,11 @@
                             -Xep:JavaDurationGetSecondsToToSeconds:ERROR
                             -Xep:StreamResourceLeak:ERROR
                             -Xep:RecordAccessorInCompactConstructor:ERROR
+                            -Xep:BoxingComparator:ERROR
+                            -Xep:ExposedPrivateType:ERROR
+                            -Xep:ListRemoveAmbiguous:ERROR
+                            -Xep:RecordComponentAccessorAnnotationConflict:ERROR
+                            -Xep:ThrowableEqualsHashCode:ERROR
                         </arg>
                     </compilerArgs>
                     <annotationProcessorPaths>
