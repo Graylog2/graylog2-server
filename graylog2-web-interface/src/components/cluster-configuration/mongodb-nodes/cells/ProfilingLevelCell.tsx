@@ -15,11 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import type { ColorVariant } from '@graylog/sawmill';
 
 import { MetricsColumn, MetricsRow, StyledLabel } from '../../shared-components/NodeMetricsLayout';
 import { MongodbProfilingLevel, type MongodbProfilingLevelType } from '../fetchClusterMongodbNodes';
 
-const LEVEL_LABELS: Record<MongodbProfilingLevelType, { label: string; style: string }> = {
+const LEVEL_LABELS: Record<MongodbProfilingLevelType, { label: string; style: ColorVariant }> = {
   [MongodbProfilingLevel.OFF]: { label: 'Off', style: 'default' },
   [MongodbProfilingLevel.SLOW_OPS]: { label: 'Slow Ops', style: 'info' },
   [MongodbProfilingLevel.ALL]: { label: 'All', style: 'warning' },
@@ -35,7 +36,7 @@ const ProfilingLevelCell = ({ profilingLevel }: Props) => {
   }
 
   const levelInfo = LEVEL_LABELS[profilingLevel];
-  const resolvedLevelInfo = levelInfo ?? { label: `Unknown (${profilingLevel})`, style: 'default' };
+  const resolvedLevelInfo: { label: string; style: ColorVariant } = levelInfo ?? { label: `Unknown (${profilingLevel})`, style: 'default' };
 
   return (
     <MetricsColumn>
