@@ -19,12 +19,12 @@ import minBy from 'lodash/minBy';
 import uniqBy from 'lodash/uniqBy';
 
 import type { Rel, ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
-import type { Px, Anchor, PlotlyHTMLElementWithInternals } from 'views/components/visualizations/OnClickPopover/anchors';
-import {
-  clamp01,
-  distToRect,
-  pickNearestElementAnchor,
+import type {
+  Px,
+  Anchor,
+  PlotlyHTMLElementWithInternals,
 } from 'views/components/visualizations/OnClickPopover/anchors';
+import { clamp01, distToRect, pickNearestElementAnchor } from 'views/components/visualizations/OnClickPopover/anchors';
 import dropdownPopover from 'views/components/visualizations/OnClickPopover/dropdownPopover';
 import CartesianOnClickPopoverDropdown from 'views/components/visualizations/OnClickPopover/CartesianOnClickPopoverDropdown';
 import { CANDIDATE_PICK_RADIUS } from 'views/components/visualizations/Constants';

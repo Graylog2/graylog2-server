@@ -22,11 +22,7 @@ import Popover from 'components/common/Popover';
 import { Menu } from 'components/bootstrap';
 import OnClickPopoverValueGroups from 'views/components/visualizations/OnClickPopover/OnClickPopoverValueGroups';
 import PopoverTitle from 'views/components/visualizations/OnClickPopover/PopoverTitle';
-import type {
-  ClickPoint,
-  FieldData,
-  ValueGroups,
-} from 'views/components/visualizations/OnClickPopover/Types';
+import type { ClickPoint, FieldData, ValueGroups } from 'views/components/visualizations/OnClickPopover/Types';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { ActionContext, AdditionalContext } from 'views/logic/ActionContext';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';

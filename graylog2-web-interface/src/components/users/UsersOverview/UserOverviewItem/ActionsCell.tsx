@@ -29,6 +29,8 @@ import { MoreActions } from 'components/common/EntityDataTable';
 
 type Props = {
   user: UserOverview;
+  onDeleted?: () => void;
+  onStatusChange?: () => void;
 };
 
 const ActionsWrapper = styled(ButtonToolbar)`
@@ -68,8 +70,12 @@ const ReadOnlyActions = ({ user }: { user: UserOverview }) => {
 const EditActions = ({
   user,
   user: { username, id, fullName, accountStatus, external, readOnly },
+  onDeleted,
+  onStatusChange,
 }: {
   user: UserOverview;
+  onDeleted: () => void;
+  onStatusChange: () => void;
 }) => {
   const currentUser = useCurrentUser();
   const sendTelemetry = useSendTelemetry();
@@ -82,13 +88,13 @@ const EditActions = ({
 
       // eslint-disable-next-line no-alert
       if (window.confirm(`Do you really want to disable user ${fullName}? All current sessions will be terminated.`)) {
-        UsersDomain.setStatus(id, 'disabled');
+        UsersDomain.setStatus(id, 'disabled').then(() => onStatusChange());
       }
 
       return;
     }
 
-    UsersDomain.setStatus(id, 'enabled');
+    UsersDomain.setStatus(id, 'enabled').then(() => onStatusChange());
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.USERS.USER_ENABLED, {
       app_action_value: 'user-item-enable',
@@ -102,7 +108,7 @@ const EditActions = ({
 
     // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to delete user ${fullName}?`)) {
-      UsersDomain.delete(id, fullName);
+      UsersDomain.delete(id, fullName).then(() => onDeleted());
     }
   };
 
@@ -137,9 +143,15 @@ const EditActions = ({
   );
 };
 
-const ActionsCell = ({ user }: Props) => (
+const ActionsCell = ({ user, onDeleted = () => {}, onStatusChange = () => {} }: Props) => (
   <td>
-    <ActionsWrapper>{user.readOnly ? <ReadOnlyActions user={user} /> : <EditActions user={user} />}</ActionsWrapper>
+    <ActionsWrapper>
+      {user.readOnly ? (
+        <ReadOnlyActions user={user} />
+      ) : (
+        <EditActions user={user} onDeleted={onDeleted} onStatusChange={onStatusChange} />
+      )}
+    </ActionsWrapper>
   </td>
 );
 
