@@ -42,7 +42,7 @@ import type { EventNotification } from 'components/event-notifications/hooks/use
 jest.mock('logic/telemetry/useSendTelemetry', () => () => jest.fn());
 
 const mockView = createSearch();
-
+jest.mock('util/AppConfig', () => jest.requireActual('util/AppConfig'));
 jest.mock('views/components/Search');
 jest.mock('routing/useParams');
 
