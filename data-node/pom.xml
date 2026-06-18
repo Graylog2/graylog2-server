@@ -846,7 +846,7 @@
                             <mainClass>org.graylog.datanode.build.ReplaceLog4jJars</mainClass>
                             <arguments>
                                 <argument>${project.build.directory}/opensearch</argument>
-                                <argument>${project.build.directory}/log4j-patch</argument>
+                                <argument>${project.build.directory}/log4j-replacement</argument>
                                 <argument>2.25.3</argument>
                                 <argument>2.25.4</argument>
                             </arguments>
@@ -904,7 +904,7 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>stage-log4j-patch-jars</id>
+                        <id>stage-log4j-replacement-jars</id>
                         <phase>generate-resources</phase>
                         <goals>
                             <goal>copy</goal>
@@ -937,7 +937,7 @@
                                     <version>2.25.4</version>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>${project.build.directory}/log4j-patch</outputDirectory>
+                            <outputDirectory>${project.build.directory}/log4j-replacement</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
