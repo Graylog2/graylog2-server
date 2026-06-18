@@ -30,6 +30,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import AppConfig from 'util/AppConfig';
 import GlobalContextProviders from 'contexts/GlobalContextProviders';
 import HotkeysProvider from 'contexts/HotkeysProvider';
+import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
 
 import AppRouter from './AppRouter';
 
@@ -53,11 +54,13 @@ jest.mock('components/navigation/HealthStatusBadge', () => () => null);
 
 const AppRouterWithContext = () => (
   <HotkeysProvider>
-    <DefaultProviders>
-      <CurrentUserContext.Provider value={defaultUser}>
-        <AppRouter />
-      </CurrentUserContext.Provider>
-    </DefaultProviders>
+    <DefaultQueryClientProvider>
+      <DefaultProviders>
+        <CurrentUserContext.Provider value={defaultUser}>
+          <AppRouter />
+        </CurrentUserContext.Provider>
+      </DefaultProviders>
+    </DefaultQueryClientProvider>
   </HotkeysProvider>
 );
 

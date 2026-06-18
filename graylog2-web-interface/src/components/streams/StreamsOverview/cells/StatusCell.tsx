@@ -22,8 +22,8 @@ import { isAnyPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { Icon } from 'components/common';
 import { Label } from 'components/bootstrap';
-import { StreamsStore } from 'stores/streams/StreamsStore';
-import type { Stream } from 'stores/streams/StreamsStore';
+import useStreamMutations from 'hooks/useStreamMutations';
+import type { Stream } from 'logic/streams/types';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
@@ -63,6 +63,7 @@ const StatusCell = ({ stream }: Props) => {
   const description = stream.disabled ? 'Paused' : 'Running';
   const title = _title(stream.disabled, disableChange, description);
   const sendTelemetry = useSendTelemetry();
+  const { pauseStream, resumeStream } = useStreamMutations();
 
   const toggleStreamStatus = useCallback(async () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_STATUS_TOGGLED, {
@@ -73,15 +74,16 @@ const StatusCell = ({ stream }: Props) => {
       },
     });
 
+    // The api fns handle the error toast on rejection, so we swallow it here to avoid an unhandled rejection.
     if (stream.disabled) {
-      await StreamsStore.resume(stream.id, (response) => response);
+      await resumeStream(stream.id).catch(() => {});
     }
 
     // eslint-disable-next-line no-alert
     if (!stream.disabled && window.confirm(`Do you really want to pause stream '${stream.title}'?`)) {
-      await StreamsStore.pause(stream.id, (response) => response);
+      await pauseStream(stream.id).catch(() => {});
     }
-  }, [sendTelemetry, stream.disabled, stream.id, stream.title]);
+  }, [sendTelemetry, stream.disabled, stream.id, stream.title, resumeStream, pauseStream]);
 
   return (
     <StatusLabel
