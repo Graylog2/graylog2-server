@@ -198,24 +198,37 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
             LOG.debug("Execute search: {}", searchRequest);
         }
 
-        final SearchResponse searchResult = client.search(searchRequest, "Unable to perform search query");
+        try {
+            final SearchResponse searchResult = client.search(searchRequest, "Unable to perform search query");
 
-        final ParsedDateHistogram histogramResult = searchResult.getAggregations().get(histogramAggregationName);
-        final var histogramBuckets = histogramResult.getBuckets();
+            final ParsedDateHistogram histogramResult = searchResult.getAggregations().get(histogramAggregationName);
+            final var histogramBuckets = histogramResult.getBuckets();
 
-        final var alerts = new ArrayList<MoreSearch.Histogram.Bucket>(histogramBuckets.size());
-        final var events = new ArrayList<MoreSearch.Histogram.Bucket>(histogramBuckets.size());
+            final var alerts = new ArrayList<MoreSearch.Histogram.Bucket>(histogramBuckets.size());
+            final var events = new ArrayList<MoreSearch.Histogram.Bucket>(histogramBuckets.size());
 
-        histogramBuckets.forEach(bucket -> {
-            final var parsedTerms = (ParsedTerms) bucket.getAggregations().get(termsAggregationName);
-            final var dateTime = (ZonedDateTime) bucket.getKey();
-            final var alertCount = Optional.ofNullable(parsedTerms.getBucketByKey("true")).map(MultiBucketsAggregation.Bucket::getDocCount).orElse(0L);
-            final var eventCount = Optional.ofNullable(parsedTerms.getBucketByKey("false")).map(MultiBucketsAggregation.Bucket::getDocCount).orElse(0L);
-            alerts.add(new MoreSearch.Histogram.Bucket(dateTime, alertCount));
-            events.add(new MoreSearch.Histogram.Bucket(dateTime, eventCount));
-        });
+            histogramBuckets.forEach(bucket -> {
+                final var parsedTerms = (ParsedTerms) bucket.getAggregations().get(termsAggregationName);
+                final var dateTime = (ZonedDateTime) bucket.getKey();
+                final var alertCount = Optional.ofNullable(parsedTerms.getBucketByKey("true")).map(MultiBucketsAggregation.Bucket::getDocCount).orElse(0L);
+                final var eventCount = Optional.ofNullable(parsedTerms.getBucketByKey("false")).map(MultiBucketsAggregation.Bucket::getDocCount).orElse(0L);
+                alerts.add(new MoreSearch.Histogram.Bucket(dateTime, alertCount));
+                events.add(new MoreSearch.Histogram.Bucket(dateTime, eventCount));
+            });
 
-        return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(events, alerts), timerange);
+            return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(events, alerts), timerange);
+        } catch (final Exception ex) {
+            // in case of an invalid query entered in the search box, we want to return an empty result set
+            if(ex.getCause() != null) {
+                for(Throwable suppressed : ex.getCause().getSuppressed()) {
+                    if(suppressed.getMessage().contains("Failed to parse query")) {
+                        return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(Collections.emptyList(), Collections.emptyList()), timerange);
+                    }
+                }
+            }
+            // re-throw unexpected exceptions
+            throw ex;
+        }
     }
 
     private QueryBuilder createQuery(String queryString, TimeRange timerange, Set<String> eventStreams, String filterString,
