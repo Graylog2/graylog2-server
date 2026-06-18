@@ -23,10 +23,10 @@ import org.graylog.plugins.views.search.IndexRangeContainsOneOfStreams;
 import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
-import org.graylog.plugins.views.search.searchtypes.pivot.buckets.NumberRange;
 import org.graylog.plugins.views.search.errors.EmptyParameterError;
 import org.graylog.plugins.views.search.errors.SearchException;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.NumberRange;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.results.ResultMessage;
@@ -42,8 +42,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.ZoneId;
-import java.util.Collection;
 import java.time.ZonedDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -241,10 +241,20 @@ public class MoreSearch {
                 groupByField, termsField, maxBuckets, maxSubBuckets, includeTerms);
     }
 
-    public Map<String, Long> aggregateTerms(String queryString, TimeRange timeRange,
-                                            String termsField, int maxBuckets) {
-        return aggregateTerms(queryString, timeRange, termsField, maxBuckets, Set.of());
+    public Map<String, Map<String, Map<String, Long>>> aggregateDoubleGroupedTerms(
+            String queryString, TimeRange timeRange,
+            String primaryGroupBy, String secondaryGroupBy, String termsField,
+            int maxPrimaryBuckets, int maxSecondaryBuckets, int maxTerms,
+            Collection<String> includeTerms) {
+        final Set<String> affectedIndices = getAffectedIndices(Set.of(), timeRange);
+        if (affectedIndices == null || affectedIndices.isEmpty()) {
+            return Map.of();
+        }
+        return moreSearchAdapter.aggregateDoubleGroupedTerms(queryString, timeRange, affectedIndices,
+                primaryGroupBy, secondaryGroupBy, termsField,
+                maxPrimaryBuckets, maxSecondaryBuckets, maxTerms, includeTerms);
     }
+
 
     public Map<String, Long> aggregateTerms(String queryString, TimeRange timeRange,
                                             String termsField, int maxBuckets,
@@ -255,12 +265,6 @@ public class MoreSearch {
         }
         return moreSearchAdapter.aggregateTerms(queryString, timeRange, affectedIndices,
                 termsField, maxBuckets, includeTerms);
-    }
-
-    public Map<String, Double> aggregateGroupedMetric(String queryString, TimeRange timeRange,
-                                                      String groupByField, MoreSearchAdapter.AggregationType metricType,
-                                                      String metricField, int maxBuckets) {
-        return aggregateGroupedMetric(queryString, timeRange, groupByField, metricType, metricField, maxBuckets, Set.of());
     }
 
     public Map<String, Double> aggregateGroupedMetric(String queryString, TimeRange timeRange,

@@ -96,6 +96,7 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
     private static final String histogramAggregationName = "histogram";
     private static final String slicesAggregationName = "slices";
     private static final String GROUP_BY_AGGREGATION_NAME = "group_by";
+    private static final String SUB_GROUP_BY_AGGREGATION_NAME = "sub_group_by";
     private static final String SUB_TERMS_AGGREGATION_NAME = "sub_terms";
     private static final String METRIC_AGGREGATION_NAME = "metric";
 
@@ -380,6 +381,37 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
         outerTerms.getBuckets().forEach(outerBucket -> {
             final ParsedTerms subTerms = outerBucket.getAggregations().get(SUB_TERMS_AGGREGATION_NAME);
             result.put(outerBucket.getKeyAsString(), extractTermsBucketCounts(subTerms));
+        });
+        return result;
+    }
+
+    @Override
+    public Map<String, Map<String, Map<String, Long>>> aggregateDoubleGroupedTerms(
+            String queryString, TimeRange timerange, Set<String> affectedIndices,
+            String primaryGroupBy, String secondaryGroupBy, String termsField,
+            int maxPrimaryBuckets, int maxSecondaryBuckets, int maxTerms,
+            Collection<String> includeTerms) {
+        final var filter = createSimpleQuery(queryString, timerange);
+        final var primaryAgg = AggregationBuilders.terms(GROUP_BY_AGGREGATION_NAME).field(primaryGroupBy).size(maxPrimaryBuckets);
+        if (includeTerms != null && !includeTerms.isEmpty()) {
+            primaryAgg.includeExclude(new IncludeExclude(includeTerms.toArray(String[]::new), null));
+        }
+        final var aggregation = primaryAgg.subAggregation(
+                AggregationBuilders.terms(SUB_GROUP_BY_AGGREGATION_NAME).field(secondaryGroupBy).size(maxSecondaryBuckets)
+                        .subAggregation(AggregationBuilders.terms(SUB_TERMS_AGGREGATION_NAME).field(termsField).size(maxTerms)));
+
+        final SearchResponse searchResult = executeAggregation(filter, affectedIndices, aggregation);
+        final ParsedTerms outerTerms = searchResult.getAggregations().get(GROUP_BY_AGGREGATION_NAME);
+
+        final Map<String, Map<String, Map<String, Long>>> result = new HashMap<>();
+        outerTerms.getBuckets().forEach(primaryBucket -> {
+            final ParsedTerms secondaryTerms = primaryBucket.getAggregations().get(SUB_GROUP_BY_AGGREGATION_NAME);
+            final Map<String, Map<String, Long>> secondaryMap = new HashMap<>();
+            secondaryTerms.getBuckets().forEach(secondaryBucket -> {
+                final ParsedTerms termBuckets = secondaryBucket.getAggregations().get(SUB_TERMS_AGGREGATION_NAME);
+                secondaryMap.put(secondaryBucket.getKeyAsString(), extractTermsBucketCounts(termBuckets));
+            });
+            result.put(primaryBucket.getKeyAsString(), secondaryMap);
         });
         return result;
     }
