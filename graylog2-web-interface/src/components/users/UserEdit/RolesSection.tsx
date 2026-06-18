@@ -18,9 +18,10 @@ import * as React from 'react';
 import { useState, useCallback } from 'react';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
+import { useQueryClient } from '@tanstack/react-query';
 
-import UsersDomain from 'domainActions/users/UsersDomain';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
+import { USERS_QUERY_KEY } from 'hooks/useUsers';
 import { ErrorAlert } from 'components/common';
 import type User from 'logic/users/User';
 import type { DescriptiveItem } from 'components/common/PaginatedItemOverview';
@@ -42,6 +43,7 @@ const Container = styled.div`
 
 const RolesSection = ({ user, onSubmit }: Props) => {
   const { username, id } = user;
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
   const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles | undefined>();
   const [errors, setErrors] = useState<string | undefined>();
@@ -62,7 +64,7 @@ const RolesSection = ({ user, onSubmit }: Props) => {
   const onRolesUpdate = (data: { roles: Array<string> }) =>
     onSubmit(data).then(() => {
       _onLoad().then(setPaginatedRoles);
-      UsersDomain.load(id);
+      queryClient.invalidateQueries({ queryKey: [...USERS_QUERY_KEY, id] });
     });
 
   const _onAssignRole = (newRoles: Immutable.Set<DescriptiveItem>) => {
@@ -75,7 +77,8 @@ const RolesSection = ({ user, onSubmit }: Props) => {
     return onRolesUpdate({ roles: newUserRoles });
   };
 
-  const ensureReaderOrAdminRole = (newRoles) => newRoles.includes('Reader') || newRoles.includes('Admin');
+  const ensureReaderOrAdminRole = (newRoles: Array<string>) =>
+    newRoles.includes('Reader') || newRoles.includes('Admin');
 
   const onDeleteRole = (role: DescriptiveItem) => {
     const newUserRoles = Immutable.Set(user.roles.toJS()).remove(role.name).toJS();

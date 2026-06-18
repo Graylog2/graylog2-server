@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import useEntityTitles from 'hooks/useEntityTitles';
 import { Link, Spinner } from 'components/common';
 import { ListGroup, ListGroupItem } from 'components/bootstrap';
@@ -31,7 +31,7 @@ const ExpandedRoutingPipelinesSection = ({ stream }: Props) => {
   const { metrics, isInitialLoading, isError } = useStreamMetricsFor(stream.id);
   const pipelineIds = metrics?.routing_pipelines;
 
-  const titleEntities = (pipelineIds ?? []).map((id) => ({ id, type: 'pipelines' }));
+  const titleEntities = (pipelineIds ?? []).map((id) => ({ id, type: 'pipeline_processor_pipelines' }));
   const { titlesById, isInitialLoading: areTitlesLoading } = useEntityTitles(titleEntities);
 
   if (isInitialLoading && !pipelineIds) {

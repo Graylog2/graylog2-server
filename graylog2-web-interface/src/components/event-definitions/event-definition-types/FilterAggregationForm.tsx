@@ -22,7 +22,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Col, ControlLabel, FormGroup, Input, Radio, Row } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
-import type { Stream } from 'views/stores/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import type User from 'logic/users/User';
 import type { EventDefinitionValidation } from 'components/event-definitions/types';
 

@@ -23,6 +23,7 @@ import heatmap from './heatmap/bindings';
 import lineChart from './line/bindings';
 import singleNumber from './number/bindings';
 import pieChart from './pie/bindings';
+import sankey from './sankey/bindings';
 import scatterChart from './scatter/bindings';
 import worldMap from './worldmap/bindings';
 
@@ -34,6 +35,7 @@ const visualizationBindings: Array<VisualizationType<any>> = [
   lineChart,
   singleNumber,
   pieChart,
+  sankey,
   scatterChart,
   worldMap,
 ];
