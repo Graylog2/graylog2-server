@@ -92,6 +92,7 @@ const Slicing = ({
         sliceCol={sliceCol}
         columnSchemas={columnSchemas}
         onChangeSlicing={onChangeSlicing}
+        isSlicingReadOnly={slicingPreferences?.readOnly}
       />
       <SlicesOverview
         key={sliceCol ?? 'no-slice'}
