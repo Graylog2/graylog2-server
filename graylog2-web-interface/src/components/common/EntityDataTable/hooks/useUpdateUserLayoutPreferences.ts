@@ -82,12 +82,18 @@ const preferencesUrl = (entityTableId: string, layoutVariant?: string) => {
 
 const useUpdateUserLayoutPreferences = <T>(entityTableId: string, layoutVariant?: string) => {
   const { data: userLayoutPreferences = {}, refetch } = useUserLayoutPreferences(entityTableId, layoutVariant);
+  const url = preferencesUrl(entityTableId, layoutVariant);
   const mutationFn = (newPreferences: TableLayoutPreferences<T>) =>
     fetch(
       'POST',
-      preferencesUrl(entityTableId, layoutVariant),
+      url,
       preferencesToJSON({ ...userLayoutPreferences, ...newPreferences }),
     );
+  const resetMutationFn = () =>
+    fetch(
+      'DELETE',
+      url
+    )
   const { mutateAsync } = useMutation({
     mutationFn,
     onError: (error) => {
@@ -95,8 +101,15 @@ const useUpdateUserLayoutPreferences = <T>(entityTableId: string, layoutVariant?
     },
     onSuccess: () => refetch(),
   });
+  const { mutateAsync: resetAsync } = useMutation({
+    mutationFn: resetMutationFn,
+    onError: (error) => {
+      UserNotification.error(`Updating table layout preferences failed with error: ${error}`);
+    },
+    onSuccess: () => refetch(),
+  });
 
-  return { mutateAsync };
+  return { mutateAsync, resetAsync };
 };
 
 export default useUpdateUserLayoutPreferences;
