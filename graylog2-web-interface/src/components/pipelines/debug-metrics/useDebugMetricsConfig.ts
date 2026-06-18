@@ -14,11 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
-import { useStore } from 'stores/connect';
-import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
-import type { MetricsConfigType } from 'stores/rules/RulesStore';
+import {
+  useRuleMetricsConfig,
+  updateRuleMetricsConfig,
+  RULE_METRICS_CONFIG_QUERY_KEY,
+} from 'components/rules/hooks/useRules';
+import type { MetricsConfigType } from 'components/rules/hooks/useRules';
 
 export type UseDebugMetricsConfig = {
   metricsEnabled: boolean;
@@ -32,19 +35,19 @@ type Options = {
 };
 
 const useDebugMetricsConfig = ({ loadOnMount = true }: Options = {}): UseDebugMetricsConfig => {
-  const metricsConfig = useStore(RulesStore, (state) => state?.metricsConfig);
-
-  useEffect(() => {
-    if (loadOnMount) {
-      RulesActions.loadMetricsConfig();
-    }
-  }, [loadOnMount]);
+  const queryClient = useQueryClient();
+  const { data: metricsConfig, isInitialLoading, refetch } = useRuleMetricsConfig({ enabled: loadOnMount });
 
   return {
     metricsEnabled: !!metricsConfig?.metrics_enabled,
-    isLoading: metricsConfig === undefined,
-    refresh: () => RulesActions.loadMetricsConfig(),
-    disable: () => RulesActions.updateMetricsConfig({ metrics_enabled: false } as MetricsConfigType),
+    isLoading: loadOnMount && isInitialLoading,
+    refresh: () => refetch(),
+    disable: () =>
+      updateRuleMetricsConfig({ metrics_enabled: false } as MetricsConfigType).then((response) => {
+        queryClient.invalidateQueries({ queryKey: RULE_METRICS_CONFIG_QUERY_KEY });
+
+        return response;
+      }),
   };
 };
 

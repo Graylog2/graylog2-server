@@ -26,7 +26,7 @@ import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
-import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
+import { getEventDefinition } from 'components/event-definitions/hooks/useEventDefinitions';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import useHistory from 'routing/useHistory';
 import useQuery from 'routing/useQuery';
@@ -47,13 +47,12 @@ const EditEventDefinitionPage = () => {
 
   useEffect(() => {
     if (isPermitted(currentUser.permissions, `eventdefinitions:edit:${params.definitionId}`)) {
-      EventDefinitionsActions.get(params.definitionId).then(
-        (response: any) => {
-          const eventDefinitionResponse = response.event_definition;
+      getEventDefinition(params.definitionId).then(
+        (response) => {
+          const eventDefinitionResponse = response.eventDefinition;
 
           // Inject an internal "_is_scheduled" field to indicate if the event definition should be scheduled in the
-          // backend. This field will be removed in the event definitions store before sending an event definition
-          // back to the server.
+          // backend. This field will be removed again before sending an event definition back to the server.
           eventDefinitionResponse.config._is_scheduled = response.context.scheduler.is_scheduled;
           setEventDefinition(eventDefinitionResponse);
         },

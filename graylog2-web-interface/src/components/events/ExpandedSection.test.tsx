@@ -35,7 +35,7 @@ jest.mock('components/common/PaginatedEntityTable', () => ({
   useTableFetchContext: jest.fn(),
 }));
 jest.mock('components/event-definitions/hooks/useEventDefinitions', () => ({
-  useGetEventDefinition: () => ({
+  useEventDefinitionWithContext: () => ({
     data: { eventDefinition: { event_procedure: '' } },
     isFetching: false,
   }),
