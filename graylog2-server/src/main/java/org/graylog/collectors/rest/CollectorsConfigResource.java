@@ -67,8 +67,8 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * Manages the collector ingest configuration. Bound in both on-prem and Cloud nodes; the only behavioral difference is
- * that in Cloud the ingest endpoint is server-provisioned (the client-supplied {@code http} is ignored and derived from
- * the node's external URI) and there is no persisted ingest input — so the input-management endpoints are
+ * that in Cloud the ingest endpoint is server-provisioned (the client-supplied http ingest config is ignored and derived
+ * from the node's external URI) and there is no persisted ingest input — so the input-management endpoints are
  * {@link HideOnCloud hidden in Cloud} and {@code PUT} never creates an input. The in-memory ingest input is launched in
  * Cloud by {@code CloudCollectorIngestService}, activated by the config save below.
  */
