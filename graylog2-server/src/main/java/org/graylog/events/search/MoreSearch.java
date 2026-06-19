@@ -241,21 +241,6 @@ public class MoreSearch {
                 groupByField, termsField, maxBuckets, maxSubBuckets, includeTerms);
     }
 
-    public Map<String, Map<String, Map<String, Long>>> aggregateDoubleGroupedTerms(
-            String queryString, TimeRange timeRange,
-            String primaryGroupBy, String secondaryGroupBy, String termsField,
-            int maxPrimaryBuckets, int maxSecondaryBuckets, int maxTerms,
-            Collection<String> includeTerms) {
-        final Set<String> affectedIndices = getAffectedIndices(Set.of(), timeRange);
-        if (affectedIndices == null || affectedIndices.isEmpty()) {
-            return Map.of();
-        }
-        return moreSearchAdapter.aggregateDoubleGroupedTerms(queryString, timeRange, affectedIndices,
-                primaryGroupBy, secondaryGroupBy, termsField,
-                maxPrimaryBuckets, maxSecondaryBuckets, maxTerms, includeTerms);
-    }
-
-
     public Map<String, Long> aggregateTerms(String queryString, TimeRange timeRange,
                                             String termsField, int maxBuckets,
                                             Collection<String> includeTerms) {

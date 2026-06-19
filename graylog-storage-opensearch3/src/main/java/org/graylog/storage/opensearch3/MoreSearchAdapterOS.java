@@ -87,7 +87,6 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
     private static final String HISTOGRAM_AGGREGATION_NAME = "histogram";
     private static final String SLICES_AGGREGATION_NAME = "slices";
     private static final String GROUP_BY_AGGREGATION_NAME = "group_by";
-    private static final String SUB_GROUP_BY_AGGREGATION_NAME = "sub_group_by";
     private static final String SUB_TERMS_AGGREGATION_NAME = "sub_terms";
     private static final String METRIC_AGGREGATION_NAME = "metric";
 
@@ -411,44 +410,6 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
                 (key, docCount, bucketAggs) -> {
                     final Map<String, Long> subCounts = extractTermsBucketCounts(bucketAggs.get(SUB_TERMS_AGGREGATION_NAME));
                     result.put(key, subCounts);
-                });
-        return result;
-    }
-
-    @Override
-    public Map<String, Map<String, Map<String, Long>>> aggregateDoubleGroupedTerms(
-            String queryString, TimeRange timerange, Set<String> affectedIndices,
-            String primaryGroupBy, String secondaryGroupBy, String termsField,
-            int maxPrimaryBuckets, int maxSecondaryBuckets, int maxTerms,
-            Collection<String> includeTerms) {
-        final var filter = createSimpleQuery(queryString, timerange);
-        final var aggregation = Aggregation.builder()
-                .terms(terms -> {
-                    terms.field(primaryGroupBy).size(maxPrimaryBuckets);
-                    if (includeTerms != null && !includeTerms.isEmpty()) {
-                        terms.include(inc -> inc.terms(includeTerms.stream().toList()));
-                    }
-                    return terms;
-                })
-                .aggregations(SUB_GROUP_BY_AGGREGATION_NAME, Aggregation.of(a -> a
-                        .terms(t -> t.field(secondaryGroupBy).size(maxSecondaryBuckets))
-                        .aggregations(SUB_TERMS_AGGREGATION_NAME, Aggregation.of(b -> b
-                                .terms(t -> t.field(termsField).size(maxTerms))))))
-                .build();
-
-        final var searchResult = executeAggregation(filter, affectedIndices, GROUP_BY_AGGREGATION_NAME, aggregation);
-
-        final Map<String, Map<String, Map<String, Long>>> result = new HashMap<>();
-        forEachTermsBucket(searchResult.aggregations().get(GROUP_BY_AGGREGATION_NAME),
-                (primaryKey, primaryDocCount, primaryAggs) -> {
-                    final Map<String, Map<String, Long>> secondaryMap = new HashMap<>();
-                    forEachTermsBucket(primaryAggs.get(SUB_GROUP_BY_AGGREGATION_NAME),
-                            (secondaryKey, secondaryDocCount, secondaryAggs) -> {
-                                final Map<String, Long> termCounts =
-                                        extractTermsBucketCounts(secondaryAggs.get(SUB_TERMS_AGGREGATION_NAME));
-                                secondaryMap.put(secondaryKey, termCounts);
-                            });
-                    result.put(primaryKey, secondaryMap);
                 });
         return result;
     }

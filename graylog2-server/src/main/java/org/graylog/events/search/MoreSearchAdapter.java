@@ -82,21 +82,6 @@ public interface MoreSearchAdapter {
                                                          Collection<String> includeTerms);
 
     /**
-     * Groups documents by {@code primaryGroupBy}, then by {@code secondaryGroupBy} within each primary
-     * bucket, then performs a terms sub-aggregation on {@code termsField}. Returns the nested counts.
-     * <p>
-     * Used when a metric needs three axes — e.g. forwarder input × forwarder node × stream — that
-     * can't be expressed with the two-level {@link #aggregateGroupedTerms}.
-     *
-     * @return map of primary key → (secondary key → (term key → doc count))
-     */
-    Map<String, Map<String, Map<String, Long>>> aggregateDoubleGroupedTerms(
-            String queryString, TimeRange timerange, Set<String> affectedIndices,
-            String primaryGroupBy, String secondaryGroupBy, String termsField,
-            int maxPrimaryBuckets, int maxSecondaryBuckets, int maxTerms,
-            Collection<String> includeTerms);
-
-    /**
      * Performs a terms aggregation on {@code termsField} and returns the doc count per term.
      * <p>
      * Pass the requested IDs as {@code includeTerms} when aggregating on multi-valued fields.
