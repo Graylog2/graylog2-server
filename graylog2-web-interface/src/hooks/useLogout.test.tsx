@@ -22,7 +22,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import DefaultProviders from 'DefaultProviders';
 import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
 import userEvent from '@testing-library/user-event';
-import { dataRouterFuture } from 'reactRouterFutureFlags';
+import { dataRouterFuture, routerProviderFuture } from 'reactRouterFutureFlags';
 
 import Routes from 'routing/Routes';
 import { usePluginExports } from 'views/test/testPlugins';
@@ -54,7 +54,7 @@ const Wrapper = () => (
       initialIndex: 0,
       future: dataRouterFuture,
     })}
-    future={{ v7_startTransition: true }}
+    future={routerProviderFuture}
   />
 );
 

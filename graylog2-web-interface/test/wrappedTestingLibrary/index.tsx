@@ -25,7 +25,7 @@ import DefaultProviders from 'DefaultProviders';
 
 import PreflightWrappingContainer from '../PreflightWrappingContainer';
 import WrappingContainer from '../WrappingContainer';
-import { dataRouterFuture } from '../reactRouterFutureFlags';
+import { dataRouterFuture, routerProviderFuture } from '../reactRouterFutureFlags';
 
 export const renderWithWrapper = (Component: React.ReactElement<any>, options?: RenderOptions) =>
   render(Component, {
@@ -37,7 +37,7 @@ export const renderWithDataRouter = (element: React.ReactElement<any>, options?:
   render(
     <RouterProvider
       router={createMemoryRouter([{ path: '/', element }], { future: dataRouterFuture })}
-      future={{ v7_startTransition: true }}
+      future={routerProviderFuture}
     />,
     {
       wrapper: DefaultProviders,
