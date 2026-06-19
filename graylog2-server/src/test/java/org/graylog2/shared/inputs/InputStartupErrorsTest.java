@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import javax.net.ssl.SSLException;
 import java.net.BindException;
 import java.net.UnknownHostException;
+import java.security.cert.CertificateException;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -106,6 +107,23 @@ class InputStartupErrorsTest {
 
         assertThat(result).contains("0.0.0.0").contains("4317")
                 .contains("no suitable certificate found");
+    }
+
+    @Test
+    void certificateExceptionWithAddress() {
+        final var input = mockInputWithAddress("0.0.0.0", 4317);
+        // A malformed/garbage certificate fails during parsing rather than during SSL context build,
+        // so the root cause is a CertificateException (a GeneralSecurityException), not an SSLException.
+        // Netty wraps the parse failure, so model it as a nested cause here.
+        final var exception = new MisfireException("Failed to start gRPC server",
+                new IllegalArgumentException("Input stream does not contain valid certificates.",
+                        new CertificateException("found no certificates in input stream")));
+
+        final String result = InputStartupErrors.describeFailure(input, exception);
+
+        assertThat(result).contains("0.0.0.0").contains("4317")
+                .contains("TLS configuration error")
+                .contains("found no certificates in input stream");
     }
 
     @Test

@@ -24,6 +24,7 @@ import javax.annotation.Nullable;
 import javax.net.ssl.SSLException;
 import java.net.BindException;
 import java.net.UnknownHostException;
+import java.security.GeneralSecurityException;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -65,7 +66,12 @@ public class InputStartupErrors {
             return host != null ? f("Unknown host '%s'.", host) : "Unknown host.";
         }
 
-        if (root instanceof SSLException && hasAddress) {
+        // SSLException covers build-time TLS failures (e.g. a private key that does not match the
+        // certificate), while GeneralSecurityException (the parent of CertificateException) covers
+        // certificate/key parsing and validation failures - the most common operator mistake. The two
+        // are unrelated type hierarchies (java.io.IOException vs java.security.GeneralSecurityException),
+        // so both must be checked to catch all TLS misconfigurations.
+        if ((root instanceof SSLException || root instanceof GeneralSecurityException) && hasAddress) {
             return f("TLS configuration error on %s:%d. %s",
                     bindAddress, port, ExceptionUtils.getRootCauseOrMessage(e));
         }
