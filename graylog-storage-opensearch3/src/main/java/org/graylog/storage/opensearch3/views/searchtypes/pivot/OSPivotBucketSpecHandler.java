@@ -26,7 +26,6 @@ import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentile;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
-import org.graylog2.indexer.fieldtypes.FieldTypeMapper;
 import org.opensearch.client.opensearch._types.SortOrder;
 import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 
@@ -109,16 +108,6 @@ public abstract class OSPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
         return ordering.isEmpty()
                 ? new SortOrders(List.of(defaultOrder), Map.of())
                 : new SortOrders(ordering, Map.copyOf(sortingAggregations));
-    }
-
-    private boolean isSortOnNumericPivotField(Pivot pivot, PivotSort pivotSort, IndexerGeneratedQueryContext<?> queryContext, Query query) {
-        return queryContext.fieldType(query.effectiveStreams(pivot), pivotSort.field())
-                .filter(this::isNumericFieldType)
-                .isPresent();
-    }
-
-    private boolean isNumericFieldType(String fieldType) {
-        return FieldTypeMapper.isNumericType(fieldType);
     }
 
     public abstract Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpecs, PivotBucket previousBucket);

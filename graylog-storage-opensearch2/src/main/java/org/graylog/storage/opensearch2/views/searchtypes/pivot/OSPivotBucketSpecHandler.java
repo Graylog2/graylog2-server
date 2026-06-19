@@ -30,7 +30,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggrega
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.BucketOrder;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
-import org.graylog2.indexer.fieldtypes.FieldTypeMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,16 +90,6 @@ public abstract class OSPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
         return ordering.isEmpty()
                 ? new SortOrders(List.of(defaultOrder), List.of())
                 : new SortOrders(ordering, List.copyOf(sortingAggregations));
-    }
-
-    private boolean isSortOnNumericPivotField(Pivot pivot, PivotSort pivotSort, IndexerGeneratedQueryContext<?> queryContext, Query query) {
-        return queryContext.fieldType(query.effectiveStreams(pivot), pivotSort.field())
-                .filter(this::isNumericFieldType)
-                .isPresent();
-    }
-
-    private boolean isNumericFieldType(String fieldType) {
-        return FieldTypeMapper.isNumericType(fieldType);
     }
 
     public abstract Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpecs, PivotBucket previousBucket);

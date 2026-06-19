@@ -24,6 +24,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.B
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.MaxAggregationBuilder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.buckets.ESValuesHandler;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -35,7 +36,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class ESPivotBucketSpecHandlerTest {
-    private final ESValuesHandler handler = new ESValuesHandler();
+    private ESValuesHandler handler;
+
+    @BeforeEach
+    void setUp() {
+        handler = new ESValuesHandler();
+    }
 
     private ESPivotBucketSpecHandler.SortOrders orderListForSortOnPivotField(String fieldType) {
         final PivotSort pivotSort = PivotSort.create("somefield", SortSpec.Direction.Ascending);

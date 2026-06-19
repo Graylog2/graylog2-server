@@ -22,6 +22,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.buckets.OSValuesHandler;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.client.opensearch._types.SortOrder;
 
@@ -34,7 +35,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class OSPivotBucketSpecHandlerTest {
-    private final OSValuesHandler handler = new OSValuesHandler();
+    private OSValuesHandler handler;
+
+    @BeforeEach
+    void setUp() {
+        handler = new OSValuesHandler();
+    }
 
     private OSPivotBucketSpecHandler.SortOrders orderListForSortOnPivotField(String fieldType) {
         final PivotSort pivotSort = PivotSort.create("somefield", SortSpec.Direction.Ascending);

@@ -24,6 +24,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.BucketO
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.MaxAggregationBuilder;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.OSValuesHandler;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -35,7 +36,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class OSPivotBucketSpecHandlerTest {
-    private final OSValuesHandler handler = new OSValuesHandler();
+    private OSValuesHandler handler;
+
+    @BeforeEach
+    void setUp() {
+        handler = new OSValuesHandler();
+    }
 
     private OSPivotBucketSpecHandler.SortOrders orderListForSortOnPivotField(String fieldType) {
         final PivotSort pivotSort = PivotSort.create("somefield", SortSpec.Direction.Ascending);
