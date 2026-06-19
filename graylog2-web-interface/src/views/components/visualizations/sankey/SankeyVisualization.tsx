@@ -21,8 +21,10 @@ import chroma from 'chroma-js';
 
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
-import type { Key, Row } from 'views/logic/searchtypes/pivot/PivotHandler';
+import type { Key } from 'views/logic/searchtypes/pivot/PivotHandler';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
+import type { LeafPath } from 'views/components/visualizations/utils/extractLeafPaths';
+import extractLeafPaths from 'views/components/visualizations/utils/extractLeafPaths';
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
 import sankeyOnClickPopover from 'views/components/visualizations/sankey/sankeyOnClickPopover';
 
@@ -50,8 +52,6 @@ const EmptyState = styled.div(
   `,
 );
 
-type LeafPath = { keys: Array<Key>; value: number };
-
 export type NodeCustomData = { field: string; value: Key };
 
 export type SankeyTrace = {
@@ -63,56 +63,6 @@ export type SankeyTrace = {
 };
 
 const STAGE_SEPARATOR = ' ';
-
-const extractLeafPaths = (
-  rows: ReadonlyArray<Row>,
-  columnFieldCount: number,
-  metricName: string | undefined,
-): Array<LeafPath> => {
-  const paths: Array<LeafPath> = [];
-
-  rows.forEach((row) => {
-    if (row.source !== 'leaf') return;
-
-    if (metricName === undefined) {
-      const colChildren = (row.values ?? []).filter((v) => v.source === 'col-leaf');
-
-      if (columnFieldCount > 0 && colChildren.length > 0) {
-        colChildren.forEach((value) => {
-          const colKeys = value.key.length === columnFieldCount + 1 ? value.key.slice(0, -1) : value.key;
-
-          if (colKeys.length !== columnFieldCount) return;
-
-          paths.push({
-            keys: [...row.key, ...colKeys],
-            value: 1,
-          });
-        });
-      } else if (row.key.length > 0) {
-        paths.push({ keys: [...row.key], value: 1 });
-      }
-
-      return;
-    }
-
-    row.values.forEach((value) => {
-      if (value.source !== 'col-leaf' && value.source !== 'row-leaf') return;
-      if (value.key.length !== columnFieldCount + 1) return;
-      if (value.key[value.key.length - 1] !== metricName) return;
-
-      const numericValue = Number(value.value);
-
-      if (!Number.isFinite(numericValue) || numericValue <= 0) return;
-
-      paths.push({
-        keys: [...row.key, ...value.key.slice(0, -1)],
-        value: numericValue,
-      });
-    });
-  });
-
-  return paths;
-};
 
 const buildSankeyTrace = (
   paths: Array<LeafPath>,
