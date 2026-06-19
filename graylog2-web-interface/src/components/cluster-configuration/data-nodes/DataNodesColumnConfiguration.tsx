@@ -63,7 +63,7 @@ export const createColumnDefinitions = (): Array<ColumnSchema> => [
   { id: 'storage', title: 'Storage', sortable: false, isDerived: true },
 ];
 
-const getLabels = (roles: Array<string>) =>
+const getRoleLabels = (roles: Array<string>) =>
   roles.map((role) => (
     <span key={role}>
       <Label bsSize="xs">{role}</Label>&nbsp;
@@ -163,7 +163,7 @@ export const createColumnRenderers = (productName: string): ColumnRenderers<Clus
       minWidth: 200,
     },
     opensearch_roles: {
-      renderCell: (_value, entity) => getLabels(getDataNodeRoles(entity)),
+      renderCell: (_value, entity) => getRoleLabels(getDataNodeRoles(entity)),
       minWidth: 220,
     },
   },
