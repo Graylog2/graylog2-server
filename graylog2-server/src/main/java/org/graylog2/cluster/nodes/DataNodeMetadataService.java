@@ -14,12 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration;
+package org.graylog2.cluster.nodes;
 
-import org.graylog.datanode.OpensearchDistribution;
+import jakarta.annotation.Nullable;
 
-import java.util.List;
+import java.util.Optional;
 
-public interface OpensearchVersionSelector {
-    OpensearchDistribution select(final List<OpensearchDistribution> candidates);
+public interface DataNodeMetadataService {
+
+    void setOpensearchVersions(String nodeId, String currentVersion, @Nullable String latestAvailableVersion);
+
+    Optional<DataNodeMetadata> findByNodeId(String nodeId);
+
+    OpensearchVersionsOverview getVersionsOverview();
 }

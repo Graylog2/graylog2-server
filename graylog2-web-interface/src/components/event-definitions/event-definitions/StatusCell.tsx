@@ -35,9 +35,6 @@ import { isSystemEventDefinition } from '../event-definitions-types';
 const StatusLabel = styled(Label)<{ $clickable: boolean }>(
   ({ $clickable }) => css`
     cursor: ${$clickable ? 'pointer' : 'default'};
-    display: inline-flex;
-    justify-content: center;
-    gap: 4px;
   `,
 );
 
