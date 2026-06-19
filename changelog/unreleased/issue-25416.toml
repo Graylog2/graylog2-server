@@ -1,0 +1,5 @@
+type = "f"
+message = "Improve input startup failure messages on the Input Diagnosis page with actionable details including bind address, port, and exception-specific guidance."
+
+issues = ["25416"]
+pulls = ["25663"]
