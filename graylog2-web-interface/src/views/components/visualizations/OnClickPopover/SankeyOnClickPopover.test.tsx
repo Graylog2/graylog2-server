@@ -23,6 +23,7 @@ import Popover from 'components/common/Popover';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
 import type { ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
 import SankeyOnClickPopover from 'views/components/visualizations/OnClickPopover/SankeyOnClickPopover';
@@ -33,7 +34,14 @@ import type { ActionContexts } from 'views/types';
 // focus on how SankeyOnClickPopover turns a clicked node/link into selectable values.
 jest.mock('views/components/actions/ActionDropdown', () => ({
   __esModule: true,
-  default: () => <div data-testid="action-dropdown">actions</div>,
+  default: ({ handlerArgs }: { handlerArgs?: { contexts?: { valuePath?: unknown; valuePathOperator?: string } } }) => (
+    <div
+      data-testid="action-dropdown"
+      data-value-path={JSON.stringify(handlerArgs?.contexts?.valuePath ?? null)}
+      data-value-path-operator={handlerArgs?.contexts?.valuePathOperator ?? ''}>
+      actions
+    </div>
+  ),
 }));
 
 const fieldTypes: FieldTypes = { all: Immutable.List(), currentQuery: Immutable.List() };
@@ -158,6 +166,37 @@ describe('SankeyOnClickPopover', () => {
 
       // Single value, so no back button and no value-selection step.
       expect(screen.queryByRole('button', { name: /back/i })).not.toBeInTheDocument();
+    });
+  });
+
+  describe('for a network graph node', () => {
+    const networkConfig = AggregationWidgetConfig.builder()
+      .rowPivots([Pivot.createValues(['source'])])
+      .columnPivots([Pivot.createValues(['target'])])
+      .series([new Series('count()')])
+      .visualization('network')
+      .build();
+    const networkActionContext = { widget: { config: { visualization: 'network' } } } as unknown as ActionContexts;
+    const networkNode = { customdata: { field: 'source', value: 'a' }, label: 'a' } as unknown as ClickPoint;
+
+    it('targets the node value across all configured groupings, combined with OR', async () => {
+      render(
+        <FieldTypesContext.Provider value={fieldTypes}>
+          <ActionContext.Provider value={networkActionContext}>
+            <Popover opened withinPortal={false}>
+              <Popover.Target>
+                <button type="button">target</button>
+              </Popover.Target>
+              <SankeyOnClickPopover clickPoint={networkNode} config={networkConfig} onPopoverClose={jest.fn()} />
+            </Popover>
+          </ActionContext.Provider>
+        </FieldTypesContext.Provider>,
+      );
+
+      const dropdown = await screen.findByTestId('action-dropdown');
+
+      expect(dropdown).toHaveAttribute('data-value-path-operator', 'OR');
+      expect(JSON.parse(dropdown.getAttribute('data-value-path'))).toEqual([{ source: 'a' }, { target: 'a' }]);
     });
   });
 
