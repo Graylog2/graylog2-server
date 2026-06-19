@@ -126,7 +126,7 @@
         <commons-validator.version>1.10.1</commons-validator.version>
         <commons-io.version>2.22.0</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
-        <error-prone.version>2.49.0</error-prone.version>
+        <error-prone.version>2.50.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
         <gcs.version>2.69.0</gcs.version>
         <azure-blob-storage.version>12.34.0</azure-blob-storage.version>
@@ -134,7 +134,7 @@
         <geoip2.version>5.1.0</geoip2.version>
         <grizzly-websockets.version>4.0.2</grizzly-websockets.version> <!-- Should match the version used by Jersey -->
         <grok.version>0.1.9-graylog-3</grok.version>
-        <grpc.version>1.81.0</grpc.version>
+        <grpc.version>1.82.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>33.6.0-jre</guava.version>
         <guice.version>7.0.0</guice.version>
@@ -169,7 +169,7 @@
         <mongojack.version>5.1.0</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.2.15.Final</netty.version>
-        <netty-tcnative-boringssl-static.version>2.0.78.Final</netty-tcnative-boringssl-static.version>
+        <netty-tcnative-boringssl-static.version>2.0.79.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>5.4.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.63.0</opentelemetry.version>
@@ -177,7 +177,7 @@
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.18</pkts.version>
         <prometheus-client.version>0.16.0</prometheus-client.version>
-        <protobuf.version>4.35.0</protobuf.version>
+        <protobuf.version>4.35.1</protobuf.version>
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>3.0.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
@@ -194,7 +194,7 @@
         <syslog4j.version>0.9.63</syslog4j.version>
         <threeten-extra.version>1.9.0</threeten-extra.version>
         <ulid.version>8.3.0</ulid.version>
-        <unboundid-ldap.version>7.0.4</unboundid-ldap.version>
+        <unboundid-ldap.version>7.0.5</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.1.1</validation-api.version>
         <zstd.version>1.5.7-10</zstd.version>
@@ -774,7 +774,7 @@
                         <dependency>
                             <groupId>org.openrewrite</groupId>
                             <artifactId>rewrite-java</artifactId>
-                            <version>8.84.8</version>
+                            <version>8.84.9</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
@@ -1199,6 +1199,12 @@
                             -Xep:JavaDurationGetSecondsToToSeconds:ERROR
                             -Xep:StreamResourceLeak:ERROR
                             -Xep:RecordAccessorInCompactConstructor:ERROR
+                            -Xep:BoxingComparator:ERROR
+                            -Xep:ExposedPrivateType:ERROR
+                            -Xep:ListRemoveAmbiguous:ERROR
+                            -Xep:RecordComponentAccessorAnnotationConflict:ERROR
+                            -Xep:RecordComponentOverride:ERROR
+                            -Xep:ThrowableEqualsHashCode:ERROR
                         </arg>
                     </compilerArgs>
                     <annotationProcessorPaths>
