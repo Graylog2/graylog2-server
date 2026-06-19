@@ -19,11 +19,13 @@ import { useState, useEffect } from 'react';
 import type * as Immutable from 'immutable';
 
 import type Role from 'logic/roles/Role';
-import type { PaginatedUsers } from 'stores/users/UsersStore';
+import type { PaginatedUsers } from 'hooks/useUsers';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { DataTable, PaginatedList, Spinner, NoSearchResult } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import type AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
+import type UserOverview from 'logic/users/UserOverview';
+import type { Pagination } from 'stores/PaginationTypes';
 
 import SyncedUsersOverviewItem from './SyncedUsersOverviewItem';
 import SyncedUsersFilter from './SyncedUsersFilter';
@@ -35,7 +37,7 @@ const DEFAULT_PAGINATION = {
   query: '',
 };
 
-const _headerCellFormatter = (header) => {
+const _headerCellFormatter = (header: string) => {
   switch (header.toLowerCase()) {
     case 'actions':
       return <th className="actions text-right">{header}</th>;
@@ -44,7 +46,12 @@ const _headerCellFormatter = (header) => {
   }
 };
 
-const _loadSyncedTeams = (authBackendId, pagination, setLoading, setPaginatedUsers) => {
+const _loadSyncedTeams = (
+  authBackendId: string,
+  pagination: Pagination,
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>,
+  setPaginatedUsers: React.Dispatch<React.SetStateAction<PaginatedUsers | undefined>>,
+) => {
   setLoading(true);
 
   AuthenticationDomain.loadUsersPaginated(authBackendId, pagination).then((paginatedUsers) => {
@@ -74,7 +81,7 @@ const SyncedUsersSection = ({ roles, authenticationBackend }: Props) => {
     return <Spinner />;
   }
 
-  const _userOverviewItem = (user) => <SyncedUsersOverviewItem user={user} roles={roles} />;
+  const _userOverviewItem = (user: UserOverview) => <SyncedUsersOverviewItem user={user} roles={roles} />;
 
   return (
     <SectionComponent title="Synchronized Users" showLoading={loading}>
@@ -85,7 +92,6 @@ const SyncedUsersSection = ({ roles, authenticationBackend }: Props) => {
         onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}
         useQueryParameter={false}>
         <DataTable
-          className="table-hover"
           customFilter={
             <SyncedUsersFilter
               onSearch={(newQuery) => setPagination({ ...pagination, query: newQuery, page: DEFAULT_PAGINATION.page })}

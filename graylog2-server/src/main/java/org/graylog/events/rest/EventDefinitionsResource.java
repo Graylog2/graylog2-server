@@ -69,6 +69,7 @@ import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.processor.EventProcessorParameters;
 import org.graylog.events.processor.EventProcessorParametersWithTimerange;
 import org.graylog.events.processor.EventResolver;
+import org.graylog.events.processor.TacticsTechniquesValidator;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.scheduler.schedule.CronUtils;
@@ -147,7 +148,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                     .filterable(true)
                     .filterOptions(DBEntitySourceService.FILTER_OPTIONS)
                     .build()
-            // Note: `tags` is not listed here — see comment on dbQueryCreator below.
+            // Note: `tags` and `tactics_techniques` are not listed here — see comment on dbQueryCreator below.
     );
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
@@ -165,6 +166,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     private final BulkExecutor<EventDefinitionDto, UserContext> bulkUnscheduleExecutor;
     private final EventResolver eventResolver;
     private final EntitySharesService entitySharesService;
+    private final TacticsTechniquesValidator tacticsTechniquesValidator;
 
     @Inject
     public EventDefinitionsResource(DBEventDefinitionService dbService,
@@ -176,7 +178,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                     ObjectMapper objectMapper,
                                     EventResolver eventResolver,
                                     EventDefinitionConfiguration eventDefinitionConfiguration,
-                                    EntitySharesService entitySharesService
+                                    EntitySharesService entitySharesService,
+                                    TacticsTechniquesValidator tacticsTechniquesValidator
     ) {
         this.dbService = dbService;
         this.eventDefinitionHandler = eventDefinitionHandler;
@@ -188,14 +191,18 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         // Including it in both places would cause a duplicate column.
         // extraSearchFields makes `tags:phishing` work in the search bar (OR-joined by SearchQueryParser)
         // while the filter UI applies multi-tag AND via the predicate in `getPage`.
+        // tactics_techniques is also registered here so API search (`tactics_techniques:T1059`) works,
+        // without exposing it as a default column on the Event Definitions list (gated to enterprise UI).
         this.dbQueryCreator = new DbQueryCreator(EventDefinitionDto.FIELD_TITLE, attributes,
-                Map.of(EventDefinitionDto.FIELD_TAGS, SearchQueryField.create(EventDefinitionDto.FIELD_TAGS)));
+                Map.of(EventDefinitionDto.FIELD_TAGS, SearchQueryField.create(EventDefinitionDto.FIELD_TAGS),
+                       EventDefinitionDto.FIELD_TACTICS_TECHNIQUES, SearchQueryField.create(EventDefinitionDto.FIELD_TACTICS_TECHNIQUES)));
         this.recentActivityService = recentActivityService;
         this.bulkDeletionExecutor = new SequentialBulkExecutor<>(this::delete, auditEventSender, objectMapper);
         this.bulkScheduleExecutor = new SequentialBulkExecutor<>(this::schedule, auditEventSender, objectMapper);
         this.bulkUnscheduleExecutor = new SequentialBulkExecutor<>(this::unschedule, auditEventSender, objectMapper);
         this.eventResolver = eventResolver;
         this.entitySharesService = entitySharesService;
+        this.tacticsTechniquesValidator = tacticsTechniquesValidator;
     }
 
     @GET
@@ -355,6 +362,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         checkEventDefinitionPermissions(dto, "create");
 
         final ValidationResult result = dto.validate(null, eventDefinitionConfiguration, userContext);
+        tacticsTechniquesValidator.validate(dto, result);
         if (result.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
         }
@@ -388,6 +396,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         checkProcessorConfig(oldDto, dto);
 
         final ValidationResult result = dto.validate(oldDto, eventDefinitionConfiguration, userContext);
+        tacticsTechniquesValidator.validate(dto, result);
         if (!definitionId.equals(dto.id())) {
             result.addError("id", "Event definition IDs don't match");
         }
@@ -563,12 +572,13 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @NoAuditEvent("Validation only")
     @Operation(summary = "Validate an event definition")
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
-    public ValidationResult validate(@RequestBody(required = true)
+    public ValidationResult validateEventDefinition(@RequestBody(required = true)
                                          @Valid @NotNull EventDefinitionDto toValidate,
                                      @Context UserContext userContext) {
         EventProcessorConfig oldConfig = dbService.get(toValidate.id()).map(EventDefinition::config).orElse(null);
         ValidationResult validationResult = toValidate.config().validate(userContext);
         validationResult.addAll(toValidate.config().validate(userContext, oldConfig, eventDefinitionConfiguration));
+        tacticsTechniquesValidator.validate(toValidate, validationResult);
         return validationResult;
     }
 
@@ -577,7 +587,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @NoAuditEvent("Validation only")
     @Operation(summary = "Validate a cron expression")
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_READ)
-    public CronValidationResponse validate(@RequestBody(required = true)
+    public CronValidationResponse validateEventDefinitionCronExpression(@RequestBody(required = true)
                                            @Valid @NotNull CronValidationRequest toValidate) {
         try {
             CronUtils.validateExpression(toValidate.expression());

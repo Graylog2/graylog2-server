@@ -28,6 +28,7 @@ type Props = {
   readOnly: Role['readOnly'];
   roleId: Role['id'];
   roleName: Role['name'];
+  onDeleted?: () => void;
 };
 
 const ActionsWrapper = styled.div`
@@ -35,7 +36,12 @@ const ActionsWrapper = styled.div`
   justify-content: flex-end;
 `;
 
-const _deleteRole = (roleId: Role['id'], roleName: Role['name'], setDeleting: (deleting: boolean) => void) => {
+const _deleteRole = (
+  roleId: Role['id'],
+  roleName: Role['name'],
+  setDeleting: (deleting: boolean) => void,
+  onDeleted?: () => void,
+) => {
   let confirmMessage = `Do you really want to delete role "${roleName}"?`;
   const getOneUser = { page: 1, perPage: 1, query: '' };
   setDeleting(true);
@@ -49,6 +55,8 @@ const _deleteRole = (roleId: Role['id'], roleName: Role['name'], setDeleting: (d
     if (window.confirm(confirmMessage)) {
       AuthzRolesDomain.delete(roleId, roleName).then(() => {
         setDeleting(false);
+
+        if (onDeleted) onDeleted();
       });
     } else {
       setDeleting(false);
@@ -56,7 +64,7 @@ const _deleteRole = (roleId: Role['id'], roleName: Role['name'], setDeleting: (d
   });
 };
 
-const ActionsCell = ({ roleId, roleName, readOnly }: Props) => {
+const ActionsCell = ({ roleId, roleName, readOnly, onDeleted }: Props) => {
   const [deleting, setDeleting] = useState(false);
 
   return (
@@ -78,7 +86,7 @@ const ActionsCell = ({ roleId, roleName, readOnly }: Props) => {
                 bsStyle="danger"
                 bsSize="xs"
                 title={`Delete role ${roleName}`}
-                onClick={() => _deleteRole(roleId, roleName, setDeleting)}
+                onClick={() => _deleteRole(roleId, roleName, setDeleting, onDeleted)}
                 type="button">
                 {deleting ? <Spinner text="Deleting" delay={0} /> : 'Delete'}
               </Button>

@@ -139,6 +139,14 @@ public class EventDefinitionDtoTest {
     }
 
     @Test
+    public void testTacticsTechniquesCanonicalizedToUpperCaseOnBuild() {
+        final EventDefinitionDto dto = testSubject.toBuilder()
+                .tacticsTechniques(ImmutableList.of("ta0002", "T1059", "t1059.001"))
+                .build();
+        assertThat(dto.tacticsTechniques()).containsExactly("TA0002", "T1059", "T1059.001");
+    }
+
+    @Test
     public void testValidEventDefinitionWithKeySpecInFieldSpec() {
         final EventFieldSpec fieldSpecMock = mock(EventFieldSpec.class);
         final EventDefinitionDto invalidEventDefinition = testSubject.toBuilder()
@@ -273,6 +281,25 @@ public class EventDefinitionDtoTest {
         final ValidationResult validationResult = validate(invalid);
         assertThat(validationResult.failed()).isTrue();
         assertThat(validationResult.getErrors()).containsKey("tags");
+    }
+
+    @Test
+    public void invalidTacticsTechniquesAreAllReportedInOneMessage() {
+        final EventDefinitionDto invalid = testSubject.toBuilder()
+                .tacticsTechniques(ImmutableList.of("TA0002", "bogus", "also-bad", "T1059"))
+                .build();
+        final ValidationResult validationResult = validate(invalid);
+        assertThat(validationResult.failed()).isTrue();
+        assertThat(validationResult.getErrors()).containsKey("tactics_techniques");
+        final var errors = (java.util.List<String>) validationResult.getErrors().get("tactics_techniques");
+        assertThat(errors).hasSize(1);
+        // Inputs are uppercased by TacticsTechniquesNormalizer before validation, so the
+        // error message reflects the canonical (upper-cased) form.
+        assertThat(errors.get(0))
+                .contains("\"BOGUS\"")
+                .contains("\"ALSO-BAD\"")
+                .doesNotContain("\"TA0002\"")
+                .doesNotContain("\"T1059\"");
     }
 
     @Test

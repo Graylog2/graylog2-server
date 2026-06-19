@@ -31,7 +31,7 @@ import { Timestamp } from 'components/common';
 import type { ColumnRenderersByAttribute, EntityBase } from 'components/common/EntityDataTable/types';
 import EventDefinitionLink from 'components/events/events/EventDefinitionLink';
 import RemediationSteps from 'components/events/ReplaySearchSidebar/RemediationSteps';
-import TagsCell from 'components/events/TagsCell';
+import ChipsCell from 'components/common/ChipsCell';
 import useAppendTagFilter from 'components/events/useAppendTagFilter';
 
 const EventDefinitionRenderer = ({
@@ -95,7 +95,7 @@ const TimeRangeRenderer = ({ eventData }: { eventData: Event }) =>
 export const TagsRenderer = ({ tags }: { tags: ReadonlyArray<string> | undefined | null }) => {
   const onTagClick = useAppendTagFilter();
 
-  return <TagsCell tags={tags} onTagClick={onTagClick} />;
+  return <ChipsCell items={tags} onItemClick={onTagClick} itemLabel="tag" />;
 };
 
 export const eventTypeAttribute = {

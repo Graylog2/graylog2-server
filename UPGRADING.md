@@ -35,3 +35,9 @@ API clients still calling these will now receive a `404`. Use the following endp
 - `GET /licenses/status/paginated` for a paginated list of license statuses.
 - `GET /licenses/validity/for-subject` to check license validity for a subject.
 
+## Java API Changes
+
+| File/method                                                               | Description |
+|---------------------------------------------------------------------------|-------------|
+| `org.graylog2.contentpacks.facades.EntityWithExcerptFacade#resolveGrants` | removed     |
+

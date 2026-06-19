@@ -31,7 +31,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import type User from 'logic/users/User';
-import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
+import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 import EventDefinitionValidationSummary from './EventDefinitionValidationSummary';
@@ -63,6 +63,9 @@ const EventDefinitionSummary = ({
 }: Props) => {
   const [showValidation, setShowValidation] = useState<boolean>(false);
   const pluggableEventProcedureSummary = usePluginEntities('views.components.eventProcedureSummary');
+  const tacticsTechniquesSummaryPlugin = usePluginEntities('eventDefinitions.components.tacticsTechniquesSummary')[0];
+  const tacticsTechniquesSummaryEnabled =
+    tacticsTechniquesSummaryPlugin?.useCondition?.() ?? !!tacticsTechniquesSummaryPlugin;
   const {
     data: { valid: validSecurityLicense },
   } = usePluggableLicenseCheck('/license/security');
@@ -86,11 +89,20 @@ const EventDefinitionSummary = ({
         <dt>Description</dt>
         <dd>{eventDefinition.description || 'No description given'}</dd>
         <dt>Priority</dt>
-        <dd>{upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</dd>
+        <dd>
+          {upperFirst(
+            EventDefinitionPriorityEnum.properties[
+              eventDefinition.priority as keyof typeof EventDefinitionPriorityEnum.properties
+            ].name,
+          )}
+        </dd>
         <dt>Tags</dt>
         <dd>
           <TagList tags={eventDefinition.tags} emptyFallback={<em>No tags</em>} />
         </dd>
+        {tacticsTechniquesSummaryEnabled && tacticsTechniquesSummaryPlugin ? (
+          <tacticsTechniquesSummaryPlugin.component eventDefinition={eventDefinition} />
+        ) : null}
         {eventDefinition.event_summary_template && (
           <>
             <dt>Event Summary Template</dt>
@@ -249,7 +261,7 @@ const EventDefinitionSummary = ({
     return <React.Fragment key={definitionNotification.notification_id}>{content}</React.Fragment>;
   };
 
-  const renderNotificationSettings = (notificationSettings) => {
+  const renderNotificationSettings = (notificationSettings: EventDefinition['notification_settings']) => {
     const formattedDuration = moment
       .duration(notificationSettings.grace_period_ms)
       .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all' });
@@ -334,7 +346,7 @@ const EventDefinitionSummary = ({
         </Row>
         <Row>
           <Col md={5}>
-            <ShareDetails shareState={eventDefinition.share_request} />
+            <ShareDetails shareState={eventDefinition.share_request} entityId={eventDefinition.id} />
           </Col>
         </Row>
       </Col>
