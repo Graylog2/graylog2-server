@@ -140,9 +140,7 @@ const CAUpload = () => {
           <Field name="files">
             {({ field: { name, onChange, value }, meta: { error } }) => (
               <>
-                <label htmlFor="ca-dropzone">
-                  Certificate Authority
-                </label>
+                <label htmlFor="ca-dropzone">Certificate Authority</label>
                 <CADropzone
                   onDrop={(files) => onChange({ target: { name, value: files } })}
                   onReject={onRejectUpload}

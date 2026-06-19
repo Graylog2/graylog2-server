@@ -40,7 +40,7 @@ const slicingToJSON = (slicing?: SlicingPreferences | null): SlicingPreferencesJ
     return undefined;
   }
 
-  const slicingPreferences = (slicing.readOnly !== undefined ? { read_only: slicing.readOnly } : {})
+  const slicingPreferences = slicing.readOnly !== undefined ? { read_only: slicing.readOnly } : {};
 
   return {
     slice_column: slicing.sliceColumn,
