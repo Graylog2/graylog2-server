@@ -112,6 +112,7 @@ export { default as ProgressBar } from './ProgressBar';
 export { default as ProgressAnimation } from './ProgressAnimation';
 export { default as Portal } from './Portal';
 export { default as QueryHelper } from './QueryHelper';
+export { default as Radio } from './Radio';
 export { default as ReactGridContainer } from './ReactGridContainer';
 export { default as ReadOnlyFormGroup } from './ReadOnlyFormGroup';
 export { default as RelativeTime } from './RelativeTime';
