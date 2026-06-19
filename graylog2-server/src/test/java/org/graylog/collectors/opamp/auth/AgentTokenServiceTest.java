@@ -30,6 +30,7 @@ import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog.collectors.db.CollectorInstanceDTO;
+import org.graylog.collectors.opamp.IssuedCertificate;
 import org.graylog.collectors.opamp.transport.OpAmpAuthContext;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.security.pki.CertificateEntry;
@@ -99,7 +100,7 @@ class AgentTokenServiceTest {
         certificateService = new CertificateService(mongoCollections, encryptedValueService, CustomizationConfig.empty(), clock);
         final var clusterIdService = mock(ClusterIdService.class);
         when(clusterIdService.getString()).thenReturn(TEST_CLUSTER_ID);
-        collectorInstanceService = new CollectorInstanceService(mongoCollections);
+        collectorInstanceService = new CollectorInstanceService(mongoCollections, clock);
         final var httpConfiguration = mock(HttpConfiguration.class);
         when(httpConfiguration.getHttpExternalUri()).thenReturn(java.net.URI.create("https://localhost:443/"));
         collectorsConfigService = new CollectorsConfigService(clusterConfigService, mock(ClusterEventBus.class), httpConfiguration);
@@ -131,7 +132,8 @@ class AgentTokenServiceTest {
         final byte[] csrPem = createCsrPem("CN=test-agent", agentKeyPair, "Ed25519");
 
         // Sign CSR with enrollment CA - need to create a CertificateEntry from the signed X509Certificate
-        final X509Certificate signedCert = certificateService.builder().signCsr(csrPem, enrollmentCa, "test-agent", Duration.ofDays(365));
+        final PKCS10CertificationRequest parsedCsr = PemUtils.parseCsr(new String(csrPem, StandardCharsets.UTF_8));
+        final X509Certificate signedCert = certificateService.builder().signCsr(parsedCsr, enrollmentCa, "test-agent", Duration.ofDays(365));
         final String certFingerprint = PemUtils.computeFingerprint(signedCert);
         final String certPem = PemUtils.toPem(signedCert);
 
@@ -139,11 +141,7 @@ class AgentTokenServiceTest {
         final CollectorInstanceDTO collectorInstanceDTO = collectorInstanceService.enroll(
                 "test-instance-uid",
                 "507f1f77bcf86cd799439012", // Valid 24-char hex ObjectId
-                certFingerprint,
-                certPem,
-                signedCert.getNotAfter(),
-                enrollmentCa.id(),
-                Instant.now(clock),
+                new IssuedCertificate(certFingerprint, certPem, signedCert.getNotAfter().toInstant(), enrollmentCa.id()),
                 "000000000000000000000000"
         );
 
@@ -231,7 +229,8 @@ class AgentTokenServiceTest {
         final byte[] csrPem = createCsrPem("CN=test-agent", agentKeyPair, "Ed25519");
 
         // Sign CSR with enrollment CA
-        final X509Certificate signedCert = certificateService.builder().signCsr(csrPem, enrollmentCa, "test-agent", Duration.ofDays(365));
+        final PKCS10CertificationRequest parsedCsr = PemUtils.parseCsr(new String(csrPem, StandardCharsets.UTF_8));
+        final X509Certificate signedCert = certificateService.builder().signCsr(parsedCsr, enrollmentCa, "test-agent", Duration.ofDays(365));
         final String certFingerprint = PemUtils.computeFingerprint(signedCert);
         final String certPem = PemUtils.toPem(signedCert);
 
@@ -239,11 +238,7 @@ class AgentTokenServiceTest {
         final CollectorInstanceDTO collectorInstanceDTO = collectorInstanceService.enroll(
                 "test-instance-uid-2",
                 "507f1f77bcf86cd799439012", // Valid 24-char hex ObjectId
-                certFingerprint,
-                certPem,
-                signedCert.getNotAfter(),
-                enrollmentCa.id(),
-                Instant.now(),
+                new IssuedCertificate(certFingerprint, certPem, signedCert.getNotAfter().toInstant(), enrollmentCa.id()),
                 "000000000000000000000000"
         );
 

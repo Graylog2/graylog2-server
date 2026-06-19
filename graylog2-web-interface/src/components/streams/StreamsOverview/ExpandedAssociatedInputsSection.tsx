@@ -53,13 +53,6 @@ const ExpandedAssociatedInputsSection = ({ stream }: Props) => {
   return (
     <ListGroup componentClass="ul">
       {typedInputs.map(({ id: inputId }) => {
-        // Three cases when a title is missing:
-        //   - a details request is in flight (initial or background refetch) → still loading,
-        //     show the bare ID; the label fills in once the request settles
-        //   - the details request errored → we don't know if the input is deleted, show bare ID
-        //   - the details request settled with no entry for this ID → the input has been deleted
-        //     since the cached associated_inputs entry was computed (cache TTL is hours); show
-        //     "(deleted)" so the user knows it isn't expected to load
         const resolved = resolvedById[inputId];
         const label =
           resolved?.title ?? (areDetailsFetching || isDetailsError ? inputId : `${inputId} (deleted)`);
