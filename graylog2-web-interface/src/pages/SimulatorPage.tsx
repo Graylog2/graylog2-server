@@ -25,10 +25,7 @@ import PipelinesPageNavigation from 'components/pipelines/PipelinesPageNavigatio
 
 const SimulatorPage = () => {
   const { data: allStreams } = useAllStreams();
-  const streams = useMemo(
-    () => (allStreams ? allStreams.filter((s) => s.is_editable) : undefined),
-    [allStreams],
-  );
+  const streams = useMemo(() => (allStreams ? allStreams.filter((s) => s.is_editable) : undefined), [allStreams]);
 
   const content = !streams ? <Spinner /> : <ProcessorSimulator streams={streams} />;
 
