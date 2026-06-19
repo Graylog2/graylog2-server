@@ -23,8 +23,7 @@ import {
   Dropdown,
   Form,
   PanelGroup,
-  Radio, // NOTE: do we want custom or keep OS styles
   /* 👆 no custom theme colors needed 👆 */
 } from 'react-bootstrap';
 
-export { Clearfix, Collapse, Dropdown, Form, PanelGroup, Radio };
+export { Clearfix, Collapse, Dropdown, Form, PanelGroup };

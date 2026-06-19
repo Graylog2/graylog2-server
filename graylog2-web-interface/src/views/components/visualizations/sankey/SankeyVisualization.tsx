@@ -21,8 +21,10 @@ import chroma from 'chroma-js';
 
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
-import type { Key, Row } from 'views/logic/searchtypes/pivot/PivotHandler';
+import type { Key } from 'views/logic/searchtypes/pivot/PivotHandler';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
+import type { LeafPath } from 'views/components/visualizations/utils/extractLeafPaths';
+import extractLeafPaths from 'views/components/visualizations/utils/extractLeafPaths';
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
 import sankeyOnClickPopover from 'views/components/visualizations/sankey/sankeyOnClickPopover';
 
@@ -50,8 +52,6 @@ const EmptyState = styled.div(
   `,
 );
 
-type LeafPath = { keys: Array<Key>; value: number };
-
 export type NodeCustomData = { field: string; value: Key };
 
 export type SankeyTrace = {
@@ -59,66 +59,24 @@ export type SankeyTrace = {
   orientation: 'h';
   arrangement: 'fixed';
   node: { label: Array<string>; customdata: Array<NodeCustomData>; pad: number; thickness: number };
-  link: { source: Array<number>; target: Array<number>; value: Array<number>; label: Array<string>; color: string };
+  link: {
+    source: Array<number>;
+    target: Array<number>;
+    value: Array<number>;
+    label: Array<string>;
+    color: string;
+    hovercolor: string;
+  };
 };
 
 const STAGE_SEPARATOR = ' ';
-
-const extractLeafPaths = (
-  rows: ReadonlyArray<Row>,
-  columnFieldCount: number,
-  metricName: string | undefined,
-): Array<LeafPath> => {
-  const paths: Array<LeafPath> = [];
-
-  rows.forEach((row) => {
-    if (row.source !== 'leaf') return;
-
-    if (metricName === undefined) {
-      const colChildren = (row.values ?? []).filter((v) => v.source === 'col-leaf');
-
-      if (columnFieldCount > 0 && colChildren.length > 0) {
-        colChildren.forEach((value) => {
-          const colKeys = value.key.length === columnFieldCount + 1 ? value.key.slice(0, -1) : value.key;
-
-          if (colKeys.length !== columnFieldCount) return;
-
-          paths.push({
-            keys: [...row.key, ...colKeys],
-            value: 1,
-          });
-        });
-      } else if (row.key.length > 0) {
-        paths.push({ keys: [...row.key], value: 1 });
-      }
-
-      return;
-    }
-
-    row.values.forEach((value) => {
-      if (value.source !== 'col-leaf' && value.source !== 'row-leaf') return;
-      if (value.key.length !== columnFieldCount + 1) return;
-      if (value.key[value.key.length - 1] !== metricName) return;
-
-      const numericValue = Number(value.value);
-
-      if (!Number.isFinite(numericValue) || numericValue <= 0) return;
-
-      paths.push({
-        keys: [...row.key, ...value.key.slice(0, -1)],
-        value: numericValue,
-      });
-    });
-  });
-
-  return paths;
-};
 
 const buildSankeyTrace = (
   paths: Array<LeafPath>,
   displayKeys: Array<Array<string>>,
   allFields: Array<string>,
   linkColor: string,
+  linkHoverColor: string,
 ): SankeyTrace => {
   const nodeIndex = new Map<string, number>();
   const labels: Array<string> = [];
@@ -176,7 +134,7 @@ const buildSankeyTrace = (
     orientation: 'h',
     arrangement: 'fixed',
     node: { label: labels, customdata, pad: 15, thickness: 18 },
-    link: { source, target, value, label, color: linkColor },
+    link: { source, target, value, label, color: linkColor, hovercolor: linkHoverColor },
   };
 };
 
@@ -192,6 +150,10 @@ const SankeyVisualization = makeVisualization(({ config, data }: VisualizationCo
   // contrast (lower index = more contrast), so a value toward the background end keeps the
   // links subtle in both themes — a lighter gray in light mode, a darker gray in dark mode.
   const linkColor = chroma(theme.colors.gray[70]).alpha(0.3).css();
+
+  // On hover, jump to a higher-contrast gray that is nearly opaque so the hovered flow clearly
+  // stands out from the faint resting links (plotly's default only nudges the opacity slightly).
+  const linkHoverColor = chroma(theme.colors.gray[40]).alpha(0.85).css();
 
   const trace = useMemo<SankeyTrace | null>(() => {
     const rowFields = config.rowPivots.flatMap((pivot) => pivot.fields);
@@ -211,8 +173,8 @@ const SankeyVisualization = makeVisualization(({ config, data }: VisualizationCo
 
     const displayKeys = paths.map((path) => path.keys.map((k, i) => String(mapKeys(k, allFields[i]) ?? k)));
 
-    return buildSankeyTrace(paths, displayKeys, allFields, linkColor);
-  }, [config, mapKeys, rows, linkColor]);
+    return buildSankeyTrace(paths, displayKeys, allFields, linkColor, linkHoverColor);
+  }, [config, mapKeys, rows, linkColor, linkHoverColor]);
 
   return (
     <Container>
