@@ -134,9 +134,11 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     }
 
     protected void afterContainerCreated() {
-        // Set cluster-wide default replicas to 0 so system indices created by plugins
-        // don't leave the single-node cluster in YELLOW state.
-        setDefaultNumberOfReplicasToZero();
+        if (version().satisfies(SearchVersion.Distribution.OPENSEARCH, ">=2.9.0")) {
+            // Set cluster-wide default replicas to 0 so system indices created by plugins
+            // don't leave the single-node cluster in YELLOW state.
+            setDefaultNumberOfReplicasToZero();
+        }
         if (version().satisfies(SearchVersion.Distribution.OPENSEARCH, "2.9.0")) {
             fixNumberOfReplicaForMlPlugin();
         }
