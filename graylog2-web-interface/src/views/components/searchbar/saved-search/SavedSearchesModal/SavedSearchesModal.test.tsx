@@ -86,7 +86,7 @@ describe('SavedSearchesModal', () => {
     asMock(fetchSavedSearches).mockResolvedValue(defaultPaginatedSearches);
     asMock(useUpdateUserLayoutPreferences).mockReturnValue({
       mutateAsync: () => Promise.resolve(),
-      resetAsync: () => Promise.resolve()
+      resetAsync: () => Promise.resolve(),
     });
     asMock(useCurrentUser).mockReturnValue(adminUser);
   });

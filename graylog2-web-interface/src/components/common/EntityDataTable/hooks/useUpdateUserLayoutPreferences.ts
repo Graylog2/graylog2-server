@@ -85,16 +85,8 @@ const useUpdateUserLayoutPreferences = <T>(entityTableId: string, layoutVariant?
   const { data: userLayoutPreferences = {}, refetch } = useUserLayoutPreferences(entityTableId, layoutVariant);
   const url = preferencesUrl(entityTableId, layoutVariant);
   const mutationFn = (newPreferences: TableLayoutPreferences<T>) =>
-    fetch(
-      'POST',
-      url,
-      preferencesToJSON({ ...userLayoutPreferences, ...newPreferences }),
-    );
-  const resetMutationFn = () =>
-    fetch(
-      'DELETE',
-      url
-    )
+    fetch('POST', url, preferencesToJSON({ ...userLayoutPreferences, ...newPreferences }));
+  const resetMutationFn = () => fetch('DELETE', url);
   const { mutateAsync } = useMutation({
     mutationFn,
     onError: (error) => {
