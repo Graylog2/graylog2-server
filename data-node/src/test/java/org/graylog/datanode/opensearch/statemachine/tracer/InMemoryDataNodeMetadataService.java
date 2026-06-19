@@ -16,13 +16,13 @@
  */
 package org.graylog.datanode.opensearch.statemachine.tracer;
 
+import jakarta.annotation.Nullable;
 import org.graylog2.cluster.nodes.DataNodeMetadata;
 import org.graylog2.cluster.nodes.DataNodeMetadataService;
 import org.graylog2.cluster.nodes.OpensearchVersionsOverview;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -31,17 +31,11 @@ class InMemoryDataNodeMetadataService implements DataNodeMetadataService {
     private final Map<String, DataNodeMetadata> store = new HashMap<>();
 
     @Override
-    public void setOpensearchVersion(String nodeId, String version) {
+    public void setOpensearchVersions(String nodeId, String currentVersion, @Nullable String latestAvailableVersion) {
         final DataNodeMetadata existing = store.get(nodeId);
-        final String latestAvailable = existing != null ? existing.latestAvailableOpensearchVersion() : null;
-        store.put(nodeId, new DataNodeMetadata(null, nodeId, version, latestAvailable));
-    }
-
-    @Override
-    public void setLatestAvailableOpensearchVersion(String nodeId, String version) {
-        final DataNodeMetadata existing = store.get(nodeId);
-        final String opensearchVersion = existing != null ? existing.currentOpensearchVersion() : null;
-        store.put(nodeId, new DataNodeMetadata(null, nodeId, opensearchVersion, version));
+        final String resolvedLatestAvailable = latestAvailableVersion != null ? latestAvailableVersion
+                : (existing != null ? existing.latestAvailableOpensearchVersion() : null);
+        store.put(nodeId, new DataNodeMetadata(null, nodeId, currentVersion, resolvedLatestAvailable));
     }
 
     @Override

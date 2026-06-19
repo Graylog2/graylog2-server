@@ -16,8 +16,10 @@
  */
 import React from 'react';
 
+import { Label } from 'components/bootstrap';
+
 import type { ClusterGraylogNode } from '../fetchClusterGraylogNodes';
-import { MetricsColumn, MetricsRow, StyledLabel } from '../../shared-components/NodeMetricsLayout';
+import { MetricsColumn, MetricsRow } from '../../shared-components/NodeMetricsLayout';
 
 type Props = {
   node: ClusterGraylogNode;
@@ -33,13 +35,13 @@ const LifecycleCell = ({ node }: Props) => {
   return (
     <MetricsColumn>
       <MetricsRow>
-        <StyledLabel
+        <Label
           bsStyle={lifecycleStatus === 'RUNNING' ? 'success' : 'warning'}
           bsSize="xs"
           title={lifecycleStatus}
           aria-label={lifecycleStatus}>
           {lifecycleStatus}
-        </StyledLabel>
+        </Label>
       </MetricsRow>
     </MetricsColumn>
   );

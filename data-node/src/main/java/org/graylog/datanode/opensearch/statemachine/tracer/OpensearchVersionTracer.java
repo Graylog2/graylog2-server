@@ -59,17 +59,18 @@ public class OpensearchVersionTracer implements StateMachineTracer<OpensearchSta
             final Version currentVersion = Version.parse(opensearchVersion);
 
             if (isCurrentNewerThanPersisted(currentVersion)) {
-                metadataService.setOpensearchVersion(nodeId.getNodeId(), opensearchVersion);
-                LOG.info("Persisting confirmed opensearch version in data node metadata {}", opensearchVersion);
-            }
+                final String latestAvailableVersion = opensearchDistribution.otherCandidates().stream()
+                        .filter(candidate -> Version.parse(candidate.version()).isHigherThan(currentVersion))
+                        .max(Comparator.comparing(d -> Version.parse(d.version())))
+                        .map(OpensearchDistribution::version)
+                        .orElse(null);
 
-            opensearchDistribution.otherCandidates().stream()
-                    .filter(candidate -> Version.parse(candidate.version()).isHigherThan(currentVersion))
-                    .max(Comparator.comparing(d -> Version.parse(d.version())))
-                    .ifPresent(candidate -> {
-                        LOG.warn("You are running outdated Opensearch version. Perform index migration to activate latest version {}", candidate.version());
-                        metadataService.setLatestAvailableOpensearchVersion(nodeId.getNodeId(), candidate.version());
-                    });
+                metadataService.setOpensearchVersions(nodeId.getNodeId(), opensearchVersion, latestAvailableVersion);
+                LOG.info("Persisting confirmed opensearch version in data node metadata {}", opensearchVersion);
+                if (latestAvailableVersion != null) {
+                    LOG.warn("You are running outdated Opensearch version. Please go to the data node upgrade page in administration to update to {}", latestAvailableVersion);
+                }
+            }
 
         }
     }

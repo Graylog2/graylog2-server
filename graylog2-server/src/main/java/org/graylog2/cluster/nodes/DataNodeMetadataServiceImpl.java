@@ -19,7 +19,9 @@ package org.graylog2.cluster.nodes;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
+import org.bson.conversions.Bson;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 
@@ -37,25 +39,16 @@ public class DataNodeMetadataServiceImpl implements DataNodeMetadataService {
     }
 
     @Override
-    public void setOpensearchVersion(String nodeId, String version) {
+    public void setOpensearchVersions(String nodeId, String currentVersion, @Nullable String latestAvailableVersion) {
+        final List<Bson> updates = new ArrayList<>();
+        updates.add(Updates.setOnInsert(DataNodeMetadata.FIELD_NODE_ID, nodeId));
+        updates.add(Updates.set(DataNodeMetadata.FIELD_CURRENT_OPENSEARCH_VERSION, currentVersion));
+        if (latestAvailableVersion != null) {
+            updates.add(Updates.set(DataNodeMetadata.FIELD_LATEST_AVAILABLE_OPENSEARCH_VERSION, latestAvailableVersion));
+        }
         collection.updateOne(
                 Filters.eq(DataNodeMetadata.FIELD_NODE_ID, nodeId),
-                Updates.combine(
-                        Updates.setOnInsert(DataNodeMetadata.FIELD_NODE_ID, nodeId),
-                        Updates.set(DataNodeMetadata.FIELD_CURRENT_OPENSEARCH_VERSION, version)
-                ),
-                new UpdateOptions().upsert(true)
-        );
-    }
-
-    @Override
-    public void setLatestAvailableOpensearchVersion(String nodeId, String version) {
-        collection.updateOne(
-                Filters.eq(DataNodeMetadata.FIELD_NODE_ID, nodeId),
-                Updates.combine(
-                        Updates.setOnInsert(DataNodeMetadata.FIELD_NODE_ID, nodeId),
-                        Updates.set(DataNodeMetadata.FIELD_LATEST_AVAILABLE_OPENSEARCH_VERSION, version)
-                ),
+                Updates.combine(updates),
                 new UpdateOptions().upsert(true)
         );
     }

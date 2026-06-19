@@ -16,13 +16,13 @@
  */
 package org.graylog2.cluster.nodes;
 
+import jakarta.annotation.Nullable;
+
 import java.util.Optional;
 
 public interface DataNodeMetadataService {
 
-    void setOpensearchVersion(String nodeId, String version);
-
-    void setLatestAvailableOpensearchVersion(String nodeId, String version);
+    void setOpensearchVersions(String nodeId, String currentVersion, @Nullable String latestAvailableVersion);
 
     Optional<DataNodeMetadata> findByNodeId(String nodeId);
 

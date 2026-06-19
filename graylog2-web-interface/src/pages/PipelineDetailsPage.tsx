@@ -15,15 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Pipeline from 'components/pipelines/Pipeline';
 import NewPipeline from 'components/pipelines/NewPipeline';
 import SourceGenerator from 'logic/pipelines/SourceGenerator';
-import { StreamsStore } from 'stores/streams/StreamsStore';
-import type { Stream } from 'stores/streams/StreamsStore';
+import useAllStreams from 'components/streams/hooks/useAllStreams';
+import type { Stream } from 'logic/streams/types';
 import type { PipelineType, StageType } from 'components/pipelines/types';
 import DocsHelper from 'util/DocsHelper';
 import useParams from 'routing/useParams';
@@ -51,15 +51,11 @@ const PipelineDetailsPage = () => {
   const { data: allConnections } = usePipelineConnections();
   const connections = allConnections?.filter((c) => c.pipeline_ids && c.pipeline_ids.includes(params.pipelineId));
   const { connectToPipeline } = usePipelineConnectionMutation();
-  const [streams, setStreams] = useState<Array<Stream>>();
-
-  useEffect(() => {
-    StreamsStore.listStreams().then((_streams: Array<Stream>) => {
-      const filteredStreams = _streams.filter((s: Stream) => s.is_editable);
-
-      setStreams(filteredStreams);
-    });
-  }, []);
+  const { data: allStreams } = useAllStreams();
+  const streams = useMemo(
+    () => (allStreams ? allStreams.filter((s: Stream) => s.is_editable) : undefined),
+    [allStreams],
+  );
 
   const _onConnectionsChange = (
     updatedConnections: { pipeline: string; streams: Array<string> },

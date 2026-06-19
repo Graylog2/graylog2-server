@@ -47,12 +47,6 @@ const StyledHorizontalDl = styled.dl(
     }
   `,
 );
-const StatusLabel = styled(Label)`
-  display: inline-flex;
-  justify-content: center;
-  gap: 4px;
-`;
-
 const ActionsCol = styled(Col)`
   text-align: right;
 `;
@@ -93,13 +87,13 @@ const DataNodePage = () => {
               <dd>{datanode.transport_address || '-'}</dd>
               <dt>Status:</dt>
               <dd>
-                <StatusLabel
+                <Label
                   bsStyle={datanodeDisabled ? 'warning' : 'success'}
                   title={datanode.datanode_status}
                   aria-label={datanode.datanode_status}
                   role="button">
                   {datanode.datanode_status || 'N/A'}
-                </StatusLabel>
+                </Label>
               </dd>
               <dt>Certificate valid until:</dt>
               <dd>

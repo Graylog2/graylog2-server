@@ -71,7 +71,7 @@ class OpensearchVersionTracerTest {
 
     @Test
     void storesVersionWhenCurrentVersionIsNewer() {
-        metadataService.setOpensearchVersion(NODE_ID, "2.18.0");
+        metadataService.setOpensearchVersions(NODE_ID, "2.18.0", null);
         final OpensearchVersionTracer tracer = tracerWithVersion("2.19.5");
 
         tracer.transition(OpensearchEvent.HEALTH_CHECK_OK, OpensearchState.STARTING, OpensearchState.AVAILABLE);
@@ -82,7 +82,7 @@ class OpensearchVersionTracerTest {
 
     @Test
     void doesNotStoreVersionWhenCurrentVersionIsOlder() {
-        metadataService.setOpensearchVersion(NODE_ID, "2.19.5");
+        metadataService.setOpensearchVersions(NODE_ID, "2.19.5", null);
         final OpensearchVersionTracer tracer = tracerWithVersion("2.18.0");
 
         tracer.transition(OpensearchEvent.HEALTH_CHECK_OK, OpensearchState.STARTING, OpensearchState.AVAILABLE);
@@ -93,7 +93,7 @@ class OpensearchVersionTracerTest {
 
     @Test
     void doesNotStoreVersionWhenCurrentVersionIsSame() {
-        metadataService.setOpensearchVersion(NODE_ID, "2.19.5");
+        metadataService.setOpensearchVersions(NODE_ID, "2.19.5", null);
         final OpensearchVersionTracer tracer = tracerWithVersion("2.19.5");
 
         tracer.transition(OpensearchEvent.HEALTH_CHECK_OK, OpensearchState.STARTING, OpensearchState.AVAILABLE);
