@@ -263,7 +263,7 @@ const CollectorsSettings = () => {
                 <SectionTitle>Ingest Endpoint</SectionTitle>
                 <HelpText>
                   {isCloud
-                    ? 'The ingest endpoint is managed by Graylog Cloud. Collectors connect here automatically; the address cannot be changed.'
+                    ? 'The ingest endpoint is system-managed. Collectors connect here automatically.'
                     : 'Ingest endpoints receive log data from collectors via OpenTelemetry (OTLP). The external address that is pushed to managed collectors as their data destination. It must route to a running collector ingest input. This is typically the address of a load balancer or the server itself.'}
                 </HelpText>
 
