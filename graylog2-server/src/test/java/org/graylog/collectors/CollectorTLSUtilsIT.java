@@ -17,6 +17,7 @@
 package org.graylog.collectors;
 
 import com.google.common.eventbus.EventBus;
+import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -149,7 +150,7 @@ class CollectorTLSUtilsIT {
         caCache.startAsync().awaitRunning();
         final var keyManager = new CollectorCaKeyManager(caCache);
         final var trustManager = new CollectorCaTrustManager(caCache, Clock.systemUTC());
-        tlsUtils = new CollectorTLSUtils(keyManager, trustManager);
+        tlsUtils = new CollectorTLSUtils(keyManager, trustManager, MoreExecutors.directExecutor());
 
         bossGroup = new MultiThreadIoEventLoopGroup(1, NioIoHandler.newFactory());
         workerGroup = new MultiThreadIoEventLoopGroup(2, NioIoHandler.newFactory());

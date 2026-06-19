@@ -21,7 +21,6 @@ import com.google.inject.assistedinject.AssistedInject;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.EventLoopGroup;
-import io.netty.handler.ssl.SslContext;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog.collectors.CollectorCaService;
@@ -34,7 +33,6 @@ import org.graylog2.inputs.transports.NettyTransportConfiguration;
 import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
-import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
@@ -44,6 +42,7 @@ import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
+import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.utilities.IpSubnet;
 
 import java.util.HashMap;
@@ -93,10 +92,7 @@ public class CollectorIngestHttpTransport extends AbstractHttpTransport {
 
     @Override
     protected Callable<? extends ChannelHandler> createSslHandler(MessageInput input) {
-        return () -> {
-            final SslContext sslContext = tlsUtils.newServerSslContextBuilder().build();
-            return sslContext.newHandler(PooledByteBufAllocator.DEFAULT);
-        };
+        return () -> tlsUtils.newServerSslHandler(PooledByteBufAllocator.DEFAULT);
     }
 
     @Override

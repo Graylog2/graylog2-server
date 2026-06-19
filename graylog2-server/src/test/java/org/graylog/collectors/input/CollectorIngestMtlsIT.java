@@ -16,6 +16,7 @@
  */
 package org.graylog.collectors.input;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -29,8 +30,10 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.ssl.SslProvider;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import io.netty.handler.ssl.util.SimpleTrustManagerFactory;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.logs.v1.LogRecord;
@@ -72,11 +75,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.net.ssl.KeyManager;
+import javax.net.ssl.ManagerFactoryParameters;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509ExtendedKeyManager;
+import javax.net.ssl.X509ExtendedTrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.math.BigInteger;
 import java.net.InetSocketAddress;
@@ -87,6 +93,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.KeyStore;
 import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.Security;
@@ -94,6 +101,10 @@ import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -300,6 +311,59 @@ class CollectorIngestMtlsIT {
         assertThat(record.getCollectorInstanceUid()).isEqualTo(AGENT_INSTANCE_UID);
     }
 
+    @Test
+    void delegatedTaskExecutorRunsClientCertCheckOffTheEventLoop() throws Exception {
+        final AtomicReference<String> trustCheckThread = new AtomicReference<>();
+        final ExecutorService certVerificationExecutor = Executors.newFixedThreadPool(2,
+                new ThreadFactoryBuilder().setNameFormat("collector-cert-verification-%d").setDaemon(true).build());
+        try {
+            final int port = startHttpServer(recordingTrustManagerServerContext(trustCheckThread), certVerificationExecutor);
+            final HttpClient client = createHttpClient(agentKey, agentCert);
+
+            final HttpResponse<byte[]> response = client.send(
+                    HttpRequest.newBuilder()
+                            .uri(URI.create("https://127.0.0.1:" + port + "/v1/logs"))
+                            .header("Content-Type", "application/x-protobuf")
+                            .POST(HttpRequest.BodyPublishers.ofByteArray(createTestRequest().toByteArray()))
+                            .build(),
+                    HttpResponse.BodyHandlers.ofByteArray());
+
+            // The handshake still completes successfully with the executor wired in.
+            assertThat(response.statusCode()).isEqualTo(200);
+            // checkClientTrusted ran on the cert-verification executor, not the Netty event loop.
+            assertThat(trustCheckThread.get())
+                    .as("thread running checkClientTrusted")
+                    .isNotNull()
+                    .startsWith("collector-cert-verification-");
+        } finally {
+            certVerificationExecutor.shutdownNow();
+        }
+    }
+
+    @Test
+    void clientCertCheckRunsOnEventLoopWhenNoExecutorIsConfigured() throws Exception {
+        // Control for the test above: with no delegated-task executor, Netty runs the trust check
+        // inline on the event loop. This proves the executor is what moves it off-loop, and that
+        // the prefix assertion above is meaningful rather than vacuously true.
+        final AtomicReference<String> trustCheckThread = new AtomicReference<>();
+        final int port = startHttpServer(recordingTrustManagerServerContext(trustCheckThread), null);
+        final HttpClient client = createHttpClient(agentKey, agentCert);
+
+        final HttpResponse<byte[]> response = client.send(
+                HttpRequest.newBuilder()
+                        .uri(URI.create("https://127.0.0.1:" + port + "/v1/logs"))
+                        .header("Content-Type", "application/x-protobuf")
+                        .POST(HttpRequest.BodyPublishers.ofByteArray(createTestRequest().toByteArray()))
+                        .build(),
+                HttpResponse.BodyHandlers.ofByteArray());
+
+        assertThat(response.statusCode()).isEqualTo(200);
+        assertThat(trustCheckThread.get())
+                .as("thread running checkClientTrusted without an executor")
+                .isNotNull()
+                .doesNotStartWith("collector-cert-verification-");
+    }
+
     // ----- Helper methods -----
 
     private int startHttpServer() throws Exception {
@@ -310,7 +374,16 @@ class CollectorIngestMtlsIT {
                 .clientAuth(ClientAuth.REQUIRE)
                 .trustManager(InsecureTrustManagerFactory.INSTANCE)
                 .build();
+        return startHttpServer(sslContext, null);
+    }
 
+    /**
+     * Starts the ingest server with the given SSL context. When {@code delegatedTaskExecutor} is
+     * non-null it is passed to {@code SslContext#newHandler(allocator, executor)}, so the SSLEngine's
+     * handshake delegated tasks (including the trust manager's {@code checkClientTrusted}) run on
+     * that executor instead of the Netty event loop.
+     */
+    private int startHttpServer(SslContext sslContext, Executor delegatedTaskExecutor) throws Exception {
         final ServerBootstrap bootstrap = new ServerBootstrap()
                 .group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
@@ -318,7 +391,10 @@ class CollectorIngestMtlsIT {
                     @Override
                     protected void initChannel(SocketChannel ch) {
                         final ChannelPipeline pipeline = ch.pipeline();
-                        pipeline.addLast("ssl", sslContext.newHandler(ch.alloc()));
+                        final SslHandler sslHandler = delegatedTaskExecutor == null
+                                ? sslContext.newHandler(ch.alloc())
+                                : sslContext.newHandler(ch.alloc(), delegatedTaskExecutor);
+                        pipeline.addLast("ssl", sslHandler);
                         pipeline.addLast("agent-cert-handler", new AgentCertChannelHandler());
                         pipeline.addLast("http-codec", new HttpServerCodec());
                         pipeline.addLast("http-aggregator", new HttpObjectAggregator(1024 * 1024));
@@ -328,6 +404,18 @@ class CollectorIngestMtlsIT {
 
         httpServerChannel = bootstrap.bind("127.0.0.1", 0).sync().channel();
         return ((InetSocketAddress) httpServerChannel.localAddress()).getPort();
+    }
+
+    /**
+     * A server SSL context whose trust manager records the thread that runs {@code checkClientTrusted}
+     * (and otherwise accepts any client cert), used to verify handshake-task offloading.
+     */
+    private SslContext recordingTrustManagerServerContext(AtomicReference<String> trustCheckThread) throws SSLException {
+        return SslContextBuilder.forServer(serverKey, serverCert)
+                .sslProvider(SslProvider.JDK)
+                .clientAuth(ClientAuth.REQUIRE)
+                .trustManager(new RecordingTrustManagerFactory(trustCheckThread))
+                .build();
     }
 
     /**
@@ -422,6 +510,80 @@ class CollectorIngestMtlsIT {
         @Override
         public void checkServerTrusted(X509Certificate[] chain, String authType) {
             // Accept all
+        }
+
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+            return new X509Certificate[0];
+        }
+    }
+
+    /**
+     * A {@link SimpleTrustManagerFactory} that supplies a {@link RecordingTrustManager}.
+     */
+    private static class RecordingTrustManagerFactory extends SimpleTrustManagerFactory {
+        private final TrustManager trustManager;
+
+        RecordingTrustManagerFactory(AtomicReference<String> trustCheckThread) {
+            this.trustManager = new RecordingTrustManager(trustCheckThread);
+        }
+
+        @Override
+        protected void engineInit(KeyStore keyStore) {
+        }
+
+        @Override
+        protected void engineInit(ManagerFactoryParameters managerFactoryParameters) {
+        }
+
+        @Override
+        protected TrustManager[] engineGetTrustManagers() {
+            return new TrustManager[]{trustManager};
+        }
+    }
+
+    /**
+     * An {@link X509ExtendedTrustManager} that records the name of the thread on which
+     * {@code checkClientTrusted} runs, then accepts the certificate. Extends the "Extended"
+     * variant so Netty does not wrap it in the endpoint-identification adapter (same reason
+     * as the production {@code CollectorCaTrustManager}).
+     */
+    private static class RecordingTrustManager extends X509ExtendedTrustManager {
+        private final AtomicReference<String> trustCheckThread;
+
+        RecordingTrustManager(AtomicReference<String> trustCheckThread) {
+            this.trustCheckThread = trustCheckThread;
+        }
+
+        private void record() {
+            trustCheckThread.compareAndSet(null, Thread.currentThread().getName());
+        }
+
+        @Override
+        public void checkClientTrusted(X509Certificate[] chain, String authType) {
+            record();
+        }
+
+        @Override
+        public void checkClientTrusted(X509Certificate[] chain, String authType, Socket socket) {
+            record();
+        }
+
+        @Override
+        public void checkClientTrusted(X509Certificate[] chain, String authType, SSLEngine engine) {
+            record();
+        }
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] chain, String authType) {
+        }
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] chain, String authType, Socket socket) {
+        }
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] chain, String authType, SSLEngine engine) {
         }
 
         @Override

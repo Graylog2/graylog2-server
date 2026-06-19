@@ -16,9 +16,14 @@
  */
 package org.graylog.collectors;
 
+import com.codahale.metrics.InstrumentedExecutorService;
+import com.codahale.metrics.MetricRegistry;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
+import jakarta.inject.Singleton;
 import org.graylog.collectors.cloud.CloudCollectorIngestService;
 import org.graylog.collectors.config.receiver.FilelogReceiverConfig;
 import org.graylog.collectors.config.receiver.JournaldReceiverConfig;
@@ -52,6 +57,15 @@ import org.graylog2.database.SequenceTopics;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.indexer.template.IndexTemplateProvider;
 import org.graylog2.plugin.PluginModule;
+
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+
+import static com.codahale.metrics.MetricRegistry.name;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class CollectorsModule extends PluginModule {
     private static final String OTLP_DUMP_FLAG = "collector_otlp_traffic_dump";
@@ -150,5 +164,37 @@ public class CollectorsModule extends PluginModule {
                 .to(CollectorLogsIndexTemplateProvider.class);
 
         addTelemetryMetricProvider("Collector Metrics", CollectorMetricsSupplier.class);
+    }
+
+    /**
+     * Provides the executor that runs collector mTLS certificate verification off the Netty event
+     * loop (see {@link CollectorCertVerificationExecutor}).
+     * <p>
+     * Sized to {@code max(2, cores/2)} threads: the work is mostly fast in-memory cache hits with
+     * occasional blocking MongoDB lookups, and concurrency is bounded so a reconnect storm cannot
+     * oversubscribe CPU or flood the shared Mongo connection pool. {@code allowCoreThreadTimeOut}
+     * lets the pool scale back to zero when idle, and daemon threads avoid any shutdown wiring.
+     * <p>
+     * The bounded queue with the default {@code AbortPolicy} makes overload shed rather than grow
+     * unboundedly: once the pool and queue are full, {@code execute} throws, which fails the TLS
+     * handshake and lets the collector reconnect with backoff — bounded admission rather than
+     * latency-unbounded queueing. Wrapped in an {@link InstrumentedExecutorService} so queue depth
+     * and rejections are observable.
+     */
+    @Provides
+    @Singleton
+    @CollectorCertVerificationExecutor
+    Executor collectorCertVerificationExecutor(MetricRegistry metricRegistry) {
+        final var maxThreads = Math.max(2, Runtime.getRuntime().availableProcessors() / 2);
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder()
+                .setNameFormat("collector-cert-verification-%d")
+                .setDaemon(true)
+                .build();
+        final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>(1024);
+        final ThreadPoolExecutor executor = new ThreadPoolExecutor(maxThreads, maxThreads, 60L, SECONDS, queue,
+                threadFactory);
+        executor.allowCoreThreadTimeOut(true);
+        return new InstrumentedExecutorService(executor, metricRegistry,
+                name("collector-cert-verification", "executor-service"));
     }
 }
