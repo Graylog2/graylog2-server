@@ -201,6 +201,11 @@ export default [
               name: 'lodash/max',
               message: 'Please use `Math.max` instead.',
             },
+            {
+              name: '@mantine/hooks',
+              message:
+                'We wrap Mantine hooks with our own abstractions. Check `util/hooks/` for an existing wrapper before importing from `@mantine/hooks` directly.',
+            },
           ],
         },
       ],

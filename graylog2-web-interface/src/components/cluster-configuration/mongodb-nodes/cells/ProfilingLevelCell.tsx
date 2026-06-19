@@ -36,7 +36,10 @@ const ProfilingLevelCell = ({ profilingLevel }: Props) => {
   }
 
   const levelInfo = LEVEL_LABELS[profilingLevel];
-  const resolvedLevelInfo: { label: string; style: ColorVariant } = levelInfo ?? { label: `Unknown (${profilingLevel})`, style: 'default' };
+  const resolvedLevelInfo: { label: string; style: ColorVariant } = levelInfo ?? {
+    label: `Unknown (${profilingLevel})`,
+    style: 'default',
+  };
 
   return (
     <MetricsColumn>
