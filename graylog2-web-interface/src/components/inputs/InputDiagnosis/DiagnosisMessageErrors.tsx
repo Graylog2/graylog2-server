@@ -43,9 +43,6 @@ const StyledListGroup = styled(ListGroup)(
   `,
 );
 
-const ListItemContent = styled.div`
-  display: flex;
-`;
 
 const StyledTitle = styled.p(
   ({ theme }) => css`
@@ -102,34 +99,28 @@ const DiagnosisMessageErrors = ({ messageErrors, inputId }: Props) => {
       </StyledP>
       <StyledListGroup>
         <ListGroupItem>
-          <ListItemContent>
-            <StyledTitle>
-              <LinkCompoment failureType="input" inputId={inputId}>
-                Message Error at Input:
-              </LinkCompoment>
-            </StyledTitle>
-            {messageErrors.failures_inputs_codecs}
-          </ListItemContent>
+          <StyledTitle>
+            <LinkCompoment failureType="input" inputId={inputId}>
+              Message Error at Input:
+            </LinkCompoment>
+          </StyledTitle>
+          {messageErrors.failures_inputs_codecs}
         </ListGroupItem>
         <ListGroupItem>
-          <ListItemContent>
-            <StyledTitle>
-              <LinkCompoment failureType="processing" inputId={inputId}>
-                Message failed to process:
-              </LinkCompoment>
-            </StyledTitle>
-            {messageErrors.failures_processing}
-          </ListItemContent>
+          <StyledTitle>
+            <LinkCompoment failureType="processing" inputId={inputId}>
+              Message failed to process:
+            </LinkCompoment>
+          </StyledTitle>
+          {messageErrors.failures_processing}
         </ListGroupItem>
         <ListGroupItem>
-          <ListItemContent>
-            <StyledTitle>
-              <LinkCompoment failureType="indexing" inputId={inputId}>
-                Message failed to index:
-              </LinkCompoment>
-            </StyledTitle>
-            {messageErrors.failures_indexing}
-          </ListItemContent>
+          <StyledTitle>
+            <LinkCompoment failureType="indexing" inputId={inputId}>
+              Message failed to index:
+            </LinkCompoment>
+          </StyledTitle>
+          {messageErrors.failures_indexing}
         </ListGroupItem>
       </StyledListGroup>
     </Section>

@@ -26,9 +26,8 @@ import useContentStream from 'components/content-stream/hook/useContentStream';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-const ListItemContent = styled.div(
+const StyledListGroupItem = styled(ListGroupItem)(
   ({ theme }: { theme: DefaultTheme }) => css`
-    display: flex;
     gap: ${theme.spacings.md};
     align-items: flex-start;
   `,
@@ -78,18 +77,16 @@ const ContentStreamReleasesSection = () => {
   return (
     <ListGroup>
       {feedList.map((feed) => (
-        <ListGroupItem key={feed?.guid['#text'] || feed?.title}>
-          <ListItemContent>
-            <a href={feed?.link} onClick={() => handleSendTelemetry(feed)} target="_blank" rel="noreferrer">
-              <Sanitize html={feed?.title} />
-            </a>
-            {feed?.pubDate ? (
-              <LastOpenedTime>
-                <RelativeTime dateTime={feed.pubDate} />
-              </LastOpenedTime>
-            ) : null}
-          </ListItemContent>
-        </ListGroupItem>
+        <StyledListGroupItem key={feed?.guid['#text'] || feed?.title}>
+          <a href={feed?.link} onClick={() => handleSendTelemetry(feed)} target="_blank" rel="noreferrer">
+            <Sanitize html={feed?.title} />
+          </a>
+          {feed?.pubDate ? (
+            <LastOpenedTime>
+              <RelativeTime dateTime={feed.pubDate} />
+            </LastOpenedTime>
+          ) : null}
+        </StyledListGroupItem>
       ))}
     </ListGroup>
   );

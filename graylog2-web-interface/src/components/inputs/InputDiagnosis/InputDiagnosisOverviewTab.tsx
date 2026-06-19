@@ -73,10 +73,6 @@ const StyledListGroup = styled(ListGroup)(
   `,
 );
 
-const ListItemContent = styled.div`
-  display: flex;
-`;
-
 const StyledTitle = styled.p(
   ({ theme }) => css`
     font-weight: bold;
@@ -153,28 +149,26 @@ const NodeListItem = ({
 
   return (
     <ListGroupItem key={detailedMessage}>
-      <ListItemContent>
-        <NodeListItemContent>
-          {nodeId && (
-            <NodeDetailsRow>
-              <StyledTitle>Node ID:</StyledTitle>
-              <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(nodeId)}>{nodeId}</Link>
-            </NodeDetailsRow>
-          )}
-          {detailedMessage && (
-            <NodeDetailsRow>
-              <StyledTitle>Message:</StyledTitle>
-              <InputMessage>{detailedMessage}</InputMessage>
-            </NodeDetailsRow>
-          )}
-          {lastFailedAt && (
-            <NodeDetailsRow>
-              <StyledTitle>Last failed:</StyledTitle>
-              <RelativeTime dateTime={lastFailedAt} />
-            </NodeDetailsRow>
-          )}
-        </NodeListItemContent>
-      </ListItemContent>
+      <NodeListItemContent>
+        {nodeId && (
+          <NodeDetailsRow>
+            <StyledTitle>Node ID:</StyledTitle>
+            <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(nodeId)}>{nodeId}</Link>
+          </NodeDetailsRow>
+        )}
+        {detailedMessage && (
+          <NodeDetailsRow>
+            <StyledTitle>Message:</StyledTitle>
+            <InputMessage>{detailedMessage}</InputMessage>
+          </NodeDetailsRow>
+        )}
+        {lastFailedAt && (
+          <NodeDetailsRow>
+            <StyledTitle>Last failed:</StyledTitle>
+            <RelativeTime dateTime={lastFailedAt} />
+          </NodeDetailsRow>
+        )}
+      </NodeListItemContent>
     </ListGroupItem>
   );
 };
@@ -192,10 +186,8 @@ const StateListItem = ({ inputNodeStates, state }: { inputNodeStates: InputNodeS
     return (
       <>
         <ListGroupItem>
-          <ListItemContent>
-            <StyledTitle>{capitalize(state)}:</StyledTitle>
-            {inputNodeStates.states[state].length}/{inputNodeStates.total} nodes
-          </ListItemContent>
+          <StyledTitle>{capitalize(state)}:</StyledTitle>
+          {inputNodeStates.states[state].length}/{inputNodeStates.total} nodes
         </ListGroupItem>
         {inputNodeStates.states[state].map(({ detailed_message, last_failed_at, node_id }) => (
           <NodeListItem
@@ -211,10 +203,8 @@ const StateListItem = ({ inputNodeStates, state }: { inputNodeStates: InputNodeS
 
   return (
     <ListGroupItem>
-      <ListItemContent>
-        <StyledTitle>{state}:</StyledTitle>
-        {inputNodeStates.states[state].length}/{inputNodeStates.total}
-      </ListItemContent>
+      <StyledTitle>{state}:</StyledTitle>
+      {inputNodeStates.states[state].length}/{inputNodeStates.total}
     </ListGroupItem>
   );
 };
@@ -260,37 +250,27 @@ const InputDiagnosisOverviewTab = ({
         <StyledP>The address on which the Input is being run.</StyledP>
         <StyledListGroup>
           <ListGroupItem>
-            <ListItemContent>
-              <StyledTitle>Input Title:</StyledTitle>
-              {input.title}
-            </ListItemContent>
+            <StyledTitle>Input Title:</StyledTitle>
+            {input.title}
           </ListGroupItem>
           <ListGroupItem>
-            <ListItemContent>
-              <StyledTitle>Input Type:</StyledTitle>
-              {input.name}
-            </ListItemContent>
+            <StyledTitle>Input Type:</StyledTitle>
+            {input.name}
           </ListGroupItem>
           <ListGroupItem>
-            <ListItemContent>
-              <StyledTitle>This Input is running on:</StyledTitle>
-              {input.global ? `all ${productName} nodes` : <LinkToNode nodeId={input.node} />}
-            </ListItemContent>
+            <StyledTitle>This Input is running on:</StyledTitle>
+            {input.global ? `all ${productName} nodes` : <LinkToNode nodeId={input.node} />}
           </ListGroupItem>
           {input.attributes?.bind_address && input.attributes?.port && (
             <>
               <ListGroupItem>
-                <ListItemContent>
-                  <StyledTitle>This Input is listening on:</StyledTitle>Bind address {input.attributes?.bind_address},
-                  Port {input.attributes?.port}.
-                </ListItemContent>
+                <StyledTitle>This Input is listening on:</StyledTitle>Bind address {input.attributes?.bind_address},
+                Port {input.attributes?.port}.
               </ListGroupItem>
               {listeningProtocol && (
                 <ListGroupItem>
-                  <ListItemContent>
-                    <StyledTitle>This Input is listening for:</StyledTitle>
-                    {listeningProtocol}
-                  </ListItemContent>
+                  <StyledTitle>This Input is listening for:</StyledTitle>
+                  {listeningProtocol}
                 </ListGroupItem>
               )}
             </>
@@ -314,10 +294,8 @@ const InputDiagnosisOverviewTab = ({
         <StyledListGroup>
           {inputMetrics.failedStarts15mCount !== undefined && (
             <ListGroupItem>
-              <ListItemContent>
-                <StyledTitle>Failed starts (last 15min):</StyledTitle>
-                {inputMetrics.failedStarts15mCount}
-              </ListItemContent>
+              <StyledTitle>Failed starts (last 15min):</StyledTitle>
+              {inputMetrics.failedStarts15mCount}
             </ListGroupItem>
           )}
           {Object.keys(inputNodeStates.states).map((state: InputState) => (
@@ -434,36 +412,28 @@ const InputDiagnosisOverviewTab = ({
         {inputMetrics && (
           <StyledListGroup>
             <ListGroupItem>
-              <ListItemContent>
-                <StyledTitle>Total Messages received by Input:</StyledTitle>
-                {inputMetrics.incomingMessagesTotal} events
-              </ListItemContent>
+              <StyledTitle>Total Messages received by Input:</StyledTitle>
+              {inputMetrics.incomingMessagesTotal} events
             </ListGroupItem>
             <ListGroupItem>
-              <ListItemContent>
-                <StyledTitle>Empty Messages discarded:</StyledTitle>
-                {inputMetrics.emptyMessages}
-              </ListItemContent>
+              <StyledTitle>Empty Messages discarded:</StyledTitle>
+              {inputMetrics.emptyMessages}
             </ListGroupItem>
             {Number.isInteger(inputMetrics.open_connections) && Number.isInteger(inputMetrics.total_connections) && (
               <ListGroupItem>
-                <ListItemContent>
-                  <StyledTitle>Active Connections:</StyledTitle>
-                  {inputMetrics.open_connections}&nbsp; ({inputMetrics.total_connections} total)
-                </ListItemContent>
+                <StyledTitle>Active Connections:</StyledTitle>
+                {inputMetrics.open_connections}&nbsp; ({inputMetrics.total_connections} total)
               </ListGroupItem>
             )}
             {Number.isInteger(inputMetrics.read_bytes_1sec) && Number.isInteger(inputMetrics.read_bytes_total) && (
               <ListGroupItem>
-                <ListItemContent>
-                  <StyledTitle>Network I/O:</StyledTitle>
-                  <NetworkStats
-                    readBytes1Sec={inputMetrics.read_bytes_1sec}
-                    readBytesTotal={inputMetrics.read_bytes_total}
-                    writtenBytes1Sec={inputMetrics.write_bytes_1sec}
-                    writtenBytesTotal={inputMetrics.write_bytes_total}
-                  />
-                </ListItemContent>
+                <StyledTitle>Network I/O:</StyledTitle>
+                <NetworkStats
+                  readBytes1Sec={inputMetrics.read_bytes_1sec}
+                  readBytesTotal={inputMetrics.read_bytes_total}
+                  writtenBytes1Sec={inputMetrics.write_bytes_1sec}
+                  writtenBytesTotal={inputMetrics.write_bytes_total}
+                />
               </ListGroupItem>
             )}
           </StyledListGroup>
@@ -484,15 +454,13 @@ const InputDiagnosisOverviewTab = ({
         <StyledListGroup>
           {inputMetrics.stream_message_count.map((stream: StreamMessageCount) => (
             <ListGroupItem key={stream.stream_id}>
-              <ListItemContent>
-                <StyledTitleLink
-                  to={Routes.search_with_query(`gl2_source_input:${input.id}`, 'relative', { relative: 900 }, [
-                    stream.stream_id,
-                  ])}>
-                  <strong>{stream.stream_name}:</strong>
-                </StyledTitleLink>
-                <StyledSpan>{stream.count}</StyledSpan>
-              </ListItemContent>
+              <StyledTitleLink
+                to={Routes.search_with_query(`gl2_source_input:${input.id}`, 'relative', { relative: 900 }, [
+                  stream.stream_id,
+                ])}>
+                <strong>{stream.stream_name}:</strong>
+              </StyledTitleLink>
+              <StyledSpan>{stream.count}</StyledSpan>
             </ListGroupItem>
           ))}
         </StyledListGroup>

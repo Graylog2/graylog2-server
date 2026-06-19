@@ -15,33 +15,37 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { List } from '@mantine/core';
+import styled from 'styled-components';
 
-type Props = React.PropsWithChildren<{
+const StyledList = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: 0;
+`;
+
+type OwnProps = {
   bsClass?: string;
-  className?: string;
   componentClass?: React.ElementType;
-  role?: 'list';
-  style?: React.CSSProperties;
-}>;
+};
+
+type Props = OwnProps & React.ComponentPropsWithoutRef<'ul'>;
 
 const ListGroup = ({
   bsClass = undefined,
   children = undefined,
   className = undefined,
   componentClass = undefined,
-  role = undefined,
   style = undefined,
+  ...rest
 }: Props) => (
-  <List
-    component={componentClass}
+  <StyledList
+    as={componentClass}
     className={[className, bsClass].filter(Boolean).join(' ') || undefined}
-    listStyleType="none"
-    role={role}
-    style={{ padding: 0, margin: 0, ...style }}
+    style={style}
+    {...rest}
   >
     {children}
-  </List>
+  </StyledList>
 );
 
 /** @component */

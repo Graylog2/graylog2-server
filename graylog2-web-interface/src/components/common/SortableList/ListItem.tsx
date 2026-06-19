@@ -35,11 +35,10 @@ type Props<ItemType extends ListItemType> = {
   item: ItemType;
 };
 
-const ListItemContent = styled.div<{
+const StyledListGroupItem = styled(ListGroupItem)<{
   $alignItemContent: 'flex-start' | 'center';
 }>(
   ({ $alignItemContent }) => css`
-    display: flex;
     align-items: ${$alignItemContent};
   `,
 );
@@ -80,12 +79,10 @@ const ListItem = <ItemType extends ListItemType>(
   }
 
   return (
-    <ListGroupItem ref={ref} className={className}>
-      <ListItemContent $alignItemContent={alignItemContent}>
-        {dragHandle}
-        {itemContent}
-      </ListItemContent>
-    </ListGroupItem>
+    <StyledListGroupItem ref={ref} className={className} $alignItemContent={alignItemContent}>
+      {dragHandle}
+      {itemContent}
+    </StyledListGroupItem>
   );
 };
 

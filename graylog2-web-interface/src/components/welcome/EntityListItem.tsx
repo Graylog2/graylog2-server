@@ -26,8 +26,7 @@ import { getValuesFromGRN } from 'logic/permissions/GRN';
 import useHasEntityPermissionByGRN from 'hooks/useHasEntityPermissionByGRN';
 import useShowRouteFromGRN from 'routing/hooks/useShowRouteFromGRN';
 
-const ListItemContent = styled.div`
-  display: flex;
+const StyledListGroupItem = styled(ListGroupItem)`
   gap: 16px;
   align-items: flex-start;
 `;
@@ -59,17 +58,15 @@ const EntityItem = ({ title, grn, timestamp = undefined }: Props) => {
   const showLink = !!entityLink && hasReadPermission;
 
   return (
-    <ListGroupItem>
-      <ListItemContent>
-        <StyledLabel bsStyle="info">{entityTypeTitle}</StyledLabel>
-        {!showLink ? <i>{entityTitle}</i> : <Link to={entityLink}>{entityTitle}</Link>}
-        {timestamp ? (
-          <LastOpenedTime>
-            <RelativeTime dateTime={timestamp} />
-          </LastOpenedTime>
-        ) : null}
-      </ListItemContent>
-    </ListGroupItem>
+    <StyledListGroupItem>
+      <StyledLabel bsStyle="info">{entityTypeTitle}</StyledLabel>
+      {!showLink ? <i>{entityTitle}</i> : <Link to={entityLink}>{entityTitle}</Link>}
+      {timestamp ? (
+        <LastOpenedTime>
+          <RelativeTime dateTime={timestamp} />
+        </LastOpenedTime>
+      ) : null}
+    </StyledListGroupItem>
   );
 };
 

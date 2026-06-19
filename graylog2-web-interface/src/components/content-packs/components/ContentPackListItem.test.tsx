@@ -18,6 +18,8 @@ import React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
+import { ListGroup } from 'components/bootstrap';
+
 import ContentPackListItem from './ContentPackListItem';
 
 describe('<ContentPackListItem />', () => {
@@ -41,7 +43,7 @@ describe('<ContentPackListItem />', () => {
 
   it('render content pack item', async () => {
     render(
-      <ContentPackListItem pack={pack} contentPackMetadata={metadata} onDeletePack={() => {}} onInstall={() => {}} />,
+      <ListGroup><ContentPackListItem pack={pack} contentPackMetadata={metadata} onDeletePack={() => {}} onInstall={() => {}} /></ListGroup>,
     );
 
     await screen.findByText('SSH Archive');
@@ -51,7 +53,7 @@ describe('<ContentPackListItem />', () => {
     const deleteFn = jest.fn();
 
     render(
-      <ContentPackListItem pack={pack} contentPackMetadata={metadata} onDeletePack={deleteFn} onInstall={() => {}} />,
+      <ListGroup><ContentPackListItem pack={pack} contentPackMetadata={metadata} onDeletePack={deleteFn} onInstall={() => {}} /></ListGroup>,
     );
 
     await userEvent.click(await screen.findByRole('button', { name: /more actions/i }));
@@ -68,7 +70,7 @@ describe('<ContentPackListItem />', () => {
     const deleteFn = jest.fn();
 
     render(
-      <ContentPackListItem pack={pack} contentPackMetadata={metadata} onDeletePack={deleteFn} onInstall={() => {}} />,
+      <ListGroup><ContentPackListItem pack={pack} contentPackMetadata={metadata} onDeletePack={deleteFn} onInstall={() => {}} /></ListGroup>,
     );
 
     await userEvent.click(await screen.findByRole('button', { name: /more actions/i }));

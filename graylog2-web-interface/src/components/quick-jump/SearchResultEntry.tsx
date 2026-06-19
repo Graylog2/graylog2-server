@@ -46,10 +46,6 @@ const StyledListGroupItem = styled(ListGroupItem)<{ $active?: boolean }>(({ them
   `;
 });
 
-const ListItemContent = styled.div`
-  display: flex;
-`;
-
 const FullWidthCol = styled.div`
   flex: 1;
 `;
@@ -130,21 +126,19 @@ const SearchResultEntry = ({ item, itemProps, isActive, lastOpened, favorite }: 
 
   return (
     <StyledListGroupItem $active={isActive} {...itemProps}>
-      <ListItemContent>
-        <TypeColorIndicator $color={typeColor} />
-        <FullWidthCol>
-          <HeaderRow>
-            <EntityType>{StringUtils.toTitleCase(item.type, '_')}</EntityType>
-            {lastOpened ? <RecentBadge>Recent</RecentBadge> : null}
-          </HeaderRow>
+      <TypeColorIndicator $color={typeColor} />
+      <FullWidthCol>
+        <HeaderRow>
+          <EntityType>{StringUtils.toTitleCase(item.type, '_')}</EntityType>
+          {lastOpened ? <RecentBadge>Recent</RecentBadge> : null}
+        </HeaderRow>
 
-          <div>
-            {item.title}
-            {item.type === LINK_TYPE && <ExternalIcon name="open_in_new" />}
-            {favorite ? <FavIcon name="star" type="solid" size="xs" /> : null}
-          </div>
-        </FullWidthCol>
-      </ListItemContent>
+        <div>
+          {item.title}
+          {item.type === LINK_TYPE && <ExternalIcon name="open_in_new" />}
+          {favorite ? <FavIcon name="star" type="solid" size="xs" /> : null}
+        </div>
+      </FullWidthCol>
     </StyledListGroupItem>
   );
 };

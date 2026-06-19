@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
-import { List } from '@mantine/core';
 
 type StyledProps = {
   $active?: boolean;
@@ -26,25 +25,22 @@ type StyledProps = {
   $isInteractive?: boolean;
 };
 
-const StyledListItem = styled(List.Item)<StyledProps>(
-  ({ theme, $active, $disabled, $bsStyle, $isInteractive }) => css`
-    background-color: ${theme.colors.global.contentBackground};
-    border: 0;
-    line-height: 1.25;
-    padding: 5px 10px;
-
-    .mantine-List-itemWrapper {
-      display: flex;
-    }
-
-    .mantine-List-itemWrapper,
-    .mantine-List-itemLabel {
-      width: 100%;
-    }
-
+const StyledItem = styled.li(
+  ({ theme }) => css`
     &:not(:last-child) {
       border-bottom: 1px solid ${theme.colors.table.row.divider};
     }
+  `,
+);
+
+const InnerContainer = styled.div<StyledProps>(
+  ({ theme, $active, $disabled, $bsStyle, $isInteractive }) => css`
+    display: flex;
+    padding: 5px 10px;
+    background-color: ${theme.colors.global.contentBackground};
+    line-height: 1.25;
+    color: ${theme.colors.text.primary};
+    text-decoration: none;
 
     .list-group-item-heading {
       font-size: ${theme.fonts.size.h5};
@@ -57,7 +53,6 @@ const StyledListItem = styled(List.Item)<StyledProps>(
     ${$isInteractive &&
     css`
       cursor: pointer;
-      color: ${theme.colors.text.primary};
 
       .list-group-item-heading {
         color: ${theme.colors.variant.darkest.default};
@@ -138,9 +133,10 @@ type Props = React.PropsWithChildren<{
   className?: string;
   disabled?: boolean;
   header?: React.ReactNode;
+  href?: string;
   onClick?: () => void;
   onKeyDown?: React.KeyboardEventHandler;
-  role?: 'listitem';
+  role?: 'listitem' | 'button';
 }>;
 
 const ListGroupItem = (
@@ -151,6 +147,7 @@ const ListGroupItem = (
     className = undefined,
     disabled = undefined,
     header = undefined,
+    href = undefined,
     id = undefined,
     onClick = undefined,
     onKeyDown = undefined,
@@ -158,23 +155,42 @@ const ListGroupItem = (
   }: Props,
   ref: React.ForwardedRef<HTMLLIElement>,
 ) => {
-  const isInteractive = !!onClick;
+  const isLink = !!href;
+  const isInteractive = !!(onClick || href);
+  const effectiveRole = role ?? (isInteractive && !isLink ? 'button' : undefined);
 
-  return (
-    <StyledListItem
-      ref={ref}
-      id={id}
-      className={className}
-      role={role}
-      $active={active}
-      $disabled={disabled}
-      $bsStyle={bsStyle}
-      $isInteractive={isInteractive}
-      onClick={!disabled ? onClick : undefined}
-      onKeyDown={onKeyDown}>
+  const content = (
+    <>
       {header && <div className="list-group-item-heading">{header}</div>}
       {header ? <p className="list-group-item-text">{children}</p> : children}
-    </StyledListItem>
+    </>
+  );
+
+  const sharedInnerProps = {
+    className,
+    $active: active,
+    $disabled: disabled,
+    $bsStyle: bsStyle,
+    $isInteractive: isInteractive,
+  };
+
+  return (
+    <StyledItem ref={ref} id={id}>
+      {href ? (
+        <InnerContainer as="a" href={href} {...sharedInnerProps}>
+          {content}
+        </InnerContainer>
+      ) : (
+        <InnerContainer
+          {...sharedInnerProps}
+          role={effectiveRole}
+          tabIndex={isInteractive && !disabled ? 0 : undefined}
+          onClick={!disabled ? onClick : undefined}
+          onKeyDown={onKeyDown}>
+          {content}
+        </InnerContainer>
+      )}
+    </StyledItem>
   );
 };
 

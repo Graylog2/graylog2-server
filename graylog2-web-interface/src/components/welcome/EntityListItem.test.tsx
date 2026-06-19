@@ -19,19 +19,20 @@ import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import EntityListItem from 'components/welcome/EntityListItem';
+import { ListGroup } from 'components/bootstrap';
 import { createGRN } from 'logic/permissions/GRN';
 
 const grn = createGRN('dashboard', '1');
 
 describe('EntityListItem', () => {
   it('Show type', async () => {
-    render(<EntityListItem grn={grn} title="Title 1" />);
+    render(<ListGroup><EntityListItem grn={grn} title="Title 1" /></ListGroup>);
 
     await screen.findByText('dashboard');
   });
 
   it('Show correct link', async () => {
-    render(<EntityListItem grn={grn} title="Title 1" />);
+    render(<ListGroup><EntityListItem grn={grn} title="Title 1" /></ListGroup>);
 
     const link = await screen.findByText('Title 1');
 
