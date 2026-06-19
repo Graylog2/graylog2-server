@@ -59,7 +59,7 @@ const AddToQueryHandler =
         ? contexts.valuePath.map((path) => {
             const [pathField, pathValue] = Object.entries(path)[0];
 
-            return { field: pathField, value: pathValue, type: fieldTypeFor(field, contexts?.fieldTypes) };
+            return { field: pathField, value: pathValue, type: fieldTypeFor(pathField, contexts?.fieldTypes) };
           })
         : [{ field, value, type }],
     );
