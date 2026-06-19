@@ -19,11 +19,14 @@ import styled, { css } from 'styled-components';
 
 import { Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
 import { Spinner } from 'components/common';
+import useDataNodeUpgradeStatus from 'components/datanode/hooks/useDataNodeUpgradeStatus';
 import useOutdatedIndices from 'components/indices/hooks/useOutdatedIndices';
 
 import useOpenSearchClusterStats from './hooks/useOpenSearchClusterStats';
 import { outdatedIndicesMockOverride } from './mockOutdatedIndices';
+import { upgradeNodesMockOverride } from './mockUpgradeNodes';
 import OutdatedIndicesTable from './OutdatedIndicesTable';
+import OpenSearchRollingUpgradeNodes from './OpenSearchRollingUpgradeNodes';
 
 const Section = styled.div(
   ({ theme }) => css`
@@ -81,8 +84,12 @@ const OpenSearchUpgradeInfo = ({
 const OpenSearchUpgradeSection = () => {
   const { currentVersion, targetVersion, numberOfDataNodes, isLoading } = useOpenSearchClusterStats();
   const { data: outdatedIndices } = useOutdatedIndices({ mockData: outdatedIndicesMockOverride });
+  const { data: upgradeStatus } = useDataNodeUpgradeStatus();
   const isRollingUpgradePossible = numberOfDataNodes >= MIN_NODES_FOR_ROLLING_UPGRADE;
   const hasOutdatedIndices = outdatedIndices.length > 0;
+
+  const pendingNodes = upgradeNodesMockOverride?.pendingNodes ?? upgradeStatus?.outdated_nodes ?? [];
+  const upgradedNodes = upgradeNodesMockOverride?.upgradedNodes ?? upgradeStatus?.up_to_date_nodes ?? [];
 
   return (
     <Section>
@@ -109,6 +116,16 @@ const OpenSearchUpgradeSection = () => {
             )}
           </ButtonToolbar>
           {hasOutdatedIndices && <DisabledHint>Resolve all outdated indices first.</DisabledHint>}
+        </Col>
+      </Row>
+
+      <Row>
+        <Col xs={12}>
+          <OpenSearchRollingUpgradeNodes
+            pendingNodes={pendingNodes}
+            upgradedNodes={upgradedNodes}
+            currentProgress={upgradeNodesMockOverride?.upgradingProgress}
+          />
         </Col>
       </Row>
     </Section>
