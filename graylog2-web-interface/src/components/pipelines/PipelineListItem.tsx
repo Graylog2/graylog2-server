@@ -79,7 +79,6 @@ const PipelineStage = styled.div<{ $idle?: boolean }>(
 );
 const DefaultLabel = styled(Label)(
   ({ theme }) => css`
-    display: inline-flex;
     margin-left: ${theme.spacings.xs};
     vertical-align: inherit;
   `,

@@ -27,8 +27,6 @@ import type { Stream } from 'logic/streams/types';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
-const StatusLabel = styled(Label)``;
-
 const InnerContainer = styled.span`
   display: inline-flex;
   justify-content: center;
@@ -86,7 +84,7 @@ const StatusCell = ({ stream }: Props) => {
   }, [sendTelemetry, stream.disabled, stream.id, stream.title, resumeStream, pauseStream]);
 
   return (
-    <StatusLabel
+    <Label
       bsStyle={stream.disabled ? 'warning' : 'success'}
       onClick={disableChange ? undefined : toggleStreamStatus}
       title={title}
@@ -100,7 +98,7 @@ const StatusCell = ({ stream }: Props) => {
           </>
         )}
       </InnerContainer>
-    </StatusLabel>
+    </Label>
   );
 };
 
