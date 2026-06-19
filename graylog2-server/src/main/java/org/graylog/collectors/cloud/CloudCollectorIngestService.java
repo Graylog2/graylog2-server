@@ -167,7 +167,7 @@ public class CloudCollectorIngestService extends AbstractIdleService {
 
     private CollectorIngestHttpInput launchInput(CollectorsConfig collectorsConfig) throws MisfireException {
         final var input = createInput(collectorsConfig);
-        // A failure recorder that won't propagate state to the global event bus, because it has its own private copy
+        // A failure recorder that keeps this system-managed input isolated from user-managed inputs.
         final var sideEffectFreeFailureRecorder = new InputFailureRecorder(new IOState<>(new EventBus(), input));
 
         input.initialize();
