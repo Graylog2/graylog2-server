@@ -26,7 +26,6 @@ type Props = {
   stream: Stream;
 };
 const DefaultLabel = styled(Label)`
-  display: inline-flex;
   margin-left: 5px;
   vertical-align: inherit;
 `;

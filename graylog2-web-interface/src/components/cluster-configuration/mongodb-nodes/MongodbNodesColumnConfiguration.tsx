@@ -16,6 +16,7 @@
  */
 import React from 'react';
 
+import { Label } from 'components/bootstrap';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 
 import type { MongodbNode } from './fetchClusterMongodbNodes';
@@ -24,7 +25,7 @@ import PercentRatioCell from './cells/PercentRatioCell';
 import ProfilingLevelCell from './cells/ProfilingLevelCell';
 import ReplicationLagCell from './cells/ReplicationLagCell';
 
-import { RoleLabel, SecondaryText } from '../shared-components/NodeMetricsLayout';
+import { SecondaryText } from '../shared-components/NodeMetricsLayout';
 
 const REPLICATION_LAG_WARNING_THRESHOLD_MS = 1000;
 const REPLICATION_LAG_DANGER_THRESHOLD_MS = 30000;
@@ -62,7 +63,7 @@ export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
           );
         }
 
-        return <RoleLabel bsSize="xs">{role}</RoleLabel>;
+        return <Label bsSize="xs">{role}</Label>;
       },
       minWidth: 130,
     },
