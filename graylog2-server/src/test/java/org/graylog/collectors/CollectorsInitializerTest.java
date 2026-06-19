@@ -45,18 +45,8 @@ import java.util.Collections;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/**
- * Exercises {@link CollectorsInitializer} against the <em>real</em> {@link CollectorCaService} and
- * {@link EnrollmentTokenService} (backed by a test MongoDB), so that contract changes in those
- * collaborators are caught here rather than hidden behind stubs. Only {@link CollectorLogsDestinationService}
- * is mocked — its real behavior (index set / stream / stream rule creation) is covered by its own test, and
- * wiring the full index/stream stack here would be disproportionate.
- *
- * <p>Requires Docker (Testcontainers MongoDB), so it runs in CI, not necessarily locally.
- */
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(ClusterConfigServiceExtension.class)
 class CollectorsInitializerTest {
@@ -65,7 +55,6 @@ class CollectorsInitializerTest {
     private CollectorCaService caService;
     private EnrollmentTokenService enrollmentTokenService;
     private CollectorsConfigService collectorsConfigService;
-    private CollectorLogsDestinationService logsDestinationService;
     private CollectorsInitializer initializer;
 
     @BeforeEach
@@ -90,9 +79,8 @@ class CollectorsInitializerTest {
         collectorsConfigService = new CollectorsConfigService(clusterConfigService, mock(ClusterEventBus.class), httpConfiguration);
         caService = new CollectorCaService(certificateService, clusterIdService, collectorsConfigService, clock);
         enrollmentTokenService = new EnrollmentTokenService(clusterIdService, clock, encryptedValueService, collectorsConfigService, mongoCollections);
-        logsDestinationService = mock(CollectorLogsDestinationService.class);
 
-        initializer = new CollectorsInitializer(caService, logsDestinationService, enrollmentTokenService);
+        initializer = new CollectorsInitializer(caService, enrollmentTokenService);
     }
 
     @Test
@@ -114,8 +102,6 @@ class CollectorsInitializerTest {
 
         // Caller-supplied fields are preserved.
         assertThat(result.http()).isEqualTo(requested.http());
-
-        verify(logsDestinationService).ensureExists();
 
         // initialize() builds the config but does not persist it — the caller saves (as CollectorsConfigResource
         // does). isCaInitialized() is config-backed, so it only flips to true once the caller has saved.

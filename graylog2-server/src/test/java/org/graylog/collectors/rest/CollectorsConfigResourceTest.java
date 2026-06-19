@@ -21,6 +21,7 @@ import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import org.apache.shiro.subject.Subject;
 import org.graylog.collectors.CollectorIngestInputService;
+import org.graylog.collectors.CollectorLogsDestinationService;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.CollectorsInitializer;
@@ -68,6 +69,8 @@ class CollectorsConfigResourceTest {
     @Mock
     private CollectorIngestInputService collectorIngestInputService;
     @Mock
+    private CollectorLogsDestinationService logsDestinationService;
+    @Mock
     private HttpConfiguration httpConfiguration;
     @Mock
     private FleetService fleetService;
@@ -93,6 +96,7 @@ class CollectorsConfigResourceTest {
         return new CollectorsConfigResource(
                 collectorsConfigService,
                 collectorIngestInputService,
+                logsDestinationService,
                 httpConfiguration,
                 fleetService,
                 fleetTransactionLogService,
@@ -136,6 +140,8 @@ class CollectorsConfigResourceTest {
 
         verify(collectorsInitializer).initialize(any(CollectorsConfig.class));
         verify(collectorsConfigService).save(any(CollectorsConfig.class));
+        // The collector-logs destination is ensured on the first save too.
+        verify(logsDestinationService).ensureExists();
     }
 
     @Test
@@ -154,6 +160,8 @@ class CollectorsConfigResourceTest {
 
         verify(collectorsInitializer, never()).initialize(any());
         verify(collectorsConfigService).save(any(CollectorsConfig.class));
+        // Self-heal regression guard: ensureExists() must run on update saves too, not just the first bootstrap.
+        verify(logsDestinationService).ensureExists();
         // System fields (certs + token) are carried forward; only the overlaid field changes.
         assertThat(result.caCertId()).isEqualTo("existing-ca");
         assertThat(result.tokenSigningKey()).isEqualTo(existingKey);

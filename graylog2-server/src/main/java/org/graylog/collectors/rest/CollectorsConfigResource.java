@@ -35,6 +35,7 @@ import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.collectors.CollectorIngestInputService;
+import org.graylog.collectors.CollectorLogsDestinationService;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.CollectorsInitializer;
@@ -81,6 +82,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 public class CollectorsConfigResource extends RestResource {
     private final CollectorsConfigService collectorsConfigService;
     private final CollectorIngestInputService collectorIngestInputService;
+    private final CollectorLogsDestinationService logsDestinationService;
     private final URI httpExternalUri;
     private final FleetService fleetService;
     private final FleetTransactionLogService fleetTransactionLogService;
@@ -90,6 +92,7 @@ public class CollectorsConfigResource extends RestResource {
     @Inject
     public CollectorsConfigResource(CollectorsConfigService collectorsConfigService,
                                     CollectorIngestInputService collectorIngestInputService,
+                                    CollectorLogsDestinationService logsDestinationService,
                                     HttpConfiguration httpConfiguration,
                                     FleetService fleetService,
                                     FleetTransactionLogService fleetTransactionLogService,
@@ -97,6 +100,7 @@ public class CollectorsConfigResource extends RestResource {
                                     Configuration configuration) {
         this.collectorsConfigService = collectorsConfigService;
         this.collectorIngestInputService = collectorIngestInputService;
+        this.logsDestinationService = logsDestinationService;
         this.httpExternalUri = httpConfiguration.getHttpExternalUri();
         this.fleetService = fleetService;
         this.fleetTransactionLogService = fleetTransactionLogService;
@@ -149,25 +153,28 @@ public class CollectorsConfigResource extends RestResource {
 
         final var existing = collectorsConfigService.get();
 
-        final CollectorsConfig config;
+        final CollectorsConfig.Builder configBuilder;
         if (existing.isEmpty()) {
-            final var builder = request.applyTo(CollectorsConfig.builder());
+            configBuilder = request.applyTo(CollectorsConfig.builder());
             if (isCloud) {
                 // The ingest endpoint is server-provisioned in Cloud; ignore any client-supplied hostname/port.
-                builder.http(new IngestEndpointConfig(derivedHostname(requestContext), CollectorsConfig.DEFAULT_HTTP_PORT));
+                configBuilder.http(new IngestEndpointConfig(derivedHostname(requestContext), CollectorsConfig.DEFAULT_HTTP_PORT));
             }
-            final var newConfig = builder.build();
-            validateThresholds(newConfig);
-            config = collectorsInitializer.initialize(newConfig);
         } else {
-            final var builder = request.applyTo(existing.get().toBuilder());
+            configBuilder = request.applyTo(existing.get().toBuilder());
             if (isCloud) {
                 // Keep the server-provisioned endpoint; thresholds are the only thing a Cloud tenant may change.
-                builder.http(existing.get().http());
+                configBuilder.http(existing.get().http());
             }
-            config = builder.build();
-            validateThresholds(config);
         }
+
+        final var validatedConfig = validateThresholds(configBuilder.build());
+
+        // Ensure the collector-logs destination (index set + stream + stream rule) is set up correctly
+        logsDestinationService.ensureExists();
+
+        // Ensure one-time bootstrapping of certs etc. so that references in the config are set
+        final var config = existing.isPresent() ? validatedConfig : collectorsInitializer.initialize(validatedConfig);
 
         collectorsConfigService.save(config);
 
@@ -192,7 +199,7 @@ public class CollectorsConfigResource extends RestResource {
         return isCloud ? "ingest-" + host : host;
     }
 
-    private void validateThresholds(CollectorsConfig config) throws ValidationException {
+    private CollectorsConfig validateThresholds(CollectorsConfig config) throws ValidationException {
         final Duration offlineThreshold = config.collectorOfflineThreshold();
         final Duration visibilityThreshold = config.collectorDefaultVisibilityThreshold();
         final Duration expirationThreshold = config.collectorExpirationThreshold();
@@ -242,5 +249,7 @@ public class CollectorsConfigResource extends RestResource {
         if (!errors.isEmpty()) {
             throw new ValidationException(errors);
         }
+
+        return config;
     }
 }

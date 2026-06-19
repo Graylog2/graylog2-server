@@ -21,23 +21,21 @@ import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
 
 public class CollectorsInitializer {
     private final CollectorCaService caService;
-    private final CollectorLogsDestinationService logsDestinationService;
     private final EnrollmentTokenService enrollmentTokenService;
 
     @Inject
     public CollectorsInitializer(CollectorCaService caService,
-                                 CollectorLogsDestinationService logsDestinationService,
                                  EnrollmentTokenService enrollmentTokenService) {
         this.caService = caService;
-        this.logsDestinationService = logsDestinationService;
         this.enrollmentTokenService = enrollmentTokenService;
     }
 
+    /**
+     * One-time bootstrap of the CA hierarchy and the enrollment token signing key.
+     */
     public CollectorsConfig initialize(CollectorsConfig config) {
         final var caHierarchy = caService.initializeCa();
         final var tokenSigningKey = createTokenSigningKey();
-
-        logsDestinationService.ensureExists();
 
         return config.toBuilder()
                 .caCertId(caHierarchy.caCert().id())
