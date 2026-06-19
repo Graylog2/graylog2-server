@@ -62,7 +62,7 @@ const ExcludeFromQueryHandler =
     const newQuery =
       multipleValues && contexts?.valuePathOperator === 'OR'
         ? excludeOrClause(oldQuery, contexts.valuePath)
-        : valuesToAdd.reduce((prev, valueToAdd) => formatNewQuery(prev, valueToAdd.field, valueToAdd.value as string | number), oldQuery);
+        : valuesToAdd.reduce((prev, valueToAdd) => formatNewQuery(prev, valueToAdd.field, valueToAdd.value), oldQuery);
 
     await recordQueryStringUsage(newQuery, oldQuery);
 
