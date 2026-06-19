@@ -24,6 +24,7 @@ import com.google.common.net.HostAndPort;
 import com.google.common.net.InetAddresses;
 import com.google.common.net.InternetDomainName;
 import io.netty.buffer.ByteBuf;
+import io.netty.util.CharsetUtil;
 import io.netty.handler.codec.dns.DefaultDnsPtrRecord;
 import io.netty.handler.codec.dns.DefaultDnsQuestion;
 import io.netty.handler.codec.dns.DefaultDnsRawRecord;
@@ -45,6 +46,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -362,10 +364,12 @@ public class DnsClient {
     }
 
     private static String decodeTxtRecord(DefaultDnsRawRecord record) {
-
         LOG.debug("Attempting to read TXT value from DNS record [{}]", record);
 
-        return DefaultDnsRecordDecoder.decodeName(record.content());
+        ByteBuf data = ((DefaultDnsRawRecord) record).content();
+        int idx = data.readerIndex();
+        int len = data.getUnsignedByte(idx++);
+        return data.toString(idx, len, CharsetUtil.UTF_8);
     }
 
     public String getInverseAddressFormat(String ipAddress) {
