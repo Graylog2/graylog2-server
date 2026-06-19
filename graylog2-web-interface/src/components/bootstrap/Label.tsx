@@ -14,34 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
-// eslint-disable-next-line no-restricted-imports
-import { Label as BootstrapLabel } from 'react-bootstrap';
 
-const getColorStyles = (theme: DefaultTheme, bsStyle: string) => {
-  if (!bsStyle) {
-    return '';
-  }
+import Badge from './Badge';
 
-  const { color, background } = theme.colors.button[bsStyle === 'default' ? 'gray' : bsStyle];
-
-  return css`
-    background-color: ${background};
-    color: ${color};
+const Label = styled(Badge)(
+  ({ theme }) => css`
+    border-radius: 3px;
     font-weight: normal;
-  `;
-};
-
-type StyledLabelProps = {
-  bsStyle?: string;
-};
-type Props = React.ComponentProps<typeof BootstrapLabel> & StyledLabelProps;
-const StyledLabel: React.ComponentType<Props> = styled(BootstrapLabel)<StyledLabelProps>(
-  ({ bsStyle, theme }) => css`
-    ${getColorStyles(theme, bsStyle)}
-    padding: 0.3em 0.6em;
+    padding-left: ${theme.spacings.xs};
+    padding-right: ${theme.spacings.xs};
+    text-align: center;
   `,
 );
 
-export default StyledLabel;
+export default Label;
