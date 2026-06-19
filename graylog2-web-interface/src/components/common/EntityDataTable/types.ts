@@ -18,7 +18,7 @@ import type * as React from 'react';
 
 import type { Attribute, Sort } from 'stores/PaginationTypes';
 import type { ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
-import type {UrlQueryFilters} from 'components/common/EntityFilters/types';
+import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
 export type EntityBase = {
   id: string;
