@@ -18,8 +18,9 @@ import * as React from 'react';
 import { useLayoutEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { Drawer as MantineDrawer } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
 import styled, { css } from 'styled-components';
+
+import useDisclosure from 'util/hooks/useDisclosure';
 
 const StyledDrawer = styled(MantineDrawer)(
   ({ theme }) => css`

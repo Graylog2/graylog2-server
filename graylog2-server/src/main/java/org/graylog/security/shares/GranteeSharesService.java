@@ -117,7 +117,7 @@ public class GranteeSharesService {
                 .values()
                 .stream()
                 // Select the grant with the highest capability priority
-                .map(grantsList -> grantsList.stream().max(Comparator.comparing(grant -> grant.capability().priority())))
+                .map(grantsList -> grantsList.stream().max(Comparator.comparingInt(grant -> grant.capability().priority())))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toMap(GrantDTO::target, GrantDTO::capability));

@@ -61,16 +61,6 @@ describe('WidgetQueryControls', () => {
 
   useViewsPlugin();
 
-  const config = {
-    relative_timerange_options: { P1D: 'Search in last day', PT0S: 'Search in all messages' },
-    query_time_range_limit: 'PT0S',
-  };
-
-  const defaultProps = {
-    availableStreams: [],
-    config,
-  };
-
   const emptyGlobalOverride = GlobalOverride.empty();
   const globalOverrideWithQuery = GlobalOverride.create(undefined, {
     type: 'elasticsearch',
@@ -96,7 +86,7 @@ describe('WidgetQueryControls', () => {
   const renderSUT = (props = {}) =>
     render(
       <Wrapper>
-        <WidgetQueryControls {...defaultProps} {...props} />
+        <WidgetQueryControls {...props} />
       </Wrapper>,
     );
 
@@ -194,7 +184,7 @@ describe('WidgetQueryControls', () => {
 
       rerender(
         <Wrapper>
-          <WidgetQueryControls {...defaultProps} />
+          <WidgetQueryControls />
         </Wrapper>,
       );
 

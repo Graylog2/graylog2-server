@@ -23,7 +23,7 @@ import { Formik, Form, Field } from 'formik';
 import { fetchMultiPartFormData } from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import { FormikInput, Icon, Dropzone } from 'components/common';
-import { Button, Label, Alert } from 'components/bootstrap';
+import { Button, Alert } from 'components/bootstrap';
 import { qualifyUrl } from 'util/URLUtils';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'components/datanode/hooks/useDataNodesCA';
 import UnsecureConnectionAlert from 'preflight/components/ConfigurationWizard/UnsecureConnectionAlert';
@@ -140,9 +140,7 @@ const CAUpload = () => {
           <Field name="files">
             {({ field: { name, onChange, value }, meta: { error } }) => (
               <>
-                <Label required htmlFor="ca-dropzone">
-                  Certificate Authority
-                </Label>
+                <label htmlFor="ca-dropzone">Certificate Authority</label>
                 <CADropzone
                   onDrop={(files) => onChange({ target: { name, value: files } })}
                   onReject={onRejectUpload}

@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useCallback, useState } from 'react';
 
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import { Button } from 'components/bootstrap';
 import StreamRuleModal from 'components/streamrules/StreamRuleModal';
 import Routes from 'routing/Routes';
