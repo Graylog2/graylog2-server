@@ -14,20 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import styled from 'styled-components';
 
 import HumanReadableStreamRule from 'components/streamrules/HumanReadableStreamRule';
-import { useStore } from 'stores/connect';
 import { Icon } from 'components/common';
 import { Button, ListGroupItem } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
 import StreamRuleModal from 'components/streamrules/StreamRuleModal';
 import UserNotification from 'util/UserNotification';
-import { StreamRulesInputsActions, StreamRulesInputsStore } from 'stores/inputs/StreamRulesInputsStore';
-import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
-import type { StreamRule as StreamRuleTypeDefinition, Stream } from 'stores/streams/StreamsStore';
+import useStreamRulesInputs from 'hooks/useStreamRulesInputs';
+import useStreamRuleMutations from 'hooks/useStreamRuleMutations';
+import type { StreamRule as StreamRuleTypeDefinition, Stream } from 'logic/streams/types';
 
 import useCurrentUser from '../../hooks/useCurrentUser';
 
@@ -49,11 +48,8 @@ type Props = {
 const StreamRule = ({ matchData = undefined, stream, streamRule, onSubmit = () => {}, onDelete = () => {} }: Props) => {
   const { permissions } = useCurrentUser();
   const [showStreamRuleForm, setShowStreamRuleForm] = useState(false);
-  const { inputs } = useStore(StreamRulesInputsStore);
-
-  useEffect(() => {
-    StreamRulesInputsActions.list();
-  }, []);
+  const { data: inputs } = useStreamRulesInputs();
+  const { removeStreamRule, updateStreamRule } = useStreamRuleMutations();
 
   const _onEdit = (event: React.MouseEvent) => {
     event.preventDefault();
@@ -66,7 +62,7 @@ const StreamRule = ({ matchData = undefined, stream, streamRule, onSubmit = () =
     /* TODO: Replace with custom confirmation dialog */
     // eslint-disable-next-line no-alert
     if (window.confirm('Do you really want to delete this stream rule?')) {
-      StreamRulesStore.remove(stream.id, streamRule.id, () => {
+      removeStreamRule({ streamId: stream.id, streamRuleId: streamRule.id }).then(() => {
         if (onDelete) {
           onDelete(streamRule.id);
         }
@@ -77,7 +73,7 @@ const StreamRule = ({ matchData = undefined, stream, streamRule, onSubmit = () =
   };
 
   const _onSubmit = (streamRuleId: string, data: StreamRuleTypeDefinition) =>
-    StreamRulesStore.update(stream.id, streamRuleId, data, () => {
+    updateStreamRule({ streamId: stream.id, streamRuleId, data }).then(() => {
       if (onSubmit) {
         onSubmit(streamRuleId, data);
       }

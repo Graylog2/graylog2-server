@@ -47,10 +47,12 @@ public class ParserUtilTest {
     public void initializeFreemarkerConfig() {
         SecureFreemarkerConfigProvider secureFreemarkerConfigProvider = new SecureFreemarkerConfigProvider();
         this.configuration = secureFreemarkerConfigProvider.get();
+        configuration.setNumberFormat("computer");
         configuration.setLogTemplateExceptions(false);
         StringTemplateLoader templateLoader = new StringTemplateLoader();
         templateLoader.putTemplate("test_fragment1", "let gl2_fragmentvar_v1 = $message.${field};");
         templateLoader.putTemplate("test_fragment2", "let gl2_fragmentvar_v1 = $message.${field!\"defaultField\"};");
+        templateLoader.putTemplate("test_numeric_fragment", "( has_field(${field}) && to_long($message.${field}) <= ${fieldValue} )");
         configuration.setTemplateLoader(templateLoader);
     }
 
@@ -212,5 +214,14 @@ public class ParserUtilTest {
                 .isEqualTo("let gl2_fragmentvar_v1 = $message.\"my_field\";");
     }
 
+    @Test
+    public void generateForFragmentFormatsLargeNumbersWithoutThousandSeparators() {
+        final RuleBuilderStep step = mock(RuleBuilderStep.class);
+        when(step.function()).thenReturn("test_numeric_fragment");
+        final Map<String, Object> params = Map.of("field", "bytes", "fieldValue", 10000);
+        when(step.parameters()).thenReturn(params);
+        assertThat(ParserUtil.generateForFragment(step, configuration))
+                .isEqualTo("( has_field(\"bytes\") && to_long($message.\"bytes\") <= 10000 )");
+    }
 
 }

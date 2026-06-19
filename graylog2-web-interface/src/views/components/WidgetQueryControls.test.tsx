@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, waitFor, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import GlobalOverride from 'views/logic/search/GlobalOverride';
@@ -27,6 +27,7 @@ import { asMock } from 'helpers/mocking';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
 import { setGlobalOverrideTimerange, setGlobalOverrideQuery } from 'views/logic/slices/searchExecutionSlice';
 import { executeActiveQuery } from 'views/logic/slices/viewSlice';
+import useSearchResultTimeRangeErrorCheck from 'views/hooks/useSearchResultTimeRangeErrorCheck';
 
 import WidgetQueryControls from './WidgetQueryControls';
 import WidgetContext from './contexts/WidgetContext';
@@ -38,6 +39,7 @@ jest.mock('views/components/searchbar/queryinput/QueryInput');
 jest.mock('views/components/searchbar/queryinput/BasicQueryInput');
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 jest.mock('views/hooks/useGlobalOverride');
+jest.mock('views/hooks/useSearchResultTimeRangeErrorCheck');
 
 jest.mock('views/logic/slices/searchExecutionSlice', () => ({
   ...jest.requireActual('views/logic/slices/searchExecutionSlice'),
@@ -54,19 +56,10 @@ describe('WidgetQueryControls', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     asMock(useGlobalOverride).mockReturnValue(GlobalOverride.empty());
+    asMock(useSearchResultTimeRangeErrorCheck).mockReturnValue(() => false);
   });
 
   useViewsPlugin();
-
-  const config = {
-    relative_timerange_options: { P1D: 'Search in last day', PT0S: 'Search in all messages' },
-    query_time_range_limit: 'PT0S',
-  };
-
-  const defaultProps = {
-    availableStreams: [],
-    config,
-  };
 
   const emptyGlobalOverride = GlobalOverride.empty();
   const globalOverrideWithQuery = GlobalOverride.create(undefined, {
@@ -93,7 +86,7 @@ describe('WidgetQueryControls', () => {
   const renderSUT = (props = {}) =>
     render(
       <Wrapper>
-        <WidgetQueryControls {...defaultProps} {...props} />
+        <WidgetQueryControls {...props} />
       </Wrapper>,
     );
 
@@ -191,12 +184,52 @@ describe('WidgetQueryControls', () => {
 
       rerender(
         <Wrapper>
-          <WidgetQueryControls {...defaultProps} />
+          <WidgetQueryControls />
         </Wrapper>,
       );
 
       expect(screen.queryByText(queryOverrideInfo)).toBeNull();
       expect(screen.queryByText(timeRangeOverrideInfo)).toBeNull();
     });
+  });
+
+  it('shows warning icon on timerange button when search result timerange check returns true', async () => {
+    asMock(useSearchResultTimeRangeErrorCheck).mockReturnValue(() => true);
+
+    renderSUT();
+
+    const timeRangePickerButton = await screen.findByLabelText('Open Time Range Selector');
+
+    await waitFor(() => expect(within(timeRangePickerButton).getByText('warning')).toBeInTheDocument());
+  });
+
+  it('disables the search button when search result timerange check returns true', async () => {
+    asMock(useSearchResultTimeRangeErrorCheck).mockReturnValue(() => true);
+
+    renderSUT();
+
+    const searchButton = await screen.findByRole('button', { name: /perform search/i });
+
+    await waitFor(() => expect(searchButton.classList).toContain('disabled'));
+  });
+
+  it('does not show warning icon on timerange button when search result timerange check returns false', async () => {
+    asMock(useSearchResultTimeRangeErrorCheck).mockReturnValue(() => false);
+
+    renderSUT();
+
+    const timeRangePickerButton = await screen.findByLabelText('Open Time Range Selector');
+
+    expect(within(timeRangePickerButton).queryByText('warning')).not.toBeInTheDocument();
+  });
+
+  it('does not disable the search button when search result timerange check returns false', async () => {
+    asMock(useSearchResultTimeRangeErrorCheck).mockReturnValue(() => false);
+
+    renderSUT();
+
+    const searchButton = await screen.findByRole('button', { name: /perform search/i });
+
+    await waitFor(() => expect(searchButton.classList).not.toContain('disabled'));
   });
 });

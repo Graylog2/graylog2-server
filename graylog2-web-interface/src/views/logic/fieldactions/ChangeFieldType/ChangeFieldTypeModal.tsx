@@ -20,7 +20,7 @@ import mapValues from 'lodash/mapValues';
 import { Formik, Form, Field } from 'formik';
 
 import { Modal, Alert, Input } from 'components/bootstrap';
-import { Select, Spinner, FormikInput } from 'components/common';
+import { Select, Spinner, FormikInput, Link } from 'components/common';
 import StreamLink from 'components/streams/StreamLink';
 import IndexSetsTable from 'views/logic/fieldactions/ChangeFieldType/IndexSetsTable';
 import usePutFieldTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
@@ -33,7 +33,6 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import FieldSelect from 'views/logic/fieldactions/ChangeFieldType/FieldSelect';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import type { FieldTypePutResponse, FieldTypePutResponseJson } from 'views/logic/fieldactions/ChangeFieldType/types';
-import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import type { Stream } from 'logic/streams/types';
 import useCurrentUser from 'hooks/useCurrentUser';

@@ -19,7 +19,6 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import { useQueryParams } from 'routing/QueryParams';
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import { asMock } from 'helpers/mocking';
 
@@ -33,15 +32,12 @@ jest.mock('routing/QueryParams', () => ({
 }));
 
 describe('PaginatedList', () => {
-  const renderSUT = (component: React.ReactElement) =>
-    render(<DefaultQueryParamProvider>{component}</DefaultQueryParamProvider>);
-
   beforeEach(() => {
     asMock(useQueryParams).mockImplementation(() => [{}, jest.fn()]);
   });
 
   it('should display Pagination', () => {
-    renderSUT(
+    render(
       <PaginatedList totalItems={100} onChange={() => {}}>
         <div>The list</div>
       </PaginatedList>,
@@ -52,7 +48,7 @@ describe('PaginatedList', () => {
   });
 
   it('should not dived by 0 if pageSize is 0 Pagination', () => {
-    renderSUT(
+    render(
       <PaginatedList totalItems={100} pageSize={0} onChange={() => {}}>
         <div>The list</div>
       </PaginatedList>,
@@ -62,7 +58,7 @@ describe('PaginatedList', () => {
   });
 
   it('should not display Pagination, when context is not interactive', () => {
-    const { queryByText } = renderSUT(
+    const { queryByText } = render(
       <InteractiveContext.Provider value={false}>
         <PaginatedList totalItems={100} onChange={() => {}}>
           <div>The list</div>
@@ -76,7 +72,7 @@ describe('PaginatedList', () => {
 
   it('should reset current page on page size change', async () => {
     const onChangeStub = jest.fn();
-    const { getByRole } = renderSUT(
+    const { getByRole } = render(
       <PaginatedList totalItems={200} onChange={onChangeStub} activePage={3}>
         <div>The list</div>
       </PaginatedList>,
@@ -102,45 +98,40 @@ describe('PaginatedList', () => {
       const currentPage = 4;
       asMock(useQueryParams).mockImplementation(() => [{ page: currentPage }, setQueryParams]);
 
-      const { findByTestId } = renderSUT(
+      render(
         <PaginatedList totalItems={200} onChange={() => {}} activePage={3}>
           <div>The list</div>
         </PaginatedList>,
       );
 
-      const graylogPagination = await findByTestId('graylog-pagination');
-      const activePageElement = graylogPagination.getElementsByClassName('active');
+      const activePageElement = await screen.findByTitle('Active page');
 
       expect(activePageElement).not.toBeNull();
-      expect(activePageElement[0].textContent).toContain(`${currentPage}`);
+      expect(activePageElement).toHaveTextContent(`${currentPage}`);
     });
   });
 
   describe('with internal state', () => {
     it('should update active page, when prop changes', async () => {
-      const { findByTestId, rerender } = renderSUT(
+      const { rerender } = render(
         <PaginatedList totalItems={200} onChange={() => {}} activePage={3} useQueryParameter={false}>
           <div>The list</div>
         </PaginatedList>,
       );
 
-      const graylogPagination = await findByTestId('graylog-pagination');
-      const activePageElement = graylogPagination.getElementsByClassName('active');
+      const activePageElement = await screen.findByTitle('Active page');
 
-      expect(activePageElement[0].textContent).toContain('3');
+      expect(activePageElement).toHaveTextContent('3');
 
       rerender(
-        <DefaultQueryParamProvider>
-          <PaginatedList totalItems={200} onChange={() => {}} activePage={1} useQueryParameter={false}>
-            <div>The list</div>
-          </PaginatedList>
-        </DefaultQueryParamProvider>,
+        <PaginatedList totalItems={200} onChange={() => {}} activePage={1} useQueryParameter={false}>
+          <div>The list</div>
+        </PaginatedList>,
       );
 
-      await findByTestId('graylog-pagination');
-      const newActivePageElement = graylogPagination.getElementsByClassName('active');
+      const newActivePageElement = await screen.findByTitle('Active page');
 
-      expect(newActivePageElement[0].textContent).toContain('1');
+      expect(newActivePageElement).toHaveTextContent('1');
     });
   });
 });

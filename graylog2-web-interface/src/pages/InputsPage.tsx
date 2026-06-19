@@ -17,10 +17,9 @@
 import React from 'react';
 
 import { Row, Col } from 'components/bootstrap';
-import { DocumentTitle, PageHeader, Spinner } from 'components/common';
+import { DocumentTitle, PageHeader, Spinner, Link } from 'components/common';
 import PageNavigation from 'components/common/PageNavigation';
 import AppConfig from 'util/AppConfig';
-import { Link } from 'components/common/router';
 import DocsHelper from 'util/DocsHelper';
 import useProductName from 'brand-customization/useProductName';
 import { InputsOverview } from 'components/inputs/InputsOveriew';
@@ -67,9 +66,10 @@ const InputsPage = () => {
           <span>{productName} nodes accept data via inputs. Launch or terminate as many inputs as you want here.</span>
         )}
       </PageHeader>
-      <InputsNotifications />
       <Row className="content">
         <Col md={12}>
+          <InputsNotifications />
+
           <InputsOverview inputTypeDescriptions={inputTypeDescriptions} inputTypes={inputTypes} />
         </Col>
       </Row>

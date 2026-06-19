@@ -79,11 +79,29 @@ const useFilterValueSuggestions = (
   }
 
   const { data, isInitialLoading } = useQuery({
-    queryKey: ['filters', 'suggestions', collection, collectionProperty, relatedIdentifier, identifierType, searchParams, displayFields, displayTemplate],
+    queryKey: [
+      'filters',
+      'suggestions',
+      collection,
+      collectionProperty,
+      relatedIdentifier,
+      identifierType,
+      searchParams,
+      displayFields,
+      displayTemplate,
+    ],
 
     queryFn: () =>
       defaultOnError(
-        fetchFilterValueSuggestions(collection, searchParams, relatedIdentifier, displayFields, displayTemplate, identifierType, collectionProperty),
+        fetchFilterValueSuggestions(
+          collection,
+          searchParams,
+          relatedIdentifier,
+          displayFields,
+          displayTemplate,
+          identifierType,
+          collectionProperty,
+        ),
         'Loading suggestions for filter failed with status',
         'Could not load filter suggestions',
       ),

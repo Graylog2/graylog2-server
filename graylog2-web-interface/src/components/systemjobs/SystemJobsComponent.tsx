@@ -14,42 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect } from 'react';
+import React, { useMemo } from 'react';
 
 import { SystemJobsList } from 'components/systemjobs';
 import { Col, Row } from 'components/bootstrap';
 import { Spinner } from 'components/common';
-import connect from 'stores/connect';
-import { SystemJobsActions, SystemJobsStore } from 'stores/systemjobs/SystemJobsStore';
 import useProductName from 'brand-customization/useProductName';
+import useSystemJobs from 'components/systemjobs/useSystemJobs';
 
-type SystemJobsComponentProps = {
-  jobs?: Record<
-    string,
-    {
-      jobs?: any[];
-    }
-  >;
-};
-
-const SystemJobsComponent = ({ jobs = undefined }: SystemJobsComponentProps) => {
+const SystemJobsComponent = () => {
   const productName = useProductName();
-  useEffect(() => {
-    SystemJobsActions.list();
-    const interval = setInterval(SystemJobsActions.list, 2000);
+  const jobs = useSystemJobs();
+  const jobList = useMemo(
+    () => (jobs ? Object.values(jobs).flatMap((jobsPerNode) => jobsPerNode?.jobs ?? []) : undefined),
+    [jobs],
+  );
 
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
-
-  if (!jobs) {
+  if (!jobList) {
     return <Spinner />;
   }
-
-  const jobList = Object.keys(jobs)
-    .map((nodeId) => (jobs[nodeId] ? jobs[nodeId].jobs : []))
-    .reduce((a, b) => a.concat(b), []);
 
   return (
     <Row className="content">
@@ -66,6 +49,4 @@ const SystemJobsComponent = ({ jobs = undefined }: SystemJobsComponentProps) => 
   );
 };
 
-export default connect(SystemJobsComponent, { systemJobsStore: SystemJobsStore }, ({ systemJobsStore }) => ({
-  jobs: (systemJobsStore as any).jobs,
-}));
+export default SystemJobsComponent;

@@ -59,8 +59,10 @@ import org.graylog2.inputs.InputRuntimeStatusProvider;
 import org.graylog2.inputs.InputStateListener;
 import org.graylog2.inputs.PersistedInputsImpl;
 import org.graylog2.lookup.LookupModule;
+import org.graylog2.metrics.entity.EntityMetricsModule;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterIdFactory;
+import org.graylog2.plugin.cluster.ClusterIdService;
 import org.graylog2.plugin.cluster.RandomUUIDClusterIdFactory;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.rest.ValidationFailureExceptionMapper;
@@ -192,12 +194,15 @@ public class ServerBindings extends Graylog2Module {
         bind(GracefulShutdown.class).in(Scopes.SINGLETON);
         bind(ClusterStatsModule.class).asEagerSingleton();
         bind(ClusterConfigService.class).to(ClusterConfigServiceImpl.class).asEagerSingleton();
+        bind(ClusterIdService.class).asEagerSingleton();
         bind(GrokPatternRegistry.class).in(Scopes.SINGLETON);
         bind(Engine.class).toProvider(DefaultJmteEngineProvider.class).asEagerSingleton();
         bind(Engine.class).annotatedWith(Names.named("HtmlSafe")).toProvider(HtmlSafeJmteEngineProvider.class).asEagerSingleton();
         bind(Engine.class).annotatedWith(Names.named("JsonSafe")).toProvider(JsonSafeEngineProvider.class).asEagerSingleton();
         bind(ErrorPageGenerator.class).to(GraylogErrorPageGenerator.class).asEagerSingleton();
         bind(Clock.class).toProvider(Clock::systemUTC).asEagerSingleton();
+
+        install(new EntityMetricsModule());
     }
 
     private void bindInterfaces() {

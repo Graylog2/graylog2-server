@@ -27,7 +27,7 @@ import onSaveView from 'views/logic/views/OnSaveViewAction';
 import { updateView } from 'views/logic/slices/viewSlice';
 import asMock from 'helpers/mocking/AsMock';
 import { createEntityShareState } from 'fixtures/entityShareState';
-import { EntityShareStore } from 'stores/permissions/EntityShareStore';
+import useEntityShareState from 'hooks/useEntityShareState';
 
 jest.mock('views/logic/views/OnSaveViewAction');
 
@@ -39,17 +39,26 @@ jest.mock('views/logic/slices/viewSlice', () => {
     updateView: jest.fn(actualModule.updateView),
   };
 });
-jest.mock('stores/permissions/EntityShareStore', () => ({
-  __esModule: true,
-  EntityShareActions: {
-    prepare: jest.fn(() => Promise.resolve()),
-    update: jest.fn(() => Promise.resolve()),
-  },
-  EntityShareStore: {
-    listen: jest.fn(),
-    getInitialState: jest.fn(),
-  },
+jest.mock('api/entity-share', () => ({
+  prepareEntityShare: jest.fn(() => Promise.resolve()),
+  updateEntityShare: jest.fn(() => Promise.resolve()),
+  loadUserSharesPaginated: jest.fn(() =>
+    Promise.resolve({
+      list: require('immutable').List(),
+      pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
+    }),
+  ),
 }));
+jest.mock('hooks/useEntityShareState', () => {
+  const mockSetEntityShareState = jest.fn();
+
+  return {
+    __esModule: true,
+    default: jest.fn(() => ({ data: undefined })),
+    useSetEntityShareState: jest.fn(() => mockSetEntityShareState),
+    entityShareQueryKey: jest.fn((grn) => ['entity-share', grn ?? 'new']),
+  };
+});
 const view = createSearch().toBuilder().id('viewId').title('Some view').type(View.Type.Dashboard).build();
 
 const ViewHeader = () => (
@@ -58,10 +67,12 @@ const ViewHeader = () => (
   </TestStoreProvider>
 );
 
+const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+
 describe('ViewHeader', () => {
   beforeEach(() => {
     asMock(onSaveView).mockReturnValue(async () => {});
-    asMock(EntityShareStore.getInitialState).mockReturnValue({ state: createEntityShareState });
+    asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState } as any);
   });
 
   beforeAll(() => {
@@ -86,14 +97,14 @@ describe('ViewHeader', () => {
 
     const editButton = await screen.findByTitle('Edit dashboard Some view metadata');
 
-    await userEvent.click(editButton);
+    await setupUser().click(editButton);
     await screen.findByText('Editing saved dashboard', { exact: false });
 
     const titleInput = await screen.findByRole('textbox', { name: /title/i });
-    await userEvent.type(titleInput, ' updated');
+    await setupUser().type(titleInput, ' updated');
 
     const saveButton = await screen.findByRole('button', { name: /save dashboard/i });
-    await userEvent.click(saveButton);
+    await setupUser().click(saveButton);
 
     expect(onSaveView).toHaveBeenCalledWith(expect.objectContaining({ title: 'Some view updated' }));
     expect(updateView).toHaveBeenCalledWith(expect.objectContaining({ title: 'Some view updated' }));

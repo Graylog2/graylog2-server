@@ -15,13 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useContext } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { defaultOnError } from 'util/conditional/onError';
-import TableFetchContext from 'components/common/PaginatedEntityTable/TableFetchContext';
+import useTableFilterContext from 'components/common/PaginatedEntityTable/useTableFilterContext';
 import type { Slice, SliceRenderers } from 'components/common/PaginatedEntityTable/slicing/Slicing';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
+import { slicesQueryKey } from 'components/common/PaginatedEntityTable/slicing/queryKeys';
+import useOnRefresh from 'components/common/PaginatedEntityTable/useOnRefresh';
 
 export type FetchSlices = (
   column: string,
@@ -32,10 +33,10 @@ export type FetchSlices = (
 const useFetchSlices = (fetchSlices: FetchSlices, sliceRenderers?: SliceRenderers) => {
   const {
     searchParams: { sliceCol, query, filters },
-  } = useContext(TableFetchContext);
+  } = useTableFilterContext();
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['slicing', sliceCol, query, filters],
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: slicesQueryKey(sliceCol, query, filters),
     queryFn: () =>
       defaultOnError(
         fetchSlices(sliceCol, query, filters).then(
@@ -44,8 +45,9 @@ const useFetchSlices = (fetchSlices: FetchSlices, sliceRenderers?: SliceRenderer
         'Error fetching table slices',
       ),
   });
+  useOnRefresh(refetch);
 
-  return { slices: data ?? [], isLoading };
+  return { slices: data ?? [], isLoading, refetchSlices: refetch };
 };
 
 export default useFetchSlices;

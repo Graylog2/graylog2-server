@@ -26,7 +26,6 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import useExternalValueActions from 'views/hooks/useExternalValueActions';
 import asMock from 'helpers/mocking/AsMock';
-import AppConfig from 'util/AppConfig';
 import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
 
 import { oneRowPivotOneColumnPivot, oneRowPivot } from './fixtures';
@@ -59,15 +58,13 @@ const SimplePieVisualization = (props: Pick<React.ComponentProps<typeof PieVisua
 
 describe('PieVisualization', () => {
   const openActionsDropdown = async () => {
-    userEvent.click(await screen.findByText('show'));
+    await userEvent.click(await screen.findByText('show'));
     await screen.findByRole('menu');
   };
 
   useViewsPlugin();
 
   beforeEach(() => {
-    AppConfig.isFeatureEnabled = jest.fn(() => false);
-
     asMock(useExternalValueActions).mockReturnValue({
       isLoading: false,
       externalValueActions: [],

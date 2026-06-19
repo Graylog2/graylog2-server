@@ -19,7 +19,7 @@ import styled, { css } from 'styled-components';
 
 import Icon from 'components/common/Icon';
 import type { IconName } from 'components/common/Icon';
-import { Link } from 'components/common/router';
+import { Link } from 'components/common';
 
 type ContainerProps = {
   $isSelected: boolean;

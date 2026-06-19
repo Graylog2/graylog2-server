@@ -20,7 +20,6 @@ import * as React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 
 import { useQueryParam } from 'routing/QueryParams';
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 import { asMock } from 'helpers/mocking';
 
 import useUrlQueryFilters from './useUrlQueryFilters';
@@ -31,11 +30,7 @@ jest.mock('routing/QueryParams', () => ({
 }));
 
 describe('useUrlQueryFilters', () => {
-  const wrapper = ({ children }: { children: React.ReactNode }) => (
-    <MemoryRouter>
-      <DefaultQueryParamProvider>{children}</DefaultQueryParamProvider>
-    </MemoryRouter>
-  );
+  const wrapper = ({ children }: { children: React.ReactNode }) => <MemoryRouter>{children}</MemoryRouter>;
 
   beforeEach(() => {
     asMock(useQueryParam).mockReturnValue([['index_set_id=index_set_id_1', 'index_set_id=index_set_id_2'], () => {}]);

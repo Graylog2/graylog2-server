@@ -19,7 +19,6 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import { usePluginExports } from 'views/test/testPlugins';
 import { prefixUrl } from 'routing/Routes';
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 import RulesPage from './RulesPage';
 
@@ -34,13 +33,9 @@ const rulesPlugin = {
   ],
 };
 describe('RulesPage', () => {
+  const renderSUT = () => render(<RulesPage />);
+
   usePluginExports(rulesPlugin);
-  const renderSUT = () =>
-    render(
-      <DefaultQueryParamProvider>
-        <RulesPage />
-      </DefaultQueryParamProvider>,
-    );
 
   it('should show create rule button', async () => {
     renderSUT();

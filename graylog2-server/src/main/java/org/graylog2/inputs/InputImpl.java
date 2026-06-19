@@ -17,6 +17,7 @@
 package org.graylog2.inputs;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -38,9 +39,20 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.graylog2.inputs.InputImpl.FIELD_CREATED_AT;
+import static org.graylog2.inputs.InputImpl.FIELD_CREATOR_USER_ID;
+import static org.graylog2.inputs.InputImpl.FIELD_GLOBAL;
+import static org.graylog2.inputs.InputImpl.FIELD_NAME;
+import static org.graylog2.inputs.InputImpl.FIELD_NODE_ID;
+import static org.graylog2.inputs.InputImpl.FIELD_TITLE;
+import static org.graylog2.inputs.InputImpl.FIELD_TYPE;
+import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
+
 @AutoValue
 @JsonDeserialize(builder = InputImpl.Builder.class)
-@DbEntity(collection = InputServiceImpl.COLLECTION_NAME, readPermission = RestPermissions.INPUTS_READ)
+@DbEntity(collection = InputServiceImpl.COLLECTION_NAME, readPermission = RestPermissions.INPUTS_READ,
+          readableFields = {ID_FIELD, FIELD_TITLE, FIELD_TYPE, FIELD_CREATOR_USER_ID, FIELD_CREATED_AT,
+                  FIELD_GLOBAL, FIELD_NODE_ID, FIELD_NAME})
 public abstract class InputImpl implements Input, MongoEntity {
     private static final Logger LOG = LoggerFactory.getLogger(InputImpl.class);
 
@@ -108,6 +120,15 @@ public abstract class InputImpl implements Input, MongoEntity {
         return result;
     }
 
+    /**
+     * The embedded extractor documents. They are modified through targeted update operations (see
+     * {@code InputServiceImpl#addExtractor} etc.) and only modeled here so that they survive full document
+     * replacements when saving an input.
+     */
+    @Nullable
+    @JsonProperty(EMBEDDED_EXTRACTORS)
+    public abstract List<Map<String, Object>> getEmbeddedExtractors();
+
     @NotNull
     @JsonProperty(FIELD_TYPE)
     public abstract String getType();
@@ -167,6 +188,9 @@ public abstract class InputImpl implements Input, MongoEntity {
         @JsonProperty(EMBEDDED_STATIC_FIELDS)
         public abstract Builder setEmbeddedStaticFields(List<Map<String, String>> staticFields);
 
+        @JsonProperty(EMBEDDED_EXTRACTORS)
+        public abstract Builder setEmbeddedExtractors(List<Map<String, Object>> extractors);
+
         @JsonProperty(FIELD_TYPE)
         public abstract Builder setType(String type);
 
@@ -193,6 +217,7 @@ public abstract class InputImpl implements Input, MongoEntity {
         return toBuilder().setPersistedDesiredState(desiredState).build();
     }
 
+    @JsonIgnore
     @Override
     public Map<String, Object> getFields() {
         final Map<String, Object> doc = new java.util.LinkedHashMap<>();
@@ -211,6 +236,11 @@ public abstract class InputImpl implements Input, MongoEntity {
         final List<Map<String, String>> staticFields = getEmbeddedStaticFields();
         if (staticFields != null && !getStaticFields().isEmpty()) {
             doc.put(EMBEDDED_STATIC_FIELDS, getEmbeddedStaticFields());
+        }
+
+        final List<Map<String, Object>> extractors = getEmbeddedExtractors();
+        if (extractors != null && !extractors.isEmpty()) {
+            doc.put(EMBEDDED_EXTRACTORS, extractors);
         }
 
         if (getContentPack() != null) {

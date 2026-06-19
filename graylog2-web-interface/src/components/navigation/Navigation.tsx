@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import useLocation from 'routing/useLocation';
-import { Link, LinkContainer } from 'components/common/router';
+import { Link, LinkContainer } from 'components/common';
 import AppConfig from 'util/AppConfig';
 import { Navbar, Nav } from 'components/bootstrap';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
@@ -31,6 +31,7 @@ import { NAV_ITEM_HEIGHT } from 'theme/constants';
 
 import UserMenu from './UserMenu';
 import HelpMenu from './HelpMenu';
+import HealthStatusBadge from './HealthStatusBadge';
 import NotificationBadge from './NotificationBadge';
 import DevelopmentHeaderBadge from './DevelopmentHeaderBadge';
 import InactiveNavItem from './InactiveNavItem';
@@ -79,6 +80,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
       <Navbar.Collapse>
         <MainNavbar pathname={pathname} />
 
+        <HealthStatusBadge />
         <NotificationBadge />
 
         <Nav pullRight className="header-meta-nav">

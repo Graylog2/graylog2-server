@@ -59,6 +59,7 @@ public class McpService {
     static final List<String> ALL_SUPPORTED_MCP_VERSIONS = List.of(LATEST_SUPPORTED_MCP_VERSION);
 
     private final ObjectMapper objectMapper;
+    private final ObjectMapper protocolObjectMapper;
     private final AuditEventSender auditEventSender;
     private final CustomizationConfig customizationConfig;
     private final GRNRegistry grnRegistry;
@@ -67,12 +68,14 @@ public class McpService {
 
     @Inject
     protected McpService(ObjectMapper objectMapper,
+                         @McpProtocolObjectMapper ObjectMapper protocolObjectMapper,
                          AuditEventSender auditEventSender,
                          CustomizationConfig customizationConfig,
                          GRNRegistry grnRegistry,
                          Map<String, Tool<?, ?>> tools,
                          Map<GRNType, ? extends ResourceProvider> resourceProviders) {
         this.objectMapper = objectMapper;
+        this.protocolObjectMapper = protocolObjectMapper;
         this.auditEventSender = auditEventSender;
         this.customizationConfig = customizationConfig;
         this.grnRegistry = grnRegistry;
@@ -93,7 +96,7 @@ public class McpService {
 
         switch (request.method()) {
             case McpSchema.METHOD_INITIALIZE -> {
-                final McpSchema.InitializeRequest initializeRequest = objectMapper.convertValue(request.params(), new TypeReference<>() {});
+                final McpSchema.InitializeRequest initializeRequest = protocolObjectMapper.convertValue(request.params(), new TypeReference<>() {});
                 auditContext.put("request", initializeRequest);
                 final McpSchema.InitializeResult result = new McpSchema.InitializeResult(
                         // Version negotiation: https://modelcontextprotocol.io/specification/2025-06-18/basic/lifecycle#version-negotiation
@@ -130,7 +133,7 @@ public class McpService {
                 return Optional.of(result);
             }
             case McpSchema.METHOD_RESOURCES_READ -> {
-                final McpSchema.ReadResourceRequest readResourceRequest = objectMapper.convertValue(request.params(), new TypeReference<>() {});
+                final McpSchema.ReadResourceRequest readResourceRequest = protocolObjectMapper.convertValue(request.params(), new TypeReference<>() {});
                 auditContext.put("request", readResourceRequest);
                 LOG.debug("Reading resource: {}", readResourceRequest);
                 try {
@@ -181,7 +184,7 @@ public class McpService {
                 return Optional.of(new McpSchema.ListToolsResult(toolList, null));
             }
             case McpSchema.METHOD_TOOLS_CALL -> {
-                final McpSchema.CallToolRequest callToolRequest = objectMapper.convertValue(request.params(), new TypeReference<>() {});
+                final McpSchema.CallToolRequest callToolRequest = protocolObjectMapper.convertValue(request.params(), new TypeReference<>() {});
                 auditContext.put("request", callToolRequest);
 
                 LOG.debug("Calling MCP tool: {}", callToolRequest);
@@ -197,10 +200,11 @@ public class McpService {
                                         });
                                 auditEventSender.success(auditActor, AuditEventType.create(MCP_TOOL_CALL),
                                         auditContext);
-                                return Optional.of(new McpSchema.CallToolResult(
-                                        List.of(new McpSchema.TextContent(objectMapper.writeValueAsString(result))),
-                                        false,
-                                        structuredContent));
+                                return Optional.of(McpSchema.CallToolResult.builder()
+                                        .content(List.of(new McpSchema.TextContent(objectMapper.writeValueAsString(result))))
+                                        .isError(false)
+                                        .structuredContent(structuredContent)
+                                        .build());
                             } catch (JsonProcessingException e) {
                                 auditEventSender.failure(auditActor, AuditEventType.create(MCP_TOOL_CALL),
                                         auditContext);
@@ -209,15 +213,24 @@ public class McpService {
                         } else {
                             // no schema, just return the string representation directly
                             auditEventSender.success(auditActor, AuditEventType.create(MCP_TOOL_CALL), auditContext);
-                            return Optional.of(new McpSchema.CallToolResult(result.toString(), false));
+                            return Optional.of(McpSchema.CallToolResult.builder()
+                                    .content(List.of(new McpSchema.TextContent(result.toString())))
+                                    .isError(false)
+                                    .build());
                         }
                     } catch (Exception e) {
                         auditEventSender.failure(auditActor, AuditEventType.create(MCP_TOOL_CALL), auditContext);
-                        return Optional.of(new McpSchema.CallToolResult(f("Tool call failed: %s", e.getMessage()), true));
+                        return Optional.of(McpSchema.CallToolResult.builder()
+                                .content(List.of(new McpSchema.TextContent(f("Tool call failed: %s", e.getMessage()))))
+                                .isError(true)
+                                .build());
                     }
                 } else {
                     auditEventSender.failure(auditActor, AuditEventType.create(MCP_TOOL_CALL), auditContext);
-                    return Optional.of(new McpSchema.CallToolResult("Unknown tool named: " + callToolRequest.name(), true));
+                    return Optional.of(McpSchema.CallToolResult.builder()
+                            .content(List.of(new McpSchema.TextContent("Unknown tool named: " + callToolRequest.name())))
+                            .isError(true)
+                            .build());
                 }
             }
             case McpSchema.METHOD_PROMPT_LIST -> {
@@ -227,7 +240,7 @@ public class McpService {
             }
             case McpSchema.METHOD_PROMPT_GET -> {
                 // disabled for now
-                final McpSchema.GetPromptRequest promptRequest = objectMapper.convertValue(request.params(), new TypeReference<>() {});
+                final McpSchema.GetPromptRequest promptRequest = protocolObjectMapper.convertValue(request.params(), new TypeReference<>() {});
                 auditContext.put("request", promptRequest);
                 LOG.debug("Getting prompt {}", promptRequest.name());
                 auditEventSender.failure(auditActor, AuditEventType.create(MCP_PROMPT_GET), auditContext);

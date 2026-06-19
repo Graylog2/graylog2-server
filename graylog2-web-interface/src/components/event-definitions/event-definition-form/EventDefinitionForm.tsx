@@ -14,45 +14,42 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import React from 'react';
 import type { SyntheticEvent } from 'react';
-import * as React from 'react';
-import { useMemo } from 'react';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
 
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { Col, Row } from 'components/bootstrap';
 import { Wizard } from 'components/common';
-import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
-import type {
-  EventDefinition,
-  EventDefinitionFormControlsProps,
-} from 'components/event-definitions/event-definitions-types';
-import type User from 'logic/users/User';
+import type { StepType } from 'components/common/Wizard';
+import type { EventDefinitionFormControlsProps } from 'components/event-definitions/event-definitions-types';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import EventDefinitionFormControls from 'components/event-definitions/event-definition-form/EventDefinitionFormControls';
-import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
-
-import EventDetailsForm from './EventDetailsForm';
-import EventConditionForm from './EventConditionForm';
-import FieldsForm from './FieldsForm';
-import NotificationsForm from './NotificationsForm';
-import EventDefinitionSummary from './EventDefinitionSummary';
-import ShareForm from './ShareForm';
 
 const WizardContainer = styled.div`
   margin-bottom: 10px;
 `;
-export const getStepKeys = (isNew: boolean) => [
-  'event-details',
-  'condition',
-  'fields',
-  'notifications',
-  ...(isNew ? ['Share'] : []),
-  'summary',
+
+const STEP_KEYS = {
+  EVENT_DETAILS: 'event-details',
+  CONDITION: 'condition',
+  FIELDS: 'fields',
+  NOTIFICATIONS: 'notifications',
+  SHARE: 'Share',
+  SUMMARY: 'summary',
+};
+
+export const getStepKeys = (isNew: boolean, hideFieldsStep = false) => [
+  STEP_KEYS.EVENT_DETAILS,
+  STEP_KEYS.CONDITION,
+  ...(hideFieldsStep ? [] : [STEP_KEYS.FIELDS]),
+  STEP_KEYS.NOTIFICATIONS,
+  ...(isNew ? [STEP_KEYS.SHARE] : []),
+  STEP_KEYS.SUMMARY,
 ];
+
 const STEP_TELEMETRY_KEYS = [
   TELEMETRY_EVENT_TYPE.EVENTDEFINITION_DETAILS.STEP_CLICKED,
   TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.STEP_CLICKED,
@@ -61,53 +58,24 @@ const STEP_TELEMETRY_KEYS = [
   TELEMETRY_EVENT_TYPE.EVENTDEFINITION_SUMMARY.STEP_CLICKED,
 ];
 
-const getConditionPlugin = (type: string | undefined) => {
-  if (type === undefined) {
-    return { displayName: null };
-  }
-
-  return PluginStore.exports('eventDefinitionTypes').find((edt) => edt.type === type) || {};
-};
-
 type Props = {
+  steps: Array<StepType<string>>;
   activeStep: string;
   action?: 'edit' | 'create';
-  eventDefinition: EventDefinition & {
-    share_request?: EntitySharePayload;
-  };
-  currentUser: User;
-  validation: {
-    errors: {
-      config?: unknown;
-      title?: string;
-    };
-  };
-  entityTypes: {};
-  notifications: Array<EventNotification>;
-  defaults: { default_backlog_size: number };
-  onChange: (key: string, value: unknown) => void;
   onChangeStep: (step: string) => void;
   onCancel: () => void;
   onSubmit: () => void;
-  canEdit: boolean;
   formControls?: React.ComponentType<EventDefinitionFormControlsProps>;
 };
 
 const EventDefinitionForm = ({
+  steps,
   action = 'edit',
   activeStep,
-  canEdit,
-  currentUser,
-  defaults,
-  entityTypes,
-  eventDefinition,
   formControls: FormControls = EventDefinitionFormControls,
-  notifications,
   onCancel,
-  onChange,
   onChangeStep,
   onSubmit,
-  validation,
 }: Props) => {
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
@@ -120,72 +88,8 @@ const EventDefinitionForm = ({
     onSubmit();
   };
 
-  const defaultStepProps = {
-    key: eventDefinition.id, // Recreate components if ID changed
-    action,
-    entityTypes,
-    eventDefinition,
-    onChange,
-    validation,
-    currentUser,
-  };
-
-  const canEditCondition = useMemo(
-    () => canEdit || eventDefinition._scope.toUpperCase() === 'ILLUMINATE',
-    [canEdit, eventDefinition._scope],
-  );
-
-  const eventProcedureId = eventDefinition?.event_procedure || undefined;
-
-  const eventDefinitionType = getConditionPlugin(eventDefinition.config.type);
-  const isNew = action === 'create';
-  const currentStepKeys = getStepKeys(isNew);
+  const currentStepKeys = steps.map((step) => step.key);
   const activeStepIndex = currentStepKeys.indexOf(activeStep);
-  const steps = [
-    {
-      key: currentStepKeys[0],
-      title: 'Event Details',
-      component: (
-        <EventDetailsForm {...defaultStepProps} eventDefinitionEventProcedure={eventProcedureId} canEdit={canEdit} />
-      ),
-    },
-    {
-      key: currentStepKeys[1],
-      title: eventDefinitionType?.displayName ?? 'Condition',
-      component: <EventConditionForm {...defaultStepProps} canEdit={canEditCondition} />,
-    },
-    {
-      key: currentStepKeys[2],
-      title: 'Fields',
-      component: <FieldsForm {...defaultStepProps} canEdit={canEdit} />,
-    },
-    {
-      key: currentStepKeys[3],
-      title: 'Notifications',
-      component: <NotificationsForm {...defaultStepProps} notifications={notifications} defaults={defaults} />,
-    },
-    ...(isNew
-      ? [
-          {
-            key: currentStepKeys[4],
-            title: 'Share',
-            component: <ShareForm {...defaultStepProps} />,
-          },
-        ]
-      : []),
-    {
-      key: currentStepKeys[currentStepKeys.length - 1],
-      title: 'Summary',
-      component: (
-        <EventDefinitionSummary
-          eventDefinition={eventDefinition}
-          currentUser={currentUser}
-          notifications={notifications}
-          validation={validation}
-        />
-      ),
-    },
-  ];
 
   const handleStepChange = (nextStep: string) => {
     sendTelemetry(STEP_TELEMETRY_KEYS[currentStepKeys.indexOf(nextStep)], {

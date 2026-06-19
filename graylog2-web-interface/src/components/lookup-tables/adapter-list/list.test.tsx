@@ -21,7 +21,6 @@ import userEvent from '@testing-library/user-event';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
 import { DATA_ADAPTERS, ERROR_STATE } from 'components/lookup-tables/fixtures';
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 import { attributes } from './constants';
 import DataAdapterList from './index';
@@ -78,14 +77,10 @@ jest.mock('components/lookup-tables/hooks/useLookupTablesAPI', () => ({
 }));
 
 const moreActionsName = { name: new RegExp(`More Actions for ${DATA_ADAPTERS[0].name}`, 'i') };
-const renderSUT = () =>
-  render(
-    <DefaultQueryParamProvider>
-      <DataAdapterList />
-    </DefaultQueryParamProvider>,
-  );
 
 describe('Data Adapter List', () => {
+  const renderSUT = () => render(<DataAdapterList />);
+
   it('should render a list of data adapters', async () => {
     renderSUT();
 
@@ -109,7 +104,7 @@ describe('Data Adapter List', () => {
   it('should be able to edit a data adapter', async () => {
     renderSUT();
 
-    userEvent.click(await screen.findByRole('button', moreActionsName));
+    await userEvent.click(await screen.findByRole('button', moreActionsName));
 
     await screen.findByRole('menuitem', { name: /edit/i });
   });
@@ -117,9 +112,9 @@ describe('Data Adapter List', () => {
   it('should be able to delete a data adapter', async () => {
     renderSUT();
 
-    userEvent.click(await screen.findByRole('button', moreActionsName));
-    userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
-    userEvent.click(await screen.findByRole('button', { name: /delete/i }));
+    await userEvent.click(await screen.findByRole('button', moreActionsName));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /delete/i }));
 
     expect(mockDeleteDataAdapter).toHaveBeenLastCalledWith(DATA_ADAPTERS[0].id);
   });

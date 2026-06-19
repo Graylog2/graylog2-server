@@ -152,7 +152,7 @@ public class OSMessageList implements OSSearchTypeHandler<MessageList> {
                 .highlight(Highlight.of(h -> h
                         .requireFieldMatch(false)
                         .highlightQuery(highlightQuery.toQuery())
-                        .fields("*", HighlightField.of(f -> f.matchedFields("*")))
+                        .fields("*", HighlightField.of(f -> f))
                         .fragmentSize(0)
                         .numberOfFragments(0))
                 );

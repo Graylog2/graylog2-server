@@ -19,25 +19,10 @@ import type { ColorVariant } from '@graylog/sawmill';
 import { Button as MantineButton } from '@mantine/core';
 import type { DefaultTheme } from 'styled-components';
 import styled, { useTheme, css } from 'styled-components';
-import { Link } from 'react-router-dom';
 
+import Link from 'components/common/Link';
 import type { BsSize } from 'components/bootstrap/types';
-
-const sizeForMantine = (size: BsSize) => {
-  switch (size) {
-    case 'xs':
-    case 'xsmall':
-      return 'xs';
-    case 'sm':
-    case 'small':
-      return 'sm';
-    case 'lg':
-    case 'large':
-      return 'lg';
-    default:
-      return 'md';
-  }
-};
+import sizeForMantine from 'theme/utils/sizeForMantine';
 
 export type StyleProps = ColorVariant | 'link' | 'transparent';
 
@@ -140,10 +125,17 @@ const activeStyles = (themeColors: DefaultTheme['colors'], bsStyle: StyleProps) 
 // Other link styles are defined in e.g. the size specific function
 const linkStyles = css`
   vertical-align: baseline;
+  user-select: text;
 
   &:hover {
     background: transparent;
     text-decoration: underline;
+  }
+
+  .mantine-Button-label {
+    word-break: break-word;
+    white-space: normal;
+    text-align: left;
   }
 `;
 

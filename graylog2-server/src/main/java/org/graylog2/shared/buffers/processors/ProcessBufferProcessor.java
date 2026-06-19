@@ -70,7 +70,8 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
     private final EventBus eventBus;
 
     private volatile Message currentMessage;
-    private volatile Duration cachedGracePeriod = null;
+    private volatile Optional<Duration> cachedGracePeriod = Optional.empty();
+    private volatile boolean gracePeriodLoaded = false;
 
     @AssistedInject
     public ProcessBufferProcessor(MetricRegistry metricRegistry,
@@ -199,17 +200,19 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
     }
 
     public Duration getTimeStampGracePeriod() {
-        if (cachedGracePeriod == null) {
-            cachedGracePeriod = clusterConfigService.getOrDefault(TimeStampConfig.class, TimeStampConfig.getDefault()).gracePeriod();
+        if (!gracePeriodLoaded) {
+            cachedGracePeriod = Optional.ofNullable(
+                    clusterConfigService.getOrDefault(TimeStampConfig.class, TimeStampConfig.getDefault()).gracePeriod());
+            gracePeriodLoaded = true;
         }
-        return cachedGracePeriod;
+        return cachedGracePeriod.orElse(null);
     }
 
     @Subscribe
     @SuppressWarnings("unused")
     public void handleGracePeriodUpdated(ClusterConfigChangedEvent event) {
         if (TimeStampConfig.class.getName().equals(event.type())) {
-            cachedGracePeriod = null;
+            gracePeriodLoaded = false;
         }
     }
 

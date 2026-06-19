@@ -22,9 +22,8 @@ import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import usePipelinesConnectedStream, { type StreamConnectedPipelines } from 'hooks/usePipelinesConnectedStream';
 import { Table, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import { IfPermitted, Section, Icon } from 'components/common';
+import { IfPermitted, Section, Icon, LinkContainer } from 'components/common';
 import usePipelines from 'hooks/usePipelines';
-import { LinkContainer } from 'components/common/router';
 import StreamPipelinesConnectionForm from 'components/streams/StreamDetails/StreamPipelinesConnectionForm';
 import type { Stream } from 'logic/streams/types';
 
@@ -63,7 +62,7 @@ const StreamDataRoutingProcessing = ({ stream }: Props) => {
             />
           </IfPermitted>
         }>
-        <Table condensed striped hover>
+        <Table condensed>
           <thead>
             <tr>
               <th colSpan={2}>Pipeline</th>

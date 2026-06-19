@@ -18,8 +18,7 @@ import React from 'react';
 
 import useParams from 'routing/useParams';
 import Routes from 'routing/Routes';
-import { DocumentTitle, PageHeader, Spinner, IfPermitted } from 'components/common';
-import { LinkContainer } from 'components/common/router';
+import { DocumentTitle, PageHeader, Spinner, IfPermitted, LinkContainer } from 'components/common';
 import { Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
 import { IndicesPageNavigation } from 'components/indices';
 import TemplateDetails from 'components/indices/IndexSetTemplates/TemplateDetails';

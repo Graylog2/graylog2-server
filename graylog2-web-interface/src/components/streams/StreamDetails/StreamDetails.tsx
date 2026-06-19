@@ -15,10 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
-import { useQueryClient } from '@tanstack/react-query';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import URI from 'urijs';
 import upperCase from 'lodash/upperCase';
@@ -27,9 +26,9 @@ import Routes from 'routing/Routes';
 import { Button, Col, MenuItem, Row, SegmentedControl } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
 import { Icon, IfPermitted } from 'components/common';
-import { StreamsStore, type Stream } from 'stores/streams/StreamsStore';
-import { useStore } from 'stores/connect';
-import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import type { Stream } from 'logic/streams/types';
+import useStreamMutations from 'hooks/useStreamMutations';
+import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useQuery from 'routing/useQuery';
@@ -162,8 +161,10 @@ const StreamDetails = ({ stream }: Props) => {
   const [currentSegment, setCurrentSegment] = useState<DetailsSegment>((segment as DetailsSegment) || INTAKE_SEGMENT);
   const DataLakeJobComponent = PluginStore.exports('dataLake')?.[0]?.DataLakeJobs;
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const { indexSets } = useStore(IndexSetsStore);
-  const queryClient = useQueryClient();
+  const {
+    data: { indexSets },
+  } = useIndexSetsList(false);
+  const { updateStream } = useStreamMutations();
   const history = useHistory();
   const currentUser = useCurrentUser();
   const sendTelemetry = useSendTelemetry();
@@ -182,10 +183,6 @@ const StreamDetails = ({ stream }: Props) => {
     updateURLStepQueryParam(nextSegment);
   };
 
-  useEffect(() => {
-    IndexSetsActions.list(false);
-  }, []);
-
   const toggleUpdateModal = useCallback(() => {
     setShowUpdateModal((cur) => !cur);
 
@@ -195,15 +192,10 @@ const StreamDetails = ({ stream }: Props) => {
   }, [sendTelemetry]);
   const onUpdate = useCallback(
     (newStream: Stream) =>
-      StreamsStore.update(stream.id, newStream, (response) => {
+      updateStream({ streamId: stream.id, data: newStream }).then(() => {
         UserNotification.success(`Stream '${newStream.title}' was updated successfully.`, 'Success');
-        queryClient.invalidateQueries({
-          queryKey: ['stream', stream.id],
-        });
-
-        return response;
       }),
-    [stream.id, queryClient],
+    [stream.id, updateStream],
   );
 
   return (

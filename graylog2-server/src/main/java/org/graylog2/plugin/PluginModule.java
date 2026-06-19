@@ -60,6 +60,7 @@ import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.database.DbEntity;
 import org.graylog2.database.entities.EntityScope;
+import org.graylog2.jersey.HttpServerExtension;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
@@ -173,6 +174,10 @@ public abstract class PluginModule extends Graylog2Module {
 
     protected void addJerseyExceptionMapper(Class<? extends ExceptionMapper> exceptionMapperClass) {
         jerseyExceptionMapperBinder().addBinding().toInstance(exceptionMapperClass);
+    }
+
+    protected void addHttpServerExtension(String type, Class<? extends HttpServerExtension> extensionClass) {
+        httpServerExtensionBinder().addBinding(type).to(extensionClass);
     }
 
     protected void addConfigBeans() {

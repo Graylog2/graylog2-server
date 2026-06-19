@@ -18,9 +18,8 @@ import React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
-import { LinkContainer } from 'components/common/router';
-import EntityShareModal from 'components/permissions/EntityShareModal';
 import {
+  LinkContainer,
   EmptyEntity,
   EntityList,
   EntityListItem,
@@ -32,6 +31,7 @@ import {
   Icon,
   QueryHelper,
 } from 'components/common';
+import EntityShareModal from 'components/permissions/EntityShareModal';
 import { Col, DropdownButton, MenuItem, Row, Button, DeleteMenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import EventNotificationLink from 'components/event-notifications/event-notifications/EventNotificationLink';

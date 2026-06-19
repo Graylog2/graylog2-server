@@ -22,17 +22,16 @@ import { useFormikContext, Formik, Form } from 'formik';
 
 import { Button } from 'components/bootstrap';
 import Popover from 'components/common/Popover';
-import { Icon, ModalSubmit, FormikInput } from 'components/common';
+import { Icon, ModalSubmit, FormikInput, Link } from 'components/common';
 import type { TimeRange, KeywordTimeRange } from 'views/logic/queries/Query';
 import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useUserDateTime from 'hooks/useUserDateTime';
-import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import generateId from 'logic/generateId';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import type { TimeRangePickerFormValues } from 'views/components/time-range-picker/TimeRangePicker';
+import type { TimeRangePickerFormValues } from 'views/components/time-range-picker/types';
 import {
   normalizeFromPickerForSearchBar,
   normalizeFromSearchBarForBackend,

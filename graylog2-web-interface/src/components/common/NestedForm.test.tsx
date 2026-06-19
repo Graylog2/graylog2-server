@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen, act } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { Form, Formik } from 'formik';
 
@@ -57,12 +57,9 @@ describe('NestedForm', () => {
       </Formik>,
     );
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      await userEvent.click(await screen.findByRole('button', { name: /submit/i }));
-    });
+    await userEvent.click(await screen.findByRole('button', { name: /submit/i }));
 
-    expect(onSubmit).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
     expect(onSubmitParentForm).not.toHaveBeenCalled();
   });
 
@@ -82,7 +79,7 @@ describe('NestedForm', () => {
       </Formik>,
     );
 
-    userEvent.click(await screen.findByRole('button', { name: /reset/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /reset/i }));
 
     expect(onReset).toHaveBeenCalledTimes(1);
     expect(onResetParentForm).not.toHaveBeenCalled();

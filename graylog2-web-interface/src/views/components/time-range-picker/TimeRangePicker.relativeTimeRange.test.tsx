@@ -20,7 +20,7 @@ import userEvent from '@testing-library/user-event';
 
 import OriginalTimeRangePicker from './TimeRangePicker';
 
-jest.mock('stores/tools/ToolsStore', () => ({}));
+jest.mock('api/tools', () => ({}));
 jest.mock('hooks/useHotkey', () => jest.fn());
 
 describe('TimeRangePicker relative time range', () => {
@@ -51,7 +51,7 @@ describe('TimeRangePicker relative time range', () => {
     const fromRangeValueInput = screen.getByTitle('Set the from value');
 
     const submitButton = getSubmitButton();
-    userEvent.type(fromRangeValueInput, '{backspace}');
+    await userEvent.type(fromRangeValueInput, '{backspace}');
 
     await screen.findByText('Cannot be empty.');
 
@@ -69,7 +69,7 @@ describe('TimeRangePicker relative time range', () => {
     const toRangeValueInput = screen.getByTitle('Set the to value');
     const submitButton = getSubmitButton();
 
-    userEvent.type(toRangeValueInput, '{backspace}');
+    await userEvent.type(toRangeValueInput, '{backspace}');
 
     await screen.findByText('Cannot be empty.');
 

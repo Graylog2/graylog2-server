@@ -16,9 +16,8 @@
  */
 import React from 'react';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, DataTable, PaginatedList, SearchForm } from 'components/common';
 import { Col, Row, Button } from 'components/bootstrap';
-import { DataTable, PaginatedList, SearchForm } from 'components/common';
 import Routes from 'routing/Routes';
 
 import ConfigurationRow from './ConfigurationRow';
@@ -111,7 +110,6 @@ class ConfigurationList extends React.Component<Props> {
               <div className={style.configurationTable}>
                 <DataTable
                   id="collector-configurations-list"
-                  className="table-hover"
                   headers={headers}
                   headerCellFormatter={_headerCellFormatter}
                   rows={configurations}

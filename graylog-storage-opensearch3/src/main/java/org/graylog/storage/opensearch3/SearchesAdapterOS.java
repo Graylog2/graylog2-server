@@ -16,15 +16,8 @@
  */
 package org.graylog.storage.opensearch3;
 
-import com.google.common.collect.Streams;
 import jakarta.inject.Inject;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Cardinality;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ExtendedStats;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ValueCount;
-import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
+import org.graylog.storage.search.SearchCommand;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.results.ChunkedResult;
 import org.graylog2.indexer.results.FieldStatsResult;
@@ -35,8 +28,17 @@ import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.indexer.searches.SearchesConfig;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
+import org.opensearch.client.opensearch._types.aggregations.CardinalityAggregate;
+import org.opensearch.client.opensearch._types.aggregations.ExtendedStatsAggregate;
+import org.opensearch.client.opensearch._types.aggregations.ValueCountAggregate;
+import org.opensearch.client.opensearch.core.SearchRequest;
+import org.opensearch.client.opensearch.core.SearchResponse;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -47,15 +49,15 @@ public class SearchesAdapterOS implements SearchesAdapter {
     private static final String AGG_EXTENDED_STATS = "gl2_extended_stats";
     private static final String AGG_VALUE_COUNT = "gl2_value_count";
 
-    private final OpenSearchClient client;
+    private final OfficialOpensearchClient client;
     private final Scroll scroll;
-    private final SearchRequestFactory searchRequestFactory;
+    private final SearchRequestFactoryOS searchRequestFactory;
     private final ResultMessageFactory resultMessageFactory;
 
     @Inject
-    public SearchesAdapterOS(OpenSearchClient client,
+    public SearchesAdapterOS(OfficialOpensearchClient client,
                              Scroll scroll,
-                             SearchRequestFactory searchRequestFactory,
+                             SearchRequestFactoryOS searchRequestFactory,
                              ResultMessageFactory resultMessageFactory) {
         this.client = client;
         this.scroll = scroll;
@@ -70,27 +72,31 @@ public class SearchesAdapterOS implements SearchesAdapter {
 
     @Override
     public SearchResult search(Set<String> indices, Set<IndexRange> indexRanges, SearchesConfig config) {
-        final SearchSourceBuilder searchSourceBuilder = searchRequestFactory.create(config);
+        SearchRequest.Builder builder = searchRequestFactory.create(SearchCommand.from(config));
+
 
         if (indexRanges.isEmpty()) {
-            return SearchResult.empty(config.query(), searchSourceBuilder.toString());
+            return SearchResult.empty(config.query(), builder.build().toJsonString());
         }
 
-        final SearchRequest searchRequest = new SearchRequest(indices.toArray(new String[0]))
-                .source(searchSourceBuilder);
-        final SearchResponse searchResult = client.search(searchRequest, "Unable to perform search query");
+        final SearchRequest searchRequest = builder
+                .index(indices.stream().toList())
+                .build();
+        final SearchResponse<JsonData> searchResult = client.sync(
+                c -> c.search(searchRequest, JsonData.class),
+                "Unable to perform search query");
 
         final List<ResultMessage> resultMessages = extractResultMessages(searchResult);
-        final long totalResults = searchResult.getHits().getTotalHits().value;
-        final long tookMs = searchResult.getTook().getMillis();
-        final String builtQuery = searchSourceBuilder.toString();
+        final long totalResults = searchResult.hits().total().value();
+        final long tookMs = searchResult.took();
+        final String builtQuery = searchRequest.toJsonString();
 
         return new SearchResult(resultMessages, totalResults, indexRanges, config.query(), builtQuery, tookMs);
     }
 
-    private List<ResultMessage> extractResultMessages(SearchResponse searchResult) {
-        return Streams.stream(searchResult.getHits())
-                .map(hit -> resultMessageFactory.parseFromSource(hit.getId(), hit.getIndex(), hit.getSourceAsMap()))
+    private List<ResultMessage> extractResultMessages(SearchResponse<JsonData> searchResult) {
+        return searchResult.hits().hits().stream()
+                .map(hit -> resultMessageFactory.parseFromSource(hit.id(), hit.index(), OSSerializationUtils.toMap(hit.source())))
                 .collect(Collectors.toList());
     }
 
@@ -103,52 +109,68 @@ public class SearchesAdapterOS implements SearchesAdapter {
                 .offset(0)
                 .limit(-1)
                 .build();
-        final SearchSourceBuilder searchSourceBuilder = searchRequestFactory.create(config);
+        final SearchCommand searchCommand = SearchCommand.from(config);
+        SearchRequest.Builder builder = searchRequestFactory.create(searchCommand);
+        builder.index(indices.stream().toList());
 
         if (includeCount) {
-            searchSourceBuilder.aggregation(AggregationBuilders.count(AGG_VALUE_COUNT).field(field));
+            builder.aggregations(AGG_VALUE_COUNT, Aggregation.of(a -> a.valueCount(v -> v.field(field))));
         }
         if (includeStats) {
-            searchSourceBuilder.aggregation(AggregationBuilders.extendedStats(AGG_EXTENDED_STATS).field(field));
+            builder.aggregations(AGG_EXTENDED_STATS, Aggregation.of(a -> a.extendedStats(v -> v.field(field))));
         }
         if (includeCardinality) {
-            searchSourceBuilder.aggregation(AggregationBuilders.cardinality(AGG_CARDINALITY).field(field));
+            builder.aggregations(AGG_CARDINALITY, Aggregation.of(a -> a.cardinality(v -> v.field(field))));
         }
+
+        SearchRequest searchRequest = builder.build();
 
         if (indices.isEmpty()) {
-            return FieldStatsResult.empty(query, searchSourceBuilder.toString());
+            return FieldStatsResult.empty(query, searchRequest.toJsonString());
         }
 
-        final SearchRequest searchRequest = new SearchRequest(indices.toArray(new String[0]))
-                .source(searchSourceBuilder);
-
-        final SearchResponse searchResult = client.search(searchRequest, "Unable to retrieve fields stats");
+        final SearchResponse<JsonData> searchResult = client.sync(
+                c -> c.search(searchRequest, JsonData.class),
+                "Unable to retrieve fields stats"
+        );
 
         final List<ResultMessage> resultMessages = extractResultMessages(searchResult);
-        final long tookMs = searchResult.getTook().getMillis();
+        final long tookMs = searchResult.took();
 
-        final ExtendedStats extendedStatsAggregation = searchResult.getAggregations().get(AGG_EXTENDED_STATS);
-        final ValueCount valueCountAggregation = searchResult.getAggregations().get(AGG_VALUE_COUNT);
-        final Cardinality cardinalityAggregation = searchResult.getAggregations().get(AGG_CARDINALITY);
+        ExtendedStatsAggregate extendedStatsAggregation =
+                Optional.ofNullable(searchResult.aggregations().get(AGG_EXTENDED_STATS))
+                        .filter(Aggregate::isExtendedStats)
+                        .map(Aggregate::extendedStats)
+                        .orElse(null);
+        ValueCountAggregate valueCountAggregation =
+                Optional.ofNullable(searchResult.aggregations().get(AGG_VALUE_COUNT))
+                        .filter(Aggregate::isValueCount)
+                        .map(Aggregate::valueCount)
+                        .orElse(null);
+        CardinalityAggregate cardinalityAggregation =
+                Optional.ofNullable(searchResult.aggregations().get(AGG_CARDINALITY))
+                        .filter(Aggregate::isCardinality)
+                        .map(Aggregate::cardinality)
+                        .orElse(null);
 
         return createFieldStatsResult(extendedStatsAggregation,
                 valueCountAggregation,
                 cardinalityAggregation,
                 resultMessages,
                 query,
-                searchSourceBuilder.toString(),
+                searchRequest.toJsonString(),
                 tookMs);
     }
 
-    private FieldStatsResult createFieldStatsResult(ExtendedStats extendedStatsAggregation,
-                                                    ValueCount valueCountAggregation,
-                                                    Cardinality cardinalityAggregation,
+    private FieldStatsResult createFieldStatsResult(ExtendedStatsAggregate extendedStatsAggregation,
+                                                    ValueCountAggregate valueCountAggregation,
+                                                    CardinalityAggregate cardinalityAggregation,
                                                     List<ResultMessage> resultMessages,
                                                     String query,
                                                     String builtQuery,
                                                     long tookMs) {
-        final long cardinality = cardinalityAggregation == null ? Long.MIN_VALUE : cardinalityAggregation.getValue();
-        final long count = valueCountAggregation == null ? Long.MIN_VALUE : valueCountAggregation.getValue();
+        final long cardinality = cardinalityAggregation == null ? Long.MIN_VALUE : cardinalityAggregation.value();
+        final long count = valueCountAggregation == null ? Long.MIN_VALUE : valueCountAggregation.value().longValue();
 
         double sum = Double.NaN;
         double sumOfSquares = Double.NaN;
@@ -159,13 +181,13 @@ public class SearchesAdapterOS implements SearchesAdapter {
         double stdDeviation = Double.NaN;
 
         if (extendedStatsAggregation != null) {
-            sum = firstNonNull(extendedStatsAggregation.getSum(), Double.NaN);
-            sumOfSquares = firstNonNull(extendedStatsAggregation.getSumOfSquares(), Double.NaN);
-            mean = firstNonNull(extendedStatsAggregation.getAvg(), Double.NaN);
-            min = firstNonNull(extendedStatsAggregation.getMin(), Double.NaN);
-            max = firstNonNull(extendedStatsAggregation.getMax(), Double.NaN);
-            variance = firstNonNull(extendedStatsAggregation.getVariance(), Double.NaN);
-            stdDeviation = firstNonNull(extendedStatsAggregation.getStdDeviation(), Double.NaN);
+            sum = firstNonNull(extendedStatsAggregation.sum(), Double.NaN);
+            sumOfSquares = firstNonNull(extendedStatsAggregation.sumOfSquares(), Double.NaN);
+            mean = firstNonNull(extendedStatsAggregation.avg(), Double.NaN);
+            min = firstNonNull(extendedStatsAggregation.min(), Double.NaN);
+            max = firstNonNull(extendedStatsAggregation.max(), Double.NaN);
+            variance = firstNonNull(extendedStatsAggregation.variance(), Double.NaN);
+            stdDeviation = firstNonNull(extendedStatsAggregation.stdDeviation(), Double.NaN);
         }
 
         return FieldStatsResult.create(

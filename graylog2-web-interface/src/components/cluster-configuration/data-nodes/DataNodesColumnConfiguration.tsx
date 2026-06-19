@@ -17,9 +17,9 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import { Label } from 'components/bootstrap';
 import type { ColumnRenderers, ColumnSchema } from 'components/common/EntityDataTable';
-import { Icon } from 'components/common';
-import { Link } from 'components/common/router';
+import { Icon, Link } from 'components/common';
 import DataNodeStatusCell from 'components/datanode/DataNodeList/DataNodeStatusCell';
 import type { DataNode } from 'components/datanode/Types';
 import Routes from 'routing/Routes';
@@ -28,7 +28,7 @@ import type { ClusterDataNode } from './fetchClusterDataNodes';
 import IndexingMetricsCell from './cells/IndexingMetricsCell';
 
 import CpuMetricsCell from '../shared-components/CpuMetricsCell';
-import { RoleLabel, SecondaryText } from '../shared-components/NodeMetricsLayout';
+import { SecondaryText } from '../shared-components/NodeMetricsLayout';
 import SizeAndRatioMetric from '../shared-components/SizeAndRatioMetric';
 
 export const DEFAULT_VISIBLE_COLUMNS = [
@@ -66,7 +66,7 @@ export const createColumnDefinitions = (): Array<ColumnSchema> => [
 const getRoleLabels = (roles: Array<string>) =>
   roles.map((role) => (
     <span key={role}>
-      <RoleLabel bsSize="xs">{role}</RoleLabel>&nbsp;
+      <Label bsSize="xs">{role}</Label>&nbsp;
     </span>
   ));
 

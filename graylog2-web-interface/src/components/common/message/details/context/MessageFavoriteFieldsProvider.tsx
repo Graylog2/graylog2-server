@@ -1,0 +1,118 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+
+import React, { useContext, useMemo } from 'react';
+import zip from 'lodash/zip';
+import uniq from 'lodash/uniq';
+import flattenDeep from 'lodash/flattenDeep';
+
+import type { Message } from 'views/components/messagelist/Types';
+import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
+import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
+import StreamsContext from 'contexts/StreamsContext';
+import type { Stream } from 'logic/streams/types';
+import { isPermitted } from 'util/PermissionsMixin';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { getStreamFavoriteFields } from 'components/common/message/helpers';
+import useMessageFavoriteFieldsMutation from 'components/common/message/details/fields/hooks/useMessageFavoriteFieldsMutation';
+
+type OriginalProps = React.PropsWithChildren<{
+  message: Message;
+  messageFields: FieldTypeMappingsList;
+}>;
+
+const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messageFields }: OriginalProps) => {
+  const streamsContext = useContext(StreamsContext);
+  const streamsList = useMemo(() => streamsContext ?? [], [streamsContext]);
+  const { permissions } = useCurrentUser();
+  const streams = useMemo<Array<Stream>>(() => {
+    const messageStreamIds: Array<string> = message?.fields?.streams ?? [];
+    const streamsById = Object.fromEntries(
+      streamsList
+        .filter((stream: Stream) => isPermitted(permissions, `streams:read:${stream.id}`))
+        .map((stream) => [stream.id, stream]),
+    );
+
+    return messageStreamIds.map((id) => streamsById?.[id]).filter((s) => !!s);
+  }, [message?.fields?.streams, permissions, streamsList]);
+
+  const initialFavoriteFieldsByStream = useMemo(
+    () => Object.fromEntries(streams.map((stream) => [stream.id, getStreamFavoriteFields(stream, message?.fields)])),
+    [message?.fields, streams],
+  );
+
+  const initialFavoriteFields = useMemo(
+    () => uniq(flattenDeep(zip(Object.values(initialFavoriteFieldsByStream)))),
+    [initialFavoriteFieldsByStream],
+  );
+
+  const editableStreams = useMemo(
+    () => streams.filter((stream) => isPermitted(permissions, `streams:edit:${stream.id}`)),
+    [permissions, streams],
+  );
+
+  const editableStreamsInitialFavoriteFields = useMemo(
+    () => Object.fromEntries(editableStreams.map(({ id }) => [id, initialFavoriteFieldsByStream[id]])),
+    [editableStreams, initialFavoriteFieldsByStream],
+  );
+
+  const { saveFavoriteField, toggleField, setFieldsIsPending } = useMessageFavoriteFieldsMutation(
+    editableStreamsInitialFavoriteFields,
+    initialFavoriteFields,
+  );
+
+  const contextValue = useMemo(
+    () => ({
+      favoriteFields: initialFavoriteFields,
+      saveFavoriteField,
+      messageFields,
+      message,
+      toggleField,
+      editableStreams,
+      setFieldsIsPending,
+      initialFavoriteFieldsByStream,
+    }),
+    [
+      initialFavoriteFields,
+      saveFavoriteField,
+      messageFields,
+      message,
+      toggleField,
+      setFieldsIsPending,
+      initialFavoriteFieldsByStream,
+      editableStreams,
+    ],
+  );
+
+  return <MessageFavoriteFieldsContext.Provider value={contextValue}>{children}</MessageFavoriteFieldsContext.Provider>;
+};
+
+const MessageFavoriteFieldsProvider = ({
+  children = null,
+  message,
+  messageFields,
+  isFeatureEnabled,
+}: OriginalProps & { isFeatureEnabled: boolean }) => {
+  if (!isFeatureEnabled) return children;
+
+  return (
+    <OriginalMessageFavoriteFieldsProvider message={message} messageFields={messageFields}>
+      {children}
+    </OriginalMessageFavoriteFieldsProvider>
+  );
+};
+export default MessageFavoriteFieldsProvider;

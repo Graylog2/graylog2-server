@@ -110,7 +110,7 @@ export default [
       'no-loop-func': 'error',
 
       'import/prefer-default-export': 'off',
-      'jsx-a11y/control-has-associated-label': 'error',
+      'jsx-a11y/control-has-associated-label': ['error', { depth: 3, ignoreElements: ['td', 'th'] }],
       'react/no-array-index-key': 'error',
       'react/no-danger': 'error',
       'react/no-unstable-nested-components': 'error',
@@ -170,7 +170,7 @@ export default [
             {
               name: 'react-router-dom',
               importNames: ['Link'],
-              message: 'Please use Link from `components/common/router` instead.',
+              message: 'Please use Link from `components/common` instead.',
             },
             {
               name: 'react-router-dom',
@@ -200,6 +200,11 @@ export default [
             {
               name: 'lodash/max',
               message: 'Please use `Math.max` instead.',
+            },
+            {
+              name: '@mantine/hooks',
+              message:
+                'We wrap Mantine hooks with our own abstractions. Check `util/hooks/` for an existing wrapper before importing from `@mantine/hooks` directly.',
             },
           ],
         },

@@ -26,12 +26,13 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import Series from 'views/logic/aggregationbuilder/Series';
 import { keySeparator } from 'views/Constants';
 import useExternalValueActions from 'views/hooks/useExternalValueActions';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import asMock from 'helpers/mocking/AsMock';
 
 import ChartColorContext from './ChartColorContext';
 
 jest.mock('views/logic/queries/useCurrentQueryId', () => () => 'active-query-id');
-jest.mock('views/stores/useViewsDispatch');
 jest.mock('views/hooks/useExternalValueActions');
 
 const colors = ColorMapper.create();
@@ -52,23 +53,27 @@ const SUT = ({
   plotConfig?: AggregationWidgetConfig;
   neverHide?: boolean;
 }) => (
-  <WidgetFocusContext.Provider
-    value={{
-      focusedWidget: undefined,
-      setWidgetFocusing: jest.fn(),
-      unsetWidgetFocusing: jest.fn(),
-      unsetWidgetEditing: jest.fn(),
-      setWidgetEditing: jest.fn(),
-    }}>
-    <ChartColorContext.Provider value={{ colors, setColor }}>
-      <PlotLegend config={plotConfig} chartData={chartDataProp} height={480} width={640} neverHide={neverHide}>
-        <div>Plot</div>
-      </PlotLegend>
-    </ChartColorContext.Provider>
-  </WidgetFocusContext.Provider>
+  <TestStoreProvider>
+    <WidgetFocusContext.Provider
+      value={{
+        focusedWidget: undefined,
+        setWidgetFocusing: jest.fn(),
+        unsetWidgetFocusing: jest.fn(),
+        unsetWidgetEditing: jest.fn(),
+        setWidgetEditing: jest.fn(),
+      }}>
+      <ChartColorContext.Provider value={{ colors, setColor }}>
+        <PlotLegend config={plotConfig} chartData={chartDataProp} height={480} width={640} neverHide={neverHide}>
+          <div>Plot</div>
+        </PlotLegend>
+      </ChartColorContext.Provider>
+    </WidgetFocusContext.Provider>
+  </TestStoreProvider>
 );
 
 describe('PlotLegend', () => {
+  useViewsPlugin();
+
   beforeEach(() => {
     asMock(useExternalValueActions).mockReturnValue({
       isLoading: false,

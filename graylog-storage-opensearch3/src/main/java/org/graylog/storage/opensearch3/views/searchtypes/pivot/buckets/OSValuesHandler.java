@@ -25,6 +25,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.ValuesBucketOrdering;
+import org.graylog.storage.opensearch3.OSSerializationUtils;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.OSPivotBucketSpecHandler;
@@ -34,12 +35,9 @@ import org.opensearch.client.opensearch._types.SortOrder;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
 import org.opensearch.client.opensearch._types.aggregations.AggregateVariant;
 import org.opensearch.client.opensearch._types.aggregations.Aggregation;
-import org.opensearch.client.opensearch._types.aggregations.DoubleTermsBucket;
 import org.opensearch.client.opensearch._types.aggregations.FiltersAggregation;
 import org.opensearch.client.opensearch._types.aggregations.FiltersBucket;
-import org.opensearch.client.opensearch._types.aggregations.LongTermsBucket;
 import org.opensearch.client.opensearch._types.aggregations.MultiBucketBase;
-import org.opensearch.client.opensearch._types.aggregations.StringTermsBucket;
 import org.opensearch.client.opensearch._types.aggregations.TermsAggregateBase;
 import org.opensearch.client.opensearch._types.aggregations.TermsAggregation;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
@@ -186,12 +184,7 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
     }
 
     private List<String> extractKeys(MultiBucketBase bucket) {
-        String keys = switch (bucket) {
-            case StringTermsBucket sterms -> sterms.key();
-            case DoubleTermsBucket dterms -> dterms.keyAsString();
-            case LongTermsBucket lterms -> lterms.keyAsString();
-            default -> "";
-        };
+        String keys = OSSerializationUtils.getBucketKeyAsString(bucket);
         return splitKeys(keys);
     }
 

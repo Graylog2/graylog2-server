@@ -21,7 +21,6 @@ import userEvent from '@testing-library/user-event';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
-import { act } from 'wrappedTestingLibrary/hooks';
 
 import selectEvent from 'helpers/selectEvent';
 import { asMock } from 'helpers/mocking';
@@ -132,6 +131,31 @@ describe('AggregationWizard', () => {
       await submitWidgetConfigForm();
 
       const pivot = Pivot.createValues(['took_ms'], expectedPivotConfig);
+      const updatedConfig = widgetConfig.toBuilder().rowPivots([pivot]).build();
+
+      await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
+
+      expect(onChange).toHaveBeenCalledWith(updatedConfig);
+    },
+    extendedTimeout,
+  );
+
+  it(
+    'should allow entering an arbitrary field that is not in the field list',
+    async () => {
+      const onChange = jest.fn();
+      renderSUT({ onChange });
+
+      await addGrouping();
+
+      const groupingContainer = await screen.findByTestId('grouping-0');
+      const fieldInput = await selectEvent.findSelectInput('Add a field', { container: groupingContainer });
+      await selectEvent.create(fieldInput, 'my_custom_field');
+
+      await within(groupingContainer).findByText('my_custom_field');
+      await submitWidgetConfigForm();
+
+      const pivot = Pivot.createValues(['my_custom_field'], expectedPivotConfig);
       const updatedConfig = widgetConfig.toBuilder().rowPivots([pivot]).build();
 
       await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
@@ -297,7 +321,7 @@ describe('AggregationWizard', () => {
 
       const deleteFieldButton = await screen.findByRole('button', { name: /remove timestamp field/i });
 
-      userEvent.click(deleteFieldButton);
+      await userEvent.click(deleteFieldButton);
 
       await screen.findByLabelText('Limit');
     },
@@ -328,7 +352,7 @@ describe('AggregationWizard', () => {
       renderSUT({ config, onChange: onChangeMock });
 
       const removeGroupingElementButton = screen.getByRole('button', { name: 'Remove Grouping' });
-      userEvent.click(removeGroupingElementButton);
+      await userEvent.click(removeGroupingElementButton);
 
       await submitWidgetConfigForm();
 
@@ -361,6 +385,7 @@ describe('AggregationWizard', () => {
     it(
       'should correctly update sort of grouping fields',
       async () => {
+        const user = userEvent.setup();
         const initialPivot = Pivot.createValues(['http_method', 'took_ms']);
         const updatedPivot = Pivot.createValues(['took_ms', 'http_method']);
         const config = widgetConfig.toBuilder().rowPivots([initialPivot]).build();
@@ -375,17 +400,13 @@ describe('AggregationWizard', () => {
         });
         firstItemDragHandle.focus();
 
-        await act(async () => {
-          await userEvent.keyboard('[Space]');
-        });
+        await user.keyboard('[Space]');
 
-        userEvent.keyboard('{ArrowDown}');
+        await user.keyboard('{ArrowDown}');
 
         await screen.findByText('Draggable item http_method was moved over droppable area took_ms.');
 
-        await act(async () => {
-          await userEvent.keyboard('[Space]');
-        });
+        await user.keyboard('[Space]');
 
         await submitWidgetConfigForm();
 

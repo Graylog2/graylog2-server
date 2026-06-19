@@ -26,11 +26,6 @@ import { inputs } from 'components/messageloaders/MessageLoaders.fixtures';
 
 import RecentMessageLoader from './RecentMessageLoader';
 
-jest.mock('util/AppConfig', () => ({
-  isCloud: jest.fn(() => false),
-  gl2ServerUrl: () => `https://graylog`,
-}));
-
 jest.mock('graylog-web-plugin/plugin', () => ({
   PluginStore: {
     exports: jest.fn(),
@@ -80,9 +75,7 @@ describe('<RecentMessageLoader>', () => {
       );
     });
 
-    it('allows user to select between server and forwarder input on premise', () => {
-      asMock(AppConfig.isCloud).mockImplementation(() => false);
-
+    it('allows user to select between server and forwarder input on premise', async () => {
       render(<RecentMessageLoader onMessageLoaded={jest.fn()} inputs={inputs} />);
 
       expect(screen.getByRole('combobox', { name: /input type select/i })).toBeInTheDocument();
@@ -91,7 +84,7 @@ describe('<RecentMessageLoader>', () => {
 
       expect(inputTypeSelect).toBeInTheDocument();
 
-      userEvent.selectOptions(inputTypeSelect, ['server']);
+      await userEvent.selectOptions(inputTypeSelect, ['server']);
 
       expect(screen.getByText(/select an input from the list below/i)).toBeInTheDocument();
       expect(screen.getByRole('combobox', { name: /server input select/i })).toBeInTheDocument();
@@ -100,7 +93,7 @@ describe('<RecentMessageLoader>', () => {
       expect(screen.queryByText(/select an input profile from the list/i)).not.toBeInTheDocument();
       expect(screen.queryByText(/forwarder inputs/i)).not.toBeInTheDocument();
 
-      userEvent.selectOptions(inputTypeSelect, ['forwarder']);
+      await userEvent.selectOptions(inputTypeSelect, ['forwarder']);
 
       expect(screen.getByText(/select an input profile from the list/i)).toBeInTheDocument();
       expect(screen.getByText(/forwarder inputs/i)).toBeInTheDocument();

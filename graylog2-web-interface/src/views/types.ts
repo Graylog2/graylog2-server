@@ -279,6 +279,9 @@ export interface ActionContexts {
   widget: Widget;
   message: Message;
   valuePath: ValuePath;
+  // How to combine the entries of `valuePath` when generating a query clause. Defaults to 'AND'
+  // (combined groupings); 'OR' is used e.g. for a network-graph node queried across all groupings.
+  valuePathOperator?: 'AND' | 'OR';
   isLocalNode: boolean;
   parameters?: Immutable.Set<Parameter>;
   parameterBindings?: ParameterBindings;
@@ -286,6 +289,10 @@ export interface ActionContexts {
   toggleFavoriteField?: (field: string) => void;
   favoriteFields?: Array<string>;
 }
+
+export type AdditionalViewsActionHandlerArguments = {
+  queryId: QueryId;
+};
 
 export type SearchTypeResult = SearchTypeResultTypes[keyof SearchTypeResultTypes];
 export type SearchTypeResults = { [id: string]: SearchTypeResult };
@@ -434,6 +441,14 @@ type MessageActionComponentProps = {
   id: string;
 };
 
+export type MessageBulkActionsComponentProps<T = unknown> = {
+  modalRef: () => T;
+};
+
+export type MessageBulkActionsModalProps<T = unknown> = {
+  ref: React.LegacyRef<T>;
+};
+
 type SearchActionComponentProps = {
   loaded: boolean;
   search: View;
@@ -452,8 +467,10 @@ interface MessageRowOverrideProps {
 
 export interface CombinedSearchBarFormValues {
   timerange?: TimeRange | NoTimeRangeOverride;
-  streams?: Array<string>;
-  streamCategories?: Array<string>;
+  streamsAndCategories?: {
+    streams: Array<string>;
+    categories?: Array<string>;
+  };
   queryString?: string;
 }
 
@@ -569,7 +586,7 @@ export interface WidgetCreator {
   icon: React.ComponentType<{}>;
 }
 
-export type FieldUnitType = 'size' | 'time' | 'percent';
+export type FieldUnitType = 'size' | 'time' | 'percent' | 'binary_size';
 
 export type DefaultAxisKey = typeof DEFAULT_AXIS_KEY;
 
@@ -616,20 +633,32 @@ type MarkdownAugmentation = {
 
 export type EventReplaySideBarDetailsProps = {
   alertId: string;
+  definitionId?: string;
+};
+
+export type EventDefinitionSideBarDetailsProps = {
+  definitionId: string;
 };
 
 export type EventReplaySideBarPlugin = {
   component: React.ComponentType<EventReplaySideBarDetailsProps>;
+  eventDefinitionComponent?: React.ComponentType<EventDefinitionSideBarDetailsProps>;
   key: string;
   useCondition?: () => boolean;
 };
 
+export type SidebarComponentPlugin = {
+  key: string;
+  component: React.ComponentType<any>;
+};
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
+    'sidebar.components'?: Array<SidebarComponentPlugin>;
     creators?: Array<Creator>;
     enterpriseWidgets?: Array<WidgetExport>;
     useExternalActions?: Array<() => ExternalActionsHookData>;
-    fieldActions?: Array<ActionDefinition>;
+    fieldActions?: Array<ActionDefinition<AdditionalViewsActionHandlerArguments>>;
     fieldTypeValueRenderer?: Array<{
       type: string;
       render: (value: unknown, field: string, render: React.ComponentType<ValueRendererProps>) => React.ReactNode;
@@ -638,7 +667,7 @@ declare module 'graylog-web-plugin/plugin' {
     searchTypes?: Array<SearchType<any, any>>;
     coreSystemConfigurations?: Array<CoreSystemConfiguration>;
     systemConfigurations?: Array<SystemConfiguration>;
-    valueActions?: Array<ActionDefinition>;
+    valueActions?: Array<ActionDefinition<AdditionalViewsActionHandlerArguments>>;
     'views.completers'?: Array<Completer>;
     'views.components.assetInformationActions'?: Array<AssetInformation>;
     'views.components.eventProcedureForm'?: Array<EventProcedureForm>;
@@ -655,6 +684,12 @@ declare module 'graylog-web-plugin/plugin' {
     'views.components.widgets.messageTable.contextProviders'?: Array<React.ComponentType<React.PropsWithChildren<{}>>>;
     'views.components.widgets.messageTable.messageActions'?: Array<{
       component: React.ComponentType<MessageActionComponentProps>;
+      key: string;
+      useCondition: () => boolean;
+    }>;
+    'views.components.widgets.messageTable.messageBulkActions'?: Array<{
+      component: React.ComponentType<MessageBulkActionsComponentProps<unknown>>;
+      modal?: React.ComponentType<MessageBulkActionsModalProps<unknown>>;
       key: string;
       useCondition: () => boolean;
     }>;

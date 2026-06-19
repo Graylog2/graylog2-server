@@ -23,7 +23,6 @@ import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.client.opensearch._types.ExpandWildcard;
-import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.SearchRequest;
 
 import java.util.List;
@@ -42,6 +41,7 @@ class PaginationOSTest {
     @BeforeEach
     void setUp() {
         final SearchRequestFactoryOS searchRequestFactory = new SearchRequestFactoryOS(
+                true,
                 true,  // allowLeadingWildcardSearches
                 new IgnoreSearchFilters()
         );
@@ -49,8 +49,7 @@ class PaginationOSTest {
         paginationOS = new PaginationOS(
                 null,  // resultMessageFactory - not needed for these tests
                 null,  // opensearchClient - not needed for these tests
-                searchRequestFactory,
-                true   // allowHighlighting
+                searchRequestFactory
         );
     }
 
@@ -226,7 +225,7 @@ class PaginationOSTest {
                 .build();
 
         // When
-        final Query query = paginationOS.createQuery(chunkCommand);
+        final SearchRequest query = paginationOS.buildSearchRequest(chunkCommand);
 
         // Then
         assertThat(query.toJsonString()).contains("test query");

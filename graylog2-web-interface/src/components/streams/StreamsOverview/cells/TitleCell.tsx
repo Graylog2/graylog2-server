@@ -18,16 +18,14 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import Routes from 'routing/Routes';
-import { Link } from 'components/common/router';
-import type { Stream } from 'stores/streams/StreamsStore';
+import { Link, Text } from 'components/common';
+import type { Stream } from 'logic/streams/types';
 import { Label } from 'components/bootstrap';
-import { Text } from 'components/common';
 
 type Props = {
   stream: Stream;
 };
 const DefaultLabel = styled(Label)`
-  display: inline-flex;
   margin-left: 5px;
   vertical-align: inherit;
 `;

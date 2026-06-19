@@ -22,8 +22,11 @@ import com.github.joschi.jadconfig.Validator;
 import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.StringSetConverter;
 import com.github.joschi.jadconfig.converters.TrimmedStringSetConverter;
+import com.github.joschi.jadconfig.documentation.Documentation;
 import com.github.joschi.jadconfig.documentation.DocumentationSection;
 import com.github.joschi.jadconfig.util.Duration;
+import com.github.joschi.jadconfig.util.Size;
+import com.github.joschi.jadconfig.util.SizeUnit;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
@@ -38,9 +41,9 @@ import org.graylog2.cluster.leader.AutomaticLeaderElectionService;
 import org.graylog2.cluster.leader.LeaderElectionMode;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.cluster.lock.MongoLockService;
-import com.github.joschi.jadconfig.documentation.Documentation;
 import org.graylog2.configuration.DocumentationConstants;
 import org.graylog2.configuration.converters.JavaDurationConverter;
+import org.graylog2.configuration.validators.PositiveJavaDurationValidator;
 import org.graylog2.notifications.Notification;
 import org.graylog2.outputs.BatchSizeConfig;
 import org.graylog2.plugin.Tools;
@@ -513,9 +516,13 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Parameter(value = "global_inputs_only")
     private boolean globalInputsOnly = false;
 
-    @Documentation("tbd")
-    @Parameter(value = "max_event_age", converter = JavaDurationConverter.class)
-    private java.time.Duration maxEventAge = java.time.Duration.ofDays(1L);
+    @Documentation("""
+            This parameter defines the maximum size in bytes of cluster events. When it is exceeded, oldest events will
+            be overwritten. This should be as small as possible (for performance), but large enough to hold events long
+            enough for all nodes to process them.
+            """)
+    @Parameter(value = "max_events_collection_size")
+    private Size maxEventsCollectionSize = Size.megabytes(100);
 
     public boolean maintainsStreamAwareFieldTypes() {
         return streamAwareFieldTypes;

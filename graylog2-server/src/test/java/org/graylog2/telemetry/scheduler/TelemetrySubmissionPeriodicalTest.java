@@ -77,4 +77,16 @@ class TelemetrySubmissionPeriodicalTest {
 
         verify(client).capture(Map.of("1", event1, "2", event2));
     }
+
+    @Test
+    void exceptionsAreCaught() throws IOException {
+        final TelemetryConfiguration conf = mock(TelemetryConfiguration.class);
+        final var periodical = new TelemetrySubmissionPeriodical(client, conf, Map.of(
+                "1", () -> Optional.of(TelemetryEvent.of(Map.of("foo", 42L))),
+                "2", () -> {throw new IllegalStateException();}
+        ));
+
+        periodical.doRun();
+        verify(client).capture(Map.of("1", TelemetryEvent.of(Map.of("foo", 42L))));
+    }
 }

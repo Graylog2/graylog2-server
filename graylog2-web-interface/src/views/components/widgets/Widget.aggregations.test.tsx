@@ -20,7 +20,6 @@ import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
 import selectEvent from 'helpers/selectEvent';
-import MockStore from 'helpers/mocking/StoreMock';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
@@ -37,6 +36,8 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import { updateWidget } from 'views/logic/slices/widgetActions';
 import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
 import suppressConsole from 'helpers/suppressConsole';
+import StreamsContext from 'contexts/StreamsContext';
+import type { Stream } from 'logic/streams/types';
 
 import Widget from './Widget';
 import type { Props as WidgetComponentProps } from './Widget';
@@ -59,14 +60,7 @@ jest.mock('views/logic/fieldtypes/useFieldTypes');
 
 jest.mock('views/hooks/useAggregationFunctions');
 
-jest.mock('views/stores/StreamsStore', () => ({
-  StreamsStore: MockStore([
-    'getInitialState',
-    () => ({
-      streams: [{ title: 'Stream 1', id: 'stream-id-1' }],
-    }),
-  ]),
-}));
+const streams = [{ title: 'Stream 1', id: 'stream-id-1', categories: [] }] as Array<Stream>;
 
 jest.mock('views/hooks/useViewType');
 
@@ -76,6 +70,8 @@ jest.mock('views/logic/slices/widgetActions', () => ({
   ...jest.requireActual('views/logic/slices/widgetActions'),
   updateWidget: jest.fn(() => async () => {}),
 }));
+
+const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
 
 describe('Aggregation Widget', () => {
   useViewsPlugin();
@@ -114,20 +110,22 @@ describe('Aggregation Widget', () => {
 
   const AggregationWidget = ({ widget: propsWidget = dataTableWidget, ...props }: AggregationWidgetProps) => (
     <TestStoreProvider>
-      <TestFieldTypesContextProvider>
-        <WidgetFocusContext.Provider value={widgetFocusContextState}>
-          <WidgetContext.Provider value={propsWidget}>
-            <Widget
-              widget={propsWidget}
-              id="widgetId"
-              onPositionsChange={() => {}}
-              title="Widget Title"
-              position={new WidgetPosition(1, 1, 1, 1)}
-              {...props}
-            />
-          </WidgetContext.Provider>
-        </WidgetFocusContext.Provider>
-      </TestFieldTypesContextProvider>
+      <StreamsContext.Provider value={streams}>
+        <TestFieldTypesContextProvider>
+          <WidgetFocusContext.Provider value={widgetFocusContextState}>
+            <WidgetContext.Provider value={propsWidget}>
+              <Widget
+                widget={propsWidget}
+                id="widgetId"
+                onPositionsChange={() => {}}
+                title="Widget Title"
+                position={new WidgetPosition(1, 1, 1, 1)}
+                {...props}
+              />
+            </WidgetContext.Provider>
+          </WidgetFocusContext.Provider>
+        </TestFieldTypesContextProvider>
+      </StreamsContext.Provider>
     </TestStoreProvider>
   );
 
@@ -140,7 +138,7 @@ describe('Aggregation Widget', () => {
       expect(saveButton).not.toBeDisabled();
     });
 
-    await userEvent.click(saveButton);
+    await setupUser().click(saveButton);
   };
 
   describe('on a dashboard', () => {
@@ -157,15 +155,20 @@ describe('Aggregation Widget', () => {
           .build();
         const updatedConfig = dataTableWidget.config.toBuilder().series([newSeries]).build();
 
-        const updatedWidget = dataTableWidget.toBuilder().config(updatedConfig).streams(['stream-id-1']).build();
+        const updatedWidget = dataTableWidget
+          .toBuilder()
+          .config(updatedConfig)
+          .streams(['stream-id-1'])
+          .streamCategories([])
+          .build();
         render(<AggregationWidget editing />);
 
         // Change widget aggregation elements
         const addMetricButton = await screen.findByRole('button', { name: 'Add a Metric' });
-        await userEvent.click(addMetricButton);
+        await setupUser().click(addMetricButton);
 
         const nameInput = await screen.findByLabelText(/Name/);
-        await userEvent.type(nameInput, 'Metric name');
+        await setupUser().type(nameInput, 'Metric name');
 
         await selectEvent.chooseOption('Select a function', 'Count');
 
@@ -207,16 +210,16 @@ describe('Aggregation Widget', () => {
         const timeRangePickerButton = await screen.findByLabelText('Open Time Range Selector');
         // Suppressing nested form error for now, until usage of `NestedForms` is fixed
         await suppressConsole(async () => {
-          await userEvent.click(timeRangePickerButton);
+          await setupUser().click(timeRangePickerButton);
         });
 
         const absoluteTabButton = await screen.findByRole('tab', { name: /absolute/i });
         jest.setSystemTime(mockedUnixTime);
-        await userEvent.click(absoluteTabButton);
+        await setupUser().click(absoluteTabButton);
 
         const applyTimeRangeChangesButton = await screen.findByRole('button', { name: 'Update time range' });
         await waitFor(() => expect(applyTimeRangeChangesButton).not.toBeDisabled());
-        await userEvent.click(applyTimeRangeChangesButton);
+        await setupUser().click(applyTimeRangeChangesButton);
 
         const timeRangeDisplay = await screen.findByLabelText('Search Time Range, Opens Time Range Selector On Click');
         await within(timeRangeDisplay).findByText('2020-01-01 00:55:00.000');
@@ -245,10 +248,10 @@ describe('Aggregation Widget', () => {
 
         // Change widget aggregation elements
         const addMetricButton = await screen.findByRole('button', { name: 'Add a Metric' });
-        await userEvent.click(addMetricButton);
+        await setupUser().click(addMetricButton);
 
         const nameInput = await screen.findByLabelText(/Name/);
-        await userEvent.type(nameInput, 'Metric name');
+        await setupUser().type(nameInput, 'Metric name');
 
         await selectEvent.chooseOption('Select a function', 'Count');
 

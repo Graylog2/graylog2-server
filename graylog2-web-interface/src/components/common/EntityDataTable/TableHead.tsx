@@ -46,13 +46,16 @@ export const Th = styled.th<{
     width: var(${columnWidthVar($colId)});
     opacity: var(${columnOpacityVar($colId)}, 1);
     transform: var(${columnTransformVar($colId)}, translate3d(0, 0, 0));
-    background-color: ${theme.colors.table.head.background};
     transition: var(${columnTransition()}, none);
     height: 100%; // required to be able to use height: 100% in child elements
     ${$pinningPosition
       ? css`
           position: sticky;
           ${$pinningPosition === 'left' ? 'left' : 'right'}: 0;
+          background-color: ${theme.utils.flattenColorStack([
+            theme.colors.global.contentBackground,
+            theme.colors.table.head.background,
+          ])};
         `
       : ''}
 

@@ -79,7 +79,7 @@ public class DatanodeSelfsignedStartupIT {
                     .relaxedHTTPSValidation(true)
                     .jwtAuthToken(createJwtAuthToken())
                     .build())
-                    .waitForNodesCount(1);
+                    .waitForGreenStatusAndNodesCount(1);
 
             response.assertThat().body("status", Matchers.equalTo("green"));
         } catch (Exception e) {

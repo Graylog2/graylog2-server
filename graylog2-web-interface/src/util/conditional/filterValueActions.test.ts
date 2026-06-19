@@ -15,16 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import asMock from 'helpers/mocking/AsMock';
-import type { ActionDefinition } from 'views/components/actions/ActionHandler';
 import AppConfig from 'util/AppConfig';
 
 import filterValueActions, { filterCloudValueActions } from './filterValueActions';
 
-jest.mock('util/AppConfig', () => ({
-  isCloud: jest.fn(() => false),
-}));
-
-const items: Array<ActionDefinition> = [
+const items = [
   { type: 'something', title: 'something', resetFocus: false, handler: () => Promise.resolve(42) },
   { type: 'delete-me', title: 'delete me', resetFocus: false, handler: () => Promise.resolve(42) },
 ];

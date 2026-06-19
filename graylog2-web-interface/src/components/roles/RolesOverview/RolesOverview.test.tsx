@@ -19,10 +19,8 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
 
-import mockAction from 'helpers/mocking/MockAction';
+import { loadRolesPaginated } from 'hooks/useAuthzRoles';
 import { rolesList as mockRoles } from 'fixtures/roles';
-import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 import RolesOverview from './RolesOverview';
 
@@ -45,23 +43,14 @@ const loadRolesPaginatedResponse = {
 
 const mockLoadRolesPaginatedPromise = Promise.resolve(loadRolesPaginatedResponse);
 
-jest.mock('stores/roles/AuthzRolesStore', () => ({
-  AuthzRolesStore: {
-    listen: jest.fn(),
-  },
-  AuthzRolesActions: {
-    delete: mockAction(),
-    loadRolesPaginated: jest.fn(() => mockLoadRolesPaginatedPromise),
-  },
+jest.mock('hooks/useAuthzRoles', () => ({
+  AUTHZ_ROLES_QUERY_KEY: ['authz', 'roles'],
+  deleteRole: jest.fn(() => Promise.resolve()),
+  loadRolesPaginated: jest.fn(() => mockLoadRolesPaginatedPromise),
 }));
 
 describe('RolesOverview', () => {
-  const renderSUT = () =>
-    render(
-      <DefaultQueryParamProvider>
-        <RolesOverview />
-      </DefaultQueryParamProvider>,
-    );
+  const renderSUT = () => render(<RolesOverview />);
 
   afterEach(() => {
     jest.clearAllMocks();
@@ -93,7 +82,7 @@ describe('RolesOverview', () => {
     await userEvent.type(searchInput, 'name:manager');
 
     await waitFor(() =>
-      expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith({
+      expect(loadRolesPaginated).toHaveBeenCalledWith({
         page: 1,
         perPage: 10,
         query: 'name:manager',
@@ -108,7 +97,7 @@ describe('RolesOverview', () => {
     await userEvent.type(searchInput, 'name:manager');
 
     await waitFor(() =>
-      expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith({
+      expect(loadRolesPaginated).toHaveBeenCalledWith({
         page: 1,
         perPage: 10,
         query: 'name:manager',
@@ -118,8 +107,6 @@ describe('RolesOverview', () => {
     const resetSearchButton = await screen.findByRole('button', { name: 'Reset search' });
     await userEvent.click(resetSearchButton);
 
-    await waitFor(() =>
-      expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith({ page: 1, perPage: 10, query: '' }),
-    );
+    await waitFor(() => expect(loadRolesPaginated).toHaveBeenCalledWith({ page: 1, perPage: 10, query: '' }));
   });
 });

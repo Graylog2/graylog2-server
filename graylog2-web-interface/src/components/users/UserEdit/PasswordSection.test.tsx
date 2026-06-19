@@ -16,7 +16,7 @@
  */
 import userEvent from '@testing-library/user-event';
 import * as React from 'react';
-import { render, waitFor, screen, act } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import { defaultUser } from 'defaultMockValues';
 
 import { asMock } from 'helpers/mocking';
@@ -24,7 +24,7 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import { alice } from 'fixtures/users';
 import usePasswordComplexityConfig from 'components/users/usePasswordComplexityConfig';
 import { PASSWORD_SPECIAL_CHARACTERS } from 'logic/users/passwordComplexity';
-import { UsersActions } from 'stores/users/UsersStore';
+import { changeUserPassword } from 'hooks/useUsers';
 
 import PasswordSection from './PasswordSection';
 
@@ -40,10 +40,9 @@ const passwordComplexityConfig = {
 jest.mock('hooks/useCurrentUser');
 jest.mock('components/users/usePasswordComplexityConfig');
 
-jest.mock('stores/users/UsersStore', () => ({
-  UsersActions: {
-    changePassword: jest.fn(() => Promise.resolve()),
-  },
+jest.mock('hooks/useUsers', () => ({
+  USERS_QUERY_KEY: ['users'],
+  changeUserPassword: jest.fn(() => Promise.resolve()),
 }));
 
 describe('<PasswordSection />', () => {
@@ -63,16 +62,13 @@ describe('<PasswordSection />', () => {
     const newPasswordRepeatInput = screen.getByLabelText('Repeat Password');
     const submitButton = screen.getByText('Change Password');
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      await userEvent.type(newPasswordInput, 'Abcdef1!');
-      await userEvent.type(newPasswordRepeatInput, 'Abcdef1!');
-      await userEvent.click(submitButton);
-    });
+    await userEvent.type(newPasswordInput, 'Abcdef1!');
+    await userEvent.type(newPasswordRepeatInput, 'Abcdef1!');
+    await userEvent.click(submitButton);
 
-    await waitFor(() => expect(UsersActions.changePassword).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(changeUserPassword).toHaveBeenCalledTimes(1));
 
-    expect(UsersActions.changePassword).toHaveBeenCalledWith(exampleUser.id, {
+    expect(changeUserPassword).toHaveBeenCalledWith(exampleUser.id, {
       password: 'Abcdef1!',
     });
   });
@@ -86,17 +82,14 @@ describe('<PasswordSection />', () => {
     const newPasswordRepeatInput = screen.getByLabelText('Repeat Password');
     const submitButton = screen.getByText('Change Password');
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      await userEvent.type(passwordInput, 'oldpassword');
-      await userEvent.type(newPasswordInput, 'Abcdef1!');
-      await userEvent.type(newPasswordRepeatInput, 'Abcdef1!');
-      await userEvent.click(submitButton);
-    });
+    await userEvent.type(passwordInput, 'oldpassword');
+    await userEvent.type(newPasswordInput, 'Abcdef1!');
+    await userEvent.type(newPasswordRepeatInput, 'Abcdef1!');
+    await userEvent.click(submitButton);
 
-    await waitFor(() => expect(UsersActions.changePassword).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(changeUserPassword).toHaveBeenCalledTimes(1));
 
-    expect(UsersActions.changePassword).toHaveBeenCalledWith(exampleUser.id, {
+    expect(changeUserPassword).toHaveBeenCalledWith(exampleUser.id, {
       old_password: 'oldpassword',
       password: 'Abcdef1!',
     });
@@ -108,12 +101,9 @@ describe('<PasswordSection />', () => {
     const newPasswordInput = screen.getByLabelText('New Password');
     const newPasswordRepeatInput = screen.getByLabelText('Repeat Password');
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      await userEvent.type(newPasswordInput, 'Abcdef1!');
-      await userEvent.type(newPasswordRepeatInput, 'Abcdef1?');
-      await userEvent.tab();
-    });
+    await userEvent.type(newPasswordInput, 'Abcdef1!');
+    await userEvent.type(newPasswordRepeatInput, 'Abcdef1?');
+    await userEvent.tab();
 
     await screen.findByText('Passwords do not match');
   });
@@ -125,10 +115,7 @@ describe('<PasswordSection />', () => {
 
     const newPasswordInput = screen.getByLabelText('New Password');
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      await userEvent.type(newPasswordInput, 'Abcdef1!');
-    });
+    await userEvent.type(newPasswordInput, 'Abcdef1!');
 
     await waitFor(() => {
       expect(
@@ -142,11 +129,8 @@ describe('<PasswordSection />', () => {
 
     const newPasswordInput = screen.getByLabelText('New Password');
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      await userEvent.type(newPasswordInput, 'abc');
-      await userEvent.tab();
-    });
+    await userEvent.type(newPasswordInput, 'abc');
+    await userEvent.tab();
 
     expect(screen.getByText('Password must be at least 8 characters long.', { exact: false })).toBeInTheDocument();
     expect(
