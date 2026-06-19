@@ -41,7 +41,7 @@ const ControlLabel = ({ children, className = undefined, htmlFor = undefined, st
   const controlId = useContext(FormGroupControlIdContext);
 
   return (
-    <StyledLabel htmlFor={htmlFor ?? controlId} className={className} style={style}>
+    <StyledLabel htmlFor={htmlFor ?? controlId} className={`${className} control-label`} style={style}>
       {children}
     </StyledLabel>
   );
