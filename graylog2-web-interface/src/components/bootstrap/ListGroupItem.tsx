@@ -133,7 +133,6 @@ type Props = React.PropsWithChildren<{
   href?: string;
   onClick?: () => void;
   onKeyDown?: React.KeyboardEventHandler;
-  role?: 'listitem' | 'button';
 }>;
 
 const ListGroupItem = (
@@ -148,13 +147,11 @@ const ListGroupItem = (
     id = undefined,
     onClick = undefined,
     onKeyDown = undefined,
-    role = undefined,
   }: Props,
   ref: React.ForwardedRef<HTMLLIElement>,
 ) => {
   const isLink = !!href;
   const isInteractive = !!(onClick || href);
-  const effectiveRole = role ?? (isInteractive && !isLink ? 'button' : undefined);
 
   const content = (
     <>
@@ -180,7 +177,7 @@ const ListGroupItem = (
       ) : (
         <InnerContainer
           {...sharedInnerProps}
-          role={effectiveRole}
+          role={isInteractive && !isLink ? 'button' : undefined}
           tabIndex={isInteractive && !disabled ? 0 : undefined}
           onClick={!disabled ? onClick : undefined}
           onKeyDown={onKeyDown}>

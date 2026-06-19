@@ -43,7 +43,6 @@ const StyledListGroup = styled(ListGroup)(
   `,
 );
 
-
 const StyledTitle = styled.p(
   ({ theme }) => css`
     font-weight: bold;

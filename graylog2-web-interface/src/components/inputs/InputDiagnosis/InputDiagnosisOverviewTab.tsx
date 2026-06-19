@@ -301,9 +301,7 @@ const InputDiagnosisOverviewTab = ({
           {Object.keys(inputNodeStates.states).map((state: InputState) => (
             <StateListItem key={state} state={state} inputNodeStates={inputNodeStates} />
           ))}
-          {Object.keys(inputNodeStates.states).length === 0 && (
-            <ListGroupItem>Input is not running.</ListGroupItem>
-          )}
+          {Object.keys(inputNodeStates.states).length === 0 && <ListGroupItem>Input is not running.</ListGroupItem>}
         </StyledListGroup>
       </Section>
     </StyledSectionGrid>

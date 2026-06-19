@@ -23,27 +23,24 @@ const StyledList = styled.ul`
   margin: 0;
 `;
 
-type OwnProps = {
+type Props = {
   bsClass?: string;
+  children?: React.ReactNode;
+  className?: string;
   componentClass?: React.ElementType;
+  'data-testid'?: string;
+  style?: React.CSSProperties;
 };
-
-type Props = OwnProps & React.ComponentPropsWithoutRef<'ul'>;
 
 const ListGroup = ({
   bsClass = undefined,
   children = undefined,
   className = undefined,
   componentClass = undefined,
+  'data-testid': dataTestId = undefined,
   style = undefined,
-  ...rest
 }: Props) => (
-  <StyledList
-    as={componentClass}
-    className={[className, bsClass].filter(Boolean).join(' ') || undefined}
-    style={style}
-    {...rest}
-  >
+  <StyledList as={componentClass} className={`${className ?? ''} ${bsClass ?? ''}`} style={style} data-testid={dataTestId}>
     {children}
   </StyledList>
 );
