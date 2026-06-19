@@ -18,9 +18,9 @@ import React from 'react';
 
 import InputDescription from 'components/common/InputDescription';
 import type { BsSize } from 'components/bootstrap/types';
+import Radio from 'components/common/Radio';
 
 import Checkbox from './Checkbox';
-import Radio from 'components/common/Radio';
 import ControlLabel from './ControlLabel';
 import FormControl from './FormControl';
 import FormGroup from './FormGroup';
