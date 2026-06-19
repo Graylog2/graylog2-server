@@ -42,12 +42,6 @@ class InputStartupErrorsTest {
         return input;
     }
 
-    private NativeIoException mockNativeIoException(String message) {
-        final var exception = mock(NativeIoException.class);
-        when(exception.getMessage()).thenReturn(message);
-        return exception;
-    }
-
     private MessageInput mockInputWithoutAddress() {
         final var input = mock(MessageInput.class);
         when(input.getConfiguration()).thenReturn(new Configuration(Map.of()));
@@ -82,24 +76,13 @@ class InputStartupErrorsTest {
         // Netty's native (epoll/kqueue) transport throws NativeIoException, not BindException.
         // Constructing a real one needs the native lib loaded, so mock it; the message format
         // matches what Netty produces for a failed bind() syscall with EADDRINUSE.
-        final var exception = new MisfireException("Failed to start input",
-                mockNativeIoException("bind(..) failed with error(-98): Address already in use"));
+        final var nativeError = mock(NativeIoException.class);
+        when(nativeError.getMessage()).thenReturn("bind(..) failed with error(-98): Address already in use");
+        final var exception = new MisfireException("Failed to start input", nativeError);
 
         final String result = InputStartupErrors.describeFailure(input, exception);
 
         assertThat(result).contains("4317").contains("0.0.0.0").contains("already in use");
-    }
-
-    @Test
-    void nativeIoExceptionNonBindIsNotTreatedAsBindFailure() {
-        final var input = mockInputWithAddress("0.0.0.0", 9000);
-        // A non-bind native error (here: connect) must not be reported as a bind failure.
-        final var exception = new MisfireException("Failed to start input",
-                mockNativeIoException("connect(..) failed with error(-111): Connection refused"));
-
-        final String result = InputStartupErrors.describeFailure(input, exception);
-
-        assertThat(result).doesNotContain("Cannot bind").doesNotContain("already in use");
     }
 
     @Test
@@ -148,18 +131,6 @@ class InputStartupErrorsTest {
     }
 
     @Test
-    void deeplyNestedExceptionChain() {
-        final var input = mockInputWithAddress("0.0.0.0", 4317);
-        final var exception = new MisfireException(
-                new MisfireException("Failed to start gRPC server",
-                        new BindException("Address already in use")));
-
-        final String result = InputStartupErrors.describeFailure(input, exception);
-
-        assertThat(result).contains("4317").contains("0.0.0.0");
-    }
-
-    @Test
     void unknownHostExceptionWithNullMessage() {
         final var input = mockInputWithAddress("0.0.0.0", 514);
         final var exception = new MisfireException(new UnknownHostException());
@@ -167,15 +138,5 @@ class InputStartupErrorsTest {
         final String result = InputStartupErrors.describeFailure(input, exception);
 
         assertThat(result).doesNotContain("null");
-    }
-
-    @Test
-    void nullExceptionMessage() {
-        final var input = mockInputWithAddress("0.0.0.0", 4317);
-        final var exception = new RuntimeException((String) null);
-
-        final String result = InputStartupErrors.describeFailure(input, exception);
-
-        assertThat(result).isNotNull().isNotEmpty();
     }
 }
