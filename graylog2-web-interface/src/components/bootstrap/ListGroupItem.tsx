@@ -88,8 +88,6 @@ const InnerContainer = styled.div<StyledProps>(
     css`
       color: ${theme.colors.variant.darker.default};
       background-color: ${theme.colors.variant.lightest.info};
-      border-color: ${theme.colors.variant.lightest.info};
-      z-index: auto;
 
       .list-group-item-heading,
       .list-group-item-heading > small,
@@ -119,7 +117,6 @@ const InnerContainer = styled.div<StyledProps>(
         css`
           color: ${theme.utils.readableColor(theme.colors.variant.light[$bsStyle])};
           background-color: ${theme.colors.variant.light[$bsStyle]};
-          border-color: ${theme.colors.variant.light[$bsStyle]};
         `}
       `}
     `}
