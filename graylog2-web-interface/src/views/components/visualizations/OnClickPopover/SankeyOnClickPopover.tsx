@@ -87,7 +87,7 @@ const linkContext = (
 const nodeContext = (pt: SankeyClickPoint): NodeCustomData | null => {
   const cd = pt.customdata as NodeCustomData | undefined;
 
-  return cd && typeof (cd as NodeCustomData).field === 'string' ? cd : null;
+  return cd && typeof cd.field === 'string' ? cd : null;
 };
 
 type Props = {

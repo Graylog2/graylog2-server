@@ -62,7 +62,7 @@ const runLayout = (nodeCount: number, links: ReadonlyArray<{ source: number; tar
   const simNodes: Array<SimNode> = Array.from({ length: nodeCount }, (_, i) => ({ id: i }));
   const simLinks: Array<SimLink> = links.map((l) => ({ source: l.source, target: l.target }));
 
-  const simulation = forceSimulation(simNodes as never)
+  const simulation = forceSimulation(simNodes)
     .force(
       'link',
       forceLink(simLinks as never)
@@ -217,138 +217,135 @@ const buildLayout = (width: number, height: number, positions: NodePositions | n
   };
 };
 
-const NetworkGraphVisualization = makeVisualization(
-  ({ config, data, height, width }: VisualizationComponentProps) => {
-    const rows = retrieveChartData(data);
-    const mapKeys = useMapKeys();
-    const theme = useTheme();
-    const { onChartClick, initializeGraphDivRef, popover } = usePlotOnClickPopover({ ...networkOnClickPopover, config });
-    const visualizationConfig = (config.visualizationConfig ??
-      NetworkVisualizationConfig.empty()) as NetworkVisualizationConfig;
+const NetworkGraphVisualization = makeVisualization(({ config, data, height, width }: VisualizationComponentProps) => {
+  const rows = retrieveChartData(data);
+  const mapKeys = useMapKeys();
+  const theme = useTheme();
+  const { onChartClick, initializeGraphDivRef, popover } = usePlotOnClickPopover({ ...networkOnClickPopover, config });
+  const visualizationConfig =
+    (config.visualizationConfig as NetworkVisualizationConfig) ?? NetworkVisualizationConfig.empty();
 
-    const plot = useMemo<{ traces: [EdgeTrace, NodeTrace]; xs: Array<number>; ys: Array<number> } | null>(() => {
-      const rowFields = config.rowPivots.flatMap((pivot) => pivot.fields);
-      const columnFields = config.columnPivots.flatMap((pivot) => pivot.fields);
-      const allFields = [...rowFields, ...columnFields];
+  const plot = useMemo<{ traces: [EdgeTrace, NodeTrace]; xs: Array<number>; ys: Array<number> } | null>(() => {
+    const rowFields = config.rowPivots.flatMap((pivot) => pivot.fields);
+    const columnFields = config.columnPivots.flatMap((pivot) => pivot.fields);
+    const allFields = [...rowFields, ...columnFields];
 
-      if (allFields.length < 2 || !rows) return null;
+    if (allFields.length < 2 || !rows) return null;
 
-      const metric = config.series?.[0];
-      const paths = extractLeafPaths(rows, columnFields.length, metric?.effectiveName);
+    const metric = config.series?.[0];
+    const paths = extractLeafPaths(rows, columnFields.length, metric?.effectiveName);
 
-      if (paths.length === 0) return null;
+    if (paths.length === 0) return null;
 
-      const { nodes, edges } = buildGraph(paths, allFields);
+    const { nodes, edges } = buildGraph(paths, allFields);
 
-      if (edges.length === 0) return null;
+    if (edges.length === 0) return null;
 
-      const positions = runLayout(nodes.length, edges);
+    const positions = runLayout(nodes.length, edges);
 
-      const edgeX: Array<number | null> = [];
-      const edgeY: Array<number | null> = [];
-      const edgeCustomData: Array<EdgeCustomData | null> = [];
-      edges.forEach((edge) => {
-        const s = positions[edge.source];
-        const t = positions[edge.target];
+    const edgeX: Array<number | null> = [];
+    const edgeY: Array<number | null> = [];
+    const edgeCustomData: Array<EdgeCustomData | null> = [];
+    edges.forEach((edge) => {
+      const s = positions[edge.source];
+      const t = positions[edge.target];
 
-        if (s.x === undefined || s.y === undefined || t.x === undefined || t.y === undefined) return;
+      if (s.x === undefined || s.y === undefined || t.x === undefined || t.y === undefined) return;
 
-        const sourceNode = nodes[edge.source];
-        const targetNode = nodes[edge.target];
-        const cd: EdgeCustomData = {
-          source: {
-            customdata: { field: sourceNode.field, value: sourceNode.value },
-            label: sourceNode.label,
-          },
-          target: {
-            customdata: { field: targetNode.field, value: targetNode.value },
-            label: targetNode.label,
-          },
-          value: edge.value,
-        };
-
-        edgeX.push(s.x, t.x, null);
-        edgeY.push(s.y, t.y, null);
-        // Both points carry the same edge metadata; the separator slot is `null` so
-        // plotly won't surface a click between segments.
-        edgeCustomData.push(cd, cd, null);
-      });
-
-      const textColor = theme.colors.text.primary;
-
-      const edgeTrace: EdgeTrace = {
-        type: 'scatter',
-        mode: 'lines',
-        x: edgeX,
-        y: edgeY,
-        line: { width: 1, color: theme.colors.text.secondary },
-        customdata: edgeCustomData,
-        hoverinfo: 'none',
-        showlegend: false,
-      };
-
-      const displayLabels = nodes.map((n) => String(mapKeys(n.value, n.field) ?? n.label));
-
-      const xs = positions.map((p) => p.x ?? 0);
-      const ys = positions.map((p) => p.y ?? 0);
-
-      const nodeTrace: NodeTrace = {
-        type: 'scatter',
-        mode: 'markers+text',
-        x: xs,
-        y: ys,
-        text: displayLabels,
-        textposition: positions.map((p) => radialTextPosition(p.x ?? 0, p.y ?? 0)),
-        textfont: { color: textColor },
-        cliponaxis: false,
-        marker: {
-          size: 14,
-          color: nodes.map((n) => n.degree),
-          colorscale: visualizationConfig.colorScale,
-          reversescale: visualizationConfig.reverseScale,
-          showscale: true,
-          colorbar: {
-            title: { text: 'Connections', font: { color: textColor }, side: 'top' },
-            orientation: 'h',
-            x: 0.5,
-            xanchor: 'center',
-            y: -0.05,
-            yanchor: 'top',
-            len: 0.5,
-            thickness: 10,
-            tickfont: { color: textColor },
-          },
-          line: { width: 1.5, color: theme.colors.text.primary },
+      const sourceNode = nodes[edge.source];
+      const targetNode = nodes[edge.target];
+      const cd: EdgeCustomData = {
+        source: {
+          customdata: { field: sourceNode.field, value: sourceNode.value },
+          label: sourceNode.label,
         },
-        customdata: nodes.map((n) => ({ field: n.field, value: n.value })),
-        hovertemplate: '%{text}<br>Connections: %{marker.color}<extra></extra>',
-        showlegend: false,
+        target: {
+          customdata: { field: targetNode.field, value: targetNode.value },
+          label: targetNode.label,
+        },
+        value: edge.value,
       };
 
-      return { traces: [edgeTrace, nodeTrace], xs, ys };
-    }, [config, mapKeys, rows, theme, visualizationConfig]);
+      edgeX.push(s.x, t.x, null);
+      edgeY.push(s.y, t.y, null);
+      // Both points carry the same edge metadata; the separator slot is `null` so
+      // plotly won't surface a click between segments.
+      edgeCustomData.push(cd, cd, null);
+    });
 
-    const layout = useMemo(() => buildLayout(width, height, plot), [width, height, plot]);
+    const textColor = theme.colors.text.primary;
 
-    return (
-      <Container $height={height} $width={width}>
-        {plot ? (
-          <GenericPlot
-            chartData={plot.traces}
-            layout={layout}
-            config={PLOT_CONFIG}
-            onClickMarker={onChartClick}
-            onInitialized={initializeGraphDivRef}
-          />
-        ) : (
-          <EmptyState>No connections to display. Adjust your search or grouping to see results.</EmptyState>
-        )}
-        {popover}
-      </Container>
-    );
-  },
-  'network',
-);
+    const edgeTrace: EdgeTrace = {
+      type: 'scatter',
+      mode: 'lines',
+      x: edgeX,
+      y: edgeY,
+      line: { width: 1, color: theme.colors.text.secondary },
+      customdata: edgeCustomData,
+      hoverinfo: 'none',
+      showlegend: false,
+    };
+
+    const displayLabels = nodes.map((n) => String(mapKeys(n.value, n.field) ?? n.label));
+
+    const xs = positions.map((p) => p.x ?? 0);
+    const ys = positions.map((p) => p.y ?? 0);
+
+    const nodeTrace: NodeTrace = {
+      type: 'scatter',
+      mode: 'markers+text',
+      x: xs,
+      y: ys,
+      text: displayLabels,
+      textposition: positions.map((p) => radialTextPosition(p.x ?? 0, p.y ?? 0)),
+      textfont: { color: textColor },
+      cliponaxis: false,
+      marker: {
+        size: 14,
+        color: nodes.map((n) => n.degree),
+        colorscale: visualizationConfig.colorScale,
+        reversescale: visualizationConfig.reverseScale,
+        showscale: true,
+        colorbar: {
+          title: { text: 'Connections', font: { color: textColor }, side: 'top' },
+          orientation: 'h',
+          x: 0.5,
+          xanchor: 'center',
+          y: -0.05,
+          yanchor: 'top',
+          len: 0.5,
+          thickness: 10,
+          tickfont: { color: textColor },
+        },
+        line: { width: 1.5, color: theme.colors.text.primary },
+      },
+      customdata: nodes.map((n) => ({ field: n.field, value: n.value })),
+      hovertemplate: '%{text}<br>Connections: %{marker.color}<extra></extra>',
+      showlegend: false,
+    };
+
+    return { traces: [edgeTrace, nodeTrace], xs, ys };
+  }, [config, mapKeys, rows, theme, visualizationConfig]);
+
+  const layout = useMemo(() => buildLayout(width, height, plot), [width, height, plot]);
+
+  return (
+    <Container $height={height} $width={width}>
+      {plot ? (
+        <GenericPlot
+          chartData={plot.traces}
+          layout={layout}
+          config={PLOT_CONFIG}
+          onClickMarker={onChartClick}
+          onInitialized={initializeGraphDivRef}
+        />
+      ) : (
+        <EmptyState>No connections to display. Adjust your search or grouping to see results.</EmptyState>
+      )}
+      {popover}
+    </Container>
+  );
+}, 'network');
 
 NetworkGraphVisualization.displayName = 'NetworkGraphVisualization';
 
