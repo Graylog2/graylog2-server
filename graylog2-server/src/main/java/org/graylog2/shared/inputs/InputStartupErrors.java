@@ -16,6 +16,7 @@
  */
 package org.graylog2.shared.inputs;
 
+import io.netty.channel.unix.Errors.NativeIoException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.utilities.ExceptionUtils;
 
@@ -49,7 +50,7 @@ public class InputStartupErrors {
         final int port = getPort(input);
         final boolean hasAddress = bindAddress != null && port > 0;
 
-        if (root instanceof BindException && hasAddress) {
+        if (isBindFailure(root) && hasAddress) {
             final String rootMsg = root.getMessage();
             if (rootMsg != null && rootMsg.contains("Address already in use")) {
                 return f("Port %d is already in use. Check if another input or process is bound to %s:%d.",
@@ -75,6 +76,22 @@ public class InputStartupErrors {
         }
 
         return ExceptionUtils.getRootCauseOrMessage(e);
+    }
+
+    /**
+     * Netty's native (epoll/kqueue) transports report failed syscalls as {@link NativeIoException},
+     * an {@link java.io.IOException} subclass, rather than {@link BindException}. Since that exception
+     * wraps any syscall (connect, listen, write, ...), we restrict it to the {@code bind} syscall to
+     * avoid misreporting unrelated native errors as bind failures. Netty formats the message as
+     * {@code "bind(..) failed with error(<errno>): <reason>"}.
+     */
+    private static boolean isBindFailure(Throwable root) {
+        if (root instanceof BindException) {
+            return true;
+        }
+        return root instanceof NativeIoException
+                && root.getMessage() != null
+                && root.getMessage().startsWith("bind");
     }
 
     @Nullable

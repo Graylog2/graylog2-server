@@ -16,6 +16,7 @@
  */
 package org.graylog2.shared.inputs;
 
+import io.netty.channel.unix.Errors.NativeIoException;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
@@ -39,6 +40,12 @@ class InputStartupErrorsTest {
                 "port", port
         )));
         return input;
+    }
+
+    private NativeIoException mockNativeIoException(String message) {
+        final var exception = mock(NativeIoException.class);
+        when(exception.getMessage()).thenReturn(message);
+        return exception;
     }
 
     private MessageInput mockInputWithoutAddress() {
@@ -67,6 +74,32 @@ class InputStartupErrorsTest {
         final String result = InputStartupErrors.describeFailure(input, exception);
 
         assertThat(result).contains("192.168.99.99").contains("5140");
+    }
+
+    @Test
+    void nativeIoExceptionAddressAlreadyInUse() {
+        final var input = mockInputWithAddress("0.0.0.0", 4317);
+        // Netty's native (epoll/kqueue) transport throws NativeIoException, not BindException.
+        // Constructing a real one needs the native lib loaded, so mock it; the message format
+        // matches what Netty produces for a failed bind() syscall with EADDRINUSE.
+        final var exception = new MisfireException("Failed to start input",
+                mockNativeIoException("bind(..) failed with error(-98): Address already in use"));
+
+        final String result = InputStartupErrors.describeFailure(input, exception);
+
+        assertThat(result).contains("4317").contains("0.0.0.0").contains("already in use");
+    }
+
+    @Test
+    void nativeIoExceptionNonBindIsNotTreatedAsBindFailure() {
+        final var input = mockInputWithAddress("0.0.0.0", 9000);
+        // A non-bind native error (here: connect) must not be reported as a bind failure.
+        final var exception = new MisfireException("Failed to start input",
+                mockNativeIoException("connect(..) failed with error(-111): Connection refused"));
+
+        final String result = InputStartupErrors.describeFailure(input, exception);
+
+        assertThat(result).doesNotContain("Cannot bind").doesNotContain("already in use");
     }
 
     @Test
