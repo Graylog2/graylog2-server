@@ -20,7 +20,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import { QueryHelper, PaginatedEntityTable } from 'components/common';
-import type { EventNotification, TestResults } from 'stores/event-notifications/EventNotificationsStore';
+import type { EventNotification, TestResults } from 'components/event-notifications/hooks/useEventNotifications';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';

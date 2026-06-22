@@ -16,7 +16,8 @@
  */
 import URI from 'urijs';
 
-import type { AppConfigs } from 'util/AppConfig';
+import AppConfig from 'util/AppConfig';
+import { asMock } from 'helpers/mocking';
 
 let Routes;
 const prefix = '/test';
@@ -25,7 +26,7 @@ describe('Routes', () => {
   describe('without prefix', () => {
     beforeAll(() => {
       jest.resetModules();
-      window.appConfig = {} as AppConfigs; // Ensure no prefix is set
+      asMock(AppConfig.gl2AppPathPrefix).mockReturnValue('/');
       Routes = jest.requireActual('./Routes').default;
     });
 
@@ -51,11 +52,7 @@ describe('Routes', () => {
   describe('with prefix', () => {
     beforeAll(() => {
       jest.resetModules();
-
-      window.appConfig = {
-        gl2AppPathPrefix: prefix,
-      } as AppConfigs;
-
+      asMock(AppConfig.gl2AppPathPrefix).mockReturnValue(prefix);
       Routes = jest.requireActual('./Routes').default;
     });
 
@@ -81,11 +78,7 @@ describe('Routes', () => {
   describe('with `/` prefix', () => {
     beforeAll(() => {
       jest.resetModules();
-
-      window.appConfig = {
-        gl2AppPathPrefix: '/',
-      } as AppConfigs;
-
+      asMock(AppConfig.gl2AppPathPrefix).mockReturnValue('/');
       Routes = jest.requireActual('./Routes').default;
     });
 

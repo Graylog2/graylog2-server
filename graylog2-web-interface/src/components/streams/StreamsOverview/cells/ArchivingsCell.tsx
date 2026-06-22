@@ -17,7 +17,7 @@
 
 import * as React from 'react';
 
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import { StatusIcon, Tooltip } from 'components/common';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { ARCHIVE_RETENTION_STRATEGY } from 'hooks/useIndices';
