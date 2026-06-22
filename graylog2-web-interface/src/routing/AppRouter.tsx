@@ -31,6 +31,7 @@ import {
   ContentPacksPage,
   CreateContentPackPage,
   CreateEventDefinitionPage,
+  SigmaEventDefinitionPage,
   CreateEventNotificationPage,
   CreateExtractorsPage,
   DataNodePage,
@@ -112,6 +113,7 @@ import {
   StreamOutputsPage,
   StreamsPage,
   StreamDetailsPage,
+  SystemNotificationsPage,
   SystemOutputsPage,
   SystemOverviewPage,
   ThreadDumpPage,
@@ -215,6 +217,8 @@ const AppRouter = () => {
             { path: RoutePaths.ALERTS.LIST, element: <EventsPage /> },
             { path: RoutePaths.ALERTS.DEFINITIONS.LIST, element: <EventDefinitionsPage /> },
             { path: RoutePaths.ALERTS.DEFINITIONS.CREATE, element: <CreateEventDefinitionPage /> },
+            { path: RoutePaths.ALERTS.DEFINITIONS.SIGMA.GIT_IMPORT, element: <SigmaEventDefinitionPage /> },
+            { path: RoutePaths.ALERTS.DEFINITIONS.SIGMA.FILE_IMPORT, element: <SigmaEventDefinitionPage /> },
             {
               path: RoutePaths.ALERTS.DEFINITIONS.edit(':definitionId'),
               element: <EditEventDefinitionPage />,
@@ -366,6 +370,7 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.AUTHZROLES.edit(':roleId'), element: <RoleEditPage /> },
 
             { path: RoutePaths.SYSTEM.OVERVIEW, element: <SystemOverviewPage /> },
+            { path: RoutePaths.SYSTEM.NOTIFICATIONS, element: <SystemNotificationsPage /> },
             { path: RoutePaths.SYSTEM.PROCESSBUFFERDUMP(':nodeId'), element: <ProcessBufferDumpPage /> },
             { path: RoutePaths.SYSTEM.THREADDUMP(':nodeId'), element: <ThreadDumpPage /> },
             { path: RoutePaths.SYSTEM.SYSTEMLOGS(':nodeId'), element: <SystemLogsPage /> },

@@ -16,16 +16,14 @@
  */
 
 // eslint-disable-next-line no-restricted-imports
-export {
+import {
   /* 👇 no custom theme colors needed 👇 */
   Clearfix,
-  Col,
   Collapse,
   Dropdown,
   Form,
-  Grid,
-  Pager,
   PanelGroup,
-  Radio, // NOTE: do we want custom or keep OS styles
   /* 👆 no custom theme colors needed 👆 */
 } from 'react-bootstrap';
+
+export { Clearfix, Collapse, Dropdown, Form, PanelGroup };

@@ -18,7 +18,7 @@ import * as React from 'react';
 import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import { StoreMock as MockStore, asMock } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
 import MockQuery from 'views/logic/queries/Query';
 import type { WidgetEditingState, WidgetFocusingState } from 'views/components/contexts/WidgetFocusContext';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
@@ -29,15 +29,12 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
+import useSearchResultTimeRangeErrorCheck from 'views/hooks/useSearchResultTimeRangeErrorCheck';
 
 import OriginalSearchBar from './SearchBar';
 
 jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('views/logic/fieldtypes/useFieldTypes');
-
-jest.mock('stores/streams/StreamsStore', () =>
-  MockStore(['listStreams', () => ({ then: jest.fn() })], 'availableStreams'),
-);
 
 jest.mock('hooks/useSearchConfiguration');
 
@@ -58,6 +55,7 @@ jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 jest.mock('views/logic/queries/useCurrentQuery');
 jest.mock('views/stores/useViewsDispatch');
 jest.mock('views/hooks/useAutoRefresh');
+jest.mock('views/hooks/useSearchResultTimeRangeErrorCheck');
 
 const query = MockQuery.builder()
   .timerange({ type: 'relative', from: 300 })
@@ -81,6 +79,7 @@ describe('SearchBar', () => {
       isInitialLoading: false,
     });
     asMock(useCurrentQuery).mockReturnValue(query);
+    asMock(useSearchResultTimeRangeErrorCheck).mockReturnValue(() => false);
   });
 
   it('should render the SearchBar', async () => {
@@ -173,5 +172,45 @@ describe('SearchBar', () => {
     render(<SearchBar />);
 
     await waitFor(() => expect(validateQuery).toHaveBeenCalled());
+  });
+
+  it('shows warning icon on timerange button when search result timerange check returns true', async () => {
+    asMock(useSearchResultTimeRangeErrorCheck).mockReturnValue(() => true);
+
+    render(<SearchBar />);
+
+    const timeRangePickerButton = await screen.findByLabelText('Open Time Range Selector');
+
+    await waitFor(() => expect(within(timeRangePickerButton).getByText('warning')).toBeInTheDocument());
+  });
+
+  it('disables the search button when search result timerange check returns true', async () => {
+    asMock(useSearchResultTimeRangeErrorCheck).mockReturnValue(() => true);
+
+    render(<SearchBar />);
+
+    const searchButton = await screen.findByRole('button', { name: /perform search/i });
+
+    await waitFor(() => expect(searchButton.classList).toContain('disabled'));
+  });
+
+  it('does not show warning icon on timerange button when search result timerange check returns false', async () => {
+    asMock(useSearchResultTimeRangeErrorCheck).mockReturnValue(() => false);
+
+    render(<SearchBar />);
+
+    const timeRangePickerButton = await screen.findByLabelText('Open Time Range Selector');
+
+    expect(within(timeRangePickerButton).queryByText('warning')).not.toBeInTheDocument();
+  });
+
+  it('does not disable the search button when search result timerange check returns false', async () => {
+    asMock(useSearchResultTimeRangeErrorCheck).mockReturnValue(() => false);
+
+    render(<SearchBar />);
+
+    const searchButton = await screen.findByRole('button', { name: /perform search/i });
+
+    await waitFor(() => expect(searchButton.classList).not.toContain('disabled'));
   });
 });

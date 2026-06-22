@@ -151,7 +151,8 @@ class MessageCreationLoopPreventionTest extends BaseParserTest {
         this.pipelineInterpreter = new PipelineInterpreter(
                 messageQueueAcknowledger,
                 new MetricRegistry(),
-                stateUpdater);
+                stateUpdater,
+                1);
     }
 
     // make sure a naive call to clone_message() will not cause a loop

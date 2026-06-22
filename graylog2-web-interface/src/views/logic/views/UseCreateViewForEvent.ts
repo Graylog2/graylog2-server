@@ -330,7 +330,7 @@ export const UseCreateViewForEvent = ({
         searchFilters,
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    [eventData?.id, eventDefinition?.id],
   );
 };
 

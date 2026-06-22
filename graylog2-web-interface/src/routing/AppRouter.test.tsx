@@ -30,6 +30,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import AppConfig from 'util/AppConfig';
 import GlobalContextProviders from 'contexts/GlobalContextProviders';
 import HotkeysProvider from 'contexts/HotkeysProvider';
+import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
 
 import AppRouter from './AppRouter';
 
@@ -43,28 +44,23 @@ jest.mock('pages/StartPage', () => () => <>This is the start page</>);
 jest.mock('hooks/usePluginEntities');
 jest.mock('contexts/GlobalContextProviders', () => jest.fn(({ children }: React.PropsWithChildren<{}>) => children));
 
-jest.mock('util/AppConfig', () => ({
-  gl2AppPathPrefix: jest.fn(() => ''),
-  gl2ServerUrl: jest.fn(() => undefined),
-  gl2DevMode: jest.fn(() => false),
-  isFeatureEnabled: jest.fn(() => true),
-  isCloud: jest.fn(() => false),
-}));
-
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   createBrowserRouter: jest.fn(),
 }));
 
 jest.mock('components/navigation/NotificationBadge', () => () => null);
+jest.mock('components/navigation/HealthStatusBadge', () => () => null);
 
 const AppRouterWithContext = () => (
   <HotkeysProvider>
-    <DefaultProviders>
-      <CurrentUserContext.Provider value={defaultUser}>
-        <AppRouter />
-      </CurrentUserContext.Provider>
-    </DefaultProviders>
+    <DefaultQueryClientProvider>
+      <DefaultProviders>
+        <CurrentUserContext.Provider value={defaultUser}>
+          <AppRouter />
+        </CurrentUserContext.Provider>
+      </DefaultProviders>
+    </DefaultQueryClientProvider>
   </HotkeysProvider>
 );
 
@@ -85,7 +81,7 @@ const mockRoutes = (routes: PluginExports['routes']) => {
 
 describe('AppRouter', () => {
   beforeEach(() => {
-    AppConfig.isFeatureEnabled = jest.fn(() => false);
+    asMock(AppConfig.isFeatureEnabled).mockReturnValue(false);
     asMock(usePluginEntities).mockReturnValue([]);
     asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) => createMemoryRouter(routes));
   });

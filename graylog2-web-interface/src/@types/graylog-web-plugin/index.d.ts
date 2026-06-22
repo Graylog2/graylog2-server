@@ -203,6 +203,11 @@ type StreamsOverviewTableElement = {
   attributeName: string;
   attributes: Array<Attribute>;
   columnRenderers: ColumnRenderersByAttribute<Stream>;
+  // Optional map of column id → backend metric fields. Plugins use this to plug their
+  // columns into the open-source `GET /streams/metrics` request (e.g. enterprise's
+  // `failure_count`). When the column is visible, the listed fields are added to the
+  // metrics request automatically.
+  metricFields?: Record<string, Array<string>>;
 };
 
 declare module 'graylog-web-plugin/plugin' {
@@ -267,7 +272,7 @@ declare module 'graylog-web-plugin/plugin' {
     messagecount: 'read';
     messages: 'analyze' | 'read';
     node: 'shutdown';
-    notifications: 'read';
+    notifications: 'delete' | 'read';
     outputs: 'create' | 'edit' | 'read' | 'terminate';
     pipeline: 'create' | 'delete' | 'edit' | 'read';
     pipeline_rule: 'create' | 'delete' | 'edit' | 'read';

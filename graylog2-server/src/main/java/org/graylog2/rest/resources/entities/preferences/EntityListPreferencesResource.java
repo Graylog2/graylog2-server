@@ -28,6 +28,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -37,12 +38,17 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.subject.Subject;
 import org.graylog.security.UserContext;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.rest.resources.entities.preferences.metrics.EntityListMetricProvider;
 import org.graylog2.rest.resources.entities.preferences.model.EntityListPreferences;
+import org.graylog2.rest.resources.entities.preferences.model.MetricValue;
 import org.graylog2.rest.resources.entities.preferences.model.PredefinedLayoutVariant;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId;
@@ -51,6 +57,7 @@ import org.graylog2.shared.rest.PublicCloudAPI;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 @RequiresAuthentication
 @PublicCloudAPI
@@ -59,10 +66,13 @@ import java.util.List;
 public class EntityListPreferencesResource {
 
     private final EntityListPreferencesService entityListPreferencesService;
+    private final Map<String, EntityListMetricProvider> metricProviders;
 
     @Inject
-    public EntityListPreferencesResource(final EntityListPreferencesService entityListPreferencesService) {
+    public EntityListPreferencesResource(final EntityListPreferencesService entityListPreferencesService,
+                                         final Map<String, EntityListMetricProvider> metricProviders) {
         this.entityListPreferencesService = entityListPreferencesService;
+        this.metricProviders = metricProviders;
     }
 
     @POST
@@ -132,7 +142,35 @@ public class EntityListPreferencesResource {
         }
     }
 
-    @GET
+    @DELETE
+    @Path("/{entity_list_id}")
+    @Timed
+    @Operation(summary = "Delete preferences for user's entity list")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Preferences for user's entity list deleted successfully."),
+            @ApiResponse(responseCode = "400", description = "Wrong parameters for preferences deletion."),
+            @ApiResponse(responseCode = "404", description = "Preferences not found.")
+    })
+    @NoAuditEvent("Audit logs are not stored for entity list preferences")
+    public Response delete(@Parameter(name = "entity_list_id", required = true) @PathParam("entity_list_id") @NotEmpty String entityListId,
+                           @QueryParam("layout_variant") String layoutVariant,
+                           @Context UserContext userContext) throws ValidationException {
+        final String currentUserId = userContext.getUserId();
+        final StoredEntityListPreferencesId complexIdOfUsersPreferences = StoredEntityListPreferencesId.builder()
+                .userId(currentUserId)
+                .entityListId(entityListId)
+                .layoutVariant(obtainLayoutVariant(layoutVariant))
+                .build();
+        final boolean successful = entityListPreferencesService.delete(complexIdOfUsersPreferences);
+        if (successful) {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+    }
+
+    @POST
     @Path("/list_predefined/{entity_list_id}")
     @Timed
     @Operation(summary = "List predefined layout variants for entity list with given id")
@@ -141,9 +179,11 @@ public class EntityListPreferencesResource {
                          content = @Content(schema = @Schema(implementation = PredefinedLayoutVariant[].class)))
     })
     @Produces(MediaType.APPLICATION_JSON)
-    public List<PredefinedLayoutVariant> listPredefined(@Parameter(name = "entity_list_id", required = true)
-                                                        @PathParam("entity_list_id") @NotEmpty String entityListId) {
-
+    @Consumes(MediaType.APPLICATION_JSON)
+    @NoAuditEvent("Audit logs are not stored for entity list preferences")
+    public List<PredefinedLayoutVariant> listPredefined(@Parameter(name = "entity_list_id", required = true) @PathParam("entity_list_id") @NotEmpty String entityListId,
+                                                        @RequestBody(required = true) TimeRange timeRange) {
+        final Subject subject = SecurityUtils.getSubject();
         return entityListPreferencesService
                 .getPredefinedForEntityList(entityListId)
                 .stream()
@@ -151,7 +191,14 @@ public class EntityListPreferencesResource {
                 .map(pref -> new PredefinedLayoutVariant(
                         pref.preferencesId().layoutVariant(),
                         pref.preferencesId().entityListId(),
-                        pref.preferences().displayName()))
+                        pref.preferences().displayName(),
+                        pref.preferences().metrics()
+                                .stream()
+                                .map(metricName -> metricProviders
+                                        .getOrDefault(metricName, (tr, sub) -> new MetricValue(0L, "", metricName))
+                                        .compute(timeRange, subject))
+                                .toList())
+                )
                 .toList();
 
     }

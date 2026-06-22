@@ -102,7 +102,7 @@ public class FixDeflectorByMoveJob extends LegacySystemJob {
                 newTarget = indexSet.getNewestIndex();
 
                 LOG.info("Starting to move <{}> to <{}>.", indexSet.getWriteIndexAlias(), newTarget);
-                indices.move(indexSet.getWriteIndexAlias(), newTarget);
+                indices.reindex(indexSet.getWriteIndexAlias(), newTarget);
             } catch (Exception e) {
                 LOG.error("Moving index failed. Rolling back.", e);
                 if (newTarget != null) {

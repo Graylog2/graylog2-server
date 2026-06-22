@@ -172,6 +172,17 @@ public class InputServiceImplTest {
     }
 
     @Test
+    @MongoDBFixtures("inputCountByType.json")
+    public void totalCountByTypeReturnsCountsGroupedByType() {
+        final Map<String, Long> counts = inputService.totalCountByType();
+
+        assertThat(counts).isEqualTo(Map.of(
+                "org.graylog2.inputs.gelf.tcp.GELFTCPInput", 2L,
+                "org.graylog2.inputs.raw.tcp.RawTCPInput", 1L
+        ));
+    }
+
+    @Test
     public void handlesEncryptedValue() throws ValidationException, NotFoundException {
 
         // Setup required to detect fields that need conversion from Map to EncryptedValue when reading
@@ -448,6 +459,7 @@ public class InputServiceImplTest {
                 .setEmbeddedStaticFields(List.of(
                         Map.of(InputImpl.FIELD_STATIC_FIELD_KEY, "static_key",
                                 InputImpl.FIELD_STATIC_FIELD_VALUE, "static_value")))
+                .setEmbeddedExtractors(List.of(createCopyInputExtractor().getPersistedFields()))
                 .build();
 
         final String id = inputService.save(input);
@@ -466,10 +478,62 @@ public class InputServiceImplTest {
                 InputImpl.FIELD_GLOBAL,
                 InputImpl.FIELD_CONFIGURATION,
                 InputImpl.EMBEDDED_STATIC_FIELDS,
+                InputImpl.EMBEDDED_EXTRACTORS,
                 InputImpl.FIELD_DESIRED_STATE,
                 InputImpl.FIELD_CONTENT_PACK,
                 InputImpl.FIELD_NODE_ID
         );
+    }
+
+    /**
+     * Regression test for <a href="https://github.com/Graylog2/graylog2-server/issues/26009">#26009</a>:
+     * persisting the desired state when starting or stopping an input must not delete its extractors.
+     */
+    @Test
+    void persistDesiredStateKeepsExtractors() throws Exception {
+        final Input input = inputService.find(inputService.save(createTestInput()));
+        inputService.addExtractor(input, createCopyInputExtractor());
+
+        inputService.persistDesiredState(input, IOState.Type.STOPPED);
+
+        assertThat(inputService.extractorCountByInputId(List.of(input.getId())))
+                .containsEntry(input.getId(), 1);
+        assertThat(inputService.find(input.getId()).getDesiredState()).isEqualTo(IOState.Type.STOPPED);
+    }
+
+    /**
+     * Regression test for <a href="https://github.com/Graylog2/graylog2-server/issues/26009">#26009</a>:
+     * saving an input that was loaded from the database must round-trip the embedded extractors.
+     */
+    @Test
+    void saveKeepsExtractors() throws Exception {
+        final Input input = inputService.find(inputService.save(createTestInput()));
+        inputService.addExtractor(input, createCopyInputExtractor());
+
+        inputService.save(inputService.find(input.getId()));
+
+        assertThat(inputService.extractorCountByInputId(List.of(input.getId())))
+                .containsEntry(input.getId(), 1);
+    }
+
+    /**
+     * Regression test for <a href="https://github.com/Graylog2/graylog2-server/issues/26009">#26009</a>:
+     * the input update flow in {@code InputsResource} merges via the {@code getFields()} Map view and
+     * re-creates the input from the merged map. Extractors must survive this round-trip, too.
+     */
+    @Test
+    void updateViaFieldsMapKeepsExtractors() throws Exception {
+        final Input input = inputService.find(inputService.save(createTestInput()));
+        inputService.addExtractor(input, createCopyInputExtractor());
+
+        final Input reloaded = inputService.find(input.getId());
+        final Map<String, Object> mergedFields = new HashMap<>(reloaded.getFields());
+        mergedFields.put(MessageInput.FIELD_TITLE, "updated title");
+        inputService.update(inputService.create(reloaded.getId(), mergedFields));
+
+        assertThat(inputService.extractorCountByInputId(List.of(input.getId())))
+                .containsEntry(input.getId(), 1);
+        assertThat(inputService.find(input.getId()).getTitle()).isEqualTo("updated title");
     }
 
     @Test
@@ -486,6 +550,33 @@ public class InputServiceImplTest {
         assertThat(result)
                 .containsEntry(Extractor.Type.COPY_INPUT, 3L)
                 .containsEntry(Extractor.Type.REGEX, 1L);
+    }
+
+    @Test
+    void extractorCountByInputId_returnsCounts() throws Exception {
+        final Input input1 = inputService.find(inputService.save(createTestInput()));
+        inputService.addExtractor(input1, createCopyInputExtractor());
+        inputService.addExtractor(input1, createCopyInputExtractor());
+        inputService.addExtractor(input1, createRegexExtractor());
+
+        final Input input2 = inputService.find(inputService.save(createTestInput()));
+        inputService.addExtractor(input2, createCopyInputExtractor());
+
+        final Input input3 = inputService.find(inputService.save(createTestInput()));
+
+        final Map<String, Integer> result = inputService.extractorCountByInputId(
+                List.of(input1.getId(), input2.getId(), input3.getId()));
+
+        assertThat(result)
+                .containsEntry(input1.getId(), 3)
+                .containsEntry(input2.getId(), 1)
+                .containsEntry(input3.getId(), 0);
+    }
+
+    @Test
+    void extractorCountByInputId_returnsEmptyForNoInputs() {
+        final Map<String, Integer> result = inputService.extractorCountByInputId(List.of());
+        assertThat(result).isEmpty();
     }
 
     private static CopyInputExtractor createCopyInputExtractor() throws Extractor.ReservedFieldException {

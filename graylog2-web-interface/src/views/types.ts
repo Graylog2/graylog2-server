@@ -279,6 +279,9 @@ export interface ActionContexts {
   widget: Widget;
   message: Message;
   valuePath: ValuePath;
+  // How to combine the entries of `valuePath` when generating a query clause. Defaults to 'AND'
+  // (combined groupings); 'OR' is used e.g. for a network-graph node queried across all groupings.
+  valuePathOperator?: 'AND' | 'OR';
   isLocalNode: boolean;
   parameters?: Immutable.Set<Parameter>;
   parameterBindings?: ParameterBindings;
@@ -464,8 +467,10 @@ interface MessageRowOverrideProps {
 
 export interface CombinedSearchBarFormValues {
   timerange?: TimeRange | NoTimeRangeOverride;
-  streams?: Array<string>;
-  streamCategories?: Array<string>;
+  streamsAndCategories?: {
+    streams: Array<string>;
+    categories?: Array<string>;
+  };
   queryString?: string;
 }
 
