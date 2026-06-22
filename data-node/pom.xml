@@ -78,7 +78,7 @@
             and opensearch.log4j.replacement.version to the newer version that should replace it.
         -->
         <opensearch.log4j.bundled.version>2.25.3</opensearch.log4j.bundled.version>
-        <opensearch.log4j.replacement.version>2.25.4</opensearch.log4j.replacement.version>
+        <opensearch.log4j.replacement.version>2.26.0</opensearch.log4j.replacement.version>
 
         <!--
            We don't need to sign anything in this module. This fixes a release build error related to setting
