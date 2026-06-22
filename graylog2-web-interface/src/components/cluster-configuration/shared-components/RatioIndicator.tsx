@@ -18,7 +18,6 @@ import React from 'react';
 import styled from 'styled-components';
 
 import NumberUtils from 'util/NumberUtils';
-
 import { Label } from 'components/bootstrap';
 
 const SecondaryText = styled.div`

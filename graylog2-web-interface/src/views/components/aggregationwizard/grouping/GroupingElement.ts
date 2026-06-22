@@ -96,9 +96,11 @@ export const onGroupingFieldsChange = ({
     return;
   }
 
-  const groupingHasValuesField = fieldTypes.currentQuery.some(
-    ({ name, type }) => newFields.includes(name) && type.type !== 'date',
-  );
+  const isKnownDateField = (fieldName: string) =>
+    fieldTypes.currentQuery.some(({ name, type }) => name === fieldName && type.type === 'date');
+  // A field counts as a "values" field unless it is a known date field. Unknown
+  // (arbitrary) fields are therefore treated as values fields rather than date fields.
+  const groupingHasValuesField = newFields.some((fieldName) => !isKnownDateField(fieldName));
   const newGroupingType = groupingHasValuesField ? ValuesType : DateType;
 
   if (grouping.type === newGroupingType) {
