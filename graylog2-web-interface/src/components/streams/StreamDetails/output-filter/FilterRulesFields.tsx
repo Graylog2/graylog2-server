@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 import { useFormikContext } from 'formik';
 
 import Errors from 'components/rules/rule-builder/Errors';
-import { ConfirmDialog , Radio } from 'components/common';
+import { ConfirmDialog, Radio } from 'components/common';
 import type { BlockType, RuleBlock } from 'components/rules/rule-builder/types';
 import RuleBuilderBlock from 'components/rules/rule-builder/RuleBuilderBlock';
 import { Panel } from 'components/bootstrap';
