@@ -52,7 +52,7 @@ const OnboardingBanner = () => {
   if (!isAnyPermitted(permissions, REQUIRED_PERMISSIONS)) {
     return (
       <Alert bsStyle="info">
-        {productName} is not currently receiving any log data — please contact an administrator so they can begin
+        {productName} is not currently receiving any log data - please contact an administrator so they can begin
         setting up ingestion.
       </Alert>
     );
