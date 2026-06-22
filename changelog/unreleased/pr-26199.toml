@@ -1,0 +1,4 @@
+type = "a"
+message = "Make Sidecar default collector paths and host variable configurable."
+
+pulls = ["26199"]
