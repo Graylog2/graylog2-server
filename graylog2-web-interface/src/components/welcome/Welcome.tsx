@@ -25,10 +25,12 @@ import type { StartPage } from 'logic/users/User';
 import ContentStreamContainer from 'components/content-stream/ContentStreamContainer';
 import useProductName from 'brand-customization/useProductName';
 import { hasAdminPermission } from 'util/PermissionsMixin';
+import useFeature from 'hooks/useFeature';
 
 import LastOpenList from './LastOpenList';
 import FavoriteItemsList from './FavoriteItemsList';
 import RecentActivityList from './RecentActivityList';
+import OnboardingBanner from './OnboardingBanner';
 
 import SectionGrid from '../common/Section/SectionGrid';
 import useCurrentUser from '../../hooks/useCurrentUser';
@@ -64,12 +66,14 @@ const Welcome = () => {
   const productName = useProductName();
   const { permissions, readOnly, id: userId, startpage } = useCurrentUser();
   const isAdmin = hasAdminPermission(permissions);
+  const onboardingEnabled = useFeature('onboarding_experience');
 
   return (
     <>
       <PageHeader title={`Welcome to ${productName}!`}>
         <ChangeStartPageHelper userId={userId} readOnly={readOnly} startpage={startpage} />
       </PageHeader>
+      {onboardingEnabled && <OnboardingBanner />}
       <SectionGrid>
         <StyledSectionComponent title="Last Opened">
           <p className="description">Overview of recently visited saved searches and dashboards.</p>
