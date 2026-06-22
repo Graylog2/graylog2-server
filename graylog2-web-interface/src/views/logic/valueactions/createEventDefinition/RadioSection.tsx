@@ -17,7 +17,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { Radio } from 'components/bootstrap';
+import { Radio } from 'components/common';
 import { strategiesLabels } from 'views/logic/valueactions/createEventDefinition/Constants';
 import type { StrategyId } from 'views/logic/valueactions/createEventDefinition/types';
 
@@ -29,7 +29,7 @@ const Container = styled.div`
 
 type Props = {
   strategy: StrategyId;
-  onChange: (e: React.FormEvent<Radio>) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   strategyAvailabilities: { [name in StrategyId]: boolean };
 };
 

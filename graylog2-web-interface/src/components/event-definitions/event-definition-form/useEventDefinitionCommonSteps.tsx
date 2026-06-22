@@ -22,7 +22,7 @@ import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnu
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
-import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
+import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 import type { StepType } from 'components/common/Wizard';
 
 import FieldsForm from './FieldsForm';
@@ -61,7 +61,7 @@ export const INITIAL_EVENT_DEFINITION: EventDefinition = {
   tactics_techniques: [],
 };
 
-const getConditionPlugin = (edType): any => {
+const getConditionPlugin = (edType: string): any => {
   if (edType === undefined) return {};
 
   return (
@@ -69,35 +69,37 @@ const getConditionPlugin = (edType): any => {
   );
 };
 
-const defaultCommonStepProps = {
+type CommonStepProps = {
+  key: string;
+  action?: 'edit' | 'create';
+  entityTypes?: {};
+  eventDefinition: EventDefinition & {
+    share_request?: EntitySharePayload;
+  };
+  onChange: (key: string, value: unknown) => void;
+  validation?: {
+    errors: {
+      config?: unknown;
+      title?: string;
+    };
+  };
+  currentUser: User;
+};
+
+const defaultCommonStepProps: CommonStepProps = {
   key: '',
   action: 'create' as const,
   eventDefinition: INITIAL_EVENT_DEFINITION,
-  onChange: undefined,
+  onChange: undefined as CommonStepProps['onChange'],
   validation: {
     errors: {},
   },
-  currentUser: undefined,
+  currentUser: undefined as User,
 };
 
 type Args = {
   viewSteps: Array<StepType<string>>;
-  commonStepProps?: {
-    key: string;
-    action?: 'edit' | 'create';
-    entityTypes?: {};
-    eventDefinition: EventDefinition & {
-      share_request?: EntitySharePayload;
-    };
-    onChange: (key: string, value: unknown) => void;
-    validation?: {
-      errors: {
-        config?: unknown;
-        title?: string;
-      };
-    };
-    currentUser: User;
-  };
+  commonStepProps?: CommonStepProps;
   notifications?: Array<EventNotification>;
   notificationDefaults?: { default_backlog_size: number };
   hideFieldsStep?: boolean;

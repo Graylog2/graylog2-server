@@ -17,7 +17,7 @@
 import React from 'react';
 
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import StreamActions from 'components/streams/StreamsOverview/StreamActions';
 import BulkActions from 'components/streams/StreamsOverview/BulkActions';
 import ExpandedRulesSection from 'components/streams/StreamsOverview/ExpandedRulesSection';

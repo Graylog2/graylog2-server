@@ -23,9 +23,8 @@ import isEmpty from 'lodash/isEmpty';
 import { useIsFetching } from '@tanstack/react-query';
 
 import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
-import type { Stream } from 'views/stores/StreamsStore';
-import { StreamsStore } from 'views/stores/StreamsStore';
-import connect from 'stores/connect';
+import type { Stream } from 'logic/streams/types';
+import StreamsContext from 'contexts/StreamsContext';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import type Widget from 'views/logic/widgets/Widget';
 import type { SearchBarFormValues } from 'views/Constants';
@@ -85,10 +84,6 @@ const SearchInputAndValidation = styled.div`
   display: flex;
   flex: 1;
 `;
-
-type Props = {
-  availableStreams: Array<Stream>;
-};
 
 export const updateWidgetSearchControls = (widget, { timerange, streamsAndCategories, queryString }) =>
   widget
@@ -196,9 +191,11 @@ const _validateQueryString = (
   return debouncedValidateQuery(request, userTimezone);
 };
 
-const WidgetQueryControls = ({ availableStreams }: Props) => {
+const WidgetQueryControls = () => {
   const editorRef = useRef<Editor>(null);
   const view = useView();
+  const streamsContext = useContext(StreamsContext);
+  const availableStreams = useMemo(() => streamsContext ?? [], [streamsContext]);
   const globalOverride = useGlobalOverride();
   const widget = useContext(WidgetContext);
   const { userTimezone } = useUserDateTime();
@@ -226,20 +223,28 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
   );
   const _resetTimeRangeOverride = useCallback(() => dispatch(resetTimeRangeOverride), [dispatch]);
   const _resetQueryOverride = useCallback(() => dispatch(resetQueryOverride), [dispatch]);
-  const allStreams = availableStreams.map((stream) => ({
-    key: stream.title,
-    value: stream.id,
-  }));
-  const availableStreamCategories = availableStreams
-    .reduce((acc, stream: Stream) => {
-      stream.categories?.forEach((category: string) => {
-        if (!acc.find((option: { value: string }) => option.value === category))
-          acc.push({ key: category, value: category });
-      });
+  const allStreams = useMemo(
+    () =>
+      availableStreams.map((stream) => ({
+        key: stream.title,
+        value: stream.id,
+      })),
+    [availableStreams],
+  );
+  const availableStreamCategories = useMemo(
+    () =>
+      availableStreams
+        .reduce((acc, stream: Stream) => {
+          stream.categories?.forEach((category: string) => {
+            if (!acc.find((option: { value: string }) => option.value === category))
+              acc.push({ key: category, value: category });
+          });
 
-      return acc;
-    }, [])
-    .sort((a, b) => defaultCompare(a.value, b.value));
+          return acc;
+        }, [])
+        .sort((a, b) => defaultCompare(a.value, b.value)),
+    [availableStreams],
+  );
 
   useBindApplySearchControlsChanges(formRef);
 
@@ -349,13 +354,4 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
   );
 };
 
-export default connect(
-  WidgetQueryControls,
-  {
-    availableStreams: StreamsStore,
-  },
-  ({ availableStreams: { streams = [] }, ...rest }) => ({
-    ...rest,
-    availableStreams: streams,
-  }),
-);
+export default WidgetQueryControls;

@@ -18,7 +18,7 @@ import * as React from 'react';
 
 import useOutputs from 'hooks/useOutputs';
 import { IfPermitted, Section, Spinner } from 'components/common';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import useStreamOutputs from 'hooks/useStreamOutputs';
 import type { AvailableOutputSummary } from 'components/streams/useAvailableOutputTypes';
 import useAvailableOutputTypes, {
