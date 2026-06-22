@@ -19,12 +19,8 @@ import { render, screen, within } from 'wrappedTestingLibrary';
 
 import Trend from './Trend';
 
-const renderTrend = ({
-  current = 42,
-  previous = 42,
-  trendPreference = 'NEUTRAL',
-}: Partial<React.ComponentProps<typeof Trend>> = {}) =>
-  render(<Trend current={current} previous={previous} trendPreference={trendPreference} />);
+const renderTrend = ({ current = 42, previous = 42 }: Partial<React.ComponentProps<typeof Trend>> = {}) =>
+  render(<Trend current={current} previous={previous} />);
 
 const findTrend = async () => {
   const trend = await screen.findByTestId('trend-value');
@@ -91,72 +87,6 @@ describe('Trend', () => {
     renderTrend({ current: NaN, previous: 42 });
 
     expect(await findTrend()).toEqual('-- / --');
-  });
-
-  describe('renders background according to values and trend preference', () => {
-    it.each`
-      trendPreference
-      ${'NEUTRAL'}
-      ${'HIGHER'}
-      ${'LOWER'}
-    `(
-      'shows neutral background if values are equal and trend preference is $trendPreference',
-      async ({ trendPreference }: { trendPreference: 'NEUTRAL' | 'LOWER' | 'HIGHER' }) => {
-        renderTrend({ trendPreference });
-
-        const background = await screen.findByTestId('trend-background');
-
-        expect(background).toHaveStyleRule('background-color', '#fff!important');
-      },
-    );
-
-    it('shows good background if current value and preference are higher', async () => {
-      renderTrend({ current: 43, trendPreference: 'HIGHER' });
-
-      const background = await screen.findByTestId('trend-background');
-
-      expect(background).toHaveStyleRule('background-color', '#2ECA8F!important');
-    });
-
-    it('shows good background if current value and preference are lower', async () => {
-      renderTrend({ current: 41, trendPreference: 'LOWER' });
-
-      const background = await screen.findByTestId('trend-background');
-
-      expect(background).toHaveStyleRule('background-color', '#2ECA8F!important');
-    });
-
-    it('shows bad background if current value is lower but preference is higher', async () => {
-      renderTrend({ current: 41, trendPreference: 'HIGHER' });
-
-      const background = await screen.findByTestId('trend-background');
-
-      expect(background).toHaveStyleRule('background-color', '#FE4A49!important');
-    });
-
-    it('shows bad background if current value is higher but preference is lower', async () => {
-      renderTrend({ current: 43, trendPreference: 'LOWER' });
-
-      const background = await screen.findByTestId('trend-background');
-
-      expect(background).toHaveStyleRule('background-color', '#FE4A49!important');
-    });
-
-    it('shows neutral background if current value is higher but preference is neutral', async () => {
-      renderTrend({ current: 43, trendPreference: 'NEUTRAL' });
-
-      const background = await screen.findByTestId('trend-background');
-
-      expect(background).toHaveStyleRule('background-color', '#fff!important');
-    });
-
-    it('shows neutral background if current value is lower but preference is neutral', async () => {
-      renderTrend({ current: 41, trendPreference: 'NEUTRAL' });
-
-      const background = await screen.findByTestId('trend-background');
-
-      expect(background).toHaveStyleRule('background-color', '#fff!important');
-    });
   });
 
   describe('renders icon indicating trend direction', () => {

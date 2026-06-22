@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
-import MockStore from 'helpers/mocking/StoreMock';
 import asMock from 'helpers/mocking/AsMock';
+import AppConfig from 'util/AppConfig';
 import EventDefinitionInfoList from 'components/event-definitions/replay-search/EventDefinitionInfoList';
 import {
   mockedMappedAggregation,
@@ -36,14 +36,12 @@ import RightSidebarProvider from 'contexts/RightSidebarProvider';
 
 import useAlertAndEventDefinitionData from './hooks/useAlertAndEventDefinitionData';
 
-jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
-  EventNotificationsActions: {
-    listAll: jest.fn(async () => Promise.resolve()),
-  },
-  EventNotificationsStore: MockStore([
-    'getInitialState',
-    () => ({ all: [{ id: 'email_notification_id', title: 'Email notification' }] }),
-  ]),
+jest.mock('components/event-notifications/hooks/useEventNotifications', () => ({
+  ...jest.requireActual('components/event-notifications/hooks/useEventNotifications'),
+  useEventNotifications: jest.fn(() => ({
+    data: { notifications: [{ id: 'email_notification_id', title: 'Email notification' }] },
+    isFetched: true,
+  })),
 }));
 
 jest.mock('./hooks/useAlertAndEventDefinitionData');
@@ -109,6 +107,7 @@ describe('<EventDefinitionInfoList />', () => {
 
   beforeEach(() => {
     mockUseAlertAndEventDefinitionData({});
+    asMock(AppConfig.isFeatureEnabled).mockImplementation((feature) => feature !== 'replay_search_right_sidebar');
   });
 
   it('Always shows fields: Priority, Execute search every, Search within, Description, Notifications, Aggregation conditions', async () => {

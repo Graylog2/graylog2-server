@@ -62,7 +62,7 @@ const StreamDataRoutingProcessing = ({ stream }: Props) => {
             />
           </IfPermitted>
         }>
-        <Table condensed striped hover>
+        <Table condensed>
           <thead>
             <tr>
               <th colSpan={2}>Pipeline</th>
