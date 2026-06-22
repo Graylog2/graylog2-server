@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import styled from 'styled-components';
 
 import { Row, Col, HelpBlock, Input, Alert } from 'components/bootstrap';
 import TimeoutUnitSelect from 'components/users/TimeoutUnitSelect';
@@ -26,6 +27,19 @@ type Props = {
   value?: number;
   onChange?: (value: number) => void;
 };
+
+// Contains its floated `<Col>` children, equivalent to Bootstrap 3's `.clearfix`.
+const ClearfixContainer = styled.div`
+  &::before,
+  &::after {
+    display: table;
+    content: ' ';
+  }
+
+  &::after {
+    clear: both;
+  }
+`;
 
 const _estimateUnit = (value: number): number => {
   if (value === 0) {
@@ -99,7 +113,7 @@ const TimeoutInput = ({ value: propsValue = MS_HOUR, onChange = () => {} }: Prop
           checked={sessionTimeoutNever}
         />
 
-        <div className="clearfix">
+        <ClearfixContainer>
           <Col xs={2}>
             <Input
               type="number"
@@ -121,7 +135,7 @@ const TimeoutInput = ({ value: propsValue = MS_HOUR, onChange = () => {} }: Prop
               <HelpBlock>Session automatically end after this amount of time, unless they are actively used.</HelpBlock>
             </Col>
           </Row>
-        </div>
+        </ClearfixContainer>
       </>
     </Input>
   );
