@@ -21,7 +21,17 @@ import sankeyOnClickPopover from 'views/components/visualizations/sankey/sankeyO
 const { buildAnchor } = sankeyOnClickPopover;
 
 const fakeRect = (left: number, top: number, width: number, height: number) =>
-  ({ left, top, width, height, right: left + width, bottom: top + height, x: left, y: top, toJSON: () => {} }) as DOMRect;
+  ({
+    left,
+    top,
+    width,
+    height,
+    right: left + width,
+    bottom: top + height,
+    x: left,
+    y: top,
+    toJSON: () => {},
+  }) as DOMRect;
 
 const withRect = <T extends Element>(el: T, rect: DOMRect): T =>
   Object.assign(el, { getBoundingClientRect: () => rect });
@@ -29,7 +39,10 @@ const withRect = <T extends Element>(el: T, rect: DOMRect): T =>
 // Sankey emits clicks through Fx.click(gd, { target: true }), so the PlotMouseEvent's own
 // `event` carries no coordinates — the real DOM event is stashed on the point as `originalEvent`.
 const clickEvent = (target: Element, clientX: number, clientY: number, pt: object): PlotMouseEvent =>
-  ({ points: [{ ...pt, originalEvent: { target, clientX, clientY } }], event: { target: true } }) as unknown as PlotMouseEvent;
+  ({
+    points: [{ ...pt, originalEvent: { target, clientX, clientY } }],
+    event: { target: true },
+  }) as unknown as PlotMouseEvent;
 
 describe('sankeyOnClickPopover.buildAnchor', () => {
   it('anchors the popover at the click position within a clicked link', () => {

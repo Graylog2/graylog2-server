@@ -239,6 +239,23 @@ describe('SankeyVisualization', () => {
     expect(trace.node.color).toBeUndefined();
   });
 
+  it('uses a distinct, more prominent hover color so hovered links stand out', () => {
+    const config = AggregationWidgetConfig.builder()
+      .rowPivots([Pivot.createValues(['a']), Pivot.createValues(['b'])])
+      .series([Series.forFunction('count()')])
+      .visualization('sankey')
+      .build();
+
+    render(<WrappedSankey {...baseProps} config={config} data={fixtures.twoRowPivots} />);
+
+    const trace = lastTrace();
+
+    expect(typeof trace.link.hovercolor).toBe('string');
+    expect(trace.link.hovercolor).not.toHaveLength(0);
+    // The hover color differs from the resting color, so hovering changes the appearance.
+    expect(trace.link.hovercolor).not.toEqual(trace.link.color);
+  });
+
   it('renders an empty-state message when there are no rows', () => {
     const config = AggregationWidgetConfig.builder()
       .rowPivots([Pivot.createValues(['a']), Pivot.createValues(['b'])])

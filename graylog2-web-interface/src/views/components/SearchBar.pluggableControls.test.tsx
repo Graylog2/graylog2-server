@@ -20,7 +20,6 @@ import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 import { PluginManifest } from 'graylog-web-plugin/plugin';
 
-import { StoreMock as MockStore } from 'helpers/mocking';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
 import FormikInput from 'components/common/FormikInput';
@@ -41,10 +40,6 @@ const testTimeout = applyTimeoutMultiplier(30000);
 jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 jest.mock('views/hooks/useAutoRefresh');
-
-jest.mock('stores/streams/StreamsStore', () =>
-  MockStore(['listStreams', () => ({ then: jest.fn() })], 'availableStreams'),
-);
 
 jest.mock('views/components/searchbar/saved-search/SearchActionsMenu', () =>
   jest.fn(() => <div>Saved Search Controls</div>),

@@ -395,7 +395,7 @@ public class ContentPackResource extends RestResource {
         return new ContentPackUninstallResponse(contentPack, removedInstallation);
     }
 
-    private record ContentPackUninstallResponse(
+    public record ContentPackUninstallResponse(
             @JsonProperty("content_pack") ContentPack contentPack,
             @JsonProperty("uninstalled") ContentPackUninstallation uninstalled) {}
 }
