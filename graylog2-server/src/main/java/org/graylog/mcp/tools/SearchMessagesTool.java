@@ -23,6 +23,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -34,7 +35,10 @@ import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryFailedExc
 import org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.web.customization.CustomizationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,7 +88,7 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
                     parameters.query(),
                     parameters.streams(),
                     parameters.streamCategories(),
-                    RelativeRange.create(parameters.rangeSeconds()),
+                    resolveTimeRange(parameters),
                     null,
                     null,
                     parameters.offset(),
@@ -99,6 +103,17 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
         } catch (NoSuchElementException | QueryFailedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static TimeRange resolveTimeRange(Parameters parameters) {
+        if (parameters.absoluteRange() != null) {
+            try {
+                return AbsoluteRange.create(parameters.absoluteRange().from(), parameters.absoluteRange().to());
+            } catch (InvalidRangeParametersException e) {
+                throw new IllegalArgumentException("Invalid absolute time range: " + e.getMessage(), e);
+            }
+        }
+        return RelativeRange.create(parameters.rangeSeconds());
     }
 
     @AutoValue
@@ -132,8 +147,13 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
         @PositiveOrZero
         public abstract int offset();
 
+        @JsonProperty("absolute_range")
+        @JsonPropertyDescription("An absolute time range with required 'from' and 'to' fields in ISO 8601 format. Takes precedence over range_seconds when provided.")
+        @Nullable
+        public abstract AbsoluteTimeRange absoluteRange();
+
         @JsonProperty("range_seconds")
-        @JsonPropertyDescription("The number of seconds to look back, the search window is always up to now, with this many seconds into the past.")
+        @JsonPropertyDescription("The number of seconds to look back, the search window is always up to now, with this many seconds into the past. Ignored when absolute_range is provided.")
         @DefaultValue("3600")
         @Positive
         public abstract int rangeSeconds();
@@ -154,7 +174,8 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
                         .fields(List.of("source", "timestamp"))
                         .limit(50)
                         .offset(0)
-                        .rangeSeconds(3600);
+                        .rangeSeconds(3600)
+                        .absoluteRange(null);
             }
 
             @JsonProperty("query")
@@ -170,6 +191,9 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
             @JsonProperty("range_seconds")
             public abstract Builder rangeSeconds(
                     @Positive final int rangeSeconds);
+
+            @JsonProperty("absolute_range")
+            public abstract Builder absoluteRange(@Nullable final AbsoluteTimeRange absoluteRange);
 
             @JsonProperty("streams")
             public abstract Builder streams(final Set<String> streams);
