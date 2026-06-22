@@ -25,6 +25,7 @@ import ABSGeoIpFormGroup from './ABSGeoIpFormGroup';
 
 describe('ABSGeoIpFormGroup', () => {
   const newConfig = {
+    enabled: true,
     azure_container: '',
     azure_account: '',
     azure_endpoint: '',
@@ -32,6 +33,7 @@ describe('ABSGeoIpFormGroup', () => {
   } as Partial<GeoIpConfigType>;
 
   const existingConfig = {
+    enabled: true,
     azure_container: 'my-container',
     azure_account: 'my-account',
     azure_endpoint: 'https://myaccount.blob.core.windows.net',
@@ -79,6 +81,15 @@ describe('ABSGeoIpFormGroup', () => {
       expect(screen.queryByTestId('azure-account-key-input')).not.toBeInTheDocument();
       expect(screen.getByRole('button', { name: /reset password/i })).toBeInTheDocument();
     });
+  });
+
+  it('disables all fields when the resolver is not enabled', async () => {
+    renderComponent({ ...newConfig, enabled: false });
+
+    expect(await screen.findByLabelText(/azure blob container name/i)).toBeDisabled();
+    expect(screen.getByLabelText(/azure blob endpoint url/i)).toBeDisabled();
+    expect(screen.getByLabelText(/azure account name/i)).toBeDisabled();
+    expect(screen.getByTestId('azure-account-key-input')).toBeDisabled();
   });
 
   it('updates formik values correctly', async () => {
