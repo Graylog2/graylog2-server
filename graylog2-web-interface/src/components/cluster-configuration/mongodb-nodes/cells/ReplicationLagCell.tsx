@@ -17,7 +17,6 @@
 import React from 'react';
 
 import NumberUtils from 'util/NumberUtils';
-
 import { Label } from 'components/bootstrap';
 
 import { MetricPlaceholder, MetricsColumn, MetricsRow } from '../../shared-components/NodeMetricsLayout';
