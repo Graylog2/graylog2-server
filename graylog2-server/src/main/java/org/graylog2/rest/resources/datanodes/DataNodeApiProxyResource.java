@@ -125,7 +125,14 @@ public class DataNodeApiProxyResource extends RestResource {
                     .build();
         }
 
-        final var response = proxyRequestAdapter.request(request);
-        return Response.status(response.status()).type(response.contentType()).entity(response.response()).build();
+        try {
+            final var response = proxyRequestAdapter.request(request);
+            return Response.status(response.status()).type(response.contentType()).entity(response.response()).build();
+        } catch (IllegalStateException e) {
+            return Response.status(Response.Status.SERVICE_UNAVAILABLE)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN_TYPE)
+                    .build();
+        }
     }
 }
