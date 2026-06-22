@@ -1,0 +1,8 @@
+type = "a"
+message = "Add an absolute time range to the MCP aggregate_messages tool."
+
+details.user = """
+The `aggregate_messages` tool of the MCP server accepts `from` and `to` for an absolute time range in ISO 8601, in addition to `range_seconds`, like the `search_messages` tool.
+"""
+
+issues = ["26421"]
