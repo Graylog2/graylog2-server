@@ -67,7 +67,10 @@ const AddToQueryHandler =
     const newQuery =
       multipleValues && contexts?.valuePathOperator === 'OR'
         ? addToQuery(oldQuery, orClause(valuesToAdd))
-        : valuesToAdd.reduce((prev, valueToAdd) => formatNewQuery(prev, valueToAdd.field, valueToAdd.value, valueToAdd.type), oldQuery);
+        : valuesToAdd.reduce(
+            (prev, valueToAdd) => formatNewQuery(prev, valueToAdd.field, valueToAdd.value, valueToAdd.type),
+            oldQuery,
+          );
 
     await recordQueryStringUsage(newQuery, oldQuery);
 
