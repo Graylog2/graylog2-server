@@ -1,0 +1,4 @@
+type = "c"
+message = "Disable `collectors` feature flag by default."
+
+pulls = ["26427"]
