@@ -36,6 +36,7 @@ import org.graylog.grn.GRNRegistry;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
 import org.graylog.security.pki.PemUtils;
+import org.graylog.security.pki.VerifiedCsr;
 import org.graylog.testing.TestClocks;
 import org.graylog.testing.cluster.ClusterConfigServiceExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
@@ -132,7 +133,7 @@ class AgentTokenServiceTest {
         final byte[] csrPem = createCsrPem("CN=test-agent", agentKeyPair, "Ed25519");
 
         // Sign CSR with enrollment CA - need to create a CertificateEntry from the signed X509Certificate
-        final PKCS10CertificationRequest parsedCsr = PemUtils.parseCsr(new String(csrPem, StandardCharsets.UTF_8));
+        final VerifiedCsr parsedCsr = PemUtils.parseCsr(new String(csrPem, StandardCharsets.UTF_8));
         final X509Certificate signedCert = certificateService.builder().signCsr(parsedCsr, enrollmentCa, "test-agent", Duration.ofDays(365));
         final String certFingerprint = PemUtils.computeFingerprint(signedCert);
         final String certPem = PemUtils.toPem(signedCert);
@@ -229,7 +230,7 @@ class AgentTokenServiceTest {
         final byte[] csrPem = createCsrPem("CN=test-agent", agentKeyPair, "Ed25519");
 
         // Sign CSR with enrollment CA
-        final PKCS10CertificationRequest parsedCsr = PemUtils.parseCsr(new String(csrPem, StandardCharsets.UTF_8));
+        final VerifiedCsr parsedCsr = PemUtils.parseCsr(new String(csrPem, StandardCharsets.UTF_8));
         final X509Certificate signedCert = certificateService.builder().signCsr(parsedCsr, enrollmentCa, "test-agent", Duration.ofDays(365));
         final String certFingerprint = PemUtils.computeFingerprint(signedCert);
         final String certPem = PemUtils.toPem(signedCert);
