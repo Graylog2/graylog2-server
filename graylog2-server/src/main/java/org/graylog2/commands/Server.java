@@ -43,6 +43,7 @@ import org.graylog.plugins.formatting.units.UnitsModule;
 import org.graylog.plugins.map.MapWidgetModule;
 import org.graylog.plugins.map.config.GeoIpProcessorConfig;
 import org.graylog.plugins.netflow.NetFlowPluginModule;
+import org.graylog.plugins.onboarding.OnboardingModule;
 import org.graylog.plugins.pipelineprocessor.PipelineConfig;
 import org.graylog.plugins.sidecar.SidecarModule;
 import org.graylog.plugins.sidecar.common.SidecarPluginConfiguration;
@@ -211,6 +212,7 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
                 new NetFlowPluginModule(),
                 new CEFInputModule(),
                 new SidecarModule(),
+                new OnboardingModule(),
                 new ContentPacksModule(),
                 new ViewsBindings(),
                 new JobSchedulerModule(),
