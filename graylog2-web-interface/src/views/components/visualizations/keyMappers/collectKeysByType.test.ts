@@ -63,7 +63,7 @@ describe('collectKeysByType', () => {
     const withNulls = {
       chart: [{ source: 'leaf', key: [null], values: [] }],
       events: [{ x: 1 }],
-    } as any;
+    };
 
     const result = collectKeysByType(withNulls, config, fieldTypeOf, new Set(['streams']));
 

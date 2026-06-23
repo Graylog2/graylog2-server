@@ -35,6 +35,12 @@ const testPlugin = {
         type: 'streams',
         useKeyMapper: () => (key: string) => (key === 'stream-1' ? 'All messages' : key),
       },
+      // Asset-style binding: only resolves keys it was actually handed by the provider, so a test
+      // fails if collectKeysByType does not prefetch the right ids for a given pivot layout.
+      {
+        type: 'associated-assets',
+        useKeyMapper: (keys: Array<string>) => (key: string) => (keys.includes(String(key)) ? `Asset ${key}` : key),
+      },
     ],
   },
 };
@@ -44,16 +50,20 @@ const config = AggregationWidgetConfig.builder()
   .columnPivots([])
   .build();
 
-const fields = Immutable.List([new FieldTypeMapping('streams', FieldType.create('streams', []))]);
+const fields = Immutable.List([
+  new FieldTypeMapping('streams', FieldType.create('streams', [])),
+  new FieldTypeMapping('a', FieldType.create('streams', [])),
+  new FieldTypeMapping('b', FieldType.create('associated-assets', [])),
+]);
 
 const data = {
   chart: [{ source: 'leaf', key: ['stream-1'], values: [] }],
 } as any;
 
-const Consumer = ({ k }: { k: string }) => {
+const Consumer = ({ k, field = 'streams' }: { k: string; field?: string }) => {
   const mapKeys = useContext(KeyMapperContext);
 
-  return <span>{mapKeys(k, 'streams')}</span>;
+  return <span>{mapKeys(k, field)}</span>;
 };
 
 describe('KeyMapperProvider', () => {
@@ -77,5 +87,50 @@ describe('KeyMapperProvider', () => {
     );
 
     expect(screen.getByText('stream-unknown')).toBeInTheDocument();
+  });
+
+  it('prefetches and resolves keys from the second of two row pivots (sankey/network layout)', () => {
+    const twoRowPivots = AggregationWidgetConfig.builder()
+      .rowPivots([Pivot.createValues(['a']), Pivot.createValues(['b'])])
+      .columnPivots([])
+      .build();
+    const twoRowPivotData = {
+      chart: [
+        { source: 'leaf', key: ['a1', 'b1'], values: [{ source: 'row-leaf', key: ['count()'], value: 5, rollup: true }] },
+        { source: 'leaf', key: ['a1', 'b2'], values: [{ source: 'row-leaf', key: ['count()'], value: 3, rollup: true }] },
+      ],
+    } as any;
+
+    render(
+      <KeyMapperProvider data={twoRowPivotData} config={twoRowPivots} fields={fields}>
+        <Consumer k="b1" field="b" />
+      </KeyMapperProvider>,
+    );
+
+    expect(screen.getByText('Asset b1')).toBeInTheDocument();
+  });
+
+  it('prefetches and resolves keys from a column pivot (one row + one column layout)', () => {
+    const rowAndColumn = AggregationWidgetConfig.builder()
+      .rowPivots([Pivot.createValues(['a'])])
+      .columnPivots([Pivot.createValues(['b'])])
+      .build();
+    const rowAndColumnData = {
+      chart: [
+        {
+          source: 'leaf',
+          key: ['a1'],
+          values: [{ source: 'col-leaf', key: ['b1', 'count()'], value: 5, rollup: false }],
+        },
+      ],
+    } as any;
+
+    render(
+      <KeyMapperProvider data={rowAndColumnData} config={rowAndColumn} fields={fields}>
+        <Consumer k="b1" field="b" />
+      </KeyMapperProvider>,
+    );
+
+    expect(screen.getByText('Asset b1')).toBeInTheDocument();
   });
 });
