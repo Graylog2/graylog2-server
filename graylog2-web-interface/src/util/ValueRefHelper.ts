@@ -21,7 +21,7 @@ export default class ValueRefHelper {
 
   static VALUE_REF_PARAMETER_VALUE = 'parameter';
 
-  static dataIsValueRef(data) {
+  static dataIsValueRef(data: any) {
     if (!data) {
       return false;
     }
@@ -43,7 +43,7 @@ export default class ValueRefHelper {
     );
   }
 
-  static dataValueIsParameter(data) {
+  static dataValueIsParameter(data: any) {
     if (!data) {
       return false;
     }
@@ -61,7 +61,7 @@ export default class ValueRefHelper {
     );
   }
 
-  static createValueRef(type, value) {
+  static createValueRef(type: string, value: any) {
     return { [this.VALUE_REF_TYPE_FIELD]: type, [this.VALUE_REF_VALUE_FIELD]: value };
   }
 }

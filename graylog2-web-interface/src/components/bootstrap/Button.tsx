@@ -169,7 +169,6 @@ const StyledButton = styled(MantineButton)<{
   return css`
     color: ${color};
     font-weight: 400;
-    overflow: visible;
 
     ${disabledStyles(theme.colors, $bsStyle)}
     ${stylesForSize($bsSize, $bsStyle)}
@@ -190,7 +189,6 @@ const StyledButton = styled(MantineButton)<{
 
     .mantine-Button-label {
       gap: 0.25em;
-      overflow: visible;
     }
 
     .mantine-Button-loader {

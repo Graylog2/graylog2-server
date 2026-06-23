@@ -16,6 +16,8 @@
  */
 package org.graylog.plugins.datanode;
 
+import org.graylog2.cluster.nodes.DataNodeMetadataService;
+import org.graylog2.cluster.nodes.DataNodeMetadataServiceImpl;
 import org.graylog2.datanode.DataNodeCommandService;
 import org.graylog2.datanode.DataNodeCommandServiceImpl;
 import org.graylog2.datanode.DataNodeEventService;
@@ -29,6 +31,7 @@ public class DataNodeModule extends PluginModule {
     @Override
     protected void configure() {
         bind(DataNodeCommandService.class).to(DataNodeCommandServiceImpl.class);
+        bind(DataNodeMetadataService.class).to(DataNodeMetadataServiceImpl.class).asEagerSingleton();
         bind(DataNodeEventService.class).asEagerSingleton();
         addMigration(V20231107164300_CreateDataNodeManagerRole.class);
         bind(Version.class).toProvider(ServerVersionProvider.class);

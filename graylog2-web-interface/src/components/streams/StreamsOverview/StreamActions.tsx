@@ -19,8 +19,8 @@ import { useState, useCallback } from 'react';
 
 import { ShareButton, IfPermitted, HoverForHelp, LinkContainer } from 'components/common';
 import { Button, ButtonToolbar, MenuItem, DeleteMenuItem } from 'components/bootstrap';
-import type { Stream } from 'stores/streams/StreamsStore';
-import StreamsStore from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
+import useStreamMutations from 'hooks/useStreamMutations';
 import Routes from 'routing/Routes';
 import { setStartpage } from 'api/startpage';
 import StreamRuleModal from 'components/streamrules/StreamRuleModal';
@@ -45,6 +45,7 @@ const DefaultStreamHelp = () => (
 
 const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array<IndexSet> }) => {
   const currentUser = useCurrentUser();
+  const { pauseStream, resumeStream, updateStream, removeStream, cloneStream } = useStreamMutations();
   const { deselectEntity } = useSelectedEntities();
   const [showDeleteModal, setDeleteModal] = useState(false);
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
@@ -76,17 +77,18 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
 
     setChangingStatus(true);
 
+    // The api fns handle the error toast on rejection, so we swallow it here to avoid an unhandled rejection.
     if (stream.disabled) {
-      await StreamsStore.resume(stream.id, (response) => response);
+      await resumeStream(stream.id).catch(() => {});
     }
 
     // eslint-disable-next-line no-alert
     if (!stream.disabled && window.confirm(`Do you really want to pause stream '${stream.title}'?`)) {
-      await StreamsStore.pause(stream.id, (response) => response);
+      await pauseStream(stream.id).catch(() => {});
     }
 
     setChangingStatus(false);
-  }, [sendTelemetry, stream.disabled, stream.id, stream.title]);
+  }, [sendTelemetry, stream.disabled, stream.id, stream.title, resumeStream, pauseStream]);
 
   const toggleEntityShareModal = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_SHARE_MODAL_OPENED, {
@@ -118,7 +120,7 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
       app_action_value: 'stream-item-delete',
     });
 
-    StreamsStore.remove(stream.id)
+    removeStream(stream.id)
       .then(() => {
         deselectEntity(stream.id);
         UserNotification.success(`Stream '${stream.title}' was deleted successfully.`, 'Success');
@@ -127,7 +129,7 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
       .catch((error) => {
         UserNotification.error(`An error occurred while deleting the stream. ${error}`);
       });
-  }, [deselectEntity, sendTelemetry, stream.id, stream.title, toggleDeleteModal]);
+  }, [deselectEntity, removeStream, sendTelemetry, stream.id, stream.title, toggleDeleteModal]);
 
   const { onCreateStreamRule, showStartStreamDialog, onCancelStartStreamDialog, onStartStream, isStartingStream } =
     useCreateStreamRule({
@@ -137,16 +139,14 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
 
   const onUpdate = useCallback(
     (newStream: Stream) =>
-      StreamsStore.update(stream.id, newStream, (response) => {
+      updateStream({ streamId: stream.id, data: newStream }).then(() => {
         sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_UPDATED, {
           app_pathname: 'streams',
         });
 
         UserNotification.success(`Stream '${newStream.title}' was updated successfully.`, 'Success');
-
-        return response;
       }),
-    [sendTelemetry, stream.id],
+    [sendTelemetry, stream.id, updateStream],
   );
 
   const onCloneSubmit = useCallback(
@@ -155,13 +155,19 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
         app_pathname: 'streams',
       });
 
-      return StreamsStore.cloneStream(stream.id, newStream, (response) => {
+      return cloneStream({
+        streamId: stream.id,
+        data: {
+          title: newStream.title,
+          description: newStream.description,
+          index_set_id: newStream.index_set_id,
+          remove_matches_from_default_stream: newStream.remove_matches_from_default_stream,
+        },
+      }).then(() => {
         UserNotification.success(`Stream was successfully cloned as '${newStream.title}'.`, 'Success');
-
-        return response;
       });
     },
-    [sendTelemetry, stream.id],
+    [sendTelemetry, stream.id, cloneStream],
   );
 
   return (

@@ -37,7 +37,7 @@ import { isPermitted } from 'util/PermissionsMixin';
 import FilterPreviewResults from 'components/event-definitions/event-definition-types/FilterPreviewResults';
 import useDebouncedValue from 'hooks/useDebouncedValue';
 import StreamsContext from 'contexts/StreamsContext';
-import type { Stream } from 'views/stores/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 
 type FilterPreviewProps = {
   config: EventDefinition['config'];

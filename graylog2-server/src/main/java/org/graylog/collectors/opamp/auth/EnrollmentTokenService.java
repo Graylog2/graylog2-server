@@ -240,6 +240,13 @@ public class EnrollmentTokenService {
         tokenCollection.deleteMany(eq(EnrollmentTokenDTO.FIELD_FLEET_ID, fleetId));
     }
 
+    /**
+     * Increments the token's usage counter and updates its {@code last_used_at} timestamp.
+     * <p>
+     * Call this when the token authorizes a new enrollment. For repeat uses that should not
+     * inflate the usage counter (e.g. a collector re-enrolling with the same token), use
+     * {@link #markUsed} instead.
+     */
     public void incrementUsage(String id) {
         tokenCollection.updateOne(
                 idEq(id),
@@ -247,6 +254,19 @@ public class EnrollmentTokenService {
                         Updates.inc(EnrollmentTokenDTO.FIELD_USAGE_COUNT, 1),
                         Updates.set(EnrollmentTokenDTO.FIELD_LAST_USED_AT, Date.from(Instant.now(clock)))
                 )
+        );
+    }
+
+    /**
+     * Updates the token's {@code last_used_at} timestamp without incrementing the usage counter.
+     * <p>
+     * Keeps the "Last Used" signal truthful for tokens that active collectors still rely on for
+     * recovery (re-enrollment), so they don't appear dormant and get cleaned up while in use.
+     */
+    public void markUsed(String id) {
+        tokenCollection.updateOne(
+                idEq(id),
+                Updates.set(EnrollmentTokenDTO.FIELD_LAST_USED_AT, Date.from(Instant.now(clock)))
         );
     }
 

@@ -19,7 +19,7 @@ import styled, { css } from 'styled-components';
 
 import { Col, Row } from 'components/bootstrap';
 import type { Sort } from 'stores/PaginationTypes';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import { Section, PaginatedEntityTable } from 'components/common';
 import {
   fetchStreamConnectedPipelines,

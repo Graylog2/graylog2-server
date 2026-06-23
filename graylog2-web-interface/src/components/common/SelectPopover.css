@@ -31,6 +31,7 @@
   min-width: 200px;
   max-height: 340px; /* 10 items */
   overflow: auto;
+  overscroll-behavior: contain; /* prevent scroll chaining to the page behind the popover */
 }
 
 :local(.dataFilterInput) {
