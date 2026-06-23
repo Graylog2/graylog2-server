@@ -15,118 +15,182 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled from 'styled-components';
 
-import { Col, Label, Row, Table } from 'components/bootstrap';
-import { Icon, ProgressBar } from 'components/common';
-import type { DataNodeInformation } from 'components/datanode/hooks/useDataNodeUpgradeStatus';
+import { Alert, Col, Label, Row, Table } from 'components/bootstrap';
+import { Icon, Timestamp } from 'components/common';
 
-type Props = {
-  pendingNodes: DataNodeInformation[];
-  upgradedNodes: DataNodeInformation[];
-  currentProgress?: number;
+import type {
+  RollingRestartJob,
+  RollingRestartNode,
+  RollingRestartNodeStatus,
+  RollingRestartState,
+} from './rollingRestartTypes';
+
+type NodeWithIndex = {
+  node: RollingRestartNode;
+  index: number;
 };
 
-const NodeProgressBar = styled(ProgressBar)`
-  display: inline-flex;
-  width: 140px;
-  margin-bottom: 0;
-  vertical-align: middle;
-`;
+type Props = {
+  job: RollingRestartJob | null | undefined;
+};
 
-const NodeIdentityCell = ({ node }: { node: DataNodeInformation }) => (
+const STATE_LABELS: Record<RollingRestartState, string> = {
+  PREPARING_CLUSTER: 'Preparing cluster',
+  SELECTING_NEXT_NODE: 'Selecting next node',
+  STOPPING_NODE: 'Stopping node',
+  WAITING_NODE_LEFT: 'Waiting for node to leave',
+  STARTING_NODE: 'Starting node',
+  WAITING_NODE_JOINED: 'Waiting for node to rejoin',
+  REENABLING_ALLOCATION: 'Re-enabling allocation',
+  WAITING_GREEN: 'Waiting for green cluster',
+  PAUSED_WAITING_GREEN: 'Paused waiting for green cluster',
+  FINALIZING: 'Finalizing',
+  COMPLETED: 'Completed',
+  ABORTED: 'Aborted',
+  FAILED: 'Failed',
+};
+
+const NODE_STATUS_STYLE: Record<RollingRestartNodeStatus, 'default' | 'info' | 'success' | 'warning' | 'danger'> = {
+  PENDING: 'default',
+  STOPPING: 'warning',
+  STOPPED: 'warning',
+  STARTING: 'info',
+  STARTED: 'info',
+  COMPLETED: 'success',
+  FAILED: 'danger',
+  SKIPPED: 'default',
+};
+
+const STATE_STYLE: Record<RollingRestartState, 'default' | 'info' | 'success' | 'warning' | 'danger'> = {
+  PREPARING_CLUSTER: 'info',
+  SELECTING_NEXT_NODE: 'info',
+  STOPPING_NODE: 'warning',
+  WAITING_NODE_LEFT: 'warning',
+  STARTING_NODE: 'info',
+  WAITING_NODE_JOINED: 'info',
+  REENABLING_ALLOCATION: 'info',
+  WAITING_GREEN: 'info',
+  PAUSED_WAITING_GREEN: 'warning',
+  FINALIZING: 'info',
+  COMPLETED: 'success',
+  ABORTED: 'warning',
+  FAILED: 'danger',
+};
+
+const NodeIdentityCell = ({ node, isCurrent }: { node: RollingRestartNode; isCurrent: boolean }) => (
   <td>
     <div>
-      {node?.hostname}&nbsp;
-      <Label bsStyle={node?.data_node_status === 'AVAILABLE' ? 'success' : 'warning'} bsSize="xs">
-        {node?.data_node_status}
-      </Label>
-      &nbsp;
-      {node?.manager_node && (
-        <Label bsStyle="info" bsSize="xs">
-          manager
+      {node.hostname}&nbsp;
+      {isCurrent && (
+        <Label bsStyle="info">
+          current
         </Label>
       )}
     </div>
     <div>
-      <i>{node?.ip}</i>
+      <i>{node.datanode_id}</i>
     </div>
+    {node.last_error && (
+      <div>
+        <Label bsStyle="danger">
+          {node.last_error}
+        </Label>
+      </div>
+    )}
   </td>
 );
 
-const UpgradingStatus = ({ progress }: { progress?: number }) =>
-  typeof progress === 'number' ? (
-    <NodeProgressBar
-      bars={[{ value: progress, label: `${progress}%`, bsStyle: 'warning', animated: true, striped: true }]}
-    />
-  ) : (
-    <Label bsStyle="warning" bsSize="xs">
-      Upgrading…
+const NodeStatusCell = ({ node }: { node: RollingRestartNode }) => (
+  <td align="right">
+    <Label bsStyle={NODE_STATUS_STYLE[node.status]}>
+      {node.status}
+      &nbsp;
+      {node.status === 'COMPLETED' && <Icon name="check" />}
     </Label>
-  );
-
-const OpenSearchRollingUpgradeNodes = ({ pendingNodes, upgradedNodes, currentProgress = undefined }: Props) => (
-  <>
-    <br />
-    <Row>
-      <Col sm={6}>
-        <h3>Pending OpenSearch Upgrade</h3>
-        <br />
-        <Table>
-          <tbody>
-            {pendingNodes?.map((node, index) => (
-              <tr key={node?.hostname}>
-                <NodeIdentityCell node={node} />
-                <td>
-                  <i>{node?.opensearch_version}</i>
-                </td>
-                <td align="right">
-                  {index === 0 ? (
-                    <UpgradingStatus progress={currentProgress} />
-                  ) : (
-                    <Label bsStyle="default" bsSize="xs">
-                      Pending
-                    </Label>
-                  )}
-                </td>
-              </tr>
-            ))}
-            {!pendingNodes?.length && (
-              <tr>
-                <td>No pending nodes.</td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
-      </Col>
-      <Col sm={6}>
-        <h3>Upgraded OpenSearch</h3>
-        <br />
-        <Table>
-          <tbody>
-            {upgradedNodes?.map((node) => (
-              <tr key={node?.hostname}>
-                <NodeIdentityCell node={node} />
-                <td>
-                  <i>{node?.opensearch_version}</i>
-                </td>
-                <td align="right">
-                  <Label bsStyle="success" bsSize="xs">
-                    Upgraded <Icon name="check" />
-                  </Label>
-                </td>
-              </tr>
-            ))}
-            {!upgradedNodes?.length && (
-              <tr>
-                <td>No upgraded nodes yet.</td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
-      </Col>
-    </Row>
-  </>
+  </td>
 );
+
+const TimeCell = ({ node }: { node: RollingRestartNode }) => {
+  const timestamp = node.finished_at ?? node.started_at;
+
+  return <td>{timestamp ? <Timestamp dateTime={timestamp} /> : '-'}</td>;
+};
+
+const NodesTable = ({
+  emptyMessage,
+  nodes,
+  currentNodeIndex,
+}: {
+  emptyMessage: string;
+  nodes: Array<NodeWithIndex>;
+  currentNodeIndex: number;
+}) => (
+  <Table>
+    <tbody>
+      {nodes.map(({ node, index }) => (
+        <tr key={node.datanode_id}>
+          <NodeIdentityCell node={node} isCurrent={index === currentNodeIndex} />
+          <TimeCell node={node} />
+          <NodeStatusCell node={node} />
+        </tr>
+      ))}
+      {!nodes.length && (
+        <tr>
+          <td>{emptyMessage}</td>
+        </tr>
+      )}
+    </tbody>
+  </Table>
+);
+
+const OpenSearchRollingUpgradeNodes = ({ job }: Props) => {
+  const data = job?.data;
+
+  if (!data) {
+    return <Alert bsStyle="info">No OpenSearch rolling restart has been started yet.</Alert>;
+  }
+
+  const nodes = data.nodes.map((node, index) => ({ node, index }));
+  const completedNodes = nodes.filter(({ node }) => node.status === 'COMPLETED');
+  const remainingNodes = nodes.filter(({ node }) => node.status !== 'COMPLETED');
+
+  return (
+    <>
+      <br />
+      <h3>
+        OpenSearch rolling restart&nbsp;
+        <Label bsStyle={STATE_STYLE[data.sm_state]}>
+          {STATE_LABELS[data.sm_state]}
+        </Label>
+      </h3>
+      {data.paused_reason && <Alert bsStyle="warning">{data.paused_reason}</Alert>}
+      {data.last_error && <Alert bsStyle="danger">{data.last_error}</Alert>}
+      {data.abort_requested && (
+        <Alert bsStyle="warning">Abort requested. The restart will stop after the current step.</Alert>
+      )}
+      <Row>
+        <Col sm={6}>
+          <h3>Remaining OpenSearch Restart</h3>
+          <br />
+          <NodesTable
+            nodes={remainingNodes}
+            currentNodeIndex={data.current_node_index}
+            emptyMessage="No remaining nodes."
+          />
+        </Col>
+        <Col sm={6}>
+          <h3>Completed OpenSearch Restart</h3>
+          <br />
+          <NodesTable
+            nodes={completedNodes}
+            currentNodeIndex={data.current_node_index}
+            emptyMessage="No completed nodes yet."
+          />
+        </Col>
+      </Row>
+    </>
+  );
+};
 
 export default OpenSearchRollingUpgradeNodes;

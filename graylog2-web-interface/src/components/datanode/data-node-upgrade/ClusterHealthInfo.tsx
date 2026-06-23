@@ -123,7 +123,7 @@ type Props = {
 const ClusterHealthInfo = ({ data, numberOfNodes, showShardReplication }: Props) => (
   <>
     <h3>
-      <Label bsStyle={getClusterHealthStyle(data?.cluster_state?.status)} bsSize="xs">
+      <Label bsStyle={getClusterHealthStyle(data?.cluster_state?.status)}>
         {data?.cluster_state?.cluster_name}: {data?.cluster_state?.status}
       </Label>
       &nbsp;
@@ -140,11 +140,11 @@ const ClusterHealthInfo = ({ data, numberOfNodes, showShardReplication }: Props)
           <dd>
             <ShardReplicationContainer>
               {data?.shard_replication_enabled ? (
-                <Label bsStyle="success" bsSize="xs">
+                <Label bsStyle="success">
                   Enabled
                 </Label>
               ) : (
-                <Label bsStyle="warning" bsSize="xs">
+                <Label bsStyle="warning">
                   Disabled
                 </Label>
               )}
