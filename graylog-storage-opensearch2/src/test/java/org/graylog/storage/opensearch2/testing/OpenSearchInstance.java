@@ -134,22 +134,26 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     }
 
     protected void afterContainerCreated() {
+        if (version().satisfies(SearchVersion.Distribution.OPENSEARCH, ">=2.9.0")) {
+            // Set cluster-wide default replicas to 0 so system indices created by plugins
+            // don't leave the single-node cluster in YELLOW state.
+            setDefaultNumberOfReplicasToZero();
+        }
         if (version().satisfies(SearchVersion.Distribution.OPENSEARCH, "2.9.0")) {
             fixNumberOfReplicaForMlPlugin();
         }
-        if (version().satisfies(SearchVersion.Distribution.OPENSEARCH, "~2.19")) {
-            fixDefaultNumberOfReplicasForIsmConfigs();
-        }
     }
 
-    private void fixDefaultNumberOfReplicasForIsmConfigs() {
-        // changes default number of replicas for some system managed indices in 2.19
-        // (see http://github.com/opensearch-project/OpenSearch/issues/9438)
-        openSearchClient().execute((client, requestOptions) -> {
-            final ClusterUpdateSettingsRequest req = new ClusterUpdateSettingsRequest();
-            req.persistentSettings(Map.of("cluster.default_number_of_replicas", "0"));
-            return client.cluster().putSettings(req, requestOptions);
-        });
+    private void setDefaultNumberOfReplicasToZero() {
+        try {
+            openSearchClient().execute((client, requestOptions) -> {
+                final ClusterUpdateSettingsRequest req = new ClusterUpdateSettingsRequest();
+                req.persistentSettings(Map.of("cluster.default_number_of_replicas", "0"));
+                return client.cluster().putSettings(req, requestOptions);
+            });
+        } catch (Exception e) {
+            // silently ignore error on versions where this cannot be set
+        }
     }
 
     /**
