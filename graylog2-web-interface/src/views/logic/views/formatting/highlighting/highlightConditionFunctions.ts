@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import type { Value } from 'views/logic/views/formatting/highlighting/HighlightingRule';
+
 // Todo: this is copied from components/messagelist
 const isNumeric = (str: any) => {
   if (typeof str === 'number') return true;
@@ -34,12 +36,12 @@ const checkNumeric = (a: any, b: any, callback: (a: any, b: any) => boolean): bo
 };
 
 const highlightConditionFunctions = {
-  equal: (a, b) => String(a) === String(b),
-  not_equal: (a, b) => String(a) !== String(b),
-  less_equal: (a, b) => checkNumeric(a, b, (aFloat, bFloat) => aFloat <= bFloat),
-  greater_equal: (a, b) => checkNumeric(a, b, (aFloat, bFloat) => aFloat >= bFloat),
-  greater: (a, b) => checkNumeric(a, b, (aFloat, bFloat) => aFloat > bFloat),
-  less: (a, b) => checkNumeric(a, b, (aFloat, bFloat) => aFloat < bFloat),
+  equal: (a: Value, b: Value) => String(a) === String(b),
+  not_equal: (a: Value, b: Value) => String(a) !== String(b),
+  less_equal: (a: Value, b: Value) => checkNumeric(a, b, (aFloat, bFloat) => aFloat <= bFloat),
+  greater_equal: (a: Value, b: Value) => checkNumeric(a, b, (aFloat, bFloat) => aFloat >= bFloat),
+  greater: (a: Value, b: Value) => checkNumeric(a, b, (aFloat, bFloat) => aFloat > bFloat),
+  less: (a: Value, b: Value) => checkNumeric(a, b, (aFloat, bFloat) => aFloat < bFloat),
 };
 
 export default highlightConditionFunctions;

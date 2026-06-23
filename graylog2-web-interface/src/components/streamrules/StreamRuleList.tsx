@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import type { Stream, MatchData } from 'stores/streams/StreamsStore';
+import type { Stream, MatchData } from 'logic/streams/types';
 import StreamRule from 'components/streamrules/StreamRule';
 import { Spinner } from 'components/common';
 import { ListGroup, ListGroupItem } from 'components/bootstrap';

@@ -19,9 +19,9 @@ import styled, { css } from 'styled-components';
 
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
-import { Row, Col, Button, Panel, Radio } from 'components/bootstrap';
+import { Row, Col, Button, Panel } from 'components/bootstrap';
+import { ConfirmDialog, FormSubmit, Radio } from 'components/common';
 import useRuleBuilder from 'hooks/useRuleBuilder';
-import { ConfirmDialog, FormSubmit } from 'components/common';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import generateObjectId from 'logic/generateObjectId';
@@ -61,10 +61,8 @@ const StyledPanelHeading = styled(Panel.Heading)(
 
 const WhenOperator = styled.div`
   display: flex;
-
-  .radio {
-    margin: 0 8px;
-  }
+  gap: 8px;
+  align-items: center;
 `;
 
 const StyledPanelBody = styled(Panel.Body)`

@@ -54,7 +54,7 @@ describe('useFiltersWithTitle', () => {
     await waitFor(() => expect(result.current.isInitialLoading).toBe(false));
 
     await waitFor(() =>
-      expect(fetch).toHaveBeenCalledWith('POST', 'http://localhost/system/catalog/entities/titles', {
+      expect(fetch).toHaveBeenCalledWith('POST', 'http://localhost:9000/api/system/catalog/entities/titles', {
         entities: [
           { id: 'index_set_id_1', type: 'index_sets' },
           { id: 'index_set_id_2', type: 'index_sets' },

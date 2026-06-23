@@ -35,7 +35,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.NotFoundException;
@@ -91,8 +90,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import static org.graylog2.shared.security.RestPermissions.USERS_READ;
 
 @PublicCloudAPI
 @Tag(name = "Sidecar", description = "Manage Sidecar fleet")
@@ -309,17 +306,13 @@ public class SidecarResource extends RestResource implements PluginRestResource 
 
     @GET
     @Path("/user")
+    @RequiresPermissions(SidecarRestPermissions.SIDECARS_READ)
     @Operation(summary = "Get basic sidecar user")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "The sidecar user could not be found.")
     })
     public BasicUserResponse getBasicSidecarUser() {
-
-        if (!isPermitted(USERS_READ, sidecarUserName)) {
-            throw new ForbiddenException("Not allowed to view user " + sidecarUserName);
-        }
-
         final User user = userManagementService.load(sidecarUserName);
         if (user == null) {
             throw new NotFoundException("Couldn't find user " + sidecarUserName);
