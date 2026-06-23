@@ -17,16 +17,13 @@
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import type { Datum } from 'plotly.js';
+import uniq from 'lodash/uniq';
 
 import Popover from 'components/common/Popover';
 import { Menu } from 'components/bootstrap';
 import OnClickPopoverValueGroups from 'views/components/visualizations/OnClickPopover/OnClickPopoverValueGroups';
 import PopoverTitle from 'views/components/visualizations/OnClickPopover/PopoverTitle';
-import type {
-  ClickPoint,
-  FieldData,
-  ValueGroups,
-} from 'views/components/visualizations/OnClickPopover/Types';
+import type { ClickPoint, FieldData, ValueGroups } from 'views/components/visualizations/OnClickPopover/Types';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { ActionContext, AdditionalContext } from 'views/logic/ActionContext';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
@@ -40,18 +37,24 @@ import { humanSeparator } from 'views/Constants';
 
 type NodeCustomData = { field: string; value: unknown };
 
-type SankeyNodePoint = {
+type LinkEndpoint = {
   customdata?: NodeCustomData;
   label?: string;
 };
 
+type EdgeCustomData = {
+  source?: LinkEndpoint;
+  target?: LinkEndpoint;
+  value?: number;
+};
+
 type SankeyClickPoint = {
-  customdata?: NodeCustomData;
+  customdata?: NodeCustomData | EdgeCustomData;
   index?: number;
   label?: string;
   value?: number;
-  source?: SankeyNodePoint;
-  target?: SankeyNodePoint;
+  source?: LinkEndpoint;
+  target?: LinkEndpoint;
 };
 
 const DivContainer = styled.div(
@@ -62,8 +65,28 @@ const DivContainer = styled.div(
   `,
 );
 
-const isSankeyLink = (pt: SankeyClickPoint): boolean =>
-  !!pt.source && !!pt.target && typeof pt.source === 'object' && typeof pt.target === 'object';
+// Sankey natively emits link clicks with `source`/`target` at the top level of the click point.
+// Other viz (e.g. network graph rendered as a scatter trace) instead encode link metadata into
+// the trace's `customdata` so we treat that shape as a link too.
+const linkContext = (pt: SankeyClickPoint): { source: LinkEndpoint; target: LinkEndpoint; value?: number } | null => {
+  if (pt.source && pt.target && typeof pt.source === 'object' && typeof pt.target === 'object') {
+    return { source: pt.source, target: pt.target, value: pt.value };
+  }
+
+  const cd = pt.customdata as EdgeCustomData | undefined;
+
+  if (cd?.source && cd?.target && typeof cd.source === 'object' && typeof cd.target === 'object') {
+    return { source: cd.source, target: cd.target, value: cd.value };
+  }
+
+  return null;
+};
+
+const nodeContext = (pt: SankeyClickPoint): NodeCustomData | null => {
+  const cd = pt.customdata as NodeCustomData | undefined;
+
+  return cd && typeof cd.field === 'string' ? cd : null;
+};
 
 type Props = {
   clickPoint: ClickPoint;
@@ -92,35 +115,43 @@ const SankeyActions = ({
     ...additionalHandlerArgs,
   };
 
-  // When the combined groupings were selected, the action targets a value path rather than a
-  // single field/value, so show the combined grouping values instead of the metric.
-  const showMultipleValueHeader = hasMultipleValueForActions(actionContext);
+  // An OR value path targets a single value across several groupings, so show that value once. The
+  // combined (AND) value path of an edge instead lists each grouping value. Otherwise it's a single
+  // field/value.
+  const isOrCombination = actionContext.valuePathOperator === 'OR';
+  const showCombinedHeader = hasMultipleValueForActions(actionContext) && !isOrCombination;
+
+  let headerContent: React.ReactNode;
+
+  if (showCombinedHeader) {
+    headerContent = actionContext.valuePath.map((entry, index) => {
+      const [entryField, entryValue] = Object.entries(entry)[0];
+
+      return (
+        <React.Fragment key={`${entryField}-${String(entryValue)}`}>
+          {index > 0 && humanSeparator}
+          <TypeSpecificValue
+            field={entryField}
+            value={entryValue}
+            type={fieldTypeFor(entryField, actionContext.fieldTypes)}
+            truncate
+          />
+        </React.Fragment>
+      );
+    });
+  } else if (isOrCombination) {
+    headerContent = <TypeSpecificValue field={selected.field} value={selected.value} type={type} truncate />;
+  } else {
+    headerContent = (
+      <>
+        {selected.field} = <TypeSpecificValue field={selected.field} value={selected.value} type={type} truncate />
+      </>
+    );
+  }
 
   return (
     <>
-      <PopoverTitle onBackClick={onBack ?? false}>
-        {showMultipleValueHeader ? (
-          actionContext.valuePath.map((entry, index) => {
-            const [entryField, entryValue] = Object.entries(entry)[0];
-
-            return (
-              <React.Fragment key={`${entryField}-${String(entryValue)}`}>
-                {index > 0 && humanSeparator}
-                <TypeSpecificValue
-                  field={entryField}
-                  value={entryValue}
-                  type={fieldTypeFor(entryField, actionContext.fieldTypes)}
-                  truncate
-                />
-              </React.Fragment>
-            );
-          })
-        ) : (
-          <>
-            {selected.field} = <TypeSpecificValue field={selected.field} value={selected.value} type={type} truncate />
-          </>
-        )}
-      </PopoverTitle>
+      <PopoverTitle onBackClick={onBack ?? false}>{headerContent}</PopoverTitle>
       <Menu opened>
         <ActionDropdown
           handlerArgs={handlerArgs}
@@ -143,16 +174,18 @@ const collectGroupItems = (valueGroups: ValueGroups) => [
 const SankeyOnClickPopover = ({ clickPoint, config, onPopoverClose }: Props) => {
   const pt = clickPoint as unknown as SankeyClickPoint | undefined;
 
-  const valueGroups = useMemo<ValueGroups & { title: string }>(() => {
+  const valueGroups = useMemo<ValueGroups & { title: string; nodeSelection?: FieldData | null }>(() => {
     if (!pt) return { title: '' };
 
-    if (isSankeyLink(pt)) {
-      const srcLabel = pt.source?.label ?? '';
-      const tgtLabel = pt.target?.label ?? '';
+    const link = linkContext(pt);
+
+    if (link) {
+      const srcLabel = link.source.label ?? '';
+      const tgtLabel = link.target.label ?? '';
       const linkTitle = srcLabel && tgtLabel ? `${srcLabel} → ${tgtLabel}` : 'Connection';
-      const srcCustom = pt.source?.customdata;
-      const tgtCustom = pt.target?.customdata;
-      const linkValue = pt.value;
+      const srcCustom = link.source.customdata;
+      const tgtCustom = link.target.customdata;
+      const linkValue = link.value;
       const metric = config?.series?.[0];
 
       return {
@@ -184,22 +217,39 @@ const SankeyOnClickPopover = ({ clickPoint, config, onPopoverClose }: Props) => 
       };
     }
 
-    const nodeCustom = pt.customdata;
+    const node = nodeContext(pt);
 
-    if (!nodeCustom) return { title: pt.label ?? '' };
+    if (!node) return { title: pt.label ?? '' };
+
+    // For the network graph a node value can occur in any of the configured groupings, so clicking
+    // it should query that value across all of them, OR'd together (e.g. `source:V OR target:V`).
+    const groupingFields = uniq(
+      [...(config?.rowPivots ?? []), ...(config?.columnPivots ?? [])].flatMap((pivot) => pivot.fields),
+    );
+    const queryAcrossGroupings = config?.visualization === 'network' && groupingFields.length > 1;
 
     return {
-      title: pt.label ?? String(nodeCustom.value),
+      title: pt.label ?? String(node.value),
       rowPivotValues: [
         {
-          field: nodeCustom.field,
-          value: nodeCustom.value as Datum,
-          text: pt.label ?? String(nodeCustom.value),
+          field: node.field,
+          value: node.value as Datum,
+          text: pt.label ?? String(node.value),
           traceColor: null,
         },
       ],
       columnPivotValues: [],
       metricValue: undefined,
+      nodeSelection: queryAcrossGroupings
+        ? {
+            field: node.field,
+            value: node.value as Datum,
+            contexts: {
+              valuePath: groupingFields.map((groupingField) => ({ [groupingField]: node.value })),
+              valuePathOperator: 'OR',
+            },
+          }
+        : null,
     };
   }, [pt, config]);
 
@@ -209,14 +259,20 @@ const SankeyOnClickPopover = ({ clickPoint, config, onPopoverClose }: Props) => 
   // Component is remounted (via `key` on the caller) whenever the chart click changes,
   // so internal state always starts fresh. When there's only one selectable item, jump
   // straight to the action menu instead of asking the user to pick from a single option.
-  const [selected, setSelected] = useState<FieldData | null>(() =>
-    skipValueSelection ? { field: items[0].field, value: items[0].value, contexts: null } : null,
-  );
+  const [selected, setSelected] = useState<FieldData | null>(() => {
+    if (!skipValueSelection) return null;
+
+    return valueGroups.nodeSelection ?? { field: items[0].field, value: items[0].value, contexts: null };
+  });
 
   const types = useQueryFieldTypes();
   const additionalContextValue = useMemo(
-    () => ({ valuePath: selected?.contexts?.valuePath, fieldTypes: types }),
-    [selected?.contexts?.valuePath, types],
+    () => ({
+      valuePath: selected?.contexts?.valuePath,
+      valuePathOperator: selected?.contexts?.valuePathOperator,
+      fieldTypes: types,
+    }),
+    [selected?.contexts?.valuePath, selected?.contexts?.valuePathOperator, types],
   );
 
   const onActionRun = useCallback(() => {

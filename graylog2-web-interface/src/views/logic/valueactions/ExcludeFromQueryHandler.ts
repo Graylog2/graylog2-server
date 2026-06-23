@@ -16,7 +16,7 @@
  */
 import uniq from 'lodash/uniq';
 
-import { escape, addToQuery, predicate, not } from 'views/logic/queries/QueryHelper';
+import { escape, addToQuery, predicate, not, concatQueryStrings } from 'views/logic/queries/QueryHelper';
 import recordQueryStringUsage from 'views/logic/queries/recordQueryStringUsage';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { RootState } from 'views/types';
@@ -26,32 +26,43 @@ import hasMultipleValueForActions from 'views/components/visualizations/utils/ha
 import type { ValuePath } from 'views/logic/valueactions/ValueActionHandler';
 import type Widget from 'views/logic/widgets/Widget';
 
-const formatNewQuery = (oldQuery: string, field: string, value: any) => {
-  const fieldPredicate = not(predicate(field, escape(value)));
+const formatNewQuery = (oldQuery: string, field: string, value: any) =>
+  addToQuery(oldQuery, not(predicate(field, escape(value))));
 
-  return addToQuery(oldQuery, fieldPredicate);
+// Negates a single OR group of all value path entries, e.g. `NOT (source:a OR target:a)` — exclude
+// every message where the value appears in any of the configured groupings.
+const excludeOrClause = (oldQuery: string, valuePath: ValuePath) => {
+  const orGroup = concatQueryStrings(
+    valuePath.map((path) => {
+      const [pathField, pathValue] = Object.entries(path)[0];
+
+      return predicate(pathField, escape(pathValue));
+    }),
+    { operator: 'OR', withBrackets: false },
+  );
+
+  return addToQuery(oldQuery, not(`(${orGroup})`));
 };
 
 type Args = {
   queryId: string;
   field: string;
   value?: string;
-  contexts?: { valuePath?: ValuePath; widget?: Widget } | null;
+  contexts?: { valuePath?: ValuePath; valuePathOperator?: 'AND' | 'OR'; widget?: Widget } | null;
 };
 
 const ExcludeFromQueryHandler =
   ({ queryId, field, value, contexts }: Args) =>
   async (dispatch: ViewsDispatch, getState: () => RootState) => {
     const oldQuery = selectQueryString(queryId)(getState());
+    const multipleValues = hasMultipleValueForActions(contexts);
 
-    const valuesToAdd = uniq(
-      hasMultipleValueForActions(contexts) ? contexts.valuePath.map(() => ({ field, value })) : [{ field, value }],
-    );
+    const valuesToAdd = uniq(multipleValues ? contexts.valuePath.map(() => ({ field, value })) : [{ field, value }]);
 
-    const newQuery = valuesToAdd.reduce(
-      (prev, valueToAdd) => formatNewQuery(prev, valueToAdd.field, valueToAdd.value as string | number),
-      oldQuery,
-    );
+    const newQuery =
+      multipleValues && contexts?.valuePathOperator === 'OR'
+        ? excludeOrClause(oldQuery, contexts.valuePath)
+        : valuesToAdd.reduce((prev, valueToAdd) => formatNewQuery(prev, valueToAdd.field, valueToAdd.value), oldQuery);
 
     await recordQueryStringUsage(newQuery, oldQuery);
 

@@ -56,7 +56,6 @@ jest.mock('components/inputs/InputSetupWizard/hooks/useFilteredStreams');
 jest.mock('hooks/usePipelinesConnectedStream');
 jest.mock('components/indices/hooks/useIndexSetsList');
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
-jest.mock('views/stores/StreamsStore', () => ({ StreamsStore: MockStore() }));
 
 jest.mock('stores/nodes/NodesStore', () => ({
   NodesStore: MockStore(),

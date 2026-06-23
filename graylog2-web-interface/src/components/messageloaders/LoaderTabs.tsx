@@ -20,7 +20,7 @@ import * as Immutable from 'immutable';
 import { Col, Tabs } from 'components/bootstrap';
 import MessageShow from 'components/search/MessageShow';
 import MessageLoader from 'components/extractors/MessageLoader';
-import StreamsStore from 'stores/streams/StreamsStore';
+import { fetchStreams } from 'api/streams';
 import useInputsList, { inputsAsMap } from 'hooks/useInputs';
 import type { Message } from 'views/components/messagelist/Types';
 import type { Stream } from 'logic/streams/types';
@@ -92,7 +92,7 @@ class LoaderTabs extends React.Component<
   };
 
   loadData = () => {
-    StreamsStore.listStreams().then((response: Array<Stream>) => {
+    fetchStreams().then((response: Array<Stream>) => {
       const streams = {};
 
       response.forEach((stream) => {
