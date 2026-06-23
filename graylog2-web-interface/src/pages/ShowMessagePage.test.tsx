@@ -23,7 +23,7 @@ import { Messages } from '@graylog/server-api';
 import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import useViewsPlugin from 'views/test/testViewsPlugin';
-import type { Stream } from 'views/stores/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import { fetchInput } from 'hooks/useInputs';
 import StreamsContext from 'contexts/StreamsContext';
 import FetchError from 'logic/errors/FetchError';

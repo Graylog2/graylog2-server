@@ -25,10 +25,6 @@ import App from './App';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve({})));
 
-jest.mock('util/AppConfig', () => ({
-  gl2ServerUrl: () => 'https://example.org/',
-}));
-
 jest.mock('preflight/hooks/useServerAvailability', () =>
   jest.fn(() => ({
     data: false,

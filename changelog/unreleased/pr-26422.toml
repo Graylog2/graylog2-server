@@ -1,0 +1,3 @@
+type = "a"
+message = "Allow entering arbitrary field names for groupings and metrics in the aggregation wizard."
+pulls = ["26422"]
