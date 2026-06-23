@@ -22,11 +22,15 @@ import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 
 import HealthModule from './HealthModule';
 import useHealthModuleVisible from './useHealthModuleVisible';
+import useHealthReport from './useHealthReport';
+import mockHealthReport from './mockHealthReport';
 
 jest.mock('./useHealthModuleVisible');
+jest.mock('./useHealthReport');
 jest.mock('hooks/usePluggableLicenseCheck');
 
 const mockedUseHealthModuleVisible = jest.mocked(useHealthModuleVisible);
+const mockedUseHealthReport = jest.mocked(useHealthReport);
 const mockedUsePluggableLicenseCheck = jest.mocked(usePluggableLicenseCheck);
 
 const licenseCheckResult = (valid: boolean): ReturnType<typeof usePluggableLicenseCheck> => ({
@@ -45,6 +49,7 @@ describe('HealthModule', () => {
   beforeEach(() => {
     mockedUseHealthModuleVisible.mockReturnValue(true);
     mockedUsePluggableLicenseCheck.mockReturnValue(licenseCheckResult(true));
+    mockedUseHealthReport.mockReturnValue({ data: mockHealthReport } as unknown as ReturnType<typeof useHealthReport>);
   });
 
   it('renders the interpretation legend by default when the synthetic root is selected', () => {
