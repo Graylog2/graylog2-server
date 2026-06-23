@@ -32,22 +32,17 @@ import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
-import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.bouncycastle.pkcs.PKCSException;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -529,16 +524,20 @@ public class CertificateBuilder {
     /**
      * Signs a Certificate Signing Request (CSR) and produces an X.509 certificate.
      * <p>
+     * Accepting only {@link VerifiedCsr} guarantees the CSR's self-signature has already been
+     * verified (see {@link PemUtils#parseCsr(String)}), so the requester has proven possession of
+     * the private key.
+     * <p>
      * This method:
      * <ul>
-     *   <li>Parses and verifies the CSR self-signature (proves agent has private key)</li>
-     *   <li>Validates that the public key is Ed25519</li>
-     *   <li>Ignores the CSR subject - uses the provided subjectCn instead</li>
-     *   <li>Sets extensions: BasicConstraints CA:FALSE (critical), KeyUsage digitalSignature (critical),
-     *       ExtendedKeyUsage clientAuth</li>
+     *   <li>Enforces that the CSR's public key is Ed25519 (or EdDSA)</li>
+     *   <li>Ignores the CSR subject — uses the provided {@code subjectCn} instead</li>
+     *   <li>Sets extensions: BasicConstraints CA:FALSE (critical), KeyUsage digitalSignature
+     *       (critical), ExtendedKeyUsage clientAuth</li>
+     *   <li>Caps the cert's {@code NotAfter} at the issuer's {@code NotAfter}</li>
      * </ul>
      *
-     * @param csrPem    the PEM-encoded CSR
+     * @param csr       the signature-verified CSR
      * @param issuer    the issuing CA's certificate entry (must contain the private key)
      * @param subjectCn the common name for the certificate subject (CSR subject is ignored)
      * @param validity  the validity period of the certificate
@@ -546,34 +545,10 @@ public class CertificateBuilder {
      * @throws Exception                if signing fails
      * @throws IllegalArgumentException if the CSR public key is not Ed25519
      */
-    public X509Certificate signCsr(byte[] csrPem, CertificateEntry issuer, String subjectCn, Duration validity)
+    public X509Certificate signCsr(VerifiedCsr csr, CertificateEntry issuer, String subjectCn, Duration validity)
             throws Exception {
-        // Parse the CSR
-        final PKCS10CertificationRequest csr;
-        try (PEMParser pemParser = new PEMParser(new StringReader(new String(csrPem, StandardCharsets.UTF_8)))) {
-            final Object object = pemParser.readObject();
-            if (!(object instanceof PKCS10CertificationRequest)) {
-                throw new IllegalArgumentException("PEM does not contain a valid CSR");
-            }
-            csr = (PKCS10CertificationRequest) object;
-        }
 
-        // Verify CSR self-signature (proves agent possesses private key)
-        try {
-            final ContentVerifierProvider verifier = new JcaContentVerifierProviderBuilder()
-                    .setProvider("BC")
-                    .build(csr.getSubjectPublicKeyInfo());
-            if (!csr.isSignatureValid(verifier)) {
-                throw new IllegalArgumentException("CSR signature verification failed");
-            }
-        } catch (PKCSException e) {
-            throw new IllegalArgumentException("CSR signature verification failed", e);
-        }
-
-        // Extract and validate public key - must be Ed25519
-        final PublicKey publicKey = new org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter()
-                .setProvider("BC")
-                .getPublicKey(csr.getSubjectPublicKeyInfo());
+        final PublicKey publicKey = csr.publicKey();
 
         if (!Set.of("Ed25519", "EdDSA").contains(publicKey.getAlgorithm())) {
             throw new IllegalArgumentException(

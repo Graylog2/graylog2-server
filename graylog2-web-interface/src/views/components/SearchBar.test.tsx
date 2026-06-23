@@ -18,7 +18,7 @@ import * as React from 'react';
 import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import { StoreMock as MockStore, asMock } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
 import MockQuery from 'views/logic/queries/Query';
 import type { WidgetEditingState, WidgetFocusingState } from 'views/components/contexts/WidgetFocusContext';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
@@ -35,10 +35,6 @@ import OriginalSearchBar from './SearchBar';
 
 jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('views/logic/fieldtypes/useFieldTypes');
-
-jest.mock('stores/streams/StreamsStore', () =>
-  MockStore(['listStreams', () => ({ then: jest.fn() })], 'availableStreams'),
-);
 
 jest.mock('hooks/useSearchConfiguration');
 

@@ -43,7 +43,7 @@ public abstract class Roles {
         return new RoleToNameFunction(lowerCase);
     }
 
-    private static class RoleIdToNameFunction implements Function<String, String> {
+    public static class RoleIdToNameFunction implements Function<String, String> {
         private final Map<String, Role> idToRole;
 
         public RoleIdToNameFunction(Map<String, Role> idToRole) {
@@ -60,7 +60,7 @@ public abstract class Roles {
         }
     }
 
-    private static class RoleNameToIdFunction implements Function<String, String> {
+    public static class RoleNameToIdFunction implements Function<String, String> {
 
         private final Map<String, Role> nameToRole;
 
@@ -82,7 +82,7 @@ public abstract class Roles {
         }
     }
 
-    private static class RoleToNameFunction implements Function<Role, String> {
+    public static class RoleToNameFunction implements Function<Role, String> {
         private final boolean lowerCase;
 
         public RoleToNameFunction(boolean lowerCase) {

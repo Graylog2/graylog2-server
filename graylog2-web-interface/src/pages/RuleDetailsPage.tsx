@@ -14,35 +14,33 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { useStore } from 'stores/connect';
 import { DocumentTitle, Spinner } from 'components/common';
 import Rule from 'components/rules/Rule';
 import Routes from 'routing/Routes';
 import useQuery from 'routing/useQuery';
 import { PipelineRulesProvider } from 'components/rules/RuleContext';
-import type { RulesStoreState } from 'stores/rules/RulesStore';
-import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
+import { useRule } from 'components/rules/hooks/useRules';
 import usePipelines from 'hooks/usePipelines';
+import type { PipelineType, StageType } from 'components/pipelines/types';
 
 import useHistory from '../routing/useHistory';
 
-const getCurrentRule = (ruleStoreState: RulesStoreState, ruleId: string) =>
-  ruleStoreState?.rules?.filter((r) => r.id === ruleId)[0];
-
-function filterPipelines(pipelines = [], title = '') {
-  return pipelines.filter((pipeline) => pipeline.stages.some((stage) => stage.rules.indexOf(title) !== -1));
+function filterPipelines(pipelines: Array<PipelineType> = [], title = '') {
+  return pipelines.filter((pipeline) => pipeline.stages.some((stage: StageType) => stage.rules.indexOf(title) !== -1));
 }
 
 const RuleDetailsPage = () => {
   const { ruleId } = useParams<{ ruleId: string }>();
-  const ruleStoreState = useStore(RulesStore);
   const isNewRule = ruleId === 'new';
   const { data: pipelines, isInitialLoading: isInitialLoadingPipelines } = usePipelines({ enabled: !isNewRule });
-  const [isLoading, setIsLoading] = useState(true);
-  const [currentRule, setCurrentRule] = useState(undefined);
+  const {
+    data: currentRule,
+    isInitialLoading: isInitialLoadingRule,
+    error: ruleError,
+  } = useRule(ruleId, { enabled: !isNewRule });
   const history = useHistory();
   const { rule_builder } = useQuery();
 
@@ -53,25 +51,12 @@ const RuleDetailsPage = () => {
   const pipelinesUsingRule = isNewRule ? [] : filterPipelines(pipelines, title);
 
   useEffect(() => {
-    setCurrentRule(getCurrentRule(ruleStoreState, ruleId));
-  }, [ruleId, ruleStoreState]);
-
-  useEffect(() => {
-    if (isNewRule) {
-      setIsLoading(false);
-    } else {
-      RulesActions.get(ruleId).then(
-        () => {},
-        (error) => {
-          if (error.status === 404) {
-            history.push(Routes.SYSTEM.PIPELINES.RULES);
-          }
-        },
-      );
-
-      setIsLoading(!currentRule || isInitialLoadingPipelines);
+    if (!isNewRule && (ruleError as { status?: number })?.status === 404) {
+      history.push(Routes.SYSTEM.PIPELINES.RULES);
     }
-  }, [currentRule, history, isNewRule, ruleId, isInitialLoadingPipelines]);
+  }, [history, isNewRule, ruleError]);
+
+  const isLoading = !isNewRule && (isInitialLoadingRule || isInitialLoadingPipelines);
 
   if (isLoading) {
     return <Spinner text="Loading Rule Details..." />;

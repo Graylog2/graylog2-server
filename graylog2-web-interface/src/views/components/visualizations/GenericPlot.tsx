@@ -95,6 +95,7 @@ export type ChartColor = {
 type Props = {
   chartData: Array<any>;
   layout?: Partial<PlotLayout>;
+  config?: Partial<Plotly.Config>;
   onZoom?: (from: string, to: string) => void;
   setChartColor?: (data: ChartConfig, color: ColorMapper) => ChartColor;
   onClickMarker?: (markerEvent: OnClickMarkerEvent, event?: PlotMouseEvent) => void;
@@ -116,7 +117,12 @@ const nonInteractiveLayout = {
 
 const style = { height: '100%', width: '100%' };
 
-const config = { displayModeBar: false, doubleClick: false, responsive: true, showTips: false } as const;
+const defaultPlotConfig: Partial<Plotly.Config> = {
+  displayModeBar: false,
+  doubleClick: false,
+  responsive: true,
+  showTips: false,
+};
 
 const usePlotLayout = (layout: Partial<Layout>) => {
   const theme = useTheme();
@@ -211,6 +217,7 @@ const usePlotChartData = (
 const GenericPlot = ({
   chartData,
   layout = {},
+  config = undefined,
   setChartColor = undefined,
   onClickMarker = () => {},
   onHoverMarker = () => {},
@@ -222,6 +229,7 @@ const GenericPlot = ({
   const interactive = useContext(InteractiveContext);
   const plotLayout = usePlotLayout(layout);
   const plotChartData = usePlotChartData(chartData, setChartColor);
+  const plotConfig = useMemo(() => ({ ...defaultPlotConfig, ...config }), [config]);
   const onRenderComplete = useContext(RenderCompletionCallback);
 
   const _onRelayout = useCallback(
@@ -238,13 +246,16 @@ const GenericPlot = ({
 
   const _onHoverMarker = useCallback(
     (event: unknown) => {
-      const { points } = event as { points: Array<{ bbox: { x0: number; y0: number }; y: string; x: string }> };
+      const { points } = event as { points: Array<{ bbox?: { x0: number; y0: number }; y: string; x: string }> };
+      const point = points?.[0];
+
+      if (!point?.bbox) return;
 
       onHoverMarker?.({
-        positionX: points[0].bbox.x0,
-        positionY: points[0].bbox.y0,
-        x: points[0].x,
-        y: points[0].y,
+        positionX: point.bbox.x0,
+        positionY: point.bbox.y0,
+        x: point.x,
+        y: point.y,
       });
     },
     [onHoverMarker],
@@ -279,7 +290,7 @@ const GenericPlot = ({
       onHover={_onHoverMarker}
       onUnhover={onUnhoverMarker}
       onRelayout={interactive ? _onRelayout : () => {}}
-      config={config}
+      config={plotConfig}
       onInitialized={onInitialized}
     />
   );

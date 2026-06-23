@@ -26,11 +26,6 @@ import { inputs } from 'components/messageloaders/MessageLoaders.fixtures';
 
 import RecentMessageLoader from './RecentMessageLoader';
 
-jest.mock('util/AppConfig', () => ({
-  isCloud: jest.fn(() => false),
-  gl2ServerUrl: () => `https://graylog`,
-}));
-
 jest.mock('graylog-web-plugin/plugin', () => ({
   PluginStore: {
     exports: jest.fn(),
@@ -81,8 +76,6 @@ describe('<RecentMessageLoader>', () => {
     });
 
     it('allows user to select between server and forwarder input on premise', async () => {
-      asMock(AppConfig.isCloud).mockImplementation(() => false);
-
       render(<RecentMessageLoader onMessageLoaded={jest.fn()} inputs={inputs} />);
 
       expect(screen.getByRole('combobox', { name: /input type select/i })).toBeInTheDocument();
