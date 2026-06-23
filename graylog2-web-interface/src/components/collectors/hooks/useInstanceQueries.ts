@@ -93,7 +93,7 @@ export const useInstances = (fleetId?: string, options: { refetchInterval?: numb
   });
 
 export const useInstance = (instanceUid: string | undefined) =>
-  useQuery<CollectorInstanceView | null>({
+  useQuery<CollectorInstanceView>({
     queryKey: [...INSTANCES_KEY_PREFIX, 'single', instanceUid],
     queryFn: () =>
       defaultOnError(

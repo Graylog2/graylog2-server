@@ -24,7 +24,7 @@ import { useInstance } from './useInstanceQueries';
 
 jest.mock('@graylog/server-api', () => ({
   Collectors: {
-    findInstances: jest.fn(),
+    getInstance: jest.fn(),
   },
 }));
 
@@ -43,21 +43,22 @@ const dto = (instanceUid: string) => ({
   non_identifying_attributes: { 'service.version': '1.2.3', 'os.type': 'linux' },
 });
 
+const asInstanceResponse = (instanceUid: string) =>
+  dto(instanceUid) as unknown as Awaited<ReturnType<typeof Collectors.getInstance>>;
+
 describe('useInstance', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-
-    asMock(Collectors.findInstances).mockResolvedValue({
-      elements: [dto('uid-1'), dto('uid-42')],
-      pagination: { total: 2 },
-      attributes: [],
-    } as unknown as Awaited<ReturnType<typeof Collectors.findInstances>>);
   });
 
   it('returns the matching instance mapped to a view', async () => {
+    asMock(Collectors.getInstance).mockResolvedValue(asInstanceResponse('uid-42'));
+
     const { result } = renderHook(() => useInstance('uid-42'));
 
     await waitFor(() => expect(result.current.data).toBeTruthy());
+
+    expect(Collectors.getInstance).toHaveBeenCalledWith('uid-42');
 
     expect(result.current.data).toEqual(
       expect.objectContaining({
@@ -70,17 +71,21 @@ describe('useInstance', () => {
     );
   });
 
-  it('returns null when no instance matches', async () => {
+  // The GET endpoint throws NotFoundException (HTTP 404) for a missing instance, so a
+  // failed lookup now travels the react-query error path instead of resolving to null.
+  it('surfaces an error when the instance cannot be loaded', async () => {
+    asMock(Collectors.getInstance).mockRejectedValue(new Error('Collector instance <uid-unknown> not found'));
+
     const { result } = renderHook(() => useInstance('uid-unknown'));
 
-    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    await waitFor(() => expect(result.current.isError).toBe(true));
 
-    expect(result.current.data).toBeNull();
+    expect(result.current.data).toBeUndefined();
   });
 
   it('does not fetch without an instance uid', () => {
     renderHook(() => useInstance(undefined));
 
-    expect(Collectors.findInstances).not.toHaveBeenCalled();
+    expect(Collectors.getInstance).not.toHaveBeenCalled();
   });
 });
