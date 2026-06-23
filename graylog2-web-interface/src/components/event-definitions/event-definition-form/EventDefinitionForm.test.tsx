@@ -14,11 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { getStepKeys } from './EventDefinitionForm';
+import { getStepKeys, normalizeStepKey } from './EventDefinitionForm';
 
 describe('EventDefinitionForm step keys', () => {
   it('uses the "additional-details" key for the renamed step', () => {
     expect(getStepKeys(true)).toContain('additional-details');
     expect(getStepKeys(true)).not.toContain('fields');
+  });
+
+  it('maps the legacy "fields" step key to "additional-details"', () => {
+    expect(normalizeStepKey('fields')).toBe('additional-details');
+  });
+
+  it('leaves current and unknown step keys unchanged', () => {
+    expect(normalizeStepKey('additional-details')).toBe('additional-details');
+    expect(normalizeStepKey('condition')).toBe('condition');
+    expect(normalizeStepKey(undefined)).toBeUndefined();
   });
 });
