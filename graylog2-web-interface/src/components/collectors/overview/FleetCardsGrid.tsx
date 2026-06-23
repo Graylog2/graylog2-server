@@ -69,7 +69,7 @@ const FleetCardsGrid = ({ fleets, filter }: Props) => {
           sources to define what data its Collectors should collect. Once configured,{' '}
           <Link to={Routes.SYSTEM.COLLECTORS.DEPLOYMENT}>deploy Collectors</Link> using an enrollment token.
         </p>
-        <Button bsStyle="success" onClick={() => history.push(Routes.SYSTEM.COLLECTORS.FLEETS)}>
+        <Button bsStyle="success" onClick={() => history.push(Routes.SYSTEM.COLLECTORS.FLEETS_NEW)}>
           Create Fleet
         </Button>
       </EmptyEntity>
