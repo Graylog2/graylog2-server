@@ -15,21 +15,26 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Pipeline from 'components/pipelines/Pipeline';
 import NewPipeline from 'components/pipelines/NewPipeline';
 import SourceGenerator from 'logic/pipelines/SourceGenerator';
-import { StreamsStore } from 'stores/streams/StreamsStore';
+import useAllStreams from 'components/streams/hooks/useAllStreams';
+import type { Stream } from 'logic/streams/types';
+import type { PipelineType, StageType } from 'components/pipelines/types';
 import DocsHelper from 'util/DocsHelper';
 import useParams from 'routing/useParams';
-import { RulesActions } from 'stores/rules/RulesStore';
 import usePipeline from 'hooks/usePipeline';
 import usePipelineMutations from 'hooks/usePipelineMutations';
 import usePipelineConnections, { usePipelineConnectionMutation } from 'hooks/usePipelineConnections';
-import { ProcessingLoadDebugMetricsBanner, ProcessingLoadProvider } from 'components/pipelines/processing-load';
+import {
+  EnableDebugMetricsButton,
+  ProcessingLoadDebugMetricsBanner,
+  ProcessingLoadProvider,
+} from 'components/pipelines/processing-load';
 
 import PipelinesPageNavigation from '../components/pipelines/PipelinesPageNavigation';
 
@@ -46,23 +51,20 @@ const PipelineDetailsPage = () => {
   const { data: allConnections } = usePipelineConnections();
   const connections = allConnections?.filter((c) => c.pipeline_ids && c.pipeline_ids.includes(params.pipelineId));
   const { connectToPipeline } = usePipelineConnectionMutation();
-  const [streams, setStreams] = useState();
+  const { data: allStreams } = useAllStreams();
+  const streams = useMemo(
+    () => (allStreams ? allStreams.filter((s: Stream) => s.is_editable) : undefined),
+    [allStreams],
+  );
 
-  useEffect(() => {
-    RulesActions.list();
-
-    StreamsStore.listStreams().then((_streams) => {
-      const filteredStreams = _streams.filter((s) => s.is_editable);
-
-      setStreams(filteredStreams);
-    });
-  }, []);
-
-  const _onConnectionsChange = (updatedConnections, callback) => {
+  const _onConnectionsChange = (
+    updatedConnections: { pipeline: string; streams: Array<string> },
+    callback: () => void,
+  ) => {
     connectToPipeline(updatedConnections).then(() => callback());
   };
 
-  const _onStagesChange = (newStages, callback) => {
+  const _onStagesChange = (newStages: Array<StageType>, callback: () => void) => {
     const pipelineWithNewStages = {
       ...pipeline,
       stages: newStages,
@@ -80,7 +82,7 @@ const PipelineDetailsPage = () => {
     }
   };
 
-  const _savePipeline = (_pipeline, callback) => {
+  const _savePipeline = (_pipeline: PipelineType, callback: (pipeline: PipelineType) => void) => {
     const requestPipeline = {
       ..._pipeline,
       source: SourceGenerator.generatePipeline(_pipeline),
@@ -128,6 +130,7 @@ const PipelineDetailsPage = () => {
         <PipelinesPageNavigation />
         <PageHeader
           title={title}
+          actions={<EnableDebugMetricsButton />}
           documentationLink={{
             title: 'Pipelines documentation',
             path: DocsHelper.PAGES.PIPELINES,

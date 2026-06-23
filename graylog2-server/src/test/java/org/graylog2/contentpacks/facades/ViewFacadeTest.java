@@ -48,7 +48,6 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDT
 import org.graylog.plugins.views.search.views.widgets.aggregation.TimeHistogramConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
 import org.graylog.security.entities.EntityRegistrar;
-import org.graylog.security.shares.EntityGrantLookup;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
@@ -153,9 +152,8 @@ public class ViewFacadeTest {
         viewService = new TestViewService(null, mongoCollections);
         viewSummaryService = new TestViewSummaryService(mongoCollections);
         userService = mock(UserService.class);
-        final EntityGrantLookup grantLookup = mock(EntityGrantLookup.class);
 
-        facade = new SearchFacade(objectMapper, searchDbService, viewService, viewSummaryService, userService, grantLookup);
+        facade = new SearchFacade(objectMapper, searchDbService, viewService, viewSummaryService, userService);
     }
 
     @Test

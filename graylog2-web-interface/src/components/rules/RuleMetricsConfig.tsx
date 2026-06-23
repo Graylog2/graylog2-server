@@ -115,36 +115,15 @@ export default class RuleMetricsConfig extends React.Component<
             checked={!nextConfig.metrics_enabled}
           />
         </fieldset>
-        <p>When enabled the system metrics will update two timers for every rule execution.</p>
-        <strong>Rule evaluation timer</strong>
         <p>
-          This timer measures the duration for the rule condition. (everything inside the <code>when</code> statement)
+          Enabling these metrics will add a new column to the Pipeline and Pipeline Rule pages called{' '}
+          <strong>Pipeline Load</strong>, which will contain % values showing relatively, which of your Pipelines is
+          consuming the most thread time.
         </p>
         <p>
-          Example metric name with rule ID placeholder:
-          <br />
-          <code>org.graylog.plugins.pipelineprocessor.ast.Rule.[rule-id].trace.evaluate.duration</code>
-          <br />
-          Example metric name with rule ID, pipeline ID and stage number placeholders:
-          <br />
-          <code>
-            org.graylog.plugins.pipelineprocessor.ast.Rule.[rule-id].[pipeline-id].[stage-num].trace.evaluate.duration
-          </code>
-        </p>
-        <strong>Rule execution timer</strong>
-        <p>
-          This timer measures the duration for the rule execution. (everything inside the <code>then</code> statement)
-        </p>
-        <p>
-          Example metric name with rule ID placeholder:
-          <br />
-          <code>org.graylog.plugins.pipelineprocessor.ast.Rule.[rule-id].trace.execute.duration</code>
-          <br />
-          Example metric name with rule ID, pipeline ID and stage number placeholders:
-          <br />
-          <code>
-            org.graylog.plugins.pipelineprocessor.ast.Rule.[rule-id].[pipeline-id].[stage-num].trace.execute.duration
-          </code>
+          Enabling these metrics will also add a new column to the Pipeline Detail page called{' '}
+          <strong>Rule Load</strong>, This will identify which Pipeline rules within the selected Pipeline are the most
+          expensive.
         </p>
       </BootstrapModalForm>
     );

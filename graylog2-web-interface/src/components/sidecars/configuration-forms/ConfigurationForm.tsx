@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import clone from 'lodash/clone';
 import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
@@ -24,8 +24,8 @@ import { ColorPickerPopover, FormSubmit, InputDescription, Select, SourceCodeEdi
 import { Button, Col, ControlLabel, FormControl, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
-import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
-import { CollectorsActions } from 'stores/sidecars/CollectorsStore';
+import { createConfiguration, updateConfiguration, validateConfiguration } from 'hooks/useCollectorConfigurations';
+import { fetchCollector, useCollectorsAll } from 'hooks/useCollectors';
 import ConfigurationHelper from 'components/sidecars/configuration-forms/ConfigurationHelper';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -63,7 +63,7 @@ const ConfigurationForm = ({
     tags: configuration.tags || [],
   };
 
-  const [collectors, setCollectors] = useState<Collector[]>([]);
+  const { data: collectors = [] } = useCollectorsAll();
   const [formData, setFormData] = useState(initFormData);
   const [error, setError] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
@@ -72,16 +72,12 @@ const ConfigurationForm = ({
   const history = useHistory();
   const sendTelemetry = useSendTelemetry();
 
-  useEffect(() => {
-    CollectorsActions.all().then((response) => setCollectors(response.collectors));
-  }, []);
-
   const _isTemplateSet = (template: string) => template !== undefined && template !== '';
 
   const _hasErrors = () => error || !_isTemplateSet(formData.template);
 
   const _validateFormData = (nextFormData: Partial<Configuration>, checkForRequiredFields: boolean) => {
-    CollectorConfigurationsActions.validate(nextFormData).then((validation) => {
+    validateConfiguration(nextFormData).then((validation) => {
       const nextValidation = clone(validation);
 
       if (checkForRequiredFields && !_isTemplateSet(nextFormData.template)) {
@@ -113,11 +109,9 @@ const ConfigurationForm = ({
     let promise;
 
     if (isCreate) {
-      promise = CollectorConfigurationsActions.createConfiguration(formData).then(() =>
-        history.push(Routes.SYSTEM.SIDECARS.CONFIGURATION),
-      );
+      promise = createConfiguration(formData).then(() => history.push(Routes.SYSTEM.SIDECARS.CONFIGURATION));
     } else {
-      promise = CollectorConfigurationsActions.updateConfiguration(formData);
+      promise = updateConfiguration(formData);
     }
 
     await promise;
@@ -173,7 +167,7 @@ const ConfigurationForm = ({
       return new Promise<string>((resolve) => resolve(storedTemplate));
     }
 
-    return CollectorsActions.getCollector(collectorId).then((collector) => {
+    return fetchCollector(collectorId).then((collector) => {
       defaultTemplates.current[collectorId] = collector.default_template;
 
       return collector.default_template;

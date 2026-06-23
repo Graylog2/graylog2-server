@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import { CountBadge, Spinner } from 'components/common';
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
 import { useStreamMetricsFor } from 'components/streams/StreamsOverview/StreamMetricsContext';

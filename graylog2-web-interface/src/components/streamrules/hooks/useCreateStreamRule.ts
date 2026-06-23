@@ -17,8 +17,8 @@
 import { useCallback, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
-import StreamsStore from 'stores/streams/StreamsStore';
-import type { StreamRule } from 'stores/streams/StreamsStore';
+import useStreamMutations from 'hooks/useStreamMutations';
+import type { StreamRule } from 'logic/streams/types';
 import UserNotification from 'util/UserNotification';
 import useStreamRuleMutations from 'hooks/useStreamRuleMutations';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -45,6 +45,7 @@ const useCreateStreamRule = ({ streamId, streamIsPaused }: Props): Result => {
   const queryClient = useQueryClient();
   const sendTelemetry = useSendTelemetry();
   const { createStreamRule } = useStreamRuleMutations();
+  const { resumeStream } = useStreamMutations();
 
   const onStreamRuleCreated = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_RULE_SAVED, {
@@ -74,16 +75,15 @@ const useCreateStreamRule = ({ streamId, streamIsPaused }: Props): Result => {
     setIsStartingStream(true);
 
     try {
-      await StreamsStore.resume(streamId, () => {
-        setShowStartStreamDialog(false);
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['stream', streamId],
-      });
+      // The api fn handles the error toast on rejection; resumeStream invalidates the stream queries on success.
+      await resumeStream(streamId);
+      setShowStartStreamDialog(false);
+    } catch {
+      // error toast handled by the api fn
     } finally {
       setIsStartingStream(false);
     }
-  }, [queryClient, streamId]);
+  }, [resumeStream, streamId]);
 
   return {
     onCreateStreamRule,
