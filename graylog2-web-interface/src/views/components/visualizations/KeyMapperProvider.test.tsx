@@ -17,12 +17,13 @@
 import * as React from 'react';
 import { useContext } from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import * as Immutable from 'immutable';
 
-import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import { usePlugin } from 'views/test/testPlugins';
 
 import KeyMapperProvider from './KeyMapperProvider';
 import KeyMapperContext from './KeyMapperContext';
@@ -38,10 +39,10 @@ const testPlugin = {
   },
 };
 
-const config = {
-  rowPivots: [{ fields: ['streams'] }],
-  columnPivots: [],
-} as unknown as AggregationWidgetConfig;
+const config = AggregationWidgetConfig.builder()
+  .rowPivots([Pivot.createValues(['streams'])])
+  .columnPivots([])
+  .build();
 
 const fields = Immutable.List([new FieldTypeMapping('streams', FieldType.create('streams', []))]);
 
@@ -56,8 +57,7 @@ const Consumer = ({ k }: { k: string }) => {
 };
 
 describe('KeyMapperProvider', () => {
-  beforeAll(() => PluginStore.register(testPlugin));
-  afterAll(() => PluginStore.unregister(testPlugin));
+  usePlugin(testPlugin);
 
   it('provides a mapper that resolves keys via the registered binding for the field type', () => {
     render(

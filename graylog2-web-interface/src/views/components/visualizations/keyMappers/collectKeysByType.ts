@@ -70,7 +70,7 @@ const collectKeysByType = (
       return;
     }
 
-    (rows as Rows).forEach(visitRow);
+    rows.forEach(visitRow);
   });
 
   return Object.fromEntries(Object.entries(acc).map(([type, values]) => [type, Array.from(values)]));

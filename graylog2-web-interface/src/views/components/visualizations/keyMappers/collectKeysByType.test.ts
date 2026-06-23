@@ -42,7 +42,7 @@ const data = {
     },
   ],
   events: [{ something: true }],
-} as any;
+};
 
 describe('collectKeysByType', () => {
   it('groups distinct pivot key values by relevant field type', () => {
