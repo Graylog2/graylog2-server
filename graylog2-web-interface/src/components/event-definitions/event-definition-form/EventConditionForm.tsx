@@ -18,8 +18,8 @@ import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 
 import { defaultCompare } from 'logic/DefaultCompare';
-import { Select } from 'components/common';
-import { Clearfix, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
+import { ClearFloat, Select } from 'components/common';
+import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
 import { HelpPanel } from 'components/event-definitions/common/HelpPanel';
 import type User from 'logic/users/User';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -204,7 +204,7 @@ const EventConditionForm = ({
           </HelpPanel>
         </Col>
       )}
-      <Clearfix />
+      <ClearFloat />
       {canEditCondition && eventDefinitionTypeComponent && (
         <>
           <hr className={styles.hr} />

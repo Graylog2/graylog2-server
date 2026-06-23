@@ -68,9 +68,7 @@ const DivContainer = styled.div(
 // Sankey natively emits link clicks with `source`/`target` at the top level of the click point.
 // Other viz (e.g. network graph rendered as a scatter trace) instead encode link metadata into
 // the trace's `customdata` so we treat that shape as a link too.
-const linkContext = (
-  pt: SankeyClickPoint,
-): { source: LinkEndpoint; target: LinkEndpoint; value?: number } | null => {
+const linkContext = (pt: SankeyClickPoint): { source: LinkEndpoint; target: LinkEndpoint; value?: number } | null => {
   if (pt.source && pt.target && typeof pt.source === 'object' && typeof pt.target === 'object') {
     return { source: pt.source, target: pt.target, value: pt.value };
   }
