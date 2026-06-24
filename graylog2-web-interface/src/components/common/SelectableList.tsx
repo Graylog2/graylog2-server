@@ -22,7 +22,6 @@ import Select from 'components/common/Select';
 import { Button, ListGroup, ListGroupItem } from 'components/bootstrap';
 
 const StyledListGroupItem = styled(ListGroupItem)`
-  display: flex;
   justify-content: space-between;
 `;
 

@@ -30,7 +30,6 @@ const StyledListGroupItem = styled(ListGroupItem)<{ $active?: boolean }>(({ them
   const highlightColor = theme.utils.opacify(theme.utils.colorLevel(theme.colors.global.contentBackground, 10), 0.5);
 
   return css`
-    display: flex;
     position: relative;
     cursor: pointer;
     transition: background-color 0.15s ease-in-out;
@@ -38,11 +37,6 @@ const StyledListGroupItem = styled(ListGroupItem)<{ $active?: boolean }>(({ them
     ${$active &&
     css`
       background-color: ${highlightColor};
-
-      & > .list-group-item {
-        background-color: ${highlightColor};
-        color: ${theme.colors.text.primary};
-      }
 
       a {
         color: inherit;

@@ -28,7 +28,6 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const StyledListGroupItem = styled(ListGroupItem)(
   ({ theme }: { theme: DefaultTheme }) => css`
-    display: flex;
     gap: ${theme.spacings.md};
     align-items: flex-start;
   `,
