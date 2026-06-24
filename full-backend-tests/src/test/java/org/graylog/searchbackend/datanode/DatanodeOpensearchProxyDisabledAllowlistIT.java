@@ -25,6 +25,12 @@ import org.graylog2.storage.SearchVersion;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 
+import java.util.List;
+
+import static io.restassured.RestAssured.given;
+import static java.time.Duration.ofSeconds;
+import static org.awaitility.Awaitility.waitAtMost;
+
 @GraylogBackendConfiguration(
         serverLifecycle = Lifecycle.CLASS,
         env = @GraylogBackendConfiguration.Env(key = "GRAYLOG_DATANODE_PROXY_API_ALLOWLIST", value = "false"))
@@ -35,6 +41,15 @@ public class DatanodeOpensearchProxyDisabledAllowlistIT {
     @BeforeEach
     void setUp(GraylogApis apis) {
         this.apis = apis;
+
+        waitAtMost(ofSeconds(120)).pollInterval(ofSeconds(1)).until(() -> {
+            final List<String> statuses = given()
+                    .spec(apis.requestSpecification())
+                    .get("/system/cluster/datanodes")
+                    .jsonPath()
+                    .getList("elements.datanode_status");
+            return statuses != null && statuses.contains("AVAILABLE");
+        });
     }
 
     @FullBackendTest
