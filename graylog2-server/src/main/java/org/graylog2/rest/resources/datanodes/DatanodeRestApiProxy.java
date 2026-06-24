@@ -185,7 +185,7 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
         } else {
             return datanodeResolver.findByHostname(nodeSelector)
                     .map(Collections::singleton)
-                    .orElseThrow(() -> new IllegalStateException("No datanode found matching name " + nodeSelector));
+                    .orElseThrow(() -> new DatanodeNotFoundException("No datanode found matching name " + nodeSelector));
         }
     }
 

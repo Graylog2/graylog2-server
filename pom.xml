@@ -191,7 +191,7 @@
         <swagger.version>2.2.51</swagger.version>
         <swagger-parser.version>2.1.44</swagger-parser.version>
         <syslog4j.version>0.9.63</syslog4j.version>
-        <threeten-extra.version>1.9.0</threeten-extra.version>
+        <threeten-extra.version>1.10.0</threeten-extra.version>
         <ulid.version>8.3.0</ulid.version>
         <unboundid-ldap.version>7.0.5</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
