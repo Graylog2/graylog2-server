@@ -21,6 +21,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
@@ -28,9 +29,10 @@ import org.graylog.plugins.pipelineprocessor.events.PipelineConnectionsChangedEv
 import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.RuleMetricsConfigChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
-import org.graylog.scheduler.system.SystemJobManager;
 import org.graylog2.rest.resources.system.inputs.InputDeletedEvent;
 
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
@@ -39,7 +41,8 @@ import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory
 public class PipelineInterpreterStateUpdater {
     private static final RateLimitedLog log = createDefaultRateLimitedLog(PipelineInterpreterStateUpdater.class);
 
-    private final SystemJobManager systemJobManager;
+    private final PipelineInterpreterStateBuilder stateBuilder;
+    private final ScheduledExecutorService scheduler;
     /**
      * non-null if the update has successfully loaded a state
      */
@@ -49,24 +52,32 @@ public class PipelineInterpreterStateUpdater {
     @Inject
     public PipelineInterpreterStateUpdater(PipelineInterpreterStateBuilder stateBuilder,
                                      MetricRegistry metricRegistry,
-                                     SystemJobManager systemJobManager,
+                                     @Named("daemonScheduler") ScheduledExecutorService scheduler,
                                      EventBus serverEventBus) {
-        this.systemJobManager = systemJobManager;
+        this.stateBuilder = stateBuilder;
+        this.scheduler = scheduler;
         this.pipelineMetricRegistry = PipelineMetricRegistry.create(metricRegistry, Pipeline.class.getName(), Rule.class.getName());
 
-        // Perform synchronous initial load before registering on the event bus. This closes the race
-        // window where an async event could trigger a reload before the initial load completes.
-        // We load synchronously here because the system scheduler may not be ready during Guice injection.
-        try {
-            final PipelineInterpreter.State initialState = stateBuilder.buildState(pipelineMetricRegistry);
-            latestState.set(initialState);
-            log.debug("Pipeline interpreter state initialized");
-        } catch (Exception e) {
-            log.error("Failed to load initial pipeline interpreter state, will retry on next event", e);
-        }
+        // Perform the synchronous initial load before registering on the event bus. This closes the race
+        // window where an async event could trigger a reload before the initial load completes. A failure
+        // here (e.g. a transient MongoDB error) schedules a local retry rather than aborting startup.
+        reloadAndSave();
 
         // listens to cluster wide Rule, Pipeline and pipeline stream connection changes
         serverEventBus.register(this);
+    }
+
+    // Only the singleton instance should mutate itself. We reload locally on every node so that each node
+    // rebuilds its own in-memory state. On a transient failure we retry on the local scheduler so we never
+    // get stuck on stale state, and we route the result through updateState() to apply the empty-state guard.
+    private synchronized void reloadAndSave() {
+        try {
+            final PipelineInterpreter.State newState = stateBuilder.buildState(pipelineMetricRegistry);
+            updateState(newState);
+        } catch (Exception e) {
+            log.warn("Failed to reload pipeline interpreter state, retrying in 1 second", e);
+            scheduler.schedule(this::reloadAndSave, 1, TimeUnit.SECONDS);
+        }
     }
 
     /**
@@ -102,7 +113,7 @@ public class PipelineInterpreterStateUpdater {
     }
 
     private void scheduleReload() {
-        systemJobManager.submit(PipelineInterpreterStateReloadJob.create());
+        scheduler.schedule(this::reloadAndSave, 0, TimeUnit.SECONDS);
     }
 
     // TODO avoid reloading everything on every change, certain changes can get away with doing less work
