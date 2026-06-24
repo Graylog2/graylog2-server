@@ -54,6 +54,7 @@ import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.graylog.collectors.CollectorFingerprintCache;
 import org.graylog.collectors.CollectorJournal;
 import org.graylog.collectors.input.transport.AgentCertChannelHandler;
 import org.graylog.collectors.input.transport.CollectorIngestHttpHandler;
@@ -101,6 +102,7 @@ import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -108,6 +110,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -146,6 +150,9 @@ class CollectorIngestMtlsIT {
 
     @Mock
     private MessageInput input;
+
+    @Mock
+    private CollectorFingerprintCache fingerprintCache;
 
     private Channel httpServerChannel;
     private EventLoopGroup bossGroup;
@@ -203,6 +210,9 @@ class CollectorIngestMtlsIT {
     void setUp() {
         bossGroup = new NioEventLoopGroup(1);
         workerGroup = new NioEventLoopGroup(2);
+        // The handler resolves the client cert fingerprint to its instance UID; bind any fingerprint
+        // to the agent's UID. lenient() because the no-client-cert test fails before reaching the handler.
+        lenient().when(fingerprintCache.lookup(any())).thenReturn(Optional.of(AGENT_INSTANCE_UID));
     }
 
     @AfterEach
@@ -398,7 +408,7 @@ class CollectorIngestMtlsIT {
                         pipeline.addLast("agent-cert-handler", new AgentCertChannelHandler());
                         pipeline.addLast("http-codec", new HttpServerCodec());
                         pipeline.addLast("http-aggregator", new HttpObjectAggregator(1024 * 1024));
-                        pipeline.addLast("http-handler", new CollectorIngestHttpHandler(input));
+                        pipeline.addLast("http-handler", new CollectorIngestHttpHandler(input, fingerprintCache));
                     }
                 });
 

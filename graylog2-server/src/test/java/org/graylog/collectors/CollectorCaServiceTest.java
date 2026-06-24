@@ -318,7 +318,8 @@ class CollectorCaServiceTest {
     void newServerSslContextBuilder_returnsConfiguredBuilder() throws Exception {
         initConfig();
         final var cache = new CollectorCaCache(collectorCaService, certificateService, encryptedValueService, new EventBus(), TestClocks.fixedEpoch());
-        final var tlsUtils = new CollectorTLSUtils(new CollectorCaKeyManager(cache), new CollectorCaTrustManager(cache, clock), MoreExecutors.directExecutor());
+        final var tlsUtils = new CollectorTLSUtils(new CollectorCaKeyManager(cache),
+                new CollectorCaTrustManager(cache, mock(CollectorFingerprintCache.class), clock), MoreExecutors.directExecutor());
         final SslContextBuilder builder = tlsUtils.newServerSslContextBuilder();
         assertThat(builder).isNotNull();
 

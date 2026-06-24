@@ -65,6 +65,7 @@ public class CollectorIngestHttpTransport extends AbstractHttpTransport {
     static final int DEFAULT_HTTP_PORT = 14401;
 
     private final CollectorTLSUtils tlsUtils;
+    private final CollectorIngestHttpHandler.Factory httpHandlerFactory;
 
     @AssistedInject
     public CollectorIngestHttpTransport(@Assisted Configuration configuration,
@@ -76,11 +77,13 @@ public class CollectorIngestHttpTransport extends AbstractHttpTransport {
                                         TLSProtocolsConfiguration tlsConfiguration,
                                         @Named("trusted_proxies") Set<IpSubnet> trustedProxies,
                                         CollectorTLSUtils tlsUtils,
-                                        EncryptedValueService encryptedValueService) {
+                                        EncryptedValueService encryptedValueService,
+                                        CollectorIngestHttpHandler.Factory httpHandlerFactory) {
         super(withTlsDefaults(configuration), eventLoopGroup, eventLoopGroupFactory,
                 nettyTransportConfiguration, throughputCounter, localMetricRegistry,
                 tlsConfiguration, encryptedValueService, trustedProxies, OtlpHttpUtils.LOGS_PATH);
         this.tlsUtils = tlsUtils;
+        this.httpHandlerFactory = httpHandlerFactory;
     }
 
     private static Configuration withTlsDefaults(Configuration userConfig) {
@@ -110,7 +113,7 @@ public class CollectorIngestHttpTransport extends AbstractHttpTransport {
         // Note: rawmessage-handler, codec-aggregator, and exception-logger are added downstream
         // by AbstractTcpTransport and are unreachable because CollectorIngestHttpHandler does not
         // fire messages downstream. These cannot be removed without overriding getChildChannelHandlers.
-        handlers.replace("http-handler", () -> new CollectorIngestHttpHandler(input));
+        handlers.replace("http-handler", () -> httpHandlerFactory.create(input));
 
         return handlers;
     }

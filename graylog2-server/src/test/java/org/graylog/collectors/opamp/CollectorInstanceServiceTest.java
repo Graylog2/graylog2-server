@@ -16,8 +16,11 @@
  */
 package org.graylog.collectors.opamp;
 
+import com.google.common.eventbus.Subscribe;
 import com.mongodb.client.model.Filters;
 import org.bouncycastle.asn1.x509.KeyUsage;
+import org.graylog.collectors.events.CollectorInstanceCertsChangedEvent;
+import org.graylog2.events.ClusterEventBus;
 import org.bson.Document;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorOSType;
@@ -39,6 +42,7 @@ import org.threeten.extra.MutableClock;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -62,6 +66,7 @@ class CollectorInstanceServiceTest {
     private CollectorInstanceService collectorInstanceService;
     private MongoCollections mongoCollections;
     private MutableClock clock;
+    private List<CollectorInstanceCertsChangedEvent> capturedEvents;
 
     @BeforeAll
     static void beforeAll() throws Exception {
@@ -74,7 +79,23 @@ class CollectorInstanceServiceTest {
     void setUp(MongoCollections coll) {
         mongoCollections = coll;
         clock = TestClocks.mutableFixedEpoch();
-        collectorInstanceService = new CollectorInstanceService(coll, clock);
+        capturedEvents = new ArrayList<>();
+
+        // directExecutor() makes posts synchronous, so events are captured inline.
+        final var clusterEventBus = new ClusterEventBus();
+        clusterEventBus.registerClusterEventSubscriber(new Object() {
+            @Subscribe
+            public void on(CollectorInstanceCertsChangedEvent event) {
+                capturedEvents.add(event);
+            }
+        });
+
+        collectorInstanceService = new CollectorInstanceService(coll, clusterEventBus, clock);
+    }
+
+    private CollectorInstanceCertsChangedEvent lastEvent() {
+        assertThat(capturedEvents).isNotEmpty();
+        return capturedEvents.get(capturedEvents.size() - 1);
     }
 
     @Test
@@ -302,7 +323,7 @@ class CollectorInstanceServiceTest {
         final var newCert = certBuilder.createEndEntityCert("uid-re", issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
         final var newIssued = new IssuedCertificate(newCert.fingerprint(), newCert.certificate(), newCert.notAfter(), issuerCert.id());
 
-        final var updated = collectorInstanceService.reEnroll(original.id(), original.activeCertificateFingerprint(), newIssued, "new-token-id");
+        final var updated = collectorInstanceService.reEnroll(original, newIssued, "new-token-id");
 
         assertThat(updated.activeCertificateFingerprint()).isEqualTo(newIssued.fingerprint());
         assertThat(updated.activeCertificatePem()).isEqualTo(newIssued.certPem());
@@ -321,7 +342,7 @@ class CollectorInstanceServiceTest {
         final var newCert = certBuilder.createEndEntityCert("uid-preserve", issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
         final var newIssued = new IssuedCertificate(newCert.fingerprint(), newCert.certificate(), newCert.notAfter(), issuerCert.id());
 
-        final var updated = collectorInstanceService.reEnroll(original.id(), original.activeCertificateFingerprint(), newIssued, "new-token-id");
+        final var updated = collectorInstanceService.reEnroll(original, newIssued, "new-token-id");
 
         assertThat(updated.instanceUid()).isEqualTo(original.instanceUid());
         assertThat(updated.enrolledAt()).isEqualTo(enrollTime);
@@ -339,7 +360,8 @@ class CollectorInstanceServiceTest {
         final var newCert = certBuilder.createEndEntityCert("uid-pending-renewal", issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
         final var newIssued = new IssuedCertificate(newCert.fingerprint(), newCert.certificate(), newCert.notAfter(), issuerCert.id());
 
-        final var updated = collectorInstanceService.reEnroll(original.id(), original.activeCertificateFingerprint(), newIssued, "token-x");
+        final var withNext = collectorInstanceService.findByInstanceUid("uid-pending-renewal").orElseThrow();
+        final var updated = collectorInstanceService.reEnroll(withNext, newIssued, "token-x");
 
         assertThat(updated.nextCertificateFingerprint()).isEmpty();
         assertThat(updated.nextCertificatePem()).isEmpty();
@@ -363,7 +385,7 @@ class CollectorInstanceServiceTest {
         clock.setInstant(reEnrollTime);
         final var newCert = certBuilder.createEndEntityCert("uid-roundtrip", issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
         final var newIssued = new IssuedCertificate(newCert.fingerprint(), newCert.certificate(), newCert.notAfter(), issuerCert.id());
-        collectorInstanceService.reEnroll(enrolled.id(), enrolled.activeCertificateFingerprint(), newIssued, "token-2");
+        collectorInstanceService.reEnroll(enrolled, newIssued, "token-2");
 
         // Fresh read after re-enroll — exercises the post-update deserialize path.
         final var afterReEnroll = collectorInstanceService.findByInstanceUid("uid-roundtrip").orElseThrow();
@@ -384,7 +406,7 @@ class CollectorInstanceServiceTest {
         final var newCert = certBuilder.createEndEntityCert(uid, issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
         final var newIssued = new IssuedCertificate(newCert.fingerprint(), newCert.certificate(), newCert.notAfter(), issuerCert.id());
 
-        collectorInstanceService.reEnroll(original.id(), original.activeCertificateFingerprint(), newIssued, "token-x");
+        collectorInstanceService.reEnroll(original, newIssued, "token-x");
 
         assertFieldIsDate(uid, CollectorInstanceDTO.FIELD_LAST_SEEN);
         assertFieldIsDate(uid, CollectorInstanceDTO.FIELD_ACTIVE_CERTIFICATE_EXPIRES_AT);
@@ -395,7 +417,10 @@ class CollectorInstanceServiceTest {
         final var cert = certBuilder.createEndEntityCert("ghost", issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
         final var issued = new IssuedCertificate(cert.fingerprint(), cert.certificate(), cert.notAfter(), issuerCert.id());
 
-        assertThatThrownBy(() -> collectorInstanceService.reEnroll("507f1f77bcf86cd799439999", "sha256:whatever", issued, "token"))
+        // An instance whose id matches no stored record.
+        final var ghost = enroll("ghost").toBuilder().id("507f1f77bcf86cd799439999").build();
+
+        assertThatThrownBy(() -> collectorInstanceService.reEnroll(ghost, issued, "token"))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("doesn't exist");
     }
@@ -409,7 +434,8 @@ class CollectorInstanceServiceTest {
 
         // Stale fingerprint: simulates the active cert being swapped (e.g. by a concurrent renewal
         // activation) between the caller's read and the update.
-        assertThatThrownBy(() -> collectorInstanceService.reEnroll(original.id(), "sha256:stale-fingerprint", newIssued, "token"))
+        final var stale = original.toBuilder().activeCertificateFingerprint("sha256:stale-fingerprint").build();
+        assertThatThrownBy(() -> collectorInstanceService.reEnroll(stale, newIssued, "token"))
                 .isInstanceOf(IllegalStateException.class);
 
         // The record must be untouched — same cert, token, and next_* state as before.
@@ -534,6 +560,103 @@ class CollectorInstanceServiceTest {
         assertThat(updated.nextCertificateFingerprint()).hasValue("sha256:second-next-fp");
         assertThat(updated.nextCertificatePem()).hasValue("second-pem");
         assertThat(updated.nextCertificateExpiresAt()).hasValue(Date.from(secondExpiresAt).toInstant());
+    }
+
+    // ----- CollectorInstanceCertsChangedEvent publishing -----
+
+    @Test
+    void enrollPublishesAddedFingerprint() throws Exception {
+        final var instance = enroll("uid-evt-enroll");
+
+        assertThat(lastEvent().addedFingerprints()).containsExactly(instance.activeCertificateFingerprint());
+        assertThat(lastEvent().removedFingerprints()).isEmpty();
+    }
+
+    @Test
+    void insertNextCertificatePublishesAddedNextFingerprint() throws Exception {
+        enroll("uid-evt-next");
+        capturedEvents.clear();
+
+        collectorInstanceService.insertNextCertificate("uid-evt-next", "sha256:next-fp", "pem",
+                Instant.now().plus(Duration.ofDays(30)));
+
+        assertThat(lastEvent().addedFingerprints()).containsExactly("sha256:next-fp");
+        assertThat(lastEvent().removedFingerprints()).isEmpty();
+    }
+
+    @Test
+    void insertNextCertificatePublishesReplacedNextAsRemoved() throws Exception {
+        enroll("uid-evt-next-replace");
+        collectorInstanceService.insertNextCertificate("uid-evt-next-replace", "sha256:first-next", "pem1",
+                Instant.now().plus(Duration.ofDays(10)));
+        capturedEvents.clear();
+
+        collectorInstanceService.insertNextCertificate("uid-evt-next-replace", "sha256:second-next", "pem2",
+                Instant.now().plus(Duration.ofDays(20)));
+
+        assertThat(lastEvent().addedFingerprints()).containsExactly("sha256:second-next");
+        assertThat(lastEvent().removedFingerprints()).containsExactly("sha256:first-next");
+    }
+
+    @Test
+    void activateNextCertificatePublishesSupersededActiveAsRemoved() throws Exception {
+        final var enrolled = enroll("uid-evt-activate");
+        setNextCertificateFields("uid-evt-activate", "sha256:new-active", "new-pem",
+                Instant.now().plus(Duration.ofDays(30)));
+        final var withNext = collectorInstanceService.findByInstanceUid("uid-evt-activate").orElseThrow();
+        capturedEvents.clear();
+
+        collectorInstanceService.activateNextCertificate(withNext);
+
+        assertThat(lastEvent().removedFingerprints()).containsExactly(enrolled.activeCertificateFingerprint());
+        assertThat(lastEvent().addedFingerprints()).isEmpty();
+    }
+
+    @Test
+    void reEnrollPublishesReplacedActiveFingerprint() throws Exception {
+        final var original = enroll("uid-evt-reenroll");
+        final var newCert = certBuilder.createEndEntityCert("uid-evt-reenroll", issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
+        final var newIssued = new IssuedCertificate(newCert.fingerprint(), newCert.certificate(), newCert.notAfter(), issuerCert.id());
+        capturedEvents.clear();
+
+        collectorInstanceService.reEnroll(original, newIssued, "token-evt");
+
+        assertThat(lastEvent().addedFingerprints()).containsExactly(newIssued.fingerprint());
+        assertThat(lastEvent().removedFingerprints()).containsExactly(original.activeCertificateFingerprint());
+    }
+
+    @Test
+    void deleteByInstanceUidPublishesActiveAndNextAsRemoved() throws Exception {
+        final var instance = enroll("uid-evt-delete");
+        setNextCertificateFields("uid-evt-delete", "sha256:pending", "pending-pem",
+                Instant.now().plus(Duration.ofDays(30)));
+        capturedEvents.clear();
+
+        collectorInstanceService.deleteByInstanceUid("uid-evt-delete");
+
+        assertThat(lastEvent().addedFingerprints()).isEmpty();
+        assertThat(lastEvent().removedFingerprints())
+                .containsExactlyInAnyOrder(instance.activeCertificateFingerprint(), "sha256:pending");
+    }
+
+    @Test
+    void deleteExpiredPublishesRemovedFingerprintsForPurgedInstances() throws Exception {
+        final Instant reference = Instant.parse("2025-01-01T00:00:00Z");
+        final var expiredA = enrollWithFleetAndLastSeen("uid-exp-a", "507f1f77bcf86cd799439012", reference.minus(Duration.ofDays(8)));
+        final var expiredB = enrollWithFleetAndLastSeen("uid-exp-b", "507f1f77bcf86cd799439012", reference.minus(Duration.ofDays(8)));
+        enrollWithFleetAndLastSeen("uid-exp-fresh", "507f1f77bcf86cd799439012", reference);
+        capturedEvents.clear();
+
+        clock.setInstant(reference);
+        collectorInstanceService.deleteExpired(Duration.ofDays(7));
+
+        final var removed = new ArrayList<String>();
+        capturedEvents.forEach(event -> {
+            assertThat(event.addedFingerprints()).isEmpty();
+            removed.addAll(event.removedFingerprints());
+        });
+        assertThat(removed).containsExactlyInAnyOrder(
+                expiredA.activeCertificateFingerprint(), expiredB.activeCertificateFingerprint());
     }
 
     @Test

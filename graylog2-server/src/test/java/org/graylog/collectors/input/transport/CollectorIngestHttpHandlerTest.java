@@ -31,6 +31,7 @@ import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import io.opentelemetry.proto.logs.v1.ResourceLogs;
 import io.opentelemetry.proto.logs.v1.ScopeLogs;
+import org.graylog.collectors.CollectorFingerprintCache;
 import org.graylog.collectors.CollectorJournal;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.journal.RawMessage;
@@ -41,19 +42,25 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CollectorIngestHttpHandlerTest {
 
     @Mock
     private MessageInput input;
+
+    @Mock
+    private CollectorFingerprintCache fingerprintCache;
 
     @Test
     void postWithValidIdentityReturns200() throws Exception {
@@ -70,10 +77,26 @@ class CollectorIngestHttpHandlerTest {
     }
 
     @Test
-    void postWithoutIdentityReturns401() {
+    void postWithMissingFingerprintReturns500() {
         final EmbeddedChannel channel = createChannel(null);
         final ExportLogsServiceRequest request = createTestRequest();
 
+        final FullHttpRequest httpRequest = createProtobufRequest("/v1/logs", request.toByteArray());
+        channel.writeInbound(httpRequest);
+
+        final FullHttpResponse response = channel.readOutbound();
+        assertThat(response.status()).isEqualTo(HttpResponseStatus.INTERNAL_SERVER_ERROR);
+        verifyNoInteractions(input);
+        response.release();
+    }
+
+    @Test
+    void postWithUnboundFingerprintReturns401() {
+        final EmbeddedChannel channel = new EmbeddedChannel(new CollectorIngestHttpHandler(input, fingerprintCache));
+        channel.attr(AgentCertChannelHandler.AGENT_CERT_FINGERPRINT).set("sha256:unbound");
+        when(fingerprintCache.lookup("sha256:unbound")).thenReturn(Optional.empty());
+
+        final ExportLogsServiceRequest request = createTestRequest();
         final FullHttpRequest httpRequest = createProtobufRequest("/v1/logs", request.toByteArray());
         channel.writeInbound(httpRequest);
 
@@ -262,9 +285,12 @@ class CollectorIngestHttpHandlerTest {
 
     private EmbeddedChannel createChannel(String agentInstanceUid) {
         final EmbeddedChannel channel = new EmbeddedChannel(
-                new CollectorIngestHttpHandler(input));
+                new CollectorIngestHttpHandler(input, fingerprintCache));
         if (agentInstanceUid != null) {
-            channel.attr(AgentCertChannelHandler.AGENT_INSTANCE_UID).set(agentInstanceUid);
+            // The handler reads the fingerprint from the channel attribute and resolves it to an
+            // instance UID via the cache; here the test uses the UID itself as the fingerprint.
+            channel.attr(AgentCertChannelHandler.AGENT_CERT_FINGERPRINT).set(agentInstanceUid);
+            lenient().when(fingerprintCache.lookup(agentInstanceUid)).thenReturn(Optional.of(agentInstanceUid));
         }
         return channel;
     }

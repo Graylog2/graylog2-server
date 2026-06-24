@@ -21,6 +21,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import jakarta.inject.Singleton;
@@ -43,6 +44,7 @@ import org.graylog.collectors.input.processor.FilelogRecordProcessor;
 import org.graylog.collectors.input.processor.JournaldRecordProcessor;
 import org.graylog.collectors.input.processor.LogRecordProcessor;
 import org.graylog.collectors.input.processor.WindowsEventLogRecordProcessor;
+import org.graylog.collectors.input.transport.CollectorIngestHttpHandler;
 import org.graylog.collectors.input.transport.CollectorIngestHttpTransport;
 import org.graylog.collectors.opamp.OpAmpModule;
 import org.graylog.collectors.periodical.CollectorCaRenewalPeriodical;
@@ -101,6 +103,8 @@ public class CollectorsModule extends PluginModule {
         addMessageInput(CollectorIngestHttpInput.class);
         addTransport(CollectorIngestHttpTransport.NAME, CollectorIngestHttpTransport.class);
         addCodec(CollectorIngestCodec.NAME, CollectorIngestCodec.class);
+        install(new FactoryModuleBuilder().build(CollectorIngestHttpHandler.Factory.class));
+        addInitializer(CollectorFingerprintCache.class);
 
         if (isCloud) {
             serviceBinder().addBinding().to(CloudCollectorIngestService.class).in(Scopes.SINGLETON);

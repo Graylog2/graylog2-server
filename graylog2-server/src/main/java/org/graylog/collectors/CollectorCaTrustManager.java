@@ -32,6 +32,8 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.Date;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 /**
  * Custom trust manager that looks up the trust chain via authority key identifiers. This allows efficient certificate
  * lookup with multiple active signing certs. (e.g., cert renewal)
@@ -45,11 +47,13 @@ public class CollectorCaTrustManager extends X509ExtendedTrustManager {
     private static final Logger LOG = LoggerFactory.getLogger(CollectorCaTrustManager.class);
 
     private final CollectorCaCache caCache;
+    private final CollectorFingerprintCache fingerprintCache;
     private final Clock clock;
 
     @Inject
-    public CollectorCaTrustManager(CollectorCaCache caCache, Clock clock) {
+    public CollectorCaTrustManager(CollectorCaCache caCache, CollectorFingerprintCache fingerprintCache, Clock clock) {
         this.caCache = caCache;
+        this.fingerprintCache = fingerprintCache;
         this.clock = clock;
     }
 
@@ -72,6 +76,7 @@ public class CollectorCaTrustManager extends X509ExtendedTrustManager {
         verifySignatureAndValidity(clientCert, issuerEntry.cert());
         verifyEndEntityCert(clientCert);
         verifyClientAuthEku(clientCert);
+        verifyClientCertCollectorBinding(clientCert);
 
         LOG.debug("Client certificate trusted: subject=<{}>, issuer=<{}>",
                 clientCert.getSubjectX500Principal(), clientCert.getIssuerX500Principal());
@@ -131,6 +136,31 @@ public class CollectorCaTrustManager extends X509ExtendedTrustManager {
             throw e;
         } catch (Exception e) {
             throw new CertificateException("Failed to check extended key usage", e);
+        }
+    }
+
+    private void verifyClientCertCollectorBinding(X509Certificate clientCert) throws CertificateException {
+        final String cn;
+        try {
+            cn = PemUtils.extractCn(clientCert);
+        } catch (Exception e) {
+            throw new CertificateException("Failed to extract CN from client certificate for collector binding verification", e);
+        }
+
+        final String fingerprint;
+        try {
+            fingerprint = PemUtils.computeFingerprint(clientCert);
+        } catch (Exception e) {
+            throw new CertificateException("Failed to compute fingerprint for client certificate", e);
+        }
+
+        final var boundInstanceUuid = fingerprintCache.lookup(fingerprint);
+        if (boundInstanceUuid.isEmpty()) {
+            throw new CertificateException(f("No collector instance found for certificate fingerprint %s", fingerprint));
+        }
+
+        if (!cn.equals(boundInstanceUuid.get())) {
+            throw new CertificateException("Certificate CN does not match bound collector instance");
         }
     }
 

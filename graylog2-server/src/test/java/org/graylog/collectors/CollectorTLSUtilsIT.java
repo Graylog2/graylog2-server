@@ -42,6 +42,7 @@ import io.netty.handler.ssl.SslContext;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.graylog.collectors.input.transport.AgentCertChannelHandler;
+import org.graylog.collectors.opamp.IssuedCertificate;
 import org.graylog.security.pki.CertificateBuilder;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
@@ -90,9 +91,11 @@ import static org.mockito.Mockito.when;
 /**
  * Integration test for {@link CollectorTLSUtils} with a real Netty server.
  * <p>
- * The test creates a three-level CA hierarchy (root CA → signing cert → server cert),
- * wires it through mocked {@link CollectorCaService} into a real {@link CollectorCaKeyManager} and
- * {@link CollectorCaTrustManager}, then verifies Ed25519 mTLS handshakes succeed end-to-end.
+ * The test initializes the collectors CA hierarchy, enrolls an agent so its certificate fingerprint
+ * resolves to an active instance, and wires the real {@link CollectorCaKeyManager},
+ * {@link CollectorCaTrustManager} (including the active-instance binding), and
+ * {@link CollectorFingerprintCache}. It verifies that an Ed25519 mTLS handshake succeeds end-to-end
+ * and that the client certificate resolves to its enrolled instance UID.
  */
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(ClusterConfigServiceExtension.class)
@@ -108,6 +111,7 @@ class CollectorTLSUtilsIT {
     private final EncryptedValueService encryptedValueService = new EncryptedValueService("1234567890abcdef");
 
     private CollectorCaCache caCache;
+    private CollectorFingerprintCache fingerprintCache;
     private CollectorTLSUtils tlsUtils;
     private Channel serverChannel;
     private EventLoopGroup bossGroup;
@@ -146,10 +150,20 @@ class CollectorTLSUtilsIT {
         agentKey = PemUtils.parsePrivateKey(encryptedValueService.decrypt(agentCertEntry.privateKey()));
         agentCert = PemUtils.parseCertificate(agentCertEntry.certificate());
 
+        // Enroll the agent so its certificate fingerprint resolves to an active instance, which the
+        // trust manager requires before trusting a client certificate.
+        final var instanceService = new CollectorInstanceService(mongoCollections, new ClusterEventBus(), Clock.systemUTC());
+        instanceService.enroll(AGENT_INSTANCE_UID, "000000000000000000000000",
+                new IssuedCertificate(agentCertEntry.fingerprint(), agentCertEntry.certificate(),
+                        agentCertEntry.notAfter(), hierarchy.signingCert().id()),
+                "000000000000000000000000");
+        fingerprintCache = new CollectorFingerprintCache(collectorsConfigService, instanceService,
+                new EventBus(), MoreExecutors.directExecutor());
+
         caCache = new CollectorCaCache(caService, certService, encryptedValueService, new EventBus(), Clock.systemUTC());
         caCache.startAsync().awaitRunning();
         final var keyManager = new CollectorCaKeyManager(caCache);
-        final var trustManager = new CollectorCaTrustManager(caCache, Clock.systemUTC());
+        final var trustManager = new CollectorCaTrustManager(caCache, fingerprintCache, Clock.systemUTC());
         tlsUtils = new CollectorTLSUtils(keyManager, trustManager, MoreExecutors.directExecutor());
 
         bossGroup = new MultiThreadIoEventLoopGroup(1, NioIoHandler.newFactory());
@@ -180,7 +194,7 @@ class CollectorTLSUtilsIT {
         );
 
         assertThat(response.statusCode()).isEqualTo(200);
-        // AgentCertChannelHandler extracts the CN from the client cert
+        // End-to-end identity: the client cert's fingerprint resolves to its enrolled instance UID.
         assertThat(response.body()).isEqualTo(AGENT_INSTANCE_UID);
     }
 
@@ -215,7 +229,7 @@ class CollectorTLSUtilsIT {
                         pipeline.addLast("agent-cert-handler", new AgentCertChannelHandler());
                         pipeline.addLast("http-codec", new HttpServerCodec());
                         pipeline.addLast("http-aggregator", new HttpObjectAggregator(64 * 1024));
-                        pipeline.addLast("handler", new EchoAgentUidHandler());
+                        pipeline.addLast("handler", new EchoAgentUidHandler(fingerprintCache));
                     }
                 });
 
@@ -231,13 +245,21 @@ class CollectorTLSUtilsIT {
     }
 
     /**
-     * Simple HTTP handler that echoes the agent instance UID extracted by {@link AgentCertChannelHandler},
-     * or "ok" if no UID path is requested at {@code /test}.
+     * Resolves the agent's instance UID from the certificate fingerprint set by
+     * {@link AgentCertChannelHandler} (via the fingerprint cache, as the ingest handler does) and
+     * echoes it, or "ok" when the fingerprint does not resolve to an instance.
      */
     private static class EchoAgentUidHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
+        private final CollectorFingerprintCache fingerprintCache;
+
+        EchoAgentUidHandler(CollectorFingerprintCache fingerprintCache) {
+            this.fingerprintCache = fingerprintCache;
+        }
+
         @Override
         protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) {
-            final String uid = ctx.channel().attr(AgentCertChannelHandler.AGENT_INSTANCE_UID).get();
+            final String fingerprint = ctx.channel().attr(AgentCertChannelHandler.AGENT_CERT_FINGERPRINT).get();
+            final String uid = fingerprint == null ? null : fingerprintCache.lookup(fingerprint).orElse(null);
             final byte[] body = (uid != null ? uid : "ok").getBytes(StandardCharsets.UTF_8);
 
             final DefaultFullHttpResponse response = new DefaultFullHttpResponse(

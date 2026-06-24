@@ -16,6 +16,8 @@
  */
 package org.graylog.collectors.input.transport;
 
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -29,11 +31,12 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
+import org.graylog.collectors.CollectorFingerprintCache;
 import org.graylog.collectors.input.CollectorJournalRecordFactory;
-import org.graylog2.shared.utilities.RecordSizeDistributingProcessor;
 import org.graylog.inputs.otel.transport.OtlpHttpUtils;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.journal.RawMessage;
+import org.graylog2.shared.utilities.RecordSizeDistributingProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,9 +58,16 @@ public class CollectorIngestHttpHandler extends SimpleChannelInboundHandler<Full
     private static final String LOGS_PATH = OtlpHttpUtils.LOGS_PATH;
 
     private final MessageInput input;
+    private final CollectorFingerprintCache fingerprintCache;
 
-    public CollectorIngestHttpHandler(MessageInput input) {
+    public interface Factory {
+        CollectorIngestHttpHandler create(MessageInput input);
+    }
+
+    @AssistedInject
+    public CollectorIngestHttpHandler(@Assisted MessageInput input, CollectorFingerprintCache fingerprintCache) {
         this.input = input;
+        this.fingerprintCache = fingerprintCache;
     }
 
     @Override
@@ -74,8 +84,15 @@ public class CollectorIngestHttpHandler extends SimpleChannelInboundHandler<Full
             return;
         }
 
-        final String instanceUid = ctx.channel().attr(AgentCertChannelHandler.AGENT_INSTANCE_UID).get();
-        if (instanceUid == null) {
+        final String certFingerprint = ctx.channel().attr(AgentCertChannelHandler.AGENT_CERT_FINGERPRINT).get();
+        if (certFingerprint == null) {
+            LOG.error("Missing client certificate fingerprint channel attribute.");
+            sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR, keepAlive);
+            return;
+        }
+
+        final var instanceUid = fingerprintCache.lookup(certFingerprint);
+        if (instanceUid.isEmpty()) {
             LOG.warn("Rejecting request without agent identity (no valid client certificate)");
             sendError(ctx, HttpResponseStatus.UNAUTHORIZED, keepAlive);
             return;
@@ -104,7 +121,7 @@ public class CollectorIngestHttpHandler extends SimpleChannelInboundHandler<Full
             }
 
             RecordSizeDistributingProcessor.processRecords(
-                    CollectorJournalRecordFactory.createFromRequest(exportRequest, instanceUid),
+                    CollectorJournalRecordFactory.createFromRequest(exportRequest, instanceUid.get()),
                     exportRequest.getSerializedSize(),
                     r -> r.getOtelRecord().getLog().getLogRecord().getSerializedSize(),
                     createRawMessage,
