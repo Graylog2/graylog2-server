@@ -55,10 +55,11 @@ const StyledContainer = styled.div<{ $topMargin: number }>(
   `,
 );
 
-const StyledInput = styled.input<{ $queryWidth: number; $feedbackContainerWidth: number }>(
-  ({ $queryWidth, $feedbackContainerWidth }) => css`
+const StyledInput = styled.input<{ $queryWidth: number; $feedbackContainerWidth: number; $isInvalid: boolean }>(
+  ({ $queryWidth, $feedbackContainerWidth, $isInvalid }) => css`
     width: ${$queryWidth}px;
     padding-right: ${$feedbackContainerWidth ?? 12}px;
+    ${$isInvalid && 'text-decoration: underline wavy red;'}
   `,
 );
 
@@ -112,6 +113,7 @@ type Props = {
   topMargin?: number;
   onQueryChange?: (query: string) => void;
   query?: string;
+  validationRegexp?: RegExp;
 };
 
 /**
@@ -135,9 +137,11 @@ const SearchForm = ({
   topMargin = 0,
   onQueryChange = undefined,
   query: propsQuery = '',
+  validationRegexp = undefined,
 }: Props) => {
   const [query, setQuery] = useState(propsQuery);
   const [isLoading, setIsLoading] = useState(false);
+  const [isInvalid, setIsInvalid] = useState(false);
   const inputFeedbackContainer = useRef<HTMLDivElement>(undefined);
 
   useEffect(() => {
@@ -169,6 +173,7 @@ const SearchForm = ({
 
   const handleReset = () => {
     resetLoadingState();
+    setIsInvalid(false);
     setQuery(propsQuery);
 
     if (typeof onQueryChange === 'function') {
@@ -186,6 +191,17 @@ const SearchForm = ({
     const newQuery = e.target.value;
 
     setQuery(newQuery);
+
+    // check for basic validity of the entered query
+    if(newQuery.length > 0 && validationRegexp) {
+      if(!(validationRegexp.test(newQuery))) {
+        setIsInvalid(true);
+
+        return;
+      }
+    }
+
+    setIsInvalid(false);
 
     if (typeof onQueryChange === 'function') {
       onQueryChange(newQuery);
@@ -220,6 +236,7 @@ const SearchForm = ({
               placeholder={placeholder}
               type="text"
               $queryWidth={queryWidth}
+              $isInvalid={isInvalid}
               className="query form-control"
               autoComplete="off"
               spellCheck="false"
