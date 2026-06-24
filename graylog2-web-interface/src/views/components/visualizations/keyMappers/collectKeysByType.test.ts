@@ -14,14 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import Pivot from 'views/logic/aggregationbuilder/Pivot';
 
 import collectKeysByType from './collectKeysByType';
 
-const config = {
-  rowPivots: [{ fields: ['streams'] }],
-  columnPivots: [{ fields: ['gl2_source_input'] }],
-} as unknown as AggregationWidgetConfig;
+const config = AggregationWidgetConfig.builder()
+  .rowPivots([Pivot.createValues(['streams'])])
+  .columnPivots([Pivot.createValues(['gl2_source_input'])])
+  .build();
 
 const fieldTypeOf = (field: string) => ({ streams: 'streams', gl2_source_input: 'input' })[field];
 
