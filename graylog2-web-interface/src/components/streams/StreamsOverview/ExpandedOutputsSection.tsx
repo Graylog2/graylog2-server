@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import { Link, Pluralize, Spinner } from 'components/common';
 import { ListGroup, ListGroupItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';

@@ -86,7 +86,6 @@ const ClientCertForm = ({ onCancel }: Props) => {
                   required
                 />
                 <Checkbox
-                  type="checkbox"
                   id="client_certificate_unencrypted"
                   name="client_certificate_unencrypted"
                   checked={isUnencrypted}
