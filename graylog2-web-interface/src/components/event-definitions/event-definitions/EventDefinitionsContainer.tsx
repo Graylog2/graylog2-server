@@ -21,7 +21,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { QueryHelper, RelativeTime, PaginatedEntityTable, Link } from 'components/common';
 import Routes from 'routing/Routes';
-import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
+import FilterValueRenderers from 'components/event-definitions/FilterValueRenderers';
 import { keyFn, fetchEventDefinitions } from 'components/event-definitions/hooks/useEventDefinitions';
 import BulkActions from 'components/event-definitions/event-definitions/BulkActions';
 import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
