@@ -17,16 +17,9 @@
 package org.graylog.events.search;
 
 import jakarta.inject.Inject;
-import jakarta.inject.Provider;
 import org.apache.shiro.subject.Subject;
-import org.graylog.events.configuration.EventsConfiguration;
 import org.graylog.events.configuration.EventsConfigurationProvider;
-import org.graylog.grn.GRN;
-import org.graylog.grn.GRNRegistry;
-import org.graylog.grn.GRNTypes;
-import org.graylog.security.DBGrantService;
-import org.graylog.security.GrantDTO;
-import org.graylog.security.PermissionAndRoleResolver;
+import org.graylog.events.processor.DBEventDefinitionService;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,31 +28,23 @@ import static org.graylog2.shared.security.RestPermissions.EVENT_DEFINITIONS_REA
 
 public class EventDefinitionFilterFactory {
     private final EventsConfigurationProvider eventsConfiguration;
-    private final DBGrantService grantService;
-    private final GRNRegistry grnRegistry;
-    private final PermissionAndRoleResolver permissionAndRoleResolver;
+    private final DBEventDefinitionService eventDefinitionService;
 
     @Inject
     public EventDefinitionFilterFactory(EventsConfigurationProvider eventsConfiguration,
-                                        DBGrantService grantService,
-                                        GRNRegistry grnRegistry,
-                                        PermissionAndRoleResolver permissionAndRoleResolver) {
+                                        DBEventDefinitionService eventDefinitionService) {
         this.eventsConfiguration = eventsConfiguration;
-        this.grantService = grantService;
-        this.grnRegistry = grnRegistry;
-        this.permissionAndRoleResolver = permissionAndRoleResolver;
+        this.eventDefinitionService = eventDefinitionService;
     }
 
     public EventDefinitionFilter forSubject(Subject subject) {
         if (!eventsConfiguration.get().enforceEventDefinitionPermissions() || subject.isPermitted(EVENT_DEFINITIONS_READ)) {
             return EventDefinitionFilter.allAllowed();
         }
-        final GRN userGRN = grnRegistry.newGRN(GRNTypes.USER, (String) subject.getPrincipal());
-        final Set<GRN> grantees = permissionAndRoleResolver.resolveGrantees(userGRN);
-        final Set<String> ids = grantService.getForGranteesOrGlobal(grantees).stream()
-                .map(GrantDTO::target)
-                .filter(target -> target.isType(GRNTypes.EVENT_DEFINITION))
-                .map(GRN::entity)
+        final Set<String> ids = eventDefinitionService.findPermittedIds(
+                        id -> subject.isPermitted(EVENT_DEFINITIONS_READ + ":" + id)
+                ).stream()
+                .map(org.bson.types.ObjectId::toHexString)
                 .collect(Collectors.toSet());
         return EventDefinitionFilter.allowList(ids);
     }
