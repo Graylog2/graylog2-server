@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
-import org.graylog.plugins.datanode.DatanodeUpgradeServiceAdapter;
+import org.graylog.plugins.datanode.DatanodeClusterAdminAdapter;
 import org.graylog.plugins.datanode.dto.ClusterState;
 import org.graylog.plugins.datanode.dto.FlushResponse;
 import org.graylog.plugins.datanode.dto.ManagerNode;
@@ -48,9 +48,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class DatanodeUpgradeServiceAdapterOS implements DatanodeUpgradeServiceAdapter {
+public class DatanodeClusterAdminAdapterOS implements DatanodeClusterAdminAdapter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DatanodeUpgradeServiceAdapterOS.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DatanodeClusterAdminAdapterOS.class);
 
     public static final String REPLICATION_PRIMARIES = "primaries";
     public static final String REPLICATION_ALL = "all";
@@ -59,7 +59,7 @@ public class DatanodeUpgradeServiceAdapterOS implements DatanodeUpgradeServiceAd
     private final ObjectMapper objectMapper;
 
     @Inject
-    public DatanodeUpgradeServiceAdapterOS(OfficialOpensearchClient officialOpensearchClient, ObjectMapper objectMapper) {
+    public DatanodeClusterAdminAdapterOS(OfficialOpensearchClient officialOpensearchClient, ObjectMapper objectMapper) {
         this.officialOpensearchClient = officialOpensearchClient;
         this.objectMapper = objectMapper;
     }
