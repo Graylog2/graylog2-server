@@ -14,15 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import styled from 'styled-components';
 
-// eslint-disable-next-line no-restricted-imports
-import {
-  /* 👇 no custom theme colors needed 👇 */
-  Collapse,
-  Dropdown,
-  Form,
-  PanelGroup,
-  /* 👆 no custom theme colors needed 👆 */
-} from 'react-bootstrap';
+/**
+ * An empty element that clears preceding floated siblings (e.g. Bootstrap `<Col>`
+ * elements not wrapped in a `<Row>`), so subsequent content starts on a new line.
+ */
+const ClearFloat = styled.div`
+  clear: both;
+`;
 
-export { Collapse, Dropdown, Form, PanelGroup };
+export default ClearFloat;
