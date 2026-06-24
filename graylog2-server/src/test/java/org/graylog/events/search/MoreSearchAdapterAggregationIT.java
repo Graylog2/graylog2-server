@@ -16,6 +16,7 @@
  */
 package org.graylog.events.search;
 
+import org.graylog.events.search.EventDefinitionFilter;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.rest.resources.entities.Slice;
@@ -51,7 +52,7 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
     public void aggregateSlicesForColumn_groupsByField() {
         final List<Slice> result = adapter.aggregateSlicesForColumn(
                 "*", RelativeRange.allTime(), Set.of(INDEX_NAME),
-                ALL_STREAMS, null, allAllowed(),
+                ALL_STREAMS, null, allAllowed(), EventDefinitionFilter.allAllowed(),
                 Map.of(), "gl2_source_input", Map.of(), 100);
 
         final Map<String, Integer> countsByInput = result.stream()
@@ -67,7 +68,7 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
     public void aggregateSlicesForColumn_withQueryFilter() {
         final List<Slice> result = adapter.aggregateSlicesForColumn(
                 "gl2_source_input:input-1", RelativeRange.allTime(), Set.of(INDEX_NAME),
-                ALL_STREAMS, null, allAllowed(),
+                ALL_STREAMS, null, allAllowed(), EventDefinitionFilter.allAllowed(),
                 Map.of(), "streams", Map.of(), 100);
 
         final Map<String, Integer> countsByStream = result.stream()
@@ -82,7 +83,7 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
     public void aggregateSlicesForColumn_emptyResultForNoMatch() {
         final List<Slice> result = adapter.aggregateSlicesForColumn(
                 "gl2_source_input:nonexistent", RelativeRange.allTime(), Set.of(INDEX_NAME),
-                ALL_STREAMS, null, allAllowed(),
+                ALL_STREAMS, null, allAllowed(), EventDefinitionFilter.allAllowed(),
                 Map.of(), "streams", Map.of(), 100);
 
         assertThat(result).isEmpty();
