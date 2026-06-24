@@ -16,67 +16,63 @@
  */
 package org.graylog.collectors.input;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.common.eventbus.EventBus;
+import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.MultiThreadIoEventLoopGroup;
+import io.netty.channel.nio.NioIoHandler;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
-import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.SslContextBuilder;
-import io.netty.handler.ssl.SslHandler;
-import io.netty.handler.ssl.SslProvider;
-import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
-import io.netty.handler.ssl.util.SimpleTrustManagerFactory;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import io.opentelemetry.proto.logs.v1.ResourceLogs;
 import io.opentelemetry.proto.logs.v1.ScopeLogs;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.X500NameBuilder;
-import org.bouncycastle.asn1.x500.style.BCStyle;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.KeyUsage;
-import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
-import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.graylog.collectors.CollectorCaCache;
+import org.graylog.collectors.CollectorCaKeyManager;
+import org.graylog.collectors.CollectorCaService;
+import org.graylog.collectors.CollectorCaTrustManager;
 import org.graylog.collectors.CollectorFingerprintCache;
+import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorJournal;
+import org.graylog.collectors.CollectorTLSUtils;
+import org.graylog.collectors.CollectorsConfig;
+import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.input.transport.AgentCertChannelHandler;
 import org.graylog.collectors.input.transport.CollectorIngestHttpHandler;
+import org.graylog.collectors.opamp.IssuedCertificate;
 import org.graylog.security.pki.Algorithm;
 import org.graylog.security.pki.CertificateBuilder;
 import org.graylog.security.pki.CertificateEntry;
+import org.graylog.security.pki.CertificateService;
 import org.graylog.security.pki.PemUtils;
-import org.graylog.testing.TestClocks;
+import org.graylog.testing.cluster.ClusterConfigServiceExtension;
+import org.graylog.testing.mongodb.MongoDBExtension;
+import org.graylog2.configuration.HttpConfiguration;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.events.ClusterEventBus;
+import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.cluster.ClusterIdService;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.security.encryption.EncryptedValueService;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.net.ssl.KeyManager;
-import javax.net.ssl.ManagerFactoryParameters;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
@@ -84,316 +80,244 @@ import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509ExtendedKeyManager;
 import javax.net.ssl.X509ExtendedTrustManager;
-import javax.net.ssl.X509TrustManager;
-import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.KeyStore;
 import java.security.Principal;
 import java.security.PrivateKey;
-import java.security.Security;
 import java.security.cert.X509Certificate;
+import java.time.Clock;
 import java.time.Duration;
-import java.time.Instant;
-import java.util.Date;
-import java.util.Optional;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
- * Integration tests for Ed25519 mTLS over the managed HTTP ingest path.
+ * End-to-end integration test for the collector ingest mTLS path against the real production stack.
  * <p>
- * These tests verify the remaining technical risk after removing the unpublished gRPC path:
- * Ed25519 mTLS still works end-to-end for the HTTP OTLP transport. Each test starts a real
- * server with TLS, creates client connections using Ed25519 certificates, and validates
- * authentication and data flow.
+ * It initializes the collectors CA hierarchy, enrolls an agent, and wires the real
+ * {@link CollectorCaKeyManager}, {@link CollectorCaTrustManager} (including its active-instance
+ * binding), {@link CollectorFingerprintCache}, and {@link CollectorIngestHttpHandler} into a Netty
+ * server. Client certificates are minted with the production {@link CertificateBuilder}
+ * (clientAuth EKU, signed by the real signing cert), so they are cryptographically valid and only
+ * the instance binding decides whether a handshake is trusted.
  * <p>
- * BouncyCastle is used to generate Ed25519 certificates (JDK does not provide a
- * certificate builder API). All keys and certs are parsed through {@link PemUtils}
- * (same code path as production) which returns JDK-native types via SunEC.
+ * It verifies the security fix for the ingest mTLS path: a certificate is trusted only when it binds
+ * to an active, non-deleted collector instance — not merely because it was signed by the CA. It also
+ * covers the renewal model (the {@code next} certificate is accepted before activation; the superseded
+ * certificate loses access after activation) and that a foreign-CA certificate is rejected at the
+ * crypto gate. A trusted connection propagates the resolved instance UID to the journal record.
  * <p>
- * Both client and server use {@code InsecureTrustManagerFactory} to bypass PKIX cert path
- * validation. The server still enforces {@code ClientAuth.REQUIRE}, ensuring the client
- * must present a certificate. The focus of these tests is on the mTLS handshake mechanics
- * and agent identity propagation, not on cert chain validation.
+ * The test client uses an {@link X509ExtendedTrustManager} that accepts any server certificate, which
+ * also bypasses the JDK's hostname-verification wrapper — so the real OTLP server certificate is used
+ * as-is without needing an IP SAN for {@code 127.0.0.1}.
  */
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@ExtendWith(ClusterConfigServiceExtension.class)
 class CollectorIngestMtlsIT {
 
-    private static final String AGENT_INSTANCE_UID = "test-agent-instance-123";
+    private static final String AGENT_INSTANCE_UID = "test-agent-42";
+    private static final String UNENROLLED_INSTANCE_UID = "unenrolled-agent-99";
     private static final Duration CERT_VALIDITY = Duration.ofDays(1);
 
-    // Server cert with SAN for 127.0.0.1
-    private static PrivateKey serverKey;
-    private static X509Certificate serverCert;
+    private final EncryptedValueService encryptedValueService = new EncryptedValueService("1234567890abcdef");
 
-    // Agent cert signed by the CA
-    private static PrivateKey agentKey;
-    private static X509Certificate agentCert;
+    private CertificateBuilder certBuilder;
+    private CertificateEntry signingCertEntry;
+    private X509Certificate signingCert;
 
-    // CA cert (self-signed root)
-    private static X509Certificate caCert;
+    // Enrolled agent: its certificate binds to an active instance.
+    private PrivateKey agentKey;
+    private X509Certificate agentCert;
 
-    @Mock
+    private CollectorInstanceService instanceService;
+    private CollectorFingerprintCache fingerprintCache;
+    private CollectorTLSUtils tlsUtils;
+    private CollectorCaCache caCache;
     private MessageInput input;
 
-    @Mock
-    private CollectorFingerprintCache fingerprintCache;
-
-    private Channel httpServerChannel;
+    private Channel serverChannel;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
 
-
-    @BeforeAll
-    static void setupCerts() throws Exception {
-        // Register BC for cert generation (JDK has no certificate builder API).
-        if (Security.getProvider("BC") == null) {
-            Security.addProvider(new BouncyCastleProvider());
-        }
-
-        final EncryptedValueService encryptedValueService = new EncryptedValueService("1234567890abcdef");
-        final CertificateBuilder certificateBuilder = new CertificateBuilder(encryptedValueService, "Test", TestClocks.fixedEpoch());
-
-        // Create a flat CA hierarchy: self-signed root CA signs all end-entity certs
-        final CertificateEntry caEntry = certificateBuilder.createRootCa("Test CA", Algorithm.ED25519, CERT_VALIDITY);
-        final CertificateEntry agentCertEntry = certificateBuilder.createEndEntityCert(AGENT_INSTANCE_UID, caEntry,
-                KeyUsage.digitalSignature, KeyPurposeId.id_kp_clientAuth, CERT_VALIDITY);
-
-        // Parse CA and agent certs via PemUtils — same code path as production
-        // (OpAmpCaService.newServerSslContextBuilder())
-        caCert = PemUtils.parseCertificate(caEntry.certificate());
-        agentKey = PemUtils.parsePrivateKey(encryptedValueService.decrypt(agentCertEntry.privateKey()));
-        agentCert = PemUtils.parseCertificate(agentCertEntry.certificate());
-
-        // Create server cert with SAN for IP 127.0.0.1 (required by hostname verification).
-        // CertificateBuilder only supports DNS SANs, so we build this one manually with BC.
-        final PrivateKey issuerKey = PemUtils.parsePrivateKey(encryptedValueService.decrypt(caEntry.privateKey()));
-        final KeyPair serverKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
-        final X500Name serverSubject = new X500NameBuilder(BCStyle.INSTANCE)
-                .addRDN(BCStyle.CN, "Test Server").addRDN(BCStyle.O, "Test").build();
-        final X500Name issuerDn = new X500Name(caCert.getSubjectX500Principal().getName());
-        final Instant now = Instant.now();
-        final JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
-                issuerDn, BigInteger.valueOf(System.currentTimeMillis()),
-                Date.from(now), Date.from(now.plus(CERT_VALIDITY)),
-                serverSubject, serverKeyPair.getPublic());
-        certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(false));
-        certBuilder.addExtension(Extension.keyUsage, true,
-                new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyEncipherment));
-        certBuilder.addExtension(Extension.extendedKeyUsage, false,
-                new ExtendedKeyUsage(KeyPurposeId.id_kp_serverAuth));
-        certBuilder.addExtension(Extension.subjectAlternativeName, false,
-                new GeneralNames(new GeneralName(GeneralName.iPAddress, "127.0.0.1")));
-        final ContentSigner signer = new JcaContentSignerBuilder("Ed25519")
-                .setProvider("BC").build(issuerKey);
-        serverCert = new JcaX509CertificateConverter()
-                .getCertificate(certBuilder.build(signer));
-        serverKey = serverKeyPair.getPrivate();
-    }
-
     @BeforeEach
-    void setUp() {
-        bossGroup = new NioEventLoopGroup(1);
-        workerGroup = new NioEventLoopGroup(2);
-        // The handler resolves the client cert fingerprint to its instance UID; bind any fingerprint
-        // to the agent's UID. lenient() because the no-client-cert test fails before reaching the handler.
-        lenient().when(fingerprintCache.lookup(any())).thenReturn(Optional.of(AGENT_INSTANCE_UID));
+    void setUp(MongoCollections mongoCollections, ClusterConfigService clusterConfigService) throws Exception {
+        certBuilder = new CertificateBuilder(encryptedValueService, "Test", Clock.systemUTC());
+        final var certService = new CertificateService(mongoCollections, encryptedValueService, CustomizationConfig.empty(), Clock.systemUTC());
+
+        final var clusterIdService = mock(ClusterIdService.class);
+        when(clusterIdService.getString()).thenReturn(UUID.randomUUID().toString());
+        final var httpConfiguration = mock(HttpConfiguration.class);
+        when(httpConfiguration.getHttpExternalUri()).thenReturn(URI.create("https://localhost:443/"));
+
+        final var collectorsConfigService = new CollectorsConfigService(clusterConfigService, new ClusterEventBus(), httpConfiguration);
+        final var caService = new CollectorCaService(certService, clusterIdService, collectorsConfigService, Clock.systemUTC());
+
+        final var hierarchy = caService.initializeCa();
+        collectorsConfigService.save(CollectorsConfig.createDefaultBuilder("localhost")
+                .caCertId(hierarchy.caCert().id())
+                .signingCertId(hierarchy.signingCert().id())
+                .otlpServerCertId(hierarchy.otlpServerCert().id())
+                .build());
+        signingCertEntry = hierarchy.signingCert();
+        signingCert = PemUtils.parseCertificate(signingCertEntry.certificate());
+
+        // Mint and enroll the agent so its (active) fingerprint resolves to an active instance.
+        final AgentCert agent = mintClientCert(AGENT_INSTANCE_UID, signingCertEntry);
+        agentKey = agent.key();
+        agentCert = agent.cert();
+
+        instanceService = new CollectorInstanceService(mongoCollections, new ClusterEventBus(), Clock.systemUTC());
+        instanceService.enroll(AGENT_INSTANCE_UID, "000000000000000000000000",
+                new IssuedCertificate(agent.entry().fingerprint(), agent.entry().certificate(),
+                        agent.entry().notAfter(), signingCertEntry.id()),
+                "000000000000000000000000");
+
+        fingerprintCache = new CollectorFingerprintCache(collectorsConfigService, instanceService,
+                new EventBus(), MoreExecutors.directExecutor());
+
+        caCache = new CollectorCaCache(caService, certService, encryptedValueService, new EventBus(), Clock.systemUTC());
+        caCache.startAsync().awaitRunning();
+        final var keyManager = new CollectorCaKeyManager(caCache);
+        final var trustManager = new CollectorCaTrustManager(caCache, fingerprintCache, Clock.systemUTC());
+        tlsUtils = new CollectorTLSUtils(keyManager, trustManager, MoreExecutors.directExecutor());
+
+        input = mock(MessageInput.class);
+
+        bossGroup = new MultiThreadIoEventLoopGroup(1, NioIoHandler.newFactory());
+        workerGroup = new MultiThreadIoEventLoopGroup(2, NioIoHandler.newFactory());
     }
 
     @AfterEach
     void tearDown() throws Exception {
-        if (httpServerChannel != null) {
-            httpServerChannel.close().sync();
+        caCache.stopAsync().awaitTerminated();
+        if (serverChannel != null) {
+            serverChannel.close().sync();
         }
         bossGroup.shutdownGracefully().sync();
         workerGroup.shutdownGracefully().sync();
     }
 
-    // ----- HTTP mTLS Tests -----
-
     @Test
-    void httpMtlsSuccessWithAgentCertSignedByOpAmpCa() throws Exception {
-        final int port = startHttpServer();
-        final HttpClient client = createHttpClient(agentKey, agentCert);
+    void enrolledAgentCompletesMtlsAndPropagatesInstanceUidToJournal() throws Exception {
+        final int port = startServer();
+        final HttpClient client = createMtlsClient(agentKey, agentCert);
 
-        final ExportLogsServiceRequest request = createTestRequest();
-        final HttpResponse<byte[]> response = client.send(
-                HttpRequest.newBuilder()
-                        .uri(URI.create("https://127.0.0.1:" + port + "/v1/logs"))
-                        .header("Content-Type", "application/x-protobuf")
-                        .POST(HttpRequest.BodyPublishers.ofByteArray(request.toByteArray()))
-                        .build(),
-                HttpResponse.BodyHandlers.ofByteArray()
-        );
+        final HttpResponse<byte[]> response = postLogs(client, port);
 
         assertThat(response.statusCode()).isEqualTo(200);
+
+        // The handshake completion event must fire before the HTTP request so AgentCertChannelHandler
+        // can set the fingerprint attribute; reaching the journal with the right UID proves both the
+        // ordering and the end-to-end binding fingerprint -> active instance UID.
+        assertThat(capturedJournalRecord().getCollectorInstanceUid()).isEqualTo(AGENT_INSTANCE_UID);
     }
 
     @Test
-    void httpMtlsRejectsConnectionWithNoClientCert() throws Exception {
-        final int port = startHttpServer();
+    void rejectsConnectionWithoutClientCert() throws Exception {
+        final int port = startServer();
 
-        // Build a Java SSLContext with no client cert - trust all servers
         final SSLContext sslContext = SSLContext.getInstance("TLS");
         sslContext.init(null, new TrustManager[]{new TrustAllManager()}, null);
+        final HttpClient client = HttpClient.newBuilder().sslContext(sslContext).build();
 
-        final HttpClient client = HttpClient.newBuilder()
-                .sslContext(sslContext)
-                .build();
-
-        final ExportLogsServiceRequest request = createTestRequest();
-
-        // The server requires client auth so the TLS handshake should fail
-        assertThatThrownBy(() -> client.send(
-                HttpRequest.newBuilder()
-                        .uri(URI.create("https://127.0.0.1:" + port + "/v1/logs"))
-                        .header("Content-Type", "application/x-protobuf")
-                        .POST(HttpRequest.BodyPublishers.ofByteArray(request.toByteArray()))
-                        .build(),
-                HttpResponse.BodyHandlers.ofByteArray()
-        )).hasCauseInstanceOf(SSLHandshakeException.class);
+        // The server requires client auth, so the handshake fails before any HTTP request is processed.
+        assertThatThrownBy(() -> postLogs(client, port))
+                .hasCauseInstanceOf(SSLHandshakeException.class);
     }
 
     @Test
-    void httpMtlsSetsCollectorInstanceUidInJournalRecord() throws Exception {
-        final int port = startHttpServer();
-        final HttpClient client = createHttpClient(agentKey, agentCert);
+    void rejectsCaSignedCertOfUnenrolledInstance() throws Exception {
+        // The cert is signed by the CA and otherwise valid, but its instance was never enrolled, so the
+        // trust manager's binding lookup finds no active instance and aborts the handshake. This is the
+        // core of the fix: a CA signature alone is not enough to be trusted.
+        final AgentCert unenrolled = mintClientCert(UNENROLLED_INSTANCE_UID, signingCertEntry);
 
-        final ExportLogsServiceRequest request = createTestRequest();
-        final HttpResponse<byte[]> response = client.send(
-                HttpRequest.newBuilder()
-                        .uri(URI.create("https://127.0.0.1:" + port + "/v1/logs"))
-                        .header("Content-Type", "application/x-protobuf")
-                        .POST(HttpRequest.BodyPublishers.ofByteArray(request.toByteArray()))
-                        .build(),
-                HttpResponse.BodyHandlers.ofByteArray()
-        );
+        final int port = startServer();
+        final HttpClient client = createMtlsClient(unenrolled.key(), unenrolled.cert());
+
+        assertThatThrownBy(() -> postLogs(client, port))
+                .hasCauseInstanceOf(SSLException.class);
+    }
+
+    @Test
+    void rejectsCertOfDeletedInstance() throws Exception {
+        // Delete the enrolled instance before the first handshake: its fingerprint was never cached, so
+        // the binding lookup resolves straight from MongoDB and finds nothing — the cert is no longer
+        // trusted. This is the revocation half of the fix (a removed instance loses ingest access).
+        assertThat(instanceService.deleteByInstanceUid(AGENT_INSTANCE_UID)).isTrue();
+
+        final int port = startServer();
+        final HttpClient client = createMtlsClient(agentKey, agentCert);
+
+        assertThatThrownBy(() -> postLogs(client, port))
+                .hasCauseInstanceOf(SSLException.class);
+    }
+
+    @Test
+    void acceptsNextCertificateDuringRenewal() throws Exception {
+        // During renewal the agent may present its freshly issued "next" certificate before it is
+        // activated. findByActiveOrNextFingerprint resolves the next fingerprint to the same instance,
+        // so the handshake is trusted and the same instance UID reaches the journal.
+        final AgentCert renewed = mintClientCert(AGENT_INSTANCE_UID, signingCertEntry);
+        assertThat(instanceService.insertNextCertificate(AGENT_INSTANCE_UID, renewed.entry().fingerprint(),
+                renewed.entry().certificate(), renewed.entry().notAfter())).isTrue();
+
+        final int port = startServer();
+        final HttpClient client = createMtlsClient(renewed.key(), renewed.cert());
+
+        final HttpResponse<byte[]> response = postLogs(client, port);
 
         assertThat(response.statusCode()).isEqualTo(200);
-
-        final ArgumentCaptor<RawMessage> captor = ArgumentCaptor.forClass(RawMessage.class);
-        verify(input).processRawMessage(captor.capture());
-
-        final CollectorJournal.Record record = CollectorJournal.Record.parseFrom(captor.getValue().getPayload());
-        assertThat(record.getCollectorInstanceUid()).isEqualTo(AGENT_INSTANCE_UID);
+        assertThat(capturedJournalRecord().getCollectorInstanceUid()).isEqualTo(AGENT_INSTANCE_UID);
     }
 
     @Test
-    void httpSslHandshakeCompletionEventFiresBeforeHttpRequest() throws Exception {
-        // This test verifies that SslHandshakeCompletionEvent fires before HTTP requests,
-        // allowing AgentCertChannelHandler to extract the CN before CollectorIngestHttpHandler processes the request.
-        // If the handshake event did NOT fire, CollectorIngestHttpHandler would return 401.
-        final int port = startHttpServer();
-        final HttpClient client = createHttpClient(agentKey, agentCert);
+    void rejectsSupersededCertificateAfterRenewalActivation() throws Exception {
+        // Insert a next certificate and activate it: the previously active fingerprint is dropped. The
+        // old certificate is presented for the first time only after activation, so the binding lookup
+        // resolves from MongoDB and no longer finds it — renewal rotates ingest access off the old cert.
+        final AgentCert renewed = mintClientCert(AGENT_INSTANCE_UID, signingCertEntry);
+        instanceService.insertNextCertificate(AGENT_INSTANCE_UID, renewed.entry().fingerprint(),
+                renewed.entry().certificate(), renewed.entry().notAfter());
+        final var instance = instanceService.findByInstanceUid(AGENT_INSTANCE_UID).orElseThrow();
+        assertThat(instanceService.activateNextCertificate(instance)).isTrue();
 
-        final ExportLogsServiceRequest request = createTestRequest();
-        final HttpResponse<byte[]> response = client.send(
-                HttpRequest.newBuilder()
-                        .uri(URI.create("https://127.0.0.1:" + port + "/v1/logs"))
-                        .header("Content-Type", "application/x-protobuf")
-                        .POST(HttpRequest.BodyPublishers.ofByteArray(request.toByteArray()))
-                        .build(),
-                HttpResponse.BodyHandlers.ofByteArray()
-        );
+        final int port = startServer();
+        final HttpClient client = createMtlsClient(agentKey, agentCert);
 
-        // 200 means the handler found the agent UID, proving the handshake event fired first
-        assertThat(response.statusCode()).isEqualTo(200);
-
-        // Verify that collector_instance_uid was propagated all the way to the journal record
-        final ArgumentCaptor<RawMessage> captor = ArgumentCaptor.forClass(RawMessage.class);
-        verify(input).processRawMessage(captor.capture());
-        final CollectorJournal.Record record = CollectorJournal.Record.parseFrom(captor.getValue().getPayload());
-        assertThat(record.getCollectorInstanceUid()).isEqualTo(AGENT_INSTANCE_UID);
+        assertThatThrownBy(() -> postLogs(client, port))
+                .hasCauseInstanceOf(SSLException.class);
     }
 
     @Test
-    void delegatedTaskExecutorRunsClientCertCheckOffTheEventLoop() throws Exception {
-        final AtomicReference<String> trustCheckThread = new AtomicReference<>();
-        final ExecutorService certVerificationExecutor = Executors.newFixedThreadPool(2,
-                new ThreadFactoryBuilder().setNameFormat("collector-cert-verification-%d").setDaemon(true).build());
-        try {
-            final int port = startHttpServer(recordingTrustManagerServerContext(trustCheckThread), certVerificationExecutor);
-            final HttpClient client = createHttpClient(agentKey, agentCert);
+    void rejectsCertSignedByForeignCa() throws Exception {
+        // An attacker who knows the instance UID but signs with their own CA: the cert carries the right
+        // CN but does not chain to the collectors root, so the trust manager rejects it at the crypto
+        // gate before the binding is even consulted.
+        final CertificateEntry foreignCa = certBuilder.createRootCa("Foreign CA", Algorithm.ED25519, CERT_VALIDITY);
+        final AgentCert foreign = mintClientCert(AGENT_INSTANCE_UID, foreignCa);
+        final X509Certificate foreignCaCert = PemUtils.parseCertificate(foreignCa.certificate());
 
-            final HttpResponse<byte[]> response = client.send(
-                    HttpRequest.newBuilder()
-                            .uri(URI.create("https://127.0.0.1:" + port + "/v1/logs"))
-                            .header("Content-Type", "application/x-protobuf")
-                            .POST(HttpRequest.BodyPublishers.ofByteArray(createTestRequest().toByteArray()))
-                            .build(),
-                    HttpResponse.BodyHandlers.ofByteArray());
+        final int port = startServer();
+        final HttpClient client = createMtlsClient(foreign.key(), foreign.cert(), foreignCaCert);
 
-            // The handshake still completes successfully with the executor wired in.
-            assertThat(response.statusCode()).isEqualTo(200);
-            // checkClientTrusted ran on the cert-verification executor, not the Netty event loop.
-            assertThat(trustCheckThread.get())
-                    .as("thread running checkClientTrusted")
-                    .isNotNull()
-                    .startsWith("collector-cert-verification-");
-        } finally {
-            certVerificationExecutor.shutdownNow();
-        }
+        assertThatThrownBy(() -> postLogs(client, port))
+                .hasCauseInstanceOf(SSLException.class);
     }
 
-    @Test
-    void clientCertCheckRunsOnEventLoopWhenNoExecutorIsConfigured() throws Exception {
-        // Control for the test above: with no delegated-task executor, Netty runs the trust check
-        // inline on the event loop. This proves the executor is what moves it off-loop, and that
-        // the prefix assertion above is meaningful rather than vacuously true.
-        final AtomicReference<String> trustCheckThread = new AtomicReference<>();
-        final int port = startHttpServer(recordingTrustManagerServerContext(trustCheckThread), null);
-        final HttpClient client = createHttpClient(agentKey, agentCert);
+    // ----- Helpers -----
 
-        final HttpResponse<byte[]> response = client.send(
-                HttpRequest.newBuilder()
-                        .uri(URI.create("https://127.0.0.1:" + port + "/v1/logs"))
-                        .header("Content-Type", "application/x-protobuf")
-                        .POST(HttpRequest.BodyPublishers.ofByteArray(createTestRequest().toByteArray()))
-                        .build(),
-                HttpResponse.BodyHandlers.ofByteArray());
+    private int startServer() throws Exception {
+        final SslContext sslContext = tlsUtils.newServerSslContextBuilder().build();
 
-        assertThat(response.statusCode()).isEqualTo(200);
-        assertThat(trustCheckThread.get())
-                .as("thread running checkClientTrusted without an executor")
-                .isNotNull()
-                .doesNotStartWith("collector-cert-verification-");
-    }
-
-    // ----- Helper methods -----
-
-    private int startHttpServer() throws Exception {
-        // InsecureTrustManagerFactory accepts any client cert. ClientAuth.REQUIRE
-        // still enforces that a cert MUST be presented.
-        final SslContext sslContext = SslContextBuilder.forServer(serverKey, serverCert)
-                .sslProvider(SslProvider.JDK)
-                .clientAuth(ClientAuth.REQUIRE)
-                .trustManager(InsecureTrustManagerFactory.INSTANCE)
-                .build();
-        return startHttpServer(sslContext, null);
-    }
-
-    /**
-     * Starts the ingest server with the given SSL context. When {@code delegatedTaskExecutor} is
-     * non-null it is passed to {@code SslContext#newHandler(allocator, executor)}, so the SSLEngine's
-     * handshake delegated tasks (including the trust manager's {@code checkClientTrusted}) run on
-     * that executor instead of the Netty event loop.
-     */
-    private int startHttpServer(SslContext sslContext, Executor delegatedTaskExecutor) throws Exception {
         final ServerBootstrap bootstrap = new ServerBootstrap()
                 .group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
@@ -401,10 +325,7 @@ class CollectorIngestMtlsIT {
                     @Override
                     protected void initChannel(SocketChannel ch) {
                         final ChannelPipeline pipeline = ch.pipeline();
-                        final SslHandler sslHandler = delegatedTaskExecutor == null
-                                ? sslContext.newHandler(ch.alloc())
-                                : sslContext.newHandler(ch.alloc(), delegatedTaskExecutor);
-                        pipeline.addLast("ssl", sslHandler);
+                        pipeline.addLast("ssl", sslContext.newHandler(ch.alloc()));
                         pipeline.addLast("agent-cert-handler", new AgentCertChannelHandler());
                         pipeline.addLast("http-codec", new HttpServerCodec());
                         pipeline.addLast("http-aggregator", new HttpObjectAggregator(1024 * 1024));
@@ -412,37 +333,36 @@ class CollectorIngestMtlsIT {
                     }
                 });
 
-        httpServerChannel = bootstrap.bind("127.0.0.1", 0).sync().channel();
-        return ((InetSocketAddress) httpServerChannel.localAddress()).getPort();
+        serverChannel = bootstrap.bind("127.0.0.1", 0).sync().channel();
+        return ((InetSocketAddress) serverChannel.localAddress()).getPort();
     }
 
-    /**
-     * A server SSL context whose trust manager records the thread that runs {@code checkClientTrusted}
-     * (and otherwise accepts any client cert), used to verify handshake-task offloading.
-     */
-    private SslContext recordingTrustManagerServerContext(AtomicReference<String> trustCheckThread) throws SSLException {
-        return SslContextBuilder.forServer(serverKey, serverCert)
-                .sslProvider(SslProvider.JDK)
-                .clientAuth(ClientAuth.REQUIRE)
-                .trustManager(new RecordingTrustManagerFactory(trustCheckThread))
-                .build();
+    private HttpResponse<byte[]> postLogs(HttpClient client, int port) throws Exception {
+        final ExportLogsServiceRequest request = createTestRequest();
+        return client.send(
+                HttpRequest.newBuilder()
+                        .uri(URI.create("https://127.0.0.1:" + port + "/v1/logs"))
+                        .header("Content-Type", "application/x-protobuf")
+                        .POST(HttpRequest.BodyPublishers.ofByteArray(request.toByteArray()))
+                        .build(),
+                HttpResponse.BodyHandlers.ofByteArray());
     }
 
-    /**
-     * Creates a Java HttpClient with mTLS using a custom KeyManager and trust-all TrustManager.
-     * <p>
-     * The custom {@link SimpleKeyManager} avoids PKCS12 keystore chain validation issues
-     * with Ed25519 certs (JDK's {@code KeyStore.setKeyEntry()} rejects Ed25519 cert chains).
-     */
-    private HttpClient createHttpClient(PrivateKey clientKey, X509Certificate clientCert) throws Exception {
-        final X509ExtendedKeyManager km = new SimpleKeyManager(clientKey, clientCert, caCert);
+    private CollectorJournal.Record capturedJournalRecord() throws Exception {
+        final ArgumentCaptor<RawMessage> captor = ArgumentCaptor.forClass(RawMessage.class);
+        verify(input).processRawMessage(captor.capture());
+        return CollectorJournal.Record.parseFrom(captor.getValue().getPayload());
+    }
 
+    private HttpClient createMtlsClient(PrivateKey clientKey, X509Certificate clientCert) throws Exception {
+        return createMtlsClient(clientKey, clientCert, signingCert);
+    }
+
+    private HttpClient createMtlsClient(PrivateKey clientKey, X509Certificate clientCert, X509Certificate issuerCert) throws Exception {
+        final X509ExtendedKeyManager km = new SimpleKeyManager(clientKey, clientCert, issuerCert);
         final SSLContext sslContext = SSLContext.getInstance("TLS");
         sslContext.init(new KeyManager[]{km}, new TrustManager[]{new TrustAllManager()}, null);
-
-        return HttpClient.newBuilder()
-                .sslContext(sslContext)
-                .build();
+        return HttpClient.newBuilder().sslContext(sslContext).build();
     }
 
     private ExportLogsServiceRequest createTestRequest() {
@@ -452,14 +372,28 @@ class CollectorIngestMtlsIT {
                                 .addLogRecords(LogRecord.newBuilder()
                                         .setBody(AnyValue.newBuilder().setStringValue("test log message"))
                                         .setTimeUnixNano(System.nanoTime())
-                                        .setSeverityText("INFO")
-                                )))
+                                        .setSeverityText("INFO"))))
                 .build();
     }
 
     /**
-     * A simple X509ExtendedKeyManager that returns a fixed client cert and key.
-     * This avoids the PKCS12 keystore chain validation that fails for Ed25519 certs.
+     * Mints an Ed25519 client (clientAuth) end-entity certificate with the given CN, signed by the given
+     * issuer, using the production {@link CertificateBuilder}.
+     */
+    private AgentCert mintClientCert(String cn, CertificateEntry issuer) throws Exception {
+        final CertificateEntry entry = certBuilder.createEndEntityCert(
+                cn, issuer, KeyUsage.digitalSignature, KeyPurposeId.id_kp_clientAuth, CERT_VALIDITY);
+        return new AgentCert(
+                PemUtils.parsePrivateKey(encryptedValueService.decrypt(entry.privateKey())),
+                PemUtils.parseCertificate(entry.certificate()),
+                entry);
+    }
+
+    private record AgentCert(PrivateKey key, X509Certificate cert, CertificateEntry entry) {}
+
+    /**
+     * A simple {@link X509ExtendedKeyManager} that returns a fixed client cert and key. This avoids the
+     * PKCS12 keystore chain validation that fails for Ed25519 certs.
      */
     private static class SimpleKeyManager extends X509ExtendedKeyManager {
         private final PrivateKey privateKey;
@@ -507,89 +441,31 @@ class CollectorIngestMtlsIT {
     }
 
     /**
-     * A TrustManager that accepts all certificates. Used only in tests to bypass
-     * client-side server cert validation. Server-side mTLS validation (the focus
-     * of these tests) is unaffected.
+     * Trust manager that accepts all server certificates and skips hostname verification.
+     * <p>
+     * Must extend {@link X509ExtendedTrustManager} (not just {@link javax.net.ssl.X509TrustManager})
+     * because the JDK wraps a plain X509TrustManager in AbstractTrustManagerWrapper which adds
+     * hostname/IP identity checks; X509ExtendedTrustManager is used directly, bypassing the wrapper.
      */
-    private static class TrustAllManager implements X509TrustManager {
+    private static class TrustAllManager extends X509ExtendedTrustManager {
         @Override
         public void checkClientTrusted(X509Certificate[] chain, String authType) {
-            // Accept all
         }
 
         @Override
         public void checkServerTrusted(X509Certificate[] chain, String authType) {
-            // Accept all
-        }
-
-        @Override
-        public X509Certificate[] getAcceptedIssuers() {
-            return new X509Certificate[0];
-        }
-    }
-
-    /**
-     * A {@link SimpleTrustManagerFactory} that supplies a {@link RecordingTrustManager}.
-     */
-    private static class RecordingTrustManagerFactory extends SimpleTrustManagerFactory {
-        private final TrustManager trustManager;
-
-        RecordingTrustManagerFactory(AtomicReference<String> trustCheckThread) {
-            this.trustManager = new RecordingTrustManager(trustCheckThread);
-        }
-
-        @Override
-        protected void engineInit(KeyStore keyStore) {
-        }
-
-        @Override
-        protected void engineInit(ManagerFactoryParameters managerFactoryParameters) {
-        }
-
-        @Override
-        protected TrustManager[] engineGetTrustManagers() {
-            return new TrustManager[]{trustManager};
-        }
-    }
-
-    /**
-     * An {@link X509ExtendedTrustManager} that records the name of the thread on which
-     * {@code checkClientTrusted} runs, then accepts the certificate. Extends the "Extended"
-     * variant so Netty does not wrap it in the endpoint-identification adapter (same reason
-     * as the production {@code CollectorCaTrustManager}).
-     */
-    private static class RecordingTrustManager extends X509ExtendedTrustManager {
-        private final AtomicReference<String> trustCheckThread;
-
-        RecordingTrustManager(AtomicReference<String> trustCheckThread) {
-            this.trustCheckThread = trustCheckThread;
-        }
-
-        private void record() {
-            trustCheckThread.compareAndSet(null, Thread.currentThread().getName());
-        }
-
-        @Override
-        public void checkClientTrusted(X509Certificate[] chain, String authType) {
-            record();
         }
 
         @Override
         public void checkClientTrusted(X509Certificate[] chain, String authType, Socket socket) {
-            record();
-        }
-
-        @Override
-        public void checkClientTrusted(X509Certificate[] chain, String authType, SSLEngine engine) {
-            record();
-        }
-
-        @Override
-        public void checkServerTrusted(X509Certificate[] chain, String authType) {
         }
 
         @Override
         public void checkServerTrusted(X509Certificate[] chain, String authType, Socket socket) {
+        }
+
+        @Override
+        public void checkClientTrusted(X509Certificate[] chain, String authType, SSLEngine engine) {
         }
 
         @Override
