@@ -21,7 +21,6 @@ import { render, screen } from 'wrappedTestingLibrary';
 import { defaultUser } from 'defaultMockValues';
 
 import { asMock } from 'helpers/mocking';
-import mockAction from 'helpers/mocking/MockAction';
 import mockComponent from 'helpers/mocking/MockComponent';
 import { simpleEventDefinition as mockEventDefinition } from 'fixtures/eventDefinition';
 import { adminUser } from 'fixtures/users';
@@ -45,17 +44,15 @@ jest.mock('react-router-dom', () => ({
   })),
 }));
 
-jest.mock('stores/event-definitions/EventDefinitionsStore', () => ({
-  EventDefinitionsActions: {
-    get: mockAction(
-      jest.fn(() =>
-        Promise.resolve({
-          event_definition: mockEventDefinition,
-          context: { scheduler: { is_scheduled: true } },
-        }),
-      ),
-    ),
-  },
+jest.mock('components/event-definitions/hooks/useEventDefinitions', () => ({
+  ...jest.requireActual('components/event-definitions/hooks/useEventDefinitions'),
+  getEventDefinition: jest.fn(() =>
+    Promise.resolve({
+      eventDefinition: mockEventDefinition,
+      context: { scheduler: { is_scheduled: true } },
+      is_mutable: true,
+    }),
+  ),
 }));
 
 jest.mock('hooks/useScopePermissions', () => jest.fn());

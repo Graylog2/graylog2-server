@@ -36,6 +36,8 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.resources.entities.Slice;
 import org.graylog2.streams.StreamService;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,7 +132,7 @@ public class MoreSearch {
 
         final var effectiveTimeRange = AbsoluteRange.create(parameters.timerange().getFrom(), parameters.timerange().getTo());
         if (affectedIndices == null || affectedIndices.isEmpty()) {
-            return Histogram.empty();
+            return Histogram.empty(effectiveTimeRange);
         }
         return moreSearchAdapter.eventHistogram(queryString, effectiveTimeRange, affectedIndices, eventStreams,
                 filterString, sourceStreamFilter, timeZone, parameters.filter().extraFilters());
@@ -342,9 +344,13 @@ public class MoreSearch {
         }
     }
 
-    public record Histogram(EventsBuckets buckets) {
+    public record Histogram(EventsBuckets buckets, AbsoluteRange effectiveTimerange) {
         public static Histogram empty() {
-            return new Histogram(new EventsBuckets(List.of(), List.of()));
+            return empty(AbsoluteRange.create(new DateTime(0, DateTimeZone.UTC), new DateTime(0, DateTimeZone.UTC)));
+        }
+
+        public static Histogram empty(AbsoluteRange effectiveTimerange) {
+            return new Histogram(new EventsBuckets(List.of(), List.of()), effectiveTimerange);
         }
 
         public record EventsBuckets(List<Bucket> events, List<Bucket> alerts) {}

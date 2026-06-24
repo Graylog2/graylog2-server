@@ -51,6 +51,7 @@ import java.io.InputStream;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -153,10 +154,14 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
 
     public <RemoteInterfaceType, RemoteResponseType> Map<String, RemoteResponseType> remoteInterface(String nodeSelector, Class<RemoteInterfaceType> interfaceClass, Function<RemoteInterfaceType, Call<RemoteResponseType>> function) {
         final Collection<DataNodeDto> hosts = resolveHosts(nodeSelector);
-        return hosts.stream()
+        // synchronizedMap on HashMap so we can safely insert null values from parallel threads.
+        // null is the expected body for void-typed Retrofit calls (Call<Void>) and 204 No Content responses;
+        // we still want the entry in the result map to signal that the host responded successfully.
+        final Map<String, RemoteResponseType> result = Collections.synchronizedMap(new HashMap<>());
+        hosts.stream()
                 .filter(n -> Objects.nonNull(n.getRestApiAddress()))
                 .parallel()
-                .collect(Collectors.toMap(NodeDto::getHostname, n -> {
+                .forEach(n -> {
                     final Retrofit retrofit = new Retrofit.Builder()
                             .baseUrl(StringUtils.removeEnd(n.getRestApiAddress(), "/"))
                             .addConverterFactory(JacksonConverterFactory.create(objectMapper))
@@ -168,15 +173,16 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
                             .build();
                     try {
                         final retrofit2.Response<RemoteResponseType> response = function.apply(retrofit.create(interfaceClass)).execute();
-                        if (response.isSuccessful() && response.body() != null) { // TODO: this causes exceptions when the remote if returns no body but ok state!
-                            return response.body();
+                        if (response.isSuccessful()) {
+                            result.put(n.getHostname(), response.body());
                         } else {
                             throw new IllegalStateException("Failed to trigger datanode request. Code: " + response.code() + ", message: " + response.message());
                         }
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                }));
+                });
+        return Collections.unmodifiableMap(new HashMap<>(result));
     }
 
     private Collection<DataNodeDto> resolveHosts(String nodeSelector) {
@@ -185,7 +191,7 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
         } else {
             return datanodeResolver.findByHostname(nodeSelector)
                     .map(Collections::singleton)
-                    .orElseThrow(() -> new IllegalStateException("No datanode found matching name " + nodeSelector));
+                    .orElseThrow(() -> new DatanodeNotFoundException("No datanode found matching name " + nodeSelector));
         }
     }
 

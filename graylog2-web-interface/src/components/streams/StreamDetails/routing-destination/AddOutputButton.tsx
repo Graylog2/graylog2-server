@@ -20,7 +20,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import styled, { css } from 'styled-components';
 
 import { Modal, BootstrapModalWrapper, Button, SegmentedControl } from 'components/bootstrap';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import CreateOutputDropdown from 'components/outputs/CreateOutputDropdown';
 import AssignOutputDropdown from 'components/outputs/AssignOutputDropdown';
 import type { Output } from 'hooks/useOutputs';
