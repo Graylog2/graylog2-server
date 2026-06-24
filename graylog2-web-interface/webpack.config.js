@@ -29,7 +29,6 @@ const ROOT_PATH = path.resolve(__dirname);
 const APP_PATH = path.resolve(ROOT_PATH, 'src');
 const BUILD_PATH = path.resolve(ROOT_PATH, 'target/web/build');
 const TARGET = process.env.npm_lifecycle_event || 'build';
-process.env.BABEL_ENV = TARGET;
 
 const coreConfig = core.config(TARGET, APP_PATH, ROOT_PATH, ROOT_PATH, supportedBrowsers);
 
