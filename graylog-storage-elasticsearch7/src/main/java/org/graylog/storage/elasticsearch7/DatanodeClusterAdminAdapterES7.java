@@ -16,11 +16,11 @@
  */
 package org.graylog.storage.elasticsearch7;
 
-import org.graylog.plugins.datanode.DatanodeUpgradeServiceAdapter;
+import org.graylog.plugins.datanode.DatanodeClusterAdminAdapter;
 import org.graylog.plugins.datanode.dto.ClusterState;
 import org.graylog.plugins.datanode.dto.FlushResponse;
 
-public class DatanodeUpgradeServiceAdapterES7 implements DatanodeUpgradeServiceAdapter {
+public class DatanodeClusterAdminAdapterES7 implements DatanodeClusterAdminAdapter {
     @Override
     public ClusterState getClusterState() {
         throw new UnsupportedOperationException("Not supported for elasticsearch.");

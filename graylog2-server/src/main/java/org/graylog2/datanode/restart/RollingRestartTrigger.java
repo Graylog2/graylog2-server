@@ -14,13 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.datanode;
+package org.graylog2.datanode.restart;
 
-import org.graylog.plugins.datanode.dto.ClusterState;
-import org.graylog.plugins.datanode.dto.FlushResponse;
-
-public interface DatanodeUpgradeServiceAdapter {
-    ClusterState getClusterState();
-    FlushResponse disableShardReplication();
-    FlushResponse enableShardReplication();
+public enum RollingRestartTrigger {
+    PROCEED,
+    MORE_NODES,
+    NO_MORE_NODES,
+    NODE_LEFT,
+    NODE_JOINED,
+    CLUSTER_GREEN,
+    GREEN_TIMEOUT,
+    ABORT,
+    RESUME,
+    ERROR
 }

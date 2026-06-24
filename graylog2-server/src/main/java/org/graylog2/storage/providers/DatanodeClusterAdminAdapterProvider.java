@@ -18,16 +18,16 @@ package org.graylog2.storage.providers;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
-import org.graylog.plugins.datanode.DatanodeUpgradeServiceAdapter;
+import org.graylog.plugins.datanode.DatanodeClusterAdminAdapter;
 import org.graylog2.storage.DetectedSearchVersion;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.storage.VersionAwareProvider;
 
 import java.util.Map;
 
-public class DatanodeUpgradeAdapterProvider extends VersionAwareProvider<DatanodeUpgradeServiceAdapter> {
+public class DatanodeClusterAdminAdapterProvider extends VersionAwareProvider<DatanodeClusterAdminAdapter> {
     @Inject
-    public DatanodeUpgradeAdapterProvider(@DetectedSearchVersion SearchVersion indexerVersion, Map<SearchVersion, Provider<DatanodeUpgradeServiceAdapter>> pluginBindings) {
+    public DatanodeClusterAdminAdapterProvider(@DetectedSearchVersion SearchVersion indexerVersion, Map<SearchVersion, Provider<DatanodeClusterAdminAdapter>> pluginBindings) {
         super(indexerVersion, pluginBindings);
     }
 }
