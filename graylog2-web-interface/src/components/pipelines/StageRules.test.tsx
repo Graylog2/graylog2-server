@@ -20,7 +20,8 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import StageRules from 'components/pipelines/StageRules';
 import type { PipelineType, StageType } from 'components/pipelines/types';
-import type { RuleType } from 'stores/rules/RulesStore';
+import type { RuleType } from 'components/rules/hooks/useRules';
+import type { ProcessingLoadResponse } from 'components/pipelines/processing-load';
 
 jest.mock('components/metrics', () => ({
   MetricContainer: ({ children, name }: { children: React.ReactNode; name: string }) => (
@@ -263,8 +264,8 @@ describe('StageRules', () => {
     expect(screen.queryByRole('button', { name: /Remove .* Rule/ })).not.toBeInTheDocument();
   });
 
-  describe('Pipeline Load column', () => {
-    const baseProcessingLoad = {
+  describe('Rule Load column', () => {
+    const baseProcessingLoad: ProcessingLoadResponse = {
       available: true,
       total_cost_microseconds_per_second: 100,
       pipelines: [],
@@ -292,7 +293,7 @@ describe('StageRules', () => {
         <StageRules pipeline={mockPipeline} stage={mockStage} rules={mockRules} processingLoad={baseProcessingLoad} />,
       );
 
-      expect(screen.queryByText('Pipeline Load (15m)')).not.toBeInTheDocument();
+      expect(screen.queryByText('Rule Load (15m)')).not.toBeInTheDocument();
       expect(screen.queryByText('60.42%')).not.toBeInTheDocument();
     });
 
@@ -307,7 +308,7 @@ describe('StageRules', () => {
         />,
       );
 
-      expect(screen.getByText('Pipeline Load (15m)')).toBeInTheDocument();
+      expect(screen.getByText('Rule Load (15m)')).toBeInTheDocument();
       expect(screen.getByText('60.42%')).toBeInTheDocument();
       expect(screen.getByText('0.00%')).toBeInTheDocument();
     });

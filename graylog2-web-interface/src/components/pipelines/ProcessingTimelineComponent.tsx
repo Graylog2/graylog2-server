@@ -14,12 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { DataTable, Spinner, PaginatedList, SearchForm, QueryHelper } from 'components/common';
-import type { Stream } from 'stores/streams/StreamsStore';
-import StreamsStore from 'stores/streams/StreamsStore';
+import useAllStreams from 'components/streams/hooks/useAllStreams';
 import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import usePipelineConnections from 'hooks/usePipelineConnections';
@@ -63,7 +62,7 @@ const ProcessingTimelineComponent = () => {
   const { data: connections } = usePipelineConnections();
   const { page, pageSize: perPage, resetPage, setPagination } = usePaginationQueryParameter();
   const [query, setQuery] = useState('');
-  const [streams, setStreams] = useState<Stream[] | undefined>();
+  const { data: streams } = useAllStreams();
   const { deletePipeline } = usePipelineMutations();
   const { data: paginatedPipelinesData, isInitialLoading: isLoadingPipelines } = usePipelinesPaginated({
     page,
@@ -71,10 +70,6 @@ const ProcessingTimelineComponent = () => {
     query,
   });
   const { pipelines, total } = paginatedPipelinesData;
-
-  useEffect(() => {
-    StreamsStore.listStreams().then(setStreams);
-  }, []);
 
   const isLoading = !pipelines || !streams || !connections;
 
@@ -140,7 +135,6 @@ const ProcessingTimelineComponent = () => {
       <StyledPaginatedList totalItems={total}>
         <DataTable
           id="processing-timeline"
-          className="table-hover"
           headers={headers}
           headerCellFormatter={_headerCellFormatter}
           rows={pipelines}

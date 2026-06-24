@@ -108,7 +108,6 @@ class NotificationList extends React.Component<
       <>
         <DataTable
           id="event-definition-notifications"
-          className="table-striped table-hover"
           headers={['Notification', 'Type', 'Actions']}
           sortByKey="title"
           rows={definitionNotifications}

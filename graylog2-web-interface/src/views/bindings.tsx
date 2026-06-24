@@ -90,6 +90,8 @@ import {
 import ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
+import NetworkVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NetworkVisualizationConfig';
+import NetworkGraphVisualization from 'views/components/visualizations/network/NetworkGraphVisualization';
 import visualizationBindings from 'views/components/visualizations/bindings';
 import { AggregationWizard } from 'views/components/aggregationwizard';
 import { filterCloudValueActions } from 'util/conditional/filterValueActions';
@@ -150,6 +152,7 @@ VisualizationConfig.registerSubtype(NumberVisualization.type, NumberVisualizatio
 VisualizationConfig.registerSubtype(LineVisualization.type, LineVisualizationConfig);
 VisualizationConfig.registerSubtype(AreaVisualization.type, AreaVisualizationConfig);
 VisualizationConfig.registerSubtype(HeatmapVisualization.type, HeatmapVisualizationConfig);
+VisualizationConfig.registerSubtype(NetworkGraphVisualization.type, NetworkVisualizationConfig);
 VisualizationConfig.registerSubtype(DataTable.type, DataTableVisualizationConfig);
 VisualizationConfig.registerSubtype(ScatterVisualization.type, ScatterVisualizationConfig);
 

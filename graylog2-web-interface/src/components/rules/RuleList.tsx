@@ -17,7 +17,7 @@
 import React from 'react';
 
 import { DataTable } from 'components/common';
-import type { RuleType, RulesContext } from 'stores/rules/RulesStore';
+import type { RuleType, RulesContext } from 'components/rules/hooks/useRules';
 import { useProcessingLoadContext, type ProcessingLoadResponse } from 'components/pipelines/processing-load';
 
 import RuleListEntry from './RuleListEntry';
@@ -63,7 +63,7 @@ const RuleList = ({
     'Actions',
   ];
 
-  const ruleInfoFormatter = (rule) => (
+  const ruleInfoFormatter = (rule: RuleType) => (
     <RuleListEntry
       key={rule.id}
       rule={rule}
@@ -78,7 +78,6 @@ const RuleList = ({
   return (
     <DataTable
       id="rule-list"
-      className="table-hover"
       headers={headers}
       headerCellFormatter={headerCellFormatter}
       sortByKey="title"
