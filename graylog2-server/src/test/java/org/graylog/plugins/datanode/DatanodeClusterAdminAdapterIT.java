@@ -37,43 +37,43 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-public abstract class DatanodeUpgradeServiceAdapterIT {
+public abstract class DatanodeClusterAdminAdapterIT {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DatanodeUpgradeServiceAdapterIT.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatanodeClusterAdminAdapterIT.class);
 
-    private DatanodeUpgradeServiceAdapter upgradeAdapter;
+    private DatanodeClusterAdminAdapter clusterAdmin;
 
     @BeforeEach
     void setUp() throws ExecutionException, RetryException {
-        upgradeAdapter = createAdapter();
-        waitForGreenClusterState(upgradeAdapter);
+        clusterAdmin = createAdapter();
+        waitForGreenClusterState(clusterAdmin);
     }
 
-    protected abstract DatanodeUpgradeServiceAdapter createAdapter();
+    protected abstract DatanodeClusterAdminAdapter createAdapter();
 
     protected abstract Version indexerVersion();
 
 
     @Test
     void testUpgradeOperations() {
-        Assertions.assertThat(upgradeAdapter.getClusterState())
+        Assertions.assertThat(clusterAdmin.getClusterState())
                 .satisfies(expectedReplicationStatus(ShardReplication.ALL))
                 .satisfies(nodeDetails(indexerVersion()));
 
-        Assertions.assertThat(upgradeAdapter.disableShardReplication())
+        Assertions.assertThat(clusterAdmin.disableShardReplication())
                 .satisfies(this::successfulFlush);
 
-        Assertions.assertThat(upgradeAdapter.getClusterState())
+        Assertions.assertThat(clusterAdmin.getClusterState())
                 .satisfies(expectedReplicationStatus(ShardReplication.PRIMARIES));
 
-        Assertions.assertThat(upgradeAdapter.enableShardReplication())
+        Assertions.assertThat(clusterAdmin.enableShardReplication())
                 .satisfies(this::successfulFlush);
 
-        Assertions.assertThat(upgradeAdapter.getClusterState())
+        Assertions.assertThat(clusterAdmin.getClusterState())
                 .satisfies(expectedReplicationStatus(ShardReplication.ALL));
     }
 
-    private void waitForGreenClusterState(DatanodeUpgradeServiceAdapter upgradeAdapter) throws ExecutionException, RetryException {
+    private void waitForGreenClusterState(DatanodeClusterAdminAdapter clusterAdmin) throws ExecutionException, RetryException {
         RetryerBuilder.<HealthStatus>newBuilder()
                 .retryIfResult(status -> status != HealthStatus.Green)
                 .withStopStrategy(StopStrategies.stopAfterDelay(1, TimeUnit.MINUTES))
@@ -85,7 +85,7 @@ public abstract class DatanodeUpgradeServiceAdapterIT {
                     }
                 })
                 .build()
-                .call(() -> upgradeAdapter.getClusterState().status());
+                .call(() -> clusterAdmin.getClusterState().status());
     }
 
     private Consumer<ClusterState> nodeDetails(Version version) {

@@ -18,7 +18,6 @@
 // eslint-disable-next-line no-restricted-imports
 import {
   /* 👇 no custom theme colors needed 👇 */
-  Clearfix,
   Collapse,
   Dropdown,
   Form,
@@ -26,4 +25,4 @@ import {
   /* 👆 no custom theme colors needed 👆 */
 } from 'react-bootstrap';
 
-export { Clearfix, Collapse, Dropdown, Form, PanelGroup };
+export { Collapse, Dropdown, Form, PanelGroup };
