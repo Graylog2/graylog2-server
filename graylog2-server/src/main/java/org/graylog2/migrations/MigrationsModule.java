@@ -86,5 +86,6 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20251103123300_MigrateEntityListPreferences.class);
         addMigration(V20260416120000_RemoveStrayFieldsFromInputs.class);
         addMigration(V20260428120000_AddLayoutVariantToEntityListPreferencesId.class);
+        addMigration(V20260624153204_InitializeOnboardingState.class);
     }
 }
