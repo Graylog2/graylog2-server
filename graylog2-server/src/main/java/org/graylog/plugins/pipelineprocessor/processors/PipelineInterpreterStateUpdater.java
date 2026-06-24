@@ -33,6 +33,7 @@ import org.graylog2.rest.resources.system.inputs.InputDeletedEvent;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
@@ -47,6 +48,9 @@ public class PipelineInterpreterStateUpdater {
      * non-null if the update has successfully loaded a state
      */
     private final AtomicReference<PipelineInterpreter.State> latestState = new AtomicReference<>();
+    // True when a reload is queued on the scheduler but has not yet started executing.
+    // Coalesces bursts of change events (and retries) into a single pending reload.
+    private final AtomicBoolean reloadScheduled = new AtomicBoolean(false);
     private final PipelineMetricRegistry pipelineMetricRegistry;
 
     @Inject
@@ -71,12 +75,20 @@ public class PipelineInterpreterStateUpdater {
     // rebuilds its own in-memory state. On a transient failure we retry on the local scheduler so we never
     // get stuck on stale state, and we route the result through updateState() to apply the empty-state guard.
     private synchronized void reloadAndSave() {
+        // Clear the pending flag *before* reading from MongoDB. Any change committed and signalled after
+        // this point will re-arm the flag (via scheduleReload) and queue a fresh reload, so we never miss
+        // an update that became visible during the rebuild.
+        reloadScheduled.set(false);
         try {
             final PipelineInterpreter.State newState = stateBuilder.buildState(pipelineMetricRegistry);
             updateState(newState);
         } catch (Exception e) {
             log.warn("Failed to reload pipeline interpreter state, retrying in 1 second", e);
-            scheduler.schedule(this::reloadAndSave, 1, TimeUnit.SECONDS);
+            // Re-arm so a concurrent scheduleReload() does not also queue a reload. If an event already
+            // armed the flag and scheduled an immediate reload, skip the retry — that reload will retry for us.
+            if (reloadScheduled.compareAndSet(false, true)) {
+                scheduler.schedule(this::reloadAndSave, 1, TimeUnit.SECONDS);
+            }
         }
     }
 
@@ -113,7 +125,10 @@ public class PipelineInterpreterStateUpdater {
     }
 
     private void scheduleReload() {
-        scheduler.schedule(this::reloadAndSave, 0, TimeUnit.SECONDS);
+        // Coalesce: only queue a reload if one is not already pending.
+        if (reloadScheduled.compareAndSet(false, true)) {
+            scheduler.schedule(this::reloadAndSave, 0, TimeUnit.SECONDS);
+        }
     }
 
     // TODO avoid reloading everything on every change, certain changes can get away with doing less work
