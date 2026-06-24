@@ -14,13 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.datanode;
+package org.graylog2.rest.resources.datanodes;
 
-import org.graylog.plugins.datanode.dto.ClusterState;
-import org.graylog.plugins.datanode.dto.FlushResponse;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ExceptionMapper;
 
-public interface DatanodeUpgradeServiceAdapter {
-    ClusterState getClusterState();
-    FlushResponse disableShardReplication();
-    FlushResponse enableShardReplication();
+public class DatanodeProxyExceptionMapper implements ExceptionMapper<DatanodeNotFoundException> {
+
+    @Override
+    public Response toResponse(DatanodeNotFoundException exception) {
+        return Response.status(Response.Status.SERVICE_UNAVAILABLE)
+                .entity(exception.getMessage())
+                .type(MediaType.TEXT_PLAIN_TYPE)
+                .build();
+    }
 }
