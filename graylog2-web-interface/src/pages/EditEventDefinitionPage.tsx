@@ -22,6 +22,7 @@ import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import EventDefinitionFormContainer from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
+import { normalizeStepKey } from 'components/event-definitions/event-definition-form/EventDefinitionForm';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import { isPermitted } from 'util/PermissionsMixin';
@@ -113,7 +114,7 @@ const EditEventDefinitionPage = () => {
         <Col md={12}>
           <EventDefinitionFormContainer
             action="edit"
-            initialStep={step as string}
+            initialStep={normalizeStepKey(step as string)}
             onChangeStep={updateURLStepQueryParam}
             eventDefinition={eventDefinition}
             onSubmit={goToOverview}
