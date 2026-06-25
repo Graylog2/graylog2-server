@@ -18,6 +18,7 @@ package org.graylog2.migrations;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,12 +30,15 @@ public class V20260624153204_InitializeOnboardingState extends Migration {
 
     private final boolean isFreshInstallation;
     private final ClusterConfigService clusterConfigService;
+    private final boolean featureFlagOnboardingEnabled;
 
     @Inject
     public V20260624153204_InitializeOnboardingState(@Named("isFreshInstallation") boolean isFreshInstallation,
-                                                     ClusterConfigService clusterConfigService) {
+                                                     ClusterConfigService clusterConfigService,
+                                                     FeatureFlags featureFlags) {
         this.isFreshInstallation = isFreshInstallation;
         this.clusterConfigService = clusterConfigService;
+        this.featureFlagOnboardingEnabled = featureFlags.isOn("onboarding_experience");
     }
 
     @Override
@@ -44,6 +48,11 @@ public class V20260624153204_InitializeOnboardingState extends Migration {
 
     @Override
     public void upgrade() {
+        // if feature flag is disabled, do nothing
+        if(!featureFlagOnboardingEnabled) {
+            return;
+        }
+
         if (clusterConfigService.get(MigrationCompleted.class) != null) {
             return;
         }
