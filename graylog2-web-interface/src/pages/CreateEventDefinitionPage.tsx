@@ -20,6 +20,7 @@ import { useNavigate } from 'react-router-dom';
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import EventDefinitionFormContainer from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
+import { normalizeStepKey } from 'components/event-definitions/event-definition-form/EventDefinitionForm';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import { isPermitted } from 'util/PermissionsMixin';
@@ -76,7 +77,7 @@ const CreateEventDefinitionPage = () => {
           <EventDefinitionFormContainer
             action="create"
             onEventDefinitionChange={handleEventDefinitionChange}
-            initialStep={step as string}
+            initialStep={normalizeStepKey(step as string)}
             onSubmit={goToOverview}
             onCancel={goToOverview}
           />

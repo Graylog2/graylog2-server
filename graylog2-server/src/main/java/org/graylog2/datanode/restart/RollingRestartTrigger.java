@@ -14,7 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-module.exports = {
-  // eslint-disable-next-line global-require
-  presets: [require('babel-preset-graylog')],
-};
+package org.graylog2.datanode.restart;
+
+public enum RollingRestartTrigger {
+    PROCEED,
+    MORE_NODES,
+    NO_MORE_NODES,
+    NODE_LEFT,
+    NODE_JOINED,
+    CLUSTER_GREEN,
+    GREEN_TIMEOUT,
+    ABORT,
+    RESUME,
+    ERROR
+}
