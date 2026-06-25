@@ -19,7 +19,7 @@ package org.graylog.storage.opensearch2;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
-import org.graylog.plugins.datanode.DatanodeUpgradeServiceAdapter;
+import org.graylog.plugins.datanode.DatanodeClusterAdminAdapter;
 import org.graylog.plugins.datanode.dto.ClusterState;
 import org.graylog.plugins.datanode.dto.FlushResponse;
 import org.graylog.plugins.datanode.dto.ManagerNode;
@@ -47,9 +47,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class DatanodeUpgradeServiceAdapterOS2 implements DatanodeUpgradeServiceAdapter {
+public class DatanodeClusterAdminAdapterOS2 implements DatanodeClusterAdminAdapter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DatanodeUpgradeServiceAdapterOS2.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DatanodeClusterAdminAdapterOS2.class);
 
     public static final String REPLICATION_PRIMARIES = "primaries";
     public static final String REPLICATION_ALL = "all";
@@ -57,7 +57,7 @@ public class DatanodeUpgradeServiceAdapterOS2 implements DatanodeUpgradeServiceA
     private final ObjectMapper objectMapper;
 
     @Inject
-    public DatanodeUpgradeServiceAdapterOS2(OpenSearchClient client, ObjectMapper objectMapper) {
+    public DatanodeClusterAdminAdapterOS2(OpenSearchClient client, ObjectMapper objectMapper) {
         this.client = client;
         this.objectMapper = objectMapper;
     }
