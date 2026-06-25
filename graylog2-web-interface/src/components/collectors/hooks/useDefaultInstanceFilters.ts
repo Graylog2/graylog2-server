@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo } from 'react';
 import { OrderedMap } from 'immutable';
 import moment from 'moment';
 
@@ -25,16 +24,13 @@ import { useCollectorsConfig } from './useCollectorsConfig';
 const useDefaultInstanceFilters = (): UrlQueryFilters | undefined => {
   const { data: config } = useCollectorsConfig();
 
-  return useMemo(() => {
-    if (!config?.collector_default_visibility_threshold) {
-      return undefined;
-    }
+  if (!config?.collector_default_visibility_threshold) {
+    return undefined;
+  }
 
-    const threshold = moment.duration(config.collector_default_visibility_threshold);
-    const cutoff = moment().subtract(threshold).utc().toISOString();
+  const threshold = moment.duration(config.collector_default_visibility_threshold).asSeconds();
 
-    return OrderedMap({ last_seen: [`${cutoff}><`] });
-  }, [config?.collector_default_visibility_threshold]);
+  return OrderedMap({ last_seen: [`relative@${threshold}`] });
 };
 
 export default useDefaultInstanceFilters;

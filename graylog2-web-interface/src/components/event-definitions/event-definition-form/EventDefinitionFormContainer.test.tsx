@@ -31,6 +31,7 @@ import useEventDefinitionConfigFromLocalStorage from 'components/event-definitio
 import { SYSTEM_EVENT_DEFINITION_TYPE as mockSYSTEM_EVENT_DEFINITION_TYPE } from 'components/event-definitions/constants';
 import type { PermissionsByScopeReturnType } from 'hooks/useScopePermissions';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
+import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 import fetch from 'logic/rest/FetchProvider';
 
 import EventDefinitionFormContainer from './EventDefinitionFormContainer';
@@ -121,7 +122,7 @@ const mockEntityTypes = {
   storage_handler_types: ['persist-to-streams-v1'],
 };
 
-const mockEventNotifications = [
+const mockEventNotifications: Array<EventNotification> = [
   {
     id: 'mock-notification-id',
     title: 'mock-notification-title',
@@ -149,24 +150,16 @@ const mockEventNotifications = [
   },
 ];
 
-jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
-  EventNotificationsActions: { listAll: jest.fn() },
-  EventNotificationsStore: {
-    listen: () => jest.fn(),
-    getInitialState: () => ({
-      all: mockEventNotifications,
-      allLegacyTypes: [],
-      notifications: mockEventNotifications,
-      query: '',
-      pagination: {
-        count: 1,
-        page: 1,
-        pageSize: 10,
-        total: 1,
-        grandTotal: 1,
-      },
-    }),
-  },
+jest.mock('components/event-notifications/hooks/useEventNotifications', () => ({
+  ...jest.requireActual('components/event-notifications/hooks/useEventNotifications'),
+  fetchAllEventNotifications: jest.fn(() => Promise.resolve({ notifications: mockEventNotifications })),
+  // The container reads notifications through useEventNotifications(). The hook's queryFn closes
+  // over the module-local fetchAllEventNotifications, so overriding the export above is not enough
+  // to feed it mock data; mock the hook directly with the react-query result shape it returns.
+  useEventNotifications: jest.fn(() => ({
+    data: { notifications: mockEventNotifications },
+    isLoading: false,
+  })),
 }));
 
 jest.mock('stores/configurations/ConfigurationsStore', () => ({
@@ -279,23 +272,30 @@ describe('EventDefinitionFormContainer', () => {
     expect(screen.getByText(/cannot be edited/i)).toBeVisible();
   });
 
-  it('should render Fields form enabled', async () => {
+  it('should render Additional Details form enabled', async () => {
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
 
-    const tab = await screen.findByRole('button', { name: /fields/i });
+    const tab = await screen.findByRole('button', { name: /additional details/i });
     await userEvent.click(tab);
 
     expect(screen.getByRole('button', { name: /add custom field/i })).toBeEnabled();
   });
 
-  it('Fields should not be accessible for immutable entities', async () => {
+  it('Additional Details should not be accessible for immutable entities', async () => {
     asMock(useScopePermissions).mockImplementation(() => exampleEntityScopeImmutable);
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
 
-    const tab = await screen.findByRole('button', { name: /fields/i });
+    const tab = await screen.findByRole('button', { name: /additional details/i });
     await userEvent.click(tab);
 
     expect(screen.getByText(/cannot be edited/i)).toBeVisible();
+  });
+
+  it('labels the step "Additional Details" rather than the legacy "Fields"', async () => {
+    render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
+
+    expect(await screen.findByRole('button', { name: /additional details/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^fields$/i })).not.toBeInTheDocument();
   });
 
   it('should render Notifications form enabled', async () => {

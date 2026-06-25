@@ -23,7 +23,7 @@ import type { Permission } from 'graylog-web-plugin/plugin';
 import { paginatedUsers } from 'fixtures/userOverviews';
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
-import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
+import { deleteRole, loadUsersForRole } from 'hooks/useAuthzRoles';
 import { adminUser } from 'fixtures/users';
 import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
@@ -34,11 +34,10 @@ const mockLoadUsersPromise = Promise.resolve({
   pagination: { perPage: 10, page: 1, total: 0 },
 });
 
-jest.mock('stores/roles/AuthzRolesStore', () => ({
-  AuthzRolesActions: {
-    delete: jest.fn(() => Promise.resolve()),
-    loadUsersForRole: jest.fn(() => mockLoadUsersPromise),
-  },
+jest.mock('hooks/useAuthzRoles', () => ({
+  AUTHZ_ROLES_QUERY_KEY: ['authz', 'roles'],
+  deleteRole: jest.fn(() => Promise.resolve()),
+  loadUsersForRole: jest.fn(() => mockLoadUsersPromise),
 }));
 
 jest.mock('hooks/useCurrentUser');
@@ -87,13 +86,13 @@ describe('ActionsCell', () => {
         expect(window.confirm).toHaveBeenCalledWith(`Do you really want to delete role "${customRoleName}"?`),
       );
 
-      expect(AuthzRolesActions.delete).toHaveBeenCalledWith(customRoleId, customRoleName);
+      expect(deleteRole).toHaveBeenCalledWith(customRoleId);
     });
 
     it('should display confirm dialog which includes information about assigned users', async () => {
       const confirmMessage = `Do you really want to delete role "${customRoleName}"?\n\nIt is still assigned to ${paginatedUsers.list.size} users.`;
       const mockLoadManyUsersPromise = Promise.resolve(paginatedUsers);
-      asMock(AuthzRolesActions.loadUsersForRole).mockReturnValueOnce(mockLoadManyUsersPromise);
+      asMock(loadUsersForRole).mockReturnValueOnce(mockLoadManyUsersPromise);
 
       asMock(useCurrentUser).mockReturnValue(
         adminUser
@@ -109,7 +108,7 @@ describe('ActionsCell', () => {
 
       await waitFor(() => expect(window.confirm).toHaveBeenCalledWith(confirmMessage));
 
-      expect(AuthzRolesActions.delete).toHaveBeenCalledWith(customRoleId, customRoleName);
+      expect(deleteRole).toHaveBeenCalledWith(customRoleId);
     });
 
     it('should not be possible for built in roles', () => {

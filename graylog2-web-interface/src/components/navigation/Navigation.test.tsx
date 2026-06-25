@@ -25,7 +25,7 @@ import Navigation from 'components/navigation/Navigation';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useLocation from 'routing/useLocation';
 import HotkeysProvider from 'contexts/HotkeysProvider';
-import useNotifications from 'components/notifications/useNotifications';
+import useNotificationBadgeCount from 'components/notifications/hooks/useNotificationBadgeCount';
 
 jest.mock('./ScratchpadToggle', () => mockComponent('ScratchpadToggle'));
 jest.mock('hooks/useCurrentUser');
@@ -33,9 +33,10 @@ jest.mock('routing/useLocation', () => jest.fn(() => ({ pathname: '' })));
 jest.mock('@graylog/server-api', () => ({
   SystemNotifications: {
     listNotifications: jest.fn(async () => ({ total: 0 })),
+    getPaginated: jest.fn(async () => ({ pagination: { total: 0 }, elements: [] })),
   },
 }));
-jest.mock('components/notifications/useNotifications');
+jest.mock('components/notifications/hooks/useNotificationBadgeCount');
 
 describe('Navigation', () => {
   const SUT = () => (
@@ -48,23 +49,8 @@ describe('Navigation', () => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
     asMock(useLocation).mockReturnValue({ pathname: '/' } as Location);
 
-    asMock(useNotifications).mockReturnValue({
-      data: {
-        total: 1,
-        notifications: [
-          {
-            id: 'deadbeef',
-            details: {},
-            validations: {},
-            fields: {},
-            severity: 'urgent',
-            type: 'no_input_running',
-            key: 'test',
-            timestamp: '2022-12-12T10:55:55.014Z',
-            node_id: '3fcc3889-18a3-4a0d-821c-0fd560d152e7',
-          },
-        ],
-      },
+    asMock(useNotificationBadgeCount).mockReturnValue({
+      data: 1,
       isLoading: false,
     });
   });
@@ -84,8 +70,8 @@ describe('Navigation', () => {
   });
 
   it('does not show notification badge when there are no notifications', async () => {
-    asMock(useNotifications).mockReturnValue({
-      data: { total: 0, notifications: [] },
+    asMock(useNotificationBadgeCount).mockReturnValue({
+      data: 0,
       isLoading: false,
     });
 

@@ -55,7 +55,7 @@ public abstract class IndexStatistics {
         return create(index, buildIndexStats(primaries),
                 buildIndexStats(total),
                 buildShardRoutings(shards).stream()
-                        .sorted(Comparator.comparing(ShardRouting::id).thenComparing(ShardRouting::nodeId))
+                        .sorted(Comparator.comparingInt(ShardRouting::id).thenComparing(ShardRouting::nodeId))
                         .toList());
     }
 

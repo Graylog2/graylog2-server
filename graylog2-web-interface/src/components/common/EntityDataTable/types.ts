@@ -18,6 +18,7 @@ import type * as React from 'react';
 
 import type { Attribute, Sort } from 'stores/PaginationTypes';
 import type { ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
+import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
 export type EntityBase = {
   id: string;
@@ -71,12 +72,14 @@ export type SlicingPreferences = {
   sliceColumn: string;
   sortBy: string;
   order: 'asc' | 'desc';
+  readOnly?: boolean;
 };
 
 export type SlicingPreferencesJSON = {
   slice_column: string;
   sort_by: string;
   order: 'asc' | 'desc';
+  read_only?: boolean;
 };
 
 export type TableLayoutPreferences<T = { [key: string]: unknown }> = {
@@ -84,9 +87,12 @@ export type TableLayoutPreferences<T = { [key: string]: unknown }> = {
   sort?: Sort;
   perPage?: number;
   order?: Array<string>;
-  slicing?: SlicingPreferences;
+  slicing?: SlicingPreferences | null;
   customPreferences?: T;
+  defaultFilters?: UrlQueryFilters;
 };
+
+export type TableLayoutDefaultFiltersJSON = Array<string>;
 
 export type TableLayoutPreferencesJSON<T = { [key: string]: unknown }> = {
   attributes?: ColumnPreferences;
@@ -95,9 +101,10 @@ export type TableLayoutPreferencesJSON<T = { [key: string]: unknown }> = {
     order: 'asc' | 'desc';
   };
   per_page?: number;
-  slicing?: SlicingPreferencesJSON;
+  slicing?: SlicingPreferencesJSON | null;
   custom_preferences?: T;
   order?: Array<string>;
+  filters?: TableLayoutDefaultFiltersJSON;
 };
 
 export type ExpandedSectionRenderer<Entity> = {
@@ -117,6 +124,7 @@ export type DefaultLayout = {
   entityTableId: string;
   layoutVariant?: string;
   defaultSort: Sort;
+  defaultSlicing?: SlicingPreferences;
   defaultDisplayedAttributes: Array<string>;
   defaultPageSize: number;
   defaultColumnOrder: Array<string>;

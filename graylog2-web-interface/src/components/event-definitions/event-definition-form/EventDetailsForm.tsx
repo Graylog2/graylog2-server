@@ -21,8 +21,8 @@ import upperFirst from 'lodash/upperFirst';
 import toNumber from 'lodash/toNumber';
 import toString from 'lodash/toString';
 import { useMantineTheme } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
 
+import useMediaQuery from 'util/hooks/useMediaQuery';
 import { Select } from 'components/common';
 import { Button, Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
@@ -95,10 +95,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
     data: { valid: validSecurityLicense },
   } = usePluggableLicenseCheck('/license/security');
 
-  const readOnly = useMemo(
-    () => !canEdit || isSystemEventDefinition(eventDefinition) || eventDefinition.config.type === 'sigma-v1',
-    [canEdit, eventDefinition],
-  );
+  const readOnly = useMemo(() => !canEdit || isSystemEventDefinition(eventDefinition), [canEdit, eventDefinition]);
   const showEventProcedureSummary = useMemo(
     () => !!eventDefinitionEventProcedure && !showAddEventProcedureForm && validSecurityLicense,
     [eventDefinitionEventProcedure, showAddEventProcedureForm, validSecurityLicense],

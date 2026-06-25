@@ -45,6 +45,7 @@ import org.graylog.plugins.map.config.GeoIpProcessorConfig;
 import org.graylog.plugins.netflow.NetFlowPluginModule;
 import org.graylog.plugins.pipelineprocessor.PipelineConfig;
 import org.graylog.plugins.sidecar.SidecarModule;
+import org.graylog.plugins.sidecar.common.SidecarPluginConfiguration;
 import org.graylog.plugins.views.ViewsBindings;
 import org.graylog.plugins.views.ViewsConfig;
 import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiModule;
@@ -87,6 +88,7 @@ import org.graylog2.configuration.VersionCheckConfiguration;
 import org.graylog2.contentpacks.ContentPacksModule;
 import org.graylog2.database.MongoSequenceModule;
 import org.graylog2.database.entities.ScopedEntitiesModule;
+import org.graylog2.datanode.restart.RollingRestartModule;
 import org.graylog2.datatiering.DataTieringModule;
 import org.graylog2.decorators.DecoratorBindings;
 import org.graylog2.featureflag.FeatureFlags;
@@ -158,6 +160,7 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
     private final DnsLookupAdapterConfiguration dnsLookupAdapterConfiguration = new DnsLookupAdapterConfiguration();
     private final EventDefinitionConfiguration eventDefinitionConfiguration = new EventDefinitionConfiguration();
     private final MetricsCacheConfiguration metricsCacheConfiguration = new MetricsCacheConfiguration();
+    private final SidecarPluginConfiguration sidecarPluginConfiguration = new SidecarPluginConfiguration();
 
     @Option(name = {"-l", "--local"}, description = "Run Graylog in local mode. Only interesting for Graylog developers.")
     private boolean local = false;
@@ -212,6 +215,7 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
                 new ViewsBindings(),
                 new JobSchedulerModule(),
                 new EventsModule(),
+                new RollingRestartModule(),
                 new EnterpriseModule(),
                 new GRNTypesModule(),
                 new SecurityModule(),
@@ -262,7 +266,8 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
                 contentStreamConfiguration,
                 dnsLookupAdapterConfiguration,
                 eventDefinitionConfiguration,
-                metricsCacheConfiguration);
+                metricsCacheConfiguration,
+                sidecarPluginConfiguration);
     }
 
     @Override

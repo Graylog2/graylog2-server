@@ -47,13 +47,16 @@ const mockDummyVisualization = ({
 
 jest.mock('graylog-web-plugin/plugin', () => ({
   PluginStore: {
-    exports: () => [
-      {
-        type: 'dummy',
-        displayName: 'Some Dummy Visualization',
-        component: mockDummyVisualization,
-      },
-    ],
+    exports: (key: string) =>
+      key === 'visualizationTypes'
+        ? [
+            {
+              type: 'dummy',
+              displayName: 'Some Dummy Visualization',
+              component: mockDummyVisualization,
+            },
+          ]
+        : [],
   },
 }));
 

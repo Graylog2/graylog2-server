@@ -14,21 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
+import type { Permissions } from 'graylog-web-plugin/plugin';
 
 import IfPermitted from 'components/common/IfPermitted';
 import { LinkContainer } from 'components/common';
-import Button from 'components/bootstrap/Button';
+import { Button } from 'components/bootstrap';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
 
 type Props = {
-  disabled?: boolean;
   entityKey: string;
+  disabled?: boolean;
 };
+
 const useEntityCreator = (entityKey: string) => {
   const entityCreators = usePluginEntities('entityCreators');
 
@@ -42,10 +43,18 @@ const useEntityCreator = (entityKey: string) => {
 
   return entityCreator;
 };
+
+const PermissionWrapper = ({
+  permissions = undefined,
+  children = undefined,
+}: React.PropsWithChildren<{ permissions?: Permissions }>) =>
+  permissions ? <IfPermitted permissions={permissions}>{children}</IfPermitted> : <>{children}</>;
+
 const CreateButton = ({ disabled = false, entityKey }: Props) => {
   const entityCreator = useEntityCreator(entityKey);
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
+
   const _onClick = useCallback(() => {
     const { telemetryEvent } = entityCreator;
     if (telemetryEvent) {
@@ -56,12 +65,6 @@ const CreateButton = ({ disabled = false, entityKey }: Props) => {
       });
     }
   }, [entityCreator, pathname, sendTelemetry]);
-
-  const PermissionWrapper = entityCreator?.permissions
-    ? ({ children }: React.PropsWithChildren<{}>) => (
-        <IfPermitted permissions={entityCreator.permissions}>{children}</IfPermitted>
-      )
-    : React.Fragment;
 
   return (
     <PermissionWrapper>

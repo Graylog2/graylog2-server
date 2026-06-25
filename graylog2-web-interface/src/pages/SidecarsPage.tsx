@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import { Link, DocumentTitle, PageHeader, Spinner } from 'components/common';
+import { Link, DocumentTitle, PageHeader } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -28,10 +28,9 @@ import useBasicSidecarUser from 'components/sidecars/hooks/useBasicSidecarUser';
 
 const SidecarsPage = () => {
   const currentUser = useCurrentUser();
-  const canCreateSidecarUserTokens = isPermitted(currentUser?.permissions, ['users:tokencreate:graylog-sidecar']);
-  const canReadSidecarUser = isPermitted(currentUser?.permissions, ['users:read:graylog-sidecar']);
-  const shouldFetchSidecarUser = canCreateSidecarUserTokens && canReadSidecarUser;
-  const { data: sidecarUser } = useBasicSidecarUser({ enabled: shouldFetchSidecarUser });
+  const { data: sidecarUser } = useBasicSidecarUser();
+  const canCreateSidecarUserTokens =
+    sidecarUser && isPermitted(currentUser?.permissions, [`users:tokencreate:${sidecarUser.username}`]);
 
   return (
     <DocumentTitle title="Sidecars">
@@ -44,18 +43,15 @@ const SidecarsPage = () => {
         }}>
         <span>
           Sidecars can reliably forward contents of log files or Windows EventLog from your servers.
-          {canCreateSidecarUserTokens &&
-            (sidecarUser ? (
-              <span>
-                <br />
-                Do you need an API token for a sidecar?&ensp;
-                <Link to={Routes.SYSTEM.USERS.TOKENS.edit(sidecarUser.id)}>
-                  Create or reuse a token for the <em>{sidecarUser.username}</em> user
-                </Link>
-              </span>
-            ) : (
-              <Spinner />
-            ))}
+          {canCreateSidecarUserTokens && (
+            <span>
+              <br />
+              Do you need an API token for a sidecar?&ensp;
+              <Link to={Routes.SYSTEM.USERS.TOKENS.edit(sidecarUser.id)}>
+                Create or reuse a token for the <em>{sidecarUser.username}</em> user
+              </Link>
+            </span>
+          )}
         </span>
       </PageHeader>
 
