@@ -42,9 +42,10 @@ import java.util.concurrent.TimeoutException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -172,16 +173,43 @@ class CloudCollectorIngestServiceTest {
     }
 
     @Test
-    void retriesLaunchOnMisfire() throws Exception {
+    void stopsFailedInputBeforeRetryingOnMisfire() throws Exception {
         when(configService.get()).thenReturn(Optional.of(config()));
-        // First launch fails (transient bind failure), second succeeds.
-        doThrow(new MisfireException("boom")).doNothing().when(input).launch(any(), any());
+
+        // Each attempt builds a fresh input. The first misfires (e.g. transient bind failure); the second succeeds.
+        final var firstInput = mock(CollectorIngestHttpInput.class);
+        final var secondInput = mock(CollectorIngestHttpInput.class);
+        when(httpInputFactory.create(any())).thenReturn(firstInput, secondInput);
+        doThrow(new MisfireException("boom")).when(firstInput).launch(any(), any());
 
         service.startAsync().awaitRunning();
         // awaitIdle() returns only after the whole launch attempt — including its retries — has finished.
         awaitIdle();
 
-        verify(input, times(2)).launch(eq(inputBuffer), any(InputFailureRecorder.class));
+        // The misfired input must be stopped (releasing its port and de-registering its metrics) before the next
+        // attempt launches — otherwise the re-registered metrics collide and every retry fails.
+        final var inOrder = inOrder(firstInput, secondInput);
+        inOrder.verify(firstInput).launch(eq(inputBuffer), any(InputFailureRecorder.class));
+        inOrder.verify(firstInput).stop();
+        inOrder.verify(secondInput).launch(eq(inputBuffer), any(InputFailureRecorder.class));
+
+        // The successfully launched input is left running; it is only stopped on shutdown.
+        verify(secondInput, never()).stop();
+    }
+
+    @Test
+    void doesNotRetryNonMisfireFailures() throws Exception {
+        when(configService.get()).thenReturn(Optional.of(config()));
+        // Only MisfireExceptions are retried. A non-transient failure (here a RuntimeException) must be logged and
+        // given up on — not retried forever.
+        doThrow(new RuntimeException("boom")).when(input).launch(any(), any());
+
+        service.startAsync().awaitRunning();
+        awaitIdle();
+
+        // Exactly one attempt (default verify count) — no retry. If the retry predicate caught this, the loop would
+        // never settle and awaitIdle() would time out.
+        verify(input).launch(eq(inputBuffer), any(InputFailureRecorder.class));
     }
 
     // Deterministic barrier replacing timeout()/after() waits: returns once every launch attempt submitted so far

@@ -99,7 +99,7 @@ public class CloudCollectorIngestService extends AbstractIdleService {
     }
 
     private void launch() {
-        if (this.input == null) {
+        if (input == null) {
             executorService.submit(this::reconcileIngestState);
         }
     }
@@ -138,8 +138,10 @@ public class CloudCollectorIngestService extends AbstractIdleService {
 
         try {
             retryer.call(() -> {
+                stopInput();
                 final var collectorsConfig = config.get();
-                this.input = launchInput(collectorsConfig);
+                input = createInput(collectorsConfig);
+                launchInput(input);
                 LOG.info("Collector Ingest on [{}:{}] launched successfully.", collectorsConfig.http().hostname(),
                         collectorsConfig.http().port());
                 return null;
@@ -160,19 +162,15 @@ public class CloudCollectorIngestService extends AbstractIdleService {
         if (!executorService.awaitTermination(shutdownTimeoutMs, TimeUnit.MILLISECONDS)) {
             LOG.warn("Timed out after {} ms waiting for executor to shut down.", shutdownTimeoutMs);
         }
-        if (input != null) {
-            input.stop();
-        }
+        stopInput();
     }
 
-    private CollectorIngestHttpInput launchInput(CollectorsConfig collectorsConfig) throws MisfireException {
-        final var input = createInput(collectorsConfig);
+    private void launchInput(CollectorIngestHttpInput input) throws MisfireException {
         // A failure recorder that keeps this system-managed input isolated from user-managed inputs.
         final var sideEffectFreeFailureRecorder = new InputFailureRecorder(new IOState<>(new EventBus(), input));
 
         input.initialize();
         input.launch(inputBuffer, sideEffectFreeFailureRecorder);
-        return input;
     }
 
     private CollectorIngestHttpInput createInput(CollectorsConfig collectorsConfig) {
@@ -182,6 +180,13 @@ public class CloudCollectorIngestService extends AbstractIdleService {
         input.setPersistId(ReservedInputIds.EPHEMERAL_COLLECTOR_INGEST);
         input.setTitle("Managed Collector Ingest");
         return input;
+    }
+
+    private void stopInput() {
+        if (input != null) {
+            input.stop();
+            input = null;
+        }
     }
 
     @VisibleForTesting
