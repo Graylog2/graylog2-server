@@ -240,6 +240,7 @@ declare module 'graylog-web-plugin/plugin' {
     clusterconfig: 'read';
     clusterconfigentry: 'read' | 'edit';
     clusterconfiguration: 'read';
+    clusterhealth: 'read';
     collector_fleets: 'read';
     collectors_config: 'read';
     contentpack: 'read';

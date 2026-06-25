@@ -20,6 +20,7 @@ import type { TreeNodeData } from '@mantine/core';
 import type { HealthFeature, HealthNode, HealthReport, HealthStatus } from './HealthReport.types';
 import { isHealthFeature } from './HealthReport.types';
 import { formatLeafCount } from './healthTree';
+import { getTitleOverrideFor } from './healthCheckDefinitions';
 import useHealthReport from './useHealthReport';
 
 const SYNTHETIC_ROOT_ID = 'cluster_health';
@@ -42,7 +43,7 @@ type HealthModuleState = {
 
 const toTreeData = (node: HealthNode): HealthTreeDataNode => ({
   value: node.id,
-  label: node.title,
+  label: getTitleOverrideFor(node.id) ?? node.title,
   nodeProps: {
     status: node.status,
     countSummary: formatLeafCount(node),
@@ -70,7 +71,7 @@ const buildPaths = (root: HealthNode): Record<string, string[]> => {
   const paths: Record<string, string[]> = {};
 
   const visit = (node: HealthNode, parentPath: string[] = []) => {
-    const path = [...parentPath, node.title];
+    const path = [...parentPath, getTitleOverrideFor(node.id) ?? node.title];
     paths[node.id] = path;
 
     if (isHealthFeature(node)) {

@@ -38,38 +38,38 @@ type HealthCheckDefinition = {
 };
 
 const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> = {
-  graylog: {
+  server: {
     description:
       'The Graylog application itself — receives, processes, and writes log messages between sources and the search cluster.',
   },
-  'graylog.server': {
+  'server.node': {
     description:
       'Operational health of the running Graylog server processes — whether each node is alive, reachable, and contributing to the cluster.',
     entityList: { url: Routes.SYSTEM.CLUSTER.NODES, label: 'Graylog nodes' },
   },
-  'graylog.input': {
+  'server.input': {
     description: 'Health of message ingest — whether configured inputs are open and accepting data from their sources.',
     entityList: { url: Routes.SYSTEM.INPUTS, label: 'inputs' },
   },
-  'graylog.processing': {
+  'server.processing': {
     description: 'Health of the in-flight message processing pipeline between ingest and output.',
     entityList: { url: Routes.SYSTEM.CLUSTER.NODES, label: 'Graylog nodes' },
   },
-  'graylog.output': {
+  'server.output': {
     description:
       'Health of message delivery and outputs — writing processed messages to storage, configured external destinations, and generated exports.',
   },
-  'graylog.archiving': {
+  'server.archiving': {
     description:
       'Health of long-term message archival — exporting indexed data to cold storage for retention or compliance.',
     entityList: { url: EnterpriseRoutes.ARCHIVES, label: 'archives' },
   },
-  'graylog.data_lake': {
+  'server.data_lake': {
     description:
       'Health of Data Lake storage, preview, and retrieval for log data routed to configured Data Lake backends.',
     entityList: { url: EnterpriseRoutes.DATA_LAKE, label: 'data lake backends' },
   },
-  'graylog.integrations': {
+  'server.integrations': {
     description:
       'Health of third-party integrations Graylog relies on for authentication, notifications, and external service calls.',
   },
@@ -114,7 +114,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'Open the Sidecars page to inspect each Sidecar’s status, last check-in, and configuration sync.',
     entityList: { url: Routes.SYSTEM.SIDECARS.OVERVIEW, label: 'collectors' },
   },
-  'graylog.server.storage': {
+  'server.node.storage': {
     description:
       'Disk usage on each Graylog server node, typically the partition holding the message journal and logs.',
     meaning:
@@ -126,7 +126,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
     ],
     recommendedAction: 'Open the affected node to inspect disk usage, journal size, and log retention configuration.',
   },
-  'graylog.server.cpu': {
+  'server.node.cpu': {
     description: 'Per-node CPU utilization across the Graylog server cluster.',
     meaning:
       'One or more Graylog nodes are running close to or above their CPU capacity, which can degrade message processing throughput and increase queue latency.',
@@ -138,7 +138,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
     recommendedAction:
       'Open the affected node to inspect its CPU profile, recent pipelines and extractors, and ingest rate.',
   },
-  'graylog.server.memory': {
+  'server.node.memory': {
     description: 'Per-node JVM heap utilization across the Graylog server cluster.',
     meaning:
       'JVM heap usage on one or more Graylog nodes is at a level where garbage collection pauses or out-of-memory failures become likely.',
@@ -150,7 +150,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
     recommendedAction:
       'Open the affected node to inspect heap usage, GC logs, and recent search activity. Increase JVM heap allocation if undersized.',
   },
-  'graylog.server.certificates': {
+  'server.node.certificates': {
     description: "Certificate validity for the Graylog server's TLS surfaces (HTTPS/API and TLS-enabled inputs).",
     meaning:
       'One or more certificates used by Graylog are expired, expiring soon, or could not be validated. Affected services may stop accepting connections or be removed from rotation.',
@@ -162,7 +162,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
     recommendedAction:
       'Open the affected node to verify each TLS surface (HTTPS/API and TLS-enabled inputs) and rotate certificates as needed.',
   },
-  'graylog.server.processing_state': {
+  'server.node.processing_state': {
     description: 'Whether each Graylog node is actively processing messages or has been paused/halted.',
     meaning:
       'One or more Graylog nodes have stopped processing messages. Cluster throughput may degrade and the affected nodes’ journals will start to fill.',
@@ -174,7 +174,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
     recommendedAction:
       'Open the affected node to inspect its lifecycle state, last_seen timestamp, and recent log entries.',
   },
-  'graylog.server.load_balancer': {
+  'server.node.load_balancer': {
     description:
       'Whether each Graylog node reports itself as ready to receive traffic from a load balancer (ALIVE / THROTTLED / DEAD).',
     meaning:
@@ -186,7 +186,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
     ],
     recommendedAction: 'Open the affected node to verify its lifecycle state and any manual lb_status override.',
   },
-  'graylog.input.input_buffer': {
+  'server.input.input_buffer': {
     description: 'The in-memory queue holding messages just received by inputs, before they enter processing.',
     meaning:
       'The input buffer is filling because messages arrive faster than they can be moved into processing. Once full, inputs stop accepting new messages; sources without retry or buffering may lose data.',
@@ -197,7 +197,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
     ],
     recommendedAction: 'Open the affected node to check processing state and downstream buffer / journal usage.',
   },
-  'graylog.input.input_failures': {
+  'server.input.input_failures': {
     description:
       'Configured inputs that are currently failing — not running, not accepting connections, or repeatedly crashing.',
     meaning:
@@ -209,7 +209,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
     ],
     recommendedAction: 'Open the inputs page to inspect the failed inputs and review their error messages.',
   },
-  'graylog.processing.processing_buffer': {
+  'server.processing.processing_buffer': {
     description:
       'The in-memory queue between ingest and output holding messages waiting to be processed by extractors, stream rules, and pipelines.',
     meaning:
@@ -221,7 +221,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
     ],
     recommendedAction: 'Open the affected node to inspect pipeline/extractor performance and downstream output health.',
   },
-  'graylog.processing.journal_size': {
+  'server.processing.journal_size': {
     description: 'The on-disk message journal that provides a durable buffer when processing slows down or pauses.',
     meaning:
       'The journal is filling because messages arrive faster than the node can process them, or processing has been paused. If it reaches the configured max age or size, unprocessed messages can be dropped from the journal before being written.',
@@ -233,7 +233,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
     recommendedAction:
       'Open the affected node to check processing state, downstream indexing health, and pipeline performance.',
   },
-  'graylog.output.output_buffer': {
+  'server.output.output_buffer': {
     description:
       'The in-memory queue holding processed messages waiting to be written to storage or external destinations.',
     meaning:
@@ -246,7 +246,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
     recommendedAction: 'Open the affected node and inspect search cluster health and any configured external outputs.',
     entityList: { url: Routes.SYSTEM.CLUSTER.NODES, label: 'Graylog nodes' },
   },
-  'graylog.output.report_generation': {
+  'server.output.report_generation': {
     description: 'The state of scheduled report generation jobs that produce dashboard exports and emails.',
     meaning:
       'One or more scheduled reports failed to generate or are stuck. Recipients may not receive the expected exports until the issue is resolved.',
@@ -258,7 +258,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
     recommendedAction: 'Open the reports page to inspect each failed report and review its job logs.',
     entityList: { url: EnterpriseRoutes.REPORTS, label: 'reports' },
   },
-  'graylog.archiving.archive_failures': {
+  'server.archiving.archive_failures': {
     description: 'Errors encountered while exporting indexed messages to long-term archival storage.',
     meaning:
       'One or more archive jobs failed. Messages in the affected indices have not been exported to long-term storage and may be lost when retention deletion runs.',
@@ -269,7 +269,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
     ],
     recommendedAction: 'Open the archives page to inspect failed archive jobs and the configured backend.',
   },
-  'graylog.data_lake.connectivity': {
+  'server.data_lake.connectivity': {
     description: 'The connection between Graylog and the configured Data Lake backend.',
     meaning:
       'Graylog cannot reach the configured Data Lake backend. Logs/messages destined for the Data Lake are not being delivered until connectivity is restored.',
@@ -280,7 +280,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
     ],
     recommendedAction: 'Open the Data Lake page to verify the backend configuration and connectivity.',
   },
-  'graylog.data_lake.message_drops': {
+  'server.data_lake.message_drops': {
     description:
       'Messages lost or dropped before reaching the Data Lake, typically due to backpressure or storage errors.',
     meaning:
@@ -292,7 +292,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
     ],
     recommendedAction: 'Open the Data Lake page to inspect recent write errors and the configured backend.',
   },
-  'graylog.integrations.idp_sync': {
+  'server.integrations.idp_sync': {
     description: 'Synchronization with the configured identity provider for users, groups, and role mappings.',
     meaning:
       'Synchronization with one or more configured identity providers failed. Users, groups, or role mappings may be stale or missing until sync recovers.',
@@ -305,7 +305,7 @@ const HEALTH_CHECK_DEFINITIONS: Partial<Record<string, HealthCheckDefinition>> =
       'Open the authentication services page to inspect each backend’s last sync result and configuration.',
     entityList: { url: Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW, label: 'authentication services' },
   },
-  'graylog.integrations.email_transport': {
+  'server.integrations.email_transport': {
     description: 'The configured SMTP transport used to send notifications and alerts.',
     meaning:
       'Graylog cannot deliver email through the configured SMTP transport. Notifications and report deliveries that depend on email will fail until it is restored.',
@@ -473,5 +473,47 @@ export const getEntityListFor = (id: string): HealthEntityListLink | undefined =
 
   return lastDot === -1 ? undefined : getEntityListFor(id.slice(0, lastDot));
 };
+
+// The human unit noun the count display appends ("1 of 3 nodes affected"). The backend emits only the counts, so
+// the noun is frontend-owned (Artifact A) and keyed by the `id`s the backend emits. Resolved most-specific-first,
+// falling back up the dotted id so a feature noun covers all its leaves.
+const UNIT_NOUNS: Record<string, string> = {
+  // Per-node platform checks count server nodes.
+  'server.node': 'nodes',
+  'server.input': 'nodes',
+  'server.processing': 'nodes',
+  'server.output.output_buffer': 'nodes',
+  // Cluster-level outcome / backend checks count their own units.
+  'server.output.report_generation': 'jobs',
+  'server.archiving': 'archives',
+  'server.data_lake': 'backends',
+  'server.integrations': 'integrations',
+  'search_cluster.server.state': 'checks',
+  'search_cluster.server': 'nodes',
+  'search_cluster.index_management': 'index sets',
+  mongodb: 'members',
+};
+
+export const getUnitNounFor = (id: string): string | undefined => {
+  const own = UNIT_NOUNS[id];
+
+  if (own) return own;
+
+  const lastDot = id.lastIndexOf('.');
+
+  return lastDot === -1 ? undefined : getUnitNounFor(id.slice(0, lastDot));
+};
+
+// The backend derives each title mechanically from the `id` (last segment, title-cased), which mis-cases a few
+// acronyms/brands. This frontend-owned override (Artifact A) corrects them; any id not listed falls back to the
+// backend-provided title.
+const TITLE_OVERRIDES: Record<string, string> = {
+  'server.node.cpu': 'CPU',
+  'search_cluster.server.cpu': 'CPU',
+  'server.integrations.idp_sync': 'IdP Sync',
+  mongodb: 'MongoDB',
+};
+
+export const getTitleOverrideFor = (id: string): string | undefined => TITLE_OVERRIDES[id];
 
 export default HEALTH_CHECK_DEFINITIONS;

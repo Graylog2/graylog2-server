@@ -78,7 +78,7 @@ describe('HealthModule', () => {
   it('renders the full check panel when a non-healthy leaf is selected', async () => {
     render(<HealthModule />);
 
-    await clickInTree('Graylog');
+    await clickInTree('Server');
     await clickInTree('Memory');
 
     expect(screen.getByRole('heading', { name: 'Memory' })).toBeInTheDocument();
@@ -125,9 +125,9 @@ describe('HealthModule', () => {
 
     expect(within(tree).queryByText('Memory')).not.toBeInTheDocument();
 
-    await clickInTree('Graylog');
+    await clickInTree('Server');
 
-    expect(within(tree).getByText('Server')).toBeInTheDocument();
+    expect(within(tree).getByText('Node')).toBeInTheDocument();
     expect(within(tree).getByText('Memory')).toBeInTheDocument();
   });
 
@@ -136,13 +136,13 @@ describe('HealthModule', () => {
 
     const tree = screen.getByLabelText('Cluster health tree');
 
-    await clickInTree('Graylog');
+    await clickInTree('Server');
     expect(within(tree).getByText('Memory')).toBeInTheDocument();
 
-    await clickInTree('Graylog');
+    await clickInTree('Server');
 
     expect(within(tree).queryByText('Memory')).not.toBeInTheDocument();
-    expect(within(tree).queryByText('Server')).not.toBeInTheDocument();
+    expect(within(tree).queryByText('Node')).not.toBeInTheDocument();
   });
 
   it('keeps the synthetic root expanded even when toggled', async () => {
@@ -152,7 +152,7 @@ describe('HealthModule', () => {
 
     const tree = screen.getByLabelText('Cluster health tree');
 
-    expect(within(tree).getByText('Graylog')).toBeInTheDocument();
+    expect(within(tree).getByText('Server')).toBeInTheDocument();
     expect(within(tree).getByText('MongoDB')).toBeInTheDocument();
   });
 

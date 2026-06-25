@@ -22,7 +22,7 @@ import { Badge, Nav } from 'components/bootstrap';
 import useNotificationBadgeCount from 'components/notifications/hooks/useNotificationBadgeCount';
 import { STATUS_LABELS } from 'components/health/healthStatusCopy';
 import { useHealthSummary } from 'components/health/useHealthModule';
-import useHealthModuleVisible, { HEALTH_QUERY_PARAM, HEALTH_ON_VALUE } from 'components/health/useHealthModuleVisible';
+import useHealthModuleVisible from 'components/health/useHealthModuleVisible';
 import type { HealthStatus } from 'components/health/HealthReport.types';
 import usePermissions from 'hooks/usePermissions';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
@@ -81,7 +81,7 @@ const HealthStatusBadge = () => {
 
   if (!hasEnterpriseLicense || !showHealthModule) return null;
   const statusLabel = STATUS_LABELS[overallStatus];
-  const overviewWithHealthOn = `${Routes.SYSTEM.OVERVIEW}?${HEALTH_QUERY_PARAM}=${HEALTH_ON_VALUE}`;
+  const overviewLink = Routes.SYSTEM.OVERVIEW;
   const accessibleLabel =
     notificationCount > 0
       ? `Cluster health: ${statusLabel}, ${notificationCount} system notifications`
@@ -89,7 +89,7 @@ const HealthStatusBadge = () => {
 
   return (
     <StyledNav navbar>
-      <LinkContainer to={overviewWithHealthOn}>
+      <LinkContainer to={overviewLink}>
         <StyledInactiveNavItem>
           <StyledBadge
             bsStyle={STATUS_TO_BS_STYLE[overallStatus]}
