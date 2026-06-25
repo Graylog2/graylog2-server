@@ -14,23 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch3;
+package org.graylog.storage.opensearch2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.zafarkhaja.semver.Version;
-import org.graylog.plugins.datanode.DatanodeUpgradeServiceAdapter;
-import org.graylog.plugins.datanode.DatanodeUpgradeServiceAdapterIT;
-import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
+import org.graylog.plugins.datanode.DatanodeClusterAdminAdapter;
+import org.graylog.plugins.datanode.DatanodeClusterAdminAdapterIT;
+import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
 import org.graylog.testing.elasticsearch.SearchInstance;
 
-class DatanodeUpgradeServiceAdapterOSIT extends DatanodeUpgradeServiceAdapterIT {
+class DatanodeClusterAdminAdapterOS2IT extends DatanodeClusterAdminAdapterIT {
 
     @SearchInstance
     public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
     @Override
-    protected DatanodeUpgradeServiceAdapter createAdapter() {
-        return new DatanodeUpgradeServiceAdapterOS(openSearchInstance.getOfficialOpensearchClient(), new ObjectMapper());
+    protected DatanodeClusterAdminAdapter createAdapter() {
+        return new DatanodeClusterAdminAdapterOS2(openSearchInstance.openSearchClient(), new ObjectMapper());
     }
 
     @Override
