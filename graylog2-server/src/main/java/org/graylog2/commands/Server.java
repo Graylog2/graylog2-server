@@ -88,6 +88,7 @@ import org.graylog2.configuration.VersionCheckConfiguration;
 import org.graylog2.contentpacks.ContentPacksModule;
 import org.graylog2.database.MongoSequenceModule;
 import org.graylog2.database.entities.ScopedEntitiesModule;
+import org.graylog2.datanode.restart.RollingRestartModule;
 import org.graylog2.datatiering.DataTieringModule;
 import org.graylog2.decorators.DecoratorBindings;
 import org.graylog2.featureflag.FeatureFlags;
@@ -214,6 +215,7 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
                 new ViewsBindings(),
                 new JobSchedulerModule(),
                 new EventsModule(),
+                new RollingRestartModule(),
                 new EnterpriseModule(),
                 new GRNTypesModule(),
                 new SecurityModule(),
