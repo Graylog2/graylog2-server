@@ -1117,11 +1117,11 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     }
 
     public abstract static class Recording {
-        static Timing timing(String name, long elapsedNanos) {
+        private static Timing timing(String name, long elapsedNanos) {
             return new Timing(name, elapsedNanos);
         }
 
-        public static Message.Counter counter(String name, int counter) {
+        private static Message.Counter counter(String name, int counter) {
             return new Counter(name, counter);
         }
 

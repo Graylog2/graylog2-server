@@ -59,7 +59,7 @@ const CollectorsFleets = () => {
   );
 
   const closeCreateModal = useCallback(() => {
-    history.push(Routes.SYSTEM.COLLECTORS.FLEETS);
+    history.goBack();
   }, [history]);
 
   const handleSaveFleet = async (fleet: Omit<Fleet, 'id' | 'created_at' | 'updated_at'>) => {
