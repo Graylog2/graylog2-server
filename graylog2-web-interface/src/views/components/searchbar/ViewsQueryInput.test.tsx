@@ -22,11 +22,18 @@ import QueryValidationActions from 'views/actions/QueryValidationActions';
 import { validationError } from 'fixtures/queryValidationState';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
+import asMock from 'helpers/mocking/AsMock';
+import { fetchRawQueryHistory } from 'views/components/searchbar/QueryHistoryButton';
 
 import ViewsQueryInput from './ViewsQueryInput';
 
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 jest.mock('hooks/useHotkey', () => jest.fn());
+jest.mock('views/components/searchbar/QueryHistoryButton', () => ({
+  ...jest.requireActual('views/components/searchbar/QueryHistoryButton'),
+  fetchRawQueryHistory: jest.fn(),
+  displayHistoryCompletions: jest.fn(),
+}));
 
 jest.mock('views/actions/QueryValidationActions', () => ({
   displayValidationErrors: jest.fn(),
@@ -171,6 +178,108 @@ describe('QueryInput', () => {
       await waitFor(() => {
         expect(exec).toHaveBeenCalled();
       });
+    });
+  });
+
+  describe('history navigation', () => {
+    beforeEach(() => {
+      asMock(fetchRawQueryHistory).mockResolvedValue(['query-1', 'query-2', 'query-3']);
+    });
+
+    it('replaces editor content with most recent history entry on ArrowUp', async () => {
+      const onChange = jest.fn().mockResolvedValue('');
+      render(<SimpleQueryInput onChange={onChange} />);
+
+      const queryInput = await findQueryInput();
+      queryInput.focus();
+      await userEvent.keyboard('{ArrowUp}');
+
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalledWith({ target: { value: 'query-1', name: 'search-query' } });
+      });
+    });
+
+    it('advances to the next older entry on a second ArrowUp', async () => {
+      const onChange = jest.fn().mockResolvedValue('');
+      render(<SimpleQueryInput onChange={onChange} />);
+
+      const queryInput = await findQueryInput();
+      queryInput.focus();
+      await userEvent.keyboard('{ArrowUp}');
+      await waitFor(() => expect(onChange).toHaveBeenCalledWith({ target: { value: 'query-1', name: 'search-query' } }));
+
+      await userEvent.keyboard('{ArrowUp}');
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalledWith({ target: { value: 'query-2', name: 'search-query' } });
+      });
+    });
+
+    it('moves back toward present on ArrowDown after ArrowUp', async () => {
+      const onChange = jest.fn().mockResolvedValue('');
+      render(<SimpleQueryInput onChange={onChange} />);
+
+      const queryInput = await findQueryInput();
+      queryInput.focus();
+      await userEvent.keyboard('{ArrowUp}');
+      await waitFor(() => expect(onChange).toHaveBeenCalledWith({ target: { value: 'query-1', name: 'search-query' } }));
+
+      await userEvent.keyboard('{ArrowUp}');
+      await waitFor(() => expect(onChange).toHaveBeenCalledWith({ target: { value: 'query-2', name: 'search-query' } }));
+
+      await userEvent.keyboard('{ArrowDown}');
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalledWith({ target: { value: 'query-1', name: 'search-query' } });
+      });
+    });
+
+    it('restores the original query when ArrowDown is pressed past the most recent entry', async () => {
+      const onChange = jest.fn().mockResolvedValue('');
+      render(<SimpleQueryInput value="original" onChange={onChange} />);
+
+      const queryInput = await findQueryInput();
+      queryInput.focus();
+      await userEvent.keyboard('{ArrowUp}');
+      await waitFor(() => expect(onChange).toHaveBeenCalledWith({ target: { value: 'query-1', name: 'search-query' } }));
+
+      await userEvent.keyboard('{ArrowDown}');
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalledWith({ target: { value: 'original', name: 'search-query' } });
+      });
+    });
+
+    it('does not navigate history when ArrowDown is pressed without prior ArrowUp', async () => {
+      const onChange = jest.fn().mockResolvedValue('');
+      render(<SimpleQueryInput onChange={onChange} />);
+
+      const queryInput = await findQueryInput();
+      queryInput.focus();
+      await userEvent.keyboard('{ArrowDown}');
+
+      // onChange is not called because the Down command falls through to ACE line navigation
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it('clamps at the oldest history entry and does not wrap around', async () => {
+      const onChange = jest.fn().mockResolvedValue('');
+      render(<SimpleQueryInput onChange={onChange} />);
+
+      const queryInput = await findQueryInput();
+      queryInput.focus();
+
+      // Navigate to last entry (3 entries: query-1, query-2, query-3)
+      await userEvent.keyboard('{ArrowUp}');
+      await waitFor(() => expect(onChange).toHaveBeenCalledWith({ target: { value: 'query-1', name: 'search-query' } }));
+      await userEvent.keyboard('{ArrowUp}');
+      await waitFor(() => expect(onChange).toHaveBeenCalledWith({ target: { value: 'query-2', name: 'search-query' } }));
+      await userEvent.keyboard('{ArrowUp}');
+      await waitFor(() => expect(onChange).toHaveBeenCalledWith({ target: { value: 'query-3', name: 'search-query' } }));
+
+      const callsBefore = onChange.mock.calls.length;
+
+      // One more Up should not produce another call (already at oldest)
+      await userEvent.keyboard('{ArrowUp}');
+
+      expect(onChange.mock.calls.length).toBe(callsBefore);
     });
   });
 });
