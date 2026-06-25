@@ -14,11 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useContext } from 'react';
+import * as React from 'react';
 
 import type { KeyMapper } from 'views/components/visualizations/TransformKeys';
-import KeyMapperContext from 'views/components/visualizations/KeyMapperContext';
 
-const useMapKeys = (): KeyMapper => useContext(KeyMapperContext);
+const identityMapper: KeyMapper = (key) => key;
 
-export default useMapKeys;
+const KeyMapperContext = React.createContext<KeyMapper>(identityMapper);
+
+export default KeyMapperContext;
