@@ -212,7 +212,6 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
                 new NetFlowPluginModule(),
                 new CEFInputModule(),
                 new SidecarModule(),
-                new OnboardingModule(),
                 new ContentPacksModule(),
                 new ViewsBindings(),
                 new JobSchedulerModule(),
@@ -243,6 +242,9 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
         );
 
         modules.add(new FieldTypeManagementModule());
+        if (featureFlags.isOn("onboarding_experience")) {
+            modules.add(new OnboardingModule());
+        }
 
         return modules.build();
     }
