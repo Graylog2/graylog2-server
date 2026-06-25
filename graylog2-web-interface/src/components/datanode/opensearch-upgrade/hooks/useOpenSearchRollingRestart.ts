@@ -16,6 +16,8 @@
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { DataNodeRollingRestart } from '@graylog/server-api';
+
 import FetchError from 'logic/errors/FetchError';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
@@ -23,7 +25,6 @@ import { defaultOnError } from 'util/conditional/onError';
 import extractErrorMessage from 'util/extractErrorMessage';
 import UserNotification from 'util/UserNotification';
 
-import { rollingRestartMockOverride } from '../mockRollingRestart';
 import type { RollingRestartJob } from '../rollingRestartTypes';
 import { isRollingRestartTerminalState } from '../rollingRestartTypes';
 
@@ -37,53 +38,30 @@ type RollingRestartErrorBody = {
   message?: string;
 };
 
-const fetchCurrentRollingRestart = () => fetch<RollingRestartJob | null>('GET', qualifyUrl(ROLLING_RESTART_URL));
+const fetchCurrentRollingRestart = () => DataNodeRollingRestart.current() as Promise<RollingRestartJob | null>;
 
 const startRollingRestartRequest = (force: boolean) =>
   fetch<RollingRestartJob>('POST', qualifyUrl(ROLLING_RESTART_URL), { force });
 
-const abortRollingRestartRequest = () => fetch<RollingRestartJob>('POST', qualifyUrl(`${ROLLING_RESTART_URL}/abort`));
-
-const resumeRollingRestartRequest = () => fetch<RollingRestartJob>('POST', qualifyUrl(`${ROLLING_RESTART_URL}/resume`));
-
-const fetchMockRollingRestart = () => Promise.resolve(rollingRestartMockOverride ?? null);
-
-const startMockRollingRestart = () => Promise.resolve(rollingRestartMockOverride as RollingRestartJob);
-
-const updateMockRollingRestart = (updater: (job: RollingRestartJob) => RollingRestartJob) =>
-  Promise.resolve(updater(rollingRestartMockOverride as RollingRestartJob));
-
-const abortMockRollingRestart = () =>
-  updateMockRollingRestart((job) => ({
-    ...job,
-    data: job.data ? { ...job.data, abort_requested: true } : job.data,
-  }));
-
-const resumeMockRollingRestart = () =>
-  updateMockRollingRestart((job) => ({
-    ...job,
-    data: job.data
-      ? {
-          ...job.data,
-          sm_state: 'WAITING_GREEN',
-          paused_reason: null,
-          waiting_green_since: new Date().toISOString(),
-        }
-      : job.data,
-  }));
+const resumeRollingRestartRequest = () => DataNodeRollingRestart.resume() as unknown as Promise<RollingRestartJob>;
 
 const rollingRestartErrorBody = (error: unknown): RollingRestartErrorBody | undefined =>
   error instanceof FetchError ? error.additional?.body : undefined;
 
+const isForceableFailedCheck = (failedCheck: string) => failedCheck.includes('force=true');
+
+const displayFailedCheck = (failedCheck: string) => failedCheck.replace(/\s*\(pass force=true to override\)/, '');
+
 export const rollingRestartStartError = (error: unknown) => {
   const body = rollingRestartErrorBody(error);
   const failedChecks = body?.failed_checks ?? [];
+  const displayFailedChecks = failedChecks.map(displayFailedCheck);
 
   if (failedChecks.length) {
     return {
-      canRetryWithForce: failedChecks.some((failedCheck) => failedCheck.includes('force=true')),
-      failedChecks,
-      message: failedChecks.join('\n'),
+      canRetryWithForce: failedChecks.every(isForceableFailedCheck),
+      failedChecks: displayFailedChecks,
+      message: displayFailedChecks.join('\n'),
     };
   }
 
@@ -96,23 +74,19 @@ export const rollingRestartStartError = (error: unknown) => {
 
 const useOpenSearchRollingRestart = () => {
   const queryClient = useQueryClient();
-  const isUsingMockData = !!rollingRestartMockOverride;
-  const queryKey = [...ROLLING_RESTART_QUERY_KEY, isUsingMockData];
 
-  const { data, isInitialLoading, refetch } = useQuery({
-    queryKey,
+  const { data, isInitialLoading, refetch } = useQuery<RollingRestartJob | null>({
+    queryKey: ROLLING_RESTART_QUERY_KEY,
     queryFn: () =>
-      isUsingMockData
-        ? fetchMockRollingRestart()
-        : defaultOnError(
-            fetchCurrentRollingRestart(),
-            'Loading OpenSearch rolling restart status failed',
-            'Could not load OpenSearch rolling restart status',
-          ),
+      defaultOnError(
+        fetchCurrentRollingRestart(),
+        'Loading OpenSearch rolling upgrade status failed',
+        'Could not load OpenSearch rolling upgrade status',
+      ),
     refetchInterval: (query) => {
       const rollingRestart = query.state.data;
 
-      if (isUsingMockData || isRollingRestartTerminalState(rollingRestart?.data?.sm_state)) {
+      if (isRollingRestartTerminalState(rollingRestart?.data?.sm_state)) {
         return false;
       }
 
@@ -121,13 +95,12 @@ const useOpenSearchRollingRestart = () => {
   });
 
   const { mutateAsync: startRollingRestart, isPending: isStartingRollingRestart } = useMutation({
-    mutationFn: (force: boolean = false) =>
-      isUsingMockData ? startMockRollingRestart() : startRollingRestartRequest(force),
-    onSuccess: (rollingRestart) => queryClient.setQueryData(queryKey, rollingRestart),
+    mutationFn: (force: boolean = false) => startRollingRestartRequest(force),
+    onSuccess: (rollingRestart) => queryClient.setQueryData(ROLLING_RESTART_QUERY_KEY, rollingRestart),
     onError: (error, force) => {
       const startError = rollingRestartStartError(error);
 
-      // When the failure is overridable with force, the caller shows a confirmation dialog instead —
+      // When the failure is overridable with force, the caller shows a confirmation dialog instead,
       // skip the toast to avoid signalling the same thing twice. A failed forced retry still toasts.
       if (force || !startError.canRetryWithForce) {
         UserNotification.error(startError.message, 'Could not start OpenSearch rolling upgrade');
@@ -135,21 +108,10 @@ const useOpenSearchRollingRestart = () => {
     },
   });
 
-  const { mutateAsync: abortRollingRestart, isPending: isAbortingRollingRestart } = useMutation({
-    mutationFn: () => (isUsingMockData ? abortMockRollingRestart() : abortRollingRestartRequest()),
-    onSuccess: (rollingRestart) => {
-      queryClient.setQueryData(queryKey, rollingRestart);
-      UserNotification.success('OpenSearch rolling upgrade abort was requested.');
-    },
-    onError: (error) => {
-      UserNotification.error(extractErrorMessage(error), 'Could not abort OpenSearch rolling upgrade');
-    },
-  });
-
   const { mutateAsync: resumeRollingRestart, isPending: isResumingRollingRestart } = useMutation({
-    mutationFn: () => (isUsingMockData ? resumeMockRollingRestart() : resumeRollingRestartRequest()),
+    mutationFn: resumeRollingRestartRequest,
     onSuccess: (rollingRestart) => {
-      queryClient.setQueryData(queryKey, rollingRestart);
+      queryClient.setQueryData(ROLLING_RESTART_QUERY_KEY, rollingRestart);
       UserNotification.success('OpenSearch rolling upgrade was resumed.');
     },
     onError: (error) => {
@@ -158,9 +120,7 @@ const useOpenSearchRollingRestart = () => {
   });
 
   return {
-    abortRollingRestart,
     data,
-    isAbortingRollingRestart,
     isLoading: isInitialLoading,
     isResumingRollingRestart,
     isStartingRollingRestart,

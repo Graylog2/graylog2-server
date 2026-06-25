@@ -28,12 +28,7 @@ export type OutdatedIndex = {
   system_index: boolean;
 };
 
-type Options = {
-  mockData?: Array<OutdatedIndex>;
-};
-
-const useOutdatedIndices = ({ mockData }: Options = {}) => {
-  const useMockData = !!mockData;
+const useOutdatedIndices = () => {
   const {
     data = [],
     isError,
@@ -48,13 +43,12 @@ const useOutdatedIndices = ({ mockData }: Options = {}) => {
         'Could not load outdated indices',
       ),
     retry: false,
-    enabled: !useMockData,
   });
 
   return {
-    data: mockData ?? data,
-    isError: useMockData ? false : isError,
-    isLoading: useMockData ? false : isLoading,
+    data,
+    isError,
+    isLoading,
     refetch,
   };
 };

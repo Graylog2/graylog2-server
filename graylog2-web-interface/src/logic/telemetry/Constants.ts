@@ -410,6 +410,15 @@ export const TELEMETRY_EVENT_TYPE = {
     INPLACE_STOP_MESSAGE_PROCESSING_NEXT_CLICKED: 'Datanode Migration Inplace Stop Message Processing Next Clicked',
     INPLACE_RESTART_GRAYLOG_NEXT_CLICKED: 'Datanode Migration Inplace Restart Graylog Next Clicked',
   },
+  DATANODE_OPENSEARCH_UPGRADE: {
+    ROLLING_UPGRADE_STARTED: 'Datanode OpenSearch Upgrade Rolling Upgrade Started',
+    ROLLING_UPGRADE_FORCE_STARTED: 'Datanode OpenSearch Upgrade Rolling Upgrade Force Started',
+    ROLLING_UPGRADE_RESUMED: 'Datanode OpenSearch Upgrade Rolling Upgrade Resumed',
+    APPLY_ON_NEXT_RESTART_CLICKED: 'Datanode OpenSearch Upgrade Apply On Next Restart Clicked',
+    INDEX_DELETE_CONFIRMED: 'Datanode OpenSearch Upgrade Index Delete Confirmed',
+    INDEX_ARCHIVE_AND_DELETE_CONFIRMED: 'Datanode OpenSearch Upgrade Index Archive And Delete Confirmed',
+    SYSTEM_INDEX_REINDEX_CONFIRMED: 'Datanode OpenSearch Upgrade System Index Reindex Confirmed',
+  },
   ALERTS_AND_EVENTS: {
     ACTION_RAN: 'Alerts And Events Action Ran',
   },

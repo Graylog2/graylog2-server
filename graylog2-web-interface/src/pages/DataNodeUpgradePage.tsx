@@ -57,14 +57,14 @@ const openSearchStatusLine = ({
   if (isOpenSearchUpToDate) {
     return (
       <p>
-        <Icon name="check_circle" bsStyle="success" /> Data Node&apos;s embedded OpenSearch is up to date.
+        <Icon name="check_circle" bsStyle="success" /> Data Nodes&apos; embedded OpenSearch is up to date.
       </p>
     );
   }
 
   return (
     <p>
-      <Icon name="warning" bsStyle="warning" /> Data Node&apos;s embedded OpenSearch is not up to date.
+      <Icon name="warning" bsStyle="warning" /> Data Nodes&apos; embedded OpenSearch is not up to date.
     </p>
   );
 };

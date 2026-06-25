@@ -20,8 +20,16 @@ import { DatanodeUpgrade } from '@graylog/server-api';
 
 import { defaultOnError } from 'util/conditional/onError';
 
+type OpenSearchVersionsOverview = Awaited<ReturnType<typeof DatanodeUpgrade.opensearchVersions>>;
+
+export type OpenSearchVersionNode = Omit<OpenSearchVersionsOverview['nodes'][number], 'datanode'> & {
+  datanode?: OpenSearchVersionsOverview['nodes'][number]['datanode'] | null;
+};
+
+const isAvailableDataNode = ({ datanode }: OpenSearchVersionNode) => datanode?.datanode_status === 'AVAILABLE';
+
 const useOpenSearchClusterStats = () => {
-  const { data, isInitialLoading } = useQuery({
+  const { data, isError, isFetching, isInitialLoading, refetch } = useQuery({
     queryKey: ['opensearch-upgrade', 'versions-overview'],
     queryFn: () =>
       defaultOnError(
@@ -30,13 +38,19 @@ const useOpenSearchClusterStats = () => {
         'Could not load OpenSearch versions overview',
       ),
   });
+  const nodes: Array<OpenSearchVersionNode> = data?.nodes ?? [];
 
   return {
     currentVersion: data?.lowest_current_version,
     targetVersion: data?.highest_available_version,
-    numberOfDataNodes: data?.nodes.length ?? 0,
+    nodes,
+    numberOfDataNodes: nodes.filter(isAvailableDataNode).length,
+    isUpgradeAvailable: data?.upgrade_available ?? false,
     isUpToDate: data ? !data.upgrade_available && data.up_to_date_count === data.nodes.length : false,
+    isError,
+    isFetching,
     isLoading: isInitialLoading,
+    refetch,
   };
 };
 

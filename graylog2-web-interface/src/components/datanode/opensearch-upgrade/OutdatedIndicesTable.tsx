@@ -21,10 +21,10 @@ import { Alert, SegmentedControl } from 'components/bootstrap';
 import { ConfirmDialog, Spinner } from 'components/common';
 import useCanArchive from 'components/indices/hooks/useCanArchive';
 import useOutdatedIndices from 'components/indices/hooks/useOutdatedIndices';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import UserNotification from 'util/UserNotification';
 
 import IndicesGroupTable from './IndicesGroupTable';
-import { outdatedIndicesMockOverride } from './mockOutdatedIndices';
 import { ACTION_DEFINITIONS } from './outdatedIndexActions';
 import type { ConfirmedAction } from './outdatedIndexActions';
 import { getFirstGroupWithIndices, getSelectedGroup, groupOutdatedIndices } from './outdatedIndexGroups';
@@ -65,11 +65,9 @@ const ActionConfirmDialog = ({
 };
 
 const OutdatedIndicesTable = () => {
-  const { data: outdatedIndices, isError, isLoading, refetch } = useOutdatedIndices({
-    mockData: outdatedIndicesMockOverride,
-  });
+  const { data: outdatedIndices, isError, isLoading, refetch } = useOutdatedIndices();
   const canArchive = useCanArchive();
-  const isUsingMockData = !!outdatedIndicesMockOverride;
+  const sendTelemetry = useSendTelemetry();
   const [confirmedAction, setConfirmedAction] = useState<ConfirmedAction | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedGroupId, setSelectedGroupId] = useState<string | undefined>();
@@ -92,15 +90,22 @@ const OutdatedIndicesTable = () => {
 
     const actionDefinition = ACTION_DEFINITIONS[confirmedAction.action];
 
+    sendTelemetry(actionDefinition.telemetryEventType, {
+      app_pathname: 'datanode',
+      app_section: 'opensearch-upgrade',
+    });
+
     setIsSubmitting(true);
 
     try {
-      if (isUsingMockData) {
-        UserNotification.success(`[Mock] ${actionDefinition.successMessage(confirmedAction.index)}`);
-      } else {
-        await actionDefinition.run(confirmedAction.index);
-        UserNotification.success(actionDefinition.successMessage(confirmedAction.index));
-        await refetch();
+      await actionDefinition.run(confirmedAction.index);
+      UserNotification.success(actionDefinition.successMessage(confirmedAction.index));
+      const { data: updatedOutdatedIndices = [] } = await refetch();
+      const updatedGroups = groupOutdatedIndices(updatedOutdatedIndices);
+      const updatedSelectedGroup = getSelectedGroup(updatedGroups, activeGroupId);
+
+      if (updatedSelectedGroup.indices.length === 0) {
+        setSelectedGroupId(getFirstGroupWithIndices(updatedGroups));
       }
 
       closeConfirmDialog();

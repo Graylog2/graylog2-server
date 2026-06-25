@@ -20,6 +20,8 @@ import { IndexerIndices } from '@graylog/server-api';
 
 import type { StyleProps } from 'components/bootstrap/Button';
 import type { OutdatedIndex } from 'components/indices/hooks/useOutdatedIndices';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import type { TelemetryEventType } from 'logic/telemetry/TelemetryContext';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 
@@ -38,6 +40,7 @@ type ActionDefinition = {
   confirmationBody: (index: OutdatedIndex) => React.ReactNode;
   run: (index: OutdatedIndex) => Promise<unknown>;
   successMessage: (index: OutdatedIndex) => string;
+  telemetryEventType: TelemetryEventType;
 };
 
 const archiveAndDeleteIndex = (indexName: string) =>
@@ -61,6 +64,7 @@ export const ACTION_DEFINITIONS: Record<IndexAction, ActionDefinition> = {
     ),
     run: (index) => IndexerIndices.remove(index.index_name),
     successMessage: (index) => `Index "${index.index_name}" was deleted.`,
+    telemetryEventType: TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.INDEX_DELETE_CONFIRMED,
   },
   'archive-delete': {
     buttonLabel: 'Archive and delete',
@@ -74,6 +78,7 @@ export const ACTION_DEFINITIONS: Record<IndexAction, ActionDefinition> = {
     ),
     run: (index) => archiveAndDeleteIndex(index.index_name),
     successMessage: (index) => `Archive and delete job for "${index.index_name}" was started.`,
+    telemetryEventType: TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.INDEX_ARCHIVE_AND_DELETE_CONFIRMED,
   },
   'reindex-system-index': {
     buttonLabel: 'Reindex',
@@ -87,6 +92,7 @@ export const ACTION_DEFINITIONS: Record<IndexAction, ActionDefinition> = {
     ),
     run: (index) => IndexerIndices.reindex(index.index_name),
     successMessage: (index) => `Index "${index.index_name}" was reindexed.`,
+    telemetryEventType: TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.SYSTEM_INDEX_REINDEX_CONFIRMED,
   },
 };
 

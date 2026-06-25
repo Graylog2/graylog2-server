@@ -15,25 +15,52 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import { Alert, Col, Label, Row, Table } from 'components/bootstrap';
-import { Icon, Timestamp } from 'components/common';
+import { Icon } from 'components/common';
 
+import type { OpenSearchVersionNode } from './hooks/useOpenSearchClusterStats';
 import type {
   RollingRestartJob,
   RollingRestartNode,
   RollingRestartNodeStatus,
   RollingRestartState,
 } from './rollingRestartTypes';
+import { isRollingRestartTerminalState } from './rollingRestartTypes';
 
 type NodeWithIndex = {
   node: RollingRestartNode;
   index: number;
+  versionNode?: OpenSearchVersionNode;
 };
 
 type Props = {
   job: RollingRestartJob | null | undefined;
+  versionNodes: Array<OpenSearchVersionNode>;
 };
+
+const SectionHeading = styled.h2(
+  ({ theme }) => css`
+    margin-top: ${theme.spacings.lg};
+    margin-bottom: ${theme.spacings.md};
+  `,
+);
+
+const NodesHeading = styled.h3(
+  ({ theme }) => css`
+    margin-top: 0;
+    margin-bottom: ${theme.spacings.sm};
+  `,
+);
+
+const CellDetail = styled.div(
+  ({ theme }) => css`
+    color: ${theme.colors.gray[60]};
+    font-size: ${theme.fonts.size.small};
+    margin-top: ${theme.spacings.xxs};
+  `,
+);
 
 const STATE_LABELS: Record<RollingRestartState, string> = {
   PREPARING_CLUSTER: 'Preparing cluster',
@@ -62,6 +89,17 @@ const NODE_STATUS_STYLE: Record<RollingRestartNodeStatus, 'default' | 'info' | '
   SKIPPED: 'default',
 };
 
+const NODE_STATUS_LABELS: Record<RollingRestartNodeStatus, string> = {
+  PENDING: 'Waiting',
+  STOPPING: 'Stopping',
+  STOPPED: 'Stopped',
+  STARTING: 'Starting',
+  STARTED: 'Started',
+  COMPLETED: 'Upgraded',
+  FAILED: 'Failed',
+  SKIPPED: 'Skipped',
+};
+
 const STATE_STYLE: Record<RollingRestartState, 'default' | 'info' | 'success' | 'warning' | 'danger'> = {
   PREPARING_CLUSTER: 'info',
   SELECTING_NEXT_NODE: 'info',
@@ -78,44 +116,80 @@ const STATE_STYLE: Record<RollingRestartState, 'default' | 'info' | 'success' | 
   FAILED: 'danger',
 };
 
-const NodeIdentityCell = ({ node, isCurrent }: { node: RollingRestartNode; isCurrent: boolean }) => (
-  <td>
-    <div>
-      {node.hostname}&nbsp;
-      {isCurrent && (
-        <Label bsStyle="info">
-          current
-        </Label>
-      )}
-    </div>
-    <div>
-      <i>{node.datanode_id}</i>
-    </div>
-    {node.last_error && (
+const nodeName = (node: RollingRestartNode, versionNode: OpenSearchVersionNode | undefined) =>
+  versionNode?.datanode?.node_name ?? versionNode?.datanode?.hostname ?? node.hostname;
+
+const opensearchVersion = (node: RollingRestartNode, versionNode: OpenSearchVersionNode | undefined) => {
+  if (!versionNode) {
+    return 'Unknown';
+  }
+
+  // Remaining nodes show the version they are upgraded from; completed nodes show the upgraded version.
+  // (The versions overview is fetched once, so `available_version` still carries the target for completed nodes.)
+  return node.status === 'COMPLETED'
+    ? (versionNode.available_version ?? versionNode.current_version)
+    : versionNode.current_version;
+};
+
+const NodeIdentityCell = ({
+  isCurrent,
+  node,
+  versionNode = undefined,
+}: {
+  isCurrent: boolean;
+  node: RollingRestartNode;
+  versionNode?: OpenSearchVersionNode;
+}) => {
+  const ip = versionNode?.datanode?.ip;
+  const isManagerNode = versionNode?.datanode?.manager_node;
+
+  return (
+    <td>
       <div>
-        <Label bsStyle="danger">
-          {node.last_error}
-        </Label>
+        {nodeName(node, versionNode)}&nbsp;
+        {isManagerNode && (
+          <Label bsStyle="default">
+            manager
+          </Label>
+        )}
+        {isCurrent && (
+          <>
+            &nbsp;
+            <Label bsStyle="primary">
+              current
+            </Label>
+          </>
+        )}
       </div>
-    )}
-  </td>
-);
+      {ip && <CellDetail>{ip}</CellDetail>}
+      {node.last_error && (
+        <div>
+          <Label bsStyle="danger">
+            {node.last_error}
+          </Label>
+        </div>
+      )}
+    </td>
+  );
+};
+
+const OpenSearchVersionCell = ({
+  node,
+  versionNode = undefined,
+}: {
+  node: RollingRestartNode;
+  versionNode?: OpenSearchVersionNode;
+}) => <td>{opensearchVersion(node, versionNode)}</td>;
 
 const NodeStatusCell = ({ node }: { node: RollingRestartNode }) => (
   <td align="right">
     <Label bsStyle={NODE_STATUS_STYLE[node.status]}>
-      {node.status}
+      {NODE_STATUS_LABELS[node.status]}
       &nbsp;
       {node.status === 'COMPLETED' && <Icon name="check" />}
     </Label>
   </td>
 );
-
-const TimeCell = ({ node }: { node: RollingRestartNode }) => {
-  const timestamp = node.finished_at ?? node.started_at;
-
-  return <td>{timestamp ? <Timestamp dateTime={timestamp} /> : '-'}</td>;
-};
 
 const NodesTable = ({
   emptyMessage,
@@ -127,65 +201,75 @@ const NodesTable = ({
   currentNodeIndex: number;
 }) => (
   <Table>
+    <thead>
+      <tr>
+        <th>Data Node</th>
+        <th>OpenSearch version</th>
+        <th aria-label="Status" />
+      </tr>
+    </thead>
     <tbody>
-      {nodes.map(({ node, index }) => (
+      {nodes.map(({ node, index, versionNode }) => (
         <tr key={node.datanode_id}>
-          <NodeIdentityCell node={node} isCurrent={index === currentNodeIndex} />
-          <TimeCell node={node} />
+          <NodeIdentityCell node={node} versionNode={versionNode} isCurrent={index === currentNodeIndex} />
+          <OpenSearchVersionCell node={node} versionNode={versionNode} />
           <NodeStatusCell node={node} />
         </tr>
       ))}
       {!nodes.length && (
         <tr>
-          <td>{emptyMessage}</td>
+          <td colSpan={3}>{emptyMessage}</td>
         </tr>
       )}
     </tbody>
   </Table>
 );
 
-const OpenSearchRollingUpgradeNodes = ({ job }: Props) => {
+const OpenSearchRollingUpgradeNodes = ({ job, versionNodes }: Props) => {
   const data = job?.data;
 
   if (!data) {
-    return <Alert bsStyle="info">No OpenSearch rolling restart has been started yet.</Alert>;
+    return <Alert bsStyle="info">No OpenSearch rolling upgrade has been started yet.</Alert>;
   }
 
-  const nodes = data.nodes.map((node, index) => ({ node, index }));
+  const versionNodeById = new Map(versionNodes.map((versionNode) => [versionNode.node_id, versionNode]));
+  const nodes = data.nodes.map((node, index) => ({
+    node,
+    index,
+    versionNode: versionNodeById.get(node.datanode_id),
+  }));
   const completedNodes = nodes.filter(({ node }) => node.status === 'COMPLETED');
   const remainingNodes = nodes.filter(({ node }) => node.status !== 'COMPLETED');
+  const currentNodeIndex = isRollingRestartTerminalState(data.sm_state) ? -1 : data.current_node_index;
 
   return (
     <>
-      <br />
-      <h3>
-        OpenSearch rolling restart&nbsp;
+      <SectionHeading>
+        OpenSearch rolling upgrade&nbsp;
         <Label bsStyle={STATE_STYLE[data.sm_state]}>
           {STATE_LABELS[data.sm_state]}
         </Label>
-      </h3>
+      </SectionHeading>
       {data.paused_reason && <Alert bsStyle="warning">{data.paused_reason}</Alert>}
       {data.last_error && <Alert bsStyle="danger">{data.last_error}</Alert>}
       {data.abort_requested && (
-        <Alert bsStyle="warning">Abort requested. The restart will stop after the current step.</Alert>
+        <Alert bsStyle="warning">Abort requested. The upgrade will stop after the current step.</Alert>
       )}
       <Row>
         <Col sm={6}>
-          <h3>Remaining OpenSearch Restart</h3>
-          <br />
+          <NodesHeading>Waiting for OpenSearch upgrade</NodesHeading>
           <NodesTable
             nodes={remainingNodes}
-            currentNodeIndex={data.current_node_index}
+            currentNodeIndex={currentNodeIndex}
             emptyMessage="No remaining nodes."
           />
         </Col>
         <Col sm={6}>
-          <h3>Completed OpenSearch Restart</h3>
-          <br />
+          <NodesHeading>Upgraded to target OpenSearch</NodesHeading>
           <NodesTable
             nodes={completedNodes}
-            currentNodeIndex={data.current_node_index}
-            emptyMessage="No completed nodes yet."
+            currentNodeIndex={currentNodeIndex}
+            emptyMessage="No upgraded nodes yet."
           />
         </Col>
       </Row>
