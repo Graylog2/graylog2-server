@@ -63,14 +63,13 @@ describe('FilterAggregationForm', () => {
     );
 
   it('should clear aggregation config when switching from aggregation to filter mode', async () => {
-    const user = userEvent.setup();
     const onChange = jest.fn();
 
     renderForm({ eventDefinition: aggregationEventDefinition, onChange });
 
     const filterRadio = await screen.findByLabelText('Filter has results');
 
-    await user.click(filterRadio);
+    await userEvent.click(filterRadio);
 
     expect(onChange).toHaveBeenCalledWith(
       'config',
@@ -83,7 +82,6 @@ describe('FilterAggregationForm', () => {
   });
 
   it('should restore aggregation config when switching back from filter to aggregation mode', async () => {
-    const user = userEvent.setup();
     const onChange = jest.fn();
 
     const { rerender } = renderForm({
@@ -94,7 +92,7 @@ describe('FilterAggregationForm', () => {
     // Switch to filter mode
     const filterRadio = await screen.findByLabelText('Filter has results');
 
-    await user.click(filterRadio);
+    await userEvent.click(filterRadio);
 
     expect(onChange).toHaveBeenCalledWith(
       'config',
@@ -121,7 +119,7 @@ describe('FilterAggregationForm', () => {
     // Switch back to aggregation mode
     const aggregationRadio = await screen.findByLabelText('Aggregation of results reaches a threshold');
 
-    await user.click(aggregationRadio);
+    await userEvent.click(aggregationRadio);
 
     expect(onChange).toHaveBeenLastCalledWith(
       'config',
