@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.resources.tools;
 
+import jakarta.ws.rs.BadRequestException;
 import org.graylog2.rest.models.tools.requests.RegexTestRequest;
 import org.graylog2.rest.models.tools.responses.RegexTesterResponse;
 import org.graylog2.rest.models.tools.responses.RegexValidationResponse;
@@ -23,11 +24,9 @@ import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import jakarta.ws.rs.BadRequestException;
-
 import java.util.Collections;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

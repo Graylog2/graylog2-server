@@ -19,6 +19,18 @@ package org.graylog2.rest.resources.tools;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.ConfigurationException;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -29,26 +41,16 @@ import org.graylog2.rest.models.tools.requests.RegexReplaceTestRequest;
 import org.graylog2.rest.models.tools.responses.RegexReplaceTesterResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.MediaType;
-
 import java.util.Collections;
 import java.util.Map;
+import java.util.regex.PatternSyntaxException;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @RequiresAuthentication
 @Path("/tools/regex_replace_tester")
 public class RegexReplaceTesterResource extends RestResource {
+
     @GET
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
@@ -68,8 +70,16 @@ public class RegexReplaceTesterResource extends RestResource {
         return testRegexReplaceExtractor(r.string(), r.regex(), r.replacement(), r.replaceAll());
     }
 
-    private RegexReplaceTesterResponse testRegexReplaceExtractor(String example, String regex, String replacement, boolean replaceAll) {
-        final Map<String, Object> config = ImmutableMap.<String, Object>of(
+    private RegexReplaceTesterResponse testRegexReplaceExtractor(final String example, final String regex,
+                                                          final String replacement, final boolean replaceAll) {
+        if (regex.length() > SafePattern.MAX_REGEX_LENGTH) {
+            throw new BadRequestException(f("Regular expression exceeds maximum length of %d characters", SafePattern.MAX_REGEX_LENGTH));
+        }
+        if (example.length() > SafePattern.MAX_STRING_LENGTH) {
+            throw new BadRequestException(f("Test string exceeds maximum length of %d characters", SafePattern.MAX_STRING_LENGTH));
+        }
+
+        final Map<String, Object> config = ImmutableMap.of(
                 "regex", regex,
                 "replacement", replacement,
                 "replace_all", replaceAll
@@ -77,18 +87,32 @@ public class RegexReplaceTesterResource extends RestResource {
         final RegexReplaceExtractor extractor;
         try {
             extractor = new RegexReplaceExtractor(
-                    new MetricRegistry(), "test", "Test", 0L, Extractor.CursorStrategy.COPY, "test", "test",
-                    config, getCurrentUser().getName(), Collections.<Converter>emptyList(), Extractor.ConditionType.NONE, ""
-            );
+                    new MetricRegistry(), "test", "Test", 0L, Extractor.CursorStrategy.COPY,
+                    "test", "test", config, "tester",
+                    Collections.<Converter>emptyList(), Extractor.ConditionType.NONE, "");
+        } catch (PatternSyntaxException e) {
+            throw new BadRequestException("Invalid regular expression: " + e.getMessage(), e);
         } catch (Extractor.ReservedFieldException e) {
             throw new BadRequestException("Trying to overwrite a reserved message field", e);
         } catch (ConfigurationException e) {
             throw new BadRequestException("Invalid extractor configuration", e);
         }
 
-        final Extractor.Result result = extractor.runExtractor(example);
-        final RegexReplaceTesterResponse.Match match = result == null ? null :
-                RegexReplaceTesterResponse.Match.create(String.valueOf(result.getValue()), result.getBeginIndex(), result.getEndIndex());
-        return RegexReplaceTesterResponse.create(result != null, match, regex, replacement, replaceAll, example);
+        try {
+            final Extractor.Result result = extractor.runExtractor(
+                    TimeLimitedCharSequence.withTimeout(example, TimeLimitedCharSequence.DEFAULT_TIMEOUT_MS));
+            final RegexReplaceTesterResponse.Match match = result == null ? null :
+                    RegexReplaceTesterResponse.Match.create(
+                            String.valueOf(result.getValue()), result.getBeginIndex(), result.getEndIndex());
+            return RegexReplaceTesterResponse.create(result != null, match, regex, replacement, replaceAll, example);
+        } catch (TimeLimitedCharSequence.TimeoutException e) {
+            throw new BadRequestException("Regular expression matching timed out — the pattern may be susceptible to catastrophic backtracking");
+        } catch (RuntimeException e) {
+            final Throwable cause = e.getCause();
+            if (cause instanceof IndexOutOfBoundsException || cause instanceof IllegalArgumentException) {
+                throw new BadRequestException("Invalid replacement expression: " + cause.getMessage(), e);
+            }
+            throw e;
+        }
     }
 }
