@@ -31,6 +31,7 @@ import static org.graylog2.datanode.restart.RollingRestartState.REENABLING_ALLOC
 import static org.graylog2.datanode.restart.RollingRestartState.SELECTING_NEXT_NODE;
 import static org.graylog2.datanode.restart.RollingRestartState.STARTING_NODE;
 import static org.graylog2.datanode.restart.RollingRestartState.STOPPING_NODE;
+import static org.graylog2.datanode.restart.RollingRestartState.UPGRADING_NODE;
 import static org.graylog2.datanode.restart.RollingRestartState.WAITING_GREEN;
 import static org.graylog2.datanode.restart.RollingRestartState.WAITING_NODE_JOINED;
 import static org.graylog2.datanode.restart.RollingRestartState.WAITING_NODE_LEFT;
@@ -59,10 +60,10 @@ class RollingRestartStateMachineBuilderTest {
     }
 
     @Test
-    void selectingNextNode_moreNodes_goesToStoppingNode() {
+    void selectingNextNode_moreNodes_goesToUpgradingNode() {
         final var sm = from(SELECTING_NEXT_NODE);
         sm.fire(MORE_NODES);
-        assertThat(sm.getState()).isEqualTo(STOPPING_NODE);
+        assertThat(sm.getState()).isEqualTo(UPGRADING_NODE);
     }
 
     @Test
@@ -77,6 +78,13 @@ class RollingRestartStateMachineBuilderTest {
         final var sm = from(SELECTING_NEXT_NODE);
         sm.fire(ABORT);
         assertThat(sm.getState()).isEqualTo(ABORTED);
+    }
+
+    @Test
+    void upgradingNode_moreNodes_goesToStoppingNode() {
+        final var sm = from(UPGRADING_NODE);
+        sm.fire(MORE_NODES);
+        assertThat(sm.getState()).isEqualTo(STOPPING_NODE);
     }
 
     @Test
