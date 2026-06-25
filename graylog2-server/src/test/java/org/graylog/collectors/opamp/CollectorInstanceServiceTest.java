@@ -413,6 +413,33 @@ class CollectorInstanceServiceTest {
     }
 
     @Test
+    void enrollDoesNotPersistNextCertificateFingerprintAsNull() throws Exception {
+        // The partial index on next_certificate_fingerprint filters on {$exists: true}, which in MongoDB
+        // also matches a field present with an explicit null. Persisting the field as null (instead of
+        // omitting it) would pull every non-renewing instance into the index, defeating its purpose. A
+        // freshly enrolled instance has no next certificate, so the field must be absent from the document.
+        enroll("uid-no-next-field");
+
+        final var doc = findRawDocument("uid-no-next-field").orElseThrow();
+        assertThat(doc.containsKey(CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_FINGERPRINT)).isFalse();
+    }
+
+    @Test
+    void activateNextCertificateRemovesNextCertificateFingerprintField() throws Exception {
+        // Activation promotes next -> active and must remove the next fingerprint field entirely (not set
+        // it to null), so the instance drops back out of the partial index once it is no longer mid-renewal.
+        enroll("uid-activate-clears-next");
+        collectorInstanceService.insertNextCertificate("uid-activate-clears-next", "sha256:next-fp", "next-pem",
+                Instant.ofEpochMilli(0).plus(Duration.ofDays(2)));
+        final var withNext = collectorInstanceService.findByInstanceUid("uid-activate-clears-next").orElseThrow();
+
+        collectorInstanceService.activateNextCertificate(withNext);
+
+        final var doc = findRawDocument("uid-activate-clears-next").orElseThrow();
+        assertThat(doc.containsKey(CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_FINGERPRINT)).isFalse();
+    }
+
+    @Test
     void reEnrollThrowsWhenRecordDoesNotExist() throws Exception {
         final var cert = certBuilder.createEndEntityCert("ghost", issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
         final var issued = new IssuedCertificate(cert.fingerprint(), cert.certificate(), cert.notAfter(), issuerCert.id());

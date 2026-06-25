@@ -17,6 +17,7 @@
 package org.graylog.collectors.db;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -32,6 +33,7 @@ import java.util.Optional;
 
 @AutoValue
 @JsonDeserialize(builder = CollectorInstanceDTO.Builder.class)
+@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public abstract class CollectorInstanceDTO implements BuildableMongoEntity<CollectorInstanceDTO, CollectorInstanceDTO.Builder> {
     public static final String FIELD_INSTANCE_UID = "instance_uid";
     public static final String FIELD_MESSAGE_SEQ_NUM = "message_seq_num";

@@ -128,7 +128,10 @@ public class CollectorInstanceService {
                             FIELD_IDENTIFYING_ATTRIBUTES + ".value")),
                     new IndexModel(Indexes.ascending(FIELD_NON_IDENTIFYING_ATTRIBUTES + ".key",
                             FIELD_NON_IDENTIFYING_ATTRIBUTES + ".value")),
-                    new IndexModel(Indexes.ascending(FIELD_ACTIVE_CERTIFICATE_FINGERPRINT), new IndexOptions().unique(true)),
+                    new IndexModel(Indexes.ascending(FIELD_ACTIVE_CERTIFICATE_FINGERPRINT),
+                            new IndexOptions().unique(true)),
+                    new IndexModel(Indexes.ascending(FIELD_NEXT_CERTIFICATE_FINGERPRINT),
+                            new IndexOptions().partialFilterExpression(Filters.exists(FIELD_NEXT_CERTIFICATE_FINGERPRINT))),
                     new IndexModel(Indexes.ascending(FIELD_LAST_SEEN))
             ));
         } catch (Exception e) {
