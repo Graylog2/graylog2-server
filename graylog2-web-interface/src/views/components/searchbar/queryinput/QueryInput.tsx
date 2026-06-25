@@ -270,6 +270,7 @@ const QueryInput = (
   const onLoadEditor = useCallback(
     (editor: Editor) => {
       _onLoadEditor(editor, isInitialTokenizerUpdate);
+      fetchRawQueryHistory().then((entries) => { historyEntriesRef.current = entries; });
       editor.on('change', () => {
         if (!navigatingRef.current) {
           historyIndexRef.current = -1;
@@ -284,7 +285,14 @@ const QueryInput = (
     (editor: Editor) =>
       handleExecution({
         editor,
-        onExecute: onExecuteProp,
+        onExecute: (query: string) => {
+          if (query) {
+            historyEntriesRef.current = [query, ...historyEntriesRef.current.filter((q) => q !== query)];
+          }
+
+          historyIndexRef.current = -1;
+          onExecuteProp(query);
+        },
         value,
         error,
         disableExecution,
@@ -325,26 +333,29 @@ const QueryInput = (
       {
         name: 'Navigate history up',
         bindKey: { win: 'Up', mac: 'Up' },
-        exec: async (editor: Editor) => {
+        exec: (editor: Editor) => {
           if (editor.session.getLength() > 1) {
             editor.navigateUp(1);
 
             return;
           }
 
-          if (historyEntriesRef.current.length === 0) {
-            historyEntriesRef.current = await fetchRawQueryHistory();
-          }
-
           if (historyEntriesRef.current.length === 0) return;
-
-          const nextIndex = Math.min(historyIndexRef.current + 1, historyEntriesRef.current.length - 1);
-
-          if (nextIndex === historyIndexRef.current) return;
 
           if (historyIndexRef.current === -1) {
             savedQueryRef.current = editor.getValue();
           }
+
+          // When first entering history mode, skip index 0 if it matches the current query
+          // so the first Up press always produces a visible change.
+          const startIndex =
+            historyIndexRef.current === -1 && historyEntriesRef.current[0] === savedQueryRef.current ? 1 : 0;
+          const nextIndex =
+            historyIndexRef.current === -1
+              ? startIndex
+              : Math.min(historyIndexRef.current + 1, historyEntriesRef.current.length - 1);
+
+          if (nextIndex >= historyEntriesRef.current.length || nextIndex === historyIndexRef.current) return;
 
           historyIndexRef.current = nextIndex;
           navigatingRef.current = true;
@@ -362,14 +373,20 @@ const QueryInput = (
             return;
           }
 
-          historyIndexRef.current -= 1;
+          const prevIndex = historyIndexRef.current - 1;
+          // Symmetric with the Up skip: if landing on index 0 which was skipped going up, skip it
+          // on the way back too so Down restores the original query in one step.
+          const skipIndex0 = prevIndex === 0 && historyEntriesRef.current[0] === savedQueryRef.current;
+          const newIndex = skipIndex0 ? -1 : prevIndex;
+
+          historyIndexRef.current = newIndex;
           navigatingRef.current = true;
 
-          if (historyIndexRef.current < 0) {
+          if (newIndex < 0) {
             historyIndexRef.current = -1;
             editor.setValue(savedQueryRef.current, 1);
           } else {
-            editor.setValue(historyEntriesRef.current[historyIndexRef.current], 1);
+            editor.setValue(historyEntriesRef.current[newIndex], 1);
           }
 
           navigatingRef.current = false;
