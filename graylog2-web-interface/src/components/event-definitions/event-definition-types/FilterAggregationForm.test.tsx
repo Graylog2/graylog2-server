@@ -25,9 +25,6 @@ import { adminUser } from 'fixtures/users';
 import FilterAggregationForm from './FilterAggregationForm';
 
 jest.mock('hooks/useHotkey', () => jest.fn());
-jest.mock('components/lookup-tables/hooks/api/lookupTablesAPI', () => ({
-  fetchAllLookupTables: jest.fn(() => Promise.resolve([])),
-}));
 
 describe('FilterAggregationForm', () => {
   const defaultProps = {
