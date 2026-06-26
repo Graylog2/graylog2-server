@@ -118,7 +118,7 @@ class RollingRestartExecutionJobTest {
         final var update = job.execute(ctxWith(baseData(RollingRestartState.SELECTING_NEXT_NODE)));
 
         final var data = dataOf(update);
-        assertThat(data.smState()).isEqualTo(RollingRestartState.STOPPING_NODE);
+        assertThat(data.smState()).isEqualTo(RollingRestartState.UPGRADING_NODE);
         assertThat(data.currentNodeIndex()).isEqualTo(0);
         assertThat(data.nodes().get(0).hostname()).isEqualTo("node-a");
         assertThat(data.nodes().get(0).status()).isEqualTo(RollingRestartNodeStatus.STOPPING);
