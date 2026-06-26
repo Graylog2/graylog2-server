@@ -14,7 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-module.exports = {
-  // eslint-disable-next-line global-require
-  presets: [require('babel-preset-graylog')],
-};
+import * as React from 'react';
+
+import type { KeyMapper } from 'views/components/visualizations/TransformKeys';
+
+const identityMapper: KeyMapper = (key) => key;
+
+const KeyMapperContext = React.createContext<KeyMapper>(identityMapper);
+
+export default KeyMapperContext;
