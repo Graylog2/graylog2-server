@@ -113,12 +113,9 @@ public class KinesisConsumer implements Runnable {
         final DynamoDbAsyncClientBuilder dynamoDbClientBuilder = DynamoDbAsyncClient.builder();
         awsClientBuilderUtil.initializeBuilder(dynamoDbClientBuilder, request.dynamodbEndpoint(), region, credentialsProvider);
         dynamoDbClientBuilder.httpClientBuilder(awsClientBuilderUtil.asyncHttpClientBuilder());
-        final DynamoDbAsyncClient dynamoClient = dynamoDbClientBuilder.build();
-
         final CloudWatchAsyncClientBuilder cloudwatchClientBuilder = CloudWatchAsyncClient.builder();
         awsClientBuilderUtil.initializeBuilder(cloudwatchClientBuilder, request.cloudwatchEndpoint(), region, credentialsProvider);
         cloudwatchClientBuilder.httpClientBuilder(awsClientBuilderUtil.asyncHttpClientBuilder());
-        final CloudWatchAsyncClient cloudWatchClient = cloudwatchClientBuilder.build();
 
         // The Kinesis Client Library normally configures the async client through
         // KinesisClientUtil.createKinesisAsyncClient(), but that installs its own HTTP client builder and would discard
@@ -126,63 +123,70 @@ public class KinesisConsumer implements Runnable {
         final KinesisAsyncClientBuilder kinesisAsyncClientBuilder = KinesisAsyncClient.builder();
         awsClientBuilderUtil.initializeBuilder(kinesisAsyncClientBuilder, request.kinesisEndpoint(), region, credentialsProvider);
         kinesisAsyncClientBuilder.httpClientBuilder(awsClientBuilderUtil.kinesisAsyncHttpClientBuilder());
-        final KinesisAsyncClient kinesisAsyncClient = kinesisAsyncClientBuilder.build();
 
-        final String workerId = String.format(Locale.ENGLISH, "graylog-node-%s", nodeId.anonymize());
-        LOG.debug("Using workerId [{}].", workerId);
+        // All three clients are kept open for the lifetime of the KCL Scheduler (kinesisScheduler.run() blocks).
+        // Try-with-resources ensures the Netty event loop groups and connection pools are released when the scheduler
+        // exits, whether normally or due to an exception.
+        try (DynamoDbAsyncClient dynamoClient = dynamoDbClientBuilder.build();
+             CloudWatchAsyncClient cloudWatchClient = cloudwatchClientBuilder.build();
+             KinesisAsyncClient kinesisAsyncClient = kinesisAsyncClientBuilder.build()) {
 
-        // The application name needs to be unique per input/consumer.
-        final String applicationName = String.format(Locale.ENGLISH, "graylog-aws-plugin-%s", kinesisStreamName);
-        LOG.debug("Using Kinesis applicationName [{}].", applicationName);
+            final String workerId = String.format(Locale.ENGLISH, "graylog-node-%s", nodeId.anonymize());
+            LOG.debug("Using workerId [{}].", workerId);
 
-        // The KinesisShardProcessorFactory contains the message processing logic.
-        final KinesisShardProcessorFactory kinesisShardProcessorFactory = new KinesisShardProcessorFactory(objectMapper, transport, handleMessageCallback, kinesisStreamName, awsMessageType);
+            // The application name needs to be unique per input/consumer.
+            final String applicationName = String.format(Locale.ENGLISH, "graylog-aws-plugin-%s", kinesisStreamName);
+            LOG.debug("Using Kinesis applicationName [{}].", applicationName);
 
-        ConfigsBuilder configsBuilder = new ConfigsBuilder(kinesisStreamName, applicationName,
-                kinesisAsyncClient, dynamoClient, cloudWatchClient,
-                workerId,
-                kinesisShardProcessorFactory);
+            // The KinesisShardProcessorFactory contains the message processing logic.
+            final KinesisShardProcessorFactory kinesisShardProcessorFactory = new KinesisShardProcessorFactory(objectMapper, transport, handleMessageCallback, kinesisStreamName, awsMessageType);
 
-        final PollingConfig pollingConfig = new PollingConfig(kinesisStreamName, kinesisAsyncClient);
+            ConfigsBuilder configsBuilder = new ConfigsBuilder(kinesisStreamName, applicationName,
+                    kinesisAsyncClient, dynamoClient, cloudWatchClient,
+                    workerId,
+                    kinesisShardProcessorFactory);
 
-        // Default max records per request is 10k.
-        if (recordBatchSize != null) {
-            LOG.debug("Using explicit batch size [{}]", recordBatchSize);
-            pollingConfig.maxRecords(recordBatchSize);
-        }
-        WorkerStateChangeListener workerStateChangeListener = new NoOpWorkerStateChangeListener() {
-            @Override
-            public void onAllInitializationAttemptsFailed(Throwable e) {
-                inputFailureRecorder.setFailing(
-                        KinesisConsumer.class,
-                        String.format(Locale.ROOT, "Initialization for Kinesis stream <%s> failed.", kinesisStreamName), e);
+            final PollingConfig pollingConfig = new PollingConfig(kinesisStreamName, kinesisAsyncClient);
+
+            // Default max records per request is 10k.
+            if (recordBatchSize != null) {
+                LOG.debug("Using explicit batch size [{}]", recordBatchSize);
+                pollingConfig.maxRecords(recordBatchSize);
             }
-        };
-
-        TaskExecutionListener taskExecutionListener = new NoOpTaskExecutionListener() {
-            @Override
-            public void afterTaskExecution(TaskExecutionListenerInput input) {
-                if (TaskOutcome.FAILURE.equals(input.taskOutcome())) {
-                    inputFailureRecorder.setFailing(KinesisConsumer.class,
-                            String.format(Locale.ROOT, "Errors for Kinesis stream <%s>!", kinesisStreamName));
-                } else if (TaskOutcome.SUCCESSFUL.equals(input.taskOutcome()) && TaskType.PROCESS.equals(input.taskType())) {
-                    inputFailureRecorder.setRunning();
+            WorkerStateChangeListener workerStateChangeListener = new NoOpWorkerStateChangeListener() {
+                @Override
+                public void onAllInitializationAttemptsFailed(Throwable e) {
+                    inputFailureRecorder.setFailing(
+                            KinesisConsumer.class,
+                            String.format(Locale.ROOT, "Initialization for Kinesis stream <%s> failed.", kinesisStreamName), e);
                 }
-            }
-        };
+            };
 
-        this.kinesisScheduler = new Scheduler(
-                configsBuilder.checkpointConfig(),
-                configsBuilder.coordinatorConfig().workerStateChangeListener(workerStateChangeListener),
-                configsBuilder.leaseManagementConfig(),
-                configsBuilder.lifecycleConfig().taskExecutionListener(taskExecutionListener),
-                configsBuilder.metricsConfig(),
-                configsBuilder.processorConfig(),
-                configsBuilder.retrievalConfig().retrievalSpecificConfig(pollingConfig));
+            TaskExecutionListener taskExecutionListener = new NoOpTaskExecutionListener() {
+                @Override
+                public void afterTaskExecution(TaskExecutionListenerInput input) {
+                    if (TaskOutcome.FAILURE.equals(input.taskOutcome())) {
+                        inputFailureRecorder.setFailing(KinesisConsumer.class,
+                                String.format(Locale.ROOT, "Errors for Kinesis stream <%s>!", kinesisStreamName));
+                    } else if (TaskOutcome.SUCCESSFUL.equals(input.taskOutcome()) && TaskType.PROCESS.equals(input.taskType())) {
+                        inputFailureRecorder.setRunning();
+                    }
+                }
+            };
 
-        LOG.debug("Starting Kinesis scheduler.");
-        kinesisScheduler.run();
-        LOG.debug("After Kinesis scheduler stopped.");
+            this.kinesisScheduler = new Scheduler(
+                    configsBuilder.checkpointConfig(),
+                    configsBuilder.coordinatorConfig().workerStateChangeListener(workerStateChangeListener),
+                    configsBuilder.leaseManagementConfig(),
+                    configsBuilder.lifecycleConfig().taskExecutionListener(taskExecutionListener),
+                    configsBuilder.metricsConfig(),
+                    configsBuilder.processorConfig(),
+                    configsBuilder.retrievalConfig().retrievalSpecificConfig(pollingConfig));
+
+            LOG.debug("Starting Kinesis scheduler.");
+            kinesisScheduler.run();
+            LOG.debug("After Kinesis scheduler stopped.");
+        }
     }
 
     /**

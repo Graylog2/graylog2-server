@@ -85,7 +85,6 @@ public class AWSClientBuilderUtil {
 
     /**
      * Creates an AWS credentials provider with proxy support on the STS client used for assume-role.
-     * Use this for inputs that support HTTP proxy (S3, Security Lake) but NOT for Kinesis.
      */
     public AwsCredentialsProvider createCredentialsProviderWithStsProxy(AWSRequest request) {
         return authFactoryProvider.get().create(
