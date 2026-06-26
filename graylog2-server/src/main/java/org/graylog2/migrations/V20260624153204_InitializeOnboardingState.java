@@ -67,5 +67,5 @@ public class V20260624153204_InitializeOnboardingState extends Migration {
         clusterConfigService.write(new MigrationCompleted());
     }
 
-    public record MigrationCompleted() {}
+    record MigrationCompleted() {}
 }
