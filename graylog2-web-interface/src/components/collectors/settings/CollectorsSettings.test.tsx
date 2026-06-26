@@ -19,7 +19,6 @@ import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import { asMock } from 'helpers/mocking';
-import AppConfig from 'util/AppConfig';
 import useInputsStates from 'hooks/useInputsStates';
 import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendCollectorsTelemetry';
 
@@ -78,6 +77,7 @@ const config: CollectorsConfig = {
   collector_offline_threshold: 'PT5M',
   collector_default_visibility_threshold: 'P1D',
   collector_expiration_threshold: 'P7D',
+  collector_transaction_log_retention_threshold: 'P30D',
 };
 
 describe('CollectorsSettings', () => {
@@ -149,6 +149,7 @@ describe('CollectorsSettings', () => {
         collector_offline_threshold: 'PT5M',
         collector_default_visibility_threshold: 'P1D',
         collector_expiration_threshold: 'P7D',
+        collector_transaction_log_retention_threshold: 'P30D',
       }),
     );
   });
@@ -204,49 +205,6 @@ describe('CollectorsSettings', () => {
 
     await screen.findByLabelText('External hostname');
     expect(screen.queryByText(/different port/i)).not.toBeInTheDocument();
-  });
-
-  describe('in cloud', () => {
-    beforeEach(() => {
-      jest.spyOn(AppConfig, 'isCloud').mockReturnValue(true);
-    });
-
-    afterEach(() => {
-      asMock(AppConfig.isCloud).mockRestore();
-    });
-
-    it('shows the ingest endpoint read-only and hides editing/creation controls', async () => {
-      render(<CollectorsSettings />);
-
-      // Endpoint fields are present but read-only (disabled), showing the server-provisioned values.
-      const hostname = await screen.findByLabelText('External hostname');
-      const port = screen.getByLabelText('External port');
-      expect(hostname).toBeDisabled();
-      expect(hostname).toHaveValue('otlp.example.com');
-      expect(port).toBeDisabled();
-      expect(port).toHaveValue(14401);
-
-      // No input-management UI in cloud.
-      expect(screen.queryByLabelText('Create ingest input')).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Create input' })).not.toBeInTheDocument();
-
-      // Thresholds remain editable.
-      expect(screen.getByLabelText('Offline threshold')).toBeEnabled();
-    });
-
-    it('shows cloud-appropriate getting-started copy before configuration', async () => {
-      asMock(useCollectorsConfig).mockReturnValue({
-        data: { ...config, signing_cert_id: null },
-        isLoading: false,
-      });
-
-      render(<CollectorsSettings />);
-
-      await screen.findByText('Getting started with Collectors');
-      // The on-prem instruction to configure the endpoint must not appear — it's managed in cloud.
-      expect(screen.queryByText(/Configure the HTTP endpoint below/i)).not.toBeInTheDocument();
-      expect(screen.getByText(/managed ingest endpoint/i)).toBeInTheDocument();
-    });
   });
 });
 

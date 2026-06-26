@@ -73,6 +73,7 @@ public class CollectorMetricsSupplier implements TelemetryMetricSupplier {
                 entry("visibility_threshold_seconds", collectorsConfig.collectorDefaultVisibilityThreshold().toSeconds()),
                 entry("offline_threshold_seconds", collectorsConfig.collectorOfflineThreshold().toSeconds()),
                 entry("expiration_threshold_seconds", collectorsConfig.collectorExpirationThreshold().toSeconds()),
+                entry("transaction_log_retention_threshold_seconds", collectorsConfig.collectorTransactionLogRetentionThreshold().toSeconds()),
                 entry("collector_cert_lifetime_seconds", collectorsConfig.collectorCertLifetime().toSeconds()),
                 entry("enrollment_tokens", enrollmentTokenStats.count()),
                 entry("enrollment_token_total_usage", enrollmentTokenStats.totalUsage()),

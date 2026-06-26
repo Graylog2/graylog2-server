@@ -27,7 +27,6 @@ import FormSubmit from 'components/common/FormSubmit';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useInputsStates from 'hooks/useInputsStates';
-import AppConfig from 'util/AppConfig';
 import { isPermitted } from 'util/PermissionsMixin';
 
 import IngestEndpointStatus from './IngestEndpointStatus';
@@ -64,6 +63,8 @@ type FormValues = {
   visibility_unit: string;
   expiration_value: number;
   expiration_unit: string;
+  retention_value: number;
+  retention_unit: string;
 };
 
 const THRESHOLD_UNITS = ['DAYS', 'HOURS', 'MINUTES'];
@@ -77,16 +78,13 @@ const CollectorsSettings = () => {
   const { loadedInputs: collectorInputs, isLoading: isLoadingInputDetails } = useCollectorInputDetails();
   const { data: inputStates } = useInputsStates({ enabled: collectorInputIds.length > 0 });
 
-  const isCloud = AppConfig.isCloud();
-
   const canCreateInputs = isPermitted(currentUser?.permissions, [
     'inputs:create',
     'input_types:create:org.graylog.collectors.input.CollectorIngestHttpInput',
   ]);
 
-  // In Cloud the ingest endpoint is server-provisioned and there is no persisted input, so input creation is hidden.
   const showCreateInputCheckbox =
-    !isCloud && !isConfigured && !isLoadingInputIds && collectorInputIds.length === 0 && canCreateInputs;
+    !isConfigured && !isLoadingInputIds && collectorInputIds.length === 0 && canCreateInputs;
   const sendTelemetry = useSendCollectorsTelemetry();
 
   const initialValues: FormValues = useMemo(() => {
@@ -101,12 +99,15 @@ const CollectorsSettings = () => {
         visibility_unit: 'DAYS',
         expiration_value: 7,
         expiration_unit: 'DAYS',
+        retention_value: 30,
+        retention_unit: 'DAYS',
       };
     }
 
     const offline = extractDurationAndUnit(config.collector_offline_threshold, THRESHOLD_UNITS);
     const visibility = extractDurationAndUnit(config.collector_default_visibility_threshold, THRESHOLD_UNITS);
     const expiration = extractDurationAndUnit(config.collector_expiration_threshold, THRESHOLD_UNITS);
+    const retention = extractDurationAndUnit(config.collector_transaction_log_retention_threshold, THRESHOLD_UNITS);
 
     return {
       http_hostname: config.http.hostname,
@@ -118,6 +119,8 @@ const CollectorsSettings = () => {
       visibility_unit: visibility.unit,
       expiration_value: expiration.duration,
       expiration_unit: expiration.unit,
+      retention_value: retention.duration,
+      retention_unit: retention.unit,
     };
   }, [config]);
 
@@ -161,6 +164,9 @@ const CollectorsSettings = () => {
         collector_expiration_threshold: moment
           .duration(values.expiration_value, values.expiration_unit as moment.unitOfTime.DurationConstructor)
           .toISOString(),
+        collector_transaction_log_retention_threshold: moment
+          .duration(values.retention_value, values.retention_unit as moment.unitOfTime.DurationConstructor)
+          .toISOString(),
         create_input: showCreateInputCheckbox && values.create_input,
       };
 
@@ -182,6 +188,11 @@ const CollectorsSettings = () => {
             .duration(values.expiration_value, values.expiration_unit as moment.unitOfTime.DurationConstructor)
             .asSeconds(),
         );
+        const retentionSec = Math.round(
+          moment
+            .duration(values.retention_value, values.retention_unit as moment.unitOfTime.DurationConstructor)
+            .asSeconds(),
+        );
 
         sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SETTINGS.UPDATED, {
           app_action_value: 'settings-save',
@@ -190,6 +201,7 @@ const CollectorsSettings = () => {
           offline_threshold_seconds: offlineSec,
           visibility_threshold_seconds: visibilitySec,
           expiration_threshold_seconds: expirationSec,
+          transaction_log_retention_threshold_seconds: retentionSec,
           http_hostname_changed: (config?.http?.hostname ?? '') !== values.http_hostname,
           http_port_changed: (config?.http?.port ?? null) !== values.http_port,
           offline_threshold_changed: config?.collector_offline_threshold !== request.collector_offline_threshold,
@@ -197,6 +209,8 @@ const CollectorsSettings = () => {
             config?.collector_default_visibility_threshold !== request.collector_default_visibility_threshold,
           expiration_threshold_changed:
             config?.collector_expiration_threshold !== request.collector_expiration_threshold,
+          transaction_log_retention_threshold_changed:
+            config?.collector_transaction_log_retention_threshold !== request.collector_transaction_log_retention_threshold,
           port_matches_any_input: portMatchesAnyInput,
           input_bind_types: inputBindTypes,
           has_running_input: hasRunningInput,
@@ -212,6 +226,7 @@ const CollectorsSettings = () => {
             collector_offline_threshold: 'offline_value',
             collector_default_visibility_threshold: 'visibility_value',
             collector_expiration_threshold: 'expiration_value',
+            collector_transaction_log_retention_threshold: 'retention_value',
           };
           const mapped: Record<string, string> = {};
 
@@ -249,9 +264,9 @@ const CollectorsSettings = () => {
             <Alert bsStyle="info">
               <strong>Getting started with Collectors</strong>
               <p>
-                {isCloud
-                  ? 'Collectors connect to a managed ingest endpoint to send their data. Save your collector settings to initialize the collector infrastructure. After setup, you can create fleets, add sources, and deploy collectors to your hosts.'
-                  : 'Collectors need ingest endpoints to receive collected data. Configure the HTTP endpoint below and save to initialize the collector infrastructure. After setup, you can create fleets, add sources, and deploy collectors to your hosts.'}
+                Collectors need ingest endpoints to receive collected data. Configure the HTTP endpoint below and save
+                to initialize the collector infrastructure. After setup, you can create fleets, add sources, and deploy
+                collectors to your hosts.
               </p>
             </Alert>
           </Col>
@@ -262,9 +277,9 @@ const CollectorsSettings = () => {
               <Col md={6}>
                 <SectionTitle>Ingest Endpoint</SectionTitle>
                 <HelpText>
-                  {isCloud
-                    ? 'The ingest endpoint is system-managed. Collectors connect here automatically.'
-                    : 'Ingest endpoints receive log data from collectors via OpenTelemetry (OTLP). The external address that is pushed to managed collectors as their data destination. It must route to a running collector ingest input. This is typically the address of a load balancer or the server itself.'}
+                  Ingest endpoints receive log data from collectors via OpenTelemetry (OTLP). The external address that
+                  is pushed to managed collectors as their data destination. It must route to a running collector ingest
+                  input. This is typically the address of a load balancer or the server itself.
                 </HelpText>
 
                 <FormikInput
@@ -272,28 +287,19 @@ const CollectorsSettings = () => {
                   type="text"
                   label="External hostname"
                   name="http_hostname"
-                  disabled={isCloud}
                   placeholder="e.g. otlp.example.com"
-                  help={
-                    isCloud
-                      ? undefined
-                      : 'The hostname or IP address that Collectors will use to connect. Must be reachable from Collector hosts.'
-                  }
+                  help="The hostname or IP address that Collectors will use to connect. Must be reachable from Collector hosts."
                 />
-                <FormikInput id="http-port" type="number" label="External port" name="http_port" disabled={isCloud} />
+                <FormikInput id="http-port" type="number" label="External port" name="http_port" />
 
-                {!isCloud && (
-                  <>
-                    <PortMismatchAlert
-                      formPort={values.http_port}
-                      collectorInputs={collectorInputs}
-                      isLoading={isLoadingInputDetails}
-                    />
+                <PortMismatchAlert
+                  formPort={values.http_port}
+                  collectorInputs={collectorInputs}
+                  isLoading={isLoadingInputDetails}
+                />
 
-                    {showCreateInputCheckbox && (
-                      <FormikInput id="create-input" type="checkbox" label="Create ingest input" name="create_input" />
-                    )}
-                  </>
+                {showCreateInputCheckbox && (
+                  <FormikInput id="create-input" type="checkbox" label="Create ingest input" name="create_input" />
                 )}
               </Col>
 
@@ -359,6 +365,26 @@ const CollectorsSettings = () => {
                     )
                   }
                 />
+
+                <TimeUnitInput
+                  label="Transaction log retention"
+                  update={(value: number, unit: string) => {
+                    setFieldValue('retention_value', value);
+                    setFieldValue('retention_unit', unit);
+                  }}
+                  value={values.retention_value}
+                  unit={values.retention_unit}
+                  units={THRESHOLD_UNITS}
+                  required
+                  hideCheckbox
+                  help={
+                    errors.retention_value ? (
+                      <span className="text-danger">{errors.retention_value}</span>
+                    ) : (
+                      "Transaction log entries older than this are purged, provided all collectors have processed them."
+                    )
+                  }
+                />
               </Col>
 
               <Col md={12}>
@@ -375,7 +401,7 @@ const CollectorsSettings = () => {
         </Formik>
       </Row>
 
-      {!isCloud && <IngestEndpointStatus isInitialSetup={!isConfigured} />}
+      <IngestEndpointStatus isInitialSetup={!isConfigured} />
     </>
   );
 };

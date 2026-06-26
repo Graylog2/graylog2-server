@@ -738,6 +738,52 @@ class CollectorInstanceServiceTest {
         assertThat(CollectorInstanceService.extractOsTypeFromReport(report)).isEqualTo(CollectorOSType.UNKNOWN);
     }
 
+    // --- getMinLastProcessedTxnSeq tests ---
+
+    @Test
+    void getMinLastProcessedTxnSeqReturnsMaxValueWhenNoInstances() {
+        assertThat(collectorInstanceService.getMinLastProcessedTxnSeq()).isEqualTo(Long.MAX_VALUE);
+    }
+
+    @Test
+    void getMinLastProcessedTxnSeqReturnsMaxValueWhenAllSeqZero() throws Exception {
+        enroll("uid-zero");
+        final var report = CollectorInstanceReport.builder()
+                .instanceUid("uid-zero")
+                .messageSeqNum(1L)
+                .capabilities(100L)
+                .lastProcessedTxnSeq(0L)
+                .build();
+        collectorInstanceService.updateFromReport(report);
+
+        assertThat(collectorInstanceService.getMinLastProcessedTxnSeq()).isEqualTo(Long.MAX_VALUE);
+    }
+
+    @Test
+    void getMinLastProcessedTxnSeqReturnsMinimumAcrossEligibleInstances() throws Exception {
+        enroll("uid-a");
+        enroll("uid-b");
+        enroll("uid-c");
+
+        collectorInstanceService.updateFromReport(CollectorInstanceReport.builder()
+                .instanceUid("uid-a").messageSeqNum(1L).capabilities(100L).lastProcessedTxnSeq(10L).build());
+        collectorInstanceService.updateFromReport(CollectorInstanceReport.builder()
+                .instanceUid("uid-b").messageSeqNum(1L).capabilities(100L).lastProcessedTxnSeq(5L).build());
+        collectorInstanceService.updateFromReport(CollectorInstanceReport.builder()
+                .instanceUid("uid-c").messageSeqNum(1L).capabilities(100L).lastProcessedTxnSeq(0L).build());
+
+        assertThat(collectorInstanceService.getMinLastProcessedTxnSeq()).isEqualTo(5L);
+    }
+
+    @Test
+    void getMinLastProcessedTxnSeqSingleInstance() throws Exception {
+        enroll("uid-single");
+        collectorInstanceService.updateFromReport(CollectorInstanceReport.builder()
+                .instanceUid("uid-single").messageSeqNum(1L).capabilities(100L).lastProcessedTxnSeq(42L).build());
+
+        assertThat(collectorInstanceService.getMinLastProcessedTxnSeq()).isEqualTo(42L);
+    }
+
     private static CollectorInstanceReport reportWithAttributes(List<Attribute> attributes) {
         return CollectorInstanceReport.builder()
                 .instanceUid("uid-1")
