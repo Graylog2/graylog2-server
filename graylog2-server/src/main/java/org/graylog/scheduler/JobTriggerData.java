@@ -16,8 +16,11 @@
  */
 package org.graylog.scheduler;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -36,10 +39,12 @@ public interface JobTriggerData {
         SELF type(String type);
     }
 
-    class FallbackData implements JobTriggerData {
-        @Override
-        public String type() {
-            return "";
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    record FallbackData(@JsonProperty(TYPE_FIELD) String type) implements JobTriggerData {
+        private static final Logger LOG = LoggerFactory.getLogger(FallbackData.class);
+
+        public FallbackData {
+            LOG.warn("JobTriggerData class for type <{}> not found", type);
         }
     }
 }
