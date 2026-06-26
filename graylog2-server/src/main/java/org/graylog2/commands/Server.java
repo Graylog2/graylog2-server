@@ -43,6 +43,7 @@ import org.graylog.plugins.formatting.units.UnitsModule;
 import org.graylog.plugins.map.MapWidgetModule;
 import org.graylog.plugins.map.config.GeoIpProcessorConfig;
 import org.graylog.plugins.netflow.NetFlowPluginModule;
+import org.graylog.plugins.onboarding.OnboardingModule;
 import org.graylog.plugins.pipelineprocessor.PipelineConfig;
 import org.graylog.plugins.sidecar.SidecarModule;
 import org.graylog.plugins.sidecar.common.SidecarPluginConfiguration;
@@ -241,6 +242,9 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
         );
 
         modules.add(new FieldTypeManagementModule());
+        if (featureFlags.isOn("onboarding_experience")) {
+            modules.add(new OnboardingModule());
+        }
 
         return modules.build();
     }
