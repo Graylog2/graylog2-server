@@ -96,8 +96,16 @@ describe('KeyMapperProvider', () => {
       .build();
     const twoRowPivotData = {
       chart: [
-        { source: 'leaf', key: ['a1', 'b1'], values: [{ source: 'row-leaf', key: ['count()'], value: 5, rollup: true }] },
-        { source: 'leaf', key: ['a1', 'b2'], values: [{ source: 'row-leaf', key: ['count()'], value: 3, rollup: true }] },
+        {
+          source: 'leaf',
+          key: ['a1', 'b1'],
+          values: [{ source: 'row-leaf', key: ['count()'], value: 5, rollup: true }],
+        },
+        {
+          source: 'leaf',
+          key: ['a1', 'b2'],
+          values: [{ source: 'row-leaf', key: ['count()'], value: 3, rollup: true }],
+        },
       ],
     } as any;
 

@@ -36,7 +36,12 @@ const QueryValidation = ({ validationExplanations = [] }: Props) => {
     errors: { queryString: queryStringErrors },
   } = useFormikContext<QueryForm>();
 
-  return <QueryValidationDisplay queryStringErrors={queryStringErrors as unknown as QueryValidationState} validationExplanations={validationExplanations} />;
+  return (
+    <QueryValidationDisplay
+      queryStringErrors={queryStringErrors as unknown as QueryValidationState}
+      validationExplanations={validationExplanations}
+    />
+  );
 };
 
 export default QueryValidation;
