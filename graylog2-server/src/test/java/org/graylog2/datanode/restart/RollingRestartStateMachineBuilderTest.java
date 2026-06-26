@@ -83,7 +83,7 @@ class RollingRestartStateMachineBuilderTest {
     @Test
     void upgradingNode_moreNodes_goesToStoppingNode() {
         final var sm = from(UPGRADING_NODE);
-        sm.fire(MORE_NODES);
+        sm.fire(PROCEED);
         assertThat(sm.getState()).isEqualTo(STOPPING_NODE);
     }
 
