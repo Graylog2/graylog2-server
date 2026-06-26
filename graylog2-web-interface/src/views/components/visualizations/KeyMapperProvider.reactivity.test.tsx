@@ -64,7 +64,10 @@ describe('KeyMapperProvider (async resolution)', () => {
   usePlugin(testPlugin);
 
   it('updates labels once asynchronously-loaded titles arrive', async () => {
-    const config = AggregationWidgetConfig.builder().rowPivots([Pivot.createValues(['b'])]).columnPivots([]).build();
+    const config = AggregationWidgetConfig.builder()
+      .rowPivots([Pivot.createValues(['b'])])
+      .columnPivots([])
+      .build();
     const data = { chart: [{ source: 'leaf', key: ['b1'], values: [] }] } as any;
 
     render(
