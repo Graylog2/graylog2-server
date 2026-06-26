@@ -42,7 +42,7 @@ public class V20260624153204_InitializeOnboardingState extends Migration {
 
     @Override
     public ZonedDateTime createdAt() {
-        return ZonedDateTime.parse("2026-06-15:32:04Z");
+        return ZonedDateTime.parse("2026-06-24T15:32:04Z");
     }
 
     @Override
