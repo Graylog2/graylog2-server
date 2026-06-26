@@ -257,11 +257,11 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
           bsSize="xsmall"
         />
         <MoreActions>
-            <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
-              <MenuItem onClick={onEditEventDefinition} data-testid="edit-button">
-                Edit
-              </MenuItem>
-            </IfPermitted>
+          <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
+            <MenuItem onClick={onEditEventDefinition} data-testid="edit-button">
+              Edit
+            </MenuItem>
+          </IfPermitted>
           <IfPermitted permissions="eventdefinitions:create">
             {!isSystemEventDefinition(eventDefinition) && !isSigmaEventDefinition(eventDefinition) && (
               <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
