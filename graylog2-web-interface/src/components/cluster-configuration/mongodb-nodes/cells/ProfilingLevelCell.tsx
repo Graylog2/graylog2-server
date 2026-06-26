@@ -17,7 +17,9 @@
 import React from 'react';
 import type { ColorVariant } from '@graylog/sawmill';
 
-import { MetricsColumn, MetricsRow, StyledLabel } from '../../shared-components/NodeMetricsLayout';
+import { Label } from 'components/bootstrap';
+
+import { MetricsColumn, MetricsRow } from '../../shared-components/NodeMetricsLayout';
 import { MongodbProfilingLevel, type MongodbProfilingLevelType } from '../fetchClusterMongodbNodes';
 
 const LEVEL_LABELS: Record<MongodbProfilingLevelType, { label: string; style: ColorVariant }> = {
@@ -36,14 +38,17 @@ const ProfilingLevelCell = ({ profilingLevel }: Props) => {
   }
 
   const levelInfo = LEVEL_LABELS[profilingLevel];
-  const resolvedLevelInfo: { label: string; style: ColorVariant } = levelInfo ?? { label: `Unknown (${profilingLevel})`, style: 'default' };
+  const resolvedLevelInfo: { label: string; style: ColorVariant } = levelInfo ?? {
+    label: `Unknown (${profilingLevel})`,
+    style: 'default',
+  };
 
   return (
     <MetricsColumn>
       <MetricsRow>
-        <StyledLabel bsStyle={resolvedLevelInfo.style} bsSize="xs">
+        <Label bsStyle={resolvedLevelInfo.style} bsSize="xs">
           {resolvedLevelInfo.label}
-        </StyledLabel>
+        </Label>
       </MetricsRow>
     </MetricsColumn>
   );

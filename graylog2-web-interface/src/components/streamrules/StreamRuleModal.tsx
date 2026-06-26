@@ -18,7 +18,7 @@ import * as React from 'react';
 import { Formik, Form, Field } from 'formik';
 import { useCallback, useMemo } from 'react';
 
-import type { StreamRule } from 'stores/streams/StreamsStore';
+import type { StreamRule } from 'logic/streams/types';
 import {
   Icon,
   TypeAheadFieldInput,

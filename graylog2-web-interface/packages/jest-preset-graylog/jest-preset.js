@@ -33,6 +33,7 @@ module.exports = {
     require.resolve('./lib/setup-files/console-warnings-fail-tests.js'),
     require.resolve('./lib/setup-files/mock-crypto-getrandomvalues.js'),
     require.resolve('./lib/setup-files/mock-styled-components.js'),
+    require.resolve('./lib/setup-files/mock-AppConfig.js'),
     /* eslint-enable no-undef */
     'jest-canvas-mock',
   ],
@@ -52,7 +53,23 @@ module.exports = {
   testPathIgnorePatterns: ['.fixtures.[jt]s$', '^<rootDir>/target/'],
   testTimeout: applyTimeoutMultiplier(5000),
   transform: {
-    '^.+\\.[tj]sx?$': 'babel-jest',
+    // Mirror the previous babel-preset-graylog behaviour:
+    // - target es5 downlevels `let`/`const` to `var`, which is required because several test
+    //   files reference variables from hoisted `jest.mock` factories (TDZ-safe only with `var`).
+    // - the classic React runtime extracts `key` from spread props like `React.createElement` did.
+    // - `useDefineForClassFields: true` keeps babel's define semantics for class fields.
+    '^.+\\.[tj]sx?$': ['@swc/jest', {
+      jsc: {
+        parser: { syntax: 'typescript', tsx: true, decorators: true },
+        transform: {
+          react: { runtime: 'classic' },
+          useDefineForClassFields: true,
+        },
+        target: 'es5',
+        loose: false,
+      },
+      module: { type: 'commonjs' },
+    }],
   },
   transformIgnorePatterns: [
     'node_modules/(?!(@react-hook|uuid|@?react-leaflet|jest-preset-graylog|graylog-web-plugin|styled-components|p-debounce|marked|d3-(interpolate|color))/)',

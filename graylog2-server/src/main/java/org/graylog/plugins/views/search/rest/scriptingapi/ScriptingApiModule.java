@@ -17,7 +17,10 @@
 package org.graylog.plugins.views.search.rest.scriptingapi;
 
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.plugins.views.ViewsModule;
+import org.graylog.plugins.views.search.rest.scriptingapi.mapping.SearchRequestSpecToSearchMapper;
+import org.graylog.plugins.views.search.rest.scriptingapi.mapping.SimpleSearchRequestSpecToSearchMapper;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.decorators.FieldDecorator;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.decorators.IdDecorator;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.decorators.NodeTitleDecorator;
@@ -29,6 +32,7 @@ public class ScriptingApiModule extends ViewsModule {
     protected void configure() {
         addSystemRestResource(ScriptingApiResource.class);
         bind(ScriptingApiService.class).to(ScriptingApiServiceImpl.class).asEagerSingleton();
+        OptionalBinder.newOptionalBinder(binder(), SearchRequestSpecToSearchMapper.class).setDefault().to(SimpleSearchRequestSpecToSearchMapper.class);
         jerseyAdditionalComponentsBinder().addBinding().toInstance(TabularResponseWriter.class);
 
         final Multibinder<FieldDecorator> fieldDecoratorBinder = Multibinder.newSetBinder(binder(), FieldDecorator.class);
