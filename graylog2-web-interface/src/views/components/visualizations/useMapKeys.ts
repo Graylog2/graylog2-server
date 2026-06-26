@@ -14,42 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useCallback, useContext, useMemo } from 'react';
+import { useContext } from 'react';
 
 import type { KeyMapper } from 'views/components/visualizations/TransformKeys';
-import StreamsContext from 'contexts/StreamsContext';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import type { Key } from 'views/logic/searchtypes/pivot/PivotHandler';
-import { useInputs } from 'hooks/useInputs';
-import useNodeSummaries from 'hooks/useNodeSummaries';
+import KeyMapperContext from 'views/components/visualizations/KeyMapperContext';
 
-const formatNode = (node: { short_node_id: string; hostname: string }) => `${node.short_node_id} / ${node.hostname}`;
-
-const useMapKeys = (): KeyMapper => {
-  const streams = useContext(StreamsContext);
-  const streamsMap = useMemo(() => Object.fromEntries(streams?.map((stream) => [stream.id, stream]) ?? []), [streams]);
-  const nodes = useNodeSummaries();
-  const inputs = useInputs();
-  const fieldTypes = useContext(FieldTypesContext);
-  const currentFields = useMemo(() => fieldTypes?.currentQuery, [fieldTypes?.currentQuery]);
-
-  return useCallback(
-    (key: Key, field: string) => {
-      const fieldType = currentFields?.find((type) => type.name === field);
-
-      switch (fieldType?.type?.type) {
-        case 'node':
-          return nodes?.[key] ? formatNode(nodes[key]) : key;
-        case 'input':
-          return inputs?.[key]?.title ?? key;
-        case 'streams':
-          return streamsMap?.[key]?.title ?? key;
-        default:
-          return key;
-      }
-    },
-    [currentFields, inputs, nodes, streamsMap],
-  );
-};
+const useMapKeys = (): KeyMapper => useContext(KeyMapperContext);
 
 export default useMapKeys;

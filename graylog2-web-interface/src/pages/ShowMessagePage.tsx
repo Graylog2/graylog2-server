@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useMemo, useState, useContext } from 'react';
+import React, {useEffect, useMemo, useState, useContext} from 'react';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
 
@@ -22,23 +22,24 @@ import useMessage from 'views/hooks/useMessage';
 import MessageDetail from 'components/common/message/details/MessageDetail';
 import DocumentTitle from 'components/common/DocumentTitle';
 import Spinner from 'components/common/Spinner';
-import { Col, Row } from 'components/bootstrap';
+import {Col, Row} from 'components/bootstrap';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import withParams from 'routing/withParams';
-import type { Input } from 'components/messageloaders/Types';
+import type {Input} from 'components/messageloaders/Types';
 import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
-import { fetchInput } from 'hooks/useInputs';
-import { NodesActions } from 'stores/nodes/NodesStore';
-import { isLocalNode } from 'views/hooks/useIsLocalNode';
+import {fetchInput} from 'hooks/useInputs';
+import FetchError from 'logic/errors/FetchError';
+import {NodesActions} from 'stores/nodes/NodesStore';
+import {isLocalNode} from 'views/hooks/useIsLocalNode';
 import ViewsStoreProvider from 'views/stores/ViewsStoreProvider';
 import View from 'views/logic/views/View';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import SingleMessageFieldTypesProvider from 'views/components/fieldtypes/SingleMessageFieldTypesProvider';
 import StreamsContext from 'contexts/StreamsContext';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import type { Message } from 'views/components/messagelist/Types';
+import type {Message} from 'views/components/messagelist/Types';
 import ErrorPage from 'components/errors/ErrorPage';
-import type { Stream } from 'logic/streams/types';
+import type {Stream} from 'logic/streams/types';
 
 type Props = {
   params: {
@@ -53,12 +54,20 @@ const useInputs = (sourceInputId: string | undefined, gl2SourceNode: string | un
   useEffect(() => {
     const fetchInputs = async () => {
       if (sourceInputId && (await isLocalNode(gl2SourceNode))) {
-        const input = await fetchInput(sourceInputId);
+        try {
+          const input = await fetchInput(sourceInputId);
 
-        if (input) {
-          const newInputs = Immutable.Map({ [input.id]: input });
+          if (input) {
+            const newInputs = Immutable.Map({ [input.id]: input });
 
-          setInputs(newInputs);
+            setInputs(newInputs);
+          }
+        } catch (e) {
+          // A missing input — a deleted one, or the in-memory collector ingest input which has no persisted
+          // record — is not an error here
+          if (!(e instanceof FetchError && e.status === 404)) {
+            throw e;
+          }
         }
       }
     };

@@ -18,7 +18,6 @@ import React from 'react';
 import concat from 'lodash/concat';
 import isEqual from 'lodash/isEqual';
 import without from 'lodash/without';
-import IsolatedScroll from 'react-isolated-scroll';
 
 import { FormControl, FormGroup, ListGroup, ListGroupItem } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
@@ -186,7 +185,7 @@ class SelectPopover extends React.Component<
       <>
         {displayDataFilter && this.renderDataFilter(items)}
         {selectedItems.length > 0 && this.renderClearSelectionItem()}
-        <IsolatedScroll className={style.scrollableList}>
+        <div className={style.scrollableList}>
           <ListGroup>
             {filteredItems.map((item) => (
               <ListGroupItem
@@ -198,7 +197,7 @@ class SelectPopover extends React.Component<
               </ListGroupItem>
             ))}
           </ListGroup>
-        </IsolatedScroll>
+        </div>
       </>
     );
 
