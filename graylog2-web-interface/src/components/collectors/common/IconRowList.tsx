@@ -29,7 +29,7 @@ export const IconRowList = styled.ul`
 export const IconRow = styled.li(
   ({ theme }) => css`
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: ${theme.spacings.sm};
     padding: ${theme.spacings.xs} 0;
   `,

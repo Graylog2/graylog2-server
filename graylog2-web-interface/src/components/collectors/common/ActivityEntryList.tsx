@@ -37,6 +37,44 @@ const MutedText = styled.span(
   `,
 );
 
+// Query container so the rows adapt to their own available width rather than the viewport: the same
+// component renders inline in the wide overview feed and stacked in the narrow instance drawer.
+const ActivityList = styled(IconRowList)`
+  container-type: inline-size;
+`;
+
+// Below the xs container width (e.g. the narrow instance drawer) the actor/timestamp drop onto a
+// line below the description so it no longer wraps early; in wider containers they stay inline.
+const Row = styled(DividedIconRow)(
+  ({ theme }) => css`
+    @container (max-width: ${theme.breakpoints.max.xs}) {
+      align-items: flex-start;
+    }
+  `,
+);
+
+const Content = styled.div(
+  ({ theme }) => css`
+    flex: 1;
+    display: flex;
+    align-items: baseline;
+    gap: ${theme.spacings.sm};
+
+    @container (max-width: ${theme.breakpoints.max.xs}) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: ${theme.spacings.xxs};
+    }
+  `,
+);
+
+const Meta = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    gap: ${theme.spacings.xs};
+  `,
+);
+
 const ICON_MAP: Record<ActivityEntry['type'], IconName> = {
   CONFIG_CHANGED: 'settings',
   INGEST_CONFIG_CHANGED: 'settings',
@@ -134,23 +172,28 @@ type Props = {
 /**
  * Renders transaction-log activity entries (icon, description, actor, time). Shared between the
  * overview's Recent Activity feed and the instance drawer's Pending Changes section, mirroring the
- * shared `ActivityEntryMapper` on the backend.
+ * shared `ActivityEntryMapper` on the backend. The actor/timestamp stack below the description in
+ * narrow containers (see {@link Content}).
  */
 const ActivityEntryList = ({ entries, compareTargets = byName }: Props) => (
-  <IconRowList>
+  <ActivityList>
     {entries.map((entry) => (
-      <DividedIconRow key={entry.seq}>
+      <Row key={entry.seq}>
         <Icon name={ICON_MAP[entry.type] ?? 'info'} />
-        <Description>{renderDescription(entry, compareTargets)}</Description>
-        <MutedText>{entry.actor ? `by ${entry.actor.full_name}` : 'by System'}</MutedText>
-        {entry.timestamp && (
-          <MutedText>
-            <RelativeTime dateTime={entry.timestamp} />
-          </MutedText>
-        )}
-      </DividedIconRow>
+        <Content>
+          <Description>{renderDescription(entry, compareTargets)}</Description>
+          <Meta>
+            <MutedText>{entry.actor ? `by ${entry.actor.full_name}` : 'by System'}</MutedText>
+            {entry.timestamp && (
+              <MutedText>
+                <RelativeTime dateTime={entry.timestamp} />
+              </MutedText>
+            )}
+          </Meta>
+        </Content>
+      </Row>
     ))}
-  </IconRowList>
+  </ActivityList>
 );
 
 export default ActivityEntryList;
