@@ -50,7 +50,9 @@ const KeyMapperProvider = ({ data, config, fields, children }: Props) => {
   // entries are registered once at module load, so this is a stable-length, stable-order list of
   // hook calls on every render (the Rules of Hooks preconditions hold).
   const mappers = (bindings ?? []).map((binding) => binding.useKeyMapper(keysByType[binding.type] ?? []));
-  const mapperByType = Object.fromEntries((bindings ?? []).map((binding, idx) => [binding.type, mappers[idx]] as const));
+  const mapperByType = Object.fromEntries(
+    (bindings ?? []).map((binding, idx) => [binding.type, mappers[idx]] as const),
+  );
 
   const fieldTypeByName = useMemo(() => {
     const pivotFields = [
