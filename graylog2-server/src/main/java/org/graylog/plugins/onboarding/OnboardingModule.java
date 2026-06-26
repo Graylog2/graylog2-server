@@ -18,6 +18,7 @@ package org.graylog.plugins.onboarding;
 
 import org.graylog.plugins.onboarding.audit.OnboardingAuditEventTypes;
 import org.graylog.plugins.onboarding.rest.OnboardingResource;
+import org.graylog2.migrations.V20260624153204_InitializeOnboardingState;
 import org.graylog2.plugin.PluginModule;
 
 public class OnboardingModule extends PluginModule {
@@ -25,5 +26,6 @@ public class OnboardingModule extends PluginModule {
     protected void configure() {
         addSystemRestResource(OnboardingResource.class);
         addAuditEventTypes(OnboardingAuditEventTypes.class);
+        addMigration(V20260624153204_InitializeOnboardingState.class);
     }
 }
