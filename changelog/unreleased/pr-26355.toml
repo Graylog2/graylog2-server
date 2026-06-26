@@ -1,0 +1,4 @@
+type = "changed"
+message = "Renamed the \"Fields\" tab on the Event Definition wizard to \"Additional Details\"."
+issues = ["Graylog2/graylog-plugin-enterprise#14222"]
+pulls = ["26355"]

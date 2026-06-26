@@ -20,6 +20,7 @@ import { useQueries } from '@tanstack/react-query';
 import { SystemInputs } from '@graylog/server-api';
 
 import useCurrentUser from 'hooks/useCurrentUser';
+import AppConfig from 'util/AppConfig';
 import { isPermitted } from 'util/PermissionsMixin';
 import { onError } from 'util/conditional/onError';
 import FetchError from 'logic/errors/FetchError';
@@ -49,6 +50,7 @@ export const useCollectorInputDetails = () => {
           );
         }),
       retry: false,
+      enabled: !AppConfig.isCloud(),
       refetchOnWindowFocus: true, // override global false — refresh input data when user returns to this tab
     })),
   });
