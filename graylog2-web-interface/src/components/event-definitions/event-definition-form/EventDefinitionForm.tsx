@@ -35,7 +35,7 @@ const WizardContainer = styled.div`
 const STEP_KEYS = {
   EVENT_DETAILS: 'event-details',
   CONDITION: 'condition',
-  FIELDS: 'fields',
+  ADDITIONAL_DETAILS: 'additional-details',
   NOTIFICATIONS: 'notifications',
   SHARE: 'Share',
   SUMMARY: 'summary',
@@ -44,11 +44,20 @@ const STEP_KEYS = {
 export const getStepKeys = (isNew: boolean, hideFieldsStep = false) => [
   STEP_KEYS.EVENT_DETAILS,
   STEP_KEYS.CONDITION,
-  ...(hideFieldsStep ? [] : [STEP_KEYS.FIELDS]),
+  ...(hideFieldsStep ? [] : [STEP_KEYS.ADDITIONAL_DETAILS]),
   STEP_KEYS.NOTIFICATIONS,
   ...(isNew ? [STEP_KEYS.SHARE] : []),
   STEP_KEYS.SUMMARY,
 ];
+
+// Maps legacy `?step=` query-param values to their current keys so older bookmarked
+// links keep landing on the right step (e.g. `fields` was renamed to `additional-details`).
+const LEGACY_STEP_KEYS: Record<string, string> = {
+  fields: STEP_KEYS.ADDITIONAL_DETAILS,
+};
+
+export const normalizeStepKey = (step: string | undefined): string | undefined =>
+  step ? (LEGACY_STEP_KEYS[step] ?? step) : step;
 
 const STEP_TELEMETRY_KEYS = [
   TELEMETRY_EVENT_TYPE.EVENTDEFINITION_DETAILS.STEP_CLICKED,
