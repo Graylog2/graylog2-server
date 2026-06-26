@@ -18,6 +18,7 @@ package org.graylog.events.search;
 
 import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
+import org.graylog.events.search.EventDefinitionFilter;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.searches.Sorting;
@@ -59,7 +60,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
     public void eventSearchGetsAllMessages() {
         int expectedNumberOfMessages = 7;
 
-        final MoreSearch.Result result = toTest.eventSearch("*", RelativeRange.allTime(), Set.of(INDEX_NAME), Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", allAllowed());
+        final MoreSearch.Result result = toTest.eventSearch("*", RelativeRange.allTime(), Set.of(INDEX_NAME), Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", allAllowed(), EventDefinitionFilter.allAllowed());
         assertThat(result.results()).hasSize(expectedNumberOfMessages);
         for (int i = 0; i < expectedNumberOfMessages; i++) {
             verifyResult(result, i, expectedNumberOfMessages - i);
@@ -69,7 +70,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
     @Test
     public void eventsHistogram() {
         final AbsoluteRange timerange = AbsoluteRange.create("2015-01-01 01:00:00.000", "2022-01-01 01:00:00.000");
-        final MoreSearch.Histogram result = toTest.eventHistogram("*", timerange, Set.of(INDEX_NAME), ALL_STREAMS, "*", allAllowed(), ZoneId.of("Europe/Vienna"), Map.of());
+        final MoreSearch.Histogram result = toTest.eventHistogram("*", timerange, Set.of(INDEX_NAME), ALL_STREAMS, "*", allAllowed(), EventDefinitionFilter.allAllowed(), ZoneId.of("Europe/Vienna"), Map.of());
         Assertions.assertThat(result.effectiveTimerange()).isEqualTo(timerange);
         Assertions.assertThat(result.buckets().alerts())
                 .hasSize(85);
@@ -92,13 +93,13 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
     public void eventSearchGetsPaginatedMessages() {
         //page 1 : 7,6, page 2 : 5, 4, page 3: 3,2, page 4 : 1
         for (int i = 0; i < 3; i++) {
-            final MoreSearch.Result result = toTest.eventSearch("*", RelativeRange.allTime(), Set.of(INDEX_NAME), Sorting.DEFAULT, i + 1, 2, ALL_STREAMS, "", allAllowed());
+            final MoreSearch.Result result = toTest.eventSearch("*", RelativeRange.allTime(), Set.of(INDEX_NAME), Sorting.DEFAULT, i + 1, 2, ALL_STREAMS, "", allAllowed(), EventDefinitionFilter.allAllowed());
             assertThat(result.results()).hasSize(2);
             verifyResult(result, 0, 7 - i * 2);
             verifyResult(result, 1, 6 - i * 2);
         }
 
-        final MoreSearch.Result result = toTest.eventSearch("*", RelativeRange.allTime(), Set.of(INDEX_NAME), Sorting.DEFAULT, 4, 2, ALL_STREAMS, "", allAllowed());
+        final MoreSearch.Result result = toTest.eventSearch("*", RelativeRange.allTime(), Set.of(INDEX_NAME), Sorting.DEFAULT, 4, 2, ALL_STREAMS, "", allAllowed(), EventDefinitionFilter.allAllowed());
         assertThat(result.results()).hasSize(1);
         verifyResult(result, 0, 1);
 
@@ -106,13 +107,13 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
 
     @Test
     public void eventSearchReturnsNoMessagesIfTheyDoNotMatchQueryString() {
-        final MoreSearch.Result result = toTest.eventSearch("message:moin", RelativeRange.allTime(), Set.of(INDEX_NAME), Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", allAllowed());
+        final MoreSearch.Result result = toTest.eventSearch("message:moin", RelativeRange.allTime(), Set.of(INDEX_NAME), Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", allAllowed(), EventDefinitionFilter.allAllowed());
         assertThat(result.results()).isEmpty();
     }
 
     @Test
     public void eventSearchNoExceptionIfIndexUnavailable() {
-        final MoreSearch.Result result = toTest.eventSearch("*", RelativeRange.allTime(), Set.of("unavailable"), Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", allAllowed());
+        final MoreSearch.Result result = toTest.eventSearch("*", RelativeRange.allTime(), Set.of("unavailable"), Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", allAllowed(), EventDefinitionFilter.allAllowed());
         assertThat(result.results()).isEmpty();
     }
 
@@ -120,7 +121,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
     public void eventSearchPartiallyAvailable() {
         int expectedNumberOfMessages = 7;
 
-        final MoreSearch.Result result = toTest.eventSearch("*", RelativeRange.allTime(), Set.of("unavailable", INDEX_NAME), Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", allAllowed());
+        final MoreSearch.Result result = toTest.eventSearch("*", RelativeRange.allTime(), Set.of("unavailable", INDEX_NAME), Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", allAllowed(), EventDefinitionFilter.allAllowed());
         assertThat(result.results()).hasSize(expectedNumberOfMessages);
         for (int i = 0; i < expectedNumberOfMessages; i++) {
             verifyResult(result, i, expectedNumberOfMessages - i);
@@ -233,7 +234,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
                 RelativeRange.allTime(),
                 Set.of(INDEX_NAME),
                 Sorting.DEFAULT,
-                1, 10, ALL_STREAMS, "", allAllowed());
+                1, 10, ALL_STREAMS, "", allAllowed(), EventDefinitionFilter.allAllowed());
 
         assertThat(resultAsc.results()).hasSize(7);
         // Default sorting is descending by timestamp, so newest first
@@ -248,7 +249,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
                 RelativeRange.allTime(),
                 Set.of(INDEX_NAME),
                 new Sorting("timestamp", Sorting.Direction.ASC),
-                1, 10, ALL_STREAMS, "", allAllowed());
+                1, 10, ALL_STREAMS, "", allAllowed(), EventDefinitionFilter.allAllowed());
 
         assertThat(result.results()).hasSize(7);
         // Ascending order - oldest first
@@ -263,7 +264,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
                 RelativeRange.allTime(),
                 Set.of(INDEX_NAME),
                 new Sorting("timestamp", Sorting.Direction.DESC),
-                1, 10, ALL_STREAMS, "", allAllowed());
+                1, 10, ALL_STREAMS, "", allAllowed(), EventDefinitionFilter.allAllowed());
 
         assertThat(result.results()).hasSize(7);
         // Descending order - newest first
@@ -277,7 +278,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
         final MoreSearch.Result result = toTest.eventSearch("*",
                 RelativeRange.allTime(),
                 Set.of(INDEX_NAME),
-                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", allAllowed(), extraFilters);
+                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", allAllowed(), EventDefinitionFilter.allAllowed(), extraFilters);
 
         assertThat(result.results()).hasSize(2);
         verifyResult(result, 0, 7);
@@ -290,7 +291,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
         final MoreSearch.Result result = toTest.eventSearch("*",
                 RelativeRange.allTime(),
                 Set.of(INDEX_NAME),
-                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", allAllowed(), extraFilters);
+                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", allAllowed(), EventDefinitionFilter.allAllowed(), extraFilters);
 
         assertThat(result.results()).hasSize(2);
         verifyResult(result, 0, 7);
@@ -303,7 +304,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
         final MoreSearch.Result result = toTest.eventSearch("*",
                 RelativeRange.allTime(),
                 Set.of(INDEX_NAME),
-                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", allAllowed(), extraFilters);
+                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", allAllowed(), EventDefinitionFilter.allAllowed(), extraFilters);
 
         assertThat(result.results()).hasSize(3);
         verifyResult(result, 0, 3);
@@ -317,7 +318,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
         final MoreSearch.Result result = toTest.eventSearch("*",
                 RelativeRange.allTime(),
                 Set.of(INDEX_NAME),
-                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", allAllowed(), extraFilters);
+                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", allAllowed(), EventDefinitionFilter.allAllowed(), extraFilters);
 
         assertThat(result.results()).hasSize(3);
         verifyResult(result, 0, 3);
@@ -333,7 +334,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
         final MoreSearch.Result result = toTest.eventSearch("*",
                 RelativeRange.allTime(),
                 Set.of(INDEX_NAME),
-                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", allAllowed(), extraFilters);
+                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", allAllowed(), EventDefinitionFilter.allAllowed(), extraFilters);
 
         assertThat(result.results()).hasSize(3);
         verifyResult(result, 0, 6);
@@ -346,7 +347,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
         final MoreSearch.Result result = toTest.eventSearch("*",
                 RelativeRange.allTime(),
                 Set.of(INDEX_NAME),
-                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "alert:true", allAllowed());
+                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "alert:true", allAllowed(), EventDefinitionFilter.allAllowed());
 
         assertThat(result.results()).hasSize(3); // Only messages with alert:true
         verifyResult(result, 0, 7);
@@ -359,7 +360,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
         final MoreSearch.Result result = toTest.eventSearch("message:Ahoj",
                 RelativeRange.allTime(),
                 Set.of(INDEX_NAME),
-                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "alert:true", allAllowed());
+                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "alert:true", allAllowed(), EventDefinitionFilter.allAllowed());
 
         assertThat(result.results()).hasSize(1); // Only message 7 has both
         verifyResult(result, 0, 7);
@@ -371,7 +372,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
         final MoreSearch.Result result = toTest.eventSearch("message:Ahoj",
                 RelativeRange.allTime(),
                 Set.of(INDEX_NAME),
-                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", allAllowed(), extraFilters);
+                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", allAllowed(), EventDefinitionFilter.allAllowed(), extraFilters);
 
         assertThat(result.results()).hasSize(3); // Messages 5, 6, 7 have "Ahoj" and number > 4
         verifyResult(result, 0, 7);
@@ -386,7 +387,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
         final MoreSearch.Result result = toTest.eventSearch("*",
                 RelativeRange.allTime(),
                 Set.of(INDEX_NAME),
-                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", allAllowed(), extraFilters);
+                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", allAllowed(), EventDefinitionFilter.allAllowed(), extraFilters);
 
         assertThat(result.results()).hasSize(4); // messages 1-4 have "Hi"
     }
@@ -397,7 +398,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
         final MoreSearch.Result result = toTest.eventSearch("*",
                 RelativeRange.allTime(),
                 Set.of(INDEX_NAME),
-                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", allAllowed(), extraFilters);
+                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", allAllowed(), EventDefinitionFilter.allAllowed(), extraFilters);
 
         assertThat(result.results()).hasSize(7);
     }
@@ -408,7 +409,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
         final MoreSearch.Histogram result = toTest.eventHistogram("*",
                 AbsoluteRange.create("2015-01-01 01:00:00.000", "2022-01-01 01:00:00.000"),
                 Set.of(INDEX_NAME),
-                ALL_STREAMS, "", allAllowed(), ZoneId.of("Europe/Vienna"), extraFilters);
+                ALL_STREAMS, "", allAllowed(), EventDefinitionFilter.allAllowed(), ZoneId.of("Europe/Vienna"), extraFilters);
 
         final long totalCount = result.buckets().alerts().stream().mapToLong(MoreSearch.Histogram.Bucket::count).sum()
                 + result.buckets().events().stream().mapToLong(MoreSearch.Histogram.Bucket::count).sum();
@@ -420,7 +421,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
         final MoreSearch.Result result = toTest.eventSearch("*",
                 RelativeRange.allTime(),
                 Set.of(INDEX_NAME),
-                Sorting.DEFAULT, 100, 10, ALL_STREAMS, "", allAllowed());
+                Sorting.DEFAULT, 100, 10, ALL_STREAMS, "", allAllowed(), EventDefinitionFilter.allAllowed());
 
         assertThat(result.results()).isEmpty();
     }
@@ -479,7 +480,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
                 RelativeRange.allTime(),
                 Set.of(INDEX_NAME),
                 Sorting.DEFAULT, 1, 10, ALL_STREAMS, "",
-                SourceStreamFilter.allowList(Set.of("source_stream_a")));
+                SourceStreamFilter.allowList(Set.of("source_stream_a")), EventDefinitionFilter.allAllowed());
 
         assertThat(result.results()).hasSize(1);
         verifyResult(result, 0, 5);
@@ -492,7 +493,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
                 RelativeRange.allTime(),
                 Set.of(INDEX_NAME),
                 Sorting.DEFAULT, 1, 10, ALL_STREAMS, "",
-                SourceStreamFilter.allowList(Set.of("source_stream_a", "source_stream_b")));
+                SourceStreamFilter.allowList(Set.of("source_stream_a", "source_stream_b")), EventDefinitionFilter.allAllowed());
 
         assertThat(result.results()).hasSize(2);
         verifyResult(result, 0, 6);
@@ -506,7 +507,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
                 RelativeRange.allTime(),
                 Set.of(INDEX_NAME),
                 Sorting.DEFAULT, 1, 10, ALL_STREAMS, "",
-                SourceStreamFilter.allowList(Set.of("source_stream_a")));
+                SourceStreamFilter.allowList(Set.of("source_stream_a")), EventDefinitionFilter.allAllowed());
 
         assertThat(result.results()).hasSize(1);
         verifyResult(result, 0, 5);

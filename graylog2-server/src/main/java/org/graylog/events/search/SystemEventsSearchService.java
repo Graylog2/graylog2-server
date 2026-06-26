@@ -57,7 +57,7 @@ public class SystemEventsSearchService extends AbstractEventsSearchService {
             throw e;
         }
         final var filter = new EventsFilterBuilder(parameters).build();
-        final MoreSearch.Result result = moreSearch.eventSearch(parameters, filter, eventStreams, allAllowed());
+        final MoreSearch.Result result = moreSearch.eventSearch(parameters, filter, eventStreams, allAllowed(), EventDefinitionFilter.allAllowed());
 
         return buildResultForSystem(parameters, result);
     }
