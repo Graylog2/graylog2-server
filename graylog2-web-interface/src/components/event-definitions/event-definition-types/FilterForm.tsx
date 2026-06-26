@@ -533,7 +533,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
           <InputRow>
             <ViewsQueryInput
               inputId="filter-query"
-              name="query"
+              name="search query"
               value={currentConfig.query ?? ''}
               onChange={handleQueryChange}
               isValidating={false}
