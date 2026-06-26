@@ -40,6 +40,7 @@ import org.graylog.collectors.db.TransactionMarker;
 import org.graylog.collectors.rest.RecentActivityResponse.ActivityDetails;
 import org.graylog.collectors.rest.RecentActivityResponse.FleetReassignedDetails;
 import org.graylog.collectors.rest.RecentActivityResponse.TargetInfo;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
@@ -59,6 +60,7 @@ import java.util.stream.Collectors;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
+@PublicCloudAPI
 public class CollectorsActivityResource extends RestResource {
 
     private static final int RECENT_ACTIVITY_LIMIT = 20;

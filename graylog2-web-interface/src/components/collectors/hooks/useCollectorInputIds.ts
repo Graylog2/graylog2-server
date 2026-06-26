@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { CollectorsConfig as CollectorsConfigApi } from '@graylog/server-api';
 
+import AppConfig from 'util/AppConfig';
 import { defaultOnError } from 'util/conditional/onError';
 
 import type { CollectorInputIdsResponse } from '../types';
@@ -33,6 +34,7 @@ export const useCollectorInputIds = (): { data: string[] | undefined; isLoading:
         'Loading Collector input IDs failed with status',
         'Could not load Collector input IDs.',
       ),
+    enabled: !AppConfig.isCloud(),
     refetchOnWindowFocus: true, // override global false — refresh input data when user returns to this tab
   });
 
