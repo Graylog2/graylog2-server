@@ -19,11 +19,13 @@ import styled, { css } from 'styled-components';
 
 import { Icon } from 'components/common';
 
-const Wrapper = styled.span(
+const Wrapper = styled.span`
+  white-space: nowrap;
+`;
+
+const StatusLabel = styled.span(
   ({ theme }) => css`
-    display: inline-flex;
-    align-items: center;
-    gap: ${theme.spacings.xxs};
+    margin-left: ${theme.spacings.xxs};
   `,
 );
 
@@ -52,12 +54,12 @@ const SyncStateIndicator = ({ pending, withLabel = false }: Props) =>
   pending ? (
     <Wrapper title="Sync pending — changes will apply at the collector's next check-in">
       <SyncPendingIcon name="update" />
-      {withLabel && <span>Sync pending</span>}
+      {withLabel && <StatusLabel>Sync pending</StatusLabel>}
     </Wrapper>
   ) : (
     <Wrapper title="In sync — all changes applied">
       <InSyncIcon name="check_circle" />
-      {withLabel && <span>In sync</span>}
+      {withLabel && <StatusLabel>In sync</StatusLabel>}
     </Wrapper>
   );
 
