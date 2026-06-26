@@ -35,7 +35,7 @@ const SyncPendingIcon = styled(Icon)(
 
 const InSyncIcon = styled(Icon)(
   ({ theme }) => css`
-    color: ${theme.colors.variant.default};
+    color: ${theme.colors.text.primary};
   `,
 );
 
