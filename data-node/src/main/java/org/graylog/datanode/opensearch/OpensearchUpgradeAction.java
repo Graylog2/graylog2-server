@@ -49,16 +49,14 @@ public class OpensearchUpgradeAction {
         final String opensearchVersion = opensearchDistribution.version();
 
         final Version currentVersion = Version.parse(opensearchVersion);
-        final String latestAvailableVersion = opensearchDistribution.otherCandidates().stream()
+        opensearchDistribution.otherCandidates().stream()
                 .filter(candidate -> Version.parse(candidate.version()).isHigherThan(currentVersion))
                 .max(Comparator.comparing(d -> Version.parse(d.version())))
                 .map(OpensearchDistribution::version)
-                .orElse(null);
-        metadataService.setOpensearchVersions(nodeId.getNodeId(), latestAvailableVersion, null);
-        LOG.info("Persisting confirmed opensearch version in data node metadata {}", opensearchVersion);
-        if (latestAvailableVersion != null) {
-            LOG.warn("You are running outdated Opensearch version. Please go to the data node upgrade page in administration to update to {}", latestAvailableVersion);
-        }
+                .ifPresent(latest -> {
+                    metadataService.setOpensearchVersions(nodeId.getNodeId(), latest, null);
+                    LOG.info("Datanode upgraded to use the latest opensearch version {}", latest);
+                });
     }
 }
 
