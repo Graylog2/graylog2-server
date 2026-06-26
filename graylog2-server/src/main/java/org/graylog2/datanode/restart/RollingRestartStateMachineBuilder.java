@@ -44,7 +44,7 @@ public final class RollingRestartStateMachineBuilder {
                 .permit(RollingRestartTrigger.ERROR, RollingRestartState.FAILED);
 
         c.configure(RollingRestartState.UPGRADING_NODE)
-                .permit(RollingRestartTrigger.MORE_NODES, RollingRestartState.STOPPING_NODE)
+                .permit(RollingRestartTrigger.PROCEED, RollingRestartState.STOPPING_NODE)
                 .permit(RollingRestartTrigger.ERROR, RollingRestartState.FAILED);
 
         c.configure(RollingRestartState.STOPPING_NODE)
