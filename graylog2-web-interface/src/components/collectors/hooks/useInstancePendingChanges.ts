@@ -24,12 +24,7 @@ import useCollectorRefetchInterval from './useCollectorRefetchInterval';
 
 import type { PendingChangesResponse } from '../types';
 
-export const pendingChangesKey = (instanceUid: string) => [
-  'collectors',
-  'instances',
-  instanceUid,
-  'pending_changes',
-];
+export const pendingChangesKey = (instanceUid: string) => ['collectors', 'instances', instanceUid, 'pending_changes'];
 
 const fetchPendingChanges = (instanceUid: string): Promise<PendingChangesResponse> =>
   Collectors.instancePendingChanges(instanceUid) as Promise<PendingChangesResponse>;

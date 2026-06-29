@@ -133,9 +133,7 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
   const osDescription = (instance.non_identifying_attributes?.['os.description'] as string) ?? null;
   const { data: pendingChanges, isError: pendingChangesError } = useInstancePendingChanges(instance.instance_uid);
   // Until the pending-changes detail has loaded, fall back to the flag from the table row.
-  const hasPendingChanges = pendingChanges
-    ? pendingChanges.activities.length > 0
-    : instance.has_pending_changes;
+  const hasPendingChanges = pendingChanges ? pendingChanges.activities.length > 0 : instance.has_pending_changes;
   const [showTransactions, setShowTransactions] = useState(false);
 
   // In this per-instance view a bulk reassignment lists every collector in the batch. Float the
