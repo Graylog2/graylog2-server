@@ -105,6 +105,9 @@ const TransactionsToggle = styled(Button)`
 
 type PendingAction = { key: string; icon: IconName; description: React.ReactNode };
 
+// The Synchronization section's mutually-exclusive states, in precedence order.
+type SyncStatus = 'error' | 'loading' | 'pending' | 'inSync';
+
 // The net actions still awaiting the collector, as imperative one-liners.
 const pendingActions = (coalesced: CoalescedActions): PendingAction[] => {
   const actions: PendingAction[] = [];
@@ -131,13 +134,27 @@ const pendingActions = (coalesced: CoalescedActions): PendingAction[] => {
 
 const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) => {
   const osDescription = (instance.non_identifying_attributes?.['os.description'] as string) ?? null;
-  const { data: pendingChanges, isError: pendingChangesError } = useInstancePendingChanges(instance.instance_uid);
+  const { data: pendingDetail, isError: pendingError } = useInstancePendingChanges(instance.instance_uid);
   // Use the backend's authoritative flag (consistent with the table); fall back to the table row's
   // value until the detail loads. Deriving from activities.length would wrongly show "In sync" for an
   // instance whose only pending markers are UNKNOWN (those are excluded from activities).
-  const hasPendingChanges = pendingChanges ? pendingChanges.has_pending_changes : instance.has_pending_changes;
-  const actions = pendingChanges ? pendingActions(pendingChanges.coalesced) : [];
+  const hasPendingChanges = pendingDetail ? pendingDetail.has_pending_changes : instance.has_pending_changes;
+  const actions = pendingDetail ? pendingActions(pendingDetail.coalesced) : [];
+  const activities = pendingDetail ? pendingDetail.activities : [];
   const [showTransactions, setShowTransactions] = useState(false);
+
+  // The Synchronization section is a small state machine over the pending-changes request. The
+  // header indicator still uses hasPendingChanges (above) so it can show the table's value at once;
+  // the section waits for the fetched detail to avoid flashing a contradictory "In sync".
+  const syncStatus: SyncStatus = pendingError
+    ? 'error'
+    : !pendingDetail
+      ? 'loading'
+      : hasPendingChanges
+        ? 'pending'
+        : 'inSync';
+  // Among pending instances, whether any queued change is describable (vs only UNKNOWN markers).
+  const hasDescribableChanges = actions.length > 0 || activities.length > 0;
 
   // In this per-instance view a bulk reassignment lists every collector in the batch. Float the
   // collector we're viewing to the front so it leads the description instead of an arbitrary one.
@@ -243,14 +260,12 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
 
       <Section>
         <SectionTitle>Synchronization</SectionTitle>
-        {pendingChangesError && <EmptyText>Could not load pending changes. Please try again later.</EmptyText>}
+        {syncStatus === 'error' && <EmptyText>Could not load pending changes. Please try again later.</EmptyText>}
         {/* Spin until the detail loads regardless of the table-row flag, which can be stale and would
             otherwise flash a contradictory "In sync" before the fetched state arrives. */}
-        {!pendingChangesError && !pendingChanges && <Spinner />}
-        {!pendingChangesError &&
-          pendingChanges &&
-          hasPendingChanges &&
-          (actions.length > 0 || pendingChanges.activities.length > 0 ? (
+        {syncStatus === 'loading' && <Spinner />}
+        {syncStatus === 'pending' &&
+          (hasDescribableChanges ? (
             <>
               <span>The following actions are queued until the collector synchronizes:</span>
               <ActionList>
@@ -262,19 +277,15 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
                 ))}
               </ActionList>
               <TransactionsToggle bsStyle="link" bsSize="xsmall" onClick={() => setShowTransactions((show) => !show)}>
-                {showTransactions
-                  ? 'Hide queued transactions'
-                  : `Show queued transactions (${pendingChanges.activities.length})`}
+                {showTransactions ? 'Hide queued transactions' : `Show queued transactions (${activities.length})`}
               </TransactionsToggle>
-              {showTransactions && (
-                <ActivityEntryList entries={pendingChanges.activities} compareTargets={compareTargets} />
-              )}
+              {showTransactions && <ActivityEntryList entries={activities} compareTargets={compareTargets} />}
             </>
           ) : (
             // Pending, but every queued marker is of a type this version can't describe (UNKNOWN).
             <EmptyText>Changes are queued and will be applied at the collector&apos;s next check-in.</EmptyText>
           ))}
-        {!pendingChangesError && pendingChanges && !hasPendingChanges && (
+        {syncStatus === 'inSync' && (
           <>
             <SyncStateIndicator pending={false} withLabel />
             <br />
