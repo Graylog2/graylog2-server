@@ -16,8 +16,13 @@
  */
 package org.graylog2.rest.resources.tools;
 
+import org.graylog.testing.TestClocks;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.threeten.extra.MutableClock;
 
+import java.time.Clock;
+import java.time.Duration;
 import java.util.regex.Matcher;
 import java.util.regex.PatternSyntaxException;
 
@@ -26,56 +31,75 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class SafePatternTest {
 
+    private MutableClock clock;
+    private SafePattern toTest;
+
+    @BeforeEach
+    public void setUp() {
+        clock = TestClocks.mutableFixedEpoch();
+        toTest = new SafePattern(clock);
+    }
+
     @Test
     public void compileThrowsPatternSyntaxExceptionForInvalidRegex() {
-        assertThatThrownBy(() -> SafePattern.compile("?*foo"))
+        assertThatThrownBy(() -> toTest.compile("?*foo"))
                 .isInstanceOf(PatternSyntaxException.class);
     }
 
     @Test
     public void compileThrowsIllegalArgumentExceptionWhenRegexExceedsMaxLength() {
         final String tooLong = "a".repeat(SafePattern.MAX_REGEX_LENGTH + 1);
-        assertThatThrownBy(() -> SafePattern.compile(tooLong))
+        assertThatThrownBy(() -> toTest.compile(tooLong))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("maximum length");
     }
 
     @Test
     public void matcherThrowsIllegalArgumentExceptionWhenInputExceedsMaxLength() {
-        final SafePattern safePattern = SafePattern.compile(".*");
         final String tooLong = "a".repeat(SafePattern.MAX_STRING_LENGTH + 1);
-        assertThatThrownBy(() -> safePattern.matcher(tooLong))
+        assertThatThrownBy(() -> toTest.compile(".*").matcher(tooLong))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("maximum length");
     }
 
     @Test
     public void matcherFindsMatchForValidPatternAndInput() {
-        final Matcher matcher = SafePattern.compile("([a-z]+)").matcher("test");
+        final Matcher matcher = toTest.compile("([a-z]+)").matcher("test");
         assertThat(matcher.find()).isTrue();
         assertThat(matcher.group(1)).isEqualTo("test");
     }
 
     @Test
     public void matcherReturnsNoMatchWhenPatternDoesNotMatch() {
-        final Matcher matcher = SafePattern.compile("([0-9]+)").matcher("test");
+        final Matcher matcher = toTest.compile("([0-9]+)").matcher("test");
         assertThat(matcher.find()).isFalse();
     }
 
     @Test
     public void matcherThrowsTimeoutExceptionWhenDeadlineIsAlreadyExpired() {
-        // timeout=-1 sets the deadline 1 ms in the past, so the first charAt() immediately throws
-        final Matcher matcher = SafePattern.compile("([a-z]+)", -1L).matcher("test");
+        // timeout=-1 sets the deadline 1ms before the clock's current time
+        final SafePattern expiredTimeout = new SafePattern(clock, -1L);
+        final Matcher matcher = expiredTimeout.compile("([a-z]+)").matcher("test");
+        assertThatThrownBy(matcher::find)
+                .isInstanceOf(TimeLimitedCharSequence.TimeoutException.class);
+    }
+
+    @Test
+    public void matcherThrowsTimeoutExceptionWhenClockAdvancesPastDeadline() {
+        final SafePattern shortTimeout = new SafePattern(clock, 10L);
+        final Matcher matcher = shortTimeout.compile("([a-z]+)").matcher("test");
+        clock.add(Duration.ofMillis(11));
         assertThatThrownBy(matcher::find)
                 .isInstanceOf(TimeLimitedCharSequence.TimeoutException.class);
     }
 
     @Test
     public void matcherThrowsTimeoutExceptionOnRedosPattern() {
-        // example of ReDos from https://github.com/rkeytacked/java-redos/blob/master/src/test/java/de/creativecouple/talks/PatternTest.java
-        final Matcher matcher = SafePattern.compile(
-                "bedco?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?oooooooooooooooooooooooooooooon",
-                50L).matcher("bedcoooooooooooooooooooooooooooooon");
+        // ReDoS requires real wall-clock time — use Clock.systemUTC() for this test only
+        final SafePattern shortTimeout = new SafePattern(Clock.systemUTC(), 50L);
+        final Matcher matcher = shortTimeout.compile(
+                "bedco?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?o?oooooooooooooooooooooooooooooon")
+                .matcher("bedcoooooooooooooooooooooooooooooon");
         assertThatThrownBy(matcher::find)
                 .isInstanceOf(TimeLimitedCharSequence.TimeoutException.class);
     }

@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.tools;
 
 import com.codahale.metrics.annotation.Timed;
+import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -42,6 +43,13 @@ import java.util.regex.PatternSyntaxException;
 @Path("/tools/regex_tester")
 public class RegexTesterResource extends RestResource {
 
+    private final SafePattern safePattern;
+
+    @Inject
+    public RegexTesterResource(final SafePattern safePattern) {
+        this.safePattern = safePattern;
+    }
+
     @GET
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
@@ -66,7 +74,7 @@ public class RegexTesterResource extends RestResource {
     public RegexValidationResponse validateRegex(@QueryParam("regex") @NotEmpty String regex) {
         final RegexValidationResponse.Builder response = RegexValidationResponse.builder().regex(regex);
         try {
-            SafePattern.compile(regex);
+            safePattern.compile(regex);
             response.isValid(true);
         } catch (IllegalArgumentException e) {
             response.isValid(false).validationMessage(e.getMessage());
@@ -76,7 +84,7 @@ public class RegexTesterResource extends RestResource {
 
     private RegexTesterResponse doTestRegex(final String example, final String regex) {
         try {
-            final Matcher matcher = SafePattern.compile(regex).matcher(example);
+            final Matcher matcher = safePattern.compile(regex).matcher(example);
             final boolean matched = matcher.find();
             final RegexTesterResponse.Match match;
             if (matched && matcher.groupCount() > 0) {

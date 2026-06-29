@@ -16,66 +16,89 @@
  */
 package org.graylog2.rest.resources.tools;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
+import java.time.Clock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
- * Wraps {@link Pattern} with length limits and a per-match deadline enforced via
- * {@link TimeLimitedCharSequence}, guarding against ReDoS (catastrophic backtracking).
+ * Injectable factory that compiles regexes with length limits and enforces a per-match deadline
+ * via {@link TimeLimitedCharSequence}, guarding against ReDoS (catastrophic backtracking).
  *
- * <p>Callers must catch {@link TimeLimitedCharSequence.TimeoutException} when invoking
- * matching operations on the returned {@link Matcher}.
+ * <p>Usage: inject this class, then call {@link #compile(String)} to get a compiled instance,
+ * then call {@link #matcher(String)} on that instance.
  */
-public final class SafePattern {
+@Singleton
+public class SafePattern {
     public static final int MAX_REGEX_LENGTH = 1000;
     public static final int MAX_STRING_LENGTH = 10_000;
 
     private final Pattern pattern;
+    private final Clock clock;
     private final long timeoutMs;
 
-    private SafePattern(final Pattern pattern, final long timeoutMs) {
+    @Inject
+    public SafePattern(final Clock clock) {
+        this(null, clock, TimeLimitedCharSequence.DEFAULT_TIMEOUT_MS);
+    }
+
+    SafePattern(final Clock clock, final long timeoutMs) {
+        this(null, clock, timeoutMs);
+    }
+
+    private SafePattern(final Pattern pattern, final Clock clock, final long timeoutMs) {
         this.pattern = pattern;
+        this.clock = clock;
         this.timeoutMs = timeoutMs;
     }
 
     /**
-     * Compiles {@code regex} with {@link Pattern#DOTALL} and the default timeout.
+     * Returns a compiled instance of {@code SafePattern}.
      *
-     * @throws IllegalArgumentException  if the regex exceeds {@link #MAX_REGEX_LENGTH}
+     * @throws IllegalArgumentException       if the regex exceeds {@link #MAX_REGEX_LENGTH}
      * @throws java.util.regex.PatternSyntaxException if the regex is syntactically invalid
      */
-    public static SafePattern compile(final String regex) {
-        return compile(regex, TimeLimitedCharSequence.DEFAULT_TIMEOUT_MS);
-    }
-
-    /**
-     * Compiles {@code regex} with {@link Pattern#DOTALL} and a custom {@code timeoutMs}.
-     *
-     * @throws IllegalArgumentException  if the regex exceeds {@link #MAX_REGEX_LENGTH}
-     * @throws java.util.regex.PatternSyntaxException if the regex is syntactically invalid
-     */
-    public static SafePattern compile(final String regex, final long timeoutMs) {
+    public SafePattern compile(final String regex) {
         if (regex.length() > MAX_REGEX_LENGTH) {
             throw new IllegalArgumentException(
                     f("Regular expression exceeds maximum length of %d characters", MAX_REGEX_LENGTH));
         }
-        return new SafePattern(Pattern.compile(regex, Pattern.DOTALL), timeoutMs);
+        return new SafePattern(Pattern.compile(regex, Pattern.DOTALL), clock, timeoutMs);
     }
 
     /**
      * Returns a {@link Matcher} backed by a {@link TimeLimitedCharSequence}.
-     * Every {@code charAt()} call during matching checks the deadline; if exceeded,
-     * {@link TimeLimitedCharSequence.TimeoutException} is thrown.
+     * Must be called on an instance returned by {@link #compile(String)}.
      *
+     * @throws IllegalStateException    if called on an uncompiled instance
      * @throws IllegalArgumentException if {@code input} exceeds {@link #MAX_STRING_LENGTH}
      */
     public Matcher matcher(final String input) {
+        if (pattern == null) {
+            throw new IllegalStateException("Call compile(regex) before matcher(input)");
+        }
         if (input.length() > MAX_STRING_LENGTH) {
             throw new IllegalArgumentException(
                     f("Test string exceeds maximum length of %d characters", MAX_STRING_LENGTH));
         }
-        return pattern.matcher(TimeLimitedCharSequence.withTimeout(input, timeoutMs));
+        return pattern.matcher(TimeLimitedCharSequence.withTimeout(input, timeoutMs, clock));
+    }
+
+    /**
+     * Wraps {@code input} in a {@link TimeLimitedCharSequence} after enforcing {@link #MAX_STRING_LENGTH}.
+     * For use when pattern compilation is handled externally (e.g. {@code RegexReplaceExtractor}).
+     *
+     * @throws IllegalArgumentException if {@code input} exceeds {@link #MAX_STRING_LENGTH}
+     */
+    public TimeLimitedCharSequence timeLimitedInput(final String input) {
+        if (input.length() > MAX_STRING_LENGTH) {
+            throw new IllegalArgumentException(
+                    f("Test string exceeds maximum length of %d characters", MAX_STRING_LENGTH));
+        }
+        return TimeLimitedCharSequence.withTimeout(input, timeoutMs, clock);
     }
 }

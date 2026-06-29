@@ -16,19 +16,23 @@
  */
 package org.graylog2.rest.resources.tools;
 
+import java.time.Clock;
+
 public final class TimeLimitedCharSequence implements CharSequence {
     public static final long DEFAULT_TIMEOUT_MS = 500;
 
     private final CharSequence inner;
     private final long deadline;
+    private final Clock clock;
 
-    private TimeLimitedCharSequence(final CharSequence inner, final long deadline) {
+    private TimeLimitedCharSequence(final CharSequence inner, final long deadline, final Clock clock) {
         this.inner = inner;
         this.deadline = deadline;
+        this.clock = clock;
     }
 
-    public static TimeLimitedCharSequence withTimeout(final CharSequence inner, final long timeoutMs) {
-        return new TimeLimitedCharSequence(inner, System.currentTimeMillis() + timeoutMs);
+    public static TimeLimitedCharSequence withTimeout(final CharSequence inner, final long timeoutMs, final Clock clock) {
+        return new TimeLimitedCharSequence(inner, clock.millis() + timeoutMs, clock);
     }
 
     @Override
@@ -38,7 +42,7 @@ public final class TimeLimitedCharSequence implements CharSequence {
 
     @Override
     public char charAt(final int index) {
-        if (System.currentTimeMillis() > deadline) {
+        if (clock.millis() > deadline) {
             throw new TimeoutException();
         }
         return inner.charAt(index);
@@ -46,7 +50,7 @@ public final class TimeLimitedCharSequence implements CharSequence {
 
     @Override
     public CharSequence subSequence(final int start, final int end) {
-        return new TimeLimitedCharSequence(inner.subSequence(start, end), deadline);
+        return new TimeLimitedCharSequence(inner.subSequence(start, end), deadline, clock);
     }
 
     @Override

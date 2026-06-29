@@ -24,6 +24,7 @@ import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Clock;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,7 +41,7 @@ public class RegexTesterResourceTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        resource = new RegexTesterResource();
+        resource = new RegexTesterResource(new SafePattern(Clock.systemUTC()));
     }
 
     @Test

@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.tools;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
+import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -51,6 +52,13 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 @Path("/tools/regex_replace_tester")
 public class RegexReplaceTesterResource extends RestResource {
 
+    private final SafePattern safePattern;
+
+    @Inject
+    public RegexReplaceTesterResource(final SafePattern safePattern) {
+        this.safePattern = safePattern;
+    }
+
     @GET
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
@@ -75,9 +83,6 @@ public class RegexReplaceTesterResource extends RestResource {
         if (regex.length() > SafePattern.MAX_REGEX_LENGTH) {
             throw new BadRequestException(f("Regular expression exceeds maximum length of %d characters", SafePattern.MAX_REGEX_LENGTH));
         }
-        if (example.length() > SafePattern.MAX_STRING_LENGTH) {
-            throw new BadRequestException(f("Test string exceeds maximum length of %d characters", SafePattern.MAX_STRING_LENGTH));
-        }
 
         final Map<String, Object> config = ImmutableMap.of(
                 "regex", regex,
@@ -99,12 +104,13 @@ public class RegexReplaceTesterResource extends RestResource {
         }
 
         try {
-            final Extractor.Result result = extractor.runExtractor(
-                    TimeLimitedCharSequence.withTimeout(example, TimeLimitedCharSequence.DEFAULT_TIMEOUT_MS));
+            final Extractor.Result result = extractor.runExtractor(safePattern.timeLimitedInput(example));
             final RegexReplaceTesterResponse.Match match = result == null ? null :
                     RegexReplaceTesterResponse.Match.create(
                             String.valueOf(result.getValue()), result.getBeginIndex(), result.getEndIndex());
             return RegexReplaceTesterResponse.create(result != null, match, regex, replacement, replaceAll, example);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getMessage(), e);
         } catch (TimeLimitedCharSequence.TimeoutException e) {
             throw new BadRequestException("Regular expression matching timed out — the pattern may be susceptible to catastrophic backtracking");
         } catch (RuntimeException e) {
