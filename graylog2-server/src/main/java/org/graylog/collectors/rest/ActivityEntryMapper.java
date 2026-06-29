@@ -54,7 +54,7 @@ import java.util.stream.Collectors;
  * {@code this::isPermitted}) because visibility filtering must run against the requesting user's subject.
  */
 @Singleton
-class ActivityEntryMapper {
+public class ActivityEntryMapper {
 
     private final FleetService fleetService;
     private final CollectorInstanceService instanceService;
