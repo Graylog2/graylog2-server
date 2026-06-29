@@ -150,6 +150,85 @@ class OutdatedIndexServiceTest {
     }
 
     @Test
+    void reindexAbortsAndKeepsSourceWhenTempCopyIncomplete() throws IOException {
+        when(indices.waitForRecovery("my_index", 2)).thenReturn(HealthStatus.Green);
+        when(indices.indexSettings("my_index")).thenReturn(sourceSettings());
+        when(indices.indexMapping("my_index")).thenReturn(sourceMapping());
+        when(indicesAdapter.exists(".gltmp_my_index")).thenReturn(false);
+        when(indices.waitForRecovery(".gltmp_my_index")).thenReturn(HealthStatus.Green);
+        when(indices.numberOfMessages("my_index")).thenReturn(100L);
+        when(indices.numberOfMessages(".gltmp_my_index")).thenReturn(90L);
+
+        Assertions.assertThatThrownBy(() -> outdatedIndexService.reindex("my_index", true))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("temporary index .gltmp_my_index holds 90 of 100 documents");
+
+        // The incomplete temp copy is discarded, but the source index must remain untouched.
+        verify(indices, never()).delete("my_index");
+        verify(indicesAdapter).delete(".gltmp_my_index");
+        verify(indices, never()).reindex(".gltmp_my_index", "my_index");
+    }
+
+    @Test
+    void reindexProceedsWhenTempCountExceedsSource() throws IOException {
+        when(indices.waitForRecovery("my_index", 2)).thenReturn(HealthStatus.Green);
+        when(indices.indexSettings("my_index")).thenReturn(sourceSettings());
+        when(indices.indexMapping("my_index")).thenReturn(sourceMapping());
+        when(indicesAdapter.exists(".gltmp_my_index")).thenReturn(false);
+        when(indices.waitForRecovery(".gltmp_my_index")).thenReturn(HealthStatus.Green);
+        when(indices.waitForRecovery("my_index")).thenReturn(HealthStatus.Green);
+        // Guard 1 only aborts on a shortfall: a temp count above the source's start count must not trigger an abort.
+        when(indices.numberOfMessages("my_index")).thenReturn(100L, 110L);
+        when(indices.numberOfMessages(".gltmp_my_index")).thenReturn(110L);
+
+        outdatedIndexService.reindex("my_index", true);
+
+        verify(indices).delete("my_index");
+        verify(indices).reindex(".gltmp_my_index", "my_index");
+        verify(indices).delete(".gltmp_my_index");
+    }
+
+    @Test
+    void reindexRefusesToDeleteLeftoverTempWhenSourceMissing() throws IOException {
+        when(indices.waitForRecovery("my_index", 2)).thenReturn(HealthStatus.Green);
+        when(indices.indexSettings("my_index")).thenReturn(sourceSettings());
+        when(indices.indexMapping("my_index")).thenReturn(sourceMapping());
+        when(indicesAdapter.exists(".gltmp_my_index")).thenReturn(true);
+        when(indicesAdapter.exists("my_index")).thenReturn(false);
+
+        Assertions.assertThatThrownBy(() -> outdatedIndexService.reindex("my_index", true))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("may hold the only copy of the data from a previous failed reindex");
+
+        // A leftover temp index with a missing source may be the only copy: never delete it, never start over it.
+        verify(indicesAdapter, never()).delete(".gltmp_my_index");
+        verify(indicesAdapter, never()).create(eq(".gltmp_my_index"), any(), any());
+    }
+
+    @Test
+    void reindexKeepsTempWhenRecreatedIndexIncomplete() throws IOException {
+        when(indices.waitForRecovery("my_index", 2)).thenReturn(HealthStatus.Green);
+        when(indices.indexSettings("my_index")).thenReturn(sourceSettings());
+        when(indices.indexMapping("my_index")).thenReturn(sourceMapping());
+        when(indicesAdapter.exists(".gltmp_my_index")).thenReturn(false);
+        when(indices.waitForRecovery(".gltmp_my_index")).thenReturn(HealthStatus.Green);
+        when(indices.waitForRecovery("my_index")).thenReturn(HealthStatus.Green);
+        // source holds 100; temp copy is complete (100); but the recreated index ends up with only 80.
+        when(indices.numberOfMessages("my_index")).thenReturn(100L, 80L);
+        when(indices.numberOfMessages(".gltmp_my_index")).thenReturn(100L);
+
+        Assertions.assertThatThrownBy(() -> outdatedIndexService.reindex("my_index", true))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("holds 80 of 100 documents")
+                .hasMessageContaining("preserved in temporary index .gltmp_my_index");
+
+        // Source was already deleted and copied back, but since the result is incomplete the temp copy must survive.
+        verify(indices).delete("my_index");
+        verify(indices).reindex(".gltmp_my_index", "my_index");
+        verify(indices, never()).delete(".gltmp_my_index");
+    }
+
+    @Test
     void reindexWrapsIOExceptionInRuntimeException() throws IOException {
         when(indices.waitForRecovery("my_index", 2)).thenReturn(HealthStatus.Green);
         when(indices.indexSettings("my_index")).thenReturn(sourceSettings());
