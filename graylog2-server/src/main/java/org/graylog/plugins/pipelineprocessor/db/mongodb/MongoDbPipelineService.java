@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.pipelineprocessor.db.mongodb;
 
-import com.mongodb.MongoException;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
@@ -38,7 +37,6 @@ import org.graylog2.events.ClusterEventBus;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -119,26 +117,16 @@ public class MongoDbPipelineService implements PipelineService {
 
     @Override
     public Collection<PipelineDao> loadBySourcePattern(String sourcePattern) {
-        try {
-            return ruleService.loadBySourcePattern(sourcePattern).stream()
-                    .flatMap(rule ->
-                            collection.find(Filters.regex(FIELD_SOURCE, Pattern.quote(rule.title()))).into(new ArrayList<>()).stream())
-                    .filter(pipelineDao -> !pipelineStreamConnectionsService.loadByPipelineId(pipelineDao.id()).isEmpty())
-                    .collect(Collectors.toSet());
-        } catch (MongoException e) {
-            log.error("Unable to load pipelines", e);
-            return Collections.emptySet();
-        }
+        return ruleService.loadBySourcePattern(sourcePattern).stream()
+                .flatMap(rule ->
+                        collection.find(Filters.regex(FIELD_SOURCE, Pattern.quote(rule.title()))).into(new ArrayList<>()).stream())
+                .filter(pipelineDao -> !pipelineStreamConnectionsService.loadByPipelineId(pipelineDao.id()).isEmpty())
+                .collect(Collectors.toSet());
     }
 
     @Override
     public Collection<PipelineDao> loadAll() {
-        try {
-            return collection.find().into(new LinkedHashSet<>());
-        } catch (MongoException e) {
-            log.error("Unable to load pipelines", e);
-            return Collections.emptySet();
-        }
+        return collection.find().into(new LinkedHashSet<>());
     }
 
     @Override
