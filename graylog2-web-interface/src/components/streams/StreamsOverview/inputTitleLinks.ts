@@ -14,21 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.configuration;
+import usePluginEntities from 'hooks/usePluginEntities';
+import type { ResolvedInput } from 'hooks/useInputDetails';
 
-import java.net.URI;
-import java.util.List;
+import './types';
 
-public interface IndexerDiscoveryListener {
-    void onExplicitlyConfiguredNodes(List<URI> hosts);
-    /**
-     * Triggered before we start with indexer discovery. Won't be triggered if there are any indexers
-     * explicitly defined in the configuration.
-     */
-    void beforeIndexerDiscovery();
+export const useInputTitleLinkBuilder = (): ((resolved: ResolvedInput) => string | null) => {
+  const builders = usePluginEntities('inputTitleLinks');
 
-    /**
-     * Triggered after each unsuccessful retry during indexer discovery
-     */
-    void onDiscoveryRetry();
-}
+  return (resolved: ResolvedInput) => {
+    const builder = builders.find((b) => b.type === resolved.type);
+
+    return builder ? (builder.buildPath as (r: ResolvedInput) => string | null)(resolved) : null;
+  };
+};

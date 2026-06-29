@@ -14,21 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.configuration;
+import type { PluginExports } from 'graylog-web-plugin/plugin';
 
-import java.net.URI;
-import java.util.List;
+import Routes from 'routing/Routes';
 
-public interface IndexerDiscoveryListener {
-    void onExplicitlyConfiguredNodes(List<URI> hosts);
-    /**
-     * Triggered before we start with indexer discovery. Won't be triggered if there are any indexers
-     * explicitly defined in the configuration.
-     */
-    void beforeIndexerDiscovery();
+import './inputTitleLinks';
 
-    /**
-     * Triggered after each unsuccessful retry during indexer discovery
-     */
-    void onDiscoveryRetry();
-}
+const streamsOverviewBindings: PluginExports = {
+  inputTitleLinks: [
+    {
+      type: 'input',
+      buildPath: (resolved) => Routes.SYSTEM.INPUT_DIAGNOSIS(resolved.id),
+    },
+  ],
+};
+
+export default streamsOverviewBindings;

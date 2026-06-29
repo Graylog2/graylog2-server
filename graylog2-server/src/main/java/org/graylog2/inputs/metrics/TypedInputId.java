@@ -14,21 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.configuration;
+package org.graylog2.inputs.metrics;
 
-import java.net.URI;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public interface IndexerDiscoveryListener {
-    void onExplicitlyConfiguredNodes(List<URI> hosts);
-    /**
-     * Triggered before we start with indexer discovery. Won't be triggered if there are any indexers
-     * explicitly defined in the configuration.
-     */
-    void beforeIndexerDiscovery();
-
-    /**
-     * Triggered after each unsuccessful retry during indexer discovery
-     */
-    void onDiscoveryRetry();
+/**
+ * An input identifier paired with the input type it belongs to (e.g. {@code "input"} for regular
+ * inputs, {@code "forwarder_input"} for enterprise forwarder inputs).
+ */
+public record TypedInputId(@JsonProperty("id") String id,
+                           @JsonProperty("type") String type) {
 }
