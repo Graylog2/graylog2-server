@@ -116,6 +116,9 @@ public class MongoDbPipelineMetadataService {
     }
 
     public void delete(Collection<String> pipelineIds) {
+        if (pipelineIds == null || pipelineIds.isEmpty()) {
+            return;
+        }
         final DeleteResult deleteResult = collection.deleteMany(Filters.in(FIELD_PIPELINE_ID, pipelineIds));
         if (deleteResult.getDeletedCount() == 0) {
             LOG.warn("No pipeline rules metadata records found for pipelines {}", pipelineIds);
