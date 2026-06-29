@@ -30,6 +30,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.collectors.CollectorsPermissions;
 import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.db.TransactionMarker;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.List;
@@ -39,6 +40,7 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
+@PublicCloudAPI
 public class CollectorsActivityResource extends RestResource {
 
     private static final int RECENT_ACTIVITY_LIMIT = 20;
