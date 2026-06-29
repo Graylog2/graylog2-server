@@ -150,6 +150,21 @@ class EntityMetricsServiceTest {
                 .containsEntry("pipeline_count", 2);
     }
 
+    @Test
+    void cacheHit_withIncompatibleCachedValue_triggersRecompute() {
+        cacheService.putFieldBatch(ENTITY_TYPE, "message_count", Map.of("entity-1", "stale-shape"));
+
+        when(searchUser.canReadStream("stream-a")).thenReturn(true);
+        final var descriptor = new TestCachedDescriptor(
+                "message_count", Duration.ofMinutes(5),
+                Map.of("entity-1", Map.of("stream-a", 42L)));
+
+        final var result = createService(descriptor).getMetrics(
+                List.of("entity-1"), Set.of("message_count"), searchUser);
+
+        assertThat(result.toMap().get("entity-1")).containsEntry("message_count", Map.of("stream-a", 42L));
+    }
+
     private EntityMetricsService createService(EntityMetricDescriptor descriptor) {
         return new EntityMetricsService(ENTITY_TYPE, Set.of(descriptor), cacheService, new ObjectMapperProvider().get());
     }
