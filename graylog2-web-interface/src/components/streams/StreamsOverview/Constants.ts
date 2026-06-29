@@ -36,7 +36,6 @@ const getStreamTableElements = (
       ...(isPipelineColumnPermitted ? ['pipelines'] : []),
       'outputs',
       'archiving',
-      ...(extensionAttributes?.attributeNames || []),
       'destination_filters',
       'disabled',
       'throughput',
