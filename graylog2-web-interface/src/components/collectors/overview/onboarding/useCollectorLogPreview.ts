@@ -178,8 +178,7 @@ const useCollectorLogPreview = (instanceUid: string) => {
   });
 
   const generalError = (createError ?? executeError ?? null) as Error | null;
-  const paneError = (description: string | undefined) =>
-    generalError ?? (description ? new Error(description) : null);
+  const paneError = (description: string | undefined) => generalError ?? (description ? new Error(description) : null);
 
   return {
     selfLogs: results?.selfLogs,

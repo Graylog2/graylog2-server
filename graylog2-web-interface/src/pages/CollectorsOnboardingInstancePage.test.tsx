@@ -78,7 +78,9 @@ const instance = {
 } as CollectorInstanceView;
 
 describe('CollectorsOnboardingInstancePage', () => {
-  const mockInstanceLookup = (overrides: { data?: CollectorInstanceView | null; isLoading?: boolean; error?: Error | null } = {}) =>
+  const mockInstanceLookup = (
+    overrides: { data?: CollectorInstanceView | null; isLoading?: boolean; error?: Error | null } = {},
+  ) =>
     asMock(useInstance).mockReturnValue({
       data: instance,
       isLoading: false,

@@ -81,7 +81,9 @@ const PreviewBody = ({ preview, isLoading, error }: Pick<Props, 'preview' | 'isL
   if (error) {
     return (
       <div aria-live="polite">
-        <Alert bsStyle="warning">Log preview unavailable &mdash; {StringUtils.truncateWithEllipses(error.message, 120)}</Alert>
+        <Alert bsStyle="warning">
+          Log preview unavailable &mdash; {StringUtils.truncateWithEllipses(error.message, 120)}
+        </Alert>
       </div>
     );
   }

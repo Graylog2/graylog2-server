@@ -81,13 +81,17 @@ export const useInstances = (fleetId?: string, options: { refetchInterval?: numb
     queryKey: [...INSTANCES_KEY_PREFIX, { fleetId }],
     queryFn: () => {
       const filters = fleetId ? [`fleet_id:${fleetId}`] : undefined;
-      const promise = Collectors.findInstances(1, 0, undefined, filters, undefined, undefined, NO_SESSION_EXT).then((response) =>
-        response.elements.map(toView),
+      const promise = Collectors.findInstances(1, 0, undefined, filters, undefined, undefined, NO_SESSION_EXT).then(
+        (response) => response.elements.map(toView),
       );
 
       return options.silent
         ? promise
-        : defaultOnError(promise, 'Loading Collector instances failed with status', 'Could not load Collector instances');
+        : defaultOnError(
+            promise,
+            'Loading Collector instances failed with status',
+            'Could not load Collector instances',
+          );
     },
     refetchInterval: options.refetchInterval,
   });

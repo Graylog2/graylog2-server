@@ -38,7 +38,7 @@ describe('InstallCommand', () => {
   });
 
   it('displays the token expiry note', () => {
-    render(<InstallCommand command={command} platformLabel="Linux" tokenDuration='P1D' />);
+    render(<InstallCommand command={command} platformLabel="Linux" tokenDuration="P1D" />);
 
     expect(screen.getByText(/token expires in 1 day/i)).toBeInTheDocument();
   });

@@ -78,8 +78,8 @@ const InstallCommand = ({ command, platformLabel, tokenDuration }: Props) => (
     </Header>
     <CommandBlock>{command}</CommandBlock>
     <Note>
-      Downloads the collector, enrolls it in the selected fleet, and starts collecting immediately.
-      Token expires in {formatDuration(tokenDuration, () => true)}.
+      Downloads the collector, enrolls it in the selected fleet, and starts collecting immediately. Token expires in{' '}
+      {formatDuration(tokenDuration, () => true)}.
     </Note>
   </Container>
 );

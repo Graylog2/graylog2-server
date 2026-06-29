@@ -74,11 +74,8 @@ const FirstOnboarding = () => {
 
   const { data: config, isLoading: isConfigLoading } = useCollectorsConfig();
   const { data: fleets, isLoading: isFleetsLoading } = useFleets();
-  const {
-    createFleet, isCreatingFleet,
-    createSource,
-    createEnrollmentToken, isCreatingEnrollmentToken,
-  } = useCollectorsMutations();
+  const { createFleet, isCreatingFleet, createSource, createEnrollmentToken, isCreatingEnrollmentToken } =
+    useCollectorsMutations();
 
   const buildCommand = useCallback(
     (platformId: PlatformId, token: string) => {
@@ -100,9 +97,7 @@ const FirstOnboarding = () => {
       description: `Created by Graylog ${version} onboarding wizard`,
     });
 
-    await Promise.all(
-      DEFAULT_SOURCES.map((source) => createSource({ fleetId: fleet.id, source, silent: true })),
-    );
+    await Promise.all(DEFAULT_SOURCES.map((source) => createSource({ fleetId: fleet.id, source, silent: true })));
 
     return fleet;
   }, [createFleet, createSource]);
@@ -121,9 +116,8 @@ const FirstOnboarding = () => {
     async (platformId: PlatformId, choice: FleetChoiceValue) => {
       try {
         if (!tokenRef.current) {
-          const fleet = choice.kind === 'create-new'
-            ? await createOnboardingFleet()
-            : fleets?.find((f) => f.id === choice.fleetId);
+          const fleet =
+            choice.kind === 'create-new' ? await createOnboardingFleet() : fleets?.find((f) => f.id === choice.fleetId);
 
           if (!fleet) return;
 
@@ -196,11 +190,7 @@ const FirstOnboarding = () => {
   return (
     <div>
       {/* 1. Always: pick the operating system. */}
-      <PlatformPicker
-        onSelect={handlePlatformSelect}
-        selectedPlatform={selectedPlatform}
-        disabled={isBusy}
-      />
+      <PlatformPicker onSelect={handlePlatformSelect} selectedPlatform={selectedPlatform} disabled={isBusy} />
 
       {/* 2. Only when a platform is picked and at least one fleet exists.
             Shows the choice controls until a fleet is resolved, then its details. */}
@@ -220,7 +210,7 @@ const FirstOnboarding = () => {
           <InstallCommand
             command={installCommand}
             platformLabel={PLATFORMS.find((p) => p.id === selectedPlatform)?.label ?? ''}
-            tokenDuration='P1D'
+            tokenDuration="P1D"
           />
           <WaitingForConnection key={resolvedFleet?.id} fleetId={resolvedFleet?.id} onConnected={handleConnected} />
         </BodyContainer>

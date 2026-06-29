@@ -69,7 +69,11 @@ jest.mock('./onboarding/WaitingForConnection', () => {
     status: 'online' as const,
   };
 
-  return function WaitingForConnectionStub({ onConnected }: { onConnected: (instance: CollectorInstanceView) => void }) {
+  return function WaitingForConnectionStub({
+    onConnected,
+  }: {
+    onConnected: (instance: CollectorInstanceView) => void;
+  }) {
     return (
       <div>
         <span>Waiting for connection...</span>
@@ -80,7 +84,6 @@ jest.mock('./onboarding/WaitingForConnection', () => {
     );
   };
 });
-
 
 const mockConfig = {
   http: { hostname: 'graylog.example', port: 4317 },

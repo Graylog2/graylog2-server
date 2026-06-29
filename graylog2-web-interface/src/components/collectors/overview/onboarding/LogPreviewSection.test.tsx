@@ -30,7 +30,13 @@ describe('LogPreviewSection', () => {
 
   it('renders one row per message', () => {
     render(
-      <LogPreviewSection title="Your log sources" searchUrl="/search?q=x" preview={preview} isLoading={false} error={null} />,
+      <LogPreviewSection
+        title="Your log sources"
+        searchUrl="/search?q=x"
+        preview={preview}
+        isLoading={false}
+        error={null}
+      />,
     );
 
     expect(screen.getByText(/sshd\[412\]/)).toBeInTheDocument();
@@ -39,7 +45,13 @@ describe('LogPreviewSection', () => {
 
   it('links to the full search page', () => {
     render(
-      <LogPreviewSection title="Your log sources" searchUrl="/search?q=x" preview={preview} isLoading={false} error={null} />,
+      <LogPreviewSection
+        title="Your log sources"
+        searchUrl="/search?q=x"
+        preview={preview}
+        isLoading={false}
+        error={null}
+      />,
     );
 
     expect(screen.getByRole('link', { name: /open in search/i })).toHaveAttribute(

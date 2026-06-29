@@ -123,9 +123,7 @@ const renderPlatformIcon = (icon: PlatformIcon) => {
 const PlatformPicker = ({ onSelect, selectedPlatform, disabled }: Props) => (
   <Container>
     <Heading>Get Started with Collectors</Heading>
-    <Subtitle>
-      Deploy lightweight collectors across your infrastructure to forward logs into Graylog.
-    </Subtitle>
+    <Subtitle>Deploy lightweight collectors across your infrastructure to forward logs into Graylog.</Subtitle>
     <Grid>
       {PLATFORMS.map((platform) => (
         <PlatformCard
@@ -134,7 +132,9 @@ const PlatformPicker = ({ onSelect, selectedPlatform, disabled }: Props) => (
           isActive={selectedPlatform === platform.id}
           onClick={disabled ? undefined : () => onSelect(platform.id)}>
           {selectedPlatform === platform.id && (
-            <CheckMark><Icon name="check_circle" bsStyle="success" /></CheckMark>
+            <CheckMark>
+              <Icon name="check_circle" bsStyle="success" />
+            </CheckMark>
           )}
           <PlatformIconContainer>{renderPlatformIcon(platform.icon)}</PlatformIconContainer>
           <PlatformLabel>{platform.label}</PlatformLabel>

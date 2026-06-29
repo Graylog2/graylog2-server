@@ -154,9 +154,7 @@ describe('useCollectorLogPreview', () => {
     const queryStrings = queries.map((q) => q.query.query_string);
 
     expect(queryStrings).toContain('collector_instance_uid:"uid-42"');
-    expect(queryStrings).toContain(
-      'collector_instance_uid:"uid-42" AND NOT collector_receiver_type:"collector_log"',
-    );
+    expect(queryStrings).toContain('collector_instance_uid:"uid-42" AND NOT collector_receiver_type:"collector_log"');
 
     const selfQuery = queries.find((q) => q.query.query_string === 'collector_instance_uid:"uid-42"');
 

@@ -24,7 +24,13 @@ export {
   FLEETS_KEY_PREFIX,
 } from './useFleetQueries';
 
-export { useInstances, useInstance, fetchPaginatedInstances, instancesKeyFn, INSTANCES_KEY_PREFIX } from './useInstanceQueries';
+export {
+  useInstances,
+  useInstance,
+  fetchPaginatedInstances,
+  instancesKeyFn,
+  INSTANCES_KEY_PREFIX,
+} from './useInstanceQueries';
 
 export { useSources, fetchPaginatedSources, sourcesKeyFn, SOURCES_KEY_PREFIX } from './useSourceQueries';
 
