@@ -65,6 +65,7 @@ export const fetchPaginatedInstances = async (
       FiltersForQueryParams(searchParams.filters),
       searchParams.sort?.attributeId as 'instance_uid' | 'last_seen',
       searchParams.sort?.direction,
+      { requestShouldExtendSession: false },
     ).then((response) => ({
       list: response.elements.map(toView),
       pagination: response.pagination,

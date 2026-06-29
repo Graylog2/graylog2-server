@@ -27,7 +27,7 @@ import type { PendingChangesResponse } from '../types';
 export const pendingChangesKey = (instanceUid: string) => ['collectors', 'instances', instanceUid, 'pending_changes'];
 
 const fetchPendingChanges = (instanceUid: string): Promise<PendingChangesResponse> =>
-  Collectors.instancePendingChanges(instanceUid) as Promise<PendingChangesResponse>;
+  Collectors.instancePendingChanges(instanceUid, { requestShouldExtendSession: false }) as Promise<PendingChangesResponse>;
 
 const useInstancePendingChanges = (
   instanceUid: string,
