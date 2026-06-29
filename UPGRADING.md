@@ -82,3 +82,18 @@ for reference, showing their name and whether they were previously enabled. Howe
 configuration (indices, feature fields, intervals, etc.) will not be displayed and detectors can no longer be
 edited or re-enabled. **Note: If you have custom anomaly detectors, you should note down their configuration 
 before upgrading.**
+
+Matching the file's style (top-level `##` heading, markdown links, ~120-char wrapping):
+
+### AWS Kinesis/CloudWatch Input: Additional IAM Permissions Required
+
+Graylog 7.1 upgrades the bundled Kinesis Client Library (KCL) that the AWS Kinesis/CloudWatch input uses, from version
+2.x to 3.x. KCL 3.x changes how it coordinates work across consumers and requires additional DynamoDB IAM permissions
+that were not needed by KCL 2.x.
+
+As a result, existing AWS Kinesis/CloudWatch inputs may fail to run successfully after the upgrade until the IAM
+role/policy used by the input is updated to grant the additional permissions. Review and update the policy attached to
+the role Graylog assumes for the input before or immediately after upgrading.
+
+For more information, see the AWS [KCL 2.x to 3.x migration guide](https://docs.aws.amazon.com/streams/latest/dev/kcl-migration-from-2-3.html).
+For the full list of IAM permissions required by KCL 3.x, see [IAM permissions for KCL 3.x](https://docs.aws.amazon.com/streams/latest/dev/kcl-migration-from-2-3.html#kcl-migration-from-2-3-IAM-permissions).
