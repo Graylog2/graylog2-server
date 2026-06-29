@@ -109,6 +109,7 @@ class CollectorInstancesResourceTest {
 
         final var response = resource.instancePendingChanges("uid-1");
 
+        assertThat(response.hasPendingChanges()).isTrue();
         assertThat(response.coalesced().reassign()).isTrue();
         assertThat(response.coalesced().recomputeConfig()).isTrue();
         assertThat(response.coalesced().restart()).isFalse();
@@ -132,12 +133,31 @@ class CollectorInstancesResourceTest {
 
         final var response = resource.instancePendingChanges("uid-1");
 
+        assertThat(response.hasPendingChanges()).isFalse();
         assertThat(response.activities()).isEmpty();
         assertThat(response.coalesced().recomputeConfig()).isFalse();
         assertThat(response.coalesced().recomputeIngestConfig()).isFalse();
         assertThat(response.coalesced().reassign()).isFalse();
         assertThat(response.coalesced().restart()).isFalse();
         assertThat(response.coalesced().runDiscovery()).isFalse();
+    }
+
+    @Test
+    void pendingChangesAreStillPendingForUnknownOnlyMarkers() {
+        when(collectorInstanceService.findByInstanceUid("uid-1"))
+                .thenReturn(Optional.of(instance("uid-1", "fleet-1", 5L)));
+        final var unknown = new TransactionMarker(6L, TransactionMarker.TARGET_FLEET, Set.of("fleet-1"),
+                MarkerType.UNKNOWN, null, Instant.now(), "node-1", null);
+        when(txnLogService.getUnprocessedMarkers("fleet-1", "uid-1", 5L)).thenReturn(List.of(unknown));
+        when(txnLogService.coalesce(anyList())).thenCallRealMethod();
+        when(activityEntryMapper.toEntries(anyList(), any())).thenReturn(List.of());
+
+        final var response = resource.instancePendingChanges("uid-1");
+
+        // UNKNOWN markers are excluded from the activity list but still mark the instance as pending.
+        assertThat(response.hasPendingChanges()).isTrue();
+        assertThat(response.activities()).isEmpty();
+        assertThat(response.coalesced().recomputeConfig()).isFalse();
     }
 
     @Test

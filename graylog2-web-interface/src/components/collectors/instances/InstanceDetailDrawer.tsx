@@ -132,8 +132,11 @@ const pendingEffects = (coalesced: CoalescedActions): PendingEffect[] => {
 const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) => {
   const osDescription = (instance.non_identifying_attributes?.['os.description'] as string) ?? null;
   const { data: pendingChanges, isError: pendingChangesError } = useInstancePendingChanges(instance.instance_uid);
-  // Until the pending-changes detail has loaded, fall back to the flag from the table row.
-  const hasPendingChanges = pendingChanges ? pendingChanges.activities.length > 0 : instance.has_pending_changes;
+  // Use the backend's authoritative flag (consistent with the table); fall back to the table row's
+  // value until the detail loads. Deriving from activities.length would wrongly show "In sync" for an
+  // instance whose only pending markers are UNKNOWN (those are excluded from activities).
+  const hasPendingChanges = pendingChanges ? pendingChanges.has_pending_changes : instance.has_pending_changes;
+  const effects = pendingChanges ? pendingEffects(pendingChanges.coalesced) : [];
   const [showTransactions, setShowTransactions] = useState(false);
 
   // In this per-instance view a bulk reassignment lists every collector in the batch. Float the
@@ -242,27 +245,33 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
         <SectionTitle>Synchronization</SectionTitle>
         {pendingChangesError && <EmptyText>Could not load pending changes. Please try again later.</EmptyText>}
         {!pendingChangesError && hasPendingChanges && !pendingChanges && <Spinner />}
-        {!pendingChangesError && hasPendingChanges && pendingChanges && (
-          <>
-            <span>The following actions are queued until the collector synchronizes:</span>
-            <EffectList>
-              {pendingEffects(pendingChanges.coalesced).map((effect) => (
-                <IconRow key={effect.key}>
-                  <Icon name={effect.icon} />
-                  <span>{effect.description}</span>
-                </IconRow>
-              ))}
-            </EffectList>
-            <TransactionsToggle bsStyle="link" bsSize="xsmall" onClick={() => setShowTransactions((show) => !show)}>
-              {showTransactions
-                ? 'Hide queued transactions'
-                : `Show queued transactions (${pendingChanges.activities.length})`}
-            </TransactionsToggle>
-            {showTransactions && (
-              <ActivityEntryList entries={pendingChanges.activities} compareTargets={compareTargets} />
-            )}
-          </>
-        )}
+        {!pendingChangesError &&
+          hasPendingChanges &&
+          pendingChanges &&
+          (effects.length > 0 || pendingChanges.activities.length > 0 ? (
+            <>
+              <span>The following actions are queued until the collector synchronizes:</span>
+              <EffectList>
+                {effects.map((effect) => (
+                  <IconRow key={effect.key}>
+                    <Icon name={effect.icon} />
+                    <span>{effect.description}</span>
+                  </IconRow>
+                ))}
+              </EffectList>
+              <TransactionsToggle bsStyle="link" bsSize="xsmall" onClick={() => setShowTransactions((show) => !show)}>
+                {showTransactions
+                  ? 'Hide queued transactions'
+                  : `Show queued transactions (${pendingChanges.activities.length})`}
+              </TransactionsToggle>
+              {showTransactions && (
+                <ActivityEntryList entries={pendingChanges.activities} compareTargets={compareTargets} />
+              )}
+            </>
+          ) : (
+            // Pending, but every queued marker is of a type this version can't describe (UNKNOWN).
+            <EmptyText>Changes are queued and will be applied at the collector&apos;s next check-in.</EmptyText>
+          ))}
         {!pendingChangesError && !hasPendingChanges && (
           <>
             <SyncStateIndicator pending={false} withLabel />

@@ -311,7 +311,10 @@ public class CollectorInstancesResource extends RestResource {
                 markers.stream().filter(marker -> marker.type() != MarkerType.UNKNOWN).toList(),
                 this::isPermitted);
 
-        return new PendingChangesResponse(PendingChangesResponse.CoalescedActionsView.from(coalesced), activities);
+        // Any unprocessed marker (including UNKNOWN, which is excluded from `activities`) means the
+        // instance is still pending — matching the instances table's "Sync" column.
+        return new PendingChangesResponse(!markers.isEmpty(),
+                PendingChangesResponse.CoalescedActionsView.from(coalesced), activities);
     }
 
     @POST

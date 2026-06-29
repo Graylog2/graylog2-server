@@ -105,7 +105,6 @@ class FleetTransactionLogServiceTest {
         assertThat(marker.payload()).isInstanceOf(FleetReassignedPayload.class);
         assertThat(((FleetReassignedPayload) marker.payload()).newFleetId()).isEqualTo("fleet-B");
     }
-
     @Test
     void sequenceNumbersAreMonotonicallyIncreasing() {
         long seq1 = service.appendFleetMarker("fleet-1", MarkerType.CONFIG_CHANGED);

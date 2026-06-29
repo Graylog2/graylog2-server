@@ -60,6 +60,7 @@ const mockSources: Source[] = [
 ];
 
 const pendingChanges: PendingChangesResponse = {
+  has_pending_changes: true,
   coalesced: {
     recompute_config: true,
     recompute_ingest_config: false,
@@ -162,6 +163,7 @@ describe('InstanceDetailDrawer', () => {
   it('hides the pending changes section when the instance is caught up', async () => {
     asMock(useInstancePendingChanges).mockReturnValue({
       data: {
+        has_pending_changes: false,
         coalesced: {
           recompute_config: false,
           recompute_ingest_config: false,
@@ -186,6 +188,36 @@ describe('InstanceDetailDrawer', () => {
     expect(screen.queryByText(/queued until the collector synchronizes/i)).not.toBeInTheDocument();
   });
 
+  it('shows the instance as pending even when there are no displayable queued actions', async () => {
+    // Only UNKNOWN markers are pending: the backend reports has_pending_changes but no effects/activities.
+    asMock(useInstancePendingChanges).mockReturnValue({
+      data: {
+        has_pending_changes: true,
+        coalesced: {
+          recompute_config: false,
+          recompute_ingest_config: false,
+          reassign: false,
+          restart: false,
+          run_discovery: false,
+        },
+        activities: [],
+      },
+      isLoading: false,
+      isError: false,
+    });
+
+    render(
+      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+    );
+
+    await screen.findByText('Synchronization');
+    // Consistent with the table: pending, not "In sync", with a graceful message rather than an empty list.
+    await screen.findByText('Sync pending');
+    await screen.findByText(/queued and will be applied/i);
+    expect(screen.queryByText('In sync')).not.toBeInTheDocument();
+    expect(screen.queryByText(/queued until the collector synchronizes/i)).not.toBeInTheDocument();
+  });
+
   it('shows an error message instead of spinning forever when pending changes fail to load', async () => {
     asMock(useInstancePendingChanges).mockReturnValue({ data: undefined, isLoading: false, isError: true });
     const pendingInstance = { ...mockInstance, has_pending_changes: true };
@@ -206,6 +238,7 @@ describe('InstanceDetailDrawer', () => {
   it('leads a bulk reassignment with the instance being viewed', async () => {
     asMock(useInstancePendingChanges).mockReturnValue({
       data: {
+        has_pending_changes: true,
         coalesced: {
           recompute_config: false,
           recompute_ingest_config: false,

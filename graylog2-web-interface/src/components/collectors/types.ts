@@ -205,6 +205,7 @@ export type CoalescedActions = {
 };
 
 export type PendingChangesResponse = {
+  has_pending_changes: boolean;
   coalesced: CoalescedActions;
   activities: ActivityEntry[];
 };
