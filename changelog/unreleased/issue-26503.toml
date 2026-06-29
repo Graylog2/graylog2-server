@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Navbar links and buttons no longer keep the focus ring visible after a mouse click; the outline now only shows for keyboard navigation."
+
+issues = ["26503"]
+pulls = ["26504"]
