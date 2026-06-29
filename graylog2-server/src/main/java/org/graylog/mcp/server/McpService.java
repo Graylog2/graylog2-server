@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.graylog2.audit.AuditEventTypes.MCP_PROMPT_GET;
@@ -142,7 +143,10 @@ public class McpService {
                             .read(permissionHelper, new URI(readResourceRequest.uri()))
                             .orElseThrow();
                     auditEventSender.success(auditActor, AuditEventType.create(MCP_RESOURCE_READ), auditContext);
-                    final var contents = new McpSchema.TextResourceContents(resource.uri(), null, resource.description());
+                    // MCP SDK 2.0.0 rejects a null TextResourceContents text; a resource with no
+                    // description must still be readable, so fall back to an empty string.
+                    final var contents = new McpSchema.TextResourceContents(resource.uri(), null,
+                            Objects.requireNonNullElse(resource.description(), ""));
                     return Optional.of(new McpSchema.ReadResourceResult(List.of(contents)));
                 } catch (Exception e) {
                     throw McpError.builder(McpSchema.ErrorCodes.RESOURCE_NOT_FOUND)
