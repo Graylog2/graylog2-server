@@ -93,7 +93,7 @@ const SourceList = styled.div`
   gap: ${({ theme }) => theme.spacings.xs};
 `;
 
-const EffectList = styled(IconRowList)(
+const ActionList = styled(IconRowList)(
   ({ theme }) => css`
     margin-top: ${theme.spacings.xs};
   `,
@@ -103,30 +103,30 @@ const TransactionsToggle = styled(Button)`
   padding-left: 0;
 `;
 
-type PendingEffect = { key: string; icon: IconName; description: React.ReactNode };
+type PendingAction = { key: string; icon: IconName; description: React.ReactNode };
 
-// The net effect still awaiting the collector, as imperative one-liners.
-const pendingEffects = (coalesced: CoalescedActions): PendingEffect[] => {
-  const effects: PendingEffect[] = [];
+// The net actions still awaiting the collector, as imperative one-liners.
+const pendingActions = (coalesced: CoalescedActions): PendingAction[] => {
+  const actions: PendingAction[] = [];
 
   if (coalesced.reassign) {
-    effects.push({ key: 'reassign', icon: 'shuffle', description: 'Reassign to another fleet' });
+    actions.push({ key: 'reassign', icon: 'shuffle', description: 'Reassign to another fleet' });
   }
 
   if (coalesced.recompute_config) {
-    effects.push({ key: 'config', icon: 'settings', description: 'Reload configuration' });
+    actions.push({ key: 'config', icon: 'settings', description: 'Reload configuration' });
   }
   if (coalesced.recompute_ingest_config) {
-    effects.push({ key: 'ingest-config', icon: 'settings', description: 'Reload ingest configuration' });
+    actions.push({ key: 'ingest-config', icon: 'settings', description: 'Reload ingest configuration' });
   }
   if (coalesced.restart) {
-    effects.push({ key: 'restart', icon: 'refresh', description: 'Restart' });
+    actions.push({ key: 'restart', icon: 'refresh', description: 'Restart' });
   }
   if (coalesced.run_discovery) {
-    effects.push({ key: 'discovery', icon: 'search', description: 'Run source discovery' });
+    actions.push({ key: 'discovery', icon: 'search', description: 'Run source discovery' });
   }
 
-  return effects;
+  return actions;
 };
 
 const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) => {
@@ -136,7 +136,7 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
   // value until the detail loads. Deriving from activities.length would wrongly show "In sync" for an
   // instance whose only pending markers are UNKNOWN (those are excluded from activities).
   const hasPendingChanges = pendingChanges ? pendingChanges.has_pending_changes : instance.has_pending_changes;
-  const effects = pendingChanges ? pendingEffects(pendingChanges.coalesced) : [];
+  const actions = pendingChanges ? pendingActions(pendingChanges.coalesced) : [];
   const [showTransactions, setShowTransactions] = useState(false);
 
   // In this per-instance view a bulk reassignment lists every collector in the batch. Float the
@@ -248,17 +248,17 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
         {!pendingChangesError &&
           hasPendingChanges &&
           pendingChanges &&
-          (effects.length > 0 || pendingChanges.activities.length > 0 ? (
+          (actions.length > 0 || pendingChanges.activities.length > 0 ? (
             <>
               <span>The following actions are queued until the collector synchronizes:</span>
-              <EffectList>
-                {effects.map((effect) => (
-                  <IconRow key={effect.key}>
-                    <Icon name={effect.icon} />
-                    <span>{effect.description}</span>
+              <ActionList>
+                {actions.map((action) => (
+                  <IconRow key={action.key}>
+                    <Icon name={action.icon} />
+                    <span>{action.description}</span>
                   </IconRow>
                 ))}
-              </EffectList>
+              </ActionList>
               <TransactionsToggle bsStyle="link" bsSize="xsmall" onClick={() => setShowTransactions((show) => !show)}>
                 {showTransactions
                   ? 'Hide queued transactions'
