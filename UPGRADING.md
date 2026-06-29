@@ -83,8 +83,6 @@ configuration (indices, feature fields, intervals, etc.) will not be displayed a
 edited or re-enabled. **Note: If you have custom anomaly detectors, you should note down their configuration 
 before upgrading.**
 
-Matching the file's style (top-level `##` heading, markdown links, ~120-char wrapping):
-
 ### AWS Kinesis/CloudWatch Input: Additional IAM Permissions Required
 
 Graylog 7.1 upgrades the bundled Kinesis Client Library (KCL) that the AWS Kinesis/CloudWatch input uses, from version
