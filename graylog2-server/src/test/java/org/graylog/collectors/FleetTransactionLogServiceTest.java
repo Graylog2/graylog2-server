@@ -36,7 +36,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -228,81 +227,72 @@ class FleetTransactionLogServiceTest {
         assertThat(markers.getFirst().type()).isEqualTo(MarkerType.CONFIG_CHANGED);
     }
 
-    // --- instanceUidsWithPendingChanges tests ---
+    // --- pendingChangesLookup / isPending tests ---
 
     @Test
-    void instanceUidsWithPendingChangesCoversFleetAndCollectorScopes() {
+    void pendingChangesLookupCoversFleetAndCollectorScopes() {
         service.appendFleetMarker("fleet-1", MarkerType.CONFIG_CHANGED);              // seq 1
         service.appendCollectorMarker(Set.of("uid-C"), MarkerType.RESTART, null);     // seq 2
 
-        var result = service.instanceUidsWithPendingChanges(List.of(
-                instance("uid-A", "fleet-1", 0L),    // pending via its fleet's marker
-                instance("uid-B", "fleet-2", 0L),    // nothing targets fleet-2 or uid-B
-                instance("uid-C", "fleet-2", 0L)));  // pending via its own marker
+        final var lookup = service.pendingChangesLookup();
 
-        assertThat(result).containsExactlyInAnyOrder("uid-A", "uid-C");
+        assertThat(lookup.isPending(instance("uid-A", "fleet-1", 0L))).isTrue();   // pending via its fleet's marker
+        assertThat(lookup.isPending(instance("uid-B", "fleet-2", 0L))).isFalse();  // nothing targets fleet-2 or uid-B
+        assertThat(lookup.isPending(instance("uid-C", "fleet-2", 0L))).isTrue();   // pending via its own marker
     }
 
     @Test
-    void instanceUidsWithPendingChangesHonorsEachInstancesOwnCursor() {
+    void pendingChangesLookupHonorsEachInstancesOwnCursor() {
         service.appendFleetMarker("fleet-1", MarkerType.CONFIG_CHANGED);              // seq 1
         long s2 = service.appendFleetMarker("fleet-1", MarkerType.CONFIG_CHANGED);    // seq 2
 
-        // same fleet, different applied cursors: only the lagging instance is pending
-        var result = service.instanceUidsWithPendingChanges(List.of(
-                instance("uid-A", "fleet-1", 0L),
-                instance("uid-B", "fleet-1", s2)));
+        final var lookup = service.pendingChangesLookup();
 
-        assertThat(result).containsExactly("uid-A");
+        // same fleet, different applied cursors: only the lagging instance is pending
+        assertThat(lookup.isPending(instance("uid-A", "fleet-1", 0L))).isTrue();
+        assertThat(lookup.isPending(instance("uid-B", "fleet-1", s2))).isFalse();
     }
 
     @Test
-    void instanceUidsWithPendingChangesTreatsMarkerAtCursorAsApplied() {
+    void pendingChangesLookupTreatsMarkerAtCursorAsApplied() {
         long s1 = service.appendFleetMarker("fleet-1", MarkerType.CONFIG_CHANGED);
 
-        var result = service.instanceUidsWithPendingChanges(List.of(instance("uid-A", "fleet-1", s1)));
+        final var lookup = service.pendingChangesLookup();
 
-        assertThat(result).isEmpty();
+        assertThat(lookup.isPending(instance("uid-A", "fleet-1", s1))).isFalse();
     }
 
     @Test
-    void instanceUidsWithPendingChangesUnwindsBulkCollectorMarkers() {
+    void pendingChangesLookupUnwindsBulkCollectorMarkers() {
         service.appendCollectorMarker(Set.of("uid-A", "uid-B"), MarkerType.RESTART, null);
 
-        var result = service.instanceUidsWithPendingChanges(List.of(
-                instance("uid-A", "fleet-1", 0L),
-                instance("uid-B", "fleet-1", 0L),
-                instance("uid-C", "fleet-1", 0L)));
+        final var lookup = service.pendingChangesLookup();
 
-        assertThat(result).containsExactlyInAnyOrder("uid-A", "uid-B");
+        assertThat(lookup.isPending(instance("uid-A", "fleet-1", 0L))).isTrue();
+        assertThat(lookup.isPending(instance("uid-B", "fleet-1", 0L))).isTrue();
+        assertThat(lookup.isPending(instance("uid-C", "fleet-1", 0L))).isFalse();
     }
 
     @Test
-    void instanceUidsWithPendingChangesIgnoresForeignIdsFromBulkFleetMarkers() {
-        // bulk marker also targets fleet-2, which no given instance belongs to
+    void pendingChangesLookupRecordsEachFleetFromBulkFleetMarkers() {
+        // a bulk marker targets both fleets; each fleet gets its own max-seq entry
         service.appendFleetMarker(Set.of("fleet-1", "fleet-2"), MarkerType.CONFIG_CHANGED);
 
-        var result = service.instanceUidsWithPendingChanges(List.of(instance("uid-A", "fleet-1", 0L)));
+        final var lookup = service.pendingChangesLookup();
 
-        assertThat(result).containsExactly("uid-A");
+        assertThat(lookup.maxByFleetId()).containsOnlyKeys("fleet-1", "fleet-2");
+        assertThat(lookup.isPending(instance("uid-A", "fleet-1", 0L))).isTrue();
+        assertThat(lookup.isPending(instance("uid-B", "fleet-2", 0L))).isTrue();
+        assertThat(lookup.isPending(instance("uid-C", "fleet-3", 0L))).isFalse();
     }
 
     @Test
-    void instanceUidsWithPendingChangesChunksLargeInputs() {
-        service.appendFleetMarker("fleet-1", MarkerType.CONFIG_CHANGED);
+    void pendingChangesLookupIsEmptyWhenNoMarkers() {
+        final var lookup = service.pendingChangesLookup();
 
-        var instances = IntStream.range(0, FleetTransactionLogService.MAX_SEQ_SCAN_BATCH_SIZE + 50)
-                .mapToObj(n -> instance("uid-" + n, "fleet-1", 0L))
-                .toList();
-
-        var result = service.instanceUidsWithPendingChanges(instances);
-
-        assertThat(result).hasSize(instances.size());
-    }
-
-    @Test
-    void instanceUidsWithPendingChangesReturnsEmptySetForEmptyInput() {
-        assertThat(service.instanceUidsWithPendingChanges(List.of())).isEmpty();
+        assertThat(lookup.maxByFleetId()).isEmpty();
+        assertThat(lookup.maxByInstanceUid()).isEmpty();
+        assertThat(lookup.isPending(instance("uid-A", "fleet-1", 0L))).isFalse();
     }
 
     private static CollectorInstanceDTO instance(String uid, String fleetId, long lastProcessedTxnSeq) {

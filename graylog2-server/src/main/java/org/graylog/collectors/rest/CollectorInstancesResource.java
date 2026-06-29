@@ -71,8 +71,6 @@ import org.graylog2.search.AttributeFieldSorts;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -94,8 +92,6 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 @Consumes(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class CollectorInstancesResource extends RestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(CollectorInstancesResource.class);
-
     private static final String DEFAULT_SORT_FIELD = "last_seen";
     private static final String DEFAULT_SORT_DIRECTION = "desc";
 
@@ -117,7 +113,16 @@ public class CollectorInstancesResource extends RestResource {
                     })
                     .sortSpec(AttributeSortSpec.field(FIELD_LAST_SEEN))
                     .build(),
-            EntityAttribute.builder().id("has_pending_changes").title("Sync").sortable(false).build(),
+            EntityAttribute.builder().id("has_pending_changes").title("Sync")
+                    .sortable(false)
+                    .filterable(true)
+                    .filterOptions(Set.of(
+                            FilterOption.create("true", "Sync pending"),
+                            FilterOption.create("false", "In sync")
+                    ))
+                    .type(SearchQueryField.Type.BOOLEAN)
+                    .bsonFilterCreator((name, value) -> hasPendingChangesFilter((boolean) value.getValue()))
+                    .build(),
             // Workaround: type(OBJECT_ID) is needed so the frontend sends identifier_type=OBJECT_ID
             // to the entity title service (POST /system/catalog/entities/titles), which converts the
             // string fleet_id to an ObjectId for the _id lookup in the fleets collection.
@@ -229,14 +234,13 @@ public class CollectorInstancesResource extends RestResource {
         final Instant offlineCutoff = Instant.now().minus(offlineThreshold);
         final Bson dbQuery = dbQueryCreator.createDbQuery(filters, query);
         final var resolvedSort = DbSortResolver.resolve(ATTRIBUTES, sort, order);
+        final var pendingChangesLookup = txnLogService.pendingChangesLookup();
         final var list = collectorInstanceService.findPaginated(
                 dbQuery,
                 resolvedSort,
                 page,
                 perPage,
                 dto -> isPermitted(CollectorsPermissions.FLEET_READ, dto.fleetId()));
-
-        final var instanceUidsWithPendingChanges = txnLogService.instanceUidsWithPendingChanges(list);
 
         return PageListResponse.create(
                 query,
@@ -257,7 +261,7 @@ public class CollectorInstancesResource extends RestResource {
                         dto.nextCertificateExpiresAt().orElse(null),
                         attributesToMap(dto.identifyingAttributes()),
                         attributesToMap(dto.nonIdentifyingAttributes()),
-                        instanceUidsWithPendingChanges.contains(dto.instanceUid())
+                        pendingChangesLookup.isPending(dto)
                 )).toList(),
                 ATTRIBUTES,
                 DEFAULTS);
@@ -356,6 +360,18 @@ public class CollectorInstancesResource extends RestResource {
 
     private Duration getOfflineThreshold() {
         return collectorsConfigService.getOrDefault().collectorOfflineThreshold();
+    }
+
+    /**
+     * Translates the {@code has_pending_changes} filter value into a MongoDB filter: the
+     * pending-changes filter for {@code true}, or its negation ({@code $nor}) for {@code false}
+     * (in sync). Accessed through this method — rather than reading {@code txnLogService} directly in
+     * the {@code ATTRIBUTES} initializer lambda — so the field is read at request time, after the
+     * constructor has assigned it.
+     */
+    private Bson hasPendingChangesFilter(boolean wantPending) {
+        final var filter = CollectorInstanceService.hasPendingChangesFilter(txnLogService.pendingChangesLookup());
+        return wantPending ? filter : Filters.nor(filter);
     }
 
     private static Map<String, Object> attributesToMap(Optional<List<Attribute>> attributes) {
