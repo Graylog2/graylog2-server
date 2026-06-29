@@ -75,8 +75,12 @@ public class MongodbNodeUtils {
     /**
      * @param timeout optional client-side operation timeout (CSOT); see
      *                {@link #getProfilingResults(MongoClient, Duration)}. Unlike
-     *                {@link #calculateStorageUsedPercent(MongoClient)}, this overload propagates failures (including
-     *                a timeout) instead of swallowing them as {@code 0.0}, so a caller can surface them.
+     *                {@link #calculateStorageUsedPercent(MongoClient)}, this overload propagates failures instead of
+     *                swallowing them as {@code 0.0}, so a caller can surface them. That includes a timeout, a failed
+     *                {@code dbStats} command, <em>and</em> a missing/zero {@code fsTotalSize} (no usable capacity
+     *                figure) -- the swallowing overload reports the last case as {@code 0.0}, but a caller such as a
+     *                health check needs to tell "0% used" apart from "capacity unknown" and map the latter to
+     *                {@code unknown} rather than a false "healthy 0%".
      */
     public static double calculateStorageUsedPercent(MongoClient mongoConnection, Duration timeout) {
         return storageUsedPercent(mongoConnection, timeout);
@@ -88,10 +92,14 @@ public class MongodbNodeUtils {
         final Document dbStats = db.runCommand(new Document("dbStats", 1));
         double fsUsedSize = dbStats.getDouble("fsUsedSize");
         double fsTotalSize = dbStats.getDouble("fsTotalSize");
-        if (fsTotalSize > 0) {
-            return 100.0d * fsUsedSize / fsTotalSize;
+        if (fsTotalSize <= 0) {
+            // No usable capacity figure (missing/zero fsTotalSize -- e.g. a partial dbStats document or a storage
+            // engine that does not report filesystem size). Signal it rather than returning a misleading 0%: the
+            // swallowing overload catches this and reports 0.0 as before, while the timeout overload propagates it
+            // so a caller can surface "capacity unknown" instead of a false "healthy 0%".
+            throw new IllegalStateException("MongoDB dbStats reported no filesystem capacity (fsTotalSize=" + fsTotalSize + ")");
         }
-        return 0.0;
+        return 100.0d * fsUsedSize / fsTotalSize;
     }
 
     private static MongoDatabase withOptionalTimeout(MongoDatabase db, Duration timeout) {
