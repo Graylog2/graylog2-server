@@ -143,6 +143,7 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
                                            Map<EntityDescriptor, Object> nativeEntities) {
         final DBSearchFilter dbFilter = (DBSearchFilter) nativeEntities.get(EntityDescriptor.create(id(), ModelTypes.SEARCH_FILTER_V1));
         if (dbFilter != null) {
+            // If this filter references a newly imported filter, update this filter with the ID and scope of the new filter created in MongoDB.
             final Builder builder = toBuilder().id(dbFilter.id());
             if (dbFilter instanceof ScopedEntity<?> scopedFilter) {
                 builder.scope(scopedFilter.scope());
