@@ -157,6 +157,9 @@ public class MongoDbPipelineMetadataService {
     }
 
     public void delete(Collection<String> pipelineIds) {
+        if (pipelineIds == null || pipelineIds.isEmpty()) {
+            return;
+        }
         final DeleteResult deleteResult = collection.deleteMany(Filters.in(FIELD_PIPELINE_ID, pipelineIds));
         routingRulesCollection.deleteMany(Filters.in(RoutingRuleDao.FIELD_PIPELINE_ID, pipelineIds));
         if (deleteResult.getDeletedCount() == 0) {
