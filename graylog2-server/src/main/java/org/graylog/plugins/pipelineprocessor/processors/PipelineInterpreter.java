@@ -509,7 +509,9 @@ public class PipelineInterpreter implements MessageProcessor {
                         }
                     });
 
-            // we have to remove the metrics, because otherwise we leak references to the cache (and the register call with throw)
+            // Synchronized to prevent concurrent State constructions from racing on remove+register,
+            // which would cause duplicate metric registration errors. (See #26080)
+            // We have to remove the metrics, because otherwise we leak references to the cache (and the register call with throw)
             synchronized (METRIC_REGISTRATION_LOCK) {
                 metricRegistry.removeMatching((name, metric) -> name.startsWith(getStageCacheMetricName()));
                 MetricUtils.safelyRegisterAll(metricRegistry, new CacheStatsSet(getStageCacheMetricName(), cache));
