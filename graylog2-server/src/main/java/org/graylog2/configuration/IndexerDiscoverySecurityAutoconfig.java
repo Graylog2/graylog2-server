@@ -26,6 +26,8 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 public class IndexerDiscoverySecurityAutoconfig implements IndexerDiscoveryListener {
@@ -61,6 +63,11 @@ public class IndexerDiscoverySecurityAutoconfig implements IndexerDiscoveryListe
 
     private Optional<RenewalPolicy> getRenewalPolicy() {
         return Optional.ofNullable(this.clusterConfigService.get(RenewalPolicy.class));
+    }
+
+    @Override
+    public void onExplicitlyConfiguredNodes(List<URI> hosts) {
+
     }
 
     @Override
