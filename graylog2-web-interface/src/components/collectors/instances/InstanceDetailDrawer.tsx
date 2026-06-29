@@ -244,10 +244,12 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
       <Section>
         <SectionTitle>Synchronization</SectionTitle>
         {pendingChangesError && <EmptyText>Could not load pending changes. Please try again later.</EmptyText>}
-        {!pendingChangesError && hasPendingChanges && !pendingChanges && <Spinner />}
+        {/* Spin until the detail loads regardless of the table-row flag, which can be stale and would
+            otherwise flash a contradictory "In sync" before the fetched state arrives. */}
+        {!pendingChangesError && !pendingChanges && <Spinner />}
         {!pendingChangesError &&
-          hasPendingChanges &&
           pendingChanges &&
+          hasPendingChanges &&
           (actions.length > 0 || pendingChanges.activities.length > 0 ? (
             <>
               <span>The following actions are queued until the collector synchronizes:</span>
@@ -272,7 +274,7 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
             // Pending, but every queued marker is of a type this version can't describe (UNKNOWN).
             <EmptyText>Changes are queued and will be applied at the collector&apos;s next check-in.</EmptyText>
           ))}
-        {!pendingChangesError && !hasPendingChanges && (
+        {!pendingChangesError && pendingChanges && !hasPendingChanges && (
           <>
             <SyncStateIndicator pending={false} withLabel />
             <br />

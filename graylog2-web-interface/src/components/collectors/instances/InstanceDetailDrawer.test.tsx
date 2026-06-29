@@ -160,6 +160,20 @@ describe('InstanceDetailDrawer', () => {
     expect(screen.queryByText('In sync')).not.toBeInTheDocument();
   });
 
+  it('spins while loading instead of asserting a possibly-stale in-sync state', async () => {
+    asMock(useInstancePendingChanges).mockReturnValue({ data: undefined, isLoading: true, isError: false });
+    // Table row reports in-sync, but the detail hasn't loaded yet; the section must not commit to it.
+    const staleInstance = { ...mockInstance, has_pending_changes: false };
+
+    render(
+      <InstanceDetailDrawer instance={staleInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+    );
+
+    await screen.findByText('Synchronization');
+    await screen.findByText(/loading/i);
+    expect(screen.queryByText(/applied all queued actions/i)).not.toBeInTheDocument();
+  });
+
   it('hides the pending changes section when the instance is caught up', async () => {
     asMock(useInstancePendingChanges).mockReturnValue({
       data: {
