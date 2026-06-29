@@ -46,7 +46,9 @@ import org.bson.codecs.EncoderContext;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
+import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.database.utils.MongoUtils.idEq;
@@ -99,6 +101,12 @@ public class MongoEntityCollection<T extends MongoEntity> implements MongoCollec
     @Override
     public MongoCollection<T> withWriteConcern(@Nonnull WriteConcern writeConcern) {
         return new MongoEntityCollection<>(delegate.withWriteConcern(writeConcern));
+    }
+
+    @Nonnull
+    @Override
+    public MongoCollection<T> withTimeout(@Nonnull Duration timeout) {
+        return new MongoEntityCollection<>(delegate.withTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS));
     }
 
     @Override
