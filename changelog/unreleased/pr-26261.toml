@@ -1,0 +1,4 @@
+type = "a"
+message = "Enable Collectors in Graylog Cloud."
+
+pulls = ["26261"]

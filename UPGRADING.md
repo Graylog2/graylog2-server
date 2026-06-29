@@ -18,6 +18,17 @@ After upgrading:
   matched only `test` now also matches `Test` and `TEST`. API clients relying on exact-case matching
   via paginated endpoints will see additional results.
 
+## Web Interface Changes
+
+### Event Definition "Fields" step renamed to "Additional Details"
+
+The "Fields" step on the Event Definition wizard has been renamed to "Additional Details" to better reflect its
+content, which now covers more than event fields (e.g. tags). Along with the visible label, the step's `step` query
+parameter changed from `fields` to `additional-details`, so the URL for that step is now
+`.../edit?step=additional-details`. Existing bookmarked links using the old `?step=fields` value will continue to
+work, since they are mapped to the renamed step. You should update them to the new value, because support for the
+old value may be removed in a future version.
+
 ## Java API Changes
 
 | File/method                                                               | Description |
