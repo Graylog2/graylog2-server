@@ -106,6 +106,10 @@ public class PipelineInterpreter implements MessageProcessor {
     public Messages process(Messages messages) {
         try (Timer.Context ignored = executionTime.time()) {
             final State latestState = stateUpdater.getLatestState();
+            if (latestState == null) {
+                log.warn("Pipeline interpreter state is not yet available, passing messages through unchanged");
+                return messages;
+            }
             if (latestState.enableRuleMetrics()) {
                 return process(messages, new RuleMetricsListener(metricRegistry, ruleMetricsSampleRate), latestState);
             }
@@ -507,6 +511,7 @@ public class PipelineInterpreter implements MessageProcessor {
 
             // Synchronized to prevent concurrent State constructions from racing on remove+register,
             // which would cause duplicate metric registration errors. (See #26080)
+            // We have to remove the metrics, because otherwise we leak references to the cache (and the register call with throw)
             synchronized (METRIC_REGISTRATION_LOCK) {
                 metricRegistry.removeMatching((name, metric) -> name.startsWith(getStageCacheMetricName()));
                 MetricUtils.safelyRegisterAll(metricRegistry, new CacheStatsSet(getStageCacheMetricName(), cache));
