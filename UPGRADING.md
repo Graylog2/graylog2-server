@@ -91,7 +91,7 @@ that were not needed by KCL 2.x.
 
 As a result, existing AWS Kinesis/CloudWatch inputs may fail to run successfully after the upgrade until the IAM
 role/policy used by the input is updated to grant the additional permissions. Review and update the policy attached to
-the role Graylog assumes for the input before or immediately after upgrading.
+the role Graylog uses for the input before or immediately after upgrading.
 
 For more information, see the AWS [KCL 2.x to 3.x migration guide](https://docs.aws.amazon.com/streams/latest/dev/kcl-migration-from-2-3.html).
 For the full list of IAM permissions required by KCL 3.x, see [IAM permissions for KCL 3.x](https://docs.aws.amazon.com/streams/latest/dev/kcl-migration-from-2-3.html#kcl-migration-from-2-3-IAM-permissions).
