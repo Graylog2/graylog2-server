@@ -27,7 +27,8 @@ import type { RecentActivityResponse } from '../types';
 export const ACTIVITY_KEY = ['collectors', 'activity', 'recent'];
 
 const fetchRecentActivity = (): Promise<RecentActivityResponse> =>
-  CollectorsActivity.recent() as Promise<RecentActivityResponse>;
+  // The activity feed auto-refreshes; don't let its polling keep idle sessions alive.
+  CollectorsActivity.recent({ requestShouldExtendSession: false }) as Promise<RecentActivityResponse>;
 
 export const useRecentActivity = (): { data: RecentActivityResponse | undefined; isLoading: boolean } => {
   const refetchInterval = useCollectorRefetchInterval();
