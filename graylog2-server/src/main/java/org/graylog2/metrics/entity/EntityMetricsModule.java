@@ -26,6 +26,8 @@ import jakarta.inject.Singleton;
 import org.graylog2.inputs.InputServiceImpl;
 import org.graylog2.inputs.metrics.InputExtractorCountDescriptor;
 import org.graylog2.inputs.metrics.InputMessagesPerStreamDescriptor;
+import org.graylog2.inputs.metrics.InputType;
+import org.graylog2.inputs.metrics.RegularInputType;
 import org.graylog2.metrics.entity.cache.MetricsCacheService;
 import org.graylog2.streams.StreamServiceImpl;
 import org.graylog2.streams.metrics.StreamAssociatedInputsDescriptor;
@@ -68,6 +70,9 @@ public class EntityMetricsModule extends AbstractModule {
         streamDescriptors.addBinding().to(StreamAssociatedInputsDescriptor.class);
         streamDescriptors.addBinding().to(StreamPipelinesDescriptor.class);
         streamDescriptors.addBinding().to(StreamRoutingPipelinesDescriptor.class);
+
+        final Multibinder<InputType> inputTypes = Multibinder.newSetBinder(binder(), InputType.class);
+        inputTypes.addBinding().to(RegularInputType.class);
     }
 
     @SuppressWarnings("unused")
