@@ -46,8 +46,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.regex.PatternSyntaxException;
 
-import static org.graylog2.shared.utilities.StringUtils.f;
-
 @RequiresAuthentication
 @Path("/tools/regex_replace_tester")
 public class RegexReplaceTesterResource extends RestResource {
@@ -80,10 +78,6 @@ public class RegexReplaceTesterResource extends RestResource {
 
     private RegexReplaceTesterResponse testRegexReplaceExtractor(final String example, final String regex,
                                                           final String replacement, final boolean replaceAll) {
-        if (regex.length() > SafePattern.MAX_REGEX_LENGTH) {
-            throw new BadRequestException(f("Regular expression exceeds maximum length of %d characters", SafePattern.MAX_REGEX_LENGTH));
-        }
-
         final Map<String, Object> config = ImmutableMap.of(
                 "regex", regex,
                 "replacement", replacement,

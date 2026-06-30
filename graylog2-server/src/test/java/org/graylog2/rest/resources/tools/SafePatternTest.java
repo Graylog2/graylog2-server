@@ -47,22 +47,6 @@ public class SafePatternTest {
     }
 
     @Test
-    public void compileThrowsIllegalArgumentExceptionWhenRegexExceedsMaxLength() {
-        final String tooLong = "a".repeat(SafePattern.MAX_REGEX_LENGTH + 1);
-        assertThatThrownBy(() -> toTest.compile(tooLong))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("maximum length");
-    }
-
-    @Test
-    public void matcherThrowsIllegalArgumentExceptionWhenInputExceedsMaxLength() {
-        final String tooLong = "a".repeat(SafePattern.MAX_STRING_LENGTH + 1);
-        assertThatThrownBy(() -> toTest.compile(".*").matcher(tooLong))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("maximum length");
-    }
-
-    @Test
     public void matcherFindsMatchForValidPatternAndInput() {
         final Matcher matcher = toTest.compile("([a-z]+)").matcher("test");
         assertThat(matcher.find()).isTrue();
