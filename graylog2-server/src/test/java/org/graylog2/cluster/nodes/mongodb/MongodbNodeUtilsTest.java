@@ -67,4 +67,24 @@ class MongodbNodeUtilsTest {
 
         assertThat(MongodbNodeUtils.calculateStorageUsedPercent(client)).isEqualTo(0.0);
     }
+
+    @Test
+    void timeoutOverloadPropagatesWhenFilesystemFieldsAreMissingRatherThanThrowingNpe() {
+        // A partial dbStats document that omits fsUsedSize/fsTotalSize must surface as the same controlled
+        // "capacity unknown" signal -- getDouble returns null for the missing fields, which must not unbox into a
+        // NullPointerException.
+        dbStats(new Document());
+
+        assertThatThrownBy(() -> MongodbNodeUtils.calculateStorageUsedPercent(client, Duration.ofSeconds(4)))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("no filesystem capacity");
+    }
+
+    @Test
+    void swallowingOverloadStillReportsZeroWhenFilesystemFieldsAreMissing() {
+        // The legacy node-roster callers swallow the missing-field case to 0.0 as well, not an NPE.
+        dbStats(new Document());
+
+        assertThat(MongodbNodeUtils.calculateStorageUsedPercent(client)).isEqualTo(0.0);
+    }
 }

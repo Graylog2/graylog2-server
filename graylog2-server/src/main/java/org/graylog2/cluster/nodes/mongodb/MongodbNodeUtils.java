@@ -90,14 +90,18 @@ public class MongodbNodeUtils {
         final MongoDatabase db = withOptionalTimeout(
                 mongoConnection.getDatabase(MongodbClusterCommand.GRAYLOG_DATABASE_NAME), timeout);
         final Document dbStats = db.runCommand(new Document("dbStats", 1));
-        double fsUsedSize = dbStats.getDouble("fsUsedSize");
-        double fsTotalSize = dbStats.getDouble("fsTotalSize");
-        if (fsTotalSize <= 0) {
-            // No usable capacity figure (missing/zero fsTotalSize -- e.g. a partial dbStats document or a storage
-            // engine that does not report filesystem size). Signal it rather than returning a misleading 0%: the
-            // swallowing overload catches this and reports 0.0 as before, while the timeout overload propagates it
-            // so a caller can surface "capacity unknown" instead of a false "healthy 0%".
-            throw new IllegalStateException("MongoDB dbStats reported no filesystem capacity (fsTotalSize=" + fsTotalSize + ")");
+        // getDouble returns a boxed Double that is null when the field is absent, so read into Double (not the
+        // primitive) and null-check before use -- unboxing a missing field into a primitive double would throw a
+        // NullPointerException before the capacity handling below could run.
+        final Double fsUsedSize = dbStats.getDouble("fsUsedSize");
+        final Double fsTotalSize = dbStats.getDouble("fsTotalSize");
+        if (fsUsedSize == null || fsTotalSize == null || fsTotalSize <= 0) {
+            // No usable capacity figure (missing/zero fsTotalSize, or missing fsUsedSize -- e.g. a partial dbStats
+            // document or a storage engine that does not report filesystem size). Signal it rather than returning a
+            // misleading 0%: the swallowing overload catches this and reports 0.0 as before, while the timeout
+            // overload propagates it so a caller can surface "capacity unknown" instead of a false "healthy 0%".
+            throw new IllegalStateException("MongoDB dbStats reported no filesystem capacity (fsUsedSize="
+                    + fsUsedSize + ", fsTotalSize=" + fsTotalSize + ")");
         }
         return 100.0d * fsUsedSize / fsTotalSize;
     }
