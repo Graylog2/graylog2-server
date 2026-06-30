@@ -22,9 +22,11 @@ import type { SearchParams } from 'stores/PaginationTypes';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
 import { defaultOnError } from 'util/conditional/onError';
 import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
+import type { RequestOptions } from 'routing/request';
 
 import type { CollectorInstanceView } from '../types';
 
+const NO_SESSION_EXT: RequestOptions = { requestShouldExtendSession: false };
 export const INSTANCES_KEY_PREFIX = ['collectors', 'instances'];
 export const instancesKeyFn = (searchParams: SearchParams) => [...INSTANCES_KEY_PREFIX, 'paginated', searchParams];
 
@@ -73,16 +75,35 @@ export const fetchPaginatedInstances = async (
     'Could not load instances',
   );
 
-export const useInstances = (fleetId?: string) =>
+export const useInstances = (fleetId?: string, options: { refetchInterval?: number; silent?: boolean } = {}) =>
   useQuery<CollectorInstanceView[]>({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- silent only affects the error-reporting wrapper, not the cached data; callers deliberately share one cache entry regardless of the flag
     queryKey: [...INSTANCES_KEY_PREFIX, { fleetId }],
     queryFn: () => {
       const filters = fleetId ? [`fleet_id:${fleetId}`] : undefined;
-
-      return defaultOnError(
-        Collectors.findInstances(1, 0, undefined, filters).then((response) => response.elements.map(toView)),
-        'Loading Collector instances failed with status',
-        'Could not load Collector instances',
+      const promise = Collectors.findInstances(1, 0, undefined, filters, undefined, undefined, NO_SESSION_EXT).then(
+        (response) => response.elements.map(toView),
       );
+
+      return options.silent
+        ? promise
+        : defaultOnError(
+            promise,
+            'Loading Collector instances failed with status',
+            'Could not load Collector instances',
+          );
     },
+    refetchInterval: options.refetchInterval,
+  });
+
+export const useInstance = (instanceUid: string | undefined) =>
+  useQuery<CollectorInstanceView>({
+    queryKey: [...INSTANCES_KEY_PREFIX, 'single', instanceUid],
+    queryFn: () =>
+      defaultOnError(
+        Collectors.getInstance(instanceUid).then((response) => toView(response)),
+        'Loading Collector instance failed with status',
+        'Could not load Collector instance',
+      ),
+    enabled: !!instanceUid,
   });
