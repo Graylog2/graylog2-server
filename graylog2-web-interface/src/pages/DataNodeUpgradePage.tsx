@@ -44,9 +44,13 @@ const upgradeInstructionsDocumentationMessage = (
 );
 
 const openSearchStatusLine = ({
+  currentOpenSearchVersion,
+  isOpenSearchVersionError,
   isLoadingOpenSearchVersion,
   isOpenSearchUpToDate,
 }: {
+  currentOpenSearchVersion: string | undefined;
+  isOpenSearchVersionError: boolean;
   isLoadingOpenSearchVersion: boolean;
   isOpenSearchUpToDate: boolean;
 }) => {
@@ -54,10 +58,19 @@ const openSearchStatusLine = ({
     return <p>Checking OpenSearch version...</p>;
   }
 
+  if (isOpenSearchVersionError) {
+    return (
+      <p>
+        <Icon name="warning" bsStyle="warning" /> Could not check Data Nodes&apos; embedded OpenSearch version.
+      </p>
+    );
+  }
+
   if (isOpenSearchUpToDate) {
     return (
       <p>
-        <Icon name="check_circle" bsStyle="success" /> Data Nodes&apos; embedded OpenSearch is up to date.
+        <Icon name="check_circle" bsStyle="success" /> Data Nodes&apos; embedded OpenSearch is up to date
+        {currentOpenSearchVersion ? <b>{` (${currentOpenSearchVersion}).`}</b> : '.'}
       </p>
     );
   }
@@ -70,9 +83,13 @@ const openSearchStatusLine = ({
 };
 
 const UpgradeStatusAlert = ({
+  currentOpenSearchVersion,
+  isOpenSearchVersionError,
   isOpenSearchUpToDate,
   isLoadingOpenSearchVersion,
 }: {
+  currentOpenSearchVersion: string | undefined;
+  isOpenSearchVersionError: boolean;
   isOpenSearchUpToDate: boolean;
   isLoadingOpenSearchVersion: boolean;
 }) => (
@@ -80,7 +97,12 @@ const UpgradeStatusAlert = ({
     <p>
       <Icon name="check_circle" bsStyle="success" /> All your Data Nodes are up to date.
     </p>
-    {openSearchStatusLine({ isLoadingOpenSearchVersion, isOpenSearchUpToDate })}
+    {openSearchStatusLine({
+      currentOpenSearchVersion,
+      isOpenSearchVersionError,
+      isLoadingOpenSearchVersion,
+      isOpenSearchUpToDate,
+    })}
   </Alert>
 );
 
@@ -88,7 +110,12 @@ const DataNodeUpgradePage = () => {
   const upgradeListRef = useRef<HTMLTableSectionElement>(null);
 
   const { data, isInitialLoading } = useDataNodeUpgradeStatus();
-  const { isUpToDate: isOpenSearchUpToDate, isLoading: isLoadingOpenSearchVersion } = useOpenSearchClusterStats();
+  const {
+    currentVersion: currentOpenSearchVersion,
+    isError: isOpenSearchVersionError,
+    isUpToDate: isOpenSearchUpToDate,
+    isLoading: isLoadingOpenSearchVersion,
+  } = useOpenSearchClusterStats();
   const [upgradeMethod, setUpgradeMethod] = useState<DataNodeUpgradeMethodType>('cluster-restart');
   const [openUpgradeConfirmDialog, setOpenUpgradeConfirmDialog] = useState<boolean>(false);
 
@@ -131,6 +158,11 @@ const DataNodeUpgradePage = () => {
   const isRollingUpgradePossible = numberOfNodes >= 3;
   const showRollingUpgrade = upgradeMethod === 'rolling-upgrade' && (!!nodeInProgress || isRollingUpgradePossible);
   const areAllDataNodesUpToDate = !data?.outdated_nodes?.length && data?.up_to_date_nodes?.length > 0;
+  const showOpenSearchUpgradeSection =
+    areAllDataNodesUpToDate &&
+    !isLoadingOpenSearchVersion &&
+    !isOpenSearchVersionError &&
+    !isOpenSearchUpToDate;
 
   return (
     <DocumentTitle title="Data Node Upgrade">
@@ -166,8 +198,12 @@ const DataNodeUpgradePage = () => {
                 )}
               </>
             )}
-            <h1>Upgrade Data Node</h1>
-            <br />
+            {!areAllDataNodesUpToDate && (
+              <>
+                <h1>Upgrade Data Node</h1>
+                <br />
+              </>
+            )}
             <ClusterHealthInfo
               data={data}
               numberOfNodes={numberOfNodes}
@@ -183,11 +219,13 @@ const DataNodeUpgradePage = () => {
             )}
             {!data?.outdated_nodes?.length && data?.up_to_date_nodes?.length > 0 && (
               <UpgradeStatusAlert
+                currentOpenSearchVersion={currentOpenSearchVersion}
+                isOpenSearchVersionError={isOpenSearchVersionError}
                 isOpenSearchUpToDate={isOpenSearchUpToDate}
                 isLoadingOpenSearchVersion={isLoadingOpenSearchVersion}
               />
             )}
-            {areAllDataNodesUpToDate && <OpenSearchUpgradeSection />}
+            {showOpenSearchUpgradeSection && <OpenSearchUpgradeSection />}
             {openUpgradeConfirmDialog && nodeInProgress && (
               <Modal
                 show
