@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 import { Row, Col, Alert } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Link } from 'components/common';
@@ -25,21 +25,20 @@ import { CollectorsPageNavigation } from 'components/collectors/common';
 import collectorReceivedMessagesUrl from 'components/collectors/common/collectorReceivedMessagesUrl';
 import { COLLECTOR_INSTANCE_UID_FIELD } from 'components/collectors/common/fields';
 import { useInstance } from 'components/collectors/hooks/useInstanceQueries';
-import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import { extractErrorMessage } from 'util/extractErrorMessage';
 
 const CollectorsOnboardingInstancePage = () => {
   const { instanceUid } = useParams<{ instanceUid: string }>();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const { data: instance, isLoading, error } = useInstance(instanceUid);
 
   useEffect(() => {
     if (instance) {
-      history.push(collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid));
+      navigate(collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid));
     }
-  }, [instance, history]);
+  }, [instance, navigate]);
 
   const content = () => {
     if (isLoading) return <Spinner />;
