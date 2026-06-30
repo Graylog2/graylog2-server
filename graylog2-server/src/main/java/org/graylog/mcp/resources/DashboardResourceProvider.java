@@ -82,7 +82,9 @@ public class DashboardResourceProvider extends ResourceProvider {
         if (!permissionHelper.getSearchUser().canReadView(dashboard)) {
             return Optional.empty();
         }
-        return Optional.of(McpSchema.Resource.builder(grn.toString(), dashboard.title())
+        // MCP SDK 2.0.0 rejects a null/empty Resource name; fall back to the id.
+        final String name = Strings.isNullOrEmpty(dashboard.title()) ? dashboard.id() : dashboard.title();
+        return Optional.of(McpSchema.Resource.builder(grn.toString(), name)
                 .description(dashboard.description())
                 .build());
     }

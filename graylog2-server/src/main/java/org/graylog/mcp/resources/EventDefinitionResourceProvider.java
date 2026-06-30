@@ -80,7 +80,9 @@ public class EventDefinitionResourceProvider extends ResourceProvider {
             return Optional.empty();
         }
         final var eventDefinition = definitionDto.get();
-        return Optional.of(McpSchema.Resource.builder(grn.toString(), eventDefinition.title())
+        // MCP SDK 2.0.0 rejects a null/empty Resource name; fall back to the id.
+        final String name = Strings.isNullOrEmpty(eventDefinition.title()) ? eventDefinition.id() : eventDefinition.title();
+        return Optional.of(McpSchema.Resource.builder(grn.toString(), name)
                 .description(eventDefinition.description())
                 .build());
     }

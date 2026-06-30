@@ -78,7 +78,9 @@ public class StreamResourceProvider extends ResourceProvider {
         }
         try {
             final Stream stream = streamService.load(grn.entity());
-            return Optional.of(McpSchema.Resource.builder(grn.toString(), stream.getTitle())
+            // MCP SDK 2.0.0 rejects a null/empty Resource name; fall back to the id.
+            final String name = Strings.isNullOrEmpty(stream.getTitle()) ? stream.getId() : stream.getTitle();
+            return Optional.of(McpSchema.Resource.builder(grn.toString(), name)
                     .description(stream.getDescription())
                     .build());
         } catch (NotFoundException e) {
