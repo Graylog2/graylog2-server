@@ -19,6 +19,7 @@ package org.graylog.mcp.server;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.modelcontextprotocol.json.McpJsonMapper;
 import io.modelcontextprotocol.json.jackson2.JacksonMcpJsonMapperSupplier;
+import io.modelcontextprotocol.json.schema.jackson2.JacksonJsonSchemaValidatorSupplier;
 import io.modelcontextprotocol.spec.McpError;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.ProtocolVersions;
@@ -26,7 +27,9 @@ import org.glassfish.jersey.uri.UriTemplate;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
+import org.graylog.mcp.config.McpConfiguration;
 import org.graylog.mcp.tools.PermissionHelper;
+import org.graylog.security.certutil.InMemoryClusterConfigService;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventType;
@@ -52,6 +55,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -72,6 +76,7 @@ class McpServiceTest {
     private McpService mcpService;
     private Map<String, Tool<?, ?>> tools;
     private Map<GRNType, ResourceProvider> resourceProviders;
+    private InMemoryClusterConfigService clusterConfigService;
 
     @BeforeEach
     void setUp() {
@@ -80,6 +85,7 @@ class McpServiceTest {
         protocolMapper = new JacksonMcpJsonMapperSupplier().get();
         tools = new HashMap<>();
         resourceProviders = new HashMap<>();
+        clusterConfigService = new InMemoryClusterConfigService();
 
         when(permissionHelper.getCurrentUser()).thenReturn(user);
         when(user.getName()).thenReturn("testuser");
@@ -91,7 +97,9 @@ class McpServiceTest {
                 new CustomizationConfig(null),
                 GRNRegistry.createWithBuiltinTypes(),
                 tools,
-                resourceProviders
+                resourceProviders,
+                clusterConfigService,
+                new JacksonJsonSchemaValidatorSupplier().get()
         );
     }
 
@@ -566,5 +574,58 @@ class McpServiceTest {
         assertThatThrownBy(() -> mcpService.handle(permissionHelper, request, "session123"))
                 .isInstanceOf(McpError.class)
                 .hasMessageContaining("Unsupported method");
+    }
+
+    @Test
+    void testCallToolRejectsInvalidArgumentsWhenValidationEnabled() throws Exception {
+        clusterConfigService.write(McpConfiguration.create(false, false, true));
+
+        Tool<Map<String, Object>, String> mockTool = mock(Tool.class);
+        when(mockTool.inputSchema()).thenReturn(Map.of(
+                "type", "object",
+                "properties", Map.of("limit", Map.of("type", "integer")),
+                "required", List.of("limit")));
+        tools.put("test_tool", mockTool);
+
+        // missing the required "limit" property
+        var callParams = new McpSchema.CallToolRequest("test_tool", Map.of());
+        var request = new McpSchema.JSONRPCRequest("2.0", McpSchema.METHOD_TOOLS_CALL, "1",
+                objectMapper.convertValue(callParams, Map.class));
+
+        Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, "session123");
+
+        assertThat(result).isPresent();
+        assertThat(result.get()).isInstanceOf(McpSchema.CallToolResult.class);
+        final McpSchema.CallToolResult callResult = (McpSchema.CallToolResult) result.get();
+        assertThat(callResult.isError()).isTrue();
+        verify(mockTool, never()).apply(any(), any());
+        verify(auditEventSender).failure(any(AuditActor.class), any(AuditEventType.class), anyMap());
+    }
+
+    @Test
+    void testCallToolAcceptsValidArgumentsWhenValidationEnabled() throws Exception {
+        clusterConfigService.write(McpConfiguration.create(false, false, true));
+
+        Tool<Map<String, Object>, String> mockTool = mock(Tool.class);
+        when(mockTool.inputSchema()).thenReturn(Map.of(
+                "type", "object",
+                "properties", Map.of("limit", Map.of("type", "integer")),
+                "required", List.of("limit")));
+        when(mockTool.outputSchema()).thenReturn(Optional.empty());
+        when(mockTool.apply(eq(permissionHelper), any())).thenReturn("Tool result");
+        tools.put("test_tool", mockTool);
+
+        var callParams = new McpSchema.CallToolRequest("test_tool", Map.of("limit", 5));
+        var request = new McpSchema.JSONRPCRequest("2.0", McpSchema.METHOD_TOOLS_CALL, "1",
+                objectMapper.convertValue(callParams, Map.class));
+
+        Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, "session123");
+
+        assertThat(result).isPresent();
+        assertThat(result.get()).isInstanceOf(McpSchema.CallToolResult.class);
+        final McpSchema.CallToolResult callResult = (McpSchema.CallToolResult) result.get();
+        assertThat(callResult.isError()).isFalse();
+        verify(mockTool).apply(eq(permissionHelper), any());
+        verify(auditEventSender).success(any(AuditActor.class), any(AuditEventType.class), anyMap());
     }
 }

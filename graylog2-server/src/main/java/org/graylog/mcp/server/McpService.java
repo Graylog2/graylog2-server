@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import io.modelcontextprotocol.json.McpJsonMapper;
+import io.modelcontextprotocol.json.schema.JsonSchemaValidator;
 import io.modelcontextprotocol.spec.McpError;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.ProtocolVersions;
@@ -28,10 +29,12 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
+import org.graylog.mcp.config.McpConfiguration;
 import org.graylog.mcp.tools.PermissionHelper;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventType;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.ServerVersion;
 import org.graylog2.web.customization.CustomizationConfig;
 import org.slf4j.Logger;
@@ -67,6 +70,8 @@ public class McpService {
     private final GRNRegistry grnRegistry;
     private final Map<String, Tool<?, ?>> tools;
     private final Map<GRNType, ? extends ResourceProvider> resourceProviders;
+    private final ClusterConfigService clusterConfigService;
+    private final JsonSchemaValidator schemaValidator;
 
     @Inject
     protected McpService(ObjectMapper objectMapper,
@@ -75,7 +80,9 @@ public class McpService {
                          CustomizationConfig customizationConfig,
                          GRNRegistry grnRegistry,
                          Map<String, Tool<?, ?>> tools,
-                         Map<GRNType, ? extends ResourceProvider> resourceProviders) {
+                         Map<GRNType, ? extends ResourceProvider> resourceProviders,
+                         ClusterConfigService clusterConfigService,
+                         JsonSchemaValidator schemaValidator) {
         this.objectMapper = objectMapper;
         this.protocolMapper = protocolMapper;
         this.auditEventSender = auditEventSender;
@@ -83,6 +90,8 @@ public class McpService {
         this.grnRegistry = grnRegistry;
         this.tools = tools;
         this.resourceProviders = resourceProviders;
+        this.clusterConfigService = clusterConfigService;
+        this.schemaValidator = schemaValidator;
     }
 
     public Optional<McpSchema.Result> handle(PermissionHelper permissionHelper, McpSchema.JSONRPCRequest request, String sessionId) throws McpError {
@@ -192,6 +201,18 @@ public class McpService {
                 LOG.debug("Calling MCP tool: {}", callToolRequest);
                 if (tools.containsKey(callToolRequest.name())) {
                     final Tool<?, ?> tool = tools.get(callToolRequest.name());
+                    if (inputValidationEnabled()) {
+                        final var validation = schemaValidator.validate(tool.inputSchema(),
+                                Objects.requireNonNullElse(callToolRequest.arguments(), Map.of()));
+                        if (!validation.valid()) {
+                            auditEventSender.failure(auditActor, AuditEventType.create(MCP_TOOL_CALL), auditContext);
+                            return Optional.of(McpSchema.CallToolResult.builder()
+                                    .content(List.of(McpSchema.TextContent.builder(
+                                            "Invalid tool arguments: " + validation.errorMessage()).build()))
+                                    .isError(true)
+                                    .build());
+                        }
+                    }
                     try {
                         final Object result = tool.apply(permissionHelper, callToolRequest.arguments());
                         if (tool.outputSchema().isPresent()) {
@@ -254,5 +275,10 @@ public class McpService {
         throw McpError.builder(McpSchema.ErrorCodes.METHOD_NOT_FOUND)
                 .message("Unsupported method: " + request.method())
                 .build();
+    }
+
+    private boolean inputValidationEnabled() {
+        return clusterConfigService.getOrDefault(McpConfiguration.class, McpConfiguration.DEFAULT_VALUES)
+                .enableInputValidation();
     }
 }

@@ -37,7 +37,7 @@ public class McpRestResourceTest {
                                        null,
                                        new JacksonMcpJsonMapperSupplier().get(),
                                        null);
-        clusterConfigService.write(McpConfiguration.create(false, false));
+        clusterConfigService.write(McpConfiguration.create(false, false, false));
     }
 
     @Test
