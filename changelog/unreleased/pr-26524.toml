@@ -1,0 +1,4 @@
+type = "a"
+message = "Support custom server config prefix via `GRAYLOG_CONFIG_PREFIX`"
+
+pulls = ["26524"]
