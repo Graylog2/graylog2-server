@@ -26,6 +26,7 @@ import type { Events } from 'views/logic/searchtypes/events/EventHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import type { OnVisualizationConfigChange } from 'views/components/aggregationwizard/OnVisualizationConfigChangeContext';
 import OnVisualizationConfigChangeContext from 'views/components/aggregationwizard/OnVisualizationConfigChangeContext';
+import KeyMapperProvider from 'views/components/visualizations/KeyMapperProvider';
 
 import EmptyAggregationContent from './EmptyAggregationContent';
 
@@ -117,18 +118,22 @@ const AggregationBuilder = ({
   ) as VisualizationResult;
 
   return (
-    <VisComponent
-      config={config}
-      data={rows}
-      setLoadingState={setLoadingState}
-      effectiveTimerange={effectiveTimerange}
-      editing={editing}
-      fields={fields}
-      height={height}
-      width={width}
-      toggleEdit={toggleEdit}
-      onChange={onVisualizationConfigChange}
-    />
+    <KeyMapperProvider data={rows} config={config} fields={fields}>
+      {/* VisComponent is resolved by visualization type at render time and cannot be hoisted. */}
+      {/* eslint-disable-next-line react-hooks/static-components */}
+      <VisComponent
+        config={config}
+        data={rows}
+        setLoadingState={setLoadingState}
+        effectiveTimerange={effectiveTimerange}
+        editing={editing}
+        fields={fields}
+        height={height}
+        width={width}
+        toggleEdit={toggleEdit}
+        onChange={onVisualizationConfigChange}
+      />
+    </KeyMapperProvider>
   );
 };
 
