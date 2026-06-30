@@ -18,6 +18,7 @@ package org.graylog.mcp.server;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import io.modelcontextprotocol.json.McpJsonMapper;
@@ -39,6 +40,7 @@ import org.graylog2.web.customization.CustomizationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -88,6 +90,14 @@ public class McpService {
         this.tools = tools;
         this.resourceProviders = resourceProviders;
         this.schemaValidator = schemaValidator;
+    }
+
+    /**
+     * Parses a raw JSON-RPC payload into a typed message (request, notification, or response) using
+     * the MCP protocol mapper. McpService owns that mapper, so HTTP callers don't need one of their own.
+     */
+    public McpSchema.JSONRPCMessage parseMessage(JsonNode payload) throws IOException {
+        return McpSchema.deserializeJsonRpcMessage(protocolMapper, payload.toString());
     }
 
     public Optional<McpSchema.Result> handle(PermissionHelper permissionHelper, McpSchema.JSONRPCRequest request, String sessionId) throws McpError {
