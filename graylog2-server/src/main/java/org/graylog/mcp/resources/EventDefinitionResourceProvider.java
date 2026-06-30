@@ -16,6 +16,7 @@
  */
 package org.graylog.mcp.resources;
 
+import com.google.common.base.Strings;
 import io.modelcontextprotocol.spec.McpSchema;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.MediaType;
@@ -94,7 +95,8 @@ public class EventDefinitionResourceProvider extends ResourceProvider {
                             eventDefinition.id()))
                     .map(eventDefinition -> new McpSchema.Resource(
                             GRN_TYPE.toGRN(eventDefinition.id()).toString(),
-                            eventDefinition.title(),
+                            // MCP SDK 2.0.0 rejects a null/empty Resource name; fall back to the id.
+                            Strings.isNullOrEmpty(eventDefinition.title()) ? eventDefinition.id() : eventDefinition.title(),
                             eventDefinition.title(),
                             eventDefinition.description(),
                             null,
