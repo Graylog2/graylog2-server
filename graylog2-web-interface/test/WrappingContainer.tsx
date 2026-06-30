@@ -22,6 +22,7 @@ import MetricsContext from 'contexts/MetricsContext';
 
 import DefaultQueryClientProvider from './DefaultQueryClientProvider';
 import DefaultProviders from './DefaultProviders';
+import { memoryRouterFuture } from './reactRouterFutureFlags';
 
 type Props = {
   children: React.ReactNode;
@@ -37,7 +38,7 @@ const noopMetricsContext = {
 const WrappingContainer = ({ children }: Props) => (
   <DefaultQueryClientProvider>
     <MetricsContext.Provider value={noopMetricsContext}>
-      <MemoryRouter>
+      <MemoryRouter future={memoryRouterFuture}>
         <DefaultQueryParamProvider>
           <DefaultProviders env="test">{children}</DefaultProviders>
         </DefaultQueryParamProvider>

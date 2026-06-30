@@ -103,6 +103,27 @@ class IndexerDiscoveryProviderTest {
 
 
     @Test
+    void testCertProvisioningTriggeredForExplicitlyConfiguredNodes() {
+        final GraylogCertificateProvisioner provisioner = Mockito.mock(GraylogCertificateProvisioner.class);
+        final IndexerDiscoveryCertProvisioning listener = new IndexerDiscoveryCertProvisioning(provisioner);
+
+        final IndexerDiscoveryProvider provider = new IndexerDiscoveryProvider(
+                List.of(URI.create("http://datanode:9200")),
+                1,
+                Duration.seconds(1),
+                preflightConfig(null),
+                nodes(),
+                Collections.singleton(listener)
+        );
+
+        provider.get();
+
+        // Even with explicitly configured hosts a DataNode may still need a fresh certificate,
+        // so provisioning must run exactly once on this path.
+        Mockito.verify(provisioner, Mockito.times(1)).runProvisioning();
+    }
+
+    @Test
     void testPreconfiguredIndexers() {
         final IndexerDiscoveryProvider provider = new IndexerDiscoveryProvider(
                 List.of(URI.create("http://my-host:9200")),
@@ -156,6 +177,10 @@ class IndexerDiscoveryProviderTest {
     void testProvisioningWillBeTriggered() {
         final GraylogCertificateProvisioner provisioner = Mockito.mock(GraylogCertificateProvisioner.class);
         final org.graylog2.configuration.IndexerDiscoveryListener indexerDiscoveryListener = new IndexerDiscoveryListener() {
+
+            @Override
+            public void onExplicitlyConfiguredNodes(List<URI> hosts) {
+            }
 
             @Override
             public void beforeIndexerDiscovery() {
