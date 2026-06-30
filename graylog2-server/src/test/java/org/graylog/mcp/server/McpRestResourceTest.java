@@ -16,8 +16,7 @@
  */
 package org.graylog.mcp.server;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import io.modelcontextprotocol.json.jackson2.JacksonMcpJsonMapperSupplier;
 import jakarta.ws.rs.core.Response;
 import org.graylog.mcp.config.McpConfiguration;
 import org.graylog.security.certutil.InMemoryClusterConfigService;
@@ -36,7 +35,7 @@ public class McpRestResourceTest {
         // we have to create mocks for the rest, too
         resource = new McpRestResource(clusterConfigService,
                                        null,
-                                       new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false),
+                                       new JacksonMcpJsonMapperSupplier().get(),
                                        null);
         clusterConfigService.write(McpConfiguration.create(false, false));
     }

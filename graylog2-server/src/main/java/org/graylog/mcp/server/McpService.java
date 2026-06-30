@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
+import io.modelcontextprotocol.json.McpJsonMapper;
 import io.modelcontextprotocol.spec.McpError;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.ProtocolVersions;
@@ -60,7 +61,7 @@ public class McpService {
     static final List<String> ALL_SUPPORTED_MCP_VERSIONS = List.of(LATEST_SUPPORTED_MCP_VERSION);
 
     private final ObjectMapper objectMapper;
-    private final ObjectMapper protocolObjectMapper;
+    private final McpJsonMapper protocolMapper;
     private final AuditEventSender auditEventSender;
     private final CustomizationConfig customizationConfig;
     private final GRNRegistry grnRegistry;
@@ -69,14 +70,14 @@ public class McpService {
 
     @Inject
     protected McpService(ObjectMapper objectMapper,
-                         @McpProtocolObjectMapper ObjectMapper protocolObjectMapper,
+                         McpJsonMapper protocolMapper,
                          AuditEventSender auditEventSender,
                          CustomizationConfig customizationConfig,
                          GRNRegistry grnRegistry,
                          Map<String, Tool<?, ?>> tools,
                          Map<GRNType, ? extends ResourceProvider> resourceProviders) {
         this.objectMapper = objectMapper;
-        this.protocolObjectMapper = protocolObjectMapper;
+        this.protocolMapper = protocolMapper;
         this.auditEventSender = auditEventSender;
         this.customizationConfig = customizationConfig;
         this.grnRegistry = grnRegistry;
@@ -97,7 +98,7 @@ public class McpService {
 
         switch (request.method()) {
             case McpSchema.METHOD_INITIALIZE -> {
-                final McpSchema.InitializeRequest initializeRequest = protocolObjectMapper.convertValue(request.params(), new TypeReference<>() {});
+                final McpSchema.InitializeRequest initializeRequest = protocolMapper.convertValue(request.params(), McpSchema.InitializeRequest.class);
                 auditContext.put("request", initializeRequest);
                 final McpSchema.InitializeResult result = new McpSchema.InitializeResult(
                         // Version negotiation: https://modelcontextprotocol.io/specification/2025-06-18/basic/lifecycle#version-negotiation
@@ -134,7 +135,7 @@ public class McpService {
                 return Optional.of(result);
             }
             case McpSchema.METHOD_RESOURCES_READ -> {
-                final McpSchema.ReadResourceRequest readResourceRequest = protocolObjectMapper.convertValue(request.params(), new TypeReference<>() {});
+                final McpSchema.ReadResourceRequest readResourceRequest = protocolMapper.convertValue(request.params(), McpSchema.ReadResourceRequest.class);
                 auditContext.put("request", readResourceRequest);
                 LOG.debug("Reading resource: {}", readResourceRequest);
                 try {
@@ -188,7 +189,7 @@ public class McpService {
                 return Optional.of(new McpSchema.ListToolsResult(toolList, null));
             }
             case McpSchema.METHOD_TOOLS_CALL -> {
-                final McpSchema.CallToolRequest callToolRequest = protocolObjectMapper.convertValue(request.params(), new TypeReference<>() {});
+                final McpSchema.CallToolRequest callToolRequest = protocolMapper.convertValue(request.params(), McpSchema.CallToolRequest.class);
                 auditContext.put("request", callToolRequest);
 
                 LOG.debug("Calling MCP tool: {}", callToolRequest);
@@ -244,7 +245,7 @@ public class McpService {
             }
             case McpSchema.METHOD_PROMPT_GET -> {
                 // disabled for now
-                final McpSchema.GetPromptRequest promptRequest = protocolObjectMapper.convertValue(request.params(), new TypeReference<>() {});
+                final McpSchema.GetPromptRequest promptRequest = protocolMapper.convertValue(request.params(), McpSchema.GetPromptRequest.class);
                 auditContext.put("request", promptRequest);
                 LOG.debug("Getting prompt {}", promptRequest.name());
                 auditEventSender.failure(auditActor, AuditEventType.create(MCP_PROMPT_GET), auditContext);

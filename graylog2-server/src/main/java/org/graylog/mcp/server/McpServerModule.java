@@ -16,8 +16,8 @@
  */
 package org.graylog.mcp.server;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import io.modelcontextprotocol.json.McpJsonMapper;
+import io.modelcontextprotocol.json.jackson2.JacksonMcpJsonMapperSupplier;
 import org.graylog.mcp.resources.DashboardResourceProvider;
 import org.graylog.mcp.resources.EventDefinitionResourceProvider;
 import org.graylog.mcp.resources.StreamResourceProvider;
@@ -38,11 +38,13 @@ import org.graylog2.plugin.PluginModule;
 public class McpServerModule extends PluginModule {
     @Override
     protected void configure() {
-        // Workaround for https://github.com/modelcontextprotocol/java-sdk/issues/766
-        // Remove once the SDK adds @JsonIgnoreProperties(ignoreUnknown=true) to capability records.
-        bind(ObjectMapper.class).annotatedWith(McpProtocolObjectMapper.class)
-                .toInstance(new ObjectMapper()
-                        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false));
+        // MCP protocol messages must be (de)serialized with the MCP SDK's own JSON mapper, not the
+        // global Graylog ObjectMapper (whose SnakeCaseStrategy and custom modules interfere with the
+        // SDK's camelCase @JsonProperty mappings). The SDK's McpSchema records carry their own Jackson
+        // annotations -- including @JsonIgnoreProperties(ignoreUnknown=true) on every wire record as of
+        // SDK 2.0.0 -- so this mapper tolerates forward-compatible fields from newer clients without any
+        // extra configuration (previously worked around in https://github.com/modelcontextprotocol/java-sdk/issues/766).
+        bind(McpJsonMapper.class).toInstance(new JacksonMcpJsonMapperSupplier().get());
 
         // Initialize schema module binder (empty set by default, plugins can contribute)
         schemaModuleBinder();
