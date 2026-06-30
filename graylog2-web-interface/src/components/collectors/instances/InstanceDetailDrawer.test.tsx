@@ -249,6 +249,19 @@ describe('InstanceDetailDrawer', () => {
     expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
   });
 
+  it('keeps showing cached actions when a background refetch fails', async () => {
+    // react-query retains the last good data on a failed refetch but flips isError to true.
+    asMock(useInstancePendingChanges).mockReturnValue({ data: pendingChanges, isLoading: false, isError: true });
+
+    render(
+      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+    );
+
+    await screen.findByText('Synchronization');
+    await screen.findByText(/reload configuration/i); // cached actions still rendered…
+    expect(screen.queryByText(/could not load pending changes/i)).not.toBeInTheDocument(); // …not the error arm
+  });
+
   it('leads a bulk reassignment with the instance being viewed', async () => {
     asMock(useInstancePendingChanges).mockReturnValue({
       data: {

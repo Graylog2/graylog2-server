@@ -143,16 +143,16 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
   const activities = pendingDetail ? pendingDetail.activities : [];
   const [showTransactions, setShowTransactions] = useState(false);
 
-  // The Synchronization section is a small state machine over the pending-changes request. The
-  // header indicator still uses hasPendingChanges (above) so it can show the table's value at once;
-  // the section waits for the fetched detail to avoid flashing a contradictory "In sync".
-  const syncStatus: SyncStatus = pendingError
-    ? 'error'
-    : !pendingDetail
-      ? 'loading'
-      : hasPendingChanges
-        ? 'pending'
-        : 'inSync';
+  let syncStatus: SyncStatus;
+  if (pendingDetail) {
+    // Have data: show it even if a refetch errored, so a transient blip can't wipe a valid list.
+    syncStatus = hasPendingChanges ? 'pending' : 'inSync';
+  } else if (pendingError) {
+    // No data and the load failed; the failure is also surfaced via the query hook's toast.
+    syncStatus = 'error';
+  } else {
+    syncStatus = 'loading';
+  }
   // Among pending instances, whether any queued change is describable (vs only UNKNOWN markers).
   const hasDescribableChanges = actions.length > 0 || activities.length > 0;
 
