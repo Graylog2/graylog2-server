@@ -17,6 +17,7 @@
 package org.graylog2;
 
 import org.graylog2.plugin.ServerStatus;
+import org.graylog2.web.customization.CustomizationConfig;
 
 import java.util.Set;
 
@@ -67,12 +68,12 @@ public interface CommonNodeConfiguration extends GraylogNodeConfiguration {
 
     @Override
     default String getEnvironmentVariablePrefix() {
-        return ConfigurationPrefixes.env();
+        return CustomizationConfig.environmentVariablePrefix();
     }
 
     @Override
     default String getSystemPropertyPrefix() {
-        return ConfigurationPrefixes.sysProp();
+        return CustomizationConfig.systemPropertyPrefix();
     }
 
     @Override

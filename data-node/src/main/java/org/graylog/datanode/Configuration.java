@@ -38,10 +38,10 @@ import org.graylog2.CommonNodeConfiguration;
 import org.graylog2.Configuration.SafeClassesValidator;
 import com.github.joschi.jadconfig.documentation.Documentation;
 import com.github.joschi.jadconfig.documentation.DocumentationSection;
-import org.graylog2.ConfigurationPrefixes;
 import org.graylog2.configuration.NativeLibPathConfiguration;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.SuppressForbidden;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -732,12 +732,12 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
 
     @Override
     public String getEnvironmentVariablePrefix() {
-        return ConfigurationPrefixes.env() + "DATANODE_";
+        return CustomizationConfig.environmentVariablePrefix() + "DATANODE_";
     }
 
     @Override
     public String getSystemPropertyPrefix() {
-        return ConfigurationPrefixes.sysProp() + "datanode.";
+        return CustomizationConfig.systemPropertyPrefix() + "datanode.";
     }
 
     @Override
