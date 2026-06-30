@@ -16,6 +16,7 @@
  */
 package org.graylog.mcp.resources;
 
+import com.google.common.base.Strings;
 import io.modelcontextprotocol.spec.McpSchema;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.MediaType;
@@ -95,7 +96,8 @@ public class StreamResourceProvider extends ResourceProvider {
                     .filter(stream -> permissionHelper.isPermitted(RestPermissions.STREAMS_READ, stream.getId()))
                     .map(stream -> new McpSchema.Resource(
                             GRN_TYPE.toGRN(stream.getId()).toString(),
-                            stream.getTitle(),
+                            // MCP SDK 2.0.0 rejects a null/empty Resource name; fall back to the id.
+                            Strings.isNullOrEmpty(stream.getTitle()) ? stream.getId() : stream.getTitle(),
                             stream.getTitle(),
                             stream.getDescription(),
                             null,
