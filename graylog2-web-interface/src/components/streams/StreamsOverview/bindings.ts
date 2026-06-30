@@ -14,25 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.datanode.restart;
+import type { PluginExports } from 'graylog-web-plugin/plugin';
 
-public enum RollingRestartState {
-    PREPARING_CLUSTER,
-    SELECTING_NEXT_NODE,
-    UPGRADING_NODE,
-    STOPPING_NODE,
-    WAITING_NODE_LEFT,
-    STARTING_NODE,
-    WAITING_NODE_JOINED,
-    REENABLING_ALLOCATION,
-    WAITING_GREEN,
-    PAUSED_WAITING_GREEN,
-    FINALIZING,
-    COMPLETED,
-    ABORTED,
-    FAILED;
+import Routes from 'routing/Routes';
 
-    public boolean isTerminal() {
-        return this == COMPLETED || this == ABORTED || this == FAILED;
-    }
-}
+import './inputTitleLinks';
+
+const streamsOverviewBindings: PluginExports = {
+  inputTitleLinks: [
+    {
+      type: 'input',
+      buildPath: (resolved) => Routes.SYSTEM.INPUT_DIAGNOSIS(resolved.id),
+    },
+  ],
+};
+
+export default streamsOverviewBindings;

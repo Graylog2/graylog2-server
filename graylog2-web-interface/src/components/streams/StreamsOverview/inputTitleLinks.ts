@@ -14,25 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.datanode.restart;
+import usePluginEntities from 'hooks/usePluginEntities';
+import type { ResolvedInput } from 'hooks/useInputDetails';
 
-public enum RollingRestartState {
-    PREPARING_CLUSTER,
-    SELECTING_NEXT_NODE,
-    UPGRADING_NODE,
-    STOPPING_NODE,
-    WAITING_NODE_LEFT,
-    STARTING_NODE,
-    WAITING_NODE_JOINED,
-    REENABLING_ALLOCATION,
-    WAITING_GREEN,
-    PAUSED_WAITING_GREEN,
-    FINALIZING,
-    COMPLETED,
-    ABORTED,
-    FAILED;
+import './types';
 
-    public boolean isTerminal() {
-        return this == COMPLETED || this == ABORTED || this == FAILED;
-    }
-}
+export const useInputTitleLinkBuilder = (): ((resolved: ResolvedInput) => string | null) => {
+  const builders = usePluginEntities('inputTitleLinks');
+
+  return (resolved: ResolvedInput) => {
+    const builder = builders.find((b) => b.type === resolved.type);
+
+    return builder ? (builder.buildPath as (r: ResolvedInput) => string | null)(resolved) : null;
+  };
+};

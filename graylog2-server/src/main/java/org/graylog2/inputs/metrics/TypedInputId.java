@@ -14,25 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.datanode.restart;
+package org.graylog2.inputs.metrics;
 
-public enum RollingRestartState {
-    PREPARING_CLUSTER,
-    SELECTING_NEXT_NODE,
-    UPGRADING_NODE,
-    STOPPING_NODE,
-    WAITING_NODE_LEFT,
-    STARTING_NODE,
-    WAITING_NODE_JOINED,
-    REENABLING_ALLOCATION,
-    WAITING_GREEN,
-    PAUSED_WAITING_GREEN,
-    FINALIZING,
-    COMPLETED,
-    ABORTED,
-    FAILED;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    public boolean isTerminal() {
-        return this == COMPLETED || this == ABORTED || this == FAILED;
-    }
+/**
+ * An input identifier paired with the input type it belongs to (e.g. {@code "input"} for regular
+ * inputs, {@code "forwarder_input"} for enterprise forwarder inputs).
+ */
+public record TypedInputId(@JsonProperty("id") String id,
+                           @JsonProperty("type") String type) {
 }

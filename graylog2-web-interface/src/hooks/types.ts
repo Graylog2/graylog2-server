@@ -14,25 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.datanode.restart;
+import type { InputDetailsFetcher } from './useInputDetails';
 
-public enum RollingRestartState {
-    PREPARING_CLUSTER,
-    SELECTING_NEXT_NODE,
-    UPGRADING_NODE,
-    STOPPING_NODE,
-    WAITING_NODE_LEFT,
-    STARTING_NODE,
-    WAITING_NODE_JOINED,
-    REENABLING_ALLOCATION,
-    WAITING_GREEN,
-    PAUSED_WAITING_GREEN,
-    FINALIZING,
-    COMPLETED,
-    ABORTED,
-    FAILED;
-
-    public boolean isTerminal() {
-        return this == COMPLETED || this == ABORTED || this == FAILED;
-    }
+declare module 'graylog-web-plugin/plugin' {
+  interface PluginExports {
+    inputDetailsFetchers?: Array<InputDetailsFetcher>;
+  }
 }

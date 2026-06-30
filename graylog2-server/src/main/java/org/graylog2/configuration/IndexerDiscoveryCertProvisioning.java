@@ -19,6 +19,9 @@ package org.graylog2.configuration;
 import jakarta.inject.Inject;
 import org.graylog2.bootstrap.preflight.GraylogCertificateProvisioner;
 
+import java.net.URI;
+import java.util.List;
+
 public class IndexerDiscoveryCertProvisioning implements IndexerDiscoveryListener {
 
     private final GraylogCertificateProvisioner graylogCertificateProvisioner;
@@ -31,6 +34,14 @@ public class IndexerDiscoveryCertProvisioning implements IndexerDiscoveryListene
     @Override
     public void beforeIndexerDiscovery() {
 
+    }
+
+    @Override
+    public void onExplicitlyConfiguredNodes(List<URI> hosts) {
+        // the user has some explicitly configured nodes. They might still need fresh certificates.
+        // the downside here is that there is no loop, no waiting, like in the onDiscoveryRetry method.
+        // Any node needing fresh cert has to trigger a CSR before the server starts and checks CSRs here.
+        graylogCertificateProvisioner.runProvisioning();
     }
 
     @Override
