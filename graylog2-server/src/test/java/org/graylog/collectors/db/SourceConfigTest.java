@@ -38,7 +38,8 @@ class SourceConfigTest {
         objectMapper.registerSubtypes(
                 new NamedType(FileSourceConfig.class, FileSourceConfig.TYPE_NAME),
                 new NamedType(JournaldSourceConfig.class, JournaldSourceConfig.TYPE_NAME),
-                new NamedType(WindowsEventLogSourceConfig.class, WindowsEventLogSourceConfig.TYPE_NAME)
+                new NamedType(WindowsEventLogSourceConfig.class, WindowsEventLogSourceConfig.TYPE_NAME),
+                new NamedType(MacOSUnifiedLoggingSourceConfig.class, MacOSUnifiedLoggingSourceConfig.TYPE_NAME)
         );
     }
 
@@ -128,6 +129,36 @@ class SourceConfigTest {
 
         assertThat(tree.has("type")).isTrue();
         assertThat(tree.get("type").asText()).isEqualTo("file");
+    }
+
+    @Test
+    void macosRoundTripAndReceiverConfig() throws Exception {
+        final var original = MacOSUnifiedLoggingSourceConfig.builder()
+                .predicate("subsystem == 'com.apple.securityd'")
+                .build();
+
+        final var json = objectMapper.writeValueAsString(original);
+        final var deserialized = objectMapper.readValue(json, SourceConfig.class);
+        assertThat(deserialized).isEqualTo(original);
+
+        final var receiver = original.toReceiverConfig("src-1").orElseThrow();
+        assertThat(receiver.type()).isEqualTo("macos_unified_logging");
+        assertThat(receiver.name()).isEqualTo("macos_unified_logging/src-1");
+        assertThat(receiver).isInstanceOf(
+                org.graylog.collectors.config.receiver.MacOSUnifiedLoggingReceiverConfig.class);
+        final var macReceiver =
+                (org.graylog.collectors.config.receiver.MacOSUnifiedLoggingReceiverConfig) receiver;
+        assertThat(macReceiver.predicate()).isEqualTo("subsystem == 'com.apple.securityd'");
+        assertThat(macReceiver.storage()).isEqualTo("file_storage/default");
+    }
+
+    @Test
+    void macosUsesDefaultPredicateWhenUnset() {
+        final var config = MacOSUnifiedLoggingSourceConfig.builder().build();
+        final var macReceiver =
+                (org.graylog.collectors.config.receiver.MacOSUnifiedLoggingReceiverConfig)
+                        config.toReceiverConfig("s").orElseThrow();
+        assertThat(macReceiver.predicate()).contains("subsystem");
     }
 
 }

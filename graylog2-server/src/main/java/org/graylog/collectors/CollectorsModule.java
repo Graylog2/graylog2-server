@@ -26,6 +26,7 @@ import org.graylog.collectors.config.receiver.WindowsEventLogReceiverConfig;
 import org.graylog.collectors.db.FileSourceConfig;
 import org.graylog.collectors.db.FleetDTO;
 import org.graylog.collectors.db.JournaldSourceConfig;
+import org.graylog.collectors.db.MacOSUnifiedLoggingSourceConfig;
 import org.graylog.collectors.db.WindowsEventLogSourceConfig;
 import org.graylog.collectors.indexer.CollectorLogsIndexTemplateProvider;
 import org.graylog.collectors.input.CollectorIngestCodec;
@@ -143,6 +144,7 @@ public class CollectorsModule extends PluginModule {
         registerJacksonSubtype(FileSourceConfig.class);
         registerJacksonSubtype(JournaldSourceConfig.class);
         registerJacksonSubtype(WindowsEventLogSourceConfig.class);
+        registerJacksonSubtype(MacOSUnifiedLoggingSourceConfig.class);
 
         final var indexTemplateProviderBinder = MapBinder.newMapBinder(binder(), String.class,
                 IndexTemplateProvider.class);
