@@ -249,6 +249,9 @@ class OutdatedIndexServiceTest {
         when(indicesAdapter.exists(".gltmp_my_index")).thenReturn(false);
         when(indices.waitForRecovery(".gltmp_my_index")).thenReturn(HealthStatus.Green);
         when(indices.waitForRecovery("my_index")).thenReturn(HealthStatus.Green);
+        // Equal counts everywhere so both safety checks pass: source == temp == recreated.
+        when(indices.numberOfMessages("my_index")).thenReturn(10L);
+        when(indices.numberOfMessages(".gltmp_my_index")).thenReturn(10L);
 
         outdatedIndexService.reindex("my_index", true);
 
@@ -256,14 +259,19 @@ class OutdatedIndexServiceTest {
         inOrder.verify(indices).waitForRecovery("my_index", 2);
         inOrder.verify(indices).indexSettings("my_index");
         inOrder.verify(indices).indexMapping("my_index");
+        inOrder.verify(indices).numberOfMessages("my_index"); // capture source count before any destructive step
         inOrder.verify(indicesAdapter).exists(".gltmp_my_index");
         inOrder.verify(indicesAdapter).create(eq(".gltmp_my_index"), any(IndexSettings.class), eq(sourceMapping));
         inOrder.verify(indices).waitForRecovery(".gltmp_my_index");
         inOrder.verify(indices).reindex("my_index", ".gltmp_my_index");
+        inOrder.verify(indices).refresh(".gltmp_my_index");
+        inOrder.verify(indices).numberOfMessages(".gltmp_my_index"); // verify temp copy is complete before deleting source
         inOrder.verify(indices).delete("my_index");
         inOrder.verify(indicesAdapter).create(eq("my_index"), any(IndexSettings.class), eq(sourceMapping));
         inOrder.verify(indices).waitForRecovery("my_index");
         inOrder.verify(indices).reindex(".gltmp_my_index", "my_index");
+        inOrder.verify(indices).refresh("my_index");
+        inOrder.verify(indices).numberOfMessages("my_index"); // verify recreated index is complete before deleting temp
         inOrder.verify(indices).delete(".gltmp_my_index");
     }
 
