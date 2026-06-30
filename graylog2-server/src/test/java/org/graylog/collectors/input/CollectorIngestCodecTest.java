@@ -20,6 +20,7 @@ import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import org.graylog.collectors.CollectorJournal;
 import org.graylog.collectors.input.debug.OtlpTrafficDump;
+import org.graylog.collectors.input.processor.CollectorLogRecordProcessor;
 import org.graylog.inputs.otel.OTelJournal;
 import org.graylog.inputs.otel.codec.OTelTypeConverter;
 import org.graylog.schema.EventFields;
@@ -95,6 +96,36 @@ class CollectorIngestCodecTest {
 
         assertThat(decoded).isPresent();
         assertThat(decoded.get().getMessage()).isEqualTo("test message");
+    }
+
+    @Test
+    void marksOnlyCollectorLogMessagesAsExcludedFromTrafficAccounting() {
+        final var codec = new CollectorIngestCodec(Configuration.EMPTY_CONFIGURATION, messageFactory,
+                dumpWriter, typeConverter,
+                Map.of("file_log", log -> Map.of(),
+                        CollectorLogRecordProcessor.RECEIVER_TYPE, new CollectorLogRecordProcessor()));
+
+        final var collectorLog = codec.decodeSafe(rawMessageForReceiverType(CollectorLogRecordProcessor.RECEIVER_TYPE));
+        assertThat(collectorLog).isPresent();
+        assertThat(collectorLog.get().isAccounted()).isFalse();
+
+        final var customerLog = codec.decodeSafe(rawMessageForReceiverType("file_log"));
+        assertThat(customerLog).isPresent();
+        assertThat(customerLog.get().isAccounted()).isTrue();
+    }
+
+    private RawMessage rawMessageForReceiverType(String receiverType) {
+        final var log = OTelJournal.Log.newBuilder()
+                .setLogRecord(LogRecord.newBuilder()
+                        .setBody(AnyValue.newBuilder().setStringValue("test message"))
+                        .setTimeUnixNano(1700000000000000000L)
+                        .build())
+                .build();
+        final var collectorRecord = CollectorJournal.Record.newBuilder()
+                .setOtelRecord(OTelJournal.Record.newBuilder().setLog(log).build())
+                .setCollectorReceiverType(receiverType)
+                .build();
+        return new RawMessage(collectorRecord.toByteArray());
     }
 
     @Test
