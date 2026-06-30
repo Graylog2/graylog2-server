@@ -34,7 +34,6 @@ import org.graylog.mcp.tools.PermissionHelper;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventType;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.ServerVersion;
 import org.graylog2.web.customization.CustomizationConfig;
 import org.slf4j.Logger;
@@ -70,7 +69,6 @@ public class McpService {
     private final GRNRegistry grnRegistry;
     private final Map<String, Tool<?, ?>> tools;
     private final Map<GRNType, ? extends ResourceProvider> resourceProviders;
-    private final ClusterConfigService clusterConfigService;
     private final JsonSchemaValidator schemaValidator;
 
     @Inject
@@ -81,7 +79,6 @@ public class McpService {
                          GRNRegistry grnRegistry,
                          Map<String, Tool<?, ?>> tools,
                          Map<GRNType, ? extends ResourceProvider> resourceProviders,
-                         ClusterConfigService clusterConfigService,
                          JsonSchemaValidator schemaValidator) {
         this.objectMapper = objectMapper;
         this.protocolMapper = protocolMapper;
@@ -90,15 +87,14 @@ public class McpService {
         this.grnRegistry = grnRegistry;
         this.tools = tools;
         this.resourceProviders = resourceProviders;
-        this.clusterConfigService = clusterConfigService;
         this.schemaValidator = schemaValidator;
     }
 
     public Optional<McpSchema.Result> handle(PermissionHelper permissionHelper, McpSchema.JSONRPCRequest request, String sessionId) throws McpError {
-        return handle(permissionHelper, request, sessionId, null);
+        return handle(permissionHelper, request, sessionId, null, McpConfiguration.DEFAULT_VALUES);
     }
 
-    public Optional<McpSchema.Result> handle(PermissionHelper permissionHelper, McpSchema.JSONRPCRequest request, String sessionId, String protocolVersion) throws McpError {
+    public Optional<McpSchema.Result> handle(PermissionHelper permissionHelper, McpSchema.JSONRPCRequest request, String sessionId, String protocolVersion, McpConfiguration config) throws McpError {
         final AuditActor auditActor = AuditActor.user(permissionHelper.getCurrentUser().getName());
         final Map<String, Object> auditContext = Maps.newHashMap();
         auditContext.put("sessionId", sessionId);
@@ -201,7 +197,7 @@ public class McpService {
                 LOG.debug("Calling MCP tool: {}", callToolRequest);
                 if (tools.containsKey(callToolRequest.name())) {
                     final Tool<?, ?> tool = tools.get(callToolRequest.name());
-                    if (inputValidationEnabled()) {
+                    if (config.enableInputValidation()) {
                         final var validation = schemaValidator.validate(tool.inputSchema(),
                                 Objects.requireNonNullElse(callToolRequest.arguments(), Map.of()));
                         if (!validation.valid()) {
@@ -275,10 +271,5 @@ public class McpService {
         throw McpError.builder(McpSchema.ErrorCodes.METHOD_NOT_FOUND)
                 .message("Unsupported method: " + request.method())
                 .build();
-    }
-
-    private boolean inputValidationEnabled() {
-        return clusterConfigService.getOrDefault(McpConfiguration.class, McpConfiguration.DEFAULT_VALUES)
-                .enableInputValidation();
     }
 }

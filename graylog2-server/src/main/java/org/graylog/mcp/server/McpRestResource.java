@@ -137,7 +137,7 @@ public class McpRestResource extends RestResource {
                     protocolVersionHeader = McpService.FALLBACK_MCP_VERSION;
                 }
                 final PermissionHelper permissionHelper = new PermissionHelper(getCurrentUser(), securityContext, searchUser);
-                final Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, sessionId, protocolVersionHeader);
+                final Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, sessionId, protocolVersionHeader, mcpConfig);
 
                 if (result.isPresent() && LOG.isTraceEnabled()) {
                     LOG.trace("Successfully handled JSON-RPC request: {}", protocolMapper.writeValueAsString(result));

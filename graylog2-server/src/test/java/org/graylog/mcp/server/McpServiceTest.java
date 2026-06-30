@@ -29,7 +29,6 @@ import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
 import org.graylog.mcp.config.McpConfiguration;
 import org.graylog.mcp.tools.PermissionHelper;
-import org.graylog.security.certutil.InMemoryClusterConfigService;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventType;
@@ -76,7 +75,6 @@ class McpServiceTest {
     private McpService mcpService;
     private Map<String, Tool<?, ?>> tools;
     private Map<GRNType, ResourceProvider> resourceProviders;
-    private InMemoryClusterConfigService clusterConfigService;
 
     @BeforeEach
     void setUp() {
@@ -85,7 +83,6 @@ class McpServiceTest {
         protocolMapper = new JacksonMcpJsonMapperSupplier().get();
         tools = new HashMap<>();
         resourceProviders = new HashMap<>();
-        clusterConfigService = new InMemoryClusterConfigService();
 
         when(permissionHelper.getCurrentUser()).thenReturn(user);
         when(user.getName()).thenReturn("testuser");
@@ -98,7 +95,6 @@ class McpServiceTest {
                 GRNRegistry.createWithBuiltinTypes(),
                 tools,
                 resourceProviders,
-                clusterConfigService,
                 new JacksonJsonSchemaValidatorSupplier().get()
         );
     }
@@ -578,7 +574,7 @@ class McpServiceTest {
 
     @Test
     void testCallToolRejectsInvalidArgumentsWhenValidationEnabled() throws Exception {
-        clusterConfigService.write(McpConfiguration.create(false, false, true));
+        final McpConfiguration config = McpConfiguration.create(false, false, true);
 
         Tool<Map<String, Object>, String> mockTool = mock(Tool.class);
         when(mockTool.inputSchema()).thenReturn(Map.of(
@@ -592,7 +588,7 @@ class McpServiceTest {
         var request = new McpSchema.JSONRPCRequest("2.0", McpSchema.METHOD_TOOLS_CALL, "1",
                 objectMapper.convertValue(callParams, Map.class));
 
-        Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, "session123");
+        Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, "session123", null, config);
 
         assertThat(result).isPresent();
         assertThat(result.get()).isInstanceOf(McpSchema.CallToolResult.class);
@@ -604,7 +600,7 @@ class McpServiceTest {
 
     @Test
     void testCallToolAcceptsValidArgumentsWhenValidationEnabled() throws Exception {
-        clusterConfigService.write(McpConfiguration.create(false, false, true));
+        final McpConfiguration config = McpConfiguration.create(false, false, true);
 
         Tool<Map<String, Object>, String> mockTool = mock(Tool.class);
         when(mockTool.inputSchema()).thenReturn(Map.of(
@@ -619,7 +615,7 @@ class McpServiceTest {
         var request = new McpSchema.JSONRPCRequest("2.0", McpSchema.METHOD_TOOLS_CALL, "1",
                 objectMapper.convertValue(callParams, Map.class));
 
-        Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, "session123");
+        Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, "session123", null, config);
 
         assertThat(result).isPresent();
         assertThat(result.get()).isInstanceOf(McpSchema.CallToolResult.class);
