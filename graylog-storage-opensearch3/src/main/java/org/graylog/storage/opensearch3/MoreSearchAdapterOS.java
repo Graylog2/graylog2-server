@@ -262,26 +262,36 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
             LOG.debug("Execute search: {}", newSearchRequest.toJsonString());
         }
 
-        final SearchResponse<Map> searchResult = opensearchClient.sync(c -> c.search(newSearchRequest, Map.class), "Unable to perform search query");
+        try {
+            final SearchResponse<Map> searchResult = opensearchClient.sync(c -> c.search(newSearchRequest, Map.class), "Unable to perform search query");
 
-        final DateHistogramAggregate histogramResult = searchResult.aggregations().get(HISTOGRAM_AGGREGATION_NAME).dateHistogram();
-        final var histogramBuckets = histogramResult.buckets();
+            final DateHistogramAggregate histogramResult = searchResult.aggregations().get(HISTOGRAM_AGGREGATION_NAME).dateHistogram();
+            final var histogramBuckets = histogramResult.buckets();
 
-        final List<DateHistogramBucket> buckets = histogramBuckets.array();
+            final List<DateHistogramBucket> buckets = histogramBuckets.array();
 
-        final var alerts = new ArrayList<MoreSearch.Histogram.Bucket>(buckets.size());
-        final var events = new ArrayList<MoreSearch.Histogram.Bucket>(buckets.size());
+            final var alerts = new ArrayList<MoreSearch.Histogram.Bucket>(buckets.size());
+            final var events = new ArrayList<MoreSearch.Histogram.Bucket>(buckets.size());
 
-        buckets.forEach(bucket -> {
-            final LongTermsAggregate parsedTerms = bucket.aggregations().get(TERMS_AGGREGATION_NAME).lterms();
-            final ZonedDateTime dateTime = Instant.ofEpochMilli(bucket.key()).atZone(timeZone);
-            final var alertCount = parsedTerms.buckets().array().stream().filter(b -> b.keyAsString().equals("true")).findFirst().map(MultiBucketBase::docCount).orElse(0L);
-            final var eventCount = parsedTerms.buckets().array().stream().filter(b -> b.keyAsString().equals("false")).findFirst().map(MultiBucketBase::docCount).orElse(0L);
-            alerts.add(new MoreSearch.Histogram.Bucket(dateTime, alertCount));
-            events.add(new MoreSearch.Histogram.Bucket(dateTime, eventCount));
-        });
+            buckets.forEach(bucket -> {
+                final LongTermsAggregate parsedTerms = bucket.aggregations().get(TERMS_AGGREGATION_NAME).lterms();
+                final ZonedDateTime dateTime = Instant.ofEpochMilli(bucket.key()).atZone(timeZone);
+                final var alertCount = parsedTerms.buckets().array().stream().filter(b -> b.keyAsString().equals("true")).findFirst().map(MultiBucketBase::docCount).orElse(0L);
+                final var eventCount = parsedTerms.buckets().array().stream().filter(b -> b.keyAsString().equals("false")).findFirst().map(MultiBucketBase::docCount).orElse(0L);
+                alerts.add(new MoreSearch.Histogram.Bucket(dateTime, alertCount));
+                events.add(new MoreSearch.Histogram.Bucket(dateTime, eventCount));
+            });
 
-        return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(events, alerts), timerange);
+            return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(events, alerts), timerange);
+        } catch (final Exception ex) {
+            // most likely an invalid query entered in the search box. in this case, we want to return an empty result set
+            if(ex.getCause() != null && ex.getCause().getMessage().contains("search_phase_execution_exception")) {
+                return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(Collections.emptyList(), Collections.emptyList()), timerange);
+            }
+            // re-throw unexpected exceptions
+            throw ex;
+        }
+
     }
 
     static Query buildExtraFilter(String field, String value) {
