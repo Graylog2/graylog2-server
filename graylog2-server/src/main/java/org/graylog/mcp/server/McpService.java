@@ -22,7 +22,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import io.modelcontextprotocol.json.McpJsonMapper;
+import io.modelcontextprotocol.json.jackson2.JacksonMcpJsonMapperSupplier;
 import io.modelcontextprotocol.json.schema.JsonSchemaValidator;
+import io.modelcontextprotocol.json.schema.jackson2.JacksonJsonSchemaValidatorSupplier;
 import io.modelcontextprotocol.spec.McpError;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.ProtocolVersions;
@@ -65,31 +67,32 @@ public class McpService {
     static final List<String> ALL_SUPPORTED_MCP_VERSIONS = List.of(LATEST_SUPPORTED_MCP_VERSION);
 
     private final ObjectMapper objectMapper;
-    private final McpJsonMapper protocolMapper;
+    // The MCP SDK's own JSON mapper -- NOT the global Graylog ObjectMapper, whose SnakeCaseStrategy and
+    // custom modules interfere with the SDK's camelCase @JsonProperty mappings. The McpSchema records carry
+    // their own Jackson annotations (incl. @JsonIgnoreProperties(ignoreUnknown=true) as of SDK 2.0.0), so
+    // this tolerates forward-compatible fields from newer clients without extra configuration (java-sdk#766).
+    private final McpJsonMapper protocolMapper = new JacksonMcpJsonMapperSupplier().get();
+    // Validates tool-call arguments against each tool's input schema; caches compiled schemas internally.
+    private final JsonSchemaValidator schemaValidator = new JacksonJsonSchemaValidatorSupplier().get();
     private final AuditEventSender auditEventSender;
     private final CustomizationConfig customizationConfig;
     private final GRNRegistry grnRegistry;
     private final Map<String, Tool<?, ?>> tools;
     private final Map<GRNType, ? extends ResourceProvider> resourceProviders;
-    private final JsonSchemaValidator schemaValidator;
 
     @Inject
     protected McpService(ObjectMapper objectMapper,
-                         McpJsonMapper protocolMapper,
                          AuditEventSender auditEventSender,
                          CustomizationConfig customizationConfig,
                          GRNRegistry grnRegistry,
                          Map<String, Tool<?, ?>> tools,
-                         Map<GRNType, ? extends ResourceProvider> resourceProviders,
-                         JsonSchemaValidator schemaValidator) {
+                         Map<GRNType, ? extends ResourceProvider> resourceProviders) {
         this.objectMapper = objectMapper;
-        this.protocolMapper = protocolMapper;
         this.auditEventSender = auditEventSender;
         this.customizationConfig = customizationConfig;
         this.grnRegistry = grnRegistry;
         this.tools = tools;
         this.resourceProviders = resourceProviders;
-        this.schemaValidator = schemaValidator;
     }
 
     /**

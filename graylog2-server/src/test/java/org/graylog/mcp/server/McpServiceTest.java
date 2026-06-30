@@ -17,9 +17,6 @@
 package org.graylog.mcp.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.modelcontextprotocol.json.McpJsonMapper;
-import io.modelcontextprotocol.json.jackson2.JacksonMcpJsonMapperSupplier;
-import io.modelcontextprotocol.json.schema.jackson2.JacksonJsonSchemaValidatorSupplier;
 import io.modelcontextprotocol.spec.McpError;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.ProtocolVersions;
@@ -71,7 +68,6 @@ class McpServiceTest {
     private User user;
 
     private ObjectMapper objectMapper;
-    private McpJsonMapper protocolMapper;
     private McpService mcpService;
     private Map<String, Tool<?, ?>> tools;
     private Map<GRNType, ResourceProvider> resourceProviders;
@@ -79,8 +75,6 @@ class McpServiceTest {
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
-        // Mirror production: the protocol mapper is the MCP SDK's own JSON mapper (see McpServerModule).
-        protocolMapper = new JacksonMcpJsonMapperSupplier().get();
         tools = new HashMap<>();
         resourceProviders = new HashMap<>();
 
@@ -89,13 +83,11 @@ class McpServiceTest {
 
         mcpService = new McpService(
                 objectMapper,
-                protocolMapper,
                 auditEventSender,
                 new CustomizationConfig(null),
                 GRNRegistry.createWithBuiltinTypes(),
                 tools,
-                resourceProviders,
-                new JacksonJsonSchemaValidatorSupplier().get()
+                resourceProviders
         );
     }
 

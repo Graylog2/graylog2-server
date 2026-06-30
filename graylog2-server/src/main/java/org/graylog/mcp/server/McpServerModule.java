@@ -16,10 +16,6 @@
  */
 package org.graylog.mcp.server;
 
-import io.modelcontextprotocol.json.McpJsonMapper;
-import io.modelcontextprotocol.json.jackson2.JacksonMcpJsonMapperSupplier;
-import io.modelcontextprotocol.json.schema.JsonSchemaValidator;
-import io.modelcontextprotocol.json.schema.jackson2.JacksonJsonSchemaValidatorSupplier;
 import org.graylog.mcp.resources.DashboardResourceProvider;
 import org.graylog.mcp.resources.EventDefinitionResourceProvider;
 import org.graylog.mcp.resources.StreamResourceProvider;
@@ -40,20 +36,6 @@ import org.graylog2.plugin.PluginModule;
 public class McpServerModule extends PluginModule {
     @Override
     protected void configure() {
-        // MCP protocol messages must be (de)serialized with the MCP SDK's own JSON mapper, not the
-        // global Graylog ObjectMapper (whose SnakeCaseStrategy and custom modules interfere with the
-        // SDK's camelCase @JsonProperty mappings). The SDK's McpSchema records carry their own Jackson
-        // annotations -- including @JsonIgnoreProperties(ignoreUnknown=true) on every wire record as of
-        // SDK 2.0.0 -- so this mapper tolerates forward-compatible fields from newer clients without any
-        // extra configuration (previously worked around in https://github.com/modelcontextprotocol/java-sdk/issues/766).
-        bind(McpJsonMapper.class).toInstance(new JacksonMcpJsonMapperSupplier().get());
-
-        // Validates tool-call arguments against each tool's input schema (gated by
-        // McpConfiguration#enableInputValidation). Uses the MCP SDK's own validator so our 2020-12
-        // schemas are checked against the same meta-schema the SDK uses; the default implementation
-        // caches compiled schemas.
-        bind(JsonSchemaValidator.class).toInstance(new JacksonJsonSchemaValidatorSupplier().get());
-
         // Initialize schema module binder (empty set by default, plugins can contribute)
         schemaModuleBinder();
 
