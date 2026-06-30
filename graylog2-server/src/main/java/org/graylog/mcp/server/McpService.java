@@ -174,11 +174,9 @@ public class McpService {
             case McpSchema.METHOD_TOOLS_LIST -> {
                 LOG.debug("Listing available tools");
                 final List<McpSchema.Tool> toolList = this.tools.values().stream().map(tool -> {
-                    var builder = McpSchema.Tool.builder()
-                            .name(tool.name())
+                    var builder = McpSchema.Tool.builder(tool.name(), tool.inputSchema())
                             .title(tool.title())
                             .description(tool.description());
-                    tool.inputSchema().ifPresent(builder::inputSchema);
                     if (tool.isOutputSchemaEnabled()) {
                         tool.outputSchema().ifPresent(builder::outputSchema);
                     }

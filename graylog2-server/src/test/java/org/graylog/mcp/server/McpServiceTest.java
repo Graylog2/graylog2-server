@@ -377,7 +377,7 @@ class McpServiceTest {
         when(mockTool.name()).thenReturn("test_tool");
         when(mockTool.title()).thenReturn("Test Tool");
         when(mockTool.description()).thenReturn("A test tool");
-        when(mockTool.inputSchema()).thenReturn(Optional.empty());
+        when(mockTool.inputSchema()).thenReturn(Map.of("type", "object"));
 
         tools.put("test_tool", mockTool);
 
