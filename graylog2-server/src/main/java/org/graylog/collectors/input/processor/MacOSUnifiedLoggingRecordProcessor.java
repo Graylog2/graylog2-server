@@ -58,8 +58,8 @@ public class MacOSUnifiedLoggingRecordProcessor implements LogRecordProcessor {
                         result.put(ProcessFields.PROCESS_PATH, path);
                     }
                 }
-                case "macos.processID" -> result.put(ProcessFields.PROCESS_ID, value.getIntValue());
-                case "macos.userID" -> result.put(UserFields.USER_ID, value.getIntValue());
+                case "macos.processID" -> result.put(ProcessFields.PROCESS_ID, Long.toString(value.getIntValue()));
+                case "macos.userID" -> result.put(UserFields.USER_ID, Long.toString(value.getIntValue()));
                 // macOS-specific identifiers preserved under a macos_* prefix.
                 case "macos.threadID" -> result.put("macos_thread_id", value.getIntValue());
                 case "macos.bootUUID" -> putStr(result, "macos_boot_uuid", value.getStringValue());

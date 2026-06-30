@@ -74,8 +74,8 @@ class MacOSUnifiedLoggingRecordProcessorTest {
                 Map.entry("vendor_event_description", "fmt %@"),
                 Map.entry("process_path", "/usr/sbin/bluetoothd"),
                 Map.entry("process_name", "bluetoothd"),
-                Map.entry("process_id", 401L),
-                Map.entry("user_id", 205L),
+                Map.entry("process_id", "401"),
+                Map.entry("user_id", "205"),
                 Map.entry("macos_thread_id", 11537025L),
                 Map.entry("macos_boot_uuid", "BOOT-A"),
                 Map.entry("macos_mach_timestamp", 12868010147176L),
@@ -124,7 +124,7 @@ class MacOSUnifiedLoggingRecordProcessorTest {
         assertThat(result).containsEntry("event_source", "com.example.network");
         assertThat(result).containsEntry("vendor_subtype", "connection");
         assertThat(result).containsEntry("process_name", "example-daemon");
-        assertThat(result).containsEntry("user_id", 501L);
+        assertThat(result).containsEntry("user_id", "501");
         assertThat(result).containsEntry("macos_boot_uuid", "FFEEDDCC-BBAA-9988-7766-554433221100");
         assertThat(result).containsEntry("macos_trace_id", 45473881108119556L);
     }
