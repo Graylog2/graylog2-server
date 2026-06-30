@@ -29,9 +29,6 @@ import static java.util.Objects.requireNonNull;
  * names resolved server-side).
  */
 public record PendingChangesResponse(
-        // The authoritative pending state, computed the same way as the instances table's "Sync" column.
-        // Carried explicitly so the drawer doesn't have to infer it from `activities`, which excludes
-        // UNKNOWN markers — an instance with only UNKNOWN pending markers is still pending here.
         @JsonProperty("has_pending_changes") boolean hasPendingChanges,
         @JsonProperty("coalesced") CoalescedActionsView coalesced,
         @JsonProperty("activities") List<RecentActivityResponse.ActivityEntry> activities) {
