@@ -19,6 +19,7 @@ package org.graylog.events.processor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -26,6 +27,10 @@ import org.graylog.events.TestEventProcessorConfig;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
+import org.graylog.events.processor.exclusion.ExclusionRule;
+import org.graylog.events.processor.exclusion.Matcher;
+import org.graylog.events.processor.exclusion.MatcherType;
+import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
 import org.graylog.security.UserContext;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -281,6 +286,52 @@ public class EventDefinitionDtoTest {
         final ValidationResult validationResult = validate(invalid);
         assertThat(validationResult.failed()).isTrue();
         assertThat(validationResult.getErrors()).containsKey("tags");
+    }
+
+    @Test
+    void exclusionsRoundTripThroughJackson() throws Exception {
+        final ObjectMapper mapper = new ObjectMapperProvider().get();
+        mapper.registerSubtypes(new NamedType(TestEventProcessorConfig.class, TestEventProcessorConfig.TYPE_NAME));
+        mapper.registerSubtypes(new NamedType(PersistToStreamsStorageHandler.Config.class, PersistToStreamsStorageHandler.Config.TYPE_NAME));
+        final EventDefinitionDto dto = EventDefinitionDto.builder()
+                .title("foo")
+                .description("bar")
+                .priority(1)
+                .alert(false)
+                .keySpec(ImmutableList.of())
+                .config(TestEventProcessorConfig.builder()
+                        .message("test")
+                        .searchWithinMs(1000)
+                        .executeEveryMs(1000)
+                        .build())
+                .notificationSettings(EventNotificationSettings.withGracePeriod(0))
+                .exclusions(ImmutableList.of(ExclusionRule.builder()
+                        .id("r")
+                        .title("t")
+                        .matchers(ImmutableList.of(Matcher.builder()
+                                .type(MatcherType.ASSET)
+                                .values(ImmutableList.of("alice"))
+                                .build()))
+                        .build()))
+                .build();
+        final String json = mapper.writeValueAsString(dto);
+        final EventDefinitionDto back = mapper.readValue(json, EventDefinitionDto.class);
+        assertThat(back.exclusions()).hasSize(1);
+        assertThat(back.exclusions().get(0).id()).isEqualTo("r");
+    }
+
+    @Test
+    void exclusionsDefaultToEmptyList() {
+        final EventDefinitionDto dto = EventDefinitionDto.builder()
+                .title("foo")
+                .description("bar")
+                .priority(1)
+                .alert(false)
+                .config(mock(AggregationEventProcessorConfig.class))
+                .keySpec(ImmutableList.of())
+                .notificationSettings(EventNotificationSettings.withGracePeriod(0))
+                .build();
+        assertThat(dto.exclusions()).isEmpty();
     }
 
     @Test

@@ -34,6 +34,7 @@ import org.graylog.events.context.EventDefinitionContextService;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
+import org.graylog.events.processor.exclusion.ExclusionRule;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
 import org.graylog.security.UserContext;
@@ -78,6 +79,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
     public static final String FIELD_TACTICS_TECHNIQUES = "tactics_techniques";
     public static final int MAX_TACTICS_TECHNIQUES = 64;
     public static final String FIELD_TAGS = "tags";
+    public static final String FIELD_EXCLUSIONS = "exclusions";
     public static final int MAX_TAG_LENGTH = 128;
     public static final int MAX_TAGS = 64;
     private static final String FIELD_FIELD_SPEC = "field_spec";
@@ -153,6 +155,10 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
     @Override
     @JsonProperty(FIELD_TAGS)
     public abstract ImmutableSet<String> tags();
+
+    @Override
+    @JsonProperty(FIELD_EXCLUSIONS)
+    public abstract ImmutableList<ExclusionRule> exclusions();
 
     @Override
     @JsonProperty(value = FIELD_SCHEDULERCTX, access = JsonProperty.Access.READ_ONLY)
@@ -257,6 +263,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
                     .storage(ImmutableList.of())
                     .tacticsTechniques(ImmutableList.of())
                     .tags(ImmutableSet.of())
+                    .exclusions(ImmutableList.of())
                     .state(EventDefinition.State.DISABLED);
         }
 
@@ -314,6 +321,9 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
 
         @JsonProperty(FIELD_TAGS)
         public abstract Builder tags(ImmutableSet<String> tags);
+
+        @JsonProperty(FIELD_EXCLUSIONS)
+        public abstract Builder exclusions(ImmutableList<ExclusionRule> exclusions);
 
         @JsonProperty(FIELD_STATE)
         public abstract Builder state(EventDefinition.State state);

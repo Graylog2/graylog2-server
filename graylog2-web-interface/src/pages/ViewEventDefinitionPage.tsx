@@ -40,6 +40,8 @@ import {
 } from 'components/event-definitions/hooks/useEventDefinitions';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
 
+import useEventDefinitionDetailSections from './useEventDefinitionDetailSections';
+
 type SigmaEventDefinitionConfig = EventDefinition['config'] & {
   sigma_rule_id: string;
 };
@@ -54,6 +56,7 @@ const ViewEventDefinitionPage = () => {
   const sendTelemetry = useSendTelemetry();
   const navigate = useNavigate();
   const [showSigmaModal, setShowSigmaModal] = useState(false);
+  const detailSections = useEventDefinitionDetailSections();
 
   const pluggableSigmaModal = usePluginEntities('eventDefinitions.components.editSigmaModal').find(
     (entity: { key: string }) => entity.key === 'coreSigmaModal',
@@ -152,6 +155,9 @@ const ViewEventDefinitionPage = () => {
 
         <Row className="content">
           <Col md={12}>
+            {detailSections.map(({ key, component: Component }) => (
+              <Component key={key} eventDefinition={eventDefinition} />
+            ))}
             <EventDefinitionSummary
               eventDefinition={eventDefinition}
               currentUser={currentUser}
