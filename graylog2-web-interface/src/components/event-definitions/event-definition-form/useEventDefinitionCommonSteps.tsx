@@ -31,7 +31,7 @@ import NotificationsForm from './NotificationsForm';
 import EventDefinitionSummary from './EventDefinitionSummary';
 
 const COMMON_STEP_KEYS = {
-  FIELDS: 'fields',
+  ADDITIONAL_DETAILS: 'additional-details',
   NOTIFICATIONS: 'notifications',
   SHARE: 'Share',
   SUMMARY: 'summary',
@@ -130,8 +130,8 @@ function useEventDefinitionSteps({
   return [
     ...viewSteps,
     {
-      key: COMMON_STEP_KEYS.FIELDS,
-      title: 'Fields',
+      key: COMMON_STEP_KEYS.ADDITIONAL_DETAILS,
+      title: 'Additional Details',
       component: <FieldsForm {...resolvedCommonStepProps} canEdit={canEdit} />,
       hidden: shouldHideFieldsStep,
     },

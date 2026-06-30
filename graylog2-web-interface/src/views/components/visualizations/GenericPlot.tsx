@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useMemo, useCallback } from 'react';
+import { useContext, useMemo, useCallback, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import merge from 'lodash/merge';
 import type { Layout, PlotMouseEvent, PlotlyHTMLElement } from 'plotly.js';
@@ -229,6 +229,26 @@ const GenericPlot = ({
   const interactive = useContext(InteractiveContext);
   const plotLayout = usePlotLayout(layout);
   const plotChartData = usePlotChartData(chartData, setChartColor);
+
+  // Plotly.react does not always repaint in-trace labels (notably Sankey `node.label` and scatter
+  // `text`) when the data changes after the initial render — e.g. when entity/asset titles resolve
+  // asynchronously. Bumping `datarevision` whenever the chart data changes forces Plotly to
+  // re-evaluate the trace data. (Axis tick labels live in the layout and update without this.)
+  // Tracked with the "adjust state during render" pattern so the revision changes in the same
+  // render that the data changes — without an effect (extra commit) or a ref read during render.
+  const [dataRevision, setDataRevision] = useState(0);
+  const [revisionedChartData, setRevisionedChartData] = useState(plotChartData);
+
+  if (revisionedChartData !== plotChartData) {
+    setRevisionedChartData(plotChartData);
+    setDataRevision((revision) => revision + 1);
+  }
+
+  const plotLayoutWithRevision = useMemo(
+    () => ({ ...plotLayout, datarevision: dataRevision }),
+    [plotLayout, dataRevision],
+  );
+
   const plotConfig = useMemo(() => ({ ...defaultPlotConfig, ...config }), [config]);
   const onRenderComplete = useContext(RenderCompletionCallback);
 
@@ -283,7 +303,7 @@ const GenericPlot = ({
     <StyledPlot
       data={plotChartData}
       useResizeHandler
-      layout={plotLayout}
+      layout={plotLayoutWithRevision}
       style={style}
       onAfterPlot={_onAfterPlot}
       onClick={interactive ? _onMarkerClick : () => false}
