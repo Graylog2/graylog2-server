@@ -32,6 +32,16 @@ const Label = styled(Badge)(
       justify-content: center;
       gap: ${theme.spacings.xxs};
     }
+
+    /* When a label's content is wrapped in a <span> (e.g. to carry a title tooltip), that span
+       becomes a flex item of the label, so it needs to be its own single-line ellipsis context —
+       otherwise long text overflows instead of truncating when the label is width-constrained. */
+    .mantine-Badge-label > span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   `,
 );
 
