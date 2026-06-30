@@ -111,7 +111,7 @@ public class McpService {
                                 new McpSchema.ServerCapabilities.ResourceCapabilities(false, false),
                                 new McpSchema.ServerCapabilities.ToolCapabilities(false)
                         ),
-                        new McpSchema.Implementation(customizationConfig.productName(), ServerVersion.VERSION.toString()),
+                        McpSchema.Implementation.builder(customizationConfig.productName(), ServerVersion.VERSION.toString()).build(),
                         null,
                         null);
                 auditEventSender.success(auditActor, AuditEventType.create(MCP_PROTOCOL_INITIALIZE), auditContext);
@@ -129,7 +129,7 @@ public class McpService {
                         .map(resourceProvider -> resourceProvider.list(permissionHelper))
                         .flatMap(List::stream)
                         .toList();
-                final McpSchema.ListResourcesResult result = new McpSchema.ListResourcesResult(resourceList, null);
+                final McpSchema.ListResourcesResult result = McpSchema.ListResourcesResult.builder(resourceList).build();
                 LOG.debug("Returning available resources {}", result);
                 auditEventSender.success(auditActor, AuditEventType.create(MCP_RESOURCE_LIST), auditContext);
                 return Optional.of(result);
@@ -144,11 +144,11 @@ public class McpService {
                             .read(permissionHelper, new URI(readResourceRequest.uri()))
                             .orElseThrow();
                     auditEventSender.success(auditActor, AuditEventType.create(MCP_RESOURCE_READ), auditContext);
-                    // MCP SDK 2.0.0 rejects a null TextResourceContents text; a resource with no
-                    // description must still be readable, so fall back to an empty string.
-                    final var contents = new McpSchema.TextResourceContents(resource.uri(), null,
-                            Objects.requireNonNullElse(resource.description(), ""));
-                    return Optional.of(new McpSchema.ReadResourceResult(List.of(contents)));
+                    final var contents = McpSchema.TextResourceContents.builder(
+                            resource.uri(),
+                            Objects.requireNonNullElse(resource.description(), "")
+                    ).build();
+                    return Optional.of(McpSchema.ReadResourceResult.builder(List.of(contents)).build());
                 } catch (Exception e) {
                     throw McpError.builder(McpSchema.ErrorCodes.RESOURCE_NOT_FOUND)
                             .message("Failed to read resource")
@@ -160,17 +160,16 @@ public class McpService {
                 LOG.debug("Listing available resource templates");
                 final List<McpSchema.ResourceTemplate> templates = resourceProviders.values().stream()
                         .map(ResourceProvider::resourceTemplate)
-                        .map(template -> new McpSchema.ResourceTemplate(
-                                template.uriTemplate().getTemplate(),
-                                template.name(),
-                                template.title(),
-                                template.description(),
-                                template.contentType(),
-                                null
-                        ))
+                        .map(template -> McpSchema.ResourceTemplate.builder(
+                                        template.uriTemplate().getTemplate(),
+                                        template.name())
+                                .title(template.title())
+                                .description(template.description())
+                                .mimeType(template.contentType())
+                                .build())
                         .toList();
                 auditEventSender.success(auditActor, AuditEventType.create(MCP_RESOURCE_READTEMPLATES), auditContext);
-                return Optional.of(new McpSchema.ListResourceTemplatesResult(templates, null));
+                return Optional.of(McpSchema.ListResourceTemplatesResult.builder(templates).build());
             }
             case McpSchema.METHOD_TOOLS_LIST -> {
                 LOG.debug("Listing available tools");
@@ -186,7 +185,7 @@ public class McpService {
                     return builder.build();
                 }).toList();
                 auditEventSender.success(auditActor, AuditEventType.create(MCP_TOOL_LIST), auditContext);
-                return Optional.of(new McpSchema.ListToolsResult(toolList, null));
+                return Optional.of(McpSchema.ListToolsResult.builder(toolList).build());
             }
             case McpSchema.METHOD_TOOLS_CALL -> {
                 final McpSchema.CallToolRequest callToolRequest = protocolMapper.convertValue(request.params(), McpSchema.CallToolRequest.class);
@@ -206,7 +205,7 @@ public class McpService {
                                 auditEventSender.success(auditActor, AuditEventType.create(MCP_TOOL_CALL),
                                         auditContext);
                                 return Optional.of(McpSchema.CallToolResult.builder()
-                                        .content(List.of(new McpSchema.TextContent(objectMapper.writeValueAsString(result))))
+                                        .content(List.of(McpSchema.TextContent.builder(objectMapper.writeValueAsString(result)).build()))
                                         .isError(false)
                                         .structuredContent(structuredContent)
                                         .build());
@@ -219,21 +218,21 @@ public class McpService {
                             // no schema, just return the string representation directly
                             auditEventSender.success(auditActor, AuditEventType.create(MCP_TOOL_CALL), auditContext);
                             return Optional.of(McpSchema.CallToolResult.builder()
-                                    .content(List.of(new McpSchema.TextContent(result.toString())))
+                                    .content(List.of(McpSchema.TextContent.builder(result.toString()).build()))
                                     .isError(false)
                                     .build());
                         }
                     } catch (Exception e) {
                         auditEventSender.failure(auditActor, AuditEventType.create(MCP_TOOL_CALL), auditContext);
                         return Optional.of(McpSchema.CallToolResult.builder()
-                                .content(List.of(new McpSchema.TextContent(f("Tool call failed: %s", e.getMessage()))))
+                                .content(List.of(McpSchema.TextContent.builder(f("Tool call failed: %s", e.getMessage())).build()))
                                 .isError(true)
                                 .build());
                     }
                 } else {
                     auditEventSender.failure(auditActor, AuditEventType.create(MCP_TOOL_CALL), auditContext);
                     return Optional.of(McpSchema.CallToolResult.builder()
-                            .content(List.of(new McpSchema.TextContent("Unknown tool named: " + callToolRequest.name())))
+                            .content(List.of(McpSchema.TextContent.builder("Unknown tool named: " + callToolRequest.name()).build()))
                             .isError(true)
                             .build());
                 }
@@ -241,7 +240,7 @@ public class McpService {
             case McpSchema.METHOD_PROMPT_LIST -> {
                 LOG.debug("Listing available prompts");
                 auditEventSender.success(auditActor, AuditEventType.create(MCP_PROMPT_LIST), auditContext);
-                return Optional.of(new McpSchema.ListPromptsResult(List.of(), null));
+                return Optional.of(McpSchema.ListPromptsResult.builder(List.of()).build());
             }
             case McpSchema.METHOD_PROMPT_GET -> {
                 // disabled for now
