@@ -115,8 +115,9 @@ type QueryParametersProps = {
   eventDefinition: EventDefinition;
   onChange: (config: EventDefinitionConfig) => void;
   validation: Props['validation'];
+  userCanViewLookupTables: boolean;
 };
-const QueryParameters = ({ eventDefinition, onChange, validation }: QueryParametersProps) => {
+const QueryParameters = ({ eventDefinition, onChange, validation, userCanViewLookupTables }: QueryParametersProps) => {
   const queryParameters = eventDefinition?.config?.query_parameters ?? [];
 
   const onChangeQueryParameters = useCallback(
@@ -127,6 +128,12 @@ const QueryParameters = ({ eventDefinition, onChange, validation }: QueryParamet
     },
     [eventDefinition.config, onChange],
   );
+
+  if (!userCanViewLookupTables) {
+    return (
+      <Alert bsStyle="info">This account lacks permission to declare Query Parameters from Lookup Tables.</Alert>
+    );
+  }
 
   const parameterButtons = queryParameters.map((queryParam) => {
     let parsed;
@@ -555,6 +562,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
           eventDefinition={eventDefinition}
           onChange={propagateChange}
           validation={validation}
+          userCanViewLookupTables={userCanViewLookupTables}
         />
       )}
 
