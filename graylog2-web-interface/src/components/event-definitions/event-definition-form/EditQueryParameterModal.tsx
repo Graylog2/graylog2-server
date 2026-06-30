@@ -14,143 +14,140 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import isEmpty from 'lodash/isEmpty';
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 
-import LookupTableParameterEdit from 'components/lookup-table-parameters/LookupTableParameterEdit';
-import { Button, BootstrapModalForm } from 'components/bootstrap';
-import type { LookupTable } from 'logic/lookup-tables/types';
-import type { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
-import type LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
-import type { ValidationState } from 'components/common/types';
+import { Button, BootstrapModalForm, Input } from 'components/bootstrap';
+import usePluginEntities from 'hooks/usePluginEntities';
+import type Parameter from 'views/logic/parameters/Parameter';
+import type { ParameterJson } from 'views/logic/parameters/Parameter';
 
 type Props = {
-  queryParameters: Array<LookupTableParameterJson>;
-  lookupTables: Array<LookupTable>;
-  onChange: (newQueryParameters: Array<LookupTableParameterJson>) => void;
-  queryParameter: LookupTableParameter;
+  queryParameters: Array<ParameterJson>;
+  onChange: (newQueryParameters: Array<ParameterJson>) => void;
+  queryParameter: Parameter;
   embryonic: boolean;
 };
 
-type State = {
-  showModal: boolean;
-  queryParameter: LookupTableParameter;
-  validation: {
-    lookupTable?: string;
-    key?: string;
-  };
+const EMPTY_PARAM_JSON: Omit<ParameterJson, 'type'> = {
+  name: '',
+  title: 'new title',
+  description: '',
+  data_type: 'any',
+  default_value: null,
+  optional: false,
+  binding: null,
 };
 
-class EditQueryParameterModal extends React.Component<Props, State> {
-  constructor(props) {
-    super(props);
+const EditQueryParameterModal = ({ queryParameters, onChange, queryParameter: initialParameter, embryonic }: Props) => {
+  const [showModal, setShowModal] = useState(false);
+  const [parameter, setParameter] = useState<Parameter>(initialParameter);
+  const [validation, setValidation] = useState<Record<string, string | undefined>>({});
 
-    const { queryParameter } = this.props;
+  const parameterTypes = usePluginEntities('eventDefinitionQueryParameterTypes');
+  const currentTypeDef = parameterTypes.find((t) => t.type === parameter.type) ?? parameterTypes[0];
 
-    this.state = {
-      showModal: false,
-      queryParameter,
-      validation: {},
-    };
-  }
+  const openModal = useCallback(() => {
+    setParameter(initialParameter);
+    setValidation({});
+    setShowModal(true);
+  }, [initialParameter]);
 
-  openModal = () => {
-    const { queryParameter } = this.props;
+  const handleClose = useCallback(() => {
+    setParameter(initialParameter);
+    setShowModal(false);
+  }, [initialParameter]);
 
-    this.setState({ showModal: true, queryParameter });
-  };
+  const handleTypeChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newType = e.target.value;
+      const newTypeDef = parameterTypes.find((t) => t.type === newType);
+      if (!newTypeDef) return;
 
-  _cleanState = () => {
-    const { queryParameter } = this.props;
+      const newParam = newTypeDef.fromJSON({
+        ...EMPTY_PARAM_JSON,
+        name: parameter.name,
+        title: parameter.title ?? 'new title',
+        description: parameter.description ?? '',
+        type: newType,
+      });
 
-    this.setState({ queryParameter, showModal: false });
-  };
+      setParameter(newParam);
+      setValidation({});
+    },
+    [parameter, parameterTypes],
+  );
 
-  _saved = () => {
-    const { queryParameter } = this.state;
+  const handleChange = useCallback((key: string, value: any) => {
+    setParameter((prev) => (prev as any).toBuilder()[key](value).build());
+  }, []);
 
-    if (!this._validate(queryParameter)) {
-      return;
-    }
+  const handleSave = useCallback(() => {
+    if (!currentTypeDef) return;
 
-    this.propagateChanges();
-    this._cleanState();
-  };
+    const errors = currentTypeDef.validate(parameter);
+    setValidation(errors);
 
-  propagateChanges = () => {
-    const { queryParameters, onChange, queryParameter: prevQueryParameter } = this.props;
-    const { queryParameter } = this.state;
+    if (Object.values(errors).some(Boolean)) return;
+
     const newQueryParameters = [...queryParameters];
-    const index = queryParameters.findIndex((p) => p.name === prevQueryParameter.name);
+    const index = queryParameters.findIndex((p) => p.name === initialParameter.name);
 
-    if (index < 0) {
-      throw new Error(`Query parameter "${queryParameter.name}" not found`);
-    }
+    if (index < 0) throw new Error(`Query parameter "${initialParameter.name}" not found`);
 
-    newQueryParameters[index] = queryParameter.toJSON();
+    newQueryParameters[index] = (parameter as any).toJSON();
     onChange(newQueryParameters);
-  };
+    setShowModal(false);
+  }, [currentTypeDef, initialParameter.name, onChange, parameter, queryParameters]);
 
-  handleParameterChange = (key, value) => {
-    const { queryParameter } = this.state;
-    const nextQueryParameter = queryParameter.toBuilder()[key](value).build();
-
-    this.setState({ queryParameter: nextQueryParameter });
-  };
-
-  _validate = (queryParameter) => {
-    const newValidation: State['validation'] = {};
-
-    if (!queryParameter.lookupTable) {
-      newValidation.lookupTable = 'Cannot be empty';
-    }
-
-    if (!queryParameter.key) {
-      newValidation.key = 'Cannot be empty';
-    }
-
-    this.setState({ validation: newValidation });
-
-    return isEmpty(newValidation);
-  };
-
-  render() {
-    const { lookupTables, embryonic } = this.props;
-    const { queryParameter, validation, showModal } = this.state;
-
-    const validationState: {
-      lookupTable?: [ValidationState, string];
-      key?: [ValidationState, string];
-    } = {
-      lookupTable: validation.lookupTable ? ['error', validation.lookupTable] : undefined,
-      key: validation.key ? ['error', validation.key] : undefined,
-    };
-
-    return (
-      <>
-        <Button bsSize="small" bsStyle={embryonic ? 'primary' : 'info'} onClick={() => this.openModal()}>
-          {queryParameter.name}
-          {embryonic && ': undeclared'}
-        </Button>
-
-        <BootstrapModalForm
-          show={showModal}
-          title={`Declare Query Parameter "${queryParameter.name}" from Lookup Table`}
-          data-telemetry-title="Declare Query Parameter from Lookup Table"
-          onSubmitForm={this._saved}
-          onCancel={this._cleanState}
-          submitButtonText="Save">
-          <LookupTableParameterEdit
-            validationState={validationState}
-            identifier={queryParameter.name}
-            parameter={queryParameter}
-            onChange={this.handleParameterChange}
-            lookupTables={lookupTables}
-          />
-        </BootstrapModalForm>
-      </>
-    );
+  if (parameterTypes.length === 0) {
+    return null;
   }
-}
+
+  const validationState = Object.fromEntries(
+    Object.entries(validation).map(([k, v]) => [k, v ? (['error', v] as ['error', string]) : undefined]),
+  );
+
+  const EditComponent = currentTypeDef?.editComponent;
+
+  return (
+    <>
+      <Button bsSize="small" bsStyle={embryonic ? 'primary' : 'info'} onClick={openModal}>
+        {initialParameter.name}
+        {embryonic && ': undeclared'}
+      </Button>
+
+      <BootstrapModalForm
+        show={showModal}
+        title={`Declare Query Parameter "${initialParameter.name}"`}
+        data-telemetry-title="Declare Query Parameter"
+        onSubmitForm={handleSave}
+        onCancel={handleClose}
+        submitButtonText="Save">
+        {parameterTypes.length > 1 && (
+          <Input
+            id={`parameter-type-${initialParameter.name}`}
+            type="select"
+            label="Type"
+            value={parameter.type}
+            onChange={handleTypeChange}>
+            {parameterTypes.map(({ type, title }) => (
+              <option key={type} value={type}>
+                {title}
+              </option>
+            ))}
+          </Input>
+        )}
+        {EditComponent && (
+          <EditComponent
+            parameter={parameter}
+            onChange={handleChange}
+            identifier={initialParameter.name}
+            validationState={validationState}
+          />
+        )}
+      </BootstrapModalForm>
+    </>
+  );
+};
 
 export default EditQueryParameterModal;
