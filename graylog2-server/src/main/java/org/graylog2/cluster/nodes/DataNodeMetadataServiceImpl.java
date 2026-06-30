@@ -45,6 +45,8 @@ public class DataNodeMetadataServiceImpl implements DataNodeMetadataService {
         updates.add(Updates.set(DataNodeMetadata.FIELD_CURRENT_OPENSEARCH_VERSION, currentVersion));
         if (latestAvailableVersion != null) {
             updates.add(Updates.set(DataNodeMetadata.FIELD_LATEST_AVAILABLE_OPENSEARCH_VERSION, latestAvailableVersion));
+        } else {
+            updates.add(Updates.unset(DataNodeMetadata.FIELD_LATEST_AVAILABLE_OPENSEARCH_VERSION));
         }
         collection.updateOne(
                 Filters.eq(DataNodeMetadata.FIELD_NODE_ID, nodeId),

@@ -234,14 +234,14 @@ public class Messages {
     private void accountTotalMessageSizes(List<IndexingSuccess> requests, boolean isSystemTraffic) {
         final long totalSizeOfIndexedMessages = requests.stream()
                 .map(IndexingSuccess::message)
+                .filter(Indexable::isAccounted)
                 .mapToLong(Indexable::getSize)
                 .sum();
 
         final long totalInputSizeOfIndexedMessages = requests.stream()
                 .map(IndexingSuccess::message)
-                .filter(ImmutableMessage.class::isInstance)
-                .map(ImmutableMessage.class::cast)
-                .mapToLong(ImmutableMessage::getInputMessageSize)
+                .filter(Indexable::isAccounted)
+                .mapToLong(Indexable::getInputMessageSize)
                 .sum();
 
         if (isSystemTraffic) {
