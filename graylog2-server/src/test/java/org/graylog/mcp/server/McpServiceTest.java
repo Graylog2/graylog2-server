@@ -295,6 +295,45 @@ class McpServiceTest {
     }
 
     @Test
+    void testReadResourceWithNullDescriptionStillReturnsResource() throws Exception {
+        // Regression guard for the MCP SDK 2.0.0 upgrade: the SDK now enforces required fields in its
+        // record constructors. McpService builds McpSchema.TextResourceContents(uri, null, description),
+        // where the resource description is the (nullable) "text" argument. SDK 2.0.0 rejects a null
+        // text with IllegalArgumentException("text must not be null"), which McpService's catch-all maps
+        // to RESOURCE_NOT_FOUND. A readable entity with no description (common in Graylog) must not be
+        // reported as missing.
+        ResourceProvider mockProvider = mock(ResourceProvider.class);
+        McpSchema.Resource resource = McpSchema.Resource.builder()
+                .uri("grn::dashboard:test123")
+                .name("Test Dashboard")
+                // intentionally no description -> null
+                .build();
+        when(mockProvider.read(eq(permissionHelper), any(URI.class))).thenReturn(Optional.of(resource));
+
+        resourceProviders.put(GRNTypes.DASHBOARD, mockProvider);
+
+        var readParams = new McpSchema.ReadResourceRequest("grn:local:0:internal:dashboard:test123");
+        var request = new McpSchema.JSONRPCRequest(
+                "2.0",
+                McpSchema.METHOD_RESOURCES_READ,
+                "1",
+                objectMapper.convertValue(readParams, Map.class)
+        );
+
+        // When
+        Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, "session123");
+
+        // Then
+        assertThat(result).isPresent();
+        assertThat(result.get()).isInstanceOf(McpSchema.ReadResourceResult.class);
+
+        McpSchema.ReadResourceResult readResult = (McpSchema.ReadResourceResult) result.get();
+        assertThat(readResult.contents()).hasSize(1);
+
+        verify(auditEventSender).success(any(AuditActor.class), any(AuditEventType.class), anyMap());
+    }
+
+    @Test
     void testListResourceTemplates() throws Exception {
         // Given
         ResourceProvider mockProvider = mock(ResourceProvider.class);

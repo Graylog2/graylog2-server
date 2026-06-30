@@ -14,7 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-module.exports = {
-  // eslint-disable-next-line global-require
-  presets: [require('babel-preset-graylog')],
-};
+package org.graylog2.inputs.metrics;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+/**
+ * An input identifier paired with the input type it belongs to (e.g. {@code "input"} for regular
+ * inputs, {@code "forwarder_input"} for enterprise forwarder inputs).
+ */
+public record TypedInputId(@JsonProperty("id") String id,
+                           @JsonProperty("type") String type) {
+}
