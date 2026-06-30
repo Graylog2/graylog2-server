@@ -17,7 +17,7 @@
 import React, { useState, useRef } from 'react';
 
 import { Row, Col, Button, Alert, Modal } from 'components/bootstrap';
-import { DocumentTitle, Icon, PageHeader, Spinner } from 'components/common';
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import useDataNodeUpgradeStatus, {
   getNodeToUpgrade,
@@ -35,75 +35,13 @@ import UpgradeMethodSelector, {
   type DataNodeUpgradeMethodType,
 } from 'components/datanode/data-node-upgrade/UpgradeMethodSelector';
 import ClusterHealthInfo from 'components/datanode/data-node-upgrade/ClusterHealthInfo';
+import UpgradeStatusAlert from 'components/datanode/data-node-upgrade/UpgradeStatusAlert';
 
 const upgradeInstructionsDocumentationMessage = (
   <p>
     To upgrade your Data Nodes manually, please follow the instructions in the&nbsp;
     <DocumentationLink text="documentation" page={DocsHelper.PAGES.GRAYLOG_DATA_NODE} />.
   </p>
-);
-
-const openSearchStatusLine = ({
-  currentOpenSearchVersion,
-  isOpenSearchVersionError,
-  isLoadingOpenSearchVersion,
-  isOpenSearchUpToDate,
-}: {
-  currentOpenSearchVersion: string | undefined;
-  isOpenSearchVersionError: boolean;
-  isLoadingOpenSearchVersion: boolean;
-  isOpenSearchUpToDate: boolean;
-}) => {
-  if (isLoadingOpenSearchVersion) {
-    return <p>Checking OpenSearch version...</p>;
-  }
-
-  if (isOpenSearchVersionError) {
-    return (
-      <p>
-        <Icon name="warning" bsStyle="warning" /> Could not check Data Nodes&apos; embedded OpenSearch version.
-      </p>
-    );
-  }
-
-  if (isOpenSearchUpToDate) {
-    return (
-      <p>
-        <Icon name="check_circle" bsStyle="success" /> Data Nodes&apos; embedded OpenSearch is up to date
-        {currentOpenSearchVersion ? <b>{` (${currentOpenSearchVersion}).`}</b> : '.'}
-      </p>
-    );
-  }
-
-  return (
-    <p>
-      <Icon name="warning" bsStyle="warning" /> Data Nodes&apos; embedded OpenSearch is not up to date.
-    </p>
-  );
-};
-
-const UpgradeStatusAlert = ({
-  currentOpenSearchVersion,
-  isOpenSearchVersionError,
-  isOpenSearchUpToDate,
-  isLoadingOpenSearchVersion,
-}: {
-  currentOpenSearchVersion: string | undefined;
-  isOpenSearchVersionError: boolean;
-  isOpenSearchUpToDate: boolean;
-  isLoadingOpenSearchVersion: boolean;
-}) => (
-  <Alert bsStyle={isOpenSearchUpToDate ? 'success' : 'warning'} noIcon>
-    <p>
-      <Icon name="check_circle" bsStyle="success" /> All your Data Nodes are up to date.
-    </p>
-    {openSearchStatusLine({
-      currentOpenSearchVersion,
-      isOpenSearchVersionError,
-      isLoadingOpenSearchVersion,
-      isOpenSearchUpToDate,
-    })}
-  </Alert>
 );
 
 const DataNodeUpgradePage = () => {

@@ -18,14 +18,15 @@ import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
-import { ConfirmDialog, Spinner } from 'components/common';
 import useOutdatedIndices from 'components/indices/hooks/useOutdatedIndices';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
+import ForceStartConfirmDialog from './ForceStartConfirmDialog';
 import useOpenSearchClusterStats from './hooks/useOpenSearchClusterStats';
 import useOpenSearchRollingRestart, { rollingRestartStartError } from './hooks/useOpenSearchRollingRestart';
 import OutdatedIndicesTable from './OutdatedIndicesTable';
+import OpenSearchUpgradeInfo from './OpenSearchUpgradeInfo';
 import OpenSearchRollingUpgradeNodes from './OpenSearchRollingUpgradeNodes';
 import { isRollingRestartActive, isRollingRestartTerminalState } from './rollingRestartTypes';
 
@@ -45,72 +46,8 @@ const DisabledHint = styled.p(
   `,
 );
 
-const InfoList = styled.dl(
-  ({ theme }) => css`
-    margin: ${theme.spacings.md} 0;
-
-    > dt {
-      clear: left;
-      float: left;
-      margin-bottom: ${theme.spacings.sm};
-      width: 240px;
-    }
-
-    > dd {
-      margin-bottom: ${theme.spacings.sm};
-      margin-left: 240px;
-    }
-  `,
-);
-
 const MIN_NODES_FOR_ROLLING_UPGRADE = 3;
 const TELEMETRY_DEFAULTS = { app_pathname: 'datanode', app_section: 'opensearch-upgrade' } as const;
-
-const OpenSearchUpgradeInfo = ({
-  currentVersion,
-  targetVersion,
-  isLoading,
-}: {
-  currentVersion: string | undefined;
-  targetVersion: string | undefined;
-  isLoading: boolean;
-}) => (
-  <InfoList>
-    <dt>Current OpenSearch version:</dt>
-    <dd>{isLoading ? <Spinner text="Loading..." /> : currentVersion || 'Unknown'}</dd>
-    <dt>Target OpenSearch version:</dt>
-    <dd>{isLoading ? <Spinner text="Loading..." /> : targetVersion || 'Unknown'}</dd>
-  </InfoList>
-);
-
-const ForceStartConfirmDialog = ({
-  failedChecks,
-  isSubmitting,
-  onCancel,
-  onConfirm,
-}: {
-  failedChecks: Array<string>;
-  isSubmitting: boolean;
-  onCancel: () => void;
-  onConfirm: () => void;
-}) => (
-  <ConfirmDialog
-    show
-    title="Start OpenSearch upgrade anyway?"
-    btnConfirmText="Start anyway"
-    isAsyncSubmit
-    isSubmitting={isSubmitting}
-    onCancel={onCancel}
-    onConfirm={onConfirm}
-    submitLoadingText="Starting...">
-    <p>The backend reported that the normal preflight checks did not pass.</p>
-    <ul>
-      {failedChecks.map((failedCheck) => (
-        <li key={failedCheck}>{failedCheck}</li>
-      ))}
-    </ul>
-  </ConfirmDialog>
-);
 
 const OpenSearchUpgradeSection = () => {
   const {

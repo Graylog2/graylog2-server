@@ -38,8 +38,10 @@ type RollingRestartErrorBody = {
   message?: string;
 };
 
+// The generated API does not expose the rolling restart data payload yet, so keep the payload typed locally.
 const fetchCurrentRollingRestart = () => DataNodeRollingRestart.current() as Promise<RollingRestartJob | null>;
 
+// The generated start() function does not accept the StartRequest body, but force must be sent for retry flow.
 const startRollingRestartRequest = (force: boolean) =>
   fetch<RollingRestartJob>('POST', qualifyUrl(ROLLING_RESTART_URL), { force });
 

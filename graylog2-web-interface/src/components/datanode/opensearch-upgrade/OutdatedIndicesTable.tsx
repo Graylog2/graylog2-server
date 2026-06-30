@@ -22,6 +22,7 @@ import { ConfirmDialog, Spinner } from 'components/common';
 import useCanArchive from 'components/indices/hooks/useCanArchive';
 import useOutdatedIndices from 'components/indices/hooks/useOutdatedIndices';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import extractErrorMessage from 'util/extractErrorMessage';
 import UserNotification from 'util/UserNotification';
 
 import IndicesGroupTable from './IndicesGroupTable';
@@ -110,7 +111,7 @@ const OutdatedIndicesTable = () => {
 
       closeConfirmDialog();
     } catch (errorThrown) {
-      UserNotification.error(String(errorThrown), `Could not ${actionDefinition.confirmText.toLowerCase()}.`);
+      UserNotification.error(extractErrorMessage(errorThrown), `Could not ${actionDefinition.confirmText.toLowerCase()}.`);
     } finally {
       setIsSubmitting(false);
     }
