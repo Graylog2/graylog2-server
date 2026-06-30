@@ -89,7 +89,6 @@ import {
 } from 'views/Constants';
 import ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
-import LookupTableQueryParameterEdit from 'components/lookup-table-parameters/LookupTableQueryParameterEdit';
 import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 import NetworkVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NetworkVisualizationConfig';
 import NetworkGraphVisualization from 'views/components/visualizations/network/NetworkGraphVisualization';
@@ -508,18 +507,6 @@ const exports: PluginExports = {
   'views.reducers': viewsReducers,
   'views.elements.validationErrorExplanation': [WarmTierQueryValidation],
   'views.widgets.actions': [ExportMessageWidgetAction, ExportWidgetAction],
-  eventDefinitionQueryParameterTypes: [
-    {
-      type: LookupTableParameter.type,
-      title: 'Lookup Table',
-      fromJSON: LookupTableParameter.fromJSON.bind(LookupTableParameter),
-      validate: (param: any) => ({
-        lookupTable: !param.lookupTable ? 'Cannot be empty' : undefined,
-        key: !param.key ? 'Cannot be empty' : undefined,
-      }),
-      editComponent: LookupTableQueryParameterEdit,
-    },
-  ],
 };
 
 export default exports;
