@@ -41,10 +41,12 @@ describe('AssociatedInputsCell (Streams)', () => {
 
   it('renders the count of associated inputs', () => {
     asMock(useStreamMetricsFor).mockReturnValue({
-      metrics: { associated_inputs: [
-        { id: 'input-a', type: 'input' },
-        { id: 'input-b', type: 'input' },
-      ] },
+      metrics: {
+        associated_inputs: [
+          { id: 'input-a', type: 'input' },
+          { id: 'input-b', type: 'input' },
+        ],
+      },
       isInitialLoading: false,
       isError: false,
     });

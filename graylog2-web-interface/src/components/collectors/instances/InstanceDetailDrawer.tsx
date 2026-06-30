@@ -29,6 +29,7 @@ import ActivityEntryList from '../common/ActivityEntryList';
 import { IconRow, IconRowList } from '../common/IconRowList';
 import SyncStateIndicator from '../common/SyncStateIndicator';
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
+import { COLLECTOR_INSTANCE_UID_FIELD } from '../common/fields';
 import collectorSystemLogsUrl from '../common/collectorSystemLogsUrl';
 import { useInstancePendingChanges } from '../hooks';
 import type { CoalescedActions, CollectorInstanceView, Source, TargetInfo } from '../types';
@@ -213,7 +214,7 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
 
         <DetailRow>
           <Title>Messages:</Title>
-          <Link to={collectorReceivedMessagesUrl('collector_instance_uid', instance.instance_uid)}>
+          <Link to={collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid)}>
             Received messages
           </Link>
         </DetailRow>

@@ -71,6 +71,7 @@ import org.graylog2.search.AttributeFieldSorts;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.jspecify.annotations.NonNull;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -249,23 +250,32 @@ public class CollectorInstancesResource extends RestResource {
                 list.pagination().total(),
                 sort,
                 order,
-                list.stream().map(dto -> new CollectorInstanceResponse(
-                        dto.lastSeen().isBefore(offlineCutoff) ? "offline" : "online",
-                        dto.instanceUid(),
-                        dto.fleetId(),
-                        dto.capabilities(),
-                        dto.enrolledAt(),
-                        dto.lastSeen(),
-                        dto.activeCertificateFingerprint(),
-                        dto.activeCertificateExpiresAt(),
-                        dto.nextCertificateFingerprint().orElse(null),
-                        dto.nextCertificateExpiresAt().orElse(null),
-                        attributesToMap(dto.identifyingAttributes()),
-                        attributesToMap(dto.nonIdentifyingAttributes()),
-                        pendingChangesLookup.isPending(dto)
-                )).toList(),
+                list.stream().map(dto -> toResponse(dto, offlineCutoff, pendingChangesLookup.isPending(dto))).toList(),
                 ATTRIBUTES,
                 DEFAULTS);
+    }
+
+    @GET
+    @Path("/instances/{instanceUid}")
+    @Timed
+    @Operation(summary = "Get a collector instance")
+    public CollectorInstanceResponse getInstance(
+            @Parameter(name = "instanceUid", required = true) @PathParam("instanceUid") String instanceUid) {
+        final Optional<CollectorInstanceDTO> collector = collectorInstanceService.findByInstanceUid(instanceUid);
+        if (collector.isEmpty()) {
+            throw new NotFoundException(f("Collector instance <%s> not found", instanceUid));
+        }
+        final CollectorInstanceDTO dto = collector.get();
+        // we scope instance read on the entire fleet, there's no sharing that makes sense per instance.
+        checkPermission(CollectorsPermissions.FLEET_READ, dto.fleetId());
+
+        final Duration offlineThreshold = getOfflineThreshold();
+        final Instant offlineCutoff = Instant.now().minus(offlineThreshold);
+
+        final var hasPendingChanges = !txnLogService.getUnprocessedMarkers(
+                dto.fleetId(), dto.instanceUid(), dto.lastProcessedTxnSeq()).isEmpty();
+
+        return toResponse(dto, offlineCutoff, hasPendingChanges);
     }
 
     @DELETE
@@ -362,6 +372,25 @@ public class CollectorInstancesResource extends RestResource {
         return Response.noContent().build();
     }
 
+    private static @NonNull CollectorInstanceResponse toResponse(CollectorInstanceDTO dto, Instant offlineCutoff,
+                                                                 boolean hasPendingChanges) {
+        return new CollectorInstanceResponse(
+                dto.lastSeen().isBefore(offlineCutoff) ? "offline" : "online",
+                dto.instanceUid(),
+                dto.fleetId(),
+                dto.capabilities(),
+                dto.enrolledAt(),
+                dto.lastSeen(),
+                dto.activeCertificateFingerprint(),
+                dto.activeCertificateExpiresAt(),
+                dto.nextCertificateFingerprint().orElse(null),
+                dto.nextCertificateExpiresAt().orElse(null),
+                attributesToMap(dto.identifyingAttributes()),
+                attributesToMap(dto.nonIdentifyingAttributes()),
+                hasPendingChanges
+        );
+    }
+
     private Duration getOfflineThreshold() {
         return collectorsConfigService.getOrDefault().collectorOfflineThreshold();
     }
@@ -369,9 +398,7 @@ public class CollectorInstancesResource extends RestResource {
     /**
      * Translates the {@code has_pending_changes} filter value into a MongoDB filter: the
      * pending-changes filter for {@code true}, or its negation ({@code $nor}) for {@code false}
-     * (in sync). Accessed through this method — rather than reading {@code txnLogService} directly in
-     * the {@code ATTRIBUTES} initializer lambda — so the field is read at request time, after the
-     * constructor has assigned it.
+     * (in sync).
      */
     private Bson hasPendingChangesFilter(boolean wantPending) {
         final var filter = CollectorInstanceService.hasPendingChangesFilter(txnLogService.pendingChangesLookup());
