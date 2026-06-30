@@ -21,10 +21,13 @@ import jakarta.ws.rs.BadRequestException;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.metrics.entity.cache.EntityCachedMetricDescriptor;
 import org.graylog2.metrics.entity.cache.MetricsCacheService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,6 +44,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  * </p>
  */
 public class EntityMetricsService {
+    private static final Logger LOG = LoggerFactory.getLogger(EntityMetricsService.class);
 
     private final String entityType;
     private final Map<String, EntityMetricDescriptor> descriptorsByField;
@@ -109,12 +113,24 @@ public class EntityMetricsService {
                                    Map<String, EntityCachedMetricDescriptor<?, ?>> cachedDescriptors,
                                    SearchUser searchUser,
                                    EntityMetricValues.Builder builder) {
+        // Entries that fail to deserialize are typically left over from a previous version with a
+        // different cache schema. Treat them as stale and recompute below, which overwrites the
+        // broken cache entries with fresh ones.
+        final Map<String, Set<String>> incompatibleByField = new HashMap<>();
         freshFields.forEach((entityId, fields) ->
-                fields.forEach((fieldName, value) ->
-                        builder.put(entityId, fieldName,
-                                applyFilter(cachedDescriptors.get(fieldName), value, searchUser))
-                )
+                fields.forEach((fieldName, value) -> {
+                    final EntityCachedMetricDescriptor<?, ?> descriptor = cachedDescriptors.get(fieldName);
+                    try {
+                        builder.put(entityId, fieldName, applyFilter(descriptor, value, searchUser));
+                    } catch (IncompatibleCachedValueException e) {
+                        LOG.debug("Cached metric value for entity {} field {} is incompatible with the current cache schema ({}); recomputing.",
+                                entityId, fieldName, descriptor.cacheType().getType(), e);
+                        incompatibleByField.computeIfAbsent(fieldName, k -> new HashSet<>()).add(entityId);
+                    }
+                })
         );
+        incompatibleByField.forEach((fieldName, ids) ->
+                computeAndCache(cachedDescriptors.get(fieldName), ids, searchUser, builder));
     }
 
     private <C, R> void computeAndCache(EntityCachedMetricDescriptor<C, R> descriptor,
@@ -134,7 +150,12 @@ public class EntityMetricsService {
     private <C, R> R applyFilter(EntityCachedMetricDescriptor<C, R> descriptor,
                                   Object cachedValue,
                                   SearchUser searchUser) {
-        final C typedValue = objectMapper.convertValue(cachedValue, descriptor.cacheType());
+        final C typedValue;
+        try {
+            typedValue = objectMapper.convertValue(cachedValue, descriptor.cacheType());
+        } catch (IllegalArgumentException e) {
+            throw new IncompatibleCachedValueException(e);
+        }
         return descriptor.computeForUser(typedValue, searchUser);
     }
 
@@ -146,5 +167,16 @@ public class EntityMetricsService {
                     throw new BadRequestException(
                             f("Invalid field: %s. Valid fields: %s", field, descriptorsByField.keySet()));
                 });
+    }
+
+    /**
+     * Thrown when a cached metric value can't be deserialized into the descriptor's current
+     * {@link EntityCachedMetricDescriptor#cacheType()}. Typically indicates a leftover entry from a
+     * previous version whose cache schema differs.
+     */
+    private static class IncompatibleCachedValueException extends RuntimeException {
+        IncompatibleCachedValueException(Throwable cause) {
+            super(cause);
+        }
     }
 }

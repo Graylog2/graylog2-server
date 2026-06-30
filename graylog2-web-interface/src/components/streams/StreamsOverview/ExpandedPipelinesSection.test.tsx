@@ -36,6 +36,7 @@ describe('ExpandedPipelinesSection', () => {
     asMock(useEntityTitles).mockReturnValue({
       titlesById: { 'pipeline-1': 'My Pipeline' },
       notPermittedIds: new Set(),
+      isFetching: false,
       isInitialLoading: false,
       isError: false,
     });

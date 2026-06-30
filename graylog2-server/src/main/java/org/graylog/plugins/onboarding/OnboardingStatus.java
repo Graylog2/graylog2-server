@@ -22,5 +22,6 @@ public enum OnboardingStatus {
     @JsonProperty("finished") FINISHED,
     @JsonProperty("dismissed") DISMISSED,
     @JsonProperty("unknown") UNKNOWN,
+    @JsonProperty("setup") SETUP,
     //TODO: more values expected
 }
