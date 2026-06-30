@@ -136,7 +136,7 @@ const DataNodeUpgradePage = () => {
                 )}
               </>
             )}
-            {!areAllDataNodesUpToDate && (
+            {showOpenSearchUpgradeSection && (
               <>
                 <h1>Upgrade Data Node</h1>
                 <br />
