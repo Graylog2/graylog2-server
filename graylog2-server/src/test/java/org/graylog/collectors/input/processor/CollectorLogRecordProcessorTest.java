@@ -31,6 +31,12 @@ class CollectorLogRecordProcessorTest {
     private final CollectorLogRecordProcessor processor = new CollectorLogRecordProcessor();
 
     @Test
+    void producesUnaccountedMessages() {
+        // Collector self-logs are Graylog-internal telemetry and must not count against the license.
+        assertThat(processor.producesUnaccountedMessages()).isTrue();
+    }
+
+    @Test
     void processesEmptyLogRecord() {
         final var log = OTelJournal.Log.newBuilder()
                 .setLogRecord(LogRecord.newBuilder().build())

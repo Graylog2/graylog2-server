@@ -147,7 +147,9 @@ public class CollectorIngestCodec implements Codec {
         final String source = source(rawMessage.getRemoteAddress());
         final DateTime timestamp = timestamp(logRecord).orElse(rawMessage.getTimestamp());
 
-        final Message message = messageFactory.createMessage(body, source, timestamp);
+        final Message message = processor.producesUnaccountedMessages()
+                ? messageFactory.createUnaccountedMessage(body, source, timestamp)
+                : messageFactory.createMessage(body, source, timestamp);
 
         message.addField(FIELD_COLLECTOR_RECEIVER_TYPE, receiverType);
 

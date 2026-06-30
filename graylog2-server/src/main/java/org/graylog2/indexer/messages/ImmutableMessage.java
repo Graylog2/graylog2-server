@@ -56,9 +56,12 @@ public interface ImmutableMessage extends Indexable, Acknowledgeable {
     ImmutableSet<String> getStreamIds();
 
     /**
-     * Returns the input message size in bytes. This is the raw payload size at the transport
-     * layer, as recorded in {@link Message#FIELD_GL2_INPUT_MESSAGE_SIZE}.
-     * Falls back to {@link #getSize()} if no input message size was recorded.
+     * {@inheritDoc}
+     * <p>
+     * Re-declared as abstract — overriding {@link Indexable}'s {@code 0} default — so that every
+     * {@link ImmutableMessage} implementation must supply a real input size. This prevents a wrapper
+     * from silently inheriting the {@code 0} default and under-counting input-based traffic.
      */
+    @Override
     long getInputMessageSize();
 }
