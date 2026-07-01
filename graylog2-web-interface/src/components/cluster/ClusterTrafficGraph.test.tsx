@@ -72,6 +72,7 @@ describe('ClusterTrafficGraph', () => {
 
     render(<ClusterTrafficGraph />);
 
+    expect(screen.getByTestId('traffic-graph')).toHaveAttribute('data-type', 'output');
     expect(screen.getByTestId('traffic-graph')).toHaveAttribute(
       'data-traffic',
       JSON.stringify({
