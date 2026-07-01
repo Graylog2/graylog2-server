@@ -26,13 +26,7 @@ const ClusterTrafficGraph = () => {
   const { graphDays } = useGraphDays();
   const { traffic } = useClusterTraffic(graphDays);
 
-  const graphTraffic = traffic
-    ? Object.fromEntries(
-        Object.entries(traffic.output).map(([date, output]) => [date, traffic.input_indexed?.[date] || output]),
-      )
-    : undefined;
-
-  return <TrafficGraphWithDaySelect traffic={graphTraffic} trafficType="input-indexed" />;
+  return <TrafficGraphWithDaySelect traffic={traffic?.output} />;
 };
 
 export default ClusterTrafficGraph;

@@ -1,5 +1,5 @@
 type = "fixed"
-message = "Fixed cluster traffic graph showing no history from before the 7.1 upgrade by falling back to output traffic for days without indexed input traffic data."
+message = "Fixed traffic graph on the System Overview and Licenses pages showing no history from before the 7.1 upgrade by plotting output traffic again instead of indexed input traffic, which is only recorded since 7.1.0."
 
 issues = ["Graylog2/graylog-plugin-enterprise#14694"]
 pulls = ["26544"]

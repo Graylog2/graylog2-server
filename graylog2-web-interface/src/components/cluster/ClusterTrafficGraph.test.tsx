@@ -64,7 +64,7 @@ describe('ClusterTrafficGraph', () => {
     });
   });
 
-  it('falls back to output traffic for buckets without input_indexed data', () => {
+  it('plots output traffic', () => {
     asMock(useClusterTraffic).mockReturnValue({
       traffic: mockTrafficData,
       isLoading: false,
@@ -72,13 +72,11 @@ describe('ClusterTrafficGraph', () => {
 
     render(<ClusterTrafficGraph />);
 
-    expect(screen.getByTestId('traffic-graph')).toHaveAttribute('data-type', 'input-indexed');
-
     expect(screen.getByTestId('traffic-graph')).toHaveAttribute(
       'data-traffic',
       JSON.stringify({
         '2022-09-21T08:00:00.000Z': 45410034,
-        '2022-09-21T09:00:00.000Z': 7100000,
+        '2022-09-21T09:00:00.000Z': 17605708,
       }),
     );
   });
