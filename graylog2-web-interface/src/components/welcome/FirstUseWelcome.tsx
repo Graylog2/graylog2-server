@@ -15,11 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import useProductName from 'brand-customization/useProductName';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import LinkContainer from 'components/common/LinkContainer';
+import { Button } from 'components/bootstrap';
+import Routes from 'routing/Routes';
+import PlatformIcons from 'components/collectors/overview/onboarding/PlatformIcons';
 
 import PageHeader from '../common/PageHeader';
 const StyledSectionComponent = styled(SectionComponent)`
@@ -61,6 +64,16 @@ const ActionsSection = styled(Section)`
   padding-top: 1rem;
 `;
 
+const EndpointActions = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: ${theme.spacings.md};
+    margin-top: ${theme.spacings.md};
+  `,
+);
+
 const FirstUseWelcome = () => {
   const productName = useProductName();
 
@@ -78,6 +91,12 @@ const FirstUseWelcome = () => {
             Install a lightweight agent on your servers, VMs, or containers. Graylog Sidecar manages the configuration
             automatically.
           </Description>
+          <EndpointActions>
+            <PlatformIcons />
+            <LinkContainer to={Routes.SYSTEM.COLLECTORS.OVERVIEW}>
+              <Button bsStyle="primary">Set up Collector</Button>
+            </LinkContainer>
+          </EndpointActions>
         </StyledSectionComponent>
         <StyledSectionComponent title="Other Data Sources">
           <Description>
