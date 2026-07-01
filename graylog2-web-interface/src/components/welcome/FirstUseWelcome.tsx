@@ -30,6 +30,7 @@ import PageHeader from '../common/PageHeader';
 const StyledSectionComponent = styled(SectionComponent)`
   flex: 1;
 `;
+
 const Description = ({ children = undefined }: React.PropsWithChildren<{}>) => (
   <p className="description">{children}</p>
 );
