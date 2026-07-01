@@ -22,7 +22,7 @@ import Routes from 'routing/Routes';
  * Uses a 1h relative time range and no stream scoping — the Collector System
  * Logs stream is system-scoped and is not included in unscoped searches.
  */
-const collectorReceivedMessagesUrl = (field: string, value: string): string =>
-  Routes.search_with_query(`${field}:"${value}"`, 'relative', { relative: 3600 });
+const collectorReceivedMessagesUrl = (field: string, value: string, autorefresh?: string): string =>
+  Routes.search_with_query(`${field}:"${value}"`, 'relative', { relative: 3600 }, undefined, undefined, autorefresh);
 
 export default collectorReceivedMessagesUrl;

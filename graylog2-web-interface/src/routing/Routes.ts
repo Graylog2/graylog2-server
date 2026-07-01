@@ -49,6 +49,7 @@ type SearchQueryParams = {
   keyword?: string;
   streams?: string;
   stream_categories?: string;
+  autorefresh?: string;
 };
 
 const Routes = {
@@ -255,6 +256,7 @@ const Routes = {
     timeRange: RoutesTimeRange,
     streams?: string[],
     streamCategories?: string[],
+    autorefresh?: string,
   ) => {
     const route = new URI(Routes.SEARCH);
     const queryParams: SearchQueryParams = {
@@ -286,6 +288,10 @@ const Routes = {
 
     if (streamCategories) {
       queryParams.stream_categories = streamCategories.join(',');
+    }
+
+    if(autorefresh) {
+      queryParams.autorefresh = autorefresh;
     }
 
     route.query(queryParams);
