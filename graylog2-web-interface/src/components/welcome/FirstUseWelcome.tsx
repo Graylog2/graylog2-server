@@ -23,7 +23,7 @@ import LinkContainer from 'components/common/LinkContainer';
 
 import PageHeader from '../common/PageHeader';
 const StyledSectionComponent = styled(SectionComponent)`
-  flex-grow: 1;
+  flex: 1;
 `;
 const Description = ({ children = undefined }: React.PropsWithChildren<{}>) => (
   <p className="description">{children}</p>
