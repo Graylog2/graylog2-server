@@ -27,18 +27,20 @@ import { COLLECTOR_INSTANCE_UID_FIELD } from 'components/collectors/common/field
 import { useInstance } from 'components/collectors/hooks/useInstanceQueries';
 import Routes from 'routing/Routes';
 import { extractErrorMessage } from 'util/extractErrorMessage';
+import useDefaultInterval from 'views/hooks/useDefaultIntervalForRefresh';
 
 const CollectorsOnboardingInstancePage = () => {
   const { instanceUid } = useParams<{ instanceUid: string }>();
   const navigate = useNavigate();
 
   const { data: instance, isLoading, error } = useInstance(instanceUid);
+  const defaultInterval = useDefaultInterval();
 
   useEffect(() => {
     if (instance) {
-      navigate(collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid));
+      navigate(collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid, defaultInterval));
     }
-  }, [instance, navigate]);
+  }, [defaultInterval, instance, navigate]);
 
   const content = () => {
     if (isLoading) return <Spinner />;

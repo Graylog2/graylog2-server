@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect} from 'react';
 import { styled } from 'styled-components';
 
 import { ProgressAnimation, Icon, Spinner, HoverForHelp } from 'components/common/index';
@@ -61,6 +61,7 @@ type Props = React.PropsWithChildren<{
   onEnable?: () => void;
   onDisable?: () => void;
   humanName: string;
+  autoRefresh?: string;
 }>;
 
 const RefreshControls = ({
@@ -75,8 +76,15 @@ const RefreshControls = ({
   isLoadingMinimumInterval,
   minimumRefreshInterval,
   defaultInterval,
+  autoRefresh = null,
 }: Props) => {
   const { refreshConfig, startAutoRefresh, stopAutoRefresh, animationId } = useAutoRefresh();
+
+  useEffect(() => {
+    if(autoRefresh) {
+      startAutoRefresh(durationToMS(autoRefresh));
+    }
+  }, [autoRefresh, startAutoRefresh]);
 
   const selectInterval = useCallback(
     (interval: string) => {

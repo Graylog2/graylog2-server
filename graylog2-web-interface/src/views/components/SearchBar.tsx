@@ -73,6 +73,7 @@ import useIsLoading from 'views/hooks/useIsLoading';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import { defaultCompare } from 'logic/DefaultCompare';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
+import { useSearchURLQueryParams } from 'views/logic/NormalizeSearchURLQueryParams';
 import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
 import useSearchResultTimeRangeErrorCheck from 'views/hooks/useSearchResultTimeRangeErrorCheck';
@@ -213,6 +214,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
   const initialValues = useInitialFormValues({ queryFilters, currentQuery });
   const dispatch = useViewsDispatch();
   const { restartAutoRefresh } = useAutoRefresh();
+  const { autoRefresh } = useSearchURLQueryParams();
   const _onSubmit = useCallback(
     (values: SearchBarFormValues) =>
       onSubmit(dispatch, values, pluggableSearchBarControls, currentQuery, restartAutoRefresh),
@@ -295,7 +297,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
                             />
                           )}
                         </Field>
-                        <ViewsRefreshControls disable={!isValid} />
+                        <ViewsRefreshControls disable={!isValid} autoRefresh={autoRefresh}/>
                       </StreamsAndRefresh>
                     </TimeRangeRow>
                     <SearchQueryRow>
