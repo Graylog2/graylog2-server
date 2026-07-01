@@ -84,7 +84,12 @@ public class FleetTransactionLogService {
                         Indexes.ascending(FIELD_ID)
                 )
         );
-        collection.createIndex(Indexes.ascending(FIELD_CREATED_AT));
+        collection.createIndex(
+                Indexes.compoundIndex(
+                        Indexes.ascending(FIELD_CREATED_AT),
+                        Indexes.ascending(FIELD_ID)
+                )
+        );
     }
 
     public long appendFleetMarker(String fleetId, MarkerType type) {
@@ -256,6 +261,15 @@ public class FleetTransactionLogService {
         }
 
         return new CoalescedActions(recomputeConfig, recomputeIngestConfig, newFleetId, restart, runDiscovery, maxSeq);
+    }
+
+    public long deleteOldMarkers(Instant timeCutoff, long minActiveSeq) {
+        return collection.deleteMany(
+                Filters.and(
+                        Filters.lt(FIELD_CREATED_AT, timeCutoff),
+                        Filters.lt(FIELD_ID, minActiveSeq)
+                )
+        ).getDeletedCount();
     }
 
     public long countMarkersSince(Instant since) {

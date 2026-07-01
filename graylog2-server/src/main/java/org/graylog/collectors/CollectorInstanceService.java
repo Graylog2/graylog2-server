@@ -335,6 +335,18 @@ public class CollectorInstanceService {
         return collection.deleteOne(Filters.eq(FIELD_INSTANCE_UID, instanceUid)).getDeletedCount() > 0;
     }
 
+    public long getMinLastProcessedTxnSeq() {
+        final var pipeline = List.of(
+                Aggregates.match(Filters.gt(FIELD_LAST_PROCESSED_TXN_SEQ, 0L)),
+                Aggregates.group(null, Accumulators.min("minSeq", "$" + FIELD_LAST_PROCESSED_TXN_SEQ))
+        );
+        final var result = collection.aggregate(pipeline, Document.class);
+        for (var doc : result) {
+            return doc.getLong("minSeq");
+        }
+        return Long.MAX_VALUE;
+    }
+
     public long deleteExpired(Duration expirationThreshold) {
         final Date cutoff = Date.from(Instant.now(clock).minus(expirationThreshold));
         return collection.deleteMany(Filters.lt(FIELD_LAST_SEEN, cutoff)).getDeletedCount();

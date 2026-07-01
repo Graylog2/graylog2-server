@@ -25,6 +25,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -34,17 +35,17 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.collectors.CollectorCaService;
 import org.graylog.collectors.CollectorIngestInputService;
 import org.graylog.collectors.CollectorLogsDestinationService;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
-import org.graylog.collectors.CollectorsInitializer;
 import org.graylog.collectors.CollectorsPermissions;
 import org.graylog.collectors.FleetService;
 import org.graylog.collectors.FleetTransactionLogService;
-import org.graylog.collectors.IngestEndpointConfig;
+import org.graylog.collectors.TokenSigningKey;
 import org.graylog.collectors.db.MarkerType;
-import org.graylog2.Configuration;
+import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -52,8 +53,6 @@ import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.validators.ValidationResult;
 import org.graylog2.rest.RestTools;
-import org.graylog2.shared.rest.HideOnCloud;
-import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import java.net.URI;
@@ -66,54 +65,48 @@ import java.util.Map;
 import static org.apache.commons.lang3.time.DurationFormatUtils.formatDurationWords;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
-/**
- * Manages the collector ingest configuration. Bound in both on-prem and Cloud nodes; the only behavioral difference is
- * that in Cloud the ingest endpoint is server-provisioned (the client-supplied http ingest config is ignored and derived
- * from the node's external URI) and there is no persisted ingest input — so the input-management endpoints are
- * {@link HideOnCloud hidden in Cloud} and {@code PUT} never creates an input. The in-memory ingest input is launched in
- * Cloud by {@code CloudCollectorIngestService}, activated by the config save below.
- */
 @Tag(name = "Collectors/Config", description = "Managed collector configuration")
 @Path("/collectors/config")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
-@PublicCloudAPI
 public class CollectorsConfigResource extends RestResource {
     private final CollectorsConfigService collectorsConfigService;
     private final CollectorIngestInputService collectorIngestInputService;
-    private final CollectorLogsDestinationService logsDestinationService;
+    private final CollectorLogsDestinationService collectorLogsDestinationService;
     private final URI httpExternalUri;
     private final FleetService fleetService;
     private final FleetTransactionLogService fleetTransactionLogService;
-    private final CollectorsInitializer collectorsInitializer;
-    private final boolean isCloud;
+    private final EnrollmentTokenService enrollmentTokenService;
+    private final CollectorCaService collectorCaService;
 
     @Inject
     public CollectorsConfigResource(CollectorsConfigService collectorsConfigService,
                                     CollectorIngestInputService collectorIngestInputService,
-                                    CollectorLogsDestinationService logsDestinationService,
+                                    CollectorLogsDestinationService collectorLogsDestinationService,
                                     HttpConfiguration httpConfiguration,
                                     FleetService fleetService,
                                     FleetTransactionLogService fleetTransactionLogService,
-                                    CollectorsInitializer collectorsInitializer,
-                                    Configuration configuration) {
+                                    EnrollmentTokenService enrollmentTokenService,
+                                    CollectorCaService collectorCaService) {
         this.collectorsConfigService = collectorsConfigService;
         this.collectorIngestInputService = collectorIngestInputService;
-        this.logsDestinationService = logsDestinationService;
+        this.collectorLogsDestinationService = collectorLogsDestinationService;
         this.httpExternalUri = httpConfiguration.getHttpExternalUri();
         this.fleetService = fleetService;
         this.fleetTransactionLogService = fleetTransactionLogService;
-        this.collectorsInitializer = collectorsInitializer;
-        this.isCloud = configuration.isCloud();
+        this.enrollmentTokenService = enrollmentTokenService;
+        this.collectorCaService = collectorCaService;
     }
 
     @GET
     @Operation(summary = "Get collectors configuration")
     @RequiresPermissions(CollectorsPermissions.CONFIGURATION_READ)
     public CollectorsConfig get(@Context ContainerRequestContext requestContext) {
-        return collectorsConfigService.get()
-                .orElseGet(() -> CollectorsConfig.createDefault(derivedHostname(requestContext)));
+        return collectorsConfigService.get().orElseGet(() -> {
+            final var hostname = RestTools.buildExternalUri(requestContext.getHeaders(), httpExternalUri).getHost();
+            return CollectorsConfig.createDefault(hostname);
+        });
     }
 
     // Separate endpoint so the UI can check input existence without needing read permission on each input.
@@ -124,7 +117,6 @@ public class CollectorsConfigResource extends RestResource {
     @Path("/inputs")
     @Operation(summary = "Get collector ingest input IDs")
     @RequiresPermissions(CollectorsPermissions.CONFIGURATION_READ)
-    @HideOnCloud
     public CollectorInputIdsResponse getInputIds() {
         return new CollectorInputIdsResponse(collectorIngestInputService.getInputIds());
     }
@@ -136,7 +128,6 @@ public class CollectorsConfigResource extends RestResource {
     // Input permissions are checked inline in CollectorIngestInputService#createInput. Collectors config is not
     // altered, only read in this process.
     @RequiresPermissions(CollectorsPermissions.CONFIGURATION_READ)
-    @HideOnCloud
     public CollectorInputIdsResponse createInput() throws ValidationException {
         final var config = collectorsConfigService.get()
                 .orElseThrow(() -> new BadRequestException("Collectors config has not been initialized yet"));
@@ -148,40 +139,54 @@ public class CollectorsConfigResource extends RestResource {
     @PUT
     @Operation(summary = "Update collectors configuration")
     @RequiresPermissions(CollectorsPermissions.CONFIGURATION_EDIT)
-    public CollectorsConfig put(@Context ContainerRequestContext requestContext,
-                                @Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) CollectorsConfigRequest request) throws ValidationException {
+    public CollectorsConfig put(@Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) CollectorsConfigRequest request) throws ValidationException {
+        validateThresholds(request);
+        collectorLogsDestinationService.ensureExists();
 
         final var existing = collectorsConfigService.get();
 
-        final CollectorsConfig.Builder configBuilder;
-        if (existing.isEmpty()) {
-            configBuilder = request.applyTo(CollectorsConfig.builder());
-            if (isCloud) {
-                // The ingest endpoint is server-provisioned in Cloud; ignore any client-supplied hostname/port.
-                configBuilder.http(new IngestEndpointConfig(derivedHostname(requestContext), CollectorsConfig.DEFAULT_HTTP_PORT));
-            }
+        final Duration effectiveOffline = request.collectorOfflineThreshold() != null
+                ? request.collectorOfflineThreshold() : CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD;
+        final Duration effectiveVisibility = request.collectorDefaultVisibilityThreshold() != null
+                ? request.collectorDefaultVisibilityThreshold() : CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD;
+        final Duration effectiveExpiration = request.collectorExpirationThreshold() != null
+                ? request.collectorExpirationThreshold() : CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD;
+        final Duration effectiveRetention = request.collectorTransactionLogRetentionThreshold() != null
+                ? request.collectorTransactionLogRetentionThreshold()
+                : existing.map(CollectorsConfig::collectorTransactionLogRetentionThreshold)
+                .orElse(CollectorsConfig.DEFAULT_COLLECTOR_TRANSACTION_LOG_RETENTION);
+
+        final TokenSigningKey tokenSigningKey;
+        final CollectorCaService.CaHierarchy caHierarchy;
+        if (existing.isPresent()) {
+            tokenSigningKey = existing.get().tokenSigningKey();
+            caHierarchy = collectorCaService.loadHierarchy();
         } else {
-            configBuilder = request.applyTo(existing.get().toBuilder());
-            if (isCloud) {
-                // Keep the server-provisioned endpoint; thresholds are the only thing a Cloud tenant may change.
-                configBuilder.http(existing.get().http());
+            caHierarchy = collectorCaService.initializeCa();
+            try {
+                tokenSigningKey = enrollmentTokenService.createTokenSigningKey();
+            } catch (Exception e) {
+                throw new InternalServerErrorException("Could not create token signing key", e);
             }
         }
 
-        final var validatedConfig = validateThresholds(configBuilder.build());
+        final var config = CollectorsConfig.builder()
+                .caCertId(caHierarchy.caCert().id())
+                .signingCertId(caHierarchy.signingCert().id())
+                .tokenSigningKey(tokenSigningKey)
+                .otlpServerCertId(caHierarchy.otlpServerCert().id())
+                .http(request.http().toConfig())
+                .collectorOfflineThreshold(effectiveOffline)
+                .collectorDefaultVisibilityThreshold(effectiveVisibility)
+                .collectorExpirationThreshold(effectiveExpiration)
+                .collectorTransactionLogRetentionThreshold(effectiveRetention)
+                .build();
 
-        // Ensure the collector-logs destination (index set + stream + stream rule) is set up correctly
-        logsDestinationService.ensureExists();
-
-        // Ensure one-time bootstrapping of certs etc. so that references in the config are set
-        final var config = existing.isPresent() ? validatedConfig : collectorsInitializer.initialize(validatedConfig);
-
-        collectorsConfigService.save(config);
-
-        // No persisted ingest input exists in Cloud — the input is launched in-memory by CloudCollectorIngestService.
-        if (!isCloud && request.createInput()) {
+        if (request.createInput()) {
             collectorIngestInputService.createInput(getSubject(), getCurrentUser().getName(), request.http().port());
         }
+
+        collectorsConfigService.save(config);
 
         // TODO: We should probably compare the existing and new config to avoid the marker for unrelated changes.
         final var fleetIds = fleetService.getAllFleetIds();
@@ -192,17 +197,11 @@ public class CollectorsConfigResource extends RestResource {
         return config;
     }
 
-    private String derivedHostname(ContainerRequestContext requestContext) {
-        final var host = RestTools.buildExternalUri(requestContext.getHeaders(), httpExternalUri).getHost();
-        // In Cloud the ingest endpoint is exposed under an "ingest-"-prefixed hostname (same scheme the forwarder
-        // ingest endpoint uses).
-        return isCloud ? "ingest-" + host : host;
-    }
-
-    private CollectorsConfig validateThresholds(CollectorsConfig config) throws ValidationException {
-        final Duration offlineThreshold = config.collectorOfflineThreshold();
-        final Duration visibilityThreshold = config.collectorDefaultVisibilityThreshold();
-        final Duration expirationThreshold = config.collectorExpirationThreshold();
+    private void validateThresholds(CollectorsConfigRequest request) throws ValidationException {
+        final Duration offlineThreshold = request.collectorOfflineThreshold();
+        final Duration visibilityThreshold = request.collectorDefaultVisibilityThreshold();
+        final Duration expirationThreshold = request.collectorExpirationThreshold();
+        final Duration retentionThreshold = request.collectorTransactionLogRetentionThreshold();
         final Map<String, List<ValidationResult>> errors = new HashMap<>();
 
         if (offlineThreshold != null && (offlineThreshold.isZero() || offlineThreshold.isNegative())) {
@@ -215,6 +214,10 @@ public class CollectorsConfigResource extends RestResource {
         }
         if (expirationThreshold != null && (expirationThreshold.isZero() || expirationThreshold.isNegative())) {
             errors.computeIfAbsent("collector_expiration_threshold", k -> new ArrayList<>())
+                    .add(new ValidationResult.ValidationFailed("Must be a positive duration"));
+        }
+        if (retentionThreshold != null && (retentionThreshold.isZero() || retentionThreshold.isNegative())) {
+            errors.computeIfAbsent("collector_transaction_log_retention_threshold", k -> new ArrayList<>())
                     .add(new ValidationResult.ValidationFailed("Must be a positive duration"));
         }
 
@@ -246,10 +249,17 @@ public class CollectorsConfigResource extends RestResource {
                                     formatDurationWords(effectiveVisibility.toMillis(), true, true))));
         }
 
+        final Duration effectiveRetention = retentionThreshold != null
+                ? retentionThreshold : CollectorsConfig.DEFAULT_COLLECTOR_TRANSACTION_LOG_RETENTION;
+        if (effectiveRetention.minus(effectiveExpiration).isNegative()) {
+            errors.computeIfAbsent("collector_transaction_log_retention_threshold", k -> new ArrayList<>())
+                    .add(new ValidationResult.ValidationFailed(
+                            f("Must be greater than or equal to the expiration threshold (%s)",
+                                    formatDurationWords(effectiveExpiration.toMillis(), true, true))));
+        }
+
         if (!errors.isEmpty()) {
             throw new ValidationException(errors);
         }
-
-        return config;
     }
 }
