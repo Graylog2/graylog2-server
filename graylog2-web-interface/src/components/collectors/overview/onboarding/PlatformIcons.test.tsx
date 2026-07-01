@@ -14,19 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.onboarding.audit;
+import * as React from 'react';
+import { render, screen } from 'wrappedTestingLibrary';
 
-import org.graylog2.audit.PluginAuditEventTypes;
+import PlatformIcons from './PlatformIcons';
 
-import java.util.Set;
+describe('PlatformIcons', () => {
+  it('renders an icon for each supported platform', () => {
+    render(<PlatformIcons />);
 
-public class OnboardingAuditEventTypes implements PluginAuditEventTypes {
-    private static final String NAMESPACE = "onboarding";
-
-    public static final String ONBOARDING_DISMISSED = NAMESPACE + ":status:dismissed";
-
-    @Override
-    public Set<String> auditEventTypes() {
-        return Set.of(ONBOARDING_DISMISSED);
-    }
-}
+    ['Linux', 'Windows', 'macOS', 'Kubernetes', 'Docker'].forEach((label) => {
+      expect(screen.getByTitle(label)).toBeInTheDocument();
+    });
+  });
+});

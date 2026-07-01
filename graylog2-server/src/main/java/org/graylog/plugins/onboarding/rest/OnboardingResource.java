@@ -17,7 +17,6 @@
 package org.graylog.plugins.onboarding.rest;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,10 +24,8 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.onboarding.OnboardingState;
@@ -39,8 +36,6 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-
-import java.util.Locale;
 
 @Tag(name = "Onboarding", description = "Manages the onboarding process state")
 @Path("/onboarding")
@@ -72,24 +67,15 @@ public class OnboardingResource extends RestResource {
     }
 
     @PUT
-    @Path("/{status}")
-    @AuditEvent(type = OnboardingAuditEventTypes.ONBOARDING_STATUS_UPDATE)
+    @Path("/dismiss")
+    @AuditEvent(type = OnboardingAuditEventTypes.ONBOARDING_DISMISSED)
     @Operation(summary = "Update onboarding status")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Updated onboarding status"),
             @ApiResponse(responseCode = "400", description = "Bad request, illegal status value")
     })
     @RequiresPermissions(RestPermissions.CLUSTER_CONFIG_ENTRY_EDIT)
-    public Response update(@Parameter(name = "status", required = true) @PathParam("status") final String status) {
-        try {
-            clusterConfigService.write(
-                    new OnboardingState(
-                            OnboardingStatus.valueOf(status.toUpperCase(Locale.ROOT))
-                    )
-            );
-            return Response.ok().build();
-        } catch (IllegalArgumentException e) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
+    public void dismiss() {
+        clusterConfigService.write(new OnboardingState(OnboardingStatus.DISMISSED));
     }
 }
