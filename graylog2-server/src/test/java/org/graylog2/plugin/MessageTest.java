@@ -502,6 +502,41 @@ public class MessageTest {
     }
 
     @Test
+    public void messagesAreAccountedByDefaultButCanBeCreatedExcluded() {
+        final Message accounted = new Message("1234567890", "12345", Tools.nowUTC());
+        assertThat(accounted.isAccounted()).isTrue();
+
+        final Message excluded = new Message("1234567890", "12345", Tools.nowUTC(), false);
+        assertThat(excluded.isAccounted()).isFalse();
+    }
+
+    @Test
+    public void unaccountedMessageReportsZeroSize() {
+        // getSize() (also stored as gl2_accounted_message_size) is 0 for an unaccounted message,
+        // while an accounted message reports its real field size.
+        final Message accounted = new Message("1234567890", "12345", Tools.nowUTC());
+        final Message unaccounted = new Message("1234567890", "12345", Tools.nowUTC(), false);
+
+        assertThat(accounted.getSize()).isGreaterThan(0L);
+        assertThat(unaccounted.getSize()).isZero();
+    }
+
+    @Test
+    public void getInputMessageSizeReturnsRecordedFieldValue() {
+        final Message message = new Message("1234567890", "12345", Tools.nowUTC());
+        message.addField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, 500L);
+
+        assertThat(message.getInputMessageSize()).isEqualTo(500L);
+    }
+
+    @Test
+    public void getInputMessageSizeFallsBackToGetSizeWhenNotRecorded() {
+        final Message message = new Message("1234567890", "12345", Tools.nowUTC());
+
+        assertThat(message.getInputMessageSize()).isEqualTo(message.getSize());
+    }
+
+    @Test
     public void testMessageSizeIgnoresIlluminateFields() {
         final Message message = new Message("1234567890", "12345", Tools.nowUTC());
         assertThat(message.getSize()).isEqualTo(45);
