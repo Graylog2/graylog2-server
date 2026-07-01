@@ -24,6 +24,7 @@ import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.OutdatedIndex;
 import org.graylog2.indexer.indices.OutdatedIndexService;
+import org.graylog2.indexer.indices.ReindexOutdatedIndexJobHandler;
 import org.graylog2.security.WithAuthorization;
 import org.graylog2.security.WithAuthorizationExtension;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -54,6 +57,9 @@ class IndicesResourceTest {
 
     @Mock
     OutdatedIndexService outdatedIndexService;
+
+    @Mock
+    ReindexOutdatedIndexJobHandler reindexOutdatedIndexJobHandler;
 
     @InjectMocks
     IndicesResource indicesResource;
@@ -87,7 +93,8 @@ class IndicesResourceTest {
     void reindexSucceeds() {
         when(outdatedIndexService.getOutdatedIndices()).thenReturn(List.of(new OutdatedIndex(".outdated1", "1.3.0", false, false)));
         indicesResource.reindex(".outdated1", true);
-        verify(outdatedIndexService, times(1)).reindex(".outdated1", true);
+        // Reindex is now started asynchronously via the job handler instead of being run synchronously.
+        verify(reindexOutdatedIndexJobHandler, times(1)).start(eq(".outdated1"), eq(true), anyString());
     }
 
 }

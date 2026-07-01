@@ -37,8 +37,11 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.scheduler.JobTriggerDto;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -49,6 +52,7 @@ import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.OutdatedIndex;
 import org.graylog2.indexer.indices.OutdatedIndexService;
+import org.graylog2.indexer.indices.ReindexOutdatedIndexJobHandler;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.indices.util.NumberBasedIndexNameComparator;
@@ -83,13 +87,17 @@ public class IndicesResource extends RestResource {
     private final NodeInfoCache nodeInfoCache;
     private final IndexSetRegistry indexSetRegistry;
     private final OutdatedIndexService outdatedIndexService;
+    private final ReindexOutdatedIndexJobHandler reindexOutdatedIndexJobHandler;
 
     @Inject
-    public IndicesResource(Indices indices, NodeInfoCache nodeInfoCache, IndexSetRegistry indexSetRegistry, OutdatedIndexService outdatedIndexService) {
+    public IndicesResource(Indices indices, NodeInfoCache nodeInfoCache, IndexSetRegistry indexSetRegistry,
+                           OutdatedIndexService outdatedIndexService,
+                           ReindexOutdatedIndexJobHandler reindexOutdatedIndexJobHandler) {
         this.indices = indices;
         this.nodeInfoCache = nodeInfoCache;
         this.indexSetRegistry = indexSetRegistry;
         this.outdatedIndexService = outdatedIndexService;
+        this.reindexOutdatedIndexJobHandler = reindexOutdatedIndexJobHandler;
     }
 
     @GET
@@ -330,13 +338,21 @@ public class IndicesResource extends RestResource {
     @RequiresPermissions(RestPermissions.INDICES_REINDEX)
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.ES_INDEX_REINDEX)
-    public void reindex(@Parameter(name = "index") @PathParam("index") @NotNull String index,
-                        @Parameter(name = "withReplication") @QueryParam("withReplication") @DefaultValue("true") boolean withReplication) {
+    public Response reindex(@Parameter(name = "index") @PathParam("index") @NotNull String index,
+                            @Parameter(name = "withReplication") @QueryParam("withReplication") @DefaultValue("true") boolean withReplication) {
         OutdatedIndex outdatedIndex = getOutdatedIndices().stream()
                 .filter(OutdatedIndex::isSystemIndex)
                 .filter(i -> i.indexName().equals(index))
                 .findAny().orElseThrow(() -> new NotFoundException("Index " + index + " not found or is no system index"));
-        outdatedIndexService.reindex(outdatedIndex.indexName(), withReplication);
+        final String triggeredBy = String.valueOf(SecurityUtils.getSubject().getPrincipal());
+        try {
+            final JobTriggerDto trigger = reindexOutdatedIndexJobHandler.start(outdatedIndex.indexName(), withReplication, triggeredBy);
+            return Response.status(Response.Status.CREATED).entity(trigger).build();
+        } catch (IllegalStateException e) {
+            return Response.status(Response.Status.CONFLICT)
+                    .entity(Map.of("error", e.getMessage()))
+                    .build();
+        }
     }
 
     @DELETE
