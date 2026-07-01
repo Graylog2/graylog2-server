@@ -15,11 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import useProductName from 'brand-customization/useProductName';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import LinkContainer from 'components/common/LinkContainer';
+import ConfirmDialog from 'components/common/ConfirmDialog';
 import { Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import PlatformIcons from 'components/collectors/overview/onboarding/PlatformIcons';
@@ -81,17 +83,33 @@ const BoxActions = styled.div(
 const FirstUseWelcome = () => {
   const productName = useProductName();
   const { mutate: dismiss } = useDismissOnboarding();
+  const [showDismissConfirm, setShowDismissConfirm] = useState(false);
 
   return (
     <>
-      <PageHeader title={`Welcome to ${productName}!`}>
+      <ConfirmDialog
+        show={showDismissConfirm}
+        title="Dismiss onboarding for everyone?"
+        btnConfirmText="Dismiss for everyone"
+        onConfirm={() => {
+          dismiss();
+          setShowDismissConfirm(false);
+        }}
+        onCancel={() => setShowDismissConfirm(false)}>
+        This turns off the guided onboarding and shows the default welcome page instead for <strong>every user</strong>{' '}
+        of this installation.
+      </ConfirmDialog>
+      <PageHeader
+        title={`Welcome to ${productName}!`}
+        topActions={
+          <Button bsStyle="link" onClick={() => setShowDismissConfirm(true)}>
+            Dismiss
+          </Button>
+        }>
         <span>
           {productName} connects to dozens of sources; servers, firewalls, cloud apps, and more.{' '}
           <strong>Where would you like to start?</strong>
         </span>
-        <Button bsStyle="link" onClick={() => dismiss()}>
-          Dismiss
-        </Button>
       </PageHeader>
       <ActionsSection>
         <StyledSectionComponent title="Endpoint Logging">

@@ -16,8 +16,22 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
+
+import { asMock } from 'helpers/mocking';
+import useDismissOnboarding from 'components/welcome/hooks/useDismissOnboarding';
 
 import FirstUseWelcome from './FirstUseWelcome';
+
+jest.mock('components/welcome/hooks/useDismissOnboarding');
+
+const mockDismiss = jest.fn();
+
+beforeEach(() => {
+  asMock(useDismissOnboarding).mockReturnValue({ mutate: mockDismiss } as unknown as ReturnType<
+    typeof useDismissOnboarding
+  >);
+});
 
 describe('FirstUseWelcome', () => {
   it('links the "Set up Collector" button to the collectors overview', async () => {
@@ -48,5 +62,23 @@ describe('FirstUseWelcome', () => {
 
     expect(screen.getByTitle('Google')).toBeInTheDocument();
     expect(screen.getByTitle('AWS')).toBeInTheDocument();
+  });
+
+  it('asks for confirmation before dismissing the onboarding', async () => {
+    render(<FirstUseWelcome />);
+
+    await userEvent.click(screen.getByRole('button', { name: 'Dismiss' }));
+
+    expect(await screen.findByRole('button', { name: /Dismiss for everyone/i })).toBeInTheDocument();
+    expect(mockDismiss).not.toHaveBeenCalled();
+  });
+
+  it('dismisses the onboarding after confirming', async () => {
+    render(<FirstUseWelcome />);
+
+    await userEvent.click(screen.getByRole('button', { name: 'Dismiss' }));
+    await userEvent.click(await screen.findByRole('button', { name: /Dismiss for everyone/i }));
+
+    expect(mockDismiss).toHaveBeenCalledTimes(1);
   });
 });

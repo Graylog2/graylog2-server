@@ -23,10 +23,10 @@ import java.util.Set;
 public class OnboardingAuditEventTypes implements PluginAuditEventTypes {
     private static final String NAMESPACE = "onboarding";
 
-    public static final String ONBOARDING_STATUS_UPDATE = NAMESPACE + ":status:update";
+    public static final String ONBOARDING_DISMISSED = NAMESPACE + ":status:dismissed";
 
     @Override
     public Set<String> auditEventTypes() {
-        return Set.of(ONBOARDING_STATUS_UPDATE);
+        return Set.of(ONBOARDING_DISMISSED);
     }
 }

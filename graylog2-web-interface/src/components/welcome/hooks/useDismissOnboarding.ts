@@ -16,10 +16,12 @@
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import { Onboarding } from '@graylog/server-api';
+
 import { ONBOARDING_ELIGIBILITY_QUERY_KEY } from './useOnboardingEligibility';
 
 // TODO: Replace with a real backend call once the dismiss endpoint exists.
-const dismissOnboarding = (): Promise<void> => Promise.resolve();
+const dismissOnboarding = () => Onboarding.dismiss();
 
 const useDismissOnboarding = () => {
   const queryClient = useQueryClient();
