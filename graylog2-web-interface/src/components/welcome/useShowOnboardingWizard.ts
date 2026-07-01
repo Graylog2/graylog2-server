@@ -24,7 +24,7 @@ type ShowOnboardingWizard = 'LOADING' | 'SHOW' | 'FINISHED' | 'WAIT_FOR_ADMIN';
 const useShowOnboardingWizard = (): ShowOnboardingWizard => {
   const onboardingEnabled = useFeature('onboarding_experience');
   const { data, isLoading } = useOnboardingEligibility(onboardingEnabled);
-  const firstUse = onboardingEnabled && data?.eligible;
+  const firstUse = onboardingEnabled && data?.status === 'setup';
   const { isAnyPermitted } = usePermissions();
   const isPermitted = isAnyPermitted(REQUIRED_PERMISSIONS);
 

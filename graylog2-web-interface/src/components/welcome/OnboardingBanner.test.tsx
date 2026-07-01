@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import userEvent from '@testing-library/user-event';
 import Immutable from 'immutable';
 import type { Permission } from 'graylog-web-plugin/plugin';
 
@@ -24,13 +23,11 @@ import OnboardingBanner from 'components/welcome/OnboardingBanner';
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useOnboardingEligibility from 'components/welcome/hooks/useOnboardingEligibility';
-import useDismissOnboarding from 'components/welcome/hooks/useDismissOnboarding';
 import { adminUser } from 'fixtures/users';
 import type User from 'logic/users/User';
 
 jest.mock('hooks/useCurrentUser');
 jest.mock('components/welcome/hooks/useOnboardingEligibility');
-jest.mock('components/welcome/hooks/useDismissOnboarding');
 
 const userWithPermissions = (permissions: Array<string>): User =>
   adminUser
@@ -38,81 +35,41 @@ const userWithPermissions = (permissions: Array<string>): User =>
     .permissions(Immutable.List(permissions as Array<Permission>))
     .build();
 
-const mockDismiss = jest.fn();
-
-const ACTIONABLE_MESSAGE = /Graylog is not currently receiving any log data\. Click/i;
 const CONTACT_ADMIN_MESSAGE = /please contact an administrator so they can begin setting up ingestion/i;
 
 beforeEach(() => {
-  asMock(useCurrentUser).mockReturnValue(adminUser);
-  asMock(useOnboardingEligibility).mockReturnValue({ data: { eligible: true }, isLoading: false });
-  asMock(useDismissOnboarding).mockReturnValue({ mutate: mockDismiss } as unknown as ReturnType<
-    typeof useDismissOnboarding
-  >);
+  asMock(useCurrentUser).mockReturnValue(userWithPermissions(['inputs:read']));
+  asMock(useOnboardingEligibility).mockReturnValue({ data: { status: 'setup' }, isLoading: false });
 });
 
 describe('OnboardingBanner', () => {
-  it('renders no message while eligibility is loading', () => {
-    asMock(useOnboardingEligibility).mockReturnValue({ data: undefined, isLoading: true });
-
+  it('shows the contact-admin message when the user is not permitted and setup is pending', () => {
     render(<OnboardingBanner />);
 
-    expect(screen.queryByText(ACTIONABLE_MESSAGE)).not.toBeInTheDocument();
-    expect(screen.queryByText(CONTACT_ADMIN_MESSAGE)).not.toBeInTheDocument();
+    expect(screen.getByText(CONTACT_ADMIN_MESSAGE)).toBeInTheDocument();
   });
 
-  it('renders no message when the system is not eligible', () => {
-    asMock(useOnboardingEligibility).mockReturnValue({ data: { eligible: false }, isLoading: false });
-
-    render(<OnboardingBanner />);
-
-    expect(screen.queryByText(ACTIONABLE_MESSAGE)).not.toBeInTheDocument();
-    expect(screen.queryByText(CONTACT_ADMIN_MESSAGE)).not.toBeInTheDocument();
-  });
-
-  it('shows the actionable message to a permitted user', async () => {
-    asMock(useCurrentUser).mockReturnValue(userWithPermissions(['inputs:create', 'collectors:create']));
-
-    render(<OnboardingBanner />);
-
-    await screen.findByText(ACTIONABLE_MESSAGE);
-    expect(screen.queryByText(CONTACT_ADMIN_MESSAGE)).not.toBeInTheDocument();
-  });
-
-  it('treats the required permissions as OR (any one qualifies)', async () => {
+  it('treats the required permissions as OR (any one qualifies to hide the message)', () => {
     asMock(useCurrentUser).mockReturnValue(userWithPermissions(['collectors:create']));
 
     render(<OnboardingBanner />);
 
-    await screen.findByText(ACTIONABLE_MESSAGE);
+    expect(screen.queryByText(CONTACT_ADMIN_MESSAGE)).not.toBeInTheDocument();
   });
 
-  it('opens the ingestion setup modal when clicking the link', async () => {
-    asMock(useCurrentUser).mockReturnValue(userWithPermissions(['inputs:create']));
+  it('renders nothing when the onboarding status is not "setup"', () => {
+    asMock(useOnboardingEligibility).mockReturnValue({ data: { status: 'finished' }, isLoading: false });
 
     render(<OnboardingBanner />);
 
-    await userEvent.click(await screen.findByRole('button', { name: /here/i }));
-
-    await screen.findByText(/coming soon/i);
+    expect(screen.queryByText(CONTACT_ADMIN_MESSAGE)).not.toBeInTheDocument();
   });
 
-  it('dismisses the banner via the close button', async () => {
-    asMock(useCurrentUser).mockReturnValue(userWithPermissions(['inputs:create']));
+  it('renders nothing while eligibility is loading', () => {
+    asMock(useOnboardingEligibility).mockReturnValue({ data: undefined, isLoading: true });
 
     render(<OnboardingBanner />);
 
-    await userEvent.click(await screen.findByRole('button', { name: /close alert/i }));
-
-    expect(mockDismiss).toHaveBeenCalledTimes(1);
-  });
-
-  it('shows the contact-admin message to a user without the required permissions', async () => {
-    asMock(useCurrentUser).mockReturnValue(userWithPermissions(['inputs:read']));
-
-    render(<OnboardingBanner />);
-
-    await screen.findByText(CONTACT_ADMIN_MESSAGE);
-    expect(screen.queryByText(ACTIONABLE_MESSAGE)).not.toBeInTheDocument();
+    expect(screen.queryByText(CONTACT_ADMIN_MESSAGE)).not.toBeInTheDocument();
   });
 });

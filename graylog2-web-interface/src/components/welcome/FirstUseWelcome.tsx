@@ -24,6 +24,7 @@ import { Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import PlatformIcons from 'components/collectors/overview/onboarding/PlatformIcons';
 
+import useDismissOnboarding from './hooks/useDismissOnboarding';
 import DataSourceIcons from './DataSourceIcons';
 
 import PageHeader from '../common/PageHeader';
@@ -79,6 +80,7 @@ const BoxActions = styled.div(
 
 const FirstUseWelcome = () => {
   const productName = useProductName();
+  const { mutate: dismiss } = useDismissOnboarding();
 
   return (
     <>
@@ -87,6 +89,9 @@ const FirstUseWelcome = () => {
           {productName} connects to dozens of sources; servers, firewalls, cloud apps, and more.{' '}
           <strong>Where would you like to start?</strong>
         </span>
+        <Button bsStyle="link" onClick={() => dismiss()}>
+          Dismiss
+        </Button>
       </PageHeader>
       <ActionsSection>
         <StyledSectionComponent title="Endpoint Logging">

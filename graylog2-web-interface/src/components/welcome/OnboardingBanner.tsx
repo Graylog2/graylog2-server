@@ -15,37 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
-import styled from 'styled-components';
 
-import { Alert, Button } from 'components/bootstrap';
+import { Alert } from 'components/bootstrap';
 import useProductName from 'brand-customization/useProductName';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { isAnyPermitted } from 'util/PermissionsMixin';
 import { REQUIRED_PERMISSIONS } from 'components/welcome/Constants';
 
-import IngestionSetupModal from './IngestionSetupModal';
 import useOnboardingEligibility from './hooks/useOnboardingEligibility';
-import useDismissOnboarding from './hooks/useDismissOnboarding';
-
-// Inline link button that matches the surrounding sentence instead of using a button-sized font.
-const InlineLink = styled(Button)`
-  font-size: inherit;
-  vertical-align: baseline;
-`;
 
 const OnboardingBanner = () => {
   const productName = useProductName();
   const { permissions } = useCurrentUser();
-  const { data, isLoading } = useOnboardingEligibility();
-  const { mutate: dismiss } = useDismissOnboarding();
-  const [showSetupModal, setShowSetupModal] = useState(false);
+  const { data } = useOnboardingEligibility();
 
-  if (isLoading || !data?.eligible) {
-    return null;
-  }
-
-  if (!isAnyPermitted(permissions, REQUIRED_PERMISSIONS)) {
+  if (!isAnyPermitted(permissions, REQUIRED_PERMISSIONS) && data?.status === 'setup') {
     return (
       <Alert bsStyle="info">
         {productName} is not currently receiving any log data - please contact an administrator so they can begin
@@ -54,18 +38,7 @@ const OnboardingBanner = () => {
     );
   }
 
-  return (
-    <>
-      <Alert bsStyle="info" onDismiss={dismiss}>
-        {productName} is not currently receiving any log data. Click{' '}
-        <InlineLink bsStyle="link" onClick={() => setShowSetupModal(true)}>
-          here
-        </InlineLink>{' '}
-        to set up ingestion.
-      </Alert>
-      <IngestionSetupModal show={showSetupModal} onHide={() => setShowSetupModal(false)} />
-    </>
-  );
+  return null;
 };
 
 export default OnboardingBanner;
