@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState} from 'react';
 import { Formik, Form } from 'formik';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
@@ -78,6 +78,7 @@ const CollectorsSettings = () => {
   const { data: inputStates } = useInputsStates({ enabled: collectorInputIds.length > 0 });
 
   const isCloud = AppConfig.isCloud();
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
 
   const canCreateInputs = isPermitted(currentUser?.permissions, [
     'inputs:create',
@@ -295,8 +296,13 @@ const CollectorsSettings = () => {
                     )}
                   </>
                 )}
+
+                  <button type="button" onClick={() => setShowAdvancedSettings(prev => !prev)} style={{ background: "none", border: "none", padding: 0, color: "#06c", textDecoration: "underline", cursor: "pointer", marginBottom: "1rem" }}>
+                    {showAdvancedSettings ? "<<< Hide advanced settings" : "Show advanced settings >>>"}
+                  </button>
               </Col>
 
+              {showAdvancedSettings && (
               <Col md={6}>
                 <SectionTitle>Collector Lifecycle</SectionTitle>
 
@@ -360,12 +366,13 @@ const CollectorsSettings = () => {
                   }
                 />
               </Col>
+                )}
 
               <Col md={12}>
                 <FormSubmit
                   isAsyncSubmit
-                  submitButtonText="Update settings"
-                  submitLoadingText="Updating..."
+                  submitButtonText="Confirm settings"
+                  submitLoadingText="Saving..."
                   isSubmitting={isSubmitting}
                   displayCancel={false}
                 />
