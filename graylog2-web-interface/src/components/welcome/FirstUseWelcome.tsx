@@ -22,6 +22,7 @@ import useProductName from 'brand-customization/useProductName';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import LinkContainer from 'components/common/LinkContainer';
 import ConfirmDialog from 'components/common/ConfirmDialog';
+import { Card } from 'components/common';
 import { Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import PlatformIcons from 'components/collectors/overview/onboarding/PlatformIcons';
@@ -64,6 +65,36 @@ const Section = styled.div`
 const Resources = styled.h3`
   padding-top: 2rem;
   padding-bottom: 1rem;
+`;
+
+const ResourceLink = styled.a`
+  flex: 1;
+  text-decoration: none;
+  color: inherit;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: none;
+    color: inherit;
+  }
+`;
+
+const ResourceCard = styled(Card)(
+  ({ theme }) => css`
+    height: 100%;
+    cursor: pointer;
+    background-color: ${theme.colors.global.contentBackground};
+
+    &:hover,
+    ${ResourceLink}:focus-visible & {
+      border-color: ${theme.colors.input.borderFocus};
+      box-shadow: ${theme.colors.input.boxShadow};
+    }
+  `,
+);
+
+const ResourceTitle = styled.h3`
+  margin-top: 0;
 `;
 
 const ActionsSection = styled(Section)`
@@ -141,11 +172,12 @@ const FirstUseWelcome = () => {
 
       <Section>
         {resources.map((resource) => (
-          <LinkContainer key={resource.title} to={resource.link}>
-            <StyledSectionComponent title={resource.title}>
+          <ResourceLink key={resource.title} href={resource.link} target="_blank" rel="noreferrer">
+            <ResourceCard>
+              <ResourceTitle>{resource.title}</ResourceTitle>
               <Description>{resource.description}</Description>
-            </StyledSectionComponent>
-          </LinkContainer>
+            </ResourceCard>
+          </ResourceLink>
         ))}
       </Section>
     </>

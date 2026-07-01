@@ -64,6 +64,15 @@ describe('FirstUseWelcome', () => {
     expect(screen.getByTitle('AWS')).toBeInTheDocument();
   });
 
+  it('renders resource panels as links that open in a new tab', () => {
+    render(<FirstUseWelcome />);
+
+    const link = screen.getByRole('link', { name: /Quickstart Guide/i });
+
+    expect(link).toHaveAttribute('href', 'https://www.graylog.org');
+    expect(link).toHaveAttribute('target', '_blank');
+  });
+
   it('asks for confirmation before dismissing the onboarding', async () => {
     render(<FirstUseWelcome />);
 
