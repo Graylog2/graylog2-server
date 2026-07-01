@@ -24,6 +24,8 @@ import { Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import PlatformIcons from 'components/collectors/overview/onboarding/PlatformIcons';
 
+import DataSourceIcons from './DataSourceIcons';
+
 import PageHeader from '../common/PageHeader';
 const StyledSectionComponent = styled(SectionComponent)`
   flex: 1;
@@ -64,7 +66,7 @@ const ActionsSection = styled(Section)`
   padding-top: 1rem;
 `;
 
-const EndpointActions = styled.div(
+const BoxActions = styled.div(
   ({ theme }) => css`
     display: flex;
     flex-direction: column;
@@ -81,27 +83,33 @@ const FirstUseWelcome = () => {
     <>
       <PageHeader title={`Welcome to ${productName}!`}>
         <span>
-          Graylog connects to dozens of sources; servers, firewalls, cloud apps, and more. Where would you like to
+          {productName} connects to dozens of sources; servers, firewalls, cloud apps, and more. Where would you like to
           start?
         </span>
       </PageHeader>
       <ActionsSection>
         <StyledSectionComponent title="Endpoint Logging">
           <Description>
-            Install a lightweight agent on your servers, VMs, or containers. Graylog Sidecar manages the configuration
-            automatically.
+            Install a lightweight agent on your servers, VMs, or containers. {productName} Sidecar manages the
+            configuration automatically.
           </Description>
-          <EndpointActions>
+          <BoxActions>
             <PlatformIcons />
             <LinkContainer to={Routes.SYSTEM.COLLECTORS.OVERVIEW}>
               <Button bsStyle="primary">Set up Collector</Button>
             </LinkContainer>
-          </EndpointActions>
+          </BoxActions>
         </StyledSectionComponent>
         <StyledSectionComponent title="Other Data Sources">
           <Description>
             Open a network listener that accepts logs directly over GELF, Syslog, Beats, or other protocols.
           </Description>
+          <BoxActions>
+            <DataSourceIcons />
+            <LinkContainer to={Routes.SYSTEM.INPUTS}>
+              <Button bsStyle="primary">Configure Input</Button>
+            </LinkContainer>
+          </BoxActions>
         </StyledSectionComponent>
       </ActionsSection>
 

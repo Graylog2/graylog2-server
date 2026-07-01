@@ -34,4 +34,19 @@ describe('FirstUseWelcome', () => {
     expect(screen.getByTitle('Linux')).toBeInTheDocument();
     expect(screen.getByTitle('Windows')).toBeInTheDocument();
   });
+
+  it('links the "Configure Input" button to the inputs page', async () => {
+    render(<FirstUseWelcome />);
+
+    const link = await screen.findByRole('link', { name: /Configure Input/i });
+
+    expect(link).toHaveAttribute('href', '/system/inputs');
+  });
+
+  it('shows the data source icons', () => {
+    render(<FirstUseWelcome />);
+
+    expect(screen.getByTitle('Google')).toBeInTheDocument();
+    expect(screen.getByTitle('AWS')).toBeInTheDocument();
+  });
 });
