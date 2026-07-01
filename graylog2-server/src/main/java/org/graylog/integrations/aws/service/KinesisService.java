@@ -90,7 +90,7 @@ import java.util.zip.GZIPInputStream;
  */
 public class KinesisService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AWSService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(KinesisService.class);
 
     private static final int EIGHT_BITS = 8;
     private static final int KINESIS_LIST_STREAMS_MAX_ATTEMPTS = 1000;

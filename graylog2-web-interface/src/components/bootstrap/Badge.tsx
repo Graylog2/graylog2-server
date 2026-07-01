@@ -40,9 +40,19 @@ const StyledBadge = styled(MantineBadge)<{ color: ColorVariant; size: SupportedM
     background-color: ${color};
     color: ${theme.utils.contrastingColor(color)};
 
+    /* Let the badge shrink below its content width — as a flex/grid item (min-width: 0) and
+       capped to its container (max-width: 100%) instead of Mantine's default width: fit-content.
+       Without this the badge always stays as wide as its text, so the label below never gets a
+       constrained width to truncate against. */
+    min-width: 0;
+    max-width: 100%;
+
     .mantine-Badge-label {
       font-size: ${theme.fonts.size[mapFontSize[size]]};
-      overflow: visible;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
   `,
 );
@@ -53,7 +63,7 @@ type Props = React.PropsWithChildren<{
   bsStyle?: ColorVariant;
   className?: string;
   'data-testid'?: string;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent) => void;
   onMouseEnter?: React.MouseEventHandler<HTMLElement>;
   onMouseLeave?: React.MouseEventHandler<HTMLElement>;
   role?: string;

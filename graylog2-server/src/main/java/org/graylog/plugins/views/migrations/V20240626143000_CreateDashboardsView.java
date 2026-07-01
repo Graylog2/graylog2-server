@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class V20240626143000_CreateDashboardsView extends Migration {
-    private static final Logger LOG = LoggerFactory.getLogger(V20190127111728_MigrateWidgetFormatSettings.class);
+    private static final Logger LOG = LoggerFactory.getLogger(V20240626143000_CreateDashboardsView.class);
     private static final String DASHBOARDS_COLLECTION = "dashboards";
     private final ClusterConfigService clusterConfigService;
     private final MongoConnection mongoConnection;
