@@ -28,6 +28,7 @@ import withParams from 'routing/withParams';
 import type { Input } from 'components/messageloaders/Types';
 import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
 import { fetchInput } from 'hooks/useInputs';
+import FetchError from 'logic/errors/FetchError';
 import { NodesActions } from 'stores/nodes/NodesStore';
 import { isLocalNode } from 'views/hooks/useIsLocalNode';
 import ViewsStoreProvider from 'views/stores/ViewsStoreProvider';
@@ -53,12 +54,20 @@ const useInputs = (sourceInputId: string | undefined, gl2SourceNode: string | un
   useEffect(() => {
     const fetchInputs = async () => {
       if (sourceInputId && (await isLocalNode(gl2SourceNode))) {
-        const input = await fetchInput(sourceInputId);
+        try {
+          const input = await fetchInput(sourceInputId);
 
-        if (input) {
-          const newInputs = Immutable.Map({ [input.id]: input });
+          if (input) {
+            const newInputs = Immutable.Map({ [input.id]: input });
 
-          setInputs(newInputs);
+            setInputs(newInputs);
+          }
+        } catch (e) {
+          // A missing input — a deleted one, or the in-memory collector ingest input which has no persisted
+          // record — is not an error here
+          if (!(e instanceof FetchError && e.status === 404)) {
+            throw e;
+          }
         }
       }
     };

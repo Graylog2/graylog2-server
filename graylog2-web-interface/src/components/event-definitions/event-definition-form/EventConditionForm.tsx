@@ -74,7 +74,9 @@ const EventConditionForm = ({
   const sendTelemetry = useSendTelemetry();
 
   const eventDefinitionTypes = usePluginEntities('eventDefinitionTypes');
-  const filteredDefinitionTypes = eventDefinitionTypes.filter((type) => type.useCondition());
+  const filteredDefinitionTypes = eventDefinitionTypes.filter(
+    (type) => type.useCondition() && !type.hideFromCreation,
+  );
 
   const currentConditionPlugin = useMemo(
     () => eventDefinitionTypes.find((edt) => edt.type === eventDefinition.config.type),

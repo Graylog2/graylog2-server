@@ -19,6 +19,7 @@ package org.graylog.collectors;
 import com.google.inject.Scopes;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
+import org.graylog.collectors.cloud.CloudCollectorIngestService;
 import org.graylog.collectors.config.receiver.FilelogReceiverConfig;
 import org.graylog.collectors.config.receiver.JournaldReceiverConfig;
 import org.graylog.collectors.config.receiver.WindowsEventLogReceiverConfig;
@@ -46,6 +47,7 @@ import org.graylog.collectors.rest.CollectorsActivityResource;
 import org.graylog.collectors.rest.CollectorsConfigResource;
 import org.graylog.collectors.rest.FleetResource;
 import org.graylog.collectors.rest.SourceResource;
+import org.graylog2.Configuration;
 import org.graylog2.database.SequenceTopics;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.indexer.template.IndexTemplateProvider;
@@ -57,10 +59,12 @@ public class CollectorsModule extends PluginModule {
 
     private final boolean collectorsEnabled;
     private final boolean otlpDumpEnabled;
+    private final boolean isCloud;
 
-    public CollectorsModule(FeatureFlags featureFlags) {
+    public CollectorsModule(FeatureFlags featureFlags, Configuration configuration) {
         this.collectorsEnabled = featureFlags.isOn(COLLECTORS_FLAG);
         this.otlpDumpEnabled = featureFlags.isOn(OTLP_DUMP_FLAG);
+        this.isCloud = configuration.isCloud();
     }
 
     @Override
@@ -83,6 +87,10 @@ public class CollectorsModule extends PluginModule {
         addMessageInput(CollectorIngestHttpInput.class);
         addTransport(CollectorIngestHttpTransport.NAME, CollectorIngestHttpTransport.class);
         addCodec(CollectorIngestCodec.NAME, CollectorIngestCodec.class);
+
+        if (isCloud) {
+            serviceBinder().addBinding().to(CloudCollectorIngestService.class).in(Scopes.SINGLETON);
+        }
 
         final var logRecordProcessorBinder = MapBinder.newMapBinder(binder(), String.class, LogRecordProcessor.class);
 

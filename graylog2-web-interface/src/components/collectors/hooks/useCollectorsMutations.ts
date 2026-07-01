@@ -31,6 +31,8 @@ import type { CollectorsConfigRequest, Fleet, Source } from '../types';
 type CreateSourceInput = {
   fleetId: string;
   source: Omit<Source, 'id' | 'fleet_id'>;
+  // When true, suppress the per-source success notification (e.g. bulk creation during onboarding).
+  silent?: boolean;
 };
 type UpdateSourceInput = {
   fleetId: string;
@@ -51,6 +53,9 @@ const onMutationSuccess = (message: string, invalidate: () => Promise<void>) => 
 const useCollectorsMutations = () => {
   const queryClient = useQueryClient();
 
+  // Contract: every query keyed under ['collectors'] is refetched after ANY collector mutation.
+  // Session-scoped state that must not be (e.g. the onboarding log preview's created search)
+  // lives under ONBOARDING_KEY_PREFIX instead — see useCollectorLogPreview.
   const invalidateCollectorsQueries = () => queryClient.invalidateQueries({ queryKey: ['collectors'] });
 
   const onSuccess = (message: string) => onMutationSuccess(message, invalidateCollectorsQueries);
@@ -106,8 +111,10 @@ const useCollectorsMutations = () => {
         config: { type: source.type, ...source.config },
       }) as Promise<Source>,
     onError: onMutationError('Creating source'),
-    onSuccess: (source) => {
-      UserNotification.success(`Source "${source.name}" has been created.`, 'Success!');
+    onSuccess: (source, { silent }) => {
+      if (!silent) {
+        UserNotification.success(`Source "${source.name}" has been created.`, 'Success!');
+      }
 
       return invalidateCollectorsQueries();
     },
