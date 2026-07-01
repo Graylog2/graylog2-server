@@ -22,6 +22,7 @@ const getStreamTableElements = (
   isPipelineColumnPermitted: boolean,
   extensionAttributes?: {
     attributeNames?: Array<string>;
+    defaultDisplayedAttributeNames?: Array<string>;
     attributes?: Array<Attribute>;
   },
 ) => {
@@ -36,7 +37,7 @@ const getStreamTableElements = (
       ...(isPipelineColumnPermitted ? ['pipelines'] : []),
       'outputs',
       'archiving',
-      ...(extensionAttributes?.attributeNames || []),
+      ...(extensionAttributes?.defaultDisplayedAttributeNames || []),
       'destination_filters',
       'disabled',
       'throughput',

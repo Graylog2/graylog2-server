@@ -28,6 +28,7 @@ const useStreamsOverviewExtensions = (): {
   columnRenderers: ColumnRenderersByAttribute<Stream>;
   attributes: {
     attributeNames: Array<string>;
+    defaultDisplayedAttributeNames: Array<string>;
     attributes: Array<Attribute>;
   };
   expandedSections: { [sectionName: string]: ExpandedSectionRenderer<Stream> };
@@ -49,6 +50,7 @@ const useStreamsOverviewExtensions = (): {
         ...pluginTableElements.map(({ attributeName }) => attributeName),
         ...pluggableAttributes.attributeNames,
       ],
+      defaultDisplayedAttributeNames: pluginTableElements.map(({ attributeName }) => attributeName),
       attributes: [...pluginTableElements.flatMap(({ attributes }) => attributes), ...pluggableAttributes.attributes],
     },
     expandedSections: pluggableExpandedSections,

@@ -24,13 +24,7 @@ const getEventNotificationTableElements = (pluggableAttributes?: {
     entityTableId: 'event_notifications',
     defaultPageSize: 20,
     defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
-    defaultDisplayedAttributes: [
-      'title',
-      'description',
-      'type',
-      'created_at',
-      ...(pluggableAttributes?.attributeNames || []),
-    ],
+    defaultDisplayedAttributes: ['title', 'description', 'type', 'created_at'],
     defaultColumnOrder: ['title', 'description', 'type', 'created_at', ...(pluggableAttributes?.attributeNames || [])],
   };
 
