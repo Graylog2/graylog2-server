@@ -16,41 +16,30 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import { IndexerIndices } from '@graylog/server-api';
-
+import fetch from 'logic/rest/FetchProvider';
+import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 import { defaultOnError } from 'util/conditional/onError';
+import { qualifyUrl } from 'util/URLUtils';
 
-export type OutdatedIndex = {
-  index_name: string;
-  version: string;
-  warm_index: boolean;
-  managed_index: boolean;
-  system_index: boolean;
-};
+const useCanArchive = (): boolean => {
+  const { data: license } = usePluggableLicenseCheck('/license/enterprise/archive');
+  const hasArchiveLicense = license.valid;
 
-const useOutdatedIndices = () => {
-  const {
-    data = [],
-    isError,
-    isLoading,
-    refetch,
-  } = useQuery({
-    queryKey: ['outdatedIndices'],
+  const { data: config } = useQuery({
+    queryKey: ['archive-config'],
     queryFn: () =>
       defaultOnError(
-        IndexerIndices.getOutdatedIndices() as Promise<Array<OutdatedIndex>>,
-        'Loading outdated indices failed',
-        'Could not load outdated indices',
+        fetch('GET', qualifyUrl('/plugins/org.graylog.plugins.archive/config')) as Promise<{
+          backend_id: string;
+        }>,
+        'Loading archive config failed',
+        'Could not load archive config',
       ),
+    enabled: hasArchiveLicense,
     retry: false,
   });
 
-  return {
-    data,
-    isError,
-    isLoading,
-    refetch,
-  };
+  return hasArchiveLicense && !!config?.backend_id;
 };
 
-export default useOutdatedIndices;
+export default useCanArchive;
