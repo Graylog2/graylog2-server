@@ -19,8 +19,10 @@ package org.graylog.collectors.opamp;
 import com.mongodb.client.model.Filters;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorOSType;
+import org.graylog.collectors.PendingChangesLookup;
 import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.CollectorInstanceReport;
@@ -39,6 +41,7 @@ import org.threeten.extra.MutableClock;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -800,5 +803,61 @@ class CollectorInstanceServiceTest {
                         set(CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_EXPIRES_AT, expiresAt)
                 )
         );
+    }
+
+    // --- hasPendingChangesFilter selection tests ---
+
+    @Test
+    void hasPendingChangesFilterSelectsPendingInstances() {
+        insertInstance("uid-pending-fleet", "fleet-1", 0L);   // behind its fleet's marker (max 5)
+        insertInstance("uid-pending-self", "fleet-2", 3L);    // behind its own marker (max 4)
+        insertInstance("uid-insync", "fleet-1", 5L);          // caught up with its fleet
+        insertInstance("uid-untouched", "fleet-3", 0L);       // no markers for fleet-3
+
+        final var lookup = new PendingChangesLookup(
+                Map.of("fleet-1", 5L),
+                Map.of("uid-pending-self", 4L));
+
+        assertThat(collectorUids(CollectorInstanceService.hasPendingChangesFilter(lookup)))
+                .containsExactlyInAnyOrder("uid-pending-fleet", "uid-pending-self");
+    }
+
+    @Test
+    void norOfHasPendingChangesFilterSelectsInSyncInstances() {
+        insertInstance("uid-pending-fleet", "fleet-1", 0L);
+        insertInstance("uid-insync", "fleet-1", 5L);
+        insertInstance("uid-untouched", "fleet-3", 0L);
+
+        final var lookup = new PendingChangesLookup(Map.of("fleet-1", 5L), Map.of());
+
+        assertThat(collectorUids(Filters.nor(CollectorInstanceService.hasPendingChangesFilter(lookup))))
+                .containsExactlyInAnyOrder("uid-insync", "uid-untouched");
+    }
+
+    @Test
+    void hasPendingChangesFilterWithEmptyLookupMatchesNothingAndNorMatchesAll() {
+        insertInstance("uid-1", "fleet-1", 0L);
+        insertInstance("uid-2", "fleet-2", 7L);
+
+        final var filter = CollectorInstanceService.hasPendingChangesFilter(new PendingChangesLookup(Map.of(), Map.of()));
+
+        assertThat(collectorUids(filter)).isEmpty();
+        assertThat(collectorUids(Filters.nor(filter))).containsExactlyInAnyOrder("uid-1", "uid-2");
+    }
+
+    private void insertInstance(String uid, String fleetId, long lastProcessedTxnSeq) {
+        mongoCollections.nonEntityCollection("collector_instances", Document.class)
+                .insertOne(new Document(CollectorInstanceDTO.FIELD_INSTANCE_UID, uid)
+                        .append(CollectorInstanceDTO.FIELD_FLEET_ID, fleetId)
+                        .append(CollectorInstanceDTO.FIELD_LAST_PROCESSED_TXN_SEQ, lastProcessedTxnSeq)
+                        // distinct value so the unique active_certificate_fingerprint index accepts the insert
+                        .append(CollectorInstanceDTO.FIELD_ACTIVE_CERTIFICATE_FINGERPRINT, "fp-" + uid));
+    }
+
+    private List<String> collectorUids(Bson filter) {
+        return mongoCollections.nonEntityCollection("collector_instances", Document.class)
+                .find(filter)
+                .map(doc -> doc.getString(CollectorInstanceDTO.FIELD_INSTANCE_UID))
+                .into(new ArrayList<>());
     }
 }

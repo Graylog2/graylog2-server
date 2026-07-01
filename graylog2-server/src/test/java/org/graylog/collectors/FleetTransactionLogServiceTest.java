@@ -19,6 +19,7 @@ package org.graylog.collectors;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
+import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.FleetReassignedPayload;
 import org.graylog.collectors.db.MarkerType;
 import org.graylog.collectors.db.TransactionMarker;
@@ -32,6 +33,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
@@ -103,7 +105,6 @@ class FleetTransactionLogServiceTest {
         assertThat(marker.payload()).isInstanceOf(FleetReassignedPayload.class);
         assertThat(((FleetReassignedPayload) marker.payload()).newFleetId()).isEqualTo("fleet-B");
     }
-
     @Test
     void sequenceNumbersAreMonotonicallyIncreasing() {
         long seq1 = service.appendFleetMarker("fleet-1", MarkerType.CONFIG_CHANGED);
@@ -223,5 +224,90 @@ class FleetTransactionLogServiceTest {
 
         assertThat(markers).hasSize(1);
         assertThat(markers.getFirst().type()).isEqualTo(MarkerType.CONFIG_CHANGED);
+    }
+
+    // --- pendingChangesLookup / isPending tests ---
+
+    @Test
+    void pendingChangesLookupCoversFleetAndCollectorScopes() {
+        service.appendFleetMarker("fleet-1", MarkerType.CONFIG_CHANGED);              // seq 1
+        service.appendCollectorMarker(Set.of("uid-C"), MarkerType.RESTART, null);     // seq 2
+
+        final var lookup = service.pendingChangesLookup();
+
+        assertThat(lookup.isPending(instance("uid-A", "fleet-1", 0L))).isTrue();   // pending via its fleet's marker
+        assertThat(lookup.isPending(instance("uid-B", "fleet-2", 0L))).isFalse();  // nothing targets fleet-2 or uid-B
+        assertThat(lookup.isPending(instance("uid-C", "fleet-2", 0L))).isTrue();   // pending via its own marker
+    }
+
+    @Test
+    void pendingChangesLookupHonorsEachInstancesOwnCursor() {
+        service.appendFleetMarker("fleet-1", MarkerType.CONFIG_CHANGED);              // seq 1
+        long s2 = service.appendFleetMarker("fleet-1", MarkerType.CONFIG_CHANGED);    // seq 2
+
+        final var lookup = service.pendingChangesLookup();
+
+        // same fleet, different applied cursors: only the lagging instance is pending
+        assertThat(lookup.isPending(instance("uid-A", "fleet-1", 0L))).isTrue();
+        assertThat(lookup.isPending(instance("uid-B", "fleet-1", s2))).isFalse();
+    }
+
+    @Test
+    void pendingChangesLookupTreatsMarkerAtCursorAsApplied() {
+        long s1 = service.appendFleetMarker("fleet-1", MarkerType.CONFIG_CHANGED);
+
+        final var lookup = service.pendingChangesLookup();
+
+        assertThat(lookup.isPending(instance("uid-A", "fleet-1", s1))).isFalse();
+    }
+
+    @Test
+    void pendingChangesLookupUnwindsBulkCollectorMarkers() {
+        service.appendCollectorMarker(Set.of("uid-A", "uid-B"), MarkerType.RESTART, null);
+
+        final var lookup = service.pendingChangesLookup();
+
+        assertThat(lookup.isPending(instance("uid-A", "fleet-1", 0L))).isTrue();
+        assertThat(lookup.isPending(instance("uid-B", "fleet-1", 0L))).isTrue();
+        assertThat(lookup.isPending(instance("uid-C", "fleet-1", 0L))).isFalse();
+    }
+
+    @Test
+    void pendingChangesLookupRecordsEachFleetFromBulkFleetMarkers() {
+        // a bulk marker targets both fleets; each fleet gets its own max-seq entry
+        service.appendFleetMarker(Set.of("fleet-1", "fleet-2"), MarkerType.CONFIG_CHANGED);
+
+        final var lookup = service.pendingChangesLookup();
+
+        assertThat(lookup.maxByFleetId()).containsOnlyKeys("fleet-1", "fleet-2");
+        assertThat(lookup.isPending(instance("uid-A", "fleet-1", 0L))).isTrue();
+        assertThat(lookup.isPending(instance("uid-B", "fleet-2", 0L))).isTrue();
+        assertThat(lookup.isPending(instance("uid-C", "fleet-3", 0L))).isFalse();
+    }
+
+    @Test
+    void pendingChangesLookupIsEmptyWhenNoMarkers() {
+        final var lookup = service.pendingChangesLookup();
+
+        assertThat(lookup.maxByFleetId()).isEmpty();
+        assertThat(lookup.maxByInstanceUid()).isEmpty();
+        assertThat(lookup.isPending(instance("uid-A", "fleet-1", 0L))).isFalse();
+    }
+
+    private static CollectorInstanceDTO instance(String uid, String fleetId, long lastProcessedTxnSeq) {
+        return CollectorInstanceDTO.builder()
+                .instanceUid(uid)
+                .fleetId(fleetId)
+                .lastProcessedTxnSeq(lastProcessedTxnSeq)
+                .lastSeen(Instant.EPOCH)
+                .enrolledAt(Instant.EPOCH)
+                .messageSeqNum(0L)
+                .capabilities(0L)
+                .activeCertificateFingerprint("fp-" + uid)
+                .activeCertificatePem("pem")
+                .activeCertificateExpiresAt(Instant.EPOCH)
+                .issuingCaId("ca-1")
+                .enrollmentTokenId("token-1")
+                .build();
     }
 }

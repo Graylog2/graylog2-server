@@ -52,6 +52,7 @@ const toView = (dto: ApiInstanceResponse): CollectorInstanceView => {
     hostname: (allAttributes?.['host.name'] as string) ?? null,
     os: (allAttributes?.['os.type'] as string) ?? null,
     version: (allAttributes?.['service.version'] as string) ?? null,
+    has_pending_changes: dto.has_pending_changes,
   };
 };
 
@@ -66,6 +67,7 @@ export const fetchPaginatedInstances = async (
       FiltersForQueryParams(searchParams.filters),
       searchParams.sort?.attributeId as 'instance_uid' | 'last_seen',
       searchParams.sort?.direction,
+      { requestShouldExtendSession: false },
     ).then((response) => ({
       list: response.elements.map(toView),
       pagination: response.pagination,

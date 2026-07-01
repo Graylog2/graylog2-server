@@ -72,8 +72,6 @@ import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -95,8 +93,6 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 @Consumes(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class CollectorInstancesResource extends RestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(CollectorInstancesResource.class);
-
     private static final String DEFAULT_SORT_FIELD = "last_seen";
     private static final String DEFAULT_SORT_DIRECTION = "desc";
 
@@ -117,6 +113,16 @@ public class CollectorInstancesResource extends RestResource {
                         };
                     })
                     .sortSpec(AttributeSortSpec.field(FIELD_LAST_SEEN))
+                    .build(),
+            EntityAttribute.builder().id("has_pending_changes").title("Sync")
+                    .sortable(false)
+                    .filterable(true)
+                    .filterOptions(Set.of(
+                            FilterOption.create("true", "Sync pending"),
+                            FilterOption.create("false", "In sync")
+                    ))
+                    .type(SearchQueryField.Type.BOOLEAN)
+                    .bsonFilterCreator((name, value) -> hasPendingChangesFilter((boolean) value.getValue()))
                     .build(),
             // Workaround: type(OBJECT_ID) is needed so the frontend sends identifier_type=OBJECT_ID
             // to the entity title service (POST /system/catalog/entities/titles), which converts the
@@ -171,6 +177,7 @@ public class CollectorInstancesResource extends RestResource {
     private final CollectorsConfigService collectorsConfigService;
     private final DbQueryCreator dbQueryCreator;
     private final AuditEventSender auditEventSender;
+    private final ActivityEntryMapper activityEntryMapper;
 
     @Inject
     public CollectorInstancesResource(CollectorInstanceService collectorInstanceService,
@@ -179,7 +186,8 @@ public class CollectorInstancesResource extends RestResource {
                                       ComputedFieldRegistry computedFieldRegistry,
                                       FleetTransactionLogService txnLogService,
                                       CollectorsConfigService collectorsConfigService,
-                                      AuditEventSender auditEventSender) {
+                                      AuditEventSender auditEventSender,
+                                      ActivityEntryMapper activityEntryMapper) {
         this.collectorInstanceService = collectorInstanceService;
         this.fleetService = fleetService;
         this.sourceService = sourceService;
@@ -187,6 +195,7 @@ public class CollectorInstancesResource extends RestResource {
         this.dbQueryCreator = new DbQueryCreator("hostname", ATTRIBUTES, computedFieldRegistry);
         this.collectorsConfigService = collectorsConfigService;
         this.auditEventSender = auditEventSender;
+        this.activityEntryMapper = activityEntryMapper;
     }
 
     @GET
@@ -227,6 +236,7 @@ public class CollectorInstancesResource extends RestResource {
         final Instant offlineCutoff = Instant.now().minus(offlineThreshold);
         final Bson dbQuery = dbQueryCreator.createDbQuery(filters, query);
         final var resolvedSort = DbSortResolver.resolve(ATTRIBUTES, sort, order);
+        final var pendingChangesLookup = txnLogService.pendingChangesLookup();
         final var list = collectorInstanceService.findPaginated(
                 dbQuery,
                 resolvedSort,
@@ -240,7 +250,7 @@ public class CollectorInstancesResource extends RestResource {
                 list.pagination().total(),
                 sort,
                 order,
-                list.stream().map(dto -> toResponse(dto, offlineCutoff)).toList(),
+                list.stream().map(dto -> toResponse(dto, offlineCutoff, pendingChangesLookup.isPending(dto))).toList(),
                 ATTRIBUTES,
                 DEFAULTS);
     }
@@ -262,7 +272,10 @@ public class CollectorInstancesResource extends RestResource {
         final Duration offlineThreshold = getOfflineThreshold();
         final Instant offlineCutoff = Instant.now().minus(offlineThreshold);
 
-        return toResponse(dto, offlineCutoff);
+        final var hasPendingChanges = !txnLogService.getUnprocessedMarkers(
+                dto.fleetId(), dto.instanceUid(), dto.lastProcessedTxnSeq()).isEmpty();
+
+        return toResponse(dto, offlineCutoff, hasPendingChanges);
     }
 
     @DELETE
@@ -288,6 +301,30 @@ public class CollectorInstancesResource extends RestResource {
                 "fleetId", dto.fleetId()
         ));
         return Response.noContent().build();
+    }
+
+    @GET
+    @Path("/instances/{instanceUid}/pending_changes")
+    @Timed
+    @Operation(summary = "Get pending changes that a collector has not applied yet")
+    public PendingChangesResponse instancePendingChanges(
+            @Parameter(name = "instanceUid", required = true) @PathParam("instanceUid") String instanceUid) {
+        final var collector = collectorInstanceService.findByInstanceUid(instanceUid).orElseThrow(() ->
+                new NotFoundException(f("Collector instance <%s> not found", instanceUid)));
+
+        checkPermission(CollectorsPermissions.FLEET_READ, collector.fleetId());
+
+        final var markers = txnLogService.getUnprocessedMarkers(collector.fleetId(), collector.instanceUid(),
+                collector.lastProcessedTxnSeq());
+        final var coalesced = txnLogService.coalesce(markers);
+        final var activities = activityEntryMapper.toEntries(
+                markers.stream().filter(marker -> marker.type() != MarkerType.UNKNOWN).toList(),
+                this::isPermitted);
+
+        // Any unprocessed marker (including UNKNOWN, which is excluded from `activities`) means the
+        // instance is still pending — matching the instances table's "Sync" column.
+        return new PendingChangesResponse(!markers.isEmpty(),
+                PendingChangesResponse.CoalescedActionsView.from(coalesced), activities);
     }
 
     @POST
@@ -320,7 +357,6 @@ public class CollectorInstancesResource extends RestResource {
                 .map(CollectorInstanceDTO::instanceUid)
                 .collect(Collectors.toSet());
 
-        // TODO: Show pending configuration changes per collector instance (#25341)
         txnLogService.appendCollectorMarker(
                 permittedInstanceUids,
                 MarkerType.FLEET_REASSIGNED,
@@ -336,7 +372,8 @@ public class CollectorInstancesResource extends RestResource {
         return Response.noContent().build();
     }
 
-    private static @NonNull CollectorInstanceResponse toResponse(CollectorInstanceDTO dto, Instant offlineCutoff) {
+    private static @NonNull CollectorInstanceResponse toResponse(CollectorInstanceDTO dto, Instant offlineCutoff,
+                                                                 boolean hasPendingChanges) {
         return new CollectorInstanceResponse(
                 dto.lastSeen().isBefore(offlineCutoff) ? "offline" : "online",
                 dto.instanceUid(),
@@ -349,12 +386,23 @@ public class CollectorInstancesResource extends RestResource {
                 dto.nextCertificateFingerprint().orElse(null),
                 dto.nextCertificateExpiresAt().orElse(null),
                 attributesToMap(dto.identifyingAttributes()),
-                attributesToMap(dto.nonIdentifyingAttributes())
+                attributesToMap(dto.nonIdentifyingAttributes()),
+                hasPendingChanges
         );
     }
 
     private Duration getOfflineThreshold() {
         return collectorsConfigService.getOrDefault().collectorOfflineThreshold();
+    }
+
+    /**
+     * Translates the {@code has_pending_changes} filter value into a MongoDB filter: the
+     * pending-changes filter for {@code true}, or its negation ({@code $nor}) for {@code false}
+     * (in sync).
+     */
+    private Bson hasPendingChangesFilter(boolean wantPending) {
+        final var filter = CollectorInstanceService.hasPendingChangesFilter(txnLogService.pendingChangesLookup());
+        return wantPending ? filter : Filters.nor(filter);
     }
 
     private static Map<String, Object> attributesToMap(Optional<List<Attribute>> attributes) {
