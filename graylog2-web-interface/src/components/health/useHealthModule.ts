@@ -14,12 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { useMemo } from 'react';
 import type { TreeNodeData } from '@mantine/core';
 
 import type { HealthFeature, HealthNode, HealthReport, HealthStatus } from './HealthReport.types';
 import { isHealthFeature } from './HealthReport.types';
 import { formatLeafCount } from './healthTree';
-import mockHealthReport from './mockHealthReport';
+import { getTitleOverrideFor } from './healthCheckDefinitions';
+import useHealthReport from './useHealthReport';
 
 const SYNTHETIC_ROOT_ID = 'cluster_health';
 const SYNTHETIC_ROOT_TITLE = 'Cluster Health';
@@ -41,7 +43,7 @@ type HealthModuleState = {
 
 const toTreeData = (node: HealthNode): HealthTreeDataNode => ({
   value: node.id,
-  label: node.title,
+  label: getTitleOverrideFor(node.id) ?? node.title,
   nodeProps: {
     status: node.status,
     countSummary: formatLeafCount(node),
@@ -69,7 +71,7 @@ const buildPaths = (root: HealthNode): Record<string, string[]> => {
   const paths: Record<string, string[]> = {};
 
   const visit = (node: HealthNode, parentPath: string[] = []) => {
-    const path = [...parentPath, node.title];
+    const path = [...parentPath, getTitleOverrideFor(node.id) ?? node.title];
     paths[node.id] = path;
 
     if (isHealthFeature(node)) {
@@ -99,16 +101,24 @@ const buildHealthModuleState = (report: HealthReport): HealthModuleState => {
   };
 };
 
-const HEALTH_MODULE_STATE = buildHealthModuleState(mockHealthReport);
+// Placeholder shown before the first poll resolves. The backend always answers (a synthetic all-unknown
+// cold-start report before the leader's first cycle), so this is only the brief initial-load window.
+const EMPTY_REPORT: HealthReport = { overall_status: 'unknown', generated_at: '', features: [] };
 
-const useHealthModule = (): HealthModuleState => HEALTH_MODULE_STATE;
+const useHealthModule = (): HealthModuleState => {
+  const { data } = useHealthReport();
+
+  return useMemo(() => buildHealthModuleState(data ?? EMPTY_REPORT), [data]);
+};
 
 type HealthSummary = {
   overallStatus: HealthStatus;
 };
 
-export const useHealthSummary = (): HealthSummary => ({
-  overallStatus: mockHealthReport.overall_status,
-});
+export const useHealthSummary = (): HealthSummary => {
+  const { data } = useHealthReport();
+
+  return { overallStatus: data?.overall_status ?? 'unknown' };
+};
 
 export default useHealthModule;

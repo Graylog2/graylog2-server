@@ -22,11 +22,15 @@ import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 
 import HealthModule from './HealthModule';
 import useHealthModuleVisible from './useHealthModuleVisible';
+import useHealthReport from './useHealthReport';
+import mockHealthReport from './mockHealthReport';
 
 jest.mock('./useHealthModuleVisible');
+jest.mock('./useHealthReport');
 jest.mock('hooks/usePluggableLicenseCheck');
 
 const mockedUseHealthModuleVisible = jest.mocked(useHealthModuleVisible);
+const mockedUseHealthReport = jest.mocked(useHealthReport);
 const mockedUsePluggableLicenseCheck = jest.mocked(usePluggableLicenseCheck);
 
 const licenseCheckResult = (valid: boolean): ReturnType<typeof usePluggableLicenseCheck> => ({
@@ -45,6 +49,7 @@ describe('HealthModule', () => {
   beforeEach(() => {
     mockedUseHealthModuleVisible.mockReturnValue(true);
     mockedUsePluggableLicenseCheck.mockReturnValue(licenseCheckResult(true));
+    mockedUseHealthReport.mockReturnValue({ data: mockHealthReport } as unknown as ReturnType<typeof useHealthReport>);
   });
 
   it('renders the interpretation legend by default when the synthetic root is selected', () => {
@@ -73,7 +78,7 @@ describe('HealthModule', () => {
   it('renders the full check panel when a non-healthy leaf is selected', async () => {
     render(<HealthModule />);
 
-    await clickInTree('Graylog');
+    await clickInTree('Server');
     await clickInTree('Memory');
 
     expect(screen.getByRole('heading', { name: 'Memory' })).toBeInTheDocument();
@@ -120,9 +125,9 @@ describe('HealthModule', () => {
 
     expect(within(tree).queryByText('Memory')).not.toBeInTheDocument();
 
-    await clickInTree('Graylog');
+    await clickInTree('Server');
 
-    expect(within(tree).getByText('Server')).toBeInTheDocument();
+    expect(within(tree).getByText('Node')).toBeInTheDocument();
     expect(within(tree).getByText('Memory')).toBeInTheDocument();
   });
 
@@ -131,13 +136,13 @@ describe('HealthModule', () => {
 
     const tree = screen.getByLabelText('Cluster health tree');
 
-    await clickInTree('Graylog');
+    await clickInTree('Server');
     expect(within(tree).getByText('Memory')).toBeInTheDocument();
 
-    await clickInTree('Graylog');
+    await clickInTree('Server');
 
     expect(within(tree).queryByText('Memory')).not.toBeInTheDocument();
-    expect(within(tree).queryByText('Server')).not.toBeInTheDocument();
+    expect(within(tree).queryByText('Node')).not.toBeInTheDocument();
   });
 
   it('keeps the synthetic root expanded even when toggled', async () => {
@@ -147,7 +152,7 @@ describe('HealthModule', () => {
 
     const tree = screen.getByLabelText('Cluster health tree');
 
-    expect(within(tree).getByText('Graylog')).toBeInTheDocument();
+    expect(within(tree).getByText('Server')).toBeInTheDocument();
     expect(within(tree).getByText('MongoDB')).toBeInTheDocument();
   });
 

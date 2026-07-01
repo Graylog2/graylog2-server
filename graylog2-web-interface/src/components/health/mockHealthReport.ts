@@ -21,22 +21,22 @@ const mockHealthReport: HealthReport = {
   generated_at: '2026-04-27T08:45:00Z',
   features: [
     {
-      id: 'graylog',
-      title: 'Graylog',
+      id: 'server',
+      title: 'Server',
       status: 'warning',
       children: [
         {
-          id: 'graylog.server',
-          title: 'Server',
+          id: 'server.node',
+          title: 'Node',
           status: 'warning',
           children: [
-            { id: 'graylog.server.storage', title: 'Storage', status: 'healthy', total_affected: 0 },
-            { id: 'graylog.server.cpu', title: 'CPU', status: 'healthy', total_affected: 0 },
-            { id: 'graylog.server.memory', title: 'Memory', status: 'warning', total_affected: 1, total: 3 },
-            { id: 'graylog.server.certificates', title: 'Certificates', status: 'unknown', total_affected: 0 },
-            { id: 'graylog.server.load_balancer', title: 'Load Balancer', status: 'healthy', total_affected: 0 },
+            { id: 'server.node.storage', title: 'Storage', status: 'healthy', total_affected: 0 },
+            { id: 'server.node.cpu', title: 'CPU', status: 'healthy', total_affected: 0 },
+            { id: 'server.node.memory', title: 'Memory', status: 'warning', total_affected: 1, total: 3 },
+            { id: 'server.node.certificates', title: 'Certificates', status: 'unknown', total_affected: 0 },
+            { id: 'server.node.load_balancer', title: 'Load Balancer', status: 'healthy', total_affected: 0 },
             {
-              id: 'graylog.server.processing_state',
+              id: 'server.node.processing_state',
               title: 'Processing State',
               status: 'warning',
               total_affected: 1,
@@ -45,36 +45,36 @@ const mockHealthReport: HealthReport = {
           ],
         },
         {
-          id: 'graylog.input',
+          id: 'server.input',
           title: 'Input',
           status: 'healthy',
           children: [
-            { id: 'graylog.input.input_buffer', title: 'Input Buffer', status: 'healthy', total_affected: 0 },
-            { id: 'graylog.input.input_failures', title: 'Input Failures', status: 'healthy', total_affected: 0 },
+            { id: 'server.input.input_buffer', title: 'Input Buffer', status: 'healthy', total_affected: 0 },
+            { id: 'server.input.input_failures', title: 'Input Failures', status: 'healthy', total_affected: 0 },
           ],
         },
         {
-          id: 'graylog.processing',
+          id: 'server.processing',
           title: 'Processing',
           status: 'healthy',
           children: [
             {
-              id: 'graylog.processing.processing_buffer',
+              id: 'server.processing.processing_buffer',
               title: 'Processing Buffer',
               status: 'healthy',
               total_affected: 0,
             },
-            { id: 'graylog.processing.journal_size', title: 'Journal Size', status: 'healthy', total_affected: 0 },
+            { id: 'server.processing.journal_size', title: 'Journal Size', status: 'healthy', total_affected: 0 },
           ],
         },
         {
-          id: 'graylog.output',
+          id: 'server.output',
           title: 'Output',
           status: 'healthy',
           children: [
-            { id: 'graylog.output.output_buffer', title: 'Output Buffer', status: 'healthy', total_affected: 0 },
+            { id: 'server.output.output_buffer', title: 'Output Buffer', status: 'healthy', total_affected: 0 },
             {
-              id: 'graylog.output.report_generation',
+              id: 'server.output.report_generation',
               title: 'Report Generation',
               status: 'healthy',
               total_affected: 0,
@@ -82,12 +82,12 @@ const mockHealthReport: HealthReport = {
           ],
         },
         {
-          id: 'graylog.archiving',
+          id: 'server.archiving',
           title: 'Archiving',
           status: 'healthy',
           children: [
             {
-              id: 'graylog.archiving.archive_failures',
+              id: 'server.archiving.archive_failures',
               title: 'Archive Failures',
               status: 'healthy',
               total_affected: 0,
@@ -95,22 +95,22 @@ const mockHealthReport: HealthReport = {
           ],
         },
         {
-          id: 'graylog.data_lake',
+          id: 'server.data_lake',
           title: 'Data Lake',
           status: 'healthy',
           children: [
-            { id: 'graylog.data_lake.connectivity', title: 'Connectivity', status: 'healthy', total_affected: 0 },
-            { id: 'graylog.data_lake.message_drops', title: 'Message Drops', status: 'healthy', total_affected: 0 },
+            { id: 'server.data_lake.connectivity', title: 'Connectivity', status: 'healthy', total_affected: 0 },
+            { id: 'server.data_lake.message_drops', title: 'Message Drops', status: 'healthy', total_affected: 0 },
           ],
         },
         {
-          id: 'graylog.integrations',
+          id: 'server.integrations',
           title: 'Integrations',
           status: 'healthy',
           children: [
-            { id: 'graylog.integrations.idp_sync', title: 'IdP Sync', status: 'healthy', total_affected: 0 },
+            { id: 'server.integrations.idp_sync', title: 'IdP Sync', status: 'healthy', total_affected: 0 },
             {
-              id: 'graylog.integrations.email_transport',
+              id: 'server.integrations.email_transport',
               title: 'Email Transport',
               status: 'healthy',
               total_affected: 0,

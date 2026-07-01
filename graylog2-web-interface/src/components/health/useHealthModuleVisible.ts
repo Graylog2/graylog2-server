@@ -14,15 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import useQuery from 'routing/useQuery';
+import usePermissions from 'hooks/usePermissions';
 
-export const HEALTH_QUERY_PARAM = 'health';
-export const HEALTH_ON_VALUE = 'on';
+export const HEALTH_READ_PERMISSION = 'clusterhealth:read';
 
 /**
- * Returns whether the Health module should be shown on the System Overview page.
- * Default: hidden. Add `?health=on` to the URL to show it.
+ * Returns whether the Health module (panel and nav-bar badge) should be shown. Gated on the dedicated
+ * `clusterhealth:read` permission (Decision 6); the backend endpoint enforces the same permission, so the FE and
+ * backend agree on visibility. The Enterprise-license check is applied separately by the consumers.
  */
-const useHealthModuleVisible = (): boolean => useQuery()[HEALTH_QUERY_PARAM] === HEALTH_ON_VALUE;
+const useHealthModuleVisible = (): boolean => {
+  const { isPermitted } = usePermissions();
+
+  return isPermitted(HEALTH_READ_PERMISSION);
+};
 
 export default useHealthModuleVisible;

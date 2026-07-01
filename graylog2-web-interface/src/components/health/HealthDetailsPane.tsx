@@ -23,7 +23,7 @@ import { ExternalLink, Icon, LinkContainer } from 'components/common';
 import HealthStatusIcon from './HealthStatusIcon';
 import { countContainedChecks, formatLeafCountVerbose } from './healthTree';
 import { getStatusMeta, STATUS_LABELS } from './healthStatusCopy';
-import HEALTH_CHECK_DEFINITIONS, { getEntityListFor } from './healthCheckDefinitions';
+import HEALTH_CHECK_DEFINITIONS, { getEntityListFor, getTitleOverrideFor, getUnitNounFor } from './healthCheckDefinitions';
 import type { HealthNode } from './HealthReport.types';
 import { isHealthFeature } from './HealthReport.types';
 import {
@@ -52,7 +52,7 @@ const formatCheckCount = (count: number) => `${count} check${count === 1 ? '' : 
 
 const AffectedChildButton = ({ child, tree }: { child: HealthNode; tree: ReturnType<typeof useTree> }) => {
   const childIsFeature = isHealthFeature(child);
-  const childCountSummary = formatLeafCountVerbose(child, getEntityListFor(child.id)?.label);
+  const childCountSummary = formatLeafCountVerbose(child, getUnitNounFor(child.id));
 
   const handleClick = () => {
     tree.select(child.id);
@@ -66,7 +66,7 @@ const AffectedChildButton = ({ child, tree }: { child: HealthNode; tree: ReturnT
         <HealthStatusIcon status={child.status} title={STATUS_LABELS[child.status]} />
         <ChildButtonText>
           <strong>
-            {child.title}
+            {getTitleOverrideFor(child.id) ?? child.title}
             {childCountSummary ? <ChildCountSuffix> ({childCountSummary})</ChildCountSuffix> : null}
           </strong>
           {childIsFeature ? <span>{formatCheckCount(countContainedChecks(child))}</span> : null}
@@ -98,7 +98,7 @@ const HealthDetailsPane = ({ tree, selectedNode, selectedPath }: Props) => {
   const isFeatureWithChildren = isHealthFeature(selectedNode) && selectedNode.children.length > 0;
   const isLeafNode = !isFeatureWithChildren;
   const isUnhealthy = status !== 'healthy';
-  const countSummary = formatLeafCountVerbose(selectedNode, entityList?.label);
+  const countSummary = formatLeafCountVerbose(selectedNode, getUnitNounFor(selectedNode.id));
 
   const meaning = isLeafNode && isUnhealthy ? definition?.meaning : undefined;
   const latestMessage = isUnhealthy && selectedNode.message?.trim() ? selectedNode.message : undefined;
@@ -114,7 +114,7 @@ const HealthDetailsPane = ({ tree, selectedNode, selectedPath }: Props) => {
   return (
     <DetailsPane>
       <Breadcrumbs>{selectedPath.join(' / ')}</Breadcrumbs>
-      <DetailsTitle>{selectedNode.title}</DetailsTitle>
+      <DetailsTitle>{getTitleOverrideFor(selectedNode.id) ?? selectedNode.title}</DetailsTitle>
 
       <StatusSummary>
         <HealthStatusIcon status={status} title={statusMeta.label} />

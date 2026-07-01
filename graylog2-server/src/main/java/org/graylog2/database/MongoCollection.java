@@ -40,6 +40,7 @@ import jakarta.annotation.Nullable;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -92,6 +93,18 @@ public interface MongoCollection<TDocument extends MongoEntity> {
      */
     @Nonnull
     MongoCollection<TDocument> withWriteConcern(@Nonnull WriteConcern writeConcern);
+
+    /**
+     * Create a new MongoCollection instance with a client-side operation timeout (CSOT) applied to every operation
+     * on the returned view. The timeout bounds the whole operation -- including the socket read -- so a stuck or
+     * black-holed connection fails fast instead of blocking indefinitely (the driver's default socket timeout is
+     * infinite). Useful where a caller must not block longer than a known budget, e.g. a health check.
+     *
+     * @param timeout the per-operation timeout
+     * @return a new MongoCollection instance bounded by the given timeout
+     */
+    @Nonnull
+    MongoCollection<TDocument> withTimeout(@Nonnull Duration timeout);
 
     /**
      * Counts the number of documents in the collection.
