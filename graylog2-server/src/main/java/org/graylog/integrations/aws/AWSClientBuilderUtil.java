@@ -19,6 +19,7 @@ package org.graylog.integrations.aws;
 import com.google.common.base.Preconditions;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
+import jakarta.ws.rs.BadRequestException;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.aws.AWSAsyncProxyConfigurationProvider;
 import org.graylog.aws.AWSProxyConfigurationProvider;
@@ -75,24 +76,32 @@ public class AWSClientBuilderUtil {
     }
 
     public AwsCredentialsProvider createCredentialsProvider(AWSRequest request) {
-        return authFactoryProvider.get().create(
-                configuration.isCloud(),
-                request.region(),
-                request.awsAccessKeyId(),
-                decryptSecretAccessKey(request.awsSecretAccessKey()),
-                request.assumeRoleArn());
-    }
-
-    /**
-     * Creates an AWS credentials provider with proxy support on the STS client used for assume-role.
-     */
-    public AwsCredentialsProvider createCredentialsProviderWithStsProxy(AWSRequest request) {
+        if (StringUtils.isNotBlank(request.externalId()) && StringUtils.isBlank(request.assumeRoleArn())) {
+            throw new BadRequestException("External ID can only be used when an Assume Role ARN is provided.");
+        }
         return authFactoryProvider.get().create(
                 configuration.isCloud(),
                 request.region(),
                 request.awsAccessKeyId(),
                 decryptSecretAccessKey(request.awsSecretAccessKey()),
                 request.assumeRoleArn(),
+                request.externalId());
+    }
+
+    /**
+     * Creates an AWS credentials provider with proxy support on the STS client used for assume-role.
+     */
+    public AwsCredentialsProvider createCredentialsProviderWithStsProxy(AWSRequest request) {
+        if (StringUtils.isNotBlank(request.externalId()) && StringUtils.isBlank(request.assumeRoleArn())) {
+            throw new BadRequestException("External ID can only be used when an Assume Role ARN is provided.");
+        }
+        return authFactoryProvider.get().create(
+                configuration.isCloud(),
+                request.region(),
+                request.awsAccessKeyId(),
+                decryptSecretAccessKey(request.awsSecretAccessKey()),
+                request.assumeRoleArn(),
+                request.externalId(),
                 proxyConfigurationProvider.get());
     }
 

@@ -17,6 +17,7 @@
 package org.graylog.integrations.aws;
 
 import com.google.common.base.Preconditions;
+import jakarta.ws.rs.BadRequestException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +53,16 @@ public class AWSAuthFactory {
                                          @Nullable String accessKey,
                                          @Nullable String secretKey,
                                          @Nullable String assumeRoleArn) {
-        return create(requireKeySecret, stsRegion, accessKey, secretKey, assumeRoleArn, null);
+        return create(requireKeySecret, stsRegion, accessKey, secretKey, assumeRoleArn, null, null);
+    }
+
+    public AwsCredentialsProvider create(boolean requireKeySecret,
+                                         @Nullable String stsRegion,
+                                         @Nullable String accessKey,
+                                         @Nullable String secretKey,
+                                         @Nullable String assumeRoleArn,
+                                         @Nullable String externalId) {
+        return create(requireKeySecret, stsRegion, accessKey, secretKey, assumeRoleArn, externalId, null);
     }
 
     /**
@@ -68,13 +78,35 @@ public class AWSAuthFactory {
                                          @Nullable String secretKey,
                                          @Nullable String assumeRoleArn,
                                          @Nullable ApacheHttpClient.Builder stsHttpClientBuilder) {
+        return create(requireKeySecret, stsRegion, accessKey, secretKey, assumeRoleArn, null, stsHttpClientBuilder);
+    }
+
+    /**
+     * Resolves the appropriate AWS authorization provider, optionally configuring an External ID
+     * on the STS AssumeRole request to prevent the confused deputy problem, and optionally configuring
+     * an HTTP client builder on the STS client used for assume-role.
+     *
+     * @param externalId           optional external ID to include in the AssumeRole request
+     * @param stsHttpClientBuilder optional Apache HTTP client builder (e.g. with proxy config) for the STS client
+     */
+    public AwsCredentialsProvider create(boolean requireKeySecret,
+                                         @Nullable String stsRegion,
+                                         @Nullable String accessKey,
+                                         @Nullable String secretKey,
+                                         @Nullable String assumeRoleArn,
+                                         @Nullable String externalId,
+                                         @Nullable ApacheHttpClient.Builder stsHttpClientBuilder) {
         AwsCredentialsProvider awsCredentials = requireKeySecret ? getKeySecretCredentialsProvider(accessKey, secretKey) :
                 getAwsCredentialsProvider(accessKey, secretKey);
+
+        if (StringUtils.isNotBlank(externalId) && StringUtils.isBlank(assumeRoleArn)) {
+            throw new BadRequestException("External ID can only be used when an Assume Role ARN is provided.");
+        }
 
         // Apply the Assume Role ARN Authorization if specified. All AWSCredentialsProviders support this.
         if (!isNullOrEmpty(assumeRoleArn) && !isNullOrEmpty(stsRegion)) {
             LOG.debug("Creating cross account assume role credentials");
-            return buildStsCredentialsProvider(awsCredentials, stsRegion, assumeRoleArn, accessKey, stsHttpClientBuilder);
+            return buildStsCredentialsProvider(awsCredentials, stsRegion, assumeRoleArn, accessKey, externalId, stsHttpClientBuilder);
         }
 
         return awsCredentials;
@@ -104,8 +136,9 @@ public class AWSAuthFactory {
      * permission, which provides authorization for a role to be assumed.
      */
     private static AwsCredentialsProvider buildStsCredentialsProvider(AwsCredentialsProvider awsCredentials, String stsRegion,
-                                                                      String assumeRoleArn, @Nullable String accessKey,
-                                                                      @Nullable ApacheHttpClient.Builder stsHttpClientBuilder) {
+                                                                       String assumeRoleArn, @Nullable String accessKey,
+                                                                       @Nullable String externalId,
+                                                                       @Nullable ApacheHttpClient.Builder stsHttpClientBuilder) {
 
         final StsClientBuilder stsClientBuilder = StsClient.builder()
                 .region(Region.of(stsRegion))
@@ -127,10 +160,14 @@ public class AWSAuthFactory {
         }
 
         LOG.debug("Cross account role session name: " + roleSessionName);
-        return StsAssumeRoleCredentialsProvider.builder().refreshRequest(AssumeRoleRequest.builder()
-                        .roleSessionName(roleSessionName)
-                        .roleArn(assumeRoleArn)
-                        .build())
+        final AssumeRoleRequest.Builder assumeRoleRequestBuilder = AssumeRoleRequest.builder()
+                .roleSessionName(roleSessionName)
+                .roleArn(assumeRoleArn);
+        if (!isNullOrEmpty(externalId)) {
+            assumeRoleRequestBuilder.externalId(externalId);
+        }
+        return StsAssumeRoleCredentialsProvider.builder()
+                .refreshRequest(assumeRoleRequestBuilder.build())
                 .stsClient(stsClient)
                 .build();
     }

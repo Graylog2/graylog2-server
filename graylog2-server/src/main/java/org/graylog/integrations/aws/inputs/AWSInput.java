@@ -55,6 +55,7 @@ public class AWSInput extends MessageInput {
     public static final String CK_DYNAMODB_ENDPOINT = "dynamodb_endpoint";
     public static final String CK_IAM_ENDPOINT = "iam_endpoint";
     public static final String CK_KINESIS_ENDPOINT = "kinesis_endpoint";
+    public static final String CK_EXTERNAL_ID = "aws_external_id";
 
     public static final String CK_OVERRIDE_SOURCE = "override_source";
 
@@ -148,6 +149,13 @@ public class AWSInput extends MessageInput {
                     "AWS assume role ARN",
                     "",
                     "Role ARN with required permissions (cross account access)",
+                    ConfigurationField.Optional.OPTIONAL));
+
+            request.addField(new TextField(
+                    CK_EXTERNAL_ID,
+                    "AWS External ID (optional)",
+                    "",
+                    "An external ID that is required to assume the role. This prevents the confused deputy problem in cross-account scenarios.",
                     ConfigurationField.Optional.OPTIONAL));
 
             request.addField(new TextField(
