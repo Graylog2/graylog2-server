@@ -2,3 +2,4 @@ type = "fixed"
 message = "Fixed cluster traffic graph showing no history from before the 7.1 upgrade by falling back to output traffic for days without indexed input traffic data."
 
 issues = ["Graylog2/graylog-plugin-enterprise#14694"]
+pulls = ["26544"]
