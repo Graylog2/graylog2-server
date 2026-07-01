@@ -52,7 +52,7 @@ import java.util.Date;
 import java.util.Optional;
 
 public class V20230601104500_AddSourcesPageV2 extends Migration {
-    private static final Logger LOG = LoggerFactory.getLogger(V20191219090834_AddSourcesPage.class);
+    private static final Logger LOG = LoggerFactory.getLogger(V20230601104500_AddSourcesPageV2.class);
     private static final Date UNMODIFIED_SOURCES_SEARCH_DATE = new Date(1574420327255L);
 
     private final ContentPackService contentPackService;
