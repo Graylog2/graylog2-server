@@ -83,8 +83,8 @@ const FirstUseWelcome = () => {
     <>
       <PageHeader title={`Welcome to ${productName}!`}>
         <span>
-          {productName} connects to dozens of sources; servers, firewalls, cloud apps, and more. Where would you like to
-          start?
+          {productName} connects to dozens of sources; servers, firewalls, cloud apps, and more.{' '}
+          <strong>Where would you like to start?</strong>
         </span>
       </PageHeader>
       <ActionsSection>
