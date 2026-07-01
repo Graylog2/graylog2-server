@@ -14,10 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type React from 'react';
+
 import type { InputDetailsFetcher } from './useInputDetails';
+
+export type EventDefinitionQueryParameterType = {
+  type: string;
+  title: string;
+  fromJSON: (json: any) => any;
+  validate: (parameter: any) => Record<string, string | undefined>;
+  editComponent: React.ComponentType<{
+    parameter: any;
+    onChange: (key: string, value: any) => void;
+    identifier: string | number;
+    validationState?: Record<string, ['error' | 'warning' | 'success', string] | undefined>;
+  }>;
+};
 
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     inputDetailsFetchers?: Array<InputDetailsFetcher>;
+    eventDefinitionQueryParameterTypes?: Array<EventDefinitionQueryParameterType>;
   }
 }
