@@ -103,10 +103,6 @@ public class McpService {
         return McpSchema.deserializeJsonRpcMessage(protocolMapper, payload.toString());
     }
 
-    public Optional<McpSchema.Result> handle(PermissionHelper permissionHelper, McpSchema.JSONRPCRequest request, String sessionId) throws McpError {
-        return handle(permissionHelper, request, sessionId, null, McpConfiguration.DEFAULT_VALUES);
-    }
-
     public Optional<McpSchema.Result> handle(PermissionHelper permissionHelper, McpSchema.JSONRPCRequest request, String sessionId, String protocolVersion, McpConfiguration config) throws McpError {
         final AuditActor auditActor = AuditActor.user(permissionHelper.getCurrentUser().getName());
         final Map<String, Object> auditContext = Maps.newHashMap();
