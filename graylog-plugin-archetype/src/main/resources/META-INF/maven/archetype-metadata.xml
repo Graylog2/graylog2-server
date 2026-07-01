@@ -80,6 +80,7 @@
                 <include>package.json</include>
                 <include>webpack.config.js</include>
                 <include>build.config.js</include>
+                <include>.npmrc</include>
             </includes>
         </fileSet>
     </fileSets>

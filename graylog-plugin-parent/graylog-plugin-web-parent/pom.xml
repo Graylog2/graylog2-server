@@ -75,43 +75,42 @@
                         <artifactId>frontend-maven-plugin</artifactId>
                         <configuration>
                             <nodeVersion>${nodejs.version}</nodeVersion>
-                            <yarnVersion>${yarn.version}</yarnVersion>
+                            <npmVersion>${npm.version}</npmVersion>
                             <nodeDownloadRoot>https://graylog-ci-cache.s3.eu-west-1.amazonaws.com/downloads/node/</nodeDownloadRoot>
                         </configuration>
                         <executions>
                             <execution>
-                                <id>install node and yarn</id>
+                                <id>install node and npm</id>
                                 <goals>
-                                    <goal>install-node-and-yarn</goal>
+                                    <goal>install-node-and-npm</goal>
                                 </goals>
                             </execution>
 
                             <execution>
-                                <id>yarn install</id>
+                                <id>npm install</id>
                                 <phase>compile</phase>
                                 <goals>
-                                    <goal>yarn</goal>
+                                    <goal>npm</goal>
                                 </goals>
-                                <!-- Optional configuration which provides for running any npm command -->
                                 <configuration>
-                                    <arguments>install</arguments>
+                                    <arguments>ci</arguments>
                                 </configuration>
                             </execution>
                             <execution>
                                 <id>Generate backend API types</id>
                                 <phase>compile</phase>
                                 <goals>
-                                    <goal>yarn</goal>
+                                    <goal>npm</goal>
                                 </goals>
                                 <configuration>
-                                    <arguments>generate:apidefs</arguments>
+                                    <arguments>run generate:apidefs</arguments>
                                 </configuration>
                             </execution>
                             <execution>
-                                <id>yarn run build</id>
+                                <id>npm run build</id>
                                 <phase>compile</phase>
                                 <goals>
-                                    <goal>yarn</goal>
+                                    <goal>npm</goal>
                                 </goals>
                                 <configuration>
                                     <arguments>run build</arguments>

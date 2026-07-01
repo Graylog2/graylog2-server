@@ -21,10 +21,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
-      - name: Install yarn
-        run: npm install -g yarn
       - name: Install dependencies
-        run: yarn install
+        run: npm install
       - name: Updating browserslist db
         continue-on-error: true
         run: npx browserslist@latest --update-db
