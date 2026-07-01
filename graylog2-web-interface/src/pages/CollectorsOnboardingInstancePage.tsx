@@ -36,8 +36,9 @@ const CollectorsOnboardingInstancePage = () => {
   const { data: instance, isLoading, error } = useInstance(instanceUid);
   const defaultInterval = useDefaultInterval();
 
+  // using useEffect to guard that the default is actually there when we call the navigate
   useEffect(() => {
-    if (instance) {
+    if (instance && defaultInterval) {
       navigate(collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid, defaultInterval));
     }
   }, [defaultInterval, instance, navigate]);
