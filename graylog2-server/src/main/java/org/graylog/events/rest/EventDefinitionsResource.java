@@ -142,6 +142,13 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                     ))
                     .bsonFilterCreator((name, value) -> Filters.eq(name, value.getValue().toString()))
                     .build(),
+            EntityAttribute.builder().id("type").title("Type").type(SearchQueryField.Type.STRING)
+                    .dbField(EventDefinitionDto.FIELD_CONFIG + "." + EventProcessorConfig.TYPE_FIELD)
+                    // Not sortable: A DB sort on the raw config.type wouldn't match the display-name labels shown.
+                    .sortable(false)
+                    .filterable(true)
+                    .bsonFilterCreator((name, value) -> Filters.eq(name, value.getValue().toString()))
+                    .build(),
             EntityAttribute.builder().id(SourcedMongoEntityUtils.FILTERABLE_FIELD).title("Source")
                     .type(SearchQueryField.Type.STRING)
                     .sortable(false)
